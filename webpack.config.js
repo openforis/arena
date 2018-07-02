@@ -1,9 +1,9 @@
-const path                 = require('path')
-const HtmlWebpackPlugin    = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin")
-const webpack              = require('webpack')
-const uuidv4               = require('uuid/v4')
+const path                    = require('path')
+const HtmlWebpackPlugin       = require('html-webpack-plugin')
+const MiniCssExtractPlugin    = require('mini-css-extract-plugin')
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const webpack                 = require('webpack')
+const uuidv4                  = require('uuid/v4')
 
 const prodBuild = process.env.NODE_ENV === 'production'
 
@@ -29,7 +29,7 @@ const plugins = [
 ]
 
 const webPackConfig = {
-  entry  : './webapp/main.js',
+  entry  : ['babel-polyfill', './webapp/main.js'],
   output : {
     filename  : 'bundle-[hash].js',
     path      : path.resolve(__dirname, 'dist'),
@@ -80,7 +80,6 @@ if (prodBuild) {
   }
   
 } else {
-  
   webPackConfig.devtool = 'source-map'
 }
 
