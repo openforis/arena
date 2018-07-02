@@ -15,7 +15,7 @@ const compression = require('compression')
 
 const app = express()
 
-runMigrations()
+// runMigrations()
 
 // app initializations
 app.use(bodyParser.json({limit: '5000kb'}))

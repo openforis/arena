@@ -1,4 +1,3 @@
-### Node template
 # Logs
 logs
 *.log
@@ -14,7 +13,8 @@ node_modules/
 # dotenv environment variables file
 .env
 
-
-
 # output dir
 dist/
+
+# dev
+.idea/
