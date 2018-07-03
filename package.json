@@ -33,11 +33,22 @@
     "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "bluebird": "^3.5.1",
     "db-migrate": "^0.11.1",
     "dotenv": "^6.0.0",
+    "i18n": "^0.8.3",
+    "pg": "^7.4.3",
     "pg-promise": "^8.4.4",
+    "ramda": "^0.25.0",
     "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "react-redux": "^5.0.7",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
+    "redux": "^4.0.0",
+    "redux-debounced": "^0.5.0",
+    "redux-thunk": "^2.3.0",
     "uuidv4": "^1.0.1",
     "xmldom": "^0.1.27",
     "xpath": "^0.0.27"
