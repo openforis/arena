@@ -1,4 +1,4 @@
-# FRA Platform
+# OpenForis Arena - The cloud platform from OpenForis
 
 ## Prerequisites
 
