@@ -1,0 +1,31 @@
+
+//@import url('https://fonts.googleapis.com/css?family=Spectral:200,400,600,700,800');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:100,200,400,600,800,900');
+body, html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  //font: 14px/1.6 'Spectral', serif;
+  font: 14px/1.6 'Montserrat', sans-serif;
+  font-weight: 200;
+}
+
+#main {
+  height: 100%;
+}
+
+// layout
+.height100 {
+  height: 100%;
+}
+
+.justify-self-right {
+  justify-self: right;
+}
+
+.justify-self-left {
+  justify-self: left;
+}

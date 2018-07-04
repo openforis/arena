@@ -1,0 +1,176 @@
+.login__bg {
+  background-image: url("/img/landing-bg.jpg");
+  height: 100%;
+  width: 100%;
+  //background-repeat: no-repeat;
+  background-size: 100%;
+  //animation:move-twink-back 300s linear infinite;
+}
+
+.login__bg:after {
+  opacity: 0.8;
+  background: transparent;
+  background-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.25) 100%);
+  background-repeat: repeat-x;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  display: block !important;
+}
+
+@keyframes move-twink-back {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -10000px 0px;
+  }
+}
+
+.login__grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(12, 8.333333vw);
+  grid-template-rows: repeat(6, 16.6vh);
+  animation: move-twink-back 300s linear infinite;
+}
+
+$color: rgba(222, 220, 203, 0.6);
+
+
+$loginFormContainerBorderColor: rgba(50, 42, 39, .5);
+.login__form-container {
+  grid-column: span 6;
+  grid-row: span 4;
+  padding: 50px;
+  border: 3px double $loginFormContainerBorderColor;
+  //-webkit-box-shadow: -1px 101px 300px -28px $loginFormContainerBorderColor;
+  //-moz-box-shadow: -1px 101px 300px -28px $loginFormContainerBorderColor;
+  box-shadow: -1px 101px 1000px 20px $loginFormContainerBorderColor;
+  //background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.01) 2%, rgba(0,0,0,0.65) 100%);
+  //background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0.01) 2%,rgba(0,0,0,0.65) 100%);
+  //background: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(0,0,0,0.01) 2%,rgba(0,0,0,0.65) 100%);
+
+  //&:after {
+  //  background-image: linear-gradient(to top, black 0%, rgba(0, 0, 0, 0.25) 100%);
+  //}
+  //position: absolute;
+  //left: 0;
+  //top: 0;
+  /* height: 100%; */
+  //display: flex;
+  //justify-content: center;
+  //align-items: center;
+  /* width: 40%; */
+  /* height: 100vh; */
+  /* padding: 30vh 0; */
+  /* margin-left: 30%; */
+  /* margin-top: 30vh; */
+  /* background-color: #373e45; */
+  //filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=0 );
+  //height: 60vh;
+  //margin-top: 20vh;
+  //width: 50vw;
+  //margin-left: 25vw;
+  /* border: 50px springgreen; */
+  //border: 50% 50%;
+  /* border: 55px solid rgba(150, 144, 141, .2); */
+  /* border-radius: 10px; */
+}
+
+.login__form {
+  display: grid;
+  grid-template-columns: 100%;
+  height: 100%;
+  position: relative;
+  justify-items: center;
+  align-items: start;
+
+  button {
+    align-self: center;
+    //margin-top: 40px;
+    width: 50%;
+    text-transform: uppercase;
+    //margin-top: 30px;
+    //font-size: 14px;
+    /* border: solid 2px rgba(222, 251, 255, 0.3); */
+    /* align-self: center; */
+    /* background: transparent; */
+    padding: 1rem 1rem;
+    /* margin: 0 1rem; */
+    transition: all .5s ease;
+    color: rgba(222, 220, 203, 1);
+    letter-spacing: 1px;
+    outline: none;
+    /* box-shadow: 20px 38px 34px -26px rgba(222, 251, 255, 0.2); */
+    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+    border: 3px double $color;
+    //background-color: $color;
+    background-color: transparent;
+
+    &:hover {
+      //box-shadow: 2px 8px 4px -6px rgba(222, 251, 255, 0.3);
+      //background-color: rgba(222, 220, 203, 0.1);
+      background-color: $color;
+      cursor: pointer;
+      //font-size: 23px;
+    }
+  }
+
+  input {
+    width: 60%;
+    background-color: transparent;
+    border: none;
+    border-bottom: 5px dotted $color;
+    color: $color;
+    font-size: 20px;
+    padding: 20px 5px;
+    text-align: center;
+    outline: none;
+    font-weight: 100;
+  }
+}
+
+.login__form-header {
+  grid-column: span 2;
+  font-size: 40px;
+  color: $color;
+  /* grid-column-start: auto; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  align-self: end;
+  justify-self: center;
+}
+
+.cell {
+  //border:1px dotted rgba(255, 255, 255, 0.21);
+  //background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(239, 155, 155, 0.15);
+  width: 100%;
+  height: 100%;
+  position: relative;
+  //opacity: 0;
+
+
+}
+
+.cell-content {
+  transform: rotateY(0deg);
+  opacity: 1;
+  position: relative;
+  font-weight: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 70px;
+  color: $color;
+}
