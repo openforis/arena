@@ -2,7 +2,8 @@ $color: rgba(222, 220, 203, 0.6);
 $loginFormContainerBorderColor: rgba(50, 42, 39, .5);
 
 .login__bg {
-  background-size: 100%;
+  background-size: cover;
+  background-position: center;
 }
 
 .login__bg1 {

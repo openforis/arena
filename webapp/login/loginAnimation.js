@@ -70,8 +70,8 @@ const tlEnterInit = () => {
 }
 
 const onEnter = (node, isAppearing) => {
-  // tlEnterInit()
-  // tlEnter.restart()
+  tlEnterInit()
+  tlEnter.restart()
 }
 
 // ======================
