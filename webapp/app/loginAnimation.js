@@ -23,7 +23,7 @@ const tlEnterInit = () => {
   tlEnter.set('.login__bg2', {scale: 1, opacity: 1})
 
 // letters animation
-  for (let el of document.getElementsByClassName('of-logo')) {
+  for (let el of document.getElementsByClassName('logo-letter')) {
     tlEnter.from(el, .5,
       {
         rotationY: 180,
@@ -70,8 +70,8 @@ const tlEnterInit = () => {
 }
 
 const onEnter = (node, isAppearing) => {
-  tlEnterInit()
-  tlEnter.restart()
+  // tlEnterInit()
+  // tlEnter.restart()
 }
 
 // ======================

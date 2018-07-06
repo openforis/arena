@@ -1,6 +1,7 @@
 
 //@import url('https://fonts.googleapis.com/css?family=Spectral:200,400,600,700,800');
 @import url('https://fonts.googleapis.com/css?family=Montserrat:100,200,400,600,800,900');
+
 body, html {
   height: 100%;
   overflow: hidden;
@@ -18,6 +19,14 @@ body {
 }
 
 // layout
+.full-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .height100 {
   height: 100%;
 }

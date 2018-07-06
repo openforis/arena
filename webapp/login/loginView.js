@@ -26,14 +26,13 @@ const LoginForm = () =>
   <div className="login__form">
     <input type='text' name='username' placeholder='Your email'/>
     <input type='password' name='password' placeholder='Your password'/>
-    <Link to={'/app/a'}>AASAAA</Link>
     <button type="button" className="">Login</button>
   </div>
 
 const LoginView = () =>
   <div className="login__container height100">
-    <div className="login__bg login__bg1"/>
-    <div className="login__bg login__bg2"/>
+    <div className="full-screen login__bg1"/>
+    <div className="full-screen login__bg2"/>
     <div className="login__bg-overlay"/>
 
     <div className="login__grid">
@@ -43,11 +42,11 @@ const LoginView = () =>
           const content = cellContent[i]
           return (
             <div key={i}
-                 className={`cell_${i} ${isLoginContainer ? 'login__form-container' : 'cell'}`}>
+                 className={`${isLoginContainer ? 'login__form-container' : 'login__grid-cell'}`}>
               {
                 isLoginContainer
                   ? <LoginForm/>
-                  : <div className={`cell-content ${content ? 'of-logo' : ''}`}>{content}</div>
+                  : <div className={`${content ? 'logo-letter' : ''}`}>{content}</div>
               }
             </div>
           )
