@@ -10,7 +10,7 @@ import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import createDebounce from 'redux-debounced'
 
-import reducer from './app/rootReducer'
+import reducer from './rootReducer'
 
 const store = createStore(
   reducer,
