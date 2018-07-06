@@ -1,12 +1,20 @@
+@import "../app/app";
+
 $color: rgba(222, 220, 203, 0.6);
 $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
 
+.login__container{
+  @extend .full-screen-fixed;
+}
+
 .login__bg {
+  @extend .full-screen-fixed;
   background-size: cover;
   background-position: center;
 }
 
 .login__bg1 {
+  @extend .full-screen-fixed;
   @extend .login__bg;
   background-image: url("/img/landing-bg.jpg");
 }

@@ -5,6 +5,8 @@ import {
   Back
 } from 'gsap/TweenMax'
 
+import {kill} from '../app-utils/gsapUtils'
+
 const key = 'login'
 
 // ======================
@@ -13,7 +15,7 @@ const key = 'login'
 // const tlEnter = new TimelineMax()
 let tlEnter = null
 
-const tlEnterKill = () => tlEnter ? tlEnter.kill() : null
+const tlEnterKill = () => kill(tlEnter)
 
 const tlEnterInit = () => {
   tlEnterKill()
@@ -23,7 +25,7 @@ const tlEnterInit = () => {
   tlEnter.set('.login__bg2', {scale: 1.3, scaleY: 1.3})
   tlEnter.set('.of-letter', {position: 'relative'})
 
-// letters animation
+  // ofLetters animation
   for (let el of document.getElementsByClassName('of-letter')) {
     tlEnter.from(el, .5, {
       rotationY: 180,
@@ -34,23 +36,10 @@ const tlEnterInit = () => {
   }
 
   tlEnter.add('ofLettersEnd')
-// background images
+
+  // login boxes
   const start = 'ofLettersEnd-=3'
   tlEnter
-  // .from('.login__form-container', .5,
-  //   {
-  //     backgroundColor: bgColorStart,
-  //     // borderColor: 'rgb(50, 42, 39)',
-  //     ease: Power4.easeIn
-  //   },
-  //   1.5
-  // )
-  // .from('.cell', 1,
-  //   {
-  //     backgroundColor: bgColorStart,
-  //     ease: Power4.easeIn
-  //   }
-  //   , 1)
     .from('.login__form', 2,
       {
         top: -1000,
@@ -60,7 +49,7 @@ const tlEnterInit = () => {
       , start)
   tlEnter.add('loginFormEnd')
 
-  //login boxes
+
   tlEnter.to('.login__form-box', 2, {
     border: '3px double rgba(50, 42, 39, 0.5)',
     ease: Back.easeIn.config(4)
@@ -69,7 +58,6 @@ const tlEnterInit = () => {
   tlEnter.to('.login__form-container', 3, {
     backgroundColor: 'rgba(239, 155, 155, 0.0)',
     ease: Elastic.easeOut.config(1, 0.3)
-    // ease: Back.easeIn.config(4)
   }, start)
 
   //background image overlay
@@ -80,7 +68,6 @@ const tlEnterInit = () => {
         opacity: 0.7,
         repeat: -1,
         yoyo: true,
-        // ease: SlowMo.ease.config(0.5, 0.4, false)
         ease: Back.easeOut.config(4)
       }, start)
   // }
@@ -96,7 +83,7 @@ const onEnter = (node, isAppearing) => {
 // ======================
 let tlExit = null
 
-const tlExitKill = () => tlExit ? tlExit.kill() : null
+const tlExitKill = () => kill(tlExit)
 
 const tlExitInit = () => {
   tlExitKill()

@@ -12,9 +12,9 @@ import appAnimation from './appAnimation'
 import LoginView from '../login/loginView'
 
 const A = (props) =>
-  <div className="app__container login__bg" style={{zIndex: 200}}>
+  <div className="app__container">
     <Link to={'/'}>
-      <span style={{fontSize: '30px', color: 'white', zIndex: 200}}>LOGIN</span>
+      <span style={{fontSize: '30px', color: 'yellow', zIndex: 200}}>LOGIN</span>
     </Link>
   </div>
 

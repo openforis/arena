@@ -19,8 +19,8 @@ body {
 }
 
 // layout
-.full-screen {
-  position: absolute;
+.full-screen-fixed {
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -37,4 +37,9 @@ body {
 
 .justify-self-left {
   justify-self: left;
+}
+
+.app__container{
+  @extend .full-screen-fixed;
+  z-index: 1;
 }
