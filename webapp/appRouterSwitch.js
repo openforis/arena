@@ -1,4 +1,4 @@
-import './app.scss'
+import './app/app.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -6,19 +6,13 @@ import { withRouter, Link } from 'react-router-dom'
 import { Switch, Route } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
 
-import loginAnimation from '../login/loginAnimation'
-import appAnimation from './appAnimation'
+import loginAnimation from './login/loginAnimation'
+import appAnimation from './app/appAnimation'
 
-import LoginView from '../login/loginView'
+import LoginView from './login/loginView'
+import AppView from './app/appView'
 
-const A = (props) =>
-  <div className="app__container">
-    <Link to={'/'}>
-      <span style={{fontSize: '30px', color: 'yellow', zIndex: 200}}>LOGIN</span>
-    </Link>
-  </div>
-
-class App extends React.Component {
+class AppRouterSwitch extends React.Component {
 
   render () {
     const {location} = this.props
@@ -43,7 +37,7 @@ class App extends React.Component {
 
           <Switch location={location}>
             <Route exact path="/" component={LoginView}/>
-            <Route exact path="/app/a" component={A}/>
+            <Route exact path="/app/a" component={AppView}/>
           </Switch>
 
         </Transition>
@@ -59,5 +53,5 @@ const mapStateToProps = state => ({
 })
 
 export default withRouter(
-  connect(mapStateToProps)(App)
+  connect(mapStateToProps)(AppRouterSwitch)
 )

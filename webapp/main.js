@@ -15,13 +15,13 @@ const store = createStore(
   applyMiddleware(createDebounce(), thunkMiddleware)
 )
 
-import App from './app/app'
+import AppRouterSwitch from './appRouterSwitch'
 
 function renderApp () {
 
   const provider = <Provider store={store}>
     <BrowserRouter>
-      <App/>
+      <AppRouterSwitch/>
     </BrowserRouter>
   </Provider>
 
