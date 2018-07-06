@@ -37,7 +37,7 @@ app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
 // initializing api router
 // app.use('/api', apiRouter.router)
 
-const httpServerPort = process.env.PORT || '8080'
+const httpServerPort = process.env.PORT || '9090'
 app.listen(httpServerPort, () => {
   console.log('server listening on port', httpServerPort)
 })
