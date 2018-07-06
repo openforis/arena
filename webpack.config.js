@@ -49,7 +49,7 @@ const webPackConfig = {
           loader: 'babel-loader',
           options: {
             presets: ['env', 'react'],
-            // plugins: [require('babel-plugin-transform-object-rest-spread')]
+            plugins: ['transform-object-rest-spread']
           }
         }
       },
