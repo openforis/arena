@@ -4,7 +4,10 @@ import {
   Elastic,
   Back,
   Power0,
-  RoughEase
+  Power4,
+  RoughEase,
+  SlowMo,
+  SteppedEase
 } from 'gsap/TweenMax'
 
 import { kill } from '../app-utils/gsapUtils'
@@ -24,7 +27,8 @@ const tlEnterInit = () => {
 
   tlEnter = new TimelineMax({pause: true})
   tlEnter.set('.login__container', {opacity: 1})
-  tlEnter.set('.login__bg2', {scale: 1.3, scaleY: 1.3})
+  // tlEnter.set('.login__bg1', {scaleX: 1.3, scaleY: 1.3})
+  tlEnter.set('.login__bg2', {scaleX: 1.3, scaleY: 1.3})
   tlEnter.set('.of-letter', {position: 'relative'})
 
   const start = 'ofLettersEnd-=3'
@@ -51,7 +55,7 @@ const tlEnterInit = () => {
     }, start)
     .add('loginFormEnd')
 
-    .to('.login__form-box', 1, {
+    .to('.login__form-container', 1, {
       border: '3px double rgba(239, 155, 155, 0.08)',
       ease: Power0.easeIn
     }, start)
@@ -61,25 +65,58 @@ const tlEnterInit = () => {
       ease: Elastic.easeOut.config(1, 0.3)
     }, start)
 
+    .to('.login__form-container', 4, {
+      boxShadow: 'inset 0px -8px 260px -50px rgba(222, 220, 203, 0.1);',
+    }, start)
+
     //background image overlay
     .to('.login__bg2', 12, {
       scaleX: 1.6,
       scaleY: 1.6,
-      opacity: 0.8,
+      opacity: 0.65,
       repeat: -1,
       yoyo: true,
-      ease: RoughEase.ease.config({
-        template: Power0.easeNone,
-        strength: 1,
-        points: 10,
-        taper: 'none',
-        randomize: true,
-        clamp: false
-      })
+      // ease: RoughEase.ease.config({
+      //   template: Power0.none,
+      //   strength: 2,
+      //   points: 10,
+      //   taper: 'both',
+      //   randomize: true,
+      //   clamp: false
+      // })
       // ease: Back.easeOut.config(4)
+      // ease: Bounce.easeInOut
+      ease: Power4.easeInOut
     }, start)
 
-    .to('.login__form', 4, {boxShadow: 'inset 0px -8px 260px -50px rgba(222, 220, 203, 0.1);',}, start)
+    .fromTo('.login__bg1', 6,
+      {
+        scaleX: 1.15,
+        scaleY: 1.15,
+        rotationZ: -0.5
+      },
+      {
+        scaleX: 1.1,
+        scaleY: 1.1,
+        rotationZ: 0.5,
+        // opacity: 0.8,
+        repeat: -1,
+        yoyo: true,
+        // ease: RoughEase.ease.config({
+        //   template: Power0.easeNone,
+        //   strength: 1,
+        //   points: 10,
+        //   taper: 'none',
+        //   randomize: true,
+        //   clamp: false
+        // })
+        // ease: Back.easeOut.config(4)
+        // ease: SlowMo.ease.config(0.7, 0.7, false)
+        ease: SteppedEase.config(40)
+        // ease: RoughEase.ease.config({ template:  Power0.none, strength: 1, points: 200, taper: "both", randomize: true, clamp: false})
+        // ease: Power4.easeInOut
+      }, start)
+
 }
 
 const onEnter = (node, isAppearing) => {

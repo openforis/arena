@@ -23,7 +23,7 @@ const ofLetters = {
 }
 
 const LoginForm = () =>
-  <div className="login__form login__form-box">
+  <div className="login__form">
     <input type='text' name='username' placeholder='Your email'/>
     <input type='password' name='password' placeholder='Your password'/>
     <div className="buttons">
@@ -48,7 +48,7 @@ const LoginView = () =>
           const ofLetter = ofLetters[i]
           return (
             <div key={i}
-                 className={`${isLoginContainer ? 'login__form-container login__form-box' : 'login__grid-cell'}`}>
+                 className={`${isLoginContainer ? 'login__form-container' : 'login__grid-cell'}`}>
               {
                 isLoginContainer
                   ? <LoginForm/>
