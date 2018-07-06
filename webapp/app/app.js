@@ -6,7 +6,7 @@ import { withRouter, Link } from 'react-router-dom'
 import { Switch, Route } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
 
-import loginAnimation from './loginAnimation'
+import loginAnimation from '../login/loginAnimation'
 import appAnimation from './appAnimation'
 
 import LoginView from '../login/loginView'
