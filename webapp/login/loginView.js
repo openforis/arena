@@ -10,7 +10,7 @@ const noRows = 6
 const noCells = noCols * noRows - 6 * 4 + 1
 const cells = R.range(0, noCells)
 
-const cellContent = {
+const ofLetters = {
   1: 'O',
   2: 'P',
   3: 'E',
@@ -23,7 +23,7 @@ const cellContent = {
 }
 
 const LoginForm = () =>
-  <div className="login__form">
+  <div className="login__form login__form-box">
     <input type='text' name='username' placeholder='Your email'/>
     <input type='password' name='password' placeholder='Your password'/>
     <button type="button" className="">Login</button>
@@ -39,14 +39,14 @@ const LoginView = () =>
       {
         cells.map(i => {
           const isLoginContainer = i === 15
-          const content = cellContent[i]
+          const ofLetter = ofLetters[i]
           return (
             <div key={i}
-                 className={`${isLoginContainer ? 'login__form-container' : 'login__grid-cell'}`}>
+                 className={`${isLoginContainer ? 'login__form-container login__form-box' : 'login__grid-cell'}`}>
               {
                 isLoginContainer
                   ? <LoginForm/>
-                  : <div className={`${content ? 'logo-letter' : ''}`}>{content}</div>
+                  : <div className={ofLetter ? 'of-letter' : ''}>{ofLetter}</div>
               }
             </div>
           )

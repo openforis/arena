@@ -20,20 +20,22 @@ const tlEnterInit = () => {
 
   tlEnter = new TimelineMax({pause: true})
   tlEnter.set('.login__container', {opacity: 1})
-  tlEnter.set('.login__bg2', {scale: 1, opacity: 1})
+  tlEnter.set('.login__bg2', {scale: 1.3, scaleY: 1.3})
+  tlEnter.set('.of-letter', {position: 'relative'})
 
 // letters animation
-  for (let el of document.getElementsByClassName('logo-letter')) {
-    tlEnter.from(el, .5,
-      {
-        rotationY: 180,
-        opacity: 0,
-        top: '-100px',
-        ease: Bounce.easeIn
-      }
-    )
+  for (let el of document.getElementsByClassName('of-letter')) {
+    tlEnter.from(el, .5, {
+      rotationY: 180,
+      opacity: 0,
+      top: '-100%',
+      ease: Bounce.easeIn
+    })
   }
+
+  tlEnter.add('ofLettersEnd')
 // background images
+  const start = 'ofLettersEnd-=3'
   tlEnter
   // .from('.login__form-container', .5,
   //   {
@@ -49,23 +51,38 @@ const tlEnterInit = () => {
   //     ease: Power4.easeIn
   //   }
   //   , 1)
-    .to('.login__bg2', 6,
+    .from('.login__form', 2,
       {
-        scaleX: 1.1,
-        scaleY: 1.1,
+        top: -1000,
+        // ease: Bounce.easeOut,
+        ease: Elastic.easeOut.config(1.75, 0.75)
+      }
+      , start)
+  tlEnter.add('loginFormEnd')
+
+  //login boxes
+  tlEnter.to('.login__form-box', 2, {
+    border: '3px double rgba(50, 42, 39, 0.5)',
+    ease: Back.easeIn.config(4)
+  }, start)
+
+  tlEnter.to('.login__form-container', 3, {
+    backgroundColor: 'rgba(239, 155, 155, 0.0)',
+    ease: Elastic.easeOut.config(1, 0.3)
+    // ease: Back.easeIn.config(4)
+  }, start)
+
+  //background image overlay
+    .to('.login__bg2', 12,
+      {
+        scaleX: 1.6,
+        scaleY: 1.6,
         opacity: 0.7,
         repeat: -1,
         yoyo: true,
         // ease: SlowMo.ease.config(0.5, 0.4, false)
         ease: Back.easeOut.config(4)
-      }, '-=2')
-    .from('.login__form', 1,
-      {
-        top: -1000,
-        // ease: Bounce.easeOut,
-        ease: Elastic.easeOut.config(1.75, 0.75),
-      }
-      , '-=6')
+      }, start)
   // }
 }
 
