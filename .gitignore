@@ -18,3 +18,4 @@ dist/
 
 # dev
 .idea/
+*.iml
