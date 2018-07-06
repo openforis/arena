@@ -1,7 +1,6 @@
-@import "../app/app";
+@import "../style/vars";
+@import "../style/layout";
 
-$color: #dedccb;
-$white: rgba($color, 0.6);
 $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
 
 .login__container {
@@ -21,6 +20,7 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
 }
 
 .login__bg2 {
+  @extend .full-screen-fixed;
   @extend .login__bg;
   background-image: url("/img/landing-bg2.jpg");
 }
@@ -43,12 +43,7 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
 }
 
 .login__grid {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-
+  @extend .full-screen-fixed;
   display: grid;
   grid-template-columns: repeat(12, 8.33333333333333vw);
   grid-template-rows: repeat(6, 16.66666666666667vh);
@@ -59,7 +54,7 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
 }
 
 .of-letter {
-  color: $white;
+  color: $pinkLight;
   font-size: 70px;
   font-weight: 100;
   text-align: center;
@@ -84,20 +79,10 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
   //box-shadow: 0px -8px 260px -50px rgba($color, 0.1);
 
   input {
-    background-color: transparent;
     border: none;
-
-    border-bottom: 5px dotted $white;
-    padding: 20px 5px;
+    border-bottom: 5px dotted $pinkLight;
+    background-color: transparent;
     text-align: center;
-
-    color: $white;
-
-    width: 100%;
-    outline: none;
-    font-weight: 100;
-    font-size: 20px;
-    letter-spacing: 2px;
   }
 
   .buttons {
@@ -105,52 +90,6 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
     display: grid;
     grid-template-columns: 100%;
 
-    button, .btn {
-      outline: none;
-      width: 100%;
-      padding: 1rem 1rem;
-      font-weight: 100;
-      font-size: 1.1rem;
-      letter-spacing: 4px;
-      word-wrap: break-word;
-      transition: all .5s ease;
-
-      &:hover {
-        cursor: pointer;
-      }
-    }
-
-    .btn-of {
-      text-transform: uppercase;
-      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-      border: 3px double;
-    }
-
-    .btn-transparent {
-      color: $white;
-      background-color: transparent;
-      border-color: $white;
-
-      &:hover {
-        background-color: rgba($color, 0.25);
-      }
-    }
-
-    .btn-link {
-      border: none;
-
-      &.btn-transparent {
-        background-color: transparent;
-        border: none !important;
-
-        &:hover {
-          color: rgba($color, 0.95);
-        }
-      }
-
-    }
-
-    // custom
     .btn-link {
       text-align: right;
       font-size: 0.9rem;

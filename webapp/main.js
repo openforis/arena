@@ -1,3 +1,5 @@
+import './style/main.scss'
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -19,15 +21,15 @@ import AppRouterSwitch from './appRouterSwitch'
 
 function renderApp () {
 
-  const provider = <Provider store={store}>
-    <BrowserRouter>
-      <AppRouterSwitch/>
-    </BrowserRouter>
-  </Provider>
-
-  const domElement = document.getElementById('main')
-
-  ReactDOM.render(provider, domElement)
+  ReactDOM.render(
+    <Provider store={store}>
+      <BrowserRouter>
+        <AppRouterSwitch/>
+      </BrowserRouter>
+    </Provider>
+    ,
+    document.getElementById('main')
+  )
 
 }
 

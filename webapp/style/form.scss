@@ -1,0 +1,60 @@
+@import "./vars";
+
+input {
+
+  padding: 20px 5px;
+
+  color: $pink;
+
+  width: 100%;
+  outline: none;
+  font-weight: 100;
+  font-size: 20px;
+  letter-spacing: 2px;
+}
+
+// buttons
+button, .btn {
+  outline: none;
+  width: 100%;
+  padding: 1rem 1rem;
+  font-weight: 100;
+  font-size: 1.1rem;
+  letter-spacing: 4px;
+  word-wrap: break-word;
+  transition: all .5s ease;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.btn-transparent {
+  color: $pinkLight;
+  background-color: transparent;
+  border: 1px solid $pinkLight;
+
+  &:hover {
+    background-color: rgba($pink, 0.25);
+  }
+}
+
+.btn-link {
+  border: none;
+
+  &.btn-transparent {
+    background-color: transparent;
+    border: none !important;
+
+    &:hover {
+      color: rgba($pink, 0.95);
+    }
+  }
+
+}
+
+.btn-of {
+  text-transform: uppercase;
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  border: 3px double !important;
+}

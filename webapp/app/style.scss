@@ -1,0 +1,7 @@
+@import "../style/layout";
+
+.app__container {
+  @extend .full-screen-fixed;
+
+  z-index: 1;
+}
