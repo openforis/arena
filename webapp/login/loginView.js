@@ -2,7 +2,7 @@ import './style.scss'
 
 import React from 'react'
 import * as R from 'ramda'
-import { Link } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 
 const noCols = 12
 const noRows = 6
@@ -26,13 +26,19 @@ const LoginForm = () =>
   <div className="login__form login__form-box">
     <input type='text' name='username' placeholder='Your email'/>
     <input type='password' name='password' placeholder='Your password'/>
-    <button type="button" className="">Login</button>
+    <div className="buttons">
+      <button type="button" className="btn btn-transparent btn-of">Login</button>
+      <button type="button" className="btn btn-link btn-transparent">Password??</button>
+    </div>
+    {/*<Link to={'/app/a'}>*/}
+      {/*<span style={{fontSize: '30px', color: 'white', zIndex: 200}}>LOGIN</span>*/}
+    {/*</Link>*/}
   </div>
 
 const LoginView = () =>
   <div className="login__container height100">
-    <div className="full-screen login__bg1"/>
-    <div className="full-screen login__bg2"/>
+    <div className="login__bg1"/>
+    <div className="login__bg2"/>
     <div className="login__bg-overlay"/>
 
     <div className="login__grid">
