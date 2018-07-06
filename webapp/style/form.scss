@@ -4,7 +4,7 @@ input {
 
   padding: 20px 5px;
 
-  color: $pink;
+  color: $white;
 
   width: 100%;
   outline: none;
@@ -30,12 +30,12 @@ button, .btn {
 }
 
 .btn-transparent {
-  color: $pinkLight;
+  color: $whiteLight;
   background-color: transparent;
-  border: 1px solid $pinkLight;
+  border: 1px solid $whiteLight;
 
   &:hover {
-    background-color: rgba($pink, 0.25);
+    background-color: rgba($white, 0.25);
   }
 }
 
@@ -47,7 +47,7 @@ button, .btn {
     border: none !important;
 
     &:hover {
-      color: rgba($pink, 0.95);
+      color: rgba($white, 0.95);
     }
   }
 

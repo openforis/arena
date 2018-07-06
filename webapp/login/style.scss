@@ -54,7 +54,7 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
 }
 
 .of-letter {
-  color: $pinkLight;
+  color: $whiteLight;
   font-size: 70px;
   font-weight: 100;
   text-align: center;
@@ -80,7 +80,7 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
 
   input {
     border: none;
-    border-bottom: 5px dotted $pinkLight;
+    border-bottom: 5px dotted $whiteLight;
     background-color: transparent;
     text-align: center;
   }
