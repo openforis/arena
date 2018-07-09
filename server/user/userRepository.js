@@ -22,7 +22,7 @@ const findUserByEmailAndPassword = async (email, password) => {
     WHERE LOWER(email) = LOWER($1)`
     , [email])
 
-  return (userPwd && comparePassword(userPwd.password, password))
+  return (userPwd && await comparePassword(password, userPwd.password))
     ? await findUserById(userPwd.id)
     : null
 

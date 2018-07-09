@@ -24,8 +24,9 @@ app.use(bodyParser.json({limit: '5000kb'}))
 app.use(cookieParser())
 headerMiddleware.init(app)
 sessionMiddleware.init(app)
-accessControlMiddleware.init(app)
 authConfig.init(app)
+//accesscontrolmiddleware must be initialized after authConfig
+accessControlMiddleware.init(app)
 // authenticator.init(app)
 // loginHandler.init(app)
 
