@@ -19,3 +19,44 @@ To constantly build it when something changes, run:
 ## Running the server
 
 ```node server/server.js```
+
+
+
+## Database
+
+#### Create your own local datbase
+
+If you have a Docker server configured locally, just run this command:
+
+```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgres:10.4```
+
+And add a .env file to the root directory
+```
+PGHOST=localhost
+PGPORT=5444
+PGDATABASE=of-arena-dev
+PGUSER=arena
+PGPASSWORD=arena
+```
+
+Otherwise, check `.env` configurations for setting it up manually (note that the server port is not default!)
+
+#### To restart the database server
+
+```docker container restart of-arena-dev-db```
+
+#### Database Migrations
+
+Migrations are run automatically on startup of the server.
+
+##### Adding a database migration
+
+When you need execute a DDL (e.g. add new table to the database, say "dbtable"), create a migration template with:
+
+```yarn run create-migration add-table-dbtable```
+
+Now you'll see new sql files in `db/migration/migrations/sql/<timestamp>-kuikka-<up/down>.sql`
+
+You should edit the `<timestamp>-add-table-dbtable-up.sql to contain your `create table` -statement. 
+You could also add the corresponding `drop table` to `<timestamp>-add-table-dbtable-down.sql` if you ever want to run migrations downwards.
+

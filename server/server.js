@@ -15,7 +15,7 @@ const compression = require('compression')
 
 const app = express()
 
-// runMigrations()
+runMigrations()
 
 // app initializations
 app.use(bodyParser.json({limit: '5000kb'}))
@@ -32,7 +32,6 @@ app.use('/app/*', express.static(`${__dirname}/../dist`))
 
 app.use('/img/', express.static(`${__dirname}/../web-resources/img`))
 app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
-// app.use('/webfonts/', express.static(`${__dirname}/../web-resources/webfonts`))
 
 // initializing api router
 // app.use('/api', apiRouter.router)
