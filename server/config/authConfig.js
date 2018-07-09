@@ -18,19 +18,13 @@ const authSetup = app => {
   })
 }
 
-const authenticationSuccessful = (req, user, next, res, done) => {
+const authenticationSuccessful = (req, res, next, user) =>
   req.logIn(user, err => {
-    if (err) {
+    if (err)
       next(err)
-    } else {
-      // We have to explicitly save session and wait for saving to complete
-      // because of the way chrome handles redirects (it doesn't read the whole response)
-      // More here:
-      // https://github.com/voxpelli/node-connect-pg-simple/issues/31#issuecomment-230596077
-      req.session.save(() => done(`/app/a`))
-    }
+    else
+      req.session.save(() => res.send(`/app/a`))
   })
-}
 
 module.exports.init = app => {
   authSetup(app)
@@ -41,29 +35,19 @@ module.exports.init = app => {
     res.json({})
   })
 
-  // app.post('/auth/login',
-  //   passport.authenticate(
-  //     'local',
-  //     {
-  //       successRedirect: '/app',
-  //       // failureRedirect: '/',
-  //       failureFlash: true
-  //     }
-  //   )
-  // )
-
   app.post('/auth/login', (req, res, next) => {
 
     passport.authenticate('local', (err, user, info) => {
-      if (err) {
+
+      if (err)
         return next(err)
-      } else if (!user) {
+      else if (!user)
         res.send(info)
-      } else {
-        authenticationSuccessful(req, user, next, res,
-          redirectUrl => res.send({redirectUrl})
-        )
-      }
+      else
+        authenticationSuccessful(req, res, next, user)
+
     })(req, res, next)
+
   })
+
 }

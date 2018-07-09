@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "bcrypt": "^3.0.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.3",
     "compression": "^1.7.2",

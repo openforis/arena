@@ -12,6 +12,11 @@ const findUserById = async (userId, client = db) => {
   return {...user, roles}
 }
 
+const findUserByEmailAndPassword = async (email, password) => {
+return null
+}
+
 module.exports = {
-  findUserById
+  findUserById,
+  findUserByEmailAndPassword
 }

@@ -1,10 +1,26 @@
 const LocalStrategy = require('passport-local')
+const R = require('ramda')
+
+const {validEmail} = require('../user/userUtils')
+const {findUserByEmailAndPassword} = require('../user/userRepository')
 
 const verifyCallback = async (req, email, password, done) => {
-  // console.log('=== req ', req)
-  // console.log('=== email ', email)
-  // console.log('=== password ', password)
-  done(null, {id: 1, email: 'trew', name: 'mino'})
+
+  const sendResp = (user, message) => user
+    ? done(null, user)
+    : done(null, false, {message})
+
+  if (!validEmail(email))
+    sendResp(null, 'Email not valid')
+  else if (R.isEmpty(R.trim(password)))
+    sendResp(null, 'Password cannot be empty')
+  else {
+    const user = await findUserByEmailAndPassword(email, password)
+    user
+      ? sendResp(user)
+      : sendResp(null, 'User not found. Make sure email and password are correct')
+  }
+
 }
 
 const localStrategy = new LocalStrategy({
