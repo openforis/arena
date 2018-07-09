@@ -1,10 +1,12 @@
 require('dotenv').config()
 
 const path = require('path')
-// const sessionInitializer = require('./sessionInitializer')
+
+const sessionInitializer = require('./config/sessionInitializer')
+const headerMiddleware = require('./config/headerMiddleware')
 // const loginHandler = require('./auth/loginHandler')
 // const authenticator = require('./auth/authenticator')
-// const headerMiddleware = require('./headerMiddleware')
+
 const runMigrations = require('./db/migration/execMigrations')
 
 // const apiRouter = require('./api/apiRouter')
@@ -20,8 +22,8 @@ runMigrations()
 // app initializations
 app.use(bodyParser.json({limit: '5000kb'}))
 
-// headerMiddleware.init(app)
-// sessionInitializer.init(app)
+headerMiddleware.init(app)
+sessionInitializer.init(app)
 // authenticator.init(app)
 // loginHandler.init(app)
 
