@@ -30,5 +30,8 @@ CREATE TABLE
           ON DELETE CASCADE
     );
 
+ALTER TABLE
+    "user" ADD CONSTRAINT user_unique_email_ix UNIQUE ("email");
+
 INSERT INTO role (role)
 VALUES ('ADMINISTRATOR');
