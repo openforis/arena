@@ -1,22 +1,14 @@
 const R = require('ramda')
 const passport = require('passport')
-const LocalStrategy = require('passport-local')
+
+const localStrategy = require('./authConfigLocalStrategy')
 
 const {findUserById} = require('../user/userRepository')
 
-const localStrategyVerifyCallback = async (req, email, password, done) => {
-
-}
-
-module.exports.init = (app) => {
-
-  passport.use(new LocalStrategy({
-      usernameField: 'username',
-      passwordField: 'password',
-      passReqToCallback: true
-    },
-    localStrategyVerifyCallback
-  ))
+const authSetup = app => {
+  app.use(passport.initialize())
+  app.use(passport.session())
+  passport.use(localStrategy)
 
   passport.serializeUser((user, done) => done(null, user.id))
 
@@ -24,5 +16,9 @@ module.exports.init = (app) => {
     const user = await findUserById(userId)
     done(null, user)
   })
+}
+
+module.exports.init = app => {
+  authSetup(app)
 
 }
