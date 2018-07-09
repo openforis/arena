@@ -1,14 +1,14 @@
 const R = require('ramda')
 
-const noLoginAllowedPaths = [
-  /^\//,
-  /^\/resetPassword.*/,
-  /^\/img\//,
-  /^\/css\//
+const privatePaths = [
+  /^\/app\//,
 ]
 
 const checkAuth = (req, res, next) => {
-  if (!req.user) {
+  if (req.user) {
+    next()
+  } else {
+
     const acceptHeader = req.header('Accept')
     if (acceptHeader && acceptHeader.indexOf('application/json') !== -1) {
       res.status(401).json({error: 'Not logged in'})
@@ -16,18 +16,18 @@ const checkAuth = (req, res, next) => {
       // redirect to login page
       res.redirect('/')
     }
-  } else {
-    next()
+
   }
 }
 
 module.exports.init = app => {
+
   app.use((req, res, next) => {
 
-    if (R.any(allowedRegex => req.path.match(allowedRegex), noLoginAllowedPaths)) {
-      next()
-    } else {
+    if (R.any(privatePath => req.path.match(privatePath), privatePaths)) {
       checkAuth(req, res, next)
+    } else {
+      next()
     }
 
   })

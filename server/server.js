@@ -4,10 +4,12 @@ const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
 const compression = require('compression')
+const cookieParser = require('cookie-parser')
 
 const sessionMiddleware = require('./config/sessionMiddleware')
 const headerMiddleware = require('./config/headerMiddleware')
 const accessControlMiddleware = require('./config/accessControlMiddleware')
+const authConfig = require('./config/authConfig')
 // const loginHandler = require('./auth/loginHandler')
 // const authenticator = require('./auth/authenticator')
 // const apiRouter = require('./api/apiRouter')
@@ -15,15 +17,15 @@ const accessControlMiddleware = require('./config/accessControlMiddleware')
 // run database migrations
 require('./db/migration/execMigrations')()
 
-
 const app = express()
 
 // app initializations
 app.use(bodyParser.json({limit: '5000kb'}))
-
+app.use(cookieParser())
 headerMiddleware.init(app)
 sessionMiddleware.init(app)
 accessControlMiddleware.init(app)
+authConfig.init(app)
 // authenticator.init(app)
 // loginHandler.init(app)
 
