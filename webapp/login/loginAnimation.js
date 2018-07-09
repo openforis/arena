@@ -29,7 +29,7 @@ const tlEnterInit = () => {
   tlEnter.set('.login__container', {opacity: 1})
   tlEnter.set('.login__form', {opacity: 0})
   // tlEnter.set('.login__bg1', {scaleX: 1.3, scaleY: 1.3})
-  tlEnter.set('.login__bg2', {scaleX: 1.3, scaleY: 1.3})
+  tlEnter.set('.login__bg2', {scaleX: 1.3, scaleY: 1.3, opacity: 1})
   tlEnter.set('.of-letter', {position: 'relative'})
 
   const start = 'ofLettersEnd-=3'
@@ -61,18 +61,18 @@ const tlEnterInit = () => {
       border: '3px double rgba(239, 155, 155, 0.08)',
       ease: Power0.easeIn
     }, start)
-
+    //
     .to('.login__form-container', 3, {
       backgroundColor: 'rgba(239, 155, 155, 0.0)',
       ease: Elastic.easeOut.config(1, 0.3)
     }, start)
-
-    .to('.login__form-container', 4, {
-      boxShadow: 'inset 0px -8px 260px -50px rgba(222, 220, 203, 0.1);',
-    }, start)
+    //
+    // .to('.login__form-container', 4, {
+    //   boxShadow: 'inset 0px -8px 260px -50px rgba(222, 220, 203, 0.1);',
+    // }, start)
 
     //background image overlay
-    .set('.login__bg2',{opacity:.9},start)
+    .set('.login__bg2', {opacity: .9}, start)
     .to('.login__bg2', 12, {
       scaleX: 1.6,
       scaleY: 1.6,
@@ -97,15 +97,15 @@ const tlEnterInit = () => {
         scaleX: 1.15,
         scaleY: 1.15,
         // rotationZ: -0.5,
-        '-webkit-filter':'contrast(100%) brightness(100%)',
-        filter: 'contrast(100%) brightness(100%)',
+        // '-webkit-filter': 'contrast(100%) brightness(100%)',
+        // filter: 'contrast(100%) brightness(100%)',
       },
       {
         scaleX: 1.1,
         scaleY: 1.1,
         // rotationZ: 0.5,
-        '-webkit-filter':'contrast(180%) brightness(150%)',
-        filter: 'contrast(180%) brightness(150%)',
+        // '-webkit-filter': 'contrast(180%) brightness(150%)',
+        // filter: 'contrast(180%) brightness(150%)',
         // opacity: 0.8,
         repeat: -1,
         yoyo: true,
