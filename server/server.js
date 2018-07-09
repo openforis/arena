@@ -1,29 +1,29 @@
 require('dotenv').config()
 
 const path = require('path')
-
-const sessionInitializer = require('./config/sessionInitializer')
-const headerMiddleware = require('./config/headerMiddleware')
-// const loginHandler = require('./auth/loginHandler')
-// const authenticator = require('./auth/authenticator')
-
-const runMigrations = require('./db/migration/execMigrations')
-
-// const apiRouter = require('./api/apiRouter')
-
 const express = require('express')
 const bodyParser = require('body-parser')
 const compression = require('compression')
 
-const app = express()
+const sessionMiddleware = require('./config/sessionMiddleware')
+const headerMiddleware = require('./config/headerMiddleware')
+const accessControlMiddleware = require('./config/accessControlMiddleware')
+// const loginHandler = require('./auth/loginHandler')
+// const authenticator = require('./auth/authenticator')
+// const apiRouter = require('./api/apiRouter')
 
-runMigrations()
+// run database migrations
+require('./db/migration/execMigrations')()
+
+
+const app = express()
 
 // app initializations
 app.use(bodyParser.json({limit: '5000kb'}))
 
 headerMiddleware.init(app)
-sessionInitializer.init(app)
+sessionMiddleware.init(app)
+accessControlMiddleware.init(app)
 // authenticator.init(app)
 // loginHandler.init(app)
 
