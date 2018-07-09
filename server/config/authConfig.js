@@ -23,7 +23,7 @@ const authenticationSuccessful = (req, res, next, user) =>
     if (err)
       next(err)
     else
-      req.session.save(() => res.send(`/app/a`))
+      req.session.save(() => res.send({redirectUrl: `/app/a`}))
   })
 
 module.exports.init = app => {
