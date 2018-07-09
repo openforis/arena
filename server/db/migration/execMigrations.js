@@ -1,6 +1,6 @@
 module.exports = async () => {
   try {
-    console.log('running migrations')
+    console.log('running database migrations')
     
     const config = require('./migrationConfig')
     
@@ -14,9 +14,9 @@ module.exports = async () => {
     
     await dbm.up()
     
-    console.log('migration check completed')
+    console.log('database migrations completed')
   } catch (err) {
-    console.log('error running migrations', err)
+    console.log('error running database migrations', err)
   }
   
 }
