@@ -12,8 +12,6 @@ const verifyCallback = async (req, email, password, done) => {
 
   if (!validEmail(email))
     sendResp(null, 'Email not valid')
-  else if (R.isEmpty(R.trim(password)))
-    sendResp(null, 'Password cannot be empty')
   else {
     const user = await findUserByEmailAndPassword(email, password)
     user

@@ -1,8 +1,11 @@
 const db = require('../db/db')
+const {comparePassword} = require('./userUtils')
+
+// in sql queries, user table must be surrounded by "" e.g. "user"
 
 const findUserById = async (userId, client = db) => {
   const user = await client.one(`
-    SELECT id, name, email FROM user WHERE id = $1
+    SELECT id, name, email FROM "user" WHERE id = $1
   `, [userId])
 
   const roles = await client.any(`
@@ -13,7 +16,16 @@ const findUserById = async (userId, client = db) => {
 }
 
 const findUserByEmailAndPassword = async (email, password) => {
-return null
+  const userPwd = await  db.oneOrNone(`
+    SELECT id, password 
+    FROM "user" 
+    WHERE LOWER(email) = LOWER($1)`
+    , [email])
+
+  return (userPwd && comparePassword(userPwd.password, password))
+    ? await findUserById(userPwd.id)
+    : null
+
 }
 
 module.exports = {
