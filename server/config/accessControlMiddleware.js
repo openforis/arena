@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const privatePaths = [
   /^\/app\//,
+  /^\/api\//
 ]
 
 const checkAuth = (req, res, next) => {
