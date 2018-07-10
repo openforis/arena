@@ -1,24 +1,5 @@
-const R = require('ramda')
 const passport = require('passport')
-
-const localStrategy = require('./authConfigLocalStrategy')
-
-const {findUserById} = require('../user/userRepository')
-
-const {sendOkResp} = require('./../response')
-
-const authSetup = app => {
-  app.use(passport.initialize())
-  app.use(passport.session())
-  passport.use(localStrategy)
-
-  passport.serializeUser((user, done) => done(null, user.id))
-
-  passport.deserializeUser(async (userId, done) => {
-    const user = await findUserById(userId)
-    done(null, user)
-  })
-}
+const {sendOkResp} = require('../response')
 
 const authenticationSuccessful = (req, res, next, user) =>
   req.logIn(user, err => {
@@ -29,10 +10,9 @@ const authenticationSuccessful = (req, res, next, user) =>
     }
   })
 
-module.exports.init = app => {
-  authSetup(app)
 
-  //auth apis
+module.exports.init = app => {
+
   app.get('/auth/user', (req, res) => {
     res.json({user: req.user})
   })
@@ -56,5 +36,4 @@ module.exports.init = app => {
     })(req, res, next)
 
   })
-
 }

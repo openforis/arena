@@ -1,6 +1,5 @@
 require('dotenv').config()
 
-const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
 const compression = require('compression')
@@ -9,10 +8,9 @@ const cookieParser = require('cookie-parser')
 const sessionMiddleware = require('./config/sessionMiddleware')
 const headerMiddleware = require('./config/headerMiddleware')
 const accessControlMiddleware = require('./config/accessControlMiddleware')
-const authConfig = require('./config/authConfig')
-// const loginHandler = require('./auth/loginHandler')
-// const authenticator = require('./auth/authenticator')
+const authConfig = require('./auth/authConfig')
 // const apiRouter = require('./api/apiRouter')
+const authApi = require('./auth/authApi')
 
 // run database migrations
 require('./db/migration/execMigrations')()
@@ -27,8 +25,6 @@ sessionMiddleware.init(app)
 authConfig.init(app)
 //accesscontrolmiddleware must be initialized after authConfig
 accessControlMiddleware.init(app)
-// authenticator.init(app)
-// loginHandler.init(app)
 
 app.use(compression({threshold: 512}))
 
@@ -38,6 +34,8 @@ app.use('/app*', express.static(`${__dirname}/../dist`))
 app.use('/img/', express.static(`${__dirname}/../web-resources/img`))
 app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
 
+//apis
+authApi.init(app)
 // initializing api router
 // app.use('/api', apiRouter.router)
 

@@ -1,5 +1,4 @@
 const LocalStrategy = require('passport-local')
-const R = require('ramda')
 
 const {validEmail} = require('../user/userUtils')
 const {findUserByEmailAndPassword} = require('../user/userRepository')
