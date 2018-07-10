@@ -29,7 +29,7 @@ const tlEnterInit = () => {
   tlEnter.set('.login__container', {opacity: 1})
   tlEnter.set('.login__form', {opacity: 0})
   // tlEnter.set('.login__bg1', {scaleX: 1.3, scaleY: 1.3})
-  tlEnter.set('.login__bg2', {scaleX: 1.3, scaleY: 1.3, opacity: 1})
+  // tlEnter.set('.login__bg2', {scaleX: 1.3, scaleY: 1.3, opacity: 1})
   tlEnter.set('.of-letter', {position: 'relative'})
 
   const start = 'ofLettersEnd-=3'
@@ -72,7 +72,7 @@ const tlEnterInit = () => {
     // }, start)
 
     //background image overlay
-    .set('.login__bg2', {opacity: .9}, start)
+    // .set('.login__bg2', {opacity: .9}, start)
     .to('.login__bg2', 12, {
       scaleX: 1.6,
       scaleY: 1.6,
@@ -146,6 +146,8 @@ const tlExitInit = () => {
 }
 
 const onExit = node => {
+  tlEnter.pause()
+  tlEnter.progress(0)
   tlEnterKill()
   tlExitInit()
   tlExit.restart()

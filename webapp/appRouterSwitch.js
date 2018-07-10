@@ -35,24 +35,29 @@ class AppRouterSwitch extends React.Component {
 
     return (
       isReady
-        ? <TransitionGroup component={null}>
-          <Transition
-            key={key}
-            appear={true}
-            timeout={2000}
-            onEnter={onEnter}
-            onExit={onExit}>
+        ? <React.Fragment>
+          <div className="login__bg1"/>
+          <div className="login__bg2"/>
+          <div className="login__bg-overlay"/>
 
-            <Switch location={location}>
+          <TransitionGroup component={null}>
+            <Transition
+              key={key}
+              appear={true}
+              timeout={2000}
+              onEnter={onEnter}
+              onExit={onExit}>
 
-              <Route exact path="/" component={LoginView}/>
-              <Route exact path="/app" component={AppView}/>
-              <Route exact path="/app/a" component={AppView}/>
+              <Switch location={location}>
 
-            </Switch>
+                <Route exact path="/" component={LoginView}/>
+                <Route path="/app" component={AppView}/>
 
-          </Transition>
-        </TransitionGroup>
+              </Switch>
+
+            </Transition>
+          </TransitionGroup>
+        </React.Fragment>
         : null
     )
   }

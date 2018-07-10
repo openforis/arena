@@ -23,6 +23,8 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
   @extend .full-screen-fixed;
   @extend .login__bg;
   background-image: url("/img/landing-bg2.jpg");
+  transform: scale(1.3, 1.3);
+  opacity: .95;
 }
 
 .login__bg-overlay:after {

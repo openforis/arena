@@ -1,0 +1,24 @@
+$gridBgColor: rgba(44, 49, 44, 0.2);
+
+.survey-summary__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: 25vh 50vh 25vh;
+  justify-content: center;
+}
+
+.survey-summary__sections-container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-row: 2;
+  grid-column: 2 / 4;
+
+  border: 3px double $gridBgColor;
+  padding: 1rem;
+}
+
+.survey-summary__section {
+  background-color: $gridBgColor;
+  height: 100%;
+}
+
