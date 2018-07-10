@@ -30,16 +30,8 @@ If you have a Docker server configured locally, just run this command:
 
 ```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgres:10.4```
 
-And add a .env file to the root directory
-```
-PGHOST=localhost
-PGPORT=5444
-PGDATABASE=of-arena-dev
-PGUSER=arena
-PGPASSWORD=arena
-```
 
-Otherwise, check `.env` configurations for setting it up manually (note that the server port is not default!)
+Add the db configurations to the **`.env`** file [(see .env section)](#env-file)
 
 #### To restart the database server
 
@@ -60,3 +52,21 @@ Now you'll see new sql files in `db/migration/migrations/sql/<timestamp>-kuikka-
 You should edit the `<timestamp>-add-table-dbtable-up.sql to contain your `create table` -statement. 
 You could also add the corresponding `drop table` to `<timestamp>-add-table-dbtable-down.sql` if you ever want to run migrations downwards.
 
+
+## .env File
+
+The .env file must be added to the root directory of the project and must contain the following environment variables:
+```
+# Default web server port
+PORT=9090
+
+# DB
+PGHOST=localhost
+PGPORT=5444
+PGDATABASE=of-arena-dev
+PGUSER=arena
+PGPASSWORD=arena
+
+# Session
+FOO_COOKIE_SECRET=my-cookie-secret-key
+```
