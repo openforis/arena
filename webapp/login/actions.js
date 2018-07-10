@@ -8,14 +8,12 @@ export const login = (username, password) => async dispatch => {
   try {
     const resp = await axios.post('/auth/login', {username, password})
 
-    const errorMessage = R.path(['data', 'message'], resp)
-    const redirectUrl = R.path(['data', 'redirectUrl'], resp)
+    const {message: errorMessage, user} = R.prop('data', resp)
 
     if (errorMessage) {
       dispatch({type: loginError, errorMessage})
-    } else if (redirectUrl) {
-      dispatch({type: loginSuccess})
-      window.location = redirectUrl
+    } else {
+      dispatch({type: loginSuccess, user})
     }
   } catch (e) {
     alert(e)

@@ -2,9 +2,12 @@ import './app/style.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Link } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { Switch, Route } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
+
+import { initApp } from './app/actions'
+import { isAppReady } from './app/app'
 
 import loginAnimation from './login/loginAnimation'
 import appAnimation from './app/appAnimation'
@@ -14,8 +17,12 @@ import AppView from './app/appView'
 
 class AppRouterSwitch extends React.Component {
 
+  componentDidMount () {
+    this.props.initApp()
+  }
+
   render () {
-    const {location} = this.props
+    const {location, isReady} = this.props
     const {pathname} = location
 
     const isLogin = pathname === '/'
@@ -27,31 +34,35 @@ class AppRouterSwitch extends React.Component {
     } = isLogin ? loginAnimation : appAnimation
 
     return (
-      <TransitionGroup component={null}>
-        <Transition
-          key={key}
-          appear={true}
-          timeout={2000}
-          onEnter={onEnter}
-          onExit={onExit}>
+      isReady
+        ? <TransitionGroup component={null}>
+          <Transition
+            key={key}
+            appear={true}
+            timeout={2000}
+            onEnter={onEnter}
+            onExit={onExit}>
 
-          <Switch location={location}>
-            <Route exact path="/" component={LoginView}/>
-            <Route exact path="/app/a" component={AppView}/>
-          </Switch>
+            <Switch location={location}>
 
-        </Transition>
-      </TransitionGroup>
+              <Route exact path="/" component={LoginView}/>
+              <Route exact path="/app" component={AppView}/>
+              <Route exact path="/app/a" component={AppView}/>
+
+            </Switch>
+
+          </Transition>
+        </TransitionGroup>
+        : null
     )
   }
 }
 
 const mapStateToProps = state => ({
-  x: 'a'
-  // i18n: R.path(['app', 'i18n'], state),
-  // appReady: !!R.path(['app', 'i18n'], state)
+  ...state.app,
+  isReady: isAppReady(state)
 })
 
 export default withRouter(
-  connect(mapStateToProps)(AppRouterSwitch)
+  connect(mapStateToProps, {initApp})(AppRouterSwitch)
 )

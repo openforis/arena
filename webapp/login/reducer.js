@@ -1,4 +1,4 @@
-import { exportReducer } from '../app-utils/reducerUtils'
+import { exportReducer, assocActionParams, dissocStateParams } from '../app-utils/reducerUtils'
 
 import {
   loginError,
@@ -6,8 +6,11 @@ import {
 } from './actions'
 
 const actionHandlers = {
-  [loginError]: (state, action) => ({...state, errorMessage: action.errorMessage}),
 
-  [loginSuccess]: (state, action) => ({...state, errorMessage: null})
+  [loginError]: (state, action) => assocActionParams(state, action),
+
+  [loginSuccess]: (state, action) => dissocStateParams(state, 'errorMessage')
+
 }
+
 export default exportReducer(actionHandlers)

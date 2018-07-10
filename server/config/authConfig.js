@@ -5,6 +5,8 @@ const localStrategy = require('./authConfigLocalStrategy')
 
 const {findUserById} = require('../user/userRepository')
 
+const {sendOkResp} = require('./../response')
+
 const authSetup = app => {
   app.use(passport.initialize())
   app.use(passport.session())
@@ -22,17 +24,22 @@ const authenticationSuccessful = (req, res, next, user) =>
   req.logIn(user, err => {
     if (err)
       next(err)
-    else
-      req.session.save(() => res.send({redirectUrl: `/app/a`}))
+    else {
+      req.session.save(() => res.json({user}))
+    }
   })
 
 module.exports.init = app => {
   authSetup(app)
 
   //auth apis
+  app.get('/auth/user', (req, res) => {
+    res.json({user: req.user})
+  })
+
   app.post('/auth/logout', (req, res) => {
     req.logout()
-    res.json({})
+    sendOkResp(res)
   })
 
   app.post('/auth/login', (req, res, next) => {
@@ -42,7 +49,7 @@ module.exports.init = app => {
       if (err)
         return next(err)
       else if (!user)
-        res.send(info)
+        res.json(info)
       else
         authenticationSuccessful(req, res, next, user)
 

@@ -33,7 +33,7 @@ accessControlMiddleware.init(app)
 app.use(compression({threshold: 512}))
 
 app.use('/', express.static(`${__dirname}/../dist`))
-app.use('/app/*', express.static(`${__dirname}/../dist`))
+app.use('/app*', express.static(`${__dirname}/../dist`))
 
 app.use('/img/', express.static(`${__dirname}/../web-resources/img`))
 app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
