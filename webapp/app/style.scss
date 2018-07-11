@@ -5,12 +5,11 @@
   @extend .full-screen-fixed;
 
   z-index: 1;
+  display: grid;
+  grid-template-rows: 60px 1fr;
 }
 
 .app-header {
-  position: absolute;
-  height: $appHeaderHeight;
-  width: 100%;
   background-color: rgba($pink, 0.1);
   display: grid;
   grid-template-columns: .8fr .2fr;
