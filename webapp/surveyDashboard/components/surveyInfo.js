@@ -3,7 +3,7 @@ import React from 'react'
 class SurveyInfo extends React.Component {
 
   render () {
-    return <div className="survey-info__container">
+    return <div className="survey-info">
 
       <input className="text-center" placeholder="Survey name"/>
 
