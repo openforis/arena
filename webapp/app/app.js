@@ -8,4 +8,9 @@ export const appStatus = {
 
 export const isAppReady = R.pathEq(['app', 'status'], appStatus.ready)
 
-export const appUser = R.path(['app', 'user'])
+
+const appUserPath = ['app', 'user']
+
+export const appUser = R.path(appUserPath)
+
+export const logoutAppUser = R.dissocPath(appUserPath)
