@@ -18,10 +18,10 @@ class SurveyDashboardView extends React.Component {
         <SurveyModules/>
       </div>
 
-      <div className="" style={{
-        // gridColumn: '2/4',
-        // gridRow: '3'
-      }}></div>
+      {/*<div className="" style={{*/}
+        {/*// gridColumn: '2/4',*/}
+        {/*// gridRow: '3'*/}
+      {/*}}></div>*/}
 
     </div>
   }
