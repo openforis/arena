@@ -1,6 +1,6 @@
 $gridBgColor: rgba(44, 49, 44, 0.2);
 
-.survey-summary__grid {
+.survey-dashboard__grid {
   display: grid;
   //grid-template-columns: repeat(4, 1fr);
   grid-template-columns: 1fr;
@@ -9,7 +9,7 @@ $gridBgColor: rgba(44, 49, 44, 0.2);
   padding: 0 10vw;
 }
 
-.survey-summary__sections-container {
+.survey-dashboard__sections-container {
   display: grid;
   grid-template-columns: repeat(4,1fr);
   grid-column-gap: 1rem;
@@ -19,7 +19,7 @@ $gridBgColor: rgba(44, 49, 44, 0.2);
   //padding: 1rem;
 }
 
-.survey-summary__section {
+.survey-dashboard__module {
   background-color: $gridBgColor;
   height: 100%;
   display: grid;
