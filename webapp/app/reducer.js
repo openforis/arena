@@ -7,7 +7,7 @@ import {
 
 import { loginSuccess } from '../login/actions'
 
-import { logoutAppUser } from './app'
+import { appState } from './app'
 
 const actionHandlers = {
 
@@ -15,7 +15,7 @@ const actionHandlers = {
 
   [loginSuccess]: (state, action) => assocActionParams(state, action),
 
-  [appUserLogout]: (state, action) => logoutAppUser(state)
+  [appUserLogout]: (state, action) => appState.logoutUser(state)
 
 }
 

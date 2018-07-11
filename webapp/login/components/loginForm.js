@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
 
 import { login } from './../actions'
-import { appUri, appUser } from '../../app/app'
+import { appUri, appState } from '../../app/app'
 
 class LoginForm extends React.Component {
 
@@ -43,7 +43,7 @@ class LoginForm extends React.Component {
 
 const mapStateToProps = state => ({
   ...state.login,
-  user: appUser(state)
+  user: appState.user(state)
 })
 
 export default connect(mapStateToProps, {login})(LoginForm)

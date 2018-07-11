@@ -23,8 +23,8 @@ export const initApp = () => async dispatch => {
 export const logout = () => async dispatch => {
   try {
     await axios.post('/auth/logout')
-    dispatch({type: appUserLogout})
 
+    dispatch({type: appUserLogout})
   } catch (e) {
   }
 

@@ -7,7 +7,7 @@ import { Switch, Route } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
 
 import { initApp } from './app/actions'
-import { isAppReady } from './app/app'
+import { appState } from './app/app'
 
 import loginAnimation from './login/loginAnimation'
 import appAnimation from './app/appAnimation'
@@ -35,36 +35,40 @@ class AppRouterSwitch extends React.Component {
 
     return (
       isReady
-        ? <React.Fragment>
-          <div className="main__bg1"/>
-          <div className="main__bg2"/>
-          <div className="main__bg-overlay"/>
+        ? (
+          <React.Fragment>
+            <div className="main__bg1"/>
+            <div className="main__bg2"/>
+            <div className="main__bg-overlay"/>
 
-          <TransitionGroup component={null}>
-            <Transition
-              key={key}
-              appear={true}
-              timeout={2000}
-              onEnter={onEnter}
-              onExit={onExit}>
+            <TransitionGroup component={null}>
+              <Transition
+                key={key}
+                appear={true}
+                timeout={2000}
+                onEnter={onEnter}
+                onExit={onExit}>
 
-              <Switch location={location}>
+                <Switch location={location}>
 
-                <Route exact path="/" component={LoginView}/>
-                <Route path="/app" component={AppView}/>
+                  <Route exact path="/" component={LoginView}/>
+                  <Route path="/app" component={AppView}/>
 
-              </Switch>
+                </Switch>
 
-            </Transition>
-          </TransitionGroup>
-        </React.Fragment>
-        : null
+              </Transition>
+            </TransitionGroup>
+          </React.Fragment>
+        )
+        : (
+          null
+        )
     )
   }
 }
 
 const mapStateToProps = state => ({
-  isReady: isAppReady(state)
+  isReady: appState.isReady(state)
 })
 
 export default withRouter(

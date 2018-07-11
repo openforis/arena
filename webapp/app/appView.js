@@ -8,7 +8,7 @@ import SurveyDashboardView from '../surveyDashboard/surveyDashboardView'
 const AppView = (props) =>
   <div className="app__container">
 
-    <AppHeader/>
+    <AppHeader {...props} />
     <SurveyDashboardView {...props} />
 
   </div>

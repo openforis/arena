@@ -1,16 +1,25 @@
 import * as R from 'ramda'
 
 export const appUri = '/app'
+export const loginUri = '/'
 
 export const appStatus = {
   ready: 'ready'
 }
 
-export const isAppReady = R.pathEq(['app', 'status'], appStatus.ready)
+const appStatePath = {
+  status: ['app', 'status'],
+  user: ['app', 'user']
+}
 
+const removeRootStatePath = R.remove(0, 1)
 
-const appUserPath = ['app', 'user']
+export const appState = {
 
-export const appUser = R.path(appUserPath)
+  isReady: R.pathEq(appStatePath.status, appStatus.ready),
 
-export const logoutAppUser = R.dissocPath(appUserPath)
+  user: R.path(appStatePath.user),
+
+  logoutUser: R.dissocPath(removeRootStatePath(appStatePath.user))
+
+}
