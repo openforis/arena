@@ -1,4 +1,4 @@
-import { exportReducer, assocActionParams } from '../app-utils/reducerUtils'
+import { exportReducer, assocActionProps } from '../app-utils/reduxUtils'
 
 import {
   appStatusChange,
@@ -11,9 +11,9 @@ import { appState } from './app'
 
 const actionHandlers = {
 
-  [appStatusChange]: (state, action) => assocActionParams(state, action),
+  [appStatusChange]: (state, action) => assocActionProps(state, action),
 
-  [loginSuccess]: (state, action) => assocActionParams(state, action),
+  [loginSuccess]: (state, action) => assocActionProps(state, action),
 
   [appUserLogout]: (state, action) => appState.logoutUser(state)
 
