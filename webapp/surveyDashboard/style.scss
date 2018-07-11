@@ -9,9 +9,14 @@ $gridBgColor: rgba(44, 49, 44, 0.2);
   padding: 0 10vw;
 }
 
-.survey-dashboard__sections-container {
+.survey-dashboard__survey-info-container {
+  align-content: center;
   display: grid;
-  grid-template-columns: repeat(4,1fr);
+}
+
+.survey-dashboard__modules-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   grid-column-gap: 1rem;
   //grid-row: 2;
   //grid-column: 2 / 4;
@@ -19,7 +24,7 @@ $gridBgColor: rgba(44, 49, 44, 0.2);
   //padding: 1rem;
 }
 
-.survey-dashboard__module {
+.survey-modules__module {
   background-color: $gridBgColor;
   height: 100%;
   display: grid;
@@ -28,3 +33,13 @@ $gridBgColor: rgba(44, 49, 44, 0.2);
   align-content: start;
 }
 
+.survey-info__container {
+  display: grid;
+  grid-template-columns: .8fr .2fr;
+}
+.survey-info__btns {
+  display: grid;
+  grid-template-columns: .4fr .4fr;
+  /* grid-column-gap: 1rem; */
+  justify-content: space-evenly;
+}
