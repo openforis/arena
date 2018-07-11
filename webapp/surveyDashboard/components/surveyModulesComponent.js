@@ -8,8 +8,10 @@ class SurveyModules extends React.Component {
 
       <div className="survey-modules__module-container">
         <div className="survey-modules__module">
-          <div className="flex-center">
-            <span className="icon icon-quill icon-24px icon-left"></span><h5>Survey Designer</h5></div>
+          <div className="flex-center title-of">
+            <span className="icon icon-quill icon-24px icon-left"/>
+            <h5>Survey Designer</h5>
+          </div>
         </div>
       </div>
 

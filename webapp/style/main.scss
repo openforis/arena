@@ -59,3 +59,11 @@ body {
   font-weight: 400;
   font-size: .9rem;
 }
+
+.title-of {
+  border-bottom: 3px double $whiteLight;
+  padding-bottom: .5rem;
+  text-transform: uppercase;
+  border-bottom-right-radius: 10% 2%;
+  border-bottom-left-radius: 80% 10%;
+}

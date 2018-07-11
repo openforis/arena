@@ -25,6 +25,7 @@ $gridBgColor: rgba(44, 49, 44, 0.2);
 }
 
 .survey-modules__module {
+  padding: 1rem .5rem;
   background-color: $gridBgColor;
   height: 100%;
   display: grid;
