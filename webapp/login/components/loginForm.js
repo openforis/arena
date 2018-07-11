@@ -26,11 +26,11 @@ class LoginForm extends React.Component {
           }
           <div className="buttons">
             <button type="button"
-                    className="btn btn-transparent btn-of"
+                    className="btn btn-of"
                     onClick={() => login(this.refs.username.value, this.refs.password.value)}>
               Login
             </button>
-            <button type="button" className="btn btn-link btn-transparent">Password??</button>
+            <button type="button" className="btn btn-link">Password??</button>
           </div>
           {/*<Link to={'/app/a'}>*/}
           {/*<span style={{fontSize: '30px', color: 'white', zIndex: 200}}>LOGIN</span>*/}

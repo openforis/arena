@@ -29,35 +29,23 @@ button, .btn {
   font-size: 1.1rem;
   letter-spacing: 4px;
   word-wrap: break-word;
+  color: $whiteLight;
+  background-color: transparent;
+  border: 1px solid $whiteLight;
   transition: all .5s ease;
 
   &:hover {
     cursor: pointer;
-  }
-}
-
-.btn-transparent {
-  color: $whiteLight;
-  background-color: transparent;
-  border: 1px solid $whiteLight;
-
-  &:hover {
     background-color: rgba($white, 0.25);
   }
 }
 
 .btn-link {
-  border: none;
+  border: none !important;
 
-  &.btn-transparent {
-    background-color: transparent;
-    border: none !important;
-
-    &:hover {
-      color: rgba($white, 0.95);
-    }
+  &:hover {
+    color: rgba($white, 0.95);
   }
-
 }
 
 .btn-of {

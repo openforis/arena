@@ -8,11 +8,11 @@ class SurveyInfo extends React.Component {
       <input className="text-center" placeholder="Survey name"/>
 
       <div className="survey-info__btns">
-        <button className="btn btn-transparent btn-of-light">
+        <button className="btn btn-of-light">
           <span className="icon icon-download3 icon-24px"></span>
         </button>
 
-        <button className="btn btn-transparent btn-of-light">
+        <button className="btn btn-of-light">
           <span className="icon icon-upload3 icon-24px"></span>
         </button>
       </div>
