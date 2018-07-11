@@ -1,7 +1,23 @@
+@import "../style/vars";
 @import "../style/layout";
 
 .app__container {
   @extend .full-screen-fixed;
 
   z-index: 1;
+}
+
+.app-header {
+  position: absolute;
+  height: $appHeaderHeight;
+  width: 100%;
+  background-color: rgba($pink, 0.1);
+  display: grid;
+  grid-template-columns: .8fr .2fr;
+}
+
+.app-header__user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

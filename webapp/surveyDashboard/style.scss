@@ -15,6 +15,7 @@ $op: .1;
   display: grid;
   grid-template-columns: .7fr .3fr;
   background-color: rgba($blue1, $op);
+  padding-top: $appHeaderHeight;
 }
 
 .survey-info__actions {

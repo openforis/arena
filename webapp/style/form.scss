@@ -40,6 +40,13 @@ button, .btn {
   }
 }
 
+.btn-xs {
+  padding: .5rem;
+  font-weight: 100;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+}
+
 .btn-link {
   border: none !important;
 
@@ -57,4 +64,9 @@ button, .btn {
 .btn-of-light {
   @extend .btn-of;
   border-color: rgba($white, .4) !important;
+}
+
+.btn-of-light-xs {
+  @extend .btn-of;
+  border-color: rgba($white, .1) !important;
 }
