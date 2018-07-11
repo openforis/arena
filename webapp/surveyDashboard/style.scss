@@ -21,7 +21,9 @@ $op: .1;
 .survey-dashboard__survey-info-container {
   align-content: center;
   display: grid;
-  background-color: rgba($yellow,$op);
+  //background-color: rgba($blue2,$op);
+  background-color: rgba($blue1,$op);
+
   //border-bottom: 25px solid rgba($yellow,0.05);
 
   /* border-bottom: 5px dotted rgba(215, 215, 215, 0.1); */
@@ -57,7 +59,8 @@ $op: .1;
 
 .survey-modules__module {
   padding: 3.5rem .5rem;
-  background-color: $gridBgColor;
+  //background-color: rgba($blue1,0.1);
+  background-color: rgba($blue2,0.1);
   display: grid;
   grid-template-columns: 1fr;
   justify-items: center;
