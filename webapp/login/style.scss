@@ -3,47 +3,6 @@
 
 $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
 
-.login__container {
-  @extend .full-screen-fixed;
-}
-
-.login__bg {
-  @extend .full-screen-fixed;
-  background-size: cover;
-  background-position: center;
-}
-
-.login__bg1 {
-  @extend .full-screen-fixed;
-  @extend .login__bg;
-  background-image: url("/img/landing-bg.jpg");
-}
-
-.login__bg2 {
-  @extend .full-screen-fixed;
-  @extend .login__bg;
-  background-image: url("/img/landing-bg2.jpg");
-  transform: scale(1.3, 1.3);
-  opacity: .95;
-}
-
-.login__bg-overlay:after {
-  opacity: 0.8;
-  background: transparent;
-  background-image: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0.25) 100%);
-  background-repeat: repeat-x;
-  content: '';
-  display: block !important;
-
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-  width: 100%;
-}
-
 .login__grid {
   @extend .full-screen-fixed;
   display: grid;
@@ -61,6 +20,7 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
   font-weight: 100;
   text-align: center;
   padding-top: 1rem;
+  position: relative;
 }
 
 .login__form-container {

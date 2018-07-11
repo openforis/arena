@@ -36,9 +36,9 @@ class AppRouterSwitch extends React.Component {
     return (
       isReady
         ? <React.Fragment>
-          <div className="login__bg1"/>
-          <div className="login__bg2"/>
-          <div className="login__bg-overlay"/>
+          <div className="main__bg1"/>
+          <div className="main__bg2"/>
+          <div className="main__bg-overlay"/>
 
           <TransitionGroup component={null}>
             <Transition
@@ -64,7 +64,6 @@ class AppRouterSwitch extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  ...state.app,
   isReady: isAppReady(state)
 })
 

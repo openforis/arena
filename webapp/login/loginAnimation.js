@@ -28,9 +28,6 @@ const tlEnterInit = () => {
   tlEnter = new TimelineMax({pause: true})
   tlEnter.set('.login__container', {opacity: 1})
   tlEnter.set('.login__form', {opacity: 0})
-  // tlEnter.set('.login__bg1', {scaleX: 1.3, scaleY: 1.3})
-  // tlEnter.set('.login__bg2', {scaleX: 1.3, scaleY: 1.3, opacity: 1})
-  tlEnter.set('.of-letter', {position: 'relative'})
 
   const start = 'ofLettersEnd-=3'
 
@@ -73,7 +70,7 @@ const tlEnterInit = () => {
 
     //background image overlay
     // .set('.login__bg2', {opacity: .9}, start)
-    .to('.login__bg2', 12, {
+    .to('.main__bg2', 12, {
       scaleX: 1.6,
       scaleY: 1.6,
       opacity: 0.65,
@@ -92,7 +89,7 @@ const tlEnterInit = () => {
       ease: Power4.easeInOut
     }, start)
 
-    .fromTo('.login__bg1', 6,
+    .fromTo('.main__bg1', 6,
       {
         scaleX: 1.15,
         scaleY: 1.15,

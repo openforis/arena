@@ -24,7 +24,7 @@ const ofLetters = {
 }
 
 const LoginView = () =>
-  <div className="login__container height100">
+  <div className="login__container full-screen-fixed">
     {/*<div className="login__bg1"/>*/}
     {/*<div className="login__bg2"/>*/}
     {/*<div className="login__bg-overlay"/>*/}
