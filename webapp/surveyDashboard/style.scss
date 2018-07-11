@@ -66,13 +66,14 @@ $op: .1;
 
 .survey-info__container {
   display: grid;
-  grid-template-columns: .8fr .2fr;
+  grid-template-columns: .7fr .3fr;
 }
 
-.survey-info__btns {
+.survey-info__actions {
   display: grid;
-  grid-template-columns: .4fr .4fr;
+  grid-template-columns: .5fr .25fr .25fr;
   /* grid-column-gap: 1rem; */
   justify-content: space-evenly;
+  align-items: center;
 }
 
