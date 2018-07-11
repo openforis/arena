@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import { excludePathRoot } from '../app-utils/reduxUtils'
+
 export const appUri = '/app'
 export const loginUri = '/'
 
@@ -12,14 +14,12 @@ const appStatePath = {
   user: ['app', 'user']
 }
 
-const removeRootStatePath = R.remove(0, 1)
-
 export const appState = {
 
   isReady: R.pathEq(appStatePath.status, appStatus.ready),
 
   user: R.path(appStatePath.user),
 
-  logoutUser: R.dissocPath(removeRootStatePath(appStatePath.user))
+  logoutUser: R.dissocPath(excludePathRoot(appStatePath.user))
 
 }
