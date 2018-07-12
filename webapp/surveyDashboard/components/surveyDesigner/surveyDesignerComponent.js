@@ -36,7 +36,7 @@ class SurveyDesignerComponent extends React.Component {
         {
           R.equals(count(pages), 0)
             ? (
-              <button className="btn btn-of-light">
+              <button className="btn btn-of">
                 Start now!
               </button>
             )

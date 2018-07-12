@@ -9,15 +9,21 @@ export const appStatus = {
   ready: 'ready'
 }
 
+const app = 'app'
+const appSurvey = ['app', 'survey']
+
 const appStatePath = {
   //application status
-  status: ['app', 'status'],
+  status: [app, 'status'],
 
   //logged in user
-  user: ['app', 'user'],
+  user: [app, 'user'],
 
   //active survey
-  surveyId: ['app', 'surveyId'],
+  survey: {
+    id: [...appSurvey, 'id'],
+    status: [...appSurvey, 'status'],
+  },
 }
 
 export const appState = {
@@ -28,6 +34,9 @@ export const appState = {
 
   logoutUser: R.dissocPath(excludePathRoot(appStatePath.user)),
 
-  surveyId: R.path(appStatePath.surveyId),
+  //TODO Move to root survey state
+  surveyId: R.path(appStatePath.survey.id),
+
+  surveyStatus: R.path(appStatePath.survey.status),
 
 }

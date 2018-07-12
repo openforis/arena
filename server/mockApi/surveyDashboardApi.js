@@ -13,13 +13,13 @@ const init = app => {
   //survey section
   app.get(getPath('/survey'), (req, res) => {
     const survey = {
-      id: 1,
       surveyId: surveyIdRestParam(req),
       name: 'Italian NFI 2020',
       countryIso: 'ITA',
       ownerId: 1,
       addedTime: new Date().toISOString(),
-      status: surveyStatus.draft,
+      // status: surveyStatus.draft,
+      status: surveyStatus.new,
       version: {
         id: 1,
         addedTime: new Date().toISOString(),
@@ -53,8 +53,12 @@ const init = app => {
   app.get(getPath('/dataExplorer'), (req, res) => {
     const dataExplorer = {
       surveyId: surveyIdRestParam(req),
-      entities: {count: 0},
-      attributes: {count: 0}
+      entities: {},
+      // entities: {
+      //   tree: {count: 1236},
+      //   deadWood: {count: 589},
+      //   plot: {count: 90},
+      // },
     }
     res.json({dataExplorer})
   })

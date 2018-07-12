@@ -1,8 +1,14 @@
 const passport = require('passport')
 const {sendOkResp} = require('../response')
 
+const {defaultSurvey} = require('../../common/survey/survey')
+
+// on get user request, current survey is sent as well
 const sendUser = (res, user) =>
-  res.json({user, surveyId: 1})
+  res.json({
+    user,
+    survey: defaultSurvey
+  })
 
 const authenticationSuccessful = (req, res, next, user) =>
   req.logIn(user, err => {

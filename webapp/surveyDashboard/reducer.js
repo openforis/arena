@@ -13,6 +13,8 @@ const actionHandlers = {
 
   [actionTypes.surveyDesignerLoaded]: assocActionProps,
 
+  [actionTypes.dataExplorerLoaded]: assocActionProps,
+
 }
 
 export default exportReducer(actionHandlers)
