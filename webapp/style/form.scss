@@ -55,18 +55,48 @@ button, .btn {
   }
 }
 
+$ofBorderColor: rgba($white, .7);
+$ofBorder: 3px double !important;
+$ofBorderRadius: 255px 15px 225px 15px/15px 225px 15px 255px;
+$ofBorderColorLight: rgba($white, .4) !important;
+$ofBorderColorLightXs: rgba($white, .1) !important;
+
+.of {
+  border-radius: $ofBorderRadius;
+  border: $ofBorder;
+}
+
 .btn-of {
+  @extend .of;
   text-transform: uppercase;
-  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-  border: 3px double !important;
+  border-color: $ofBorderColor;
 }
 
 .btn-of-light {
   @extend .btn-of;
-  border-color: rgba($white, .4) !important;
+  border-color: $ofBorderColorLight;
 }
 
 .btn-of-light-xs {
   @extend .btn-of;
-  border-color: rgba($white, .1) !important;
+  border-color: $ofBorderColorLightXs;
+}
+
+//dropdown
+.dropdown {
+  display: grid;
+  grid-template-columns: .95fr .05fr;
+  align-items: center;
+
+  span.icon {
+    color: $whiteLight;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.dropdown-of {
+  @extend .of;
+  border-color: $ofBorderColorLight;
 }
