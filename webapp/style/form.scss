@@ -15,7 +15,7 @@ input {
   background-color: transparent;
   transition: all .5s ease;
 
-  &:focus {
+  &:not([readonly]):focus {
     background-color: rgba(44, 49, 44, 0.2);
   }
 }

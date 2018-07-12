@@ -1,4 +1,8 @@
-import { exportReducer, assocActionProps, dissocStateProps } from '../app-utils/reduxUtils'
+import {
+  exportReducer,
+  assocActionProps,
+  dissocStateProps
+} from '../app-utils/reduxUtils'
 
 import {
   loginError,
@@ -7,7 +11,7 @@ import {
 
 const actionHandlers = {
 
-  [loginError]: (state, action) => assocActionProps(state, action),
+  [loginError]: assocActionProps,
 
   [loginSuccess]: (state, action) => dissocStateProps(state, 'errorMessage')
 

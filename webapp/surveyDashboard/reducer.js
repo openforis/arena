@@ -1,8 +1,6 @@
-import * as R from 'ramda'
-
 import {
   exportReducer,
-  excludePathRoot
+  assocActionProps,
 } from '../app-utils/reduxUtils'
 
 import {
@@ -11,8 +9,9 @@ import {
 } from './surveyDashboard'
 
 const actionHandlers = {
-  [actionTypes.surveyLoaded]: (state, action) =>
-    R.assocPath(excludePathRoot(statePaths.survey), action.survey, state)
+
+  [actionTypes.surveyLoaded]: assocActionProps
+
 }
 
 export default exportReducer(actionHandlers)
