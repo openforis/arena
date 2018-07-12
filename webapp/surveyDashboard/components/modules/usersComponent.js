@@ -9,6 +9,8 @@ import { appState } from '../../../app/app'
 import { modules, statePaths } from '../../surveyDashboard'
 import { userRoles } from '../../../../common/user/userRole'
 
+const canInviteUsers = false
+
 class UsersComponent extends React.Component {
 
   render () {
@@ -41,14 +43,35 @@ class UsersComponent extends React.Component {
                   }
                 </div>
               )
-              : null
+              : (null)
           }
 
-          <button className="btn btn-of">
-            <span className="icon icon-user-plus icon-24px icon-left"/>
-            Invite
-          </button>
+          {
+            canInviteUsers
+              ? (
+                <button className="btn btn-of">
+                  <span className="icon icon-user-plus icon-24px icon-left"/>
+                  Invite
+                </button>
+              )
+              : (null)
+          }
 
+          {
+            !canInviteUsers && !hasUsers
+              ? (
+                <div style={{opacity: .2}}>
+                  <span className="icon icon-32px icon-cool"></span>
+                  <span className="icon icon-32px icon-sleepy"></span>
+                  <span className="icon icon-32px icon-shocked"></span>
+                  <span className="icon icon-32px icon-hipster"></span>
+                  <span className="icon icon-32px icon-frustrated"></span>
+                  <span className="icon icon-32px icon-baffled"></span>
+                  <span className="icon icon-32px icon-evil"></span>
+                </div>
+              )
+              : (null)
+          }
         </div>
       </DataFetchComponent>
     )
