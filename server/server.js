@@ -9,8 +9,8 @@ const sessionMiddleware = require('./config/sessionMiddleware')
 const headerMiddleware = require('./config/headerMiddleware')
 const accessControlMiddleware = require('./config/accessControlMiddleware')
 const authConfig = require('./auth/authConfig')
-// const apiRouter = require('./api/apiRouter')
 const authApi = require('./auth/authApi')
+const apiRouter = require('./apiRouter')
 
 // run database migrations
 require('./db/migration/execMigrations')()
@@ -36,8 +36,7 @@ app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
 
 //apis
 authApi.init(app)
-// initializing api router
-// app.use('/api', apiRouter.router)
+app.use('/api', apiRouter.router)
 
 const httpServerPort = process.env.PORT || '9090'
 app.listen(httpServerPort, () => {
