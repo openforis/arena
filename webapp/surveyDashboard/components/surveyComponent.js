@@ -8,6 +8,8 @@ import DataFetchComponent from './dataFetchComponent'
 import { appState } from '../../app/app'
 import { modules, statePaths } from '../surveyDashboard'
 
+import Dropdown from '../../commonComponents/dropdown'
+
 class SurveyComponent extends React.Component {
 
   render () {
@@ -17,12 +19,11 @@ class SurveyComponent extends React.Component {
       <DataFetchComponent module={modules.survey}>
         <div className="survey-info">
 
-          <div className="dropdown dropdown-of">
-            <input className="text-center"
-                   placeholder="Survey name"
-                   value={survey.name}/>
-            <span className="icon icon-menu2 icon-24px"></span>
-          </div>
+          <Dropdown className="dropdown-of"
+                    placeholder="Survey name"
+                    value={survey.name}
+                    selection={['survey 1', 'survey 2', 'survey 3', 'survey 4']}
+          />
 
           <div className="survey-info__actions">
 

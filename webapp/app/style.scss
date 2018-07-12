@@ -4,7 +4,7 @@
 .app__container {
   @extend .full-screen-fixed;
 
-  z-index: 1;
+  z-index: $zIndex1App;
   display: grid;
   grid-template-rows: 60px 1fr;
 }
