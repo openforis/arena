@@ -12,7 +12,6 @@ const init = app => {
 
   //survey section
   app.get(getPath('/survey'), (req, res) => {
-    console.log(surveyIdRestParam(req))
     const survey = {
       id: 1,
       surveyId: surveyIdRestParam(req),
@@ -41,7 +40,11 @@ const init = app => {
       surveyId: surveyIdRestParam(req),
       entityDefns: {count: 0},
       attributeDefns: {count: 0},
-      pages: {count: 0}
+      pages: {count: 0},
+      // surveyId: surveyIdRestParam(req),
+      // entityDefns: {count: 5},
+      // attributeDefns: {count: 20},
+      // pages: {count: 2},
     }
     res.json({surveyDesigner})
   })

@@ -2,10 +2,13 @@ export const surveyDashboardApiUri = surveyId => `/api/surveyDashboard/${surveyI
 
 const surveyDashboard = 'surveyDashboard'
 export const statePaths = {
-  survey: [surveyDashboard, 'survey']
+  survey: [surveyDashboard, 'survey'],
+  surveyDesigner: [surveyDashboard, 'surveyDesigner'],
 }
 
 export const actionTypes = {
-  surveyLoaded: 'surveyDashboard/survey/loaded'
+  surveyLoaded: 'surveyDashboard/survey/loaded',
+
+  surveyDesignerLoaded: 'surveyDashboard/surveyDesigner/loaded',
 }
 

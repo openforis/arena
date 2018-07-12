@@ -34,6 +34,13 @@ $op: .1;
   padding: 3.5rem .5rem;
   display: grid;
   grid-template-columns: 1fr;
+  grid-row-gap: 4rem;
   justify-items: center;
   align-content: start;
+}
+
+.survey-module-item {
+  @extend .survey-module;
+  padding: 0;
+  grid-row-gap: 1rem;
 }

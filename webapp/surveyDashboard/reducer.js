@@ -4,13 +4,14 @@ import {
 } from '../app-utils/reduxUtils'
 
 import {
-  actionTypes,
-  statePaths
+  actionTypes
 } from './surveyDashboard'
 
 const actionHandlers = {
 
-  [actionTypes.surveyLoaded]: assocActionProps
+  [actionTypes.surveyLoaded]: assocActionProps,
+
+  [actionTypes.surveyDesignerLoaded]: assocActionProps,
 
 }
 
