@@ -1,6 +1,6 @@
 import React from 'react'
 
-class SurveyInfo extends React.Component {
+class SurveyComponent extends React.Component {
 
   render () {
     return (
@@ -25,4 +25,4 @@ class SurveyInfo extends React.Component {
   }
 }
 
-export default SurveyInfo
+export default SurveyComponent
