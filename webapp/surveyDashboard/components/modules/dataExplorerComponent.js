@@ -7,7 +7,7 @@ import { surveyStatus } from '../../../../common/survey/survey'
 
 import DataFetchComponent from '../dataFetchComponent'
 import { appState } from '../../../app/app'
-import { dataComponentType, statePaths } from '../../surveyDashboard'
+import { modules, statePaths } from '../../surveyDashboard'
 
 class DataExplorerComponent extends React.Component {
 
@@ -18,7 +18,7 @@ class DataExplorerComponent extends React.Component {
     const entityCount = entity => R.path([entity, 'count'])(entities)
 
     return (
-      <DataFetchComponent type={dataComponentType.dataExplorer}>
+      <DataFetchComponent module={modules.dataExplorer}>
         <div className="survey-module">
 
           <div className="flex-center title-of">

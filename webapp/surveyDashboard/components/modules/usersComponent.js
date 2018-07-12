@@ -6,7 +6,7 @@ import * as R from 'ramda'
 import DataFetchComponent from '../dataFetchComponent'
 
 import { appState } from '../../../app/app'
-import { dataComponentType, statePaths } from '../../surveyDashboard'
+import { modules, statePaths } from '../../surveyDashboard'
 import { userRoles } from '../../../../common/user/userRole'
 
 class UsersComponent extends React.Component {
@@ -20,7 +20,7 @@ class UsersComponent extends React.Component {
     const hasUsers = roleKeys.some(roleHasUsers)
 
     return (
-      <DataFetchComponent type={dataComponentType.users}>
+      <DataFetchComponent module={modules.users}>
         <div className="survey-module">
 
           <div className="flex-center title-of">

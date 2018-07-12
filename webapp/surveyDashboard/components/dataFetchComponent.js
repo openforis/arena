@@ -7,8 +7,8 @@ import { connect } from 'react-redux'
 class DataFetchComponent extends React.Component {
 
   fetchData () {
-    const {getDashboardComponentData, surveyId, type} = this.props
-    getDashboardComponentData(surveyId, type)
+    const {getDashboardComponentData, surveyId, module} = this.props
+    getDashboardComponentData(surveyId, module)
   }
 
   componentDidMount () {

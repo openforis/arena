@@ -5,7 +5,7 @@ import * as R from 'ramda'
 
 import DataFetchComponent from '../dataFetchComponent'
 import { appState } from '../../../app/app'
-import { dataComponentType, statePaths } from '../../surveyDashboard'
+import { modules, statePaths } from '../../surveyDashboard'
 
 class SurveyDesignerComponent extends React.Component {
 
@@ -21,7 +21,7 @@ class SurveyDesignerComponent extends React.Component {
     const count = R.prop('count')
 
     return (
-      <DataFetchComponent type={dataComponentType.surveyDesigner}>
+      <DataFetchComponent module={modules.surveyDesigner}>
         <div className="survey-module">
 
           <div className="flex-center title-of">

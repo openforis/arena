@@ -6,7 +6,7 @@ import * as R from 'ramda'
 import DataFetchComponent from './dataFetchComponent'
 
 import { appState } from '../../app/app'
-import { dataComponentType, statePaths } from '../surveyDashboard'
+import { modules, statePaths } from '../surveyDashboard'
 
 class SurveyComponent extends React.Component {
 
@@ -14,7 +14,7 @@ class SurveyComponent extends React.Component {
     const {survey} = this.props
 
     return (
-      <DataFetchComponent type={dataComponentType.survey}>
+      <DataFetchComponent module={modules.survey}>
         <div className="survey-info">
 
           <input className="text-center"

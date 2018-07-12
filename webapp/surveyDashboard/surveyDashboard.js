@@ -2,7 +2,7 @@ const surveyDashboard = 'surveyDashboard'
 
 export const surveyDashboardApiUri = surveyId => `/api/surveyDashboard/${surveyId}`
 
-export const dataComponentType = {
+export const modules = {
   survey: 'survey',
   surveyDesigner: 'surveyDesigner',
   dataExplorer: 'dataExplorer',
@@ -11,11 +11,11 @@ export const dataComponentType = {
 }
 
 export const statePaths = {
-  survey: [surveyDashboard, dataComponentType.survey],
-  surveyDesigner: [surveyDashboard, dataComponentType.surveyDesigner],
-  dataExplorer: [surveyDashboard, dataComponentType.dataExplorer],
-  dataAnalysis: [surveyDashboard, dataComponentType.dataAnalysis],
-  users: [surveyDashboard, dataComponentType.users],
+  survey: [surveyDashboard, modules.survey],
+  surveyDesigner: [surveyDashboard, modules.surveyDesigner],
+  dataExplorer: [surveyDashboard, modules.dataExplorer],
+  dataAnalysis: [surveyDashboard, modules.dataAnalysis],
+  users: [surveyDashboard, modules.users],
 }
 
 export const actionTypes = {
