@@ -22,12 +22,20 @@ const userRoles = {
   dataEntry,
   dataAnalysis,
 
+  keys: () => [
+    administrator.role,
+    surveyManager.role,
+    dataEntry.role,
+    dataAnalysis.role,
+  ],
+
+
   toArray: () => [
     administrator,
     surveyManager,
     dataEntry,
-    dataAnalysis
-  ]
+    dataAnalysis,
+  ],
 
 }
 

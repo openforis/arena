@@ -82,6 +82,10 @@ const init = app => {
       [userRoles.surveyManager.role]: {count: 0},
       [userRoles.dataAnalysis.role]: {count: 0},
       [userRoles.dataEntry.role]: {count: 0},
+      // [userRoles.dataEntry.role]: {count: 9},
+      // [userRoles.dataAnalysis.role]: {count: 2},
+      // [userRoles.surveyManager.role]: {count: 1},
+      // [userRoles.administrator.role]: {count: 1},
     }
     const users = {
       surveyId: surveyIdRestParam(req),

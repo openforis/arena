@@ -2,15 +2,15 @@ import './style.scss'
 
 import React from 'react'
 
-import SurveyComponent from './components/survey/surveyComponent'
-import SurveyModulesComponent from './components/surveyModulesComponent'
+import SurveyComponent from './components/surveyComponent'
+import ModulesContainerComponent from './components/modules/modulesContainerComponent'
 
 const SurveyDashboardView = () => (
   <div className="survey-dashboard">
 
     <SurveyComponent/>
 
-    <SurveyModulesComponent/>
+    <ModulesContainerComponent/>
 
   </div>
 )

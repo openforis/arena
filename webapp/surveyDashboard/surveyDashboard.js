@@ -1,17 +1,24 @@
+const surveyDashboard = 'surveyDashboard'
+
 export const surveyDashboardApiUri = surveyId => `/api/surveyDashboard/${surveyId}`
 
-const surveyDashboard = 'surveyDashboard'
+export const dataComponentType = {
+  survey: 'survey',
+  surveyDesigner: 'surveyDesigner',
+  dataExplorer: 'dataExplorer',
+  dataAnalysis: 'dataAnalysis',
+  users: 'users',
+}
+
 export const statePaths = {
-  survey: [surveyDashboard, 'survey'],
-  surveyDesigner: [surveyDashboard, 'surveyDesigner'],
-  dataExplorer: [surveyDashboard, 'dataExplorer'],
+  survey: [surveyDashboard, dataComponentType.survey],
+  surveyDesigner: [surveyDashboard, dataComponentType.surveyDesigner],
+  dataExplorer: [surveyDashboard, dataComponentType.dataExplorer],
+  dataAnalysis: [surveyDashboard, dataComponentType.dataAnalysis],
+  users: [surveyDashboard, dataComponentType.users],
 }
 
 export const actionTypes = {
-  surveyLoaded: 'surveyDashboard/survey/loaded',
-
-  surveyDesignerLoaded: 'surveyDashboard/surveyDesigner/loaded',
-
-  dataExplorerLoaded: 'surveyDashboard/dataExplorer/loaded',
+  surveyDashboardDataComponentLoaded: 'surveyDashboard/dataComponent/loaded',
 }
 
