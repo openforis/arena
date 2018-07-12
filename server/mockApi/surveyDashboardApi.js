@@ -1,0 +1,90 @@
+const {restParam} = require('../request')
+
+const {surveyStatus} = require('../../common/survey/survey')
+const {userRoles} = require('../../common/user/userRole')
+
+const getPath = path =>
+  `/surveyDashboard/:surveyId${path}`
+
+const surveyIdRestParam = restParam('surveyId')
+
+const init = app => {
+
+  //survey section
+  app.get(getPath('/survey'), (req, res) => {
+    console.log(surveyIdRestParam(req))
+    const survey = {
+      id: 1,
+      surveyId: surveyIdRestParam(req),
+      name: 'Italian NFI 2020',
+      countryIso: 'ITA',
+      ownerId: 1,
+      addedTime: new Date().toISOString(),
+      status: surveyStatus.draft,
+      version: {
+        id: 1,
+        addedTime: new Date().toISOString(),
+        updatedTime: new Date().toISOString(),
+      },
+      draftVersion: {
+        id: 2,
+        addedTime: new Date().toISOString(),
+        updatedTime: new Date().toISOString(),
+      }
+    }
+    res.json({survey})
+  })
+
+  //Survey Designer
+  app.get(getPath('/surveyDesigner'), (req, res) => {
+    const surveyDesigner = {
+      surveyId: surveyIdRestParam(req),
+      entityDefns: {count: 0},
+      attributeDefns: {count: 0},
+      pages: {count: 0}
+    }
+    res.json({surveyDesigner})
+  })
+
+  //Data Explorer
+  app.get(getPath('/dataExplorer'), (req, res) => {
+    const dataExplorer = {
+      surveyId: surveyIdRestParam(req),
+      entities: {count: 0},
+      attributes: {count: 0}
+    }
+    res.json({dataExplorer})
+  })
+
+  //Data Analysis
+  app.get(getPath('/dataAnalysis'), (req, res) => {
+    const dataAnalysis = {
+      surveyId: surveyIdRestParam(req),
+      samplingDesign: null,
+      entities: {count: 0},
+      // attributes: {count: 0},
+      outputAttributes: {count: 0},
+    }
+    res.json({dataAnalysis})
+  })
+
+  //Users
+  app.get(getPath('/users'), (req, res) => {
+    const roles = {
+      [userRoles.administrator.role]: {count: 0},
+      [userRoles.surveyManager.role]: {count: 0},
+      [userRoles.dataAnalysis.role]: {count: 0},
+      [userRoles.dataEntry.role]: {count: 0},
+    }
+    const users = {
+      surveyId: surveyIdRestParam(req),
+      ...roles
+    }
+    res.json({users})
+  })
+
+}
+
+module.exports = {
+  init
+}

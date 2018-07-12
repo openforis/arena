@@ -1,20 +1,22 @@
 const passport = require('passport')
 const {sendOkResp} = require('../response')
 
+const sendUser = (res, user) =>
+  res.json({user, surveyId: 1})
+
 const authenticationSuccessful = (req, res, next, user) =>
   req.logIn(user, err => {
     if (err)
       next(err)
     else {
-      req.session.save(() => res.json({user}))
+      req.session.save(() => sendUser(res, user))
     }
   })
-
 
 module.exports.init = app => {
 
   app.get('/auth/user', (req, res) => {
-    res.json({user: req.user})
+    sendUser(res, req.user)
   })
 
   app.post('/auth/logout', (req, res) => {

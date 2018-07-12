@@ -10,7 +10,7 @@ import { getSurvey } from './actions'
 class SurveyComponent extends React.Component {
 
   componentDidMount () {
-    const {getSurvey, surveyId = 1} = this.props
+    const {getSurvey, surveyId} = this.props
     getSurvey(surveyId)
   }
 
@@ -42,7 +42,6 @@ class SurveyComponent extends React.Component {
 }
 
 SurveyComponent.defaultProps = {
-  surveyId: 1,
   survey: {
     name: ''
   }

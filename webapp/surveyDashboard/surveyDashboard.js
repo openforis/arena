@@ -2,8 +2,6 @@ export const surveyDashboardApiUri = surveyId => `/api/surveyDashboard/${surveyI
 
 const surveyDashboard = 'surveyDashboard'
 export const statePaths = {
-  surveyId: [surveyDashboard, 'surveyId'],
-
   survey: [surveyDashboard, 'survey']
 }
 
