@@ -29,9 +29,15 @@ class DataExplorerComponent extends React.Component {
           {
             surveyStatus.isNew(surveyStatusApp)
               ? (
-                <button className="btn btn-of-light width50">
-                  Start designing your forms!
-                </button>
+                <div style={{opacity: .2}}>
+                  <span className="icon icon-32px icon-stats-dots"></span>
+                  <span className="icon icon-32px icon-pie-chart"></span>
+                  <span className="icon icon-32px icon-stats-bars"></span>
+                  <span className="icon icon-32px icon-stats-bars2"></span>
+                  <span className="icon icon-32px icon-tree"></span>
+                  <span className="icon icon-32px icon-database"></span>
+                  <span className="icon icon-32px icon-table2"></span>
+                </div>
               )
               : (
                 <React.Fragment>
@@ -55,17 +61,21 @@ class DataExplorerComponent extends React.Component {
                             )
                           }
                           <button className="btn btn-of" key={'btn-explore'}>
-                            Explore now!
+                            <span className="icon icon-table2 icon-24px icon-left"></span>
+                            Explore
                           </button>
 
                         </div>
                       )
                   }
 
-                  <button className="btn btn-of">
-                    <span className="icon icon-plus icon-left"/>
-                    Add a record
-                  </button>
+                  {/*TODO: add check if published*/}
+                  <div className="survey-module-item">
+                    <button className="btn btn-of">
+                      <span className="icon icon-plus icon-20px icon-left"/>
+                      Record
+                    </button>
+                  </div>
 
                 </React.Fragment>
               )

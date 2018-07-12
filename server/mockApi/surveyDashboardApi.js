@@ -38,10 +38,10 @@ const init = app => {
   app.get(getPath('/surveyDesigner'), (req, res) => {
     const surveyDesigner = {
       surveyId: surveyIdRestParam(req),
+
       entityDefns: {count: 0},
       attributeDefns: {count: 0},
       pages: {count: 0},
-      // surveyId: surveyIdRestParam(req),
       // entityDefns: {count: 5},
       // attributeDefns: {count: 20},
       // pages: {count: 2},
@@ -58,6 +58,7 @@ const init = app => {
       //   tree: {count: 1236},
       //   deadWood: {count: 589},
       //   plot: {count: 90},
+      //   cluster: {count: 11},
       // },
     }
     res.json({dataExplorer})

@@ -45,7 +45,7 @@ class UsersComponent extends React.Component {
           }
 
           <button className="btn btn-of">
-            <span className="icon icon-user-plus icon-left"/>
+            <span className="icon icon-user-plus icon-24px icon-left"/>
             Invite
           </button>
 

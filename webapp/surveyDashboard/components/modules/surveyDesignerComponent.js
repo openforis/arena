@@ -45,7 +45,8 @@ class SurveyDesignerComponent extends React.Component {
           }
 
           <button className="btn btn-of">
-            Design your survey
+            <span className="icon icon-quill icon-24px icon-left"></span>
+            Design
           </button>
 
         </div>
