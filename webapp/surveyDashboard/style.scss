@@ -13,14 +13,16 @@ $op: .1;
 
 .survey-info {
   display: grid;
-  grid-template-columns: .7fr .3fr;
+  grid-template-columns: .6fr .4fr;
   background-color: rgba($blue1, $op);
   align-content: center;
 }
 
 .survey-info__actions {
   display: grid;
-  grid-template-columns: .25fr .25fr .25fr .25fr;
+  grid-template-columns: repeat(5, .2fr);
+  grid-column-gap: 1rem;
+  padding: 0 1rem;
   justify-content: space-evenly;
   align-items: center;
 }

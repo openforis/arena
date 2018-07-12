@@ -40,8 +40,11 @@ class SurveyComponent extends React.Component {
             </button>
 
             <button className="btn btn-of-light">
-              <span className="icon icon-plus icon-20px icon-left"/>
-              Survey
+              <span className="icon icon-bin icon-24px"/>
+            </button>
+
+            <button className="btn btn-of-light">
+              <span className="icon icon-plus icon-24px"/>
             </button>
 
           </div>

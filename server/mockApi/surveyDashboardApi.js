@@ -14,7 +14,10 @@ const init = app => {
   app.get(getPath('/survey'), (req, res) => {
     const survey = {
       surveyId: surveyIdRestParam(req),
-      name: 'Italian NFI 2020',
+      name: '',
+      // name: 'Italian NFI 2020',
+
+
       countryIso: 'ITA',
       ownerId: 1,
       addedTime: new Date().toISOString(),
