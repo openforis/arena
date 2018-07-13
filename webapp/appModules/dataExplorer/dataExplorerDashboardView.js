@@ -3,13 +3,13 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { surveyStatus } from '../../../../common/survey/survey'
+import { surveyStatus } from '../../../common/survey/survey'
 
 import DataFetchComponent from '../dataFetchComponent'
-import { appState, appModules } from '../../../app/app'
-import { statePaths } from '../../surveyDashboard'
+import { appState } from '../../app/app'
+import { appModules, getDashboardData } from '../appModules'
 
-class DataExplorerComponent extends React.Component {
+class DataExplorerDashboardView extends React.Component {
 
   render () {
     const {dataExplorer, surveyStatusApp} = this.props
@@ -18,8 +18,8 @@ class DataExplorerComponent extends React.Component {
     const entityCount = entity => R.path([entity, 'count'])(entities)
 
     return (
-      <DataFetchComponent module={appModules.dataExplorer}>
-        <div className="survey-module">
+      <DataFetchComponent module={appModules.dataExplorer} dashboard={true}>
+        <div className="app-dashboard__module">
 
           <div className="flex-center title-of">
             <span className="icon icon-table2 icon-24px icon-left"/>
@@ -47,7 +47,7 @@ class DataExplorerComponent extends React.Component {
                         null
                       )
                       : (
-                        <div className="survey-module-item">
+                        <div className="app-dashboard__module-item">
                           {
                             R.reduce(
                               (array, entity) => {
@@ -70,7 +70,7 @@ class DataExplorerComponent extends React.Component {
                   }
 
                   {/*TODO: add check if published*/}
-                  <div className="survey-module-item">
+                  <div className="app-dashboard__module-item">
                     <button className="btn btn-of">
                       <span className="icon icon-plus icon-left"/>
                       Record
@@ -88,7 +88,7 @@ class DataExplorerComponent extends React.Component {
 
 }
 
-DataExplorerComponent.defaultProps = {
+DataExplorerDashboardView.defaultProps = {
   dataExplorer: {
     surveyId: -1,
     entities: {},
@@ -96,9 +96,8 @@ DataExplorerComponent.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  surveyId: appState.surveyId(state),
   surveyStatusApp: appState.surveyStatus(state),
-  dataExplorer: R.path(statePaths.dataExplorer)(state),
+  dataExplorer: getDashboardData(appModules.dataExplorer)(state),
 })
 
-export default connect(mapStateToProps)(DataExplorerComponent)
+export default connect(mapStateToProps)(DataExplorerDashboardView)

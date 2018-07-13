@@ -31,21 +31,14 @@ export const appState = {
 
   isReady: R.pathEq(statePath.status, systemStatus.ready),
 
-  user: R.path(statePath.user),
+  getUser: R.path(statePath.user),
 
   logoutUser: R.dissocPath(excludePathRoot(statePath.user)),
 
-  //TODO Move to root survey state
+  //TODO Move to root survey state??
   surveyId: R.path(statePath.survey.id),
 
   surveyStatus: R.path(statePath.survey.status),
 
 }
 
-export const appModules = {
-  survey: 'survey',
-  surveyDesigner: 'surveyDesigner',
-  dataExplorer: 'dataExplorer',
-  dataAnalysis: 'dataAnalysis',
-  users: 'users',
-}

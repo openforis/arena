@@ -1,0 +1,17 @@
+@import "../style/vars";
+
+.survey-info {
+  display: grid;
+  grid-template-columns: .6fr .4fr;
+  background-color: rgba($blue1, .1);
+  align-content: center;
+}
+
+.survey-info__actions {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  grid-column-gap: 2rem;
+  padding: 0 1rem;
+  justify-content: center;
+  align-items: center;
+}

@@ -55,7 +55,7 @@ class AppHeader extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  user: appState.user(state)
+  user: appState.getUser(state)
 })
 
 export default connect(mapStateToProps, {logout})(AppHeader)

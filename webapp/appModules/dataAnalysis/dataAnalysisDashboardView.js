@@ -3,20 +3,20 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { surveyStatus } from '../../../../common/survey/survey'
+import { surveyStatus } from '../../../common/survey/survey'
 
 import DataFetchComponent from '../dataFetchComponent'
-import { appState, appModules } from '../../../app/app'
-import { statePaths } from '../../surveyDashboard'
+import { appState } from '../../app/app'
+import { appModules, getDashboardData } from '../appModules'
 
-class DataAnalysisComponent extends React.Component {
+class DataAnalysisDashboardView extends React.Component {
 
   render () {
     const {dataAnalysis, surveyStatusApp} = this.props
 
     return (
-      <DataFetchComponent module={appModules.dataExplorer}>
-        <div className="survey-module">
+      <DataFetchComponent module={appModules.dataAnalysis} dashboard={true}>
+        <div className="app-dashboard__module">
 
           <div className="flex-center title-of">
             <span className="icon icon-calculator icon-24px icon-left"/>
@@ -59,8 +59,9 @@ class DataAnalysisComponent extends React.Component {
 
 }
 
-DataAnalysisComponent.defaultProps = {
+DataAnalysisDashboardView.defaultProps = {
   dataAnalysis: {
+    surveyId: -1,
     samplingDesign: null,
     entities: {count: 0},
     // attributes: {count: 0},
@@ -69,9 +70,8 @@ DataAnalysisComponent.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  surveyId: appState.surveyId(state),
   surveyStatusApp: appState.surveyStatus(state),
-  dataAnalysis: R.path(statePaths.dataAnalysis)(state),
+  dataAnalysis: getDashboardData(appModules.dataAnalysis)(state),
 })
 
-export default connect(mapStateToProps)(DataAnalysisComponent)
+export default connect(mapStateToProps)(DataAnalysisDashboardView)

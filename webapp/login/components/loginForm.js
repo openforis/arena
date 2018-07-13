@@ -46,7 +46,7 @@ class LoginForm extends React.Component {
 
 const mapStateToProps = state => ({
   ...state.login,
-  user: appState.user(state)
+  user: appState.getUser(state)
 })
 
 export default connect(mapStateToProps, {login})(LoginForm)

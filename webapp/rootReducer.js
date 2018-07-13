@@ -2,10 +2,10 @@ import { combineReducers } from 'redux'
 
 import app from './app/reducer'
 import login from './login/reducer'
-import surveyDashboard from './surveyDashboard/components/reducer'
+import appModules from './appModules/reducer'
 
 export default combineReducers({
   app,
   login,
-  surveyDashboard
+  appModules
 })

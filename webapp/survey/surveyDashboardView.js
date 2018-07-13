@@ -1,22 +1,24 @@
+import './style.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import DataFetchComponent from './dataFetchComponent'
+import DataFetchComponent from '../appModules/dataFetchComponent'
 
-import { appState , appModules} from '../../app/app'
-import { statePaths } from '../surveyDashboard'
+import { appState } from '../app/app'
+import { appModules, getDashboardData } from '../appModules/appModules'
 
-import Dropdown from '../../commonComponents/dropdown'
+import Dropdown from '../commonComponents/dropdown'
 
-class SurveyComponent extends React.Component {
+class SurveyDashboardView extends React.Component {
 
   render () {
     const {survey} = this.props
 
     return (
-      <DataFetchComponent module={appModules.survey}>
+      <DataFetchComponent module={appModules.survey} dashboard={true}>
         <div className="survey-info">
 
           <Dropdown className="dropdown-of"
@@ -54,7 +56,7 @@ class SurveyComponent extends React.Component {
   }
 }
 
-SurveyComponent.defaultProps = {
+SurveyDashboardView.defaultProps = {
   survey: {
     name: ''
   }
@@ -62,7 +64,7 @@ SurveyComponent.defaultProps = {
 
 const mapStateToProps = state => ({
   surveyId: appState.surveyId(state),
-  survey: R.path(statePaths.survey)(state)
+  survey: getDashboardData(appModules.survey)(state)
 })
 
-export default connect(mapStateToProps)(SurveyComponent)
+export default connect(mapStateToProps)(SurveyDashboardView)

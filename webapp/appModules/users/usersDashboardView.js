@@ -5,13 +5,13 @@ import * as R from 'ramda'
 
 import DataFetchComponent from '../dataFetchComponent'
 
-import { appState, appModules } from '../../../app/app'
-import { statePaths } from '../../surveyDashboard'
-import { userRoles } from '../../../../common/user/userRole'
+import { appState } from '../../app/app'
+import { appModules, getDashboardData } from '../appModules'
+import { userRoles } from '../../../common/user/userRole'
 
 const canInviteUsers = false
 
-class UsersComponent extends React.Component {
+class UsersDashboardView extends React.Component {
 
   render () {
     const {users} = this.props
@@ -22,8 +22,8 @@ class UsersComponent extends React.Component {
     const hasUsers = roleKeys.some(roleHasUsers)
 
     return (
-      <DataFetchComponent module={appModules.users}>
-        <div className="survey-module">
+      <DataFetchComponent module={appModules.users} dashboard={true}>
+        <div className="app-dashboard__module">
 
           <div className="flex-center title-of">
             <span className="icon icon-users icon-24px icon-left"/>
@@ -33,7 +33,7 @@ class UsersComponent extends React.Component {
           {
             hasUsers
               ? (
-                <div className="survey-module-item">
+                <div className="app-dashboard__module-item">
                   {
                     roleKeys.map(
                       role => roleHasUsers(role)
@@ -83,8 +83,9 @@ class UsersComponent extends React.Component {
 
 }
 
-UsersComponent.defaultProps = {
+UsersDashboardView.defaultProps = {
   users: {
+    surveyId: -1,
     [userRoles.administrator.role]: {count: 0},
     [userRoles.surveyManager.role]: {count: 0},
     [userRoles.dataAnalysis.role]: {count: 0},
@@ -93,9 +94,8 @@ UsersComponent.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  surveyId: appState.surveyId(state),
   surveyStatusApp: appState.surveyStatus(state),
-  users: R.path(statePaths.users)(state),
+  users: getDashboardData(appModules.users)(state),
 })
 
-export default connect(mapStateToProps)(UsersComponent)
+export default connect(mapStateToProps)(UsersDashboardView)

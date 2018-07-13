@@ -4,10 +4,10 @@ import React from 'react'
 import { Route } from 'react-router'
 
 import AppHeader from './components/appHeader'
-import SurveyDashboardView from '../surveyDashboard/surveyDashboardView'
+import AppDashboardView from '../appDashboard/appDashboardView'
 
 import { appUri } from './app'
-import { appModules } from './app'
+import { appModules } from '../appModules/appModules'
 
 const AppView = (props) =>
   <div className="app__container">
@@ -15,10 +15,10 @@ const AppView = (props) =>
     <AppHeader {...props} />
 
     <Route exact path={appUri()}
-           component={SurveyDashboardView}/>
+           component={AppDashboardView}/>
 
     <Route exact path={appUri(appModules.surveyDesigner)}
-           render={()=><div>Survey Designer</div>}/>
+           render={() => <div>Survey Designer</div>}/>
 
   </div>
 

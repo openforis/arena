@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import * as R from 'ramda'
 
 import DataFetchComponent from '../dataFetchComponent'
-import { appState, appModules, appUri } from '../../../app/app'
-import { statePaths } from '../../surveyDashboard'
+import { appUri } from '../../app/app'
+import { appModules, getDashboardData } from '../appModules'
 
-class SurveyDesignerComponent extends React.Component {
+class SurveyDesignerDashboardView extends React.Component {
 
   render () {
     const {surveyDesigner} = this.props
@@ -22,8 +22,8 @@ class SurveyDesignerComponent extends React.Component {
     const count = R.prop('count')
 
     return (
-      <DataFetchComponent module={appModules.surveyDesigner}>
-        <div className="survey-module">
+      <DataFetchComponent module={appModules.surveyDesigner} dashboard={true}>
+        <div className="app-dashboard__module">
 
           <div className="flex-center title-of">
             <span className="icon icon-quill icon-24px icon-left"/>
@@ -36,7 +36,7 @@ class SurveyDesignerComponent extends React.Component {
                 null
               )
               : (
-                <div className="survey-module-item">
+                <div className="app-dashboard__module-item">
                   <div>{count(pages)} Pages</div>
                   <div>{count(entityDefns)} Entities</div>
                   <div>{count(attributeDefns)} Attributes</div>
@@ -57,7 +57,7 @@ class SurveyDesignerComponent extends React.Component {
 
 }
 
-SurveyDesignerComponent.defaultProps = {
+SurveyDesignerDashboardView.defaultProps = {
   surveyDesigner: {
     surveyId: -1,
     entityDefns: {count: 0},
@@ -67,8 +67,7 @@ SurveyDesignerComponent.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  surveyId: appState.surveyId(state),
-  surveyDesigner: R.path(statePaths.surveyDesigner)(state)
+  surveyDesigner: getDashboardData(appModules.surveyDesigner)(state)
 })
 
-export default connect(mapStateToProps)(SurveyDesignerComponent)
+export default connect(mapStateToProps)(SurveyDesignerDashboardView)
