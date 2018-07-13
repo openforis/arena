@@ -53,13 +53,7 @@ button, .btn {
   font-size: 0.8rem;
 }
 
-.btn-link {
-  border: none !important;
 
-  &:hover {
-    color: rgba($white, 0.95);
-  }
-}
 
 $ofBorderColor: rgba($white, .6) !important;
 $ofBorder: 3px double !important;
@@ -76,6 +70,18 @@ $ofBorderColorLightXs: rgba($white, .1) !important;
   @extend .of;
   text-transform: uppercase;
   border-color: $ofBorderColor;
+}
+
+.btn-of-link {
+  border: none !important;
+  border-bottom: 3px double transparent !important;
+  border-bottom-right-radius: 10% 2%;
+  border-bottom-left-radius: 80% 10%;
+
+  &:hover {
+    background-color: transparent;
+    border-bottom: 3px double rgba(222, 220, 203, 0.6) !important;
+  }
 }
 
 .btn-of-light {

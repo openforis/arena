@@ -32,11 +32,10 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
 
 .login__form {
   display: grid;
-  grid-template-columns: 60%;
+  grid-template-columns: .7fr;
   height: 100%;
   position: relative;
   justify-content: center;
-  justify-items: center;
   align-content: space-evenly;
   //box-shadow: 0px -8px 260px -50px rgba($color, 0.1);
 
@@ -48,11 +47,11 @@ $loginGridCellBgColor: rgba(239, 155, 155, 0.2);
   .buttons {
     width: 70%;
     display: grid;
-    grid-template-columns: 100%;
+    justify-self: center;
+    grid-row-gap: .5rem;
 
-    .btn-link {
-      text-align: right;
-      font-size: 0.9rem;
+    .btn-of-link {
+      justify-self: end;
     }
   }
 }

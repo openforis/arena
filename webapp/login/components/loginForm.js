@@ -31,7 +31,10 @@ class LoginForm extends React.Component {
                       onClick={() => login(this.refs.username.value, this.refs.password.value)}>
                 Login
               </button>
-              <button type="button" className="btn btn-link">Password??</button>
+              <button type="button" className="btn btn-s btn-of-link">
+                <span className="icon icon-question icon-left icon-12px"/>
+                Forgot Password
+              </button>
             </div>
 
           </div>
