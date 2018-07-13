@@ -13,7 +13,7 @@ class LoginForm extends React.Component {
     return (
       user
         ? (
-          <Redirect to={appUri}/>
+          <Redirect to={appUri()}/>
         )
         : (
           <div className="login__form">

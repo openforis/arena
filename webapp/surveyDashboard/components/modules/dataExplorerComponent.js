@@ -6,8 +6,8 @@ import * as R from 'ramda'
 import { surveyStatus } from '../../../../common/survey/survey'
 
 import DataFetchComponent from '../dataFetchComponent'
-import { appState } from '../../../app/app'
-import { modules, statePaths } from '../../surveyDashboard'
+import { appState, appModules } from '../../../app/app'
+import { statePaths } from '../../surveyDashboard'
 
 class DataExplorerComponent extends React.Component {
 
@@ -18,7 +18,7 @@ class DataExplorerComponent extends React.Component {
     const entityCount = entity => R.path([entity, 'count'])(entities)
 
     return (
-      <DataFetchComponent module={modules.dataExplorer}>
+      <DataFetchComponent module={appModules.dataExplorer}>
         <div className="survey-module">
 
           <div className="flex-center title-of">

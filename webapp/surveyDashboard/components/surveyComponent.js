@@ -5,8 +5,8 @@ import * as R from 'ramda'
 
 import DataFetchComponent from './dataFetchComponent'
 
-import { appState } from '../../app/app'
-import { modules, statePaths } from '../surveyDashboard'
+import { appState , appModules} from '../../app/app'
+import { statePaths } from '../surveyDashboard'
 
 import Dropdown from '../../commonComponents/dropdown'
 
@@ -16,7 +16,7 @@ class SurveyComponent extends React.Component {
     const {survey} = this.props
 
     return (
-      <DataFetchComponent module={modules.survey}>
+      <DataFetchComponent module={appModules.survey}>
         <div className="survey-info">
 
           <Dropdown className="dropdown-of"

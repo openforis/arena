@@ -5,8 +5,8 @@ import * as R from 'ramda'
 
 import DataFetchComponent from '../dataFetchComponent'
 
-import { appState } from '../../../app/app'
-import { modules, statePaths } from '../../surveyDashboard'
+import { appState, appModules } from '../../../app/app'
+import { statePaths } from '../../surveyDashboard'
 import { userRoles } from '../../../../common/user/userRole'
 
 const canInviteUsers = false
@@ -22,7 +22,7 @@ class UsersComponent extends React.Component {
     const hasUsers = roleKeys.some(roleHasUsers)
 
     return (
-      <DataFetchComponent module={modules.users}>
+      <DataFetchComponent module={appModules.users}>
         <div className="survey-module">
 
           <div className="flex-center title-of">

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { appStatus } from './app'
+import { systemStatus } from './app'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
@@ -13,7 +13,7 @@ export const initApp = () => async dispatch => {
 
     const data = R.prop('data', resp)
 
-    dispatch({type: appStatusChange, status: appStatus.ready, ...data})
+    dispatch({type: appStatusChange, status: systemStatus.ready, ...data})
 
   } catch (e) {
   }

@@ -2,17 +2,17 @@ import * as R from 'ramda'
 
 import { excludePathRoot } from '../app-utils/reduxUtils'
 
-export const appUri = '/app'
+export const appUri = module => ['/app', module].join('/')
 export const loginUri = '/'
 
-export const appStatus = {
+export const systemStatus = {
   ready: 'ready'
 }
 
 const app = 'app'
 const appSurvey = ['app', 'survey']
 
-const appStatePath = {
+const statePath = {
   //application status
   status: [app, 'status'],
 
@@ -28,15 +28,23 @@ const appStatePath = {
 
 export const appState = {
 
-  isReady: R.pathEq(appStatePath.status, appStatus.ready),
+  isReady: R.pathEq(statePath.status, systemStatus.ready),
 
-  user: R.path(appStatePath.user),
+  user: R.path(statePath.user),
 
-  logoutUser: R.dissocPath(excludePathRoot(appStatePath.user)),
+  logoutUser: R.dissocPath(excludePathRoot(statePath.user)),
 
   //TODO Move to root survey state
-  surveyId: R.path(appStatePath.survey.id),
+  surveyId: R.path(statePath.survey.id),
 
-  surveyStatus: R.path(appStatePath.survey.status),
+  surveyStatus: R.path(statePath.survey.status),
 
+}
+
+export const appModules = {
+  survey: 'survey',
+  surveyDesigner: 'surveyDesigner',
+  dataExplorer: 'dataExplorer',
+  dataAnalysis: 'dataAnalysis',
+  users: 'users',
 }
