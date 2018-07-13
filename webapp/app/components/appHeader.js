@@ -22,7 +22,7 @@ class AppHeader extends React.Component {
               ? (null)
               : (
                 <Link to={appUri()} className="btn btn-s btn-of-light-xs">
-                  <span className="icon icon-home"></span>
+                  <span className="icon icon-home2 icon-20px"></span>
                 </Link>
               )
 
