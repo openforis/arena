@@ -31,7 +31,7 @@ input {
   background-color: transparent;
 
   &:not([readonly]):focus {
-    background-color: rgba(44, 49, 44, 0.2);
+    background-color: rgba($black, 0.35);
   }
 }
 
@@ -53,10 +53,8 @@ button, .btn {
   font-size: 0.8rem;
 }
 
-
-
 $ofBorderColor: rgba($white, .6) !important;
-$ofBorder: 3px double !important;
+$ofBorder: 1px solid !important;
 $ofBorderRadius: 255px 15px 225px 15px/15px 225px 15px 255px;
 $ofBorderColorLight: rgba($white, .4) !important;
 $ofBorderColorLightXs: rgba($white, .1) !important;
@@ -74,13 +72,13 @@ $ofBorderColorLightXs: rgba($white, .1) !important;
 
 .btn-of-link {
   border: none !important;
-  border-bottom: 3px double transparent !important;
+  border-bottom: 1px solid transparent !important;
   border-bottom-right-radius: 10% 2%;
   border-bottom-left-radius: 80% 10%;
 
   &:hover {
     background-color: transparent;
-    border-bottom: 3px double rgba(222, 220, 203, 0.6) !important;
+    border-bottom: 1px solid rgba(222, 220, 203, 0.6) !important;
   }
 }
 

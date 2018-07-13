@@ -41,6 +41,10 @@ class UsersComponent extends React.Component {
                         : null
                     )
                   }
+                  <button className="btn btn-of">
+                    <span className="icon icon-users icon-left"/>
+                    See all
+                  </button>
                 </div>
               )
               : (null)
