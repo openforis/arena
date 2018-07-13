@@ -14,8 +14,11 @@ const AppView = (props) =>
 
     <AppHeader {...props} />
 
-    <Route exact path={appUri()} component={SurveyDashboardView}/>
-    <Route exact path={appUri(appModules.surveyDesigner)} component={SurveyDashboardView}/>
+    <Route exact path={appUri()}
+           component={SurveyDashboardView}/>
+
+    <Route exact path={appUri(appModules.surveyDesigner)}
+           render={()=><div>Survey Designer</div>}/>
 
   </div>
 

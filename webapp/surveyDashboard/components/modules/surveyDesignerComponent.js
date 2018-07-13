@@ -1,10 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import {Link} from 'react-router-dom'
 
 import * as R from 'ramda'
 
 import DataFetchComponent from '../dataFetchComponent'
-import { appState, appModules } from '../../../app/app'
+import { appState, appModules, appUri } from '../../../app/app'
 import { statePaths } from '../../surveyDashboard'
 
 class SurveyDesignerComponent extends React.Component {
@@ -44,10 +45,10 @@ class SurveyDesignerComponent extends React.Component {
               )
           }
 
-          <button className="btn btn-of">
+          <Link to={appUri(appModules.surveyDesigner)} className="btn btn-of">
             <span className="icon icon-quill icon-left"></span>
             Design
-          </button>
+          </Link>
 
         </div>
       </DataFetchComponent>

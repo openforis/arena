@@ -12,11 +12,8 @@
 .app-header {
   background-color: rgba($pink, 0.1);
   display: grid;
-  grid-template-columns: .8fr .2fr;
-}
-
-.app-header__user {
-  display: flex;
+  grid-template-columns: .1fr .7fr .2fr;
   align-items: center;
   justify-content: center;
+  justify-items: center;
 }

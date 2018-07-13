@@ -1,22 +1,37 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
 
 import * as R from 'ramda'
 
-import { appState, loginUri } from '../app'
+import { appState, loginUri, isHome, appUri } from '../app'
 import { logout } from '../actions'
+import { pathname } from '../../app-utils/routerUtils'
 
 class AppHeader extends React.Component {
 
   render () {
-    const {user, logout, history} = this.props
+    const {user, logout} = this.props
+    const path = pathname(this.props)
 
     return (
       <div className="app-header">
+        <div>
+          {
+            isHome(path)
+              ? (null)
+              : (
+                <Link to={appUri()} className="btn btn-s btn-of-light-xs">
+                  <span className="icon icon-home"></span>
+                </Link>
+              )
+
+          }
+        </div>
 
         <div></div>
-        <div className="app-header__user">
+
+        <div className="flex-center">
           <h6 className="text-uppercase">{user && user.name}</h6>
           <button className="btn btn-s btn-of-light-xs icon-right"
                   onClick={() => logout()}>
@@ -28,7 +43,7 @@ class AppHeader extends React.Component {
           user
             ? (null)
             : (
-              R.pathEq(['location', 'pathname'], loginUri, history)
+              R.equals(path, loginUri)
                 ? null
                 : <Redirect to={loginUri}/>
             )

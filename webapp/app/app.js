@@ -4,6 +4,7 @@ import { excludePathRoot } from '../app-utils/reduxUtils'
 
 export const appUri = module => ['/app', module].join('/')
 export const loginUri = '/'
+export const isHome = R.equals(appUri())
 
 export const systemStatus = {
   ready: 'ready'
