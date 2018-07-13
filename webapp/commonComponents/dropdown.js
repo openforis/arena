@@ -1,16 +1,37 @@
 import React from 'react'
 
-import { elementOffset } from '../app-utils/domUtils'
+import { elementOffset, clickedOutside } from '../app-utils/domUtils'
 
 class Dropdown extends React.Component {
 
   constructor () {
     super()
     this.state = {opened: false}
+
+    this.outsideClick = this.outsideClick.bind(this)
+    window.addEventListener('click', this.outsideClick)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('click', this.outsideClick)
+  }
+
+  dropdown () {
+    return this.refs.dropdown
   }
 
   toggleOpened () {
     this.setState({opened: !this.state.opened})
+  }
+
+  isOpened () {
+    return this.state.opened
+  }
+
+  outsideClick (evt) {
+    if (this.isOpened() && clickedOutside(this.dropdown(), evt)) {
+      this.toggleOpened()
+    }
   }
 
   getOffset () {
@@ -19,7 +40,7 @@ class Dropdown extends React.Component {
       left,
       height,
       width
-    } = elementOffset(this.refs.dropdown)
+    } = elementOffset(this.dropdown())
 
     return {
       top: (top + height),
@@ -43,7 +64,7 @@ class Dropdown extends React.Component {
       <span className="icon icon-menu2 icon-24px"
             onClick={() => this.toggleOpened()}></span>
       {
-        this.state.opened
+        this.isOpened()
           ? (
             <div className="dropdown__list"
                  style={{

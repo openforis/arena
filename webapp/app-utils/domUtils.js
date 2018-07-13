@@ -5,11 +5,13 @@ export const elementOffset = el => {
   const scrollTop = window.pageYOffset || document.documentElement.scrollTop
 
   return {
-    height:rect.height,
-    width:rect.width,
-    x:rect.x,
-    y:rect.y,
+    height: rect.height,
+    width: rect.width,
+    x: rect.x,
+    y: rect.y,
     top: rect.top + scrollTop,
     left: rect.left + scrollLeft,
   }
 }
+
+export const clickedOutside = (el, evt) => !el.contains(evt.target)
