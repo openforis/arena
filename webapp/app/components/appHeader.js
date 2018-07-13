@@ -18,7 +18,7 @@ class AppHeader extends React.Component {
         <div></div>
         <div className="app-header__user">
           <h6 className="text-uppercase">{user && user.name}</h6>
-          <button className="btn btn-xs btn-of-light-xs icon-right"
+          <button className="btn btn-s btn-of-light-xs icon-right"
                   onClick={() => logout()}>
             <span className="icon icon-exit"/>
           </button>

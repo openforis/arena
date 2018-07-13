@@ -1,19 +1,34 @@
 @import "./vars";
 
-input {
+input,
+label,
+select,
+button,
+textarea {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  display: inline-block;
+  vertical-align: middle;
+  white-space: normal;
+  background: none;
+  line-height: 1;
+  outline: none;
 
-  padding: 20px 5px;
-
+  /* Browsers have different default form fonts */
+  font-size: 1rem;
+  font-family: inherit;
+  letter-spacing: 1px;
+  font-weight: inherit;
+  word-wrap: break-word;
   color: $white;
 
-  //width: 100%;
-  outline: none;
-  font-weight: 100;
-  font-size: 20px;
-  letter-spacing: 2px;
-  border: none;
-  background-color: transparent;
   transition: all .5s ease;
+}
+
+input {
+  padding: 20px 5px;
+  background-color: transparent;
 
   &:not([readonly]):focus {
     background-color: rgba(44, 49, 44, 0.2);
@@ -22,17 +37,9 @@ input {
 
 // buttons
 button, .btn {
-  outline: none;
-  //width: 100%;
-  padding: 1rem 1rem;
-  font-weight: 100;
-  font-size: 1.1rem;
-  letter-spacing: 4px;
-  word-wrap: break-word;
-  color: $whiteLight;
-  background-color: transparent;
+  padding: .7rem .8rem;
+  font-weight: 200;
   border: 1px solid $whiteLight;
-  transition: all .5s ease;
 
   &:hover {
     cursor: pointer;
@@ -40,11 +47,10 @@ button, .btn {
   }
 }
 
-.btn-xs {
+.btn-s {
   padding: .5rem;
   font-weight: 100;
   font-size: 0.8rem;
-  letter-spacing: 2px;
 }
 
 .btn-link {
@@ -55,7 +61,7 @@ button, .btn {
   }
 }
 
-$ofBorderColor: rgba($white, .7);
+$ofBorderColor: rgba($white, .6) !important;
 $ofBorder: 3px double !important;
 $ofBorderRadius: 255px 15px 225px 15px/15px 225px 15px 255px;
 $ofBorderColorLight: rgba($white, .4) !important;

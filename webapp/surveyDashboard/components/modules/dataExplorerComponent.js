@@ -61,7 +61,7 @@ class DataExplorerComponent extends React.Component {
                             )
                           }
                           <button className="btn btn-of" key={'btn-explore'}>
-                            <span className="icon icon-table2 icon-24px icon-left"></span>
+                            <span className="icon icon-table2 icon-left"></span>
                             Explore
                           </button>
 
@@ -72,7 +72,7 @@ class DataExplorerComponent extends React.Component {
                   {/*TODO: add check if published*/}
                   <div className="survey-module-item">
                     <button className="btn btn-of">
-                      <span className="icon icon-plus icon-20px icon-left"/>
+                      <span className="icon icon-plus icon-left"/>
                       Record
                     </button>
                   </div>

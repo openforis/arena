@@ -7,7 +7,7 @@ $op: .1;
 .survey-dashboard {
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 25vh 75vh;
+  grid-template-rows: 20vh 80vh;
   justify-content: center;
 }
 
@@ -34,10 +34,10 @@ $op: .1;
 }
 
 .survey-module {
-  padding: 3.5rem .5rem;
+  padding: 1.5rem .5rem;
   display: grid;
   grid-template-columns: 1fr;
-  grid-row-gap: 4rem;
+  grid-row-gap: 2.5rem;
   justify-items: center;
   align-content: start;
 }
@@ -45,5 +45,5 @@ $op: .1;
 .survey-module-item {
   @extend .survey-module;
   padding: 0;
-  grid-row-gap: 1rem;
+  grid-row-gap: .5rem;
 }

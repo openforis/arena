@@ -50,7 +50,7 @@ class UsersComponent extends React.Component {
             canInviteUsers
               ? (
                 <button className="btn btn-of">
-                  <span className="icon icon-user-plus icon-24px icon-left"/>
+                  <span className="icon icon-user-plus icon-left"/>
                   Invite
                 </button>
               )
