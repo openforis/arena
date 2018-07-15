@@ -7,7 +7,7 @@ import * as R from 'ramda'
 import { surveyStatus } from '../../../common/survey/survey'
 
 import DataFetchComponent from '../components/moduleDataFetchComponent'
-import { appState, appUri } from '../../app/app'
+import { appState, appModuleUri } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 
 class DataExplorerDashboardView extends React.Component {
@@ -61,7 +61,7 @@ class DataExplorerDashboardView extends React.Component {
                               R.keys(entities)
                             )
                           }
-                          <Link to={appUri(appModules.dataExplorer)} className="btn btn-of">
+                          <Link to={appModuleUri(appModules.dataExplorer)} className="btn btn-of">
                             <span className="icon icon-table2 icon-left"></span>
                             Explore
                           </Link>

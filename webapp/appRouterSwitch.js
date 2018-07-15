@@ -3,11 +3,11 @@ import './app/style.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { Switch, Route } from 'react-router'
+import { Switch, Route, Redirect } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
 
 import { initApp } from './app/actions'
-import { appState } from './app/app'
+import { appState, isLocationLogin, loginUri } from './app/app'
 
 import loginAnimation from './login/loginAnimation'
 import appAnimation from './app/appAnimation'
@@ -22,10 +22,9 @@ class AppRouterSwitch extends React.Component {
   }
 
   render () {
-    const {location, isReady} = this.props
-    const {pathname} = location
+    const {location, isReady, user} = this.props
 
-    const isLogin = pathname === '/'
+    const isLogin = isLocationLogin(this.props)
 
     const {
       key,
@@ -37,6 +36,13 @@ class AppRouterSwitch extends React.Component {
       isReady
         ? (
           <React.Fragment>
+
+            {
+              !user && !isLogin
+                ? <Redirect to={loginUri}/>
+                : null
+            }
+
             <div className="main__bg1"/>
             <div className="main__bg2"/>
             <div className="main__bg-overlay"/>
@@ -68,7 +74,8 @@ class AppRouterSwitch extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  isReady: appState.isReady(state)
+  isReady: appState.isReady(state),
+  user: appState.getUser(state)
 })
 
 export default withRouter(

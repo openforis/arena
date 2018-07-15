@@ -2,18 +2,25 @@ import * as R from 'ramda'
 
 import { excludePathRoot } from '../app-utils/reduxUtils'
 import { appDashboard } from '../appModules/appModules'
+import { getLocationPathname } from '../app-utils/routerUtils'
 
 //default home is dashboard
-export const appUri = (module = appDashboard, dashboard = false) => (
+export const appModuleUri = (module = appDashboard, dashboard = false) => (
   dashboard
     ? appDashboardUri
     : ['/app', module].join('/') + '/'
 )
 
-export const appDashboardUri = appUri(appDashboard)
+export const appDashboardUri = appModuleUri(appDashboard)
 export const loginUri = '/'
-export const isHome = R.equals(appUri())
 
+const isPath = path => R.pipe(
+  getLocationPathname,
+  R.equals(path),
+)
+export const isLocationLogin = isPath(loginUri)
+
+export const isLocationHome = isPath(appModuleUri())
 
 export const systemStatus = {
   ready: 'ready'

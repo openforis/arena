@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
 
 import { login } from './../actions'
-import { appUri, appState } from '../../app/app'
+import { appModuleUri, appState } from '../../app/app'
 
 class LoginForm extends React.Component {
 
@@ -13,7 +13,7 @@ class LoginForm extends React.Component {
     return (
       user
         ? (
-          <Redirect to={appUri()}/>
+          <Redirect to={appModuleUri()}/>
         )
         : (
           <div className="login__form">

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import * as R from 'ramda'
 
 import DataFetchComponent from '../components/moduleDataFetchComponent'
-import { appUri } from '../../app/app'
+import { appModuleUri } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 
 class SurveyDesignerDashboardView extends React.Component {
@@ -45,7 +45,7 @@ class SurveyDesignerDashboardView extends React.Component {
               )
           }
 
-          <Link to={appUri(appModules.surveyDesigner)} className="btn btn-of">
+          <Link to={appModuleUri(appModules.surveyDesigner)} className="btn btn-of">
             <span className="icon icon-quill icon-left"></span>
             Design
           </Link>
