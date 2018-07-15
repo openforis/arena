@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import DataFetchComponent from '../appModules/dataFetchComponent'
+import DataFetchComponent from '../appModules/components/moduleDataFetchComponent'
 
 import { appState } from '../app/app'
 import { appModules, getDashboardData } from '../appModules/appModules'
@@ -21,7 +21,7 @@ class SurveyDashboardView extends React.Component {
       <DataFetchComponent module={appModules.survey} dashboard={true}>
         <div className="survey-info">
 
-          <Dropdown className="dropdown-of"
+          <Dropdown className="dropdown-of survey-info__name"
                     placeholder="Survey name"
                     value={survey.name}
                     selection={['survey 1', 'survey 2', 'survey 3', 'survey 4']}

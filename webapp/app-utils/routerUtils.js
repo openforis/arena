@@ -1,4 +1,3 @@
 import * as R from 'ramda'
 
-export const pathname = ({history}) =>
-  R.path(['location', 'pathname'], history)
+export const getLocationPathname = R.path(['location', 'pathname'])

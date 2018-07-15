@@ -43,7 +43,7 @@ class Dropdown extends React.Component {
     } = elementOffset(this.dropdown())
 
     return {
-      top: (top + height),
+      top,
       left,
       width
     }

@@ -1,12 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 import * as R from 'ramda'
 
 import { surveyStatus } from '../../../common/survey/survey'
 
-import DataFetchComponent from '../dataFetchComponent'
-import { appState } from '../../app/app'
+import DataFetchComponent from '../components/moduleDataFetchComponent'
+import { appState, appUri } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 
 class DataExplorerDashboardView extends React.Component {
@@ -60,10 +61,10 @@ class DataExplorerDashboardView extends React.Component {
                               R.keys(entities)
                             )
                           }
-                          <button className="btn btn-of" key={'btn-explore'}>
+                          <Link to={appUri(appModules.dataExplorer)} className="btn btn-of">
                             <span className="icon icon-table2 icon-left"></span>
                             Explore
-                          </button>
+                          </Link>
 
                         </div>
                       )

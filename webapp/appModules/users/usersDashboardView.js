@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import DataFetchComponent from '../dataFetchComponent'
+import DataFetchComponent from '../components/moduleDataFetchComponent'
 
 import { appState } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'

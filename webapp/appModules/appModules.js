@@ -1,7 +1,8 @@
 import * as R from 'ramda'
 
-const dashboard = 'dashboard'
 const rootStatePath = 'appModules'
+
+export const appDashboard = 'dashboard'
 
 export const apiUri = (surveyId, module, dashboard) => (
   `/api/appModules/${module}${dashboard ? '/dashboard' : ''}/${surveyId}`

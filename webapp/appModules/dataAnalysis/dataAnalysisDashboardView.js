@@ -5,7 +5,7 @@ import * as R from 'ramda'
 
 import { surveyStatus } from '../../../common/survey/survey'
 
-import DataFetchComponent from '../dataFetchComponent'
+import DataFetchComponent from '../components/moduleDataFetchComponent'
 import { appState } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 

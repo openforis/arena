@@ -2,6 +2,7 @@
 @import "../style/layout";
 
 .app__container {
+
   @extend .full-screen-fixed;
 
   z-index: $zIndex1App;
@@ -16,4 +17,9 @@
   align-items: center;
   justify-content: center;
   justify-items: center;
+}
+
+.app__modules {
+  position: relative;
+  display: grid;
 }

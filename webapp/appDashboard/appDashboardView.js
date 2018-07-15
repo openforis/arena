@@ -1,6 +1,7 @@
 import './style.scss'
 
 import React from 'react'
+import { withRouter } from 'react-router'
 
 import SurveyDashboardView from '../survey/surveyDashboardView'
 import SurveyDesignerDashboardView from '../appModules/surveyDesigner/surveyDesignerDashboardView'
@@ -8,24 +9,26 @@ import DataExplorerDashboardView from '../appModules/dataExplorer/dataExplorerDa
 import DataAnalysisDashboardView from '../appModules/dataAnalysis/dataAnalysisDashboardView'
 import UsersDashboardView from '../appModules/users/usersDashboardView'
 
-const AppDashboardView = () => (
+const AppDashboardView = (props) => (
+
   <div className="app-dashboard">
 
-    <SurveyDashboardView/>
+    <SurveyDashboardView {...props}/>
 
     <div className="app-dashboard__modules">
 
-      <SurveyDesignerDashboardView/>
+      <SurveyDesignerDashboardView {...props}/>
 
-      <DataExplorerDashboardView/>
+      <DataExplorerDashboardView {...props}/>
 
-      <DataAnalysisDashboardView/>
+      <DataAnalysisDashboardView {...props}/>
 
-      <UsersDashboardView/>
+      <UsersDashboardView {...props}/>
 
     </div>
 
   </div>
+
 )
 
-export default AppDashboardView
+export default withRouter(AppDashboardView)

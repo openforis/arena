@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 import * as R from 'ramda'
 
-import DataFetchComponent from '../dataFetchComponent'
+import DataFetchComponent from '../components/moduleDataFetchComponent'
 import { appUri } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 

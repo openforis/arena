@@ -6,13 +6,13 @@ import * as R from 'ramda'
 
 import { appState, loginUri, isHome, appUri } from '../app'
 import { logout } from '../actions'
-import { pathname } from '../../app-utils/routerUtils'
+import { getLocationPathname } from '../../app-utils/routerUtils'
 
 class AppHeader extends React.Component {
 
   render () {
     const {user, logout} = this.props
-    const path = pathname(this.props)
+    const path = getLocationPathname(this.props)
 
     return (
       <div className="app-header">
