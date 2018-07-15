@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom'
 import { fetchData } from '../actions'
 import { connect } from 'react-redux'
 
-import { appPath } from '../../app/app'
+import { appModulesPath } from '../appModules'
 import { getLocationPathname } from '../../app-utils/routerUtils'
 
 class ModuleDataFetchComponent extends React.Component {
@@ -20,7 +20,7 @@ class ModuleDataFetchComponent extends React.Component {
 
   matchesPath () {
     const {module, pathname, dashboard} = this.props
-    return appPath.matches(pathname, module, dashboard)
+    return appModulesPath.matches(pathname, module, dashboard)
   }
 
   componentDidMount () {

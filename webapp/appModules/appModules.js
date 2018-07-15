@@ -1,4 +1,6 @@
 import * as R from 'ramda'
+import { getLocationPathname } from '../app-utils/routerUtils'
+import { appDashboardUri, appUri } from '../app/app'
 
 const rootStatePath = 'appModules'
 
@@ -23,5 +25,11 @@ export const getDashboardData = (module) => R.path([rootStatePath, module, 'dash
 export const actionTypes = {
   appModulesDashboardDataLoaded: 'appModules/dashboardData/loaded',
   appModulesDataLoaded: 'appModules/data/loaded',
+}
+
+export const appModulesPath = {
+
+  matches: (path, module, dashboard = false) => path === appUri(module, dashboard),
+
 }
 

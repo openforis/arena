@@ -5,7 +5,7 @@ import { appDashboard } from '../appModules'
 
 import { TimelineMax, Elastic } from 'gsap/TweenMax'
 import { getViewportDimensions } from '../../app-utils/domUtils'
-import { appPath } from '../../app/app'
+import { appModulesPath } from '../appModules'
 
 const duration = 1
 const ease = Elastic.easeOut.config(1, 0.8)
@@ -80,7 +80,7 @@ class ModuleViewTransitionComponent extends React.Component {
   render () {
     const {pathname, module, component} = this.props
 
-    const matches = appPath.matches(pathname, module)
+    const matches = appModulesPath.matches(pathname, module)
 
     const {width} = getViewportDimensions()
 

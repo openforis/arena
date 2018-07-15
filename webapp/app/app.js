@@ -14,11 +14,6 @@ export const appDashboardUri = appUri(appDashboard)
 export const loginUri = '/'
 export const isHome = R.equals(appUri())
 
-export const appPath = {
-
-  matches: (path, module, dashboard = false) => path === appUri(module, dashboard),
-
-}
 
 export const systemStatus = {
   ready: 'ready'
