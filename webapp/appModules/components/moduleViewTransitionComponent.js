@@ -25,6 +25,15 @@ class ModuleViewTransitionComponent extends React.Component {
     this.initTweenExit = this.initTweenExit.bind(this)
   }
 
+  getRightPosition () {
+    const {module} = this.props
+    const {width} = getViewportDimensions()
+
+    return module === appDashboard
+      ? (width)
+      : -(width)
+  }
+
   initTweenEnter (node) {
     if (!this.tweenEnter) {
       this.tweenEnter = new TimelineMax({paused: true})
@@ -34,27 +43,24 @@ class ModuleViewTransitionComponent extends React.Component {
 
   initTweenExit (node) {
     if (!this.tweenExit) {
-      const {module} = this.props
-      const {width} = getViewportDimensions()
-
-      //set initial exit right position
-      const right = module === appDashboard
-        ? (width)
-        : -(width)
-
       this.tweenExit = new TimelineMax({paused: true})
-      this.tweenExit.to(node, duration, {right, display: 'none', ease})
+      this.tweenExit.to(node, duration, {
+        right: this.getRightPosition(),
+        display: 'none',
+        ease,
+        onComplete: () => this.setState({mounted: false})
+      })
     }
-  }
-
-  pauseTween (tween) {
-    if (tween)
-      tween.pause()
   }
 
   checkMountedState () {
     if (!this.state.mounted)
       this.setState({mounted: true})
+  }
+
+  pauseTween (tween) {
+    if (tween)
+      tween.pause()
   }
 
   enter (node, isAppearing) {
@@ -82,8 +88,6 @@ class ModuleViewTransitionComponent extends React.Component {
 
     const matches = appModulesPath.matches(pathname, module)
 
-    const {width} = getViewportDimensions()
-
     return (
 
       <Transition
@@ -102,9 +106,7 @@ class ModuleViewTransitionComponent extends React.Component {
              className="app-module"
              style={{
                display: 'none',
-               right: module === appDashboard
-                 ? (width)
-                 : -(width)
+               right: this.getRightPosition()
              }}>
           {
             this.state.mounted
