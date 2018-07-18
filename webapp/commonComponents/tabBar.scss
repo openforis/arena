@@ -1,0 +1,11 @@
+.tab-bar {
+  display: grid;
+  grid-template-rows: .15fr .85fr;
+  height: 100%;
+}
+
+.tab-bar__nav {
+  > button {
+    margin: 0 .5rem;
+  }
+}

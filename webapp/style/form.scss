@@ -70,6 +70,12 @@ $ofBorderColorLightXs: rgba($white, .1) !important;
   @extend .of;
   text-transform: uppercase;
   border-color: $ofBorderColor;
+
+  &.active {
+    //border-color: transparent !important;
+    background-color: rgba($white, .45) !important;
+    pointer-events: none;
+  }
 }
 
 .btn-of-link {
@@ -135,4 +141,36 @@ $ofBorderColorLightXs: rgba($white, .1) !important;
     cursor: pointer;
     background-color: rgba($black, .3);
   }
+}
+
+// form grid
+.form {
+  display: grid;
+  /* height: 100%; */
+  grid-row-gap: 1.2rem;
+}
+
+.form-item {
+  display: grid;
+  grid-template-columns: repeat(3, 0.33333333333333fr);
+  grid-column-gap: 2rem;
+  height: auto;
+  align-items: center;
+}
+
+.form-label {
+  justify-self: right;
+  text-transform: uppercase;
+  font-size: .9rem;
+  font-weight: 200;
+}
+
+//.form-input {
+//  justify-self: center;
+//  display: grid;
+//}
+
+input.form-input {
+  padding: .75rem;
+  border-bottom: 5px dotted rgba($white, .6);
 }
