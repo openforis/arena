@@ -48,7 +48,8 @@ class ModuleViewTransitionComponent extends React.Component {
         right: this.getRightPosition(),
         display: 'none',
         ease,
-        onComplete: () => this.setState({mounted: false})
+        //let's leave it mounted for now
+        // onComplete: () => this.setState({mounted: false})
       })
     }
   }

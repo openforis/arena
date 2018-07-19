@@ -5,7 +5,7 @@ const rootStatePath = 'appModules'
 
 export const appDashboard = 'dashboard'
 
-export const apiUri = (surveyId, module, dashboard) => (
+export const apiUri = (surveyId, module, dashboard = false) => (
   `/api/appModules/${module}${dashboard ? '/dashboard' : ''}/${surveyId}`
 )
 
