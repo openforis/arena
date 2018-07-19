@@ -91,13 +91,13 @@ class DataExplorerDashboardView extends React.Component {
 
 DataExplorerDashboardView.defaultProps = {
   dataExplorer: {
-    surveyId: -1,
+    getSurveyId: -1,
     entities: {},
   }
 }
 
 const mapStateToProps = state => ({
-  surveyStatusApp: appState.surveyStatus(state),
+  surveyStatusApp: appState.getSurveyStatus(state),
   dataExplorer: getDashboardData(appModules.dataExplorer)(state),
 })
 

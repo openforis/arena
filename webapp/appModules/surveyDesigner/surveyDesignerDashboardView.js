@@ -59,7 +59,7 @@ class SurveyDesignerDashboardView extends React.Component {
 
 SurveyDesignerDashboardView.defaultProps = {
   surveyDesigner: {
-    surveyId: -1,
+    getSurveyId: -1,
     entityDefns: {count: 0},
     attributeDefns: {count: 0},
     pages: {count: 0}

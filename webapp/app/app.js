@@ -52,9 +52,9 @@ export const appState = {
   logoutUser: R.dissocPath(excludePathRoot(statePath.user)),
 
   //TODO Move to root survey state??
-  surveyId: R.path(statePath.survey.id),
+  getSurveyId: R.path(statePath.survey.id),
 
-  surveyStatus: R.path(statePath.survey.status),
+  getSurveyStatus: R.path(statePath.survey.status),
 
 }
 

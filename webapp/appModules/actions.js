@@ -11,7 +11,7 @@ export const fetchData = (module, dashboard) =>
   async (dispatch, getState) => {
     try {
 
-      const surveyId = appState.surveyId(getState())
+      const surveyId = appState.getSurveyId(getState())
 
       const {data} = await axios.get(apiUri(surveyId, module, dashboard))
 

@@ -85,7 +85,7 @@ class UsersDashboardView extends React.Component {
 
 UsersDashboardView.defaultProps = {
   users: {
-    surveyId: -1,
+    getSurveyId: -1,
     [userRoles.administrator.role]: {count: 0},
     [userRoles.surveyManager.role]: {count: 0},
     [userRoles.dataAnalysis.role]: {count: 0},
@@ -94,7 +94,7 @@ UsersDashboardView.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  surveyStatusApp: appState.surveyStatus(state),
+  surveyStatusApp: appState.getSurveyStatus(state),
   users: getDashboardData(appModules.users)(state),
 })
 

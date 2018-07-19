@@ -63,7 +63,7 @@ SurveyDashboardView.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  surveyId: appState.surveyId(state),
+  getSurveyId: appState.getSurveyId(state),
   survey: getDashboardData(appModules.survey)(state)
 })
 
