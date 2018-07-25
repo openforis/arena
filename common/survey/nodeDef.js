@@ -10,11 +10,11 @@ const attributeDefType = {
   boolean: 'boolean',
   codeList: 'codeList',
   coordinate: 'coordinate',
-  species: 'species',
+  taxon: 'taxon',
 }
 
 const entityDefRenderType = {
-  inline: 'inline',
+  form: 'form',
   table: 'table',
 }
 

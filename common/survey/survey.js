@@ -6,18 +6,14 @@ const PUBLISHED = 'published'
 const PUBLISHED_DRAFT = 'publishedDraft'
 
 const surveyStatus = {
-  // a new survey has been created
-  // can add and delete nodes
-  new: NEW,
 
-  // an existing survey has been updated AND contains at least 1 entity defn
-  // surveyDefn: can add and delete nodes
-  // dataEntry: cannot add
+  // a survey has been created or updated
+  // surveyDefn : can add and delete nodes
+  // dataEntry : cannot add
   draft: DRAFT,
 
   // an existing survey does now allow further changes of properties of existing nodes
-  // surveyDefn: cannot edit published nodes
-  // surveyDefn: can add and delete new nodes
+  // surveyDefn: can edit and will create a draft version
   // dataEntry: can add, edit, delete..
   published: PUBLISHED,
 
