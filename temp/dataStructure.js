@@ -24,16 +24,28 @@ const pageDef = {
 
 const nodeDef = {
   id,
-  hash: null,
+  uuid: null,
   parentId: id,
-  surveyId: id,
+  surveyVersionId: id,
   //nodeDefType
   type: null,
 
   props: {
     name: '',
+    labels: {
+      en: '',
+      es: '',
+    },
+    descriptions: {
+      en: '',
+      es: '',
+    },
     multiple: false,//boolean
     required: false,//boolean
+    requiredIf: null,//expr
+    applicableIf: null,//expr
+    minCount: null,//int
+    maxCount: null,//int
   },
 }
 
@@ -44,18 +56,30 @@ const attributeDef = {
   props: {
     ...nodeDef.props,
     type: null,
-    default: null,
+    key: null,//boolean
+    defaultValues: [
+      {
+        condition: '',
+        value: ''
+      },
+    ],
+    min: null,
+    max: null,
+    minInclusive: null,
+    maxInclusive: null,
+    regex: null,
+    maxDistance: null,
+    calculated: null, //boolean
   },
 }
 
 const entityDef = {
   ...nodeDef,
   type: nodeDefType.entity,
-  keyAttributeDefId: id,
 
   props: {
     ...nodeDef.props,
-    renderType: entityDefRenderType.inline,
+    renderType: entityDefRenderType.table,
   },
 
   // load first level
@@ -64,34 +88,43 @@ const entityDef = {
     [id]: attributeDef
   },
 
-  //validation status only rootEntity?
-  //validation: {},
-
-
 }
 
-const survey = {
+const surveyVersion = {
   id,
-  hash: null,
-  ownerId: id,
+  surveyId: id,
 
   // root entity
   entityDefId: id,
 
   // status columns
-  draft: false,
-  published: false,
-
-  props: {
-    name: 'name',
-    label: '',
-  },
+  status: null,
 
   // only survey contains the pageDef
   pageDef,
 
   //no store
   entityDef,
+}
+
+const survey = {
+  id,
+  uuid: null,
+  ownerId: id,
+
+  //surveyVersion IDs
+  publishedVersionId: id,
+  draftSurveyVersionId: id,
+
+  props: {
+    name: 'name',
+    labels: {
+      en: '',
+      es: '',
+    },
+  },
+
+  surveyVersion,
 }
 
 console.log(JSON.stringify(survey))
