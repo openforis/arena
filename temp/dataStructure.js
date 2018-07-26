@@ -25,8 +25,8 @@ const pageDef = {
 const nodeDef = {
   id,
   uuid: null,
-  parentId: id,
   surveyVersionId: id,
+  parentId: id,
   //nodeDefType
   type: null,
 
@@ -46,6 +46,7 @@ const nodeDef = {
     applicableIf: null,//expr
     minCount: null,//int
     maxCount: null,//int
+    codeListId: id,
   },
 }
 
@@ -95,10 +96,7 @@ const surveyVersion = {
   surveyId: id,
 
   // root entity
-  entityDefId: id,
-
-  // status columns
-  status: null,
+  rootNodeDefId: id,
 
   // only survey contains the pageDef
   pageDef,
@@ -114,7 +112,7 @@ const survey = {
 
   //surveyVersion IDs
   publishedVersionId: id,
-  draftSurveyVersionId: id,
+  draftVersionId: id,
 
   props: {
     name: 'name',
@@ -128,3 +126,22 @@ const survey = {
 }
 
 console.log(JSON.stringify(survey))
+
+// data
+
+const record = {
+  id,
+  uuid: null,
+  surveyId: id,
+  rootNodeId: id,
+}
+
+const node = {
+  id,
+  uuid: null,
+  surveyId: id,
+  recordId: id,
+  parentId: id,
+  nodeDefId: id,
+  value: {},
+}
