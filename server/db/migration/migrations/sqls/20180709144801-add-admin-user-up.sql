@@ -8,9 +8,9 @@ INTO
     )
     VALUES
     (
-        'Mino Togna',
-        'mino.togna@gmail.com',
-        '$2b$10$hngGjfyw4LZIjTogmp1gV.Kg.BSU/gYW/15NZfIqwFdtpFyU3/S8q'
+        'Admin',
+        'admin@openforis.org',
+        '$2b$10$PGiD7cS.ESkAI4NIbuJ.9OYDEsfnMl8wNoETWoi03JWhXXJIwLDte'
     );
 
 INSERT

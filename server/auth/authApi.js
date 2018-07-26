@@ -1,5 +1,5 @@
 const passport = require('passport')
-const {sendOkResp} = require('../response')
+const {sendOk} = require('../response')
 
 const {defaultSurvey} = require('../../common/survey/survey')
 
@@ -27,7 +27,7 @@ module.exports.init = app => {
 
   app.post('/auth/logout', (req, res) => {
     req.logout()
-    sendOkResp(res)
+    sendOk(res)
   })
 
   app.post('/auth/login', (req, res, next) => {

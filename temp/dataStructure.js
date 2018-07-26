@@ -25,29 +25,29 @@ const pageDef = {
 const nodeDef = {
   id,
   uuid: null,
-  surveyVersionId: id,
+  // surveyVersionId: id,
   parentId: id,
   //nodeDefType
   type: null,
 
-  props: {
-    name: '',
-    labels: {
-      en: '',
-      es: '',
-    },
-    descriptions: {
-      en: '',
-      es: '',
-    },
-    multiple: false,//boolean
-    required: false,//boolean
-    requiredIf: null,//expr
-    applicableIf: null,//expr
-    minCount: null,//int
-    maxCount: null,//int
-    codeListId: id,
+  // props: {
+  name: '',
+  labels: {
+    en: '',
+    es: '',
   },
+  descriptions: {
+    en: '',
+    es: '',
+  },
+  multiple: false,//boolean
+  required: false,//boolean
+  requiredIf: null,//expr
+  applicableIf: null,//expr
+  minCount: null,//int
+  maxCount: null,//int
+  codeListId: id,
+  // },
 }
 
 const attributeDef = {
@@ -97,6 +97,9 @@ const surveyVersion = {
 
   // root entity
   rootNodeDefId: id,
+
+  dateCreated: null,
+  dateModified: null,
 
   // only survey contains the pageDef
   pageDef,

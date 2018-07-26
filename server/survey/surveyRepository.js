@@ -1,6 +1,21 @@
 const db = require('../db/db')
-
 const {nodeDefType} = require('../../common/survey/nodeDef')
+const {uuidv4} = require('../../common/uuid')
+
+const defaultSurveyDef = () => ({
+  1: {
+    id: 1,
+    uuid: uuidv4(),
+    name: 'root_entity',
+    type: nodeDefType.entity,
+    labels: {
+      en: 'Root entity'
+    },
+
+  }
+})
+
+const getSurvey = async (surveyId, client = db) => await client.one(`SELECT * FROM survey WHERE id = $1`, [surveyId])
 
 const createSurvey = async (ownerId, props) => db.tx(
   async t => {
@@ -11,24 +26,18 @@ const createSurvey = async (ownerId, props) => db.tx(
     `, [ownerId, props])
 
     const surveyVersionId = await t.one(`
-      INSERT INTO survey_version (survey_id)
-      VALUES ($1)
-      RETURNING id
-    `, [surveyId])
-
-    const rootDefId = await t.one(`
-      INSERT INTO node_def (survey_version_id, type, props)
+      INSERT INTO survey_version (survey_id, survey_def)
       VALUES ($1, $2)
       RETURNING id
-    `, [surveyVersionId, nodeDefType.entity, {name: 'root_entity'}])
+    `, [surveyId, defaultSurveyDef()])
 
     await t.any(`UPDATE survey SET draft_version_id = $1`, [surveyVersionId])
-    await t.any(`UPDATE survey_version SET root_def_id = $1`, [rootDefId])
 
-    return await t.one(`SELECT * FROM survey WHERE id = $1`, [surveyId])
+    return await getSurvey(surveyId, t)
   }
 )
 
 module.exports = {
-  createSurvey
+  getSurvey,
+  createSurvey,
 }

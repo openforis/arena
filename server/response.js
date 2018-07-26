@@ -3,8 +3,15 @@ const status = {
   error: 'error'
 }
 
-const sendOkResp = resp => resp.json({status:status.ok})
+const sendOk = res => res.json({status: status.ok})
+
+const sendErr = (res, err) => res.status(500).json({
+  status: status.error,
+  error: 'Could not serve',
+  err
+})
 
 module.exports = {
-  sendOkResp
+  sendOk,
+  sendErr
 }

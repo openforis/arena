@@ -70,3 +70,11 @@ PGPASSWORD=arena
 # Session
 FOO_COOKIE_SECRET=my-cookie-secret-key
 ```
+
+## Predefined users
+
+##### ***ADMIN USER***: 
+email:admin@openforis.org 
+
+pwd:admin 
+
