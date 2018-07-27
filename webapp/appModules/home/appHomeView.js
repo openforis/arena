@@ -40,7 +40,7 @@ class AppHomeView extends React.Component {
 
   componentDidUpdate (prevProps) {
 
-    const {currentSurvey: prevCurrentSurvey, newSurvey: prevNewSurvey} = prevProps
+    const {currentSurvey: prevCurrentSurvey} = prevProps
     const {currentSurvey, history} = this.props
 
     if (currentSurvey && (!prevCurrentSurvey || currentSurvey.id !== prevCurrentSurvey.id)) {
