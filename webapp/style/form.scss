@@ -173,4 +173,8 @@ $ofBorderColorLightXs: rgba($white, .1) !important;
 input.form-input {
   padding: .75rem;
   border-bottom: 5px dotted rgba($white, .6);
+
+  &.error {
+    border-bottom: 5px dotted rgba($red, .6);
+  }
 }

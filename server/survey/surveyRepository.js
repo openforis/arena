@@ -21,26 +21,32 @@ const createSurveyVersion = async (surveyId, nodeDefs, client = db) => await cli
 const createSurvey = async (ownerId, props) => db.tx(
   async t => {
 
-    const surveyId = await t.one(`
+    const {id: surveyId} = await t.one(`
       INSERT INTO survey (owner_id, props)
       VALUES ($1, $2)
       RETURNING id
     `, [ownerId, props])
 
-    const rootNodeDef = createEntityDef({name: 'root_entity', label: 'Root entity'})
+    const rootNodeDef = createEntityDef({id: 1, name: 'root_entity', label: 'Root entity'})
 
-    const {id: surveyVersionId} = await createSurveyVersion(surveyVersionId, [rootNodeDef], t)
+    const {id: surveyVersionId} = await createSurveyVersion(surveyId, {nodeDefs: [rootNodeDef]}, t)
 
-    await t.any(`UPDATE survey SET draft_version_id = $1`, [surveyVersionId])
+    await t.any(`UPDATE survey SET draft_version_id = $1 WHERE id = $2`, [surveyVersionId, surveyId])
 
-    return await getSurvey(surveyId, t)
+    return await getSurveyById(surveyId, t)
   }
 )
 
 // ============== READ
-const getSurvey = async (surveyId, client = db) => await client.one(
+const getSurveyById = async (surveyId, client = db) => await client.one(
   `SELECT * FROM survey WHERE id = $1`,
   [surveyId],
+  camelize
+)
+
+const getSurveyByName = async (surveyName, client = db) => await client.oneOrNone(
+  `SELECT * FROM survey WHERE props->>'name' = $1`,
+  [surveyName],
   camelize
 )
 
@@ -49,6 +55,10 @@ const getSurvey = async (surveyId, client = db) => await client.one(
 // ============== DELETE
 
 module.exports = {
+  // CREATE
   createSurvey,
-  getSurvey,
+
+  // READ
+  getSurveyById,
+  getSurveyByName,
 }

@@ -1,8 +1,44 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import * as R from 'ramda'
+
+import { normalizeName } from './../../../common/survey/survey'
+
+import { createSurvey, updateNewSurveyProp } from '../../survey/actions'
+
+const FormInput = ({type = 'input', value, placeholder, onChange, validation = {}}) => {
+  const {valid = true} = validation
+
+  return <input type={type}
+                className={`form-input ${valid ? '' : ' error'}`}
+                value={value}
+                placeholder={placeholder}
+                onChange={onChange}
+  />
+}
 
 class AppHomeView extends React.Component {
 
+  constructor (props) {
+    super(props)
+
+    // this.state = {name: '', label: ''}
+
+    this.createSurvey = this.createSurvey.bind(this)
+  }
+
+  createSurvey () {
+    const {createSurvey, newSurvey} = this.props
+    const {name, label} = newSurvey
+
+    createSurvey({name, label})
+  }
+
   render () {
+    const {newSurvey, updateNewSurveyProp} = this.props
+
+    const {name, label, validation = {}} = newSurvey
+
     return (
       <div style={{
         display: 'grid',
@@ -18,9 +54,19 @@ class AppHomeView extends React.Component {
           alignItems: 'center',
           gridColumnGap: '2rem',
         }}>
-          <input className="form-input" type='input' ref="name" placeholder="Survey name"/>
-          <input className="form-input" type='input' ref="label" placeholder="Survey label"/>
-          <button className="btn btn-of-light">
+
+          <FormInput placeholder="Survey name"
+                     value={name}
+                     validation={R.path(['fields', 'name'])(validation)}
+                     onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
+
+          <FormInput placeholder="Survey Label"
+                     value={label}
+                     validation={R.path(['fields', 'label'])(validation)}
+                     onChange={e => updateNewSurveyProp('label', e.target.value)}/>
+
+          <button className="btn btn-of-light"
+                  onClick={this.createSurvey}>
             <span className="icon icon-plus icon-left"></span>
             Create Survey
           </button>
@@ -31,4 +77,18 @@ class AppHomeView extends React.Component {
   }
 }
 
-export default AppHomeView
+AppHomeView.defaultProps = {
+  newSurvey: {
+    name: '',
+    label: '',
+  }
+}
+
+const mapStateToProps = state => ({
+  newSurvey: R.path(['survey', 'newSurvey'])(state)
+})
+
+export default connect(
+  mapStateToProps,
+  {createSurvey, updateNewSurveyProp}
+)(AppHomeView)

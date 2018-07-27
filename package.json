@@ -69,9 +69,7 @@
     "redux": "^4.0.0",
     "redux-debounced": "^0.5.0",
     "redux-thunk": "^2.3.0",
-    "uuid": "^3.3.2",
-    "xmldom": "^0.1.27",
-    "xpath": "^0.0.27"
+    "uuid": "^3.3.2"
   },
   "browserslist": [
     "last 2 versions"

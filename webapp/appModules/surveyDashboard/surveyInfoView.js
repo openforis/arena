@@ -67,6 +67,7 @@ class SurveyInfoView extends React.Component {
 
 SurveyInfoView.defaultProps = {
   survey: {
+    id: -1,
     name: ''
   }
 }

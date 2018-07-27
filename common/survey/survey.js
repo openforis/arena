@@ -35,7 +35,17 @@ const defaultSurvey = {
   // status: surveyStatus.draft,
 }
 
+const leftTrim = R.replace(/^\s+/, '')
+
+const normalizeName = R.pipe(
+  leftTrim,
+  R.replace(/[^A-Za-z0-9]/g, '_'),
+  R.slice(0, 60),
+)
+
 module.exports = {
   defaultSurvey,
   surveyStatus,
+  leftTrim,
+  normalizeName,
 }
