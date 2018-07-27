@@ -1,10 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
 import { normalizeName } from './../../../common/survey/survey'
 
 import { createSurvey, updateNewSurveyProp } from '../../survey/actions'
+import { surveyState } from '../../survey/surveyState'
+import { appModules } from '../appModules'
+import { appModuleUri } from '../../app/app'
 
 const FormInput = ({type = 'input', value, placeholder, onChange, validation = {}}) => {
   const {valid = true} = validation
@@ -22,7 +26,7 @@ class AppHomeView extends React.Component {
   constructor (props) {
     super(props)
 
-    // this.state = {name: '', label: ''}
+    this.state = {}
 
     this.createSurvey = this.createSurvey.bind(this)
   }
@@ -32,6 +36,17 @@ class AppHomeView extends React.Component {
     const {name, label} = newSurvey
 
     createSurvey({name, label})
+  }
+
+  componentDidUpdate (prevProps) {
+
+    const {currentSurvey: prevCurrentSurvey, newSurvey: prevNewSurvey} = prevProps
+    const {currentSurvey, history} = this.props
+
+    if (currentSurvey && (!prevCurrentSurvey || currentSurvey.id !== prevCurrentSurvey.id)) {
+      history.push(appModuleUri(appModules.surveyDashboard))
+    }
+
   }
 
   render () {
@@ -84,11 +99,14 @@ AppHomeView.defaultProps = {
   }
 }
 
-const mapStateToProps = state => ({
-  newSurvey: R.path(['survey', 'newSurvey'])(state)
+const mapStateToProps = state => console.log('==state ', state) || ({
+  newSurvey: surveyState.getNewSurvey(state),
+  currentSurvey: surveyState.getCurrentSurvey(state),
 })
 
-export default connect(
-  mapStateToProps,
-  {createSurvey, updateNewSurveyProp}
-)(AppHomeView)
+export default withRouter(
+  connect(
+    mapStateToProps,
+    {createSurvey, updateNewSurveyProp}
+  )(AppHomeView)
+)

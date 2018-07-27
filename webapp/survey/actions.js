@@ -3,7 +3,8 @@ import * as R from 'ramda'
 
 import { surveyState } from './surveyState'
 
-export const newSurveyUpdate = 'survey/new/update'
+export const surveyCurrentUpdate = 'survey/current/update'
+export const surveyNewUpdate = 'survey/new/update'
 
 export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
 
@@ -13,21 +14,29 @@ export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
     R.assoc(name, value),
   )(getState())
 
-  dispatch({type: newSurveyUpdate, newSurvey})
+  dispatch({type: surveyNewUpdate, newSurvey})
 
 }
 
-export const createSurvey = survey => async (dispatch, getState) => {
+export const createSurvey = surveyProps => async (dispatch, getState) => {
   try {
+    const {data} = await axios.post('/api/survey', surveyProps)
 
-    const {data} = await axios.post('/api/survey', survey)
+    const {survey} = data
+    const valid = !!survey
 
-    const newSurvey = {
-      ...surveyState.getNewSurvey(getState()),
-      ...data,
+    const newSurvey = valid
+      ? null
+      : {
+        ...surveyState.getNewSurvey(getState()),
+        ...data,
+      }
+
+    dispatch({type: surveyNewUpdate, newSurvey})
+
+    if (valid) {
+      dispatch({type: surveyCurrentUpdate, current: survey})
     }
-
-    dispatch({type: newSurveyUpdate, newSurvey})
 
   } catch (e) {
 
