@@ -1,35 +1,35 @@
 const db = require('../db/db')
-const {nodeDefType} = require('../../common/survey/nodeDef')
+const camelize = require('camelize')
+
 const {uuidv4} = require('../../common/uuid')
 
-const defaultSurveyDef = () => ({
-  1: {
-    id: 1,
-    uuid: uuidv4(),
-    name: 'root_entity',
-    type: nodeDefType.entity,
-    labels: {
-      en: 'Root entity'
-    },
+// const {createEntityDef} = require('./nodeDefRepository')
+const {createEntityDef} = require('../../common/survey/nodeDef')
 
-  }
-})
+// ============== CREATE
 
-const getSurvey = async (surveyId, client = db) => await client.one(`SELECT * FROM survey WHERE id = $1`, [surveyId])
+const createSurveyVersion = async (surveyId, nodeDefs, client = db) => await client.one(
+  `
+  INSERT INTO survey_version (survey_id, node_defs)
+  VALUES ($1, $2)
+  RETURNING *
+  `,
+  [surveyId, nodeDefs],
+  camelize
+)
 
 const createSurvey = async (ownerId, props) => db.tx(
   async t => {
+
     const surveyId = await t.one(`
       INSERT INTO survey (owner_id, props)
       VALUES ($1, $2)
       RETURNING id
     `, [ownerId, props])
 
-    const surveyVersionId = await t.one(`
-      INSERT INTO survey_version (survey_id, survey_def)
-      VALUES ($1, $2)
-      RETURNING id
-    `, [surveyId, defaultSurveyDef()])
+    const rootNodeDef = createEntityDef({name: 'root_entity', label: 'Root entity'})
+
+    const {id: surveyVersionId} = await createSurveyVersion(surveyVersionId, [rootNodeDef], t)
 
     await t.any(`UPDATE survey SET draft_version_id = $1`, [surveyVersionId])
 
@@ -37,7 +37,18 @@ const createSurvey = async (ownerId, props) => db.tx(
   }
 )
 
+// ============== READ
+const getSurvey = async (surveyId, client = db) => await client.one(
+  `SELECT * FROM survey WHERE id = $1`,
+  [surveyId],
+  camelize
+)
+
+// ============== UPDATE
+
+// ============== DELETE
+
 module.exports = {
-  getSurvey,
   createSurvey,
+  getSurvey,
 }

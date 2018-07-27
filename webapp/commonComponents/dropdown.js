@@ -54,10 +54,11 @@ class Dropdown extends React.Component {
       selection,
       placeholder,
       value,
-      className
+      className,
+      style = {},
     } = this.props
 
-    return <div className={`dropdown ${className}`} ref="dropdown">
+    return <div className={`dropdown ${className}`} style={style} ref="dropdown">
       <input className="text-center"
              placeholder={placeholder}
              value={value}/>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Transition } from 'react-transition-group'
 
-import { appDashboard } from '../appModules'
+import { appModules } from '../appModules'
 
 import { TimelineMax, Elastic } from 'gsap/TweenMax'
 import { getViewportDimensions } from '../../app-utils/domUtils'
@@ -29,7 +29,7 @@ class ModuleViewTransitionComponent extends React.Component {
     const {module} = this.props
     const {width} = getViewportDimensions()
 
-    return module === appDashboard
+    return module === appModules.home
       ? (width)
       : -(width)
   }

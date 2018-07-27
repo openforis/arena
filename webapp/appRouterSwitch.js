@@ -10,7 +10,7 @@ import { initApp } from './app/actions'
 import { appState, isLocationLogin, loginUri } from './app/app'
 
 import loginAnimation from './login/loginAnimation'
-import appAnimation from './app/appAnimation'
+import appAnimation from './app/components/appAnimation'
 
 import LoginView from './login/loginView'
 import AppView from './app/appView'

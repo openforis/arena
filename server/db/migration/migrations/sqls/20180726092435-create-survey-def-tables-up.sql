@@ -24,12 +24,14 @@ CREATE TABLE
     (
         id bigserial NOT NULL,
         survey_id bigint NOT NULL,
-        survey_def jsonb,
-        created_date TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
-        modified_date TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
+        node_defs jsonb,
+        date_created TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
+        date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
         PRIMARY KEY (id)
     );
 
+
+    
 ALTER TABLE
     survey ADD CONSTRAINT survey_user_fk FOREIGN KEY (owner_id) REFERENCES "user" ("id");
 --ON DELETE CASCADE;
@@ -43,3 +45,4 @@ ALTER TABLE
 ALTER TABLE
     survey_version ADD CONSTRAINT survey_version_survey_fk FOREIGN KEY (survey_id) REFERENCES "survey" ("id")
 ON DELETE CASCADE;
+

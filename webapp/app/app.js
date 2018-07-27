@@ -1,17 +1,12 @@
 import * as R from 'ramda'
 
 import { excludePathRoot } from '../app-utils/reduxUtils'
-import { appDashboard } from '../appModules/appModules'
+import { appModules } from '../appModules/appModules'
 import { getLocationPathname } from '../app-utils/routerUtils'
 
 //default home is dashboard
-export const appModuleUri = (module = appDashboard, dashboard = false) => (
-  dashboard
-    ? appDashboardUri
-    : ['/app', module].join('/') + '/'
-)
+export const appModuleUri = (module = appModules.home) => ['/app', module].join('/') + '/'
 
-export const appDashboardUri = appModuleUri(appDashboard)
 export const loginUri = '/'
 
 const isPath = path => R.pipe(

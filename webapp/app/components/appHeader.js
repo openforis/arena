@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import { appState, isLocationHome, appModuleUri } from '../app'
 import { logout } from '../actions'
+import { appModules } from '../../appModules/appModules'
 
 class AppHeader extends React.Component {
 
@@ -23,6 +24,11 @@ class AppHeader extends React.Component {
               )
 
           }
+
+          <Link to={appModuleUri(appModules.surveyDashboard)} className="btn btn-s btn-of-light-xs">
+            <span className="icon icon-office icon-20px"></span>
+          </Link>
+
         </div>
 
         <div></div>

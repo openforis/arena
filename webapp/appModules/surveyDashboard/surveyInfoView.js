@@ -1,33 +1,42 @@
-import './style.scss'
-
 import React from 'react'
 import { connect } from 'react-redux'
 
-import * as R from 'ramda'
+import DataFetchComponent from '../components/moduleDataFetchComponent'
 
-import DataFetchComponent from '../appModules/components/moduleDataFetchComponent'
+import { appState } from '../../app/app'
+import { appModules, getDashboardData } from '../appModules'
 
-import { appState } from '../app/app'
-import { appModules, getDashboardData } from '../appModules/appModules'
+import Dropdown from '../../commonComponents/dropdown'
 
-import Dropdown from '../commonComponents/dropdown'
-
-class SurveyDashboardView extends React.Component {
+class SurveyInfoView extends React.Component {
 
   render () {
     const {survey} = this.props
 
     return (
       <DataFetchComponent module={appModules.survey} dashboard={true}>
-        <div className="survey-info">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '.2fr .4fr .4fr',
+          alignContent: 'center',
+          backgroundColor: 'rgba(198, 214, 225, 0.1)',
+        }}>
 
-          <Dropdown className="dropdown-of survey-info__name"
+          <Dropdown className="dropdown-of"
                     placeholder="Survey name"
                     value={survey.name}
                     selection={['survey 1', 'survey 2', 'survey 3', 'survey 4']}
+                    style={{gridColumn: 2}}
           />
 
-          <div className="survey-info__actions">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(5, auto)',
+            gridColumnGap: '2rem',
+            padding: '0 1rem',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
 
             <button className="btn btn-of-light">
               <span className="icon icon-warning icon-20px"/>
@@ -56,7 +65,7 @@ class SurveyDashboardView extends React.Component {
   }
 }
 
-SurveyDashboardView.defaultProps = {
+SurveyInfoView.defaultProps = {
   survey: {
     name: ''
   }
@@ -67,4 +76,4 @@ const mapStateToProps = state => ({
   survey: getDashboardData(appModules.survey)(state)
 })
 
-export default connect(mapStateToProps)(SurveyDashboardView)
+export default connect(mapStateToProps)(SurveyInfoView)

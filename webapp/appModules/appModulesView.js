@@ -5,15 +5,17 @@ import { TransitionGroup } from 'react-transition-group'
 
 import ModuleViewTransitionComponent from './components/moduleViewTransitionComponent'
 
-import { appDashboard, appModules } from './appModules'
+import { appModules } from './appModules'
 import { getLocationPathname } from '../app-utils/routerUtils'
 
-import AppDashboardView from '../appDashboard/appDashboardView'
+import AppHomeView from './home/appHomeView'
+import SurveyDashboardView from './surveyDashboard/surveyDashboardView'
 import DataExplorerView from './dataExplorer/dataExplorerView'
 import SurveyDesignerView from './surveyDesigner/surveyDesignerView'
 
 const appModulesComponents = {
-  [appDashboard]: AppDashboardView,
+  [appModules.home]: AppHomeView,
+  [appModules.surveyDashboard]: SurveyDashboardView,
   [appModules.surveyDesigner]: SurveyDesignerView,
   [appModules.dataExplorer]: DataExplorerView,
 }
@@ -31,7 +33,8 @@ const AppModulesView = (props) => (
 
     <TransitionGroup component={null}>
 
-      <AppModule module={appDashboard} {...props}/>
+      <AppModule module={appModules.home} {...props}/>
+      <AppModule module={appModules.surveyDashboard} {...props}/>
       <AppModule module={appModules.surveyDesigner} {...props}/>
       <AppModule module={appModules.dataExplorer} {...props}/>
 

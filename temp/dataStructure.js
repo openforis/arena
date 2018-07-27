@@ -25,28 +25,30 @@ const pageDef = {
 const nodeDef = {
   id,
   uuid: null,
-  // surveyVersionId: id,
+
+  surveyVersionId: id,
+  deletedSurveyVersionId: id,
+
   parentId: id,
-  //nodeDefType
-  type: null,
+  type: null, //nodeDefType
 
   // props: {
-  name: '',
-  labels: {
-    en: '',
-    es: '',
-  },
-  descriptions: {
-    en: '',
-    es: '',
-  },
-  multiple: false,//boolean
-  required: false,//boolean
-  requiredIf: null,//expr
-  applicableIf: null,//expr
-  minCount: null,//int
-  maxCount: null,//int
-  codeListId: id,
+    name: '',
+    labels: {
+      en: '',
+      es: '',
+    },
+    descriptions: {
+      en: '',
+      es: '',
+    },
+    multiple: false,//boolean
+    required: false,//boolean
+    requiredIf: null,//expr
+    applicableIf: null,//expr
+    minCount: null,//int
+    maxCount: null,//int
+    codeListId: id,
   // },
 }
 
@@ -54,8 +56,8 @@ const attributeDef = {
   ...nodeDef,
   type: nodeDefType.attribute,
 
-  props: {
-    ...nodeDef.props,
+  // props: {
+  //   ...nodeDef.props,
     type: null,
     key: null,//boolean
     defaultValues: [
@@ -71,23 +73,23 @@ const attributeDef = {
     regex: null,
     maxDistance: null,
     calculated: null, //boolean
-  },
+  // },
 }
 
 const entityDef = {
   ...nodeDef,
   type: nodeDefType.entity,
 
-  props: {
+  // props: {
     ...nodeDef.props,
     renderType: entityDefRenderType.table,
-  },
+  // },
 
   // load first level
-  children: {
-    //key value objs can be entityDef or attributDef
-    [id]: attributeDef
-  },
+  // children: {
+  //   //key value objs can be entityDef or attributDef
+  //   [id]: attributeDef
+  // },
 
 }
 
@@ -96,7 +98,7 @@ const surveyVersion = {
   surveyId: id,
 
   // root entity
-  rootNodeDefId: id,
+  // rootNodeDefId: id,
 
   dateCreated: null,
   dateModified: null,
@@ -105,7 +107,7 @@ const surveyVersion = {
   pageDef,
 
   //no store
-  entityDef,
+  // entityDef,
 }
 
 const survey = {

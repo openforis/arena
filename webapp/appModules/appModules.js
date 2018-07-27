@@ -10,6 +10,8 @@ export const apiUri = (surveyId, module, dashboard = false) => (
 )
 
 export const appModules = {
+  home: 'home',
+  surveyDashboard: 'surveyDashboard',
   survey: 'survey',
   surveyDesigner: 'surveyDesigner',
   dataExplorer: 'dataExplorer',
@@ -28,7 +30,7 @@ export const actionTypes = {
 
 export const appModulesPath = {
 
-  matches: (path, module, dashboard = false) => path === appModuleUri(module, dashboard),
+  matches: (path, module) => path === appModuleUri(module),
 
 }
 
