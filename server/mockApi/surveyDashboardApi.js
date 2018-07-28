@@ -14,7 +14,7 @@ const init = app => {
   app.get(getPath('/survey'), (req, res) => {
     const survey = {
       dashboard: {
-        getSurveyId: surveyIdRestParam(req),
+        surveyId: surveyIdRestParam(req),
         name: '',
         // name: 'Italian NFI 2020',
 
@@ -42,7 +42,7 @@ const init = app => {
   app.get(getPath('/surveyDesigner'), (req, res) => {
     const surveyDesigner = {
       dashboard: {
-        getSurveyId: surveyIdRestParam(req),
+        surveyId: surveyIdRestParam(req),
 
         entityDefns: {count: 0},
         attributeDefns: {count: 0},
@@ -59,7 +59,7 @@ const init = app => {
   app.get(getPath('/dataExplorer'), (req, res) => {
     const dataExplorer = {
       dashboard: {
-        getSurveyId: surveyIdRestParam(req),
+        surveyId: surveyIdRestParam(req),
         entities: {},
         // entities: {
         //   tree: {count: 1236},
@@ -76,7 +76,7 @@ const init = app => {
   app.get(getPath('/dataAnalysis'), (req, res) => {
     const dataAnalysis = {
       dashboard: {
-        getSurveyId: surveyIdRestParam(req),
+        surveyId: surveyIdRestParam(req),
         samplingDesign: null,
         entities: {count: 0},
         // attributes: {count: 0},
@@ -101,7 +101,7 @@ const init = app => {
     }
     const users = {
       dashboard: {
-        getSurveyId: surveyIdRestParam(req),
+        surveyId: surveyIdRestParam(req),
         ...roles
       }
     }

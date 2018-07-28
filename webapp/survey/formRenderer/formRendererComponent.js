@@ -32,7 +32,6 @@ class FormRendererComponent extends React.Component {
   render () {
 
     const {
-      surveyId,
       entityDef,
       pageDef,
       // addRootEntity
@@ -73,7 +72,6 @@ FormRendererComponent.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  surveyId: appState.getSurveyId(state)
 })
 
 export default connect(

@@ -61,7 +61,7 @@ class DataAnalysisDashboardView extends React.Component {
 
 DataAnalysisDashboardView.defaultProps = {
   dataAnalysis: {
-    getSurveyId: -1,
+    surveyId: -1,
     samplingDesign: null,
     entities: {count: 0},
     // attributes: {count: 0},
@@ -70,7 +70,7 @@ DataAnalysisDashboardView.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  surveyStatusApp: appState.getSurveyStatus(state),
+  surveyStatusApp: 'draft',
   dataAnalysis: getDashboardData(appModules.dataAnalysis)(state),
 })
 

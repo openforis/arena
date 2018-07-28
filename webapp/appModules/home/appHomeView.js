@@ -6,7 +6,7 @@ import * as R from 'ramda'
 import { normalizeName } from './../../../common/survey/survey'
 
 import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
-import { surveyState } from '../../survey/surveyState'
+import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
 import { FormInput } from '../../commonComponents/form'
@@ -94,8 +94,8 @@ AppHomeView.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  newSurvey: surveyState.getNewSurvey(state),
-  currentSurvey: surveyState.getCurrentSurvey(state),
+  newSurvey: getNewSurvey(state),
+  currentSurvey: getCurrentSurvey(state),
 })
 
 export default withRouter(connect(

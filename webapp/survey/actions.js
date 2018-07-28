@@ -1,16 +1,19 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { surveyState } from './surveyState'
+import { getNewSurvey } from './surveyState'
 
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyNewUpdate = 'survey/new/update'
+
+export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
+  dispatch({type: surveyCurrentUpdate, current: survey})
 
 // == CREATE
 export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
 
   const newSurvey = R.pipe(
-    surveyState.getNewSurvey,
+    getNewSurvey,
     R.dissocPath(['validation', 'fields', name]),
     R.assoc(name, value),
   )(getState())
@@ -26,17 +29,18 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
     const {survey} = data
     const valid = !!survey
 
-    const newSurvey = valid
-      ? null
-      : {
-        ...surveyState.getNewSurvey(getState()),
-        ...data,
-      }
-
-    dispatch({type: surveyNewUpdate, newSurvey})
-
     if (valid) {
-      dispatch({type: surveyCurrentUpdate, current: survey})
+      dispatchCurrentSurveyUpdate(dispatch, survey)
+      dispatch(resetNewSurvey())
+    } else {
+      dispatch({
+        type: surveyNewUpdate,
+        newSurvey: {
+          ...getNewSurvey(getState()),
+          ...data,
+        }
+      })
+
     }
 
   } catch (e) {
