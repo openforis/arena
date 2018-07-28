@@ -99,7 +99,7 @@ AppHomeView.defaultProps = {
   }
 }
 
-const mapStateToProps = state => console.log('==state ', state) || ({
+const mapStateToProps = state => ({
   newSurvey: surveyState.getNewSurvey(state),
   currentSurvey: surveyState.getCurrentSurvey(state),
 })

@@ -49,12 +49,13 @@ button, .btn {
   }
 }
 
-.btn[aria-disabled="true"] {
+.btn[aria-disabled="true"],
+button[aria-disabled="true"] {
   color: currentColor;
   display: inline-block; /* For IE11/ MS Edge bug */
   pointer-events: none;
   text-decoration: none;
-  opacity: .5;
+  opacity: .4;
   background-color: rgba(222, 220, 203, 0.1);
 }
 
