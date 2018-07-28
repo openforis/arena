@@ -6,6 +6,7 @@ import { surveyState } from './surveyState'
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyNewUpdate = 'survey/new/update'
 
+// == CREATE
 export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
 
   const newSurvey = R.pipe(
@@ -43,3 +44,5 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
   }
 
 }
+
+export const resetNewSurvey = () => dispatch => dispatch({type: surveyNewUpdate, newSurvey: null})

@@ -45,7 +45,11 @@ class ModuleViewTransitionComponent extends React.Component {
   initTweenExit (node) {
     if (!this.tweenExit) {
       this.tweenExit = new TimelineMax({paused: true})
-      this.tweenExit.to(node, duration, {opacity:0,display: 'none'})
+      this.tweenExit.to(node, duration, {
+        opacity: 0,
+        display: 'none',
+        onComplete: () => this.setState({mounted: false})
+      })
       // this.tweenExit.to(node, duration, {
       //   right: this.getRightPosition(),
       //   display: 'none',

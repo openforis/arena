@@ -5,7 +5,7 @@ import * as R from 'ramda'
 
 import { normalizeName } from './../../../common/survey/survey'
 
-import { createSurvey, updateNewSurveyProp } from '../../survey/actions'
+import { createSurvey, updateNewSurveyProp, resetNewSurvey } from '../../survey/actions'
 import { surveyState } from '../../survey/surveyState'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
@@ -29,6 +29,10 @@ class AppHomeView extends React.Component {
     this.state = {}
 
     this.createSurvey = this.createSurvey.bind(this)
+  }
+
+  componentWillUnmount () {
+    this.props.resetNewSurvey()
   }
 
   createSurvey () {
@@ -104,9 +108,11 @@ const mapStateToProps = state => ({
   currentSurvey: surveyState.getCurrentSurvey(state),
 })
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    {createSurvey, updateNewSurveyProp}
-  )(AppHomeView)
-)
+export default withRouter(connect(
+  mapStateToProps,
+  {
+    createSurvey,
+    updateNewSurveyProp,
+    resetNewSurvey,
+  }
+)(AppHomeView))
