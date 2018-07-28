@@ -5,21 +5,11 @@ import * as R from 'ramda'
 
 import { normalizeName } from './../../../common/survey/survey'
 
-import { createSurvey, updateNewSurveyProp, resetNewSurvey } from '../../survey/actions'
+import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
 import { surveyState } from '../../survey/surveyState'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
-
-const FormInput = ({type = 'input', value, placeholder, onChange, validation = {}}) => {
-  const {valid = true} = validation
-
-  return <input type={type}
-                className={`form-input ${valid ? '' : ' error'}`}
-                value={value}
-                placeholder={placeholder}
-                onChange={onChange}
-  />
-}
+import { FormInput } from '../../commonComponents/form'
 
 class AppHomeView extends React.Component {
 

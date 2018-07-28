@@ -27,7 +27,13 @@
   font-weight: 100;
   letter-spacing: -0.10rem;
   font-size: .8rem;
-  padding: .15rem .3rem;
+  padding: .3rem .5rem .15rem;
+
+  &:hover {
+    background-color: rgba($white,.1);
+    color: rgba($white,.75);
+    border-bottom: 1px solid rgba($white, 0.75) !important;
+  }
 }
 
 .app__modules {
