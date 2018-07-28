@@ -56,8 +56,12 @@ body {
 
 .error {
   color: $red;
-  //font-weight: 400;
-  //font-size: .9rem;
+}
+
+.error-msg {
+  color: $red;
+  font-size: .8rem;
+  font-weight: 600;
 }
 
 .title-of {

@@ -54,11 +54,12 @@ const tlEnterInit = () => {
     }, start)
     // .add('loginFormEnd')
 
-    .to('.login__form-container', 1, {
-      border: '3px double rgba(239, 155, 155, 0.08)',
-      ease: Power0.easeIn
-    }, start)
+    // .to('.login__form-container', 1, {
+    //   border: '3px double rgba(239, 155, 155, 0.08)',
+    //   ease: Power0.easeIn
+    // }, start)
     //
+    .set('.login__form-container', {border: '3px double rgba(249, 225, 226, 0.08)'}, 'ofLettersEnd')
     .to('.login__form-container', 3, {
       backgroundColor: 'rgba(239, 155, 155, 0.0)',
       ease: Elastic.easeOut.config(1, 0.3)

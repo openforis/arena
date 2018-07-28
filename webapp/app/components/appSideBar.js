@@ -94,7 +94,7 @@ class AppSideBar extends React.Component {
         }}>
           <a className="btn btn-s btn-of-light-xs"
              onClick={() => this.toggleOpen()}>
-            <span className="icon icon-tab icon-16px"/>
+            <span className={`icon icon-${opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
           </a>
         </div>
 
@@ -114,7 +114,12 @@ class AppSideBar extends React.Component {
         </div>
 
         {/*footer*/}
-        <div>
+        <div style={{
+          display: 'grid',
+          justifyItems: 'center',
+          alignContent: 'space-around',
+          height: '100%',
+        }}>
           {/*<h6 className="text-uppercase">{user && user.name}</h6>*/}
           <a className="btn btn-s btn-of-light-xs"
              onClick={() => logout()}>
@@ -124,6 +129,15 @@ class AppSideBar extends React.Component {
               opened
                 ? <span>Logout</span>
                 : null
+            }
+          </a>
+
+          <a className="btn btn-of-link btn-of-sidebar"
+             href="http://www.openforis.org"
+             target="_blank">
+            {
+              opened
+                ? 'Open Foris' : 'OF'
             }
           </a>
         </div>

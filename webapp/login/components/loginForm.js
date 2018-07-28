@@ -22,7 +22,7 @@ class LoginForm extends React.Component {
             <input ref="password" type='password' name='password' placeholder='Your password'/>
             {
               errorMessage
-                ? <div className="error text-center">{errorMessage}</div>
+                ? <div className="error-msg text-center">{errorMessage}</div>
                 : null
             }
             <div className="buttons">
