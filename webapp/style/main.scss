@@ -71,3 +71,11 @@ body {
   border-bottom-right-radius: 10% 2%;
   border-bottom-left-radius: 80% 10%;
 }
+
+.separator-of {
+  border-bottom: 1px double rgba($white,.2);
+  border-bottom-right-radius: 10% 2%;
+  border-bottom-left-radius: 80% 10%;
+  width: 70%;
+  justify-self: center;
+}
