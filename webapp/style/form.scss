@@ -49,6 +49,15 @@ button, .btn {
   }
 }
 
+.btn[aria-disabled="true"] {
+  color: currentColor;
+  display: inline-block; /* For IE11/ MS Edge bug */
+  pointer-events: none;
+  text-decoration: none;
+  opacity: .5;
+  background-color: rgba(222, 220, 203, 0.1);
+}
+
 .btn-s {
   padding: .5rem;
   font-weight: 100;

@@ -7,13 +7,14 @@
 
   z-index: $zIndex1App;
   display: grid;
-  grid-template-rows: 60px 1fr;
+  grid-template-columns: 60px 1fr;
 }
 
-.app-header {
-  background-color: rgba($pink, 0.1);
+.app-sidebar {
+  background-color: rgba($brown, 0.4);
+  border-right: 1px solid rgba($white, 0.1);
   display: grid;
-  grid-template-columns: .3fr .5fr .2fr;
+  grid-template-rows: .8fr .2fr;
   align-items: center;
   justify-content: center;
   justify-items: center;

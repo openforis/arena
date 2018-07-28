@@ -2,14 +2,14 @@ import './style.scss'
 
 import React from 'react'
 
-import AppHeader from './components/appHeader'
+import AppSideBar from './components/appSideBar'
 import AppModulesView from '../appModules/appModulesView'
 
 const AppView = (props) => (
 
   <div className="app__container">
 
-    <AppHeader {...props} />
+    <AppSideBar {...props} />
 
     <AppModulesView {...props} />
 
