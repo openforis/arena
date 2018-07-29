@@ -78,7 +78,7 @@ const tlEnterInit = () => {
     // .set('.login__bg2', {opacity: .9}, start)
     .to('.main__bg2', 12, {
       scaleX: 1.5,
-      scaleY: 1.4,
+      scaleY: 1.5,
       opacity: 0.65,
       repeat: -1,
       yoyo: true,
@@ -95,14 +95,14 @@ const tlEnterInit = () => {
       ease: Power4.easeInOut
     }, start)
 
-    .fromTo('.main__bg1', 6,
-      {
-        scaleX: 1.15,
-        scaleY: 1.15,
-        // rotationZ: -0.5,
-        // '-webkit-filter': 'contrast(100%) brightness(100%)',
-        // filter: 'contrast(100%) brightness(100%)',
-      },
+    .to('.main__bg1', 6,
+      // {
+      //   scaleX: 1.15,
+      //   scaleY: 1.15,
+      //   // rotationZ: -0.5,
+      //   // '-webkit-filter': 'contrast(100%) brightness(100%)',
+      //   // filter: 'contrast(100%) brightness(100%)',
+      // },
       {
         scaleX: 1.1,
         scaleY: 1.1,

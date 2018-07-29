@@ -1,7 +1,10 @@
 import React from 'react'
 
 const Tooltip = ({children, type = null, message = null}) => (
-  <div className={message ? `tooltip${type ? '-' + type : ''}` : ''}>
+
+  <div className={message ? `tooltip${type ? '-' + type : ''}` : ''}
+       style={{display: 'grid'}}>
+
     <React.Fragment>
       {children}
       {
@@ -14,7 +17,9 @@ const Tooltip = ({children, type = null, message = null}) => (
           : null
       }
     </React.Fragment>
+
   </div>
+
 )
 
 export const TooltipError = (props) => (

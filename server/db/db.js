@@ -1,3 +1,12 @@
+const pgPromiseOptions = {
+  query: (e) => {
+    console.log('QUERY: ', e.query);
+    if (e.params) {
+      console.log('PARAMS:', e.params);
+    }
+  }
+}
+
 const pgp = require('pg-promise')({})
 
 const configCommon = {
