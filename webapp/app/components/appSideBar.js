@@ -93,7 +93,11 @@ export const AppSideBarFooter = ({logout, opened}) => (
     height: '100%',
   }}>
     <a className="btn btn-s btn-of-light-xs"
-       onClick={() => logout()}>
+       onClick={() => logout()}
+       style={{
+         display: 'flex',
+         alignItems: 'baseline',
+       }}>
             <span className={`icon icon-exit ${opened ? ' icon-left' : ''}`}
                   style={{transform: 'scaleX(-1)'}}/>
       {

@@ -65,19 +65,9 @@ button[aria-disabled="true"] {
   font-size: 0.8rem;
 }
 
-$ofBorderColor: rgba($white, .6) !important;
-$ofBorder: 1px solid !important;
-$ofBorderRadius: 255px 15px 225px 15px/15px 225px 15px 255px;
-$ofBorderColorLight: rgba($white, .4) !important;
-$ofBorderColorLightXs: rgba($white, .1) !important;
-
-.of {
-  border-radius: $ofBorderRadius;
-  border: $ofBorder;
-}
 
 .btn-of {
-  @extend .of;
+  @include of;
   text-transform: uppercase;
   border-color: $ofBorderColor;
 
@@ -108,83 +98,4 @@ $ofBorderColorLightXs: rgba($white, .1) !important;
 .btn-of-light-xs {
   @extend .btn-of;
   border-color: $ofBorderColorLightXs;
-}
-
-//dropdown
-.dropdown {
-  display: grid;
-  grid-template-columns: .95fr .05fr;
-  align-items: center;
-
-  span.icon {
-    color: $whiteLight;
-    &:hover {
-      cursor: pointer;
-    }
-  }
-}
-
-.dropdown-of {
-  @extend .of;
-  border-color: $ofBorderColorLight;
-}
-
-.dropdown__list {
-  position: absolute;
-  z-index: $zIndex10Dropdown;
-  display: grid;
-  grid-template-columns: 1rem 1fr 1rem;
-  grid-row-gap: .5rem;
-  background-color: rgba($black, .6);
-  padding: 1rem 0;
-  justify-content: center;
-}
-
-.dropdown__list-item {
-  padding: 1rem 0;
-  grid-column: 2;
-  text-align: center;
-  font-weight: 200;
-  color: rgba($white, 0.95);
-
-  &:hover {
-    cursor: pointer;
-    background-color: rgba($black, .3);
-  }
-}
-
-// form grid
-.form {
-  display: grid;
-  /* height: 100%; */
-  grid-row-gap: 1.2rem;
-}
-
-.form-item {
-  display: grid;
-  grid-template-columns: repeat(3, 0.33333333333333fr);
-  grid-column-gap: 2rem;
-  height: auto;
-  align-items: center;
-}
-
-.form-label {
-  justify-self: right;
-  text-transform: uppercase;
-  font-size: .9rem;
-  font-weight: 200;
-}
-
-//.form-input {
-//  justify-self: center;
-//  display: grid;
-//}
-
-input.form-input {
-  padding: .75rem;
-  border-bottom: 5px dotted rgba($white, .6);
-
-  &.error {
-    border-bottom: 5px dotted rgba($red, .6);
-  }
 }

@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:100,200,400,600,800,900');
 @import "./vars";
 @import "./layout";
-@import "./form";
+@import "formBase";
 @import "./ico";
 
 body, html {
@@ -78,6 +78,10 @@ body {
   border-bottom-left-radius: 80% 10%;
   width: 70%;
   justify-self: center;
+}
+
+.no-border {
+  border: none !important;
 }
 
 /*Tooltip text*/

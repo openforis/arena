@@ -1,0 +1,44 @@
+@import "../style/vars";
+
+.dropdown {
+  display: grid;
+  grid-template-columns: .95fr .05fr;
+  align-items: center;
+
+  span.icon {
+    color: $whiteLight;
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.dropdown-of {
+  @include of;
+  border-color: $ofBorderColorLight;
+}
+
+.dropdown__list {
+  position: absolute;
+  z-index: $zIndex10Dropdown;
+  display: grid;
+  grid-template-columns: 1rem 1fr 1rem;
+  grid-row-gap: .5rem;
+  background-color: rgba($black, .6);
+  padding: 1rem 0;
+  justify-content: center;
+}
+
+.dropdown__list-item {
+  padding: 1rem 0;
+  grid-column: 2;
+  text-align: center;
+  font-weight: 200;
+  color: rgba($white, 0.95);
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgba($black, .3);
+  }
+}
+

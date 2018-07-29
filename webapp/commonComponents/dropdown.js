@@ -1,3 +1,5 @@
+import './dropdown.scss'
+
 import React from 'react'
 
 import { elementOffset, clickedOutside } from '../app-utils/domUtils'

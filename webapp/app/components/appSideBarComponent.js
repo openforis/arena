@@ -36,7 +36,7 @@ class AppSideBarComponent extends React.Component {
           justifyItems: 'end',
           opacity: '.5',
         }}>
-          <a className="btn btn-s btn-of-light-xs"
+          <a className="btn btn-s btn-of-light-xs no-border"
              onClick={() => this.toggleOpen()}>
             <span className={`icon icon-${opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
           </a>

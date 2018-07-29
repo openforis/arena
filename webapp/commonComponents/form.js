@@ -1,3 +1,5 @@
+import './form.scss'
+
 import React from 'react'
 
 import { TooltipError } from './tooltip'
