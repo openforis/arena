@@ -2,30 +2,23 @@ import './react-grid-layout.scss'
 
 import React from 'react'
 
+import FormPageHeadersComponent from './formPageHeadersComponent'
 import EntityDefPageComponent from './entityDefPageComponent'
 
 class FormRendererComponent extends React.Component {
 
-  //simulate with state now
-  constructor () {
-    super()
-    this.state = {
-      pageDef: null,
-      entityDef: null,
-    }
-  }
-
   render () {
     const {entityDef} = this.props
+
 
     return (
       <div style={{
         display: 'grid',
-        position: 'relative',
-        overflowY: 'scroll',
+        gridTemplateRows:'40px 1fr',
       }}>
 
         {/*//tab navigation*/}
+        <FormPageHeadersComponent entityDef={entityDef}/>
 
         {/*//current page*/}
         <EntityDefPageComponent entityDef={entityDef}/>

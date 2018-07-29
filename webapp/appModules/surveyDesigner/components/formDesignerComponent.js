@@ -26,7 +26,7 @@ const FormDesignerActions = () => {
   )
 }
 
-const generateLayout = R.pipe(
+const newPageItemLayout = R.pipe(
   R.defaultTo({}),
   R.merge({
     i: '0',
@@ -45,6 +45,17 @@ const generateLayout = R.pipe(
   }),
 )
 
+const newPageDef = (entityDef) => ({
+  entityDefId: entityDef.id,
+  entityDefUUID: entityDef.uiid,
+  columns: 3,
+  uuid: uuidv4(),
+})
+
+const newPageLayout = (entityDef) => ({
+  pageDef: newPageDef(entityDef),
+})
+
 class FormDesignerComponent extends React.Component {
 
   constructor (props) {
@@ -58,20 +69,16 @@ class FormDesignerComponent extends React.Component {
     const {entityDef} = this.state
 
     const children = [
-      {id: '0', props: {name: 'attrA'}, layout: generateLayout()},
-      {id: '1', props: {name: 'attrB'}, layout: generateLayout({x: 1})},
-      {id: '2', props: {name: 'attrC'}, layout: generateLayout({x: 2})},
-      {id: '3', props: {name: 'attrD'}, },
+      {id: '0', props: {name: 'attrA'}, layout: newPageItemLayout({})},
+      {id: '1', props: {name: 'attrB'}, layout: newPageItemLayout({x: 1})},
+      {id: '2', props: {name: 'attrC'}, layout: newPageItemLayout({x: 2})},
+      // item with no layout is added at the end of the grid
+      {id: '3', props: {name: 'attrD'},},
+      {id: '2', props: {type: 'entity', name: 'plot'}, layout: newPageLayout({id: '2', uuid: uuidv4()})},
+      {id: '3', props: {type: 'entity', name: 'sub_root_entity'}, layout: newPageItemLayout({render: 'table'})},
     ]
 
-    const layout = {
-      pageDef: {
-        entityDefId: entityDef.id,
-        entityDefUUID: entityDef.uiid,
-        columns: 3,
-        uuid: uuidv4(),
-      },
-    }
+    const layout = newPageLayout(entityDef)
 
     this.setState({
       entityDef: R.pipe(
@@ -119,11 +126,13 @@ FormDesignerComponent.defaultProps = {
   entityDef: {
     surveyId: '1',
     parentId: null,
-    'id': '1',
-    'name': 'root_entity',
-    'type': 'e',
-    'uuid': '0bce2450-a68f-494d-9e83-f4f7471b83bb',
-    'label': 'Root entity',
+    props: {
+      'id': '1',
+      'name': 'root_entity',
+      'type': 'e',
+      'uuid': '0bce2450-a68f-494d-9e83-f4f7471b83bb',
+      'label': 'Root entity',
+    },
     layout: null,
   }
   ,

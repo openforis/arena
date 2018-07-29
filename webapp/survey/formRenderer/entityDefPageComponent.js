@@ -7,10 +7,14 @@ import { Responsive, WidthProvider } from 'react-grid-layout'
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 const EntityDefPageComponent = ({entityDef}) => {
-  console.log(entityDef)
+  // console.log(entityDef)
   const {layout, children = []} = entityDef
   const {columns} = R.prop('pageDef')(layout)
   const layouts = []
+
+  const childNodeDefs = R.filter(
+    nodeDef=>R.isNil(R.path(['layout','pageDef'], nodeDef))
+  )(children)
 
   return (
     <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
@@ -22,8 +26,8 @@ const EntityDefPageComponent = ({entityDef}) => {
                             console.log('allLayouts ', allLayouts)
                           }}>
       {
-        children.map(nodeDef =>
-          <div key={nodeDef.id} data-grid={nodeDef.layout}>{nodeDef.props.name}</div>
+        childNodeDefs.map( (nodeDef,i) =>
+          <div key={i} data-grid={nodeDef.layout}>{nodeDef.props.name}</div>
         )
       }
     </ResponsiveGridLayout>

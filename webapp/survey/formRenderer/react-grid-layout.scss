@@ -3,6 +3,8 @@
 .react-grid-layout {
   position: relative;
   transition: height 200ms ease;
+
+  overflow-y: scroll;
 }
 
 .react-grid-item {
