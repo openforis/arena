@@ -1,5 +1,3 @@
-import './tabBar.scss'
-
 import React from 'react'
 
 class TabBar extends React.Component {
@@ -15,8 +13,11 @@ class TabBar extends React.Component {
     const {selection} = this.state
 
     return (
-      <div className="tab-bar">
-        <div className="tab-bar__nav flex-center">
+      <div style={{
+        display: 'grid',
+        gridTemplateRows: '.15fr .85fr',
+      }}>
+        <div className="flex-center">
           {
             tabs.map((tab, i) => {
               return (
@@ -30,9 +31,7 @@ class TabBar extends React.Component {
           }
         </div>
 
-        <div className="tab-bar__item">
-          {React.createElement(tabs[selection].component)}
-        </div>
+        {React.createElement(tabs[selection].component)}
 
       </div>
     )

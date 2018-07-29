@@ -2,32 +2,20 @@ import './style.scss'
 
 import React from 'react'
 
-// import DataFetchComponent from '../components/moduleDataFetchComponent'
-// import { appModules } from '../appModules'
-
 import TabBar from '../../commonComponents/tabBar'
 import SurveyInfoComponent from './components/surveyInfoComponent'
-import FormRendererComponent from '../../survey/formRenderer/formRendererComponent'
+import FormDesignerComponent from './components/formDesignerComponent'
 
-class SurveyDesignerView extends React.Component {
+const SurveyDesignerView = () => (
+  <div className="survey-designer grid100">
 
-  //<DataFetchComponent module={appModules.surveyDesigner}>
-  // </DataFetchComponent>
+    <TabBar
+      tabs={[
+        {label: 'Survey Info', component: SurveyInfoComponent},
+        {label: 'Form Designer', component: FormDesignerComponent},
+      ]}/>
 
-  render () {
-    return (
-      <div className="survey-designer">
-
-        <TabBar
-          tabs={[
-            {label: 'Survey Info', component: SurveyInfoComponent},
-            {label: 'Form Designer', component: FormRendererComponent},
-          ]}/>
-
-      </div>
-    )
-  }
-
-}
+  </div>
+)
 
 export default SurveyDesignerView
