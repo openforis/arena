@@ -10,7 +10,7 @@ import {
   SteppedEase
 } from 'gsap/TweenMax'
 
-import { kill } from '../app-utils/gsapUtils'
+import { kill } from '../../app-utils/gsapUtils'
 
 const key = 'login'
 
@@ -36,7 +36,8 @@ const tlEnterInit = () => {
     tlEnter.from(el, .5, {
       rotationY: 180,
       opacity: 0,
-      top: '-100%',
+      // top: '-100%',
+      // css:{filter:'blur(10px)'},
       ease: Bounce.easeIn
     })
   }
@@ -59,9 +60,13 @@ const tlEnterInit = () => {
     //   ease: Power0.easeIn
     // }, start)
     //
-    .set('.login__form-container', {border: '3px double rgba(249, 225, 226, 0.08)'}, 'ofLettersEnd')
+    .set('.login__form-container', {border: '3px double rgba(222, 220, 203, 0.1)'}, start)
     .to('.login__form-container', 3, {
-      backgroundColor: 'rgba(239, 155, 155, 0.0)',
+      // backgroundColor: 'rgba(239, 155, 155, 0.0)',
+      // backgroundColor: 'rgba(249, 225, 226, 0.02)',
+      backgroundColor: 'rgba(59, 78, 62, 0.1)',
+      // borderRadius: '255px 15px 225px 15px/15px 225px 15px 255px',
+      // onComplete:()=>tlEnter.set('.login__form-container',{borderRadius:'255px 15px 225px 15px/15px 225px 15px 255px'}),
       ease: Elastic.easeOut.config(1, 0.3)
     }, start)
     //
@@ -72,8 +77,8 @@ const tlEnterInit = () => {
     //background image overlay
     // .set('.login__bg2', {opacity: .9}, start)
     .to('.main__bg2', 12, {
-      scaleX: 1.6,
-      scaleY: 1.6,
+      scaleX: 1.5,
+      scaleY: 1.4,
       opacity: 0.65,
       repeat: -1,
       yoyo: true,

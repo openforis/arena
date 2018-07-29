@@ -9,7 +9,7 @@ import { TransitionGroup, Transition } from 'react-transition-group'
 import { initApp } from './app/actions'
 import { appState, isLocationLogin, loginUri } from './app/app'
 
-import loginAnimation from './login/loginAnimation'
+import loginAnimation from './login/components/loginAnimation'
 import appAnimation from './app/components/appAnimation'
 
 import LoginView from './login/loginView'
