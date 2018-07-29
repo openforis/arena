@@ -1,11 +1,10 @@
 import { assocActionProps, exportReducer, } from '../app-utils/reduxUtils'
 
-import { surveyCurrentUpdate, surveyNewUpdate, } from './actions'
+import { surveyNewUpdate, } from './actions'
 
 const actionHandlers = {
 
   [surveyNewUpdate]: assocActionProps,
-  [surveyCurrentUpdate]: assocActionProps,
 
 }
 

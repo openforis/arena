@@ -1,14 +1,20 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import { getCurrentSurvey } from '../../../survey/surveyState'
+import { FormInput } from '../../../commonComponents/form'
 
 class SurveyInfoComponent extends React.Component {
 
   render () {
+    const {survey} = this.props
+
     return (
       <div className="form">
 
         <div className="form-item">
           <label className="form-label">Name</label>
-          <input className="form-input"></input>
+          <FormInput value={survey.props.name}/>
+
         </div>
 
         <div className="form-item">
@@ -22,4 +28,8 @@ class SurveyInfoComponent extends React.Component {
 
 }
 
-export default SurveyInfoComponent
+const mapStateToProps = state => ({
+  survey: getCurrentSurvey(state)
+})
+
+export default connect(mapStateToProps)(SurveyInfoComponent)

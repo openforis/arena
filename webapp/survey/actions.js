@@ -7,7 +7,7 @@ export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyNewUpdate = 'survey/new/update'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
-  dispatch({type: surveyCurrentUpdate, current: survey})
+  dispatch({type: surveyCurrentUpdate, survey})
 
 // == CREATE
 export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {

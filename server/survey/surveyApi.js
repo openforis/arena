@@ -2,7 +2,6 @@ const {sendOk, sendErr} = require('../response')
 
 const {createSurvey} = require('./surveyRepository')
 const {validateCreateSurvey} = require('./surveyValidator')
-const {setUserPref} = require('../user/userRepository')
 
 module.exports.init = app => {
 
@@ -13,8 +12,7 @@ module.exports.init = app => {
       const validation = await validateCreateSurvey(body)
 
       if (validation.valid) {
-        const survey = await createSurvey(user.id, body)
-        const userUpdated = await setUserPref(user, 'survey', survey.id)
+        const survey = await createSurvey(user, body)
 
         res.json({survey})
       } else {

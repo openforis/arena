@@ -2,13 +2,21 @@ const passport = require('passport')
 
 const {sendOk} = require('../response')
 
-// on get user request,
-// TODO: load default user survey
-const sendUser = (res, user) =>
+const userPref = require('./../user/userPrefs')
+const {getSurveyById} = require('../survey/surveyRepository')
+
+const sendUser = async (res, user) => {
+  const surveyId = userPref.getSurvey(user)
+
+  const survey = surveyId
+    ? await getSurveyById(surveyId)
+    : null
+
   res.json({
     user,
-    // survey: defaultSurvey
+    survey
   })
+}
 
 const authenticationSuccessful = (req, res, next, user) =>
   req.logIn(user, err => {

@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-export const getCurrentSurvey = R.path(['survey', 'current'])
+export const getCurrentSurvey = R.path(['app', 'survey'])
 
 export const getCurrentSurveyId = R.pipe(
   getCurrentSurvey,

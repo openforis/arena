@@ -34,12 +34,12 @@ const findUserByEmailAndPassword = async (email, password) => {
 
 // ==== UPDATE
 
-const setUserPref = async (user, name, value) => {
+const setUserPref = async (user, name, value, client = db) => {
   const userPref = JSON.stringify(
     {[name]: value}
   )
 
-  const userRes = await db.one(`
+  const userRes = await client.one(`
     UPDATE "user" 
     SET prefs = prefs || $1
     WHERE id = $2
