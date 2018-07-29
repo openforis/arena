@@ -3,7 +3,7 @@ import './react-grid-layout.scss'
 import React from 'react'
 
 import FormPageHeadersComponent from './formPageHeadersComponent'
-import EntityDefPageComponent from './entityDefPageComponent'
+import FormPageComponent from './formPageComponent'
 
 class FormRendererComponent extends React.Component {
 
@@ -21,7 +21,7 @@ class FormRendererComponent extends React.Component {
         <FormPageHeadersComponent entityDef={entityDef}/>
 
         {/*//current page*/}
-        <EntityDefPageComponent entityDef={entityDef}/>
+        <FormPageComponent entityDef={entityDef}/>
       </div>
     )
   }

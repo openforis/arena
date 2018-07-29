@@ -11,7 +11,7 @@
   transition: all 200ms ease;
   transition-property: left, top;
 
-  border: 2px dashed rgba($white,.4);
+  border: 1px dashed rgba($white, .4);
 }
 
 .react-grid-item.cssTransforms {
@@ -57,6 +57,6 @@
   bottom: 3px;
   width: 5px;
   height: 5px;
-  border-right: 2px solid rgba(0, 0, 0, 0.4);
-  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+  border-right: 2px solid rgba($white, 0.7);
+  border-bottom: 2px solid rgba($white, 0.7);
 }

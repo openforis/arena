@@ -69,13 +69,13 @@ class FormDesignerComponent extends React.Component {
     const {entityDef} = this.state
 
     const children = [
-      {id: '0', props: {name: 'attrA'}, layout: newPageItemLayout({})},
-      {id: '1', props: {name: 'attrB'}, layout: newPageItemLayout({x: 1})},
-      {id: '2', props: {name: 'attrC'}, layout: newPageItemLayout({x: 2})},
+      {id: '0', props: {name: 'attrA'}, layout: newPageItemLayout({isDraggable: false, isResizable: false, static: true, w:3})},
+      {id: '1', props: {name: 'attrB'}, layout: newPageItemLayout({x: 4})},
+      {id: '2', props: {name: 'attrC'}, layout: newPageItemLayout({x: 5})},
       // item with no layout is added at the end of the grid
       {id: '3', props: {name: 'attrD'},},
       {id: '2', props: {type: 'entity', name: 'plot'}, layout: newPageLayout({id: '2', uuid: uuidv4()})},
-      {id: '3', props: {type: 'entity', name: 'sub_root_entity'}, layout: newPageItemLayout({render: 'table'})},
+      {id: '3', props: {type: 'entity', name: 'sub_root_entity'}, layout: newPageItemLayout({render: 'table',x: 7})},
     ]
 
     const layout = newPageLayout(entityDef)
