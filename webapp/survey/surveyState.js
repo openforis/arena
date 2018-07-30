@@ -9,5 +9,5 @@ export const getCurrentSurveyId = R.pipe(
 
 export const getNewSurvey = R.pipe(
   R.path(['survey', 'newSurvey']),
-  R.defaultTo({name: '', label: ''})
+  R.defaultTo({name: '', label: '', lang: 'en', validation: {}})
 )

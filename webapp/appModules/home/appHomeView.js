@@ -24,7 +24,7 @@ class AppHomeView extends React.Component {
 
     this.languages = R.pipe(
       R.keys,
-      R.map(lang =>({key:lang,value:R.path([lang,'en'], languages)}))
+      R.map(lang => ({key: lang, value: R.path([lang, 'en'], languages)}))
     )(languages)
 
   }
@@ -35,9 +35,13 @@ class AppHomeView extends React.Component {
 
   createSurvey () {
     const {createSurvey, newSurvey} = this.props
-    const {name, label} = newSurvey
+    const {name, label, lang} = newSurvey
 
-    createSurvey({name, label})
+    createSurvey({
+      name,
+      label: {[lang]: label},
+      lang
+    })
   }
 
   componentDidUpdate (prevProps) {
@@ -54,7 +58,7 @@ class AppHomeView extends React.Component {
   render () {
     const {newSurvey, updateNewSurveyProp} = this.props
 
-    const {name, label, validation = {}} = newSurvey
+    const {name, label, lang, validation} = newSurvey
 
     return (
       <div style={{
@@ -83,7 +87,9 @@ class AppHomeView extends React.Component {
                      onChange={e => updateNewSurveyProp('label', e.target.value)}/>
 
           <Dropdown items={this.languages}
-                    inputClassName="form-input"/>
+                    inputClassName="form-input"
+                    value={lang}
+                    onChange={e => updateNewSurveyProp('lang', e.key)}/>
 
           <button className="btn btn-of-light"
                   onClick={this.createSurvey}>
@@ -94,13 +100,6 @@ class AppHomeView extends React.Component {
         </div>
       </div>
     )
-  }
-}
-
-AppHomeView.defaultProps = {
-  newSurvey: {
-    name: '',
-    label: '',
   }
 }
 

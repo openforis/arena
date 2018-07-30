@@ -6,11 +6,18 @@ import { clickedOutside, elementOffset } from '../appUtils/domUtils'
 
 class Dropdown extends React.Component {
 
-  constructor () {
-    super()
-    this.state = {opened: false}
+  constructor (props) {
+    super(props)
+    this.state = {
+      items: props.items,
+      value: props.value,
+      opened: false
+    }
 
     this.outsideClick = this.outsideClick.bind(this)
+    this.onChange = this.onChange.bind(this)
+    this.onInputChange = this.onInputChange.bind(this)
+
     window.addEventListener('click', this.outsideClick)
   }
 
@@ -36,6 +43,35 @@ class Dropdown extends React.Component {
     }
   }
 
+  onChange (item) {
+    this.props.onChange(item)
+    this.toggleOpened()
+  }
+
+  onInputChange (evt) {
+    const {value = ''} = evt.target
+    const {items} = this.props
+
+    const filteredItems = R.trim(value).length > 0
+      ? items.filter(item => {
+        return R.contains(value, item) ||
+          R.contains(value, item.key) ||
+          R.contains(value, item.label)
+      })
+      : items
+
+    const selected = filteredItems.length < 2
+
+    this.setState({
+      items: filteredItems,
+      value: value,
+      opened: !selected,
+    })
+
+    if(selected)
+      this.onChange(R.head(filteredItems))
+  }
+
   getOffset () {
     const {
       top,
@@ -51,19 +87,31 @@ class Dropdown extends React.Component {
     }
   }
 
+  getItemLabel (item = '') {
+    return item.value ? `${item.value} (${item.key})` : item
+  }
+
+  getItemLabelFromValue (value = '') {
+    const item = this.props.items.find(item => item.key ? item.key === value : item === value)
+    return this.getItemLabel(item)
+  }
+
   render () {
     const {
-      items,
       placeholder,
-      value,
       className,
       style = {},
-      inputClassName = ''
+      inputClassName = '',
     } = this.props
+
+    const {
+      items,
+      value,
+    } = this.state
 
     return <div className={`dropdown ${className}`} style={style} ref="dropdown">
       <input placeholder={placeholder}
-             value={value}
+             value={this.getItemLabelFromValue(value)}
              className={inputClassName}
              ref="dropdownInput"/>
       <span className="icon icon-menu2 icon-24px"
@@ -77,8 +125,9 @@ class Dropdown extends React.Component {
                  }}>
               {
                 items.map(
-                  item => <div key={item.key ? item.key : item} className="dropdown__list-item">
-                    {item.value ? `${item.value} (${item.key})` : item}
+                  item => <div key={item.key ? item.key : item} className="dropdown__list-item"
+                               onClick={() => this.onChange(item)}>
+                    {this.getItemLabel(item)}
                   </div>
                 )
               }
@@ -90,7 +139,6 @@ class Dropdown extends React.Component {
       }
     </div>
   }
-
 }
 
 export default Dropdown
