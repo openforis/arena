@@ -6,19 +6,21 @@ const {nodeDefType} = require('../../common/survey/nodeDef')
 
 // ============== CREATE
 
-const createNodeDef = async (surveyVersionId, props, client = db, type) => await client.one(
+const createNodeDef = async (surveyId, parentId, type, props, client = db) => await client.one(
   ` 
-  INSERT INTO node_def (survey_version_id, type, props)
-  VALUES ($1, $2)
+  INSERT INTO node_def (survey_id, parent_id, type, props_draft)
+  VALUES ($1, $2, $3, $4)
   RETURNING * 
   `,
-  [surveyVersionId, type, props],
+  [surveyId, parentId, type, props],
   camelize
 )
 
-const createEntityDef = R.partialRight(createNodeDef, [nodeDefType.entity])
+const createEntityDef = async (surveyId, parentId, props, client = db) =>
+  await createNodeDef(surveyId, parentId, nodeDefType.entity, props, client)
 
-const createAttributeDef = R.partialRight(createNodeDef, [nodeDefType.attribute])
+const createAttributeDef = async (surveyId, parentId, props, client = db) =>
+  await createNodeDef(surveyId, parentId, nodeDefType.attribute, props, client)
 
 // ============== READ
 
@@ -26,14 +28,14 @@ const createAttributeDef = R.partialRight(createNodeDef, [nodeDefType.attribute]
 
 // ============== DELETE
 
-const markNodeDefDeleted = async (surveyVersionId, nodeDefId, client = db) => await client.one(
+const markNodeDefDeleted = async (nodeDefId, client = db) => await client.one(
   `
   UPDATE node_def 
-  SET deleted_survey_version_id = $1 
-  WHERE id = $2
+  SET deleted = true
+  WHERE id = $1
   RETURNING *
   `,
-  [surveyVersionId, nodeDefId],
+  [nodeDefId],
   camelize
 )
 

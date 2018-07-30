@@ -25,15 +25,16 @@ const entityDefRenderType = {
 
 // ======== CREATE
 
-const createNodeDef = (nodeDef, type) => ({
-  ...nodeDef,
+const createNodeDef = (surveyId, type, props) => ({
+  surveyId,
   type,
-  uuid: uuidv4(),
+
+  props,
 })
 
-const createEntityDef = R.partialRight(createNodeDef, nodeDefType.entity)
+const createEntityDef = (surveyId, props) => createNodeDef(surveyId, nodeDefType.entity, props)
 
-const createAttributeDef = R.partialRight(createNodeDef, nodeDefType.attribute)
+const createAttributeDef = (surveyId, props) => createNodeDef(surveyId, nodeDefType.attribute, props)
 
 module.exports = {
   nodeDefType,

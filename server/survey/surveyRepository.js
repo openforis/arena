@@ -6,20 +6,10 @@ const {uuidv4} = require('../../common/uuid')
 const {setUserPref} = require('../user/userRepository')
 const userPref = require('../user/userPrefs')
 
-// const {createEntityDef} = require('./nodeDefRepository')
-const {createEntityDef} = require('../../common/survey/nodeDef')
+const {createEntityDef} = require('./nodeDefRepository')
+// const {createEntityDef} = require('../../common/survey/nodeDef')
 
 // ============== CREATE
-
-const createSurveyVersion = async (surveyId, nodeDefs, client = db) => await client.one(
-  `
-  INSERT INTO survey_version (survey_id, node_defs)
-  VALUES ($1, $2)
-  RETURNING *
-  `,
-  [surveyId, nodeDefs],
-  camelize
-)
 
 const createSurvey = async (user, props) => db.tx(
   async t => {
@@ -30,11 +20,9 @@ const createSurvey = async (user, props) => db.tx(
       RETURNING id
     `, [user.id, props])
 
-    const rootNodeDef = createEntityDef({id: 1, name: 'root_entity', label: 'Root entity'})
+    const {id: rootNodeDefId} = createEntityDef(surveyId, null, {name: 'root_entity', label: 'Root entity'})
 
-    const {id: surveyVersionId} = await createSurveyVersion(surveyId, {nodeDefs: [rootNodeDef]}, t)
-
-    await t.any(`UPDATE survey SET draft_version_id = $1 WHERE id = $2`, [surveyVersionId, surveyId])
+    await t.any(`UPDATE survey SET root_node_def_id = $1 WHERE id = $2`, [rootNodeDefId, surveyId])
 
     // update user prefs
     await setUserPref(user, userPref.survey, surveyId, t)

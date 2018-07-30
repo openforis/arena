@@ -26,13 +26,13 @@ const nodeDef = {
   id,
   uuid: null,
 
-  surveyVersionId: id,
-  deletedSurveyVersionId: id,
+  dateCreated: null,
+  dateModified: null,
 
   parentId: id,
   type: null, //nodeDefType
 
-  // props: {
+  props: {
     name: '',
     labels: {
       en: '',
@@ -49,15 +49,19 @@ const nodeDef = {
     minCount: null,//int
     maxCount: null,//int
     codeListId: id,
-  // },
+  },
+
+  propsDraft : {
+
+  }
 }
 
 const attributeDef = {
   ...nodeDef,
   type: nodeDefType.attribute,
 
-  // props: {
-  //   ...nodeDef.props,
+  props: {
+    ...nodeDef.props,
     type: null,
     key: null,//boolean
     defaultValues: [
@@ -73,41 +77,19 @@ const attributeDef = {
     regex: null,
     maxDistance: null,
     calculated: null, //boolean
-  // },
+  },
+
 }
 
 const entityDef = {
   ...nodeDef,
   type: nodeDefType.entity,
 
-  // props: {
+  props: {
     ...nodeDef.props,
     renderType: entityDefRenderType.table,
-  // },
+  },
 
-  // load first level
-  // children: {
-  //   //key value objs can be entityDef or attributDef
-  //   [id]: attributeDef
-  // },
-
-}
-
-const surveyVersion = {
-  id,
-  surveyId: id,
-
-  // root entity
-  // rootNodeDefId: id,
-
-  dateCreated: null,
-  dateModified: null,
-
-  // only survey contains the pageDef
-  pageDef,
-
-  //no store
-  // entityDef,
 }
 
 const survey = {
@@ -115,9 +97,14 @@ const survey = {
   uuid: null,
   ownerId: id,
 
-  //surveyVersion IDs
-  publishedVersionId: id,
-  draftVersionId: id,
+  rootNodeDefId:id,
+
+  published:false,
+  draft:true,
+
+  // surveyVersion IDs
+  // publishedVersionId: id,
+  // draftVersionId: id,
 
   props: {
     name: 'name',

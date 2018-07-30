@@ -13,8 +13,19 @@ const FormPageComponent = ({entityDef}) => {
   const layouts = []
 
   const childNodeDefs = R.filter(
-    nodeDef=>R.isNil(R.path(['layout','pageDef'], nodeDef))
+    nodeDef => R.isNil(R.path(['layout', 'pageDef'], nodeDef))
   )(children)
+
+  const printEvtTargets = (layout, oldItem, newItem, placeholder, e, element) => {
+
+    console.log('evt ', e)
+    console.log('layout ', layout)
+    console.log('oldItem ', oldItem)
+    console.log('newItem ', newItem)
+    console.log('placeholder ', placeholder)
+    console.log('element ', element)
+
+  }
 
   return (
     <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
@@ -24,9 +35,18 @@ const FormPageComponent = ({entityDef}) => {
                           onLayoutChange={(currentLayout, allLayouts) => {
                             console.log('currentLayout ', currentLayout)
                             console.log('allLayouts ', allLayouts)
-                          }}>
+                          }}
+
+                          // onDragStart={printEvtTargets}
+                          // onDrag={printEvtTargets}
+                          onDragStop={printEvtTargets}
+                          // onResizeStart={printEvtTargets}
+                          // onResize={printEvtTargets}
+                          onResizeStop={printEvtTargets}
+
+    >
       {
-        childNodeDefs.map( (nodeDef,i) =>
+        childNodeDefs.map((nodeDef, i) =>
           <div key={i} data-grid={nodeDef.layout}>{nodeDef.props.name}</div>
         )
       }
