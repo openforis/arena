@@ -17,8 +17,9 @@ const validateCreateSurveyName = async survey => {
     : {}
 }
 
-const validateCreateSurveyLabel = async survey => {
-  const error = R.isEmpty(survey.label)
+const validateRequired = (obj, name) => {
+  const value = R.prop(name, obj)
+  const error = R.isEmpty(value) || R.isNil(value)
     ? 'empty'
     : null
 
@@ -39,12 +40,15 @@ const assocValidation = (name, validation, obj) => R.propEq('valid', false, vali
 
 const validateCreateSurvey = async survey => {
   const nameValidation = await validateCreateSurveyName(survey)
-  const labelValidation = await validateCreateSurveyLabel(survey)
+  const labelValidation = await validateRequired(survey, 'label')
+  const langValidation = await validateRequired(survey, 'lang')
+console.log(survey)
 
   return R.pipe(
     R.assocPath(['validation', 'valid'], true),
     R.partial(assocValidation, ['name', nameValidation]),
     R.partial(assocValidation, ['label', labelValidation]),
+    R.partial(assocValidation, ['lang', langValidation]),
     R.prop('validation'),
   )(survey)
 }

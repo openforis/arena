@@ -39,7 +39,7 @@ class AppHomeView extends React.Component {
 
     createSurvey({
       name,
-      label: {[lang]: label},
+      label,
       lang
     })
   }
@@ -59,6 +59,9 @@ class AppHomeView extends React.Component {
     const {newSurvey, updateNewSurveyProp} = this.props
 
     const {name, label, lang, validation} = newSurvey
+    const selection = lang
+      ? {key: lang, value: languages[lang].en}
+      : null
 
     return (
       <div style={{
@@ -76,20 +79,21 @@ class AppHomeView extends React.Component {
           gridColumnGap: '2rem',
         }}>
 
-          <FormInput placeholder="Survey name"
+          <FormInput placeholder="Name"
                      value={name}
                      validation={R.path(['fields', 'name'])(validation)}
                      onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
 
-          <FormInput placeholder="Survey Label"
+          <FormInput placeholder="Label"
                      value={label}
                      validation={R.path(['fields', 'label'])(validation)}
                      onChange={e => updateNewSurveyProp('label', e.target.value)}/>
 
-          <Dropdown items={this.languages}
-                    inputClassName="form-input"
-                    value={lang}
-                    onChange={e => updateNewSurveyProp('lang', e.key)}/>
+          <Dropdown placeholder="Language"
+                    items={this.languages}
+                    selection={selection}
+                    onChange={e => updateNewSurveyProp('lang', e ? e.key : null)}
+                    validation={R.path(['fields', 'lang'])(validation)}/>
 
           <button className="btn btn-of-light"
                   onClick={this.createSurvey}>

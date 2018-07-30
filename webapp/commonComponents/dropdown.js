@@ -2,20 +2,27 @@ import './dropdown.scss'
 
 import React from 'react'
 
+import * as R from 'ramda'
+
 import { clickedOutside, elementOffset } from '../appUtils/domUtils'
+import { FormInput } from './form'
 
 class Dropdown extends React.Component {
 
   constructor (props) {
     super(props)
+
+    const {items, selection} = this.props
+
     this.state = {
-      items: props.items,
-      value: props.value,
+      items,
+      selection,
+      displayValue: this.getItemLabel(selection),
       opened: false
     }
 
     this.outsideClick = this.outsideClick.bind(this)
-    this.onChange = this.onChange.bind(this)
+    this.onSelectionChange = this.onSelectionChange.bind(this)
     this.onInputChange = this.onInputChange.bind(this)
 
     window.addEventListener('click', this.outsideClick)
@@ -23,10 +30,6 @@ class Dropdown extends React.Component {
 
   componentWillUnmount () {
     window.removeEventListener('click', this.outsideClick)
-  }
-
-  dropdown () {
-    return this.refs.dropdown
   }
 
   toggleOpened () {
@@ -38,38 +41,47 @@ class Dropdown extends React.Component {
   }
 
   outsideClick (evt) {
-    if (this.isOpened() && clickedOutside(this.dropdown(), evt)) {
+    if (this.isOpened() && clickedOutside(this.refs.dropdown, evt)) {
       this.toggleOpened()
     }
   }
 
-  onChange (item) {
+  onSelectionChange (item) {
     this.props.onChange(item)
-    this.toggleOpened()
+
+    this.setState({
+      selection: item,
+      displayValue: this.getItemLabel(item),
+      opened: false,
+    })
   }
 
   onInputChange (evt) {
     const {value = ''} = evt.target
+
     const {items} = this.props
 
+    const contains = (a = '', b = '') => R.contains(R.toLower(a), R.toLower(b))
+
     const filteredItems = R.trim(value).length > 0
-      ? items.filter(item => {
-        return R.contains(value, item) ||
-          R.contains(value, item.key) ||
-          R.contains(value, item.label)
-      })
+      ? items.filter(item => item.key
+        ? contains(value, item.key) || contains(value, item.value)
+        : contains(value, item)
+      )
       : items
 
-    const selected = filteredItems.length < 2
+    const selected = filteredItems.length === 1
+
+    const selection = selected ? R.head(filteredItems) : null
 
     this.setState({
       items: filteredItems,
-      value: value,
+      selection,
+      displayValue: selected ? this.getItemLabel(selection) : value,
       opened: !selected,
     })
 
-    if(selected)
-      this.onChange(R.head(filteredItems))
+    this.props.onChange(selection)
   }
 
   getOffset () {
@@ -78,7 +90,7 @@ class Dropdown extends React.Component {
       left,
       height,
       width
-    } = elementOffset(this.refs.dropdownInput)
+    } = elementOffset(this.refs.dropdownInput.refs.input)
 
     return {
       top: (top + height),
@@ -88,7 +100,9 @@ class Dropdown extends React.Component {
   }
 
   getItemLabel (item = '') {
-    return item.value ? `${item.value} (${item.key})` : item
+    return item
+      ? item.value ? `${item.value} (${item.key})` : item
+      : ''
   }
 
   getItemLabelFromValue (value = '') {
@@ -101,19 +115,22 @@ class Dropdown extends React.Component {
       placeholder,
       className,
       style = {},
-      inputClassName = '',
+      validation = {},
     } = this.props
 
     const {
       items,
-      value,
+      displayValue,
     } = this.state
 
     return <div className={`dropdown ${className}`} style={style} ref="dropdown">
-      <input placeholder={placeholder}
-             value={this.getItemLabelFromValue(value)}
-             className={inputClassName}
-             ref="dropdownInput"/>
+      <FormInput placeholder={placeholder}
+                 value={displayValue}
+                 validation={validation}
+                 ref="dropdownInput"
+                 onChange={this.onInputChange}/>
+
+
       <span className="icon icon-menu2 icon-24px"
             onClick={() => this.toggleOpened()}></span>
       {
@@ -126,7 +143,7 @@ class Dropdown extends React.Component {
               {
                 items.map(
                   item => <div key={item.key ? item.key : item} className="dropdown__list-item"
-                               onClick={() => this.onChange(item)}>
+                               onClick={() => this.onSelectionChange(item)}>
                     {this.getItemLabel(item)}
                   </div>
                 )
