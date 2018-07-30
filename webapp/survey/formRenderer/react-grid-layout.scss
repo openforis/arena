@@ -4,7 +4,8 @@
   position: relative;
   transition: height 200ms ease;
 
-  overflow-y: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .react-grid-item {
