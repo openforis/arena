@@ -10,7 +10,7 @@ import {
   SteppedEase
 } from 'gsap/TweenMax'
 
-import { kill } from '../../app-utils/gsapUtils'
+import { kill } from '../../appUtils/gsapUtils'
 
 const key = 'login'
 

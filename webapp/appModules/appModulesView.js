@@ -6,7 +6,7 @@ import { TransitionGroup } from 'react-transition-group'
 import ModuleViewTransitionComponent from './components/moduleViewTransitionComponent'
 
 import { appModules } from './appModules'
-import { getLocationPathname } from '../app-utils/routerUtils'
+import { getLocationPathname } from '../appUtils/routerUtils'
 
 import AppHomeView from './home/appHomeView'
 import SurveyDashboardView from './surveyDashboard/surveyDashboardView'

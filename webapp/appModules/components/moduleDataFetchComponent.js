@@ -5,7 +5,7 @@ import { fetchData } from '../actions'
 import { connect } from 'react-redux'
 
 import { appModulesPath } from '../appModules'
-import { getLocationPathname } from '../../app-utils/routerUtils'
+import { getLocationPathname } from '../../appUtils/routerUtils'
 
 class ModuleDataFetchComponent extends React.Component {
 

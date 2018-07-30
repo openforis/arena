@@ -1,7 +1,7 @@
 import {
   exportReducer,
   assocActionProps,
-} from '../app-utils/reduxUtils'
+} from '../appUtils/reduxUtils'
 
 import { actionTypes } from './appModules'
 

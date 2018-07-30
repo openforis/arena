@@ -2,7 +2,7 @@ import './dropdown.scss'
 
 import React from 'react'
 
-import { elementOffset, clickedOutside } from '../app-utils/domUtils'
+import { elementOffset, clickedOutside } from '../appUtils/domUtils'
 
 class Dropdown extends React.Component {
 

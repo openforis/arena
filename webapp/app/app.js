@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import { excludePathRoot } from '../app-utils/reduxUtils'
+import { excludePathRoot } from '../appUtils/reduxUtils'
 import { appModules } from '../appModules/appModules'
-import { getLocationPathname } from '../app-utils/routerUtils'
+import { getLocationPathname } from '../appUtils/routerUtils'
 
 const app = 'app'
 

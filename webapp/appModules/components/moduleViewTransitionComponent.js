@@ -4,7 +4,7 @@ import { Transition } from 'react-transition-group'
 import { appModules } from '../appModules'
 
 import { TimelineMax, Elastic } from 'gsap/TweenMax'
-import { getViewportDimensions } from '../../app-utils/domUtils'
+import { getViewportDimensions } from '../../appUtils/domUtils'
 import { appModulesPath } from '../appModules'
 
 const duration = 0.5

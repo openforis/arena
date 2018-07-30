@@ -1,4 +1,4 @@
-import { assocActionProps, exportReducer, } from '../app-utils/reduxUtils'
+import { assocActionProps, exportReducer, } from '../appUtils/reduxUtils'
 
 import { surveyNewUpdate, } from './actions'
 

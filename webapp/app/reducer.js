@@ -1,4 +1,4 @@
-import { exportReducer, assocActionProps } from '../app-utils/reduxUtils'
+import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 
 import {
   appStatusChange,

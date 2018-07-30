@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import { appModules } from '../../appModules/appModules'
-import { getLocationPathname } from '../../app-utils/routerUtils'
+import { getLocationPathname } from '../../appUtils/routerUtils'
 import { appModuleUri } from '../app'
 
 export const appModulesSideBar = [
