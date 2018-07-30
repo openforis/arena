@@ -6,7 +6,7 @@ const camelize = require('camelize')
 const {uuidv4} = require('../../common/uuid')
 
 const {setUserPref} = require('../user/userRepository')
-const userPref = require('../user/userPrefs')
+const {userPrefNames} = require('../user/userPrefs')
 
 const {createEntityDef, dbTransformCallback} = require('./nodeDefRepository')
 
@@ -26,7 +26,7 @@ const createSurvey = async (user, props) => db.tx(
     await t.any(`UPDATE survey SET root_node_def_id = $1 WHERE id = $2`, [rootNodeDefId, surveyId])
 
     // update user prefs
-    await setUserPref(user, userPref.survey, surveyId, t)
+    await setUserPref(user, userPrefNames.survey, surveyId, t)
 
     return await getSurveyById(surveyId, true, t)
   }
@@ -42,7 +42,7 @@ const getSurveyById = async (surveyId, draft = false, client = db) => await clie
 const getSurveyByName = async (surveyName, client = db) => await client.oneOrNone(
   `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
   [surveyName],
-  def =>  dbTransformCallback(def)
+  def => dbTransformCallback(def)
 )
 
 // ============== UPDATE

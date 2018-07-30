@@ -1,10 +1,13 @@
 const R = require('ramda')
 
-const survey = 'survey'
+const userPrefNames = {
+  survey: 'survey',
+}
 
-const getSurvey = R.path(['prefs',survey])
+const getSurvey = R.path(['prefs', userPrefNames.survey])
 
 module.exports = {
-  survey,
+  userPrefNames,
+
   getSurvey,
 }
