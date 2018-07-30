@@ -4,6 +4,7 @@
   display: grid;
   grid-template-columns: .95fr .05fr;
   align-items: center;
+  position: relative;
 
   span.icon {
     color: $whiteLight;
@@ -19,18 +20,21 @@
 }
 
 .dropdown__list {
-  position: absolute;
+  position: fixed;
   z-index: $zIndex10Dropdown;
   display: grid;
   grid-template-columns: 1rem 1fr 1rem;
-  grid-row-gap: .5rem;
   background-color: rgba($black, .6);
   padding: 1rem 0;
   justify-content: center;
+
+  overflow-y: auto;
+  max-height: 400px;
+  font-size: .9rem;
 }
 
 .dropdown__list-item {
-  padding: 1rem 0;
+  padding: .4rem 0;
   grid-column: 2;
   text-align: center;
   font-weight: 200;
@@ -38,7 +42,7 @@
 
   &:hover {
     cursor: pointer;
-    background-color: rgba($black, .3);
+    background-color: rgba($white, .15);
   }
 }
 

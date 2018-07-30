@@ -2,7 +2,7 @@ import './dropdown.scss'
 
 import React from 'react'
 
-import { elementOffset, clickedOutside } from '../appUtils/domUtils'
+import { clickedOutside, elementOffset } from '../appUtils/domUtils'
 
 class Dropdown extends React.Component {
 
@@ -42,28 +42,30 @@ class Dropdown extends React.Component {
       left,
       height,
       width
-    } = elementOffset(this.dropdown())
+    } = elementOffset(this.refs.dropdownInput)
 
     return {
-      top,
-      left,
+      top: (top + height),
+      // left,
       width
     }
   }
 
   render () {
     const {
-      selection,
+      items,
       placeholder,
       value,
       className,
       style = {},
+      inputClassName = ''
     } = this.props
 
     return <div className={`dropdown ${className}`} style={style} ref="dropdown">
-      <input className="text-center"
-             placeholder={placeholder}
-             value={value}/>
+      <input placeholder={placeholder}
+             value={value}
+             className={inputClassName}
+             ref="dropdownInput"/>
       <span className="icon icon-menu2 icon-24px"
             onClick={() => this.toggleOpened()}></span>
       {
@@ -74,9 +76,9 @@ class Dropdown extends React.Component {
                    ...this.getOffset(),
                  }}>
               {
-                selection.map(
-                  item => <div key={item} className="dropdown__list-item">
-                    {item}
+                items.map(
+                  item => <div key={item.key ? item.key : item} className="dropdown__list-item">
+                    {item.value ? `${item.value} (${item.key})` : item}
                   </div>
                 )
               }

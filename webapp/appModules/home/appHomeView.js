@@ -4,12 +4,14 @@ import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
 import { normalizeName } from './../../../common/survey/survey'
-
 import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
 import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
 import { FormInput } from '../../commonComponents/form'
+
+import Dropdown from '../../commonComponents/dropdown'
+import languages from '../../../common/app/languages'
 
 class AppHomeView extends React.Component {
 
@@ -19,6 +21,12 @@ class AppHomeView extends React.Component {
     this.state = {}
 
     this.createSurvey = this.createSurvey.bind(this)
+
+    this.languages = R.pipe(
+      R.keys,
+      R.map(lang =>({key:lang,value:R.path([lang,'en'], languages)}))
+    )(languages)
+
   }
 
   componentWillUnmount () {
@@ -59,7 +67,7 @@ class AppHomeView extends React.Component {
           gridColumn: '2',
 
           display: 'grid',
-          gridTemplateColumns: '.35fr .35fr .3fr',
+          gridTemplateColumns: 'repeat(4, .25fr)',
           alignItems: 'center',
           gridColumnGap: '2rem',
         }}>
@@ -73,6 +81,9 @@ class AppHomeView extends React.Component {
                      value={label}
                      validation={R.path(['fields', 'label'])(validation)}
                      onChange={e => updateNewSurveyProp('label', e.target.value)}/>
+
+          <Dropdown items={this.languages}
+                    inputClassName="form-input"/>
 
           <button className="btn btn-of-light"
                   onClick={this.createSurvey}>

@@ -25,7 +25,7 @@ class SurveyInfoView extends React.Component {
           <Dropdown className="dropdown-of"
                     placeholder="Survey name"
                     value={survey.name}
-                    selection={['survey 1', 'survey 2', 'survey 3', 'survey 4']}
+                    items={['survey 1', 'survey 2', 'survey 3', 'survey 4']}
                     style={{gridColumn: 2}}
           />
 
