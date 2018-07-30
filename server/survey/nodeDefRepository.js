@@ -4,6 +4,24 @@ const R = require('ramda')
 const db = require('../db/db')
 const {nodeDefType} = require('../../common/survey/nodeDef')
 
+const mergeProps = (def, draft = false) => {
+  if (draft) {
+    const {props, propsDraft} = def
+    const propsMerged = R.mergeDeepRight(props, propsDraft, def)
+
+    return R.assoc('props', propsMerged, def)
+  }
+  return def
+}
+
+const dbTransformCallback = (def, draft = false) => def
+  ? R.pipe(
+    camelize,
+    def => mergeProps(def, draft),
+    R.dissoc('propsDraft'),
+  )(def)
+  : null
+
 // ============== CREATE
 
 const createNodeDef = async (surveyId, parentId, type, props, client = db) => await client.one(
@@ -40,6 +58,8 @@ const markNodeDefDeleted = async (nodeDefId, client = db) => await client.one(
 )
 
 module.exports = {
+  dbTransformCallback,
+
   createEntityDef,
   createAttributeDef,
 }

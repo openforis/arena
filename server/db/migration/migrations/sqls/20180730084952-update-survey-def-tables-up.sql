@@ -21,8 +21,8 @@ CREATE TABLE
         published boolean NOT NULL DEFAULT false,
         draft boolean NOT NULL DEFAULT true,
 
-        props jsonb,
-        props_draft jsonb,
+        props jsonb DEFAULT '{}'::jsonb,
+        props_draft jsonb DEFAULT '{}'::jsonb,
 
         owner_id bigint NOT NULL,
 
@@ -36,7 +36,7 @@ CREATE TABLE
         uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
 
         survey_id bigint NOT NULL,
-        parent_id bigint NOT NULL,
+        parent_id bigint,
         type varchar NOT NULL,
 
         date_created TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
@@ -44,8 +44,8 @@ CREATE TABLE
 
         deleted boolean NOT NULL DEFAULT false,
 
-        props jsonb,
-        props_draft jsonb,
+        props jsonb DEFAULT '{}'::jsonb,
+        props_draft jsonb DEFAULT '{}'::jsonb,
 
         PRIMARY KEY (id)
     );

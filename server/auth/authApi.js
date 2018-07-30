@@ -9,7 +9,7 @@ const sendUser = async (res, user) => {
   const surveyId = userPref.getSurvey(user)
 
   const survey = surveyId
-    ? await getSurveyById(surveyId)
+    ? await getSurveyById(surveyId, true)
     : null
 
   res.json({
