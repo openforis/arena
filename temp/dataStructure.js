@@ -5,23 +5,6 @@ const {
 
 const id = -1
 
-const pageDef = {
-  entityId: id,
-
-  grid: {
-    //first cell is itself
-    cols: 1,
-    rows: 1,
-    nodeDefIds: [],
-
-    //child grids
-    children: [],
-  },
-
-  // child pages
-  children: [],
-}
-
 const nodeDef = {
   id,
   uuid: null,
@@ -107,14 +90,8 @@ const survey = {
   uuid: null,
   ownerId: id,
 
-  rootNodeDefId: id,
-
   published: false,
   draft: true,
-
-  // surveyVersion IDs
-  // publishedVersionId: id,
-  // draftVersionId: id,
 
   props: {
     name: 'name',
@@ -134,7 +111,6 @@ const record = {
   id,
   uuid: null,
   surveyId: id,
-  rootNodeId: id,
 }
 
 const node = {
