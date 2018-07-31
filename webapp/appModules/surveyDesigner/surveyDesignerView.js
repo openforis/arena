@@ -4,7 +4,7 @@ import React from 'react'
 
 import TabBarComponent from '../../commonComponents/tabBarComponent'
 import SurveyInfoComponent from './components/surveyInfoComponent'
-import FormRendererComponent from '../../survey/formRendererComponent'
+import SurveyFormView from '../../survey/surveyFormView'
 
 const SurveyDesignerView = () => (
   <div className="survey-designer grid100">
@@ -12,7 +12,7 @@ const SurveyDesignerView = () => (
     <TabBarComponent
       tabs={[
         {label: 'Survey Info', component: SurveyInfoComponent},
-        {label: 'Form Designer', component: FormRendererComponent, props: {edit: true}},
+        {label: 'Form Designer', component: SurveyFormView, props: {edit: true}},
       ]}/>
 
   </div>

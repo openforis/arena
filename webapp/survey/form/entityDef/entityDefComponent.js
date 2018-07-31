@@ -6,7 +6,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-const FormPageComponent = ({entityDef}) => {
+const EntityDefComponent = ({entityDef}) => {
   // console.log(entityDef)
   const {layout, children = []} = entityDef
   const {columns} = R.prop('pageDef')(layout)
@@ -55,4 +55,4 @@ const FormPageComponent = ({entityDef}) => {
   )
 }
 
-export default FormPageComponent
+export default EntityDefComponent

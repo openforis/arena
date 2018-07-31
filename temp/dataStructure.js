@@ -49,11 +49,14 @@ const nodeDef = {
     minCount: null,//int
     maxCount: null,//int
     codeListId: id,
+
+    // common layout
+    layout: {
+      ///
+    }
   },
 
-  propsDraft : {
-
-  }
+  propsDraft: {}
 }
 
 const attributeDef = {
@@ -88,6 +91,13 @@ const entityDef = {
   props: {
     ...nodeDef.props,
     renderType: entityDefRenderType.table,
+
+    layout: {
+      ///
+      pageDefUUID: null, // uuid - if this entity renders is its own page
+      render: 'form', //|| table
+      children: [], // rect-grid-layout layout value
+    }
   },
 
 }
@@ -97,10 +107,10 @@ const survey = {
   uuid: null,
   ownerId: id,
 
-  rootNodeDefId:id,
+  rootNodeDefId: id,
 
-  published:false,
-  draft:true,
+  published: false,
+  draft: true,
 
   // surveyVersion IDs
   // publishedVersionId: id,
@@ -114,7 +124,6 @@ const survey = {
     },
   },
 
-  surveyVersion,
 }
 
 console.log(JSON.stringify(survey))

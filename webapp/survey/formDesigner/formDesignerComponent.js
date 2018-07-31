@@ -4,7 +4,7 @@ import * as R from 'ramda'
 
 import { uuidv4 } from '../../../common/uuid'
 
-import FormComponent from '../formComponents/formComponent'
+import FormComponent from '../form/formComponent'
 
 const FormDesignerActions = () => {
   return (
@@ -58,6 +58,7 @@ const newPageLayout = (entityDef) => ({
 
 
 const layouts = {
+
 
   attr:{
     props:{

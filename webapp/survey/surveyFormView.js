@@ -1,13 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import FormDesignerComponent from './formDesignerComponents/formDesignerComponent'
-import FormComponent from './formComponents/formComponent'
+import FormDesignerComponent from './formDesigner/formDesignerComponent'
+import FormComponent from './form/formComponent'
 
 import { getCurrentSurvey, getEntityDefsByParentId, getRootEntityDef } from './surveyState'
 import { fetchNodeDef } from './nodeDefActions'
 
-class FormRendererComponent extends React.Component {
+class SurveyFormView extends React.Component {
 
   componentDidMount () {
     const {survey, fetchNodeDef, edit} = this.props
@@ -26,7 +26,7 @@ class FormRendererComponent extends React.Component {
 
 }
 
-FormRendererComponent.defaultProps = {
+SurveyFormView.defaultProps = {
   //root entity
   rootEntityDef: {},
 }
@@ -36,4 +36,4 @@ const mapStateToProps = state => ({
   rootEntityDef: getRootEntityDef(state),
 })
 
-export default connect(mapStateToProps, {fetchNodeDef})(FormRendererComponent)
+export default connect(mapStateToProps, {fetchNodeDef})(SurveyFormView)
