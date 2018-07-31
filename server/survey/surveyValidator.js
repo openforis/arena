@@ -4,14 +4,6 @@ const Promise = require('bluebird')
 const {createError, validateRequired} = require('../serverUtils/validator')
 const {getSurveyByName} = require('./surveyRepository')
 
-const validateCreateSurveyName = async survey => {
-  const requiredError = validateRequired(survey, 'name')
-  return requiredError
-    ? requiredError
-    : (await getSurveyByName(survey.name))
-      ? createError('duplicate')
-      : null
-}
 
 const assocValidation = (name, validation, obj) => R.propEq('valid', false, validation ? validation : {})
   ? R.pipe(
@@ -20,9 +12,22 @@ const assocValidation = (name, validation, obj) => R.propEq('valid', false, vali
   )(obj)
   : obj
 
+
+const validateCreateSurveyName = async survey => {
+  const requiredError = validateRequired('name', survey)
+  if(requiredError)
+    return requiredError
+
+  const surveyByName = await getSurveyByName(survey.name)
+  if(surveyByName)
+    return createError('duplicate')
+
+  return null
+}
+
 const validateCreateSurvey = async survey => {
   const [nameValidation, labelValidation, langValidation] = await Promise.all(
-    [validateCreateSurveyName(survey), validateRequired(survey, 'label'), validateRequired(survey, 'lang')]
+    [validateCreateSurveyName(survey), validateRequired('label', survey), validateRequired('lang', survey)]
   )
 
   return R.pipe(

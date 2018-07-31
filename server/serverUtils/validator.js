@@ -7,9 +7,14 @@ const createError = (error) => error
   )({})
   : null
 
-const validateRequired = async (obj, name) => {
-  const value = R.prop(name, obj)
-  const error = R.isEmpty(value) || R.isNil(value)
+const validateRequired = (propName, obj) => {
+  const value = R.pipe(
+    R.prop(propName),
+    R.defaultTo(''),
+    R.trim,
+  )(obj)
+
+  const error = R.isEmpty(value)
     ? 'empty'
     : null
 
