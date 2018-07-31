@@ -2,9 +2,9 @@ import React from 'react'
 
 import * as R from 'ramda'
 
-import { uuidv4 } from '../../../../common/uuid'
+import { uuidv4 } from '../../../common/uuid'
 
-import FormRendererComponent from '../../../survey/formRenderer/formRendererComponent'
+import FormComponent from '../formComponents/formComponent'
 
 const FormDesignerActions = () => {
   return (
@@ -108,7 +108,7 @@ class FormDesignerComponent extends React.Component {
             display: 'grid',
             gridTemplateColumns: '.8fr .2fr',
           }}>
-            <FormRendererComponent entityDef={entityDef}/>
+            <FormComponent entityDef={entityDef}/>
             <FormDesignerActions/>
           </div>
         )

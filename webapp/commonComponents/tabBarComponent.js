@@ -31,7 +31,7 @@ class TabBarComponent extends React.Component {
           }
         </div>
 
-        {React.createElement(tabs[selection].component)}
+        {React.createElement(tabs[selection].component, tabs[selection].props)}
 
       </div>
     )

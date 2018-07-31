@@ -14,7 +14,7 @@ const FormPageHeaderComponent = ({entityDef}) => {
       <button className="btn btn-of-light">{entityDef.props.name}</button>
       {
         childPages.map(child =>
-          <FormPageHeaderComponent entityDef={child}/>
+          <FormPageHeaderComponent key={child.id} entityDef={child}/>
         )
       }
     </React.Fragment>
