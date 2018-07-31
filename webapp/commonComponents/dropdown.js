@@ -32,18 +32,18 @@ class Dropdown extends React.Component {
     window.removeEventListener('click', this.outsideClick)
   }
 
+  outsideClick (evt) {
+    if (this.isOpened() && clickedOutside(this.refs.dropdown, evt)) {
+      this.toggleOpened()
+    }
+  }
+
   toggleOpened () {
     this.setState({opened: !this.state.opened})
   }
 
   isOpened () {
     return this.state.opened
-  }
-
-  outsideClick (evt) {
-    if (this.isOpened() && clickedOutside(this.refs.dropdown, evt)) {
-      this.toggleOpened()
-    }
   }
 
   onSelectionChange (item) {
@@ -70,15 +70,13 @@ class Dropdown extends React.Component {
       )
       : items
 
-    const selected = filteredItems.length === 1
-
-    const selection = selected ? R.head(filteredItems) : null
+    const selection = null
 
     this.setState({
       items: filteredItems,
       selection,
-      displayValue: selected ? this.getItemLabel(selection) : value,
-      opened: !selected,
+      displayValue: value,
+      opened: true,
     })
 
     this.props.onChange(selection)
@@ -101,13 +99,8 @@ class Dropdown extends React.Component {
 
   getItemLabel (item = '') {
     return item
-      ? item.value ? `${item.value} (${item.key})` : item
+      ? item.key ? `${item.value} (${item.key})` : item
       : ''
-  }
-
-  getItemLabelFromValue (value = '') {
-    const item = this.props.items.find(item => item.key ? item.key === value : item === value)
-    return this.getItemLabel(item)
   }
 
   render () {
