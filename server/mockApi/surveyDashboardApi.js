@@ -1,4 +1,4 @@
-const {restParam} = require('../serverUtils/request')
+const {getRestParam} = require('../serverUtils/request')
 
 const {surveyStatus} = require('../../common/survey/survey')
 const {userRoles} = require('../../common/user/userRole')
@@ -6,7 +6,7 @@ const {userRoles} = require('../../common/user/userRole')
 const getPath = path =>
   `/appModules${path}/dashboard/:surveyId`
 
-const surveyIdRestParam = restParam('surveyId')
+const surveyIdRestParam = getRestParam('surveyId')
 
 const init = app => {
 
