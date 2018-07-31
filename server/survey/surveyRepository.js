@@ -22,7 +22,7 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       RETURNING id
     `, [user.id, props])
 
-    const {id: rootNodeDefId} = createEntityDef(surveyId, null, {name: 'root_entity', label: 'Root entity'}, t)
+    const {id: rootNodeDefId} = await createEntityDef(surveyId, null, {name: 'root_entity', label: 'Root entity'}, t)
 
     await t.any(`UPDATE survey SET root_node_def_id = $1 WHERE id = $2`, [rootNodeDefId, surveyId])
 
