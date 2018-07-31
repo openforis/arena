@@ -29,24 +29,6 @@ const surveyStatus = {
   isPublished: R.equals(PUBLISHED),
 }
 
-const defaultSurvey = {
-  id: -1,
-  status: surveyStatus.new,
-  // status: surveyStatus.draft,
-}
-
-const leftTrim = R.replace(/^\s+/, '')
-
-const normalizeName = R.pipe(
-  leftTrim,
-  R.toLower,
-  R.replace(/[^a-z0-9]/g, '_'),
-  R.slice(0, 60),
-)
-
 module.exports = {
-  defaultSurvey,
   surveyStatus,
-  leftTrim,
-  normalizeName,
 }
