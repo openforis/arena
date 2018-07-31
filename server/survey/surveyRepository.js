@@ -12,8 +12,9 @@ const {createEntityDef, dbTransformCallback} = require('../nodeDef/nodeDefReposi
 
 // ============== CREATE
 
-const createSurvey = async (user, props) => db.tx(
+const createSurvey = async (user, {name, label, lang}) => db.tx(
   async t => {
+    const props = {name, labels: {[lang]: label}, languages: [lang]}
 
     const {id: surveyId} = await t.one(`
       INSERT INTO survey (owner_id, props_draft)
