@@ -49,11 +49,26 @@ const setUserPref = async (user, name, value, client = db) => {
   return userRes
 }
 
+// ==== DELETE
+const deleteUserPref = async (user, name, client = db) => {
+  const userRes = await client.one(`
+    UPDATE "user" 
+    SET prefs = prefs - $1
+    WHERE id = $2
+    RETURNING ${selectFieldsCommaSep}
+  `, [name, user.id])
+
+  return userRes
+}
+
 module.exports = {
   // READ
   findUserById,
   findUserByEmailAndPassword,
 
   // UPDATE
-  setUserPref
+  setUserPref,
+
+  // DELETE
+  deleteUserPref,
 }
