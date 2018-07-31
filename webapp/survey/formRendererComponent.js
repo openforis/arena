@@ -34,7 +34,6 @@ FormRendererComponent.defaultProps = {
 const mapStateToProps = state => ({
   survey: getCurrentSurvey(state),
   rootEntityDef: getRootEntityDef(state),
-  rootEntityDefds: getEntityDefsByParentId(state),
 })
 
 export default connect(mapStateToProps, {fetchNodeDef})(FormRendererComponent)
