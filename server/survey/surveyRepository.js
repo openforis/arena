@@ -47,6 +47,16 @@ const getSurveyByName = async (surveyName, client = db) => await client.oneOrNon
 )
 
 // ============== UPDATE
+const updateSurveyProp = async (surveyId, prop, client = db) => {
+  return await client.one(`
+    UPDATE survey 
+    SET props_draft = props_draft || $1 
+    WHERE id = $2
+    RETURNING *
+  `, [JSON.stringify(prop), surveyId],
+    def => dbTransformCallback(def)
+  )
+}
 
 // ============== DELETE
 
@@ -57,4 +67,7 @@ module.exports = {
   // READ
   getSurveyById,
   getSurveyByName,
+
+  //UPDATE
+  updateSurveyProp,
 }

@@ -1,7 +1,8 @@
 const {sendOk, sendErr} = require('../serverUtils/response')
 
-const {createSurvey} = require('./surveyRepository')
+const {createSurvey, updateSurveyProp} = require('./surveyRepository')
 const {validateCreateSurvey} = require('./surveyValidator')
+const {getRestParam} = require('../serverUtils/request')
 
 module.exports.init = app => {
 
@@ -23,6 +24,20 @@ module.exports.init = app => {
       sendErr(res, err)
     }
 
+  })
+
+  app.put('/survey/:id/prop', async (req, res) => {
+    const {user, body} = req
+
+    const surveyId = getRestParam(req, 'id')
+
+    try {
+      await updateSurveyProp(surveyId, body)
+
+      res.json({result: 'ok'})
+    } catch (err) {
+      sendErr(res, err)
+    }
   })
 
 }

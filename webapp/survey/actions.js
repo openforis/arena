@@ -5,6 +5,7 @@ import { getNewSurvey } from './surveyState'
 
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyNewUpdate = 'survey/new/update'
+export const surveyCurrentPropUpdate = 'survey/current/propupdate'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyCurrentUpdate, survey})
@@ -50,3 +51,13 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
 }
 
 export const resetNewSurvey = () => dispatch => dispatch({type: surveyNewUpdate, newSurvey: null})
+
+export const updateSurveyProp = (surveyId, prop) => async (dispatch, getState) => {
+  try {
+    const {result} = await axios.put(`/api/survey/${surveyId}/prop`, prop)
+
+    dispatch({type: surveyCurrentPropUpdate, prop})
+  } catch (e) {
+
+  }
+}
