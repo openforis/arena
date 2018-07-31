@@ -5,6 +5,7 @@ import * as R from 'ramda'
  * survey State
  * ======================
  */
+
 // READ
 export const getCurrentSurvey = R.path(['app', 'survey'])
 
@@ -24,14 +25,25 @@ export const getNewSurvey = R.pipe(
  * ======================
  */
 
+export const getEntityDefs = R.pipe(
+  R.path(['survey', 'nodeDefs']),
+  R.defaultTo({}),
+  R.values,
+)
+
+export const getEntityDefsByParentId = parentId => R.pipe(
+  getEntityDefs,
+  R.reduce(
+    (entityDefs, entityDef) => entityDef.parentId === parentId
+      ? R.append(entityDef, entityDefs)
+      : entityDefs,
+    []
+  )
+)
+
 // READ
 export const getRootEntityDef = R.pipe(
-  R.path(['survey', 'nodeDefs']),
-  R.toPairs,
-  R.filter(nodeDef => R.isNil(nodeDef[1].parentId)),
-  R.head,
-  R.defaultTo([[]]),
-  R.tail,
+  getEntityDefsByParentId(null),
   R.head,
 )
 
