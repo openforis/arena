@@ -6,7 +6,7 @@ import DataFetchComponent from '../components/moduleDataFetchComponent'
 import { appState } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 
-import Dropdown from '../../commonComponents/dropdown'
+import DropdownComponent from '../../commonComponents/dropdownComponent'
 
 class SurveyInfoView extends React.Component {
 
@@ -22,11 +22,11 @@ class SurveyInfoView extends React.Component {
           backgroundColor: 'rgba(198, 214, 225, 0.1)',
         }}>
 
-          <Dropdown className="dropdown-of"
-                    placeholder="Survey name"
-                    value={survey.name}
-                    items={['survey 1', 'survey 2', 'survey 3', 'survey 4']}
-                    style={{gridColumn: 2}}
+          <DropdownComponent className="dropdown-of"
+                             placeholder="Survey name"
+                             value={survey.name}
+                             items={['survey 1', 'survey 2', 'survey 3', 'survey 4']}
+                             style={{gridColumn: 2}}
           />
 
           <div style={{

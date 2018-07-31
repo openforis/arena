@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { getCurrentSurvey } from '../../../survey/surveyState'
-import { FormInput } from '../../../commonComponents/form'
+import { FormInput } from '../../../commonComponents/formInputComponents'
 
 class SurveyInfoComponent extends React.Component {
 

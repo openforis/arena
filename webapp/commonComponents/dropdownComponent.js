@@ -5,9 +5,9 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { clickedOutside, elementOffset } from '../appUtils/domUtils'
-import { FormInput } from './form'
+import { FormInput } from './formInputComponents'
 
-class Dropdown extends React.Component {
+class DropdownComponent extends React.Component {
 
   constructor (props) {
     super(props)
@@ -151,4 +151,4 @@ class Dropdown extends React.Component {
   }
 }
 
-export default Dropdown
+export default DropdownComponent

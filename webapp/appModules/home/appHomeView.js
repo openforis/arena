@@ -8,9 +8,9 @@ import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/
 import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
-import { FormInput } from '../../commonComponents/form'
+import { FormInput } from '../../commonComponents/formInputComponents'
 
-import Dropdown from '../../commonComponents/dropdown'
+import DropdownComponent from '../../commonComponents/dropdownComponent'
 import languages from '../../../common/app/languages'
 
 class AppHomeView extends React.Component {
@@ -89,11 +89,11 @@ class AppHomeView extends React.Component {
                      validation={R.path(['fields', 'label'])(validation)}
                      onChange={e => updateNewSurveyProp('label', e.target.value)}/>
 
-          <Dropdown placeholder="Language"
-                    items={this.languages}
-                    selection={selection}
-                    onChange={e => updateNewSurveyProp('lang', e ? e.key : null)}
-                    validation={R.path(['fields', 'lang'])(validation)}/>
+          <DropdownComponent placeholder="Language"
+                             items={this.languages}
+                             selection={selection}
+                             onChange={e => updateNewSurveyProp('lang', e ? e.key : null)}
+                             validation={R.path(['fields', 'lang'])(validation)}/>
 
           <button className="btn btn-of-light"
                   onClick={this.createSurvey}>

@@ -2,7 +2,7 @@ import './form.scss'
 
 import React from 'react'
 
-import { TooltipError } from './tooltip'
+import { TooltipError } from './tooltipComponent'
 
 export class FormInput extends React.Component {
 

@@ -1,11 +1,11 @@
 import React from 'react'
 
-class TabBar extends React.Component {
+class TabBarComponent extends React.Component {
 
   constructor (props) {
     super(props)
 
-    this.state = {selection: TabBar.defaultProps.selection}
+    this.state = {selection: TabBarComponent.defaultProps.selection}
   }
 
   render () {
@@ -39,9 +39,9 @@ class TabBar extends React.Component {
 
 }
 
-TabBar.defaultProps = {
+TabBarComponent.defaultProps = {
   selection: 0,
   tabs: []
 }
 
-export default TabBar
+export default TabBarComponent
