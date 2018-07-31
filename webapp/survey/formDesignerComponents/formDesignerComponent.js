@@ -46,8 +46,8 @@ const newPageItemLayout = R.pipe(
 )
 
 const newPageDef = (entityDef) => ({
-  entityDefId: entityDef.id,
-  entityDefUUID: entityDef.uiid,
+  // entityDefId: entityDef.id,
+  // entityDefUUID: entityDef.uiid,
   columns: 3,
   uuid: uuidv4(),
 })
@@ -55,6 +55,29 @@ const newPageDef = (entityDef) => ({
 const newPageLayout = (entityDef) => ({
   pageDef: newPageDef(entityDef),
 })
+
+
+const layouts = {
+
+  attr:{
+    props:{
+      layout:{
+        ///
+      }
+    }
+  },
+  entity:{
+    props:{
+      layout:{
+        ///
+        pageDef:{}, //
+        render: 'form' , //|| table
+        children:[],
+      }
+    }
+  }
+
+}
 
 class FormDesignerComponent extends React.Component {
 

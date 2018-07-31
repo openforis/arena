@@ -1,3 +1,4 @@
+const R = require('ramda')
 const {getRestParam} = require('../serverUtils/request')
 
 const {surveyStatus} = require('../../common/survey/survey')
@@ -6,7 +7,7 @@ const {userRoles} = require('../../common/user/userRole')
 const getPath = path =>
   `/appModules${path}/dashboard/:surveyId`
 
-const surveyIdRestParam = getRestParam('surveyId')
+const surveyIdRestParam = R.partialRight(getRestParam, ['surveyId'])
 
 const init = app => {
 
