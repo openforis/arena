@@ -8,7 +8,7 @@ const {uuidv4} = require('../../common/uuid')
 const {setUserPref} = require('../user/userRepository')
 const {userPrefNames} = require('../user/userPrefs')
 
-const {createEntityDef, dbTransformCallback} = require('./nodeDefRepository')
+const {createEntityDef, dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 
 // ============== CREATE
 

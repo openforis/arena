@@ -1,37 +1,19 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
+const {createError, validateRequired} = require('../serverUtils/validator')
 const {getSurveyByName} = require('./surveyRepository')
 
 const validateCreateSurveyName = async survey => {
-  const error = R.isEmpty(survey.name)
-    ? 'empty'
-    : await getSurveyByName(survey.name)
-      ? 'duplicate'
+  const requiredError = validateRequired(survey, 'name')
+  return requiredError
+    ? requiredError
+    : (await getSurveyByName(survey.name))
+      ? createError('duplicate')
       : null
-
-  return error
-    ? R.pipe(
-      R.assoc('valid', false),
-      R.assoc('error', error),
-    )({})
-    : {}
 }
 
-const validateRequired = (obj, name) => {
-  const value = R.prop(name, obj)
-  const error = R.isEmpty(value) || R.isNil(value)
-    ? 'empty'
-    : null
-
-  return error
-    ? R.pipe(
-      R.assoc('valid', false),
-      R.assoc('error', error),
-    )({})
-    : {}
-}
-
-const assocValidation = (name, validation, obj) => R.propEq('valid', false, validation)
+const assocValidation = (name, validation, obj) => R.propEq('valid', false, validation ? validation : {})
   ? R.pipe(
     R.assocPath(['validation', 'valid'], false),
     R.assocPath(['validation', 'fields', name], validation),
@@ -39,10 +21,9 @@ const assocValidation = (name, validation, obj) => R.propEq('valid', false, vali
   : obj
 
 const validateCreateSurvey = async survey => {
-  const nameValidation = await validateCreateSurveyName(survey)
-  const labelValidation = await validateRequired(survey, 'label')
-  const langValidation = await validateRequired(survey, 'lang')
-console.log(survey)
+  const [nameValidation, labelValidation, langValidation] = await Promise.all(
+    [validateCreateSurveyName(survey), validateRequired(survey, 'label'), validateRequired(survey, 'lang')]
+  )
 
   return R.pipe(
     R.assocPath(['validation', 'valid'], true),

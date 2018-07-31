@@ -10,7 +10,7 @@ const headerMiddleware = require('./config/headerMiddleware')
 const accessControlMiddleware = require('./config/accessControlMiddleware')
 const authConfig = require('./auth/authConfig')
 const authApi = require('./auth/authApi')
-const apiRouter = require('./apiRouter')
+const apiRouter = require('./config/apiRouter')
 
 // run database migrations
 require('./db/migration/execMigrations')()

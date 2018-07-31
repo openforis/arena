@@ -1,4 +1,4 @@
-const {restParam} = require('../request')
+const {restParam} = require('../serverUtils/request')
 
 const {surveyStatus} = require('../../common/survey/survey')
 const {userRoles} = require('../../common/user/userRole')

@@ -1,4 +1,4 @@
-const {sendOk, sendErr} = require('../response')
+const {sendOk, sendErr} = require('../serverUtils/response')
 
 const {createSurvey} = require('./surveyRepository')
 const {validateCreateSurvey} = require('./surveyValidator')
