@@ -65,7 +65,6 @@ button[aria-disabled="true"] {
   font-size: 0.8rem;
 }
 
-
 .btn-of {
   @include of;
   text-transform: uppercase;
@@ -98,4 +97,10 @@ button[aria-disabled="true"] {
 .btn-of-light-xs {
   @extend .btn-of;
   border-color: $ofBorderColorLightXs;
+}
+
+.badge {
+  background-color: rgba($white, .2);
+  padding: .15rem .3rem;
+  border-radius: $ofBorderRadius;
 }
