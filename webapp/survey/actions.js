@@ -1,6 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import { setSurveyProp } from '../../common/survey/survey'
+
 import { getCurrentSurvey, getNewSurvey } from './surveyState'
 import { nodeDefFetch } from './nodeDefActions'
 
@@ -65,11 +67,11 @@ export const fetchRootNodeDef = (surveyId, draft = false) => async dispatch => {
 
 // ==== UPDATE
 
-export const updateSurveyProp = (surveyId, {key, value}) => async (dispatch, getState) => {
-  //TODO: create updateSurveyProp into common/survey
+export const updateSurveyProp = (surveyId, key, value) => async (dispatch, getState) => {
+
   const survey = R.pipe(
     getCurrentSurvey,
-    R.assocPath(['props', key], value)
+    setSurveyProp(key, value),
   )(getState())
 
   dispatchCurrentSurveyUpdate(dispatch, survey)

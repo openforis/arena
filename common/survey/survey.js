@@ -1,3 +1,11 @@
+const {
+  getProps,
+  getProp,
+  getLabels,
+
+  setProp,
+} = require('./surveyUtils')
+
 const R = require('ramda')
 
 const NEW = 'new'
@@ -30,5 +38,14 @@ const surveyStatus = {
 }
 
 module.exports = {
+  //TODO: REMOVE
   surveyStatus,
+
+  // props
+  getSurveyProps: getProps,
+  getSurveyProp: getProp,
+  getSurveyLabels: getLabels,
+  getSurveyLanguages: getProp('languages'),
+
+  setSurveyProp: setProp,
 }

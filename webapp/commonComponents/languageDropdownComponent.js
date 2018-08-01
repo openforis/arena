@@ -1,13 +1,13 @@
-import DropdownComponent from './dropdownComponent'
-import languages from '../../common/app/languages'
-import * as R from 'ramda'
 import React from 'react'
+import * as R from 'ramda'
+
+import DropdownComponent from './dropdownComponent'
+
+import { getLanguageLabel, languages } from '../../common/app/languages'
 
 const LanguageDropdownComponent = (props) => {
 
   const {selection, onChange, validation} = props
-
-  const getLanguageLabel = lang => R.path([lang, 'en'], languages)
 
   const dropdownItems = R.pipe(
     R.keys,

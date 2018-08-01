@@ -1,37 +1,26 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { getCurrentSurvey } from '../../../survey/surveyState'
+
+import * as R from 'ramda'
+
+import { getSurveyLabels, getSurveyLanguages } from '../../../../common/survey/survey'
 import { FormInput } from '../../../commonComponents/formInputComponents'
-import LabelsEditorComponent from '../../../commonComponents/labelsEditorComponent'
+import FormLabelsEditorComponent from '../../../commonComponents/formLabelsEditorComponent'
+
+import { getCurrentSurvey } from '../../../survey/surveyState'
+
 import { updateSurveyProp } from '../../../survey/actions'
 
 class SurveyInfoComponent extends React.Component {
 
-  constructor (props) {
-    super(props)
+  onLabelsChange (item) {
+    const {survey, updateSurveyProp} = this.props
 
-    this.onLabelsChange = this.onLabelsChange.bind(this)
-    this.onNewLabelAdd = this.onNewLabelAdd.bind(this)
-  }
-
-  onLabelsChange(e) {
-    const { survey, updateSurveyProp } = this.props
-    const labels = survey.props.labels
-    const newLabels = Object.assign({}, labels, {[e.lang]: e.label})
-
-    updateSurveyProp(survey.id, {key: 'labels', value: newLabels})
-
-    this.forceUpdate()
-  }
-
-  onNewLabelAdd(e) {
-    const { survey, updateSurveyProp } = this.props
-    const currentLanguages = survey.props.languages
-    const {lang} = e
-    const newLanguages = [...currentLanguages, lang]
-    updateSurveyProp(survey.id, {key: 'languages', value: newLanguages})
-
-    this.onLabelsChange(e)
+    updateSurveyProp(
+      survey.id,
+      'labels',
+      R.assoc(item.lang, item.label, getSurveyLabels(survey))
+    )
   }
 
   render () {
@@ -42,22 +31,14 @@ class SurveyInfoComponent extends React.Component {
 
         <div className="form-item">
           <label className="form-label">Name</label>
-          <FormInput value={survey.props.name}/>
+          <FormInput value={survey.props.name}
+                     onChange={() => {}}/>
 
         </div>
 
-        <div className="form-item">
-          <label className="form-label">Label</label>
-          <LabelsEditorComponent languages={survey.props.languages}
-                                 labels={survey.props.labels}
-                                 onChange={this.onLabelsChange}
-                                 onNewLabelAdd={this.onNewLabelAdd}/>
-        </div>
-
-        <div className="form-item">
-          <label className="form-label">das</label>
-          <input className="form-input"></input>
-        </div>
+        <FormLabelsEditorComponent languages={getSurveyLanguages(survey)}
+                                   labels={getSurveyLabels(survey)}
+                                   onChange={(item) => this.onLabelsChange(item)}/>
 
       </div>
     )
@@ -65,8 +46,12 @@ class SurveyInfoComponent extends React.Component {
 
 }
 
+SurveyInfoComponent.defaultProps = {
+  survey: {},
+}
+
 const mapStateToProps = state => ({
-  survey: getCurrentSurvey(state)
+  survey: getCurrentSurvey(state),
 })
 
 export default connect(

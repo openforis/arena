@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 const languages = {
   ab: {en: 'Abkhazian'},
   aa: {en: 'Afar'},
@@ -220,4 +222,10 @@ const languages = {
   zu: {en: 'Zulu'},
 }
 
-module.exports = languages
+const getLanguageLabel = (lang, translationLang = 'en') => R.path([lang, translationLang], languages)
+
+module.exports = {
+  languages,
+
+  getLanguageLabel,
+}
