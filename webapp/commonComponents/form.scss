@@ -10,7 +10,7 @@
 
 .form-item {
   display: grid;
-  grid-template-columns: repeat(3, 0.33333333333333fr);
+  grid-template-columns: .2fr .6fr .2fr;
   grid-column-gap: 2rem;
   height: auto;
   align-items: center;
