@@ -22,7 +22,12 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       RETURNING id
     `, [user.id, props])
 
-    await createEntityDef(surveyId, null, {name: 'root_entity', label: 'Root entity'}, t)
+    await createEntityDef(surveyId, null, {
+      name: 'root_entity',
+      label: 'Root entity',
+      multiple: false,
+      layout: {pageUUID: uuidv4()}
+    }, t)
 
     // update user prefs
     await setUserPref(user, userPrefNames.survey, surveyId, t)

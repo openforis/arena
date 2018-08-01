@@ -77,7 +77,7 @@ const entityDef = {
 
     layout: {
       ///
-      pageDefUUID: null, // uuid - if this entity renders is its own page
+      pageUUID: null, // uuid - if this entity renders in its own page
       render: 'form', //|| table
       children: [], // rect-grid-layout layout value
     }
