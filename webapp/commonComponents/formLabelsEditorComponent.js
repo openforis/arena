@@ -8,15 +8,9 @@ import { FormInput } from './formInputComponents'
 const LabelRow = ({label = '', lang, onChange, displayLang = true}) => {
   return (
     <React.Fragment>
-      <FormInput value={label}
-                 onChange={e => onChange({
-                     lang,
-                     label: e.target.value
-                   }
-                 )}/>
       {
         displayLang
-          ? <h6>{
+          ? <h6 style={{alignSelf: 'end'}}>{
             R.pipe(
               getLanguageLabel,
               R.toUpper
@@ -24,6 +18,12 @@ const LabelRow = ({label = '', lang, onChange, displayLang = true}) => {
           }</h6>
           : null
       }
+      <FormInput value={label}
+                 onChange={e => onChange({
+                     lang,
+                     label: e.target.value
+                   }
+                 )}/>
     </React.Fragment>
   )
 }
@@ -37,7 +37,7 @@ const FormLabelsEditorComponent = ({languages, labels, onChange}) => {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: displayLang ? '.9fr .1fr' : '1fr',
+        gridTemplateColumns: displayLang ? '.1fr .9fr' : '1fr',
         gridRowGap: '.5rem',
         alignItems: 'center',
       }}>
