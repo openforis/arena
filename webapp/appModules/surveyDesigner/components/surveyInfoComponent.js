@@ -21,8 +21,6 @@ class SurveyInfoComponent extends React.Component {
 
     updateSurveyProp(survey.id, {key: 'labels', value: newLabels})
 
-    //do not wait for update to complete
-    survey.props.labels = newLabels
     this.forceUpdate()
   }
 
@@ -33,7 +31,6 @@ class SurveyInfoComponent extends React.Component {
     const newLanguages = [...currentLanguages, lang]
     updateSurveyProp(survey.id, {key: 'languages', value: newLanguages})
 
-    survey.props.languages = newLanguages
     this.onLabelsChange(e)
   }
 

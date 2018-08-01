@@ -1,9 +1,4 @@
-const R = require('ramda')
-
 const db = require('../db/db')
-const camelize = require('camelize')
-
-const {uuidv4} = require('../../common/uuid')
 
 const {setUserPref} = require('../user/userRepository')
 const {userPrefNames} = require('../user/userPrefs')
@@ -47,7 +42,9 @@ const getSurveyByName = async (surveyName, client = db) => await client.oneOrNon
 )
 
 // ============== UPDATE
-const updateSurveyProp = async (surveyId, prop, client = db) => {
+const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
+  const prop = {[key]: value}
+
   return await client.one(`
     UPDATE survey 
     SET props_draft = props_draft || $1 

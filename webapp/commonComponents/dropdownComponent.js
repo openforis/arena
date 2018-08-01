@@ -16,7 +16,6 @@ class DropdownComponent extends React.Component {
 
     this.state = {
       items,
-      selection,
       displayValue: this.getItemLabel(selection),
       opened: false
     }
@@ -70,16 +69,13 @@ class DropdownComponent extends React.Component {
       )
       : items
 
-    const selection = null
-
     this.setState({
       items: filteredItems,
-      selection,
       displayValue: value,
       opened: true,
     })
 
-    this.props.onChange(selection)
+    this.props.onChange(null)
   }
 
   getOffset () {

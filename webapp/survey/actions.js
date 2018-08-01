@@ -1,11 +1,10 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { getNewSurvey } from './surveyState'
+import { getCurrentSurvey, getNewSurvey } from './surveyState'
 
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyNewUpdate = 'survey/new/update'
-export const surveyCurrentPropUpdate = 'survey/current/propupdate'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyCurrentUpdate, survey})
@@ -52,11 +51,18 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
 
 export const resetNewSurvey = () => dispatch => dispatch({type: surveyNewUpdate, newSurvey: null})
 
-export const updateSurveyProp = (surveyId, prop) => async (dispatch, getState) => {
-  try {
-    const {result} = await axios.put(`/api/survey/${surveyId}/prop`, prop)
+export const updateSurveyProp = (surveyId, {key, value}) => async (dispatch, getState) => {
 
-    dispatch({type: surveyCurrentPropUpdate, prop})
+  //TODO: create updateSurveyProp into common/survey
+  const survey = R.pipe(
+    getCurrentSurvey,
+    R.assocPath(['props', key], value)
+  )(getState())
+
+  dispatchCurrentSurveyUpdate(dispatch, survey)
+
+  try {
+    await axios.put(`/api/survey/${surveyId}/prop`, {key, value})
   } catch (e) {
 
   }
