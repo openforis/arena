@@ -21,6 +21,9 @@ class AppSideBarComponent extends React.Component {
     document.getElementsByClassName('app__container')[0].style.gridTemplateColumns = `${width}px 1fr`
 
     this.setState({opened: !opened})
+
+    //react-grid-layout re-render
+    window.dispatchEvent(new Event('resize'))
   }
 
   render () {

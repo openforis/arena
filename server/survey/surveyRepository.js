@@ -8,7 +8,7 @@ const {uuidv4} = require('../../common/uuid')
 const {setUserPref} = require('../user/userRepository')
 const {userPrefNames} = require('../user/userPrefs')
 
-const {createEntityDef, dbTransformCallback} = require('../nodeDef/nodeDefRepository')
+const {createEntityDef, dbTransformCallback, nodeDefSelectFields} = require('../nodeDef/nodeDefRepository')
 
 // ============== CREATE
 
@@ -22,9 +22,7 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       RETURNING id
     `, [user.id, props])
 
-    const {id: rootNodeDefId} = await createEntityDef(surveyId, null, {name: 'root_entity', label: 'Root entity'}, t)
-
-    await t.any(`UPDATE survey SET root_node_def_id = $1 WHERE id = $2`, [rootNodeDefId, surveyId])
+    await createEntityDef(surveyId, null, {name: 'root_entity', label: 'Root entity'}, t)
 
     // update user prefs
     await setUserPref(user, userPrefNames.survey, surveyId, t)
@@ -46,6 +44,15 @@ const getSurveyByName = async (surveyName, client = db) => await client.oneOrNon
   def => dbTransformCallback(def)
 )
 
+const fetchRootNodeDef = async (surveyId, draft, client = db) =>
+  await client.one(
+    `SELECT ${nodeDefSelectFields}
+     FROM node_def 
+     WHERE parent_id IS NULL
+     AND survey_id =$1`,
+    [surveyId],
+    res => dbTransformCallback(res, draft)
+  )
 // ============== UPDATE
 
 // ============== DELETE
@@ -57,4 +64,6 @@ module.exports = {
   // READ
   getSurveyById,
   getSurveyByName,
+
+  fetchRootNodeDef,
 }

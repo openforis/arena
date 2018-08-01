@@ -2,8 +2,8 @@ import './react-grid-layout.scss'
 
 import React from 'react'
 
-import FormPageHeadersComponent from './formPageHeadersComponent'
-import FormPageComponent from './formPageComponent'
+import PageHeadersComponent from './pageHeadersComponent'
+import EntityDefComponent from './entityDef/entityDefComponent'
 
 const FormComponent = (props) => {
 
@@ -20,7 +20,7 @@ const FormComponent = (props) => {
       <div>PAGES</div>
 
       {/*//current page*/}
-      <FormPageComponent entityDef={entityDef}/>
+      <EntityDefComponent entityDef={entityDef}/>
     </div>
   )
 

@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as R from 'ramda'
 
-const FormPageHeaderComponent = ({entityDef}) => {
+const PageHeaderComponent = ({entityDef}) => {
   const {children = []} = entityDef
 
   const childPages = R.reject(
@@ -14,23 +14,23 @@ const FormPageHeaderComponent = ({entityDef}) => {
       <button className="btn btn-of-light">{entityDef.props.name}</button>
       {
         childPages.map(child =>
-          <FormPageHeaderComponent key={child.id} entityDef={child}/>
+          <PageHeaderComponent key={child.id} entityDef={child}/>
         )
       }
     </React.Fragment>
   )
 }
 
-const FormPageHeadersComponent = ({entityDef}) => {
+const PageHeadersComponent = ({entityDef}) => {
 
   return (
     <div style={{
       display: 'flex',
       alignItems: 'flex-end',
     }}>
-      <FormPageHeaderComponent entityDef={entityDef}/>
+      <PageHeaderComponent entityDef={entityDef}/>
     </div>
   )
 }
 
-export default FormPageHeadersComponent
+export default PageHeadersComponent

@@ -2,6 +2,7 @@ import axios from 'axios'
 import * as R from 'ramda'
 
 import { getNewSurvey } from './surveyState'
+import { nodeDefFetch } from './nodeDefActions'
 
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyNewUpdate = 'survey/new/update'
@@ -50,3 +51,18 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
 }
 
 export const resetNewSurvey = () => dispatch => dispatch({type: surveyNewUpdate, newSurvey: null})
+
+
+// READ
+
+
+export const fetchRootNodeDef = (surveyId, draft = false) => async dispatch => {
+
+  try {
+
+    const {data} = await axios.get(`/api/survey/${surveyId}/rootNodeDef?draft=${draft}`)
+    dispatch({type: nodeDefFetch, ...data})
+
+  } catch (e) { }
+
+}
