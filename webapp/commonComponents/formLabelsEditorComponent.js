@@ -33,7 +33,7 @@ const FormLabelsEditorComponent = ({languages, labels, onChange}) => {
 
   return (
     <div className="form-item">
-      <label className="form-label">Label</label>
+      <label className="form-label">Label(s)</label>
 
       <div style={{
         display: 'grid',

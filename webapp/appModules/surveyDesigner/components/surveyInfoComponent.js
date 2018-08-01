@@ -13,11 +13,16 @@ import { updateSurveyProp } from '../../../survey/actions'
 
 class SurveyInfoComponent extends React.Component {
 
+  updateSurveyProp (key, value) {
+    const {survey, updateSurveyProp} = this.props
+
+    updateSurveyProp(survey.id, key, value)
+  }
+
   onLabelsChange (item) {
     const {survey, updateSurveyProp} = this.props
 
-    updateSurveyProp(
-      survey.id,
+    this.updateSurveyProp(
       'labels',
       R.assoc(item.lang, item.label, getSurveyLabels(survey))
     )
@@ -32,7 +37,7 @@ class SurveyInfoComponent extends React.Component {
         <div className="form-item">
           <label className="form-label">Name</label>
           <FormInput value={survey.props.name}
-                     onChange={() => {}}/>
+                     onChange={e => this.updateSurveyProp('name', e.target.value)}/>
 
         </div>
 
@@ -44,10 +49,6 @@ class SurveyInfoComponent extends React.Component {
     )
   }
 
-}
-
-SurveyInfoComponent.defaultProps = {
-  survey: {},
 }
 
 const mapStateToProps = state => ({
