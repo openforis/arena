@@ -32,9 +32,9 @@ const LabelRow = ({label = '', lang, onChange}) => (
   </div>
 )
 
-const FormLabelsEditorComponent = ({languages, labels, onChange}) => (
+const FormLabelsEditorComponent = ({label = 'Label(s)', languages, labels, onChange}) => (
   <div className="form-item">
-    <label className="form-label">Label(s)</label>
+    <label className="form-label">{label}</label>
 
     <div style={{
       display: 'grid',
