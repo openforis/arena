@@ -5,6 +5,7 @@ import * as R from 'ramda'
  * survey State
  * ======================
  */
+
 // READ
 export const getCurrentSurvey = R.path(['app', 'survey'])
 
@@ -23,17 +24,34 @@ export const getNewSurvey = R.pipe(
  * nodeDefs State
  * ======================
  */
+export const getSurveyState = R.prop('survey')
+
+export const getNodeDefs = R.pipe(
+  getSurveyState,
+  R.prop('nodeDefs'),
+  R.defaultTo([]),
+)
+
+export const getNodeDefsByParentId = parentId => R.pipe(
+  getNodeDefs,
+  R.reduce(
+    (entityDefs, entityDef) => entityDef.parentId === parentId
+      ? R.append(entityDef, entityDefs)
+      : entityDefs,
+    []
+  )
+)
 
 // READ
-export const getRootEntityDef = R.pipe(
-  R.path(['survey', 'nodeDefs']),
-  R.toPairs,
-  R.filter(nodeDef => R.isNil(nodeDef[1].parentId)),
-  R.head,
-  R.defaultTo([[]]),
-  R.tail,
+export const getRootNodeDef = R.pipe(
+  getNodeDefsByParentId(null),
   R.head,
 )
 
 // UPDATE
-export const assocNodeDef = nodeDef => R.assocPath(['nodeDefs', nodeDef.uuid], nodeDef)
+export const assocNodeDef = nodeDef =>
+  state => {
+    const nodeDefs = getNodeDefs(state)
+    const nodeDefsUpdate = R.insert(nodeDefs.length, nodeDef, nodeDefs)
+    return R.assoc('nodeDefs', nodeDefsUpdate)(state)
+  }

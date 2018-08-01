@@ -1,26 +1,8 @@
 const {
   nodeDefType,
-  entityDefRenderType
 } = require('../common/survey/nodeDef')
 
 const id = -1
-
-const pageDef = {
-  entityId: id,
-
-  grid: {
-    //first cell is itself
-    cols: 1,
-    rows: 1,
-    nodeDefIds: [],
-
-    //child grids
-    children: [],
-  },
-
-  // child pages
-  children: [],
-}
 
 const nodeDef = {
   id,
@@ -49,11 +31,14 @@ const nodeDef = {
     minCount: null,//int
     maxCount: null,//int
     codeListId: id,
+
+    // common layout
+    layout: {
+      ///
+    }
   },
 
-  propsDraft : {
-
-  }
+  propsDraft: {}
 }
 
 const attributeDef = {
@@ -87,7 +72,14 @@ const entityDef = {
 
   props: {
     ...nodeDef.props,
-    renderType: entityDefRenderType.table,
+    renderType: '',//entityDefRenderType.table,
+
+    layout: {
+      ///
+      pageUUID: null, // uuid - if this entity renders in its own page
+      render: 'form', //|| table
+      children: [], // rect-grid-layout layout value
+    }
   },
 
 }
@@ -97,14 +89,8 @@ const survey = {
   uuid: null,
   ownerId: id,
 
-  rootNodeDefId:id,
-
-  published:false,
-  draft:true,
-
-  // surveyVersion IDs
-  // publishedVersionId: id,
-  // draftVersionId: id,
+  published: false,
+  draft: true,
 
   props: {
     name: 'name',
@@ -114,7 +100,6 @@ const survey = {
     },
   },
 
-  surveyVersion,
 }
 
 console.log(JSON.stringify(survey))
@@ -125,7 +110,6 @@ const record = {
   id,
   uuid: null,
   surveyId: id,
-  rootNodeId: id,
 }
 
 const node = {

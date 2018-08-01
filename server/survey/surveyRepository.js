@@ -1,9 +1,12 @@
 const db = require('../db/db')
 
+const {uuidv4} = require('../../common/uuid')
+const {entityDefRenderType} = require('../../common/survey/nodeDef')
+
 const {setUserPref} = require('../user/userRepository')
 const {userPrefNames} = require('../user/userPrefs')
 
-const {createEntityDef, dbTransformCallback} = require('../nodeDef/nodeDefRepository')
+const {createEntityDef, dbTransformCallback, nodeDefSelectFields} = require('../nodeDef/nodeDefRepository')
 
 // ============== CREATE
 
@@ -17,9 +20,15 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       RETURNING id
     `, [user.id, props])
 
-    const {id: rootNodeDefId} = await createEntityDef(surveyId, null, {name: 'root_entity', label: 'Root entity'}, t)
-
-    await t.any(`UPDATE survey SET root_node_def_id = $1 WHERE id = $2`, [rootNodeDefId, surveyId])
+    await createEntityDef(surveyId, null, {
+      name: 'root_entity',
+      label: 'Root entity',
+      multiple: false,
+      layout: {
+        pageUUID: uuidv4(),
+        render: entityDefRenderType.form,
+      }
+    }, t)
 
     // update user prefs
     await setUserPref(user, userPrefNames.survey, surveyId, t)
@@ -29,17 +38,29 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
 )
 
 // ============== READ
-const getSurveyById = async (surveyId, draft = false, client = db) => await client.one(
-  `SELECT * FROM survey WHERE id = $1`,
-  [surveyId],
-  def => dbTransformCallback(def, draft)
-)
+const getSurveyById = async (surveyId, draft = false, client = db) =>
+  await client.one(
+    `SELECT * FROM survey WHERE id = $1`,
+    [surveyId],
+    def => dbTransformCallback(def, draft)
+  )
 
-const getSurveyByName = async (surveyName, client = db) => await client.oneOrNone(
-  `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
-  [surveyName],
-  def => dbTransformCallback(def)
-)
+const getSurveyByName = async (surveyName, client = db) =>
+  await client.oneOrNone(
+    `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
+    [surveyName],
+    def => dbTransformCallback(def)
+  )
+
+const fetchRootNodeDef = async (surveyId, draft, client = db) =>
+  await client.one(
+    `SELECT ${nodeDefSelectFields}
+     FROM node_def 
+     WHERE parent_id IS NULL
+     AND survey_id =$1`,
+    [surveyId],
+    res => dbTransformCallback(res, draft)
+  )
 
 // ============== UPDATE
 const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
@@ -64,7 +85,9 @@ module.exports = {
   // READ
   getSurveyById,
   getSurveyByName,
+  fetchRootNodeDef,
 
   //UPDATE
   updateSurveyProp,
+
 }

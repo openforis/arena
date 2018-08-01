@@ -24,6 +24,9 @@ const dbTransformCallback = (def, draft = false) => def
   )(def)
   : null
 
+const nodeDefSelectFields = `id, uuid, survey_id, parent_id, type, deleted, props, props_draft, 
+     ${selectDate('date_created')}, ${selectDate('date_modified')}`
+
 // ============== CREATE
 
 const createNodeDef = async (surveyId, parentId, type, props, client = db) =>
@@ -44,13 +47,19 @@ const createAttributeDef = async (surveyId, parentId, props, client = db) =>
 
 // ============== READ
 
-const fetchNodeDef = async (nodeDefId, draft, client = db) =>
+const fetchNodeDef = async (nodeDefId = null, draft, client = db) =>
   await client.one(
-    `SELECT 
-     id, uuid, survey_id, parent_id, type, deleted, props, props_draft, 
-     ${selectDate('date_created')}, ${selectDate('date_modified')}
+    `SELECT ${nodeDefSelectFields}
      FROM node_def WHERE id = $1`,
     [nodeDefId],
+    res => dbTransformCallback(res, draft)
+  )
+
+const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
+  await client.map(
+    `SELECT ${nodeDefSelectFields}
+     FROM node_def WHERE parent_id = $1`,
+    [parentId],
     res => dbTransformCallback(res, draft)
   )
 
@@ -72,6 +81,7 @@ const markNodeDefDeleted = async (nodeDefId, client = db) => await client.one(
 module.exports = {
   //utils
   dbTransformCallback,
+  nodeDefSelectFields,
 
   //CREATE
   createEntityDef,
@@ -79,6 +89,7 @@ module.exports = {
 
   //READ
   fetchNodeDef,
+  fetchNodeDefsByParentId,
 
   //UPDATE
 

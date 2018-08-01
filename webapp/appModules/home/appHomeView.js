@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
-import { normalizeName } from './../../../common/survey/survey'
+import { normalizeName } from './../../../common/survey/surveyUtils'
 import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
 import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
 import { appModules } from '../appModules'

@@ -1,11 +1,12 @@
 const {sendOk, sendErr} = require('../serverUtils/response')
-
-const {createSurvey, updateSurveyProp} = require('./surveyRepository')
-const {validateCreateSurvey} = require('./surveyValidator')
 const {getRestParam} = require('../serverUtils/request')
+
+const {createSurvey, fetchRootNodeDef, updateSurveyProp} = require('./surveyRepository')
+const {validateCreateSurvey} = require('./surveyValidator')
 
 module.exports.init = app => {
 
+  // ==== CREATE
   app.post('/survey', async (req, res) => {
     try {
 
@@ -25,6 +26,25 @@ module.exports.init = app => {
     }
 
   })
+
+  // ==== READ
+
+  // fetch root node definition
+  app.get('/survey/:id/rootNodeDef', async (req, res) => {
+    try {
+
+      const draft = getRestParam(req, 'draft')
+      const surveyId = getRestParam(req, 'id')
+
+      const nodeDef = await fetchRootNodeDef(surveyId, draft)
+      res.json({nodeDef})
+
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  // ==== UPDATE
 
   app.put('/survey/:id/prop', async (req, res) => {
     const {user, body} = req

@@ -2,20 +2,35 @@ const passport = require('passport')
 
 const {sendOk} = require('../serverUtils/response')
 
-const userPref = require('./../user/userPrefs')
+const {userPrefNames, getUserPrefSurveyId} = require('./../user/userPrefs')
 const {getSurveyById} = require('../survey/surveyRepository')
+const {deleteUserPref} = require('../user/userRepository')
+
+const sendResponse = (res, user, survey = null) => res.json({user, survey})
+
+const sendUserSurvey = async (res, user, surveyId) => {
+  try {
+    sendResponse(
+      res,
+      user,
+      await getSurveyById(surveyId, true)
+    )
+  } catch (e) {
+    // survey not found with user pref
+    // removing user pref
+    sendResponse(
+      res,
+      await deleteUserPref(user, userPrefNames.survey)
+    )
+  }
+}
 
 const sendUser = async (res, user) => {
-  const surveyId = userPref.getSurvey(user)
+  const surveyId = getUserPrefSurveyId(user)
 
-  const survey = surveyId
-    ? await getSurveyById(surveyId, true)
-    : null
-
-  res.json({
-    user,
-    survey
-  })
+  surveyId
+    ? await sendUserSurvey(res, user, surveyId)
+    : sendResponse(res, user)
 }
 
 const authenticationSuccessful = (req, res, next, user) =>
