@@ -1,17 +1,17 @@
 import React from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 
-import FormInputChipsComponent from '../../../commonComponents/formInputChipsComponent'
+import FormInputChipsComponent from '../../commonComponents/formInputChipsComponent'
 
-import { getCurrentSurvey } from '../../../survey/surveyState'
-import { updateSurveyProp } from '../../../survey/actions'
-import { getLanguageLabel, languages } from '../../../../common/app/languages'
-import { getSurveyLanguages } from '../../../../common/survey/survey'
+import { getCurrentSurvey } from '../surveyState'
+import { updateSurveyProp } from '../actions'
+import { getLanguageLabel, languages } from '../../../common/app/languages'
+import { getSurveyLanguages } from '../../../common/survey/survey'
 
 class SurveyLanguagesEditorComponent extends React.Component {
 
   onLanguagesChange (items) {
-    let newLanguages = items.map(i => i.key)
+    const newLanguages = items.map(i => i.key)
     this.props.updateSurveyProp('languages', newLanguages)
   }
 
@@ -26,7 +26,8 @@ class SurveyLanguagesEditorComponent extends React.Component {
       <label className="form-label">Language(s)</label>
       <FormInputChipsComponent items={languages}
                                selection={selection}
-                               onChange={(selectedItems) => this.onLanguagesChange(selectedItems)}/>
+                               onChange={(selectedItems) => this.onLanguagesChange(selectedItems)}
+                               requiredItems={1}/>
     </div>
   }
 }

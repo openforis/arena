@@ -94,13 +94,12 @@ button[aria-disabled="true"] {
   border-color: $ofBorderColorLight;
 }
 
+.btn-of-light-s {
+  @extend .btn-of;
+  border-color: $ofBorderColorLightS;
+}
+
 .btn-of-light-xs {
   @extend .btn-of;
   border-color: $ofBorderColorLightXs;
-}
-
-.badge {
-  background-color: rgba($white, .2);
-  padding: .15rem .3rem;
-  border-radius: $ofBorderRadius;
 }

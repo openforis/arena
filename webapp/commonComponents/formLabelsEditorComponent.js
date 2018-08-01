@@ -6,7 +6,7 @@ import { getLanguageLabel } from '../../common/app/languages'
 import { FormInput } from './formInputComponents'
 
 const LabelBadge = ({lang}) => (
-  <h6 className="badge"
+  <h6 className="badge-of"
       style={{
         position: 'absolute',
         right: '0',

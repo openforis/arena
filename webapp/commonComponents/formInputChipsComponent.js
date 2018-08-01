@@ -1,21 +1,30 @@
 import React from 'react'
 import * as R from 'ramda'
+
 import DropdownComponent from './dropdownComponent'
 
-const Chip = ({item, onDelete}) => {
-  return <span style={{
-    border: '2px solid white',
-    borderRadius: '15px',
-    padding: '6px 12px',
-  }}>
-    {item.value}
-    <button onClick={e => onDelete(item)}>
-      <span className="icon icon-cross icon-12px"/>
-    </button>
-  </span>
-}
+const margin = '0 .3rem'
 
-const FormInputChipsComponent = ({items, selection, onChange}) => {
+const Chip = ({item, onDelete, idx, canBeRemoved}) => (
+  <div className="btn-of btn-s"
+       style={{
+         display: 'grid',
+         gridTemplateColumns: '1fr 30px',
+         alignItems: 'center',
+         gridColumnGap: '.3rem',
+         margin,
+         fontWeight: idx === 0 ? '600' : 'inherit'
+       }}>
+    {item.value}
+    <button className="btn-of-light-s btn-s"
+            onClick={e => onDelete(item)}
+            aria-disabled={!canBeRemoved}>
+      <span className="icon icon-cross icon-8px"/>
+    </button>
+  </div>
+)
+
+const FormInputChipsComponent = ({items, selection, onChange, requiredItems = 0}) => {
 
   const addItem = (item) => {
     const newItems = R.append(item)(selection)
@@ -30,12 +39,24 @@ const FormInputChipsComponent = ({items, selection, onChange}) => {
 
   const dropdownItems = R.reject(item => R.contains(item, selection))(items)
 
-  return <div>
-    {selection.map(item => <Chip key={item.key} item={item} onDelete={item => removeItem(item)}/>)}
+  return <div style={{
+    display: 'flex',
+    flexWrap: 'wrap',
+  }}>
+    {
+      selection.map((item, i) =>
+        <Chip key={item.key}
+              item={item}
+              onDelete={item => removeItem(item)}
+              idx={i}
+              canBeRemoved={selection.length > requiredItems}/>
+      )
+    }
     <DropdownComponent items={dropdownItems}
                        onChange={item => addItem(item)}
                        selection={null}
-                       clearOnSelection={true} />
+                       clearOnSelection={true}
+                       style={{margin}}/>
   </div>
 }
 

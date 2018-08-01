@@ -10,7 +10,7 @@ import FormLabelsEditorComponent from '../../../commonComponents/formLabelsEdito
 import { getCurrentSurvey } from '../../../survey/surveyState'
 
 import { updateSurveyProp } from '../../../survey/actions'
-import SurveyLanguagesEditorComponent from './surveyLanguagesEditorComponent'
+import SurveyLanguagesEditorComponent from '../../../survey/form/surveyLanguagesEditorComponent'
 
 class SurveyInfoComponent extends React.Component {
 

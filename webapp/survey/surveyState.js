@@ -51,7 +51,9 @@ export const getRootNodeDef = R.pipe(
 // UPDATE
 export const assocNodeDef = nodeDef =>
   state => {
-    const nodeDefs = getNodeDefs(state)
-    const nodeDefsUpdate = R.insert(nodeDefs.length, nodeDef, nodeDefs)
-    return R.assoc('nodeDefs', nodeDefsUpdate)(state)
+    const nodeDefs = R.pipe(
+      getNodeDefs,
+      R.append(nodeDef)
+    )(state)
+    return R.assoc('nodeDefs', nodeDefs)(state)
   }

@@ -81,6 +81,12 @@ body {
   justify-self: center;
 }
 
+.badge-of {
+  background-color: rgba($white, .2);
+  padding: .15rem .3rem;
+  border-radius: $ofBorderRadius;
+}
+
 .no-border {
   border: none !important;
 }
