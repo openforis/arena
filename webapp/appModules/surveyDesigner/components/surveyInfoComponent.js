@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { getSurveyLanguages, getSurveyLabels, getSurveyDescriptions} from '../../../../common/survey/survey'
+import { getSurveyLanguages, getSurveyLabels, getSurveyDescriptions } from '../../../../common/survey/survey'
 import { FormInput } from '../../../commonComponents/formInputComponents'
 import FormLabelsEditorComponent from '../../../commonComponents/formLabelsEditorComponent'
 
@@ -41,7 +41,7 @@ class SurveyInfoComponent extends React.Component {
                                    labels={getSurveyLabels(survey)}
                                    onChange={(item) => this.onPropLabelsChange(item, 'labels', getSurveyLabels(survey))}/>
 
-        <FormLabelsEditorComponent label="Description(s))"
+        <FormLabelsEditorComponent formLabel="Description(s))"
                                    languages={getSurveyLanguages(survey)}
                                    labels={getSurveyDescriptions(survey)}
                                    onChange={(item) => this.onPropLabelsChange(item, 'descriptions', getSurveyDescriptions(survey))}/>
