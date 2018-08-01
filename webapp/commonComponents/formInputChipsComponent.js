@@ -3,24 +3,30 @@ import * as R from 'ramda'
 
 import DropdownComponent from './dropdownComponent'
 
-const margin = '0 .3rem'
-
 const Chip = ({item, onDelete, idx, canBeRemoved}) => (
-  <div className="btn-of btn-s"
-       style={{
-         display: 'grid',
-         gridTemplateColumns: '1fr 30px',
-         alignItems: 'center',
-         gridColumnGap: '.3rem',
-         margin,
-         fontWeight: idx === 0 ? '600' : 'inherit'
-       }}>
-    {item.value}
-    <button className="btn-of-light-s btn-s"
-            onClick={e => onDelete(item)}
-            aria-disabled={!canBeRemoved}>
-      <span className="icon icon-cross icon-8px"/>
-    </button>
+  <div className="form-input"
+  style={{
+    padding:'0',
+  }}>
+    <div className="btn-of btn-s"
+         style={{
+           display: 'grid',
+           gridTemplateColumns: '1fr 30px',
+           alignItems: 'center',
+           gridColumnGap: '.3rem',
+           fontWeight: idx === 0 ? '600' : 'inherit',
+           margin:'.25rem .3rem',
+           fontSize:'.7rem',
+           padding:'.25rem .5rem'
+         }}>
+      {item.value}
+      <button className="btn-of-light-xs btn-s"
+              onClick={e => onDelete(item)}
+              aria-disabled={!canBeRemoved}
+      style={{padding:'.2rem .5rem'}}>
+        <span className="icon icon-cross icon-8px"/>
+      </button>
+    </div>
   </div>
 )
 
@@ -55,8 +61,7 @@ const FormInputChipsComponent = ({items, selection, onChange, requiredItems = 0}
     <DropdownComponent items={dropdownItems}
                        onChange={item => addItem(item)}
                        selection={null}
-                       clearOnSelection={true}
-                       style={{margin}}/>
+                       clearOnSelection={true}/>
   </div>
 }
 
