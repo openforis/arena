@@ -1,5 +1,6 @@
 const R = require('ramda')
 
+// naming utils
 const leftTrim = R.replace(/^\s+/, '')
 
 const normalizeName = R.pipe(
@@ -9,6 +10,34 @@ const normalizeName = R.pipe(
   R.slice(0, 60),
 )
 
+/**
+ * NodeDef and Survey common PROPS UTILS
+ */
+
+// READ
+const getProps = R.pipe(
+  R.prop('props'),
+  R.defaultTo({}),
+)
+
+const getProp = (prop, defaultTo = null) => R.pipe(
+  getProps,
+  R.prop(prop),
+  R.defaultTo(defaultTo),
+)
+
+const getLabels = getProp('labels', {})
+
+//UPDATE
+const setProp = (key, value) => R.assocPath(['props', key], value)
+
 module.exports = {
   normalizeName,
+
+  // PROPS
+  getProps,
+  getProp,
+  getLabels,
+
+  setProp,
 }

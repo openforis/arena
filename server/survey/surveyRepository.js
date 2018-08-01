@@ -1,7 +1,4 @@
-const R = require('ramda')
-
 const db = require('../db/db')
-const camelize = require('camelize')
 
 const {uuidv4} = require('../../common/uuid')
 const {entityDefRenderType} = require('../../common/survey/nodeDef')
@@ -41,17 +38,19 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
 )
 
 // ============== READ
-const getSurveyById = async (surveyId, draft = false, client = db) => await client.one(
-  `SELECT * FROM survey WHERE id = $1`,
-  [surveyId],
-  def => dbTransformCallback(def, draft)
-)
+const getSurveyById = async (surveyId, draft = false, client = db) =>
+  await client.one(
+    `SELECT * FROM survey WHERE id = $1`,
+    [surveyId],
+    def => dbTransformCallback(def, draft)
+  )
 
-const getSurveyByName = async (surveyName, client = db) => await client.oneOrNone(
-  `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
-  [surveyName],
-  def => dbTransformCallback(def)
-)
+const getSurveyByName = async (surveyName, client = db) =>
+  await client.oneOrNone(
+    `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
+    [surveyName],
+    def => dbTransformCallback(def)
+  )
 
 const fetchRootNodeDef = async (surveyId, draft, client = db) =>
   await client.one(
@@ -62,7 +61,20 @@ const fetchRootNodeDef = async (surveyId, draft, client = db) =>
     [surveyId],
     res => dbTransformCallback(res, draft)
   )
+
 // ============== UPDATE
+const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
+  const prop = {[key]: value}
+
+  return await client.one(`
+    UPDATE survey 
+    SET props_draft = props_draft || $1 
+    WHERE id = $2
+    RETURNING *
+  `, [JSON.stringify(prop), surveyId],
+    def => dbTransformCallback(def)
+  )
+}
 
 // ============== DELETE
 
@@ -73,6 +85,9 @@ module.exports = {
   // READ
   getSurveyById,
   getSurveyByName,
-
   fetchRootNodeDef,
+
+  //UPDATE
+  updateSurveyProp,
+
 }
