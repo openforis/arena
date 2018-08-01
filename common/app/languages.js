@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-const languages = {
+const languagesMap = {
   ab: {en: 'Abkhazian'},
   aa: {en: 'Afar'},
   af: {en: 'Afrikaans'},
@@ -222,7 +222,12 @@ const languages = {
   zu: {en: 'Zulu'},
 }
 
-const getLanguageLabel = (lang, translationLang = 'en') => R.path([lang, translationLang], languages)
+const getLanguageLabel = (lang, translationLang = 'en') => R.path([lang, translationLang], languagesMap)
+
+const languages = R.pipe(
+  R.keys,
+  R.map(lang => ({key: lang, value: getLanguageLabel(lang)}))
+)(languagesMap)
 
 module.exports = {
   languages,

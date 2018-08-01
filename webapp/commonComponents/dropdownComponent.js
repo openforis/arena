@@ -27,6 +27,12 @@ class DropdownComponent extends React.Component {
     window.addEventListener('click', this.outsideClick)
   }
 
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    const {items} = this.props
+    if (prevProps.items.length !== items.length)
+      this.setState({items})
+  }
+
   componentWillUnmount () {
     window.removeEventListener('click', this.outsideClick)
   }
@@ -46,11 +52,13 @@ class DropdownComponent extends React.Component {
   }
 
   onSelectionChange (item) {
-    this.props.onChange(item)
+    const {onChange, clearOnSelection} = this.props
+
+    onChange(item)
 
     this.setState({
-      selection: item,
-      displayValue: this.getItemLabel(item),
+      selection: clearOnSelection ? null : item,
+      displayValue: clearOnSelection ? '' : this.getItemLabel(item),
       opened: false,
     })
   }
@@ -145,6 +153,10 @@ class DropdownComponent extends React.Component {
       }
     </div>
   }
+}
+
+DropdownComponent.defaultProps = {
+  clearOnSelection: false
 }
 
 export default DropdownComponent

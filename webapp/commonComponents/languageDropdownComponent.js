@@ -9,17 +9,12 @@ const LanguageDropdownComponent = (props) => {
 
   const {selection, onChange, validation} = props
 
-  const dropdownItems = R.pipe(
-    R.keys,
-    R.map(lang => ({key: lang, value: getLanguageLabel(lang)}))
-  )(languages)
-
   const selectedItem = selection
     ? {key: selection, value: getLanguageLabel(selection)}
     : null
 
   return <DropdownComponent placeholder="Language"
-                            items={dropdownItems}
+                            items={languages}
                             selection={selectedItem}
                             onChange={e => onChange(e ? e.key : null)}
                             validation={validation}/>

@@ -10,6 +10,7 @@ import FormLabelsEditorComponent from '../../../commonComponents/formLabelsEdito
 import { getCurrentSurvey } from '../../../survey/surveyState'
 
 import { updateSurveyProp } from '../../../survey/actions'
+import SurveyLanguagesEditorComponent from './surveyLanguagesEditorComponent'
 
 class SurveyInfoComponent extends React.Component {
 
@@ -45,6 +46,7 @@ class SurveyInfoComponent extends React.Component {
                                    labels={getSurveyLabels(survey)}
                                    onChange={(item) => this.onLabelsChange(item)}/>
 
+        <SurveyLanguagesEditorComponent />
       </div>
     )
   }
