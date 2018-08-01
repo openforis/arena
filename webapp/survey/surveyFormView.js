@@ -28,7 +28,13 @@ class SurveyFormView extends React.Component {
 
 SurveyFormView.defaultProps = {
   //root entity
-  rootEntityDef: {},
+  rootEntityDef: {
+    props: {
+      layout: {
+
+      },
+    }
+  },
 }
 
 const mapStateToProps = state => ({

@@ -1,6 +1,5 @@
 const {
   nodeDefType,
-  entityDefRenderType
 } = require('../common/survey/nodeDef')
 
 const id = -1
@@ -73,7 +72,7 @@ const entityDef = {
 
   props: {
     ...nodeDef.props,
-    renderType: entityDefRenderType.table,
+    renderType: '',//entityDefRenderType.table,
 
     layout: {
       ///

@@ -4,6 +4,7 @@ const db = require('../db/db')
 const camelize = require('camelize')
 
 const {uuidv4} = require('../../common/uuid')
+const {entityDefRenderType} = require('../../common/survey/nodeDef')
 
 const {setUserPref} = require('../user/userRepository')
 const {userPrefNames} = require('../user/userPrefs')
@@ -26,7 +27,10 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       name: 'root_entity',
       label: 'Root entity',
       multiple: false,
-      layout: {pageUUID: uuidv4()}
+      layout: {
+        pageUUID: uuidv4(),
+        render: entityDefRenderType.form,
+      }
     }, t)
 
     // update user prefs

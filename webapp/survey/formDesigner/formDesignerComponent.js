@@ -2,8 +2,6 @@ import React from 'react'
 
 import * as R from 'ramda'
 
-import { uuidv4 } from '../../../common/uuid'
-
 import FormComponent from '../form/formComponent'
 
 const FormDesignerActions = () => {
@@ -45,121 +43,14 @@ const newPageItemLayout = R.pipe(
   }),
 )
 
-const newPageDef = (entityDef) => ({
-  // entityDefId: entityDef.id,
-  // entityDefUUID: entityDef.uiid,
-  columns: 3,
-  uuid: uuidv4(),
-})
-
-const newPageLayout = (entityDef) => ({
-  pageDef: newPageDef(entityDef),
-})
-
-
-const layouts = {
-
-
-  attr:{
-    props:{
-      layout:{
-        ///
-      }
-    }
-  },
-  entity:{
-    props:{
-      layout:{
-        ///
-        pageDef:{}, //
-        render: 'form' , //|| table
-        children:[],
-      }
-    }
-  }
-
-}
-
-class FormDesignerComponent extends React.Component {
-
-  constructor (props) {
-    super(props)
-    //TODO: fetch survey layout prefs
-    const {survey, entityDef} = props
-    this.state = {survey, entityDef}
-  }
-
-  createLayout () {
-    const {entityDef} = this.state
-
-    const children = [
-      {id: '0', props: {name: 'attrA'}, layout: newPageItemLayout({isDraggable: false, isResizable: false, static: true, w:3})},
-      {id: '1', props: {name: 'attrB'}, layout: newPageItemLayout({x: 4})},
-      {id: '2', props: {name: 'attrC'}, layout: newPageItemLayout({x: 5})},
-      // item with no layout is added at the end of the grid
-      {id: '3', props: {name: 'attrD'},},
-      {id: '2', props: {type: 'entity', name: 'plot'}, layout: newPageLayout({id: '2', uuid: uuidv4()})},
-      {id: '3', props: {type: 'entity', name: 'sub_root_entity'}, layout: newPageItemLayout({render: 'table',x: 7})},
-    ]
-
-    const layout = newPageLayout(entityDef)
-
-    this.setState({
-      entityDef: R.pipe(
-        R.assoc('layout', layout),
-        R.assoc('children', children),
-      )(entityDef)
-    })
-  }
-
-  render () {
-
-    const {entityDef} = this.state
-    const {layout} = entityDef
-
-    return (
-      R.isNil(layout)
-        ? (
-          <div style={{display: 'grid', justifyContent: 'center', alignContent: 'start'}}>
-            <button className="btn btn-of-light"
-                    onClick={() => this.createLayout()}>
-              Start
-            </button>
-          </div>
-        )
-        : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '.8fr .2fr',
-          }}>
-            <FormComponent entityDef={entityDef}/>
-            <FormDesignerActions/>
-          </div>
-        )
-
-    )
-  }
-
-}
-
-FormDesignerComponent.defaultProps = {
-  survey: {
-    rootEntityDefId: '1',
-  },
-  //rootEntityDef
-  entityDef: {
-    surveyId: '1',
-    parentId: null,
-    props: {
-      'id': '1',
-      'name': 'root_entity',
-      'type': 'e',
-      'uuid': '0bce2450-a68f-494d-9e83-f4f7471b83bb',
-      'label': 'Root entity',
-    },
-    layout: null,
-  }
-  ,
-}
+const FormDesignerComponent = ({entityDef}) => (
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: '.8fr .2fr',
+  }}>
+    <FormComponent entityDef={entityDef}/>
+    <FormDesignerActions/>
+  </div>
+)
 
 export default FormDesignerComponent
