@@ -2,7 +2,7 @@ import './react-grid-layout.scss'
 
 import React from 'react'
 
-import PageHeadersComponent from './pageHeadersComponent'
+import PageHeadersComponent from './components/pageHeadersComponent'
 import EntityDefComponent from './nodeDef/entityDefComponent'
 
 const FormComponent = (props) => {

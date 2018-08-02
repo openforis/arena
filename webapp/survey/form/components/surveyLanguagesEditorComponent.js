@@ -1,12 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import FormInputChipsComponent from '../../commonComponents/formInputChipsComponent'
+import FormInputChipsComponent from '../../../commonComponents/formInputChipsComponent'
 
-import { getCurrentSurvey } from '../surveyState'
-import { updateSurveyProp } from '../actions'
-import { getLanguageLabel, languages } from '../../../common/app/languages'
-import { getSurveyLanguages } from '../../../common/survey/survey'
+import { getCurrentSurvey } from '../../surveyState'
+import { updateSurveyProp } from '../../actions'
+import { getLanguageLabel, languages } from '../../../../common/app/languages'
+import { getSurveyLanguages } from '../../../../common/survey/survey'
 
 class SurveyLanguagesEditorComponent extends React.Component {
 
