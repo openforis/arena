@@ -10,8 +10,8 @@ import { fetchRootNodeDef } from './actions'
 class SurveyFormView extends React.Component {
 
   componentDidMount () {
-    const {survey, fetchRootNodeDef, edit} = this.props
-    fetchRootNodeDef(survey.id, edit)
+    const {fetchRootNodeDef, edit} = this.props
+    fetchRootNodeDef(edit)
   }
 
   render () {

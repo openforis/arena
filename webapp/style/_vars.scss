@@ -23,6 +23,7 @@ $ofBorderColor: rgba($white, .6) !important;
 $ofBorder: 1px solid !important;
 $ofBorderRadius: 255px 15px 225px 15px/15px 225px 15px 255px;
 $ofBorderColorLight: rgba($white, .4) !important;
+$ofBorderColorLightS: rgba($white, .2) !important;
 $ofBorderColorLightXs: rgba($white, .1) !important;
 
 @mixin of(){
