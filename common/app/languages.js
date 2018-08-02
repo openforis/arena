@@ -33,7 +33,7 @@ const languagesMap = {
   ce: {en: 'Chechen'},
   ny: {en: 'Chichewa; Chewa; Nyanja'},
   zh: {en: 'Chinese'},
-  cu: {en: 'Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic'},
+  cu: {en: 'Church Slavic; Church Slavonic'},
   cv: {en: 'Chuvash'},
   kw: {en: 'Cornish'},
   co: {en: 'Corsican'},
