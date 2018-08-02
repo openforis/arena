@@ -6,15 +6,17 @@ import { surveyNewUpdate, } from './actions'
 /**
  * nodeDef Actions
  */
-import { nodeDefUpdate } from './nodeDefActions'
-import { assocNodeDef } from './surveyState'
+import { nodeDefsFetch, nodeDefUpdate } from './nodeDefActions'
+import { assocNodeDef, assocNodeDefs } from './surveyState'
 
 const actionHandlers = {
   //survey
   [surveyNewUpdate]: assocActionProps,
 
   // nodeDef
-  [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state)
+  [nodeDefsFetch]: (state, {nodeDefs}) => assocNodeDefs(nodeDefs)(state),
+
+  [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
 
 }
 

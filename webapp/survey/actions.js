@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import { setSurveyProp } from '../../common/survey/survey'
 
 import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey } from './surveyState'
-import { nodeDefUpdate } from './nodeDefActions'
+import { nodeDefsFetch } from './nodeDefActions'
 
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyNewUpdate = 'survey/new/update'
@@ -60,7 +60,7 @@ export const fetchRootNodeDef = (draft = false) => async (dispatch, getState) =>
   try {
     const surveyId = getCurrentSurveyId(getState())
     const {data} = await axios.get(`/api/survey/${surveyId}/rootNodeDef?draft=${draft}`)
-    dispatch({type: nodeDefUpdate, ...data})
+    dispatch({type: nodeDefsFetch, ...data})
 
   } catch (e) { }
 }

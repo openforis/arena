@@ -6,7 +6,12 @@ const {entityDefRenderType} = require('../../common/survey/nodeDef')
 const {setUserPref} = require('../user/userRepository')
 const {userPrefNames} = require('../user/userPrefs')
 
-const {createEntityDef, dbTransformCallback, nodeDefSelectFields} = require('../nodeDef/nodeDefRepository')
+const {
+  createEntityDef,
+  fetchNodeDefsByParentId,
+  dbTransformCallback,
+  nodeDefSelectFields,
+} = require('../nodeDef/nodeDefRepository')
 
 // ============== CREATE
 
@@ -20,7 +25,7 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       RETURNING id
     `, [user.id, props])
 
-    await createEntityDef(surveyId, null, {
+    const rootEntityDefProps = {
       name: 'root_entity',
       label: 'Root entity',
       multiple: false,
@@ -28,7 +33,8 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
         pageUUID: uuidv4(),
         render: entityDefRenderType.form,
       }
-    }, t)
+    }
+    await createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
     // update user prefs
     await setUserPref(user, userPrefNames.survey, surveyId, t)
@@ -52,8 +58,8 @@ const getSurveyByName = async (surveyName, client = db) =>
     def => dbTransformCallback(def)
   )
 
-const fetchRootNodeDef = async (surveyId, draft, client = db) =>
-  await client.one(
+const fetchRootNodeDefAndChildren = async (surveyId, draft, client = db) => {
+  const rootDef = await client.one(
     `SELECT ${nodeDefSelectFields}
      FROM node_def 
      WHERE parent_id IS NULL
@@ -61,6 +67,11 @@ const fetchRootNodeDef = async (surveyId, draft, client = db) =>
     [surveyId],
     res => dbTransformCallback(res, draft)
   )
+
+  const childDefs = await fetchNodeDefsByParentId(rootDef.id)
+
+  return [rootDef, ...childDefs]
+}
 
 // ============== UPDATE
 const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
@@ -85,7 +96,7 @@ module.exports = {
   // READ
   getSurveyById,
   getSurveyByName,
-  fetchRootNodeDef,
+  fetchRootNodeDefAndChildren,
 
   //UPDATE
   updateSurveyProp,

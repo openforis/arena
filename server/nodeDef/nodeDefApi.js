@@ -1,19 +1,18 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendOk, sendErr} = require('../serverUtils/response')
 
-const {fetchNodeDef} = require('./nodeDefRepository')
+const {fetchNodeDefAndChildren, createNodeDef} = require('./nodeDefRepository')
 
 module.exports.init = app => {
 
-  // ==== CREATE
   app.post('/nodeDef', async (req, res) => {
     try {
+      const {user, body: nodeDefRequest} = req
+      const {surveyId, parentId, uuid, type, props} = nodeDefRequest
 
-      const {user, body} = req
+      const nodeDef = await createNodeDef(surveyId, parentId, uuid, type, props)
 
-      console.log(' ====== CREATING NODE DEF ')
-      console.log(body)
-
+      res.json({nodeDef})
     } catch (err) {
       sendErr(res, err)
     }
@@ -22,12 +21,11 @@ module.exports.init = app => {
   // ==== READ
   app.get('/nodeDef/:id', async (req, res) => {
     try {
-
       const nodeDefId = getRestParam(req, 'id')
       const draft = getRestParam(req, 'draft')
 
-      const nodeDef = await fetchNodeDef(nodeDefId, draft)
-      res.json({nodeDef})
+      const nodeDefs = await fetchNodeDefAndChildren(nodeDefId, draft)
+      res.json({nodeDefs})
 
     } catch (err) {
       sendErr(res, err)

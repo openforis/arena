@@ -3,7 +3,7 @@ import React from 'react'
 const AttributeDefComponent = ({nodeDef}) =>{
 
   return (
-    <div>{JSON.stringify(nodeDef)}</div>
+    <div>uuid: {JSON.stringify(nodeDef.uuid)}</div>
   )
 }
 

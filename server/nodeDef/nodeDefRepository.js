@@ -6,21 +6,22 @@ const {selectDate} = require('../db/dbUtils')
 
 const {nodeDefType} = require('../../common/survey/nodeDef')
 
-const mergeProps = (def, draft = false) => {
-  if (draft) {
-    const {props, propsDraft} = def
-    const propsMerged = R.mergeDeepRight(props, propsDraft, def)
+const mergeProps = def => {
+  const {props, propsDraft} = def
+  const propsMerged = R.mergeDeepRight(props, propsDraft, def)
 
-    return R.assoc('props', propsMerged, def)
-  }
-  return def
+  return R.pipe(
+    R.assoc('props', propsMerged),
+    R.dissoc('propsDraft'),
+  )(def)
 }
 
 const dbTransformCallback = (def, draft = false) => def
   ? R.pipe(
     camelize,
-    def => mergeProps(def, draft),
-    R.dissoc('propsDraft'),
+    def => draft
+      ? mergeProps(def, draft)
+      : def,
   )(def)
   : null
 
@@ -29,28 +30,29 @@ const nodeDefSelectFields = `id, uuid, survey_id, parent_id, type, deleted, prop
 
 // ============== CREATE
 
-const createNodeDef = async (surveyId, parentId, type, props, client = db) =>
+const createNodeDef = async (surveyId, parentId, uuid, type, props, client = db) =>
   await client.one(`
-    INSERT INTO node_def (survey_id, parent_id, type, props_draft)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO node_def (survey_id, parent_id, uuid, type, props_draft)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING * 
     `,
-    [surveyId, parentId, type, props],
+    [surveyId, parentId, uuid, type, props],
     camelize
   )
 
-const createEntityDef = async (surveyId, parentId, props, client = db) =>
-  await createNodeDef(surveyId, parentId, nodeDefType.entity, props, client)
+const createEntityDef = async (surveyId, parentId, uuid, props, client = db) =>
+  await createNodeDef(surveyId, parentId, uuid, nodeDefType.entity, props, client)
 
-const createAttributeDef = async (surveyId, parentId, props, client = db) =>
-  await createNodeDef(surveyId, parentId, nodeDefType.attribute, props, client)
+const createAttributeDef = async (surveyId, parentId, uuid, props, client = db) =>
+  await createNodeDef(surveyId, parentId, uuid, nodeDefType.attribute, props, client)
 
 // ============== READ
 
-const fetchNodeDef = async (nodeDefId = null, draft, client = db) =>
+const fetchNodeDefAndChildren = async (nodeDefId = null, draft, client = db) =>
   await client.one(
     `SELECT ${nodeDefSelectFields}
-     FROM node_def WHERE id = $1`,
+     FROM node_def 
+     WHERE id = $1 OR parent_id = $1`,
     [nodeDefId],
     res => dbTransformCallback(res, draft)
   )
@@ -84,11 +86,12 @@ module.exports = {
   nodeDefSelectFields,
 
   //CREATE
+  createNodeDef,
   createEntityDef,
   createAttributeDef,
 
   //READ
-  fetchNodeDef,
+  fetchNodeDefAndChildren,
   fetchNodeDefsByParentId,
 
   //UPDATE
