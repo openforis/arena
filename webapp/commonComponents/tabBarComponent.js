@@ -15,7 +15,7 @@ class TabBarComponent extends React.Component {
     return (
       <div style={{
         display: 'grid',
-        gridTemplateRows: '.15fr .85fr',
+        gridTemplateRows: '60px 1fr',
       }}>
         <div className="flex-center">
           {
