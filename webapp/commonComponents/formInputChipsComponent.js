@@ -32,9 +32,11 @@ const Chip = ({item, onDelete, idx, canBeRemoved}) => (
 
 const FormInputChipsComponent = ({items, selection, onChange, requiredItems = 0}) => {
 
-  const addItem = (item) => {
-    const newItems = R.append(item)(selection)
-    onChange(newItems)
+  const onDropdownChange = (item) => {
+    if (item) {
+      const newItems = R.append(item)(selection)
+      onChange(newItems)
+    }
   }
 
   const removeItem = (item) => {
@@ -59,7 +61,7 @@ const FormInputChipsComponent = ({items, selection, onChange, requiredItems = 0}
       )
     }
     <DropdownComponent items={dropdownItems}
-                       onChange={item => addItem(item)}
+                       onChange={onDropdownChange}
                        selection={null}
                        clearOnSelection={true}/>
   </div>
