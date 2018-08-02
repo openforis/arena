@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import { setSurveyProp } from '../../common/survey/survey'
 
-import { getCurrentSurvey, getNewSurvey } from './surveyState'
+import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey } from './surveyState'
 import { nodeDefFetch } from './nodeDefActions'
 
 export const surveyCurrentUpdate = 'survey/current/update'
@@ -56,9 +56,9 @@ export const resetNewSurvey = () => dispatch => dispatch({type: surveyNewUpdate,
 
 // ==== READ
 
-export const fetchRootNodeDef = (surveyId, draft = false) => async dispatch => {
+export const fetchRootNodeDef = (draft = false) => async (dispatch, getState) => {
   try {
-
+    const surveyId = getCurrentSurveyId(getState())
     const {data} = await axios.get(`/api/survey/${surveyId}/rootNodeDef?draft=${draft}`)
     dispatch({type: nodeDefFetch, ...data})
 
@@ -67,7 +67,7 @@ export const fetchRootNodeDef = (surveyId, draft = false) => async dispatch => {
 
 // ==== UPDATE
 
-export const updateSurveyProp = (surveyId, key, value) => async (dispatch, getState) => {
+export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
 
   const survey = R.pipe(
     getCurrentSurvey,
@@ -77,7 +77,7 @@ export const updateSurveyProp = (surveyId, key, value) => async (dispatch, getSt
   dispatchCurrentSurveyUpdate(dispatch, survey)
 
   try {
-    await axios.put(`/api/survey/${surveyId}/prop`, {key, value})
+    await axios.put(`/api/survey/${survey.id}/prop`, {key, value})
   } catch (e) {
 
   }

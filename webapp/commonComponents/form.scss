@@ -6,6 +6,7 @@
   /* height: 100%; */
   grid-row-gap: 3rem;
   align-content: start;
+  overflow-y: auto;
 }
 
 .form-item {
@@ -28,7 +29,7 @@
 //  display: grid;
 //}
 
-input.form-input {
+.form-input {
   padding: .75rem;
   border-bottom: 5px dotted rgba($white, .6);
 
