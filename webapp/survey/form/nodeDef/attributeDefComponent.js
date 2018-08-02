@@ -1,10 +1,21 @@
 import React from 'react'
 
-const AttributeDefComponent = ({nodeDef}) =>{
+class AttributeDefComponent extends React.Component {
 
-  return (
-    <div>uuid: {JSON.stringify(nodeDef.uuid)}</div>
-  )
+  componentDidMount () {
+    const {nodeDef} = this.props
+
+    if (!nodeDef.id)
+      this.refs.elem.scrollIntoView()
+  }
+
+  render () {
+    const {nodeDef} = this.props
+    return (
+      <div ref="elem">uuid: {JSON.stringify(nodeDef.uuid)}</div>
+    )
+  }
+
 }
 
 export default AttributeDefComponent
