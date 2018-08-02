@@ -24,36 +24,28 @@ export const getNewSurvey = R.pipe(
  * nodeDefs State
  * ======================
  */
+
+// ==== READ
 export const getSurveyState = R.prop('survey')
 
 export const getNodeDefs = R.pipe(
   getSurveyState,
   R.prop('nodeDefs'),
-  R.defaultTo([]),
+  R.defaultTo({}),
+  R.values,
 )
 
 export const getNodeDefsByParentId = parentId => R.pipe(
   getNodeDefs,
-  R.reduce(
-    (entityDefs, entityDef) => entityDef.parentId === parentId
-      ? R.append(entityDef, entityDefs)
-      : entityDefs,
-    []
-  )
+  R.filter(entityDef => entityDef.parentId === parentId),
 )
 
-// READ
 export const getRootNodeDef = R.pipe(
   getNodeDefsByParentId(null),
   R.head,
 )
 
-// UPDATE
-export const assocNodeDef = nodeDef =>
-  state => {
-    const nodeDefs = R.pipe(
-      getNodeDefs,
-      R.append(nodeDef)
-    )(state)
-    return R.assoc('nodeDefs', nodeDefs)(state)
-  }
+export const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
+
+// ==== UPDATE
+export const assocNodeDef = nodeDef => R.assocPath(['nodeDefs', nodeDef.uuid], nodeDef)

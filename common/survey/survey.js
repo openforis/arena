@@ -44,9 +44,10 @@ module.exports = {
   // props
   getSurveyProps: getProps,
   getSurveyProp: getProp,
-  getSurveyLanguages: getProp('languages'),
+  setSurveyProp: setProp,
   getSurveyLabels: getLabels,
+
+  getSurveyLanguages: getProp('languages'),
   getSurveyDescriptions: getProp('descriptions'),
 
-  setSurveyProp: setProp,
 }

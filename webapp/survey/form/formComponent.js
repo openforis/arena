@@ -7,7 +7,7 @@ import EntityDefComponent from './nodeDef/entityDefComponent'
 
 const FormComponent = (props) => {
 
-  const {entityDef} = props
+  const {nodeDef} = props
 
   return (
     <div style={{
@@ -20,7 +20,7 @@ const FormComponent = (props) => {
       <div>PAGES</div>
 
       {/*//current page*/}
-      <EntityDefComponent entityDef={entityDef}/>
+      <EntityDefComponent nodeDef={nodeDef}/>
     </div>
   )
 

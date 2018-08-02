@@ -5,6 +5,21 @@ const {fetchNodeDef} = require('./nodeDefRepository')
 
 module.exports.init = app => {
 
+  // ==== CREATE
+  app.post('/nodeDef', async (req, res) => {
+    try {
+
+      const {user, body} = req
+
+      console.log(' ====== CREATING NODE DEF ')
+      console.log(body)
+
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  // ==== READ
   app.get('/nodeDef/:id', async (req, res) => {
     try {
 
@@ -19,5 +34,9 @@ module.exports.init = app => {
     }
 
   })
+
+  // ==== UPDATE
+
+  // ==== DELETE
 
 }

@@ -15,12 +15,12 @@ class SurveyFormView extends React.Component {
   }
 
   render () {
-    const {rootEntityDef, edit = false} = this.props
+    const {nodeDef, edit = false} = this.props
 
     return (
       edit
-        ? <FormDesignerComponent entityDef={rootEntityDef}/>
-        : <FormComponent entityDef={rootEntityDef}/>
+        ? <FormDesignerComponent nodeDef={nodeDef}/>
+        : <FormComponent nodeDef={nodeDef}/>
     )
   }
 
@@ -28,18 +28,16 @@ class SurveyFormView extends React.Component {
 
 SurveyFormView.defaultProps = {
   //root entity
-  rootEntityDef: {
+  nodeDef: {
     props: {
-      layout: {
-
-      },
+      layout: {},
     }
   },
 }
 
 const mapStateToProps = state => ({
   survey: getCurrentSurvey(state),
-  rootEntityDef: getRootNodeDef(state),
+  nodeDef: getRootNodeDef(state),
 })
 
 export default connect(mapStateToProps, {fetchRootNodeDef})(SurveyFormView)
