@@ -91,6 +91,14 @@ class DropdownComponent extends React.Component {
     }
   }
 
+  onInputBlur(e) {
+    setTimeout(() => {
+      if (this.isOpened()) {
+        this.toggleOpened()
+      }
+    }, 100)
+  }
+
   getOffset () {
     const {
       top,
@@ -131,7 +139,8 @@ class DropdownComponent extends React.Component {
                  validation={validation}
                  ref="dropdownInput"
                  onChange={e => this.onInputChange(e)}
-                 onFocus={e => this.onInputFocus(e)} />
+                 onFocus={e => this.onInputFocus(e)}
+                 onBlur={e => this.onInputBlur(e)} />
 
 
       <span className="icon icon-menu2 icon-24px"
