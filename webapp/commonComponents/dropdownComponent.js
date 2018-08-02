@@ -22,7 +22,6 @@ class DropdownComponent extends React.Component {
 
     this.outsideClick = this.outsideClick.bind(this)
     this.onSelectionChange = this.onSelectionChange.bind(this)
-    this.onInputChange = this.onInputChange.bind(this)
 
     window.addEventListener('click', this.outsideClick)
   }
@@ -86,6 +85,12 @@ class DropdownComponent extends React.Component {
     this.props.onChange(null)
   }
 
+  onInputFocus (e) {
+    if (! this.isOpened() && this.props.selection === null) {
+      this.toggleOpened()
+    }
+  }
+
   getOffset () {
     const {
       top,
@@ -125,7 +130,8 @@ class DropdownComponent extends React.Component {
                  value={displayValue}
                  validation={validation}
                  ref="dropdownInput"
-                 onChange={this.onInputChange}/>
+                 onChange={e => this.onInputChange(e)}
+                 onFocus={e => this.onInputFocus(e)} />
 
 
       <span className="icon icon-menu2 icon-24px"
