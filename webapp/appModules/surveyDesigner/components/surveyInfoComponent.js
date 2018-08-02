@@ -41,7 +41,7 @@ class SurveyInfoComponent extends React.Component {
                                    labels={getSurveyLabels(survey)}
                                    onChange={(item) => this.onPropLabelsChange(item, 'labels', getSurveyLabels(survey))}/>
 
-        <FormLabelsEditorComponent formLabel="Description(s))"
+        <FormLabelsEditorComponent formLabel="Description(s)"
                                    languages={getSurveyLanguages(survey)}
                                    labels={getSurveyDescriptions(survey)}
                                    onChange={(item) => this.onPropLabelsChange(item, 'descriptions', getSurveyDescriptions(survey))}/>
