@@ -1,3 +1,5 @@
+import './react-grid-layout.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -6,19 +8,19 @@ import * as R from 'ramda'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import AttributeDefComponent from './attributeDefComponent'
 
-import { entityDefLayoutProps, getLayout, getNoColumns } from '../../../../common/survey/entityDefLayout'
-import { isNodeDefAttribute } from '../../../../common/survey/nodeDef'
+import { entityDefLayoutProps, getLayout, getNoColumns } from '../../../../../common/survey/entityDefLayout'
+import { isNodeDefAttribute } from '../../../../../common/survey/nodeDef'
 
-import { getNodeDefChildren, getSurveyState } from '../../surveyState'
+import { getNodeDefChildren, getSurveyState } from '../../../surveyState'
 
-import { fetchNodeDefChildren, putNodeDefProp } from '../../nodeDefActions'
+import { fetchNodeDefChildren, putNodeDefProp } from '../../../nodeDefActions'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 class EntityDefComponent extends React.Component {
 
   componentDidMount () {
-    const {nodeDef, fetchNodeDefChildren, draft = true} = this.props
+    const {nodeDef, fetchNodeDefChildren, draft = false} = this.props
 
     if (nodeDef.id)
       fetchNodeDefChildren(nodeDef.id, draft)

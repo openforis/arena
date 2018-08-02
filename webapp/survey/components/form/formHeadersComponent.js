@@ -21,7 +21,7 @@ const PageHeaderComponent = ({entityDef}) => {
   )
 }
 
-const PageHeadersComponent = ({entityDef}) => {
+const FormHeadersComponent = ({entityDef}) => {
 
   return (
     <div style={{
@@ -33,4 +33,4 @@ const PageHeadersComponent = ({entityDef}) => {
   )
 }
 
-export default PageHeadersComponent
+export default FormHeadersComponent

@@ -1,10 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { nodeDefType } from '../../../common/survey/nodeDef'
-import { createNodeDef } from '../nodeDefActions'
+import { nodeDefType } from '../../../../common/survey/nodeDef'
+import { createNodeDef } from '../../nodeDefActions'
 
-class FormDesignerActionsComponent extends React.Component {
+class FormActionsComponent extends React.Component {
 
   createNodeDef (type, props) {
     const {nodeDef, createNodeDef} = this.props
@@ -46,4 +46,4 @@ class FormDesignerActionsComponent extends React.Component {
 
 }
 
-export default connect(null, {createNodeDef})(FormDesignerActionsComponent)
+export default connect(null, {createNodeDef})(FormActionsComponent)

@@ -1,13 +1,9 @@
-import './react-grid-layout.scss'
-
 import React from 'react'
-
-import PageHeadersComponent from './components/pageHeadersComponent'
 import EntityDefComponent from './nodeDef/entityDefComponent'
 
 const FormComponent = (props) => {
 
-  const {nodeDef} = props
+  const {nodeDef, edit, draft} = props
 
   return (
     <div style={{
@@ -16,11 +12,11 @@ const FormComponent = (props) => {
     }}>
 
       {/*//tab navigation*/}
-      {/*<FormPageHeadersComponent entityDef={entityDef}/>*/}
+      {/*<FormHeadersComponent entityDef={entityDef}/>*/}
       <div>PAGES</div>
 
       {/*//current page*/}
-      <EntityDefComponent nodeDef={nodeDef}/>
+      <EntityDefComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
     </div>
   )
 

@@ -1,11 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import FormDesignerComponent from './formDesigner/formDesignerComponent'
 import FormComponent from './form/formComponent'
+import FormActionsComponent from './form/formActionsComponent'
 
-import { getCurrentSurvey, getRootNodeDef, getSurveyState } from './surveyState'
-import { fetchRootNodeDef } from './actions'
+import { getCurrentSurvey, getRootNodeDef, getSurveyState } from '../surveyState'
+import { fetchRootNodeDef } from '../actions'
 
 class SurveyFormView extends React.Component {
 
@@ -15,12 +15,18 @@ class SurveyFormView extends React.Component {
   }
 
   render () {
-    const {nodeDef, edit = false} = this.props
+    const {nodeDef, edit = false, draft = false} = this.props
 
     return (
       edit
-        ? <FormDesignerComponent nodeDef={nodeDef}/>
-        : <FormComponent nodeDef={nodeDef}/>
+        ? <div style={{
+          display: 'grid',
+          gridTemplateColumns: '.8fr .2fr',
+        }}>
+          <FormComponent nodeDef={nodeDef} draft={draft} edit={true}/>
+          <FormActionsComponent nodeDef={nodeDef}/>
+        </div>
+        : <FormComponent nodeDef={nodeDef} draft={draft} edit={false}/>
     )
   }
 
