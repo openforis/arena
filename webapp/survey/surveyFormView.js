@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import FormDesignerComponent from './formDesigner/formDesignerComponent'
 import FormComponent from './form/formComponent'
 
-import { getCurrentSurvey, getRootNodeDef } from './surveyState'
+import { getCurrentSurvey, getRootNodeDef, getSurveyState } from './surveyState'
 import { fetchRootNodeDef } from './actions'
 
 class SurveyFormView extends React.Component {
@@ -37,7 +37,7 @@ SurveyFormView.defaultProps = {
 
 const mapStateToProps = state => ({
   survey: getCurrentSurvey(state),
-  nodeDef: getRootNodeDef(state),
+  nodeDef: getRootNodeDef(getSurveyState(state)),
 })
 
 export default connect(mapStateToProps, {fetchRootNodeDef})(SurveyFormView)

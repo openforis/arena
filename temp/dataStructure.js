@@ -33,9 +33,7 @@ const nodeDef = {
     codeListId: id,
 
     // common layout
-    layout: {
-      ///
-    }
+
   },
 
   propsDraft: {}
@@ -74,12 +72,10 @@ const entityDef = {
     ...nodeDef.props,
     renderType: '',//entityDefRenderType.table,
 
-    layout: {
-      ///
-      pageUUID: null, // uuid - if this entity renders in its own page
-      render: 'form', //|| table
-      children: [], // rect-grid-layout layout value
-    }
+    ///layout
+    pageUUID: null, // uuid - if this entity renders in its own page
+    render: 'form', //|| table
+    layout: []// rect-grid-layout layout value
   },
 
 }

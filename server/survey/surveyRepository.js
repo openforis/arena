@@ -13,6 +13,10 @@ const {
   nodeDefSelectFields,
 } = require('../nodeDef/nodeDefRepository')
 
+const {
+  entityDefLayoutProps
+} = require('../../common/survey/entityDefLayout')
+
 // ============== CREATE
 
 const createSurvey = async (user, {name, label, lang}) => db.tx(
@@ -29,10 +33,8 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       name: 'root_entity',
       label: 'Root entity',
       multiple: false,
-      layout: {
-        pageUUID: uuidv4(),
-        render: entityDefRenderType.form,
-      }
+      [entityDefLayoutProps.pageUUID]: uuidv4(),
+      [entityDefLayoutProps.render]: entityDefRenderType.form,
     }
     await createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
@@ -58,8 +60,8 @@ const getSurveyByName = async (surveyName, client = db) =>
     def => dbTransformCallback(def)
   )
 
-const fetchRootNodeDefAndChildren = async (surveyId, draft, client = db) => {
-  const rootDef = await client.one(
+const fetchRootNodeDef = async (surveyId, draft, client = db) =>
+  await client.one(
     `SELECT ${nodeDefSelectFields}
      FROM node_def 
      WHERE parent_id IS NULL
@@ -67,11 +69,6 @@ const fetchRootNodeDefAndChildren = async (surveyId, draft, client = db) => {
     [surveyId],
     res => dbTransformCallback(res, draft)
   )
-
-  const childDefs = await fetchNodeDefsByParentId(rootDef.id)
-
-  return [rootDef, ...childDefs]
-}
 
 // ============== UPDATE
 const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
@@ -96,7 +93,7 @@ module.exports = {
   // READ
   getSurveyById,
   getSurveyByName,
-  fetchRootNodeDefAndChildren,
+  fetchRootNodeDef,
 
   //UPDATE
   updateSurveyProp,

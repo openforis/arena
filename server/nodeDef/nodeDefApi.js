@@ -1,7 +1,11 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendOk, sendErr} = require('../serverUtils/response')
 
-const {fetchNodeDefAndChildren, createNodeDef} = require('./nodeDefRepository')
+const {
+  fetchNodeDefsByParentId,
+  createNodeDef,
+  updateNodeDefProp
+} = require('./nodeDefRepository')
 
 module.exports.init = app => {
 
@@ -18,15 +22,13 @@ module.exports.init = app => {
     }
   })
 
-  // ==== READ
-  app.get('/nodeDef/:id', async (req, res) => {
+  app.get('/nodeDef/:id/children', async (req, res) => {
     try {
       const nodeDefId = getRestParam(req, 'id')
       const draft = getRestParam(req, 'draft')
 
-      const nodeDefs = await fetchNodeDefAndChildren(nodeDefId, draft)
+      const nodeDefs = await fetchNodeDefsByParentId(nodeDefId, draft)
       res.json({nodeDefs})
-
     } catch (err) {
       sendErr(res, err)
     }
@@ -34,6 +36,20 @@ module.exports.init = app => {
   })
 
   // ==== UPDATE
+
+  app.put('/nodeDef/:id/prop', async (req, res) => {
+    const {user, body} = req
+
+    const nodeDefId = getRestParam(req, 'id')
+
+    try {
+      await updateNodeDefProp(nodeDefId, body)
+
+      sendOk(res)
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
 
   // ==== DELETE
 

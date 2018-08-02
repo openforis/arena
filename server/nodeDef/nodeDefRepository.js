@@ -48,11 +48,11 @@ const createAttributeDef = async (surveyId, parentId, uuid, props, client = db) 
 
 // ============== READ
 
-const fetchNodeDefAndChildren = async (nodeDefId = null, draft, client = db) =>
+const fetchNodeDef = async (nodeDefId = null, draft, client = db) =>
   await client.one(
     `SELECT ${nodeDefSelectFields}
      FROM node_def 
-     WHERE id = $1 OR parent_id = $1`,
+     WHERE id = $1`,
     [nodeDefId],
     res => dbTransformCallback(res, draft)
   )
@@ -66,6 +66,19 @@ const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
   )
 
 // ============== UPDATE
+
+const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
+  const prop = {[key]: value}
+
+  return await client.one(`
+    UPDATE node_def 
+    SET props_draft = props_draft || $1 
+    WHERE id = $2
+    RETURNING ${nodeDefSelectFields}
+  `, [JSON.stringify(prop), nodeDefId],
+    def => dbTransformCallback(def)
+  )
+}
 
 // ============== DELETE
 
@@ -91,10 +104,11 @@ module.exports = {
   createAttributeDef,
 
   //READ
-  fetchNodeDefAndChildren,
+  fetchNodeDef,
   fetchNodeDefsByParentId,
 
   //UPDATE
+  updateNodeDefProp,
 
   //DELETE
 }

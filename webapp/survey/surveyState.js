@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+const survey = 'survey'
 /**
  * ======================
  * survey State
@@ -7,7 +8,7 @@ import * as R from 'ramda'
  */
 
 // READ
-export const getCurrentSurvey = R.path(['app', 'survey'])
+export const getCurrentSurvey = R.path(['app', survey])
 
 export const getCurrentSurveyId = R.pipe(
   getCurrentSurvey,
@@ -15,7 +16,7 @@ export const getCurrentSurveyId = R.pipe(
 )
 
 export const getNewSurvey = R.pipe(
-  R.path(['survey', 'newSurvey']),
+  R.path([survey, 'newSurvey']),
   R.defaultTo({name: '', label: '', lang: 'en', validation: {}})
 )
 
@@ -26,21 +27,21 @@ export const getNewSurvey = R.pipe(
  */
 
 // ==== READ
-export const getSurveyState = R.prop('survey')
+export const getSurveyState = R.prop(survey)
+const nodeDefs = 'nodeDefs'
 
-export const getNodeDefsByKey = R.pipe(
-  getSurveyState,
-  R.prop('nodeDefs'),
+export const getNodeDefs = R.pipe(
+  R.prop(nodeDefs),
   R.defaultTo({}),
 )
 
-export const getNodeDefs = R.pipe(
-  getNodeDefsByKey,
+export const getNodeDefsArray = R.pipe(
+  getNodeDefs,
   R.values,
 )
 
 export const getNodeDefsByParentId = parentId => R.pipe(
-  getNodeDefs,
+  getNodeDefsArray,
   R.filter(entityDef => entityDef.parentId === parentId),
 )
 
@@ -52,16 +53,15 @@ export const getRootNodeDef = R.pipe(
 export const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
 
 // ==== UPDATE
-export const assocNodeDefs = nodeDefs => survey => {
+export const assocNodeDefs = newNodeDefsArray =>
+  survey => R.pipe(
+    R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
+    R.mergeDeepRight(getNodeDefs(survey)),
+    newNodeDefs => R.assoc(nodeDefs, newNodeDefs, survey)
+  )(newNodeDefsArray)
 
-  const nodeDefsKeyValueReducer = (newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs)
+export const assocNodeDef = nodeDef =>
+  R.assocPath([nodeDefs, nodeDef.uuid], nodeDef)
 
-  const mergedNodeDefs = R.pipe(
-    R.reduce(nodeDefsKeyValueReducer, {}),
-    R.mergeDeepRight(getNodeDefsByKey(survey)),
-  )(nodeDefs)
-
-  return R.assoc('nodeDefs', mergedNodeDefs, survey)
-}
-
-export const assocNodeDef = nodeDef => R.assocPath(['nodeDefs', nodeDef.uuid], nodeDef)
+export const assocNodeDefProp = (nodeDefUUID, key, value) =>
+  R.assocPath([nodeDefs, nodeDefUUID, 'props', key], value)

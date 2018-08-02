@@ -1,13 +1,13 @@
 const R = require('ramda')
 const {uuidv4} = require('../uuid')
 
-const {
-  getProps,
-  getProp,
-  getLabels,
-
-  setProp,
-} = require('./surveyUtils')
+// const {
+//   getProps,
+//   getProp,
+//   getLabels,
+//
+//   setProp,
+// } = require('./surveyUtils')
 
 // ======== NODE DEF PROPERTIES
 
@@ -60,10 +60,10 @@ module.exports = {
   entityDefRenderType,
 
 // props
-  getNodeDefProps: getProps,
-  getNodeDefProp: getProp,
-  setNodeDefProp: setProp,
-  getNodeDefLabels: getLabels,
+//   getNodeDefProps: getProps,
+//   getNodeDefProp: getProp,
+//   setNodeDefProp: setProp,
+//   getNodeDefLabels: getLabels,
 
   // READ
   isNodeDefAttribute,
