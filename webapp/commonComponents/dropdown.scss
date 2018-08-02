@@ -40,9 +40,10 @@
   font-weight: 200;
   color: rgba($white, 0.95);
 
-  &:hover {
+  &:hover, &:focus {
     cursor: pointer;
     background-color: rgba($white, .15);
+    outline: none
   }
 }
 

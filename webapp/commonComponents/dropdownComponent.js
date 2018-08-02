@@ -1,6 +1,7 @@
 import './dropdown.scss'
 
 import React from 'react'
+import ReactDOM from 'react-dom'
 
 import * as R from 'ramda'
 
@@ -17,7 +18,8 @@ class DropdownComponent extends React.Component {
     this.state = {
       items,
       displayValue: this.getItemLabel(selection),
-      opened: false
+      focusedItemIndex: -1,
+      opened: false,
     }
 
     this.outsideClick = this.outsideClick.bind(this)
@@ -43,7 +45,10 @@ class DropdownComponent extends React.Component {
   }
 
   toggleOpened () {
-    this.setState({opened: !this.state.opened})
+    this.setState({
+      opened: !this.state.opened,
+      focusedItemIndex: -1,
+    })
   }
 
   isOpened () {
@@ -58,8 +63,16 @@ class DropdownComponent extends React.Component {
     this.setState({
       selection: clearOnSelection ? null : item,
       displayValue: clearOnSelection ? '' : this.getItemLabel(item),
+      focusedItemIndex: -1,
       opened: false,
     })
+  }
+
+  selectFocusedItem () {
+    const {focusedItemIndex, items} = this.state
+    if (focusedItemIndex >= 0) {
+      this.onSelectionChange(items[focusedItemIndex])
+    }
   }
 
   onInputChange (evt) {
@@ -79,6 +92,7 @@ class DropdownComponent extends React.Component {
     this.setState({
       items: filteredItems,
       displayValue: value,
+      focusedItemIndex: -1,
       opened: true,
     })
 
@@ -86,17 +100,73 @@ class DropdownComponent extends React.Component {
   }
 
   onInputFocus (e) {
-    if (! this.isOpened() && this.props.selection === null) {
+    if (!this.isOpened() && this.props.selection === null) {
       this.toggleOpened()
     }
   }
 
-  onInputBlur(e) {
-    setTimeout(() => {
-      if (this.isOpened()) {
-        this.toggleOpened()
+  onBlur (e) {
+    const focusRequestedOnDropdownListItem = R.prop('className')(e.relatedTarget) === 'dropdown__list-item'
+    if (this.isOpened() && !focusRequestedOnDropdownListItem) {
+      this.toggleOpened()
+    }
+  }
+
+  onInputKeyDown (e) {
+    const {items} = this.state
+    if (items.length > 0 && e.keyCode === 40) { //arrow down
+      this.setFocusOnDropdownListItem(0)
+    }
+  }
+
+  onListItemKeyDown (e) {
+    e.stopPropagation()
+    e.preventDefault()
+
+    const {items, focusedItemIndex} = this.state
+    if (items.length > 0) {
+      let offset = 0
+      switch (e.keyCode) {
+        case 13: //enter
+        case 32: //space
+          this.selectFocusedItem()
+          break
+        case 27:
+          this.toggleOpened()
+          ReactDOM.findDOMNode(this.refs.dropdownInput.refs.input).focus()
+          break
+        case 33: //page up
+          offset = -10
+          break
+        case 34: //page down
+          offset = 10
+          break
+        case 38: //arrow up
+          offset = -1
+          break
+        case 40: //arrow down
+          offset = 1
+          break
       }
-    }, 100)
+      if (offset) {
+        let index = focusedItemIndex + offset
+        if (index < 0)
+          index = 0
+        else if (index >= items.length)
+          index = items.length - 1
+        this.setFocusOnDropdownListItem(index)
+      }
+    }
+  }
+
+  setFocusOnDropdownListItem (index) {
+    const dropdownEl = ReactDOM.findDOMNode(this.refs.dropdown)
+    const itemEl = dropdownEl.getElementsByClassName('dropdown__list-item')[index]
+    itemEl.focus()
+
+    this.setState({
+      focusedItemIndex: index
+    })
   }
 
   getOffset () {
@@ -123,7 +193,7 @@ class DropdownComponent extends React.Component {
   render () {
     const {
       placeholder,
-      className,
+      className = '',
       style = {},
       validation = {},
     } = this.props
@@ -133,15 +203,17 @@ class DropdownComponent extends React.Component {
       displayValue,
     } = this.state
 
-    return <div className={`dropdown ${className}`} style={style} ref="dropdown">
+    return <div className={`dropdown ${className}`}
+                style={style}
+                ref="dropdown"
+                onBlur={e => this.onBlur(e)}>
       <FormInput placeholder={placeholder}
                  value={displayValue}
                  validation={validation}
                  ref="dropdownInput"
                  onChange={e => this.onInputChange(e)}
                  onFocus={e => this.onInputFocus(e)}
-                 onBlur={e => this.onInputBlur(e)} />
-
+                 onKeyDown={e => this.onInputKeyDown(e)}/>
 
       <span className="icon icon-menu2 icon-24px"
             onClick={() => this.toggleOpened()}></span>
@@ -155,7 +227,9 @@ class DropdownComponent extends React.Component {
               {
                 items.map(
                   item => <div key={item.key ? item.key : item} className="dropdown__list-item"
-                               onClick={() => this.onSelectionChange(item)}>
+                               onMouseDown={e => this.onSelectionChange(item)}
+                               onKeyDown={e => this.onListItemKeyDown(e)}
+                               tabIndex="1">
                     {this.getItemLabel(item)}
                   </div>
                 )
