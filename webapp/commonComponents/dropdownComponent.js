@@ -18,7 +18,7 @@ class DropdownComponent extends React.Component {
     this.state = {
       items,
       displayValue: this.getItemLabel(selection),
-      focusedItemIndex: -1,
+      itemsFocusIndex: -1,
       opened: false,
     }
 
@@ -38,8 +38,15 @@ class DropdownComponent extends React.Component {
     window.removeEventListener('click', this.outsideClick)
   }
 
+  getRefs() {
+    return {
+      dropdown: this.refs.dropdown,
+      input: this.refs.dropdownInput.refs.input
+    }
+  }
+
   outsideClick (evt) {
-    if (this.isOpened() && clickedOutside(this.refs.dropdown, evt)) {
+    if (this.isOpened() && clickedOutside(this.getRefs().dropdown, evt)) {
       this.toggleOpened()
     }
   }
@@ -47,7 +54,7 @@ class DropdownComponent extends React.Component {
   toggleOpened () {
     this.setState({
       opened: !this.state.opened,
-      focusedItemIndex: -1,
+      itemsFocusIndex: -1,
     })
   }
 
@@ -63,15 +70,15 @@ class DropdownComponent extends React.Component {
     this.setState({
       selection: clearOnSelection ? null : item,
       displayValue: clearOnSelection ? '' : this.getItemLabel(item),
-      focusedItemIndex: -1,
+      itemsFocusIndex: -1,
       opened: false,
     })
   }
 
   selectFocusedItem () {
-    const {focusedItemIndex, items} = this.state
-    if (focusedItemIndex >= 0) {
-      this.onSelectionChange(items[focusedItemIndex])
+    const {itemsFocusIndex, items} = this.state
+    if (itemsFocusIndex >= 0) {
+      this.onSelectionChange(items[itemsFocusIndex])
     }
   }
 
@@ -92,7 +99,7 @@ class DropdownComponent extends React.Component {
     this.setState({
       items: filteredItems,
       displayValue: value,
-      focusedItemIndex: -1,
+      itemsFocusIndex: -1,
       opened: true,
     })
 
@@ -106,8 +113,8 @@ class DropdownComponent extends React.Component {
   }
 
   onBlur (e) {
-    const focusRequestedOnDropdownListItem = R.prop('className')(e.relatedTarget) === 'dropdown__list-item'
-    if (this.isOpened() && !focusRequestedOnDropdownListItem) {
+    const itemFocused = R.prop('className')(e.relatedTarget) === 'dropdown__list-item'
+    if (this.isOpened() && !itemFocused) {
       this.toggleOpened()
     }
   }
@@ -115,7 +122,7 @@ class DropdownComponent extends React.Component {
   onInputKeyDown (e) {
     const {items} = this.state
     if (items.length > 0 && e.keyCode === 40) { //arrow down
-      this.setFocusOnDropdownListItem(0)
+      this.focusItem(0)
     }
   }
 
@@ -123,7 +130,7 @@ class DropdownComponent extends React.Component {
     e.stopPropagation()
     e.preventDefault()
 
-    const {items, focusedItemIndex} = this.state
+    const {items, itemsFocusIndex} = this.state
     if (items.length > 0) {
       let offset = 0
       switch (e.keyCode) {
@@ -131,9 +138,9 @@ class DropdownComponent extends React.Component {
         case 32: //space
           this.selectFocusedItem()
           break
-        case 27:
+        case 27: //escape
           this.toggleOpened()
-          ReactDOM.findDOMNode(this.refs.dropdownInput.refs.input).focus()
+          ReactDOM.findDOMNode(this.getRefs().input).focus()
           break
         case 33: //page up
           offset = -10
@@ -149,23 +156,26 @@ class DropdownComponent extends React.Component {
           break
       }
       if (offset) {
-        let index = focusedItemIndex + offset
+        let index = itemsFocusIndex + offset
         if (index < 0)
           index = 0
         else if (index >= items.length)
           index = items.length - 1
-        this.setFocusOnDropdownListItem(index)
+        this.focusItem(index)
       }
     }
   }
 
-  setFocusOnDropdownListItem (index) {
-    const dropdownEl = ReactDOM.findDOMNode(this.refs.dropdown)
+  focusItem (index) {
+    const dropdownEl = ReactDOM.findDOMNode(this.getRefs().dropdown)
     const itemEl = dropdownEl.getElementsByClassName('dropdown__list-item')[index]
+    if (!itemEl) {
+      console.log(index)
+    }
     itemEl.focus()
 
     this.setState({
-      focusedItemIndex: index
+      itemsFocusIndex: index
     })
   }
 
@@ -175,7 +185,7 @@ class DropdownComponent extends React.Component {
       left,
       height,
       width
-    } = elementOffset(this.refs.dropdownInput.refs.input)
+    } = elementOffset(this.getRefs().input)
 
     return {
       top: (top + height),
@@ -185,9 +195,7 @@ class DropdownComponent extends React.Component {
   }
 
   getItemLabel (item = '') {
-    return item
-      ? item.key ? `${item.value} (${item.key})` : item
-      : ''
+    return item ? item.key ? `${item.value}` : item : ''
   }
 
   render () {
