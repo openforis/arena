@@ -1,4 +1,5 @@
 import './react-grid-layout.scss'
+import './entityDef.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -8,9 +9,14 @@ import * as R from 'ramda'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import AttributeDefComponent from './attributeDefComponent'
 
-import { entityDefLayoutProps, getLayout, getNoColumns } from '../../../../../common/survey/entityDefLayout'
-import { isNodeDefAttribute } from '../../../../../common/survey/nodeDef'
+import {
+  entityDefLayoutProps,
+  filterInnerPageChildren,
+  getLayout,
+  getNoColumns,
+} from '../../../../../common/survey/entityDefLayout'
 
+import { isNodeDefAttribute } from '../../../../../common/survey/nodeDef'
 import { getNodeDefChildren, getSurveyState } from '../../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp } from '../../../nodeDefActions'
@@ -20,7 +26,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 class EntityDefComponent extends React.Component {
 
   componentDidMount () {
-    const {nodeDef, fetchNodeDefChildren, draft = false} = this.props
+    const {nodeDef, fetchNodeDefChildren, draft} = this.props
 
     if (nodeDef.id)
       fetchNodeDefChildren(nodeDef.id, draft)
@@ -41,7 +47,13 @@ class EntityDefComponent extends React.Component {
   }
 
   render () {
-    const {nodeDef, children, putNodeDefProp} = this.props
+    const {
+      nodeDef,
+      children,
+      putNodeDefProp,
+      edit,
+      draft,
+    } = this.props
     const columns = getNoColumns(nodeDef)
     const rdgLayout = getLayout(nodeDef)
 
@@ -60,18 +72,32 @@ class EntityDefComponent extends React.Component {
                                       md: rdgLayout,
                                       sm: rdgLayout,
                                     }}
-            >
+                                    isDraggable={edit}
+                                    isResizable={edit}>
               {
-                children.map((childDef, i) =>
-                  <div key={i}>
-                    {
-                      isNodeDefAttribute(childDef)
-                        ? <AttributeDefComponent nodeDef={childDef}/>
-                        //TODO: entity
-                        : null
-                    }
-                  </div>
-                )
+                filterInnerPageChildren(children)
+                  .map((childDef, i) =>
+                    <div key={i}>
+                      <React.Fragment>
+                        {
+                          edit
+                            ? <div className="node-def__edit-actions">
+                              <button className="btn-s btn-of-light-xs"
+                                      onClick={() => window.confirm('Are you sure you want to delete it?') ? null : null}>
+                                <span className="icon icon-bin2 icon-12px"/>
+                              </button>
+                            </div>
+                            : null
+                        }
+                        {
+                          isNodeDefAttribute(childDef)
+                            ? <AttributeDefComponent nodeDef={childDef}/>
+                            //TODO: entity
+                            : <EntityDefComponent nodeDef={childDef} edit={edit} draft={draft}/>
+                        }
+                      </React.Fragment>
+                    </div>
+                  )
               }
 
             </ResponsiveGridLayout>
@@ -85,7 +111,9 @@ class EntityDefComponent extends React.Component {
 }
 
 EntityDefComponent.defaultProps = {
-  entityDef: {}
+  entityDef: {},
+  draft: false,
+  edit: false,
 }
 
 const mapStateToProps = (state, props) => ({

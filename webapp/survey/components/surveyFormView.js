@@ -15,7 +15,7 @@ class SurveyFormView extends React.Component {
   }
 
   render () {
-    const {nodeDef, edit = false, draft = false} = this.props
+    const {nodeDef, edit, draft} = this.props
 
     return (
       edit
@@ -39,6 +39,10 @@ SurveyFormView.defaultProps = {
       layout: {},
     }
   },
+  // can edit form
+  edit: false,
+  // load draft props
+  draft: false,
 }
 
 const mapStateToProps = state => ({

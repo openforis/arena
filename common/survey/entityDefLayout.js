@@ -22,8 +22,13 @@ const isRenderType = type => R.pipe(
 const isRenderTable = isRenderType(entityDefRenderType.table)
 const isRenderForm = isRenderType(entityDefRenderType.form)
 
+const getPageUUID = getProp(entityDefLayoutProps.pageUUID)
 const getNoColumns = getProp(entityDefLayoutProps.columns, 3)
 const getLayout = getProp(entityDefLayoutProps.layout, [])
+
+const hasPage = R.pipe(getPageUUID, R.isNil, R.not)
+const filterInnerPageChildren = R.reject(hasPage)
+const filterOuterPageChildren = R.filter(hasPage)
 
 module.exports = {
   entityDefLayoutProps,
@@ -32,4 +37,7 @@ module.exports = {
   isRenderForm,
   getNoColumns,
   getLayout,
+
+  filterInnerPageChildren,
+  filterOuterPageChildren,
 }
