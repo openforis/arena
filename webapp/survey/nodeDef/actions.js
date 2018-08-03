@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-import { newNodeDef } from '../../common/survey/nodeDef'
-import { getCurrentSurveyId } from './surveyState'
+import { newNodeDef } from '../../../common/survey/nodeDef'
+import { getCurrentSurveyId } from '../surveyState'
 
 /**
  * ==== NODE DEFS

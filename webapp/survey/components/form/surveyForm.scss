@@ -3,6 +3,16 @@
 .survey-form {
   display: grid;
   grid-template-rows: 50px 1fr;
+
+  //edit mode
+  &.edit {
+    grid-template-columns: .8fr .2fr;
+
+    .survey-form__nav {
+      grid-column: 1/3;
+    }
+
+  }
 }
 
 .survey-form__node-def-edit-wrapper {
@@ -27,7 +37,12 @@
   align-content: start;
 }
 
-.node-def__edit-actions {
+.node-def__form {
+  display: grid;
+  position: relative;
+}
+
+.node-def__form-actions {
   position: absolute;
   right: 0;
   background-color: rgba($greyDark, 0.9);

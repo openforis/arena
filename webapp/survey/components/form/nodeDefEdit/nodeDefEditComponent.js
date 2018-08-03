@@ -5,7 +5,7 @@ import CommonPropsComponent from './commonPropsComponent'
 
 import { getFormNodeDefEdit } from '../../../surveyState'
 
-import { setFormNodDefEdit } from '../../../nodeDefActions'
+import { setFormNodDefEdit } from '../../../nodeDef/actions'
 
 class NodeDefEditComponent extends React.Component {
 

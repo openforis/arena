@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { nodeDefType } from '../../../../common/survey/nodeDef'
-import { createNodeDef } from '../../nodeDefActions'
+import { createNodeDef } from '../../nodeDef/actions'
 
 class FormActionsComponent extends React.Component {
 

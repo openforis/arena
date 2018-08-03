@@ -21,13 +21,13 @@ import {
 
   //survey-form
   formNodeDefEditUpdate,
-} from './nodeDefActions'
+} from './nodeDef/actions'
 
 const actionHandlers = {
   //survey
   [surveyNewUpdate]: assocActionProps,
 
-  //current survey update reset state
+  //on app current survey update, reset survey state
   [surveyCurrentUpdate]: (state, action) => ({}),
 
   // nodeDefs

@@ -17,7 +17,7 @@ import {
 
 import { getNodeDefChildren, getSurveyState } from '../../surveyState'
 
-import { fetchNodeDefChildren, putNodeDefProp, setFormNodDefEdit } from '../../nodeDefActions'
+import { fetchNodeDefChildren, putNodeDefProp, setFormNodDefEdit } from '../actions'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -33,7 +33,7 @@ class EntityDefComponent extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    const {nodeDef, fetchNodeDefChildren, draft = true} = this.props
+    const {nodeDef, fetchNodeDefChildren, draft} = this.props
     const prevNodeDefId = R.path(['nodeDef', 'id'], prevProps)
     if (nodeDef.id !== prevNodeDefId)
       fetchNodeDefChildren(nodeDef.id, draft)
@@ -42,11 +42,6 @@ class EntityDefComponent extends React.Component {
   hasChildren () {
     const {children} = this.props
     return children.length > 0
-  }
-
-  editNodeDef (nodeDef) {
-    const {setFormNodDefEdit} = this.props
-    setFormNodDefEdit(nodeDef)
   }
 
   render () {
@@ -80,29 +75,14 @@ class EntityDefComponent extends React.Component {
                                     }}
                                     isDraggable={edit}
                                     isResizable={edit}>
+              <div key="info">
+
+              </div>
               {
                 filterInnerPageChildren(children)
                   .map((childDef, i) =>
                     <div key={i}>
-                      <React.Fragment>
-                        {
-                          edit
-                            ? <div className="node-def__edit-actions">
-                              <button className="btn-s btn-of-light-xs"
-                                      onClick={() => this.editNodeDef(childDef)}>
-                                <span className="icon icon-pencil2 icon-12px"/>
-                              </button>
-                              <button className="btn-s btn-of-light-xs"
-                                      onClick={() => window.confirm('Are you sure you want to delete it?') ? null : null}>
-                                <span className="icon icon-bin2 icon-12px"/>
-                              </button>
-                            </div>
-                            : null
-                        }
-
-                        <NodeDefSwitchComponent nodeDef={childDef} edit={edit} draft={draft} render={render}/>
-
-                      </React.Fragment>
+                      <NodeDefSwitchComponent key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}/>
                     </div>
                   )
               }

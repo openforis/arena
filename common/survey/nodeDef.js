@@ -39,6 +39,7 @@ const newNodeDef = (surveyId, parentId, type, props) => ({
 
 module.exports = {
   nodeDefType,
+  getNodeDefType: R.prop('type'),
 
 // props
 //   getNodeDefProps: getProps,

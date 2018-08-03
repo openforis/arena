@@ -1,11 +1,15 @@
+import './form/surveyForm.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
-import FormComponent from './form/formComponent'
 import FormActionsComponent from './form/formActionsComponent'
 
 import { getCurrentSurvey, getRootNodeDef, getSurveyState } from '../surveyState'
 import { fetchRootNodeDef } from '../actions'
+
+import NodeDefEditComponent from './form/nodeDefEdit/nodeDefEditComponent'
+import NodeDefSwitchComponent from '../nodeDef/components/nodeDefSwitchComponent'
 
 class SurveyFormView extends React.Component {
 
@@ -18,15 +22,22 @@ class SurveyFormView extends React.Component {
     const {nodeDef, edit, draft} = this.props
 
     return (
-      edit
-        ? <div style={{
-          display: 'grid',
-          gridTemplateColumns: '.8fr .2fr',
-        }}>
-          <FormComponent nodeDef={nodeDef} draft={draft} edit={true}/>
-          <FormActionsComponent nodeDef={nodeDef}/>
+      <React.Fragment>
+        <NodeDefEditComponent/>
+
+        <div className={`survey-form${edit ? ' edit' : ''}`}>
+
+          <div className="survey-form__nav">PAGES</div>
+
+          <NodeDefSwitchComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
+
+          {
+            edit
+              ? <FormActionsComponent nodeDef={nodeDef}/>
+              : null
+          }
         </div>
-        : <FormComponent nodeDef={nodeDef} draft={draft} edit={false}/>
+      </React.Fragment>
     )
   }
 

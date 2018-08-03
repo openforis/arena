@@ -32,7 +32,7 @@ input {
   background-color: transparent;
 
   &:not([readonly]):focus {
-    background-color: rgba($black, 0.6);
+    background-color: rgba($white, 0.15);
   }
 }
 
