@@ -13,9 +13,11 @@
     }
 
     .react-grid-item {
-      border: 1px dashed rgba($white, .4);
+      border: 1px dashed rgba($white, .3);
     }
-
+    .node-def__form_root {
+      border: 2px dashed rgba($white, .2);
+    }
   }
 }
 
@@ -44,6 +46,10 @@
 .node-def__form {
   display: grid;
   position: relative;
+}
+
+.node-def__form_root {
+
 }
 
 .node-def__form-actions {

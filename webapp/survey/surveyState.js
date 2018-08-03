@@ -74,3 +74,6 @@ export const assocNodeDef = nodeDef =>
 
 export const assocNodeDefProp = (nodeDefUUID, key, value) =>
   R.assocPath([nodeDefs, nodeDefUUID, 'props', key], value)
+
+// ==== UTILITY
+export const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
