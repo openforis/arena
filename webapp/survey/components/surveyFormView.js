@@ -3,6 +3,7 @@ import './form/surveyForm.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import FormNavigationComponent from './form/formNavigationComponent'
 import FormActionsComponent from './form/formActionsComponent'
 
 import { getCurrentSurvey, getRootNodeDef, getSurveyState } from '../surveyState'
@@ -23,11 +24,12 @@ class SurveyFormView extends React.Component {
 
     return (
       <React.Fragment>
+
         <NodeDefEditComponent/>
 
         <div className={`survey-form${edit ? ' edit' : ''}`}>
 
-          <div className="survey-form__nav">PAGES</div>
+          <FormNavigationComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
 
           <NodeDefSwitchComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
 

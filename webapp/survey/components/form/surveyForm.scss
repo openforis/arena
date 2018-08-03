@@ -13,10 +13,16 @@
     }
 
     .react-grid-item {
-      border: 1px dashed rgba($white, .3);
+      border: 1px dashed rgba($blue1, .7);
+
+      > .react-resizable-handle::after {
+        border-right: 2px solid rgba($blue1, 0.7);
+        border-bottom: 2px solid rgba($blue1, 0.7);
+      }
+
     }
     .node-def__form_root {
-      border: 2px dashed rgba($white, .2);
+      border: 2px dashed rgba($white, .4);
     }
   }
 }
@@ -55,7 +61,7 @@
 .node-def__form-actions {
   position: absolute;
   right: 0;
-  background-color: rgba($greyDark, 0.9);
+  background-color: rgba($greyDark, 0.55);
   padding: .2rem .3rem;
   z-index: $zIndex1App;
 }

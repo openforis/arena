@@ -58,11 +58,7 @@ class EntityDefComponent extends React.Component {
     } = this.props
     const columns = getNoColumns(nodeDef)
     const rdgLayout = getLayout(nodeDef)
-    const layoutReactDataGrid = [
-      {'h': 1, 'i': 'info', 'w': 3, 'x': 0, 'y': 0, 'moved': false, 'static': false},
-      {'h': 2, 'i': '0', 'w': 2, 'x': 0, 'y': 1, 'moved': false, 'static': false},
-      {'h': 1, 'i': '1', 'w': 1, 'x': 0, 'y': 3, 'moved': false, 'static': false}
-    ]
+
     return (
       this.hasChildren()
 
@@ -71,7 +67,11 @@ class EntityDefComponent extends React.Component {
                                 cols={{lg: columns, md: columns, sm: columns, xs: 1, xxs: 1}}
                                 rowHeight={60}
                                 autoSize={false}
-                                onLayoutChange={(layout) => putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)}
+                                onLayoutChange={(layout) => console.log(window.innerWidth) ||
+                                  window.innerWidth > 1200
+                                    ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
+                                    : null
+                                }
                                 layouts={{
                                   lg: rdgLayout,
                                   md: rdgLayout,
@@ -82,7 +82,7 @@ class EntityDefComponent extends React.Component {
 
           <div key="node-info" data-grid={
             {
-              isDraggable: false, isResizable: false, static: true, minW: columns, maxH: 1,
+              isDraggable: false, isResizable: false, static: true, maxH: 1,
               h: 1, i: 'info', w: columns, x: 0, y: 0, moved: false,
             }
           } style={{border: 'none'}}>

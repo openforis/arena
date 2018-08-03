@@ -14,8 +14,8 @@ const {
 const nodeDefType = {
   //TODO remove attribute
   attribute: 'attribute',
-  entity: 'entity',
 
+  entity: 'entity',
   integer: 'integer',
   string: 'string',
   decimal: 'decimal',
