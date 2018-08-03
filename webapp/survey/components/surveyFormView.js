@@ -23,23 +23,25 @@ class SurveyFormView extends React.Component {
     const {nodeDef, edit, draft} = this.props
 
     return (
-      <React.Fragment>
+      nodeDef ?
+        <React.Fragment>
 
-        <NodeDefEditComponent/>
+          <NodeDefEditComponent/>
 
-        <div className={`survey-form${edit ? ' edit' : ''}`}>
+          <div className={`survey-form${edit ? ' edit' : ''}`}>
 
-          <FormNavigationComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
+            <FormNavigationComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
 
-          <NodeDefSwitchComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
+            <NodeDefSwitchComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
 
-          {
-            edit
-              ? <FormActionsComponent nodeDef={nodeDef}/>
-              : null
-          }
-        </div>
-      </React.Fragment>
+            {
+              edit
+                ? <FormActionsComponent nodeDef={nodeDef}/>
+                : null
+            }
+          </div>
+        </React.Fragment>
+        : null
     )
   }
 
@@ -47,11 +49,7 @@ class SurveyFormView extends React.Component {
 
 SurveyFormView.defaultProps = {
   //root entity
-  nodeDef: {
-    props: {
-      layout: {},
-    }
-  },
+  nodeDef: null,
   // can edit form
   edit: false,
   // load draft props

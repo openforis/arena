@@ -10,19 +10,20 @@ import NodeDefSwitchComponent from './nodeDefSwitchComponent'
 import { FormInput, FormItemComponent } from '../../../commonComponents/formInputComponents'
 import LabelsEditorComponent from '../../components/labelsEditorComponent'
 
+const ResponsiveGridLayout = WidthProvider(Responsive)
+
 import {
   nodeDefLayoutProps,
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
 } from '../../../../common/survey/nodeDefLayout'
+import { getNodeDefLabels } from '../../../../common/survey/nodeDef'
+import { normalizeName } from './../../../../common/survey/surveyUtils'
 
 import { getNodeDefChildren, getSurveyState } from '../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, setFormNodDefEdit } from '../actions'
-import { getNodeDefLabels } from '../../../../common/survey/nodeDef'
-
-const ResponsiveGridLayout = WidthProvider(Responsive)
 
 class EntityDefComponent extends React.Component {
 
@@ -68,9 +69,9 @@ class EntityDefComponent extends React.Component {
                                 rowHeight={60}
                                 autoSize={false}
                                 onLayoutChange={(layout) => console.log(window.innerWidth) ||
-                                  window.innerWidth > 1200
-                                    ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
-                                    : null
+                                window.innerWidth > 1200
+                                  ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
+                                  : null
                                 }
                                 layouts={{
                                   lg: rdgLayout,
@@ -91,12 +92,14 @@ class EntityDefComponent extends React.Component {
 
               <FormItemComponent label={'Entity name'}>
                 <FormInput value={nodeDef.props.name}
-                           onChange={() => {}}/>
+                           onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
               </FormItemComponent>
 
               <LabelsEditorComponent labels={getNodeDefLabels(nodeDef)}
-                // onChange={(item) => this.onPropsChange(item, 'labels', getSurveyLabels(survey))}/>
-                                     onChange={(item) => console.log(item)}
+                                     onChange={(item) => putNodeDefProp(
+                                       nodeDef, 'labels',
+                                       R.assoc(item.lang, item.label)(getNodeDefLabels(nodeDef))
+                                     )}
                                      maxPreview={1}
                                      canTogglePreview={false}
               />

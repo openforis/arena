@@ -12,6 +12,8 @@ import { getCurrentSurvey } from '../../../survey/surveyState'
 import { updateSurveyProp } from '../../../survey/actions'
 import SurveyLanguagesEditorComponent from '../../../survey/components/languagesEditorComponent'
 
+import { normalizeName } from './../../../../common/survey/surveyUtils'
+
 class SurveyInfoComponent extends React.Component {
 
   updateSurveyProp (key, value) {
@@ -31,7 +33,7 @@ class SurveyInfoComponent extends React.Component {
         <div className="form-item">
           <label className="form-label">Name</label>
           <FormInput value={survey.props.name}
-                     onChange={e => this.updateSurveyProp('name', e.target.value)}/>
+                     onChange={e => this.updateSurveyProp('name', normalizeName(e.target.value))}/>
 
         </div>
 

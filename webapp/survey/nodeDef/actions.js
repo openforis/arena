@@ -43,9 +43,23 @@ export const fetchNodeDefChildren = (id, draft = false) => async dispatch => {
 // ==== UPDATE
 export const putNodeDefProp = (nodeDef, key, value) => async dispatch => {
   dispatch({type: nodeDefPropUpdate, nodeDefUUID: nodeDef.uuid, key, value})
-  try {
-    await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
-  } catch (e) { }
+  dispatch(_putNodeDefProp(nodeDef, key, value))
+}
+
+const _putNodeDefProp = (nodeDef, key, value) => {
+  const dispatched = async dispatch => {
+    try {
+      await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
+    } catch (e) { }
+  }
+
+  dispatched.meta = {
+    debounce: {
+      time: 1000,
+      key: `${nodeDefPropUpdate}_${key}`
+    }
+  }
+  return dispatched
 }
 
 /**
