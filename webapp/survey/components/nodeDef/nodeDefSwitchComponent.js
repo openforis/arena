@@ -1,10 +1,19 @@
 import React from 'react'
 
-const NodeDefSwitchComponent = ({nodeDef}) => {
+import { nodeDefType } from '../../../../common/survey/nodeDef'
+import DefaultNodeDefComponent from './defaultNodeDefComponent'
+
+const NodeDefSwitchComponent = ({nodeDef, draft, edit, render}) => {
 
   switch (nodeDef.type) {
-    case 1:
-      return <div></div>;
+    case nodeDefType.entity:
+      return null
+
+    default:
+      return React.createElement(DefaultNodeDefComponent, {nodeDef, draft, edit, render})
+
   }
 
 }
+
+export default NodeDefSwitchComponent

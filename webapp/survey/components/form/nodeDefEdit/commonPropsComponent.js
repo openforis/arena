@@ -2,15 +2,14 @@ import React from 'react'
 import { FormInput } from '../../../../commonComponents/formInputComponents'
 import DropdownComponent from '../../../../commonComponents/dropdownComponent'
 
-import { attributeDefType, getNodeDefLabels, getNodeDefDescriptions } from '../../../../../common/survey/nodeDef'
+import { nodeDefType, getNodeDefLabels, getNodeDefDescriptions } from '../../../../../common/survey/nodeDef'
 import FormLabelsEditorComponent from '../../labelsEditorComponent'
-import { getSurveyLabels, getSurveyLanguages } from '../../../../../common/survey/survey'
 
 const attributeType = type => ({key: type, value: type})
 
 const attributeTypes = [
-  attributeType(attributeDefType.integer),
-  attributeType(attributeDefType.decimal),
+  attributeType(nodeDefType.integer),
+  attributeType(nodeDefType.decimal),
 
 ]
 

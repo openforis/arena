@@ -33,6 +33,23 @@ const nodeDef = {
 
     // common layout
 
+    // nodeDefTypes
+
+    // entity:
+    ///layout
+    pageUUID: null, // uuid - if this entity renders in its own page
+    render: 'form', //|| table
+    layout: [],// rect-grid-layout layout value
+
+    // not entity:
+    min: null,
+    max: null,
+    minInclusive: null,
+    maxInclusive: null,
+    regex: null,
+    maxDistance: null,
+    calculated: null, //boolean
+    codeListId: id,//
   },
 
   propsDraft: {}
@@ -70,7 +87,6 @@ const entityDef = {
 
   props: {
     ...nodeDef.props,
-    renderType: '',//entityDefRenderType.table,
 
     ///layout
     pageUUID: null, // uuid - if this entity renders in its own page

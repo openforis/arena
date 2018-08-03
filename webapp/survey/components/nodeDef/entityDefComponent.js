@@ -6,16 +6,15 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
-import AttributeDefComponent from './attributeDefComponent'
+import NodeDefSwitchComponent from './nodeDefSwitchComponent'
 
 import {
-  entityDefLayoutProps,
+  nodeDefLayoutProps,
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
-} from '../../../../common/survey/entityDefLayout'
+} from '../../../../common/survey/nodeDefLayout'
 
-import { isNodeDefAttribute } from '../../../../common/survey/nodeDef'
 import { getNodeDefChildren, getSurveyState } from '../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, setFormNodDefEdit } from '../../nodeDefActions'
@@ -55,8 +54,11 @@ class EntityDefComponent extends React.Component {
       nodeDef,
       children,
       putNodeDefProp,
+
+      // from parent
       edit,
       draft,
+      render,
     } = this.props
     const columns = getNoColumns(nodeDef)
     const rdgLayout = getLayout(nodeDef)
@@ -70,7 +72,7 @@ class EntityDefComponent extends React.Component {
                                     cols={{lg: columns, md: columns, sm: columns, xs: 1, xxs: 1}}
                                     rowHeight={60}
                                     autoSize={false}
-                                    onLayoutChange={(layout) => putNodeDefProp(nodeDef, entityDefLayoutProps.layout, layout)}
+                                    onLayoutChange={(layout) => putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)}
                                     layouts={{
                                       lg: rdgLayout,
                                       md: rdgLayout,
@@ -97,13 +99,9 @@ class EntityDefComponent extends React.Component {
                             </div>
                             : null
                         }
-                        {
-                          isNodeDefAttribute(childDef)
-                            ? <AttributeDefComponent nodeDef={childDef}/>
-                            //TODO: entity
-                            // : <EntityDefComponent nodeDef={childDef} edit={edit} draft={draft}/>
-                            : null
-                        }
+
+                        <NodeDefSwitchComponent nodeDef={childDef} edit={edit} draft={draft} render={render}/>
+
                       </React.Fragment>
                     </div>
                   )
