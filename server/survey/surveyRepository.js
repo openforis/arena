@@ -30,7 +30,7 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
 
     const rootEntityDefProps = {
       name: 'root_entity',
-      label: 'Root entity',
+      labels: {[lang]: 'Root entity'},
       multiple: false,
       [nodeDefLayoutProps.pageUUID]: uuidv4(),
       [nodeDefLayoutProps.render]: nodeDefRenderType.form,

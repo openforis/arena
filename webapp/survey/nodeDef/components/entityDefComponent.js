@@ -84,16 +84,18 @@ class EntityDefComponent extends React.Component {
                   h: 1, i: "info", w: columns, x: 0, y: 0, moved: false,}
               } style={{border:'none'}}>
 
-                <div className="node-def-entity__form">
+                <div className="node-def-entity__info-form">
 
                   <FormItemComponent label={'Entity name'}>
-                    <FormInput/>
+                    <FormInput value={nodeDef.props.name}/>
                   </FormItemComponent>
 
                   <LabelsEditorComponent labels={getNodeDefLabels(nodeDef)}
                     // onChange={(item) => this.onPropsChange(item, 'labels', getSurveyLabels(survey))}/>
                                          onChange={(item) => console.log(item)}
-                                         maxPreview="1"/>
+                                         maxPreview={1}
+                                         canTogglePreview={false}
+                                         />
 
                 </div>
               </div>

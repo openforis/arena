@@ -51,10 +51,10 @@
   right: 0;
   background-color: rgba($greyDark, 0.9);
   padding: .2rem .3rem;
-  z-index: $zIndex10TopOfApp;
+  z-index: $zIndex1App;
 }
 
-.node-def-entity__form {
+.node-def-entity__info-form {
   display: grid;
   grid-template-columns: .5fr .5fr;
 }

@@ -54,13 +54,14 @@ class LabelsEditorComponent extends React.Component {
       languages,
       onChange,
       maxPreview = 2,
+      canTogglePreview = true,
     } = this.props
 
     const displayLangs = this.isPreview()
       ? R.slice(0, maxPreview, languages)
       : languages
 
-    const canTogglePreview = languages.length > maxPreview
+    const _canTogglePreview = canTogglePreview && languages.length > maxPreview
 
     return (
       <div className="form-item" ref="elem">
@@ -79,7 +80,7 @@ class LabelsEditorComponent extends React.Component {
             )
           }
           {
-            canTogglePreview
+            _canTogglePreview
               ? <button className="btn-s btn-of-light-s"
                         style={{justifySelf: 'end'}}
                         onClick={() => this.togglePreview()}>
