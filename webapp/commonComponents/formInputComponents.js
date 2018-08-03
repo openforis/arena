@@ -17,6 +17,7 @@ export class FormInput extends React.Component {
 
     const {
       validation = {},
+      disabled = false,
       ...inputProps,
     } = this.props
 
@@ -27,6 +28,7 @@ export class FormInput extends React.Component {
 
         <input className={`form-input ${valid ? '' : ' error'}`}
                ref="input"
+               aria-disabled={disabled}
                {...inputProps}/>
 
       </TooltipError>

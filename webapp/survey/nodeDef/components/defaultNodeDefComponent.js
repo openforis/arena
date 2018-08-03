@@ -5,11 +5,11 @@ class DefaultNodeDefComponent extends React.Component {
 
 
   render () {
-    const {nodeDef} = this.props
+    const {nodeDef, draft, edit} = this.props
 
     return (
       <FormItemComponent label={`nodeName: ${nodeDef.props.name}`}>
-        <FormInput/>
+        <FormInput readOnly={edit}/>
       </FormItemComponent>
     )
   }
