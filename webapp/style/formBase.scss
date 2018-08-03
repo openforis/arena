@@ -34,6 +34,10 @@ input {
   &:not([readonly]):focus {
     background-color: rgba($white, 0.15);
   }
+
+  &[readonly] {
+    cursor: default;
+  }
 }
 
 // buttons
