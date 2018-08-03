@@ -3,14 +3,20 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { getSurveyLanguages, getSurveyLabels, getSurveyDescriptions } from '../../../../common/survey/survey'
+import {
+  getSurveyDescriptions,
+  getSurveyLabels,
+  getSurveyLanguages,
+  getSurveySrs
+} from '../../../../common/survey/survey'
+import { getSrsName, srs } from '../../../../common/app/srs'
 import { FormInput } from '../../../commonComponents/formInputComponents'
 import FormLabelsEditorComponent from '../../../commonComponents/formLabelsEditorComponent'
+import FormInputChipsComponent from '../../../commonComponents/formInputChipsComponent'
+import SurveyLanguagesEditorComponent from '../../../survey/components/surveyLanguagesEditorComponent'
 
 import { getCurrentSurvey } from '../../../survey/surveyState'
-
 import { updateSurveyProp } from '../../../survey/actions'
-import SurveyLanguagesEditorComponent from '../../../survey/components/surveyLanguagesEditorComponent'
 
 class SurveyInfoComponent extends React.Component {
 
@@ -25,6 +31,8 @@ class SurveyInfoComponent extends React.Component {
   render () {
     const {survey} = this.props
 
+    const surveySrs = getSurveySrs(survey).map(code => {return {key: code, value: getSrsName(code)}})
+
     return (
       <div className="form">
 
@@ -36,6 +44,14 @@ class SurveyInfoComponent extends React.Component {
         </div>
 
         <SurveyLanguagesEditorComponent/>
+
+        <div className="form-item">
+          <label className="form-label">SRS</label>
+          <FormInputChipsComponent selection={surveySrs}
+                                   items={srs}
+                                   onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>
+        </div>
+
 
         <FormLabelsEditorComponent languages={getSurveyLanguages(survey)}
                                    labels={getSurveyLabels(survey)}

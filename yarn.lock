@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@esri/proj-codes@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-1.0.4.tgz#5599012b413d8b3f5d9e72e2e27ef2a4a22d1349"
+
 "@webassemblyjs/ast@1.5.12":
   version "1.5.12"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.5.12.tgz#a9acbcb3f25333c4edfa1fdf3186b1ccf64e6664"
