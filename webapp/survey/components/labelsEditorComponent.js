@@ -1,11 +1,13 @@
 import React from 'react'
+import { connect } from 'react-redux'
+
 import * as R from 'ramda'
 
-import { getLanguageLabel } from '../../common/app/languages'
+import { getCurrentSurvey } from '../surveyState'
+import { getSurveyLanguages, } from '../../../common/survey/survey'
+import { getLanguageLabel } from '../../../common/app/languages'
 
-import { FormInput } from './formInputComponents'
-
-import { elementOffset } from '../appUtils/domUtils'
+import { FormInput } from '../../commonComponents/formInputComponents'
 
 const LabelBadge = ({lang}) => (
   <h6 className="badge-of"
@@ -34,7 +36,7 @@ const LabelRow = ({label = '', lang, onChange}) => (
   </div>
 )
 
-class FormLabelsEditorComponent extends React.Component {
+class LabelsEditorComponent extends React.Component {
 
   isPreview () {
     const {preview} = this.state || {preview: true}
@@ -95,4 +97,12 @@ class FormLabelsEditorComponent extends React.Component {
 
 }
 
-export default FormLabelsEditorComponent
+LabelsEditorComponent.defaultProps = {
+  languages: [],
+}
+
+const mapStateToProps = state => ({
+  languages: getSurveyLanguages(getCurrentSurvey(state))
+})
+
+export default connect(mapStateToProps,)(LabelsEditorComponent)

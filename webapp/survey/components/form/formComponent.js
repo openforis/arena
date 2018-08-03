@@ -1,16 +1,16 @@
-import './formComponent.scss'
+import './surveyForm.scss'
 
 import React from 'react'
 
-import FormNodeDefEditComponent from './formNodeDefEditComponent'
-import EntityDefComponent from './nodeDef/entityDefComponent'
+import NodeDefEditComponent from './nodeDefEdit/nodeDefEditComponent'
+import EntityDefComponent from '../nodeDef/entityDefComponent'
 
 const FormComponent = (props) => {
   const {nodeDef, edit, draft} = props
 
   return (
     <React.Fragment>
-      <FormNodeDefEditComponent/>
+      <NodeDefEditComponent/>
 
       <div className="survey-form">
 

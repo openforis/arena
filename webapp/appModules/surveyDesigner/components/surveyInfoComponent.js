@@ -3,14 +3,14 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { getSurveyLanguages, getSurveyLabels, getSurveyDescriptions } from '../../../../common/survey/survey'
+import { getSurveyLabels, getSurveyDescriptions } from '../../../../common/survey/survey'
 import { FormInput } from '../../../commonComponents/formInputComponents'
-import FormLabelsEditorComponent from '../../../commonComponents/formLabelsEditorComponent'
+import FormLabelsEditorComponent from '../../../survey/components/labelsEditorComponent'
 
 import { getCurrentSurvey } from '../../../survey/surveyState'
 
 import { updateSurveyProp } from '../../../survey/actions'
-import SurveyLanguagesEditorComponent from '../../../survey/components/surveyLanguagesEditorComponent'
+import SurveyLanguagesEditorComponent from '../../../survey/components/languagesEditorComponent'
 
 class SurveyInfoComponent extends React.Component {
 
@@ -37,12 +37,10 @@ class SurveyInfoComponent extends React.Component {
 
         <SurveyLanguagesEditorComponent/>
 
-        <FormLabelsEditorComponent languages={getSurveyLanguages(survey)}
-                                   labels={getSurveyLabels(survey)}
+        <FormLabelsEditorComponent labels={getSurveyLabels(survey)}
                                    onChange={(item) => this.onPropLabelsChange(item, 'labels', getSurveyLabels(survey))}/>
 
         <FormLabelsEditorComponent formLabel="Description(s)"
-                                   languages={getSurveyLanguages(survey)}
                                    labels={getSurveyDescriptions(survey)}
                                    onChange={(item) => this.onPropLabelsChange(item, 'descriptions', getSurveyDescriptions(survey))}/>
 

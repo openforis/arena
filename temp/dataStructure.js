@@ -30,7 +30,6 @@ const nodeDef = {
     applicableIf: null,//expr
     minCount: null,//int
     maxCount: null,//int
-    codeListId: id,
 
     // common layout
 
@@ -60,6 +59,7 @@ const attributeDef = {
     regex: null,
     maxDistance: null,
     calculated: null, //boolean
+    codeListId: id,//
   },
 
 }

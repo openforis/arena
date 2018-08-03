@@ -1,5 +1,4 @@
 import './react-grid-layout.scss'
-import './entityDef.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -14,12 +13,12 @@ import {
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
-} from '../../../../../common/survey/entityDefLayout'
+} from '../../../../common/survey/entityDefLayout'
 
-import { isNodeDefAttribute } from '../../../../../common/survey/nodeDef'
-import { getNodeDefChildren, getSurveyState } from '../../../surveyState'
+import { isNodeDefAttribute } from '../../../../common/survey/nodeDef'
+import { getNodeDefChildren, getSurveyState } from '../../surveyState'
 
-import { fetchNodeDefChildren, putNodeDefProp, setFormNodDefEdit } from '../../../nodeDefActions'
+import { fetchNodeDefChildren, putNodeDefProp, setFormNodDefEdit } from '../../nodeDefActions'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
