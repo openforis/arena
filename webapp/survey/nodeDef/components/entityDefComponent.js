@@ -7,6 +7,8 @@ import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import NodeDefSwitchComponent from './nodeDefSwitchComponent'
+import { FormInput, FormItemComponent } from '../../../commonComponents/formInputComponents'
+import LabelsEditorComponent from '../../components/labelsEditorComponent'
 
 import {
   nodeDefLayoutProps,
@@ -18,6 +20,7 @@ import {
 import { getNodeDefChildren, getSurveyState } from '../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, setFormNodDefEdit } from '../actions'
+import { getNodeDefLabels } from '../../../../common/survey/nodeDef'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -28,8 +31,6 @@ class EntityDefComponent extends React.Component {
 
     if (nodeDef.id)
       fetchNodeDefChildren(nodeDef.id, draft)
-    else
-      this.refs.elem.scrollIntoView()
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
@@ -57,13 +58,15 @@ class EntityDefComponent extends React.Component {
     } = this.props
     const columns = getNoColumns(nodeDef)
     const rdgLayout = getLayout(nodeDef)
-
+    const layoutReactDataGrid = [
+      {"h": 1, "i": "info", "w": 3, "x": 0, "y": 0, "moved": false, "static": false},
+      {"h": 2, "i": "0", "w": 2, "x": 0, "y": 1, "moved": false, "static": false},
+      {"h": 1, "i": "1", "w": 1, "x": 0, "y": 3, "moved": false, "static": false}
+      ]
     return (
-      <div ref="elem" style={{display: 'grid'}}>
-        {
-          this.hasChildren()
+
             //TODO ? isRenderForm(nodeDef)
-            ? <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
+             <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                                     cols={{lg: columns, md: columns, sm: columns, xs: 1, xxs: 1}}
                                     rowHeight={60}
                                     autoSize={false}
@@ -75,8 +78,24 @@ class EntityDefComponent extends React.Component {
                                     }}
                                     isDraggable={edit}
                                     isResizable={edit}>
-              <div key="info">
 
+              <div key="node-info" data-grid={
+                {isDraggable: false, isResizable: false, static: true, minW: columns, maxH: 1,
+                  h: 1, i: "info", w: columns, x: 0, y: 0, moved: false,}
+              } style={{border:'none'}}>
+
+                <div className="node-def-entity__form">
+
+                  <FormItemComponent label={'Entity name'}>
+                    <FormInput/>
+                  </FormItemComponent>
+
+                  <LabelsEditorComponent labels={getNodeDefLabels(nodeDef)}
+                    // onChange={(item) => this.onPropsChange(item, 'labels', getSurveyLabels(survey))}/>
+                                         onChange={(item) => console.log(item)}
+                                         maxPreview="1"/>
+
+                </div>
               </div>
               {
                 filterInnerPageChildren(children)
@@ -90,9 +109,7 @@ class EntityDefComponent extends React.Component {
             </ResponsiveGridLayout>
             //TODO Render table
             // : '=P'
-            : null
-        }
-      </div>
+
     )
   }
 }

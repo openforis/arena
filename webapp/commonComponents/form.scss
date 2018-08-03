@@ -12,7 +12,7 @@
 .form-item {
   display: grid;
   grid-template-columns: .2fr .6fr .2fr;
-  grid-column-gap: 2rem;
+  grid-column-gap: .3rem;
   height: auto;
   align-items: center;
 }
@@ -22,6 +22,7 @@
   text-transform: uppercase;
   font-size: .9rem;
   font-weight: 200;
+  text-align: end;
 }
 
 //.form-input {

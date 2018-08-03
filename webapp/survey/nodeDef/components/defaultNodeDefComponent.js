@@ -1,5 +1,5 @@
 import React from 'react'
-import { FormInput } from '../../../commonComponents/formInputComponents'
+import { FormInput, FormItemComponent } from '../../../commonComponents/formInputComponents'
 
 class DefaultNodeDefComponent extends React.Component {
 
@@ -8,10 +8,9 @@ class DefaultNodeDefComponent extends React.Component {
     const {nodeDef} = this.props
 
     return (
-      <div className="form-item">
-        <label className="form-label">nodeName: {nodeDef.props.name}</label>
+      <FormItemComponent label={`nodeName: ${nodeDef.props.name}`}>
         <FormInput/>
-      </div>
+      </FormItemComponent>
     )
   }
 

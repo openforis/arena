@@ -4,6 +4,13 @@ import React from 'react'
 
 import { TooltipError } from './tooltipComponent'
 
+export const FormItemComponent = ({label, children}) => (
+  <div className="form-item">
+    <label className="form-label">{label}</label>
+    {children}
+  </div>
+)
+
 export class FormInput extends React.Component {
 
   render () {

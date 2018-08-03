@@ -1,5 +1,5 @@
 import React from 'react'
-import { FormInput } from '../../../../commonComponents/formInputComponents'
+import { FormInput, FormItemComponent } from '../../../../commonComponents/formInputComponents'
 import DropdownComponent from '../../../../commonComponents/dropdownComponent'
 
 import { nodeDefType, getNodeDefLabels, getNodeDefDescriptions } from '../../../../../common/survey/nodeDef'
@@ -21,15 +21,13 @@ class CommonPropsComonent extends React.Component {
     return (
       <React.Fragment>
 
-        <div className="form-item">
-          <label className="form-label">Name</label>
+        <FormItemComponent label={'name'}>
           <FormInput/>
-        </div>
+        </FormItemComponent>
 
-        <div className="form-item">
-          <label className="form-label">Type</label>
+        <FormItemComponent label={'type'}>
           <DropdownComponent items={attributeTypes}/>
-        </div>
+        </FormItemComponent>
 
         <FormLabelsEditorComponent labels={getNodeDefLabels(nodeDef)}
           // onChange={(item) => this.onPropsChange(item, 'labels', getSurveyLabels(survey))}/>
