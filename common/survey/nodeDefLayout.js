@@ -5,6 +5,7 @@ const nodeDefRenderType = {
   table: 'table',
 }
 
+const nodeDefLayoutPropertyName = 'props'
 const nodeDefLayoutProps = {
   pageUUID: 'layoutPageUUID', // uuid
   render: 'layoutRender', // nodeDefRenderType
@@ -13,7 +14,7 @@ const nodeDefLayoutProps = {
 }
 
 const getProp = (prop, defaultTo = null) => R.pipe(
-  R.path(['props', prop]),
+  R.path([nodeDefLayoutPropertyName, prop]),
   R.defaultTo(defaultTo),
 )
 
@@ -26,7 +27,10 @@ const isRenderTable = isRenderType(nodeDefRenderType.table)
 const isRenderForm = isRenderType(nodeDefRenderType.form)
 
 const getPageUUID = getProp(nodeDefLayoutProps.pageUUID)
-const getNoColumns = getProp(nodeDefLayoutProps.columns, 3)
+const getNoColumns = R.pipe(
+  getProp(nodeDefLayoutProps.columns, '3'),
+  parseInt
+)
 const getLayout = getProp(nodeDefLayoutProps.layout, [])
 
 const hasPage = R.pipe(getPageUUID, R.isNil, R.not)
