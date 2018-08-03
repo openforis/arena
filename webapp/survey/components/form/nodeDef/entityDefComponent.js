@@ -19,7 +19,7 @@ import {
 import { isNodeDefAttribute } from '../../../../../common/survey/nodeDef'
 import { getNodeDefChildren, getSurveyState } from '../../../surveyState'
 
-import { fetchNodeDefChildren, putNodeDefProp } from '../../../nodeDefActions'
+import { fetchNodeDefChildren, putNodeDefProp, setFormNodDefEdit } from '../../../nodeDefActions'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -44,6 +44,11 @@ class EntityDefComponent extends React.Component {
   hasChildren () {
     const {children} = this.props
     return children.length > 0
+  }
+
+  editNodeDef (nodeDef) {
+    const {setFormNodDefEdit} = this.props
+    setFormNodDefEdit(nodeDef)
   }
 
   render () {
@@ -83,6 +88,10 @@ class EntityDefComponent extends React.Component {
                           edit
                             ? <div className="node-def__edit-actions">
                               <button className="btn-s btn-of-light-xs"
+                                      onClick={() => this.editNodeDef(childDef)}>
+                                <span className="icon icon-pencil2 icon-12px"/>
+                              </button>
+                              <button className="btn-s btn-of-light-xs"
                                       onClick={() => window.confirm('Are you sure you want to delete it?') ? null : null}>
                                 <span className="icon icon-bin2 icon-12px"/>
                               </button>
@@ -93,7 +102,8 @@ class EntityDefComponent extends React.Component {
                           isNodeDefAttribute(childDef)
                             ? <AttributeDefComponent nodeDef={childDef}/>
                             //TODO: entity
-                            : <EntityDefComponent nodeDef={childDef} edit={edit} draft={draft}/>
+                            // : <EntityDefComponent nodeDef={childDef} edit={edit} draft={draft}/>
+                            : null
                         }
                       </React.Fragment>
                     </div>
@@ -120,4 +130,4 @@ const mapStateToProps = (state, props) => ({
   children: getNodeDefChildren(props.nodeDef)(getSurveyState(state)),
 })
 
-export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren})(EntityDefComponent)
+export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren, setFormNodDefEdit})(EntityDefComponent)

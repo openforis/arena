@@ -21,7 +21,7 @@
 
 .dropdown__list {
   position: fixed;
-  z-index: $zIndex10Dropdown;
+  z-index: $zIndex20Dropdown;
   display: grid;
   grid-template-columns: 1rem 1fr 1rem;
   background-color: rgba($black, .6);

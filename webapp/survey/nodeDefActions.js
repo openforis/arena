@@ -3,6 +3,9 @@ import axios from 'axios'
 import { newNodeDef } from '../../common/survey/nodeDef'
 import { getCurrentSurveyId } from './surveyState'
 
+/**
+ * ==== NODE DEFS
+ */
 export const nodeDefUpdate = 'nodeDef/update'
 export const nodeDefsUpdate = 'nodeDefs/update'
 export const nodeDefPropUpdate = 'nodeDef/prop/update'
@@ -14,6 +17,8 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
     const surveyId = getCurrentSurveyId(getState())
     const nodeDef = newNodeDef(surveyId, parentId, type, props)
     dispatch({type: nodeDefUpdate, nodeDef})
+    //setting current editing nodeDef
+    dispatch(setFormNodDefEdit(nodeDef))
 
     const {data} = await axios.post(`/api/nodeDef`, nodeDef)
     dispatch({type: nodeDefUpdate, ...data})
@@ -43,3 +48,9 @@ export const putNodeDefProp = (nodeDef, key, value) => async dispatch => {
   } catch (e) { }
 }
 
+/**
+ * ==== SURVEY-FORM EDIT MODE - NODE DEFS
+ */
+export const formNodeDefEditUpdate = 'survey/form/nodeDefEdit/update'
+
+export const setFormNodDefEdit = nodeDef => dispatch => dispatch({type: formNodeDefEditUpdate, nodeDef})

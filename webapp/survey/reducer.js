@@ -1,4 +1,12 @@
-import { assocActionProps, dissocStateProps, exportReducer, } from '../appUtils/reduxUtils'
+import { assocActionProps, exportReducer, } from '../appUtils/reduxUtils'
+
+import {
+  assocNodeDef,
+  assocNodeDefProp,
+  assocNodeDefs,
+  assocFormNodeDefEdit,
+} from './surveyState'
+
 /**
  * survey actions
  */
@@ -7,12 +15,13 @@ import { surveyCurrentUpdate, surveyNewUpdate, } from './actions'
  * nodeDef Actions
  */
 import {
+  nodeDefPropUpdate,
   nodeDefsUpdate,
   nodeDefUpdate,
-  nodeDefPropUpdate,
+
+  //survey-form
+  formNodeDefEditUpdate,
 } from './nodeDefActions'
-import { assocNodeDef, assocNodeDefProp, assocNodeDefs } from './surveyState'
-import * as R from 'ramda'
 
 const actionHandlers = {
   //survey
@@ -28,6 +37,8 @@ const actionHandlers = {
 
   [nodeDefPropUpdate]: (state, {nodeDefUUID, key, value}) => assocNodeDefProp(nodeDefUUID, key, value)(state),
 
+  //survey-form
+  [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),
 }
 
 export default exportReducer(actionHandlers)

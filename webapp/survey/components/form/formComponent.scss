@@ -1,0 +1,28 @@
+@import "../../../style/vars";
+
+.survey-form {
+  display: grid;
+  grid-template-rows: 50px 1fr;
+}
+
+.survey-form__node-def-edit-wrapper {
+  position: absolute;
+  background-color: rgba($yellowDark, 0.4);
+  width: 100%;
+  height: 100%;
+  z-index: $zIndex10TopOfApp;
+
+  display: grid;
+  grid-template-columns: .25fr .5fr .25fr;
+  grid-template-rows: .15fr .7fr .15fr;
+}
+
+.survey-form__node-def-edit {
+  grid-column: 2;
+  grid-row: 2;
+
+  display: grid;
+  grid-row-gap: 2rem;
+  align-content: start;
+  justify-items: center;
+}

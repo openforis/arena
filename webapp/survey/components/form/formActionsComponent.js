@@ -15,6 +15,10 @@ class FormActionsComponent extends React.Component {
     this.createNodeDef(nodeDefType.attribute, {})
   }
 
+  createEntity () {
+    // this.createNodeDef(nodeDefType.entity, {})
+  }
+
   render () {
     return (
       <div style={{
@@ -33,7 +37,8 @@ class FormActionsComponent extends React.Component {
             Add Attribute
           </button>
 
-          <button className="btn btn-of-light">
+          <button className="btn btn-of-light"
+                  onClick={() => this.createEntity()}>
             Add Entity
           </button>
           <button className="btn btn-of-light">
