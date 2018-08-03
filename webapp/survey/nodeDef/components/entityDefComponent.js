@@ -61,15 +61,14 @@ class EntityDefComponent extends React.Component {
     const rdgLayout = getLayout(nodeDef)
 
     return (
-      this.hasChildren()
 
         //TODO ? isRenderForm(nodeDef)
-        ? <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
+        <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                                 cols={{lg: columns, md: columns, sm: columns, xs: 1, xxs: 1}}
                                 rowHeight={60}
                                 autoSize={false}
                                 onLayoutChange={(layout) => console.log(window.innerWidth) ||
-                                window.innerWidth > 1200
+                                window.innerWidth > 1200 && layout.length > 1
                                   ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
                                   : null
                                 }
@@ -118,7 +117,6 @@ class EntityDefComponent extends React.Component {
         </ResponsiveGridLayout>
         //TODO Render table
         // : '=P'
-        : null
     )
   }
 }
