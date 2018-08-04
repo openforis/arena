@@ -43,7 +43,6 @@ class NodeDefSwitchComponent extends React.Component {
                          type="number" min="1" max="6"
                          onChange={e => e.target.value > 0 ?
                            putNodeDefProp(nodeDef, nodeDefLayoutProps.columns, e.target.value)
-                           // console.log(e.target.value)
                            : null
                          }/>
                 </div>

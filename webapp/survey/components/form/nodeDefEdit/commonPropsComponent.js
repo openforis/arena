@@ -1,9 +1,11 @@
 import React from 'react'
+
 import { FormInput, FormItemComponent } from '../../../../commonComponents/formInputComponents'
 import DropdownComponent from '../../../../commonComponents/dropdownComponent'
+import FormLabelsEditorComponent from '../../labelsEditorComponent'
 
 import { nodeDefType, getNodeDefLabels, getNodeDefDescriptions } from '../../../../../common/survey/nodeDef'
-import FormLabelsEditorComponent from '../../labelsEditorComponent'
+import { normalizeName } from './../../../../../common/survey/surveyUtils'
 
 const attributeType = type => ({key: type, value: type})
 
