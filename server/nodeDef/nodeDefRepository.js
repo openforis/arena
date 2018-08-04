@@ -43,9 +43,6 @@ const createNodeDef = async (surveyId, parentId, uuid, type, props, client = db)
 const createEntityDef = async (surveyId, parentId, uuid, props, client = db) =>
   await createNodeDef(surveyId, parentId, uuid, nodeDefType.entity, props, client)
 
-const createAttributeDef = async (surveyId, parentId, uuid, props, client = db) =>
-  await createNodeDef(surveyId, parentId, uuid, nodeDefType.attribute, props, client)
-
 // ============== READ
 
 const fetchNodeDef = async (nodeDefId = null, draft, client = db) =>
@@ -101,7 +98,6 @@ module.exports = {
   //CREATE
   createNodeDef,
   createEntityDef,
-  createAttributeDef,
 
   //READ
   fetchNodeDef,

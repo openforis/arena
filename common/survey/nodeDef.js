@@ -12,17 +12,17 @@ const {
 // ======== NODE DEF PROPERTIES
 
 const nodeDefType = {
-  //TODO remove attribute
-  attribute: 'attribute',
-
-  entity: 'entity',
   integer: 'integer',
-  string: 'string',
   decimal: 'decimal',
+  string: 'string',
+  date: 'date',
+  time: 'time',
   boolean: 'boolean',
   codeList: 'codeList',
   coordinate: 'coordinate',
   taxon: 'taxon',
+  file: 'file',
+  entity: 'entity',
 }
 
 // ==== CREATE
