@@ -23,15 +23,6 @@ export const getNewSurvey = R.pipe(
 
 /**
  * ======================
- * Survey-Form State
- * ======================
- */
-const surveyFormNodeDefEditPath = ['form', 'nodeDefEdit']
-export const assocFormNodeDefEdit = R.pipe(R.assocPath(surveyFormNodeDefEditPath))
-export const getFormNodeDefEdit = R.pipe(getSurveyState, R.path(surveyFormNodeDefEditPath))
-
-/**
- * ======================
  * nodeDefs State TODO: Move to common/survey/NodeDef
  * ======================
  */
@@ -42,6 +33,11 @@ const nodeDefs = 'nodeDefs'
 export const getNodeDefs = R.pipe(
   R.prop(nodeDefs),
   R.defaultTo({}),
+)
+
+export const getNodeDef = uuid => R.pipe(
+  getNodeDefs,
+  R.prop(uuid),
 )
 
 export const getNodeDefsArray = R.pipe(
@@ -77,3 +73,17 @@ export const assocNodeDefProp = (nodeDefUUID, key, value) =>
 
 // ==== UTILITY
 export const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
+
+/**
+ * ======================
+ * Survey-Form State
+ * ======================
+ */
+// CURRENT EDITING NODE_DEF
+const nodeDefEditPath = ['form', 'nodeDefEdit']
+export const assocFormNodeDefEdit = nodeDef => R.assocPath(nodeDefEditPath, nodeDef ? nodeDef.uuid : null)
+export const getFormNodeDefEdit = state => {
+  const surveyState = getSurveyState(state)
+  const uuid = R.path(nodeDefEditPath, surveyState)
+  return getNodeDef(uuid)(surveyState)
+}

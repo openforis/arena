@@ -15,14 +15,14 @@ class NodeDefEditComponent extends React.Component {
   }
 
   render () {
-    const {nodeDefEdit} = this.props
+    const {nodeDef} = this.props
 
-    return nodeDefEdit
+    return nodeDef
       ? <div className="survey-form__node-def-edit-wrapper">
         <div className="survey-form__node-def-edit">
-          <CommonPropsComponent/>
+          <CommonPropsComponent nodeDef={nodeDef}/>
 
-          <div style={{justifySelf:'center'}}>
+          <div style={{justifySelf: 'center'}}>
             <button className="btn btn-of-light"
                     onClick={() => this.close()}>Done
             </button>
@@ -36,10 +36,10 @@ class NodeDefEditComponent extends React.Component {
 }
 
 NodeDefEditComponent.defaultProps = {
-  nodeDefEdit: null,
+  nodeDef: null,
 }
 const mapStateToProps = state => ({
-  nodeDefEdit: getFormNodeDefEdit(state)
+  nodeDef: getFormNodeDefEdit(state)
 })
 
 export default connect(mapStateToProps, {setFormNodDefEdit})(NodeDefEditComponent)

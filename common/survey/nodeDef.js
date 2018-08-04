@@ -43,7 +43,7 @@ module.exports = {
 
 // props
 //   getNodeDefProps: getProps,
-//   getNodeDefProp: getProp,
+  getNodeDefProp: getProp,
 //   setNodeDefProp: setProp,
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
