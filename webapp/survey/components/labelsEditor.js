@@ -7,7 +7,7 @@ import { getCurrentSurvey } from '../surveyState'
 import { getSurveyLanguages, } from '../../../common/survey/survey'
 import { getLanguageLabel } from '../../../common/app/languages'
 
-import { FormInput } from '../../commonComponents/form/formInput'
+import { Input } from '../../commonComponents/form/input'
 
 const LabelBadge = ({lang}) => (
   <h6 className="badge-of"
@@ -27,8 +27,8 @@ const LabelRow = ({label = '', lang, onChange}) => (
 
     <LabelBadge lang={lang}/>
 
-    <FormInput value={label}
-               onChange={e => onChange({
+    <Input value={label}
+           onChange={e => onChange({
                    lang,
                    label: e.target.value
                  }

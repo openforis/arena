@@ -30,7 +30,7 @@ const Chip = ({item, onDelete, idx, canBeRemoved}) => (
   </div>
 )
 
-const FormInputChipsComponent = ({items, selection, onChange, requiredItems = 0, dropdownAutocompleteMinChars = 0}) => {
+const InputChips = ({items, selection, onChange, requiredItems = 0, dropdownAutocompleteMinChars = 0}) => {
 
   const onDropdownChange = (item) => {
     if (item) {
@@ -68,4 +68,4 @@ const FormInputChipsComponent = ({items, selection, onChange, requiredItems = 0,
   </div>
 }
 
-export default FormInputChipsComponent
+export default InputChips

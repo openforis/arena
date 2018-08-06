@@ -1,5 +1,5 @@
 import React from 'react'
-import { FormInput, FormItem } from '../../../commonComponents/form/formInput'
+import { Input, FormItem } from '../../../commonComponents/form/input'
 
 class DefaultNodeDef extends React.Component {
 
@@ -9,7 +9,7 @@ class DefaultNodeDef extends React.Component {
 
     return (
       <FormItem label={`nodeName: ${nodeDef.props.name}`}>
-        <FormInput readOnly={edit}/>
+        <Input readOnly={edit}/>
       </FormItem>
     )
   }

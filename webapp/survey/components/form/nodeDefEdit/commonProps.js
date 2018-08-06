@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { FormInput, FormItem } from '../../../../commonComponents/form/formInput'
+import { Input, FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import LabelsEditor from '../../labelsEditor'
 
@@ -33,8 +33,8 @@ class CommonProps extends React.Component {
       <React.Fragment>
 
         <FormItem label={'name'}>
-          <FormInput value={getNodeDefProp('name', '')(nodeDef)}
-                     onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
+          <Input value={getNodeDefProp('name', '')(nodeDef)}
+                 onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
         </FormItem>
 
         <FormItem label={'type'}>

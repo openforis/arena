@@ -8,7 +8,7 @@ import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/
 import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
-import { FormInput } from '../../commonComponents/form/formInput'
+import { Input } from '../../commonComponents/form/input'
 
 import LanguageDropdown from '../../commonComponents/form/languageDropdown'
 
@@ -69,15 +69,15 @@ class AppHomeView extends React.Component {
           gridColumnGap: '2rem',
         }}>
 
-          <FormInput placeholder="Name"
-                     value={name}
-                     validation={R.path(['fields', 'name'])(validation)}
-                     onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
+          <Input placeholder="Name"
+                 value={name}
+                 validation={R.path(['fields', 'name'])(validation)}
+                 onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
 
-          <FormInput placeholder="Label"
-                     value={label}
-                     validation={R.path(['fields', 'label'])(validation)}
-                     onChange={e => updateNewSurveyProp('label', e.target.value)}/>
+          <Input placeholder="Label"
+                 value={label}
+                 validation={R.path(['fields', 'label'])(validation)}
+                 onChange={e => updateNewSurveyProp('label', e.target.value)}/>
 
           <LanguageDropdown placeholder="Language"
                             selection={lang}

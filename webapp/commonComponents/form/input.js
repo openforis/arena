@@ -11,7 +11,7 @@ export const FormItem = ({label, children}) => (
   </div>
 )
 
-export class FormInput extends React.Component {
+export class Input extends React.Component {
 
   render () {
 
