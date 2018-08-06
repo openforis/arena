@@ -2,7 +2,7 @@ import './form.scss'
 
 import React from 'react'
 
-import { TooltipError } from './tooltipComponent'
+import { TooltipError } from './tooltip'
 
 export const FormItem = ({label, children}) => (
   <div className="form-item">

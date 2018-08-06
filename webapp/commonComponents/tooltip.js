@@ -1,6 +1,6 @@
 import React from 'react'
 
-const TooltipComponent = ({children, type = null, message = null}) => (
+const Tooltip = ({children, type = null, message = null}) => (
 
   <div className={message ? `tooltip${type ? '-' + type : ''}` : ''}
        style={{display: 'grid'}}>
@@ -23,8 +23,8 @@ const TooltipComponent = ({children, type = null, message = null}) => (
 )
 
 export const TooltipError = (props) => (
-  <TooltipComponent {...props}
-                    type="error"/>
+  <Tooltip {...props}
+           type="error"/>
 )
 
-export default TooltipComponent
+export default Tooltip
