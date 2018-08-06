@@ -21,7 +21,7 @@ const nodeDefTypeIcons = {
   [nodeDefType.entity]: <span className="icon icon-table2 icon-left"/>,
 }
 
-class FormActionsComponent extends React.Component {
+class FormActions extends React.Component {
   constructor () {
     super()
     this.state = {opened: true}
@@ -104,4 +104,4 @@ class FormActionsComponent extends React.Component {
 
 }
 
-export default connect(null, {createNodeDef})(FormActionsComponent)
+export default connect(null, {createNodeDef})(FormActions)

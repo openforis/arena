@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import DropdownComponent from './dropdownComponent'
+import Dropdown from './dropdown'
 
 const Chip = ({item, onDelete, idx, canBeRemoved}) => (
   <div className="form-input"
@@ -30,7 +30,7 @@ const Chip = ({item, onDelete, idx, canBeRemoved}) => (
   </div>
 )
 
-const FormInputChipsComponent = ({items, selection, onChange, requiredItems = 0, dropdownAutocompleteMinChars = 0}) => {
+const InputChips = ({items, selection, onChange, requiredItems = 0, dropdownAutocompleteMinChars = 0}) => {
 
   const onDropdownChange = (item) => {
     if (item) {
@@ -60,12 +60,12 @@ const FormInputChipsComponent = ({items, selection, onChange, requiredItems = 0,
               canBeRemoved={selection.length > requiredItems}/>
       )
     }
-    <DropdownComponent items={dropdownItems}
-                       onChange={onDropdownChange}
-                       selection={null}
-                       clearOnSelection={true}
-                       autocompleteMinChars={dropdownAutocompleteMinChars} />
+    <Dropdown items={dropdownItems}
+              onChange={onDropdownChange}
+              selection={null}
+              clearOnSelection={true}
+              autocompleteMinChars={dropdownAutocompleteMinChars} />
   </div>
 }
 
-export default FormInputChipsComponent
+export default InputChips

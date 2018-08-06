@@ -2,10 +2,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { FormInput } from '../../../commonComponents/formInputComponents'
-import FormInputChipsComponent from '../../../commonComponents/formInputChipsComponent'
-import LabelsEditorComponent from '../../../survey/components/labelsEditorComponent'
-import LanguagesEditorComponent from '../../../survey/components/languagesEditorComponent'
+import { Input } from '../../../commonComponents/form/input'
+import InputChips from '../../../commonComponents/form/inputChips'
+import LabelsEditorComponent from '../../../survey/components/labelsEditor'
+import LanguagesEditorComponent from '../../../survey/components/languagesEditor'
 
 import {
   getSurveyDescriptions,
@@ -39,8 +39,8 @@ class SurveyInfoComponent extends React.Component {
 
         <div className="form-item">
           <label className="form-label">Name</label>
-          <FormInput value={survey.props.name}
-                     onChange={e => this.updateSurveyProp('name', normalizeName(e.target.value))}/>
+          <Input value={survey.props.name}
+                 onChange={e => this.updateSurveyProp('name', normalizeName(e.target.value))}/>
 
         </div>
 
@@ -48,10 +48,10 @@ class SurveyInfoComponent extends React.Component {
 
         <div className="form-item">
           <label className="form-label">SRS</label>
-          <FormInputChipsComponent selection={surveySrs}
-                                   items={srs}
-                                   dropdownAutocompleteMinChars={3}
-                                   onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>
+          <InputChips selection={surveySrs}
+                      items={srs}
+                      dropdownAutocompleteMinChars={3}
+                      onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>
         </div>
 
         <LabelsEditorComponent labels={getSurveyLabels(survey)}

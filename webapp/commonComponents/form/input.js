@@ -2,16 +2,16 @@ import './form.scss'
 
 import React from 'react'
 
-import { TooltipError } from './tooltipComponent'
+import { TooltipError } from '../tooltip'
 
-export const FormItemComponent = ({label, children}) => (
+export const FormItem = ({label, children}) => (
   <div className="form-item">
     <label className="form-label">{label}</label>
     {children}
   </div>
 )
 
-export class FormInput extends React.Component {
+export class Input extends React.Component {
 
   render () {
 

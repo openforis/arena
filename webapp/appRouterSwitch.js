@@ -12,8 +12,8 @@ import { appState, isLocationLogin, loginUri } from './app/app'
 import loginAnimation from './login/components/loginAnimation'
 import appAnimation from './app/components/appAnimation'
 
-import LoginView from './login/loginView'
-import AppView from './app/appView'
+import LoginView from './login/components/loginView'
+import AppView from './app/components/appView'
 
 class AppRouterSwitch extends React.Component {
 

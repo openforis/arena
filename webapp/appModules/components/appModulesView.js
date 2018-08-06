@@ -1,17 +1,17 @@
-import './style.scss'
+import '../style.scss'
 
 import React from 'react'
 import { TransitionGroup } from 'react-transition-group'
 
-import ModuleViewTransitionComponent from './components/moduleViewTransitionComponent'
+import ModuleViewTransitionComponent from './moduleViewTransitionComponent'
 
-import { appModules } from './appModules'
-import { getLocationPathname } from '../appUtils/routerUtils'
+import { appModules } from '../appModules'
+import { getLocationPathname } from '../../appUtils/routerUtils'
 
-import AppHomeView from './home/appHomeView'
-import SurveyDashboardView from './surveyDashboard/surveyDashboardView'
-import DataExplorerView from './dataExplorer/dataExplorerView'
-import SurveyDesignerView from './surveyDesigner/surveyDesignerView'
+import AppHomeView from '../home/appHomeView'
+import SurveyDashboardView from '../surveyDashboard/surveyDashboardView'
+import DataExplorerView from '../dataExplorer/dataExplorerView'
+import SurveyDesignerView from '../surveyDesigner/surveyDesignerView'
 
 const appModulesComponents = {
   [appModules.home]: AppHomeView,

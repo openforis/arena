@@ -8,9 +8,9 @@ import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/
 import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
-import { FormInput } from '../../commonComponents/formInputComponents'
+import { Input } from '../../commonComponents/form/input'
 
-import LanguageDropdownComponent from '../../commonComponents/languageDropdownComponent'
+import LanguageDropdown from '../../commonComponents/form/languageDropdown'
 
 class AppHomeView extends React.Component {
 
@@ -69,20 +69,20 @@ class AppHomeView extends React.Component {
           gridColumnGap: '2rem',
         }}>
 
-          <FormInput placeholder="Name"
-                     value={name}
-                     validation={R.path(['fields', 'name'])(validation)}
-                     onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
+          <Input placeholder="Name"
+                 value={name}
+                 validation={R.path(['fields', 'name'])(validation)}
+                 onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
 
-          <FormInput placeholder="Label"
-                     value={label}
-                     validation={R.path(['fields', 'label'])(validation)}
-                     onChange={e => updateNewSurveyProp('label', e.target.value)}/>
+          <Input placeholder="Label"
+                 value={label}
+                 validation={R.path(['fields', 'label'])(validation)}
+                 onChange={e => updateNewSurveyProp('label', e.target.value)}/>
 
-          <LanguageDropdownComponent placeholder="Language"
-                             selection={lang}
-                             onChange={e => updateNewSurveyProp('lang', e)}
-                             validation={R.path(['fields', 'lang'])(validation)}/>
+          <LanguageDropdown placeholder="Language"
+                            selection={lang}
+                            onChange={e => updateNewSurveyProp('lang', e)}
+                            validation={R.path(['fields', 'lang'])(validation)}/>
 
           <button className="btn btn-of-light"
                   onClick={this.createSurvey}>

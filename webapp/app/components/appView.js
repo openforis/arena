@@ -1,9 +1,9 @@
-import './style.scss'
+import '../style.scss'
 
 import React from 'react'
 
-import AppSideBar from './components/appSideBarComponent'
-import AppModulesView from '../appModules/appModulesView'
+import AppSideBar from './sideBar/appSideBar'
+import AppModulesView from '../../appModules/components/appModulesView'
 
 const AppView = (props) => (
 

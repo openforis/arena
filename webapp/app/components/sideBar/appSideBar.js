@@ -1,13 +1,52 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { appState } from '../app'
-import { getCurrentSurvey } from '../../survey/surveyState'
-import { logout } from '../actions'
+import { appModules } from '../../../appModules/appModules'
+import { appState } from '../../app'
+import { getCurrentSurvey } from '../../../survey/surveyState'
+import { logout } from '../../actions'
 
-import { AppSideBarFooter, AppSideBarModules } from './appSideBar'
+import AppSideBarFooter from './appSideBarFooter'
+import AppSideBarModules from './appSideBarModules'
 
-class AppSideBarComponent extends React.Component {
+const appModulesSideBar = [
+  {
+    module: appModules.home,
+    icon: 'home2',
+    label: 'Home',
+  },
+  {
+    module: appModules.surveyDashboard,
+    icon: 'office',
+    label: 'Dashboard',
+  },
+  {
+    module: appModules.surveyDesigner,
+    icon: 'quill',
+    label: 'Designer',
+  },
+  {
+    module: appModules.dataExplorer,
+    icon: 'table2',
+    label: 'Data',
+    disabled: true,
+  },
+  {
+    module: appModules.dataAnalysis,
+    icon: 'calculator',
+    label: 'Analysis',
+    disabled: true,
+  },
+  {
+    module: appModules.users,
+    icon: 'users',
+    label: 'Users',
+    disabled: true,
+  },
+]
+
+
+class AppSideBar extends React.Component {
 
   constructor () {
     super()
@@ -45,7 +84,7 @@ class AppSideBarComponent extends React.Component {
           </a>
         </div>
 
-        <AppSideBarModules {...this.props} opened={opened}/>
+        <AppSideBarModules {...this.props} modules={appModulesSideBar} opened={opened}/>
 
         <AppSideBarFooter {...this.props} opened={opened}/>
 
@@ -60,4 +99,4 @@ const mapStateToProps = state => ({
   survey: getCurrentSurvey(state)
 })
 
-export default connect(mapStateToProps, {logout})(AppSideBarComponent)
+export default connect(mapStateToProps, {logout})(AppSideBar)

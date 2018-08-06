@@ -5,10 +5,10 @@ import ReactDOM from 'react-dom'
 
 import * as R from 'ramda'
 
-import { clickedOutside, elementOffset } from '../appUtils/domUtils'
-import { FormInput } from './formInputComponents'
+import { clickedOutside, elementOffset } from '../../appUtils/domUtils'
+import { Input } from './input'
 
-class DropdownComponent extends React.Component {
+class Dropdown extends React.Component {
 
   constructor (props) {
     super(props)
@@ -222,13 +222,13 @@ class DropdownComponent extends React.Component {
                 style={style}
                 ref="dropdown"
                 onBlur={e => this.onBlur(e)}>
-      <FormInput placeholder={placeholder}
-                 value={displayValue}
-                 validation={validation}
-                 ref="dropdownInput"
-                 onChange={e => this.onInputChange(e)}
-                 onFocus={e => this.onInputFocus(e)}
-                 onKeyDown={e => this.onInputKeyDown(e)}/>
+      <Input placeholder={placeholder}
+             value={displayValue}
+             validation={validation}
+             ref="dropdownInput"
+             onChange={e => this.onInputChange(e)}
+             onFocus={e => this.onInputFocus(e)}
+             onKeyDown={e => this.onInputKeyDown(e)}/>
 
       <span className="icon icon-menu2 icon-24px"
             onClick={() => this.toggleOpened()}></span>
@@ -259,9 +259,9 @@ class DropdownComponent extends React.Component {
   }
 }
 
-DropdownComponent.defaultProps = {
+Dropdown.defaultProps = {
   clearOnSelection: false,
   autocompleteMinChars: 0
 }
 
-export default DropdownComponent
+export default Dropdown

@@ -7,7 +7,7 @@ import { getCurrentSurvey } from '../surveyState'
 import { getSurveyLanguages, } from '../../../common/survey/survey'
 import { getLanguageLabel } from '../../../common/app/languages'
 
-import { FormInput } from '../../commonComponents/formInputComponents'
+import { Input } from '../../commonComponents/form/input'
 
 const LabelBadge = ({lang}) => (
   <h6 className="badge-of"
@@ -27,8 +27,8 @@ const LabelRow = ({label = '', lang, onChange}) => (
 
     <LabelBadge lang={lang}/>
 
-    <FormInput value={label}
-               onChange={e => onChange({
+    <Input value={label}
+           onChange={e => onChange({
                    lang,
                    label: e.target.value
                  }
@@ -36,7 +36,7 @@ const LabelRow = ({label = '', lang, onChange}) => (
   </div>
 )
 
-class LabelsEditorComponent extends React.Component {
+class LabelsEditor extends React.Component {
 
   isPreview () {
     const {preview} = this.state || {preview: true}
@@ -98,7 +98,7 @@ class LabelsEditorComponent extends React.Component {
 
 }
 
-LabelsEditorComponent.defaultProps = {
+LabelsEditor.defaultProps = {
   languages: [],
 }
 
@@ -106,4 +106,4 @@ const mapStateToProps = state => ({
   languages: getSurveyLanguages(getCurrentSurvey(state))
 })
 
-export default connect(mapStateToProps,)(LabelsEditorComponent)
+export default connect(mapStateToProps,)(LabelsEditor)

@@ -1,14 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import FormInputChipsComponent from '../../commonComponents/formInputChipsComponent'
+import InputChips from '../../commonComponents/form/inputChips'
 
 import { getCurrentSurvey } from '../surveyState'
 import { updateSurveyProp } from '../actions'
 import { getLanguageLabel, languages } from '../../../common/app/languages'
 import { getSurveyLanguages } from '../../../common/survey/survey'
 
-class LanguagesEditorComponent extends React.Component {
+class LanguagesEditor extends React.Component {
 
   onLanguagesChange (items) {
     const newLanguages = items.map(i => i.key)
@@ -24,10 +24,10 @@ class LanguagesEditorComponent extends React.Component {
 
     return <div className="form-item">
       <label className="form-label">Language(s)</label>
-      <FormInputChipsComponent items={languages}
-                               selection={selection}
-                               onChange={(selectedItems) => this.onLanguagesChange(selectedItems)}
-                               requiredItems={1}/>
+      <InputChips items={languages}
+                  selection={selection}
+                  onChange={(selectedItems) => this.onLanguagesChange(selectedItems)}
+                  requiredItems={1}/>
     </div>
   }
 }
@@ -41,7 +41,7 @@ export default connect(
   {
     updateSurveyProp,
   }
-)(LanguagesEditorComponent)
+)(LanguagesEditor)
 
 
 
