@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { FormInput } from '../../../commonComponents/formInputComponents'
+import { FormInput } from '../../../commonComponents/formInput'
 import FormInputChipsComponent from '../../../commonComponents/formInputChipsComponent'
 import LabelsEditorComponent from '../../../survey/components/labelsEditor'
 import LanguagesEditorComponent from '../../../survey/components/languagesEditor'

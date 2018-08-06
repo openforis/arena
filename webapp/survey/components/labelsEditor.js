@@ -7,7 +7,7 @@ import { getCurrentSurvey } from '../surveyState'
 import { getSurveyLanguages, } from '../../../common/survey/survey'
 import { getLanguageLabel } from '../../../common/app/languages'
 
-import { FormInput } from '../../commonComponents/formInputComponents'
+import { FormInput } from '../../commonComponents/formInput'
 
 const LabelBadge = ({lang}) => (
   <h6 className="badge-of"

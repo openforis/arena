@@ -8,7 +8,7 @@ import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/
 import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
-import { FormInput } from '../../commonComponents/formInputComponents'
+import { FormInput } from '../../commonComponents/formInput'
 
 import LanguageDropdownComponent from '../../commonComponents/languageDropdownComponent'
 

@@ -6,9 +6,9 @@ import ReactDOM from 'react-dom'
 import * as R from 'ramda'
 
 import { clickedOutside, elementOffset } from '../appUtils/domUtils'
-import { FormInput } from './formInputComponents'
+import { FormInput } from './formInput'
 
-class DropdownComponent extends React.Component {
+class Dropdown extends React.Component {
 
   constructor (props) {
     super(props)
@@ -259,9 +259,9 @@ class DropdownComponent extends React.Component {
   }
 }
 
-DropdownComponent.defaultProps = {
+Dropdown.defaultProps = {
   clearOnSelection: false,
   autocompleteMinChars: 0
 }
 
-export default DropdownComponent
+export default Dropdown
