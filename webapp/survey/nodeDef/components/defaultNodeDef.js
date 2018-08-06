@@ -8,7 +8,7 @@ class DefaultNodeDef extends React.Component {
     const {nodeDef, draft, edit} = this.props
 
     return (
-      <FormItem label={`nodeName: ${nodeDef.props.name}`}>
+      <FormItem label={nodeDef.props.name}>
         <Input readOnly={edit}/>
       </FormItem>
     )

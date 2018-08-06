@@ -61,7 +61,7 @@ class EntityDef extends React.Component {
         //TODO ? isRenderForm(nodeDef)
         <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                               cols={{lg: columns, md: columns, sm: columns, xs: 1, xxs: 1}}
-                              rowHeight={60}
+                              rowHeight={50}
                               autoSize={false}
                               containerPadding={edit ? [20, 50] : [20, 20]}
                               onLayoutChange={(layout) => console.log(window.innerWidth) ||
