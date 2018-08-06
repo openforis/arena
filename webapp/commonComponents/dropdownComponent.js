@@ -93,18 +93,15 @@ class DropdownComponent extends React.Component {
 
     const searchValue = R.trim(value)
 
-    let filteredItems
-    if (autocompleteMinChars <= 0 && searchValue.length === 0) {
-      filteredItems = items
-    } else if (autocompleteMinChars > 0 &&
-      (searchValue.length === 0 || searchValue.length < autocompleteMinChars)) {
-      filteredItems = []
-    } else {
-      filteredItems = items.filter(item => item.key
-        ? contains(searchValue, item.key) || contains(searchValue, item.value)
-        : contains(searchValue, item)
-      )
-    }
+    const filteredItems =
+      autocompleteMinChars <= 0 && searchValue.length === 0 ?
+        items
+        : autocompleteMinChars > 0 && searchValue.length < autocompleteMinChars ?
+          []
+          : items.filter(item => item.key
+              ? contains(searchValue, item.key) || contains(searchValue, item.value)
+              : contains(searchValue, item)
+            )
 
     this.setState({
       items: filteredItems,
