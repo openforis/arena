@@ -1,11 +1,10 @@
 import React from 'react'
-import * as R from 'ramda'
 
 import Dropdown from './dropdown'
 
 import { getLanguageLabel, languages } from '../../common/app/languages'
 
-const LanguageDropdownComponent = (props) => {
+const LanguageDropdown = (props) => {
 
   const {selection, onChange, validation} = props
 
@@ -21,4 +20,4 @@ const LanguageDropdownComponent = (props) => {
 
 }
 
-export default LanguageDropdownComponent
+export default LanguageDropdown
