@@ -1,7 +1,5 @@
-import * as R from 'ramda'
-
-import codes from '@esri/proj-codes'
-
+const R = require('ramda')
+const codes = require('@esri/proj-codes')
 /**
  * Projected coordinate reference systems indexed by EPSG code
  * format: {epgsCode: {name:"CRS name", wkt: "Well Know Text"}}
