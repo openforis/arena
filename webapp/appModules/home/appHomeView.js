@@ -8,9 +8,9 @@ import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/
 import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
-import { FormInput } from '../../commonComponents/formInput'
+import { FormInput } from '../../commonComponents/form/formInput'
 
-import LanguageDropdown from '../../commonComponents/languageDropdown'
+import LanguageDropdown from '../../commonComponents/form/languageDropdown'
 
 class AppHomeView extends React.Component {
 

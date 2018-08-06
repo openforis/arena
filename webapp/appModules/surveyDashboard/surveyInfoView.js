@@ -6,7 +6,7 @@ import DataFetchComponent from '../components/moduleDataFetchComponent'
 import { appState } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 
-import Dropdown from '../../commonComponents/dropdown'
+import Dropdown from '../../commonComponents/form/dropdown'
 
 class SurveyInfoView extends React.Component {
 

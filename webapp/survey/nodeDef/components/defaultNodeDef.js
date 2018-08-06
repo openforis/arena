@@ -1,5 +1,5 @@
 import React from 'react'
-import { FormInput, FormItem } from '../../../commonComponents/formInput'
+import { FormInput, FormItem } from '../../../commonComponents/form/formInput'
 
 class DefaultNodeDef extends React.Component {
 

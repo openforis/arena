@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom'
 
 import * as R from 'ramda'
 
-import { clickedOutside, elementOffset } from '../appUtils/domUtils'
+import { clickedOutside, elementOffset } from '../../appUtils/domUtils'
 import { FormInput } from './formInput'
 
 class Dropdown extends React.Component {

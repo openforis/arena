@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { FormInput, FormItem } from '../../../../commonComponents/formInput'
-import Dropdown from '../../../../commonComponents/dropdown'
+import { FormInput, FormItem } from '../../../../commonComponents/form/formInput'
+import Dropdown from '../../../../commonComponents/form/dropdown'
 import LabelsEditor from '../../labelsEditor'
 
 import {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import FormInputChipsComponent from '../../commonComponents/formInputChipsComponent'
+import FormInputChipsComponent from '../../commonComponents/form/formInputChipsComponent'
 
 import { getCurrentSurvey } from '../surveyState'
 import { updateSurveyProp } from '../actions'

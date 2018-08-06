@@ -2,7 +2,7 @@ import React from 'react'
 
 import Dropdown from './dropdown'
 
-import { getLanguageLabel, languages } from '../../common/app/languages'
+import { getLanguageLabel, languages } from '../../../common/app/languages'
 
 const LanguageDropdown = (props) => {
 
