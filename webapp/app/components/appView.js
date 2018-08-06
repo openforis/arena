@@ -3,7 +3,7 @@ import '../style.scss'
 import React from 'react'
 
 import AppSideBar from './sideBar/appSideBar'
-import AppModulesView from '../../appModules/appModulesView'
+import AppModulesView from '../../appModules/components/appModulesView'
 
 const AppView = (props) => (
 
