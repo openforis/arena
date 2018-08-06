@@ -7,16 +7,18 @@ $blue2: #defbff;
 $pink: #f9e1e2;
 //$yellow: #debf32;
 $yellow: #d6c990;
-$green:#3b4e3e;
+$yellowDark: #191907;
+$green: #3b4e3e;
 $grey: #d7d7d7;
+$greyDark: #2b2a28;
 $brown: #17150f;
 //$black: #202324;
 $black: #343736;
 
 //z-indexes
-$zIndex1App: 10;
-$zIndex10Dropdown: 10;
-
+$zIndex1App: 1;
+$zIndex10TopOfApp: 10;
+$zIndex20Dropdown: 20;
 
 //OF style
 $ofBorderColor: rgba($white, .6) !important;
@@ -26,7 +28,7 @@ $ofBorderColorLight: rgba($white, .4) !important;
 $ofBorderColorLightS: rgba($white, .2) !important;
 $ofBorderColorLightXs: rgba($white, .1) !important;
 
-@mixin of(){
+@mixin of() {
   border-radius: $ofBorderRadius;
   border: $ofBorder;
 }

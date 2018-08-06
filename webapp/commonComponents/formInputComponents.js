@@ -4,12 +4,20 @@ import React from 'react'
 
 import { TooltipError } from './tooltipComponent'
 
+export const FormItemComponent = ({label, children}) => (
+  <div className="form-item">
+    <label className="form-label">{label}</label>
+    {children}
+  </div>
+)
+
 export class FormInput extends React.Component {
 
   render () {
 
     const {
       validation = {},
+      disabled = false,
       ...inputProps,
     } = this.props
 
@@ -20,6 +28,7 @@ export class FormInput extends React.Component {
 
         <input className={`form-input ${valid ? '' : ' error'}`}
                ref="input"
+               aria-disabled={disabled}
                {...inputProps}/>
 
       </TooltipError>

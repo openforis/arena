@@ -1,8 +1,11 @@
 import axios from 'axios'
 
-import { newNodeDef } from '../../common/survey/nodeDef'
-import { getCurrentSurveyId } from './surveyState'
+import { newNodeDef } from '../../../common/survey/nodeDef'
+import { getCurrentSurveyId } from '../surveyState'
 
+/**
+ * ==== NODE DEFS
+ */
 export const nodeDefUpdate = 'nodeDef/update'
 export const nodeDefsUpdate = 'nodeDefs/update'
 export const nodeDefPropUpdate = 'nodeDef/prop/update'
@@ -14,6 +17,8 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
     const surveyId = getCurrentSurveyId(getState())
     const nodeDef = newNodeDef(surveyId, parentId, type, props)
     dispatch({type: nodeDefUpdate, nodeDef})
+    //setting current editing nodeDef
+    dispatch(setFormNodDefEdit(nodeDef))
 
     const {data} = await axios.post(`/api/nodeDef`, nodeDef)
     dispatch({type: nodeDefUpdate, ...data})
@@ -38,8 +43,28 @@ export const fetchNodeDefChildren = (id, draft = false) => async dispatch => {
 // ==== UPDATE
 export const putNodeDefProp = (nodeDef, key, value) => async dispatch => {
   dispatch({type: nodeDefPropUpdate, nodeDefUUID: nodeDef.uuid, key, value})
-  try {
-    await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
-  } catch (e) { }
+  dispatch(_putNodeDefProp(nodeDef, key, value))
 }
 
+const _putNodeDefProp = (nodeDef, key, value) => {
+  const dispatched = async dispatch => {
+    try {
+      await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
+    } catch (e) { }
+  }
+
+  dispatched.meta = {
+    debounce: {
+      time: 1000,
+      key: `${nodeDefPropUpdate}_${key}`
+    }
+  }
+  return dispatched
+}
+
+/**
+ * ==== SURVEY-FORM EDIT MODE - NODE DEFS
+ */
+export const formNodeDefEditUpdate = 'survey/form/nodeDefEdit/update'
+
+export const setFormNodDefEdit = nodeDef => dispatch => dispatch({type: formNodeDefEditUpdate, nodeDef})

@@ -1,11 +1,16 @@
+import './form/surveyForm.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
-import FormComponent from './form/formComponent'
+import FormNavigationComponent from './form/formNavigationComponent'
 import FormActionsComponent from './form/formActionsComponent'
 
 import { getCurrentSurvey, getRootNodeDef, getSurveyState } from '../surveyState'
 import { fetchRootNodeDef } from '../actions'
+
+import NodeDefEditComponent from './form/nodeDefEdit/nodeDefEditComponent'
+import NodeDefSwitchComponent from '../nodeDef/components/nodeDefSwitchComponent'
 
 class SurveyFormView extends React.Component {
 
@@ -15,18 +20,28 @@ class SurveyFormView extends React.Component {
   }
 
   render () {
-    const {nodeDef, edit = false, draft = false} = this.props
+    const {nodeDef, edit, draft} = this.props
 
     return (
-      edit
-        ? <div style={{
-          display: 'grid',
-          gridTemplateColumns: '.8fr .2fr',
-        }}>
-          <FormComponent nodeDef={nodeDef} draft={draft} edit={true}/>
-          <FormActionsComponent nodeDef={nodeDef}/>
-        </div>
-        : <FormComponent nodeDef={nodeDef} draft={draft} edit={false}/>
+      nodeDef ?
+        <React.Fragment>
+
+          <NodeDefEditComponent/>
+
+          <div className={`survey-form${edit ? ' edit' : ''}`}>
+
+            <FormNavigationComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
+
+            <NodeDefSwitchComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
+
+            {
+              edit
+                ? <FormActionsComponent nodeDef={nodeDef}/>
+                : null
+            }
+          </div>
+        </React.Fragment>
+        : null
     )
   }
 
@@ -34,11 +49,11 @@ class SurveyFormView extends React.Component {
 
 SurveyFormView.defaultProps = {
   //root entity
-  nodeDef: {
-    props: {
-      layout: {},
-    }
-  },
+  nodeDef: null,
+  // can edit form
+  edit: false,
+  // load draft props
+  draft: false,
 }
 
 const mapStateToProps = state => ({

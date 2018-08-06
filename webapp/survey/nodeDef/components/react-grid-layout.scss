@@ -1,4 +1,4 @@
-@import "../../../../style/vars";
+@import "../../../style/vars";
 
 .react-grid-layout {
   position: relative;
@@ -11,8 +11,6 @@
 .react-grid-item {
   transition: all 200ms ease;
   transition-property: left, top;
-
-  border: 1px dashed rgba($white, .4);
 }
 
 .react-grid-item.cssTransforms {
@@ -31,7 +29,7 @@
 }
 
 .react-grid-item.react-grid-placeholder {
-  background: rgba($blue1,0.3);
+  background: rgba($blue1, 0.5);
   opacity: 0.2;
   transition-duration: 100ms;
   z-index: 2;

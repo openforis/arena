@@ -1,21 +1,20 @@
 const db = require('../db/db')
 
 const {uuidv4} = require('../../common/uuid')
-const {entityDefRenderType} = require('../../common/survey/nodeDef')
 
 const {setUserPref} = require('../user/userRepository')
 const {userPrefNames} = require('../user/userPrefs')
 
 const {
   createEntityDef,
-  fetchNodeDefsByParentId,
   dbTransformCallback,
   nodeDefSelectFields,
 } = require('../nodeDef/nodeDefRepository')
 
 const {
-  entityDefLayoutProps
-} = require('../../common/survey/entityDefLayout')
+  nodeDefLayoutProps,
+  nodeDefRenderType,
+} = require('../../common/survey/nodeDefLayout')
 
 // ============== CREATE
 
@@ -36,10 +35,10 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
 
     const rootEntityDefProps = {
       name: 'root_entity',
-      label: 'Root entity',
+      labels: {[lang]: 'Root entity'},
       multiple: false,
-      [entityDefLayoutProps.pageUUID]: uuidv4(),
-      [entityDefLayoutProps.render]: entityDefRenderType.form,
+      [nodeDefLayoutProps.pageUUID]: uuidv4(),
+      [nodeDefLayoutProps.render]: nodeDefRenderType.form,
     }
     await createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 

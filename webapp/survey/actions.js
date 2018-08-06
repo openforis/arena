@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import { setSurveyProp } from '../../common/survey/survey'
 
 import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey } from './surveyState'
-import { nodeDefUpdate } from './nodeDefActions'
+import { nodeDefUpdate } from './nodeDef/actions'
 
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyNewUpdate = 'survey/new/update'

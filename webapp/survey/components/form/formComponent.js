@@ -1,23 +1,27 @@
+import './surveyForm.scss'
+
 import React from 'react'
-import EntityDefComponent from './nodeDef/entityDefComponent'
+
+import NodeDefEditComponent from './nodeDefEdit/nodeDefEditComponent'
+import NodeDefSwitchComponent from '../../nodeDef/components/nodeDefSwitchComponent'
 
 const FormComponent = (props) => {
-
   const {nodeDef, edit, draft} = props
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateRows: '40px 1fr',
-    }}>
+    <React.Fragment>
+      <NodeDefEditComponent/>
 
-      {/*//tab navigation*/}
-      {/*<FormHeadersComponent entityDef={entityDef}/>*/}
-      <div>PAGES</div>
+      <div className="survey-form">
 
-      {/*//current page*/}
-      <EntityDefComponent nodeDef={nodeDef} edit={edit} draft={draft}/>
-    </div>
+        {/*//tab navigation*/}
+        {/*<FormHeadersComponent entityDef={entityDef}/>*/}
+        <div>PAGES</div>
+
+        {/*//current page*/}
+        <NodeDefSwitchComponent nodeDef={nodeDef} edit={edit} draft={draft} render={}/>
+      </div>
+    </React.Fragment>
   )
 
 }

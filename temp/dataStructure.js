@@ -2,17 +2,15 @@ const {
   nodeDefType,
 } = require('../common/survey/nodeDef')
 
-const id = -1
+const id = "-1"
 
 const nodeDef = {
   id,
   uuid: null,
-
-  dateCreated: null,
-  dateModified: null,
-
   parentId: id,
   type: null, //nodeDefType
+  dateCreated: null,
+  dateModified: null,
 
   props: {
     name: '',
@@ -30,29 +28,16 @@ const nodeDef = {
     applicableIf: null,//expr
     minCount: null,//int
     maxCount: null,//int
-    codeListId: id,
 
-    // common layout
+    // nodeDefTypes
 
-  },
+    // entity:
+    ///layout
+    pageUUID: null, // uuid - if this entity renders in its own page
+    render: 'form', //|| table
+    layout: [],// rect-grid-layout layout value
 
-  propsDraft: {}
-}
-
-const attributeDef = {
-  ...nodeDef,
-  type: nodeDefType.attribute,
-
-  props: {
-    ...nodeDef.props,
-    type: null,
-    key: null,//boolean
-    defaultValues: [
-      {
-        condition: '',
-        value: ''
-      },
-    ],
+    // not entity:
     min: null,
     max: null,
     minInclusive: null,
@@ -60,24 +45,10 @@ const attributeDef = {
     regex: null,
     maxDistance: null,
     calculated: null, //boolean
+    codeListId: id,//
   },
 
-}
-
-const entityDef = {
-  ...nodeDef,
-  type: nodeDefType.entity,
-
-  props: {
-    ...nodeDef.props,
-    renderType: '',//entityDefRenderType.table,
-
-    ///layout
-    pageUUID: null, // uuid - if this entity renders in its own page
-    render: 'form', //|| table
-    layout: []// rect-grid-layout layout value
-  },
-
+  propsDraft: {}
 }
 
 const survey = {

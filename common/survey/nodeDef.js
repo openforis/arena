@@ -1,42 +1,29 @@
 const R = require('ramda')
 const {uuidv4} = require('../uuid')
 
-// const {
-//   getProps,
-//   getProp,
-//   getLabels,
-//
-//   setProp,
-// } = require('./surveyUtils')
+const {
+  // getProps,
+  getProp,
+  getLabels,
+
+  // setProp,
+} = require('./surveyUtils')
 
 // ======== NODE DEF PROPERTIES
 
 const nodeDefType = {
-  attribute: 'attribute',
-  entity: 'entity',
-}
-
-const attributeDefType = {
   integer: 'integer',
-  string: 'string',
   decimal: 'decimal',
+  string: 'string',
+  date: 'date',
+  time: 'time',
   boolean: 'boolean',
   codeList: 'codeList',
   coordinate: 'coordinate',
   taxon: 'taxon',
+  file: 'file',
+  entity: 'entity',
 }
-
-const entityDefRenderType = {
-  form: 'form',
-  table: 'table',
-}
-
-// ==== READ
-
-const isNodeDefType = type => R.propEq('type', type)
-
-const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
-const isNodeDefAttribute = isNodeDefType(nodeDefType.attribute)
 
 // ==== CREATE
 
@@ -48,29 +35,21 @@ const newNodeDef = (surveyId, parentId, type, props) => ({
   props,
 })
 
-const newEntityDef = (surveyId, parentId, props) => newNodeDef(surveyId, parentId, nodeDefType.entity, props)
-
-const newAttributeDef = (surveyId, parentId, props) => newNodeDef(surveyId, parentId, nodeDefType.attribute, props)
-
 // ==== UPDATE
 
 module.exports = {
   nodeDefType,
-  attributeDefType,
-  entityDefRenderType,
+  getNodeDefType: R.prop('type'),
 
 // props
 //   getNodeDefProps: getProps,
-//   getNodeDefProp: getProp,
+  getNodeDefProp: getProp,
 //   setNodeDefProp: setProp,
-//   getNodeDefLabels: getLabels,
+  getNodeDefLabels: getLabels,
+  getNodeDefDescriptions: getProp('descriptions', {}),
 
   // READ
-  isNodeDefAttribute,
-  isNodeDefEntity,
 
   //CREATE
   newNodeDef,
-  newEntityDef,
-  newAttributeDef,
 }
