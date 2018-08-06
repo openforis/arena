@@ -1,9 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { FormInput, FormItemComponent } from '../../../../commonComponents/formInputComponents'
-import DropdownComponent from '../../../../commonComponents/dropdownComponent'
-import FormLabelsEditorComponent from '../../labelsEditorComponent'
+import { FormInput, FormItem } from '../../../../commonComponents/formInputComponents'
+import Dropdown from '../../../../commonComponents/dropdownComponent'
+import LabelsEditor from '../../labelsEditor'
 
 import {
   nodeDefType,
@@ -24,7 +24,7 @@ const attributeTypes = [
 
 ]
 
-class CommonPropsComonent extends React.Component {
+class CommonProps extends React.Component {
 
   render () {
     const {nodeDef, putNodeDefProp} = this.props
@@ -32,26 +32,26 @@ class CommonPropsComonent extends React.Component {
     return (
       <React.Fragment>
 
-        <FormItemComponent label={'name'}>
+        <FormItem label={'name'}>
           <FormInput value={getNodeDefProp('name', '')(nodeDef)}
                      onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
-        </FormItemComponent>
+        </FormItem>
 
-        <FormItemComponent label={'type'}>
-          <DropdownComponent items={attributeTypes}/>
-        </FormItemComponent>
+        <FormItem label={'type'}>
+          <Dropdown items={attributeTypes}/>
+        </FormItem>
 
-        <FormLabelsEditorComponent labels={getNodeDefLabels(nodeDef)}
+        <LabelsEditor labels={getNodeDefLabels(nodeDef)}
           // onChange={(item) => this.onPropsChange(item, 'labels', getSurveyLabels(survey))}/>
-                                   onChange={(item) => console.log(item)}/>
-        <FormLabelsEditorComponent formLabel="Description(s)"
-                                   labels={getNodeDefDescriptions(nodeDef)}
+                      onChange={(item) => console.log(item)}/>
+        <LabelsEditor formLabel="Description(s)"
+                      labels={getNodeDefDescriptions(nodeDef)}
           // onChange={(item) => this.onPropsChange(item, 'labels', getSurveyLabels(survey))}/>
-                                   onChange={(item) => console.log(item)}/>
+                      onChange={(item) => console.log(item)}/>
       </React.Fragment>
     )
   }
 
 }
 
-export default connect(null, {putNodeDefProp})(CommonPropsComonent)
+export default connect(null, {putNodeDefProp})(CommonProps)

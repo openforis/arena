@@ -8,7 +8,7 @@ import { updateSurveyProp } from '../actions'
 import { getLanguageLabel, languages } from '../../../common/app/languages'
 import { getSurveyLanguages } from '../../../common/survey/survey'
 
-class LanguagesEditorComponent extends React.Component {
+class LanguagesEditor extends React.Component {
 
   onLanguagesChange (items) {
     const newLanguages = items.map(i => i.key)
@@ -41,7 +41,7 @@ export default connect(
   {
     updateSurveyProp,
   }
-)(LanguagesEditorComponent)
+)(LanguagesEditor)
 
 
 

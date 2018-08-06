@@ -4,7 +4,7 @@ import React from 'react'
 
 import { TooltipError } from './tooltipComponent'
 
-export const FormItemComponent = ({label, children}) => (
+export const FormItem = ({label, children}) => (
   <div className="form-item">
     <label className="form-label">{label}</label>
     {children}

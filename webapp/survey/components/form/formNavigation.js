@@ -19,7 +19,7 @@ const mapStateToProps = (state, props) => ({
 })
 const FormNavigationItemConnect = connect(mapStateToProps)(FormNavigationItem)
 
-const FormNavigationComponent = ({nodeDef}) => {
+const FormNavigation = ({nodeDef}) => {
 
   return (
     <div className="survey-form__nav" style={{
@@ -31,4 +31,4 @@ const FormNavigationComponent = ({nodeDef}) => {
   )
 }
 
-export default FormNavigationComponent
+export default FormNavigation

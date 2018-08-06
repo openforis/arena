@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
-import NodeDefSwitchComponent from './nodeDefSwitchComponent'
+import NodeDefSwitch from './nodeDefSwitch'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -21,7 +21,7 @@ import { getNodeDefChildren, getSurveyState } from '../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, } from '../actions'
 
-class EntityDefComponent extends React.Component {
+class EntityDef extends React.Component {
 
   componentDidMount () {
     const {nodeDef, fetchNodeDefChildren, draft} = this.props
@@ -81,7 +81,7 @@ class EntityDefComponent extends React.Component {
             filterInnerPageChildren(children)
               .map((childDef, i) =>
                 <div key={childDef.uuid}>
-                  <NodeDefSwitchComponent key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}/>
+                  <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}/>
                 </div>
               )
           }
@@ -94,7 +94,7 @@ class EntityDefComponent extends React.Component {
   }
 }
 
-EntityDefComponent.defaultProps = {
+EntityDef.defaultProps = {
   entityDef: {},
   draft: false,
   edit: false,
@@ -104,4 +104,4 @@ const mapStateToProps = (state, props) => ({
   children: getNodeDefChildren(props.nodeDef)(getSurveyState(state)),
 })
 
-export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren})(EntityDefComponent)
+export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren})(EntityDef)

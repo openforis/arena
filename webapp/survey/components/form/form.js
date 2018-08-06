@@ -2,10 +2,10 @@ import './surveyForm.scss'
 
 import React from 'react'
 
-import NodeDefEditComponent from './nodeDefEdit/nodeDefEditComponent'
-import NodeDefSwitchComponent from '../../nodeDef/components/nodeDefSwitchComponent'
+import NodeDefEditComponent from './nodeDefEdit/nodeDefEdit'
+import NodeDefSwitchComponent from '../../nodeDef/components/nodeDefSwitch'
 
-const FormComponent = (props) => {
+const Form = (props) => {
   const {nodeDef, edit, draft} = props
 
   return (
@@ -26,4 +26,4 @@ const FormComponent = (props) => {
 
 }
 
-export default FormComponent
+export default Form

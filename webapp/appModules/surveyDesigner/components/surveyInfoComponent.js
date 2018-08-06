@@ -4,8 +4,8 @@ import * as R from 'ramda'
 
 import { FormInput } from '../../../commonComponents/formInputComponents'
 import FormInputChipsComponent from '../../../commonComponents/formInputChipsComponent'
-import LabelsEditorComponent from '../../../survey/components/labelsEditorComponent'
-import LanguagesEditorComponent from '../../../survey/components/languagesEditorComponent'
+import LabelsEditorComponent from '../../../survey/components/labelsEditor'
+import LanguagesEditorComponent from '../../../survey/components/languagesEditor'
 
 import {
   getSurveyDescriptions,

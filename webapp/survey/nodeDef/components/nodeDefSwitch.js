@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import DefaultNodeDefComponent from './defaultNodeDefComponent'
-import EntityDefComponent from './entityDefComponent'
+import DefaultNodeDef from './defaultNodeDef'
+import EntityDef from './entityDef'
 
 import { nodeDefType, getNodeDefType } from '../../../../common/survey/nodeDef'
 import {
@@ -15,10 +15,10 @@ import { isNodeDefRoot } from '../../surveyState'
 import { setFormNodDefEdit, putNodeDefProp } from '../actions'
 
 const nodeDefTypeComponents = {
-  [nodeDefType.entity]: EntityDefComponent,
+  [nodeDefType.entity]: EntityDef,
 }
 
-class NodeDefSwitchComponent extends React.Component {
+class NodeDefSwitch extends React.Component {
   componentDidMount () {
     const {nodeDef} = this.props
 
@@ -66,7 +66,7 @@ class NodeDefSwitchComponent extends React.Component {
 
       {
         React.createElement(
-          nodeDefTypeComponents[getNodeDefType(nodeDef)] || DefaultNodeDefComponent,
+          nodeDefTypeComponents[getNodeDefType(nodeDef)] || DefaultNodeDef,
           {nodeDef, draft, edit, render}
         )
       }
@@ -76,4 +76,4 @@ class NodeDefSwitchComponent extends React.Component {
   }
 }
 
-export default connect(null, {setFormNodDefEdit, putNodeDefProp})(NodeDefSwitchComponent)
+export default connect(null, {setFormNodDefEdit, putNodeDefProp})(NodeDefSwitch)

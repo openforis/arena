@@ -36,7 +36,7 @@ const LabelRow = ({label = '', lang, onChange}) => (
   </div>
 )
 
-class LabelsEditorComponent extends React.Component {
+class LabelsEditor extends React.Component {
 
   isPreview () {
     const {preview} = this.state || {preview: true}
@@ -98,7 +98,7 @@ class LabelsEditorComponent extends React.Component {
 
 }
 
-LabelsEditorComponent.defaultProps = {
+LabelsEditor.defaultProps = {
   languages: [],
 }
 
@@ -106,4 +106,4 @@ const mapStateToProps = state => ({
   languages: getSurveyLanguages(getCurrentSurvey(state))
 })
 
-export default connect(mapStateToProps,)(LabelsEditorComponent)
+export default connect(mapStateToProps,)(LabelsEditor)
