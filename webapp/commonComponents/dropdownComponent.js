@@ -13,10 +13,10 @@ class DropdownComponent extends React.Component {
   constructor (props) {
     super(props)
 
-    const {items, selection} = this.props
+    const {items, selection, autocompleteMinChars} = this.props
 
     this.state = {
-      items,
+      items: autocompleteMinChars > 0 ? [] : items,
       displayValue: this.getItemLabel(selection),
       itemsFocusIndex: -1,
       opened: false,
@@ -29,9 +29,11 @@ class DropdownComponent extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    const {items} = this.props
+    const {items, autocompleteMinChars} = this.props
     if (prevProps.items.length !== items.length)
-      this.setState({items})
+      this.setState({
+        items: autocompleteMinChars > 0 ? [] : items
+      })
   }
 
   componentWillUnmount () {
@@ -85,16 +87,24 @@ class DropdownComponent extends React.Component {
   onInputChange (evt) {
     const {value = ''} = evt.target
 
-    const {items} = this.props
+    const {items, autocompleteMinChars} = this.props
 
     const contains = (a = '', b = '') => R.contains(R.toLower(a), R.toLower(b))
 
-    const filteredItems = R.trim(value).length > 0
-      ? items.filter(item => item.key
-        ? contains(value, item.key) || contains(value, item.value)
-        : contains(value, item)
+    const searchValue = R.trim(value)
+
+    let filteredItems
+    if (autocompleteMinChars <= 0 && searchValue.length === 0) {
+      filteredItems = items
+    } else if (autocompleteMinChars > 0 &&
+      (searchValue.length === 0 || searchValue.length < autocompleteMinChars)) {
+      filteredItems = []
+    } else {
+      filteredItems = items.filter(item => item.key
+        ? contains(searchValue, item.key) || contains(searchValue, item.value)
+        : contains(searchValue, item)
       )
-      : items
+    }
 
     this.setState({
       items: filteredItems,
@@ -253,7 +263,8 @@ class DropdownComponent extends React.Component {
 }
 
 DropdownComponent.defaultProps = {
-  clearOnSelection: false
+  clearOnSelection: false,
+  autocompleteMinChars: 0
 }
 
 export default DropdownComponent

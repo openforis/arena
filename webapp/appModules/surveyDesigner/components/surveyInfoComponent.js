@@ -49,6 +49,7 @@ class SurveyInfoComponent extends React.Component {
           <label className="form-label">SRS</label>
           <FormInputChipsComponent selection={surveySrs}
                                    items={srs}
+                                   dropdownAutocompleteMinChars={3}
                                    onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>
         </div>
 
