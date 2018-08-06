@@ -1,9 +1,9 @@
-import './style.scss'
+import '../style.scss'
 
 import React from 'react'
 import * as R from 'ramda'
 
-import LoginForm from './components/loginForm'
+import LoginForm from './loginForm'
 
 const noCols = 12
 const noRows = 6
