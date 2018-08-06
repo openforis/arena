@@ -5,6 +5,7 @@
   grid-template-columns: .95fr .05fr;
   align-items: center;
   position: relative;
+  flex-grow: 1;
 
   span.icon {
     color: $whiteLight;

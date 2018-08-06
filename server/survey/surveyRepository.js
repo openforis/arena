@@ -20,7 +20,12 @@ const {
 
 const createSurvey = async (user, {name, label, lang}) => db.tx(
   async t => {
-    const props = {name, labels: {[lang]: label}, languages: [lang]}
+    const props = {
+      name,
+      labels: {[lang]: label},
+      languages: [lang],
+      srs: ["4326"] //EPSG:4326 WGS84 Lat Lon Spatial Reference System
+    }
 
     const {id: surveyId} = await t.one(`
       INSERT INTO survey (owner_id, props_draft)

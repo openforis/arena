@@ -49,5 +49,5 @@ module.exports = {
 
   getSurveyLanguages: getProp('languages', []),
   getSurveyDescriptions: getProp('descriptions', {}),
-
+  getSurveySrs: getProp('srs', []),
 }

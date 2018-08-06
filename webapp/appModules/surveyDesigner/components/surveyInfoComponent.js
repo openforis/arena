@@ -1,16 +1,21 @@
 import React from 'react'
 import { connect } from 'react-redux'
-
 import * as R from 'ramda'
 
-import { getSurveyLabels, getSurveyDescriptions } from '../../../../common/survey/survey'
 import { FormInput } from '../../../commonComponents/formInputComponents'
-import FormLabelsEditorComponent from '../../../survey/components/labelsEditorComponent'
+import FormInputChipsComponent from '../../../commonComponents/formInputChipsComponent'
+import LabelsEditorComponent from '../../../survey/components/labelsEditorComponent'
+import LanguagesEditorComponent from '../../../survey/components/languagesEditorComponent'
+
+import {
+  getSurveyDescriptions,
+  getSurveyLabels,
+  getSurveySrs
+} from '../../../../common/survey/survey'
+import { getSrsName, srs } from '../../../../common/app/srs'
 
 import { getCurrentSurvey } from '../../../survey/surveyState'
-
 import { updateSurveyProp } from '../../../survey/actions'
-import SurveyLanguagesEditorComponent from '../../../survey/components/languagesEditorComponent'
 
 import { normalizeName } from './../../../../common/survey/surveyUtils'
 
@@ -27,6 +32,8 @@ class SurveyInfoComponent extends React.Component {
   render () {
     const {survey} = this.props
 
+    const surveySrs = getSurveySrs(survey).map(code => {return {key: code, value: getSrsName(code)}})
+
     return (
       <div className="form">
 
@@ -37,14 +44,22 @@ class SurveyInfoComponent extends React.Component {
 
         </div>
 
-        <SurveyLanguagesEditorComponent/>
+        <LanguagesEditorComponent/>
 
-        <FormLabelsEditorComponent labels={getSurveyLabels(survey)}
-                                   onChange={(item) => this.onPropLabelsChange(item, 'labels', getSurveyLabels(survey))}/>
+        <div className="form-item">
+          <label className="form-label">SRS</label>
+          <FormInputChipsComponent selection={surveySrs}
+                                   items={srs}
+                                   dropdownAutocompleteMinChars={3}
+                                   onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>
+        </div>
 
-        <FormLabelsEditorComponent formLabel="Description(s)"
-                                   labels={getSurveyDescriptions(survey)}
-                                   onChange={(item) => this.onPropLabelsChange(item, 'descriptions', getSurveyDescriptions(survey))}/>
+        <LabelsEditorComponent labels={getSurveyLabels(survey)}
+                               onChange={(item) => this.onPropLabelsChange(item, 'labels', getSurveyLabels(survey))}/>
+
+        <LabelsEditorComponent formLabel="Description(s)"
+                               labels={getSurveyDescriptions(survey)}
+                               onChange={(item) => this.onPropLabelsChange(item, 'descriptions', getSurveyDescriptions(survey))}/>
 
       </div>
     )
