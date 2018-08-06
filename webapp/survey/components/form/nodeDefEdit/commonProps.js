@@ -1,12 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
 import { Input, FormItem } from '../../../../commonComponents/form/input'
-import Dropdown from '../../../../commonComponents/form/dropdown'
+import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../labelsEditor'
 
 import {
-  nodeDefType,
   getNodeDefLabels,
   getNodeDefDescriptions,
   getNodeDefProp
@@ -15,16 +15,11 @@ import { normalizeName } from './../../../../../common/survey/surveyUtils'
 
 import { putNodeDefProp } from '../../../nodeDef/actions'
 
-//
-const attributeType = type => ({key: type, value: type})
-
-const attributeTypes = [
-  attributeType(nodeDefType.integer),
-  attributeType(nodeDefType.decimal),
-
-]
-
 class CommonProps extends React.Component {
+
+  onPropLabelsChange (nodeDef, labelItem, key, currentValue) {
+    this.props.putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
+  }
 
   render () {
     const {nodeDef, putNodeDefProp} = this.props
@@ -38,16 +33,21 @@ class CommonProps extends React.Component {
         </FormItem>
 
         <FormItem label={'type'}>
-          <Dropdown items={attributeTypes}/>
+          <label>{getNodeDefProp('type')(nodeDef)}</label>
         </FormItem>
 
         <LabelsEditor labels={getNodeDefLabels(nodeDef)}
-          // onChange={(item) => this.onPropsChange(item, 'labels', getSurveyLabels(survey))}/>
-                      onChange={(item) => console.log(item)}/>
+                      onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'labels', getNodeDefLabels(nodeDef))} />
+
         <LabelsEditor formLabel="Description(s)"
                       labels={getNodeDefDescriptions(nodeDef)}
-          // onChange={(item) => this.onPropsChange(item, 'labels', getSurveyLabels(survey))}/>
-                      onChange={(item) => console.log(item)}/>
+                      onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'descriptions', getNodeDefDescriptions(nodeDef))} />
+
+        <FormItem label={'multiple'}>
+          <Checkbox checked={getNodeDefProp('multiple', false)(nodeDef)}
+                    onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)} />
+        </FormItem>
+
       </React.Fragment>
     )
   }
