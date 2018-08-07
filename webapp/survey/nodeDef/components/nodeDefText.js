@@ -1,19 +1,22 @@
 import React from 'react'
+
 import { Input, FormItem } from '../../../commonComponents/form/input'
 
-class DefaultNodeDef extends React.Component {
+import { getNodeDefInputMask } from './nodeDefSystemProps'
 
+class NodeDefText extends React.Component {
 
   render () {
     const {nodeDef, draft, edit} = this.props
 
     return (
       <FormItem label={nodeDef.props.name}>
-        <Input readOnly={edit}/>
+        <Input readOnly={edit}
+               {...getNodeDefInputMask(nodeDef)}/>
       </FormItem>
     )
   }
 
 }
 
-export default DefaultNodeDef
+export default NodeDefText

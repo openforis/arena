@@ -4,22 +4,7 @@ import * as R from 'ramda'
 
 import { nodeDefType } from '../../../../common/survey/nodeDef'
 import { createNodeDef } from '../../nodeDef/actions'
-
-const nodeDefTypeIcons = {
-  [nodeDefType.integer]: <span className="icon-left node_def__icon">923</span>,
-  [nodeDefType.decimal]: <span className="icon-left node_def__icon">923,4</span>,
-  [nodeDefType.string]: <span className="icon-left">{R.range(0, 3).map(i =>
-    <span key={i} className="icon icon-text-color" style={{margin: '0 -3px'}}/>
-  )}</span>,
-  [nodeDefType.date]: <span className="icon icon-calendar icon-left"/>,
-  [nodeDefType.time]: <span className="icon icon-clock icon-left"/>,
-  [nodeDefType.boolean]: <span className="icon icon-radio-checked2 icon-left"/>,
-  [nodeDefType.codeList]: <span className="icon icon-list icon-left"/>,
-  [nodeDefType.coordinate]: <span className="icon icon-location2 icon-left"/>,
-  [nodeDefType.taxon]: <span className="icon icon-leaf icon-left"/>,
-  [nodeDefType.file]: <span className="icon icon-file-picture icon-left"/>,
-  [nodeDefType.entity]: <span className="icon icon-table2 icon-left"/>,
-}
+import { getNodeDefIconByType } from '../../nodeDef/components/nodeDefSystemProps'
 
 class FormActions extends React.Component {
   constructor () {
@@ -83,7 +68,7 @@ class FormActions extends React.Component {
                     }
                     <button className="btn btn-s btn-of-light-s"
                             onClick={() => this.addNodeDef(type)}>
-                      {nodeDefTypeIcons[type]}{type}
+                      {getNodeDefIconByType(type)}{type}
                     </button>
                   </React.Fragment>
                 )

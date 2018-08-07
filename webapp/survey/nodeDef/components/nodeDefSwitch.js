@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import DefaultNodeDef from './defaultNodeDef'
-import EntityDef from './entityDef'
+import NodeDefText from './nodeDefText'
+import EntityDef from './nodeDefEntity'
 
 import { nodeDefType, getNodeDefType } from '../../../../common/survey/nodeDef'
 import {
@@ -66,7 +66,7 @@ class NodeDefSwitch extends React.Component {
 
       {
         React.createElement(
-          nodeDefTypeComponents[getNodeDefType(nodeDef)] || DefaultNodeDef,
+          nodeDefTypeComponents[getNodeDefType(nodeDef)] || NodeDefText,
           {nodeDef, draft, edit, render}
         )
       }

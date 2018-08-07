@@ -21,7 +21,7 @@ import { getNodeDefChildren, getSurveyState } from '../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, } from '../actions'
 
-class EntityDef extends React.Component {
+class NodeDefEntity extends React.Component {
 
   componentDidMount () {
     const {nodeDef, fetchNodeDefChildren, draft} = this.props
@@ -94,7 +94,7 @@ class EntityDef extends React.Component {
   }
 }
 
-EntityDef.defaultProps = {
+NodeDefEntity.defaultProps = {
   entityDef: {},
   draft: false,
   edit: false,
@@ -104,4 +104,4 @@ const mapStateToProps = (state, props) => ({
   children: getNodeDefChildren(props.nodeDef)(getSurveyState(state)),
 })
 
-export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren})(EntityDef)
+export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren})(NodeDefEntity)

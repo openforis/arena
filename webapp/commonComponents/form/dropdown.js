@@ -43,7 +43,7 @@ class Dropdown extends React.Component {
   getRefs() {
     return {
       dropdown: this.refs.dropdown,
-      input: this.refs.dropdownInput.refs.input
+      input: this.refs.dropdownInput.input.current.inputElement
     }
   }
 

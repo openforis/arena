@@ -3,6 +3,7 @@ import './form.scss'
 import React from 'react'
 
 import { TooltipError } from '../tooltip'
+import MaskedInput from 'react-text-mask'
 
 export const FormItem = ({label, children}) => (
   <div className="form-item">
@@ -13,11 +14,17 @@ export const FormItem = ({label, children}) => (
 
 export class Input extends React.Component {
 
+  constructor () {
+    super()
+    this.input = React.createRef()
+  }
+
   render () {
 
     const {
       validation = {},
       disabled = false,
+      mask = false,
       ...inputProps,
     } = this.props
 
@@ -25,11 +32,12 @@ export class Input extends React.Component {
 
     return (
       <TooltipError message={valid ? null : validation.error}>
+        <MaskedInput ref={this.input}
+                     mask={mask}
+                     className={`form-input ${valid ? '' : ' error'}`}
+                     {...inputProps}
+        />
 
-        <input className={`form-input ${valid ? '' : ' error'}`}
-               ref="input"
-               aria-disabled={disabled}
-               {...inputProps}/>
 
       </TooltipError>
     )
@@ -37,3 +45,11 @@ export class Input extends React.Component {
 
 }
 
+/**
+
+ <input className={`form-input ${valid ? '' : ' error'}`}
+ ref="input"
+ aria-disabled={disabled}
+ {...inputProps}/>
+
+ */
