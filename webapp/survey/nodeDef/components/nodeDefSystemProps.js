@@ -20,7 +20,7 @@ export const nodeDefSystemProps = {
 
   [nodeDefType.date]: {
     icon: <span className="icon icon-calendar icon-left"/>,
-    inputMask: {
+    inputText: {
       mask: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
       showMask: true,
       placeholderChar: '\u2000',
@@ -66,7 +66,7 @@ export const getNodeDefIconByType = nodeDefType => R.pipe(
   getProp(nodeDefType, 'icon'),
 )(nodeDefSystemProps)
 
-export const getNodeDefInputMask = nodeDef => R.pipe(
-  getProp(nodeDef.type, 'inputMask'),
+export const getNodeDefInputTextProps = nodeDef => R.pipe(
+  getProp(nodeDef.type, 'inputText'),
   R.defaultTo({mask: false, showMask: false}),
 )(nodeDefSystemProps)

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Input, FormItem } from '../../../commonComponents/form/input'
 
-import { getNodeDefInputMask } from './nodeDefSystemProps'
+import { getNodeDefInputTextProps } from './nodeDefSystemProps'
 
 class NodeDefText extends React.Component {
 
@@ -12,7 +12,7 @@ class NodeDefText extends React.Component {
     return (
       <FormItem label={nodeDef.props.name}>
         <Input readOnly={edit}
-               {...getNodeDefInputMask(nodeDef)}/>
+               {...getNodeDefInputTextProps(nodeDef)}/>
       </FormItem>
     )
   }
