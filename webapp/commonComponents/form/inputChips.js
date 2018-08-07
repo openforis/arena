@@ -30,7 +30,7 @@ const Chip = ({item, onDelete, idx, canBeRemoved}) => (
   </div>
 )
 
-const InputChips = ({items, selection, onChange, requiredItems = 0, dropdownAutocompleteMinChars = 0}) => {
+const InputChips = ({items, selection = [], onChange, requiredItems = 0, dropdownAutocompleteMinChars = 0}) => {
 
   const onDropdownChange = (item) => {
     if (item) {

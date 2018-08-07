@@ -1,8 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import NodeDefBoolean from './nodeDefBoolean'
+import NodeDefCodeList from './nodeDefCodeList'
+import NodeDefCoordinate from './nodeDefCoordinate'
+import NodeDefEntity from './nodeDefEntity'
+import NodeDefTaxon from './nodeDefTaxon'
 import NodeDefText from './nodeDefText'
-import EntityDef from './nodeDefEntity'
 
 import { nodeDefType, getNodeDefType } from '../../../../common/survey/nodeDef'
 import {
@@ -13,9 +17,15 @@ import {
 import { isNodeDefRoot } from '../../surveyState'
 
 import { setFormNodDefEdit, putNodeDefProp } from '../actions'
+import NodeDefFile from './nodeDefFile'
 
 const nodeDefTypeComponents = {
-  [nodeDefType.entity]: EntityDef,
+  [nodeDefType.boolean]: NodeDefBoolean,
+  [nodeDefType.codeList]: NodeDefCodeList,
+  [nodeDefType.coordinate]: NodeDefCoordinate,
+  [nodeDefType.entity]: NodeDefEntity,
+  [nodeDefType.file]: NodeDefFile,
+  [nodeDefType.taxon]: NodeDefTaxon,
 }
 
 class NodeDefSwitch extends React.Component {
