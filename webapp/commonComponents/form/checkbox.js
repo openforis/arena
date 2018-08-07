@@ -7,22 +7,23 @@ class Checkbox extends React.Component {
 
     const {
       validation,
-      disabled,
-      checked = checked || value === 'true' || value == '1',
+      checked,
       onChange,
-      ...inputProps,
     } = this.props
 
     const {valid = true} = validation
 
     return (
-      <TooltipError message={valid ? null : validation.error}>
+      <div style={{justifySelf:'start'}}>
+        <TooltipError message={valid ? null : validation.error}>
 
-        <span className={`icon icon-checkbox-${!checked ? 'un' : ''}checked`}
-              style={{cursor: 'pointer'}}
-              onClick={() => onChange(!checked)} />
+          <button className="btn btn-s btn-transparent"
+                  onClick={() => onChange(!checked)}>
+            <span className={`icon icon-checkbox-${!checked ? 'un' : ''}checked icon-24px`}/>
+          </button>
 
-      </TooltipError>
+        </TooltipError>
+      </div>
     )
   }
 }
