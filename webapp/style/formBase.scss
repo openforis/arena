@@ -108,3 +108,7 @@ button[aria-disabled="true"] {
   @extend .btn-of;
   border-color: $ofBorderColorLightXs;
 }
+
+.btn-transparent {
+  border: none !important;
+}

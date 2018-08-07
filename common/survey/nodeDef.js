@@ -35,6 +35,13 @@ const newNodeDef = (surveyId, parentId, type, props) => ({
   props,
 })
 
+// ==== READ
+
+const getNodeDefLabel = (nodeDef, lang) => R.pipe(
+  getLabels,
+  R.prop(lang),
+)(nodeDef)
+
 // ==== UPDATE
 
 module.exports = {
@@ -47,8 +54,7 @@ module.exports = {
 //   setNodeDefProp: setProp,
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
-
-  // READ
+  getNodeDefLabel,
 
   //CREATE
   newNodeDef,

@@ -37,6 +37,13 @@ const surveyStatus = {
   isPublished: R.equals(PUBLISHED),
 }
 
+const getSurveyLanguages = getProp('languages', [])
+
+const getSurveyDefaultLanguage = R.pipe(
+  getSurveyLanguages,
+  R.head,
+)
+
 module.exports = {
   //TODO: REMOVE
   surveyStatus,
@@ -47,7 +54,8 @@ module.exports = {
   setSurveyProp: setProp,
   getSurveyLabels: getLabels,
 
-  getSurveyLanguages: getProp('languages', []),
+  getSurveyLanguages,
+  getSurveyDefaultLanguage,
   getSurveyDescriptions: getProp('descriptions', {}),
   getSurveySrs: getProp('srs', []),
 }
