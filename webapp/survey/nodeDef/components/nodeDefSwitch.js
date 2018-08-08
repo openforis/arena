@@ -1,12 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import NodeDefBoolean from './nodeDefBoolean'
-import NodeDefCodeList from './nodeDefCodeList'
-import NodeDefCoordinate from './nodeDefCoordinate'
-import NodeDefEntity from './nodeDefEntity'
-import NodeDefTaxon from './nodeDefTaxon'
-import NodeDefText from './nodeDefText'
+import NodeDefBoolean from './types/nodeDefBoolean'
+import NodeDefCodeList from './types/nodeDefCodeList'
+import NodeDefCoordinate from './types/nodeDefCoordinate'
+import NodeDefEntity from './types/nodeDefEntity'
+import NodeDefFile from './types/nodeDefFile'
+import NodeDefTaxon from './types/nodeDefTaxon'
+import NodeDefText from './types/nodeDefText'
 
 import { nodeDefType, getNodeDefType } from '../../../../common/survey/nodeDef'
 import {
@@ -17,7 +18,6 @@ import {
 import { isNodeDefRoot } from '../../surveyState'
 
 import { setFormNodDefEdit, putNodeDefProp } from '../actions'
-import NodeDefFile from './nodeDefFile'
 
 const nodeDefTypeComponents = {
   [nodeDefType.boolean]: NodeDefBoolean,

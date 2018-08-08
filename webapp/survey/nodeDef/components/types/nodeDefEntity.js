@@ -1,4 +1,4 @@
-import './react-grid-layout.scss'
+import '../react-grid-layout.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
-import NodeDefSwitch from './nodeDefSwitch'
+import NodeDefSwitch from '../nodeDefSwitch'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -15,11 +15,11 @@ import {
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
-} from '../../../../common/survey/nodeDefLayout'
+} from '../../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefChildren, getSurveyState } from '../../surveyState'
+import { getNodeDefChildren, getSurveyState } from '../../../surveyState'
 
-import { fetchNodeDefChildren, putNodeDefProp, } from '../actions'
+import { fetchNodeDefChildren, putNodeDefProp, } from '../../actions'
 
 class NodeDefEntity extends React.Component {
 

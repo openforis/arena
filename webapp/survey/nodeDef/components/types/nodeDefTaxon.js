@@ -1,13 +1,15 @@
 import React from 'react'
-import { FormItem, Input } from '../../../commonComponents/form/input'
+
+import { FormItem, Input } from '../../../../commonComponents/form/input'
+import NodeDefFormItem from './nodeDefFormItem'
 
 class NodeDefTaxon extends React.Component {
 
-  render() {
+  render () {
     const {nodeDef, draft, edit} = this.props
 
     return (
-      <FormItem label={nodeDef.props.name}>
+      <NodeDefFormItem nodeDef={nodeDef}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr'
@@ -25,7 +27,7 @@ class NodeDefTaxon extends React.Component {
             <Input readOnly={edit}/>
           </FormItem>
         </div>
-      </FormItem>
+      </NodeDefFormItem>
     )
   }
 }

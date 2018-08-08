@@ -1,7 +1,7 @@
 import React from 'react'
-import NodeDefBoolean from './nodeDefBoolean'
-import InputChips from '../../../commonComponents/form/inputChips'
-import { FormItem } from '../../../commonComponents/form/input'
+
+import InputChips from '../../../../commonComponents/form/inputChips'
+import NodeDefFormItem from './nodeDefFormItem'
 
 class NodeDefCodeList extends React.Component {
 
@@ -14,9 +14,9 @@ class NodeDefCodeList extends React.Component {
       {key: '3', value: 'Value 3'},
     ]
     return (
-      <FormItem label={nodeDef.props.name}>
-        <InputChips items={items}/>
-      </FormItem>
+      <NodeDefFormItem nodeDef={nodeDef}>
+        <InputChips readOnly={edit} items={items}/>
+      </NodeDefFormItem>
     )
   }
 }
