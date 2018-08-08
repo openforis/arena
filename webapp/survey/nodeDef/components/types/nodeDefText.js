@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { Input, FormItem } from '../../../commonComponents/form/input'
-
-import { getNodeDefInputTextProps } from './nodeDefSystemProps'
+import { Input } from '../../../../commonComponents/form/input'
+import NodeDefFormItem from './nodeDefFormItem'
+import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
 
 class NodeDefText extends React.Component {
 
@@ -10,10 +10,10 @@ class NodeDefText extends React.Component {
     const {nodeDef, draft, edit} = this.props
 
     return (
-      <FormItem label={nodeDef.props.name}>
+      <NodeDefFormItem nodeDef={nodeDef}>
         <Input readOnly={edit}
                {...getNodeDefInputTextProps(nodeDef)}/>
-      </FormItem>
+      </NodeDefFormItem>
     )
   }
 

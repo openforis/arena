@@ -6,10 +6,18 @@ import { nodeDefType } from '../../../../common/survey/nodeDef'
 export const nodeDefSystemProps = {
   [nodeDefType.integer]: {
     icon: <span className="icon-left node_def__icon">923</span>,
+    inputText: {
+     type: "number",
+     step: 1
+    },
   },
 
   [nodeDefType.decimal]: {
     icon: <span className="icon-left node_def__icon">923,4</span>,
+    inputText: {
+      type: "number",
+      step: 0.001
+    },
   },
 
   [nodeDefType.string]: {
@@ -29,6 +37,11 @@ export const nodeDefSystemProps = {
 
   [nodeDefType.time]: {
     icon: <span className="icon icon-clock icon-left"/>,
+    inputText: {
+      mask: [/\d/, /\d/, ':', /\d/, /\d/],
+      showMask: true,
+      placeholderChar: '\u2000',
+    }
   },
 
   [nodeDefType.boolean]: {
