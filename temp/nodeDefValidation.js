@@ -1,4 +1,5 @@
 const nodeDefValidationType = {
+  cardinality: 'cardinality', //common
   comparison: 'comparison', //only for Code, Text, Integer, Decimal, Date, Time
   custom: 'custom',
   distance: 'distance', //only for Coordinate
@@ -9,6 +10,11 @@ const nodeDefValidation = {
   type: null, //nodeDefValidationType
 
   condition: null, //boolean expression
+
+  //===cardinality
+  required: false,//boolean expression
+  minCount: null,//numeric expression
+  maxCount: null,//numeric expression
 
   //=== comparison
   min: null, //numeric expression
@@ -25,5 +31,4 @@ const nodeDefValidation = {
 
   //=== custom
   expression: null, //boolean expression
-
 }
