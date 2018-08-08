@@ -3,13 +3,57 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { nodeDefType } from '../../../../common/survey/nodeDef'
+import { nodeDefLayoutProps, nodeDefRenderType } from '../../../../common/survey/nodeDefLayout'
 import { createNodeDef } from '../../nodeDef/actions'
 import { getNodeDefIconByType } from '../../nodeDef/components/nodeDefSystemProps'
+
+const EntityDefAddButton = ({type, addNodeDef}) => {
+  const isEntity = type === nodeDefType.entity
+  const nodeDefProps = isEntity ? {[nodeDefLayoutProps.render]: nodeDefRenderType.table} : {}
+
+  return <React.Fragment key={type}>
+    {
+      isEntity ?
+        <div className="separator-of"></div>
+        : null
+
+    }
+    <button className="btn btn-s btn-of-light-s"
+            onClick={() => addNodeDef(type, nodeDefProps)}>
+      {getNodeDefIconByType(type)}{type}
+    </button>
+  </React.Fragment>
+}
+
+const EntityDefAddButtonsBar = ({addNodeDef}) => (
+  <React.Fragment>
+    <div/>
+    <div/>
+    <div/>
+    <div className="title-of">
+      <span className="icon icon-plus icon-left"></span> Add
+    </div>
+
+    {
+      R.values(nodeDefType)
+        .map(type =>
+          <EntityDefAddButton key={type} type={type} addNodeDef={addNodeDef}/>
+        )
+    }
+
+    <button className="btn btn-s btn-of-light-xs">
+      <span className="icon icon-insert-template icon-left"></span>
+      Entity New Page
+    </button>
+  </React.Fragment>
+)
 
 class FormActions extends React.Component {
   constructor () {
     super()
     this.state = {opened: true}
+
+    this.addNodeDef = this.addNodeDef.bind(this)
   }
 
   toggleOpen () {
@@ -29,8 +73,8 @@ class FormActions extends React.Component {
     createNodeDef(nodeDef.id, type, props)
   }
 
-  addNodeDef (type) {
-    this.createNodeDef(type, {})
+  addNodeDef (type, props) {
+    this.createNodeDef(type, props)
   }
 
   createEntityNewPage () {
@@ -38,6 +82,7 @@ class FormActions extends React.Component {
   }
 
   render () {
+
     return (
       <div className="survey-form__actions node-def__form_root">
 
@@ -50,35 +95,7 @@ class FormActions extends React.Component {
 
         {
           this.state.opened ?
-            <React.Fragment>
-              <div/>
-              <div/>
-              <div/>
-              <div className="title-of">
-                <span className="icon icon-plus icon-left"></span> Add
-              </div>
-
-              {
-                R.values(nodeDefType).map(type => <React.Fragment key={type}>
-                    {
-                      type === nodeDefType.entity ?
-                        <div className="separator-of"></div>
-                        : null
-
-                    }
-                    <button className="btn btn-s btn-of-light-s"
-                            onClick={() => this.addNodeDef(type)}>
-                      {getNodeDefIconByType(type)}{type}
-                    </button>
-                  </React.Fragment>
-                )
-              }
-
-              <button className="btn btn-s btn-of-light-xs">
-                <span className="icon icon-insert-template icon-left"></span>
-                Entity New Page
-              </button>
-            </React.Fragment>
+            <EntityDefAddButtonsBar addNodeDef={this.addNodeDef}/>
             : null
         }
 
