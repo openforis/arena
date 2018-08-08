@@ -38,14 +38,9 @@ const nodeDef = {
     layout: [],// rect-grid-layout layout value
 
     // not entity:
-    min: null,
-    max: null,
-    minInclusive: null,
-    maxInclusive: null,
-    regex: null,
-    maxDistance: null,
-    calculated: null, //boolean
-    codeListId: id,//
+    calculated: false, //boolean
+    validations: [], //nodeDefValidation
+    codeListId: id,
   },
 
   propsDraft: {}
