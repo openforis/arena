@@ -1,4 +1,4 @@
-import './react-grid-layout.scss'
+import '../react-grid-layout.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
-import NodeDefSwitch from './nodeDefSwitch'
+import NodeDefSwitch from '../nodeDefSwitch'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -15,13 +15,14 @@ import {
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
+
   isRenderForm,
   isRenderTable,
-} from '../../../../common/survey/nodeDefLayout'
+} from '../../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefChildren, getSurveyState } from '../../surveyState'
+import { getNodeDefChildren, getSurveyState } from '../../../surveyState'
 
-import { fetchNodeDefChildren, putNodeDefProp, } from '../actions'
+import { fetchNodeDefChildren, putNodeDefProp, } from '../../actions'
 
 class NodeDefEntity extends React.Component {
 
@@ -68,10 +69,11 @@ class NodeDefEntity extends React.Component {
                               rowHeight={edit ? 80 : 60}
                               autoSize={false}
                               containerPadding={edit ? [20, 50] : [20, 20]}
-                              onLayoutChange={(layout) => console.log(window.innerWidth) ||
-                              window.innerWidth > 1200 && layout.length > 0
-                                ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
-                                : null
+                              onLayoutChange={(layout) =>
+                                //console.log(window.innerWidth) ||
+                                edit && window.innerWidth > 1200 && layout.length > 0
+                                  ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
+                                  : null
                               }
                               layouts={{
                                 lg: rdgLayout,
@@ -80,6 +82,7 @@ class NodeDefEntity extends React.Component {
                               }}
                               isDraggable={edit}
                               isResizable={edit}
+          //TODO decide if verticalCompact
                               verticalCompact={false}>
 
           {
