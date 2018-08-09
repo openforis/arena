@@ -121,7 +121,7 @@ class NodeDefEntity extends React.Component {
           display: 'grid',
           gridTemplateRows: '20px 1fr',
         }}>
-          <div>{nodeDef.props.name}</div>
+          <div className="form-label" style={{justifySelf: 'center'}}>{nodeDef.props.name}</div>
           <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                                 autoSize={false}
                                 rowHeight={edit ? 80 : 60}
@@ -143,7 +143,7 @@ class NodeDefEntity extends React.Component {
               innerPageChildren
                 .map((childDef, i) =>
                   <div key={childDef.uuid} data-grid={{
-                    i: nodeDef.uuid, x: i, y: 0, w: 1, h: 1, static:true,
+                    i: nodeDef.uuid, x: i, y: 0, w: 1, h: 1, static: true,
                   }}>
                     <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}/>
                   </div>
