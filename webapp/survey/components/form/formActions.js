@@ -6,8 +6,9 @@ import { nodeDefType } from '../../../../common/survey/nodeDef'
 import { nodeDefLayoutProps, nodeDefRenderType } from '../../../../common/survey/nodeDefLayout'
 import { createNodeDef } from '../../nodeDef/actions'
 import { getNodeDefIconByType } from '../../nodeDef/components/nodeDefSystemProps'
+import { getNodeDefFormUnlocked } from '../../surveyState'
 
-const EntityDefAddButton = ({type, addNodeDef}) => {
+const EntityDefAddButton = ({type, addNodeDef, enabled}) => {
   const isEntity = type === nodeDefType.entity
   const nodeDefProps = isEntity ? {[nodeDefLayoutProps.render]: nodeDefRenderType.table} : {}
 
@@ -19,13 +20,14 @@ const EntityDefAddButton = ({type, addNodeDef}) => {
 
     }
     <button className="btn btn-s btn-of-light-s"
-            onClick={() => addNodeDef(type, nodeDefProps)}>
+            onClick={() => addNodeDef(type, nodeDefProps)}
+            aria-disabled={!enabled}>
       {getNodeDefIconByType(type)}{type}
     </button>
   </React.Fragment>
 }
 
-const EntityDefAddButtonsBar = ({addNodeDef}) => (
+const EntityDefAddButtonsBar = ({addNodeDef, enabled}) => (
   <React.Fragment>
     <div/>
     <div/>
@@ -37,11 +39,12 @@ const EntityDefAddButtonsBar = ({addNodeDef}) => (
     {
       R.values(nodeDefType)
         .map(type =>
-          <EntityDefAddButton key={type} type={type} addNodeDef={addNodeDef}/>
+          <EntityDefAddButton key={type} type={type} addNodeDef={addNodeDef} enabled={enabled}/>
         )
     }
 
-    <button className="btn btn-s btn-of-light-xs">
+    <button className="btn btn-s btn-of-light-xs"
+            aria-disabled={!enabled}>
       <span className="icon icon-insert-template icon-left"></span>
       Entity New Page
     </button>
@@ -83,6 +86,9 @@ class FormActions extends React.Component {
 
   render () {
 
+    const {nodeDef} = this.props
+    const enabled = nodeDef && nodeDef.type === nodeDefType.entity
+
     return (
       <div className="survey-form__actions node-def__form_root">
 
@@ -95,7 +101,7 @@ class FormActions extends React.Component {
 
         {
           this.state.opened ?
-            <EntityDefAddButtonsBar addNodeDef={this.addNodeDef}/>
+            <EntityDefAddButtonsBar enabled={enabled} addNodeDef={this.addNodeDef}/>
             : null
         }
 
@@ -106,4 +112,8 @@ class FormActions extends React.Component {
 
 }
 
-export default connect(null, {createNodeDef})(FormActions)
+const mapStateToProps = state => ({
+  nodeDef: getNodeDefFormUnlocked(state)
+})
+
+export default connect(mapStateToProps, {createNodeDef})(FormActions)

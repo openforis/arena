@@ -95,6 +95,12 @@ const nodeDefEntityUnlockedPath = ['form', 'nodeDefUnlocked']
 export const assocNodeDefFormUnlocked = nodeDef =>
   R.assocPath(nodeDefEntityUnlockedPath, nodeDef ? nodeDef.uuid : null)
 
+export const getNodeDefFormUnlocked = state => {
+  const surveyState = getSurveyState(state)
+  const uuid = R.path(nodeDefEntityUnlockedPath, surveyState)
+  return getNodeDef(uuid)(surveyState)
+}
+
 export const isNodeDefFormLocked = nodeDef => R.pipe(
   getSurveyState,
   R.path(nodeDefEntityUnlockedPath),
