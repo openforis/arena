@@ -66,5 +66,8 @@ const _putNodeDefProp = (nodeDef, key, value) => {
  * ==== SURVEY-FORM EDIT MODE - NODE DEFS
  */
 export const formNodeDefEditUpdate = 'survey/form/nodeDefEdit/update'
+export const formNodeDefUnlockedUpdate = 'survey/form/nodeDefUnlocked/update'
 
 export const setFormNodDefEdit = nodeDef => dispatch => dispatch({type: formNodeDefEditUpdate, nodeDef})
+
+export const setFormNodeDefUnlocked = nodeDef => dispatch => dispatch({type: formNodeDefUnlockedUpdate, nodeDef})

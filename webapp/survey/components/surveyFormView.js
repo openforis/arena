@@ -35,7 +35,7 @@ class SurveyFormView extends React.Component {
 
             {
               edit
-                ? <FormActions nodeDef={nodeDef}/>
+                ? <FormActions/>
                 : null
             }
           </div>

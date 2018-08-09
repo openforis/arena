@@ -45,6 +45,7 @@ module.exports = {
   isRenderForm,
   getNoColumns,
   getLayout,
+  getPageUUID,
 
   filterInnerPageChildren,
   filterOuterPageChildren,

@@ -15,9 +15,9 @@ import {
   nodeDefLayoutProps,
 } from '../../../../common/survey/nodeDefLayout'
 
-import { isNodeDefRoot } from '../../surveyState'
+import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
 
-import { setFormNodDefEdit, putNodeDefProp } from '../actions'
+import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
 
 const nodeDefTypeComponents = {
   [nodeDefType.boolean]: NodeDefBoolean,
@@ -29,6 +29,7 @@ const nodeDefTypeComponents = {
 }
 
 class NodeDefSwitch extends React.Component {
+
   componentDidMount () {
     const {nodeDef} = this.props
 
@@ -36,40 +37,73 @@ class NodeDefSwitch extends React.Component {
       this.refs.nodeDefElem.scrollIntoView()
   }
 
+  isEditMode () {
+    return this.props.edit
+  }
+
   render () {
-    const {nodeDef, draft, edit, render, setFormNodDefEdit, putNodeDefProp} = this.props
+    const {
+      nodeDef,
+
+      // passed by the caller
+      edit, draft, render,
+
+      // actions
+      setFormNodDefEdit,
+      putNodeDefProp,
+      setFormNodeDefUnlocked,
+
+      //state
+      locked,
+    } = this.props
 
     const isRoot = isNodeDefRoot(nodeDef)
+
     return <div className={`node-def__form${isRoot ? ' node-def__form_root' : ''}`} ref="nodeDefElem">
 
       {
         edit ?
           <div className="node-def__form-actions">
             {
-              isRoot ?
-                <div className="btn-of-light-xs node-def__form-root-actions">
-                  columns
-                  <input value={getNoColumns(nodeDef)}
-                         type="number" min="1" max="6"
-                         onChange={e => e.target.value > 0 ?
-                           putNodeDefProp(nodeDef, nodeDefLayoutProps.columns, e.target.value)
-                           : null
-                         }/>
-                </div>
-                : null
+              locked ?
+                null :
+                <React.Fragment>
+                  {
+                    isRoot ?
+                      <div className="btn-of-light-xs node-def__form-root-actions">
+                        columns
+                        <input value={getNoColumns(nodeDef)}
+                               type="number" min="1" max="6"
+                               onChange={e => e.target.value > 0 ?
+                                 putNodeDefProp(nodeDef, nodeDefLayoutProps.columns, e.target.value)
+                                 : null
+                               }/>
+                      </div>
+                      : null
+                  }
+
+                  <button className="btn-s btn-of-light-xs"
+                          onClick={() => setFormNodDefEdit(nodeDef)}>
+                    <span className="icon icon-pencil2 icon-12px"/>
+                  </button>
+
+                  {
+                    isRoot ?
+                      null
+                      : <button className="btn-s btn-of-light-xs"
+                                onClick={() => window.confirm('Are you sure you want to delete it?') ? null : null}>
+                        <span className="icon icon-bin2 icon-12px"/>
+                      </button>
+                  }
+
+                </React.Fragment>
             }
+
             <button className="btn-s btn-of-light-xs"
-                    onClick={() => setFormNodDefEdit(nodeDef)}>
-              <span className="icon icon-pencil2 icon-12px"/>
+                    onClick={() => setFormNodeDefUnlocked(locked ? nodeDef : null)}>
+              <span className={`icon icon-${locked ? 'lock' : 'unlocked'} icon-12px`}/>
             </button>
-            {
-              isRoot ?
-                null
-                : <button className="btn-s btn-of-light-xs"
-                          onClick={() => window.confirm('Are you sure you want to delete it?') ? null : null}>
-                  <span className="icon icon-bin2 icon-12px"/>
-                </button>
-            }
+
           </div>
           : null
       }
@@ -77,7 +111,7 @@ class NodeDefSwitch extends React.Component {
       {
         React.createElement(
           nodeDefTypeComponents[getNodeDefType(nodeDef)] || NodeDefText,
-          {nodeDef, draft, edit, render}
+          {nodeDef, draft, edit, locked, render}
         )
       }
 
@@ -86,4 +120,15 @@ class NodeDefSwitch extends React.Component {
   }
 }
 
-export default connect(null, {setFormNodDefEdit, putNodeDefProp})(NodeDefSwitch)
+NodeDefSwitch.defaultProps = {
+  locked: true,
+}
+
+const mapStateToProps = (state, props) => ({
+  locked: isNodeDefFormLocked(props.nodeDef)(state)
+})
+
+export default connect(
+  mapStateToProps,
+  {setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp}
+)(NodeDefSwitch)
