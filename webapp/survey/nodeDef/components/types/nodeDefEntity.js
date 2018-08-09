@@ -138,12 +138,13 @@ class NodeDefEntity extends React.Component {
             //                     isDraggable={edit && !locked}
                                 isDraggable={false}
                                 isResizable={false}
-                                compactType={'horizontal'}>
+                                compactType={'horizontal'}
+                                margin={[0,0]}>
             {
               innerPageChildren
                 .map((childDef, i) =>
                   <div key={childDef.uuid} data-grid={{
-                    i: nodeDef.uuid, x: i, y: 0, w: 1, h: 1, static: true,
+                    i: nodeDef.uuid, x: i, y: 0, w: 1, h: 1,
                   }}>
                     <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}/>
                   </div>
