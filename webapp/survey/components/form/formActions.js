@@ -2,14 +2,15 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { nodeDefType } from '../../../../common/survey/nodeDef'
-import { nodeDefLayoutProps, nodeDefRenderType } from '../../../../common/survey/nodeDefLayout'
+import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
+import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
 import { createNodeDef } from '../../nodeDef/actions'
 import { getNodeDefIconByType } from '../../nodeDef/components/nodeDefSystemProps'
 import { getNodeDefFormUnlocked } from '../../surveyState'
 
-const EntityDefAddButton = ({type, addNodeDef, enabled}) => {
+const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
   const isEntity = type === nodeDefType.entity
+
   const nodeDefProps = isEntity ? {[nodeDefLayoutProps.render]: nodeDefRenderType.table} : {}
 
   return <React.Fragment key={type}>
@@ -27,8 +28,13 @@ const EntityDefAddButton = ({type, addNodeDef, enabled}) => {
   </React.Fragment>
 }
 
-const EntityDefAddButtonsBar = ({addNodeDef, enabled}) => (
-  <React.Fragment>
+const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
+  const enabled = nodeDef && isNodeDefEntity(nodeDef)
+
+  const canAddAttribute = enabled
+  const canAddEntity = enabled && isRenderForm(nodeDef)
+
+  return <React.Fragment>
     <div/>
     <div/>
     <div/>
@@ -39,17 +45,19 @@ const EntityDefAddButtonsBar = ({addNodeDef, enabled}) => (
     {
       R.values(nodeDefType)
         .map(type =>
-          <EntityDefAddButton key={type} type={type} addNodeDef={addNodeDef} enabled={enabled}/>
+          <AddNodeDefButton key={type} type={type}
+                            addNodeDef={addNodeDef}
+                            enabled={type===nodeDefType.entity ? canAddEntity : canAddAttribute}/>
         )
     }
 
     <button className="btn btn-s btn-of-light-xs"
-            aria-disabled={!enabled}>
+            aria-disabled={!canAddEntity}>
       <span className="icon icon-insert-template icon-left"></span>
       Entity New Page
     </button>
   </React.Fragment>
-)
+}
 
 class FormActions extends React.Component {
   constructor () {
@@ -87,7 +95,6 @@ class FormActions extends React.Component {
   render () {
 
     const {nodeDef} = this.props
-    const enabled = nodeDef && nodeDef.type === nodeDefType.entity
 
     return (
       <div className="survey-form__actions node-def__form_root">
@@ -101,7 +108,7 @@ class FormActions extends React.Component {
 
         {
           this.state.opened ?
-            <EntityDefAddButtonsBar enabled={enabled} addNodeDef={this.addNodeDef}/>
+            <AddNodeDefButtons nodeDef={nodeDef} addNodeDef={this.addNodeDef}/>
             : null
         }
 
