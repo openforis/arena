@@ -1,5 +1,6 @@
 const {getRestParam} = require('../serverUtils/request')
-const {sendOk, sendErr} = require('../serverUtils/response')
+const {sendOk, sendErr, sendValidationError} = require('../serverUtils/response')
+const { validateNodeDefPropUpdate } = require('./nodeDefValidator')
 
 const {
   fetchNodeDefsByParentId,
@@ -40,12 +41,19 @@ module.exports.init = app => {
   app.put('/nodeDef/:id/prop', async (req, res) => {
     const {user, body} = req
 
+    const {key, value} = body
+
     const nodeDefId = getRestParam(req, 'id')
 
     try {
-      await updateNodeDefProp(nodeDefId, body)
+      const validation = await validateNodeDefPropUpdate(nodeDefId, key, value)
 
-      sendOk(res)
+      if (validation === null || validation.valid) {
+        await updateNodeDefProp(nodeDefId, body)
+        sendOk(res)
+      } else {
+        sendValidationError(res, validation)
+      }
     } catch (err) {
       sendErr(res, err)
     }

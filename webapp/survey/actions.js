@@ -7,10 +7,14 @@ import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey } from './surveyStat
 import { nodeDefUpdate } from './nodeDef/actions'
 
 export const surveyCurrentUpdate = 'survey/current/update'
+export const surveyCurrentFieldValidationUpdate = 'survey/current/validation/update'
 export const surveyNewUpdate = 'survey/new/update'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyCurrentUpdate, survey})
+
+export const dispatchCurrentSurveyFieldValidationUpdate = (dispatch, field, validation) =>
+  dispatch({type: surveyCurrentFieldValidationUpdate, field, validation})
 
 // ====== CREATE
 
@@ -77,7 +81,11 @@ export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
   dispatchCurrentSurveyUpdate(dispatch, survey)
 
   try {
-    await axios.put(`/api/survey/${survey.id}/prop`, {key, value})
+    const res = await axios.put(`/api/survey/${survey.id}/prop`, {key, value})
+
+    const { validation } = res.data
+
+    dispatchCurrentSurveyFieldValidationUpdate(dispatch, key, validation)
   } catch (e) {
 
   }

@@ -11,6 +11,8 @@ export const getSurveyState = R.prop(survey)
 // READ
 export const getCurrentSurvey = R.path(['app', survey])
 
+export const getCurrentSurveyValidation = R.path(['app', 'surveyValidation'])
+
 export const getCurrentSurveyId = R.pipe(
   getCurrentSurvey,
   R.prop('id'),
@@ -58,6 +60,11 @@ export const getRootNodeDef = R.pipe(
 export const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
 
 // ==== UPDATE
+export const assocFieldValidation = (field, validation) => R.pipe(
+  getCurrentSurveyValidation,
+  R.assocPath(['fields', field], validation)
+)
+
 export const assocNodeDefs = newNodeDefsArray =>
   survey => R.pipe(
     R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
@@ -70,6 +77,9 @@ export const assocNodeDef = nodeDef =>
 
 export const assocNodeDefProp = (nodeDefUUID, key, value) =>
   R.assocPath([nodeDefs, nodeDefUUID, 'props', key], value)
+
+export const assocNodeDefPropValidation = (nodeDefUUID, key, validation) =>
+  R.assocPath([nodeDefs, nodeDefUUID, 'validation', "fields", key], validation)
 
 // ==== UTILITY
 export const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)

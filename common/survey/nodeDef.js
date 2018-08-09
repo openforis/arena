@@ -42,6 +42,8 @@ const getNodeDefLabel = (nodeDef, lang) => R.pipe(
   R.prop(lang),
 )(nodeDef)
 
+const getNodeDefValidation = (nodeDef, field) => R.path(['validation', 'fields', field])(nodeDef)
+
 // ==== UPDATE
 
 module.exports = {
@@ -55,6 +57,7 @@ module.exports = {
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefLabel,
+  getNodeDefValidation,
 
   //CREATE
   newNodeDef,

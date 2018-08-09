@@ -57,8 +57,8 @@ const getSurveyById = async (surveyId, draft = false, client = db) =>
     def => dbTransformCallback(def, draft)
   )
 
-const getSurveyByName = async (surveyName, client = db) =>
-  await client.oneOrNone(
+const getSurveysByName = async (surveyName, client = db) =>
+  await client.many(
     `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
     def => dbTransformCallback(def)
@@ -96,7 +96,7 @@ module.exports = {
 
   // READ
   getSurveyById,
-  getSurveyByName,
+  getSurveysByName,
   fetchRootNodeDef,
 
   //UPDATE

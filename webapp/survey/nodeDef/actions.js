@@ -9,6 +9,7 @@ import { getCurrentSurveyId } from '../surveyState'
 export const nodeDefUpdate = 'nodeDef/update'
 export const nodeDefsUpdate = 'nodeDefs/update'
 export const nodeDefPropUpdate = 'nodeDef/prop/update'
+export const nodeDefValidationUpdate = 'nodeDef/validation/update'
 
 // ==== CREATE
 
@@ -49,7 +50,10 @@ export const putNodeDefProp = (nodeDef, key, value) => async dispatch => {
 const _putNodeDefProp = (nodeDef, key, value) => {
   const dispatched = async dispatch => {
     try {
-      await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
+      const res = await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
+      const {data} = res
+      const validation = data.status === 'ok' ? null : data
+      dispatch({type: nodeDefValidationUpdate, nodeDefUUID: nodeDef.uuid, key, validation})
     } catch (e) { }
   }
 

@@ -14,7 +14,7 @@ import {
 } from '../../../../common/survey/survey'
 import { getSrsName, srs } from '../../../../common/app/srs'
 
-import { getCurrentSurvey } from '../../../survey/surveyState'
+import { getCurrentSurvey, getCurrentSurveyValidation } from '../../../survey/surveyState'
 import { updateSurveyProp } from '../../../survey/actions'
 
 import { normalizeName } from './../../../../common/survey/surveyUtils'
@@ -30,7 +30,9 @@ class SurveyInfoComponent extends React.Component {
   }
 
   render () {
-    const {survey} = this.props
+    const {survey, validation} = this.props
+
+    console.log(validation)
 
     const surveySrs = getSurveySrs(survey).map(code => {return {key: code, value: getSrsName(code)}})
 
@@ -40,6 +42,7 @@ class SurveyInfoComponent extends React.Component {
         <div className="form-item">
           <label className="form-label">Name</label>
           <Input value={survey.props.name}
+                 validation={R.path(['fields', 'name'])(validation)}
                  onChange={e => this.updateSurveyProp('name', normalizeName(e.target.value))}/>
 
         </div>
@@ -51,6 +54,7 @@ class SurveyInfoComponent extends React.Component {
           <InputChips selection={surveySrs}
                       items={srs}
                       dropdownAutocompleteMinChars={3}
+                      validation={R.path(['fields', 'srs'])(validation)}
                       onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>
         </div>
 
@@ -69,6 +73,7 @@ class SurveyInfoComponent extends React.Component {
 
 const mapStateToProps = state => ({
   survey: getCurrentSurvey(state),
+  validation: getCurrentSurveyValidation(state),
 })
 
 export default connect(

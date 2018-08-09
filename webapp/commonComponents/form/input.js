@@ -2,6 +2,8 @@ import './form.scss'
 
 import React from 'react'
 
+import * as R from 'ramda'
+
 import { TooltipError } from '../tooltip'
 import MaskedInput from 'react-text-mask'
 
@@ -22,13 +24,13 @@ export class Input extends React.Component {
   render () {
 
     const {
-      validation = {},
-      disabled = false,
-      mask = false,
+      validation,
+      disabled,
+      mask,
       ...inputProps,
     } = this.props
 
-    const {valid = true} = validation
+    const valid = R.propOr(true, 'valid')(validation)
 
     return (
       <TooltipError message={valid ? null : validation.error}>
@@ -43,6 +45,12 @@ export class Input extends React.Component {
     )
   }
 
+}
+
+Input.defaultProps = {
+  validation: {},
+  disabled: false,
+  mask: false,
 }
 
 /**

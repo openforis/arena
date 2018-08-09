@@ -9,9 +9,8 @@ const createError = (error) => error
 
 const validateRequired = (propName, obj) => {
   const value = R.pipe(
-    R.prop(propName),
+    R.path(propName.split('.')),
     R.defaultTo(''),
-    R.trim,
   )(obj)
 
   const error = R.isEmpty(value)

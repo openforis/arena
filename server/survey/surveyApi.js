@@ -1,8 +1,8 @@
-const {sendOk, sendErr} = require('../serverUtils/response')
+const {sendOk, sendErr, sendValidationError} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
 
 const {createSurvey, fetchRootNodeDef, updateSurveyProp} = require('./surveyRepository')
-const {validateCreateSurvey} = require('./surveyValidator')
+const {validateCreateSurvey, validateUpdateSurveyProp} = require('./surveyValidator')
 
 module.exports.init = app => {
 
@@ -47,14 +47,16 @@ module.exports.init = app => {
   // ==== UPDATE
 
   app.put('/survey/:id/prop', async (req, res) => {
-    const {user, body} = req
+    const {body} = req
 
     const surveyId = getRestParam(req, 'id')
 
+    const {key, value} = body
+
     try {
       await updateSurveyProp(surveyId, body)
-
-      sendOk(res)
+      const validation = await validateUpdateSurveyProp(surveyId, key, value)
+      res.json({status: 'ok', validation: validation})
     } catch (err) {
       sendErr(res, err)
     }
