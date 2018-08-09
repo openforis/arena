@@ -51,16 +51,19 @@ class NodeDefEntity extends React.Component {
       children,
       putNodeDefProp,
 
-      // from parent
+      // form
       edit,
       draft,
       render,
+
+      // edit mode
+      locked,
     } = this.props
     const columns = getNoColumns(nodeDef)
     const rdgLayout = getLayout(nodeDef)
 
-    console.log('==== ')
-    console.log(nodeDef)
+    // console.log('==== ')
+    // console.log(nodeDef)
 
     return (
       isRenderForm(nodeDef) && this.hasChildren() ?
@@ -71,7 +74,7 @@ class NodeDefEntity extends React.Component {
                               containerPadding={edit ? [20, 50] : [20, 20]}
                               onLayoutChange={(layout) =>
                                 //console.log(window.innerWidth) ||
-                                edit && window.innerWidth > 1200 && layout.length > 0
+                                edit && !locked && window.innerWidth > 1200 && layout.length > 0
                                   ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
                                   : null
                               }
@@ -80,10 +83,10 @@ class NodeDefEntity extends React.Component {
                                 md: rdgLayout,
                                 sm: rdgLayout,
                               }}
-                              isDraggable={edit}
-                              isResizable={edit}
+                              isDraggable={edit && !locked}
+                              isResizable={edit && !locked}
           //TODO decide if verticalCompact
-                              verticalCompact={false}>
+                              compactType={'vertical'}>
 
           {
             filterInnerPageChildren(children)

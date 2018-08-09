@@ -81,7 +81,8 @@ export const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
  */
 // CURRENT EDITING NODE_DEF
 const nodeDefEditPath = ['form', 'nodeDefEdit']
-export const assocFormNodeDefEdit = nodeDef => R.assocPath(nodeDefEditPath, nodeDef ? nodeDef.uuid : null)
+export const assocFormNodeDefEdit = nodeDef =>
+  R.assocPath(nodeDefEditPath, nodeDef ? nodeDef.uuid : null)
 
 export const getFormNodeDefEdit = state => {
   const surveyState = getSurveyState(state)
@@ -90,11 +91,13 @@ export const getFormNodeDefEdit = state => {
 }
 
 // CURRENT UNLOCKED NODE_DEF ENTITY
-const nodeDefEntityUnlockedPath = ['form', 'nodeDefEntityUnlocked']
-export const assocFormNodeDefEntityUnlocked = nodeDef => R.assocPath(nodeDefEntityUnlockedPath, nodeDef ? nodeDef.uuid : null)
+const nodeDefEntityUnlockedPath = ['form', 'nodeDefUnlocked']
+export const assocNodeDefFormUnlocked = nodeDef =>
+  R.assocPath(nodeDefEntityUnlockedPath, nodeDef ? nodeDef.uuid : null)
 
-export const getFormNodeDefEntityUnlocked = state => {
-  const surveyState = getSurveyState(state)
-  const uuid = R.path(nodeDefEntityUnlockedPath, surveyState)
-  return getNodeDef(uuid)(surveyState)
-}
+export const isNodeDefFormLocked = nodeDef => R.pipe(
+  getSurveyState,
+  R.path(nodeDefEntityUnlockedPath),
+  R.equals(nodeDef.uuid),
+  R.not,
+)

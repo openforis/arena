@@ -5,7 +5,7 @@ import {
   assocNodeDefProp,
   assocNodeDefs,
   assocFormNodeDefEdit,
-  assocFormNodeDefEntityUnlocked,
+  assocNodeDefFormUnlocked,
 } from './surveyState'
 
 /**
@@ -42,7 +42,7 @@ const actionHandlers = {
   //survey-form
   [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),
 
-  [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocFormNodeDefEntityUnlocked(nodeDef)(state),
+  [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocNodeDefFormUnlocked(nodeDef)(state),
 }
 
 export default exportReducer(actionHandlers)
