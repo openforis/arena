@@ -79,6 +79,17 @@ export const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
  * Survey-Form State
  * ======================
  */
+// CURRENT VIEW NODE_DEF PAGE
+const nodeDefViewPage = ['form', 'nodeDefViewPage']
+export const assocFormNodeDefViewPage = nodeDef =>
+  R.assocPath(nodeDefViewPage, nodeDef ? nodeDef.uuid : null)
+
+export const getFormNodeDefViewPage = state => {
+  const surveyState = getSurveyState(state)
+  const uuid = R.path(nodeDefViewPage, surveyState)
+  return getNodeDef(uuid)(surveyState)
+}
+
 // CURRENT EDITING NODE_DEF
 const nodeDefEditPath = ['form', 'nodeDefEdit']
 export const assocFormNodeDefEdit = nodeDef =>

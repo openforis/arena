@@ -67,7 +67,10 @@ const _putNodeDefProp = (nodeDef, key, value) => {
  */
 export const formNodeDefEditUpdate = 'survey/form/nodeDefEdit/update'
 export const formNodeDefUnlockedUpdate = 'survey/form/nodeDefUnlocked/update'
+export const formNodeDefViewPage = 'survey/form/nodeDefViewPage/update'
 
 export const setFormNodDefEdit = nodeDef => dispatch => dispatch({type: formNodeDefEditUpdate, nodeDef})
 
 export const setFormNodeDefUnlocked = nodeDef => dispatch => dispatch({type: formNodeDefUnlockedUpdate, nodeDef})
+
+export const setFormNodeDefViewPage = nodeDef => dispatch => dispatch({type: formNodeDefViewPage, nodeDef})
