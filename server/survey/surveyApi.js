@@ -56,7 +56,7 @@ module.exports.init = app => {
     try {
       await updateSurveyProp(surveyId, body)
       const validation = await validateUpdateSurveyProp(surveyId, key, value)
-      res.json({status: 'ok', validation: validation})
+      res.json({validation})
     } catch (err) {
       sendErr(res, err)
     }

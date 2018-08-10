@@ -5,7 +5,7 @@ import { setSurveyProp } from '../../common/survey/survey'
 
 import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey, assocSurveyPropValidation } from './surveyState'
 import { nodeDefUpdate } from './nodeDef/actions'
-import { runDelayed } from '../appUtils/asyncUtils'
+import { runDelayed } from '../appUtils/reduxUtils'
 
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyCurrentFieldValidationUpdate = 'survey/current/validation/field/update'

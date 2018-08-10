@@ -8,7 +8,7 @@ const {getSurveyById} = require('../survey/surveyRepository')
 const {deleteUserPref} = require('../user/userRepository')
 const {validateSurvey} = require('../survey/surveyValidator')
 
-const sendResponse = (res, user, survey = null, surveyValidation = null) => res.json({user, survey, surveyValidation})
+const sendResponse = (res, user, survey = null) => res.json({user, survey})
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {

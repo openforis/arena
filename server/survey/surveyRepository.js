@@ -58,7 +58,7 @@ const getSurveyById = async (surveyId, draft = false, client = db) =>
   )
 
 const getSurveysByName = async (surveyName, client = db) =>
-  await client.many(
+  await client.map(
     `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
     def => dbTransformCallback(def)

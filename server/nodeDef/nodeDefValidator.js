@@ -3,15 +3,14 @@ const Promise = require('bluebird')
 
 const {createError, validateRequired, assocValidation} = require('../serverUtils/validator')
 const {fetchNodeDefsBySurveyId} = require('./nodeDefRepository')
-const {getNodeDefProp, nodeDefType} = require('../../common/survey/nodeDef')
+const {nodeDefType} = require('../../common/survey/nodeDef')
 
 const validateNodeDefName = async (nodeDef, newNode = true) => {
   const requiredError = validateRequired('props.name', nodeDef)
   if (requiredError)
     return requiredError
 
-  const draft = true
-  const nodeDefsAll = await fetchNodeDefsBySurveyId(nodeDef.surveyId, draft)
+  const nodeDefsAll = await fetchNodeDefsBySurveyId(nodeDef.surveyId, true)
   const nodeDefsByName = nodeDefsAll.filter(n => n.props.name === nodeDef.props.name)
 
   if (!R.isEmpty(nodeDefsByName) && (newNode || R.find(n => n.id != nodeDef.id)(nodeDefsByName)))

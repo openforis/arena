@@ -1,6 +1,6 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendOk, sendErr} = require('../serverUtils/response')
-const {validateNodeDefs, validateNodeDefProp} = require('./nodeDefValidator')
+const {validateNodeDef, validateNodeDefs, validateNodeDefProp} = require('./nodeDefValidator')
 
 const {
   fetchNodeDef,
@@ -16,7 +16,12 @@ module.exports.init = app => {
       const {user, body: nodeDefRequest} = req
       const {surveyId, parentId, uuid, type, props} = nodeDefRequest
 
-      const nodeDef = await createNodeDef(surveyId, parentId, uuid, type, props)
+      const nodeDefDB = await createNodeDef(surveyId, parentId, uuid, type, props)
+      const nodeDef = {
+        ...nodeDefDB,
+        validation: await validateNodeDef(nodeDefDB)
+      }
+      console.log(nodeDef)
 
       res.json({nodeDef})
     } catch (err) {
@@ -49,10 +54,9 @@ module.exports.init = app => {
     const nodeDefId = getRestParam(req, 'id')
 
     try {
-      await updateNodeDefProp(nodeDefId, body)
-      const nodeDef = await fetchNodeDef(nodeDefId, true)
+      const nodeDef = await updateNodeDefProp(nodeDefId, body)
       const validation = await validateNodeDefProp(nodeDef, key, false)
-      res.json({status: 'ok', validation: validation})
+      res.json({validation})
     } catch (err) {
       sendErr(res, err)
     }
