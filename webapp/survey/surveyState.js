@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 const survey = 'survey'
+
 /**
  * ======================
  * Survey State
@@ -10,8 +11,6 @@ export const getSurveyState = R.prop(survey)
 
 // READ
 export const getCurrentSurvey = R.path(['app', survey])
-
-export const getCurrentSurveyValidation = R.path(['app', 'surveyValidation'])
 
 export const getCurrentSurveyId = R.pipe(
   getCurrentSurvey,
@@ -60,10 +59,6 @@ export const getRootNodeDef = R.pipe(
 export const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
 
 // ==== UPDATE
-export const assocFieldValidation = (field, validation) => R.pipe(
-  getCurrentSurveyValidation,
-  R.assocPath(['fields', field], validation)
-)
 
 export const assocNodeDefs = newNodeDefsArray =>
   survey => R.pipe(
@@ -79,7 +74,7 @@ export const assocNodeDefProp = (nodeDefUUID, key, value) =>
   R.assocPath([nodeDefs, nodeDefUUID, 'props', key], value)
 
 export const assocNodeDefPropValidation = (nodeDefUUID, key, validation) =>
-  R.assocPath([nodeDefs, nodeDefUUID, 'validation', "fields", key], validation)
+  R.assocPath([nodeDefs, nodeDefUUID, 'validation', 'fields', key], validation)
 
 // ==== UTILITY
 export const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
@@ -97,3 +92,11 @@ export const getFormNodeDefEdit = state => {
   const uuid = R.path(nodeDefEditPath, surveyState)
   return getNodeDef(uuid)(surveyState)
 }
+
+/**
+ * ======================
+ * Survey Validation
+ * ======================
+ */
+export const assocSurveyPropValidation = (key, validation) =>
+  R.assocPath(['validation', 'fields', key], validation)

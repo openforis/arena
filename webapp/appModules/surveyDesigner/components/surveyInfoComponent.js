@@ -14,7 +14,7 @@ import {
 } from '../../../../common/survey/survey'
 import { getSrsName, srs } from '../../../../common/app/srs'
 
-import { getCurrentSurvey, getCurrentSurveyValidation } from '../../../survey/surveyState'
+import { getCurrentSurvey } from '../../../survey/surveyState'
 import { updateSurveyProp } from '../../../survey/actions'
 
 import { normalizeName } from './../../../../common/survey/surveyUtils'
@@ -30,10 +30,8 @@ class SurveyInfoComponent extends React.Component {
   }
 
   render () {
-    const {survey, validation} = this.props
-
-    console.log(validation)
-
+    const {survey} = this.props
+    const {validation} = survey
     const surveySrs = getSurveySrs(survey).map(code => {return {key: code, value: getSrsName(code)}})
 
     return (
@@ -73,7 +71,6 @@ class SurveyInfoComponent extends React.Component {
 
 const mapStateToProps = state => ({
   survey: getCurrentSurvey(state),
-  validation: getCurrentSurveyValidation(state),
 })
 
 export default connect(

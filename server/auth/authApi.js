@@ -13,13 +13,11 @@ const sendResponse = (res, user, survey = null, surveyValidation = null) => res.
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
     const survey = await getSurveyById(surveyId, true)
-    const surveyValidation = await validateSurvey(survey)
 
     sendResponse(
       res,
       user,
-      survey,
-      surveyValidation,
+      {...survey, validation: await validateSurvey(survey)}
     )
   } catch (e) {
     console.log(`error loading survey with id ${surveyId}`, e)

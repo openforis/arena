@@ -26,12 +26,14 @@ class CommonProps extends React.Component {
 
   render () {
     const {nodeDef, putNodeDefProp} = this.props
+    const {validation} = nodeDef
 
     return (
       <React.Fragment>
 
         <FormItem label={'name'}>
           <Input value={getNodeDefProp('name', '')(nodeDef)}
+                 validation={R.path(['fields', 'name'])(validation)}
                  onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
         </FormItem>
 
@@ -40,20 +42,20 @@ class CommonProps extends React.Component {
         </FormItem>
 
         <LabelsEditor labels={getNodeDefLabels(nodeDef)}
-                      onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'labels', getNodeDefLabels(nodeDef))} />
+                      onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'labels', getNodeDefLabels(nodeDef))}/>
 
         <LabelsEditor formLabel="Description(s)"
                       labels={getNodeDefDescriptions(nodeDef)}
-                      onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'descriptions', getNodeDefDescriptions(nodeDef))} />
+                      onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'descriptions', getNodeDefDescriptions(nodeDef))}/>
 
         <FormItem label={'key'}>
           <Checkbox checked={getNodeDefProp('key', false)(nodeDef)}
-                    onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)} />
+                    onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
         </FormItem>
 
         <FormItem label={'multiple'}>
           <Checkbox checked={getNodeDefProp('multiple', false)(nodeDef)}
-                    onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)} />
+                    onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
         </FormItem>
 
         <FormItem label={'applicable if'}>
@@ -63,17 +65,16 @@ class CommonProps extends React.Component {
 
         <FormItem label={'calculated'}>
           <Checkbox checked={getNodeDefProp('calculated', false)(nodeDef)}
-                    onChange={(checked) => putNodeDefProp(nodeDef, 'calculated', checked)} />
+                    onChange={(checked) => putNodeDefProp(nodeDef, 'calculated', checked)}/>
         </FormItem>
 
         {nodeDef.type === nodeDefType.codeList &&
-          <FormItem label={'code list'}>
-            <Dropdown items={[]}
-                      selection={getNodeDefProp('codeListId', null)(nodeDef)}
-                      onChange={e => putNodeDefProp(nodeDef, 'codeListId', e.key)}
-                      validation={getNodeDefValidation(nodeDef, 'codeListId')}
-                      />
-          </FormItem>
+        <FormItem label={'code list'}>
+          <Dropdown items={[]}
+                    selection={getNodeDefProp('codeListId', null)(nodeDef)}
+                    onChange={e => putNodeDefProp(nodeDef, 'codeListId', e.key)}
+                    validation={getNodeDefValidation(nodeDef, 'codeListId')}/>
+        </FormItem>
         }
 
 

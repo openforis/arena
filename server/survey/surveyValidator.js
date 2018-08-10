@@ -1,17 +1,10 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {createError, validateRequired} = require('../serverUtils/validator')
+const {createError, validateRequired, assocValidation} = require('../serverUtils/validator')
 const {getSurveysByName} = require('./surveyRepository')
 
 const {getSurveyLanguages} = require('../../common/survey/survey')
-
-const assocValidation = (name, validation, obj) => R.propEq('valid', false, validation ? validation : {})
-  ? R.pipe(
-    R.assocPath(['validation', 'valid'], false),
-    R.assocPath(['validation', 'fields', name], validation),
-  )(obj)
-  : obj
 
 const validateSurveyName = async (survey, propName = 'name', newSurvey = true) => {
   const requiredError = validateRequired(propName, survey)
@@ -21,7 +14,7 @@ const validateSurveyName = async (survey, propName = 'name', newSurvey = true) =
   const surveyName = R.path(propName.split('.'))(survey)
   const surveysByName = await getSurveysByName(surveyName)
 
-  if (! R.isEmpty(surveysByName) && (newSurvey || R.find(s => s.id != survey.id)(surveysByName)))
+  if (!R.isEmpty(surveysByName) && (newSurvey || R.find(s => s.id != survey.id)(surveysByName)))
     return createError('duplicate')
 
   return null
@@ -46,7 +39,7 @@ const validateSurvey = async survey => {
 
   const [nameValidation, languagesValidation, defaultLangLabelValidation, srsValidation] = await Promise.all([
     validateSurveyName(survey, 'props.name', false),
-    validateRequired("props." + defaultLangLabelField, survey),
+    validateRequired('props.' + defaultLangLabelField, survey),
     validateRequired('props.languages', survey),
     validateRequired('props.srs', survey)
   ])

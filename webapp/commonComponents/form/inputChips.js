@@ -31,7 +31,7 @@ const Chip = ({item, onDelete, idx, canBeRemoved}) => (
 )
 
 const InputChips = ({items, selection = [], onChange, requiredItems = 0, dropdownAutocompleteMinChars = 0,
-                      readOnly: readOnly = false}) => {
+                      readOnly = false, validation = {}}) => {
 
   const onDropdownChange = (item) => {
     if (item) {
@@ -47,6 +47,8 @@ const InputChips = ({items, selection = [], onChange, requiredItems = 0, dropdow
   }
 
   const dropdownItems = R.reject(item => R.contains(item, selection))(items)
+
+  //const valid = R.propOr(true, 'valid')(validation)
 
   return <div style={{
     display: 'flex',

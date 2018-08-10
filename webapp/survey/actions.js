@@ -3,18 +3,16 @@ import * as R from 'ramda'
 
 import { setSurveyProp } from '../../common/survey/survey'
 
-import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey } from './surveyState'
+import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey, assocSurveyPropValidation } from './surveyState'
 import { nodeDefUpdate } from './nodeDef/actions'
+import { runDelayed } from '../appUtils/asyncUtils'
 
 export const surveyCurrentUpdate = 'survey/current/update'
-export const surveyCurrentFieldValidationUpdate = 'survey/current/validation/update'
+export const surveyCurrentFieldValidationUpdate = 'survey/current/validation/field/update'
 export const surveyNewUpdate = 'survey/new/update'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyCurrentUpdate, survey})
-
-export const dispatchCurrentSurveyFieldValidationUpdate = (dispatch, field, validation) =>
-  dispatch({type: surveyCurrentFieldValidationUpdate, field, validation})
 
 // ====== CREATE
 
@@ -76,17 +74,21 @@ export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
   const survey = R.pipe(
     getCurrentSurvey,
     setSurveyProp(key, value),
+    assocSurveyPropValidation(key, null)
   )(getState())
 
   dispatchCurrentSurveyUpdate(dispatch, survey)
+  dispatch(_updateSurveyProp(survey, key, value))
+}
 
+const _updateSurveyProp = (survey, key, value) => runDelayed(async dispatch => {
   try {
     const res = await axios.put(`/api/survey/${survey.id}/prop`, {key, value})
 
-    const { validation } = res.data
+    const {validation} = res.data
 
-    dispatchCurrentSurveyFieldValidationUpdate(dispatch, key, validation)
-  } catch (e) {
+    const updatedSurvey = assocSurveyPropValidation(key, validation)(survey)
 
-  }
-}
+    dispatchCurrentSurveyUpdate(dispatch, updatedSurvey)
+  } catch (e) {}
+}, `${surveyCurrentUpdate}_${key}`)

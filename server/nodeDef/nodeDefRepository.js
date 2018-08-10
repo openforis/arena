@@ -54,19 +54,18 @@ const fetchNodeDef = async (nodeDefId = null, draft, client = db) =>
     res => dbTransformCallback(res, draft)
   )
 
+const fetchNodeDefsBySurveyId = async (surveyId, draft, client = db) =>
+  await client.map(`SELECT ${nodeDefSelectFields}
+     FROM node_def WHERE survey_id = $1`,
+    [surveyId],
+    res => dbTransformCallback(res, draft)
+  )
+
 const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
   await client.map(
     `SELECT ${nodeDefSelectFields}
      FROM node_def WHERE parent_id = $1`,
     [parentId],
-    res => dbTransformCallback(res, draft)
-  )
-
-const fetchNodeDefByName = async (surveyId, name, draft, client = db) =>
-  await client.one(
-    `SELECT ${nodeDefSelectFields}
-     FROM node_def WHERE survey_id = $1 and ${draft ? 'props_draft' : 'props'} ->> 'name' = $2`,
-    [surveyId, name],
     res => dbTransformCallback(res, draft)
   )
 
@@ -88,7 +87,7 @@ const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
 // ============== DELETE
 
 const markNodeDefDeleted = async (nodeDefId, client = db) => await client.one(
-  `
+    `
   UPDATE node_def 
   SET deleted = true
   WHERE id = $1
@@ -109,8 +108,8 @@ module.exports = {
 
   //READ
   fetchNodeDef,
+  fetchNodeDefsBySurveyId,
   fetchNodeDefsByParentId,
-  fetchNodeDefByName,
 
   //UPDATE
   updateNodeDefProp,
