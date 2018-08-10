@@ -19,14 +19,14 @@ const mapStateToProps = (state, props) => ({
 })
 const FormNavigationItemConnect = connect(mapStateToProps)(FormNavigationItem)
 
-const FormNavigation = ({nodeDef}) => {
+const FormNavigation = ({rootNodeDef, nodeDef}) => {
 
   return (
     <div className="survey-form__nav" style={{
       display: 'flex',
       alignItems: 'flex-end',
     }}>
-      <FormNavigationItemConnect nodeDef={nodeDef}/>
+      <FormNavigationItemConnect nodeDef={rootNodeDef}/>
     </div>
   )
 }

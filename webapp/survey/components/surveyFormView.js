@@ -8,8 +8,9 @@ import FormActions from './form/formActions'
 import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
-import { getCurrentSurvey, getRootNodeDef, getSurveyState } from '../surveyState'
+import { getCurrentSurvey, getFormNodeDefViewPage, getRootNodeDef, getSurveyState } from '../surveyState'
 import { fetchRootNodeDef } from '../actions'
+import { setFormNodeDefViewPage } from '../nodeDef/actions'
 
 class SurveyFormView extends React.Component {
 
@@ -18,20 +19,32 @@ class SurveyFormView extends React.Component {
     fetchRootNodeDef(edit)
   }
 
+  componentDidUpdate () {
+    const {rootNodeDef, nodeDef, setFormNodeDefViewPage} = this.props
+    if (rootNodeDef && !nodeDef) {
+      setFormNodeDefViewPage(rootNodeDef)
+    }
+  }
+
   render () {
-    const {nodeDef, edit, draft} = this.props
+    const {rootNodeDef, nodeDef, edit, draft} = this.props
 
     return (
-      nodeDef ?
+      rootNodeDef ?
         <React.Fragment>
 
           <NodeDefEdit/>
 
           <div className={`survey-form${edit ? ' edit' : ''}`}>
 
-            <FormNavigation nodeDef={nodeDef} edit={edit} draft={draft}/>
+            <FormNavigation rootNodeDef={rootNodeDef} edit={edit} draft={draft}/>
 
-            <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft}/>
+            {
+              nodeDef
+                ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft}/>
+                : <div></div>
+            }
+
 
             {
               edit
@@ -48,6 +61,8 @@ class SurveyFormView extends React.Component {
 
 SurveyFormView.defaultProps = {
   //root entity
+  rootNodeDef: null,
+  // current nodeDef page
   nodeDef: null,
   // can edit form
   edit: false,
@@ -57,7 +72,11 @@ SurveyFormView.defaultProps = {
 
 const mapStateToProps = state => ({
   survey: getCurrentSurvey(state),
-  nodeDef: getRootNodeDef(getSurveyState(state)),
+  rootNodeDef: getRootNodeDef(getSurveyState(state)),
+  nodeDef: getFormNodeDefViewPage(state),
 })
 
-export default connect(mapStateToProps, {fetchRootNodeDef})(SurveyFormView)
+export default connect(
+  mapStateToProps,
+  {fetchRootNodeDef, setFormNodeDefViewPage}
+)(SurveyFormView)
