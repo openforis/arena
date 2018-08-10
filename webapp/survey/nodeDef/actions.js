@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { runDelayed } from '../../appUtils/asyncUtils'
+import { runDelayed } from '../../appUtils/reduxUtils'
 import { newNodeDef } from '../../../common/survey/nodeDef'
 import { getCurrentSurveyId } from '../surveyState'
 
