@@ -37,7 +37,7 @@ const createNodeDef = async (surveyId, parentId, uuid, type, props, client = db)
     RETURNING * 
     `,
     [surveyId, parentId, uuid, type, props],
-    camelize
+    def => dbTransformCallback(def, true) //always loading draft when creating or updating a nodeDef
   )
 
 const createEntityDef = async (surveyId, parentId, uuid, props, client = db) =>
@@ -73,7 +73,7 @@ const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
     WHERE id = $2
     RETURNING ${nodeDefSelectFields}
   `, [JSON.stringify(prop), nodeDefId],
-    def => dbTransformCallback(def)
+    def => dbTransformCallback(def, true) //always loading draft when creating or updating a nodeDef
   )
 }
 

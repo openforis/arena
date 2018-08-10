@@ -2,6 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
+import { uuidv4 } from '../../../../common/uuid'
+
 import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
 import { createNodeDef } from '../../nodeDef/actions'
@@ -47,19 +49,28 @@ const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
         .map(type =>
           <AddNodeDefButton key={type} type={type}
                             addNodeDef={addNodeDef}
-                            enabled={type===nodeDefType.entity ? canAddEntity : canAddAttribute}/>
+                            enabled={type === nodeDefType.entity ? canAddEntity : canAddAttribute}/>
         )
     }
 
     <button className="btn btn-s btn-of-light-xs"
-            aria-disabled={!canAddEntity}>
+            aria-disabled={!canAddEntity}
+            onClick={() => addNodeDef(
+              nodeDefType.entity,
+              {
+                [nodeDefLayoutProps.render]: nodeDefRenderType.form,
+                [nodeDefLayoutProps.pageUUID]: uuidv4(),
+              }
+            )}>
       <span className="icon icon-insert-template icon-left"></span>
       Entity New Page
     </button>
+
   </React.Fragment>
 }
 
 class FormActions extends React.Component {
+
   constructor () {
     super()
     this.state = {opened: true}
@@ -79,17 +90,9 @@ class FormActions extends React.Component {
     window.dispatchEvent(new Event('resize'))
   }
 
-  createNodeDef (type, props) {
+  addNodeDef (type, props) {
     const {nodeDef, createNodeDef} = this.props
     createNodeDef(nodeDef.id, type, props)
-  }
-
-  addNodeDef (type, props) {
-    this.createNodeDef(type, props)
-  }
-
-  createEntityNewPage () {
-    // this.createNodeDef(nodeDefType.entity, {})
   }
 
   render () {
