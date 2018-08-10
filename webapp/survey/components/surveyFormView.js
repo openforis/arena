@@ -33,7 +33,11 @@ class SurveyFormView extends React.Component {
       rootNodeDef ?
         <React.Fragment>
 
-          <NodeDefEdit/>
+          {
+            edit
+              ? <NodeDefEdit/>
+              : null
+          }
 
           <div className={`survey-form${edit ? ' edit' : ''}`}>
 
@@ -45,12 +49,12 @@ class SurveyFormView extends React.Component {
                 : <div></div>
             }
 
-
             {
               edit
                 ? <FormActions/>
                 : null
             }
+
           </div>
         </React.Fragment>
         : null

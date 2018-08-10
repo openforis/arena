@@ -75,9 +75,6 @@ class NodeDefEntity extends React.Component {
     const columns = getNoColumns(nodeDef)
     const rdgLayout = getLayout(nodeDef)
 
-    // console.log('==== ')
-    // console.log(nodeDef)
-
     const innerPageChildren = filterInnerPageChildren(children)
 
     const l = [
@@ -139,7 +136,7 @@ class NodeDefEntity extends React.Component {
                                 isDraggable={false}
                                 isResizable={false}
                                 compactType={'horizontal'}
-                                margin={[0,0]}>
+                                margin={[0, 0]}>
             {
               innerPageChildren
                 .map((childDef, i) =>

@@ -2,13 +2,41 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
-import { getNodeDefChildren, getSurveyState } from '../../surveyState'
+import { getFormNodeDefViewPage, getNodeDefChildren, getSurveyState } from '../../surveyState'
+import { fetchNodeDefChildren, setFormNodeDefViewPage } from '../../nodeDef/actions'
 
-const FormNavigationItem = ({nodeDef, children}) => {
+const FormNavigationItem = (props) => {
+  const {
+    nodeDef,
+    draft,
+    children,
+    currentPageNodeDef = {},
+    //actions
+    fetchNodeDefChildren,
+    setFormNodeDefViewPage,
+    level,
+  } = props
 
+  const outerPageChildren = children ? filterOuterPageChildren(children) : []
+
+  const isActive = currentPageNodeDef.uuid === nodeDef.uuid
   return (
     <React.Fragment>
-      <button className="btn btn-of-light">{nodeDef.props.name}</button>
+
+      <button className={`btn btn-of-light${isActive ? ' active' : ''}`}
+              onClick={() => {
+                fetchNodeDefChildren(nodeDef.id, draft)
+                setFormNodeDefViewPage(nodeDef)
+              }}
+              style={{height: `${100 - level * 10}%`}}>
+        {nodeDef.props.name}
+      </button>
+
+      {
+        outerPageChildren.map((child, i) =>
+          <FormNavigationItemConnect key={child.uuid} nodeDef={child} draft={draft} level={level + 1}/>
+        )
+      }
 
     </React.Fragment>
   )
@@ -16,17 +44,21 @@ const FormNavigationItem = ({nodeDef, children}) => {
 
 const mapStateToProps = (state, props) => ({
   children: getNodeDefChildren(props.nodeDef)(getSurveyState(state)),
+  currentPageNodeDef: getFormNodeDefViewPage(state),
 })
-const FormNavigationItemConnect = connect(mapStateToProps)(FormNavigationItem)
+const FormNavigationItemConnect = connect(
+  mapStateToProps,
+  {fetchNodeDefChildren, setFormNodeDefViewPage}
+)(FormNavigationItem)
 
-const FormNavigation = ({rootNodeDef, nodeDef}) => {
+const FormNavigation = ({rootNodeDef, draft}) => {
 
   return (
     <div className="survey-form__nav" style={{
       display: 'flex',
       alignItems: 'flex-end',
     }}>
-      <FormNavigationItemConnect nodeDef={rootNodeDef}/>
+      <FormNavigationItemConnect nodeDef={rootNodeDef} draft={draft} level={0}/>
     </div>
   )
 }
