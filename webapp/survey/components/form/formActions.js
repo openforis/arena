@@ -2,14 +2,80 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { nodeDefType } from '../../../../common/survey/nodeDef'
+import { uuidv4 } from '../../../../common/uuid'
+
+import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
+import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
 import { createNodeDef } from '../../nodeDef/actions'
 import { getNodeDefIconByType } from '../../nodeDef/components/nodeDefSystemProps'
+import { getNodeDefFormUnlocked } from '../../surveyState'
+
+const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
+  const isEntity = type === nodeDefType.entity
+
+  const nodeDefProps = isEntity ? {[nodeDefLayoutProps.render]: nodeDefRenderType.table} : {}
+
+  return <React.Fragment key={type}>
+    {
+      isEntity ?
+        <div className="separator-of"></div>
+        : null
+
+    }
+    <button className="btn btn-s btn-of-light-s"
+            onClick={() => addNodeDef(type, nodeDefProps)}
+            aria-disabled={!enabled}>
+      {getNodeDefIconByType(type)}{type}
+    </button>
+  </React.Fragment>
+}
+
+const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
+  const enabled = nodeDef && isNodeDefEntity(nodeDef)
+
+  const canAddAttribute = enabled
+  const canAddEntity = enabled && isRenderForm(nodeDef)
+
+  return <React.Fragment>
+    <div/>
+    <div/>
+    <div/>
+    <div className="title-of">
+      <span className="icon icon-plus icon-left"></span> Add
+    </div>
+
+    {
+      R.values(nodeDefType)
+        .map(type =>
+          <AddNodeDefButton key={type} type={type}
+                            addNodeDef={addNodeDef}
+                            enabled={type === nodeDefType.entity ? canAddEntity : canAddAttribute}/>
+        )
+    }
+
+    <button className="btn btn-s btn-of-light-xs"
+            aria-disabled={!canAddEntity}
+            onClick={() => addNodeDef(
+              nodeDefType.entity,
+              {
+                [nodeDefLayoutProps.render]: nodeDefRenderType.form,
+                [nodeDefLayoutProps.pageUUID]: uuidv4(),
+              }
+            )}>
+      <span className="icon icon-insert-template icon-left"></span>
+      Entity New Page
+    </button>
+
+  </React.Fragment>
+}
 
 class FormActions extends React.Component {
+
   constructor () {
     super()
     this.state = {opened: true}
+
+    this.addNodeDef = this.addNodeDef.bind(this)
   }
 
   toggleOpen () {
@@ -24,20 +90,15 @@ class FormActions extends React.Component {
     window.dispatchEvent(new Event('resize'))
   }
 
-  createNodeDef (type, props) {
+  addNodeDef (type, props) {
     const {nodeDef, createNodeDef} = this.props
     createNodeDef(nodeDef.id, type, props)
   }
 
-  addNodeDef (type) {
-    this.createNodeDef(type, {})
-  }
-
-  createEntityNewPage () {
-    // this.createNodeDef(nodeDefType.entity, {})
-  }
-
   render () {
+
+    const {nodeDef} = this.props
+
     return (
       <div className="survey-form__actions node-def__form_root">
 
@@ -50,35 +111,7 @@ class FormActions extends React.Component {
 
         {
           this.state.opened ?
-            <React.Fragment>
-              <div/>
-              <div/>
-              <div/>
-              <div className="title-of">
-                <span className="icon icon-plus icon-left"></span> Add
-              </div>
-
-              {
-                R.values(nodeDefType).map(type => <React.Fragment key={type}>
-                    {
-                      type === nodeDefType.entity ?
-                        <div className="separator-of"></div>
-                        : null
-
-                    }
-                    <button className="btn btn-s btn-of-light-s"
-                            onClick={() => this.addNodeDef(type)}>
-                      {getNodeDefIconByType(type)}{type}
-                    </button>
-                  </React.Fragment>
-                )
-              }
-
-              <button className="btn btn-s btn-of-light-xs">
-                <span className="icon icon-insert-template icon-left"></span>
-                Entity New Page
-              </button>
-            </React.Fragment>
+            <AddNodeDefButtons nodeDef={nodeDef} addNodeDef={this.addNodeDef}/>
             : null
         }
 
@@ -89,4 +122,8 @@ class FormActions extends React.Component {
 
 }
 
-export default connect(null, {createNodeDef})(FormActions)
+const mapStateToProps = state => ({
+  nodeDef: getNodeDefFormUnlocked(state)
+})
+
+export default connect(mapStateToProps, {createNodeDef})(FormActions)

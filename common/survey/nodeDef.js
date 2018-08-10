@@ -44,11 +44,15 @@ const getNodeDefLabel = (nodeDef, lang) => R.pipe(
 
 const getNodeDefValidation = (nodeDef, field) => R.path(['validation', 'fields', field])(nodeDef)
 
+const getNodeDefType = R.prop('type')
+
 // ==== UPDATE
 
 module.exports = {
   nodeDefType,
-  getNodeDefType: R.prop('type'),
+  getNodeDefType,
+
+  isNodeDefEntity: R.pipe(getNodeDefType, R.equals(nodeDefType.entity)),
 
 // props
 //   getNodeDefProps: getProps,
