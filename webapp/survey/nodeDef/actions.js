@@ -1,4 +1,5 @@
 import axios from 'axios'
+import * as R from 'ramda'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 import { newNodeDef } from '../../../common/survey/nodeDef'
@@ -10,6 +11,7 @@ import { getCurrentSurveyId } from '../surveyState'
 export const nodeDefUpdate = 'nodeDef/update'
 export const nodeDefsUpdate = 'nodeDefs/update'
 export const nodeDefPropUpdate = 'nodeDef/prop/update'
+export const nodeDefValidationUpdate = 'nodeDef/validation/updated'
 export const nodeDefPropValidationUpdate = 'nodeDef/prop/validation/update'
 
 // ==== CREATE
@@ -76,3 +78,14 @@ export const setFormNodDefEdit = nodeDef => dispatch => dispatch({type: formNode
 export const setFormNodeDefUnlocked = nodeDef => dispatch => dispatch({type: formNodeDefUnlockedUpdate, nodeDef})
 
 export const setFormNodeDefViewPage = nodeDef => dispatch => dispatch({type: formNodeDefViewPage, nodeDef})
+
+export const closeFormNodeDefEdit = nodeDef => async dispatch => {
+  const res = await axios.get(`/api/nodeDef/${nodeDef.id}/validation`)
+  const {validation} = res.data
+
+  if (!validation || validation.valid) {
+    dispatch({type: formNodeDefEditUpdate, nodeDef: null})
+  } else {
+    dispatch({type: nodeDefValidationUpdate, nodeDefUUID: nodeDef.uuid, validation})
+  }
+}

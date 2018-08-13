@@ -58,9 +58,17 @@ class NodeDefSwitch extends React.Component {
     } = this.props
 
     const isRoot = isNodeDefRoot(nodeDef)
+    const invalid = nodeDef.validation && !nodeDef.validation.valid
 
     return <div className={`node-def__form${isRoot ? ' node-def__form_root' : ''}`} ref="nodeDefElem">
-
+      {
+        invalid ?
+          <div className="node-def__form-error">
+            <span className="icon icon-warning icon-16px icon-left"/>
+            <span>INVALID</span>
+          </div>
+          : null
+      }
       {
         edit ?
           <div className="node-def__form-actions">

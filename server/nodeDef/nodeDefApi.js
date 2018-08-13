@@ -1,5 +1,5 @@
 const {getRestParam} = require('../serverUtils/request')
-const {sendOk, sendErr} = require('../serverUtils/response')
+const {sendErr} = require('../serverUtils/response')
 const {validateNodeDef, validateNodeDefs, validateNodeDefProp} = require('./nodeDefValidator')
 
 const {
@@ -11,9 +11,11 @@ const {
 
 module.exports.init = app => {
 
+  // ==== CREATE
+
   app.post('/nodeDef', async (req, res) => {
     try {
-      const {user, body: nodeDefRequest} = req
+      const {body: nodeDefRequest} = req
       const {surveyId, parentId, uuid, type, props} = nodeDefRequest
 
       const nodeDefDB = await createNodeDef(surveyId, parentId, uuid, type, props)
@@ -27,6 +29,8 @@ module.exports.init = app => {
     }
   })
 
+  // ==== READ
+
   app.get('/nodeDef/:id/children', async (req, res) => {
     try {
       const nodeDefId = getRestParam(req, 'id')
@@ -39,15 +43,24 @@ module.exports.init = app => {
     } catch (err) {
       sendErr(res, err)
     }
+  })
 
+  app.get('/nodeDef/:id/validation', async (req, res) => {
+    try {
+      const nodeDefId = getRestParam(req, 'id')
+      const nodeDef = await fetchNodeDef(nodeDefId, true)
+      const validation = await validateNodeDef(nodeDef, false)
+      res.json({validation})
+    } catch (err) {
+      sendErr(res, err)
+    }
   })
 
   // ==== UPDATE
 
   app.put('/nodeDef/:id/prop', async (req, res) => {
-    const {user, body} = req
-
-    const {key, value} = body
+    const {body} = req
+    const {key} = body
 
     const nodeDefId = getRestParam(req, 'id')
 

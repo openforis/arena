@@ -73,9 +73,6 @@ export const assocNodeDef = nodeDef =>
 export const assocNodeDefProp = (nodeDefUUID, key, value) =>
   R.assocPath([nodeDefs, nodeDefUUID, 'props', key], value)
 
-export const assocNodeDefPropValidation = (nodeDefUUID, key, validation) =>
-  R.assocPath([nodeDefs, nodeDefUUID, 'validation', 'fields', key], validation)
-
 // ==== UTILITY
 export const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
 
@@ -131,3 +128,24 @@ export const isNodeDefFormLocked = nodeDef => R.pipe(
  */
 export const assocSurveyPropValidation = (key, validation) =>
   R.assocPath(['validation', 'fields', key], validation)
+
+
+export const assocNodeDefValidation = (nodeDefUUID, validation) => R.assocPath([nodeDefs, nodeDefUUID, 'validation'], validation)
+
+export const assocNodeDefPropValidation = (nodeDefUUID, key, validation) => state => {
+  const nodeDefValidationPath = [nodeDefs, nodeDefUUID, 'validation']
+
+  const oldNodeDefValidation = R.pipe(
+    R.path(nodeDefValidationPath),
+    R.defaultTo({valid: true})
+  )(state)
+
+  const nodeDefValidation = R.assocPath(['fields', key], validation)(oldNodeDefValidation)
+
+  const invalidFields = oldNodeDefValidation.fields ? R.find((v) => !v.valid)(oldNodeDefValidation.fields) : []
+
+  nodeDefValidation.valid = R.isNil(invalidFields) || R.isEmpty(invalidFields)
+
+  return R.assocPath(nodeDefValidationPath, nodeDefValidation)(state)
+}
+
