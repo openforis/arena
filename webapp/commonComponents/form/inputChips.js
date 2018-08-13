@@ -2,6 +2,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Dropdown from './dropdown'
+import { TooltipError } from '../tooltip'
 
 const Chip = ({item, onDelete, idx, canBeRemoved}) => (
   <div className="form-input"
@@ -30,8 +31,17 @@ const Chip = ({item, onDelete, idx, canBeRemoved}) => (
   </div>
 )
 
-const InputChips = ({items, selection = [], onChange, requiredItems = 0, dropdownAutocompleteMinChars = 0,
-                      readOnly = false, validation = {}}) => {
+const InputChips = (props) => {
+
+  const {
+    items,
+    onChange,
+    selection = [],
+    requiredItems = 0,
+    dropdownAutocompleteMinChars = 0,
+    readOnly = false,
+    validation = {}
+  } = props
 
   const onDropdownChange = (item) => {
     if (item) {
@@ -48,28 +58,30 @@ const InputChips = ({items, selection = [], onChange, requiredItems = 0, dropdow
 
   const dropdownItems = R.reject(item => R.contains(item, selection))(items)
 
-  //const valid = R.propOr(true, 'valid')(validation)
+  const valid = R.propOr(true, 'valid')(validation)
 
-  return <div style={{
-    display: 'flex',
-    flexWrap: 'wrap',
-  }}>
-    {
-      selection.map((item, i) =>
-        <Chip key={item.key}
-              item={item}
-              onDelete={item => removeItem(item)}
-              idx={i}
-              canBeRemoved={!readOnly && selection.length > requiredItems}/>
-      )
-    }
-    <Dropdown items={dropdownItems}
-              onChange={onDropdownChange}
-              selection={null}
-              clearOnSelection={true}
-              autocompleteMinChars={dropdownAutocompleteMinChars}
-              readOnly={readOnly}/>
-  </div>
+  return <TooltipError message={valid ? null : validation.error}>
+    <div style={{
+      display: 'flex',
+      flexWrap: 'wrap',
+    }}>
+      {
+        selection.map((item, i) =>
+          <Chip key={item.key}
+                item={item}
+                onDelete={item => removeItem(item)}
+                idx={i}
+                canBeRemoved={!readOnly && selection.length > requiredItems}/>
+        )
+      }
+      <Dropdown items={dropdownItems}
+                onChange={onDropdownChange}
+                selection={null}
+                clearOnSelection={true}
+                autocompleteMinChars={dropdownAutocompleteMinChars}
+                readOnly={readOnly}/>
+    </div>
+  </TooltipError>
 }
 
 export default InputChips
