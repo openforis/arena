@@ -4,8 +4,6 @@ const Promise = require('bluebird')
 const {createError, validateRequired, assocValidation} = require('../serverUtils/validator')
 const {getSurveysByName} = require('./surveyRepository')
 
-const {getSurveyLanguages} = require('../../common/survey/survey')
-
 const validateSurveyName = async (propName, survey) => {
   const requiredError = validateRequired(propName, survey)
   if (requiredError)
