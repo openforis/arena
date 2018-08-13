@@ -18,11 +18,8 @@ module.exports.init = app => {
       const {body: nodeDefRequest} = req
       const {surveyId, parentId, uuid, type, props} = nodeDefRequest
 
-      const nodeDefDB = await createNodeDef(surveyId, parentId, uuid, type, props)
-      const nodeDef = {
-        ...nodeDefDB,
-        validation: await validateNodeDef(nodeDefDB)
-      }
+      const nodeDef = await createNodeDef(surveyId, parentId, uuid, type, props)
+
       res.json({nodeDef})
     } catch (err) {
       sendErr(res, err)
@@ -35,9 +32,12 @@ module.exports.init = app => {
     try {
       const nodeDefId = getRestParam(req, 'id')
       const draft = getRestParam(req, 'draft')
+      const validate = getRestParam(req, 'validate')
 
       const nodeDefsDB = await fetchNodeDefsByParentId(nodeDefId, draft)
-      const nodeDefs = await validateNodeDefs(nodeDefsDB)
+      const nodeDefs = validate
+        ? await validateNodeDefs(nodeDefsDB)
+        : nodeDefsDB
 
       res.json({nodeDefs})
     } catch (err) {
@@ -66,7 +66,7 @@ module.exports.init = app => {
 
     try {
       const nodeDef = await updateNodeDefProp(nodeDefId, body)
-      const validation = await validateNodeDefProp(nodeDef, key, false)
+      const validation = await validateNodeDefProp(nodeDef, key)
       res.json({validation})
     } catch (err) {
       sendErr(res, err)

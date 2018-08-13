@@ -5,7 +5,7 @@ const {createError, validateRequired, assocValidation} = require('../serverUtils
 const {fetchNodeDefsBySurveyId} = require('./nodeDefRepository')
 const {nodeDefType} = require('../../common/survey/nodeDef')
 
-const validateNodeDefName = async (nodeDef, newNode = true) => {
+const validateNodeDefName = async (nodeDef) => {
   const requiredError = validateRequired('props.name', nodeDef)
   if (requiredError)
     return requiredError
@@ -13,24 +13,24 @@ const validateNodeDefName = async (nodeDef, newNode = true) => {
   const nodeDefsAll = await fetchNodeDefsBySurveyId(nodeDef.surveyId, true)
   const nodeDefsByName = nodeDefsAll.filter(n => n.props.name === nodeDef.props.name)
 
-  if (!R.isEmpty(nodeDefsByName) && (newNode || R.find(n => n.id != nodeDef.id)(nodeDefsByName)))
+  if (!R.isEmpty(nodeDefsByName) && R.find(n => n.id != nodeDef.id)(nodeDefsByName))
     return createError('duplicate')
 
   return null
 }
 
-const validateNodeDefProp = async (nodeDef, propName, newNode = true) => {
+const validateNodeDefProp = async (nodeDef, propName) => {
   switch (propName) {
     case 'name':
-      return validateNodeDefName(nodeDef, newNode)
+      return validateNodeDefName(nodeDef)
     default:
       return null
   }
 }
 
-const validateNodeDef = async (nodeDef, newNode) => {
+const validateNodeDef = async (nodeDef) => {
   const [nameValidation] = await Promise.all([
-    validateNodeDefName(nodeDef, newNode),
+    validateNodeDefName(nodeDef),
     //nodeDef.type === nodeDefType.codeList ? validateRequired('props.codeListId', nodeDef) : null
   ])
   return R.pipe(
@@ -44,7 +44,7 @@ const validateNodeDef = async (nodeDef, newNode) => {
 const validateNodeDefs = async (nodeDefs) =>
   await Promise.all(nodeDefs.map(async n => ({
     ...n,
-    validation: await validateNodeDef(n, false)
+    validation: await validateNodeDef(n)
   })))
 
 module.exports = {

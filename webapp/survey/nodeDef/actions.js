@@ -37,9 +37,9 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
 
 // ==== READ
 
-export const fetchNodeDefChildren = (id, draft = false) => async dispatch => {
+export const fetchNodeDefChildren = (id, draft = false, validate = false) => async dispatch => {
   try {
-    const {data} = await axios.get(`/api/nodeDef/${id}/children?draft=${draft}`)
+    const {data} = await axios.get(`/api/nodeDef/${id}/children?draft=${draft}&validate=${validate}`)
     dispatch({type: nodeDefsUpdate, ...data})
   } catch (e) { }
 }

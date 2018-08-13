@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
 import { getFormNodeDefViewPage, getNodeDefChildren, getSurveyState } from '../../surveyState'
-import { fetchNodeDefChildren, setFormNodeDefViewPage } from '../../nodeDef/actions'
+import { setFormNodeDefViewPage } from '../../nodeDef/actions'
 
 const FormNavigationItem = (props) => {
   const {
@@ -12,7 +12,6 @@ const FormNavigationItem = (props) => {
     children,
     currentPageNodeDef = {},
     //actions
-    fetchNodeDefChildren,
     setFormNodeDefViewPage,
     level,
   } = props
@@ -25,7 +24,7 @@ const FormNavigationItem = (props) => {
 
       <button className={`btn btn-of-light${isActive ? ' active' : ''}`}
               onClick={() => {
-                fetchNodeDefChildren(nodeDef.id, draft)
+                // fetchNodeDefChildren(nodeDef.id, draft)
                 setFormNodeDefViewPage(nodeDef)
               }}
               style={{height: `${100 - level * 10}%`}}>
@@ -48,7 +47,7 @@ const mapStateToProps = (state, props) => ({
 })
 const FormNavigationItemConnect = connect(
   mapStateToProps,
-  {fetchNodeDefChildren, setFormNodeDefViewPage}
+  {setFormNodeDefViewPage}
 )(FormNavigationItem)
 
 const FormNavigation = ({rootNodeDef, draft}) => {
