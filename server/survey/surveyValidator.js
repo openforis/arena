@@ -49,32 +49,36 @@ const surveyPropsValidations = {
 }
 
 const validateProp = async (obj, prop, validations) => {
-  const validationResults = await Promise.all(
-    validations.map(validationFn => validationFn(prop, obj))
+  const errors = R.reject(
+    R.isNil,
+    await Promise.all(
+      validations.map(validationFn => validationFn(prop, obj))
+    )
   )
-
-  return R.pipe(
-    R.reject(R.isNil),
-    results => R.pipe(
-      R.assoc('valid', R.isEmpty(results)),
-      R.assoc('errors', results)
-    )({})
-  )(validationResults)
+  return {
+    valid: R.isEmpty(errors),
+    errors,
+  }
 }
 
 const validate = async (obj, propsValidations) => {
   const props = R.keys(propsValidations)
-  const validationResults = await Promise.all(
-    props.map(prop => validateProp(obj, prop, propsValidations[prop]))
+  const propName = R.pipe(R.split('.'), R.tail)
+
+  const fields = R.mergeAll(
+    await Promise.all(
+      props.map(async prop => ({
+        [propName(prop)]: await validateProp(obj, prop, propsValidations[prop])
+      }))
+    )
   )
 
   return {
-    valid: !R.any(R.propEq('valid', false), validationResults),
-    fields: R.mergeAll(
-      props.map((prop, i) => ({
-        [R.pipe(R.split('.'), R.tail)(prop)]: validationResults[i]
-      }))
-    )
+    valid: !R.any(
+      prop => R.pathEq([propName(prop), 'valid'], false, fields),
+      props,
+    ),
+    fields
   }
 }
 const validateSurvey = async survey => {
@@ -97,7 +101,7 @@ const validateUpdateSurveyProp = async (survey, prop) => {
   const surveyValidation = await validate(survey, surveyPropsValidations)
   console.log('===== validateUpdateSurveyProp test validation survey ', JSON.stringify(surveyValidation))
 
-  const propValidation = await validateProp(survey,'props.'+prop, surveyPropsValidations['props.'+prop])
+  const propValidation = await validateProp(survey, 'props.' + prop, surveyPropsValidations['props.' + prop])
   console.log('===== validateUpdateSurveyProp test validation prop', ` '${prop}' `, JSON.stringify(propValidation))
 
   switch (prop) {
