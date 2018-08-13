@@ -41,7 +41,7 @@ class NodeDefEntity extends React.Component {
   componentDidUpdate (prevProps, prevState, snapshot) {
     const {nodeDef, fetchNodeDefChildren, draft} = this.props
     const prevNodeDefId = R.path(['nodeDef', 'id'], prevProps)
-    if (nodeDef.id !== prevNodeDefId)
+    if (nodeDef.id && nodeDef.id !== prevNodeDefId)
       fetchNodeDefChildren(nodeDef.id, draft)
   }
 
