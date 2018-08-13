@@ -6,7 +6,7 @@ const {getSurveysByName} = require('./surveyRepository')
 
 const {getSurveyLanguages} = require('../../common/survey/survey')
 
-const validateSurveyName = async (survey, propName = 'name', newSurvey = true) => {
+const validateSurveyName = async (survey, propName = 'name') => {
   const requiredError = validateRequired(propName, survey)
   if (requiredError)
     return requiredError
@@ -14,7 +14,7 @@ const validateSurveyName = async (survey, propName = 'name', newSurvey = true) =
   const surveyName = R.path(propName.split('.'))(survey)
   const surveysByName = await getSurveysByName(surveyName)
 
-  if (!R.isEmpty(surveysByName) && (newSurvey || R.find(s => s.id != survey.id)(surveysByName)))
+  if (!R.isEmpty(surveysByName) && R.find(s => s.id != survey.id)(surveysByName))
     return createError('duplicate')
 
   return null
@@ -38,7 +38,7 @@ const validateSurvey = async survey => {
   const defaultLangLabelField = 'labels.' + R.head(getSurveyLanguages(survey))
 
   const [nameValidation, languagesValidation, defaultLangLabelValidation, srsValidation] = await Promise.all([
-    validateSurveyName(survey, 'props.name', false),
+    validateSurveyName(survey, 'props.name'),
     validateRequired('props.' + defaultLangLabelField, survey),
     validateRequired('props.languages', survey),
     validateRequired('props.srs', survey)
@@ -61,7 +61,7 @@ const validateUpdateSurveyProp = async (surveyId, key, value) => {
   }
   switch (key) {
     case 'name':
-      return validateSurveyName(surveyFormObj, key, false)
+      return validateSurveyName(surveyFormObj, key)
     case 'languages':
     case 'srs':
       return validateRequired(key, surveyFormObj)
