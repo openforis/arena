@@ -47,15 +47,13 @@ module.exports.init = app => {
   // ==== UPDATE
 
   app.put('/survey/:id/prop', async (req, res) => {
-    const {body} = req
-
-    const surveyId = getRestParam(req, 'id')
-
-    const {key, value} = body
-
     try {
-      await updateSurveyProp(surveyId, body)
-      const validation = await validateUpdateSurveyProp(surveyId, key, value)
+      const {body} = req
+      const surveyId = getRestParam(req, 'id')
+
+      const survey = await updateSurveyProp(surveyId, body)
+      const validation = await validateUpdateSurveyProp(survey, body.key)
+
       res.json({validation})
     } catch (err) {
       sendErr(res, err)

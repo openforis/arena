@@ -24,7 +24,7 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       name,
       labels: {[lang]: label},
       languages: [lang],
-      srs: ["4326"] //EPSG:4326 WGS84 Lat Lon Spatial Reference System
+      srs: ['4326'] //EPSG:4326 WGS84 Lat Lon Spatial Reference System
     }
 
     const {id: surveyId} = await t.one(`
@@ -84,7 +84,7 @@ const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
     WHERE id = $2
     RETURNING *
   `, [JSON.stringify(prop), surveyId],
-    def => dbTransformCallback(def)
+    def => dbTransformCallback(def, true)
   )
 }
 

@@ -6,7 +6,7 @@ const {getSurveysByName} = require('./surveyRepository')
 
 const {getSurveyLanguages} = require('../../common/survey/survey')
 
-const validateSurveyName = async (survey, propName = 'name') => {
+const validateSurveyName = async (propName, survey) => {
   const requiredError = validateRequired(propName, survey)
   if (requiredError)
     return requiredError
@@ -21,25 +21,24 @@ const validateSurveyName = async (survey, propName = 'name') => {
 }
 
 const validateCreateSurvey = async survey => {
-  const [nameValidation, labelValidation, langValidation] = await Promise.all(
-    [validateSurveyName(survey), validateRequired('label', survey), validateRequired('lang', survey)]
-  )
+  const [nameValidation, langValidation] =
+    await Promise.all([
+      validateSurveyName('name', survey),
+      validateRequired('lang', survey)
+    ])
 
   return R.pipe(
     R.assocPath(['validation', 'valid'], true),
     R.partial(assocValidation, ['name', nameValidation]),
-    R.partial(assocValidation, ['label', labelValidation]),
     R.partial(assocValidation, ['lang', langValidation]),
     R.prop('validation'),
   )(survey)
 }
 
 const validateSurvey = async survey => {
-  const defaultLangLabelField = 'labels.' + R.head(getSurveyLanguages(survey))
 
-  const [nameValidation, languagesValidation, defaultLangLabelValidation, srsValidation] = await Promise.all([
-    validateSurveyName(survey, 'props.name'),
-    validateRequired('props.' + defaultLangLabelField, survey),
+  const [nameValidation, languagesValidation, srsValidation] = await Promise.all([
+    validateSurveyName('props.name', survey),
     validateRequired('props.languages', survey),
     validateRequired('props.srs', survey)
   ])
@@ -48,23 +47,19 @@ const validateSurvey = async survey => {
     R.assocPath(['validation', 'valid'], true),
     R.partial(assocValidation, ['name', nameValidation]),
     R.partial(assocValidation, ['languages', languagesValidation]),
-    R.partial(assocValidation, [defaultLangLabelField, defaultLangLabelValidation]),
     R.partial(assocValidation, ['srs', srsValidation]),
     R.prop('validation'),
   )(survey)
 }
 
-const validateUpdateSurveyProp = async (surveyId, key, value) => {
-  const surveyFormObj = {
-    id: surveyId,
-    [key]: value
-  }
+const validateUpdateSurveyProp = async (survey, key) => {
+
   switch (key) {
     case 'name':
-      return validateSurveyName(surveyFormObj, key)
+      return validateSurveyName('props.' + key, survey)
     case 'languages':
     case 'srs':
-      return validateRequired(key, surveyFormObj)
+      return validateRequired('props.' + key, survey)
     default:
       return null
   }
