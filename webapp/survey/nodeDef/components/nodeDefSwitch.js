@@ -13,6 +13,7 @@ import { nodeDefType, getNodeDefType } from '../../../../common/survey/nodeDef'
 import {
   getNoColumns,
   nodeDefLayoutProps,
+  getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
 
 import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
@@ -58,8 +59,9 @@ class NodeDefSwitch extends React.Component {
     } = this.props
 
     const isRoot = isNodeDefRoot(nodeDef)
+    const isPage = !!getPageUUID(nodeDef)
 
-    return <div className={`node-def__form${isRoot ? ' node-def__form_root' : ''}`} ref="nodeDefElem">
+    return <div className={`node-def__form${isPage ? ' node-def__form_page' : ''}`} ref="nodeDefElem">
 
       {
         edit ?
@@ -69,7 +71,7 @@ class NodeDefSwitch extends React.Component {
                 null :
                 <React.Fragment>
                   {
-                    isRoot ?
+                    isPage ?
                       <div className="btn-of-light-xs node-def__form-root-actions">
                         columns
                         <input value={getNoColumns(nodeDef)}
