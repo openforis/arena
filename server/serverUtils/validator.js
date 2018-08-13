@@ -20,6 +20,17 @@ const validateRequired = (propName, obj) => {
   return createError(error)
 }
 
+const validateRequired2 = (propName, obj) => {
+  const value = R.pipe(
+    R.path(propName.split('.')),
+    R.defaultTo(''),
+  )(obj)
+
+  return R.isEmpty(value)
+    ? 'empty'
+    : null
+}
+
 const assocValidation = (name, validation, obj) => R.propEq('valid', false, validation ? validation : {})
   ? R.pipe(
     R.assocPath(['validation', 'valid'], false),
@@ -30,5 +41,6 @@ const assocValidation = (name, validation, obj) => R.propEq('valid', false, vali
 module.exports = {
   createError,
   validateRequired,
+  validateRequired2,
   assocValidation,
 }

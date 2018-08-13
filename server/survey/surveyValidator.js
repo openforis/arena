@@ -1,7 +1,7 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {createError, validateRequired, assocValidation} = require('../serverUtils/validator')
+const {createError, validateRequired, validateRequired2, assocValidation} = require('../serverUtils/validator')
 const {getSurveysByName} = require('./surveyRepository')
 
 const validateSurveyName = async (propName, survey) => {
@@ -16,6 +16,15 @@ const validateSurveyName = async (propName, survey) => {
     return createError('duplicate')
 
   return null
+}
+
+const validateSurveyNameUniqueness = async (propName, survey) => {
+  const surveyName = R.path(propName.split('.'))(survey)
+  const surveysByName = await getSurveysByName(surveyName)
+
+  return !R.isEmpty(surveysByName) && R.find(s => s.id != survey.id, surveysByName)
+    ? 'duplicate'
+    : null
 }
 
 const validateCreateSurvey = async survey => {
@@ -33,8 +42,42 @@ const validateCreateSurvey = async survey => {
   )(survey)
 }
 
-const validateSurvey = async survey => {
+const surveyPropsValidations = {
+  'props.name': [validateRequired2, validateSurveyNameUniqueness],
+  'props.languages': [validateRequired2],
+  'props.srs': [validateRequired2],
+}
 
+const validateProp = async (obj, prop, validations) => {
+  const validationResults = await Promise.all(
+    validations.map(validationFn => validationFn(prop, obj))
+  )
+
+  return R.pipe(
+    R.reject(R.isNil),
+    results => R.pipe(
+      R.assoc('valid', R.isEmpty(results)),
+      R.assoc('errors', results)
+    )({})
+  )(validationResults)
+}
+
+const validate = async (obj, propsValidations) => {
+  const props = R.keys(propsValidations)
+  const validationResults = await Promise.all(
+    props.map(prop => validateProp(obj, prop, propsValidations[prop]))
+  )
+
+  return {
+    valid: !R.any(R.propEq('valid', false), validationResults),
+    fields: R.mergeAll(
+      props.map((prop, i) => ({
+        [R.pipe(R.split('.'), R.tail)(prop)]: validationResults[i]
+      }))
+    )
+  }
+}
+const validateSurvey = async survey => {
   const [nameValidation, languagesValidation, srsValidation] = await Promise.all([
     validateSurveyName('props.name', survey),
     validateRequired('props.languages', survey),
@@ -50,14 +93,19 @@ const validateSurvey = async survey => {
   )(survey)
 }
 
-const validateUpdateSurveyProp = async (survey, key) => {
+const validateUpdateSurveyProp = async (survey, prop) => {
+  const surveyValidation = await validate(survey, surveyPropsValidations)
+  console.log('===== validateUpdateSurveyProp test validation survey ', JSON.stringify(surveyValidation))
 
-  switch (key) {
+  const propValidation = await validateProp(survey,'props.'+prop, surveyPropsValidations['props.'+prop])
+  console.log('===== validateUpdateSurveyProp test validation prop', ` '${prop}' `, JSON.stringify(propValidation))
+
+  switch (prop) {
     case 'name':
-      return validateSurveyName('props.' + key, survey)
+      return validateSurveyName('props.' + prop, survey)
     case 'languages':
     case 'srs':
-      return validateRequired('props.' + key, survey)
+      return validateRequired('props.' + prop, survey)
     default:
       return null
   }
