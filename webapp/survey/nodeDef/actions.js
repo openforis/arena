@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-import { newNodeDef } from '../../../common/survey/nodeDef'
+import { newNodeDef, isNodeDefEntity } from '../../../common/survey/nodeDef'
+import { getPageUUID } from '../../../common/survey/nodeDefLayout'
 import { getCurrentSurveyId } from '../surveyState'
 
 /**
@@ -19,6 +20,12 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
     dispatch({type: nodeDefUpdate, nodeDef})
     //setting current editing nodeDef
     dispatch(setFormNodDefEdit(nodeDef))
+
+    if (isNodeDefEntity(nodeDef)) {
+      dispatch(setFormNodeDefUnlocked(nodeDef))
+      if (getPageUUID(nodeDef))
+        dispatch(setFormNodeDefViewPage(nodeDef))
+    }
 
     const {data} = await axios.post(`/api/nodeDef`, nodeDef)
     dispatch({type: nodeDefUpdate, ...data})
