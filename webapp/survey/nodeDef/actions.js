@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { runDelayed } from '../../appUtils/reduxUtils'
+import { debounceAction } from '../../appUtils/reduxUtils'
 import { newNodeDef } from '../../../common/survey/nodeDef'
 import { getCurrentSurveyId } from '../surveyState'
 
@@ -50,14 +50,19 @@ export const putNodeDefProp = (nodeDef, key, value) => async dispatch => {
   dispatch(_putNodeDefProp(nodeDef, key, value))
 }
 
-const _putNodeDefProp = (nodeDef, key, value) => runDelayed(async dispatch => {
-  try {
-    const res = await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
-    //update node def validation
-    const {validation} = res.data
-    dispatch({type: nodeDefPropValidationUpdate, nodeDefUUID: nodeDef.uuid, key, validation})
-  } catch (e) { }
-}, `${nodeDefPropUpdate}_${key}`)
+const _putNodeDefProp = (nodeDef, key, value) => {
+  const action = async dispatch => {
+    try {
+      const res = await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
+      //update node def validation
+      const {validation} = res.data
+      dispatch({type: nodeDefPropValidationUpdate, nodeDefUUID: nodeDef.uuid, key, validation})
+    } catch (e) { }
+
+  }
+
+  return debounceAction(action, `${nodeDefPropUpdate}_${key}`)
+}
 
 /**
  * ==== SURVEY-FORM EDIT MODE - NODE DEFS

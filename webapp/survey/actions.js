@@ -5,7 +5,7 @@ import { setSurveyProp } from '../../common/survey/survey'
 
 import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey, assocSurveyPropValidation } from './surveyState'
 import { nodeDefUpdate } from './nodeDef/actions'
-import { runDelayed } from '../appUtils/reduxUtils'
+import { debounceAction } from '../appUtils/reduxUtils'
 
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyCurrentFieldValidationUpdate = 'survey/current/validation/field/update'
@@ -81,14 +81,18 @@ export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
   dispatch(_updateSurveyProp(survey, key, value))
 }
 
-const _updateSurveyProp = (survey, key, value) => runDelayed(async dispatch => {
-  try {
-    const res = await axios.put(`/api/survey/${survey.id}/prop`, {key, value})
+const _updateSurveyProp = (survey, key, value) => {
+  const action = async dispatch => {
+    try {
+      const res = await axios.put(`/api/survey/${survey.id}/prop`, {key, value})
 
-    const {validation} = res.data
+      const {validation} = res.data
 
-    const updatedSurvey = assocSurveyPropValidation(key, validation)(survey)
+      const updatedSurvey = assocSurveyPropValidation(key, validation)(survey)
 
-    dispatchCurrentSurveyUpdate(dispatch, updatedSurvey)
-  } catch (e) {}
-}, `${surveyCurrentUpdate}_${key}`)
+      dispatchCurrentSurveyUpdate(dispatch, updatedSurvey)
+    } catch (e) {}
+  }
+
+  return debounceAction(action, `${surveyCurrentUpdate}_${key}`)
+}

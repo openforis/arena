@@ -23,12 +23,12 @@ export const dissocStateProps = (state, props) =>
 
 export const excludePathRoot = R.remove(0, 1)
 
-export const runDelayed = (callback, key, delay = 500) => {
-  callback.meta = {
+export const debounceAction = (action, key, delay = 500) => {
+  action.meta = {
     debounce: {
       time: delay,
       key
     }
   }
-  return callback
+  return action
 }
