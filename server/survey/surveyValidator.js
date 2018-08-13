@@ -62,21 +62,18 @@ const validateProp = async (obj, prop, validations) => {
 }
 
 const validate = async (obj, propsValidations) => {
-  const props = R.keys(propsValidations)
-  const propName = R.pipe(R.split('.'), R.tail)
-
   const fields = R.mergeAll(
     await Promise.all(
-      props.map(async prop => ({
-        [propName(prop)]: await validateProp(obj, prop, propsValidations[prop])
-      }))
+      R.keys(propsValidations)
+        .map(async prop => ({
+          [R.pipe(R.split('.'), R.tail)(prop)]: await validateProp(obj, prop, propsValidations[prop])
+        }))
     )
   )
-
   return {
     valid: !R.any(
-      prop => R.pathEq([propName(prop), 'valid'], false, fields),
-      props,
+      prop => R.pathEq([prop, 'valid'], false, fields),
+      R.keys(fields),
     ),
     fields
   }
