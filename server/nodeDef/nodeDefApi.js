@@ -21,8 +21,6 @@ module.exports.init = app => {
         ...nodeDefDB,
         validation: await validateNodeDef(nodeDefDB)
       }
-      console.log(nodeDef)
-
       res.json({nodeDef})
     } catch (err) {
       sendErr(res, err)

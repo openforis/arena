@@ -29,14 +29,14 @@ const validateNodeDefProp = async (nodeDef, propName, newNode = true) => {
 }
 
 const validateNodeDef = async (nodeDef, newNode) => {
-  const [nameValidation, codeListIdValidation] = await Promise.all([
+  const [nameValidation] = await Promise.all([
     validateNodeDefName(nodeDef, newNode),
-    nodeDef.type === nodeDefType.codeList ? validateRequired('props.codeListId', nodeDef) : null
+    //nodeDef.type === nodeDefType.codeList ? validateRequired('props.codeListId', nodeDef) : null
   ])
   return R.pipe(
     R.assocPath(['validation', 'valid'], true),
     R.partial(assocValidation, ['name', nameValidation]),
-    R.partial(assocValidation, ['codeListId', codeListIdValidation]),
+    //R.partial(assocValidation, ['codeListId', codeListIdValidation]),
     R.prop('validation'),
   )(nodeDef)
 }

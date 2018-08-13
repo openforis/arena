@@ -11,12 +11,10 @@ import {
   getNodeDefDescriptions,
   getNodeDefProp,
   getNodeDefPropValidation,
-  nodeDefType
 } from '../../../../../common/survey/nodeDef'
 import { normalizeName } from './../../../../../common/survey/surveyUtils'
 
 import { putNodeDefProp } from '../../../nodeDef/actions'
-import Dropdown from '../../../../commonComponents/form/dropdown'
 
 class CommonProps extends React.Component {
 
@@ -56,31 +54,9 @@ class CommonProps extends React.Component {
           <Checkbox checked={getNodeDefProp('multiple', false)(nodeDef)}
                     onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
         </FormItem>
-
-        <FormItem label={'applicable if'}>
-          <Input value={getNodeDefProp('applicableIf', '')(nodeDef)}
-                 onChange={e => putNodeDefProp(nodeDef, 'applicableIf', e.target.value)}/>
-        </FormItem>
-
-        <FormItem label={'calculated'}>
-          <Checkbox checked={getNodeDefProp('calculated', false)(nodeDef)}
-                    onChange={(checked) => putNodeDefProp(nodeDef, 'calculated', checked)}/>
-        </FormItem>
-
-        {nodeDef.type === nodeDefType.codeList &&
-        <FormItem label={'code list'}>
-          <Dropdown items={[]}
-                    selection={getNodeDefProp('codeListId', null)(nodeDef)}
-                    onChange={e => putNodeDefProp(nodeDef, 'codeListId', e.key)}
-                    validation={getNodeDefPropValidation(nodeDef, 'codeListId')}/>
-        </FormItem>
-        }
-
-
       </React.Fragment>
     )
   }
-
 }
 
 export default connect(null, {putNodeDefProp})(CommonProps)
