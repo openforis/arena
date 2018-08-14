@@ -59,9 +59,18 @@ class NodeDefSwitch extends React.Component {
     } = this.props
 
     const isRoot = isNodeDefRoot(nodeDef)
+    const invalid = nodeDef.validation && !nodeDef.validation.valid
     const isPage = !!getPageUUID(nodeDef)
 
     return <div className={`node-def__form${isPage ? ' node-def__form_page' : ''}`} ref="nodeDefElem">
+      {
+        invalid ?
+          <div className="node-def__form-error">
+            <span className="icon icon-warning icon-16px icon-left"/>
+            <span>INVALID</span>
+          </div>
+          : null
+      }
 
       {
         edit ?

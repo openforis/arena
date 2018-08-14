@@ -5,13 +5,13 @@ import CommonProps from './commonProps'
 
 import { getFormNodeDefEdit } from '../../../surveyState'
 
-import { setFormNodDefEdit } from '../../../nodeDef/actions'
+import { closeFormNodeDefEdit } from '../../../nodeDef/actions'
 
 class NodeDefEdit extends React.Component {
 
   close () {
-    const {setFormNodDefEdit} = this.props
-    setFormNodDefEdit(null)
+    const {nodeDef, closeFormNodeDefEdit} = this.props
+    closeFormNodeDefEdit(nodeDef)
   }
 
   render () {
@@ -42,4 +42,4 @@ const mapStateToProps = state => ({
   nodeDef: getFormNodeDefEdit(state)
 })
 
-export default connect(mapStateToProps, {setFormNodDefEdit})(NodeDefEdit)
+export default connect(mapStateToProps, {closeFormNodeDefEdit})(NodeDefEdit)

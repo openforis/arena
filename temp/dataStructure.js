@@ -2,7 +2,7 @@ const {
   nodeDefType,
 } = require('../common/survey/nodeDef')
 
-const id = "-1"
+const id = '-1'
 
 const nodeDef = {
   id,
@@ -22,14 +22,9 @@ const nodeDef = {
       en: '',
       es: '',
     },
+    key: false,//boolean
     multiple: false,//boolean
-    required: false,//boolean
-    requiredIf: null,//expr
-    applicableIf: null,//expr
-    minCount: null,//int
-    maxCount: null,//int
-
-    // nodeDefTypes
+    applicable: true,//expr
 
     // entity:
     ///layout
@@ -38,14 +33,16 @@ const nodeDef = {
     layout: [],// rect-grid-layout layout value
 
     // not entity:
-    min: null,
-    max: null,
-    minInclusive: null,
-    maxInclusive: null,
-    regex: null,
-    maxDistance: null,
-    calculated: null, //boolean
-    codeListId: id,//
+    calculated: false, //boolean expression
+    defaultValues: [], //expression
+
+    //nodeDefCodeList
+    codeListUUID: id,
+    //or
+    parentCodeUUID: id,
+
+    //all
+    validations: [], //nodeDefValidation
   },
 
   propsDraft: {}

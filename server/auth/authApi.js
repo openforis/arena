@@ -1,21 +1,26 @@
 const passport = require('passport')
+const R = require('ramda')
 
 const {sendOk} = require('../serverUtils/response')
 
 const {userPrefNames, getUserPrefSurveyId} = require('./../user/userPrefs')
 const {getSurveyById} = require('../survey/surveyRepository')
 const {deleteUserPref} = require('../user/userRepository')
+const {validateSurvey} = require('../survey/surveyValidator')
 
 const sendResponse = (res, user, survey = null) => res.json({user, survey})
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
+    const survey = await getSurveyById(surveyId, true)
+
     sendResponse(
       res,
       user,
-      await getSurveyById(surveyId, true)
+      {...survey, validation: await validateSurvey(survey)}
     )
   } catch (e) {
+    console.log(`error loading survey with id ${surveyId}`, e)
     // survey not found with user pref
     // removing user pref
     sendResponse(

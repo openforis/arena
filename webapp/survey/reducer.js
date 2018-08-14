@@ -5,6 +5,8 @@ import {
   assocNodeDefProp,
   assocNodeDefs,
   assocFormNodeDefEdit,
+  assocNodeDefValidation,
+  assocNodeDefPropValidation,
   assocNodeDefFormUnlocked,
   assocFormNodeDefViewPage,
 } from './surveyState'
@@ -12,7 +14,10 @@ import {
 /**
  * survey actions
  */
-import { surveyCurrentUpdate, surveyNewUpdate, } from './actions'
+import {
+  surveyCurrentUpdate,
+  surveyNewUpdate,
+} from './actions'
 /**
  * nodeDef Actions
  */
@@ -20,6 +25,8 @@ import {
   nodeDefPropUpdate,
   nodeDefsUpdate,
   nodeDefUpdate,
+  nodeDefValidationUpdate,
+  nodeDefPropValidationUpdate,
 
   //survey-form
   formNodeDefEditUpdate,
@@ -40,6 +47,10 @@ const actionHandlers = {
   [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
 
   [nodeDefPropUpdate]: (state, {nodeDefUUID, key, value}) => assocNodeDefProp(nodeDefUUID, key, value)(state),
+
+  [nodeDefValidationUpdate]: (state, {nodeDefUUID, validation}) => assocNodeDefValidation(nodeDefUUID, validation)(state),
+
+  [nodeDefPropValidationUpdate]: (state, {nodeDefUUID, key, validation}) => assocNodeDefPropValidation(nodeDefUUID, key, validation)(state),
 
   //survey-form
   [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),

@@ -1,44 +1,42 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
-const {createError, validateRequired} = require('../serverUtils/validator')
-const {getSurveyByName} = require('./surveyRepository')
+const {validate, validateProp, validateRequired} = require('../../common/validation/validator')
 
+const {getSurveysByName} = require('./surveyRepository')
 
-const assocValidation = (name, validation, obj) => R.propEq('valid', false, validation ? validation : {})
-  ? R.pipe(
-    R.assocPath(['validation', 'valid'], false),
-    R.assocPath(['validation', 'fields', name], validation),
-  )(obj)
-  : obj
+const validateSurveyNameUniqueness = async (propName, survey) => {
+  const surveyName = R.path(propName.split('.'))(survey)
+  const surveysByName = await getSurveysByName(surveyName)
 
-
-const validateCreateSurveyName = async survey => {
-  const requiredError = validateRequired('name', survey)
-  if(requiredError)
-    return requiredError
-
-  const surveyByName = await getSurveyByName(survey.name)
-  if(surveyByName)
-    return createError('duplicate')
-
-  return null
+  return !R.isEmpty(surveysByName) && R.find(s => s.id != survey.id, surveysByName)
+    ? 'duplicate'
+    : null
 }
 
-const validateCreateSurvey = async survey => {
-  const [nameValidation, labelValidation, langValidation] = await Promise.all(
-    [validateCreateSurveyName(survey), validateRequired('label', survey), validateRequired('lang', survey)]
-  )
+const surveyPropsValidations = {
+  'props.name': [validateRequired, validateSurveyNameUniqueness],
+  'props.languages': [validateRequired],
+  'props.srs': [validateRequired],
+}
 
-  return R.pipe(
-    R.assocPath(['validation', 'valid'], true),
-    R.partial(assocValidation, ['name', nameValidation]),
-    R.partial(assocValidation, ['label', labelValidation]),
-    R.partial(assocValidation, ['lang', langValidation]),
-    R.prop('validation'),
-  )(survey)
+const newSurveyPropsValidations = {
+  'name': [validateRequired, validateSurveyNameUniqueness],
+  'lang': [validateRequired],
+}
+
+const validateNewSurvey = async survey =>
+  await validate(survey, newSurveyPropsValidations)
+
+const validateSurvey = async survey =>
+  await validate(survey, surveyPropsValidations)
+
+const validateSurveyProp = async (survey, prop) => {
+  const propName = 'props.' + prop
+  return await validateProp(survey, propName, surveyPropsValidations[propName])
 }
 
 module.exports = {
-  validateCreateSurvey,
+  validateNewSurvey,
+  validateSurvey,
+  validateSurveyProp,
 }

@@ -42,6 +42,7 @@ const getNodeDefLabel = (nodeDef, lang) => R.pipe(
   R.prop(lang),
 )(nodeDef)
 
+
 const getNodeDefType = R.prop('type')
 
 // ==== UPDATE

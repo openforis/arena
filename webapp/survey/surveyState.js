@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 const survey = 'survey'
+
 /**
  * ======================
  * Survey State
@@ -58,6 +59,7 @@ export const getRootNodeDef = R.pipe(
 export const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
 
 // ==== UPDATE
+
 export const assocNodeDefs = newNodeDefsArray =>
   survey => R.pipe(
     R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
@@ -118,3 +120,32 @@ export const isNodeDefFormLocked = nodeDef => R.pipe(
   R.equals(nodeDef.uuid),
   R.not,
 )
+
+/**
+ * ======================
+ * Survey Validation
+ * ======================
+ */
+export const assocSurveyPropValidation = (key, validation) =>
+  R.assocPath(['validation', 'fields', key], validation)
+
+
+export const assocNodeDefValidation = (nodeDefUUID, validation) => R.assocPath([nodeDefs, nodeDefUUID, 'validation'], validation)
+
+export const assocNodeDefPropValidation = (nodeDefUUID, key, validation) => state => {
+  const nodeDefValidationPath = [nodeDefs, nodeDefUUID, 'validation']
+
+  const oldNodeDefValidation = R.pipe(
+    R.path(nodeDefValidationPath),
+    R.defaultTo({valid: true})
+  )(state)
+
+  const nodeDefValidation = R.assocPath(['fields', key], validation)(oldNodeDefValidation)
+
+  const invalidFields = oldNodeDefValidation.fields ? R.find((v) => !v.valid)(oldNodeDefValidation.fields) : []
+
+  nodeDefValidation.valid = R.isNil(invalidFields) || R.isEmpty(invalidFields)
+
+  return R.assocPath(nodeDefValidationPath, nodeDefValidation)(state)
+}
+

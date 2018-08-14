@@ -22,19 +22,17 @@ export class Input extends React.Component {
   render () {
 
     const {
-      validation = {},
-      disabled = false,
-      mask = false,
+      validation,
+      disabled,
+      mask,
       ...inputProps,
     } = this.props
 
-    const {valid = true} = validation
-
     return (
-      <TooltipError message={valid ? null : validation.error}>
+      <TooltipError messages={validation.errors}>
         <MaskedInput ref={this.input}
                      mask={mask}
-                     className={`form-input ${valid ? '' : ' error'}`}
+                     className="form-input"
                      {...inputProps}
         />
 
@@ -45,11 +43,8 @@ export class Input extends React.Component {
 
 }
 
-/**
-
- <input className={`form-input ${valid ? '' : ' error'}`}
- ref="input"
- aria-disabled={disabled}
- {...inputProps}/>
-
- */
+Input.defaultProps = {
+  validation: {},
+  disabled: false,
+  mask: false,
+}

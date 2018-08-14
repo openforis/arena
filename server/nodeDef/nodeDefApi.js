@@ -1,17 +1,21 @@
 const {getRestParam} = require('../serverUtils/request')
-const {sendOk, sendErr} = require('../serverUtils/response')
+const {sendErr} = require('../serverUtils/response')
+const {validateNodeDef, validateNodeDefs, validateNodeDefProp} = require('./nodeDefValidator')
 
 const {
+  fetchNodeDef,
   fetchNodeDefsByParentId,
   createNodeDef,
-  updateNodeDefProp
+  updateNodeDefProp,
 } = require('./nodeDefRepository')
 
 module.exports.init = app => {
 
+  // ==== CREATE
+
   app.post('/nodeDef', async (req, res) => {
     try {
-      const {user, body: nodeDefRequest} = req
+      const {body: nodeDefRequest} = req
       const {surveyId, parentId, uuid, type, props} = nodeDefRequest
 
       const nodeDef = await createNodeDef(surveyId, parentId, uuid, type, props)
@@ -22,30 +26,48 @@ module.exports.init = app => {
     }
   })
 
+  // ==== READ
+
   app.get('/nodeDef/:id/children', async (req, res) => {
     try {
       const nodeDefId = getRestParam(req, 'id')
       const draft = getRestParam(req, 'draft')
+      const validate = getRestParam(req, 'validate')
 
-      const nodeDefs = await fetchNodeDefsByParentId(nodeDefId, draft)
+      const nodeDefsDB = await fetchNodeDefsByParentId(nodeDefId, draft)
+      const nodeDefs = validate
+        ? await validateNodeDefs(nodeDefsDB)
+        : nodeDefsDB
+
       res.json({nodeDefs})
     } catch (err) {
       sendErr(res, err)
     }
+  })
 
+  app.get('/nodeDef/:id/validation', async (req, res) => {
+    try {
+      const nodeDefId = getRestParam(req, 'id')
+      const nodeDef = await fetchNodeDef(nodeDefId, true)
+      const validation = await validateNodeDef(nodeDef, false)
+      res.json({validation})
+    } catch (err) {
+      sendErr(res, err)
+    }
   })
 
   // ==== UPDATE
 
   app.put('/nodeDef/:id/prop', async (req, res) => {
-    const {user, body} = req
+    const {body} = req
+    const {key} = body
 
     const nodeDefId = getRestParam(req, 'id')
 
     try {
-      await updateNodeDefProp(nodeDefId, body)
-
-      sendOk(res)
+      const nodeDef = await updateNodeDefProp(nodeDefId, body)
+      const validation = await validateNodeDefProp(nodeDef, key)
+      res.json({validation})
     } catch (err) {
       sendErr(res, err)
     }

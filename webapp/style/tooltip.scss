@@ -1,3 +1,4 @@
+@import "vars";
 
 .tooltip {
   position: relative;
@@ -52,5 +53,9 @@
 
   .tooltip-text::after {
     border-color: $red transparent transparent transparent;
+  }
+
+  .form-input {
+    border-bottom: 5px dotted rgba($red, .6);
   }
 }
