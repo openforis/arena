@@ -2,7 +2,7 @@ const {sendErr} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
 
 const {createSurvey, fetchRootNodeDef, updateSurveyProp} = require('./surveyRepository')
-const {validateNewSurvey, validateUpdateSurveyProp} = require('./surveyValidator')
+const {validateNewSurvey, validateSurveyProp} = require('./surveyValidator')
 
 module.exports.init = app => {
 
@@ -52,7 +52,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'id')
 
       const survey = await updateSurveyProp(surveyId, body)
-      const validation = await validateUpdateSurveyProp(survey, body.key)
+      const validation = await validateSurveyProp(survey, body.key)
 
       res.json({validation})
     } catch (err) {

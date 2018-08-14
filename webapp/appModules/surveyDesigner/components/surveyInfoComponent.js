@@ -18,7 +18,7 @@ import { getCurrentSurvey } from '../../../survey/surveyState'
 import { updateSurveyProp } from '../../../survey/actions'
 
 import { normalizeName } from './../../../../common/survey/surveyUtils'
-import { getFieldValidation } from './../../../../common/validation/validator'
+import { getValidation, getFieldValidation } from './../../../../common/validation/validator'
 
 class SurveyInfoComponent extends React.Component {
 
@@ -32,7 +32,7 @@ class SurveyInfoComponent extends React.Component {
 
   render () {
     const {survey} = this.props
-    const {validation} = survey
+    const validation = getValidation(survey)
     const surveySrs = getSurveySrs(survey).map(code => {return {key: code, value: getSrsName(code)}})
 
     return (

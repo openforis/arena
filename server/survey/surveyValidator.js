@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const {validate, validateProp, validateRequired2} = require('../../common/validation/validator')
+const {validate, validateProp, validateRequired} = require('../../common/validation/validator')
 
 const {getSurveysByName} = require('./surveyRepository')
 
@@ -14,14 +14,14 @@ const validateSurveyNameUniqueness = async (propName, survey) => {
 }
 
 const surveyPropsValidations = {
-  'props.name': [validateRequired2, validateSurveyNameUniqueness],
-  'props.languages': [validateRequired2],
-  'props.srs': [validateRequired2],
+  'props.name': [validateRequired, validateSurveyNameUniqueness],
+  'props.languages': [validateRequired],
+  'props.srs': [validateRequired],
 }
 
 const newSurveyPropsValidations = {
-  'name': [validateRequired2, validateSurveyNameUniqueness],
-  'lang': [validateRequired2],
+  'name': [validateRequired, validateSurveyNameUniqueness],
+  'lang': [validateRequired],
 }
 
 const validateNewSurvey = async survey =>
@@ -30,7 +30,7 @@ const validateNewSurvey = async survey =>
 const validateSurvey = async survey =>
   await validate(survey, surveyPropsValidations)
 
-const validateUpdateSurveyProp = async (survey, prop) => {
+const validateSurveyProp = async (survey, prop) => {
   const propName = 'props.' + prop
   return await validateProp(survey, propName, surveyPropsValidations[propName])
 }
@@ -38,5 +38,5 @@ const validateUpdateSurveyProp = async (survey, prop) => {
 module.exports = {
   validateNewSurvey,
   validateSurvey,
-  validateUpdateSurveyProp,
+  validateSurveyProp,
 }

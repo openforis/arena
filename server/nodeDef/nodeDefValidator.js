@@ -1,45 +1,35 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {createError, validateRequired, assocValidation} = require('../../common/validation/validator')
+const {validate, validateProp, validateRequired} = require('../../common/validation/validator')
 const {fetchNodeDefsBySurveyId} = require('./nodeDefRepository')
-const {nodeDefType} = require('../../common/survey/nodeDef')
+const {getNodeDefProp} = require('../../common/survey/nodeDef')
 
-const validateNodeDefName = async (nodeDef) => {
-  const requiredError = validateRequired('props.name', nodeDef)
-  if (requiredError)
-    return requiredError
+const validateNodeDefNameUniqueness = async (propName, nodeDef) => {
+  const getName = getNodeDefProp('name')
+  const nodeDefs = await fetchNodeDefsBySurveyId(nodeDef.surveyId, true)
 
-  const nodeDefsAll = await fetchNodeDefsBySurveyId(nodeDef.surveyId, true)
-  const nodeDefsByName = nodeDefsAll.filter(n => n.props.name === nodeDef.props.name)
+  const hasDuplicates = R.any(
+    n => getName(n) === getName(nodeDef) && n.id !== nodeDef.id,
+    nodeDefs
+  )
 
-  if (!R.isEmpty(nodeDefsByName) && R.find(n => n.id != nodeDef.id)(nodeDefsByName))
-    return createError('duplicate')
-
-  return null
+  return hasDuplicates
+    ? 'duplicate'
+    : null
 }
 
-const validateNodeDefProp = async (nodeDef, propName) => {
-  switch (propName) {
-    case 'name':
-      return validateNodeDefName(nodeDef)
-    default:
-      return null
-  }
+const propsValidations = {
+  'props.name': [validateRequired, validateNodeDefNameUniqueness],
 }
 
-const validateNodeDef = async (nodeDef) => {
-  const [nameValidation] = await Promise.all([
-    validateNodeDefName(nodeDef),
-    //nodeDef.type === nodeDefType.codeList ? validateRequired('props.codeListId', nodeDef) : null
-  ])
-  return R.pipe(
-    R.assocPath(['validation', 'valid'], true),
-    R.partial(assocValidation, ['name', nameValidation]),
-    //R.partial(assocValidation, ['codeListId', codeListIdValidation]),
-    R.prop('validation'),
-  )(nodeDef)
+const validateNodeDefProp = async (nodeDef, prop) => {
+  const propName = 'props.' + prop
+  return await validateProp(nodeDef, propName, propsValidations[propName])
 }
+
+const validateNodeDef = async nodeDef =>
+  await validate(nodeDef, propsValidations)
 
 const validateNodeDefs = async (nodeDefs) =>
   await Promise.all(nodeDefs.map(async n => ({

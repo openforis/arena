@@ -10,9 +10,10 @@ import {
   getNodeDefLabels,
   getNodeDefDescriptions,
   getNodeDefProp,
-  getNodeDefPropValidation,
 } from '../../../../../common/survey/nodeDef'
 import { normalizeName } from './../../../../../common/survey/surveyUtils'
+
+import { getValidation, getFieldValidation } from './../../../../../common/validation/validator'
 
 import { putNodeDefProp } from '../../../nodeDef/actions'
 
@@ -24,13 +25,14 @@ class CommonProps extends React.Component {
 
   render () {
     const {nodeDef, putNodeDefProp} = this.props
+    const validation = getValidation(nodeDef)
 
     return (
       <React.Fragment>
 
         <FormItem label={'name'}>
           <Input value={getNodeDefProp('name', '')(nodeDef)}
-                 validation={getNodeDefPropValidation(nodeDef, 'name')}
+                 validation={getFieldValidation('name')(validation)}
                  onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
         </FormItem>
 

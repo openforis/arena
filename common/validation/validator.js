@@ -17,12 +17,12 @@ const validateProp = async (obj, prop, validations) => {
 const validate = async (obj, propsValidations) => {
   const fields = R.mergeAll(
     await Promise.all(
-      R.mapObjIndexed(
-        async (propValidations, prop) => ({
-          [R.pipe(R.split('.'), R.last)(prop)]: await validateProp(obj, prop, propValidations)
-        }),
-        propsValidations
-      )
+      R.keys(propsValidations)
+        .map(
+          async (prop) => ({
+            [R.pipe(R.split('.'), R.last)(prop)]: await validateProp(obj, prop, propsValidations[prop])
+          })
+        )
     )
   )
   return {
@@ -34,32 +34,7 @@ const validate = async (obj, propsValidations) => {
   }
 }
 
-const getFieldValidation = field => R.pathOr(
-  {valid: true, errors: []},
-  ['fields', field]
-)
-
-const createError = (error) => error
-  ? R.pipe(
-    R.assoc('valid', false),
-    R.assoc('error', error),
-  )({})
-  : null
-
 const validateRequired = (propName, obj) => {
-  const value = R.pipe(
-    R.path(propName.split('.')),
-    R.defaultTo(''),
-  )(obj)
-
-  const error = R.isEmpty(value)
-    ? 'empty'
-    : null
-
-  return createError(error)
-}
-
-const validateRequired2 = (propName, obj) => {
   const value = R.pipe(
     R.path(propName.split('.')),
     R.defaultTo(''),
@@ -70,20 +45,20 @@ const validateRequired2 = (propName, obj) => {
     : null
 }
 
-const assocValidation = (name, validation, obj) => R.propEq('valid', false, validation ? validation : {})
-  ? R.pipe(
-    R.assocPath(['validation', 'valid'], false),
-    R.assocPath(['validation', 'fields', name], validation),
-  )(obj)
-  : obj
+//==== getters
+
+const getValidation = R.prop('validation')
+
+const getFieldValidation = field => R.pathOr(
+  {valid: true, errors: []},
+  ['fields', field]
+)
 
 module.exports = {
   validate,
   validateProp,
-  getFieldValidation,
-
-  createError,
   validateRequired,
-  validateRequired2,
-  assocValidation,
+
+  getValidation,
+  getFieldValidation,
 }
