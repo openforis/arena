@@ -74,6 +74,7 @@ const record = {
   id,
   uuid: null,
   surveyId: id,
+  ownerId: id,
 }
 
 const node = {
@@ -81,7 +82,18 @@ const node = {
   uuid: null,
   surveyId: id,
   recordId: id,
-  parentId: id,
+  parentId: id, // can be null
   nodeDefId: id,
-  value: {},
+  // value is a key value pairs object where
+  // key is the step id
+  // value is the node value at the given step
+  value: {
+    '1': 'ytreyrte', //node string
+    '2': '545235', // node integer
+    '3': '545235.5634', // node decimal
+    '3': 'true', // node boolean
+    '1': '12/12/2005', // node date DD/MM/YYYY
+    '1': '11:55', // node time mm:HH
+    '1': {'x': '5432543', 'y': '42565342', 'srs': '4326'}, // node coordinate
+  },
 }

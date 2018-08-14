@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const {
   getProps,
   getProp,
@@ -6,7 +8,11 @@ const {
   setProp,
 } = require('./surveyUtils')
 
-const R = require('ramda')
+const defaultSteps = {
+  '1': {name: 'entry'},
+  '2': {name: 'cleansing', prev: '1'},
+  '3': {name: 'analysis', prev: '2'},
+}
 
 const NEW = 'new'
 const DRAFT = 'draft'
@@ -45,8 +51,7 @@ const getSurveyDefaultLanguage = R.pipe(
 )
 
 module.exports = {
-  //TODO: REMOVE
-  surveyStatus,
+  defaultSteps,
 
   // props
   getSurveyProps: getProps,
@@ -58,4 +63,7 @@ module.exports = {
   getSurveyDefaultLanguage,
   getSurveyDescriptions: getProp('descriptions', {}),
   getSurveySrs: getProp('srs', []),
+
+  //TODO: REMOVE
+  surveyStatus,
 }
