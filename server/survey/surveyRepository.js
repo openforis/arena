@@ -16,6 +16,10 @@ const {
   nodeDefRenderType,
 } = require('../../common/survey/nodeDefLayout')
 
+const {
+  defaultSteps,
+} = require('../../common/survey/survey')
+
 // ============== CREATE
 
 const createSurvey = async (user, {name, label, lang}) => db.tx(
@@ -24,7 +28,8 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       name,
       labels: {[lang]: label},
       languages: [lang],
-      srs: ['4326'] //EPSG:4326 WGS84 Lat Lon Spatial Reference System
+      srs: ['4326'], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
+      steps: {...defaultSteps},
     }
 
     const {id: surveyId} = await t.one(`

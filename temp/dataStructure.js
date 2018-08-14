@@ -2,6 +2,15 @@ const {
   nodeDefType,
 } = require('../common/survey/nodeDef')
 
+const recordActions = {
+  createRecord: 'createRecord',
+  deleteRecord: 'deleteRecord',
+  changeStep: 'changeStep',
+  addNode: 'addNode',
+  updateNode: 'updateNode',
+  deleteNode: 'deleteNode',
+}
+
 const id = '-1'
 
 const nodeDef = {
@@ -75,6 +84,8 @@ const record = {
   uuid: null,
   surveyId: id,
   ownerId: id,
+  step: id, // current step id
+  dateCreated: null,
 }
 
 const node = {
@@ -96,4 +107,23 @@ const node = {
     '1': '11:55', // node time mm:HH
     '1': {'x': '5432543', 'y': '42565342', 'srs': '4326'}, // node coordinate
   },
+}
+
+const recordCommand = {
+  action: null, //recordActions
+  userId: id,
+  surveyId: id,
+  recordId: id,
+  parentId: id, //only for addNode action
+  nodeDefId: id,
+  nodeId: id, //only for updateNode, deleteNode actions
+  value: null,
+}
+
+const recordUpdateLog = {
+  id: id,
+  action: null, //recordActions
+  userId: id,
+  dateCreated: null,
+  node: null,
 }
