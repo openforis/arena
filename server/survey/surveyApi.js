@@ -1,8 +1,8 @@
-const {sendOk, sendErr, sendValidationError} = require('../serverUtils/response')
+const {sendErr} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
 
 const {createSurvey, fetchRootNodeDef, updateSurveyProp} = require('./surveyRepository')
-const {validateNewSurvey2, validateUpdateSurveyProp} = require('./surveyValidator')
+const {validateNewSurvey, validateUpdateSurveyProp} = require('./surveyValidator')
 
 module.exports.init = app => {
 
@@ -11,7 +11,7 @@ module.exports.init = app => {
     try {
 
       const {user, body} = req
-      const validation = await validateNewSurvey2(body)
+      const validation = await validateNewSurvey(body)
 
       if (validation.valid) {
         const survey = await createSurvey(user, body)

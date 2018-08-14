@@ -17,10 +17,12 @@ const validateProp = async (obj, prop, validations) => {
 const validate = async (obj, propsValidations) => {
   const fields = R.mergeAll(
     await Promise.all(
-      R.keys(propsValidations)
-        .map(async prop => ({
-          [R.pipe(R.split('.'), R.last)(prop)]: await validateProp(obj, prop, propsValidations[prop])
-        }))
+      R.mapObjIndexed(
+        async (propValidations, prop) => ({
+          [R.pipe(R.split('.'), R.last)(prop)]: await validateProp(obj, prop, propValidations)
+        }),
+        propsValidations
+      )
     )
   )
   return {
@@ -31,6 +33,11 @@ const validate = async (obj, propsValidations) => {
     fields
   }
 }
+
+const getFieldValidation = field => R.pathOr(
+  {valid: true, errors: []},
+  ['fields', field]
+)
 
 const createError = (error) => error
   ? R.pipe(
@@ -73,6 +80,7 @@ const assocValidation = (name, validation, obj) => R.propEq('valid', false, vali
 module.exports = {
   validate,
   validateProp,
+  getFieldValidation,
 
   createError,
   validateRequired,

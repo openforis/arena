@@ -58,9 +58,7 @@ const InputChips = (props) => {
 
   const dropdownItems = R.reject(item => R.contains(item, selection))(items)
 
-  const valid = R.propOr(true, 'valid')(validation)
-
-  return <TooltipError message={valid ? null : validation.error}>
+  return <TooltipError messages={validation.errors}>
     <div style={{
       display: 'flex',
       flexWrap: 'wrap',

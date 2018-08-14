@@ -6,6 +6,7 @@ import * as R from 'ramda'
 import { appModuleUri } from '../../app/app'
 import { appModules } from '../appModules'
 import { normalizeName } from './../../../common/survey/surveyUtils'
+import { getFieldValidation } from './../../../common/validation/validator'
 
 import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
 import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
@@ -38,7 +39,6 @@ class AppHomeView extends React.Component {
     if (currentSurvey && (!prevCurrentSurvey || currentSurvey.id !== prevCurrentSurvey.id)) {
       history.push(appModuleUri(appModules.surveyDashboard))
     }
-
   }
 
   render () {
@@ -64,18 +64,18 @@ class AppHomeView extends React.Component {
 
           <Input placeholder="Name"
                  value={name}
-                 validation={R.path(['fields', 'name'])(validation)}
+                 validation={getFieldValidation('name')(validation)}
                  onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
 
           <Input placeholder="Label"
                  value={label}
-                 validation={R.path(['fields', 'label'])(validation)}
+                 validation={getFieldValidation('label')(validation)}
                  onChange={e => updateNewSurveyProp('label', e.target.value)}/>
 
           <LanguageDropdown placeholder="Language"
                             selection={lang}
                             onChange={e => updateNewSurveyProp('lang', e)}
-                            validation={R.path(['fields', 'lang'])(validation)}/>
+                            validation={getFieldValidation('lang')(validation)}/>
 
           <button className="btn btn-of-light"
                   onClick={() => this.createSurvey()}>

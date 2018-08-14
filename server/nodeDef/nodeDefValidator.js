@@ -1,7 +1,7 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {createError, validateRequired, assocValidation} = require('../serverUtils/validator')
+const {createError, validateRequired, assocValidation} = require('../../common/validation/validator')
 const {fetchNodeDefsBySurveyId} = require('./nodeDefRepository')
 const {nodeDefType} = require('../../common/survey/nodeDef')
 
