@@ -1,17 +1,25 @@
 import React from 'react'
+import * as R from 'ramda'
 
-const Tooltip = ({children, type = null, message = null}) => (
+const Tooltip = ({children, type = null, messages = []}) => {
 
-  <div className={message ? `tooltip${type ? '-' + type : ''}` : ''}
-       style={{display: 'grid'}}>
+  const hasMessages = !R.isEmpty(messages)
+
+  return <div className={hasMessages ? `tooltip${type ? '-' + type : ''}` : ''}
+              style={{display: 'grid'}}>
 
     <React.Fragment>
       {children}
+
       {
-        message
+        hasMessages
           ? (
             <div className="tooltip-text">
-              {message}
+              {
+                messages.map((msg, i) =>
+                  <div key={i}>{msg}</div>
+                )
+              }
             </div>
           )
           : null
@@ -20,7 +28,7 @@ const Tooltip = ({children, type = null, message = null}) => (
 
   </div>
 
-)
+}
 
 export const TooltipError = (props) => (
   <Tooltip {...props}

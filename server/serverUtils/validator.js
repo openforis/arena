@@ -1,4 +1,36 @@
 const R = require('ramda')
+const Promise = require('bluebird')
+
+const validateProp = async (obj, prop, validations) => {
+  const errors = R.reject(
+    R.isNil,
+    await Promise.all(
+      validations.map(validationFn => validationFn(prop, obj))
+    )
+  )
+  return {
+    valid: R.isEmpty(errors),
+    errors,
+  }
+}
+
+const validate = async (obj, propsValidations) => {
+  const fields = R.mergeAll(
+    await Promise.all(
+      R.keys(propsValidations)
+        .map(async prop => ({
+          [R.pipe(R.split('.'), R.last)(prop)]: await validateProp(obj, prop, propsValidations[prop])
+        }))
+    )
+  )
+  return {
+    valid: !R.any(
+      prop => R.pathEq([prop, 'valid'], false, fields),
+      R.keys(fields),
+    ),
+    fields
+  }
+}
 
 const createError = (error) => error
   ? R.pipe(
@@ -39,6 +71,9 @@ const assocValidation = (name, validation, obj) => R.propEq('valid', false, vali
   : obj
 
 module.exports = {
+  validate,
+  validateProp,
+
   createError,
   validateRequired,
   validateRequired2,

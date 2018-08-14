@@ -1,8 +1,31 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {createError, validateRequired, validateRequired2, assocValidation} = require('../serverUtils/validator')
+const {validate, validateProp, createError, validateRequired, validateRequired2, assocValidation} = require('../serverUtils/validator')
 const {getSurveysByName} = require('./surveyRepository')
+
+const validateSurveyNameUniqueness = async (propName, survey) => {
+  const surveyName = R.path(propName.split('.'))(survey)
+  const surveysByName = await getSurveysByName(surveyName)
+
+  return !R.isEmpty(surveysByName) && R.find(s => s.id != survey.id, surveysByName)
+    ? 'duplicate'
+    : null
+}
+
+const surveyPropsValidations = {
+  'props.name': [validateRequired2, validateSurveyNameUniqueness],
+  'props.languages': [validateRequired2],
+  'props.srs': [validateRequired2],
+}
+
+const newSurveyPropsValidations = {
+  'name': [validateRequired2, validateSurveyNameUniqueness],
+  'lang': [validateRequired2],
+}
+
+const validateNewSurvey2 = async survey =>
+  await validate(survey, newSurveyPropsValidations)
 
 const validateSurveyName = async (propName, survey) => {
   const requiredError = validateRequired(propName, survey)
@@ -18,16 +41,7 @@ const validateSurveyName = async (propName, survey) => {
   return null
 }
 
-const validateSurveyNameUniqueness = async (propName, survey) => {
-  const surveyName = R.path(propName.split('.'))(survey)
-  const surveysByName = await getSurveysByName(surveyName)
-
-  return !R.isEmpty(surveysByName) && R.find(s => s.id != survey.id, surveysByName)
-    ? 'duplicate'
-    : null
-}
-
-const validateCreateSurvey = async survey => {
+const validateNewSurvey = async survey => {
   const [nameValidation, langValidation] =
     await Promise.all([
       validateSurveyName('name', survey),
@@ -42,42 +56,6 @@ const validateCreateSurvey = async survey => {
   )(survey)
 }
 
-const surveyPropsValidations = {
-  'props.name': [validateRequired2, validateSurveyNameUniqueness],
-  'props.languages': [validateRequired2],
-  'props.srs': [validateRequired2],
-}
-
-const validateProp = async (obj, prop, validations) => {
-  const errors = R.reject(
-    R.isNil,
-    await Promise.all(
-      validations.map(validationFn => validationFn(prop, obj))
-    )
-  )
-  return {
-    valid: R.isEmpty(errors),
-    errors,
-  }
-}
-
-const validate = async (obj, propsValidations) => {
-  const fields = R.mergeAll(
-    await Promise.all(
-      R.keys(propsValidations)
-        .map(async prop => ({
-          [R.pipe(R.split('.'), R.tail)(prop)]: await validateProp(obj, prop, propsValidations[prop])
-        }))
-    )
-  )
-  return {
-    valid: !R.any(
-      prop => R.pathEq([prop, 'valid'], false, fields),
-      R.keys(fields),
-    ),
-    fields
-  }
-}
 const validateSurvey = async survey => {
   const [nameValidation, languagesValidation, srsValidation] = await Promise.all([
     validateSurveyName('props.name', survey),
@@ -113,7 +91,8 @@ const validateUpdateSurveyProp = async (survey, prop) => {
 }
 
 module.exports = {
-  validateCreateSurvey,
+  validateNewSurvey2,
+  validateNewSurvey,
   validateSurvey,
   validateUpdateSurveyProp,
 }

@@ -3,24 +3,17 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
-import { normalizeName } from './../../../common/survey/surveyUtils'
-import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
-import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
-import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
-import { Input } from '../../commonComponents/form/input'
+import { appModules } from '../appModules'
+import { normalizeName } from './../../../common/survey/surveyUtils'
 
+import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
+import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
+
+import { Input } from '../../commonComponents/form/input'
 import LanguageDropdown from '../../commonComponents/form/languageDropdown'
 
 class AppHomeView extends React.Component {
-
-  constructor (props) {
-    super(props)
-
-    this.state = {}
-
-    this.createSurvey = this.createSurvey.bind(this)
-  }
 
   componentWillUnmount () {
     this.props.resetNewSurvey()
@@ -85,7 +78,7 @@ class AppHomeView extends React.Component {
                             validation={R.path(['fields', 'lang'])(validation)}/>
 
           <button className="btn btn-of-light"
-                  onClick={this.createSurvey}>
+                  onClick={() => this.createSurvey()}>
             <span className="icon icon-plus icon-left"></span>
             Create Survey
           </button>
