@@ -1,7 +1,7 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const validateProp = async (obj, prop, validations) => {
+const validateProp = async (obj, prop, validations = []) => {
   const errors = R.reject(
     R.isNil,
     await Promise.all(

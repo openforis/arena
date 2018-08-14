@@ -100,7 +100,7 @@ class FormActions extends React.Component {
     const {nodeDef} = this.props
 
     return (
-      <div className="survey-form__actions node-def__form_root">
+      <div className="survey-form__actions node-def__form_page">
 
         <div style={{opacity: '0.5', position: 'absolute'}}>
           <a className="btn btn-s btn-of-light-xs no-border"
