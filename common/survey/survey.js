@@ -50,6 +50,15 @@ const getSurveyDefaultLanguage = R.pipe(
   R.head,
 )
 
+const getSurveyDefaultStep = survey => {
+  const steps = getProp('steps')(survey)
+
+  return R.pipe(
+    R.keys,
+    R.find(sId => !steps[sId].prev),
+  )(steps)
+}
+
 module.exports = {
   defaultSteps,
 
@@ -63,6 +72,7 @@ module.exports = {
   getSurveyDefaultLanguage,
   getSurveyDescriptions: getProp('descriptions', {}),
   getSurveySrs: getProp('srs', []),
+  getSurveyDefaultStep,
 
   //TODO: REMOVE
   surveyStatus,

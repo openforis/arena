@@ -47,7 +47,7 @@ class NodeDefSwitch extends React.Component {
       nodeDef,
 
       // passed by the caller
-      edit, draft, render,
+      edit, draft, entry, render,
 
       // actions
       setFormNodDefEdit,
@@ -56,6 +56,10 @@ class NodeDefSwitch extends React.Component {
 
       //state
       locked,
+
+      //data entry
+      parentNode,
+      node,
     } = this.props
 
     const isRoot = isNodeDefRoot(nodeDef)
@@ -122,7 +126,7 @@ class NodeDefSwitch extends React.Component {
       {
         React.createElement(
           nodeDefTypeComponents[getNodeDefType(nodeDef)] || NodeDefText,
-          {nodeDef, draft, edit, locked, render}
+          {nodeDef, draft, edit, entry, parentNode, locked, render}
         )
       }
 

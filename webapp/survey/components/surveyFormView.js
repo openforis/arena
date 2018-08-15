@@ -9,6 +9,7 @@ import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
 import { getCurrentSurvey, getFormNodeDefViewPage, getRootNodeDef, getSurveyState } from '../surveyState'
+import { getCurrentRecord } from '../../record/recordState'
 import { fetchRootNodeDef } from '../actions'
 import { setFormNodeDefViewPage } from '../nodeDef/actions'
 
@@ -72,12 +73,17 @@ SurveyFormView.defaultProps = {
   edit: false,
   // load draft props
   draft: false,
+  // can entry data
+  entry: false,
+  // record being edited
+  record: null,
 }
 
 const mapStateToProps = state => ({
   survey: getCurrentSurvey(state),
   rootNodeDef: getRootNodeDef(getSurveyState(state)),
   nodeDef: getFormNodeDefViewPage(state),
+  record: getCurrentRecord(state),
 })
 
 export default connect(

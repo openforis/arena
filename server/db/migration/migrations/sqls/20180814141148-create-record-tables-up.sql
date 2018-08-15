@@ -17,6 +17,7 @@ CREATE TABLE
         uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
         survey_id bigint NOT NULL,
         owner_id bigint NOT NULL,
+        step varchar(63) NOT NULL,
         date_created TIMESTAMP without TIME zone DEFAULT now() NOT NULL,
         PRIMARY KEY (id)
     );

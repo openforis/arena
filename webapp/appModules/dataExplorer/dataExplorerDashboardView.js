@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
 import * as R from 'ramda'
 
@@ -9,8 +9,24 @@ import { surveyStatus } from '../../../common/survey/survey'
 import DataFetchComponent from '../components/moduleDataFetchComponent'
 import { appState, appModuleUri } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
+import { createRecord } from '../../record/actions'
+import { getCurrentRecord } from '../../record/recordState'
 
 class DataExplorerDashboardView extends React.Component {
+
+  componentDidUpdate (prevProps) {
+    const {currentRecord: prevRecord} = prevProps
+    const {currentRecord, history} = this.props
+
+    if (currentRecord && (!prevRecord || currentRecord.id !== prevRecord.id)) {
+      history.push(appModuleUri(appModules.record))
+    }
+  }
+
+  createRecord() {
+    const { createRecord } = this.props
+    createRecord()
+  }
 
   render () {
     const {dataExplorer, surveyStatusApp} = this.props
@@ -72,7 +88,8 @@ class DataExplorerDashboardView extends React.Component {
 
                   {/*TODO: add check if published*/}
                   <div className="app-dashboard__module-item">
-                    <button className="btn btn-of">
+                    <button className="btn btn-of"
+                            onClick={() => this.createRecord()}>
                       <span className="icon icon-plus icon-left"/>
                       Record
                     </button>
@@ -99,6 +116,12 @@ DataExplorerDashboardView.defaultProps = {
 const mapStateToProps = state => ({
   surveyStatusApp: 'draft',
   dataExplorer: getDashboardData(appModules.dataExplorer)(state),
+  currentRecord: getCurrentRecord(state)
 })
 
-export default connect(mapStateToProps)(DataExplorerDashboardView)
+export default withRouter(connect(
+  mapStateToProps,
+  {
+    createRecord,
+  }
+  )(DataExplorerDashboardView))

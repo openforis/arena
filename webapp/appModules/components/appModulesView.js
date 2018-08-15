@@ -12,12 +12,14 @@ import AppHomeView from '../home/appHomeView'
 import SurveyDashboardView from '../surveyDashboard/surveyDashboardView'
 import DataExplorerView from '../dataExplorer/dataExplorerView'
 import SurveyDesignerView from '../surveyDesigner/surveyDesignerView'
+import RecordEditView from '../record/recordEditView'
 
 const appModulesComponents = {
   [appModules.home]: AppHomeView,
   [appModules.surveyDashboard]: SurveyDashboardView,
   [appModules.surveyDesigner]: SurveyDesignerView,
   [appModules.dataExplorer]: DataExplorerView,
+  [appModules.record]: RecordEditView,
 }
 
 const AppModule = ({module, ...props}) => (
@@ -37,6 +39,7 @@ const AppModulesView = (props) => (
       <AppModule module={appModules.surveyDashboard} {...props}/>
       <AppModule module={appModules.surveyDesigner} {...props}/>
       <AppModule module={appModules.dataExplorer} {...props}/>
+      <AppModule module={appModules.record} {...props}/>
 
     </TransitionGroup>
   </div>

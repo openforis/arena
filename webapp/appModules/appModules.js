@@ -16,6 +16,7 @@ export const appModules = {
   surveyDesigner: 'surveyDesigner',
   dataExplorer: 'dataExplorer',
   dataAnalysis: 'dataAnalysis',
+  record: 'record',
   users: 'users',
 }
 
