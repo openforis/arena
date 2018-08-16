@@ -20,6 +20,8 @@ const {
   defaultSteps,
 } = require('../../common/survey/survey')
 
+const { migrateSurveyDataSchema } = require('../db/migration/survey/surveyDataSchemaMigrator')
+
 // ============== CREATE
 
 const createSurvey = async (user, {name, label, lang}) => db.tx(
@@ -47,6 +49,9 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
     }
     await createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
+    //create survey data schema
+    migrateSurveyDataSchema(surveyId)
+
     // update user prefs
     await setUserPref(user, userPrefNames.survey, surveyId, t)
 
@@ -66,6 +71,13 @@ const getSurveysByName = async (surveyName, client = db) =>
   await client.map(
     `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
+    def => dbTransformCallback(def)
+  )
+
+const fetchSurveys = async (client = db) =>
+  await client.map(
+    `SELECT * FROM survey`,
+    [],
     def => dbTransformCallback(def)
   )
 
@@ -102,6 +114,7 @@ module.exports = {
   // READ
   getSurveyById,
   getSurveysByName,
+  fetchSurveys,
   fetchRootNodeDef,
 
   //UPDATE
