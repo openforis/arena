@@ -14,7 +14,7 @@ const Button = ({label, disabled, selected}) => (
 class NodeDefBoolean extends React.Component {
 
   render () {
-    const {nodeDef, draft, edit, entry, node} = this.props
+    const {nodeDef, draft, edit, entry, parentNode, node} = this.props
 
     const value = entry && node ? node.value: true
 

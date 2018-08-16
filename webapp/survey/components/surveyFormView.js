@@ -3,6 +3,7 @@ import './form/surveyForm.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import {getRootNode} from '../../../common/record/record'
 import FormNavigation from './form/formNavigation'
 import FormActions from './form/formActions'
 import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
@@ -28,7 +29,9 @@ class SurveyFormView extends React.Component {
   }
 
   render () {
-    const {rootNodeDef, nodeDef, edit, draft} = this.props
+    const {rootNodeDef, nodeDef, edit, draft, entry, record} = this.props
+
+    const rootNode = entry ? getRootNode(record): null
 
     return (
       rootNodeDef ?
@@ -46,7 +49,7 @@ class SurveyFormView extends React.Component {
 
             {
               nodeDef
-                ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft}/>
+                ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft} entry={entry} node={rootNode}/>
                 : <div></div>
             }
 

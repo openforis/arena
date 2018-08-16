@@ -15,7 +15,6 @@ CREATE TABLE
     (
         id bigserial NOT NULL,
         uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
-        survey_id bigint NOT NULL,
         owner_id bigint NOT NULL,
         step varchar(63) NOT NULL,
         date_created TIMESTAMP without TIME zone DEFAULT now() NOT NULL,
@@ -45,9 +44,6 @@ CREATE TABLE
         date_created TIMESTAMP without TIME zone DEFAULT now() NOT NULL,
         PRIMARY KEY (id)
     );
-
-ALTER TABLE
-    record ADD CONSTRAINT record_survey_fk FOREIGN KEY (survey_id) REFERENCES "survey" ("id");
 
 ALTER TABLE
     record ADD CONSTRAINT record_user_fk FOREIGN KEY (owner_id) REFERENCES "user" ("id");

@@ -16,9 +16,10 @@ import {
   getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
 
-import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
-
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
+import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
+import { getCurrentRecord, getRecordState } from '../../../record/recordState'
+import { getNodeChildren } from '../../../../common/record/record'
 
 const nodeDefTypeComponents = {
   [nodeDefType.boolean]: NodeDefBoolean,
@@ -47,7 +48,7 @@ class NodeDefSwitch extends React.Component {
       nodeDef,
 
       // passed by the caller
-      edit, draft, entry, render,
+      edit, draft, render,
 
       // actions
       setFormNodDefEdit,
@@ -58,6 +59,7 @@ class NodeDefSwitch extends React.Component {
       locked,
 
       //data entry
+      entry,
       parentNode,
       node,
     } = this.props
@@ -126,7 +128,7 @@ class NodeDefSwitch extends React.Component {
       {
         React.createElement(
           nodeDefTypeComponents[getNodeDefType(nodeDef)] || NodeDefText,
-          {nodeDef, draft, edit, entry, parentNode, locked, render}
+          {nodeDef, draft, edit, locked, entry, parentNode, node, render}
         )
       }
 
@@ -139,9 +141,24 @@ NodeDefSwitch.defaultProps = {
   locked: true,
 }
 
-const mapStateToProps = (state, props) => ({
-  locked: isNodeDefFormLocked(props.nodeDef)(state)
-})
+const mapStateToProps = (state, props) => {
+  const record = getCurrentRecord(state)
+  const {nodeDef, entry, parentNode, node} = props
+
+  const actualNode =
+    entry ?
+      node ?
+        node
+        : parentNode ?
+          getNodeChildren(parentNode.id)(record).filter(n => n.nodeDefId == nodeDef.id)
+      : null
+    : null
+
+  return {
+    locked: isNodeDefFormLocked(props.nodeDef)(state),
+    node: actualNode
+  }
+}
 
 export default connect(
   mapStateToProps,

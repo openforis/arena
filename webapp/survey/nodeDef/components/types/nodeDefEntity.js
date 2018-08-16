@@ -78,7 +78,8 @@ class NodeDefEntity extends React.Component {
       // edit mode
       locked,
 
-      // entry
+      // data entry
+      entry,
       parentNode,
       node,
     } = this.props
@@ -115,7 +116,8 @@ class NodeDefEntity extends React.Component {
             innerPageChildren
               .map((childDef, i) =>
                 <div key={childDef.uuid}>
-                  <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}/>
+                  <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}
+                    entry={entry} parentNode={node} />
                 </div>
               )
           }
