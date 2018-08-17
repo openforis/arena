@@ -43,6 +43,10 @@ const surveyStatus = {
   isPublished: R.equals(PUBLISHED),
 }
 
+const surveyDataSchemaPrefix = 'of_arena_survey_'
+
+const surveyDataSchema = surveyId => surveyDataSchemaPrefix + surveyId
+
 const getSurveyLanguages = getProp('languages', [])
 
 const getSurveyDefaultLanguage = R.pipe(
@@ -61,6 +65,8 @@ const getSurveyDefaultStep = survey => {
 
 module.exports = {
   defaultSteps,
+
+  surveyDataSchema,
 
   // props
   getSurveyProps: getProps,

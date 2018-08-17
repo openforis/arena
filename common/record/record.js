@@ -2,6 +2,24 @@ const R = require('ramda')
 
 const nodes = 'nodes'
 
+const commandType = {
+  createRecord: 'createRecord',
+  deleteRecord: 'deleteRecord',
+  changeStep: 'changeStep',
+  addNode: 'addNode',
+  deleteNode: 'deleteNode',
+  updateNode: 'updateNode',
+}
+
+const eventType = {
+  recordCreated: 'recordCreated',
+  recordDeleted: 'recordDeleted',
+  stepChanged: 'stepChanged',
+  nodeAdded: 'nodeAdded',
+  nodeUpdated: 'nodeUpdated',
+  nodeDeleted: 'nodeDeleted',
+}
+
 const getNodes = R.pipe(
   R.prop(nodes),
   R.defaultTo({}),
@@ -29,15 +47,21 @@ const getRootNode = R.pipe(
 
 const getNodeChildren = node => getNodesByParentId(node.id)
 
-const createRootNode = (recordId, rootNodeDefId) => {
+const createNode = (recordId, parentId, nodeDefId, value = null) => {
   return {
     recordId,
-    parentId: null,
-    nodeDefId: rootNodeDefId,
+    parentId,
+    nodeDefId,
+    value
   }
 }
 
+const createRootNode = (recordId, rootNodeDefId) => createNode(recordId, null, rootNodeDefId)
+
 module.exports = {
+  commandType,
+  eventType,
+  createNode,
   createRootNode,
   getNode,
   getNodeChildren,

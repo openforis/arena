@@ -1,7 +1,9 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
 const {getSurveyById} = require('../survey/surveyRepository')
-const {createRecord, fetchRecordById, fetchRecordNodes} = require('../record/recordRepository')
+const {createRecord, fetchRecordById} = require('../record/recordRepository')
+const {processCommand} = require('./commandProcessor')
+const {commandType} = require('../../common/record/record')
 
 module.exports.init = app => {
 
@@ -10,9 +12,13 @@ module.exports.init = app => {
     const {user} = req
     const surveyId = getRestParam(req, 'surveyId')
     try {
-      const survey = await getSurveyById(surveyId)
-      const record = await createRecord(user, survey)
-      res.json({record})
+      const command = {
+        type: commandType.createRecord,
+        surveyId,
+        user
+      }
+      const events = await processCommand(command)
+      res.json({events})
     } catch (err) {
       sendErr(res, err)
     }
@@ -39,11 +45,19 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const recordId = getRestParam(req, 'recordId')
 
-      const command = body
+      const command = {
+        ...body.command,
+        surveyId,
+        recordId,
+        user
+      }
+      console.log(command)
+      const events = await processCommand(command)
 
-
+      res.json({events})
     } catch (err) {
       sendErr(res, err)
     }
   })
+
 }

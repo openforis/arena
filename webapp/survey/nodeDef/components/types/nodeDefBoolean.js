@@ -1,22 +1,23 @@
 import React from 'react'
+import * as R from 'ramda'
 
 import NodeDefFormItem from './nodeDefFormItem'
 
-const Button = ({label, disabled, selected}) => (
+const Button = ({label, disabled, selected, value, onChange}) => (
   <button className="btn btn-s btn-transparent"
-          disabled={disabled}>
-    <span className={`icon icon-radio-${selected ? 'checked2': 'unchecked'} icon-left`}/>
+          disabled={disabled}
+          onClick={() => onChange({value: value})}>
+    <span className={`icon icon-radio-${selected ? 'checked2' : 'unchecked'} icon-left`}/>
     {label}
   </button>
 )
 
-
 class NodeDefBoolean extends React.Component {
 
   render () {
-    const {nodeDef, draft, edit, entry, parentNode, node} = this.props
+    const {nodeDef, draft, edit, entry, parentNode, node, onChange} = this.props
 
-    const value = entry && node ? node.value: true
+    const value = entry && node ? R.path(['value', 'value'])(node) : false
 
     return (
       <NodeDefFormItem nodeDef={nodeDef}>
@@ -28,11 +29,15 @@ class NodeDefBoolean extends React.Component {
         }}>
           <Button disabled={edit}
                   label="YES"
-                  selected={value}/>
+                  selected={value}
+                  value={true}
+                  onChange={onChange}/>
 
           <Button disabled={edit}
                   label="NO"
-                  selected={!value}/>
+                  selected={!value}
+                  value={false}
+                  onChange={onChange}/>
         </div>
       </NodeDefFormItem>
     )

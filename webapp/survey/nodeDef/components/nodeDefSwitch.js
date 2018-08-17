@@ -1,4 +1,5 @@
 import React from 'react'
+import * as R from 'ramda'
 import { connect } from 'react-redux'
 
 import NodeDefBoolean from './types/nodeDefBoolean'
@@ -10,6 +11,7 @@ import NodeDefTaxon from './types/nodeDefTaxon'
 import NodeDefText from './types/nodeDefText'
 
 import { nodeDefType, getNodeDefType } from '../../../../common/survey/nodeDef'
+import { commandType, getNodeChildren } from '../../../../common/record/record'
 import {
   getNoColumns,
   nodeDefLayoutProps,
@@ -17,9 +19,10 @@ import {
 } from '../../../../common/survey/nodeDefLayout'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
+import { updateRecord } from '../../../record/actions'
+
 import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
-import { getCurrentRecord, getRecordState } from '../../../record/recordState'
-import { getNodeChildren } from '../../../../common/record/record'
+import { getCurrentRecord } from '../../../record/recordState'
 
 const nodeDefTypeComponents = {
   [nodeDefType.boolean]: NodeDefBoolean,
@@ -32,6 +35,12 @@ const nodeDefTypeComponents = {
 
 class NodeDefSwitch extends React.Component {
 
+  constructor (props) {
+    super(props)
+
+    this.onChange = this.onChange.bind(this)
+  }
+
   componentDidMount () {
     const {nodeDef} = this.props
 
@@ -41,6 +50,19 @@ class NodeDefSwitch extends React.Component {
 
   isEditMode () {
     return this.props.edit
+  }
+
+  onChange (event) {
+    const {nodeDef, parentNode, node, updateRecord} = this.props
+    const {value} = event
+    const command = {
+      type: commandType.updateNode,
+      nodeDefId: nodeDef.id,
+      parentNodeId: parentNode ? parentNode.id : null,
+      nodeId: node ? node.id : null,
+      value: {value}
+    }
+    updateRecord(command)
   }
 
   render () {
@@ -128,7 +150,7 @@ class NodeDefSwitch extends React.Component {
       {
         React.createElement(
           nodeDefTypeComponents[getNodeDefType(nodeDef)] || NodeDefText,
-          {nodeDef, draft, edit, locked, entry, parentNode, node, render}
+          {nodeDef, draft, edit, locked, entry, parentNode, node, render, onChange: (e) => this.onChange(e)}
         )
       }
 
@@ -141,18 +163,25 @@ NodeDefSwitch.defaultProps = {
   locked: true,
 }
 
-const mapStateToProps = (state, props) => {
+const determineActualNode = (state, props) => {
   const record = getCurrentRecord(state)
   const {nodeDef, entry, parentNode, node} = props
+  if (entry) {
+    if (node) {
+      return node
+    } else if (parentNode) {
+      const children = getNodeChildren(parentNode)(record)
+      return R.find(n => n.nodeDefId === nodeDef.id)(children)
+    } else {
+      return null
+    }
+  } else {
+    return null
+  }
+}
 
-  const actualNode =
-    entry ?
-      node ?
-        node
-        : parentNode ?
-          getNodeChildren(parentNode.id)(record).filter(n => n.nodeDefId == nodeDef.id)
-      : null
-    : null
+const mapStateToProps = (state, props) => {
+  const actualNode = determineActualNode(state, props)
 
   return {
     locked: isNodeDefFormLocked(props.nodeDef)(state),
@@ -162,5 +191,5 @@ const mapStateToProps = (state, props) => {
 
 export default connect(
   mapStateToProps,
-  {setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp}
+  {setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp, updateRecord}
 )(NodeDefSwitch)

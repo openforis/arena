@@ -4,7 +4,7 @@ const R = require('ramda')
 const db = require('../../db')
 const config = require('../migrationConfig')
 
-const surveyDataSchemaPrefix = 'of_arena_survey_'
+const {surveyDataSchema} = require('../../../../common/survey/survey')
 
 const migrateOptions = {
   config,
@@ -15,7 +15,7 @@ const migrateOptions = {
 const migrateSurveyDataSchema = async(surveyId) => {
   console.log(`starting db migrations for survey ${surveyId}`)
 
-  const schema = surveyDataSchemaPrefix + surveyId
+  const schema = surveyDataSchema(surveyId)
 
   await createSchemaIfNotExists(schema)
 
