@@ -1,36 +1,42 @@
 import * as R from 'ramda'
 
-import { assocActionProps, exportReducer } from '../appUtils/reduxUtils'
+import { exportReducer } from '../appUtils/reduxUtils'
 
-import { recordCreated, recordUpdated } from '../record/actions'
+import { recordUpdated } from '../record/actions'
 import { assocCurrentRecord, getCurrentRecord } from '../record/recordState'
-import { eventType, getNode } from '../../common/record/record'
+import { eventType, getNode, addNode } from '../../common/record/record'
 
 const actionHandlers = {
 
   //record
-  [recordCreated]: (state, {record}) => assocCurrentRecord(record)(state),
-
   [recordUpdated]: (state, {events}) => {
-    const newState = R.clone(state)
-    events.forEach(e => handleRecordEvent(e, newState))
+    //TODO do it with Ramda
+    let newState = R.clone(state)
+    events.forEach(e => {
+      newState = handleRecordEvent(e, newState)
+    })
     return newState
   },
 }
 
 const handleRecordEvent = (event, state) => {
-  const record = R.prop('current')(state)
   const {node} = event
   switch (event.type) {
-    case eventType.nodeAdded:
-      record.nodes.push(node)
-      break
-    case eventType.nodeUpdated:
-      const oldNode = getNode(node.id)(record)
+    case eventType.recordCreated:
+      return assocCurrentRecord(event.record)(state)
+    case eventType.nodeAdded: {
+      const currentRecord = getCurrentRecord(state)
+      const modifiedRecord = addNode(node)(currentRecord)
+      return assocCurrentRecord(modifiedRecord)(state)
+    }
+    case eventType.nodeUpdated: {
+      const currentRecord = getCurrentRecord(state)
+      const oldNode = getNode(node.id)(currentRecord)
       oldNode.value = node.value
-      break
+      return assocCurrentRecord(currentRecord)(state)
+    }
   }
-  return R.assoc('current', record)(state)
+  return state
 }
 
 export default exportReducer(actionHandlers)

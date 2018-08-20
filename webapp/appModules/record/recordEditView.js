@@ -1,7 +1,7 @@
 import React from 'react'
 import connect from 'react-redux/es/connect/connect'
 
-import { getCurrentRecord } from '../../record/recordState'
+import { getGlobalCurrentRecord } from '../../record/recordState'
 import SurveyFormView from '../../survey/components/surveyFormView'
 
 class RecordEditView extends React.Component {
@@ -19,7 +19,7 @@ class RecordEditView extends React.Component {
 
 
 const mapStateToProps = state => ({
-  record: getCurrentRecord(state)
+  record: getGlobalCurrentRecord(state)
 })
 
 export default connect(mapStateToProps)(RecordEditView)

@@ -1,7 +1,6 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
-const {getSurveyById} = require('../survey/surveyRepository')
-const {createRecord, fetchRecordById} = require('../record/recordRepository')
+const {fetchRecordById} = require('../record/recordRepository')
 const {processCommand} = require('./commandProcessor')
 const {commandType} = require('../../common/record/record')
 
@@ -18,6 +17,7 @@ module.exports.init = app => {
         user
       }
       const events = await processCommand(command)
+
       res.json({events})
     } catch (err) {
       sendErr(res, err)

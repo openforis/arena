@@ -1,11 +1,11 @@
 const R = require('ramda')
 
 const {nodeDefType} = require('../../common/survey/nodeDef')
-const {commandType, eventType, createNode, createRootNode} = require('../../common/record/record')
-const {fetchNodeDefsBySurveyId, fetchNodeDefsByParentId} = require('../nodeDef/nodeDefRepository')
+const {commandType, eventType, createNode} = require('../../common/record/record')
+const {fetchNodeDef, fetchNodeDefsBySurveyId, fetchNodeDefsByParentId} = require('../nodeDef/nodeDefRepository')
 const {getSurveyById} = require('../survey/surveyRepository')
 const {createRecord} = require('../record/recordRepository')
-const {fetchNodes, insertNode, updateNode, deleteNode} = require('../record/nodeRepository')
+const {insertNode, updateNode, deleteNode} = require('../record/nodeRepository')
 const {insertRecordCreatedLog, insertNodeAddedLog, insertNodeUpdatedLog, insertNodeDeletedLog} = require('../record/recordLogRepository')
 
 const processCommand = async (command) => {
@@ -25,43 +25,35 @@ const processCommand = async (command) => {
 
 const processCreateRecordCommand = async (command) => {
   //TODO do it in transaction
+
+  const events = []
   const {surveyId, user} = command
   const survey = await getSurveyById(surveyId)
   const record = await createRecord(user, survey)
+
+  events.push({
+    type: eventType.recordCreated,
+    record,
+  })
+
+  //TODO handle with event observer
   //LOG
   insertRecordCreatedLog(surveyId, command.user, record)
 
   const nodeDefs = await fetchNodeDefsBySurveyId(survey.id)
   const rootNodeDef = R.find(n => n.parentId === null)(nodeDefs)
 
-  const rootNode = await insertNode(survey.id, createRootNode(record.id, rootNodeDef.id))
-  //LOG
-  insertNodeAddedLog(surveyId, command.user, rootNode)
+  const rootNodeEvents = await insertNodeInternal(survey.id, command.user, record.id, null, rootNodeDef)
+  Array.prototype.push.apply(events, rootNodeEvents)
 
-  await insertEmptyChildren(survey.id, user, rootNode)
-
-  record.nodes = await fetchNodes(surveyId, record.id)
-
-  return [{
-    type: eventType.recordCreated,
-    record,
-  }]
+  return events
 }
 
 const processAddNodeCommand = async (command) => {
   const {surveyId, recordId, nodeDefId, parentNodeId} = command
 
-  const events = []
-
-  const node = await insertNode(surveyId, createNode(recordId, parentNodeId, nodeDefId, command.value))
-  //LOG
-  await insertNodeAddedLog(surveyId, command.user, node)
-
-  events.push({
-    type: eventType.nodeAdded,
-    node,
-  })
-  return events
+  const nodeDef = await fetchNodeDef(nodeDefId)
+  return await insertNodeInternal(surveyId, command.user, recordId, parentNodeId, nodeDef)
 }
 
 const processUpdateNodeCommand = async (command) => {
@@ -70,6 +62,7 @@ const processUpdateNodeCommand = async (command) => {
   const events = []
 
   const node = await updateNode(surveyId, nodeId, command.value)
+  //LOG
   await insertNodeUpdatedLog(surveyId, command.user, node)
 
   events.push({
@@ -95,14 +88,36 @@ const processDeleteNodeCommand = async (command) => {
   return events
 }
 
+const insertNodeInternal = async (surveyId, user, recordId, parentId, nodeDef) => {
+  const events = []
+
+  const node = await insertNode(surveyId, createNode(recordId, parentId, nodeDef.id))
+
+  events.push({
+    type: eventType.nodeAdded,
+    node: node,
+  })
+  //TODO move it to event observer
+  //LOG
+  await insertNodeAddedLog(surveyId, user, node)
+
+  if (nodeDefType.entity === nodeDef.type) {
+    const emptyChildrenEvents = await insertEmptyChildren(surveyId, user, node)
+    Array.prototype.push.apply(events, emptyChildrenEvents)
+  }
+  return events
+}
+
 const insertEmptyChildren = async (surveyId, user, parentNode) => {
+  const events = []
   const childrenDefs = await fetchNodeDefsByParentId(parentNode.nodeDefId)
 
   await Promise.all(childrenDefs.map(async childDef => {
-    const childNode = await insertNode(surveyId, createNode(parentNode.recordId, parentNode.id, childDef.id))
-    //LOG
-    await insertNodeAddedLog(surveyId, user, childNode)
+    const childInsertEvents = await insertNodeInternal(surveyId, user, parentNode.recordId, parentNode.id, childDef)
+    Array.prototype.push.apply(events, childInsertEvents)
   }))
+
+  return events
 }
 
 module.exports = {

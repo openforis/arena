@@ -22,7 +22,7 @@ import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../ac
 import { updateRecord } from '../../../record/actions'
 
 import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
-import { getCurrentRecord } from '../../../record/recordState'
+import { getGlobalCurrentRecord } from '../../../record/recordState'
 
 const nodeDefTypeComponents = {
   [nodeDefType.boolean]: NodeDefBoolean,
@@ -164,7 +164,7 @@ NodeDefSwitch.defaultProps = {
 }
 
 const determineActualNode = (state, props) => {
-  const record = getCurrentRecord(state)
+  const record = getGlobalCurrentRecord(state)
   const {nodeDef, entry, parentNode, node} = props
   if (entry) {
     if (node) {

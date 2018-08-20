@@ -65,18 +65,19 @@ const createNode = (recordId, parentId, nodeDefId, value = null) => {
   }
 }
 
-const createRootNode = (recordId, rootNodeDefId) => createNode(recordId, null, rootNodeDefId)
+const addNode = node => R.assocPath(['nodes', node.id], node)
 
 module.exports = {
   commandType,
   eventType,
   recordLogType,
   createNode,
-  createRootNode,
   getNode,
   getNodeChildren,
   getNodes,
   getNodesArray,
   getNodesByParentId,
   getRootNode,
+
+  addNode,
 }

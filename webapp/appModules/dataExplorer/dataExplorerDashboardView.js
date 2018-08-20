@@ -10,7 +10,7 @@ import DataFetchComponent from '../components/moduleDataFetchComponent'
 import { appState, appModuleUri } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 import { createRecord } from '../../record/actions'
-import { getCurrentRecord } from '../../record/recordState'
+import { getGlobalCurrentRecord } from '../../record/recordState'
 
 class DataExplorerDashboardView extends React.Component {
 
@@ -116,7 +116,7 @@ DataExplorerDashboardView.defaultProps = {
 const mapStateToProps = state => ({
   surveyStatusApp: 'draft',
   dataExplorer: getDashboardData(appModules.dataExplorer)(state),
-  currentRecord: getCurrentRecord(state)
+  currentRecord: getGlobalCurrentRecord(state)
 })
 
 export default withRouter(connect(
