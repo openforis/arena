@@ -1,8 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import {eventType} from '../../common/record/record'
-import {getCurrentSurveyId} from '../survey/surveyState'
+import { eventType } from '../../common/record/record'
+import { getCurrentSurveyId } from '../survey/surveyState'
 import { getCurrentRecordId } from './recordState'
 
 export const recordCreated = 'record/created'

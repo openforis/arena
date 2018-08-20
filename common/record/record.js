@@ -20,6 +20,15 @@ const eventType = {
   nodeDeleted: 'nodeDeleted',
 }
 
+const recordLogType = {
+  recordCreated: 'recordCreated',
+  recordDeleted: 'recordDeleted',
+  stepChanged: 'stepChanged',
+  nodeAdded: 'nodeAdded',
+  nodeUpdated: 'nodeUpdated',
+  nodeDeleted: 'nodeDeleted',
+}
+
 const getNodes = R.pipe(
   R.prop(nodes),
   R.defaultTo({}),
@@ -61,6 +70,7 @@ const createRootNode = (recordId, rootNodeDefId) => createNode(recordId, null, r
 module.exports = {
   commandType,
   eventType,
+  recordLogType,
   createNode,
   createRootNode,
   getNode,

@@ -9,15 +9,14 @@ const dbTransformCallback = r =>
 
 // ============== CREATE
 
-const insertNode = async (surveyId, node, client = db) => {
-  const {id: nodeId} = await client.one(`
-    INSERT INTO ${surveyDataSchema(surveyId)}.node (record_id, parent_id, node_def_id, value)
-    VALUES ($1, $2, $3, $4)
-    RETURNING id
-  `, [node.recordId, node.parentId, node.nodeDefId, node.value])
-
-  return fetchNodeById(surveyId, nodeId, client)
-}
+const insertNode = async (surveyId, node, client = db) =>
+  await client.one(
+    `INSERT INTO ${surveyDataSchema(surveyId)}.node (record_id, parent_id, node_def_id, value)
+     VALUES ($1, $2, $3, $4)
+     RETURNING *`,
+    [node.recordId, node.parentId, node.nodeDefId, node.value],
+    r => dbTransformCallback(r)
+  )
 
 // ============== READ
 
@@ -47,9 +46,27 @@ const updateNode = async (surveyId, nodeId, value, client = db) =>
     r => dbTransformCallback(r)
   )
 
+// ============== DELETE
+const deleteNode = async (surveyId, nodeId, client = db) =>
+  await client.one(
+    `DELETE ${surveyDataSchema(surveyId)}.node
+     WHERE id = $1
+     RETURNING *
+    `, [nodeId],
+    r => dbTransformCallback(r)
+  )
+
 module.exports = {
+  //CREATE
   insertNode,
+
+  //READ
   fetchNodeById,
   fetchNodes,
+
+  //UPDATE
   updateNode,
+
+  //DELETE
+  deleteNode,
 }

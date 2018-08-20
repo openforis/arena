@@ -51,9 +51,7 @@ module.exports.init = app => {
         recordId,
         user
       }
-      console.log(command)
       const events = await processCommand(command)
-
       res.json({events})
     } catch (err) {
       sendErr(res, err)
