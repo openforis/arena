@@ -155,9 +155,7 @@ const createInstance = () => {
   return instance
 }
 
-const instance = createInstance()
-
-const commandProcessor = () => instance
+const commandProcessor = createInstance()
 
 module.exports = {
   commandProcessor,

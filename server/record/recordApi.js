@@ -16,7 +16,7 @@ module.exports.init = app => {
         surveyId,
         user
       }
-      const events = await commandProcessor().processCommand(command)
+      const events = await commandProcessor.processCommand(command)
 
       res.json({events})
     } catch (err) {
@@ -51,7 +51,7 @@ module.exports.init = app => {
         recordId,
         user
       }
-      const events = await commandProcessor().processCommand(command)
+      const events = await commandProcessor.processCommand(command)
       res.json({events})
     } catch (err) {
       sendErr(res, err)
