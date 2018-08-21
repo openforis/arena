@@ -8,6 +8,7 @@ const {fetchNodeDef, fetchNodeDefsBySurveyId, fetchNodeDefsByParentId} = require
 const {getSurveyById} = require('../survey/surveyRepository')
 const {createRecord} = require('../record/recordRepository')
 const {insertNode, updateNode, deleteNode} = require('../record/nodeRepository')
+const {insertRecordCreatedLog, insertNodeAddedLog, insertNodeUpdatedLog, insertNodeDeletedLog} = require('../record/recordLogRepository')
 
 const CommandProcessor = function CommandProcessor () {
 
@@ -132,6 +133,32 @@ const CommandProcessor = function CommandProcessor () {
 
 util.inherits(CommandProcessor, EventEmitter)
 
+//TODO move it to service factory?
+
+const createInstance = () => {
+  const instance = new CommandProcessor()
+
+  //register record update log listeners
+  instance.on(eventType.recordCreated, async ({surveyId, user, record}) => {
+    await insertRecordCreatedLog(surveyId, user, record)
+  })
+  instance.on(eventType.nodeAdded, async ({surveyId, user, node}) => {
+    await insertNodeAddedLog(surveyId, user, node)
+  })
+  instance.on(eventType.nodeUpdated, async ({surveyId, user, node}) => {
+    await insertNodeUpdatedLog(surveyId, user, node)
+  })
+  instance.on(eventType.nodeDeleted, async ({surveyId, user, node}) => {
+    await insertNodeDeletedLog(surveyId, user, node)
+  })
+
+  return instance
+}
+
+const instance = createInstance()
+
+const commandProcessor = () => instance
+
 module.exports = {
-  CommandProcessor,
+  commandProcessor,
 }

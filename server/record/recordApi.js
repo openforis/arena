@@ -1,25 +1,8 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
 const {fetchRecordById} = require('../record/recordRepository')
-const {CommandProcessor} = require('./commandProcessor')
-const {commandType, eventType} = require('../../common/record/record')
-const {insertRecordCreatedLog, insertNodeAddedLog, insertNodeUpdatedLog, insertNodeDeletedLog} = require('../record/recordLogRepository')
-
-const commandProcessor = new CommandProcessor()
-
-//register record update log listeners
-commandProcessor.on(eventType.recordCreated, async ({surveyId, user, record}) => {
-  await insertRecordCreatedLog(surveyId, user, record)
-})
-commandProcessor.on(eventType.nodeAdded, async ({surveyId, user, node}) => {
-  await insertNodeAddedLog(surveyId, user, node)
-})
-commandProcessor.on(eventType.nodeUpdated, async ({surveyId, user, node}) => {
-  await insertNodeUpdatedLog(surveyId, user, node)
-})
-commandProcessor.on(eventType.nodeDeleted, async ({surveyId, user, node}) => {
-  await insertNodeDeletedLog(surveyId, user, node)
-})
+const {commandProcessor} = require('./commandProcessor')
+const {commandType} = require('../../common/record/record')
 
 module.exports.init = app => {
 
@@ -33,7 +16,7 @@ module.exports.init = app => {
         surveyId,
         user
       }
-      const events = await commandProcessor.processCommand(command)
+      const events = await commandProcessor().processCommand(command)
 
       res.json({events})
     } catch (err) {
@@ -68,7 +51,7 @@ module.exports.init = app => {
         recordId,
         user
       }
-      const events = await commandProcessor.processCommand(command)
+      const events = await commandProcessor().processCommand(command)
       res.json({events})
     } catch (err) {
       sendErr(res, err)
