@@ -62,9 +62,12 @@ const lookupSrs = (code) => {
   return {code, name: formatName(item.name), wkt: item.wkt}
 }
 
+const toSrsItems = (codes) => R.filter(srsItem => R.contains(srsItem.key, codes))(srs)
+
 module.exports = {
   srs,
   findSrs,
   lookupSrs,
   getSrsName,
+  toSrsItems,
 }

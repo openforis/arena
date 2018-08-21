@@ -36,7 +36,7 @@ const getNodes = R.pipe(
 
 const getNode = id => R.pipe(
   getNodes,
-  R.find(n => n.id === id),
+  R.prop(id),
 )
 
 const getNodesArray = R.pipe(
@@ -67,6 +67,11 @@ const createNode = (recordId, parentId, nodeDefId, value = null) => {
 
 const addNode = node => R.assocPath(['nodes', node.id], node)
 
+const getNodeValue = node => R.pipe(
+  R.prop('value'),
+  R.defaultTo({})
+)(node)
+
 module.exports = {
   commandType,
   eventType,
@@ -78,6 +83,7 @@ module.exports = {
   getNodesArray,
   getNodesByParentId,
   getRootNode,
+  getNodeValue,
 
   addNode,
 }

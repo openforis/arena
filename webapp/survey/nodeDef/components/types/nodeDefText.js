@@ -1,21 +1,27 @@
 import React from 'react'
+import * as R from 'ramda'
 
 import { Input } from '../../../../commonComponents/form/input'
 import NodeDefFormItem from './nodeDefFormItem'
 import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
-import * as R from 'ramda'
+import { getNodeValue } from '../../../../../common/record/record'
 
 class NodeDefText extends React.Component {
 
+  onChange (value) {
+    this.props.onChange({value: value})
+  }
+
   render () {
-    const {nodeDef, draft, edit, entry, parentNode, node, onChange} = this.props
-    const value = entry && node ? R.path(['value', 'value'])(node) : null
+    const {nodeDef, draft, edit, entry, node} = this.props
+    const nodeValue = entry && node ? getNodeValue(node) : null
+    const value = R.prop('v')(nodeValue)
 
     return (
       <NodeDefFormItem nodeDef={nodeDef}>
         <Input readOnly={edit}
                {...getNodeDefInputTextProps(nodeDef)}
-               onChange={(e) => onChange({value: e.target.value})}
+               onChange={(e) => this.onChange(e.target.value)}
                value={value}/>
       </NodeDefFormItem>
     )

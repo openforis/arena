@@ -7,10 +7,6 @@ import SurveyFormView from '../../survey/components/surveyFormView'
 class RecordEditView extends React.Component {
 
   render() {
-    const {record} = this.props
-
-    console.log(record)
-
     return (
       <SurveyFormView draft={false} edit={false} entry={true} />
     )

@@ -55,12 +55,13 @@ class NodeDefSwitch extends React.Component {
   onChange (event) {
     const {nodeDef, parentNode, node, updateRecord} = this.props
     const {value} = event
+    const commandValue = R.is(Object, value) ? value : {v: value}
     const command = {
       type: commandType.updateNode,
       nodeDefId: nodeDef.id,
       parentNodeId: parentNode ? parentNode.id : null,
       nodeId: node ? node.id : null,
-      value: {value}
+      value: commandValue
     }
     updateRecord(command)
   }
