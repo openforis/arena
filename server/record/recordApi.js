@@ -38,7 +38,7 @@ module.exports.init = app => {
   })
 
   // ==== UPDATE
-  app.put('/survey/:surveyId/record/:recordId/update', async (req, res) => {
+  app.put('/survey/:surveyId/record/:recordId/node/:nodeId', async (req, res) => {
     try {
       const {user, body} = req
 
