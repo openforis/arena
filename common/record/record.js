@@ -11,15 +11,6 @@ const commandType = {
   updateNode: 'updateNode',
 }
 
-const eventType = {
-  recordCreated: 'recordCreated',
-  recordDeleted: 'recordDeleted',
-  stepChanged: 'stepChanged',
-  nodeAdded: 'nodeAdded',
-  nodeUpdated: 'nodeUpdated',
-  nodeDeleted: 'nodeDeleted',
-}
-
 const recordLogType = {
   recordCreated: 'recordCreated',
   recordDeleted: 'recordDeleted',
@@ -74,7 +65,6 @@ const getNodeValue = node => R.pipe(
 
 module.exports = {
   commandType,
-  eventType,
   recordLogType,
   createNode,
   getNode,

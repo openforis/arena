@@ -1,7 +1,7 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
 const {fetchRecordById} = require('../record/recordRepository')
-const {commandProcessor} = require('./commandProcessor')
+const {processCommand} = require('./recordUpdater')
 const {commandType} = require('../../common/record/record')
 
 module.exports.init = app => {
@@ -16,9 +16,9 @@ module.exports.init = app => {
         surveyId,
         user
       }
-      const events = await commandProcessor.processCommand(command)
+      const record = await processCommand(command)
 
-      res.json({events})
+      res.json({record})
     } catch (err) {
       sendErr(res, err)
     }
@@ -51,8 +51,8 @@ module.exports.init = app => {
         recordId,
         user
       }
-      const events = await commandProcessor.processCommand(command)
-      res.json({events})
+      const updatedNodes = await processCommand(command)
+      res.json({updatedNodes})
     } catch (err) {
       sendErr(res, err)
     }
