@@ -63,6 +63,23 @@ const getNodeValue = node => R.pipe(
   R.defaultTo({})
 )(node)
 
+const deleteNodeAndChildren = node => record => {
+  record.nodes = record.nodes.filter(n => n.id !== node.id && n.parentId !== node.id)
+  return record
+}
+
+const updateNodes = nodes => record => {
+  nodes.forEach(updatedNode => {
+    const index = R.findIndex(existingNode => existingNode.id === updatedNode.id)(record.nodes)
+    if (index >= 0) {
+      record.nodes[index] = updatedNode
+    } else {
+      record.nodes.push(updatedNode)
+    }
+  })
+  return record
+}
+
 module.exports = {
   commandType,
   recordLogType,
@@ -74,6 +91,7 @@ module.exports = {
   getNodesByParentId,
   getRootNode,
   getNodeValue,
-
+  deleteNodeAndChildren,
+  updateNodes,
   addNode,
 }

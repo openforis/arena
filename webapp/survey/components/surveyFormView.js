@@ -9,8 +9,7 @@ import FormActions from './form/formActions'
 import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
-import { getCurrentSurvey, getFormNodeDefViewPage, getRootNodeDef, getSurveyState } from '../surveyState'
-import { getGlobalCurrentRecord } from '../../record/recordState'
+import { getSurveyState, getCurrentSurvey, getFormNodeDefViewPage, getRootNodeDef, getRecord } from '../surveyState'
 import { fetchRootNodeDef } from '../actions'
 import { setFormNodeDefViewPage } from '../nodeDef/actions'
 
@@ -86,7 +85,7 @@ const mapStateToProps = state => ({
   survey: getCurrentSurvey(state),
   rootNodeDef: getRootNodeDef(getSurveyState(state)),
   nodeDef: getFormNodeDefViewPage(state),
-  record: getGlobalCurrentRecord(state),
+  record: getRecord(getSurveyState(state)),
 })
 
 export default connect(

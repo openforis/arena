@@ -9,6 +9,10 @@ import {
   assocNodeDefPropValidation,
   assocNodeDefFormUnlocked,
   assocFormNodeDefViewPage,
+  //record
+  assocRecord,
+  updateRecordNodes,
+  deleteRecordNodeAndChildren,
 } from './surveyState'
 
 /**
@@ -34,6 +38,15 @@ import {
   formNodeDefViewPage,
 } from './nodeDef/actions'
 
+/**
+ * record actions
+ */
+import {
+  nodeDeleted,
+  recordCreated,
+  recordUpdated
+} from '../record/actions'
+
 const actionHandlers = {
   //survey
   [surveyNewUpdate]: assocActionProps,
@@ -58,6 +71,14 @@ const actionHandlers = {
   [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocNodeDefFormUnlocked(nodeDef)(state),
 
   [formNodeDefViewPage]: (state, {nodeDef}) => assocFormNodeDefViewPage(nodeDef)(state),
+
+  //record
+  [recordCreated]: (state, {record}) => assocRecord(record)(state),
+
+  [recordUpdated]: (state, {updatedNodes}) => updateRecordNodes(updatedNodes)(state),
+
+  [nodeDeleted]: (state, {node}) => deleteRecordNodeAndChildren(node)(state),
+
 }
 
 export default exportReducer(actionHandlers)

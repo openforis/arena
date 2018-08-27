@@ -7,18 +7,18 @@ import * as R from 'ramda'
 import { surveyStatus } from '../../../common/survey/survey'
 
 import DataFetchComponent from '../components/moduleDataFetchComponent'
-import { appState, appModuleUri } from '../../app/app'
+import { appModuleUri } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 import { createRecord } from '../../record/actions'
-import { getGlobalCurrentRecord } from '../../record/recordState'
+import { getSurveyState, getRecord } from '../../survey/surveyState'
 
 class DataExplorerDashboardView extends React.Component {
 
   componentDidUpdate (prevProps) {
-    const {currentRecord: prevRecord} = prevProps
-    const {currentRecord, history} = this.props
+    const {record: prevRecord} = prevProps
+    const {record, history} = this.props
 
-    if (currentRecord && (!prevRecord || currentRecord.id !== prevRecord.id)) {
+    if (record && (!prevRecord || record.id !== prevRecord.id)) {
       history.push(appModuleUri(appModules.record))
     }
   }
@@ -116,7 +116,7 @@ DataExplorerDashboardView.defaultProps = {
 const mapStateToProps = state => ({
   surveyStatusApp: 'draft',
   dataExplorer: getDashboardData(appModules.dataExplorer)(state),
-  currentRecord: getGlobalCurrentRecord(state)
+  record: getRecord(getSurveyState(state)),
 })
 
 export default withRouter(connect(
