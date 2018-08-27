@@ -4,7 +4,7 @@ import connect from 'react-redux/es/connect/connect'
 import { getGlobalCurrentRecord } from '../../record/recordState'
 import SurveyFormView from '../../survey/components/surveyFormView'
 
-class RecordEditView extends React.Component {
+class DataEntryView extends React.Component {
 
   render() {
     return (
@@ -18,4 +18,4 @@ const mapStateToProps = state => ({
   record: getGlobalCurrentRecord(state)
 })
 
-export default connect(mapStateToProps)(RecordEditView)
+export default connect(mapStateToProps)(DataEntryView)

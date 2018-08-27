@@ -12,7 +12,7 @@ import AppHomeView from '../home/appHomeView'
 import SurveyDashboardView from '../surveyDashboard/surveyDashboardView'
 import DataExplorerView from '../dataExplorer/dataExplorerView'
 import SurveyDesignerView from '../surveyDesigner/surveyDesignerView'
-import RecordEditView from '../record/recordEditView'
+import RecordEditView from '../dataExplorer/dataEntryView'
 
 const appModulesComponents = {
   [appModules.home]: AppHomeView,
