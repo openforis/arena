@@ -4,7 +4,7 @@ const R = require('ramda')
 const db = require('../../db')
 const config = require('../migrationConfig')
 
-const {surveyDataSchema} = require('../../../../common/survey/survey')
+const {getSurveyDBSchema} = require('../../../../common/survey/survey')
 
 const migrateOptions = {
   config,
@@ -12,12 +12,13 @@ const migrateOptions = {
   env: process.env.NODE_ENV,
 }
 
-const migrateSurveyDataSchema = async(surveyId) => {
+const migrateSurveySchema = async(surveyId) => {
   console.log(`starting db migrations for survey ${surveyId}`)
 
-  const schema = surveyDataSchema(surveyId)
+  const schema = getSurveyDBSchema(surveyId)
 
-  await createSchemaIfNotExists(schema)
+  // first create db schema
+  await db.none(`CREATE SCHEMA IF NOT EXISTS ${schema}`)
 
   const options = R.assocPath(['config', process.env.NODE_ENV, 'schema'], schema)(migrateOptions)
 
@@ -27,12 +28,6 @@ const migrateSurveyDataSchema = async(surveyId) => {
   console.log(`db migrations for survey ${surveyId} completed`)
 }
 
-const createSchemaIfNotExists = async (schema) => {
-  await db.tx(async t => {
-    await t.none(`CREATE SCHEMA IF NOT EXISTS ${schema}`)
-  })
-}
-
 module.exports = {
-  migrateSurveyDataSchema
+  migrateSurveySchema
 }

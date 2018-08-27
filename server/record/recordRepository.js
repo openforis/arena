@@ -1,7 +1,7 @@
 const camelize = require('camelize')
 const db = require('../db/db')
 
-const {surveyDataSchema, getSurveyDefaultStep} = require('../../common/survey/survey')
+const {getSurveyDBSchema, getSurveyDefaultStep} = require('../../common/survey/survey')
 
 const dbTransformCallback = r =>
   r ? camelize(r)
@@ -12,7 +12,7 @@ const dbTransformCallback = r =>
 const createRecord = async (user, survey, client = db) => client.tx(
   async tx =>
     await tx.one(
-      `INSERT INTO ${surveyDataSchema(survey.id)}.record (owner_id, step)
+      `INSERT INTO ${getSurveyDBSchema(survey.id)}.record (owner_id, step)
        VALUES ($1, $2)
        RETURNING *`,
       [user.id, getSurveyDefaultStep(survey)],
@@ -24,7 +24,7 @@ const createRecord = async (user, survey, client = db) => client.tx(
 
 const fetchRecordById = async (surveyId, recordId, client = db) => {
   const record = await client.one(
-    `SELECT * FROM ${surveyDataSchema(surveyId)}.record WHERE id = $1`,
+    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.record WHERE id = $1`,
     [recordId],
     r => dbTransformCallback(r)
   )

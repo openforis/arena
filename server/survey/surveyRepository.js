@@ -20,7 +20,7 @@ const {
   defaultSteps,
 } = require('../../common/survey/survey')
 
-const { migrateSurveyDataSchema } = require('../db/migration/survey/surveyDataSchemaMigrator')
+const { migrateSurveySchema } = require('../db/migration/survey/execMigrations')
 
 // ============== CREATE
 
@@ -50,7 +50,7 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
     await createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
     //create survey data schema
-    migrateSurveyDataSchema(surveyId)
+    migrateSurveySchema(surveyId)
 
     // update user prefs
     await setUserPref(user, userPrefNames.survey, surveyId, t)

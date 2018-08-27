@@ -1,8 +1,10 @@
+const Promise = require('bluebird')
 const DBMigrate = require('db-migrate')
 
-const config = require('./migrationConfig')
-const {fetchSurveys} = require('../../survey/surveyRepository')
-const {migrateSurveyDataSchema} = require('./survey/surveyDataSchemaMigrator')
+const config = require('../migrationConfig')
+
+const {fetchSurveys} = require('../../../survey/surveyRepository')
+const {migrateSurveySchema} = require('../survey/execMigrations')
 
 const migrateOptions = {
   config,
@@ -10,13 +12,13 @@ const migrateOptions = {
   env: process.env.NODE_ENV,
 }
 
-const migrateSurveyDataSchemas = async() => {
+const migrateSurveySchemas = async() => {
   const surveys = await fetchSurveys()
 
   console.log(`starting data schemas migrations for ${surveys.length} surveys`)
 
   await Promise.all(surveys.map(async s => {
-    await migrateSurveyDataSchema(s.id)
+    await migrateSurveySchema(s.id)
   }))
 
   console.log(`data schemas migrations completed`)
@@ -32,7 +34,7 @@ module.exports = async () => {
 
     console.log('database migrations completed')
 
-    await migrateSurveyDataSchemas()
+    await migrateSurveySchemas()
   } catch (err) {
     console.log('error running database migrations', err)
   }

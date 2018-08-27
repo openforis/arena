@@ -1,6 +1,6 @@
 const db = require('../db/db')
 
-const {surveyDataSchema} = require('../../common/survey/survey')
+const {getSurveyDBSchema} = require('../../common/survey/survey')
 const {recordLogType} = require('../../common/record/record')
 
 const insertRecordCreatedLog = async (surveyId, user, record, client = db) =>
@@ -33,7 +33,7 @@ const insertNodeDeletedLog = async (surveyId, user, node, client = db) =>
 const insertNodeLog = async (actionType, surveyId, user, node, client = db) => client.tx(
   async tx =>
     await tx.one(
-      `INSERT INTO ${surveyDataSchema(surveyId)}.record_update_log (action, user_id, node)
+      `INSERT INTO ${getSurveyDBSchema(surveyId)}.record_update_log (action, user_id, node)
       VALUES ($1, $2, $3)
       RETURNING *`,
       [actionType, user.id, node]
