@@ -42,7 +42,6 @@ const getNodeDefLabel = (nodeDef, lang) => R.pipe(
   R.prop(lang),
 )(nodeDef)
 
-
 const getNodeDefType = R.prop('type')
 
 // ==== UPDATE
@@ -52,6 +51,7 @@ module.exports = {
   getNodeDefType,
 
   isNodeDefEntity: R.pipe(getNodeDefType, R.equals(nodeDefType.entity)),
+  isNodeDefMultiple: R.pipe(getProp('multiple'), R.equals(true)),
 
 // props
 //   getNodeDefProps: getProps,

@@ -6,7 +6,7 @@ const db = require('../db/db')
 const {getSurveyById} = require('../survey/surveyRepository')
 
 const {fetchNodeDef, fetchNodeDefsBySurveyId, fetchNodeDefsByParentId} = require('../nodeDef/nodeDefRepository')
-const {nodeDefType, isNodeDefEntity} = require('../../common/survey/nodeDef')
+const {nodeDefType, isNodeDefEntity, isNodeDefMultiple} = require('../../common/survey/nodeDef')
 
 const {insertRecord} = require('../record/recordRepository')
 const {commandType, newNode} = require('../../common/record/record')
@@ -37,22 +37,22 @@ const createNode = async (nodeDef, recordId, parentId = null, client = db) => {
   const node = await insertNode(nodeDef.surveyId, newNode(nodeDef.id, recordId, parentId), client)
 
   // insert children if entity
-  const childDefs = isNodeDefEntity(nodeDef)
+  const childDefs = isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
     ? await fetchNodeDefsByParentId(nodeDef.id)
     : []
 
-  const nodes = await Promise.all(
-    R.reduce(
-      async (obj, nodeDef) => {
-        const createdNodes = await createNode(nodeDef, recordId, node.id, client)
-        return R.merge(obj, createdNodes)
-      },
-      [],
+  const childNodes = R.isEmpty(childDefs)
+    ? {}
+    : R.reduce(
+      async (obj, nodeDef) => R.merge(
+        obj,
+        await createNode(nodeDef, recordId, node.id, client)
+      ),
+      {},
       childDefs
     )
-  )
 
-  return R.merge({[node.id]: node}, nodes)
+  return R.merge({[node.id]: node}, childNodes)
 }
 
 //

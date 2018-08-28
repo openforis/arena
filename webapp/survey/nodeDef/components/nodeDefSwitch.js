@@ -11,23 +11,24 @@ import NodeDefTaxon from './types/nodeDefTaxon'
 import NodeDefText from './types/nodeDefText'
 
 import { nodeDefType, getNodeDefType } from '../../../../common/survey/nodeDef'
-import { commandType, getNodeChildren } from '../../../../common/record/record'
 import {
   getNoColumns,
   nodeDefLayoutProps,
   getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
+import { getNodesByDefId, getNodeChildren } from '../../../../common/record/record'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
 import { updateRecord } from '../../record/actions'
 
-import { isNodeDefRoot, isNodeDefFormLocked, getSurveyState, getRecord } from '../../surveyState'
+import { isNodeDefRoot, isNodeDefFormLocked, getSurveyState } from '../../surveyState'
+import { getRecord } from '../../record/recordState'
 
 const nodeDefTypeComponents = {
+  [nodeDefType.entity]: NodeDefEntity,
   [nodeDefType.boolean]: NodeDefBoolean,
   [nodeDefType.codeList]: NodeDefCodeList,
   [nodeDefType.coordinate]: NodeDefCoordinate,
-  [nodeDefType.entity]: NodeDefEntity,
   [nodeDefType.file]: NodeDefFile,
   [nodeDefType.taxon]: NodeDefTaxon,
 }
@@ -52,17 +53,18 @@ class NodeDefSwitch extends React.Component {
   }
 
   onChange (event) {
-    const {nodeDef, parentNode, node, updateRecord} = this.props
-    const {value} = event
-    const commandValue = R.is(Object, value) ? value : {v: value}
-    const command = {
-      type: commandType.updateNode,
-      nodeDefId: nodeDef.id,
-      parentNodeId: parentNode ? parentNode.id : null,
-      nodeId: node ? node.id : null,
-      value: commandValue
-    }
-    updateRecord(command)
+    console.log('=== on change ', this.props.nodeDef)
+    // const {nodeDef, parentNode, node, updateRecord} = this.props
+    // const {value} = event
+    // const commandValue = R.is(Object, value) ? value : {v: value}
+    // const command = {
+    //   type: commandType.updateNode,
+    //   nodeDefId: nodeDef.id,
+    //   parentNodeId: parentNode ? parentNode.id : null,
+    //   nodeId: node ? node.id : null,
+    //   value: commandValue
+    // }
+    // updateRecord(command)
   }
 
   render () {
@@ -70,7 +72,7 @@ class NodeDefSwitch extends React.Component {
       nodeDef,
 
       // passed by the caller
-      edit, draft, render,
+      edit,
 
       // actions
       setFormNodDefEdit,
@@ -79,11 +81,6 @@ class NodeDefSwitch extends React.Component {
 
       //state
       locked,
-
-      //data entry
-      entry,
-      parentNode,
-      node,
     } = this.props
 
     const isRoot = isNodeDefRoot(nodeDef)
@@ -150,7 +147,10 @@ class NodeDefSwitch extends React.Component {
       {
         React.createElement(
           nodeDefTypeComponents[getNodeDefType(nodeDef)] || NodeDefText,
-          {nodeDef, draft, edit, locked, entry, parentNode, node, render, onChange: (e) => this.onChange(e)}
+          {
+            ...this.props,
+            onChange: (e) => this.onChange(e)
+          }
         )
       }
 
@@ -163,31 +163,10 @@ NodeDefSwitch.defaultProps = {
   locked: true,
 }
 
-const determineActualNode = (state, props) => {
-  const {nodeDef, entry, parentNode, node} = props
-  const record = getRecord(getSurveyState(state))
-  if (entry) {
-    if (node) {
-      return node
-    } else if (parentNode) {
-      const children = getNodeChildren(parentNode)(record)
-      return R.find(n => n.nodeDefId === nodeDef.id)(children)
-    } else {
-      return null
-    }
-  } else {
-    return null
-  }
-}
-
-const mapStateToProps = (state, props) => {
-  const actualNode = determineActualNode(state, props)
-
-  return {
-    locked: isNodeDefFormLocked(props.nodeDef)(state),
-    node: actualNode
-  }
-}
+const mapStateToProps = (state, props) => ({
+  locked: isNodeDefFormLocked(props.nodeDef)(state),
+  nodes: props.entry ? getNodesByDefId(props.nodeDef.id)(getRecord(state)) : [],
+})
 
 export default connect(
   mapStateToProps,

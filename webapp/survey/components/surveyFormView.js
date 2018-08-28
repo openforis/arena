@@ -3,7 +3,7 @@ import './form/surveyForm.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import {getRootNode} from '../../../common/record/record'
+import { getRootNode } from '../../../common/record/record'
 import FormNavigation from './form/formNavigation'
 import FormActions from './form/formActions'
 import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
@@ -29,9 +29,15 @@ class SurveyFormView extends React.Component {
   }
 
   render () {
-    const {rootNodeDef, nodeDef, edit, draft, entry, record} = this.props
-
-    const rootNode = entry ? getRootNode(record): null
+    const {
+      rootNodeDef,
+      nodeDef,
+      edit,
+      draft,
+      // data entry mode props
+      entry,
+      rootNode
+    } = this.props
 
     return (
       rootNodeDef ?
@@ -49,7 +55,8 @@ class SurveyFormView extends React.Component {
 
             {
               nodeDef
-                ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft} entry={entry} node={rootNode}/>
+                ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft}
+                                 entry={entry} node={rootNode}/>
                 : <div></div>
             }
 
@@ -79,14 +86,14 @@ SurveyFormView.defaultProps = {
   // can entry data
   entry: false,
   // record being edited
-  record: null,
+  rootNode: null,
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, props) => ({
   survey: getCurrentSurvey(state),
   rootNodeDef: getRootNodeDef(getSurveyState(state)),
   nodeDef: getFormNodeDefViewPage(state),
-  record: getRecord(getSurveyState(state)),
+  rootNode: props.entry ? getRootNode(getRecord(state)) : null,
 })
 
 export default connect(

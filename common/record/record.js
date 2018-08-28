@@ -47,6 +47,11 @@ const getNodesByParentId = parentId => R.pipe(
   R.filter(n => n.parentId === parentId),
 )
 
+const getNodesByDefId = nodeDefId => R.pipe(
+  getNodesArray,
+  R.filter(n => n.nodeDefId === nodeDefId),
+)
+
 const getRootNode = R.pipe(
   getNodesByParentId(null),
   R.head,
@@ -94,6 +99,7 @@ module.exports = {
   getNodesByParentId,
   getRootNode,
   getNodeValue,
+  getNodesByDefId,
 
   // ====== UPDATE
 
