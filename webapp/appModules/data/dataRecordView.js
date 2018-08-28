@@ -2,7 +2,7 @@ import React from 'react'
 
 import SurveyFormView from '../../survey/components/surveyFormView'
 
-class DataEntryView extends React.Component {
+class DataRecordView extends React.Component {
 
   render() {
     return (
@@ -12,4 +12,4 @@ class DataEntryView extends React.Component {
 }
 
 
-export default DataEntryView
+export default DataRecordView

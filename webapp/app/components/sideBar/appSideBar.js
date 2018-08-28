@@ -26,13 +26,13 @@ const appModulesSideBar = [
     label: 'Designer',
   },
   {
-    module: appModules.dataExplorer,
+    module: appModules.data,
     icon: 'table2',
     label: 'Data',
     disabled: true,
   },
   {
-    module: appModules.dataAnalysis,
+    module: appModules.analysis,
     icon: 'calculator',
     label: 'Analysis',
     disabled: true,

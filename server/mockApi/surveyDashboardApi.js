@@ -1,7 +1,6 @@
 const R = require('ramda')
 const {getRestParam} = require('../serverUtils/request')
 
-const {surveyStatus} = require('../../common/survey/survey')
 const {userRoles} = require('../../common/user/userRole')
 
 const getPath = path =>
@@ -23,7 +22,7 @@ const init = app => {
         ownerId: 1,
         addedTime: new Date().toISOString(),
         // status: surveyStatus.draft,
-        status: surveyStatus.new,
+        // status: surveyStatus.new,
         version: {
           id: 1,
           addedTime: new Date().toISOString(),
@@ -70,7 +69,7 @@ const init = app => {
         // },
       }
     }
-    res.json({dataExplorer})
+    res.json({dataExplorer: data})
   })
 
   //Data Analysis
@@ -84,7 +83,7 @@ const init = app => {
         outputAttributes: {count: 0},
       }
     }
-    res.json({dataAnalysis})
+    res.json({dataAnalysis: analysis})
   })
 
   //Users

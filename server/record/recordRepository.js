@@ -1,39 +1,46 @@
+const R = require('ramda')
 const camelize = require('camelize')
+
 const db = require('../db/db')
+const {selectDate} = require('../db/dbUtils')
 
-const {getSurveyDBSchema, getSurveyDefaultStep} = require('../../common/survey/survey')
+const {getSurveyDBSchema} = require('../../common/survey/survey')
 
-const dbTransformCallback = r =>
-  r ? camelize(r)
-  : null
+const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}`
+
+const dbTransformCallback = (surveyId) => R.pipe(
+  camelize,
+  R.assoc('surveyId', surveyId)
+)
 
 // ============== CREATE
 
-const createRecord = async (user, survey, client = db) => client.tx(
-  async tx =>
-    await tx.one(
-      `INSERT INTO ${getSurveyDBSchema(survey.id)}.record (owner_id, step)
-       VALUES ($1, $2)
-       RETURNING *`,
-      [user.id, getSurveyDefaultStep(survey)],
-      r => dbTransformCallback(r)
-    )
-)
+const insertRecord = async (record, client = db) =>
+  await client.one(`
+    INSERT INTO ${getSurveyDBSchema(record.surveyId)}.record 
+    (owner_id, uuid, step)
+    VALUES ($1, $2, $3)
+    RETURNING ${recordSelectFields}`,
+    [record.ownerId, record.uuid, record.step],
+    dbTransformCallback(record.surveyId)
+  )
 
 // ============== READ
 
 const fetchRecordById = async (surveyId, recordId, client = db) => {
   const record = await client.one(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.record WHERE id = $1`,
+    `SELECT 
+     ${recordSelectFields}
+     FROM ${getSurveyDBSchema(surveyId)}.record WHERE id = $1`,
     [recordId],
-    r => dbTransformCallback(r)
+    dbTransformCallback(surveyId)
   )
   return record
 }
 
 module.exports = {
   // CREATE
-  createRecord,
+  insertRecord,
 
   // READ
   fetchRecordById,

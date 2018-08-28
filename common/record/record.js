@@ -1,25 +1,32 @@
 const R = require('ramda')
+const {uuidv4} = require('./../uuid')
 
+// ====== UTILS
 const nodes = 'nodes'
 
-const commandType = {
-  createRecord: 'createRecord',
-  deleteRecord: 'deleteRecord',
-  changeStep: 'changeStep',
-  addNode: 'addNode',
-  deleteNode: 'deleteNode',
-  updateNode: 'updateNode',
+// ====== CREATE
+
+const newRecord = (user, surveyId, step) => {
+  return {
+    uuid: uuidv4(),
+    surveyId,
+    ownerId: user.id,
+    step,
+  }
 }
 
-const recordLogType = {
-  recordCreated: 'recordCreated',
-  recordDeleted: 'recordDeleted',
-  stepChanged: 'stepChanged',
-  nodeAdded: 'nodeAdded',
-  nodeUpdated: 'nodeUpdated',
-  nodeDeleted: 'nodeDeleted',
+const newNode = (nodeDefId, recordId, parentId = null) => {
+  return {
+    uuid: uuidv4(),
+    nodeDefId,
+    recordId,
+    parentId,
+  }
 }
 
+const addNode = node => R.assocPath(['nodes', node.id], node)
+
+// ====== READ
 const getNodes = R.pipe(
   R.prop(nodes),
   R.defaultTo({}),
@@ -47,26 +54,12 @@ const getRootNode = R.pipe(
 
 const getNodeChildren = node => getNodesByParentId(node.id)
 
-const createNode = (recordId, parentId, nodeDefId, value = null) => {
-  return {
-    recordId,
-    parentId,
-    nodeDefId,
-    value
-  }
-}
-
-const addNode = node => R.assocPath(['nodes', node.id], node)
-
 const getNodeValue = node => R.pipe(
   R.prop('value'),
   R.defaultTo({})
 )(node)
 
-const deleteNodeAndChildren = node => record => {
-  record.nodes = record.nodes.filter(n => n.id !== node.id && n.parentId !== node.id)
-  return record
-}
+// ====== UPDATE
 
 const updateNodes = nodes => record => {
   nodes.forEach(updatedNode => {
@@ -80,10 +73,20 @@ const updateNodes = nodes => record => {
   return record
 }
 
+// ====== DELETE
+
+const deleteNodeAndChildren = node => record => {
+  record.nodes = record.nodes.filter(n => n.id !== node.id && n.parentId !== node.id)
+  return record
+}
+
 module.exports = {
-  commandType,
-  recordLogType,
-  createNode,
+  // ====== CREATE
+  newRecord,
+  newNode,
+  addNode,
+
+// ====== READ
   getNode,
   getNodeChildren,
   getNodes,
@@ -91,7 +94,12 @@ module.exports = {
   getNodesByParentId,
   getRootNode,
   getNodeValue,
-  deleteNodeAndChildren,
+
+  // ====== UPDATE
+
   updateNodes,
-  addNode,
+
+  // ====== DELETE
+
+  deleteNodeAndChildren,
 }

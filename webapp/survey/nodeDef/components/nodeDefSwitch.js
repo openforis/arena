@@ -19,7 +19,7 @@ import {
 } from '../../../../common/survey/nodeDefLayout'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
-import { updateRecord } from '../../../record/actions'
+import { updateRecord } from '../../record/actions'
 
 import { isNodeDefRoot, isNodeDefFormLocked, getSurveyState, getRecord } from '../../surveyState'
 

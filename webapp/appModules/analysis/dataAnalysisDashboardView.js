@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { surveyStatus } from '../../../common/survey/survey'
 
 import DataFetchComponent from '../components/moduleDataFetchComponent'
 import { appState } from '../../app/app'
@@ -15,7 +14,7 @@ class DataAnalysisDashboardView extends React.Component {
     const {dataAnalysis, surveyStatusApp} = this.props
 
     return (
-      <DataFetchComponent module={appModules.dataAnalysis} dashboard={true}>
+      <DataFetchComponent module={appModules.analysis} dashboard={true}>
         <div className="app-dashboard__module">
 
           <div className="flex-center title-of">
@@ -71,7 +70,7 @@ DataAnalysisDashboardView.defaultProps = {
 
 const mapStateToProps = state => ({
   surveyStatusApp: 'draft',
-  dataAnalysis: getDashboardData(appModules.dataAnalysis)(state),
+  analysis: getDashboardData(appModules.analysis)(state),
 })
 
 export default connect(mapStateToProps)(DataAnalysisDashboardView)

@@ -3,11 +3,11 @@ import React from 'react'
 import DataFetchComponent from '../components/moduleDataFetchComponent'
 import { appModules } from '../appModules'
 
-class DataExplorerView extends React.Component {
+class DataView extends React.Component {
 
   render () {
     return (
-      <DataFetchComponent module={appModules.dataExplorer}>
+      <DataFetchComponent module={appModules.data}>
         <div className="">
           Data Explorer
         </div>
@@ -17,4 +17,4 @@ class DataExplorerView extends React.Component {
 
 }
 
-export default DataExplorerView
+export default DataView

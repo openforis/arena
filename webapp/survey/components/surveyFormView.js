@@ -9,7 +9,8 @@ import FormActions from './form/formActions'
 import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
-import { getSurveyState, getCurrentSurvey, getFormNodeDefViewPage, getRootNodeDef, getRecord } from '../surveyState'
+import { getSurveyState, getCurrentSurvey, getFormNodeDefViewPage, getRootNodeDef } from '../surveyState'
+import { getRecord } from '../record/recordState'
 import { fetchRootNodeDef } from '../actions'
 import { setFormNodeDefViewPage } from '../nodeDef/actions'
 

@@ -1,5 +1,8 @@
 import { assocActionProps, exportReducer, } from '../appUtils/reduxUtils'
 
+/**
+ * survey state
+ */
 import {
   assocNodeDef,
   assocNodeDefProp,
@@ -9,11 +12,14 @@ import {
   assocNodeDefPropValidation,
   assocNodeDefFormUnlocked,
   assocFormNodeDefViewPage,
-  //record
-  assocRecord,
-  updateRecordNodes,
-  deleteRecordNodeAndChildren,
 } from './surveyState'
+
+/**
+ * record state
+ */
+import {
+  //record
+} from './record/recordState'
 
 /**
  * survey actions
@@ -43,18 +49,17 @@ import {
  */
 import {
   nodeDeleted,
-  recordCreated,
-  recordUpdated
-} from '../record/actions'
+  recordUpdate,
+} from './record/actions'
 
 const actionHandlers = {
-  //survey
+  //SURVEY
   [surveyNewUpdate]: assocActionProps,
 
   //on app current survey update, reset survey state
   [surveyCurrentUpdate]: (state, action) => ({}),
 
-  // nodeDefs
+  // NODE-DEFS
   [nodeDefsUpdate]: (state, {nodeDefs}) => assocNodeDefs(nodeDefs)(state),
 
   [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
@@ -65,19 +70,17 @@ const actionHandlers = {
 
   [nodeDefPropValidationUpdate]: (state, {nodeDefUUID, key, validation}) => assocNodeDefPropValidation(nodeDefUUID, key, validation)(state),
 
-  //survey-form
+  //SURVEY-FORM
   [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),
 
   [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocNodeDefFormUnlocked(nodeDef)(state),
 
   [formNodeDefViewPage]: (state, {nodeDef}) => assocFormNodeDefViewPage(nodeDef)(state),
 
-  //record
-  [recordCreated]: (state, {record}) => assocRecord(record)(state),
+  //RECORD
+  [recordUpdate]: assocActionProps,
 
-  [recordUpdated]: (state, {updatedNodes}) => updateRecordNodes(updatedNodes)(state),
-
-  [nodeDeleted]: (state, {node}) => deleteRecordNodeAndChildren(node)(state),
+  // [nodeDeleted]: (state, {node}) => deleteRecordNodeAndChildren(node)(state),
 
 }
 

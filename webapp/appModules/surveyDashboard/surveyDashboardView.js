@@ -5,8 +5,8 @@ import { withRouter } from 'react-router'
 
 import SurveyInfoView from './surveyInfoView'
 import SurveyDesignerDashboardView from '../surveyDesigner/surveyDesignerDashboardView'
-import DataExplorerDashboardView from '../dataExplorer/dataExplorerDashboardView'
-import DataAnalysisDashboardView from '../dataAnalysis/dataAnalysisDashboardView'
+import DataExplorerDashboardView from '../data/dataDashboardView'
+import DataAnalysisDashboardView from '../analysis/dataAnalysisDashboardView'
 import UsersDashboardView from '../users/usersDashboardView'
 
 const SurveyDashboardView = (props) => (

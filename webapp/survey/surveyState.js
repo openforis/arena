@@ -1,7 +1,5 @@
 import * as R from 'ramda'
 
-import { updateNodes, deleteNodeAndChildren } from '../../common/record/record'
-
 const survey = 'survey'
 
 /**
@@ -150,28 +148,3 @@ export const assocNodeDefPropValidation = (nodeDefUUID, key, validation) => stat
 
   return R.assocPath(nodeDefValidationPath, nodeDefValidation)(state)
 }
-
-/**
- * ======================
- * Record
- * ======================
- */
-const record = 'record'
-
-export const getRecord = R.prop(record)
-
-export const assocRecord = r => R.assoc(record, r)
-
-export const updateRecordNodes = updatedNodes =>
-  R.pipe(
-    getRecord,
-    updateNodes(updatedNodes),
-    assocRecord,
-  )
-
-export const deleteRecordNodeAndChildren = node =>
-  R.pipe(
-    getRecord,
-    deleteNodeAndChildren(node),
-    assocRecord,
-  )
