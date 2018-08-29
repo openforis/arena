@@ -1,15 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import NodeDefBoolean from './types/nodeDefBoolean'
-import NodeDefCodeList from './types/nodeDefCodeList'
-import NodeDefCoordinate from './types/nodeDefCoordinate'
-import NodeDefEntity from './types/nodeDefEntity'
-import NodeDefFile from './types/nodeDefFile'
-import NodeDefTaxon from './types/nodeDefTaxon'
-import NodeDefText from './types/nodeDefText'
-
-import { nodeDefType, getNodeDefType } from '../../../../common/survey/nodeDef'
 import {
   getNoColumns,
   nodeDefLayoutProps,
@@ -22,16 +13,9 @@ import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
 import { getRecord } from '../../record/recordState'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
-import { updateRecord, updateNodeValue } from '../../record/actions'
+import { updateNodeValue } from '../../record/actions'
 
-const nodeDefTypeComponents = {
-  [nodeDefType.entity]: NodeDefEntity,
-  [nodeDefType.boolean]: NodeDefBoolean,
-  [nodeDefType.codeList]: NodeDefCodeList,
-  [nodeDefType.coordinate]: NodeDefCoordinate,
-  [nodeDefType.file]: NodeDefFile,
-  [nodeDefType.taxon]: NodeDefTaxon,
-}
+import { getNodeDefComponent } from './nodeDefSystemProps'
 
 class NodeDefSwitch extends React.Component {
 
@@ -120,10 +104,7 @@ class NodeDefSwitch extends React.Component {
       }
 
       {
-        React.createElement(
-          nodeDefTypeComponents[getNodeDefType(nodeDef)] || NodeDefText,
-          {...this.props}
-        )
+        React.createElement(getNodeDefComponent(nodeDef), {...this.props})
       }
 
     </div>
@@ -144,6 +125,6 @@ export default connect(
   mapStateToProps,
   {
     setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
-    updateRecord, updateNodeValue,
+    updateNodeValue,
   }
 )(NodeDefSwitch)
