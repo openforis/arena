@@ -16,7 +16,7 @@ class NodeDefCoordinate extends React.Component {
 
   getValue () {
     const {entry, nodes} = this.props
-    return entry ? getNodeValue(nodes[0]) : null
+    return entry ? getNodeValue(nodes[0]) : {}
   }
 
   handleInputChange (field, value) {
