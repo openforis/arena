@@ -14,7 +14,7 @@ const {
 const nodeDefType = {
   integer: 'integer',
   decimal: 'decimal',
-  string: 'string',
+  text: 'text',
   date: 'date',
   time: 'time',
   boolean: 'boolean',
