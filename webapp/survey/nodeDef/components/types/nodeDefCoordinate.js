@@ -2,35 +2,35 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
+import { getNodeValue } from '../../../../../common/record/record'
+import { getSurveySrs } from '../../../../../common/survey/survey'
+import { toSrsItems } from '../../../../../common/app/srs'
+
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import NodeDefFormItem from './nodeDefFormItem'
-import { getNodeValue } from '../../../../../common/record/record'
-import { getSurveySrs } from '../../../../../common/survey/survey'
+
 import { getCurrentSurvey } from '../../../surveyState'
-import { toSrsItems } from '../../../../../common/app/srs'
 
 class NodeDefCoordinate extends React.Component {
 
   getValue () {
-    const { entry, node } = this.props
-
-    return entry && node ? getNodeValue(node) : {}
+    const {entry, nodes} = this.props
+    return entry ? getNodeValue(nodes[0]) : null
   }
 
   handleInputChange (field, value) {
-    const prevValue = this.getValue()
-    const attrValue = R.assoc(field, value)(prevValue)
+    const {nodeDef, nodes, updateNodeValue} = this.props
 
-    this.props.onChange({
-      value: attrValue
-    })
+    const newValue = R.assoc(field, value)(this.getValue())
+
+    updateNodeValue(nodeDef, nodes[0], newValue)
   }
 
   render () {
-    const {survey, nodeDef, draft, edit} = this.props
-    const value = this.getValue()
+    const {survey, nodeDef, edit} = this.props
 
+    const value = this.getValue()
     const srsItems = toSrsItems(getSurveySrs(survey))
 
     return (
