@@ -31,8 +31,8 @@ module.exports.init = app => {
   app.get('/nodeDef/:id/children', async (req, res) => {
     try {
       const nodeDefId = getRestParam(req, 'id')
-      const draft = getRestParam(req, 'draft')
-      const validate = getRestParam(req, 'validate')
+      const draft = getRestParam(req, 'draft') === 'true'
+      const validate = getRestParam(req, 'validate') === 'true'
 
       const nodeDefsDB = await fetchNodeDefsByParentId(nodeDefId, draft)
       const nodeDefs = validate
