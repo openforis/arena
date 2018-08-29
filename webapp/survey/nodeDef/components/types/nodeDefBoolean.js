@@ -10,6 +10,7 @@ const Button = ({nodeDef, nodes, updateNodeValue, label, disabled, value}) => {
 
   return (
     <button className="btn btn-s btn-transparent"
+            style={{borderRadius: '.75rem'}}
             disabled={disabled}
             onClick={() => updateNodeValue(nodeDef, node, value)}>
       <span className={`icon icon-radio-${nodeValue === value ? 'checked2' : 'unchecked'} icon-left`}/>
