@@ -1,47 +1,45 @@
 import React from 'react'
-import * as R from 'ramda'
+
+import { getNodeValue } from '../../../../../common/record/record'
 
 import NodeDefFormItem from './nodeDefFormItem'
 
-const Button = ({label, disabled, selected, value, onChange}) => (
-  <button className="btn btn-s btn-transparent"
-          disabled={disabled}
-          onClick={() => onChange({value: value})}>
-    <span className={`icon icon-radio-${selected ? 'checked2' : 'unchecked'} icon-left`}/>
-    {label}
-  </button>
-)
+const Button = ({nodeDef, nodes, updateNodeValue, label, disabled, value}) => {
+  const node = nodes[0]
+  const nodeValue = getNodeValue(node, 'false')
 
-class NodeDefBoolean extends React.Component {
+  return (
+    <button className="btn btn-s btn-transparent"
+            disabled={disabled}
+            onClick={() => updateNodeValue(nodeDef, node, value)}>
+      <span className={`icon icon-radio-${nodeValue === value ? 'checked2' : 'unchecked'} icon-left`}/>
+      {label}
+    </button>
+  )
 
-  render () {
-    const {nodeDef, draft, edit, entry, parentNode, node, onChange} = this.props
+}
 
-    const value = entry && node ? R.path(['value', 'value'])(node) : false
+const NodeDefBoolean = props => {
+  const {nodeDef, edit} = props
 
-    return (
-      <NodeDefFormItem nodeDef={nodeDef}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '.1fr .2fr .1fr .2fr',
-          alignItems: 'center',
-          height: '3rem',
-        }}>
-          <Button disabled={edit}
-                  label="YES"
-                  selected={value}
-                  value={true}
-                  onChange={onChange}/>
+  return (
+    <NodeDefFormItem nodeDef={nodeDef}>
+      <div className="form-input" style={{borderBottom: 'none'}}>
 
-          <Button disabled={edit}
-                  label="NO"
-                  selected={!value}
-                  value={false}
-                  onChange={onChange}/>
-        </div>
-      </NodeDefFormItem>
-    )
-  }
+        <Button disabled={edit}
+                label="YES"
+                value="true"
+                {...props}/>
+
+        <Button disabled={edit}
+                label="NO"
+                value="false"
+                {...props}/>
+
+      </div>
+    </NodeDefFormItem>
+  )
+
 }
 
 export default NodeDefBoolean

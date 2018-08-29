@@ -1,32 +1,31 @@
 import React from 'react'
-import * as R from 'ramda'
 
 import { Input } from '../../../../commonComponents/form/input'
 import NodeDefFormItem from './nodeDefFormItem'
-import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
+
+import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
 import { getNodeValue } from '../../../../../common/record/record'
+import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
 
-class NodeDefText extends React.Component {
+const NodeDefTextInput = ({nodeDef, node, updateNodeValue, edit,}) =>
+  <Input readOnly={edit}
+         {...getNodeDefInputTextProps(nodeDef)}
+         onChange={(e) => updateNodeValue(nodeDef, node, e.target.value)}
+         value={getNodeValue(node, '')}/>
 
-  onChange (value) {
-    this.props.onChange({value: value})
-  }
+const NodeDefText = props => {
 
-  render () {
-    const {nodeDef, draft, edit, entry, node} = this.props
-    const nodeValue = entry && node ? getNodeValue(node) : null
-    const value = R.prop('v')(nodeValue)
+  const {nodeDef, edit, nodes} = props
 
-    return (
-      <NodeDefFormItem nodeDef={nodeDef}>
-        <Input readOnly={edit}
-               {...getNodeDefInputTextProps(nodeDef)}
-               onChange={(e) => this.onChange(e.target.value)}
-               value={value}/>
-      </NodeDefFormItem>
-    )
-  }
-
+  return (
+    <NodeDefFormItem nodeDef={nodeDef}>
+      {
+        edit || !isNodeDefMultiple(nodeDef)
+          ? <NodeDefTextInput node={nodes[0]} {...props} />
+          : null //TODO multiple
+      }
+    </NodeDefFormItem>
+  )
 }
 
 export default NodeDefText

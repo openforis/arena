@@ -2,7 +2,7 @@ const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
 
 const {fetchRecordById} = require('../record/recordRepository')
-const {createRecord} = require('./recordUpdater')
+const {createRecord, updateNodeValue} = require('./recordManager')
 const {commandType} = require('../../common/record/record')
 
 module.exports.init = app => {
@@ -40,24 +40,19 @@ module.exports.init = app => {
   // })
   //
   // // ==== UPDATE
-  // app.put('/survey/:surveyId/record/:recordId/node/:nodeId', async (req, res) => {
-  //   try {
-  //     const {user, body} = req
-  //
-  //     const surveyId = getRestParam(req, 'surveyId')
-  //     const recordId = getRestParam(req, 'recordId')
-  //
-  //     const command = {
-  //       ...body.command,
-  //       surveyId,
-  //       recordId,
-  //       user
-  //     }
-  //     const updatedNodes = await processCommand(command)
-  //     res.json({updatedNodes})
-  //   } catch (err) {
-  //     sendErr(res, err)
-  //   }
-  // })
+  app.put('/survey/:surveyId/record/:recordId/node/:nodeId', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const recordId = getRestParam(req, 'recordId')
+      const nodeId = getRestParam(req, 'nodeId')
+      const {value} = req.body
+
+      const nodes = await updateNodeValue(surveyId, recordId, nodeId, value)
+      res.json({nodes})
+
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
 
 }

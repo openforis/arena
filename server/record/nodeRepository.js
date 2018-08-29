@@ -35,7 +35,7 @@ const updateNode = async (surveyId, nodeId, value, client = db) =>
     SET value = $1 
     WHERE id = $2
     RETURNING *
-    `, [value, nodeId],
+    `, [JSON.stringify(value), nodeId],
     dbTransformCallback
   )
 

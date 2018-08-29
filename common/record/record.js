@@ -59,30 +59,24 @@ const getRootNode = R.pipe(
 
 const getNodeChildren = node => getNodesByParentId(node.id)
 
-const getNodeValue = node => R.pipe(
+const getNodeValue = (node, defaultValue = {}) => R.pipe(
   R.prop('value'),
-  R.defaultTo({})
+  R.defaultTo(defaultValue)
 )(node)
 
 // ====== UPDATE
 
-const updateNodes = nodes => record => {
-  nodes.forEach(updatedNode => {
-    const index = R.findIndex(existingNode => existingNode.id === updatedNode.id)(record.nodes)
-    if (index >= 0) {
-      record.nodes[index] = updatedNode
-    } else {
-      record.nodes.push(updatedNode)
-    }
-  })
-  return record
-}
+const assocNodes = nodes =>
+  record => R.pipe(
+    R.merge(getNodes(record)),
+    newNodes => R.assoc('nodes', newNodes, record)
+  )(nodes)
 
 // ====== DELETE
 
-const deleteNodeAndChildren = node => record => {
-  record.nodes = record.nodes.filter(n => n.id !== node.id && n.parentId !== node.id)
-  return record
+const deleteNode = node => record => {
+  // record.nodes = record.nodes.filter(n => n.id !== node.id && n.parentId !== node.id)
+  // return record
 }
 
 module.exports = {
@@ -103,9 +97,9 @@ module.exports = {
 
   // ====== UPDATE
 
-  updateNodes,
+  assocNodes,
 
   // ====== DELETE
 
-  deleteNodeAndChildren,
+  deleteNode,
 }

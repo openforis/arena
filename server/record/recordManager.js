@@ -11,10 +11,15 @@ const {nodeDefType, isNodeDefEntity, isNodeDefMultiple} = require('../../common/
 const {insertRecord} = require('../record/recordRepository')
 const {commandType, newNode} = require('../../common/record/record')
 
-const {insertNode, updateNode, deleteNode} = require('../record/nodeRepository')
+const {insertNode, updateNode, deleteNode: deleteNodeRepos} = require('../record/nodeRepository')
 
 // const mapNodes = R.groupBy(R.prop('id'))
 
+/**
+ * ===================
+ * CREATE
+ * ===================
+ */
 const createRecord = async (recordToCreate) =>
   await db.tx(
     async t => {
@@ -36,58 +41,52 @@ const createNode = async (nodeDef, recordId, parentId = null, client = db) => {
   // insert node
   const node = await insertNode(nodeDef.surveyId, newNode(nodeDef.id, recordId, parentId), client)
 
-  // insert children if entity
+  // insert children if single entity
   const childDefs = isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
     ? await fetchNodeDefsByParentId(nodeDef.id)
     : []
 
-  const childNodes = R.isEmpty(childDefs)
-    ? {}
-    : R.reduce(
-      async (obj, nodeDef) => R.merge(
-        obj,
-        await createNode(nodeDef, recordId, node.id, client)
-      ),
-      {},
-      childDefs
+  const childNodes = R.mergeAll(
+    await Promise.all(
+      childDefs.map(
+        async childDef => await createNode(childDef, recordId, node.id, client)
+      )
     )
+  )
 
   return R.merge({[node.id]: node}, childNodes)
 }
+/**
+ * ===================
+ * READ
+ * ===================
+ */
+/**
+ * ===================
+ * UPDATE
+ * ===================
+ */
+const updateNodeValue = async (surveyId, recordId, nodeId, value) => {
+  const node = await updateNode(surveyId, nodeId, value)
 
-//
-// const processUpdateNodeCommand = async (command) => {
-//   const {surveyId, user, nodeId} = command
-//
-//   const updatedNodes = []
-//
-//   const node = await updateNode(surveyId, nodeId, command.value)
-//
-//   //history
-//   await insertNodeUpdatedLog(surveyId, user, node)
-//
-//   updatedNodes.push(node)
-//
-//   //TODO evaluate dependent expressions
-//   return updatedNodes
-// }
-//
-// processDeleteNodeCommand = async (command) => {
-//   const {surveyId, user, nodeId} = command
-//
-//   const updatedNodes = []
-//
-//   const node = await deleteNode(surveyId, nodeId)
-//
-//   //history
-//   await insertNodeDeletedLog(surveyId, user, node)
-//
-//   //TODO evaluate dependent expressions
-//   return updatedNodes
-// }
+  return {[node.id]: node}
+}
+/**
+ * ===================
+ * DELETE
+ * ===================
+ */
+
+const deleteNode = async (surveyId, nodeId) => {
+
+}
 
 module.exports = {
   //==== CREATE
   createRecord,
   createNode,
+  //==== READ
+  //==== UPDATE
+  updateNodeValue,
+  //==== DELETE
 }

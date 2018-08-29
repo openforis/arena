@@ -1,4 +1,7 @@
+import * as R from 'ramda'
 import axios from 'axios'
+
+import { debounceAction } from '../../appUtils/reduxUtils'
 
 import { getCurrentSurvey } from '../surveyState'
 import { getSurveyDefaultStep } from '../../../common/survey/survey'
@@ -7,6 +10,7 @@ import { appState } from '../../app/app'
 import { newRecord } from '../../../common/record/record'
 
 export const recordUpdate = 'survey/record/update'
+export const nodesUpdate = 'survey/record/node/update'
 
 export const nodeDeleted = 'record/nodeDeleted'
 
@@ -29,23 +33,21 @@ export const createRecord = () => async (dispatch, getState) => {
   }
 }
 
-export const updateRecord = (command) => async (dispatch, getState) => {
-  // try {
-  //   const surveyId = getCurrentSurveyId(getState())
-  //   const record = getRecord(getSurveyState(getState()))
-  //
-  //   const {data} = await axios.put(`/api/survey/${surveyId}/record/${record.id}/node/${command.nodeId}`, {command})
-  //   const {updatedNodes} = data
-  //
-  //   if (command.type === commandType.deleteNode) {
-  //     dispatch({type: nodeDeleted, updatedNodes})
-  //   } else {
-  //     dispatch({type: recordUpdated, updatedNodes})
-  //   }
-// }
-// catch
-// (e)
-// {
-//   console.log(e)
-// }
+export const updateNodeValue = (nodeDef, node, value) => dispatch => {
+  dispatch({type: nodesUpdate, nodes: {[node.id]: R.assoc('value', value, node)}})
+  dispatch(_updateNodeValue(nodeDef, node, value))
+}
+
+const _updateNodeValue = (nodeDef, node, value) => {
+  const action = async dispatch => {
+    try {
+
+      const {data} = await axios.put(`/api/survey/${nodeDef.surveyId}/record/${node.recordId}/node/${node.id}`, {value})
+      dispatch({type: nodesUpdate, nodes: data.nodes})
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  return debounceAction(action, `node_update_${node.id}`)
 }

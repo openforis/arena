@@ -19,6 +19,7 @@ import {
  */
 import {
   //record
+  assocNodes,
 } from './record/recordState'
 
 /**
@@ -48,8 +49,8 @@ import {
  * record actions
  */
 import {
-  nodeDeleted,
   recordUpdate,
+  nodesUpdate,
 } from './record/actions'
 
 const actionHandlers = {
@@ -79,6 +80,8 @@ const actionHandlers = {
 
   //RECORD
   [recordUpdate]: assocActionProps,
+
+  [nodesUpdate]: (state, {nodes}) => assocNodes(nodes)(state),
 
   // [nodeDeleted]: (state, {node}) => deleteRecordNodeAndChildren(node)(state),
 

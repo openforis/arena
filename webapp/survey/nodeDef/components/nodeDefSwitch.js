@@ -1,5 +1,4 @@
 import React from 'react'
-import * as R from 'ramda'
 import { connect } from 'react-redux'
 
 import NodeDefBoolean from './types/nodeDefBoolean'
@@ -16,13 +15,14 @@ import {
   nodeDefLayoutProps,
   getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
-import { getNodesByDefId, getNodeChildren } from '../../../../common/record/record'
+
+import { getNodesByDefId } from '../../../../common/record/record'
+
+import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
+import { getRecord } from '../../record/recordState'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
-import { updateRecord } from '../../record/actions'
-
-import { isNodeDefRoot, isNodeDefFormLocked, getSurveyState } from '../../surveyState'
-import { getRecord } from '../../record/recordState'
+import { updateRecord, updateNodeValue } from '../../record/actions'
 
 const nodeDefTypeComponents = {
   [nodeDefType.entity]: NodeDefEntity,
@@ -35,36 +35,11 @@ const nodeDefTypeComponents = {
 
 class NodeDefSwitch extends React.Component {
 
-  constructor (props) {
-    super(props)
-
-    this.onChange = this.onChange.bind(this)
-  }
-
   componentDidMount () {
     const {nodeDef} = this.props
 
     if (!nodeDef.id)
       this.refs.nodeDefElem.scrollIntoView()
-  }
-
-  isEditMode () {
-    return this.props.edit
-  }
-
-  onChange (event) {
-    console.log('=== on change ', this.props.nodeDef)
-    // const {nodeDef, parentNode, node, updateRecord} = this.props
-    // const {value} = event
-    // const commandValue = R.is(Object, value) ? value : {v: value}
-    // const command = {
-    //   type: commandType.updateNode,
-    //   nodeDefId: nodeDef.id,
-    //   parentNodeId: parentNode ? parentNode.id : null,
-    //   nodeId: node ? node.id : null,
-    //   value: commandValue
-    // }
-    // updateRecord(command)
   }
 
   render () {
@@ -147,10 +122,7 @@ class NodeDefSwitch extends React.Component {
       {
         React.createElement(
           nodeDefTypeComponents[getNodeDefType(nodeDef)] || NodeDefText,
-          {
-            ...this.props,
-            onChange: (e) => this.onChange(e)
-          }
+          {...this.props}
         )
       }
 
@@ -170,5 +142,8 @@ const mapStateToProps = (state, props) => ({
 
 export default connect(
   mapStateToProps,
-  {setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp, updateRecord}
+  {
+    setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
+    updateRecord, updateNodeValue,
+  }
 )(NodeDefSwitch)
