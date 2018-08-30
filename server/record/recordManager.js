@@ -3,13 +3,11 @@ const Promise = require('bluebird')
 
 const db = require('../db/db')
 
-const {getSurveyById} = require('../survey/surveyRepository')
-
-const {fetchNodeDef, fetchNodeDefsBySurveyId, fetchNodeDefsByParentId} = require('../nodeDef/nodeDefRepository')
-const {nodeDefType, isNodeDefEntity, isNodeDefMultiple} = require('../../common/survey/nodeDef')
+const {fetchNodeDefsBySurveyId, fetchNodeDefsByParentId} = require('../nodeDef/nodeDefRepository')
+const {isNodeDefEntity, isNodeDefMultiple} = require('../../common/survey/nodeDef')
 
 const {insertRecord} = require('../record/recordRepository')
-const {commandType, newNode} = require('../../common/record/record')
+const {newNode} = require('../../common/record/record')
 
 const {insertNode, updateNode, deleteNode: deleteNodeRepos} = require('../record/nodeRepository')
 
@@ -30,16 +28,16 @@ const createRecord = async (recordToCreate) =>
       //TODO use getRootNodeDef from common/nodeDef after refactor
       const rootNodeDef = R.find(n => n.parentId === null)(nodeDefs)
 
-      const nodes = await createNode(rootNodeDef, recordId, null, t)
+      const nodes = await createNode(rootNodeDef, newNode(rootNodeDef.id, recordId), t)
 
       return R.assoc('nodes', nodes, record)
     }
   )
 
-const createNode = async (nodeDef, recordId, parentId = null, client = db) => {
+const createNode = async (nodeDef, nodeReq, client = db) => {
 
   // insert node
-  const node = await insertNode(nodeDef.surveyId, newNode(nodeDef.id, recordId, parentId), client)
+  const node = await insertNode(nodeDef.surveyId, nodeReq, client)
 
   // insert children if single entity
   const childDefs = isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
@@ -49,12 +47,12 @@ const createNode = async (nodeDef, recordId, parentId = null, client = db) => {
   const childNodes = R.mergeAll(
     await Promise.all(
       childDefs.map(
-        async childDef => await createNode(childDef, recordId, node.id, client)
+        async childDef => await createNode(childDef, newNode(childDef.id, node.recordId, node.id), client)
       )
     )
   )
 
-  return R.merge({[node.id]: node}, childNodes)
+  return R.merge({[node.uuid]: node}, childNodes)
 }
 /**
  * ===================
@@ -69,7 +67,7 @@ const createNode = async (nodeDef, recordId, parentId = null, client = db) => {
 const updateNodeValue = async (surveyId, recordId, nodeId, value) => {
   const node = await updateNode(surveyId, nodeId, value)
 
-  return {[node.id]: node}
+  return {[node.uuid]: node}
 }
 /**
  * ===================
@@ -78,7 +76,9 @@ const updateNodeValue = async (surveyId, recordId, nodeId, value) => {
  */
 
 const deleteNode = async (surveyId, nodeId) => {
+  const node = await deleteNodeRepos(surveyId, nodeId)
 
+  return {[node.uuid]: R.assoc('deleted', true)(node)}
 }
 
 module.exports = {
@@ -89,4 +89,5 @@ module.exports = {
   //==== UPDATE
   updateNodeValue,
   //==== DELETE
+  deleteNode,
 }

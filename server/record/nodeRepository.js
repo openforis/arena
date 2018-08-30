@@ -10,10 +10,10 @@ const dbTransformCallback = camelize
 const insertNode = async (surveyId, node, client = db) =>
   await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node 
-    (record_id, parent_id, node_def_id)
-    VALUES ($1, $2, $3)
+    (uuid, record_id, parent_id, node_def_id, value)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING *`,
-    [node.recordId, node.parentId, node.nodeDefId],
+    [node.uuid, node.recordId, node.parentId, node.nodeDefId, JSON.stringify(node.value)],
     dbTransformCallback
   )
 
@@ -42,7 +42,7 @@ const updateNode = async (surveyId, nodeId, value, client = db) =>
 // ============== DELETE
 const deleteNode = async (surveyId, nodeId, client = db) =>
   await client.one(`
-    DELETE ${getSurveyDBSchema(surveyId)}.node
+    DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE id = $1
     RETURNING *
     `, [nodeId],

@@ -7,13 +7,13 @@ import {
   getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
 
-import { getNodesByDefId } from '../../../../common/record/record'
+import { getNodeChildrenByDefId } from '../../../../common/record/record'
 
 import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
 import { getRecord } from '../../record/recordState'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
-import { updateNodeValue } from '../../record/actions'
+import { updateNodeValue, addNode, removeNode } from '../../record/actions'
 
 import { getNodeDefComponent } from './nodeDefSystemProps'
 
@@ -116,15 +116,18 @@ NodeDefSwitch.defaultProps = {
   locked: true,
 }
 
-const mapStateToProps = (state, props) => ({
-  locked: isNodeDefFormLocked(props.nodeDef)(state),
-  nodes: props.entry ? getNodesByDefId(props.nodeDef.id)(getRecord(state)) : [],
-})
+const mapStateToProps = (state, props) => {
+  const {nodeDef, parentNode, entry} = props
+  return {
+    locked: isNodeDefFormLocked(nodeDef)(state),
+    nodes: entry ? getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(state)) : [],
+  }
+}
 
 export default connect(
   mapStateToProps,
   {
     setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
-    updateNodeValue,
+    updateNodeValue, addNode, removeNode,
   }
 )(NodeDefSwitch)

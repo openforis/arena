@@ -15,26 +15,22 @@ const newRecord = (user, surveyId, step) => {
   }
 }
 
-const newNode = (nodeDefId, recordId, parentId = null) => {
+const newNode = (nodeDefId, recordId, parentId = null, value = null) => {
   return {
     uuid: uuidv4(),
     nodeDefId,
     recordId,
     parentId,
+    value,
   }
 }
 
-const addNode = node => R.assocPath(['nodes', node.id], node)
+const addNode = node => R.assocPath(['nodes', node.uuid], node)
 
 // ====== READ
 const getNodes = R.pipe(
   R.prop(nodes),
   R.defaultTo({}),
-)
-
-const getNode = id => R.pipe(
-  getNodes,
-  R.prop(id),
 )
 
 const getNodesArray = R.pipe(
@@ -45,19 +41,20 @@ const getNodesArray = R.pipe(
 const getNodesByParentId = parentId => R.pipe(
   getNodesArray,
   R.filter(n => n.parentId === parentId),
+  R.sortBy(R.prop('id')),
 )
 
-const getNodesByDefId = nodeDefId => R.pipe(
-  getNodesArray,
+const getNodeChildren = node => getNodesByParentId(R.propOr(null, 'id')(node))
+
+const getNodeChildrenByDefId = (parentNode, nodeDefId) => record => R.pipe(
+  getNodeChildren(parentNode),
   R.filter(n => n.nodeDefId === nodeDefId),
-)
+)(record)
 
 const getRootNode = R.pipe(
   getNodesByParentId(null),
   R.head,
 )
-
-const getNodeChildren = node => getNodesByParentId(node.id)
 
 const getNodeValue = (node, defaultValue = {}) => R.pipe(
   R.prop('value'),
@@ -69,15 +66,21 @@ const getNodeValue = (node, defaultValue = {}) => R.pipe(
 const assocNodes = nodes =>
   record => R.pipe(
     R.merge(getNodes(record)),
+    //exclude deleted nodes
+    R.values,
+    R.filter(n => R.not(R.prop('deleted', n))),
+    //transform into dictionary (indexed by uuid)
+    R.reduce((acc, n) => R.assoc(n.uuid, n)(acc), {}),
     newNodes => R.assoc('nodes', newNodes, record)
   )(nodes)
 
 // ====== DELETE
 
-const deleteNode = node => record => {
-  // record.nodes = record.nodes.filter(n => n.id !== node.id && n.parentId !== node.id)
-  // return record
-}
+const deleteNode = node =>
+  record => R.pipe(
+    getNodes,
+    R.dissoc(node.uuid)
+  )(record)
 
 module.exports = {
   // ====== CREATE
@@ -86,14 +89,13 @@ module.exports = {
   addNode,
 
 // ====== READ
-  getNode,
-  getNodeChildren,
   getNodes,
   getNodesArray,
+  getNodeChildren,
   getNodesByParentId,
   getRootNode,
   getNodeValue,
-  getNodesByDefId,
+  getNodeChildrenByDefId,
 
   // ====== UPDATE
 
