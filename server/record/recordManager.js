@@ -46,9 +46,11 @@ const createNode = async (nodeDef, nodeReq, client = db) => {
 
   const childNodes = R.mergeAll(
     await Promise.all(
-      childDefs.map(
-        async childDef => await createNode(childDef, newNode(childDef.id, node.recordId, node.id), client)
-      )
+      childDefs
+        .filter(childDef => !isNodeDefMultiple(childDef))
+        .map(
+          async childDef => await createNode(childDef, newNode(childDef.id, node.recordId, node.id), client)
+        )
     )
   )
 

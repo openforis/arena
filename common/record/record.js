@@ -66,20 +66,16 @@ const getNodeValue = (node, defaultValue = {}) => R.pipe(
 const assocNodes = nodes =>
   record => R.pipe(
     R.merge(getNodes(record)),
-    //exclude deleted nodes
-    R.values,
-    R.filter(n => R.not(R.prop('deleted', n))),
-    //transform into dictionary (indexed by uuid)
-    R.reduce((acc, n) => R.assoc(n.uuid, n)(acc), {}),
     newNodes => R.assoc('nodes', newNodes, record)
   )(nodes)
 
 // ====== DELETE
-
+//TODO remove entity children recursively
 const deleteNode = node =>
   record => R.pipe(
     getNodes,
-    R.dissoc(node.uuid)
+    R.dissoc(node.uuid),
+    newNodes => R.assoc('nodes', newNodes, record)
   )(record)
 
 module.exports = {
