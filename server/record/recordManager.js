@@ -78,9 +78,9 @@ const updateNodeValue = async (surveyId, recordId, nodeId, value) => {
  */
 
 const deleteNode = async (surveyId, nodeId) => {
-  const node = await deleteNodeRepos(surveyId, nodeId)
+  await deleteNodeRepos(surveyId, nodeId)
 
-  return {[node.uuid]: R.assoc('deleted', true)(node)}
+  return {}
 }
 
 module.exports = {
