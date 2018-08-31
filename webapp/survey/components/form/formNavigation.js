@@ -1,8 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { getNodeDefChildren } from '../../../../common/survey/survey'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
-import { getFormNodeDefViewPage, getNodeDefChildren, getSurveyState } from '../../surveyState'
+
+import { getFormNodeDefViewPage, getSurveyState } from '../../surveyState'
+
 import { setFormNodeDefViewPage } from '../../nodeDef/actions'
 
 const FormNavigationItem = (props) => {

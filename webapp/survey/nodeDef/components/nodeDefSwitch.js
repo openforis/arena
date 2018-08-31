@@ -7,9 +7,10 @@ import {
   getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
 
+import { isNodeDefRoot } from '../../../../common/survey/nodeDef'
 import { getNodeChildrenByDefId } from '../../../../common/record/record'
 
-import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
+import { isNodeDefFormLocked } from '../../surveyState'
 import { getRecord } from '../../record/recordState'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'

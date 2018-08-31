@@ -10,17 +10,17 @@ import NodeDefSwitch from '../nodeDefSwitch'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
+import {getNodeDefChildren} from '../../../../../common/survey/survey'
 import {
   nodeDefLayoutProps,
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
-
   isRenderForm,
   isRenderTable,
 } from '../../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefChildren, getSurveyState } from '../../../surveyState'
+import { getSurveyState } from '../../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, } from '../../actions'
 

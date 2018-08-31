@@ -9,7 +9,10 @@ import LabelsEditor from '../../labelsEditor'
 import {
   getNodeDefLabels,
   getNodeDefDescriptions,
-  getNodeDefProp,
+  getNodeDefName,
+  isNodeDefKey,
+  isNodeDefMultiple,
+  canNodeDefBeMultiple,
 } from '../../../../../common/survey/nodeDef'
 import { normalizeName } from './../../../../../common/survey/surveyUtils'
 
@@ -31,7 +34,7 @@ class CommonProps extends React.Component {
       <React.Fragment>
 
         <FormItem label={'name'}>
-          <Input value={getNodeDefProp('name', '')(nodeDef)}
+          <Input value={getNodeDefName(nodeDef)}
                  validation={getFieldValidation('name')(validation)}
                  onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
         </FormItem>
@@ -48,14 +51,19 @@ class CommonProps extends React.Component {
                       onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'descriptions', getNodeDefDescriptions(nodeDef))}/>
 
         <FormItem label={'key'}>
-          <Checkbox checked={getNodeDefProp('key', false)(nodeDef)}
+          <Checkbox checked={isNodeDefKey(nodeDef)}
                     onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
         </FormItem>
 
-        <FormItem label={'multiple'}>
-          <Checkbox checked={getNodeDefProp('multiple', false)(nodeDef)}
-                    onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
-        </FormItem>
+        {
+          canNodeDefBeMultiple(nodeDef)
+            ? <FormItem label={'multiple'}>
+              <Checkbox checked={isNodeDefMultiple(nodeDef)}
+                        onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
+            </FormItem>
+            : null
+        }
+
       </React.Fragment>
     )
   }

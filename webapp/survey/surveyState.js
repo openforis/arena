@@ -1,9 +1,8 @@
 import * as R from 'ramda'
 
 import {
-  assocNodeDefFieldValidation as nodeDefAssocFieldValidation,
-  assocNodeDefValidation as nodeDefAssocValidation
-} from '../../common/survey/nodeDef'
+  getNodeDefByUUID,
+} from '../../common/survey/survey'
 
 const survey = 'survey'
 
@@ -29,60 +28,6 @@ export const getNewSurvey = R.pipe(
 
 /**
  * ======================
- * nodeDefs State TODO: Move to common/survey/NodeDef
- * ======================
- */
-
-// ==== READ
-const nodeDefs = 'nodeDefs'
-
-export const getNodeDefs = R.pipe(
-  R.prop(nodeDefs),
-  R.defaultTo({}),
-)
-
-export const getNodeDef = uuid => R.pipe(
-  getNodeDefs,
-  R.prop(uuid),
-)
-
-export const getNodeDefsArray = R.pipe(
-  getNodeDefs,
-  R.values,
-)
-
-export const getNodeDefsByParentId = parentId => R.pipe(
-  getNodeDefsArray,
-  R.filter(entityDef => entityDef.parentId === parentId),
-)
-
-export const getRootNodeDef = R.pipe(
-  getNodeDefsByParentId(null),
-  R.head,
-)
-
-export const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
-
-// ==== UPDATE
-
-export const assocNodeDefs = newNodeDefsArray =>
-  survey => R.pipe(
-    R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
-    R.mergeDeepRight(getNodeDefs(survey)),
-    newNodeDefs => R.assoc(nodeDefs, newNodeDefs, survey)
-  )(newNodeDefsArray)
-
-export const assocNodeDef = nodeDef =>
-  R.assocPath([nodeDefs, nodeDef.uuid], nodeDef)
-
-export const assocNodeDefProp = (nodeDefUUID, key, value) =>
-  R.assocPath([nodeDefs, nodeDefUUID, 'props', key], value)
-
-// ==== UTILITY
-export const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
-
-/**
- * ======================
  * Survey-Form State
  * ======================
  */
@@ -94,7 +39,7 @@ export const assocFormNodeDefViewPage = nodeDef =>
 export const getFormNodeDefViewPage = state => {
   const surveyState = getSurveyState(state)
   const uuid = R.path(nodeDefViewPage, surveyState)
-  return getNodeDef(uuid)(surveyState)
+  return getNodeDefByUUID(uuid)(surveyState)
 }
 
 // CURRENT EDITING NODE_DEF
@@ -105,7 +50,7 @@ export const assocFormNodeDefEdit = nodeDef =>
 export const getFormNodeDefEdit = state => {
   const surveyState = getSurveyState(state)
   const uuid = R.path(nodeDefEditPath, surveyState)
-  return getNodeDef(uuid)(surveyState)
+  return getNodeDefByUUID(uuid)(surveyState)
 }
 
 // CURRENT UNLOCKED NODE_DEF ENTITY
@@ -116,7 +61,7 @@ export const assocNodeDefFormUnlocked = nodeDef =>
 export const getNodeDefFormUnlocked = state => {
   const surveyState = getSurveyState(state)
   const uuid = R.path(nodeDefEntityUnlockedPath, surveyState)
-  return getNodeDef(uuid)(surveyState)
+  return getNodeDefByUUID(uuid)(surveyState)
 }
 
 export const isNodeDefFormLocked = nodeDef => R.pipe(
@@ -125,25 +70,3 @@ export const isNodeDefFormLocked = nodeDef => R.pipe(
   R.equals(nodeDef.uuid),
   R.not,
 )
-
-/**
- * ======================
- * Survey Validation
- * ======================
- */
-export const assocSurveyPropValidation = (key, validation) =>
-  R.assocPath(['validation', 'fields', key], validation)
-
-export const assocNodeDefValidation = (nodeDefUUID, validation) => state =>
-  R.pipe(
-    getNodeDef(nodeDefUUID),
-    nodeDefAssocValidation(validation),
-    nodeDef => assocNodeDef(nodeDef)(state),
-  )(state)
-
-export const assocNodeDefPropValidation = (nodeDefUUID, key, validation) => state =>
-  R.pipe(
-    getNodeDef(nodeDefUUID),
-    nodeDefAssocFieldValidation(key, validation),
-    nodeDef => assocNodeDef(nodeDef)(state)
-  )(state)

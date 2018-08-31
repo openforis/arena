@@ -4,12 +4,15 @@ import { assocActionProps, exportReducer, } from '../appUtils/reduxUtils'
  * survey state
  */
 import {
+  assocNodeDefs,
   assocNodeDef,
   assocNodeDefProp,
-  assocNodeDefs,
-  assocFormNodeDefEdit,
   assocNodeDefValidation,
-  assocNodeDefPropValidation,
+} from '../../common/survey/survey'
+
+
+import {
+  assocFormNodeDefEdit,
   assocNodeDefFormUnlocked,
   assocFormNodeDefViewPage,
 } from './surveyState'
@@ -38,7 +41,6 @@ import {
   nodeDefsUpdate,
   nodeDefUpdate,
   nodeDefValidationUpdate,
-  nodeDefPropValidationUpdate,
 
   //survey-form
   formNodeDefEditUpdate,
@@ -70,8 +72,6 @@ const actionHandlers = {
   [nodeDefPropUpdate]: (state, {nodeDefUUID, key, value}) => assocNodeDefProp(nodeDefUUID, key, value)(state),
 
   [nodeDefValidationUpdate]: (state, {nodeDefUUID, validation}) => assocNodeDefValidation(nodeDefUUID, validation)(state),
-
-  [nodeDefPropValidationUpdate]: (state, {nodeDefUUID, key, validation}) => assocNodeDefPropValidation(nodeDefUUID, key, validation)(state),
 
   //SURVEY-FORM
   [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),

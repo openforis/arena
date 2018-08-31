@@ -1,9 +1,9 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { setSurveyProp } from '../../common/survey/survey'
+import { assocSurveyProp, assocSurveyPropValidation } from '../../common/survey/survey'
 
-import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey, assocSurveyPropValidation } from './surveyState'
+import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey } from './surveyState'
 import { nodeDefUpdate } from './nodeDef/actions'
 import { debounceAction } from '../appUtils/reduxUtils'
 
@@ -72,7 +72,7 @@ export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
 
   const survey = R.pipe(
     getCurrentSurvey,
-    setSurveyProp(key, value),
+    assocSurveyProp(key, value),
     assocSurveyPropValidation(key, null)
   )(getState())
 

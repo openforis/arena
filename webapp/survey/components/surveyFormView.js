@@ -3,14 +3,16 @@ import './form/surveyForm.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getRootNode } from '../../../common/record/record'
 import FormNavigation from './form/formNavigation'
 import FormActions from './form/formActions'
 import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
-import { getSurveyState, getCurrentSurvey, getFormNodeDefViewPage, getRootNodeDef } from '../surveyState'
+import { getRootNodeDef } from '../../../common/survey/survey'
+import { getRootNode } from '../../../common/record/record'
+import { getSurveyState, getCurrentSurvey, getFormNodeDefViewPage } from '../surveyState'
 import { getRecord } from '../record/recordState'
+
 import { fetchRootNodeDef } from '../actions'
 import { setFormNodeDefViewPage } from '../nodeDef/actions'
 
