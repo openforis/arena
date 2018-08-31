@@ -6,7 +6,6 @@ import {
 } from './actions'
 
 import { loginSuccess } from '../login/actions'
-import { surveyCurrentUpdate } from '../survey/actions'
 import { appState } from './app'
 
 const actionHandlers = {
@@ -17,8 +16,6 @@ const actionHandlers = {
   [loginSuccess]: assocActionProps,
 
   [appUserLogout]: (state, action) => appState.logoutUser(state),
-
-  [surveyCurrentUpdate]: assocActionProps,
 
 }
 

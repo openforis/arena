@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 
 import DataFetchComponent from '../components/moduleDataFetchComponent'
 
-import { appState } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
 
 import Dropdown from '../../commonComponents/form/dropdown'

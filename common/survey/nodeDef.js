@@ -1,20 +1,18 @@
 const R = require('ramda')
 const {uuidv4} = require('../uuid')
-
 const {
-  // getProps,
   getProp,
   getLabels,
-
-  // setProp,
 } = require('./surveyUtils')
+
+const validation = 'validation'
 
 // ======== NODE DEF PROPERTIES
 
 const nodeDefType = {
   integer: 'integer',
   decimal: 'decimal',
-  string: 'string',
+  text: 'text',
   date: 'date',
   time: 'time',
   boolean: 'boolean',
@@ -37,30 +35,39 @@ const newNodeDef = (surveyId, parentId, type, props) => ({
 
 // ==== READ
 
-const getNodeDefLabel = (nodeDef, lang) => R.pipe(
-  getLabels,
-  R.prop(lang),
-)(nodeDef)
-
-
 const getNodeDefType = R.prop('type')
+
+const isNodeDefEntity = R.pipe(getNodeDefType, R.equals(nodeDefType.entity))
+
+const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
 
 // ==== UPDATE
 
+// ==== UTILS
+const canNodeDefBeMultiple = nodeDef =>
+  (isNodeDefEntity(nodeDef) && !isNodeDefRoot(nodeDef)) ||
+  R.contains(
+    getNodeDefType(nodeDef),
+    [nodeDefType.decimal, nodeDefType.codeList, nodeDefType.file, nodeDefType.integer, nodeDefType.text]
+  )
+
 module.exports = {
   nodeDefType,
-  getNodeDefType,
-
-  isNodeDefEntity: R.pipe(getNodeDefType, R.equals(nodeDefType.entity)),
-
-// props
-//   getNodeDefProps: getProps,
-  getNodeDefProp: getProp,
-//   setNodeDefProp: setProp,
-  getNodeDefLabels: getLabels,
-  getNodeDefDescriptions: getProp('descriptions', {}),
-  getNodeDefLabel,
 
   //CREATE
   newNodeDef,
+
+  //READ
+  getNodeDefType,
+  getNodeDefName: getProp('name', ''),
+  isNodeDefKey: R.pipe(getProp('key'), R.equals(true)),
+  isNodeDefEntity,
+  isNodeDefMultiple: R.pipe(getProp('multiple'), R.equals(true)),
+  getNodeDefLabels: getLabels,
+  getNodeDefDescriptions: getProp('descriptions', {}),
+  getNodeDefValidation: R.prop(validation),
+  isNodeDefRoot,
+
+  //UTILS
+  canNodeDefBeMultiple,
 }

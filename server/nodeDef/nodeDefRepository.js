@@ -21,7 +21,7 @@ const dbTransformCallback = (def, draft = false) => def
     camelize,
     def => draft
       ? mergeProps(def, draft)
-      : def,
+      : R.omit(['propsDraft'], def),
   )(def)
   : null
 
@@ -87,7 +87,7 @@ const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
 // ============== DELETE
 
 const markNodeDefDeleted = async (nodeDefId, client = db) => await client.one(
-    `
+  `
   UPDATE node_def 
   SET deleted = true
   WHERE id = $1

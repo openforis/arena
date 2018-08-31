@@ -1,8 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import { getNodeDefChildren } from '../../../../common/survey/survey'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
-import { getFormNodeDefViewPage, getNodeDefChildren, getSurveyState } from '../../surveyState'
+
+import { getFormNodeDefViewPage, getSurvey } from '../../surveyState'
+
 import { setFormNodeDefViewPage } from '../../nodeDef/actions'
 
 const FormNavigationItem = (props) => {
@@ -42,7 +45,7 @@ const FormNavigationItem = (props) => {
 }
 
 const mapStateToProps = (state, props) => ({
-  children: getNodeDefChildren(props.nodeDef)(getSurveyState(state)),
+  children: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
   currentPageNodeDef: getFormNodeDefViewPage(state),
 })
 const FormNavigationItemConnect = connect(

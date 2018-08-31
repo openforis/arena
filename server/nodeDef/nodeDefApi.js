@@ -1,6 +1,6 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
-const {validateNodeDef, validateNodeDefs, validateNodeDefProp} = require('./nodeDefValidator')
+const {validateNodeDef, validateNodeDefs} = require('./nodeDefValidator')
 
 const {
   fetchNodeDef,
@@ -31,8 +31,8 @@ module.exports.init = app => {
   app.get('/nodeDef/:id/children', async (req, res) => {
     try {
       const nodeDefId = getRestParam(req, 'id')
-      const draft = getRestParam(req, 'draft')
-      const validate = getRestParam(req, 'validate')
+      const draft = getRestParam(req, 'draft') === 'true'
+      const validate = getRestParam(req, 'validate') === 'true'
 
       const nodeDefsDB = await fetchNodeDefsByParentId(nodeDefId, draft)
       const nodeDefs = validate
@@ -49,7 +49,8 @@ module.exports.init = app => {
     try {
       const nodeDefId = getRestParam(req, 'id')
       const nodeDef = await fetchNodeDef(nodeDefId, true)
-      const validation = await validateNodeDef(nodeDef, false)
+      const validation = await validateNodeDef(nodeDef)
+
       res.json({validation})
     } catch (err) {
       sendErr(res, err)
@@ -59,14 +60,13 @@ module.exports.init = app => {
   // ==== UPDATE
 
   app.put('/nodeDef/:id/prop', async (req, res) => {
-    const {body} = req
-    const {key} = body
-
-    const nodeDefId = getRestParam(req, 'id')
-
     try {
+      const {body} = req
+      const nodeDefId = getRestParam(req, 'id')
+
       const nodeDef = await updateNodeDefProp(nodeDefId, body)
-      const validation = await validateNodeDefProp(nodeDef, key)
+      const validation = await validateNodeDef(nodeDef)
+
       res.json({validation})
     } catch (err) {
       sendErr(res, err)

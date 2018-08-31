@@ -13,7 +13,7 @@ const authApi = require('./auth/authApi')
 const apiRouter = require('./config/apiRouter')
 
 // run database migrations
-require('./db/migration/execMigrations')()
+require('./db/migration/public/execMigrations')()
 
 const app = express()
 

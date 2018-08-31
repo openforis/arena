@@ -1,15 +1,29 @@
 import { assocActionProps, exportReducer, } from '../appUtils/reduxUtils'
 
+/**
+ * survey state
+ */
 import {
+  assocNodeDefs,
   assocNodeDef,
   assocNodeDefProp,
-  assocNodeDefs,
-  assocFormNodeDefEdit,
   assocNodeDefValidation,
-  assocNodeDefPropValidation,
+} from '../../common/survey/survey'
+
+import {
+  assocFormNodeDefEdit,
   assocNodeDefFormUnlocked,
   assocFormNodeDefViewPage,
 } from './surveyState'
+
+/**
+ * record state
+ */
+import {
+  //record
+  assocNodes,
+  deleteNode,
+} from './record/recordState'
 
 /**
  * survey actions
@@ -26,7 +40,6 @@ import {
   nodeDefsUpdate,
   nodeDefUpdate,
   nodeDefValidationUpdate,
-  nodeDefPropValidationUpdate,
 
   //survey-form
   formNodeDefEditUpdate,
@@ -34,14 +47,22 @@ import {
   formNodeDefViewPage,
 } from './nodeDef/actions'
 
+/**
+ * record actions
+ */
+import {
+  recordUpdate,
+  nodesUpdate,
+  nodeDelete,
+} from './record/actions'
+
 const actionHandlers = {
-  //survey
+  //SURVEY
   [surveyNewUpdate]: assocActionProps,
 
-  //on app current survey update, reset survey state
-  [surveyCurrentUpdate]: (state, action) => ({}),
+  [surveyCurrentUpdate]: (state, {survey}) => survey,
 
-  // nodeDefs
+  // NODE-DEFS
   [nodeDefsUpdate]: (state, {nodeDefs}) => assocNodeDefs(nodeDefs)(state),
 
   [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
@@ -50,14 +71,20 @@ const actionHandlers = {
 
   [nodeDefValidationUpdate]: (state, {nodeDefUUID, validation}) => assocNodeDefValidation(nodeDefUUID, validation)(state),
 
-  [nodeDefPropValidationUpdate]: (state, {nodeDefUUID, key, validation}) => assocNodeDefPropValidation(nodeDefUUID, key, validation)(state),
-
-  //survey-form
+  //SURVEY-FORM
   [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),
 
   [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocNodeDefFormUnlocked(nodeDef)(state),
 
   [formNodeDefViewPage]: (state, {nodeDef}) => assocFormNodeDefViewPage(nodeDef)(state),
+
+  //RECORD
+  [recordUpdate]: assocActionProps,
+
+  [nodesUpdate]: (state, {nodes}) => assocNodes(nodes)(state),
+
+  [nodeDelete]: (state, {node}) => deleteNode(node)(state),
+
 }
 
 export default exportReducer(actionHandlers)

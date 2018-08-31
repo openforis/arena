@@ -10,17 +10,17 @@ import NodeDefSwitch from '../nodeDefSwitch'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
+import {getNodeDefChildren} from '../../../../../common/survey/survey'
 import {
   nodeDefLayoutProps,
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
-
   isRenderForm,
   isRenderTable,
 } from '../../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefChildren, getSurveyState } from '../../../surveyState'
+import { getSurvey } from '../../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, } from '../../actions'
 
@@ -77,6 +77,11 @@ class NodeDefEntity extends React.Component {
 
       // edit mode
       locked,
+
+      // data entry
+      entry,
+      parentNode,
+      node,
     } = this.props
     const columns = getNoColumns(nodeDef)
     const rdgLayout = getLayout(nodeDef)
@@ -111,7 +116,8 @@ class NodeDefEntity extends React.Component {
             innerPageChildren
               .map((childDef, i) =>
                 <div key={childDef.uuid}>
-                  <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}/>
+                  <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}
+                    entry={entry} parentNode={node} />
                 </div>
               )
           }
@@ -149,7 +155,12 @@ class NodeDefEntity extends React.Component {
                   <div key={childDef.uuid} data-grid={{
                     i: nodeDef.uuid, x: i, y: 0, w: 1, h: 1,
                   }}>
-                    <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}/>
+                    <NodeDefSwitch key={i}
+                                   nodeDef={childDef}
+                                   edit={edit}
+                                   draft={draft}
+                                   render={render}
+                                   parentNode={node} />
                   </div>
                 )
             }
@@ -169,7 +180,7 @@ NodeDefEntity.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => ({
-  children: getNodeDefChildren(props.nodeDef)(getSurveyState(state)),
+  children: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
 })
 
 export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren})(NodeDefEntity)

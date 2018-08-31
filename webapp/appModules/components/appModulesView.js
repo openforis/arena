@@ -10,20 +10,14 @@ import { getLocationPathname } from '../../appUtils/routerUtils'
 
 import AppHomeView from '../home/appHomeView'
 import SurveyDashboardView from '../surveyDashboard/surveyDashboardView'
-import DataExplorerView from '../dataExplorer/dataExplorerView'
+import DataView from '../data/dataView'
+import DataRecordView from '../data/dataRecordView'
 import SurveyDesignerView from '../surveyDesigner/surveyDesignerView'
 
-const appModulesComponents = {
-  [appModules.home]: AppHomeView,
-  [appModules.surveyDashboard]: SurveyDashboardView,
-  [appModules.surveyDesigner]: SurveyDesignerView,
-  [appModules.dataExplorer]: DataExplorerView,
-}
-
-const AppModule = ({module, ...props}) => (
+const AppModule = ({module, component, ...props}) => (
 
   <ModuleViewTransitionComponent pathname={getLocationPathname(props)}
-                                 component={appModulesComponents[module]}
+                                 component={component}
                                  module={module}
   />
 )
@@ -33,10 +27,12 @@ const AppModulesView = (props) => (
 
     <TransitionGroup component={null}>
 
-      <AppModule module={appModules.home} {...props}/>
-      <AppModule module={appModules.surveyDashboard} {...props}/>
-      <AppModule module={appModules.surveyDesigner} {...props}/>
-      <AppModule module={appModules.dataExplorer} {...props}/>
+      <AppModule module={appModules.home} component={AppHomeView} {...props}/>
+      <AppModule module={appModules.surveyDashboard} component={SurveyDashboardView}  {...props}/>
+      <AppModule module={appModules.surveyDesigner} component={SurveyDesignerView} {...props}/>
+
+      <AppModule module={appModules.data} component={DataView}  {...props}/>
+      <AppModule module={appModules.dataRecord} component={DataRecordView}  {...props}/>
 
     </TransitionGroup>
   </div>

@@ -6,6 +6,7 @@ const router = express.Router()
 require('../mockApi/surveyDashboardApi').init(router)
 require('../survey/surveyApi').init(router)
 require('../nodeDef/nodeDefApi').init(router)
+require('../record/recordApi').init(router)
 
 module.exports = {
   router

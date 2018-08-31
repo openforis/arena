@@ -2,6 +2,7 @@ import axios from 'axios'
 import * as R from 'ramda'
 
 import { systemStatus } from './app'
+import { dispatchCurrentSurveyUpdate } from '../survey/actions'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
@@ -11,9 +12,13 @@ export const initApp = () => async dispatch => {
 
     const resp = await axios.get('/auth/user')
 
-    const data = R.prop('data', resp)
+    const {data} = resp
+    const {user, survey} = data
 
-    dispatch({type: appStatusChange, status: systemStatus.ready, ...data})
+    if (survey)
+      dispatchCurrentSurveyUpdate(dispatch, survey)
+
+    dispatch({type: appStatusChange, status: systemStatus.ready, user})
 
   } catch (e) {
   }

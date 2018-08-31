@@ -1,33 +1,22 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import NodeDefBoolean from './types/nodeDefBoolean'
-import NodeDefCodeList from './types/nodeDefCodeList'
-import NodeDefCoordinate from './types/nodeDefCoordinate'
-import NodeDefEntity from './types/nodeDefEntity'
-import NodeDefFile from './types/nodeDefFile'
-import NodeDefTaxon from './types/nodeDefTaxon'
-import NodeDefText from './types/nodeDefText'
-
-import { nodeDefType, getNodeDefType } from '../../../../common/survey/nodeDef'
 import {
   getNoColumns,
   nodeDefLayoutProps,
   getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
 
-import { isNodeDefRoot, isNodeDefFormLocked } from '../../surveyState'
+import { isNodeDefRoot } from '../../../../common/survey/nodeDef'
+import { getNodeChildrenByDefId } from '../../../../common/record/record'
+
+import { isNodeDefFormLocked } from '../../surveyState'
+import { getRecord } from '../../record/recordState'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
+import { updateNodeValue, addNode, removeNode } from '../../record/actions'
 
-const nodeDefTypeComponents = {
-  [nodeDefType.boolean]: NodeDefBoolean,
-  [nodeDefType.codeList]: NodeDefCodeList,
-  [nodeDefType.coordinate]: NodeDefCoordinate,
-  [nodeDefType.entity]: NodeDefEntity,
-  [nodeDefType.file]: NodeDefFile,
-  [nodeDefType.taxon]: NodeDefTaxon,
-}
+import { getNodeDefComponent } from './nodeDefSystemProps'
 
 class NodeDefSwitch extends React.Component {
 
@@ -38,16 +27,12 @@ class NodeDefSwitch extends React.Component {
       this.refs.nodeDefElem.scrollIntoView()
   }
 
-  isEditMode () {
-    return this.props.edit
-  }
-
   render () {
     const {
       nodeDef,
 
       // passed by the caller
-      edit, draft, render,
+      edit,
 
       // actions
       setFormNodDefEdit,
@@ -120,10 +105,7 @@ class NodeDefSwitch extends React.Component {
       }
 
       {
-        React.createElement(
-          nodeDefTypeComponents[getNodeDefType(nodeDef)] || NodeDefText,
-          {nodeDef, draft, edit, locked, render}
-        )
+        React.createElement(getNodeDefComponent(nodeDef), {...this.props})
       }
 
     </div>
@@ -135,11 +117,18 @@ NodeDefSwitch.defaultProps = {
   locked: true,
 }
 
-const mapStateToProps = (state, props) => ({
-  locked: isNodeDefFormLocked(props.nodeDef)(state)
-})
+const mapStateToProps = (state, props) => {
+  const {nodeDef, parentNode, entry} = props
+  return {
+    locked: isNodeDefFormLocked(nodeDef)(state),
+    nodes: entry ? getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(state)) : [],
+  }
+}
 
 export default connect(
   mapStateToProps,
-  {setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp}
+  {
+    setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
+    updateNodeValue, addNode, removeNode,
+  }
 )(NodeDefSwitch)

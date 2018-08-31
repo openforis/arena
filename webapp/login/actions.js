@@ -9,7 +9,7 @@ export const login = (username, password) => async dispatch => {
   try {
     const {data} = await axios.post('/auth/login', {username, password})
 
-    const {message: errorMessage, user, survey, surveyValidation} = data
+    const {message: errorMessage, user, survey} = data
 
     if (errorMessage) {
       dispatch({type: loginError, errorMessage})
@@ -18,7 +18,6 @@ export const login = (username, password) => async dispatch => {
 
       if (survey) {
         dispatchCurrentSurveyUpdate(dispatch, survey)
-        dispatchCurrentSurveyValidationUpdate(dispatch, surveyValidation)
       }
     }
   } catch (e) {

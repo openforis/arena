@@ -8,40 +8,22 @@ const {
   setProp,
 } = require('./surveyUtils')
 
+// == utils
+const nodeDefs = 'nodeDefs'
+
 const defaultSteps = {
   '1': {name: 'entry'},
   '2': {name: 'cleansing', prev: '1'},
   '3': {name: 'analysis', prev: '2'},
 }
 
-const NEW = 'new'
-const DRAFT = 'draft'
-const PUBLISHED = 'published'
-const PUBLISHED_DRAFT = 'publishedDraft'
-
-const surveyStatus = {
-
-  // a survey has been created or updated
-  // surveyDefn : can add and delete nodes
-  // dataEntry : cannot add
-  draft: DRAFT,
-
-  // an existing survey does now allow further changes of properties of existing nodes
-  // surveyDefn: can edit and will create a draft version
-  // dataEntry: can add, edit, delete..
-  published: PUBLISHED,
-
-  // a publishedDraft survey diffs from the published version by the no of nodes
-  // (at least 1 node was added or deleted)
-  // surveyDefn: permissions same as published
-  // dataEntry: can add, edit, delete..
-  // BUT using survey definition of latest published version
-  publishedDraft: PUBLISHED_DRAFT,
-
-  isNew: R.equals(NEW),
-
-  isPublished: R.equals(PUBLISHED),
-}
+/**
+ * ==== READ
+ */
+const isSurveyPublished = R.pipe(
+  R.prop('published'),
+  R.equals(true)
+)
 
 const getSurveyLanguages = getProp('languages', [])
 
@@ -50,20 +32,83 @@ const getSurveyDefaultLanguage = R.pipe(
   R.head,
 )
 
+const getSurveyDefaultStep = R.pipe(
+  getProp('steps'),
+  R.toPairs,
+  R.find(s => !s[1].prev),
+  R.head
+)
+
+// ** READ nodeDefs
+const getNodeDefs = R.pipe(R.prop(nodeDefs), R.defaultTo({}))
+
+const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
+
+const getNodeDefByUUID = uuid => R.pipe(getNodeDefs, R.prop(uuid))
+
+const getNodeDefsByParentId = parentId => R.pipe(
+  getNodeDefsArray,
+  R.filter(entityDef => entityDef.parentId === parentId),
+)
+
+const getRootNodeDef = R.pipe(getNodeDefsByParentId(null), R.head)
+
+const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
+
+/**
+ * ==== UPDATE
+ */
+const assocSurveyPropValidation = (key, validation) =>
+  R.assocPath(['validation', 'fields', key], validation)
+
+// UPDATE nodeDefs
+
+const assocNodeDefs = newNodeDefsArray =>
+  survey => R.pipe(
+    R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
+    R.mergeDeepRight(getNodeDefs(survey)),
+    newNodeDefs => R.assoc(nodeDefs, newNodeDefs, survey)
+  )(newNodeDefsArray)
+
+const assocNodeDef = nodeDef => R.assocPath([nodeDefs, nodeDef.uuid], nodeDef)
+
+const assocNodeDefProp = (nodeDefUUID, key, value) => R.pipe(
+  R.assocPath([nodeDefs, nodeDefUUID, 'props', key], value),
+  R.dissocPath([nodeDefs, nodeDefUUID, 'validation', 'fields', key]),
+)
+
+const assocNodeDefValidation = (nodeDefUUID, validation) =>
+  R.assocPath([nodeDefs, nodeDefUUID, 'validation'], validation)
+
 module.exports = {
   defaultSteps,
 
-  // props
+  // READ
   getSurveyProps: getProps,
-  getSurveyProp: getProp,
-  setSurveyProp: setProp,
   getSurveyLabels: getLabels,
 
+  isSurveyPublished,
   getSurveyLanguages,
   getSurveyDefaultLanguage,
   getSurveyDescriptions: getProp('descriptions', {}),
   getSurveySrs: getProp('srs', []),
+  getSurveyDefaultStep,
 
-  //TODO: REMOVE
-  surveyStatus,
+  // READ nodeDefs
+  getNodeDefByUUID,
+  getRootNodeDef,
+  getNodeDefChildren,
+
+  // UPDATE
+  assocSurveyProp: setProp,
+  assocSurveyPropValidation,
+
+  // UPDATE nodeDefs
+  assocNodeDefs,
+  assocNodeDef,
+  assocNodeDefProp,
+  assocNodeDefValidation,
+
+  // UTILS
+  getSurveyDBSchema: surveyId => `survey_${surveyId}`,
 }

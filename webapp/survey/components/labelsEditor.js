@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-import { getCurrentSurvey } from '../surveyState'
+import { getSurvey } from '../surveyState'
 import { getSurveyLanguages, } from '../../../common/survey/survey'
 import { getLanguageLabel } from '../../../common/app/languages'
 
@@ -103,7 +103,7 @@ LabelsEditor.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  languages: getSurveyLanguages(getCurrentSurvey(state))
+  languages: getSurveyLanguages(getSurvey(state))
 })
 
 export default connect(mapStateToProps,)(LabelsEditor)

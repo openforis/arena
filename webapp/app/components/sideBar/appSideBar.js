@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { appModules } from '../../../appModules/appModules'
 import { appState } from '../../app'
-import { getCurrentSurvey } from '../../../survey/surveyState'
+import { getSurvey } from '../../../survey/surveyState'
 import { logout } from '../../actions'
 
 import AppSideBarFooter from './appSideBarFooter'
@@ -26,13 +26,13 @@ const appModulesSideBar = [
     label: 'Designer',
   },
   {
-    module: appModules.dataExplorer,
+    module: appModules.data,
     icon: 'table2',
     label: 'Data',
     disabled: true,
   },
   {
-    module: appModules.dataAnalysis,
+    module: appModules.analysis,
     icon: 'calculator',
     label: 'Analysis',
     disabled: true,
@@ -96,7 +96,7 @@ class AppSideBar extends React.Component {
 
 const mapStateToProps = state => ({
   user: appState.getUser(state),
-  survey: getCurrentSurvey(state)
+  survey: getSurvey(state)
 })
 
 export default connect(mapStateToProps, {logout})(AppSideBar)

@@ -3,14 +3,13 @@ const Promise = require('bluebird')
 
 const {validate, validateProp, validateRequired} = require('../../common/validation/validator')
 const {fetchNodeDefsBySurveyId} = require('./nodeDefRepository')
-const {getNodeDefProp} = require('../../common/survey/nodeDef')
+const {getNodeDefName} = require('../../common/survey/nodeDef')
 
 const validateNodeDefNameUniqueness = async (propName, nodeDef) => {
-  const getName = getNodeDefProp('name')
   const nodeDefs = await fetchNodeDefsBySurveyId(nodeDef.surveyId, true)
 
   const hasDuplicates = R.any(
-    n => getName(n) === getName(nodeDef) && n.id !== nodeDef.id,
+    n => getNodeDefName(n) === getNodeDefName(nodeDef) && n.id !== nodeDef.id,
     nodeDefs
   )
 
@@ -21,11 +20,6 @@ const validateNodeDefNameUniqueness = async (propName, nodeDef) => {
 
 const propsValidations = {
   'props.name': [validateRequired, validateNodeDefNameUniqueness],
-}
-
-const validateNodeDefProp = async (nodeDef, prop) => {
-  const propName = 'props.' + prop
-  return await validateProp(nodeDef, propName, propsValidations[propName])
 }
 
 const validateNodeDef = async nodeDef =>
@@ -40,6 +34,5 @@ const validateNodeDefs = async (nodeDefs) =>
 module.exports = {
   validateNodeDef,
   validateNodeDefs,
-  validateNodeDefProp,
 }
 

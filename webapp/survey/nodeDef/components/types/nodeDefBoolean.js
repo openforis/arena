@@ -1,32 +1,46 @@
 import React from 'react'
 
+import { getNodeValue } from '../../../../../common/record/record'
+
 import NodeDefFormItem from './nodeDefFormItem'
 
-class NodeDefBoolean extends React.Component {
+const Button = ({nodeDef, nodes, updateNodeValue, label, disabled, value}) => {
+  const node = nodes[0]
+  const nodeValue = getNodeValue(node, 'false')
 
-  render () {
-    const {nodeDef, draft, edit} = this.props
+  return (
+    <button className="btn btn-s btn-transparent"
+            style={{borderRadius: '.75rem'}}
+            aria-disabled={disabled}
+            onClick={() => updateNodeValue(nodeDef, node, value)}>
+      <span className={`icon icon-radio-${nodeValue === value ? 'checked2' : 'unchecked'} icon-left`}/>
+      {label}
+    </button>
+  )
 
-    return (
-      <NodeDefFormItem nodeDef={nodeDef}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '.1fr .2fr .1fr .2fr',
-          alignItems: 'center',
-          height: '3rem',
-        }}>
-          <button className="btn btn-s btn-transparent">
-            <span className="icon icon-radio-checked2 icon-left"/>
-            YES
-          </button>
-          <button className="btn btn-s btn-transparent">
-            <span className="icon icon-radio-unchecked icon-left"/>
-            NO
-          </button>
-        </div>
-      </NodeDefFormItem>
-    )
-  }
+}
+
+const NodeDefBoolean = props => {
+  const {nodeDef, edit} = props
+
+  return (
+    <NodeDefFormItem nodeDef={nodeDef}>
+      <div className="form-input" style={{borderBottom: 'none'}}>
+
+        <Button disabled={edit}
+                label="YES"
+                value="true"
+                {...props}/>
+
+        <Button disabled={edit}
+                label="NO"
+                value="false"
+                {...props}/>
+
+      </div>
+    </NodeDefFormItem>
+  )
+
 }
 
 export default NodeDefBoolean

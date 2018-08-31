@@ -33,7 +33,7 @@ module.exports.init = app => {
   app.get('/survey/:id/rootNodeDef', async (req, res) => {
     try {
 
-      const draft = getRestParam(req, 'draft')
+      const draft = getRestParam(req, 'draft') === 'true'
       const surveyId = getRestParam(req, 'id')
 
       const nodeDef = await fetchRootNodeDef(surveyId, draft)

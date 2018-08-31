@@ -16,6 +16,12 @@ const {
   nodeDefRenderType,
 } = require('../../common/survey/nodeDefLayout')
 
+const {
+  defaultSteps,
+} = require('../../common/survey/survey')
+
+const { migrateSurveySchema } = require('../db/migration/survey/execMigrations')
+
 // ============== CREATE
 
 const createSurvey = async (user, {name, label, lang}) => db.tx(
@@ -24,7 +30,8 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       name,
       labels: {[lang]: label},
       languages: [lang],
-      srs: ['4326'] //EPSG:4326 WGS84 Lat Lon Spatial Reference System
+      srs: ['4326'], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
+      steps: {...defaultSteps},
     }
 
     const {id: surveyId} = await t.one(`
@@ -41,6 +48,9 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       [nodeDefLayoutProps.render]: nodeDefRenderType.form,
     }
     await createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
+
+    //create survey data schema
+    migrateSurveySchema(surveyId)
 
     // update user prefs
     await setUserPref(user, userPrefNames.survey, surveyId, t)
@@ -61,6 +71,13 @@ const getSurveysByName = async (surveyName, client = db) =>
   await client.map(
     `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
+    def => dbTransformCallback(def)
+  )
+
+const fetchSurveys = async (client = db) =>
+  await client.map(
+    `SELECT * FROM survey`,
+    [],
     def => dbTransformCallback(def)
   )
 
@@ -97,6 +114,7 @@ module.exports = {
   // READ
   getSurveyById,
   getSurveysByName,
+  fetchSurveys,
   fetchRootNodeDef,
 
   //UPDATE

@@ -8,7 +8,11 @@ import FormActions from './form/formActions'
 import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
-import { getCurrentSurvey, getFormNodeDefViewPage, getRootNodeDef, getSurveyState } from '../surveyState'
+import { getRootNodeDef } from '../../../common/survey/survey'
+import { getRootNode } from '../../../common/record/record'
+import { getSurvey, getFormNodeDefViewPage } from '../surveyState'
+import { getRecord } from '../record/recordState'
+
 import { fetchRootNodeDef } from '../actions'
 import { setFormNodeDefViewPage } from '../nodeDef/actions'
 
@@ -27,7 +31,15 @@ class SurveyFormView extends React.Component {
   }
 
   render () {
-    const {rootNodeDef, nodeDef, edit, draft} = this.props
+    const {
+      rootNodeDef,
+      nodeDef,
+      edit,
+      draft,
+      // data entry mode props
+      entry,
+      rootNode
+    } = this.props
 
     return (
       rootNodeDef ?
@@ -45,7 +57,8 @@ class SurveyFormView extends React.Component {
 
             {
               nodeDef
-                ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft}/>
+                ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft}
+                                 entry={entry} node={rootNode}/>
                 : <div></div>
             }
 
@@ -72,13 +85,21 @@ SurveyFormView.defaultProps = {
   edit: false,
   // load draft props
   draft: false,
+  // can entry data
+  entry: false,
+  // record being edited
+  rootNode: null,
 }
 
-const mapStateToProps = state => ({
-  survey: getCurrentSurvey(state),
-  rootNodeDef: getRootNodeDef(getSurveyState(state)),
-  nodeDef: getFormNodeDefViewPage(state),
-})
+const mapStateToProps = (state, props) => {
+  const survey = getSurvey(state)
+  return {
+    survey,
+    rootNodeDef: getRootNodeDef(survey),
+    nodeDef: getFormNodeDefViewPage(state),
+    rootNode: props.entry ? getRootNode(getRecord(state)) : null,
+  }
+}
 
 export default connect(
   mapStateToProps,
