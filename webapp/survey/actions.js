@@ -8,7 +8,6 @@ import { nodeDefUpdate } from './nodeDef/actions'
 import { debounceAction } from '../appUtils/reduxUtils'
 
 export const surveyCurrentUpdate = 'survey/current/update'
-export const surveyCurrentFieldValidationUpdate = 'survey/current/validation/field/update'
 export const surveyNewUpdate = 'survey/new/update'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
