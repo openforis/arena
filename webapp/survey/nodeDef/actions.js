@@ -14,6 +14,9 @@ export const nodeDefPropUpdate = 'nodeDef/prop/update'
 export const nodeDefValidationUpdate = 'nodeDef/validation/updated'
 export const nodeDefPropValidationUpdate = 'nodeDef/prop/validation/update'
 
+const dispatchNodeDefPropValidationUpdate = (dispatch, nodeDef, key, validation) =>
+  dispatch({type: nodeDefPropValidationUpdate, nodeDefUUID: nodeDef.uuid, key, validation})
+
 // ==== CREATE
 
 export const createNodeDef = (parentId, type, props) => async (dispatch, getState) => {
@@ -54,7 +57,7 @@ export const fetchNodeDefChildren = (id, draft = false, validate = false) => asy
 export const putNodeDefProp = (nodeDef, key, value) => async dispatch => {
   dispatch({type: nodeDefPropUpdate, nodeDefUUID: nodeDef.uuid, key, value})
   //reset prop validation
-  dispatch({type: nodeDefPropValidationUpdate, nodeDefUUID: nodeDef.uuid, key, validation: null})
+  dispatchNodeDefPropValidationUpdate(dispatch, nodeDef, key, null)
   dispatch(_putNodeDefProp(nodeDef, key, value))
 }
 
@@ -64,7 +67,7 @@ const _putNodeDefProp = (nodeDef, key, value) => {
       const res = await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
       //update node def validation
       const {validation} = res.data
-      dispatch({type: nodeDefPropValidationUpdate, nodeDefUUID: nodeDef.uuid, key, validation})
+      dispatchNodeDefPropValidationUpdate(dispatch, nodeDef, key, validation)
     } catch (e) { }
 
   }
