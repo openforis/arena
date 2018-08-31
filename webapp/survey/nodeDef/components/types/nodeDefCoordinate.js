@@ -10,7 +10,7 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import NodeDefFormItem from './nodeDefFormItem'
 
-import { getCurrentSurvey } from '../../../surveyState'
+import { getSurvey } from '../../../surveyState'
 
 class NodeDefCoordinate extends React.Component {
 
@@ -65,7 +65,7 @@ class NodeDefCoordinate extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  survey: getCurrentSurvey(state),
+  survey: getSurvey(state),
 })
 
 export default connect(mapStateToProps)(NodeDefCoordinate)

@@ -10,7 +10,6 @@ import {
   assocNodeDefValidation,
 } from '../../common/survey/survey'
 
-
 import {
   assocFormNodeDefEdit,
   assocNodeDefFormUnlocked,
@@ -61,8 +60,7 @@ const actionHandlers = {
   //SURVEY
   [surveyNewUpdate]: assocActionProps,
 
-  //on app current survey update, reset survey state
-  [surveyCurrentUpdate]: (state, action) => ({}),
+  [surveyCurrentUpdate]: (state, {survey}) => survey,
 
   // NODE-DEFS
   [nodeDefsUpdate]: (state, {nodeDefs}) => assocNodeDefs(nodeDefs)(state),

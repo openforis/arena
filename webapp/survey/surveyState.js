@@ -11,13 +11,12 @@ const survey = 'survey'
  * Survey State
  * ======================
  */
-export const getSurveyState = R.prop(survey)
 
 // READ
-export const getCurrentSurvey = R.path(['app', survey])
+export const getSurvey = R.prop(survey)
 
-export const getCurrentSurveyId = R.pipe(
-  getCurrentSurvey,
+export const getSurveyId = R.pipe(
+  getSurvey,
   R.prop('id'),
 )
 
@@ -37,7 +36,7 @@ export const assocFormNodeDefViewPage = nodeDef =>
   R.assocPath(nodeDefViewPage, nodeDef ? nodeDef.uuid : null)
 
 export const getFormNodeDefViewPage = state => {
-  const surveyState = getSurveyState(state)
+  const surveyState = getSurvey(state)
   const uuid = R.path(nodeDefViewPage, surveyState)
   return getNodeDefByUUID(uuid)(surveyState)
 }
@@ -48,7 +47,7 @@ export const assocFormNodeDefEdit = nodeDef =>
   R.assocPath(nodeDefEditPath, nodeDef ? nodeDef.uuid : null)
 
 export const getFormNodeDefEdit = state => {
-  const surveyState = getSurveyState(state)
+  const surveyState = getSurvey(state)
   const uuid = R.path(nodeDefEditPath, surveyState)
   return getNodeDefByUUID(uuid)(surveyState)
 }
@@ -59,13 +58,13 @@ export const assocNodeDefFormUnlocked = nodeDef =>
   R.assocPath(nodeDefEntityUnlockedPath, nodeDef ? nodeDef.uuid : null)
 
 export const getNodeDefFormUnlocked = state => {
-  const surveyState = getSurveyState(state)
+  const surveyState = getSurvey(state)
   const uuid = R.path(nodeDefEntityUnlockedPath, surveyState)
   return getNodeDefByUUID(uuid)(surveyState)
 }
 
 export const isNodeDefFormLocked = nodeDef => R.pipe(
-  getSurveyState,
+  getSurvey,
   R.path(nodeDefEntityUnlockedPath),
   R.equals(nodeDef.uuid),
   R.not,

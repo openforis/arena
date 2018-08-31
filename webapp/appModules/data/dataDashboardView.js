@@ -8,7 +8,7 @@ import DataFetchComponent from '../components/moduleDataFetchComponent'
 
 import { appModuleUri } from '../../app/app'
 import { appModules, getDashboardData } from '../appModules'
-import { getCurrentSurvey } from '../../survey/surveyState'
+import { getSurvey } from '../../survey/surveyState'
 
 import { isSurveyPublished } from '../../../common/survey/survey'
 
@@ -102,7 +102,7 @@ DataDashboardView.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  survey: getCurrentSurvey(state),
+  survey: getSurvey(state),
   data: getDashboardData(appModules.data)(state),
 })
 

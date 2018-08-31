@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import { assocSurveyProp, assocSurveyPropValidation } from '../../common/survey/survey'
 
-import { getCurrentSurvey, getCurrentSurveyId, getNewSurvey } from './surveyState'
+import { getSurvey, getSurveyId, getNewSurvey } from './surveyState'
 import { nodeDefUpdate } from './nodeDef/actions'
 import { debounceAction } from '../appUtils/reduxUtils'
 
@@ -59,7 +59,7 @@ export const resetNewSurvey = () => dispatch => dispatch({type: surveyNewUpdate,
 
 export const fetchRootNodeDef = (draft = false) => async (dispatch, getState) => {
   try {
-    const surveyId = getCurrentSurveyId(getState())
+    const surveyId = getSurveyId(getState())
     const {data} = await axios.get(`/api/survey/${surveyId}/rootNodeDef?draft=${draft}`)
     dispatch({type: nodeDefUpdate, ...data})
 
@@ -71,7 +71,7 @@ export const fetchRootNodeDef = (draft = false) => async (dispatch, getState) =>
 export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
 
   const survey = R.pipe(
-    getCurrentSurvey,
+    getSurvey,
     assocSurveyProp(key, value),
     assocSurveyPropValidation(key, null)
   )(getState())

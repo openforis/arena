@@ -3,7 +3,7 @@ import axios from 'axios'
 import { debounceAction } from '../../appUtils/reduxUtils'
 import { newNodeDef, isNodeDefEntity } from '../../../common/survey/nodeDef'
 import { getPageUUID } from '../../../common/survey/nodeDefLayout'
-import { getCurrentSurveyId } from '../surveyState'
+import { getSurveyId } from '../surveyState'
 
 /**
  * ==== NODE DEFS
@@ -17,7 +17,7 @@ export const nodeDefValidationUpdate = 'nodeDef/validation/updated'
 
 export const createNodeDef = (parentId, type, props) => async (dispatch, getState) => {
   try {
-    const surveyId = getCurrentSurveyId(getState())
+    const surveyId = getSurveyId(getState())
     const nodeDef = newNodeDef(surveyId, parentId, type, props)
     dispatch({type: nodeDefUpdate, nodeDef})
     //setting current editing nodeDef

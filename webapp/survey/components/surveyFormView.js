@@ -10,7 +10,7 @@ import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
 import { getRootNodeDef } from '../../../common/survey/survey'
 import { getRootNode } from '../../../common/record/record'
-import { getSurveyState, getCurrentSurvey, getFormNodeDefViewPage } from '../surveyState'
+import { getSurvey, getFormNodeDefViewPage } from '../surveyState'
 import { getRecord } from '../record/recordState'
 
 import { fetchRootNodeDef } from '../actions'
@@ -91,12 +91,15 @@ SurveyFormView.defaultProps = {
   rootNode: null,
 }
 
-const mapStateToProps = (state, props) => ({
-  survey: getCurrentSurvey(state),
-  rootNodeDef: getRootNodeDef(getSurveyState(state)),
-  nodeDef: getFormNodeDefViewPage(state),
-  rootNode: props.entry ? getRootNode(getRecord(state)) : null,
-})
+const mapStateToProps = (state, props) => {
+  const survey = getSurvey(state)
+  return {
+    survey,
+    rootNodeDef: getRootNodeDef(survey),
+    nodeDef: getFormNodeDefViewPage(state),
+    rootNode: props.entry ? getRootNode(getRecord(state)) : null,
+  }
+}
 
 export default connect(
   mapStateToProps,

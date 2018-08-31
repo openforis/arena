@@ -20,7 +20,7 @@ import {
   isRenderTable,
 } from '../../../../../common/survey/nodeDefLayout'
 
-import { getSurveyState } from '../../../surveyState'
+import { getSurvey } from '../../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, } from '../../actions'
 
@@ -180,7 +180,7 @@ NodeDefEntity.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => ({
-  children: getNodeDefChildren(props.nodeDef)(getSurveyState(state)),
+  children: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
 })
 
 export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren})(NodeDefEntity)

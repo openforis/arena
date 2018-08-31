@@ -8,7 +8,7 @@ import { appModules } from '../appModules'
 import { normalizeName } from './../../../common/survey/surveyUtils'
 import { getFieldValidation } from './../../../common/validation/validator'
 
-import { getCurrentSurvey, getNewSurvey } from '../../survey/surveyState'
+import { getSurvey, getNewSurvey } from '../../survey/surveyState'
 import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
 
 import { Input } from '../../commonComponents/form/input'
@@ -91,7 +91,7 @@ class AppHomeView extends React.Component {
 
 const mapStateToProps = state => ({
   newSurvey: getNewSurvey(state),
-  currentSurvey: getCurrentSurvey(state),
+  currentSurvey: getSurvey(state),
 })
 
 export default withRouter(connect(

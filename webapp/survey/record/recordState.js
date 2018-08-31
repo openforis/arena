@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import { getSurveyState } from '../surveyState'
+import { getSurvey } from '../surveyState'
 import {
   assocNodes as assocRecordNodes,
   deleteNode as deleteRecordNode,
@@ -18,7 +18,7 @@ const record = 'record'
  * ======
  */
 export const getRecord = R.pipe(
-  getSurveyState,
+  getSurvey,
   R.prop(record),
 )
 
