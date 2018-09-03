@@ -56,7 +56,7 @@ class SurveyFormView extends React.Component {
             <FormNavigation rootNodeDef={rootNodeDef} edit={edit} draft={draft}/>
 
             {
-              nodeDef
+              nodeDef && (edit || (entry && rootNode))
                 ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft}
                                  entry={entry} node={rootNode}/>
                 : <div></div>

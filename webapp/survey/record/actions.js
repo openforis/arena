@@ -7,7 +7,8 @@ import { getSurvey } from '../surveyState'
 import { getSurveyDefaultStep } from '../../../common/survey/survey'
 import { appState } from '../../app/app'
 
-import { newRecord, newNode } from '../../../common/record/record'
+import { newRecord } from '../../../common/record/record'
+import { isNodeValueNotBlank } from '../../../common/record/node'
 
 export const recordUpdate = 'survey/record/update'
 export const nodesUpdate = 'survey/record/node/update'
@@ -39,10 +40,26 @@ export const createRecord = () => async (dispatch, getState) => {
   }
 }
 
-export const addNode = (nodeDef, node) => async dispatch => {
+export const updateNode = (nodeDef, node, value) => async dispatch => {
+  if (node.placeholder) {
+    if (isNodeValueNotBlank(value)) {
+      dispatch(addNode(nodeDef, node, value))
+    }
+  } else {
+    dispatch(updateNodeValue(nodeDef, node, value))
+  }
+}
+
+const addNode = (nodeDef, node, value) => async dispatch => {
   try {
-    dispatchNodesUpdate(dispatch, {[node.uuid]: node})
-    const {data} = await axios.post(`/api/survey/${nodeDef.surveyId}/record/${node.recordId}/node`, node)
+    const nodeToAdd = R.pipe(
+      R.dissoc('placeholder'),
+      R.assoc('value', value)
+    )(node)
+
+    dispatchNodesUpdate(dispatch, {[nodeToAdd.uuid]: nodeToAdd})
+
+    const {data} = await axios.post(`/api/survey/${nodeDef.surveyId}/record/${nodeToAdd.recordId}/node`, nodeToAdd)
     dispatch({type: nodesUpdate, nodes: data.nodes})
   } catch (e) {
     console.log(e)
@@ -54,7 +71,7 @@ export const addNode = (nodeDef, node) => async dispatch => {
  * UPDATE
  * ============
  */
-export const updateNodeValue = (nodeDef, node, value) => dispatch => {
+const updateNodeValue = (nodeDef, node, value) => dispatch => {
   dispatchNodesUpdate(dispatch, {[node.uuid]: R.assoc('value', value, node)})
   dispatch(_updateNodeValue(nodeDef, node, value))
 }
