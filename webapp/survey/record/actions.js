@@ -8,7 +8,7 @@ import { getSurveyDefaultStep } from '../../../common/survey/survey'
 import { appState } from '../../app/app'
 
 import { newRecord } from '../../../common/record/record'
-import { isNotBlank } from '../../../common/stringUtils'
+import { isNodeValueNotBlank } from '../../../common/record/node'
 
 export const recordUpdate = 'survey/record/update'
 export const nodesUpdate = 'survey/record/node/update'
@@ -40,9 +40,9 @@ export const createRecord = () => async (dispatch, getState) => {
   }
 }
 
-export const updateNode =  (nodeDef, node, value) => async dispatch => {
+export const updateNode = (nodeDef, node, value) => async dispatch => {
   if (node.placeholder) {
-    if (isNotBlank(value)) {
+    if (isNodeValueNotBlank(value)) {
       dispatch(addNode(nodeDef, node, value))
     }
   } else {

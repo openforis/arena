@@ -26,8 +26,8 @@ const newNode = (nodeDefId, recordId, parentId = null, placeholder = false ,valu
   }
 }
 
-const newNodePlaceholder = (nodeDef, parentNode) =>
-  newNode(nodeDef.id, parentNode.recordId, parentNode.id, true)
+const newNodePlaceholder = (nodeDef, parentNode, value = null) =>
+  newNode(nodeDef.id, parentNode.recordId, parentNode.id, true, value)
 
 // ====== READ
 const getNodes = R.pipe(
