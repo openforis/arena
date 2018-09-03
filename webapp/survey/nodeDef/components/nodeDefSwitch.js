@@ -14,7 +14,7 @@ import { isNodeDefFormLocked } from '../../surveyState'
 import { getRecord } from '../../record/recordState'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
-import { updateNodeValue, addNode, removeNode } from '../../record/actions'
+import { updateNode, removeNode } from '../../record/actions'
 
 import { getNodeDefComponent } from './nodeDefSystemProps'
 
@@ -129,6 +129,6 @@ export default connect(
   mapStateToProps,
   {
     setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
-    updateNodeValue, addNode, removeNode,
+    updateNode, removeNode,
   }
 )(NodeDefSwitch)

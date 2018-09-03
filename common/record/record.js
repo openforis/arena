@@ -15,17 +15,19 @@ const newRecord = (user, surveyId, step) => {
   }
 }
 
-const newNode = (nodeDefId, recordId, parentId = null, value = null) => {
+const newNode = (nodeDefId, recordId, parentId = null, placeholder = false ,value = null) => {
   return {
     uuid: uuidv4(),
     nodeDefId,
     recordId,
     parentId,
+    placeholder,
     value,
   }
 }
 
-const addNode = node => R.assocPath(['nodes', node.uuid], node)
+const newNodePlaceholder = (nodeDef, parentNode) =>
+  newNode(nodeDef.id, parentNode.recordId, parentNode.id, true)
 
 // ====== READ
 const getNodes = R.pipe(
@@ -56,7 +58,7 @@ const getRootNode = R.pipe(
   R.head,
 )
 
-const getNodeValue = (node, defaultValue = {}) => R.pipe(
+const getNodeValue = (node = {}, defaultValue = {}) => R.pipe(
   R.prop('value'),
   R.defaultTo(defaultValue)
 )(node)
@@ -82,7 +84,7 @@ module.exports = {
   // ====== CREATE
   newRecord,
   newNode,
-  addNode,
+  newNodePlaceholder,
 
 // ====== READ
   getNodes,
