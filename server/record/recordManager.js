@@ -4,7 +4,7 @@ const Promise = require('bluebird')
 const db = require('../db/db')
 
 const {fetchNodeDefsBySurveyId, fetchNodeDefsByParentId} = require('../nodeDef/nodeDefRepository')
-const {isNodeDefEntity, isNodeDefMultiple} = require('../../common/survey/nodeDef')
+const {isNodeDefSingleEntity} = require('../../common/survey/nodeDef')
 
 const {insertRecord} = require('../record/recordRepository')
 const {newNode} = require('../../common/record/record')
@@ -39,15 +39,16 @@ const createNode = async (nodeDef, nodeReq, client = db) => {
   // insert node
   const node = await insertNode(nodeDef.surveyId, nodeReq, client)
 
-  // insert children if single entity
-  const childDefs = isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
+  // fetch children if single entity
+  const childDefs = isNodeDefSingleEntity(nodeDef)
     ? await fetchNodeDefsByParentId(nodeDef.id)
     : []
 
+  // insert only child single entities
   const childNodes = R.mergeAll(
     await Promise.all(
       childDefs
-        .filter(childDef => !isNodeDefMultiple(childDef))
+        .filter(isNodeDefSingleEntity)
         .map(
           async childDef => await createNode(childDef, newNode(childDef.id, node.recordId, node.id), client)
         )

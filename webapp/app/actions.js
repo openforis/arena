@@ -1,5 +1,4 @@
 import axios from 'axios'
-import * as R from 'ramda'
 
 import { systemStatus } from './app'
 import { dispatchCurrentSurveyUpdate } from '../survey/actions'
