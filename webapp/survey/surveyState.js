@@ -30,6 +30,7 @@ export const getNewSurvey = R.pipe(
  * Survey-Form State
  * ======================
  */
+
 // CURRENT VIEW NODE_DEF PAGE
 const nodeDefViewPage = ['form', 'nodeDefViewPage']
 export const assocFormNodeDefViewPage = nodeDef =>

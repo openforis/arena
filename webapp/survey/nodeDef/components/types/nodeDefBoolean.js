@@ -43,15 +43,15 @@ const NodeDefBoolean = props => {
     <NodeDefFormItem {...props}>
       <div className="form-input" style={{borderBottom: 'none'}}>
 
-        <Button disabled={edit}
+        <Button {...props}
+                disabled={edit}
                 label="YES"
-                value="true"
-                {...props}/>
+                value="true"/>
 
-        <Button disabled={edit}
+        <Button {...props}
+                disabled={edit}
                 label="NO"
-                value="false"
-                {...props}/>
+                value="false"/>
 
       </div>
     </NodeDefFormItem>

@@ -4,8 +4,7 @@ import * as R from 'ramda'
 import { Input } from '../../../../commonComponents/form/input'
 import NodeDefFormItem from './nodeDefFormItem'
 
-import { getSurveyDefaultLanguage } from '../../../../../common/survey/survey'
-import { isNodeDefMultiple, getNodeDefLabel } from '../../../../../common/survey/nodeDef'
+import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/node'
@@ -62,9 +61,9 @@ const NodeDefText = props => {
                    gridTemplateColumns: '.9fr .1fr'
                  }}>
 
-              <NodeDefTextInput node={n} {...props} />
+              <NodeDefTextInput {...props} node={n}/>
 
-              <NodeDefDeleteButton node={n} {...props} />
+              <NodeDefDeleteButton {...props} node={n}/>
 
             </div>
           )

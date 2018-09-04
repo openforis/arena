@@ -19,9 +19,10 @@ import {
   isRenderForm,
   isRenderTable,
 } from '../../../../../common/survey/nodeDefLayout'
+
 import { newNodePlaceholder } from '../../../../../common/record/node'
 
-const TableRow = (props) => {
+const EntityTableRow = (props) => {
 
   const {nodeDef, edit, childDefs, parentNode, renderType, label} = props
 
@@ -33,7 +34,7 @@ const TableRow = (props) => {
 
       <div className="form-label" style={{justifySelf: 'center'}}>
         {label}
-        </div>
+      </div>
 
       <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                             autoSize={false}
@@ -101,12 +102,12 @@ class NodeDefEntityTable extends React.Component {
     return (
       <React.Fragment>
 
-        <TableRow {...this.props} parentNode={null} renderType={nodeDefRenderType.tableHeader}/>
+        <EntityTableRow {...this.props} parentNode={null} renderType={nodeDefRenderType.tableHeader}/>
 
         {
           entry
             ? nodesToRender.map(node =>
-              <TableRow {...this.props} parentNode={node} renderType={nodeDefRenderType.tableBody}/>
+              <EntityTableRow {...this.props} parentNode={node} renderType={nodeDefRenderType.tableBody}/>
             )
             : null
         }

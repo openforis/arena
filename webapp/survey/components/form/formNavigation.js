@@ -11,7 +11,6 @@ import { setFormNodeDefViewPage } from '../../nodeDef/actions'
 const FormNavigationItem = (props) => {
   const {
     nodeDef,
-    draft,
     children,
     currentPageNodeDef = {},
     //actions
@@ -36,7 +35,7 @@ const FormNavigationItem = (props) => {
 
       {
         outerPageChildren.map((child, i) =>
-          <FormNavigationItemConnect key={child.uuid} nodeDef={child} draft={draft} level={level + 1}/>
+          <FormNavigationItemConnect key={child.uuid} nodeDef={child} level={level + 1}/>
         )
       }
 

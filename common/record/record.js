@@ -44,11 +44,6 @@ const getRootNode = R.pipe(
   R.head,
 )
 
-const getNodeValue = (node = {}, defaultValue = {}) => R.pipe(
-  R.prop('value'),
-  R.defaultTo(defaultValue)
-)(node)
-
 // ====== UPDATE
 
 const assocNodes = nodes =>

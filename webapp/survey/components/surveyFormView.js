@@ -34,13 +34,9 @@ class SurveyFormView extends React.Component {
 
   render () {
     const {
-      survey,
-
       rootNodeDef,
       nodeDef,
       edit,
-      draft,
-      // data entry mode props
       entry,
       rootNode
     } = this.props
@@ -57,12 +53,11 @@ class SurveyFormView extends React.Component {
 
           <div className={`survey-form${edit ? ' edit' : ''}`}>
 
-            <FormNavigation rootNodeDef={rootNodeDef} edit={edit} draft={draft}/>
+            <FormNavigation {...this.props}/>
 
             {
               nodeDef && (edit || (entry && rootNode))
-                ? <NodeDefSwitch {...this.props}
-                                 nodes={[rootNode]}/>
+                ? <NodeDefSwitch {...this.props} />
                 : <div></div>
             }
 
@@ -97,6 +92,7 @@ SurveyFormView.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
+
   return {
     survey,
     rootNodeDef: getRootNodeDef(survey),
