@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import { getSurveyDefaultLanguage } from '../../../../../common/survey/survey'
 import { getNodeDefLabel } from '../../../../../common/survey/nodeDef'
 
-import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/record'
+import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/node'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 

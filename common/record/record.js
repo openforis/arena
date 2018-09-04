@@ -15,20 +15,6 @@ const newRecord = (user, surveyId, step) => {
   }
 }
 
-const newNode = (nodeDefId, recordId, parentId = null, placeholder = false ,value = null) => {
-  return {
-    uuid: uuidv4(),
-    nodeDefId,
-    recordId,
-    parentId,
-    placeholder,
-    value,
-  }
-}
-
-const newNodePlaceholder = (nodeDef, parentNode, value = null) =>
-  newNode(nodeDef.id, parentNode.recordId, parentNode.id, true, value)
-
 // ====== READ
 const getNodes = R.pipe(
   R.prop(nodes),
@@ -83,20 +69,14 @@ const deleteNode = node =>
 module.exports = {
   // ====== CREATE
   newRecord,
-  newNode,
-  newNodePlaceholder,
 
-// ====== READ
+  // ====== READ
   getNodes,
   getNodesArray,
-  getNodeChildren,
-  getNodesByParentId,
   getRootNode,
-  getNodeValue,
   getNodeChildrenByDefId,
 
   // ====== UPDATE
-
   assocNodes,
 
   // ====== DELETE

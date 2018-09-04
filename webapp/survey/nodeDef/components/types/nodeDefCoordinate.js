@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { newNodePlaceholder } from '../../../../../common/record/record'
+import { newNodePlaceholder } from '../../../../../common/record/node'
 import { getSurveySrs } from '../../../../../common/survey/survey'
 import { toSrsItems } from '../../../../../common/app/srs'
 

@@ -14,6 +14,8 @@ import {
   isNodeDefMultiple,
   canNodeDefBeMultiple,
 } from '../../../../../common/survey/nodeDef'
+import { isRenderTable } from '../../../../../common/survey/nodeDefLayout'
+
 import { normalizeName } from './../../../../../common/survey/surveyUtils'
 
 import { getValidation, getFieldValidation } from './../../../../../common/validation/validator'
@@ -59,6 +61,7 @@ class CommonProps extends React.Component {
           canNodeDefBeMultiple(nodeDef)
             ? <FormItem label={'multiple'}>
               <Checkbox checked={isNodeDefMultiple(nodeDef)}
+                        disabled={isRenderTable(nodeDef)}
                         onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
             </FormItem>
             : null

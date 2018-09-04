@@ -7,7 +7,6 @@ import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import NodeDefSwitch from '../nodeDefSwitch'
-import NodeDefEntityTable from './nodeDefEntityTable'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -27,7 +26,7 @@ import { getSurvey } from '../../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, } from '../../actions'
 
-class NodeDefEntity extends React.Component {
+class NodeDefEntityTable extends React.Component {
 
   constructor () {
     super()
@@ -87,61 +86,56 @@ class NodeDefEntity extends React.Component {
       parentNode,
       node,
     } = this.props
-    const columns = getNoColumns(nodeDef)
-    const rdgLayout = getLayout(nodeDef)
 
     const innerPageChildren = filterInnerPageChildren(children)
 
-    const l = [
-      {w: 1, h: 1, x: 0, y: 0, i: '24739212-9fe4-4521-941c-d84ca83b16f9', moved: false, static: false},
-      {w: 1, h: 1, x: 1, y: 0, i: '2b031ea5-b286-45c7-8e11-df6baf7629c1', moved: false, static: false},
-      {w: 1, h: 1, x: 2, y: 0, i: '647a635d-6357-4e78-96a7-8cf1f13b8f47', moved: false, static: false},
-    ]
 
     return (
-      isRenderForm(nodeDef) && this.hasChildren() ?
+      <div style={{
+        display: 'grid',
+        gridTemplateRows: '20px 1fr',
+      }}>
+        <div className="form-label" style={{justifySelf: 'center'}}>{nodeDef.props.name}</div>
         <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                               autoSize={false}
                               rowHeight={edit ? 80 : 60}
-                              cols={{lg: columns, md: columns, sm: columns, xs: 1, xxs: 1}}
-                              containerPadding={edit ? [20, 50] : [20, 20]}
-                              layouts={{
-                                lg: rdgLayout,
-                                md: rdgLayout,
-                                sm: rdgLayout,
+                              cols={{
+                                lg: innerPageChildren.length || 1,
+                                md: innerPageChildren.length || 1,
+                                sm: innerPageChildren.length || 1,
+                                xs: 1,
+                                xxs: 1
                               }}
-                              onLayoutChange={this.onLayoutChange}
-                              isDraggable={edit && !locked}
-                              isResizable={edit && !locked}
-          //TODO decide if verticalCompact
-                              compactType={'vertical'}>
-
+                              containerPadding={edit ? [0, 30] : [0, 0]}
+          // layouts={{}}
+          //                     onLayoutChange={this.onLayoutChange}
+          //                     isDraggable={edit && !locked}
+                              isDraggable={false}
+                              isResizable={false}
+                              compactType={'horizontal'}
+                              margin={[0, 0]}>
           {
             innerPageChildren
               .map((childDef, i) =>
-                <div key={childDef.uuid}>
-                  <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}
-                                 entry={entry} parentNode={node}/>
+                <div key={childDef.uuid} data-grid={{
+                  i: nodeDef.uuid, x: i, y: 0, w: 1, h: 1,
+                }}>
+                  <NodeDefSwitch key={i}
+                                 nodeDef={childDef}
+                                 edit={edit}
+                                 draft={draft}
+                                 render={render}
+                                 parentNode={node}
+                                 renderType={nodeDefRenderType.tableHeader}/>
                 </div>
               )
           }
 
-        </ResponsiveGridLayout>
 
-        : isRenderTable(nodeDef) ? <NodeDefEntityTable {...this.props}/>
-        : null
+        </ResponsiveGridLayout>
+      </div>
     )
   }
 }
 
-NodeDefEntity.defaultProps = {
-  entityDef: {},
-  draft: false,
-  edit: false,
-}
-
-const mapStateToProps = (state, props) => ({
-  children: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
-})
-
-export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren})(NodeDefEntity)
+export default NodeDefEntityTable

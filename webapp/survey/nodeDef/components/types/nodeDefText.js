@@ -7,7 +7,8 @@ import NodeDefFormItem from './nodeDefFormItem'
 import { getSurveyDefaultLanguage } from '../../../../../common/survey/survey'
 import { isNodeDefMultiple, getNodeDefLabel } from '../../../../../common/survey/nodeDef'
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
-import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/record'
+
+import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/node'
 import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
 
 const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
