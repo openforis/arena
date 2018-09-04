@@ -1,7 +1,6 @@
 import '../react-grid-layout.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
@@ -76,20 +75,6 @@ const TableRow = (props) => {
 }
 
 class NodeDefEntityTable extends React.Component {
-
-  // constructor () {
-  //   super()
-  //   this.onLayoutChange = this.onLayoutChange.bind(this)
-  // }
-
-//   onLayoutChange (layout) {
-//     const {nodeDef, edit, locked, putNodeDefProp} = this.props
-//
-// //console.log(window.innerWidth) ||
-//     edit && !locked && window.innerWidth > 1200 && layout.length > 0
-//       ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
-//       : null
-//   }
 
   render () {
     const {

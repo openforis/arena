@@ -4,7 +4,7 @@ import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import { nodeDefType } from '../../../../common/survey/nodeDef'
 
-import NodeDefEntity from './types/nodeDefEntity'
+import NodeDefEntitySwitch from './types/nodeDefEntitySwitch'
 import NodeDefFile from './types/nodeDefFile'
 import NodeDefTaxon from './types/nodeDefTaxon'
 import NodeDefCoordinate from './types/nodeDefCoordinate'
@@ -101,7 +101,7 @@ export const nodeDefSystemProps = {
   },
 
   [nodeDefType.entity]: {
-    component: NodeDefEntity,
+    component: NodeDefEntitySwitch,
     icon: <span className="icon icon-table2 icon-left"/>,
   },
 
