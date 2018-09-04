@@ -14,7 +14,7 @@ class NodeDefCodeList extends React.Component {
       {key: '3', value: 'Value 3'},
     ]
     return (
-      <NodeDefFormItem nodeDef={nodeDef}>
+      <NodeDefFormItem {...this.props}>
         <InputChips readOnly={edit} items={items}/>
       </NodeDefFormItem>
     )

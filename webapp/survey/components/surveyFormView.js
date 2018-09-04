@@ -19,7 +19,9 @@ import { setFormNodeDefViewPage } from '../nodeDef/actions'
 class SurveyFormView extends React.Component {
 
   componentDidMount () {
-    const {fetchRootNodeDef, edit} = this.props
+    const {fetchRootNodeDef, setFormNodeDefViewPage, edit} = this.props
+
+    setFormNodeDefViewPage(null)
     fetchRootNodeDef(edit)
   }
 
@@ -32,6 +34,8 @@ class SurveyFormView extends React.Component {
 
   render () {
     const {
+      survey,
+
       rootNodeDef,
       nodeDef,
       edit,
@@ -57,7 +61,7 @@ class SurveyFormView extends React.Component {
 
             {
               nodeDef && (edit || (entry && rootNode))
-                ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft}
+                ? <NodeDefSwitch survey={survey} nodeDef={nodeDef} edit={edit} draft={draft}
                                  entry={entry} node={rootNode}/>
                 : <div></div>
             }

@@ -37,6 +37,7 @@ const newNodeDef = (surveyId, parentId, type, props) => ({
 // ==== READ
 
 const getNodeDefType = R.prop('type')
+const getNodeDefName = getProp('name', '')
 
 const isNodeDefKey = R.pipe(getProp('key'), R.equals(true))
 const isNodeDefMultiple = R.pipe(getProp('multiple'), R.equals(true))
@@ -55,6 +56,14 @@ const canNodeDefBeMultiple = nodeDef =>
     [nodeDefType.decimal, nodeDefType.codeList, nodeDefType.file, nodeDefType.integer, nodeDefType.text]
   )
 
+const getNodeDefLabel = (nodeDef, lang) =>{
+  const label = R.path(['props','labels',lang], nodeDef)
+  return R.defaultTo(
+    getNodeDefName(nodeDef),
+    label
+  )
+}
+
 module.exports = {
   nodeDefType,
 
@@ -63,7 +72,7 @@ module.exports = {
 
   //READ
   getNodeDefType,
-  getNodeDefName: getProp('name', ''),
+  getNodeDefName,
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
@@ -76,4 +85,5 @@ module.exports = {
 
   //UTILS
   canNodeDefBeMultiple,
+  getNodeDefLabel,
 }

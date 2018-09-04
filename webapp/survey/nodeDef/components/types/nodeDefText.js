@@ -4,7 +4,9 @@ import * as R from 'ramda'
 import { Input } from '../../../../commonComponents/form/input'
 import NodeDefFormItem from './nodeDefFormItem'
 
-import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
+import { getSurveyDefaultLanguage } from '../../../../../common/survey/survey'
+import { isNodeDefMultiple, getNodeDefLabel } from '../../../../../common/survey/nodeDef'
+import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/record'
 import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
 
@@ -31,10 +33,15 @@ const NodeDefDeleteButton = ({nodeDef, node, removeNode}) =>
 
 const NodeDefText = props => {
 
-  const {edit, nodeDef, nodes, parentNode} = props
+  const {survey, edit, nodeDef, nodes, parentNode, renderType} = props
 
-  if(edit)
-    return <NodeDefFormItem nodeDef={nodeDef}>
+  if (renderType === nodeDefRenderType.tableHeader) {
+    const lang = getSurveyDefaultLanguage(survey)
+    return <label className="node-def__table-header">{getNodeDefLabel(nodeDef, lang)}</label>
+  }
+
+  if (edit)
+    return <NodeDefFormItem {...props}>
       <NodeDefTextInput {...props} />
     </NodeDefFormItem>
 
@@ -43,7 +50,7 @@ const NodeDefText = props => {
     : nodes
 
   return (
-    <NodeDefFormItem nodeDef={nodeDef}>
+    <NodeDefFormItem {...props}>
       <div className="overflowYAuto">
         {
           nodesToRender.map(n =>

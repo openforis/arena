@@ -9,7 +9,7 @@ class NodeDefTaxon extends React.Component {
     const {nodeDef, draft, edit} = this.props
 
     return (
-      <NodeDefFormItem nodeDef={nodeDef}>
+      <NodeDefFormItem {...this.props}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr'

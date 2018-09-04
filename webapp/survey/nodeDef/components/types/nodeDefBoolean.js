@@ -1,7 +1,12 @@
 import React from 'react'
 import * as R from 'ramda'
 
+import { getSurveyDefaultLanguage } from '../../../../../common/survey/survey'
+import { getNodeDefLabel } from '../../../../../common/survey/nodeDef'
+
 import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/record'
+
+import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 import NodeDefFormItem from './nodeDefFormItem'
 
@@ -27,10 +32,15 @@ const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value,
 }
 
 const NodeDefBoolean = props => {
-  const {nodeDef, edit} = props
+  const {survey, edit, nodeDef, renderType} = props
+
+  if (renderType === nodeDefRenderType.tableHeader) {
+    const lang = getSurveyDefaultLanguage(survey)
+    return <label className="node-def__table-header">{getNodeDefLabel(nodeDef, lang)}</label>
+  }
 
   return (
-    <NodeDefFormItem nodeDef={nodeDef}>
+    <NodeDefFormItem {...props}>
       <div className="form-input" style={{borderBottom: 'none'}}>
 
         <Button disabled={edit}

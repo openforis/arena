@@ -10,12 +10,14 @@ import NodeDefSwitch from '../nodeDefSwitch'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-import {getNodeDefChildren} from '../../../../../common/survey/survey'
+import { getNodeDefChildren } from '../../../../../common/survey/survey'
 import {
   nodeDefLayoutProps,
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
+
+  nodeDefRenderType,
   isRenderForm,
   isRenderTable,
 } from '../../../../../common/survey/nodeDefLayout'
@@ -32,7 +34,7 @@ class NodeDefEntity extends React.Component {
   }
 
   componentDidMount () {
-    const {nodeDef, fetchNodeDefChildren, draft} = this.props
+    const {nodeDef} = this.props
 
     if (nodeDef.id)
       this.fetchChildren()
@@ -40,9 +42,10 @@ class NodeDefEntity extends React.Component {
 
   componentDidUpdate (prevProps, prevState, snapshot) {
     const {nodeDef} = this.props
+    const {id: nodeDefId} = nodeDef
     const prevNodeDefId = R.path(['nodeDef', 'id'], prevProps)
 
-    if (nodeDef.id !== prevNodeDefId)
+    if (nodeDefId && nodeDefId !== prevNodeDefId)
       this.fetchChildren()
   }
 
@@ -117,7 +120,7 @@ class NodeDefEntity extends React.Component {
               .map((childDef, i) =>
                 <div key={childDef.uuid}>
                   <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}
-                    entry={entry} parentNode={node} />
+                                 entry={entry} parentNode={node}/>
                 </div>
               )
           }
@@ -160,7 +163,8 @@ class NodeDefEntity extends React.Component {
                                    edit={edit}
                                    draft={draft}
                                    render={render}
-                                   parentNode={node} />
+                                   parentNode={node}
+                                   renderType={nodeDefRenderType.tableHeader}/>
                   </div>
                 )
             }

@@ -3,6 +3,7 @@ const R = require('ramda')
 const nodeDefRenderType = {
   form: 'form',
   table: 'table',
+  tableHeader: 'tableHeader',
 }
 
 const nodeDefLayoutPropertyName = 'props'
