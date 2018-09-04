@@ -13,11 +13,11 @@ import NodeDefFormItem from './nodeDefFormItem'
 class NodeDefCoordinate extends React.Component {
 
   handleInputChange (node, field, value) {
-    const {nodeDef, updateNode} = this.props
+    const {nodeDef, parentNode, updateNode} = this.props
 
     const newValue = R.assoc(field, value)(node.value)
 
-    updateNode(nodeDef, node, newValue)
+    updateNode(nodeDef, node, newValue, parentNode)
   }
 
   render () {

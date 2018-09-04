@@ -124,7 +124,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     locked: isNodeDefFormLocked(nodeDef)(state),
-    nodes: entry ? getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(state)) : [],
+    nodes: entry ? getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(survey)) : [],
     label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey))
   }
 }

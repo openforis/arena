@@ -44,6 +44,8 @@ const getRootNode = R.pipe(
   R.head,
 )
 
+const getNodeByUUID = uuid => R.path([nodes, uuid])
+
 // ====== UPDATE
 
 const assocNodes = nodes =>
@@ -68,8 +70,9 @@ module.exports = {
   // ====== READ
   getNodes,
   getNodesArray,
-  getRootNode,
   getNodeChildrenByDefId,
+  getRootNode,
+  getNodeByUUID,
 
   // ====== UPDATE
   assocNodes,

@@ -32,9 +32,13 @@ const EntityTableRow = (props) => {
       gridTemplateRows: '20px 1fr',
     }}>
 
-      <div className="form-label" style={{justifySelf: 'center'}}>
-        {label}
-      </div>
+      {
+        renderType === nodeDefRenderType.tableHeader ?
+          <div className="form-label" style={{justifySelf: 'center'}}>
+            {label}
+          </div>
+          : null
+      }
 
       <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                             autoSize={false}
@@ -106,8 +110,11 @@ class NodeDefEntityTable extends React.Component {
 
         {
           entry
-            ? nodesToRender.map(node =>
-              <EntityTableRow {...this.props} parentNode={node} renderType={nodeDefRenderType.tableBody}/>
+            ? nodesToRender.map((node,i) =>
+              <EntityTableRow key={i}
+                              {...this.props}
+                              parentNode={node}
+                              renderType={nodeDefRenderType.tableBody}/>
             )
             : null
         }

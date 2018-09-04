@@ -15,7 +15,7 @@ const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
          {...getNodeDefInputTextProps(nodeDef)}
          value={getNodeValue(node, '')}
          onChange={(e) =>
-           updateNode(nodeDef, node, e.target.value)
+           updateNode(nodeDef, node, e.target.value, parentNode)
          }
   />
 

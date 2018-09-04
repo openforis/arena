@@ -12,8 +12,12 @@ const FormNavigationItem = (props) => {
   const {
     nodeDef,
     childDefs,
+    node,
+    parentNode,
+
     level,
     isActive,
+
     setFormActivePage,
   } = props
 
@@ -25,7 +29,7 @@ const FormNavigationItem = (props) => {
       <button className={`btn btn-of-light${isActive ? ' active' : ''}`}
               onClick={() => {
                 // fetchNodeDefChildren(nodeDef.id, draft)
-                setFormActivePage(nodeDef)
+                setFormActivePage(nodeDef, node, parentNode)
               }}
               style={{height: `${100 - level * 10}%`}}>
         {nodeDef.props.name}
@@ -33,7 +37,12 @@ const FormNavigationItem = (props) => {
 
       {
         outerPageChildDefs.map((child, i) =>
-          <FormNavigationItemConnect key={child.uuid} nodeDef={child} level={level + 1}/>
+          <FormNavigationItemConnect key={child.uuid}
+                                     level={level + 1}
+                                     nodeDef={child}
+                                     node={{}}
+                                     parentNode={node}
+                                     />
         )
       }
 
@@ -51,14 +60,14 @@ const FormNavigationItemConnect = connect(
   {setFormActivePage}
 )(FormNavigationItem)
 
-const FormNavigation = ({rootNodeDef, draft}) => {
+const FormNavigation = ({rootNodeDef, rootNode}) => {
 
   return (
     <div className="survey-form__nav" style={{
       display: 'flex',
       alignItems: 'flex-end',
     }}>
-      <FormNavigationItemConnect nodeDef={rootNodeDef} level={0}/>
+      <FormNavigationItemConnect nodeDef={rootNodeDef} node={rootNode} level={0}/>
     </div>
   )
 }

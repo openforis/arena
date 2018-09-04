@@ -1,9 +1,6 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { getSurveyDefaultLanguage } from '../../../../../common/survey/survey'
-import { getNodeDefLabel } from '../../../../../common/survey/nodeDef'
-
 import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/node'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
@@ -23,7 +20,7 @@ const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value,
     <button className="btn btn-s btn-transparent"
             style={{borderRadius: '.75rem'}}
             aria-disabled={disabled}
-            onClick={() => updateNode(nodeDef, node, value)}>
+            onClick={() => updateNode(nodeDef, node, value, parentNode)}>
       <span className={`icon icon-radio-${nodeValue === value ? 'checked2' : 'unchecked'} icon-left`}/>
       {label}
     </button>

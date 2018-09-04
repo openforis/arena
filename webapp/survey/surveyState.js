@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import {
-  getNodeDefByUUID,
-} from '../../common/survey/survey'
+import { getNodeDefByUUID } from '../../common/survey/survey'
+import { getNodeByUUID } from '../../common/record/record'
+import { getRecord } from './record/recordState'
 
 const survey = 'survey'
 
@@ -45,6 +45,13 @@ export const getFormActivePageNodeDef = state => {
   const surveyState = getSurvey(state)
   const uuid = R.path(R.concat(surveyFormActivePage, ['nodeDefUUID']), surveyState)
   return getNodeDefByUUID(uuid)(surveyState)
+}
+
+export const getFormActivePageParentNode = state => {
+  const survey = getSurvey(state)
+  const record = getRecord(survey)
+  const uuid = R.path(R.concat(surveyFormActivePage, ['parentNodeUUID']), survey)
+  return getNodeByUUID(uuid)(record)
 }
 
 export const isNodeDefFormActivePage = nodeDef =>
