@@ -4,6 +4,7 @@ const nodeDefRenderType = {
   form: 'form',
   table: 'table',
   tableHeader: 'tableHeader',
+  tableBody: 'tableBody',
 }
 
 const nodeDefLayoutPropertyName = 'props'

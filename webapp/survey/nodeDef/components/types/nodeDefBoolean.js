@@ -32,12 +32,12 @@ const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value,
 }
 
 const NodeDefBoolean = props => {
-  const {survey, edit, nodeDef, renderType} = props
+  const {edit, renderType, label} = props
 
-  if (renderType === nodeDefRenderType.tableHeader) {
-    const lang = getSurveyDefaultLanguage(survey)
-    return <label className="node-def__table-header">{getNodeDefLabel(nodeDef, lang)}</label>
-  }
+  if (renderType === nodeDefRenderType.tableHeader)
+    return <label className="node-def__table-header">
+      {label}
+    </label>
 
   return (
     <NodeDefFormItem {...props}>

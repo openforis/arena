@@ -18,12 +18,10 @@ import {
   getLayout,
   getNoColumns,
 
-  nodeDefRenderType,
   isRenderForm,
   isRenderTable,
+  nodeDefRenderType,
 } from '../../../../../common/survey/nodeDefLayout'
-
-import { getSurvey } from '../../../surveyState'
 
 import { fetchNodeDefChildren, putNodeDefProp, } from '../../actions'
 
@@ -56,8 +54,8 @@ class NodeDefEntity extends React.Component {
   }
 
   hasChildren () {
-    const {children} = this.props
-    return children.length > 0
+    const {childDefs} = this.props
+    return childDefs.length > 0
   }
 
   onLayoutChange (layout) {
@@ -72,7 +70,7 @@ class NodeDefEntity extends React.Component {
   render () {
     const {
       nodeDef,
-      children,
+      childDefs,
 
       // form
       edit,
@@ -85,18 +83,14 @@ class NodeDefEntity extends React.Component {
       // data entry
       entry,
       parentNode,
-      node,
+      nodes,
     } = this.props
     const columns = getNoColumns(nodeDef)
     const rdgLayout = getLayout(nodeDef)
 
-    const innerPageChildren = filterInnerPageChildren(children)
+    const node = entry ? nodes[0] : null
 
-    const l = [
-      {w: 1, h: 1, x: 0, y: 0, i: '24739212-9fe4-4521-941c-d84ca83b16f9', moved: false, static: false},
-      {w: 1, h: 1, x: 1, y: 0, i: '2b031ea5-b286-45c7-8e11-df6baf7629c1', moved: false, static: false},
-      {w: 1, h: 1, x: 2, y: 0, i: '647a635d-6357-4e78-96a7-8cf1f13b8f47', moved: false, static: false},
-    ]
+    const innerPageChildren = filterInnerPageChildren(childDefs)
 
     return (
       isRenderForm(nodeDef) && this.hasChildren() ?
@@ -120,15 +114,17 @@ class NodeDefEntity extends React.Component {
             innerPageChildren
               .map((childDef, i) =>
                 <div key={childDef.uuid}>
-                  <NodeDefSwitch key={i} nodeDef={childDef} edit={edit} draft={draft} render={render}
-                                 entry={entry} parentNode={node}/>
+                  <NodeDefSwitch key={i}
+                                 {...this.props}
+                                 nodeDef={childDef}
+                                 parentNode={node}/>
                 </div>
               )
           }
 
         </ResponsiveGridLayout>
 
-        : isRenderTable(nodeDef) ? <NodeDefEntityTable {...this.props}/>
+        : isRenderTable(nodeDef) ? <NodeDefEntityTable {...this.props} />
         : null
     )
   }
@@ -141,7 +137,7 @@ NodeDefEntity.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => ({
-  children: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
+  childDefs: getNodeDefChildren(props.nodeDef)(props.survey),
 })
 
 export default connect(mapStateToProps, {putNodeDefProp, fetchNodeDefChildren})(NodeDefEntity)

@@ -34,11 +34,12 @@ const NodeDefDeleteButton = ({nodeDef, node, removeNode}) =>
 
 const NodeDefText = props => {
 
-  const {survey, edit, nodeDef, nodes, parentNode, renderType} = props
+  const {label, edit, nodeDef, nodes, parentNode, renderType} = props
 
   if (renderType === nodeDefRenderType.tableHeader) {
-    const lang = getSurveyDefaultLanguage(survey)
-    return <label className="node-def__table-header">{getNodeDefLabel(nodeDef, lang)}</label>
+    return <label className="node-def__table-header">
+      {label}
+    </label>
   }
 
   if (edit)

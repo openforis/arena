@@ -61,8 +61,8 @@ class SurveyFormView extends React.Component {
 
             {
               nodeDef && (edit || (entry && rootNode))
-                ? <NodeDefSwitch survey={survey} nodeDef={nodeDef} edit={edit} draft={draft}
-                                 entry={entry} node={rootNode}/>
+                ? <NodeDefSwitch {...this.props}
+                                 nodes={[rootNode]}/>
                 : <div></div>
             }
 
