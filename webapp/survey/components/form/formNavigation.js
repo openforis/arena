@@ -4,37 +4,35 @@ import { connect } from 'react-redux'
 import { getNodeDefChildren } from '../../../../common/survey/survey'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
 
-import { getFormNodeDefViewPage, getSurvey } from '../../surveyState'
+import { getFormActivePageNodeDef, getSurvey, isNodeDefFormActivePage } from '../../surveyState'
 
-import { setFormNodeDefViewPage } from '../../nodeDef/actions'
+import { setFormActivePage } from '../../nodeDef/actions'
 
 const FormNavigationItem = (props) => {
   const {
     nodeDef,
-    children,
-    currentPageNodeDef = {},
-    //actions
-    setFormNodeDefViewPage,
+    childDefs,
     level,
+    isActive,
+    setFormActivePage,
   } = props
 
-  const outerPageChildren = children ? filterOuterPageChildren(children) : []
+  const outerPageChildDefs = childDefs ? filterOuterPageChildren(childDefs) : []
 
-  const isActive = currentPageNodeDef.uuid === nodeDef.uuid
   return (
     <React.Fragment>
 
       <button className={`btn btn-of-light${isActive ? ' active' : ''}`}
               onClick={() => {
                 // fetchNodeDefChildren(nodeDef.id, draft)
-                setFormNodeDefViewPage(nodeDef)
+                setFormActivePage(nodeDef)
               }}
               style={{height: `${100 - level * 10}%`}}>
         {nodeDef.props.name}
       </button>
 
       {
-        outerPageChildren.map((child, i) =>
+        outerPageChildDefs.map((child, i) =>
           <FormNavigationItemConnect key={child.uuid} nodeDef={child} level={level + 1}/>
         )
       }
@@ -44,12 +42,13 @@ const FormNavigationItem = (props) => {
 }
 
 const mapStateToProps = (state, props) => ({
-  children: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
-  currentPageNodeDef: getFormNodeDefViewPage(state),
+  childDefs: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
+  currentPageNodeDef: getFormActivePageNodeDef(state),
+  isActive: isNodeDefFormActivePage(props.nodeDef)(getSurvey(state)),
 })
 const FormNavigationItemConnect = connect(
   mapStateToProps,
-  {setFormNodeDefViewPage}
+  {setFormActivePage}
 )(FormNavigationItem)
 
 const FormNavigation = ({rootNodeDef, draft}) => {
@@ -59,7 +58,7 @@ const FormNavigation = ({rootNodeDef, draft}) => {
       display: 'flex',
       alignItems: 'flex-end',
     }}>
-      <FormNavigationItemConnect nodeDef={rootNodeDef} draft={draft} level={0}/>
+      <FormNavigationItemConnect nodeDef={rootNodeDef} level={0}/>
     </div>
   )
 }

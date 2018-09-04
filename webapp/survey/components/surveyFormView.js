@@ -10,25 +10,25 @@ import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
 import { getRootNodeDef } from '../../../common/survey/survey'
 import { getRootNode } from '../../../common/record/record'
-import { getSurvey, getFormNodeDefViewPage } from '../surveyState'
+import { getSurvey, getFormActivePageNodeDef } from '../surveyState'
 import { getRecord } from '../record/recordState'
 
 import { fetchRootNodeDef } from '../actions'
-import { setFormNodeDefViewPage } from '../nodeDef/actions'
+import { setFormActivePage } from '../nodeDef/actions'
 
 class SurveyFormView extends React.Component {
 
   componentDidMount () {
-    const {fetchRootNodeDef, setFormNodeDefViewPage, edit} = this.props
+    const {fetchRootNodeDef, setFormActivePage, edit} = this.props
 
-    setFormNodeDefViewPage(null)
+    setFormActivePage(null)
     fetchRootNodeDef(edit)
   }
 
   componentDidUpdate () {
-    const {rootNodeDef, nodeDef, setFormNodeDefViewPage} = this.props
+    const {rootNodeDef, nodeDef, setFormActivePage} = this.props
     if (rootNodeDef && !nodeDef) {
-      setFormNodeDefViewPage(rootNodeDef)
+      setFormActivePage(rootNodeDef)
     }
   }
 
@@ -96,12 +96,12 @@ const mapStateToProps = (state, props) => {
   return {
     survey,
     rootNodeDef: getRootNodeDef(survey),
-    nodeDef: getFormNodeDefViewPage(state),
+    nodeDef: getFormActivePageNodeDef(state),
     rootNode: props.entry ? getRootNode(getRecord(state)) : null,
   }
 }
 
 export default connect(
   mapStateToProps,
-  {fetchRootNodeDef, setFormNodeDefViewPage}
+  {fetchRootNodeDef, setFormActivePage}
 )(SurveyFormView)

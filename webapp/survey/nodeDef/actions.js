@@ -26,7 +26,7 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
     if (isNodeDefEntity(nodeDef)) {
       dispatch(setFormNodeDefUnlocked(nodeDef))
       if (getPageUUID(nodeDef))
-        dispatch(setFormNodeDefViewPage(nodeDef))
+        dispatch(setFormActivePage(nodeDef))
     }
 
     const {data} = await axios.post(`/api/nodeDef`, nodeDef)
@@ -74,7 +74,8 @@ export const setFormNodDefEdit = nodeDef => dispatch => dispatch({type: formNode
 
 export const setFormNodeDefUnlocked = nodeDef => dispatch => dispatch({type: formNodeDefUnlockedUpdate, nodeDef})
 
-export const setFormNodeDefViewPage = nodeDef => dispatch => dispatch({type: formNodeDefViewPage, nodeDef})
+export const setFormActivePage = (nodeDef, node, parentNode) => dispatch =>
+  dispatch({type: formNodeDefViewPage, nodeDef, node, parentNode})
 
 export const closeFormNodeDefEdit = nodeDef => async dispatch => {
   const res = await axios.get(`/api/nodeDef/${nodeDef.id}/validation`)

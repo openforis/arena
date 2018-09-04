@@ -32,15 +32,23 @@ export const getNewSurvey = R.pipe(
  */
 
 // CURRENT VIEW NODE_DEF PAGE
-const nodeDefViewPage = ['form', 'nodeDefViewPage']
-export const assocFormNodeDefViewPage = nodeDef =>
-  R.assocPath(nodeDefViewPage, nodeDef ? nodeDef.uuid : null)
+const surveyFormActivePage = ['form', 'activePage']
 
-export const getFormNodeDefViewPage = state => {
+export const assocFormActivePage = (nodeDef, node = {}, parentNode = {}) =>
+  R.assocPath(surveyFormActivePage, nodeDef ? {
+    nodeDefUUID: nodeDef.uuid,
+    nodeUUID: node.uuid,
+    parentNodeUUID: parentNode.uuid,
+  } : null)
+
+export const getFormActivePageNodeDef = state => {
   const surveyState = getSurvey(state)
-  const uuid = R.path(nodeDefViewPage, surveyState)
+  const uuid = R.path(R.concat(surveyFormActivePage, ['nodeDefUUID']), surveyState)
   return getNodeDefByUUID(uuid)(surveyState)
 }
+
+export const isNodeDefFormActivePage = nodeDef =>
+  R.pathEq(R.concat(surveyFormActivePage, ['nodeDefUUID']), nodeDef.uuid)
 
 // CURRENT EDITING NODE_DEF
 const nodeDefEditPath = ['form', 'nodeDefEdit']
