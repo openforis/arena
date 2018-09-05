@@ -54,8 +54,7 @@ button, .btn {
   }
 }
 
-.btn[aria-disabled="true"],
-button[aria-disabled="true"] {
+*[aria-disabled="true"] {
   color: currentColor;
   display: inline-block; /* For IE11/ MS Edge bug */
   pointer-events: none;

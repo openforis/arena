@@ -9,6 +9,7 @@ import NodeDefSwitch from '../nodeDefSwitch'
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
+import { newNode } from '../../../../../common/record/node'
 
 import {
   nodeDefLayoutProps,
@@ -74,17 +75,64 @@ const EntityForm = props => {
   )
 }
 
+const NodeSelect = props => {
+  const {nodeDef, nodes, selectedNodeUUID, parentNode, addNode, onChange} = props
+
+  return (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+    }}>
+
+      <select aria-disabled={R.isEmpty(nodes)}
+              value={selectedNodeUUID || 'placeholder'}
+              onChange={e => onChange(e.target.value)}>
+        <option value='placeholder' disabled hidden={true}>Select</option>
+        {
+          nodes.map(n =>
+            <option key={n.uuid}
+                    value={n.uuid}>
+              {/*//TODO add key attribute*/}
+              {n.uuid}
+            </option>
+          )
+        }
+      </select>
+
+      <button className="btn btn-s btn-of-light-xs"
+              style={{marginLeft: '4px'}}
+              onClick={() => {
+                const entity = newNode(nodeDef.id, parentNode.recordId, parentNode.id)
+                addNode(nodeDef, entity)
+                onChange(entity.uuid)
+              }}>
+        <span className="icon icon-plus icon-16px icon-left"></span>
+        ADD
+      </button>
+
+    </div>
+  )
+}
+
 class NodeDefEntityForm extends React.Component {
+
+  constructor () {
+    super()
+    this.state = {selectedNodeUUID: null}
+  }
+
+  getSelectedNode () {
+    const {nodes} = this.props
+    const {selectedNodeUUID} = this.state
+    return selectedNodeUUID
+      ? R.find(R.propEq('uuid', selectedNodeUUID), nodes)
+      : null
+  }
 
   render () {
     const {
       nodeDef,
-      childDefs,
-
-      // form
       edit,
-
-      // data entry
       entry,
       nodes,
     } = this.props
@@ -95,14 +143,17 @@ class NodeDefEntityForm extends React.Component {
 
     // entry multiple entity
     if (entry && isNodeDefMultiple(nodeDef)) {
+      const node = this.getSelectedNode()
+
       return <div>
-        <select>
-          <option>a</option>
-        </select>
+
+        <NodeSelect {...this.props}
+                    selectedNodeUUID={this.state.selectedNodeUUID}
+                    onChange={selectedNodeUUID => this.setState({selectedNodeUUID})}/>
 
         {
-          this.state.node
-            ? <EntityForm {...this.props} node={this.state.node}/>
+          node
+            ? <EntityForm {...this.props} node={node}/>
             : null
         }
       </div>

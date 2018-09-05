@@ -50,7 +50,7 @@ export const updateNode = (nodeDef, node, value, parentNode) => async dispatch =
   }
 }
 
-const addNode = (nodeDef, node, value, parentNode = null) => async dispatch => {
+export const addNode = (nodeDef, node, value, parentNode = null) => async dispatch => {
   try {
     //TODO REFACTOR
     // add parent if not exist
