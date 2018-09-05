@@ -7,6 +7,7 @@ const {
 
   setProp,
 } = require('./surveyUtils')
+const {isNodeDefRoot} = require('./nodeDef')
 
 // == utils
 const nodeDefs = 'nodeDefs'
@@ -18,7 +19,9 @@ const defaultSteps = {
 }
 
 /**
- * ==== READ
+ * ======
+ * READ
+ * ======
  */
 const isSurveyPublished = R.pipe(
   R.prop('published'),
@@ -39,16 +42,25 @@ const getSurveyDefaultStep = R.pipe(
   R.head
 )
 
-// ** READ nodeDefs
+/**
+ * ======
+ * READ NodeDefs
+ * ======
+ */
 const getNodeDefs = R.pipe(R.prop(nodeDefs), R.defaultTo({}))
 
 const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
 const getNodeDefByUUID = uuid => R.pipe(getNodeDefs, R.prop(uuid))
 
+const getNodeDefById = id => R.pipe(
+  getNodeDefsArray,
+  R.find(R.propEq('id', id)),
+)
+
 const getNodeDefsByParentId = parentId => R.pipe(
   getNodeDefsArray,
-  R.filter(entityDef => entityDef.parentId === parentId),
+  R.filter(R.propEq('parentId', parentId)),
 )
 
 const getRootNodeDef = R.pipe(getNodeDefsByParentId(null), R.head)
@@ -56,13 +68,18 @@ const getRootNodeDef = R.pipe(getNodeDefsByParentId(null), R.head)
 const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
 
 /**
- * ==== UPDATE
+ * ======
+ * UPDATE
+ * ======
  */
 const assocSurveyPropValidation = (key, validation) =>
   R.assocPath(['validation', 'fields', key], validation)
 
-// UPDATE nodeDefs
-
+/**
+ * ======
+ * UPDATE NodeDefs
+ * ======
+ */
 const assocNodeDefs = newNodeDefsArray =>
   survey => R.pipe(
     R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
@@ -79,6 +96,23 @@ const assocNodeDefProp = (nodeDefUUID, key, value) => R.pipe(
 
 const assocNodeDefValidation = (nodeDefUUID, validation) =>
   R.assocPath([nodeDefs, nodeDefUUID, 'validation'], validation)
+
+/**
+ * ======
+ * UTILS NodeDefs
+ * ======
+ */
+const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
+  survey => {
+    if (isNodeDefRoot(nodeDefDescendant))
+      return false
+
+    const nodeDefParent = getNodeDefById(nodeDefDescendant.parentId)
+    if (nodeDefParent.id === nodeDefAncestor.id)
+      return true
+    else
+      return isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
+  }
 
 module.exports = {
   defaultSteps,
@@ -111,4 +145,6 @@ module.exports = {
 
   // UTILS
   getSurveyDBSchema: surveyId => `survey_${surveyId}`,
+  // UTILS NodeDefs
+  isNodeDefAncestor,
 }

@@ -4,11 +4,14 @@ import * as R from 'ramda'
 
 import { uuidv4 } from '../../../../common/uuid'
 
+import { isNodeDefAncestor } from '../../../../common/survey/survey'
 import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
-import { createNodeDef } from '../../nodeDef/actions'
 import { getNodeDefIconByType } from '../../nodeDef/components/nodeDefSystemProps'
+
 import { getNodeDefFormUnlocked, getFormActivePageNodeDef } from '../../surveyState'
+
+import { createNodeDef } from '../../nodeDef/actions'
 
 const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
   const isEntity = type === nodeDefType.entity
@@ -126,8 +129,11 @@ const mapStateToProps = state => {
   const nodeDefUnlocked = getNodeDefFormUnlocked(state)
   const nodeDefActivePage = getFormActivePageNodeDef(state)
 
-  const nodeDef = nodeDefUnlocked && nodeDefActivePage.uuid === nodeDefUnlocked.uuid
-    ? nodeDefUnlocked : null
+  const nodeDef =
+    nodeDefUnlocked &&
+    (nodeDefActivePage.uuid === nodeDefUnlocked.uuid || isNodeDefAncestor(nodeDefActivePage, nodeDefUnlocked))
+      ? nodeDefUnlocked
+      : null
 
   return {
     nodeDef
