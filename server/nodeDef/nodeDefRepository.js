@@ -55,16 +55,19 @@ const fetchNodeDef = async (nodeDefId = null, draft, client = db) =>
   )
 
 const fetchNodeDefsBySurveyId = async (surveyId, draft, client = db) =>
-  await client.map(`SELECT ${nodeDefSelectFields}
-     FROM node_def WHERE survey_id = $1`,
+  await client.map(`
+    SELECT ${nodeDefSelectFields}
+    FROM node_def WHERE survey_id = $1
+    ORDER BY id`,
     [surveyId],
     res => dbTransformCallback(res, draft)
   )
 
 const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
-  await client.map(
-    `SELECT ${nodeDefSelectFields}
-     FROM node_def WHERE parent_id = $1`,
+  await client.map(`
+    SELECT ${nodeDefSelectFields}
+    FROM node_def WHERE parent_id = $1
+    ORDER BY id`,
     [parentId],
     res => dbTransformCallback(res, draft)
   )
@@ -86,16 +89,16 @@ const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
 
 // ============== DELETE
 
-const markNodeDefDeleted = async (nodeDefId, client = db) => await client.one(
-  `
-  UPDATE node_def 
-  SET deleted = true
-  WHERE id = $1
-  RETURNING *
+const markNodeDefDeleted = async (nodeDefId, client = db) =>
+  await client.one(`
+    UPDATE node_def 
+    SET deleted = true
+    WHERE id = $1
+    RETURNING *
   `,
-  [nodeDefId],
-  camelize
-)
+    [nodeDefId],
+    res => dbTransformCallback(res, true)
+  )
 
 module.exports = {
   //utils
