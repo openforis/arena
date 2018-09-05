@@ -7,7 +7,7 @@ const {fetchNodeDefsBySurveyId, fetchNodeDefsByParentId} = require('../nodeDef/n
 const {isNodeDefSingleEntity} = require('../../common/survey/nodeDef')
 
 const {insertRecord} = require('../record/recordRepository')
-const {newNode} = require('../../common/record/record')
+const {newNode} = require('../../common/record/node')
 
 const {insertNode, updateNode, deleteNode: deleteNodeRepos} = require('../record/nodeRepository')
 

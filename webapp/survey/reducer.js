@@ -13,7 +13,7 @@ import {
 import {
   assocFormNodeDefEdit,
   assocNodeDefFormUnlocked,
-  assocFormNodeDefViewPage,
+  assocFormActivePage,
 } from './surveyState'
 
 /**
@@ -76,7 +76,7 @@ const actionHandlers = {
 
   [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocNodeDefFormUnlocked(nodeDef)(state),
 
-  [formNodeDefViewPage]: (state, {nodeDef}) => assocFormNodeDefViewPage(nodeDef)(state),
+  [formNodeDefViewPage]: (state, {nodeDef, node, parentNode}) => assocFormActivePage(nodeDef, node, parentNode)(state),
 
   //RECORD
   [recordUpdate]: assocActionProps,

@@ -1,42 +1,48 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getNodeDefChildren } from '../../../../common/survey/survey'
+import { getNodeDefChildren, getSurveyDefaultLanguage } from '../../../../common/survey/survey'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
 
-import { getFormNodeDefViewPage, getSurvey } from '../../surveyState'
+import { getFormActivePageNodeDef, getSurvey, isNodeDefFormActivePage } from '../../surveyState'
 
-import { setFormNodeDefViewPage } from '../../nodeDef/actions'
+import { setFormActivePage } from '../../nodeDef/actions'
+import { getNodeDefLabel } from '../../../../common/survey/nodeDef'
 
 const FormNavigationItem = (props) => {
   const {
     nodeDef,
-    draft,
-    children,
-    currentPageNodeDef = {},
-    //actions
-    setFormNodeDefViewPage,
+    childDefs,
+    node,
+    parentNode,
+    label,
     level,
+    isActive,
+    setFormActivePage,
   } = props
 
-  const outerPageChildren = children ? filterOuterPageChildren(children) : []
+  const outerPageChildDefs = childDefs ? filterOuterPageChildren(childDefs) : []
 
-  const isActive = currentPageNodeDef.uuid === nodeDef.uuid
   return (
     <React.Fragment>
 
       <button className={`btn btn-of-light${isActive ? ' active' : ''}`}
               onClick={() => {
                 // fetchNodeDefChildren(nodeDef.id, draft)
-                setFormNodeDefViewPage(nodeDef)
+                setFormActivePage(nodeDef, node, parentNode)
               }}
               style={{height: `${100 - level * 10}%`}}>
-        {nodeDef.props.name}
+        {label}
       </button>
 
       {
-        outerPageChildren.map((child, i) =>
-          <FormNavigationItemConnect key={child.uuid} nodeDef={child} draft={draft} level={level + 1}/>
+        outerPageChildDefs.map((child, i) =>
+          <FormNavigationItemConnect key={child.uuid}
+                                     level={level + 1}
+                                     nodeDef={child}
+                                     node={{}}
+                                     parentNode={node}
+          />
         )
       }
 
@@ -44,23 +50,31 @@ const FormNavigationItem = (props) => {
   )
 }
 
-const mapStateToProps = (state, props) => ({
-  children: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
-  currentPageNodeDef: getFormNodeDefViewPage(state),
-})
+const mapStateToProps = (state, props) => {
+  const survey = getSurvey(state)
+  const {nodeDef} = props
+
+  return {
+    childDefs: getNodeDefChildren(nodeDef)(survey),
+    currentPageNodeDef: getFormActivePageNodeDef(state),
+    isActive: isNodeDefFormActivePage(nodeDef)(survey),
+    label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey)),
+  }
+}
+
 const FormNavigationItemConnect = connect(
   mapStateToProps,
-  {setFormNodeDefViewPage}
+  {setFormActivePage}
 )(FormNavigationItem)
 
-const FormNavigation = ({rootNodeDef, draft}) => {
+const FormNavigation = ({rootNodeDef, rootNode}) => {
 
   return (
     <div className="survey-form__nav" style={{
       display: 'flex',
       alignItems: 'flex-end',
     }}>
-      <FormNavigationItemConnect nodeDef={rootNodeDef} draft={draft} level={0}/>
+      <FormNavigationItemConnect nodeDef={rootNodeDef} node={rootNode} level={0}/>
     </div>
   )
 }

@@ -7,16 +7,17 @@ import {
   getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
 
-import { isNodeDefRoot } from '../../../../common/survey/nodeDef'
+import { getNodeDefLabel, isNodeDefRoot } from '../../../../common/survey/nodeDef'
 import { getNodeChildrenByDefId } from '../../../../common/record/record'
 
-import { isNodeDefFormLocked } from '../../surveyState'
+import { getSurvey, isNodeDefFormLocked } from '../../surveyState'
 import { getRecord } from '../../record/recordState'
 
 import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
-import { updateNode, removeNode } from '../../record/actions'
+import { updateNode, addNode, removeNode } from '../../record/actions'
 
 import { getNodeDefComponent } from './nodeDefSystemProps'
+import { getSurveyDefaultLanguage } from '../../../../common/survey/survey'
 
 class NodeDefSwitch extends React.Component {
 
@@ -119,9 +120,12 @@ NodeDefSwitch.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const {nodeDef, parentNode, entry} = props
+  const survey = getSurvey(state)
+
   return {
     locked: isNodeDefFormLocked(nodeDef)(state),
-    nodes: entry ? getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(state)) : [],
+    nodes: entry ? getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(survey)) : [],
+    label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey))
   }
 }
 
@@ -129,6 +133,6 @@ export default connect(
   mapStateToProps,
   {
     setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
-    updateNode, removeNode,
+    updateNode, addNode, removeNode,
   }
 )(NodeDefSwitch)

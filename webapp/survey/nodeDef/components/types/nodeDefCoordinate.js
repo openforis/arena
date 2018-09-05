@@ -1,8 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
-import { connect } from 'react-redux'
 
-import { newNodePlaceholder } from '../../../../../common/record/record'
+import { newNodePlaceholder } from '../../../../../common/record/node'
 import { getSurveySrs } from '../../../../../common/survey/survey'
 import { toSrsItems } from '../../../../../common/app/srs'
 
@@ -10,16 +9,15 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import NodeDefFormItem from './nodeDefFormItem'
 
-import { getSurvey } from '../../../surveyState'
 
 class NodeDefCoordinate extends React.Component {
 
   handleInputChange (node, field, value) {
-    const {nodeDef, updateNode} = this.props
+    const {nodeDef, parentNode, updateNode} = this.props
 
     const newValue = R.assoc(field, value)(node.value)
 
-    updateNode(nodeDef, node, newValue)
+    updateNode(nodeDef, node, newValue, parentNode)
   }
 
   render () {
@@ -35,7 +33,7 @@ class NodeDefCoordinate extends React.Component {
     const srsItems = toSrsItems(getSurveySrs(survey))
 
     return (
-      <NodeDefFormItem nodeDef={nodeDef}>
+      <NodeDefFormItem {...this.props}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr'
@@ -65,8 +63,5 @@ class NodeDefCoordinate extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
-  survey: getSurvey(state),
-})
 
-export default connect(mapStateToProps)(NodeDefCoordinate)
+export default NodeDefCoordinate

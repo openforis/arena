@@ -5,10 +5,10 @@ import { FormItem } from '../../../../commonComponents/form/input'
 class NodeDefFormItem extends React.Component {
 
   render () {
-    const {nodeDef, children} = this.props
+    const {children, label} = this.props
 
     return (
-      <FormItem label={nodeDef.props.name}>
+      <FormItem label={label}>
         {children}
       </FormItem>
     )

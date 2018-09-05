@@ -13,7 +13,7 @@ import { getNodeDefFormUnlocked } from '../../surveyState'
 const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
   const isEntity = type === nodeDefType.entity
 
-  const nodeDefProps = isEntity ? {[nodeDefLayoutProps.render]: nodeDefRenderType.table} : {}
+  const nodeDefProps = isEntity ? {[nodeDefLayoutProps.render]: nodeDefRenderType.table, multiple: true} : {}
 
   return <React.Fragment key={type}>
     {

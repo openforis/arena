@@ -49,13 +49,13 @@ ALTER TABLE
     record ADD CONSTRAINT record_user_fk FOREIGN KEY (owner_id) REFERENCES "user" ("id");
 
 ALTER TABLE
-    node ADD CONSTRAINT node_record_fk FOREIGN KEY (record_id) REFERENCES "record" ("id");
+    node ADD CONSTRAINT node_record_fk FOREIGN KEY (record_id) REFERENCES "record" ("id") ON DELETE CASCADE;
 
 ALTER TABLE
-    node ADD CONSTRAINT node_parent_fk FOREIGN KEY (parent_id) REFERENCES "node" ("id");
+    node ADD CONSTRAINT node_parent_fk FOREIGN KEY (parent_id) REFERENCES "node" ("id") ON DELETE CASCADE;
 
 ALTER TABLE
-    node ADD CONSTRAINT node_node_def_fk FOREIGN KEY (node_def_id) REFERENCES "node_def" ("id");
+    node ADD CONSTRAINT node_node_def_fk FOREIGN KEY (node_def_id) REFERENCES "node_def" ("id") ON DELETE CASCADE;
 
 ALTER TABLE
     record_update_log ADD CONSTRAINT record_update_log_user_fk FOREIGN KEY (user_id) REFERENCES "user" ("id");

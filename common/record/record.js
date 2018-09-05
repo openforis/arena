@@ -15,20 +15,6 @@ const newRecord = (user, surveyId, step) => {
   }
 }
 
-const newNode = (nodeDefId, recordId, parentId = null, placeholder = false ,value = null) => {
-  return {
-    uuid: uuidv4(),
-    nodeDefId,
-    recordId,
-    parentId,
-    placeholder,
-    value,
-  }
-}
-
-const newNodePlaceholder = (nodeDef, parentNode, value = null) =>
-  newNode(nodeDef.id, parentNode.recordId, parentNode.id, true, value)
-
 // ====== READ
 const getNodes = R.pipe(
   R.prop(nodes),
@@ -58,10 +44,7 @@ const getRootNode = R.pipe(
   R.head,
 )
 
-const getNodeValue = (node = {}, defaultValue = {}) => R.pipe(
-  R.prop('value'),
-  R.defaultTo(defaultValue)
-)(node)
+const getNodeByUUID = uuid => R.path([nodes, uuid])
 
 // ====== UPDATE
 
@@ -72,31 +55,38 @@ const assocNodes = nodes =>
   )(nodes)
 
 // ====== DELETE
-//TODO remove entity children recursively
 const deleteNode = node =>
-  record => R.pipe(
-    getNodes,
-    R.dissoc(node.uuid),
-    newNodes => R.assoc('nodes', newNodes, record)
-  )(record)
+  record => {
+    //remove itself
+    const updatedRecord = R.pipe(
+      getNodes,
+      R.dissoc(node.uuid),
+      newNodes => R.assoc('nodes', newNodes, record)
+    )(record)
+
+    //remove entity children recursively
+    const children = getNodeChildren(node)(updatedRecord)
+    return R.isEmpty(children)
+      ? updatedRecord
+      : R.reduce(
+        (recordCurrent, child) => deleteNode(child)(recordCurrent),
+        updatedRecord,
+        children
+      )
+  }
 
 module.exports = {
   // ====== CREATE
   newRecord,
-  newNode,
-  newNodePlaceholder,
 
-// ====== READ
+  // ====== READ
   getNodes,
   getNodesArray,
-  getNodeChildren,
-  getNodesByParentId,
-  getRootNode,
-  getNodeValue,
   getNodeChildrenByDefId,
+  getRootNode,
+  getNodeByUUID,
 
   // ====== UPDATE
-
   assocNodes,
 
   // ====== DELETE

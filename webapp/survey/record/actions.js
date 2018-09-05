@@ -30,7 +30,7 @@ export const createRecord = () => async (dispatch, getState) => {
     const step = getSurveyDefaultStep(survey)
 
     const record = newRecord(user, survey.id, step)
-    dispatch({type: recordUpdate, record})
+    //dispatch({type: recordUpdate, record})
 
     const {data} = await axios.post(`/api/survey/${survey.id}/record`, record)
     dispatch({type: recordUpdate, record: data.record})
@@ -40,27 +40,40 @@ export const createRecord = () => async (dispatch, getState) => {
   }
 }
 
-export const updateNode = (nodeDef, node, value) => async dispatch => {
+export const updateNode = (nodeDef, node, value, parentNode) => async dispatch => {
   if (node.placeholder) {
     if (isNodeValueNotBlank(value)) {
-      dispatch(addNode(nodeDef, node, value))
+      dispatch(addNode(nodeDef, node, value, parentNode))
     }
   } else {
     dispatch(updateNodeValue(nodeDef, node, value))
   }
 }
 
-const addNode = (nodeDef, node, value) => async dispatch => {
+export const addNode = (nodeDef, node, value, parentNode = null) => async dispatch => {
   try {
+    //TODO REFACTOR
+    // add parent if not exist
+    let addedParentNode = null
+    if (parentNode && parentNode.placeholder) {
+      const {data} = await axios.post(`/api/survey/${nodeDef.surveyId}/record/${parentNode.recordId}/node`, parentNode)
+      addedParentNode = R.path(['nodes', parentNode.uuid], data)
+    }
+
     const nodeToAdd = R.pipe(
       R.dissoc('placeholder'),
-      R.assoc('value', value)
+      R.assoc('value', value),
+      R.assoc('parentId', addedParentNode ? addedParentNode.id : node.parentId),
     )(node)
 
-    dispatchNodesUpdate(dispatch, {[nodeToAdd.uuid]: nodeToAdd})
+    const addedNodes = addedParentNode
+      ? {[nodeToAdd.uuid]: nodeToAdd, [addedParentNode.uuid]: addedParentNode}
+      : {[nodeToAdd.uuid]: nodeToAdd}
+
+    dispatchNodesUpdate(dispatch, addedNodes)
 
     const {data} = await axios.post(`/api/survey/${nodeDef.surveyId}/record/${nodeToAdd.recordId}/node`, nodeToAdd)
-    dispatch({type: nodesUpdate, nodes: data.nodes})
+    dispatchNodesUpdate(dispatch, data.nodes)
   } catch (e) {
     console.log(e)
   }

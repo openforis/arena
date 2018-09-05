@@ -5,7 +5,9 @@ import { Input } from '../../../../commonComponents/form/input'
 import NodeDefFormItem from './nodeDefFormItem'
 
 import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
-import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/record'
+import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+
+import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/node'
 import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
 
 const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
@@ -13,7 +15,7 @@ const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
          {...getNodeDefInputTextProps(nodeDef)}
          value={getNodeValue(node, '')}
          onChange={(e) =>
-           updateNode(nodeDef, node, e.target.value)
+           updateNode(nodeDef, node, e.target.value, parentNode)
          }
   />
 
@@ -31,10 +33,22 @@ const NodeDefDeleteButton = ({nodeDef, node, removeNode}) =>
 
 const NodeDefText = props => {
 
-  const {edit, nodeDef, nodes, parentNode} = props
+  const {
+    nodeDef, nodes, parentNode,
+    entry, edit, label, renderType
+  } = props
 
-  if(edit)
-    return <NodeDefFormItem nodeDef={nodeDef}>
+  // table header
+  if (renderType === nodeDefRenderType.tableHeader) {
+    return <label className="node-def__table-header">
+      {label}
+    </label>
+  }
+
+  // EDIT MODE
+
+  if (edit)
+    return <NodeDefFormItem {...props}>
       <NodeDefTextInput {...props} />
     </NodeDefFormItem>
 
@@ -42,27 +56,32 @@ const NodeDefText = props => {
     ? R.concat(nodes, [newNodePlaceholder(nodeDef, parentNode)])
     : nodes
 
-  return (
-    <NodeDefFormItem nodeDef={nodeDef}>
-      <div className="overflowYAuto">
-        {
-          nodesToRender.map(n =>
-            <div key={`nodeDefTextInput_${n.uuid}`}
-                 style={{
-                   display: 'grid',
-                   gridTemplateColumns: '.9fr .1fr'
-                 }}>
+  // ENTRY MODE
 
-              <NodeDefTextInput node={n} {...props} />
+  if (entry && renderType === nodeDefRenderType.tableBody)
+    return <NodeDefTextInput {...props} node={nodesToRender[0]}/>
+  else
+    return (
+      <NodeDefFormItem {...props}>
+        <div className="overflowYAuto">
+          {
+            nodesToRender.map(n =>
+              <div key={`nodeDefTextInput_${n.uuid}`}
+                   style={{
+                     display: 'grid',
+                     gridTemplateColumns: '.9fr .1fr'
+                   }}>
 
-              <NodeDefDeleteButton node={n} {...props} />
+                <NodeDefTextInput {...props} node={n}/>
 
-            </div>
-          )
-        }
-      </div>
-    </NodeDefFormItem>
-  )
+                <NodeDefDeleteButton {...props} node={n}/>
+
+              </div>
+            )
+          }
+        </div>
+      </NodeDefFormItem>
+    )
 }
 
 export default NodeDefText

@@ -10,23 +10,30 @@ import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
 import { getRootNodeDef } from '../../../common/survey/survey'
 import { getRootNode } from '../../../common/record/record'
-import { getSurvey, getFormNodeDefViewPage } from '../surveyState'
+import { getSurvey, getFormActivePageNodeDef, getFormActivePageParentNode } from '../surveyState'
 import { getRecord } from '../record/recordState'
 
 import { fetchRootNodeDef } from '../actions'
-import { setFormNodeDefViewPage } from '../nodeDef/actions'
+import { setFormActivePage } from '../nodeDef/actions'
 
 class SurveyFormView extends React.Component {
 
   componentDidMount () {
-    const {fetchRootNodeDef, edit} = this.props
+    const {fetchRootNodeDef, setFormActivePage, edit} = this.props
+
+    setFormActivePage(null)
     fetchRootNodeDef(edit)
   }
 
   componentDidUpdate () {
-    const {rootNodeDef, nodeDef, setFormNodeDefViewPage} = this.props
-    if (rootNodeDef && !nodeDef) {
-      setFormNodeDefViewPage(rootNodeDef)
+    const {rootNodeDef, nodeDef, rootNode, setFormActivePage, edit, entry} = this.props
+
+    if (edit && rootNodeDef && !nodeDef) {
+      setFormActivePage(rootNodeDef)
+    }
+
+    if (entry && rootNodeDef && rootNode && !nodeDef) {
+      setFormActivePage(rootNodeDef, rootNode)
     }
   }
 
@@ -35,8 +42,6 @@ class SurveyFormView extends React.Component {
       rootNodeDef,
       nodeDef,
       edit,
-      draft,
-      // data entry mode props
       entry,
       rootNode
     } = this.props
@@ -53,12 +58,11 @@ class SurveyFormView extends React.Component {
 
           <div className={`survey-form${edit ? ' edit' : ''}`}>
 
-            <FormNavigation rootNodeDef={rootNodeDef} edit={edit} draft={draft}/>
+            <FormNavigation {...this.props}/>
 
             {
               nodeDef && (edit || (entry && rootNode))
-                ? <NodeDefSwitch nodeDef={nodeDef} edit={edit} draft={draft}
-                                 entry={entry} node={rootNode}/>
+                ? <NodeDefSwitch {...this.props} />
                 : <div></div>
             }
 
@@ -93,15 +97,17 @@ SurveyFormView.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
+
   return {
     survey,
     rootNodeDef: getRootNodeDef(survey),
-    nodeDef: getFormNodeDefViewPage(state),
-    rootNode: props.entry ? getRootNode(getRecord(state)) : null,
+    nodeDef: getFormActivePageNodeDef(state),
+    rootNode: props.entry ? getRootNode(getRecord(survey)) : {},
+    parentNode: getFormActivePageParentNode(state),
   }
 }
 
 export default connect(
   mapStateToProps,
-  {fetchRootNodeDef, setFormNodeDefViewPage}
+  {fetchRootNodeDef, setFormActivePage}
 )(SurveyFormView)
