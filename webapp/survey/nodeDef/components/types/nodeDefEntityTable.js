@@ -12,6 +12,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 import { newNodePlaceholder } from '../../../../../common/record/node'
+import { getNodeDefFieldsCount } from '../nodeDefSystemProps'
 
 const EntityTableRow = (props) => {
 
@@ -56,7 +57,7 @@ const EntityTableRow = (props) => {
             childDefs
               .map((childDef, i) =>
                 <div key={childDef.uuid} data-grid={{
-                  i: nodeDef.uuid, x: i, y: 0, w: 1, h: 1,
+                  i: nodeDef.uuid, x: i, y: 0, w: getNodeDefFieldsCount(childDef), h: 1,
                 }}>
                   <NodeDefSwitch key={i}
                                  {...props}

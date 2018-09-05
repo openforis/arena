@@ -88,6 +88,7 @@ export const nodeDefSystemProps = {
   [nodeDefType.coordinate]: {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
+    fieldsCount: 3,
   },
 
   [nodeDefType.taxon]: {
@@ -107,18 +108,30 @@ export const nodeDefSystemProps = {
 
 }
 
-const getProp = (nodeDefType, prop) => R.path([nodeDefType, prop])
+const getProp = (nodeDefType, prop, defaultValue = null) => R.pathOr(defaultValue, [nodeDefType, prop])
 
 export const getNodeDefIconByType = nodeDefType => R.pipe(
   getProp(nodeDefType, 'icon'),
 )(nodeDefSystemProps)
 
-export const getNodeDefInputTextProps = nodeDef => R.pipe(
-  getProp(nodeDef.type, 'inputText'),
-  R.defaultTo({mask: false, showMask: false}),
-)(nodeDefSystemProps)
+export const getNodeDefInputTextProps = nodeDef =>
+  getProp(
+    nodeDef.type,
+    'inputText',
+    {mask: false, showMask: false}
+  )(nodeDefSystemProps)
 
-export const getNodeDefComponent = nodeDef => R.pipe(
-  getProp(nodeDef.type, 'component'),
-  R.defaultTo(NodeDefText),
-)(nodeDefSystemProps)
+export const getNodeDefComponent = nodeDef =>
+  getProp(
+    nodeDef.type,
+    'component',
+    NodeDefText
+  )
+  (nodeDefSystemProps)
+
+export const getNodeDefFieldsCount = nodeDef =>
+  getProp(
+    nodeDef.type,
+    'fieldsCount',
+    1
+  )(nodeDefSystemProps)

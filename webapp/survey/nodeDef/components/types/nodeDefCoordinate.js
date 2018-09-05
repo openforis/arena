@@ -8,7 +8,7 @@ import { toSrsItems } from '../../../../../common/app/srs'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import NodeDefFormItem from './nodeDefFormItem'
-
+import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 class NodeDefCoordinate extends React.Component {
 
@@ -21,7 +21,19 @@ class NodeDefCoordinate extends React.Component {
   }
 
   render () {
-    const {survey, nodeDef, nodes, parentNode, edit, entry} = this.props
+    const {survey, nodeDef, nodes, parentNode, edit, entry, renderType, label} = this.props
+
+    // table header
+    if (renderType === nodeDefRenderType.tableHeader) {
+      return <div className="node-def__coordinate-table-row">
+        <label className="node-def__table-header" style={{gridColumn: '1 / span 3'}}>
+          {label}
+        </label>
+        <div className="node-def__table-header">X</div>
+        <div className="node-def__table-header">Y</div>
+        <div className="node-def__table-header">SRS</div>
+      </div>
+    }
 
     const defaultValue = {x: '', y: '', srs: ''}
     const node = edit ?
@@ -62,6 +74,5 @@ class NodeDefCoordinate extends React.Component {
     )
   }
 }
-
 
 export default NodeDefCoordinate
