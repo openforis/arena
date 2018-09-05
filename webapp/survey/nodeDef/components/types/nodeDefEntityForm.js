@@ -76,7 +76,10 @@ const EntityForm = props => {
 }
 
 const NodeSelect = props => {
-  const {nodeDef, nodes, selectedNodeUUID, parentNode, addNode, onChange} = props
+  const {
+    nodeDef, nodes, parentNode, selectedNode,
+    addNode, removeNode, onChange,
+  } = props
 
   return (
     <div style={{
@@ -85,7 +88,7 @@ const NodeSelect = props => {
     }}>
 
       <select aria-disabled={R.isEmpty(nodes)}
-              value={selectedNodeUUID || 'placeholder'}
+              value={selectedNode ? selectedNode.uuid : 'placeholder'}
               onChange={e => onChange(e.target.value)}>
         <option value='placeholder' disabled hidden={true}>Select</option>
         {
@@ -100,7 +103,20 @@ const NodeSelect = props => {
       </select>
 
       <button className="btn btn-s btn-of-light-xs"
-              style={{marginLeft: '4px'}}
+              style={{marginLeft: '5px'}}
+              aria-disabled={!selectedNode}
+              onClick={() => {
+                if (window.confirm('Are you sure you want to delete this entity?')) {
+                  onChange(null)
+                  removeNode(nodeDef, selectedNode)
+                }
+              }}>
+        <span className="icon icon-bin icon-12px icon-left"/>
+        DELETE
+      </button>
+
+      <button className="btn btn-s btn-of-light-xs"
+              style={{marginLeft: '50px'}}
               onClick={() => {
                 const entity = newNode(nodeDef.id, parentNode.recordId, parentNode.id)
                 addNode(nodeDef, entity)
@@ -148,7 +164,7 @@ class NodeDefEntityForm extends React.Component {
       return <div>
 
         <NodeSelect {...this.props}
-                    selectedNodeUUID={this.state.selectedNodeUUID}
+                    selectedNode={node}
                     onChange={selectedNodeUUID => this.setState({selectedNodeUUID})}/>
 
         {
