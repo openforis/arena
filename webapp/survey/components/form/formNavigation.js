@@ -1,12 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getNodeDefChildren } from '../../../../common/survey/survey'
+import { getNodeDefChildren, getSurveyDefaultLanguage } from '../../../../common/survey/survey'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
 
 import { getFormActivePageNodeDef, getSurvey, isNodeDefFormActivePage } from '../../surveyState'
 
 import { setFormActivePage } from '../../nodeDef/actions'
+import { getNodeDefLabel } from '../../../../common/survey/nodeDef'
 
 const FormNavigationItem = (props) => {
   const {
@@ -14,10 +15,9 @@ const FormNavigationItem = (props) => {
     childDefs,
     node,
     parentNode,
-
+    label,
     level,
     isActive,
-
     setFormActivePage,
   } = props
 
@@ -32,7 +32,7 @@ const FormNavigationItem = (props) => {
                 setFormActivePage(nodeDef, node, parentNode)
               }}
               style={{height: `${100 - level * 10}%`}}>
-        {nodeDef.props.name}
+        {label}
       </button>
 
       {
@@ -42,7 +42,7 @@ const FormNavigationItem = (props) => {
                                      nodeDef={child}
                                      node={{}}
                                      parentNode={node}
-                                     />
+          />
         )
       }
 
@@ -50,11 +50,18 @@ const FormNavigationItem = (props) => {
   )
 }
 
-const mapStateToProps = (state, props) => ({
-  childDefs: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
-  currentPageNodeDef: getFormActivePageNodeDef(state),
-  isActive: isNodeDefFormActivePage(props.nodeDef)(getSurvey(state)),
-})
+const mapStateToProps = (state, props) => {
+  const survey = getSurvey(state)
+  const {nodeDef} = props
+
+  return {
+    childDefs: getNodeDefChildren(nodeDef)(survey),
+    currentPageNodeDef: getFormActivePageNodeDef(state),
+    isActive: isNodeDefFormActivePage(nodeDef)(survey),
+    label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey)),
+  }
+}
+
 const FormNavigationItemConnect = connect(
   mapStateToProps,
   {setFormActivePage}

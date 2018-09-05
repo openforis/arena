@@ -6,6 +6,8 @@ const {
   getLabels,
 } = require('./surveyUtils')
 
+const {isBlank} = require('../stringUtils')
+
 const validation = 'validation'
 
 // ======== NODE DEF PROPERTIES
@@ -56,12 +58,12 @@ const canNodeDefBeMultiple = nodeDef =>
     [nodeDefType.decimal, nodeDefType.codeList, nodeDefType.file, nodeDefType.integer, nodeDefType.text]
   )
 
-const getNodeDefLabel = (nodeDef, lang) =>{
-  const label = R.path(['props','labels',lang], nodeDef)
-  return R.defaultTo(
-    getNodeDefName(nodeDef),
-    label
-  )
+const getNodeDefLabel = (nodeDef, lang) => {
+  const label = R.path(['props', 'labels', lang], nodeDef)
+  return isBlank(label)
+    ? getNodeDefName(nodeDef)
+    : label
+
 }
 
 module.exports = {
