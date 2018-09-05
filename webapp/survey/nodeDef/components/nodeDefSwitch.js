@@ -13,7 +13,7 @@ import { getNodeChildrenByDefId } from '../../../../common/record/record'
 import { getSurvey, isNodeDefFormLocked } from '../../surveyState'
 import { getRecord } from '../../record/recordState'
 
-import { setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
+import { setFormNodeDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
 import { updateNode, addNode, removeNode } from '../../record/actions'
 
 import { getNodeDefComponent } from './nodeDefSystemProps'
@@ -36,7 +36,7 @@ class NodeDefSwitch extends React.Component {
       edit,
 
       // actions
-      setFormNodDefEdit,
+      setFormNodeDefEdit,
       putNodeDefProp,
       setFormNodeDefUnlocked,
 
@@ -80,7 +80,7 @@ class NodeDefSwitch extends React.Component {
                   }
 
                   <button className="btn-s btn-of-light-xs"
-                          onClick={() => setFormNodDefEdit(nodeDef)}>
+                          onClick={() => setFormNodeDefEdit(nodeDef)}>
                     <span className="icon icon-pencil2 icon-12px"/>
                   </button>
 
@@ -132,7 +132,7 @@ const mapStateToProps = (state, props) => {
 export default connect(
   mapStateToProps,
   {
-    setFormNodDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
+    setFormNodeDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
     updateNode, addNode, removeNode,
   }
 )(NodeDefSwitch)

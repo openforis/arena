@@ -21,7 +21,7 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
     const nodeDef = newNodeDef(surveyId, parentId, type, props)
     dispatch({type: nodeDefUpdate, nodeDef})
     //setting current editing nodeDef
-    dispatch(setFormNodDefEdit(nodeDef))
+    dispatch(setFormNodeDefEdit(nodeDef))
 
     if (isNodeDefEntity(nodeDef)) {
       dispatch(setFormNodeDefUnlocked(nodeDef))
@@ -70,7 +70,7 @@ export const formNodeDefEditUpdate = 'survey/form/nodeDefEdit/update'
 export const formNodeDefUnlockedUpdate = 'survey/form/nodeDefUnlocked/update'
 export const formNodeDefViewPage = 'survey/form/nodeDefViewPage/update'
 
-export const setFormNodDefEdit = nodeDef => dispatch => dispatch({type: formNodeDefEditUpdate, nodeDef})
+export const setFormNodeDefEdit = nodeDef => dispatch => dispatch({type: formNodeDefEditUpdate, nodeDef})
 
 export const setFormNodeDefUnlocked = nodeDef => dispatch => dispatch({type: formNodeDefUnlockedUpdate, nodeDef})
 
