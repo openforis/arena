@@ -14,7 +14,7 @@ const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value,
       ? newNodePlaceholder(nodeDef, parentNode)
       : nodes[0]
 
-  const nodeValue = getNodeValue(node, 'false')
+  const nodeValue = getNodeValue(node, '')
 
   return (
     <button className="btn btn-s btn-transparent"
@@ -28,31 +28,41 @@ const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value,
 
 }
 
-const NodeDefBoolean = props => {
-  const {edit, renderType, label} = props
+const Buttons = props =>
+  <div className="form-input" style={{borderBottom: 'none', textAlign: 'center'}}>
 
-  if (renderType === nodeDefRenderType.tableHeader)
+    <Button {...props}
+            disabled={props.edit}
+            label="YES"
+            value="true"/>
+
+    <Button {...props}
+            disabled={props.edit}
+            label="NO"
+            value="false"/>
+
+  </div>
+
+const NodeDefBoolean = props => {
+  const {renderType, label} = props
+
+  if (renderType === nodeDefRenderType.tableHeader) {
+
     return <label className="node-def__table-header">
       {label}
     </label>
 
-  return (
-    <NodeDefFormItem {...props}>
-      <div className="form-input" style={{borderBottom: 'none'}}>
+  } else if (renderType === nodeDefRenderType.tableBody) {
 
-        <Button {...props}
-                disabled={edit}
-                label="YES"
-                value="true"/>
+    return <Buttons {...props}/>
 
-        <Button {...props}
-                disabled={edit}
-                label="NO"
-                value="false"/>
+  } else {
 
-      </div>
+    return <NodeDefFormItem {...props}>
+      <Buttons {...props}/>
     </NodeDefFormItem>
-  )
+
+  }
 
 }
 

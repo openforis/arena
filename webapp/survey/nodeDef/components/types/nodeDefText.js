@@ -33,13 +33,19 @@ const NodeDefDeleteButton = ({nodeDef, node, removeNode}) =>
 
 const NodeDefText = props => {
 
-  const {label, edit, nodeDef, nodes, parentNode, renderType} = props
+  const {
+    nodeDef, nodes, parentNode,
+    entry, edit, label, renderType
+  } = props
 
+  // table header
   if (renderType === nodeDefRenderType.tableHeader) {
     return <label className="node-def__table-header">
       {label}
     </label>
   }
+
+  // EDIT MODE
 
   if (edit)
     return <NodeDefFormItem {...props}>
@@ -50,27 +56,32 @@ const NodeDefText = props => {
     ? R.concat(nodes, [newNodePlaceholder(nodeDef, parentNode)])
     : nodes
 
-  return (
-    <NodeDefFormItem {...props}>
-      <div className="overflowYAuto">
-        {
-          nodesToRender.map(n =>
-            <div key={`nodeDefTextInput_${n.uuid}`}
-                 style={{
-                   display: 'grid',
-                   gridTemplateColumns: '.9fr .1fr'
-                 }}>
+  // ENTRY MODE
 
-              <NodeDefTextInput {...props} node={n}/>
+  if (entry && renderType === nodeDefRenderType.tableBody)
+    return <NodeDefTextInput {...props} node={nodesToRender[0]}/>
+  else
+    return (
+      <NodeDefFormItem {...props}>
+        <div className="overflowYAuto">
+          {
+            nodesToRender.map(n =>
+              <div key={`nodeDefTextInput_${n.uuid}`}
+                   style={{
+                     display: 'grid',
+                     gridTemplateColumns: '.9fr .1fr'
+                   }}>
 
-              <NodeDefDeleteButton {...props} node={n}/>
+                <NodeDefTextInput {...props} node={n}/>
 
-            </div>
-          )
-        }
-      </div>
-    </NodeDefFormItem>
-  )
+                <NodeDefDeleteButton {...props} node={n}/>
+
+              </div>
+            )
+          }
+        </div>
+      </NodeDefFormItem>
+    )
 }
 
 export default NodeDefText
