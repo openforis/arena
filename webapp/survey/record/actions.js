@@ -58,7 +58,6 @@ const addNode = (nodeDef, node, value, parentNode = null) => async dispatch => {
     if (parentNode && parentNode.placeholder) {
       const {data} = await axios.post(`/api/survey/${nodeDef.surveyId}/record/${parentNode.recordId}/node`, parentNode)
       addedParentNode = R.path(['nodes', parentNode.uuid], data)
-
     }
 
     const nodeToAdd = R.pipe(

@@ -12,6 +12,7 @@ import {
   getNodeDefName,
   isNodeDefKey,
   isNodeDefMultiple,
+  isNodeDefEntity,
   canNodeDefBeMultiple,
 } from '../../../../../common/survey/nodeDef'
 import { isRenderTable } from '../../../../../common/survey/nodeDefLayout'
@@ -52,10 +53,15 @@ class CommonProps extends React.Component {
                       labels={getNodeDefDescriptions(nodeDef)}
                       onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'descriptions', getNodeDefDescriptions(nodeDef))}/>
 
-        <FormItem label={'key'}>
-          <Checkbox checked={isNodeDefKey(nodeDef)}
-                    onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
-        </FormItem>
+        {
+          isNodeDefEntity(nodeDef)
+            ? null
+            : <FormItem label={'key'}>
+              <Checkbox checked={isNodeDefKey(nodeDef)}
+                        onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
+            </FormItem>
+        }
+
 
         {
           canNodeDefBeMultiple(nodeDef)
