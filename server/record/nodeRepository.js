@@ -13,7 +13,7 @@ const insertNode = async (surveyId, node, client = db) =>
     (uuid, record_id, parent_id, node_def_id, value)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *`,
-    [node.uuid, node.recordId, node.parentId, node.nodeDefId, JSON.stringify(node.value)],
+    [node.uuid, node.recordId, node.parentId, node.nodeDefId, node.value ? JSON.stringify(node.value) : null],
     dbTransformCallback
   )
 

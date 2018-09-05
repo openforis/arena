@@ -55,13 +55,25 @@ const assocNodes = nodes =>
   )(nodes)
 
 // ====== DELETE
-//TODO remove entity children recursively
 const deleteNode = node =>
-  record => R.pipe(
-    getNodes,
-    R.dissoc(node.uuid),
-    newNodes => R.assoc('nodes', newNodes, record)
-  )(record)
+  record => {
+    //remove itself
+    const updatedRecord = R.pipe(
+      getNodes,
+      R.dissoc(node.uuid),
+      newNodes => R.assoc('nodes', newNodes, record)
+    )(record)
+
+    //remove entity children recursively
+    const children = getNodeChildren(node)(updatedRecord)
+    return R.isEmpty(children)
+      ? updatedRecord
+      : R.reduce(
+        (recordCurrent, child) => deleteNode(child)(recordCurrent),
+        updatedRecord,
+        children
+      )
+  }
 
 module.exports = {
   // ====== CREATE
