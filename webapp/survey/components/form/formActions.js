@@ -8,7 +8,7 @@ import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
 import { createNodeDef } from '../../nodeDef/actions'
 import { getNodeDefIconByType } from '../../nodeDef/components/nodeDefSystemProps'
-import { getNodeDefFormUnlocked } from '../../surveyState'
+import { getNodeDefFormUnlocked, getFormActivePageNodeDef } from '../../surveyState'
 
 const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
   const isEntity = type === nodeDefType.entity
@@ -18,7 +18,7 @@ const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
   return <React.Fragment key={type}>
     {
       isEntity ?
-        <div className="separator-of"></div>
+        <div className="separator-of"/>
         : null
 
     }
@@ -41,7 +41,7 @@ const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
     <div/>
     <div/>
     <div className="title-of">
-      <span className="icon icon-plus icon-left"></span> Add
+      <span className="icon icon-plus icon-left"/> Add
     </div>
 
     {
@@ -62,7 +62,7 @@ const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
                 [nodeDefLayoutProps.pageUUID]: uuidv4(),
               }
             )}>
-      <span className="icon icon-insert-template icon-left"></span>
+      <span className="icon icon-insert-template icon-left"/>
       Entity New Page
     </button>
 
@@ -122,8 +122,16 @@ class FormActions extends React.Component {
 
 }
 
-const mapStateToProps = state => ({
-  nodeDef: getNodeDefFormUnlocked(state)
-})
+const mapStateToProps = state => {
+  const nodeDefUnlocked = getNodeDefFormUnlocked(state)
+  const nodeDefActivePage = getFormActivePageNodeDef(state)
+
+  const nodeDef = nodeDefUnlocked && nodeDefActivePage.uuid === nodeDefUnlocked.uuid
+    ? nodeDefUnlocked : null
+
+  return {
+    nodeDef
+  }
+}
 
 export default connect(mapStateToProps, {createNodeDef})(FormActions)
