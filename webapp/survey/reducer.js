@@ -44,7 +44,7 @@ import {
   //survey-form
   formNodeDefEditUpdate,
   formNodeDefUnlockedUpdate,
-  formNodeDefViewPage,
+  formActivePageNodeDefUpdate,
 } from './nodeDef/actions'
 
 /**
@@ -76,7 +76,7 @@ const actionHandlers = {
 
   [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocNodeDefFormUnlocked(nodeDef)(state),
 
-  [formNodeDefViewPage]: (state, {nodeDef, node, parentNode}) => assocFormActivePage(nodeDef, node, parentNode)(state),
+  [formActivePageNodeDefUpdate]: (state, {nodeDef}) => assocFormActivePage(nodeDef)(state),
 
   //RECORD
   [recordUpdate]: assocActionProps,

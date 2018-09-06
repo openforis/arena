@@ -34,7 +34,7 @@ class SurveyFormView extends React.Component {
     }
 
     if (entry && rootNodeDef && rootNode && !nodeDef) {
-      setFormActivePage(rootNodeDef, rootNode)
+      setFormActivePage(rootNodeDef)
     }
   }
 
@@ -59,11 +59,12 @@ class SurveyFormView extends React.Component {
 
           <div className={`survey-form${edit ? ' edit' : ''}`}>
 
-            <FormNavigation {...this.props}/>
-
             {
               nodeDef && (edit || (entry && rootNode))
-                ? <NodeDefSwitch {...this.props} />
+                ? <React.Fragment>
+                  <FormNavigation {...this.props}/>
+                  <NodeDefSwitch {...this.props} />
+                </React.Fragment>
                 : <div/>
             }
 
@@ -104,7 +105,7 @@ const mapStateToProps = (state, props) => {
     rootNodeDef: getRootNodeDef(survey),
     nodeDef: getFormActivePageNodeDef(state),
     rootNode: props.entry ? getRootNode(getRecord(survey)) : {},
-    parentNode: getFormActivePageParentNode(state),
+    // parentNode: getFormActivePageParentNode(state),
   }
 }
 

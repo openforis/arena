@@ -31,31 +31,42 @@ export const getNewSurvey = R.pipe(
  * ======================
  */
 
-// CURRENT VIEW NODE_DEF PAGE
-const surveyFormActivePage = ['form', 'activePage']
+//SURVEY FORM ACTIVE PAGE
 
-export const assocFormActivePage = (nodeDef, node = {}, parentNode = {}) =>
-  R.assocPath(surveyFormActivePage, nodeDef ? {
-    nodeDefUUID: nodeDef.uuid,
-    nodeUUID: node.uuid,
-    parentNodeUUID: parentNode.uuid,
-  } : null)
+const surveyFormActivePage = ['form', 'activePageNodeDefUUID']
 
-export const getFormActivePageNodeDef = state => {
-  const surveyState = getSurvey(state)
-  const uuid = R.path(R.concat(surveyFormActivePage, ['nodeDefUUID']), surveyState)
-  return getNodeDefByUUID(uuid)(surveyState)
-}
+export const assocFormActivePage = (nodeDef) =>
+  R.assocPath(
+    surveyFormActivePage,
+    nodeDef ? nodeDef.uuid : null
+  )
+
+export const getFormActivePageNodeDef = R.pipe(
+  getSurvey,
+  survey => getNodeDefByUUID(
+    R.path(surveyFormActivePage, survey)
+  )(survey)
+)
+
+export const isNodeDefFormActivePage = nodeDef =>
+  R.pathEq(surveyFormActivePage, nodeDef.uuid)
+
+// SURVEY FORM PAGES NODES SELECTED STATE
+const surveyFormPages = ['form', 'pagesNodes']
 
 export const getFormActivePageParentNode = state => {
   const survey = getSurvey(state)
   const record = getRecord(survey)
-  const uuid = R.path(R.concat(surveyFormActivePage, ['parentNodeUUID']), survey)
+  const uuid = R.path(R.concat(surveyFormPages, ['parentNodeUUID']), survey)
   return getNodeByUUID(uuid)(record)
 }
 
-export const isNodeDefFormActivePage = nodeDef =>
-  R.pathEq(R.concat(surveyFormActivePage, ['nodeDefUUID']), nodeDef.uuid)
+export const getFormActivePageNode = state => {
+  const survey = getSurvey(state)
+  const record = getRecord(survey)
+  const uuid = R.path(R.concat(surveyFormPages, ['nodeUUID']), survey)
+  return getNodeByUUID(uuid)(record)
+}
 
 // CURRENT EDITING NODE_DEF
 const nodeDefEditPath = ['form', 'nodeDefEdit']

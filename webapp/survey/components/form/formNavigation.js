@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { getNodeDefChildren, getSurveyDefaultLanguage } from '../../../../common/survey/survey'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
 
-import { getFormActivePageNodeDef, getSurvey, isNodeDefFormActivePage } from '../../surveyState'
+import { getFormActivePageNode, getFormActivePageNodeDef, getSurvey, isNodeDefFormActivePage } from '../../surveyState'
 
 import { setFormActivePage } from '../../nodeDef/actions'
 import { getNodeDefLabel } from '../../../../common/survey/nodeDef'
@@ -15,6 +15,8 @@ const FormNavigationItem = (props) => {
     childDefs,
     node,
     parentNode,
+    currentPageNode,
+
     label,
     level,
     isActive,
@@ -29,7 +31,7 @@ const FormNavigationItem = (props) => {
       <button className={`btn btn-of-light${isActive ? ' active' : ''}`}
               onClick={() => {
                 // fetchNodeDefChildren(nodeDef.id, draft)
-                setFormActivePage(nodeDef, node, parentNode)
+                setFormActivePage(nodeDef)
               }}
               style={{height: `${100 - level * 10}%`}}>
         {label}
@@ -40,8 +42,8 @@ const FormNavigationItem = (props) => {
           <FormNavigationItemConnect key={child.uuid}
                                      level={level + 1}
                                      nodeDef={child}
-                                     node={{}}
-                                     parentNode={node}
+                                     // node={}
+                                     parentNode={currentPageNode}
           />
         )
       }
@@ -57,6 +59,7 @@ const mapStateToProps = (state, props) => {
   return {
     childDefs: getNodeDefChildren(nodeDef)(survey),
     currentPageNodeDef: getFormActivePageNodeDef(state),
+    currentPageNode: getFormActivePageNode(state),
     isActive: isNodeDefFormActivePage(nodeDef)(survey),
     label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey)),
   }
@@ -67,14 +70,14 @@ const FormNavigationItemConnect = connect(
   {setFormActivePage}
 )(FormNavigationItem)
 
-const FormNavigation = ({rootNodeDef, rootNode}) => {
+const FormNavigation = ({rootNodeDef}) => {
 
   return (
     <div className="survey-form__nav" style={{
       display: 'flex',
       alignItems: 'flex-end',
     }}>
-      <FormNavigationItemConnect nodeDef={rootNodeDef} node={rootNode} level={0}/>
+      <FormNavigationItemConnect nodeDef={rootNodeDef} level={0}/>
     </div>
   )
 }
