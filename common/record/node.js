@@ -9,19 +9,19 @@ const {isBlank} = require('../stringUtils')
  * ======
  */
 
-const newNode = (nodeDefId, recordId, parentId = null, placeholder = false, value = null) => {
+const newNode = (nodeDefId, recordId, parentUUID = null, placeholder = false, value = null) => {
   return {
     uuid: uuidv4(),
     nodeDefId,
     recordId,
-    parentId,
+    parentUUID,
     placeholder,
     value,
   }
 }
 
 const newNodePlaceholder = (nodeDef, parentNode, value = null) =>
-  newNode(nodeDef.id, parentNode.recordId, parentNode.id, true, value)
+  newNode(nodeDef.id, parentNode.recordId, parentNode.uuid, true, value)
 
 /**
  * ======

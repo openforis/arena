@@ -66,6 +66,11 @@ const _putNodeDefProp = (nodeDef, key, value) => {
 /**
  * ==== SURVEY-FORM EDIT MODE - NODE DEFS EDIT
  */
+
+export const formReset = 'survey/form/reset'
+export const resetForm = () => dispatch =>
+  dispatch({type: formReset})
+
 export const formNodeDefEditUpdate = 'survey/form/nodeDefEdit/update'
 export const formNodeDefUnlockedUpdate = 'survey/form/nodeDefUnlocked/update'
 
@@ -86,5 +91,10 @@ export const closeFormNodeDefEdit = nodeDef => async dispatch => {
 
 //SURVEY FORM ACTIVE PAGE
 export const formActivePageNodeDefUpdate = 'survey/form/activePageNodeDef/update'
+export const formPageNodeUpdate = 'survey/form/pageParentNode/update'
+
 export const setFormActivePage = (nodeDef) => dispatch =>
   dispatch({type: formActivePageNodeDefUpdate, nodeDef})
+
+export const setFormPageNode = (nodeDef, node) => dispatch =>
+  dispatch({type: formPageNodeUpdate, nodeDef, node})

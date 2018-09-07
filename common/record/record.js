@@ -26,13 +26,17 @@ const getNodesArray = R.pipe(
   R.values,
 )
 
-const getNodesByParentId = parentId => R.pipe(
+const getNodeChildren = node => R.pipe(
   getNodesArray,
-  R.filter(n => n.parentId === parentId),
-  R.sortBy(R.prop('id')),
+  R.filter(n => n.parentId === node.id || n.parentUUID === node.uuid),
+  R.sort((n1, n2) => {
+    return !n1.id
+      ? 1
+      : !n2.id
+        ? -1
+        : Number(n1.id) > Number(n2.id)
+  }),
 )
-
-const getNodeChildren = node => getNodesByParentId(R.propOr(null, 'id')(node))
 
 const getNodeChildrenByDefId = (parentNode, nodeDefId) => record => R.pipe(
   getNodeChildren(parentNode),
@@ -40,11 +44,22 @@ const getNodeChildrenByDefId = (parentNode, nodeDefId) => record => R.pipe(
 )(record)
 
 const getRootNode = R.pipe(
-  getNodesByParentId(null),
-  R.head,
+  getNodesArray,
+  R.find(R.propEq('parentId', null)),
 )
 
 const getNodeByUUID = uuid => R.path([nodes, uuid])
+
+const getNodeById = id => R.pipe(
+  getNodesArray,
+  R.find(R.propEq('id', id))
+)
+
+const getParentNode = node => node.parentId
+  ? getNodeById(node.parentId)
+  : node.parentUUID
+    ? getNodeByUUID(node.parentUUID)
+    : R.F
 
 // ====== UPDATE
 
@@ -85,6 +100,7 @@ module.exports = {
   getNodeChildrenByDefId,
   getRootNode,
   getNodeByUUID,
+  getParentNode,
 
   // ====== UPDATE
   assocNodes,

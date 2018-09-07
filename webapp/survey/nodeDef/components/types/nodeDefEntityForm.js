@@ -1,6 +1,7 @@
 import '../react-grid-layout.scss'
 
 import React from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
@@ -17,6 +18,7 @@ import {
   getLayout,
   getNoColumns,
 } from '../../../../../common/survey/nodeDefLayout'
+import { getFormPageNodeUUID } from '../../../surveyState'
 
 const onLayoutChange = (props, layout) => {
   const {nodeDef, edit, locked, putNodeDefProp} = props
@@ -38,10 +40,11 @@ const EntityForm = props => {
     R.dissoc('node'),
     R.dissoc('childDefs'),
     R.dissoc('nodeDef'),
+    R.dissoc('parentNode'),
   )(props)
 
   return (
-    childDefs.length > 0
+    innerPageChildren.length > 0
       ? <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                               autoSize={false}
                               rowHeight={edit ? 80 : 60}
@@ -78,7 +81,7 @@ const EntityForm = props => {
 const NodeSelect = props => {
   const {
     nodeDef, nodes, parentNode, selectedNode,
-    addNode, removeNode, onChange,
+    updateNode, removeNode, onChange,
   } = props
 
   return (
@@ -118,8 +121,8 @@ const NodeSelect = props => {
       <button className="btn btn-s btn-of-light-xs"
               style={{marginLeft: '50px'}}
               onClick={() => {
-                const entity = newNode(nodeDef.id, parentNode.recordId, parentNode.id)
-                addNode(nodeDef, entity)
+                const entity = newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
+                updateNode(nodeDef, entity)
                 onChange(entity.uuid)
               }}>
         <span className="icon icon-plus icon-16px icon-left"></span>
@@ -132,17 +135,35 @@ const NodeSelect = props => {
 
 class NodeDefEntityForm extends React.Component {
 
-  constructor () {
-    super()
-    this.state = {selectedNodeUUID: null}
+  getNode (nodeUUID) {
+    const {nodes} = this.props
+    return nodeUUID
+      ? R.find(R.propEq('uuid', nodeUUID), nodes)
+      : null
   }
 
-  getSelectedNode () {
-    const {nodes} = this.props
-    const {selectedNodeUUID} = this.state
-    return selectedNodeUUID
-      ? R.find(R.propEq('uuid', selectedNodeUUID), nodes)
-      : null
+  checkNodePage () {
+    const {nodeDef, setFormPageNode, nodes, entry} = this.props
+
+    if (entry && !isNodeDefMultiple(nodeDef)) {
+      const nodeUUID = R.pipe(
+        R.head,
+        R.prop('uuid')
+      )(nodes)
+
+      setFormPageNode(nodeDef, nodeUUID)
+    }
+  }
+
+  componentDidMount () {
+    this.checkNodePage()
+  }
+
+  componentDidUpdate (prevProps, prevState) {
+    const {nodeDef} = this.props
+    const {nodeDef: prevNodeDef} = prevProps
+    if (nodeDef.uuid !== prevNodeDef.uuid)
+      this.checkNodePage()
   }
 
   render () {
@@ -151,6 +172,9 @@ class NodeDefEntityForm extends React.Component {
       edit,
       entry,
       nodes,
+
+      setFormPageNode,
+      selectedNodeUUID,
     } = this.props
 
     // edit survey mode
@@ -159,13 +183,13 @@ class NodeDefEntityForm extends React.Component {
 
     // entry multiple entity
     if (entry && isNodeDefMultiple(nodeDef)) {
-      const node = this.getSelectedNode()
+      const node = this.getNode(selectedNodeUUID)
 
       return <div>
 
         <NodeSelect {...this.props}
                     selectedNode={node}
-                    onChange={selectedNodeUUID => this.setState({selectedNodeUUID})}/>
+                    onChange={selectedNodeUUID => setFormPageNode(nodeDef, selectedNodeUUID)}/>
 
         {
           node
@@ -183,4 +207,8 @@ class NodeDefEntityForm extends React.Component {
   }
 }
 
-export default NodeDefEntityForm
+const mapStateToProps = (state, props) => ({
+  selectedNodeUUID: getFormPageNodeUUID(props.nodeDef)(state)
+})
+
+export default connect(mapStateToProps)(NodeDefEntityForm)

@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { getNodeDefByUUID } from '../../common/survey/survey'
+import { getNodeDefParent, getNodeDefByUUID } from '../../common/survey/survey'
 import { getNodeByUUID } from '../../common/record/record'
 import { getRecord } from './record/recordState'
 
@@ -32,6 +32,10 @@ export const getNewSurvey = R.pipe(
  */
 
 //SURVEY FORM ACTIVE PAGE
+export const dissocForm = R.pipe(
+  R.dissoc('form'),
+  R.dissoc('record'),
+)
 
 const surveyFormActivePage = ['form', 'activePageNodeDefUUID']
 
@@ -52,21 +56,36 @@ export const isNodeDefFormActivePage = nodeDef =>
   R.pathEq(surveyFormActivePage, nodeDef.uuid)
 
 // SURVEY FORM PAGES NODES SELECTED STATE
-const surveyFormPages = ['form', 'pagesNodes']
+const surveyFormPages = ['form', 'pageNodes']
 
-export const getFormActivePageParentNode = state => {
-  const survey = getSurvey(state)
-  const record = getRecord(survey)
-  const uuid = R.path(R.concat(surveyFormPages, ['parentNodeUUID']), survey)
-  return getNodeByUUID(uuid)(record)
+const getSurveyFormPageNodePath = nodeDef => R.append(nodeDef.uuid, surveyFormPages)
+
+export const assocFormPageNode = (nodeDef, nodeUUID) => {
+  const path = getSurveyFormPageNodePath(nodeDef)
+  return nodeUUID
+    ? R.assocPath(path, nodeUUID)
+    : R.dissocPath(path)
 }
 
-export const getFormActivePageNode = state => {
-  const survey = getSurvey(state)
-  const record = getRecord(survey)
-  const uuid = R.path(R.concat(surveyFormPages, ['nodeUUID']), survey)
-  return getNodeByUUID(uuid)(record)
-}
+export const getFormPageNodeUUID = nodeDef => R.pipe(
+  getSurvey,
+  R.path(getSurveyFormPageNodePath(nodeDef))
+)
+
+export const getFormPageParentNode = nodeDef =>
+  state => {
+    const survey = getSurvey(state)
+    const record = getRecord(survey)
+
+    const nodeDefParent = getNodeDefParent(nodeDef)(survey)
+    if (nodeDefParent) {
+      const parentNodeUUID = R.path(getSurveyFormPageNodePath(nodeDefParent))(survey)
+
+      return getNodeByUUID(parentNodeUUID)(record)
+    }
+
+    return null
+  }
 
 // CURRENT EDITING NODE_DEF
 const nodeDefEditPath = ['form', 'nodeDefEdit']

@@ -3,15 +3,14 @@ const Promise = require('bluebird')
 
 const db = require('../db/db')
 
-const {fetchNodeDefsBySurveyId, fetchNodeDefsByParentId} = require('../nodeDef/nodeDefRepository')
 const {isNodeDefSingleEntity} = require('../../common/survey/nodeDef')
-
-const {insertRecord} = require('../record/recordRepository')
 const {newNode} = require('../../common/record/node')
 
-const {insertNode, updateNode, deleteNode: deleteNodeRepos} = require('../record/nodeRepository')
+const {fetchRootNodeDef} = require('../survey/surveyRepository')
+const {fetchNodeDef, fetchNodeDefsByParentId} = require('../nodeDef/nodeDefRepository')
 
-// const mapNodes = R.groupBy(R.prop('id'))
+const {insertRecord} = require('../record/recordRepository')
+const {insertNode, updateNode, deleteNode: deleteNodeRepos, fetchNodeByUUID} = require('../record/nodeRepository')
 
 /**
  * ===================
@@ -24,15 +23,23 @@ const createRecord = async (recordToCreate) =>
       const record = await insertRecord(recordToCreate, t)
       const {surveyId, id: recordId} = record
 
-      const nodeDefs = await fetchNodeDefsBySurveyId(surveyId)
-      //TODO use getRootNodeDef from common/nodeDef after refactor
-      const rootNodeDef = R.find(n => n.parentId === null)(nodeDefs)
+      const rootNodeDef = await fetchRootNodeDef(surveyId, false, t)
 
       const nodes = await createNode(rootNodeDef, newNode(rootNodeDef.id, recordId), t)
 
       return R.assoc('nodes', nodes, record)
     }
   )
+
+const persistNode = async (surveyId, nodeReq, client = db) => {
+  const {nodeDefId, value, uuid} = nodeReq
+
+  const node = await fetchNodeByUUID(surveyId, uuid, client)
+
+  return node
+    ? await updateNodeValue(surveyId, uuid, value, client)
+    : await createNode(await fetchNodeDef(nodeDefId), nodeReq, client)
+}
 
 const createNode = async (nodeDef, nodeReq, client = db) => {
 
@@ -50,7 +57,7 @@ const createNode = async (nodeDef, nodeReq, client = db) => {
       childDefs
         .filter(isNodeDefSingleEntity)
         .map(
-          async childDef => await createNode(childDef, newNode(childDef.id, node.recordId, node.id), client)
+          async childDef => await createNode(childDef, newNode(childDef.id, node.recordId, node.uuid), client)
         )
     )
   )
@@ -67,8 +74,8 @@ const createNode = async (nodeDef, nodeReq, client = db) => {
  * UPDATE
  * ===================
  */
-const updateNodeValue = async (surveyId, recordId, nodeId, value) => {
-  const node = await updateNode(surveyId, nodeId, value)
+const updateNodeValue = async (surveyId, nodeUUID, value, client = db) => {
+  const node = await updateNode(surveyId, nodeUUID, value, client)
 
   return {[node.uuid]: node}
 }
@@ -78,8 +85,8 @@ const updateNodeValue = async (surveyId, recordId, nodeId, value) => {
  * ===================
  */
 
-const deleteNode = async (surveyId, nodeId) => {
-  await deleteNodeRepos(surveyId, nodeId)
+const deleteNode = async (surveyId, nodeUUID) => {
+  await deleteNodeRepos(surveyId, nodeUUID)
 
   return {}
 }
@@ -87,10 +94,11 @@ const deleteNode = async (surveyId, nodeId) => {
 module.exports = {
   //==== CREATE
   createRecord,
-  createNode,
+  persistNode,
+  // createNode,
   //==== READ
   //==== UPDATE
-  updateNodeValue,
+  // updateNodeValue,
   //==== DELETE
   deleteNode,
 }

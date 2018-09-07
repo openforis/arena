@@ -1,14 +1,16 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { newNodePlaceholder } from '../../../../../common/record/node'
-import { getSurveySrs } from '../../../../../common/survey/survey'
-import { toSrsItems } from '../../../../../common/app/srs'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import NodeDefFormItem from './nodeDefFormItem'
+
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+
+import { getSurveySrs } from '../../../../../common/survey/survey'
+import { toSrsItems } from '../../../../../common/app/srs'
+import { getNodeDefDefaultValue } from '../nodeDefSystemProps'
 
 class NodeDefCoordinate extends React.Component {
 
@@ -17,7 +19,7 @@ class NodeDefCoordinate extends React.Component {
 
     const newValue = R.assoc(field, value)(node.value)
 
-    updateNode(nodeDef, node, newValue, parentNode)
+    updateNode(nodeDef, node, newValue)
   }
 
   render () {
@@ -35,12 +37,8 @@ class NodeDefCoordinate extends React.Component {
       </div>
     }
 
-    const defaultValue = {x: '', y: '', srs: ''}
-    const node = edit ?
-      {value: defaultValue}
-      : entry && !R.isEmpty(nodes)
-        ? nodes[0]
-        : newNodePlaceholder(nodeDef, parentNode, defaultValue)
+    const node = entry ? nodes[0] : null
+    const value = node ? node.value : getNodeDefDefaultValue(nodeDef)
 
     const srsItems = toSrsItems(getSurveySrs(survey))
 
@@ -53,20 +51,20 @@ class NodeDefCoordinate extends React.Component {
           <FormItem label="X">
             <Input ref="xInput"
                    readOnly={edit}
-                   value={node.value.x}
+                   value={value.x}
                    onChange={(e) => this.handleInputChange(node, 'x', e.target.value)}/>
           </FormItem>
           <FormItem label="Y">
             <Input ref="yInput"
                    readOnly={edit}
-                   value={node.value.y}
+                   value={value.y}
                    onChange={(e) => this.handleInputChange(node, 'y', e.target.value)}/>
           </FormItem>
           <FormItem label="SRS">
             <Dropdown ref="srsDropdown"
                       readOnly={edit}
                       items={srsItems}
-                      selection={node.value.srs}
+                      selection={value.srs}
                       onChange={(selection) => this.handleInputChange(node, 'srs', R.prop('key')(selection))}/>
           </FormItem>
         </div>

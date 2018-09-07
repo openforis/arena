@@ -10,7 +10,6 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
-import { newNodePlaceholder } from '../../../../../common/record/node'
 import { getNodeDefFieldsCount } from '../nodeDefSystemProps'
 
 const EntityTableRow = (props) => {
@@ -119,9 +118,7 @@ class NodeDefEntityTable extends React.Component {
 
   render () {
     const {
-      nodeDef,
       entry,
-      parentNode,
       nodes,
     } = this.props
 
@@ -133,16 +130,13 @@ class NodeDefEntityTable extends React.Component {
                         renderType={nodeDefRenderType.tableHeader}/>
         {
           entry ?
-            R.pipe(
-              R.append(newNodePlaceholder(nodeDef, parentNode)),
-              R.addIndex(R.map)(
-                (node, i) =>
-                  <EntityTableRow key={i}
-                                  {...this.props}
-                                  node={node}
-                                  renderType={nodeDefRenderType.tableBody}/>
-              )
-            )(nodes)
+            nodes.map((node, i) =>
+              <EntityTableRow key={i}
+                              {...this.props}
+                              node={node}
+                              renderType={nodeDefRenderType.tableBody}/>
+            )
+
             : null
         }
 

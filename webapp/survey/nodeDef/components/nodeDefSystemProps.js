@@ -89,6 +89,7 @@ export const nodeDefSystemProps = {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
     fieldsCount: 3,
+    defaultValue: {x: '', y: '', srs: ''},
   },
 
   [nodeDefType.taxon]: {
@@ -134,4 +135,11 @@ export const getNodeDefFieldsCount = nodeDef =>
     nodeDef.type,
     'fieldsCount',
     1
+  )(nodeDefSystemProps)
+
+export const getNodeDefDefaultValue = nodeDef =>
+  getProp(
+    nodeDef.type,
+    'defaultValue',
+    ''
   )(nodeDefSystemProps)

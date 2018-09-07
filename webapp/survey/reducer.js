@@ -14,6 +14,8 @@ import {
   assocFormNodeDefEdit,
   assocNodeDefFormUnlocked,
   assocFormActivePage,
+  assocFormPageNode,
+  dissocForm,
 } from './surveyState'
 
 /**
@@ -44,7 +46,7 @@ import {
   //survey-form
   formNodeDefEditUpdate,
   formNodeDefUnlockedUpdate,
-  formActivePageNodeDefUpdate,
+  formActivePageNodeDefUpdate, formPageNodeUpdate, formReset,
 } from './nodeDef/actions'
 
 /**
@@ -72,11 +74,15 @@ const actionHandlers = {
   [nodeDefValidationUpdate]: (state, {nodeDefUUID, validation}) => assocNodeDefValidation(nodeDefUUID, validation)(state),
 
   //SURVEY-FORM
+  [formReset]: dissocForm,
+
   [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),
 
   [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocNodeDefFormUnlocked(nodeDef)(state),
 
   [formActivePageNodeDefUpdate]: (state, {nodeDef}) => assocFormActivePage(nodeDef)(state),
+
+  [formPageNodeUpdate]: (state, {nodeDef, node}) => assocFormPageNode(nodeDef, node)(state),
 
   //RECORD
   [recordUpdate]: assocActionProps,

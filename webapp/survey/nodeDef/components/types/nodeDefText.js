@@ -15,7 +15,7 @@ const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
          {...getNodeDefInputTextProps(nodeDef)}
          value={getNodeValue(node, '')}
          onChange={(e) =>
-           updateNode(nodeDef, node, e.target.value, parentNode)
+           updateNode(nodeDef, node, e.target.value)
          }
   />
 
@@ -52,20 +52,16 @@ const NodeDefText = props => {
       <NodeDefTextInput {...props} />
     </NodeDefFormItem>
 
-  const nodesToRender = R.isEmpty(nodes) || isNodeDefMultiple(nodeDef)
-    ? R.concat(nodes, [newNodePlaceholder(nodeDef, parentNode)])
-    : nodes
-
   // ENTRY MODE
 
   if (entry && renderType === nodeDefRenderType.tableBody)
-    return <NodeDefTextInput {...props} node={nodesToRender[0]}/>
+    return <NodeDefTextInput {...props} node={nodes[0]}/>
   else
     return (
       <NodeDefFormItem {...props}>
         <div className="overflowYAuto">
           {
-            nodesToRender.map(n =>
+            nodes.map(n =>
               <div key={`nodeDefTextInput_${n.uuid}`}
                    style={{
                      display: 'grid',

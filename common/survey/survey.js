@@ -102,12 +102,14 @@ const assocNodeDefValidation = (nodeDefUUID, validation) =>
  * UTILS NodeDefs
  * ======
  */
+const getNodeDefParent = nodeDef => getNodeDefById(nodeDef.parentId)
+
 const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
   survey => {
     if (isNodeDefRoot(nodeDefDescendant))
       return false
 
-    const nodeDefParent = getNodeDefById(nodeDefDescendant.parentId)
+    const nodeDefParent = getNodeDefParent(nodeDefDescendant)(survey)
     if (nodeDefParent.id === nodeDefAncestor.id)
       return true
     else
@@ -146,5 +148,6 @@ module.exports = {
   // UTILS
   getSurveyDBSchema: surveyId => `survey_${surveyId}`,
   // UTILS NodeDefs
+  getNodeDefParent,
   isNodeDefAncestor,
 }
