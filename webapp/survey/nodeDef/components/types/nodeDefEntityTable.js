@@ -1,7 +1,6 @@
 import '../react-grid-layout.scss'
 
 import React from 'react'
-
 import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
@@ -11,14 +10,34 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
-import { newNodePlaceholder } from '../../../../../common/record/node'
+import { getNodeDefFieldsCount } from '../nodeDefSystemProps'
 
 const EntityTableRow = (props) => {
 
-  const {nodeDef, edit, childDefs, node, renderType, label, removeNode} = props
+  const {
+    nodeDef, edit, childDefs, node,
+    renderType, label,
+    removeNode,
+  } = props
+
+  const childDefsLayout = R.reduce(
+    (layout, childDef) => {
+      const count = getNodeDefFieldsCount(childDef)
+      const {columns} = layout
+      return R.pipe(
+        R.assoc('columns', columns + count),
+        R.assoc(
+          childDef.uuid,
+          {i: childDef.uuid, w: count, x: columns, y: 0, h: 1,}
+        )
+      )(layout)
+    },
+    {columns: 0},
+    childDefs
+  )
+  const {columns} = childDefsLayout
 
   return (
-
     <React.Fragment>
       {
         renderType === nodeDefRenderType.tableHeader ?
@@ -38,9 +57,9 @@ const EntityTableRow = (props) => {
                               autoSize={false}
                               rowHeight={edit ? 80 : 60}
                               cols={{
-                                lg: childDefs.length || 1,
-                                md: childDefs.length || 1,
-                                sm: childDefs.length || 1,
+                                lg: columns || 1,
+                                md: columns || 1,
+                                sm: columns || 1,
                                 xs: 1,
                                 xxs: 1
                               }}
@@ -54,17 +73,18 @@ const EntityTableRow = (props) => {
                               margin={[0, 0]}>
           {
             childDefs
-              .map((childDef, i) =>
-                <div key={childDef.uuid} data-grid={{
-                  i: nodeDef.uuid, x: i, y: 0, w: 1, h: 1,
-                }}>
-                  <NodeDefSwitch key={i}
-                                 {...props}
-                                 node={null}
-                                 nodeDef={childDef}
-                                 parentNode={node}
-                                 renderType={renderType}/>
-                </div>
+              .map((childDef, i) => {
+                  const childDefLayout = R.prop(childDef.uuid, childDefsLayout)
+
+                  return <div key={childDef.uuid} data-grid={{...childDefLayout}}>
+                    <NodeDefSwitch key={i}
+                                   {...props}
+                                   node={null}
+                                   nodeDef={childDef}
+                                   parentNode={node}
+                                   renderType={renderType}/>
+                  </div>
+                }
               )
           }
 
@@ -98,9 +118,7 @@ class NodeDefEntityTable extends React.Component {
 
   render () {
     const {
-      nodeDef,
       entry,
-      parentNode,
       nodes,
     } = this.props
 
@@ -112,16 +130,14 @@ class NodeDefEntityTable extends React.Component {
                         renderType={nodeDefRenderType.tableHeader}/>
         {
           entry ?
-            R.pipe(
-              R.append(newNodePlaceholder(nodeDef, parentNode)),
-              R.addIndex(R.map)(
-                (node, i) =>
-                  <EntityTableRow key={i}
-                                  {...this.props}
-                                  node={node}
-                                  renderType={nodeDefRenderType.tableBody}/>
-              )
-            )(nodes)
+            nodes.map((node, i) =>
+              <EntityTableRow key={i}
+                              {...this.props}
+                              node={node}
+                              nodes={null}
+                              renderType={nodeDefRenderType.tableBody}/>
+            )
+
             : null
         }
 

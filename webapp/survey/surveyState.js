@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { getNodeDefByUUID } from '../../common/survey/survey'
+import { getNodeDefParent, getNodeDefByUUID } from '../../common/survey/survey'
 import { getNodeByUUID } from '../../common/record/record'
 import { getRecord } from './record/recordState'
 
@@ -31,31 +31,61 @@ export const getNewSurvey = R.pipe(
  * ======================
  */
 
-// CURRENT VIEW NODE_DEF PAGE
-const surveyFormActivePage = ['form', 'activePage']
+//SURVEY FORM ACTIVE PAGE
+export const dissocForm = R.pipe(
+  R.dissoc('form'),
+  R.dissoc('record'),
+)
 
-export const assocFormActivePage = (nodeDef, node = {}, parentNode = {}) =>
-  R.assocPath(surveyFormActivePage, nodeDef ? {
-    nodeDefUUID: nodeDef.uuid,
-    nodeUUID: node.uuid,
-    parentNodeUUID: parentNode.uuid,
-  } : null)
+const surveyFormActivePage = ['form', 'activePageNodeDefUUID']
 
-export const getFormActivePageNodeDef = state => {
-  const surveyState = getSurvey(state)
-  const uuid = R.path(R.concat(surveyFormActivePage, ['nodeDefUUID']), surveyState)
-  return getNodeDefByUUID(uuid)(surveyState)
-}
+export const assocFormActivePage = (nodeDef) =>
+  R.assocPath(
+    surveyFormActivePage,
+    nodeDef ? nodeDef.uuid : null
+  )
 
-export const getFormActivePageParentNode = state => {
-  const survey = getSurvey(state)
-  const record = getRecord(survey)
-  const uuid = R.path(R.concat(surveyFormActivePage, ['parentNodeUUID']), survey)
-  return getNodeByUUID(uuid)(record)
-}
+export const getFormActivePageNodeDef = R.pipe(
+  getSurvey,
+  survey => getNodeDefByUUID(
+    R.path(surveyFormActivePage, survey)
+  )(survey)
+)
 
 export const isNodeDefFormActivePage = nodeDef =>
-  R.pathEq(R.concat(surveyFormActivePage, ['nodeDefUUID']), nodeDef.uuid)
+  R.pathEq(surveyFormActivePage, nodeDef.uuid)
+
+// SURVEY FORM PAGES NODES SELECTED STATE
+const surveyFormPages = ['form', 'pageNodes']
+
+const getSurveyFormPageNodePath = nodeDef => R.append(nodeDef.uuid, surveyFormPages)
+
+export const assocFormPageNode = (nodeDef, nodeUUID) => {
+  const path = getSurveyFormPageNodePath(nodeDef)
+  return nodeUUID
+    ? R.assocPath(path, nodeUUID)
+    : R.dissocPath(path)
+}
+
+export const getFormPageNodeUUID = nodeDef => R.pipe(
+  getSurvey,
+  R.path(getSurveyFormPageNodePath(nodeDef))
+)
+
+export const getFormPageParentNode = nodeDef =>
+  state => {
+    const survey = getSurvey(state)
+    const record = getRecord(survey)
+
+    const nodeDefParent = getNodeDefParent(nodeDef)(survey)
+    if (nodeDefParent) {
+      const parentNodeUUID = R.path(getSurveyFormPageNodePath(nodeDefParent))(survey)
+
+      return getNodeByUUID(parentNodeUUID)(record)
+    }
+
+    return null
+  }
 
 // CURRENT EDITING NODE_DEF
 const nodeDefEditPath = ['form', 'nodeDefEdit']

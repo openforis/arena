@@ -64,18 +64,19 @@ const _putNodeDefProp = (nodeDef, key, value) => {
 }
 
 /**
- * ==== SURVEY-FORM EDIT MODE - NODE DEFS
+ * ==== SURVEY-FORM EDIT MODE - NODE DEFS EDIT
  */
+
+export const formReset = 'survey/form/reset'
+export const resetForm = () => dispatch =>
+  dispatch({type: formReset})
+
 export const formNodeDefEditUpdate = 'survey/form/nodeDefEdit/update'
 export const formNodeDefUnlockedUpdate = 'survey/form/nodeDefUnlocked/update'
-export const formNodeDefViewPage = 'survey/form/nodeDefViewPage/update'
 
 export const setFormNodeDefEdit = nodeDef => dispatch => dispatch({type: formNodeDefEditUpdate, nodeDef})
 
 export const setFormNodeDefUnlocked = nodeDef => dispatch => dispatch({type: formNodeDefUnlockedUpdate, nodeDef})
-
-export const setFormActivePage = (nodeDef, node, parentNode) => dispatch =>
-  dispatch({type: formNodeDefViewPage, nodeDef, node, parentNode})
 
 export const closeFormNodeDefEdit = nodeDef => async dispatch => {
   const res = await axios.get(`/api/nodeDef/${nodeDef.id}/validation`)
@@ -87,3 +88,13 @@ export const closeFormNodeDefEdit = nodeDef => async dispatch => {
     dispatch({type: nodeDefValidationUpdate, nodeDefUUID: nodeDef.uuid, validation})
   }
 }
+
+//SURVEY FORM ACTIVE PAGE
+export const formActivePageNodeDefUpdate = 'survey/form/activePageNodeDef/update'
+export const formPageNodeUpdate = 'survey/form/pageParentNode/update'
+
+export const setFormActivePage = (nodeDef) => dispatch =>
+  dispatch({type: formActivePageNodeDefUpdate, nodeDef})
+
+export const setFormPageNode = (nodeDef, node) => dispatch =>
+  dispatch({type: formPageNodeUpdate, nodeDef, node})

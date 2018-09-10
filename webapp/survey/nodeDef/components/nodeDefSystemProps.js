@@ -30,6 +30,7 @@ export const nodeDefSystemProps = {
         allowLeadingZeroes: true,
       }),
     },
+    defaultValue: '',
   },
 
   [nodeDefType.decimal]: {
@@ -49,12 +50,14 @@ export const nodeDefSystemProps = {
         allowLeadingZeroes: true,
       }),
     },
+    defaultValue: '',
   },
 
   [nodeDefType.text]: {
     icon: <span className="icon-left">{R.range(0, 3).map(i =>
       <span key={i} className="icon icon-text-color" style={{margin: '0 -3px'}}/>
     )}</span>,
+    defaultValue: '',
   },
 
   [nodeDefType.date]: {
@@ -63,7 +66,8 @@ export const nodeDefSystemProps = {
       mask: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
       showMask: true,
       placeholderChar: '\u2000',
-    }
+    },
+    defaultValue: '',
   },
 
   [nodeDefType.time]: {
@@ -72,22 +76,27 @@ export const nodeDefSystemProps = {
       mask: [/\d/, /\d/, ':', /\d/, /\d/],
       showMask: true,
       placeholderChar: '\u2000',
-    }
+    },
+    defaultValue: '',
   },
 
   [nodeDefType.boolean]: {
     component: NodeDefBoolean,
     icon: <span className="icon icon-radio-checked2 icon-left"/>,
+    defaultValue: '',
   },
 
   [nodeDefType.codeList]: {
     component: NodeDefCodeList,
     icon: <span className="icon icon-list icon-left"/>,
+    defaultValue: '',
   },
 
   [nodeDefType.coordinate]: {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
+    fieldsCount: 3,
+    defaultValue: {x: '', y: '', srs: ''},
   },
 
   [nodeDefType.taxon]: {
@@ -107,18 +116,36 @@ export const nodeDefSystemProps = {
 
 }
 
-const getProp = (nodeDefType, prop) => R.path([nodeDefType, prop])
+const getProp = (nodeDefType, prop, defaultValue = null) => R.pathOr(defaultValue, [nodeDefType, prop])
 
 export const getNodeDefIconByType = nodeDefType => R.pipe(
   getProp(nodeDefType, 'icon'),
 )(nodeDefSystemProps)
 
-export const getNodeDefInputTextProps = nodeDef => R.pipe(
-  getProp(nodeDef.type, 'inputText'),
-  R.defaultTo({mask: false, showMask: false}),
-)(nodeDefSystemProps)
+export const getNodeDefInputTextProps = nodeDef =>
+  getProp(
+    nodeDef.type,
+    'inputText',
+    {mask: false, showMask: false}
+  )(nodeDefSystemProps)
 
-export const getNodeDefComponent = nodeDef => R.pipe(
-  getProp(nodeDef.type, 'component'),
-  R.defaultTo(NodeDefText),
-)(nodeDefSystemProps)
+export const getNodeDefComponent = nodeDef =>
+  getProp(
+    nodeDef.type,
+    'component',
+    NodeDefText
+  )
+  (nodeDefSystemProps)
+
+export const getNodeDefFieldsCount = nodeDef =>
+  getProp(
+    nodeDef.type,
+    'fieldsCount',
+    1
+  )(nodeDefSystemProps)
+
+export const getNodeDefDefaultValue = nodeDef =>
+  getProp(
+    nodeDef.type,
+    'defaultValue',
+  )(nodeDefSystemProps)

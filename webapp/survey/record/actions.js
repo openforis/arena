@@ -7,8 +7,10 @@ import { getSurvey } from '../surveyState'
 import { getSurveyDefaultStep } from '../../../common/survey/survey'
 import { appState } from '../../app/app'
 
-import { newRecord } from '../../../common/record/record'
-import { isNodeValueNotBlank } from '../../../common/record/node'
+import { newRecord, getParentNode } from '../../../common/record/record'
+import { newNodePlaceholder } from '../../../common/record/node'
+
+import { getRecord } from './recordState'
 
 export const recordUpdate = 'survey/record/update'
 export const nodesUpdate = 'survey/record/node/update'
@@ -30,7 +32,6 @@ export const createRecord = () => async (dispatch, getState) => {
     const step = getSurveyDefaultStep(survey)
 
     const record = newRecord(user, survey.id, step)
-    //dispatch({type: recordUpdate, record})
 
     const {data} = await axios.post(`/api/survey/${survey.id}/record`, record)
     dispatch({type: recordUpdate, record: data.record})
@@ -40,65 +41,60 @@ export const createRecord = () => async (dispatch, getState) => {
   }
 }
 
-export const updateNode = (nodeDef, node, value, parentNode) => async dispatch => {
-  if (node.placeholder) {
-    if (isNodeValueNotBlank(value)) {
-      dispatch(addNode(nodeDef, node, value, parentNode))
-    }
-  } else {
-    dispatch(updateNodeValue(nodeDef, node, value))
+export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
+  dispatch => {
+    const node = newNodePlaceholder(nodeDef, parentNode, defaultValue)
+    dispatchNodesUpdate(dispatch, {[node.uuid]: node})
   }
-}
-
-export const addNode = (nodeDef, node, value, parentNode = null) => async dispatch => {
-  try {
-    //TODO REFACTOR
-    // add parent if not exist
-    let addedParentNode = null
-    if (parentNode && parentNode.placeholder) {
-      const {data} = await axios.post(`/api/survey/${nodeDef.surveyId}/record/${parentNode.recordId}/node`, parentNode)
-      addedParentNode = R.path(['nodes', parentNode.uuid], data)
-    }
-
-    const nodeToAdd = R.pipe(
-      R.dissoc('placeholder'),
-      R.assoc('value', value),
-      R.assoc('parentId', addedParentNode ? addedParentNode.id : node.parentId),
-    )(node)
-
-    const addedNodes = addedParentNode
-      ? {[nodeToAdd.uuid]: nodeToAdd, [addedParentNode.uuid]: addedParentNode}
-      : {[nodeToAdd.uuid]: nodeToAdd}
-
-    dispatchNodesUpdate(dispatch, addedNodes)
-
-    const {data} = await axios.post(`/api/survey/${nodeDef.surveyId}/record/${nodeToAdd.recordId}/node`, nodeToAdd)
-    dispatchNodesUpdate(dispatch, data.nodes)
-  } catch (e) {
-    console.log(e)
-  }
-}
 
 /**
  * ============
  * UPDATE
  * ============
  */
-const updateNodeValue = (nodeDef, node, value) => dispatch => {
-  dispatchNodesUpdate(dispatch, {[node.uuid]: R.assoc('value', value, node)})
-  dispatch(_updateNodeValue(nodeDef, node, value))
-}
 
-const _updateNodeValue = (nodeDef, node, value) => {
+export const updateNode = (nodeDef, node, value) =>
+  async (dispatch, getState) => {
+
+    const survey = getSurvey(getState())
+    const record = getRecord(survey)
+    const parentNode = getParentNode(node)(record)
+
+    // first update state
+    const parentNodeToUpdate = parentNode.placeholder ? getUpdatedNode(dispatch, parentNode, null) : null
+    const nodeToUpdate = getUpdatedNode(dispatch, node, value)
+
+    const nodes = parentNodeToUpdate
+      ? {[node.uuid]: nodeToUpdate, [parentNodeToUpdate.uuid]: parentNodeToUpdate}
+      : {[node.uuid]: nodeToUpdate}
+
+    dispatchNodesUpdate(dispatch, nodes)
+
+    // then post nodes
+    if (parentNodeToUpdate) {
+      const {data} = await axios.post(`/api/survey/${survey.id}/record/${parentNodeToUpdate.recordId}/node`, parentNodeToUpdate)
+      dispatchNodesUpdate(dispatch, data.nodes)
+    }
+
+    dispatch(_updateNodeDebounced(survey.id, nodeToUpdate, node.placeholder ? 0 : 500))
+  }
+
+const getUpdatedNode = (dispatch, node, value) =>
+  R.pipe(
+    R.dissoc('placeholder'),
+    R.assoc('value', value),
+  )(node)
+
+const _updateNodeDebounced = (surveyId, node, delay) => {
   const action = async dispatch => {
     try {
-      const {data} = await axios.put(`/api/survey/${nodeDef.surveyId}/record/${node.recordId}/node/${node.id}`, {value})
+      const {data} = await axios.post(`/api/survey/${surveyId}/record/${node.recordId}/node`, node)
       dispatchNodesUpdate(dispatch, data.nodes)
     } catch (e) {
       console.log(e)
     }
   }
-  return debounceAction(action, `node_update_${node.uuid}`)
+  return debounceAction(action, `node_update_${node.uuid}`, delay)
 }
 
 /**
@@ -110,8 +106,8 @@ export const removeNode = (nodeDef, node) => async dispatch => {
   try {
     dispatch({type: nodeDelete, node})
 
-    const {data} = await axios.delete(`/api/survey/${nodeDef.surveyId}/record/${node.recordId}/node/${node.id}`, node)
-    dispatch({type: nodesUpdate, nodes: data.nodes})
+    const {data} = await axios.delete(`/api/survey/${nodeDef.surveyId}/record/${node.recordId}/node/${node.uuid}`)
+    dispatchNodesUpdate(dispatch, data.nodes)
   } catch (e) {
     console.log(e)
   }

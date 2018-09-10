@@ -2,7 +2,7 @@ const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
 
 const {fetchNodeDef} = require('../nodeDef/nodeDefRepository')
-const {createRecord, createNode, updateNodeValue, deleteNode} = require('./recordManager')
+const {createRecord, persistNode, deleteNode} = require('./recordManager')
 
 module.exports.init = app => {
 
@@ -24,13 +24,13 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/survey/:surveyId/record/:recordId/node', async(req, res) => {
+  app.post('/survey/:surveyId/record/:recordId/node', async (req, res) => {
     try {
       const nodeReq = req.body
 
-      const nodeDef = await fetchNodeDef(nodeReq.nodeDefId)
-
-      const nodes = await createNode(nodeDef, nodeReq)
+      // const nodeDef = await fetchNodeDef(nodeReq.nodeDefId)
+      const surveyId = getRestParam(req, 'surveyId')
+      const nodes = await persistNode(surveyId, nodeReq)
 
       res.json({nodes})
     } catch (err) {
@@ -54,28 +54,15 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/record/:recordId/node/:nodeId', async (req, res) => {
-    try {
-      const surveyId = getRestParam(req, 'surveyId')
-      const recordId = getRestParam(req, 'recordId')
-      const nodeId = getRestParam(req, 'nodeId')
-      const {value} = req.body
-
-      const nodes = await updateNodeValue(surveyId, recordId, nodeId, value)
-      res.json({nodes})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId/record/:recordId/node/:nodeId', async (req, res) => {
+  app.delete('/survey/:surveyId/record/:recordId/node/:nodeUUID', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const nodeId = getRestParam(req, 'nodeId')
+      const nodeUUID = getRestParam(req, 'nodeUUID')
 
-      const nodes = await deleteNode(surveyId, nodeId)
+      const nodes = await deleteNode(surveyId, nodeUUID)
       res.json({nodes})
     } catch (err) {
       sendErr(res, err)

@@ -1,18 +1,13 @@
 import React from 'react'
-import * as R from 'ramda'
 
-import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/node'
+import { getNodeValue } from '../../../../../common/record/node'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 import NodeDefFormItem from './nodeDefFormItem'
 
-const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value, edit}) => {
-  const node = edit
-    ? null
-    : R.isEmpty(nodes)
-      ? newNodePlaceholder(nodeDef, parentNode)
-      : nodes[0]
+const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value, entry}) => {
+  const node = entry ? nodes[0] : null
 
   const nodeValue = getNodeValue(node, '')
 
@@ -20,7 +15,7 @@ const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value,
     <button className="btn btn-s btn-transparent"
             style={{borderRadius: '.75rem'}}
             aria-disabled={disabled}
-            onClick={() => updateNode(nodeDef, node, value, parentNode)}>
+            onClick={() => updateNode(nodeDef, node, value)}>
       <span className={`icon icon-radio-${nodeValue === value ? 'checked2' : 'unchecked'} icon-left`}/>
       {label}
     </button>

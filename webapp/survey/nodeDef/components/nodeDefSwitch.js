@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
 import {
   getNoColumns,
@@ -7,41 +8,58 @@ import {
   getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefLabel, isNodeDefRoot } from '../../../../common/survey/nodeDef'
-import { getNodeChildrenByDefId } from '../../../../common/record/record'
+import { getNodeDefLabel, isNodeDefRoot, isNodeDefMultiple } from '../../../../common/survey/nodeDef'
+import { isRenderForm } from '../../../../common/survey/nodeDefLayout'
+import { getNodeChildrenByDefId, getRootNode } from '../../../../common/record/record'
 
 import { getSurvey, isNodeDefFormLocked } from '../../surveyState'
 import { getRecord } from '../../record/recordState'
 
 import { setFormNodeDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
-import { updateNode, addNode, removeNode } from '../../record/actions'
+import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
 
-import { getNodeDefComponent } from './nodeDefSystemProps'
+import { getNodeDefComponent, getNodeDefDefaultValue } from './nodeDefSystemProps'
 import { getSurveyDefaultLanguage } from '../../../../common/survey/survey'
 
 class NodeDefSwitch extends React.Component {
 
-  componentDidMount () {
-    const {nodeDef} = this.props
+  checkNodePlaceholder () {
+    const {entry, nodes, nodeDef, parentNode, createNodePlaceholder} = this.props
 
-    if (!nodeDef.id)
+    if (entry && !isRenderForm(nodeDef) && (R.isEmpty(nodes) || isNodeDefMultiple(nodeDef))) {
+      const hasNotPlaceholder = R.pipe(
+        R.find(R.propEq('placeholder', true)),
+        R.isNil,
+      )(nodes)
+
+      if (hasNotPlaceholder && parentNode) {
+        createNodePlaceholder(nodeDef, parentNode, getNodeDefDefaultValue(nodeDef))
+      }
+    }
+  }
+
+  componentDidMount () {
+    const {nodeDef, edit} = this.props
+
+    if (edit && !nodeDef.id)
       this.refs.nodeDefElem.scrollIntoView()
+
+    this.checkNodePlaceholder()
+  }
+
+  componentDidUpdate () {
+    this.checkNodePlaceholder()
   }
 
   render () {
     const {
       nodeDef,
-
-      // passed by the caller
       edit,
+      locked,
 
-      // actions
       setFormNodeDefEdit,
       putNodeDefProp,
       setFormNodeDefUnlocked,
-
-      //state
-      locked,
     } = this.props
 
     const isRoot = isNodeDefRoot(nodeDef)
@@ -122,10 +140,19 @@ const mapStateToProps = (state, props) => {
   const {nodeDef, parentNode, entry} = props
   const survey = getSurvey(state)
 
+  const mapEntryProps = () => ({
+    nodes: isNodeDefRoot(nodeDef)
+      ? [getRootNode(getRecord(survey))]
+      // : getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(survey))
+      : parentNode
+        ? getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(survey))
+        : []
+  })
+
   return {
     locked: isNodeDefFormLocked(nodeDef)(state),
-    nodes: entry ? getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(survey)) : [],
-    label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey))
+    label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey)),
+    ...entry ? mapEntryProps() : {},
   }
 }
 
@@ -133,6 +160,6 @@ export default connect(
   mapStateToProps,
   {
     setFormNodeDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
-    updateNode, addNode, removeNode,
+    updateNode, removeNode, createNodePlaceholder,
   }
 )(NodeDefSwitch)

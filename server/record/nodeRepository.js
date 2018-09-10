@@ -7,19 +7,25 @@ const dbTransformCallback = camelize
 
 // ============== CREATE
 
-const insertNode = async (surveyId, node, client = db) =>
-  await client.one(`
+const insertNode = async (surveyId, node, client = db) => {
+  const parent = await client.oneOrNone(`
+    SELECT id FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = $1
+    `,
+    [node.parentUUID])
+
+  return await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node 
     (uuid, record_id, parent_id, node_def_id, value)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *`,
-    [node.uuid, node.recordId, node.parentId, node.nodeDefId, node.value ? JSON.stringify(node.value) : null],
+    [node.uuid, node.recordId, parent ? parent.id : null, node.nodeDefId, node.value ? JSON.stringify(node.value) : null],
     dbTransformCallback
   )
+}
 
 // ============== READ
 
-const fetchNodes = async (surveyId, recordId, client = db) =>
+const fetchNodesByRecordId = async (surveyId, recordId, client = db) =>
   await client.map(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node 
     WHERE record_id = $1 
@@ -28,24 +34,32 @@ const fetchNodes = async (surveyId, recordId, client = db) =>
     dbTransformCallback
   )
 
+const fetchNodeByUUID = async (surveyId, uuid, client = db) =>
+  await client.oneOrNone(`
+    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node 
+    WHERE uuid = $1`,
+    [uuid],
+    dbTransformCallback
+  )
+
 // ============== UPDATE
-const updateNode = async (surveyId, nodeId, value, client = db) =>
+const updateNode = async (surveyId, nodeUUID, value, client = db) =>
   await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node 
     SET value = $1 
-    WHERE id = $2
+    WHERE uuid = $2
     RETURNING *
-    `, [JSON.stringify(value), nodeId],
+    `, [JSON.stringify(value), nodeUUID],
     dbTransformCallback
   )
 
 // ============== DELETE
-const deleteNode = async (surveyId, nodeId, client = db) =>
+const deleteNode = async (surveyId, nodeUUID, client = db) =>
   await client.one(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE id = $1
+    WHERE uuid = $1
     RETURNING *
-    `, [nodeId],
+    `, [nodeUUID],
     dbTransformCallback
   )
 
@@ -54,7 +68,8 @@ module.exports = {
   insertNode,
 
   //READ
-  fetchNodes,
+  fetchNodesByRecordId,
+  fetchNodeByUUID,
 
   //UPDATE
   updateNode,
