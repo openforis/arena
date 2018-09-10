@@ -40,7 +40,7 @@ class Dropdown extends React.Component {
     window.removeEventListener('click', this.outsideClick)
   }
 
-  getRefs() {
+  getRefs () {
     return {
       dropdown: this.refs.dropdown,
       input: this.refs.dropdownInput.input.current.inputElement
@@ -54,7 +54,7 @@ class Dropdown extends React.Component {
   }
 
   toggleOpened () {
-    if (! this.props.readOnly) {
+    if (!this.props.readOnly) {
       this.setState({
         opened: !this.state.opened,
         itemsFocusIndex: -1,
@@ -99,11 +99,11 @@ class Dropdown extends React.Component {
       autocompleteMinChars <= 0 && searchValue.length === 0 ?
         items
         : autocompleteMinChars > 0 && searchValue.length < autocompleteMinChars ?
-          []
-          : items.filter(item => item.key
-              ? contains(searchValue, item.key) || contains(searchValue, item.value)
-              : contains(searchValue, item)
-            )
+        []
+        : items.filter(item => item.key
+          ? contains(searchValue, item.key) || contains(searchValue, item.value)
+          : contains(searchValue, item)
+        )
 
     this.setState({
       items: filteredItems,
@@ -198,7 +198,7 @@ class Dropdown extends React.Component {
 
     return {
       top: (top + height),
-      // left,
+      left,
       width
     }
   }
@@ -237,8 +237,8 @@ class Dropdown extends React.Component {
       <span className="icon icon-menu2 icon-24px"
             onClick={() => this.toggleOpened()}></span>
       {
-        this.isOpened()
-          ? (
+        this.isOpened() ?
+          ReactDOM.createPortal(
             <div className="dropdown__list"
                  style={{
                    ...this.getOffset(),
@@ -253,11 +253,11 @@ class Dropdown extends React.Component {
                   </div>
                 )
               }
-            </div>
+            </div>,
+            document.body
           )
-          : (
-            null
-          )
+          : null
+
       }
     </div>
   }
