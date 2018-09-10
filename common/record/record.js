@@ -28,14 +28,14 @@ const getNodesArray = R.pipe(
 
 const getNodeChildren = node => R.pipe(
   getNodesArray,
-  R.filter(n => n.parentId === node.id || n.parentUUID === node.uuid),
-  R.sort((n1, n2) => {
-    return !n1.id
-      ? 1
-      : !n2.id
-        ? -1
-        : Number(n1.id) > Number(n2.id)
-  }),
+  R.filter(n => n.parentId ? n.parentId === node.id : n.parentUUID === node.uuid),
+  // R.sort((n1, n2) => {
+  //   return !n1.id
+  //     ? 1
+  //     : !n2.id
+  //       ? -1
+  //       : Number(n1.id) < Number(n2.id)
+  // }),
 )
 
 const getNodeChildrenByDefId = (parentNode, nodeDefId) => record => R.pipe(

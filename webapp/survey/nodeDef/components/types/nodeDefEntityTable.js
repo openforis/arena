@@ -134,6 +134,7 @@ class NodeDefEntityTable extends React.Component {
               <EntityTableRow key={i}
                               {...this.props}
                               node={node}
+                              nodes={null}
                               renderType={nodeDefRenderType.tableBody}/>
             )
 

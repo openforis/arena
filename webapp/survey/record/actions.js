@@ -55,7 +55,6 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
 
 export const updateNode = (nodeDef, node, value) =>
   async (dispatch, getState) => {
-    // new node, update value
 
     const survey = getSurvey(getState())
     const record = getRecord(survey)
@@ -65,12 +64,11 @@ export const updateNode = (nodeDef, node, value) =>
     const parentNodeToUpdate = parentNode.placeholder ? getUpdatedNode(dispatch, parentNode, null) : null
     const nodeToUpdate = getUpdatedNode(dispatch, node, value)
 
-    dispatchNodesUpdate(
-      dispatch,
-      parentNodeToUpdate
-        ? {[node.uuid]: nodeToUpdate, [parentNodeToUpdate.uuid]: parentNodeToUpdate}
-        : {[node.uuid]: nodeToUpdate}
-    )
+    const nodes = parentNodeToUpdate
+      ? {[node.uuid]: nodeToUpdate, [parentNodeToUpdate.uuid]: parentNodeToUpdate}
+      : {[node.uuid]: nodeToUpdate}
+
+    dispatchNodesUpdate(dispatch, nodes)
 
     // then post nodes
     if (parentNodeToUpdate) {
