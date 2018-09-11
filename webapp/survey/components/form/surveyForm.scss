@@ -133,9 +133,21 @@
 
 .node-def__entity-table-data-rows {
   display: grid;
-  row-gap: .1rem;
-  overflow-y: auto;
+  overflow-y: scroll;
   position: absolute;
   width: 100%;
   top: 80px;
+
+  .form-input {
+    border: none;
+  }
+
+  .react-grid-item {
+    border-right: 1px solid rgba($white, .7);
+    border-bottom: 1px solid rgba($white, .7);
+
+    &:first-child {
+      border-left: 1px solid rgba($white, .7);
+    }
+  }
 }

@@ -20,7 +20,7 @@
 .form-label {
   justify-self: right;
   text-transform: uppercase;
-  font-size: 1rem;
+  font-size: .9rem;
   font-weight: 400;
   text-align: end;
 }
@@ -31,13 +31,13 @@
 //}
 
 .form-input {
-  padding: .5rem;
-  border-bottom: 5px dotted rgba($white, .6);
+  padding: .5rem 1rem;
+  border-bottom: 1px solid rgba($white, .7);
   //&.error {
   //  border-bottom: 5px dotted rgba($red, .6);
   //}
 
   &[readonly] {
-    border-bottom: 5px dotted rgba($white, .3);
+    border-bottom: 1px solid rgba($white, .5);
   }
 }

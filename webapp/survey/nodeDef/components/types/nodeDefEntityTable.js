@@ -52,12 +52,12 @@ const EntityTableRow = (props) => {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 30px'
+        gridTemplateColumns: '1fr 40px'
       }}>
 
         <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                               autoSize={false}
-                              rowHeight={rowHeight}
+                              rowHeight={rowHeight -1}
                               cols={{
                                 lg: columns || 1,
                                 md: columns || 1,

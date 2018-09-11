@@ -49,7 +49,7 @@ class AppHomeView extends React.Component {
     return (
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '.2fr .6fr .2fr',
+        gridTemplateColumns: '.1fr .8fr .1fr',
         gridTemplateRows: '.3fr .7fr',
       }}>
 
@@ -61,17 +61,18 @@ class AppHomeView extends React.Component {
           alignItems: 'center',
           gridColumnGap: '2rem',
         }}>
-
-          <Input placeholder="Name"
-                 value={name}
-                 validation={getFieldValidation('name')(validation)}
-                 onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
-
-          <Input placeholder="Label"
-                 value={label}
-                 validation={getFieldValidation('label')(validation)}
-                 onChange={e => updateNewSurveyProp('label', e.target.value)}/>
-
+          <div>
+            <Input placeholder="Name"
+                   value={name}
+                   validation={getFieldValidation('name')(validation)}
+                   onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
+          </div>
+          <div>
+            <Input placeholder="Label"
+                   value={label}
+                   validation={getFieldValidation('label')(validation)}
+                   onChange={e => updateNewSurveyProp('label', e.target.value)}/>
+          </div>
           <LanguageDropdown placeholder="Language"
                             selection={lang}
                             onChange={e => updateNewSurveyProp('lang', e)}
