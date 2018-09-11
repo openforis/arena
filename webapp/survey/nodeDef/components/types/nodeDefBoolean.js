@@ -24,16 +24,16 @@ const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value,
 }
 
 const Buttons = props =>
-  <div className="form-input" style={{borderBottom: 'none', textAlign: 'center'}}>
+  <div style={{borderBottom: 'none', textAlign: 'center'}}>
 
     <Button {...props}
             disabled={props.edit}
-            label="YES"
+            label="TRUE"
             value="true"/>
 
     <Button {...props}
             disabled={props.edit}
-            label="NO"
+            label="FALSE"
             value="false"/>
 
   </div>

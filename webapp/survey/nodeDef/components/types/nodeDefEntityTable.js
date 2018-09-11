@@ -55,7 +55,7 @@ const EntityTableRow = (props) => {
 
         <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                               autoSize={false}
-                              rowHeight={edit ? 80 : 60}
+                              rowHeight={50}
                               cols={{
                                 lg: columns || 1,
                                 md: columns || 1,

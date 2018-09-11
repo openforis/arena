@@ -62,7 +62,8 @@ class NodeDefCoordinate extends React.Component {
       <NodeDefFormItem {...this.props}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr'
+          gridTemplateColumns: '1fr',
+          rowGap: '.3rem',
         }}>
           <FormItem label="X">
             <Input ref="xInput"

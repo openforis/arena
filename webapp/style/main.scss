@@ -5,6 +5,10 @@
 @import "./ico";
 @import "tooltip";
 
+html {
+  font: 14px/1.6 'Montserrat', sans-serif;
+}
+
 body, html {
   height: 100%;
   overflow: hidden;
@@ -12,7 +16,6 @@ body, html {
 
 body {
   margin: 0;
-  font: 18px/1.6 'Montserrat', sans-serif;
   font-weight: 200;
   letter-spacing: 1px;
   color: $white;
