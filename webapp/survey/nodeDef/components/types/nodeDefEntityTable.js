@@ -11,6 +11,9 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 import { getNodeDefFieldsCount } from '../nodeDefSystemProps'
+import { elementOffset } from '../../../../appUtils/domUtils'
+
+const rowHeight = 50
 
 const EntityTableRow = (props) => {
 
@@ -41,21 +44,20 @@ const EntityTableRow = (props) => {
     <React.Fragment>
       {
         renderType === nodeDefRenderType.tableHeader ?
-          <div className="form-label" style={{justifySelf: 'center'}}>
+          <div className="form-label node-def__table-header">
             {label}
           </div>
           : null
       }
 
-
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 20px'
+        gridTemplateColumns: '1fr 30px'
       }}>
 
         <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                               autoSize={false}
-                              rowHeight={50}
+                              rowHeight={rowHeight}
                               cols={{
                                 lg: columns || 1,
                                 md: columns || 1,
@@ -63,7 +65,7 @@ const EntityTableRow = (props) => {
                                 xs: 1,
                                 xxs: 1
                               }}
-                              containerPadding={edit ? [0, 30] : [0, 0]}
+                              containerPadding={[0, 0]}
           // layouts={{}}
           //                     onLayoutChange={this.onLayoutChange}
           //                     isDraggable={edit && !locked}
@@ -120,28 +122,40 @@ class NodeDefEntityTable extends React.Component {
     const {
       entry,
       nodes,
+      nodeDef,
     } = this.props
 
+    const domElem = document.getElementById(nodeDef.uuid)
+    const {height} = domElem ? elementOffset(domElem) : {height: 80}
+
     return (
-      <React.Fragment>
+      <div className="node-def__entity-table">
 
         <EntityTableRow {...this.props}
                         node={null}
                         renderType={nodeDefRenderType.tableHeader}/>
+
         {
           entry ?
-            nodes.map((node, i) =>
-              <EntityTableRow key={i}
-                              {...this.props}
-                              node={node}
-                              nodes={null}
-                              renderType={nodeDefRenderType.tableBody}/>
-            )
-
+            <div className="node-def__entity-table-data-rows"
+                 style={{
+                   gridTemplateRows: `repeat(${nodes.length}, ${rowHeight}px)`,
+                   maxHeight: height - 80,
+                 }}>
+              {
+                nodes.map((node, i) =>
+                  <EntityTableRow key={i}
+                                  {...this.props}
+                                  node={node}
+                                  nodes={null}
+                                  renderType={nodeDefRenderType.tableBody}/>
+                )
+              }
+            </div>
             : null
         }
 
-      </React.Fragment>
+      </div>
     )
   }
 }

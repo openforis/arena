@@ -23,7 +23,7 @@ import { getFormPageNodeUUID } from '../../../surveyState'
 const onLayoutChange = (props, layout) => {
   const {nodeDef, edit, locked, putNodeDefProp} = props
 
-//console.log(window.innerWidth) ||
+  //console.log(window.innerWidth) ||
   edit && !locked && window.innerWidth > 1200 && layout.length > 0
     ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
     : null
@@ -60,7 +60,7 @@ const EntityForm = props => {
         {
           innerPageChildren
             .map((childDef, i) =>
-              <div key={childDef.uuid}>
+              <div key={childDef.uuid} id={childDef.uuid}>
                 <NodeDefSwitch key={i}
                                {...childProps}
                                nodeDef={childDef}

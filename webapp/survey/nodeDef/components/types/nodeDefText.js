@@ -7,8 +7,9 @@ import NodeDefFormItem from './nodeDefFormItem'
 import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
-import { getNodeValue, newNodePlaceholder } from '../../../../../common/record/node'
+import { getNodeValue } from '../../../../../common/record/node'
 import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
+import { elementOffset } from '../../../../appUtils/domUtils'
 
 const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
   <Input readOnly={edit}
@@ -56,10 +57,13 @@ const NodeDefText = props => {
 
   if (entry && renderType === nodeDefRenderType.tableBody)
     return <NodeDefTextInput {...props} node={nodes[0]}/>
-  else
+  else {
+    const domElem = document.getElementById(nodeDef.uuid)
+    const {height} = domElem ? elementOffset(domElem) : {height: 80}
+
     return (
       <NodeDefFormItem {...props}>
-        <div className="overflowYAuto">
+        <div className="overflowYAuto" style={{display: 'grid', alignContent: 'center',  height}}>
           {
             nodes.map(n =>
               <div key={`nodeDefTextInput_${n.uuid}`}
@@ -78,6 +82,7 @@ const NodeDefText = props => {
         </div>
       </NodeDefFormItem>
     )
+  }
 }
 
 export default NodeDefText
