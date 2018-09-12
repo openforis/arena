@@ -79,7 +79,8 @@ const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
 
   return await client.one(`
     UPDATE node_def 
-    SET props_draft = props_draft || $1 
+    SET props_draft = props_draft || $1,
+    date_modified = timezone('UTC'::text, now())
     WHERE id = $2
     RETURNING ${nodeDefSelectFields}
   `, [JSON.stringify(prop), nodeDefId],
