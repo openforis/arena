@@ -2,13 +2,12 @@
 
 .dropdown {
   display: grid;
-  grid-template-columns: .95fr .05fr;
+  grid-template-columns: .9fr .1fr;
   align-items: center;
-  position: relative;
-  flex-grow: 1;
 
   span.icon {
     color: $whiteLight;
+    justify-self: end;
     &:hover {
       cursor: pointer;
     }
