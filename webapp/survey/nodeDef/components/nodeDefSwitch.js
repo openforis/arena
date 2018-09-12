@@ -8,8 +8,7 @@ import {
   getPageUUID,
 } from '../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefLabel, isNodeDefRoot, isNodeDefMultiple } from '../../../../common/survey/nodeDef'
-import { isRenderForm } from '../../../../common/survey/nodeDefLayout'
+import { getNodeDefLabel, isNodeDefRoot, isNodeDefMultiple, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { getNodeChildrenByDefId, getRootNode } from '../../../../common/record/record'
 
 import { getSurvey, isNodeDefFormLocked } from '../../surveyState'
@@ -26,7 +25,7 @@ class NodeDefSwitch extends React.Component {
   checkNodePlaceholder () {
     const {entry, nodes, nodeDef, parentNode, createNodePlaceholder} = this.props
 
-    if (entry && !isRenderForm(nodeDef) && (R.isEmpty(nodes) || isNodeDefMultiple(nodeDef))) {
+    if (entry && !isNodeDefEntity(nodeDef) && (R.isEmpty(nodes) || isNodeDefMultiple(nodeDef))) {
       const hasNotPlaceholder = R.pipe(
         R.find(R.propEq('placeholder', true)),
         R.isNil,

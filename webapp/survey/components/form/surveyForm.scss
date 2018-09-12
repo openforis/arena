@@ -1,5 +1,7 @@
 @import "../../../style/vars";
 
+$tableBorder: 1px solid rgba($white, .7);
+
 .survey-form {
   display: grid;
   grid-template-rows: 50px 1fr;
@@ -111,27 +113,33 @@
   letter-spacing: 0px;
 }
 
-.node-def__table-header {
-  justify-self: center;
-  align-self: center;
-  text-transform: uppercase;
-  font-size: 1rem;
-  font-weight: 400;
-  //text-align: end;
-}
-
-.node-def__coordinate-table-row {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-}
-
-.node-def__entity-table {
+.node-def__table {
   display: grid;
   align-self: start;
   grid-template-rows: 30px 50px 1fr;
 }
 
-.node-def__entity-table-data-rows {
+.node-def__table-header {
+  justify-self: center;
+  align-self: center;
+  text-transform: uppercase;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+}
+
+.node-def__table-row {
+  display: grid;
+  grid-template-columns: 1fr 40px;
+  border-bottom: $tableBorder;
+}
+
+.node-def__table-row-coordinate {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+}
+
+.node-def__table-data-rows {
   display: grid;
   overflow-y: scroll;
   position: absolute;
@@ -143,11 +151,17 @@
   }
 
   .react-grid-item {
-    border-right: 1px solid rgba($white, .7);
-    border-bottom: 1px solid rgba($white, .7);
+    border-right: $tableBorder;
 
     &:first-child {
-      border-left: 1px solid rgba($white, .7);
+      border-left: $tableBorder;
     }
   }
+
+  .node-def__table-data-composite-attr {
+    > div:not(:last-child) {
+      border-right: $tableBorder;
+    }
+  }
+
 }

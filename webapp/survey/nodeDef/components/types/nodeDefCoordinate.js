@@ -26,7 +26,7 @@ class NodeDefCoordinate extends React.Component {
 
     // table header
     if (renderType === nodeDefRenderType.tableHeader) {
-      return <div className="node-def__coordinate-table-row">
+      return <div className="node-def__table-row-coordinate">
         <label className="node-def__table-header" style={{gridColumn: '1 / span 3'}}>
           {label}
         </label>
@@ -41,7 +41,7 @@ class NodeDefCoordinate extends React.Component {
     const srsItems = toSrsItems(getSurveySrs(survey))
 
     if (renderType === nodeDefRenderType.tableBody) {
-      return <div className="node-def__coordinate-table-row">
+      return <div className="node-def__table-row-coordinate node-def__table-data-composite-attr">
         <Input ref="xInput"
                readOnly={edit}
                value={value.x}
