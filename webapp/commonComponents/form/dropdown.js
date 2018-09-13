@@ -54,7 +54,7 @@ class Dropdown extends React.Component {
   }
 
   toggleOpened () {
-    if (!this.props.readOnly) {
+    if (!(this.props.readOnly || this.props.disabled)) {
       this.setState({
         opened: !this.state.opened,
         itemsFocusIndex: -1,
@@ -214,6 +214,7 @@ class Dropdown extends React.Component {
       style = {},
       validation = {},
       readOnly,
+      disabled,
     } = this.props
 
     const {
@@ -230,6 +231,7 @@ class Dropdown extends React.Component {
              validation={validation}
              ref="dropdownInput"
              readOnly={readOnly}
+             disabled={disabled}
              onChange={e => this.onInputChange(e)}
              onFocus={e => this.onInputFocus(e)}
              onKeyDown={e => this.onInputKeyDown(e)}/>
@@ -267,6 +269,9 @@ Dropdown.defaultProps = {
   clearOnSelection: false,
   autocompleteMinChars: 0,
   readOnly: false,
+  disabled: false,
+  items: [],
+  selection: null,
 }
 
 export default Dropdown

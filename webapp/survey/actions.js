@@ -10,6 +10,9 @@ import { debounceAction } from '../appUtils/reduxUtils'
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyNewUpdate = 'survey/new/update'
 
+//CODE LISTS
+export const codeListsUpdate = 'survey/codeLists/update'
+
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyCurrentUpdate, survey})
 
@@ -94,4 +97,14 @@ const _updateSurveyProp = (survey, key, value) => {
   }
 
   return debounceAction(action, `${surveyCurrentUpdate}_${key}`)
+}
+
+export const addCodeList = (codeList) => async (dispatch) => {
+  dispatch({type: codeListsUpdate, [codeList.uuid]: codeList})
+
+  const res = await axios.post(`/api/survey/${survey.id}/codeLists`, codeList)
+
+  const {codeList: addedCodeList} = res.data
+
+  dispatch({type: codeListsUpdate, [addedCodeList.uuid]: addedCodeList})
 }

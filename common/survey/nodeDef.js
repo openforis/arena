@@ -26,6 +26,11 @@ const nodeDefType = {
   entity: 'entity',
 }
 
+const displayAs = {
+  dropdown: 'dropdown',
+  checkbox: 'checkbox',
+}
+
 // ==== CREATE
 
 const newNodeDef = (surveyId, parentId, type, props) => ({
@@ -68,6 +73,7 @@ const getNodeDefLabel = (nodeDef, lang) => {
 
 module.exports = {
   nodeDefType,
+  displayAs,
 
   //CREATE
   newNodeDef,
@@ -78,6 +84,7 @@ module.exports = {
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
+  getNodeDefProp: getProp,
 
   isNodeDefKey,
   isNodeDefMultiple,

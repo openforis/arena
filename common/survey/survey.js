@@ -18,6 +18,8 @@ const defaultSteps = {
   '3': {name: 'analysis', prev: '2'},
 }
 
+const codeLists = 'codeLists'
+
 /**
  * ======
  * READ
@@ -69,6 +71,13 @@ const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
 
 /**
  * ======
+ * READ Code Lists
+ * ======
+ */
+const getSurveyCodeLists = R.pipe(R.prop(codeLists), R.defaultTo({}))
+
+/**
+ * ======
  * UPDATE
  * ======
  */
@@ -96,6 +105,18 @@ const assocNodeDefProp = (nodeDefUUID, key, value) => R.pipe(
 
 const assocNodeDefValidation = (nodeDefUUID, validation) =>
   R.assocPath([nodeDefs, nodeDefUUID, 'validation'], validation)
+
+/**
+ * ======
+ * UPDATE Code Lists
+ * ======
+ */
+const assocSurveyCodeLists = codeLists =>
+  survey => R.pipe(
+    R.merge(getSurveyCodeLists(survey)),
+    newCodeLists => R.assoc('codeLists', newCodeLists, survey)
+  )(codeLists)
+
 
 /**
  * ======
@@ -130,6 +151,8 @@ module.exports = {
   getSurveySrs: getProp('srs', []),
   getSurveyDefaultStep,
 
+  getSurveyCodeLists,
+
   // READ nodeDefs
   getNodeDefByUUID,
   getRootNodeDef,
@@ -144,6 +167,9 @@ module.exports = {
   assocNodeDef,
   assocNodeDefProp,
   assocNodeDefValidation,
+
+  // UPDATE code lists
+  assocSurveyCodeLists,
 
   // UTILS
   getSurveyDBSchema: surveyId => `survey_${surveyId}`,

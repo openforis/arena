@@ -16,6 +16,7 @@ import {
   assocFormActivePage,
   assocFormPageNode,
   dissocForm,
+  assocCodeLists,
 } from './surveyState'
 
 /**
@@ -31,6 +32,7 @@ import {
  * survey actions
  */
 import {
+  codeListsUpdate,
   surveyCurrentUpdate,
   surveyNewUpdate,
 } from './actions'
@@ -90,6 +92,10 @@ const actionHandlers = {
   [nodesUpdate]: (state, {nodes}) => assocNodes(nodes)(state),
 
   [nodeDelete]: (state, {node}) => deleteNode(node)(state),
+
+
+  //CODE LISTS
+  [codeListsUpdate]: (state, {codeLists}) => assocCodeLists(codeLists)(state),
 
 }
 
