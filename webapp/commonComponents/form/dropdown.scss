@@ -3,11 +3,13 @@
 .dropdown {
   display: grid;
   grid-template-columns: .9fr .1fr;
-  align-items: center;
+  align-self: stretch;
 
   span.icon {
     color: $whiteLight;
     justify-self: end;
+    align-self: end;
+
     &:hover {
       cursor: pointer;
     }

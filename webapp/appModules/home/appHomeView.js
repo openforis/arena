@@ -73,11 +73,12 @@ class AppHomeView extends React.Component {
                    validation={getFieldValidation('label')(validation)}
                    onChange={e => updateNewSurveyProp('label', e.target.value)}/>
           </div>
-          <LanguageDropdown placeholder="Language"
-                            selection={lang}
-                            onChange={e => updateNewSurveyProp('lang', e)}
-                            validation={getFieldValidation('lang')(validation)}/>
-
+          <div>
+            <LanguageDropdown placeholder="Language"
+                              selection={lang}
+                              onChange={e => updateNewSurveyProp('lang', e)}
+                              validation={getFieldValidation('lang')(validation)}/>
+          </div>
           <button className="btn btn-of-light"
                   onClick={() => this.createSurvey()}>
             <span className="icon icon-plus icon-left"></span>
