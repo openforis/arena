@@ -111,7 +111,7 @@ class NodeDefEntityTable extends React.Component {
     const {nodes, nodeDef} = this.props
     const {nodes: prevNodes} = prevProps
 
-    if (!R.isEmpty(nodes) && nodes.length !== prevNodes.length) {
+    if (nodes && !R.isEmpty(nodes) && nodes.length !== prevNodes.length) {
       const element = document.getElementById(`${nodeDef.uuid}_${nodes.length - 1}`)
       element.scrollIntoView()
     }

@@ -10,7 +10,7 @@ import { getLanguageLabel } from '../../../common/app/languages'
 import { Input } from '../../commonComponents/form/input'
 
 const LabelBadge = ({lang}) => (
-  <h6 className="badge-of"
+  <div className="badge-of"
       style={{
         position: 'absolute',
         right: '0',
@@ -19,7 +19,7 @@ const LabelBadge = ({lang}) => (
     {
       getLanguageLabel(lang)
     }
-  </h6>
+  </div>
 )
 
 const LabelRow = ({label = '', lang, onChange}) => (
