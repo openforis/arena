@@ -8,6 +8,7 @@ import {
   assocNodeDef,
   assocNodeDefProp,
   assocNodeDefValidation,
+  assocSurveyCodeLists,
 } from '../../common/survey/survey'
 
 import {
@@ -95,7 +96,7 @@ const actionHandlers = {
 
 
   //CODE LISTS
-  [codeListsUpdate]: (state, {codeLists}) => assocCodeLists(codeLists)(state),
+  [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state)
 
 }
 

@@ -28,30 +28,8 @@ module.exports.init = app => {
       const draft = getRestParam(req, 'draft') === 'true'
       const surveyId = getRestParam(req, 'id')
 
-      //const codeLists = await fetchCodeListsBySurveyId(surveyId, draft)
+      const codeLists = await fetchCodeListsBySurveyId(surveyId, draft)
 
-      const codeLists = [
-        {
-          id: 1,
-          uuid: '122132',
-          props: {
-            name: 'list1',
-            labels: {
-              en: 'Code List 1'
-            }
-          }
-        },
-        {
-          id: 2,
-          uuid: '122133',
-          props: {
-            name: 'list2',
-            labels: {
-              en: 'Code List2 '
-            }
-          }
-        },
-      ]
       res.json({codeLists})
     } catch (err) {
       sendErr(res, err)

@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { getNodeDefParent, getNodeDefByUUID, assocSurveyCodeLists } from '../../common/survey/survey'
+import { getNodeDefParent, getNodeDefByUUID } from '../../common/survey/survey'
 import { getNodeByUUID } from '../../common/record/record'
 import { getRecord } from './record/recordState'
 
@@ -115,15 +115,3 @@ export const isNodeDefFormLocked = nodeDef => R.pipe(
   R.equals(nodeDef.uuid),
   R.not,
 )
-
-/**
- * ======================
- * Code Lists
- * ======================
- */
-export const assocCodeLists = codeLists => state =>
-  R.pipe(
-    getSurvey,
-    assocSurveyCodeLists(codeLists),
-    s => R.assoc(survey, s)(state),
-  )(state)

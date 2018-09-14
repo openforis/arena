@@ -1,7 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { assocSurveyProp, assocSurveyPropValidation } from '../../common/survey/survey'
+import { assocSurveyProp, assocSurveyPropValidation, getSurveyCodeListByUUID, getSurveyCodeListById } from '../../common/survey/survey'
+import { assocCodeListProp } from '../../common/survey/codeList'
 
 import { getSurvey, getSurveyId, getNewSurvey } from './surveyState'
 import { nodeDefUpdate } from './nodeDef/actions'
@@ -12,9 +13,16 @@ export const surveyNewUpdate = 'survey/new/update'
 
 //CODE LISTS
 export const codeListsUpdate = 'survey/codeLists/update'
+export const codeListLevelUpdate = 'survey/codeLists/level/update'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyCurrentUpdate, survey})
+
+const dispatchCodeListUpdate = (dispatch, codeList) =>
+  dispatch({type: codeListsUpdate, codeLists: {[codeList.uuid]: codeList}})
+
+const dispatchCodeListLevelUpdate = (dispatch, codeList, level) =>
+  dispatch({type: codeListLevelUpdate, codeList, level})
 
 // ====== CREATE
 
@@ -99,12 +107,48 @@ const _updateSurveyProp = (survey, key, value) => {
   return debounceAction(action, `${surveyCurrentUpdate}_${key}`)
 }
 
-export const addCodeList = (codeList) => async (dispatch) => {
-  dispatch({type: codeListsUpdate, [codeList.uuid]: codeList})
+// ==== CODE LISTS
 
+// ==== CREATE
+
+export const addCodeList = (codeList) => async (dispatch, getState) => {
+  const survey = getSurvey(getState())
   const res = await axios.post(`/api/survey/${survey.id}/codeLists`, codeList)
 
   const {codeList: addedCodeList} = res.data
 
-  dispatch({type: codeListsUpdate, [addedCodeList.uuid]: addedCodeList})
+  dispatchCodeListUpdate(dispatch, addedCodeList)
+}
+
+export const addCodeListLevel = (level) => async (dispatch, getState) => {
+  const survey = getSurvey(getState())
+
+  const res = await axios.post(`/api/survey/${survey.id}/codeList/${level.codeListId}/level`, level)
+
+  const {level: addedLevel} = res.data
+
+  const codeList = getSurveyCodeListById(level.codeListId)
+
+  dispatchCodeListLevelUpdate(dispatch, codeList, addedLevel)
+}
+
+
+
+// ==== UPDATE
+
+export const putCodeListProp = (codeListUUID, key, value) => async (dispatch, getState) => {
+
+  const codeList = R.pipe(
+    getSurvey,
+    getSurveyCodeListByUUID(codeListUUID),
+  )(getState())
+
+  const updatedCodeList = R.pipe(
+    assocCodeListProp(key, value),
+    //assocCodeListPropValidation(key, null)
+  )(codeList)
+
+  //TODO apply changes to DB
+
+  dispatchCodeListUpdate(dispatch, updatedCodeList)
 }

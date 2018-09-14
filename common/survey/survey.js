@@ -74,7 +74,25 @@ const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
  * READ Code Lists
  * ======
  */
-const getSurveyCodeLists = R.pipe(R.prop(codeLists), R.defaultTo({}))
+const getSurveyCodeLists = R.pipe(
+  R.prop(codeLists),
+  R.defaultTo({})
+)
+
+const getSurveyCodeListsArray = R.pipe(
+  getSurveyCodeLists,
+  R.values,
+)
+
+const getSurveyCodeListByUUID = uuid => R.pipe(
+  getSurveyCodeLists,
+  R.prop(uuid)
+)
+
+const getSurveyCodeListById = id => R.pipe(
+  getSurveyCodeListsArray,
+  R.find(list => list.id === id)
+)
 
 /**
  * ======
@@ -117,6 +135,11 @@ const assocSurveyCodeLists = codeLists =>
     newCodeLists => R.assoc('codeLists', newCodeLists, survey)
   )(codeLists)
 
+const assocSurveyCodeListLevel = (codeList, level) => survey => {
+  const levelIdx = level.index
+  //TODO
+  return survey
+}
 
 /**
  * ======
@@ -151,12 +174,16 @@ module.exports = {
   getSurveySrs: getProp('srs', []),
   getSurveyDefaultStep,
 
-  getSurveyCodeLists,
-
   // READ nodeDefs
   getNodeDefByUUID,
   getRootNodeDef,
   getNodeDefChildren,
+
+  // READ codeLists
+  getSurveyCodeLists,
+  getSurveyCodeListsArray,
+  getSurveyCodeListByUUID,
+  getSurveyCodeListById,
 
   // UPDATE
   assocSurveyProp: setProp,
@@ -170,6 +197,7 @@ module.exports = {
 
   // UPDATE code lists
   assocSurveyCodeLists,
+  assocSurveyCodeListLevel,
 
   // UTILS
   getSurveyDBSchema: surveyId => `survey_${surveyId}`,

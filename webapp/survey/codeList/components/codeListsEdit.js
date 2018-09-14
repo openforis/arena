@@ -1,7 +1,13 @@
 import React from 'react'
-import { getSurvey } from '../../surveyState'
-import connect from 'react-redux/es/connect/connect'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
+
+import { getSurveyCodeLists } from '../../../../common/survey/survey'
+import { newCodeList } from '../../../../common/survey/codeList'
+
+import { getSurvey } from '../../surveyState'
+import { addCodeList } from '../../actions'
+import CodeListEdit from './codeListEdit'
 
 class CodeListsEdit extends React.Component {
 
@@ -9,37 +15,58 @@ class CodeListsEdit extends React.Component {
     super(props)
 
     this.state = {
-      codeLists: []
+      edit: false,
+      editedCodeList: null,
     }
   }
 
-  componentDidMount () {
-    const {survey} = this.props
+  handleAddCodeList () {
+    const codeList = newCodeList()
 
+    this.props.addCodeList(codeList)
 
-  }
-
-
-  addCodeList () {
-
+    this.setState({
+      edit: true,
+      editedCodeList: codeList,
+    })
   }
 
   render () {
-    return <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-    }}>
+    const {survey} = this.props
+    const {edit, editedCodeList} = this.state
 
-      <label>Code lists</label>
+    const codeLists = getSurveyCodeLists(survey)
 
-      <button className="btn btn-s btn-of-light-xs"
-              style={{marginLeft: '50px'}}
-              onClick={() => this.addCodeList()}>
-        <span className="icon icon-plus icon-16px icon-left" />
-        ADD
-      </button>
+    return (
+      edit ?
+        <CodeListEdit codeList={editedCodeList}/>
+        :
+        <React.Fragment>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}>
 
-    </div>
+            <label>Code lists</label>
+
+            <button className="btn btn-s btn-of-light-xs"
+                    style={{marginLeft: '50px'}}
+                    onClick={() => this.handleAddCodeList()}>
+              <span className="icon icon-plus icon-16px icon-left"/>
+              ADD
+            </button>
+
+          </div>
+
+          {
+            R.empty(codeLists) ?
+              <div>No code list added</div>
+              : <div>
+                TABLE (TODO)
+              </div>
+          }
+        </React.Fragment>
+    )
   }
 }
 
@@ -47,4 +74,4 @@ const mapStateToProps = state => ({
   survey: getSurvey(state)
 })
 
-export default connect(mapStateToProps)(CodeListsEdit)
+export default connect(mapStateToProps, {addCodeList})(CodeListsEdit)

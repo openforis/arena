@@ -1,23 +1,23 @@
 const passport = require('passport')
-const R = require('ramda')
 
 const {sendOk} = require('../serverUtils/response')
 
 const {userPrefNames, getUserPrefSurveyId} = require('./../user/userPrefs')
-const {getSurveyById} = require('../survey/surveyRepository')
+const {fetchSurveyById} = require('../survey/surveyManager')
 const {deleteUserPref} = require('../user/userRepository')
-const {validateSurvey} = require('../survey/surveyValidator')
 
 const sendResponse = (res, user, survey = null) => res.json({user, survey})
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
-    const survey = await getSurveyById(surveyId, true)
+    const draft = true //TODO
+
+    const survey = await fetchSurveyById(surveyId, draft)
 
     sendResponse(
       res,
       user,
-      {...survey, validation: await validateSurvey(survey)}
+      survey,
     )
   } catch (e) {
     console.log(`error loading survey with id ${surveyId}`, e)
