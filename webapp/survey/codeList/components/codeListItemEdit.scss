@@ -1,0 +1,6 @@
+.codeListItem {
+  display: grid;
+  grid-template-columns: 4fr, 4fr;
+  min-height: 2rem;
+  border: 2px solid white;
+}

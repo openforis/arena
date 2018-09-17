@@ -9,6 +9,8 @@ import {
   assocNodeDefProp,
   assocNodeDefValidation,
   assocSurveyCodeLists,
+  assocSurveyCodeListLevel,
+  assocSurveyCodeListItem,
 } from '../../common/survey/survey'
 
 import {
@@ -17,7 +19,6 @@ import {
   assocFormActivePage,
   assocFormPageNode,
   dissocForm,
-  assocCodeLists,
 } from './surveyState'
 
 /**
@@ -33,7 +34,6 @@ import {
  * survey actions
  */
 import {
-  codeListsUpdate,
   surveyCurrentUpdate,
   surveyNewUpdate,
 } from './actions'
@@ -60,6 +60,15 @@ import {
   nodesUpdate,
   nodeDelete,
 } from './record/actions'
+
+/**
+ * code list actions
+ */
+import {
+  codeListItemUpdate,
+  codeListLevelUpdate,
+  codeListsUpdate
+} from './codeList/actions'
 
 const actionHandlers = {
   //SURVEY
@@ -94,9 +103,12 @@ const actionHandlers = {
 
   [nodeDelete]: (state, {node}) => deleteNode(node)(state),
 
+  //CODE LIST
+  [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state),
 
-  //CODE LISTS
-  [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state)
+  [codeListLevelUpdate]: (state, {level}) => assocSurveyCodeListLevel(level)(state),
+
+  [codeListItemUpdate]: (state, {codeListUUID, item}) => assocSurveyCodeListItem(codeListUUID, item)(state),
 
 }
 

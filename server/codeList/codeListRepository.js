@@ -1,4 +1,5 @@
 const db = require('../db/db')
+const Promise = require('bluebird')
 
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 const {getSurveyDBSchema} = require('../../common/survey/survey')
@@ -15,19 +16,30 @@ const insertCodeList = async (surveyId, codeList, client = db) => client.tx(
     )
 
     //insert levels
-    insertedCodeList.levels = codeList.map(level =>
-      insertCodeListLevel(surveyId, codeList.id, level, tx)
+    insertedCodeList.levels = await Promise.all(
+      codeList.levels.map(async level =>
+        await insertCodeListLevel(surveyId, insertedCodeList.id, level, t)
+      )
     )
-    return codeList
+    return insertedCodeList
   }
 )
 
 const insertCodeListLevel = async (surveyId, codeListId, level, client = db) =>
   await client.one(`
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.code_list_level (uuid, index, props_draft)
-        VALUES ($1, $2, $3)
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.code_list_level (uuid, code_list_id, index, props_draft)
+        VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [level.uuid, level.index, level.props],
+    [level.uuid, codeListId, level.index, level.props],
+    def => dbTransformCallback(def, true)
+  )
+
+const insertCodeListItem = async (surveyId, item, client = db) =>
+  await client.one(`
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.code_list_item (uuid, level_id, parent_id, props_draft)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *`,
+    [item.uuid, item.levelId, item.parentId, item.props],
     def => dbTransformCallback(def, true)
   )
 
@@ -40,9 +52,44 @@ const fetchCodeListsBySurveyId = async (surveyId, draft = false, client = db) =>
     def => dbTransformCallback(def, draft)
   )
 
+/*
+const fetchCodeListById = async (surveyId, id, draft = false, client = db) =>
+  await client.one(
+    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list
+     WHERE id = $1`,
+    [id],
+    def => dbTransformCallback(def, draft)
+  )
+*/
+
+const fetchCodeListItems = async (surveyId, levelId, parentId, draft = false, client = db) =>
+  await client.map(
+    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list_item
+     WHERE levelId = $1 and parentId = $2`,
+    [levelId, parentId],
+    def => dbTransformCallback(def, draft)
+  )
+
+
+// ============== UPDATE
+const updateCodeList = async (surveyId, codeList, client = db) =>
+  await client.one(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.code_list
+     SET props_draft = $1
+     WHERE id = $2
+      RETURNING *`,
+      [codeList.props, codeList.id],
+      def => dbTransformCallback(def, true)
+    )
+
 module.exports = {
   //CREATE
   insertCodeList,
+  insertCodeListLevel,
+  insertCodeListItem,
   //READ
   fetchCodeListsBySurveyId,
+  fetchCodeListItems,
+  //UPDATE
+  updateCodeList,
 }

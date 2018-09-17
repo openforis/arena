@@ -31,7 +31,7 @@ import { getValidation, getFieldValidation } from './../../../../../common/valid
 import { putNodeDefProp } from '../../../nodeDef/actions'
 import CodeListEdit from '../../../codeList/components/codeListEdit'
 import CodeListsEdit from '../../../codeList/components/codeListsEdit'
-import { addCodeList } from '../../../actions'
+import { addCodeList } from '../../../codeList/actions'
 
 class CommonProps extends React.Component {
 
@@ -40,7 +40,7 @@ class CommonProps extends React.Component {
 
     this.state = {
       addingNewCodeList: false,
-      newCodeList: null,
+      newCodeListUUID: null,
       showingCodeListsManager: false,
     }
   }
@@ -56,7 +56,7 @@ class CommonProps extends React.Component {
 
     this.setState({
       addingNewCodeList: true,
-      newCodeList: codeList
+      newCodeListUUID: codeList.uuid
     })
   }
 
@@ -66,7 +66,7 @@ class CommonProps extends React.Component {
 
   render () {
     const {survey, nodeDef, putNodeDefProp} = this.props
-    const {addingNewCodeList, newCodeList, showingCodeListsManager} = this.state
+    const {addingNewCodeList, newCodeListUUID, showingCodeListsManager} = this.state
 
     const validation = getValidation(nodeDef)
 
@@ -86,7 +86,7 @@ class CommonProps extends React.Component {
 
     return (
       addingNewCodeList
-          ? <CodeListEdit codeList={newCodeList}/>
+          ? <CodeListEdit codeListUUID={newCodeListUUID}/>
           : showingCodeListsManager
             ? <CodeListsEdit/>
             : <React.Fragment>

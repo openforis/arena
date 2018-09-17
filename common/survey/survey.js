@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const {assocCodeListLevel, assocCodeListItem} = require('./codeList')
+
 const {
   getProps,
   getProp,
@@ -135,11 +137,19 @@ const assocSurveyCodeLists = codeLists =>
     newCodeLists => R.assoc('codeLists', newCodeLists, survey)
   )(codeLists)
 
-const assocSurveyCodeListLevel = (codeList, level) => survey => {
-  const levelIdx = level.index
-  //TODO
-  return survey
-}
+const assocSurveyCodeList = codeList => assocSurveyCodeLists({[codeList.uuid]: codeList})
+
+const assocSurveyCodeListLevel = (level) => survey => R.pipe(
+  getSurveyCodeListById(level.codeListId),
+  assocCodeListLevel(level),
+  newCodeList => assocSurveyCodeLists({[newCodeList.uuid]: newCodeList})(survey)
+)(survey)
+
+const assocSurveyCodeListItem = (codeListUUID, item) => survey => R.pipe(
+  getSurveyCodeListByUUID(codeListUUID),
+  assocCodeListItem(item),
+  updatedCodeList => assocSurveyCodeList(updatedCodeList)(survey),
+)(survey)
 
 /**
  * ======
@@ -197,7 +207,9 @@ module.exports = {
 
   // UPDATE code lists
   assocSurveyCodeLists,
+  assocSurveyCodeList,
   assocSurveyCodeListLevel,
+  assocSurveyCodeListItem,
 
   // UTILS
   getSurveyDBSchema: surveyId => `survey_${surveyId}`,

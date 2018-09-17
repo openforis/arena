@@ -2,12 +2,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
+import CodeListEdit from './codeListEdit'
+
 import { getSurveyCodeLists } from '../../../../common/survey/survey'
 import { newCodeList } from '../../../../common/survey/codeList'
 
+import { addCodeList } from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
-import { addCodeList } from '../../actions'
-import CodeListEdit from './codeListEdit'
 
 class CodeListsEdit extends React.Component {
 
