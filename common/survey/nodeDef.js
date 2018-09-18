@@ -26,11 +26,6 @@ const nodeDefType = {
   entity: 'entity',
 }
 
-const displayAs = {
-  dropdown: 'dropdown',
-  checkbox: 'checkbox',
-}
-
 // ==== CREATE
 
 const newNodeDef = (surveyId, parentId, type, props) => ({
@@ -48,10 +43,12 @@ const getNodeDefName = getProp('name', '')
 
 const isNodeDefKey = R.pipe(getProp('key'), R.equals(true))
 const isNodeDefMultiple = R.pipe(getProp('multiple'), R.equals(true))
-
 const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
-const isNodeDefEntity = R.pipe(getNodeDefType, R.equals(nodeDefType.entity))
+
+const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
+const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
+const isNodeDefCodeList = isNodeDefType(nodeDefType.codeList)
 
 // ==== UPDATE
 
@@ -73,7 +70,6 @@ const getNodeDefLabel = (nodeDef, lang) => {
 
 module.exports = {
   nodeDefType,
-  displayAs,
 
   //CREATE
   newNodeDef,
@@ -84,13 +80,14 @@ module.exports = {
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
-  getNodeDefProp: getProp,
+  getCodeListId: getProp('codeListId'),
 
   isNodeDefKey,
   isNodeDefMultiple,
   isNodeDefRoot,
   isNodeDefEntity,
   isNodeDefSingleEntity,
+  isNodeDefCodeList,
 
   //UTILS
   canNodeDefBeMultiple,

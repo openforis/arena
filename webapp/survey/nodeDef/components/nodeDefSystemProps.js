@@ -12,6 +12,11 @@ import NodeDefCodeList from './types/nodeDefCodeList'
 import NodeDefBoolean from './types/nodeDefBoolean'
 import NodeDefText from './types/nodeDefText'
 
+import {
+  nodeDefLayoutProps,
+  nodeDefRenderType,
+} from '../../../../common/survey/nodeDefLayout'
+
 export const nodeDefSystemProps = {
   [nodeDefType.integer]: {
     icon: <span className="icon-left node_def__icon">923</span>,
@@ -90,6 +95,7 @@ export const nodeDefSystemProps = {
     component: NodeDefCodeList,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
+    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.dropdown}
   },
 
   [nodeDefType.coordinate]: {
@@ -112,6 +118,7 @@ export const nodeDefSystemProps = {
   [nodeDefType.entity]: {
     component: NodeDefEntitySwitch,
     icon: <span className="icon icon-table2 icon-left"/>,
+    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.table, multiple: true}
   },
 
 }
@@ -148,4 +155,11 @@ export const getNodeDefDefaultValue = nodeDef =>
   getProp(
     nodeDef.type,
     'defaultValue',
+  )(nodeDefSystemProps)
+
+export const getNodeDefDefaultLayoutPropsByType = type =>
+  getProp(
+    type,
+    'defaultLayoutProps',
+    {}
   )(nodeDefSystemProps)

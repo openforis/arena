@@ -7,7 +7,7 @@ import { uuidv4 } from '../../../../common/uuid'
 import { isNodeDefAncestor } from '../../../../common/survey/survey'
 import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
-import { getNodeDefIconByType } from '../../nodeDef/components/nodeDefSystemProps'
+import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../../nodeDef/components/nodeDefSystemProps'
 
 import { getNodeDefFormUnlocked, getFormActivePageNodeDef, getSurvey } from '../../surveyState'
 
@@ -15,8 +15,7 @@ import { createNodeDef } from '../../nodeDef/actions'
 
 const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
   const isEntity = type === nodeDefType.entity
-
-  const nodeDefProps = isEntity ? {[nodeDefLayoutProps.render]: nodeDefRenderType.table, multiple: true} : {}
+  const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
 
   return <React.Fragment key={type}>
     {
