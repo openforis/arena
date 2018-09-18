@@ -96,11 +96,13 @@ module.exports = {
 
   //READ
   getCodeListName,
+  getCodeListLevels,
   getCodeListLevelById,
   getCodeListLevelByUUID,
   getCodeListItemsByParentId,
   getCodeListItemByUUID,
   getCodeListLevelName: R.path(['props', 'name']),
+  getCodeListItemId: R.propOr(null, 'id'),
   getCodeListItemCode: R.path(['props', 'code']),
   getCodeListItemLabels,
   getCodeListItemLabel,

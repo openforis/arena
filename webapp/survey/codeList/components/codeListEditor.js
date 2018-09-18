@@ -2,9 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { FormItem, Input } from '../../../commonComponents/form/input'
-import CodeListLevelEdit from './codeListLevelEdit'
+import CodeListLevelEditor from './CodeListLevelEditor'
 
-import { getCodeListName, newCodeListLevel } from '../../../../common/survey/codeList'
+import { getCodeListName } from '../../../../common/survey/codeList'
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import { getFieldValidation } from '../../../../common/validation/validator'
 
@@ -12,17 +12,10 @@ import { putCodeListProp, createCodeListLevel } from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
 import { getCodeListsEditorEditedCodeList } from '../codeListsEditorState'
 
-class CodeListEdit extends React.Component {
-
-  addNewLevel() {
-    const {codeList, createCodeListLevel} = this.props
-    const {levels} = codeList
-    const level = newCodeListLevel(codeList.id, levels.length)
-    createCodeListLevel(level)
-  }
+class CodeListEditor extends React.Component {
 
   render () {
-    const { codeList, putCodeListProp } = this.props
+    const { codeList, putCodeListProp, createCodeListLevel } = this.props
     const { levels, validation } = codeList
 
     return <div>
@@ -35,15 +28,14 @@ class CodeListEdit extends React.Component {
 
       <div style={{display: 'flex'}}>
         {
-          levels.map(level => <CodeListLevelEdit key={level.uuid}
-                                             level={level}
-                                             parentId={null}/>)
+          levels.map(level => <CodeListLevelEditor key={level.uuid}
+                                                 level={level}/>)
         }
         <button className="btn btn-s btn-of-light-xs"
                 style={{marginLeft: '50px'}}
-                onClick={() => this.addNewLevel()}>
-          <span className="icon icon-plus icon-16px icon-left"></span>
-          ADD
+                onClick={() => createCodeListLevel()}>
+          <span className="icon icon-plus icon-16px icon-left"/>
+          ADD LEVEL
         </button>
       </div>
     </div>
@@ -60,4 +52,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps, {putCodeListProp, createCodeListLevel})(CodeListEdit)
+export default connect(mapStateToProps, {putCodeListProp, createCodeListLevel})(CodeListEditor)

@@ -3,6 +3,9 @@ import * as R from 'ramda'
 
 import {
   newCodeList,
+  newCodeListLevel,
+  newCodeListItem,
+  getCodeListLevels,
   getCodeListLevelById,
   getCodeListLevelByUUID,
   getCodeListItemByUUID,
@@ -13,14 +16,14 @@ import {
 
 import { getSurvey } from '../surveyState'
 import { debounceAction } from '../../appUtils/reduxUtils'
-import { getCodeListsEditorEditedCodeList } from './codeListsEditorState'
+import { getCodeListsEditorEditedCodeList, getCodeListsEditorSelectedItemByLevelIndex } from './codeListsEditorState'
 
 export const codeListsUpdate = 'survey/codeLists/update'
-export const codeListLevelUpdate = 'survey/codeLists/level/update'
-export const codeListItemUpdate = 'survey/codeLists/item/update'
-export const codeListsEditorEditedCodeListUpdate = 'survey/codeListsEditor/editedCodeList/update'
-export const codeListsEditorItemSelect = 'survey/codeListsEditor/editedCodeList/editedItem/update'
-export const codeListsEditorItemReset = 'survey/codeListsEditor/editedCodeList/editedItem/reset'
+export const codeListEditorLevelUpdate = 'survey/codeLists/level/update'
+export const codeListsEditorItemUpdate = 'survey/codeLists/item/update'
+export const codeListsEditorCodeListUpdate = 'survey/codeListsEditor/editedCodeList/update'
+export const codeListsEditorItemSelect = 'survey/codeListsEditor/editedItem/select'
+export const codeListsEditorItemReset = 'survey/codeListsEditor/editedItem/reset'
 
 const dispatchCodeListUpdate = (dispatch, codeList) => {
   dispatchCodeListsUpdate(dispatch, {[codeList.uuid]: codeList})
@@ -28,16 +31,16 @@ const dispatchCodeListUpdate = (dispatch, codeList) => {
 }
 
 const dispatchEditedCodeListUpdate = (dispatch, codeList) =>
-  dispatch({type: codeListsEditorEditedCodeListUpdate, codeList})
+  dispatch({type: codeListsEditorCodeListUpdate, codeList})
 
 const dispatchCodeListsUpdate = (dispatch, codeLists) =>
   dispatch({type: codeListsUpdate, codeLists})
 
 const dispatchCodeListLevelUpdate = (dispatch, level) =>
-  dispatch({type: codeListLevelUpdate, level})
+  dispatch({type: codeListEditorLevelUpdate, level})
 
-const dispatchCodeListItemUpdate = (dispatch, codeListUUID, item) =>
-  dispatch({type: codeListItemUpdate, codeListUUID, item})
+const dispatchCodeListItemUpdate = (dispatch, item) =>
+  dispatch({type: codeListsEditorItemUpdate, item})
 
 // ==== CREATE
 
@@ -68,8 +71,12 @@ export const deleteCodeList = () => dispatch => {
   //TODO
 }
 
-export const createCodeListLevel = (level) => async (dispatch, getState) => {
+export const createCodeListLevel = () => async (dispatch, getState) => {
   const survey = getSurvey(getState())
+
+  const codeList = getCodeListsEditorEditedCodeList(survey)
+  const levels = getCodeListLevels(codeList)
+  const level = newCodeListLevel(codeList.id, levels.length) //add new level to the end
 
   dispatchCodeListLevelUpdate(dispatch, level)
 
@@ -80,26 +87,25 @@ export const createCodeListLevel = (level) => async (dispatch, getState) => {
   dispatchCodeListLevelUpdate(dispatch, addedLevel)
 }
 
-export const createCodeListItem = (codeListId, item) => async (dispatch, getState) => {
-  const {levelId} = item
-
+export const createCodeListItem = (level) => async (dispatch, getState) => {
   const survey = getSurvey(getState())
   const codeList = getCodeListsEditorEditedCodeList(survey)
+  const parentItem = getCodeListsEditorSelectedItemByLevelIndex(level.index - 1)(survey)
 
-  const {uuid: codeListUUID} = codeList
+  const item = newCodeListItem(level.id, R.propOr(null, 'id', parentItem))
 
-  dispatchCodeListItemUpdate(dispatch, codeListUUID, item)
+  dispatchCodeListItemUpdate(dispatch, item)
 
-  const res = await axios.post(`/api/survey/${survey.id}/codeLists/${codeListId}/levels/${levelId}/items`, item)
+  const res = await axios.post(`/api/survey/${survey.id}/codeLists/${codeList.id}/levels/${level.id}/items`, item)
 
   const {item: addedItem} = res.data
 
-  dispatchCodeListItemUpdate(dispatch, codeListUUID, addedItem)
+  dispatchCodeListItemUpdate(dispatch, addedItem)
 }
 
 // ==== UPDATE
 
-export const editCodeListItem = item => (dispatch, getState) => {
+export const openCodeListItemEditor = item => (dispatch, getState) => {
   const survey = getSurvey(getState())
   const codeList = getCodeListsEditorEditedCodeList(survey)
   const level = getCodeListLevelById(item.levelId)(codeList)
@@ -134,7 +140,8 @@ const _putCodeList = (surveyId, codeList) => {
       const res = await axios.put(`/api/survey/${surveyId}/codeLists/${codeList.id}`, {codeList})
       const {reloadedCodeList} = res.data
 
-      dispatchCodeListUpdate(dispatch, reloadedCodeList)
+      //TODO reloaded code list does not include levels...
+      //dispatchCodeListUpdate(dispatch, reloadedCodeList)
     } catch (e) {}
   }
   return debounceAction(action, `${codeListsUpdate}_${codeList.uuid}`)
@@ -161,7 +168,7 @@ const _putCodeListLevel = (surveyId, codeList, level) => {
       dispatchCodeListLevelUpdate(dispatch, reloadedLevel)
     } catch (e) {}
   }
-  return debounceAction(action, `${codeListLevelUpdate}_${level.uuid}`)
+  return debounceAction(action, `${codeListEditorLevelUpdate}_${level.uuid}`)
 }
 
 export const putCodeListItemProp = (level, itemUUID, key, value) => async (dispatch, getState) => {
@@ -171,7 +178,7 @@ export const putCodeListItemProp = (level, itemUUID, key, value) => async (dispa
   const item = getCodeListItemByUUID(itemUUID)(codeList)
   const updatedItem = assocCodeListItemProp(key, value)(item)
 
-  dispatchCodeListItemUpdate(dispatch, codeList.uuid, updatedItem)
+  dispatchCodeListItemUpdate(dispatch, updatedItem)
   dispatch(_putCodeListItem(survey.id, codeList, updatedItem))
 }
 
@@ -184,6 +191,6 @@ const _putCodeListItem = (surveyId, codeList, item) => {
       dispatchCodeListItemUpdate(dispatch, reloadedItem)
     } catch (e) {}
   }
-  return debounceAction(action, `${codeListItemUpdate}_${item.uuid}`)
+  return debounceAction(action, `${codeListsEditorItemUpdate}_${item.uuid}`)
 }
 

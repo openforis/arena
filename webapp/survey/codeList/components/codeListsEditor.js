@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import CodeListEdit from './codeListEdit'
+import CodeListEditor from './codeListEditor'
 
 import { getSurveyCodeListsArray } from '../../../../common/survey/survey'
 
@@ -24,7 +24,7 @@ class CodeListsEditor extends React.Component {
 
     return (
       editedCodeList ?
-        <CodeListEdit/>
+        <CodeListEditor/>
         :
         <React.Fragment>
           <div style={{

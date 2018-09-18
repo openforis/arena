@@ -34,7 +34,9 @@ import {
  * code lists editor
  */
 import {
-  assocCodeListsEditorEditedCodeList,
+  assocCodeListsEditorCodeList,
+  assocCodeListsEditorLevel,
+  assocCodeListsEditorItem,
   assocCodeListsEditorSelectedItemInLevel,
   dissocCodeListsEditorSelectedItemInLevel,
 } from './codeList/codeListsEditorState'
@@ -74,10 +76,10 @@ import {
  * code list actions
  */
 import {
-  codeListItemUpdate,
-  codeListLevelUpdate,
+  codeListsEditorItemUpdate,
+  codeListEditorLevelUpdate,
   codeListsUpdate,
-  codeListsEditorEditedCodeListUpdate,
+  codeListsEditorCodeListUpdate,
   codeListsEditorItemSelect,
   codeListsEditorItemReset,
 } from './codeList/actions'
@@ -118,13 +120,13 @@ const actionHandlers = {
   //CODE LIST
   [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state),
 
-  [codeListLevelUpdate]: (state, {level}) => assocSurveyCodeListLevel(level)(state),
+  [codeListsEditorCodeListUpdate]: (state, {codeList}) => assocCodeListsEditorCodeList(codeList)(state),
 
-  [codeListItemUpdate]: (state, {codeListUUID, item}) => assocSurveyCodeListItem(codeListUUID, item)(state),
-
-  [codeListsEditorEditedCodeListUpdate]: (state, {codeList}) => assocCodeListsEditorEditedCodeList(codeList)(state),
+  [codeListEditorLevelUpdate]: (state, {level}) => assocCodeListsEditorLevel(level)(state),
 
   [codeListsEditorItemSelect]: (state, {level, item}) => assocCodeListsEditorSelectedItemInLevel(level, item)(state),
+
+  [codeListsEditorItemUpdate]: (state, {item}) => assocCodeListsEditorItem(item)(state),
 
   [codeListsEditorItemReset]: (state, {level}) => dissocCodeListsEditorSelectedItemInLevel(level)(state),
 }
