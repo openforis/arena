@@ -47,6 +47,7 @@ class CodeListLevelEdit extends React.Component {
 
       {
         items.map(item => <CodeListItemEdit key={item.uuid}
+                                            level={level}
                                             item={item}/>)
       }
     </div>

@@ -57,13 +57,16 @@ const getCodeListItemsByParentId = parentId => R.pipe(
   R.filter(item => item.parentId === parentId)
 )
 
-// UPDATE
-const assocCodeListProp = (key, value) => codeList => R.pipe(
-  getCodeListProps,
-  R.assoc(key, value),
-  props => R.assoc('props', props)(codeList)
-)(codeList)
+const getCodeListItemByUUID = uuid => R.pipe(
+  getCodeListItems,
+  R.prop(uuid),
+)
 
+const getCodeListItemLabels = R.path(['props', 'labels'])
+
+const getCodeListItemLabel = language => R.pipe(getCodeListItemLabels, R.prop(language))
+
+// UPDATE
 const assocCodeListLevel = level => codeList => R.pipe(
   getCodeListLevels,
   levels => level.index >= levels.length
@@ -72,7 +75,7 @@ const assocCodeListLevel = level => codeList => R.pipe(
   newLevels => R.assoc(levels, newLevels)(codeList),
 )(codeList)
 
-const assocCodeListLevelProp = (key, value) => R.assoc(key, value)
+const assocProp = (key, value) => R.assocPath(['props', key], value)
 
 const assocCodeListItem = item => codeList => R.pipe(
   getCodeListItems,
@@ -90,13 +93,16 @@ module.exports = {
   getCodeListName,
   getCodeListLevelByUUID,
   getCodeListItemsByParentId,
+  getCodeListItemByUUID,
   getCodeListLevelName: R.path(['props', 'name']),
   getCodeListItemCode: R.path(['props', 'code']),
-  getCodeListItemLabel: language => R.path(['props', 'labels', language]),
+  getCodeListItemLabels,
+  getCodeListItemLabel,
 
   //UPDATE
-  assocCodeListProp,
   assocCodeListLevel,
   assocCodeListItem,
-  assocCodeListLevelProp,
+  assocCodeListProp: assocProp,
+  assocCodeListLevelProp: assocProp,
+  assocCodeListItemProp: assocProp,
 }

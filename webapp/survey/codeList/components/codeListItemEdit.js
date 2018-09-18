@@ -25,33 +25,56 @@ class CodeListItemEdit extends React.Component {
     }
   }
 
-  onPropLabelsChange (nodeDef, labelItem, key, currentValue) {
-    this.props.putCodeListItemProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
+  onPropLabelsChange (labelItem) {
+    const {level, item, putCodeListItemProp} = this.props
+    putCodeListItemProp(level, item.uuid, 'labels',
+      R.assoc(labelItem.lang, labelItem.label, getCodeListItemLabels(item)))
   }
 
-  render() {
-    const {survey, item} = this.props
+  render () {
+    const {survey, level, item, putCodeListItemProp} = this.props
+    const {edit} = this.state
+
+    const validation = {} //TODO
     const language = getSurveyDefaultLanguage(survey)
 
-    return <div className="codeListItem">
+
+    return <div className={`codeListItem ${edit ? 'edit': ''}`}>
       {
-        edit
-          ? <React.Fragment>
-              <FormItem label={'code'}>
-                <Input value={getCodeListItemCode(item)}
-                       validation={getFieldValidation('code')(validation)}
-                       onChange={e => putCodeListItemProp(item.uuid, 'code', normalizeName(e.target.value))}/>
-              </FormItem>
-              <LabelsEditor labels={getCodeListItemLabels(item)}
-                            onChange={(labelItem) => this.onPropLabelsChange(item, labelItem, 'labels', getCodeItemLabels(item))}/>
+        edit ?
+          <React.Fragment>
+            <FormItem label={'code'}>
+              <Input value={getCodeListItemCode(item)}
+                     validation={getFieldValidation('code')(validation)}
+                     onChange={e => putCodeListItemProp(level, item.uuid, 'code', normalizeName(e.target.value))}/>
+            </FormItem>
+            <button className="btn-of-light-xs btn-s"
+                    style={{
+                      padding: '0.2rem 0.5rem',
+                    }}
+                    onClick={() => this.setState({edit: false})}>
+              <span className="icon icon-arrow-up icon-8px"/>
+            </button>
+            <LabelsEditor labels={getCodeListItemLabels(item)}
+                          onChange={(labelItem) => this.onPropLabelsChange(labelItem, 'labels')}/>
           </React.Fragment>
-          : <React.Fragment>
-              <label>{getCodeListItemCode(item)}</label>
-              <label>{getCodeListItemLabel(language)(item)}</label>
-            </React.Fragment>
+          :
+          <React.Fragment>
+            <label>{getCodeListItemCode(item)}</label>
+            <label>{getCodeListItemLabel(language)(item)}</label>
+            <button className="open-btn"
+                    onClick={() => this.setState({edit: true})}>
+              <span className="icon icon-arrow-down icon-8px"/>
+            </button>
+          </React.Fragment>
       }
     </div>
   }
+}
+
+CodeListItemEdit.defaultProps = {
+  level: null,
+  item: null,
 }
 
 const mapStateToProps = (state) => ({

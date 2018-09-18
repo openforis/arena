@@ -5,7 +5,8 @@ import {
   getSurveyCodeListByUUID,
   getSurveyCodeListById,
 } from '../../../common/survey/survey'
-import { getCodeListLevelByUUID, assocCodeListProp, assocCodeListLevelProp } from '../../../common/survey/codeList'
+import { getCodeListLevelByUUID, getCodeListItemByUUID,
+  assocCodeListProp, assocCodeListLevelProp, assocCodeListItemProp } from '../../../common/survey/codeList'
 
 import { getSurvey } from '../surveyState'
 import { debounceAction } from '../../appUtils/reduxUtils'
@@ -68,7 +69,6 @@ export const addCodeListItem = (codeListId, item) => async (dispatch, getState) 
 // ==== UPDATE
 
 export const putCodeListProp = (codeListUUID, key, value) => async (dispatch, getState) => {
-
   const survey = getSurvey(getState())
   const codeList = getSurveyCodeListByUUID(codeListUUID)(survey)
 
@@ -95,32 +95,48 @@ const _putCodeList = (surveyId, codeList) => {
 
 
 export const putCodeListLevelProp = (codeListId, codeListLevelUUID, key, value) => async (dispatch, getState) => {
+  const survey = getSurvey(getState())
+  const codeList = getSurveyCodeListById(codeListId)(survey)
+  const level = getCodeListLevelByUUID(codeListLevelUUID)(codeList)
 
-  const level = R.pipe(
-    getSurvey,
-    getSurveyCodeListById(codeListId),
-    getCodeListLevelByUUID(codeListLevelUUID),
-  )(getState())
-
-  const updatedLevel = R.pipe(
-    assocCodeListLevelProp(key, value),
-  )(level)
-
-  //TODO apply changes to DB
+  const updatedLevel = assocCodeListLevelProp(key, value)(level)
 
   dispatchCodeListLevelUpdate(dispatch, updatedLevel)
+  dispatch(_putCodeListLevel(survey.id, codeList, updatedLevel))
 }
 
-export const putCodeListItemProp = (codeListId, codeListLevelId, key, value) => async (dispatch, getState) => {
-  /*
+const _putCodeListLevel = (surveyId, codeList, level) => {
+  const action = async dispatch => {
+    try {
+      const res = await axios.put(`/api/survey/${surveyId}/codeLists/${codeList.id}/levels/${level.id}`, {level})
+      const {reloadedLevel} = res.data
+
+      dispatchCodeListLevelUpdate(dispatch, reloadedLevel)
+    } catch (e) {}
+  }
+  return debounceAction(action, `${codeListLevelUpdate}_${level.uuid}`)
+}
+
+export const putCodeListItemProp = (level, itemUUID, key, value) => async (dispatch, getState) => {
   const survey = getSurvey(getState())
-  const codeList = getSurveyCodeListByUUID(codeListUUID)(survey)
+  const codeList = getSurveyCodeListById(level.codeListId)(survey)
 
-  const updatedCodeList = R.pipe(
-    assocCodeListProp(key, value),
-    //assocCodeListPropValidation(key, null)
-  )(codeList)
+  const item = getCodeListItemByUUID(itemUUID)(codeList)
+  const updatedItem = assocCodeListItemProp(key, value)(item)
 
-  dispatchCodeListUpdate(dispatch, updatedCodeList)
-  */
+  dispatchCodeListItemUpdate(dispatch, codeList.uuid, updatedItem)
+  dispatch(_putCodeListItem(survey.id, codeList, updatedItem))
 }
+
+const _putCodeListItem = (surveyId, codeList, item) => {
+  const action = async dispatch => {
+    try {
+      const res = await axios.put(`/api/survey/${surveyId}/codeLists/${codeList.id}/items/${item.id}`, {item})
+      const {reloadedItem} = res.data
+
+      dispatchCodeListItemUpdate(dispatch, reloadedItem)
+    } catch (e) {}
+  }
+  return debounceAction(action, `${codeListItemUpdate}_${item.uuid}`)
+}
+

@@ -1,6 +1,17 @@
 .codeListItem {
   display: grid;
-  grid-template-columns: 4fr, 4fr;
+  grid-template-columns: 4fr 5fr 1fr;
   min-height: 2rem;
   border: 2px solid white;
+}
+
+.codeListItem.edit {
+  display: grid;
+  grid-template-columns: 9fr 1fr;
+
+}
+
+.open-btn,
+.close-btn {
+  padding: 0.2rem 0.5rem;
 }

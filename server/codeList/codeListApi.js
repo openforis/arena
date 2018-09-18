@@ -4,7 +4,7 @@ const {getRestParam} = require('../serverUtils/request')
 const {
   insertCodeList, insertCodeListLevel, insertCodeListItem,
   fetchCodeListsBySurveyId, fetchCodeListItems,
-  updateCodeList
+  updateCodeList, updateCodeListLevel, updateCodeListItem,
 } = require('./codeListRepository')
 
 module.exports.init = app => {
@@ -89,12 +89,44 @@ module.exports.init = app => {
   app.put('/survey/:surveyId/codeLists/:codeListId', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const codeListId = getRestParam(req, 'codeListId')
-      const {body} = req
+      //const codeListId = getRestParam(req, 'codeListId')
+      const {codeList} = req.body
 
-      const updatedCodeList = await updateCodeList(surveyId, body)
+      const updatedCdeList = await updateCodeList(surveyId, codeList)
 
-      res.json({codeList: updatedCodeList})
+      res.json({updatedCdeList})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.put('/survey/:surveyId/codeLists/:codeListId/levels/:levelId', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      //const codeListId = getRestParam(req, 'codeListId')
+      //const levelId = getRestParam(req, 'levelId')
+
+      const {level} = req.body
+
+      const updatedLevel = await updateCodeListLevel(surveyId, level)
+
+      res.json({level: updatedLevel})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.put('/survey/:surveyId/codeLists/:codeListId/items/:itemId', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      //const codeListId = getRestParam(req, 'codeListId')
+      //const itemId = getRestParam(req, 'itemId')
+
+      const {item} = req.body
+
+      const updatedItem = await updateCodeListItem(surveyId, item)
+
+      res.json({item: updatedItem})
     } catch (err) {
       sendErr(res, err)
     }
