@@ -21,14 +21,17 @@ import {
 } from '../../../../../common/survey/nodeDefLayout'
 
 const newCodeList = (props) => {
-  const {addCodeList, onCodeListEdit} = props
+  const {createCodeList, onCodeListEdit} = props
+
+  createCodeList()
 
   onCodeListEdit(true)
-  // const codeList = newCodeList()
-  //
-  // this.props.addCodeList(codeList)
-  //
-  // this.setState({editingCodeList: false})
+}
+
+const showCodeListsEditor = (props) => {
+  const {onCodeListEdit} = props
+
+  onCodeListEdit(true)
 }
 
 const CodeListProps = (props) => {
@@ -44,7 +47,6 @@ const CodeListProps = (props) => {
   const selectedParentCode = null//R.find(item => item.key === getNodeDefProp('parentCodeId')(nodeDef))(possibleParentCodeItems)
 
   return (
-
     <React.Fragment>
       <FormItem label={'Code List'}>
         <div style={{
@@ -62,8 +64,8 @@ const CodeListProps = (props) => {
           </button>
           <button className="btn btn-s btn-of-light-xs"
                   style={{marginLeft: '50px'}}
-                  onClick={() => showCodeListsEditor()}>
-            <span className="icon icon-plus icon-16px icon-left"/>
+                  onClick={() => showCodeListsEditor(props)}>
+            <span className="icon icon-list icon-16px icon-left"/>
             MANAGE
           </button>
         </div>

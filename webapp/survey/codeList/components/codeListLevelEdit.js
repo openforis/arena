@@ -1,29 +1,34 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
 import { FormItem, Input } from '../../../commonComponents/form/input'
 import CodeListItemEdit from './codeListItemEdit'
 
 import { normalizeName } from '../../../../common/survey/surveyUtils'
-import { getSurveyCodeListById } from '../../../../common/survey/survey'
 import { getCodeListLevelName, newCodeListItem, getCodeListItemsByParentId } from '../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../common/validation/validator'
 
-import { addCodeListItem, putCodeListLevelProp } from '../../codeList/actions'
+import {
+  createCodeListItem,
+  putCodeListLevelProp,
+  editCodeListItem,
+  closeCodeListItemEditor
+} from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
-
+import { getCodeListsEditorEditedCodeList, getCodeListsEditorSelectedItemsByLevelIndex } from '../codeListsEditorState'
 
 class CodeListLevelEdit extends React.Component {
 
   addNewItem () {
-    const {level, parentItem, addCodeListItem} = this.props
+    const {level, parentItem, createCodeListItem} = this.props
     const {codeListId} = level
     const item = newCodeListItem(level.id, parentItem ? parentItem.id : null)
-    addCodeListItem(codeListId, item)
+    createCodeListItem(codeListId, item)
   }
 
   render () {
-    const {level, items, putCodeListLevelProp} = this.props
+    const {level, items, selectedItem, putCodeListLevelProp, editCodeListItem} = this.props
 
     const validation = {} //TODO
 
@@ -48,25 +53,36 @@ class CodeListLevelEdit extends React.Component {
       {
         items.map(item => <CodeListItemEdit key={item.uuid}
                                             level={level}
-                                            item={item}/>)
+                                            item={item}
+                                            edit={selectedItem === item}
+                                            onEditChange={edit => edit ? editCodeListItem(item) : closeCodeListItemEditor(item)}/>)
       }
     </div>
   }
 }
 
-
 const mapStateToProps = (state, props) => {
-  const { level, parentId } = props
-  const { codeListId } = level
+  const {level} = props
 
   const survey = getSurvey(state)
-  const codeList = getSurveyCodeListById(codeListId)(survey)
+  const codeList = getCodeListsEditorEditedCodeList(survey)
+
+  const editedItemsByLevelIndex = getCodeListsEditorSelectedItemsByLevelIndex(survey)
+  const previousLevelSelectedItem = level.index > 0 ? editedItemsByLevelIndex[level.index - 1] : null
+  const items = getCodeListItemsByParentId(R.prop('id', previousLevelSelectedItem))(codeList)
+  const selectedItem = editedItemsByLevelIndex.length > level.index ? editedItemsByLevelIndex[level.index] : null
 
   return {
     survey,
-    items: getCodeListItemsByParentId(parentId)(codeList)
+    items,
+    selectedItem,
   }
 }
 
-export default connect(mapStateToProps, {addCodeListItem, putCodeListLevelProp})(CodeListLevelEdit)
+export default connect(mapStateToProps, {
+  createCodeListItem,
+  putCodeListLevelProp,
+  editCodeListItem,
+  closeCodeListItemEditor
+})(CodeListLevelEdit)
 

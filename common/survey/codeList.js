@@ -40,9 +40,14 @@ const getCodeListName = R.pipe(
 
 const getCodeListLevels = R.prop(levels)
 
-const getCodeListLevelByUUID = levelUUID => R.pipe(
+const getCodeListLevelById = id => R.pipe(
   getCodeListLevels,
-  R.find(l => l.uuid === levelUUID),
+  R.find(R.propEq('id', id)),
+)
+
+const getCodeListLevelByUUID = uuid => R.pipe(
+  getCodeListLevels,
+  R.find(R.propEq('uuid', uuid)),
 )
 
 const getCodeListItems = R.prop(items)
@@ -91,6 +96,7 @@ module.exports = {
 
   //READ
   getCodeListName,
+  getCodeListLevelById,
   getCodeListLevelByUUID,
   getCodeListItemsByParentId,
   getCodeListItemByUUID,

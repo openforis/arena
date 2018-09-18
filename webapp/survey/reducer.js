@@ -31,6 +31,15 @@ import {
 } from './record/recordState'
 
 /**
+ * code lists editor
+ */
+import {
+  assocCodeListsEditorEditedCodeList,
+  assocCodeListsEditorSelectedItemInLevel,
+  dissocCodeListsEditorSelectedItemInLevel,
+} from './codeList/codeListsEditorState'
+
+/**
  * survey actions
  */
 import {
@@ -67,7 +76,10 @@ import {
 import {
   codeListItemUpdate,
   codeListLevelUpdate,
-  codeListsUpdate
+  codeListsUpdate,
+  codeListsEditorEditedCodeListUpdate,
+  codeListsEditorItemSelect,
+  codeListsEditorItemReset,
 } from './codeList/actions'
 
 const actionHandlers = {
@@ -110,6 +122,11 @@ const actionHandlers = {
 
   [codeListItemUpdate]: (state, {codeListUUID, item}) => assocSurveyCodeListItem(codeListUUID, item)(state),
 
+  [codeListsEditorEditedCodeListUpdate]: (state, {codeList}) => assocCodeListsEditorEditedCodeList(codeList)(state),
+
+  [codeListsEditorItemSelect]: (state, {level, item}) => assocCodeListsEditorSelectedItemInLevel(level, item)(state),
+
+  [codeListsEditorItemReset]: (state, {level}) => dissocCodeListsEditorSelectedItemInLevel(level)(state),
 }
 
 export default exportReducer(actionHandlers)

@@ -52,7 +52,6 @@ const fetchCodeListsBySurveyId = async (surveyId, draft = false, client = db) =>
     def => dbTransformCallback(def, draft)
   )
 
-/*
 const fetchCodeListById = async (surveyId, id, draft = false, client = db) =>
   await client.one(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list
@@ -60,16 +59,24 @@ const fetchCodeListById = async (surveyId, id, draft = false, client = db) =>
     [id],
     def => dbTransformCallback(def, draft)
   )
-*/
 
-const fetchCodeListItems = async (surveyId, levelId, parentId, draft = false, client = db) =>
+const fetchCodeListLevelsByCodeListId = async (surveyId, codeListId, draft = false, client = db) =>
   await client.map(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list_item
-     WHERE levelId = $1 and parentId = $2`,
-    [levelId, parentId],
+    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list_level
+     WHERE code_list_id = $1
+     ORDER BY index`,
+    [codeListId],
     def => dbTransformCallback(def, draft)
   )
 
+const fetchCodeListItemsByCodeListId = async (surveyId, levelId, draft = false, client = db) =>
+  await client.map(
+    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list_item
+     WHERE level_id = $1
+     ORDER BY parent_id, id`,
+    [levelId],
+    def => dbTransformCallback(def, draft)
+  )
 
 // ============== UPDATE
 const updateProps = async (surveyId, tableName, id, props, client = db) =>
@@ -97,8 +104,10 @@ module.exports = {
   insertCodeListLevel,
   insertCodeListItem,
   //READ
+  fetchCodeListById,
   fetchCodeListsBySurveyId,
-  fetchCodeListItems,
+  fetchCodeListLevelsByCodeListId,
+  fetchCodeListItemsByCodeListId,
   //UPDATE
   updateCodeList,
   updateCodeListLevel,

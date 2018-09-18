@@ -4,27 +4,26 @@ import { connect } from 'react-redux'
 import { FormItem, Input } from '../../../commonComponents/form/input'
 import CodeListLevelEdit from './codeListLevelEdit'
 
-import { getSurveyCodeListByUUID } from '../../../../common/survey/survey'
 import { getCodeListName, newCodeListLevel } from '../../../../common/survey/codeList'
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import { getFieldValidation } from '../../../../common/validation/validator'
 
-import { putCodeListProp, addCodeListLevel } from '../../codeList/actions'
+import { putCodeListProp, createCodeListLevel } from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
+import { getCodeListsEditorEditedCodeList } from '../codeListsEditorState'
 
 class CodeListEdit extends React.Component {
 
   addNewLevel() {
-    const {codeList, addCodeListLevel} = this.props
+    const {codeList, createCodeListLevel} = this.props
     const {levels} = codeList
     const level = newCodeListLevel(codeList.id, levels.length)
-    addCodeListLevel(level)
+    createCodeListLevel(level)
   }
 
   render () {
     const { codeList, putCodeListProp } = this.props
     const { levels, validation } = codeList
-
 
     return <div>
 
@@ -52,8 +51,13 @@ class CodeListEdit extends React.Component {
 
 }
 
-const mapStateToProps = (state, props) => ({
-  codeList: getSurveyCodeListByUUID(props.codeListUUID)(getSurvey(state)),
-})
+const mapStateToProps = (state) => {
+  const survey = getSurvey(state)
 
-export default connect(mapStateToProps, {putCodeListProp, addCodeListLevel})(CodeListEdit)
+  return {
+    survey,
+    codeList: getCodeListsEditorEditedCodeList(survey),
+  }
+}
+
+export default connect(mapStateToProps, {putCodeListProp, createCodeListLevel})(CodeListEdit)

@@ -6,7 +6,7 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../labelsEditor'
 import CodeListProps from './codeListProps'
-import CodeListEdit from '../../../codeList/components/codeListEdit'
+import CodeListsEditor from '../../../codeList/components/codeListsEditor'
 
 import { getFieldValidation, getValidation } from './../../../../../common/validation/validator'
 
@@ -23,7 +23,7 @@ import {
 import { isRenderTable, } from '../../../../../common/survey/nodeDefLayout'
 
 import { putNodeDefProp } from '../../../nodeDef/actions'
-import { addCodeList } from '../../../codeList/actions'
+import { createCodeList, editCodeList } from '../../../codeList/actions'
 
 import { normalizeName } from './../../../../../common/survey/surveyUtils'
 
@@ -33,9 +33,7 @@ class CommonProps extends React.Component {
     super(props)
 
     this.state = {
-      addingNewCodeList: false,
-      newCodeListUUID: null,
-      showingCodeListsManager: false,
+      editingCodeList: false,
     }
   }
 
@@ -44,15 +42,13 @@ class CommonProps extends React.Component {
   }
 
   render () {
-    const {survey, nodeDef, putNodeDefProp} = this.props
+    const {nodeDef, putNodeDefProp} = this.props
 
     const validation = getValidation(nodeDef)
 
-    const isCodeList = isNodeDefCodeList(nodeDef)
-
     return (
       this.state.editingCodeList
-        ? <CodeListEdit/>
+        ? <CodeListsEditor/>
         : <React.Fragment>
           <FormItem label={'name'}>
             <Input value={getNodeDefName(nodeDef)}
@@ -72,7 +68,7 @@ class CommonProps extends React.Component {
                         onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'descriptions', getNodeDefDescriptions(nodeDef))}/>
 
           {
-            isCodeList
+            isNodeDefCodeList(nodeDef)
               ? <CodeListProps {...this.props} onCodeListEdit={(editing) => this.setState({editingCodeList: editing})}/>
               : null
           }
@@ -101,4 +97,4 @@ class CommonProps extends React.Component {
   }
 }
 
-export default connect(null, {putNodeDefProp, addCodeList})(CommonProps)
+export default connect(null, {putNodeDefProp, createCodeList, editCodeList})(CommonProps)

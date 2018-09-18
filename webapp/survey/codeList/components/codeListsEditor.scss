@@ -1,0 +1,11 @@
+.code-lists-table {
+
+}
+
+.code-lists-table .row {
+  display: grid;
+  grid-template-columns: .8fr .1fr .1fr;
+  min-height: 2rem;
+  align-items: center;
+  border-bottom: 1px solid white;
+}

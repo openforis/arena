@@ -17,14 +17,6 @@ import { putCodeListItemProp } from '../../codeList/actions'
 
 class CodeListItemEdit extends React.Component {
 
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      edit: false,
-    }
-  }
-
   onPropLabelsChange (labelItem) {
     const {level, item, putCodeListItemProp} = this.props
     putCodeListItemProp(level, item.uuid, 'labels',
@@ -32,12 +24,10 @@ class CodeListItemEdit extends React.Component {
   }
 
   render () {
-    const {survey, level, item, putCodeListItemProp} = this.props
-    const {edit} = this.state
+    const {survey, level, item, edit, putCodeListItemProp, onEditChange} = this.props
 
     const validation = {} //TODO
     const language = getSurveyDefaultLanguage(survey)
-
 
     return <div className={`codeListItem ${edit ? 'edit': ''}`}>
       {
@@ -52,7 +42,7 @@ class CodeListItemEdit extends React.Component {
                     style={{
                       padding: '0.2rem 0.5rem',
                     }}
-                    onClick={() => this.setState({edit: false})}>
+                    onClick={() => onEditChange(false, item)}>
               <span className="icon icon-arrow-up icon-8px"/>
             </button>
             <LabelsEditor labels={getCodeListItemLabels(item)}
@@ -63,7 +53,7 @@ class CodeListItemEdit extends React.Component {
             <label>{getCodeListItemCode(item)}</label>
             <label>{getCodeListItemLabel(language)(item)}</label>
             <button className="open-btn"
-                    onClick={() => this.setState({edit: true})}>
+                    onClick={() => onEditChange(true, item)}>
               <span className="icon icon-arrow-down icon-8px"/>
             </button>
           </React.Fragment>

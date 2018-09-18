@@ -3,9 +3,13 @@ const {getRestParam} = require('../serverUtils/request')
 
 const {
   insertCodeList, insertCodeListLevel, insertCodeListItem,
-  fetchCodeListsBySurveyId, fetchCodeListItems,
+  fetchCodeListsBySurveyId,
   updateCodeList, updateCodeListLevel, updateCodeListItem,
 } = require('./codeListRepository')
+
+const {
+  fetchCodeListById,
+} = require('./codeListManager')
 
 module.exports.init = app => {
 
@@ -68,17 +72,16 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/codeLists/:codeListId/items', async (req, res) => {
+  // fetch code list by id
+  app.get('/survey/:surveyId/codeLists/:codeListId', async (req, res) => {
     try {
-
-      const surveyId = getRestParam(req, 'surveyId')
-      const levelId = getRestParam(req, 'codeListId')
-      const parentId = getRestParam(req, 'parentId')
       const draft = getRestParam(req, 'draft') === 'true'
+      const surveyId = getRestParam(req, 'surveyId')
+      const codeListId = getRestParam(req, 'codeListId')
 
-      const items = await fetchCodeListItems(surveyId, levelId, parentId, draft)
+      const codeList = await fetchCodeListById(surveyId, codeListId, draft)
 
-      res.json({items})
+      res.json({codeList})
     } catch (err) {
       sendErr(res, err)
     }
@@ -92,9 +95,9 @@ module.exports.init = app => {
       //const codeListId = getRestParam(req, 'codeListId')
       const {codeList} = req.body
 
-      const updatedCdeList = await updateCodeList(surveyId, codeList)
+      const updatedCodeList = await updateCodeList(surveyId, codeList)
 
-      res.json({updatedCdeList})
+      res.json({codeList: updatedCodeList})
     } catch (err) {
       sendErr(res, err)
     }

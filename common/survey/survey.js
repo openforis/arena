@@ -192,7 +192,6 @@ module.exports = {
   // READ codeLists
   getSurveyCodeLists,
   getSurveyCodeListsArray,
-  getSurveyCodeListByUUID,
   getSurveyCodeListById,
 
   // UPDATE
