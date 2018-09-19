@@ -42,6 +42,14 @@ const getSurveyDefaultStep = R.pipe(
   R.head
 )
 
+const getSurveyLabels = getProp('labels', {})
+
+const getSurveyDefaultLabel = survey => {
+  const labels = getSurveyLabels(survey)
+  const lang = getSurveyDefaultLanguage(survey)
+  return R.prop(lang, labels)
+}
+
 /**
  * ======
  * READ NodeDefs
@@ -123,12 +131,16 @@ module.exports = {
   getSurveyProps: getProps,
   getSurveyLabels: getLabels,
 
-  isSurveyPublished,
+  getSurveyName: getProp('name', ''),
   getSurveyLanguages,
   getSurveyDefaultLanguage,
+  getSurveyLabels,
+  getSurveyDefaultLabel,
   getSurveyDescriptions: getProp('descriptions', {}),
   getSurveySrs: getProp('srs', []),
   getSurveyDefaultStep,
+
+  isSurveyPublished,
 
   // READ nodeDefs
   getNodeDefByUUID,

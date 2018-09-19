@@ -85,7 +85,7 @@ const fetchUserSurveys = async (user, client = db) =>
       ON s.id = nm.survey_id
     `,
     [],
-    def => dbTransformCallback(def, false)
+    def => dbTransformCallback(def, true)
   )
 
 const getSurveysByName = async (surveyName, client = db) =>
