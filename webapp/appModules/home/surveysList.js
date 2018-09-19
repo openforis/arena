@@ -22,8 +22,8 @@ const SurveyListHeader = () => (
   </div>
 )
 
-const SurveyRow = ({survey}) => (
-  <div className="surveys-list__row">
+const SurveyRow = ({survey, currentSurvey}) => (
+  <div className={`surveys-list__row${survey.id === currentSurvey.id ? ' active' : ''}`}>
     <div>{getSurveyName(survey)}</div>
     <div>{getSurveyDefaultLabel(survey)}</div>
     <div>{survey.dateCreated}</div>

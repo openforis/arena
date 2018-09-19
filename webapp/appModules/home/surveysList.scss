@@ -1,6 +1,6 @@
 @import "../../style/vars";
 
-$rowHeight: 30px;
+$rowHeight: 35px;
 $rowBorder: 1px solid rgba($white, 0.4);
 
 .surveys-list {
@@ -33,6 +33,10 @@ $rowBorder: 1px solid rgba($white, 0.4);
   align-items: center;
   justify-items: center;
   border-bottom: $rowBorder;
+
+  &.active {
+    background-color: rgba($white, .2);
+  }
 
 }
 
