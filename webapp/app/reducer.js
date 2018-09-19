@@ -2,7 +2,8 @@ import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 
 import {
   appStatusChange,
-  appUserLogout
+  appUserLogout,
+  appSurveysUpdate,
 } from './actions'
 
 import { loginSuccess } from '../login/actions'
@@ -17,6 +18,8 @@ const actionHandlers = {
 
   [appUserLogout]: (state, action) => appState.logoutUser(state),
 
+  //surveys list
+  [appSurveysUpdate]: assocActionProps,
 }
 
 export default exportReducer(actionHandlers)

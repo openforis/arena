@@ -33,3 +33,15 @@ export const logout = () => async dispatch => {
   }
 
 }
+
+// List of surveys available to current user
+export const appSurveysUpdate = 'app/surveys/update'
+
+export const fetchSurveys = () => async dispatch => {
+  try {
+    const {data} = await axios.get('/api/surveys')
+
+    dispatch({type: appSurveysUpdate, surveys: data.surveys})
+  } catch (e) {
+  }
+}

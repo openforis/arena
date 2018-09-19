@@ -1,24 +1,21 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import * as R from 'ramda'
 
-import { appModuleUri } from '../../app/app'
+import { Input } from '../../commonComponents/form/input'
+import LanguageDropdown from '../../commonComponents/form/languageDropdown'
+
+import { appModuleUri, getSurveys } from '../../app/app'
 import { appModules } from '../appModules'
 import { normalizeName } from './../../../common/survey/surveyUtils'
 import { getFieldValidation } from './../../../common/validation/validator'
 
 import { getSurvey, getNewSurvey } from '../../survey/surveyState'
-import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
 
-import { Input } from '../../commonComponents/form/input'
-import LanguageDropdown from '../../commonComponents/form/languageDropdown'
+import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
+import { fetchSurveys } from '../../app/actions'
 
 class AppHomeView extends React.Component {
-
-  componentWillUnmount () {
-    this.props.resetNewSurvey()
-  }
 
   createSurvey () {
     const {createSurvey, newSurvey} = this.props
@@ -31,6 +28,10 @@ class AppHomeView extends React.Component {
     })
   }
 
+  componentDidMount () {
+    this.props.fetchSurveys()
+  }
+
   componentDidUpdate (prevProps) {
 
     const {currentSurvey: prevCurrentSurvey} = prevProps
@@ -41,8 +42,12 @@ class AppHomeView extends React.Component {
     }
   }
 
+  componentWillUnmount () {
+    this.props.resetNewSurvey()
+  }
+
   render () {
-    const {newSurvey, updateNewSurveyProp} = this.props
+    const {surveys, newSurvey, updateNewSurveyProp} = this.props
 
     const {name, label, lang, validation} = newSurvey
 
@@ -91,9 +96,16 @@ class AppHomeView extends React.Component {
   }
 }
 
+AppHomeView.defaultProps = {
+  newSurvey: null,
+  currentSurvey: null,
+  surveys: [],
+}
+
 const mapStateToProps = state => ({
   newSurvey: getNewSurvey(state),
   currentSurvey: getSurvey(state),
+  surveys: getSurveys(state)
 })
 
 export default withRouter(connect(
@@ -102,5 +114,6 @@ export default withRouter(connect(
     createSurvey,
     updateNewSurveyProp,
     resetNewSurvey,
+    fetchSurveys,
   }
 )(AppHomeView))

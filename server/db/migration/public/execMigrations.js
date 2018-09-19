@@ -3,7 +3,7 @@ const DBMigrate = require('db-migrate')
 
 const config = require('../migrationConfig')
 
-const {fetchSurveys} = require('../../../survey/surveyRepository')
+const {fetchAllSurveys} = require('../../../survey/surveyRepository')
 const {migrateSurveySchema} = require('../survey/execMigrations')
 
 const migrateOptions = {
@@ -13,7 +13,7 @@ const migrateOptions = {
 }
 
 const migrateSurveySchemas = async() => {
-  const surveys = await fetchSurveys()
+  const surveys = await fetchAllSurveys()
 
   console.log(`starting data schemas migrations for ${surveys.length} surveys`)
 
