@@ -43,4 +43,7 @@ $rowBorder: 1px solid rgba($white, 0.4);
 .surveys-list__row-header {
   @extend .surveys-list__row;
   font-weight: 400;
+  background-color: rgba($white, 0.1);
+  text-transform: uppercase;
+  font-size: .8rem;
 }
