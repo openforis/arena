@@ -12,9 +12,17 @@ import createDebounce from 'redux-debounced'
 
 import reducer from './rootReducer'
 
+const middlewares = [createDebounce(), thunkMiddleware]
+
+if (process.env.NODE_ENV === 'development') {
+  const { logger } = require('redux-logger')
+
+  middlewares.push(logger);
+}
+
 const store = createStore(
   reducer,
-  applyMiddleware(createDebounce(), thunkMiddleware)
+  applyMiddleware(...middlewares)
 )
 
 import AppRouterSwitch from './appRouterSwitch'
