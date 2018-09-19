@@ -1,5 +1,30 @@
 import * as R from 'ramda'
 
+// DOCS
+const codeListManagerState = {
+  survey: {
+    //....
+    codeLists: {
+      uuid: {
+        // codelist
+      }
+    },
+    // loaded codeLists
+    codeListEdit: {
+      uuid: '',
+      levelItems: {
+        0: {'itemUUID': {}},
+        1: {'itemUUID': {}},
+      },
+      activeLevelItem: {
+        0: 'uuid',
+        1: 'uuid',
+      }
+    },
+
+  }
+}
+
 import {
   getCodeListLevelById,
   assocCodeListLevel,
