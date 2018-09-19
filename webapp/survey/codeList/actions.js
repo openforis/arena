@@ -215,8 +215,6 @@ export const deleteCodeListLevel = levelUUID => async (dispatch, getState) => {
   const level = getCodeListLevelByUUID(levelUUID)(codeList)
 
   //remove level items from code list manager state
-  dispatchCodeListEditorLevelItemReset(dispatch, level.index)
-
   dispatch({type: codeListEditorLevelDelete, levelIndex: level.index})
 
   //delete level and items from db

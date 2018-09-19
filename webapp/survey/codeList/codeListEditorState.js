@@ -118,13 +118,16 @@ const dissocLevelItems = levelIndex => state => R.pipe(
   updatedItemsByLevel => R.assocPath(itemsPath, updatedItemsByLevel)(state)
 )(state)
 
-export const dissocCodeListEditorLevel = levelIndex => state => R.pipe(
-  dissocCodeListEditorActiveLevelItem(levelIndex),
-  dissocLevelItems(levelIndex),
-
+const dissocCodeListEditorLevel = levelIndex => state => R.pipe(
   getCodeListEditorCodeList,
   dissocCodeListLevel(levelIndex),
   updatedCodeList => assocCodeList(updatedCodeList)(state),
+)(state)
+
+export const dissocCodeListEditorLevelAndItems = levelIndex => state => R.pipe(
+  dissocCodeListEditorActiveLevelItem(levelIndex),
+  dissocLevelItems(levelIndex),
+  dissocCodeListEditorLevel(levelIndex),
 )(state)
 
 export const dissocCodeListEditorItem = itemUUID => R.dissocPath(R.append(itemUUID, itemsPath))
