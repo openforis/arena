@@ -2,21 +2,22 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { FormItem, Input } from '../../../commonComponents/form/input'
-import CodeListLevelEditor from './CodeListLevelEditor'
+import CodeListLevelEditor from './codeListLevelEditor'
 
-import { getCodeListName } from '../../../../common/survey/codeList'
+import { getCodeListName,getCodeListLevelsArray } from '../../../../common/survey/codeList'
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import { getFieldValidation } from '../../../../common/validation/validator'
 
 import { putCodeListProp, createCodeListLevel } from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
-import { getCodeListsEditorEditedCodeList } from '../codeListsEditorState'
+import { getCodeListEditorCodeList } from '../codeListEditorState'
 
 class CodeListEditor extends React.Component {
 
   render () {
     const { codeList, putCodeListProp, createCodeListLevel } = this.props
-    const { levels, validation } = codeList
+    const { validation } = codeList
+    const levels = getCodeListLevelsArray(codeList)
 
     return <div>
 
@@ -48,7 +49,7 @@ const mapStateToProps = (state) => {
 
   return {
     survey,
-    codeList: getCodeListsEditorEditedCodeList(survey),
+    codeList: getCodeListEditorCodeList(survey),
   }
 }
 

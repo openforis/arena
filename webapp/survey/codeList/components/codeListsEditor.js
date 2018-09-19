@@ -3,13 +3,13 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import CodeListEditor from './codeListEditor'
+import CodeListsTable from './codeListsTable'
 
-import { getSurveyCodeListsArray } from '../../../../common/survey/survey'
+import {getCodeListName} from '../../../../common/survey/codeList'
 
 import { createCodeList, editCodeList, deleteCodeList } from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
-import { getCodeListsEditorEditedCodeList } from '../codeListsEditorState'
-import CodeListsTable from './codeListsTable'
+import { getCodeListsArray, getCodeListEditorCodeList } from '../codeListEditorState'
 
 class CodeListsEditor extends React.Component {
 
@@ -17,10 +17,14 @@ class CodeListsEditor extends React.Component {
     this.props.createCodeList()
   }
 
-  render () {
-    const {survey, editedCodeList, editCodeList, deleteCodeList} = this.props
+  handleDeleteCodeList (codeList) {
+    if (window.confirm(`DELETE THE CODE LIST ${getCodeListName(codeList)}?`)) {
+      this.props.deleteCodeList(codeList.uuid)
+    }
+  }
 
-    const codeLists = getSurveyCodeListsArray(survey)
+  render () {
+    const {codeLists, editedCodeList, editCodeList} = this.props
 
     return (
       editedCodeList ?
@@ -48,7 +52,7 @@ class CodeListsEditor extends React.Component {
               ? <div>No code list added</div>
               : <CodeListsTable codeLists={codeLists}
                                 editCodeList={editCodeList}
-                                deleteCodeList={deleteCodeList} />
+                                deleteCodeList={(codeList) => this.handleDeleteCodeList(codeList)} />
           }
         </React.Fragment>
     )
@@ -60,7 +64,8 @@ const mapStateToProps = state => {
 
   return {
     survey,
-    editedCodeList: getCodeListsEditorEditedCodeList(survey),
+    codeLists: getCodeListsArray(survey),
+    editedCodeList: getCodeListEditorCodeList(survey),
   }
 }
 

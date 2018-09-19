@@ -34,12 +34,16 @@ import {
  * code lists editor
  */
 import {
-  assocCodeListsEditorCodeList,
-  assocCodeListsEditorLevel,
-  assocCodeListsEditorItem,
-  assocCodeListsEditorSelectedItemInLevel,
-  dissocCodeListsEditorSelectedItemInLevel,
-} from './codeList/codeListsEditorState'
+  assocCodeListEditorListUUID,
+  assocCodeListEditorLevel,
+  assocCodeListEditorItem,
+  assocCodeListEditorActiveLevelItem,
+  assocCodeListEditorLevelItems,
+  dissocCodeListEditorActiveLevelItem,
+  dissocCodeListEditorList,
+  dissocCodeListEditorLevel,
+  dissocCodeListEditorItem,
+} from './codeList/codeListEditorState'
 
 /**
  * survey actions
@@ -76,12 +80,15 @@ import {
  * code list actions
  */
 import {
-  codeListsEditorItemUpdate,
+  codeListEditorItemUpdate,
   codeListEditorLevelUpdate,
   codeListsUpdate,
-  codeListsEditorCodeListUpdate,
-  codeListsEditorItemSelect,
-  codeListsEditorItemReset,
+  codeListEditorCodeListUpdate,
+  codeListEditorItemSelect,
+  codeListEditorItemReset,
+  codeListEditorLevelItemsUpdate,
+  codeListEditorListDelete,
+  codeListEditorLevelDelete,
 } from './codeList/actions'
 
 const actionHandlers = {
@@ -120,15 +127,21 @@ const actionHandlers = {
   //CODE LIST
   [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state),
 
-  [codeListsEditorCodeListUpdate]: (state, {codeList}) => assocCodeListsEditorCodeList(codeList)(state),
+  [codeListEditorCodeListUpdate]: (state, {codeListUUID}) => assocCodeListEditorListUUID(codeListUUID)(state),
 
-  [codeListEditorLevelUpdate]: (state, {level}) => assocCodeListsEditorLevel(level)(state),
+  [codeListEditorLevelUpdate]: (state, {level}) => assocCodeListEditorLevel(level)(state),
 
-  [codeListsEditorItemSelect]: (state, {level, item}) => assocCodeListsEditorSelectedItemInLevel(level, item)(state),
+  [codeListEditorItemSelect]: (state, {levelIndex, itemUUID}) => assocCodeListEditorActiveLevelItem(levelIndex, itemUUID)(state),
 
-  [codeListsEditorItemUpdate]: (state, {item}) => assocCodeListsEditorItem(item)(state),
+  [codeListEditorItemUpdate]: (state, {item}) => assocCodeListEditorItem(item)(state),
 
-  [codeListsEditorItemReset]: (state, {level}) => dissocCodeListsEditorSelectedItemInLevel(level)(state),
+  [codeListEditorItemReset]: (state, {levelIndex}) => dissocCodeListEditorActiveLevelItem(levelIndex)(state),
+
+  [codeListEditorLevelItemsUpdate]: (state, {levelIndex, items}) => assocCodeListEditorLevelItems(levelIndex, items)(state),
+
+  [codeListEditorListDelete]: (state, {codeListUUID}) => dissocCodeListEditorList(codeListUUID)(state),
+
+  [codeListEditorLevelDelete]: (state, {levelIndex}) => dissocCodeListEditorLevel(levelIndex)(state),
 }
 
 export default exportReducer(actionHandlers)

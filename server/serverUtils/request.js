@@ -8,6 +8,25 @@ const getRestParam = (req, param) => {
   return queryValue || paramsValue || bodyValue
 }
 
+const getIntParam = (req, param) => {
+  const strParam = getRestParam(req, param)
+  return strParam && strParam !== 'null' ? parseInt(strParam) : NaN
+}
+
+const getBoolParam = R.pipe(
+  getRestParam,
+  R.equals('true'),
+)
+
+const toQueryString = obj =>
+  R.reduce((acc, key) => {
+    const value = R.prop(key)(obj)
+    return value ? `${acc}&${key}=${value}`: acc
+  }, '')(R.keys(obj))
+
 module.exports = {
-  getRestParam
+  getRestParam,
+  getIntParam,
+  getBoolParam,
+  toQueryString,
 }

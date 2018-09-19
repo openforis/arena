@@ -54,7 +54,6 @@ const CodeListItemEditor = (props) => {
         </React.Fragment>
     }
   </div>
-
 }
 
 export default CodeListItemEditor

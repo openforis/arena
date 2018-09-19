@@ -1,15 +1,17 @@
 const R = require('ramda')
 const {uuidv4} = require('../uuid')
 
+const {toUUIDIndexedObj} = require('./surveyUtils')
+
 const levels = 'levels'
 const items = 'items'
 
 const newCodeList = () => ({
   uuid: uuidv4(),
 
-  levels: [
-    newCodeListLevel()
-  ]
+  levels: {
+    0: newCodeListLevel()
+  }
 })
 
 const newCodeListLevel = (codeListId = null, index = 0) => {
@@ -38,29 +40,22 @@ const getCodeListName = R.pipe(
   R.prop('name'),
 )
 
-const getCodeListLevels = R.prop(levels)
+const getCodeListLevelsArray = R.pipe(
+  R.prop(levels),
+  R.values,
+)
 
 const getCodeListLevelById = id => R.pipe(
-  getCodeListLevels,
+  getCodeListLevelsArray,
   R.find(R.propEq('id', id)),
 )
 
 const getCodeListLevelByUUID = uuid => R.pipe(
-  getCodeListLevels,
+  getCodeListLevelsArray,
   R.find(R.propEq('uuid', uuid)),
 )
 
 const getCodeListItems = R.prop(items)
-
-const getCodeListItemsArray = R.pipe(
-  getCodeListItems,
-  R.values,
-)
-
-const getCodeListItemsByParentId = parentId => R.pipe(
-  getCodeListItemsArray,
-  R.filter(item => item.parentId === parentId)
-)
 
 const getCodeListItemByUUID = uuid => R.pipe(
   getCodeListItems,
@@ -72,13 +67,9 @@ const getCodeListItemLabels = R.path(['props', 'labels'])
 const getCodeListItemLabel = language => R.pipe(getCodeListItemLabels, R.prop(language))
 
 // UPDATE
-const assocCodeListLevel = level => codeList => R.pipe(
-  getCodeListLevels,
-  levels => level.index >= levels.length
-    ? R.insert(level.index, level, levels)
-    : R.update(level.index, level, levels),
-  newLevels => R.assoc(levels, newLevels)(codeList),
-)(codeList)
+const assocCodeListLevelsArray = array => R.assoc(levels, toUUIDIndexedObj(array))
+
+const assocCodeListLevel = level => R.assocPath([levels, level.index], level)
 
 const assocProp = (key, value) => R.assocPath(['props', key], value)
 
@@ -88,6 +79,18 @@ const assocCodeListItem = item => codeList => R.pipe(
   updatedItems => R.assoc(items, updatedItems)(codeList),
 )(codeList)
 
+const dissocCodeListLevel = levelIndex => R.dissocPath([levels, levelIndex])
+
+// UTILS
+const isCodeListLevelDeleteAllowed = level =>  R.pipe(
+  getCodeListLevelsArray,
+  R.length,
+  levelsCount => R.and(
+    level.index > 0,
+    level.index === (levelsCount - 1)
+  )
+)
+
 module.exports = {
   //CREATE
   newCodeList,
@@ -96,21 +99,26 @@ module.exports = {
 
   //READ
   getCodeListName,
-  getCodeListLevels,
+  getCodeListLevelsArray,
   getCodeListLevelById,
   getCodeListLevelByUUID,
-  getCodeListItemsByParentId,
   getCodeListItemByUUID,
   getCodeListLevelName: R.path(['props', 'name']),
   getCodeListItemId: R.propOr(null, 'id'),
+  getCodeListItemUUID: R.propOr(null, 'uuid'),
   getCodeListItemCode: R.path(['props', 'code']),
   getCodeListItemLabels,
   getCodeListItemLabel,
 
   //UPDATE
+  assocCodeListLevelsArray,
   assocCodeListLevel,
   assocCodeListItem,
   assocCodeListProp: assocProp,
   assocCodeListLevelProp: assocProp,
   assocCodeListItemProp: assocProp,
+  dissocCodeListLevel,
+
+  //UTILS
+  isCodeListLevelDeleteAllowed,
 }

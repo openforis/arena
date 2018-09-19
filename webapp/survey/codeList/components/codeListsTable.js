@@ -32,7 +32,7 @@ const TableRow = ({codeList, editCodeList, deleteCodeList}) => {
       </button>
       <button className="btn btn-s btn-of-light-xs"
               style={{marginLeft: '50px'}}
-              onClick={() => deleteCodeList(codeList.id)}>
+              onClick={() => deleteCodeList(codeList)}>
         <span className="icon icon-cross icon-16px icon-left"/>
         DELETE
       </button>

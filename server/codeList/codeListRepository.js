@@ -1,8 +1,10 @@
 const db = require('../db/db')
 const Promise = require('bluebird')
+const R = require('ramda')
 
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 const {getSurveyDBSchema} = require('../../common/survey/survey')
+const {getCodeListLevelsArray, assocCodeListLevelsArray} = require('../../common/survey/codeList')
 
 // ============== CREATE
 const insertCodeList = async (surveyId, codeList, client = db) => client.tx(
@@ -14,14 +16,16 @@ const insertCodeList = async (surveyId, codeList, client = db) => client.tx(
       [codeList.uuid, codeList.props],
       def => dbTransformCallback(def, true)
     )
+    const levels = getCodeListLevelsArray(codeList)
 
     //insert levels
-    insertedCodeList.levels = await Promise.all(
-      codeList.levels.map(async level =>
+    const insertedLevels = await Promise.all(
+      levels.map(async level =>
         await insertCodeListLevel(surveyId, insertedCodeList.id, level, t)
       )
     )
-    return insertedCodeList
+
+    return assocCodeListLevelsArray(insertedLevels)(insertedCodeList)
   }
 )
 
@@ -42,7 +46,6 @@ const insertCodeListItem = async (surveyId, item, client = db) =>
     [item.uuid, item.levelId, item.parentId, item.props],
     def => dbTransformCallback(def, true)
   )
-
 
 // ============== READ
 const fetchCodeListsBySurveyId = async (surveyId, draft = false, client = db) =>
@@ -69,34 +72,44 @@ const fetchCodeListLevelsByCodeListId = async (surveyId, codeListId, draft = fal
     def => dbTransformCallback(def, draft)
   )
 
-const fetchCodeListItemsByCodeListId = async (surveyId, levelId, draft = false, client = db) =>
+const fetchCodeListItemsByParentId = async (surveyId, codeListId, parentId, draft = false, client = db) =>
   await client.map(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list_item
-     WHERE level_id = $1
-     ORDER BY parent_id, id`,
-    [levelId],
+     WHERE 
+      level_id IN (
+        SELECT l.id from ${getSurveyDBSchema(surveyId)}.code_list_level l WHERE l.code_list_id = $1
+      ) 
+      AND ${parentId ? 'parent_id = $2' : 'parent_id IS NULL'}
+     ORDER BY id`,
+    [codeListId, parentId],
     def => dbTransformCallback(def, draft)
   )
 
 // ============== UPDATE
-const updateProps = async (surveyId, tableName, id, props, client = db) =>
+const updateProps = async (tableName, surveyId, item, client = db) =>
   await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
      SET props_draft = $1
      WHERE id = $2
      RETURNING *`,
-    [props, id],
+    [item.props, item.id],
     def => dbTransformCallback(def, true)
   )
 
-const updateCodeListLevel = async (surveyId, level, client = db) =>
-  await updateProps(surveyId, 'code_list_level', level.id, level.props, client)
+const updateCodeListProps = R.partial(updateProps, ['code_list'])
 
-const updateCodeList = async (surveyId, codeList, client = db) =>
-  await updateProps(surveyId, 'code_list', codeList.id, codeList.props, client)
+const updateCodeListLevelProps = R.partial(updateProps, ['code_list_level'])
 
-const updateCodeListItem = async (surveyId, item, client = db) =>
-  await updateProps(surveyId, 'code_list_item', item.id, item.props, client)
+const updateCodeListItemProps = R.partial(updateProps, ['code_list_item'])
+
+const deleteItem = async (tableName, surveyId, id, client = db) =>
+  await client.one(`DELETE FROM ${getSurveyDBSchema(surveyId)}.${tableName} WHERE id = $1 RETURNING *`, [id])
+
+const deleteCodeList = R.partial(deleteItem, ['code_list'])
+
+const deleteCodeListLevel = R.partial(deleteItem, ['code_list_level'])
+
+const deleteCodeListItem = R.partial(deleteItem, ['code_list_item'])
 
 module.exports = {
   //CREATE
@@ -107,9 +120,13 @@ module.exports = {
   fetchCodeListById,
   fetchCodeListsBySurveyId,
   fetchCodeListLevelsByCodeListId,
-  fetchCodeListItemsByCodeListId,
+  fetchCodeListItemsByParentId,
   //UPDATE
-  updateCodeList,
-  updateCodeListLevel,
-  updateCodeListItem,
+  updateCodeListProps,
+  updateCodeListLevelProps,
+  updateCodeListItemProps,
+  //DELETE
+  deleteCodeList,
+  deleteCodeListLevel,
+  deleteCodeListItem,
 }
