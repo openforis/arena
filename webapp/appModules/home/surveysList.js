@@ -44,7 +44,7 @@ const SurveyList = (props) => {
       <SurveyListHeader {...props}/>
 
       {
-        R.isEmpty(surveys)
+        Number.isNaN(rowsHeight) || R.isEmpty(surveys)
           ? null
           : (
             <div className="surveys-list__rows" style={{maxHeight: rowsHeight + 'px'}}>
