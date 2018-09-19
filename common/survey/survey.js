@@ -28,6 +28,11 @@ const isSurveyPublished = R.pipe(
   R.equals(true)
 )
 
+const isSurveyDraft = R.pipe(
+  R.prop('draft'),
+  R.equals(true)
+)
+
 const getSurveyLanguages = getProp('languages', [])
 
 const getSurveyDefaultLanguage = R.pipe(
@@ -49,6 +54,15 @@ const getSurveyDefaultLabel = survey => {
   const lang = getSurveyDefaultLanguage(survey)
   return R.prop(lang, labels)
 }
+
+const getSurveyStatus = survey =>
+  isSurveyPublished(survey) && isSurveyDraft(survey)
+    ? 'PUBLISHED-DRAFT'
+    : isSurveyPublished(survey)
+    ? 'PUBLISHED'
+    : isSurveyDraft(survey)
+      ? 'DRAFT'
+      : ''
 
 /**
  * ======
@@ -140,6 +154,7 @@ module.exports = {
   getSurveySrs: getProp('srs', []),
   getSurveyDefaultStep,
 
+  getSurveyStatus,
   isSurveyPublished,
 
   // READ nodeDefs

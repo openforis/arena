@@ -8,6 +8,7 @@ import { elementOffset } from '../../appUtils/domUtils'
 import {
   getSurveyName,
   getSurveyDefaultLabel,
+  getSurveyStatus,
 } from '../../../common/survey/survey'
 
 const SurveyListHeader = () => (
@@ -18,6 +19,7 @@ const SurveyListHeader = () => (
       <div>Label</div>
       <div>Date created</div>
       <div>Date last modified</div>
+      <div>Status</div>
     </div>
   </div>
 )
@@ -28,6 +30,7 @@ const SurveyRow = ({survey, currentSurvey}) => (
     <div>{getSurveyDefaultLabel(survey)}</div>
     <div>{survey.dateCreated}</div>
     <div>{survey.dateModified}</div>
+    <div>{getSurveyStatus(survey)}</div>
   </div>
 )
 

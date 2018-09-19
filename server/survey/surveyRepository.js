@@ -83,6 +83,7 @@ const fetchUserSurveys = async (user, client = db) =>
         GROUP BY survey_id
       ) as nm
       ON s.id = nm.survey_id
+    ORDER BY s.id
     `,
     [],
     def => dbTransformCallback(def, true)

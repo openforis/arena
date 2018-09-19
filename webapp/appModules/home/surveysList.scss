@@ -29,7 +29,7 @@ $rowBorder: 1px solid rgba($white, 0.4);
 
 .surveys-list__row {
   display: grid;
-  grid-template-columns: .3fr .3fr .2fr .2fr;
+  grid-template-columns: .2fr .2fr .2fr .2fr .2fr;
   align-items: center;
   justify-items: center;
   border-bottom: $rowBorder;
