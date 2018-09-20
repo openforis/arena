@@ -14,10 +14,13 @@ const newCodeList = () => ({
   }
 })
 
-const newCodeListLevel = (codeListId = null, index = 0) => {
+const newCodeListLevel = (codeList) => {
+  const levels = getCodeListLevelsArray(codeList)
+  const index = levels.length
+
   return {
     uuid: uuidv4(),
-    codeListId,
+    codeListId: codeList.id,
     index,
     props: {
       name: 'level_' + (index + 1),
@@ -43,6 +46,7 @@ const getCodeListName = R.pipe(
 const getCodeListLevelsArray = R.pipe(
   R.prop(levels),
   R.values,
+  R.sortBy(R.prop('index'))
 )
 
 const getCodeListLevelById = id => R.pipe(

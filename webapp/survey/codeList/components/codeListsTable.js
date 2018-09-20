@@ -5,11 +5,11 @@ import * as R from 'ramda'
 
 import { getCodeListName } from '../../../../common/survey/codeList'
 
-const CodeListsTable = ({codeLists, editCodeList, deleteCodeList}) => {
+const CodeListsTable = ({codeLists, setCodeListForEdit, deleteCodeList}) => {
   return (
     <div className="code-lists-table">
       {codeLists.map(codeList =>
-        <TableRow editCodeList={editCodeList}
+        <TableRow setCodeListForEdit={setCodeListForEdit}
                   deleteCodeList={deleteCodeList}
                   key={codeList.uuid}
                   codeList={codeList}/>)
@@ -18,7 +18,7 @@ const CodeListsTable = ({codeLists, editCodeList, deleteCodeList}) => {
   )
 }
 
-const TableRow = ({codeList, editCodeList, deleteCodeList}) => {
+const TableRow = ({codeList, setCodeListForEdit, deleteCodeList}) => {
   const name = R.defaultTo('--- undefined name ---', getCodeListName(codeList))
 
   return (
@@ -26,7 +26,7 @@ const TableRow = ({codeList, editCodeList, deleteCodeList}) => {
       <label>{name}</label>
       <button className="btn btn-s btn-of-light-xs"
               style={{marginLeft: '50px'}}
-              onClick={() => editCodeList(codeList.id)}>
+              onClick={() => setCodeListForEdit(codeList.id)}>
         <span className="icon icon-pencil2 icon-16px icon-left"/>
         EDIT
       </button>

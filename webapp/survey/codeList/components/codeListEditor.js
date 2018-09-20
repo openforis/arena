@@ -10,7 +10,7 @@ import { getFieldValidation } from '../../../../common/validation/validator'
 
 import { putCodeListProp, createCodeListLevel } from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
-import { getCodeListEditorCodeList } from '../codeListEditorState'
+import { getCodeListEditCodeList } from '../codeListEditorState'
 
 class CodeListEditor extends React.Component {
 
@@ -49,7 +49,7 @@ const mapStateToProps = (state) => {
 
   return {
     survey,
-    codeList: getCodeListEditorCodeList(survey),
+    codeList: getCodeListEditCodeList(survey),
   }
 }
 

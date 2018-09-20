@@ -7,9 +7,9 @@ import CodeListsTable from './codeListsTable'
 
 import {getCodeListName} from '../../../../common/survey/codeList'
 
-import { createCodeList, editCodeList, deleteCodeList } from '../../codeList/actions'
+import { createCodeList, setCodeListForEdit, deleteCodeList } from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
-import { getCodeListsArray, getCodeListEditorCodeList } from '../codeListEditorState'
+import { getCodeListsArray, getCodeListEditCodeList } from '../codeListEditorState'
 
 class CodeListsEditor extends React.Component {
 
@@ -24,7 +24,7 @@ class CodeListsEditor extends React.Component {
   }
 
   render () {
-    const {codeLists, editedCodeList, editCodeList} = this.props
+    const {codeLists, editedCodeList, setCodeListForEdit} = this.props
 
     return (
       editedCodeList ?
@@ -51,7 +51,7 @@ class CodeListsEditor extends React.Component {
             R.isEmpty(codeLists)
               ? <div>No code list added</div>
               : <CodeListsTable codeLists={codeLists}
-                                editCodeList={editCodeList}
+                                setCodeListForEdit={setCodeListForEdit}
                                 deleteCodeList={(codeList) => this.handleDeleteCodeList(codeList)} />
           }
         </React.Fragment>
@@ -65,8 +65,8 @@ const mapStateToProps = state => {
   return {
     survey,
     codeLists: getCodeListsArray(survey),
-    editedCodeList: getCodeListEditorCodeList(survey),
+    editedCodeList: getCodeListEditCodeList(survey),
   }
 }
 
-export default connect(mapStateToProps, {createCodeList, editCodeList, deleteCodeList})(CodeListsEditor)
+export default connect(mapStateToProps, {createCodeList, setCodeListForEdit, deleteCodeList})(CodeListsEditor)

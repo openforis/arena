@@ -16,14 +16,13 @@ import {
   createCodeListItem,
   putCodeListLevelProp,
   deleteCodeListLevel,
-  openCodeListItemEditor,
-  closeCodeListItemEditor
+  setCodeListItemForEdit,
 } from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
 import {
-  getCodeListEditorActiveLevelItem,
-  getCodeListEditorCodeList,
-  getCodeListEditorLevelItems
+  getCodeListEditActiveLevelItem,
+  getCodeListEditCodeList,
+  getCodeListEditLevelItemsArray,
 } from '../codeListEditorState'
 import { putCodeListItemProp } from '../actions'
 
@@ -40,8 +39,7 @@ class CodeListLevelEditor extends React.Component {
   render () {
     const {
       survey, level, items, editedItemUUID, itemEditDisabled,
-      createCodeListItem, putCodeListLevelProp, putCodeListItemProp,
-      openCodeListItemEditor, closeCodeListItemEditor,
+      createCodeListItem, putCodeListLevelProp, putCodeListItemProp, setCodeListItemForEdit,
       levelDeleteDisabled,
     } = this.props
 
@@ -83,7 +81,7 @@ class CodeListLevelEditor extends React.Component {
                                               item={item}
                                               edit={item.uuid === editedItemUUID}
                                               putCodeListItemProp={putCodeListItemProp}
-                                              onEditChange={edit => edit ? openCodeListItemEditor(item) : closeCodeListItemEditor(item)}/>)
+                                              onEditChange={edit => setCodeListItemForEdit(item, edit)}/>)
       }
     </div>
   }
@@ -94,11 +92,11 @@ const mapStateToProps = (state, props) => {
 
   const survey = getSurvey(state)
 
-  const codeList = getCodeListEditorCodeList(survey)
-  const editedItem = getCodeListEditorActiveLevelItem(level.index)(survey)
-  const previousLevelEditedItem = getCodeListEditorActiveLevelItem(level.index - 1)(survey)
+  const codeList = getCodeListEditCodeList(survey)
+  const editedItem = getCodeListEditActiveLevelItem(level.index)(survey)
+  const previousLevelEditedItem = getCodeListEditActiveLevelItem(level.index - 1)(survey)
   const itemEditDisabled = level.index > 0 && !previousLevelEditedItem
-  const items = itemEditDisabled ? [] : getCodeListEditorLevelItems(level.index)(survey)
+  const items = itemEditDisabled ? [] : getCodeListEditLevelItemsArray(level.index)(survey)
   const levelDeleteDisabled = !isCodeListLevelDeleteAllowed(level)(codeList)
 
   return {
@@ -115,7 +113,6 @@ export default connect(mapStateToProps, {
   putCodeListLevelProp,
   putCodeListItemProp,
   deleteCodeListLevel,
-  openCodeListItemEditor,
-  closeCodeListItemEditor
+  setCodeListItemForEdit,
 })(CodeListLevelEditor)
 

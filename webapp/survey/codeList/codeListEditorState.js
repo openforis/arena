@@ -35,6 +35,7 @@ const surveyState = {
 // action creators
 // createCodeList => dispatch survey/codeList/update, dispatch => survey/codeListEdit/update , load first level and dispatch survey/codeListEdit/levelItems/update
 // updateCodeList => dispatch survey/codeList/update
+// deleteCodeList => dispatch survey/codeList/update
 
 // createCodeListLevel => dispatch survey/codeList/update
 // updateCodeListLevel => dispatch survey/codeList/update
@@ -50,20 +51,13 @@ const surveyState = {
 // survey/codeListEdit/levelItems/update
 // survey/codeListEdit/activeLevelItem/update
 
-import { toUUIDIndexedObj } from '../../../common/survey/surveyUtils'
-
-import {
-  getCodeListLevelById,
-  assocCodeListLevel,
-  dissocCodeListLevel,
-} from '../../../common/survey/codeList'
-import { createCodeList } from './actions'
-
 const codeListsPath = ['codeLists']
 const codeListEditPath = ['codeListEdit']
 const codeListUUIDPath = R.append('uuid', codeListEditPath)
 const activeLevelItemPath = R.concat(codeListEditPath, ['activeLevelItem'])
 const itemsPath = R.append('levelItems', codeListEditPath)
+
+// ========= READ
 
 export const getCodeListsArray = R.pipe(
   R.path(codeListsPath),
@@ -72,7 +66,7 @@ export const getCodeListsArray = R.pipe(
 
 export const getCodeListByUUID = uuid => R.path(R.append(uuid, codeListsPath))
 
-export const getCodeListEditorCodeList = state => R.pipe(
+export const getCodeListEditCodeList = state => R.pipe(
   R.path(codeListsPath),
   codeLists => R.prop(R.path(codeListUUIDPath)(state))(codeLists),
 )(state)
@@ -82,47 +76,47 @@ const getActiveLevelItem = R.pipe(
   R.defaultTo([]),
 )
 
-export const getCodeListEditorActiveLevelItem = levelIndex => state => R.pipe(
+export const getCodeListEditActiveLevelItem = levelIndex => state => R.pipe(
   getActiveLevelItem,
   R.prop(levelIndex),
-  uuid => R.find(item => item.uuid === uuid, getCodeListEditorLevelItems(levelIndex)(state))
+  activeItemUUID => R.find(item => item.uuid === activeItemUUID, getCodeListEditLevelItemsArray(levelIndex)(state))
 )(state)
 
-export const getCodeListEditorLevelItems = levelIndex => R.pipe(
+export const getCodeListEditLevelItems = levelIndex => R.pipe(
   R.path(itemsPath),
   R.prop(levelIndex),
+)
+
+export const getCodeListEditLevelItemsArray = levelIndex => R.pipe(
+  getCodeListEditLevelItems(levelIndex),
   R.values,
   R.sortBy(R.prop('index')),
 )
 
-export const getCodeListEditorLevelItemByUUID = (levelIndex, itemUUID) => R.path(R.concat(itemsPath, [levelIndex, itemUUID]))
+export const getCodeListEditLevelItemByUUID = (levelIndex, itemUUID) => R.path(R.concat(itemsPath, [levelIndex, itemUUID]))
 
-export const assocCodeList = codeList => R.assocPath(R.append(codeList.uuid, codeListsPath), codeList)
+// ========== UPDATE
 
-export const assocCodeListEditorListUUID = uuid => R.assocPath(codeListUUIDPath, uuid)
+export const assocCodeListEdit = codeListUUID => R.assocPath(codeListEditPath, {uuid: codeListUUID})
 
-export const assocCodeListEditorLevel = level => state => R.pipe(
-  getCodeListEditorCodeList,
-  assocCodeListLevel(level),
-  codeList => assocCodeList(codeList)(state),
+export const dissocCodeListEdit = R.dissocPath(codeListEditPath)
+
+export const assocCodeListEditLevelItems = (levelIndex, items) => state => R.pipe(
+  R.path(R.append(levelIndex, itemsPath)),
+  oldItems => R.merge(oldItems, items),
+  //remove deleted items (null)
+  updatedItems => R.reduce((acc, item) => item === null ? R.dissoc(item.uuid)(acc) : acc, updatedItems, R.values(updatedItems)),
+  updatedItems => R.assocPath(R.append(levelIndex, itemsPath)(state), updatedItems),
 )(state)
 
-export const assocCodeListEditorItem = item => state => R.pipe(
-  getCodeListEditorCodeList,
-  getCodeListLevelById(item.levelId),
-  level => R.assocPath(R.concat(itemsPath, [level.index, item.uuid]), item)(state)
-)(state)
-
-export const assocCodeListEditorLevelItems = (levelIndex, items) => R.assocPath(R.append(levelIndex, itemsPath), toUUIDIndexedObj(items))
-
-export const assocCodeListEditorActiveLevelItem = (levelIndex, itemUUID) => state => R.pipe(
-  dissocCodeListEditorActiveLevelItem(levelIndex),
+export const assocCodeListEditActiveLevelItem = (levelIndex, itemUUID) => state => R.pipe(
+  dissocCodeListEditActiveLevelItem(levelIndex),
   getActiveLevelItem,
   R.assoc(levelIndex, itemUUID),
   updatedActiveItems => R.assocPath(activeLevelItemPath, updatedActiveItems)(state)
 )(state)
 
-export const dissocCodeListEditorActiveLevelItem = (levelIndex) => state => R.pipe(
+export const dissocCodeListEditActiveLevelItem = (levelIndex) => state => R.pipe(
   getActiveLevelItem,
   //remove items in following levels
   activeItems => R.reduce((acc, index) =>
@@ -143,22 +137,4 @@ const dissocLevelItems = levelIndex => state => R.pipe(
   (R.filter(index => index < levelIndex)(R.keys(itemsByLevel))), //consider only previous levels items
   updatedItemsByLevel => R.assocPath(itemsPath, updatedItemsByLevel)(state)
 )(state)
-
-const dissocCodeListEditorLevel = levelIndex => state => R.pipe(
-  getCodeListEditorCodeList,
-  dissocCodeListLevel(levelIndex),
-  updatedCodeList => assocCodeList(updatedCodeList)(state),
-)(state)
-
-export const dissocCodeListEditorLevelAndItems = levelIndex => state => R.pipe(
-  dissocCodeListEditorActiveLevelItem(levelIndex),
-  dissocLevelItems(levelIndex),
-  dissocCodeListEditorLevel(levelIndex),
-)(state)
-
-export const dissocCodeListEditorItem = itemUUID => R.dissocPath(R.append(itemUUID, itemsPath))
-
-export const dissocCodeListEditorList = codeListUUID => R.dissocPath(R.append(codeListUUID, codeListsPath))
-
-export const dissocCodeListEditorCodeListEdit = R.dissocPath(codeListEditPath)
 
