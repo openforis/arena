@@ -3,7 +3,7 @@ const R = require('ramda')
 
 const {sendOk} = require('../serverUtils/response')
 
-const {userPrefNames, getUserPrefSurveyId} = require('./../user/userPrefs')
+const {userPrefNames, getUserPrefSurveyId} = require('../../common/user/userPrefs')
 const {getSurveyById} = require('../survey/surveyRepository')
 const {deleteUserPref} = require('../user/userRepository')
 const {validateSurvey} = require('../survey/surveyValidator')

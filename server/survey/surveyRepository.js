@@ -3,8 +3,8 @@ const db = require('../db/db')
 const {uuidv4} = require('../../common/uuid')
 const {selectDate} = require('../db/dbUtils')
 
-const {setUserPref} = require('../user/userRepository')
-const {userPrefNames} = require('../user/userPrefs')
+const {updateUserPref} = require('../user/userRepository')
+const {userPrefNames} = require('../../common/user/userPrefs')
 
 const {
   createEntityDef,
@@ -54,7 +54,7 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
     migrateSurveySchema(surveyId)
 
     // update user prefs
-    await setUserPref(user, userPrefNames.survey, surveyId, t)
+    await updateUserPref(user, userPrefNames.survey, surveyId, t)
 
     return await getSurveyById(surveyId, true, t)
   }

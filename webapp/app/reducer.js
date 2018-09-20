@@ -1,8 +1,13 @@
+import * as R from 'ramda'
+
 import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
+
+import { setUserPref } from '../../common/user/userPrefs'
 
 import {
   appStatusChange,
   appUserLogout,
+  appUserPrefUpdate,
   appSurveysUpdate,
 } from './actions'
 
@@ -15,6 +20,15 @@ const actionHandlers = {
 
   // user and current survey are properties of app state
   [loginSuccess]: assocActionProps,
+
+  [appUserPrefUpdate]: (state, {name, value}) => {
+    const user = R.pipe(
+      R.prop('user'),
+      setUserPref(name, value)
+    )(state)
+
+    return assocActionProps(state, {user})
+  },
 
   [appUserLogout]: (state, action) => appState.logoutUser(state),
 
