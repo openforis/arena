@@ -1,12 +1,20 @@
 import * as R from 'ramda'
 
 // DOCS
-const codeListManagerState = {
+const surveyState = {
   survey: {
     //....
     codeLists: {
       uuid: {
         // codelist
+        uuid: '',
+        props: {},
+        levels: {
+          0: {
+            uuid: '',
+            props: {},
+          },
+        }
       }
     },
     // loaded codeLists
@@ -24,6 +32,23 @@ const codeListManagerState = {
 
   }
 }
+// action creators
+// createCodeList => dispatch survey/codeList/update, dispatch => survey/codeListEdit/update , load first level and dispatch survey/codeListEdit/levelItems/update
+// updateCodeList => dispatch survey/codeList/update
+
+// createCodeListLevel => dispatch survey/codeList/update
+// updateCodeListLevel => dispatch survey/codeList/update
+// deleteCodeListLevel => dispatch survey/codeList/update
+
+// createCodeListItem => dispatch survey/codeListEdit/levelItems/update
+// updateCodeListItem => dispatch survey/codeListEdit/levelItems/update
+// deleteCodeListItem => dispatch survey/codeListEdit/levelItems/update and remove dispatch survey/codeListEdit/activeLevelItem/update
+// setCodeListItemForEdit => dispatch survey/codeListEdit/activeLevelItem/update , load or remove children and dispatch survey/codeListEdit/levelItems/update
+
+// actions
+// survey/codeList/update -- assoc or dissoc codeList
+// survey/codeListEdit/levelItems/update
+// survey/codeListEdit/activeLevelItem/update
 
 import { toUUIDIndexedObj } from '../../../common/survey/surveyUtils'
 
@@ -32,6 +57,7 @@ import {
   assocCodeListLevel,
   dissocCodeListLevel,
 } from '../../../common/survey/codeList'
+import { createCodeList } from './actions'
 
 const codeListsPath = ['codeLists']
 const codeListEditPath = ['codeListEdit']
