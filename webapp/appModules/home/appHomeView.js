@@ -37,12 +37,12 @@ class AppHomeView extends React.Component {
     return (
       <div style={{
         display: 'grid',
-        gridTemplateRows: '.8fr .2fr',
+        gridTemplateRows: '.15fr .8fr',
       }}>
 
-        <SurveysList {...this.props}/>
-
         <AddSurveyForm {...this.props}/>
+
+        <SurveysList {...this.props}/>
 
       </div>
     )

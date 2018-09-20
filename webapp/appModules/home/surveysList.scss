@@ -5,7 +5,8 @@ $rowBorder: 1px solid rgba($white, 0.4);
 
 .surveys-list {
   overflow: hidden;
-  padding: 0 4rem;
+  margin: 0 4rem;
+  border-bottom: $rowBorder;
 }
 
 .surveys-list__header {
