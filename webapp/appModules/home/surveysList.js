@@ -4,6 +4,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { elementOffset } from '../../appUtils/domUtils'
+import { getRelativeDate } from '../../appUtils/dateUtils'
 
 import {
   getSurveyName,
@@ -32,8 +33,8 @@ const SurveyRow = ({survey, currentSurvey, setActiveSurvey}) => {
     <div className={`surveys-list__row${activeClass}`}>
       <div>{getSurveyName(survey)}</div>
       <div>{getSurveyDefaultLabel(survey)}</div>
-      <div>{survey.dateCreated}</div>
-      <div>{survey.dateModified}</div>
+      <div>{getRelativeDate(survey.dateCreated)}</div>
+      <div>{getRelativeDate(survey.dateModified)}</div>
       <div>{getSurveyStatus(survey)}</div>
       <div>
         <button className={`btn btn-s btn-of${activeClass}`}
