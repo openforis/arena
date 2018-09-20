@@ -38,6 +38,7 @@ import {
   dissocCodeListEdit,
   assocCodeListEditActiveLevelItem,
   assocCodeListEditLevelItems,
+  dissocCodeListEditLevelItems,
 } from './codeList/codeListEditorState'
 
 /**
@@ -121,7 +122,7 @@ const actionHandlers = {
 
   [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditActiveLevelItem(levelIndex, itemUUID)(state),
 
-  [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) => assocCodeListEditLevelItems(levelIndex, items)(state)
+  [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) => items === null ? dissocCodeListEditLevelItems(levelIndex)(state) : assocCodeListEditLevelItems(levelIndex, items)(state)
 }
 
 export default exportReducer(actionHandlers)

@@ -134,6 +134,11 @@ const assocNodeDefValidation = (nodeDefUUID, validation) =>
 const assocSurveyCodeLists = codeLists =>
   survey => R.pipe(
     R.merge(getSurveyCodeLists(survey)),
+    //exclude null objects
+    newCodeLists => R.reduce((acc, key) => {
+      const codeList = R.prop(key, acc)
+      return codeList === null ? R.dissoc(key, acc) : acc
+    }, newCodeLists)(R.keys(newCodeLists)),
     newCodeLists => R.assoc('codeLists', newCodeLists, survey)
   )(codeLists)
 

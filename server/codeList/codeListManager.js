@@ -1,3 +1,5 @@
+const {toIndexedObj} = require('../../common/survey/surveyUtils')
+
 const {
   fetchCodeListById: repFetchCodeListById,
   fetchCodeListLevelsByCodeListId,
@@ -8,7 +10,7 @@ const fetchCodeListById = async (surveyId, id, draft = false) => {
 
   return {
     ...codeList,
-    levels: await fetchCodeListLevelsByCodeListId(surveyId, id, draft),
+    levels: toIndexedObj(await fetchCodeListLevelsByCodeListId(surveyId, id, draft), 'index'),
   }
 }
 

@@ -31,7 +31,7 @@ class CodeListLevelEditor extends React.Component {
   handleDelete () {
     const {level, deleteCodeListLevel} = this.props
 
-    if (window.confirm('DELETE THE LEVEL AND ALL ASSOCIATED ITEMS?')) {
+    if (window.confirm('delete the level and all it\'s items?')) {
       deleteCodeListLevel(level.uuid)
     }
   }

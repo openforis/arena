@@ -1,7 +1,7 @@
 const R = require('ramda')
 const {uuidv4} = require('../uuid')
 
-const {toUUIDIndexedObj} = require('./surveyUtils')
+const {toIndexedObj} = require('./surveyUtils')
 
 const levels = 'levels'
 const items = 'items'
@@ -15,12 +15,11 @@ const newCodeList = () => ({
 })
 
 const newCodeListLevel = (codeList) => {
-  const levels = getCodeListLevelsArray(codeList)
-  const index = levels.length
+  const index = codeList ? getCodeListLevelsArray(codeList).length : 0
 
   return {
     uuid: uuidv4(),
-    codeListId: codeList.id,
+    codeListId: R.propOr(null, 'id')(codeList),
     index,
     props: {
       name: 'level_' + (index + 1),
@@ -71,7 +70,7 @@ const getCodeListItemLabels = R.path(['props', 'labels'])
 const getCodeListItemLabel = language => R.pipe(getCodeListItemLabels, R.prop(language))
 
 // UPDATE
-const assocCodeListLevelsArray = array => R.assoc(levels, toUUIDIndexedObj(array))
+const assocCodeListLevelsArray = array => R.assoc(levels, toIndexedObj(array, 'index'))
 
 const assocCodeListLevel = level => R.assocPath([levels, level.index], level)
 
@@ -83,7 +82,7 @@ const assocCodeListItem = item => codeList => R.pipe(
   updatedItems => R.assoc(items, updatedItems)(codeList),
 )(codeList)
 
-const dissocCodeListLevel = levelIndex => R.dissocPath([levels, levelIndex])
+const dissocCodeListLevel = levelIndex => R.dissocPath([levels, R.toString(levelIndex)])
 
 // UTILS
 const isCodeListLevelDeleteAllowed = level =>  R.pipe(

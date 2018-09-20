@@ -31,10 +31,13 @@ const getLabels = getProp('labels', {})
 //UPDATE
 const setProp = (key, value) => R.assocPath(['props', key], value)
 
-const toUUIDIndexedObj = array => R.reduce((acc, item) => R.assoc(item.uuid, item)(acc), {})(array)
+const toIndexedObj = (array, prop) => R.reduce((acc, item) => R.assoc(R.prop(prop)(item), item)(acc), {})(array)
+
+const toUUIDIndexedObj = array => R.partialRight(toIndexedObj, ['uuid'])(array)
 
 module.exports = {
   normalizeName,
+  toIndexedObj,
   toUUIDIndexedObj,
 
   // PROPS

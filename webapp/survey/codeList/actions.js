@@ -5,6 +5,10 @@ import {toUUIDIndexedObj} from '../../../common/survey/surveyUtils'
 import {toQueryString} from '../../../server/serverUtils/request'
 
 import {
+  getSurveyCodeLists
+} from '../../../common/survey/survey'
+
+import {
   newCodeList,
   newCodeListLevel,
   newCodeListItem,
@@ -99,7 +103,7 @@ export const createCodeListItem = (level) => async (dispatch, getState) => {
 // ==== READ
 
 const loadCodeListLevelItems = async (surveyId, codeListId, levelIndex, parentId, dispatch) => {
-  dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, []) //reset level items
+  dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, null) //reset level items
 
   const queryParams = {
     draft: true,
@@ -193,8 +197,7 @@ export const deleteCodeList = codeListUUID => async (dispatch, getState) => {
   const survey = getSurvey(getState())
   const codeList = getCodeListByUUID(codeListUUID)(survey)
 
-  //remove code list  from code list manager state
-  dispatchCodeListsUpdate(dispatch, {[codeListUUID]: null})
+  dispatchCodeListsUpdate(dispatch, {[codeList.uuid]: null})
 
   //delete code list and items from db
   await axios.delete(`/api/survey/${survey.id}/codeLists/${codeList.id}`)
@@ -205,10 +208,10 @@ export const deleteCodeListLevel = levelUUID => async (dispatch, getState) => {
   const codeList = getCodeListEditCodeList(survey)
   const level = getCodeListLevelByUUID(levelUUID)(codeList)
 
-  const updatedCodeList = dissocCodeListLevel(codeList)
+  const updatedCodeList = dissocCodeListLevel(level.index)(codeList)
   dispatchCodeListUpdate(dispatch, updatedCodeList)
 
-  dispatchCodeListEditLevelItemsUpdate(dispatch, level.index, [])
+  dispatchCodeListEditLevelItemsUpdate(dispatch, level.index, null)
   dispatchCodeListEditActiveLevelItemUpdate(dispatch, level.index, null)
 
   //delete level and items from db
