@@ -30,7 +30,7 @@ $rowBorder: 1px solid rgba($white, 0.4);
 
 .surveys-list__row {
   display: grid;
-  grid-template-columns: .2fr .2fr .2fr .2fr .2fr;
+  grid-template-columns: repeat(5, 1.5fr) 1fr;
   align-items: center;
   justify-items: center;
   border-bottom: $rowBorder;
@@ -44,6 +44,11 @@ $rowBorder: 1px solid rgba($white, 0.4);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .btn {
+    font-weight: 400;
+    font-size: 0.7rem;
   }
 }
 

@@ -24,15 +24,26 @@ const SurveyListHeader = () => (
   </div>
 )
 
-const SurveyRow = ({survey, currentSurvey}) => (
-  <div className={`surveys-list__row${survey.id === currentSurvey.id ? ' active' : ''}`}>
-    <div>{getSurveyName(survey)}</div>
-    <div>{getSurveyDefaultLabel(survey)}</div>
-    <div>{survey.dateCreated}</div>
-    <div>{survey.dateModified}</div>
-    <div>{getSurveyStatus(survey)}</div>
-  </div>
-)
+const SurveyRow = ({survey, currentSurvey, setActiveSurvey}) => {
+  const active = survey.id === currentSurvey.id
+  const activeClass = active ? ' active' : ''
+
+  return (
+    <div className={`surveys-list__row${activeClass}`}>
+      <div>{getSurveyName(survey)}</div>
+      <div>{getSurveyDefaultLabel(survey)}</div>
+      <div>{survey.dateCreated}</div>
+      <div>{survey.dateModified}</div>
+      <div>{getSurveyStatus(survey)}</div>
+      <div>
+        <button className={`btn btn-s btn-of${activeClass}`}
+                onClick={() => setActiveSurvey(survey.id)}>
+          {active ? 'active' : 'activate'}
+        </button>
+      </div>
+    </div>
+  )
+}
 
 const getElementHeight = cssClass =>
   elementOffset(document.getElementsByClassName(cssClass)[0]).height

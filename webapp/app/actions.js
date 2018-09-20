@@ -45,3 +45,12 @@ export const fetchSurveys = () => async dispatch => {
   } catch (e) {
   }
 }
+
+export const setActiveSurvey = surveyId => async dispatch => {
+  try {
+    const {data} = await axios.get(`/api/survey/${surveyId}`)
+
+    dispatchCurrentSurveyUpdate(dispatch, data.survey)
+  } catch (e) {
+  }
+}

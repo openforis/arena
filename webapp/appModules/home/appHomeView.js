@@ -11,7 +11,7 @@ import { appModules } from '../appModules'
 import { getNewSurvey, getSurvey } from '../../survey/surveyState'
 
 import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
-import { fetchSurveys } from '../../app/actions'
+import { fetchSurveys, setActiveSurvey } from '../../app/actions'
 
 class AppHomeView extends React.Component {
 
@@ -68,5 +68,6 @@ export default withRouter(connect(
     updateNewSurveyProp,
     resetNewSurvey,
     fetchSurveys,
+    setActiveSurvey,
   }
 )(AppHomeView))
