@@ -14,7 +14,7 @@ import { getNodeChildrenByDefId, getRootNode } from '../../../../common/record/r
 import { getSurvey, isNodeDefFormLocked } from '../../surveyState'
 import { getRecord } from '../../record/recordState'
 
-import { setFormNodeDefEdit, setFormNodeDefUnlocked, putNodeDefProp } from '../actions'
+import { setFormNodeDefEdit, setFormNodeDefUnlocked, putNodeDefProp, removeNodeDef } from '../actions'
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
 
 import { getNodeDefComponent, getNodeDefDefaultValue } from './nodeDefSystemProps'
@@ -59,6 +59,7 @@ class NodeDefSwitch extends React.Component {
       setFormNodeDefEdit,
       putNodeDefProp,
       setFormNodeDefUnlocked,
+      removeNodeDef,
     } = this.props
 
     const isRoot = isNodeDefRoot(nodeDef)
@@ -106,7 +107,11 @@ class NodeDefSwitch extends React.Component {
                       null
                       : <button className="btn-s btn-of-light-xs"
                                 aria-disabled={nodeDef.published}
-                                onClick={() => window.confirm('Are you sure you want to permanently delete this node definition? This operation cannot be undone') ? null : null}>
+                                onClick={() => {
+                                  window.confirm('Are you sure you want to permanently delete this node definition? This operation cannot be undone')
+                                    ? removeNodeDef(nodeDef)
+                                    : null
+                                }}>
                         <span className="icon icon-bin2 icon-12px"/>
                       </button>
                   }
@@ -159,7 +164,8 @@ const mapStateToProps = (state, props) => {
 export default connect(
   mapStateToProps,
   {
-    setFormNodeDefEdit, setFormNodeDefUnlocked, putNodeDefProp,
+    setFormNodeDefEdit, setFormNodeDefUnlocked,
+    putNodeDefProp, removeNodeDef,
     updateNode, removeNode, createNodePlaceholder,
   }
 )(NodeDefSwitch)

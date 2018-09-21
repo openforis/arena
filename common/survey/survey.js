@@ -121,6 +121,13 @@ const assocNodeDefValidation = (nodeDefUUID, validation) =>
 
 /**
  * ======
+ * DELETE NodeDef
+ * ======
+ */
+const dissocNodeDef = nodeDef => R.dissocPath([nodeDefs, nodeDef.uuid])
+
+/**
+ * ======
  * UTILS NodeDefs
  * ======
  */
@@ -171,6 +178,9 @@ module.exports = {
   assocNodeDef,
   assocNodeDefProp,
   assocNodeDefValidation,
+
+  // DELETE nodeDefs
+  dissocNodeDef,
 
   // UTILS
   getSurveyDBSchema: surveyId => `survey_${surveyId}`,

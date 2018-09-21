@@ -8,6 +8,8 @@ import {
   assocNodeDef,
   assocNodeDefProp,
   assocNodeDefValidation,
+
+  dissocNodeDef,
 } from '../../common/survey/survey'
 
 import {
@@ -42,6 +44,7 @@ import {
   nodeDefsUpdate,
   nodeDefUpdate,
   nodeDefValidationUpdate,
+  nodeDefDelete,
 
   //survey-form
   formNodeDefEditUpdate,
@@ -73,6 +76,7 @@ const actionHandlers = {
 
   [nodeDefValidationUpdate]: (state, {nodeDefUUID, validation}) => assocNodeDefValidation(nodeDefUUID, validation)(state),
 
+  [nodeDefDelete]: (state, {nodeDef}) => dissocNodeDef(nodeDef)(state),
   //SURVEY-FORM
   [formReset]: dissocForm,
 
