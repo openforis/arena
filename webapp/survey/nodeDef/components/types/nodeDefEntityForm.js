@@ -20,17 +20,8 @@ import {
 } from '../../../../../common/survey/nodeDefLayout'
 import { getFormPageNodeUUID } from '../../../surveyState'
 
-const onLayoutChange = (props, layout) => {
-  const {nodeDef, edit, locked, putNodeDefProp} = props
-
-  //console.log(window.innerWidth) ||
-  edit && !locked && window.innerWidth > 1200 && layout.length > 0
-    ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
-    : null
-}
-
 const EntityForm = props => {
-  const {nodeDef, childDefs, edit, locked, node} = props
+  const {nodeDef, childDefs, edit, locked, node, putNodeDefProp} = props
 
   const columns = getNoColumns(nodeDef)
   const rdgLayout = getLayout(nodeDef)
@@ -43,6 +34,15 @@ const EntityForm = props => {
     R.dissoc('parentNode'),
   )(props)
 
+  const onLayoutChange = (layout) => {
+
+    //console.log(window.innerWidth) ||
+    edit && !locked && window.innerWidth > 1200 && layout.length > 0
+    && layout.length === innerPageChildren.length
+      ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
+      : null
+  }
+
   return (
     innerPageChildren.length > 0
       ? <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
@@ -51,7 +51,7 @@ const EntityForm = props => {
                               cols={{lg: columns, md: columns, sm: columns, xs: 1, xxs: 1}}
                               layouts={{lg: rdgLayout, md: rdgLayout, sm: rdgLayout}}
                               containerPadding={[20, 50]}
-                              onLayoutChange={(layout) => onLayoutChange(props, layout)}
+                              onLayoutChange={onLayoutChange}
                               isDraggable={edit && !locked}
                               isResizable={edit && !locked}
         //TODO decide if verticalCompact
