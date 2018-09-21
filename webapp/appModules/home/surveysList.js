@@ -4,7 +4,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { elementOffset } from '../../appUtils/domUtils'
-import { getRelativeDate } from '../../appUtils/dateUtils'
+import { getRelativeDate, compareDatesDesc } from '../../appUtils/dateUtils'
 
 import {
   getSurveyName,
@@ -64,9 +64,11 @@ const SurveyList = (props) => {
           : (
             <div className="surveys-list__rows" style={{maxHeight: rowsHeight + 'px'}}>
               {
-                surveys.map(survey =>
-                  <SurveyRow key={survey.id} {...props} survey={survey}/>
-                )
+                surveys
+                  .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
+                  .map(survey =>
+                    <SurveyRow key={survey.id} {...props} survey={survey}/>
+                  )
               }
             </div>
           )

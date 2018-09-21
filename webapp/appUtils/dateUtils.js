@@ -7,19 +7,22 @@ import {
   differenceInDays,
   differenceInHours,
   format,
+
+  compareDesc,
 } from 'date-fns'
 
-export const getRelativeDate = (rawDate) => {
-  const timestamp = parse(rawDate)
+export const getRelativeDate = date => {
+
+  if (R.isNil(date))
+    return null
+
+  const timestamp = parse(date)
   const now = new Date()
 
   const formatDiff = (fn, unit) => {
-    const count = fn(now, timestamp)
-    return `${count} ${unit}${count > 1 ? 's' : ''} ago`
+    const diff = fn(now, timestamp)
+    return `${diff} ${unit}${diff > 1 ? 's' : ''} ago`
   }
-
-  if (R.isNil(rawDate))
-    return null
 
   if (differenceInMonths(now, timestamp) > 0)
     return format(timestamp, 'DD MMM YYYY')
@@ -35,3 +38,5 @@ export const getRelativeDate = (rawDate) => {
 
   return 'A moment ago'
 }
+
+export const compareDatesDesc = compareDesc
