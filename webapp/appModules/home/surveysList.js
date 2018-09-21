@@ -14,7 +14,7 @@ import {
 
 const SurveyListHeader = () => (
   <div className="surveys-list__header">
-    <h4 className="header-label">Surveys</h4>
+    <h5 className="header-label">Surveys</h5>
     <div className="surveys-list__row-header">
       <div>Name</div>
       <div>Label</div>

@@ -18,9 +18,9 @@ const AddSurveyForm = (props) => {
 
       display: 'grid',
       gridTemplateColumns: 'repeat(4, .25fr)',
-      alignItems: 'center',
+      alignItems: 'end',
       gridColumnGap: '2rem',
-      padding: '0 8rem',
+      padding: '0 10rem',
     }}>
       <div>
         <Input placeholder="Name"
