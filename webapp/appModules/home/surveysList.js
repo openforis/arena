@@ -3,7 +3,6 @@ import './surveysList.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { elementOffset } from '../../appUtils/domUtils'
 import { getRelativeDate, compareDatesDesc } from '../../appUtils/dateUtils'
 
 import {
@@ -46,23 +45,18 @@ const SurveyRow = ({survey, currentSurvey, setActiveSurvey}) => {
   )
 }
 
-const getElementHeight = cssClass =>
-  elementOffset(document.getElementsByClassName(cssClass)[0]).height
-
 const SurveyList = (props) => {
   const {surveys} = props
-
-  const rowsHeight = getElementHeight('surveys-list') - getElementHeight('surveys-list__header')
 
   return (
     <div className="surveys-list">
       <SurveyListHeader {...props}/>
 
       {
-        Number.isNaN(rowsHeight) || R.isEmpty(surveys)
+        R.isEmpty(surveys)
           ? null
           : (
-            <div className="surveys-list__rows" style={{maxHeight: rowsHeight + 'px'}}>
+            <div className="surveys-list__rows">
               {
                 surveys
                   .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
