@@ -66,7 +66,7 @@ class NodeDefSwitch extends React.Component {
     const invalid = nodeDef.validation && !nodeDef.validation.valid
     const isPage = !!getPageUUID(nodeDef)
 
-    return <div className={`node-def__form${isPage ? ' node-def__form_page' : ''}`} ref="nodeDefElem">
+    return <div className={`${isPage ? 'node-def__form_page' : 'node-def__form'}`} ref="nodeDefElem">
       {
         invalid ?
           <div className="node-def__form-error">
