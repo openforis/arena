@@ -1,7 +1,9 @@
 const R = require('ramda')
+const camelize = require('camelize')
+
+const {leftTrim} = require('../../common/stringUtils')
 
 // naming utils
-const leftTrim = R.replace(/^\s+/, '')
 
 const normalizeName = R.pipe(
   leftTrim,
@@ -13,6 +15,25 @@ const normalizeName = R.pipe(
 /**
  * NodeDef and Survey common PROPS UTILS
  */
+//DB Utils
+const mergeProps = def => {
+  const {props, propsDraft} = def
+  const propsMerged = R.mergeDeepRight(props, propsDraft, def)
+
+  return R.pipe(
+    R.assoc('props', propsMerged),
+    R.dissoc('propsDraft'),
+  )(def)
+}
+
+const defDbTransformCallback = (def, draft = false) => def
+  ? R.pipe(
+    camelize,
+    def => draft
+      ? mergeProps(def, draft)
+      : R.omit(['propsDraft'], def),
+  )(def)
+  : null
 
 // READ
 const getProps = R.pipe(
@@ -35,6 +56,8 @@ module.exports = {
   normalizeName,
 
   // PROPS
+  defDbTransformCallback,
+
   getProps,
   getProp,
   getLabels,

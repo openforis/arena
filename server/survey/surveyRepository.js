@@ -7,8 +7,13 @@ const {updateUserPref} = require('../user/userRepository')
 const {userPrefNames} = require('../../common/user/userPrefs')
 
 const {
+  defDbTransformCallback: dbTransformCallback
+} = require('../../common/survey/surveyUtils')
+
+const {defaultSteps} = require('../../common/survey/survey')
+
+const {
   createEntityDef,
-  dbTransformCallback,
   nodeDefSelectFields,
 } = require('../nodeDef/nodeDefRepository')
 
@@ -16,10 +21,6 @@ const {
   nodeDefLayoutProps,
   nodeDefRenderType,
 } = require('../../common/survey/nodeDefLayout')
-
-const {
-  defaultSteps,
-} = require('../../common/survey/survey')
 
 const {migrateSurveySchema} = require('../db/migration/survey/execMigrations')
 

@@ -105,7 +105,8 @@ class NodeDefSwitch extends React.Component {
                     isRoot ?
                       null
                       : <button className="btn-s btn-of-light-xs"
-                                onClick={() => window.confirm('Are you sure you want to delete it?') ? null : null}>
+                                aria-disabled={nodeDef.published}
+                                onClick={() => window.confirm('Are you sure you want to permanently delete this node definition? This operation cannot be undone') ? null : null}>
                         <span className="icon icon-bin2 icon-12px"/>
                       </button>
                   }
