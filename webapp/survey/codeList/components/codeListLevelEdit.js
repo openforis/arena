@@ -17,6 +17,7 @@ import {
   putCodeListLevelProp,
   deleteCodeListLevel,
   setCodeListItemForEdit,
+  deleteCodeListItem,
 } from '../../codeList/actions'
 import { getSurvey } from '../../surveyState'
 import {
@@ -31,8 +32,14 @@ class CodeListLevelEdit extends React.Component {
   handleDelete () {
     const {level, deleteCodeListLevel} = this.props
 
-    if (window.confirm('Delete the level with all items? This operation cannot be undone')) {
+    if (confirm('Delete the level with all items? This operation cannot be undone')) {
       deleteCodeListLevel(level.index)
+    }
+  }
+
+  handleDeleteItem(item) {
+    if (confirm('Delete the item with all children? This operation cannot be undone')) {
+      this.props.deleteCodeListItem(item)
     }
   }
 
@@ -81,7 +88,8 @@ class CodeListLevelEdit extends React.Component {
                                             item={item}
                                             edit={item.uuid === editedItemUUID}
                                             putCodeListItemProp={putCodeListItemProp}
-                                            onEditChange={edit => setCodeListItemForEdit(item, edit)}/>)
+                                            onEditChange={edit => setCodeListItemForEdit(item, edit)}
+                                            onDelete={() => this.handleDeleteItem(item)}/>)
       }
     </div>
   }
@@ -114,5 +122,6 @@ export default connect(mapStateToProps, {
   putCodeListItemProp,
   deleteCodeListLevel,
   setCodeListItemForEdit,
+  deleteCodeListItem,
 })(CodeListLevelEdit)
 

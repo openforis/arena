@@ -70,7 +70,7 @@ const newCodeListItem = (levelId, parentId = null) => {
   }
 }
 
-const getCodeListItemLabels = R.path(['props', 'labels'])
+const getCodeListItemLabels = getProp('labels')
 
 const getCodeListItemLabel = language => R.pipe(getCodeListItemLabels, R.prop(language))
 
@@ -113,16 +113,21 @@ module.exports = {
   assocCodeListLevelProp,
   // DELETE
 
+
+  // ====== CODELIST ITEM
+  //CREATE
   newCodeListItem,
 
+  //READ
   getCodeListItemId: R.propOr(null, 'id'),
   getCodeListItemUUID: R.propOr(null, 'uuid'),
-  getCodeListItemCode: R.path(['props', 'code']),
+  getCodeListItemCode: getProp('code'),
   getCodeListItemLabels,
   getCodeListItemLabel,
 
-
+  //UPDATE
   assocCodeListItemProp: setProp,
+
   //UTILS
   isCodeListLevelDeleteAllowed,
 }

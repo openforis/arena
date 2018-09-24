@@ -5,7 +5,7 @@ const {
   insertCodeList, insertCodeListLevel, insertCodeListItem,
   fetchCodeListItemsByParentId,
   updateCodeListProps, updateCodeListLevelProps, updateCodeListItemProps,
-  deleteCodeList, deleteCodeListLevel,
+  deleteCodeList, deleteCodeListLevel, deleteCodeListItem,
 } = require('./codeListRepository')
 
 module.exports.init = app => {
@@ -169,6 +169,19 @@ module.exports.init = app => {
       const levelId = getRestParam(req, 'levelId')
 
       await deleteCodeListLevel(surveyId, levelId)
+
+      sendOk(res)
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.delete('/survey/:surveyId/codeLists/:codeListId/items/:itemId', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const itemId = getRestParam(req, 'itemId')
+
+      await deleteCodeListItem(surveyId, itemId)
 
       sendOk(res)
     } catch (err) {

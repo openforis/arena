@@ -100,8 +100,8 @@ export const assocCodeListEditLevelItems = (levelIndex, items) =>
   state => R.pipe(
     R.path(R.append(levelIndex, levelItemsPath)),
     oldItems => R.merge(oldItems, items),
-    //remove deleted items (null)
-    updatedItems => R.reduce((acc, item) => item === null ? R.dissoc(item.uuid)(acc) : acc, updatedItems, R.values(updatedItems)),
+    //remove deleted items (null value)
+    updatedItems => R.reduce((acc, itemUUID) => R.prop(itemUUID)(acc) === null ? R.dissoc(itemUUID)(acc) : acc, updatedItems, R.keys(updatedItems)),
     updatedItems => R.assocPath(R.append(levelIndex, levelItemsPath), updatedItems)(state),
   )(state)
 

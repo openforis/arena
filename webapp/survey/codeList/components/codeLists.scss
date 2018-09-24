@@ -28,16 +28,18 @@
   }
 }
 
-.codeListItem {
+.code-lists__item {
   display: grid;
-  grid-template-columns: 4fr 5fr 1fr;
-  min-height: 2rem;
+  grid-template-columns: .4fr .6fr 25px;
+  align-items: center;
+  grid-auto-rows: 2rem;
+  padding: 4px;
   border: 2px solid white;
 }
 
-.codeListItem.edit {
+.code-lists__item.edit {
   display: grid;
-  grid-template-columns: 9fr 1fr;
+  grid-template-columns: 1fr 25px 25px;
 
 }
 

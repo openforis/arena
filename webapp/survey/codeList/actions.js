@@ -160,23 +160,20 @@ export const putCodeListLevelProp = (codeListId, levelIndex, key, value) => asyn
 export const putCodeListItemProp = (levelIndex, itemUUID, key, value) => async (dispatch, getState) => {
   const survey = getSurvey(getState())
   const codeList = getCodeListEditCodeList(survey)
-  const item = getCodeListEditLevelItemByUUID(levelIndex, itemUUID)(survey)
-  const updatedItem = assocCodeListItemProp(key, value)(item)
 
-  dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, {[updatedItem.uuid]: updatedItem})
-  dispatch(_putCodeListItem(survey.id, codeList.id, levelIndex, updatedItem))
-}
+  const item = R.pipe(
+    getCodeListEditLevelItemByUUID(levelIndex, itemUUID),
+    assocCodeListItemProp(key, value),
+  )(survey)
 
-const _putCodeListItem = (surveyId, codeListId, levelIndex, item) => {
-  const action = async dispatch => {
+  dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, {[itemUUID]: item})
+
+  const action = async () => {
     try {
-      const res = await axios.put(`/api/survey/${surveyId}/codeLists/${codeListId}/items/${item.id}`, {item})
-      const {reloadedItem: updatedItem} = res.data
-
-      dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, {[updatedItem.uuid]: updatedItem})
+      await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}/items/${item.id}`, {item})
     } catch (e) {}
   }
-  return debounceAction(action, `${codeListEditLevelItemsUpdate}_${item.uuid}`)
+  dispatch(debounceAction(action, `${codeListEditLevelItemsUpdate}_${itemUUID}`))
 }
 
 // ==== DELETE
@@ -204,6 +201,22 @@ export const deleteCodeListLevel = levelIndex => async (dispatch, getState) => {
 
   //delete level and items from db
   await axios.delete(`/api/survey/${survey.id}/codeLists/${codeList.id}/levels/${level.id}`)
+}
+
+export const deleteCodeListItem = item => async (dispatch, getState) => {
+  const survey = getSurvey(getState())
+  const codeList = getCodeListEditCodeList(survey)
+  const level = getCodeListLevelById(item.levelId)(codeList)
+
+  //reset selected level item
+  dispatchCodeListEditActiveLevelItemUpdate(dispatch, level.index, null)
+  //reset next level items
+  dispatchCodeListEditLevelItemsUpdate(dispatch, level.index + 1, null)
+  //update current level items
+  dispatchCodeListEditLevelItemsUpdate(dispatch, level.index, {[item.uuid]: null})
+
+  //delete item from db
+  await axios.delete(`/api/survey/${survey.id}/codeLists/${codeList.id}/items/${item.id}`)
 }
 
 // ==== OPEN / CLOSE EDITOR

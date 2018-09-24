@@ -1,4 +1,3 @@
-
 import React from 'react'
 import * as R from 'ramda'
 
@@ -12,38 +11,39 @@ import { getFieldValidation } from '../../../../common/validation/validator'
 
 const onPropLabelsChange = (props, labelItem) => {
   const {level, item, putCodeListItemProp} = props
-  putCodeListItemProp(level, item.uuid, 'labels',
+  putCodeListItemProp(level.index, item.uuid, 'labels',
     R.assoc(labelItem.lang, labelItem.label, getCodeListItemLabels(item)))
 }
 
 const CodeListItemEdit = (props) => {
 
-  const {survey, level, item, edit, putCodeListItemProp, onEditChange} = props
+  const {survey, level, item, edit, putCodeListItemProp, onEditChange, onDelete} = props
 
   const validation = {} //TODO
   const language = getSurveyDefaultLanguage(survey)
 
-  return <div className={`codeListItem ${edit ? 'edit' : ''}`}>
+  return <div className={`code-lists__item ${edit ? 'edit' : ''}`}>
     {
-      edit ?
-        <React.Fragment>
+      edit
+        ? <React.Fragment>
           <FormItem label={'code'}>
             <Input value={getCodeListItemCode(item)}
                    validation={getFieldValidation('code')(validation)}
-                   onChange={e => putCodeListItemProp(level, item.uuid, 'code', normalizeName(e.target.value))}/>
+                   onChange={e => putCodeListItemProp(level.index, item.uuid, 'code', normalizeName(e.target.value))}/>
           </FormItem>
           <button className="btn-of-light-xs btn-s"
-                  style={{
-                    padding: '0.2rem 0.5rem',
-                  }}
                   onClick={() => onEditChange(false, item)}>
             <span className="icon icon-arrow-up icon-8px"/>
+          </button>
+          <button className="btn-of-light-xs btn-s"
+                  onClick={() => onDelete(item)}>
+            <span className="icon icon-bin2 icon-8px"/>
           </button>
           <LabelsEditor labels={getCodeListItemLabels(item)}
                         onChange={(labelItem) => onPropLabelsChange(props, labelItem)}/>
         </React.Fragment>
-        :
-        <React.Fragment>
+
+        : <React.Fragment>
           <label>{getCodeListItemCode(item)}</label>
           <label>{getCodeListItemLabel(language)(item)}</label>
           <button className="open-btn"
