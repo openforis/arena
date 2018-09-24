@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { FormItem, Input } from '../../../commonComponents/form/input'
-import CodeListItemEditor from './codeListItemEditor'
+import CodeListItemEdit from './codeListItemEdit'
 
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import {
@@ -26,7 +26,7 @@ import {
 } from '../codeListEditorState'
 import { putCodeListItemProp } from '../actions'
 
-class CodeListLevelEditor extends React.Component {
+class CodeListLevelEdit extends React.Component {
 
   handleDelete () {
     const {level, deleteCodeListLevel} = this.props
@@ -75,13 +75,13 @@ class CodeListLevelEditor extends React.Component {
       </div>
 
       {
-        items.map(item => <CodeListItemEditor key={item.uuid}
-                                              survey={survey}
-                                              level={level}
-                                              item={item}
-                                              edit={item.uuid === editedItemUUID}
-                                              putCodeListItemProp={putCodeListItemProp}
-                                              onEditChange={edit => setCodeListItemForEdit(item, edit)}/>)
+        items.map(item => <CodeListItemEdit key={item.uuid}
+                                            survey={survey}
+                                            level={level}
+                                            item={item}
+                                            edit={item.uuid === editedItemUUID}
+                                            putCodeListItemProp={putCodeListItemProp}
+                                            onEditChange={edit => setCodeListItemForEdit(item, edit)}/>)
       }
     </div>
   }
@@ -114,5 +114,5 @@ export default connect(mapStateToProps, {
   putCodeListItemProp,
   deleteCodeListLevel,
   setCodeListItemForEdit,
-})(CodeListLevelEditor)
+})(CodeListLevelEdit)
 

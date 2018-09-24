@@ -1,4 +1,3 @@
-import './codeListItemEditor.scss'
 
 import React from 'react'
 import * as R from 'ramda'
@@ -17,7 +16,7 @@ const onPropLabelsChange = (props, labelItem) => {
     R.assoc(labelItem.lang, labelItem.label, getCodeListItemLabels(item)))
 }
 
-const CodeListItemEditor = (props) => {
+const CodeListItemEdit = (props) => {
 
   const {survey, level, item, edit, putCodeListItemProp, onEditChange} = props
 
@@ -56,4 +55,4 @@ const CodeListItemEditor = (props) => {
   </div>
 }
 
-export default CodeListItemEditor
+export default CodeListItemEdit

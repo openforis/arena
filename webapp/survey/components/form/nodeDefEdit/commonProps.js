@@ -6,7 +6,7 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../labelsEditor'
 import CodeListProps from './codeListProps'
-import CodeListsEditor from '../../../codeList/components/codeListsEditor'
+import CodeListsEditor from '../../../codeList/components/codeListsView'
 
 import { getFieldValidation, getValidation } from './../../../../../common/validation/validator'
 

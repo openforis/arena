@@ -96,6 +96,11 @@ const getRootNodeDef = R.pipe(getNodeDefsByParentId(null), R.head)
 
 const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
 
+const getNodeDefsByCodeListUUID = (uuid) => R.pipe(
+  getNodeDefsArray,
+  R.filter(R.pathEq(['props', 'codeListUUID'], uuid))
+)
+
 /**
  * ======
  * UPDATE
@@ -240,6 +245,7 @@ module.exports = {
   getNodeDefByUUID,
   getRootNodeDef,
   getNodeDefChildren,
+  getNodeDefsByCodeListUUID,
 
   // UPDATE
   assocSurveyProp: setProp,

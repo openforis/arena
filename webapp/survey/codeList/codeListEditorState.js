@@ -59,13 +59,6 @@ const levelItemsPath = R.append('levelItems', codeListEditPath)
 
 // ========= READ
 
-export const getCodeListsArray = R.pipe(
-  R.path(codeListsPath),
-  R.values,
-)
-
-export const getCodeListByUUID = uuid => R.path(R.append(uuid, codeListsPath))
-
 export const getCodeListEditCodeList = state => R.pipe(
   R.path(codeListsPath),
   codeLists => R.prop(R.path(codeListUUIDPath)(state))(codeLists),

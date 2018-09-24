@@ -1,11 +1,11 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import {toUUIDIndexedObj} from '../../../common/survey/surveyUtils'
-import {toQueryString} from '../../../server/serverUtils/request'
+import { toUUIDIndexedObj } from '../../../common/survey/surveyUtils'
+import { toQueryString } from '../../../server/serverUtils/request'
 
 import {
-  getSurveyCodeLists
+  getSurveyCodeListByUUID,
 } from '../../../common/survey/survey'
 
 import {
@@ -25,7 +25,6 @@ import {
 import { getSurvey } from '../surveyState'
 import { debounceAction } from '../../appUtils/reduxUtils'
 import {
-  getCodeListByUUID,
   getCodeListEditCodeList,
   getCodeListEditActiveLevelItem,
   getCodeListEditLevelItemByUUID,
@@ -195,7 +194,7 @@ const _putCodeListItem = (surveyId, codeListId, levelIndex, item) => {
 
 export const deleteCodeList = codeListUUID => async (dispatch, getState) => {
   const survey = getSurvey(getState())
-  const codeList = getCodeListByUUID(codeListUUID)(survey)
+  const codeList = getSurveyCodeListByUUID(codeListUUID)(survey)
 
   dispatchCodeListsUpdate(dispatch, {[codeList.uuid]: null})
 
