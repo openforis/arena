@@ -1,12 +1,16 @@
 const {getRestParam} = require('../serverUtils/request')
-const {sendErr} = require('../serverUtils/response')
+const {sendErr, sendOk} = require('../serverUtils/response')
 const {validateNodeDef, validateNodeDefs} = require('./nodeDefValidator')
 
 const {
+  createNodeDef,
+
   fetchNodeDef,
   fetchNodeDefsByParentId,
-  createNodeDef,
+
   updateNodeDefProp,
+
+  markNodeDefDeleted,
 } = require('./nodeDefRepository')
 
 module.exports.init = app => {
@@ -75,4 +79,15 @@ module.exports.init = app => {
 
   // ==== DELETE
 
+  app.delete('/nodeDef/:id', async (req, res) => {
+    try {
+      const nodeDefId = getRestParam(req, 'id')
+
+      await markNodeDefDeleted(nodeDefId)
+
+      sendOk(res)
+    } catch (e) {
+      sendErr(res, e)
+    }
+  })
 }

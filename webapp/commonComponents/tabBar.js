@@ -9,11 +9,11 @@ class TabBar extends React.Component {
   }
 
   render () {
-    const {tabs} = this.props
+    const {tabs, ...rest} = this.props
     const {selection} = this.state
 
     return (
-      <div style={{
+      <div {...rest} style={{
         display: 'grid',
         gridTemplateRows: '60px 1fr',
       }}>

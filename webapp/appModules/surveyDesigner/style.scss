@@ -2,4 +2,8 @@
 
 .survey-designer {
   background-color: rgba($blue1, .1);
+
+  .form {
+    max-height: calc(100vh - 100px);
+  }
 }

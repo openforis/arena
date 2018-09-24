@@ -1,13 +1,19 @@
 const db = require('../db/db')
 
 const {uuidv4} = require('../../common/uuid')
+const {selectDate} = require('../db/dbUtils')
 
-const {setUserPref} = require('../user/userRepository')
-const {userPrefNames} = require('../user/userPrefs')
+const {updateUserPref} = require('../user/userRepository')
+const {userPrefNames} = require('../../common/user/userPrefs')
+
+const {
+  defDbTransformCallback: dbTransformCallback
+} = require('../../common/survey/surveyUtils')
+
+const {defaultSteps} = require('../../common/survey/survey')
 
 const {
   createEntityDef,
-  dbTransformCallback,
   nodeDefSelectFields,
 } = require('../nodeDef/nodeDefRepository')
 
@@ -16,11 +22,7 @@ const {
   nodeDefRenderType,
 } = require('../../common/survey/nodeDefLayout')
 
-const {
-  defaultSteps,
-} = require('../../common/survey/survey')
-
-const { migrateSurveySchema } = require('../db/migration/survey/execMigrations')
+const {migrateSurveySchema} = require('../db/migration/survey/execMigrations')
 
 // ============== CREATE
 
@@ -53,32 +55,53 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
     migrateSurveySchema(surveyId)
 
     // update user prefs
-    await setUserPref(user, userPrefNames.survey, surveyId, t)
+    await updateUserPref(user, userPrefNames.survey, surveyId, t)
 
     return await getSurveyById(surveyId, true, t)
   }
 )
 
 // ============== READ
-const getSurveyById = async (surveyId, draft = false, client = db) =>
-  await client.one(
-    `SELECT * FROM survey WHERE id = $1`,
-    [surveyId],
-    def => dbTransformCallback(def, draft)
+const fetchAllSurveys = async (client = db) =>
+  await client.map(
+      `SELECT * FROM survey`,
+    [],
+    def => dbTransformCallback(def)
+  )
+
+const fetchUserSurveys = async (user, client = db) =>
+  await client.map(`
+    SELECT 
+      s.*, ${selectDate('n.date_created', 'date_created')},nm.date_modified
+    FROM survey s
+    JOIN node_def n
+      ON s.id = n.survey_id
+      AND n.parent_id IS NULL
+    JOIN (
+        SELECT 
+          survey_id, ${selectDate('MAX(date_modified)', 'date_modified')}
+        FROM node_def
+        GROUP BY survey_id
+      ) as nm
+      ON s.id = nm.survey_id
+    ORDER BY s.id
+    `,
+    [],
+    def => dbTransformCallback(def, true)
   )
 
 const getSurveysByName = async (surveyName, client = db) =>
   await client.map(
-    `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
+      `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
     def => dbTransformCallback(def)
   )
 
-const fetchSurveys = async (client = db) =>
-  await client.map(
-    `SELECT * FROM survey`,
-    [],
-    def => dbTransformCallback(def)
+const getSurveyById = async (surveyId, draft = false, client = db) =>
+  await client.one(
+      `SELECT * FROM survey WHERE id = $1`,
+    [surveyId],
+    def => dbTransformCallback(def, draft)
   )
 
 const fetchRootNodeDef = async (surveyId, draft, client = db) =>
@@ -112,9 +135,10 @@ module.exports = {
   createSurvey,
 
   // READ
-  getSurveyById,
+  fetchAllSurveys,
+  fetchUserSurveys,
   getSurveysByName,
-  fetchSurveys,
+  getSurveyById,
   fetchRootNodeDef,
 
   //UPDATE

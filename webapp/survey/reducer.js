@@ -8,6 +8,8 @@ import {
   assocNodeDef,
   assocNodeDefProp,
   assocNodeDefValidation,
+  dissocNodeDef,
+
   assocSurveyCodeLists,
   assocSurveyCodeListLevel,
   assocSurveyCodeListItem,
@@ -56,6 +58,7 @@ import {
   nodeDefsUpdate,
   nodeDefUpdate,
   nodeDefValidationUpdate,
+  nodeDefDelete,
 
   //survey-form
   formNodeDefEditUpdate,
@@ -97,6 +100,8 @@ const actionHandlers = {
 
   [nodeDefValidationUpdate]: (state, {nodeDefUUID, validation}) => assocNodeDefValidation(nodeDefUUID, validation)(state),
 
+  [nodeDefDelete]: (state, {nodeDef}) => dissocNodeDef(nodeDef)(state),
+
   //SURVEY-FORM
   [formReset]: dissocForm,
 
@@ -108,21 +113,30 @@ const actionHandlers = {
 
   [formPageNodeUpdate]: (state, {nodeDef, node}) => assocFormPageNode(nodeDef, node)(state),
 
-  //RECORD
-  [recordUpdate]: assocActionProps,
+  //CODE LIST
+  [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state),
+
+  [codeListEditUpdate]: (state, {codeListUUID}) =>
+    codeListUUID == null
+      ? dissocCodeListEdit(state)
+      : assocCodeListEdit(codeListUUID)(state),
+
+  [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditActiveLevelItem(levelIndex, itemUUID)(state),
+
+  [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) =>
+    items === null
+      ? dissocCodeListEditLevelItems(levelIndex)(state)
+      : assocCodeListEditLevelItems(levelIndex, items)(state),
+
+
+    //RECORD
+    [recordUpdate]: assocActionProps,
 
   [nodesUpdate]: (state, {nodes}) => assocNodes(nodes)(state),
 
   [nodeDelete]: (state, {node}) => deleteNode(node)(state),
 
-  //CODE LIST
-  [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state),
 
-  [codeListEditUpdate]: (state, {codeListUUID}) => codeListUUID == null ? dissocCodeListEdit(state) : assocCodeListEdit(codeListUUID)(state),
-
-  [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditActiveLevelItem(levelIndex, itemUUID)(state),
-
-  [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) => items === null ? dissocCodeListEditLevelItems(levelIndex)(state) : assocCodeListEditLevelItems(levelIndex, items)(state)
 }
 
 export default exportReducer(actionHandlers)

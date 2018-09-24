@@ -1,29 +1,19 @@
-const camelize = require('camelize')
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const db = require('../db/db')
 const {selectDate} = require('../db/dbUtils')
 
+const {defDbTransformCallback} = require('../../common/survey/surveyUtils')
 const {nodeDefType} = require('../../common/survey/nodeDef')
 
-const mergeProps = def => {
-  const {props, propsDraft} = def
-  const propsMerged = R.mergeDeepRight(props, propsDraft, def)
-
-  return R.pipe(
-    R.assoc('props', propsMerged),
-    R.dissoc('propsDraft'),
-  )(def)
-}
-
-const dbTransformCallback = (def, draft = false) => def
-  ? R.pipe(
-    camelize,
-    def => draft
-      ? mergeProps(def, draft)
-      : R.omit(['propsDraft'], def),
-  )(def)
-  : null
+const dbTransformCallback = (def, draft = false) => R.pipe(
+  // assoc published and draft properties based on props
+  R.assoc('published', !R.isEmpty(def.props)),
+  R.assoc('draft', !R.isEmpty(def.props_draft)),
+  // apply db conversion
+  R.partialRight(defDbTransformCallback, [draft]),
+)(def)
 
 const nodeDefSelectFields = `id, uuid, survey_id, parent_id, type, deleted, props, props_draft, 
      ${selectDate('date_created')}, ${selectDate('date_modified')}`
@@ -57,7 +47,9 @@ const fetchNodeDef = async (nodeDefId = null, draft, client = db) =>
 const fetchNodeDefsBySurveyId = async (surveyId, draft, client = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields}
-    FROM node_def WHERE survey_id = $1
+    FROM node_def 
+    WHERE survey_id = $1
+    AND deleted IS NOT TRUE
     ORDER BY id`,
     [surveyId],
     res => dbTransformCallback(res, draft)
@@ -66,7 +58,9 @@ const fetchNodeDefsBySurveyId = async (surveyId, draft, client = db) =>
 const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields}
-    FROM node_def WHERE parent_id = $1
+    FROM node_def 
+    WHERE parent_id = $1
+    AND deleted IS NOT TRUE
     ORDER BY id`,
     [parentId],
     res => dbTransformCallback(res, draft)
@@ -90,16 +84,22 @@ const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
 
 // ============== DELETE
 
-const markNodeDefDeleted = async (nodeDefId, client = db) =>
+const markNodeDefDeleted = async (nodeDefId, client = db) => {
   await client.one(`
     UPDATE node_def 
     SET deleted = true
     WHERE id = $1
     RETURNING *
   `,
-    [nodeDefId],
-    res => dbTransformCallback(res, true)
+    [nodeDefId]
   )
+
+  const childNodeDefs = await fetchNodeDefsByParentId(nodeDefId, true, client)
+  await Promise.all(childNodeDefs.map(async childNodeDef =>
+    await markNodeDefDeleted(childNodeDef.id, client)
+  ))
+
+}
 
 module.exports = {
   //utils
@@ -119,4 +119,5 @@ module.exports = {
   updateNodeDefProp,
 
   //DELETE
+  markNodeDefDeleted,
 }

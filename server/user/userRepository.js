@@ -20,7 +20,7 @@ const findUserById = async (userId, client = db) => {
 }
 
 const findUserByEmailAndPassword = async (email, password) => {
-  const userPwd = await  db.oneOrNone(`
+  const userPwd = await db.oneOrNone(`
     SELECT id, password 
     FROM "user" 
     WHERE LOWER(email) = LOWER($1)`
@@ -34,7 +34,7 @@ const findUserByEmailAndPassword = async (email, password) => {
 
 // ==== UPDATE
 
-const setUserPref = async (user, name, value, client = db) => {
+const updateUserPref = async (user, name, value, client = db) => {
   const userPref = JSON.stringify(
     {[name]: value}
   )
@@ -67,7 +67,7 @@ module.exports = {
   findUserByEmailAndPassword,
 
   // UPDATE
-  setUserPref,
+  updateUserPref,
 
   // DELETE
   deleteUserPref,

@@ -18,18 +18,20 @@ class NodeDefEdit extends React.Component {
     const {nodeDef} = this.props
 
     return nodeDef
-      ? <div className="survey-form__node-def-edit-wrapper">
+      ? (
         <div className="survey-form__node-def-edit">
-          <CommonProps nodeDef={nodeDef}/>
+          <div className="form">
+            <CommonProps nodeDef={nodeDef}/>
 
-          <div style={{justifySelf: 'center'}}>
-            <button className="btn btn-of-light"
-                    onClick={() => this.close()}>Done
-            </button>
+            <div style={{justifySelf: 'center'}}>
+              <button className="btn btn-of-light"
+                      onClick={() => this.close()}>Done
+              </button>
+            </div>
+
           </div>
-
         </div>
-      </div>
+      )
       : null
 
   }

@@ -17,8 +17,6 @@ const isPath = path => R.pipe(
 )
 export const isLocationLogin = isPath(loginUri)
 
-export const isLocationHome = isPath(appModuleUri())
-
 export const systemStatus = {
   ready: 'ready'
 }
@@ -32,12 +30,11 @@ const statePath = {
 }
 
 export const appState = {
-
   isReady: R.pathEq(statePath.status, systemStatus.ready),
 
   getUser: R.path(statePath.user),
 
   logoutUser: R.dissocPath(excludePathRoot(statePath.user)),
-
 }
 
+export const getSurveys = R.path([app, 'surveys'])

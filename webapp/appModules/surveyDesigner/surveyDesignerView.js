@@ -7,15 +7,14 @@ import SurveyInfoComponent from './components/surveyInfoComponent'
 import SurveyFormView from '../../survey/components/surveyFormView'
 
 const SurveyDesignerView = () => (
-  <div className="survey-designer grid100">
 
-    <TabBar
-      tabs={[
-        {label: 'Survey Info', component: SurveyInfoComponent},
-        {label: 'Form Designer', component: SurveyFormView, props: {edit: true, draft: true}},
-      ]}/>
+  <TabBar
+    className="survey-designer grid100"
+    tabs={[
+      {label: 'Survey Info', component: SurveyInfoComponent},
+      {label: 'Form Designer', component: SurveyFormView, props: {edit: true, draft: true}},
+    ]}/>
 
-  </div>
 )
 
 export default SurveyDesignerView

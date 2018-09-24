@@ -1,0 +1,27 @@
+@import "../../style/vars";
+
+.labels-editor {
+
+  .btn-toggle-labels {
+    padding: .4rem;
+    border-color: rgba($white, 0.5) !important;
+    margin-left: .5rem;
+  }
+}
+
+.labels-editor__labels {
+  display: grid;
+  grid-row-gap: 1rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.labels-editor__label {
+  position: relative;
+}
+
+.labels-editor__label-lang-badge {
+  position: absolute;
+  right: 0;
+  text-transform: uppercase;
+}

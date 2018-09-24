@@ -102,13 +102,14 @@ export const assocCodeListEdit = codeListUUID => R.assocPath(codeListEditPath, {
 
 export const dissocCodeListEdit = R.dissocPath(codeListEditPath)
 
-export const assocCodeListEditLevelItems = (levelIndex, items) => state => R.pipe(
-  R.path(R.append(levelIndex, levelItemsPath)),
-  oldItems => R.merge(oldItems, items),
-  //remove deleted items (null)
-  updatedItems => R.reduce((acc, item) => item === null ? R.dissoc(item.uuid)(acc) : acc, updatedItems, R.values(updatedItems)),
-  updatedItems => R.assocPath(R.append(levelIndex, levelItemsPath), updatedItems)(state),
-)(state)
+export const assocCodeListEditLevelItems = (levelIndex, items) =>
+  state => R.pipe(
+    R.path(R.append(levelIndex, levelItemsPath)),
+    oldItems => R.merge(oldItems, items),
+    //remove deleted items (null)
+    updatedItems => R.reduce((acc, item) => item === null ? R.dissoc(item.uuid)(acc) : acc, updatedItems, R.values(updatedItems)),
+    updatedItems => R.assocPath(R.append(levelIndex, levelItemsPath), updatedItems)(state),
+  )(state)
 
 export const dissocCodeListEditLevelItems = (levelIndex) => R.dissocPath(R.append(levelIndex, levelItemsPath))
 

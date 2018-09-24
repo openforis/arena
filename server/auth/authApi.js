@@ -2,7 +2,7 @@ const passport = require('passport')
 
 const {sendOk} = require('../serverUtils/response')
 
-const {userPrefNames, getUserPrefSurveyId} = require('./../user/userPrefs')
+const {userPrefNames, getUserPrefSurveyId} = require('../../common/user/userPrefs')
 const {fetchSurveyById} = require('../survey/surveyManager')
 const {deleteUserPref} = require('../user/userRepository')
 

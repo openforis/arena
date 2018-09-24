@@ -1,33 +1,25 @@
+import './inputChips.scss'
+
 import React from 'react'
 import * as R from 'ramda'
 
 import Dropdown from './dropdown'
 import { TooltipError } from '../tooltip'
 
-const Chip = ({item, onDelete, idx, canBeRemoved}) => (
-  <div className="form-input"
-       style={{
-         padding: '0',
-       }}>
-    <div className="btn-of btn-s"
-         style={{
-           display: 'grid',
-           gridTemplateColumns: '1fr 30px',
-           alignItems: 'center',
-           gridColumnGap: '.3rem',
-           fontWeight: idx === 0 ? '600' : 'inherit',
-           margin: '.25rem .3rem',
-           fontSize: '.7rem',
-           padding: '.25rem .5rem'
-         }}>
+const Chip = ({item, onDelete, canBeRemoved}) => (
+  <div className="form-input">
+
+    <div className="btn-of btn-s form-input-chip-item">
       {item.value}
-      <button className="btn-of-light-xs btn-s"
+
+      <button className="btn-of-light-xs btn-s btn-remove"
               onClick={() => onDelete(item)}
-              aria-disabled={!canBeRemoved}
-              style={{padding: '.2rem .5rem'}}>
+              aria-disabled={!canBeRemoved}>
         <span className="icon icon-cross icon-8px"/>
       </button>
+
     </div>
+
   </div>
 )
 
@@ -59,16 +51,12 @@ const InputChips = (props) => {
   const dropdownItems = R.reject(item => R.contains(item, selection))(items)
 
   return <TooltipError messages={validation.errors}>
-    <div style={{
-      display: 'flex',
-      flexWrap: 'wrap',
-    }}>
+    <div className="form-input-chip">
       {
         selection.map((item, i) =>
           <Chip key={item.key}
                 item={item}
                 onDelete={item => removeItem(item)}
-                idx={i}
                 canBeRemoved={!readOnly && selection.length > requiredItems}/>
         )
       }

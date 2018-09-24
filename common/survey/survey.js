@@ -9,7 +9,10 @@ const {
 
   setProp,
 } = require('./surveyUtils')
-const {isNodeDefRoot} = require('./nodeDef')
+const {
+  isNodeDefRoot,
+  isNodeDefEntity,
+} = require('./nodeDef')
 
 // == utils
 const nodeDefs = 'nodeDefs'
@@ -32,6 +35,11 @@ const isSurveyPublished = R.pipe(
   R.equals(true)
 )
 
+const isSurveyDraft = R.pipe(
+  R.prop('draft'),
+  R.equals(true)
+)
+
 const getSurveyLanguages = getProp('languages', [])
 
 const getSurveyDefaultLanguage = R.pipe(
@@ -45,6 +53,23 @@ const getSurveyDefaultStep = R.pipe(
   R.find(s => !s[1].prev),
   R.head
 )
+
+const getSurveyLabels = getProp('labels', {})
+
+const getSurveyDefaultLabel = survey => {
+  const labels = getSurveyLabels(survey)
+  const lang = getSurveyDefaultLanguage(survey)
+  return R.prop(lang, labels)
+}
+
+const getSurveyStatus = survey =>
+  isSurveyPublished(survey) && isSurveyDraft(survey)
+    ? 'PUBLISHED-DRAFT'
+    : isSurveyPublished(survey)
+    ? 'PUBLISHED'
+    : isSurveyDraft(survey)
+      ? 'DRAFT'
+      : ''
 
 /**
  * ======
@@ -128,6 +153,23 @@ const assocNodeDefValidation = (nodeDefUUID, validation) =>
 
 /**
  * ======
+ * DELETE NodeDef
+ * ======
+ */
+const dissocNodeDef = nodeDef =>
+  survey => {
+    const updatedSurvey = isNodeDefEntity(nodeDef)
+      ? R.reduce(
+        (s, n) => dissocNodeDef(n)(s),
+        survey,
+        getNodeDefChildren(nodeDef)(survey)
+      ) : survey
+
+    return R.dissocPath([nodeDefs, nodeDef.uuid])(updatedSurvey)
+  }
+
+/**
+ * ======
  * UPDATE Code Lists
  * ======
  */
@@ -182,12 +224,17 @@ module.exports = {
   getSurveyProps: getProps,
   getSurveyLabels: getLabels,
 
-  isSurveyPublished,
+  getSurveyName: getProp('name', ''),
   getSurveyLanguages,
   getSurveyDefaultLanguage,
+  getSurveyLabels,
+  getSurveyDefaultLabel,
   getSurveyDescriptions: getProp('descriptions', {}),
   getSurveySrs: getProp('srs', []),
   getSurveyDefaultStep,
+
+  getSurveyStatus,
+  isSurveyPublished,
 
   // READ nodeDefs
   getNodeDefByUUID,
@@ -208,6 +255,9 @@ module.exports = {
   assocNodeDef,
   assocNodeDefProp,
   assocNodeDefValidation,
+
+  // DELETE nodeDefs
+  dissocNodeDef,
 
   // UPDATE code lists
   assocSurveyCodeLists,

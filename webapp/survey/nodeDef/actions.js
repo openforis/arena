@@ -12,6 +12,7 @@ export const nodeDefUpdate = 'nodeDef/update'
 export const nodeDefsUpdate = 'nodeDefs/update'
 export const nodeDefPropUpdate = 'nodeDef/prop/update'
 export const nodeDefValidationUpdate = 'nodeDef/validation/updated'
+export const nodeDefDelete = 'nodeDef/delete'
 
 // ==== CREATE
 
@@ -47,6 +48,13 @@ export const fetchNodeDefChildren = (id, draft = false, validate = false) => asy
 export const putNodeDefProp = (nodeDef, key, value) => async dispatch => {
   dispatch({type: nodeDefPropUpdate, nodeDefUUID: nodeDef.uuid, key, value})
   dispatch(_putNodeDefProp(nodeDef, key, value))
+}
+
+// ==== DELETE
+export const removeNodeDef = (nodeDef) => async dispatch => {
+  dispatch({type: nodeDefDelete, nodeDef})
+
+  await axios.delete(`/api/nodeDef/${nodeDef.id}`)
 }
 
 const _putNodeDefProp = (nodeDef, key, value) => {
