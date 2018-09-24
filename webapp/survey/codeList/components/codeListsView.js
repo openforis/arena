@@ -9,7 +9,13 @@ import CodeListsTable from './codeListsTable'
 import { getSurvey } from '../../surveyState'
 import { getCodeListEditCodeList } from '../codeListEditorState'
 
-import { createCodeList, setCodeListForEdit, deleteCodeList } from '../../codeList/actions'
+import {
+  createCodeList,
+  setCodeListForEdit,
+  deleteCodeList,
+  putCodeListProp,
+  createCodeListLevel
+} from '../../codeList/actions'
 
 const Header = props => (
   <div className="code-lists__header">
@@ -24,14 +30,14 @@ const Header = props => (
 )
 
 const CodeListsView = (props) =>
-  props.activeCodeList
+  props.codeList
     ? (
-      <CodeListEdit/>
+      <CodeListEdit {...props}/>
     )
     : (
       <React.Fragment>
         <Header {...props}/>
-        <CodeListsTable {...props}/>
+        <CodeListsTable {...props} codeList={null}/>
       </React.Fragment>
     )
 
@@ -40,11 +46,11 @@ const mapStateToProps = state => {
 
   return {
     survey,
-    activeCodeList: getCodeListEditCodeList(survey),
+    codeList: getCodeListEditCodeList(survey),
   }
 }
 
 export default connect(
   mapStateToProps,
-  {createCodeList, setCodeListForEdit, deleteCodeList}
+  {createCodeList, setCodeListForEdit, deleteCodeList, putCodeListProp, createCodeListLevel}
 )(CodeListsView)

@@ -31,8 +31,8 @@ class CodeListLevelEdit extends React.Component {
   handleDelete () {
     const {level, deleteCodeListLevel} = this.props
 
-    if (window.confirm('delete the level and all it\'s items?')) {
-      deleteCodeListLevel(level.uuid)
+    if (window.confirm('Delete the level with all items? This operation cannot be undone')) {
+      deleteCodeListLevel(level.index)
     }
   }
 
@@ -59,7 +59,7 @@ class CodeListLevelEdit extends React.Component {
       <FormItem label={'name'}>
         <Input value={getCodeListLevelName(level)}
                validation={getFieldValidation('name')(validation)}
-               onChange={e => putCodeListLevelProp(level.codeListId, level.uuid, 'name', normalizeName(e.target.value))}/>
+               onChange={e => putCodeListLevelProp(level.codeListId, level.index, 'name', normalizeName(e.target.value))}/>
       </FormItem>
 
       <div style={{display: 'flex'}}>

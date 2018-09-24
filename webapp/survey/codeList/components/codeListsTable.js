@@ -15,7 +15,7 @@ const CodeListTableRow = ({survey, codeList, setCodeListForEdit, deleteCodeList}
     <div className="code-lists__table-row">
       <label>{name}</label>
       <button className="btn btn-s btn-of-light-xs"
-              onClick={() => setCodeListForEdit(codeList.uuid)}>
+              onClick={() => setCodeListForEdit(codeList)}>
         <span className="icon icon-pencil2 icon-12px icon-left"/>
         EDIT
       </button>
@@ -43,9 +43,10 @@ const CodeListsTable = (props) => {
       : <div className="code-lists__table">
         {
           codeLists.map(codeList =>
-            <CodeListTableRow key={codeList.uuid}
+            <CodeListTableRow {...props}
+                              key={codeList.uuid}
                               codeList={codeList}
-                              {...props}/>)
+            />)
         }
       </div>
   )

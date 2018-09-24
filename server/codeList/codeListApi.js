@@ -3,14 +3,10 @@ const {getRestParam, getIntParam, getBoolParam} = require('../serverUtils/reques
 
 const {
   insertCodeList, insertCodeListLevel, insertCodeListItem,
-  fetchCodeListsBySurveyId, fetchCodeListItemsByParentId,
+  fetchCodeListItemsByParentId,
   updateCodeListProps, updateCodeListLevelProps, updateCodeListItemProps,
   deleteCodeList, deleteCodeListLevel,
 } = require('./codeListRepository')
-
-const {
-  fetchCodeListById,
-} = require('./codeListManager')
 
 module.exports.init = app => {
 
@@ -59,34 +55,34 @@ module.exports.init = app => {
   // ==== READ
 
   // fetch code lists
-  app.get('/survey/:surveyId/codeLists', async (req, res) => {
-    try {
-
-      const draft = getBoolParam(req, 'draft')
-      const surveyId = getRestParam(req, 'surveyId')
-
-      const codeLists = await fetchCodeListsBySurveyId(surveyId, draft)
-
-      res.json({codeLists})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
+  // app.get('/survey/:surveyId/codeLists', async (req, res) => {
+  //   try {
+  //
+  //     const draft = getBoolParam(req, 'draft')
+  //     const surveyId = getRestParam(req, 'surveyId')
+  //
+  //     const codeLists = await fetchCodeListsBySurveyId(surveyId, draft)
+  //
+  //     res.json({codeLists})
+  //   } catch (err) {
+  //     sendErr(res, err)
+  //   }
+  // })
 
   // fetch code list by id
-  app.get('/survey/:surveyId/codeLists/:codeListId', async (req, res) => {
-    try {
-      const draft = getBoolParam(req, 'draft')
-      const surveyId = getRestParam(req, 'surveyId')
-      const codeListId = getRestParam(req, 'codeListId')
-
-      const codeList = await fetchCodeListById(surveyId, codeListId, draft)
-
-      res.json({codeList})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
+  // app.get('/survey/:surveyId/codeLists/:codeListId', async (req, res) => {
+  //   try {
+  //     const draft = getBoolParam(req, 'draft')
+  //     const surveyId = getRestParam(req, 'surveyId')
+  //     const codeListId = getRestParam(req, 'codeListId')
+  //
+  //     const codeList = await fetchCodeListById(surveyId, codeListId, draft)
+  //
+  //     res.json({codeList})
+  //   } catch (err) {
+  //     sendErr(res, err)
+  //   }
+  // })
 
   // fetch code list items by parent id
   app.get('/survey/:surveyId/codeLists/:codeListId/items', async (req, res) => {

@@ -55,14 +55,6 @@ const fetchCodeListsBySurveyId = async (surveyId, draft = false, client = db) =>
     def => dbTransformCallback(def, draft)
   )
 
-const fetchCodeListById = async (surveyId, id, draft = false, client = db) =>
-  await client.one(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list
-     WHERE id = $1`,
-    [id],
-    def => dbTransformCallback(def, draft)
-  )
-
 const fetchCodeListLevelsByCodeListId = async (surveyId, codeListId, draft = false, client = db) =>
   await client.map(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list_level
@@ -116,15 +108,17 @@ module.exports = {
   insertCodeList,
   insertCodeListLevel,
   insertCodeListItem,
+
   //READ
-  fetchCodeListById,
   fetchCodeListsBySurveyId,
   fetchCodeListLevelsByCodeListId,
   fetchCodeListItemsByParentId,
+
   //UPDATE
   updateCodeListProps,
   updateCodeListLevelProps,
   updateCodeListItemProps,
+
   //DELETE
   deleteCodeList,
   deleteCodeListLevel,

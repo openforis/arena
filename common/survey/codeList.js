@@ -1,19 +1,46 @@
 const R = require('ramda')
 const {uuidv4} = require('../uuid')
 
-const {toIndexedObj} = require('./surveyUtils')
+const {
+  setProp,
+  getProp,
+  toIndexedObj,
+} = require('./surveyUtils')
 
 const levels = 'levels'
-const items = 'items'
 
+/**
+ * CODE LIST
+ */
+// ====== CREATE
 const newCodeList = () => ({
   uuid: uuidv4(),
-
-  levels: {
-    0: newCodeListLevel()
-  }
+  levels: {0: newCodeListLevel()}
 })
 
+// ====== READ
+const getCodeListLevelsArray = R.pipe(
+  R.prop(levels),
+  R.values,
+  R.sortBy(R.prop('index'))
+)
+const getCodeListLevelById = id => R.pipe(
+  getCodeListLevelsArray,
+  R.find(R.propEq('id', id)),
+)
+const getCodeListLevelByIndex = idx => R.path(['levels', idx])
+
+// ====== UPDATE
+const assocCodeListLevelsArray = array => R.assoc(levels, toIndexedObj(array, 'index'))
+const assocCodeListLevel = level => R.assocPath([levels, level.index], level)
+
+// ====== DELETE
+const dissocCodeListLevel = levelIndex => R.dissocPath([levels, R.toString(levelIndex)])
+
+/**
+ * CODE LIST LEVEL
+ */
+// ====== CREATE
 const newCodeListLevel = (codeList) => {
   const index = codeList ? getCodeListLevelsArray(codeList).length : 0
 
@@ -26,7 +53,15 @@ const newCodeListLevel = (codeList) => {
     }
   }
 }
+// ====== READ
 
+// ====== UPDATE
+const assocCodeListLevelProp = (levelIndex, key, value) => R.assocPath(['levels', levelIndex, 'props', key], value)
+
+/**
+ * CODE LIST ITEM
+ */
+// ====== CREATE
 const newCodeListItem = (levelId, parentId = null) => {
   return {
     uuid: uuidv4(),
@@ -35,57 +70,13 @@ const newCodeListItem = (levelId, parentId = null) => {
   }
 }
 
-const getCodeListProps = R.prop('props')
-
-const getCodeListName = R.pipe(
-  getCodeListProps,
-  R.prop('name'),
-)
-
-const getCodeListLevelsArray = R.pipe(
-  R.prop(levels),
-  R.values,
-  R.sortBy(R.prop('index'))
-)
-
-const getCodeListLevelById = id => R.pipe(
-  getCodeListLevelsArray,
-  R.find(R.propEq('id', id)),
-)
-
-const getCodeListLevelByUUID = uuid => R.pipe(
-  getCodeListLevelsArray,
-  R.find(R.propEq('uuid', uuid)),
-)
-
-const getCodeListItems = R.prop(items)
-
-const getCodeListItemByUUID = uuid => R.pipe(
-  getCodeListItems,
-  R.prop(uuid),
-)
-
 const getCodeListItemLabels = R.path(['props', 'labels'])
 
 const getCodeListItemLabel = language => R.pipe(getCodeListItemLabels, R.prop(language))
 
-// UPDATE
-const assocCodeListLevelsArray = array => R.assoc(levels, toIndexedObj(array, 'index'))
-
-const assocCodeListLevel = level => R.assocPath([levels, level.index], level)
-
-const assocProp = (key, value) => R.assocPath(['props', key], value)
-
-const assocCodeListItem = item => codeList => R.pipe(
-  getCodeListItems,
-  R.assoc(item.uuid, item),
-  updatedItems => R.assoc(items, updatedItems)(codeList),
-)(codeList)
-
-const dissocCodeListLevel = levelIndex => R.dissocPath([levels, R.toString(levelIndex)])
 
 // UTILS
-const isCodeListLevelDeleteAllowed = level =>  R.pipe(
+const isCodeListLevelDeleteAllowed = level => R.pipe(
   getCodeListLevelsArray,
   R.length,
   levelsCount => R.and(
@@ -95,33 +86,43 @@ const isCodeListLevelDeleteAllowed = level =>  R.pipe(
 )
 
 module.exports = {
+  // ====== CODE LIST
   //CREATE
   newCodeList,
-  newCodeListLevel,
-  newCodeListItem,
 
   //READ
-  getCodeListName,
+  getCodeListName: getProp('name'),
   getCodeListLevelsArray,
   getCodeListLevelById,
-  getCodeListLevelByUUID,
-  getCodeListItemByUUID,
-  getCodeListLevelName: R.path(['props', 'name']),
+  getCodeListLevelByIndex,
+
+  // UPDATE
+  assocCodeListProp: setProp,
+  assocCodeListLevelsArray,
+  assocCodeListLevel,
+
+  // DELETE
+  dissocCodeListLevel,
+
+  // ====== CODELIST LEVEL
+  //CREATE
+  newCodeListLevel,
+  //READ
+  getCodeListLevelName: getProp('name'),
+  //UPDATE
+  assocCodeListLevelProp,
+  // DELETE
+
+  newCodeListItem,
+
   getCodeListItemId: R.propOr(null, 'id'),
   getCodeListItemUUID: R.propOr(null, 'uuid'),
   getCodeListItemCode: R.path(['props', 'code']),
   getCodeListItemLabels,
   getCodeListItemLabel,
 
-  //UPDATE
-  assocCodeListLevelsArray,
-  assocCodeListLevel,
-  assocCodeListItem,
-  assocCodeListProp: assocProp,
-  assocCodeListLevelProp: assocProp,
-  assocCodeListItemProp: assocProp,
-  dissocCodeListLevel,
 
+  assocCodeListItemProp: setProp,
   //UTILS
   isCodeListLevelDeleteAllowed,
 }

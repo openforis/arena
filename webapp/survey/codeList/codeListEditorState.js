@@ -91,9 +91,10 @@ export const getCodeListEditLevelItemByUUID = (levelIndex, itemUUID) => R.path(R
 
 // ========== UPDATE
 
-export const assocCodeListEdit = codeListUUID => R.assocPath(codeListEditPath, {uuid: codeListUUID})
-
-export const dissocCodeListEdit = R.dissocPath(codeListEditPath)
+export const updateCodeListEdit = (codeListUUID = null) =>
+  codeListUUID
+    ? R.assocPath(codeListEditPath, {uuid: codeListUUID})
+    : R.dissocPath(codeListEditPath)
 
 export const assocCodeListEditLevelItems = (levelIndex, items) =>
   state => R.pipe(

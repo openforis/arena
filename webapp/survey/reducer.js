@@ -33,11 +33,10 @@ import {
 } from './record/recordState'
 
 /**
- * code lists editor
+ * code lists state
  */
 import {
-  assocCodeListEdit,
-  dissocCodeListEdit,
+  updateCodeListEdit,
   assocCodeListEditActiveLevelItem,
   assocCodeListEditLevelItems,
   dissocCodeListEditLevelItems,
@@ -116,10 +115,7 @@ const actionHandlers = {
   //CODE LIST
   [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state),
 
-  [codeListEditUpdate]: (state, {codeListUUID}) =>
-    codeListUUID == null
-      ? dissocCodeListEdit(state)
-      : assocCodeListEdit(codeListUUID)(state),
+  [codeListEditUpdate]: (state, {codeListUUID}) => updateCodeListEdit(codeListUUID)(state),
 
   [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditActiveLevelItem(levelIndex, itemUUID)(state),
 
