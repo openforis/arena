@@ -7,7 +7,10 @@ const {
 
   setProp,
 } = require('./surveyUtils')
-const {isNodeDefRoot} = require('./nodeDef')
+const {
+  isNodeDefRoot,
+  isNodeDefEntity,
+} = require('./nodeDef')
 
 // == utils
 const nodeDefs = 'nodeDefs'
@@ -124,7 +127,17 @@ const assocNodeDefValidation = (nodeDefUUID, validation) =>
  * DELETE NodeDef
  * ======
  */
-const dissocNodeDef = nodeDef => R.dissocPath([nodeDefs, nodeDef.uuid])
+const dissocNodeDef = nodeDef =>
+  survey => {
+    const updatedSurvey = isNodeDefEntity(nodeDef)
+      ? R.reduce(
+        (s, n) => dissocNodeDef(n)(s),
+        survey,
+        getNodeDefChildren(nodeDef)(survey)
+      ) : survey
+
+    return R.dissocPath([nodeDefs, nodeDef.uuid])(updatedSurvey)
+  }
 
 /**
  * ======
