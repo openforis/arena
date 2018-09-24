@@ -33,7 +33,7 @@ export class Input extends React.Component {
         <MaskedInput ref={this.input}
                      mask={mask}
                      className="form-input"
-                     disabled={disabled}
+                     aria-disabled={disabled}
                      {...inputProps}
         />
 

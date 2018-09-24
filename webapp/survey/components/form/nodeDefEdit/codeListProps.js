@@ -5,12 +5,12 @@ import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
 import {
-  getSurveyCodeListById,
+  getSurveyCodeListByUUID,
   getSurveyCodeListsArray,
 } from '../../../../../common/survey/survey'
 
 import {
-  getCodeListId,
+  getCodeListUUID,
 } from '../../../../../common/survey/nodeDef'
 
 import {
@@ -20,58 +20,62 @@ import {
   nodeDefRenderType
 } from '../../../../../common/survey/nodeDefLayout'
 
-const newCodeList = (props) => {
-  const {createCodeList, onCodeListEdit} = props
+import {
+  getCodeListName,
+} from '../../../../../common/survey/codeList'
 
-  createCodeList()
-
-  onCodeListEdit(true)
-}
-
-const showCodeListsEditor = (props) => {
-  const {onCodeListEdit} = props
-
-  onCodeListEdit(true)
-}
+const getCodeListItem = (codeList) => ({key: codeList.uuid, value: getCodeListName(codeList)})
+const getCodeListItems = R.pipe(getSurveyCodeListsArray, R.map(getCodeListItem))
 
 const CodeListProps = (props) => {
 
-  const {survey, nodeDef, putNodeDefProp} = props
+  const {
+    survey,
+    nodeDef,
+    putNodeDefProp,
 
-  const codeLists = getSurveyCodeListsArray(survey)
+    createCodeList,
+    onCodeListEdit,
+  } = props
 
-  const selectedCodeList = getSurveyCodeListById(getCodeListId(nodeDef))(survey)
+  const selectedCodeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
 
-  const parentCodeAvailable = R.path(['levels', 'length'], selectedCodeList) > 0 //hierarchical TODO
-  const possibleParentCodeItems = []//isCodeList ? [] : [] //TODO
-  const selectedParentCode = null//R.find(item => item.key === getNodeDefProp('parentCodeId')(nodeDef))(possibleParentCodeItems)
+  const parentCodeAvailable = false //R.path(['levels', 'length'], selectedCodeList) > 0 //hierarchical TODO
+  const possibleParentCodeItems = [] //isCodeList ? [] : [] //TODO
+  const selectedParentCode = null //R.find(item => item.key === getNodeDefProp('parentCodeId')(nodeDef))(possibleParentCodeItems)
 
   return (
     <React.Fragment>
+
       <FormItem label={'Code List'}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '.8fr .1fr .1fr'
+          gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
-          <Dropdown items={codeLists}
-                    selection={selectedCodeList}
-                    onChange={item => putNodeDefProp(nodeDef, 'codeListId', item.key)}/>
+          <Dropdown items={getCodeListItems(survey)}
+                    selection={selectedCodeList ? getCodeListItem(selectedCodeList) : null}
+                    onChange={item => putNodeDefProp(nodeDef, 'codeListUUID', item.key)}/>
           <button className="btn btn-s btn-of-light-xs"
-                  style={{marginLeft: '50px'}}
-                  onClick={() => newCodeList(props)}>
+                  style={{justifySelf:'center'}}
+                  onClick={() => {
+                    createCodeList()
+                    onCodeListEdit(true)
+                  }}>
+
             <span className="icon icon-plus icon-16px icon-left"/>
             ADD
           </button>
           <button className="btn btn-s btn-of-light-xs"
-                  style={{marginLeft: '50px'}}
-                  onClick={() => showCodeListsEditor(props)}>
+                  style={{justifySelf:'center'}}
+                  onClick={() => onCodeListEdit(true)}>
             <span className="icon icon-list icon-16px icon-left"/>
             MANAGE
           </button>
         </div>
       </FormItem>
+
       <FormItem label={'Display As'}>
-        <div style={{display: 'grid', gridTemplateColumns: '.1fr .1fr'}}>
+        <div>
           <button className={`btn btn-of-light ${isRenderDropdown(nodeDef) ? 'active' : ''}`}
                   onClick={() => putNodeDefProp(nodeDef, nodeDefLayoutProps.render, nodeDefRenderType.dropdown)}>
             Dropdown
@@ -82,12 +86,19 @@ const CodeListProps = (props) => {
           </button>
         </div>
       </FormItem>
+
       <FormItem label={'Parent Code'}>
-        <Dropdown disabled={!parentCodeAvailable}
-                  items={possibleParentCodeItems}
-                  selection={selectedParentCode}
-                  onChange={item => putNodeDefProp(nodeDef, 'parentCodeId', item.key)}/>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 200px',
+        }}>
+          <Dropdown disabled={!parentCodeAvailable}
+                    items={possibleParentCodeItems}
+                    selection={selectedParentCode}
+                    onChange={item => putNodeDefProp(nodeDef, 'parentCodeId', item.key)}/>
+        </div>
       </FormItem>
+
     </React.Fragment>
   )
 }

@@ -22,9 +22,6 @@ import {
 } from '../../../../../common/survey/nodeDef'
 import { isRenderTable, } from '../../../../../common/survey/nodeDefLayout'
 
-import { putNodeDefProp } from '../../../nodeDef/actions'
-import { createCodeList, editCodeList } from '../../../codeList/actions'
-
 import { normalizeName } from './../../../../../common/survey/surveyUtils'
 
 class CommonProps extends React.Component {
@@ -97,4 +94,4 @@ class CommonProps extends React.Component {
   }
 }
 
-export default connect(null, {putNodeDefProp, createCodeList, editCodeList})(CommonProps)
+export default CommonProps

@@ -40,9 +40,11 @@ class SurveyFormView extends React.Component {
     const {
       rootNodeDef,
       nodeDef,
+
       edit,
       entry,
-      recordLoaded
+
+      recordLoaded,
     } = this.props
 
     return (

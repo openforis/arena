@@ -237,7 +237,8 @@ class Dropdown extends React.Component {
              onKeyDown={e => this.onInputKeyDown(e)}/>
 
       <span className="icon icon-menu2 icon-24px"
-            onClick={() => this.toggleOpened()}></span>
+            onClick={() => this.toggleOpened()}
+            aria-disabled={disabled}/>
       {
         this.isOpened() ?
           ReactDOM.createPortal(

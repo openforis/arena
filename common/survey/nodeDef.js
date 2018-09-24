@@ -80,7 +80,7 @@ module.exports = {
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
-  getCodeListId: getProp('codeListId'),
+  getCodeListUUID: getProp('codeListUUID'),
 
   isNodeDefKey,
   isNodeDefMultiple,

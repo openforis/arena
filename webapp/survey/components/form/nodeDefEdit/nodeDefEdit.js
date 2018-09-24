@@ -3,9 +3,10 @@ import { connect } from 'react-redux'
 
 import CommonProps from './commonProps'
 
-import { getFormNodeDefEdit } from '../../../surveyState'
+import { getFormNodeDefEdit, getSurvey } from '../../../surveyState'
 
-import { closeFormNodeDefEdit } from '../../../nodeDef/actions'
+import { closeFormNodeDefEdit, putNodeDefProp } from '../../../nodeDef/actions'
+import { createCodeList, editCodeList } from '../../../codeList/actions'
 
 class NodeDefEdit extends React.Component {
 
@@ -21,7 +22,7 @@ class NodeDefEdit extends React.Component {
       ? (
         <div className="survey-form__node-def-edit">
           <div className="form">
-            <CommonProps nodeDef={nodeDef}/>
+            <CommonProps {...this.props} />
 
             <div style={{justifySelf: 'center'}}>
               <button className="btn btn-of-light"
@@ -41,7 +42,11 @@ NodeDefEdit.defaultProps = {
   nodeDef: null,
 }
 const mapStateToProps = state => ({
-  nodeDef: getFormNodeDefEdit(state)
+  survey: getSurvey(state),
+  nodeDef: getFormNodeDefEdit(state),
 })
 
-export default connect(mapStateToProps, {closeFormNodeDefEdit})(NodeDefEdit)
+export default connect(
+  mapStateToProps,
+  {closeFormNodeDefEdit, putNodeDefProp, createCodeList, editCodeList}
+)(NodeDefEdit)

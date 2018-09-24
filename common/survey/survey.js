@@ -98,31 +98,6 @@ const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
 
 /**
  * ======
- * READ Code Lists
- * ======
- */
-const getSurveyCodeLists = R.pipe(
-  R.prop(codeLists),
-  R.defaultTo({})
-)
-
-const getSurveyCodeListsArray = R.pipe(
-  getSurveyCodeLists,
-  R.values,
-)
-
-const getSurveyCodeListByUUID = uuid => R.pipe(
-  getSurveyCodeLists,
-  R.prop(uuid)
-)
-
-const getSurveyCodeListById = id => R.pipe(
-  getSurveyCodeListsArray,
-  R.find(list => list.id === id)
-)
-
-/**
- * ======
  * UPDATE
  * ======
  */
@@ -167,6 +142,31 @@ const dissocNodeDef = nodeDef =>
 
     return R.dissocPath([nodeDefs, nodeDef.uuid])(updatedSurvey)
   }
+
+/**
+ * ======
+ * READ Code Lists
+ * ======
+ */
+const getSurveyCodeLists = R.pipe(
+  R.prop(codeLists),
+  R.defaultTo({})
+)
+
+const getSurveyCodeListsArray = R.pipe(
+  getSurveyCodeLists,
+  R.values,
+)
+
+const getSurveyCodeListByUUID = uuid => R.pipe(
+  getSurveyCodeLists,
+  R.prop(uuid)
+)
+
+const getSurveyCodeListById = id => R.pipe(
+  getSurveyCodeListsArray,
+  R.find(list => list.id === id)
+)
 
 /**
  * ======
@@ -241,11 +241,6 @@ module.exports = {
   getRootNodeDef,
   getNodeDefChildren,
 
-  // READ codeLists
-  getSurveyCodeLists,
-  getSurveyCodeListsArray,
-  getSurveyCodeListById,
-
   // UPDATE
   assocSurveyProp: setProp,
   assocSurveyPropValidation,
@@ -259,6 +254,14 @@ module.exports = {
   // DELETE nodeDefs
   dissocNodeDef,
 
+  //=======
+  // CodeLists
+  //=======
+  // READ codeLists
+  getSurveyCodeLists,
+  getSurveyCodeListsArray,
+  getSurveyCodeListByUUID,
+
   // UPDATE code lists
   assocSurveyCodeLists,
   assocSurveyCodeList,
@@ -267,6 +270,7 @@ module.exports = {
 
   // UTILS
   getSurveyDBSchema: surveyId => `survey_${surveyId}`,
+
   // UTILS NodeDefs
   getNodeDefParent,
   isNodeDefAncestor,
