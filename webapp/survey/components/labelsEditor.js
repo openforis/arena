@@ -69,9 +69,10 @@ class LabelsEditor extends React.Component {
               ? <button className="btn-s btn-of-light-s btn-toggle-labels"
                         style={{justifySelf: 'end'}}
                         onClick={() => this.togglePreview()}>
-                {
-                  this.isPreview() ? '...more' : '...less'
-                }
+                <span className={`icon icon-${this.isPreview() ? 'enlarge2' : 'shrink2'} icon-12px`}/>
+                {/*{*/}
+                {/*this.isPreview() ? '...more' : '...less'*/}
+                {/*}*/}
 
               </button>
               : null
