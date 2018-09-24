@@ -103,15 +103,17 @@ const loadCodeListLevelItems = async (dispatch, surveyId, codeListId, levelIndex
 
   dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, null) //reset level items
 
-  const queryParams = {
-    draft: true,
-    parentId,
+  if (levelIndex === 0 || parentId) {
+    const queryParams = {
+      draft: true,
+      parentId,
+    }
+
+    const {data} = await axios.get(`/api/survey/${surveyId}/codeLists/${codeListId}/items?${toQueryString(queryParams)}`)
+    const {items} = data
+
+    dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, toUUIDIndexedObj(items))
   }
-
-  const {data} = await axios.get(`/api/survey/${surveyId}/codeLists/${codeListId}/items?${toQueryString(queryParams)}`)
-  const {items} = data
-
-  dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, toUUIDIndexedObj(items))
 }
 
 // ==== UPDATE
@@ -223,5 +225,5 @@ export const setCodeListItemForEdit = (item, edit = true) => async (dispatch, ge
   dispatchCodeListEditActiveLevelItemUpdate(dispatch, level.index, edit ? item.uuid : null)
 
   //load child items
-  await loadCodeListLevelItems(dispatch, survey.id, codeList.id, level.index + 1, item.id)
+  await loadCodeListLevelItems(dispatch, survey.id, codeList.id, level.index + 1, getCodeListItemId(item))
 }
