@@ -15,61 +15,77 @@ const onPropLabelsChange = (props, labelItem) => {
     R.assoc(labelItem.lang, labelItem.label, getCodeListItemLabels(item)))
 }
 
-const CodeListEditItem = (props) => {
+class CodeListEditItem extends React.Component {
 
-  const {
-    survey, level, item, active,
-    putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem
-  } = props
+  constructor (props) {
+    super(props)
+    this.elemRef = React.createRef()
+  }
 
-  const validation = {} //TODO
-  const language = getSurveyDefaultLanguage(survey)
+  componentDidUpdate (prevProps) {
+    if (
+      (this.props.active && !prevProps.active) ||
+      (this.props.item.id && !prevProps.item.id)
+    )
+      this.elemRef.current.scrollIntoView()
+  }
 
-  return (
-    <div className={`code-lists__edit-item ${active ? 'active' : ''}`}
-         onClick={() => active ? null : setCodeListItemForEdit(item, true)}>
-      {
-        active
-          ? (
-            <React.Fragment>
+  render () {
+    const {
+      survey, level, item, active,
+      putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem
+    } = this.props
 
-              <button className="btn-s btn-of-light-xs btn-close"
-                      onClick={() => setCodeListItemForEdit(item, false)}>
-                <span className="icon icon-arrow-up icon-12px"/>
-              </button>
+    const validation = {} //TODO
+    const language = getSurveyDefaultLanguage(survey)
 
-              <FormItem label={'code'}>
-                <Input value={getCodeListItemCode(item)}
-                       validation={getFieldValidation('code')(validation)}
-                       onChange={e => putCodeListItemProp(level.index, item.uuid, 'code', normalizeName(e.target.value))}/>
-              </FormItem>
+    return (
+      <div className={`code-lists__edit-item ${active ? 'active' : ''}`}
+           onClick={() => active ? null : setCodeListItemForEdit(item, true)}
+           ref={this.elemRef}>
+        {
+          active
+            ? (
+              <React.Fragment>
 
-              <LabelsEditor labels={getCodeListItemLabels(item)}
-                            onChange={(labelItem) => onPropLabelsChange(props, labelItem)}/>
+                <button className="btn-s btn-of-light-xs btn-close"
+                        onClick={() => setCodeListItemForEdit(item, false)}>
+                  <span className="icon icon-arrow-up icon-12px"/>
+                </button>
 
-              <button className="btn btn-of-light btn-delete"
-                      onClick={() => {
-                        if (confirm('Delete the item with all children? This operation cannot be undone')) {
-                          deleteCodeListItem(item)
-                        }
-                      }}>
-                <span className="icon icon-bin2 icon-12px icon-left"/>
-                Delete Item
-              </button>
+                <FormItem label={'code'}>
+                  <Input value={getCodeListItemCode(item)}
+                         validation={getFieldValidation('code')(validation)}
+                         onChange={e => putCodeListItemProp(level.index, item.uuid, 'code', normalizeName(e.target.value))}/>
+                </FormItem>
 
-            </React.Fragment>
-          )
-          : (
-            <React.Fragment>
-              <div/>
-              <div>{getCodeListItemCode(item)}</div>
-              <div>{'\xA0'}-{'\xA0'}</div>
-              <div>{getCodeListItemLabel(language)(item)}</div>
-            </React.Fragment>
-          )
-      }
-    </div>
-  )
+                <LabelsEditor labels={getCodeListItemLabels(item)}
+                              onChange={(labelItem) => onPropLabelsChange(props, labelItem)}/>
+
+                <button className="btn btn-of-light btn-delete"
+                        onClick={() => {
+                          if (confirm('Delete the item with all children? This operation cannot be undone')) {
+                            deleteCodeListItem(item)
+                          }
+                        }}>
+                  <span className="icon icon-bin2 icon-12px icon-left"/>
+                  Delete Item
+                </button>
+
+              </React.Fragment>
+            )
+            : (
+              <React.Fragment>
+                <div/>
+                <div>{getCodeListItemCode(item)}</div>
+                <div>{'\xA0'}-{'\xA0'}</div>
+                <div>{getCodeListItemLabel(language)(item)}</div>
+              </React.Fragment>
+            )
+        }
+      </div>
+    )
+  }
 }
 
 export default CodeListEditItem

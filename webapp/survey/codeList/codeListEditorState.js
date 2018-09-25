@@ -33,7 +33,6 @@ const surveyState = {
   }
 }
 
-
 const codeListsPath = ['codeLists']
 const codeListEditPath = ['codeListEdit']
 const codeListUUIDPath = R.append('uuid', codeListEditPath)
@@ -67,7 +66,7 @@ export const getCodeListEditLevelItems = levelIndex => R.pipe(
 export const getCodeListEditLevelItemsArray = levelIndex => R.pipe(
   getCodeListEditLevelItems(levelIndex),
   R.values,
-  R.sortBy(R.prop('id')),
+  R.sort((a, b) => Number(a.id) - Number(b.id)),
 )
 
 export const getCodeListEditLevelItemByUUID = (levelIndex, itemUUID) => R.path(R.concat(levelItemsPath, [levelIndex, itemUUID]))
