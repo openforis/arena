@@ -1,5 +1,11 @@
 @import "../../../style/vars";
 
+.code-lists {
+  display: grid;
+  grid-template-rows: 5rem 1fr 5rem;
+  height: 100%;
+}
+
 .code-lists__header {
   display: flex;
   justify-content: center;
@@ -12,8 +18,8 @@
 }
 
 .code-lists__table {
-  margin: 2rem 10rem 0 10rem;
-  height: calc(100vh - 20rem);
+  margin: 2rem 10rem;
+  max-height: calc(100vh - 14rem);
   overflow-y: auto;
 }
 

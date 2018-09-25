@@ -54,9 +54,9 @@ const CodeListProps = (props) => {
         }}>
           <Dropdown items={getCodeListItems(survey)}
                     selection={selectedCodeList ? getCodeListItem(selectedCodeList) : null}
-                    onChange={item => putNodeDefProp(nodeDef, 'codeListUUID', item.key)}/>
+                    onChange={item => putNodeDefProp(nodeDef, 'codeListUUID', item ? item.key : null)}/>
           <button className="btn btn-s btn-of-light-xs"
-                  style={{justifySelf:'center'}}
+                  style={{justifySelf: 'center'}}
                   onClick={() => {
                     createCodeList()
                     toggleCodeListEdit(true)
@@ -66,7 +66,7 @@ const CodeListProps = (props) => {
             ADD
           </button>
           <button className="btn btn-s btn-of-light-xs"
-                  style={{justifySelf:'center'}}
+                  style={{justifySelf: 'center'}}
                   onClick={() => toggleCodeListEdit(true)}>
             <span className="icon icon-list icon-16px icon-left"/>
             MANAGE

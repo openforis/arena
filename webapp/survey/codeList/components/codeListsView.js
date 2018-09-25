@@ -29,17 +29,32 @@ const Header = props => (
   </div>
 )
 
-const CodeListsView = (props) =>
-  props.codeList
+const CodeListsView = (props) => {
+  const {codeList, onClose} = props
+
+  return codeList
     ? (
       <CodeListEdit {...props}/>
     )
     : (
-      <React.Fragment>
+      <div className="code-lists">
         <Header {...props}/>
         <CodeListsTable {...props} codeList={null}/>
-      </React.Fragment>
+        {
+          onClose
+            ? <div style={{justifySelf: 'center'}}>
+              <button className="btn btn-of-light"
+                      onClick={() => {
+                        onClose ? onClose() : null
+                      }}>
+                Close
+              </button>
+            </div>
+            : null
+        }
+      </div>
     )
+}
 
 const mapStateToProps = state => {
   const survey = getSurvey(state)

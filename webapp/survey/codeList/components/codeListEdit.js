@@ -13,7 +13,6 @@ const CodeListEdit = props => {
     codeList,
     putCodeListProp, createCodeListLevel,
     setCodeListForEdit,
-    onClose
   } = props
   const {validation} = codeList
   const levels = getCodeListLevelsArray(codeList)
@@ -46,7 +45,6 @@ const CodeListEdit = props => {
         <button className="btn btn-of-light"
                 onClick={() => {
                   setCodeListForEdit(null)
-                  onClose ? onClose(codeList) : null
                 }}>
           Done
         </button>
