@@ -45,11 +45,17 @@
 }
 
 .code-lists__edit-level {
-  margin-right: 2rem;
   min-width: 370px;
   display: grid;
   align-content: start;
-  grid-row-gap: 1.5rem;
+  padding: .5rem 1rem;
+  border-right: 1px dashed rgba($white, 0.35);
+  border-top: 1px dashed rgba($white, 0.35);
+  border-bottom: 1px dashed rgba($white, 0.35);
+
+  &:first-child {
+    border-left: 1px dashed rgba($white, 0.35);
+  }
 }
 
 .code-lists__edit-level-header {
@@ -64,6 +70,7 @@
 .code-lists__edit-level-items-header {
   display: flex;
   justify-content: space-between;
+  margin-top: 1rem;
 
   .label {
     font-weight: 400;
@@ -77,7 +84,7 @@
 
 .code-lists__edit-item {
   position: relative;
-  border: 1px dotted rgba($white, 0.35);
+  border-bottom: 1px dotted rgba($white, 0.35);
   display: grid;
   align-content: center;
   grid-template-columns: 2rem 80px 1rem 1fr;
