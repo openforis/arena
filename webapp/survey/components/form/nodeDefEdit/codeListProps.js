@@ -35,7 +35,7 @@ const CodeListProps = (props) => {
     putNodeDefProp,
 
     createCodeList,
-    onCodeListEdit,
+    toggleCodeListEdit,
   } = props
 
   const selectedCodeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
@@ -59,7 +59,7 @@ const CodeListProps = (props) => {
                   style={{justifySelf:'center'}}
                   onClick={() => {
                     createCodeList()
-                    onCodeListEdit(true)
+                    toggleCodeListEdit(true)
                   }}>
 
             <span className="icon icon-plus icon-16px icon-left"/>
@@ -67,7 +67,7 @@ const CodeListProps = (props) => {
           </button>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf:'center'}}
-                  onClick={() => onCodeListEdit(true)}>
+                  onClick={() => toggleCodeListEdit(true)}>
             <span className="icon icon-list icon-16px icon-left"/>
             MANAGE
           </button>

@@ -1,12 +1,10 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../labelsEditor'
 import CodeListProps from './codeListProps'
-import CodeListsEditor from '../../../codeList/components/codeListsView'
 
 import { getFieldValidation, getValidation } from './../../../../../common/validation/validator'
 
@@ -20,78 +18,65 @@ import {
   isNodeDefKey,
   isNodeDefMultiple,
 } from '../../../../../common/survey/nodeDef'
+
 import { isRenderTable, } from '../../../../../common/survey/nodeDefLayout'
 
 import { normalizeName } from './../../../../../common/survey/surveyUtils'
 
-class CommonProps extends React.Component {
+const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValue) => {
+  putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
+}
 
-  constructor (props) {
-    super(props)
+const CommonProps = props => {
+  const {nodeDef, putNodeDefProp} = props
+  const validation = getValidation(nodeDef)
 
-    this.state = {
-      editingCodeList: false,
-    }
-  }
+  return (
+    <React.Fragment>
+      <FormItem label={'name'}>
+        <Input value={getNodeDefName(nodeDef)}
+               validation={getFieldValidation('name')(validation)}
+               onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
+      </FormItem>
 
-  onPropLabelsChange (nodeDef, labelItem, key, currentValue) {
-    this.props.putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
-  }
+      <FormItem label={'type'}>
+        <label>{nodeDef.type}</label>
+      </FormItem>
 
-  render () {
-    const {nodeDef, putNodeDefProp} = this.props
+      <LabelsEditor labels={getNodeDefLabels(nodeDef)}
+                    onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'labels', getNodeDefLabels(nodeDef))}/>
 
-    const validation = getValidation(nodeDef)
+      <LabelsEditor formLabel="Description(s)"
+                    labels={getNodeDefDescriptions(nodeDef)}
+                    onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'descriptions', getNodeDefDescriptions(nodeDef))}/>
 
-    return (
-      this.state.editingCodeList
-        ? <CodeListsEditor/>
-        : <React.Fragment>
-          <FormItem label={'name'}>
-            <Input value={getNodeDefName(nodeDef)}
-                   validation={getFieldValidation('name')(validation)}
-                   onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
+      {
+        isNodeDefCodeList(nodeDef)
+          ? <CodeListProps {...props} />
+          : null
+      }
+
+      {
+        isNodeDefEntity(nodeDef)
+          ? null
+          : <FormItem label={'key'}>
+            <Checkbox checked={isNodeDefKey(nodeDef)}
+                      onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
           </FormItem>
+      }
 
-          <FormItem label={'type'}>
-            <label>{nodeDef.type}</label>
+      {
+        canNodeDefBeMultiple(nodeDef)
+          ? <FormItem label={'multiple'}>
+            <Checkbox checked={isNodeDefMultiple(nodeDef)}
+                      disabled={isRenderTable(nodeDef)}
+                      onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
           </FormItem>
+          : null
+      }
 
-          <LabelsEditor labels={getNodeDefLabels(nodeDef)}
-                        onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'labels', getNodeDefLabels(nodeDef))}/>
-
-          <LabelsEditor formLabel="Description(s)"
-                        labels={getNodeDefDescriptions(nodeDef)}
-                        onChange={(labelItem) => this.onPropLabelsChange(nodeDef, labelItem, 'descriptions', getNodeDefDescriptions(nodeDef))}/>
-
-          {
-            isNodeDefCodeList(nodeDef)
-              ? <CodeListProps {...this.props} onCodeListEdit={(editing) => this.setState({editingCodeList: editing})}/>
-              : null
-          }
-
-          {
-            isNodeDefEntity(nodeDef)
-              ? null
-              : <FormItem label={'key'}>
-                <Checkbox checked={isNodeDefKey(nodeDef)}
-                          onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
-              </FormItem>
-          }
-
-          {
-            canNodeDefBeMultiple(nodeDef)
-              ? <FormItem label={'multiple'}>
-                <Checkbox checked={isNodeDefMultiple(nodeDef)}
-                          disabled={isRenderTable(nodeDef)}
-                          onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
-              </FormItem>
-              : null
-          }
-
-        </React.Fragment>
-    )
-  }
+    </React.Fragment>
+  )
 }
 
 export default CommonProps

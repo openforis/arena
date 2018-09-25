@@ -2,13 +2,22 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import CommonProps from './commonProps'
+import CodeListsView from './../../../codeList/components/codeListsView'
 
 import { getFormNodeDefEdit, getSurvey } from '../../../surveyState'
 
 import { closeFormNodeDefEdit, putNodeDefProp } from '../../../nodeDef/actions'
-import { createCodeList, editCodeList } from '../../../codeList/actions'
+import { createCodeList } from '../../../codeList/actions'
 
 class NodeDefEdit extends React.Component {
+
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      editingCodeList: false,
+    }
+  }
 
   close () {
     const {nodeDef, closeFormNodeDefEdit} = this.props
@@ -21,16 +30,22 @@ class NodeDefEdit extends React.Component {
     return nodeDef
       ? (
         <div className="survey-form__node-def-edit">
-          <div className="form">
-            <CommonProps {...this.props} />
+          {
+            this.state.editingCodeList
+              ?
+              <CodeListsView/>
+              :
+              <div className="form">
+                <CommonProps {...this.props}
+                             toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}/>
 
-            <div style={{justifySelf: 'center'}}>
-              <button className="btn btn-of-light"
-                      onClick={() => this.close()}>Done
-              </button>
-            </div>
-
-          </div>
+                <div style={{justifySelf: 'center'}}>
+                  <button className="btn btn-of-light"
+                          onClick={() => this.close()}>Done
+                  </button>
+                </div>
+              </div>
+          }
         </div>
       )
       : null
@@ -48,5 +63,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  {closeFormNodeDefEdit, putNodeDefProp, createCodeList, editCodeList}
+  {closeFormNodeDefEdit, putNodeDefProp, createCodeList}
 )(NodeDefEdit)
