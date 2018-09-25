@@ -118,14 +118,21 @@ export const putCodeListProp = (codeListUUID, key, value) => async (dispatch, ge
 
   const codeList = R.pipe(
     getCodeListEditCodeList,
-    assocCodeListProp(key, value)
+    assocCodeListProp(key, value),
+    R.dissoc('validation'),
   )(survey)
 
   dispatchCodeListUpdate(dispatch, codeList)
 
   const action = async () => {
     try {
-      await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}`, {codeList})
+      const {data} = await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}`, {codeList})
+
+      const updatedCodeList = R.assoc(
+        'validation',
+        R.path(['codeList', 'validation'], data)
+      )(codeList)
+      dispatchCodeListUpdate(dispatch, updatedCodeList)
     } catch (e) {}
   }
   dispatch(debounceAction(action, `${codeListsUpdate}_${codeList.uuid}`))

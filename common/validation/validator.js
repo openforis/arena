@@ -47,7 +47,9 @@ const validateRequired = (propName, obj) => {
 
 //==== getters
 
-const getValidation = R.prop('validation')
+const getValidation = R.propOr({valid: true}, 'validation')
+
+const isValid = R.pipe(getValidation, R.propEq('valid', true))
 
 const getFieldValidation = field => R.pathOr(
   {valid: true, errors: []},
@@ -60,5 +62,6 @@ module.exports = {
   validateRequired,
 
   getValidation,
+  isValid,
   getFieldValidation,
 }

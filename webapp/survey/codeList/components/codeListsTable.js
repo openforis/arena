@@ -6,6 +6,10 @@ import {
   getSurveyCodeListsArray,
 } from '../../../../common/survey/survey'
 
+import {
+  isValid
+} from '../../../../common/validation/validator'
+
 import { getCodeListName } from '../../../../common/survey/codeList'
 
 const CodeListTableRow = props => {
@@ -21,7 +25,19 @@ const CodeListTableRow = props => {
   const selected = codeList.uuid === selectedCodeListUUID
   return (
     <div className="code-lists__table-row">
-      <label>{name}</label>
+      <div>
+        {name}
+        {
+          isValid(codeList)
+            ? null
+            : (
+              <span className="error-badge" style={{marginLeft: '2rem'}}>
+                <span className="icon icon-warning icon-12px icon-left"/>
+                <span>INVALID</span>
+              </span>
+            )
+        }
+      </div>
 
       {
         onSelect

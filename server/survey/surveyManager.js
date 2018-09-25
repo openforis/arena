@@ -1,4 +1,5 @@
 const Promise = require('bluebird')
+const R = require('ramda')
 
 const {
   toIndexedObj,
@@ -12,17 +13,46 @@ const {
   fetchCodeListsBySurveyId,
   fetchCodeListLevelsByCodeListId,
 } = require('../codeList/codeListRepository')
+const {
+  validateCodeList
+} = require('../codeList/codeListValidator')
+
+const fetchCodeListsWithLevels = async (surveyId, draft) => {
+  const codeListsDb = await fetchCodeListsBySurveyId(surveyId, draft)
+
+  const codeListsWithLevels = await Promise.all(
+    codeListsDb.map(async codeList => ({
+      ...codeList,
+      levels: toIndexedObj(await fetchCodeListLevelsByCodeListId(surveyId, codeList.id, draft), 'index'),
+    }))
+  )
+  return codeListsWithLevels
+}
+
+const assocCodeListValidation = async (codeList, codeListsWithLevels) => ({
+  ...codeList,
+  validation: await validateCodeList(codeListsWithLevels, codeList)
+})
+
+const fetchCodeListById = async (surveyId, codeListId, draft) => {
+  const codeListsWithLevels = await fetchCodeListsWithLevels(surveyId, draft)
+  const codeList = R.find(R.propEq('id', codeListId))(codeListsWithLevels)
+  return await assocCodeListValidation(codeList, codeListsWithLevels)
+}
+
+const fetchCodeLists = async (surveyId, draft) => {
+  const codeListsWithLevels = await fetchCodeListsWithLevels(surveyId, draft)
+
+  return await Promise.all(
+    codeListsWithLevels.map(
+      async codeList => await assocCodeListValidation(codeList, codeListsWithLevels)
+    )
+  )
+}
 
 const fetchSurveyById = async (id, draft) => {
   const survey = await getSurveyById(id, draft)
-
-  const codeListsDb = await fetchCodeListsBySurveyId(id, draft)
-  const codeLists = await Promise.all(
-    codeListsDb.map(async codeList => ({
-      ...codeList,
-      levels: toIndexedObj(await fetchCodeListLevelsByCodeListId(survey.id, codeList.id, draft), 'index')
-    }))
-  )
+  const codeLists = await fetchCodeLists(id, draft)
 
   return {
     ...survey,
@@ -33,4 +63,5 @@ const fetchSurveyById = async (id, draft) => {
 
 module.exports = {
   fetchSurveyById,
+  fetchCodeListById,
 }

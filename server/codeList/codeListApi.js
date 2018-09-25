@@ -2,6 +2,9 @@ const {sendOk, sendErr} = require('../serverUtils/response')
 const {getRestParam, getIntParam, getBoolParam} = require('../serverUtils/request')
 
 const {
+  fetchCodeListById
+} = require('../survey/surveyManager')
+const {
   insertCodeList, insertCodeListLevel, insertCodeListItem,
   fetchCodeListItemsByParentId,
   updateCodeListProps, updateCodeListLevelProps, updateCodeListItemProps,
@@ -54,37 +57,7 @@ module.exports.init = app => {
 
   // ==== READ
 
-  // fetch code lists
-  // app.get('/survey/:surveyId/codeLists', async (req, res) => {
-  //   try {
-  //
-  //     const draft = getBoolParam(req, 'draft')
-  //     const surveyId = getRestParam(req, 'surveyId')
-  //
-  //     const codeLists = await fetchCodeListsBySurveyId(surveyId, draft)
-  //
-  //     res.json({codeLists})
-  //   } catch (err) {
-  //     sendErr(res, err)
-  //   }
-  // })
-
-  // fetch code list by id
-  // app.get('/survey/:surveyId/codeLists/:codeListId', async (req, res) => {
-  //   try {
-  //     const draft = getBoolParam(req, 'draft')
-  //     const surveyId = getRestParam(req, 'surveyId')
-  //     const codeListId = getRestParam(req, 'codeListId')
-  //
-  //     const codeList = await fetchCodeListById(surveyId, codeListId, draft)
-  //
-  //     res.json({codeList})
-  //   } catch (err) {
-  //     sendErr(res, err)
-  //   }
-  // })
-
-  // fetch code list items by parent id
+    // fetch code list items by parent id
   app.get('/survey/:surveyId/codeLists/:codeListId/items', async (req, res) => {
     try {
       const draft = getBoolParam(req, 'draft')
@@ -106,11 +79,12 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       //const codeListId = getRestParam(req, 'codeListId')
-      const {codeList} = req.body
+      const {codeList: codeListBody} = req.body
 
-      const updatedCodeList = await updateCodeListProps(surveyId, codeList)
+      await updateCodeListProps(surveyId, codeListBody)
+      const codeList = await fetchCodeListById(surveyId, codeListBody.id, true)
 
-      res.json({codeList: updatedCodeList})
+      res.json({codeList})
     } catch (err) {
       sendErr(res, err)
     }
