@@ -9,7 +9,12 @@ import { getFieldValidation } from '../../../../common/validation/validator'
 
 const CodeListEdit = props => {
 
-  const {codeList, putCodeListProp, createCodeListLevel} = props
+  const {
+    codeList,
+    putCodeListProp, createCodeListLevel,
+    setCodeListForEdit,
+    onClose
+  } = props
   const {validation} = codeList
   const levels = getCodeListLevelsArray(codeList)
 
@@ -36,6 +41,17 @@ const CodeListEdit = props => {
           ADD LEVEL
         </button>
       </div>
+
+      <div style={{justifySelf: 'center'}}>
+        <button className="btn btn-of-light"
+                onClick={() => {
+                  setCodeListForEdit(null)
+                  onClose ? onClose(codeList) : null
+                }}>
+          Done
+        </button>
+      </div>
+
     </div>
   )
 }

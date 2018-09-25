@@ -4,6 +4,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 2rem;
 
   button {
     margin-left: 1rem;
@@ -30,13 +31,13 @@
 
 .code-lists__edit {
   display: grid;
-  grid-template-rows: 3rem 2rem 1fr;
+  grid-template-rows: 5rem 1fr 5rem;
+  align-items: center;
   margin: 0 5rem;
 }
 
 .code-lists__edit-levels {
   display: flex;
-  grid-row: 3;
   overflow-x: auto;
 
   .btn-add-level {
@@ -79,7 +80,7 @@
 }
 
 .code-lists__edit-level-items {
-  max-height: calc(100vh - 300px);
+  max-height: calc(100vh - 20rem);
   overflow-y: auto;
 }
 

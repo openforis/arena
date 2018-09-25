@@ -221,7 +221,8 @@ export const setCodeListForEdit = (codeList) => async (dispatch, getState) => {
   dispatchCodeListEditUpdate(dispatch, codeList ? codeList.uuid : null)
 
   //load first level items
-  await loadCodeListLevelItems(dispatch, survey.id, codeList.id)
+  if (codeList)
+    await loadCodeListLevelItems(dispatch, survey.id, codeList.id)
 }
 
 export const setCodeListItemForEdit = (item, edit = true) => async (dispatch, getState) => {

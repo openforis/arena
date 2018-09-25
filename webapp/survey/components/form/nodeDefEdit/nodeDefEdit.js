@@ -33,7 +33,7 @@ class NodeDefEdit extends React.Component {
           {
             this.state.editingCodeList
               ?
-              <CodeListsView/>
+              <CodeListsView onClose={() => this.setState({editingCodeList: false})}/>
               :
               <div className="form">
                 <CommonProps {...this.props}
