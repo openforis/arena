@@ -74,7 +74,6 @@ const getCodeListItemLabels = getProp('labels')
 
 const getCodeListItemLabel = language => R.pipe(getCodeListItemLabels, R.prop(language))
 
-
 // UTILS
 const isCodeListLevelDeleteAllowed = level => R.pipe(
   getCodeListLevelsArray,
@@ -112,7 +111,6 @@ module.exports = {
   //UPDATE
   assocCodeListLevelProp,
   // DELETE
-
 
   // ====== CODELIST ITEM
   //CREATE

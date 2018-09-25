@@ -94,8 +94,13 @@ const updateCodeListLevelProps = R.partial(updateProps, ['code_list_level'])
 
 const updateCodeListItemProps = R.partial(updateProps, ['code_list_item'])
 
+// ============== DELETE
 const deleteItem = async (tableName, surveyId, id, client = db) =>
-  await client.one(`DELETE FROM ${getSurveyDBSchema(surveyId)}.${tableName} WHERE id = $1 RETURNING *`, [id])
+  await client.one(`
+    DELETE 
+    FROM ${getSurveyDBSchema(surveyId)}.${tableName} 
+    WHERE id = $1 RETURNING *
+  `, [id])
 
 const deleteCodeList = R.partial(deleteItem, ['code_list'])
 

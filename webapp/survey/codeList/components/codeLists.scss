@@ -72,16 +72,22 @@
 
   .label {
     font-weight: 400;
+    text-transform: uppercase;
   }
 }
 
 .code-lists__edit-level-items-header {
   display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
+  justify-content: center;
+  margin-top: 3rem;
+  align-items: center;
 
   .label {
     font-weight: 400;
+    text-transform: uppercase;
+  }
+  .btn-add-item {
+    margin-left: 1rem;
   }
 }
 

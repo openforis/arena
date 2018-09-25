@@ -48,7 +48,7 @@ class CodeListEditLevel extends React.Component {
     return <div className="code-lists__edit-level">
 
       <div className="code-lists__edit-level-header">
-        <h4 className="label">LEVEL {level.index + 1}</h4>
+        <h4 className="label">Level {level.index + 1}</h4>
         <button className="btn btn-s btn-of-light-xs"
                 onClick={() => this.handleDelete()}
                 aria-disabled={!canBeDeleted}>
@@ -65,8 +65,7 @@ class CodeListEditLevel extends React.Component {
       <div className="code-lists__edit-level-items-header">
         <h5 className="label">Items</h5>
 
-        <button className="btn btn-s btn-of-light-xs"
-                style={{marginLeft: '50px'}}
+        <button className="btn btn-s btn-of-light-xs btn-add-item"
                 aria-disabled={disabledItems}
                 onClick={() => createCodeListItem(level)}>
           <span className="icon icon-plus icon-12px icon-left"/>

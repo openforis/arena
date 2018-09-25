@@ -38,7 +38,8 @@ const CodeListEdit = props => {
         }
 
         <button className="btn btn-s btn-of-light-xs btn-add-level"
-                onClick={() => createCodeListLevel()}>
+                onClick={() => createCodeListLevel()}
+                aria-disabled={levels.length === 5}>
           <span className="icon icon-plus icon-16px icon-left"/>
           ADD LEVEL
         </button>
