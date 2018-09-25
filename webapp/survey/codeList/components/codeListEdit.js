@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { isBlank } from '../../../../common/stringUtils'
+
 import { FormItem, Input } from '../../../commonComponents/form/input'
 import CodeListEditLevel from './codeListEditLevel'
 
@@ -17,11 +19,12 @@ const CodeListEdit = props => {
   const {validation} = codeList
   const levels = getCodeListLevelsArray(codeList)
 
+  const codeListName = getCodeListName(codeList)
   return (
     <div className="code-lists__edit">
 
       <FormItem label="Code list name">
-        <Input value={getCodeListName(codeList)}
+        <Input value={codeListName}
                validation={getFieldValidation('name')(validation)}
                onChange={e => putCodeListProp(codeList.uuid, 'name', normalizeName(e.target.value))}/>
       </FormItem>
@@ -43,6 +46,7 @@ const CodeListEdit = props => {
 
       <div style={{justifySelf: 'center'}}>
         <button className="btn btn-of-light"
+                aria-disabled={isBlank(codeListName)}
                 onClick={() => {
                   setCodeListForEdit(null)
                 }}>
