@@ -37,6 +37,7 @@
 .code-lists__edit-levels {
   display: flex;
   grid-row: 3;
+  overflow-x: auto;
 
   .btn-add-level {
     align-self: start;
