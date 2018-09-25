@@ -8,17 +8,37 @@ import {
 
 import { getCodeListName } from '../../../../common/survey/codeList'
 
-const CodeListTableRow = ({survey, codeList, setCodeListForEdit, deleteCodeList}) => {
+const CodeListTableRow = props => {
+
+  const {
+    survey, codeList,
+    setCodeListForEdit, deleteCodeList,
+    onSelect, selectedCodeListUUID
+  } = props
+
   const name = R.defaultTo('--- undefined name ---', getCodeListName(codeList))
 
+  const selected = codeList.uuid === selectedCodeListUUID
   return (
     <div className="code-lists__table-row">
       <label>{name}</label>
+
+      {
+        onSelect
+          ? <button className={`btn btn-s btn-of-light-xs${selected ? ' active' : ''}`}
+                    onClick={() => onSelect(codeList)}>
+            <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`}/>
+            {selected ? 'Selected' : 'Select'}
+          </button>
+          : null
+      }
+
       <button className="btn btn-s btn-of-light-xs"
               onClick={() => setCodeListForEdit(codeList)}>
         <span className="icon icon-pencil2 icon-12px icon-left"/>
-        EDIT
+        Edit
       </button>
+
       <button className="btn btn-s btn-of-light-xs"
               onClick={() => {
                 if (getNodeDefsByCodeListUUID(codeList.uuid)(survey).length > 0) {
@@ -28,8 +48,9 @@ const CodeListTableRow = ({survey, codeList, setCodeListForEdit, deleteCodeList}
                 }
               }}>
         <span className="icon icon-bin2 icon-12px icon-left"/>
-        DELETE
+        Delete
       </button>
+
     </div>
   )
 }

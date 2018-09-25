@@ -47,9 +47,7 @@ const CodeListEdit = props => {
       <div style={{justifySelf: 'center'}}>
         <button className="btn btn-of-light"
                 aria-disabled={isBlank(codeListName)}
-                onClick={() => {
-                  setCodeListForEdit(null)
-                }}>
+                onClick={() => setCodeListForEdit(null)}>
           Done
         </button>
       </div>

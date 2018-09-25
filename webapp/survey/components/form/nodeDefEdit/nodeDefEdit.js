@@ -5,6 +5,7 @@ import CommonProps from './commonProps'
 import CodeListsView from './../../../codeList/components/codeListsView'
 
 import { getFormNodeDefEdit, getSurvey } from '../../../surveyState'
+import { getCodeListUUID } from '../../../../../common/survey/nodeDef'
 
 import { closeFormNodeDefEdit, putNodeDefProp } from '../../../nodeDef/actions'
 import { createCodeList } from '../../../codeList/actions'
@@ -25,7 +26,7 @@ class NodeDefEdit extends React.Component {
   }
 
   render () {
-    const {nodeDef} = this.props
+    const {nodeDef, putNodeDefProp} = this.props
 
     return nodeDef
       ? (
@@ -33,9 +34,11 @@ class NodeDefEdit extends React.Component {
           {
             this.state.editingCodeList
               ?
-              <CodeListsView onClose={() => this.setState({editingCodeList: false})}/>
-              :
-              <div className="form">
+              <CodeListsView onClose={() => this.setState({editingCodeList: false})}
+                             onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
+                             selectedCodeListUUID={getCodeListUUID(nodeDef)}
+              />
+              : <div className="form">
                 <CommonProps {...this.props}
                              toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}/>
 

@@ -25,7 +25,7 @@
 
 .code-lists__table-row {
   display: grid;
-  grid-template-columns: 1fr repeat(2, 100px);
+  grid-template-columns: 1fr repeat(3, 100px);
   grid-auto-rows: 35px;
   align-items: center;
   border-bottom: 1px solid rgba($white, 0.5);
