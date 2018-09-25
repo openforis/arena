@@ -36,9 +36,6 @@ export const codeListEditActiveLevelItemUpdate = 'survey/codeListEdit/activeLeve
 const dispatchCodeListUpdate = (dispatch, codeList) =>
   dispatch({type: codeListsUpdate, codeLists: {[codeList.uuid]: codeList}})
 
-const dispatchCodeListsUpdate = (dispatch, codeLists) =>
-  dispatch({type: codeListsUpdate, codeLists})
-
 const dispatchCodeListEditUpdate = (dispatch, codeListUUID) =>
   dispatch({type: codeListEditUpdate, codeListUUID})
 
@@ -178,11 +175,10 @@ export const putCodeListItemProp = (levelIndex, itemUUID, key, value) => async (
 
 // ==== DELETE
 
-export const deleteCodeList = codeListUUID => async (dispatch, getState) => {
+export const deleteCodeList = codeList => async (dispatch, getState) => {
   const survey = getSurvey(getState())
-  const codeList = getSurveyCodeListByUUID(codeListUUID)(survey)
 
-  dispatchCodeListsUpdate(dispatch, {[codeList.uuid]: null})
+  dispatch({type: codeListsUpdate, codeLists: {[codeList.uuid]: null}})
 
   //delete code list and items from db
   await axios.delete(`/api/survey/${survey.id}/codeLists/${codeList.id}`)
