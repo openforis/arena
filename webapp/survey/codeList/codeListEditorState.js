@@ -32,24 +32,7 @@ const surveyState = {
 
   }
 }
-// action creators
-// createCodeList => dispatch survey/codeList/update, dispatch => survey/codeListEdit/update , load first level and dispatch survey/codeListEdit/levelItems/update
-// updateCodeList => dispatch survey/codeList/update
-// deleteCodeList => dispatch survey/codeList/update
 
-// createCodeListLevel => dispatch survey/codeList/update
-// updateCodeListLevel => dispatch survey/codeList/update
-// deleteCodeListLevel => dispatch survey/codeList/update
-
-// createCodeListItem => dispatch survey/codeListEdit/levelItems/update
-// updateCodeListItem => dispatch survey/codeListEdit/levelItems/update
-// deleteCodeListItem => dispatch survey/codeListEdit/levelItems/update and remove dispatch survey/codeListEdit/activeLevelItem/update
-// setCodeListItemForEdit => dispatch survey/codeListEdit/activeLevelItem/update , load or remove children and dispatch survey/codeListEdit/levelItems/update
-
-// actions
-// survey/codeList/update -- assoc or dissoc codeList
-// survey/codeListEdit/levelItems/update
-// survey/codeListEdit/activeLevelItem/update
 
 const codeListsPath = ['codeLists']
 const codeListEditPath = ['codeListEdit']
@@ -84,7 +67,7 @@ export const getCodeListEditLevelItems = levelIndex => R.pipe(
 export const getCodeListEditLevelItemsArray = levelIndex => R.pipe(
   getCodeListEditLevelItems(levelIndex),
   R.values,
-  R.sortBy(R.prop('index')),
+  R.sortBy(R.prop('id')),
 )
 
 export const getCodeListEditLevelItemByUUID = (levelIndex, itemUUID) => R.path(R.concat(levelItemsPath, [levelIndex, itemUUID]))

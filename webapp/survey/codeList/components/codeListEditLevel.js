@@ -2,12 +2,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { FormItem, Input } from '../../../commonComponents/form/input'
-import CodeListItemEdit from './codeListItemEdit'
+import CodeListEditItem from './codeListEditItem'
 
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import {
   getCodeListLevelName,
-  getCodeListItemUUID,
   isCodeListLevelDeleteAllowed
 } from '../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../common/validation/validator'
@@ -27,7 +26,7 @@ import {
 } from '../codeListEditorState'
 import { putCodeListItemProp } from '../actions'
 
-class CodeListLevelEdit extends React.Component {
+class CodeListEditLevel extends React.Component {
 
   handleDelete () {
     const {level, deleteCodeListLevel} = this.props
@@ -37,29 +36,23 @@ class CodeListLevelEdit extends React.Component {
     }
   }
 
-  handleDeleteItem(item) {
-    if (confirm('Delete the item with all children? This operation cannot be undone')) {
-      this.props.deleteCodeListItem(item)
-    }
-  }
-
   render () {
     const {
-      survey, level, items, editedItemUUID, itemEditDisabled,
-      createCodeListItem, putCodeListLevelProp, putCodeListItemProp, setCodeListItemForEdit,
-      levelDeleteDisabled,
+      survey, level, items, activeItemUUID, disabledItems,
+      canBeDeleted,
+      createCodeListItem, putCodeListLevelProp, putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
     } = this.props
 
     const validation = {} //TODO
 
-    return <div>
-      <div style={{display: 'flex'}}>
-        <h2>LEVEL {level.index + 1}</h2>
+    return <div className="code-lists__edit-level">
+
+      <div className="code-lists__edit-level-header">
+        <h4 className="label">LEVEL {level.index + 1}</h4>
         <button className="btn btn-s btn-of-light-xs"
-                style={{marginLeft: '50px'}}
                 onClick={() => this.handleDelete()}
-                aria-disabled={levelDeleteDisabled}>
-          <span className="icon icon-cross icon-16px icon-left"/>
+                aria-disabled={!canBeDeleted}>
+          <span className="icon icon-bin2 icon-12px"/>
         </button>
       </div>
 
@@ -69,28 +62,32 @@ class CodeListLevelEdit extends React.Component {
                onChange={e => putCodeListLevelProp(level.codeListId, level.index, 'name', normalizeName(e.target.value))}/>
       </FormItem>
 
-      <div style={{display: 'flex'}}>
-        <h3>Items</h3>
+      <div className="code-lists__edit-level-items-header">
+        <h5 className="label">Items</h5>
 
         <button className="btn btn-s btn-of-light-xs"
                 style={{marginLeft: '50px'}}
-                aria-disabled={itemEditDisabled}
+                aria-disabled={disabledItems}
                 onClick={() => createCodeListItem(level)}>
-          <span className="icon icon-plus icon-16px icon-left"/>
+          <span className="icon icon-plus icon-12px icon-left"/>
           ADD
         </button>
       </div>
 
-      {
-        items.map(item => <CodeListItemEdit key={item.uuid}
-                                            survey={survey}
-                                            level={level}
-                                            item={item}
-                                            edit={item.uuid === editedItemUUID}
-                                            putCodeListItemProp={putCodeListItemProp}
-                                            onEditChange={edit => setCodeListItemForEdit(item, edit)}
-                                            onDelete={() => this.handleDeleteItem(item)}/>)
-      }
+      <div className="code-lists__edit-level-items">
+        {
+          items.map(item =>
+            <CodeListEditItem key={item.uuid}
+                              survey={survey}
+                              level={level}
+                              item={item}
+                              active={item.uuid === activeItemUUID}
+                              putCodeListItemProp={putCodeListItemProp}
+                              setCodeListItemForEdit={setCodeListItemForEdit}
+                              deleteCodeListItem={deleteCodeListItem}/>
+          )
+        }
+      </div>
     </div>
   }
 }
@@ -101,18 +98,18 @@ const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
 
   const codeList = getCodeListEditCodeList(survey)
-  const editedItem = getCodeListEditActiveLevelItem(level.index)(survey)
+  const activeItem = getCodeListEditActiveLevelItem(level.index)(survey)
   const previousLevelEditedItem = getCodeListEditActiveLevelItem(level.index - 1)(survey)
-  const itemEditDisabled = level.index > 0 && !previousLevelEditedItem
-  const items = itemEditDisabled ? [] : getCodeListEditLevelItemsArray(level.index)(survey)
-  const levelDeleteDisabled = !isCodeListLevelDeleteAllowed(level)(codeList)
+  const disabledItems = level.index > 0 && !previousLevelEditedItem
+  const items = disabledItems ? [] : getCodeListEditLevelItemsArray(level.index)(survey)
+  const canBeDeleted = isCodeListLevelDeleteAllowed(level)(codeList)
 
   return {
     survey,
     items,
-    editedItemUUID: getCodeListItemUUID(editedItem),
-    itemEditDisabled,
-    levelDeleteDisabled,
+    activeItemUUID: activeItem ? activeItem.uuid : null,
+    disabledItems,
+    canBeDeleted,
   }
 }
 
@@ -123,5 +120,5 @@ export default connect(mapStateToProps, {
   deleteCodeListLevel,
   setCodeListItemForEdit,
   deleteCodeListItem,
-})(CodeListLevelEdit)
+})(CodeListEditLevel)
 

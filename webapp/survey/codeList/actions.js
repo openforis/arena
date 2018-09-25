@@ -4,8 +4,6 @@ import * as R from 'ramda'
 import { toUUIDIndexedObj } from '../../../common/survey/surveyUtils'
 import { toQueryString } from '../../../server/serverUtils/request'
 
-import { getSurveyCodeListByUUID, } from '../../../common/survey/survey'
-
 import {
   assocCodeListItemProp,
   assocCodeListLevel,

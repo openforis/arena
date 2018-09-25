@@ -120,7 +120,6 @@ module.exports = {
 
   //READ
   getCodeListItemId: R.propOr(null, 'id'),
-  getCodeListItemUUID: R.propOr(null, 'uuid'),
   getCodeListItemCode: getProp('code'),
   getCodeListItemLabels,
   getCodeListItemLabel,
