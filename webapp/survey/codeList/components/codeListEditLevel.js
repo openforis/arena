@@ -7,6 +7,7 @@ import CodeListEditItem from './codeListEditItem'
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import {
   getCodeListLevelName,
+  getCodeListLevelValidation,
   isCodeListLevelDeleteAllowed
 } from '../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../common/validation/validator'
@@ -38,12 +39,12 @@ class CodeListEditLevel extends React.Component {
 
   render () {
     const {
-      survey, level, items, activeItemUUID, disabledItems,
+      survey, codeList, level, items, activeItemUUID, disabledItems,
       canBeDeleted,
       createCodeListItem, putCodeListLevelProp, putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
     } = this.props
 
-    const validation = {} //TODO
+    const validation = getCodeListLevelValidation(level.index)(codeList)
 
     return <div className="code-lists__edit-level">
 
@@ -105,6 +106,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     survey,
+    codeList,
     items,
     activeItemUUID: activeItem ? activeItem.uuid : null,
     disabledItems,

@@ -12,6 +12,7 @@ const {validateSurvey} = require('../survey/surveyValidator')
 const {
   fetchCodeListsBySurveyId,
   fetchCodeListLevelsByCodeListId,
+  fetchCodeListItemsByCodeListId,
 } = require('../codeList/codeListRepository')
 const {
   validateCodeList
@@ -20,33 +21,39 @@ const {
 const fetchCodeListsWithLevels = async (surveyId, draft) => {
   const codeListsDb = await fetchCodeListsBySurveyId(surveyId, draft)
 
-  const codeListsWithLevels = await Promise.all(
+  return await Promise.all(
     codeListsDb.map(async codeList => ({
       ...codeList,
       levels: toIndexedObj(await fetchCodeListLevelsByCodeListId(surveyId, codeList.id, draft), 'index'),
     }))
   )
-  return codeListsWithLevels
 }
 
-const assocCodeListValidation = async (codeList, codeListsWithLevels) => ({
+const assocCodeListValidation = async (codeList, codeListsWithLevels, codeListItems) => ({
   ...codeList,
-  validation: await validateCodeList(codeListsWithLevels, codeList)
+  validation: await validateCodeList(codeListsWithLevels, codeList, codeListItems)
 })
 
-const fetchCodeListById = async (surveyId, codeListId, draft) => {
+const fetchCodeListById = async (surveyId, codeListId, draft, validate = false) => {
   const codeListsWithLevels = await fetchCodeListsWithLevels(surveyId, draft)
   const codeList = R.find(R.propEq('id', codeListId))(codeListsWithLevels)
-  return await assocCodeListValidation(codeList, codeListsWithLevels)
+
+  if (validate) {
+    const items = await fetchCodeListItemsByCodeListId(surveyId, codeList.id, draft)
+    return await assocCodeListValidation(codeList, codeListsWithLevels, items)
+  } else {
+    return codeList
+  }
 }
 
 const fetchCodeLists = async (surveyId, draft) => {
   const codeListsWithLevels = await fetchCodeListsWithLevels(surveyId, draft)
 
   return await Promise.all(
-    codeListsWithLevels.map(
-      async codeList => await assocCodeListValidation(codeList, codeListsWithLevels)
-    )
+    codeListsWithLevels.map(async codeList => {
+      const codeListItems = await fetchCodeListItemsByCodeListId(surveyId, codeList.id, draft)
+      return await assocCodeListValidation(codeList, codeListsWithLevels, codeListItems)
+    })
   )
 }
 

@@ -108,8 +108,11 @@ module.exports = {
   newCodeListLevel,
   //READ
   getCodeListLevelName: getProp('name'),
+  getCodeListLevelValidation: levelIndex => R.path(['validation', 'levels', levelIndex]),
   //UPDATE
   assocCodeListLevelProp,
+  assocCodeListLevelValidation: (levelIndex, validation) => R.assocPath(['validation', 'levels', levelIndex], validation),
+  dissocCodeListLevelValidation: levelIndex => R.dissocPath(['validation', 'levels', R.toString(levelIndex)]),
   // DELETE
 
   // ====== CODELIST ITEM

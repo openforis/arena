@@ -5,6 +5,7 @@ import LabelsEditor from '../../components/labelsEditor'
 import { FormItem, Input } from '../../../commonComponents/form/input'
 
 import { normalizeName } from '../../../../common/survey/surveyUtils'
+import { getValidation, isValid } from '../../../../common/validation/validator'
 import { getSurveyDefaultLanguage } from '../../../../common/survey/survey'
 import { getCodeListItemCode, getCodeListItemLabel, getCodeListItemLabels } from '../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../common/validation/validator'
@@ -36,7 +37,7 @@ class CodeListEditItem extends React.Component {
       putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem
     } = this.props
 
-    const validation = {} //TODO
+    const validation = getValidation(item)
     const language = getSurveyDefaultLanguage(survey)
 
     return (
@@ -76,7 +77,17 @@ class CodeListEditItem extends React.Component {
             )
             : (
               <React.Fragment>
-                <div/>
+                <div>
+                  {
+                    isValid(item)
+                      ? null
+                      : (
+                        <span className="error-badge">
+                          <span className="icon icon-warning icon-12px icon-left"/>
+                        </span>
+                      )
+                  }
+                </div>
                 <div>{getCodeListItemCode(item)}</div>
                 <div>{'\xA0'}-{'\xA0'}</div>
                 <div>{getCodeListItemLabel(language)(item)}</div>

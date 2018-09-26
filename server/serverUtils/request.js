@@ -8,11 +8,6 @@ const getRestParam = (req, param) => {
   return queryValue || paramsValue || bodyValue
 }
 
-const getIntParam = (req, param) => {
-  const strParam = getRestParam(req, param)
-  return strParam && strParam !== 'null' ? parseInt(strParam) : NaN
-}
-
 const getBoolParam = R.pipe(
   getRestParam,
   R.equals('true'),
@@ -26,7 +21,6 @@ const toQueryString = obj =>
 
 module.exports = {
   getRestParam,
-  getIntParam,
   getBoolParam,
   toQueryString,
 }

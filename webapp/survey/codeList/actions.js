@@ -16,6 +16,8 @@ import {
   newCodeListItem,
   newCodeListLevel,
   assocCodeListLevelProp,
+  assocCodeListLevelValidation,
+  dissocCodeListLevelValidation,
 } from '../../../common/survey/codeList'
 
 import { getSurvey } from '../surveyState'
@@ -145,6 +147,7 @@ export const putCodeListLevelProp = (codeListId, levelIndex, key, value) => asyn
   const codeList = R.pipe(
     getCodeListEditCodeList,
     assocCodeListLevelProp(levelIndex, key, value),
+    dissocCodeListLevelValidation(levelIndex),
   )(survey)
 
   dispatchCodeListUpdate(dispatch, codeList)
@@ -152,7 +155,9 @@ export const putCodeListLevelProp = (codeListId, levelIndex, key, value) => asyn
   const level = getCodeListLevelByIndex(levelIndex)(codeList)
   const action = async () => {
     try {
-      await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}/levels/${level.id}`, {level})
+      const {data} = await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}/levels/${level.id}`, {level})
+      const {validation} = data
+      dispatchCodeListUpdate(dispatch, assocCodeListLevelValidation(levelIndex, validation)(codeList))
     } catch (e) {}
   }
   dispatch(debounceAction(action, `codeListLevel_${level.uuid}`))
@@ -166,13 +171,17 @@ export const putCodeListItemProp = (levelIndex, itemUUID, key, value) => async (
   const item = R.pipe(
     getCodeListEditLevelItemByUUID(levelIndex, itemUUID),
     assocCodeListItemProp(key, value),
+    R.dissoc('validation'),
   )(survey)
 
   dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, {[itemUUID]: item})
 
   const action = async () => {
     try {
-      await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}/items/${item.id}`, {item})
+      const {data} = await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}/items/${item.id}`, {item})
+      const {item: updatedItem} = data
+      //TODO update ancestor code items validation
+      dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, {[itemUUID]: updatedItem})
     } catch (e) {}
   }
   dispatch(debounceAction(action, `${codeListEditLevelItemsUpdate}_${itemUUID}`))
