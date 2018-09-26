@@ -9,12 +9,6 @@ import { getSurveyDefaultLanguage } from '../../../../common/survey/survey'
 import { getCodeListItemCode, getCodeListItemLabel, getCodeListItemLabels } from '../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../common/validation/validator'
 
-const onPropLabelsChange = (props, labelItem) => {
-  const {level, item, putCodeListItemProp} = props
-  putCodeListItemProp(level.index, item.uuid, 'labels',
-    R.assoc(labelItem.lang, labelItem.label, getCodeListItemLabels(item)))
-}
-
 class CodeListEditItem extends React.Component {
 
   constructor (props) {
@@ -28,6 +22,12 @@ class CodeListEditItem extends React.Component {
       (this.props.item.id && !prevProps.item.id)
     )
       this.elemRef.current.scrollIntoView()
+  }
+
+  onPropLabelsChange (labelItem) {
+    const {level, item, putCodeListItemProp} = this.props
+    putCodeListItemProp(level.index, item.uuid, 'labels',
+      R.assoc(labelItem.lang, labelItem.label, getCodeListItemLabels(item)))
   }
 
   render () {
@@ -60,7 +60,7 @@ class CodeListEditItem extends React.Component {
                 </FormItem>
 
                 <LabelsEditor labels={getCodeListItemLabels(item)}
-                              onChange={(labelItem) => onPropLabelsChange(props, labelItem)}/>
+                              onChange={(labelItem) => this.onPropLabelsChange(labelItem)}/>
 
                 <button className="btn btn-of-light btn-delete"
                         onClick={() => {
