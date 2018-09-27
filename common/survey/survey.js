@@ -1,7 +1,5 @@
 const R = require('ramda')
 
-const {assocCodeListLevel, assocCodeListItem} = require('./codeList')
-
 const {
   getProps,
   getProp,
@@ -9,10 +7,19 @@ const {
 
   setProp,
 } = require('./surveyUtils')
+
 const {
   isNodeDefRoot,
   isNodeDefEntity,
+  getCodeListUUID,
+  getParentCodeUUID,
 } = require('./nodeDef')
+
+const {
+  assocCodeListLevel,
+  assocCodeListItem,
+  getCodeListLevelsArray,
+} = require('./codeList')
 
 // == utils
 const nodeDefs = 'nodeDefs'
@@ -80,7 +87,7 @@ const getNodeDefs = R.pipe(R.prop(nodeDefs), R.defaultTo({}))
 
 const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
-const getNodeDefByUUID = uuid => R.pipe(getNodeDefs, R.prop(uuid))
+const getNodeDefByUUID = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
 const getNodeDefById = id => R.pipe(
   getNodeDefsArray,
@@ -210,6 +217,16 @@ const assocSurveyCodeListItem = (codeListUUID, item) => survey => R.pipe(
  */
 const getNodeDefParent = nodeDef => getNodeDefById(nodeDef.parentId)
 
+const getNodeDefAncestors = nodeDef =>
+  survey => {
+    if (isNodeDefRoot(nodeDef)) {
+      return []
+    } else {
+      const parent = getNodeDefParent(nodeDef)(survey)
+      return R.append(parent, getNodeDefAncestors(parent)(survey))
+    }
+  }
+
 const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
   survey => {
     if (isNodeDefRoot(nodeDefDescendant))
@@ -222,17 +239,59 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       return isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }
 
+const getNodeDefCodeParent = nodeDef => getNodeDefByUUID(getParentCodeUUID(nodeDef))
+
+const getNodeDefCodePossibleParents = nodeDef => survey => {
+  const codeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
+
+  if (codeList) {
+    const ancestors = getNodeDefAncestors(nodeDef)(survey)
+
+    const sameCodeListNodeDefs = R.reduce((acc, ancestor) =>
+      R.pipe(
+        getNodeDefChildren(ancestor),
+        R.filter(n => getCodeListUUID(n) === codeList.uuid),
+        R.concat(acc),
+      )(survey), [], ancestors)
+
+    return R.filter(def =>
+      def.uuid !== nodeDef.uuid
+      && getParentCodeUUID(def) !== nodeDef.uuid
+      && getNodeDefCodeListLevelIndex(def)(survey) < getCodeListLevelsArray(codeList).length - 1
+    )(sameCodeListNodeDefs)
+  } else {
+    return []
+  }
+}
+
+const getNodeDefCodeListLevelIndex = nodeDef => survey => {
+  let levelIndex = 0
+  const visitedNodes = []
+
+  let parentCodeNodeDef = getNodeDefCodeParent(nodeDef)(survey)
+
+  while (parentCodeNodeDef) {
+    if (R.contains(parentCodeNodeDef, visitedNodes)) {
+      return NaN //loop found
+    } else {
+      visitedNodes.push(parentCodeNodeDef)
+      parentCodeNodeDef = getNodeDefCodeParent(parentCodeNodeDef)(survey)
+      levelIndex++
+    }
+  }
+  return levelIndex
+}
+
 module.exports = {
   defaultSteps,
 
   // READ
   getSurveyProps: getProps,
-  getSurveyLabels: getLabels,
 
   getSurveyName: getProp('name', ''),
   getSurveyLanguages,
   getSurveyDefaultLanguage,
-  getSurveyLabels,
+  getSurveyLabels: getLabels,
   getSurveyDefaultLabel,
   getSurveyDescriptions: getProp('descriptions', {}),
   getSurveySrs: getProp('srs', []),
@@ -246,6 +305,10 @@ module.exports = {
   getRootNodeDef,
   getNodeDefChildren,
   getNodeDefsByCodeListUUID,
+
+  getNodeDefCodeListLevelIndex,
+  getNodeDefCodeParent,
+  getNodeDefCodePossibleParents,
 
   // UPDATE
   assocSurveyProp: setProp,
@@ -270,7 +333,6 @@ module.exports = {
 
   // UPDATE code lists
   assocSurveyCodeLists,
-  assocSurveyCodeList,
   assocSurveyCodeListLevel,
   assocSurveyCodeListItem,
 
