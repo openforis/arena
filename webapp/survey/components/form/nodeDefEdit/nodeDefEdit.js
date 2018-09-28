@@ -9,6 +9,7 @@ import { getCodeListUUID } from '../../../../../common/survey/nodeDef'
 
 import { closeFormNodeDefEdit, putNodeDefProp } from '../../../nodeDef/actions'
 import { createCodeList } from '../../../codeList/actions'
+import { canUpdateCodeList } from '../../../../../common/survey/survey'
 
 class NodeDefEdit extends React.Component {
 
@@ -26,7 +27,7 @@ class NodeDefEdit extends React.Component {
   }
 
   render () {
-    const {nodeDef, putNodeDefProp} = this.props
+    const {nodeDef, putNodeDefProp, survey} = this.props
 
     return nodeDef
       ? (
@@ -35,6 +36,7 @@ class NodeDefEdit extends React.Component {
             this.state.editingCodeList
               ?
               <CodeListsView onClose={() => this.setState({editingCodeList: false})}
+                             canSelect={canUpdateCodeList(nodeDef)(survey)}
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
                              selectedCodeListUUID={getCodeListUUID(nodeDef)}
               />

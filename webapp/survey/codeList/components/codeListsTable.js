@@ -17,7 +17,7 @@ const CodeListTableRow = props => {
   const {
     survey, codeList,
     setCodeListForEdit, deleteCodeList,
-    onSelect, selectedCodeListUUID
+    canSelect, onSelect, selectedCodeListUUID
   } = props
 
   const name = R.defaultTo('--- undefined name ---', getCodeListName(codeList))
@@ -40,13 +40,14 @@ const CodeListTableRow = props => {
       </div>
 
       {
-        onSelect
+        onSelect &&
+        (canSelect || selected)
           ? <button className={`btn btn-s btn-of-light-xs${selected ? ' active' : ''}`}
                     onClick={() => onSelect(codeList)}>
             <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`}/>
             {selected ? 'Selected' : 'Select'}
           </button>
-          : null
+          : <div/>
       }
 
       <button className="btn btn-s btn-of-light-xs"

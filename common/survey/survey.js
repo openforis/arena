@@ -18,6 +18,7 @@ const {
 const {
   assocCodeListLevel,
   assocCodeListItem,
+  getCodeListLevelsLength,
   getCodeListLevelsArray,
 } = require('./codeList')
 
@@ -233,54 +234,63 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       return false
 
     const nodeDefParent = getNodeDefParent(nodeDefDescendant)(survey)
-    if (nodeDefParent.id === nodeDefAncestor.id)
-      return true
-    else
-      return isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
+    return nodeDefParent.id === nodeDefAncestor.id
+      ? true
+      : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }
 
 const getNodeDefCodeParent = nodeDef => getNodeDefByUUID(getParentCodeUUID(nodeDef))
 
-const getNodeDefCodePossibleParents = nodeDef => survey => {
-  const codeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
+const isNodeDefCodeParent = nodeDef => R.pipe(
+  getNodeDefsArray,
+  R.any(R.pathEq(['props', 'parentCodeUUID'], nodeDef.uuid)),
+)
 
-  if (codeList) {
-    const ancestors = getNodeDefAncestors(nodeDef)(survey)
+const getNodeDefCodeCandidateParents = nodeDef =>
+  survey => {
+    const codeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
 
-    const sameCodeListNodeDefs = R.reduce((acc, ancestor) =>
-      R.pipe(
-        getNodeDefChildren(ancestor),
-        R.filter(n => getCodeListUUID(n) === codeList.uuid),
-        R.concat(acc),
-      )(survey), [], ancestors)
+    if (codeList) {
+      const codeListLevelsLength = getCodeListLevelsLength(codeList)
+      const ancestors = getNodeDefAncestors(nodeDef)(survey)
 
-    return R.filter(def =>
-      def.uuid !== nodeDef.uuid
-      && getParentCodeUUID(def) !== nodeDef.uuid
-      && getNodeDefCodeListLevelIndex(def)(survey) < getCodeListLevelsArray(codeList).length - 1
-    )(sameCodeListNodeDefs)
-  } else {
-    return []
-  }
-}
+      return R.reduce(
+        (acc, ancestor) =>
+          R.pipe(
+            getNodeDefChildren(ancestor),
+            R.reject(n =>
+              // reject different codeList nodeDef
+              getCodeListUUID(n) !== codeList.uuid
+              ||
+              // or itself
+              n.uuid === nodeDef.uuid
+              ||
+              // leaves nodeDef
+              getNodeDefCodeListLevelIndex(n)(survey) === codeListLevelsLength - 1
+            ),
+            R.concat(acc),
+          )(survey),
+        [],
+        ancestors
+      )
 
-const getNodeDefCodeListLevelIndex = nodeDef => survey => {
-  let levelIndex = 0
-  const visitedNodes = []
-
-  let parentCodeNodeDef = getNodeDefCodeParent(nodeDef)(survey)
-
-  while (parentCodeNodeDef) {
-    if (R.contains(parentCodeNodeDef, visitedNodes)) {
-      return NaN //loop found
     } else {
-      visitedNodes.push(parentCodeNodeDef)
-      parentCodeNodeDef = getNodeDefCodeParent(parentCodeNodeDef)(survey)
-      levelIndex++
+      return []
     }
   }
-  return levelIndex
-}
+
+const getNodeDefCodeListLevelIndex = nodeDef =>
+  survey => {
+    const parentCodeNodeDef = getNodeDefCodeParent(nodeDef)(survey)
+    return parentCodeNodeDef
+      ? 1 + getNodeDefCodeListLevelIndex(parentCodeNodeDef)(survey)
+      : 0
+  }
+
+const canUpdateCodeList = nodeDef =>
+  survey => {
+    return !isNodeDefCodeParent(nodeDef)(survey)
+  }
 
 module.exports = {
   defaultSteps,
@@ -306,10 +316,6 @@ module.exports = {
   getNodeDefChildren,
   getNodeDefsByCodeListUUID,
 
-  getNodeDefCodeListLevelIndex,
-  getNodeDefCodeParent,
-  getNodeDefCodePossibleParents,
-
   // UPDATE
   assocSurveyProp: setProp,
   assocSurveyPropValidation,
@@ -323,9 +329,24 @@ module.exports = {
   // DELETE nodeDefs
   dissocNodeDef,
 
+  // UTILS
+  getSurveyDBSchema: surveyId => `survey_${surveyId}`,
+
+  // UTILS NodeDefs
+  getNodeDefParent,
+  isNodeDefAncestor,
+
   //=======
   // CodeLists
   //=======
+
+  //NodeDef CodeList
+  isNodeDefCodeParent,
+  getNodeDefCodeListLevelIndex,
+  getNodeDefCodeParent,
+  getNodeDefCodeCandidateParents,
+  canUpdateCodeList,
+
   // READ codeLists
   getSurveyCodeLists,
   getSurveyCodeListsArray,
@@ -336,10 +357,4 @@ module.exports = {
   assocSurveyCodeListLevel,
   assocSurveyCodeListItem,
 
-  // UTILS
-  getSurveyDBSchema: surveyId => `survey_${surveyId}`,
-
-  // UTILS NodeDefs
-  getNodeDefParent,
-  isNodeDefAncestor,
 }

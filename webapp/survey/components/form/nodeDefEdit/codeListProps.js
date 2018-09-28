@@ -8,8 +8,9 @@ import {
   getSurveyCodeListByUUID,
   getSurveyCodeListsArray,
   getNodeDefCodeParent,
-  getNodeDefCodePossibleParents,
+  getNodeDefCodeCandidateParents,
   getNodeDefCodeListLevelIndex,
+  canUpdateCodeList,
 } from '../../../../../common/survey/survey'
 
 import {
@@ -48,12 +49,15 @@ const CodeListProps = (props) => {
   const codeListLevelName = getCodeListLevelName(
     getCodeListLevelByIndex(getNodeDefCodeListLevelIndex(nodeDef)(survey))(selectedCodeList)
   )
-  const possibleParentCodeNodeDefs = getNodeDefCodePossibleParents(nodeDef)(survey)
+  const possibleParentCodeNodeDefs = getNodeDefCodeCandidateParents(nodeDef)(survey)
   const possibleParentCodeItems = possibleParentCodeNodeDefs.map(nodeDef => ({
     key: nodeDef.uuid,
     value: getNodeDefName(nodeDef)
   }))
+
   const parentCodeDef = getNodeDefCodeParent(nodeDef)(survey)
+
+  const disabled = !canUpdateCodeList(nodeDef)(survey)
 
   return (
     <React.Fragment>
@@ -63,7 +67,8 @@ const CodeListProps = (props) => {
           display: 'grid',
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
-          <Dropdown items={getCodeListItems(survey)}
+          <Dropdown disabled={disabled}
+                    items={getCodeListItems(survey)}
                     selection={selectedCodeList ? getCodeListItem(selectedCodeList) : null}
                     onChange={item => {
                       putNodeDefProp(nodeDef, 'parentCodeUUID', null) //reset parent code
@@ -106,7 +111,7 @@ const CodeListProps = (props) => {
           display: 'grid',
           gridTemplateColumns: '1fr 200px',
         }}>
-          <Dropdown disabled={R.isEmpty(possibleParentCodeNodeDefs)}
+          <Dropdown disabled={disabled}
                     items={possibleParentCodeItems}
                     selection={parentCodeDef ? {key: parentCodeDef.uuid, value: getNodeDefName(parentCodeDef)} : null}
                     onChange={item => putNodeDefProp(nodeDef, 'parentCodeUUID', item ? item.key : null)}/>
