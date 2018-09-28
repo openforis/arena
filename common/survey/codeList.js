@@ -19,11 +19,19 @@ const newCodeList = () => ({
 })
 
 // ====== READ
+const getCodeListLevels = R.prop(levels)
 const getCodeListLevelsArray = R.pipe(
-  R.prop(levels),
+  getCodeListLevels,
   R.values,
   R.sortBy(R.prop('index'))
 )
+
+const getCodeListLevelsLength = R.pipe(
+  getCodeListLevels,
+  R.keys,
+  R.length
+)
+
 const getCodeListLevelById = id => R.pipe(
   getCodeListLevelsArray,
   R.find(R.propEq('id', id)),
@@ -107,6 +115,7 @@ module.exports = {
   //CREATE
   newCodeListLevel,
   //READ
+  getCodeListLevelsLength,
   getCodeListLevelName: getProp('name'),
   getCodeListLevelValidation: levelIndex => R.path(['validation', 'levels', levelIndex]),
   //UPDATE

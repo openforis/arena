@@ -81,6 +81,7 @@ module.exports = {
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
   getCodeListUUID: getProp('codeListUUID'),
+  getParentCodeUUID: getProp('parentCodeUUID'),
 
   isNodeDefKey,
   isNodeDefMultiple,

@@ -7,9 +7,14 @@ import Dropdown from '../../../../commonComponents/form/dropdown'
 import {
   getSurveyCodeListByUUID,
   getSurveyCodeListsArray,
+  getNodeDefCodeParent,
+  getNodeDefCodeCandidateParents,
+  getNodeDefCodeListLevelIndex,
+  canUpdateCodeList,
 } from '../../../../../common/survey/survey'
 
 import {
+  getNodeDefName,
   getCodeListUUID,
 } from '../../../../../common/survey/nodeDef'
 
@@ -22,6 +27,8 @@ import {
 
 import {
   getCodeListName,
+  getCodeListLevelByIndex,
+  getCodeListLevelName,
 } from '../../../../../common/survey/codeList'
 
 const getCodeListItem = (codeList) => ({key: codeList.uuid, value: getCodeListName(codeList)})
@@ -39,10 +46,18 @@ const CodeListProps = (props) => {
   } = props
 
   const selectedCodeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
+  const codeListLevelName = getCodeListLevelName(
+    getCodeListLevelByIndex(getNodeDefCodeListLevelIndex(nodeDef)(survey))(selectedCodeList)
+  )
+  const possibleParentCodeNodeDefs = getNodeDefCodeCandidateParents(nodeDef)(survey)
+  const possibleParentCodeItems = possibleParentCodeNodeDefs.map(nodeDef => ({
+    key: nodeDef.uuid,
+    value: getNodeDefName(nodeDef)
+  }))
 
-  const parentCodeAvailable = false //R.path(['levels', 'length'], selectedCodeList) > 0 //hierarchical TODO
-  const possibleParentCodeItems = [] //isCodeList ? [] : [] //TODO
-  const selectedParentCode = null //R.find(item => item.key === getNodeDefProp('parentCodeId')(nodeDef))(possibleParentCodeItems)
+  const parentCodeDef = getNodeDefCodeParent(nodeDef)(survey)
+
+  const disabled = !canUpdateCodeList(nodeDef)(survey)
 
   return (
     <React.Fragment>
@@ -52,9 +67,13 @@ const CodeListProps = (props) => {
           display: 'grid',
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
-          <Dropdown items={getCodeListItems(survey)}
+          <Dropdown disabled={disabled}
+                    items={getCodeListItems(survey)}
                     selection={selectedCodeList ? getCodeListItem(selectedCodeList) : null}
-                    onChange={item => putNodeDefProp(nodeDef, 'codeListUUID', item ? item.key : null)}/>
+                    onChange={item => {
+                      putNodeDefProp(nodeDef, 'parentCodeUUID', null) //reset parent code
+                      putNodeDefProp(nodeDef, 'codeListUUID', item ? item.key : null)
+                    }}/>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
                   onClick={() => {
@@ -92,13 +111,15 @@ const CodeListProps = (props) => {
           display: 'grid',
           gridTemplateColumns: '1fr 200px',
         }}>
-          <Dropdown disabled={!parentCodeAvailable}
+          <Dropdown disabled={disabled}
                     items={possibleParentCodeItems}
-                    selection={selectedParentCode}
-                    onChange={item => putNodeDefProp(nodeDef, 'parentCodeId', item.key)}/>
+                    selection={parentCodeDef ? {key: parentCodeDef.uuid, value: getNodeDefName(parentCodeDef)} : null}
+                    onChange={item => putNodeDefProp(nodeDef, 'parentCodeUUID', item ? item.key : null)}/>
+          <FormItem label="Level">
+            <label>{codeListLevelName}</label>
+          </FormItem>
         </div>
       </FormItem>
-
     </React.Fragment>
   )
 }
