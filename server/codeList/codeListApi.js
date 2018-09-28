@@ -6,7 +6,8 @@ const {getRestParam, getBoolParam} = require('../serverUtils/request')
 const {getCodeListLevelsArray} = require('../../common/survey/codeList')
 
 const {
-  fetchCodeListById
+  fetchCodeListById,
+  validateCodeListProps,
 } = require('../survey/surveyManager')
 
 const {
@@ -16,7 +17,7 @@ const {
 
 const {
   insertCodeList, insertCodeListLevel, insertCodeListItem,
-  fetchCodeListItemsByParentId, fetchCodeListItemsByCodeListId,
+  fetchCodeListItemsByCodeListId,
   updateCodeListProps, updateCodeListLevelProps, updateCodeListItemProps,
   deleteCodeList, deleteCodeListLevel, deleteCodeListItem,
 } = require('./codeListRepository')
@@ -97,12 +98,13 @@ module.exports.init = app => {
   app.put('/survey/:surveyId/codeLists/:codeListId', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
+      const codeListId = getRestParam(req, 'codeListId')
       const {codeList: codeListBody} = req.body
 
       await updateCodeListProps(surveyId, codeListBody)
-      const codeList = await fetchCodeListById(surveyId, codeListBody.id, true, true)
+      const validation = await validateCodeListProps(surveyId, codeListId)
 
-      res.json({codeList})
+      res.json({validation})
     } catch (err) {
       sendErr(res, err)
     }
@@ -116,7 +118,7 @@ module.exports.init = app => {
 
       const level = await updateCodeListLevelProps(surveyId, levelReq)
 
-      const codeList = await fetchCodeListById(surveyId, level.codeListId, true, false)
+      const codeList = await fetchCodeListById(surveyId, level.codeListId, true)
       const levels = getCodeListLevelsArray(codeList)
 
       const validation = await validateCodeListLevel(levels, level)

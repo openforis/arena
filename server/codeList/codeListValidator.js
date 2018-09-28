@@ -48,7 +48,13 @@ const validateCodeListLevels = async (codeList) => {
       async level => await validateCodeListLevel(levels, level)
     )
   )
-  return R.reduce((acc, validation) => R.assoc(R.keys(acc).length, validation)(acc), {})(validations)
+
+  const invalid = R.any(R.propEq('valid', false))(validations)
+  return {
+    valid: !invalid,
+    fields: Object.assign({}, validations)
+  }
+
 }
 
 // ====== ITEMS
@@ -59,11 +65,11 @@ const codeListItemValidators = (items) => ({
 
 const validateCodeListItemCodeUniqueness = items =>
   (propName, item) => {
-    const itemsInLevel = R.filter(it => it.levelId === item.levelId)(items)
+    const siblingItems = R.filter(it => it.parentId === item.parentId)(items)
 
     const hasDuplicates = R.any(
       l => getCodeListItemCode(l) === getCodeListItemCode(item) && l.id !== item.id,
-      itemsInLevel
+      siblingItems
     )
     return hasDuplicates
       ? 'duplicate'
@@ -71,56 +77,61 @@ const validateCodeListItemCodeUniqueness = items =>
   }
 
 const validateCodeListItem = async (items, item) => {
+
+  const childValidation = await validateCodeListItems(items, item.id)
   const validation = await validate(item, codeListItemValidators(items))
 
-  if (validation.valid) {
-    const children = R.filter(it => it.parentId === item.id)(items)
-    const childrenValidations = await Promise.all(children.map(async child => await validateCodeListItem(items, child)))
-    const hasInvalidChildren = R.any(childValidation => !childValidation.valid)(childrenValidations)
-
-    return {
-      valid: !hasInvalidChildren,
-      errors: hasInvalidChildren ? ['invalid_children'] : []
-    }
-  } else {
-    return validation
-  }
+  return R.pipe(
+    R.assoc('valid', validation.valid && childValidation.valid),
+    R.assocPath(['fields', 'items'], childValidation),
+  )(validation)
 }
 
-const validateCodeListItems = async (codeList, items) => {
-  const levels = getCodeListLevelsArray(codeList)
-  const firstLevel = R.head(levels)
+const validateCodeListItems = async (items, parentId) => {
 
-  const firstLevelItems = R.filter(item => item.levelId === firstLevel.id)(items)
+  const itemsToValidate = R.filter(R.propEq('parentId', parentId))(items)
 
-  const itemsValidations = await Promise.all(firstLevelItems.map(async item => await validateCodeListItem(items, item)))
+  const itemsValidation = await Promise.all(
+    itemsToValidate.map(async item => {
+        const validation = await validateCodeListItem(items, item)
+        return validation.valid
+          ? null
+          : {[item.uuid]: validation}
+      }
+    )
+  )
 
-  return {
-    valid: R.pipe(
-      R.any(validation => !validation.valid),
-      R.not,
-    )(itemsValidations)
-  }
+  return R.pipe(
+    R.reject(R.isNil),
+    R.mergeAll,
+    validations => R.pipe(
+      R.assoc('valid', R.isEmpty(validations)),
+      R.assoc('fields', validations)
+    )({})
+  )(itemsValidation)
 }
+
+const validateCodeListProps = async (codeLists, codeList) =>
+  await validate(codeList, codeListValidators(codeLists))
 
 const validateCodeList = async (codeLists, codeList, items) => {
-  const codeListValidation = await validate(codeList, codeListValidators(codeLists))
-  const {valid: codeListValid, ...codeListPartialValidation} = codeListValidation
+  const codeListValidation = await validateCodeListProps(codeLists, codeList)
   const levelsValidation = await validateCodeListLevels(codeList)
-  const levelsValid = !R.any(validation => !validation.valid)(R.values(levelsValidation))
+  const itemsValidation = await validateCodeListItems(items, null)
 
-  const itemsValidation = await validateCodeListItems(codeList, items)
+  const valid = codeListValidation.valid && levelsValidation.valid && itemsValidation.valid
 
-  return {
-    valid: codeListValid && levelsValid && itemsValidation.valid,
-    ...codeListPartialValidation,
-    levels: levelsValidation,
-    items: itemsValidation,
-  }
+  return R.pipe(
+    R.assoc('valid', valid),
+    R.assocPath(['fields', 'levels'], levelsValidation),
+    R.assocPath(['fields', 'items'], itemsValidation),
+  )(codeListValidation)
+
 }
 
 module.exports = {
   validateCodeList,
+  validateCodeListProps,
   validateCodeListLevel,
   validateCodeListItem,
 }

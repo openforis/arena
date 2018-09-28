@@ -6,7 +6,10 @@ const {
   getProp,
   toIndexedObj,
 } = require('./surveyUtils')
-
+const {
+  getValidation,
+  getFieldValidation,
+} = require('../validation/validator')
 const levels = 'levels'
 
 /**
@@ -117,7 +120,11 @@ module.exports = {
   //READ
   getCodeListLevelsLength,
   getCodeListLevelName: getProp('name'),
-  getCodeListLevelValidation: levelIndex => R.path(['validation', 'levels', levelIndex]),
+  getCodeListLevelValidation: levelIndex => R.pipe(
+    getValidation,
+    getFieldValidation('levels'),
+    getFieldValidation(levelIndex),
+  ),
   //UPDATE
   assocCodeListLevelProp,
   assocCodeListLevelValidation: (levelIndex, validation) => R.assocPath(['validation', 'levels', levelIndex], validation),

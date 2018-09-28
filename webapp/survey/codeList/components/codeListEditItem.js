@@ -45,6 +45,13 @@ class CodeListEditItem extends React.Component {
            onClick={() => active ? null : setCodeListItemForEdit(item, true)}
            ref={this.elemRef}>
         {
+          !isValid(item) &&
+          <span className="error-badge">
+            <span className="icon icon-warning icon-12px"/>
+          </span>
+        }
+
+        {
           active
             ? (
               <React.Fragment>
@@ -77,17 +84,6 @@ class CodeListEditItem extends React.Component {
             )
             : (
               <React.Fragment>
-                <div>
-                  {
-                    isValid(item)
-                      ? null
-                      : (
-                        <span className="error-badge">
-                          <span className="icon icon-warning icon-12px icon-left"/>
-                        </span>
-                      )
-                  }
-                </div>
                 <div>{getCodeListItemCode(item)}</div>
                 <div>{'\xA0'}-{'\xA0'}</div>
                 <div>{getCodeListItemLabel(language)(item)}</div>

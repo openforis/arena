@@ -15,9 +15,13 @@ const {
   fetchCodeListItemsByCodeListId,
 } = require('../codeList/codeListRepository')
 const {
-  validateCodeList
+  validateCodeListProps: codeListValidatorProps,
+  validateCodeList,
 } = require('../codeList/codeListValidator')
 
+/**
+ * ===== CODE LIST
+ */
 const fetchCodeListsWithLevels = async (surveyId, draft) => {
   const codeListsDb = await fetchCodeListsBySurveyId(surveyId, draft)
 
@@ -34,16 +38,9 @@ const assocCodeListValidation = async (codeList, codeListsWithLevels, codeListIt
   validation: await validateCodeList(codeListsWithLevels, codeList, codeListItems)
 })
 
-const fetchCodeListById = async (surveyId, codeListId, draft, validate = false) => {
+const fetchCodeListById = async (surveyId, codeListId, draft) => {
   const codeListsWithLevels = await fetchCodeListsWithLevels(surveyId, draft)
-  const codeList = R.find(R.propEq('id', codeListId))(codeListsWithLevels)
-
-  if (validate) {
-    const items = await fetchCodeListItemsByCodeListId(surveyId, codeList.id, draft)
-    return await assocCodeListValidation(codeList, codeListsWithLevels, items)
-  } else {
-    return codeList
-  }
+  return R.find(R.propEq('id', codeListId))(codeListsWithLevels)
 }
 
 const fetchCodeLists = async (surveyId, draft) => {
@@ -57,6 +54,15 @@ const fetchCodeLists = async (surveyId, draft) => {
   )
 }
 
+const validateCodeListProps = async (surveyId, codeListId) => {
+  const codeListsWithLevels = await fetchCodeListsWithLevels(surveyId, true)
+  const codeList = R.find(R.propEq('id', codeListId))(codeListsWithLevels)
+  return await codeListValidatorProps(codeListsWithLevels, codeList)
+}
+
+/**
+ * ===== SURVEY
+ */
 const fetchSurveyById = async (id, draft) => {
   const survey = await getSurveyById(id, draft)
   const codeLists = await fetchCodeLists(id, draft)
@@ -71,4 +77,5 @@ const fetchSurveyById = async (id, draft) => {
 module.exports = {
   fetchSurveyById,
   fetchCodeListById,
+  validateCodeListProps,
 }
