@@ -44,11 +44,12 @@
 
 .code-lists__edit-levels {
   display: flex;
+  justify-content: center;
   overflow-x: auto;
 
   .btn-add-level {
     align-self: start;
-    margin-left: 4rem;
+    margin-left: 1rem;
   }
 }
 
@@ -92,7 +93,7 @@
 }
 
 .code-lists__edit-level-items {
-  max-height: calc(100vh - 23rem);
+  height: calc(100vh - 25rem);
   overflow-y: auto;
 }
 

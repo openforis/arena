@@ -19,6 +19,10 @@ import {
   assocCodeListLevelValidation,
   dissocCodeListLevelValidation,
 } from '../../../common/survey/codeList'
+import {
+  updateFieldValidation,
+  getFieldValidation,
+} from '../../../common/validation/validator'
 
 import { getSurvey } from '../surveyState'
 import { debounceAction } from '../../appUtils/reduxUtils'
@@ -121,7 +125,7 @@ export const putCodeListProp = (codeListUUID, key, value) => async (dispatch, ge
   const codeList = R.pipe(
     getCodeListEditCodeList,
     assocCodeListProp(key, value),
-    R.dissocPath(['validation','fields',key]),
+    R.dissocPath(['validation', 'fields', key]),
   )(survey)
 
   dispatchCodeListUpdate(dispatch, codeList)
@@ -131,14 +135,13 @@ export const putCodeListProp = (codeListUUID, key, value) => async (dispatch, ge
       const {data} = await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}`, {codeList})
       const {validation} = data
 
-      const updatedCodeList = R.pipe(
-        R.assocPath(['validation','fields',key], R.path(['fields',key])(validation) ),
-        cl => {
-          const valid = R.none(R.propEq('valid',false), R.values(cl))
-          return R.assocPath(['validation','valid'], valid, cl)
-        }
+      const updatedValidation = updateFieldValidation(
+        key,
+        getFieldValidation(key)(validation)
+      )(codeList.validation)
 
-      )(codeList)
+      const updatedCodeList = R.assoc('validation', updatedValidation)(codeList)
+
       dispatchCodeListUpdate(dispatch, updatedCodeList)
     } catch (e) {}
   }
