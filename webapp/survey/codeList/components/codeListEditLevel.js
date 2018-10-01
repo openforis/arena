@@ -24,6 +24,7 @@ import {
   getCodeListEditActiveLevelItem,
   getCodeListEditCodeList,
   getCodeListEditLevelItemsArray,
+  getCodeListEditActiveItemAndAncestorsUUIDs,
 } from '../codeListEditorState'
 import { putCodeListItemProp } from '../actions'
 
@@ -39,7 +40,7 @@ class CodeListEditLevel extends React.Component {
 
   render () {
     const {
-      survey, codeList, level, items, activeItemUUID, disabledItems,
+      survey, codeList, level, ancestorItemUUIDs, items, activeItemUUID, disabledItems,
       canBeDeleted,
       createCodeListItem, putCodeListLevelProp, putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
     } = this.props
@@ -79,7 +80,9 @@ class CodeListEditLevel extends React.Component {
           items.map(item =>
             <CodeListEditItem key={item.uuid}
                               survey={survey}
+                              codeList={codeList}
                               level={level}
+                              ancestorItemUUIDs={ancestorItemUUIDs}
                               item={item}
                               active={item.uuid === activeItemUUID}
                               putCodeListItemProp={putCodeListItemProp}
@@ -99,14 +102,16 @@ const mapStateToProps = (state, props) => {
 
   const codeList = getCodeListEditCodeList(survey)
   const activeItem = getCodeListEditActiveLevelItem(level.index)(survey)
-  const previousLevelEditedItem = getCodeListEditActiveLevelItem(level.index - 1)(survey)
-  const disabledItems = level.index > 0 && !previousLevelEditedItem
+  const ancestorItemUUIDs = getCodeListEditActiveItemAndAncestorsUUIDs(level.index - 1)(survey)
+  const previousLevelActiveItem = getCodeListEditActiveLevelItem(level.index - 1)(survey)
+  const disabledItems = level.index > 0 && !previousLevelActiveItem
   const items = disabledItems ? [] : getCodeListEditLevelItemsArray(level.index)(survey)
   const canBeDeleted = isCodeListLevelDeleteAllowed(level)(codeList)
 
   return {
     survey,
     codeList,
+    ancestorItemUUIDs,
     items,
     activeItemUUID: activeItem ? activeItem.uuid : null,
     disabledItems,

@@ -273,6 +273,7 @@ Dropdown.defaultProps = {
   disabled: false,
   items: [],
   selection: null,
+  onChange: null,
 }
 
 export default Dropdown

@@ -3,22 +3,20 @@ const R = require('ramda')
 const {sendOk, sendErr} = require('../serverUtils/response')
 const {getRestParam, getBoolParam} = require('../serverUtils/request')
 
-const {getCodeListLevelsArray} = require('../../common/survey/codeList')
-
 const {
   fetchCodeListById,
   validateCodeListProps,
 } = require('../survey/surveyManager')
 
 const {
-  validateCodeListLevel,
-  validateCodeListItem
+  validateCodeListLevels,
+  validateCodeListItems,
 } = require('../../server/codeList/codeListValidator')
 
 const {
   insertCodeList, insertCodeListLevel, insertCodeListItem,
   fetchCodeListItemsByCodeListId,
-  updateCodeListProps, updateCodeListLevelProps, updateCodeListItemProps,
+  updateCodeListProp, updateCodeListLevelProp, updateCodeListItemProp,
   deleteCodeList, deleteCodeListLevel, deleteCodeListItem,
 } = require('./codeListRepository')
 
@@ -79,15 +77,7 @@ module.exports.init = app => {
       const allItems = await fetchCodeListItemsByCodeListId(surveyId, codeListId, draft)
       const items = R.filter(item => parentId ? item.parentId === parentId : item.parentId === null)(allItems)
 
-      const itemsAndValidation = await Promise.all(
-        items.map(
-          async item => ({
-            ...item,
-            validation: await validateCodeListItem(allItems, item),
-          })
-        )
-      )
-      res.json({items: itemsAndValidation})
+      res.json({items})
     } catch (err) {
       sendErr(res, err)
     }
@@ -99,9 +89,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
-      const {codeList: codeListBody} = req.body
+      const {body} = req
 
-      await updateCodeListProps(surveyId, codeListBody)
+      await updateCodeListProp(surveyId, codeListId, body)
       const validation = await validateCodeListProps(surveyId, codeListId)
 
       res.json({validation})
@@ -113,15 +103,15 @@ module.exports.init = app => {
   app.put('/survey/:surveyId/codeLists/:codeListId/levels/:levelId', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
+      const codeListId = getRestParam(req, 'codeListId')
+      const levelId = getRestParam(req, 'levelId')
+      const {body} = req
 
-      const {level: levelReq} = req.body
+      const level = await updateCodeListLevelProp(surveyId, levelId, body)
 
-      const level = await updateCodeListLevelProps(surveyId, levelReq)
+      const codeList = await fetchCodeListById(surveyId, codeListId, true)
 
-      const codeList = await fetchCodeListById(surveyId, level.codeListId, true)
-      const levels = getCodeListLevelsArray(codeList)
-
-      const validation = await validateCodeListLevel(levels, level)
+      const validation = await validateCodeListLevels(codeList)
 
       res.json({
         level,
@@ -136,19 +126,18 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
+      const itemId = getRestParam(req, 'itemId')
 
-      const {item: itemReq} = req.body
+      const {body} = req
 
-      const item = await updateCodeListItemProps(surveyId, itemReq)
-
+      const item = await updateCodeListItemProp(surveyId, itemId, body)
+      console.log(item)
       const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, true)
-      const validation = await validateCodeListItem(items, item)
+      const siblingItemsValidation = await validateCodeListItems(items, item.parentId)
 
       res.json({
-        item: {
-          ...item,
-          validation,
-        }
+        item,
+        siblingItemsValidation,
       })
     } catch (err) {
       sendErr(res, err)

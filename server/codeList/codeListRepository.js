@@ -90,21 +90,24 @@ const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = fals
   )
 
 // ============== UPDATE
-const updateProps = async (tableName, surveyId, item, client = db) =>
-  await client.one(
+const updateProp = async (tableName, surveyId, id, {key, value}, client = db) => {
+  const prop = {[key]: value}
+
+  return await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
-     SET props_draft = $1
+     SET props_draft = props_draft || $1
      WHERE id = $2
-     RETURNING *`,
-    [item.props, item.id],
-    def => dbTransformCallback(def, true)
+     RETURNING *`
+    , [JSON.stringify(prop), id]
+    , def => console.log(def) || dbTransformCallback(def, true)
   )
+}
 
-const updateCodeListProps = R.partial(updateProps, ['code_list'])
+const updateCodeListProp = R.partial(updateProp, ['code_list'])
 
-const updateCodeListLevelProps = R.partial(updateProps, ['code_list_level'])
+const updateCodeListLevelProp = R.partial(updateProp, ['code_list_level'])
 
-const updateCodeListItemProps = R.partial(updateProps, ['code_list_item'])
+const updateCodeListItemProp = R.partial(updateProp, ['code_list_item'])
 
 // ============== DELETE
 const deleteItem = async (tableName, surveyId, id, client = db) =>
@@ -133,9 +136,9 @@ module.exports = {
   fetchCodeListItemsByCodeListId,
 
   //UPDATE
-  updateCodeListProps,
-  updateCodeListLevelProps,
-  updateCodeListItemProps,
+  updateCodeListProp,
+  updateCodeListLevelProp,
+  updateCodeListItemProp,
 
   //DELETE
   deleteCodeList,

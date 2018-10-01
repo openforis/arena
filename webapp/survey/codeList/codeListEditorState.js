@@ -48,12 +48,16 @@ export const getCodeListEditCodeList = state => R.pipe(
 
 const getActiveLevelItem = R.pipe(
   R.path(activeLevelItemPath),
-  R.defaultTo([]),
+  R.defaultTo({}),
+)
+
+const getActiveLevelItemUUID = levelIndex => R.pipe(
+  getActiveLevelItem,
+  R.prop(levelIndex),
 )
 
 export const getCodeListEditActiveLevelItem = levelIndex => state => R.pipe(
-  getActiveLevelItem,
-  R.prop(levelIndex),
+  getActiveLevelItemUUID(levelIndex),
   activeItemUUID => R.find(item => item.uuid === activeItemUUID, getCodeListEditLevelItemsArray(levelIndex)(state))
 )(state)
 
@@ -70,6 +74,14 @@ export const getCodeListEditLevelItemsArray = levelIndex => R.pipe(
 )
 
 export const getCodeListEditLevelItemByUUID = (levelIndex, itemUUID) => R.path(R.concat(levelItemsPath, [levelIndex, itemUUID]))
+
+export const getCodeListEditActiveItemAndAncestorsUUIDs = levelIndex => state => R.pipe(
+  getActiveLevelItem,
+  R.keys,
+  R.filter(index => index <= levelIndex),
+  R.sort((a, b) => Number(a.id) - Number(b.id)),
+  R.reduce((acc, prevLevelIndex) => R.append(getActiveLevelItemUUID(prevLevelIndex)(state), acc), []),
+)(state)
 
 // ========== UPDATE
 

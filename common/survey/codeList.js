@@ -6,11 +6,15 @@ const {
   getProp,
   toIndexedObj,
 } = require('./surveyUtils')
+
 const {
   getValidation,
   getFieldValidation,
+  updateValidationStatus,
 } = require('../validation/validator')
 const levels = 'levels'
+
+const itemsValidationPath = ['validation', 'fields', 'items']
 
 /**
  * CODE LIST
@@ -78,12 +82,69 @@ const newCodeListItem = (levelId, parentId = null) => {
     uuid: uuidv4(),
     levelId,
     parentId,
+    props: {},
   }
 }
 
+// ====== READ
 const getCodeListItemLabels = getProp('labels')
 
 const getCodeListItemLabel = language => R.pipe(getCodeListItemLabels, R.prop(language))
+
+const getCodeListItemValidationPath = (ancestorAndSelfUUIDs) => R.reduce(
+  (currentPath, itemUUID) =>
+    R.concat(currentPath, ['fields', 'items', 'fields', itemUUID])
+  , ['validation']
+)(ancestorAndSelfUUIDs)
+
+const getCodeListItemsValidation = R.pathOr({valid: true, errors: []}, itemsValidationPath)
+
+const getCodeListItemValidation = ancestorAndSelfUUIDs =>
+  R.pathOr({valid: true, errors: []}, getCodeListItemValidationPath(ancestorAndSelfUUIDs))
+
+// ======= UPDATE
+const assocCodeListItemsValidation = validation => R.assocPath(itemsValidationPath, validation)
+
+const assocCodeListItemValidation = (ancestorAndSelfUUIDs, validation) =>
+  R.assocPath(getCodeListItemValidationPath(ancestorAndSelfUUIDs), validation)
+
+const dissocCodeListItemValidation = ancestorAndSelfUUIDs => codeList => R.pipe(
+  R.dissocPath(getCodeListItemValidationPath(ancestorAndSelfUUIDs)),
+  updateCodeListItemsValidationStatus(ancestorAndSelfUUIDs),
+)(codeList)
+
+const assocCodeListItemChildItemsValidation = (ancestorAndSelfUUIDs, validation) => codeList => {
+  const validationPath = R.isEmpty(ancestorAndSelfUUIDs)
+    ? itemsValidationPath
+    : R.concat(getCodeListItemValidationPath(ancestorAndSelfUUIDs), ['fields', 'items'])
+
+  return R.pipe(
+    R.assocPath(validationPath, validation),
+    updateCodeListItemsValidationStatus(ancestorAndSelfUUIDs)
+  )(codeList)
+}
+
+const updateCodeListItemsValidationStatus = ancestorAndSelfUUIDs => codeList => {
+  if (R.isEmpty(ancestorAndSelfUUIDs)) {
+    //update code list items global validation status
+    return R.pipe(
+      getCodeListItemsValidation,
+      updateValidationStatus,
+      newItemsValidation => assocCodeListItemsValidation(newItemsValidation)(codeList),
+    )(codeList)
+  } else {
+    const validation = getCodeListItemValidation(ancestorAndSelfUUIDs)(codeList)
+    const updatedValidation = updateValidationStatus(validation)
+    const updatedCodeList = updatedValidation.valid
+      ? R.dissocPath(getCodeListItemValidationPath(ancestorAndSelfUUIDs))(codeList)
+      : assocCodeListItemValidation(ancestorAndSelfUUIDs, {
+        ...updatedValidation
+      })(codeList)
+
+    //update parent item validation status
+    return updateCodeListItemsValidationStatus(R.take(ancestorAndSelfUUIDs.length - 1, ancestorAndSelfUUIDs))(updatedCodeList)
+  }
+}
 
 // UTILS
 const isCodeListLevelDeleteAllowed = level => R.pipe(
@@ -127,8 +188,8 @@ module.exports = {
   ),
   //UPDATE
   assocCodeListLevelProp,
-  assocCodeListLevelValidation: (levelIndex, validation) => R.assocPath(['validation', 'levels', levelIndex], validation),
-  dissocCodeListLevelValidation: levelIndex => R.dissocPath(['validation', 'levels', R.toString(levelIndex)]),
+  assocCodeListLevelsValidation: validation => R.assocPath(['validation', 'fields', 'levels'], validation),
+  dissocCodeListLevelValidation: levelIndex => R.dissocPath(['validation', 'fields', 'levels', 'fields', R.toString(levelIndex)]),
   // DELETE
 
   // ====== CODELIST ITEM
@@ -140,9 +201,12 @@ module.exports = {
   getCodeListItemCode: getProp('code'),
   getCodeListItemLabels,
   getCodeListItemLabel,
+  getCodeListItemValidation,
 
   //UPDATE
   assocCodeListItemProp: setProp,
+  dissocCodeListItemValidation,
+  assocCodeListItemChildItemsValidation,
 
   //UTILS
   isCodeListLevelDeleteAllowed,

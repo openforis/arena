@@ -5,9 +5,13 @@ import LabelsEditor from '../../components/labelsEditor'
 import { FormItem, Input } from '../../../commonComponents/form/input'
 
 import { normalizeName } from '../../../../common/survey/surveyUtils'
-import { getValidation, isValid } from '../../../../common/validation/validator'
 import { getSurveyDefaultLanguage } from '../../../../common/survey/survey'
-import { getCodeListItemCode, getCodeListItemLabel, getCodeListItemLabels } from '../../../../common/survey/codeList'
+import {
+  getCodeListItemCode,
+  getCodeListItemLabel,
+  getCodeListItemLabels,
+  getCodeListItemValidation
+} from '../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../common/validation/validator'
 
 class CodeListEditItem extends React.Component {
@@ -33,11 +37,11 @@ class CodeListEditItem extends React.Component {
 
   render () {
     const {
-      survey, level, item, active,
+      survey, codeList, level, ancestorItemUUIDs, item, active,
       putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem
     } = this.props
 
-    const validation = getValidation(item)
+    const validation = getCodeListItemValidation(R.append(item.uuid, ancestorItemUUIDs))(codeList)
     const language = getSurveyDefaultLanguage(survey)
 
     return (
@@ -45,7 +49,7 @@ class CodeListEditItem extends React.Component {
            onClick={() => active ? null : setCodeListItemForEdit(item, true)}
            ref={this.elemRef}>
         {
-          !isValid(item) &&
+          !validation.valid &&
           <span className="error-badge">
             <span className="icon icon-warning icon-12px"/>
           </span>

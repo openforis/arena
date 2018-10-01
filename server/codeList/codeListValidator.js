@@ -43,6 +43,7 @@ const validateCodeListLevel = async (levels, level) =>
 
 const validateCodeListLevels = async (codeList) => {
   const levels = getCodeListLevelsArray(codeList)
+
   const validations = await Promise.all(
     levels.map(
       async level => await validateCodeListLevel(levels, level)
@@ -76,9 +77,10 @@ const validateCodeListItemCodeUniqueness = items =>
       : null
   }
 
-const validateCodeListItem = async (items, item) => {
+const validateCodeListItem = async (items, itemId) => {
 
-  const childValidation = await validateCodeListItems(items, item.id)
+  const childValidation = await validateCodeListItems(items, itemId)
+  const item = R.find(R.propEq('id', itemId))(items)
   const validation = await validate(item, codeListItemValidators(items))
 
   return R.pipe(
@@ -93,7 +95,7 @@ const validateCodeListItems = async (items, parentId) => {
 
   const itemsValidation = await Promise.all(
     itemsToValidate.map(async item => {
-        const validation = await validateCodeListItem(items, item)
+        const validation = await validateCodeListItem(items, item.id)
         return validation.valid
           ? null
           : {[item.uuid]: validation}
@@ -132,6 +134,6 @@ const validateCodeList = async (codeLists, codeList, items) => {
 module.exports = {
   validateCodeList,
   validateCodeListProps,
-  validateCodeListLevel,
-  validateCodeListItem,
+  validateCodeListLevels,
+  validateCodeListItems,
 }
