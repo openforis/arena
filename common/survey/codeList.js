@@ -11,9 +11,11 @@ const {
   getValidation,
   getFieldValidation,
   updateValidationStatus,
+  dissocFieldValidation,
+  updateFieldValidation,
 } = require('../validation/validator')
-const levels = 'levels'
 
+const levels = 'levels'
 const itemsValidationPath = ['validation', 'fields', 'items']
 
 /**
@@ -97,54 +99,79 @@ const getCodeListItemValidationPath = (ancestorAndSelfUUIDs) => R.reduce(
   , ['validation']
 )(ancestorAndSelfUUIDs)
 
-const getCodeListItemsValidation = R.pathOr({valid: true, errors: []}, itemsValidationPath)
+const getCodeListItemChildItemsValidationPath = itemUUIDs => {
+  if (R.isEmpty(itemUUIDs)) {
+    return ['validation', 'fields', 'items']
+  } else {
+    const lastItemUUID = R.last(itemUUIDs)
+    const firstItemUUIDs = R.take(itemUUIDs.length - 1, itemUUIDs)
+    return R.concat(getCodeListItemChildItemsValidationPath(firstItemUUIDs), ['fields', lastItemUUID, 'fields', 'items'])
+  }
+}
+
+const getValidationByPath = path => R.pathOr({valid: true}, path)
+
+const getCodeListItemsValidation = R.pathOr({valid: true}, itemsValidationPath)
 
 const getCodeListItemValidation = ancestorAndSelfUUIDs =>
-  R.pathOr({valid: true, errors: []}, getCodeListItemValidationPath(ancestorAndSelfUUIDs))
+  getCodeListItemValidationByPath(getCodeListItemValidationPath(ancestorAndSelfUUIDs))
+
+const getCodeListItemValidationByPath = path =>
+  R.pathOr({valid: true}, path)
 
 // ======= UPDATE
 const assocCodeListItemsValidation = validation => R.assocPath(itemsValidationPath, validation)
 
-const assocCodeListItemValidation = (ancestorAndSelfUUIDs, validation) =>
-  R.assocPath(getCodeListItemValidationPath(ancestorAndSelfUUIDs), validation)
-
-const dissocCodeListItemValidation = ancestorAndSelfUUIDs => codeList => R.pipe(
-  R.dissocPath(getCodeListItemValidationPath(ancestorAndSelfUUIDs)),
-  updateCodeListItemsValidationStatus(ancestorAndSelfUUIDs),
-)(codeList)
-
-const assocCodeListItemChildItemsValidation = (ancestorAndSelfUUIDs, validation) => codeList => {
-  const validationPath = R.isEmpty(ancestorAndSelfUUIDs)
-    ? itemsValidationPath
-    : R.concat(getCodeListItemValidationPath(ancestorAndSelfUUIDs), ['fields', 'items'])
-
+const dissocCodeListItemValidation = ancestorAndSelfUUIDs => codeList => {
   return R.pipe(
-    R.assocPath(validationPath, validation),
+    R.dissocPath(getCodeListItemValidationPath(ancestorAndSelfUUIDs)),
     updateCodeListItemsValidationStatus(ancestorAndSelfUUIDs)
   )(codeList)
 }
 
-const updateCodeListItemsValidationStatus = ancestorAndSelfUUIDs => codeList => {
-  if (R.isEmpty(ancestorAndSelfUUIDs)) {
-    //update code list items global validation status
-    return R.pipe(
-      getCodeListItemsValidation,
-      updateValidationStatus,
-      newItemsValidation => assocCodeListItemsValidation(newItemsValidation)(codeList),
-    )(codeList)
-  } else {
-    const validation = getCodeListItemValidation(ancestorAndSelfUUIDs)(codeList)
-    const updatedValidation = updateValidationStatus(validation)
-    const updatedCodeList = updatedValidation.valid
-      ? R.dissocPath(getCodeListItemValidationPath(ancestorAndSelfUUIDs))(codeList)
-      : assocCodeListItemValidation(ancestorAndSelfUUIDs, {
-        ...updatedValidation
-      })(codeList)
+const assocCodeListItemChildItemsValidation = (ancestorAndSelfUUIDs, validation) =>
+  codeList => {
+    const validationPath = getCodeListItemChildItemsValidationPath(ancestorAndSelfUUIDs)
 
-    //update parent item validation status
-    return updateCodeListItemsValidationStatus(R.take(ancestorAndSelfUUIDs.length - 1, ancestorAndSelfUUIDs))(updatedCodeList)
+    return R.pipe(
+      R.assocPath(validationPath, validation),
+      updateCodeListItemsValidationStatus(ancestorAndSelfUUIDs)
+    )(codeList)
   }
-}
+
+const updateCodeListItemsValidationStatus = ancestorUUIDs =>
+  codeList => {
+    if (R.isEmpty(ancestorUUIDs)) {
+      //update code list items global validation status
+      return R.pipe(
+        getCodeListItemsValidation,
+        updateValidationStatus,
+        newItemsValidation => assocCodeListItemsValidation(newItemsValidation)(codeList),
+      )(codeList)
+    } else {
+      const itemValidationPath = getCodeListItemValidationPath(ancestorUUIDs)
+      return updateAncestorItemsValidationStatusByPath(itemValidationPath)(codeList)
+    }
+  }
+
+const updateAncestorItemsValidationStatusByPath = path =>
+  codeList => {
+    const validation = updateValidationStatus(getValidationByPath(path)(codeList))
+    const parentValidationPath = R.take(path.length - 2, path)
+    const field = R.last(path)
+    const parentValidation = getValidationByPath(parentValidationPath)(codeList)
+    const updatedParentValidation = validation.valid
+      ? dissocFieldValidation(field)(parentValidation)
+      : updateFieldValidation(field, validation)(parentValidation)
+
+    const updatedCodeList = R.assocPath(parentValidationPath, updatedParentValidation)(codeList)
+
+    if (R.equals(parentValidationPath, itemsValidationPath)) {
+      return updatedCodeList
+    } else {
+      return updateAncestorItemsValidationStatusByPath(parentValidationPath)(updatedCodeList)
+    }
+  }
 
 // UTILS
 const isCodeListLevelDeleteAllowed = level => R.pipe(

@@ -53,12 +53,16 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/codeLists/:codeListId/items', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
+      const codeListId = getRestParam(req, 'codeListId')
 
       const {body} = req
 
       const item = await insertCodeListItem(surveyId, body)
 
-      res.json({item})
+      res.json({
+        item,
+        siblingItemsValidation: await validateCodeListItemSiblingItems(surveyId, codeListId, item.parentId),
+      })
     } catch (err) {
       sendErr(res, err)
     }
@@ -131,13 +135,10 @@ module.exports.init = app => {
       const {body} = req
 
       const item = await updateCodeListItemProp(surveyId, itemId, body)
-      console.log(item)
-      const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, true)
-      const siblingItemsValidation = await validateCodeListItems(items, item.parentId)
 
       res.json({
         item,
-        siblingItemsValidation,
+        siblingItemsValidation: await validateCodeListItemSiblingItems(surveyId, codeListId, item.parentId),
       })
     } catch (err) {
       sendErr(res, err)
@@ -175,14 +176,22 @@ module.exports.init = app => {
   app.delete('/survey/:surveyId/codeLists/:codeListId/items/:itemId', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
+      const codeListId = getRestParam(req, 'codeListId')
       const itemId = getRestParam(req, 'itemId')
 
-      await deleteCodeListItem(surveyId, itemId)
+      const item = await deleteCodeListItem(surveyId, itemId)
 
-      sendOk(res)
+      res.json({
+        siblingItemsValidation: await validateCodeListItemSiblingItems(surveyId, codeListId, item.parentId),
+      })
     } catch (err) {
       sendErr(res, err)
     }
   })
+
+  const validateCodeListItemSiblingItems = async (surveyId, codeListId, parentItemId) => {
+    const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, true)
+    return await validateCodeListItems(items, parentItemId)
+  }
 
 }

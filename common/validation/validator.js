@@ -67,6 +67,11 @@ const updateFieldValidation = (key, fieldValidation) => R.pipe(
   updateValidationStatus,
 )
 
+const dissocFieldValidation = key => R.pipe(
+  R.dissocPath(['fields', key]),
+  updateValidationStatus,
+)
+
 module.exports = {
   validate,
   validateProp,
@@ -76,5 +81,6 @@ module.exports = {
   isValid,
   getFieldValidation,
   updateFieldValidation,
+  dissocFieldValidation,
   updateValidationStatus,
 }

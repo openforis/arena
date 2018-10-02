@@ -96,7 +96,11 @@ export const createCodeListItem = (level) => async (dispatch, getState) => {
 
   //save item
   const res = await axios.post(`/api/survey/${survey.id}/codeLists/${codeList.id}/items`, item)
-  const {item: insertedItem} = res.data
+  const {item: insertedItem, siblingItemsValidation} = res.data
+
+  //update sibling items validation
+  const parentItemsUUIDs = getCodeListEditActiveItemAndAncestorsUUIDs(level.index - 1)(survey)
+  dispatchCodeListUpdate(dispatch, assocCodeListItemChildItemsValidation(parentItemsUUIDs, siblingItemsValidation)(codeList))
 
   dispatchCodeListEditLevelItemsUpdate(dispatch, level.index, {[insertedItem.uuid]: insertedItem})
 }
@@ -166,7 +170,10 @@ export const putCodeListLevelProp = (codeListId, levelIndex, key, value) => asyn
   const level = getCodeListLevelByIndex(levelIndex)(codeList)
   const action = async () => {
     try {
-      const {data} = await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}/levels/${level.id}`, {key, value})
+      const {data} = await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}/levels/${level.id}`, {
+        key,
+        value
+      })
       const {validation} = data
       dispatchCodeListUpdate(dispatch, assocCodeListLevelsValidation(validation)(codeList))
     } catch (e) {}
@@ -244,7 +251,12 @@ export const deleteCodeListItem = item => async (dispatch, getState) => {
   dispatchCodeListEditLevelItemsUpdate(dispatch, level.index, {[item.uuid]: null})
 
   //delete item from db
-  await axios.delete(`/api/survey/${survey.id}/codeLists/${codeList.id}/items/${item.id}`)
+  const {data} = await axios.delete(`/api/survey/${survey.id}/codeLists/${codeList.id}/items/${item.id}`)
+
+  //update sibling items validation
+  const {siblingItemsValidation} = data
+  const parentItemsUUIDs = getCodeListEditActiveItemAndAncestorsUUIDs(level.index - 1)(survey)
+  dispatchCodeListUpdate(dispatch, assocCodeListItemChildItemsValidation(parentItemsUUIDs, siblingItemsValidation)(codeList))
 }
 
 // ==== OPEN / CLOSE EDITOR
