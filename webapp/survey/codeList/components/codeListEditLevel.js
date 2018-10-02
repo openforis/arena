@@ -1,4 +1,5 @@
 import React from 'react'
+import * as R from 'ramda'
 import { connect } from 'react-redux'
 
 import { FormItem, Input } from '../../../commonComponents/form/input'
@@ -6,8 +7,12 @@ import CodeListEditItem from './codeListEditItem'
 
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import {
+  getNodeDefsByCodeListUUID,
+  getNodeDefCodeListLevelIndex,
+} from '../../../../common/survey/survey'
+import {
   getCodeListLevelName,
-  getCodeListLevelValidation,
+  getCodeListLevelValidation, getCodeListName,
   isCodeListLevelDeleteAllowed
 } from '../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../common/validation/validator'
@@ -31,9 +36,12 @@ import { putCodeListItemProp } from '../actions'
 class CodeListEditLevel extends React.Component {
 
   handleDelete () {
-    const {level, deleteCodeListLevel} = this.props
+    const {survey, codeList, level, deleteCodeListLevel} = this.props
 
-    if (confirm('Delete the level with all items? This operation cannot be undone')) {
+    const codeListDefs = getNodeDefsByCodeListUUID(codeList.uuid)(survey)
+    if (R.any(def => getNodeDefCodeListLevelIndex(def)(survey) >= level.index)(codeListDefs)) {
+      alert('This code list level is used by some node definitions and cannot be removed')
+    } else if (confirm('Delete the level with all items? This operation cannot be undone')) {
       deleteCodeListLevel(level.index)
     }
   }
