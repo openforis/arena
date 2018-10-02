@@ -86,7 +86,7 @@ const updateProp = async (tableName, surveyId, id, {key, value}, client = db) =>
      WHERE id = $2
      RETURNING *`
     , [JSON.stringify(prop), id]
-    , def => console.log(def) || dbTransformCallback(def, true)
+    , def => dbTransformCallback(def, true)
   )
 }
 
@@ -101,8 +101,10 @@ const deleteItem = async (tableName, surveyId, id, client = db) =>
   await client.one(`
     DELETE 
     FROM ${getSurveyDBSchema(surveyId)}.${tableName} 
-    WHERE id = $1 RETURNING *
-  `, [id])
+    WHERE id = $1 RETURNING *`
+    , [id]
+    , def => dbTransformCallback(def, true)
+  )
 
 const deleteCodeList = R.partial(deleteItem, ['code_list'])
 
