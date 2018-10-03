@@ -8,7 +8,7 @@ import InputChips from '../../../../commonComponents/form/inputChips'
 import NodeDefFormItem from './nodeDefFormItem'
 
 import {
-  isRenderDropdown
+  isRenderDropdown, nodeDefRenderType
 } from '../../../../../common/survey/nodeDefLayout'
 import { getCodeListUUID, isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
 import { getCodeListItemCode, getCodeListItemLabel } from '../../../../../common/survey/codeList'
@@ -19,7 +19,7 @@ import { toQueryString } from '../../../../../server/serverUtils/request'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
 const CodeListDropdown = props => {
-  const {edit, nodeDef, nodes, items} = props
+  const {edit, nodeDef, nodes, items = []} = props
 
   const selectedCodes = R.pipe(
     R.values,
@@ -96,7 +96,7 @@ const Checkbox = props => {
 }
 
 const CodeListCheckbox = props => {
-  const {items} = props
+  const {items = []} = props
   return <div className="node-def__code-checkbox-wrapper">
     {
       items.map(item =>
@@ -107,6 +107,11 @@ const CodeListCheckbox = props => {
     }
   </div>
 }
+
+const CodeListRenderer = props =>
+  isRenderDropdown(props.nodeDef)
+    ? <CodeListDropdown {...props}/>
+    : <CodeListCheckbox {...props}/>
 
 class NodeDefCodeList extends React.Component {
 
@@ -153,19 +158,34 @@ class NodeDefCodeList extends React.Component {
   }
 
   render () {
-    const {nodeDef} = this.props
+    const {edit, label, renderType} = this.props
     const {items} = this.state
 
-    return (
-      <NodeDefFormItem {...this.props}>
-        {isRenderDropdown(nodeDef)
-          ? <CodeListDropdown {...this.props}
-                              items={items}/>
-          : <CodeListCheckbox {...this.props}
-                              items={items}/>
-        }
+    // table header
+    if (renderType === nodeDefRenderType.tableHeader) {
+      return <label className="node-def__table-header">
+        {label}
+      </label>
+    }
+
+    // EDIT MODE
+    if (edit)
+      return <NodeDefFormItem {...this.props}>
+        <CodeListDropdown {...this.props} />
       </NodeDefFormItem>
-    )
+
+    // ENTRY MODE
+    if (renderType === nodeDefRenderType.tableBody) {
+      return <CodeListRenderer {...this.props}
+                               items={items}/>
+    } else {
+      return (
+        <NodeDefFormItem {...this.props}>
+          <CodeListRenderer {...this.props}
+                            items={items}/>
+        </NodeDefFormItem>
+      )
+    }
   }
 }
 
