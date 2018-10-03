@@ -1,5 +1,4 @@
 import React from 'react'
-import * as R from 'ramda'
 
 import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
@@ -31,9 +30,6 @@ import {
   getCodeListLevelName,
 } from '../../../../../common/survey/codeList'
 
-const getCodeListItem = (codeList) => ({key: codeList.uuid, value: getCodeListName(codeList)})
-const getCodeListItems = R.pipe(getSurveyCodeListsArray, R.map(getCodeListItem))
-
 const CodeListProps = (props) => {
 
   const {
@@ -46,17 +42,19 @@ const CodeListProps = (props) => {
   } = props
 
   const selectedCodeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
-  const codeListLevelName = getCodeListLevelName(
-    getCodeListLevelByIndex(getNodeDefCodeListLevelIndex(nodeDef)(survey))(selectedCodeList)
-  )
-  const possibleParentCodeNodeDefs = getNodeDefCodeCandidateParents(nodeDef)(survey)
-  const possibleParentCodeItems = possibleParentCodeNodeDefs.map(nodeDef => ({
-    key: nodeDef.uuid,
-    value: getNodeDefName(nodeDef)
-  }))
-
+  const candidateParentCodeNodeDefs = getNodeDefCodeCandidateParents(nodeDef)(survey)
   const parentCodeDef = getNodeDefCodeParent(nodeDef)(survey)
-
+  const parentCodeDefLabelFunction = def => (
+    getNodeDefName(def)
+    + ' ('
+    + getCodeListLevelName(
+      getCodeListLevelByIndex(
+        getNodeDefCodeListLevelIndex(def)
+        (survey)
+      )(selectedCodeList)
+    )
+    + ')'
+  )
   const disabled = !canUpdateCodeList(nodeDef)(survey)
 
   return (
@@ -68,11 +66,13 @@ const CodeListProps = (props) => {
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
           <Dropdown disabled={disabled}
-                    items={getCodeListItems(survey)}
-                    selection={selectedCodeList ? getCodeListItem(selectedCodeList) : null}
-                    onChange={item => {
+                    items={getSurveyCodeListsArray(survey)}
+                    itemKeyProp={'uuid'}
+                    itemLabelFunction={codeList => getCodeListName(codeList)}
+                    selection={selectedCodeList}
+                    onChange={codeList => {
                       putNodeDefProp(nodeDef, 'parentCodeUUID', null) //reset parent code
-                      putNodeDefProp(nodeDef, 'codeListUUID', item ? item.key : null)
+                      putNodeDefProp(nodeDef, 'codeListUUID', codeList ? codeList.uuid : null)
                     }}/>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
@@ -112,12 +112,11 @@ const CodeListProps = (props) => {
           gridTemplateColumns: '1fr 200px',
         }}>
           <Dropdown disabled={disabled}
-                    items={possibleParentCodeItems}
-                    selection={parentCodeDef ? {key: parentCodeDef.uuid, value: getNodeDefName(parentCodeDef)} : null}
-                    onChange={item => putNodeDefProp(nodeDef, 'parentCodeUUID', item ? item.key : null)}/>
-          <FormItem label="Level">
-            <label>{codeListLevelName}</label>
-          </FormItem>
+                    items={candidateParentCodeNodeDefs}
+                    selection={parentCodeDef}
+                    itemKeyProp={'uuid'}
+                    itemLabelFunction={parentCodeDefLabelFunction}
+                    onChange={def => putNodeDefProp(nodeDef, 'parentCodeUUID', def ? def.uuid : null)}/>
         </div>
       </FormItem>
     </React.Fragment>

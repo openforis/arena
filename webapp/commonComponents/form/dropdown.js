@@ -34,7 +34,7 @@ class Dropdown extends React.Component {
     window.addEventListener('click', this.outsideClick)
   }
 
-  componentDidUpdate (prevProps, prevState, snapshot) {
+  componentDidUpdate (prevProps) {
     const {items, autocompleteMinChars} = this.props
     if (prevProps.items.length !== items.length)
       this.setState({
@@ -103,9 +103,16 @@ class Dropdown extends React.Component {
         items
         : autocompleteMinChars > 0 && searchValue.length < autocompleteMinChars ?
         []
-        : items.filter(item => item.key
-          ? contains(searchValue, item.key) || contains(searchValue, item.value)
-          : contains(searchValue, item)
+        : items.filter(item => {
+            if (R.is(Object)(item)) {
+              const key = this.getItemKey(item)
+              const label = this.getItemLabel(item)
+              return contains(searchValue, key)
+                || contains(searchValue, label)
+            } else {
+              return contains(searchValue, item)
+            }
+          }
         )
 
     this.setState({
@@ -118,7 +125,7 @@ class Dropdown extends React.Component {
     this.props.onChange(null)
   }
 
-  onInputFocus (e) {
+  onInputFocus () {
     if (!this.isOpened() && this.props.selection === null) {
       this.toggleOpened()
     }
@@ -211,7 +218,31 @@ class Dropdown extends React.Component {
   }
 
   getItemLabel (item = '') {
-    return item ? item.key ? `${item.value}` : item : ''
+    const {itemLabelFunction, itemLabelProp} = this.props
+    return (
+      R.is(Object)(item) ?
+        itemLabelFunction ?
+          itemLabelFunction(item)
+          : itemLabelProp ?
+          R.prop(itemLabelProp)(item)
+          : R.has('value')(item) ?
+            R.prop('value')(item)
+            : item
+        : item //primitive
+    )
+  }
+
+  getItemKey (item) {
+    const {itemKeyProp} = this.props
+    return (
+      R.is(Object, item) ?
+        itemKeyProp ?
+          R.prop(itemKeyProp)(item)
+          : R.has('key')(item) ?
+          R.prop('key')(item)
+          : item
+        : item //primitive
+    )
   }
 
   render () {
@@ -256,8 +287,9 @@ class Dropdown extends React.Component {
                  }}>
               {
                 items.map(
-                  item => <div key={item.key ? item.key : item} className={dropdownListItemClassName}
-                               onMouseDown={e => this.onSelectionChange(item)}
+                  item => <div key={this.getItemKey(item)}
+                               className={dropdownListItemClassName}
+                               onMouseDown={() => this.onSelectionChange(item)}
                                onKeyDown={e => this.onListItemKeyDown(e)}
                                tabIndex="1">
                     {this.getItemLabel(item)}
@@ -282,6 +314,9 @@ Dropdown.defaultProps = {
   items: [],
   selection: null,
   onChange: null,
+  itemKeyProp: null,
+  itemLabelProp: null,
+  itemLabelFunction: null,
 }
 
 export default Dropdown
