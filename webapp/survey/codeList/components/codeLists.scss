@@ -1,40 +1,5 @@
 @import "../../../style/vars";
 
-.code-lists {
-  display: grid;
-  grid-template-rows: 5rem 1fr 5rem;
-  height: 100%;
-}
-
-.code-lists__header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2rem;
-
-  button {
-    margin-left: 1rem;
-  }
-}
-
-.code-lists__table {
-  margin: 2rem 10rem;
-  max-height: calc(100vh - 14rem);
-  overflow-y: auto;
-}
-
-.code-lists__table-row {
-  display: grid;
-  grid-template-columns: 1fr repeat(3, 100px);
-  grid-auto-rows: 35px;
-  align-items: center;
-  border-bottom: 1px solid rgba($white, 0.5);
-
-  button {
-    justify-self: center;
-  }
-}
-
 .code-lists__edit {
   display: grid;
   grid-template-rows: 8rem 1fr 5rem;

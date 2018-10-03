@@ -3,12 +3,14 @@ import './codeLists.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import ItemsView from '../../../commonComponents/itemsView'
 import CodeListEdit from './codeListEdit'
-import CodeListsTable from './codeListsTable'
+
+import { getNodeDefsByCodeListUUID, getSurveyCodeListsArray } from '../../../../common/survey/survey'
+import { getCodeListName } from '../../../../common/survey/codeList'
 
 import { getSurvey } from '../../surveyState'
 import { getCodeListEditCodeList } from '../codeListEditorState'
-
 import {
   createCodeList,
   setCodeListForEdit,
@@ -17,43 +19,31 @@ import {
   createCodeListLevel
 } from '../../codeList/actions'
 
-const Header = props => (
-  <div className="code-lists__header">
-    <h5>Code lists</h5>
-
-    <button className="btn btn-s btn-of-light-xs"
-            onClick={() => props.createCodeList()}>
-      <span className="icon icon-plus icon-16px icon-left"/>
-      ADD
-    </button>
-  </div>
-)
-
 const CodeListsView = (props) => {
-  const {codeList, onClose} = props
+  const {survey, codeList, selectedCodeListUUID, createCodeList, deleteCodeList, setCodeListForEdit, onSelect} = props
 
-  return codeList
-    ? (
-      <CodeListEdit {...props}/>
-    )
-    : (
-      <div className="code-lists">
-        <Header {...props}/>
-        <CodeListsTable {...props} codeList={null}/>
-        {
-          onClose
-            ? <div style={{justifySelf: 'center'}}>
-              <button className="btn btn-of-light"
-                      onClick={() => {
-                        onClose ? onClose() : null
-                      }}>
-                Close
-              </button>
-            </div>
-            : null
-        }
-      </div>
-    )
+  const canDeleteCodeList = codeList => {
+    if (getNodeDefsByCodeListUUID(codeList.uuid)(survey).length > 0) {
+      alert('This code list is used by some node definitions and cannot be removed')
+    } else {
+      return window.confirm(`Delete the code list ${getCodeListName(codeList)}? This operation cannot be undone.`)
+    }
+  }
+
+  const codeLists = getSurveyCodeListsArray(survey)
+
+  return <ItemsView {...props}
+                    headerText="Code lists"
+                    itemEditComponent={CodeListEdit}
+                    itemEditProp="codeList"
+                    itemLabelFunction={codeList => getCodeListName(codeList)}
+                    editedItem={codeList}
+                    items={codeLists}
+                    tableSelectedItemUUID={selectedCodeListUUID}
+                    onAdd={createCodeList}
+                    onEdit={codeList => setCodeListForEdit(codeList)}
+                    canDelete={canDeleteCodeList}
+                    onDelete={deleteCodeList}/>
 }
 
 const mapStateToProps = state => {

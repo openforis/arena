@@ -24,14 +24,14 @@ const {
 
 // == utils
 const nodeDefs = 'nodeDefs'
+const codeLists = 'codeLists'
+const taxonomies = 'taxonomies'
 
 const defaultSteps = {
   '1': {name: 'entry'},
   '2': {name: 'cleansing', prev: '1'},
   '3': {name: 'analysis', prev: '2'},
 }
-
-const codeLists = 'codeLists'
 
 /**
  * ======
@@ -213,6 +213,26 @@ const assocSurveyCodeListItem = (codeListUUID, item) => survey => R.pipe(
 
 /**
  * ======
+ * READ Taxonomies
+ * ======
+ */
+const getSurveyTaxonomies = R.pipe(
+  R.prop(taxonomies),
+  R.defaultTo({})
+)
+
+const getSurveyTaxonomiesArray = R.pipe(
+  getSurveyTaxonomies,
+  R.values,
+)
+
+const getSurveyTaxonomyByUUID = uuid => R.pipe(
+  getSurveyTaxonomies,
+  R.prop(uuid)
+)
+
+/**
+ * ======
  * UTILS NodeDefs
  * ======
  */
@@ -357,4 +377,10 @@ module.exports = {
   assocSurveyCodeListLevel,
   assocSurveyCodeListItem,
 
+
+  //=======
+  // Taxonomies
+  //=======
+  getSurveyTaxonomiesArray,
+  getSurveyTaxonomyByUUID,
 }
