@@ -25,13 +25,17 @@ import {
 } from '../../../../../common/survey/nodeDefLayout'
 
 import {
+  getValidation,
+} from '../../../../../common/validation/validator'
+
+import {
   getCodeListName,
   getCodeListLevelByIndex,
   getCodeListLevelName,
 } from '../../../../../common/survey/codeList'
+import { getFieldValidation } from '../../../../../common/validation/validator'
 
 const CodeListProps = (props) => {
-
   const {
     survey,
     nodeDef,
@@ -41,6 +45,7 @@ const CodeListProps = (props) => {
     toggleCodeListEdit,
   } = props
 
+  const validation = getValidation(nodeDef)
   const selectedCodeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
   const candidateParentCodeNodeDefs = getNodeDefCodeCandidateParents(nodeDef)(survey)
   const parentCodeDef = getNodeDefCodeParent(nodeDef)(survey)
@@ -69,6 +74,7 @@ const CodeListProps = (props) => {
                     items={getSurveyCodeListsArray(survey)}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={codeList => getCodeListName(codeList)}
+                    validation={getFieldValidation('codeListUUID')(validation)}
                     selection={selectedCodeList}
                     onChange={codeList => {
                       putNodeDefProp(nodeDef, 'parentCodeUUID', null) //reset parent code
