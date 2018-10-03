@@ -8,6 +8,8 @@ import * as R from 'ramda'
 import { clickedOutside, elementOffset } from '../../appUtils/domUtils'
 import { Input } from './input'
 
+const dropdownListItemClassName = 'dropdown__list-item'
+
 class Dropdown extends React.Component {
 
   constructor (props) {
@@ -25,6 +27,10 @@ class Dropdown extends React.Component {
     this.outsideClick = this.outsideClick.bind(this)
     this.onSelectionChange = this.onSelectionChange.bind(this)
 
+    this.dropdown = React.createRef()
+    this.input = React.createRef()
+    this.dropdownList = React.createRef()
+
     window.addEventListener('click', this.outsideClick)
   }
 
@@ -40,25 +46,22 @@ class Dropdown extends React.Component {
     window.removeEventListener('click', this.outsideClick)
   }
 
-  getRefs () {
-    return {
-      dropdown: this.refs.dropdown,
-      input: this.refs.dropdownInput.input.current.inputElement
-    }
+  getInputEl () {
+    return this.input.current.inputElement
   }
 
   outsideClick (evt) {
-    if (this.isOpened() && clickedOutside(this.getRefs().dropdown, evt)) {
+    if (this.isOpened() && clickedOutside(this.dropdown.current, evt)) {
       this.toggleOpened()
     }
   }
 
-  toggleOpened () {
+  toggleOpened (callback = null) {
     if (!(this.props.readOnly || this.props.disabled)) {
       this.setState({
         opened: !this.state.opened,
         itemsFocusIndex: -1,
-      })
+      }, callback)
     }
   }
 
@@ -122,7 +125,7 @@ class Dropdown extends React.Component {
   }
 
   onBlur (e) {
-    const itemFocused = R.prop('className')(e.relatedTarget) === 'dropdown__list-item'
+    const itemFocused = R.prop('className')(e.relatedTarget) === dropdownListItemClassName
     if (this.isOpened() && !itemFocused) {
       this.toggleOpened()
     }
@@ -131,7 +134,11 @@ class Dropdown extends React.Component {
   onInputKeyDown (e) {
     const {items} = this.state
     if (items.length > 0 && e.keyCode === 40) { //arrow down
-      this.focusItem(0)
+      if (!this.isOpened()) {
+        this.toggleOpened(() => this.focusItem(0))
+      } else {
+        this.focusItem(0)
+      }
     }
   }
 
@@ -149,7 +156,7 @@ class Dropdown extends React.Component {
           break
         case 27: //escape
           this.toggleOpened()
-          ReactDOM.findDOMNode(this.getRefs().input).focus()
+          this.getInputEl().focus()
           break
         case 33: //page up
           offset = -10
@@ -176,8 +183,8 @@ class Dropdown extends React.Component {
   }
 
   focusItem (index) {
-    const dropdownEl = ReactDOM.findDOMNode(this.getRefs().dropdown)
-    const itemEl = dropdownEl.getElementsByClassName('dropdown__list-item')[index]
+    const dropdownEl = this.dropdownList.current
+    const itemEl = dropdownEl.getElementsByClassName(dropdownListItemClassName)[index]
     if (!itemEl) {
       console.log(index)
     }
@@ -194,7 +201,7 @@ class Dropdown extends React.Component {
       left,
       height,
       width
-    } = elementOffset(this.getRefs().input)
+    } = elementOffset(this.getInputEl())
 
     return {
       top: (top + height),
@@ -222,14 +229,14 @@ class Dropdown extends React.Component {
       displayValue,
     } = this.state
 
-    return <div className={`dropdown ${className}`}
+    return <div ref={this.dropdown}
+                className={`dropdown ${className}`}
                 style={style}
-                ref="dropdown"
                 onBlur={e => this.onBlur(e)}>
-      <Input placeholder={placeholder}
+      <Input ref={this.input}
+             placeholder={placeholder}
              value={displayValue}
              validation={validation}
-             ref="dropdownInput"
              readOnly={readOnly}
              disabled={disabled}
              onChange={e => this.onInputChange(e)}
@@ -242,13 +249,14 @@ class Dropdown extends React.Component {
       {
         this.isOpened() ?
           ReactDOM.createPortal(
-            <div className="dropdown__list"
+            <div ref={this.dropdownList}
+                 className="dropdown__list"
                  style={{
                    ...this.getOffset(),
                  }}>
               {
                 items.map(
-                  item => <div key={item.key ? item.key : item} className="dropdown__list-item"
+                  item => <div key={item.key ? item.key : item} className={dropdownListItemClassName}
                                onMouseDown={e => this.onSelectionChange(item)}
                                onKeyDown={e => this.onListItemKeyDown(e)}
                                tabIndex="1">
