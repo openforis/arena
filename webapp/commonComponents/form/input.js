@@ -29,8 +29,6 @@ export const Input = React.forwardRef((props, ref) => {
                    aria-disabled={disabled}
                    {...inputProps}
       />
-
-
     </TooltipError>
   )
 })
