@@ -21,7 +21,10 @@ module.exports = {
   //CREATE
   newTaxonomy,
 
+  //READ
+  getTaxonomyName: getProp('name'),
+
   // UPDATE
-  assocCodeListProp: setProp,
+  assocTaxonomyProp: setProp,
 
 }

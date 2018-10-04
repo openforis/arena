@@ -2,7 +2,7 @@ const db = require('../db/db')
 const Promise = require('bluebird')
 const R = require('ramda')
 
-const {updateProp, deleteRecord} = require('../serverUtils/repository')
+const {updateSurveyTableProp, deleteSurveyTableRecord} = require('../serverUtils/repository')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 const {getSurveyDBSchema} = require('../../common/survey/survey')
 const {getCodeListLevelsArray, assocCodeListLevelsArray} = require('../../common/survey/codeList')
@@ -81,19 +81,19 @@ const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = fals
 
 // ============== UPDATE
 
-const updateCodeListProp = R.partial(updateProp, ['code_list'])
+const updateCodeListProp = R.partial(updateSurveyTableProp, ['code_list'])
 
-const updateCodeListLevelProp = R.partial(updateProp, ['code_list_level'])
+const updateCodeListLevelProp = R.partial(updateSurveyTableProp, ['code_list_level'])
 
-const updateCodeListItemProp = R.partial(updateProp, ['code_list_item'])
+const updateCodeListItemProp = R.partial(updateSurveyTableProp, ['code_list_item'])
 
 // ============== DELETE
 
-const deleteCodeList = R.partial(deleteRecord, ['code_list'])
+const deleteCodeList = R.partial(deleteSurveyTableRecord, ['code_list'])
 
-const deleteCodeListLevel = R.partial(deleteRecord, ['code_list_level'])
+const deleteCodeListLevel = R.partial(deleteSurveyTableRecord, ['code_list_level'])
 
-const deleteCodeListItem = R.partial(deleteRecord, ['code_list_item'])
+const deleteCodeListItem = R.partial(deleteSurveyTableRecord, ['code_list_item'])
 
 module.exports = {
   //CREATE

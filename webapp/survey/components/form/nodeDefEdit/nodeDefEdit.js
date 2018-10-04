@@ -3,13 +3,15 @@ import { connect } from 'react-redux'
 
 import CommonProps from './commonProps'
 import CodeListsView from './../../../codeList/components/codeListsView'
+import TaxonomiesView from '../../../taxonomy/components/taxonomiesView'
 
-import { getFormNodeDefEdit, getSurvey } from '../../../surveyState'
-import { getCodeListUUID } from '../../../../../common/survey/nodeDef'
+import { canUpdateCodeList } from '../../../../../common/survey/survey'
+import { getCodeListUUID, getTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 
 import { closeFormNodeDefEdit, putNodeDefProp } from '../../../nodeDef/actions'
 import { createCodeList } from '../../../codeList/actions'
-import { canUpdateCodeList } from '../../../../../common/survey/survey'
+import { createTaxonomy } from '../../../taxonomy/actions'
+import { getFormNodeDefEdit, getSurvey } from '../../../surveyState'
 
 class NodeDefEdit extends React.Component {
 
@@ -18,6 +20,7 @@ class NodeDefEdit extends React.Component {
 
     this.state = {
       editingCodeList: false,
+      editingTaxonomy: false,
     }
   }
 
@@ -28,21 +31,30 @@ class NodeDefEdit extends React.Component {
 
   render () {
     const {nodeDef, putNodeDefProp, survey} = this.props
+    const {editingCodeList, editingTaxonomy} = this.state
 
     return nodeDef
       ? (
         <div className="survey-form__node-def-edit">
           {
-            this.state.editingCodeList
+            editingCodeList
               ?
               <CodeListsView onClose={() => this.setState({editingCodeList: false})}
                              canSelect={canUpdateCodeList(nodeDef)(survey)}
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
                              selectedCodeListUUID={getCodeListUUID(nodeDef)}
-              />
-              : <div className="form">
+                             />
+
+              : editingTaxonomy
+              ?
+              <TaxonomiesView onClose={() => this.setState({editingTaxonomy: false})}
+                              onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
+                              selectedTaxonomyUUID={getTaxonomyUUID(nodeDef)}/>
+              :
+              <div className="form">
                 <CommonProps {...this.props}
-                             toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}/>
+                             toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
+                             toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
 
                 <div style={{justifySelf: 'center'}}>
                   <button className="btn btn-of-light"
@@ -68,5 +80,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  {closeFormNodeDefEdit, putNodeDefProp, createCodeList}
+  {closeFormNodeDefEdit, putNodeDefProp, createCodeList, createTaxonomy}
 )(NodeDefEdit)

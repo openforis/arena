@@ -17,7 +17,7 @@ const surveyState = {
         }
       }
     },
-    // loaded codeLists
+    // loaded codeList
     codeListEdit: {
       uuid: '',
       levelItems: {

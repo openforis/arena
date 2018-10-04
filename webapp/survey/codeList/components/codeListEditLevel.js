@@ -12,7 +12,7 @@ import {
 } from '../../../../common/survey/survey'
 import {
   getCodeListLevelName,
-  getCodeListLevelValidation, getCodeListName,
+  getCodeListLevelValidation,
   isCodeListLevelDeleteAllowed
 } from '../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../common/validation/validator'
@@ -30,7 +30,7 @@ import {
   getCodeListEditCodeList,
   getCodeListEditLevelItemsArray,
   getCodeListEditActiveItemAndAncestorsUUIDs,
-} from '../codeListEditorState'
+} from '../codeListEditState'
 import { putCodeListItemProp } from '../actions'
 
 class CodeListEditLevel extends React.Component {

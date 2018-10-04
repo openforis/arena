@@ -6,6 +6,8 @@ const {
   getLabels,
 
   setProp,
+
+  filterMappedObj,
 } = require('./surveyUtils')
 
 const {
@@ -16,10 +18,7 @@ const {
 } = require('./nodeDef')
 
 const {
-  assocCodeListLevel,
-  assocCodeListItem,
   getCodeListLevelsLength,
-  getCodeListLevelsArray,
 } = require('./codeList')
 
 // == utils
@@ -109,6 +108,11 @@ const getNodeDefsByCodeListUUID = (uuid) => R.pipe(
   R.filter(R.pathEq(['props', 'codeListUUID'], uuid))
 )
 
+const getNodeDefsByTaxonomyUUID = (uuid) => R.pipe(
+  getNodeDefsArray,
+  R.filter(R.pathEq(['props', 'taxonomyUUID'], uuid))
+)
+
 /**
  * ======
  * UPDATE
@@ -176,11 +180,6 @@ const getSurveyCodeListByUUID = uuid => R.pipe(
   R.prop(uuid)
 )
 
-const getSurveyCodeListById = id => R.pipe(
-  getSurveyCodeListsArray,
-  R.find(list => list.id === id)
-)
-
 /**
  * ======
  * UPDATE Code Lists
@@ -190,26 +189,9 @@ const assocSurveyCodeLists = codeLists =>
   survey => R.pipe(
     R.merge(getSurveyCodeLists(survey)),
     //exclude null objects
-    newCodeLists => R.reduce((acc, key) => {
-      const codeList = R.prop(key, acc)
-      return codeList === null ? R.dissoc(key, acc) : acc
-    }, newCodeLists)(R.keys(newCodeLists)),
+    filterMappedObj(codeList => codeList !== null),
     newCodeLists => R.assoc('codeLists', newCodeLists, survey)
   )(codeLists)
-
-const assocSurveyCodeList = codeList => assocSurveyCodeLists({[codeList.uuid]: codeList})
-
-const assocSurveyCodeListLevel = (level) => survey => R.pipe(
-  getSurveyCodeListById(level.codeListId),
-  assocCodeListLevel(level),
-  newCodeList => assocSurveyCodeLists({[newCodeList.uuid]: newCodeList})(survey)
-)(survey)
-
-const assocSurveyCodeListItem = (codeListUUID, item) => survey => R.pipe(
-  getSurveyCodeListByUUID(codeListUUID),
-  assocCodeListItem(item),
-  updatedCodeList => assocSurveyCodeList(updatedCodeList)(survey),
-)(survey)
 
 /**
  * ======
@@ -230,6 +212,19 @@ const getSurveyTaxonomyByUUID = uuid => R.pipe(
   getSurveyTaxonomies,
   R.prop(uuid)
 )
+
+/**
+ * ======
+ * UPDATE Taxonomies
+ * ======
+ */
+const assocSurveyTaxonomies = taxonomies =>
+  survey => R.pipe(
+    R.merge(getSurveyTaxonomies(survey)),
+    filterMappedObj(taxonomy => taxonomy != null),
+    newTaxonomies => R.assoc('taxonomies', newTaxonomies, survey)
+  )(taxonomies)
+
 
 /**
  * ======
@@ -335,6 +330,7 @@ module.exports = {
   getRootNodeDef,
   getNodeDefChildren,
   getNodeDefsByCodeListUUID,
+  getNodeDefsByTaxonomyUUID,
 
   // UPDATE
   assocSurveyProp: setProp,
@@ -361,7 +357,6 @@ module.exports = {
   //=======
 
   //NodeDef CodeList
-  isNodeDefCodeParent,
   getNodeDefCodeListLevelIndex,
   getNodeDefCodeParent,
   getNodeDefCodeCandidateParents,
@@ -374,13 +369,15 @@ module.exports = {
 
   // UPDATE code lists
   assocSurveyCodeLists,
-  assocSurveyCodeListLevel,
-  assocSurveyCodeListItem,
-
 
   //=======
   // Taxonomies
   //=======
+
+  //READ taxonomies
   getSurveyTaxonomiesArray,
   getSurveyTaxonomyByUUID,
+
+  //UPDATE taxonomies
+  assocSurveyTaxonomies,
 }

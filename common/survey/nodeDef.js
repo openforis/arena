@@ -49,6 +49,7 @@ const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
 const isNodeDefCodeList = isNodeDefType(nodeDefType.codeList)
+const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
 // ==== UPDATE
 
@@ -82,6 +83,7 @@ module.exports = {
   getNodeDefValidation: R.prop(validation),
   getCodeListUUID: getProp('codeListUUID'),
   getParentCodeUUID: getProp('parentCodeUUID'),
+  getTaxonomyUUID: getProp('taxonomyUUID'),
 
   isNodeDefKey,
   isNodeDefMultiple,
@@ -89,6 +91,7 @@ module.exports = {
   isNodeDefEntity,
   isNodeDefSingleEntity,
   isNodeDefCodeList,
+  isNodeDefTaxon,
 
   //UTILS
   canNodeDefBeMultiple,

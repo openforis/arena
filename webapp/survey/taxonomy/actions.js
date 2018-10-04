@@ -2,17 +2,17 @@ import axios from 'axios'
 import * as R from 'ramda'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
-import {newTaxonomy} from '../../../common/survey/taxonomy'
+import { newTaxonomy, assocTaxonomyProp } from '../../../common/survey/taxonomy'
 
-import { assocValidation, updateFieldValidation } from '../../../common/validation/validator'
+import { assocValidation } from '../../../common/validation/validator'
 import { getSurvey } from '../surveyState'
 import { getTaxonomyEditTaxonomy } from './taxonomyEditState'
 
-export const taxonomyUpdate = 'survey/taxonomy/update'
+export const taxonomiesUpdate = 'survey/taxonomy/update'
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
 
 const dispatchTaxonomyUpdate = (dispatch, taxonomy) =>
-  dispatch({type: taxonomyUpdate, taxonomies: {[taxonomy.uuid]: taxonomy}})
+  dispatch({type: taxonomiesUpdate, taxonomies: {[taxonomy.uuid]: taxonomy}})
 
 const dispatchTaxonomyEditUpdate = (dispatch, taxonomyUUID) =>
   dispatch({type: taxonomyEditUpdate, taxonomyUUID})
@@ -57,9 +57,8 @@ export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, ge
       dispatchTaxonomyUpdate(dispatch, updatedTaxonomy)
     } catch (e) {}
   }
-  dispatch(debounceAction(action, `${taxonomyUpdate}_${taxonomy.uuid}`))
+  dispatch(debounceAction(action, `${taxonomiesUpdate}_${taxonomy.uuid}`))
 }
-
 
 export const setTaxonomyForEdit = taxonomy => async (dispatch) => {
   dispatchTaxonomyEditUpdate(dispatch, taxonomy ? taxonomy.uuid : null)

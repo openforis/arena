@@ -10,7 +10,7 @@ import { getNodeDefsByCodeListUUID, getSurveyCodeListsArray } from '../../../../
 import { getCodeListName } from '../../../../common/survey/codeList'
 
 import { getSurvey } from '../../surveyState'
-import { getCodeListEditCodeList } from '../codeListEditorState'
+import { getCodeListEditCodeList } from '../codeListEditState'
 import {
   createCodeList,
   setCodeListForEdit,
@@ -41,9 +41,10 @@ const CodeListsView = (props) => {
                     items={codeLists}
                     tableSelectedItemUUID={selectedCodeListUUID}
                     onAdd={createCodeList}
-                    onEdit={codeList => setCodeListForEdit(codeList)}
+                    onEdit={setCodeListForEdit}
                     canDelete={canDeleteCodeList}
-                    onDelete={deleteCodeList}/>
+                    onDelete={deleteCodeList}
+                    onSelect={onSelect}/>
 }
 
 const mapStateToProps = state => {

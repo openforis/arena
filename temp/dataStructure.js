@@ -4,7 +4,7 @@ const {
 
 const recordActions = {
   createRecord: 'createRecord',
-  deleteRecord: 'deleteRecord',
+  deleteRecord: 'deleteSurveyTableRecord',
   changeStep: 'changeStep',
   addNode: 'addNode',
   updateNode: 'updateNode',

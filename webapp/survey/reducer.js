@@ -11,8 +11,7 @@ import {
   dissocNodeDef,
 
   assocSurveyCodeLists,
-  assocSurveyCodeListLevel,
-  assocSurveyCodeListItem,
+  assocSurveyTaxonomies,
 } from '../../common/survey/survey'
 
 import {
@@ -40,7 +39,15 @@ import {
   assocCodeListEditActiveLevelItem,
   assocCodeListEditLevelItems,
   dissocCodeListEditLevelItems,
-} from './codeList/codeListEditorState'
+} from './codeList/codeListEditState'
+
+
+/**
+ * code lists state
+ */
+import {
+  updateTaxonomyEdit,
+} from './taxonomy/taxonomyEditState'
 
 /**
  * survey actions
@@ -84,6 +91,14 @@ import {
   codeListEditActiveLevelItemUpdate,
 } from './codeList/actions'
 
+/**
+ * taxonomy actions
+ */
+import {
+  taxonomiesUpdate,
+  taxonomyEditUpdate,
+} from './taxonomy/actions'
+
 const actionHandlers = {
   //SURVEY
   [surveyNewUpdate]: assocActionProps,
@@ -124,14 +139,17 @@ const actionHandlers = {
       ? dissocCodeListEditLevelItems(levelIndex)(state)
       : assocCodeListEditLevelItems(levelIndex, items)(state),
 
+  //TAXONOMY
+  [taxonomiesUpdate]: (state, {taxonomies}) => assocSurveyTaxonomies(taxonomies)(state),
 
-    //RECORD
-    [recordUpdate]: assocActionProps,
+  [taxonomyEditUpdate]: (state, {taxonomyUUID}) => updateTaxonomyEdit(taxonomyUUID)(state),
+
+  //RECORD
+  [recordUpdate]: assocActionProps,
 
   [nodesUpdate]: (state, {nodes}) => assocNodes(nodes)(state),
 
   [nodeDelete]: (state, {node}) => deleteNode(node)(state),
-
 
 }
 

@@ -33,7 +33,7 @@ import {
   getCodeListEditCodeList,
   getCodeListEditLevelItemByUUID,
   getCodeListEditActiveItemAndAncestorsUUIDs,
-} from './codeListEditorState'
+} from './codeListEditState'
 
 export const codeListsUpdate = 'survey/codeLists/update'
 export const codeListEditUpdate = 'survey/codeListEdit/update'

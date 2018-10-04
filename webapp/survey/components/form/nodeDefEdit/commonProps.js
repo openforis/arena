@@ -5,6 +5,7 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../labelsEditor'
 import CodeListProps from './codeListProps'
+import TaxonProps from './taxonProps'
 
 import { getFieldValidation, getValidation } from './../../../../../common/validation/validator'
 
@@ -14,6 +15,7 @@ import {
   getNodeDefLabels,
   getNodeDefName,
   isNodeDefCodeList,
+  isNodeDefTaxon,
   isNodeDefEntity,
   isNodeDefKey,
   isNodeDefMultiple,
@@ -51,9 +53,13 @@ const CommonProps = props => {
                     onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'descriptions', getNodeDefDescriptions(nodeDef))}/>
 
       {
-        isNodeDefCodeList(nodeDef)
-          ? <CodeListProps {...props} />
-          : null
+        isNodeDefCodeList(nodeDef) &&
+          <CodeListProps {...props} />
+      }
+
+      {
+        isNodeDefTaxon(nodeDef) &&
+          <TaxonProps {...props} />
       }
 
       {
