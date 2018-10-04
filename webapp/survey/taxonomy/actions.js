@@ -1,8 +1,12 @@
 import axios from 'axios'
+import * as R from 'ramda'
 
+import { debounceAction } from '../../appUtils/reduxUtils'
 import {newTaxonomy} from '../../../common/survey/taxonomy'
 
+import { assocValidation, updateFieldValidation } from '../../../common/validation/validator'
 import { getSurvey } from '../surveyState'
+import { getTaxonomyEditTaxonomy } from './taxonomyEditState'
 
 export const taxonomyUpdate = 'survey/taxonomy/update'
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
@@ -29,6 +33,33 @@ export const createTaxonomy = () => async (dispatch, getState) => {
 
   dispatchTaxonomyUpdate(dispatch, addedTaxonomy)
 }
+
+// ==== UPDATE
+
+export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, getState) => {
+  const survey = getSurvey(getState())
+
+  const taxonomy = R.pipe(
+    getTaxonomyEditTaxonomy,
+    assocTaxonomyProp(key, value),
+    R.dissocPath(['validation', 'fields', key]),
+  )(survey)
+
+  dispatchTaxonomyUpdate(dispatch, taxonomy)
+
+  const action = async () => {
+    try {
+      const {data} = await axios.put(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}`, {key, value})
+      const {validation} = data
+
+      const updatedTaxonomy = assocValidation(validation)(taxonomy)
+
+      dispatchTaxonomyUpdate(dispatch, updatedTaxonomy)
+    } catch (e) {}
+  }
+  dispatch(debounceAction(action, `${taxonomyUpdate}_${taxonomy.uuid}`))
+}
+
 
 export const setTaxonomyForEdit = taxonomy => async (dispatch) => {
   dispatchTaxonomyEditUpdate(dispatch, taxonomy ? taxonomy.uuid : null)

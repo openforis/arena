@@ -57,6 +57,8 @@ const getFieldValidation = field => R.pathOr(
 )
 
 //==== update
+const assocValidation = validation => R.assoc('validation', validation)
+
 const updateValidationStatus = validation => {
   const invalid = R.any(R.propEq('valid', false))(R.values(validation.fields))
   return R.assoc('valid', !invalid, validation)
@@ -80,6 +82,8 @@ module.exports = {
   getValidation,
   isValid,
   getFieldValidation,
+
+  assocValidation,
   updateFieldValidation,
   dissocFieldValidation,
   updateValidationStatus,

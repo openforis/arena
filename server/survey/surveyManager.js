@@ -18,6 +18,8 @@ const {
   validateCodeListProps: codeListValidatorProps,
   validateCodeList,
 } = require('../codeList/codeListValidator')
+const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyRepository')
+
 
 /**
  * ===== CODE LIST
@@ -66,10 +68,12 @@ const validateCodeListProps = async (surveyId, codeListId) => {
 const fetchSurveyById = async (id, draft) => {
   const survey = await getSurveyById(id, draft)
   const codeLists = await fetchCodeLists(id, draft)
+  const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
 
   return {
     ...survey,
     codeLists: toUUIDIndexedObj(codeLists),
+    taxonomies: toUUIDIndexedObj(taxonomies),
     validation: await validateSurvey(survey),
   }
 }

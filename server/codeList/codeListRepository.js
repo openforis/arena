@@ -2,11 +2,13 @@ const db = require('../db/db')
 const Promise = require('bluebird')
 const R = require('ramda')
 
+const {updateProp, deleteRecord} = require('../serverUtils/repository')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 const {getSurveyDBSchema} = require('../../common/survey/survey')
 const {getCodeListLevelsArray, assocCodeListLevelsArray} = require('../../common/survey/codeList')
 
 // ============== CREATE
+
 const insertCodeList = async (surveyId, codeList, client = db) => client.tx(
   async t => {
     const insertedCodeList = await t.one(`
@@ -48,6 +50,7 @@ const insertCodeListItem = async (surveyId, item, client = db) =>
   )
 
 // ============== READ
+
 const fetchCodeListsBySurveyId = async (surveyId, draft = false, client = db) =>
   await client.map(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list`,
@@ -77,18 +80,6 @@ const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = fals
   )
 
 // ============== UPDATE
-const updateProp = async (tableName, surveyId, id, {key, value}, client = db) => {
-  const prop = {[key]: value}
-
-  return await client.one(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
-     SET props_draft = props_draft || $1
-     WHERE id = $2
-     RETURNING *`
-    , [JSON.stringify(prop), id]
-    , def => dbTransformCallback(def, true)
-  )
-}
 
 const updateCodeListProp = R.partial(updateProp, ['code_list'])
 
@@ -97,20 +88,12 @@ const updateCodeListLevelProp = R.partial(updateProp, ['code_list_level'])
 const updateCodeListItemProp = R.partial(updateProp, ['code_list_item'])
 
 // ============== DELETE
-const deleteItem = async (tableName, surveyId, id, client = db) =>
-  await client.one(`
-    DELETE 
-    FROM ${getSurveyDBSchema(surveyId)}.${tableName} 
-    WHERE id = $1 RETURNING *`
-    , [id]
-    , def => dbTransformCallback(def, true)
-  )
 
-const deleteCodeList = R.partial(deleteItem, ['code_list'])
+const deleteCodeList = R.partial(deleteRecord, ['code_list'])
 
-const deleteCodeListLevel = R.partial(deleteItem, ['code_list_level'])
+const deleteCodeListLevel = R.partial(deleteRecord, ['code_list_level'])
 
-const deleteCodeListItem = R.partial(deleteItem, ['code_list_item'])
+const deleteCodeListItem = R.partial(deleteRecord, ['code_list_item'])
 
 module.exports = {
   //CREATE
