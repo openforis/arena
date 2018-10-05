@@ -3,6 +3,7 @@ const {getRestParam} = require('../serverUtils/request')
 
 const {fetchTaxonomiesBySurveyId, insertTaxonomy, updateTaxonomyProp, deleteTaxonomy} = require('./taxonomyRepository')
 const {validateTaxonomy} = require('./taxonomyValidator')
+const {importTaxa} = require('./taxonomyManager')
 
 module.exports.init = app => {
 
@@ -33,6 +34,20 @@ module.exports.init = app => {
       const validation = await validateTaxonomy(taxonomies, taxonomy)
 
       res.json({validation})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.post('/survey/:surveyId/taxonomies/:taxonomyId/upload', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonomyId = getRestParam(req, 'taxonomyId')
+
+      const file = req.files.file
+      importTaxa(surveyId, taxonomyId, file.data)
+
+      sendOk(res)
     } catch (err) {
       sendErr(res, err)
     }

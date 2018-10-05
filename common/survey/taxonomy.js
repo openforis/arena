@@ -1,13 +1,9 @@
-const R = require('ramda')
 const {uuidv4} = require('../uuid')
-
 
 const {
   setProp,
   getProp,
-  toIndexedObj,
 } = require('./surveyUtils')
-
 
 // ====== CREATE
 const newTaxonomy = () => ({
@@ -15,16 +11,20 @@ const newTaxonomy = () => ({
   props: {},
 })
 
-
+const newTaxon = (taxonomyId) => ({
+  uuid: uuidv4(),
+  taxonomyId,
+  props: {},
+})
 
 module.exports = {
   //CREATE
   newTaxonomy,
+  newTaxon,
 
   //READ
   getTaxonomyName: getProp('name'),
 
   // UPDATE
   assocTaxonomyProp: setProp,
-
 }

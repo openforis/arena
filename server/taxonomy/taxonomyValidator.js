@@ -1,27 +1,34 @@
-const R = require('ramda')
+const {
+  validate,
+  validateRequired,
+  valiateItemPropUniqueness
+} = require('../../common/validation/validator')
 
-const {validate, validateRequired} = require('../../common/validation/validator')
-const {getTaxonomyName} = require('../../common/survey/taxonomy')
-
+/**
+ * ====== TAXONOMY
+ */
 const taxonomyValidators = (taxonomies) => ({
-  'props.name': [validateRequired, validateTaxonomyNameUniqueness(taxonomies)],
+  'props.name': [validateRequired, valiateItemPropUniqueness(taxonomies)],
 })
-
-const validateTaxonomyNameUniqueness = taxonomies =>
-  (propName, taxonomy) => {
-
-    const hasDuplicates = R.any(
-      t => getTaxonomyName(t) === getTaxonomyName(taxonomy) && t.id !== taxonomy.id,
-      taxonomies
-    )
-    return hasDuplicates
-      ? 'duplicate'
-      : null
-  }
 
 const validateTaxonomy = async (taxonomies, taxonomy) =>
   await validate(taxonomy, taxonomyValidators(taxonomies))
 
+/**
+ * ====== TAXONOMY
+ */
+const taxonValidators = (taxa) => ({
+  'props.family': [validateRequired],
+  'props.genus': [validateRequired],
+  'props.scientificName': [validateRequired, valiateItemPropUniqueness(taxa)],
+  'props.code': [validateRequired, valiateItemPropUniqueness(taxa)],
+})
+
+const validateTaxon = async (taxa, taxon) =>
+  await validate(taxon, taxonValidators(taxa))
+
+
 module.exports = {
   validateTaxonomy,
+  validateTaxon,
 }

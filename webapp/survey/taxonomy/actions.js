@@ -60,6 +60,30 @@ export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, ge
   dispatch(debounceAction(action, `${taxonomiesUpdate}_${taxonomy.uuid}`))
 }
 
+export const
+  uploadTaxonomyFile = (surveyId, taxonomyId, file) => dispatch => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data'
+      }
+    }
+
+    axios
+      .post(`/api/survey/${surveyId}/taxonomies/${taxonomyId}/upload`, formData, config)
+      .then(resp => {
+        //const filesList = resp.data
+        //load first page of taxa
+        //dispatch({type: taxonomyTaxaUpdate, taxonomy})
+
+      })
+      .catch(e => {})
+  }
+
+// ====== DELETE
+
 export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
   const survey = getSurvey(getState())
 

@@ -18,6 +18,7 @@ const surveyState = {
     // loaded taxonomy
     taxonomyEdit: {
       uuid: '',
+      importingFile: false,
     },
 
   }
@@ -25,13 +26,14 @@ const surveyState = {
 
 const taxonomyEditPath = ['taxonomyEdit']
 
-export const getTaxonomyEditTaxonomyUUID = R.path([taxonomyEditPath, 'uuid'])
+export const getTaxonomyEditTaxonomyUUID = R.path(R.append('uuid', taxonomyEditPath))
 
 export const getTaxonomyEditTaxonomy = survey => R.pipe(
   getTaxonomyEditTaxonomyUUID,
   uuid => getSurveyTaxonomyByUUID(uuid)(survey),
 )(survey)
 
+export const getTaxonomyEditImportingFile = R.path(R.append('importingFile', taxonomyEditPath))
 
 // ========== UPDATE
 

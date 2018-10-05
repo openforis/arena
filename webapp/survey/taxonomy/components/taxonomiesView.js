@@ -10,13 +10,14 @@ import { getNodeDefsByTaxonomyUUID, getSurveyTaxonomiesArray } from '../../../..
 import { getTaxonomyName } from '../../../../common/survey/taxonomy'
 
 import { getSurvey } from '../../surveyState'
-import { getTaxonomyEditTaxonomy } from '../taxonomyEditState'
+import { getTaxonomyEditImportingFile, getTaxonomyEditTaxonomy } from '../taxonomyEditState'
 
 import {
   createTaxonomy,
   setTaxonomyForEdit,
   putTaxonomyProp,
   deleteTaxonomy,
+  uploadTaxonomyFile,
 } from '../actions'
 
 const TaxonomiesView = (props) => {
@@ -51,10 +52,11 @@ const mapStateToProps = state => {
   return {
     survey,
     taxonomy: getTaxonomyEditTaxonomy(survey),
+    importingTaxonomy: getTaxonomyEditImportingFile(survey),
   }
 }
 
 export default connect(
   mapStateToProps,
-  {createTaxonomy, setTaxonomyForEdit, putTaxonomyProp, deleteTaxonomy}
+  {createTaxonomy, setTaxonomyForEdit, putTaxonomyProp, deleteTaxonomy, uploadTaxonomyFile}
 )(TaxonomiesView)

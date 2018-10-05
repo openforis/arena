@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+const R = require('ramda')
 
 const languagesMap = {
   ab: {en: 'Abkhazian'},
@@ -196,6 +196,7 @@ const languages = R.pipe(
 
 module.exports = {
   languages,
+  languageCodes: languages.map(R.prop('key')),
 
   getLanguageLabel,
 }

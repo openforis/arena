@@ -1,6 +1,8 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
+const getProp = propName => R.path(propName.split('.'))
+
 const validateProp = async (obj, prop, validations = []) => {
   const errors = R.reject(
     R.isNil,
@@ -36,13 +38,24 @@ const validate = async (obj, propsValidations) => {
 
 const validateRequired = (propName, obj) => {
   const value = R.pipe(
-    R.path(propName.split('.')),
+    getProp(propName),
     R.defaultTo(''),
   )(obj)
 
   return R.isEmpty(value)
     ? 'empty'
     : null
+}
+
+const valiateItemPropUniqueness = items =>
+  (propName, item) => {
+    const hasDuplicates = R.any(
+      i => getProp(propName, i) === getProp(propName, item) && i.id !== item.id,
+      items
+    )
+    return hasDuplicates
+      ? 'duplicate'
+      : null
 }
 
 //==== getters
@@ -78,6 +91,7 @@ module.exports = {
   validate,
   validateProp,
   validateRequired,
+  valiateItemPropUniqueness,
 
   getValidation,
   isValid,
