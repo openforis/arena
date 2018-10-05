@@ -16,10 +16,11 @@ import {
   createTaxonomy,
   setTaxonomyForEdit,
   putTaxonomyProp,
+  deleteTaxonomy,
 } from '../actions'
 
 const TaxonomiesView = (props) => {
-  const {survey, taxonomy, createTaxonomy, setTaxonomyForEdit} = props
+  const {survey, taxonomy, createTaxonomy, setTaxonomyForEdit, deleteTaxonomy} = props
 
   const canDeleteTaxonomy = taxonomy => {
     if (getNodeDefsByTaxonomyUUID(taxonomy.uuid)(survey).length > 0) {
@@ -40,7 +41,8 @@ const TaxonomiesView = (props) => {
                     items={taxonomies}
                     onAdd={createTaxonomy}
                     onEdit={setTaxonomyForEdit}
-                    canDelete={canDeleteTaxonomy}/>
+                    canDelete={canDeleteTaxonomy}
+                    onDelete={deleteTaxonomy}/>
 }
 
 const mapStateToProps = state => {
@@ -54,5 +56,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  {createTaxonomy, setTaxonomyForEdit, putTaxonomyProp}
+  {createTaxonomy, setTaxonomyForEdit, putTaxonomyProp, deleteTaxonomy}
 )(TaxonomiesView)

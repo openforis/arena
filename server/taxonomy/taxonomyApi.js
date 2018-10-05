@@ -1,7 +1,8 @@
 const {sendOk, sendErr} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
 
-const {insertTaxonomy, updateTaxonomyProp} = require('./taxonomyRepository')
+const {fetchTaxonomiesBySurveyId, insertTaxonomy, updateTaxonomyProp, deleteTaxonomy} = require('./taxonomyRepository')
+const {validateTaxonomy} = require('./taxonomyValidator')
 
 module.exports.init = app => {
 
@@ -27,7 +28,24 @@ module.exports.init = app => {
       const taxonomyId = getRestParam(req, 'taxonomyId')
       const {body} = req
 
-      await updateTaxonomyProp(surveyId, taxonomyId, body)
+      const taxonomy = await updateTaxonomyProp(surveyId, taxonomyId, body)
+      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, true)
+      const validation = await validateTaxonomy(taxonomies, taxonomy)
+
+      res.json({validation})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  // ==== DELETE
+
+  app.delete('/survey/:surveyId/taxonomies/:taxonomyId', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonomyId = getRestParam(req, 'taxonomyId')
+
+      await deleteTaxonomy(surveyId, taxonomyId)
 
       sendOk(res)
     } catch (err) {

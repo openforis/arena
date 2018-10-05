@@ -60,6 +60,14 @@ export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, ge
   dispatch(debounceAction(action, `${taxonomiesUpdate}_${taxonomy.uuid}`))
 }
 
+export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
+  const survey = getSurvey(getState())
+
+  dispatch({type: taxonomiesUpdate, taxonomies: {[taxonomy.uuid]: null}})
+
+  await axios.delete(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}`)
+}
+
 export const setTaxonomyForEdit = taxonomy => async (dispatch) => {
   dispatchTaxonomyEditUpdate(dispatch, taxonomy ? taxonomy.uuid : null)
 }
