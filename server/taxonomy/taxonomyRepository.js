@@ -22,8 +22,8 @@ const insertTaxa = async (surveyId, taxa, client = db) => {
     t.batch(taxa.map(taxon =>
       t.none(`INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon (uuid, taxonomy_id, props_draft)
         VALUES ($1, $2, $3)`,
-      [taxon.uuid, taxon.taxonomyId, taxon.props]
-    )))
+        [taxon.uuid, taxon.taxonomyId, taxon.props]
+      )))
   })
 }
 
@@ -36,12 +36,31 @@ const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, client = db) =
     record => dbTransformCallback(record, draft)
   )
 
-const fetchTaxaByTaxonomyId = async (surveyId, taxonomyId, sort = {field: 'scientificName', asc: true}, draft = false, client = db) =>
-  await client.map(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
-     WHERE taxonomy_id = $1
-     ORDER BY ${draft ? 'props_draft' : 'props'}->>'${sort.field}' ${sort.asc ? 'ASC': 'DESC'}`,
+const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false, client = db) =>
+  await client.one(`
+      SELECT COUNT(*) 
+      FROM ${getSurveyDBSchema(surveyId)}.taxon
+      WHERE taxonomy_id = $1`,
     [taxonomyId],
+    record => record.count)
+
+const fetchTaxaByTaxonomyId = async (surveyId,
+                                     taxonomyId,
+                                     limit = 25,
+                                     offset = 0,
+                                     filter = null,
+                                     sort = {field: 'scientificName', asc: true},
+                                     draft = false,
+                                     client = db) =>
+  await client.map(
+    `SELECT * FROM (
+        SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
+        WHERE taxonomy_id = $1
+        ORDER BY ${draft ? 'props_draft' : 'props'}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
+      ) AS sorted_taxa 
+        LIMIT ${limit ? limit : 'ALL'} 
+        OFFSET $2`,
+    [taxonomyId, offset],
     record => dbTransformCallback(record, draft)
   )
 
@@ -66,6 +85,7 @@ module.exports = {
   insertTaxa,
   //READ
   fetchTaxonomiesBySurveyId,
+  countTaxaByTaxonomyId,
   fetchTaxaByTaxonomyId,
   //UPDATE
   updateTaxonomyProp,

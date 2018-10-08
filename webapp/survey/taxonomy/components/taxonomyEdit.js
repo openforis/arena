@@ -1,26 +1,94 @@
 import React from 'react'
+import axios from 'axios'
+import * as R from 'ramda'
 
+import TaxonTable from './taxonTable'
 import { FormItem, Input } from '../../../commonComponents/form/input'
 
+import { toQueryString } from '../../../../server/serverUtils/request'
 import { isBlank } from '../../../../common/stringUtils'
-import { getTaxonomyName } from '../../../../common/survey/taxonomy'
+import {
+  getTaxonomyName,
+} from '../../../../common/survey/taxonomy'
 import { getFieldValidation } from '../../../../common/validation/validator'
 import { normalizeName } from '../../../../common/survey/surveyUtils'
-import { uploadTaxonomyFile } from '../actions'
+import UploadButton from '../../../commonComponents/form/uploadButton'
+
+const ROWS_PER_PAGE = 25
 
 class TaxonomyEdit extends React.Component {
   constructor (props) {
     super(props)
 
-    this.fileInput = React.createRef()
+    this.state = {
+      taxa: [],
+      currentPage: 0,
+      totalPages: 0,
+    }
+  }
+
+  async componentDidMount () {
+    this.countTaxa(() => this.loadTaxa())
+  }
+
+  countTaxa (callback) {
+    const {survey, taxonomy} = this.props
+
+    const params = {
+      draft: true,
+    }
+
+    axios.get(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/taxa/count?${toQueryString(params)}`)
+      .then(res => {
+        const {count} = res.data
+        this.setState({
+          totalPages: Math.ceil(count / ROWS_PER_PAGE),
+          currentPage: 1,
+        }, () => callback())
+      })
+  }
+
+  loadTaxa () {
+    const {survey, taxonomy} = this.props
+    const {currentPage} = this.state
+
+    const params = {
+      draft: true,
+      limit: ROWS_PER_PAGE,
+      offset: (currentPage - 1) * ROWS_PER_PAGE
+    }
+
+    axios.get(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/taxa?${toQueryString(params)}`)
+      .then(res2 => {
+        const {taxa} = res2.data
+        this.setState({
+          taxa,
+        })
+      })
+  }
+
+  exportTaxonomy () {
+    const {
+      survey, taxonomy,
+    } = this.props
+
+    window.open(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/export`, '_blank')
+  }
+
+  onPageChange (page) {
+    this.setState({
+      currentPage: page
+    }, () => this.loadTaxa())
   }
 
   render () {
     const {
       survey, taxonomy,
       importingTaxonomy,
-      putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile,
+      putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile, exportTaxonomy,
     } = this.props
+
+    const {taxa, currentPage, totalPages} = this.state
 
     const {validation} = taxonomy
 
@@ -34,28 +102,29 @@ class TaxonomyEdit extends React.Component {
                  onChange={e => putTaxonomyProp(taxonomy.uuid, 'name', normalizeName(e.target.value))}/>
         </FormItem>
 
+        <div className="action-bar">
+          <UploadButton disabled={importingTaxonomy}
+                        label="IMPORT"
+                        onChange={(files) => uploadTaxonomyFile(survey.id, taxonomy.id, files[0])}/>
 
-        <input
-          ref={this.fileInput}
-          type="file"
-          style={{display: 'none'}}
-          onChange={e => {
-            console.log(e)
-            uploadTaxonomyFile(survey.id, taxonomy.id, this.fileInput.current.files[0])
-          }}
-        />
+          <button className="btn-s btn-primary btn-download"
+                  disabled={R.isEmpty(taxa)}
+                  onClick={() => this.exportTaxonomy()}>
+            <span className="icon icon-cloud-download icon-16px icon-left"/>
+            EXPORT
+          </button>
+        </div>
 
-        <button className="btn-s btn-primary btn-upload"
-                disabled={importingTaxonomy}
-                onClick={() => {
-                  // first reset current value, then trigger click event
-                  this.fileInput.current.value = ''
-                  this.fileInput.current.dispatchEvent(new MouseEvent('click'))
-                }}>
-          <span className="icon icon-cloud-upload icon-16px icon-left"/>
-          IMPORT
-        </button>
-
+        {
+          R.isEmpty(taxa)
+            ? <div>Taxonomy not imported</div>
+            : <TaxonTable taxonomy={taxonomy}
+                          taxa={taxa}
+                          currentPage={currentPage}
+                          totalPages={totalPages}
+                          rowsPerPage={ROWS_PER_PAGE}
+                          onPageChange={this.onPageChange}/>
+        }
 
         <div style={{justifySelf: 'center'}}>
           <button className="btn btn-of-light"

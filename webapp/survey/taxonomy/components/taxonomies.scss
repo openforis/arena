@@ -6,7 +6,46 @@
   align-items: center;
   margin: 0 5rem;
 
-  .btn-upload {
-    justify-self: center;
+  .action-bar {
+    display: grid;
+    grid-template-columns: .5fr .5fr;
+
+    .btn-upload, .btn-download {
+      justify-self: center;
+    }
+  }
+
+  .taxa-table {
+    display: grid;
+    grid-template-rows: 2rem 1fr;
+
+    .header, .row {
+      display: grid;
+      grid-template-columns: .2fr .2fr .2fr .4fr;
+    }
+
+    .header {
+      font-weight: 400;
+    }
+
+    .body {
+      overflow-y: auto;
+      height: calc(100vh - 300px);
+
+      .row {
+        border-bottom: 1px solid rgba($white, 0.5);
+        grid-auto-rows: 35px;
+        div {
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+      }
+    }
+
+    .paginator {
+      justify-self: center;
+    }
   }
 }
+

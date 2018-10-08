@@ -1,13 +1,20 @@
 const {sendOk, sendErr} = require('../serverUtils/response')
-const {getRestParam} = require('../serverUtils/request')
+const {getRestParam, getBoolParam} = require('../serverUtils/request')
 
-const {fetchTaxonomiesBySurveyId, insertTaxonomy, updateTaxonomyProp, deleteTaxonomy} = require('./taxonomyRepository')
+const {
+  fetchTaxonomiesBySurveyId,
+  countTaxaByTaxonomyId,
+  fetchTaxaByTaxonomyId,
+  insertTaxonomy,
+  updateTaxonomyProp,
+  deleteTaxonomy
+} = require('./taxonomyRepository')
 const {validateTaxonomy} = require('./taxonomyValidator')
-const {importTaxa} = require('./taxonomyManager')
+const {importTaxa, exportTaxa} = require('./taxonomyManager')
 
 module.exports.init = app => {
 
-  // ==== CREATE
+  // ====== CREATE
   app.post('/survey/:surveyId/taxonomies', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
@@ -21,7 +28,7 @@ module.exports.init = app => {
     }
   })
 
-  // ==== UPDATE
+  // ====== UPDATE
 
   app.put('/survey/:surveyId/taxonomies/:taxonomyId', async (req, res) => {
     try {
@@ -53,7 +60,59 @@ module.exports.init = app => {
     }
   })
 
-  // ==== DELETE
+  // ====== READ
+
+  app.get('/survey/:surveyId/taxonomies/:taxonomyId/taxa/count', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const draft = getBoolParam(req, 'draft')
+
+      const count = await countTaxaByTaxonomyId(surveyId, taxonomyId, draft)
+
+      res.json({count})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.get('/survey/:surveyId/taxonomies/:taxonomyId/taxa', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const draft = getBoolParam(req, 'draft')
+      const limit = getRestParam(req, 'limit')
+      const offset = getRestParam(req, 'offset', 0)
+      const filter = null
+      const sort = {field: 'scientificName', asc: true}
+
+      const taxa = await fetchTaxaByTaxonomyId(surveyId, taxonomyId, limit, offset, filter, sort, draft)
+
+      res.json({taxa})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.get('/survey/:surveyId/taxonomies/:taxonomyId/export', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const draft = getBoolParam(req, 'draft')
+
+      const fileName = `taxonomy_${taxonomyId}.csv`
+      res.setHeader('Content-disposition', `attachment; filename=${fileName}`)
+      res.set('Content-Type', 'text/csv')
+
+      await exportTaxa(surveyId, taxonomyId, res, draft)
+
+      res.end()
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  // ====== DELETE
 
   app.delete('/survey/:surveyId/taxonomies/:taxonomyId', async (req, res) => {
     try {

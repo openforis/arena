@@ -1,4 +1,5 @@
 const {uuidv4} = require('../uuid')
+const R = require('ramda')
 
 const {
   setProp,
@@ -17,6 +18,12 @@ const newTaxon = (taxonomyId) => ({
   props: {},
 })
 
+// ====== READ
+const getTaxonVernacularName = lang => R.pipe(
+  getProp('vernacularNames', {}),
+  R.prop(lang),
+)
+
 module.exports = {
   //CREATE
   newTaxonomy,
@@ -24,6 +31,12 @@ module.exports = {
 
   //READ
   getTaxonomyName: getProp('name'),
+  getTaxonCode: getProp('code'),
+  getTaxonFamily: getProp('family'),
+  getTaxonGenus: getProp('genus'),
+  getTaxonScientificName: getProp('scientificName'),
+  getTaxonVernacularNames: getProp('vernacularNames', {}),
+  getTaxonVernacularName,
 
   // UPDATE
   assocTaxonomyProp: setProp,

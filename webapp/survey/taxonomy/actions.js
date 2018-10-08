@@ -17,7 +17,7 @@ const dispatchTaxonomyUpdate = (dispatch, taxonomy) =>
 const dispatchTaxonomyEditUpdate = (dispatch, taxonomyUUID) =>
   dispatch({type: taxonomyEditUpdate, taxonomyUUID})
 
-// ==== CREATE
+// ====== CREATE
 
 export const createTaxonomy = () => async (dispatch, getState) => {
   const taxonomy = newTaxonomy()
@@ -34,7 +34,9 @@ export const createTaxonomy = () => async (dispatch, getState) => {
   dispatchTaxonomyUpdate(dispatch, addedTaxonomy)
 }
 
-// ==== UPDATE
+// ====== READ
+
+// ====== UPDATE
 
 export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, getState) => {
   const survey = getSurvey(getState())
