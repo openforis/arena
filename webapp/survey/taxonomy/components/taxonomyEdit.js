@@ -87,7 +87,6 @@ class TaxonomyEdit extends React.Component {
   render () {
     const {
       survey, taxonomy,
-      importingTaxonomy,
       putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile,
     } = this.props
 
@@ -106,8 +105,7 @@ class TaxonomyEdit extends React.Component {
         </FormItem>
 
         <div className="action-bar">
-          <UploadButton disabled={importingTaxonomy}
-                        label="IMPORT"
+          <UploadButton label="IMPORT"
                         onChange={(files) => uploadTaxonomyFile(survey.id, taxonomy.id, files[0])}/>
 
           <button className="btn-s btn-primary btn-download"
