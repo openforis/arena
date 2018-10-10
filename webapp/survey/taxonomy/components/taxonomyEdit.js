@@ -14,7 +14,7 @@ import { getFieldValidation } from '../../../../common/validation/validator'
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import UploadButton from '../../../commonComponents/form/uploadButton'
 
-const ROWS_PER_PAGE = 25
+const ROWS_PER_PAGE = 20
 
 class TaxonomyEdit extends React.Component {
   constructor (props) {
@@ -35,7 +35,7 @@ class TaxonomyEdit extends React.Component {
     const {survey, taxonomy} = this.props
 
     const params = {
-      draft: true,
+      draft: true
     }
 
     axios.get(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/taxa/count?${toQueryString(params)}`)
@@ -72,7 +72,10 @@ class TaxonomyEdit extends React.Component {
       survey, taxonomy,
     } = this.props
 
-    window.open(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/export`, '_blank')
+    const params = {
+      draft: true
+    }
+    window.open(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/export?${toQueryString(params)}`, '_blank')
   }
 
   onPageChange (page) {
@@ -85,7 +88,7 @@ class TaxonomyEdit extends React.Component {
     const {
       survey, taxonomy,
       importingTaxonomy,
-      putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile, exportTaxonomy,
+      putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile,
     } = this.props
 
     const {taxa, currentPage, totalPages} = this.state
@@ -123,7 +126,7 @@ class TaxonomyEdit extends React.Component {
                           currentPage={currentPage}
                           totalPages={totalPages}
                           rowsPerPage={ROWS_PER_PAGE}
-                          onPageChange={this.onPageChange}/>
+                          onPageChange={(page) => this.onPageChange(page)}/>
         }
 
         <div style={{justifySelf: 'center'}}>

@@ -1,4 +1,4 @@
-const parse = require('csv-parse')
+const fastcsv = require('fast-csv')
 const R = require('ramda')
 
 const {languageCodes} = require('../../common/app/languages')
@@ -19,60 +19,68 @@ class TaxaParser {
     this.taxonomyId = taxonomyId
     this.inputBuffer = inputBuffer
     this.callback = callback
+
+    this.vernacularLanguageCodes = []
+    this.result = null
   }
 
   async start () {
+    const start = new Date()
+    console.log(`parsing csv file. size ${this.inputBuffer.length}`)
+
     this.result = {
       taxa: [],
       errors: {},
     }
 
-    const parser = await parse(this.inputBuffer, {
-      columns: (columns) => {
-        this.validateHeader(columns)
-        this.vernacularLanguages = R.intersection(columns, languageCodes)
-        return columns
-      },
-      delimiter: ',',
-      skip_empty_lines: true,
-    })
-      .on('readable', async () => {
-        if (this.isHeaderValid()) {
-          let record
-          let row = 1 //row 0 is header
-          while (record = parser.read()) {
-            const taxonParseResult = await this.parseTaxon(record)
-            if (taxonParseResult.taxon) {
-              this.result.taxa.push(taxonParseResult.taxon)
-            } else {
-              this.result.errors[row] = taxonParseResult.errors
-            }
-            row++
+    const csvString = this.inputBuffer.toString('utf8')
+
+    let row = 0,
+      headersRead = false,
+      validHeaders = false
+
+    await fastcsv.fromString(csvString, {headers: true})
+      .on('data', async data => {
+        if (!headersRead) {
+          headersRead = true
+          validHeaders = this.validateHeaders(data)
+          if (validHeaders) {
+            this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, R.keys(data))
           }
-        } else {
-          this.onEnd()
+          console.log(`headers valid`)
+        } else if (validHeaders) {
+          const taxonParseResult = await this.parseTaxon(data)
+          if (taxonParseResult.taxon) {
+            this.result.taxa.push(taxonParseResult.taxon)
+          } else {
+            this.result.errors[row] = taxonParseResult.errors
+          }
+          row++
+          if (row % 1000 === 0)
+            console.log(`${row} rows parsed `)
         }
       })
-      .on('end', () => this.onEnd())
+      .on('end', () => {
+        const end = new Date()
+        const elapsedSeconds = (end.getTime() - start.getTime()) / 1000
+        console.log(`csv parsed successfully in ${elapsedSeconds}. taxa: ${this.result.taxa.length} errors: ${R.keys(this.result.errors).length}`)
+        this.callback(this.result)
+      })
   }
 
-  onEnd () {
-    this.callback(this.result)
-  }
-
-  validateHeader (columns) {
+  validateHeaders (data) {
+    const columns = R.keys(data)
     const missingColumns = R.difference(requiredColumns, columns)
     if (!R.isEmpty(missingColumns)) {
       this.result.errors[0] = `Missing required columns: ${R.join(', ', missingColumns)}`
+      return false
+    } else {
+      return true
     }
   }
 
-  isHeaderValid () {
-    return !R.has(0, this.result.errors)
-  }
-
-  async parseTaxon (record) {
-    const {family, genus, scientific_name, code, ...vernacularNames} = record
+  async parseTaxon (data) {
+    const {family, genus, scientific_name, code, ...vernacularNames} = data
 
     const taxon = R.assoc('props', {
       code,
@@ -97,7 +105,7 @@ class TaxaParser {
     return R.reduce((acc, langCode) => {
       const vernacularName = vernacularNames[langCode]
       return isNotBlank(vernacularName) ? R.assoc(langCode, vernacularName, acc) : acc
-    }, {}, this.vernacularLanguages)
+    }, {}, this.vernacularLanguageCodes)
   }
 }
 
