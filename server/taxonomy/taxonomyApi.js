@@ -1,10 +1,10 @@
 const {sendOk, sendErr} = require('../serverUtils/response')
-const {getRestParam, getBoolParam} = require('../serverUtils/request')
+const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
 
 const {
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyId,
-  fetchTaxaByTaxonomyId,
+  fetchTaxa,
   insertTaxonomy,
   updateTaxonomyProp,
   deleteTaxonomy
@@ -83,10 +83,10 @@ module.exports.init = app => {
       const draft = getBoolParam(req, 'draft')
       const limit = getRestParam(req, 'limit')
       const offset = getRestParam(req, 'offset', 0)
-      const filter = null
+      const filter = getJsonParam(req, 'filter')
       const sort = {field: 'scientificName', asc: true}
 
-      const taxa = await fetchTaxaByTaxonomyId(surveyId, taxonomyId, limit, offset, filter, sort, draft)
+      const taxa = await fetchTaxa(surveyId, taxonomyId, limit, offset, filter, sort, draft)
 
       res.json({taxa})
     } catch (err) {

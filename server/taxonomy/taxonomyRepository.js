@@ -44,26 +44,36 @@ const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false, client
     [taxonomyId],
     record => record.count)
 
-const fetchTaxaByTaxonomyId = async (surveyId,
-                                     taxonomyId,
-                                     limit = 25,
-                                     offset = 0,
-                                     filter = null,
-                                     sort = {field: 'scientificName', asc: true},
-                                     draft = false,
-                                     client = db) =>
-  await client.map(
+const fetchTaxa = async (surveyId,
+                         taxonomyId,
+                         limit = 25,
+                         offset = 0,
+                         filter = null,
+                         sort = {field: 'scientificName', asc: true},
+                         draft = false,
+                         client = db) => {
+  const propsCol = draft ? 'props_draft' : 'props'
+
+  const filterConditions = filter
+    ? R.pipe(
+      R.keys,
+      R.map(field => `lower(${propsCol}->>'${field}') LIKE '%${R.pipe(R.prop(field), R.toLower)(filter)}%'`),
+      R.join(' AND '),
+    )(filter)
+    : null
+
+  return await client.map(
     `SELECT * FROM (
         SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
-        WHERE taxonomy_id = $1
-        ORDER BY ${draft ? 'props_draft' : 'props'}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
+        WHERE taxonomy_id = $1 ${filterConditions ? ' AND ' + filterConditions : ''}
+        ORDER BY ${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
       ) AS sorted_taxa 
         LIMIT ${limit ? limit : 'ALL'} 
         OFFSET $2`,
     [taxonomyId, offset],
     record => dbTransformCallback(record, draft)
   )
-
+}
 // ============== UPDATE
 
 const updateTaxonomyProp = R.partial(updateSurveyTableProp, ['taxonomy'])
@@ -86,7 +96,7 @@ module.exports = {
   //READ
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyId,
-  fetchTaxaByTaxonomyId,
+  fetchTaxa,
   //UPDATE
   updateTaxonomyProp,
   //DELETE

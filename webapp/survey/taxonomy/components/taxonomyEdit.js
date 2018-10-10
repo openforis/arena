@@ -59,8 +59,8 @@ class TaxonomyEdit extends React.Component {
     }
 
     axios.get(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/taxa?${toQueryString(params)}`)
-      .then(res2 => {
-        const {taxa} = res2.data
+      .then(res => {
+        const {taxa} = res.data
         this.setState({
           taxa,
         })

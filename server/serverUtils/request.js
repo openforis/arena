@@ -13,14 +13,28 @@ const getBoolParam = R.pipe(
   R.equals('true'),
 )
 
+const getJsonParam = R.pipe(
+  getRestParam,
+  JSON.parse,
+)
+
 const toQueryString = obj =>
   R.reduce((acc, key) => {
     const value = R.prop(key)(obj)
-    return value ? `${acc}&${key}=${value}` : acc
+    if (value) {
+      const reqVal = R.is(Object, value)
+        ? JSON.stringify(value)
+        : value
+      return `${acc}&${key}=${reqVal}`
+    } else {
+      return acc
+    }
   }, '')(R.keys(obj))
 
 module.exports = {
   getRestParam,
   getBoolParam,
+  getJsonParam,
+
   toQueryString,
 }

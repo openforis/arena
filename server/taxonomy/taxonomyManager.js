@@ -12,7 +12,7 @@ const {
 const {TaxaParser} = require('./taxaParser')
 
 const {
-  fetchTaxaByTaxonomyId,
+  fetchTaxa,
   insertTaxa,
   deleteTaxaByTaxonomyId
 } = require('../../server/taxonomy/taxonomyRepository')
@@ -39,7 +39,7 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   ])
 
   //write taxa
-  const taxa = await fetchTaxaByTaxonomyId(surveyId, taxonomyId, null, 0, null, {
+  const taxa = await fetchTaxa(surveyId, taxonomyId, null, 0, null, {
     field: 'scientificName',
     asc: true
   }, draft)
