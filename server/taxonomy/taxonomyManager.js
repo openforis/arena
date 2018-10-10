@@ -25,6 +25,8 @@ const storeTaxa = async (surveyId, taxonomyId, taxa) => {
 }
 
 const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
+  console.log('start csv export', draft)
+
   const csvStream = fastcsv.createWriteStream({headers: true})
   csvStream.pipe(output)
 
@@ -50,7 +52,6 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
       getTaxonScientificName(taxon)
     ])
   })
-
   csvStream.end()
 }
 
@@ -59,10 +60,10 @@ const importTaxa = async (surveyId, taxonomyId, inputBuffer) => {
     const hasErrors = !R.isEmpty(R.keys(parseResult.errors))
 
     if (hasErrors) {
-      console.log('errors', R.keys(parseResult.errors).length, parseResult.errors)
+      console.log('errors found')
     } else {
       await storeTaxa(surveyId, taxonomyId, parseResult.taxa)
-      console.log('inserted taxa', parseResult.taxa.length)
+      console.log(`taxa stored: ${parseResult.taxa.length}`)
     }
   }).start()
 }
