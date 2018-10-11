@@ -15,22 +15,21 @@ const requiredColumns = [
 
 class TaxaParser {
 
-  constructor (taxonomyId, inputBuffer, callback) {
+  constructor (taxonomyId, inputBuffer) {
     this.taxonomyId = taxonomyId
     this.inputBuffer = inputBuffer
-    this.callback = callback
 
-    this.vernacularLanguageCodes = []
     this.result = null
   }
 
-  async start () {
+  start (callback) {
     const start = new Date()
     console.log(`parsing csv file. size ${this.inputBuffer.length}`)
 
     this.result = {
       taxa: [],
       errors: {},
+      vernacularLanguageCodes: [],
     }
 
     const csvString = this.inputBuffer.toString('utf8')
@@ -39,13 +38,13 @@ class TaxaParser {
       headersRead = false,
       validHeaders = false
 
-    await fastcsv.fromString(csvString, {headers: true})
+    fastcsv.fromString(csvString, {headers: true})
       .on('data', async data => {
         if (!headersRead) {
           headersRead = true
           validHeaders = this.validateHeaders(data)
           if (validHeaders) {
-            this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, R.keys(data))
+            this.result.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, R.keys(data))
           }
           console.log(`headers valid`)
         } else if (validHeaders) {
@@ -64,7 +63,7 @@ class TaxaParser {
         const end = new Date()
         const elapsedSeconds = (end.getTime() - start.getTime()) / 1000
         console.log(`csv parsed successfully in ${elapsedSeconds}. taxa: ${this.result.taxa.length} errors: ${R.keys(this.result.errors).length}`)
-        this.callback(this.result)
+        callback(this.result)
       })
   }
 
@@ -105,7 +104,7 @@ class TaxaParser {
     return R.reduce((acc, langCode) => {
       const vernacularName = vernacularNames[langCode]
       return isNotBlank(vernacularName) ? R.assoc(langCode, vernacularName, acc) : acc
-    }, {}, this.vernacularLanguageCodes)
+    }, {}, this.result.vernacularLanguageCodes)
   }
 }
 

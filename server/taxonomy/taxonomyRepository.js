@@ -4,6 +4,7 @@ const R = require('ramda')
 const {updateSurveyTableProp, deleteSurveyTableRecord} = require('../serverUtils/repository')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 const {getSurveyDBSchema} = require('../../common/survey/survey')
+const {getTaxonomyVernacularLanguageCodes} = require('../../common/survey/taxonomy')
 
 // ============== CREATE
 
@@ -29,6 +30,14 @@ const insertTaxa = async (surveyId, taxa, client = db) => {
 
 // ============== READ
 
+const fetchTaxonomyById = async (surveyId, id, draft = false, client = db) =>
+  await client.one(
+    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxonomy
+     WHERE id = $1`,
+    [id],
+    record => dbTransformCallback(record, draft)
+  )
+
 const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, client = db) =>
   await client.map(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxonomy`,
@@ -44,20 +53,45 @@ const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false, client
     [taxonomyId],
     record => record.count)
 
+const createTaxonFieldFilterCondition = (taxonomy, filter, field, draft) => {
+  const propsCol = draft ? 'props_draft' : 'props'
+  const filterValue = R.pipe(R.prop(field), R.toLower)(filter)
+
+  if (R.isEmpty(filterValue))
+    return 'false'
+
+  const vernacularLanguageCodes = getTaxonomyVernacularLanguageCodes(taxonomy)
+
+  if (field === 'vernacularName') {
+    return R.isEmpty(vernacularLanguageCodes)
+      ? ' false ' //cannot search by vernacular name
+      : ('(' +
+        R.pipe(
+          R.map(langCode => `lower(${propsCol}#>>'{vernacularNames, ${langCode}}') LIKE '%${filterValue}%'`),
+          R.join(' OR '),
+        )(vernacularLanguageCodes) +
+        ')')
+  } else {
+    return `lower(${propsCol}->>'${field}') LIKE '%${filterValue}%'`
+  }
+}
+
 const fetchTaxa = async (surveyId,
                          taxonomyId,
                          limit = 25,
                          offset = 0,
-                         filter = null,
+                         filter = null, //e.g. {code: 'AAA', scientificName: 'Acacia', vernacularName: 'Mohagany'}
                          sort = {field: 'scientificName', asc: true},
                          draft = false,
                          client = db) => {
   const propsCol = draft ? 'props_draft' : 'props'
 
+  const taxonomy = await fetchTaxonomyById(surveyId, taxonomyId, draft)
+
   const filterConditions = filter
     ? R.pipe(
       R.keys,
-      R.map(field => `lower(${propsCol}->>'${field}') LIKE '%${R.pipe(R.prop(field), R.toLower)(filter)}%'`),
+      R.map(field => createTaxonFieldFilterCondition(taxonomy, filter, field, draft)),
       R.join(' AND '),
     )(filter)
     : null

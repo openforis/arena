@@ -14,11 +14,13 @@ const {TaxaParser} = require('./taxaParser')
 const {
   fetchTaxa,
   insertTaxa,
+  updateTaxonomyProp,
   deleteTaxaByTaxonomyId
 } = require('../../server/taxonomy/taxonomyRepository')
 
-const storeTaxa = async (surveyId, taxonomyId, taxa) => {
+const storeTaxa = async (surveyId, taxonomyId, vernacularLanguageCodes, taxa) => {
   await db.tx(async t => {
+    await updateTaxonomyProp(surveyId, taxonomyId, {key: 'vernacularLanguageCodes', value: vernacularLanguageCodes}, t)
     await deleteTaxaByTaxonomyId(surveyId, taxonomyId, t)
     await insertTaxa(surveyId, taxa, t)
   })
@@ -56,16 +58,17 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
 }
 
 const importTaxa = async (surveyId, taxonomyId, inputBuffer) => {
-  await new TaxaParser(taxonomyId, inputBuffer, async parseResult => {
-    const hasErrors = !R.isEmpty(R.keys(parseResult.errors))
+  await new TaxaParser(taxonomyId, inputBuffer)
+    .start(async parseResult => {
+      const hasErrors = !R.isEmpty(R.keys(parseResult.errors))
 
-    if (hasErrors) {
-      console.log('errors found')
-    } else {
-      await storeTaxa(surveyId, taxonomyId, parseResult.taxa)
-      console.log(`taxa stored: ${parseResult.taxa.length}`)
-    }
-  }).start()
+      if (hasErrors) {
+        console.log('errors found')
+      } else {
+        await storeTaxa(surveyId, taxonomyId, parseResult.vernacularLanguageCodes, parseResult.taxa)
+        console.log(`taxa stored: ${parseResult.taxa.length}`)
+      }
+    })
 }
 
 module.exports = {

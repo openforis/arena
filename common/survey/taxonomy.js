@@ -31,6 +31,7 @@ module.exports = {
 
   //READ
   getTaxonomyName: getProp('name'),
+  getTaxonomyVernacularLanguageCodes: getProp('vernacularLanguageCodes', []),
   getTaxonCode: getProp('code'),
   getTaxonFamily: getProp('family'),
   getTaxonGenus: getProp('genus'),
