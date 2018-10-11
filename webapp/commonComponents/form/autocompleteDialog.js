@@ -1,11 +1,11 @@
-import './autocomplete.scss'
+import './autocompleteDialog.scss'
 
 import React from 'react'
 import { EventEmitter } from 'events'
 
-import { elementOffset } from '../../appUtils/domUtils'
+import { clickedOutside, elementOffset } from '../../appUtils/domUtils'
 
-class Autocomplete extends React.Component {
+class AutocompleteDialog extends React.Component {
 
   constructor (props) {
     super(props)
@@ -14,17 +14,20 @@ class Autocomplete extends React.Component {
 
     //add event listeners
     this.eventEmitter = new EventEmitter()
-    this.eventEmitter.on(Autocomplete.events.itemSelect, onItemSelect)
-    this.eventEmitter.on(Autocomplete.events.close, onClose)
+    this.eventEmitter.on(AutocompleteDialog.events.itemSelect, onItemSelect)
+    this.eventEmitter.on(AutocompleteDialog.events.close, onClose)
+
+    this.onInputFieldKeyDown = this.onInputFieldKeyDown.bind(this)
+    this.onOutsideClick = this.onOutsideClick.bind(this)
 
     this.list = React.createRef()
-    this.onInputFieldKeyDown = this.onInputFieldKeyDown.bind(this)
   }
 
   componentDidMount () {
     const {inputField} = this.props
 
     inputField.addEventListener('keydown', this.onInputFieldKeyDown)
+    window.addEventListener('click', this.onOutsideClick)
   }
 
   componentWillUnmount () {
@@ -35,6 +38,14 @@ class Autocomplete extends React.Component {
     }
 
     this.eventEmitter.removeAllListeners()
+
+    window.removeEventListener('click', this.onOutsideClick)
+  }
+
+  onOutsideClick (evt) {
+    if (clickedOutside(this.list.current, evt)) {
+      this.dispatchCloseEvent()
+    }
   }
 
   onInputFieldKeyDown (e) {
@@ -42,18 +53,20 @@ class Autocomplete extends React.Component {
 
     switch (e.keyCode) {
       case 40: //arrow down
-        if (items.length > 0) { //arrow down
+      case 9: //tab
+        if (items.length > 0) {
+          e.preventDefault()
+          //focus first item
           this.focusItem(0)
+        } else {
+          this.dispatchCloseEvent()
         }
         break
       case 27: //escape
-        this.close()
+        //close dialog
+        this.dispatchCloseEvent()
         inputField.focus()
         break
-    }
-
-    if (items.length > 0 && e.keyCode === 40) { //arrow down
-      this.focusItem(0)
     }
   }
 
@@ -69,10 +82,10 @@ class Autocomplete extends React.Component {
       switch (e.keyCode) {
         case 13: //enter
         case 32: //space
-          this.dispatchItemSelectEvent(this.focusedItemIndex)
+          this.dispatchItemSelectEvent(items[this.focusedItemIndex])
           break
         case 27: //escape
-          this.close()
+          this.dispatchCloseEvent()
           inputField.focus()
           break
         case 33: //page up
@@ -111,25 +124,25 @@ class Autocomplete extends React.Component {
   }
 
   onItemClick (item) {
-    this.dispatchItemSelectEvent(this.props.items.indexOf(item))
+    this.dispatchItemSelectEvent(item)
   }
 
-  dispatchItemSelectEvent (index) {
-    this.eventEmitter.emit(Autocomplete.events.itemSelect, {index})
+  dispatchItemSelectEvent (item) {
+    this.eventEmitter.emit(AutocompleteDialog.events.itemSelect, {item})
   }
 
-  close () {
-    this.eventEmitter.emit(Autocomplete.events.close)
+  dispatchCloseEvent () {
+    this.eventEmitter.emit(AutocompleteDialog.events.close)
   }
 
   calculatePosition () {
-    const {inputField} = this.props
+    const {alignToElement} = this.props
 
     const {
       top,
       left,
       height,
-    } = elementOffset(inputField)
+    } = elementOffset(alignToElement)
 
     return {
       top: (top + height),
@@ -138,13 +151,13 @@ class Autocomplete extends React.Component {
   }
 
   render () {
-    const {items, itemRenderer} = this.props
+    const {items, itemRenderer, className} = this.props
 
     const ItemRenderer = itemRenderer
 
     return (
       <div ref={this.list}
-           className="autocomplete-list"
+           className={`autocomplete-list ${className}`}
            style={{...this.calculatePosition()}}>
         {
           items.map(item => (
@@ -159,9 +172,9 @@ class Autocomplete extends React.Component {
   }
 }
 
-Autocomplete.events = {
+AutocompleteDialog.events = {
   itemSelect: 'itemSelect',
   close: 'close',
 }
 
-export default Autocomplete
+export default AutocompleteDialog

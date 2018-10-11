@@ -126,6 +126,11 @@ $tableBorder: 1px solid rgba($white, .7);
   grid-template-columns: repeat(3, auto);
 }
 
+.node-def__table-row-taxon {
+  display: grid;
+  grid-template-columns: .2fr .5fr .3fr;
+}
+
 .node-def__table-data-rows {
   display: grid;
   overflow-y: scroll;

@@ -4,7 +4,7 @@ import axios from 'axios'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import NodeDefFormItem from './nodeDefFormItem'
-import Autocomplete from '../../../../commonComponents/form/autocomplete'
+import AutocompleteDialog from '../../../../commonComponents/form/autocompleteDialog'
 
 import { toQueryString } from '../../../../../server/serverUtils/request'
 import {
@@ -22,10 +22,10 @@ import {
 import {
   getNodeValue,
 } from '../../../../../common/record/node'
+import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 const fields = {
   code: 'code',
-  genus: 'genus',
   scientificName: 'scientificName',
   vernacularName: 'vernacularName',
 }
@@ -50,7 +50,6 @@ class NodeDefTaxon extends React.Component {
     super(props)
 
     this.codeField = React.createRef()
-    this.genusField = React.createRef()
     this.scientificNameField = React.createRef()
     this.vernacularNameField = React.createRef()
 
@@ -68,7 +67,6 @@ class NodeDefTaxon extends React.Component {
   getInputFields () {
     return {
       code: this.codeField,
-      genus: this.genusField,
       scientificName: this.scientificNameField,
       vernacularName: this.vernacularNameField,
     }
@@ -80,8 +78,8 @@ class NodeDefTaxon extends React.Component {
   }
 
   getTaxonNodeValue () {
-    const {nodes} = this.props
-    const node = nodes[0]
+    const {edit, nodes} = this.props
+    const node = edit ? null : nodes[0]
 
     return getNodeValue(node, {
       code: '',
@@ -98,6 +96,7 @@ class NodeDefTaxon extends React.Component {
 
   onInputFieldChange (field, value) {
     this.setState({
+      [field]: value,
       dirty: true,
       autocompleteOpened: true,
       autocompleteTaxa: [],
@@ -107,14 +106,11 @@ class NodeDefTaxon extends React.Component {
     this.loadTaxa(field, value)
   }
 
-  onTaxonSelect ({index}) {
+  onTaxonSelect ({item: taxon}) {
     const {nodeDef, nodes, updateNode} = this.props
 
     const node = nodes[0]
 
-    const {autocompleteTaxa} = this.state
-
-    const taxon = autocompleteTaxa[index]
     const value = {
       code: getTaxonCode(taxon),
       family: getTaxonFamily(taxon),
@@ -165,10 +161,12 @@ class NodeDefTaxon extends React.Component {
   }
 
   render () {
-    const {nodeDef, draft, edit} = this.props
+    const {
+      edit, label, renderType
+    } = this.props
+
     const {
       code,
-      genus,
       scientificName,
       vernacularName,
 
@@ -177,6 +175,61 @@ class NodeDefTaxon extends React.Component {
       autocompleteInputField,
     } = this.state
 
+    // table header
+    if (renderType === nodeDefRenderType.tableHeader) {
+      return <div className="node-def__table-row-taxon">
+        <label className="node-def__table-header" style={{gridColumn: '1 / span 4'}}>
+          {label}
+        </label>
+        <label className="node-def__table-header">Code</label>
+        <label className="node-def__table-header">Scientific Name</label>
+        <label className="node-def__table-header">Vernacular Name</label>
+      </div>
+    }
+
+    const codeInputField = <Input ref={this.codeField}
+                                  readOnly={edit}
+                                  value={code}
+                                  onChange={(e) => this.onInputFieldChange(fields.code, e.target.value)}/>
+
+    const scientificNameInputField = <Input ref={this.scientificNameField}
+                                            readOnly={edit}
+                                            value={scientificName}
+                                            onChange={(e) => this.onInputFieldChange(fields.scientificName, e.target.value)}/>
+
+    const vernacularNameInputField = <Input ref={this.vernacularNameField}
+                                            readOnly={edit}
+                                            value={vernacularName}
+                                            onChange={(e) => this.onInputFieldChange(fields.vernacularName, e.target.value)}/>
+
+    const autocompleteDialog =
+      autocompleteOpened
+        ? ReactDOM.createPortal(
+        <AutocompleteDialog items={autocompleteTaxa}
+                            itemRenderer={TaxonAutocompleteItemRenderer}
+                            onItemSelect={e => this.onTaxonSelect(e)}
+                            onClose={() => this.onAutocompleteClose()}
+                            className="node-def__taxon-autocomplete-list"
+                            inputField={autocompleteInputField.current.inputElement}
+                            alignToElement={
+                              (renderType === nodeDefRenderType.tableBody
+                                  ? this.getInputFields().code
+                                  : autocompleteInputField
+                              ).current.inputElement}/>,
+        document.body
+        )
+        : null
+
+    if (renderType === nodeDefRenderType.tableBody) {
+      return <div className="node-def__table-row-taxon node-def__table-data-composite-attr">
+        {codeInputField}
+        {scientificNameInputField}
+        {vernacularNameInputField}
+
+        {autocompleteDialog}
+      </div>
+    }
+
     return (
       <NodeDefFormItem {...this.props}>
         <div style={{
@@ -184,43 +237,17 @@ class NodeDefTaxon extends React.Component {
           gridTemplateColumns: '1fr'
         }}>
           <FormItem label="Code">
-            <Input ref={this.codeField}
-                   readOnly={edit}
-                   value={code}
-                   onChange={(e) => this.onInputFieldChange(fields.code, e.target.value)}/>
-          </FormItem>
-          <FormItem label="Genus">
-            <Input ref={this.genus}
-                   readOnly={edit}
-                   value={genus}
-                   onChange={(e) => this.onInputFieldChange(fields.genus, e.target.value)}/>
+            {codeInputField}
           </FormItem>
           <FormItem label="Scientific Name">
-            <Input ref={this.scientificNameField}
-                   readOnly={edit}
-                   value={scientificName}
-                   onChange={(e) => this.onInputFieldChange(fields.scientificName, e.target.value)}/>
+            {scientificNameInputField}
           </FormItem>
           <FormItem label="Vernacular Name">
-            <Input ref={this.vernacularNameField}
-                   readOnly={edit}
-                   value={vernacularName}
-                   onChange={(e) => this.onInputFieldChange(fields.vernacularName, e.target.value)}/>
+            {vernacularNameInputField}
           </FormItem>
         </div>
 
-        {
-          autocompleteOpened ?
-            ReactDOM.createPortal(
-              <Autocomplete items={autocompleteTaxa}
-                            itemRenderer={TaxonAutocompleteItemRenderer}
-                            onItemSelect={e => this.onTaxonSelect(e)}
-                            onClose={() => this.onAutocompleteClose()}
-                            inputField={autocompleteInputField.current.inputElement}/>,
-              document.body
-            )
-            : null
-        }
+        {autocompleteDialog}
       </NodeDefFormItem>
     )
   }

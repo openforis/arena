@@ -1,4 +1,17 @@
+@import "../../../style/vars";
+
 .node-def__code-checkbox-wrapper {
   display: flex;
   flex-wrap: wrap;
+}
+
+.node-def__taxon-autocomplete-list .item {
+  display: grid;
+  grid-template-columns: .3fr .7fr;
+
+  div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
