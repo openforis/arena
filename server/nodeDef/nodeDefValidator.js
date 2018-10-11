@@ -27,9 +27,16 @@ const validateCodeList = async (propName, nodeDef) =>
     ? validateRequired(propName, nodeDef)
     : null
 
+const validateTaxonomy = async (propName, nodeDef) =>
+  getNodeDefType(nodeDef) === nodeDefType.taxon
+    ? validateRequired(propName, nodeDef)
+    : null
+
+
 const propsValidations = {
   'props.name': [validateRequired, validateNodeDefNameUniqueness],
   'props.codeListUUID': [validateCodeList],
+  'props.taxonomyUUID': [validateTaxonomy],
 }
 
 const validateNodeDef = async nodeDef =>
