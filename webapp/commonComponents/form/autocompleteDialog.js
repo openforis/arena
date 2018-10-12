@@ -128,7 +128,7 @@ class AutocompleteDialog extends React.Component {
   }
 
   dispatchItemSelectEvent (item) {
-    this.eventEmitter.emit(AutocompleteDialog.events.itemSelect, {item})
+    this.eventEmitter.emit(AutocompleteDialog.events.itemSelect, item)
   }
 
   dispatchCloseEvent () {

@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
+import * as R from 'ramda'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import NodeDefFormItem from './nodeDefFormItem'
@@ -11,7 +12,8 @@ import {
   getTaxonCode,
   getTaxonFamily,
   getTaxonGenus,
-  getTaxonScientificName
+  getTaxonScientificName,
+  getTaxonVernacularNames,
 } from '../../../../../common/survey/taxonomy'
 import {
   getTaxonomyUUID,
@@ -30,10 +32,15 @@ const fields = {
   vernacularName: 'vernacularName',
 }
 
-const AUTOCOMPLETE_ROWS = 20
-
 const TaxonAutocompleteItemRenderer = props => {
   const {item: taxon, ...otherProps} = props
+
+  const vernacularNames = getTaxonVernacularNames(taxon)
+  const vernacularNamesString = R.pipe(
+    R.keys, //vernacular language codes
+    R.map(langCode => `${langCode}: ${R.prop(langCode, vernacularNames)}`),
+    R.join(' / ')
+  )(vernacularNames)
 
   return <div {...otherProps}
               key={taxon.uuid}
@@ -41,6 +48,7 @@ const TaxonAutocompleteItemRenderer = props => {
               tabIndex="1">
     <div>{getTaxonCode(taxon)}</div>
     <div>{getTaxonScientificName(taxon)}</div>
+    <div style={{gridColumn: 2}}>{vernacularNamesString}</div>
   </div>
 }
 
@@ -64,17 +72,17 @@ class NodeDefTaxon extends React.Component {
     }
   }
 
+  componentDidUpdate (prevProps) {
+    if (this.props.node !== prevProps.node)
+      console.log('node changed')
+  }
+
   getInputFields () {
     return {
       code: this.codeField,
       scientificName: this.scientificNameField,
       vernacularName: this.vernacularNameField,
     }
-  }
-
-  componentDidUpdate (prevProps) {
-    if (this.props.node !== prevProps.node)
-      this.resetValue()
   }
 
   getTaxonNodeValue () {
@@ -90,13 +98,20 @@ class NodeDefTaxon extends React.Component {
     })
   }
 
-  resetValue () {
-    this.onValueChange(this.getTaxonNodeValue())
-  }
-
   onInputFieldChange (field, value) {
+    //reset other fields values
+
+    const fieldValues =
+      R.assoc(field, value)(
+        {
+          code: '',
+          scientificName: '',
+          vernacularName: '',
+        }
+      )
+
     this.setState({
-      [field]: value,
+      ...fieldValues,
       dirty: true,
       autocompleteOpened: true,
       autocompleteTaxa: [],
@@ -104,13 +119,12 @@ class NodeDefTaxon extends React.Component {
     })
 
     this.loadTaxa(field, value)
+
+    //reset stored value
+    this.updateNodeValue(null)
   }
 
-  onTaxonSelect ({item: taxon}) {
-    const {nodeDef, nodes, updateNode} = this.props
-
-    const node = nodes[0]
-
+  onTaxonSelect (taxon) {
     const value = {
       code: getTaxonCode(taxon),
       family: getTaxonFamily(taxon),
@@ -119,11 +133,21 @@ class NodeDefTaxon extends React.Component {
     }
     this.onValueChange(value)
 
+    this.updateNodeValue(value)
+  }
+
+  updateNodeValue (value) {
+    const {nodeDef, nodes, updateNode} = this.props
+
+    const node = nodes[0]
+
     updateNode(nodeDef, node, value)
+
   }
 
   onAutocompleteClose () {
-    this.resetValue()
+    //reset value
+    this.onValueChange(null)
   }
 
   onValueChange (value) {
@@ -143,7 +167,7 @@ class NodeDefTaxon extends React.Component {
 
     const params = {
       draft: false,
-      limit: AUTOCOMPLETE_ROWS,
+      limit: 20,
       offset: 0,
       filter: {
         [field]: value,
@@ -207,15 +231,15 @@ class NodeDefTaxon extends React.Component {
         ? ReactDOM.createPortal(
         <AutocompleteDialog items={autocompleteTaxa}
                             itemRenderer={TaxonAutocompleteItemRenderer}
-                            onItemSelect={e => this.onTaxonSelect(e)}
+                            onItemSelect={taxon => this.onTaxonSelect(taxon)}
                             onClose={() => this.onAutocompleteClose()}
                             className="node-def__taxon-autocomplete-list"
-                            inputField={autocompleteInputField.current.inputElement}
+                            inputField={autocompleteInputField.current}
                             alignToElement={
                               (renderType === nodeDefRenderType.tableBody
                                   ? this.getInputFields().code
                                   : autocompleteInputField
-                              ).current.inputElement}/>,
+                              ).current}/>,
         document.body
         )
         : null
@@ -232,10 +256,7 @@ class NodeDefTaxon extends React.Component {
 
     return (
       <NodeDefFormItem {...this.props}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr'
-        }}>
+        <div className="node-def__taxon-wrapper">
           <FormItem label="Code">
             {codeInputField}
           </FormItem>

@@ -30,12 +30,12 @@ module.exports = {
   newTaxon,
 
   //READ
-  getTaxonomyName: getProp('name'),
+  getTaxonomyName: getProp('name', ''),
   getTaxonomyVernacularLanguageCodes: getProp('vernacularLanguageCodes', []),
-  getTaxonCode: getProp('code'),
-  getTaxonFamily: getProp('family'),
-  getTaxonGenus: getProp('genus'),
-  getTaxonScientificName: getProp('scientificName'),
+  getTaxonCode: getProp('code', ''),
+  getTaxonFamily: getProp('family', ''),
+  getTaxonGenus: getProp('genus', ''),
+  getTaxonScientificName: getProp('scientificName', ''),
   getTaxonVernacularNames: getProp('vernacularNames', {}),
   getTaxonVernacularName,
 

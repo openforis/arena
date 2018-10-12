@@ -15,3 +15,8 @@
     text-overflow: ellipsis;
   }
 }
+
+.node-def__taxon-wrapper {
+  display: flex;
+  flex-direction: column;
+}
