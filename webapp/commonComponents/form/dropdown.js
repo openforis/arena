@@ -5,8 +5,8 @@ import ReactDOM from 'react-dom'
 
 import * as R from 'ramda'
 
-import { clickedOutside, elementOffset } from '../../appUtils/domUtils'
 import { Input } from './input'
+import AutocompleteDialog from './autocompleteDialog'
 
 const dropdownListItemClassName = 'dropdown__list-item'
 
@@ -20,18 +20,14 @@ class Dropdown extends React.Component {
     this.state = {
       items: autocompleteMinChars > 0 ? [] : items,
       displayValue: this.getItemLabel(selection),
-      itemsFocusIndex: -1,
       opened: false,
     }
 
-    this.outsideClick = this.outsideClick.bind(this)
     this.onSelectionChange = this.onSelectionChange.bind(this)
 
     this.dropdown = React.createRef()
     this.input = React.createRef()
     this.dropdownList = React.createRef()
-
-    window.addEventListener('click', this.outsideClick)
   }
 
   componentDidUpdate (prevProps) {
@@ -42,25 +38,10 @@ class Dropdown extends React.Component {
       })
   }
 
-  componentWillUnmount () {
-    window.removeEventListener('click', this.outsideClick)
-  }
-
-  getInputEl () {
-    return this.input.current.inputElement
-  }
-
-  outsideClick (evt) {
-    if (this.isOpened() && clickedOutside(this.dropdown.current, evt)) {
-      this.toggleOpened()
-    }
-  }
-
   toggleOpened (callback = null) {
     if (!(this.props.readOnly || this.props.disabled)) {
       this.setState({
         opened: !this.state.opened,
-        itemsFocusIndex: -1,
       }, callback)
     }
   }
@@ -77,16 +58,8 @@ class Dropdown extends React.Component {
     this.setState({
       selection: clearOnSelection ? null : item,
       displayValue: clearOnSelection ? '' : this.getItemLabel(item),
-      itemsFocusIndex: -1,
       opened: false,
     })
-  }
-
-  selectFocusedItem () {
-    const {itemsFocusIndex, items} = this.state
-    if (itemsFocusIndex >= 0) {
-      this.onSelectionChange(items[itemsFocusIndex])
-    }
   }
 
   onInputChange (evt) {
@@ -118,7 +91,6 @@ class Dropdown extends React.Component {
     this.setState({
       items: filteredItems,
       displayValue: value,
-      itemsFocusIndex: -1,
       opened: true,
     })
 
@@ -126,7 +98,7 @@ class Dropdown extends React.Component {
   }
 
   onInputFocus () {
-    if (!this.isOpened() && this.props.selection === null) {
+    if (!this.isOpened() && !R.isEmpty(this.state.items) && this.props.selection === null) {
       this.toggleOpened()
     }
   }
@@ -135,85 +107,6 @@ class Dropdown extends React.Component {
     const itemFocused = R.prop('className')(e.relatedTarget) === dropdownListItemClassName
     if (this.isOpened() && !itemFocused) {
       this.toggleOpened()
-    }
-  }
-
-  onInputKeyDown (e) {
-    const {items} = this.state
-    if (items.length > 0 && e.keyCode === 40) { //arrow down
-      if (!this.isOpened()) {
-        this.toggleOpened(() => this.focusItem(0))
-      } else {
-        this.focusItem(0)
-      }
-    }
-  }
-
-  onListItemKeyDown (e) {
-    e.stopPropagation()
-    e.preventDefault()
-
-    const {items, itemsFocusIndex} = this.state
-    if (items.length > 0) {
-      let offset = 0
-      switch (e.keyCode) {
-        case 13: //enter
-        case 32: //space
-          this.selectFocusedItem()
-          break
-        case 27: //escape
-          this.toggleOpened()
-          this.getInputEl().focus()
-          break
-        case 33: //page up
-          offset = -10
-          break
-        case 34: //page down
-          offset = 10
-          break
-        case 38: //arrow up
-          offset = -1
-          break
-        case 40: //arrow down
-          offset = 1
-          break
-      }
-      if (offset) {
-        let index = itemsFocusIndex + offset
-        if (index < 0)
-          index = 0
-        else if (index >= items.length)
-          index = items.length - 1
-        this.focusItem(index)
-      }
-    }
-  }
-
-  focusItem (index) {
-    const dropdownEl = this.dropdownList.current
-    const itemEl = dropdownEl.getElementsByClassName(dropdownListItemClassName)[index]
-    if (!itemEl) {
-      console.log(index)
-    }
-    itemEl.focus()
-
-    this.setState({
-      itemsFocusIndex: index
-    })
-  }
-
-  getOffset () {
-    const {
-      top,
-      left,
-      height,
-      width
-    } = elementOffset(this.getInputEl())
-
-    return {
-      top: (top + height),
-      left,
-      width
     }
   }
 
@@ -260,6 +153,15 @@ class Dropdown extends React.Component {
       displayValue,
     } = this.state
 
+    const DropdownItemRenderer = props => {
+      const {item, ...otherProps} = props
+
+      return <div {...otherProps}
+                  className={dropdownListItemClassName}>
+        {this.getItemLabel(item)}
+      </div>
+    }
+
     return <div ref={this.dropdown}
                 className={`dropdown ${className}`}
                 style={style}
@@ -271,32 +173,26 @@ class Dropdown extends React.Component {
              readOnly={readOnly}
              disabled={disabled}
              onChange={e => this.onInputChange(e)}
-             onFocus={e => this.onInputFocus(e)}
-             onKeyDown={e => this.onInputKeyDown(e)}/>
+             onFocus={e => this.onInputFocus(e)}/>
 
       <span className="icon icon-menu2 icon-24px"
-            onClick={() => this.toggleOpened()}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              this.toggleOpened()
+            }}
             aria-disabled={disabled}/>
       {
         this.isOpened() ?
           ReactDOM.createPortal(
-            <div ref={this.dropdownList}
-                 className="dropdown__list"
-                 style={{
-                   ...this.getOffset(),
-                 }}>
-              {
-                items.map(
-                  item => <div key={this.getItemKey(item)}
-                               className={dropdownListItemClassName}
-                               onMouseDown={() => this.onSelectionChange(item)}
-                               onKeyDown={e => this.onListItemKeyDown(e)}
-                               tabIndex="1">
-                    {this.getItemLabel(item)}
-                  </div>
-                )
-              }
-            </div>,
+            <AutocompleteDialog ref={this.dropdownList}
+                                items={items}
+                                itemRenderer={DropdownItemRenderer}
+                                itemKeyFunction={item => this.getItemKey(item)}
+                                inputField={this.input.current.inputElement}
+                                alignToElement={this.input.current.inputElement}
+                                onItemSelect={item => this.onSelectionChange(item)}
+                                onClose={() => this.toggleOpened()}/>,
             document.body
           )
           : null

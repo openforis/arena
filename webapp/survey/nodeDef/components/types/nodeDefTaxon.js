@@ -229,17 +229,19 @@ class NodeDefTaxon extends React.Component {
     const autocompleteDialog =
       autocompleteOpened
         ? ReactDOM.createPortal(
-        <AutocompleteDialog items={autocompleteTaxa}
+        <AutocompleteDialog className="node-def__taxon-autocomplete-list"
+                            items={autocompleteTaxa}
                             itemRenderer={TaxonAutocompleteItemRenderer}
-                            onItemSelect={taxon => this.onTaxonSelect(taxon)}
-                            onClose={() => this.onAutocompleteClose()}
-                            className="node-def__taxon-autocomplete-list"
-                            inputField={autocompleteInputField.current}
+                            itemKeyFunction={taxon => taxon.uuid}
+                            inputField={autocompleteInputField.current.inputElement}
+                            limitToInputFieldWidth={false}
                             alignToElement={
                               (renderType === nodeDefRenderType.tableBody
                                   ? this.getInputFields().code
                                   : autocompleteInputField
-                              ).current}/>,
+                              ).current.inputElement}
+                            onItemSelect={taxon => this.onTaxonSelect(taxon)}
+                            onClose={() => this.onAutocompleteClose()}/>,
         document.body
         )
         : null

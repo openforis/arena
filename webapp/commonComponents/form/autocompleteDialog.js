@@ -1,6 +1,7 @@
 import './autocompleteDialog.scss'
 
 import React from 'react'
+import * as R from 'ramda'
 import { EventEmitter } from 'events'
 
 import { clickedOutside, elementOffset } from '../../appUtils/domUtils'
@@ -43,7 +44,9 @@ class AutocompleteDialog extends React.Component {
   }
 
   onOutsideClick (evt) {
-    if (clickedOutside(this.list.current, evt)) {
+    const {inputField} = this.props
+
+    if (clickedOutside(this.list.current, evt) && clickedOutside(inputField, evt)) {
       this.dispatchCloseEvent()
     }
   }
@@ -136,22 +139,27 @@ class AutocompleteDialog extends React.Component {
   }
 
   calculatePosition () {
-    const {alignToElement} = this.props
+    const {alignToElement, limitToInputFieldWidth = true} = this.props
 
     const {
       top,
       left,
       height,
+      width,
     } = elementOffset(alignToElement)
 
-    return {
+    const style = {
       top: (top + height),
       left,
     }
+
+    return limitToInputFieldWidth
+      ? R.assoc('width', width)(style)
+      : style
   }
 
   render () {
-    const {items, itemRenderer, className} = this.props
+    const {items, itemRenderer, itemKeyFunction, className} = this.props
 
     const ItemRenderer = itemRenderer
 
@@ -161,7 +169,8 @@ class AutocompleteDialog extends React.Component {
            style={{...this.calculatePosition()}}>
         {
           items.map(item => (
-            <ItemRenderer key={item.uuid}
+            <ItemRenderer key={itemKeyFunction(item)}
+                          tabIndex="1"
                           item={item}
                           onKeyDown={e => this.onListItemKeyDown(e)}
                           onMouseDown={() => this.onItemClick(item)}/>
