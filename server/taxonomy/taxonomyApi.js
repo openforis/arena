@@ -52,9 +52,9 @@ module.exports.init = app => {
       const taxonomyId = getRestParam(req, 'taxonomyId')
 
       const file = req.files.file
-      importTaxa(surveyId, taxonomyId, file.data)
+      const importJob = await importTaxa(surveyId, taxonomyId, file.data)
 
-      sendOk(res)
+      res.json({importJob})
     } catch (err) {
       sendErr(res, err)
     }

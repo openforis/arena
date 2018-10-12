@@ -3,16 +3,20 @@ const db = require('../db/db')
 const {getSurveyDBSchema} = require('../../common/survey/survey')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 
-const updateSurveyTableProp = async (tableName, surveyId, id, {key, value}, client = db) => {
-  const prop = {[key]: value}
+const updateSurveyTableProp = async (tableName, surveyId, id, {key, value}, draft = true, client = db) => {
+  return updateSurveyTableProps(tableName, surveyId, id, {[key]: value}, draft, client)
+}
+
+const updateSurveyTableProps = async (tableName, surveyId, id, props, draft = true, client = db) => {
+  const propsCol = draft ? 'props_draft' : 'props'
 
   return await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
-     SET props_draft = props_draft || $1
+     SET ${propsCol} = ${propsCol} || $1
      WHERE id = $2
      RETURNING *`
-    , [JSON.stringify(prop), id]
-    , def => dbTransformCallback(def, true)
+    , [JSON.stringify(props), id]
+    , def => dbTransformCallback(def, draft)
   )
 }
 
@@ -29,5 +33,6 @@ const deleteSurveyTableRecord = async (tableName, surveyId, id, client = db) =>
 
 module.exports = {
   updateSurveyTableProp,
+  updateSurveyTableProps,
   deleteSurveyTableRecord,
 }

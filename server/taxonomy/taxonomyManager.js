@@ -11,6 +11,16 @@ const {
   getTaxonVernacularName,
 } = require('../../common/survey/taxonomy')
 
+const {
+  createJob,
+  updateJobProgress,
+  updateJobStatus,
+} = require('../job/jobManager')
+
+const {
+  jobStatus
+} = require('../../common/job/job')
+
 const {TaxaParser} = require('./taxaParser')
 
 const {
@@ -23,7 +33,10 @@ const {
 
 const storeTaxa = async (surveyId, taxonomyId, vernacularLanguageCodes, taxa) => {
   await db.tx(async t => {
-    await updateTaxonomyProp(surveyId, taxonomyId, {key: 'vernacularLanguageCodes', value: vernacularLanguageCodes}, t)
+    await updateTaxonomyProp(surveyId, taxonomyId, {
+      key: 'vernacularLanguageCodes',
+      value: vernacularLanguageCodes
+    }, true, t)
     await deleteTaxaByTaxonomyId(surveyId, taxonomyId, t)
     await insertTaxa(surveyId, taxa, t)
   })
@@ -69,17 +82,27 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
 }
 
 const importTaxa = async (surveyId, taxonomyId, inputBuffer) => {
-  await new TaxaParser(taxonomyId, inputBuffer)
-    .start(async parseResult => {
-      const hasErrors = !R.isEmpty(R.keys(parseResult.errors))
+  const importJob = await createJob(surveyId, 'import taxa')
 
+  await new TaxaParser(taxonomyId, inputBuffer)
+    .onStart(async () => console.log('started') || await updateJobStatus(surveyId, importJob.id, jobStatus.running))
+    .onProgress(async event => console.log('updating') || await updateJobProgress(surveyId, importJob.id, event.progressPercent))
+    .onEnd(async parseResult => {
+      console.log('completed')
+
+      const hasErrors = !R.isEmpty(R.keys(parseResult.errors))
       if (hasErrors) {
         console.log('errors found')
+        await updateJobStatus(surveyId, importJob.id, jobStatus.error)
       } else {
         await storeTaxa(surveyId, taxonomyId, parseResult.vernacularLanguageCodes, parseResult.taxa)
         console.log(`taxa stored: ${parseResult.taxa.length}`)
+        await updateJobStatus(surveyId, importJob.id, jobStatus.completed)
       }
     })
+    .start()
+
+  return importJob
 }
 
 module.exports = {
