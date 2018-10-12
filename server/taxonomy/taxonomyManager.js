@@ -3,15 +3,18 @@ const db = require('../db/db')
 const fastcsv = require('fast-csv')
 
 const {
+  getTaxonomyVernacularLanguageCodes,
   getTaxonCode,
   getTaxonFamily,
   getTaxonGenus,
-  getTaxonScientificName
+  getTaxonScientificName,
+  getTaxonVernacularName,
 } = require('../../common/survey/taxonomy')
 
 const {TaxaParser} = require('./taxaParser')
 
 const {
+  fetchTaxonomyById,
   fetchTaxa,
   insertTaxa,
   updateTaxonomyProp,
@@ -27,18 +30,22 @@ const storeTaxa = async (surveyId, taxonomyId, vernacularLanguageCodes, taxa) =>
 }
 
 const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
-  console.log('start csv export', draft)
+  console.log('start csv export')
+
+  const taxonomy = await fetchTaxonomyById(surveyId, taxonomyId, draft)
+  const vernacularLanguageCodes = getTaxonomyVernacularLanguageCodes(taxonomy)
 
   const csvStream = fastcsv.createWriteStream({headers: true})
   csvStream.pipe(output)
 
-  //write header
-  csvStream.write([
+  const fixedHeaders = [
     'code',
     'family',
     'genus',
     'scientific_name'
-  ])
+  ]
+  //write headers
+  csvStream.write(R.concat(fixedHeaders, vernacularLanguageCodes))
 
   //write taxa
   const taxa = await fetchTaxa(surveyId, taxonomyId, null, 0, null, {
@@ -47,14 +54,18 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   }, draft)
 
   taxa.forEach(taxon => {
-    csvStream.write([
-      getTaxonCode(taxon),
-      getTaxonFamily(taxon),
-      getTaxonGenus(taxon),
-      getTaxonScientificName(taxon)
-    ])
+    csvStream.write(R.concat([
+        getTaxonCode(taxon),
+        getTaxonFamily(taxon),
+        getTaxonGenus(taxon),
+        getTaxonScientificName(taxon)
+      ],
+      R.map(langCode => getTaxonVernacularName(langCode)(taxon))(vernacularLanguageCodes)
+    ))
   })
   csvStream.end()
+
+  console.log('csv export completed')
 }
 
 const importTaxa = async (surveyId, taxonomyId, inputBuffer) => {

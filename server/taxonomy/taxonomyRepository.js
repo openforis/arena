@@ -128,6 +128,7 @@ module.exports = {
   insertTaxonomy,
   insertTaxa,
   //READ
+  fetchTaxonomyById,
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyId,
   fetchTaxa,
