@@ -24,7 +24,8 @@ const itemsValidationPath = ['validation', 'fields', 'items']
 // ====== CREATE
 const newCodeList = () => ({
   uuid: uuidv4(),
-  levels: {0: newCodeListLevel()}
+  levels: {0: newCodeListLevel()},
+  props: {},
 })
 
 // ====== READ
