@@ -63,28 +63,29 @@ class TaxaParser {
           console.log(`total rows: ${totalRows}`)
 
           this.totalRows = totalRows
-          this.currentRow = 0
-          this.processedRows = 0
+          this.currentRowIndex = 0
 
-          fastcsv.fromString(this.csvString, {headers: true})
+          const csvStream = fastcsv.fromString(this.csvString, {headers: true})
             .on('data', async data => {
-              const row = this.currentRow
-              this.currentRow++
-
-              if (this.currentRow > 0) {
+              csvStream.pause()
+              if (this.currentRowIndex > 0) {
                 const taxonParseResult = await this.parseTaxon(data)
 
                 if (taxonParseResult.taxon) {
                   this.result.taxa.push(taxonParseResult.taxon)
                 } else {
-                  this.result.errors[row] = taxonParseResult.errors
+                  this.result.errors[this.currentRowIndex] = taxonParseResult.errors
                 }
-                this.processedRows++
-                this.dispatchProgressEvent()
               }
+              this.dispatchProgressEvent()
+              this.currentRowIndex++
+              csvStream.resume()
             })
             .on('end', () => {
-              this.dispatchEndEvent()
+              //wait for the last row to be processed and dispatch 'end' event
+              setTimeout(() => {
+                this.dispatchEndEvent()
+              }, 1000)
             })
         })
       } else {
@@ -96,12 +97,11 @@ class TaxaParser {
   processHeaders (callback) {
     const csvStream = fastcsv.fromString(this.csvString, {headers: true})
     csvStream.on('data', async data => {
+      csvStream.destroy() //stop streaming CSV
       const validHeaders = this.validateHeaders(data)
       if (validHeaders) {
         this.result.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, R.keys(data))
       }
-      csvStream.destroy()
-
       callback(validHeaders)
     })
   }
@@ -116,11 +116,11 @@ class TaxaParser {
   validateHeaders (data) {
     const columns = R.keys(data)
     const missingColumns = R.difference(requiredColumns, columns)
-    if (!R.isEmpty(missingColumns)) {
+    if (R.isEmpty(missingColumns)) {
+      return true
+    } else {
       this.result.errors[0] = `Missing required columns: ${R.join(', ', missingColumns)}`
       return false
-    } else {
-      return true
     }
   }
 
@@ -158,19 +158,17 @@ class TaxaParser {
   }
 
   dispatchProgressEvent () {
-    if (this.processedRows % 1000 === 0)
-      console.log(`${this.processedRows} rows parsed `)
     this.eventEmitter.emit('progress', {
       total: this.totalRows,
-      processed: this.processedRows,
-      progressPercent: Math.ceil(100 * this.processedRows / this.totalRows)
+      processed: this.currentRowIndex + 1,
+      progressPercent: Math.ceil(100 * (this.currentRowIndex + 1) / this.totalRows)
     })
   }
 
   dispatchEndEvent () {
     const end = new Date()
     const elapsedSeconds = (end.getTime() - this.startTime.getTime()) / 1000
-    console.log(`csv parsed successfully in ${elapsedSeconds}. taxa: ${this.result.taxa.length} errors: ${R.keys(this.result.errors).length}`)
+    console.log(`csv parsed successfully in ${elapsedSeconds} seconds. taxa: ${this.result.taxa.length} errors: ${R.keys(this.result.errors).length}`)
 
     this.eventEmitter.emit('end', this.result)
   }

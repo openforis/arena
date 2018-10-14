@@ -1,5 +1,4 @@
 const db = require('../db/db')
-const R = require('ramda')
 const camelize = require('camelize')
 
 const {getSurveyDBSchema} = require('../../common/survey/survey')
@@ -29,7 +28,7 @@ const fetchJobById = async (surveyId, id, client = db) =>
 // ============== UPDATE
 
 const updateJobProps = async (surveyId, id, props, client = db) =>
-  updateSurveyTableProps('job', surveyId, id, props, false, client)
+  await updateSurveyTableProps('job', surveyId, id, props, false, client)
 
 module.exports = {
   //CREATE

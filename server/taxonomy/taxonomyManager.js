@@ -85,11 +85,9 @@ const importTaxa = async (surveyId, taxonomyId, inputBuffer) => {
   const importJob = await createJob(surveyId, 'import taxa')
 
   await new TaxaParser(taxonomyId, inputBuffer)
-    .onStart(async () => console.log('started') || await updateJobStatus(surveyId, importJob.id, jobStatus.running))
-    .onProgress(async event => console.log('updating') || await updateJobProgress(surveyId, importJob.id, event.progressPercent))
+    .onStart(async () => await updateJobStatus(surveyId, importJob.id, jobStatus.running))
+    .onProgress(async event => await updateJobProgress(surveyId, importJob.id, event.progressPercent))
     .onEnd(async parseResult => {
-      console.log('completed')
-
       const hasErrors = !R.isEmpty(R.keys(parseResult.errors))
       if (hasErrors) {
         console.log('errors found')
