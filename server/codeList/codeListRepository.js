@@ -5,7 +5,11 @@ const R = require('ramda')
 const {updateSurveyTableProp, deleteSurveyTableRecord} = require('../serverUtils/repository')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 const {getSurveyDBSchema} = require('../../common/survey/survey')
-const {getCodeListLevelsArray, assocCodeListLevelsArray} = require('../../common/survey/codeList')
+const {
+  getCodeListLevelsArray,
+  assocCodeListLevelsArray,
+  getCodeListItemCode
+} = require('../../common/survey/codeList')
 
 // ============== CREATE
 
@@ -87,33 +91,26 @@ const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = fals
 
 const fetchCodeListItemsByParentId = async (surveyId, codeListId, parentId = null, draft = false, client = db) => {
   const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, draft, client)
+  return filterCodeListItemsByParentId(items, parentId)
+}
 
-  return R.filter(R.propEq('parentId', parentId))(items)
+const filterCodeListItemsByParentId = (allItems, parentId) =>
+  R.filter(R.propEq('parentId', parentId))(allItems)
+
+const filterCodeListItemsByAncestorCodes = (allItems, ancestorCodes) => {
+  if (R.isEmpty(ancestorCodes)) {
+    return filterCodeListItemsByParentId(allItems, null)
+  } else {
+    const previousLevelItems = filterCodeListItemsByAncestorCodes(allItems, R.take(ancestorCodes.length - 1, ancestorCodes))
+    const lastCode = R.last(ancestorCodes)
+    const previousLevelParentItem = R.find(item => getCodeListItemCode(item) === lastCode)(previousLevelItems)
+    return filterCodeListItemsByParentId(allItems, previousLevelParentItem.id)
+  }
 }
 
 const fetchCodeListItemsByAncestorCodes = async (surveyId, codeListId, ancestorCodes, draft = false, client = db) => {
-  const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, draft, client)
-
-  if (R.isEmpty(ancestorCodes)) {
-    return R.filter(R.propEq('parentId', null))(items)
-  } else {
-    let parentId = null
-    let ancestorItem = null
-
-    ancestorCodes.forEach(ancestorCode => {
-      ancestorItem = R.find(
-        R.and(
-          R.propEq('parentId', parentId),
-          R.pathEq(['props', 'code'], ancestorCode)
-        )
-      )(items)
-      if (ancestorItem == null) {
-        return [] //ancestor not found, wrong code value?
-      }
-      parentId = ancestorItem.id
-    })
-    return R.filter(R.propEq('parentId', ancestorItem.id))
-  }
+  const allItems = await fetchCodeListItemsByCodeListId(surveyId, codeListId, draft, client)
+  return filterCodeListItemsByAncestorCodes(allItems, ancestorCodes)
 }
 
 // ============== UPDATE
