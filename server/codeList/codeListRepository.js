@@ -91,6 +91,31 @@ const fetchCodeListItemsByParentId = async (surveyId, codeListId, parentId = nul
   return R.filter(R.propEq('parentId', parentId))(items)
 }
 
+const fetchCodeListItemsByAncestorCodes = async (surveyId, codeListId, ancestorCodes, draft = false, client = db) => {
+  const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, draft, client)
+
+  if (R.isEmpty(ancestorCodes)) {
+    return R.filter(R.propEq('parentId', null))(items)
+  } else {
+    let parentId = null
+    let ancestorItem = null
+
+    ancestorCodes.forEach(ancestorCode => {
+      ancestorItem = R.find(
+        R.and(
+          R.propEq('parentId', parentId),
+          R.pathEq(['props', 'code'], ancestorCode)
+        )
+      )(items)
+      if (ancestorItem == null) {
+        return [] //ancestor not found, wrong code value?
+      }
+      parentId = ancestorItem.id
+    })
+    return R.filter(R.propEq('parentId', ancestorItem.id))
+  }
+}
+
 // ============== UPDATE
 
 const updateCodeListProp = R.partial(updateSurveyTableProp, ['code_list'])
@@ -118,6 +143,7 @@ module.exports = {
   fetchCodeListLevelsByCodeListId,
   fetchCodeListItemsByCodeListId,
   fetchCodeListItemsByParentId,
+  fetchCodeListItemsByAncestorCodes,
 
   //UPDATE
   updateCodeListProp,

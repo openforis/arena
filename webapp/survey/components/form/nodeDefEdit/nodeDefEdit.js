@@ -6,7 +6,7 @@ import CodeListsView from './../../../codeList/components/codeListsView'
 import TaxonomiesView from '../../../taxonomy/components/taxonomiesView'
 
 import { canUpdateCodeList } from '../../../../../common/survey/survey'
-import { getCodeListUUID, getTaxonomyUUID } from '../../../../../common/survey/nodeDef'
+import { getNodeDefCodeListUUID, getNodeDefTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 
 import { closeFormNodeDefEdit, putNodeDefProp } from '../../../nodeDef/actions'
 import { createCodeList } from '../../../codeList/actions'
@@ -42,14 +42,14 @@ class NodeDefEdit extends React.Component {
               <CodeListsView onClose={() => this.setState({editingCodeList: false})}
                              canSelect={canUpdateCodeList(nodeDef)(survey)}
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
-                             selectedCodeListUUID={getCodeListUUID(nodeDef)}
+                             selectedCodeListUUID={getNodeDefCodeListUUID(nodeDef)}
                              />
 
               : editingTaxonomy
               ?
               <TaxonomiesView onClose={() => this.setState({editingTaxonomy: false})}
                               onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
-                              selectedTaxonomyUUID={getTaxonomyUUID(nodeDef)}/>
+                              selectedTaxonomyUUID={getNodeDefTaxonomyUUID(nodeDef)}/>
               :
               <div className="form">
                 <CommonProps {...this.props}

@@ -16,7 +16,7 @@ import {
   getTaxonVernacularNames,
 } from '../../../../../common/survey/taxonomy'
 import {
-  getTaxonomyUUID,
+  getNodeDefTaxonomyUUID,
 } from '../../../../../common/survey/nodeDef'
 import {
   getSurveyTaxonomyByUUID,
@@ -163,7 +163,7 @@ class NodeDefTaxon extends React.Component {
   loadTaxa (field, value) {
     const {survey, nodeDef} = this.props
 
-    const taxonomy = getSurveyTaxonomyByUUID(getTaxonomyUUID(nodeDef))(survey)
+    const taxonomy = getSurveyTaxonomyByUUID(getNodeDefTaxonomyUUID(nodeDef))(survey)
 
     const params = {
       draft: false,

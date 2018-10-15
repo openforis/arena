@@ -1,7 +1,6 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
 
-const {fetchNodeDef} = require('../nodeDef/nodeDefRepository')
 const {createRecord, persistNode, deleteNode} = require('./recordManager')
 
 module.exports.init = app => {
@@ -13,7 +12,7 @@ module.exports.init = app => {
       const recordReq = req.body
 
       if (recordReq.ownerId !== user.id) {
-        throw  new Error('Error record create. User is different')
+        throw new Error('Error record create. User is different')
       }
 
       const record = await createRecord(recordReq)

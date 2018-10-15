@@ -10,9 +10,10 @@ import NodeDefFormItem from './nodeDefFormItem'
 import {
   isRenderDropdown, nodeDefRenderType
 } from '../../../../../common/survey/nodeDefLayout'
-import { getCodeListUUID, isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
+import { isNodeDefMultiple, getNodeDefCodeListUUID } from '../../../../../common/survey/nodeDef'
 import { getCodeListItemCode, getCodeListItemLabel } from '../../../../../common/survey/codeList'
-import { getSurveyDefaultLanguage, getSurveyCodeListByUUID } from '../../../../../common/survey/survey'
+import { getSurveyDefaultLanguage, getSurveyCodeListByUUID, getNodeDefCodeListLevelIndex } from '../../../../../common/survey/survey'
+import { getNodeCodeAncestorAndSelfValues } from '../../../../../common/record/record'
 import { getNodeValue, newNode } from '../../../../../common/record/node'
 
 import { toQueryString } from '../../../../../server/serverUtils/request'
@@ -143,18 +144,22 @@ class NodeDefCodeList extends React.Component {
   }
 
   async loadCodeListItems () {
-    const {survey, nodeDef} = this.props
+    const {survey, record, parentNode, nodeDef} = this.props
 
-    const codeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
+    const codeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
+    const levelIndex = getNodeDefCodeListLevelIndex(nodeDef)(survey)
+    const ancestorCodes = getNodeCodeAncestorAndSelfValues(survey, parentNode, nodeDef)(record)
 
-    const parentId = null //TODO determine parent code list item id (if parent code is specified)
-
-    const queryParams = {
-      draft: false,
-      parentId,
+    if (ancestorCodes.length === levelIndex) {
+      const queryParams = {
+        draft: false,
+        ancestorCodes,
+      }
+      const {data} = await axios.get(`/api/survey/${survey.id}/codeLists/${codeList.id}/candidateItems?${toQueryString(queryParams)}`)
+      return data.items
+    } else {
+      return []
     }
-    const {data} = await axios.get(`/api/survey/${survey.id}/codeLists/${codeList.id}/items?${toQueryString(queryParams)}`)
-    return data.items
   }
 
   render () {

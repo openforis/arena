@@ -110,6 +110,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     survey,
+    record: getRecord(survey),
     rootNodeDef,
     nodeDef,
     ...props.entry

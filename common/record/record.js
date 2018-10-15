@@ -1,6 +1,10 @@
 const R = require('ramda')
 const {uuidv4} = require('./../uuid')
 
+const {getNodeDefParentCodeUUID} = require('../survey/nodeDef')
+const {getNodeDefByUUID, getNodeDefById} = require('../survey/survey')
+const {getNodeDefId, getNodeValue} = require('../record/node')
+
 // ====== UTILS
 const nodes = 'nodes'
 
@@ -61,6 +65,41 @@ const getParentNode = node => node.parentId
     ? getNodeByUUID(node.parentUUID)
     : R.F
 
+const getNodeCodeParent = (survey, record, parentNode, nodeDef) => {
+  const parentCodeDefUUID = getNodeDefParentCodeUUID(nodeDef)
+  if (parentCodeDefUUID) {
+    const parentCodeDef = getNodeDefByUUID(parentCodeDefUUID)(survey)
+    let parentEntity = parentNode
+    while (parentEntity !== null) {
+      const children = getNodeChildren(parentEntity)(record)
+      const parentCode = R.find(child => {
+        return getNodeDefId(child) === parentCodeDef.id
+      })(children)
+      if (parentCode) {
+        return parentCode
+      }
+      parentEntity = getParentNode(parentEntity)(record)
+    }
+  } else {
+    return null
+  }
+}
+
+const getNodeCodeAncestorAndSelfValues = (survey, parentNode, nodeDef) => record => {
+  const nodeCodeParent = getNodeCodeParent(survey, parentNode, nodeDef)
+  if (nodeCodeParent) {
+    const parentCodeDef = getNodeDefById(getNodeDefId(nodeCodeParent))(survey)
+    const ancestorCodes = getNodeCodeAncestorAndSelfValues(survey, getParentNode(nodeCodeParent), parentCodeDef)(record)
+    if (R.isEmpty(ancestorCodes)) {
+      return []
+    } else {
+      return R.append(getNodeValue(nodeCodeParent).code, ancestorCodes)
+    }
+  } else {
+    return []
+  }
+}
+
 // ====== UPDATE
 
 const assocNodes = nodes =>
@@ -101,6 +140,7 @@ module.exports = {
   getRootNode,
   getNodeByUUID,
   getParentNode,
+  getNodeCodeAncestorAndSelfValues,
 
   // ====== UPDATE
   assocNodes,

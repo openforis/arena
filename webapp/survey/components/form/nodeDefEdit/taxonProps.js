@@ -5,7 +5,7 @@ import Dropdown from '../../../../commonComponents/form/dropdown'
 
 import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
 import { getSurveyTaxonomiesArray, getSurveyTaxonomyByUUID } from '../../../../../common/survey/survey'
-import { getTaxonomyUUID } from '../../../../../common/survey/nodeDef'
+import { getNodeDefTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 import { getTaxonomyName } from '../../../../../common/survey/taxonomy'
 
 const TaxonProps = (props) => {
@@ -20,7 +20,7 @@ const TaxonProps = (props) => {
 
   const validation = getValidation(nodeDef)
 
-  const selectedTaxonomy = getSurveyTaxonomyByUUID(getTaxonomyUUID(nodeDef))(survey)
+  const selectedTaxonomy = getSurveyTaxonomyByUUID(getNodeDefTaxonomyUUID(nodeDef))(survey)
 
   return (
     <React.Fragment>

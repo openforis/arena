@@ -1,7 +1,5 @@
-const R = require('ramda')
-
 const {sendOk, sendErr} = require('../serverUtils/response')
-const {getRestParam, getBoolParam} = require('../serverUtils/request')
+const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
 
 const {
   fetchCodeListById,
@@ -16,6 +14,7 @@ const {
 const {
   insertCodeList, insertCodeListLevel, insertCodeListItem,
   fetchCodeListItemsByCodeListId, fetchCodeListItemsByParentId,
+  fetchCodeListItemsByAncestorCodes,
   updateCodeListProp, updateCodeListLevelProp, updateCodeListItemProp,
   deleteCodeList, deleteCodeListLevel, deleteCodeListItem,
 } = require('./codeListRepository')
@@ -79,6 +78,22 @@ module.exports.init = app => {
       const parentId = getRestParam(req, 'parentId')
 
       const items = await fetchCodeListItemsByParentId(surveyId, codeListId, parentId, draft)
+
+      res.json({items})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  // fetch code list items by ancestor codes
+  app.get('/survey/:surveyId/codeLists/:codeListId/candidateItems', async (req, res) => {
+    try {
+      const draft = getBoolParam(req, 'draft')
+      const surveyId = getRestParam(req, 'surveyId')
+      const codeListId = getRestParam(req, 'codeListId')
+      const ancestorCodes = getJsonParam(req, 'ancestorCodes')
+
+      const items = await fetchCodeListItemsByAncestorCodes(surveyId, codeListId, ancestorCodes, draft)
 
       res.json({items})
     } catch (err) {

@@ -65,6 +65,7 @@ module.exports = {
 
   // ==== READ
   getNodeValue,
+  getNodeDefId: R.prop('nodeDefId'),
 
   // ==== UTILS
   isNodeValueBlank,

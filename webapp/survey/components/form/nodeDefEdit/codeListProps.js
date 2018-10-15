@@ -15,7 +15,7 @@ import {
 
 import {
   getNodeDefName,
-  getCodeListUUID,
+  getNodeDefCodeListUUID,
 } from '../../../../../common/survey/nodeDef'
 
 import {
@@ -47,7 +47,7 @@ const CodeListProps = (props) => {
   } = props
 
   const validation = getValidation(nodeDef)
-  const selectedCodeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
+  const selectedCodeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
   const candidateParentCodeNodeDefs = getNodeDefCodeCandidateParents(nodeDef)(survey)
   const parentCodeDef = getNodeDefCodeParent(nodeDef)(survey)
   const parentCodeDefLabelFunction = def => (

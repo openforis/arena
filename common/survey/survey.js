@@ -13,8 +13,8 @@ const {
 const {
   isNodeDefRoot,
   isNodeDefEntity,
-  getCodeListUUID,
-  getParentCodeUUID,
+  getNodeDefCodeListUUID,
+  getNodeDefParentCodeUUID,
 } = require('./nodeDef')
 
 const {
@@ -253,7 +253,7 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }
 
-const getNodeDefCodeParent = nodeDef => getNodeDefByUUID(getParentCodeUUID(nodeDef))
+const getNodeDefCodeParent = nodeDef => getNodeDefByUUID(getNodeDefParentCodeUUID(nodeDef))
 
 const isNodeDefCodeParent = nodeDef => R.pipe(
   getNodeDefsArray,
@@ -262,7 +262,7 @@ const isNodeDefCodeParent = nodeDef => R.pipe(
 
 const getNodeDefCodeCandidateParents = nodeDef =>
   survey => {
-    const codeList = getSurveyCodeListByUUID(getCodeListUUID(nodeDef))(survey)
+    const codeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
 
     if (codeList) {
       const codeListLevelsLength = getCodeListLevelsLength(codeList)
@@ -274,7 +274,7 @@ const getNodeDefCodeCandidateParents = nodeDef =>
             getNodeDefChildren(ancestor),
             R.reject(n =>
               // reject different codeList nodeDef
-              getCodeListUUID(n) !== codeList.uuid
+              getNodeDefCodeListUUID(n) !== codeList.uuid
               ||
               // or itself
               n.uuid === nodeDef.uuid
@@ -326,6 +326,7 @@ module.exports = {
 
   // READ nodeDefs
   getNodeDefByUUID,
+  getNodeDefById,
   getRootNodeDef,
   getNodeDefChildren,
   getNodeDefsByCodeListUUID,

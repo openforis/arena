@@ -81,9 +81,9 @@ module.exports = {
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
-  getCodeListUUID: getProp('codeListUUID'),
-  getParentCodeUUID: getProp('parentCodeUUID'),
-  getTaxonomyUUID: getProp('taxonomyUUID'),
+  getNodeDefCodeListUUID: getProp('codeListUUID'),
+  getNodeDefParentCodeUUID: getProp('parentCodeUUID'),
+  getNodeDefTaxonomyUUID: getProp('taxonomyUUID'),
 
   isNodeDefKey,
   isNodeDefMultiple,
