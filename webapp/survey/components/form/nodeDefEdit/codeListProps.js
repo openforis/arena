@@ -1,4 +1,5 @@
 import React from 'react'
+import * as R from 'ramda'
 
 import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
@@ -117,7 +118,7 @@ const CodeListProps = (props) => {
           display: 'grid',
           gridTemplateColumns: '1fr 200px',
         }}>
-          <Dropdown disabled={disabled}
+          <Dropdown disabled={disabled || R.isEmpty(candidateParentCodeNodeDefs)}
                     items={candidateParentCodeNodeDefs}
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}

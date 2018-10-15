@@ -41,9 +41,8 @@ import {
   dissocCodeListEditLevelItems,
 } from './codeList/codeListEditState'
 
-
 /**
- * code lists state
+ * taxonomy state
  */
 import {
   updateTaxonomyEdit,
