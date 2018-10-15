@@ -32,7 +32,8 @@ class Dropdown extends React.Component {
 
   componentDidUpdate (prevProps) {
     const {items, autocompleteMinChars} = this.props
-    if (prevProps.items.length !== items.length)
+    if (prevProps.items.length !== items.length ||
+      !R.equals(prevProps.items, items))
       this.setState({
         items: autocompleteMinChars > 0 ? [] : items
       })
