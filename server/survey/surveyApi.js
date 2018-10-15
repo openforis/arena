@@ -1,13 +1,19 @@
 const {sendErr} = require('../serverUtils/response')
-const {getRestParam} = require('../serverUtils/request')
+const {
+  getRestParam,
+  getBoolParam,
+} = require('../serverUtils/request')
 
 const {
-  getSurveyById,
   fetchUserSurveys,
   createSurvey,
   fetchRootNodeDef,
   updateSurveyProp
 } = require('./surveyRepository')
+const {
+  fetchSurveyById
+} = require('./surveyManager')
+
 const {
   validateNewSurvey,
   validateSurveyProp
@@ -52,9 +58,9 @@ module.exports.init = app => {
   app.get('/survey/:id', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'id')
+      const draft = getBoolParam(req, 'draft')
 
-      //TODO : use surveyManger once merged
-      const survey = await getSurveyById(surveyId)
+      const survey = await fetchSurveyById(surveyId, draft)
 
       res.json({survey})
     } catch (err) {

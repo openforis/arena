@@ -54,7 +54,7 @@ export const setActiveSurvey = surveyId =>
     try {
 
       //load survey
-      const {data} = await axios.get(`/api/survey/${surveyId}`)
+      const {data} = await axios.get(`/api/survey/${surveyId}?draft=true`)
       dispatchCurrentSurveyUpdate(dispatch, data.survey)
 
       //update userPref

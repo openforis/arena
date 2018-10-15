@@ -47,7 +47,7 @@ const EntityForm = props => {
     innerPageChildren.length > 0
       ? <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
                               autoSize={false}
-                              rowHeight={50}
+                              rowHeight={edit ? 80 : 60}
                               cols={{lg: columns, md: columns, sm: columns, xs: 1, xxs: 1}}
                               layouts={{lg: rdgLayout, md: rdgLayout, sm: rdgLayout}}
                               containerPadding={[20, 50]}
