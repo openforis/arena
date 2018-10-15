@@ -44,6 +44,7 @@ class CodeListEditItem extends React.Component {
     const validation = getCodeListItemValidation(R.append(item.uuid, ancestorItemUUIDs))(codeList)
     const language = getSurveyDefaultLanguage(survey)
 
+    const disabled = item.published
     return (
       <div className={`code-lists__edit-item ${active ? 'active' : ''}`}
            onClick={() => active ? null : setCodeListItemForEdit(item, true)}
@@ -67,6 +68,7 @@ class CodeListEditItem extends React.Component {
 
                 <FormItem label={'code'}>
                   <Input value={getCodeListItemCode(item)}
+                         disabled={disabled}
                          validation={getFieldValidation('code')(validation)}
                          onChange={e => putCodeListItemProp(level.index, item.uuid, 'code', normalizeName(e.target.value))}/>
                 </FormItem>
@@ -75,6 +77,7 @@ class CodeListEditItem extends React.Component {
                               onChange={(labelItem) => this.onPropLabelsChange(labelItem)}/>
 
                 <button className="btn btn-of-light btn-delete"
+                        aria-disabled={disabled}
                         onClick={() => {
                           if (confirm('Delete the item with all children? This operation cannot be undone')) {
                             deleteCodeListItem(item)
