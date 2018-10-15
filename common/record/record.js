@@ -65,36 +65,29 @@ const getParentNode = node => node.parentId
     ? getNodeByUUID(node.parentUUID)
     : R.F
 
-const getNodeCodeParent = (survey, record, parentNode, nodeDef) => {
-  const parentCodeDefUUID = getNodeDefParentCodeUUID(nodeDef)
-  if (parentCodeDefUUID) {
-    const parentCodeDef = getNodeDefByUUID(parentCodeDefUUID)(survey)
-    let parentEntity = parentNode
-    while (parentEntity !== null) {
-      const children = getNodeChildren(parentEntity)(record)
-      const parentCode = R.find(child => {
-        return getNodeDefId(child) === parentCodeDef.id
-      })(children)
-      if (parentCode) {
-        return parentCode
+const getNodeParentCodeAttribute = (survey, parentNode, nodeDef) =>
+  record => {
+    const parentCodeDefUUID = getNodeDefParentCodeUUID(nodeDef)
+    if (parentCodeDefUUID) {
+      const parentCodeDef = getNodeDefByUUID(parentCodeDefUUID)(survey)
+      let parentEntity = parentNode
+      while (parentEntity) {
+        const parentCodes = getNodeChildrenByDefId(parentEntity, parentCodeDef.id)(record)
+        if (!R.isEmpty(parentCodes)) {
+          return R.head(parentCodes)
+        }
+        parentEntity = getParentNode(parentEntity)(record)
       }
-      parentEntity = getParentNode(parentEntity)(record)
     }
-  } else {
     return null
   }
-}
 
-const getNodeCodeAncestorAndSelfValues = (survey, parentNode, nodeDef) => record => {
-  const nodeCodeParent = getNodeCodeParent(survey, parentNode, nodeDef)
-  if (nodeCodeParent) {
-    const parentCodeDef = getNodeDefById(getNodeDefId(nodeCodeParent))(survey)
-    const ancestorCodes = getNodeCodeAncestorAndSelfValues(survey, getParentNode(nodeCodeParent), parentCodeDef)(record)
-    if (R.isEmpty(ancestorCodes)) {
-      return []
-    } else {
-      return R.append(getNodeValue(nodeCodeParent).code, ancestorCodes)
-    }
+const getNodeAncestorAndSelfCodeValues = (survey, parentNode, nodeDef) => record => {
+  const parentCodeAttribute = getNodeParentCodeAttribute(survey, parentNode, nodeDef)(record)
+  if (parentCodeAttribute) {
+    const parentCodeDef = getNodeDefById(getNodeDefId(parentCodeAttribute))(survey)
+    const ancestorCodes = getNodeAncestorAndSelfCodeValues(survey, getParentNode(parentCodeAttribute)(record), parentCodeDef)(record)
+    return R.append(getNodeValue(parentCodeAttribute).code, ancestorCodes)
   } else {
     return []
   }
@@ -140,7 +133,8 @@ module.exports = {
   getRootNode,
   getNodeByUUID,
   getParentNode,
-  getNodeCodeAncestorAndSelfValues,
+  getNodeParentCodeAttribute,
+  getNodeCodeAncestorAndSelfValues: getNodeAncestorAndSelfCodeValues,
 
   // ====== UPDATE
   assocNodes,

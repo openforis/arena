@@ -12,8 +12,16 @@ import {
 } from '../../../../../common/survey/nodeDefLayout'
 import { isNodeDefMultiple, getNodeDefCodeListUUID } from '../../../../../common/survey/nodeDef'
 import { getCodeListItemCode, getCodeListItemLabel } from '../../../../../common/survey/codeList'
-import { getSurveyDefaultLanguage, getSurveyCodeListByUUID, getNodeDefCodeListLevelIndex } from '../../../../../common/survey/survey'
-import { getNodeCodeAncestorAndSelfValues } from '../../../../../common/record/record'
+import {
+  getSurveyDefaultLanguage,
+  getSurveyCodeListByUUID,
+  getNodeDefCodeListLevelIndex
+} from '../../../../../common/survey/survey'
+import {
+  getNodeCodeAncestorAndSelfValues,
+  getNodeParentCodeAttribute,
+  getNodeByUUID
+} from '../../../../../common/record/record'
 import { getNodeValue, newNode } from '../../../../../common/record/node'
 
 import { toQueryString } from '../../../../../server/serverUtils/request'
@@ -125,21 +133,24 @@ class NodeDefCodeList extends React.Component {
   }
 
   async componentDidMount () {
-    const {edit, survey} = this.props
+    const {edit} = this.props
 
     if (!edit) {
-      const codeListItems = await this.loadCodeListItems()
+      await this.loadCodeListItems()
+    }
+  }
 
-      const language = getSurveyDefaultLanguage(survey)
-
-      const items = codeListItems.map(item => ({
-        key: getCodeListItemCode(item),
-        value: `${getCodeListItemCode(item)} - ${getCodeListItemLabel(language)(item)}`
-      }))
-
-      this.setState({
-        items
-      })
+  async componentDidUpdate (prevProps) {
+    const {survey, nodeDef, record, parentNode} = this.props
+    const parentCodeAttr = getNodeParentCodeAttribute(survey, parentNode, nodeDef)(record)
+    if (parentCodeAttr) {
+      const {record: prevRecord} = prevProps
+      const prevParentNode = getNodeByUUID(parentNode.uuid)(prevRecord)
+      const prevParentCodeAttr = getNodeParentCodeAttribute(survey, prevParentNode, nodeDef)(prevRecord)
+      //parent code attribute value changed
+      if (getNodeValue(prevParentCodeAttr).code !== getNodeValue(parentCodeAttr).code) {
+        await this.loadCodeListItems()
+      }
     }
   }
 
@@ -156,9 +167,21 @@ class NodeDefCodeList extends React.Component {
         ancestorCodes,
       }
       const {data} = await axios.get(`/api/survey/${survey.id}/codeLists/${codeList.id}/candidateItems?${toQueryString(queryParams)}`)
-      return data.items
+      const codeListItems = data.items
+
+      const language = getSurveyDefaultLanguage(survey)
+
+      const items = codeListItems.map(item => ({
+        key: getCodeListItemCode(item),
+        value: `${getCodeListItemCode(item)} - ${getCodeListItemLabel(language)(item)}`
+      }))
+      this.setState({
+        items
+      })
     } else {
-      return []
+      this.setState({
+        items: []
+      })
     }
   }
 
