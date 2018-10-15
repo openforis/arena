@@ -3,7 +3,7 @@
 .dropdown {
   display: grid;
   grid-template-columns: 1fr 35px;
-  align-self: stretch;
+  //align-self: stretch;
 
   span.icon {
     color: $whiteLight;

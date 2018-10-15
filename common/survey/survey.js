@@ -129,7 +129,7 @@ const assocSurveyPropValidation = (key, validation) =>
 const assocNodeDefs = newNodeDefsArray =>
   survey => R.pipe(
     R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
-    R.mergeDeepRight(getNodeDefs(survey)),
+    R.merge(getNodeDefs(survey)),
     newNodeDefs => R.assoc(nodeDefs, newNodeDefs, survey)
   )(newNodeDefsArray)
 
@@ -224,7 +224,6 @@ const assocSurveyTaxonomies = taxonomies =>
     filterMappedObj(taxonomy => taxonomy != null),
     newTaxonomies => R.assoc('taxonomies', newTaxonomies, survey)
   )(taxonomies)
-
 
 /**
  * ======
