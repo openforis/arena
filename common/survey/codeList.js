@@ -90,9 +90,17 @@ const newCodeListItem = (levelId, parentId = null) => {
 }
 
 // ====== READ
+const getCodeListItemCode = getProp('code')
+
 const getCodeListItemLabels = getProp('labels')
 
-const getCodeListItemLabel = language => R.pipe(getCodeListItemLabels, R.prop(language))
+const getCodeListItemLabel = language =>
+  codeListItem =>
+    R.pipe(
+      getCodeListItemLabels,
+      R.prop(language),
+      R.defaultTo(getCodeListItemCode(codeListItem))
+    )(codeListItem)
 
 const getCodeListItemValidationPath = (ancestorAndSelfUUIDs) => R.reduce(
   (currentPath, itemUUID) =>
@@ -226,7 +234,7 @@ module.exports = {
 
   //READ
   getCodeListItemId: R.propOr(null, 'id'),
-  getCodeListItemCode: getProp('code'),
+  getCodeListItemCode,
   getCodeListItemLabels,
   getCodeListItemLabel,
   getCodeListItemValidation,
