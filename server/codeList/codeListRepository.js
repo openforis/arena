@@ -67,17 +67,29 @@ const fetchCodeListLevelsByCodeListId = async (surveyId, codeListId, draft = fal
     def => dbTransformCallback(def, draft)
   )
 
-const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = false, client = db) =>
-  await client.map(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list_item
-     WHERE 
-      level_id IN (
-        SELECT l.id from ${getSurveyDBSchema(surveyId)}.code_list_level l WHERE l.code_list_id = $1
-      ) 
-     ORDER BY id`,
+const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = false, client = db) => {
+  const items = await client.map(`
+      SELECT i.* 
+      FROM ${getSurveyDBSchema(surveyId)}.code_list_item i
+      JOIN ${getSurveyDBSchema(surveyId)}.code_list_level l 
+        ON l.id = i.level_id
+        AND l.code_list_id = $1
+     ORDER BY i.id
+    `,
     [codeListId],
     def => dbTransformCallback(def, draft)
   )
+
+  return draft
+    ? items
+    : R.filter(item => item.published)(items)
+}
+
+const fetchCodeListItemsByParentId = async (surveyId, codeListId, parentId = null, draft = false, client = db) => {
+  const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, draft, client)
+
+  return R.filter(R.propEq('parentId', parentId))(items)
+}
 
 // ============== UPDATE
 
@@ -105,6 +117,7 @@ module.exports = {
   fetchCodeListsBySurveyId,
   fetchCodeListLevelsByCodeListId,
   fetchCodeListItemsByCodeListId,
+  fetchCodeListItemsByParentId,
 
   //UPDATE
   updateCodeListProp,

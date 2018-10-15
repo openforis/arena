@@ -15,7 +15,7 @@ const {
 
 const {
   insertCodeList, insertCodeListLevel, insertCodeListItem,
-  fetchCodeListItemsByCodeListId,
+  fetchCodeListItemsByCodeListId, fetchCodeListItemsByParentId,
   updateCodeListProp, updateCodeListLevelProp, updateCodeListItemProp,
   deleteCodeList, deleteCodeListLevel, deleteCodeListItem,
 } = require('./codeListRepository')
@@ -78,8 +78,7 @@ module.exports.init = app => {
       const codeListId = getRestParam(req, 'codeListId')
       const parentId = getRestParam(req, 'parentId')
 
-      const allItems = await fetchCodeListItemsByCodeListId(surveyId, codeListId, draft)
-      const items = R.filter(item => parentId ? item.parentId === parentId : item.parentId === null)(allItems)
+      const items = await fetchCodeListItemsByParentId(surveyId, codeListId, parentId, draft)
 
       res.json({items})
     } catch (err) {
