@@ -35,14 +35,15 @@ const CommonProps = props => {
 
   return (
     <React.Fragment>
+
+      <FormItem label={'type'}>
+        <label>{nodeDef.type}</label>
+      </FormItem>
+
       <FormItem label={'name'}>
         <Input value={getNodeDefName(nodeDef)}
                validation={getFieldValidation('name')(validation)}
                onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
-      </FormItem>
-
-      <FormItem label={'type'}>
-        <label>{nodeDef.type}</label>
       </FormItem>
 
       <LabelsEditor labels={getNodeDefLabels(nodeDef)}
@@ -54,31 +55,29 @@ const CommonProps = props => {
 
       {
         isNodeDefCodeList(nodeDef) &&
-          <CodeListProps {...props} />
+        <CodeListProps {...props} />
       }
 
       {
         isNodeDefTaxon(nodeDef) &&
-          <TaxonProps {...props} />
+        <TaxonProps {...props} />
       }
 
       {
-        isNodeDefEntity(nodeDef)
-          ? null
-          : <FormItem label={'key'}>
-            <Checkbox checked={isNodeDefKey(nodeDef)}
-                      onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
-          </FormItem>
+        !isNodeDefEntity(nodeDef) &&
+        <FormItem label={'key'}>
+          <Checkbox checked={isNodeDefKey(nodeDef)}
+                    onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
+        </FormItem>
       }
 
       {
-        canNodeDefBeMultiple(nodeDef)
-          ? <FormItem label={'multiple'}>
-            <Checkbox checked={isNodeDefMultiple(nodeDef)}
-                      disabled={isRenderTable(nodeDef)}
-                      onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
-          </FormItem>
-          : null
+        canNodeDefBeMultiple(nodeDef) &&
+        <FormItem label={'multiple'}>
+          <Checkbox checked={isNodeDefMultiple(nodeDef)}
+                    disabled={isRenderTable(nodeDef)}
+                    onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
+        </FormItem>
       }
 
     </React.Fragment>
