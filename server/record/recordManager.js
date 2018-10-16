@@ -3,14 +3,16 @@ const Promise = require('bluebird')
 
 const db = require('../db/db')
 
-const {isNodeDefSingleEntity} = require('../../common/survey/nodeDef')
-const {newNode} = require('../../common/record/node')
+const {assocNodeDefs, getNodeDefById} = require('../../common/survey/survey')
+const {isNodeDefSingleEntity, isNodeDefMultiple} = require('../../common/survey/nodeDef')
+const {assocNodes, getNodeCodeDependentAttributes} = require('../../common/record/record')
+const {newNode, getNodeRecordId, getNodeDefId} = require('../../common/record/node')
 
-const {fetchRootNodeDef} = require('../survey/surveyRepository')
-const {fetchNodeDef, fetchNodeDefsByParentId} = require('../nodeDef/nodeDefRepository')
+const {fetchRootNodeDef, getSurveyById} = require('../survey/surveyRepository')
+const {fetchNodeDef, fetchNodeDefsByParentId, fetchNodeDefsBySurveyId} = require('../nodeDef/nodeDefRepository')
 
-const {insertRecord} = require('../record/recordRepository')
-const {insertNode, updateNode, deleteNode: deleteNodeRepos, fetchNodeByUUID} = require('../record/nodeRepository')
+const {insertRecord, fetchRecordById} = require('../record/recordRepository')
+const {insertNode, updateNode, deleteNode: deleteNodeRepos, fetchNodeByUUID, fetchNodesByRecordId} = require('../record/nodeRepository')
 
 /**
  * ===================
@@ -74,21 +76,75 @@ const createNode = async (nodeDef, nodeReq, client = db) => {
  * UPDATE
  * ===================
  */
-const updateNodeValue = async (surveyId, nodeUUID, value, client = db) => {
-  const node = await updateNode(surveyId, nodeUUID, value, client)
+const updateNodeValue = async (surveyId, nodeUUID, value, client = db) =>
+  await client.tx(async t => {
+    const node = await updateNode(surveyId, nodeUUID, value, client)
 
-  return {[node.uuid]: node}
+    const survey = assocNodeDefs(
+      await fetchNodeDefsBySurveyId(surveyId, false, t)
+    )(await getSurveyById(surveyId, false, t))
+
+    const recordId = getNodeRecordId(node)
+
+    const record = assocNodes(
+      await fetchNodesByRecordId(surveyId, recordId, t)
+    )(await fetchRecordById(surveyId, recordId, t))
+
+    return onNodeUpdate(survey, record, node, t)
+  })
+
+const updateNodeValueInternal = async (survey, record, nodeUUID, value, client = db) => {
+  const node = await updateNode(survey.id, nodeUUID, value, client)
+  return onNodeUpdate(survey, record, node, client)
 }
+
 /**
  * ===================
  * DELETE
  * ===================
  */
+const deleteNode = async (surveyId, nodeUUID, client = db) =>
+  await client.tx(async t => {
+    const node = await deleteNodeRepos(surveyId, nodeUUID, t)
+    node.deleted = true
 
-const deleteNode = async (surveyId, nodeUUID) => {
-  await deleteNodeRepos(surveyId, nodeUUID)
+    const survey = assocNodeDefs(
+      await fetchNodeDefsBySurveyId(surveyId, false, t)
+    )(await getSurveyById(surveyId, false, t))
 
-  return {}
+    const recordId = getNodeRecordId(node)
+
+    const record = assocNodes(
+      await fetchNodesByRecordId(surveyId, recordId, t)
+    )(await fetchRecordById(surveyId, recordId, t))
+
+    return onNodeUpdate(survey, record, node, t)
+  })
+
+const deleteNodeInternal = async (survey, record, nodeUUID, client = db) => {
+  const node = await deleteNodeRepos(survey.id, nodeUUID, client)
+  node.deleted = true
+  return onNodeUpdate(survey, record, node, client)
+}
+
+const onNodeUpdate = async (survey, record, node, client = db) => {
+  //delete dependent code nodes
+  const dependentCodeAttributes = getNodeCodeDependentAttributes(survey, node)(record)
+
+  const clearedDependentCodeAttributes = await Promise.all(
+    dependentCodeAttributes.map(async n => {
+      const nDef = getNodeDefById(getNodeDefId(n))(survey)
+      if (isNodeDefMultiple(nDef)) {
+        //delete node
+        return await deleteNodeInternal(survey, record, n.uuid, client)
+      } else {
+        //reset value
+        return await updateNodeValueInternal(survey, record, n.uuid, null, client)
+      }
+    })
+  )
+
+  return R.merge({[node.uuid]: node}, R.mergeAll(clearedDependentCodeAttributes))
 }
 
 module.exports = {

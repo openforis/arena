@@ -104,7 +104,9 @@ const filterCodeListItemsByAncestorCodes = (allItems, ancestorCodes) => {
     const previousLevelItems = filterCodeListItemsByAncestorCodes(allItems, R.take(ancestorCodes.length - 1, ancestorCodes))
     const lastCode = R.last(ancestorCodes)
     const previousLevelParentItem = R.find(item => getCodeListItemCode(item) === lastCode)(previousLevelItems)
-    return filterCodeListItemsByParentId(allItems, previousLevelParentItem.id)
+    return previousLevelParentItem
+      ? filterCodeListItemsByParentId(allItems, previousLevelParentItem.id)
+      : []
   }
 }
 

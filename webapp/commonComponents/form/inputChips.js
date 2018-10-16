@@ -6,11 +6,36 @@ import * as R from 'ramda'
 import Dropdown from './dropdown'
 import { TooltipError } from '../tooltip'
 
-const Chip = ({item, onDelete, canBeRemoved}) => (
-  <div className="form-input">
+const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
+  R.is(Object, item) ?
+    func ?
+      func(item)
+      : prop ?
+      R.prop(prop)(item)
+      : R.has(defaultProp)(item) ?
+        R.prop(defaultProp)(item)
+        : item
+    : item //primitive
+
+const getItemLabel = (item, itemLabelFunction, itemLabelProp) =>
+  extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value')
+
+const getItemKey = (item, itemKeyFunction, itemKeyProp) =>
+  extractValueFromFunctionOrProp(item, itemKeyFunction, itemKeyProp, 'key')
+
+const Chip = props => {
+  const {
+    item,
+    itemLabelFunction,
+    itemLabelProp,
+    onDelete,
+    canBeRemoved,
+  } = props
+
+  return <div className="form-input">
 
     <div className="btn-of btn-s form-input-chip-item">
-      {item.value}
+      {getItemLabel(item, itemLabelFunction, itemLabelProp)}
 
       <button className="btn-of-light-xs btn-s btn-remove"
               onClick={() => onDelete(item)}
@@ -21,12 +46,14 @@ const Chip = ({item, onDelete, canBeRemoved}) => (
     </div>
 
   </div>
-)
+}
 
 const InputChips = (props) => {
 
   const {
     items,
+    itemKeyProp,
+    itemKeyFunction,
     onChange,
     selection = [],
     requiredItems = 0,
@@ -53,14 +80,17 @@ const InputChips = (props) => {
   return <TooltipError messages={validation.errors}>
     <div className="form-input-chip">
       {
-        selection.map((item, i) =>
-          <Chip key={item.key}
+        selection.map((item) =>
+          <Chip {...props}
+                key={getItemKey(item, itemKeyFunction, itemKeyProp)}
                 item={item}
-                onDelete={item => removeItem(item)}
-                canBeRemoved={!readOnly && selection.length > requiredItems}/>
+                onDelete={removeItem}
+                canBeRemoved={!readOnly && selection.length > requiredItems}
+          />
         )
       }
-      <Dropdown items={dropdownItems}
+      <Dropdown {...props}
+                items={dropdownItems}
                 onChange={onDropdownChange}
                 selection={null}
                 clearOnSelection={true}

@@ -360,6 +360,7 @@ module.exports = {
   getNodeDefCodeListLevelIndex,
   getNodeDefCodeParent,
   getNodeDefCodeCandidateParents,
+  isNodeDefCodeParent,
   canUpdateCodeList,
 
   // READ codeLists

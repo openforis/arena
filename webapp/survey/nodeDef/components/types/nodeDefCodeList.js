@@ -10,25 +10,27 @@ import NodeDefFormItem from './nodeDefFormItem'
 import {
   isRenderDropdown, nodeDefRenderType
 } from '../../../../../common/survey/nodeDefLayout'
-import { isNodeDefMultiple, getNodeDefCodeListUUID } from '../../../../../common/survey/nodeDef'
+import {
+  isNodeDefMultiple,
+  getNodeDefCodeListUUID,
+  getNodeDefParentCodeUUID
+} from '../../../../../common/survey/nodeDef'
 import { getCodeListItemCode, getCodeListItemLabel } from '../../../../../common/survey/codeList'
 import {
   getSurveyDefaultLanguage,
   getSurveyCodeListByUUID,
   getNodeDefCodeListLevelIndex
 } from '../../../../../common/survey/survey'
-import {
-  getNodeCodeAncestorAndSelfValues,
-  getNodeParentCodeAttribute,
-  getNodeByUUID
-} from '../../../../../common/record/record'
+import { getNodeCodeAncestorValues } from '../../../../../common/record/record'
 import { getNodeValue, newNode } from '../../../../../common/record/node'
 
 import { toQueryString } from '../../../../../server/serverUtils/request'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
 const CodeListDropdown = props => {
-  const {edit, nodeDef, nodes, items = []} = props
+  const {survey, edit, nodeDef, nodes, items = []} = props
+
+  const language = getSurveyDefaultLanguage(survey)
 
   const selectedCodes = R.pipe(
     R.values,
@@ -36,12 +38,12 @@ const CodeListDropdown = props => {
     R.map(n => getNodeValue(n).code),
   )(nodes)
 
-  const selectedItems = R.filter(item => R.contains(item.key)(selectedCodes))(items)
+  const selectedItems = R.filter(item => R.contains(getCodeListItemCode(item))(selectedCodes))(items)
 
   const handleSelectedItemsChange = (newSelectedItems) => {
     const {nodeDef, nodes, parentNode, removeNode, updateNode} = props
 
-    const newSelectedCodes = newSelectedItems.map(item => item.key)
+    const newSelectedCodes = newSelectedItems.map(item => getCodeListItemCode(item))
 
     if (isNodeDefMultiple(nodeDef)) {
       //remove deselected node
@@ -66,19 +68,25 @@ const CodeListDropdown = props => {
   return isNodeDefMultiple(nodeDef)
     ? <InputChips readOnly={edit}
                   items={items}
+                  itemKeyProp="uuid"
+                  itemLabelFunction={getCodeListItemLabel(language)}
                   selection={selectedItems}
                   onChange={selectedItems => handleSelectedItemsChange(selectedItems)}/>
 
     : <Dropdown readOnly={edit}
                 items={items}
+                itemKeyProp="uuid"
+                itemLabelFunction={getCodeListItemLabel(language)}
                 selection={R.head(selectedItems)}
                 onChange={item => handleSelectedItemsChange(item ? [item] : [])}/>
 }
 
 const Checkbox = props => {
-  const {edit, item, nodeDef, parentNode, nodes, updateNode, removeNode} = props
+  const {survey, edit, item, nodeDef, parentNode, nodes, updateNode, removeNode} = props
 
-  const matchingNode = R.find(node => getNodeValue(node).code === item.key)(nodes)
+  const language = getSurveyDefaultLanguage(survey)
+  const itemCode = getCodeListItemCode(item)
+  const matchingNode = R.find(node => getNodeValue(node).code === itemCode)(nodes)
   const selected = !R.isNil(matchingNode)
 
   return (
@@ -96,21 +104,22 @@ const Checkbox = props => {
             (isNodeDefMultiple(nodeDef) || R.isEmpty(nodes))
               ? newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
               : nodes[0]
-          updateNode(nodeDef, nodeToUpdate, {code: item.key})
+          updateNode(nodeDef, nodeToUpdate, {code: itemCode})
         }
       }}>
-      {item.value}
+      {getCodeListItemLabel(language)(item)}
     </button>
   )
 }
 
 const CodeListCheckbox = props => {
   const {items = []} = props
+
   return <div className="node-def__code-checkbox-wrapper">
     {
       items.map(item =>
         <Checkbox {...props}
-                  key={item.key}
+                  key={item.uuid}
                   item={item}/>
       )
     }
@@ -142,13 +151,14 @@ class NodeDefCodeList extends React.Component {
 
   async componentDidUpdate (prevProps) {
     const {survey, nodeDef, record, parentNode} = this.props
-    const parentCodeAttr = getNodeParentCodeAttribute(survey, parentNode, nodeDef)(record)
-    if (parentCodeAttr) {
-      const {record: prevRecord} = prevProps
-      const prevParentNode = getNodeByUUID(parentNode.uuid)(prevRecord)
-      const prevParentCodeAttr = getNodeParentCodeAttribute(survey, prevParentNode, nodeDef)(prevRecord)
-      //parent code attribute value changed
-      if (getNodeValue(prevParentCodeAttr).code !== getNodeValue(parentCodeAttr).code) {
+
+    if (getNodeDefParentCodeUUID(nodeDef)) {
+      const {record: prevRecord, parentNode: prevParentNode} = prevProps
+
+      const ancestorCodes = getNodeCodeAncestorValues(survey, parentNode, nodeDef)(record)
+      const prevAncestorCodes = getNodeCodeAncestorValues(survey, prevParentNode, nodeDef)(prevRecord)
+
+      if (!R.equals(ancestorCodes, prevAncestorCodes)) {
         await this.loadCodeListItems()
       }
     }
@@ -157,24 +167,19 @@ class NodeDefCodeList extends React.Component {
   async loadCodeListItems () {
     const {survey, record, parentNode, nodeDef} = this.props
 
-    const codeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
     const levelIndex = getNodeDefCodeListLevelIndex(nodeDef)(survey)
-    const ancestorCodes = getNodeCodeAncestorAndSelfValues(survey, parentNode, nodeDef)(record)
+    const ancestorCodes = getNodeCodeAncestorValues(survey, parentNode, nodeDef)(record)
 
     if (ancestorCodes.length === levelIndex) {
+      const codeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
+
       const queryParams = {
         draft: false,
         ancestorCodes,
       }
       const {data} = await axios.get(`/api/survey/${survey.id}/codeLists/${codeList.id}/candidateItems?${toQueryString(queryParams)}`)
-      const codeListItems = data.items
+      const items = data.items
 
-      const language = getSurveyDefaultLanguage(survey)
-
-      const items = codeListItems.map(item => ({
-        key: getCodeListItemCode(item),
-        value: `${getCodeListItemCode(item)} - ${getCodeListItemLabel(language)(item)}`
-      }))
       this.setState({
         items
       })

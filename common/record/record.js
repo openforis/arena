@@ -2,7 +2,7 @@ const R = require('ramda')
 const {uuidv4} = require('./../uuid')
 
 const {getNodeDefParentCodeUUID} = require('../survey/nodeDef')
-const {getNodeDefByUUID, getNodeDefById} = require('../survey/survey')
+const {getNodeDefByUUID, getNodeDefById, isNodeDefCodeParent} = require('../survey/survey')
 const {getNodeDefId, getNodeValue} = require('../record/node')
 
 // ====== UTILS
@@ -30,9 +30,9 @@ const getNodesArray = R.pipe(
   R.values,
 )
 
-const getNodeChildren = node => R.pipe(
+const findNodes = predicate => R.pipe(
   getNodesArray,
-  R.filter(n => n.parentId ? n.parentId === node.id : n.parentUUID === node.uuid),
+  R.filter(predicate)
   // R.sort((n1, n2) => {
   //   return !n1.id
   //     ? 1
@@ -40,6 +40,10 @@ const getNodeChildren = node => R.pipe(
   //       ? -1
   //       : Number(n1.id) < Number(n2.id)
   // }),
+)
+
+const getNodeChildren = node => findNodes(
+  n => n.parentId ? n.parentId === node.id : n.parentUUID === node.uuid
 )
 
 const getNodeChildrenByDefId = (parentNode, nodeDefId) => record => R.pipe(
@@ -65,7 +69,7 @@ const getParentNode = node => node.parentId
     ? getNodeByUUID(node.parentUUID)
     : R.F
 
-const getNodeParentCodeAttribute = (survey, parentNode, nodeDef) =>
+const getNodeCodeParentAttribute = (survey, parentNode, nodeDef) =>
   record => {
     const parentCodeDefUUID = getNodeDefParentCodeUUID(nodeDef)
     if (parentCodeDefUUID) {
@@ -82,22 +86,37 @@ const getNodeParentCodeAttribute = (survey, parentNode, nodeDef) =>
     return null
   }
 
-const getNodeAncestorAndSelfCodeValues = (survey, parentNode, nodeDef) => record => {
-  const parentCodeAttribute = getNodeParentCodeAttribute(survey, parentNode, nodeDef)(record)
-  if (parentCodeAttribute) {
-    const parentCodeDef = getNodeDefById(getNodeDefId(parentCodeAttribute))(survey)
-    const ancestorCodes = getNodeAncestorAndSelfCodeValues(survey, getParentNode(parentCodeAttribute)(record), parentCodeDef)(record)
-    return R.append(getNodeValue(parentCodeAttribute).code, ancestorCodes)
-  } else {
-    return []
+const getNodeCodeAncestorValues = (survey, parentNode, nodeDef) =>
+  record => {
+    const parentCodeAttribute = getNodeCodeParentAttribute(survey, parentNode, nodeDef)(record)
+    if (parentCodeAttribute) {
+      const parentCodeDef = getNodeDefById(getNodeDefId(parentCodeAttribute))(survey)
+      const ancestorCodes = getNodeCodeAncestorValues(survey, getParentNode(parentCodeAttribute)(record), parentCodeDef)(record)
+      return R.append(getNodeValue(parentCodeAttribute).code, ancestorCodes)
+    } else {
+      return []
+    }
   }
-}
+
+const getNodeCodeDependentAttributes = (survey, node) =>
+  record => {
+    const nodeDef = getNodeDefById(getNodeDefId(node))(survey)
+
+    return isNodeDefCodeParent(nodeDef)(survey)
+      ? findNodes(n => {
+        const def = getNodeDefById(getNodeDefId(n))(survey)
+        return getNodeDefParentCodeUUID(def) === nodeDef.uuid
+      })(record)
+      : []
+  }
 
 // ====== UPDATE
 
 const assocNodes = nodes =>
   record => R.pipe(
     R.merge(getNodes(record)),
+    //remove deleted nodes
+    newNodes => R.reduce((acc, uuid) => R.prop(uuid)(newNodes).deleted ? R.dissoc(uuid)(acc) : acc, newNodes)(R.keys(newNodes)),
     newNodes => R.assoc('nodes', newNodes, record)
   )(nodes)
 
@@ -133,8 +152,8 @@ module.exports = {
   getRootNode,
   getNodeByUUID,
   getParentNode,
-  getNodeParentCodeAttribute,
-  getNodeCodeAncestorAndSelfValues: getNodeAncestorAndSelfCodeValues,
+  getNodeCodeAncestorValues,
+  getNodeCodeDependentAttributes,
 
   // ====== UPDATE
   assocNodes,

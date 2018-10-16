@@ -113,30 +113,24 @@ class Dropdown extends React.Component {
 
   getItemLabel (item = '') {
     const {itemLabelFunction, itemLabelProp} = this.props
-    return (
-      R.is(Object)(item) ?
-        itemLabelFunction ?
-          itemLabelFunction(item)
-          : itemLabelProp ?
-          R.prop(itemLabelProp)(item)
-          : R.has('value')(item) ?
-            R.prop('value')(item)
-            : item
-        : item //primitive
-    )
+    return this.extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value')
   }
 
   getItemKey (item) {
-    const {itemKeyProp} = this.props
-    return (
-      R.is(Object, item) ?
-        itemKeyProp ?
-          R.prop(itemKeyProp)(item)
-          : R.has('key')(item) ?
-          R.prop('key')(item)
+    const {itemKeyFunction, itemKeyProp} = this.props
+    return this.extractValueFromFunctionOrProp(item, itemKeyFunction, itemKeyProp, 'key')
+  }
+
+  extractValueFromFunctionOrProp (item, func, prop, defaultProp) {
+    return R.is(Object, item) ?
+      func ?
+        func(item)
+        : prop ?
+        R.prop(prop)(item)
+        : R.has(defaultProp)(item) ?
+          R.prop(defaultProp)(item)
           : item
-        : item //primitive
-    )
+      : item //primitive
   }
 
   render () {
@@ -212,6 +206,7 @@ Dropdown.defaultProps = {
   selection: null,
   onChange: null,
   itemKeyProp: null,
+  itemKeyFunction: null,
   itemLabelProp: null,
   itemLabelFunction: null,
 }
