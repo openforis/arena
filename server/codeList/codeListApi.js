@@ -43,7 +43,10 @@ module.exports.init = app => {
 
       const level = await insertCodeListLevel(surveyId, codeListId, body)
 
-      res.json({level})
+      res.json({
+        level,
+        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
+      })
     } catch (err) {
       sendErr(res, err)
     }
@@ -60,7 +63,7 @@ module.exports.init = app => {
 
       res.json({
         item,
-        siblingItemsValidation: await validateCodeListItemSiblingItems(surveyId, codeListId, item.parentId),
+        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
       })
     } catch (err) {
       sendErr(res, err)
@@ -152,7 +155,7 @@ module.exports.init = app => {
 
       res.json({
         item,
-        siblingItemsValidation: await validateCodeListItemSiblingItems(surveyId, codeListId, item.parentId),
+        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
       })
     } catch (err) {
       sendErr(res, err)
@@ -177,11 +180,14 @@ module.exports.init = app => {
   app.delete('/survey/:surveyId/codeLists/:codeListId/levels/:levelId', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
+      const codeListId = getRestParam(req, 'codeListId')
       const levelId = getRestParam(req, 'levelId')
 
       await deleteCodeListLevel(surveyId, levelId)
 
-      sendOk(res)
+      res.json({
+        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
+      })
     } catch (err) {
       sendErr(res, err)
     }
@@ -193,19 +199,20 @@ module.exports.init = app => {
       const codeListId = getRestParam(req, 'codeListId')
       const itemId = getRestParam(req, 'itemId')
 
-      const item = await deleteCodeListItem(surveyId, itemId)
+      await deleteCodeListItem(surveyId, itemId)
 
       res.json({
-        siblingItemsValidation: await validateCodeListItemSiblingItems(surveyId, codeListId, item.parentId),
+        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
       })
     } catch (err) {
       sendErr(res, err)
     }
   })
 
-  const validateCodeListItemSiblingItems = async (surveyId, codeListId, parentItemId) => {
+  const validateAllCodeListItems = async (surveyId, codeListId) => {
     const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, true)
-    return await validateCodeListItems(items, parentItemId)
+    const codeList = await fetchCodeListById(surveyId, codeListId, true)
+    return await validateCodeListItems(codeList, items, null)
   }
 
 }

@@ -42,6 +42,20 @@ class CodeListEditItem extends React.Component {
     } = this.props
 
     const validation = getCodeListItemValidation(R.append(item.uuid, ancestorItemUUIDs))(codeList)
+    const validationGlobalErrorMessage = validation.valid
+      ? null
+      : R.pipe(
+        R.keys,
+        R.reject(field => getFieldValidation(field)(validation).valid),
+        R.map(field => {
+          const fieldValidation = getFieldValidation(field)(validation)
+          const fieldErrors = R.propOr([], 'errors', fieldValidation)
+          const fieldErrorMessage = R.isEmpty(fieldErrors) ? 'Invalid' : R.join(', ', fieldErrors)
+          return `${field}: ${fieldErrorMessage}`
+        }),
+        R.join('\n'),
+      )(validation.fields)
+
     const language = getSurveyDefaultLanguage(survey)
 
     const disabled = item.published
@@ -51,9 +65,10 @@ class CodeListEditItem extends React.Component {
            ref={this.elemRef}>
         {
           !validation.valid &&
-          <span className="error-badge">
-            <span className="icon icon-warning icon-12px"/>
-          </span>
+          <span className="error-badge"
+                title={validationGlobalErrorMessage}>
+              <span className="icon icon-warning icon-12px"/>
+            </span>
         }
 
         {

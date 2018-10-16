@@ -59,6 +59,7 @@ const InputChips = (props) => {
     requiredItems = 0,
     dropdownAutocompleteMinChars = 0,
     readOnly = false,
+    disabled = false,
     validation = {}
   } = props
 

@@ -235,6 +235,7 @@ module.exports = {
   //READ
   getCodeListItemId: R.propOr(null, 'id'),
   getCodeListItemCode,
+  getCodeListItemLevelId: R.prop('levelId'),
   getCodeListItemLabels,
   getCodeListItemLabel,
   getCodeListItemValidation,
@@ -242,6 +243,7 @@ module.exports = {
   //UPDATE
   assocCodeListItemProp: setProp,
   dissocCodeListItemValidation,
+  assocCodeListItemsValidation,
   assocCodeListItemChildItemsValidation,
 
   //UTILS
