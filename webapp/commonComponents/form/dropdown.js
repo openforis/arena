@@ -66,7 +66,7 @@ class Dropdown extends React.Component {
   onInputChange (evt) {
     const {value = ''} = evt.target
 
-    const {items, autocompleteMinChars} = this.props
+    const {items, autocompleteMinChars, onChange} = this.props
 
     const contains = (a = '', b = '') => R.contains(R.toLower(a), R.toLower(b))
 
@@ -95,7 +95,7 @@ class Dropdown extends React.Component {
       opened: true,
     })
 
-    this.props.onChange(null)
+    onChange(null)
   }
 
   onInputFocus () {

@@ -30,6 +30,8 @@ import Dropdown from '../../../../commonComponents/form/dropdown'
 const CodeListDropdown = props => {
   const {survey, edit, nodeDef, nodes, items = []} = props
 
+  const disabled = R.isEmpty(items)
+
   const language = getSurveyDefaultLanguage(survey)
 
   const selectedCodes = R.pipe(
@@ -53,21 +55,24 @@ const CodeListDropdown = props => {
       }
     }
     //add new node or update existing one
-    const newSelectedCode = R.find(code => !R.contains(code, selectedCodes))(newSelectedCodes)
-    if (newSelectedCode) {
-      const placeholder = R.find(R.propEq('placeholder', true))(nodes)
-      const nodeToUpdate = placeholder
-        ? placeholder
-        : nodes.length === 1 && !isNodeDefMultiple(nodeDef)
-          ? nodes[0]
-          : newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
-      updateNode(nodeDef, nodeToUpdate, {code: newSelectedCode})
-    }
+    const newSelectedCode = R.pipe(
+      R.find(code => !R.contains(code, selectedCodes)),
+      R.defaultTo(null),
+    )(newSelectedCodes)
+
+    const placeholder = R.find(R.propEq('placeholder', true))(nodes)
+    const nodeToUpdate = placeholder
+      ? placeholder
+      : nodes.length === 1 && !isNodeDefMultiple(nodeDef)
+        ? nodes[0]
+        : newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
+    updateNode(nodeDef, nodeToUpdate, {code: newSelectedCode})
   }
 
   return isNodeDefMultiple(nodeDef)
     ? <InputChips readOnly={edit}
                   items={items}
+                  disabled={disabled}
                   itemKeyProp="uuid"
                   itemLabelFunction={getCodeListItemLabel(language)}
                   selection={selectedItems}
@@ -75,6 +80,7 @@ const CodeListDropdown = props => {
 
     : <Dropdown readOnly={edit}
                 items={items}
+                disabled={disabled}
                 itemKeyProp="uuid"
                 itemLabelFunction={getCodeListItemLabel(language)}
                 selection={R.head(selectedItems)}
@@ -115,10 +121,13 @@ const Checkbox = props => {
 const CodeListCheckbox = props => {
   const {items = []} = props
 
+  const disabled = R.isEmpty(items)
+
   return <div className="node-def__code-checkbox-wrapper">
     {
       items.map(item =>
         <Checkbox {...props}
+                  disabled={disabled}
                   key={item.uuid}
                   item={item}/>
       )
