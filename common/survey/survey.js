@@ -323,6 +323,7 @@ module.exports = {
 
   getSurveyStatus,
   isSurveyPublished,
+  isSurveyDraft,
 
   // READ nodeDefs
   getNodeDefByUUID,
