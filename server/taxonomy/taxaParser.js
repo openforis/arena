@@ -44,49 +44,34 @@ class TaxaParser {
     this.processHeaders(validHeaders => {
       console.log(`headers processed. valid: ${validHeaders}`)
 
-      if (validHeaders) {
-        this.calculateSize(totalRows => {
-          console.log(`total rows: ${totalRows}`)
-
-          this.totalRows = totalRows
-          this.processedRows = 0
-
-          this.dispatchStartEvent()
-
-          const csvStream = fastcsv.fromString(this.csvString, {headers: true})
-            .on('data', async data => {
-              csvStream.pause()
-
-              if (this.canceled) {
-                csvStream.destroy()
-              } else {
-                if (this.processedRows > 0) {
-                  const taxonParseResult = await this.parseTaxon(data)
-
-                  if (taxonParseResult.taxon) {
-                    this.result.taxa.push(taxonParseResult.taxon)
-                  } else {
-                    this.result.errors[this.processedRows] = taxonParseResult.errors
-                  }
-                }
-                this.dispatchProgressEvent()
-                this.processedRows++
-
-                if (this.csvStreamEnded) {
-                  this.dispatchEndEvent()
-                } else {
-                  csvStream.resume()
-                }
-              }
-            })
-            .on('end', () => {
-              this.csvStreamEnded = true
-              //do not throw immediately "end" event, last item still being processed
-            })
-        })
-      } else {
+      if (!validHeaders) {
         this.dispatchEndEvent()
+        return
       }
+      this.calculateSize(totalRows => {
+        console.log(`total rows: ${totalRows}`)
+
+        this.totalRows = totalRows
+        this.processedRows = 0
+
+        this.dispatchStartEvent()
+
+        const csvStream = fastcsv.fromString(this.csvString, {headers: true})
+          .on('data', async data => {
+            csvStream.pause()
+
+            if (this.canceled) {
+              csvStream.destroy()
+            } else {
+              await this.processRow(data)
+              csvStream.resume()
+            }
+          })
+          .on('end', () => {
+            this.csvStreamEnded = true
+            //do not throw immediately "end" event, last item still being processed
+          })
+      })
     })
     return this
   }
@@ -112,6 +97,25 @@ class TaxaParser {
       }
       callback(validHeaders)
     })
+  }
+
+  async processRow (data) {
+    if (this.processedRows > 0) {
+      const taxonParseResult = await this.parseTaxon(data)
+
+      if (taxonParseResult.taxon) {
+        this.result.taxa.push(taxonParseResult.taxon)
+      } else {
+        this.result.errors[this.processedRows] = taxonParseResult.errors
+      }
+    }
+    this.processedRows++
+
+    if (this.csvStreamEnded) {
+      this.dispatchEndEvent()
+    } else {
+      this.dispatchProgressEvent()
+    }
   }
 
   validateHeaders (data) {
