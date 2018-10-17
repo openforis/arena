@@ -12,12 +12,15 @@ const {
 } = require('../../common/survey/taxonomy')
 
 const {
-  createJob,
-  updateJob,
+  fetchSurveyJobById,
+  createSurveyJob,
+  updateSurveyJob,
 } = require('../job/jobManager')
 
 const {
-  jobStatus
+  jobStatus,
+  getJobStatus,
+  isJobEnded,
 } = require('../../common/job/job')
 
 const {TaxaParser} = require('./taxaParser')
@@ -81,24 +84,35 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
 }
 
 const importTaxa = async (surveyId, taxonomyId, inputBuffer) => {
-  const importJob = await createJob(surveyId, 'import taxa')
+  const importJob = await createSurveyJob(surveyId, 'import taxa')
 
-  await new TaxaParser(taxonomyId, inputBuffer)
-    .onStart(async event => await updateJob(surveyId, importJob.id, jobStatus.running, event.total, event.processed))
-    .onProgress(async event => await updateJob(surveyId, importJob.id, jobStatus.running, event.total, event.processed))
+  const parser = await new TaxaParser(taxonomyId, inputBuffer)
+    .onStart(async event => await updateSurveyJob(surveyId, importJob.id, jobStatus.running, event.total, event.processed))
+    .onProgress(async event => await updateSurveyJob(surveyId, importJob.id, jobStatus.running, event.total, event.processed))
     .onEnd(async event => {
       const result = event.result
       const hasErrors = !R.isEmpty(R.keys(result.errors))
       if (hasErrors) {
         console.log('errors found')
-        await updateJob(surveyId, importJob.id, jobStatus.error, event.total, event.processed, {errors: result.errors})
+        await updateSurveyJob(surveyId, importJob.id, jobStatus.error, event.total, event.processed, {errors: result.errors})
       } else {
         await storeTaxa(surveyId, taxonomyId, result.vernacularLanguageCodes, result.taxa)
         console.log(`taxa stored: ${result.taxa.length}`)
-        await updateJob(surveyId, importJob.id, jobStatus.completed, event.total, event.processed)
+        await updateSurveyJob(surveyId, importJob.id, jobStatus.completed, event.total, event.processed)
       }
     })
     .start()
+
+  const jobUpdateInterval = setInterval(async () => {
+    const job = await fetchSurveyJobById(surveyId, importJob.id)
+
+    if (job && getJobStatus(job) === jobStatus.canceled) {
+      parser.cancel()
+    }
+    if (R.isNil(job) || isJobEnded(job)) {
+      clearInterval(jobUpdateInterval)
+    }
+  }, 1000)
 
   return importJob
 }

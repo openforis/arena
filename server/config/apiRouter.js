@@ -11,6 +11,7 @@ require('../survey/surveyApi').init(router)
 require('../nodeDef/nodeDefApi').init(router)
 require('../codeList/codeListApi').init(router)
 require('../taxonomy/taxonomyApi').init(router)
+require('../job/jobApi').init(router)
 
 require('../record/recordApi').init(router)
 

@@ -23,6 +23,7 @@ class TaxaParser {
 
     this.eventEmitter = new EventEmitter()
 
+    this.canceled = false
     this.startTime = null
     this.csvStreamEnded = false
     this.totalRows = NaN
@@ -55,22 +56,27 @@ class TaxaParser {
           const csvStream = fastcsv.fromString(this.csvString, {headers: true})
             .on('data', async data => {
               csvStream.pause()
-              if (this.processedRows > 0) {
-                const taxonParseResult = await this.parseTaxon(data)
 
-                if (taxonParseResult.taxon) {
-                  this.result.taxa.push(taxonParseResult.taxon)
-                } else {
-                  this.result.errors[this.processedRows] = taxonParseResult.errors
-                }
-              }
-              this.dispatchProgressEvent()
-              this.processedRows++
-
-              if (this.csvStreamEnded) {
-                this.dispatchEndEvent()
+              if (this.canceled) {
+                csvStream.destroy()
               } else {
-                csvStream.resume()
+                if (this.processedRows > 0) {
+                  const taxonParseResult = await this.parseTaxon(data)
+
+                  if (taxonParseResult.taxon) {
+                    this.result.taxa.push(taxonParseResult.taxon)
+                  } else {
+                    this.result.errors[this.processedRows] = taxonParseResult.errors
+                  }
+                }
+                this.dispatchProgressEvent()
+                this.processedRows++
+
+                if (this.csvStreamEnded) {
+                  this.dispatchEndEvent()
+                } else {
+                  csvStream.resume()
+                }
               }
             })
             .on('end', () => {
@@ -82,6 +88,11 @@ class TaxaParser {
         this.dispatchEndEvent()
       }
     })
+    return this
+  }
+
+  cancel () {
+    this.canceled = true
   }
 
   calculateSize (callback) {
@@ -171,7 +182,7 @@ class TaxaParser {
   dispatchEndEvent () {
     const end = new Date()
     const elapsedSeconds = (end.getTime() - this.startTime.getTime()) / 1000
-    console.log(`csv parsed successfully in ${elapsedSeconds} seconds. taxa: ${this.result.taxa.length} errors: ${R.keys(this.result.errors).length}`)
+    console.log(`csv parsed in ${elapsedSeconds} seconds. parsed taxa: ${this.result.taxa.length} errors: ${R.keys(this.result.errors).length}`)
 
     this.eventEmitter.emit('end', R.assoc('result', this.result)(this.createProgressEvent()))
   }

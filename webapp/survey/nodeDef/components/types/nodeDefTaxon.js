@@ -72,11 +72,6 @@ class NodeDefTaxon extends React.Component {
     }
   }
 
-  componentDidUpdate (prevProps) {
-    if (this.props.node !== prevProps.node)
-      console.log('node changed')
-  }
-
   getInputFields () {
     return {
       code: this.codeField,

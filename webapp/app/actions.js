@@ -4,12 +4,15 @@ import { appState, systemStatus } from './app'
 import { userPrefNames } from '../../common/user/userPrefs'
 
 import { dispatchCurrentSurveyUpdate } from '../survey/actions'
+import { fetchSurveyActiveJob } from '../survey/job/actions'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
 
-export const initApp = () => async dispatch => {
+let surveyActiveJobPollingInterval = null
+
+export const initApp = () => async (dispatch, getState) => {
   try {
 
     const resp = await axios.get('/auth/user')
@@ -22,6 +25,10 @@ export const initApp = () => async dispatch => {
 
     dispatch({type: appStatusChange, status: systemStatus.ready, user})
 
+    //start survey active job polling
+    surveyActiveJobPollingInterval = setInterval(() =>
+        fetchSurveyActiveJob()(dispatch, getState)
+      , 3000)
   } catch (e) {
   }
 
@@ -29,6 +36,10 @@ export const initApp = () => async dispatch => {
 
 export const logout = () => async dispatch => {
   try {
+    //stop survey active job polling
+    clearInterval(surveyActiveJobPollingInterval)
+    surveyActiveJobPollingInterval = null
+
     await axios.post('/auth/logout')
 
     dispatch({type: appUserLogout})

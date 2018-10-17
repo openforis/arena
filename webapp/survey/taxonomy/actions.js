@@ -7,6 +7,7 @@ import { newTaxonomy, assocTaxonomyProp } from '../../../common/survey/taxonomy'
 import { assocValidation } from '../../../common/validation/validator'
 import { getSurvey } from '../surveyState'
 import { getTaxonomyEditTaxonomy } from './taxonomyEditState'
+import { startSurveyJobMonitoring } from '../job/actions'
 
 export const taxonomiesUpdate = 'survey/taxonomy/update'
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
@@ -63,7 +64,7 @@ export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, ge
 }
 
 export const
-  uploadTaxonomyFile = (surveyId, taxonomyId, file) => dispatch => {
+  uploadTaxonomyFile = (surveyId, taxonomyId, file) => async dispatch => {
     const formData = new FormData()
     formData.append('file', file)
 
@@ -73,15 +74,11 @@ export const
       }
     }
 
-    axios
-      .post(`/api/survey/${surveyId}/taxonomies/${taxonomyId}/upload`, formData, config)
-      .then(resp => {
-        //const filesList = resp.data
-        //load first page of taxa
-        //dispatch({type: taxonomyTaxaUpdate, taxonomy})
+    const {data} = await axios.post(`/api/survey/${surveyId}/taxonomies/${taxonomyId}/upload`, formData, config)
 
-      })
-      .catch(e => {})
+    const job = data.job
+
+    startSurveyJobMonitoring(job)(dispatch)
   }
 
 // ====== DELETE

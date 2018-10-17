@@ -108,7 +108,7 @@ class TaxonomyEdit extends React.Component {
           <UploadButton label="IMPORT"
                         onChange={(files) => uploadTaxonomyFile(survey.id, taxonomy.id, files[0])}/>
 
-          <button className="btn-s btn-primary btn-download"
+          <button className="btn btn-of btn-download"
                   disabled={R.isEmpty(taxa)}
                   onClick={() => this.exportTaxonomy()}>
             <span className="icon icon-cloud-download icon-16px icon-left"/>

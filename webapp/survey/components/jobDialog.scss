@@ -1,0 +1,29 @@
+@import "../../style/vars";
+
+.job-dialog {
+  position: fixed;
+  top: calc(50vh - 300px);
+  left: calc(50vw - 200px);
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+
+  > * {
+    margin: 10px;
+    align-self: center;
+  }
+
+  .progress-bar {
+    position: relative;
+    height: 20px;
+    width: 100%;
+    border: 1px solid $white;
+
+    .filler {
+      background: $blue1;
+      height: 100%;
+      transition: width .2s ease-in;
+    }
+  }
+
+}
