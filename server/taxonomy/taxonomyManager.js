@@ -13,8 +13,7 @@ const {
 
 const {
   createJob,
-  updateJobProgress,
-  updateJobStatus,
+  updateJob,
 } = require('../job/jobManager')
 
 const {
@@ -85,17 +84,18 @@ const importTaxa = async (surveyId, taxonomyId, inputBuffer) => {
   const importJob = await createJob(surveyId, 'import taxa')
 
   await new TaxaParser(taxonomyId, inputBuffer)
-    .onStart(async () => await updateJobStatus(surveyId, importJob.id, jobStatus.running))
-    .onProgress(async event => await updateJobProgress(surveyId, importJob.id, event.progressPercent))
-    .onEnd(async parseResult => {
-      const hasErrors = !R.isEmpty(R.keys(parseResult.errors))
+    .onStart(async event => await updateJob(surveyId, importJob.id, jobStatus.running, event.total, event.processed))
+    .onProgress(async event => await updateJob(surveyId, importJob.id, jobStatus.running, event.total, event.processed))
+    .onEnd(async event => {
+      const result = event.result
+      const hasErrors = !R.isEmpty(R.keys(result.errors))
       if (hasErrors) {
         console.log('errors found')
-        await updateJobStatus(surveyId, importJob.id, jobStatus.error)
+        await updateJob(surveyId, importJob.id, jobStatus.error, event.total, event.processed, {errors: result.errors})
       } else {
-        await storeTaxa(surveyId, taxonomyId, parseResult.vernacularLanguageCodes, parseResult.taxa)
-        console.log(`taxa stored: ${parseResult.taxa.length}`)
-        await updateJobStatus(surveyId, importJob.id, jobStatus.completed)
+        await storeTaxa(surveyId, taxonomyId, result.vernacularLanguageCodes, result.taxa)
+        console.log(`taxa stored: ${result.taxa.length}`)
+        await updateJob(surveyId, importJob.id, jobStatus.completed, event.total, event.processed)
       }
     })
     .start()

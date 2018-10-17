@@ -23,29 +23,14 @@ class TaxaParser {
 
     this.eventEmitter = new EventEmitter()
 
+    this.startTime = null
+    this.csvStreamEnded = false
+    this.totalRows = NaN
+    this.processedRows = NaN
     this.result = null
   }
 
-  onStart (listener) {
-    return this.addEventListener('start', listener)
-  }
-
-  onProgress (listener) {
-    return this.addEventListener('progress', listener)
-  }
-
-  onEnd (listener) {
-    return this.addEventListener('end', listener)
-  }
-
-  addEventListener (eventType, listener) {
-    this.eventEmitter.addListener(eventType, listener)
-    return this
-  }
-
   start () {
-    this.dispatchStartEvent()
-
     this.startTime = new Date()
     console.log(`parsing csv file. size ${this.inputBuffer.length}`)
 
@@ -63,35 +48,47 @@ class TaxaParser {
           console.log(`total rows: ${totalRows}`)
 
           this.totalRows = totalRows
-          this.currentRowIndex = 0
+          this.processedRows = 0
+
+          this.dispatchStartEvent()
 
           const csvStream = fastcsv.fromString(this.csvString, {headers: true})
             .on('data', async data => {
               csvStream.pause()
-              if (this.currentRowIndex > 0) {
+              if (this.processedRows > 0) {
                 const taxonParseResult = await this.parseTaxon(data)
 
                 if (taxonParseResult.taxon) {
                   this.result.taxa.push(taxonParseResult.taxon)
                 } else {
-                  this.result.errors[this.currentRowIndex] = taxonParseResult.errors
+                  this.result.errors[this.processedRows] = taxonParseResult.errors
                 }
               }
               this.dispatchProgressEvent()
-              this.currentRowIndex++
-              csvStream.resume()
+              this.processedRows++
+
+              if (this.csvStreamEnded) {
+                this.dispatchEndEvent()
+              } else {
+                csvStream.resume()
+              }
             })
             .on('end', () => {
-              //wait for the last row to be processed and dispatch 'end' event
-              setTimeout(() => {
-                this.dispatchEndEvent()
-              }, 1000)
+              this.csvStreamEnded = true
+              //do not throw immediately "end" event, last item still being processed
             })
         })
       } else {
         this.dispatchEndEvent()
       }
     })
+  }
+
+  calculateSize (callback) {
+    let count = 0
+    fastcsv.fromString(this.csvString, {headers: true})
+      .on('data', () => count++)
+      .on('end', () => callback(count))
   }
 
   processHeaders (callback) {
@@ -104,13 +101,6 @@ class TaxaParser {
       }
       callback(validHeaders)
     })
-  }
-
-  calculateSize (callback) {
-    let count = 0
-    fastcsv.fromString(this.csvString, {headers: true})
-      .on('data', () => count++)
-      .on('end', () => callback(count))
   }
 
   validateHeaders (data) {
@@ -153,16 +143,29 @@ class TaxaParser {
     }, {}, this.result.vernacularLanguageCodes)
   }
 
+  onStart (listener) {
+    return this.addEventListener('start', listener)
+  }
+
+  onProgress (listener) {
+    return this.addEventListener('progress', listener)
+  }
+
+  onEnd (listener) {
+    return this.addEventListener('end', listener)
+  }
+
+  addEventListener (eventType, listener) {
+    this.eventEmitter.addListener(eventType, listener)
+    return this
+  }
+
   dispatchStartEvent () {
-    this.eventEmitter.emit('start')
+    this.eventEmitter.emit('start', this.createProgressEvent())
   }
 
   dispatchProgressEvent () {
-    this.eventEmitter.emit('progress', {
-      total: this.totalRows,
-      processed: this.currentRowIndex + 1,
-      progressPercent: Math.ceil(100 * (this.currentRowIndex + 1) / this.totalRows)
-    })
+    this.eventEmitter.emit('progress', this.createProgressEvent())
   }
 
   dispatchEndEvent () {
@@ -170,7 +173,14 @@ class TaxaParser {
     const elapsedSeconds = (end.getTime() - this.startTime.getTime()) / 1000
     console.log(`csv parsed successfully in ${elapsedSeconds} seconds. taxa: ${this.result.taxa.length} errors: ${R.keys(this.result.errors).length}`)
 
-    this.eventEmitter.emit('end', this.result)
+    this.eventEmitter.emit('end', R.assoc('result', this.result)(this.createProgressEvent()))
+  }
+
+  createProgressEvent () {
+    return {
+      total: this.totalRows,
+      processed: this.processedRows,
+    }
   }
 }
 
