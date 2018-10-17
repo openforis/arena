@@ -24,8 +24,6 @@ const migrateSurveySchema = async(surveyId) => {
 
   const dbm = DBMigrate.getInstance(true, options)
   await dbm.up()
-
-  console.log(`db migrations for survey ${surveyId} completed`)
 }
 
 module.exports = {

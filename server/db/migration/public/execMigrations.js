@@ -12,15 +12,15 @@ const migrateOptions = {
   env: process.env.NODE_ENV,
 }
 
-const migrateSurveySchemas = async() => {
+const migrateSurveySchemas = async () => {
   const surveys = await fetchAllSurveys()
 
   console.log(`starting data schemas migrations for ${surveys.length} surveys`)
 
-  await Promise.all(surveys.map(async s => {
-    await migrateSurveySchema(s.id)
-  }))
-
+  for (let i = 0; i < surveys.length; i++) {
+    const survey = surveys[i]
+    await migrateSurveySchema(survey.id)
+  }
   console.log(`data schemas migrations completed`)
 }
 
