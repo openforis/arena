@@ -40,5 +40,6 @@ module.exports = {
   getJobProgressPercent,
   isJobRunning,
   isJobEnded,
+  isJobCanceled: R.pipe(getJobStatus, R.equals(jobStatus.canceled)),
   isJobStatusEnded,
 }

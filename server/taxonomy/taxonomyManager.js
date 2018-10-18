@@ -14,7 +14,8 @@ const {
 const {
   fetchSurveyJobById,
   createSurveyJob,
-  updateSurveyJob,
+  updateSurveyJobProgress,
+  updateSurveyJobStatus,
 } = require('../job/jobManager')
 
 const {
@@ -84,35 +85,24 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
 }
 
 const importTaxa = async (surveyId, taxonomyId, inputBuffer) => {
-  const importJob = await createSurveyJob(surveyId, 'import taxa')
+  const importJob = await createSurveyJob(surveyId, 'import taxa', () => parser.cancel())
 
   const parser = await new TaxaParser(taxonomyId, inputBuffer)
-    .onStart(async event => await updateSurveyJob(surveyId, importJob.id, jobStatus.running, event.total, event.processed))
-    .onProgress(async event => await updateSurveyJob(surveyId, importJob.id, jobStatus.running, event.total, event.processed))
+    .onStart(async () => await updateSurveyJobStatus(surveyId, importJob.id, jobStatus.running))
+    .onProgress(async event => await updateSurveyJobProgress(surveyId, importJob.id, event.total, event.processed))
     .onEnd(async event => {
       const result = event.result
       const hasErrors = !R.isEmpty(R.keys(result.errors))
       if (hasErrors) {
         console.log('errors found')
-        await updateSurveyJob(surveyId, importJob.id, jobStatus.error, event.total, event.processed, {errors: result.errors})
+        await updateSurveyJobStatus(surveyId, importJob.id, jobStatus.error, {errors: result.errors})
       } else {
         await storeTaxa(surveyId, taxonomyId, result.vernacularLanguageCodes, result.taxa)
         console.log(`taxa stored: ${result.taxa.length}`)
-        await updateSurveyJob(surveyId, importJob.id, jobStatus.completed, event.total, event.processed)
+        await updateSurveyJobStatus(surveyId, importJob.id, jobStatus.completed)
       }
     })
     .start()
-
-  const jobUpdateInterval = setInterval(async () => {
-    const job = await fetchSurveyJobById(surveyId, importJob.id)
-
-    if (job && getJobStatus(job) === jobStatus.canceled) {
-      parser.cancel()
-    }
-    if (R.isNil(job) || isJobEnded(job)) {
-      clearInterval(jobUpdateInterval)
-    }
-  }, 1000)
 
   return importJob
 }

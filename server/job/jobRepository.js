@@ -18,7 +18,7 @@ const insertSurveyJob = async (surveyId, job, client = db) =>
 // ============== READ
 
 const fetchSurveyJobById = async (surveyId, id, client = db) =>
-  await client.one(
+  await client.oneOrNone(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.job
      WHERE id = $1`,
     [id],
@@ -35,18 +35,28 @@ const fetchActiveSurveyJob = async (surveyId, client = db) =>
 
 // ============== UPDATE
 
-const updateSurveyJob = async (surveyId, id, status, total, processed, props, client = db) =>
+const updateSurveyJobStatus = async (surveyId, id, status, props = {}, client = db) =>
   await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.job
      SET 
         status = $1,
-        total = $2,
-        processed = $3,
-        props = props || $4,
-        date_ended = $5
-     WHERE id = $6
+        props = props || $2,
+        date_ended = $3
+     WHERE id = $4
      RETURNING *`,
-    [status, total, processed, props, isJobStatusEnded(status) ? new Date() : null, id],
+    [status, props, isJobStatusEnded(status) ? new Date() : null, id],
+    camelize
+  )
+
+const updateSurveyJobProgress = async (surveyId, id, total, processed, client = db) =>
+  await client.one(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.job
+     SET 
+        total = $1,
+        processed = $2
+     WHERE id = $3
+     RETURNING *`,
+    [total, processed, id],
     camelize
   )
 
@@ -57,6 +67,7 @@ module.exports = {
   fetchSurveyJobById,
   fetchActiveSurveyJob,
   //UPDATE
-  updateSurveyJob,
+  updateSurveyJobProgress,
+  updateSurveyJobStatus,
   //DELETE
 }
