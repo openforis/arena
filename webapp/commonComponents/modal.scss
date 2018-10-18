@@ -1,0 +1,83 @@
+@import "../style/vars";
+
+$borderRadius: 2px;
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: $zIndex19AppModal;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  background-color: rgba($brown, 0.7);
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  width: auto;
+  flex-direction: column;
+  pointer-events: auto;
+  background-color: rgba($brown, 0.9);
+  background-clip: padding-box;
+  border: none;
+  border-radius: $borderRadius;
+  outline: 0;
+  animation-name: animatetop;
+  animation-duration: 0.5s;
+  margin: 10vh 20vw auto;
+  padding: 5vh 5vw;
+  box-shadow: $shadow3;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top-left-radius: $borderRadius;
+  border-top-right-radius: $borderRadius;
+}
+
+.modal-header-center {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+.modal-close {
+  padding: 3px;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.modal-body {
+  position: relative;
+  flex: 1 1 auto;
+  padding-top: 3rem;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 3rem;
+  //border-top: @ui-thin-border;
+}
+
+.modal-footer__item {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0
+  }
+  to {
+    top: 0;
+    opacity: 1
+  }
+}

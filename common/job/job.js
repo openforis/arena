@@ -11,7 +11,7 @@ const jobStatus = {
 
 const getJobStatus = R.prop('status')
 
-const getJobProgressPercent = job => job.total > 0 ? Math.ceil(100 * job.processed / job.total) : 0
+const getJobProgressPercent = job => job.total > 0 ? Math.floor(100 * job.processed / job.total) : 0
 
 const isJobStatusEnded = status =>
   R.contains(status, [

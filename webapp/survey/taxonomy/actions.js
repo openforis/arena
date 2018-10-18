@@ -7,7 +7,7 @@ import { newTaxonomy, assocTaxonomyProp } from '../../../common/survey/taxonomy'
 import { assocValidation } from '../../../common/validation/validator'
 import { getSurvey } from '../surveyState'
 import { getTaxonomyEditTaxonomy } from './taxonomyEditState'
-import { startSurveyJobMonitoring } from '../job/actions'
+import { showAppJobMonitor } from '../../app/components/job/actions'
 
 export const taxonomiesUpdate = 'survey/taxonomy/update'
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
@@ -63,23 +63,20 @@ export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, ge
   dispatch(debounceAction(action, `${taxonomiesUpdate}_${taxonomy.uuid}`))
 }
 
-export const
-  uploadTaxonomyFile = (surveyId, taxonomyId, file) => async dispatch => {
-    const formData = new FormData()
-    formData.append('file', file)
+export const uploadTaxonomyFile = (surveyId, taxonomyId, file) => async dispatch => {
+  const formData = new FormData()
+  formData.append('file', file)
 
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data'
-      }
+  const config = {
+    headers: {
+      'content-type': 'multipart/form-data'
     }
-
-    const {data} = await axios.post(`/api/survey/${surveyId}/taxonomies/${taxonomyId}/upload`, formData, config)
-
-    const job = data.job
-
-    startSurveyJobMonitoring(job)(dispatch)
   }
+
+  const {data} = await axios.post(`/api/survey/${surveyId}/taxonomies/${taxonomyId}/upload`, formData, config)
+
+  showAppJobMonitor(data.job)(dispatch)
+}
 
 // ====== DELETE
 
