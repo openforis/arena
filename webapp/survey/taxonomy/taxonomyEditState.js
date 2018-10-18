@@ -18,7 +18,6 @@ const surveyState = {
     // loaded taxonomy
     taxonomyEdit: {
       uuid: '',
-      importingFile: false,
       taxa: [],
       currentPage: 0,
       totalPages: 0,
@@ -38,8 +37,6 @@ export const getTaxonomyEditTaxonomy = survey => R.pipe(
   uuid => getSurveyTaxonomyByUUID(uuid)(survey),
 )(survey)
 
-export const getTaxonomyEditImportingFile = R.pathOr(false, R.append('importingFile', taxonomyEditPath))
-
 export const getTaxonomyEditTaxaCurrentPage = R.pathOr(1, R.append('taxaCurrentPage', taxonomyEditPath))
 
 export const getTaxonomyEditTaxaTotalPages = R.pathOr(0, R.append('taxaTotalPages', taxonomyEditPath))
@@ -54,7 +51,7 @@ export const updateTaxonomyEdit = props => state => {
   } else {
     return R.pipe(
       getTaxonomyEdit,
-      R.merge(props),
+      taxonomyEdit => R.merge(taxonomyEdit, props),
       taxonomyEdit => R.assocPath(taxonomyEditPath, taxonomyEdit)(state),
     )(state)
   }

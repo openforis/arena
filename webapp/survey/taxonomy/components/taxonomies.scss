@@ -15,6 +15,11 @@
     }
   }
 
+  .empty-taxa-message {
+    justify-self: center;
+    height: calc(100vh - 300px);
+  }
+
   .taxa-table {
     display: grid;
     grid-template-rows: 2rem 1fr 40px;
@@ -36,7 +41,7 @@
 
     .body {
       overflow-y: auto;
-      height: calc(100vh - 315px);
+      height: calc(100vh - 340px);
 
       .row {
         border-bottom: 1px solid rgba($white, .5);

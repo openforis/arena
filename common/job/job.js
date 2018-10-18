@@ -6,7 +6,7 @@ const jobStatus = {
   running: 'running',
   completed: 'completed',
   canceled: 'canceled',
-  error: 'error',
+  failed: 'failed',
 }
 
 const getJobStatus = R.prop('status')
@@ -16,7 +16,7 @@ const getJobProgressPercent = job => job.total > 0 ? Math.floor(100 * job.proces
 const isJobStatusEnded = status =>
   R.contains(status, [
     jobStatus.completed,
-    jobStatus.error,
+    jobStatus.failed,
     jobStatus.canceled
   ])
 
@@ -36,5 +36,6 @@ module.exports = {
   isJobCompleted: R.pipe(getJobStatus, R.equals(jobStatus.completed)),
   isJobEnded,
   isJobCanceled: R.pipe(getJobStatus, R.equals(jobStatus.canceled)),
+  isJobFailed: R.pipe(getJobStatus, R.equals(jobStatus.failed)),
   isJobStatusEnded,
 }

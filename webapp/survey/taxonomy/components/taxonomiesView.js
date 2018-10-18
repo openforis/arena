@@ -10,7 +10,7 @@ import { getNodeDefsByTaxonomyUUID, getSurveyTaxonomiesArray } from '../../../..
 import { getTaxonomyName } from '../../../../common/survey/taxonomy'
 
 import { getSurvey } from '../../surveyState'
-import { getTaxonomyEditImportingFile, getTaxonomyEditTaxonomy } from '../taxonomyEditState'
+import { getTaxonomyEditTaxonomy } from '../taxonomyEditState'
 
 import {
   createTaxonomy,
@@ -51,7 +51,6 @@ const mapStateToProps = state => {
   return {
     survey,
     taxonomy: getTaxonomyEditTaxonomy(survey),
-    importingTaxonomy: getTaxonomyEditImportingFile(survey),
   }
 }
 

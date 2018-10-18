@@ -50,7 +50,7 @@ const validateRequired = (propName, obj) => {
 const validateItemPropUniqueness = items =>
   (propName, item) => {
     const hasDuplicates = R.any(
-      i => getProp(propName, i) === getProp(propName, item) && i.id !== item.id,
+      i => getProp(propName)(i) === getProp(propName)(item) && i.id !== item.id,
       items
     )
     return hasDuplicates
