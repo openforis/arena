@@ -21,7 +21,7 @@ import {
 } from '../actions'
 
 const TaxonomiesView = (props) => {
-  const {survey, taxonomy, createTaxonomy, setTaxonomyForEdit, deleteTaxonomy} = props
+  const {survey, taxonomy, selectedTaxonomyUUID, createTaxonomy, setTaxonomyForEdit, deleteTaxonomy} = props
 
   const canDeleteTaxonomy = taxonomy => {
     if (getNodeDefsByTaxonomyUUID(taxonomy.uuid)(survey).length > 0) {
@@ -40,6 +40,7 @@ const TaxonomiesView = (props) => {
                     itemLabelFunction={taxonomy => getTaxonomyName(taxonomy)}
                     editedItem={taxonomy}
                     items={taxonomies}
+                    tableSelectedItemUUID={selectedTaxonomyUUID}
                     onAdd={createTaxonomy}
                     onEdit={setTaxonomyForEdit}
                     canDelete={canDeleteTaxonomy}

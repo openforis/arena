@@ -48,6 +48,7 @@ class NodeDefEdit extends React.Component {
               : editingTaxonomy
               ?
               <TaxonomiesView onClose={() => this.setState({editingTaxonomy: false})}
+                              canSelect={true}
                               onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
                               selectedTaxonomyUUID={getNodeDefTaxonomyUUID(nodeDef)}/>
               :
