@@ -12,7 +12,7 @@ export const appUserPrefUpdate = 'app/user/pref/update'
 
 let surveyActiveJobPollingInterval = null
 
-export const initApp = () => async (dispatch, getState) => {
+export const initApp = () => async (dispatch) => {
   try {
 
     const resp = await axios.get('/auth/user')
@@ -25,10 +25,6 @@ export const initApp = () => async (dispatch, getState) => {
 
     dispatch({type: appStatusChange, status: systemStatus.ready, user})
 
-    //start survey active job polling
-    surveyActiveJobPollingInterval = setInterval(() =>
-        fetchSurveyActiveJob()(dispatch, getState)
-      , 3000)
   } catch (e) {
   }
 
@@ -76,3 +72,11 @@ export const setActiveSurvey = surveyId =>
     } catch (e) {
     }
   }
+
+export const startAppJobMonitoring = () =>
+  dispatch =>
+    surveyActiveJobPollingInterval = setInterval(
+      () => dispatch(fetchSurveyActiveJob()),
+      3000
+    )
+
