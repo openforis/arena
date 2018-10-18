@@ -1,9 +1,9 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendOk} = require('../serverUtils/response')
 const {
-  fetchSurveyJobById,
-  fetchActiveSurveyJob,
-  cancelSurveyActiveJob,
+  fetchJobById,
+  fetchActiveJobByUserId,
+  cancelActiveJobByUserId,
 } = require('./jobManager')
 
 module.exports.init = app => {
@@ -11,19 +11,18 @@ module.exports.init = app => {
   /**
    * ====== READ
    */
-  app.get('/surveys/:surveyId/jobs/active', async (req, res) => {
-    const surveyId = getRestParam(req, 'surveyId')
+  app.get('/jobs/active', async (req, res) => {
+    const user = req.user
 
-    const job = await fetchActiveSurveyJob(surveyId)
+    const job = await fetchActiveJobByUserId(user.id)
 
     res.json({job})
   })
 
-  app.get('/surveys/:surveyId/jobs/:jobId', async (req, res) => {
-    const surveyId = getRestParam(req, 'surveyId')
+  app.get('/jobs/:jobId', async (req, res) => {
     const jobId = getRestParam(req, 'jobId')
 
-    const job = await fetchSurveyJobById(surveyId, jobId)
+    const job = await fetchJobById(jobId)
 
     res.json({job})
   })
@@ -31,10 +30,10 @@ module.exports.init = app => {
   /**
    * ====== UPDATE
    */
-  app.delete('/surveys/:surveyId/jobs/active', async (req, res) => {
-    const surveyId = getRestParam(req, 'surveyId')
+  app.delete('/jobs/active', async (req, res) => {
+    const user = req.user
 
-    await cancelSurveyActiveJob(surveyId)
+    await cancelActiveJobByUserId(user.id)
 
     sendOk(res)
   })

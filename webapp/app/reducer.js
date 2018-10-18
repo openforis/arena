@@ -45,7 +45,7 @@ const actionHandlers = {
   [appSurveysUpdate]: assocActionProps,
 
   //app job
-  [appJobActiveUpdate]: (state, {job}) => updateActiveJob(job)(state),
+  [appJobActiveUpdate]: (state, {job, hideAutomatically}) => updateActiveJob(job, hideAutomatically)(state),
 }
 
 export default exportReducer(actionHandlers)

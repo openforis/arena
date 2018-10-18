@@ -15,9 +15,7 @@ import { getTaxonomyEditImportingFile, getTaxonomyEditTaxonomy } from '../taxono
 import {
   createTaxonomy,
   setTaxonomyForEdit,
-  putTaxonomyProp,
   deleteTaxonomy,
-  uploadTaxonomyFile,
 } from '../actions'
 
 const TaxonomiesView = (props) => {
@@ -59,5 +57,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  {createTaxonomy, setTaxonomyForEdit, putTaxonomyProp, deleteTaxonomy, uploadTaxonomyFile}
+  {createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
 )(TaxonomiesView)

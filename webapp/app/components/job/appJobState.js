@@ -2,9 +2,15 @@ import * as R from 'ramda'
 
 const activeJob = 'activeJob'
 
-export const getActiveJob = R.path(['app', activeJob])
+export const getActiveJob = R.pathOr(null, ['app', activeJob])
 
-export const updateActiveJob = job =>
-  job
-    ? R.assoc(activeJob, job)
-    : R.dissoc(activeJob)
+export const updateActiveJob = (job, closeAutomatically = false) =>
+  state =>
+    job
+      ?
+      R.pipe(
+        R.assoc('closeAutomatically', closeAutomatically),
+        j => R.assoc(activeJob, j)(state)
+      )(job)
+      :
+      R.dissoc(activeJob)(state)

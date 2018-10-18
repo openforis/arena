@@ -111,10 +111,10 @@ class TaxaParser {
     }
     this.processedRows++
 
+    this.dispatchProgressEvent()
+
     if (this.csvStreamEnded) {
       this.dispatchEndEvent()
-    } else {
-      this.dispatchProgressEvent()
     }
   }
 

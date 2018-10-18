@@ -20,15 +20,9 @@ const isJobStatusEnded = status =>
     jobStatus.canceled
   ])
 
-const isJobRunning = job => R.pipe(
-  getJobStatus,
-  status => R.contains(status, [
-    jobStatus.created,
-    jobStatus.running
-  ])
-)(job)
-
 const isJobEnded = job => isJobStatusEnded(getJobStatus(job))
+
+const isJobRunning = job => !isJobEnded(job)
 
 module.exports = {
   //UTILS
@@ -39,6 +33,7 @@ module.exports = {
   getJobStatus,
   getJobProgressPercent,
   isJobRunning,
+  isJobCompleted: R.pipe(getJobStatus, R.equals(jobStatus.completed)),
   isJobEnded,
   isJobCanceled: R.pipe(getJobStatus, R.equals(jobStatus.canceled)),
   isJobStatusEnded,

@@ -48,13 +48,14 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/taxonomies/:taxonomyId/upload', async (req, res) => {
     try {
+      const user = req.user
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyId = getRestParam(req, 'taxonomyId')
 
       const file = req.files.file
-      const importJob = await importTaxa(surveyId, taxonomyId, file.data)
+      const job = await importTaxa(user.id, surveyId, taxonomyId, file.data)
 
-      res.json({importJob})
+      res.json({job})
     } catch (err) {
       sendErr(res, err)
     }

@@ -12,16 +12,13 @@ const {
 } = require('../../common/survey/taxonomy')
 
 const {
-  fetchSurveyJobById,
-  createSurveyJob,
-  updateSurveyJobProgress,
-  updateSurveyJobStatus,
+  createJob,
+  updateJobProgress,
+  updateJobStatus,
 } = require('../job/jobManager')
 
 const {
   jobStatus,
-  getJobStatus,
-  isJobEnded,
 } = require('../../common/job/job')
 
 const {TaxaParser} = require('./taxaParser')
@@ -84,22 +81,22 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   console.log('csv export completed')
 }
 
-const importTaxa = async (surveyId, taxonomyId, inputBuffer) => {
-  const importJob = await createSurveyJob(surveyId, 'import taxa', () => parser.cancel())
+const importTaxa = async (userId, surveyId, taxonomyId, inputBuffer) => {
+  const importJob = await createJob(userId, surveyId, 'import taxa', () => parser.cancel())
 
   const parser = await new TaxaParser(taxonomyId, inputBuffer)
-    .onStart(async () => await updateSurveyJobStatus(surveyId, importJob.id, jobStatus.running))
-    .onProgress(async event => await updateSurveyJobProgress(surveyId, importJob.id, event.total, event.processed))
+    .onStart(async event => await updateJobStatus(importJob.id, jobStatus.running, event.total, event.processed))
+    .onProgress(async event => await updateJobProgress(importJob.id, event.total, event.processed))
     .onEnd(async event => {
       const result = event.result
       const hasErrors = !R.isEmpty(R.keys(result.errors))
       if (hasErrors) {
         console.log('errors found')
-        await updateSurveyJobStatus(surveyId, importJob.id, jobStatus.error, {errors: result.errors})
+        await updateJobStatus(importJob.id, jobStatus.error, event.total, event.processed, {errors: result.errors})
       } else {
         await storeTaxa(surveyId, taxonomyId, result.vernacularLanguageCodes, result.taxa)
         console.log(`taxa stored: ${result.taxa.length}`)
-        await updateSurveyJobStatus(surveyId, importJob.id, jobStatus.completed)
+        await updateJobStatus(importJob.id, jobStatus.completed, event.total, event.processed)
       }
     })
     .start()

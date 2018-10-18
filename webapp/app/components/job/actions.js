@@ -1,21 +1,21 @@
 import axios from 'axios'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getActiveJob } from './appJobState'
+
+import { isJobCompleted, isJobRunning } from '../../../../common/job/job'
 
 export const appJobActiveUpdate = 'app/job/active/update'
 
-export const showAppJobMonitor = job => async (dispatch) => {
-  dispatch({type: appJobActiveUpdate, job})
+export const showAppJobMonitor = (job, hideAutomatically = false) => (dispatch) => {
+  dispatch({type: appJobActiveUpdate, job, hideAutomatically})
 }
 
 export const hideAppJobMonitor = () => async (dispatch) => {
   dispatch({type: appJobActiveUpdate, job: null})
 }
 
-export const cancelActiveJob = () => async (dispatch, getState) => {
-  const survey = getSurvey(getState())
-
-  await axios.delete(`/api/surveys/${survey.id}/jobs/active`)
+export const cancelActiveJob = () => async (dispatch) => {
+  await axios.delete(`/api/jobs/active`)
 
   dispatch(hideAppJobMonitor())
 }
@@ -31,12 +31,21 @@ let activeJobPollingTimeout = null
 export const startAppJobMonitoring = () => async (dispatch, getState) => {
 
   const fetchActiveJob = async () => {
-    const survey = getSurvey(getState())
+    const {data} = await axios.get(`/api/jobs/active`)
 
-    const {data} = await axios.get(`/api/surveys/${survey.id}/jobs/active`)
+    const activeJob = data.job
+    const activeJobState = getActiveJob(getState())
 
-    dispatch({type: appJobActiveUpdate, job: data.job})
-
+    if (activeJob !== null || activeJobState !== null) {
+      if (activeJobState === null || activeJob && (isJobRunning(activeJob) || isJobCompleted(activeJob) && activeJobState.hideAutomatically)) {
+        //job not monitored yet or ended and
+        dispatch({type: appJobActiveUpdate, job: activeJob})
+      } else if (isJobRunning(activeJobState) && activeJob === null) {
+        //job completed (no more active), load it
+        const {data} = await axios.get(`/api/jobs/${activeJobState.id}`)
+        dispatch({type: appJobActiveUpdate, job: data.job})
+      }
+    }
     activeJobPollingTimeout = setTimeout(fetchActiveJob, 3000)
   }
 

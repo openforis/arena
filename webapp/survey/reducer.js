@@ -141,7 +141,7 @@ const actionHandlers = {
   //TAXONOMY
   [taxonomiesUpdate]: (state, {taxonomies}) => assocSurveyTaxonomies(taxonomies)(state),
 
-  [taxonomyEditUpdate]: (state, {taxonomyUUID}) => updateTaxonomyEdit(taxonomyUUID)(state),
+  [taxonomyEditUpdate]: (state, {type, ...otherProps}) => updateTaxonomyEdit(otherProps)(state),
 
   //RECORD
   [recordUpdate]: assocActionProps,

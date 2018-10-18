@@ -7,29 +7,31 @@ const {
   isJobCanceled,
 } = require('../../common/job/job')
 const {
-  insertSurveyJob,
-  fetchSurveyJobById: fetchSurveyJobByIdRepos,
-  fetchActiveSurveyJob: fetchActiveSurveyJobRepos,
-  updateSurveyJobStatus: updateSurveyJobStatusRepos,
-  updateSurveyJobProgress: updateSurveyJobProgressRepos,
+  insertJob,
+  fetchJobById: fetchJobByIdRepos,
+  fetchActiveJobByUserId: fetchActiveJobByUserIdRepos,
+  updateJobStatus: updateJobStatusRepos,
+  updateJobProgress: updateJobProgressRepos,
 } = require('./jobRepository')
 
 /**
  * ====== CREATE
  */
-const createSurveyJob = async (surveyId, name, onCancel = null) => {
+const createJob = async (userId, surveyId, name, onCancel = null) => {
   const job = {
     uuid: uuidv4(),
+    userId,
+    surveyId,
     props: {
       name,
     },
   }
-  const jobDb = await insertSurveyJob(surveyId, job)
+  const jobDb = await insertJob(job)
 
   if (onCancel) {
     //check every second if the job has been canceled and execute "onCancel" in that case
     const jobCheckInterval = setInterval(async () => {
-      const reloadedJob = await fetchSurveyJobByIdRepos(surveyId, 200000)
+      const reloadedJob = await fetchJobByIdRepos(jobDb.id)
 
       if (reloadedJob && isJobCanceled(reloadedJob)) {
         onCancel()
@@ -46,31 +48,33 @@ const createSurveyJob = async (surveyId, name, onCancel = null) => {
 /**
  * ====== READ
  */
+const fetchActiveJobByUserId = async (userId) =>
+  await fetchActiveJobByUserIdRepos(userId)
 
 /**
  * ====== UPDATE
  */
-const updateSurveyJobStatus = async (surveyId, jobId, status, props = {}) =>
-  await updateSurveyJobStatusRepos(surveyId, jobId, status, props)
+const updateJobStatus = async (jobId, status, total, processed, props = {}) =>
+  await updateJobStatusRepos(jobId, status, total, processed, props)
 
-const updateSurveyJobProgress = async (surveyId, jobId, total, processed) =>
-  await throttle(updateSurveyJobProgressRepos, `job_${jobId}`, 1000)(surveyId, jobId, total, processed)
+const updateJobProgress = async (jobId, total, processed) =>
+  await throttle(updateJobProgressRepos, `job_${jobId}`, 1000)(jobId, total, processed)
 
-const cancelSurveyActiveJob = async (surveyId) => {
-  const job = await fetchActiveSurveyJobRepos(surveyId)
+const cancelActiveJobByUserId = async (userId) => {
+  const job = await fetchActiveJobByUserIdRepos(userId)
   if (job && !isJobEnded(job)) {
-    await updateSurveyJobStatusRepos(surveyId, job.id, jobStatus.canceled)
+    await updateJobStatusRepos(job.id, jobStatus.canceled, job.total, job.processed)
   }
 }
 
 module.exports = {
   //CREATE
-  createSurveyJob,
+  createJob,
   //READ
-  fetchSurveyJobById: fetchSurveyJobByIdRepos,
-  fetchActiveSurveyJob: fetchActiveSurveyJobRepos,
+  fetchJobById: fetchJobByIdRepos,
+  fetchActiveJobByUserId,
   //UPDATE
-  updateSurveyJobProgress,
-  updateSurveyJobStatus,
-  cancelSurveyActiveJob,
+  updateJobProgress,
+  updateJobStatus,
+  cancelActiveJobByUserId,
 }

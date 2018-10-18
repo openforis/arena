@@ -19,12 +19,17 @@ const surveyState = {
     taxonomyEdit: {
       uuid: '',
       importingFile: false,
+      taxa: [],
+      currentPage: 0,
+      totalPages: 0,
     },
 
   }
 }
 
 const taxonomyEditPath = ['taxonomyEdit']
+
+const getTaxonomyEdit = R.path(taxonomyEditPath)
 
 export const getTaxonomyEditTaxonomyUUID = R.path(R.append('uuid', taxonomyEditPath))
 
@@ -33,11 +38,24 @@ export const getTaxonomyEditTaxonomy = survey => R.pipe(
   uuid => getSurveyTaxonomyByUUID(uuid)(survey),
 )(survey)
 
-export const getTaxonomyEditImportingFile = R.path(R.append('importingFile', taxonomyEditPath))
+export const getTaxonomyEditImportingFile = R.pathOr(false, R.append('importingFile', taxonomyEditPath))
+
+export const getTaxonomyEditTaxaCurrentPage = R.pathOr(1, R.append('taxaCurrentPage', taxonomyEditPath))
+
+export const getTaxonomyEditTaxaTotalPages = R.pathOr(0, R.append('taxaTotalPages', taxonomyEditPath))
+
+export const getTaxonomyEditTaxa = R.pathOr([], R.append('taxa', taxonomyEditPath))
 
 // ========== UPDATE
 
-export const updateTaxonomyEdit = (taxonomyUUID = null) =>
-  taxonomyUUID
-    ? R.assocPath(taxonomyEditPath, {uuid: taxonomyUUID})
-    : R.dissocPath(taxonomyEditPath)
+export const updateTaxonomyEdit = props => state => {
+  if (R.has('uuid')(props) && R.isNil(R.prop('uuid')(props))) {
+    return R.dissocPath(taxonomyEditPath)(state)
+  } else {
+    return R.pipe(
+      getTaxonomyEdit,
+      R.merge(props),
+      taxonomyEdit => R.assocPath(taxonomyEditPath, taxonomyEdit)(state),
+    )(state)
+  }
+}

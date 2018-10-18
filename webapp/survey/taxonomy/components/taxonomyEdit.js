@@ -1,5 +1,4 @@
 import React from 'react'
-import axios from 'axios'
 import * as R from 'ramda'
 
 import TaxonTable from './taxonTable'
@@ -13,58 +12,26 @@ import {
 import { getFieldValidation } from '../../../../common/validation/validator'
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import UploadButton from '../../../commonComponents/form/uploadButton'
+import { getSurvey } from '../../surveyState'
+import {
+  getTaxonomyEditImportingFile,
+  getTaxonomyEditTaxonomy,
+  getTaxonomyEditTaxaTotalPages,
+  getTaxonomyEditTaxaCurrentPage, getTaxonomyEditTaxa
+} from '../taxonomyEditState'
+import connect from 'react-redux/es/connect/connect'
+import { setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile, reloadTaxa, loadTaxaPage } from '../actions'
 
-const ROWS_PER_PAGE = 20
+const ROWS_PER_PAGE = 15
 
 class TaxonomyEdit extends React.Component {
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      taxa: [],
-      currentPage: 0,
-      totalPages: 0,
-    }
-  }
 
   async componentDidMount () {
-    this.countTaxa(() => this.loadTaxa())
+    this.props.reloadTaxa()
   }
 
-  countTaxa (callback) {
-    const {survey, taxonomy} = this.props
+  componentDidUpdate () {
 
-    const params = {
-      draft: true
-    }
-
-    axios.get(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/taxa/count?${toQueryString(params)}`)
-      .then(res => {
-        const {count} = res.data
-        this.setState({
-          totalPages: Math.ceil(count / ROWS_PER_PAGE),
-          currentPage: 1,
-        }, () => callback())
-      })
-  }
-
-  loadTaxa () {
-    const {survey, taxonomy} = this.props
-    const {currentPage} = this.state
-
-    const params = {
-      draft: true,
-      limit: ROWS_PER_PAGE,
-      offset: (currentPage - 1) * ROWS_PER_PAGE
-    }
-
-    axios.get(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/taxa?${toQueryString(params)}`)
-      .then(res => {
-        const {taxa} = res.data
-        this.setState({
-          taxa,
-        })
-      })
   }
 
   exportTaxonomy () {
@@ -79,18 +46,14 @@ class TaxonomyEdit extends React.Component {
   }
 
   onPageChange (page) {
-    this.setState({
-      currentPage: page
-    }, () => this.loadTaxa())
+    this.props.loadTaxaPage(page)
   }
 
   render () {
     const {
-      survey, taxonomy,
+      survey, taxonomy, taxaCurrentPage, taxaTotalPages, taxa,
       putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile,
     } = this.props
-
-    const {taxa, currentPage, totalPages} = this.state
 
     const {validation} = taxonomy
 
@@ -121,8 +84,8 @@ class TaxonomyEdit extends React.Component {
             ? <div>Taxonomy not imported</div>
             : <TaxonTable taxonomy={taxonomy}
                           taxa={taxa}
-                          currentPage={currentPage}
-                          totalPages={totalPages}
+                          currentPage={taxaCurrentPage}
+                          totalPages={taxaTotalPages}
                           rowsPerPage={ROWS_PER_PAGE}
                           onPageChange={(page) => this.onPageChange(page)}/>
         }
@@ -140,4 +103,20 @@ class TaxonomyEdit extends React.Component {
   }
 }
 
-export default TaxonomyEdit
+const mapStateToProps = state => {
+  const survey = getSurvey(state)
+
+  return {
+    survey,
+    taxonomy: getTaxonomyEditTaxonomy(survey),
+    taxaTotalPages: getTaxonomyEditTaxaTotalPages(survey),
+    taxaCurrentPage: getTaxonomyEditTaxaCurrentPage(survey),
+    taxa: getTaxonomyEditTaxa(survey),
+    importingTaxonomy: getTaxonomyEditImportingFile(survey),
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  {setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile, reloadTaxa, loadTaxaPage}
+)(TaxonomyEdit)

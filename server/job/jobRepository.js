@@ -1,56 +1,58 @@
 const db = require('../db/db')
 const camelize = require('camelize')
 
-const {getSurveyDBSchema} = require('../../common/survey/survey')
 const {jobStatus, isJobStatusEnded} = require('../../common/job/job')
 
 // ============== CREATE
 
-const insertSurveyJob = async (surveyId, job, client = db) =>
+const insertJob = async (job, client = db) =>
   await client.one(`
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.job (uuid, props)
-        VALUES ($1, $2)
+        INSERT INTO job (uuid, user_id, survey_id, props)
+        VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [job.uuid, job.props],
+    [job.uuid, job.userId, job.surveyId, job.props],
     camelize
   )
 
 // ============== READ
 
-const fetchSurveyJobById = async (surveyId, id, client = db) =>
+const fetchJobById = async (id, client = db) =>
   await client.oneOrNone(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.job
+      `SELECT * FROM job
      WHERE id = $1`,
     [id],
     camelize
   )
 
-const fetchActiveSurveyJob = async (surveyId, client = db) =>
+const fetchActiveJobByUserId = async (userId, client = db) =>
   await client.oneOrNone(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.job
-     WHERE status = '${jobStatus.created}' OR status = '${jobStatus.running}'`,
-    [],
+    `SELECT * FROM job
+     WHERE user_id = $1
+       AND status IN ('${jobStatus.created}', '${jobStatus.running}')`,
+    [userId],
     camelize
   )
 
 // ============== UPDATE
 
-const updateSurveyJobStatus = async (surveyId, id, status, props = {}, client = db) =>
+const updateJobStatus = async (id, status, total, processed, props = {}, client = db) =>
   await client.one(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.job
+      `UPDATE job
      SET 
         status = $1,
-        props = props || $2,
-        date_ended = $3
-     WHERE id = $4
+        total = $2,
+        processed = $3,
+        props = props || $4,
+        date_ended = $5
+     WHERE id = $6
      RETURNING *`,
-    [status, props, isJobStatusEnded(status) ? new Date() : null, id],
+    [status, total, processed, props, isJobStatusEnded(status) ? new Date() : null, id],
     camelize
   )
 
-const updateSurveyJobProgress = async (surveyId, id, total, processed, client = db) =>
+const updateJobProgress = async (id, total, processed, client = db) =>
   await client.one(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.job
+      `UPDATE job
      SET 
         total = $1,
         processed = $2
@@ -62,12 +64,12 @@ const updateSurveyJobProgress = async (surveyId, id, total, processed, client = 
 
 module.exports = {
   //CREATE
-  insertSurveyJob,
+  insertJob,
   //READ
-  fetchSurveyJobById,
-  fetchActiveSurveyJob,
+  fetchJobById,
+  fetchActiveJobByUserId,
   //UPDATE
-  updateSurveyJobProgress,
-  updateSurveyJobStatus,
+  updateJobProgress,
+  updateJobStatus,
   //DELETE
 }
