@@ -47,7 +47,7 @@ const validateRequired = (propName, obj) => {
     : null
 }
 
-const valiateItemPropUniqueness = items =>
+const validateItemPropUniqueness = items =>
   (propName, item) => {
     const hasDuplicates = R.any(
       i => getProp(propName, i) === getProp(propName, item) && i.id !== item.id,
@@ -56,7 +56,7 @@ const valiateItemPropUniqueness = items =>
     return hasDuplicates
       ? 'duplicate'
       : null
-}
+  }
 
 //==== getters
 
@@ -91,7 +91,7 @@ module.exports = {
   validate,
   validateProp,
   validateRequired,
-  valiateItemPropUniqueness,
+  validateItemPropUniqueness,
 
   getValidation,
   isValid,
