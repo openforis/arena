@@ -26,9 +26,9 @@ export const cancelActiveJob = () => async (dispatch, getState) => {
  * ======
  */
 
-let activeJobPollingInterval = null
+let activeJobPollingTimeout = null
 
-export const startAppJobMonitoring = () => (dispatch, getState) => {
+export const startAppJobMonitoring = () => async (dispatch, getState) => {
 
   const fetchActiveJob = async () => {
     const survey = getSurvey(getState())
@@ -36,12 +36,14 @@ export const startAppJobMonitoring = () => (dispatch, getState) => {
     const {data} = await axios.get(`/api/surveys/${survey.id}/jobs/active`)
 
     dispatch({type: appJobActiveUpdate, job: data.job})
+
+    activeJobPollingTimeout = setTimeout(fetchActiveJob, 3000)
   }
 
-  activeJobPollingInterval = setInterval(fetchActiveJob, 3000)
+  await fetchActiveJob()
 }
 
 export const stopAppJobMonitoring = () => () => {
-  clearInterval(activeJobPollingInterval)
-  activeJobPollingInterval = null
+  clearTimeout(activeJobPollingTimeout)
+  activeJobPollingTimeout = null
 }

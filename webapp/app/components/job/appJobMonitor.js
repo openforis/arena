@@ -4,6 +4,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import {
+  Modal,
+  ModalBody,
+  ModalHeader,
+  ModalFooter,
+} from '../../../commonComponents/modal'
+
+import {
   getJobName,
   getJobStatus,
   getJobProgressPercent,
@@ -23,35 +30,51 @@ const ProgressBar = ({progress}) => (
 class AppJobMonitor extends React.Component {
 
   render () {
-    const {activeJob, cancelActiveJob, hideAppJobMonitor} = this.props
+    const {job, cancelActiveJob, hideAppJobMonitor} = this.props
 
-    return activeJob
+    const jobProgressPercent = job ? getJobProgressPercent(job) : 0
+
+    return job
       ? (
-        <div className="app-job-monitor">
-          <h2>Running job: {getJobName(activeJob)}</h2>
-          <h3>Status: {getJobStatus(activeJob)}</h3>
-          <ProgressBar progress={getJobProgressPercent(activeJob)}/>
+        <Modal isOpen="true">
 
+          <ModalHeader>
+            <div className="app-job-monitor__header">Job: {getJobName(job)}</div>
+          </ModalHeader>
 
-          <button className="btn btn-of"
-                  onClick={() => cancelActiveJob()}
-                  aria-disabled={!isJobRunning(activeJob)}>
-            Cancel
-          </button>
+          <ModalBody>
+            <div className="app-job-monitor">
+              <h4 className="app-job-monitor__status">{getJobStatus(job)}
+                {
+                  isJobRunning(job) && jobProgressPercent < 100 &&
+                  <span> ({jobProgressPercent}%)</span>
+                }
+              </h4>
+              <ProgressBar progress={jobProgressPercent}/>
+            </div>
+          </ModalBody>
 
-          <button className="btn btn-of"
-                  onClick={() => hideAppJobMonitor()}
-                  aria-disabled={!isJobEnded(activeJob)}>
-            Close
-          </button>
-        </div>
+          <ModalFooter>
+            <button className="btn btn-of modal-footer__item"
+                    onClick={() => cancelActiveJob()}
+                    aria-disabled={!isJobRunning(job)}>
+              Cancel
+            </button>
+
+            <button className="btn btn-of modal-footer__item"
+                    onClick={() => hideAppJobMonitor()}
+                    aria-disabled={!isJobEnded(job)}>
+              Close
+            </button>
+          </ModalFooter>
+        </Modal>
       )
       : null
   }
 }
 
 const mapStateToProps = state => ({
-  activeJob: getActiveJob(state),
+  job: getActiveJob(state),
 })
 
 export default connect(
