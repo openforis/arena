@@ -49,11 +49,6 @@ import {
 } from './taxonomy/taxonomyEditState'
 
 /**
- * survey job state
- */
-import { updateSurveyActiveJob } from './job/surveyJobState'
-
-/**
  * survey actions
  */
 import {
@@ -102,11 +97,6 @@ import {
   taxonomiesUpdate,
   taxonomyEditUpdate,
 } from './taxonomy/actions'
-
-/**
- * survey job action
- */
-import { surveyActiveJobUpdate } from './job/actions'
 
 const actionHandlers = {
   //SURVEY
@@ -160,8 +150,6 @@ const actionHandlers = {
 
   [nodeDelete]: (state, {node}) => deleteNode(node)(state),
 
-  //JOB
-  [surveyActiveJobUpdate]: (state, {job}) => updateSurveyActiveJob(job)(state),
 }
 
 export default exportReducer(actionHandlers)

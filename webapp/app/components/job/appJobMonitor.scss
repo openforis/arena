@@ -1,12 +1,13 @@
-@import "../../style/vars";
+@import "../../../style/vars";
 
-.job-dialog {
+.app-job-monitor {
   position: fixed;
   top: calc(50vh - 300px);
   left: calc(50vw - 200px);
   width: 400px;
   display: flex;
   flex-direction: column;
+  z-index: $zIndex19JobMonitor;
 
   > * {
     margin: 10px;

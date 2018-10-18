@@ -14,6 +14,15 @@ import {
 import { loginSuccess } from '../login/actions'
 import { appState } from './app'
 
+/**
+ * ======
+ * App Jobs
+ * ======
+ */
+import { appJobActiveUpdate } from './components/job/actions'
+
+import { updateActiveJob } from './components/job/appJobState'
+
 const actionHandlers = {
 
   [appStatusChange]: assocActionProps,
@@ -34,6 +43,9 @@ const actionHandlers = {
 
   //surveys list
   [appSurveysUpdate]: assocActionProps,
+
+  //app job
+  [appJobActiveUpdate]: (state, {job}) => updateActiveJob(job)(state),
 }
 
 export default exportReducer(actionHandlers)

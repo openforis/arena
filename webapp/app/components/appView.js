@@ -1,40 +1,21 @@
 import '../style.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
 
 import AppSideBar from './sideBar/appSideBar'
 import AppModulesView from '../../appModules/components/appModulesView'
-import JobMonitorDialog from '../../survey/components/jobDialog'
+import AppJobMonitor from './job/appJobMonitor'
 
-import { getSurvey } from '../../survey/surveyState'
-import { getSurveyActiveJob } from '../../survey/job/surveyJobState'
+const AppView = (props) => (
+  <div className="app__container">
 
-class AppView extends React.Component {
-  render () {
-    const {surveyActiveJob} = this.props
+    <AppSideBar {...props} />
 
-    return (
-      <div className="app__container">
+    <AppModulesView {...props} />
 
-        <AppSideBar {...this.props} />
+    <AppJobMonitor/>
 
-        {surveyActiveJob
-          ? <JobMonitorDialog/>
-          : <AppModulesView {...this.props} />
-        }
-      </div>
-    )
-  }
-}
+  </div>
+)
 
-const mapStateToProps = state => {
-  const survey = getSurvey(state)
-
-  return {
-    survey,
-    surveyActiveJob: getSurveyActiveJob(survey),
-  }
-}
-
-export default connect(mapStateToProps)(AppView)
+export default AppView

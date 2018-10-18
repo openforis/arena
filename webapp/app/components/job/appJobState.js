@@ -2,9 +2,9 @@ import * as R from 'ramda'
 
 const activeJob = 'activeJob'
 
-export const getSurveyActiveJob = R.prop(activeJob)
+export const getActiveJob = R.path(['app', activeJob])
 
-export const updateSurveyActiveJob = job =>
+export const updateActiveJob = job =>
   job
     ? R.assoc(activeJob, job)
     : R.dissoc(activeJob)

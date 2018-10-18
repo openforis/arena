@@ -6,14 +6,15 @@ import { withRouter } from 'react-router-dom'
 import { Switch, Route, Redirect } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
 
-import { initApp, startAppJobMonitoring } from './app/actions'
-import { appState, isLocationLogin, loginUri } from './app/app'
-
 import loginAnimation from './login/components/loginAnimation'
 import appAnimation from './app/components/appAnimation'
 
 import LoginView from './login/components/loginView'
 import AppView from './app/components/appView'
+
+import { appState, isLocationLogin, loginUri } from './app/app'
+import { initApp } from './app/actions'
+import { startAppJobMonitoring } from './app/components/job/actions'
 
 class AppRouterSwitch extends React.Component {
 
