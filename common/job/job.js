@@ -30,6 +30,7 @@ module.exports = {
 
   //READ
   getJobName: R.path(['props', 'name']),
+  getJobErrors: R.pathOr({}, ['props', 'errors']),
   getJobStatus,
   getJobProgressPercent,
   isJobRunning,

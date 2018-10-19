@@ -26,8 +26,8 @@ class TaxaParser {
     this.canceled = false
     this.startTime = null
     this.csvStreamEnded = false
-    this.totalRows = NaN
-    this.processedRows = NaN
+    this.totalItems = 0
+    this.processedItems = 0
     this.result = null
   }
 
@@ -48,11 +48,11 @@ class TaxaParser {
         this.dispatchEndEvent()
         return
       }
-      this.calculateSize(totalRows => {
-        console.log(`total rows: ${totalRows}`)
+      this.calculateSize(totalItems => {
+        console.log(`total rows: ${totalItems}`)
 
-        this.totalRows = totalRows
-        this.processedRows = 0
+        this.totalItems = totalItems
+        this.processedItems = 0
 
         this.dispatchStartEvent()
 
@@ -88,7 +88,7 @@ class TaxaParser {
   }
 
   processHeaders (callback) {
-    const csvStream = fastcsv.fromString(this.csvString, {headers: true})
+    const csvStream = fastcsv.fromString(this.csvString, {headers: false})
     csvStream.on('data', async data => {
       csvStream.destroy() //stop streaming CSV
       const validHeaders = this.validateHeaders(data)
@@ -100,16 +100,14 @@ class TaxaParser {
   }
 
   async processRow (data) {
-    if (this.processedRows > 0) {
-      const taxonParseResult = await this.parseTaxon(data)
+    const taxonParseResult = await this.parseTaxon(data)
 
-      if (taxonParseResult.taxon) {
-        this.result.taxa.push(taxonParseResult.taxon)
-      } else {
-        this.result.errors[this.processedRows] = taxonParseResult.errors
-      }
+    if (taxonParseResult.taxon) {
+      this.result.taxa.push(taxonParseResult.taxon)
+    } else {
+      this.result.errors[this.processedItems + 1] = taxonParseResult.errors
     }
-    this.processedRows++
+    this.processedItems++
 
     this.dispatchProgressEvent()
 
@@ -118,8 +116,7 @@ class TaxaParser {
     }
   }
 
-  validateHeaders (data) {
-    const columns = R.keys(data)
+  validateHeaders (columns) {
     const missingColumns = R.difference(requiredColumns, columns)
     if (R.isEmpty(missingColumns)) {
       return true
@@ -193,8 +190,8 @@ class TaxaParser {
 
   createProgressEvent () {
     return {
-      total: this.totalRows,
-      processed: this.processedRows,
+      total: this.totalItems,
+      processed: this.processedItems,
     }
   }
 }

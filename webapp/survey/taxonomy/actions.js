@@ -123,6 +123,16 @@ export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}`)
 }
 
+// ====== UTILS
+
 export const setTaxonomyForEdit = taxonomy => async (dispatch) => {
   dispatchTaxonomyEditUpdate(dispatch, {uuid: taxonomy ? taxonomy.uuid : null})
+}
+
+export const showTaxonomyImportErrors = importErrors => async (dispatch) => {
+  dispatchTaxonomyEditUpdate(dispatch, {importErrorsShown: true, importErrors})
+}
+
+export const hideTaxonomyImportErrors = () => async (dispatch) => {
+  dispatchTaxonomyEditUpdate(dispatch, {importErrorsShown: false, importErrors: null})
 }

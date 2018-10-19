@@ -43,6 +43,10 @@ export const getTaxonomyEditTaxaTotalPages = R.pathOr(0, R.append('taxaTotalPage
 
 export const getTaxonomyEditTaxa = R.pathOr([], R.append('taxa', taxonomyEditPath))
 
+export const isTaxonomyEditImportErrorsShown = R.pathOr(false, R.append('importErrorsShown', taxonomyEditPath))
+
+export const getTaxonomyEditImportErrors = R.pathOr([], R.append('importErrors', taxonomyEditPath))
+
 // ========== UPDATE
 
 export const updateTaxonomyEdit = props => state => {
@@ -56,3 +60,6 @@ export const updateTaxonomyEdit = props => state => {
     )(state)
   }
 }
+
+// ======= UTILS
+

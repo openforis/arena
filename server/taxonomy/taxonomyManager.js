@@ -84,7 +84,14 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
 const importTaxaJobName = 'import taxa'
 
 const importTaxa = async (userId, surveyId, taxonomyId, inputBuffer) => {
-  const importJob = await createJob(userId, surveyId, importTaxaJobName, () => parser.cancel())
+  const importJob =
+    await createJob(
+      userId,
+      surveyId,
+      importTaxaJobName,
+      //onCancel
+      () => parser.cancel()
+    )
 
   const parser = await new TaxaParser(taxonomyId, inputBuffer)
     .onStart(async event => await updateJobStatus(importJob.id, jobStatus.running, event.total, event.processed))
