@@ -1,7 +1,6 @@
 import './autocompleteDialog.scss'
 
 import React from 'react'
-import { EventEmitter } from 'events'
 
 import KeyboardMap from '../../appUtils/keyboardMap'
 import { clickedOutside, elementOffset } from '../../appUtils/domUtils'
@@ -10,13 +9,6 @@ class AutocompleteDialog extends React.Component {
 
   constructor (props) {
     super(props)
-
-    const {onItemSelect, onClose} = props
-
-    //add event listeners
-    this.eventEmitter = new EventEmitter()
-    this.eventEmitter.on(AutocompleteDialog.events.itemSelect, onItemSelect)
-    this.eventEmitter.on(AutocompleteDialog.events.close, onClose)
 
     this.onInputFieldKeyDown = this.onInputFieldKeyDown.bind(this)
     this.onOutsideClick = this.onOutsideClick.bind(this)
@@ -38,8 +30,6 @@ class AutocompleteDialog extends React.Component {
       inputField.removeEventListener('keydown', this.onInputFieldKeyDown)
     }
 
-    this.eventEmitter.removeAllListeners()
-
     window.removeEventListener('click', this.onOutsideClick)
   }
 
@@ -47,7 +37,7 @@ class AutocompleteDialog extends React.Component {
     const {inputField} = this.props
 
     if (clickedOutside(this.list.current, evt) && clickedOutside(inputField, evt)) {
-      this.dispatchCloseEvent()
+      this.close()
     }
   }
 
@@ -55,19 +45,18 @@ class AutocompleteDialog extends React.Component {
     const {items, inputField} = this.props
 
     switch (e.keyCode) {
-      case KeyboardMap.Down: //arrow down
-      case KeyboardMap.Tab: //tab
+      case KeyboardMap.Down:
+      case KeyboardMap.Tab:
         if (items.length > 0) {
           e.preventDefault()
           //focus first item
           this.focusItem(0)
         } else {
-          this.dispatchCloseEvent()
+          this.close()
         }
         break
-      case KeyboardMap.Esc: //escape
-        //close dialog
-        this.dispatchCloseEvent()
+      case KeyboardMap.Esc:
+        this.close()
         inputField.focus()
         break
     }
@@ -83,24 +72,24 @@ class AutocompleteDialog extends React.Component {
     if (itemsSize > 0) {
       let offset = 0
       switch (e.keyCode) {
-        case 13: //enter
-        case 32: //space
-          this.dispatchItemSelectEvent(items[this.focusedItemIndex])
+        case KeyboardMap.Enter:
+        case KeyboardMap.Space:
+          this.selectItem(items[this.focusedItemIndex])
           break
-        case 27: //escape
-          this.dispatchCloseEvent()
+        case KeyboardMap.Esc:
+          this.close()
           inputField.focus()
           break
-        case 33: //page up
+        case KeyboardMap.PageUp:
           offset = -10
           break
-        case 34: //page down
+        case KeyboardMap.PageDown:
           offset = 10
           break
-        case 38: //arrow up
+        case KeyboardMap.Up:
           offset = -1
           break
-        case 40: //arrow down
+        case KeyboardMap.Down:
           offset = 1
           break
       }
@@ -126,16 +115,16 @@ class AutocompleteDialog extends React.Component {
     this.focusedItemIndex = index
   }
 
-  onItemClick (item) {
-    this.dispatchItemSelectEvent(item)
+  selectItem (item) {
+    const {onItemSelect} = this.props
+    if (onItemSelect)
+      onItemSelect(item)
   }
 
-  dispatchItemSelectEvent (item) {
-    this.eventEmitter.emit(AutocompleteDialog.events.itemSelect, item)
-  }
-
-  dispatchCloseEvent () {
-    this.eventEmitter.emit(AutocompleteDialog.events.close)
+  close () {
+    const {onClose} = this.props
+    if (onClose)
+      onClose()
   }
 
   calculatePosition () {
@@ -170,17 +159,12 @@ class AutocompleteDialog extends React.Component {
                           tabIndex="1"
                           item={item}
                           onKeyDown={e => this.onListItemKeyDown(e)}
-                          onMouseDown={() => this.onItemClick(item)}/>
+                          onMouseDown={() => this.selectItem(item)}/>
           ))
         }
       </div>
     )
   }
-}
-
-AutocompleteDialog.events = {
-  itemSelect: 'itemSelect',
-  close: 'close',
 }
 
 export default AutocompleteDialog
