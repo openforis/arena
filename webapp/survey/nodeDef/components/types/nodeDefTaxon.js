@@ -229,7 +229,6 @@ class NodeDefTaxon extends React.Component {
                             itemRenderer={TaxonAutocompleteItemRenderer}
                             itemKeyFunction={taxon => taxon.uuid}
                             inputField={autocompleteInputField.current.inputElement}
-                            limitToInputFieldWidth={false}
                             alignToElement={
                               (renderType === nodeDefRenderType.tableBody
                                   ? this.getInputFields().code

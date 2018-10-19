@@ -139,7 +139,7 @@ class AutocompleteDialog extends React.Component {
   }
 
   calculatePosition () {
-    const {alignToElement, limitToInputFieldWidth = true} = this.props
+    const {alignToElement} = this.props
 
     const {
       top,
@@ -148,14 +148,11 @@ class AutocompleteDialog extends React.Component {
       width,
     } = elementOffset(alignToElement)
 
-    const style = {
+    return {
       top: (top + height),
       left,
+      width
     }
-
-    return limitToInputFieldWidth
-      ? R.assoc('width', width)(style)
-      : style
   }
 
   render () {
