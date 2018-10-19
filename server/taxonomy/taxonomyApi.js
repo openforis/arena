@@ -1,16 +1,16 @@
 const {sendOk, sendErr} = require('../serverUtils/response')
 const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
+const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const {
-  fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyId,
   fetchTaxaByProp,
   insertTaxonomy,
   updateTaxonomyProp,
   deleteTaxonomy
 } = require('./taxonomyRepository')
-const {validateTaxonomy} = require('./taxonomyValidator')
 const {importTaxa, exportTaxa} = require('./taxonomyManager')
+const {fetchTaxonomiesBySurveyId} = require('./taxonomyManager')
 
 module.exports.init = app => {
 
@@ -23,39 +23,6 @@ module.exports.init = app => {
       const taxonomy = await insertTaxonomy(surveyId, body)
 
       res.json({taxonomy})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
-
-  // ====== UPDATE
-
-  app.put('/survey/:surveyId/taxonomies/:taxonomyId', async (req, res) => {
-    try {
-      const surveyId = getRestParam(req, 'surveyId')
-      const taxonomyId = getRestParam(req, 'taxonomyId')
-      const {body} = req
-
-      const taxonomy = await updateTaxonomyProp(surveyId, taxonomyId, body)
-      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, true)
-      const validation = await validateTaxonomy(taxonomies, taxonomy)
-
-      res.json({validation})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
-
-  app.post('/survey/:surveyId/taxonomies/:taxonomyId/upload', async (req, res) => {
-    try {
-      const user = req.user
-      const surveyId = getRestParam(req, 'surveyId')
-      const taxonomyId = getRestParam(req, 'taxonomyId')
-
-      const file = req.files.file
-      const job = await importTaxa(user.id, surveyId, taxonomyId, file.data)
-
-      res.json({job})
     } catch (err) {
       sendErr(res, err)
     }
@@ -108,6 +75,38 @@ module.exports.init = app => {
       await exportTaxa(surveyId, taxonomyId, res, draft)
 
       res.end()
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  // ====== UPDATE
+
+  app.put('/survey/:surveyId/taxonomies/:taxonomyId', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const {body} = req
+
+      await updateTaxonomyProp(surveyId, taxonomyId, body)
+      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, true)
+
+      res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.post('/survey/:surveyId/taxonomies/:taxonomyId/upload', async (req, res) => {
+    try {
+      const user = req.user
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonomyId = getRestParam(req, 'taxonomyId')
+
+      const file = req.files.file
+      const job = await importTaxa(user.id, surveyId, taxonomyId, file.data)
+
+      res.json({job})
     } catch (err) {
       sendErr(res, err)
     }

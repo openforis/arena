@@ -8,7 +8,6 @@ const {
 
 const {getSurveyById} = require('../survey/surveyRepository')
 const {validateSurvey} = require('../survey/surveyValidator')
-const {validateTaxonomy} = require('../taxonomy/taxonomyValidator')
 
 const {
   fetchCodeListsBySurveyId,
@@ -19,7 +18,7 @@ const {
   validateCodeListProps: codeListValidatorProps,
   validateCodeList,
 } = require('../codeList/codeListValidator')
-const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyRepository')
+const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
 
 /**
  * ===== CODE LIST
@@ -62,25 +61,13 @@ const validateCodeListProps = async (surveyId, codeListId) => {
   return await codeListValidatorProps(codeListsWithLevels, codeList)
 }
 
-const fetchTaxonomies = async (surveyId, draft) => {
-  const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, draft)
-
-  return await Promise.all(
-    taxonomies.map(async taxonomy => ({
-        ...taxonomy,
-        validation: await validateTaxonomy(taxonomies, taxonomy)
-      })
-    )
-  )
-}
-
 /**
  * ===== SURVEY
  */
 const fetchSurveyById = async (id, draft) => {
   const survey = await getSurveyById(id, draft)
   const codeLists = await fetchCodeLists(id, draft)
-  const taxonomies = await fetchTaxonomies(id, draft)
+  const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
 
   return {
     ...survey,

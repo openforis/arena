@@ -4,17 +4,19 @@ import * as R from 'ramda'
 import { debounceAction } from '../../appUtils/reduxUtils'
 import { newTaxonomy, assocTaxonomyProp } from '../../../common/survey/taxonomy'
 
-import { assocValidation } from '../../../common/validation/validator'
 import { getSurvey } from '../surveyState'
-import { getTaxonomyEditTaxaCurrentPage, getTaxonomyEditTaxonomy } from './taxonomyEditState'
+import { getTaxonomyEditTaxonomy } from './taxonomyEditState'
 import { showAppJobMonitor } from '../../app/components/job/actions'
 import { toQueryString } from '../../../server/serverUtils/request'
 
 export const taxonomiesUpdate = 'survey/taxonomy/update'
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
 
+const dispatchTaxonomiesUpdate = (dispatch, taxonomies) =>
+  dispatch({type: taxonomiesUpdate, taxonomies})
+
 const dispatchTaxonomyUpdate = (dispatch, taxonomy) =>
-  dispatch({type: taxonomiesUpdate, taxonomies: {[taxonomy.uuid]: taxonomy}})
+  dispatchTaxonomiesUpdate(dispatch, {[taxonomy.uuid]: taxonomy})
 
 const dispatchTaxonomyEditUpdate = (dispatch, props) =>
   dispatch({type: taxonomyEditUpdate, ...props})
@@ -88,11 +90,8 @@ export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, ge
   const action = async () => {
     try {
       const {data} = await axios.put(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}`, {key, value})
-      const {validation} = data
-
-      const updatedTaxonomy = assocValidation(validation)(taxonomy)
-
-      dispatchTaxonomyUpdate(dispatch, updatedTaxonomy)
+      const {taxonomies} = data
+      dispatchTaxonomiesUpdate(dispatch, taxonomies)
     } catch (e) {}
   }
   dispatch(debounceAction(action, `${taxonomiesUpdate}_${taxonomy.uuid}`))
@@ -118,7 +117,7 @@ export const uploadTaxonomyFile = (surveyId, taxonomyId, file) => async dispatch
 export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
   const survey = getSurvey(getState())
 
-  dispatch({type: taxonomiesUpdate, taxonomies: {[taxonomy.uuid]: null}})
+  dispatchTaxonomiesUpdate(dispatch, {[taxonomy.uuid]: null})
 
   await axios.delete(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}`)
 }

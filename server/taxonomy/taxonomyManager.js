@@ -24,13 +24,18 @@ const {
 const {TaxaParser} = require('./taxaParser')
 
 const {
+  fetchTaxonomiesBySurveyId: fetchTaxonomiesBySurveyIdRepos,
   fetchTaxonomyById,
   fetchTaxaByProp,
   insertTaxa,
   updateTaxonomyProp,
   deleteTaxaByTaxonomyId
 } = require('../../server/taxonomy/taxonomyRepository')
+const {validateTaxonomy} = require('./taxonomyValidator')
 
+/**
+ * ====== CREATE
+ */
 const storeTaxa = async (surveyId, taxonomyId, vernacularLanguageCodes, taxa) => {
   await db.tx(async t => {
     await updateTaxonomyProp(surveyId, taxonomyId, {
@@ -40,6 +45,53 @@ const storeTaxa = async (surveyId, taxonomyId, vernacularLanguageCodes, taxa) =>
     await deleteTaxaByTaxonomyId(surveyId, taxonomyId, t)
     await insertTaxa(surveyId, taxa, t)
   })
+}
+
+const importTaxaJobName = 'import taxa'
+
+const importTaxa = async (userId, surveyId, taxonomyId, inputBuffer) => {
+  const importJob =
+    await createJob(
+      userId,
+      surveyId,
+      importTaxaJobName,
+      //onCancel
+      () => parser.cancel()
+    )
+
+  const parser = await new TaxaParser(taxonomyId, inputBuffer)
+    .onStart(async event => await updateJobStatus(importJob.id, jobStatus.running, event.total, event.processed))
+    .onProgress(async event => await updateJobProgress(importJob.id, event.total, event.processed))
+    .onEnd(async event => {
+      const result = event.result
+      const hasErrors = !R.isEmpty(R.keys(result.errors))
+      if (hasErrors) {
+        console.log('errors found')
+        await updateJobStatus(importJob.id, jobStatus.failed, event.total, event.processed, {errors: result.errors})
+      } else {
+        await storeTaxa(surveyId, taxonomyId, result.vernacularLanguageCodes, result.taxa)
+        console.log(`taxa stored: ${result.taxa.length}`)
+        await updateJobStatus(importJob.id, jobStatus.completed, event.total, event.processed)
+      }
+    })
+    .start()
+
+  return importJob
+}
+
+/**
+ * ====== READ
+ */
+const fetchTaxonomiesBySurveyId = async (surveyId, draft) => {
+  const taxonomies = await fetchTaxonomiesBySurveyIdRepos(surveyId, draft)
+
+  return await Promise.all(
+    taxonomies.map(async taxonomy => ({
+        ...taxonomy,
+        validation: await validateTaxonomy(taxonomies, taxonomy)
+      })
+    )
+  )
 }
 
 const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
@@ -81,39 +133,10 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   console.log('csv export completed')
 }
 
-const importTaxaJobName = 'import taxa'
-
-const importTaxa = async (userId, surveyId, taxonomyId, inputBuffer) => {
-  const importJob =
-    await createJob(
-      userId,
-      surveyId,
-      importTaxaJobName,
-      //onCancel
-      () => parser.cancel()
-    )
-
-  const parser = await new TaxaParser(taxonomyId, inputBuffer)
-    .onStart(async event => await updateJobStatus(importJob.id, jobStatus.running, event.total, event.processed))
-    .onProgress(async event => await updateJobProgress(importJob.id, event.total, event.processed))
-    .onEnd(async event => {
-      const result = event.result
-      const hasErrors = !R.isEmpty(R.keys(result.errors))
-      if (hasErrors) {
-        console.log('errors found')
-        await updateJobStatus(importJob.id, jobStatus.failed, event.total, event.processed, {errors: result.errors})
-      } else {
-        await storeTaxa(surveyId, taxonomyId, result.vernacularLanguageCodes, result.taxa)
-        console.log(`taxa stored: ${result.taxa.length}`)
-        await updateJobStatus(importJob.id, jobStatus.completed, event.total, event.processed)
-      }
-    })
-    .start()
-
-  return importJob
-}
-
 module.exports = {
-  exportTaxa,
+  //CREATE
   importTaxa,
+  //READ
+  fetchTaxonomiesBySurveyId,
+  exportTaxa,
 }
