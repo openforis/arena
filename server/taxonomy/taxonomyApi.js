@@ -4,7 +4,7 @@ const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/reque
 const {
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyId,
-  fetchTaxa,
+  fetchTaxaByProp,
   insertTaxonomy,
   updateTaxonomyProp,
   deleteTaxonomy
@@ -87,7 +87,7 @@ module.exports.init = app => {
       const filter = getJsonParam(req, 'filter')
       const sort = {field: 'scientificName', asc: true}
 
-      const taxa = await fetchTaxa(surveyId, taxonomyId, limit, offset, filter, sort, draft)
+      const taxa = await fetchTaxaByProp(surveyId, taxonomyId, filter, sort, limit, offset, draft)
 
       res.json({taxa})
     } catch (err) {

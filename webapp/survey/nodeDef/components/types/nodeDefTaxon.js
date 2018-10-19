@@ -32,6 +32,15 @@ const fields = {
   vernacularName: 'vernacularName',
 }
 
+const blankValue = {
+  code: '',
+  family: '',
+  genus: '',
+  scientificName: '',
+  vernacularName: '',
+  vernacularLanguage: '',
+}
+
 const TaxonAutocompleteItemRenderer = props => {
   const {item: taxon, ...otherProps} = props
 
@@ -84,60 +93,55 @@ class NodeDefTaxon extends React.Component {
     const {edit, nodes} = this.props
     const node = edit ? null : nodes[0]
 
-    return getNodeValue(node, {
-      code: '',
-      family: '',
-      genus: '',
-      scientificName: '',
-      vernacularName: '',
-    })
+    return getNodeValue(node, blankValue)
   }
 
   onInputFieldChange (field, value) {
     //reset other fields values
 
-    const fieldValues =
-      R.assoc(field, value)(
-        {
-          code: '',
-          scientificName: '',
-          vernacularName: '',
-        }
-      )
+    const fieldValues = R.assoc(field, value)(blankValue)
+
+    let autocompleteOpened = !R.isEmpty(value)
+
+    //reset stored value
+    this.updateNodeValue(null)
 
     this.setState({
       ...fieldValues,
       dirty: true,
-      autocompleteOpened: true,
+      autocompleteOpened,
       autocompleteTaxa: [],
       autocompleteInputField: this.getInputFields()[field]
     })
 
-    this.loadTaxa(field, value)
-
-    //reset stored value
-    this.updateNodeValue(null)
+    if (autocompleteOpened) {
+      this.loadTaxa(field, value)
+    }
   }
 
-  onTaxonSelect (taxon) {
+  onTaxonSelect (taxonSearchResult) {
     const value = {
-      code: getTaxonCode(taxon),
-      family: getTaxonFamily(taxon),
-      genus: getTaxonGenus(taxon),
-      scientificName: getTaxonScientificName(taxon),
+      code: getTaxonCode(taxonSearchResult),
+      family: getTaxonFamily(taxonSearchResult),
+      genus: getTaxonGenus(taxonSearchResult),
+      scientificName: getTaxonScientificName(taxonSearchResult),
     }
-    this.onValueChange(value)
+    const nodeValue = taxonSearchResult.vernacularName
+      ? R.pipe(
+        R.assoc('vernacularName', R.prop('vernacularName', taxonSearchResult)),
+        R.assoc('vernacularLanguage', R.prop('vernacularLanguage', taxonSearchResult))
+      )(value)
+      : value
 
-    this.updateNodeValue(value)
+    this.onValueChange(nodeValue)
+
+    this.updateNodeValue(nodeValue)
   }
 
   updateNodeValue (value) {
     const {nodeDef, nodes, updateNode} = this.props
 
-    const node = nodes[0]
-
-    updateNode(nodeDef, node, value)
-
+    updateNode(nodeDef, nodes[0], value)
   }
 
   onAutocompleteClose () {
@@ -227,14 +231,14 @@ class NodeDefTaxon extends React.Component {
         <AutocompleteDialog className="node-def__taxon-autocomplete-list"
                             items={autocompleteTaxa}
                             itemRenderer={TaxonAutocompleteItemRenderer}
-                            itemKeyFunction={taxon => taxon.uuid}
+                            itemKeyFunction={taxon => `${taxon.uuid}_${taxon.vernacularName}`}
                             inputField={autocompleteInputField.current.inputElement}
                             alignToElement={
                               (renderType === nodeDefRenderType.tableBody
                                   ? this.getInputFields().code
                                   : autocompleteInputField
                               ).current.inputElement}
-                            onItemSelect={taxon => this.onTaxonSelect(taxon)}
+                            onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
                             onClose={() => this.onAutocompleteClose()}/>,
         document.body
         )

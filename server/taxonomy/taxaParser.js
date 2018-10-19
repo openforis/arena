@@ -89,11 +89,11 @@ class TaxaParser {
 
   processHeaders (callback) {
     const csvStream = fastcsv.fromString(this.csvString, {headers: false})
-    csvStream.on('data', async data => {
+    csvStream.on('data', async columns => {
       csvStream.destroy() //stop streaming CSV
-      const validHeaders = this.validateHeaders(data)
+      const validHeaders = this.validateHeaders(columns)
       if (validHeaders) {
-        this.result.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, R.keys(data))
+        this.result.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, columns)
       }
       callback(validHeaders)
     })

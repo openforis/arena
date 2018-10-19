@@ -31,21 +31,23 @@ let activeJobPollingTimeout = null
 export const startAppJobMonitoring = () => async (dispatch, getState) => {
 
   const fetchActiveJob = async () => {
-    const {data} = await axios.get(`/api/jobs/active`)
+    try {
+      const {data} = await axios.get(`/api/jobs/active`)
 
-    const activeJob = data.job
-    const activeJobState = getActiveJob(getState())
+      const activeJob = data.job
+      const activeJobState = getActiveJob(getState())
 
-    if (activeJob !== null || activeJobState !== null) {
-      if (activeJobState === null || activeJob || activeJobState.hideAutomatically) {
-        //job not monitored yet or completed and hideAutomatically is true
-        dispatch({type: appJobActiveUpdate, job: activeJob})
-      } else if (activeJob === null && isJobRunning(activeJobState) && !activeJobState.hideAutomatically) {
-        //job completed (no more active), load it
-        const {data} = await axios.get(`/api/jobs/${activeJobState.id}`)
-        dispatch({type: appJobActiveUpdate, job: data.job})
+      if (activeJob !== null || activeJobState !== null) {
+        if (activeJobState === null || activeJob || activeJobState.hideAutomatically) {
+          //job not monitored yet or completed and hideAutomatically is true
+          dispatch({type: appJobActiveUpdate, job: activeJob})
+        } else if (activeJob === null && isJobRunning(activeJobState) && !activeJobState.hideAutomatically) {
+          //job completed (no more active), load it
+          const {data} = await axios.get(`/api/jobs/${activeJobState.id}`)
+          dispatch({type: appJobActiveUpdate, job: data.job})
+        }
       }
-    }
+    } catch (e) {}
     activeJobPollingTimeout = setTimeout(fetchActiveJob, 3000)
   }
 

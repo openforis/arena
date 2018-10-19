@@ -25,7 +25,7 @@ const {TaxaParser} = require('./taxaParser')
 
 const {
   fetchTaxonomyById,
-  fetchTaxa,
+  fetchTaxaByProp,
   insertTaxa,
   updateTaxonomyProp,
   deleteTaxaByTaxonomyId
@@ -61,10 +61,10 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   csvStream.write(R.concat(fixedHeaders, vernacularLanguageCodes))
 
   //write taxa
-  const taxa = await fetchTaxa(surveyId, taxonomyId, null, 0, null, {
+  const taxa = await fetchTaxaByProp(surveyId, taxonomyId, null, {
     field: 'scientificName',
     asc: true
-  }, draft)
+  }, null, null, draft)
 
   taxa.forEach(taxon => {
     csvStream.write(R.concat([
