@@ -5,6 +5,8 @@ import React from 'react'
 import TabBar from '../../commonComponents/tabBar'
 import SurveyInfoComponent from './components/surveyInfoComponent'
 import SurveyFormView from '../../survey/components/surveyFormView'
+import CodeListsView from '../../survey/codeList/components/codeListsView'
+import TaxonomiesView from '../../survey/taxonomy/components/taxonomiesView'
 
 const SurveyDesignerView = () => (
 
@@ -13,6 +15,8 @@ const SurveyDesignerView = () => (
     tabs={[
       {label: 'Survey Info', component: SurveyInfoComponent},
       {label: 'Form Designer', component: SurveyFormView, props: {edit: true, draft: true}},
+      {label: 'Code Lists', component: CodeListsView},
+      {label: 'Taxonomies', component: TaxonomiesView},
     ]}/>
 
 )

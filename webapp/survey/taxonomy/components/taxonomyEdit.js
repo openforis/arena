@@ -92,29 +92,32 @@ class TaxonomyEdit extends React.Component {
     const {validation} = taxonomy
 
     return (
-      <div className="taxonomies__edit">
+      <div className="taxonomy-edit">
 
-        <FormItem label="Taxonomy name">
-          <Input value={getTaxonomyName(taxonomy)}
-                 validation={getFieldValidation('name')(validation)}
-                 onChange={e => putTaxonomyProp(taxonomy.uuid, 'name', normalizeName(e.target.value))}/>
-        </FormItem>
+        <div className="taxonomy-edit__header">
+          <FormItem label="Taxonomy name">
+            <Input value={getTaxonomyName(taxonomy)}
+                   validation={getFieldValidation('name')(validation)}
+                   onChange={e => putTaxonomyProp(taxonomy.uuid, 'name', normalizeName(e.target.value))}/>
+          </FormItem>
 
-        <div className="action-bar">
-          <UploadButton label="IMPORT"
-                        onChange={(files) => uploadTaxonomyFile(survey.id, taxonomy.id, files[0])}/>
+          <div className="button-bar">
+            <UploadButton label="CSV import"
+                          onChange={(files) => uploadTaxonomyFile(survey.id, taxonomy.id, files[0])}/>
 
-          <button className="btn btn-of btn-download"
-                  aria-disabled={R.isEmpty(taxa)}
-                  onClick={() => this.exportTaxonomy()}>
-            <span className="icon icon-cloud-download icon-16px icon-left"/>
-            EXPORT
-          </button>
+            <button className="btn btn-of btn-download"
+                    aria-disabled={R.isEmpty(taxa)}
+                    onClick={() => this.exportTaxonomy()}>
+              <span className="icon icon-cloud-download icon-16px icon-left"/>
+              Csv Export
+            </button>
+          </div>
         </div>
+
 
         {
           R.isEmpty(taxa)
-            ? <div className="empty-taxa-message">Taxa not imported</div>
+            ? <div className="taxonomy-edit__empty-taxa">Taxa not imported</div>
             : <TaxonTable taxonomy={taxonomy}
                           taxa={taxa}
                           currentPage={taxaCurrentPage}

@@ -75,14 +75,15 @@ class TaxonTable extends React.Component {
         </button>
         <button className="btn btn-of-light"
                 aria-disabled={currentPage === 1}
-                onClick={() => onPageChange(currentPage - 1)}>
-          <span className="icon icon-arrow-left icon-16px"/>
+                onClick={() => onPageChange(currentPage - 1)}
+                style={{transform: 'scaleX(-1)'}}>
+          <span className="icon icon-play3 icon-16px"/>
         </button>
-        <span>{currentPage} / {totalPages}</span>
+        <span className="page-count">{currentPage} / {totalPages}</span>
         <button className="btn btn-of-light"
                 aria-disabled={currentPage === totalPages}
                 onClick={() => onPageChange(currentPage + 1)}>
-          <span className="icon icon-arrow-right icon-16px"/>
+          <span className="icon icon-play3 icon-16px"/>
         </button>
         <button className="btn btn-of-light"
                 aria-disabled={currentPage === totalPages}

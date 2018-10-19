@@ -2,14 +2,14 @@
 
 .code-lists__edit {
   display: grid;
-  grid-template-rows: 8rem 1fr 5rem;
+  grid-template-rows: 5rem 1fr 5rem;
   align-items: center;
   margin: 0 5rem;
 }
 
 .code-lists__edit-levels {
   display: flex;
-  justify-content: center;
+  //justify-content: center;
   overflow-x: auto;
 
   .btn-add-level {
