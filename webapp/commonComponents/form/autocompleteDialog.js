@@ -1,9 +1,9 @@
 import './autocompleteDialog.scss'
 
 import React from 'react'
-import * as R from 'ramda'
 import { EventEmitter } from 'events'
 
+import KeyboardMap from '../../appUtils/keyboardMap'
 import { clickedOutside, elementOffset } from '../../appUtils/domUtils'
 
 class AutocompleteDialog extends React.Component {
@@ -55,8 +55,8 @@ class AutocompleteDialog extends React.Component {
     const {items, inputField} = this.props
 
     switch (e.keyCode) {
-      case 40: //arrow down
-      case 9: //tab
+      case KeyboardMap.Down: //arrow down
+      case KeyboardMap.Tab: //tab
         if (items.length > 0) {
           e.preventDefault()
           //focus first item
@@ -65,7 +65,7 @@ class AutocompleteDialog extends React.Component {
           this.dispatchCloseEvent()
         }
         break
-      case 27: //escape
+      case KeyboardMap.Esc: //escape
         //close dialog
         this.dispatchCloseEvent()
         inputField.focus()
