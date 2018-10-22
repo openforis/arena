@@ -53,7 +53,7 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
  * ============
  */
 
-export const updateNode = (nodeDef, node, value) =>
+export const updateNode = (nodeDef, node, value, file = null) =>
   async (dispatch, getState) => {
 
     const survey = getSurvey(getState())
@@ -76,7 +76,7 @@ export const updateNode = (nodeDef, node, value) =>
       dispatchNodesUpdate(dispatch, data.nodes)
     }
 
-    dispatch(_updateNodeDebounced(survey.id, nodeToUpdate, node.placeholder ? 0 : 500))
+    dispatch(_updateNodeDebounced(survey.id, nodeToUpdate, file, node.placeholder ? 0 : 500))
   }
 
 const getUpdatedNode = (dispatch, node, value) =>
@@ -85,10 +85,20 @@ const getUpdatedNode = (dispatch, node, value) =>
     R.assoc('value', value),
   )(node)
 
-const _updateNodeDebounced = (surveyId, node, delay) => {
+const _updateNodeDebounced = (surveyId, node, file, delay) => {
   const action = async dispatch => {
     try {
-      const {data} = await axios.post(`/api/survey/${surveyId}/record/${node.recordId}/node`, node)
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('node', JSON.stringify(node))
+
+      const config = {
+        headers: {
+          'content-type': 'multipart/form-data'
+        }
+      }
+
+      const {data} = await axios.post(`/api/survey/${surveyId}/record/${node.recordId}/node`, formData, config)
       dispatchNodesUpdate(dispatch, data.nodes)
     } catch (e) {
       console.log(e)

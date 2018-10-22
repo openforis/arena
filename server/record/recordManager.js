@@ -12,7 +12,7 @@ const {fetchRootNodeDef, getSurveyById} = require('../survey/surveyRepository')
 const {fetchNodeDef, fetchNodeDefsByParentId, fetchNodeDefsBySurveyId} = require('../nodeDef/nodeDefRepository')
 
 const {insertRecord, fetchRecordById} = require('../record/recordRepository')
-const {insertNode, updateNode, deleteNode: deleteNodeRepos, fetchNodeByUUID, fetchNodesByRecordId} = require('../record/nodeRepository')
+const {insertNode, updateNode, deleteNode: deleteNodeRepos, fetchNodeByUUID, fetchNodesByRecordId, fetchNodeFileByUUID} = require('../record/nodeRepository')
 
 /**
  * ===================
@@ -27,26 +27,26 @@ const createRecord = async (recordToCreate) =>
 
       const rootNodeDef = await fetchRootNodeDef(surveyId, false, t)
 
-      const nodes = await createNode(rootNodeDef, newNode(rootNodeDef.id, recordId), t)
+      const nodes = await createNode(rootNodeDef, newNode(rootNodeDef.id, recordId), null, t)
 
       return R.assoc('nodes', nodes, record)
     }
   )
 
-const persistNode = async (surveyId, nodeReq, client = db) => {
+const persistNode = async (surveyId, nodeReq, file, client = db) => {
   const {nodeDefId, value, uuid} = nodeReq
 
   const node = await fetchNodeByUUID(surveyId, uuid, client)
 
   return node
-    ? await updateNodeValue(surveyId, uuid, value, client)
-    : await createNode(await fetchNodeDef(nodeDefId), nodeReq, client)
+    ? await updateNodeValue(surveyId, uuid, value, file, client)
+    : await createNode(await fetchNodeDef(nodeDefId), nodeReq, file, client)
 }
 
-const createNode = async (nodeDef, nodeReq, client = db) => {
+const createNode = async (nodeDef, nodeReq, file, client = db) => {
 
   // insert node
-  const node = await insertNode(nodeDef.surveyId, nodeReq, client)
+  const node = await insertNode(nodeDef.surveyId, nodeReq, file ? file.data : null, client)
 
   // fetch children if single entity
   const childDefs = isNodeDefSingleEntity(nodeDef)
@@ -76,9 +76,9 @@ const createNode = async (nodeDef, nodeReq, client = db) => {
  * UPDATE
  * ===================
  */
-const updateNodeValue = async (surveyId, nodeUUID, value, client = db) =>
+const updateNodeValue = async (surveyId, nodeUUID, value, file, client = db) =>
   await client.tx(async t => {
-    const node = await updateNode(surveyId, nodeUUID, value, client)
+    const node = await updateNode(surveyId, nodeUUID, value, file ? file.data : null, client)
 
     const survey = assocNodeDefs(
       await fetchNodeDefsBySurveyId(surveyId, false, t)
@@ -93,8 +93,8 @@ const updateNodeValue = async (surveyId, nodeUUID, value, client = db) =>
     return onNodeUpdate(survey, record, node, t)
   })
 
-const updateNodeValueInternal = async (survey, record, nodeUUID, value, client = db) => {
-  const node = await updateNode(survey.id, nodeUUID, value, client)
+const resetNodeValue = async (survey, record, nodeUUID, client = db) => {
+  const node = await updateNode(survey.id, nodeUUID, null, null, client)
   return onNodeUpdate(survey, record, node, client)
 }
 
@@ -139,7 +139,7 @@ const onNodeUpdate = async (survey, record, node, client = db) => {
         return await deleteNodeInternal(survey, record, n.uuid, client)
       } else {
         //reset value
-        return await updateNodeValueInternal(survey, record, n.uuid, null, client)
+        return await resetNodeValue(survey, record, n.uuid, client)
       }
     })
   )
@@ -153,6 +153,7 @@ module.exports = {
   persistNode,
   // createNode,
   //==== READ
+  fetchNodeFileByUUID,
   //==== UPDATE
   // updateNodeValue,
   //==== DELETE
