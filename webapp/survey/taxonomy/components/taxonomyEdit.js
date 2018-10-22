@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 
 import { FormItem, Input } from '../../../commonComponents/form/input'
 import UploadButton from '../../../commonComponents/form/uploadButton'
+import DownloadButton from '../../../commonComponents/form/downloadButton'
 import TaxonTable from './taxonTable'
 
-import { toQueryString } from '../../../../server/serverUtils/request'
 import { isBlank } from '../../../../common/stringUtils'
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 
@@ -55,21 +55,6 @@ class TaxonomyEdit extends React.Component {
     }
   }
 
-  exportTaxonomy () {
-    const {
-      survey, taxonomy,
-    } = this.props
-
-    const params = {
-      draft: true
-    }
-    window.open(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/export?${toQueryString(params)}`, '_blank')
-  }
-
-  onPageChange (page) {
-    this.props.loadTaxaPage(page)
-  }
-
   onDone () {
     const {taxonomy, setTaxonomyForEdit} = this.props
 
@@ -83,7 +68,7 @@ class TaxonomyEdit extends React.Component {
   render () {
     const {
       survey, taxonomy, taxaCurrentPage, taxaTotalPages, taxa,
-      putTaxonomyProp, uploadTaxonomyFile,
+      loadTaxaPage, putTaxonomyProp, uploadTaxonomyFile,
     } = this.props
 
     const {validation} = taxonomy
@@ -102,12 +87,9 @@ class TaxonomyEdit extends React.Component {
             <UploadButton label="CSV import"
                           onChange={(files) => uploadTaxonomyFile(survey.id, taxonomy.id, files[0])}/>
 
-            <button className="btn btn-of btn-download"
-                    aria-disabled={R.isEmpty(taxa)}
-                    onClick={() => this.exportTaxonomy()}>
-              <span className="icon icon-cloud-download icon-16px icon-left"/>
-              Csv Export
-            </button>
+            <DownloadButton href={`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/export?draft=true`}
+                            disabled={R.isEmpty(taxa)}
+                            label="CSV Export"/>
           </div>
         </div>
 
@@ -120,7 +102,7 @@ class TaxonomyEdit extends React.Component {
                           currentPage={taxaCurrentPage}
                           totalPages={taxaTotalPages}
                           rowsPerPage={ROWS_PER_PAGE}
-                          onPageChange={(page) => this.onPageChange(page)}/>
+                          onPageChange={(page) => loadTaxaPage(page)}/>
         }
 
         <div style={{justifySelf: 'center'}}>

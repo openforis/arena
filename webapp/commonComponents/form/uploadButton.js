@@ -9,7 +9,7 @@ class UploadButton extends React.Component {
   }
 
   render () {
-    const {disabled, label, onChange} = this.props
+    const {disabled, label = 'Upload', onChange} = this.props
 
     return <React.Fragment>
       <input
@@ -25,7 +25,7 @@ class UploadButton extends React.Component {
                 this.fileInput.current.value = ''
                 this.fileInput.current.dispatchEvent(new MouseEvent('click'))
               }}>
-        <span className="icon icon-cloud-upload icon-16px icon-left"/>
+        <span className="icon icon-upload2 icon-16px icon-left"/>
         {label}
       </button>
     </React.Fragment>
