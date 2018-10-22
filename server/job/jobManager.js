@@ -1,5 +1,5 @@
 const {uuidv4} = require('../../common/uuid')
-const {throttle} = require('../../common/functions')
+const {throttle} = require('../../common/functionsDefer')
 
 const {
   jobStatus,
