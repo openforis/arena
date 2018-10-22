@@ -65,7 +65,7 @@ const ImportErrrosModal = props => {
     </ModalHeader>
 
     <ModalBody>
-      <div className="taxonomies__edit-errors-table">
+      <div className="taxonomy-edit__errors-table">
         <div className="header">
           <div>Row</div>
           <div>Errors</div>
@@ -74,7 +74,7 @@ const ImportErrrosModal = props => {
           {
             R.keys(errors).map(rowIndex => {
               return (
-                <div className="row">
+                <div key={rowIndex} className="row">
                   <div>{Number(rowIndex) + 1}</div>
                   <div>{getErrorMessage(errors[rowIndex])}</div>
                 </div>

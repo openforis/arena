@@ -16,13 +16,14 @@ import {
   getJobProgressPercent,
   isJobRunning,
   isJobEnded,
+  isJobFailed
 } from '../../../../common/job/job'
 
 import { cancelActiveJob, hideAppJobMonitor } from '../job/actions'
 import { getActiveJob } from './appJobState'
 
-const ProgressBar = ({progress}) => (
-  <div className="progress-bar">
+const ProgressBar = ({progress, className}) => (
+  <div className={`progress-bar ${className ? className : ''}`}>
     <div className="filler" style={{width: `${progress}%`}}/>
   </div>
 )
@@ -50,7 +51,7 @@ class AppJobMonitor extends React.Component {
                   <span> ({jobProgressPercent}%)</span>
                 }
               </h4>
-              <ProgressBar progress={jobProgressPercent}/>
+              <ProgressBar progress={jobProgressPercent} className={isJobFailed(job) ? 'error' : ''}/>
             </div>
           </ModalBody>
 
