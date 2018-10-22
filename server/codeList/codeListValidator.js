@@ -1,47 +1,21 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {validate, validateRequired} = require('../../common/validation/validator')
+const {validate, validateRequired, validateItemPropUniqueness} = require('../../common/validation/validator')
 
 const {
-  getCodeListName,
-  getCodeListLevelName,
   getCodeListLevelsArray,
-  getCodeListItemCode,
   getCodeListItemLevelId,
   getCodeListLevelById,
 } = require('../../common/survey/codeList')
 
 const codeListValidators = (codeLists) => ({
-  'props.name': [validateRequired, validateCodeListNameUniqueness(codeLists)],
+  'props.name': [validateRequired, validateItemPropUniqueness(codeLists)],
 })
-
-const validateCodeListNameUniqueness = codeLists =>
-  (propName, codeList) => {
-
-    const hasDuplicates = R.any(
-      l => getCodeListName(l) === getCodeListName(codeList) && l.id !== codeList.id,
-      codeLists
-    )
-    return hasDuplicates
-      ? 'duplicate'
-      : null
-  }
 
 const codeListLevelValidators = (levels) => ({
-  'props.name': [validateRequired, validateCodeListLevelNameUniqueness(levels)],
+  'props.name': [validateRequired, validateItemPropUniqueness(levels)],
 })
-
-const validateCodeListLevelNameUniqueness = levels =>
-  (propName, level) => {
-    const hasDuplicates = R.any(
-      l => getCodeListLevelName(l) === getCodeListLevelName(level) && l.id !== level.id,
-      levels
-    )
-    return hasDuplicates
-      ? 'duplicate'
-      : null
-  }
 
 // ====== LEVELS
 
@@ -68,21 +42,8 @@ const validateCodeListLevels = async (codeList) => {
 // ====== ITEMS
 
 const codeListItemValidators = (items) => ({
-  'props.code': [validateRequired, validateCodeListItemCodeUniqueness(items)],
+  'props.code': [validateRequired, validateItemPropUniqueness(items)],
 })
-
-const validateCodeListItemCodeUniqueness = items =>
-  (propName, item) => {
-    const siblingItems = R.filter(it => it.parentId === item.parentId)(items)
-
-    const hasDuplicates = R.any(
-      l => getCodeListItemCode(l) === getCodeListItemCode(item) && l.id !== item.id,
-      siblingItems
-    )
-    return hasDuplicates
-      ? 'duplicate'
-      : null
-  }
 
 const validateCodeListItem = async (codeList, items, itemId) => {
   const item = R.find(R.propEq('id', itemId))(items)

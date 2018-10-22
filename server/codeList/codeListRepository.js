@@ -56,8 +56,9 @@ const insertCodeListItem = async (surveyId, item, client = db) =>
 // ============== READ
 
 const fetchCodeListsBySurveyId = async (surveyId, draft = false, client = db) =>
-  await client.map(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list`,
+  await client.map(`
+    SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list
+    ORDER BY id`,
     [],
     def => dbTransformCallback(def, draft)
   )

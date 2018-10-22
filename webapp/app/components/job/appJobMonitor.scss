@@ -18,6 +18,30 @@
   font-weight: 400;
 }
 
+.app-job-monitor__errors {
+  height: 45vh;
+  justify-self: stretch;
+
+  .header, .row {
+    display: grid;
+    grid-template-columns: .2fr .8fr;
+  }
+
+  .header {
+    font-weight: 400;
+    border-bottom: 1px solid rgba($white, .8)
+  }
+
+  .body {
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .row {
+    border-bottom: 1px solid rgba($white, .5);
+  }
+}
+
 .progress-bar {
   position: relative;
   height: 1rem;

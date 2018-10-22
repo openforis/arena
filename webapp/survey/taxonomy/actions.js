@@ -127,11 +127,3 @@ export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
 export const setTaxonomyForEdit = taxonomy => async (dispatch) => {
   dispatchTaxonomyEditUpdate(dispatch, {uuid: taxonomy ? taxonomy.uuid : null})
 }
-
-export const showTaxonomyImportErrors = importErrors => async (dispatch) => {
-  dispatchTaxonomyEditUpdate(dispatch, {importErrorsShown: true, importErrors})
-}
-
-export const hideTaxonomyImportErrors = () => async (dispatch) => {
-  dispatchTaxonomyEditUpdate(dispatch, {importErrorsShown: false, importErrors: null})
-}

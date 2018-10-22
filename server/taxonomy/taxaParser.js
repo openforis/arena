@@ -140,12 +140,8 @@ class TaxaParser {
     const validation = await validateTaxon(this.result.taxa, taxon)
 
     return validation.valid
-      ? {
-        taxon
-      }
-      : {
-        errors: validation.fields
-      }
+      ? {taxon}
+      : {errors: validation.fields}
   }
 
   parseVernacularNames (vernacularNames) {

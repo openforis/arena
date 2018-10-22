@@ -17,7 +17,7 @@ const validateProp = async (obj, prop, validations = []) => {
 }
 
 const validate = async (obj, propsValidations) => {
-  const fields = R.mergeAll(
+  const fieldValidations = R.mergeAll(
     await Promise.all(
       R.keys(propsValidations)
         .map(
@@ -27,12 +27,18 @@ const validate = async (obj, propsValidations) => {
         )
     )
   )
+  const fieldValidationsInvalid = R.reduce(
+    (acc, field) => acc[field].valid ? R.dissoc(field, acc) : acc,
+    fieldValidations,
+    R.keys(fieldValidations)
+  )
+
   return {
     valid: !R.any(
-      prop => R.pathEq([prop, 'valid'], false, fields),
-      R.keys(fields),
+      prop => R.pathEq([prop, 'valid'], false, fieldValidationsInvalid),
+      R.keys(fieldValidationsInvalid),
     ),
-    fields
+    fields: fieldValidationsInvalid
   }
 }
 

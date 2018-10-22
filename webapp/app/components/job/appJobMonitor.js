@@ -10,13 +10,15 @@ import {
   ModalFooter,
 } from '../../../commonComponents/modal'
 
+import AppJobErrors from './appJobErrors'
+
 import {
   getJobName,
   getJobStatus,
   getJobProgressPercent,
   isJobRunning,
   isJobEnded,
-  isJobFailed
+  isJobFailed,
 } from '../../../../common/job/job'
 
 import { cancelActiveJob, hideAppJobMonitor } from '../job/actions'
@@ -52,6 +54,8 @@ class AppJobMonitor extends React.Component {
                 }
               </h4>
               <ProgressBar progress={jobProgressPercent} className={isJobFailed(job) ? 'error' : ''}/>
+
+              <AppJobErrors job={job}/>
             </div>
           </ModalBody>
 
