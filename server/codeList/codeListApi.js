@@ -3,7 +3,7 @@ const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/reque
 
 const {
   fetchCodeListById,
-  validateCodeListProps,
+  fetchCodeListsBySurveyId,
 } = require('../codeList/codeListManager')
 
 const {
@@ -113,9 +113,9 @@ module.exports.init = app => {
       const {body} = req
 
       await updateCodeListProp(surveyId, codeListId, body)
-      const validation = await validateCodeListProps(surveyId, codeListId)
+      const codeLists = await fetchCodeListsBySurveyId(surveyId, true)
 
-      res.json({validation})
+      res.json({codeLists})
     } catch (err) {
       sendErr(res, err)
     }
