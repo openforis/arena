@@ -69,7 +69,7 @@ class NodeDefSwitch extends React.Component {
     return <div className={`${isPage ? 'node-def__form_page' : 'node-def__form'}`} ref="nodeDefElem">
       {
         invalid ?
-          <div className="node-def__form-error">
+          <div className="node-def__form-error error-badge">
             <span className="icon icon-warning icon-16px icon-left"/>
             <span>INVALID</span>
           </div>

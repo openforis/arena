@@ -40,9 +40,11 @@ class SurveyFormView extends React.Component {
     const {
       rootNodeDef,
       nodeDef,
+
       edit,
       entry,
-      recordLoaded
+
+      recordLoaded,
     } = this.props
 
     return (
@@ -108,6 +110,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     survey,
+    record: getRecord(survey),
     rootNodeDef,
     nodeDef,
     ...props.entry

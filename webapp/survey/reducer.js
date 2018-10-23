@@ -8,8 +8,10 @@ import {
   assocNodeDef,
   assocNodeDefProp,
   assocNodeDefValidation,
-
   dissocNodeDef,
+
+  assocSurveyCodeLists,
+  assocSurveyTaxonomies,
 } from '../../common/survey/survey'
 
 import {
@@ -28,6 +30,23 @@ import {
   assocNodes,
   deleteNode,
 } from './record/recordState'
+
+/**
+ * code lists state
+ */
+import {
+  updateCodeListEdit,
+  assocCodeListEditActiveLevelItem,
+  assocCodeListEditLevelItems,
+  dissocCodeListEditLevelItems,
+} from './codeList/codeListEditState'
+
+/**
+ * taxonomy state
+ */
+import {
+  updateTaxonomyEdit,
+} from './taxonomy/taxonomyEditState'
 
 /**
  * survey actions
@@ -61,6 +80,24 @@ import {
   nodeDelete,
 } from './record/actions'
 
+/**
+ * code list actions
+ */
+import {
+  codeListsUpdate,
+  codeListEditUpdate,
+  codeListEditLevelItemsUpdate,
+  codeListEditActiveLevelItemUpdate,
+} from './codeList/actions'
+
+/**
+ * taxonomy actions
+ */
+import {
+  taxonomiesUpdate,
+  taxonomyEditUpdate,
+} from './taxonomy/actions'
+
 const actionHandlers = {
   //SURVEY
   [surveyNewUpdate]: assocActionProps,
@@ -77,6 +114,7 @@ const actionHandlers = {
   [nodeDefValidationUpdate]: (state, {nodeDefUUID, validation}) => assocNodeDefValidation(nodeDefUUID, validation)(state),
 
   [nodeDefDelete]: (state, {nodeDef}) => dissocNodeDef(nodeDef)(state),
+
   //SURVEY-FORM
   [formReset]: dissocForm,
 
@@ -87,6 +125,23 @@ const actionHandlers = {
   [formActivePageNodeDefUpdate]: (state, {nodeDef}) => assocFormActivePage(nodeDef)(state),
 
   [formPageNodeUpdate]: (state, {nodeDef, node}) => assocFormPageNode(nodeDef, node)(state),
+
+  //CODE LIST
+  [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state),
+
+  [codeListEditUpdate]: (state, {codeListUUID}) => updateCodeListEdit(codeListUUID)(state),
+
+  [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditActiveLevelItem(levelIndex, itemUUID)(state),
+
+  [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) =>
+    items === null
+      ? dissocCodeListEditLevelItems(levelIndex)(state)
+      : assocCodeListEditLevelItems(levelIndex, items)(state),
+
+  //TAXONOMY
+  [taxonomiesUpdate]: (state, {taxonomies}) => assocSurveyTaxonomies(taxonomies)(state),
+
+  [taxonomyEditUpdate]: (state, {type, ...otherProps}) => updateTaxonomyEdit(otherProps)(state),
 
   //RECORD
   [recordUpdate]: assocActionProps,

@@ -1,11 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import DataFetchComponent from '../components/moduleDataFetchComponent'
+import { getSurvey } from '../../survey/surveyState'
 
-import { appModules, getDashboardData } from '../appModules'
-
-import Dropdown from '../../commonComponents/form/dropdown'
+import {
+  getSurveyName,
+  getSurveyStatus,
+  isSurveyDraft,
+} from '../../../common/survey/survey'
 
 class SurveyInfoView extends React.Component {
 
@@ -13,66 +15,51 @@ class SurveyInfoView extends React.Component {
     const {survey} = this.props
 
     return (
-      <DataFetchComponent module={appModules.survey} dashboard={true}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '.2fr .4fr .4fr',
-          alignContent: 'center',
-          backgroundColor: 'rgba(198, 214, 225, 0.1)',
-        }}>
+      <div className="app-dashboard__survey-info">
 
-          <Dropdown className="dropdown-of"
-                    placeholder="Survey name"
-                    value={survey.name}
-                    items={['survey 1', 'survey 2', 'survey 3', 'survey 4']}
-                    style={{gridColumn: 2}}
-          />
+        <div className="survey-status">
+          {
+            isSurveyDraft(survey) &&
+            <span className="icon icon-warning icon-12px icon-left"/>
+          }
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, auto)',
-            gridColumnGap: '2rem',
-            padding: '0 1rem',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-
-            <button className="btn btn-of-light">
-              <span className="icon icon-warning icon-20px"/>
-            </button>
-
-            <button className="btn btn-of-light">
-              <span className="icon icon-download3 icon-20px"/>
-            </button>
-
-            <button className="btn btn-of-light">
-              <span className="icon icon-upload3 icon-20px"/>
-            </button>
-
-            <button className="btn btn-of-light">
-              <span className="icon icon-bin icon-20px"/>
-            </button>
-
-            <button className="btn btn-of-light">
-              <span className="icon icon-plus icon-20px"/>
-            </button>
-
-          </div>
+          {getSurveyStatus(survey)}
         </div>
-      </DataFetchComponent>
+
+        <h4 className="survey-name">
+
+          {getSurveyName(survey)}
+        </h4>
+
+        <div className="button-bar">
+          <button className="btn btn-of-light" aria-disabled={!isSurveyDraft(survey)}>
+            <span className="icon icon-checkmark2 icon-16px icon-left"/> Publish
+          </button>
+
+          <button className="btn btn-of-light">
+            <span className="icon icon-download3 icon-16px icon-left"/> Export
+          </button>
+
+          <button className="btn btn-of-light">
+            <span className="icon icon-upload3 icon-16px icon-left"/> Import
+          </button>
+
+          <button className="btn btn-of-light">
+            <span className="icon icon-bin icon-16px icon-left"/> Delete
+          </button>
+        </div>
+
+      </div>
     )
   }
 }
 
 SurveyInfoView.defaultProps = {
-  survey: {
-    id: -1,
-    name: ''
-  }
+  survey: {}
 }
 
 const mapStateToProps = state => ({
-  survey: getDashboardData(appModules.survey)(state)
+  survey: getSurvey(state)
 })
 
 export default connect(mapStateToProps)(SurveyInfoView)

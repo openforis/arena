@@ -2,8 +2,8 @@
 
 .dropdown {
   display: grid;
-  grid-template-columns: .9fr .1fr;
-  align-self: stretch;
+  grid-template-columns: 1fr 35px;
+  //align-self: stretch;
 
   span.icon {
     color: $whiteLight;
@@ -26,7 +26,7 @@
   z-index: $zIndex20Dropdown;
   display: grid;
   grid-template-columns: 1rem 1fr 1rem;
-  background-color: rgba($brown, .75);
+  background-color: rgba($brown, .95);
   padding: 1rem 0;
   justify-content: center;
 

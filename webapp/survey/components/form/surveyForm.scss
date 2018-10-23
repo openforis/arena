@@ -35,9 +35,13 @@ $tableBorder: 1px solid rgba($white, .7);
   height: 100vh;
   top: 0px;
   left: 0px;
-  padding: 3rem 0;
+  padding-top: 3rem;
   z-index: $zIndex10TopOfApp;
   background-color: rgba($greyDark, 0.95);
+
+  .form {
+    grid-row-gap: 1.5rem;
+  }
 }
 
 .survey-form__actions {
@@ -60,6 +64,7 @@ $tableBorder: 1px solid rgba($white, .7);
 
 .node-def__form_page {
   position: relative;
+  overflow-y: auto;
 }
 
 .node-def__form-actions {
@@ -88,12 +93,7 @@ $tableBorder: 1px solid rgba($white, .7);
 }
 
 .node-def__form-error {
-  background-color: rgba($red, 0.4);
   position: absolute;
-  left: 0;
-  font-size: .9rem;
-  font-weight: 400;
-  padding: .1rem .5rem;
 }
 
 .node_def__icon {
@@ -126,6 +126,11 @@ $tableBorder: 1px solid rgba($white, .7);
 .node-def__table-row-coordinate {
   display: grid;
   grid-template-columns: repeat(3, auto);
+}
+
+.node-def__table-row-taxon {
+  display: grid;
+  grid-template-columns: .2fr .5fr .3fr;
 }
 
 .node-def__table-data-rows {

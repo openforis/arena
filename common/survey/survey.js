@@ -6,14 +6,25 @@ const {
   getLabels,
 
   setProp,
+
+  filterMappedObj,
 } = require('./surveyUtils')
+
 const {
   isNodeDefRoot,
   isNodeDefEntity,
+  getNodeDefCodeListUUID,
+  getNodeDefParentCodeUUID,
 } = require('./nodeDef')
+
+const {
+  getCodeListLevelsLength,
+} = require('./codeList')
 
 // == utils
 const nodeDefs = 'nodeDefs'
+const codeLists = 'codeLists'
+const taxonomies = 'taxonomies'
 
 const defaultSteps = {
   '1': {name: 'entry'},
@@ -76,7 +87,7 @@ const getNodeDefs = R.pipe(R.prop(nodeDefs), R.defaultTo({}))
 
 const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
-const getNodeDefByUUID = uuid => R.pipe(getNodeDefs, R.prop(uuid))
+const getNodeDefByUUID = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
 const getNodeDefById = id => R.pipe(
   getNodeDefsArray,
@@ -91,6 +102,16 @@ const getNodeDefsByParentId = parentId => R.pipe(
 const getRootNodeDef = R.pipe(getNodeDefsByParentId(null), R.head)
 
 const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
+
+const getNodeDefsByCodeListUUID = (uuid) => R.pipe(
+  getNodeDefsArray,
+  R.filter(R.pathEq(['props', 'codeListUUID'], uuid))
+)
+
+const getNodeDefsByTaxonomyUUID = (uuid) => R.pipe(
+  getNodeDefsArray,
+  R.filter(R.pathEq(['props', 'taxonomyUUID'], uuid))
+)
 
 /**
  * ======
@@ -108,7 +129,7 @@ const assocSurveyPropValidation = (key, validation) =>
 const assocNodeDefs = newNodeDefsArray =>
   survey => R.pipe(
     R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
-    R.mergeDeepRight(getNodeDefs(survey)),
+    R.merge(getNodeDefs(survey)),
     newNodeDefs => R.assoc(nodeDefs, newNodeDefs, survey)
   )(newNodeDefsArray)
 
@@ -141,10 +162,85 @@ const dissocNodeDef = nodeDef =>
 
 /**
  * ======
+ * READ Code Lists
+ * ======
+ */
+const getSurveyCodeLists = R.pipe(
+  R.prop(codeLists),
+  R.defaultTo({})
+)
+
+const getSurveyCodeListsArray = R.pipe(
+  getSurveyCodeLists,
+  R.values,
+)
+
+const getSurveyCodeListByUUID = uuid => R.pipe(
+  getSurveyCodeLists,
+  R.prop(uuid)
+)
+
+/**
+ * ======
+ * UPDATE Code Lists
+ * ======
+ */
+const assocSurveyCodeLists = codeLists =>
+  survey => R.pipe(
+    R.merge(getSurveyCodeLists(survey)),
+    //exclude null objects
+    filterMappedObj(codeList => codeList !== null),
+    newCodeLists => R.assoc('codeLists', newCodeLists, survey)
+  )(codeLists)
+
+/**
+ * ======
+ * READ Taxonomies
+ * ======
+ */
+const getSurveyTaxonomies = R.pipe(
+  R.prop(taxonomies),
+  R.defaultTo({})
+)
+
+const getSurveyTaxonomiesArray = R.pipe(
+  getSurveyTaxonomies,
+  R.values,
+)
+
+const getSurveyTaxonomyByUUID = uuid => R.pipe(
+  getSurveyTaxonomies,
+  R.prop(uuid)
+)
+
+/**
+ * ======
+ * UPDATE Taxonomies
+ * ======
+ */
+const assocSurveyTaxonomies = taxonomies =>
+  survey => R.pipe(
+    R.merge(getSurveyTaxonomies(survey)),
+    filterMappedObj(taxonomy => taxonomy != null),
+    newTaxonomies => R.assoc('taxonomies', newTaxonomies, survey)
+  )(taxonomies)
+
+/**
+ * ======
  * UTILS NodeDefs
  * ======
  */
 const getNodeDefParent = nodeDef => getNodeDefById(nodeDef.parentId)
+
+const getNodeDefAncestors = nodeDef =>
+  survey => {
+    if (isNodeDefRoot(nodeDef)) {
+      return []
+    } else {
+      const parent = getNodeDefParent(nodeDef)(survey)
+      return R.append(parent, getNodeDefAncestors(parent)(survey))
+    }
+  }
 
 const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
   survey => {
@@ -152,10 +248,62 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       return false
 
     const nodeDefParent = getNodeDefParent(nodeDefDescendant)(survey)
-    if (nodeDefParent.id === nodeDefAncestor.id)
-      return true
-    else
-      return isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
+    return nodeDefParent.id === nodeDefAncestor.id
+      ? true
+      : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
+  }
+
+const getNodeDefCodeParent = nodeDef => getNodeDefByUUID(getNodeDefParentCodeUUID(nodeDef))
+
+const isNodeDefCodeParent = nodeDef => R.pipe(
+  getNodeDefsArray,
+  R.any(R.pathEq(['props', 'parentCodeUUID'], nodeDef.uuid)),
+)
+
+const getNodeDefCodeCandidateParents = nodeDef =>
+  survey => {
+    const codeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
+
+    if (codeList) {
+      const codeListLevelsLength = getCodeListLevelsLength(codeList)
+      const ancestors = getNodeDefAncestors(nodeDef)(survey)
+
+      return R.reduce(
+        (acc, ancestor) =>
+          R.pipe(
+            getNodeDefChildren(ancestor),
+            R.reject(n =>
+              // reject different codeList nodeDef
+              getNodeDefCodeListUUID(n) !== codeList.uuid
+              ||
+              // or itself
+              n.uuid === nodeDef.uuid
+              ||
+              // leaves nodeDef
+              getNodeDefCodeListLevelIndex(n)(survey) === codeListLevelsLength - 1
+            ),
+            R.concat(acc),
+          )(survey),
+        [],
+        ancestors
+      )
+
+    } else {
+      return []
+    }
+  }
+
+const getNodeDefCodeListLevelIndex = nodeDef =>
+  survey => {
+    const parentCodeNodeDef = getNodeDefCodeParent(nodeDef)(survey)
+    return parentCodeNodeDef
+      ? 1 + getNodeDefCodeListLevelIndex(parentCodeNodeDef)(survey)
+      : 0
+  }
+
+const canUpdateCodeList = nodeDef =>
+  survey => {
+    return !isNodeDefCodeParent(nodeDef)(survey)
   }
 
 module.exports = {
@@ -163,12 +311,11 @@ module.exports = {
 
   // READ
   getSurveyProps: getProps,
-  getSurveyLabels: getLabels,
 
   getSurveyName: getProp('name', ''),
   getSurveyLanguages,
   getSurveyDefaultLanguage,
-  getSurveyLabels,
+  getSurveyLabels: getLabels,
   getSurveyDefaultLabel,
   getSurveyDescriptions: getProp('descriptions', {}),
   getSurveySrs: getProp('srs', []),
@@ -176,11 +323,15 @@ module.exports = {
 
   getSurveyStatus,
   isSurveyPublished,
+  isSurveyDraft,
 
   // READ nodeDefs
   getNodeDefByUUID,
+  getNodeDefById,
   getRootNodeDef,
   getNodeDefChildren,
+  getNodeDefsByCodeListUUID,
+  getNodeDefsByTaxonomyUUID,
 
   // UPDATE
   assocSurveyProp: setProp,
@@ -197,7 +348,38 @@ module.exports = {
 
   // UTILS
   getSurveyDBSchema: surveyId => `survey_${surveyId}`,
+
   // UTILS NodeDefs
   getNodeDefParent,
   isNodeDefAncestor,
+
+  //=======
+  // CodeLists
+  //=======
+
+  //NodeDef CodeList
+  getNodeDefCodeListLevelIndex,
+  getNodeDefCodeParent,
+  getNodeDefCodeCandidateParents,
+  isNodeDefCodeParent,
+  canUpdateCodeList,
+
+  // READ codeLists
+  getSurveyCodeLists,
+  getSurveyCodeListsArray,
+  getSurveyCodeListByUUID,
+
+  // UPDATE code lists
+  assocSurveyCodeLists,
+
+  //=======
+  // Taxonomies
+  //=======
+
+  //READ taxonomies
+  getSurveyTaxonomiesArray,
+  getSurveyTaxonomyByUUID,
+
+  //UPDATE taxonomies
+  assocSurveyTaxonomies,
 }

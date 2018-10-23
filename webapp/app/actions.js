@@ -4,12 +4,13 @@ import { appState, systemStatus } from './app'
 import { userPrefNames } from '../../common/user/userPrefs'
 
 import { dispatchCurrentSurveyUpdate } from '../survey/actions'
+import { stopAppJobMonitoring } from './components/job/actions'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
 
-export const initApp = () => async dispatch => {
+export const initApp = () => async (dispatch) => {
   try {
 
     const resp = await axios.get('/auth/user')
@@ -29,12 +30,13 @@ export const initApp = () => async dispatch => {
 
 export const logout = () => async dispatch => {
   try {
+    dispatch(stopAppJobMonitoring())
+
     await axios.post('/auth/logout')
 
     dispatch({type: appUserLogout})
   } catch (e) {
   }
-
 }
 
 // List of surveys available to current user
@@ -54,7 +56,7 @@ export const setActiveSurvey = surveyId =>
     try {
 
       //load survey
-      const {data} = await axios.get(`/api/survey/${surveyId}`)
+      const {data} = await axios.get(`/api/survey/${surveyId}?draft=true`)
       dispatchCurrentSurveyUpdate(dispatch, data.survey)
 
       //update userPref
@@ -65,3 +67,4 @@ export const setActiveSurvey = surveyId =>
     } catch (e) {
     }
   }
+

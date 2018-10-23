@@ -1,8 +1,15 @@
 const R = require('ramda')
 
 const nodeDefRenderType = {
+  // entity
   form: 'form',
   table: 'table',
+  //codelist
+  dropdown: 'dropdown',
+  checkbox: 'checkbox',
+
+
+  // only components render
   tableHeader: 'tableHeader',
   tableBody: 'tableBody',
 }
@@ -27,6 +34,8 @@ const isRenderType = type => R.pipe(
 
 const isRenderTable = isRenderType(nodeDefRenderType.table)
 const isRenderForm = isRenderType(nodeDefRenderType.form)
+const isRenderDropdown = isRenderType(nodeDefRenderType.dropdown)
+const isRenderCheckbox = isRenderType(nodeDefRenderType.checkbox)
 
 const getPageUUID = getProp(nodeDefLayoutProps.pageUUID)
 const getNoColumns = R.pipe(
@@ -45,6 +54,8 @@ module.exports = {
 
   isRenderTable,
   isRenderForm,
+  isRenderDropdown,
+  isRenderCheckbox,
   getNoColumns,
   getLayout,
   getPageUUID,

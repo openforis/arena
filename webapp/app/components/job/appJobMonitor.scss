@@ -1,0 +1,63 @@
+@import "../../../style/vars";
+
+.app-job-monitor {
+  display: grid;
+  justify-items: center;
+  grid-row-gap: .5rem;
+}
+
+.app-job-monitor__status {
+  text-transform: uppercase;
+}
+
+.app-job-monitor__header {
+  width: 100%;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.app-job-monitor__errors {
+  height: 45vh;
+  justify-self: stretch;
+
+  .header, .row {
+    display: grid;
+    grid-template-columns: .2fr .8fr;
+  }
+
+  .header {
+    font-weight: 400;
+    border-bottom: 1px solid rgba($white, .8)
+  }
+
+  .body {
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .row {
+    border-bottom: 1px solid rgba($white, .5);
+  }
+}
+
+.progress-bar {
+  position: relative;
+  height: 1rem;
+  width: 100%;
+  border: 1px solid rgba($blue3, .4);
+
+  .filler {
+    background: rgba($blue3, .8);
+    height: 100%;
+    transition: width .2s ease-in;
+  }
+
+  &.error {
+    border: 1px solid rgba($red, .4);
+    .filler {
+      background: rgba($red, .8);
+    }
+  }
+}

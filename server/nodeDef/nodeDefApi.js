@@ -1,6 +1,13 @@
-const {getRestParam} = require('../serverUtils/request')
 const {sendErr, sendOk} = require('../serverUtils/response')
-const {validateNodeDef, validateNodeDefs} = require('./nodeDefValidator')
+const {
+  getRestParam,
+  getBoolParam,
+} = require('../serverUtils/request')
+
+const {
+  validateNodeDef,
+  validateNodeDefs
+} = require('./nodeDefValidator')
 
 const {
   createNodeDef,
@@ -35,8 +42,8 @@ module.exports.init = app => {
   app.get('/nodeDef/:id/children', async (req, res) => {
     try {
       const nodeDefId = getRestParam(req, 'id')
-      const draft = getRestParam(req, 'draft') === 'true'
-      const validate = getRestParam(req, 'validate') === 'true'
+      const draft = getBoolParam(req, 'draft')
+      const validate = getBoolParam(req, 'validate')
 
       const nodeDefsDB = await fetchNodeDefsByParentId(nodeDefId, draft)
       const nodeDefs = validate

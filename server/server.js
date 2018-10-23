@@ -4,6 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const compression = require('compression')
 const cookieParser = require('cookie-parser')
+const fileUpload = require('express-fileupload')
 
 const sessionMiddleware = require('./config/sessionMiddleware')
 const headerMiddleware = require('./config/headerMiddleware')
@@ -20,6 +21,11 @@ const app = express()
 // app initializations
 app.use(bodyParser.json({limit: '5000kb'}))
 app.use(cookieParser())
+app.use(fileUpload({
+  //limit upload to 50MB
+  limits: { fileSize: 50 * 1024 * 1024 },
+}))
+
 headerMiddleware.init(app)
 sessionMiddleware.init(app)
 authConfig.init(app)

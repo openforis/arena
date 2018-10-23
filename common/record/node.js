@@ -65,6 +65,8 @@ module.exports = {
 
   // ==== READ
   getNodeValue,
+  getNodeDefId: R.prop('nodeDefId'),
+  getNodeRecordId: R.prop('recordId'),
 
   // ==== UTILS
   isNodeValueBlank,

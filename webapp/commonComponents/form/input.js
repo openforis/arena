@@ -12,39 +12,23 @@ export const FormItem = ({label, children}) => (
   </div>
 )
 
-export class Input extends React.Component {
+export const Input = React.forwardRef((props, ref) => {
 
-  constructor () {
-    super()
-    this.input = React.createRef()
-  }
+  const {
+    validation = {},
+    disabled = false,
+    mask = false,
+    ...inputProps,
+  } = props
 
-  render () {
-
-    const {
-      validation,
-      disabled,
-      mask,
-      ...inputProps,
-    } = this.props
-
-    return (
-      <TooltipError messages={validation.errors}>
-        <MaskedInput ref={this.input}
-                     mask={mask}
-                     className="form-input"
-                     {...inputProps}
-        />
-
-
-      </TooltipError>
-    )
-  }
-
-}
-
-Input.defaultProps = {
-  validation: {},
-  disabled: false,
-  mask: false,
-}
+  return (
+    <TooltipError messages={validation.errors}>
+      <MaskedInput ref={ref}
+                   mask={mask}
+                   className="form-input"
+                   aria-disabled={disabled}
+                   {...inputProps}
+      />
+    </TooltipError>
+  )
+})

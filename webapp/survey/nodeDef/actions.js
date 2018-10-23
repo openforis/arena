@@ -90,11 +90,8 @@ export const closeFormNodeDefEdit = nodeDef => async dispatch => {
   const res = await axios.get(`/api/nodeDef/${nodeDef.id}/validation`)
   const {validation} = res.data
 
-  if (!validation || validation.valid) {
-    dispatch({type: formNodeDefEditUpdate, nodeDef: null})
-  } else {
-    dispatch({type: nodeDefValidationUpdate, nodeDefUUID: nodeDef.uuid, validation})
-  }
+  dispatch({type: formNodeDefEditUpdate, nodeDef: null})
+  dispatch({type: nodeDefValidationUpdate, nodeDefUUID: nodeDef.uuid, validation})
 }
 
 //SURVEY FORM ACTIVE PAGE

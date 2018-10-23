@@ -3,7 +3,11 @@ const Promise = require('bluebird')
 
 const {validate, validateProp, validateRequired} = require('../../common/validation/validator')
 const {fetchNodeDefsBySurveyId} = require('./nodeDefRepository')
-const {getNodeDefName} = require('../../common/survey/nodeDef')
+const {
+  getNodeDefName,
+  getNodeDefType,
+  nodeDefType
+} = require('../../common/survey/nodeDef')
 
 const validateNodeDefNameUniqueness = async (propName, nodeDef) => {
   const nodeDefs = await fetchNodeDefsBySurveyId(nodeDef.surveyId, true)
@@ -18,8 +22,21 @@ const validateNodeDefNameUniqueness = async (propName, nodeDef) => {
     : null
 }
 
+const validateCodeList = async (propName, nodeDef) =>
+  getNodeDefType(nodeDef) === nodeDefType.codeList
+    ? validateRequired(propName, nodeDef)
+    : null
+
+const validateTaxonomy = async (propName, nodeDef) =>
+  getNodeDefType(nodeDef) === nodeDefType.taxon
+    ? validateRequired(propName, nodeDef)
+    : null
+
+
 const propsValidations = {
   'props.name': [validateRequired, validateNodeDefNameUniqueness],
+  'props.codeListUUID': [validateCodeList],
+  'props.taxonomyUUID': [validateTaxonomy],
 }
 
 const validateNodeDef = async nodeDef =>

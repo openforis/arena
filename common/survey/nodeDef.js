@@ -43,10 +43,13 @@ const getNodeDefName = getProp('name', '')
 
 const isNodeDefKey = R.pipe(getProp('key'), R.equals(true))
 const isNodeDefMultiple = R.pipe(getProp('multiple'), R.equals(true))
-
 const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
-const isNodeDefEntity = R.pipe(getNodeDefType, R.equals(nodeDefType.entity))
+
+const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
+const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
+const isNodeDefCodeList = isNodeDefType(nodeDefType.codeList)
+const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
 // ==== UPDATE
 
@@ -78,12 +81,17 @@ module.exports = {
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
+  getNodeDefCodeListUUID: getProp('codeListUUID'),
+  getNodeDefParentCodeUUID: getProp('parentCodeUUID'),
+  getNodeDefTaxonomyUUID: getProp('taxonomyUUID'),
 
   isNodeDefKey,
   isNodeDefMultiple,
   isNodeDefRoot,
   isNodeDefEntity,
   isNodeDefSingleEntity,
+  isNodeDefCodeList,
+  isNodeDefTaxon,
 
   //UTILS
   canNodeDefBeMultiple,

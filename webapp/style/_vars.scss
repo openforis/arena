@@ -4,6 +4,7 @@ $whiteLight: rgba($white, 0.6);
 $red: #dc4242;
 $blue1: #c6d6e1;
 $blue2: #defbff;
+$blue3: #17a2b8;
 $pink: #f9e1e2;
 //$yellow: #debf32;
 $yellow: #d6c990;
@@ -18,6 +19,7 @@ $black: #343736;
 //z-indexes
 $zIndex1App: 1;
 $zIndex10TopOfApp: 10;
+$zIndex19AppModal: 19;
 $zIndex20Dropdown: 20;
 
 //OF style
@@ -27,6 +29,10 @@ $ofBorderRadius: 255px 15px 225px 15px/15px 225px 15px 255px;
 $ofBorderColorLight: rgba($white, .4) !important;
 $ofBorderColorLightS: rgba($white, .2) !important;
 $ofBorderColorLightXs: rgba($white, .1) !important;
+
+$shadow1: 0 0 4px rgba($black, .2);
+$shadow2: 0 0 8px rgba($black, .2);
+$shadow3: 0 0 8px 1px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.1);
 
 @mixin of() {
   border-radius: $ofBorderRadius;

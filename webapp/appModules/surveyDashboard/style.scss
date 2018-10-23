@@ -27,3 +27,37 @@
   padding: 0;
   grid-row-gap: .5rem;
 }
+
+.app-dashboard__survey-info {
+  display: grid;
+  grid-template-columns: .25fr .5fr .25fr;
+  grid-template-rows: .7fr .2fr;
+  background-color: rgba($blue1, 0.1);
+
+  .survey-name {
+    grid-column: 2;
+    align-self: center;
+    justify-self: center;
+    font-weight: 400;
+  }
+
+  .survey-status {
+    position: absolute;
+    right: 25%;
+    top: 1rem;
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .button-bar {
+    grid-column: 2;
+    display: flex;
+
+    button {
+      flex-grow: 1;
+      flex-basis: 0;
+      margin: 0 .5rem;
+    }
+  }
+}
