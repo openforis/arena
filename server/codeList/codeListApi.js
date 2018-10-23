@@ -4,7 +4,7 @@ const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/reque
 const {
   fetchCodeListById,
   validateCodeListProps,
-} = require('../survey/surveyManager')
+} = require('../codeList/codeListManager')
 
 const {
   validateCodeListLevels,

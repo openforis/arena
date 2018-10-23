@@ -1,7 +1,9 @@
 const db = require('../server/db/db')
 
-const {findUserByEmailAndPassword} = require('../server/user/userRepository')
 const {deleteSurvey} = require('../server/survey/surveyManager')
+
+const {findUserByEmailAndPassword} = require('../server/user/userRepository')
+const {setUserPref, userPrefNames} = require('../common/user/userPrefs')
 
 let user = null
 let survey = null
@@ -18,6 +20,11 @@ const destroyTestContext = async () => {
   await deleteSurvey(survey.id, user)
 }
 
+const setContextSurvey = s => {
+  survey = s
+  user = setUserPref(userPrefNames.survey, survey.id)(user)
+}
+
 module.exports = {
   initTestContext,
   destroyTestContext,
@@ -25,6 +32,6 @@ module.exports = {
   getContextUser: () => user,
 
   getContextSurvey: () => survey,
-  setContextSurvey: s => survey = s,
+  setContextSurvey
 }
 
