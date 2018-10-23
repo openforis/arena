@@ -6,12 +6,13 @@ const {
 
 const {
   fetchUserSurveys,
-  createSurvey,
   fetchRootNodeDef,
   updateSurveyProp
 } = require('./surveyRepository')
+
 const {
-  fetchSurveyById
+  createSurvey,
+  fetchSurveyById,
 } = require('./surveyManager')
 
 const {

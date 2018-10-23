@@ -12,12 +12,14 @@ import createDebounce from 'redux-debounced'
 
 import reducer from './rootReducer'
 
+import { isEnvDevelopment } from '../common/processUtils'
+
 const middlewares = [createDebounce(), thunkMiddleware]
 
-if (process.env.NODE_ENV === 'development') {
-  const { logger } = require('redux-logger')
+if (isEnvDevelopment()) {
+  const {logger} = require('redux-logger')
 
-  middlewares.push(logger);
+  middlewares.push(logger)
 }
 
 const store = createStore(

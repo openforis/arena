@@ -5,11 +5,12 @@ const config = require('../migrationConfig')
 
 const {fetchAllSurveys} = require('../../../survey/surveyRepository')
 const {migrateSurveySchema} = require('../survey/execMigrations')
+const {getProcessNodeEnv} = require('../../../../common/processUtils')
 
 const migrateOptions = {
   config,
   cwd: `${__dirname}/`,
-  env: process.env.NODE_ENV,
+  env: getProcessNodeEnv(),
 }
 
 const migrateSurveySchemas = async () => {

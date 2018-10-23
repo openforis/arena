@@ -3,13 +3,14 @@ const R = require('ramda')
 
 const db = require('../../db')
 const config = require('../migrationConfig')
+const {getProcessNodeEnv} = require('../../../../common/processUtils')
 
 const {getSurveyDBSchema} = require('../../../../common/survey/survey')
 
 const migrateOptions = {
   config,
   cwd: `${__dirname}/`,
-  env: process.env.NODE_ENV,
+  env: getProcessNodeEnv(),
 }
 
 const migrateSurveySchema = async(surveyId) => {
@@ -20,7 +21,7 @@ const migrateSurveySchema = async(surveyId) => {
   // first create db schema
   await db.none(`CREATE SCHEMA IF NOT EXISTS ${schema}`)
 
-  const options = R.assocPath(['config', process.env.NODE_ENV, 'schema'], schema)(migrateOptions)
+  const options = R.assocPath(['config', getProcessNodeEnv(), 'schema'], schema)(migrateOptions)
 
   const dbm = DBMigrate.getInstance(true, options)
   await dbm.up()

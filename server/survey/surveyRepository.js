@@ -1,66 +1,27 @@
 const db = require('../db/db')
 const {getSurveyDBSchema} = require('../../common/survey/survey')
 
-const {uuidv4} = require('../../common/uuid')
 const {selectDate} = require('../db/dbUtils')
-
-const {updateUserPref} = require('../user/userRepository')
-const {userPrefNames} = require('../../common/user/userPrefs')
 
 const {
   defDbTransformCallback: dbTransformCallback
 } = require('../../common/survey/surveyUtils')
 
-const {defaultSteps} = require('../../common/survey/survey')
-
 const {
-  createEntityDef,
   nodeDefSelectFields,
 } = require('../nodeDef/nodeDefRepository')
 
-const {
-  nodeDefLayoutProps,
-  nodeDefRenderType,
-} = require('../../common/survey/nodeDefLayout')
-
-const {migrateSurveySchema} = require('../db/migration/survey/execMigrations')
-
 // ============== CREATE
 
-const createSurvey = async (user, {name, label, lang}) => db.tx(
-  async t => {
-    const props = {
-      name,
-      labels: {[lang]: label},
-      languages: [lang],
-      srs: ['4326'], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
-      steps: {...defaultSteps},
-    }
-
-    const {id: surveyId} = await t.one(`
+const insertSurvey = async (props, userId, client = db) =>
+  await client.one(`
       INSERT INTO survey (owner_id, props_draft)
       VALUES ($1, $2)
-      RETURNING id
-    `, [user.id, props])
-
-    const rootEntityDefProps = {
-      name: 'root_entity',
-      labels: {[lang]: 'Root entity'},
-      multiple: false,
-      [nodeDefLayoutProps.pageUUID]: uuidv4(),
-      [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-    }
-    await createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
-
-    //create survey data schema
-    migrateSurveySchema(surveyId)
-
-    // update user prefs
-    await updateUserPref(user, userPrefNames.survey, surveyId, t)
-
-    return await getSurveyById(surveyId, true, t)
-  }
-)
+      RETURNING *
+    `,
+    [userId, props],
+    def => dbTransformCallback(def, true)
+  )
 
 // ============== READ
 const fetchAllSurveys = async (client = db) =>
@@ -137,7 +98,7 @@ const deleteSurvey = async (id, client = db) => {
 
 module.exports = {
   // CREATE
-  createSurvey,
+  insertSurvey,
 
   // READ
   fetchAllSurveys,
