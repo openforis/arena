@@ -1,12 +1,13 @@
 const Promise = require('bluebird')
 const R = require('ramda')
+const db = require('../db/db')
 
 const {
   toIndexedObj,
   toUUIDIndexedObj,
 } = require('../../common/survey/surveyUtils')
 
-const {getSurveyById} = require('../survey/surveyRepository')
+const surveyRepository = require('../survey/surveyRepository')
 const {validateSurvey} = require('../survey/surveyValidator')
 
 const {
@@ -19,6 +20,9 @@ const {
   validateCodeList,
 } = require('../codeList/codeListValidator')
 const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
+
+const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
+const {deleteUserPref} = require('../user/userRepository')
 
 /**
  * ===== CODE LIST
@@ -64,8 +68,10 @@ const validateCodeListProps = async (surveyId, codeListId) => {
 /**
  * ===== SURVEY
  */
+
+// ====== READ
 const fetchSurveyById = async (id, draft) => {
-  const survey = await getSurveyById(id, draft)
+  const survey = await surveyRepository.getSurveyById(id, draft)
   const codeLists = await fetchCodeLists(id, draft)
   const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
 
@@ -77,8 +83,23 @@ const fetchSurveyById = async (id, draft) => {
   }
 }
 
+// ====== DELETE
+const deleteSurvey = async (id, user) => {
+  await db.tx(async t => {
+
+    const userPrefSurveyId = getUserPrefSurveyId(user)
+    if (userPrefSurveyId === id)
+      await deleteUserPref(user, userPrefNames.survey, t)
+
+    await surveyRepository.deleteSurvey(id, t)
+
+  })
+}
+
 module.exports = {
   fetchSurveyById,
+  deleteSurvey,
+
   fetchCodeListById,
   validateCodeListProps,
 }

@@ -14,7 +14,7 @@
     "watch": "cross-env-shell NODE_ENV=development \"yarn build:watch & yarn watch:server\"",
     "watch:server": "nodemon -e js --watch server server/server.js",
     "create-migration": "./server/db/migration/create-migration.sh",
-    "test": "mocha-webpack \"test/it/*.js\""
+    "test": "mocha-webpack --webpack-config webpack.config-test.js \"test/it/*.js\""
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

@@ -1,4 +1,5 @@
 const db = require('../db/db')
+const {getSurveyDBSchema} = require('../../common/survey/survey')
 
 const {uuidv4} = require('../../common/uuid')
 const {selectDate} = require('../db/dbUtils')
@@ -129,6 +130,10 @@ const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
 }
 
 // ============== DELETE
+const deleteSurvey = async (id, client = db) => {
+  await client.query(`DROP SCHEMA ${getSurveyDBSchema(id)}`)
+  await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
+}
 
 module.exports = {
   // CREATE
@@ -144,4 +149,6 @@ module.exports = {
   //UPDATE
   updateSurveyProp,
 
+  //DELETE
+  deleteSurvey,
 }
