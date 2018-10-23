@@ -34,6 +34,12 @@ const getNodeValue = (node = {}, defaultValue = {}) => R.pipe(
   R.defaultTo(defaultValue)
 )(node)
 
+const getNodeFileName = R.pipe(
+  getNodeValue,
+  R.prop('fileName'),
+  R.defaultTo(''),
+)
+
 /**
  * ======
  * UPDATE
@@ -67,6 +73,7 @@ module.exports = {
   getNodeValue,
   getNodeDefId: R.prop('nodeDefId'),
   getNodeRecordId: R.prop('recordId'),
+  getNodeFileName,
 
   // ==== UTILS
   isNodeValueBlank,

@@ -4,7 +4,6 @@ const {sendErr} = require('../serverUtils/response')
 const {createRecord, persistNode, deleteNode, fetchNodeFileByUUID} = require('./recordManager')
 const {getNodeValue} = require('../../common/record/node')
 
-
 module.exports.init = app => {
 
   // ==== CREATE
@@ -40,7 +39,7 @@ module.exports.init = app => {
   })
 
   // ==== READ
-  app.get('/survey/:surveyId/record/:recordId/nodes/:nodeUUID/file', async(req, res) => {
+  app.get('/survey/:surveyId/record/:recordId/nodes/:nodeUUID/file', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUUID = getRestParam(req, 'nodeUUID')
@@ -51,7 +50,6 @@ module.exports.init = app => {
       res.setHeader('Content-disposition', `attachment; filename=${value.fileName}`)
       // res.set('Content-Type', 'text/csv')
 
-      console.log(node.file)
       res.write(node.file, 'binary')
       res.end(null, 'binary')
     } catch (err) {
@@ -73,7 +71,6 @@ module.exports.init = app => {
   //
 
   // ==== UPDATE
-
 
   // ==== DELETE
 
