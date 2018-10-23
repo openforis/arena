@@ -59,7 +59,7 @@ const createNode = async (nodeDef, nodeReq, file, client = db) => {
       childDefs
         .filter(isNodeDefSingleEntity)
         .map(
-          async childDef => await createNode(childDef, newNode(childDef.id, node.recordId, node.uuid), client)
+          async childDef => await createNode(childDef, newNode(childDef.id, node.recordId, node.uuid), null, client)
         )
     )
   )

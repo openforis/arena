@@ -19,7 +19,7 @@ class UploadButton extends React.Component {
         onChange={() => onChange(this.fileInput.current.files)}/>
 
       <button className="btn btn-of btn-upload"
-              disabled={disabled}
+              aria-disabled={disabled}
               onClick={() => {
                 // first reset current value, then trigger click event
                 this.fileInput.current.value = ''
