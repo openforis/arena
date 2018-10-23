@@ -89,14 +89,18 @@ const _updateNodeDebounced = (surveyId, node, file, delay) => {
   const action = async dispatch => {
     try {
       const formData = new FormData()
-      formData.append('file', file)
       formData.append('node', JSON.stringify(node))
 
-      const config = {
-        headers: {
-          'content-type': 'multipart/form-data'
+      if (file)
+        formData.append('file', file)
+
+      const config = file
+        ? {
+          headers: {
+            'content-type': 'multipart/form-data'
+          }
         }
-      }
+        : {}
 
       const {data} = await axios.post(`/api/survey/${surveyId}/record/${node.recordId}/node`, formData, config)
       dispatchNodesUpdate(dispatch, data.nodes)

@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
 
@@ -27,7 +29,7 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/record/:recordId/node', async (req, res) => {
     try {
       const node = JSON.parse(req.body.node)
-      const file = req.files.file
+      const file = R.path(['files', 'file'])(req)
 
       const surveyId = getRestParam(req, 'surveyId')
       const nodes = await persistNode(surveyId, node, file)
