@@ -5,6 +5,9 @@ const {getSurveyDBSchema} = require('../../common/survey/survey')
 
 const dbTransformCallback = camelize
 
+// All columns but 'file'
+const nodeColumns = 'id, uuid, record_id, parent_id, node_def_id, value, date_created'
+
 // ============== CREATE
 
 const insertNode = async (surveyId, node, fileContent, client = db) => {
@@ -17,15 +20,13 @@ const insertNode = async (surveyId, node, fileContent, client = db) => {
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
     (uuid, record_id, parent_id, node_def_id, value, file)
     VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING *`,
+    RETURNING ${nodeColumns}`,
     [node.uuid, node.recordId, parent ? parent.id : null, node.nodeDefId, node.value ? JSON.stringify(node.value) : null, fileContent],
     dbTransformCallback
   )
 }
 
 // ============== READ
-
-const nodeColumns = 'id, uuid, record_id, parent_id, node_def_id, value, date_created'
 
 const fetchNodesByRecordId = async (surveyId, recordId, client = db) =>
   await client.map(`
@@ -58,7 +59,7 @@ const updateNode = async (surveyId, nodeUUID, value, fileContent = null, client 
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1, file = $2
     WHERE uuid = $3
-    RETURNING *
+    RETURNING ${nodeColumns}
     `, [value ? JSON.stringify(value) : null, fileContent, nodeUUID],
     dbTransformCallback
   )
@@ -68,7 +69,7 @@ const deleteNode = async (surveyId, nodeUUID, client = db) =>
   await client.one(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1
-    RETURNING *
+    RETURNING ${nodeColumns}
     `, [nodeUUID],
     dbTransformCallback
   )

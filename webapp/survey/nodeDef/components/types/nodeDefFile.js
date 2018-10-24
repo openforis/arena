@@ -4,8 +4,12 @@ import * as R from 'ramda'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
 import NodeDefFormItem from './nodeDefFormItem'
+import NodeDefDeleteButton from '../nodeDefDeleteButton'
+
+import { elementOffset } from '../../../../appUtils/domUtils'
 
 import { getNodeValue, getNodeFileName } from '../../../../../common/record/node'
+import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 const getFileExtension = R.pipe(
   getNodeFileName,
@@ -24,23 +28,57 @@ const getFileName = node => R.pipe(
     : fileName + '.' + getFileExtension(node)
 )(node)
 
-class NodeDefFile extends React.Component {
+const NodeDefFileInput = ({survey, nodeDef, edit, record, node, updateNode, removeNode}) =>
+  node
+    ? <div className="node-def__file-input">
+        <UploadButton disabled={edit}
+                      showLabel={false}
+                      onChange={files => updateNode(nodeDef, node, {fileName: files[0].name}, files[0])}/>
 
-  render () {
-    const {nodeDef, edit, nodes, updateNode, survey, record} = this.props
+        <DownloadButton href={`/api/survey/${survey.id}/record/${record.id}/nodes/${node.uuid}/file`}
+                        disabled={edit || R.isEmpty(getNodeValue(node))}
+                        label={getFileName(node)}/>
 
-    const node = edit ? null : nodes[0]
+        <NodeDefDeleteButton nodeDef={nodeDef}
+                             node={node}
+                             disabled={edit || R.isEmpty(getNodeValue(node))}
+                             showConfirm={true}
+                             removeNode={removeNode}/>
+      </div>
+    : null
+
+const NodeDefFile = props => {
+  const {nodeDef, edit, nodes, renderType, label} = props
+
+  // table header
+  if (renderType === nodeDefRenderType.tableHeader) {
+    return <label className="node-def__table-header">
+      {label}
+    </label>
+  }
+
+  // EDIT MODE
+
+  if (edit)
+    return <NodeDefFormItem {...props}>
+      <NodeDefFileInput {...props} />
+    </NodeDefFormItem>
+
+  // ENTRY MODE
+
+  if (renderType === nodeDefRenderType.tableBody) {
+    return <NodeDefFileInput {...props} node={nodes[0]}/>
+  } else {
+    const domElem = document.getElementById(nodeDef.uuid)
+    const {height} = domElem ? elementOffset(domElem) : {height: 80}
 
     return (
-      <NodeDefFormItem {...this.props}>
-        <div className="node-def__file-wrapper">
-          <UploadButton disabled={edit}
-                        showLabel={false}
-                        onChange={files => updateNode(nodeDef, node, {fileName: files[0].name}, files[0])}/>
-          {node &&
-          <DownloadButton href={`/api/survey/${survey.id}/record/${record.id}/nodes/${node.uuid}/file`}
-                          disabled={R.isEmpty(getNodeValue(node))}
-                          label={getFileName(node)}/>
+      <NodeDefFormItem {...props}>
+        <div className="overflowYAuto" style={{maxHeight: height}}>
+          {
+            nodes.map(n =>
+              <NodeDefFileInput {...props} node={n}/>
+            )
           }
         </div>
       </NodeDefFormItem>
