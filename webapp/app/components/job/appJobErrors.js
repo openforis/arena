@@ -6,31 +6,7 @@ import {
   isJobFailed,
 } from '../../../../common/job/job'
 
-const ErrorMessage = ({error}) => {
-  const fields = R.keys(error)
-
-  return <span>
-  {
-    fields.map(
-      (field, i) => <React.Fragment key={i}>
-        <span>
-          {field}:{' '}
-          {
-            R.pipe(
-              R.path([field, 'errors']),
-              R.join(', ')
-            )(error)
-          }
-          </span>
-        {
-          i !== fields.length - 1 &&
-          <br/>
-        }
-      </React.Fragment>
-    )
-  }
-</span>
-}
+import { getValidationFieldMessagesHTML } from '../../../appUtils/validationUtils'
 
 const AppJobErrors = ({job}) => {
 
@@ -52,7 +28,7 @@ const AppJobErrors = ({job}) => {
                     {1 + rowIndex}
                   </div>
                   <div>
-                    <ErrorMessage error={errors[rowIndex]}/>
+                    {getValidationFieldMessagesHTML(errors[rowIndex])}
                   </div>
                 </div>
               )
