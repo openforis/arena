@@ -20,3 +20,11 @@
   display: flex;
   flex-direction: column;
 }
+
+.node-def__file-input {
+
+  .btn-upload,
+  .btn-download {
+    margin-right: 2rem;
+  }
+}
