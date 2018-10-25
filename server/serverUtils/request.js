@@ -21,7 +21,7 @@ const getJsonParam = R.pipe(
 const toQueryString = obj =>
   R.reduce((acc, key) => {
     const value = R.prop(key)(obj)
-    if (value) {
+    if (value || value === false) {
       const reqVal = R.is(Object, value)
         ? JSON.stringify(value)
         : value

@@ -1,6 +1,8 @@
 import axios from 'axios'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
+import { toQueryString } from '../../../server/serverUtils/request'
+
 import { newNodeDef, isNodeDefEntity } from '../../../common/survey/nodeDef'
 import { getPageUUID } from '../../../common/survey/nodeDefLayout'
 import { getSurveyId } from '../surveyState'
@@ -37,10 +39,14 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
 
 // ==== READ
 
-export const fetchNodeDefChildren = (id, draft = false, validate = false) => async dispatch => {
+export const fetchNodeDefs = (surveyId, draft = false) => async dispatch => {
   try {
-    const {data} = await axios.get(`/api/nodeDef/${id}/children?draft=${draft}&validate=${validate}`)
-    dispatch({type: nodeDefsUpdate, ...data})
+    const params = {
+      surveyId,
+      draft,
+    }
+    const {data} = await axios.get(`/api/nodeDefs?${toQueryString(params)}`)
+    dispatch({type: nodeDefsUpdate, nodeDefs: data.nodeDefs})
   } catch (e) { }
 }
 

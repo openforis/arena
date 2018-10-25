@@ -13,6 +13,7 @@ const {
   createNodeDef,
 
   fetchNodeDef,
+  fetchNodeDefsBySurveyId,
   fetchNodeDefsByParentId,
 
   updateNodeDefProp,
@@ -38,6 +39,22 @@ module.exports.init = app => {
   })
 
   // ==== READ
+
+  app.get(`/nodeDefs`, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const draft = getBoolParam(req, 'draft')
+
+      const nodeDefsDB = await fetchNodeDefsBySurveyId(surveyId, draft)
+      const nodeDefs = draft
+        ? await validateNodeDefs(nodeDefsDB)
+        : nodeDefsDB
+
+      res.json({nodeDefs})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
 
   app.get('/nodeDef/:id/children', async (req, res) => {
     try {

@@ -55,6 +55,16 @@ const fetchNodeDefsBySurveyId = async (surveyId, draft, client = db) =>
     res => dbTransformCallback(res, draft)
   )
 
+const fetchRootNodeDef = async (surveyId, draft, client = db) =>
+  await client.one(
+    `SELECT ${nodeDefSelectFields}
+     FROM node_def 
+     WHERE parent_id IS NULL
+     AND survey_id =$1`,
+    [surveyId],
+    res => dbTransformCallback(res, draft)
+  )
+
 const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields}
@@ -113,6 +123,7 @@ module.exports = {
   //READ
   fetchNodeDef,
   fetchNodeDefsBySurveyId,
+  fetchRootNodeDef,
   fetchNodeDefsByParentId,
 
   //UPDATE

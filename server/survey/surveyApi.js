@@ -6,7 +6,6 @@ const {
 
 const {
   fetchUserSurveys,
-  fetchRootNodeDef,
   updateSurveyProp
 } = require('./surveyRepository')
 
@@ -64,21 +63,6 @@ module.exports.init = app => {
       const survey = await fetchSurveyById(surveyId, draft)
 
       res.json({survey})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
-
-  // fetch root node definition
-  app.get('/survey/:id/rootNodeDef', async (req, res) => {
-    try {
-
-      const draft = getRestParam(req, 'draft') === 'true'
-      const surveyId = getRestParam(req, 'id')
-
-      const nodeDef = await fetchRootNodeDef(surveyId, draft)
-      res.json({nodeDef})
-
     } catch (err) {
       sendErr(res, err)
     }
