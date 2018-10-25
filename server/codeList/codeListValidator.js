@@ -109,7 +109,6 @@ const validateCodeList = async (codeLists, codeList, items) => {
 
 module.exports = {
   validateCodeList,
-  validateCodeListProps,
   validateCodeListLevels,
   validateCodeListItems,
 }

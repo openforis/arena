@@ -3,9 +3,10 @@ import * as R from 'ramda'
 
 import { Input } from '../../../../commonComponents/form/input'
 import NodeDefFormItem from './nodeDefFormItem'
+import NodeDefDeleteButton from '../nodeDefDeleteButton'
 
-import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
 
 import { getNodeValue } from '../../../../../common/record/node'
 import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
@@ -19,18 +20,6 @@ const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
            updateNode(nodeDef, node, e.target.value)
          }
   />
-
-const NodeDefDeleteButton = ({nodeDef, node, removeNode}) =>
-  node.placeholder || !isNodeDefMultiple(nodeDef)
-    ? null
-    : <button className="btn btn-s btn-of-light-xs"
-              style={{
-                alignSelf: 'center',
-                justifySelf: 'center',
-              }}
-              onClick={() => removeNode(nodeDef, node)}>
-      <span className="icon icon-bin icon-12px"/>
-    </button>
 
 const NodeDefText = props => {
 
@@ -74,7 +63,9 @@ const NodeDefText = props => {
 
                 <NodeDefTextInput {...props} node={n}/>
 
-                <NodeDefDeleteButton {...props} node={n}/>
+                {!n.placeholder && isNodeDefMultiple(nodeDef) &&
+                  <NodeDefDeleteButton {...props} node={n}/>
+                }
 
               </div>
             )

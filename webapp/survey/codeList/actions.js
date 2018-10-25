@@ -41,7 +41,10 @@ export const codeListEditLevelItemsUpdate = 'survey/codeListEdit/levelItems/upda
 export const codeListEditActiveLevelItemUpdate = 'survey/codeListEdit/activeLevelItem/update'
 
 const dispatchCodeListUpdate = (dispatch, codeList) =>
-  dispatch({type: codeListsUpdate, codeLists: {[codeList.uuid]: codeList}})
+  dispatchCodeListsUpdate(dispatch, {[codeList.uuid]: codeList})
+
+const dispatchCodeListsUpdate = (dispatch, codeLists) =>
+  dispatch({type: codeListsUpdate, codeLists})
 
 const dispatchCodeListEditUpdate = (dispatch, codeListUUID) =>
   dispatch({type: codeListEditUpdate, codeListUUID})
@@ -144,20 +147,12 @@ export const putCodeListProp = (codeListUUID, key, value) => async (dispatch, ge
   const action = async () => {
     try {
       const {data} = await axios.put(`/api/survey/${survey.id}/codeLists/${codeList.id}`, {key, value})
-      const {validation} = data
+      const {codeLists} = data
 
-      const updatedValidation = updateFieldValidation(
-        key,
-        getFieldValidation(key)(validation)
-      )(codeList.validation)
-
-      const updatedCodeList = R.assoc('validation', updatedValidation)(codeList)
-
-      dispatchCodeListUpdate(dispatch, updatedCodeList)
+      dispatchCodeListsUpdate(dispatch, toUUIDIndexedObj(codeLists))
     } catch (e) {}
   }
   dispatch(debounceAction(action, `${codeListsUpdate}_${codeList.uuid}`))
-
 }
 
 export const putCodeListLevelProp = (codeListId, levelIndex, key, value) => async (dispatch, getState) => {

@@ -18,7 +18,7 @@ const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
 const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
-const {fetchCodeLists} = require('../codeList/codeListManager')
+const {fetchCodeListsBySurveyId} = require('../codeList/codeListManager')
 
 /**
  * ===== SURVEY
@@ -60,7 +60,7 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
 // ====== READ
 const fetchSurveyById = async (id, draft) => {
   const survey = await surveyRepository.getSurveyById(id, draft)
-  const codeLists = await fetchCodeLists(id, draft)
+  const codeLists = await fetchCodeListsBySurveyId(id, draft)
   const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
 
   return {
