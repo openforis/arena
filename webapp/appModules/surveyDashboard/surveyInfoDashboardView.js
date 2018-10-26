@@ -14,7 +14,7 @@ import { deleteSurvey, publishSurvey } from '../../survey/actions'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
 
-class SurveyInfoDashbaordView extends React.Component {
+class SurveyInfoDashboardView extends React.Component {
 
   constructor (props) {
     super(props)
@@ -97,4 +97,4 @@ const mapStateToProps = state => ({
   survey: getSurvey(state)
 })
 
-export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfoDashbaordView)
+export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfoDashboardView)
