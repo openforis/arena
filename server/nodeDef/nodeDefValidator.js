@@ -1,26 +1,9 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {validate, validateProp, validateRequired} = require('../../common/validation/validator')
-const {fetchNodeDefsBySurveyId} = require('./nodeDefRepository')
-const {
-  getNodeDefName,
-  getNodeDefType,
-  nodeDefType
-} = require('../../common/survey/nodeDef')
+const {validate, validateItemPropUniqueness, validateRequired} = require('../../common/validation/validator')
 
-const validateNodeDefNameUniqueness = async (propName, nodeDef) => {
-  const nodeDefs = await fetchNodeDefsBySurveyId(nodeDef.surveyId, true)
-
-  const hasDuplicates = R.any(
-    n => getNodeDefName(n) === getNodeDefName(nodeDef) && n.id !== nodeDef.id,
-    nodeDefs
-  )
-
-  return hasDuplicates
-    ? 'duplicate'
-    : null
-}
+const {getNodeDefType, nodeDefType} = require('../../common/survey/nodeDef')
 
 const validateCodeList = async (propName, nodeDef) =>
   getNodeDefType(nodeDef) === nodeDefType.codeList
@@ -32,24 +15,22 @@ const validateTaxonomy = async (propName, nodeDef) =>
     ? validateRequired(propName, nodeDef)
     : null
 
-
-const propsValidations = {
-  'props.name': [validateRequired, validateNodeDefNameUniqueness],
+const propsValidations = nodeDefs => ({
+  'props.name': [validateRequired, validateItemPropUniqueness(nodeDefs)],
   'props.codeListUUID': [validateCodeList],
   'props.taxonomyUUID': [validateTaxonomy],
-}
+})
 
-const validateNodeDef = async nodeDef =>
-  await validate(nodeDef, propsValidations)
+const validateNodeDef = async (nodeDefs, nodeDef) =>
+  await validate(nodeDef, propsValidations(nodeDefs))
 
 const validateNodeDefs = async (nodeDefs) =>
   await Promise.all(nodeDefs.map(async n => ({
     ...n,
-    validation: await validateNodeDef(n)
+    validation: await validateNodeDef(nodeDefs, n)
   })))
 
 module.exports = {
-  validateNodeDef,
   validateNodeDefs,
 }
 

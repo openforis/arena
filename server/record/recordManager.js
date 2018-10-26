@@ -8,11 +8,23 @@ const {isNodeDefSingleEntity, isNodeDefMultiple} = require('../../common/survey/
 const {assocNodes, getNodeCodeDependentAttributes} = require('../../common/record/record')
 const {newNode, getNodeRecordId, getNodeDefId} = require('../../common/record/node')
 
-const {fetchRootNodeDef, getSurveyById} = require('../survey/surveyRepository')
-const {fetchNodeDef, fetchNodeDefsByParentId, fetchNodeDefsBySurveyId} = require('../nodeDef/nodeDefRepository')
+const {getSurveyById} = require('../survey/surveyRepository')
+const {
+  fetchNodeDef,
+  fetchNodeDefsByParentId,
+  fetchNodeDefsBySurveyId,
+  fetchRootNodeDef
+} = require('../nodeDef/nodeDefRepository')
 
 const {insertRecord, fetchRecordById} = require('../record/recordRepository')
-const {insertNode, updateNode, deleteNode: deleteNodeRepos, fetchNodeByUUID, fetchNodesByRecordId, fetchNodeFileByUUID} = require('../record/nodeRepository')
+const {
+  insertNode,
+  updateNode,
+  deleteNode: deleteNodeRepos,
+  fetchNodeByUUID,
+  fetchNodesByRecordId,
+  fetchNodeFileByUUID
+} = require('../record/nodeRepository')
 
 /**
  * ===================
