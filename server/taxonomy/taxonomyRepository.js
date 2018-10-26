@@ -1,9 +1,8 @@
 const db = require('../db/db')
 const R = require('ramda')
 
-const {updateSurveyTableProp, deleteSurveyTableRecord} = require('../serverUtils/repository')
+const {getSurveyDBSchema, updateSurveySchemaTableProp, deleteSurveySchemaTableRecord} = require('../survey/surveySchemaRepositoryUtils')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
-const {getSurveyDBSchema} = require('../../common/survey/survey')
 const {getTaxonVernacularNames} = require('../../common/survey/taxonomy')
 
 // ============== CREATE
@@ -136,11 +135,11 @@ const fetchTaxaByVernacularName = async (surveyId,
 
 // ============== UPDATE
 
-const updateTaxonomyProp = R.partial(updateSurveyTableProp, ['taxonomy'])
+const updateTaxonomyProp = R.partial(updateSurveySchemaTableProp, ['taxonomy'])
 
 // ============== DELETE
 
-const deleteTaxonomy = R.partial(deleteSurveyTableRecord, ['taxonomy'])
+const deleteTaxonomy = R.partial(deleteSurveySchemaTableRecord, ['taxonomy'])
 
 const deleteTaxaByTaxonomyId = async (surveyId, taxonomyId, client = db) =>
   await client.none(
@@ -153,13 +152,16 @@ module.exports = {
   //CREATE
   insertTaxonomy,
   insertTaxa,
+
   //READ
   fetchTaxonomyById,
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyId,
   fetchTaxaByProp,
+
   //UPDATE
   updateTaxonomyProp,
+
   //DELETE
   deleteTaxonomy,
   deleteTaxaByTaxonomyId,
