@@ -31,7 +31,6 @@ const validateNodeDefs = async (nodeDefs) =>
   })))
 
 module.exports = {
-  validateNodeDef,
   validateNodeDefs,
 }
 

@@ -40,10 +40,10 @@ module.exports.init = app => {
       const nodeDefId = getRestParam(req, 'id')
 
       const nodeDef = await updateNodeDefProp(nodeDefId, body)
-      const nodeDefs = await fetchSurveyNodeDefs(nodeDef.surveyId, true, false)
-      const validation = await validateNodeDef(nodeDefs, nodeDef)
+      const nodeDefs = await fetchSurveyNodeDefs(nodeDef.surveyId, true, true)
+      // const validation = await validateNodeDef(nodeDefs, nodeDef)
 
-      res.json({validation})
+      res.json({nodeDefs})
     } catch (err) {
       sendErr(res, err)
     }
