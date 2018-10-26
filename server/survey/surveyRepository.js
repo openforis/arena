@@ -87,7 +87,7 @@ const publishSurveyProps = async (surveyId, client = db) =>
         props = props || props_draft,
         props_draft = '{}'::jsonb,
         draft = false,
-        published = true,
+        published = true
     WHERE
         n.id = $1
     `, [surveyId]

@@ -12,6 +12,7 @@ const {
   fetchSurveyNodeDefs,
 
   updateSurveyProp,
+  publishSurvey,
 } = require('./surveyManager')
 
 const {
@@ -93,6 +94,19 @@ module.exports.init = app => {
       const validation = await validateSurveyProp(survey, key)
 
       res.json({validation})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.put('/survey/:id/publish', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'id')
+
+      const survey = await publishSurvey(surveyId)
+
+      res.json({survey})
+
     } catch (err) {
       sendErr(res, err)
     }

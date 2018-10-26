@@ -9,10 +9,12 @@ import {
   isSurveyDraft,
 } from '../../../common/survey/survey'
 
-class SurveyInfoView extends React.Component {
+import { publishSurvey } from '../../survey/actions'
+
+class SurveyInfoDashbaordView extends React.Component {
 
   render () {
-    const {survey} = this.props
+    const {survey, publishSurvey} = this.props
 
     return (
       <div className="app-dashboard__survey-info">
@@ -32,7 +34,10 @@ class SurveyInfoView extends React.Component {
         </h4>
 
         <div className="button-bar">
-          <button className="btn btn-of-light" aria-disabled={!isSurveyDraft(survey)}>
+          <button className="btn btn-of-light" aria-disabled={!isSurveyDraft(survey)}
+                  onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
+                    ? publishSurvey()
+                    : null}>
             <span className="icon icon-checkmark2 icon-16px icon-left"/> Publish
           </button>
 
@@ -54,7 +59,7 @@ class SurveyInfoView extends React.Component {
   }
 }
 
-SurveyInfoView.defaultProps = {
+SurveyInfoDashbaordView.defaultProps = {
   survey: {}
 }
 
@@ -62,4 +67,4 @@ const mapStateToProps = state => ({
   survey: getSurvey(state)
 })
 
-export default connect(mapStateToProps)(SurveyInfoView)
+export default connect(mapStateToProps, {publishSurvey})(SurveyInfoDashbaordView)

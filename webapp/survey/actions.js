@@ -96,3 +96,10 @@ const _updateSurveyProp = (survey, key, value) => {
   return debounceAction(action, `${surveyCurrentUpdate}_${key}`)
 }
 
+export const publishSurvey = () => async (dispatch, getState) => {
+  const survey = getSurvey(getState())
+
+  const {data} = await axios.put(`/api/survey/${survey.id}/publish`)
+
+  dispatchCurrentSurveyUpdate(dispatch, data.survey)
+}

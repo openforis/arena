@@ -56,7 +56,7 @@ const createSurvey = async (user, {name, label, lang}) => {
 }
 
 // ====== READ
-const fetchSurveyById = async (id, draft) => {
+const fetchSurveyById = async (id, draft = false, validate = false) => {
   const survey = await surveyRepository.getSurveyById(id, draft)
   const codeLists = await fetchCodeListsBySurveyId(id, draft)
   const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
@@ -65,7 +65,7 @@ const fetchSurveyById = async (id, draft) => {
     ...survey,
     codeLists: toUUIDIndexedObj(codeLists),
     taxonomies: toUUIDIndexedObj(taxonomies),
-    validation: await validateSurvey(survey),
+    validation: validate ? await validateSurvey(survey) : null
   }
 }
 
@@ -84,7 +84,7 @@ const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) =>
 const updateSurveyProp = async (id, key, value, user) =>
   await surveyRepository.updateSurveyProp(id, key, value)
 
-const publishSurvey = async (id, user) =>
+const publishSurvey = async (id, user) => {
   await db.tx(async t => {
 
     await nodeDefRepository.publishNodeDefsProps(id, t)
@@ -96,7 +96,11 @@ const publishSurvey = async (id, user) =>
     await publishTaxonomiesProps(id, t)
 
     await surveyRepository.publishSurveyProps(id, t)
+
   })
+
+  return await fetchSurveyById(id)
+}
 
 // ====== DELETE
 const deleteSurvey = async (id, user) => {
