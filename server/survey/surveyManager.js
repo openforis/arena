@@ -20,6 +20,7 @@ const {fetchCodeListsBySurveyId, publishCodeListsProps} = require('../codeList/c
 
 // ====== CREATE
 const createSurvey = async (user, {name, label, lang}) => {
+
   const survey = await db.tx(
     async t => {
       const props = {
@@ -46,6 +47,7 @@ const createSurvey = async (user, {name, label, lang}) => {
       await updateUserPref(user, userPrefNames.survey, surveyId, t)
 
       return survey
+
     }
   )
 
