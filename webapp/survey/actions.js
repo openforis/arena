@@ -12,6 +12,15 @@ export const surveyNewUpdate = 'survey/new/update'
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyCurrentUpdate, survey})
 
+export const dispatchMarkCurrentSurveyDraft = (dispatch, getState) => {
+
+  const survey = R.pipe(getSurvey,
+    R.assoc('draft', true)
+  )(getState())
+
+  dispatchCurrentSurveyUpdate(dispatch, survey)
+}
+
 // ====== CREATE
 
 export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
@@ -63,6 +72,7 @@ export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
   const survey = R.pipe(
     getSurvey,
     assocSurveyProp(key, value),
+    R.assoc('draft', true),
     assocSurveyPropValidation(key, null)
   )(getState())
 

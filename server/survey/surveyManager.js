@@ -19,37 +19,41 @@ const {fetchTaxonomiesBySurveyId, publishTaxonomiesProps} = require('../taxonomy
 const {fetchCodeListsBySurveyId, publishCodeListsProps} = require('../codeList/codeListManager')
 
 // ====== CREATE
-const createSurvey = async (user, {name, label, lang}) => db.tx(
-  async t => {
-    const props = {
-      name,
-      labels: {[lang]: label},
-      languages: [lang],
-      srs: ['4326'], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
-      steps: {...defaultSteps},
+const createSurvey = async (user, {name, label, lang}) => {
+  const survey = await db.tx(
+    async t => {
+      const props = {
+        name,
+        labels: {[lang]: label},
+        languages: [lang],
+        srs: ['4326'], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
+        steps: {...defaultSteps},
+      }
+
+      const survey = await surveyRepository.insertSurvey(props, user.id, t)
+      const {id: surveyId} = survey
+
+      const rootEntityDefProps = {
+        name: 'root_entity',
+        labels: {[lang]: 'Root entity'},
+        multiple: false,
+        [nodeDefLayoutProps.pageUUID]: uuidv4(),
+        [nodeDefLayoutProps.render]: nodeDefRenderType.form,
+      }
+      await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
+
+      // update user prefs
+      await updateUserPref(user, userPrefNames.survey, surveyId, t)
+
+      return survey
     }
+  )
 
-    const survey = await surveyRepository.insertSurvey(props, user.id, t)
-    const {id: surveyId} = survey
+  //create survey data schema
+  await migrateSurveySchema(survey.id)
 
-    const rootEntityDefProps = {
-      name: 'root_entity',
-      labels: {[lang]: 'Root entity'},
-      multiple: false,
-      [nodeDefLayoutProps.pageUUID]: uuidv4(),
-      [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-    }
-    await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
-
-    //create survey data schema
-    await migrateSurveySchema(surveyId)
-
-    // update user prefs
-    await updateUserPref(user, userPrefNames.survey, surveyId, t)
-
-    return survey
-  }
-)
+  return survey
+}
 
 // ====== READ
 const fetchSurveyById = async (id, draft) => {
