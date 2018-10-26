@@ -5,10 +5,10 @@ const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 const {
   countTaxaByTaxonomyId,
   fetchTaxaByProp,
-  insertTaxonomy,
+  createTaxonomy,
   updateTaxonomyProp,
   deleteTaxonomy
-} = require('./taxonomyRepository')
+} = require('./taxonomyManager')
 const {importTaxa, exportTaxa} = require('./taxonomyManager')
 const {fetchTaxonomiesBySurveyId} = require('./taxonomyManager')
 
@@ -20,7 +20,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const {body} = req
 
-      const taxonomy = await insertTaxonomy(surveyId, body)
+      const taxonomy = await createTaxonomy(surveyId, body)
 
       res.json({taxonomy})
     } catch (err) {
@@ -87,8 +87,9 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyId = getRestParam(req, 'taxonomyId')
       const {body} = req
+      const {key, value} = body
 
-      await updateTaxonomyProp(surveyId, taxonomyId, body)
+      await updateTaxonomyProp(surveyId, taxonomyId, key, value)
       const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, true)
 
       res.json({taxonomies: toUUIDIndexedObj(taxonomies)})

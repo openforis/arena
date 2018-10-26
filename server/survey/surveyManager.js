@@ -19,8 +19,8 @@ const {fetchTaxonomiesBySurveyId, publishTaxonomiesProps} = require('../taxonomy
 const {fetchCodeListsBySurveyId, publishCodeListsProps} = require('../codeList/codeListManager')
 
 // ====== CREATE
-const createSurvey = async (user, {name, label, lang}) => db.tx(
-  async t => {
+const createSurvey = async (user, {name, label, lang}) => {
+  const survey = await db.tx(async t => {
     const props = {
       name,
       labels: {[lang]: label},
@@ -41,15 +41,16 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
     }
     await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
-    //create survey data schema
-    await migrateSurveySchema(surveyId)
-
     // update user prefs
     await updateUserPref(user, userPrefNames.survey, surveyId, t)
-
     return survey
-  }
-)
+  })
+
+  //create survey data schema
+  await migrateSurveySchema(survey.id)
+
+  return survey
+}
 
 // ====== READ
 const fetchSurveyById = async (id, draft) => {
