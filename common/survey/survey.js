@@ -140,9 +140,6 @@ const assocNodeDefProp = (nodeDefUUID, key, value) => R.pipe(
   R.dissocPath([nodeDefs, nodeDefUUID, 'validation', 'fields', key]),
 )
 
-const assocNodeDefValidation = (nodeDefUUID, validation) =>
-  R.assocPath([nodeDefs, nodeDefUUID, 'validation'], validation)
-
 /**
  * ======
  * DELETE NodeDef
@@ -341,7 +338,6 @@ module.exports = {
   assocNodeDefs,
   assocNodeDef,
   assocNodeDefProp,
-  assocNodeDefValidation,
 
   // DELETE nodeDefs
   dissocNodeDef,

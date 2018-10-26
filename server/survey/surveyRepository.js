@@ -66,16 +66,6 @@ const getSurveyById = async (surveyId, draft = false, client = db) =>
     def => dbTransformCallback(def, draft)
   )
 
-const fetchRootNodeDef = async (surveyId, draft, client = db) =>
-  await client.one(
-    `SELECT ${nodeDefSelectFields}
-     FROM node_def 
-     WHERE parent_id IS NULL
-     AND survey_id =$1`,
-    [surveyId],
-    res => dbTransformCallback(res, draft)
-  )
-
 // ============== UPDATE
 const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
   const prop = {[key]: value}
@@ -117,7 +107,6 @@ module.exports = {
   fetchUserSurveys,
   getSurveysByName,
   getSurveyById,
-  fetchRootNodeDef,
 
   //UPDATE
   updateSurveyProp,

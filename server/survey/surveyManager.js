@@ -9,20 +9,14 @@ const {defaultSteps} = require('../../common/survey/survey')
 const {validateSurvey} = require('../survey/surveyValidator')
 
 const nodeDefRepository = require('../nodeDef/nodeDefRepository')
-const {
-  nodeDefLayoutProps,
-  nodeDefRenderType,
-} = require('../../common/survey/nodeDefLayout')
+const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
+const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/nodeDefLayout')
 
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
 const {fetchTaxonomiesBySurveyId, publishTaxonomiesProps} = require('../taxonomy/taxonomyManager')
 const {fetchCodeListsBySurveyId, publishCodeListsProps} = require('../codeList/codeListManager')
-
-/**
- * ===== SURVEY
- */
 
 // ====== CREATE
 const createSurvey = async (user, {name, label, lang}) => db.tx(
@@ -71,6 +65,14 @@ const fetchSurveyById = async (id, draft) => {
   }
 }
 
+const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
+  const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
+
+  return validate
+    ? await validateNodeDefs(nodeDefsDB)
+    : nodeDefsDB
+}
+
 // ====== UPATE
 const publishSurvey = async (id, user) =>
   await db.tx(async t => {
@@ -105,10 +107,11 @@ module.exports = {
 
   // ====== READ
   fetchSurveyById,
+  fetchSurveyNodeDefs,
 
   // ====== UPDATE
   publishSurvey,
 
-  // ====== DELETE
+// ====== DELETE
   deleteSurvey,
 }
