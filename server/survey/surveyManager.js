@@ -8,7 +8,7 @@ const surveyRepository = require('../survey/surveyRepository')
 const {defaultSteps} = require('../../common/survey/survey')
 const {validateSurvey} = require('../survey/surveyValidator')
 
-const {createEntityDef} = require('../nodeDef/nodeDefRepository')
+const nodeDefRepository = require('../nodeDef/nodeDefRepository')
 const {
   nodeDefLayoutProps,
   nodeDefRenderType,
@@ -17,8 +17,8 @@ const {
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
-const {fetchCodeListsBySurveyId} = require('../codeList/codeListManager')
+const {fetchTaxonomiesBySurveyId, publishTaxonomiesProps} = require('../taxonomy/taxonomyManager')
+const {fetchCodeListsBySurveyId, publishCodeListsProps} = require('../codeList/codeListManager')
 
 /**
  * ===== SURVEY
@@ -45,10 +45,10 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       [nodeDefLayoutProps.pageUUID]: uuidv4(),
       [nodeDefLayoutProps.render]: nodeDefRenderType.form,
     }
-    await createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
+    await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
     //create survey data schema
-    migrateSurveySchema(surveyId)
+    await migrateSurveySchema(surveyId)
 
     // update user prefs
     await updateUserPref(user, userPrefNames.survey, surveyId, t)
@@ -71,6 +71,21 @@ const fetchSurveyById = async (id, draft) => {
   }
 }
 
+// ====== UPATE
+const publishSurvey = async (id, user) =>
+  await db.tx(async t => {
+
+    await nodeDefRepository.publishNodeDefsProps(id, t)
+
+    await nodeDefRepository.permanentlyDeleteNodeDefs(id, t)
+
+    await publishCodeListsProps(id, t)
+
+    await publishTaxonomiesProps(id, t)
+
+    await surveyRepository.publishSurveyProps(id, t)
+  })
+
 // ====== DELETE
 const deleteSurvey = async (id, user) => {
   await db.tx(async t => {
@@ -90,6 +105,10 @@ module.exports = {
 
   // ====== READ
   fetchSurveyById,
+
+  // ====== UPDATE
+  publishSurvey,
+
   // ====== DELETE
   deleteSurvey,
 }

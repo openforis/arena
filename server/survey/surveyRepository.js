@@ -90,6 +90,18 @@ const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
   )
 }
 
+const publishSurveyProps = async (surveyId, client = db) =>
+  await client.query(`
+    UPDATE
+        survey n
+    SET
+        props = props || props_draft,
+        props_draft = '{}'::jsonb
+    WHERE
+        n.id = $1
+    `, [surveyId]
+  )
+
 // ============== DELETE
 const deleteSurvey = async (id, client = db) => {
   await client.query(`DROP SCHEMA ${getSurveyDBSchema(id)}`)
@@ -109,6 +121,7 @@ module.exports = {
 
   //UPDATE
   updateSurveyProp,
+  publishSurveyProps,
 
   //DELETE
   deleteSurvey,

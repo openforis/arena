@@ -82,6 +82,18 @@ const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
   )
 }
 
+const publishNodeDefsProps = async (surveyId, client = db) =>
+  await client.query(`
+    UPDATE
+        node_def n
+    SET
+        props = props || props_draft,
+        props_draft = '{}'::jsonb
+    WHERE
+        n.survey_id = $1
+    `, [surveyId]
+  )
+
 // ============== DELETE
 
 const markNodeDefDeleted = async (nodeDefId, client = db) => {
@@ -98,8 +110,17 @@ const markNodeDefDeleted = async (nodeDefId, client = db) => {
   await Promise.all(childNodeDefs.map(async childNodeDef =>
     await markNodeDefDeleted(childNodeDef.id, client)
   ))
-
 }
+
+const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
+  await client.query(`
+    DELETE FROM
+        node_def
+    WHERE
+        deleted = true
+    AND survey_id = $1
+    `, [surveyId]
+  )
 
 module.exports = {
   //utils
@@ -117,7 +138,9 @@ module.exports = {
 
   //UPDATE
   updateNodeDefProp,
+  publishNodeDefsProps,
 
   //DELETE
   markNodeDefDeleted,
+  permanentlyDeleteNodeDefs,
 }

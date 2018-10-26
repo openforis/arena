@@ -2,6 +2,8 @@ const R = require('ramda')
 const db = require('../db/db')
 const fastcsv = require('fast-csv')
 
+const {publishSurveySchemaTableProps} = require('../survey/surveySchemaRepositoryUtils')
+
 const {
   getTaxonomyVernacularLanguageCodes,
   getTaxonCode,
@@ -133,10 +135,22 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   console.log('csv export completed')
 }
 
+// ====== UPDATE
+
+const publishTaxonomiesProps = async (surveyId, client = db) => {
+  await publishSurveySchemaTableProps(surveyId, 'taxonomy', client)
+
+  await publishSurveySchemaTableProps(surveyId, 'taxon_vernacular_name', client)
+
+}
 module.exports = {
   //CREATE
   importTaxa,
+
   //READ
   fetchTaxonomiesBySurveyId,
   exportTaxa,
+
+  //UPDATE
+  publishTaxonomiesProps,
 }
