@@ -100,4 +100,20 @@ module.exports.init = app => {
     }
   })
 
+  // ==== DELETE
+
+  app.delete('/survey/:id', async (req, res) => {
+    // TODO
+    try {
+      const surveyId = getRestParam(req, 'id')
+
+      // const survey = await updateSurveyProp(surveyId, body)
+      // const validation = await validateSurveyProp(survey, body.key)
+
+      // res.json({validation})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
 }
