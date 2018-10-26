@@ -22,7 +22,6 @@ const fetchCodeListsWithLevels = async (surveyId, draft) => {
   )
 }
 
-
 const fetchCodeListById = async (surveyId, codeListId, draft) => {
   const codeListsWithLevels = await fetchCodeListsWithLevels(surveyId, draft)
   return R.find(R.propEq('id', codeListId))(codeListsWithLevels)

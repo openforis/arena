@@ -65,6 +65,9 @@ const fetchSurveyById = async (id, draft) => {
   }
 }
 
+const fetchUserSurveys = async (user) =>
+  await surveyRepository.fetchSurveys()
+
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
 
@@ -74,6 +77,9 @@ const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) =>
 }
 
 // ====== UPATE
+const updateSurveyProp = async (id, key, value, user) =>
+  await surveyRepository.updateSurveyProp(id, key, value)
+
 const publishSurvey = async (id, user) =>
   await db.tx(async t => {
 
@@ -97,7 +103,6 @@ const deleteSurvey = async (id, user) => {
       await deleteUserPref(user, userPrefNames.survey, t)
 
     await surveyRepository.deleteSurvey(id, t)
-
   })
 }
 
@@ -107,9 +112,11 @@ module.exports = {
 
   // ====== READ
   fetchSurveyById,
+  fetchUserSurveys,
   fetchSurveyNodeDefs,
 
   // ====== UPDATE
+  updateSurveyProp,
   publishSurvey,
 
 // ====== DELETE

@@ -78,7 +78,7 @@ const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
 
 // ============== UPDATE
 
-const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
+const updateNodeDefProp = async (nodeDefId, key, value, client = db) => {
   const prop = {[key]: value}
 
   return await client.one(`
@@ -107,19 +107,22 @@ const publishNodeDefsProps = async (surveyId, client = db) =>
 // ============== DELETE
 
 const markNodeDefDeleted = async (nodeDefId, client = db) => {
-  await client.one(`
+  const nodeDef = await client.one(`
     UPDATE node_def 
     SET deleted = true
     WHERE id = $1
-    RETURNING *
+    RETURNING ${nodeDefSelectFields}
   `,
-    [nodeDefId]
+    [nodeDefId],
+    def => dbTransformCallback(def, true)
   )
 
   const childNodeDefs = await fetchNodeDefsByParentId(nodeDefId, true, client)
   await Promise.all(childNodeDefs.map(async childNodeDef =>
     await markNodeDefDeleted(childNodeDef.id, client)
   ))
+
+  return nodeDef
 }
 
 const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
