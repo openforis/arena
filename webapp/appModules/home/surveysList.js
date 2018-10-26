@@ -25,7 +25,7 @@ const SurveyListHeader = () => (
 )
 
 const SurveyRow = ({survey, currentSurvey, setActiveSurvey}) => {
-  const active = survey.id === currentSurvey.id
+  const active = currentSurvey && survey.id === currentSurvey.id
   const activeClass = active ? ' active' : ''
 
   return (

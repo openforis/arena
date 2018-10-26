@@ -82,8 +82,9 @@ export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
 
 // == DELETE
 
-export const deleteSurvey = surveyId => async (dispatch, getState) => {
+export const deleteSurvey = () => async (dispatch, getState) => {
   try {
+    const surveyId = getSurveyId(getState())
     await axios.delete(`/api/survey/${surveyId}`)
     dispatchCurrentSurveyUpdate(dispatch, null)
   } catch (e) {

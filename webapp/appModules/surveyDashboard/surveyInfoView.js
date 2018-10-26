@@ -1,9 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Redirect } from "react-router";
+import { Redirect } from 'react-router'
 
-import { getSurvey } from '../../survey/surveyState'
-import { deleteSurvey } from '../../survey/actions'
+import DeleteSurveyConfirmDialog from './deleteSurveyConfirmDialog'
 
 import {
   getSurveyName,
@@ -11,25 +10,33 @@ import {
   isSurveyDraft,
 } from '../../../common/survey/survey'
 
-import DeleteSurveyConfirmDialog from './deleteSurveyConfirmDialog';
+import { getSurvey } from '../../survey/surveyState'
+import { deleteSurvey } from '../../survey/actions'
+import { appModules } from '../appModules'
+import { appModuleUri } from '../../app/app'
 
 class SurveyInfoView extends React.Component {
 
-  constructor(props) {
+  constructor (props) {
     super(props)
-    this.state = {showDialog: false}
 
-    this.toggleDeleteConfirmDialog = this.toggleDeleteConfirmDialog.bind(this)
+    this.state = {
+      showDialog: false
+    }
+  }
+
+  toggleDeleteConfirmDialog (show) {
+    this.setState({
+      showDialog: show
+    })
   }
 
   render () {
-    const {survey} = this.props
+    const {survey, deleteSurvey} = this.props
+    const {showDialog} = this.state
 
-    return (
-      !survey ? (
-        null
-        // <Redirect to="/app/home/"/>
-      ) : (
+    return survey ?
+      (
         <div className="app-dashboard__survey-info">
 
           <div className="survey-status">
@@ -62,33 +69,20 @@ class SurveyInfoView extends React.Component {
               <span className="icon icon-bin icon-16px icon-left"/> Delete
             </button>
 
-            {this.state.showDialog &&
-              <DeleteSurveyConfirmDialog show={this.state.showDialog}
-                                         onCancel={() => this.toggleDeleteConfirmDialog(false)}
-                                         onDelete={() => this.deleteSurvey(survey)}
-                                         surveyName={survey.props.name}/>
+            {showDialog &&
+            <DeleteSurveyConfirmDialog show={showDialog}
+                                       onCancel={() => this.toggleDeleteConfirmDialog(false)}
+                                       onDelete={() => deleteSurvey(survey.id)}
+                                       surveyName={getSurveyName(survey)}/>
             }
           </div>
 
         </div>
       )
-    )
+      // redirecting when survey has been deleted
+      : <Redirect to={appModuleUri(appModules.home)}/>
+
   }
-
-  async deleteSurvey(survey) {
-    await this.props.deleteSurvey(survey.id)
-
-    this.toggleDeleteConfirmDialog(false)
-    this.props.history.push('/app/home/')
-  }
-
-  toggleDeleteConfirmDialog(show) {
-    this.setState({showDialog: show})
-  }
-}
-
-SurveyInfoView.defaultProps = {
-  survey: {}
 }
 
 const mapStateToProps = state => ({

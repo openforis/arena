@@ -10,24 +10,24 @@ import {
 } from '../../commonComponents/modal'
 
 export default class DeleteSurveyConfirmDialog extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     this.state = {confirmName: ''}
     this.confirmNameChanged = this.confirmNameChanged.bind(this)
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.setState({confirmName: ''})
     this.nameInput.focus()
   }
 
-  confirmNameChanged(event) {
+  confirmNameChanged (event) {
     this.setState({confirmName: event.target.value})
   }
 
-  render() {
-    const { surveyName, onDelete, onCancel } = this.props
+  render () {
+    const {surveyName, onDelete, onCancel} = this.props
 
     return (
       <Modal isOpen={true}>
@@ -42,12 +42,12 @@ export default class DeleteSurveyConfirmDialog extends React.Component {
           <p>
             Enter this survey’s name to confirm
           </p>
-          <label class="confirm-name">
+          <label className="confirm-name">
             Name:
             <input type="text"
                    value={this.state.confirmName}
                    onChange={this.confirmNameChanged}
-                   ref={input => this.nameInput = input} />
+                   ref={input => this.nameInput = input}/>
           </label>
         </ModalBody>
 
