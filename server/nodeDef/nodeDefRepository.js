@@ -55,6 +55,16 @@ const fetchNodeDefsBySurveyId = async (surveyId, draft, client = db) =>
     res => dbTransformCallback(res, draft)
   )
 
+const fetchRootNodeDef = async (surveyId, draft, client = db) =>
+  await client.one(
+    `SELECT ${nodeDefSelectFields}
+     FROM node_def 
+     WHERE parent_id IS NULL
+     AND survey_id =$1`,
+    [surveyId],
+    res => dbTransformCallback(res, draft)
+  )
+
 const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields}
@@ -68,7 +78,7 @@ const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
 
 // ============== UPDATE
 
-const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
+const updateNodeDefProp = async (nodeDefId, key, value, client = db) => {
   const prop = {[key]: value}
 
   return await client.one(`
@@ -82,16 +92,29 @@ const updateNodeDefProp = async (nodeDefId, {key, value}, client = db) => {
   )
 }
 
+const publishNodeDefsProps = async (surveyId, client = db) =>
+  await client.query(`
+    UPDATE
+        node_def n
+    SET
+        props = props || props_draft,
+        props_draft = '{}'::jsonb
+    WHERE
+        n.survey_id = $1
+    `, [surveyId]
+  )
+
 // ============== DELETE
 
 const markNodeDefDeleted = async (nodeDefId, client = db) => {
-  await client.one(`
+  const nodeDef = await client.one(`
     UPDATE node_def 
     SET deleted = true
     WHERE id = $1
-    RETURNING *
+    RETURNING ${nodeDefSelectFields}
   `,
-    [nodeDefId]
+    [nodeDefId],
+    def => dbTransformCallback(def, true)
   )
 
   const childNodeDefs = await fetchNodeDefsByParentId(nodeDefId, true, client)
@@ -99,7 +122,18 @@ const markNodeDefDeleted = async (nodeDefId, client = db) => {
     await markNodeDefDeleted(childNodeDef.id, client)
   ))
 
+  return nodeDef
 }
+
+const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
+  await client.query(`
+    DELETE FROM
+        node_def
+    WHERE
+        deleted = true
+    AND survey_id = $1
+    `, [surveyId]
+  )
 
 module.exports = {
   //utils
@@ -113,11 +147,14 @@ module.exports = {
   //READ
   fetchNodeDef,
   fetchNodeDefsBySurveyId,
+  fetchRootNodeDef,
   fetchNodeDefsByParentId,
 
   //UPDATE
   updateNodeDefProp,
+  publishNodeDefsProps,
 
   //DELETE
   markNodeDefDeleted,
+  permanentlyDeleteNodeDefs,
 }

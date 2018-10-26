@@ -61,7 +61,6 @@ import {
   nodeDefPropUpdate,
   nodeDefsUpdate,
   nodeDefUpdate,
-  nodeDefValidationUpdate,
   nodeDefDelete,
 
   //survey-form
@@ -107,8 +106,6 @@ const actionHandlers = {
   [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
 
   [nodeDefPropUpdate]: (state, {nodeDefUUID, key, value}) => assocNodeDefProp(nodeDefUUID, key, value)(state),
-
-  [nodeDefValidationUpdate]: (state, {nodeDefUUID, validation}) => assocNodeDefValidation(nodeDefUUID, validation)(state),
 
   [nodeDefDelete]: (state, {nodeDef}) => dissocNodeDef(nodeDef)(state),
 

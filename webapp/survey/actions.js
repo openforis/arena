@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import { assocSurveyProp, assocSurveyPropValidation } from '../../common/survey/survey'
 
 import { getSurvey, getSurveyId } from './surveyState'
-import { nodeDefUpdate } from './nodeDef/actions'
+
 import { debounceAction } from '../appUtils/reduxUtils'
 
 export const surveyCurrentUpdate = 'survey/current/update'
@@ -12,16 +12,16 @@ export const surveyCurrentUpdate = 'survey/current/update'
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyCurrentUpdate, survey})
 
-// ==== READ
+export const dispatchMarkCurrentSurveyDraft = (dispatch, getState) => {
 
-export const fetchRootNodeDef = (draft = false) => async (dispatch, getState) => {
-  try {
-    const surveyId = getSurveyId(getState())
-    const {data} = await axios.get(`/api/survey/${surveyId}/rootNodeDef?draft=${draft}`)
-    dispatch({type: nodeDefUpdate, ...data})
+  const survey = R.pipe(getSurvey,
+    R.assoc('draft', true)
+  )(getState())
 
-  } catch (e) { }
+  dispatchCurrentSurveyUpdate(dispatch, survey)
 }
+
+// ==== READ
 
 // ==== UPDATE
 
@@ -30,23 +30,12 @@ export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
   const survey = R.pipe(
     getSurvey,
     assocSurveyProp(key, value),
+    R.assoc('draft', true),
     assocSurveyPropValidation(key, null)
   )(getState())
 
   dispatchCurrentSurveyUpdate(dispatch, survey)
   dispatch(_updateSurveyProp(survey, key, value))
-}
-
-// == DELETE
-
-export const deleteSurvey = () => async (dispatch, getState) => {
-  try {
-    const surveyId = getSurveyId(getState())
-    await axios.delete(`/api/survey/${surveyId}`)
-    dispatchCurrentSurveyUpdate(dispatch, null)
-  } catch (e) {
-
-  }
 }
 
 const _updateSurveyProp = (survey, key, value) => {
@@ -65,3 +54,23 @@ const _updateSurveyProp = (survey, key, value) => {
   return debounceAction(action, `${surveyCurrentUpdate}_${key}`)
 }
 
+export const publishSurvey = () => async (dispatch, getState) => {
+  const survey = getSurvey(getState())
+
+  const {data} = await axios.put(`/api/survey/${survey.id}/publish`)
+
+  dispatchCurrentSurveyUpdate(dispatch, data.survey)
+}
+
+
+// == DELETE
+
+export const deleteSurvey = () => async (dispatch, getState) => {
+  try {
+    const surveyId = getSurveyId(getState())
+    await axios.delete(`/api/survey/${surveyId}`)
+    dispatchCurrentSurveyUpdate(dispatch, null)
+  } catch (e) {
+
+  }
+}

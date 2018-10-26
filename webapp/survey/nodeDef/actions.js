@@ -1,9 +1,11 @@
 import axios from 'axios'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
+
 import { newNodeDef, isNodeDefEntity } from '../../../common/survey/nodeDef'
 import { getPageUUID } from '../../../common/survey/nodeDefLayout'
 import { getSurveyId } from '../surveyState'
+import { dispatchMarkCurrentSurveyDraft } from '../actions'
 
 /**
  * ==== NODE DEFS
@@ -11,7 +13,6 @@ import { getSurveyId } from '../surveyState'
 export const nodeDefUpdate = 'nodeDef/update'
 export const nodeDefsUpdate = 'nodeDefs/update'
 export const nodeDefPropUpdate = 'nodeDef/prop/update'
-export const nodeDefValidationUpdate = 'nodeDef/validation/updated'
 export const nodeDefDelete = 'nodeDef/delete'
 
 // ==== CREATE
@@ -32,27 +33,32 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
 
     const {data} = await axios.post(`/api/nodeDef`, nodeDef)
     dispatch({type: nodeDefUpdate, ...data})
+
+    dispatchMarkCurrentSurveyDraft(dispatch, getState)
   } catch (e) { }
 }
 
 // ==== READ
 
-export const fetchNodeDefChildren = (id, draft = false, validate = false) => async dispatch => {
+export const fetchNodeDefs = (surveyId, draft = false) => async dispatch => {
   try {
-    const {data} = await axios.get(`/api/nodeDef/${id}/children?draft=${draft}&validate=${validate}`)
-    dispatch({type: nodeDefsUpdate, ...data})
+    const {data} = await axios.get(`/api/survey/${surveyId}/nodeDefs?draft=${draft}`)
+
+    dispatch({type: nodeDefsUpdate, nodeDefs: data.nodeDefs})
   } catch (e) { }
 }
 
 // ==== UPDATE
-export const putNodeDefProp = (nodeDef, key, value) => async dispatch => {
+export const putNodeDefProp = (nodeDef, key, value) => async (dispatch, getState) => {
   dispatch({type: nodeDefPropUpdate, nodeDefUUID: nodeDef.uuid, key, value})
   dispatch(_putNodeDefProp(nodeDef, key, value))
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
 }
 
 // ==== DELETE
-export const removeNodeDef = (nodeDef) => async dispatch => {
+export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
   dispatch({type: nodeDefDelete, nodeDef})
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
 
   await axios.delete(`/api/nodeDef/${nodeDef.id}`)
 }
@@ -61,9 +67,9 @@ const _putNodeDefProp = (nodeDef, key, value) => {
   const action = async dispatch => {
     try {
       const res = await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
-      //update node def validation
-      const {validation} = res.data
-      dispatch({type: nodeDefValidationUpdate, nodeDefUUID: nodeDef.uuid, validation})
+      //update node defs with their validation status
+      const {nodeDefs} = res.data
+      dispatch({type: nodeDefsUpdate, nodeDefs})
     } catch (e) { }
 
   }
@@ -86,13 +92,8 @@ export const setFormNodeDefEdit = nodeDef => dispatch => dispatch({type: formNod
 
 export const setFormNodeDefUnlocked = nodeDef => dispatch => dispatch({type: formNodeDefUnlockedUpdate, nodeDef})
 
-export const closeFormNodeDefEdit = nodeDef => async dispatch => {
-  const res = await axios.get(`/api/nodeDef/${nodeDef.id}/validation`)
-  const {validation} = res.data
-
+export const closeFormNodeDefEdit = () => async dispatch =>
   dispatch({type: formNodeDefEditUpdate, nodeDef: null})
-  dispatch({type: nodeDefValidationUpdate, nodeDefUUID: nodeDef.uuid, validation})
-}
 
 //SURVEY FORM ACTIVE PAGE
 export const formActivePageNodeDefUpdate = 'survey/form/activePageNodeDef/update'

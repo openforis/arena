@@ -140,9 +140,6 @@ const assocNodeDefProp = (nodeDefUUID, key, value) => R.pipe(
   R.dissocPath([nodeDefs, nodeDefUUID, 'validation', 'fields', key]),
 )
 
-const assocNodeDefValidation = (nodeDefUUID, validation) =>
-  R.assocPath([nodeDefs, nodeDefUUID, 'validation'], validation)
-
 /**
  * ======
  * DELETE NodeDef
@@ -306,7 +303,7 @@ const canUpdateCodeList = nodeDef =>
     return !isNodeDefCodeParent(nodeDef)(survey)
   }
 
-module.exports = {
+  module.exports = {
   defaultSteps,
 
   // READ
@@ -341,13 +338,11 @@ module.exports = {
   assocNodeDefs,
   assocNodeDef,
   assocNodeDefProp,
-  assocNodeDefValidation,
 
   // DELETE nodeDefs
   dissocNodeDef,
 
-  // UTILS
-  getSurveyDBSchema: surveyId => `survey_${surveyId}`,
+
 
   // UTILS NodeDefs
   getNodeDefParent,

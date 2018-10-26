@@ -5,7 +5,7 @@ const db = require('../../db')
 const config = require('../migrationConfig')
 const {getProcessNodeEnv} = require('../../../../common/processUtils')
 
-const {getSurveyDBSchema} = require('../../../../common/survey/survey')
+const {getSurveyDBSchema} = require('../../../../server/survey/surveySchemaRepositoryUtils')
 
 const migrateOptions = {
   config,

@@ -10,11 +10,11 @@ import {
 } from '../../../common/survey/survey'
 
 import { getSurvey } from '../../survey/surveyState'
-import { deleteSurvey } from '../../survey/actions'
+import { deleteSurvey, publishSurvey } from '../../survey/actions'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
 
-class SurveyInfoView extends React.Component {
+class SurveyInfoDashbaordView extends React.Component {
 
   constructor (props) {
     super(props)
@@ -41,7 +41,7 @@ class SurveyInfoView extends React.Component {
   }
 
   render () {
-    const {survey, deleteSurvey} = this.props
+    const {survey, deleteSurvey, publishSurvey} = this.props
     const {showDialog} = this.state
 
     return (
@@ -61,7 +61,10 @@ class SurveyInfoView extends React.Component {
         </h4>
 
         <div className="button-bar">
-          <button className="btn btn-of-light" aria-disabled={!isSurveyDraft(survey)}>
+          <button className="btn btn-of-light" aria-disabled={!isSurveyDraft(survey)}
+                  onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
+                    ? publishSurvey()
+                    : null}>
             <span className="icon icon-checkmark2 icon-16px icon-left"/> Publish
           </button>
 
@@ -94,4 +97,4 @@ const mapStateToProps = state => ({
   survey: getSurvey(state)
 })
 
-export default connect(mapStateToProps, {deleteSurvey})(SurveyInfoView)
+export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfoDashbaordView)

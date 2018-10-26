@@ -1,3 +1,5 @@
+const webpack = require('webpack')
+const path = require('path')
 const nodeExternals = require('webpack-node-externals')
 // const ExtractTextPlugin = require('extract-text-webpack-plugin')
 // const config = require("./webpack.config.js")
@@ -30,5 +32,10 @@ module.exports = {
       //   })
       // }
     ]
-  }
+  },
+  // plugins: [
+  //   new webpack.DefinePlugin({
+  //     'process.env.migrations_test_dirname': JSON.stringify(path.resolve(__dirname, 'server/db/migration/survey/migrations'))
+  //   })
+  // ]
 }

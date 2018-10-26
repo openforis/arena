@@ -26,7 +26,7 @@ class NodeDefEdit extends React.Component {
 
   close () {
     const {nodeDef, closeFormNodeDefEdit} = this.props
-    closeFormNodeDefEdit(nodeDef)
+    closeFormNodeDefEdit()
   }
 
   render () {

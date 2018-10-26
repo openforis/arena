@@ -1,39 +1,20 @@
 const db = require('../db/db')
-const Promise = require('bluebird')
 const R = require('ramda')
 
-const {updateSurveyTableProp, deleteSurveyTableRecord} = require('../serverUtils/repository')
+const {getSurveyDBSchema, updateSurveySchemaTableProp, deleteSurveySchemaTableRecord} = require('../survey/surveySchemaRepositoryUtils')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
-const {getSurveyDBSchema} = require('../../common/survey/survey')
-const {
-  getCodeListLevelsArray,
-  assocCodeListLevelsArray,
-  getCodeListItemCode
-} = require('../../common/survey/codeList')
+const {getCodeListItemCode} = require('../../common/survey/codeList')
 
 // ============== CREATE
 
-const insertCodeList = async (surveyId, codeList, client = db) => client.tx(
-  async t => {
-    const insertedCodeList = await t.one(`
+const insertCodeList = async (surveyId, codeList, client = db) =>
+  await client.one(`
         INSERT INTO ${getSurveyDBSchema(surveyId)}.code_list (uuid, props_draft)
         VALUES ($1, $2)
         RETURNING *`,
-      [codeList.uuid, codeList.props],
-      def => dbTransformCallback(def, true)
-    )
-    const levels = getCodeListLevelsArray(codeList)
-
-    //insert levels
-    const insertedLevels = await Promise.all(
-      levels.map(async level =>
-        await insertCodeListLevel(surveyId, insertedCodeList.id, level, t)
-      )
-    )
-
-    return assocCodeListLevelsArray(insertedLevels)(insertedCodeList)
-  }
-)
+    [codeList.uuid, codeList.props],
+    def => dbTransformCallback(def, true)
+  )
 
 const insertCodeListLevel = async (surveyId, codeListId, level, client = db) =>
   await client.one(`
@@ -118,19 +99,25 @@ const fetchCodeListItemsByAncestorCodes = async (surveyId, codeListId, ancestorC
 
 // ============== UPDATE
 
-const updateCodeListProp = R.partial(updateSurveyTableProp, ['code_list'])
+const updateCodeListProp = async (surveyId, codeListId, key, value, client = db) =>
+  await updateSurveySchemaTableProp(surveyId, 'code_list', codeListId, key, value, client)
 
-const updateCodeListLevelProp = R.partial(updateSurveyTableProp, ['code_list_level'])
+const updateCodeListLevelProp = async (surveyId, codeListLevelId, key, value, client = db) =>
+  await updateSurveySchemaTableProp(surveyId, 'code_list_level', codeListLevelId, key, value, client)
 
-const updateCodeListItemProp = R.partial(updateSurveyTableProp, ['code_list_item'])
+const updateCodeListItemProp = async (surveyId, codeListItemId, key, value, client = db) =>
+  await updateSurveySchemaTableProp(surveyId, 'code_list_item', codeListItemId, key, value, client)
 
 // ============== DELETE
 
-const deleteCodeList = R.partial(deleteSurveyTableRecord, ['code_list'])
+const deleteCodeList = async (surveyId, codeListId, client = db) =>
+  await deleteSurveySchemaTableRecord(surveyId, 'code_list', codeListId, client)
 
-const deleteCodeListLevel = R.partial(deleteSurveyTableRecord, ['code_list_level'])
+const deleteCodeListLevel = async (surveyId, codeListLevelId, client = db) =>
+  await deleteSurveySchemaTableRecord(surveyId, 'code_list_level', codeListLevelId, client)
 
-const deleteCodeListItem = R.partial(deleteSurveyTableRecord, ['code_list_item'])
+const deleteCodeListItem = async (surveyId, codeListItemId, client = db) =>
+  await deleteSurveySchemaTableRecord(surveyId, 'code_list_item', codeListItemId, client)
 
 module.exports = {
   //CREATE

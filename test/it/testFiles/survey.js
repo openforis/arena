@@ -1,4 +1,4 @@
-const {setContextSurvey, getContextUser} = require('./../../testContext')
+const {setContextSurvey, getContextUser, getContextSurvey} = require('./../../testContext')
 const {assert, expect} = require('chai')
 const {uuidv4} = require('../../../common/uuid')
 
@@ -24,6 +24,10 @@ const createSurveyTest = async () => {
   assert.equal(getSurveyDefaultLanguage(survey), testSurvey.lang)
   assert.equal(getSurveyDefaultLabel(survey), testSurvey.label)
 }
+
+// const publishSurveyTest = async () => {
+//   const survey = getContextSurvey()
+// }
 
 module.exports = {
   createSurveyTest,

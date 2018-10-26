@@ -1,24 +1,13 @@
 const {sendErr, sendOk} = require('../serverUtils/response')
-const {
-  getRestParam,
-  getBoolParam,
-} = require('../serverUtils/request')
-
-const {
-  validateNodeDef,
-  validateNodeDefs
-} = require('./nodeDefValidator')
+const {getRestParam} = require('../serverUtils/request')
 
 const {
   createNodeDef,
-
-  fetchNodeDef,
-  fetchNodeDefsByParentId,
-
   updateNodeDefProp,
-
   markNodeDefDeleted,
-} = require('./nodeDefRepository')
+} = require('./nodeDefManager')
+
+const {fetchSurveyNodeDefs} = require('./../survey/surveyManager')
 
 module.exports.init = app => {
 
@@ -39,46 +28,18 @@ module.exports.init = app => {
 
   // ==== READ
 
-  app.get('/nodeDef/:id/children', async (req, res) => {
-    try {
-      const nodeDefId = getRestParam(req, 'id')
-      const draft = getBoolParam(req, 'draft')
-      const validate = getBoolParam(req, 'validate')
-
-      const nodeDefsDB = await fetchNodeDefsByParentId(nodeDefId, draft)
-      const nodeDefs = validate
-        ? await validateNodeDefs(nodeDefsDB)
-        : nodeDefsDB
-
-      res.json({nodeDefs})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
-
-  app.get('/nodeDef/:id/validation', async (req, res) => {
-    try {
-      const nodeDefId = getRestParam(req, 'id')
-      const nodeDef = await fetchNodeDef(nodeDefId, true)
-      const validation = await validateNodeDef(nodeDef)
-
-      res.json({validation})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
-
   // ==== UPDATE
 
   app.put('/nodeDef/:id/prop', async (req, res) => {
     try {
       const {body} = req
+      const {key, value} = body
       const nodeDefId = getRestParam(req, 'id')
 
-      const nodeDef = await updateNodeDefProp(nodeDefId, body)
-      const validation = await validateNodeDef(nodeDef)
+      const nodeDef = await updateNodeDefProp(nodeDefId, key, value)
+      const nodeDefs = await fetchSurveyNodeDefs(nodeDef.surveyId, true, true)
 
-      res.json({validation})
+      res.json({nodeDefs})
     } catch (err) {
       sendErr(res, err)
     }

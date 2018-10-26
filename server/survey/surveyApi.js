@@ -1,19 +1,20 @@
-const {sendErr} = require('../serverUtils/response')
+const {sendErr, sendOk} = require('../serverUtils/response')
 const {
   getRestParam,
   getBoolParam,
 } = require('../serverUtils/request')
 
 const {
-  fetchUserSurveys,
-  fetchRootNodeDef,
-  updateSurveyProp
-} = require('./surveyRepository')
-
-const {
   createSurvey,
+
   fetchSurveyById,
-  deleteSurvey
+  fetchUserSurveys,
+  fetchSurveyNodeDefs,
+
+  updateSurveyProp,
+  publishSurvey,
+
+  deleteSurvey,
 } = require('./surveyManager')
 
 const {
@@ -70,32 +71,43 @@ module.exports.init = app => {
     }
   })
 
-  // fetch root node definition
-  app.get('/survey/:id/rootNodeDef', async (req, res) => {
+  app.get(`/survey/:id/nodeDefs`, async (req, res) => {
     try {
+      const surveyId = getRestParam(req, 'id')
+      const draft = getBoolParam(req, 'draft')
 
-      const draft = getRestParam(req, 'draft') === 'true'
+      const nodeDefs = await fetchSurveyNodeDefs(surveyId, draft, draft)
+
+      res.json({nodeDefs})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+  // ==== UPDATE
+
+  app.put('/survey/:id/prop', async (req, res) => {
+    try {
+      const {body, user} = req
+      const {key, value} = body
+
       const surveyId = getRestParam(req, 'id')
 
-      const nodeDef = await fetchRootNodeDef(surveyId, draft)
-      res.json({nodeDef})
+      const survey = await updateSurveyProp(surveyId, key, value, user)
+      const validation = await validateSurveyProp(survey, key)
 
+      res.json({validation})
     } catch (err) {
       sendErr(res, err)
     }
   })
 
-  // ==== UPDATE
-
-  app.put('/survey/:id/prop', async (req, res) => {
+  app.put('/survey/:id/publish', async (req, res) => {
     try {
-      const {body} = req
       const surveyId = getRestParam(req, 'id')
 
-      const survey = await updateSurveyProp(surveyId, body)
-      const validation = await validateSurveyProp(survey, body.key)
+      const survey = await publishSurvey(surveyId)
 
-      res.json({validation})
+      res.json({survey})
     } catch (err) {
       sendErr(res, err)
     }
@@ -104,12 +116,11 @@ module.exports.init = app => {
   // ==== DELETE
 
   app.delete('/survey/:id', async (req, res) => {
-    // TODO
     try {
       const surveyId = getRestParam(req, 'id')
-      const deleted = await deleteSurvey(surveyId)
+      await deleteSurvey(surveyId)
 
-      res.json({id: surveyId})
+      sendOk(res)
     } catch (err) {
       sendErr(res, err)
     }

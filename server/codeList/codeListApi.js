@@ -2,22 +2,26 @@ const {sendOk, sendErr} = require('../serverUtils/response')
 const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
 
 const {
+  insertCodeList,
+  insertCodeListLevel,
+  insertCodeListItem,
   fetchCodeListById,
   fetchCodeListsBySurveyId,
+  fetchCodeListItemsByCodeListId,
+  fetchCodeListItemsByParentId,
+  fetchCodeListItemsByAncestorCodes,
+  updateCodeListProp,
+  updateCodeListLevelProp,
+  updateCodeListItemProp,
+  deleteCodeList,
+  deleteCodeListLevel,
+  deleteCodeListItem,
 } = require('../codeList/codeListManager')
 
 const {
   validateCodeListLevels,
   validateCodeListItems,
 } = require('../../server/codeList/codeListValidator')
-
-const {
-  insertCodeList, insertCodeListLevel, insertCodeListItem,
-  fetchCodeListItemsByCodeListId, fetchCodeListItemsByParentId,
-  fetchCodeListItemsByAncestorCodes,
-  updateCodeListProp, updateCodeListLevelProp, updateCodeListItemProp,
-  deleteCodeList, deleteCodeListLevel, deleteCodeListItem,
-} = require('./codeListRepository')
 
 module.exports.init = app => {
 
@@ -111,8 +115,9 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
       const {body} = req
+      const {key, value} = body
 
-      await updateCodeListProp(surveyId, codeListId, body)
+      await updateCodeListProp(surveyId, codeListId, key, value)
       const codeLists = await fetchCodeListsBySurveyId(surveyId, true)
 
       res.json({codeLists})
@@ -127,8 +132,9 @@ module.exports.init = app => {
       const codeListId = getRestParam(req, 'codeListId')
       const levelId = getRestParam(req, 'levelId')
       const {body} = req
+      const {key, value} = body
 
-      const level = await updateCodeListLevelProp(surveyId, levelId, body)
+      const level = await updateCodeListLevelProp(surveyId, levelId, key, value)
 
       const codeList = await fetchCodeListById(surveyId, codeListId, true)
 
@@ -148,10 +154,10 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
       const itemId = getRestParam(req, 'itemId')
-
       const {body} = req
+      const {key, value} = body
 
-      const item = await updateCodeListItemProp(surveyId, itemId, body)
+      const item = await updateCodeListItemProp(surveyId, itemId, key, value)
 
       res.json({
         item,
