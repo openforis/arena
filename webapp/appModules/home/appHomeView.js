@@ -6,12 +6,12 @@ import AddSurveyForm from './addSurveyForm'
 import SurveysList from './surveysList'
 
 import { appModuleUri, getSurveys } from '../../app/app'
+import { getNewSurvey } from '../../app/appState'
 import { appModules } from '../appModules'
 
-import { getNewSurvey, getSurvey } from '../../survey/surveyState'
+import { getSurvey } from '../../survey/surveyState'
 
-import { createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../survey/actions'
-import { fetchSurveys, setActiveSurvey } from '../../app/actions'
+import { fetchSurveys, setActiveSurvey, createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../app/actions'
 
 class AppHomeView extends React.Component {
 

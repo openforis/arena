@@ -8,6 +8,7 @@ import {
   appStatusChange,
   appUserLogout,
   appUserPrefUpdate,
+  appNewSurveyUpdate,
   appSurveysUpdate,
 } from './actions'
 
@@ -40,6 +41,9 @@ const actionHandlers = {
   },
 
   [appUserLogout]: (state, action) => appState.logoutUser(state),
+
+  // new survey
+  [appNewSurveyUpdate]: assocActionProps,
 
   //surveys list
   [appSurveysUpdate]: assocActionProps,
