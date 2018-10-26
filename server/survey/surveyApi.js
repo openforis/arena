@@ -13,6 +13,7 @@ const {
 const {
   createSurvey,
   fetchSurveyById,
+  deleteSurvey
 } = require('./surveyManager')
 
 const {
@@ -106,11 +107,9 @@ module.exports.init = app => {
     // TODO
     try {
       const surveyId = getRestParam(req, 'id')
+      const deleted = await deleteSurvey(surveyId)
 
-      // const survey = await updateSurveyProp(surveyId, body)
-      // const validation = await validateSurveyProp(survey, body.key)
-
-      // res.json({validation})
+      res.json({id: surveyId})
     } catch (err) {
       sendErr(res, err)
     }
