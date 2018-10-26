@@ -3,7 +3,7 @@ import './style.scss'
 import React from 'react'
 import { withRouter } from 'react-router'
 
-import SurveyInfoView from './surveyInfoView'
+import SurveyInfoDashboardView from './surveyInfoDashbaordView'
 import SurveyDesignerDashboardView from '../surveyDesigner/surveyDesignerDashboardView'
 import DataExplorerDashboardView from '../data/dataDashboardView'
 import DataAnalysisDashboardView from '../analysis/dataAnalysisDashboardView'
@@ -13,7 +13,7 @@ const SurveyDashboardView = (props) => (
 
   <div className="app-dashboard">
 
-    <SurveyInfoView {...props}/>
+    <SurveyInfoDashboardView {...props}/>
 
     <div className="app-dashboard__modules">
 

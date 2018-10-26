@@ -303,7 +303,7 @@ const canUpdateCodeList = nodeDef =>
     return !isNodeDefCodeParent(nodeDef)(survey)
   }
 
-module.exports = {
+  module.exports = {
   defaultSteps,
 
   // READ
@@ -342,8 +342,7 @@ module.exports = {
   // DELETE nodeDefs
   dissocNodeDef,
 
-  // UTILS
-  getSurveyDBSchema: surveyId => `survey_${surveyId}`,
+
 
   // UTILS NodeDefs
   getNodeDefParent,

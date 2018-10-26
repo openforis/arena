@@ -9,6 +9,8 @@ import { getTaxonomyEditTaxonomy } from './taxonomyEditState'
 import { showAppJobMonitor } from '../../app/components/job/actions'
 import { toQueryString } from '../../../server/serverUtils/request'
 
+import { dispatchMarkCurrentSurveyDraft } from '../actions'
+
 export const taxonomiesUpdate = 'survey/taxonomy/update'
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
 
@@ -24,6 +26,8 @@ const dispatchTaxonomyEditUpdate = (dispatch, props) =>
 // ====== CREATE
 
 export const createTaxonomy = () => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const taxonomy = newTaxonomy()
 
   dispatchTaxonomyUpdate(dispatch, taxonomy)
@@ -77,6 +81,8 @@ export const loadTaxaPage = page => async (dispatch, getState) => {
 // ====== UPDATE
 
 export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const survey = getSurvey(getState())
 
   const taxonomy = R.pipe(
@@ -98,6 +104,8 @@ export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, ge
 }
 
 export const uploadTaxonomyFile = (surveyId, taxonomyId, file) => async dispatch => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const formData = new FormData()
   formData.append('file', file)
 
@@ -115,6 +123,8 @@ export const uploadTaxonomyFile = (surveyId, taxonomyId, file) => async dispatch
 // ====== DELETE
 
 export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const survey = getSurvey(getState())
 
   dispatchTaxonomiesUpdate(dispatch, {[taxonomy.uuid]: null})

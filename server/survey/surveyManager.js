@@ -15,48 +15,50 @@ const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/no
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
-const {fetchCodeListsBySurveyId} = require('../codeList/codeListManager')
-
-/**
- * ===== SURVEY
- */
+const {fetchTaxonomiesBySurveyId, publishTaxonomiesProps} = require('../taxonomy/taxonomyManager')
+const {fetchCodeListsBySurveyId, publishCodeListsProps} = require('../codeList/codeListManager')
 
 // ====== CREATE
-const createSurvey = async (user, {name, label, lang}) => db.tx(
-  async t => {
-    const props = {
-      name,
-      labels: {[lang]: label},
-      languages: [lang],
-      srs: ['4326'], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
-      steps: {...defaultSteps},
+const createSurvey = async (user, {name, label, lang}) => {
+
+  const survey = await db.tx(
+    async t => {
+      const props = {
+        name,
+        labels: {[lang]: label},
+        languages: [lang],
+        srs: ['4326'], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
+        steps: {...defaultSteps},
+      }
+
+      const survey = await surveyRepository.insertSurvey(props, user.id, t)
+      const {id: surveyId} = survey
+
+      const rootEntityDefProps = {
+        name: 'root_entity',
+        labels: {[lang]: 'Root entity'},
+        multiple: false,
+        [nodeDefLayoutProps.pageUUID]: uuidv4(),
+        [nodeDefLayoutProps.render]: nodeDefRenderType.form,
+      }
+      await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
+
+      // update user prefs
+      await updateUserPref(user, userPrefNames.survey, surveyId, t)
+
+      return survey
+
     }
+  )
 
-    const survey = await surveyRepository.insertSurvey(props, user.id, t)
-    const {id: surveyId} = survey
+  //create survey data schema
+  await migrateSurveySchema(survey.id)
 
-    const rootEntityDefProps = {
-      name: 'root_entity',
-      labels: {[lang]: 'Root entity'},
-      multiple: false,
-      [nodeDefLayoutProps.pageUUID]: uuidv4(),
-      [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-    }
-    await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
-
-    //create survey data schema
-    migrateSurveySchema(surveyId)
-
-    // update user prefs
-    await updateUserPref(user, userPrefNames.survey, surveyId, t)
-
-    return survey
-  }
-)
+  return survey
+}
 
 // ====== READ
-const fetchSurveyById = async (id, draft) => {
+const fetchSurveyById = async (id, draft = false, validate = false) => {
   const survey = await surveyRepository.getSurveyById(id, draft)
   const codeLists = await fetchCodeListsBySurveyId(id, draft)
   const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
@@ -65,9 +67,12 @@ const fetchSurveyById = async (id, draft) => {
     ...survey,
     codeLists: toUUIDIndexedObj(codeLists),
     taxonomies: toUUIDIndexedObj(taxonomies),
-    validation: await validateSurvey(survey),
+    validation: validate ? await validateSurvey(survey) : null
   }
 }
+
+const fetchUserSurveys = async (user) =>
+  await surveyRepository.fetchSurveys()
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
@@ -75,6 +80,28 @@ const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) =>
   return validate
     ? await validateNodeDefs(nodeDefsDB)
     : nodeDefsDB
+}
+
+// ====== UPATE
+const updateSurveyProp = async (id, key, value, user) =>
+  await surveyRepository.updateSurveyProp(id, key, value)
+
+const publishSurvey = async (id, user) => {
+  await db.tx(async t => {
+
+    await nodeDefRepository.publishNodeDefsProps(id, t)
+
+    await nodeDefRepository.permanentlyDeleteNodeDefs(id, t)
+
+    await publishCodeListsProps(id, t)
+
+    await publishTaxonomiesProps(id, t)
+
+    await surveyRepository.publishSurveyProps(id, t)
+
+  })
+
+  return await fetchSurveyById(id)
 }
 
 // ====== DELETE
@@ -86,7 +113,6 @@ const deleteSurvey = async (id, user) => {
       await deleteUserPref(user, userPrefNames.survey, t)
 
     await surveyRepository.deleteSurvey(id, t)
-
   })
 }
 
@@ -96,8 +122,13 @@ module.exports = {
 
   // ====== READ
   fetchSurveyById,
+  fetchUserSurveys,
   fetchSurveyNodeDefs,
 
-  // ====== DELETE
+  // ====== UPDATE
+  updateSurveyProp,
+  publishSurvey,
+
+// ====== DELETE
   deleteSurvey,
 }

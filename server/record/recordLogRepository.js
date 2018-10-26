@@ -1,6 +1,6 @@
 const db = require('../db/db')
 
-const {getSurveyDBSchema} = require('../../common/survey/survey')
+const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
 const {recordLogType} = require('../../common/record/record')
 
 const insertRecordCreatedLog = async (surveyId, user, record, client = db) =>

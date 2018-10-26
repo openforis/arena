@@ -35,6 +35,8 @@ import {
   getCodeListEditActiveItemAndAncestorsUUIDs,
 } from './codeListEditState'
 
+import { dispatchMarkCurrentSurveyDraft } from '../actions'
+
 export const codeListsUpdate = 'survey/codeLists/update'
 export const codeListEditUpdate = 'survey/codeListEdit/update'
 export const codeListEditLevelItemsUpdate = 'survey/codeListEdit/levelItems/update'
@@ -58,6 +60,8 @@ const dispatchCodeListEditActiveLevelItemUpdate = (dispatch, levelIndex, itemUUI
 // ==== CREATE
 
 export const createCodeList = () => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const codeList = newCodeList()
 
   dispatchCodeListUpdate(dispatch, codeList)
@@ -73,6 +77,8 @@ export const createCodeList = () => async (dispatch, getState) => {
 }
 
 export const createCodeListLevel = () => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const survey = getSurvey(getState())
 
   const codeList = getCodeListEditCodeList(survey)
@@ -93,6 +99,8 @@ export const createCodeListLevel = () => async (dispatch, getState) => {
 }
 
 export const createCodeListItem = (level) => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const survey = getSurvey(getState())
   const codeList = getCodeListEditCodeList(survey)
   const parentItem = getCodeListEditActiveLevelItem(level.index - 1)(survey)
@@ -134,6 +142,8 @@ const loadCodeListLevelItems = async (dispatch, surveyId, codeListId, levelIndex
 // ==== UPDATE
 
 export const putCodeListProp = (codeListUUID, key, value) => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const survey = getSurvey(getState())
 
   const codeList = R.pipe(
@@ -156,6 +166,8 @@ export const putCodeListProp = (codeListUUID, key, value) => async (dispatch, ge
 }
 
 export const putCodeListLevelProp = (codeListId, levelIndex, key, value) => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const survey = getSurvey(getState())
 
   const codeList = R.pipe(
@@ -182,6 +194,8 @@ export const putCodeListLevelProp = (codeListId, levelIndex, key, value) => asyn
 }
 
 export const putCodeListItemProp = (levelIndex, itemUUID, key, value) => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const survey = getSurvey(getState())
   const codeList = getCodeListEditCodeList(survey)
 
@@ -210,6 +224,8 @@ export const putCodeListItemProp = (levelIndex, itemUUID, key, value) => async (
 // ==== DELETE
 
 export const deleteCodeList = codeList => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const survey = getSurvey(getState())
 
   dispatch({type: codeListsUpdate, codeLists: {[codeList.uuid]: null}})
@@ -219,6 +235,8 @@ export const deleteCodeList = codeList => async (dispatch, getState) => {
 }
 
 export const deleteCodeListLevel = levelIndex => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   dispatchCodeListEditActiveLevelItemUpdate(dispatch, levelIndex, null)
   dispatchCodeListEditLevelItemsUpdate(dispatch, levelIndex, null)
 
@@ -237,6 +255,8 @@ export const deleteCodeListLevel = levelIndex => async (dispatch, getState) => {
 }
 
 export const deleteCodeListItem = item => async (dispatch, getState) => {
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
+
   const survey = getSurvey(getState())
   const codeList = getCodeListEditCodeList(survey)
   const level = getCodeListLevelById(item.levelId)(codeList)

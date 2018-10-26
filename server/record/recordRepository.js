@@ -4,7 +4,7 @@ const camelize = require('camelize')
 const db = require('../db/db')
 const {selectDate} = require('../db/dbUtils')
 
-const {getSurveyDBSchema} = require('../../common/survey/survey')
+const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
 
 const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}`
 

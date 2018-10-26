@@ -1,7 +1,7 @@
 const camelize = require('camelize')
 const db = require('../db/db')
 
-const {getSurveyDBSchema} = require('../../common/survey/survey')
+const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
 
 const dbTransformCallback = camelize
 

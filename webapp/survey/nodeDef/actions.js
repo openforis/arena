@@ -5,6 +5,7 @@ import { debounceAction } from '../../appUtils/reduxUtils'
 import { newNodeDef, isNodeDefEntity } from '../../../common/survey/nodeDef'
 import { getPageUUID } from '../../../common/survey/nodeDefLayout'
 import { getSurveyId } from '../surveyState'
+import { dispatchMarkCurrentSurveyDraft } from '../actions'
 
 /**
  * ==== NODE DEFS
@@ -32,6 +33,8 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
 
     const {data} = await axios.post(`/api/nodeDef`, nodeDef)
     dispatch({type: nodeDefUpdate, ...data})
+
+    dispatchMarkCurrentSurveyDraft(dispatch, getState)
   } catch (e) { }
 }
 
@@ -46,14 +49,16 @@ export const fetchNodeDefs = (surveyId, draft = false) => async dispatch => {
 }
 
 // ==== UPDATE
-export const putNodeDefProp = (nodeDef, key, value) => async dispatch => {
+export const putNodeDefProp = (nodeDef, key, value) => async (dispatch, getState) => {
   dispatch({type: nodeDefPropUpdate, nodeDefUUID: nodeDef.uuid, key, value})
   dispatch(_putNodeDefProp(nodeDef, key, value))
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
 }
 
 // ==== DELETE
-export const removeNodeDef = (nodeDef) => async dispatch => {
+export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
   dispatch({type: nodeDefDelete, nodeDef})
+  dispatchMarkCurrentSurveyDraft(dispatch, getState)
 
   await axios.delete(`/api/nodeDef/${nodeDef.id}`)
 }

@@ -1,15 +1,11 @@
 const db = require('../db/db')
-const {getSurveyDBSchema} = require('../../common/survey/survey')
+const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
 
 const {selectDate} = require('../db/dbUtils')
 
 const {
   defDbTransformCallback: dbTransformCallback
 } = require('../../common/survey/surveyUtils')
-
-const {
-  nodeDefSelectFields,
-} = require('../nodeDef/nodeDefRepository')
 
 // ============== CREATE
 
@@ -24,6 +20,8 @@ const insertSurvey = async (props, userId, client = db) =>
   )
 
 // ============== READ
+
+//TODO : Check why we need fetchAllSurveys and fetchSurveys
 const fetchAllSurveys = async (client = db) =>
   await client.map(
       `SELECT * FROM survey`,
@@ -31,7 +29,7 @@ const fetchAllSurveys = async (client = db) =>
     def => dbTransformCallback(def)
   )
 
-const fetchUserSurveys = async (user, client = db) =>
+const fetchSurveys = async (client = db) =>
   await client.map(`
     SELECT 
       s.*, ${selectDate('n.date_created', 'date_created')},nm.date_modified
@@ -67,18 +65,33 @@ const getSurveyById = async (surveyId, draft = false, client = db) =>
   )
 
 // ============== UPDATE
-const updateSurveyProp = async (surveyId, {key, value}, client = db) => {
+const updateSurveyProp = async (surveyId, key, value, client = db) => {
   const prop = {[key]: value}
 
   return await client.one(`
     UPDATE survey 
-    SET props_draft = props_draft || $1 
+    SET props_draft = props_draft || $1,
+    draft = true
     WHERE id = $2
     RETURNING *
   `, [JSON.stringify(prop), surveyId],
     def => dbTransformCallback(def, true)
   )
 }
+
+const publishSurveyProps = async (surveyId, client = db) =>
+  await client.query(`
+    UPDATE
+        survey n
+    SET
+        props = props || props_draft,
+        props_draft = '{}'::jsonb,
+        draft = false,
+        published = true
+    WHERE
+        n.id = $1
+    `, [surveyId]
+  )
 
 // ============== DELETE
 const deleteSurvey = async (id, client = db) => {
@@ -92,12 +105,13 @@ module.exports = {
 
   // READ
   fetchAllSurveys,
-  fetchUserSurveys,
+  fetchSurveys,
   getSurveysByName,
   getSurveyById,
 
   //UPDATE
   updateSurveyProp,
+  publishSurveyProps,
 
   //DELETE
   deleteSurvey,
