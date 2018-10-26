@@ -8,11 +8,9 @@ const surveyRepository = require('../survey/surveyRepository')
 const {defaultSteps} = require('../../common/survey/survey')
 const {validateSurvey} = require('../survey/surveyValidator')
 
-const {createEntityDef} = require('../nodeDef/nodeDefRepository')
-const {
-  nodeDefLayoutProps,
-  nodeDefRenderType,
-} = require('../../common/survey/nodeDefLayout')
+const nodeDefRepository = require('../nodeDef/nodeDefRepository')
+const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
+const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/nodeDefLayout')
 
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
@@ -45,7 +43,7 @@ const createSurvey = async (user, {name, label, lang}) => db.tx(
       [nodeDefLayoutProps.pageUUID]: uuidv4(),
       [nodeDefLayoutProps.render]: nodeDefRenderType.form,
     }
-    await createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
+    await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
     //create survey data schema
     migrateSurveySchema(surveyId)
@@ -71,6 +69,14 @@ const fetchSurveyById = async (id, draft) => {
   }
 }
 
+const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
+  const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
+
+  return draft
+    ? await validateNodeDefs(nodeDefsDB)
+    : nodeDefsDB
+}
+
 // ====== DELETE
 const deleteSurvey = async (id, user) => {
   await db.tx(async t => {
@@ -90,6 +96,8 @@ module.exports = {
 
   // ====== READ
   fetchSurveyById,
+  fetchSurveyNodeDefs,
+
   // ====== DELETE
   deleteSurvey,
 }

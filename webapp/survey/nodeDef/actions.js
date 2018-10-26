@@ -41,11 +41,8 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
 
 export const fetchNodeDefs = (surveyId, draft = false) => async dispatch => {
   try {
-    const params = {
-      surveyId,
-      draft,
-    }
-    const {data} = await axios.get(`/api/nodeDefs?${toQueryString(params)}`)
+    const {data} = await axios.get(`/api/survey/${surveyId}/nodeDefs?draft=${draft}`)
+
     dispatch({type: nodeDefsUpdate, nodeDefs: data.nodeDefs})
   } catch (e) { }
 }

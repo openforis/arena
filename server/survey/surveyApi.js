@@ -12,6 +12,7 @@ const {
 const {
   createSurvey,
   fetchSurveyById,
+  fetchSurveyNodeDefs,
 } = require('./surveyManager')
 
 const {
@@ -68,6 +69,18 @@ module.exports.init = app => {
     }
   })
 
+  app.get(`/survey/:id/nodeDefs`, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'id')
+      const draft = getBoolParam(req, 'draft')
+
+      const nodeDefs = await fetchSurveyNodeDefs(surveyId, draft, draft)
+
+      res.json({nodeDefs})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
   // ==== UPDATE
 
   app.put('/survey/:id/prop', async (req, res) => {
