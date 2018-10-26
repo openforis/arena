@@ -1,8 +1,5 @@
 const {sendErr, sendOk} = require('../serverUtils/response')
-const {
-  getRestParam,
-  getBoolParam,
-} = require('../serverUtils/request')
+const {getRestParam} = require('../serverUtils/request')
 
 const {
   validateNodeDef,
@@ -10,13 +7,11 @@ const {
 
 const {
   createNodeDef,
-
-  fetchNodeDef,
-
   updateNodeDefProp,
-
   markNodeDefDeleted,
 } = require('./nodeDefRepository')
+
+const {fetchSurveyNodeDefs} = require('./../survey/surveyManager')
 
 module.exports.init = app => {
 
@@ -37,18 +32,6 @@ module.exports.init = app => {
 
   // ==== READ
 
-  app.get('/nodeDef/:id/validation', async (req, res) => {
-    try {
-      const nodeDefId = getRestParam(req, 'id')
-      const nodeDef = await fetchNodeDef(nodeDefId, true)
-      const validation = await validateNodeDef(nodeDef)
-
-      res.json({validation})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
-
   // ==== UPDATE
 
   app.put('/nodeDef/:id/prop', async (req, res) => {
@@ -57,7 +40,8 @@ module.exports.init = app => {
       const nodeDefId = getRestParam(req, 'id')
 
       const nodeDef = await updateNodeDefProp(nodeDefId, body)
-      const validation = await validateNodeDef(nodeDef)
+      const nodeDefs = await fetchSurveyNodeDefs(nodeDef.surveyId, true, false)
+      const validation = await validateNodeDef(nodeDefs, nodeDef)
 
       res.json({validation})
     } catch (err) {

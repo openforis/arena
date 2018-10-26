@@ -72,7 +72,7 @@ const fetchSurveyById = async (id, draft) => {
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
 
-  return draft
+  return validate
     ? await validateNodeDefs(nodeDefsDB)
     : nodeDefsDB
 }

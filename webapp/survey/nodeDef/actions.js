@@ -1,7 +1,6 @@
 import axios from 'axios'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
-import { toQueryString } from '../../../server/serverUtils/request'
 
 import { newNodeDef, isNodeDefEntity } from '../../../common/survey/nodeDef'
 import { getPageUUID } from '../../../common/survey/nodeDefLayout'
@@ -89,13 +88,8 @@ export const setFormNodeDefEdit = nodeDef => dispatch => dispatch({type: formNod
 
 export const setFormNodeDefUnlocked = nodeDef => dispatch => dispatch({type: formNodeDefUnlockedUpdate, nodeDef})
 
-export const closeFormNodeDefEdit = nodeDef => async dispatch => {
-  const res = await axios.get(`/api/nodeDef/${nodeDef.id}/validation`)
-  const {validation} = res.data
-
+export const closeFormNodeDefEdit = () => async dispatch =>
   dispatch({type: formNodeDefEditUpdate, nodeDef: null})
-  dispatch({type: nodeDefValidationUpdate, nodeDefUUID: nodeDef.uuid, validation})
-}
 
 //SURVEY FORM ACTIVE PAGE
 export const formActivePageNodeDefUpdate = 'survey/form/activePageNodeDef/update'
