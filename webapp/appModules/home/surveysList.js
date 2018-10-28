@@ -26,7 +26,8 @@ const SurveyListHeader = () => (
 )
 
 const SurveyRow = ({survey, surveyInfo, setActiveSurvey}) => {
-  const active = surveyInfo && getSurveyId(survey) === surveyInfo.id
+  const surveyId = getSurveyId(survey)
+  const active = surveyInfo && surveyId === surveyInfo.id
   const activeClass = active ? ' active' : ''
 
   return (
@@ -38,7 +39,7 @@ const SurveyRow = ({survey, surveyInfo, setActiveSurvey}) => {
       <div>{getSurveyStatus(survey)}</div>
       <div>
         <button className={`btn btn-s btn-of${activeClass}`}
-                onClick={() => setActiveSurvey(survey.id)}>
+                onClick={() => setActiveSurvey(surveyId)}>
           {active ? 'active' : 'activate'}
         </button>
       </div>

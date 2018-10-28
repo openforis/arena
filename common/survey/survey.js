@@ -37,7 +37,8 @@ const defaultSteps = {
  * READ
  * ======
  */
-const getSurveyInfo = R.propOr(null, 'info')
+const info = 'info'
+const getSurveyInfo = R.propOr(null, info)
 
 const getSurveyId = R.pipe(
   getSurveyInfo,
@@ -100,6 +101,19 @@ const getSurveyStatus = survey =>
 
 /**
  * ======
+ * UPDATE
+ * ======
+ */
+const assocSurveyProp = (key, value) => R.pipe(
+  R.assocPath([info, 'props', key], value),
+  R.assocPath([info, 'draft'], true),
+)
+
+const assocSurveyPropValidation = (key, validation) =>
+  R.assocPath([info, 'validation', 'fields', key], validation)
+
+/**
+ * ======
  * READ NodeDefs
  * ======
  */
@@ -132,14 +146,6 @@ const getNodeDefsByTaxonomyUUID = (uuid) => R.pipe(
   getNodeDefsArray,
   R.filter(R.pathEq(['props', 'taxonomyUUID'], uuid))
 )
-
-/**
- * ======
- * UPDATE
- * ======
- */
-const assocSurveyPropValidation = (key, validation) =>
-  R.assocPath(['validation', 'fields', key], validation)
 
 /**
  * ======
@@ -354,7 +360,7 @@ module.exports = {
   getNodeDefsByTaxonomyUUID,
 
   // UPDATE
-  assocSurveyProp: setProp,
+  assocSurveyProp,
   assocSurveyPropValidation,
 
   // UPDATE nodeDefs
