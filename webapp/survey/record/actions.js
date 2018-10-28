@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 
-import { getSurveyState } from '../surveyState'
+import { getSurvey } from '../surveyState'
 import { getSurveyDefaultStep } from '../../../common/survey/survey'
 import { appState } from '../../app/app'
 
@@ -28,7 +28,7 @@ export const createRecord = () => async (dispatch, getState) => {
     const state = getState()
 
     const user = appState.getUser(state)
-    const survey = getSurveyState(state)
+    const survey = getSurvey(state)
     const step = getSurveyDefaultStep(survey)
 
     const record = newRecord(user, survey.id, step)
@@ -56,7 +56,7 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
 export const updateNode = (nodeDef, node, value, file = null) =>
   async (dispatch, getState) => {
 
-    const survey = getSurveyState(getState())
+    const survey = getSurvey(getState())
     const record = getRecord(survey)
     const parentNode = getParentNode(node)(record)
 

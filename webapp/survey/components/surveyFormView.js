@@ -9,7 +9,7 @@ import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
 
 import { getRootNodeDef } from '../../../common/survey/survey'
-import { getSurveyState, getFormActivePageNodeDef, getFormPageParentNode } from '../surveyState'
+import { getSurvey, getFormActivePageNodeDef, getFormPageParentNode } from '../surveyState'
 import { getRecord } from '../record/recordState'
 
 import {
@@ -103,7 +103,7 @@ SurveyFormView.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const survey = getSurveyState(state)
+  const survey = getSurvey(state)
 
   const rootNodeDef = getRootNodeDef(survey)
   const nodeDef = getFormActivePageNodeDef(state)

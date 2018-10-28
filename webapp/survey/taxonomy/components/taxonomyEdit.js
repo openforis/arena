@@ -18,7 +18,7 @@ import {
   getTaxonomyEditTaxa
 } from '../taxonomyEditState'
 
-import { getSurveyState } from '../../surveyState'
+import { getSurvey } from '../../surveyState'
 import { getActiveJob } from '../../../app/components/job/appJobState'
 import { getJobName, isJobCompleted, } from '../../../../common/job/job'
 import { getFieldValidation } from '../../../../common/validation/validator'
@@ -118,7 +118,7 @@ class TaxonomyEdit extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const survey = getSurveyState(state)
+  const survey = getSurvey(state)
 
   return {
     survey,

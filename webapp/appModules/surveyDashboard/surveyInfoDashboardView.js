@@ -9,7 +9,7 @@ import {
   isSurveyDraft,
 } from '../../../common/survey/survey'
 
-import { getSurveyState } from '../../survey/surveyState'
+import { getSurvey } from '../../survey/surveyState'
 import { deleteSurvey, publishSurvey } from '../../survey/actions'
 import { appModules } from '../appModules'
 import { appModuleUri } from '../../app/app'
@@ -94,7 +94,7 @@ class SurveyInfoDashboardView extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  survey: getSurveyState(state)
+  survey: getSurvey(state)
 })
 
 export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfoDashboardView)

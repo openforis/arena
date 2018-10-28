@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { getSurveyInfo } from '../../../../common/survey/survey'
 import { appState } from '../../app'
-import { getSurveyState } from '../../../survey/surveyState'
+import { getSurvey } from '../../../survey/surveyState'
 import { logout } from '../../actions'
 
 import AppSideBarFooter from './appSideBarFooter'
@@ -64,7 +64,7 @@ class AppSideBar extends React.Component {
 
 const mapStateToProps = state => ({
   user: appState.getUser(state),
-  surveyInfo: getSurveyInfo(getSurveyState(state))
+  surveyInfo: getSurveyInfo(getSurvey(state))
 })
 
 export default connect(mapStateToProps, {logout})(AppSideBar)

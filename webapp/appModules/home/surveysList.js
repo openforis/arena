@@ -60,8 +60,8 @@ const SurveyList = (props) => {
               {
                 surveys
                   .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
-                  .map(survey =>
-                    <SurveyRow key={survey.id} {...props} survey={survey}/>
+                  .map((survey, i) =>
+                    <SurveyRow key={i} {...props} survey={survey}/>
                   )
               }
             </div>

@@ -9,7 +9,7 @@ import { appModuleUri, getSurveys } from '../../app/app'
 import { getNewSurvey } from '../../app/appState'
 import { appModules } from '../appModules'
 
-import { getSurveyState } from '../../survey/surveyState'
+import { getSurvey } from '../../survey/surveyState'
 
 import { fetchSurveys, setActiveSurvey, createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../app/actions'
 
@@ -59,7 +59,7 @@ AppHomeView.defaultProps = {
 
 const mapStateToProps = state => ({
   newSurvey: getNewSurvey(state),
-  currentSurvey: getSurveyState(state),
+  currentSurvey: getSurvey(state),
   surveys: getSurveys(state)
 })
 

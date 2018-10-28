@@ -24,7 +24,7 @@ import {
   setCodeListItemForEdit,
   deleteCodeListItem,
 } from '../../codeList/actions'
-import { getSurveyState } from '../../surveyState'
+import { getSurvey } from '../../surveyState'
 import {
   getCodeListEditActiveLevelItem,
   getCodeListEditCodeList,
@@ -106,7 +106,7 @@ class CodeListEditLevel extends React.Component {
 const mapStateToProps = (state, props) => {
   const {level} = props
 
-  const survey = getSurveyState(state)
+  const survey = getSurvey(state)
 
   const codeList = getCodeListEditCodeList(survey)
   const activeItem = getCodeListEditActiveLevelItem(level.index)(survey)

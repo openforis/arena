@@ -5,7 +5,7 @@ import { assocSurveyInfo } from './surveyInfoState'
 import { surveyCurrentUpdate } from '../actions'
 
 const actionHandlers = {
-  [surveyCurrentUpdate]: (state, {survey}) => assocSurveyInfo(survey)(state),
+  [surveyCurrentUpdate]: (state, {survey}) => survey.info,
 }
 
 export default exportReducer(actionHandlers)

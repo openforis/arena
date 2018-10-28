@@ -39,17 +39,24 @@ const defaultSteps = {
  */
 const getSurveyInfo = R.prop('info')
 
+const getSurveyInfoProp = (prop, defaultValue) => R.pipe(
+  getSurveyInfo,
+  getProp(prop, defaultValue)
+)
+
 const isSurveyPublished = R.pipe(
+  getSurveyInfo,
   R.prop('published'),
   R.equals(true)
 )
 
 const isSurveyDraft = R.pipe(
+  getSurveyInfo,
   R.prop('draft'),
   R.equals(true)
 )
 
-const getSurveyLanguages = getProp('languages', [])
+const getSurveyLanguages = getSurveyInfoProp('languages', [])
 
 const getSurveyDefaultLanguage = R.pipe(
   getSurveyLanguages,
@@ -57,13 +64,13 @@ const getSurveyDefaultLanguage = R.pipe(
 )
 
 const getSurveyDefaultStep = R.pipe(
-  getProp('steps'),
+  getSurveyInfoProp('steps'),
   R.toPairs,
   R.find(s => !s[1].prev),
   R.head
 )
 
-const getSurveyLabels = getProp('labels', {})
+const getSurveyLabels = getSurveyInfoProp('labels', {})
 
 const getSurveyDefaultLabel = survey => {
   const labels = getSurveyLabels(survey)
@@ -312,13 +319,13 @@ module.exports = {
   getSurveyInfo,
   getSurveyProps: getProps,
 
-  getSurveyName: getProp('name', ''),
+  getSurveyName: getSurveyInfoProp('name', ''),
   getSurveyLanguages,
   getSurveyDefaultLanguage,
   getSurveyLabels: getLabels,
   getSurveyDefaultLabel,
-  getSurveyDescriptions: getProp('descriptions', {}),
-  getSurveySrs: getProp('srs', []),
+  getSurveyDescriptions: getSurveyInfoProp('descriptions', {}),
+  getSurveySrs: getSurveyInfoProp('srs', []),
   getSurveyDefaultStep,
 
   getSurveyStatus,

@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/survey/execMigrations')
 const {uuidv4} = require('../../common/uuid')
@@ -73,8 +75,10 @@ const fetchSurveyById = async (id, draft = false, validate = false) => {
   })
 }
 
-const fetchUserSurveys = async (user) =>
+const fetchUserSurveys = async (user) => R.map(
+  assocSurveyInfo,
   await surveyRepository.fetchSurveys()
+)
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
