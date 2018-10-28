@@ -1,6 +1,9 @@
 import * as R from 'ramda'
 
-import {getCodeLists as getSurveyCodeLists} from '../../../common/survey/survey'
+import {
+  getCodeLists as getSurveyCodeLists,
+  getCodeListByUUID,
+} from '../../../common/survey/survey'
 
 // DOCS
 const surveyState = {
@@ -35,26 +38,29 @@ const surveyState = {
   }
 }
 
-const codeLists = 'codeLists'
-const codeListsPath = [codeLists]
 const codeListEdit = 'codeListEdit'
 
 const codeListEditPath = [codeListEdit]
-const codeListUUIDPath = R.append('uuid', codeListEditPath)
 const activeLevelItemPath = R.concat(codeListEditPath, ['activeLevelItem'])
 const levelItemsPath = R.append('levelItems', codeListEditPath)
-
-// ========= READ
 
 export const getCodeLists = R.pipe(
   getSurveyCodeLists,
   R.dissoc(codeListEdit)
 )
 
-export const getCodeListEditCodeList = state => R.pipe(
-  R.path(codeListsPath),
-  codeLists => R.prop(R.path(codeListUUIDPath)(state))(codeLists),
-)(state)
+// ==== current editing codeList
+
+export const updateCodeListEdit = (codeListUUID = null) =>
+  codeListUUID
+    ? R.assocPath(['codeLists', codeListEdit, 'uuid'], codeListUUID)
+    : R.dissocPath(['codeLists', codeListEdit])
+
+export const getCodeListEditCodeList = survey => R.pipe(
+  getSurveyCodeLists,
+  R.path([codeListEdit, 'uuid']),
+  codeListUUUID => getCodeListByUUID(codeListUUUID)(survey),
+)(survey)
 
 const getActiveLevelItem = R.pipe(
   R.path(activeLevelItemPath),
@@ -94,11 +100,6 @@ export const getCodeListEditActiveItemAndAncestorsUUIDs = levelIndex => state =>
 )(state)
 
 // ========== UPDATE
-
-export const updateCodeListEdit = (codeListUUID = null) =>
-  codeListUUID
-    ? R.assocPath(codeListEditPath, {uuid: codeListUUID})
-    : R.dissocPath(codeListEditPath)
 
 export const assocCodeListEditLevelItems = (levelIndex, items) =>
   state => R.pipe(

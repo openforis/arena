@@ -1,5 +1,8 @@
 const {sendOk, sendErr} = require('../serverUtils/response')
+
 const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
+
+const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const {
   insertCodeList,
@@ -83,7 +86,7 @@ module.exports.init = app => {
 
       const codeLists = await fetchCodeListsBySurveyId(surveyId, draft, draft)
 
-      res.json({codeLists})
+      res.json({codeLists:toUUIDIndexedObj(codeLists)})
     } catch (err) {
       sendErr(res, err)
     }

@@ -33,7 +33,10 @@ const actionHandlers = {
     getCodeLists,
   )(simulateSurveyState(state)),
 
-  [codeListEditUpdate]: (state, {codeListUUID}) => updateCodeListEdit(codeListUUID)(state),
+  [codeListEditUpdate]: (state, {codeListUUID}) =>  R.pipe(
+    updateCodeListEdit(codeListUUID),
+    getCodeLists,
+  )(simulateSurveyState(state)),
 
   [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditActiveLevelItem(levelIndex, itemUUID)(state),
 

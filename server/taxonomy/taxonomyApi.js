@@ -36,7 +36,7 @@ module.exports.init = app => {
 
       const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, draft, draft)
 
-      res.json({taxonomies})
+      res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
     } catch (err) {
       sendErr(res, err)
     }
