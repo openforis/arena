@@ -6,6 +6,7 @@ import * as R from 'ramda'
 import { getRelativeDate, compareDatesDesc } from '../../appUtils/dateUtils'
 
 import {
+  getSurveyId,
   getSurveyName,
   getSurveyDefaultLabel,
   getSurveyStatus,
@@ -24,8 +25,8 @@ const SurveyListHeader = () => (
   </div>
 )
 
-const SurveyRow = ({survey, currentSurvey, setActiveSurvey}) => {
-  const active = currentSurvey && survey.id === currentSurvey.id
+const SurveyRow = ({survey, surveyInfo, setActiveSurvey}) => {
+  const active = surveyInfo && getSurveyId(survey) === surveyInfo.id
   const activeClass = active ? ' active' : ''
 
   return (

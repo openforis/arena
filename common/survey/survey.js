@@ -39,6 +39,11 @@ const defaultSteps = {
  */
 const getSurveyInfo = R.prop('info')
 
+const getSurveyId = R.pipe(
+  getSurveyInfo,
+  R.prop('id')
+)
+
 const getSurveyInfoProp = (prop, defaultValue) => R.pipe(
   getSurveyInfo,
   getProp(prop, defaultValue)
@@ -319,6 +324,7 @@ module.exports = {
   getSurveyInfo,
   getSurveyProps: getProps,
 
+  getSurveyId,
   getSurveyName: getSurveyInfoProp('name', ''),
   getSurveyLanguages,
   getSurveyDefaultLanguage,

@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import * as R from 'ramda'
 
 import { appModuleUri } from '../../app'
 import { appModules } from '../../../appModules/appModules'
@@ -55,7 +56,7 @@ const AppSideBarModule = (props) => {
     <React.Fragment>
       <Link className={`btn btn-s btn-of-light-xs${active ? ' active' : ''}`}
             to={appModuleUri(module)}
-            aria-disabled={disabled || (requireSurvey && !surveyInfo)}>
+            aria-disabled={disabled || (requireSurvey && R.isEmpty(surveyInfo))}>
         <span className={`icon icon-${icon} icon-20px${showLabel ? ' icon-left' : ''}`}></span>
         {
           showLabel

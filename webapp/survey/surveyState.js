@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { getNodeDefParent, getNodeDefByUUID } from '../../common/survey/survey'
+import { getSurveyInfo, getNodeDefParent, getNodeDefByUUID } from '../../common/survey/survey'
 import { getNodeByUUID } from '../../common/record/record'
 import { getRecord } from './record/recordState'
 
@@ -17,6 +17,7 @@ export const getSurvey = R.prop(survey)
 
 export const getSurveyId = R.pipe(
   getSurvey,
+  getSurveyInfo,
   R.prop('id'),
 )
 
