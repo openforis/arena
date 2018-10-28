@@ -3,11 +3,11 @@ import * as R from 'ramda'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
-import LabelsEditor from '../../labelsEditor'
+import LabelsEditor from '../../../components/labelsEditor'
 import CodeListProps from './codeListProps'
 import TaxonProps from './taxonProps'
 
-import { getFieldValidation, getValidation } from './../../../../../common/validation/validator'
+import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
 
 import {
   canNodeDefBeMultiple,
@@ -23,7 +23,7 @@ import {
 
 import { isRenderTable, } from '../../../../../common/survey/nodeDefLayout'
 
-import { normalizeName } from './../../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../../common/survey/surveyUtils'
 
 const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValue) => {
   putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))

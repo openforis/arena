@@ -9,9 +9,10 @@ import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../../nodeDef/components/nodeDefSystemProps'
 
-import { getNodeDefFormUnlocked, getFormActivePageNodeDef, getSurvey } from '../../surveyState'
+import { getSurvey } from '../../surveyState'
 
 import { createNodeDef } from '../../nodeDef/actions'
+import { getFormActivePageNodeDef, getNodeDefFormUnlocked } from '../surveyFormState'
 
 const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
   const isEntity = type === nodeDefType.entity
@@ -125,14 +126,18 @@ class FormActions extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const nodeDefUnlocked = getNodeDefFormUnlocked(state)
-  const nodeDefActivePage = getFormActivePageNodeDef(state)
+  const survey = getSurvey(state)
 
-  const nodeDef =
-    nodeDefUnlocked &&
-    (nodeDefActivePage.uuid === nodeDefUnlocked.uuid || isNodeDefAncestor(nodeDefActivePage, nodeDefUnlocked)(getSurvey(state)))
-      ? nodeDefUnlocked
-      : null
+  const nodeDefUnlocked = getNodeDefFormUnlocked(survey)
+  const nodeDefActivePage = getFormActivePageNodeDef(survey)
+
+  const nodeDef = nodeDefUnlocked &&
+  (
+    nodeDefActivePage.uuid === nodeDefUnlocked.uuid ||
+    isNodeDefAncestor(nodeDefActivePage, nodeDefUnlocked)(survey)
+  )
+    ? nodeDefUnlocked
+    : null
 
   return {
     nodeDef

@@ -1,33 +1,31 @@
-import './form/surveyForm.scss'
+import './surveyForm.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
 
-import FormNavigation from './form/formNavigation'
-import FormActions from './form/formActions'
-import NodeDefEdit from './form/nodeDefEdit/nodeDefEdit'
-import NodeDefSwitch from '../nodeDef/components/nodeDefSwitch'
+import FormNavigation from './formNavigation'
+import FormActions from './formActions'
+import NodeDefEdit from './nodeDefEdit/nodeDefEdit'
+import NodeDefSwitch from '../../nodeDef/components/nodeDefSwitch'
 
-import { getRootNodeDef } from '../../../common/survey/survey'
-import { getSurvey, getFormActivePageNodeDef, getFormPageParentNode } from '../surveyState'
-import { getRecord } from '../record/recordState'
+import { getSurvey } from '../../surveyState'
+import { getRootNodeDef } from '../../../../common/survey/survey'
 
-import {
-  resetForm,
-  setFormActivePage,
-  setFormNodeDefUnlocked,
-  setFormPageNode,
-  fetchNodeDefs
-} from '../nodeDef/actions'
+import { getFormActivePageNodeDef, getFormPageParentNode } from '../surveyFormState'
+
+import { fetchNodeDefs } from '../../nodeDef/actions'
+import { resetForm, setFormActivePage, setFormNodeDefUnlocked, setFormPageNode } from '../actions'
+
+import { getRecord } from '../../record/recordState'
 
 class SurveyFormView extends React.Component {
 
   componentDidMount () {
-    const {survey, edit, resetForm, fetchNodeDefs} = this.props
+    const {edit, resetForm, fetchNodeDefs} = this.props
 
     resetForm()
 
-    fetchNodeDefs(survey.id, edit)
+    fetchNodeDefs(edit)
   }
 
   componentDidUpdate () {
@@ -88,16 +86,16 @@ class SurveyFormView extends React.Component {
 }
 
 SurveyFormView.defaultProps = {
-  //root entity
+  //root nodeDef
   rootNodeDef: null,
   // current nodeDef page
   nodeDef: null,
   // can edit form
   edit: false,
-  // load draft props
-  draft: false,
   // can entry data
   entry: false,
+  // load draft props
+  draft: false,
   // record being edited
   recordLoaded: null,
 }
@@ -106,12 +104,12 @@ const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
 
   const rootNodeDef = getRootNodeDef(survey)
-  const nodeDef = getFormActivePageNodeDef(state)
+  const nodeDef = getFormActivePageNodeDef(survey)
 
   const mapEntryProps = () => ({
     // rootNode: getRootNode(getRecord(survey)),
     recordLoaded: !!getRecord(survey),
-    parentNode: nodeDef ? getFormPageParentNode(nodeDef)(state) : null,
+    parentNode: nodeDef ? getFormPageParentNode(nodeDef)(survey) : null,
   })
 
   return {
@@ -128,5 +126,8 @@ const mapStateToProps = (state, props) => {
 
 export default connect(
   mapStateToProps,
-  {resetForm, setFormActivePage, setFormPageNode, setFormNodeDefUnlocked, fetchNodeDefs}
+  {
+    fetchNodeDefs,
+    resetForm, setFormActivePage, setFormPageNode, setFormNodeDefUnlocked,
+  }
 )(SurveyFormView)

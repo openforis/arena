@@ -1,6 +1,6 @@
 import React from 'react'
 
-import SurveyFormView from '../../survey/components/surveyFormView'
+import SurveyFormView from '../../survey/form/components/surveyFormView'
 
 class DataRecordView extends React.Component {
 

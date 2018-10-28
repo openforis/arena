@@ -15,12 +15,8 @@ import {
 } from '../../common/survey/survey'
 
 import {
-  assocFormNodeDefEdit,
-  assocNodeDefFormUnlocked,
-  assocFormActivePage,
-  assocFormPageNode,
   dissocForm,
-} from './surveyState'
+} from './form/surveyFormState'
 
 /**
  * record state
@@ -64,10 +60,7 @@ import {
   nodeDefDelete,
 
   //survey-form
-  formNodeDefEditUpdate,
-  formNodeDefUnlockedUpdate,
-  formActivePageNodeDefUpdate, formPageNodeUpdate, formReset,
-} from './nodeDef/actions'
+  } from './nodeDef/actions'
 
 /**
  * record actions
@@ -95,6 +88,19 @@ import {
   taxonomiesUpdate,
   taxonomyEditUpdate,
 } from './taxonomy/actions'
+import {
+  formActivePageNodeDefUpdate,
+  formNodeDefEditUpdate,
+  formNodeDefUnlockedUpdate,
+  formPageNodeUpdate,
+  formReset
+} from './form/actions'
+import {
+  assocFormActivePage,
+  assocFormNodeDefEdit,
+  assocFormPageNode,
+  assocNodeDefFormUnlocked
+} from './form/surveyFormState'
 
 const actionHandlers = {
   //SURVEY
@@ -109,16 +115,8 @@ const actionHandlers = {
 
   [nodeDefDelete]: (state, {nodeDef}) => dissocNodeDef(nodeDef)(state),
 
-  //SURVEY-FORM
-  [formReset]: dissocForm,
+   [formPageNodeUpdate]: (state, {nodeDef, node}) => assocFormPageNode(nodeDef, node)(state),
 
-  [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),
-
-  [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocNodeDefFormUnlocked(nodeDef)(state),
-
-  [formActivePageNodeDefUpdate]: (state, {nodeDef}) => assocFormActivePage(nodeDef)(state),
-
-  [formPageNodeUpdate]: (state, {nodeDef, node}) => assocFormPageNode(nodeDef, node)(state),
 
   //CODE LIST
   [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state),

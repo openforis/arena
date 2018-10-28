@@ -11,14 +11,20 @@ import {
 import { getNodeDefLabel, isNodeDefRoot, isNodeDefMultiple, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { getNodeChildrenByDefId, getRootNode } from '../../../../common/record/record'
 
-import { getSurvey, isNodeDefFormLocked } from '../../surveyState'
-import { getRecord } from '../../record/recordState'
+import { getSurvey} from '../../surveyState'
+import { getSurveyDefaultLanguage } from '../../../../common/survey/survey'
 
-import { setFormNodeDefEdit, setFormNodeDefUnlocked, putNodeDefProp, removeNodeDef } from '../actions'
+import { setFormNodeDefEdit, setFormNodeDefUnlocked } from '../../form/actions'
+import { isNodeDefFormLocked } from '../../form/surveyFormState'
+
+import { putNodeDefProp, removeNodeDef } from '../actions'
+import { getNodeDefComponent, getNodeDefDefaultValue } from './nodeDefSystemProps'
+
+
+import { getRecord } from '../../record/recordState'
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
 
-import { getNodeDefComponent, getNodeDefDefaultValue } from './nodeDefSystemProps'
-import { getSurveyDefaultLanguage } from '../../../../common/survey/survey'
+
 
 class NodeDefSwitch extends React.Component {
 
@@ -155,7 +161,7 @@ const mapStateToProps = (state, props) => {
   })
 
   return {
-    locked: isNodeDefFormLocked(nodeDef)(state),
+    locked: isNodeDefFormLocked(nodeDef)(survey),
     label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey)),
     ...entry ? mapEntryProps() : {},
   }

@@ -352,6 +352,7 @@ module.exports = {
   isSurveyDraft,
 
   // READ nodeDefs
+  getNodeDefs,
   getNodeDefByUUID,
   getNodeDefById,
   getRootNodeDef,

@@ -18,7 +18,8 @@ import {
   getLayout,
   getNoColumns,
 } from '../../../../../common/survey/nodeDefLayout'
-import { getFormPageNodeUUID } from '../../../surveyState'
+import { getFormPageNodeUUID } from '../../../form/surveyFormState'
+import { getSurvey } from '../../../surveyState'
 
 const EntityForm = props => {
   const {nodeDef, childDefs, edit, locked, node, putNodeDefProp} = props
@@ -204,7 +205,7 @@ class NodeDefEntityForm extends React.Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  selectedNodeUUID: getFormPageNodeUUID(props.nodeDef)(state)
+  selectedNodeUUID: getFormPageNodeUUID(props.nodeDef)(getSurvey(state))
 })
 
 export default connect(mapStateToProps)(NodeDefEntityForm)

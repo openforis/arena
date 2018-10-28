@@ -2,16 +2,19 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import CommonProps from './commonProps'
-import CodeListsView from './../../../codeList/components/codeListsView'
+import CodeListsView from '../../../codeList/components/codeListsView'
 import TaxonomiesView from '../../../taxonomy/components/taxonomiesView'
 
 import { canUpdateCodeList } from '../../../../../common/survey/survey'
 import { getNodeDefCodeListUUID, getNodeDefTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 
-import { closeFormNodeDefEdit, putNodeDefProp } from '../../../nodeDef/actions'
+import { putNodeDefProp } from '../../../nodeDef/actions'
 import { createCodeList } from '../../../codeList/actions'
 import { createTaxonomy } from '../../../taxonomy/actions'
-import { getFormNodeDefEdit, getSurvey } from '../../../surveyState'
+
+import { getSurvey } from '../../../surveyState'
+import { closeFormNodeDefEdit } from '../../actions'
+import { getFormNodeDefEdit } from '../../surveyFormState'
 
 class NodeDefEdit extends React.Component {
 
@@ -25,7 +28,7 @@ class NodeDefEdit extends React.Component {
   }
 
   close () {
-    const {nodeDef, closeFormNodeDefEdit} = this.props
+    const {closeFormNodeDefEdit} = this.props
     closeFormNodeDefEdit()
   }
 
@@ -43,7 +46,7 @@ class NodeDefEdit extends React.Component {
                              canSelect={canUpdateCodeList(nodeDef)(survey)}
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
                              selectedCodeListUUID={getNodeDefCodeListUUID(nodeDef)}
-                             />
+              />
 
               : editingTaxonomy
               ?
@@ -74,10 +77,14 @@ class NodeDefEdit extends React.Component {
 NodeDefEdit.defaultProps = {
   nodeDef: null,
 }
-const mapStateToProps = state => ({
-  survey: getSurvey(state),
-  nodeDef: getFormNodeDefEdit(state),
-})
+const mapStateToProps = state => {
+  const survey = getSurvey(state)
+
+  return {
+    survey,
+    nodeDef: getFormNodeDefEdit(survey),
+  }
+}
 
 export default connect(
   mapStateToProps,

@@ -1,6 +1,4 @@
-import * as R from 'ramda'
-
-import { assocActionProps, exportReducer, } from '../../appUtils/reduxUtils'
+import { exportReducer } from '../../appUtils/reduxUtils'
 
 import { getSurveyInfo } from '../../../common/survey/survey'
 

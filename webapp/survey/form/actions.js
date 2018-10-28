@@ -1,0 +1,35 @@
+/**
+ * ==== SURVEY-FORM EDIT MODE - NODE DEFS EDIT
+ */
+
+export const formReset = 'survey/form/reset'
+
+export const resetForm = () => dispatch =>
+  dispatch({type: formReset})
+
+// ====== node def edit
+export const formNodeDefEditUpdate = 'survey/form/nodeDefEdit/update'
+export const formNodeDefUnlockedUpdate = 'survey/form/nodeDefUnlocked/update'
+
+// set current nodeDef edit
+export const setFormNodeDefEdit = nodeDef => dispatch =>
+  dispatch({type: formNodeDefEditUpdate, nodeDef})
+
+// reset current nodeDef edit
+export const closeFormNodeDefEdit = () => async dispatch =>
+  dispatch({type: formNodeDefEditUpdate, nodeDef: null})
+
+// set current nodeDef unlocked
+export const setFormNodeDefUnlocked = nodeDef => dispatch =>
+  dispatch({type: formNodeDefUnlockedUpdate, nodeDef})//SURVEY FORM ACTIVE PAGE
+
+
+export const formActivePageNodeDefUpdate = 'survey/form/activePageNodeDef/update'
+
+export const formPageNodeUpdate = 'survey/form/pageParentNode/update'
+
+export const setFormActivePage = (nodeDef) => dispatch =>
+  dispatch({type: formActivePageNodeDefUpdate, nodeDef})
+
+export const setFormPageNode = (nodeDef, node) => dispatch =>
+  dispatch({type: formPageNodeUpdate, nodeDef, node})

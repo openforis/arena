@@ -2,10 +2,11 @@ import axios from 'axios'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 
-import { newNodeDef, isNodeDefEntity } from '../../../common/survey/nodeDef'
+import { isNodeDefEntity, newNodeDef } from '../../../common/survey/nodeDef'
 import { getPageUUID } from '../../../common/survey/nodeDefLayout'
 import { getSurveyId } from '../surveyState'
 import { dispatchMarkCurrentSurveyDraft } from '../actions'
+import { setFormActivePage, setFormNodeDefEdit, setFormNodeDefUnlocked } from '../form/actions'
 
 /**
  * ==== NODE DEFS
@@ -40,8 +41,9 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
 
 // ==== READ
 
-export const fetchNodeDefs = (surveyId, draft = false) => async dispatch => {
+export const fetchNodeDefs = (draft = false) => async (dispatch, getState) => {
   try {
+    const surveyId = getSurveyId(getState())
     const {data} = await axios.get(`/api/survey/${surveyId}/nodeDefs?draft=${draft}`)
 
     dispatch({type: nodeDefsUpdate, nodeDefs: data.nodeDefs})
@@ -77,30 +79,3 @@ const _putNodeDefProp = (nodeDef, key, value) => {
   return debounceAction(action, `${nodeDefPropUpdate}_${key}`)
 }
 
-/**
- * ==== SURVEY-FORM EDIT MODE - NODE DEFS EDIT
- */
-
-export const formReset = 'survey/form/reset'
-export const resetForm = () => dispatch =>
-  dispatch({type: formReset})
-
-export const formNodeDefEditUpdate = 'survey/form/nodeDefEdit/update'
-export const formNodeDefUnlockedUpdate = 'survey/form/nodeDefUnlocked/update'
-
-export const setFormNodeDefEdit = nodeDef => dispatch => dispatch({type: formNodeDefEditUpdate, nodeDef})
-
-export const setFormNodeDefUnlocked = nodeDef => dispatch => dispatch({type: formNodeDefUnlockedUpdate, nodeDef})
-
-export const closeFormNodeDefEdit = () => async dispatch =>
-  dispatch({type: formNodeDefEditUpdate, nodeDef: null})
-
-//SURVEY FORM ACTIVE PAGE
-export const formActivePageNodeDefUpdate = 'survey/form/activePageNodeDef/update'
-export const formPageNodeUpdate = 'survey/form/pageParentNode/update'
-
-export const setFormActivePage = (nodeDef) => dispatch =>
-  dispatch({type: formActivePageNodeDefUpdate, nodeDef})
-
-export const setFormPageNode = (nodeDef, node) => dispatch =>
-  dispatch({type: formPageNodeUpdate, nodeDef, node})

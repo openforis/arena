@@ -4,7 +4,7 @@ import React from 'react'
 
 import TabBar from '../../commonComponents/tabBar'
 import SurveyInfoComponent from './components/surveyInfoComponent'
-import SurveyFormView from '../../survey/components/surveyFormView'
+import SurveyFormView from '../../survey/form/components/surveyFormView'
 import CodeListsView from '../../survey/codeList/components/codeListsView'
 import TaxonomiesView from '../../survey/taxonomy/components/taxonomiesView'
 
