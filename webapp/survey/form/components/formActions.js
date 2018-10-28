@@ -7,11 +7,11 @@ import { uuidv4 } from '../../../../common/uuid'
 import { isNodeDefAncestor } from '../../../../common/survey/survey'
 import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
-import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../../nodeDef/components/nodeDefSystemProps'
+import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../../nodeDefs/components/nodeDefSystemProps'
 
 import { getSurvey } from '../../surveyState'
 
-import { createNodeDef } from '../../nodeDef/actions'
+import { createNodeDef } from '../../nodeDefs/actions'
 import { getFormActivePageNodeDef, getNodeDefFormUnlocked } from '../surveyFormState'
 
 const AddNodeDefButton = ({type, addNodeDef, enabled}) => {

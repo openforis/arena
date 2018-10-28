@@ -8,7 +8,7 @@ import TaxonomiesView from '../../../taxonomy/components/taxonomiesView'
 import { canUpdateCodeList } from '../../../../../common/survey/survey'
 import { getNodeDefCodeListUUID, getNodeDefTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 
-import { putNodeDefProp } from '../../../nodeDef/actions'
+import { putNodeDefProp } from '../../../nodeDefs/actions'
 import { createCodeList } from '../../../codeList/actions'
 import { createTaxonomy } from '../../../taxonomy/actions'
 

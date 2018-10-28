@@ -60,7 +60,7 @@ import {
   nodeDefDelete,
 
   //survey-form
-  } from './nodeDef/actions'
+  } from './nodeDefs/actions'
 
 /**
  * record actions

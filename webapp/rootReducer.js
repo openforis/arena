@@ -4,7 +4,7 @@ import { combineReducers } from 'redux'
 // == survey reducer
 import info from './survey/surveyInfo/reducer'
 import form from './survey/form/reducer'
-import nodeDefs from './survey/nodeDef/reducer'
+import nodeDefs from './survey/nodeDefs/reducer'
 
 const survey = combineReducers({
   info,

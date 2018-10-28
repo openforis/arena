@@ -6,14 +6,14 @@ import { connect } from 'react-redux'
 import FormNavigation from './formNavigation'
 import FormActions from './formActions'
 import NodeDefEdit from './nodeDefEdit/nodeDefEdit'
-import NodeDefSwitch from '../../nodeDef/components/nodeDefSwitch'
+import NodeDefSwitch from '../../nodeDefs/components/nodeDefSwitch'
 
 import { getSurvey } from '../../surveyState'
 import { getRootNodeDef } from '../../../../common/survey/survey'
 
 import { getFormActivePageNodeDef, getFormPageParentNode } from '../surveyFormState'
 
-import { fetchNodeDefs } from '../../nodeDef/actions'
+import { fetchNodeDefs } from '../../nodeDefs/actions'
 import { resetForm, setFormActivePage, setFormNodeDefUnlocked, setFormPageNode } from '../actions'
 
 import { getRecord } from '../../record/recordState'
