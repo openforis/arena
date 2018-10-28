@@ -9,7 +9,7 @@ import TaxonomyEdit from './taxonomyEdit'
 import { getNodeDefsByTaxonomyUUID, getSurveyTaxonomiesArray } from '../../../../common/survey/survey'
 import { getTaxonomyName } from '../../../../common/survey/taxonomy'
 
-import { getSurvey } from '../../surveyState'
+import { getSurveyState } from '../../surveyState'
 import { getTaxonomyEditTaxonomy } from '../taxonomyEditState'
 
 import {
@@ -46,7 +46,7 @@ const TaxonomiesView = (props) => {
 }
 
 const mapStateToProps = state => {
-  const survey = getSurvey(state)
+  const survey = getSurveyState(state)
 
   return {
     survey,

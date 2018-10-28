@@ -18,6 +18,8 @@ const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPref
 const {fetchTaxonomiesBySurveyId, publishTaxonomiesProps} = require('../taxonomy/taxonomyManager')
 const {fetchCodeListsBySurveyId, publishCodeListsProps} = require('../codeList/codeListManager')
 
+const assocSurveyInfo = info => ({info})
+
 // ====== CREATE
 const createSurvey = async (user, {name, label, lang}) => {
 
@@ -54,7 +56,7 @@ const createSurvey = async (user, {name, label, lang}) => {
   //create survey data schema
   await migrateSurveySchema(survey.id)
 
-  return survey
+  return assocSurveyInfo(survey)
 }
 
 // ====== READ
@@ -63,12 +65,12 @@ const fetchSurveyById = async (id, draft = false, validate = false) => {
   const codeLists = await fetchCodeListsBySurveyId(id, draft)
   const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
 
-  return {
+  return assocSurveyInfo({
     ...survey,
     codeLists: toUUIDIndexedObj(codeLists),
     taxonomies: toUUIDIndexedObj(taxonomies),
     validation: validate ? await validateSurvey(survey) : null
-  }
+  })
 }
 
 const fetchUserSurveys = async (user) =>
@@ -84,8 +86,9 @@ const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) =>
 
 // ====== UPATE
 const updateSurveyProp = async (id, key, value, user) =>
-  await surveyRepository.updateSurveyProp(id, key, value)
-
+  assocSurveyInfo(
+    await surveyRepository.updateSurveyProp(id, key, value)
+  )
 const publishSurvey = async (id, user) => {
   await db.tx(async t => {
 
@@ -101,7 +104,7 @@ const publishSurvey = async (id, user) => {
 
   })
 
-  return await fetchSurveyById(id)
+  return assocSurveyInfo(await fetchSurveyById(id))
 }
 
 // ====== DELETE

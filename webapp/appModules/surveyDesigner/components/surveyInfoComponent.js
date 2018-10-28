@@ -14,7 +14,7 @@ import {
 } from '../../../../common/survey/survey'
 import { getSrsName, srs } from '../../../../common/app/srs'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getSurveyState } from '../../../survey/surveyState'
 import { updateSurveyProp } from '../../../survey/actions'
 
 import { normalizeName } from './../../../../common/survey/surveyUtils'
@@ -71,7 +71,7 @@ class SurveyInfoComponent extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  survey: getSurvey(state),
+  survey: getSurveyState(state),
 })
 
 export default connect(

@@ -5,7 +5,7 @@ import { getNodeDefChildren, getSurveyDefaultLanguage } from '../../../../common
 import { isNodeDefRoot, getNodeDefLabel } from '../../../../common/survey/nodeDef'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
 
-import { getFormPageParentNode, getSurvey, isNodeDefFormActivePage } from '../../surveyState'
+import { getFormPageParentNode, getSurveyState, isNodeDefFormActivePage } from '../../surveyState'
 
 import { setFormActivePage } from '../../nodeDef/actions'
 
@@ -52,7 +52,7 @@ const FormNavigationItem = (props) => {
 }
 
 const mapStateToProps = (state, props) => {
-  const survey = getSurvey(state)
+  const survey = getSurveyState(state)
   const {rootNodeDef, nodeDef, edit} = props
   const parentNode = getFormPageParentNode(nodeDef)(state)
 

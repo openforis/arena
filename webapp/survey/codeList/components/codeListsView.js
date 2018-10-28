@@ -9,7 +9,7 @@ import CodeListEdit from './codeListEdit'
 import { getNodeDefsByCodeListUUID, getSurveyCodeListsArray } from '../../../../common/survey/survey'
 import { getCodeListName } from '../../../../common/survey/codeList'
 
-import { getSurvey } from '../../surveyState'
+import { getSurveyState } from '../../surveyState'
 import { getCodeListEditCodeList } from '../codeListEditState'
 import {
   createCodeList,
@@ -48,7 +48,7 @@ const CodeListsView = (props) => {
 }
 
 const mapStateToProps = state => {
-  const survey = getSurvey(state)
+  const survey = getSurveyState(state)
 
   return {
     survey,

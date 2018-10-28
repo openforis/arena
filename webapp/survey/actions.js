@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import { assocSurveyProp, assocSurveyPropValidation } from '../../common/survey/survey'
 
-import { getSurvey, getSurveyId } from './surveyState'
+import { getSurveyState, getSurveyId } from './surveyState'
 
 import { debounceAction } from '../appUtils/reduxUtils'
 
@@ -14,7 +14,7 @@ export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
 
 export const dispatchMarkCurrentSurveyDraft = (dispatch, getState) => {
 
-  const survey = R.pipe(getSurvey,
+  const survey = R.pipe(getSurveyState,
     R.assoc('draft', true)
   )(getState())
 
@@ -28,7 +28,7 @@ export const dispatchMarkCurrentSurveyDraft = (dispatch, getState) => {
 export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
 
   const survey = R.pipe(
-    getSurvey,
+    getSurveyState,
     assocSurveyProp(key, value),
     R.assoc('draft', true),
     assocSurveyPropValidation(key, null)
@@ -55,7 +55,7 @@ const _updateSurveyProp = (survey, key, value) => {
 }
 
 export const publishSurvey = () => async (dispatch, getState) => {
-  const survey = getSurvey(getState())
+  const survey = getSurveyState(getState())
 
   const {data} = await axios.put(`/api/survey/${survey.id}/publish`)
 

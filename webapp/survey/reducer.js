@@ -98,7 +98,7 @@ import {
 
 const actionHandlers = {
   //SURVEY
-  [surveyCurrentUpdate]: (state, {survey}) => survey,
+  // [surveyCurrentUpdate]: (state, {survey}) => survey,
 
   // NODE-DEFS
   [nodeDefsUpdate]: (state, {nodeDefs}) => assocNodeDefs(nodeDefs)(state),

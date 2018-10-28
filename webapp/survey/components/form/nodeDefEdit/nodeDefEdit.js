@@ -11,7 +11,7 @@ import { getNodeDefCodeListUUID, getNodeDefTaxonomyUUID } from '../../../../../c
 import { closeFormNodeDefEdit, putNodeDefProp } from '../../../nodeDef/actions'
 import { createCodeList } from '../../../codeList/actions'
 import { createTaxonomy } from '../../../taxonomy/actions'
-import { getFormNodeDefEdit, getSurvey } from '../../../surveyState'
+import { getFormNodeDefEdit, getSurveyState } from '../../../surveyState'
 
 class NodeDefEdit extends React.Component {
 
@@ -75,7 +75,7 @@ NodeDefEdit.defaultProps = {
   nodeDef: null,
 }
 const mapStateToProps = state => ({
-  survey: getSurvey(state),
+  survey: getSurveyState(state),
   nodeDef: getFormNodeDefEdit(state),
 })
 

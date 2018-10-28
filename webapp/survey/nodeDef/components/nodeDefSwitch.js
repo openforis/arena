@@ -11,7 +11,7 @@ import {
 import { getNodeDefLabel, isNodeDefRoot, isNodeDefMultiple, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { getNodeChildrenByDefId, getRootNode } from '../../../../common/record/record'
 
-import { getSurvey, isNodeDefFormLocked } from '../../surveyState'
+import { getSurveyState, isNodeDefFormLocked } from '../../surveyState'
 import { getRecord } from '../../record/recordState'
 
 import { setFormNodeDefEdit, setFormNodeDefUnlocked, putNodeDefProp, removeNodeDef } from '../actions'
@@ -143,7 +143,7 @@ NodeDefSwitch.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const {nodeDef, parentNode, entry} = props
-  const survey = getSurvey(state)
+  const survey = getSurveyState(state)
 
   const mapEntryProps = () => ({
     nodes: isNodeDefRoot(nodeDef)

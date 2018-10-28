@@ -9,7 +9,7 @@ import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
 import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../../nodeDef/components/nodeDefSystemProps'
 
-import { getNodeDefFormUnlocked, getFormActivePageNodeDef, getSurvey } from '../../surveyState'
+import { getNodeDefFormUnlocked, getFormActivePageNodeDef, getSurveyState } from '../../surveyState'
 
 import { createNodeDef } from '../../nodeDef/actions'
 
@@ -130,7 +130,7 @@ const mapStateToProps = state => {
 
   const nodeDef =
     nodeDefUnlocked &&
-    (nodeDefActivePage.uuid === nodeDefUnlocked.uuid || isNodeDefAncestor(nodeDefActivePage, nodeDefUnlocked)(getSurvey(state)))
+    (nodeDefActivePage.uuid === nodeDefUnlocked.uuid || isNodeDefAncestor(nodeDefActivePage, nodeDefUnlocked)(getSurveyState(state)))
       ? nodeDefUnlocked
       : null
 

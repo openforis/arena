@@ -37,6 +37,8 @@ const defaultSteps = {
  * READ
  * ======
  */
+const getSurveyInfo = R.prop('info')
+
 const isSurveyPublished = R.pipe(
   R.prop('published'),
   R.equals(true)
@@ -303,10 +305,11 @@ const canUpdateCodeList = nodeDef =>
     return !isNodeDefCodeParent(nodeDef)(survey)
   }
 
-  module.exports = {
+module.exports = {
   defaultSteps,
 
   // READ
+  getSurveyInfo,
   getSurveyProps: getProps,
 
   getSurveyName: getProp('name', ''),
@@ -341,8 +344,6 @@ const canUpdateCodeList = nodeDef =>
 
   // DELETE nodeDefs
   dissocNodeDef,
-
-
 
   // UTILS NodeDefs
   getNodeDefParent,
