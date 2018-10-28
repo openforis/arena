@@ -14,7 +14,7 @@ import {
 import { getCodeLists, assocCodeLists } from '../../../common/survey/survey'
 
 import {
-  assocCodeListEditActiveLevelItem,
+  assocCodeListEditLevelItem,
   assocCodeListEditLevelItems,
   dissocCodeListEditLevelItems,
   updateCodeListEdit
@@ -33,17 +33,16 @@ const actionHandlers = {
     getCodeLists,
   )(simulateSurveyState(state)),
 
-  [codeListEditUpdate]: (state, {codeListUUID}) =>  R.pipe(
-    updateCodeListEdit(codeListUUID),
-    getCodeLists,
-  )(simulateSurveyState(state)),
-
-  [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditActiveLevelItem(levelIndex, itemUUID)(state),
+  [codeListEditUpdate]: (state, {codeListUUID}) =>
+    updateCodeListEdit(codeListUUID)(state),
 
   [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) =>
     items === null
       ? dissocCodeListEditLevelItems(levelIndex)(state)
       : assocCodeListEditLevelItems(levelIndex, items)(state),
+
+  [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) =>
+    assocCodeListEditLevelItem(levelIndex, itemUUID)(state),
 
 }
 

@@ -10,7 +10,7 @@ import { getNodeDefsByCodeListUUID } from '../../../../common/survey/survey'
 import { getCodeListName } from '../../../../common/survey/codeList'
 
 import { getSurvey } from '../../surveyState'
-import { getCodeListEditCodeList, getCodeLists } from '../codeListsState'
+import { getCodeListEdit, getCodeLists } from '../codeListsState'
 import { fetchCodeLists } from '../actions'
 
 import {
@@ -24,8 +24,9 @@ import {
 class CodeListsView extends React.Component {
 
   componentDidMount () {
-    const {codeLists, fetchCodeLists} = this.props
-    if (!codeLists)
+    const {fetchOnMount, fetchCodeLists} = this.props
+    //for now only from surveyDesigner, draft = true
+    if (fetchOnMount)
       fetchCodeLists(true)
   }
 
@@ -60,13 +61,17 @@ class CodeListsView extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+CodeListsView.defaultProps = {
+  fetchOnMount: true,
+}
+
+const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
 
   return {
     survey,
     codeLists: R.values(getCodeLists(survey)),
-    codeList: getCodeListEditCodeList(survey),
+    codeList: getCodeListEdit(survey),
   }
 }
 

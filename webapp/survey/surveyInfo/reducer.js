@@ -5,7 +5,6 @@ import { getSurveyInfo } from '../../../common/survey/survey'
 import {
   surveyCurrentUpdate,
   surveyCurrentPropUpdate,
-
 } from '../actions'
 
 const actionHandlers = {

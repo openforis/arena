@@ -46,6 +46,7 @@ class NodeDefEdit extends React.Component {
                              canSelect={canUpdateCodeList(nodeDef)(survey)}
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
                              selectedCodeListUUID={getNodeDefCodeListUUID(nodeDef)}
+                             fetchOnMount={false}
               />
 
               : editingTaxonomy

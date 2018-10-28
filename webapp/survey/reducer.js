@@ -32,7 +32,7 @@ import {
  */
 import {
   updateCodeListEdit,
-  assocCodeListEditActiveLevelItem,
+  assocCodeListEditLevelItem,
   assocCodeListEditLevelItems,
   dissocCodeListEditLevelItems,
 } from './codeLists/codeListsState'
@@ -123,7 +123,7 @@ const actionHandlers = {
 
   [codeListEditUpdate]: (state, {codeListUUID}) => updateCodeListEdit(codeListUUID)(state),
 
-  [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditActiveLevelItem(levelIndex, itemUUID)(state),
+  [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditLevelItem(levelIndex, itemUUID)(state),
 
   [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) =>
     items === null

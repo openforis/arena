@@ -7,6 +7,7 @@ import CodeListEditItem from './codeListEditItem'
 
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import {
+  getCodeLists,
   getNodeDefsByCodeListUUID,
   getNodeDefCodeListLevelIndex,
 } from '../../../../common/survey/survey'
@@ -26,8 +27,8 @@ import {
 } from '../actions'
 import { getSurvey } from '../../surveyState'
 import {
-  getCodeListEditActiveLevelItem,
-  getCodeListEditCodeList,
+  getCodeListEditLevelItem,
+  getCodeListEdit,
   getCodeListEditLevelItemsArray,
   getCodeListEditActiveItemAndAncestorsUUIDs,
 } from '../codeListsState'
@@ -108,10 +109,10 @@ const mapStateToProps = (state, props) => {
 
   const survey = getSurvey(state)
 
-  const codeList = getCodeListEditCodeList(survey)
-  const activeItem = getCodeListEditActiveLevelItem(level.index)(survey)
+  const codeList = getCodeListEdit(survey)
+  const activeItem = getCodeListEditLevelItem(level.index)(survey)
   const ancestorItemUUIDs = getCodeListEditActiveItemAndAncestorsUUIDs(level.index - 1)(survey)
-  const previousLevelActiveItem = getCodeListEditActiveLevelItem(level.index - 1)(survey)
+  const previousLevelActiveItem = getCodeListEditLevelItem(level.index - 1)(survey)
   const disabledItems = level.index > 0 && !previousLevelActiveItem
   const items = disabledItems ? [] : getCodeListEditLevelItemsArray(level.index)(survey)
   const canBeDeleted = isCodeListLevelDeleteAllowed(level)(codeList)
