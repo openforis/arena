@@ -188,18 +188,18 @@ const dissocNodeDef = nodeDef =>
  * READ Code Lists
  * ======
  */
-const getSurveyCodeLists = R.pipe(
+const getCodeLists = R.pipe(
   R.prop(codeLists),
   R.defaultTo({})
 )
 
-const getSurveyCodeListsArray = R.pipe(
-  getSurveyCodeLists,
+const getCodeListsArray = R.pipe(
+  getCodeLists,
   R.values,
 )
 
-const getSurveyCodeListByUUID = uuid => R.pipe(
-  getSurveyCodeLists,
+const getCodeListByUUID = uuid => R.pipe(
+  getCodeLists,
   R.prop(uuid)
 )
 
@@ -208,9 +208,9 @@ const getSurveyCodeListByUUID = uuid => R.pipe(
  * UPDATE Code Lists
  * ======
  */
-const assocSurveyCodeLists = codeLists =>
+const assocCodeLists = codeLists =>
   survey => R.pipe(
-    R.merge(getSurveyCodeLists(survey)),
+    R.merge(getCodeLists(survey)),
     //exclude null objects
     filterMappedObj(codeList => codeList !== null),
     newCodeLists => R.assoc('codeLists', newCodeLists, survey)
@@ -285,7 +285,7 @@ const isNodeDefCodeParent = nodeDef => R.pipe(
 
 const getNodeDefCodeCandidateParents = nodeDef =>
   survey => {
-    const codeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
+    const codeList = getCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
 
     if (codeList) {
       const codeListLevelsLength = getCodeListLevelsLength(codeList)
@@ -388,12 +388,12 @@ module.exports = {
   canUpdateCodeList,
 
   // READ codeLists
-  getSurveyCodeLists,
-  getSurveyCodeListsArray,
-  getSurveyCodeListByUUID,
+  getCodeLists,
+  getCodeListsArray,
+  getCodeListByUUID,
 
   // UPDATE code lists
-  assocSurveyCodeLists,
+  assocCodeLists,
 
   //=======
   // Taxonomies

@@ -1,26 +1,30 @@
 import './codeLists.scss'
-
 import React from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
 import ItemsView from '../../../commonComponents/itemsView'
 import CodeListEdit from './codeListEdit'
 
-import { getNodeDefsByCodeListUUID, getSurveyCodeListsArray } from '../../../../common/survey/survey'
+import { getNodeDefsByCodeListUUID } from '../../../../common/survey/survey'
 import { getCodeListName } from '../../../../common/survey/codeList'
 
 import { getSurvey } from '../../surveyState'
-import { getCodeListEditCodeList } from '../codeListEditState'
+import { getCodeListEditCodeList, getCodeLists } from '../codeListsState'
 import {
   createCodeList,
   setCodeListForEdit,
   deleteCodeList,
   putCodeListProp,
   createCodeListLevel
-} from '../../codeList/actions'
+} from '../actions'
 
 const CodeListsView = (props) => {
-  const {survey, codeList, selectedCodeListUUID, createCodeList, deleteCodeList, setCodeListForEdit, onSelect} = props
+
+  const {
+    survey, codeLists, codeList, selectedCodeListUUID,
+    createCodeList, deleteCodeList, setCodeListForEdit, onSelect
+  } = props
 
   const canDeleteCodeList = codeList => {
     if (getNodeDefsByCodeListUUID(codeList.uuid)(survey).length > 0) {
@@ -29,8 +33,6 @@ const CodeListsView = (props) => {
       return window.confirm(`Delete the code list ${getCodeListName(codeList)}? This operation cannot be undone.`)
     }
   }
-
-  const codeLists = getSurveyCodeListsArray(survey)
 
   return <ItemsView {...props}
                     headerText="Code lists"
@@ -52,6 +54,7 @@ const mapStateToProps = state => {
 
   return {
     survey,
+    codeLists: R.values(getCodeLists(survey)),
     codeList: getCodeListEditCodeList(survey),
   }
 }

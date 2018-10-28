@@ -9,8 +9,7 @@ const {
   updateTaxonomyProp,
   deleteTaxonomy
 } = require('./taxonomyManager')
-const {importTaxa, exportTaxa} = require('./taxonomyManager')
-const {fetchTaxonomiesBySurveyId} = require('./taxonomyManager')
+const {fetchTaxonomiesBySurveyId, importTaxa, exportTaxa} = require('./taxonomyManager')
 
 module.exports.init = app => {
 
@@ -29,6 +28,19 @@ module.exports.init = app => {
   })
 
   // ====== READ
+
+  app.get(`/survey/:surveyId/taxonomies`, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const draft = getBoolParam(req, 'draft')
+
+      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, draft, draft)
+
+      res.json({taxonomies})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
 
   app.get('/survey/:surveyId/taxonomies/:taxonomyId/taxa/count', async (req, res) => {
     try {

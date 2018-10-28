@@ -22,6 +22,9 @@ const {
   validateSurveyProp
 } = require('./surveyValidator')
 
+const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
+const {fetchCodeListsBySurveyId} = require('../codeList/codeListManager')
+
 module.exports.init = app => {
 
   // ==== CREATE
@@ -83,6 +86,7 @@ module.exports.init = app => {
       sendErr(res, err)
     }
   })
+
   // ==== UPDATE
 
   app.put('/survey/:id/prop', async (req, res) => {

@@ -10,7 +10,7 @@ import {
   assocNodeDefValidation,
   dissocNodeDef,
 
-  assocSurveyCodeLists,
+  assocCodeLists,
   assocSurveyTaxonomies,
 } from '../../common/survey/survey'
 
@@ -35,7 +35,7 @@ import {
   assocCodeListEditActiveLevelItem,
   assocCodeListEditLevelItems,
   dissocCodeListEditLevelItems,
-} from './codeList/codeListEditState'
+} from './codeLists/codeListsState'
 
 /**
  * taxonomy state
@@ -79,7 +79,7 @@ import {
   codeListEditUpdate,
   codeListEditLevelItemsUpdate,
   codeListEditActiveLevelItemUpdate,
-} from './codeList/actions'
+} from './codeLists/actions'
 
 /**
  * taxonomy actions
@@ -119,7 +119,7 @@ const actionHandlers = {
 
 
   //CODE LIST
-  [codeListsUpdate]: (state, {codeLists}) => assocSurveyCodeLists(codeLists)(state),
+  [codeListsUpdate]: (state, {codeLists}) => assocCodeLists(codeLists)(state),
 
   [codeListEditUpdate]: (state, {codeListUUID}) => updateCodeListEdit(codeListUUID)(state),
 

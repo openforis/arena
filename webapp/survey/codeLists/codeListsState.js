@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import {getCodeLists as getSurveyCodeLists} from '../../../common/survey/survey'
+
 // DOCS
 const surveyState = {
   survey: {
@@ -33,13 +35,21 @@ const surveyState = {
   }
 }
 
-const codeListsPath = ['codeLists']
-const codeListEditPath = ['codeListEdit']
+const codeLists = 'codeLists'
+const codeListsPath = [codeLists]
+const codeListEdit = 'codeListEdit'
+
+const codeListEditPath = [codeListEdit]
 const codeListUUIDPath = R.append('uuid', codeListEditPath)
 const activeLevelItemPath = R.concat(codeListEditPath, ['activeLevelItem'])
 const levelItemsPath = R.append('levelItems', codeListEditPath)
 
 // ========= READ
+
+export const getCodeLists = R.pipe(
+  getSurveyCodeLists,
+  R.dissoc(codeListEdit)
+)
 
 export const getCodeListEditCodeList = state => R.pipe(
   R.path(codeListsPath),

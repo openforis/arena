@@ -18,7 +18,7 @@ import {
 import { getCodeListItemCode, getCodeListItemLabel } from '../../../../../common/survey/codeList'
 import {
   getSurveyDefaultLanguage,
-  getSurveyCodeListByUUID,
+  getCodeListByUUID,
   getNodeDefCodeListLevelIndex
 } from '../../../../../common/survey/survey'
 import { getNodeCodeAncestorValues } from '../../../../../common/record/record'
@@ -180,7 +180,7 @@ class NodeDefCodeList extends React.Component {
     const ancestorCodes = getNodeCodeAncestorValues(survey, parentNode, nodeDef)(record)
 
     if (ancestorCodes.length === levelIndex) {
-      const codeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
+      const codeList = getCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
 
       const queryParams = {
         draft: false,

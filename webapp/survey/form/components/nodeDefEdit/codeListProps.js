@@ -5,8 +5,8 @@ import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
 import {
-  getSurveyCodeListByUUID,
-  getSurveyCodeListsArray,
+  getCodeListByUUID,
+  getCodeListsArray,
   getNodeDefCodeParent,
   getNodeDefCodeCandidateParents,
   getNodeDefCodeListLevelIndex,
@@ -47,7 +47,7 @@ const CodeListProps = (props) => {
   } = props
 
   const validation = getValidation(nodeDef)
-  const selectedCodeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
+  const selectedCodeList = getCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
   const candidateParentCodeNodeDefs = getNodeDefCodeCandidateParents(nodeDef)(survey)
   const parentCodeDef = getNodeDefCodeParent(nodeDef)(survey)
   const parentCodeDefLabelFunction = def => (
@@ -72,7 +72,7 @@ const CodeListProps = (props) => {
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
           <Dropdown disabled={disabled}
-                    items={getSurveyCodeListsArray(survey)}
+                    items={getCodeListsArray(survey)}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={codeList => getCodeListName(codeList)}
                     validation={getFieldValidation('codeListUUID')(validation)}

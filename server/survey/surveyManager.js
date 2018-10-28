@@ -17,8 +17,8 @@ const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/no
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const {fetchTaxonomiesBySurveyId, publishTaxonomiesProps} = require('../taxonomy/taxonomyManager')
-const {fetchCodeListsBySurveyId, publishCodeListsProps} = require('../codeList/codeListManager')
+const {publishTaxonomiesProps} = require('../taxonomy/taxonomyManager')
+const {publishCodeListsProps} = require('../codeList/codeListManager')
 
 const assocSurveyInfo = info => ({info})
 
@@ -64,13 +64,13 @@ const createSurvey = async (user, {name, label, lang}) => {
 // ====== READ
 const fetchSurveyById = async (id, draft = false, validate = false) => {
   const survey = await surveyRepository.getSurveyById(id, draft)
-  const codeLists = await fetchCodeListsBySurveyId(id, draft)
-  const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
+  // const codeLists = await fetchCodeListsBySurveyId(id, draft)
+  // const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
 
   return assocSurveyInfo({
     ...survey,
-    codeLists: toUUIDIndexedObj(codeLists),
-    taxonomies: toUUIDIndexedObj(taxonomies),
+    // codeLists: toUUIDIndexedObj(codeLists),
+    // taxonomies: toUUIDIndexedObj(taxonomies),
     validation: validate ? await validateSurvey(survey) : null
   })
 }

@@ -23,14 +23,14 @@ import {
   deleteCodeListLevel,
   setCodeListItemForEdit,
   deleteCodeListItem,
-} from '../../codeList/actions'
+} from '../actions'
 import { getSurvey } from '../../surveyState'
 import {
   getCodeListEditActiveLevelItem,
   getCodeListEditCodeList,
   getCodeListEditLevelItemsArray,
   getCodeListEditActiveItemAndAncestorsUUIDs,
-} from '../codeListEditState'
+} from '../codeListsState'
 import { putCodeListItemProp } from '../actions'
 
 class CodeListEditLevel extends React.Component {

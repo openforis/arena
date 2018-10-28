@@ -76,6 +76,19 @@ module.exports.init = app => {
 
   // ==== READ
 
+  app.get(`/survey/:surveyId/codeLists`, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const draft = getBoolParam(req, 'draft')
+
+      const codeLists = await fetchCodeListsBySurveyId(surveyId, draft, draft)
+
+      res.json({codeLists})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
   // fetch code list items by parent id
   app.get('/survey/:surveyId/codeLists/:codeListId/items', async (req, res) => {
     try {

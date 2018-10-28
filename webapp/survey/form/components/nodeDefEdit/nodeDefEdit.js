@@ -2,14 +2,14 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import CommonProps from './commonProps'
-import CodeListsView from '../../../codeList/components/codeListsView'
+import CodeListsView from '../../../codeLists/components/codeListsView'
 import TaxonomiesView from '../../../taxonomy/components/taxonomiesView'
 
 import { canUpdateCodeList } from '../../../../../common/survey/survey'
 import { getNodeDefCodeListUUID, getNodeDefTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 
 import { putNodeDefProp } from '../../../nodeDefs/actions'
-import { createCodeList } from '../../../codeList/actions'
+import { createCodeList } from '../../../codeLists/actions'
 import { createTaxonomy } from '../../../taxonomy/actions'
 
 import { getSurvey } from '../../../surveyState'

@@ -5,11 +5,13 @@ import { combineReducers } from 'redux'
 import info from './survey/surveyInfo/reducer'
 import form from './survey/form/reducer'
 import nodeDefs from './survey/nodeDefs/reducer'
+import codeLists from './survey/codeLists/reducer'
 
 const survey = combineReducers({
   info,
-  nodeDefs,
   form,
+  nodeDefs,
+  codeLists,
 })
 
 // == app reducer

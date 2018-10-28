@@ -14,6 +14,7 @@ import { getRootNodeDef } from '../../../../common/survey/survey'
 import { getFormActivePageNodeDef, getFormPageParentNode } from '../surveyFormState'
 
 import { fetchNodeDefs } from '../../nodeDefs/actions'
+import { fetchCodeLists } from '../../codeLists/actions'
 import { resetForm, setFormActivePage, setFormNodeDefUnlocked, setFormPageNode } from '../actions'
 
 import { getRecord } from '../../record/recordState'
@@ -21,11 +22,12 @@ import { getRecord } from '../../record/recordState'
 class SurveyFormView extends React.Component {
 
   componentDidMount () {
-    const {edit, resetForm, fetchNodeDefs} = this.props
+    const {edit, resetForm, fetchNodeDefs, fetchCodeLists} = this.props
 
     resetForm()
 
     fetchNodeDefs(edit)
+    fetchCodeLists(edit)
   }
 
   componentDidUpdate () {
@@ -127,7 +129,7 @@ const mapStateToProps = (state, props) => {
 export default connect(
   mapStateToProps,
   {
-    fetchNodeDefs,
+    fetchNodeDefs, fetchCodeLists,
     resetForm, setFormActivePage, setFormPageNode, setFormNodeDefUnlocked,
   }
 )(SurveyFormView)
