@@ -20,3 +20,7 @@ dist/
 # dev
 .idea/
 *.iml
+
+# MacOS
+.DS_Store
+

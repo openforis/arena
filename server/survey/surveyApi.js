@@ -1,4 +1,4 @@
-const {sendErr} = require('../serverUtils/response')
+const {sendErr, sendOk} = require('../serverUtils/response')
 const {
   getRestParam,
   getBoolParam,
@@ -13,6 +13,8 @@ const {
 
   updateSurveyProp,
   publishSurvey,
+
+  deleteSurvey,
 } = require('./surveyManager')
 
 const {
@@ -106,7 +108,19 @@ module.exports.init = app => {
       const survey = await publishSurvey(surveyId)
 
       res.json({survey})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
 
+  // ==== DELETE
+
+  app.delete('/survey/:id', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'id')
+      await deleteSurvey(surveyId)
+
+      sendOk(res)
     } catch (err) {
       sendErr(res, err)
     }

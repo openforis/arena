@@ -1,6 +1,8 @@
+import * as R from 'ramda'
 import axios from 'axios'
 
 import { appState, systemStatus } from './app'
+import { getNewSurvey } from './appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 
 import { dispatchCurrentSurveyUpdate } from '../survey/actions'
@@ -9,6 +11,7 @@ import { stopAppJobMonitoring } from './components/job/actions'
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
+export const appNewSurveyUpdate = 'app/newSurvey/update'
 
 export const initApp = () => async (dispatch) => {
   try {
@@ -39,7 +42,50 @@ export const logout = () => async dispatch => {
   }
 }
 
-// List of surveys available to current user
+// ====== CREATE SURVEY
+
+export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
+
+  const newSurvey = R.pipe(
+    getNewSurvey,
+    R.dissocPath(['validation', 'fields', name]),
+    R.assoc(name, value),
+  )(getState())
+
+  dispatch({type: appNewSurveyUpdate, newSurvey})
+
+}
+
+export const createSurvey = surveyProps => async (dispatch, getState) => {
+  try {
+    const {data} = await axios.post('/api/survey', surveyProps)
+
+    const {survey} = data
+    const valid = !!survey
+
+    if (valid) {
+      dispatchCurrentSurveyUpdate(dispatch, survey)
+      dispatch(resetNewSurvey())
+    } else {
+      dispatch({
+        type: appNewSurveyUpdate,
+        newSurvey: {
+          ...getNewSurvey(getState()),
+          ...data,
+        }
+      })
+
+    }
+
+  } catch (e) {
+
+  }
+}
+
+export const resetNewSurvey = () => dispatch =>
+  dispatch({type: appNewSurveyUpdate, newSurvey: null})
+
+// ====== SURVEYS LIST
 export const appSurveysUpdate = 'app/surveys/update'
 
 export const fetchSurveys = () => async dispatch => {
@@ -51,6 +97,7 @@ export const fetchSurveys = () => async dispatch => {
   }
 }
 
+// ====== LOAD SURVEY PROP
 export const setActiveSurvey = surveyId =>
   async (dispatch, getState) => {
     try {

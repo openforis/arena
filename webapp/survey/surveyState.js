@@ -20,11 +20,6 @@ export const getSurveyId = R.pipe(
   R.prop('id'),
 )
 
-export const getNewSurvey = R.pipe(
-  R.path([survey, 'newSurvey']),
-  R.defaultTo({name: '', label: '', lang: 'en', validation: {}})
-)
-
 /**
  * ======================
  * Survey-Form State

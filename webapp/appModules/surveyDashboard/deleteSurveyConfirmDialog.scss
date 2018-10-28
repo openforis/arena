@@ -1,0 +1,33 @@
+p.highlight {
+  background-color: rgba(222, 220, 203, 1);
+  color: black;
+  font-weight: 400;
+  line-height: 60px;
+}
+
+.modal-body {
+  padding-top: 1rem !important;
+}
+
+.modal-body p,
+.modal-body label,
+.modal-header,
+.modal-footer {
+  padding-right: 1vw !important;
+  padding-left: 1vw !important;
+}
+
+.modal-content {
+  padding-right: 4vw !important;
+  padding-left: 4vw !important;
+}
+
+label.confirm-name {
+  width: 100%;
+}
+
+label.confirm-name input {
+  border-bottom: solid #eeeeee 1px;
+  width: 50%;
+  margin-left: 2vh;
+}

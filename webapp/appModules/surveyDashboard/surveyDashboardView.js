@@ -3,7 +3,7 @@ import './style.scss'
 import React from 'react'
 import { withRouter } from 'react-router'
 
-import SurveyInfoDashboardView from './surveyInfoDashbaordView'
+import SurveyInfoDashboardView from './surveyInfoDashboardView'
 import SurveyDesignerDashboardView from '../surveyDesigner/surveyDesignerDashboardView'
 import DataExplorerDashboardView from '../data/dataDashboardView'
 import DataAnalysisDashboardView from '../analysis/dataAnalysisDashboardView'

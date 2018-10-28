@@ -53,7 +53,6 @@ import {
  */
 import {
   surveyCurrentUpdate,
-  surveyNewUpdate,
 } from './actions'
 /**
  * nodeDef Actions
@@ -99,8 +98,6 @@ import {
 
 const actionHandlers = {
   //SURVEY
-  [surveyNewUpdate]: assocActionProps,
-
   [surveyCurrentUpdate]: (state, {survey}) => survey,
 
   // NODE-DEFS

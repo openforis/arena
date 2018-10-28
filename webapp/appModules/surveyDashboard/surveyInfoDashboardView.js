@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getSurvey } from '../../survey/surveyState'
+import DeleteSurveyConfirmDialog from './deleteSurveyConfirmDialog'
 
 import {
   getSurveyName,
@@ -9,12 +9,40 @@ import {
   isSurveyDraft,
 } from '../../../common/survey/survey'
 
-import { publishSurvey } from '../../survey/actions'
+import { getSurvey } from '../../survey/surveyState'
+import { deleteSurvey, publishSurvey } from '../../survey/actions'
+import { appModules } from '../appModules'
+import { appModuleUri } from '../../app/app'
 
-class SurveyInfoDashbaordView extends React.Component {
+class SurveyInfoDashboardView extends React.Component {
+
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      showDialog: false
+    }
+  }
+
+  toggleDeleteConfirmDialog (show) {
+    this.setState({
+      showDialog: show
+    })
+  }
+
+  componentDidUpdate (prevProps) {
+    const {survey, history} = this.props
+    const {survey: prevSurvey} = prevProps
+
+    // redirecting when survey has been deleted
+    if (prevSurvey && !survey) {
+      history.push(appModuleUri(appModules.home))
+    }
+  }
 
   render () {
-    const {survey, publishSurvey} = this.props
+    const {survey, deleteSurvey, publishSurvey} = this.props
+    const {showDialog} = this.state
 
     return (
       <div className="app-dashboard__survey-info">
@@ -29,7 +57,6 @@ class SurveyInfoDashbaordView extends React.Component {
         </div>
 
         <h4 className="survey-name">
-
           {getSurveyName(survey)}
         </h4>
 
@@ -49,9 +76,16 @@ class SurveyInfoDashbaordView extends React.Component {
             <span className="icon icon-upload3 icon-16px icon-left"/> Import
           </button>
 
-          <button className="btn btn-of-light">
+          <button className="btn btn-of-light" onClick={() => this.toggleDeleteConfirmDialog(true)}>
             <span className="icon icon-bin icon-16px icon-left"/> Delete
           </button>
+
+          {showDialog &&
+          <DeleteSurveyConfirmDialog show={showDialog}
+                                     onCancel={() => this.toggleDeleteConfirmDialog(false)}
+                                     onDelete={() => deleteSurvey(survey.id)}
+                                     surveyName={getSurveyName(survey)}/>
+          }
         </div>
 
       </div>
@@ -59,12 +93,8 @@ class SurveyInfoDashbaordView extends React.Component {
   }
 }
 
-SurveyInfoDashbaordView.defaultProps = {
-  survey: {}
-}
-
 const mapStateToProps = state => ({
   survey: getSurvey(state)
 })
 
-export default connect(mapStateToProps, {publishSurvey})(SurveyInfoDashbaordView)
+export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfoDashboardView)

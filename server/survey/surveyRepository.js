@@ -95,8 +95,8 @@ const publishSurveyProps = async (surveyId, client = db) =>
 
 // ============== DELETE
 const deleteSurvey = async (id, client = db) => {
-  await client.query(`DROP SCHEMA ${getSurveyDBSchema(id)}`)
   await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
+  await client.query(`DROP SCHEMA ${getSurveyDBSchema(id)} CASCADE`)
 }
 
 module.exports = {
