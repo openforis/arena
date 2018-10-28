@@ -108,7 +108,7 @@ const publishSurvey = async (id, user) => {
 
   })
 
-  return assocSurveyInfo(await fetchSurveyById(id))
+  return await fetchSurveyById(id)
 }
 
 // ====== DELETE

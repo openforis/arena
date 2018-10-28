@@ -8,17 +8,21 @@ import { getSurvey, getSurveyId } from './surveyState'
 import { debounceAction } from '../appUtils/reduxUtils'
 
 export const surveyCurrentUpdate = 'survey/current/update'
+export const surveyCurrentPropUpdate = 'survey/current/prop/update'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyCurrentUpdate, survey})
 
-export const dispatchMarkCurrentSurveyDraft = (dispatch, getState) => {
+export const dispatchCurrentSurveyPropUpdate = (dispatch, survey) =>
+  dispatch({type: surveyCurrentPropUpdate, survey})
 
+
+export const dispatchMarkCurrentSurveyDraft = (dispatch, getState) => {
   const survey = R.pipe(getSurvey,
     R.assoc('draft', true)
   )(getState())
 
-  dispatchCurrentSurveyUpdate(dispatch, survey)
+  dispatchCurrentSurveyPropUpdate(dispatch, survey)
 }
 
 // ==== READ
@@ -34,7 +38,7 @@ export const updateSurveyProp = (key, value) => async (dispatch, getState) => {
     assocSurveyPropValidation(key, null)
   )(getState())
 
-  dispatchCurrentSurveyUpdate(dispatch, survey)
+  dispatchCurrentSurveyPropUpdate(dispatch, survey)
   dispatch(_updateSurveyProp(survey, key, value))
 }
 
@@ -47,7 +51,7 @@ const _updateSurveyProp = (survey, key, value) => {
 
       const updatedSurvey = assocSurveyPropValidation(key, validation)(survey)
 
-      dispatchCurrentSurveyUpdate(dispatch, updatedSurvey)
+      dispatchCurrentSurveyPropUpdate(dispatch, updatedSurvey)
     } catch (e) {}
   }
 
@@ -55,11 +59,11 @@ const _updateSurveyProp = (survey, key, value) => {
 }
 
 export const publishSurvey = () => async (dispatch, getState) => {
-  const survey = getSurvey(getState())
+  const surveyId = getSurveyId(getState())
 
-  const {data} = await axios.put(`/api/survey/${survey.id}/publish`)
+  const {data} = await axios.put(`/api/survey/${surveyId}/publish`)
 
-  dispatchCurrentSurveyUpdate(dispatch, data.survey)
+  dispatchCurrentSurveyPropUpdate(dispatch, data.survey)
 }
 
 
