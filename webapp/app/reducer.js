@@ -2,6 +2,10 @@ import * as R from 'ramda'
 
 import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 
+import { appState } from './app'
+
+import { updateActiveJob } from './components/job/appJobState'
+import { assocAppError, getAppErrors } from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
 
 import {
@@ -10,10 +14,9 @@ import {
   appUserPrefUpdate,
   appNewSurveyUpdate,
   appSurveysUpdate,
+  appErrorCreate,
 } from './actions'
-
 import { loginSuccess } from '../login/actions'
-import { appState } from './app'
 
 /**
  * ======
@@ -21,8 +24,6 @@ import { appState } from './app'
  * ======
  */
 import { appJobActiveUpdate } from './components/job/actions'
-
-import { updateActiveJob } from './components/job/appJobState'
 
 const actionHandlers = {
 
@@ -50,6 +51,16 @@ const actionHandlers = {
 
   //app job
   [appJobActiveUpdate]: (state, {job, hideAutomatically}) => updateActiveJob(job, hideAutomatically)(state),
+
+  // ===== app errors
+  [appErrorCreate]: (state, {error}) => R.pipe(
+    getAppErrors,
+    R.head,
+    R.defaultTo({id: -1}),
+    last => last.id + 1,
+    id => assocAppError({id, ...error})(state)
+  )(state)
+
 }
 
 export default exportReducer(actionHandlers)

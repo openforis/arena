@@ -8,6 +8,8 @@ import { userPrefNames } from '../../common/user/userPrefs'
 import { dispatchCurrentSurveyUpdate } from '../survey/actions'
 import { stopAppJobMonitoring } from './components/job/actions'
 
+export const appErrorCreate = 'app/error/create'
+
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
@@ -16,6 +18,13 @@ export const appNewSurveyUpdate = 'app/newSurvey/update'
 export const initApp = () => async (dispatch) => {
   try {
 
+    // global ajax errors handling
+    axios.interceptors.response.use(null, (error) => {
+      dispatch({type: appErrorCreate, error: {...error, message: error.message}})
+    })
+
+
+    // fetching user
     const resp = await axios.get('/auth/user')
 
     const {data} = resp
