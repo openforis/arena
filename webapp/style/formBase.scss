@@ -111,3 +111,12 @@ button, .btn {
 .btn-transparent {
   border: none !important;
 }
+
+.btn-danger {
+  background-color: rgba($red, 0.5);
+  border-color: rgba($red, 0.3) !important;
+
+  &:hover {
+    background-color: rgba($red, 0.8) !important;
+  }
+}
