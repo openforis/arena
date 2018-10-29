@@ -3,6 +3,7 @@
 @import "./layout";
 @import "./formBase";
 @import "./ico";
+@import "./reactTransitions";
 
 html {
   font: 14px/1.6 'Montserrat', sans-serif;
@@ -55,6 +56,12 @@ body {
   bottom: 0;
   height: 100%;
   width: 100%;
+}
+
+.hidden-transition {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0.5s, opacity 0.5s linear;
 }
 
 .error {

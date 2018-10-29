@@ -2,6 +2,8 @@ import './appErrors.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
+
 import * as R from 'ramda'
 
 import { getAppErrors, getAppState } from '../../appState'
@@ -25,19 +27,25 @@ const AppError = ({error, closeAppError}) => (
   </div>
 )
 
-const AppErrors = ({errors, closeAppError}) => R.isEmpty(errors)
-  ? null
-  : (
-    <div className="app-errors">
-      {
-        errors.map(error =>
-          <AppError key={error.id}
-                    error={error}
+const AppErrors = ({errors, closeAppError}) => (
+  <TransitionGroup className={`app-errors${R.isEmpty(errors)?' hidden-transition':''}`}
+                   enter={true}
+                   appear={true}
+                   >
+    {
+      errors.map(error =>
+        <CSSTransition
+          key={error.id}
+          timeout={500}
+          classNames="fade"
+        >
+          <AppError error={error}
                     closeAppError={closeAppError}/>
-        )
-      }
-    </div>
-  )
+        </CSSTransition>
+      )
+    }
+  </TransitionGroup>
+)
 
 const mapStateToProps = (state) => {
   const errors = R.pipe(

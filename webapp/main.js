@@ -10,11 +10,12 @@ import { createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import createDebounce from 'redux-debounced'
 
+import appErrorsMiddleware from './app/components/errors/appErrorsMiddleware'
 import reducer from './rootReducer'
 
 import { isEnvDevelopment } from '../common/processUtils'
 
-const middlewares = [createDebounce(), thunkMiddleware]
+const middlewares = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
 
 if (isEnvDevelopment()) {
   const {logger} = require('redux-logger')
