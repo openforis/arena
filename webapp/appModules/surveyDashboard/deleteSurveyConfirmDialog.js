@@ -32,37 +32,43 @@ export default class DeleteSurveyConfirmDialog extends React.Component {
     return (
       <Modal isOpen={true}>
         <ModalHeader>
-          <h2>Are you sure you want to delete this?</h2>
+          <h5 className="survey-delete-dialog__header">Are you sure you want to delete this?</h5>
         </ModalHeader>
 
         <ModalBody>
-          <p className="highlight">
-            Deleting the <b>{surveyName}</b> survey will delete all of its data.
-          </p>
-          <p>
-            Enter this survey’s name to confirm
-          </p>
-          <label className="confirm-name">
-            Name:
+          <div className="survey-delete-dialog__body">
+            <div className="highlight">
+              Deleting the <b>{surveyName}</b> survey will delete all of its data.
+            </div>
+
+            <div className="text-center">
+              Enter this survey’s name to confirm:
+            </div>
+
             <input type="text"
+                   className="confirm-name"
                    value={this.state.confirmName}
                    onChange={this.confirmNameChanged}
                    ref={input => this.nameInput = input}/>
-          </label>
+          </div>
         </ModalBody>
 
         <ModalFooter>
-          <button className="btn btn-of modal-footer__item"
-                  onClick={onCancel}
-                  aria-disabled={false}>
-            Cancel
-          </button>
+          <div>
+            <button className="btn btn-of modal-footer__item"
+                    onClick={onCancel}
+                    aria-disabled={false}>
+              <span className="icon icon-cross icon-12px icon-left"/>
+              Cancel
+            </button>
 
-          <button className="btn btn-of modal-footer__item"
-                  onClick={onDelete}
-                  aria-disabled={!(surveyName === this.state.confirmName)}>
-            Delete!
-          </button>
+            <button className="btn btn-of btn-danger modal-footer__item"
+                    onClick={onDelete}
+                    aria-disabled={!(surveyName === this.state.confirmName)}>
+              <span className="icon icon-bin icon-12px icon-left"/>
+              Delete
+            </button>
+          </div>
         </ModalFooter>
       </Modal>
     )
