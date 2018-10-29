@@ -5,7 +5,7 @@ import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 import { appState } from './app'
 
 import { updateActiveJob } from './components/job/appJobState'
-import { assocAppError, getAppErrors } from './appState'
+import { assocAppError, dissocAppError, getAppErrors } from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
 
 import {
@@ -15,6 +15,7 @@ import {
   appNewSurveyUpdate,
   appSurveysUpdate,
   appErrorCreate,
+  appErrorDelete,
 } from './actions'
 import { loginSuccess } from '../login/actions'
 
@@ -57,10 +58,11 @@ const actionHandlers = {
     getAppErrors,
     R.head,
     R.defaultTo({id: -1}),
-    last => last.id + 1,
+    last => 1 + last.id,
     id => assocAppError({id, ...error})(state)
-  )(state)
+  )(state),
 
+  [appErrorDelete]: (state, {error}) => dissocAppError(error)(state),
 }
 
 export default exportReducer(actionHandlers)

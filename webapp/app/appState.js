@@ -10,12 +10,12 @@ export const getNewSurvey = R.pipe(
   R.defaultTo({name: '', label: '', lang: 'en', validation: {}})
 )
 
-export const assocAppError = error => R.assocPath([errors, error.id], error)
+export const assocAppError = error => R.assocPath([errors, error.id + ''], error)
 
-export const dissocAppError = error => R.dissocPath([errors, error.id])
+export const dissocAppError = error => R.dissocPath([errors, error.id + ''])
 
 export const getAppErrors = R.pipe(
   R.prop(errors),
   R.values,
-  R.sort((a, b) => b.id - a.id)
+  R.sort((a, b) => +b.id - +a.id)
 )

@@ -1,16 +1,18 @@
 import './appErrors.scss'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { getAppErrors, getAppState } from '../../appState'
 
-const AppError = ({error}) => (
+import { closeAppError } from '../../actions'
+
+const AppError = ({error, closeAppError}) => (
   <div className="app-errors__error">
 
-    <button className="btn-s btn-close">
+    <button className="btn-s btn-close"
+            onClick={() => closeAppError(error)}>
       <span className="icon icon-cross icon-12px"/>
     </button>
 
@@ -23,13 +25,15 @@ const AppError = ({error}) => (
   </div>
 )
 
-const AppErrors = ({errors}) => R.isEmpty(errors)
+const AppErrors = ({errors, closeAppError}) => R.isEmpty(errors)
   ? null
   : (
     <div className="app-errors">
       {
         errors.map(error =>
-          <AppError key={error.id} error={error}/>
+          <AppError key={error.id}
+                    error={error}
+                    closeAppError={closeAppError}/>
         )
       }
     </div>
@@ -47,5 +51,5 @@ const mapStateToProps = (state) => {
 }
 
 export default connect(
-  mapStateToProps
+  mapStateToProps, {closeAppError}
 )(AppErrors)
