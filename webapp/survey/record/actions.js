@@ -4,7 +4,7 @@ import axios from 'axios'
 import { debounceAction } from '../../appUtils/reduxUtils'
 
 import { getSurvey } from '../surveyState'
-import { getSurveyDefaultStep } from '../../../common/survey/survey'
+import { getSurveyId, getSurveyDefaultStep } from '../../../common/survey/survey'
 import { appState } from '../../app/app'
 
 import { newRecord, getParentNode } from '../../../common/record/record'
@@ -12,7 +12,7 @@ import { newNodePlaceholder } from '../../../common/record/node'
 
 import { getRecord } from './recordState'
 
-export const recordUpdate = 'survey/record/update'
+export const recordCreate = 'survey/record/create'
 export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
 
@@ -29,12 +29,13 @@ export const createRecord = () => async (dispatch, getState) => {
 
     const user = appState.getUser(state)
     const survey = getSurvey(state)
+    const surveyId = getSurveyId(survey)
     const step = getSurveyDefaultStep(survey)
 
-    const record = newRecord(user, survey.id, step)
+    const record = newRecord(user, surveyId, step)
 
-    const {data} = await axios.post(`/api/survey/${survey.id}/record`, record)
-    dispatch({type: recordUpdate, record: data.record})
+    const {data} = await axios.post(`/api/survey/${surveyId}/record`, record)
+    dispatch({type: recordCreate, record: data.record})
 
   } catch (e) {
     console.log(e)
@@ -57,6 +58,7 @@ export const updateNode = (nodeDef, node, value, file = null) =>
   async (dispatch, getState) => {
 
     const survey = getSurvey(getState())
+    const surveyId = getSurveyId(survey)
     const record = getRecord(survey)
     const parentNode = getParentNode(node)(record)
 
@@ -72,11 +74,11 @@ export const updateNode = (nodeDef, node, value, file = null) =>
 
     // then post nodes
     if (parentNodeToUpdate) {
-      const {data} = await axios.post(`/api/survey/${survey.id}/record/${parentNodeToUpdate.recordId}/node`, parentNodeToUpdate)
+      const {data} = await axios.post(`/api/survey/${surveyId}/record/${parentNodeToUpdate.recordId}/node`, parentNodeToUpdate)
       dispatchNodesUpdate(dispatch, data.nodes)
     }
 
-    dispatch(_updateNodeDebounced(survey.id, nodeToUpdate, file, node.placeholder ? 0 : 500))
+    dispatch(_updateNodeDebounced(surveyId, nodeToUpdate, file, node.placeholder ? 0 : 500))
   }
 
 const getUpdatedNode = (dispatch, node, value) =>

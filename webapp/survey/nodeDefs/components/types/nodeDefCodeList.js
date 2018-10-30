@@ -19,7 +19,8 @@ import { getCodeListItemCode, getCodeListItemLabel } from '../../../../../common
 import {
   getSurveyDefaultLanguage,
   getCodeListByUUID,
-  getNodeDefCodeListLevelIndex
+  getNodeDefCodeListLevelIndex,
+  getSurveyId,
 } from '../../../../../common/survey/survey'
 import { getNodeCodeAncestorValues } from '../../../../../common/record/record'
 import { getNodeValue, newNode } from '../../../../../common/record/node'
@@ -186,7 +187,7 @@ class NodeDefCodeList extends React.Component {
         draft: false,
         ancestorCodes,
       }
-      const {data} = await axios.get(`/api/survey/${survey.id}/codeLists/${codeList.id}/candidateItems?${toQueryString(queryParams)}`)
+      const {data} = await axios.get(`/api/survey/${getSurveyId(survey)}/codeLists/${codeList.id}/candidateItems?${toQueryString(queryParams)}`)
       const items = data.items
 
       this.setState({

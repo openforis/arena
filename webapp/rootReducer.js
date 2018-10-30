@@ -8,6 +8,7 @@ import codeLists from './survey/codeLists/reducer'
 import codeListEdit from './survey/codeListEdit/reducer'
 import taxonomies from './survey/taxonomies/reducer'
 import taxonomyEdit from './survey/taxonomyEdit/reducer'
+import record from './survey/record/reducer'
 
 const survey = combineReducers({
   info,
@@ -17,7 +18,7 @@ const survey = combineReducers({
   codeListEdit,
   taxonomies,
   taxonomyEdit,
-  //record,
+  record,
 })
 
 // == app reducer

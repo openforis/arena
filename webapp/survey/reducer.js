@@ -66,7 +66,7 @@ import {
  * record actions
  */
 import {
-  recordUpdate,
+  recordCreate,
   nodesUpdate,
   nodeDelete,
 } from './record/actions'
