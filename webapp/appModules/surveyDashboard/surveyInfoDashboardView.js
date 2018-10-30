@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import DeleteSurveyConfirmDialog from './deleteSurveyConfirmDialog'
 
@@ -85,7 +84,7 @@ class SurveyInfoDashboardView extends React.Component {
           {showDialog &&
           <DeleteSurveyConfirmDialog show={showDialog}
                                      onCancel={() => this.toggleDeleteConfirmDialog(false)}
-                                     onDelete={() => deleteSurvey(survey.id)}
+                                     onDelete={() => deleteSurvey()}
                                      surveyName={getSurveyName(survey)}/>
           }
         </div>
