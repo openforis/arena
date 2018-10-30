@@ -9,7 +9,7 @@ import { canUpdateCodeList } from '../../../../../common/survey/survey'
 import { getNodeDefCodeListUUID, getNodeDefTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 
 import { putNodeDefProp } from '../../../nodeDefs/actions'
-import { createCodeList } from '../../../codeLists/actions'
+import { createCodeList } from '../../../codeListEdit/actions'
 import { createTaxonomy } from '../../../taxonomy/actions'
 
 import { getSurvey } from '../../../surveyState'

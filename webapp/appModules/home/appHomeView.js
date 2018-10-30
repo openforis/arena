@@ -52,12 +52,6 @@ class AppHomeView extends React.Component {
   }
 }
 
-AppHomeView.defaultProps = {
-  newSurvey: null,
-  currentSurvey: null,
-  surveys: [],
-}
-
 const mapStateToProps = state => ({
   newSurvey: getNewSurvey(state),
   surveyInfo: getSurveyInfo(getSurvey(state)),

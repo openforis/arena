@@ -4,22 +4,23 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import ItemsView from '../../../commonComponents/itemsView'
-import CodeListEdit from './codeListEdit'
-
-import { getNodeDefsByCodeListUUID } from '../../../../common/survey/survey'
-import { getCodeListName } from '../../../../common/survey/codeList'
+import CodeListEdit from '../../codeListEdit/components/codeListEdit'
 
 import { getSurvey } from '../../surveyState'
-import { getCodeListEdit, getCodeLists } from '../codeListsState'
-import { fetchCodeLists } from '../actions'
+import { getCodeListsArray, getNodeDefsByCodeListUUID } from '../../../../common/survey/survey'
+
+import { getCodeListName } from '../../../../common/survey/codeList'
+
+import { getCodeListEditCodeList } from '../../codeListEdit/codeListEditState'
 
 import {
+  createCodeListLevel,
   createCodeList,
-  setCodeListForEdit,
   deleteCodeList,
   putCodeListProp,
-  createCodeListLevel
-} from '../actions'
+  setCodeListForEdit
+} from '../../codeListEdit/actions'
+import { fetchCodeLists } from '../actions'
 
 class CodeListsView extends React.Component {
 
@@ -33,17 +34,13 @@ class CodeListsView extends React.Component {
   render () {
 
     const {
-      survey, codeLists, codeList, selectedCodeListUUID,
+      codeLists, codeList, selectedCodeListUUID,
       createCodeList, deleteCodeList, setCodeListForEdit, onSelect
     } = this.props
 
-    const canDeleteCodeList = codeList => {
-      if (getNodeDefsByCodeListUUID(codeList.uuid)(survey).length > 0) {
-        alert('This code list is used by some node definitions and cannot be removed')
-      } else {
-        return window.confirm(`Delete the code list ${getCodeListName(codeList)}? This operation cannot be undone.`)
-      }
-    }
+    const canDeleteCodeList = codeList => codeList.usedByNodeDefs
+      ? alert('This code list is used by some node definitions and cannot be removed')
+      : window.confirm(`Delete the code list ${getCodeListName(codeList)}? This operation cannot be undone.`)
 
     return <ItemsView {...this.props}
                       headerText="Code lists"
@@ -65,13 +62,20 @@ CodeListsView.defaultProps = {
   fetchOnMount: true,
 }
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = (state) => {
   const survey = getSurvey(state)
 
+  const codeLists = R.pipe(
+    getCodeListsArray,
+    R.map(codeList => ({
+      ...codeList,
+      usedByNodeDefs: getNodeDefsByCodeListUUID(codeList.uuid)(survey).length > 0
+    }))
+  )(survey)
+
   return {
-    survey,
-    codeLists: R.values(getCodeLists(survey)),
-    codeList: getCodeListEdit(survey),
+    codeLists,
+    codeList: getCodeListEditCodeList(survey),
   }
 }
 

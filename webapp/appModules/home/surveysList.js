@@ -3,6 +3,7 @@ import './surveysList.scss'
 import React from 'react'
 import * as R from 'ramda'
 
+import { getSurveyInfo } from '../../../common/survey/survey'
 import { getRelativeDate, compareDatesDesc } from '../../appUtils/dateUtils'
 
 import {
@@ -61,7 +62,7 @@ const SurveyList = (props) => {
             <div className="surveys-list__rows">
               {
                 surveys
-                  .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
+                  .sort((a, b) => compareDatesDesc(getSurveyInfo(a).dateModified, getSurveyInfo(b).dateModified))
                   .map((survey, i) =>
                     <SurveyRow key={i} {...props} survey={survey}/>
                   )

@@ -21,12 +21,18 @@ class CodeListEditItem extends React.Component {
     this.elemRef = React.createRef()
   }
 
+  componentDidMount () {
+    if (this.props.active)
+      this.scrollIntoView()
+  }
+
   componentDidUpdate (prevProps) {
-    if (
-      (this.props.active && !prevProps.active) ||
-      (this.props.item.id && !prevProps.item.id)
-    )
-      this.elemRef.current.scrollIntoView()
+    if (this.props.active && !prevProps.active)
+      this.scrollIntoView()
+  }
+
+  scrollIntoView () {
+    this.elemRef.current.scrollIntoView()
   }
 
   onPropLabelsChange (labelItem) {

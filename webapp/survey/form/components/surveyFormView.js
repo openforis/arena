@@ -25,7 +25,6 @@ class SurveyFormView extends React.Component {
     const {edit, resetForm, fetchNodeDefs, fetchCodeLists} = this.props
 
     resetForm()
-
     fetchNodeDefs(edit)
     fetchCodeLists(edit)
   }
@@ -106,7 +105,7 @@ const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
 
   const rootNodeDef = getRootNodeDef(survey)
-  const nodeDef = getFormActivePageNodeDef(survey)
+  const nodeDef = getFormActivePageNodeDef(survey) || rootNodeDef
 
   const mapEntryProps = () => ({
     // rootNode: getRootNode(getRecord(survey)),

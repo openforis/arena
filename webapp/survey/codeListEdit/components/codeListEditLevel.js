@@ -20,19 +20,16 @@ import { getFieldValidation } from '../../../../common/validation/validator'
 
 import {
   createCodeListItem,
-  putCodeListLevelProp,
-  deleteCodeListLevel,
-  setCodeListItemForEdit,
-  deleteCodeListItem,
-} from '../actions'
+  } from '../actions'
 import { getSurvey } from '../../surveyState'
 import {
-  getCodeListEditLevelItem,
-  getCodeListEdit,
+  getCodeListEditLevelActiveItem,
+  getCodeListEditCodeList,
   getCodeListEditLevelItemsArray,
-  getCodeListEditActiveItemAndAncestorsUUIDs,
-} from '../codeListsState'
-import { putCodeListItemProp } from '../actions'
+  getCodeListEditLevelActiveItemAndAncestorsUUIDs,
+} from '../codeListEditState'
+import { putCodeListItemProp, putCodeListLevelProp } from '../actions'
+import { deleteCodeListItem, deleteCodeListLevel, setCodeListItemForEdit } from '../actions'
 
 class CodeListEditLevel extends React.Component {
 
@@ -109,10 +106,10 @@ const mapStateToProps = (state, props) => {
 
   const survey = getSurvey(state)
 
-  const codeList = getCodeListEdit(survey)
-  const activeItem = getCodeListEditLevelItem(level.index)(survey)
-  const ancestorItemUUIDs = getCodeListEditActiveItemAndAncestorsUUIDs(level.index - 1)(survey)
-  const previousLevelActiveItem = getCodeListEditLevelItem(level.index - 1)(survey)
+  const codeList = getCodeListEditCodeList(survey)
+  const activeItem = getCodeListEditLevelActiveItem(level.index)(survey)
+  const ancestorItemUUIDs = getCodeListEditLevelActiveItemAndAncestorsUUIDs(level.index - 1)(survey)
+  const previousLevelActiveItem = getCodeListEditLevelActiveItem(level.index - 1)(survey)
   const disabledItems = level.index > 0 && !previousLevelActiveItem
   const items = disabledItems ? [] : getCodeListEditLevelItemsArray(level.index)(survey)
   const canBeDeleted = isCodeListLevelDeleteAllowed(level)(codeList)

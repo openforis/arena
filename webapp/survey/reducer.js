@@ -31,11 +31,11 @@ import {
  * code lists state
  */
 import {
-  updateCodeListEdit,
-  assocCodeListEditLevelItem,
-  assocCodeListEditLevelItems,
+  assocCodeListEdit,
+  assocLevelActiveItem,
+  assocLevelItems,
   dissocCodeListEditLevelItems,
-} from './codeLists/codeListsState'
+} from './codeListEdit/codeListEditState'
 
 /**
  * taxonomy state
@@ -76,10 +76,7 @@ import {
  */
 import {
   codeListsUpdate,
-  codeListEditUpdate,
-  codeListEditLevelItemsUpdate,
-  codeListEditActiveLevelItemUpdate,
-} from './codeLists/actions'
+  } from './codeLists/actions'
 
 /**
  * taxonomy actions
@@ -101,46 +98,51 @@ import {
   assocFormPageNode,
   assocNodeDefFormUnlocked
 } from './form/surveyFormState'
+import {
+  codeListEditLevelActiveItemUpdate,
+  codeListEditLevelItemsUpdate,
+  codeListEditUpdate
+} from './codeListEdit/actions'
 
 const actionHandlers = {
   //SURVEY
   // [surveyCurrentUpdate]: (state, {survey}) => survey,
 
   // NODE-DEFS
-  [nodeDefsUpdate]: (state, {nodeDefs}) => assocNodeDefs(nodeDefs)(state),
-
-  [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
-
-  [nodeDefPropUpdate]: (state, {nodeDefUUID, key, value}) => assocNodeDefProp(nodeDefUUID, key, value)(state),
-
-  [nodeDefDelete]: (state, {nodeDef}) => dissocNodeDef(nodeDef)(state),
-
-   [formPageNodeUpdate]: (state, {nodeDef, node}) => assocFormPageNode(nodeDef, node)(state),
-
-
-  //CODE LIST
-  [codeListsUpdate]: (state, {codeLists}) => assocCodeLists(codeLists)(state),
-
-  [codeListEditUpdate]: (state, {codeListUUID}) => updateCodeListEdit(codeListUUID)(state),
-
-  [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocCodeListEditLevelItem(levelIndex, itemUUID)(state),
-
-  [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) =>
-    items === null
-      ? dissocCodeListEditLevelItems(levelIndex)(state)
-      : assocCodeListEditLevelItems(levelIndex, items)(state),
-
-  //TAXONOMY
-  [taxonomiesUpdate]: (state, {taxonomies}) => assocSurveyTaxonomies(taxonomies)(state),
-
-  [taxonomyEditUpdate]: (state, {type, ...otherProps}) => updateTaxonomyEdit(otherProps)(state),
-
-  //RECORD
-  [recordUpdate]: assocActionProps,
-
-  [nodesUpdate]: (state, {nodes}) => assocNodes(nodes)(state),
-
-  [nodeDelete]: (state, {node}) => deleteNode(node)(state),
+  // [nodeDefsUpdate]: (state, {nodeDefs}) => assocNodeDefs(nodeDefs)(state),
+  //
+  // [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
+  //
+  // [nodeDefPropUpdate]: (state, {nodeDefUUID, key, value}) => assocNodeDefProp(nodeDefUUID, key, value)(state),
+  //
+  // [nodeDefDelete]: (state, {nodeDef}) => dissocNodeDef(nodeDef)(state),
+  //
+  //  [formPageNodeUpdate]: (state, {nodeDef, node}) => assocFormPageNode(nodeDef, node)(state),
+  //
+  //
+  // //CODE LIST
+  // [codeListsUpdate]: (state, {codeLists}) => assocCodeLists(codeLists)(state),
+  //
+  // [codeListEditUpdate]: (state, {codeListUUID}) => assocCodeListEdit(codeListUUID)(state),
+  //
+  // [codeListEditActiveLevelItemUpdate]: (state, {levelIndex, itemUUID}) => assocActiveLevelItem(levelIndex, itemUUID)(state),
+  //
+  // [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) =>
+  //   items === null
+  //     ? dissocCodeListEditLevelItems(levelIndex)(state)
+  //     : assocLevelItems(levelIndex, items)(state),
+  //
+  // //TAXONOMY
+  // [taxonomiesUpdate]: (state, {taxonomies}) => assocSurveyTaxonomies(taxonomies)(state),
+  //
+  // [taxonomyEditUpdate]: (state, {type, ...otherProps}) => updateTaxonomyEdit(otherProps)(state),
+  //
+  // //RECORD
+  // [recordUpdate]: assocActionProps,
+  //
+  // [nodesUpdate]: (state, {nodes}) => assocNodes(nodes)(state),
+  //
+  // [nodeDelete]: (state, {node}) => deleteNode(node)(state),
 
 }
 
