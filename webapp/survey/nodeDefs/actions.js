@@ -4,7 +4,7 @@ import { debounceAction } from '../../appUtils/reduxUtils'
 
 import { isNodeDefEntity, newNodeDef } from '../../../common/survey/nodeDef'
 import { getPageUUID } from '../../../common/survey/nodeDefLayout'
-import { getSurveyId } from '../surveyState'
+import { getStateSurveyId } from '../surveyState'
 import { dispatchMarkCurrentSurveyDraft } from '../actions'
 import { setFormActivePage, setFormNodeDefEdit, setFormNodeDefUnlocked } from '../form/actions'
 
@@ -20,7 +20,7 @@ export const nodeDefDelete = 'nodeDef/delete'
 
 export const createNodeDef = (parentId, type, props) => async (dispatch, getState) => {
   try {
-    const surveyId = getSurveyId(getState())
+    const surveyId = getStateSurveyId(getState())
     const nodeDef = newNodeDef(surveyId, parentId, type, props)
     dispatch({type: nodeDefUpdate, nodeDef})
     //setting current editing nodeDef
@@ -43,7 +43,7 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
 
 export const fetchNodeDefs = (draft = false) => async (dispatch, getState) => {
   try {
-    const surveyId = getSurveyId(getState())
+    const surveyId = getStateSurveyId(getState())
     const {data} = await axios.get(`/api/survey/${surveyId}/nodeDefs?draft=${draft}`)
 
     dispatch({type: nodeDefsUpdate, nodeDefs: data.nodeDefs})

@@ -1,3 +1,5 @@
+import './taxonomyEdit.scss'
+
 import React from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
@@ -10,6 +12,7 @@ import TaxonTable from './taxonTable'
 import { isBlank } from '../../../../common/stringUtils'
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 
+import { getSurveyId, } from '../../../../common/survey/survey'
 import { getTaxonomyName, } from '../../../../common/survey/taxonomy'
 import {
   getTaxonomyEditTaxonomy,
@@ -67,7 +70,7 @@ class TaxonomyEdit extends React.Component {
 
   render () {
     const {
-      survey, taxonomy, taxaCurrentPage, taxaTotalPages, taxa,
+      surveyId, taxonomy, taxaCurrentPage, taxaTotalPages, taxa,
       loadTaxaPage, putTaxonomyProp, uploadTaxonomyFile,
     } = this.props
 
@@ -85,9 +88,9 @@ class TaxonomyEdit extends React.Component {
 
           <div className="button-bar">
             <UploadButton label="CSV import"
-                          onChange={(files) => uploadTaxonomyFile(survey.id, taxonomy.id, files[0])}/>
+                          onChange={(files) => uploadTaxonomyFile(surveyId, taxonomy.id, files[0])}/>
 
-            <DownloadButton href={`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/export?draft=true`}
+            <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/export?draft=true`}
                             disabled={R.isEmpty(taxa)}
                             label="CSV Export"/>
           </div>
@@ -121,7 +124,7 @@ const mapStateToProps = state => {
   const survey = getSurvey(state)
 
   return {
-    survey,
+    surveyId: getSurveyId(survey),
     taxonomy: getTaxonomyEditTaxonomy(survey),
     taxaTotalPages: getTaxonomyEditTaxaTotalPages(survey),
     taxaCurrentPage: getTaxonomyEditTaxaCurrentPage(survey),

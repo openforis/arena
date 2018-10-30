@@ -4,7 +4,7 @@ import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
 import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
-import { getSurveyTaxonomiesArray, getSurveyTaxonomyByUUID } from '../../../../../common/survey/survey'
+import { getTaxonomiesArray, getSurveyTaxonomyByUUID } from '../../../../../common/survey/survey'
 import { getNodeDefTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 import { getTaxonomyName } from '../../../../../common/survey/taxonomy'
 
@@ -30,7 +30,7 @@ const TaxonProps = (props) => {
           display: 'grid',
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
-          <Dropdown items={getSurveyTaxonomiesArray(survey)}
+          <Dropdown items={getTaxonomiesArray(survey)}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={taxonomy => getTaxonomyName(taxonomy)}
                     validation={getFieldValidation('taxonomyUUID')(validation)}

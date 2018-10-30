@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { getSurvey, getSurveyId } from './surveyState'
+import { getSurvey, getStateSurveyId } from './surveyState'
 
 export const surveyCurrentUpdate = 'survey/current/update'
 export const surveyCurrentPropUpdate = 'survey/current/prop/update'
@@ -26,7 +26,7 @@ export const dispatchMarkCurrentSurveyDraft = (dispatch, getState) => {
 // ==== UPDATE
 
 export const publishSurvey = () => async (dispatch, getState) => {
-  const surveyId = getSurveyId(getState())
+  const surveyId = getStateSurveyId(getState())
 
   const {data} = await axios.put(`/api/survey/${surveyId}/publish`)
 
@@ -38,7 +38,7 @@ export const publishSurvey = () => async (dispatch, getState) => {
 
 export const deleteSurvey = () => async (dispatch, getState) => {
   try {
-    const surveyId = getSurveyId(getState())
+    const surveyId = getStateSurveyId(getState())
     await axios.delete(`/api/survey/${surveyId}`)
     dispatchCurrentSurveyUpdate(dispatch, null)
   } catch (e) {

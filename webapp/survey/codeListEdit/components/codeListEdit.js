@@ -1,3 +1,5 @@
+import './codeListEdit.scss'
+
 import React from 'react'
 
 import { isBlank } from '../../../../common/stringUtils'

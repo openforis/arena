@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 
-import { getSurvey } from '../surveyState'
-import { getNodeDefByUUID, getNodeDefParent } from '../../../common/survey/survey'
+import { getNodeDefByUUID, getNodeDefParent, getRootNodeDef } from '../../../common/survey/survey'
 
 import { getRecord } from '../record/recordState'
 import { getNodeByUUID } from '../../../common/record/record'
@@ -24,13 +23,15 @@ export const assocFormActivePage = (nodeDef) =>
     nodeDef ? nodeDef.uuid : null
   )
 
-export const getFormActivePageNodeDef = survey =>
-  getNodeDefByUUID(
-    R.path(formPagePath, survey)
-  )(survey)
+export const getFormActivePageNodeDef = survey => R.pipe(
+  getNodeDefByUUID(R.path(formPagePath, survey)),
+  R.defaultTo(getRootNodeDef(survey))
+)(survey)
 
-export const isNodeDefFormActivePage = nodeDef =>
-  R.pathEq(formPagePath, nodeDef.uuid)
+export const isNodeDefFormActivePage = nodeDef => R.pipe(
+  getFormActivePageNodeDef,
+  n => nodeDef.uuid === n.uuid
+)
 
 // ====== current nodeDef edit
 const nodeDefEdit = 'nodeDefEdit'

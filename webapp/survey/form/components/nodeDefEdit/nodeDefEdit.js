@@ -2,15 +2,15 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import CommonProps from './commonProps'
-import CodeListsView from '../../../codeLists/components/codeListsView'
-import TaxonomiesView from '../../../taxonomy/components/taxonomiesView'
+import CodeListsView from '../../../codeLists/codeListsView'
+import TaxonomiesView from '../../../taxonomies/taxonomiesView'
 
 import { canUpdateCodeList } from '../../../../../common/survey/survey'
 import { getNodeDefCodeListUUID, getNodeDefTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 
 import { putNodeDefProp } from '../../../nodeDefs/actions'
 import { createCodeList } from '../../../codeListEdit/actions'
-import { createTaxonomy } from '../../../taxonomy/actions'
+import { createTaxonomy } from '../../../taxonomyEdit/actions'
 
 import { getSurvey } from '../../../surveyState'
 import { closeFormNodeDefEdit } from '../../actions'
@@ -54,7 +54,8 @@ class NodeDefEdit extends React.Component {
               <TaxonomiesView onClose={() => this.setState({editingTaxonomy: false})}
                               canSelect={true}
                               onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
-                              selectedTaxonomyUUID={getNodeDefTaxonomyUUID(nodeDef)}/>
+                              selectedTaxonomyUUID={getNodeDefTaxonomyUUID(nodeDef)}
+                              fetchOnMount={false}/>
               :
               <div className="form">
                 <CommonProps {...this.props}

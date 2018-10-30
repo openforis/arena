@@ -226,7 +226,7 @@ const getSurveyTaxonomies = R.pipe(
   R.defaultTo({})
 )
 
-const getSurveyTaxonomiesArray = R.pipe(
+const getTaxonomiesArray = R.pipe(
   getSurveyTaxonomies,
   R.values,
 )
@@ -400,7 +400,7 @@ module.exports = {
   //=======
 
   //READ taxonomies
-  getSurveyTaxonomiesArray,
+  getTaxonomiesArray,
   getSurveyTaxonomyByUUID,
 
   //UPDATE taxonomies

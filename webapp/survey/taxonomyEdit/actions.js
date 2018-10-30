@@ -2,26 +2,31 @@ import axios from 'axios'
 import * as R from 'ramda'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
+import { getSurveyId } from '../../../common/survey/survey'
 import { newTaxonomy, assocTaxonomyProp } from '../../../common/survey/taxonomy'
 
-import { getSurvey } from '../surveyState'
+import { getSurvey, getStateSurveyId } from '../surveyState'
 import { getTaxonomyEditTaxonomy } from './taxonomyEditState'
 import { showAppJobMonitor } from '../../app/components/job/actions'
-import { toQueryString } from '../../../server/serverUtils/request'
 
 import { dispatchMarkCurrentSurveyDraft } from '../actions'
+import { dispatchTaxonomiesUpdate } from '../taxonomies/actions'
 
-export const taxonomiesUpdate = 'survey/taxonomy/update'
+export const taxonomyCreate = 'survey/taxonomy/create'
+export const taxonomyUpdate = 'survey/taxonomy/update'
+export const taxonomyDelete = 'survey/taxonomy/delete'
+
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
+export const taxonomyEditPropsUpdate = 'survey/taxonomyEdit/props/update'
 
-const dispatchTaxonomiesUpdate = (dispatch, taxonomies) =>
-  dispatch({type: taxonomiesUpdate, taxonomies})
+const dispatchTaxonomyUpdate = (dispatch, taxonomy) => dispatch({type: taxonomyUpdate, taxonomy})
 
-const dispatchTaxonomyUpdate = (dispatch, taxonomy) =>
-  dispatchTaxonomiesUpdate(dispatch, {[taxonomy.uuid]: taxonomy})
+const dispatchTaxonomyEditPropsUpdate = (dispatch, props) => dispatch({type: taxonomyEditPropsUpdate, ...props})
 
-const dispatchTaxonomyEditUpdate = (dispatch, props) =>
-  dispatch({type: taxonomyEditUpdate, ...props})
+// ====== SET TAXONOMY FOR EDIT
+
+export const setTaxonomyForEdit = taxonomy => dispatch =>
+  dispatch({type: taxonomyEditUpdate, taxonomyUUID: taxonomy ? taxonomy.uuid : null})
 
 // ====== CREATE
 
@@ -30,16 +35,12 @@ export const createTaxonomy = () => async (dispatch, getState) => {
 
   const taxonomy = newTaxonomy()
 
-  dispatchTaxonomyUpdate(dispatch, taxonomy)
+  dispatch({type: taxonomyCreate, taxonomy})
 
-  dispatchTaxonomyEditUpdate(dispatch, {uuid: taxonomy.uuid})
+  const surveyId = getStateSurveyId(getState())
+  const {data} = await axios.post(`/api/survey/${surveyId}/taxonomies`, taxonomy)
 
-  const survey = getSurvey(getState())
-  const res = await axios.post(`/api/survey/${survey.id}/taxonomies`, taxonomy)
-
-  const {taxonomy: addedTaxonomy} = res.data
-
-  dispatchTaxonomyUpdate(dispatch, addedTaxonomy)
+  dispatchTaxonomyUpdate(dispatch, data.taxonomy)
 }
 
 // ====== READ
@@ -50,32 +51,28 @@ export const reloadTaxa = () => async (dispatch, getState) => {
   const survey = getSurvey(getState())
   const taxonomy = getTaxonomyEditTaxonomy(survey)
 
-  const params = {
-    draft: true
-  }
+  const {data} = await axios.get(`/api/survey/${getSurveyId(survey)}/taxonomies/${taxonomy.id}/taxa/count?draft=true`)
 
-  const {data} = await axios.get(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/taxa/count?${toQueryString(params)}`)
-
-  dispatchTaxonomyEditUpdate(dispatch, {taxaTotalPages: Math.ceil(data.count / ROWS_PER_PAGE)})
+  dispatchTaxonomyEditPropsUpdate(dispatch, {taxaTotalPages: Math.ceil(data.count / ROWS_PER_PAGE)})
 
   dispatch(loadTaxaPage(1))
 }
 
 export const loadTaxaPage = page => async (dispatch, getState) => {
-  dispatchTaxonomyEditUpdate(dispatch, {taxaCurrentPage: page, taxa: []})
+  dispatchTaxonomyEditPropsUpdate(dispatch, {taxaCurrentPage: page, taxa: []})
 
   const survey = getSurvey(getState())
   const taxonomy = getTaxonomyEditTaxonomy(survey)
 
-  const params = {
-    draft: true,
-    limit: ROWS_PER_PAGE,
-    offset: (page - 1) * ROWS_PER_PAGE
-  }
+  const {data} = await axios.get(`/api/survey/${getSurveyId(survey)}/taxonomies/${taxonomy.id}/taxa`, {
+    params: {
+      draft: true,
+      limit: ROWS_PER_PAGE,
+      offset: (page - 1) * ROWS_PER_PAGE
+    }
+  })
 
-  const {data} = await axios.get(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/taxa?${toQueryString(params)}`)
-
-  dispatchTaxonomyEditUpdate(dispatch, {taxa: data.taxa})
+  dispatchTaxonomyEditPropsUpdate(dispatch, {taxa: data.taxa})
 }
 
 // ====== UPDATE
@@ -95,15 +92,15 @@ export const putTaxonomyProp = (taxonomyUUID, key, value) => async (dispatch, ge
 
   const action = async () => {
     try {
-      const {data} = await axios.put(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}`, {key, value})
+      const {data} = await axios.put(`/api/survey/${getSurveyId(survey)}/taxonomies/${taxonomy.id}`, {key, value})
       const {taxonomies} = data
       dispatchTaxonomiesUpdate(dispatch, taxonomies)
     } catch (e) {}
   }
-  dispatch(debounceAction(action, `${taxonomiesUpdate}_${taxonomy.uuid}`))
+  dispatch(debounceAction(action, `${taxonomyUpdate}_${taxonomy.uuid}`))
 }
 
-export const uploadTaxonomyFile = (surveyId, taxonomyId, file) => async dispatch => {
+export const uploadTaxonomyFile = (surveyId, taxonomyId, file) => async (dispatch, getState) => {
   dispatchMarkCurrentSurveyDraft(dispatch, getState)
 
   const formData = new FormData()
@@ -125,15 +122,10 @@ export const uploadTaxonomyFile = (surveyId, taxonomyId, file) => async dispatch
 export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
   dispatchMarkCurrentSurveyDraft(dispatch, getState)
 
-  const survey = getSurvey(getState())
+  const surveyId = getStateSurveyId(getState())
 
-  dispatchTaxonomiesUpdate(dispatch, {[taxonomy.uuid]: null})
+  dispatch({type: taxonomyDelete, taxonomy})
 
-  await axios.delete(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}`)
+  await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}`)
 }
 
-// ====== UTILS
-
-export const setTaxonomyForEdit = taxonomy => async (dispatch) => {
-  dispatchTaxonomyEditUpdate(dispatch, {uuid: taxonomy ? taxonomy.uuid : null})
-}

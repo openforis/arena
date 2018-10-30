@@ -6,6 +6,8 @@ import form from './survey/form/reducer'
 import nodeDefs from './survey/nodeDefs/reducer'
 import codeLists from './survey/codeLists/reducer'
 import codeListEdit from './survey/codeListEdit/reducer'
+import taxonomies from './survey/taxonomies/reducer'
+import taxonomyEdit from './survey/taxonomyEdit/reducer'
 
 const survey = combineReducers({
   info,
@@ -13,8 +15,8 @@ const survey = combineReducers({
   nodeDefs,
   codeLists,
   codeListEdit,
-
-  // taxonomies,
+  taxonomies,
+  taxonomyEdit,
   //record,
 })
 

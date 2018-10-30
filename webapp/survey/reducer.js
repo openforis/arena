@@ -41,8 +41,8 @@ import {
  * taxonomy state
  */
 import {
-  updateTaxonomyEdit,
-} from './taxonomy/taxonomyEditState'
+  mergeTaxonomyEditProps,
+} from './taxonomyEdit/taxonomyEditState'
 
 /**
  * survey actions
@@ -83,8 +83,8 @@ import {
  */
 import {
   taxonomiesUpdate,
-  taxonomyEditUpdate,
-} from './taxonomy/actions'
+  taxonomyEditPropsUpdate,
+} from './taxonomyEdit/actions'
 import {
   formActivePageNodeDefUpdate,
   formNodeDefEditUpdate,

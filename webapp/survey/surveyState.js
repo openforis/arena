@@ -13,7 +13,7 @@ const survey = 'survey'
 // READ
 export const getSurvey = R.prop(survey)
 
-export const getSurveyId = R.pipe(
+export const getStateSurveyId = R.pipe(
   getSurvey,
   getSurveyInfo,
   R.prop('id'),

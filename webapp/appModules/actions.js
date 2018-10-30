@@ -5,13 +5,13 @@ import {
   apiUri
 } from './appModules'
 
-import { getSurveyId } from '../survey/surveyState'
+import { getStateSurveyId } from '../survey/surveyState'
 
 export const fetchData = (module, dashboard) =>
   async (dispatch, getState) => {
     try {
 
-      const surveyId = getSurveyId(getState())
+      const surveyId = getStateSurveyId(getState())
 
       const {data} = await axios.get(apiUri(surveyId, module, dashboard))
 

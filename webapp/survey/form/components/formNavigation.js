@@ -1,18 +1,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getNodeDefChildren, getSurveyDefaultLanguage } from '../../../../common/survey/survey'
+import { getNodeDefChildren, getSurveyDefaultLanguage, getRootNodeDef } from '../../../../common/survey/survey'
 import { isNodeDefRoot, getNodeDefLabel } from '../../../../common/survey/nodeDef'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
 
-import { getSurvey} from '../../surveyState'
+import { getSurvey } from '../../surveyState'
 
 import { setFormActivePage } from '../actions'
 import { getFormPageParentNode, isNodeDefFormActivePage } from '../surveyFormState'
 
 const FormNavigationItem = (props) => {
   const {
-    rootNodeDef,
     nodeDef,
     childDefs,
     edit,
@@ -41,7 +40,6 @@ const FormNavigationItem = (props) => {
         outerPageChildDefs.map((child, i) =>
           <FormNavigationItemConnect key={child.uuid}
                                      level={level + 1}
-                                     rootNodeDef={rootNodeDef}
                                      nodeDef={child}
                                      edit={edit}
           />
@@ -54,7 +52,9 @@ const FormNavigationItem = (props) => {
 
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
-  const {rootNodeDef, nodeDef, edit} = props
+  const rootNodeDef = getRootNodeDef(survey)
+
+  const {edit, nodeDef = rootNodeDef} = props
   const parentNode = getFormPageParentNode(nodeDef)(survey)
 
   return {
@@ -71,7 +71,7 @@ const FormNavigationItemConnect = connect(
   {setFormActivePage}
 )(FormNavigationItem)
 
-const FormNavigation = ({rootNodeDef, edit}) => {
+const FormNavigation = ({edit}) => {
 
   return (
     <div className="survey-form__nav" style={{
@@ -79,10 +79,7 @@ const FormNavigation = ({rootNodeDef, edit}) => {
       alignItems: 'flex-end',
     }}>
       <FormNavigationItemConnect edit={edit}
-                                 nodeDef={rootNodeDef}
-                                 rootNodeDef={rootNodeDef}
-                                 level={0}
-      />
+                                 level={0}/>
     </div>
   )
 }

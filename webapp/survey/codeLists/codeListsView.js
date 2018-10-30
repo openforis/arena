@@ -1,17 +1,16 @@
-import './codeLists.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import ItemsView from '../../../commonComponents/itemsView'
-import CodeListEdit from '../../codeListEdit/components/codeListEdit'
+import ItemsView from '../../commonComponents/itemsView'
+import CodeListEdit from '../codeListEdit/components/codeListEdit'
 
-import { getSurvey } from '../../surveyState'
-import { getCodeListsArray, getNodeDefsByCodeListUUID } from '../../../../common/survey/survey'
+import { getSurvey } from '../surveyState'
+import { getCodeListsArray, getNodeDefsByCodeListUUID } from '../../../common/survey/survey'
 
-import { getCodeListName } from '../../../../common/survey/codeList'
+import { getCodeListName } from '../../../common/survey/codeList'
 
-import { getCodeListEditCodeList } from '../../codeListEdit/codeListEditState'
+import { getCodeListEditCodeList } from '../codeListEdit/codeListEditState'
 
 import {
   createCodeListLevel,
@@ -19,8 +18,9 @@ import {
   deleteCodeList,
   putCodeListProp,
   setCodeListForEdit
-} from '../../codeListEdit/actions'
-import { fetchCodeLists } from '../actions'
+} from '../codeListEdit/actions'
+
+import { fetchCodeLists } from './actions'
 
 class CodeListsView extends React.Component {
 

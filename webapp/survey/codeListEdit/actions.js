@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import { toUUIDIndexedObj } from '../../../common/survey/surveyUtils'
 import { dispatchMarkCurrentSurveyDraft } from '../actions'
-import { getSurvey, getSurveyId } from '../surveyState'
+import { getSurvey, getStateSurveyId } from '../surveyState'
 
 import {
   assocCodeListItemProp,
@@ -57,7 +57,7 @@ const dispatchCodeListEditLevelActiveItemUpdate = (dispatch, levelIndex, itemUUI
 //======
 
 export const setCodeListForEdit = (codeList) => async (dispatch, getState) => {
-  const surveyId = getSurveyId(getState())
+  const surveyId = getStateSurveyId(getState())
 
   dispatchCodeListEditUpdate(dispatch, codeList ? codeList.uuid : null)
 
@@ -69,7 +69,7 @@ export const setCodeListForEdit = (codeList) => async (dispatch, getState) => {
 export const setCodeListItemForEdit = (item, edit = true) => async (dispatch, getState) => {
   const state = getState()
   const survey = getSurvey(state)
-  const surveyId = getSurveyId(state)
+  const surveyId = getStateSurveyId(state)
   const codeList = getCodeListEditCodeList(survey)
   const level = getCodeListLevelById(item.levelId)(codeList)
 
@@ -89,7 +89,7 @@ export const createCodeList = () => async (dispatch, getState) => {
   // dispatchCodeListUpdate(dispatch, codeList)
 
   const codeList = newCodeList()
-  const surveyId = getSurveyId(getState())
+  const surveyId = getStateSurveyId(getState())
   const res = await axios.post(`/api/survey/${surveyId}/codeLists`, codeList)
 
   dispatchCodeListUpdate(dispatch, R.path(['data', 'codeList'], res))
@@ -101,7 +101,7 @@ export const createCodeListLevel = () => async (dispatch, getState) => {
 
   const state = getState()
   const survey = getSurvey(state)
-  const surveyId = getSurveyId(state)
+  const surveyId = getStateSurveyId(state)
 
   const codeList = getCodeListEditCodeList(survey)
   const level = newCodeListLevel(codeList)
@@ -125,7 +125,7 @@ export const createCodeListItem = (level) => async (dispatch, getState) => {
 
   const state = getState()
   const survey = getSurvey(state)
-  const surveyId = getSurveyId(state)
+  const surveyId = getStateSurveyId(state)
   const codeList = getCodeListEditCodeList(survey)
   const parentItem = getCodeListEditLevelActiveItem(levelIndex - 1)(survey)
   const newItem = newCodeListItem(level.id, getCodeListItemId(parentItem))
@@ -168,7 +168,7 @@ export const putCodeListProp = (codeListUUID, key, value) => async (dispatch, ge
 
   const state = getState()
   const survey = getSurvey(state)
-  const surveyId = getSurveyId(state)
+  const surveyId = getStateSurveyId(state)
 
   const codeList = R.pipe(
     getCodeListEditCodeList,
@@ -194,7 +194,7 @@ export const putCodeListLevelProp = (codeListId, levelIndex, key, value) => asyn
 
   const state = getState()
   const survey = getSurvey(state)
-  const surveyId = getSurveyId(state)
+  const surveyId = getStateSurveyId(state)
 
   const codeList = R.pipe(
     getCodeListEditCodeList,
@@ -224,7 +224,7 @@ export const putCodeListItemProp = (levelIndex, itemUUID, key, value) => async (
 
   const state = getState()
   const survey = getSurvey(state)
-  const surveyId = getSurveyId(state)
+  const surveyId = getStateSurveyId(state)
   const codeList = getCodeListEditCodeList(survey)
 
   //update item in code list edit state
@@ -256,7 +256,7 @@ export const putCodeListItemProp = (levelIndex, itemUUID, key, value) => async (
 export const deleteCodeList = codeList => async (dispatch, getState) => {
   dispatchMarkCurrentSurveyDraft(dispatch, getState)
 
-  const surveyId = getSurveyId(getState())
+  const surveyId = getStateSurveyId(getState())
 
   dispatch({type: codeListsUpdate, codeLists: {[codeList.uuid]: null}})
 
@@ -271,7 +271,7 @@ export const deleteCodeListLevel = levelIndex => async (dispatch, getState) => {
 
   const state = getState()
   const survey = getSurvey(state)
-  const surveyId = getSurveyId(state)
+  const surveyId = getStateSurveyId(state)
   const codeList = getCodeListEditCodeList(survey)
   const level = getCodeListLevelByIndex(levelIndex)(codeList)
 
@@ -289,7 +289,7 @@ export const deleteCodeListItem = item => async (dispatch, getState) => {
 
   const state = getState()
   const survey = getSurvey(state)
-  const surveyId = getSurveyId(state)
+  const surveyId = getStateSurveyId(state)
   const codeList = getCodeListEditCodeList(survey)
   const level = getCodeListLevelById(item.levelId)(codeList)
 
