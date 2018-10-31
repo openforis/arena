@@ -1,14 +1,18 @@
 import * as R from 'ramda'
 
-export const setPublished = (published = true) => R.assoc('published', published)
-
-export const markDraft = R.assoc('draft', true)
-
 /**
  * ======
  * UPDATE
  * ======
  */
+
+export const markPublished = R.pipe(
+  R.assoc('published', true),
+  R.assoc('draft', false),
+)
+
+export const markDraft = R.assoc('draft', true)
+
 export const assocSurveyInfoProp = (key, value) => R.pipe(
   R.assocPath(['props', key], value),
   // reset validation

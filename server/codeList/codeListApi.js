@@ -10,7 +10,6 @@ const {
   insertCodeListItem,
   fetchCodeListById,
   fetchCodeListsBySurveyId,
-  fetchCodeListItemsByCodeListId,
   fetchCodeListItemsByParentId,
   fetchCodeListItemsByAncestorCodes,
   updateCodeListProp,
@@ -21,10 +20,11 @@ const {
   deleteCodeListItem,
 } = require('../codeList/codeListManager')
 
-const {
-  validateCodeListLevels,
-  validateCodeListItems,
-} = require('../../server/codeList/codeListValidator')
+const sendValidatedCodeList = async (surveyId, codeListId, res, rest = {}) => {
+  const codeList = await fetchCodeListById(surveyId, codeListId, true, true)
+
+  res.json({codeList, ...rest})
+}
 
 module.exports.init = app => {
 
@@ -48,12 +48,9 @@ module.exports.init = app => {
       const codeListId = getRestParam(req, 'codeListId')
       const {body} = req
 
-      const level = await insertCodeListLevel(surveyId, codeListId, body)
+      await insertCodeListLevel(surveyId, codeListId, body)
 
-      res.json({
-        level,
-        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
-      })
+      await sendValidatedCodeList(surveyId, codeListId, res)
     } catch (err) {
       sendErr(res, err)
     }
@@ -68,10 +65,7 @@ module.exports.init = app => {
 
       const item = await insertCodeListItem(surveyId, body)
 
-      res.json({
-        item,
-        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
-      })
+      await sendValidatedCodeList(surveyId, codeListId, res, {item})
     } catch (err) {
       sendErr(res, err)
     }
@@ -86,7 +80,7 @@ module.exports.init = app => {
 
       const codeLists = await fetchCodeListsBySurveyId(surveyId, draft, draft)
 
-      res.json({codeLists:toUUIDIndexedObj(codeLists)})
+      res.json({codeLists: toUUIDIndexedObj(codeLists)})
     } catch (err) {
       sendErr(res, err)
     }
@@ -134,9 +128,8 @@ module.exports.init = app => {
       const {key, value} = body
 
       await updateCodeListProp(surveyId, codeListId, key, value)
-      const codeLists = await fetchCodeListsBySurveyId(surveyId, true)
 
-      res.json({codeLists})
+      await sendValidatedCodeList(surveyId, codeListId, res)
     } catch (err) {
       sendErr(res, err)
     }
@@ -150,16 +143,9 @@ module.exports.init = app => {
       const {body} = req
       const {key, value} = body
 
-      const level = await updateCodeListLevelProp(surveyId, levelId, key, value)
+      await updateCodeListLevelProp(surveyId, levelId, key, value)
 
-      const codeList = await fetchCodeListById(surveyId, codeListId, true)
-
-      const validation = await validateCodeListLevels(codeList)
-
-      res.json({
-        level,
-        validation,
-      })
+      await sendValidatedCodeList(surveyId, codeListId, res)
     } catch (err) {
       sendErr(res, err)
     }
@@ -173,12 +159,9 @@ module.exports.init = app => {
       const {body} = req
       const {key, value} = body
 
-      const item = await updateCodeListItemProp(surveyId, itemId, key, value)
+      await updateCodeListItemProp(surveyId, itemId, key, value)
 
-      res.json({
-        item,
-        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
-      })
+      await sendValidatedCodeList(surveyId, codeListId, res)
     } catch (err) {
       sendErr(res, err)
     }
@@ -207,9 +190,7 @@ module.exports.init = app => {
 
       await deleteCodeListLevel(surveyId, levelId)
 
-      res.json({
-        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
-      })
+      await sendValidatedCodeList(surveyId, codeListId, res)
     } catch (err) {
       sendErr(res, err)
     }
@@ -223,18 +204,10 @@ module.exports.init = app => {
 
       await deleteCodeListItem(surveyId, itemId)
 
-      res.json({
-        itemsValidation: await validateAllCodeListItems(surveyId, codeListId),
-      })
+      await sendValidatedCodeList(surveyId, codeListId, res)
     } catch (err) {
       sendErr(res, err)
     }
   })
-
-  const validateAllCodeListItems = async (surveyId, codeListId) => {
-    const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, true)
-    const codeList = await fetchCodeListById(surveyId, codeListId, true)
-    return await validateCodeListItems(codeList, items, null)
-  }
 
 }

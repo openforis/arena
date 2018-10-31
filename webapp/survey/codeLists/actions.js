@@ -3,9 +3,6 @@ import { getStateSurveyId } from '../surveyState'
 
 export const codeListsUpdate = 'survey/codeLists/update'
 
-export const dispatchCodeListUpdate = (dispatch, codeList) =>
-  dispatchCodeListsUpdate(dispatch, {[codeList.uuid]: codeList})
-
 export const dispatchCodeListsUpdate = (dispatch, codeLists) =>
   dispatch({type: codeListsUpdate, codeLists})
 

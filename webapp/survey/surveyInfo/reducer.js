@@ -2,31 +2,19 @@ import { exportReducer } from '../../appUtils/reduxUtils'
 
 import { getSurveyInfo } from '../../../common/survey/survey'
 
+import { assocSurveyInfoProp, assocSurveyInfoValidation, markDraft, markPublished } from './surveyInfoState'
+
 // app actions
 import { loginSuccess } from '../../login/actions'
 import { appStatusChange } from '../../app/actions'
-
 // survey actions
-import {
-  surveyCreate,
-  surveyUpdate,
-  surveyPublish,
-} from '../actions'
-
+import { surveyCreate, surveyUpdate, surveyPublish } from '../actions'
 // surveyInfo actions
-import {
-  surveyInfoPropUpdate,
-  surveyInfoValidationUpdate
-} from './actions'
-
-import {
-  setPublished,
-  assocSurveyInfoProp,
-  assocSurveyInfoValidation, markDraft,
-} from './surveyInfoState'
-
-// nodeDef actions
+import { surveyInfoPropUpdate, surveyInfoValidationUpdate } from './actions'
+// nodeDefs actions
 import { nodeDefCreate, nodeDefDelete, nodeDefPropUpdate, nodeDefUpdate } from '../nodeDefs/actions'
+// codeList actions
+import { codeListCreate, codeListDelete, codeListUpdate } from '../codeListEdit/actions'
 
 const actionHandlers = {
   // app initialization
@@ -37,18 +25,23 @@ const actionHandlers = {
   [surveyCreate]: (state, {survey}) => getSurveyInfo(survey),
   [surveyUpdate]: (state, {survey}) => getSurveyInfo(survey),
 
-  [surveyPublish]: (state, _) => setPublished()(state),
+  [surveyPublish]: markPublished,
 
-  // survey info
+  // survey info update
   [surveyInfoPropUpdate]: (state, {key, value}) => assocSurveyInfoProp(key, value)(state),
 
   [surveyInfoValidationUpdate]: (state, {validation}) => assocSurveyInfoValidation(validation)(state),
 
   //NODEDEF
-  [nodeDefCreate]: (state) => markDraft(state),
-  [nodeDefUpdate]: (state) => markDraft(state),
-  [nodeDefPropUpdate]: (state) => markDraft(state),
-  [nodeDefDelete]: (state) => markDraft(state),
+  [nodeDefCreate]: markDraft,
+  [nodeDefUpdate]: markDraft,
+  [nodeDefPropUpdate]: markDraft,
+  [nodeDefDelete]: markDraft,
+
+  // CodeList
+  [codeListCreate]: markDraft,
+  [codeListUpdate]: markDraft,
+  [codeListDelete]: markDraft,
 }
 
 export default exportReducer(actionHandlers)

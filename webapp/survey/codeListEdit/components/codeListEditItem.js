@@ -5,7 +5,7 @@ import LabelsEditor from '../../components/labelsEditor'
 import { FormItem, Input } from '../../../commonComponents/form/input'
 
 import { normalizeName } from '../../../../common/survey/surveyUtils'
-import { getSurveyDefaultLanguage } from '../../../../common/survey/survey'
+
 import {
   getCodeListItemCode,
   getCodeListItemLabel,
@@ -36,15 +36,21 @@ class CodeListEditItem extends React.Component {
   }
 
   onPropLabelsChange (labelItem) {
-    const {level, item, putCodeListItemProp} = this.props
-    putCodeListItemProp(level.index, item.uuid, 'labels',
-      R.assoc(labelItem.lang, labelItem.label, getCodeListItemLabels(item)))
+    const {codeList, level, item, putCodeListItemProp} = this.props
+    putCodeListItemProp(
+      codeList,
+      level,
+      item,
+      'labels',
+      R.assoc(labelItem.lang, labelItem.label, getCodeListItemLabels(item))
+    )
   }
 
   render () {
     const {
-      survey, codeList, level, ancestorItemUUIDs, item, active,
-      putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem
+      codeList, level, ancestorItemUUIDs, item, active,
+      putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
+      language
     } = this.props
 
     const validation = getCodeListItemValidation(R.append(item.uuid, ancestorItemUUIDs))(codeList)
@@ -62,12 +68,10 @@ class CodeListEditItem extends React.Component {
         R.join('\n'),
       )(validation.fields)
 
-    const language = getSurveyDefaultLanguage(survey)
-
     const disabled = item.published
     return (
       <div className={`code-lists__edit-item ${active ? 'active' : ''}`}
-           onClick={() => active ? null : setCodeListItemForEdit(item, true)}
+           onClick={() => active ? null : setCodeListItemForEdit(codeList, level, item, true)}
            ref={this.elemRef}>
         {
           !validation.valid &&
@@ -83,7 +87,7 @@ class CodeListEditItem extends React.Component {
               <React.Fragment>
 
                 <button className="btn-s btn-of-light-xs btn-close"
-                        onClick={() => setCodeListItemForEdit(item, false)}>
+                        onClick={() => setCodeListItemForEdit(codeList, level, item, false)}>
                   <span className="icon icon-arrow-up icon-12px"/>
                 </button>
 
@@ -91,7 +95,7 @@ class CodeListEditItem extends React.Component {
                   <Input value={getCodeListItemCode(item)}
                          disabled={disabled}
                          validation={getFieldValidation('code')(validation)}
-                         onChange={e => putCodeListItemProp(level.index, item.uuid, 'code', normalizeName(e.target.value))}/>
+                         onChange={e => putCodeListItemProp(codeList, level, item, 'code', normalizeName(e.target.value))}/>
                 </FormItem>
 
                 <LabelsEditor labels={getCodeListItemLabels(item)}
@@ -101,7 +105,7 @@ class CodeListEditItem extends React.Component {
                         aria-disabled={disabled}
                         onClick={() => {
                           if (confirm('Delete the item with all children? This operation cannot be undone')) {
-                            deleteCodeListItem(item)
+                            deleteCodeListItem(codeList, level, item)
                           }
                         }}>
                   <span className="icon icon-bin2 icon-12px icon-left"/>

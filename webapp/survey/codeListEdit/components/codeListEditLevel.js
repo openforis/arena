@@ -7,7 +7,7 @@ import CodeListEditItem from './codeListEditItem'
 
 import { normalizeName } from '../../../../common/survey/surveyUtils'
 import {
-  getCodeLists,
+  getSurveyDefaultLanguage,
   getNodeDefsByCodeListUUID,
   getNodeDefCodeListLevelIndex,
 } from '../../../../common/survey/survey'
@@ -20,7 +20,7 @@ import { getFieldValidation } from '../../../../common/validation/validator'
 
 import {
   createCodeListItem,
-  } from '../actions'
+} from '../actions'
 import { getSurvey } from '../../surveyState'
 import {
   getCodeListEditLevelActiveItem,
@@ -40,14 +40,14 @@ class CodeListEditLevel extends React.Component {
     if (R.any(def => getNodeDefCodeListLevelIndex(def)(survey) >= level.index)(codeListDefs)) {
       alert('This code list level is used by some node definitions and cannot be removed')
     } else if (confirm('Delete the level with all items? This operation cannot be undone')) {
-      deleteCodeListLevel(level.index)
+      deleteCodeListLevel(codeList, level)
     }
   }
 
   render () {
     const {
-      survey, codeList, level, ancestorItemUUIDs, items, activeItemUUID, disabledItems,
-      canBeDeleted,
+      codeList, level, parentItem, ancestorItemUUIDs, items, activeItemUUID, canAddItem,
+      canBeDeleted, language,
       createCodeListItem, putCodeListLevelProp, putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
     } = this.props
 
@@ -67,15 +67,15 @@ class CodeListEditLevel extends React.Component {
       <FormItem label={'name'}>
         <Input value={getCodeListLevelName(level)}
                validation={getFieldValidation('name')(validation)}
-               onChange={e => putCodeListLevelProp(level.codeListId, level.index, 'name', normalizeName(e.target.value))}/>
+               onChange={e => putCodeListLevelProp(codeList, level, 'name', normalizeName(e.target.value))}/>
       </FormItem>
 
       <div className="code-lists__edit-level-items-header">
         <h5 className="label">Items</h5>
 
         <button className="btn btn-s btn-of-light-xs btn-add-item"
-                aria-disabled={disabledItems}
-                onClick={() => createCodeListItem(level)}>
+                aria-disabled={!canAddItem}
+                onClick={() => createCodeListItem(codeList, level, parentItem)}>
           <span className="icon icon-plus icon-12px icon-left"/>
           ADD
         </button>
@@ -85,7 +85,7 @@ class CodeListEditLevel extends React.Component {
         {
           items.map(item =>
             <CodeListEditItem key={item.uuid}
-                              survey={survey}
+                              language={language}
                               codeList={codeList}
                               level={level}
                               ancestorItemUUIDs={ancestorItemUUIDs}
@@ -103,24 +103,28 @@ class CodeListEditLevel extends React.Component {
 
 const mapStateToProps = (state, props) => {
   const {level} = props
+  const {index} = level
 
   const survey = getSurvey(state)
+  const language = getSurveyDefaultLanguage(survey)
 
   const codeList = getCodeListEditCodeList(survey)
-  const activeItem = getCodeListEditLevelActiveItem(level.index)(survey)
+  const activeItem = getCodeListEditLevelActiveItem(index)(survey)
+  const parentItem = getCodeListEditLevelActiveItem(index - 1)(survey)
   const ancestorItemUUIDs = getCodeListEditLevelActiveItemAndAncestorsUUIDs(level.index - 1)(survey)
-  const previousLevelActiveItem = getCodeListEditLevelActiveItem(level.index - 1)(survey)
-  const disabledItems = level.index > 0 && !previousLevelActiveItem
-  const items = disabledItems ? [] : getCodeListEditLevelItemsArray(level.index)(survey)
+
+  const canAddItem = index === 0 || parentItem
+  const items = canAddItem ? getCodeListEditLevelItemsArray(index)(survey) : []
   const canBeDeleted = isCodeListLevelDeleteAllowed(level)(codeList)
 
   return {
-    survey,
+    language,
     codeList,
     ancestorItemUUIDs,
     items,
     activeItemUUID: activeItem ? activeItem.uuid : null,
-    disabledItems,
+    parentItem,
+    canAddItem,
     canBeDeleted,
   }
 }

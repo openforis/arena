@@ -31,7 +31,7 @@ const levelActiveItems = 'levelActiveItems'
 
 // ==== current editing codeList
 
-export const assocCodeListEdit = (codeListUUID) => codeListUUID ? {codeListUUID} : null
+export const initCodeListEdit = (codeListUUID) => codeListUUID ? {codeListUUID} : null
 
 export const getCodeListEditCodeList = survey => R.pipe(
   R.path([codeListEdit, codeListUUID]),
@@ -58,6 +58,9 @@ export const getCodeListEditLevelItemsArray = levelIndex => R.pipe(
 // ==== level item
 export const assocLevelItem = (levelIndex, item) =>
   R.assocPath([levelItems, levelIndex, item.uuid], item)
+
+export const assocLevelItemProp = (level, item, key, value) =>
+  R.assocPath([levelItems, level.index, item.uuid, 'props', key], value)
 
 export const createLevelItem = (levelIndex, item) => R.pipe(
   assocLevelItem(levelIndex, item),

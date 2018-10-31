@@ -4,13 +4,13 @@ import { surveyUpdate } from '../actions'
 import { formReset } from '../form/actions'
 
 import {
-  assocCodeListEdit,
+  initCodeListEdit,
   dissocLevel,
 
-  assocLevelItems,
-
   createLevelItem,
+  assocLevelItems,
   assocLevelItem,
+  assocLevelItemProp,
   dissocLevelItem,
 
   assocLevelActiveItem,
@@ -19,14 +19,16 @@ import {
 import {
   codeListEditUpdate,
 
-  codeListEditLevelDelete,
+  codeListLevelDelete,
 
-  codeListEditLevelItemsUpdate,
+  codeListItemsUpdate,
   codeListEditLevelActiveItemUpdate,
 
-  codeListEditLevelItemCreate,
-  codeListEditLevelItemUpdate,
-  codeListEditLevelItemDelete,
+  codeListItemCreate,
+  codeListItemUpdate,
+  codeListItemPropUpdate,
+  codeListItemDelete,
+  codeListCreate,
 } from './actions'
 
 const actionHandlers = {
@@ -34,21 +36,26 @@ const actionHandlers = {
   [surveyUpdate]: () => null,
   [formReset]: () => null,
 
-  [codeListEditUpdate]: (state, {codeListUUID}) => assocCodeListEdit(codeListUUID),
+  [codeListEditUpdate]: (state, {codeListUUID}) => initCodeListEdit(codeListUUID),
+
+  // code List
+  [codeListCreate]: (state, {codeList}) => initCodeListEdit(codeList.uuid),
 
   // ===== code list level
-  [codeListEditLevelDelete]: (state, {levelIndex}) => dissocLevel(levelIndex)(state),
+  [codeListLevelDelete]: (state, {level}) => dissocLevel(level.index)(state),
 
   // ===== code list items
-  [codeListEditLevelItemsUpdate]: (state, {levelIndex, items}) =>
+  [codeListItemsUpdate]: (state, {levelIndex, items}) =>
     assocLevelItems(levelIndex, items)(state),
 
   // ===== code list item
-  [codeListEditLevelItemCreate]: (state, {levelIndex, item}) => createLevelItem(levelIndex, item)(state),
+  [codeListItemCreate]: (state, {level, item}) => createLevelItem(level.index, item)(state),
 
-  [codeListEditLevelItemUpdate]: (state, {levelIndex, item}) => assocLevelItem(levelIndex, item)(state),
+  [codeListItemUpdate]: (state, {level, item}) => assocLevelItem(level.index, item)(state),
 
-  [codeListEditLevelItemDelete]: (state, {levelIndex, itemUUID}) => dissocLevelItem(levelIndex, itemUUID)(state),
+  [codeListItemPropUpdate]: (state, {level, item, key, value}) => assocLevelItemProp(level, item, key, value)(state),
+
+  [codeListItemDelete]: (state, {level, item}) => dissocLevelItem(level.index, item.uuid)(state),
 
   // ===== code list active item
   [codeListEditLevelActiveItemUpdate]: (state, {levelIndex, itemUUID}) =>

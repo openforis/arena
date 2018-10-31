@@ -80,11 +80,11 @@ const assocCodeListLevelProp = (levelIndex, key, value) => R.assocPath(['levels'
  * CODE LIST ITEM
  */
 // ====== CREATE
-const newCodeListItem = (levelId, parentId = null) => {
+const newCodeListItem = (levelId, parentItem = null) => {
   return {
     uuid: uuidv4(),
     levelId,
-    parentId,
+    parentId: parentItem ? parentItem.id : null,
     props: {},
   }
 }
@@ -233,7 +233,6 @@ module.exports = {
   newCodeListItem,
 
   //READ
-  getCodeListItemId: R.propOr(null, 'id'),
   getCodeListItemCode,
   getCodeListItemLevelId: R.prop('levelId'),
   getCodeListItemLabels,
