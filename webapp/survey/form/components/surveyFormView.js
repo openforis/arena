@@ -12,63 +12,49 @@ import { getSurvey } from '../../surveyState'
 
 import { getFormActivePageNodeDef, getFormPageParentNode } from '../surveyFormState'
 
-import { fetchNodeDefs } from '../../nodeDefs/actions'
-import { fetchCodeLists } from '../../codeLists/actions'
-import { fetchTaxonomies } from '../../taxonomies/actions'
-import { resetForm, setFormActivePage, setFormNodeDefUnlocked, setFormPageNode } from '../actions'
+import { setFormNodeDefUnlocked, setFormPageNode } from '../actions'
 
 import { getRecord } from '../../record/recordState'
 
-class SurveyFormView extends React.Component {
+const SurveyFormView = (props) => {
 
-  componentDidMount () {
-    const {edit, resetForm, fetchNodeDefs, fetchCodeLists, fetchTaxonomies} = this.props
+  const {
+    nodeDef,
+    edit,
+    entry,
+    recordLoaded,
+  } = props
 
-    resetForm()
-    fetchNodeDefs(edit)
-    fetchCodeLists(edit)
-    fetchTaxonomies(edit)
-  }
+  return nodeDef
+    ? (
+      <React.Fragment>
 
-  render () {
-    const {
-      nodeDef,
-      edit,
-      entry,
-      recordLoaded,
-    } = this.props
+        {
+          edit
+            ? <NodeDefEdit/>
+            : null
+        }
 
-    return (
-      nodeDef ?
-        <React.Fragment>
+        <div className={`survey-form${edit ? ' edit' : ''}`}>
+
+          <FormNavigation edit={edit}/>
+
+          {
+            nodeDef && (edit || (entry && recordLoaded))
+              ? <NodeDefSwitch {...props} />
+              : <div/>
+          }
 
           {
             edit
-              ? <NodeDefEdit/>
+              ? <FormActions/>
               : null
           }
 
-          <div className={`survey-form${edit ? ' edit' : ''}`}>
-
-            <FormNavigation edit={edit}/>
-
-            {
-              nodeDef && (edit || (entry && recordLoaded))
-                ? <NodeDefSwitch {...this.props} />
-                : <div/>
-            }
-
-            {
-              edit
-                ? <FormActions/>
-                : null
-            }
-
-          </div>
-        </React.Fragment>
-        : null
+        </div>
+      </React.Fragment>
     )
-  }
+    : null
 
 }
 
@@ -107,10 +93,4 @@ const mapStateToProps = (state, props) => {
 
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    fetchNodeDefs, fetchCodeLists, fetchTaxonomies,
-    resetForm, setFormActivePage, setFormPageNode, setFormNodeDefUnlocked,
-  }
-)(SurveyFormView)
+export default connect(mapStateToProps, {setFormPageNode, setFormNodeDefUnlocked})(SurveyFormView)
