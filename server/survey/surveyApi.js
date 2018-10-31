@@ -19,7 +19,7 @@ const {
 
 const {
   validateNewSurvey,
-  validateSurveyProp
+  validateSurvey,
 } = require('./surveyValidator')
 
 const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
@@ -97,7 +97,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'id')
 
       const survey = await updateSurveyProp(surveyId, key, value, user)
-      const validation = await validateSurveyProp(survey, key)
+      const validation = await validateSurvey(survey, key)
 
       res.json({validation})
     } catch (err) {

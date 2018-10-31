@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import { surveyCurrentUpdate } from '../actions'
+import { surveyUpdate } from '../actions'
 import { formReset } from '../form/actions'
 
 import { codeListsUpdate } from './actions'
@@ -13,7 +13,7 @@ const simulateSurveyState = (codeLists) =>
 
 const actionHandlers = {
   // reset form
-  [surveyCurrentUpdate]: () => null,
+  [surveyUpdate]: () => null,
   [formReset]: () => null,
 
   [codeListsUpdate]: (state, {codeLists}) => R.pipe(

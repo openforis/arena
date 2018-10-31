@@ -2,46 +2,39 @@ import * as R from 'ramda'
 
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import { surveyCurrentUpdate } from '../actions'
+import { surveyUpdate } from '../actions'
 import { formReset } from '../form/actions'
 
-import { nodeDefDelete, nodeDefPropUpdate, nodeDefsUpdate, nodeDefUpdate } from './actions'
+import {
+  nodeDefsLoad,
+
+  nodeDefCreate,
+  nodeDefUpdate,
+  nodeDefPropUpdate,
+  nodeDefDelete,
+} from './actions'
 
 import {
-  getNodeDefs,
   assocNodeDef,
   assocNodeDefProp,
-  assocNodeDefs,
-  dissocNodeDef
-} from '../../../common/survey/survey'
-
-const simulateSurveyState = (nodeDefs) =>
-  nodeDefs ? {nodeDefs} : {}
+  dissocNodeDef,
+} from './nodeDefsState'
 
 const actionHandlers = {
   // reset form
-  [surveyCurrentUpdate]: () => null,
+  [surveyUpdate]: () => null,
   [formReset]: () => null,
 
-  [nodeDefsUpdate]: (state = {}, {nodeDefs}) => R.pipe(
-    assocNodeDefs(nodeDefs),
-    getNodeDefs,
-  )(simulateSurveyState(state)),
+  [nodeDefsLoad]: (state = {}, {nodeDefs}) => nodeDefs,
 
-  [nodeDefUpdate]: (state, {nodeDef}) => R.pipe(
-    assocNodeDef(nodeDef),
-    getNodeDefs,
-  )(simulateSurveyState(state)),
+  // single nodeDef actions
+  [nodeDefCreate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
 
-  [nodeDefPropUpdate]: (state, {nodeDefUUID, key, value}) => R.pipe(
-    assocNodeDefProp(nodeDefUUID, key, value),
-    getNodeDefs,
-  )(simulateSurveyState(state)),
+  [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
 
-  [nodeDefDelete]: (state, {nodeDef}) => R.pipe(
-    dissocNodeDef(nodeDef),
-    getNodeDefs,
-  )(simulateSurveyState(state)),
+  [nodeDefPropUpdate]: (state, {nodeDefUUID, key, value}) => assocNodeDefProp(nodeDefUUID, key, value)(state),
+
+  [nodeDefDelete]: (state, {nodeDef}) => dissocNodeDef(nodeDef)(state),
 
 }
 

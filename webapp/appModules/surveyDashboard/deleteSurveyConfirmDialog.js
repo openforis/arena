@@ -38,7 +38,8 @@ export default class DeleteSurveyConfirmDialog extends React.Component {
         <ModalBody>
           <div className="survey-delete-dialog__body">
             <div className="highlight">
-              Deleting the <b>{surveyName}</b> survey will delete all of its data.
+              <div>Deleting the <b>{surveyName}</b> survey will delete all of its data.</div>
+              <div>This operation cannot be undone!</div>
             </div>
 
             <div className="text-center">

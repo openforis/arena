@@ -1,6 +1,6 @@
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import { surveyCurrentUpdate } from '../actions'
+import { surveyUpdate } from '../actions'
 
 import {
   formActivePageNodeDefUpdate,
@@ -19,7 +19,7 @@ import {
 
 const actionHandlers = {
   // reset form
-  [surveyCurrentUpdate]: () => null,
+  [surveyUpdate]: () => null,
 
   [formReset]: () => null,
 

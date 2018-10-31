@@ -1,24 +1,21 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { getSurvey, getStateSurveyId } from './surveyState'
+import { getStateSurveyId, getSurvey } from './surveyState'
 
-export const surveyCurrentUpdate = 'survey/current/update'
-export const surveyCurrentPropUpdate = 'survey/current/prop/update'
+export const surveyUpdate = 'survey/current/update'
+export const surveyPublish = 'survey/current/publish'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
-  dispatch({type: surveyCurrentUpdate, survey})
+  dispatch({type: surveyUpdate, survey})
 
-export const dispatchCurrentSurveyPropUpdate = (dispatch, survey) =>
-  dispatch({type: surveyCurrentPropUpdate, survey})
-
-
+//TODO REMOVE
 export const dispatchMarkCurrentSurveyDraft = (dispatch, getState) => {
   const survey = R.pipe(getSurvey,
     R.assoc('draft', true)
   )(getState())
 
-  dispatchCurrentSurveyPropUpdate(dispatch, survey)
+  // dispatchSurveyInfoPropUpdate(dispatch, survey)
 }
 
 // ==== READ
@@ -28,11 +25,10 @@ export const dispatchMarkCurrentSurveyDraft = (dispatch, getState) => {
 export const publishSurvey = () => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
 
-  const {data} = await axios.put(`/api/survey/${surveyId}/publish`)
+  await axios.put(`/api/survey/${surveyId}/publish`)
 
-  dispatchCurrentSurveyPropUpdate(dispatch, data.survey)
+  dispatch({type: surveyPublish})
 }
-
 
 // == DELETE
 

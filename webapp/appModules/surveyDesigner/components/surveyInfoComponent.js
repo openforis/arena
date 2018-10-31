@@ -17,7 +17,7 @@ import {
 import { getSrsName, srs } from '../../../../common/app/srs'
 
 import { getSurvey } from '../../../survey/surveyState'
-import { updateSurveyProp } from '../../../survey/surveyInfo/actions'
+import { updateSurveyInfoProp } from '../../../survey/surveyInfo/actions'
 
 import { normalizeName } from './../../../../common/survey/surveyUtils'
 import { getValidation, getFieldValidation } from './../../../../common/validation/validator'
@@ -80,6 +80,6 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   {
-    updateSurveyProp,
+    updateSurveyProp: updateSurveyInfoProp,
   }
 )(SurveyInfoComponent)

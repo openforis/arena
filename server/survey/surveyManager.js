@@ -83,9 +83,11 @@ const fetchUserSurveys = async (user) => R.map(
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
 
-  return validate
+  const nodeDefs = validate
     ? await validateNodeDefs(nodeDefsDB)
     : nodeDefsDB
+
+  return toUUIDIndexedObj(nodeDefs)
 }
 
 // ====== UPATE
@@ -93,6 +95,7 @@ const updateSurveyProp = async (id, key, value, user) =>
   assocSurveyInfo(
     await surveyRepository.updateSurveyProp(id, key, value)
   )
+
 const publishSurvey = async (id, user) => {
   await db.tx(async t => {
 

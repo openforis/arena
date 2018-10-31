@@ -117,7 +117,7 @@ const assocSurveyPropValidation = (key, validation) =>
  * READ NodeDefs
  * ======
  */
-const getNodeDefs = R.pipe(R.prop(nodeDefs), R.defaultTo({}))
+const getNodeDefs = R.propOr({}, nodeDefs)
 
 const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
@@ -152,36 +152,8 @@ const getNodeDefsByTaxonomyUUID = (uuid) => R.pipe(
  * UPDATE NodeDefs
  * ======
  */
-const assocNodeDefs = newNodeDefsArray =>
-  survey => R.pipe(
-    R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
-    R.merge(getNodeDefs(survey)),
-    newNodeDefs => R.assoc(nodeDefs, newNodeDefs, survey)
-  )(newNodeDefsArray)
+const assocNodeDefs = newNodeDefs => R.assoc(nodeDefs, newNodeDefs)
 
-const assocNodeDef = nodeDef => R.assocPath([nodeDefs, nodeDef.uuid], nodeDef)
-
-const assocNodeDefProp = (nodeDefUUID, key, value) => R.pipe(
-  R.assocPath([nodeDefs, nodeDefUUID, 'props', key], value),
-  R.dissocPath([nodeDefs, nodeDefUUID, 'validation', 'fields', key]),
-)
-
-/**
- * ======
- * DELETE NodeDef
- * ======
- */
-const dissocNodeDef = nodeDef =>
-  survey => {
-    const updatedSurvey = isNodeDefEntity(nodeDef)
-      ? R.reduce(
-        (s, n) => dissocNodeDef(n)(s),
-        survey,
-        getNodeDefChildren(nodeDef)(survey)
-      ) : survey
-
-    return R.dissocPath([nodeDefs, nodeDef.uuid])(updatedSurvey)
-  }
 
 /**
  * ======
@@ -366,11 +338,7 @@ module.exports = {
 
   // UPDATE nodeDefs
   assocNodeDefs,
-  assocNodeDef,
-  assocNodeDefProp,
 
-  // DELETE nodeDefs
-  dissocNodeDef,
 
   // UTILS NodeDefs
   getNodeDefParent,

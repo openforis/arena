@@ -1,7 +1,7 @@
 import { exportReducer } from '../../appUtils/reduxUtils'
 import * as R from 'ramda'
 
-import { surveyCurrentUpdate } from '../actions'
+import { surveyUpdate } from '../actions'
 import { formReset } from '../form/actions'
 
 import { taxonomiesUpdate } from './actions'
@@ -9,7 +9,7 @@ import { taxonomyCreate, taxonomyDelete, taxonomyUpdate } from '../taxonomyEdit/
 
 const actionHandlers = {
   // reset form
-  [surveyCurrentUpdate]: () => null,
+  [surveyUpdate]: () => null,
   [formReset]: () => null,
 
   [taxonomiesUpdate]: (state, {taxonomies}) => taxonomies,

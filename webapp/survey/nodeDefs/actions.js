@@ -11,8 +11,10 @@ import { setFormActivePage, setFormNodeDefEdit, setFormNodeDefUnlocked } from '.
 /**
  * ==== NODE DEFS
  */
+export const nodeDefsLoad = 'nodeDefs/load'
+
+export const nodeDefCreate = 'nodeDef/create'
 export const nodeDefUpdate = 'nodeDef/update'
-export const nodeDefsUpdate = 'nodeDefs/update'
 export const nodeDefPropUpdate = 'nodeDef/prop/update'
 export const nodeDefDelete = 'nodeDef/delete'
 
@@ -22,6 +24,8 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
   try {
     const surveyId = getStateSurveyId(getState())
     const nodeDef = newNodeDef(surveyId, parentId, type, props)
+
+
     dispatch({type: nodeDefUpdate, nodeDef})
     //setting current editing nodeDef
     dispatch(setFormNodeDefEdit(nodeDef))
@@ -46,7 +50,7 @@ export const fetchNodeDefs = (draft = false) => async (dispatch, getState) => {
     const surveyId = getStateSurveyId(getState())
     const {data} = await axios.get(`/api/survey/${surveyId}/nodeDefs?draft=${draft}`)
 
-    dispatch({type: nodeDefsUpdate, nodeDefs: data.nodeDefs})
+    dispatch({type: nodeDefsLoad, nodeDefs: data.nodeDefs})
   } catch (e) { }
 }
 
@@ -71,7 +75,7 @@ const _putNodeDefProp = (nodeDef, key, value) => {
       const res = await axios.put(`/api/nodeDef/${nodeDef.id}/prop`, {key, value})
       //update node defs with their validation status
       const {nodeDefs} = res.data
-      dispatch({type: nodeDefsUpdate, nodeDefs})
+      dispatch({type: nodeDefsLoad, nodeDefs})
     } catch (e) { }
 
   }
