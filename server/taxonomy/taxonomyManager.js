@@ -82,16 +82,32 @@ const importTaxa = async (userId, surveyId, taxonomyId, inputBuffer) => {
 /**
  * ====== READ
  */
-const fetchTaxonomiesBySurveyId = async (surveyId, draft) => {
+const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = false) => {
   const taxonomies = await taxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft)
 
-  return await Promise.all(
-    taxonomies.map(async taxonomy => ({
-        ...taxonomy,
-        validation: await validateTaxonomy(taxonomies, taxonomy)
-      })
+  return validate
+    ? await Promise.all(
+      taxonomies.map(async taxonomy => ({
+          ...taxonomy,
+          validation: await validateTaxonomy(taxonomies, taxonomy)
+        })
+      )
     )
-  )
+    : taxonomies
+}
+
+const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate = false) => {
+  const taxonomy = await taxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft)
+
+  if (validate) {
+    const taxonomies = await taxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft)
+    return {
+      ...taxonomy,
+      validation: await validateTaxonomy(taxonomies, taxonomy)
+    }
+  } else {
+    return taxonomy
+  }
 }
 
 const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false) =>
@@ -171,6 +187,7 @@ module.exports = {
   importTaxa,
 
   //READ
+  fetchTaxonomyById,
   fetchTaxonomiesBySurveyId,
   exportTaxa,
   countTaxaByTaxonomyId,

@@ -31,7 +31,7 @@ import {
   putTaxonomyProp,
   uploadTaxonomyFile,
   reloadTaxa,
-  loadTaxaPage,
+  loadTaxa,
 } from '../actions'
 
 const ROWS_PER_PAGE = 15
@@ -43,18 +43,18 @@ class TaxonomyEdit extends React.Component {
     const {taxonomy, reloadTaxa} = this.props
 
     if (taxonomy.id) {
-      reloadTaxa()
+      reloadTaxa(taxonomy)
     }
   }
 
   componentDidUpdate (prevProps) {
-    const {activeJob, reloadTaxa} = this.props
+    const {activeJob, reloadTaxa, taxonomy} = this.props
     const prevJob = prevProps.activeJob
 
     if (activeJob === null && prevJob
       && getJobName(prevJob) === importTaxaJobName
       && isJobCompleted(prevJob)) {
-      reloadTaxa()
+      reloadTaxa(taxonomy)
     }
   }
 
@@ -83,12 +83,12 @@ class TaxonomyEdit extends React.Component {
           <FormItem label="Taxonomy name">
             <Input value={getTaxonomyName(taxonomy)}
                    validation={getFieldValidation('name')(validation)}
-                   onChange={e => putTaxonomyProp(taxonomy.uuid, 'name', normalizeName(e.target.value))}/>
+                   onChange={e => putTaxonomyProp(taxonomy, 'name', normalizeName(e.target.value))}/>
           </FormItem>
 
           <div className="button-bar">
             <UploadButton label="CSV import"
-                          onChange={(files) => uploadTaxonomyFile(surveyId, taxonomy.id, files[0])}/>
+                          onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
 
             <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/export?draft=true`}
                             disabled={R.isEmpty(taxa)}
@@ -105,7 +105,7 @@ class TaxonomyEdit extends React.Component {
                           currentPage={taxaCurrentPage}
                           totalPages={taxaTotalPages}
                           rowsPerPage={ROWS_PER_PAGE}
-                          onPageChange={(page) => loadTaxaPage(page)}/>
+                          onPageChange={(page) => loadTaxaPage(taxonomy, page)}/>
         }
 
         <div style={{justifySelf: 'center'}}>
@@ -136,6 +136,6 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   {
-    setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile, reloadTaxa, loadTaxaPage,
+    setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile, reloadTaxa, loadTaxaPage: loadTaxa,
   }
 )(TaxonomyEdit)

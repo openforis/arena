@@ -7,14 +7,21 @@ import { assocSurveyInfoProp, assocSurveyInfoValidation, markDraft, markPublishe
 // app actions
 import { loginSuccess } from '../../login/actions'
 import { appStatusChange } from '../../app/actions'
+
 // survey actions
 import { surveyCreate, surveyUpdate, surveyPublish } from '../actions'
+
 // surveyInfo actions
 import { surveyInfoPropUpdate, surveyInfoValidationUpdate } from './actions'
+
 // nodeDefs actions
 import { nodeDefCreate, nodeDefDelete, nodeDefPropUpdate, nodeDefUpdate } from '../nodeDefs/actions'
+
 // codeList actions
 import { codeListCreate, codeListDelete, codeListUpdate } from '../codeListEdit/actions'
+
+// taxonomies actions
+import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomyEdit/actions'
 
 const actionHandlers = {
   // app initialization
@@ -42,6 +49,12 @@ const actionHandlers = {
   [codeListCreate]: markDraft,
   [codeListUpdate]: markDraft,
   [codeListDelete]: markDraft,
+
+  // taxonomies
+  [taxonomyCreate]: markDraft,
+  [taxonomyUpdate]: markDraft,
+  [taxonomyPropUpdate]: markDraft,
+  [taxonomyDelete]: markDraft,
 }
 
 export default exportReducer(actionHandlers)

@@ -5,6 +5,7 @@ const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 const {
   countTaxaByTaxonomyId,
   fetchTaxaByProp,
+  fetchTaxonomyById,
   createTaxonomy,
   updateTaxonomyProp,
   deleteTaxonomy
@@ -102,9 +103,9 @@ module.exports.init = app => {
       const {key, value} = body
 
       await updateTaxonomyProp(surveyId, taxonomyId, key, value)
-      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, true)
+      const taxonomy = await fetchTaxonomyById(surveyId, taxonomyId, true, true)
 
-      res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
+      res.json({taxonomy})
     } catch (err) {
       sendErr(res, err)
     }

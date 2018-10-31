@@ -4,20 +4,19 @@ import { surveyUpdate } from '../actions'
 import { formReset } from '../form/actions'
 
 import { taxonomyCreate, taxonomyEditPropsUpdate, taxonomyEditUpdate } from './actions'
-import { setTaxonomyEdit, mergeTaxonomyEditProps } from './taxonomyEditState'
+import { initTaxonomyEdit, mergeTaxonomyEditProps } from './taxonomyEditState'
 
 const actionHandlers = {
   // reset form
   [surveyUpdate]: () => null,
   [formReset]: () => null,
 
-  [taxonomyEditUpdate]: (state, {taxonomyUUID}) => setTaxonomyEdit(taxonomyUUID),
+  [taxonomyEditUpdate]: (state, {taxonomyUUID}) => initTaxonomyEdit(taxonomyUUID),
 
   [taxonomyEditPropsUpdate]: (state, {type, ...props}) => mergeTaxonomyEditProps(props)(state),
 
   // create
-  [taxonomyCreate]: (state, {taxonomy}) => setTaxonomyEdit(taxonomy.uuid)(state),
-
+  [taxonomyCreate]: (state, {taxonomy}) => initTaxonomyEdit(taxonomy.uuid),
 }
 
 export default exportReducer(actionHandlers)

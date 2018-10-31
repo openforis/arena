@@ -23,7 +23,7 @@ const taxonomyEdit = 'taxonomyEdit'
 const taxonomyUUID = 'taxonomyUUID'
 
 // ==== taxonomy for edit
-export const setTaxonomyEdit = uuid => uuid ? {taxonomyUUID: uuid} : null
+export const initTaxonomyEdit = uuid => uuid ? {taxonomyUUID: uuid} : null
 
 export const getTaxonomyEditTaxonomy = survey => R.pipe(
   R.path([taxonomyEdit, taxonomyUUID]),
