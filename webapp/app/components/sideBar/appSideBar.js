@@ -30,7 +30,7 @@ class AppSideBar extends React.Component {
 
   render () {
     const {opened} = this.state
-    const {history, user, surveyInfo} = this.props
+    const {history, user, surveyInfo, logout} = this.props
 
     return (
       <div className="app-sidebar">
@@ -54,7 +54,8 @@ class AppSideBar extends React.Component {
 
         <AppSideBarFooter surveyInfo={surveyInfo}
                           user={user}
-                          opened={opened}/>
+                          opened={opened}
+                          logout={logout}/>
 
       </div>
     )

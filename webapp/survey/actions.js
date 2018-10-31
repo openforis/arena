@@ -3,8 +3,9 @@ import * as R from 'ramda'
 
 import { getStateSurveyId, getSurvey } from './surveyState'
 
-export const surveyUpdate = 'survey/current/update'
-export const surveyPublish = 'survey/current/publish'
+export const surveyCreate = 'survey/create'
+export const surveyUpdate = 'survey/update'
+export const surveyPublish = 'survey/publish'
 
 export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyUpdate, survey})

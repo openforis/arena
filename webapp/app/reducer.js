@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
+import { exportReducer, assocActionProps, dissocStateProps } from '../appUtils/reduxUtils'
 
 import { appState } from './app'
 
@@ -25,13 +25,14 @@ import { loginSuccess } from '../login/actions'
  * ======
  */
 import { appJobActiveUpdate } from './components/job/actions'
+import { surveyCreate } from '../survey/actions'
 
 const actionHandlers = {
 
-  [appStatusChange]: assocActionProps,
+  [appStatusChange]: (state, {survey, ...props}) => assocActionProps(state, props),
 
   // user and current survey are properties of app state
-  [loginSuccess]: assocActionProps,
+  [loginSuccess]: (state, {survey, ...props}) => assocActionProps(state, props),
 
   [appUserPrefUpdate]: (state, {name, value}) => {
     const user = R.pipe(
@@ -45,6 +46,8 @@ const actionHandlers = {
   [appUserLogout]: (state, action) => appState.logoutUser(state),
 
   // new survey
+  [surveyCreate]: (state, _) => dissocStateProps(state, ['newSurvey']),
+
   [appNewSurveyUpdate]: assocActionProps,
 
   //surveys list
