@@ -2,6 +2,10 @@ import { exportReducer } from '../../appUtils/reduxUtils'
 
 import { getSurveyInfo } from '../../../common/survey/survey'
 
+// app actions
+import { loginSuccess } from '../../login/actions'
+import { appStatusChange } from '../../app/actions'
+
 // survey actions
 import {
   surveyCreate,
@@ -18,10 +22,11 @@ import {
 import {
   setPublished,
   assocSurveyInfoProp,
-  assocSurveyInfoValidation,
+  assocSurveyInfoValidation, markDraft,
 } from './surveyInfoState'
-import { loginSuccess } from '../../login/actions'
-import { appStatusChange } from '../../app/actions'
+
+// nodeDef actions
+import { nodeDefCreate, nodeDefDelete, nodeDefPropUpdate, nodeDefUpdate } from '../nodeDefs/actions'
 
 const actionHandlers = {
   // app initialization
@@ -38,6 +43,12 @@ const actionHandlers = {
   [surveyInfoPropUpdate]: (state, {key, value}) => assocSurveyInfoProp(key, value)(state),
 
   [surveyInfoValidationUpdate]: (state, {validation}) => assocSurveyInfoValidation(validation)(state),
+
+  //NODEDEF
+  [nodeDefCreate]: (state) => markDraft(state),
+  [nodeDefUpdate]: (state) => markDraft(state),
+  [nodeDefPropUpdate]: (state) => markDraft(state),
+  [nodeDefDelete]: (state) => markDraft(state),
 }
 
 export default exportReducer(actionHandlers)

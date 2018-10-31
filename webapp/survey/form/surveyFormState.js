@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 
 import { getNodeDefByUUID, getNodeDefParent, getRootNodeDef } from '../../../common/survey/survey'
+import { isNodeDefEntity } from '../../../common/survey/nodeDef'
+import { getPageUUID } from '../../../common/survey/nodeDefLayout'
 
 import { getRecord } from '../record/recordState'
 import { getNodeByUUID } from '../../../common/record/record'
@@ -88,3 +90,24 @@ export const getFormPageParentNode = nodeDef =>
 
     return null
   }
+
+// on nodeDef create
+export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
+  assocFormNodeDefEdit(nodeDef),
+  R.ifElse(
+    () => isNodeDefEntity(nodeDef),
+
+    // if is entity, unlock form
+    R.pipe(
+      assocNodeDefFormUnlocked(nodeDef),
+      // if entity renders in its own page, assoc active page
+      R.ifElse(
+        () => !!getPageUUID(nodeDef),
+        assocFormActivePage(nodeDef),
+        R.identity
+      )
+    ),
+
+    R.identity
+  )
+)

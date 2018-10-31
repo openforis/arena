@@ -14,8 +14,11 @@ import {
   assocFormActivePage,
   assocFormNodeDefEdit,
   assocFormPageNode,
-  assocNodeDefFormUnlocked
+  assocNodeDefFormUnlocked,
+  assocParamsOnNodeDefCreate,
 } from './surveyFormState'
+
+import { nodeDefCreate } from '../nodeDefs/actions'
 
 const actionHandlers = {
   // reset form
@@ -30,6 +33,9 @@ const actionHandlers = {
   [formActivePageNodeDefUpdate]: (state, {nodeDef}) => assocFormActivePage(nodeDef)(state),
 
   [formPageNodeUpdate]: (state, {nodeDef, node}) => assocFormPageNode(nodeDef, node)(state),
+
+  // node def
+  [nodeDefCreate]: (state, {nodeDef}) => assocParamsOnNodeDefCreate(nodeDef)(state)
 }
 
 export default exportReducer(actionHandlers)
