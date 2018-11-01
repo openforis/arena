@@ -3,8 +3,9 @@ import axios from 'axios'
 import { debounceAction } from '../../appUtils/reduxUtils'
 import { newTaxonomy } from '../../../common/survey/taxonomy'
 
-import {  getStateSurveyId } from '../surveyState'
+import { getStateSurveyId, getSurvey } from '../surveyState'
 import { showAppJobMonitor } from '../../app/components/job/actions'
+import { getTaxonomyEditTaxaPerPage } from './taxonomyEditState'
 
 // taxonomy actions
 export const taxonomyCreate = 'survey/taxonomy/create'
@@ -52,12 +53,14 @@ export const reloadTaxa = (taxonomy) => async (dispatch, getState) => {
 export const loadTaxa = (taxonomy, page = 1) => async (dispatch, getState) => {
   dispatchTaxonomyEditPropsUpdate(dispatch, {taxaCurrentPage: page, taxa: []})
 
+  const surveyState = getSurvey(getState())
   const surveyId = getStateSurveyId(getState())
+  const rowsPerPage = getTaxonomyEditTaxaPerPage(surveyState)
   const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/taxa`, {
     params: {
       draft: true,
-      limit: ROWS_PER_PAGE,
-      offset: (page - 1) * ROWS_PER_PAGE
+      limit: rowsPerPage,
+      offset: (page - 1) * rowsPerPage
     }
   })
 
@@ -89,7 +92,12 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
   const surveyId = getStateSurveyId(getState())
   const {data} = await axios.post(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/upload`, formData, config)
 
-  dispatch(showAppJobMonitor(data.job))
+  dispatch(showAppJobMonitor(data.job, () => {
+    //import complete
+    dispatch(reloadTaxa(taxonomy))
+    //mark survey draft
+    dispatchTaxonomyUpdate(dispatch, taxonomy)
+  }))
 }
 
 // ====== DELETE

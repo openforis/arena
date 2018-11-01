@@ -2,12 +2,13 @@ import axios from 'axios'
 
 import { getActiveJob } from './appJobState'
 
-import { isJobCompleted, isJobRunning } from '../../../../common/job/job'
+import { isJobRunning } from '../../../../common/job/job'
 
+export const appJobStart = 'app/job/start'
 export const appJobActiveUpdate = 'app/job/active/update'
 
-export const showAppJobMonitor = (job, hideAutomatically = false) => (dispatch) => {
-  dispatch({type: appJobActiveUpdate, job, hideAutomatically})
+export const showAppJobMonitor = (job, onComplete = null, autoHide = false) => (dispatch) => {
+  dispatch({type: appJobStart, job, onComplete, autoHide})
 }
 
 export const hideAppJobMonitor = () => async (dispatch) => {
@@ -16,7 +17,7 @@ export const hideAppJobMonitor = () => async (dispatch) => {
 
 export const cancelActiveJob = () => async (dispatch) => {
   await axios.delete(`/api/jobs/active`)
-
+  //hide job monitor
   dispatch(hideAppJobMonitor())
 }
 
@@ -38,13 +39,17 @@ export const startAppJobMonitoring = () => async (dispatch, getState) => {
       const activeJobState = getActiveJob(getState())
 
       if (activeJob !== null || activeJobState !== null) {
-        if (activeJobState === null || activeJob || activeJobState.hideAutomatically) {
-          //job not monitored yet or completed and hideAutomatically is true
+        if (activeJobState === null || activeJob || activeJobState.autoHide) {
+          //job not monitored yet or completed and autoHide is true
           dispatch({type: appJobActiveUpdate, job: activeJob})
-        } else if (activeJob === null && isJobRunning(activeJobState) && !activeJobState.hideAutomatically) {
+        } else if (activeJob === null && isJobRunning(activeJobState) && !activeJobState.autoHide) {
           //job completed (no more active), load it
           const {data} = await axios.get(`/api/jobs/${activeJobState.id}`)
           dispatch({type: appJobActiveUpdate, job: data.job})
+
+          if (activeJobState.onComplete) {
+            activeJobState.onComplete()
+          }
         }
       }
     } catch (e) {}

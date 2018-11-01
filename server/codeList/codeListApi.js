@@ -77,8 +77,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const draft = getBoolParam(req, 'draft')
+      const validate = getBoolParam(req, 'validate')
 
-      const codeLists = await fetchCodeListsBySurveyId(surveyId, draft, draft)
+      const codeLists = await fetchCodeListsBySurveyId(surveyId, draft, validate)
 
       res.json({codeLists: toUUIDIndexedObj(codeLists)})
     } catch (err) {
