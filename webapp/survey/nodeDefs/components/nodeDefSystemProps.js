@@ -108,6 +108,14 @@ export const nodeDefSystemProps = {
   [nodeDefType.taxon]: {
     component: NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left"/>,
+    defaultValue: {
+      code: '',
+      family: '',
+      genus: '',
+      scientificName: '',
+      vernacularName: '',
+      vernacularLanguage: '',
+    }
   },
 
   [nodeDefType.file]: {
@@ -141,8 +149,7 @@ export const getNodeDefComponent = nodeDef =>
     nodeDef.type,
     'component',
     NodeDefText
-  )
-  (nodeDefSystemProps)
+  )(nodeDefSystemProps)
 
 export const getNodeDefFieldsCount = nodeDef =>
   getProp(

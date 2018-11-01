@@ -1,17 +1,15 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { getSurveyDefaultLanguage } from '../../../../../../common/survey/survey'
-import { isNodeDefMultiple } from '../../../../../../common/survey/nodeDef'
-import { getCodeListItemCode, getCodeListItemLabel } from '../../../../../../common/survey/codeList'
-import { getNodeValue, newNode } from '../../../../../../common/record/node'
+import NodeDef from '../../../../../../common/survey/nodeDef'
+import CodeList from '../../../../../../common/survey/codeList'
+import Node from '../../../../../../common/record/node'
 
 const Checkbox = props => {
-  const {survey, edit, item, nodeDef, parentNode, nodes, updateNode, removeNode} = props
+  const {language, edit, item, nodeDef, parentNode, nodes, updateNode, removeNode} = props
 
-  const language = getSurveyDefaultLanguage(survey)
-  const itemCode = getCodeListItemCode(item)
-  const matchingNode = R.find(node => getNodeValue(node).code === itemCode)(nodes)
+  const itemCode = CodeList.getCodeListItemCode(item)
+  const matchingNode = R.find(node => Node.getNodeValue(node).code === itemCode)(nodes)
   const selected = !R.isNil(matchingNode)
 
   return (
@@ -26,13 +24,13 @@ const Checkbox = props => {
           removeNode(nodeDef, matchingNode)
         } else {
           const nodeToUpdate =
-            (isNodeDefMultiple(nodeDef) || R.isEmpty(nodes))
-              ? newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
+            (NodeDef.isNodeDefMultiple(nodeDef) || R.isEmpty(nodes))
+              ? Node.newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
               : nodes[0]
           updateNode(nodeDef, nodeToUpdate, {code: itemCode})
         }
       }}>
-      {getCodeListItemLabel(language)(item)}
+      {CodeList.getCodeListItemLabel(language)(item)}
     </button>
   )
 }

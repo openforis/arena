@@ -91,7 +91,7 @@ class NodeDefCodeList extends React.Component {
                                items={items}/>
     } else {
       return (
-        <NodeDefFormItem {...this.props}>
+        <NodeDefFormItem label={label}>
           <CodeListRenderer {...this.props}
                             items={items}/>
         </NodeDefFormItem>
@@ -107,7 +107,7 @@ const mapStateToProps = (state, props) => {
 
   const ancestorCodes = Record.getNodeCodeAncestorValues(survey, parentNode, nodeDef)(record)
 
-  const levelIndex = NodeDef.getNodeDefCodeListLevelIndex(nodeDef)(survey)
+  const levelIndex = Survey.getNodeDefCodeListLevelIndex(nodeDef)(survey)
   const codeList = ancestorCodes.length === levelIndex
     ? Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey)
     : null
