@@ -1,6 +1,7 @@
 import '../node-def.scss'
 
 import React from 'react'
+import { connect } from 'react-redux'
 import axios from 'axios'
 import * as R from 'ramda'
 
@@ -9,21 +10,14 @@ import NodeDefFormItem from './nodeDefFormItem'
 import CodeListDropdown from './codeList/codeListDropdown'
 import CodeListCheckbox from './codeList/codeListCheckbox'
 
-import {
-  isRenderDropdown, nodeDefRenderType
-} from '../../../../../common/survey/nodeDefLayout'
-import {
-  getNodeDefCodeListUUID,
-  getNodeDefParentCodeUUID
-} from '../../../../../common/survey/nodeDef'
-import {
-  getCodeListByUUID,
-  getNodeDefCodeListLevelIndex,
-  getSurveyId,
-} from '../../../../../common/survey/survey'
-import { getNodeCodeAncestorValues } from '../../../../../common/record/record'
+import NodeDef from '../../../../../common/survey/nodeDef'
+import Survey from '../../../../../common/survey/survey'
+import Record from '../../../../../common/record/record'
+import { isRenderDropdown, nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
-import {toQueryString} from '../../../../../server/serverUtils/request'
+import { toQueryString } from '../../../../../server/serverUtils/request'
+import { getSurvey } from '../../../surveyState'
+import { getRecord } from '../../../record/recordState'
 
 const CodeListRenderer = props =>
   isRenderDropdown(props.nodeDef)
@@ -49,13 +43,10 @@ class NodeDefCodeList extends React.Component {
   }
 
   async componentDidUpdate (prevProps) {
-    const {survey, nodeDef, record, parentNode} = this.props
+    const {ancestorCodes, nodeDefParentCodeUUID} = this.props
 
-    if (getNodeDefParentCodeUUID(nodeDef)) {
-      const {record: prevRecord, parentNode: prevParentNode} = prevProps
-
-      const ancestorCodes = getNodeCodeAncestorValues(survey, parentNode, nodeDef)(record)
-      const prevAncestorCodes = getNodeCodeAncestorValues(survey, prevParentNode, nodeDef)(prevRecord)
+    if (nodeDefParentCodeUUID) {
+      const {ancestorCodes: prevAncestorCodes} = prevProps
 
       //ancestor codes changed, reload items
       if (!R.equals(ancestorCodes, prevAncestorCodes)) {
@@ -65,29 +56,15 @@ class NodeDefCodeList extends React.Component {
   }
 
   async loadCodeListItems () {
-    const {survey, record, parentNode, nodeDef} = this.props
+    const {surveyInfo, codeListId, ancestorCodes} = this.props
 
-    const levelIndex = getNodeDefCodeListLevelIndex(nodeDef)(survey)
-    const ancestorCodes = getNodeCodeAncestorValues(survey, parentNode, nodeDef)(record)
+    if (codeListId) {
+      const params = {draft: false, ancestorCodes}
+      const {data} = await axios.get(`/api/survey/${surveyInfo.id}/codeLists/${codeListId}/candidateItems?${toQueryString(params)}`)
 
-    if (ancestorCodes.length === levelIndex) {
-      const codeList = getCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
-
-      const params = {
-        draft: false,
-        ancestorCodes,
-      }
-      const {data} = await axios.get(`/api/survey/${getSurveyId(survey)}/codeLists/${codeList.id}/candidateItems?${toQueryString(params)}`)
-
-      const items = data.items
-
-      this.setState({
-        items
-      })
+      this.setState({items: data.items})
     } else {
-      this.setState({
-        items: []
-      })
+      this.setState({items: []})
     }
   }
 
@@ -104,7 +81,7 @@ class NodeDefCodeList extends React.Component {
 
     // EDIT MODE
     if (edit)
-      return <NodeDefFormItem {...this.props}>
+      return <NodeDefFormItem label={label}>
         <CodeListDropdown {...this.props} />
       </NodeDefFormItem>
 
@@ -123,4 +100,25 @@ class NodeDefCodeList extends React.Component {
   }
 }
 
-export default NodeDefCodeList
+const mapStateToProps = (state, props) => {
+  const survey = getSurvey(state)
+  const record = getRecord(survey)
+  const {nodeDef, parentNode} = props
+
+  const ancestorCodes = Record.getNodeCodeAncestorValues(survey, parentNode, nodeDef)(record)
+
+  const levelIndex = NodeDef.getNodeDefCodeListLevelIndex(nodeDef)(survey)
+  const codeList = ancestorCodes.length === levelIndex
+    ? Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey)
+    : null
+
+  return {
+    language: Survey.getSurveyDefaultLanguage(survey),
+    nodeDefParentCodeUUID: NodeDef.getNodeDefParentCodeUUID(nodeDef),
+    ancestorCodes,
+    // codeListId is not null when items can be loaded from server
+    codeListId: codeList ? codeList.id : null,
+  }
+}
+
+export default connect(mapStateToProps)(NodeDefCodeList)
