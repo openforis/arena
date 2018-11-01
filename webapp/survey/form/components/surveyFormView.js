@@ -25,7 +25,7 @@ const SurveyFormView = (props) => {
     draft,
 
     recordLoaded,
-    record,
+    recordId,
     parentNode
   } = props
 
@@ -50,7 +50,7 @@ const SurveyFormView = (props) => {
                                edit={edit}
                                entry={entry}
                                draft={draft}
-                               record={record}
+                               recordId={recordId}
                                parentNode={parentNode}/>
               : <div/>
           }
@@ -79,21 +79,24 @@ SurveyFormView.defaultProps = {
   draft: false,
   // if record to edit had been loaded
   recordLoaded: null,
+  // recordId of current record
+  recordId: null,
 }
 
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
   const nodeDef = getFormActivePageNodeDef(survey)
+  const record = getRecord(survey)
 
   const mapEntryProps = () => ({
     // rootNode: getRootNode(getRecord(survey)),
-    recordLoaded: !!getRecord(survey),
+    recordLoaded: !!record,
     parentNode: nodeDef ? getFormPageParentNode(nodeDef)(survey) : null,
+    recordId: record ? record.id : null,
   })
 
   return {
     surveyInfo: getSurveyInfo(survey),
-    record: getRecord(survey),
     nodeDef,
     ...props.entry
       ? mapEntryProps()
