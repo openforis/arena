@@ -4,7 +4,7 @@ import { exportReducer, assocActionProps, dissocStateProps } from '../appUtils/r
 
 import { appState } from './app'
 
-import { updateActiveJob } from './components/job/appJobState'
+import { startJob, updateActiveJob } from './components/job/appJobState'
 import { assocAppError, dissocAppError, getAppErrors } from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
 
@@ -24,7 +24,7 @@ import { loginSuccess } from '../login/actions'
  * App Jobs
  * ======
  */
-import { appJobActiveUpdate } from './components/job/actions'
+import { appJobStart, appJobActiveUpdate } from './components/job/actions'
 import { surveyCreate } from '../survey/actions'
 
 const actionHandlers = {
@@ -54,7 +54,11 @@ const actionHandlers = {
   [appSurveysUpdate]: assocActionProps,
 
   //app job
-  [appJobActiveUpdate]: (state, {job, hideAutomatically}) => updateActiveJob(job, hideAutomatically)(state),
+  [appJobStart]: (state, {job, onComplete, autoHide}) =>
+    startJob(job, onComplete, autoHide)(state),
+
+  [appJobActiveUpdate]: (state, {job}) =>
+    updateActiveJob(job)(state),
 
   // ===== app errors
   [appErrorCreate]: (state, {error}) => R.pipe(
