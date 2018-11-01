@@ -35,6 +35,5 @@ module.exports = {
   getRestParam,
   getBoolParam,
   getJsonParam,
-
   toQueryString,
 }

@@ -14,6 +14,7 @@ const surveyState = {
       taxa: [],
       currentPage: 0,
       totalPages: 0,
+      taxaPerPage: 15,
     },
 
   }
@@ -34,6 +35,8 @@ export const getTaxonomyEditTaxonomy = survey => R.pipe(
 export const mergeTaxonomyEditProps = props => R.mergeDeepLeft(props)
 
 export const getTaxonomyEditTaxaCurrentPage = R.pathOr(1, [taxonomyEdit, 'taxaCurrentPage'])
+
+export const getTaxonomyEditTaxaPerPage = R.pathOr(15, [taxonomyEdit, 'taxaPerPage'])
 
 export const getTaxonomyEditTaxaTotalPages = R.pathOr(0, [taxonomyEdit, 'taxaTotalPages'])
 
