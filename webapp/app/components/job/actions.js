@@ -33,22 +33,32 @@ export const startAppJobMonitoring = () => async (dispatch, getState) => {
 
   const fetchActiveJob = async () => {
     try {
+      // job might be ended on server, but stateJob is still in UI
+
       const {data} = await axios.get(`/api/jobs/active`)
 
-      const activeJob = data.job
-      const activeJobState = getActiveJob(getState())
+      const {job} = data
+      // job still running on server
+      const jobRunning = job !== null
 
-      if (activeJob !== null || activeJobState !== null) {
-        if (activeJobState === null || activeJob || activeJobState.autoHide) {
+      const stateJob = getActiveJob(getState())
+      // job still in UI
+      const stateJobExists = stateJob !== null
+
+      if (jobRunning || stateJobExists) {
+
+        if (!stateJobExists || jobRunning || stateJob.autoHide) {
           //job not monitored yet or completed and autoHide is true
-          dispatch({type: appJobActiveUpdate, job: activeJob})
-        } else if (activeJob === null && isJobRunning(activeJobState) && !activeJobState.autoHide) {
+          dispatch({type: appJobActiveUpdate, job: job})
+
+          // job endeed on server, but running in UI and there's no autohide option,
+        } else if (!jobRunning && isJobRunning(stateJob) && !stateJob.autoHide) {
           //job completed (no more active), load it
-          const {data} = await axios.get(`/api/jobs/${activeJobState.id}`)
+          const {data} = await axios.get(`/api/jobs/${stateJob.id}`)
           dispatch({type: appJobActiveUpdate, job: data.job})
 
-          if (activeJobState.onComplete) {
-            activeJobState.onComplete()
+          if (stateJob.onComplete) {
+            stateJob.onComplete()
           }
         }
       }
