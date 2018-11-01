@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import DeleteSurveyConfirmDialog from './deleteSurveyConfirmDialog'
 
 import {
+  isValidSurvey,
   getSurveyName,
   getSurveyStatus,
   isSurveyDraft,
@@ -35,7 +36,7 @@ class SurveyInfoDashboardView extends React.Component {
     const {survey: prevSurvey} = prevProps
 
     // redirecting when survey has been deleted
-    if (prevSurvey && !survey) {
+    if (isValidSurvey(prevSurvey) && !isValidSurvey(survey)) {
       history.push(appModuleUri(appModules.home))
     }
   }
@@ -83,7 +84,7 @@ class SurveyInfoDashboardView extends React.Component {
           {showDialog &&
           <DeleteSurveyConfirmDialog show={showDialog}
                                      onCancel={() => this.toggleDeleteConfirmDialog(false)}
-                                     onDelete={() => deleteSurvey(survey.id)}
+                                     onDelete={() => deleteSurvey()}
                                      surveyName={getSurveyName(survey)}/>
           }
         </div>

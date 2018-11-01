@@ -3,9 +3,11 @@ import './surveysList.scss'
 import React from 'react'
 import * as R from 'ramda'
 
+import { getSurveyInfo } from '../../../common/survey/survey'
 import { getRelativeDate, compareDatesDesc } from '../../appUtils/dateUtils'
 
 import {
+  getSurveyId,
   getSurveyName,
   getSurveyDefaultLabel,
   getSurveyStatus,
@@ -24,8 +26,9 @@ const SurveyListHeader = () => (
   </div>
 )
 
-const SurveyRow = ({survey, currentSurvey, setActiveSurvey}) => {
-  const active = currentSurvey && survey.id === currentSurvey.id
+const SurveyRow = ({survey, surveyInfo, setActiveSurvey}) => {
+  const surveyId = getSurveyId(survey)
+  const active = surveyInfo && surveyId === surveyInfo.id
   const activeClass = active ? ' active' : ''
 
   return (
@@ -37,7 +40,7 @@ const SurveyRow = ({survey, currentSurvey, setActiveSurvey}) => {
       <div>{getSurveyStatus(survey)}</div>
       <div>
         <button className={`btn btn-s btn-of${activeClass}`}
-                onClick={() => setActiveSurvey(survey.id)}>
+                onClick={() => setActiveSurvey(surveyId)}>
           {active ? 'active' : 'activate'}
         </button>
       </div>
@@ -59,9 +62,9 @@ const SurveyList = (props) => {
             <div className="surveys-list__rows">
               {
                 surveys
-                  .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
-                  .map(survey =>
-                    <SurveyRow key={survey.id} {...props} survey={survey}/>
+                  .sort((a, b) => compareDatesDesc(getSurveyInfo(a).dateModified, getSurveyInfo(b).dateModified))
+                  .map((survey, i) =>
+                    <SurveyRow key={i} {...props} survey={survey}/>
                   )
               }
             </div>

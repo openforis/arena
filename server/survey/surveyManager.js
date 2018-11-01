@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/survey/execMigrations')
 const {uuidv4} = require('../../common/uuid')
@@ -15,8 +17,10 @@ const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/no
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const {fetchTaxonomiesBySurveyId, publishTaxonomiesProps} = require('../taxonomy/taxonomyManager')
-const {fetchCodeListsBySurveyId, publishCodeListsProps} = require('../codeList/codeListManager')
+const {publishTaxonomiesProps} = require('../taxonomy/taxonomyManager')
+const {publishCodeListsProps} = require('../codeList/codeListManager')
+
+const assocSurveyInfo = info => ({info})
 
 // ====== CREATE
 const createSurvey = async (user, {name, label, lang}) => {
@@ -54,37 +58,43 @@ const createSurvey = async (user, {name, label, lang}) => {
   //create survey data schema
   await migrateSurveySchema(survey.id)
 
-  return survey
+  return assocSurveyInfo(survey)
 }
 
 // ====== READ
 const fetchSurveyById = async (id, draft = false, validate = false) => {
   const survey = await surveyRepository.getSurveyById(id, draft)
-  const codeLists = await fetchCodeListsBySurveyId(id, draft)
-  const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
+  // const codeLists = await fetchCodeListsBySurveyId(id, draft)
+  // const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
 
-  return {
+  return assocSurveyInfo({
     ...survey,
-    codeLists: toUUIDIndexedObj(codeLists),
-    taxonomies: toUUIDIndexedObj(taxonomies),
+    // codeLists: toUUIDIndexedObj(codeLists),
+    // taxonomies: toUUIDIndexedObj(taxonomies),
     validation: validate ? await validateSurvey(survey) : null
-  }
+  })
 }
 
-const fetchUserSurveys = async (user) =>
+const fetchUserSurveys = async (user) => R.map(
+  assocSurveyInfo,
   await surveyRepository.fetchSurveys()
+)
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
 
-  return validate
+  const nodeDefs = validate
     ? await validateNodeDefs(nodeDefsDB)
     : nodeDefsDB
+
+  return toUUIDIndexedObj(nodeDefs)
 }
 
 // ====== UPATE
 const updateSurveyProp = async (id, key, value, user) =>
-  await surveyRepository.updateSurveyProp(id, key, value)
+  assocSurveyInfo(
+    await surveyRepository.updateSurveyProp(id, key, value)
+  )
 
 const publishSurvey = async (id, user) => {
   await db.tx(async t => {

@@ -5,7 +5,7 @@ import { appState, systemStatus } from './app'
 import { getNewSurvey } from './appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 
-import { dispatchCurrentSurveyUpdate } from '../survey/actions'
+import { dispatchCurrentSurveyUpdate, surveyCreate } from '../survey/actions'
 import { stopAppJobMonitoring } from './components/job/actions'
 
 export const appStatusChange = 'app/status/change'
@@ -15,16 +15,13 @@ export const appNewSurveyUpdate = 'app/newSurvey/update'
 
 export const initApp = () => async (dispatch) => {
   try {
-
+    // fetching user
     const resp = await axios.get('/auth/user')
 
     const {data} = resp
     const {user, survey} = data
 
-    if (survey)
-      dispatchCurrentSurveyUpdate(dispatch, survey)
-
-    dispatch({type: appStatusChange, status: systemStatus.ready, user})
+    dispatch({type: appStatusChange, status: systemStatus.ready, user, survey})
 
   } catch (e) {
   }
@@ -57,29 +54,24 @@ export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
 }
 
 export const createSurvey = surveyProps => async (dispatch, getState) => {
-  try {
-    const {data} = await axios.post('/api/survey', surveyProps)
 
-    const {survey} = data
-    const valid = !!survey
+  const {data} = await axios.post('/api/survey', surveyProps)
 
-    if (valid) {
-      dispatchCurrentSurveyUpdate(dispatch, survey)
-      dispatch(resetNewSurvey())
-    } else {
-      dispatch({
-        type: appNewSurveyUpdate,
-        newSurvey: {
-          ...getNewSurvey(getState()),
-          ...data,
-        }
-      })
+  const {survey} = data
+  const valid = !!survey
 
-    }
-
-  } catch (e) {
-
+  if (valid) {
+    dispatch({type: surveyCreate, survey})
+  } else {
+    dispatch({
+      type: appNewSurveyUpdate,
+      newSurvey: {
+        ...getNewSurvey(getState()),
+        ...data,
+      }
+    })
   }
+
 }
 
 export const resetNewSurvey = () => dispatch =>
@@ -115,3 +107,10 @@ export const setActiveSurvey = surveyId =>
     }
   }
 
+// ====== ERRORS HANDLING
+
+export const appErrorCreate = 'app/error/create'
+export const appErrorDelete = 'app/error/delete'
+
+export const closeAppError = error => dispatch =>
+  dispatch({type: appErrorDelete, error})

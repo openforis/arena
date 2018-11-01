@@ -8,6 +8,8 @@ import LabelsEditorComponent from '../../../survey/components/labelsEditor'
 import LanguagesEditorComponent from '../../../survey/components/languagesEditor'
 
 import {
+  getSurveyInfo,
+  getSurveyName,
   getSurveyDescriptions,
   getSurveyLabels,
   getSurveySrs
@@ -15,7 +17,7 @@ import {
 import { getSrsName, srs } from '../../../../common/app/srs'
 
 import { getSurvey } from '../../../survey/surveyState'
-import { updateSurveyProp } from '../../../survey/actions'
+import { updateSurveyInfoProp } from '../../../survey/surveyInfo/actions'
 
 import { normalizeName } from './../../../../common/survey/surveyUtils'
 import { getValidation, getFieldValidation } from './../../../../common/validation/validator'
@@ -31,8 +33,8 @@ class SurveyInfoComponent extends React.Component {
   }
 
   render () {
-    const {survey} = this.props
-    const validation = getValidation(survey)
+    const {survey, surveyInfo} = this.props
+    const validation = getValidation(surveyInfo)
     const surveySrs = getSurveySrs(survey).map(code => {return {key: code, value: getSrsName(code)}})
 
     return (
@@ -40,7 +42,7 @@ class SurveyInfoComponent extends React.Component {
 
         <div className="form-item">
           <label className="form-label">Name</label>
-          <Input value={survey.props.name}
+          <Input value={getSurveyName(survey)}
                  validation={getFieldValidation('name')(validation)}
                  onChange={e => this.updateSurveyProp('name', normalizeName(e.target.value))}/>
 
@@ -72,11 +74,12 @@ class SurveyInfoComponent extends React.Component {
 
 const mapStateToProps = state => ({
   survey: getSurvey(state),
+  surveyInfo: getSurveyInfo(getSurvey(state)),
 })
 
 export default connect(
   mapStateToProps,
   {
-    updateSurveyProp,
+    updateSurveyProp: updateSurveyInfoProp,
   }
 )(SurveyInfoComponent)

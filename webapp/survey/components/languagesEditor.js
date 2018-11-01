@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import InputChips from '../../commonComponents/form/inputChips'
 
 import { getSurvey } from '../surveyState'
-import { updateSurveyProp } from '../actions'
+import { updateSurveyInfoProp } from '../surveyInfo/actions'
 import { getLanguageLabel, languages } from '../../../common/app/languages'
 import { getSurveyLanguages } from '../../../common/survey/survey'
 
@@ -39,7 +39,7 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   {
-    updateSurveyProp,
+    updateSurveyProp: updateSurveyInfoProp,
   }
 )(LanguagesEditor)
 

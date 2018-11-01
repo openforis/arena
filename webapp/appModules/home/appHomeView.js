@@ -9,6 +9,7 @@ import { appModuleUri, getSurveys } from '../../app/app'
 import { getNewSurvey } from '../../app/appState'
 import { appModules } from '../appModules'
 
+import { getSurveyInfo } from '../../../common/survey/survey'
 import { getSurvey } from '../../survey/surveyState'
 
 import { fetchSurveys, setActiveSurvey, createSurvey, resetNewSurvey, updateNewSurveyProp } from '../../app/actions'
@@ -21,10 +22,10 @@ class AppHomeView extends React.Component {
 
   componentDidUpdate (prevProps) {
 
-    const {currentSurvey: prevCurrentSurvey} = prevProps
-    const {currentSurvey, history} = this.props
+    const {surveyInfo: prevSurveyInfo} = prevProps
+    const {surveyInfo, history} = this.props
 
-    if (currentSurvey && (!prevCurrentSurvey || currentSurvey.id !== prevCurrentSurvey.id)) {
+    if (surveyInfo && (!prevSurveyInfo || surveyInfo.id !== prevSurveyInfo.id)) {
       history.push(appModuleUri(appModules.surveyDashboard))
     }
   }
@@ -51,15 +52,9 @@ class AppHomeView extends React.Component {
   }
 }
 
-AppHomeView.defaultProps = {
-  newSurvey: null,
-  currentSurvey: null,
-  surveys: [],
-}
-
 const mapStateToProps = state => ({
   newSurvey: getNewSurvey(state),
-  currentSurvey: getSurvey(state),
+  surveyInfo: getSurveyInfo(getSurvey(state)),
   surveys: getSurveys(state)
 })
 

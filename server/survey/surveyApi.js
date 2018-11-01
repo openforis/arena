@@ -19,8 +19,11 @@ const {
 
 const {
   validateNewSurvey,
-  validateSurveyProp
+  validateSurvey,
 } = require('./surveyValidator')
+
+const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
+const {fetchCodeListsBySurveyId} = require('../codeList/codeListManager')
 
 module.exports.init = app => {
 
@@ -83,6 +86,7 @@ module.exports.init = app => {
       sendErr(res, err)
     }
   })
+
   // ==== UPDATE
 
   app.put('/survey/:id/prop', async (req, res) => {
@@ -93,7 +97,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'id')
 
       const survey = await updateSurveyProp(surveyId, key, value, user)
-      const validation = await validateSurveyProp(survey, key)
+      const validation = await validateSurvey(survey, key)
 
       res.json({validation})
     } catch (err) {

@@ -5,12 +5,12 @@ const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 const {
   countTaxaByTaxonomyId,
   fetchTaxaByProp,
+  fetchTaxonomyById,
   createTaxonomy,
   updateTaxonomyProp,
   deleteTaxonomy
 } = require('./taxonomyManager')
-const {importTaxa, exportTaxa} = require('./taxonomyManager')
-const {fetchTaxonomiesBySurveyId} = require('./taxonomyManager')
+const {fetchTaxonomiesBySurveyId, importTaxa, exportTaxa} = require('./taxonomyManager')
 
 module.exports.init = app => {
 
@@ -29,6 +29,19 @@ module.exports.init = app => {
   })
 
   // ====== READ
+
+  app.get(`/survey/:surveyId/taxonomies`, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const draft = getBoolParam(req, 'draft')
+
+      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, draft, draft)
+
+      res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
 
   app.get('/survey/:surveyId/taxonomies/:taxonomyId/taxa/count', async (req, res) => {
     try {
@@ -90,9 +103,9 @@ module.exports.init = app => {
       const {key, value} = body
 
       await updateTaxonomyProp(surveyId, taxonomyId, key, value)
-      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, true)
+      const taxonomy = await fetchTaxonomyById(surveyId, taxonomyId, true, true)
 
-      res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
+      res.json({taxonomy})
     } catch (err) {
       sendErr(res, err)
     }

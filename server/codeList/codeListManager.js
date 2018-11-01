@@ -11,6 +11,17 @@ const {
   assocCodeListLevelsArray,
 } = require('../../common/survey/codeList')
 
+// ====== VALIDATION
+const assocCodeListValidation = async (codeList, codeListsWithLevels, codeListItems) => ({
+  ...codeList,
+  validation: await codeListValidator.validateCodeList(codeListsWithLevels, codeList, codeListItems)
+})
+
+const validateCodeList = async (surveyId, codeLists, codeList, draft) => {
+  const codeListItems = await codeListRepository.fetchCodeListItemsByCodeListId(surveyId, codeList.id, draft)
+  return await assocCodeListValidation(codeList, codeLists, codeListItems)
+}
+
 // ====== CREATE
 
 const insertCodeList = async (surveyId, codeList) =>
@@ -40,7 +51,7 @@ const insertCodeListLevel = async (surveyId, codeListId, level) =>
 
 const insertCodeListItem = async (surveyId, item) =>
   db.tx(async t => {
-    const insertedItem = await codeListRepository.insertCodeListItem(surveyId, item)
+    const insertedItem = await codeListRepository.insertCodeListItem(surveyId, item, t)
 
     await markSurveyDraft(surveyId, t)
 
@@ -62,20 +73,25 @@ const fetchCodeListsWithLevels = async (surveyId, draft) => {
   )
 }
 
-const fetchCodeListById = async (surveyId, codeListId, draft) => {
+const fetchCodeListById = async (surveyId, codeListId, draft = false, validate = true) => {
   const codeListsWithLevels = await fetchCodeListsWithLevels(surveyId, draft)
-  return R.find(R.propEq('id', codeListId))(codeListsWithLevels)
+  const codeList = R.find(R.propEq('id', codeListId))(codeListsWithLevels)
+
+  return validate
+    ? await validateCodeList(surveyId, codeListsWithLevels, codeList, draft)
+    : codeList
 }
 
-const fetchCodeListsBySurveyId = async (surveyId, draft) => {
+const fetchCodeListsBySurveyId = async (surveyId, draft = false, validate = true) => {
   const codeListsWithLevels = await fetchCodeListsWithLevels(surveyId, draft)
 
-  return await Promise.all(
-    codeListsWithLevels.map(async codeList => {
-      const codeListItems = await codeListRepository.fetchCodeListItemsByCodeListId(surveyId, codeList.id, draft)
-      return await assocCodeListValidation(codeList, codeListsWithLevels, codeListItems)
-    })
-  )
+  return validate
+    ? await Promise.all(
+      codeListsWithLevels.map(async codeList =>
+        await validateCodeList(surveyId, codeListsWithLevels, codeList, draft)
+      )
+    )
+    : codeListsWithLevels
 }
 
 const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = false) =>
@@ -88,11 +104,6 @@ const fetchCodeListItemsByAncestorCodes = async (surveyId, codeListId, ancestorC
   await codeListRepository.fetchCodeListItemsByAncestorCodes(surveyId, codeListId, ancestorCodes, draft)
 
 // ====== UPDATE
-
-const assocCodeListValidation = async (codeList, codeListsWithLevels, codeListItems) => ({
-  ...codeList,
-  validation: await codeListValidator.validateCodeList(codeListsWithLevels, codeList, codeListItems)
-})
 
 const publishCodeListsProps = async (surveyId, client = db) => {
   await publishSurveySchemaTableProps(surveyId, 'code_list', client)
@@ -124,21 +135,29 @@ const updateCodeListItemProp = async (surveyId, codeListItemId, key, value) =>
   db.tx(async t => {
     const updatedItem = await codeListRepository.updateCodeListItemProp(surveyId, codeListItemId, key, value, t)
 
-    await markSurveyDraft(surveyId)
+    await markSurveyDraft(surveyId, t)
 
     return updatedItem
   })
 
 // ====== DELETE
 const deleteCodeList = async (surveyId, codeListId) =>
-  await codeListRepository.deleteCodeList(surveyId, codeListId)
+  db.tx(async t => {
+    await codeListRepository.deleteCodeList(surveyId, codeListId, t)
+    await markSurveyDraft(surveyId, t)
+  })
 
 const deleteCodeListLevel = async (surveyId, codeListLevelId) =>
-  await codeListRepository.deleteCodeListLevel(surveyId, codeListLevelId)
+  db.tx(async t => {
+    await codeListRepository.deleteCodeListLevel(surveyId, codeListLevelId, t)
+    await markSurveyDraft(surveyId, t)
+  })
 
 const deleteCodeListItem = async (surveyId, codeListItemId) =>
-  await codeListRepository.deleteCodeListItem(surveyId, codeListItemId)
-
+  db.tx(async t => {
+    await codeListRepository.deleteCodeListItem(surveyId, codeListItemId, t)
+    await markSurveyDraft(surveyId, t)
+  })
 
 module.exports = {
 

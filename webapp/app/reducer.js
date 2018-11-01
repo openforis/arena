@@ -1,7 +1,11 @@
 import * as R from 'ramda'
 
-import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
+import { exportReducer, assocActionProps, dissocStateProps } from '../appUtils/reduxUtils'
 
+import { appState } from './app'
+
+import { updateActiveJob } from './components/job/appJobState'
+import { assocAppError, dissocAppError, getAppErrors } from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
 
 import {
@@ -10,10 +14,10 @@ import {
   appUserPrefUpdate,
   appNewSurveyUpdate,
   appSurveysUpdate,
+  appErrorCreate,
+  appErrorDelete,
 } from './actions'
-
 import { loginSuccess } from '../login/actions'
-import { appState } from './app'
 
 /**
  * ======
@@ -21,15 +25,14 @@ import { appState } from './app'
  * ======
  */
 import { appJobActiveUpdate } from './components/job/actions'
-
-import { updateActiveJob } from './components/job/appJobState'
+import { surveyCreate } from '../survey/actions'
 
 const actionHandlers = {
 
-  [appStatusChange]: assocActionProps,
+  [appStatusChange]: (state, {survey, ...props}) => assocActionProps(state, props),
 
   // user and current survey are properties of app state
-  [loginSuccess]: assocActionProps,
+  [loginSuccess]: (state, {survey, ...props}) => assocActionProps(state, props),
 
   [appUserPrefUpdate]: (state, {name, value}) => {
     const user = R.pipe(
@@ -43,6 +46,8 @@ const actionHandlers = {
   [appUserLogout]: (state, action) => appState.logoutUser(state),
 
   // new survey
+  [surveyCreate]: (state, _) => dissocStateProps(state, ['newSurvey']),
+
   [appNewSurveyUpdate]: assocActionProps,
 
   //surveys list
@@ -50,6 +55,17 @@ const actionHandlers = {
 
   //app job
   [appJobActiveUpdate]: (state, {job, hideAutomatically}) => updateActiveJob(job, hideAutomatically)(state),
+
+  // ===== app errors
+  [appErrorCreate]: (state, {error}) => R.pipe(
+    getAppErrors,
+    R.head,
+    R.defaultTo({id: -1}),
+    last => 1 + last.id,
+    id => assocAppError({id, ...error})(state)
+  )(state),
+
+  [appErrorDelete]: (state, {error}) => dissocAppError(error)(state),
 }
 
 export default exportReducer(actionHandlers)

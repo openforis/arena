@@ -1,0 +1,44 @@
+@import "../../../style/vars";
+
+.app-errors {
+  position: fixed;
+  height: 98vh;
+  width: 20vw;
+  right: 0;
+  top: 2vh;
+  z-index: $zIndex90AppError;
+  display: grid;
+  align-content: start;
+  grid-row-gap: 1rem;
+  overflow-y: auto;
+}
+
+.app-errors__error {
+  background-color: rgba($red, .98);
+  margin: 0 .5rem;
+  height: 100px;
+  padding: .5rem;
+  border-radius: .5rem;
+  position: relative;
+
+  .btn-close {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border: none !important;
+    border-radius: 100%;
+  }
+
+  .status {
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: .9rem;
+    text-align: center;
+  }
+
+  .message {
+    font-weight: 400;
+    padding-top: .5rem;
+    font-size: .9rem;
+  }
+}

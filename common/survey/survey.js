@@ -37,17 +37,38 @@ const defaultSteps = {
  * READ
  * ======
  */
+const info = 'info'
+const getSurveyInfo = R.propOr(null, info)
+
+const getSurveyId = R.pipe(
+  getSurveyInfo,
+  R.prop('id')
+)
+
+const isValidSurvey = R.pipe(
+  getSurveyInfo,
+  info => R.isNil(info) || R.isEmpty(info),
+  R.not,
+)
+
+const getSurveyInfoProp = (prop, defaultValue) => R.pipe(
+  getSurveyInfo,
+  getProp(prop, defaultValue)
+)
+
 const isSurveyPublished = R.pipe(
+  getSurveyInfo,
   R.prop('published'),
   R.equals(true)
 )
 
 const isSurveyDraft = R.pipe(
+  getSurveyInfo,
   R.prop('draft'),
   R.equals(true)
 )
 
-const getSurveyLanguages = getProp('languages', [])
+const getSurveyLanguages = getSurveyInfoProp('languages', [])
 
 const getSurveyDefaultLanguage = R.pipe(
   getSurveyLanguages,
@@ -55,13 +76,13 @@ const getSurveyDefaultLanguage = R.pipe(
 )
 
 const getSurveyDefaultStep = R.pipe(
-  getProp('steps'),
+  getSurveyInfoProp('steps'),
   R.toPairs,
   R.find(s => !s[1].prev),
   R.head
 )
 
-const getSurveyLabels = getProp('labels', {})
+const getSurveyLabels = getSurveyInfoProp('labels', {})
 
 const getSurveyDefaultLabel = survey => {
   const labels = getSurveyLabels(survey)
@@ -80,10 +101,23 @@ const getSurveyStatus = survey =>
 
 /**
  * ======
+ * UPDATE
+ * ======
+ */
+const assocSurveyProp = (key, value) => R.pipe(
+  R.assocPath([info, 'props', key], value),
+  R.assocPath([info, 'draft'], true),
+)
+
+const assocSurveyPropValidation = (key, validation) =>
+  R.assocPath([info, 'validation', 'fields', key], validation)
+
+/**
+ * ======
  * READ NodeDefs
  * ======
  */
-const getNodeDefs = R.pipe(R.prop(nodeDefs), R.defaultTo({}))
+const getNodeDefs = R.propOr({}, nodeDefs)
 
 const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
@@ -115,65 +149,29 @@ const getNodeDefsByTaxonomyUUID = (uuid) => R.pipe(
 
 /**
  * ======
- * UPDATE
- * ======
- */
-const assocSurveyPropValidation = (key, validation) =>
-  R.assocPath(['validation', 'fields', key], validation)
-
-/**
- * ======
  * UPDATE NodeDefs
  * ======
  */
-const assocNodeDefs = newNodeDefsArray =>
-  survey => R.pipe(
-    R.reduce((newNodeDefs, nodeDef) => R.assoc(nodeDef.uuid, nodeDef, newNodeDefs), {}),
-    R.merge(getNodeDefs(survey)),
-    newNodeDefs => R.assoc(nodeDefs, newNodeDefs, survey)
-  )(newNodeDefsArray)
+const assocNodeDefs = newNodeDefs => R.assoc(nodeDefs, newNodeDefs)
 
-const assocNodeDef = nodeDef => R.assocPath([nodeDefs, nodeDef.uuid], nodeDef)
-
-const assocNodeDefProp = (nodeDefUUID, key, value) => R.pipe(
-  R.assocPath([nodeDefs, nodeDefUUID, 'props', key], value),
-  R.dissocPath([nodeDefs, nodeDefUUID, 'validation', 'fields', key]),
-)
-
-/**
- * ======
- * DELETE NodeDef
- * ======
- */
-const dissocNodeDef = nodeDef =>
-  survey => {
-    const updatedSurvey = isNodeDefEntity(nodeDef)
-      ? R.reduce(
-        (s, n) => dissocNodeDef(n)(s),
-        survey,
-        getNodeDefChildren(nodeDef)(survey)
-      ) : survey
-
-    return R.dissocPath([nodeDefs, nodeDef.uuid])(updatedSurvey)
-  }
 
 /**
  * ======
  * READ Code Lists
  * ======
  */
-const getSurveyCodeLists = R.pipe(
+const getCodeLists = R.pipe(
   R.prop(codeLists),
   R.defaultTo({})
 )
 
-const getSurveyCodeListsArray = R.pipe(
-  getSurveyCodeLists,
+const getCodeListsArray = R.pipe(
+  getCodeLists,
   R.values,
 )
 
-const getSurveyCodeListByUUID = uuid => R.pipe(
-  getSurveyCodeLists,
+const getCodeListByUUID = uuid => R.pipe(
+  getCodeLists,
   R.prop(uuid)
 )
 
@@ -182,9 +180,9 @@ const getSurveyCodeListByUUID = uuid => R.pipe(
  * UPDATE Code Lists
  * ======
  */
-const assocSurveyCodeLists = codeLists =>
+const assocCodeLists = codeLists =>
   survey => R.pipe(
-    R.merge(getSurveyCodeLists(survey)),
+    R.merge(getCodeLists(survey)),
     //exclude null objects
     filterMappedObj(codeList => codeList !== null),
     newCodeLists => R.assoc('codeLists', newCodeLists, survey)
@@ -200,7 +198,7 @@ const getSurveyTaxonomies = R.pipe(
   R.defaultTo({})
 )
 
-const getSurveyTaxonomiesArray = R.pipe(
+const getTaxonomiesArray = R.pipe(
   getSurveyTaxonomies,
   R.values,
 )
@@ -259,7 +257,7 @@ const isNodeDefCodeParent = nodeDef => R.pipe(
 
 const getNodeDefCodeCandidateParents = nodeDef =>
   survey => {
-    const codeList = getSurveyCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
+    const codeList = getCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
 
     if (codeList) {
       const codeListLevelsLength = getCodeListLevelsLength(codeList)
@@ -303,19 +301,22 @@ const canUpdateCodeList = nodeDef =>
     return !isNodeDefCodeParent(nodeDef)(survey)
   }
 
-  module.exports = {
+module.exports = {
   defaultSteps,
 
   // READ
+  getSurveyInfo,
   getSurveyProps: getProps,
 
-  getSurveyName: getProp('name', ''),
+  getSurveyId,
+  isValidSurvey,
+  getSurveyName: getSurveyInfoProp('name', ''),
   getSurveyLanguages,
   getSurveyDefaultLanguage,
   getSurveyLabels: getLabels,
   getSurveyDefaultLabel,
-  getSurveyDescriptions: getProp('descriptions', {}),
-  getSurveySrs: getProp('srs', []),
+  getSurveyDescriptions: getSurveyInfoProp('descriptions', {}),
+  getSurveySrs: getSurveyInfoProp('srs', []),
   getSurveyDefaultStep,
 
   getSurveyStatus,
@@ -323,6 +324,7 @@ const canUpdateCodeList = nodeDef =>
   isSurveyDraft,
 
   // READ nodeDefs
+  getNodeDefs,
   getNodeDefByUUID,
   getNodeDefById,
   getRootNodeDef,
@@ -331,17 +333,11 @@ const canUpdateCodeList = nodeDef =>
   getNodeDefsByTaxonomyUUID,
 
   // UPDATE
-  assocSurveyProp: setProp,
+  assocSurveyProp,
   assocSurveyPropValidation,
 
   // UPDATE nodeDefs
   assocNodeDefs,
-  assocNodeDef,
-  assocNodeDefProp,
-
-  // DELETE nodeDefs
-  dissocNodeDef,
-
 
 
   // UTILS NodeDefs
@@ -360,19 +356,19 @@ const canUpdateCodeList = nodeDef =>
   canUpdateCodeList,
 
   // READ codeLists
-  getSurveyCodeLists,
-  getSurveyCodeListsArray,
-  getSurveyCodeListByUUID,
+  getCodeLists,
+  getCodeListsArray,
+  getCodeListByUUID,
 
   // UPDATE code lists
-  assocSurveyCodeLists,
+  assocCodeLists,
 
   //=======
   // Taxonomies
   //=======
 
   //READ taxonomies
-  getSurveyTaxonomiesArray,
+  getTaxonomiesArray,
   getSurveyTaxonomyByUUID,
 
   //UPDATE taxonomies
