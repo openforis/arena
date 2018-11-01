@@ -28,14 +28,14 @@ const getFileName = node => R.pipe(
     : fileName + '.' + getFileExtension(node)
 )(node)
 
-const NodeDefFileInput = ({survey, nodeDef, edit, record, node, updateNode, removeNode}) =>
+const NodeDefFileInput = ({surveyInfo, nodeDef, edit, record, node, updateNode, removeNode}) =>
   node
     ? <div className="node-def__file-input">
       <UploadButton disabled={edit}
                     showLabel={false}
                     onChange={files => updateNode(nodeDef, node, {fileName: files[0].name}, files[0])}/>
 
-      <DownloadButton href={`/api/survey/${survey.id}/record/${record.id}/nodes/${node.uuid}/file`}
+      <DownloadButton href={`/api/survey/${surveyInfo.id}/record/${record.id}/nodes/${node.uuid}/file`}
                       disabled={edit || R.isEmpty(getNodeValue(node))}
                       label={getFileName(node)}/>
 
