@@ -26,7 +26,6 @@ import {
   getCodeListEditLevelActiveItem,
   getCodeListEditCodeList,
   getCodeListEditLevelItemsArray,
-  getCodeListEditLevelActiveItemAndAncestorsUUIDs,
 } from '../codeListEditState'
 import { putCodeListItemProp, putCodeListLevelProp } from '../actions'
 import { deleteCodeListItem, deleteCodeListLevel, setCodeListItemForEdit } from '../actions'
@@ -46,7 +45,7 @@ class CodeListEditLevel extends React.Component {
 
   render () {
     const {
-      codeList, level, parentItem, ancestorItemUUIDs, items, activeItemUUID, canAddItem,
+      codeList, level, parentItem, items, activeItemUUID, canAddItem,
       canBeDeleted, language,
       createCodeListItem, putCodeListLevelProp, putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
     } = this.props
@@ -88,7 +87,6 @@ class CodeListEditLevel extends React.Component {
                               language={language}
                               codeList={codeList}
                               level={level}
-                              ancestorItemUUIDs={ancestorItemUUIDs}
                               item={item}
                               active={item.uuid === activeItemUUID}
                               putCodeListItemProp={putCodeListItemProp}
@@ -111,7 +109,6 @@ const mapStateToProps = (state, props) => {
   const codeList = getCodeListEditCodeList(survey)
   const activeItem = getCodeListEditLevelActiveItem(index)(survey)
   const parentItem = getCodeListEditLevelActiveItem(index - 1)(survey)
-  const ancestorItemUUIDs = getCodeListEditLevelActiveItemAndAncestorsUUIDs(level.index - 1)(survey)
 
   const canAddItem = index === 0 || parentItem
   const items = canAddItem ? getCodeListEditLevelItemsArray(index)(survey) : []
@@ -120,7 +117,6 @@ const mapStateToProps = (state, props) => {
   return {
     language,
     codeList,
-    ancestorItemUUIDs,
     items,
     activeItemUUID: activeItem ? activeItem.uuid : null,
     parentItem,

@@ -3,31 +3,27 @@ const Promise = require('bluebird')
 
 const {validate, validateRequired, validateItemPropUniqueness} = require('../../common/validation/validator')
 
-const {
-  getCodeListLevelsArray,
-  getCodeListItemLevelId,
-  getCodeListLevelById,
-} = require('../../common/survey/codeList')
+const {getCodeListLevelsArray, isCodeListItemLeaf} = require('../../common/survey/codeList')
 
 const codeListValidators = (codeLists) => ({
   'props.name': [validateRequired, validateItemPropUniqueness(codeLists)],
 })
 
-const codeListLevelValidators = (levels) => ({
+const levelValidators = (levels) => ({
   'props.name': [validateRequired, validateItemPropUniqueness(levels)],
 })
 
 // ====== LEVELS
 
-const validateCodeListLevel = async (levels, level) =>
-  await validate(level, codeListLevelValidators(levels))
+const validateLevel = async (levels, level) =>
+  await validate(level, levelValidators(levels))
 
-const validateCodeListLevels = async (codeList) => {
+const validateLevels = async (codeList) => {
   const levels = getCodeListLevelsArray(codeList)
 
   const validations = await Promise.all(
     levels.map(
-      async level => await validateCodeListLevel(levels, level)
+      async level => await validateLevel(levels, level)
     )
   )
 
@@ -41,52 +37,56 @@ const validateCodeListLevels = async (codeList) => {
 
 // ====== ITEMS
 
-const codeListItemValidators = (items) => ({
+const itemValidators = (items) => ({
   'props.code': [validateRequired, validateItemPropUniqueness(items)],
 })
 
-const validateCodeListItem = async (codeList, items, itemId) => {
+const validateItem = async (codeList, items, itemId) => {
   const item = R.find(R.propEq('id', itemId))(items)
+  const validation = await validate(item, itemValidators(items.filter(i => i.parentId === item.parentId)))
 
-  const validation = await validate(item, codeListItemValidators(items))
-
-  const level = getCodeListLevelById(getCodeListItemLevelId(item))(codeList)
-  const isLeaf = getCodeListLevelsArray(codeList).length === level.index + 1
+  const isLeaf = isCodeListItemLeaf(item)(codeList)
 
   if (isLeaf) {
-    return validation
+    return {[item.uuid]: validation}
   } else {
-    const childValidation = await validateCodeListItems(codeList, items, item.id)
+    const childValidations = await validateItemsByParentId(codeList, items, item.id)
 
-    return R.pipe(
-      R.assoc('valid', validation.valid && childValidation.valid),
-      R.assocPath(['fields', 'items'], childValidation),
-    )(validation)
+    const childrenValid = childValidations.valid
+
+    return R.assoc(
+      item.uuid,
+      {
+        ...validation,
+        valid: validation.valid && childrenValid,
+        errors: childrenValid
+          ? validation.errors
+          : validation.errors ? [...validation.errors, ...childValidations.errors] : childValidations.errors
+      }
+    )(childValidations.fields)
   }
+
 }
 
-const validateCodeListItems = async (codeList, items, parentItemId) => {
+const validateItemsByParentId = async (codeList, items, parentItemId) => {
+  const children = R.filter(R.propEq('parentId', parentItemId), items)
+  const emptyChildren = R.isEmpty(children)
 
-  const itemsToValidate = R.filter(R.propEq('parentId', parentItemId))(items)
+  const childValidations = await Promise.all(children.map(
+    async child => await validateItem(codeList, items, child.id)
+  ))
 
-  const itemsValidation = await Promise.all(
-    itemsToValidate.map(async item => {
-        const validation = await validateCodeListItem(codeList, items, item.id)
-        return validation.valid
-          ? null
-          : {[item.uuid]: validation}
-      }
+  const childrenValid =
+    R.none(
+      childValidation => R.propEq('valid', false, R.values(childValidation)[0])
+      , childValidations
     )
-  )
-  return R.pipe(
-    R.reject(R.isNil),
-    R.mergeAll,
-    validations => R.pipe(
-      R.assoc('valid', !R.isEmpty(itemsToValidate) && R.isEmpty(validations)),
-      R.assoc('fields', validations),
-      R.assoc('errors', R.isEmpty(itemsToValidate) ? ['empty'] : [])
-    )({})
-  )(itemsValidation)
+
+  return {
+    fields: R.mergeAll(childValidations),
+    valid: childrenValid && !emptyChildren,
+    errors: emptyChildren ? ['emptyChildren'] : !childrenValid ? ['invalidChildren'] : []
+  }
 }
 
 const validateCodeListProps = async (codeLists, codeList) =>
@@ -94,8 +94,8 @@ const validateCodeListProps = async (codeLists, codeList) =>
 
 const validateCodeList = async (codeLists, codeList, items) => {
   const codeListValidation = await validateCodeListProps(codeLists, codeList)
-  const levelsValidation = await validateCodeListLevels(codeList)
-  const itemsValidation = await validateCodeListItems(codeList, items, null)
+  const levelsValidation = await validateLevels(codeList)
+  const itemsValidation = await validateItemsByParentId(codeList, items, null)
 
   const valid = codeListValidation.valid && levelsValidation.valid && itemsValidation.valid
 

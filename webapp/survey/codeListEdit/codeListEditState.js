@@ -89,17 +89,6 @@ export const getCodeListEditLevelActiveItem = levelIndex =>
     },
   )(survey)
 
-export const getCodeListEditLevelActiveItemByUUID = (levelIndex, itemUUID) =>
-  R.path([codeListEdit, levelItems, levelIndex, itemUUID])
-
-export const getCodeListEditLevelActiveItemAndAncestorsUUIDs = levelIndex =>
-  survey => R.pipe(
-    getLevelActiveItems,
-    R.keys,
-    R.filter(index => index <= levelIndex),
-    R.sort((a, b) => Number(a.id) - Number(b.id)),
-    R.reduce((acc, prevLevelIndex) => R.append(getLevelActiveItemUUID(prevLevelIndex)(survey), acc), []),
-  )(survey)
 
 export const assocLevelActiveItem = (levelIndex, itemUUID) => R.pipe(
   resetNextLevels(levelIndex, levelItems),

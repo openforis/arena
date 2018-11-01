@@ -51,7 +51,7 @@ const actionHandlers = {
 
   // code list items
   [codeListItemPropUpdate]: (state, {codeList, item, key}) =>
-    R.dissocPath([codeList.uuid, 'validation', 'fields', 'items', item.uuid, 'fields', key])
+    R.dissocPath([codeList.uuid, 'validation', 'fields', 'items', 'fields', item.uuid, 'fields', key])
     (state),
 
 }

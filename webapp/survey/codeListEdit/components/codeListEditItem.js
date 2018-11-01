@@ -48,12 +48,12 @@ class CodeListEditItem extends React.Component {
 
   render () {
     const {
-      codeList, level, ancestorItemUUIDs, item, active,
+      codeList, level, item, active,
       putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
       language
     } = this.props
 
-    const validation = getCodeListItemValidation(R.append(item.uuid, ancestorItemUUIDs))(codeList)
+    const validation = getCodeListItemValidation(item)(codeList)
     const validationGlobalErrorMessage = validation.valid
       ? null
       : R.pipe(
