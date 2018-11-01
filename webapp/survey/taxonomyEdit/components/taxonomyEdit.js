@@ -18,12 +18,12 @@ import {
   getTaxonomyEditTaxonomy,
   getTaxonomyEditTaxaTotalPages,
   getTaxonomyEditTaxaCurrentPage,
-  getTaxonomyEditTaxa
+  getTaxonomyEditTaxa,
+  getTaxonomyEditTaxaPerPage
 } from '../taxonomyEditState'
 
 import { getSurvey } from '../../surveyState'
 import { getActiveJob } from '../../../app/components/job/appJobState'
-import { getJobName, isJobCompleted, } from '../../../../common/job/job'
 import { getFieldValidation } from '../../../../common/validation/validator'
 
 import {
@@ -34,26 +34,12 @@ import {
   loadTaxa,
 } from '../actions'
 
-const ROWS_PER_PAGE = 15
-const importTaxaJobName = 'import taxa'
-
 class TaxonomyEdit extends React.Component {
 
   async componentDidMount () {
     const {taxonomy, reloadTaxa} = this.props
 
     if (taxonomy.id) {
-      reloadTaxa(taxonomy)
-    }
-  }
-
-  componentDidUpdate (prevProps) {
-    const {activeJob, reloadTaxa, taxonomy} = this.props
-    const prevJob = prevProps.activeJob
-
-    if (activeJob === null && prevJob
-      && getJobName(prevJob) === importTaxaJobName
-      && isJobCompleted(prevJob)) {
       reloadTaxa(taxonomy)
     }
   }
@@ -70,7 +56,7 @@ class TaxonomyEdit extends React.Component {
 
   render () {
     const {
-      surveyId, taxonomy, taxaCurrentPage, taxaTotalPages, taxa,
+      surveyId, taxonomy, taxaCurrentPage, taxaTotalPages, taxaPerPage, taxa,
       loadTaxaPage, putTaxonomyProp, uploadTaxonomyFile,
     } = this.props
 
@@ -104,7 +90,7 @@ class TaxonomyEdit extends React.Component {
                           taxa={taxa}
                           currentPage={taxaCurrentPage}
                           totalPages={taxaTotalPages}
-                          rowsPerPage={ROWS_PER_PAGE}
+                          rowsPerPage={taxaPerPage}
                           onPageChange={(page) => loadTaxaPage(taxonomy, page)}/>
         }
 
@@ -126,8 +112,9 @@ const mapStateToProps = state => {
   return {
     surveyId: getSurveyId(survey),
     taxonomy: getTaxonomyEditTaxonomy(survey),
-    taxaTotalPages: getTaxonomyEditTaxaTotalPages(survey),
     taxaCurrentPage: getTaxonomyEditTaxaCurrentPage(survey),
+    taxaTotalPages: getTaxonomyEditTaxaTotalPages(survey),
+    taxaPerPage: getTaxonomyEditTaxaPerPage(survey),
     taxa: getTaxonomyEditTaxa(survey),
     activeJob: getActiveJob(state)
   }

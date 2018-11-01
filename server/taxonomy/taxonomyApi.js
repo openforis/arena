@@ -34,8 +34,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const draft = getBoolParam(req, 'draft')
+      const validate = getBoolParam(req, 'validate')
 
-      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, draft, draft)
+      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, draft, validate)
 
       res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
     } catch (err) {
