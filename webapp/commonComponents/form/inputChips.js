@@ -54,13 +54,15 @@ const InputChips = (props) => {
     items,
     itemKeyProp,
     itemKeyFunction,
+    itemLabelFunction,
+    itemLabelProp,
     onChange,
-    selection = [],
-    requiredItems = 0,
-    dropdownAutocompleteMinChars = 0,
-    readOnly = false,
-    disabled = false,
-    validation = {}
+    selection,
+    requiredItems,
+    dropdownAutocompleteMinChars,
+    readOnly,
+    disabled,
+    validation
   } = props
 
   const onDropdownChange = (item) => {
@@ -78,27 +80,48 @@ const InputChips = (props) => {
 
   const dropdownItems = R.reject(item => R.contains(item, selection))(items)
 
-  return <TooltipError messages={validation.errors}>
+  return (
     <div className="form-input-chip">
       {
         selection.map((item) =>
-          <Chip {...props}
-                key={getItemKey(item, itemKeyFunction, itemKeyProp)}
+          <Chip key={getItemKey(item, itemKeyFunction, itemKeyProp)}
                 item={item}
+                itemLabelFunction={itemLabelFunction}
+                itemLabelProp={itemLabelProp}
                 onDelete={removeItem}
                 canBeRemoved={!readOnly && selection.length > requiredItems}
           />
         )
       }
-      <Dropdown {...props}
-                items={dropdownItems}
+      <Dropdown items={dropdownItems}
+                itemKeyProp={itemKeyProp}
+                itemKeyFunction={itemKeyFunction}
+                itemLabelFunction={itemLabelFunction}
+                itemLabelProp={itemLabelProp}
                 onChange={onDropdownChange}
                 selection={null}
                 clearOnSelection={true}
                 autocompleteMinChars={dropdownAutocompleteMinChars}
-                readOnly={readOnly}/>
+                readOnly={readOnly}
+                disabled={disabled}
+                validation={validation}/>
     </div>
-  </TooltipError>
+  )
+}
+
+InputChips.defaultProps = {
+  items: [],
+  itemKeyProp: null,
+  itemKeyFunction: null,
+  itemLabelFunction: null,
+  itemLabelProp: null,
+  onChange: null,
+  selection: [],
+  requiredItems: 0,
+  dropdownAutocompleteMinChars: 0,
+  readOnly: false,
+  disabled: false,
+  validation: {}
 }
 
 export default InputChips
