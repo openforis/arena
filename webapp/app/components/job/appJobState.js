@@ -4,13 +4,22 @@ const activeJob = 'activeJob'
 
 export const getActiveJob = R.pathOr(null, ['app', activeJob])
 
-export const updateActiveJob = (job, closeAutomatically = false) =>
+export const startJob = (job, onComplete = null, autoHide = false) =>
+  R.assoc(activeJob, {
+    ...job,
+    onComplete,
+    autoHide,
+  })
+
+export const updateActiveJob = (job) =>
   state =>
-    job
-      ?
+    job ?
       R.pipe(
-        R.assoc('closeAutomatically', closeAutomatically),
-        j => R.assoc(activeJob, j)(state)
-      )(job)
-      :
+        R.prop(activeJob),
+        activeJob => ({
+          ...activeJob,
+          ...job,
+        }),
+        actJob => R.assoc(activeJob, actJob)(state)
+      )(state) :
       R.dissoc(activeJob)(state)

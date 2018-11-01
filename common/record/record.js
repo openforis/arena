@@ -92,7 +92,8 @@ const getNodeCodeAncestorValues = (survey, parentNode, nodeDef) =>
     if (parentCodeAttribute) {
       const parentCodeDef = getNodeDefById(getNodeDefId(parentCodeAttribute))(survey)
       const ancestorCodes = getNodeCodeAncestorValues(survey, getParentNode(parentCodeAttribute)(record), parentCodeDef)(record)
-      return R.append(getNodeValue(parentCodeAttribute).code, ancestorCodes)
+      const parentCodeAttrValue = R.propOr(null, 'code', getNodeValue(parentCodeAttribute))
+      return R.append(parentCodeAttrValue, ancestorCodes)
     } else {
       return []
     }
