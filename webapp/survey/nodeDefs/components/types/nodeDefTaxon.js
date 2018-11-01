@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
 import * as R from 'ramda'
@@ -8,23 +9,15 @@ import NodeDefFormItem from './nodeDefFormItem'
 import AutocompleteDialog from '../../../../commonComponents/form/autocompleteDialog'
 
 import { toQueryString } from '../../../../../server/serverUtils/request'
-import {
-  getTaxonCode,
-  getTaxonFamily,
-  getTaxonGenus,
-  getTaxonScientificName,
-  getTaxonVernacularNames,
-} from '../../../../../common/survey/taxonomy'
-import {
-  getNodeDefTaxonomyUUID,
-} from '../../../../../common/survey/nodeDef'
-import {
-  getSurveyTaxonomyByUUID,
-} from '../../../../../common/survey/survey'
-import {
-  getNodeValue,
-} from '../../../../../common/record/node'
+
+import Survey from '../../../../../common/survey/survey'
+import Taxon from '../../../../../common/survey/taxonomy'
+import NodeDef from '../../../../../common/survey/nodeDef'
+import Node from '../../../../../common/record/node'
+
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+import { getNodeDefDefaultValue } from '../nodeDefSystemProps'
+import { getSurvey } from '../../../surveyState'
 
 const fields = {
   code: 'code',
@@ -32,19 +25,10 @@ const fields = {
   vernacularName: 'vernacularName',
 }
 
-const blankValue = {
-  code: '',
-  family: '',
-  genus: '',
-  scientificName: '',
-  vernacularName: '',
-  vernacularLanguage: '',
-}
-
 const TaxonAutocompleteItemRenderer = props => {
   const {item: taxon, ...otherProps} = props
 
-  const vernacularNames = getTaxonVernacularNames(taxon)
+  const vernacularNames = Taxon.getTaxonVernacularNames(taxon)
   const vernacularNamesString = R.pipe(
     R.keys, //vernacular language codes
     R.map(langCode => `${langCode}: ${R.prop(langCode, vernacularNames)}`),
@@ -55,8 +39,8 @@ const TaxonAutocompleteItemRenderer = props => {
               key={taxon.uuid}
               className="item"
               tabIndex="1">
-    <div>{getTaxonCode(taxon)}</div>
-    <div>{getTaxonScientificName(taxon)}</div>
+    <div>{Taxon.getTaxonCode(taxon)}</div>
+    <div>{Taxon.getTaxonScientificName(taxon)}</div>
     <div style={{gridColumn: 2}}>{vernacularNamesString}</div>
   </div>
 }
@@ -90,18 +74,18 @@ class NodeDefTaxon extends React.Component {
   }
 
   getTaxonNodeValue () {
-    const {edit, nodes} = this.props
+    const {nodeDef, edit, nodes} = this.props
     const node = edit ? null : nodes[0]
 
-    return getNodeValue(node, blankValue)
+    return Node.getNodeValue(node, getNodeDefDefaultValue(nodeDef))
   }
 
-  onInputFieldChange (field, value) {
+  async onInputFieldChange (field, value) {
     //reset other fields values
 
-    const fieldValues = R.assoc(field, value)(blankValue)
+    const fieldValues = R.assoc(field, value)(getNodeDefDefaultValue(this.props.nodeDef))
 
-    let autocompleteOpened = !R.isEmpty(value)
+    const autocompleteOpened = !R.isEmpty(value)
 
     //reset stored value
     this.updateNodeValue(null)
@@ -115,16 +99,16 @@ class NodeDefTaxon extends React.Component {
     })
 
     if (autocompleteOpened) {
-      this.loadTaxa(field, value)
+      await this.loadTaxa(field, value)
     }
   }
 
   onTaxonSelect (taxonSearchResult) {
     const value = {
-      code: getTaxonCode(taxonSearchResult),
-      family: getTaxonFamily(taxonSearchResult),
-      genus: getTaxonGenus(taxonSearchResult),
-      scientificName: getTaxonScientificName(taxonSearchResult),
+      code: Taxon.getTaxonCode(taxonSearchResult),
+      family: Taxon.getTaxonFamily(taxonSearchResult),
+      genus: Taxon.getTaxonGenus(taxonSearchResult),
+      scientificName: Taxon.getTaxonScientificName(taxonSearchResult),
     }
     const nodeValue = taxonSearchResult.vernacularName
       ? R.pipe(
@@ -159,10 +143,8 @@ class NodeDefTaxon extends React.Component {
     })
   }
 
-  loadTaxa (field, value) {
-    const {survey, nodeDef} = this.props
-
-    const taxonomy = getSurveyTaxonomyByUUID(getNodeDefTaxonomyUUID(nodeDef))(survey)
+  async loadTaxa (field, value) {
+    const {surveyInfo, taxonomy} = this.props
 
     const params = {
       draft: false,
@@ -173,14 +155,8 @@ class NodeDefTaxon extends React.Component {
       }
     }
 
-    axios.get(`/api/survey/${survey.id}/taxonomies/${taxonomy.id}/taxa?${toQueryString(params)}`)
-      .then(res => {
-        const {taxa} = res.data
-
-        this.setState({
-          autocompleteTaxa: taxa
-        })
-      })
+    const {data} = await axios.get(`/api/survey/${surveyInfo.id}/taxonomies/${taxonomy.id}/taxa?${toQueryString(params)}`)
+    this.setState({autocompleteTaxa: data.taxa})
   }
 
   render () {
@@ -255,7 +231,7 @@ class NodeDefTaxon extends React.Component {
     }
 
     return (
-      <NodeDefFormItem {...this.props}>
+      <NodeDefFormItem label={label}>
         <div className="node-def__taxon-wrapper">
           <FormItem label="Code">
             {codeInputField}
@@ -274,4 +250,10 @@ class NodeDefTaxon extends React.Component {
   }
 }
 
-export default NodeDefTaxon
+const mapStateToProps = (state, props) => ({
+  taxonomy: Survey.getSurveyTaxonomyByUUID(
+    NodeDef.getNodeDefTaxonomyUUID(props.nodeDef)
+  )(getSurvey(state))
+})
+
+export default connect(mapStateToProps)(NodeDefTaxon)

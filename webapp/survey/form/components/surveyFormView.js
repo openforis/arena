@@ -8,21 +8,25 @@ import FormActions from './formActions'
 import NodeDefEdit from './nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from '../../nodeDefs/components/nodeDefSwitch'
 
+import { getSurveyInfo } from '../../../../common/survey/survey'
 import { getSurvey } from '../../surveyState'
 
 import { getFormActivePageNodeDef, getFormPageParentNode } from '../surveyFormState'
-
-import { setFormNodeDefUnlocked, setFormPageNode } from '../actions'
 
 import { getRecord } from '../../record/recordState'
 
 const SurveyFormView = (props) => {
 
   const {
+    surveyInfo,
     nodeDef,
     edit,
     entry,
+    draft,
+
     recordLoaded,
+    recordId,
+    parentNode
   } = props
 
   return nodeDef
@@ -41,7 +45,13 @@ const SurveyFormView = (props) => {
 
           {
             nodeDef && (edit || (entry && recordLoaded))
-              ? <NodeDefSwitch {...props} />
+              ? <NodeDefSwitch surveyInfo={surveyInfo}
+                               nodeDef={nodeDef}
+                               edit={edit}
+                               entry={entry}
+                               draft={draft}
+                               recordId={recordId}
+                               parentNode={parentNode}/>
               : <div/>
           }
 
@@ -67,24 +77,26 @@ SurveyFormView.defaultProps = {
   entry: false,
   // load draft props
   draft: false,
-  // record being edited
+  // if record to edit had been loaded
   recordLoaded: null,
+  // recordId of current record
+  recordId: null,
 }
 
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
-
   const nodeDef = getFormActivePageNodeDef(survey)
+  const record = getRecord(survey)
 
   const mapEntryProps = () => ({
     // rootNode: getRootNode(getRecord(survey)),
-    recordLoaded: !!getRecord(survey),
+    recordLoaded: !!record,
     parentNode: nodeDef ? getFormPageParentNode(nodeDef)(survey) : null,
+    recordId: record ? record.id : null,
   })
 
   return {
-    survey,
-    record: getRecord(survey),
+    surveyInfo: getSurveyInfo(survey),
     nodeDef,
     ...props.entry
       ? mapEntryProps()
@@ -93,4 +105,4 @@ const mapStateToProps = (state, props) => {
 
 }
 
-export default connect(mapStateToProps, {setFormPageNode, setFormNodeDefUnlocked})(SurveyFormView)
+export default connect(mapStateToProps)(SurveyFormView)

@@ -21,6 +21,8 @@ import {
 import { getFormPageNodeUUID } from '../../../form/surveyFormState'
 import { getSurvey } from '../../../surveyState'
 
+import { setFormPageNode } from '../../../form/actions'
+
 const EntityForm = props => {
   const {nodeDef, childDefs, edit, locked, node, putNodeDefProp} = props
 
@@ -208,4 +210,4 @@ const mapStateToProps = (state, props) => ({
   selectedNodeUUID: getFormPageNodeUUID(props.nodeDef)(getSurvey(state))
 })
 
-export default connect(mapStateToProps)(NodeDefEntityForm)
+export default connect(mapStateToProps, {setFormPageNode})(NodeDefEntityForm)

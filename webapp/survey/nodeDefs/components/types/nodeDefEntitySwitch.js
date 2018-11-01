@@ -13,6 +13,7 @@ import {
 } from '../../../../../common/survey/nodeDefLayout'
 
 import { putNodeDefProp, } from '../../actions'
+import { getSurvey } from '../../../surveyState'
 
 class NodeDefEntitySwitch extends React.Component {
 
@@ -35,7 +36,7 @@ NodeDefEntitySwitch.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => ({
-  childDefs: getNodeDefChildren(props.nodeDef)(props.survey),
+  childDefs: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
 })
 
 export default connect(
