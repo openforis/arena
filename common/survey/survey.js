@@ -3,16 +3,12 @@ const R = require('ramda')
 const {
   getProps,
   getProp,
-  getLabels,
-
-  setProp,
 
   filterMappedObj,
 } = require('./surveyUtils')
 
 const {
   isNodeDefRoot,
-  isNodeDefEntity,
   getNodeDefCodeListUUID,
   getNodeDefParentCodeUUID,
 } = require('./nodeDef')
@@ -313,7 +309,7 @@ module.exports = {
   getSurveyName: getSurveyInfoProp('name', ''),
   getSurveyLanguages,
   getSurveyDefaultLanguage,
-  getSurveyLabels: getLabels,
+  getSurveyLabels,
   getSurveyDefaultLabel,
   getSurveyDescriptions: getSurveyInfoProp('descriptions', {}),
   getSurveySrs: getSurveyInfoProp('srs', []),

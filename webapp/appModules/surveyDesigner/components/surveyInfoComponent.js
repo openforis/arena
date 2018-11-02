@@ -35,7 +35,7 @@ class SurveyInfoComponent extends React.Component {
   render () {
     const {survey, surveyInfo} = this.props
     const validation = getValidation(surveyInfo)
-    const surveySrs = getSurveySrs(survey).map(code => {return {key: code, value: getSrsName(code)}})
+    const surveySrs = getSurveySrs(survey).map(code => ({key: code, value: getSrsName(code)}))
 
     return (
       <div className="form">
@@ -52,8 +52,8 @@ class SurveyInfoComponent extends React.Component {
 
         <div className="form-item">
           <label className="form-label">SRS</label>
-          <InputChips selection={surveySrs}
-                      items={srs}
+          <InputChips items={srs}
+                      selection={surveySrs}
                       dropdownAutocompleteMinChars={3}
                       validation={getFieldValidation('srs')(validation)}
                       onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>

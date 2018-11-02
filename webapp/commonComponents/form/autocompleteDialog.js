@@ -145,7 +145,7 @@ class AutocompleteDialog extends React.Component {
   }
 
   render () {
-    const {items, itemRenderer, itemKeyFunction, className} = this.props
+    const {items, itemRenderer, itemKeyFunction, className=''} = this.props
 
     const ItemRenderer = itemRenderer
 

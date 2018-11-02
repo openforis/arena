@@ -11,12 +11,15 @@ import Node from '../../../../../../common/record/node'
 const CodeListDropdown = props => {
   const {language, edit, nodeDef, nodes, items = []} = props
 
+  let multiple = NodeDef.isNodeDefMultiple(nodeDef)
+
   const disabled = R.isEmpty(items)
 
   const selectedCodes = R.pipe(
     R.values,
     R.reject(node => node.placeholder),
     R.map(n => Node.getNodeValue(n).code),
+    R.reject(R.isNil)
   )(nodes)
 
   const selectedItems = R.filter(item => R.contains(CodeList.getCodeListItemCode(item))(selectedCodes))(items)
@@ -26,7 +29,7 @@ const CodeListDropdown = props => {
 
     const newSelectedCodes = newSelectedItems.map(item => CodeList.getCodeListItemCode(item))
 
-    if (NodeDef.isNodeDefMultiple(nodeDef)) {
+    if (multiple) {
       //remove deselected node
       const removedNode = R.find(n => !R.contains(Node.getNodeValue(n).code, newSelectedCodes))(nodes)
       if (removedNode && removedNode.id) {
@@ -42,14 +45,14 @@ const CodeListDropdown = props => {
     const placeholder = R.find(R.propEq('placeholder', true))(nodes)
     const nodeToUpdate = placeholder
       ? placeholder
-      : nodes.length === 1 && !NodeDef.isNodeDefMultiple(nodeDef)
+      : nodes.length === 1 && !multiple
         ? nodes[0]
         : Node.newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
 
     updateNode(nodeDef, nodeToUpdate, {code: newSelectedCode})
   }
 
-  return NodeDef.isNodeDefMultiple(nodeDef)
+  return multiple
     ? <InputChips readOnly={edit}
                   items={items}
                   disabled={disabled}
