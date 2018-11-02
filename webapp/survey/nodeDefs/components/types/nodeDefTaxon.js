@@ -209,11 +209,6 @@ class NodeDefTaxon extends React.Component {
                             itemRenderer={TaxonAutocompleteItemRenderer}
                             itemKeyFunction={taxon => `${taxon.uuid}_${taxon.vernacularName}`}
                             inputField={autocompleteInputField.current.component.input}
-                            alignToElement={
-                              (renderType === nodeDefRenderType.tableBody
-                                  ? this.getInputFields().code
-                                  : autocompleteInputField
-                              ).current.component.input}
                             onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
                             onClose={() => this.onAutocompleteClose()}/>,
         document.body

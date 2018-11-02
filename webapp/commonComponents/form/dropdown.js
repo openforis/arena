@@ -190,7 +190,6 @@ class Dropdown extends React.Component {
                                 itemRenderer={DropdownItemRenderer}
                                 itemKeyFunction={item => this.getItemKey(item)}
                                 inputField={this.getInputField()}
-                                alignToElement={this.getInputField()}
                                 onItemSelect={item => this.onSelectionChange(item)}
                                 onClose={() => this.toggleOpened()}/>,
             document.body
