@@ -1,18 +1,8 @@
-const R = require('ramda')
-
 const {expressionTypes, evalQuery} = require('../../common/exprParser/exprParser')
-
-const expressionFunctions = {
-  [expressionTypes.ThisExpression]: (expr, {node}) => {
-    console.log('== this ')
-    console.log(expr)
-    //
-    return node
-  },
-}
 
 const rootNode = {id: 1, name: 'root'}
 const newNode = name => ({id: 3, value: 18, name})
+const testNode = {id: 2, value: 12, name: 'tree'}
 
 const bindNodeFunctions = (node) => ({
   ...node,
@@ -21,7 +11,7 @@ const bindNodeFunctions = (node) => ({
   sibling: async name => bindNodeFunctions(newNode(name)),
 })
 
-const validateNode = async node => {
+const validateNode = async (node = testNode) => {
 // get query
 // const query = '1 + 1'
   // 2
@@ -29,8 +19,20 @@ const validateNode = async node => {
   // const query = 'this.value + 1'
   // 12 + 1
 
+  // const query = 'this.value !== 1'
+  // 12 !== 1 =true
+
+  // const query = '!this.value'
+  //! 12 = false
+
+  // const query = '!(this.value === 1)'
+  // !(12 === 1) = true
+
   // const query = 'this.parent()'
   //{id: 1, name: 'root'}
+
+  // const query = 'this.parent().parent()'
+  // null
 
   // const query = 'this.node("dbh")'
   // {id: 3, value: 18, name:'dbh'}
@@ -56,11 +58,13 @@ const validateNode = async node => {
   const query = '(this.sibling("dbh").value * 0.5) >= Math.pow(this.value, 3)'
   // 18 * 0.5 >= 1728
 
-  const result = await evalQuery(query, {
+  const ctx = {
     node: bindNodeFunctions(node),
-    functions: expressionFunctions,
-  })
-  return result
+    functions: {
+      [expressionTypes.ThisExpression]: (expr, {node}) => node
+    },
+  }
+  return await evalQuery(query, ctx)
 }
 
 module.exports = {

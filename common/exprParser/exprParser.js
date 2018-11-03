@@ -3,14 +3,13 @@ const jsep = require('jsep')
 const Promise = require('bluebird')
 const {isString} = require('../stringUtils')
 
-const expressionTypes = {
-  Literal: 'Literal',
-  ThisExpression: 'ThisExpression',
-  Identifier: 'Identifier',
-  BinaryExpression: 'BinaryExpression',
-  LogicalExpression: 'LogicalExpression',
-  CallExpression: 'CallExpression',
-  MemberExpression: 'MemberExpression',
+const unaryExpression = async (expr, ctx) => {
+  const {argument, operator} = expr
+  const res = await evalExpression(argument, ctx)
+  const x = `${operator} ${JSON.stringify(res)}`
+  console.log('=== UNARY')
+  console.log(x)
+  return eval(x)
 }
 
 const binaryExpression = async (expr, ctx) => {
@@ -28,13 +27,13 @@ const memberExpression = async (expr, ctx) => {
   console.log(expr)
 
   const {object, property} = expr
-  const {name} = property
 
-  const res = await evalExpression(object, ctx)
+  const objectRes = await evalExpression(object, ctx)
+  const propertyRes = await evalExpression(property, ctx)
 
-  return isString(res)
-    ? `${res}.${name}`
-    : R.prop(name, res)
+  return isString(objectRes)
+    ? eval(`${objectRes}.${propertyRes}`)
+    : R.prop(propertyRes, objectRes)
 }
 
 const callExpression = async (expr, ctx) => {
@@ -47,15 +46,10 @@ const callExpression = async (expr, ctx) => {
   const args = await Promise.all(
     arguments.map(async arg => await evalExpression(arg, ctx))
   )
-  const res = R.apply(
-    isString(fn)
-      ? eval(fn)
-      : fn,
-    args
-  )
+  const res = await R.apply(fn, args)
 
   console.log('== CALLEE = RES ', res)
-  return await res
+  return res
 
 }
 
@@ -65,7 +59,7 @@ const literalExpression = expr => {
   return R.prop('value')(expr)
 }
 
-const thisExpression = (expr, ctx) => {
+const thisExpression = expr => {
   console.log('== this ')
   console.log(expr)
   //
@@ -79,14 +73,29 @@ const identifierExpression = expr => {
   return R.prop('name')(expr)
 }
 
+const expressionTypes = {
+  // 'Compound'
+  Identifier: 'Identifier',
+  MemberExpression: 'MemberExpression',
+  Literal: 'Literal',
+  ThisExpression: 'ThisExpression',
+  CallExpression: 'CallExpression',
+  UnaryExpression: 'UnaryExpression',
+  BinaryExpression: 'BinaryExpression',
+  LogicalExpression: 'LogicalExpression',
+  // 'ConditionalExpression'
+  // 'ArrayExpression'
+}
+
 const defaultFunctions = {
-  [expressionTypes.LogicalExpression]: binaryExpression,
-  [expressionTypes.BinaryExpression]: binaryExpression,
   [expressionTypes.Identifier]: identifierExpression,
+  [expressionTypes.MemberExpression]: memberExpression,
   [expressionTypes.Literal]: literalExpression,
   [expressionTypes.ThisExpression]: thisExpression,
-  [expressionTypes.MemberExpression]: memberExpression,
   [expressionTypes.CallExpression]: callExpression,
+  [expressionTypes.UnaryExpression]: unaryExpression,
+  [expressionTypes.BinaryExpression]: binaryExpression,
+  [expressionTypes.LogicalExpression]: binaryExpression,
 }
 
 const evalExpression = async (expr, ctx) => {
