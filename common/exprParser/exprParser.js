@@ -7,8 +7,8 @@ const unaryExpression = async (expr, ctx) => {
   const {argument, operator} = expr
   const res = await evalExpression(argument, ctx)
   const x = `${operator} ${JSON.stringify(res)}`
-  console.log('=== UNARY')
-  console.log(x)
+  // console.log('=== UNARY')
+  // console.log(x)
   return eval(x)
 }
 
@@ -17,14 +17,14 @@ const binaryExpression = async (expr, ctx) => {
   const leftResult = await evalExpression(left, ctx)
   const rightResult = await evalExpression(right, ctx)
   const x = `${JSON.stringify(leftResult)} ${operator} ${JSON.stringify(rightResult)}`
-  console.log('=== BINARY')
-  console.log(x)
+  // console.log('=== BINARY')
+  // console.log(x)
   return eval(x)
 }
 
 const memberExpression = async (expr, ctx) => {
-  console.log('== member')
-  console.log(expr)
+  // console.log('== member')
+  // console.log(expr)
 
   const {object, property} = expr
 
@@ -37,39 +37,39 @@ const memberExpression = async (expr, ctx) => {
 }
 
 const callExpression = async (expr, ctx) => {
-  console.log('== call')
-  console.log(expr)
+  // console.log('== call')
+  // console.log(expr)
 
-  const {callee, arguments} = expr
+  // arguments is a reserved word in strict mode
+  const {callee, arguments: exprArgs} = expr
 
   const fn = await evalExpression(callee, ctx)
   const args = await Promise.all(
-    arguments.map(async arg => await evalExpression(arg, ctx))
+    exprArgs.map(async arg => await evalExpression(arg, ctx))
   )
   const res = await R.apply(fn, args)
 
-  console.log('== CALLEE = RES ', res)
+  // console.log('== CALLEE = RES ', res)
   return res
 
 }
 
 const literalExpression = expr => {
-  console.log('== literal ')
-  console.log(expr)
+  // console.log('== literal ')
+  // console.log(expr)
   return R.prop('value')(expr)
 }
 
 const thisExpression = expr => {
-  console.log('== this ')
-  console.log(expr)
+  // console.log('== this ')
+  // console.log(expr)
   //
   return 'this'
 }
 
 const identifierExpression = expr => {
-  console.log('== identifierExpression ')
-  console.log(expr)
-
+  // console.log('== identifierExpression ')
+  // console.log(expr)
   return R.prop('name')(expr)
 }
 

@@ -1,6 +1,8 @@
+require('babel-polyfill')
 const webpack = require('webpack')
 const path = require('path')
 const nodeExternals = require('webpack-node-externals')
+
 // const ExtractTextPlugin = require('extract-text-webpack-plugin')
 // const config = require("./webpack.config.js")
 // config.target = "node"
@@ -8,6 +10,7 @@ const nodeExternals = require('webpack-node-externals')
 // module.exports = config
 module.exports = {
   // plugins: [new ExtractTextPlugin({filename: 'test-style.css'})],
+  entry: ['babel-polyfill'],
   target: 'node', // in order to ignore built-in modules like path, fs, etc.
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
   mode: 'development',
