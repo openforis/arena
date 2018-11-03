@@ -3,16 +3,28 @@ const {assert} = require('chai')
 
 const {evalNodeQuery} = require('../../server/record/recordExprParser')
 
-const node = {id: 2, value: 12, name: 'tree'}
+const tree = {id: 2, value: 12, name: 'tree'}
+const root = {id: 1, name: 'root'}
+const newNode = name => ({id: 3, value: 18, name})
+
+const bindNodeFunctions = (node) => ({
+  ...node,
+  parent: async () => node.id === 1 ? null : bindNodeFunctions(root),
+  node: async name => bindNodeFunctions(newNode(name)),
+  sibling: async name => bindNodeFunctions(newNode(name)),
+})
+
+const node = bindNodeFunctions(tree)
 
 const queries = [
   {q: 'this.value + 1', r: 13},
   {q: 'this.value !== 1', r: true},
   {q: '!this.value', r: false},
   {q: '!(this.value === 1)', r: true},
-  {q: 'this.parent()', r: {id: 1, name: 'root'}},
+  {q: 'this.parent()', r: root},
   {q: 'this.parent().parent()', r: null},
-  {q: `this.parent().node('dbh')`, r: {id: 3, value: 18, name: 'dbh'}},
+  {q: `this.parent().node('dbh')`, r: newNode('dbh')},
+  {q: `this.sibling('dbh')`, r: newNode('dbh')},
   //18 + 1
   {q: 'this.parent().node("dbh").value + 1', r: 19},
   //18 + 1
@@ -38,6 +50,7 @@ describe('RecordExprParser Test', () => {
     const resKeys = R.keys(r)
 
     it(q, async () => {
+
       const res = await evalNodeQuery(node, q)
 
       if (R.isEmpty(resKeys)) {
