@@ -2,31 +2,23 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
-import { FormItem, Input } from '../../../commonComponents/form/input'
+import { FormItem, Input } from '../../../../commonComponents/form/input'
 import CodeListEditItem from './codeListEditItem'
 
-import { normalizeName } from '../../../../common/survey/surveyUtils'
-import {
-  getSurveyDefaultLanguage,
-  getNodeDefsByCodeListUUID,
-  getNodeDefCodeListLevelIndex,
-} from '../../../../common/survey/survey'
-import {
-  getCodeListLevelName,
-  getCodeListLevelValidation,
-  isCodeListLevelDeleteAllowed
-} from '../../../../common/survey/codeList'
-import { getFieldValidation } from '../../../../common/validation/validator'
+import { normalizeName } from '../../../../../common/survey/surveyUtils'
 
-import {
-  createCodeListItem,
-} from '../actions'
-import { getSurvey } from '../../surveyState'
+import Survey from '../../../../../common/survey/survey'
+import CodeList from '../../../../../common/survey/codeList'
+import { getFieldValidation } from '../../../../../common/validation/validator'
+
+import { getSurvey } from '../../../../survey/surveyState'
 import {
   getCodeListEditLevelActiveItem,
   getCodeListEditCodeList,
   getCodeListEditLevelItemsArray,
 } from '../codeListEditState'
+
+import { createCodeListItem } from '../actions'
 import { putCodeListItemProp, putCodeListLevelProp } from '../actions'
 import { deleteCodeListItem, deleteCodeListLevel, setCodeListItemForEdit } from '../actions'
 
@@ -35,8 +27,8 @@ class CodeListEditLevel extends React.Component {
   handleDelete () {
     const {survey, codeList, level, deleteCodeListLevel} = this.props
 
-    const codeListDefs = getNodeDefsByCodeListUUID(codeList.uuid)(survey)
-    if (R.any(def => getNodeDefCodeListLevelIndex(def)(survey) >= level.index)(codeListDefs)) {
+    const codeListDefs = Survey.getNodeDefsByCodeListUUID(codeList.uuid)(survey)
+    if (R.any(def => Survey.getNodeDefCodeListLevelIndex(def)(survey) >= level.index)(codeListDefs)) {
       alert('This code list level is used by some node definitions and cannot be removed')
     } else if (confirm('Delete the level with all items? This operation cannot be undone')) {
       deleteCodeListLevel(codeList, level)
@@ -50,7 +42,7 @@ class CodeListEditLevel extends React.Component {
       createCodeListItem, putCodeListLevelProp, putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
     } = this.props
 
-    const validation = getCodeListLevelValidation(level.index)(codeList)
+    const validation = CodeList.getCodeListLevelValidation(level.index)(codeList)
 
     return <div className="code-lists__edit-level">
 
@@ -64,7 +56,7 @@ class CodeListEditLevel extends React.Component {
       </div>
 
       <FormItem label={'name'}>
-        <Input value={getCodeListLevelName(level)}
+        <Input value={CodeList.getCodeListLevelName(level)}
                validation={getFieldValidation('name')(validation)}
                onChange={e => putCodeListLevelProp(codeList, level, 'name', normalizeName(e.target.value))}/>
       </FormItem>
@@ -104,7 +96,7 @@ const mapStateToProps = (state, props) => {
   const {index} = level
 
   const survey = getSurvey(state)
-  const language = getSurveyDefaultLanguage(survey)
+  const language = Survey.getSurveyDefaultLanguage(survey)
 
   const codeList = getCodeListEditCodeList(survey)
   const activeItem = getCodeListEditLevelActiveItem(index)(survey)
@@ -112,7 +104,7 @@ const mapStateToProps = (state, props) => {
 
   const canAddItem = index === 0 || parentItem
   const items = canAddItem ? getCodeListEditLevelItemsArray(index)(survey) : []
-  const canBeDeleted = isCodeListLevelDeleteAllowed(level)(codeList)
+  const canBeDeleted = CodeList.isCodeListLevelDeleteAllowed(level)(codeList)
 
   return {
     language,

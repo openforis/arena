@@ -1,11 +1,11 @@
 import axios from 'axios'
 
-import { toUUIDIndexedObj } from '../../../common/survey/surveyUtils'
-import { getStateSurveyId } from '../surveyState'
+import { toUUIDIndexedObj } from '../../../../common/survey/surveyUtils'
+import { getStateSurveyId } from '../../../survey/surveyState'
 
-import { newCodeList, newCodeListItem, newCodeListLevel } from '../../../common/survey/codeList'
+import { newCodeList, newCodeListItem, newCodeListLevel } from '../../../../common/survey/codeList'
 
-import { debounceAction } from '../../appUtils/reduxUtils'
+import { debounceAction } from '../../../appUtils/reduxUtils'
 
 // code list editor
 export const codeListEditUpdate = 'survey/codeListEdit/update'

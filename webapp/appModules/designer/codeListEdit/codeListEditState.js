@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { getCodeLists, getCodeListByUUID } from '../../../common/survey/survey'
+import { getCodeListByUUID } from '../../../../common/survey/survey'
 
 // DOCS
 const surveyState = {

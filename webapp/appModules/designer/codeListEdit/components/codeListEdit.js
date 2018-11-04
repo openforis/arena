@@ -2,14 +2,14 @@ import './codeListEdit.scss'
 
 import React from 'react'
 
-import { isBlank } from '../../../../common/stringUtils'
+import { isBlank } from '../../../../../common/stringUtils'
 
-import { FormItem, Input } from '../../../commonComponents/form/input'
+import { FormItem, Input } from '../../../../commonComponents/form/input'
 import CodeListEditLevel from './codeListEditLevel'
 
-import { getCodeListName, getCodeListLevelsArray } from '../../../../common/survey/codeList'
-import { normalizeName } from '../../../../common/survey/surveyUtils'
-import { getFieldValidation } from '../../../../common/validation/validator'
+import CodeList from '../../../../../common/survey/codeList'
+import { normalizeName } from '../../../../../common/survey/surveyUtils'
+import { getFieldValidation } from '../../../../../common/validation/validator'
 
 const CodeListEdit = props => {
 
@@ -19,9 +19,9 @@ const CodeListEdit = props => {
     setCodeListForEdit,
   } = props
   const {validation} = codeList
-  const levels = getCodeListLevelsArray(codeList)
+  const levels = CodeList.getCodeListLevelsArray(codeList)
 
-  const codeListName = getCodeListName(codeList)
+  const codeListName = CodeList.getCodeListName(codeList)
   return (
     <div className="code-lists__edit">
 

@@ -5,7 +5,7 @@ import { surveyUpdate } from '../actions'
 import { formReset } from '../form/actions'
 
 import { taxonomiesLoad } from './actions'
-import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomyEdit/actions'
+import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../../appModules/designer/taxonomyEdit/actions'
 
 const actionHandlers = {
   // reset form

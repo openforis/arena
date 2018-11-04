@@ -1,15 +1,8 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import {
-  getTaxonCode,
-  getTaxonFamily,
-  getTaxonGenus,
-  getTaxonScientificName,
-  getTaxonVernacularNames,
-  getTaxonVernacularName,
-} from '../../../../common/survey/taxonomy'
-import { languages } from '../../../../common/app/languages'
+import Taxonomy from '../../../../../common/survey/taxonomy'
+import { languages } from '../../../../../common/app/languages'
 
 class TaxonTable extends React.Component {
 
@@ -26,7 +19,7 @@ class TaxonTable extends React.Component {
   render () {
     const {taxonomy, taxa, currentPage, totalPages, rowsPerPage, onPageChange} = this.props
     const vernacularLanguageCodes = R.reduce(
-      (acc, taxon) => R.concat(acc, R.difference(R.keys(getTaxonVernacularNames(taxon)), acc)),
+      (acc, taxon) => R.concat(acc, R.difference(R.keys(Taxonomy.getTaxonVernacularNames(taxon)), acc)),
       [],
       taxa)
 
@@ -55,13 +48,13 @@ class TaxonTable extends React.Component {
                  className="row"
                  style={headerAndRowCustomStyle}>
               <div className="position">{(currentPage - 1) * rowsPerPage + taxa.indexOf(taxon) + 1}</div>
-              <div>{getTaxonCode(taxon)}</div>
-              <div>{getTaxonFamily(taxon)}</div>
-              <div>{getTaxonGenus(taxon)}</div>
-              <div>{getTaxonScientificName(taxon)}</div>
+              <div>{Taxonomy.getTaxonCode(taxon)}</div>
+              <div>{Taxonomy.getTaxonFamily(taxon)}</div>
+              <div>{Taxonomy.getTaxonGenus(taxon)}</div>
+              <div>{Taxonomy.getTaxonScientificName(taxon)}</div>
               {
                 vernacularLanguageCodes.map(lang =>
-                  <div key={`vernacular_name_${taxon.uuid}_${lang}`}>{getTaxonVernacularName(lang)(taxon)}</div>)
+                  <div key={`vernacular_name_${taxon.uuid}_${lang}`}>{Taxonomy.getTaxonVernacularName(lang)(taxon)}</div>)
               }
             </div>)
         }

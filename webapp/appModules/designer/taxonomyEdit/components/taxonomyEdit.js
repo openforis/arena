@@ -4,16 +4,16 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
-import { FormItem, Input } from '../../../commonComponents/form/input'
-import UploadButton from '../../../commonComponents/form/uploadButton'
-import DownloadButton from '../../../commonComponents/form/downloadButton'
+import { FormItem, Input } from '../../../../commonComponents/form/input'
+import UploadButton from '../../../../commonComponents/form/uploadButton'
+import DownloadButton from '../../../../commonComponents/form/downloadButton'
 import TaxonTable from './taxonTable'
 
-import { isBlank } from '../../../../common/stringUtils'
-import { normalizeName } from '../../../../common/survey/surveyUtils'
+import Taxonomy from '../../../../../common/survey/taxonomy'
+import { isBlank } from '../../../../../common/stringUtils'
+import { normalizeName } from '../../../../../common/survey/surveyUtils'
+import { getFieldValidation } from '../../../../../common/validation/validator'
 
-import { getSurveyId, } from '../../../../common/survey/survey'
-import { getTaxonomyName, } from '../../../../common/survey/taxonomy'
 import {
   getTaxonomyEditTaxonomy,
   getTaxonomyEditTaxaTotalPages,
@@ -22,9 +22,9 @@ import {
   getTaxonomyEditTaxaPerPage
 } from '../taxonomyEditState'
 
-import { getSurvey } from '../../surveyState'
-import { getActiveJob } from '../../../app/components/job/appJobState'
-import { getFieldValidation } from '../../../../common/validation/validator'
+import { getSurvey } from '../../../../survey/surveyState'
+import { getActiveJob } from '../../../../app/components/job/appJobState'
+import { getStateSurveyId } from '../../../../survey/surveyState'
 
 import {
   setTaxonomyForEdit,
@@ -47,7 +47,7 @@ class TaxonomyEdit extends React.Component {
   onDone () {
     const {taxonomy, setTaxonomyForEdit} = this.props
 
-    if (isBlank(getTaxonomyName(taxonomy))) {
+    if (isBlank(Taxonomy.getTaxonomyName(taxonomy))) {
       alert('Please specify a name')
     } else {
       setTaxonomyForEdit(null)
@@ -67,7 +67,7 @@ class TaxonomyEdit extends React.Component {
 
         <div className="taxonomy-edit__header">
           <FormItem label="Taxonomy name">
-            <Input value={getTaxonomyName(taxonomy)}
+            <Input value={Taxonomy.getTaxonomyName(taxonomy)}
                    validation={getFieldValidation('name')(validation)}
                    onChange={e => putTaxonomyProp(taxonomy, 'name', normalizeName(e.target.value))}/>
           </FormItem>
@@ -110,7 +110,7 @@ const mapStateToProps = state => {
   const survey = getSurvey(state)
 
   return {
-    surveyId: getSurveyId(survey),
+    surveyId: getStateSurveyId(state),
     taxonomy: getTaxonomyEditTaxonomy(survey),
     taxaCurrentPage: getTaxonomyEditTaxaCurrentPage(survey),
     taxaTotalPages: getTaxonomyEditTaxaTotalPages(survey),

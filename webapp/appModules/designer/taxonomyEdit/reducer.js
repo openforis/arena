@@ -1,7 +1,7 @@
-import { exportReducer } from '../../appUtils/reduxUtils'
+import { exportReducer } from '../../../appUtils/reduxUtils'
 
-import { surveyUpdate } from '../actions'
-import { formReset } from '../form/actions'
+import { surveyUpdate } from '../../../survey/actions'
+import { formReset } from '../../../survey/form/actions'
 
 import { taxonomyCreate, taxonomyEditPropsUpdate, taxonomyEditUpdate } from './actions'
 import { initTaxonomyEdit, mergeTaxonomyEditProps } from './taxonomyEditState'

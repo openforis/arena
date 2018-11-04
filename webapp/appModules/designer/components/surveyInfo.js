@@ -22,7 +22,7 @@ import { updateSurveyInfoProp } from '../../../survey/surveyInfo/actions'
 import { normalizeName } from './../../../../common/survey/surveyUtils'
 import { getValidation, getFieldValidation } from './../../../../common/validation/validator'
 
-class SurveyInfoComponent extends React.Component {
+class SurveyInfo extends React.Component {
 
   updateSurveyProp (key, value) {
     this.props.updateSurveyProp(key, value)
@@ -82,4 +82,4 @@ export default connect(
   {
     updateSurveyProp: updateSurveyInfoProp,
   }
-)(SurveyInfoComponent)
+)(SurveyInfo)

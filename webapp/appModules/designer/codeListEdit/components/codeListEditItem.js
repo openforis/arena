@@ -1,18 +1,13 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import LabelsEditor from '../../components/labelsEditor'
-import { FormItem, Input } from '../../../commonComponents/form/input'
+import LabelsEditor from '../../../../survey/components/labelsEditor'
+import { FormItem, Input } from '../../../../commonComponents/form/input'
 
-import { normalizeName } from '../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../../common/survey/surveyUtils'
 
-import {
-  getCodeListItemCode,
-  getCodeListItemLabel,
-  getCodeListItemLabels,
-  getCodeListItemValidation
-} from '../../../../common/survey/codeList'
-import { getFieldValidation } from '../../../../common/validation/validator'
+import CodeList from '../../../../../common/survey/codeList'
+import { getFieldValidation } from '../../../../../common/validation/validator'
 
 class CodeListEditItem extends React.Component {
 
@@ -42,7 +37,7 @@ class CodeListEditItem extends React.Component {
       level,
       item,
       'labels',
-      R.assoc(labelItem.lang, labelItem.label, getCodeListItemLabels(item))
+      R.assoc(labelItem.lang, labelItem.label, CodeList.getCodeListItemLabels(item))
     )
   }
 
@@ -53,7 +48,7 @@ class CodeListEditItem extends React.Component {
       language
     } = this.props
 
-    const validation = getCodeListItemValidation(item)(codeList)
+    const validation = CodeList.getCodeListItemValidation(item)(codeList)
     const validationGlobalErrorMessage = validation.valid
       ? null
       : R.pipe(
@@ -92,13 +87,13 @@ class CodeListEditItem extends React.Component {
                 </button>
 
                 <FormItem label={'code'}>
-                  <Input value={getCodeListItemCode(item)}
+                  <Input value={CodeList.getCodeListItemCode(item)}
                          disabled={disabled}
                          validation={getFieldValidation('code')(validation)}
                          onChange={e => putCodeListItemProp(codeList, level, item, 'code', normalizeName(e.target.value))}/>
                 </FormItem>
 
-                <LabelsEditor labels={getCodeListItemLabels(item)}
+                <LabelsEditor labels={CodeList.getCodeListItemLabels(item)}
                               onChange={(labelItem) => this.onPropLabelsChange(labelItem)}/>
 
                 <button className="btn btn-of-light btn-delete"
@@ -116,9 +111,9 @@ class CodeListEditItem extends React.Component {
             )
             : (
               <React.Fragment>
-                <div>{getCodeListItemCode(item)}</div>
+                <div>{CodeList.getCodeListItemCode(item)}</div>
                 <div>{'\xA0'}-{'\xA0'}</div>
-                <div>{getCodeListItemLabel(language)(item)}</div>
+                <div>{CodeList.getCodeListItemLabel(language)(item)}</div>
               </React.Fragment>
             )
         }

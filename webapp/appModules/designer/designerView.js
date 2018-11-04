@@ -4,10 +4,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import TabBar from '../../commonComponents/tabBar'
-import SurveyInfoComponent from './components/surveyInfoComponent'
+import SurveyInfo from './components/surveyInfo'
 import SurveyFormView from '../../survey/form/components/surveyFormView'
-import CodeListsView from '../../survey/codeLists/codeListsView'
-import TaxonomiesView from '../../survey/taxonomies/taxonomiesView'
+import CodeLists from './components/codeLists'
+import TaxonomiesView from './components/taxonomies'
 
 import { fetchNodeDefs } from '../../survey/nodeDefs/actions'
 import { fetchCodeLists } from '../../survey/codeLists/actions'
@@ -31,9 +31,9 @@ class DesignerView extends React.Component {
       <TabBar
         className="survey-designer grid100"
         tabs={[
-          {label: 'Survey Info', component: SurveyInfoComponent},
+          {label: 'Survey Info', component: SurveyInfo},
           {label: 'Form Designer', component: SurveyFormView, props: {edit: true, draft: true}},
-          {label: 'Code Lists', component: CodeListsView},
+          {label: 'Code Lists', component: CodeLists},
           {label: 'Taxonomies', component: TaxonomiesView},
         ]}/>
     )
