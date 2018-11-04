@@ -22,8 +22,8 @@ const {
   validateSurvey,
 } = require('./surveyValidator')
 
-const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
-const {fetchCodeListsBySurveyId} = require('../codeList/codeListManager')
+// const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
+// const {fetchCodeListsBySurveyId} = require('../codeList/codeListManager')
 
 module.exports.init = app => {
 

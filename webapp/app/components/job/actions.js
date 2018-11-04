@@ -12,7 +12,7 @@ export const showAppJobMonitor = (job, onComplete = null, autoHide = false) => (
 }
 
 export const hideAppJobMonitor = () => async (dispatch) => {
-  dispatch({type: appJobActiveUpdate, job: null})
+  dispatch(activeJobUpdate(null))
 }
 
 export const cancelActiveJob = () => async (dispatch) => {
@@ -20,6 +20,9 @@ export const cancelActiveJob = () => async (dispatch) => {
   //hide job monitor
   dispatch(hideAppJobMonitor())
 }
+
+export const activeJobUpdate = (job) =>
+  ({type: appJobActiveUpdate, job})
 
 /**
  * ======
@@ -49,13 +52,13 @@ export const startAppJobMonitoring = () => async (dispatch, getState) => {
 
         if (!stateJobExists || jobRunning || stateJob.autoHide) {
           //job not monitored yet or completed and autoHide is true
-          dispatch({type: appJobActiveUpdate, job: job})
+          dispatch(activeJobUpdate(job))
 
           // job endeed on server, but running in UI and there's no autohide option,
         } else if (!jobRunning && isJobRunning(stateJob) && !stateJob.autoHide) {
           //job completed (no more active), load it
           const {data} = await axios.get(`/api/jobs/${stateJob.id}`)
-          dispatch({type: appJobActiveUpdate, job: data.job})
+          dispatch(activeJobUpdate(data.job))
 
           if (stateJob.onComplete) {
             stateJob.onComplete()
@@ -73,3 +76,27 @@ export const stopAppJobMonitoring = () => () => {
   clearTimeout(activeJobPollingTimeout)
   activeJobPollingTimeout = null
 }
+
+
+
+
+
+
+
+// Sockets
+
+// export const updateJob = () => {
+//   alert('updateJob')
+// }
+//
+// export const startJobMonitoring = () => {
+//   alert('startJobMonitoring')
+// }
+//
+// // export const endJob = () => {
+// //   alert('endJob')
+// // }
+//
+// export const jobError = () => {
+//   alert('jobError')
+// }

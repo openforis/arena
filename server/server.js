@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const compression = require('compression')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
+const io = require('socket.io')()
 
 const sessionMiddleware = require('./config/sessionMiddleware')
 const headerMiddleware = require('./config/headerMiddleware')
@@ -12,7 +13,7 @@ const accessControlMiddleware = require('./config/accessControlMiddleware')
 const authConfig = require('./auth/authConfig')
 const authApi = require('./auth/authApi')
 const apiRouter = require('./config/apiRouter')
-
+// const { fetchActiveJobByUserId } = require('./job/jobManager')
 // run database migrations
 require('./db/migration/public/execMigrations')()
 
@@ -27,7 +28,8 @@ app.use(fileUpload({
 }))
 
 headerMiddleware.init(app)
-sessionMiddleware.init(app)
+// sessionMiddleware.init(app)
+app.use(sessionMiddleware)
 authConfig.init(app)
 //accesscontrolmiddleware must be initialized after authConfig
 accessControlMiddleware.init(app)
@@ -45,6 +47,14 @@ authApi.init(app)
 app.use('/api', apiRouter.router)
 
 const httpServerPort = process.env.PORT || '9090'
-app.listen(httpServerPort, () => {
+const server = app.listen(httpServerPort, () => {
   console.log('server listening on port', httpServerPort)
 })
+
+io.attach(server)
+io.use((socket, next) => {
+  // Wrap the sessionMiddleware to get the user id
+  sessionMiddleware(socket.request, {}, next)
+})
+
+require('./job/jobManager').init(io)
