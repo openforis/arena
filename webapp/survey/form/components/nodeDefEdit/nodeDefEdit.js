@@ -2,15 +2,15 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import CommonProps from './commonProps'
-import CodeListsView from '../../../../appModules/designer/components/codeLists'
-import TaxonomiesView from '../../../../appModules/designer/components/taxonomies'
+import CodeListsView from '../../../codeLists/codeListsView'
+import TaxonomiesView from '../../../taxonomies/taxonomiesView'
 
 import { canUpdateCodeList } from '../../../../../common/survey/survey'
 import { getNodeDefCodeListUUID, getNodeDefTaxonomyUUID } from '../../../../../common/survey/nodeDef'
 
 import { putNodeDefProp } from '../../../nodeDefs/actions'
-import { createCodeList } from '../../../../appModules/designer/codeListEdit/actions'
-import { createTaxonomy } from '../../../../appModules/designer/taxonomyEdit/actions'
+import { createCodeList } from '../../../codeListEdit/actions'
+import { createTaxonomy } from '../../../taxonomyEdit/actions'
 
 import { getSurvey } from '../../../surveyState'
 import { closeFormNodeDefEdit } from '../../actions'

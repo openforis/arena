@@ -4,15 +4,15 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
-import { FormItem, Input } from '../../../../commonComponents/form/input'
-import UploadButton from '../../../../commonComponents/form/uploadButton'
-import DownloadButton from '../../../../commonComponents/form/downloadButton'
+import { FormItem, Input } from '../../../commonComponents/form/input'
+import UploadButton from '../../../commonComponents/form/uploadButton'
+import DownloadButton from '../../../commonComponents/form/downloadButton'
 import TaxonTable from './taxonTable'
 
-import Taxonomy from '../../../../../common/survey/taxonomy'
-import { isBlank } from '../../../../../common/stringUtils'
-import { normalizeName } from '../../../../../common/survey/surveyUtils'
-import { getFieldValidation } from '../../../../../common/validation/validator'
+import Taxonomy from '../../../../common/survey/taxonomy'
+import { isBlank } from '../../../../common/stringUtils'
+import { normalizeName } from '../../../../common/survey/surveyUtils'
+import { getFieldValidation } from '../../../../common/validation/validator'
 
 import {
   getTaxonomyEditTaxonomy,
@@ -22,9 +22,9 @@ import {
   getTaxonomyEditTaxaPerPage
 } from '../taxonomyEditState'
 
-import { getSurvey } from '../../../../survey/surveyState'
-import { getActiveJob } from '../../../../app/components/job/appJobState'
-import { getStateSurveyId } from '../../../../survey/surveyState'
+import { getSurvey } from '../../../survey/surveyState'
+import { getActiveJob } from '../../../app/components/job/appJobState'
+import { getStateSurveyId } from '../../../survey/surveyState'
 
 import {
   setTaxonomyForEdit,

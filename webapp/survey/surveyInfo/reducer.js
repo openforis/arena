@@ -18,10 +18,10 @@ import { surveyInfoPropUpdate, surveyInfoValidationUpdate } from './actions'
 import { nodeDefCreate, nodeDefDelete, nodeDefPropUpdate, nodeDefUpdate } from '../nodeDefs/actions'
 
 // codeList actions
-import { codeListCreate, codeListDelete, codeListUpdate } from '../../appModules/designer/codeListEdit/actions'
+import { codeListCreate, codeListDelete, codeListUpdate } from '../codeListEdit/actions'
 
 // taxonomies actions
-import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../../appModules/designer/taxonomyEdit/actions'
+import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomyEdit/actions'
 
 const actionHandlers = {
   // app initialization

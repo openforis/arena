@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { getCodeListByUUID } from '../../../../common/survey/survey'
+import Survey from '../../../common/survey/survey'
 
 // DOCS
 const surveyState = {
@@ -35,7 +35,7 @@ export const initCodeListEdit = (codeListUUID) => codeListUUID ? {codeListUUID} 
 
 export const getCodeListEditCodeList = survey => R.pipe(
   R.path([codeListEdit, codeListUUID]),
-  codeListUUUID => getCodeListByUUID(codeListUUUID)(survey),
+  codeListUUUID => Survey.getCodeListByUUID(codeListUUUID)(survey),
 )(survey)
 
 // ==== level

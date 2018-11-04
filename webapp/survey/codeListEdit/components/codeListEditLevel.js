@@ -2,16 +2,16 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
-import { FormItem, Input } from '../../../../commonComponents/form/input'
+import { FormItem, Input } from '../../../commonComponents/form/input'
 import CodeListEditItem from './codeListEditItem'
 
-import { normalizeName } from '../../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../common/survey/surveyUtils'
 
-import Survey from '../../../../../common/survey/survey'
-import CodeList from '../../../../../common/survey/codeList'
-import { getFieldValidation } from '../../../../../common/validation/validator'
+import Survey from '../../../../common/survey/survey'
+import CodeList from '../../../../common/survey/codeList'
+import { getFieldValidation } from '../../../../common/validation/validator'
 
-import { getSurvey } from '../../../../survey/surveyState'
+import { getSurvey } from '../../surveyState'
 import {
   getCodeListEditLevelActiveItem,
   getCodeListEditCodeList,

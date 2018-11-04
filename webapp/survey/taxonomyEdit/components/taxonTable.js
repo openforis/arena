@@ -1,8 +1,8 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Taxonomy from '../../../../../common/survey/taxonomy'
-import { languages } from '../../../../../common/app/languages'
+import Taxonomy from '../../../../common/survey/taxonomy'
+import { languages } from '../../../../common/app/languages'
 
 class TaxonTable extends React.Component {
 

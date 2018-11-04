@@ -2,26 +2,26 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import ItemsView from './items/itemsView'
+import ItemsView from '../components/items/itemsView'
 import TaxonomyEdit from '../taxonomyEdit/components/taxonomyEdit'
 
 import {
   getNodeDefsByTaxonomyUUID,
   getTaxonomiesArray
-} from '../../../../common/survey/survey'
-import { getTaxonomyName } from '../../../../common/survey/taxonomy'
+} from '../../../common/survey/survey'
+import { getTaxonomyName } from '../../../common/survey/taxonomy'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getSurvey } from '../surveyState'
 import { getTaxonomyEditTaxonomy } from '../taxonomyEdit/taxonomyEditState'
 
-import { fetchTaxonomies } from '../../../survey/taxonomies/actions'
+import { fetchTaxonomies } from './actions'
 import {
   createTaxonomy,
   setTaxonomyForEdit,
   deleteTaxonomy,
 } from '../taxonomyEdit/actions'
 
-class Taxonomies extends React.Component {
+class TaxonomiesView extends React.Component {
 
   componentDidMount () {
     const {fetchOnMount, fetchTaxonomies} = this.props
@@ -52,7 +52,7 @@ class Taxonomies extends React.Component {
   }
 }
 
-Taxonomies.defaultProps = {
+TaxonomiesView.defaultProps = {
   fetchOnMount: true,
 }
 
@@ -76,4 +76,4 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   {fetchTaxonomies, createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
-)(Taxonomies)
+)(TaxonomiesView)

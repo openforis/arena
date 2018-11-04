@@ -1,13 +1,13 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import LabelsEditor from '../../../../survey/components/labelsEditor'
-import { FormItem, Input } from '../../../../commonComponents/form/input'
+import LabelsEditor from '../../components/labelsEditor'
+import { FormItem, Input } from '../../../commonComponents/form/input'
 
-import { normalizeName } from '../../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../common/survey/surveyUtils'
 
-import CodeList from '../../../../../common/survey/codeList'
-import { getFieldValidation } from '../../../../../common/validation/validator'
+import CodeList from '../../../../common/survey/codeList'
+import { getFieldValidation } from '../../../../common/validation/validator'
 
 class CodeListEditItem extends React.Component {
 

@@ -13,7 +13,7 @@ import {
   codeListUpdate,
   codeListPropUpdate,
   codeListLevelPropUpdate, codeListItemPropUpdate, codeListLevelDelete,
-} from '../../appModules/designer/codeListEdit/actions'
+} from '../codeListEdit/actions'
 
 const simulateSurveyState = (codeLists) =>
   codeLists ? {codeLists} : {}

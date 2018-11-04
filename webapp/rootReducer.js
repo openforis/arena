@@ -5,9 +5,9 @@ import info from './survey/surveyInfo/reducer'
 import form from './survey/form/reducer'
 import nodeDefs from './survey/nodeDefs/reducer'
 import codeLists from './survey/codeLists/reducer'
-import codeListEdit from './appModules/designer/codeListEdit/reducer'
+import codeListEdit from './survey/codeListEdit/reducer'
 import taxonomies from './survey/taxonomies/reducer'
-import taxonomyEdit from './appModules/designer/taxonomyEdit/reducer'
+import taxonomyEdit from './survey/taxonomyEdit/reducer'
 import record from './survey/record/reducer'
 
 const survey = combineReducers({

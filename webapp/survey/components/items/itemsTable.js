@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import {
   isValid
-} from '../../../../../common/validation/validator'
+} from '../../../../common/validation/validator'
 
 const TableRow = props => {
 

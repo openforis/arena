@@ -2,13 +2,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import ItemsView from './items/itemsView'
+import ItemsView from '../components/items/itemsView'
 import CodeListEdit from '../codeListEdit/components/codeListEdit'
 
-import { getSurvey } from '../../../survey/surveyState'
-import { getCodeListsArray, getNodeDefsByCodeListUUID } from '../../../../common/survey/survey'
+import { getSurvey } from '../surveyState'
+import { getCodeListsArray, getNodeDefsByCodeListUUID } from '../../../common/survey/survey'
 
-import { getCodeListName } from '../../../../common/survey/codeList'
+import { getCodeListName } from '../../../common/survey/codeList'
 
 import { getCodeListEditCodeList } from '../codeListEdit/codeListEditState'
 
@@ -20,9 +20,9 @@ import {
   setCodeListForEdit
 } from '../codeListEdit/actions'
 
-import { fetchCodeLists } from '../../../survey/codeLists/actions'
+import { fetchCodeLists } from './actions'
 
-class CodeLists extends React.Component {
+class CodeListsView extends React.Component {
 
   componentDidMount () {
     const {fetchOnMount, fetchCodeLists} = this.props
@@ -58,7 +58,7 @@ class CodeLists extends React.Component {
   }
 }
 
-CodeLists.defaultProps = {
+CodeListsView.defaultProps = {
   fetchOnMount: true,
 }
 
@@ -82,4 +82,4 @@ const mapStateToProps = (state) => {
 export default connect(
   mapStateToProps,
   {fetchCodeLists, createCodeList, setCodeListForEdit, deleteCodeList, putCodeListProp, createCodeListLevel}
-)(CodeLists)
+)(CodeListsView)

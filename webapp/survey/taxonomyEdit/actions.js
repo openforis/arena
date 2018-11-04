@@ -1,10 +1,10 @@
 import axios from 'axios'
 
-import { debounceAction } from '../../../appUtils/reduxUtils'
-import { newTaxonomy } from '../../../../common/survey/taxonomy'
+import { debounceAction } from '../../appUtils/reduxUtils'
+import { newTaxonomy } from '../../../common/survey/taxonomy'
 
-import { getStateSurveyId, getSurvey } from '../../../survey/surveyState'
-import { showAppJobMonitor } from '../../../app/components/job/actions'
+import { getStateSurveyId, getSurvey } from '../surveyState'
+import { showAppJobMonitor } from '../../app/components/job/actions'
 import { getTaxonomyEditTaxaPerPage } from './taxonomyEditState'
 
 // taxonomy actions
