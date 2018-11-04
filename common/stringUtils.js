@@ -8,10 +8,14 @@ const isBlank = R.pipe(trim, R.isEmpty)
 
 const isNotBlank = R.pipe(isBlank, R.not)
 
+const isString = R.is(String)
+
 module.exports = {
   trim,
   leftTrim,
 
   isBlank,
   isNotBlank,
+
+  isString,
 }
