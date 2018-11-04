@@ -25,8 +25,13 @@ const survey = combineReducers({
 import app from './app/reducer'
 import login from './login/reducer'
 
+import home from './appModules/home/reducer'
+
 export default combineReducers({
   app,
   login,
+  // survey reducer
   survey,
+  // appModules reducers
+  home,
 })

@@ -45,6 +45,13 @@ const AppModuleHOC = Component => props => (
     <Component {...props}/>
   </div>
 )
+
+const AppHome = AppModuleHOC(AppHomeView)
+const SurveyDashboard = AppModuleHOC(SurveyDashboardView)
+const SurveyDesigner = AppModuleHOC(SurveyDesignerView)
+const Data = AppModuleHOC(DataView)
+const DataRecord = AppModuleHOC(DataRecordView)
+
 const AppModulesView = (props) => (
   <TransitionGroup className="app__modules">
     <CSSTransition
@@ -53,11 +60,11 @@ const AppModulesView = (props) => (
       classNames="app-module__fade">
 
       <Switch location={props.location}>
-        <Route exact={true} path={appModuleUri(appModules.home)} component={AppModuleHOC(AppHomeView)}/>
-        <Route exact={true} path={appModuleUri(appModules.surveyDashboard)} component={AppModuleHOC(SurveyDashboardView)}/>
-        <Route exact={true} path={appModuleUri(appModules.surveyDesigner)} component={AppModuleHOC(SurveyDesignerView)}/>
-        <Route exact={true} path={appModuleUri(appModules.data)} component={AppModuleHOC(DataView)}/>
-        <Route exact={true} path={appModuleUri(appModules.dataRecord)} component={AppModuleHOC(DataRecordView)}/>
+        <Route exact={true} path={appModuleUri(appModules.home)} component={AppHome}/>
+        <Route exact={true} path={appModuleUri(appModules.surveyDashboard)} component={SurveyDashboard}/>
+        <Route exact={true} path={appModuleUri(appModules.surveyDesigner)} component={SurveyDesigner}/>
+        <Route exact={true} path={appModuleUri(appModules.data)} component={Data}/>
+        <Route exact={true} path={appModuleUri(appModules.dataRecord)} component={DataRecord}/>
       </Switch>
 
     </CSSTransition>

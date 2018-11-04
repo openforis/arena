@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { Input } from '../../commonComponents/form/input'
-import LanguageDropdown from '../../commonComponents/form/languageDropdown'
+import { Input } from '../../../commonComponents/form/input'
+import LanguageDropdown from '../../../commonComponents/form/languageDropdown'
 
-import { getFieldValidation } from '../../../common/validation/validator'
-import { normalizeName } from '../../../common/survey/surveyUtils'
+import { getFieldValidation } from '../../../../common/validation/validator'
+import { normalizeName } from '../../../../common/survey/surveyUtils'
 
 const AddSurveyForm = (props) => {
 

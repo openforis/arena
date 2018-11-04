@@ -1,28 +1,49 @@
 import axios from 'axios'
 
 import { getStateSurveyId } from './surveyState'
+import { appState } from '../app/app'
+import { userPrefNames } from '../../common/user/userPrefs'
+import { appUserPrefUpdate } from '../app/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
 export const surveyPublish = 'survey/publish'
 
-export const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
+const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({type: surveyUpdate, survey})
+
+// ====== SET ACTIVE SURVEY
+export const setActiveSurvey = (surveyId, draft = true) =>
+  async (dispatch, getState) => {
+    //load survey
+    const {data} = await axios.get(`/api/survey/${surveyId}?draft=${draft}`)
+    dispatchCurrentSurveyUpdate(dispatch, data.survey)
+
+    //update userPref
+    const user = appState.getUser(getState())
+    await axios.post(`/api/user/${user.id}/pref/${userPrefNames.survey}/${surveyId}`)
+    dispatch({type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId})
+
+  }
 
 // ==== UPDATE
 
 export const publishSurvey = () => async (dispatch, getState) => {
+  const surveyId = getStateSurveyId(getState())
+
   dispatch({type: surveyPublish})
 
-  const surveyId = getStateSurveyId(getState())
   await axios.put(`/api/survey/${surveyId}/publish`)
 }
 
 // == DELETE
 
 export const deleteSurvey = () => async (dispatch, getState) => {
+  const surveyId = getStateSurveyId(getState())
+
   dispatchCurrentSurveyUpdate(dispatch, null)
 
-  const surveyId = getStateSurveyId(getState())
   await axios.delete(`/api/survey/${surveyId}`)
+
 }
+

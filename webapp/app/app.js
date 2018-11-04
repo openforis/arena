@@ -37,4 +37,3 @@ export const appState = {
   logoutUser: R.dissocPath(excludePathRoot(statePath.user)),
 }
 
-export const getSurveys = R.pathOr([], [app, 'surveys'])

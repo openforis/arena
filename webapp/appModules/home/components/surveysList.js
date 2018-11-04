@@ -3,15 +3,10 @@ import './surveysList.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { getSurveyInfo } from '../../../common/survey/survey'
-import { getRelativeDate, compareDatesDesc } from '../../appUtils/dateUtils'
+import { getSurveyInfo } from '../../../../common/survey/survey'
+import { getRelativeDate, compareDatesDesc } from '../../../appUtils/dateUtils'
 
-import {
-  getSurveyId,
-  getSurveyName,
-  getSurveyDefaultLabel,
-  getSurveyStatus,
-} from '../../../common/survey/survey'
+import Survey from '../../../../common/survey/survey'
 
 const SurveyListHeader = () => (
   <div className="surveys-list__header">
@@ -27,17 +22,17 @@ const SurveyListHeader = () => (
 )
 
 const SurveyRow = ({survey, surveyInfo, setActiveSurvey}) => {
-  const surveyId = getSurveyId(survey)
+  const surveyId = Survey.getSurveyId(survey)
   const active = surveyInfo && surveyId === surveyInfo.id
   const activeClass = active ? ' active' : ''
 
   return (
     <div className={`surveys-list__row${activeClass}`}>
-      <div>{getSurveyName(survey)}</div>
-      <div>{getSurveyDefaultLabel(survey)}</div>
+      <div>{Survey.getSurveyName(survey)}</div>
+      <div>{Survey.getSurveyDefaultLabel(survey)}</div>
       <div>{getRelativeDate(survey.dateCreated)}</div>
       <div>{getRelativeDate(survey.dateModified)}</div>
-      <div>{getSurveyStatus(survey)}</div>
+      <div>{Survey.getSurveyStatus(survey)}</div>
       <div>
         <button className={`btn btn-s btn-of${activeClass}`}
                 onClick={() => setActiveSurvey(surveyId)}>

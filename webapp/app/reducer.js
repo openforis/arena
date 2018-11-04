@@ -12,8 +12,6 @@ import {
   appStatusChange,
   appUserLogout,
   appUserPrefUpdate,
-  appNewSurveyUpdate,
-  appSurveysUpdate,
   appErrorCreate,
   appErrorDelete,
 } from './actions'
@@ -25,7 +23,6 @@ import { loginSuccess } from '../login/actions'
  * ======
  */
 import { appJobStart, appJobActiveUpdate } from './components/job/actions'
-import { surveyCreate } from '../survey/actions'
 
 const actionHandlers = {
 
@@ -44,14 +41,6 @@ const actionHandlers = {
   },
 
   [appUserLogout]: (state, action) => appState.logoutUser(state),
-
-  // new survey
-  [surveyCreate]: (state, _) => dissocStateProps(state, ['newSurvey']),
-
-  [appNewSurveyUpdate]: assocActionProps,
-
-  //surveys list
-  [appSurveysUpdate]: assocActionProps,
 
   //app job
   [appJobStart]: (state, {job, onComplete, autoHide}) =>
