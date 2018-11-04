@@ -7,12 +7,10 @@ import { formReset } from '../actions'
 
 import { nodeDelete, nodesUpdate, recordCreate } from './actions'
 
-
-
 const actionHandlers = {
   // reset form
-  [surveyUpdate]: () => null,
-  [formReset]: () => null,
+  [surveyUpdate]: () => ({}),
+  [formReset]: () => ({}),
 
   [recordCreate]: (state, {record}) => record,
 

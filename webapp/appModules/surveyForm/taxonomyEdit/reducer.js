@@ -9,8 +9,8 @@ import { taxonomyCreate } from '../../../survey/taxonomies/actions'
 
 const actionHandlers = {
   // reset form
-  [surveyUpdate]: () => null,
-  [formReset]: () => null,
+  [surveyUpdate]: () => ({}),
+  [formReset]: () => ({}),
 
   [taxonomyEditUpdate]: (state, {taxonomyUUID}) => initTaxonomyEdit(taxonomyUUID),
 

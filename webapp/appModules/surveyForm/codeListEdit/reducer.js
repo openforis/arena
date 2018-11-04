@@ -18,21 +18,23 @@ import {
 
 import {
   codeListEditUpdate,
-
   codeListEditLevelActiveItemUpdate,
+} from './actions'
 
-  } from './actions'
 import {
-  codeListCreate, codeListItemCreate,
+  codeListCreate,
+  codeListItemCreate,
   codeListItemDelete,
-  codeListItemPropUpdate, codeListItemsUpdate,
-  codeListItemUpdate, codeListLevelDelete
+  codeListItemPropUpdate,
+  codeListItemsUpdate,
+  codeListItemUpdate,
+  codeListLevelDelete,
 } from '../../../survey/codeLists/actions'
 
 const actionHandlers = {
   // reset form
-  [surveyUpdate]: () => null,
-  [formReset]: () => null,
+  [surveyUpdate]: () => ({}),
+  [formReset]: () => ({}),
 
   [codeListEditUpdate]: (state, {codeListUUID}) => initCodeListEdit(codeListUUID),
 

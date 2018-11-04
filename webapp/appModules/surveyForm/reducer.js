@@ -1,4 +1,9 @@
+import { combineReducers } from 'redux'
 import { exportReducer } from '../../appUtils/reduxUtils'
+
+import codeListEdit from './codeListEdit/reducer'
+import taxonomyEdit from './taxonomyEdit/reducer'
+import record from './record/reducer'
 
 import { surveyUpdate } from '../../survey/actions'
 
@@ -10,6 +15,8 @@ import {
   formReset
 } from './actions'
 
+import { nodeDefCreate } from '../../survey/nodeDefs/actions'
+
 import {
   assocFormActivePage,
   assocFormNodeDefEdit,
@@ -18,13 +25,11 @@ import {
   assocParamsOnNodeDefCreate,
 } from './surveyFormState'
 
-import { nodeDefCreate } from '../../survey/nodeDefs/actions'
-
 const actionHandlers = {
   // reset form
-  [surveyUpdate]: () => null,
+  [surveyUpdate]: () => ({}),
 
-  [formReset]: () => null,
+  [formReset]: () => ({}),
 
   [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),
 
@@ -38,4 +43,12 @@ const actionHandlers = {
   [nodeDefCreate]: (state, {nodeDef}) => assocParamsOnNodeDefCreate(nodeDef)(state)
 }
 
-export default exportReducer(actionHandlers)
+const props = exportReducer(actionHandlers)
+
+export default combineReducers({
+  props,
+  codeListEdit,
+  taxonomyEdit,
+  record,
+})
+

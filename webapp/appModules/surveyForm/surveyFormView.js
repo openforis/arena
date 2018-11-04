@@ -11,7 +11,7 @@ import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import { getSurveyInfo } from '../../../common/survey/survey'
 import { getSurvey } from '../../survey/surveyState'
 
-import { getFormActivePageNodeDef, getFormPageParentNode } from './surveyFormState'
+import { getFormActivePageNodeDef, getFormPageParentNode, getSurveyForm } from './surveyFormState'
 
 import { getRecord } from './record/recordState'
 
@@ -81,13 +81,14 @@ SurveyFormView.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
-  const nodeDef = getFormActivePageNodeDef(survey)
-  const record = getRecord(survey)
+  const surveyForm = getSurveyForm(state)
+  const nodeDef = getFormActivePageNodeDef(survey)(surveyForm)
+  const record = getRecord(surveyForm)
 
   const mapEntryProps = () => ({
     // rootNode: getRootNode(getRecord(survey)),
     recordLoaded: !!record,
-    parentNode: nodeDef ? getFormPageParentNode(nodeDef)(survey) : null,
+    parentNode: nodeDef ? getFormPageParentNode(survey, nodeDef)(surveyForm) : null,
     recordId: record ? record.id : null,
   })
 

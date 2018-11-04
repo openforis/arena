@@ -7,6 +7,7 @@ import { getStateSurveyId, getSurvey } from '../../../survey/surveyState'
 import { showAppJobMonitor } from '../../../app/components/job/actions'
 import { getTaxonomyEditTaxaPerPage } from './taxonomyEditState'
 import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../../../survey/taxonomies/actions'
+import { getSurveyForm } from '../surveyFormState'
 
 // taxonomy editor actions
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
@@ -48,9 +49,10 @@ export const reloadTaxa = (taxonomy) => async (dispatch, getState) => {
 export const loadTaxa = (taxonomy, page = 1) => async (dispatch, getState) => {
   dispatchTaxonomyEditPropsUpdate(dispatch, {taxaCurrentPage: page, taxa: []})
 
-  const surveyState = getSurvey(getState())
-  const surveyId = getStateSurveyId(getState())
-  const rowsPerPage = getTaxonomyEditTaxaPerPage(surveyState)
+  const state = getState()
+  const surveyForm = getSurveyForm(state)
+  const surveyId = getStateSurveyId(state)
+  const rowsPerPage = getTaxonomyEditTaxaPerPage(surveyForm)
   const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/taxa`, {
     params: {
       draft: true,

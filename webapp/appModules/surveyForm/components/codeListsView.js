@@ -21,6 +21,7 @@ import {
 } from '../codeListEdit/actions'
 
 import { fetchCodeLists } from '../../../survey/codeLists/actions'
+import { getSurveyForm } from '../surveyFormState'
 
 class CodeListsView extends React.Component {
 
@@ -75,7 +76,7 @@ const mapStateToProps = (state) => {
 
   return {
     codeLists,
-    codeList: getCodeListEditCodeList(survey),
+    codeList: getCodeListEditCodeList(survey)(getSurveyForm(state)),
   }
 }
 

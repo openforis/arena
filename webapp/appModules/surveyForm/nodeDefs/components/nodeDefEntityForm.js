@@ -18,8 +18,7 @@ import {
   getLayout,
   getNoColumns,
 } from '../../../../../common/survey/nodeDefLayout'
-import { getFormPageNodeUUID } from '../../../../appModules/surveyForm/surveyFormState'
-import { getSurvey } from '../../../../survey/surveyState'
+import { getFormPageNodeUUID, getSurveyForm } from '../../../../appModules/surveyForm/surveyFormState'
 
 import { setFormPageNode } from '../../actions'
 
@@ -207,7 +206,7 @@ class NodeDefEntityForm extends React.Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  selectedNodeUUID: getFormPageNodeUUID(props.nodeDef)(getSurvey(state))
+  selectedNodeUUID: getFormPageNodeUUID(props.nodeDef)(getSurveyForm(state))
 })
 
 export default connect(mapStateToProps, {setFormPageNode})(NodeDefEntityForm)

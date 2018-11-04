@@ -33,6 +33,7 @@ import {
   reloadTaxa,
   loadTaxa,
 } from '../actions'
+import { getSurveyForm } from '../../surveyFormState'
 
 class TaxonomyEdit extends React.Component {
 
@@ -108,14 +109,15 @@ class TaxonomyEdit extends React.Component {
 
 const mapStateToProps = state => {
   const survey = getSurvey(state)
+  const surveyForm = getSurveyForm(state)
 
   return {
     surveyId: getStateSurveyId(state),
-    taxonomy: getTaxonomyEditTaxonomy(survey),
-    taxaCurrentPage: getTaxonomyEditTaxaCurrentPage(survey),
-    taxaTotalPages: getTaxonomyEditTaxaTotalPages(survey),
-    taxaPerPage: getTaxonomyEditTaxaPerPage(survey),
-    taxa: getTaxonomyEditTaxa(survey),
+    taxonomy: getTaxonomyEditTaxonomy(survey)(surveyForm),
+    taxaCurrentPage: getTaxonomyEditTaxaCurrentPage(surveyForm),
+    taxaTotalPages: getTaxonomyEditTaxaTotalPages(surveyForm),
+    taxaPerPage: getTaxonomyEditTaxaPerPage(surveyForm),
+    taxa: getTaxonomyEditTaxa(surveyForm),
     activeJob: getActiveJob(state)
   }
 }

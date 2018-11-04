@@ -8,7 +8,7 @@ import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout
 import { getSurvey } from '../../../survey/surveyState'
 
 import { setFormActivePage } from '../actions'
-import { getFormPageParentNode, isNodeDefFormActivePage } from '../surveyFormState'
+import { getFormPageParentNode, getSurveyForm, isNodeDefFormActivePage } from '../surveyFormState'
 
 const FormNavigationItem = (props) => {
   const {
@@ -53,15 +53,16 @@ const FormNavigationItem = (props) => {
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
   const rootNodeDef = getRootNodeDef(survey)
+  const surveyForm = getSurveyForm(state)
 
   const {edit, nodeDef = rootNodeDef} = props
-  const parentNode = getFormPageParentNode(nodeDef)(survey)
+  const parentNode = getFormPageParentNode(survey, nodeDef)(surveyForm)
 
   return {
     childDefs: getNodeDefChildren(nodeDef)(survey),
     label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey)),
 
-    active: isNodeDefFormActivePage(nodeDef)(survey),
+    active: isNodeDefFormActivePage(survey, nodeDef)(surveyForm),
     enabled: edit || isNodeDefRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
   }
 }

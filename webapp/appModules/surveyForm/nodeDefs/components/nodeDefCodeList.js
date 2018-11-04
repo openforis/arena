@@ -18,6 +18,7 @@ import { isRenderDropdown, nodeDefRenderType } from '../../../../../common/surve
 import { toQueryString } from '../../../../../server/serverUtils/request'
 import { getSurvey } from '../../../../survey/surveyState'
 import { getRecord } from '../../record/recordState'
+import { getSurveyForm } from '../../surveyFormState'
 
 const CodeListRenderer = props =>
   isRenderDropdown(props.nodeDef)
@@ -102,7 +103,9 @@ class NodeDefCodeList extends React.Component {
 
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
-  const record = getRecord(survey)
+  const surveyForm = getSurveyForm(state)
+
+  const record = getRecord(surveyForm)
   const {nodeDef, parentNode} = props
 
   const ancestorCodes = Record.getNodeCodeAncestorValues(survey, parentNode, nodeDef)(record)

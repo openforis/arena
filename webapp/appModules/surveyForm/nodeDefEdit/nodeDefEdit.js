@@ -14,7 +14,7 @@ import { createTaxonomy } from '../taxonomyEdit/actions'
 
 import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
-import { getFormNodeDefEdit } from '../surveyFormState'
+import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
 
 class NodeDefEdit extends React.Component {
 
@@ -81,10 +81,11 @@ NodeDefEdit.defaultProps = {
 }
 const mapStateToProps = state => {
   const survey = getSurvey(state)
+  const surveyForm = getSurveyForm(state)
 
   return {
     survey,
-    nodeDef: getFormNodeDefEdit(survey),
+    nodeDef: getFormNodeDefEdit(survey)(surveyForm),
   }
 }
 

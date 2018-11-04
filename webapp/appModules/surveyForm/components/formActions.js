@@ -12,7 +12,7 @@ import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nod
 import { getSurvey } from '../../../survey/surveyState'
 
 import { createNodeDef } from '../../../survey/nodeDefs/actions'
-import { getFormActivePageNodeDef, getNodeDefFormUnlocked } from '../surveyFormState'
+import { getFormActivePageNodeDef, getNodeDefFormUnlocked, getSurveyForm } from '../surveyFormState'
 
 const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
   const isEntity = type === nodeDefType.entity
@@ -127,9 +127,10 @@ class FormActions extends React.Component {
 
 const mapStateToProps = state => {
   const survey = getSurvey(state)
+  const surveyForm = getSurveyForm(state)
 
-  const nodeDefUnlocked = getNodeDefFormUnlocked(survey)
-  const nodeDefActivePage = getFormActivePageNodeDef(survey)
+  const nodeDefUnlocked = getNodeDefFormUnlocked(survey)(surveyForm)
+  const nodeDefActivePage = getFormActivePageNodeDef(survey)(surveyForm)
 
   const nodeDef = nodeDefUnlocked &&
   (

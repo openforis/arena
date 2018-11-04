@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import Survey from '../../../../common/survey/survey'
+import { getSurveyForm } from '../surveyFormState'
 
 // DOCS
 const surveyState = {
@@ -33,10 +34,11 @@ const levelActiveItems = 'levelActiveItems'
 
 export const initCodeListEdit = (codeListUUID) => codeListUUID ? {codeListUUID} : null
 
-export const getCodeListEditCodeList = survey => R.pipe(
-  R.path([codeListEdit, codeListUUID]),
-  codeListUUUID => Survey.getCodeListByUUID(codeListUUUID)(survey),
-)(survey)
+export const getCodeListEditCodeList = survey =>
+  surveyForm => R.pipe(
+    R.path([codeListEdit, codeListUUID]),
+    codeListUUUID => Survey.getCodeListByUUID(codeListUUUID)(survey),
+  )(surveyForm)
 
 // ==== level
 export const dissocLevel = levelIndex => R.pipe(
@@ -49,7 +51,7 @@ export const dissocLevel = levelIndex => R.pipe(
 export const assocLevelItems = (levelIndex, items) =>
   R.assocPath([levelItems, levelIndex], items)
 
-export const getCodeListEditLevelItemsArray = levelIndex => R.pipe(
+export const getCodeListEditLevelItemsArray = (levelIndex) => R.pipe(
   R.pathOr({}, [codeListEdit, levelItems, levelIndex]),
   R.values,
   R.sort((a, b) => Number(a.id) - Number(b.id)),
@@ -81,14 +83,13 @@ const getLevelActiveItemUUID = levelIndex => R.pipe(
 )
 
 export const getCodeListEditLevelActiveItem = levelIndex =>
-  survey => R.pipe(
+  surveyForm => R.pipe(
     getLevelActiveItemUUID(levelIndex),
     activeItemUUID => {
-      const levelItems = getCodeListEditLevelItemsArray(levelIndex)(survey)
+      const levelItems = getCodeListEditLevelItemsArray(levelIndex)(surveyForm)
       return R.find(item => item.uuid === activeItemUUID, levelItems)
     },
-  )(survey)
-
+  )(surveyForm)
 
 export const assocLevelActiveItem = (levelIndex, itemUUID) => R.pipe(
   resetNextLevels(levelIndex, levelItems),

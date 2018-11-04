@@ -10,6 +10,7 @@ import { getRecord } from './recordState'
 
 import { newRecord, getParentNode } from '../../../../common/record/record'
 import { newNodePlaceholder } from '../../../../common/record/node'
+import { getSurveyForm } from '../surveyFormState'
 
 export const recordCreate = 'survey/record/create'
 export const nodesUpdate = 'survey/record/node/update'
@@ -57,9 +58,10 @@ export const updateNode = (nodeDef, node, value, file = null) =>
   async (dispatch, getState) => {
 
     const state = getState()
-    const survey = getSurvey(state)
     const surveyId = getStateSurveyId(state)
-    const record = getRecord(survey)
+    const surveyForm = getSurveyForm(state)
+
+    const record = getRecord(surveyForm)
     const parentNode = getParentNode(node)(record)
 
     // first update state

@@ -20,6 +20,7 @@ import {
   setTaxonomyForEdit,
   deleteTaxonomy,
 } from '../taxonomyEdit/actions'
+import { getSurveyForm } from '../surveyFormState'
 
 class TaxonomiesView extends React.Component {
 
@@ -58,6 +59,7 @@ TaxonomiesView.defaultProps = {
 
 const mapStateToProps = state => {
   const survey = getSurvey(state)
+  const surveyForm = getSurveyForm(state)
 
   const taxonomies = R.pipe(
     getTaxonomiesArray,
@@ -69,7 +71,7 @@ const mapStateToProps = state => {
 
   return {
     taxonomies,
-    taxonomy: getTaxonomyEditTaxonomy(survey),
+    taxonomy: getTaxonomyEditTaxonomy(survey)(surveyForm),
   }
 }
 

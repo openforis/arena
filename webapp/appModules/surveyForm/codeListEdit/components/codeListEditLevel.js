@@ -21,6 +21,7 @@ import {
 import { createCodeListItem } from '../actions'
 import { putCodeListItemProp, putCodeListLevelProp } from '../actions'
 import { deleteCodeListItem, deleteCodeListLevel, setCodeListItemForEdit } from '../actions'
+import { getSurveyForm } from '../../surveyFormState'
 
 class CodeListEditLevel extends React.Component {
 
@@ -96,14 +97,15 @@ const mapStateToProps = (state, props) => {
   const {index} = level
 
   const survey = getSurvey(state)
+  const surveyForm = getSurveyForm(state)
   const language = Survey.getSurveyDefaultLanguage(survey)
 
-  const codeList = getCodeListEditCodeList(survey)
-  const activeItem = getCodeListEditLevelActiveItem(index)(survey)
-  const parentItem = getCodeListEditLevelActiveItem(index - 1)(survey)
+  const codeList = getCodeListEditCodeList(survey)(surveyForm)
+  const activeItem = getCodeListEditLevelActiveItem(index)(surveyForm)
+  const parentItem = getCodeListEditLevelActiveItem(index - 1)(surveyForm)
 
   const canAddItem = index === 0 || parentItem
-  const items = canAddItem ? getCodeListEditLevelItemsArray(index)(survey) : []
+  const items = canAddItem ? getCodeListEditLevelItemsArray(index)(surveyForm) : []
   const canBeDeleted = CodeList.isCodeListLevelDeleteAllowed(level)(codeList)
 
   return {
