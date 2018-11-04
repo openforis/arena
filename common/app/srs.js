@@ -22,7 +22,7 @@ const formatName = (name = '') => R.replace(/_/g, ' ')(name)
  */
 const srs = R.pipe(
   R.merge(geographic),
-  R.mapObjIndexed((value, key, obj) => {return {key, value: formatName(value.name)}}),
+  R.mapObjIndexed((value, key) => ({key, value: formatName(value.name)})),
   R.values,
   R.sortBy(R.prop('value'))
 )(projected)

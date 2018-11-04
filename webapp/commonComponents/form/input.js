@@ -3,7 +3,7 @@ import './form.scss'
 import React from 'react'
 
 import { TooltipError } from '../tooltip'
-import MaskedInput from 'react-text-mask'
+import { TextMask, InputAdapter } from 'react-text-mask-hoc'
 
 export const FormItem = ({label, children}) => (
   <div className="form-item">
@@ -23,11 +23,13 @@ export const Input = React.forwardRef((props, ref) => {
 
   return (
     <TooltipError messages={validation.errors}>
-      <MaskedInput ref={ref}
-                   mask={mask}
-                   className="form-input"
-                   aria-disabled={disabled}
-                   {...inputProps}
+      <TextMask ref={ref}
+                Component={InputAdapter}
+                mask={mask}
+                className="form-input"
+                aria-disabled={disabled}
+                isControlled={true}
+                {...inputProps}
       />
     </TooltipError>
   )

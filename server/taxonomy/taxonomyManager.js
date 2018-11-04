@@ -159,7 +159,7 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
 
 const publishTaxonomiesProps = async (surveyId, client = db) => {
   await publishSurveySchemaTableProps(surveyId, 'taxonomy', client)
-
+  await publishSurveySchemaTableProps(surveyId, 'taxon', client)
   await publishSurveySchemaTableProps(surveyId, 'taxon_vernacular_name', client)
 }
 

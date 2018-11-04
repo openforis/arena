@@ -4,7 +4,6 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Dropdown from './dropdown'
-import { TooltipError } from '../tooltip'
 
 const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
   R.is(Object, item) ?
@@ -86,6 +85,8 @@ const InputChips = (props) => {
         selection.map((item) =>
           <Chip key={getItemKey(item, itemKeyFunction, itemKeyProp)}
                 item={item}
+                itemKeyProp={itemKeyProp}
+                itemKeyFunction={itemKeyFunction}
                 itemLabelFunction={itemLabelFunction}
                 itemLabelProp={itemLabelProp}
                 onDelete={removeItem}

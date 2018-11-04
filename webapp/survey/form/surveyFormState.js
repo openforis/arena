@@ -49,6 +49,7 @@ export const getFormNodeDefEdit = survey => getNodeDefByUUID(
 // ====== current unlocked nodeDef in form
 const nodeDefUnlocked = 'nodeDefUnlocked'
 const nodeDefEntityUnlockedPath = [form, nodeDefUnlocked]
+
 export const assocNodeDefFormUnlocked = nodeDef =>
   R.assoc(nodeDefUnlocked, nodeDef ? nodeDef.uuid : null)
 
@@ -68,7 +69,7 @@ const surveyFormPages = ['form', 'pageNodes']
 const getSurveyFormPageNodePath = nodeDef => R.append(nodeDef.uuid, surveyFormPages)
 
 export const assocFormPageNode = (nodeDef, nodeUUID) => {
-  const path = getSurveyFormPageNodePath(nodeDef)
+  const path = ['pageNodes', nodeDef.uuid]
   return nodeUUID
     ? R.assocPath(path, nodeUUID)
     : R.dissocPath(path)

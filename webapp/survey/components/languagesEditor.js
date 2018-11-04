@@ -25,6 +25,7 @@ class LanguagesEditor extends React.Component {
     return <div className="form-item">
       <label className="form-label">Language(s)</label>
       <InputChips items={languages}
+                  itemKeyProp="key"
                   selection={selection}
                   onChange={(selectedItems) => this.onLanguagesChange(selectedItems)}
                   requiredItems={1}/>

@@ -108,6 +108,7 @@ export const nodeDefSystemProps = {
   [nodeDefType.taxon]: {
     component: NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left"/>,
+    fieldsCount: 3,
     defaultValue: {
       code: '',
       family: '',

@@ -128,14 +128,14 @@ class AutocompleteDialog extends React.Component {
   }
 
   calculatePosition () {
-    const {alignToElement} = this.props
+    const {inputField} = this.props
 
     const {
       top,
       left,
       height,
       width,
-    } = elementOffset(alignToElement)
+    } = elementOffset(inputField)
 
     return {
       top: (top + height),
@@ -165,6 +165,14 @@ class AutocompleteDialog extends React.Component {
       </div>
     )
   }
+}
+
+AutocompleteDialog.defaultProps = {
+  items: [],
+  itemRenderer: null,
+  itemKeyFunction: null,
+  inputField: null,
+  className: '',
 }
 
 export default AutocompleteDialog
