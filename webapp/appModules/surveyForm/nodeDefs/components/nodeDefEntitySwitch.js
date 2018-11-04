@@ -13,7 +13,7 @@ import {
   isRenderTable,
 } from '../../../../../common/survey/nodeDefLayout'
 
-import { putNodeDefProp, } from '../../actions'
+import { putNodeDefProp, } from '../../../../survey/nodeDefs/actions'
 import { getSurvey } from '../../../../survey/surveyState'
 
 class NodeDefEntitySwitch extends React.Component {

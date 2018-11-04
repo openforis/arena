@@ -33,7 +33,7 @@ const plugins = [
 ]
 
 const webPackConfig = {
-  entry: ['babel-polyfill', './webapp/main.js'],
+  entry: ['@babel/polyfill', './webapp/main.js'],
   mode: prodBuild ? mode.production : mode.development,
   output: {
     filename: 'bundle-[hash].js',
@@ -48,8 +48,8 @@ const webPackConfig = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['env', 'react'],
-            plugins: ['transform-object-rest-spread']
+            presets: ['@babel/env', '@babel/react'],
+            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import']
           }
         }
       },
@@ -68,7 +68,7 @@ const webPackConfig = {
   plugins: plugins
 }
 
-if (prodBuild) {
+// if (prodBuild) {
   const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
   webpack.optimization = {
@@ -79,13 +79,13 @@ if (prodBuild) {
           compress: true,
           output: {comments: false},
         },
-        sourceMap: false
+        sourceMap: true
       }),
       new OptimizeCSSAssetsPlugin({})
     ]
   }
 
-}
+// }
 // else {
 webPackConfig.devtool = 'source-map'
 // }
