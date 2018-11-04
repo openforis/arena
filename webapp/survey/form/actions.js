@@ -32,7 +32,7 @@ export const setFormActivePage = (nodeDef) => dispatch =>
 
 
 // current node of active form page
-export const formPageNodeUpdate = 'survey/form/pageParentNode/update'
+export const formPageNodeUpdate = 'survey/form/pageNode/update'
 
 export const setFormPageNode = (nodeDef, node) => dispatch =>
   dispatch({type: formPageNodeUpdate, nodeDef, node})

@@ -31,11 +31,13 @@ class Dropdown extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const {items, autocompleteMinChars} = this.props
-    if (prevProps.items.length !== items.length ||
-      !R.equals(prevProps.items, items))
+    const {items, selection, autocompleteMinChars} = this.props
+    const {items: prevItems, selection: prevSelection} = prevProps
+
+    if (!R.equals(prevItems, items) || !R.equals(selection, prevSelection))
       this.setState({
-        items: autocompleteMinChars > 0 ? [] : items
+        displayValue: this.getItemLabel(selection),
+        items: autocompleteMinChars > 0 ? [] : items,
       })
   }
 
@@ -57,7 +59,6 @@ class Dropdown extends React.Component {
     onChange(item)
 
     this.setState({
-      selection: clearOnSelection ? null : item,
       displayValue: clearOnSelection ? '' : this.getItemLabel(item),
       opened: false,
     })
@@ -113,12 +114,16 @@ class Dropdown extends React.Component {
 
   getItemLabel (item = '') {
     const {itemLabelFunction, itemLabelProp} = this.props
-    return this.extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value')
+    return R.defaultTo('', this.extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value'))
   }
 
   getItemKey (item) {
     const {itemKeyFunction, itemKeyProp} = this.props
     return this.extractValueFromFunctionOrProp(item, itemKeyFunction, itemKeyProp, 'key')
+  }
+
+  getInputField() {
+    return this.input.current.component.input
   }
 
   extractValueFromFunctionOrProp (item, func, prop, defaultProp) {
@@ -184,8 +189,7 @@ class Dropdown extends React.Component {
                                 items={items}
                                 itemRenderer={DropdownItemRenderer}
                                 itemKeyFunction={item => this.getItemKey(item)}
-                                inputField={this.input.current.inputElement}
-                                alignToElement={this.input.current.inputElement}
+                                inputField={this.getInputField()}
                                 onItemSelect={item => this.onSelectionChange(item)}
                                 onClose={() => this.toggleOpened()}/>,
             document.body
