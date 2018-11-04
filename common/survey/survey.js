@@ -150,7 +150,6 @@ const getNodeDefsByTaxonomyUUID = (uuid) => R.pipe(
  */
 const assocNodeDefs = newNodeDefs => R.assoc(nodeDefs, newNodeDefs)
 
-
 /**
  * ======
  * READ Code Lists
@@ -312,12 +311,15 @@ module.exports = {
   getSurveyLabels,
   getSurveyDefaultLabel,
   getSurveyDescriptions: getSurveyInfoProp('descriptions', {}),
-  getSurveySrs: getSurveyInfoProp('srs', []),
+
   getSurveyDefaultStep,
 
   getSurveyStatus,
   isSurveyPublished,
   isSurveyDraft,
+
+  // === context is surveyInfo
+  getSurveySrs: getProp('srs', []),
 
   // READ nodeDefs
   getNodeDefs,
@@ -334,7 +336,6 @@ module.exports = {
 
   // UPDATE nodeDefs
   assocNodeDefs,
-
 
   // UTILS NodeDefs
   getNodeDefParent,

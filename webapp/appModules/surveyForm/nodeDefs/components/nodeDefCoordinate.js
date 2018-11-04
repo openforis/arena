@@ -22,7 +22,7 @@ class NodeDefCoordinate extends React.Component {
   }
 
   render () {
-    const {survey, nodeDef, nodes, edit, entry, renderType, label} = this.props
+    const {surveyInfo, nodeDef, nodes, edit, entry, renderType, label} = this.props
 
     // table header
     if (renderType === nodeDefRenderType.tableHeader) {
@@ -38,7 +38,7 @@ class NodeDefCoordinate extends React.Component {
 
     const node = entry ? nodes[0] : null
     const value = node ? node.value : getNodeDefDefaultValue(nodeDef)
-    const srsItems = toSrsItems(getSurveySrs(survey))
+    const srsItems = toSrsItems(getSurveySrs(surveyInfo))
 
     if (renderType === nodeDefRenderType.tableBody) {
       return <div className="node-def__table-row-coordinate node-def__table-data-composite-attr">

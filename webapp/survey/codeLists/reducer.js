@@ -16,18 +16,12 @@ import {
   codeListItemPropUpdate,
 } from './actions'
 
-const simulateSurveyState = (codeLists) =>
-  codeLists ? {codeLists} : {}
-
 const actionHandlers = {
   // reset state
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
 
-  [surveyDefsLoad]: (state, {codeLists}) => R.pipe(
-    assocCodeLists(codeLists),
-    getCodeLists,
-  )(simulateSurveyState(state)),
+  [surveyDefsLoad]: (state, {codeLists}) => codeLists,
 
   // code list
   [codeListCreate]: (state, {codeList}) => R.assoc(codeList.uuid, codeList, state),

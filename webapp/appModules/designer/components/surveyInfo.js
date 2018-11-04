@@ -35,7 +35,7 @@ class SurveyInfo extends React.Component {
   render () {
     const {survey, surveyInfo} = this.props
     const validation = getValidation(surveyInfo)
-    const surveySrs = getSurveySrs(survey).map(code => ({key: code, value: getSrsName(code)}))
+    const surveySrs = getSurveySrs(surveyInfo).map(code => ({key: code, value: getSrsName(code)}))
 
     return (
       <div className="form">
