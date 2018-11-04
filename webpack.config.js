@@ -56,7 +56,9 @@ const webPackConfig = {
       {
         test: /\.(sa|sc|c)ss$/,
         use: [
-          prodBuild ? MiniCssExtractPlugin.loader : 'style-loader',
+          {
+            loader: MiniCssExtractPlugin.loader
+          },
           'css-loader',
           'sass-loader',
         ]
@@ -83,8 +85,9 @@ if (prodBuild) {
     ]
   }
 
-} else {
-  webPackConfig.devtool = 'source-map'
 }
+// else {
+webPackConfig.devtool = 'source-map'
+// }
 
 module.exports = webPackConfig
