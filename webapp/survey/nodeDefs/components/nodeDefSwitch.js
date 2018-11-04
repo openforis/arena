@@ -2,17 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import {
-  getNoColumns,
-  nodeDefLayoutProps,
-  getPageUUID,
-} from '../../../../common/survey/nodeDefLayout'
+import Survey from '../../../../common/survey/survey'
+import NodeDef from '../../../../common/survey/nodeDef'
+import Record from '../../../../common/record/record'
+import Layout from '../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefLabel, isNodeDefRoot, isNodeDefMultiple, isNodeDefEntity } from '../../../../common/survey/nodeDef'
-import { getNodeChildrenByDefId, getRootNode } from '../../../../common/record/record'
-
-import { getSurvey} from '../../surveyState'
-import { getSurveyDefaultLanguage } from '../../../../common/survey/survey'
+import { getSurvey } from '../../surveyState'
 
 import { setFormNodeDefEdit, setFormNodeDefUnlocked } from '../../form/actions'
 import { isNodeDefFormLocked } from '../../form/surveyFormState'
@@ -20,18 +15,15 @@ import { isNodeDefFormLocked } from '../../form/surveyFormState'
 import { putNodeDefProp, removeNodeDef } from '../actions'
 import { getNodeDefComponent, getNodeDefDefaultValue } from './nodeDefSystemProps'
 
-
 import { getRecord } from '../../record/recordState'
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
-
-
 
 class NodeDefSwitch extends React.Component {
 
   checkNodePlaceholder () {
     const {entry, nodes, nodeDef, parentNode, createNodePlaceholder} = this.props
 
-    if (entry && !isNodeDefEntity(nodeDef) && (R.isEmpty(nodes) || isNodeDefMultiple(nodeDef))) {
+    if (entry && !NodeDef.isNodeDefEntity(nodeDef) && (R.isEmpty(nodes) || NodeDef.isNodeDefMultiple(nodeDef))) {
       const hasNotPlaceholder = R.pipe(
         R.find(R.propEq('placeholder', true)),
         R.isNil,
@@ -68,9 +60,9 @@ class NodeDefSwitch extends React.Component {
       removeNodeDef,
     } = this.props
 
-    const isRoot = isNodeDefRoot(nodeDef)
+    const isRoot = NodeDef.isNodeDefRoot(nodeDef)
     const invalid = nodeDef.validation && !nodeDef.validation.valid
-    const isPage = !!getPageUUID(nodeDef)
+    const isPage = !!Layout.getPageUUID(nodeDef)
 
     return <div className={`${isPage ? 'node-def__form_page' : 'node-def__form'}`} ref="nodeDefElem">
       {
@@ -86,17 +78,16 @@ class NodeDefSwitch extends React.Component {
         edit ?
           <div className="node-def__form-actions">
             {
-              locked ?
-                null :
+              !locked &&
                 <React.Fragment>
                   {
                     isPage ?
                       <div className="btn-of-light-xs node-def__form-root-actions">
                         columns
-                        <input value={getNoColumns(nodeDef)}
+                        <input value={Layout.getNoColumns(nodeDef)}
                                type="number" min="1" max="6"
                                onChange={e => e.target.value > 0 ?
-                                 putNodeDefProp(nodeDef, nodeDefLayoutProps.columns, e.target.value)
+                                 putNodeDefProp(nodeDef, Layout.nodeDefLayoutProps.columns, e.target.value)
                                  : null
                                }/>
                       </div>
@@ -125,10 +116,13 @@ class NodeDefSwitch extends React.Component {
                 </React.Fragment>
             }
 
-            <button className="btn-s btn-of-light-xs"
-                    onClick={() => setFormNodeDefUnlocked(locked ? nodeDef : null)}>
-              <span className={`icon icon-${locked ? 'lock' : 'unlocked'} icon-12px`}/>
-            </button>
+            {
+              NodeDef.isNodeDefEntity(nodeDef) &&
+              <button className="btn-s btn-of-light-xs"
+                      onClick={() => setFormNodeDefUnlocked(locked ? nodeDef : null)}>
+                <span className={`icon icon-${locked ? 'lock' : 'unlocked'} icon-12px`}/>
+              </button>
+            }
 
           </div>
           : null
@@ -152,17 +146,18 @@ const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
 
   const mapEntryProps = () => ({
-    nodes: isNodeDefRoot(nodeDef)
-      ? [getRootNode(getRecord(survey))]
-      // : getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(survey))
+    nodes: NodeDef.isNodeDefRoot(nodeDef)
+      ? [Record.getRootNode(getRecord(survey))]
+      // : Record.getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(survey))
       : parentNode
-        ? getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(survey))
+        ? Record.getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(survey))
         : []
   })
 
   return {
-    locked: isNodeDefFormLocked(nodeDef)(survey),
-    label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey)),
+    // always unlocking attributes
+    locked: NodeDef.isNodeDefEntity(nodeDef) ? isNodeDefFormLocked(nodeDef)(survey) : false,
+    label: NodeDef.getNodeDefLabel(nodeDef, Survey.getSurveyDefaultLanguage(survey)),
     ...entry ? mapEntryProps() : {},
   }
 }

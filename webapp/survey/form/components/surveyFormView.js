@@ -22,7 +22,6 @@ const SurveyFormView = (props) => {
     nodeDef,
     edit,
     entry,
-    draft,
 
     recordLoaded,
     recordId,
@@ -49,7 +48,6 @@ const SurveyFormView = (props) => {
                                nodeDef={nodeDef}
                                edit={edit}
                                entry={entry}
-                               draft={draft}
                                recordId={recordId}
                                parentNode={parentNode}/>
               : <div/>
@@ -75,8 +73,6 @@ SurveyFormView.defaultProps = {
   edit: false,
   // can entry data
   entry: false,
-  // load draft props
-  draft: false,
   // if record to edit had been loaded
   recordLoaded: null,
   // recordId of current record

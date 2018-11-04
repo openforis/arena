@@ -6,7 +6,8 @@ import { connect } from 'react-redux'
 import NodeDefEntityTable from './nodeDefEntityTable'
 import NodeDefEntityForm from './nodeDefEntityForm'
 
-import { getNodeDefChildren } from '../../../../../common/survey/survey'
+import Survey from '../../../../../common/survey/survey'
+
 import {
   isRenderForm,
   isRenderTable,
@@ -31,12 +32,11 @@ class NodeDefEntitySwitch extends React.Component {
 
 NodeDefEntitySwitch.defaultProps = {
   entityDef: {},
-  draft: false,
   edit: false,
 }
 
 const mapStateToProps = (state, props) => ({
-  childDefs: getNodeDefChildren(props.nodeDef)(getSurvey(state)),
+  childDefs: Survey.getNodeDefChildren(props.nodeDef)(getSurvey(state)),
 })
 
 export default connect(
