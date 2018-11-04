@@ -6,12 +6,7 @@ import { newTaxonomy } from '../../../../common/survey/taxonomy'
 import { getStateSurveyId, getSurvey } from '../../../survey/surveyState'
 import { showAppJobMonitor } from '../../../app/components/job/actions'
 import { getTaxonomyEditTaxaPerPage } from './taxonomyEditState'
-
-// taxonomy actions
-export const taxonomyCreate = 'survey/taxonomy/create'
-export const taxonomyUpdate = 'survey/taxonomy/update'
-export const taxonomyPropUpdate = 'survey/taxonomy/prop/update'
-export const taxonomyDelete = 'survey/taxonomy/delete'
+import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../../../survey/taxonomies/actions'
 
 // taxonomy editor actions
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'

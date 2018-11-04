@@ -34,7 +34,7 @@ const defaultSteps = {
  * ======
  */
 const info = 'info'
-const getSurveyInfo = R.propOr(null, info)
+const getSurveyInfo = R.propOr({}, info)
 
 const getSurveyId = R.pipe(
   getSurveyInfo,

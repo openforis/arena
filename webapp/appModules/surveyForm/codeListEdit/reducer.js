@@ -19,17 +19,15 @@ import {
 import {
   codeListEditUpdate,
 
-  codeListLevelDelete,
-
-  codeListItemsUpdate,
   codeListEditLevelActiveItemUpdate,
 
-  codeListItemCreate,
-  codeListItemUpdate,
-  codeListItemPropUpdate,
+  } from './actions'
+import {
+  codeListCreate, codeListItemCreate,
   codeListItemDelete,
-  codeListCreate,
-} from './actions'
+  codeListItemPropUpdate, codeListItemsUpdate,
+  codeListItemUpdate, codeListLevelDelete
+} from '../../../survey/codeLists/actions'
 
 const actionHandlers = {
   // reset form

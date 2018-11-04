@@ -5,15 +5,19 @@ import { exportReducer } from '../../appUtils/reduxUtils'
 import { surveyUpdate } from '../actions'
 import { formReset } from '../../appModules/surveyForm/actions'
 
-import { codeListsUpdate } from './actions'
 import { getCodeLists, assocCodeLists } from '../../../common/survey/survey'
+
 import {
+  codeListsUpdate,
   codeListCreate,
-  codeListDelete,
   codeListUpdate,
   codeListPropUpdate,
-  codeListLevelPropUpdate, codeListItemPropUpdate, codeListLevelDelete,
-} from '../../appModules/surveyForm/codeListEdit/actions'
+  codeListDelete,
+  codeListLevelPropUpdate,
+  codeListLevelDelete,
+  codeListItemPropUpdate,
+} from './actions'
+
 
 const simulateSurveyState = (codeLists) =>
   codeLists ? {codeLists} : {}

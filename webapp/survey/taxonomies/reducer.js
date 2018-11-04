@@ -4,13 +4,13 @@ import * as R from 'ramda'
 import { surveyUpdate } from '../actions'
 import { formReset } from '../../appModules/surveyForm/actions'
 
-import { taxonomiesLoad } from './actions'
-import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../../appModules/surveyForm/taxonomyEdit/actions'
+import { taxonomiesLoad, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from './actions'
+import { taxonomyCreate} from './actions'
 
 const actionHandlers = {
   // reset form
-  [surveyUpdate]: () => null,
-  [formReset]: () => null,
+  [surveyUpdate]: () => ({}),
+  [formReset]: () => ({}),
 
   [taxonomiesLoad]: (state, {taxonomies}) => taxonomies,
 

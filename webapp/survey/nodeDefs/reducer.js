@@ -22,8 +22,8 @@ import {
 
 const actionHandlers = {
   // reset form
-  [surveyUpdate]: () => null,
-  [formReset]: () => null,
+  [surveyUpdate]: () => ({}),
+  [formReset]: () => ({}),
 
   [nodeDefsLoad]: (state = {}, {nodeDefs}) => nodeDefs,
 
