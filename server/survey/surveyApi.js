@@ -22,9 +22,6 @@ const {
   validateSurvey,
 } = require('./surveyValidator')
 
-const {fetchTaxonomiesBySurveyId} = require('../taxonomy/taxonomyManager')
-const {fetchCodeListsBySurveyId} = require('../codeList/codeListManager')
-
 module.exports.init = app => {
 
   // ==== CREATE
@@ -78,8 +75,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'id')
       const draft = getBoolParam(req, 'draft')
+      const validate = getBoolParam(req, 'validate')
 
-      const nodeDefs = await fetchSurveyNodeDefs(surveyId, draft, draft)
+      const nodeDefs = await fetchSurveyNodeDefs(surveyId, draft, validate)
 
       res.json({nodeDefs})
     } catch (err) {
