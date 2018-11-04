@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import { exportReducer } from '../../appUtils/reduxUtils'
 
 import { surveyUpdate } from '../actions'
-import { formReset } from '../form/actions'
+import { formReset } from '../../appModules/surveyForm/actions'
 
 import { codeListsUpdate } from './actions'
 import { getCodeLists, assocCodeLists } from '../../../common/survey/survey'
@@ -13,7 +13,7 @@ import {
   codeListUpdate,
   codeListPropUpdate,
   codeListLevelPropUpdate, codeListItemPropUpdate, codeListLevelDelete,
-} from '../codeListEdit/actions'
+} from '../../appModules/surveyForm/codeListEdit/actions'
 
 const simulateSurveyState = (codeLists) =>
   codeLists ? {codeLists} : {}

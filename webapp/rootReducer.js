@@ -2,13 +2,13 @@ import { combineReducers } from 'redux'
 
 // == survey reducer
 import info from './survey/surveyInfo/reducer'
-import form from './survey/form/reducer'
+import form from './appModules/surveyForm/reducer'
 import nodeDefs from './survey/nodeDefs/reducer'
 import codeLists from './survey/codeLists/reducer'
-import codeListEdit from './survey/codeListEdit/reducer'
+import codeListEdit from './appModules/surveyForm/codeListEdit/reducer'
 import taxonomies from './survey/taxonomies/reducer'
-import taxonomyEdit from './survey/taxonomyEdit/reducer'
-import record from './survey/record/reducer'
+import taxonomyEdit from './appModules/surveyForm/taxonomyEdit/reducer'
+import record from './appModules/surveyForm/record/reducer'
 
 const survey = combineReducers({
   info,

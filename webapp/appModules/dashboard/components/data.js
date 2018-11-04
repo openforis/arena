@@ -10,7 +10,7 @@ import { getSurvey } from '../../../survey/surveyState'
 
 import Survey from '../../../../common/survey/survey'
 
-import { createRecord } from '../../../survey/record/actions'
+import { createRecord } from '../../surveyForm/record/actions'
 
 class Data extends React.Component {
 

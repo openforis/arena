@@ -1,12 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import SurveyFormView from '../../survey/form/components/surveyFormView'
+import SurveyFormView from '../surveyForm/surveyFormView'
 
 import { fetchNodeDefs } from '../../survey/nodeDefs/actions'
 import { fetchCodeLists } from '../../survey/codeLists/actions'
 import { fetchTaxonomies } from '../../survey/taxonomies/actions'
-import { resetForm } from '../../survey/form/actions'
+import { resetForm } from '../surveyForm/actions'
 
 class DataRecordView extends React.Component {
 

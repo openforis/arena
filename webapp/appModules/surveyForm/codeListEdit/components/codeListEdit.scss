@@ -1,0 +1,102 @@
+@import "../../../../style/vars";
+
+.code-lists__edit {
+  display: grid;
+  grid-template-rows: 5rem 1fr 5rem;
+  align-items: center;
+  margin: 0 5rem;
+}
+
+.code-lists__edit-levels {
+  display: flex;
+  //justify-content: center;
+  overflow-x: auto;
+
+  .btn-add-level {
+    align-self: start;
+    margin-left: 1rem;
+  }
+}
+
+.code-lists__edit-level {
+  min-width: 370px;
+  display: grid;
+  align-content: start;
+  padding: .5rem 1rem;
+  border-right: 1px dashed rgba($white, 0.35);
+  border-top: 1px dashed rgba($white, 0.35);
+  border-bottom: 1px dashed rgba($white, 0.35);
+
+  &:first-child {
+    border-left: 1px dashed rgba($white, 0.35);
+  }
+}
+
+.code-lists__edit-level-header {
+  display: flex;
+  justify-content: space-between;
+
+  .label {
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+}
+
+.code-lists__edit-level-items-header {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+  align-items: center;
+
+  .label {
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+  .btn-add-item {
+    margin-left: 1rem;
+  }
+}
+
+.code-lists__edit-level-items {
+  height: calc(100vh - 25rem);
+  overflow-y: auto;
+}
+
+.code-lists__edit-item {
+  position: relative;
+  border-bottom: 1px dotted rgba($white, 0.35);
+  display: grid;
+  align-content: center;
+  grid-template-columns: 35px 80px 1fr;
+  min-height: 35px;
+  grid-row-gap: 2rem;
+
+  &.active {
+    grid-template-columns: 1fr;
+    border: 2px dashed rgba($white, 0.35);
+    background-color: rgba($white, 0.1);
+    padding: 1.5rem 0;
+  }
+
+  &:not(.active):hover {
+    background-color: rgba($white, .15);
+    cursor: pointer;
+  }
+
+  .btn-close {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+  }
+
+  .btn-delete {
+    justify-self: center;
+  }
+
+  .error-badge {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}
+

@@ -5,14 +5,14 @@ import { connect } from 'react-redux'
 
 import TabBar from '../../commonComponents/tabBar'
 import SurveyInfo from './components/surveyInfo'
-import SurveyFormView from '../../survey/form/components/surveyFormView'
-import CodeLists from '../../survey/codeLists/codeListsView'
-import TaxonomiesView from '../../survey/taxonomies/taxonomiesView'
+import SurveyFormView from '../surveyForm/surveyFormView'
+import CodeLists from '../surveyForm/components/codeListsView'
+import TaxonomiesView from '../surveyForm/components/taxonomiesView'
 
 import { fetchNodeDefs } from '../../survey/nodeDefs/actions'
 import { fetchCodeLists } from '../../survey/codeLists/actions'
 import { fetchTaxonomies } from '../../survey/taxonomies/actions'
-import { resetForm } from '../../survey/form/actions'
+import { resetForm } from '../surveyForm/actions'
 
 class DesignerView extends React.Component {
 
