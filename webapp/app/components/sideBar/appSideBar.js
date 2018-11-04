@@ -1,13 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getSurveyInfo } from '../../../../common/survey/survey'
-import { appState } from '../../app'
-import { getSurvey } from '../../../survey/surveyState'
-import { logout } from '../../actions'
-
 import AppSideBarFooter from './appSideBarFooter'
 import AppSideBarModules from './appSideBarModules'
+
+import { getSurveyInfo } from '../../../../common/survey/survey'
+import { getSurvey } from '../../../survey/surveyState'
+import { getUser } from '../../appState'
+import { logout } from '../../actions'
 
 class AppSideBar extends React.Component {
 
@@ -64,7 +64,7 @@ class AppSideBar extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  user: appState.getUser(state),
+  user: getUser(state),
   surveyInfo: getSurveyInfo(getSurvey(state))
 })
 

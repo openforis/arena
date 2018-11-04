@@ -26,7 +26,7 @@ class CodeListsView extends React.Component {
 
   componentDidMount () {
     const {fetchOnMount, fetchCodeLists} = this.props
-    //for now only from surveyDesigner, draft = true
+    //for now only from designer, draft = true
     if (fetchOnMount)
       fetchCodeLists(true)
   }

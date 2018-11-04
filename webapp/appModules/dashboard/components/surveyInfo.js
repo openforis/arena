@@ -1,21 +1,21 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import DeleteSurveyConfirmDialog from './deleteSurveyConfirmDialog'
+import DeleteSurveyDialog from './deleteSurveyDialog'
 
 import {
   isValidSurvey,
   getSurveyName,
   getSurveyStatus,
   isSurveyDraft,
-} from '../../../common/survey/survey'
+} from '../../../../common/survey/survey'
 
-import { getSurvey } from '../../survey/surveyState'
-import { deleteSurvey, publishSurvey } from '../../survey/actions'
-import { appModules } from '../appModules'
-import { appModuleUri } from '../../app/app'
+import { getSurvey } from '../../../survey/surveyState'
+import { deleteSurvey, publishSurvey } from '../../../survey/actions'
+import { appModules } from '../../appModules'
+import { appModuleUri } from '../../appModules'
 
-class SurveyInfoDashboardView extends React.Component {
+class SurveyInfo extends React.Component {
 
   constructor (props) {
     super(props)
@@ -82,10 +82,10 @@ class SurveyInfoDashboardView extends React.Component {
           </button>
 
           {showDialog &&
-          <DeleteSurveyConfirmDialog show={showDialog}
-                                     onCancel={() => this.toggleDeleteConfirmDialog(false)}
-                                     onDelete={() => deleteSurvey()}
-                                     surveyName={getSurveyName(survey)}/>
+          <DeleteSurveyDialog show={showDialog}
+                              onCancel={() => this.toggleDeleteConfirmDialog(false)}
+                              onDelete={() => deleteSurvey()}
+                              surveyName={getSurveyName(survey)}/>
           }
         </div>
 
@@ -98,4 +98,4 @@ const mapStateToProps = state => ({
   survey: getSurvey(state)
 })
 
-export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfoDashboardView)
+export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfo)

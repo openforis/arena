@@ -14,7 +14,7 @@ import { fetchCodeLists } from '../../survey/codeLists/actions'
 import { fetchTaxonomies } from '../../survey/taxonomies/actions'
 import { resetForm } from '../../survey/form/actions'
 
-class SurveyDesignerView extends React.Component {
+class DesignerView extends React.Component {
 
   componentDidMount () {
     const {resetForm, fetchNodeDefs, fetchCodeLists, fetchTaxonomies} = this.props
@@ -43,4 +43,4 @@ class SurveyDesignerView extends React.Component {
 export default connect(
   null,
   {fetchNodeDefs, fetchCodeLists, fetchTaxonomies, resetForm}
-)(SurveyDesignerView)
+)(DesignerView)

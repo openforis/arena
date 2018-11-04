@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { getStateSurveyId } from './surveyState'
-import { appState } from '../app/app'
+import { getUser } from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 import { appUserPrefUpdate } from '../app/actions'
 
@@ -20,7 +20,7 @@ export const setActiveSurvey = (surveyId, draft = true) =>
     dispatchCurrentSurveyUpdate(dispatch, data.survey)
 
     //update userPref
-    const user = appState.getUser(getState())
+    const user = getUser(getState())
     await axios.post(`/api/user/${user.id}/pref/${userPrefNames.survey}/${surveyId}`)
     dispatch({type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId})
 
@@ -40,10 +40,8 @@ export const publishSurvey = () => async (dispatch, getState) => {
 
 export const deleteSurvey = () => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
-
-  dispatchCurrentSurveyUpdate(dispatch, null)
-
   await axios.delete(`/api/survey/${surveyId}`)
 
+  dispatchCurrentSurveyUpdate(dispatch, null)
 }
 

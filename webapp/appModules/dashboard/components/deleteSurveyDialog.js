@@ -1,4 +1,4 @@
-import './deleteSurveyConfirmDialog.scss'
+import './deleteSurveyDialog.scss'
 
 import React from 'react'
 
@@ -7,9 +7,9 @@ import {
   ModalBody,
   ModalHeader,
   ModalFooter,
-} from '../../commonComponents/modal'
+} from '../../../commonComponents/modal'
 
-export default class DeleteSurveyConfirmDialog extends React.Component {
+export default class DeleteSurveyDialog extends React.Component {
   constructor (props) {
     super(props)
 

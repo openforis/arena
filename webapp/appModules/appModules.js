@@ -1,19 +1,10 @@
-import * as R from 'ramda'
-import { appModuleUri } from '../app/app'
-
-const rootStatePath = 'appModules'
-
-export const appDashboard = 'dashboard'
-
-export const apiUri = (surveyId, module, dashboard = false) => (
-  `/api/appModules/${module}${dashboard ? '/dashboard' : ''}/${surveyId}`
-)
+const app = 'app'
 
 export const appModules = {
   home: 'home',
-  surveyDashboard: 'surveyDashboard',
+  dashboard: 'dashboard',
   survey: 'survey',
-  surveyDesigner: 'surveyDesigner',
+  designer: 'designer',
 
   data: 'data',
   dataRecord: 'data/record',
@@ -22,18 +13,11 @@ export const appModules = {
   users: 'users',
 }
 
-export const getData = (module) => R.path([rootStatePath, module, 'data'])
-
-export const getDashboardData = (module) => R.path([rootStatePath, module, 'dashboard'])
-
 export const actionTypes = {
   appModulesDashboardDataLoaded: 'appModules/dashboardData/loaded',
   appModulesDataLoaded: 'appModules/data/loaded',
 }
 
-export const appModulesPath = {
-
-  matches: (path, module) => path === appModuleUri(module),
-
-}
+//default home is dashboard
+export const appModuleUri = (module = appModules.home) => `/${[app, module].join('/')}/`
 

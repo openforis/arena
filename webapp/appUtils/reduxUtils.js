@@ -21,8 +21,6 @@ export const dissocStateProps = (state, props) =>
     R.insertAll(0, props, [])
   )
 
-export const excludePathRoot = R.remove(0, 1)
-
 export const debounceAction = (action, key, delay = 500) => {
   action.meta = {
     debounce: {

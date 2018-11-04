@@ -25,7 +25,7 @@ class TaxonomiesView extends React.Component {
 
   componentDidMount () {
     const {fetchOnMount, fetchTaxonomies} = this.props
-    //for now only from surveyDesigner, draft = true
+    //for now only from designer, draft = true
     if (fetchOnMount)
       fetchTaxonomies(true)
   }

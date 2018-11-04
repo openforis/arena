@@ -3,14 +3,13 @@ import axios from 'axios'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 
-import { getSurvey } from '../surveyState'
-import { getSurveyId, getSurveyDefaultStep } from '../../../common/survey/survey'
-import { appState } from '../../app/app'
+import Survey from '../../../common/survey/survey'
+import { getStateSurveyId, getSurvey } from '../surveyState'
+import { getUser } from '../../app/appState'
+import { getRecord } from './recordState'
 
 import { newRecord, getParentNode } from '../../../common/record/record'
 import { newNodePlaceholder } from '../../../common/record/node'
-
-import { getRecord } from './recordState'
 
 export const recordCreate = 'survey/record/create'
 export const nodesUpdate = 'survey/record/node/update'
@@ -27,10 +26,10 @@ export const createRecord = () => async (dispatch, getState) => {
   try {
     const state = getState()
 
-    const user = appState.getUser(state)
+    const user = getUser(state)
     const survey = getSurvey(state)
-    const surveyId = getSurveyId(survey)
-    const step = getSurveyDefaultStep(survey)
+    const surveyId = getStateSurveyId(state)
+    const step = Survey.getSurveyDefaultStep(survey)
 
     const record = newRecord(user, surveyId, step)
 
@@ -57,8 +56,9 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
 export const updateNode = (nodeDef, node, value, file = null) =>
   async (dispatch, getState) => {
 
-    const survey = getSurvey(getState())
-    const surveyId = getSurveyId(survey)
+    const state = getState()
+    const survey = getSurvey(state)
+    const surveyId = getStateSurveyId(state)
     const record = getRecord(survey)
     const parentNode = getParentNode(node)(record)
 

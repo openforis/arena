@@ -4,11 +4,10 @@ import { Link } from 'react-router-dom'
 
 import * as R from 'ramda'
 
-import DataFetchComponent from '../components/moduleDataFetchComponent'
-import { appModuleUri } from '../../app/app'
-import { appModules, getDashboardData } from '../appModules'
+import { appModuleUri } from '../../appModules'
+import { appModules } from '../../appModules'
 
-class SurveyDesignerDashboardView extends React.Component {
+class Designer extends React.Component {
 
   render () {
     const {surveyDesigner} = this.props
@@ -22,7 +21,6 @@ class SurveyDesignerDashboardView extends React.Component {
     const count = R.prop('count')
 
     return (
-      <DataFetchComponent module={appModules.surveyDesigner} dashboard={true}>
         <div className="app-dashboard__module">
 
           <div className="flex-center title-of">
@@ -45,19 +43,18 @@ class SurveyDesignerDashboardView extends React.Component {
               )
           }
 
-          <Link to={appModuleUri(appModules.surveyDesigner)} className="btn btn-of">
+          <Link to={appModuleUri(appModules.designer)} className="btn btn-of">
             <span className="icon icon-quill icon-left"></span>
             Design
           </Link>
 
         </div>
-      </DataFetchComponent>
     )
   }
 
 }
 
-SurveyDesignerDashboardView.defaultProps = {
+Designer.defaultProps = {
   surveyDesigner: {
     surveyId: -1,
     entityDefns: {count: 0},
@@ -67,7 +64,6 @@ SurveyDesignerDashboardView.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  surveyDesigner: getDashboardData(appModules.surveyDesigner)(state)
 })
 
-export default connect(mapStateToProps)(SurveyDesignerDashboardView)
+export default connect(mapStateToProps)(Designer)

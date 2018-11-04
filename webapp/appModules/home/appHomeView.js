@@ -5,7 +5,7 @@ import { withRouter } from 'react-router-dom'
 import AddSurveyForm from './components/addSurveyForm'
 import SurveysList from './components/surveysList'
 
-import { appModuleUri} from '../../app/app'
+import { appModuleUri} from '../appModules'
 import { getNewSurvey, getSurveys } from './homeState'
 import { appModules } from '../appModules'
 
@@ -28,7 +28,7 @@ class AppHomeView extends React.Component {
     const {surveyInfo, history} = this.props
 
     if (surveyInfo && (!prevSurveyInfo || surveyInfo.id !== prevSurveyInfo.id)) {
-      history.push(appModuleUri(appModules.surveyDashboard))
+      history.push(appModuleUri(appModules.dashboard))
     }
   }
 

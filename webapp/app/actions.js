@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { systemStatus } from './app'
+import { appStatus } from './appState'
 import { stopAppJobMonitoring } from './components/job/actions'
 
 export const appStatusChange = 'app/status/change'
@@ -15,7 +15,7 @@ export const initApp = () => async (dispatch) => {
     const {data} = resp
     const {user, survey} = data
 
-    dispatch({type: appStatusChange, status: systemStatus.ready, user, survey})
+    dispatch({type: appStatusChange, status: appStatus.ready, user, survey})
 
   } catch (e) {
   }
