@@ -20,17 +20,9 @@ import {
   setCodeListForEdit
 } from '../codeListEdit/actions'
 
-import { fetchCodeLists } from '../../../survey/codeLists/actions'
 import { getSurveyForm } from '../surveyFormState'
 
 class CodeListsView extends React.Component {
-
-  componentDidMount () {
-    const {fetchOnMount, fetchCodeLists} = this.props
-    //for now only from designer, draft = true
-    if (fetchOnMount)
-      fetchCodeLists(true)
-  }
 
   render () {
 
@@ -59,10 +51,6 @@ class CodeListsView extends React.Component {
   }
 }
 
-CodeListsView.defaultProps = {
-  fetchOnMount: true,
-}
-
 const mapStateToProps = (state) => {
   const survey = getSurvey(state)
 
@@ -82,5 +70,5 @@ const mapStateToProps = (state) => {
 
 export default connect(
   mapStateToProps,
-  {fetchCodeLists, createCodeList, setCodeListForEdit, deleteCodeList, putCodeListProp, createCodeListLevel}
+  {createCodeList, setCodeListForEdit, deleteCodeList, putCodeListProp, createCodeListLevel}
 )(CodeListsView)

@@ -2,12 +2,11 @@ import * as R from 'ramda'
 
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import { surveyUpdate } from '../actions'
+import { surveyCreate, surveyDefsLoad, surveyUpdate } from '../actions'
 
 import { getCodeLists, assocCodeLists } from '../../../common/survey/survey'
 
 import {
-  codeListsUpdate,
   codeListCreate,
   codeListUpdate,
   codeListPropUpdate,
@@ -17,14 +16,15 @@ import {
   codeListItemPropUpdate,
 } from './actions'
 
-
 const simulateSurveyState = (codeLists) =>
   codeLists ? {codeLists} : {}
 
 const actionHandlers = {
+  // reset state
+  [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
 
-  [codeListsUpdate]: (state, {codeLists}) => R.pipe(
+  [surveyDefsLoad]: (state, {codeLists}) => R.pipe(
     assocCodeLists(codeLists),
     getCodeLists,
   )(simulateSurveyState(state)),

@@ -9,21 +9,17 @@ import SurveyFormView from '../surveyForm/surveyFormView'
 import CodeLists from '../surveyForm/components/codeListsView'
 import TaxonomiesView from '../surveyForm/components/taxonomiesView'
 
-import { fetchNodeDefs } from '../../survey/nodeDefs/actions'
-import { fetchCodeLists } from '../../survey/codeLists/actions'
-import { fetchTaxonomies } from '../../survey/taxonomies/actions'
+import { initSurveyDefs } from '../../survey/actions'
 import { resetForm } from '../surveyForm/actions'
 
 class DesignerView extends React.Component {
 
   componentDidMount () {
-    const {resetForm, fetchNodeDefs, fetchCodeLists, fetchTaxonomies} = this.props
+    const {resetForm, initSurveyDefs} = this.props
 
     resetForm()
     //TODO edit and validate based on user role
-    fetchNodeDefs(true, true)
-    fetchCodeLists(true, true)
-    fetchTaxonomies(true, true)
+    initSurveyDefs(true, true)
   }
 
   render () {
@@ -42,5 +38,5 @@ class DesignerView extends React.Component {
 
 export default connect(
   null,
-  {fetchNodeDefs, fetchCodeLists, fetchTaxonomies, resetForm}
+  {initSurveyDefs, resetForm}
 )(DesignerView)

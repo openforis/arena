@@ -14,7 +14,6 @@ import { getTaxonomyName } from '../../../../common/survey/taxonomy'
 import { getSurvey } from '../../../survey/surveyState'
 import { getTaxonomyEditTaxonomy } from '../taxonomyEdit/taxonomyEditState'
 
-import { fetchTaxonomies } from '../../../survey/taxonomies/actions'
 import {
   createTaxonomy,
   setTaxonomyForEdit,
@@ -23,13 +22,6 @@ import {
 import { getSurveyForm } from '../surveyFormState'
 
 class TaxonomiesView extends React.Component {
-
-  componentDidMount () {
-    const {fetchOnMount, fetchTaxonomies} = this.props
-    //for now only from designer, draft = true
-    if (fetchOnMount)
-      fetchTaxonomies(true)
-  }
 
   render () {
     const {taxonomy, taxonomies, selectedTaxonomyUUID, createTaxonomy, setTaxonomyForEdit, deleteTaxonomy} = this.props
@@ -53,10 +45,6 @@ class TaxonomiesView extends React.Component {
   }
 }
 
-TaxonomiesView.defaultProps = {
-  fetchOnMount: true,
-}
-
 const mapStateToProps = state => {
   const survey = getSurvey(state)
   const surveyForm = getSurveyForm(state)
@@ -77,5 +65,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  {fetchTaxonomies, createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
+  {createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
 )(TaxonomiesView)

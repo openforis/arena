@@ -3,20 +3,16 @@ import { connect } from 'react-redux'
 
 import SurveyFormView from '../surveyForm/surveyFormView'
 
-import { fetchNodeDefs } from '../../survey/nodeDefs/actions'
-import { fetchCodeLists } from '../../survey/codeLists/actions'
-import { fetchTaxonomies } from '../../survey/taxonomies/actions'
+import { initSurveyDefs } from '../../survey/actions'
 import { resetForm } from '../surveyForm/actions'
 
 class DataRecordView extends React.Component {
 
   componentDidMount () {
-    const {resetForm, fetchNodeDefs, fetchCodeLists, fetchTaxonomies} = this.props
+    const {resetForm, initSurveyDefs} = this.props
 
     resetForm()
-    fetchNodeDefs(false, false)
-    fetchCodeLists(false, false)
-    fetchTaxonomies(false, false)
+    initSurveyDefs(false, false)
   }
 
   render () {
@@ -28,5 +24,5 @@ class DataRecordView extends React.Component {
 
 export default connect(
   null,
-  {fetchNodeDefs, fetchCodeLists, fetchTaxonomies, resetForm}
+  {initSurveyDefs, resetForm}
 )(DataRecordView)

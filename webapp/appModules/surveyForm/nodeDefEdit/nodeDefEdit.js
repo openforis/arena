@@ -45,17 +45,14 @@ class NodeDefEdit extends React.Component {
               <CodeListsView onClose={() => this.setState({editingCodeList: false})}
                              canSelect={canUpdateCodeList(nodeDef)(survey)}
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
-                             selectedCodeListUUID={getNodeDefCodeListUUID(nodeDef)}
-                             fetchOnMount={false}
-              />
+                             selectedCodeListUUID={getNodeDefCodeListUUID(nodeDef)}/>
 
               : editingTaxonomy
               ?
               <TaxonomiesView onClose={() => this.setState({editingTaxonomy: false})}
                               canSelect={true}
                               onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
-                              selectedTaxonomyUUID={getNodeDefTaxonomyUUID(nodeDef)}
-                              fetchOnMount={false}/>
+                              selectedTaxonomyUUID={getNodeDefTaxonomyUUID(nodeDef)}/>
               :
               <div className="form">
                 <CommonProps {...this.props}
