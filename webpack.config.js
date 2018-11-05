@@ -1,8 +1,10 @@
 const path = require('path')
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const webpack = require('webpack')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
 const uuidv4 = require('uuid/v4')
 
 const mode = {
@@ -29,7 +31,8 @@ const plugins = [
         'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
       }
     }
-  )
+  ),
+  new BundleAnalyzerPlugin()
 ]
 
 const webPackConfig = {
