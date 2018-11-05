@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import Survey from '../../../../common/survey/survey'
-import { isNodeDefRoot, getNodeDefLabel } from '../../../../common/survey/nodeDef'
+import NodeDef from '../../../../common/survey/nodeDef'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
 
 import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
@@ -61,10 +61,10 @@ const mapStateToProps = (state, props) => {
 
   return {
     childDefs: Survey.getNodeDefChildren(nodeDef)(survey),
-    label: getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
+    label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
 
     active: isNodeDefFormActivePage(survey, nodeDef)(surveyForm),
-    enabled: edit || isNodeDefRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
+    enabled: edit || NodeDef.isNodeDefRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
   }
 }
 

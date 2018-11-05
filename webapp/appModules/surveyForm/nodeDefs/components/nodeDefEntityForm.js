@@ -9,7 +9,7 @@ import NodeDefSwitch from '../nodeDefSwitch'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
+import NodeDef from '../../../../../common/survey/nodeDef'
 import { newNode } from '../../../../../common/record/node'
 
 import {
@@ -143,7 +143,7 @@ class NodeDefEntityForm extends React.Component {
   checkNodePage () {
     const {nodeDef, setFormPageNode, nodes, entry} = this.props
 
-    if (entry && !isNodeDefMultiple(nodeDef)) {
+    if (entry && !NodeDef.isNodeDefMultiple(nodeDef)) {
       const nodeUUID = R.pipe(
         R.head,
         R.prop('uuid')
@@ -180,7 +180,7 @@ class NodeDefEntityForm extends React.Component {
       return <EntityForm {...this.props} />
 
     // entry multiple entity
-    if (entry && isNodeDefMultiple(nodeDef)) {
+    if (entry && NodeDef.isNodeDefMultiple(nodeDef)) {
       const node = this.getNode(selectedNodeUUID)
 
       return <div>
@@ -198,7 +198,7 @@ class NodeDefEntityForm extends React.Component {
     }
 
     // entry single entity
-    if (entry && !isNodeDefMultiple(nodeDef))
+    if (entry && !NodeDef.isNodeDefMultiple(nodeDef))
       return <EntityForm {...this.props} node={nodes[0]}/>
 
     return null

@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
 import Survey from '../../../common/survey/survey'
-import { isNodeDefEntity } from '../../../common/survey/nodeDef'
+import NodeDef from '../../../common/survey/nodeDef'
 import { getPageUUID } from '../../../common/survey/nodeDefLayout'
 
 import { getRecord } from './record/recordState'
@@ -64,10 +64,10 @@ export const getNodeDefFormUnlocked = survey =>
   )(survey)
 
 export const isNodeDefFormLocked = (nodeDef) => R.pipe(
-    R.path(nodeDefEntityUnlockedPath),
-    R.equals(nodeDef.uuid),
-    R.not,
-  )
+  R.path(nodeDefEntityUnlockedPath),
+  R.equals(nodeDef.uuid),
+  R.not,
+)
 
 // ====== current list of form pages
 const surveyFormPages = [props, 'pageNodes']
@@ -102,7 +102,7 @@ export const getFormPageParentNode = (survey, nodeDef) =>
 export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
   assocFormNodeDefEdit(nodeDef),
   R.ifElse(
-    () => isNodeDefEntity(nodeDef),
+    () => NodeDef.isNodeDefEntity(nodeDef),
 
     // if is entity, unlock form
     R.pipe(

@@ -5,7 +5,7 @@ const db = require('../db/db')
 const {selectDate} = require('../db/dbUtils')
 
 const {defDbTransformCallback} = require('../../common/survey/surveyUtils')
-const {nodeDefType} = require('../../common/survey/nodeDef')
+const NodeDef = require('../../common/survey/nodeDef')
 
 const dbTransformCallback = (def, draft = false) => R.pipe(
   // assoc published and draft properties based on props
@@ -31,7 +31,7 @@ const createNodeDef = async (surveyId, parentId, uuid, type, props, client = db)
   )
 
 const createEntityDef = async (surveyId, parentId, uuid, props, client = db) =>
-  await createNodeDef(surveyId, parentId, uuid, nodeDefType.entity, props, client)
+  await createNodeDef(surveyId, parentId, uuid, NodeDef.nodeDefType.entity, props, client)
 
 // ============== READ
 
