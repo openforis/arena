@@ -83,9 +83,19 @@ const fetchUserSurveys = async (user) => R.map(
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
 
+  const nodeDefsResult = R.reduce(
+    (acc, nodeDef) => draft
+      ? R.append(nodeDef, acc)
+      // remove draft and unpublished nodeDef
+      : nodeDef.draft && !nodeDef.published
+        ? acc
+        : R.append(nodeDef, acc),
+    [],
+    nodeDefsDB
+  )
   const nodeDefs = validate
-    ? await validateNodeDefs(nodeDefsDB)
-    : nodeDefsDB
+    ? await validateNodeDefs(nodeDefsResult)
+    : nodeDefsResult
 
   return toUUIDIndexedObj(nodeDefs)
 }

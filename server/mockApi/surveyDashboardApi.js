@@ -39,7 +39,7 @@ const init = app => {
   })
 
   //Survey Designer
-  app.get(getPath('/surveyDesigner'), (req, res) => {
+  app.get(getPath('/designer'), (req, res) => {
     const surveyDesigner = {
       dashboard: {
         surveyId: surveyIdRestParam(req),
@@ -52,7 +52,7 @@ const init = app => {
         // pages: {count: 2},
       }
     }
-    res.json({surveyDesigner})
+    res.json({surveyDesigner: designer})
   })
 
   //Data Explorer

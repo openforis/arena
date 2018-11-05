@@ -18,7 +18,7 @@ export const Input = React.forwardRef((props, ref) => {
     validation = {},
     disabled = false,
     mask = false,
-    ...inputProps,
+    ...inputProps
   } = props
 
   return (

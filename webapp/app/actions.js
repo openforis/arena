@@ -1,17 +1,11 @@
-import * as R from 'ramda'
 import axios from 'axios'
 
-import { appState, systemStatus } from './app'
-import { getNewSurvey } from './appState'
-import { userPrefNames } from '../../common/user/userPrefs'
-
-import { dispatchCurrentSurveyUpdate, surveyCreate } from '../survey/actions'
+import { appStatus } from './appState'
 import { stopAppJobMonitoring } from './components/job/actions'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
-export const appNewSurveyUpdate = 'app/newSurvey/update'
 
 export const initApp = () => async (dispatch) => {
   try {
@@ -21,7 +15,7 @@ export const initApp = () => async (dispatch) => {
     const {data} = resp
     const {user, survey} = data
 
-    dispatch({type: appStatusChange, status: systemStatus.ready, user, survey})
+    dispatch({type: appStatusChange, status: appStatus.ready, user, survey})
 
   } catch (e) {
   }
@@ -39,73 +33,7 @@ export const logout = () => async dispatch => {
   }
 }
 
-// ====== CREATE SURVEY
 
-export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
-
-  const newSurvey = R.pipe(
-    getNewSurvey,
-    R.dissocPath(['validation', 'fields', name]),
-    R.assoc(name, value),
-  )(getState())
-
-  dispatch({type: appNewSurveyUpdate, newSurvey})
-
-}
-
-export const createSurvey = surveyProps => async (dispatch, getState) => {
-
-  const {data} = await axios.post('/api/survey', surveyProps)
-
-  const {survey} = data
-  const valid = !!survey
-
-  if (valid) {
-    dispatch({type: surveyCreate, survey})
-  } else {
-    dispatch({
-      type: appNewSurveyUpdate,
-      newSurvey: {
-        ...getNewSurvey(getState()),
-        ...data,
-      }
-    })
-  }
-
-}
-
-export const resetNewSurvey = () => dispatch =>
-  dispatch({type: appNewSurveyUpdate, newSurvey: null})
-
-// ====== SURVEYS LIST
-export const appSurveysUpdate = 'app/surveys/update'
-
-export const fetchSurveys = () => async dispatch => {
-  try {
-    const {data} = await axios.get('/api/surveys')
-
-    dispatch({type: appSurveysUpdate, surveys: data.surveys})
-  } catch (e) {
-  }
-}
-
-// ====== LOAD SURVEY PROP
-export const setActiveSurvey = surveyId =>
-  async (dispatch, getState) => {
-    try {
-
-      //load survey
-      const {data} = await axios.get(`/api/survey/${surveyId}?draft=true`)
-      dispatchCurrentSurveyUpdate(dispatch, data.survey)
-
-      //update userPref
-      const user = appState.getUser(getState())
-      await axios.post(`/api/user/${user.id}/pref/${userPrefNames.survey}/${surveyId}`)
-      dispatch({type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId})
-
-    } catch (e) {
-    }
-  }
 
 // ====== ERRORS HANDLING
 

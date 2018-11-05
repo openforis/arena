@@ -1,14 +1,25 @@
 import * as R from 'ramda'
+import { excludePathRoot } from '../appUtils/reduxUtils'
 
 const app = 'app'
+
+export const appStatus = {
+  ready: 'ready'
+}
+
+export const isReady = R.pathEq([app, 'status'], appStatus.ready)
+
+// ==== APP USER
+const user = 'user'
+
+export const getUser = R.path([app, user])
+
+export const logoutUser = R.dissoc(user)
+
+// ==== APP ERRORS
 const errors = 'errors'
 
 export const getAppState = R.prop(app)
-
-export const getNewSurvey = R.pipe(
-  R.path([app, 'newSurvey']),
-  R.defaultTo({name: '', label: '', lang: 'en', validation: {}})
-)
 
 export const assocAppError = error => R.assocPath([errors, error.id + ''], error)
 

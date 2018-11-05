@@ -1,9 +1,6 @@
-import * as R from 'ramda'
-
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import { surveyUpdate } from '../actions'
-import { formReset } from '../form/actions'
+import { surveyCreate, surveyDefsLoad, surveyUpdate } from '../actions'
 
 import {
   nodeDefsLoad,
@@ -21,11 +18,12 @@ import {
 } from './nodeDefsState'
 
 const actionHandlers = {
-  // reset form
-  [surveyUpdate]: () => null,
-  [formReset]: () => null,
+  // reset state
+  [surveyCreate]: () => ({}),
+  [surveyUpdate]: () => ({}),
 
   [nodeDefsLoad]: (state = {}, {nodeDefs}) => nodeDefs,
+  [surveyDefsLoad]: (state = {}, {nodeDefs}) => nodeDefs,
 
   // single nodeDef actions
   [nodeDefCreate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),

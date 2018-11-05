@@ -5,16 +5,19 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { Switch, Route, Redirect } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
+import DynamicImport from './commonComponents/DynamicImport'
 
 import loginAnimation from './login/components/loginAnimation'
 import appAnimation from './app/components/appAnimation'
 
 import LoginView from './login/components/loginView'
-import AppView from './app/components/appView'
 
-import { appState, isLocationLogin, loginUri } from './app/app'
 import { initApp } from './app/actions'
 import { startAppJobMonitoring } from './app/components/job/actions'
+import { getUser, isReady } from './app/appState'
+import { getLocationPathname } from './appUtils/routerUtils'
+
+const loginUri = '/'
 
 class AppRouterSwitch extends React.Component {
 
@@ -32,7 +35,7 @@ class AppRouterSwitch extends React.Component {
   render () {
     const {location, isReady, user} = this.props
 
-    const isLogin = isLocationLogin(this.props)
+    const isLogin = getLocationPathname(this.props) === loginUri
 
     const {
       key,
@@ -66,7 +69,11 @@ class AppRouterSwitch extends React.Component {
                 <Switch location={location}>
 
                   <Route exact path="/" component={LoginView}/>
-                  <Route path="/app" component={AppView}/>
+                  <Route path="/app" render={(props) =>
+                    <DynamicImport load={() => import('./app/app')}>
+                      {(Component) => Component === null ? null : <Component {...props} />}
+                    </DynamicImport>
+                  }/>
 
                 </Switch>
 
@@ -82,8 +89,8 @@ class AppRouterSwitch extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  isReady: appState.isReady(state),
-  user: appState.getUser(state)
+  isReady: isReady(state),
+  user: getUser(state)
 })
 
 export default withRouter(
