@@ -4,24 +4,11 @@ const fastcsv = require('fast-csv')
 
 const {publishSurveySchemaTableProps, markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
 
-const {
-  getTaxonomyVernacularLanguageCodes,
-  getTaxonCode,
-  getTaxonFamily,
-  getTaxonGenus,
-  getTaxonScientificName,
-  getTaxonVernacularName,
-} = require('../../common/survey/taxonomy')
+const Taxonomy = require('../../common/survey/taxonomy')
 
-const {
-  createJob,
-  updateJobProgress,
-  updateJobStatus,
-} = require('../job/jobManager')
+const {createJob, updateJobProgress, updateJobStatus} = require('../job/jobManager')
 
-const {
-  jobStatus,
-} = require('../../common/job/job')
+const {jobStatus} = require('../../common/job/job')
 
 const {TaxaParser} = require('./taxaParser')
 
@@ -120,7 +107,7 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   console.log('start csv export')
 
   const taxonomy = await taxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft)
-  const vernacularLanguageCodes = getTaxonomyVernacularLanguageCodes(taxonomy)
+  const vernacularLanguageCodes = Taxonomy.getTaxonomyVernacularLanguageCodes(taxonomy)
 
   const csvStream = fastcsv.createWriteStream({headers: true})
   csvStream.pipe(output)
@@ -142,12 +129,12 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
 
   taxa.forEach(taxon => {
     csvStream.write(R.concat([
-        getTaxonCode(taxon),
-        getTaxonFamily(taxon),
-        getTaxonGenus(taxon),
-        getTaxonScientificName(taxon)
+        Taxonomy.getTaxonCode(taxon),
+        Taxonomy.getTaxonFamily(taxon),
+        Taxonomy.getTaxonGenus(taxon),
+        Taxonomy.getTaxonScientificName(taxon)
       ],
-      R.map(langCode => getTaxonVernacularName(langCode)(taxon))(vernacularLanguageCodes)
+      R.map(langCode => Taxonomy.getTaxonVernacularName(langCode)(taxon))(vernacularLanguageCodes)
     ))
   })
   csvStream.end()

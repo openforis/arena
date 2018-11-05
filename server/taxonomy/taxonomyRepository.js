@@ -7,7 +7,7 @@ const {
   deleteSurveySchemaTableRecord
 } = require('../survey/surveySchemaRepositoryUtils')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
-const {getTaxonVernacularNames} = require('../../common/survey/taxonomy')
+const Taxonomy = require('../../common/survey/taxonomy')
 
 // ============== CREATE
 
@@ -31,7 +31,7 @@ const insertTaxa = async (surveyId, taxa, client = db) => {
         )
 
         //insert taxon vernacular names
-        const vernacularNames = getTaxonVernacularNames(taxon)
+        const vernacularNames = Taxonomy.getTaxonVernacularNames(taxon)
 
         const vernacularNameInsertPromises = R.keys(vernacularNames).map(lang => {
           const vn = R.prop(lang, vernacularNames)
