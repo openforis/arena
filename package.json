@@ -7,6 +7,7 @@
   },
   "scripts": {
     "build": "webpack -p --config webpack.config.js",
+    "build-prod": "webpack --env production -p --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch",
     "clean": "rm -rf dist/",
     "start": "node server/server.js",
