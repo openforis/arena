@@ -11,7 +11,7 @@ import Survey from '../../../../../common/survey/survey'
 import CodeList from '../../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
-import { getSurvey } from '../../../../survey/surveyState'
+import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
 import {
   getCodeListEditLevelActiveItem,
   getCodeListEditCodeList,
@@ -97,8 +97,9 @@ const mapStateToProps = (state, props) => {
   const {index} = level
 
   const survey = getSurvey(state)
+  const surveyInfo = getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
-  const language = Survey.getSurveyDefaultLanguage(survey)
+  const language = Survey.getDefaultLanguage(surveyInfo)
 
   const codeList = getCodeListEditCodeList(survey)(surveyForm)
   const activeItem = getCodeListEditLevelActiveItem(index)(surveyForm)

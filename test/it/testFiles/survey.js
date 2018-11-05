@@ -4,9 +4,9 @@ const {uuidv4} = require('../../../common/uuid')
 
 const {createSurvey} = require('../../../server/survey/surveyManager')
 const {
-  getSurveyName,
-  getSurveyDefaultLabel,
-  getSurveyDefaultLanguage,
+  getName,
+  getDefaultLabel,
+  getDefaultLanguage,
 } = require('../../../common/survey/survey')
 
 const testSurvey = {
@@ -20,9 +20,9 @@ const createSurveyTest = async () => {
   const survey = await createSurvey(getContextUser(), testSurvey)
   setContextSurvey(survey)
 
-  assert.equal(getSurveyName(survey), testSurvey.name)
-  assert.equal(getSurveyDefaultLanguage(survey), testSurvey.lang)
-  assert.equal(getSurveyDefaultLabel(survey), testSurvey.label)
+  assert.equal(getName(survey), testSurvey.name)
+  assert.equal(getDefaultLanguage(survey), testSurvey.lang)
+  assert.equal(getDefaultLabel(survey), testSurvey.label)
 }
 
 // const publishSurveyTest = async () => {

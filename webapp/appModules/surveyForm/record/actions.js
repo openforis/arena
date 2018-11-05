@@ -4,7 +4,7 @@ import axios from 'axios'
 import { debounceAction } from '../../../appUtils/reduxUtils'
 
 import Survey from '../../../../common/survey/survey'
-import { getStateSurveyId, getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyId, getStateSurveyInfo } from '../../../survey/surveyState'
 import { getUser } from '../../../app/appState'
 import { getRecord } from './recordState'
 
@@ -28,9 +28,9 @@ export const createRecord = () => async (dispatch, getState) => {
     const state = getState()
 
     const user = getUser(state)
-    const survey = getSurvey(state)
     const surveyId = getStateSurveyId(state)
-    const step = Survey.getSurveyDefaultStep(survey)
+    const surveyInfo = getStateSurveyInfo(state)
+    const step = Survey.getDefaultStep(surveyInfo)
 
     const record = newRecord(user, surveyId, step)
 

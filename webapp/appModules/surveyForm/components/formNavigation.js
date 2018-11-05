@@ -1,11 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { getNodeDefChildren, getSurveyDefaultLanguage, getRootNodeDef } from '../../../../common/survey/survey'
+import Survey from '../../../../common/survey/survey'
 import { isNodeDefRoot, getNodeDefLabel } from '../../../../common/survey/nodeDef'
 import { filterOuterPageChildren } from '../../../../common/survey/nodeDefLayout'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
 
 import { setFormActivePage } from '../actions'
 import { getFormPageParentNode, getSurveyForm, isNodeDefFormActivePage } from '../surveyFormState'
@@ -52,15 +52,16 @@ const FormNavigationItem = (props) => {
 
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
-  const rootNodeDef = getRootNodeDef(survey)
+  const surveyInfo = getStateSurveyInfo(state)
+  const rootNodeDef = Survey.getRootNodeDef(survey)
   const surveyForm = getSurveyForm(state)
 
   const {edit, nodeDef = rootNodeDef} = props
   const parentNode = getFormPageParentNode(survey, nodeDef)(surveyForm)
 
   return {
-    childDefs: getNodeDefChildren(nodeDef)(survey),
-    label: getNodeDefLabel(nodeDef, getSurveyDefaultLanguage(survey)),
+    childDefs: Survey.getNodeDefChildren(nodeDef)(survey),
+    label: getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
 
     active: isNodeDefFormActivePage(survey, nodeDef)(surveyForm),
     enabled: edit || isNodeDefRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,

@@ -157,7 +157,7 @@ const mapStateToProps = (state, props) => {
   return {
     // always unlocking attributes
     locked: NodeDef.isNodeDefEntity(nodeDef) ? isNodeDefFormLocked(nodeDef)(surveyForm) : false,
-    label: NodeDef.getNodeDefLabel(nodeDef, Survey.getSurveyDefaultLanguage(survey)),
+    label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(survey)),
     ...entry ? mapEntryProps() : {},
   }
 }

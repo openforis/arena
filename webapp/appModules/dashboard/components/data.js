@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import { appModuleUri } from '../../appModules'
 import { appModules } from '../../appModules'
-import { getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyInfo } from '../../../survey/surveyState'
 
 import Survey from '../../../../common/survey/survey'
 
@@ -15,7 +15,7 @@ import { createRecord } from '../../surveyForm/record/actions'
 class Data extends React.Component {
 
   render () {
-    const {survey, dataExplorer, createRecord} = this.props
+    const {surveyInfo, dataExplorer, createRecord} = this.props
     const {entities} = dataExplorer
 
     const entityCount = entity => R.path([entity, 'count'])(entities)
@@ -68,7 +68,7 @@ class Data extends React.Component {
           }
 
           {
-            Survey.isSurveyPublished(survey) ?
+            Survey.isPublished(surveyInfo) ?
               <div className="app-dashboard__module-item">
                 <Link className="btn btn-of"
                       to={appModuleUri(appModules.dataRecord)}
@@ -98,7 +98,7 @@ Data.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  survey: getSurvey(state),
+  surveyInfo: getStateSurveyInfo(state),
 })
 
 export default withRouter(

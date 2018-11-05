@@ -16,7 +16,7 @@ import Record from '../../../../../common/record/record'
 import { isRenderDropdown, nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 import { toQueryString } from '../../../../../server/serverUtils/request'
-import { getSurvey } from '../../../../survey/surveyState'
+import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
 import { getRecord } from '../../record/recordState'
 import { getSurveyForm } from '../../surveyFormState'
 
@@ -104,6 +104,7 @@ class NodeDefCodeList extends React.Component {
 const mapStateToProps = (state, props) => {
   const survey = getSurvey(state)
   const surveyForm = getSurveyForm(state)
+  const surveyInfo = getStateSurveyInfo(state)
 
   const record = getRecord(surveyForm)
   const {nodeDef, parentNode} = props
@@ -116,7 +117,7 @@ const mapStateToProps = (state, props) => {
     : null
 
   return {
-    language: Survey.getSurveyDefaultLanguage(survey),
+    language: Survey.getDefaultLanguage(surveyInfo),
     nodeDefParentCodeUUID: NodeDef.getNodeDefParentCodeUUID(nodeDef),
     ancestorCodes,
     // codeListId is not null when items can be loaded from server

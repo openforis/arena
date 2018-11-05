@@ -9,10 +9,10 @@ import LanguagesEditorComponent from '../../../survey/components/languagesEditor
 
 import {
   getSurveyInfo,
-  getSurveyName,
-  getSurveyDescriptions,
-  getSurveyLabels,
-  getSurveySrs
+  getName,
+  getDescriptions,
+  getLabels,
+  getSRS
 } from '../../../../common/survey/survey'
 import { getSrsName, srs } from '../../../../common/app/srs'
 
@@ -33,16 +33,16 @@ class SurveyInfo extends React.Component {
   }
 
   render () {
-    const {survey, surveyInfo} = this.props
+    const {surveyInfo} = this.props
     const validation = getValidation(surveyInfo)
-    const surveySrs = getSurveySrs(surveyInfo).map(code => ({key: code, value: getSrsName(code)}))
+    const surveySrs = getSRS(surveyInfo).map(code => ({key: code, value: getSrsName(code)}))
 
     return (
       <div className="form">
 
         <div className="form-item">
           <label className="form-label">Name</label>
-          <Input value={getSurveyName(survey)}
+          <Input value={getName(surveyInfo)}
                  validation={getFieldValidation('name')(validation)}
                  onChange={e => this.updateSurveyProp('name', normalizeName(e.target.value))}/>
 
@@ -59,12 +59,12 @@ class SurveyInfo extends React.Component {
                       onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>
         </div>
 
-        <LabelsEditorComponent labels={getSurveyLabels(survey)}
-                               onChange={(item) => this.onPropLabelsChange(item, 'labels', getSurveyLabels(survey))}/>
+        <LabelsEditorComponent labels={getLabels(surveyInfo)}
+                               onChange={(item) => this.onPropLabelsChange(item, 'labels', getLabels(surveyInfo))}/>
 
         <LabelsEditorComponent formLabel="Description(s)"
-                               labels={getSurveyDescriptions(survey)}
-                               onChange={(item) => this.onPropLabelsChange(item, 'descriptions', getSurveyDescriptions(survey))}/>
+                               labels={getDescriptions(surveyInfo)}
+                               onChange={(item) => this.onPropLabelsChange(item, 'descriptions', getDescriptions(surveyInfo))}/>
 
       </div>
     )
@@ -73,7 +73,6 @@ class SurveyInfo extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  survey: getSurvey(state),
   surveyInfo: getSurveyInfo(getSurvey(state)),
 })
 

@@ -21,18 +21,18 @@ const SurveyListHeader = () => (
   </div>
 )
 
-const SurveyRow = ({survey, surveyInfo, setActiveSurvey}) => {
-  const surveyId = Survey.getSurveyId(survey)
+const SurveyRow = ({surveyInfoRow, surveyInfo, setActiveSurvey}) => {
+  const surveyId = surveyInfoRow.id
   const active = surveyInfo && surveyId === surveyInfo.id
   const activeClass = active ? ' active' : ''
 
   return (
     <div className={`surveys-list__row${activeClass}`}>
-      <div>{Survey.getSurveyName(survey)}</div>
-      <div>{Survey.getSurveyDefaultLabel(survey)}</div>
-      <div>{getRelativeDate(survey.dateCreated)}</div>
-      <div>{getRelativeDate(survey.dateModified)}</div>
-      <div>{Survey.getSurveyStatus(survey)}</div>
+      <div>{Survey.getName(surveyInfoRow)}</div>
+      <div>{Survey.getDefaultLabel(surveyInfoRow)}</div>
+      <div>{getRelativeDate(surveyInfoRow.dateCreated)}</div>
+      <div>{getRelativeDate(surveyInfoRow.dateModified)}</div>
+      <div>{Survey.getStatus(surveyInfoRow)}</div>
       <div>
         <button className={`btn btn-s btn-of${activeClass}`}
                 onClick={() => setActiveSurvey(surveyId)}>
@@ -59,7 +59,7 @@ const SurveyList = (props) => {
                 surveys
                   .sort((a, b) => compareDatesDesc(getSurveyInfo(a).dateModified, getSurveyInfo(b).dateModified))
                   .map((survey, i) =>
-                    <SurveyRow key={i} {...props} survey={survey}/>
+                    <SurveyRow key={i} {...props} surveyInfoRow={survey.info}/>
                   )
               }
             </div>
