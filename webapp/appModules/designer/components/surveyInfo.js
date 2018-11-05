@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import axios from 'axios'
 import * as R from 'ramda'
 
 import { Input } from '../../../commonComponents/form/input'
@@ -14,28 +15,79 @@ import {
   getSurveyLabels,
   getSurveySrs
 } from '../../../../common/survey/survey'
-import { getSrsName, srs } from '../../../../common/app/srs'
 
 import { getSurvey } from '../../../survey/surveyState'
 import { updateSurveyInfoProp } from '../../../survey/surveyInfo/actions'
 
 import { normalizeName } from './../../../../common/survey/surveyUtils'
+import { toQueryString } from './../../../../server/serverUtils/request'
 import { getValidation, getFieldValidation } from './../../../../common/validation/validator'
+
+const SrsAutocomplete = props => {
+  const {selection, validation, onChange} = props
+
+  const itemsLookupFunction = async value => {
+    const {data} = await axios.get('/api/srs/find', {
+      params: {
+        codeOrName: value
+      }
+    })
+    return data.srss
+  }
+
+  return <InputChips itemsLookupFunction={itemsLookupFunction}
+                     selection={selection}
+                     dropdownAutocompleteMinChars={3}
+                     validation={validation}
+                     onChange={onChange}/>
+}
 
 class SurveyInfo extends React.Component {
 
-  updateSurveyProp (key, value) {
-    this.props.updateSurveyProp(key, value)
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      surveySrs: []
+    }
+  }
+
+  componentDidMount() {
+    this.fetchSrs()
+  }
+
+  componentDidUpdate (prevProps) {
+    const {surveyInfo} = this.props
+    const {surveyInfo: prevSurveyInfo} = prevProps
+
+    const srsCodes = getSurveySrs(surveyInfo)
+    const prevSrsCodes = getSurveySrs(prevSurveyInfo)
+
+    if (!R.equals(srsCodes, prevSrsCodes)) {
+      this.fetchSrs()
+    }
+  }
+
+  fetchSrs () {
+    const {surveyInfo} = this.props
+    const codes = getSurveySrs(surveyInfo)
+
+    axios.get(`/api/srs?${toQueryString({codes})}`).then(({data}) => {
+      this.setState({
+        surveySrs: data.srss
+      })
+    })
   }
 
   onPropLabelsChange (item, key, currentValue) {
-    this.updateSurveyProp(key, R.assoc(item.lang, item.label, currentValue))
+    this.props.updateSurveyInfoProp(key, R.assoc(item.lang, item.label, currentValue))
   }
 
   render () {
-    const {survey, surveyInfo} = this.props
+    const {survey, surveyInfo, updateSurveyInfoProp} = this.props
+    const {surveySrs} = this.state
+
     const validation = getValidation(surveyInfo)
-    const surveySrs = getSurveySrs(surveyInfo).map(code => ({key: code, value: getSrsName(code)}))
 
     return (
       <div className="form">
@@ -44,7 +96,7 @@ class SurveyInfo extends React.Component {
           <label className="form-label">Name</label>
           <Input value={getSurveyName(survey)}
                  validation={getFieldValidation('name')(validation)}
-                 onChange={e => this.updateSurveyProp('name', normalizeName(e.target.value))}/>
+                 onChange={e => updateSurveyInfoProp('name', normalizeName(e.target.value))}/>
 
         </div>
 
@@ -52,11 +104,9 @@ class SurveyInfo extends React.Component {
 
         <div className="form-item">
           <label className="form-label">SRS</label>
-          <InputChips items={srs}
-                      selection={surveySrs}
-                      dropdownAutocompleteMinChars={3}
-                      validation={getFieldValidation('srs')(validation)}
-                      onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>
+          <SrsAutocomplete selection={R.values(surveySrs)}
+                           validation={getFieldValidation('srs')}
+                           onChange={(items) => updateSurveyInfoProp('srs', R.pluck('key')(items))}/>
         </div>
 
         <LabelsEditorComponent labels={getSurveyLabels(survey)}
@@ -80,6 +130,6 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   {
-    updateSurveyProp: updateSurveyInfoProp,
+    updateSurveyInfoProp,
   }
 )(SurveyInfo)

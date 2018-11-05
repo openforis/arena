@@ -51,6 +51,7 @@ const InputChips = (props) => {
 
   const {
     items,
+    itemsLookupFunction,
     itemKeyProp,
     itemKeyFunction,
     itemLabelFunction,
@@ -95,6 +96,7 @@ const InputChips = (props) => {
         )
       }
       <Dropdown items={dropdownItems}
+                itemsLookupFunction={itemsLookupFunction}
                 itemKeyProp={itemKeyProp}
                 itemKeyFunction={itemKeyFunction}
                 itemLabelFunction={itemLabelFunction}
@@ -112,6 +114,7 @@ const InputChips = (props) => {
 
 InputChips.defaultProps = {
   items: [],
+  itemsLookupFunction: null, //async function to find items by specified value
   itemKeyProp: null,
   itemKeyFunction: null,
   itemLabelFunction: null,
