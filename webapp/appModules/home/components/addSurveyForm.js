@@ -4,7 +4,7 @@ import { Input } from '../../../commonComponents/form/input'
 import LanguageDropdown from '../../../commonComponents/form/languageDropdown'
 
 import { getFieldValidation } from '../../../../common/validation/validator'
-import { normalizeName } from '../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../common/stringUtils'
 
 const AddSurveyForm = (props) => {
 

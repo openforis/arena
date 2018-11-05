@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import CodeListEditItem from './codeListEditItem'
 
-import { normalizeName } from '../../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../../common/stringUtils'
 
 import Survey from '../../../../../common/survey/survey'
 import CodeList from '../../../../../common/survey/codeList'

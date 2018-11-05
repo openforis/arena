@@ -23,7 +23,7 @@ import {
 
 import { isRenderTable, } from '../../../../common/survey/nodeDefLayout'
 
-import { normalizeName } from '../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../common/stringUtils'
 
 const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValue) => {
   putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))

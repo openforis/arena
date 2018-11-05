@@ -11,7 +11,7 @@ import TaxonTable from './taxonTable'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'
 import { isBlank } from '../../../../../common/stringUtils'
-import { normalizeName } from '../../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../../common/stringUtils'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
 import {

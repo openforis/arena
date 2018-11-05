@@ -4,19 +4,10 @@ import * as R from 'ramda'
 import { FormItem } from '../../../commonComponents/form/input'
 import Dropdown from '../../../commonComponents/form/dropdown'
 
-import {
-  getCodeListByUUID,
-  getCodeListsArray,
-  getNodeDefCodeParent,
-  getNodeDefCodeCandidateParents,
-  getNodeDefCodeListLevelIndex,
-  canUpdateCodeList,
-} from '../../../../common/survey/survey'
-
-import {
-  getNodeDefName,
-  getNodeDefCodeListUUID,
-} from '../../../../common/survey/nodeDef'
+import Survey from '../../../../common/survey/survey'
+import NodeDef from '../../../../common/survey/nodeDef'
+import CodeList from '../../../../common/survey/codeList'
+import Validator from '../../../../common/validation/validator'
 
 import {
   isRenderCheckbox,
@@ -24,17 +15,6 @@ import {
   nodeDefLayoutProps,
   nodeDefRenderType
 } from '../../../../common/survey/nodeDefLayout'
-
-import {
-  getValidation,
-} from '../../../../common/validation/validator'
-
-import {
-  getCodeListName,
-  getCodeListLevelByIndex,
-  getCodeListLevelName,
-} from '../../../../common/survey/codeList'
-import { getFieldValidation } from '../../../../common/validation/validator'
 
 const CodeListProps = (props) => {
   const {
@@ -46,22 +26,22 @@ const CodeListProps = (props) => {
     toggleCodeListEdit,
   } = props
 
-  const validation = getValidation(nodeDef)
-  const selectedCodeList = getCodeListByUUID(getNodeDefCodeListUUID(nodeDef))(survey)
-  const candidateParentCodeNodeDefs = getNodeDefCodeCandidateParents(nodeDef)(survey)
-  const parentCodeDef = getNodeDefCodeParent(nodeDef)(survey)
+  const validation = Validator.getValidation(nodeDef)
+  const selectedCodeList = Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey)
+  const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents(nodeDef)(survey)
+  const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
   const parentCodeDefLabelFunction = def => (
-    getNodeDefName(def)
+    NodeDef.getNodeDefName(def)
     + ' ('
-    + getCodeListLevelName(
-      getCodeListLevelByIndex(
-        getNodeDefCodeListLevelIndex(def)
+    + CodeList.getCodeListLevelName(
+      CodeList.getCodeListLevelByIndex(
+        Survey.getNodeDefCodeListLevelIndex(def)
         (survey)
       )(selectedCodeList)
     )
     + ')'
   )
-  const disabled = !canUpdateCodeList(nodeDef)(survey)
+  const disabled = !Survey.canUpdateCodeList(nodeDef)(survey)
 
   return (
     <React.Fragment>
@@ -72,10 +52,10 @@ const CodeListProps = (props) => {
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
           <Dropdown disabled={disabled}
-                    items={getCodeListsArray(survey)}
+                    items={Survey.getCodeListsArray(survey)}
                     itemKeyProp={'uuid'}
-                    itemLabelFunction={codeList => getCodeListName(codeList)}
-                    validation={getFieldValidation('codeListUUID')(validation)}
+                    itemLabelFunction={codeList => CodeList.getCodeListName(codeList)}
+                    validation={Validator.getFieldValidation('codeListUUID')(validation)}
                     selection={selectedCodeList}
                     onChange={codeList => {
                       putNodeDefProp(nodeDef, 'parentCodeUUID', null) //reset parent code

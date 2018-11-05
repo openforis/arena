@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 
-import { normalizeName } from '../../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../../common/stringUtils'
 
 import CodeList from '../../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../../common/validation/validator'
