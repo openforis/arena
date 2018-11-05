@@ -6,10 +6,7 @@ const {publishSurveySchemaTableProps, markSurveyDraft} = require('../survey/surv
 const {toIndexedObj} = require('../../common/survey/surveyUtils')
 const codeListRepository = require('../codeList/codeListRepository')
 const codeListValidator = require('../codeList/codeListValidator')
-const {
-  getCodeListLevelsArray,
-  assocCodeListLevelsArray,
-} = require('../../common/survey/codeList')
+const CodeList = require('../../common/survey/codeList')
 
 // ====== VALIDATION
 const assocCodeListValidation = async (codeList, codeListsWithLevels, codeListItems) => ({
@@ -27,7 +24,7 @@ const validateCodeList = async (surveyId, codeLists, codeList, draft) => {
 const insertCodeList = async (surveyId, codeList) =>
   db.tx(async t => {
     const insertedCodeList = await codeListRepository.insertCodeList(surveyId, codeList, t)
-    const levels = getCodeListLevelsArray(codeList)
+    const levels = CodeList.getCodeListLevelsArray(codeList)
 
     //insert levels
     const insertedLevels = await Promise.all(
@@ -37,7 +34,7 @@ const insertCodeList = async (surveyId, codeList) =>
     )
     await markSurveyDraft(surveyId, t)
 
-    return assocCodeListLevelsArray(insertedLevels)(insertedCodeList)
+    return CodeList.assocCodeListLevelsArray(insertedLevels)(insertedCodeList)
   })
 
 const insertCodeListLevel = async (surveyId, codeListId, level) =>
