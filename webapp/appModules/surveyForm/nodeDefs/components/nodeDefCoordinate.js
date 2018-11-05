@@ -7,7 +7,7 @@ import NodeDefFormItem from './nodeDefFormItem'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
-import { getSRS } from '../../../../../common/survey/survey'
+import Survey from '../../../../../common/survey/survey'
 import { toSrsItems } from '../../../../../common/app/srs'
 import { getNodeDefDefaultValue } from '../nodeDefSystemProps'
 
@@ -38,7 +38,7 @@ class NodeDefCoordinate extends React.Component {
 
     const node = entry ? nodes[0] : null
     const value = node ? node.value : getNodeDefDefaultValue(nodeDef)
-    const srsItems = toSrsItems(getSRS(surveyInfo))
+    const srsItems = toSrsItems(Survey.getSRS(surveyInfo))
 
     if (renderType === nodeDefRenderType.tableBody) {
       return <div className="node-def__table-row-coordinate node-def__table-data-composite-attr">
