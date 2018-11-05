@@ -1,10 +1,6 @@
-const {getRestParam} = require('../serverUtils/request')
 const {sendOk} = require('../serverUtils/response')
-const {
-  fetchJobById,
-  fetchActiveJobByUserId,
-  cancelActiveJobByUserId,
-} = require('./jobManager')
+
+const {cancelActiveJobByUserId} = require('./jobManager')
 
 module.exports.init = app => {
 

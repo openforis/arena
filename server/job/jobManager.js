@@ -2,40 +2,39 @@ const {uuidv4} = require('../../common/uuid')
 const {throttle} = require('../../common/functionsDefer')
 
 const {
+  jobSocketEvents,
   jobStatus,
   isJobEnded,
   isJobCanceled,
 } = require('../../common/job/job')
-const {
-  insertJob,
-  fetchJobById: fetchJobByIdRepos,
-  fetchActiveJobByUserId: fetchActiveJobByUserIdRepos,
-  updateJobStatus: updateJobStatusRepos,
-  updateJobProgress: updateJobProgressRepos,
-} = require('./jobRepository')
 
-this.userSockets = {}
-this.jobSockets = {}
+const jobRepository = require('./jobRepository')
+
+const userSockets = {}
+const jobSockets = {}
 
 const init = (io) => {
+
   io.on('connection', async socket => {
     // Send a JOB_UPDATE message if the user has an active job
-    const userId = socket.request.session.passport.user;
+    const userId = socket.request.session.passport.user
     if (userId) {
-      this.userSockets[userId] = socket
-      const job = await fetchActiveJobByUserId(userId)
+      userSockets[userId] = socket
+      const job = await jobRepository.fetchActiveJobByUserId(userId)
+
       if (job) {
-        this.jobSockets[job.id] = socket
-        socket.emit('JOB_UPDATE', job)
+        jobSockets[job.id] = socket
+        socket.emit(jobSocketEvents.update, job)
       }
     }
   })
+
 }
 
-notifyUser = (job) => {
-  const socket = this.jobSockets[job.id]
+const notifyUser = (job) => {
+  const socket = jobSockets[job.id]
   if (socket)
-    throttle((job) => socket.emit('JOB_UPDATE', job), `socket_${job.id}`, 200)(job)
+    throttle((job) => socket.emit(jobSocketEvents.update, job), `socket_${job.id}`, 250)(job)
 }
 
 /**
@@ -50,15 +49,15 @@ const createJob = async (userId, surveyId, name, onCancel = null) => {
       name,
     },
   }
-  const jobDb = await insertJob(job)
+  const jobDb = await jobRepository.insertJob(job)
 
-  this.jobSockets[jobDb.id] = this.userSockets[jobDb.userId]
+  jobSockets[jobDb.id] = userSockets[jobDb.userId]
   notifyUser(job)
 
   if (onCancel) {
     //check every second if the job has been canceled and execute "onCancel" in that case
     const jobCheckInterval = setInterval(async () => {
-      const reloadedJob = await fetchJobByIdRepos(jobDb.id)
+      const reloadedJob = await jobRepository.fetchJobById(jobDb.id)
 
       if (reloadedJob && isJobCanceled(reloadedJob)) {
         onCancel()
@@ -73,38 +72,32 @@ const createJob = async (userId, surveyId, name, onCancel = null) => {
 }
 
 /**
- * ====== READ
- */
-const fetchActiveJobByUserId = async (userId) =>
-  await fetchActiveJobByUserIdRepos(userId)
-
-/**
  * ====== UPDATE
  */
 const updateJobStatus = async (jobId, status, total, processed, props = {}) => {
-  const job = await updateJobStatusRepos(jobId, status, total, processed, props)
+  const job = await jobRepository.updateJobStatus(jobId, status, total, processed, props)
 
   notifyUser(job)
   if (status === jobStatus.completed ||
-      status === jobStatus.canceled ||
-      status === jobStatus.failed) {
-    delete this.jobSockets[jobId]
+    status === jobStatus.canceled ||
+    status === jobStatus.failed) {
+    delete jobSockets[jobId]
   }
 }
 
 const updateJobProgress = async (jobId, total, processed) => {
-  throttle(updateJobProgressRepos, `job_${jobId}`, 1000)(jobId, total, processed)
+  throttle(jobRepository.updateJobProgress, `job_${jobId}`, 1000)(jobId, total, processed)
 
-  const job = await fetchJobByIdRepos(jobId)
+  const job = await jobRepository.fetchJobById(jobId)
   if (job) {
     notifyUser(job)
   }
 }
 
 const cancelActiveJobByUserId = async (userId) => {
-  const job = await fetchActiveJobByUserIdRepos(userId)
+  const job = await jobRepository.fetchActiveJobByUserId(userId)
   if (job && !isJobEnded(job)) {
-    updateJobStatusRepos(job.id, jobStatus.canceled, job.total, job.processed)
+    await jobRepository.updateJobStatus(job.id, jobStatus.canceled, job.total, job.processed)
     notifyUser(job)
   }
 }
@@ -114,8 +107,8 @@ module.exports = {
   //CREATE
   createJob,
   //READ
-  fetchJobById: fetchJobByIdRepos,
-  fetchActiveJobByUserId,
+  fetchJobById: jobRepository.fetchJobById,
+
   //UPDATE
   updateJobProgress,
   updateJobStatus,

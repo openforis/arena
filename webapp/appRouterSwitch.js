@@ -14,20 +14,32 @@ import AppView from './app/components/appView'
 
 import { appState, isLocationLogin, loginUri } from './app/app'
 import { initApp } from './app/actions'
-import { activeJobUpdate, } from './app/components/job/actions'
-import io from 'socket.io-client';
+import { activeJobUpdate } from './app/components/job/actions'
+
+import { openSocket, closeSocket, onSocketEvent } from './app/appWebSocket'
+import { jobSocketEvents } from '../common/job/job'
 
 class AppRouterSwitch extends React.Component {
 
   componentDidMount () {
     this.props.initApp()
 
-    this.socket = io('http://localhost:9090') // TODO
-    this.socket.on('JOB_UPDATE', job => this.props.activeJobUpdate(job))
   }
 
-  componentWillUnmount() {
-    this.socket.close()
+  componentDidUpdate (prevProps) {
+    const {user} = this.props
+    const {user: prevUser} = prevProps
+
+    if (user && !prevUser) {
+      openSocket()
+      onSocketEvent(jobSocketEvents.update, this.props.activeJobUpdate)
+    } else if (prevUser && !user) {
+      closeSocket()
+    }
+  }
+
+  componentWillUnmount () {
+    closeSocket()
   }
 
   render () {
@@ -90,7 +102,7 @@ const mapStateToProps = state => ({
 export default withRouter(
   connect(mapStateToProps, {
     initApp,
-    // startAppJobMonitoring, // TODO delete
-    activeJobUpdate})
+    activeJobUpdate
+  })
   (AppRouterSwitch)
 )

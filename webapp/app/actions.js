@@ -6,7 +6,6 @@ import { getNewSurvey } from './appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 
 import { dispatchCurrentSurveyUpdate, surveyCreate } from '../survey/actions'
-import { stopAppJobMonitoring } from './components/job/actions'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
@@ -30,8 +29,6 @@ export const initApp = () => async (dispatch) => {
 
 export const logout = () => async dispatch => {
   try {
-    dispatch(stopAppJobMonitoring())
-
     await axios.post('/auth/logout')
 
     dispatch({type: appUserLogout})
