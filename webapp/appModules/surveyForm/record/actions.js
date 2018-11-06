@@ -54,7 +54,7 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
  * ============
  */
 
-export const updateNode = (nodeDef, node, value, file = null) => async dispatch => {
+export const updateNode = (nodeDef, node, value, file = null) => dispatch => {
 
   const nodeToUpdate = R.pipe(
     R.dissoc('placeholder'),

@@ -59,8 +59,8 @@ const createNode = async (nodeDef, nodeReq, file, client = db) => {
   // insert node
   const node = await insertNode(nodeDef.surveyId, nodeReq, file ? file.data : null, client)
 
-  // fetch children if single entity
-  const childDefs = NodeDef.isNodeDefSingleEntity(nodeDef)
+  // add children if entity
+  const childDefs = NodeDef.isNodeDefEntity(nodeDef)
     ? await fetchNodeDefsByParentId(nodeDef.id)
     : []
 
