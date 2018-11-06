@@ -54,43 +54,19 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
  * ============
  */
 
-export const updateNode = (nodeDef, node, value, file = null) =>
-  async (dispatch, getState) => {
+export const updateNode = (nodeDef, node, value, file = null) => async dispatch => {
 
-    const state = getState()
-    const surveyId = getStateSurveyId(state)
-    const surveyForm = getSurveyForm(state)
-
-    const record = getRecord(surveyForm)
-    const parentNode = getParentNode(node)(record)
-
-    // first update state
-    const parentNodeToUpdate = parentNode.placeholder ? getUpdatedNode(dispatch, parentNode, null) : null
-    const nodeToUpdate = getUpdatedNode(dispatch, node, value)
-
-    const nodes = parentNodeToUpdate
-      ? {[node.uuid]: nodeToUpdate, [parentNodeToUpdate.uuid]: parentNodeToUpdate}
-      : {[node.uuid]: nodeToUpdate}
-
-    dispatchNodesUpdate(dispatch, nodes)
-
-    // then post nodes
-    if (parentNodeToUpdate) {
-      const {data} = await axios.post(`/api/survey/${surveyId}/record/${parentNodeToUpdate.recordId}/node`, parentNodeToUpdate)
-      dispatchNodesUpdate(dispatch, data.nodes)
-    }
-
-    dispatch(_updateNodeDebounced(surveyId, nodeToUpdate, file, node.placeholder ? 0 : 500))
-  }
-
-const getUpdatedNode = (dispatch, node, value) =>
-  R.pipe(
+  const nodeToUpdate = R.pipe(
     R.dissoc('placeholder'),
     R.assoc('value', value),
   )(node)
 
-const _updateNodeDebounced = (surveyId, node, file, delay) => {
-  const action = async dispatch => {
+  dispatchNodesUpdate(dispatch, {[node.uuid]: nodeToUpdate})
+  dispatch(_updateNodeDebounced(nodeToUpdate, file, node.placeholder ? 0 : 500))
+}
+
+const _updateNodeDebounced = (node, file, delay) => {
+  const action = async (dispatch, getState) => {
     try {
       const formData = new FormData()
       formData.append('node', JSON.stringify(node))
@@ -106,6 +82,7 @@ const _updateNodeDebounced = (surveyId, node, file, delay) => {
         }
         : {}
 
+      const surveyId = getStateSurveyId(getState())
       const {data} = await axios.post(`/api/survey/${surveyId}/record/${node.recordId}/node`, formData, config)
       dispatchNodesUpdate(dispatch, data.nodes)
     } catch (e) {
