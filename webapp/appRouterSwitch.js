@@ -13,13 +13,8 @@ import appAnimation from './app/components/appAnimation'
 import LoginView from './login/components/loginView'
 
 import { initApp } from './app/actions'
-
 import { getUser, isReady } from './app/appState'
 import { getLocationPathname } from './appUtils/routerUtils'
-
-import { activeJobUpdate } from './app/components/job/actions'
-import { openSocket, closeSocket, onSocketEvent } from './app/appWebSocket'
-import { jobSocketEvents } from '../common/job/job'
 
 const loginUri = '/'
 
@@ -27,7 +22,6 @@ class AppRouterSwitch extends React.Component {
 
   componentDidMount () {
     this.props.initApp()
-
   }
 
   componentDidUpdate (prevProps) {
