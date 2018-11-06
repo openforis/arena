@@ -2,31 +2,26 @@ import * as R from 'ramda'
 
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import { surveyUpdate } from '../actions'
-import { formReset } from '../form/actions'
+import { surveyCreate, surveyDefsLoad, surveyUpdate } from '../actions'
 
-import { codeListsUpdate } from './actions'
 import { getCodeLists, assocCodeLists } from '../../../common/survey/survey'
+
 import {
   codeListCreate,
-  codeListDelete,
   codeListUpdate,
   codeListPropUpdate,
-  codeListLevelPropUpdate, codeListItemPropUpdate, codeListLevelDelete,
-} from '../codeListEdit/actions'
-
-const simulateSurveyState = (codeLists) =>
-  codeLists ? {codeLists} : {}
+  codeListDelete,
+  codeListLevelPropUpdate,
+  codeListLevelDelete,
+  codeListItemPropUpdate,
+} from './actions'
 
 const actionHandlers = {
-  // reset form
-  [surveyUpdate]: () => null,
-  [formReset]: () => null,
+  // reset state
+  [surveyCreate]: () => ({}),
+  [surveyUpdate]: () => ({}),
 
-  [codeListsUpdate]: (state, {codeLists}) => R.pipe(
-    assocCodeLists(codeLists),
-    getCodeLists,
-  )(simulateSurveyState(state)),
+  [surveyDefsLoad]: (state, {codeLists}) => codeLists,
 
   // code list
   [codeListCreate]: (state, {codeList}) => R.assoc(codeList.uuid, codeList, state),

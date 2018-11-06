@@ -34,7 +34,7 @@ const defaultSteps = {
  * ======
  */
 const info = 'info'
-const getSurveyInfo = R.propOr(null, info)
+const getSurveyInfo = R.propOr({}, info)
 
 const getSurveyId = R.pipe(
   getSurveyInfo,
@@ -149,7 +149,6 @@ const getNodeDefsByTaxonomyUUID = (uuid) => R.pipe(
  * ======
  */
 const assocNodeDefs = newNodeDefs => R.assoc(nodeDefs, newNodeDefs)
-
 
 /**
  * ======
@@ -312,12 +311,15 @@ module.exports = {
   getSurveyLabels,
   getSurveyDefaultLabel,
   getSurveyDescriptions: getSurveyInfoProp('descriptions', {}),
-  getSurveySrs: getSurveyInfoProp('srs', []),
+
   getSurveyDefaultStep,
 
   getSurveyStatus,
   isSurveyPublished,
   isSurveyDraft,
+
+  // === context is surveyInfo
+  getSurveySrs: getProp('srs', []),
 
   // READ nodeDefs
   getNodeDefs,
@@ -334,7 +336,6 @@ module.exports = {
 
   // UPDATE nodeDefs
   assocNodeDefs,
-
 
   // UTILS NodeDefs
   getNodeDefParent,

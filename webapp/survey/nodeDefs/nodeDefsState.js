@@ -1,15 +1,9 @@
 import * as R from 'ramda'
 
-import { getNodeDefChildren } from '../../../common/survey/survey'
-import { isNodeDefEntity } from '../../../common/survey/nodeDef'
+import Survey from '../../../common/survey/survey'
+import NodeDef from '../../../common/survey/nodeDef'
 
-const nodeDefs = 'nodeDefs'
-
-/**
- * ======
- * UPDATE
- * ======
- */
+// ====== UPDATE
 
 export const assocNodeDef = nodeDef => R.assoc(nodeDef.uuid, nodeDef)
 
@@ -18,22 +12,18 @@ export const assocNodeDefProp = (nodeDefUUID, key, value) => R.pipe(
   R.dissocPath([nodeDefUUID, 'validation', 'fields', key]),
 )
 
-/**
- * ======
- * DELETE
- * ======
- */
+// ====== DELETE
+
 export const dissocNodeDef = nodeDef =>
   nodeDefsState => {
-    const survey = {nodeDefs: R.dissoc(nodeDef.uuid, nodeDefsState)}
 
-    const updatedSurvey = isNodeDefEntity(nodeDef)
+    const state = NodeDef.isNodeDefEntity(nodeDef)
       ? R.reduce(
         (s, n) => dissocNodeDef(n)(s),
-        survey,
-        getNodeDefChildren(nodeDef)(survey)
+        nodeDefsState,
+        Survey.getNodeDefChildren(nodeDef)({nodeDefs: nodeDefsState})
       )
-      : survey
+      : nodeDefsState
 
-    return R.prop(nodeDefs)(updatedSurvey)
+    return R.dissoc(nodeDef.uuid, state)
   }

@@ -1,0 +1,72 @@
+@import "../../../style/vars";
+
+$rowHeight: 35px;
+$rowBorder: 1px solid rgba($white, 0.4);
+
+.surveys-list {
+  position: relative;
+  overflow: hidden;
+  margin: 0 4rem;
+  border-bottom: $rowBorder;
+}
+
+.surveys-list__header {
+  display: grid;
+  grid-template-rows: 50px $rowHeight;
+
+  .header-label {
+    justify-self: center;
+    align-self: center;
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+}
+
+.surveys-list__rows {
+  position: absolute;
+  height: calc(100% - 85px);
+  width: 100%;
+
+  display: grid;
+  grid-auto-rows: $rowHeight;
+  overflow-y: auto;
+  border-right: $rowBorder;
+  border-left: $rowBorder;
+}
+
+.surveys-list__row {
+  display: grid;
+  grid-template-columns: repeat(5, 1.5fr) 1fr;
+  align-items: center;
+  justify-items: center;
+  border-bottom: $rowBorder;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.active {
+    background-color: rgba($white, .2);
+  }
+
+  > div {
+    //width: calc(100% / 6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn {
+    font-weight: 400;
+    font-size: 0.7rem;
+  }
+}
+
+.surveys-list__row-header {
+  @extend .surveys-list__row;
+  border-bottom: $rowBorder !important;
+  font-weight: 400;
+  background-color: rgba($white, 0.1);
+  text-transform: uppercase;
+  font-size: .8rem;
+}

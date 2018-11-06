@@ -1,40 +1,20 @@
-import * as R from 'ramda'
+import React from 'react'
 
-import { excludePathRoot } from '../appUtils/reduxUtils'
-import { appModules } from '../appModules/appModules'
-import { getLocationPathname } from '../appUtils/routerUtils'
+import component from './appView'
 
-const app = 'app'
+import homeReducer from '../appModules/home/reducer'
+import surveyFormReducer from '../appModules/surveyForm/reducer'
 
-//default home is dashboard
-export const appModuleUri = (module = appModules.home) => ['/' + app, module].join('/') + '/'
+const reducers = [
+  {name: 'home', fn: homeReducer},
+  {name: 'surveyForm', fn: surveyFormReducer},
+]
 
-export const loginUri = '/'
-
-const isPath = path => R.pipe(
-  getLocationPathname,
-  R.equals(path),
-)
-export const isLocationLogin = isPath(loginUri)
-
-export const systemStatus = {
-  ready: 'ready'
+export {
+  component,
+  reducers,
 }
 
-const statePath = {
-  //application status
-  status: [app, 'status'],
 
-  //logged in user
-  user: [app, 'user'],
-}
 
-export const appState = {
-  isReady: R.pathEq(statePath.status, systemStatus.ready),
 
-  getUser: R.path(statePath.user),
-
-  logoutUser: R.dissocPath(excludePathRoot(statePath.user)),
-}
-
-export const getSurveys = R.pathOr([], [app, 'surveys'])

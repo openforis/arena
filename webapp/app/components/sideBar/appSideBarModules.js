@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import * as R from 'ramda'
 
-import { appModuleUri } from '../../app'
+import { appModuleUri } from '../../../appModules/appModules'
 import { appModules } from '../../../appModules/appModules'
 import { getLocationPathname } from '../../../appUtils/routerUtils'
 
@@ -13,12 +13,12 @@ const modules = [
     label: 'Home',
   },
   {
-    module: appModules.surveyDashboard,
+    module: appModules.dashboard,
     icon: 'office',
     label: 'Dashboard',
   },
   {
-    module: appModules.surveyDesigner,
+    module: appModules.designer,
     icon: 'quill',
     label: 'Designer',
   },

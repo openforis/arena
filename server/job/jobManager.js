@@ -11,7 +11,6 @@ const {
 const jobRepository = require('./jobRepository')
 
 const userSockets = {}
-const jobSockets = {}
 
 const init = (io) => {
 
@@ -23,7 +22,6 @@ const init = (io) => {
       const job = await jobRepository.fetchActiveJobByUserId(userId)
 
       if (job) {
-        jobSockets[job.id] = socket
         socket.emit(jobSocketEvents.update, job)
       }
     }
@@ -32,7 +30,7 @@ const init = (io) => {
 }
 
 const notifyUser = (job) => {
-  const socket = jobSockets[job.id]
+  const socket = userSockets[job.userId]
   if (socket)
     throttle((job) => socket.emit(jobSocketEvents.update, job), `socket_${job.id}`, 250)(job)
 }
@@ -51,7 +49,6 @@ const createJob = async (userId, surveyId, name, onCancel = null) => {
   }
   const jobDb = await jobRepository.insertJob(job)
 
-  jobSockets[jobDb.id] = userSockets[jobDb.userId]
   notifyUser(job)
 
   if (onCancel) {
@@ -81,7 +78,7 @@ const updateJobStatus = async (jobId, status, total, processed, props = {}) => {
   if (status === jobStatus.completed ||
     status === jobStatus.canceled ||
     status === jobStatus.failed) {
-    delete jobSockets[jobId]
+    delete userSockets[job.userId]
   }
 }
 

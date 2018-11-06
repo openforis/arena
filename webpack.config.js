@@ -1,8 +1,10 @@
 const path = require('path')
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const webpack = require('webpack')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
 const uuidv4 = require('uuid/v4')
 
 const mode = {
@@ -29,11 +31,12 @@ const plugins = [
         'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
       }
     }
-  )
+  ),
+  new BundleAnalyzerPlugin()
 ]
 
 const webPackConfig = {
-  entry: ['babel-polyfill', './webapp/main.js'],
+  entry: ['@babel/polyfill', './webapp/main.js'],
   mode: prodBuild ? mode.production : mode.development,
   output: {
     filename: 'bundle-[hash].js',
@@ -48,15 +51,17 @@ const webPackConfig = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['env', 'react'],
-            plugins: ['transform-object-rest-spread']
+            presets: ['@babel/env', '@babel/react'],
+            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import']
           }
         }
       },
       {
         test: /\.(sa|sc|c)ss$/,
         use: [
-          prodBuild ? MiniCssExtractPlugin.loader : 'style-loader',
+          {
+            loader: MiniCssExtractPlugin.loader
+          },
           'css-loader',
           'sass-loader',
         ]
@@ -66,7 +71,7 @@ const webPackConfig = {
   plugins: plugins
 }
 
-if (prodBuild) {
+// if (prodBuild) {
   const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
   webpack.optimization = {
@@ -77,14 +82,15 @@ if (prodBuild) {
           compress: true,
           output: {comments: false},
         },
-        sourceMap: false
+        sourceMap: true
       }),
       new OptimizeCSSAssetsPlugin({})
     ]
   }
 
-} else {
-  webPackConfig.devtool = 'source-map'
-}
+// }
+// else {
+webPackConfig.devtool = 'source-map'
+// }
 
 module.exports = webPackConfig
