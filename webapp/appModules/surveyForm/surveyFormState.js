@@ -1,11 +1,11 @@
 import * as R from 'ramda'
 
 import Survey from '../../../common/survey/survey'
-import { isNodeDefEntity } from '../../../common/survey/nodeDef'
-import { getPageUUID } from '../../../common/survey/nodeDefLayout'
+import NodeDef from '../../../common/survey/nodeDef'
+import Record from '../../../common/record/record'
 
+import { getPageUUID } from '../../../common/survey/nodeDefLayout'
 import { getRecord } from './record/recordState'
-import { getNodeByUUID } from '../../../common/record/record'
 
 export const getSurveyForm = R.prop('surveyForm')
 
@@ -64,18 +64,18 @@ export const getNodeDefFormUnlocked = survey =>
   )(survey)
 
 export const isNodeDefFormLocked = (nodeDef) => R.pipe(
-    R.path(nodeDefEntityUnlockedPath),
-    R.equals(nodeDef.uuid),
-    R.not,
-  )
+  R.path(nodeDefEntityUnlockedPath),
+  R.equals(nodeDef.uuid),
+  R.not,
+)
 
 // ====== current list of form pages
-const surveyFormPages = [props, 'pageNodes']
 
-const getSurveyFormPageNodePath = nodeDef => R.append(nodeDef.uuid, surveyFormPages)
+const pageNodes = 'pageNodes'
+const getSurveyFormPageNodePath = nodeDef => [props, pageNodes, nodeDef.uuid]
 
 export const assocFormPageNode = (nodeDef, nodeUUID) => {
-  const path = ['pageNodes', nodeDef.uuid]
+  const path = [pageNodes, nodeDef.uuid]
   return nodeUUID
     ? R.assocPath(path, nodeUUID)
     : R.dissocPath(path)
@@ -90,9 +90,15 @@ export const getFormPageParentNode = (survey, nodeDef) =>
 
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
     if (nodeDefParent) {
-      const parentNodeUUID = R.path(getSurveyFormPageNodePath(nodeDefParent))(surveyForm)
 
-      return getNodeByUUID(parentNodeUUID)(record)
+      if (NodeDef.isNodeDefRoot(nodeDefParent)) {
+        return Record.getRootNode(record)
+      } else {
+        const parentNodeUUID = R.path(getSurveyFormPageNodePath(nodeDefParent))(surveyForm)
+        const node = Record.getNodeByUUID(parentNodeUUID)(record)
+        return node
+      }
+
     }
 
     return null
@@ -102,7 +108,7 @@ export const getFormPageParentNode = (survey, nodeDef) =>
 export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
   assocFormNodeDefEdit(nodeDef),
   R.ifElse(
-    () => isNodeDefEntity(nodeDef),
+    () => NodeDef.isNodeDefEntity(nodeDef),
 
     // if is entity, unlock form
     R.pipe(

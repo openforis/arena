@@ -1,7 +1,3 @@
-const {
-  nodeDefType,
-} = require('../common/survey/nodeDef')
-
 const recordActions = {
   createRecord: 'createRecord',
   deleteRecord: 'deleteSurveyTableRecord',

@@ -4,8 +4,9 @@ import * as R from 'ramda'
 
 import { uuidv4 } from '../../../../common/uuid'
 
-import { isNodeDefAncestor } from '../../../../common/survey/survey'
-import { nodeDefType, isNodeDefEntity } from '../../../../common/survey/nodeDef'
+import Survey from '../../../../common/survey/survey'
+import NodeDef from '../../../../common/survey/nodeDef'
+
 import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
@@ -15,7 +16,7 @@ import { createNodeDef } from '../../../survey/nodeDefs/actions'
 import { getFormActivePageNodeDef, getNodeDefFormUnlocked, getSurveyForm } from '../surveyFormState'
 
 const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
-  const isEntity = type === nodeDefType.entity
+  const isEntity = type === NodeDef.nodeDefType.entity
   const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
 
   return <React.Fragment key={type}>
@@ -34,7 +35,7 @@ const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
 }
 
 const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
-  const enabled = nodeDef && isNodeDefEntity(nodeDef)
+  const enabled = nodeDef && NodeDef.isNodeDefEntity(nodeDef)
 
   const canAddAttribute = enabled
   const canAddEntity = enabled && isRenderForm(nodeDef)
@@ -48,18 +49,18 @@ const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
     </div>
 
     {
-      R.values(nodeDefType)
+      R.values(NodeDef.nodeDefType)
         .map(type =>
           <AddNodeDefButton key={type} type={type}
                             addNodeDef={addNodeDef}
-                            enabled={type === nodeDefType.entity ? canAddEntity : canAddAttribute}/>
+                            enabled={type === NodeDef.nodeDefType.entity ? canAddEntity : canAddAttribute}/>
         )
     }
 
     <button className="btn btn-s btn-of-light-xs"
             aria-disabled={!canAddEntity}
             onClick={() => addNodeDef(
-              nodeDefType.entity,
+              NodeDef.nodeDefType.entity,
               {
                 [nodeDefLayoutProps.render]: nodeDefRenderType.form,
                 [nodeDefLayoutProps.pageUUID]: uuidv4(),
@@ -135,7 +136,7 @@ const mapStateToProps = state => {
   const nodeDef = nodeDefUnlocked &&
   (
     nodeDefActivePage.uuid === nodeDefUnlocked.uuid ||
-    isNodeDefAncestor(nodeDefActivePage, nodeDefUnlocked)(survey)
+    Survey.isNodeDefAncestor(nodeDefActivePage, nodeDefUnlocked)(survey)
   )
     ? nodeDefUnlocked
     : null

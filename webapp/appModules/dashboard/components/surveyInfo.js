@@ -3,14 +3,9 @@ import { connect } from 'react-redux'
 
 import DeleteSurveyDialog from './deleteSurveyDialog'
 
-import {
-  isValidSurvey,
-  getSurveyName,
-  getSurveyStatus,
-  isSurveyDraft,
-} from '../../../../common/survey/survey'
+import Survey from '../../../../common/survey/survey'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyInfo } from '../../../survey/surveyState'
 import { deleteSurvey, publishSurvey } from '../../../survey/actions'
 import { appModules } from '../../appModules'
 import { appModuleUri } from '../../appModules'
@@ -32,17 +27,17 @@ class SurveyInfo extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const {survey, history} = this.props
-    const {survey: prevSurvey} = prevProps
+    const {surveyInfo, history} = this.props
+    const {surveyInfo: prevSurveyInfo} = prevProps
 
     // redirecting when survey has been deleted
-    if (isValidSurvey(prevSurvey) && !isValidSurvey(survey)) {
+    if (Survey.isValid(prevSurveyInfo) && !Survey.isValid(surveyInfo)) {
       history.push(appModuleUri(appModules.home))
     }
   }
 
   render () {
-    const {survey, deleteSurvey, publishSurvey} = this.props
+    const {surveyInfo, deleteSurvey, publishSurvey} = this.props
     const {showDialog} = this.state
 
     return (
@@ -50,19 +45,19 @@ class SurveyInfo extends React.Component {
 
         <div className="survey-status">
           {
-            isSurveyDraft(survey) &&
+            Survey.isDraft(surveyInfo) &&
             <span className="icon icon-warning icon-12px icon-left"/>
           }
 
-          {getSurveyStatus(survey)}
+          {Survey.getStatus(surveyInfo)}
         </div>
 
         <h4 className="survey-name">
-          {getSurveyName(survey)}
+          {Survey.getName(surveyInfo)}
         </h4>
 
         <div className="button-bar">
-          <button className="btn btn-of-light" aria-disabled={!isSurveyDraft(survey)}
+          <button className="btn btn-of-light" aria-disabled={!Survey.isDraft(surveyInfo)}
                   onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
                     ? publishSurvey()
                     : null}>
@@ -85,7 +80,7 @@ class SurveyInfo extends React.Component {
           <DeleteSurveyDialog show={showDialog}
                               onCancel={() => this.toggleDeleteConfirmDialog(false)}
                               onDelete={() => deleteSurvey()}
-                              surveyName={getSurveyName(survey)}/>
+                              surveyName={Survey.getName(surveyInfo)}/>
           }
         </div>
 
@@ -95,7 +90,7 @@ class SurveyInfo extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  survey: getSurvey(state)
+  surveyInfo: getStateSurveyInfo(state),
 })
 
 export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfo)

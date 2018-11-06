@@ -7,7 +7,7 @@ const {uuidv4} = require('../../common/uuid')
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const surveyRepository = require('../survey/surveyRepository')
-const {defaultSteps} = require('../../common/survey/survey')
+const Survey = require('../../common/survey/survey')
 const {validateSurvey} = require('../survey/surveyValidator')
 
 const nodeDefRepository = require('../nodeDef/nodeDefRepository')
@@ -31,8 +31,8 @@ const createSurvey = async (user, {name, label, lang}) => {
         name,
         labels: {[lang]: label},
         languages: [lang],
-        srs: ['4326'], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
-        steps: {...defaultSteps},
+        srs: [{code: '4326', name: 'GCS WGS 1984'}], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
+        steps: {...Survey.defaultSteps},
       }
 
       const survey = await surveyRepository.insertSurvey(props, user.id, t)

@@ -4,7 +4,7 @@ const {EventEmitter} = require('events')
 
 const {languageCodes} = require('../../common/app/languages')
 const {isNotBlank} = require('../../common/stringUtils')
-const {newTaxon} = require('../../common/survey/taxonomy')
+const Taxonomy = require('../../common/survey/taxonomy')
 const {validateTaxon} = require('../../server/taxonomy/taxonomyValidator')
 
 const requiredColumns = [
@@ -135,7 +135,7 @@ class TaxaParser {
       genus,
       scientificName: scientific_name,
       vernacularNames: this.parseVernacularNames(vernacularNames)
-    })(newTaxon(this.taxonomyId))
+    })(Taxonomy.newTaxon(this.taxonomyId))
 
     const validation = await validateTaxon(this.result.taxa, taxon)
 

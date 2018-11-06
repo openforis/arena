@@ -7,7 +7,7 @@ import NodeDefFormItem from './nodeDefFormItem'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
-import { getSurveySrs } from '../../../../../common/survey/survey'
+import Survey from '../../../../../common/survey/survey'
 import { getNodeDefDefaultValue } from '../nodeDefSystemProps'
 
 class NodeDefCoordinate extends React.Component {
@@ -37,7 +37,8 @@ class NodeDefCoordinate extends React.Component {
 
     const node = entry ? nodes[0] : null
     const value = node ? node.value : getNodeDefDefaultValue(nodeDef)
-    const surveySrs = getSurveySrs(surveyInfo)
+
+    const surveySrs = Survey.getSRS(surveyInfo)
     const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)
 
     const xInput = <Input ref="xInput"

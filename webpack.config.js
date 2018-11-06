@@ -32,7 +32,7 @@ const plugins = [
       }
     }
   ),
-  new BundleAnalyzerPlugin()
+  // new BundleAnalyzerPlugin()
 ]
 
 const webPackConfig = {

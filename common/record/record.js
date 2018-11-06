@@ -1,9 +1,9 @@
 const R = require('ramda')
 const {uuidv4} = require('./../uuid')
 
-const {getNodeDefParentCodeUUID} = require('../survey/nodeDef')
-const {getNodeDefByUUID, getNodeDefById, isNodeDefCodeParent} = require('../survey/survey')
-const {getNodeDefId, getNodeValue} = require('../record/node')
+const NodeDef = require('../survey/nodeDef')
+const Survey = require('../survey/survey')
+const Node = require('../record/node')
 
 // ====== UTILS
 const nodes = 'nodes'
@@ -71,9 +71,9 @@ const getParentNode = node => node.parentId
 
 const getNodeCodeParentAttribute = (survey, parentNode, nodeDef) =>
   record => {
-    const parentCodeDefUUID = getNodeDefParentCodeUUID(nodeDef)
+    const parentCodeDefUUID = NodeDef.getNodeDefParentCodeUUID(nodeDef)
     if (parentCodeDefUUID) {
-      const parentCodeDef = getNodeDefByUUID(parentCodeDefUUID)(survey)
+      const parentCodeDef = Survey.getNodeDefByUUID(parentCodeDefUUID)(survey)
       let parentEntity = parentNode
       while (parentEntity) {
         const parentCodes = getNodeChildrenByDefId(parentEntity, parentCodeDef.id)(record)
@@ -90,9 +90,9 @@ const getNodeCodeAncestorValues = (survey, parentNode, nodeDef) =>
   record => {
     const parentCodeAttribute = getNodeCodeParentAttribute(survey, parentNode, nodeDef)(record)
     if (parentCodeAttribute) {
-      const parentCodeDef = getNodeDefById(getNodeDefId(parentCodeAttribute))(survey)
+      const parentCodeDef = Survey.getNodeDefById(Node.getNodeDefId(parentCodeAttribute))(survey)
       const ancestorCodes = getNodeCodeAncestorValues(survey, getParentNode(parentCodeAttribute)(record), parentCodeDef)(record)
-      const parentCodeAttrValue = R.propOr(null, 'code', getNodeValue(parentCodeAttribute))
+      const parentCodeAttrValue = R.propOr(null, 'code', Node.getNodeValue(parentCodeAttribute))
       return R.append(parentCodeAttrValue, ancestorCodes)
     } else {
       return []
@@ -101,12 +101,12 @@ const getNodeCodeAncestorValues = (survey, parentNode, nodeDef) =>
 
 const getNodeCodeDependentAttributes = (survey, node) =>
   record => {
-    const nodeDef = getNodeDefById(getNodeDefId(node))(survey)
+    const nodeDef = Survey.getNodeDefById(Node.getNodeDefId(node))(survey)
 
-    return isNodeDefCodeParent(nodeDef)(survey)
+    return Survey.isNodeDefParentCode(nodeDef)(survey)
       ? findNodes(n => {
-        const def = getNodeDefById(getNodeDefId(n))(survey)
-        return getNodeDefParentCodeUUID(def) === nodeDef.uuid
+        const def = Survey.getNodeDefById(Node.getNodeDefId(n))(survey)
+        return NodeDef.getNodeDefParentCodeUUID(def) === nodeDef.uuid
       })(record)
       : []
   }

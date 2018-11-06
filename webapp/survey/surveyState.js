@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { getSurveyInfo } from '../../common/survey/survey'
+import Survey from '../../common/survey/survey'
 
 const survey = 'survey'
 
@@ -13,9 +13,7 @@ const survey = 'survey'
 // READ
 export const getSurvey = R.prop(survey)
 
-export const getStateSurveyId = R.pipe(
-  getSurvey,
-  getSurveyInfo,
-  R.prop('id'),
-)
+export const getStateSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
+
+export const getStateSurveyId = R.pipe(getStateSurveyInfo, R.prop('id'))
 

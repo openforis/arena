@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 
-import { newNodeDef } from '../../../common/survey/nodeDef'
+import NodeDef from '../../../common/survey/nodeDef'
 import { getStateSurveyId } from '../surveyState'
 
 export const nodeDefsLoad = 'nodeDefs/load'
@@ -16,7 +16,7 @@ export const nodeDefDelete = 'nodeDef/delete'
 
 export const createNodeDef = (parentId, type, props) => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
-  const nodeDef = newNodeDef(surveyId, parentId, type, props)
+  const nodeDef = NodeDef.newNodeDef(surveyId, parentId, type, props)
 
   dispatch({type: nodeDefCreate, nodeDef})
 

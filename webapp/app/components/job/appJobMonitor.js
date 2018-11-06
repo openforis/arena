@@ -19,6 +19,7 @@ import {
   isJobRunning,
   isJobEnded,
   isJobFailed,
+  jobStatus,
 } from '../../../../common/job/job'
 
 import { cancelActiveJob, hideAppJobMonitor } from '../job/actions'
@@ -37,7 +38,7 @@ class AppJobMonitor extends React.Component {
 
     const jobProgressPercent = job ? getJobProgressPercent(job) : 0
 
-    return job
+    return job && job.status !== jobStatus.canceled
       ? (
         <Modal isOpen="true">
 

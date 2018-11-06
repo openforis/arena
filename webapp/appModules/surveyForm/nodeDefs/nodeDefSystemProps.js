@@ -2,7 +2,7 @@ import React from 'react'
 import * as R from 'ramda'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
-import { nodeDefType } from '../../../../common/survey/nodeDef'
+import NodeDef from '../../../../common/survey/nodeDef'
 
 import NodeDefEntitySwitch from './components/nodeDefEntitySwitch'
 import NodeDefFile from './components/nodeDefFile'
@@ -16,6 +16,8 @@ import {
   nodeDefLayoutProps,
   nodeDefRenderType,
 } from '../../../../common/survey/nodeDefLayout'
+
+const {nodeDefType} = NodeDef
 
 export const nodeDefSystemProps = {
   [nodeDefType.integer]: {

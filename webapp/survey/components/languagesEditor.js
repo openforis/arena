@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 
 import InputChips from '../../commonComponents/form/inputChips'
 
-import { getSurvey } from '../surveyState'
+import Survey from '../../../common/survey/survey'
+
+import { getStateSurveyInfo } from '../surveyState'
 import { updateSurveyInfoProp } from '../surveyInfo/actions'
 import { getLanguageLabel, languages } from '../../../common/app/languages'
-import { getSurveyLanguages } from '../../../common/survey/survey'
 
 class LanguagesEditor extends React.Component {
 
@@ -16,9 +17,9 @@ class LanguagesEditor extends React.Component {
   }
 
   render () {
-    const {survey} = this.props
+    const {surveyInfo} = this.props
 
-    const surveyLanguages = getSurveyLanguages(survey)
+    const surveyLanguages = Survey.getLanguages(surveyInfo)
 
     const selection = surveyLanguages.map(lang => ({key: lang, value: getLanguageLabel(lang)}))
 
@@ -34,7 +35,7 @@ class LanguagesEditor extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  survey: getSurvey(state),
+  surveyInfo: getStateSurveyInfo(state),
 })
 
 export default connect(

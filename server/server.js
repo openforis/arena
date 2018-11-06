@@ -12,39 +12,44 @@ const accessControlMiddleware = require('./config/accessControlMiddleware')
 const authConfig = require('./auth/authConfig')
 const authApi = require('./auth/authApi')
 const apiRouter = require('./config/apiRouter')
+const socketMiddleware = require('./config/socketMiddleware')
 
-// run database migrations
+// ====== run database migrations
 require('./db/migration/public/execMigrations')()
 
 const app = express()
 
-// app initializations
+// ====== app initializations
 app.use(bodyParser.json({limit: '5000kb'}))
 app.use(cookieParser())
 app.use(fileUpload({
   //limit upload to 50MB
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: {fileSize: 50 * 1024 * 1024},
 }))
 
 headerMiddleware.init(app)
-sessionMiddleware.init(app)
+app.use(sessionMiddleware)
 authConfig.init(app)
-//accesscontrolmiddleware must be initialized after authConfig
+//accessControlMiddleware must be initialized after authConfig
 accessControlMiddleware.init(app)
 
 app.use(compression({threshold: 512}))
 
 app.use('/', express.static(`${__dirname}/../dist`))
 app.use('/app*', express.static(`${__dirname}/../dist`))
-
 app.use('/img/', express.static(`${__dirname}/../web-resources/img`))
 // app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
 
-//apis
+// ====== apis
 authApi.init(app)
 app.use('/api', apiRouter.router)
 
+// ====== server
 const httpServerPort = process.env.PORT || '9090'
-app.listen(httpServerPort, () => {
+const server = app.listen(httpServerPort, () => {
   console.log('server listening on port', httpServerPort)
 })
+
+// ====== socket middleware
+socketMiddleware.init(server, sessionMiddleware)
+

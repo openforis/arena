@@ -5,11 +5,8 @@ import * as R from 'ramda'
 import ItemsView from './items/itemsView'
 import TaxonomyEdit from '../taxonomyEdit/components/taxonomyEdit'
 
-import {
-  getNodeDefsByTaxonomyUUID,
-  getTaxonomiesArray
-} from '../../../../common/survey/survey'
-import { getTaxonomyName } from '../../../../common/survey/taxonomy'
+import Survey from '../../../../common/survey/survey'
+import Taxonomy from '../../../../common/survey/taxonomy'
 
 import { getSurvey } from '../../../survey/surveyState'
 import { getTaxonomyEditTaxonomy } from '../taxonomyEdit/taxonomyEditState'
@@ -28,13 +25,13 @@ class TaxonomiesView extends React.Component {
 
     const canDeleteTaxonomy = taxonomy => taxonomy.usedByNodeDefs
       ? alert('This taxonomy is used by some node definitions and cannot be removed')
-      : window.confirm(`Delete the taxonomy ${getTaxonomyName(taxonomy)}? This operation cannot be undone.`)
+      : window.confirm(`Delete the taxonomy ${Taxonomy.getTaxonomyName(taxonomy)}? This operation cannot be undone.`)
 
     return <ItemsView {...this.props}
                       headerText="Taxonomies"
                       itemEditComponent={TaxonomyEdit}
                       itemEditProp="taxonomy"
-                      itemLabelFunction={taxonomy => getTaxonomyName(taxonomy)}
+                      itemLabelFunction={taxonomy => Taxonomy.getTaxonomyName(taxonomy)}
                       editedItem={taxonomy}
                       items={taxonomies}
                       tableSelectedItemUUID={selectedTaxonomyUUID}
@@ -50,10 +47,10 @@ const mapStateToProps = state => {
   const surveyForm = getSurveyForm(state)
 
   const taxonomies = R.pipe(
-    getTaxonomiesArray,
+    Survey.getTaxonomiesArray,
     R.map(t => ({
       ...t,
-      usedByNodeDefs: getNodeDefsByTaxonomyUUID(t.uuid)(survey).length > 0
+      usedByNodeDefs: Survey.getNodeDefsByTaxonomyUUID(t.uuid)(survey).length > 0
     }))
   )(survey)
 

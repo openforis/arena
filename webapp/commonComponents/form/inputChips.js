@@ -78,7 +78,13 @@ const InputChips = (props) => {
     onChange(newItems)
   }
 
-  const dropdownItems = R.reject(item => R.contains(item, selection))(items)
+  const rejectSelectedItems = R.reject(item => R.contains(item, selection))
+
+  const dropdownItems = rejectSelectedItems(items)
+
+  const dropdownItemsLookupFunction = itemsLookupFunction ?
+      async value => rejectSelectedItems(await itemsLookupFunction(value))
+    : null
 
   return (
     <div className="form-input-chip">
@@ -96,7 +102,7 @@ const InputChips = (props) => {
         )
       }
       <Dropdown items={dropdownItems}
-                itemsLookupFunction={itemsLookupFunction}
+                itemsLookupFunction={dropdownItemsLookupFunction}
                 itemKeyProp={itemKeyProp}
                 itemKeyFunction={itemKeyFunction}
                 itemLabelFunction={itemLabelFunction}

@@ -3,10 +3,10 @@ import React from 'react'
 import { FormItem } from '../../../commonComponents/form/input'
 import Dropdown from '../../../commonComponents/form/dropdown'
 
+import Survey from '../../../../common/survey/survey'
+import NodeDef from '../../../../common/survey/nodeDef'
+import Taxonomy from '../../../../common/survey/taxonomy'
 import { getFieldValidation, getValidation } from '../../../../common/validation/validator'
-import { getTaxonomiesArray, getSurveyTaxonomyByUUID } from '../../../../common/survey/survey'
-import { getNodeDefTaxonomyUUID } from '../../../../common/survey/nodeDef'
-import { getTaxonomyName } from '../../../../common/survey/taxonomy'
 
 const TaxonProps = (props) => {
   const {
@@ -20,7 +20,7 @@ const TaxonProps = (props) => {
 
   const validation = getValidation(nodeDef)
 
-  const selectedTaxonomy = getSurveyTaxonomyByUUID(getNodeDefTaxonomyUUID(nodeDef))(survey)
+  const selectedTaxonomy = Survey.getTaxonomyByUUID(NodeDef.getNodeDefTaxonomyUUID(nodeDef))(survey)
 
   return (
     <React.Fragment>
@@ -30,9 +30,9 @@ const TaxonProps = (props) => {
           display: 'grid',
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
-          <Dropdown items={getTaxonomiesArray(survey)}
+          <Dropdown items={Survey.getTaxonomiesArray(survey)}
                     itemKeyProp={'uuid'}
-                    itemLabelFunction={taxonomy => getTaxonomyName(taxonomy)}
+                    itemLabelFunction={taxonomy => Taxonomy.getTaxonomyName(taxonomy)}
                     validation={getFieldValidation('taxonomyUUID')(validation)}
                     selection={selectedTaxonomy}
                     onChange={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy ? taxonomy.uuid : null)}/>

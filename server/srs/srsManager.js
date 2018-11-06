@@ -21,7 +21,7 @@ const formatName = (name = '') => R.replace(/_/g, ' ')(name)
 const srs = R.pipe(
   R.concat(projected.ProjectedCoordinateSystems),
   R.concat(geographic.GeographicCoordinateSystems),
-  R.map(item => ({code: item.wkid, name: formatName(item.name)})),
+  R.map(item => ({code: item.wkid.toString(), name: formatName(item.name)})),
   R.sortBy(R.prop('name'))
 )([])
 

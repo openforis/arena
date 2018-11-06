@@ -17,4 +17,5 @@ const sessionOptions = {
   })
 }
 
-module.exports.init = app => app.use(session(sessionOptions))
+// module.exports.init = app => app.use(session(sessionOptions))
+module.exports = session(sessionOptions)

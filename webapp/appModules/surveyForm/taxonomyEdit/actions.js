@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { debounceAction } from '../../../appUtils/reduxUtils'
-import { newTaxonomy } from '../../../../common/survey/taxonomy'
+import Taxonomy from '../../../../common/survey/taxonomy'
 
 import { getStateSurveyId, getSurvey } from '../../../survey/surveyState'
 import { showAppJobMonitor } from '../../../app/components/job/actions'
@@ -25,7 +25,7 @@ export const setTaxonomyForEdit = taxonomy => dispatch =>
 // ====== CREATE
 
 export const createTaxonomy = () => async (dispatch, getState) => {
-  const taxonomy = newTaxonomy()
+  const taxonomy = Taxonomy.newTaxonomy()
   dispatch({type: taxonomyCreate, taxonomy})
 
   const surveyId = getStateSurveyId(getState())
