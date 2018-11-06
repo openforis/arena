@@ -4,7 +4,6 @@ import * as R from 'ramda'
 import { FormItem } from '../../../commonComponents/form/input'
 import Dropdown from '../../../commonComponents/form/dropdown'
 
-import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import CodeList from '../../../../common/survey/codeList'
 import Validator from '../../../../common/validation/validator'
@@ -18,30 +17,22 @@ import {
 
 const CodeListProps = (props) => {
   const {
-    survey,
     nodeDef,
     putNodeDefProp,
+
+    codeLists,
+    canUpdateCodeList,
+    codeList,
+    candidateParentCodeNodeDefs,
+    parentCodeDef,
 
     createCodeList,
     toggleCodeListEdit,
   } = props
 
   const validation = Validator.getValidation(nodeDef)
-  const selectedCodeList = Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey)
-  const candidateParentCodeNodeDefs = Survey.getNodeDefCodeCandidateParents(nodeDef)(survey)
-  const parentCodeDef = Survey.getNodeDefParentCode(nodeDef)(survey)
-  const parentCodeDefLabelFunction = def => (
-    NodeDef.getNodeDefName(def)
-    + ' ('
-    + CodeList.getCodeListLevelName(
-      CodeList.getCodeListLevelByIndex(
-        Survey.getNodeDefCodeListLevelIndex(def)
-        (survey)
-      )(selectedCodeList)
-    )
-    + ')'
-  )
-  const disabled = !Survey.canUpdateCodeList(nodeDef)(survey)
+
+  const disabled = !canUpdateCodeList
 
   return (
     <React.Fragment>
@@ -52,11 +43,11 @@ const CodeListProps = (props) => {
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
           <Dropdown disabled={disabled}
-                    items={Survey.getCodeListsArray(survey)}
+                    items={codeLists}
                     itemKeyProp={'uuid'}
-                    itemLabelFunction={codeList => CodeList.getCodeListName(codeList)}
+                    itemLabelFunction={CodeList.getCodeListName}
                     validation={Validator.getFieldValidation('codeListUUID')(validation)}
-                    selection={selectedCodeList}
+                    selection={codeList}
                     onChange={codeList => {
                       putNodeDefProp(nodeDef, 'parentCodeUUID', null) //reset parent code
                       putNodeDefProp(nodeDef, 'codeListUUID', codeList ? codeList.uuid : null)
@@ -102,7 +93,7 @@ const CodeListProps = (props) => {
                     items={candidateParentCodeNodeDefs}
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}
-                    itemLabelFunction={parentCodeDefLabelFunction}
+                    itemLabelFunction={NodeDef.getNodeDefName}
                     onChange={def => putNodeDefProp(nodeDef, 'parentCodeUUID', def ? def.uuid : null)}/>
         </div>
       </FormItem>
