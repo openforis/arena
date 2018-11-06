@@ -20,7 +20,6 @@ import { getSurvey } from '../../../survey/surveyState'
 import { updateSurveyInfoProp } from '../../../survey/surveyInfo/actions'
 
 import { normalizeName } from './../../../../common/survey/surveyUtils'
-import { toQueryString } from './../../../../server/serverUtils/request'
 import { getValidation, getFieldValidation } from './../../../../common/validation/validator'
 
 const SrsAutocomplete = props => {
@@ -36,6 +35,8 @@ const SrsAutocomplete = props => {
   }
 
   return <InputChips itemsLookupFunction={itemsLookupFunction}
+                     itemKeyProp="code"
+                     itemLabelProp="name"
                      selection={selection}
                      dropdownAutocompleteMinChars={3}
                      validation={validation}
@@ -44,48 +45,13 @@ const SrsAutocomplete = props => {
 
 class SurveyInfo extends React.Component {
 
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      surveySrs: []
-    }
-  }
-
-  componentDidMount() {
-    this.fetchSrs()
-  }
-
-  componentDidUpdate (prevProps) {
-    const {surveyInfo} = this.props
-    const {surveyInfo: prevSurveyInfo} = prevProps
-
-    const srsCodes = getSurveySrs(surveyInfo)
-    const prevSrsCodes = getSurveySrs(prevSurveyInfo)
-
-    if (!R.equals(srsCodes, prevSrsCodes)) {
-      this.fetchSrs()
-    }
-  }
-
-  fetchSrs () {
-    const {surveyInfo} = this.props
-    const codes = getSurveySrs(surveyInfo)
-
-    axios.get(`/api/srs?${toQueryString({codes})}`).then(({data}) => {
-      this.setState({
-        surveySrs: data.srss
-      })
-    })
-  }
-
   onPropLabelsChange (item, key, currentValue) {
     this.props.updateSurveyInfoProp(key, R.assoc(item.lang, item.label, currentValue))
   }
 
   render () {
     const {survey, surveyInfo, updateSurveyInfoProp} = this.props
-    const {surveySrs} = this.state
+    const surveySrs = getSurveySrs(surveyInfo)
 
     const validation = getValidation(surveyInfo)
 
@@ -104,9 +70,9 @@ class SurveyInfo extends React.Component {
 
         <div className="form-item">
           <label className="form-label">SRS</label>
-          <SrsAutocomplete selection={R.values(surveySrs)}
+          <SrsAutocomplete selection={surveySrs}
                            validation={getFieldValidation('srs')}
-                           onChange={(items) => updateSurveyInfoProp('srs', R.pluck('key')(items))}/>
+                           onChange={srs => updateSurveyInfoProp('srs', srs)}/>
         </div>
 
         <LabelsEditorComponent labels={getSurveyLabels(survey)}

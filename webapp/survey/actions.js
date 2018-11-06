@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { getStateSurveyId, getSurvey } from './surveyState'
+import { getStateSurveyId } from './surveyState'
 import { getUser } from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 import { appUserPrefUpdate } from '../app/actions'
@@ -23,15 +23,12 @@ const fetchTaxonomies = (surveyId, draft = false, validate = false) =>
   axios.get(`/api/survey/${surveyId}/taxonomies?draft=${draft}&validate=${validate}`)
 
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
-  const survey = getSurvey(getState())
-  const surveyInfo = getSurveyInfo(survey)
-  const surveyId = surveyInfo.id
+  const surveyId = getStateSurveyId(getState())
 
   const res = await Promise.all([
     fetchNodeDefs(surveyId, draft, validate),
     fetchCodeLists(surveyId, draft, validate),
     fetchTaxonomies(surveyId, draft, validate),
-    fetchSrs(surveyInfo.srs),
   ])
 
   dispatch({

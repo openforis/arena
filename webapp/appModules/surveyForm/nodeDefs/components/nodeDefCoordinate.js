@@ -8,13 +8,12 @@ import NodeDefFormItem from './nodeDefFormItem'
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 import { getSurveySrs } from '../../../../../common/survey/survey'
-import { toSrsItems } from '../../../../../common/app/srs'
 import { getNodeDefDefaultValue } from '../nodeDefSystemProps'
 
 class NodeDefCoordinate extends React.Component {
 
   handleInputChange (node, field, value) {
-    const {nodeDef, parentNode, updateNode} = this.props
+    const {nodeDef, updateNode} = this.props
 
     const newValue = R.assoc(field, value)(node.value)
 
@@ -38,23 +37,32 @@ class NodeDefCoordinate extends React.Component {
 
     const node = entry ? nodes[0] : null
     const value = node ? node.value : getNodeDefDefaultValue(nodeDef)
-    const srsItems = toSrsItems(getSurveySrs(surveyInfo))
+    const surveySrs = getSurveySrs(surveyInfo)
+    const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)
+
+    const xInput = <Input ref="xInput"
+                          readOnly={edit}
+                          value={value.x}
+                          onChange={(e) => this.handleInputChange(node, 'x', e.target.value)}/>
+
+    const yInput = <Input ref="yInput"
+                          readOnly={edit}
+                          value={value.y}
+                          onChange={(e) => this.handleInputChange(node, 'y', e.target.value)}/>
+
+    const srsDropdown = <Dropdown ref="srsDropdown"
+                                  readOnly={edit}
+                                  items={surveySrs}
+                                  itemKeyProp="code"
+                                  itemLabelProp="name"
+                                  selection={selectedSrs}
+                                  onChange={(selection) => this.handleInputChange(node, 'srs', R.prop('code')(selection))}/>
 
     if (renderType === nodeDefRenderType.tableBody) {
       return <div className="node-def__table-row-coordinate node-def__table-data-composite-attr">
-        <Input ref="xInput"
-               readOnly={edit}
-               value={value.x}
-               onChange={(e) => this.handleInputChange(node, 'x', e.target.value)}/>
-        <Input ref="yInput"
-               readOnly={edit}
-               value={value.y}
-               onChange={(e) => this.handleInputChange(node, 'y', e.target.value)}/>
-        <Dropdown ref="srsDropdown"
-                  readOnly={edit}
-                  items={srsItems}
-                  selection={value.srs}
-                  onChange={(selection) => this.handleInputChange(node, 'srs', R.prop('key')(selection))}/>
+        {xInput}
+        {yInput}
+        {srsDropdown}
       </div>
     }
 
@@ -66,23 +74,13 @@ class NodeDefCoordinate extends React.Component {
           rowGap: '.3rem',
         }}>
           <FormItem label="X">
-            <Input ref="xInput"
-                   readOnly={edit}
-                   value={value.x}
-                   onChange={(e) => this.handleInputChange(node, 'x', e.target.value)}/>
+            {xInput}
           </FormItem>
           <FormItem label="Y">
-            <Input ref="yInput"
-                   readOnly={edit}
-                   value={value.y}
-                   onChange={(e) => this.handleInputChange(node, 'y', e.target.value)}/>
+            {yInput}
           </FormItem>
           <FormItem label="SRS">
-            <Dropdown ref="srsDropdown"
-                      readOnly={edit}
-                      items={srsItems}
-                      selection={value.srs}
-                      onChange={(selection) => this.handleInputChange(node, 'srs', R.prop('key')(selection))}/>
+            {srsDropdown}
           </FormItem>
         </div>
       </NodeDefFormItem>

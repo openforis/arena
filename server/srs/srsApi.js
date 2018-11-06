@@ -1,8 +1,4 @@
-const {
-  getRestParam,
-  getJsonParam,
-} = require('../serverUtils/request')
-const {toIndexedObj} = require('../../common/survey/surveyUtils')
+const {getRestParam} = require('../serverUtils/request')
 
 const SrsManager = require('./srsManager')
 
@@ -14,13 +10,5 @@ module.exports.init = app => {
     const srss = await SrsManager.find(codeOrName)
 
     res.json({srss})
-  })
-
-  app.get('/srs', async (req, res) => {
-    const codes = getJsonParam(req, 'codes')
-
-    const srss = await SrsManager.fetchByCodes(codes)
-
-    res.json({srss: toIndexedObj(srss, 'key')})
   })
 }

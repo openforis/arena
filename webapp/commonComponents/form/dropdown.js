@@ -8,6 +8,8 @@ import * as R from 'ramda'
 import { Input } from './input'
 import AutocompleteDialog from './autocompleteDialog'
 
+import { contains } from '../../../common/stringUtils'
+
 const dropdownListItemClassName = 'dropdown__list-item'
 
 class Dropdown extends React.Component {
@@ -70,8 +72,6 @@ class Dropdown extends React.Component {
     const {value = ''} = evt.target
 
     const {items, autocompleteMinChars, itemsLookupFunction, onChange} = this.props
-
-    const contains = (a = '', b = '') => R.contains(R.toLower(a), R.toLower(b))
 
     const searchValue = R.trim(value)
 
