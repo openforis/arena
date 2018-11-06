@@ -4,14 +4,7 @@ const trim = R.pipe(R.defaultTo(''), R.trim)
 
 const leftTrim = R.replace(/^\s+/, '')
 
-const toLower = a => R.pipe(
-  R.ifElse(
-    isString,
-    R.identity,
-    R.toString
-  ),
-  R.toLower,
-)(a)
+const toLower = (a = '') => R.toLower(a.toString())
 
 const contains = (a = '', b = '') => R.contains(toLower(a), toLower(b))
 
