@@ -13,7 +13,6 @@ import appAnimation from './app/components/appAnimation'
 import LoginView from './login/components/loginView'
 
 import { initApp } from './app/actions'
-import { startAppJobMonitoring } from './app/components/job/actions'
 import { getUser, isReady } from './app/appState'
 import { getLocationPathname } from './appUtils/routerUtils'
 
@@ -26,10 +25,19 @@ class AppRouterSwitch extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const {user, startAppJobMonitoring} = this.props
+    const {user} = this.props
     const {user: prevUser} = prevProps
-    if (user && !prevUser)
-      startAppJobMonitoring()
+
+    if (user && !prevUser) {
+      openSocket()
+      onSocketEvent(jobSocketEvents.update, this.props.activeJobUpdate)
+    } else if (prevUser && !user) {
+      closeSocket()
+    }
+  }
+
+  componentWillUnmount () {
+    closeSocket()
   }
 
   render () {
@@ -94,5 +102,9 @@ const mapStateToProps = state => ({
 })
 
 export default withRouter(
-  connect(mapStateToProps, {initApp, startAppJobMonitoring})(AppRouterSwitch)
+  connect(mapStateToProps, {
+    initApp,
+    activeJobUpdate
+  })
+  (AppRouterSwitch)
 )

@@ -24,8 +24,6 @@ export const initApp = () => async (dispatch) => {
 
 export const logout = () => async dispatch => {
   try {
-    dispatch(stopAppJobMonitoring())
-
     await axios.post('/auth/logout')
 
     dispatch({type: appUserLogout})

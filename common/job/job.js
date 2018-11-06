@@ -9,6 +9,10 @@ const jobStatus = {
   failed: 'failed',
 }
 
+const jobSocketEvents = {
+  update: 'JOB_UPDATE',
+}
+
 const getJobStatus = R.prop('status')
 
 const getJobProgressPercent = job => job.total > 0 ? Math.floor(100 * job.processed / job.total) : 0
@@ -39,4 +43,6 @@ module.exports = {
   isJobCanceled: R.pipe(getJobStatus, R.equals(jobStatus.canceled)),
   isJobFailed: R.pipe(getJobStatus, R.equals(jobStatus.failed)),
   isJobStatusEnded,
+
+  jobSocketEvents,
 }
