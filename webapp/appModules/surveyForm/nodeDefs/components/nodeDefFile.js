@@ -60,7 +60,7 @@ const NodeDefFile = props => {
   // EDIT MODE
 
   if (edit)
-    return <NodeDefFormItem {...props}>
+    return <NodeDefFormItem label={label}>
       <NodeDefFileInput {...props} />
     </NodeDefFormItem>
 
@@ -73,7 +73,7 @@ const NodeDefFile = props => {
     const {height} = domElem ? elementOffset(domElem) : {height: 80}
 
     return (
-      <NodeDefFormItem {...props}>
+      <NodeDefFormItem label={label}>
         <div className="overflowYAuto" style={{maxHeight: height}}>
           {
             nodes.map((n, i) =>

@@ -59,7 +59,7 @@ class NodeDefCoordinate extends React.Component {
     }
 
     return (
-      <NodeDefFormItem {...this.props}>
+      <NodeDefFormItem label={label}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr',
