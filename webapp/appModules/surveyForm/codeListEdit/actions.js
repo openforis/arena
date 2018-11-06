@@ -3,7 +3,7 @@ import axios from 'axios'
 import { toUUIDIndexedObj } from '../../../../common/survey/surveyUtils'
 import { getStateSurveyId } from '../../../survey/surveyState'
 
-import { newCodeList, newCodeListItem, newCodeListLevel } from '../../../../common/survey/codeList'
+import CodeList from '../../../../common/survey/codeList'
 
 import { debounceAction } from '../../../appUtils/reduxUtils'
 import {
@@ -53,7 +53,7 @@ export const setCodeListItemForEdit = (codeList, level, item, edit = true) => as
 //======
 
 export const createCodeList = () => async (dispatch, getState) => {
-  const codeList = newCodeList()
+  const codeList = CodeList.newCodeList()
   const surveyId = getStateSurveyId(getState())
   const {data} = await axios.post(`/api/survey/${surveyId}/codeLists`, codeList)
 
@@ -61,7 +61,7 @@ export const createCodeList = () => async (dispatch, getState) => {
 }
 
 export const createCodeListLevel = (codeList) => async (dispatch, getState) => {
-  const level = newCodeListLevel(codeList)
+  const level = CodeList.newCodeListLevel(codeList)
   const surveyId = getStateSurveyId(getState())
 
   const {data} = await axios.post(`/api/survey/${surveyId}/codeLists/${codeList.id}/levels`, level)
@@ -69,7 +69,7 @@ export const createCodeListLevel = (codeList) => async (dispatch, getState) => {
 }
 
 export const createCodeListItem = (codeList, level, parentItem) => async (dispatch, getState) => {
-  const item = newCodeListItem(level.id, parentItem)
+  const item = CodeList.newCodeListItem(level.id, parentItem)
   dispatch({type: codeListItemCreate, level, item})
 
   const surveyId = getStateSurveyId(getState())

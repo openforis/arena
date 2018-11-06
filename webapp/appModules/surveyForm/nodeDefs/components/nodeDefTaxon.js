@@ -246,7 +246,7 @@ class NodeDefTaxon extends React.Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  taxonomy: Survey.getSurveyTaxonomyByUUID(
+  taxonomy: Survey.getTaxonomyByUUID(
     NodeDef.getNodeDefTaxonomyUUID(props.nodeDef)
   )(getSurvey(state))
 })

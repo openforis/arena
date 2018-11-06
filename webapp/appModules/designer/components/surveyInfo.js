@@ -7,19 +7,13 @@ import InputChips from '../../../commonComponents/form/inputChips'
 import LabelsEditorComponent from '../../../survey/components/labelsEditor'
 import LanguagesEditorComponent from '../../../survey/components/languagesEditor'
 
-import {
-  getSurveyInfo,
-  getSurveyName,
-  getSurveyDescriptions,
-  getSurveyLabels,
-  getSurveySrs
-} from '../../../../common/survey/survey'
-import { getSrsName, srs } from '../../../../common/app/srs'
+import Survey from '../../../../common/survey/survey'
+import SRS from '../../../../common/app/srs'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyInfo } from '../../../survey/surveyState'
 import { updateSurveyInfoProp } from '../../../survey/surveyInfo/actions'
 
-import { normalizeName } from './../../../../common/survey/surveyUtils'
+import { normalizeName } from '../../../../common/stringUtils'
 import { getValidation, getFieldValidation } from './../../../../common/validation/validator'
 
 class SurveyInfo extends React.Component {
@@ -33,16 +27,16 @@ class SurveyInfo extends React.Component {
   }
 
   render () {
-    const {survey, surveyInfo} = this.props
+    const {surveyInfo} = this.props
     const validation = getValidation(surveyInfo)
-    const surveySrs = getSurveySrs(surveyInfo).map(code => ({key: code, value: getSrsName(code)}))
+    const surveySrs = Survey.getSRS(surveyInfo).map(code => ({key: code, value: SRS.getSrsName(code)}))
 
     return (
       <div className="form">
 
         <div className="form-item">
           <label className="form-label">Name</label>
-          <Input value={getSurveyName(survey)}
+          <Input value={Survey.getName(surveyInfo)}
                  validation={getFieldValidation('name')(validation)}
                  onChange={e => this.updateSurveyProp('name', normalizeName(e.target.value))}/>
 
@@ -52,19 +46,19 @@ class SurveyInfo extends React.Component {
 
         <div className="form-item">
           <label className="form-label">SRS</label>
-          <InputChips items={srs}
+          <InputChips items={SRS.srs}
                       selection={surveySrs}
                       dropdownAutocompleteMinChars={3}
                       validation={getFieldValidation('srs')(validation)}
                       onChange={(items) => this.updateSurveyProp('srs', R.pluck('key')(items))}/>
         </div>
 
-        <LabelsEditorComponent labels={getSurveyLabels(survey)}
-                               onChange={(item) => this.onPropLabelsChange(item, 'labels', getSurveyLabels(survey))}/>
+        <LabelsEditorComponent labels={Survey.getLabels(surveyInfo)}
+                               onChange={(item) => this.onPropLabelsChange(item, 'labels', Survey.getLabels(surveyInfo))}/>
 
         <LabelsEditorComponent formLabel="Description(s)"
-                               labels={getSurveyDescriptions(survey)}
-                               onChange={(item) => this.onPropLabelsChange(item, 'descriptions', getSurveyDescriptions(survey))}/>
+                               labels={Survey.getDescriptions(surveyInfo)}
+                               onChange={(item) => this.onPropLabelsChange(item, 'descriptions', Survey.getDescriptions(surveyInfo))}/>
 
       </div>
     )
@@ -73,8 +67,7 @@ class SurveyInfo extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  survey: getSurvey(state),
-  surveyInfo: getSurveyInfo(getSurvey(state)),
+  surveyInfo: getStateSurveyInfo(state),
 })
 
 export default connect(

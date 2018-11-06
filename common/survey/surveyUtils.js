@@ -1,17 +1,6 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
-const {leftTrim} = require('../../common/stringUtils')
-
-// naming utils
-
-const normalizeName = R.pipe(
-  leftTrim,
-  R.toLower,
-  R.replace(/[^a-z0-9]/g, '_'),
-  R.slice(0, 60),
-)
-
 /**
  * NodeDef and Survey common PROPS UTILS
  */
@@ -36,16 +25,9 @@ const defDbTransformCallback = (def, draft = false) => def
   : null
 
 // READ
-const getProps = R.pipe(
-  R.prop('props'),
-  R.defaultTo({}),
-)
+const getProps = R.propOr({}, 'props')
 
-const getProp = (prop, defaultTo = null) => R.pipe(
-  getProps,
-  R.prop(prop),
-  R.defaultTo(defaultTo),
-)
+const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.propOr(defaultTo, prop))
 
 const getLabels = getProp('labels', {})
 
@@ -57,17 +39,9 @@ const toIndexedObj = (array, prop) => R.reduce((acc, item) => R.assoc(R.prop(pro
 
 const toUUIDIndexedObj = R.partialRight(toIndexedObj, ['uuid'])
 
-const filterMappedObj = filter =>
-  obj => R.reduce((acc, key) => {
-    const item = R.prop(key, acc)
-    return filter(item) ? acc : R.dissoc(key, acc)
-  }, obj, R.keys(obj))
-
 module.exports = {
-  normalizeName,
   toIndexedObj,
   toUUIDIndexedObj,
-  filterMappedObj,
 
   // PROPS
   defDbTransformCallback,

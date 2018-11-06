@@ -8,8 +8,7 @@ import FormActions from './components/formActions'
 import NodeDefEdit from './nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
-import { getSurveyInfo } from '../../../common/survey/survey'
-import { getSurvey } from '../../survey/surveyState'
+import { getStateSurveyInfo, getSurvey } from '../../survey/surveyState'
 
 import { getFormActivePageNodeDef, getFormPageParentNode, getSurveyForm } from './surveyFormState'
 
@@ -93,7 +92,7 @@ const mapStateToProps = (state, props) => {
   })
 
   return {
-    surveyInfo: getSurveyInfo(survey),
+    surveyInfo: getStateSurveyInfo(state),
     nodeDef,
     ...props.entry
       ? mapEntryProps()

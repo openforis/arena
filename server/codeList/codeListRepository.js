@@ -3,7 +3,7 @@ const R = require('ramda')
 
 const {getSurveyDBSchema, updateSurveySchemaTableProp, deleteSurveySchemaTableRecord} = require('../survey/surveySchemaRepositoryUtils')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
-const {getCodeListItemCode} = require('../../common/survey/codeList')
+const CodeList = require('../../common/survey/codeList')
 
 // ============== CREATE
 
@@ -85,7 +85,7 @@ const filterCodeListItemsByAncestorCodes = (allItems, ancestorCodes) => {
   } else {
     const previousLevelItems = filterCodeListItemsByAncestorCodes(allItems, R.take(ancestorCodes.length - 1, ancestorCodes))
     const lastCode = R.last(ancestorCodes)
-    const previousLevelParentItem = R.find(item => getCodeListItemCode(item) === lastCode)(previousLevelItems)
+    const previousLevelParentItem = R.find(item => CodeList.getCodeListItemCode(item) === lastCode)(previousLevelItems)
     return previousLevelParentItem
       ? filterCodeListItemsByParentId(allItems, previousLevelParentItem.id)
       : []

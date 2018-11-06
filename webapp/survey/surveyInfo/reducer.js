@@ -1,6 +1,6 @@
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import { getSurveyInfo } from '../../../common/survey/survey'
+import Survey from '../../../common/survey/survey'
 
 import { assocSurveyInfoProp, assocSurveyInfoValidation, markDraft, markPublished } from './surveyInfoState'
 
@@ -18,21 +18,21 @@ import { surveyInfoPropUpdate, surveyInfoValidationUpdate } from './actions'
 import { nodeDefCreate, nodeDefDelete, nodeDefPropUpdate, nodeDefUpdate } from '../nodeDefs/actions'
 
 // codeList actions
-import { codeListCreate} from '../codeLists/actions'
+import { codeListCreate } from '../codeLists/actions'
 
 // taxonomies actions
-import { taxonomyCreate} from '../taxonomies/actions'
+import { taxonomyCreate } from '../taxonomies/actions'
 import { codeListDelete, codeListUpdate } from '../codeLists/actions'
 import { taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomies/actions'
 
 const actionHandlers = {
   // app initialization
-  [appStatusChange]: (state, {survey}) => getSurveyInfo(survey),
-  [loginSuccess]: (state, {survey}) => getSurveyInfo(survey),
+  [appStatusChange]: (state, {survey}) => Survey.getSurveyInfo(survey),
+  [loginSuccess]: (state, {survey}) => Survey.getSurveyInfo(survey),
 
   // Survey Update
-  [surveyCreate]: (state, {survey}) => getSurveyInfo(survey),
-  [surveyUpdate]: (state, {survey}) => getSurveyInfo(survey),
+  [surveyCreate]: (state, {survey}) => Survey.getSurveyInfo(survey),
+  [surveyUpdate]: (state, {survey}) => Survey.getSurveyInfo(survey),
 
   [surveyPublish]: markPublished,
 

@@ -6,7 +6,7 @@ import NodeDefFormItem from './nodeDefFormItem'
 import NodeDefDeleteButton from '../nodeDefDeleteButton'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
-import { isNodeDefMultiple } from '../../../../../common/survey/nodeDef'
+import NodeDef from '../../../../../common/survey/nodeDef'
 
 import { getNodeValue } from '../../../../../common/record/node'
 import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
@@ -63,7 +63,7 @@ const NodeDefText = props => {
 
                 <NodeDefTextInput {...props} node={n}/>
 
-                {!n.placeholder && isNodeDefMultiple(nodeDef) &&
+                {!n.placeholder && NodeDef.isNodeDefMultiple(nodeDef) &&
                   <NodeDefDeleteButton {...props} node={n}/>
                 }
 

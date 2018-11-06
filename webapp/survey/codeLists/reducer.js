@@ -4,8 +4,6 @@ import { exportReducer } from '../../appUtils/reduxUtils'
 
 import { surveyCreate, surveyDefsLoad, surveyUpdate } from '../actions'
 
-import { getCodeLists, assocCodeLists } from '../../../common/survey/survey'
-
 import {
   codeListCreate,
   codeListUpdate,

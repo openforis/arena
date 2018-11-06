@@ -10,6 +10,13 @@ const isNotBlank = R.pipe(isBlank, R.not)
 
 const isString = R.is(String)
 
+const normalizeName = R.pipe(
+  leftTrim,
+  R.toLower,
+  R.replace(/[^a-z0-9]/g, '_'),
+  R.slice(0, 60),
+)
+
 module.exports = {
   trim,
   leftTrim,
@@ -18,4 +25,6 @@ module.exports = {
   isNotBlank,
 
   isString,
+
+  normalizeName,
 }

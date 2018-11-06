@@ -3,7 +3,7 @@ const Promise = require('bluebird')
 
 const {validate, validateRequired, validateItemPropUniqueness} = require('../../common/validation/validator')
 
-const {getCodeListLevelsArray, isCodeListItemLeaf} = require('../../common/survey/codeList')
+const CodeList = require('../../common/survey/codeList')
 
 const codeListValidators = (codeLists) => ({
   'props.name': [validateRequired, validateItemPropUniqueness(codeLists)],
@@ -19,7 +19,7 @@ const validateLevel = async (levels, level) =>
   await validate(level, levelValidators(levels))
 
 const validateLevels = async (codeList) => {
-  const levels = getCodeListLevelsArray(codeList)
+  const levels = CodeList.getCodeListLevelsArray(codeList)
 
   const validations = await Promise.all(
     levels.map(
@@ -45,7 +45,7 @@ const validateItem = async (codeList, items, itemId) => {
   const item = R.find(R.propEq('id', itemId))(items)
   const validation = await validate(item, itemValidators(items.filter(i => i.parentId === item.parentId)))
 
-  const isLeaf = isCodeListItemLeaf(item)(codeList)
+  const isLeaf = CodeList.isCodeListItemLeaf(item)(codeList)
 
   if (isLeaf) {
     return {[item.uuid]: validation}

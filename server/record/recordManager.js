@@ -1,12 +1,11 @@
 const R = require('ramda')
 const Promise = require('bluebird')
-
 const db = require('../db/db')
 
-const {assocNodeDefs, getNodeDefById} = require('../../common/survey/survey')
-const {isNodeDefSingleEntity, isNodeDefMultiple} = require('../../common/survey/nodeDef')
-const {assocNodes, getNodeCodeDependentAttributes} = require('../../common/record/record')
-const {newNode, getNodeRecordId, getNodeDefId} = require('../../common/record/node')
+const Survey = require('../../common/survey/survey')
+const NodeDef = require('../../common/survey/nodeDef')
+const Record = require('../../common/record/record')
+const Node = require('../../common/record/node')
 
 const {getSurveyById} = require('../survey/surveyRepository')
 const {
@@ -39,7 +38,7 @@ const createRecord = async (recordToCreate) =>
 
       const rootNodeDef = await fetchRootNodeDef(surveyId, false, t)
 
-      const nodes = await createNode(rootNodeDef, newNode(rootNodeDef.id, recordId), null, t)
+      const nodes = await createNode(rootNodeDef, Node.newNode(rootNodeDef.id, recordId), null, t)
 
       return R.assoc('nodes', nodes, record)
     }
@@ -60,8 +59,8 @@ const createNode = async (nodeDef, nodeReq, file, client = db) => {
   // insert node
   const node = await insertNode(nodeDef.surveyId, nodeReq, file ? file.data : null, client)
 
-  // fetch children if single entity
-  const childDefs = isNodeDefSingleEntity(nodeDef)
+  // add children if entity
+  const childDefs = NodeDef.isNodeDefEntity(nodeDef)
     ? await fetchNodeDefsByParentId(nodeDef.id)
     : []
 
@@ -69,9 +68,9 @@ const createNode = async (nodeDef, nodeReq, file, client = db) => {
   const childNodes = R.mergeAll(
     await Promise.all(
       childDefs
-        .filter(isNodeDefSingleEntity)
+        .filter(NodeDef.isNodeDefSingleEntity)
         .map(
-          async childDef => await createNode(childDef, newNode(childDef.id, node.recordId, node.uuid), null, client)
+          async childDef => await createNode(childDef, Node.newNode(childDef.id, node.recordId, node.uuid), null, client)
         )
     )
   )
@@ -92,13 +91,13 @@ const updateNodeValue = async (surveyId, nodeUUID, value, file, client = db) =>
   await client.tx(async t => {
     const node = await updateNode(surveyId, nodeUUID, value, file ? file.data : null, client)
 
-    const survey = assocNodeDefs(
+    const survey = Survey.assocNodeDefs(
       await fetchNodeDefsBySurveyId(surveyId, false, t)
     )(await getSurveyById(surveyId, false, t))
 
-    const recordId = getNodeRecordId(node)
+    const recordId = Node.getNodeRecordId(node)
 
-    const record = assocNodes(
+    const record = Record.assocNodes(
       await fetchNodesByRecordId(surveyId, recordId, t)
     )(await fetchRecordById(surveyId, recordId, t))
 
@@ -120,13 +119,13 @@ const deleteNode = async (surveyId, nodeUUID, client = db) =>
     const node = await deleteNodeRepos(surveyId, nodeUUID, t)
     node.deleted = true
 
-    const survey = assocNodeDefs(
+    const survey = Survey.assocNodeDefs(
       await fetchNodeDefsBySurveyId(surveyId, false, t)
     )(await getSurveyById(surveyId, false, t))
 
-    const recordId = getNodeRecordId(node)
+    const recordId = Node.getNodeRecordId(node)
 
-    const record = assocNodes(
+    const record = Record.assocNodes(
       await fetchNodesByRecordId(surveyId, recordId, t)
     )(await fetchRecordById(surveyId, recordId, t))
 
@@ -141,12 +140,12 @@ const deleteNodeInternal = async (survey, record, nodeUUID, client = db) => {
 
 const onNodeUpdate = async (survey, record, node, client = db) => {
   //delete dependent code nodes
-  const dependentCodeAttributes = getNodeCodeDependentAttributes(survey, node)(record)
+  const dependentCodeAttributes = Record.getNodeCodeDependentAttributes(survey, node)(record)
 
   const clearedDependentCodeAttributes = await Promise.all(
     dependentCodeAttributes.map(async n => {
-      const nDef = getNodeDefById(getNodeDefId(n))(survey)
-      if (isNodeDefMultiple(nDef)) {
+      const nDef = Survey.getNodeDefById(Node.getNodeDefId(n))(survey)
+      if (NodeDef.isNodeDefMultiple(nDef)) {
         //delete node
         return await deleteNodeInternal(survey, record, n.uuid, client)
       } else {
