@@ -55,8 +55,12 @@ class NodeDefEdit extends React.Component {
                               selectedTaxonomyUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}/>
               :
               <div className="form">
-                <CommonProps {...this.props}
+                <CommonProps nodeDef={nodeDef}
+                             putNodeDefProp={putNodeDefProp}
+                             survey={survey}
+                             createCodeList={createCodeList}
                              toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
+                             createTaxonomy={createTaxonomy}
                              toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
 
                 <div style={{justifySelf: 'center'}}>

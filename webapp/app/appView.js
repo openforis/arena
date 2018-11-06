@@ -7,18 +7,20 @@ import AppModulesView from '../appModules/appModulesView'
 import AppJobMonitor from './components/job/appJobMonitor'
 import AppErrors from './components/errors/appErrors'
 
-const AppView = (props) => (
-  <div className="app__container">
+const AppView = (props) => {
+  return (
+    <div className="app__container">
 
-    <AppSideBar {...props} />
+      <AppSideBar {...props} /> {/* TODO */}
 
-    <AppModulesView {...props} />
+      <AppModulesView location={props.location} />
 
-    <AppJobMonitor/>
+      <AppJobMonitor/>
 
-    <AppErrors/>
+      <AppErrors/>
 
-  </div>
-)
+    </div>
+  )
+}
 
 export default AppView

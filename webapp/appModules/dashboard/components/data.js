@@ -15,8 +15,7 @@ import { createRecord } from '../../surveyForm/record/actions'
 class Data extends React.Component {
 
   render () {
-    const {surveyInfo, dataExplorer, createRecord} = this.props
-    const {entities} = dataExplorer
+    const {surveyInfo, dataExplorer: {entities}, createRecord} = this.props
 
     const entityCount = entity => R.path([entity, 'count'])(entities)
 

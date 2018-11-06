@@ -19,12 +19,20 @@ const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValu
 }
 
 const CommonProps = props => {
-  const {nodeDef, putNodeDefProp} = props
+  const {
+    nodeDef,
+    putNodeDefProp,
+    survey,
+    createCodeList,
+    toggleCodeListEdit,
+    createTaxonomy,
+    toggleTaxonomyEdit,
+  } = props
   const validation = getValidation(nodeDef)
+
 
   return (
     <React.Fragment>
-
       <FormItem label={'type'}>
         <label>{nodeDef.type}</label>
       </FormItem>
@@ -44,12 +52,22 @@ const CommonProps = props => {
 
       {
         NodeDef.isNodeDefCodeList(nodeDef) &&
-        <CodeListProps {...props} />
+        <CodeListProps survey={survey}
+                       nodeDef={nodeDef}
+                       putNodeDefProp={putNodeDefProp}
+                       createCodeList={createCodeList}
+                       toggleCodeListEdit={toggleCodeListEdit}/>
       }
 
       {
         NodeDef.isNodeDefTaxon(nodeDef) &&
-        <TaxonProps {...props} />
+
+        // <TaxonProps {...props} />
+        <TaxonProps survey={survey}
+                    nodeDef={nodeDef}
+                    putNodeDefProp={putNodeDefProp}
+                    createTaxonomy={createTaxonomy}
+                    toggleTaxonomyEdit={toggleTaxonomyEdit}/>
       }
 
       {

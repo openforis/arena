@@ -13,17 +13,17 @@ const DashboardView = (props) => (
 
   <div className="app-dashboard">
 
-    <SurveyInfo {...props}/>
+    <SurveyInfo history={props.history}/>
 
     <div className="app-dashboard__modules">
 
-      <SurveyDesigner {...props}/>
+      <SurveyDesigner surveyDesigner={props.surveyDesigner} />
 
-      <Data {...props}/>
+      <Data />
 
-      <Analysis {...props}/>
+      <Analysis />
 
-      <Users {...props}/>
+      <Users />
 
     </div>
 

@@ -27,7 +27,7 @@ export const initTaxonomyEdit = uuid => uuid ? {taxonomyUUID: uuid} : null
 export const getTaxonomyEditTaxonomy = survey =>
   surveyForm => R.pipe(
     R.path([taxonomyEdit, taxonomyUUID]),
-    uuid => Survey.getSurveyTaxonomyByUUID(uuid)(survey),
+    uuid => Survey.getTaxonomyByUUID(uuid)(survey),
   )(surveyForm)
 
 // ==== taxonomyEdit Props
