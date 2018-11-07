@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const db = require('../db/db')
-const {migrateSurveySchema} = require('../db/migration/survey/execMigrations')
+const {migrateSurveySchema} = require('../db/migration/dbMigrator')
 const {uuidv4} = require('../../common/uuid')
 
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
