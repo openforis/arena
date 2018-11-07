@@ -17,10 +17,10 @@ const levels = 'levels'
  * CODE LIST
  */
 // ====== CREATE
-const newCodeList = () => ({
+const newCodeList = (props = {}) => ({
   uuid: uuidv4(),
   levels: {0: newCodeListLevel()},
-  props: {},
+  props,
 })
 
 // ====== READ
@@ -68,12 +68,12 @@ const newCodeListLevel = (codeList) => {
  * CODE LIST ITEM
  */
 // ====== CREATE
-const newCodeListItem = (levelId, parentItem = null) => {
+const newCodeListItem = (levelId, parentItem = null, props = {}) => {
   return {
     uuid: uuidv4(),
     levelId,
     parentId: parentItem ? parentItem.id : null,
-    props: {},
+    props,
   }
 }
 

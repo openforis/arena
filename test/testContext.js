@@ -34,6 +34,7 @@ module.exports = {
   getContextUser: () => user,
 
   getContextSurvey: () => survey,
+  getContextSurveyId: () => Survey.getSurveyInfo(survey).id,
   setContextSurvey
 }
 
