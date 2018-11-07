@@ -20,16 +20,14 @@ const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValu
 
 const CommonProps = props => {
   const {
-    nodeDef,
-    putNodeDefProp,
-    survey,
-    createCodeList,
-    toggleCodeListEdit,
-    createTaxonomy,
-    toggleTaxonomyEdit,
+    nodeDef, putNodeDefProp,
+    //code list
+    codeLists, canUpdateCodeList, codeList, parentCodeDef,
+    candidateParentCodeNodeDefs, toggleCodeListEdit, createCodeList,
+    //taxonomy
+    taxonomies, taxonomy, toggleTaxonomyEdit, createTaxonomy,
   } = props
   const validation = getValidation(nodeDef)
-
 
   return (
     <React.Fragment>
@@ -52,22 +50,25 @@ const CommonProps = props => {
 
       {
         NodeDef.isNodeDefCodeList(nodeDef) &&
-        <CodeListProps survey={survey}
-                       nodeDef={nodeDef}
+        <CodeListProps nodeDef={nodeDef}
+                       canUpdateCodeList={canUpdateCodeList}
+                       codeLists={codeLists}
+                       codeList={codeList}
+                       parentCodeDef={parentCodeDef}
+                       candidateParentCodeNodeDefs={candidateParentCodeNodeDefs}
+                       toggleCodeListEdit={toggleCodeListEdit}
                        putNodeDefProp={putNodeDefProp}
-                       createCodeList={createCodeList}
-                       toggleCodeListEdit={toggleCodeListEdit}/>
+                       createCodeList={createCodeList}/>
       }
 
       {
         NodeDef.isNodeDefTaxon(nodeDef) &&
-
-        // <TaxonProps {...props} />
-        <TaxonProps survey={survey}
-                    nodeDef={nodeDef}
+        <TaxonProps nodeDef={nodeDef}
+                    taxonomies={taxonomies}
+                    taxonomy={taxonomy}
+                    toggleTaxonomyEdit={toggleTaxonomyEdit}
                     putNodeDefProp={putNodeDefProp}
-                    createTaxonomy={createTaxonomy}
-                    toggleTaxonomyEdit={toggleTaxonomyEdit}/>
+                    createTaxonomy={createTaxonomy}/>
       }
 
       {

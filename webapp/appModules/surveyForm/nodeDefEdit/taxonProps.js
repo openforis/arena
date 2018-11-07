@@ -3,24 +3,21 @@ import React from 'react'
 import { FormItem } from '../../../commonComponents/form/input'
 import Dropdown from '../../../commonComponents/form/dropdown'
 
-import Survey from '../../../../common/survey/survey'
-import NodeDef from '../../../../common/survey/nodeDef'
 import Taxonomy from '../../../../common/survey/taxonomy'
 import { getFieldValidation, getValidation } from '../../../../common/validation/validator'
 
 const TaxonProps = (props) => {
   const {
-    survey,
     nodeDef,
     putNodeDefProp,
 
+    taxonomies,
+    taxonomy,
     createTaxonomy,
     toggleTaxonomyEdit,
   } = props
 
   const validation = getValidation(nodeDef)
-
-  const selectedTaxonomy = Survey.getTaxonomyByUUID(NodeDef.getNodeDefTaxonomyUUID(nodeDef))(survey)
 
   return (
     <React.Fragment>
@@ -30,11 +27,11 @@ const TaxonProps = (props) => {
           display: 'grid',
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
-          <Dropdown items={Survey.getTaxonomiesArray(survey)}
+          <Dropdown items={taxonomies}
                     itemKeyProp={'uuid'}
-                    itemLabelFunction={taxonomy => Taxonomy.getTaxonomyName(taxonomy)}
+                    itemLabelFunction={Taxonomy.getTaxonomyName}
                     validation={getFieldValidation('taxonomyUUID')(validation)}
-                    selection={selectedTaxonomy}
+                    selection={taxonomy}
                     onChange={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy ? taxonomy.uuid : null)}/>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}

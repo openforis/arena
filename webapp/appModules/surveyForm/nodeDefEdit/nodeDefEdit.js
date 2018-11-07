@@ -33,7 +33,14 @@ class NodeDefEdit extends React.Component {
   }
 
   render () {
-    const {nodeDef, putNodeDefProp, survey} = this.props
+    const {
+      nodeDef, putNodeDefProp,
+      //code list
+      codeLists, codeList, candidateParentCodeNodeDefs, parentCodeDef,
+      canUpdateCodeList, createCodeList,
+      //taxonomy
+      taxonomies, taxonomy, createTaxonomy
+    } = this.props
     const {editingCodeList, editingTaxonomy} = this.state
 
     return nodeDef
@@ -43,7 +50,7 @@ class NodeDefEdit extends React.Component {
             editingCodeList
               ?
               <CodeListsView onClose={() => this.setState({editingCodeList: false})}
-                             canSelect={Survey.canUpdateCodeList(nodeDef)(survey)}
+                             canSelect={canUpdateCodeList}
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
                              selectedCodeListUUID={NodeDef.getNodeDefCodeListUUID(nodeDef)}/>
 
@@ -57,10 +64,16 @@ class NodeDefEdit extends React.Component {
               <div className="form">
                 <CommonProps nodeDef={nodeDef}
                              putNodeDefProp={putNodeDefProp}
-                             survey={survey}
+                             codeLists={codeLists}
+                             codeList={codeList}
+                             canUpdateCodeList={canUpdateCodeList}
+                             candidateParentCodeNodeDefs={candidateParentCodeNodeDefs}
+                             parentCodeDef={parentCodeDef}
                              createCodeList={createCodeList}
-                             toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
+                             taxonomies={taxonomies}
+                             taxonomy={taxonomy}
                              createTaxonomy={createTaxonomy}
+                             toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
                              toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
 
                 <div style={{justifySelf: 'center'}}>
@@ -83,10 +96,22 @@ NodeDefEdit.defaultProps = {
 const mapStateToProps = state => {
   const survey = getSurvey(state)
   const surveyForm = getSurveyForm(state)
+  const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
+
+  const isCodeList = NodeDef.isNodeDefCodeList(nodeDef)
+  const isTaxon = NodeDef.isNodeDefTaxon(nodeDef)
 
   return {
-    survey,
-    nodeDef: getFormNodeDefEdit(survey)(surveyForm),
+    nodeDef,
+    //code list
+    codeLists: isCodeList ? Survey.getCodeListsArray(survey) : null,
+    canUpdateCodeList: isCodeList ? Survey.canUpdateCodeList(nodeDef)(survey) : false,
+    codeList: isCodeList ? Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey) : null,
+    candidateParentCodeNodeDefs: isCodeList ? Survey.getNodeDefCodeCandidateParents(nodeDef)(survey) : null,
+    parentCodeDef: isCodeList ? Survey.getNodeDefParentCode(nodeDef)(survey) : null,
+    //taxonomy
+    taxonomy: isTaxon ? Survey.getTaxonomyByUUID(NodeDef.getNodeDefTaxonomyUUID(nodeDef))(survey) : null,
+    taxonomies: isTaxon ? Survey.getTaxonomiesArray(survey) : null,
   }
 }
 
