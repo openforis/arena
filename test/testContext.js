@@ -5,6 +5,8 @@ const {deleteSurvey} = require('../server/survey/surveyManager')
 const {findUserByEmailAndPassword} = require('../server/user/userRepository')
 const {setUserPref, userPrefNames} = require('../common/user/userPrefs')
 
+const Survey = require('../common/survey/survey')
+
 let user = null
 let survey = null
 
@@ -17,7 +19,7 @@ const initTestContext = async () => {
 }
 
 const destroyTestContext = async () => {
-  await deleteSurvey(survey.id, user)
+  await deleteSurvey(survey.info.id, user)
 }
 
 const setContextSurvey = s => {

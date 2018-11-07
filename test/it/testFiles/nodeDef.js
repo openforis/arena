@@ -2,67 +2,65 @@ const {getContextSurvey} = require('./../../testContext')
 const {assert, expect} = require('chai')
 const R = require('ramda')
 
-const nodeDefRepository = require('../../../server/nodeDef/nodeDefRepository')
-const {nodeDefType, newNodeDef, getNodeDefName, getNodeDefType} = require('../../../common/survey/nodeDef')
+const NodeDefRepository = require('../../../server/nodeDef/nodeDefRepository')
+const NodeDef = require('../../../common/survey/nodeDef')
+const Survey = require('../../../common/survey/survey')
 
-const createRootDefIfNotExists = async () => {
+const fetchRootNodeDef = async () => {
   const survey = getContextSurvey()
-
-  let rootDef = R.head(await nodeDefRepository.fetchNodeDefsByParentId(survey.id, null))
-  if (rootDef) {
-    return rootDef
-  } else {
-    return await createNodeDef(survey.id, null, nodeDefType.entity, 'root_def')
-  }
+  return await NodeDefRepository.fetchRootNodeDef(Survey.getSurveyInfo(survey).id, true)
 }
 
-const createNodeDef = async (surveyId, parentNodeId, type, name) => {
-  const nodeDefReq = newNodeDef(surveyId, parentNodeId, type, {name})
-  return await nodeDefRepository.createNodeDef(surveyId, parentNodeId, nodeDefReq.uuid, type, nodeDefReq.props)
+const createNodeDef = async (parentNodeId, type, name) => {
+  const survey = getContextSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
+
+  const nodeDefReq = NodeDef.newNodeDef(surveyInfo.id, parentNodeId, type, {name})
+  return await NodeDefRepository.createNodeDef(surveyInfo.id, parentNodeId, nodeDefReq.uuid, type, nodeDefReq.props)
 }
 
 const createNodeDefsTest = async () => {
-  R.keys(nodeDefType).map(async type => {
-    const survey = getContextSurvey()
+  const survey = getContextSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
 
-    const rootDef = await createRootDefIfNotExists()
+  const rootDef = await fetchRootNodeDef()
 
-    const nodeDefReq = newNodeDef(survey.id, rootDef.id, type, {name: 'node_def_' + type})
-    const nodeDefDb = await nodeDefRepository.createNodeDef(survey.id, rootDef.id, nodeDefReq.uuid, type, nodeDefReq.props)
+  const type = NodeDef.nodeDefType.text
+  const nodeDefReq = NodeDef.newNodeDef(surveyInfo.id, rootDef.id, type, {name: 'node_def_' + type})
+  const nodeDefDb = await NodeDefRepository.createNodeDef(surveyInfo.id, rootDef.id, nodeDefReq.uuid, type, nodeDefReq.props)
 
-    expect(nodeDefDb.id).to.not.be.undefined
-    expect(nodeDefDb.type).to.eql(type)
-    expect(nodeDefDb.surveyId).to.eql(survey.id)
-    expect(nodeDefDb.parentId).to.eql(nodeDefReq.parentId)
-    expect(nodeDefDb.uuid).to.eql(nodeDefReq.uuid)
-    expect(nodeDefDb.props).to.eql(nodeDefReq.props)
-  })
+  expect(nodeDefDb.id).to.not.be.undefined
+  expect(nodeDefDb.type).to.equal(type)
+  expect(nodeDefDb.surveyId).to.equal(surveyInfo.id)
+  expect(nodeDefDb.parentId).to.equal(nodeDefReq.parentId)
+  expect(nodeDefDb.uuid).to.equal(nodeDefReq.uuid)
+  expect(nodeDefDb.props).to.eql(nodeDefReq.props)
 }
 
-const updateNodeDefTest = async() => {
+const updateNodeDefTest = async () => {
   const survey = getContextSurvey()
+  const surveyInfo = Survey.getSurveyInfo(survey)
 
-  const rootDef = await createRootDefIfNotExists()
+  const rootDef = await fetchRootNodeDef()
 
-  const nodeDef1 = await createNodeDef(survey.id, rootDef.id, nodeDefType.text, 'node_def_1')
-  const nodeDef2 = await createNodeDef(survey.id, rootDef.id, nodeDefType.boolean, 'node_def_2')
+  const nodeDef1 = await createNodeDef(rootDef.id, NodeDef.nodeDefType.text, 'node_def_1')
+  const nodeDef2 = await createNodeDef(rootDef.id, NodeDef.nodeDefType.boolean, 'node_def_2')
 
   const newName = 'node_def_1_new'
-  const updatedNodeDef = await nodeDefRepository.updateNodeDefProp(nodeDef1.id, {name: newName})
+  const updatedNodeDef = await NodeDefRepository.updateNodeDefProp(nodeDef1.id, 'name', newName)
 
-  expect(getNodeDefName(updatedNodeDef)).to.eql(newName)
+  expect(NodeDef.getNodeDefName(updatedNodeDef)).to.equal(newName)
 
-  const nodeDefs = await nodeDefRepository.fetchNodeDefsBySurveyId(survey.id)
+  const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyInfo.id, true)
 
   //only one node def with that name
-  expect(R.find(n => getNodeDefName(n) === newName, nodeDefs).length).to.be(1)
+  expect(R.filter(n => NodeDef.getNodeDefName(n) === newName, nodeDefs).length).to.equal(1)
 
   //do not modify existing nodes
-  const reloadedNodeDef2 = R.find(n => n.id === nodeDef2.id)
-  expect(getNodeDefType(reloadedNodeDef2)).to.be(getNodeDefType(nodeDef2))
-  expect(getNodeDefName(reloadedNodeDef2)).to.be(getNodeDefName(nodeDef2))
+  const reloadedNodeDef2 = R.find(n => n.id === nodeDef2.id)(nodeDefs)
+  expect(NodeDef.getNodeDefType(reloadedNodeDef2)).to.equal(NodeDef.getNodeDefType(nodeDef2))
+  expect(NodeDef.getNodeDefName(reloadedNodeDef2)).to.equal(NodeDef.getNodeDefName(nodeDef2))
 }
-
 
 module.exports = {
   createNodeDefsTest,

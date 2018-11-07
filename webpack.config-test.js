@@ -1,4 +1,4 @@
-require('babel-polyfill')
+require('@babel/polyfill')
 const webpack = require('webpack')
 const path = require('path')
 const nodeExternals = require('webpack-node-externals')
@@ -10,10 +10,14 @@ const nodeExternals = require('webpack-node-externals')
 // module.exports = config
 module.exports = {
   // plugins: [new ExtractTextPlugin({filename: 'test-style.css'})],
-  entry: ['babel-polyfill'],
+  entry: ['@babel/polyfill'],
   target: 'node', // in order to ignore built-in modules like path, fs, etc.
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
   mode: 'development',
+  node: {
+    __filename: true,
+    __dirname: true
+  },
   module: {
     rules: [
       {
@@ -22,8 +26,8 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['env', 'react'],
-            plugins: ['transform-object-rest-spread']
+            presets: ['@babel/env', '@babel/react'],
+            plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import']
           }
         }
       },
