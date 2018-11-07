@@ -8,14 +8,14 @@ import NodeDefDeleteButton from '../nodeDefDeleteButton'
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 import NodeDef from '../../../../../common/survey/nodeDef'
 
-import { getNodeValue } from '../../../../../common/record/node'
+import Node from '../../../../../common/record/node'
 import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
 import { elementOffset } from '../../../../appUtils/domUtils'
 
 const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
   <Input readOnly={edit}
          {...getNodeDefInputTextProps(nodeDef)}
-         value={getNodeValue(node, '')}
+         value={Node.getNodeValue(node, '')}
          onChange={(e) =>
            updateNode(nodeDef, node, e.target.value)
          }
@@ -24,8 +24,8 @@ const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
 const NodeDefText = props => {
 
   const {
-    nodeDef, nodes, parentNode,
-    entry, edit, label, renderType
+    nodeDef, nodes, parentNode, entry,
+    edit, label, renderType, removeNode
   } = props
 
   // table header
@@ -64,7 +64,11 @@ const NodeDefText = props => {
                 <NodeDefTextInput {...props} node={n}/>
 
                 {!n.placeholder && NodeDef.isNodeDefMultiple(nodeDef) &&
-                  <NodeDefDeleteButton {...props} node={n}/>
+                <NodeDefDeleteButton nodeDef={nodeDef}
+                                     node={n}
+                                     disabled={edit || R.isEmpty(Node.getNodeValue(n))}
+                                     showConfirm={true}
+                                     removeNode={removeNode}/>
                 }
 
               </div>

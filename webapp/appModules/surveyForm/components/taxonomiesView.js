@@ -21,24 +21,36 @@ import { getSurveyForm } from '../surveyFormState'
 class TaxonomiesView extends React.Component {
 
   render () {
-    const {taxonomy, taxonomies, selectedTaxonomyUUID, createTaxonomy, setTaxonomyForEdit, deleteTaxonomy} = this.props
+    const {
+      taxonomy,
+      taxonomies,
+      selectedItemUUID,
+      createTaxonomy,
+      setTaxonomyForEdit,
+      onDelete,
+      canSelect,
+      onSelect,
+      onClose,
+    } = this.props
 
-    const canDeleteTaxonomy = taxonomy => taxonomy.usedByNodeDefs
+    const canDelete = taxonomy => taxonomy.usedByNodeDefs
       ? alert('This taxonomy is used by some node definitions and cannot be removed')
       : window.confirm(`Delete the taxonomy ${Taxonomy.getTaxonomyName(taxonomy)}? This operation cannot be undone.`)
 
-    return <ItemsView {...this.props}
-                      headerText="Taxonomies"
+    return <ItemsView headerText="Taxonomies"
                       itemEditComponent={TaxonomyEdit}
                       itemEditProp="taxonomy"
                       itemLabelFunction={taxonomy => Taxonomy.getTaxonomyName(taxonomy)}
                       editedItem={taxonomy}
                       items={taxonomies}
-                      tableSelectedItemUUID={selectedTaxonomyUUID}
+                      selectedItemUUID={selectedItemUUID}
                       onAdd={createTaxonomy}
                       onEdit={setTaxonomyForEdit}
-                      canDelete={canDeleteTaxonomy}
-                      onDelete={deleteTaxonomy}/>
+                      canDelete={canDelete}
+                      onDelete={onDelete}
+                      canSelect={canSelect}
+                      onSelect={onSelect}
+                      onClose={onClose}/>
   }
 }
 

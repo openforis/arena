@@ -9,8 +9,8 @@ import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 
 import { putNodeDefProp } from '../../../survey/nodeDefs/actions'
-import { createCodeList } from '../codeListEdit/actions'
-import { createTaxonomy } from '../taxonomyEdit/actions'
+import { createCodeList, deleteCodeList } from '../codeListEdit/actions'
+import { createTaxonomy, deleteTaxonomy } from '../taxonomyEdit/actions'
 
 import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
@@ -37,9 +37,9 @@ class NodeDefEdit extends React.Component {
       nodeDef, putNodeDefProp,
       //code list
       codeLists, codeList, candidateParentCodeNodeDefs, parentCodeDef,
-      canUpdateCodeList, createCodeList,
+      canUpdateCodeList, createCodeList, deleteCodeList,
       //taxonomy
-      taxonomies, taxonomy, createTaxonomy
+      taxonomies, taxonomy, createTaxonomy, deleteTaxonomy
     } = this.props
     const {editingCodeList, editingTaxonomy} = this.state
 
@@ -52,14 +52,16 @@ class NodeDefEdit extends React.Component {
               <CodeListsView onClose={() => this.setState({editingCodeList: false})}
                              canSelect={canUpdateCodeList}
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
-                             selectedCodeListUUID={NodeDef.getNodeDefCodeListUUID(nodeDef)}/>
+                             selectedItemUUID={NodeDef.getNodeDefCodeListUUID(nodeDef)}
+                             onDelete={deleteCodeList}/>
 
               : editingTaxonomy
               ?
-              <TaxonomiesView onClose={() => this.setState({editingTaxonomy: false})}
-                              canSelect={true}
+              <TaxonomiesView canSelect={true}
                               onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
-                              selectedTaxonomyUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}/>
+                              selectedItemUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}
+                              onDelete={deleteTaxonomy}
+                              onClose={() => this.setState({editingTaxonomy: false})}/>
               :
               <div className="form">
                 <CommonProps nodeDef={nodeDef}
@@ -117,5 +119,12 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  {closeFormNodeDefEdit, putNodeDefProp, createCodeList, createTaxonomy}
+  {
+    closeFormNodeDefEdit,
+    putNodeDefProp,
+    createCodeList,
+    deleteCodeList,
+    createTaxonomy,
+    deleteTaxonomy,
+  }
 )(NodeDefEdit)

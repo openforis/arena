@@ -16,8 +16,7 @@ import {
   createCodeListLevel,
   createCodeList,
   deleteCodeList,
-  putCodeListProp,
-  setCodeListForEdit
+  setCodeListForEdit,
 } from '../codeListEdit/actions'
 
 class CodeListsView extends React.Component {
@@ -25,27 +24,29 @@ class CodeListsView extends React.Component {
   render () {
 
     const {
-      codeLists, codeList, selectedCodeListUUID,
-      createCodeList, deleteCodeList, setCodeListForEdit, onSelect
+      codeLists, codeList, selectedItemUUID,
+      createCodeList, deleteCodeList, onEdit, onSelect,
+      onClose, canSelect, setCodeListForEdit
     } = this.props
 
     const canDeleteCodeList = codeList => codeList.usedByNodeDefs
       ? alert('This code list is used by some node definitions and cannot be removed')
       : window.confirm(`Delete the code list ${CodeList.getCodeListName(codeList)}? This operation cannot be undone.`)
 
-    return <ItemsView {...this.props}
-                      headerText="Code lists"
+    return <ItemsView headerText="Code lists"
                       itemEditComponent={CodeListEdit}
                       itemEditProp="codeList"
                       itemLabelFunction={codeList => CodeList.getCodeListName(codeList)}
                       editedItem={codeList}
                       items={codeLists}
-                      tableSelectedItemUUID={selectedCodeListUUID}
+                      selectedItemUUID={selectedItemUUID}
                       onAdd={createCodeList}
                       onEdit={setCodeListForEdit}
                       canDelete={canDeleteCodeList}
                       onDelete={deleteCodeList}
-                      onSelect={onSelect}/>
+                      canSelect={canSelect}
+                      onSelect={onSelect}
+                      onClose={onClose}/>
   }
 }
 
@@ -68,5 +69,5 @@ const mapStateToProps = (state) => {
 
 export default connect(
   mapStateToProps,
-  {createCodeList, setCodeListForEdit, deleteCodeList, putCodeListProp, createCodeListLevel}
+  {createCodeList, setCodeListForEdit, deleteCodeList, createCodeListLevel}
 )(CodeListsView)
