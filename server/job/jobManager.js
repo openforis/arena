@@ -73,13 +73,7 @@ const createJob = async (userId, surveyId, name, onCancel = null) => {
  */
 const updateJobStatus = async (jobId, status, total, processed, props = {}) => {
   const job = await jobRepository.updateJobStatus(jobId, status, total, processed, props)
-
   notifyUser(job)
-  if (status === jobStatus.completed ||
-    status === jobStatus.canceled ||
-    status === jobStatus.failed) {
-    delete userSockets[job.userId]
-  }
 }
 
 const updateJobProgress = async (jobId, total, processed) => {
