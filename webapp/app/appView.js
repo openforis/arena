@@ -13,7 +13,7 @@ const AppView = (props) => {
   return (
     <div className="app__container">
 
-      <AppSideBar/>
+      <AppSideBar history={history}/>
 
       <AppModulesView location={props.location}/>
 

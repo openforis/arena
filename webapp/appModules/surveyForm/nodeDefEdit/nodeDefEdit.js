@@ -49,18 +49,16 @@ class NodeDefEdit extends React.Component {
           {
             editingCodeList
               ?
-              <CodeListsView onClose={() => this.setState({editingCodeList: false})}
-                             canSelect={canUpdateCodeList}
+              <CodeListsView canSelect={canUpdateCodeList}
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
                              selectedItemUUID={NodeDef.getNodeDefCodeListUUID(nodeDef)}
-                             onDelete={deleteCodeList}/>
+                             onClose={() => this.setState({editingCodeList: false})}/>
 
               : editingTaxonomy
               ?
               <TaxonomiesView canSelect={true}
                               onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
                               selectedItemUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}
-                              onDelete={deleteTaxonomy}
                               onClose={() => this.setState({editingTaxonomy: false})}/>
               :
               <div className="form">

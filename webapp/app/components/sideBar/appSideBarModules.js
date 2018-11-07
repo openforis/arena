@@ -1,11 +1,11 @@
 import React from 'react'
-import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import * as R from 'ramda'
 
 import { appModuleUri } from '../../../appModules/appModules'
 import { appModules } from '../../../appModules/appModules'
 import { getLocationPathname } from '../../../appUtils/routerUtils'
+import { withRouter } from 'react-router'
 
 const modules = [
   {
@@ -83,7 +83,7 @@ const AppSideBarModules = ({history, surveyInfo, opened}) => (
       modules.map((m, i) => (
         <AppSideBarModule key={i}
                           {...m}
-                          history={...history}
+                          history={history}
                           surveyInfo={surveyInfo}
                           showLabel={opened}
         />

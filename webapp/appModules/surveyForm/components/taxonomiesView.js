@@ -19,7 +19,6 @@ import {
 import { getSurveyForm } from '../surveyFormState'
 
 class TaxonomiesView extends React.Component {
-
   render () {
     const {
       taxonomy,
@@ -27,7 +26,7 @@ class TaxonomiesView extends React.Component {
       selectedItemUUID,
       createTaxonomy,
       setTaxonomyForEdit,
-      onDelete,
+      deleteTaxonomy,
       canSelect,
       onSelect,
       onClose,
@@ -47,7 +46,7 @@ class TaxonomiesView extends React.Component {
                       onAdd={createTaxonomy}
                       onEdit={setTaxonomyForEdit}
                       canDelete={canDelete}
-                      onDelete={onDelete}
+                      onDelete={deleteTaxonomy}
                       canSelect={canSelect}
                       onSelect={onSelect}
                       onClose={onClose}/>
