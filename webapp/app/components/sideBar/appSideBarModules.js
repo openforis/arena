@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import * as R from 'ramda'
 
@@ -82,7 +83,7 @@ const AppSideBarModules = ({history, surveyInfo, opened}) => (
       modules.map((m, i) => (
         <AppSideBarModule key={i}
                           {...m}
-                          history={history}
+                          history={...history}
                           surveyInfo={surveyInfo}
                           showLabel={opened}
         />
@@ -92,4 +93,4 @@ const AppSideBarModules = ({history, surveyInfo, opened}) => (
   </div>
 )
 
-export default AppSideBarModules
+export default withRouter(AppSideBarModules)
