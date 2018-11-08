@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const db = require('../db/db')
-const {migrateSurveySchema} = require('../db/migration/survey/execMigrations')
+const {migrateSurveySchema} = require('../db/migration/dbMigrator')
 const {uuidv4} = require('../../common/uuid')
 
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
@@ -31,7 +31,7 @@ const createSurvey = async (user, {name, label, lang}) => {
         name,
         labels: {[lang]: label},
         languages: [lang],
-        srs: ['4326'], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
+        srs: [{code: '4326', name: 'GCS WGS 1984'}], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
         steps: {...Survey.defaultSteps},
       }
 

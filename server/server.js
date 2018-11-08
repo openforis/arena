@@ -13,9 +13,10 @@ const authConfig = require('./auth/authConfig')
 const authApi = require('./auth/authApi')
 const apiRouter = require('./config/apiRouter')
 const socketMiddleware = require('./config/socketMiddleware')
+const dbMigrator = require('./db/migration/dbMigrator')
 
 // ====== run database migrations
-require('./db/migration/public/execMigrations')()
+dbMigrator.migrateAll()
 
 const app = express()
 

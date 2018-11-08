@@ -680,10 +680,10 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@esri/proj-codes@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-1.0.4.tgz#5599012b413d8b3f5d9e72e2e27ef2a4a22d1349"
-  integrity sha512-zrIyZFbLQGPEAn1DgdSj41UsCDQhLq4X9IIrJ072BZWlLK2/oVnX1x8gWkXbD5k95JlPMO5/f8aZsXjF5nMWag==
+"@esri/proj-codes@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@esri/proj-codes/-/proj-codes-2.2.0.tgz#81c080d007fb89aefa753d21268ff204d2c2f2db"
+  integrity sha512-X00vii88HbEwEtnht/YUw3KzkKMpZJSzHR4HAtIoHCo3FUaBkIfuKHR/Pair1uUQGxFs0ApYlVf8Mi1r+TtgJw==
 
 "@webassemblyjs/ast@1.7.11":
   version "1.7.11"

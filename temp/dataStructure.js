@@ -1,12 +1,3 @@
-const recordActions = {
-  createRecord: 'createRecord',
-  deleteRecord: 'deleteSurveyTableRecord',
-  changeStep: 'changeStep',
-  addNode: 'addNode',
-  updateNode: 'updateNode',
-  deleteNode: 'deleteNode',
-}
-
 const id = '-1'
 
 const nodeDef = {

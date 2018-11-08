@@ -24,17 +24,18 @@ const fetchTaxonomies = (surveyId, draft = false, validate = false) =>
 
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
+
   const res = await Promise.all([
     fetchNodeDefs(surveyId, draft, validate),
     fetchCodeLists(surveyId, draft, validate),
-    fetchTaxonomies(surveyId, draft, validate)
+    fetchTaxonomies(surveyId, draft, validate),
   ])
 
   dispatch({
     type: surveyDefsLoad,
     nodeDefs: res[0].data.nodeDefs,
     codeLists: res[1].data.codeLists,
-    taxonomies: res[2].data.taxonomies,
+    taxonomies: res[2].data.taxonomies
   })
 
 }

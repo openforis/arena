@@ -3,11 +3,7 @@ const {assert, expect} = require('chai')
 const {uuidv4} = require('../../../common/uuid')
 
 const {createSurvey} = require('../../../server/survey/surveyManager')
-const {
-  getName,
-  getDefaultLabel,
-  getDefaultLanguage,
-} = require('../../../common/survey/survey')
+const SurveyTest = require('../../../common/survey/survey')
 
 const testSurvey = {
   name: 'test_survey_' + uuidv4(),
@@ -18,11 +14,14 @@ const testSurvey = {
 const createSurveyTest = async () => {
 
   const survey = await createSurvey(getContextUser(), testSurvey)
+
   setContextSurvey(survey)
 
-  assert.equal(getName(survey), testSurvey.name)
-  assert.equal(getDefaultLanguage(survey), testSurvey.lang)
-  assert.equal(getDefaultLabel(survey), testSurvey.label)
+  const surveyInfo = SurveyTest.getSurveyInfo(survey)
+
+  assert.equal(SurveyTest.getName(surveyInfo), testSurvey.name)
+  assert.equal(SurveyTest.getDefaultLanguage(surveyInfo), testSurvey.lang)
+  assert.equal(SurveyTest.getDefaultLabel(surveyInfo), testSurvey.label)
 }
 
 // const publishSurveyTest = async () => {
