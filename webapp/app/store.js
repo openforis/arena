@@ -1,14 +1,14 @@
 import { applyMiddleware, combineReducers, createStore } from 'redux'
 
 // == app reducer
-import app from './app/reducer'
-import login from './login/reducer'
-import survey from './survey/reducer'
+import app from './reducer'
+import login from '../login/reducer'
+import survey from '../survey/reducer'
 
 import createDebounce from 'redux-debounced'
 import thunkMiddleware from 'redux-thunk'
-import appErrorsMiddleware from './app/components/errors/appErrorsMiddleware'
-import { isEnvDevelopment } from '../common/processUtils'
+import appErrorsMiddleware from './appErrorsMiddleware'
+import { isEnvDevelopment } from '../../common/processUtils'
 
 const appReducer = {
   app,

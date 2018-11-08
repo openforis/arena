@@ -1,5 +1,4 @@
 import * as R from 'ramda'
-import { excludePathRoot } from '../appUtils/reduxUtils'
 
 const app = 'app'
 

@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import AppSideBarFooter from './appSideBarFooter'
 import AppSideBarModules from './appSideBarModules'
 
-import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
-import { getUser } from '../../appState'
-import { logout } from '../../actions'
+import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
+import { getUser } from '../../../../app/appState'
+import { logout } from '../../../../app/actions'
 
 class AppSideBar extends React.Component {
 

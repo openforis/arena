@@ -2,9 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import * as R from 'ramda'
 
-import { appModuleUri } from '../../../appModules/appModules'
-import { appModules } from '../../../appModules/appModules'
-import { getLocationPathname } from '../../../appUtils/routerUtils'
+import { appModuleUri } from '../../../appModules'
+import { appModules } from '../../../appModules'
+import { getLocationPathname } from '../../../../appUtils/routerUtils'
 
 const modules = [
   {
