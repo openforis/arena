@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const jobStatus = {
-  created: 'created',
+  pending: 'pending',
   initialized: 'initialized',
   running: 'running',
   completed: 'completed',

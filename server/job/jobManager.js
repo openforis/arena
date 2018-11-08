@@ -1,16 +1,14 @@
-const {uuidv4} = require('../../common/uuid')
 const {throttle} = require('../../common/functionsDefer')
 
 const {
   jobSocketEvents,
-  jobStatus,
   isJobEnded,
-  isJobCanceled,
 } = require('../../common/job/job')
 
 const jobRepository = require('./jobRepository')
 
 const userSockets = {}
+const userJobs = {}
 
 const init = (io) => {
 
@@ -19,11 +17,18 @@ const init = (io) => {
     const userId = socket.request.session.passport.user
     if (userId) {
       userSockets[userId] = socket
-      const job = await jobRepository.fetchActiveJobByUserId(userId)
+
+      const job = getJobFromCache(userId)
 
       if (job) {
-        socket.emit(jobSocketEvents.update, job)
+        //emit job event with job loaded from db (smaller)
+        const jobDb = await jobRepository.fetchActiveJobByUserId(userId)
+        socket.emit(jobSocketEvents.update, jobDb)
       }
+
+      socket.on('disconnect', () => {
+        delete userSockets[userId]
+      })
     }
   })
 
@@ -38,32 +43,25 @@ const notifyUser = (job) => {
 /**
  * ====== CREATE
  */
-const createJob = async (userId, surveyId, name, onCancel = null) => {
-  const job = {
-    uuid: uuidv4(),
-    userId,
-    surveyId,
-    props: {
-      name,
-    },
-  }
+
+const startJob = async (job) => {
+  addJobToCache(job)
+
   const jobDb = await jobRepository.insertJob(job)
 
-  notifyUser(job)
+  job.id = jobDb.id
 
-  if (onCancel) {
-    //check every second if the job has been canceled and execute "onCancel" in that case
-    const jobCheckInterval = setInterval(async () => {
-      const reloadedJob = await jobRepository.fetchJobById(jobDb.id)
+  job
+    .onStart(updateJobStatusFromEvent)
+    .onProgress(async event => await updateJobProgress(event.jobId, event.totalItems, event.processedItems))
+    .onFail(updateJobStatusFromEvent)
+    .onComplete(updateJobStatusFromEvent)
+    .onCancel(updateJobStatusFromEvent)
+    .onEnd(async () => removeJobFromCache(job.userId))
 
-      if (reloadedJob && isJobCanceled(reloadedJob)) {
-        onCancel()
-      }
-      if (reloadedJob === null || isJobEnded(reloadedJob)) {
-        clearInterval(jobCheckInterval)
-      }
-    }, 1000)
-  }
+  job.start()
+
+  notifyUser(jobDb)
 
   return jobDb
 }
@@ -71,6 +69,12 @@ const createJob = async (userId, surveyId, name, onCancel = null) => {
 /**
  * ====== UPDATE
  */
+
+const updateJobStatusFromEvent = async jobEvent => {
+  const {jobId, status, totalItems, processedItems, errors} = jobEvent
+  await updateJobStatus(jobId, status, totalItems, processedItems, errors)
+}
+
 const updateJobStatus = async (jobId, status, total, processed, props = {}) => {
   const job = await jobRepository.updateJobStatus(jobId, status, total, processed, props)
   notifyUser(job)
@@ -86,20 +90,25 @@ const updateJobProgress = async (jobId, total, processed) => {
 }
 
 const cancelActiveJobByUserId = async (userId) => {
-  const job = await jobRepository.fetchActiveJobByUserId(userId)
+  const job = getJobFromCache(userId)
   if (job && !isJobEnded(job)) {
-    await jobRepository.updateJobStatus(job.id, jobStatus.canceled, job.total, job.processed)
-    notifyUser(job)
+    job.cancel()
   }
 }
+
+/**
+ * ====== JOB CACHE
+ */
+const addJobToCache = job => userJobs['' + job.userId] = job
+
+const removeJobFromCache = userId => delete userJobs['' + userId]
+
+const getJobFromCache = userId => userJobs[userId]
 
 module.exports = {
   init,
   //CREATE
-  createJob,
-  //READ
-  fetchJobById: jobRepository.fetchJobById,
-
+  startJob,
   //UPDATE
   updateJobProgress,
   updateJobStatus,

@@ -1,10 +1,10 @@
 const fastcsv = require('fast-csv')
 const R = require('ramda')
-const {EventEmitter} = require('events')
 
 const {languageCodes} = require('../../common/app/languages')
 const {isNotBlank} = require('../../common/stringUtils')
 const Taxonomy = require('../../common/survey/taxonomy')
+const Job = require('../../server/job/job')
 const {validateTaxon} = require('../../server/taxonomy/taxonomyValidator')
 
 const requiredColumns = [
@@ -14,25 +14,22 @@ const requiredColumns = [
   'scientific_name',
 ]
 
-class TaxaParser {
+class TaxonomyImportJob extends Job {
 
-  constructor (taxonomyId, inputBuffer) {
+  constructor (userId, surveyId, name, taxonomyId, inputBuffer, taxaPersistFunction) {
+    super(userId, surveyId, name)
+
     this.taxonomyId = taxonomyId
     this.inputBuffer = inputBuffer
     this.csvString = inputBuffer.toString('utf8')
+    this.taxaPersistFunction = taxaPersistFunction
 
-    this.eventEmitter = new EventEmitter()
-
-    this.canceled = false
-    this.startTime = null
     this.csvStreamEnded = false
-    this.totalItems = 0
-    this.processedItems = 0
-    this.result = null
   }
 
   start () {
-    this.startTime = new Date()
+    super.start()
+
     console.log(`parsing csv file. size ${this.inputBuffer.length}`)
 
     this.result = {
@@ -45,7 +42,7 @@ class TaxaParser {
       console.log(`headers processed. valid: ${validHeaders}`)
 
       if (!validHeaders) {
-        this.dispatchEndEvent()
+        this.notifyEnd()
         return
       }
       this.calculateSize(totalItems => {
@@ -54,13 +51,11 @@ class TaxaParser {
         this.totalItems = totalItems
         this.processedItems = 0
 
-        this.dispatchStartEvent()
-
         const csvStream = fastcsv.fromString(this.csvString, {headers: true})
           .on('data', async data => {
             csvStream.pause()
 
-            if (this.canceled) {
+            if (this.isCancelled()) {
               csvStream.destroy()
             } else {
               await this.processRow(data)
@@ -74,10 +69,6 @@ class TaxaParser {
       })
     })
     return this
-  }
-
-  cancel () {
-    this.canceled = true
   }
 
   calculateSize (callback) {
@@ -100,19 +91,27 @@ class TaxaParser {
   }
 
   async processRow (data) {
+    const {result, surveyId, taxonomyId} = this
+
     const taxonParseResult = await this.parseTaxon(data)
 
     if (taxonParseResult.taxon) {
-      this.result.taxa.push(taxonParseResult.taxon)
+      result.taxa.push(taxonParseResult.taxon)
     } else {
-      this.result.errors[this.processedItems + 1] = taxonParseResult.errors
+      this.errors[this.processedItems + 1] = taxonParseResult.errors
     }
     this.processedItems++
 
-    this.dispatchProgressEvent()
+    this.notifyProgress()
 
     if (this.csvStreamEnded) {
-      this.dispatchEndEvent()
+      const hasErrors = !R.isEmpty(R.keys(this.errors))
+      if (hasErrors) {
+        this.notifyFailed()
+      } else {
+        await this.taxaPersistFunction(surveyId, taxonomyId, result.taxa, result.vernacularLanguageCodes)
+        this.notifyCompleted()
+      }
     }
   }
 
@@ -121,7 +120,7 @@ class TaxaParser {
     if (R.isEmpty(missingColumns)) {
       return true
     } else {
-      this.result.errors[0] = `Missing required columns: ${R.join(', ', missingColumns)}`
+      this.errors[0] = `Missing required columns: ${R.join(', ', missingColumns)}`
       return false
     }
   }
@@ -151,47 +150,6 @@ class TaxaParser {
     }, {}, this.result.vernacularLanguageCodes)
   }
 
-  onStart (listener) {
-    return this.addEventListener('start', listener)
-  }
-
-  onProgress (listener) {
-    return this.addEventListener('progress', listener)
-  }
-
-  onEnd (listener) {
-    return this.addEventListener('end', listener)
-  }
-
-  addEventListener (eventType, listener) {
-    this.eventEmitter.addListener(eventType, listener)
-    return this
-  }
-
-  dispatchStartEvent () {
-    this.eventEmitter.emit('start', this.createProgressEvent())
-  }
-
-  dispatchProgressEvent () {
-    this.eventEmitter.emit('progress', this.createProgressEvent())
-  }
-
-  dispatchEndEvent () {
-    const end = new Date()
-    const elapsedSeconds = (end.getTime() - this.startTime.getTime()) / 1000
-    console.log(`csv parsed in ${elapsedSeconds} seconds. parsed taxa: ${this.result.taxa.length} errors: ${R.keys(this.result.errors).length}`)
-
-    this.eventEmitter.emit('end', R.assoc('result', this.result)(this.createProgressEvent()))
-  }
-
-  createProgressEvent () {
-    return {
-      total: this.totalItems,
-      processed: this.processedItems,
-    }
-  }
 }
 
-module.exports = {
-  TaxaParser,
-}
+module.exports = TaxonomyImportJob

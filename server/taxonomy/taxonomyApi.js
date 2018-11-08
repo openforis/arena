@@ -10,7 +10,7 @@ const {
   updateTaxonomyProp,
   deleteTaxonomy
 } = require('./taxonomyManager')
-const {fetchTaxonomiesBySurveyId, importTaxa, exportTaxa} = require('./taxonomyManager')
+const {fetchTaxonomiesBySurveyId, startTaxonomyImportJob, exportTaxa} = require('./taxonomyManager')
 
 module.exports.init = app => {
 
@@ -119,7 +119,7 @@ module.exports.init = app => {
       const taxonomyId = getRestParam(req, 'taxonomyId')
 
       const file = req.files.file
-      const job = await importTaxa(user.id, surveyId, taxonomyId, file.data)
+      const job = await startTaxonomyImportJob(user.id, surveyId, taxonomyId, file.data)
 
       res.json({job})
     } catch (err) {

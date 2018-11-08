@@ -28,7 +28,7 @@ const fetchActiveJobByUserId = async (userId, client = db) =>
   await client.oneOrNone(
     `SELECT * FROM job
      WHERE user_id = $1
-       AND status IN ('${jobStatus.created}', '${jobStatus.running}')`,
+       AND status IN ('${jobStatus.pending}', '${jobStatus.running}')`,
     [userId],
     camelize
   )
