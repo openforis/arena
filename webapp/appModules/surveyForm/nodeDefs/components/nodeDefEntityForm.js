@@ -39,13 +39,6 @@ const EntityForm = props => {
   const rdgLayout = getLayout(nodeDef)
   const innerPageChildren = filterInnerPageChildren(childDefs)
 
-  // const childProps = R.pipe(
-  //   R.dissoc('node'),
-  //   R.dissoc('childDefs'),
-  //   R.dissoc('nodeDef'),
-  //   R.dissoc('parentNode'),
-  // )(props)
-
   const onLayoutChange = (layout) => {
 
     //console.log(window.innerWidth) ||

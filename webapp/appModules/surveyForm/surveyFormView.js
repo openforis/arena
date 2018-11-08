@@ -85,7 +85,6 @@ const mapStateToProps = (state, props) => {
   const record = getRecord(surveyForm)
 
   const mapEntryProps = () => ({
-    // rootNode: getRootNode(getRecord(survey)),
     recordLoaded: !!record,
     parentNode: nodeDef ? getFormPageParentNode(survey, nodeDef)(surveyForm) : null,
     recordId: record ? record.id : null,
