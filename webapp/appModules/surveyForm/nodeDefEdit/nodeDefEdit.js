@@ -8,10 +8,6 @@ import TaxonomiesView from '../components/taxonomiesView'
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 
-import { putNodeDefProp } from '../../../survey/nodeDefs/actions'
-import { createCodeList, deleteCodeList } from '../codeListEdit/actions'
-import { createTaxonomy, deleteTaxonomy } from '../taxonomyEdit/actions'
-
 import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
 import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
@@ -35,11 +31,7 @@ class NodeDefEdit extends React.Component {
   render () {
     const {
       nodeDef, putNodeDefProp,
-      //code list
-      codeLists, codeList, candidateParentCodeNodeDefs, parentCodeDef,
-      canUpdateCodeList, createCodeList, deleteCodeList,
-      //taxonomy
-      taxonomies, taxonomy, createTaxonomy, deleteTaxonomy
+      canUpdateCodeList
     } = this.props
     const {editingCodeList, editingTaxonomy} = this.state
 
@@ -64,15 +56,6 @@ class NodeDefEdit extends React.Component {
               <div className="form">
                 <CommonProps nodeDef={nodeDef}
                              putNodeDefProp={putNodeDefProp}
-                             codeLists={codeLists}
-                             codeList={codeList}
-                             canUpdateCodeList={canUpdateCodeList}
-                             candidateParentCodeNodeDefs={candidateParentCodeNodeDefs}
-                             parentCodeDef={parentCodeDef}
-                             createCodeList={createCodeList}
-                             taxonomies={taxonomies}
-                             taxonomy={taxonomy}
-                             createTaxonomy={createTaxonomy}
                              toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
                              toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
 
@@ -98,31 +81,12 @@ const mapStateToProps = state => {
   const surveyForm = getSurveyForm(state)
   const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
 
-  const isCodeList = NodeDef.isNodeDefCodeList(nodeDef)
-  const isTaxon = NodeDef.isNodeDefTaxon(nodeDef)
-
   return {
-    nodeDef,
-    //code list
-    codeLists: isCodeList ? Survey.getCodeListsArray(survey) : null,
-    canUpdateCodeList: isCodeList ? Survey.canUpdateCodeList(nodeDef)(survey) : false,
-    codeList: isCodeList ? Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey) : null,
-    candidateParentCodeNodeDefs: isCodeList ? Survey.getNodeDefCodeCandidateParents(nodeDef)(survey) : null,
-    parentCodeDef: isCodeList ? Survey.getNodeDefParentCode(nodeDef)(survey) : null,
-    //taxonomy
-    taxonomy: isTaxon ? Survey.getTaxonomyByUUID(NodeDef.getNodeDefTaxonomyUUID(nodeDef))(survey) : null,
-    taxonomies: isTaxon ? Survey.getTaxonomiesArray(survey) : null,
+    nodeDef
   }
 }
 
 export default connect(
   mapStateToProps,
-  {
-    closeFormNodeDefEdit,
-    putNodeDefProp,
-    createCodeList,
-    deleteCodeList,
-    createTaxonomy,
-    deleteTaxonomy,
-  }
+  {closeFormNodeDefEdit}
 )(NodeDefEdit)

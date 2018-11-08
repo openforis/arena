@@ -19,12 +19,39 @@ import { getSurvey } from '../../../../survey/surveyState'
 class NodeDefEntitySwitch extends React.Component {
 
   render () {
-    const {nodeDef} = this.props
+    const {
+      entry,
+      nodeDef,
+      childDefs,
+      edit,
+      nodes,
+      parentNode,
+      label,
+      updateNode,
+      setFormPageNode,
+      selectedNodeUUID,
+      putNodeDefProp
+    } = this.props
 
     if (isRenderForm(nodeDef))
-      return <NodeDefEntityForm {...this.props} />
+      return <NodeDefEntityForm entry={entry}
+                                nodeDef={nodeDef}
+                                childDefs={childDefs}
+                                edit={edit}
+                                nodes={nodes}
+                                parentNode={parentNode}
+                                label={label}
+                                updateNode={updateNode}
+                                putNodeDefProp={putNodeDefProp}/>
     else if (isRenderTable(nodeDef))
-      return <NodeDefEntityTable {...this.props} />
+      return <NodeDefEntityTable entry={entry}
+                                 nodeDef={nodeDef}
+                                 childDefs={childDefs}
+                                 edit={edit}
+                                 nodes={nodes}
+                                 setFormPageNode={setFormPageNode}
+                                 selectedNodeUUID={selectedNodeUUID}
+                                 putNodeDefProp={putNodeDefProp}/>
 
     return null
   }

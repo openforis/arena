@@ -1,7 +1,6 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { FormItem } from '../../../commonComponents/form/input'
 import Dropdown from '../../../commonComponents/form/dropdown'
 
 import NodeDef from '../../../../common/survey/nodeDef'
@@ -14,18 +13,22 @@ import {
   nodeDefLayoutProps,
   nodeDefRenderType
 } from '../../../../common/survey/nodeDefLayout'
+import { getSurvey } from '../../../survey/surveyState'
+import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
+import Survey from '../../../../common/survey/survey'
+import connect from 'react-redux/es/connect/connect'
+import { putNodeDefProp } from '../../../survey/nodeDefs/actions'
+import { createCodeList, deleteCodeList } from '../codeListEdit/actions'
 
 const CodeListProps = (props) => {
   const {
     nodeDef,
     putNodeDefProp,
-
     codeLists,
     canUpdateCodeList,
     codeList,
     candidateParentCodeNodeDefs,
     parentCodeDef,
-
     createCodeList,
     toggleCodeListEdit,
   } = props
@@ -101,4 +104,28 @@ const CodeListProps = (props) => {
   )
 }
 
-export default CodeListProps
+const mapStateToProps = state => {
+  const survey = getSurvey(state)
+  const surveyForm = getSurveyForm(state)
+  const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
+
+  const isCodeList = NodeDef.isNodeDefCodeList(nodeDef)
+
+  return {
+    codeLists: isCodeList ? Survey.getCodeListsArray(survey) : null,
+    canUpdateCodeList: isCodeList ? Survey.canUpdateCodeList(nodeDef)(survey) : false,
+    codeList: isCodeList ? Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey) : null,
+    candidateParentCodeNodeDefs: isCodeList ? Survey.getNodeDefCodeCandidateParents(nodeDef)(survey) : null,
+    parentCodeDef: isCodeList ? Survey.getNodeDefParentCode(nodeDef)(survey) : null,
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  {
+    putNodeDefProp,
+    createCodeList,
+    deleteCodeList,
+  }
+)(CodeListProps)
+

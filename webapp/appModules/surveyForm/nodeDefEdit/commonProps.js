@@ -21,11 +21,6 @@ const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValu
 const CommonProps = props => {
   const {
     nodeDef, putNodeDefProp,
-    //code list
-    codeLists, canUpdateCodeList, codeList, parentCodeDef,
-    candidateParentCodeNodeDefs, toggleCodeListEdit, createCodeList,
-    //taxonomy
-    taxonomies, taxonomy, toggleTaxonomyEdit, createTaxonomy,
   } = props
   const validation = getValidation(nodeDef)
 
@@ -51,24 +46,15 @@ const CommonProps = props => {
       {
         NodeDef.isNodeDefCodeList(nodeDef) &&
         <CodeListProps nodeDef={nodeDef}
-                       canUpdateCodeList={canUpdateCodeList}
-                       codeLists={codeLists}
-                       codeList={codeList}
-                       parentCodeDef={parentCodeDef}
-                       candidateParentCodeNodeDefs={candidateParentCodeNodeDefs}
                        toggleCodeListEdit={toggleCodeListEdit}
-                       putNodeDefProp={putNodeDefProp}
-                       createCodeList={createCodeList}/>
+                       putNodeDefProp={putNodeDefProp}/>
       }
 
       {
         NodeDef.isNodeDefTaxon(nodeDef) &&
         <TaxonProps nodeDef={nodeDef}
-                    taxonomies={taxonomies}
-                    taxonomy={taxonomy}
                     toggleTaxonomyEdit={toggleTaxonomyEdit}
-                    putNodeDefProp={putNodeDefProp}
-                    createTaxonomy={createTaxonomy}/>
+                    putNodeDefProp={putNodeDefProp}/>
       }
 
       {

@@ -80,7 +80,7 @@ class NodeDefSwitch extends React.Component {
             {
               !locked &&
               <React.Fragment>
-                {
+
                   isPage ?
                     <div className="btn-of-light-xs node-def__form-root-actions">
                       columns

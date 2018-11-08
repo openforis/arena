@@ -23,18 +23,28 @@ import { getFormPageNodeUUID, getSurveyForm } from '../../../../appModules/surve
 import { setFormPageNode } from '../../actions'
 
 const EntityForm = props => {
-  const {nodeDef, childDefs, edit, locked, node, putNodeDefProp} = props
+  const {
+    nodeDef,
+    childDefs,
+    edit,
+    locked,
+    node,
+    putNodeDefProp,
+    entry,
+    recordId,
+    surveyInfo
+  } = props
 
   const columns = getNoColumns(nodeDef)
   const rdgLayout = getLayout(nodeDef)
   const innerPageChildren = filterInnerPageChildren(childDefs)
 
-  const childProps = R.pipe(
-    R.dissoc('node'),
-    R.dissoc('childDefs'),
-    R.dissoc('nodeDef'),
-    R.dissoc('parentNode'),
-  )(props)
+  // const childProps = R.pipe(
+  //   R.dissoc('node'),
+  //   R.dissoc('childDefs'),
+  //   R.dissoc('nodeDef'),
+  //   R.dissoc('parentNode'),
+  // )(props)
 
   const onLayoutChange = (layout) => {
 
@@ -64,7 +74,10 @@ const EntityForm = props => {
             .map((childDef, i) =>
               <div key={childDef.uuid} id={childDef.uuid}>
                 <NodeDefSwitch key={i}
-                               {...childProps}
+                               edit={edit}
+                               entry={entry}
+                               recordId={recordId}
+                               surveyInfo={surveyInfo}
                                nodeDef={childDef}
                                parentNode={node}/>
               </div>
@@ -209,4 +222,7 @@ const mapStateToProps = (state, props) => ({
   selectedNodeUUID: getFormPageNodeUUID(props.nodeDef)(getSurveyForm(state))
 })
 
-export default connect(mapStateToProps, {setFormPageNode})(NodeDefEntityForm)
+export default connect(
+  mapStateToProps,
+  {setFormPageNode}
+)(NodeDefEntityForm)

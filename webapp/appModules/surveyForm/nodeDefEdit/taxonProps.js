@@ -5,12 +5,16 @@ import Dropdown from '../../../commonComponents/form/dropdown'
 
 import Taxonomy from '../../../../common/survey/taxonomy'
 import { getFieldValidation, getValidation } from '../../../../common/validation/validator'
+import connect from 'react-redux/es/connect/connect'
+import { getSurvey } from '../../../survey/surveyState'
+import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
+import { putNodeDefProp } from '../../../survey/nodeDefs/actions'
+import { createTaxonomy, deleteTaxonomy } from '../taxonomyEdit/actions'
 
 const TaxonProps = (props) => {
   const {
     nodeDef,
     putNodeDefProp,
-
     taxonomies,
     taxonomy,
     createTaxonomy,
@@ -54,4 +58,24 @@ const TaxonProps = (props) => {
   )
 }
 
-export default TaxonProps
+const mapStateToProps = state => {
+  const survey = getSurvey(state)
+  const surveyForm = getSurveyForm(state)
+  const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
+
+  const isTaxon = NodeDef.isNodeDefTaxon(nodeDef)
+
+  return {
+    taxonomy: isTaxon ? Survey.getTaxonomyByUUID(NodeDef.getNodeDefTaxonomyUUID(nodeDef))(survey) : null,
+    taxonomies: isTaxon ? Survey.getTaxonomiesArray(survey) : null,
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  {
+    putNodeDefProp,
+    createTaxonomy,
+    deleteTaxonomy,
+  }
+)(TaxonProps)
