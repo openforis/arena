@@ -29,7 +29,7 @@ class AppSideBar extends React.Component {
 
   render () {
     const {opened} = this.state
-    const {history, user, surveyInfo, logout} = this.props
+    const {pathname, user, surveyInfo, logout} = this.props
 
     return (
       <div className="app-sidebar">
@@ -47,7 +47,7 @@ class AppSideBar extends React.Component {
           </a>
         </div>
 
-        <AppSideBarModules history={history}
+        <AppSideBarModules pathname={pathname}
                            surveyInfo={surveyInfo}
                            opened={opened}/>
 

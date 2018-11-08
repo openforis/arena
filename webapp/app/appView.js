@@ -8,12 +8,12 @@ import AppJobMonitor from './components/job/appJobMonitor'
 import AppErrors from './components/errors/appErrors'
 
 const AppView = (props) => {
-  const history = {...props.history}
+  const pathName = props.history.location.pathname
 
   return (
     <div className="app__container">
 
-      <AppSideBar history={history}/>
+      <AppSideBar pathname={pathName}/>
 
       <AppModulesView location={props.location}/>
 
