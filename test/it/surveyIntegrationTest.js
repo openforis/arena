@@ -3,9 +3,9 @@ require('dotenv').config()
 
 const {initTestContext, destroyTestContext} = require('./../testContext')
 
-const surveyTest = require('./testFiles/survey')
-const nodeDefTest = require('./testFiles/nodeDef')
-const codeListTest = require('./testFiles/codeList')
+const surveyIntegrationTest = require('./surveyTests/surveyTest')
+const nodeDefTest = require('./surveyTests/nodeDefTest')
+const codeListTest = require('./surveyTests/codeListTest')
 
 before(initTestContext)
 
@@ -13,7 +13,7 @@ describe('Survey Test', () => {
 
   // ==== SURVEY
 
-  it('Create Survey', surveyTest.createSurveyTest)
+  it('Create Survey', surveyIntegrationTest.createSurveyTest)
 
   // ==== CODE LIST
 
