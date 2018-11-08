@@ -1,8 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { Input } from '../../../../commonComponents/form/input'
-import NodeDefFormItem from './nodeDefFormItem'
+import { FormItem, Input } from '../../../../commonComponents/form/input'
 import NodeDefDeleteButton from '../nodeDefDeleteButton'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
@@ -38,9 +37,9 @@ const NodeDefText = props => {
   // EDIT MODE
 
   if (edit)
-    return <NodeDefFormItem label={label}>
+    return <FormItem label={label}>
       <NodeDefTextInput {...props} />
-    </NodeDefFormItem>
+    </FormItem>
 
   // ENTRY MODE
 
@@ -51,7 +50,7 @@ const NodeDefText = props => {
     const {height} = domElem ? elementOffset(domElem) : {height: 80}
 
     return (
-      <NodeDefFormItem label={label}>
+      <FormItem label={label}>
         <div className="overflowYAuto" style={{display: 'grid', alignContent: 'center',  height}}>
           {
             nodes.map(n =>
@@ -75,7 +74,7 @@ const NodeDefText = props => {
             )
           }
         </div>
-      </NodeDefFormItem>
+      </FormItem>
     )
   }
 }

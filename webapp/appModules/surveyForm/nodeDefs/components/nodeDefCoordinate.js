@@ -3,7 +3,6 @@ import * as R from 'ramda'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
-import NodeDefFormItem from './nodeDefFormItem'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
@@ -68,7 +67,7 @@ class NodeDefCoordinate extends React.Component {
     }
 
     return (
-      <NodeDefFormItem label={label}>
+      <FormItem label={label}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr',
@@ -84,7 +83,7 @@ class NodeDefCoordinate extends React.Component {
             {srsDropdown}
           </FormItem>
         </div>
-      </NodeDefFormItem>
+      </FormItem>
     )
   }
 }

@@ -5,7 +5,6 @@ import axios from 'axios'
 import * as R from 'ramda'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
-import NodeDefFormItem from './nodeDefFormItem'
 import AutocompleteDialog from '../../../../commonComponents/form/autocompleteDialog'
 
 import { toQueryString } from '../../../../../server/serverUtils/request'
@@ -226,7 +225,7 @@ class NodeDefTaxon extends React.Component {
     }
 
     return (
-      <NodeDefFormItem label={label}>
+      <FormItem label={label}>
         <div className="node-def__taxon-wrapper">
           <FormItem label="Code">
             {codeInputField}
@@ -240,7 +239,7 @@ class NodeDefTaxon extends React.Component {
         </div>
 
         {autocompleteDialog}
-      </NodeDefFormItem>
+      </FormItem>
     )
   }
 }
