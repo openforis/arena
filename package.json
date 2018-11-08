@@ -47,7 +47,7 @@
     "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
-    "@esri/proj-codes": "^1.0.4",
+    "@esri/proj-codes": "^2.2.0",
     "axios": "^0.18.0",
     "bcrypt": "^3.0.2",
     "bluebird": "^3.5.2",
