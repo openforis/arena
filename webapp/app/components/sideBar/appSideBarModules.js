@@ -5,7 +5,6 @@ import * as R from 'ramda'
 import { appModuleUri } from '../../../appModules/appModules'
 import { appModules } from '../../../appModules/appModules'
 import { getLocationPathname } from '../../../appUtils/routerUtils'
-import { withRouter } from 'react-router'
 
 const modules = [
   {
@@ -93,4 +92,4 @@ const AppSideBarModules = ({pathname, surveyInfo, opened}) => (
   </div>
 )
 
-export default withRouter(AppSideBarModules)
+export default AppSideBarModules
