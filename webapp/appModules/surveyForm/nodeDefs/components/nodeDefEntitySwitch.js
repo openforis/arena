@@ -30,7 +30,8 @@ class NodeDefEntitySwitch extends React.Component {
       updateNode,
       setFormPageNode,
       selectedNodeUUID,
-      putNodeDefProp
+      putNodeDefProp,
+      removeNode,
     } = this.props
 
     if (isRenderForm(nodeDef))
@@ -53,7 +54,8 @@ class NodeDefEntitySwitch extends React.Component {
                                  setFormPageNode={setFormPageNode}
                                  selectedNodeUUID={selectedNodeUUID}
                                  updateNode={updateNode}
-                                 putNodeDefProp={putNodeDefProp}/>
+                                 putNodeDefProp={putNodeDefProp}
+                                 removeNode={removeNode}/>
 
     return null
   }

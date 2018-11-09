@@ -16,7 +16,7 @@ import Node from '../../../../../common/record/node'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 import { getNodeDefDefaultValue } from '../nodeDefSystemProps'
-import { getSurvey } from '../../../../survey/surveyState'
+import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
 
 const fields = {
   code: 'code',
@@ -247,7 +247,8 @@ class NodeDefTaxon extends React.Component {
 const mapStateToProps = (state, props) => ({
   taxonomy: Survey.getTaxonomyByUUID(
     NodeDef.getNodeDefTaxonomyUUID(props.nodeDef)
-  )(getSurvey(state))
+  )(getSurvey(state)),
+  surveyInfo: getStateSurveyInfo(state)
 })
 
 export default connect(mapStateToProps)(NodeDefTaxon)
