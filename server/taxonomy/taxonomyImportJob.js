@@ -3,6 +3,7 @@ const R = require('ramda')
 
 const {languageCodes} = require('../../common/app/languages')
 const {isNotBlank} = require('../../common/stringUtils')
+const {jobStatus} = require('../../common/job/job')
 const Taxonomy = require('../../common/survey/taxonomy')
 const Job = require('../../server/job/job')
 const {validateTaxon} = require('../../server/taxonomy/taxonomyValidator')
@@ -34,7 +35,6 @@ class TaxonomyImportJob extends Job {
 
     this.result = {
       taxa: [],
-      errors: {},
       vernacularLanguageCodes: [],
     }
 
@@ -42,7 +42,7 @@ class TaxonomyImportJob extends Job {
       console.log(`headers processed. valid: ${validHeaders}`)
 
       if (!validHeaders) {
-        this.notifyEnd()
+        this.changeStatus(jobStatus.failed)
         return
       }
       this.calculateSize(totalItems => {
@@ -98,19 +98,17 @@ class TaxonomyImportJob extends Job {
     if (taxonParseResult.taxon) {
       result.taxa.push(taxonParseResult.taxon)
     } else {
-      this.errors[this.processedItems + 1] = taxonParseResult.errors
+      this.errors['' + (this.processedItems + 1)] = taxonParseResult.errors
     }
-    this.processedItems++
-
-    this.notifyProgress()
+    this.incrementProcessedItems()
 
     if (this.csvStreamEnded) {
       const hasErrors = !R.isEmpty(R.keys(this.errors))
       if (hasErrors) {
-        this.notifyFailed()
+        this.changeStatus(jobStatus.failed)
       } else {
         await this.taxaPersistFunction(surveyId, taxonomyId, result.taxa, result.vernacularLanguageCodes)
-        this.notifyCompleted()
+        this.changeStatus(jobStatus.completed)
       }
     }
   }

@@ -106,8 +106,9 @@ module.exports.init = app => {
   app.put('/survey/:id/publish', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'id')
+      const user = req.user
 
-      const survey = await publishSurvey(surveyId)
+      const survey = await publishSurvey(surveyId, user)
 
       res.json({survey})
     } catch (err) {

@@ -2,17 +2,31 @@ const {uuidv4} = require('../../common/uuid')
 
 const JobCommon = require('../../common/job/job')
 
-/**
- * events:
- * - start: job has just started
- * - progress: job is running
- * - complete: job completed successfully
- * - fail: job failed with errors
- * - end: job completed successfully or failed
- */
+const eventTypes = {
+  start: 'start', //job has just started
+  progress: 'progress', //job is running
+  complete: 'complete', //job completed successfully
+  fail: 'fail', //job failed with errors
+  cancel: 'cancel', //job has been canceled
+  end: 'end', //job completed successfully or failed
+  innerJob: 'innerJob', //inner job events
+
+  all: 'all', //all events
+}
+
+class JobEvent {
+
+  constructor (jobId, status, totalItems, processedItems) {
+    this.jobId = jobId
+    this.status = status
+    this.totalItems = totalItems
+    this.processedItems = processedItems
+  }
+}
+
 class Job {
 
-  constructor (userId, surveyId, name) {
+  constructor (userId, surveyId, name, innerJobs = []) {
     this.id = null
     this.uuid = uuidv4()
     this.userId = userId
@@ -25,55 +39,95 @@ class Job {
     this.startTime = null
     this.totalItems = 0
     this.processedItems = 0
-    this.result = null
-    this.errors = null
+    this.result = {}
+    this.errors = {}
+    this.context = {} //context shared among inner jobs
 
-    this.startListener = null
-    this.progressListener = null
-    this.completeListener = null
-    this.failListener = null
-    this.cancelListener = null
-    this.endListener = null
+    this.innerJobs = innerJobs
+    this.currentInnerJobIndex = -1
+
+    this.eventListeners = {}
   }
 
   start () {
     this.startTime = new Date()
-    this.status = JobCommon.jobStatus.running
-    this.notifyStart()
+    this.changeStatus(JobCommon.jobStatus.running)
+
+    const innerJobsSize = this.innerJobs.length
+    if (innerJobsSize > 0) {
+      this.totalItems = innerJobsSize
+      this.startNextInnerJob()
+    }
+  }
+
+  startNextInnerJob () {
+    this.currentInnerJobIndex ++
+    const innerJob = this.innerJobs[this.currentInnerJobIndex]
+
+    innerJob.context = this.context
+
+    innerJob
+      .onAllEvents(event => this.notifyEvent(eventTypes.innerJob, event)) //propagate events to parent job
+      .onEnd(event => {
+        switch (event.status) {
+          case JobCommon.jobStatus.failed:
+            this.changeStatus(event.status)
+            break
+          case JobCommon.jobStatus.canceled:
+            this.changeStatus(event.status)
+            break
+          case JobCommon.jobStatus.completed:
+            this.processedItems ++
+            if (this.processedItems < this.innerJobs.length) {
+              this.startNextInnerJob()
+            } else {
+              this.changeStatus(event.status)
+            }
+            break
+        }
+      })
+    innerJob.start()
   }
 
   cancel () {
-    this.status = JobCommon.jobStatus.canceled
-    this.notifyCanceled()
+    this.changeStatus(JobCommon.jobStatus.canceled)
   }
 
   onStart (listener) {
-    this.startListener = listener
-    return this
+    return this.addEventListener(eventTypes.start, listener)
   }
 
   onProgress (listener) {
-    this.progressListener = listener
-    return this
+    return this.addEventListener(eventTypes.progress, listener)
   }
 
   onComplete (listener) {
-    this.completeListener = listener
-    return this
+    return this.addEventListener(eventTypes.complete, listener)
   }
 
   onEnd (listener) {
-    this.endListener = listener
-    return this
+    return this.addEventListener(eventTypes.end, listener)
   }
 
   onFail (listener) {
-    this.failListener = listener
-    return this
+    return this.addEventListener(eventTypes.fail, listener)
   }
 
   onCancel (listener) {
-    this.cancelListener = listener
+    return this.addEventListener(eventTypes.cancel, listener)
+  }
+
+  onAllEvents (listener) {
+    return this.addEventListener(eventTypes.all, listener)
+  }
+
+  addEventListener (type, listener) {
+    this.eventListeners[type] = listener
+    return this
+  }
+
+  onInnerJobEvent (listener) {
+    this.eventListeners[eventTypes.innerJob] = listener
     return this
   }
 
@@ -81,68 +135,68 @@ class Job {
     return JobCommon.isJobCanceled(this)
   }
 
-  notifyStart () {
-    if (this.startListener)
-      this.startListener(this.createJobEvent())
+  changeStatus (status) {
+    this.status = status
+
+    if (status === JobCommon.jobStatus.completed) {
+      const end = new Date()
+      const elapsedSeconds = (end.getTime() - this.startTime.getTime()) / 1000
+
+      console.log(`job '${JobCommon.getJobName(this)}' completed in ${elapsedSeconds}s`)
+    }
+    this.notifyStatusChangeEvent()
   }
 
-  notifyProgress () {
-    if (this.progressListener)
-      this.progressListener(this.createJobEvent())
+  incrementProcessedItems () {
+    this.processedItems ++
+    this.notifyEvent(eventTypes.progress, this.createJobEvent())
   }
 
-  notifyFailed () {
-    this.status = JobCommon.jobStatus.failed
+  notifyStatusChangeEvent () {
+    const eventType = this.getStatusChangeEventType()
+    const event = this.createJobEvent(eventType)
+    if (this.status === JobCommon.jobStatus.failed) {
+      event.errors = this.errors
+    }
+    this.notifyEvent(eventType, event)
+  }
 
-    if (this.failListener) {
-      const event = {
-        ...this.createJobEvent(),
-        errors: this.errors
+  notifyEvent (eventType, event) {
+    if (this.eventListeners[eventType]) {
+      this.eventListeners[eventType](event)
+    }
+
+    //notify end event
+    if (this.eventListeners[eventTypes.end]) {
+      switch (event.status) {
+        case JobCommon.jobStatus.canceled:
+        case JobCommon.jobStatus.completed:
+        case JobCommon.jobStatus.failed:
+          this.eventListeners[eventTypes.end](event)
       }
-      this.failListener(event)
     }
-    this.notifyEnd()
+
+    //notify "all" event
+    if (this.eventListeners[eventTypes.all]) {
+      this.eventListeners[eventTypes.all](event)
+    }
   }
 
-  notifyCompleted () {
-    this.status = JobCommon.jobStatus.completed
-
-    const end = new Date()
-    const elapsedSeconds = (end.getTime() - this.startTime.getTime()) / 1000
-
-    console.log(`job '${JobCommon.getJobName(this)}' completed in ${elapsedSeconds}s`)
-
-    if (this.completeListener) {
-      this.completeListener(this.createJobEvent())
-    }
-    this.notifyEnd()
-  }
-
-  notifyCanceled () {
-    if (this.cancelListener) {
-      this.cancelListener(this.createJobEvent())
-    }
-    this.notifyEnd()
-  }
-
-  notifyEnd () {
-    if (this.endListener) {
-      this.endListener(this.createJobEvent())
+  getStatusChangeEventType () {
+    switch (this.status) {
+      case JobCommon.jobStatus.running:
+        return eventTypes.start
+      case JobCommon.jobStatus.canceled:
+        return eventTypes.cancel
+      case JobCommon.jobStatus.completed:
+        return eventTypes.complete
+      case JobCommon.jobStatus.failed:
+        return eventTypes.fail
     }
   }
 
   createJobEvent () {
     return new JobEvent(this.id, this.status, this.totalItems, this.processedItems)
-  }
-}
-
-class JobEvent {
-
-  constructor (jobId, status, totalItems, processedItems) {
-    this.jobId = jobId
-    this.status = status
-    this.totalItems = totalItems
-    this.processedItems = processedItems
   }
 }
 

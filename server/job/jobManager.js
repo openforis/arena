@@ -3,6 +3,7 @@ const {throttle} = require('../../common/functionsDefer')
 const {
   jobSocketEvents,
   isJobEnded,
+  jobStatus,
 } = require('../../common/job/job')
 
 const jobRepository = require('./jobRepository')
@@ -47,9 +48,7 @@ const notifyUser = (job) => {
 const startJob = async (job) => {
   addJobToCache(job)
 
-  const jobDb = await jobRepository.insertJob(job)
-
-  job.id = jobDb.id
+  const jobDb = await insertJobAndInnerJobs(job)
 
   job
     .onStart(updateJobStatusFromEvent)
@@ -58,10 +57,29 @@ const startJob = async (job) => {
     .onComplete(updateJobStatusFromEvent)
     .onCancel(updateJobStatusFromEvent)
     .onEnd(async () => removeJobFromCache(job.userId))
+    .onInnerJobEvent(async event => {
+      if (event.status === jobStatus.running) {
+        await updateJobProgress(event.jobId, event.total, event.processed)
+      } else {
+        await updateJobStatusFromEvent(event)
+      }
+    })
 
   job.start()
 
   notifyUser(jobDb)
+
+  return jobDb
+}
+
+const insertJobAndInnerJobs = async job => {
+  console.log('inserting job', job.props.name)
+  const jobDb = await jobRepository.insertJob(job)
+  job.id = jobDb.id
+
+  for (const innerJob of job.innerJobs) {
+    await insertJobAndInnerJobs(innerJob)
+  }
 
   return jobDb
 }
@@ -71,8 +89,10 @@ const startJob = async (job) => {
  */
 
 const updateJobStatusFromEvent = async jobEvent => {
-  const {jobId, status, totalItems, processedItems, errors} = jobEvent
-  await updateJobStatus(jobId, status, totalItems, processedItems, errors)
+  console.log('job event', jobEvent)
+
+  const {jobId, status, totalItems, processedItems, errors = {}} = jobEvent
+  await updateJobStatus(jobId, status, totalItems, processedItems, {errors})
 }
 
 const updateJobStatus = async (jobId, status, total, processed, props = {}) => {
