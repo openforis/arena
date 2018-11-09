@@ -7,6 +7,8 @@ $rowBorder: 1px solid rgba($white, 0.4);
   position: relative;
   overflow: hidden;
   margin: 0 4rem;
+  display: grid;
+  grid-template-rows: 85px 1fr;
   border-bottom: $rowBorder;
 }
 
@@ -24,8 +26,8 @@ $rowBorder: 1px solid rgba($white, 0.4);
 
 .surveys-list__rows {
   position: absolute;
+  top: 85px;
   height: calc(100% - 85px);
-  width: 100%;
 
   display: grid;
   grid-auto-rows: $rowHeight;

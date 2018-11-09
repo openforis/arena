@@ -120,7 +120,7 @@ module.exports.init = app => {
   app.delete('/survey/:id', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'id')
-      await deleteSurvey(surveyId)
+      await deleteSurvey(surveyId, req.user)
 
       sendOk(res)
     } catch (err) {
