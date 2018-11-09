@@ -35,17 +35,18 @@ class NodeDefEntitySwitch extends React.Component {
     } = this.props
 
     if (isRenderForm(nodeDef))
-      return <NodeDefEntityForm entry={entry}
+      return <NodeDefEntityForm label={label}
+                                entry={entry}
                                 nodeDef={nodeDef}
                                 childDefs={childDefs}
                                 edit={edit}
                                 nodes={nodes}
                                 parentNode={parentNode}
-                                label={label}
                                 updateNode={updateNode}
                                 putNodeDefProp={putNodeDefProp}/>
     else if (isRenderTable(nodeDef))
-      return <NodeDefEntityTable entry={entry}
+      return <NodeDefEntityTable label={label}
+                                 entry={entry}
                                  nodeDef={nodeDef}
                                  childDefs={childDefs}
                                  edit={edit}
