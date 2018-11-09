@@ -116,6 +116,7 @@ const mapStateToProps = (state, props) => {
     : null
 
   return {
+    surveyInfo: surveyInfo,
     language: Survey.getDefaultLanguage(surveyInfo),
     nodeDefParentCodeUUID: NodeDef.getNodeDefParentCodeUUID(nodeDef),
     ancestorCodes,

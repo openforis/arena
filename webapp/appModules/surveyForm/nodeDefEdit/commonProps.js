@@ -20,7 +20,7 @@ const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValu
 
 const CommonProps = props => {
   const {
-    nodeDef, putNodeDefProp,
+    nodeDef, putNodeDefProp, toggleTaxonomyEdit, toggleCodeListEdit
   } = props
   const validation = getValidation(nodeDef)
 

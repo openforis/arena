@@ -1,6 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
+import { FormItem } from '../../../commonComponents/form/input'
 import Dropdown from '../../../commonComponents/form/dropdown'
 
 import NodeDef from '../../../../common/survey/nodeDef'

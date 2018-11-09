@@ -4,6 +4,8 @@ import { FormItem } from '../../../commonComponents/form/input'
 import Dropdown from '../../../commonComponents/form/dropdown'
 
 import Taxonomy from '../../../../common/survey/taxonomy'
+import NodeDef from '../../../../common/survey/nodeDef'
+import Survey from '../../../../common/survey/survey'
 import { getFieldValidation, getValidation } from '../../../../common/validation/validator'
 import connect from 'react-redux/es/connect/connect'
 import { getSurvey } from '../../../survey/surveyState'

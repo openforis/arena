@@ -49,8 +49,10 @@ class NodeDefEntitySwitch extends React.Component {
                                  childDefs={childDefs}
                                  edit={edit}
                                  nodes={nodes}
+                                 parentNode={parentNode}
                                  setFormPageNode={setFormPageNode}
                                  selectedNodeUUID={selectedNodeUUID}
+                                 updateNode={updateNode}
                                  putNodeDefProp={putNodeDefProp}/>
 
     return null

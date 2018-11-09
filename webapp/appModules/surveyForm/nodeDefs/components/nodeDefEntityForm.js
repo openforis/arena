@@ -205,7 +205,8 @@ class NodeDefEntityForm extends React.Component {
 
     // entry single entity
     if (entry && !NodeDef.isNodeDefMultiple(nodeDef))
-      return <EntityForm {...this.props} node={nodes[0]}/>
+      return <EntityForm {...this.props}
+                         node={nodes[0]}/>
 
     return null
   }
