@@ -81,17 +81,17 @@ class NodeDefSwitch extends React.Component {
               !locked &&
               <React.Fragment>
 
-                  isPage ?
-                    <div className="btn-of-light-xs node-def__form-root-actions">
-                      columns
-                      <input value={Layout.getNoColumns(nodeDef)}
-                             type="number" min="1" max="6"
-                             onChange={e => e.target.value > 0 ?
-                               putNodeDefProp(nodeDef, Layout.nodeDefLayoutProps.columns, e.target.value)
-                               : null
-                             }/>
-                    </div>
-                    : null
+                {
+                  isPage &&
+                  <div className="btn-of-light-xs node-def__form-root-actions">
+                    columns
+                    <input value={Layout.getNoColumns(nodeDef)}
+                           type="number" min="1" max="6"
+                           onChange={e => e.target.value > 0 ?
+                             putNodeDefProp(nodeDef, Layout.nodeDefLayoutProps.columns, e.target.value)
+                             : null
+                           }/>
+                  </div>
                 }
 
                 <button className="btn-s btn-of-light-xs"

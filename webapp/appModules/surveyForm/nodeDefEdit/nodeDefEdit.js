@@ -5,11 +5,11 @@ import CommonProps from './commonProps'
 import CodeListsView from '../components/codeListsView'
 import TaxonomiesView from '../components/taxonomiesView'
 
-import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 
 import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
+import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
 import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
 
 class NodeDefEdit extends React.Component {
@@ -88,5 +88,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  {closeFormNodeDefEdit}
+  {putNodeDefProp, closeFormNodeDefEdit}
 )(NodeDefEdit)
