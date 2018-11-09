@@ -1,56 +1,37 @@
 require('dotenv').config()
 
-const express = require('express')
-const bodyParser = require('body-parser')
-const compression = require('compression')
-const cookieParser = require('cookie-parser')
-const fileUpload = require('express-fileupload')
-
-const sessionMiddleware = require('./config/sessionMiddleware')
-const headerMiddleware = require('./config/headerMiddleware')
-const accessControlMiddleware = require('./config/accessControlMiddleware')
-const authConfig = require('./auth/authConfig')
-const authApi = require('./auth/authApi')
-const apiRouter = require('./config/apiRouter')
-const socketMiddleware = require('./config/socketMiddleware')
+const cluster = require('cluster')
 const dbMigrator = require('./db/migration/dbMigrator')
+const serverCluster = require('./serverCluster')
 
-// ====== run database migrations
-dbMigrator.migrateAll()
+if (cluster.isMaster) {
 
-const app = express()
+// ====== run database migrations in master process
+  dbMigrator.migrateAll()
 
-// ====== app initializations
-app.use(bodyParser.json({limit: '5000kb'}))
-app.use(cookieParser())
-app.use(fileUpload({
-  //limit upload to 50MB
-  limits: {fileSize: 50 * 1024 * 1024},
-}))
+  // process.env.WEB_CONCURRENCY is used by Heroku
+  // const numWorkers = process.env.WEB_CONCURRENCY || require('os').cpus().length
+  const numWorkers = require('os').cpus().length
 
-headerMiddleware.init(app)
-app.use(sessionMiddleware)
-authConfig.init(app)
-//accessControlMiddleware must be initialized after authConfig
-accessControlMiddleware.init(app)
+  console.log('Master cluster setting up ' + numWorkers + ' workers...')
 
-app.use(compression({threshold: 512}))
+  for (let i = 0; i < numWorkers; i++) {
+    cluster.fork()
+  }
 
-app.use('/', express.static(`${__dirname}/../dist`))
-app.use('/app*', express.static(`${__dirname}/../dist`))
-app.use('/img/', express.static(`${__dirname}/../web-resources/img`))
-// app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
+  cluster.on('online', function (worker) {
+    console.log('Worker ' + worker.process.pid + ' is online')
+  })
 
-// ====== apis
-authApi.init(app)
-app.use('/api', apiRouter.router)
+  cluster.on('exit', function (worker, code, signal) {
+    console.log('Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal)
+    console.log('Starting a new worker')
+    cluster.fork()
+  })
 
-// ====== server
-const httpServerPort = process.env.PORT || '9090'
-const server = app.listen(httpServerPort, () => {
-  console.log('server listening on port', httpServerPort)
-})
+} else {
 
-// ====== socket middleware
-socketMiddleware.init(server, sessionMiddleware)
+  serverCluster()
+
+}
 
