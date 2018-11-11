@@ -108,9 +108,9 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'id')
       const user = req.user
 
-      const survey = await publishSurvey(surveyId, user)
+      const job = await publishSurvey(surveyId, user)
 
-      res.json({survey})
+      res.json({job})
     } catch (err) {
       sendErr(res, err)
     }

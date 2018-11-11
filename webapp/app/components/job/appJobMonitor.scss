@@ -19,7 +19,6 @@
 }
 
 .app-job-monitor__errors {
-  height: 45vh;
   justify-self: stretch;
 
   .header, .row {
@@ -33,12 +32,43 @@
   }
 
   .body {
-    height: 100%;
+    max-height: 35vh;
     overflow-y: auto;
   }
 
   .row {
     border-bottom: 1px solid rgba($white, .5);
+  }
+}
+
+.app-job-monitor_inner-jobs {
+
+  .header {
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .inner-jobs-wrapper {
+    height: 35vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    .inner-job {
+      border-bottom: 1px dotted rgba($white, 0.35);
+    }
+
+    .inner-job.failed {
+      border: 2px dashed rgba($white, 0.35);
+      background-color: rgba($white, 0.1);
+
+      .app-job-monitor__errors {
+        margin: 2rem;
+
+        .header {
+          text-align: left;
+        }
+      }
+    }
   }
 }
 

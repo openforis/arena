@@ -36,10 +36,9 @@ const startTaxonomyImportJob = async (userId, surveyId, taxonomyId, inputBuffer)
   const taxaPersistFunction = async (surveyId, taxonomyId, taxa, vernacularLanguageCodes) =>
     await persistTaxa(surveyId, taxonomyId, taxa, vernacularLanguageCodes)
 
-  const importJob =
-    await JobManager.startJob(new TaxonomyImportJob(userId, surveyId, 'import taxa', taxonomyId, inputBuffer, taxaPersistFunction))
-
-  return importJob
+  return await JobManager.startJob(
+    new TaxonomyImportJob(userId, surveyId, 'import taxa', taxonomyId, inputBuffer, taxaPersistFunction)
+  )
 }
 
 /**

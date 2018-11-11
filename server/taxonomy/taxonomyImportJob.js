@@ -5,7 +5,7 @@ const {languageCodes} = require('../../common/app/languages')
 const {isNotBlank} = require('../../common/stringUtils')
 const {jobStatus} = require('../../common/job/job')
 const Taxonomy = require('../../common/survey/taxonomy')
-const Job = require('../../server/job/job')
+const {Job} = require('../../server/job/job')
 const {validateTaxon} = require('../../server/taxonomy/taxonomyValidator')
 
 const requiredColumns = [
@@ -28,9 +28,7 @@ class TaxonomyImportJob extends Job {
     this.csvStreamEnded = false
   }
 
-  start () {
-    super.start()
-
+  async process () {
     console.log(`parsing csv file. size ${this.inputBuffer.length}`)
 
     this.result = {
@@ -38,55 +36,54 @@ class TaxonomyImportJob extends Job {
       vernacularLanguageCodes: [],
     }
 
-    this.processHeaders(validHeaders => {
-      console.log(`headers processed. valid: ${validHeaders}`)
+    const validHeaders = await this.processHeaders()
+    console.log(`headers processed. valid: ${validHeaders}`)
 
-      if (!validHeaders) {
-        this.changeStatus(jobStatus.failed)
-        return
-      }
-      this.calculateSize(totalItems => {
-        console.log(`total rows: ${totalItems}`)
+    if (!validHeaders) {
+      this.changeStatus(jobStatus.failed)
+      return
+    }
+    this.processed = 0
 
-        this.totalItems = totalItems
-        this.processedItems = 0
+    const csvStream = fastcsv.fromString(this.csvString, {headers: true})
+      .on('data', async data => {
+        csvStream.pause()
 
-        const csvStream = fastcsv.fromString(this.csvString, {headers: true})
-          .on('data', async data => {
-            csvStream.pause()
-
-            if (this.isCancelled()) {
-              csvStream.destroy()
-            } else {
-              await this.processRow(data)
-              csvStream.resume()
-            }
-          })
-          .on('end', () => {
-            this.csvStreamEnded = true
-            //do not throw immediately "end" event, last item still being processed
-          })
+        if (this.isCancelled()) {
+          csvStream.destroy()
+        } else {
+          await this.processRow(data)
+          csvStream.resume()
+        }
       })
+      .on('end', () => {
+        this.csvStreamEnded = true
+        //do not throw immediately "end" event, last item still being processed
+      })
+  }
+
+  calculateTotal () {
+    const csvString = this.csvString
+    return new Promise(resolve => {
+      let count = 0
+      fastcsv.fromString(csvString, {headers: true})
+        .on('data', () => count++)
+        .on('end', () => resolve(count))
     })
-    return this
   }
 
-  calculateSize (callback) {
-    let count = 0
-    fastcsv.fromString(this.csvString, {headers: true})
-      .on('data', () => count++)
-      .on('end', () => callback(count))
-  }
-
-  processHeaders (callback) {
-    const csvStream = fastcsv.fromString(this.csvString, {headers: false})
-    csvStream.on('data', async columns => {
-      csvStream.destroy() //stop streaming CSV
-      const validHeaders = this.validateHeaders(columns)
-      if (validHeaders) {
-        this.result.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, columns)
-      }
-      callback(validHeaders)
+  processHeaders () {
+    const $this = this
+    return new Promise(function (resolve) {
+      const csvStream = fastcsv.fromString($this.csvString, {headers: false})
+      csvStream.on('data', async columns => {
+        csvStream.destroy() //stop streaming CSV
+        const validHeaders = $this.validateHeaders(columns)
+        if (validHeaders) {
+          $this.result.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, columns)
+        }
+        resolve(validHeaders)
+      })
     })
   }
 
@@ -98,7 +95,7 @@ class TaxonomyImportJob extends Job {
     if (taxonParseResult.taxon) {
       result.taxa.push(taxonParseResult.taxon)
     } else {
-      this.errors['' + (this.processedItems + 1)] = taxonParseResult.errors
+      this.errors['' + (this.processed + 1)] = taxonParseResult.errors
     }
     this.incrementProcessedItems()
 

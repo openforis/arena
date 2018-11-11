@@ -37,6 +37,7 @@ module.exports = {
   getJobErrors: R.pathOr({}, ['props', 'errors']),
   getJobStatus,
   getJobProgressPercent,
+  getJobInnerJobs: R.propOr([], 'innerJobs'),
   isJobRunning,
   isJobCompleted: R.pipe(getJobStatus, R.equals(jobStatus.completed)),
   isJobEnded,

@@ -108,27 +108,8 @@ const updateSurveyProp = async (id, key, value, user) =>
     await surveyRepository.updateSurveyProp(id, key, value)
   )
 
-const publishSurvey = async (id, user) => {
-  JobManager.startJob(new SurveyPublishJob(user.id, id))
-
-  /*
-  await db.tx(async t => {
-
-    await nodeDefRepository.publishNodeDefsProps(id, t)
-
-    await nodeDefRepository.permanentlyDeleteNodeDefs(id, t)
-
-    await publishCodeListsProps(id, t)
-
-    await publishTaxonomiesProps(id, t)
-
-    await surveyRepository.publishSurveyProps(id, t)
-
-  })
-
-  return await fetchSurveyById(id)
-  */
-}
+const publishSurvey = async (id, user) =>
+  await JobManager.startJob(new SurveyPublishJob(user.id, id))
 
 // ====== DELETE
 const deleteSurvey = async (id, user) => {

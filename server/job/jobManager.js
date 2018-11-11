@@ -1,10 +1,13 @@
+const db = require('../db/db')
+
 const {throttle} = require('../../common/functionsDefer')
 
 const {
   jobSocketEvents,
   isJobEnded,
-  jobStatus,
 } = require('../../common/job/job')
+
+const {jobEventTypes} = require('./job')
 
 const jobRepository = require('./jobRepository')
 
@@ -22,9 +25,7 @@ const init = (io) => {
       const job = getJobFromCache(userId)
 
       if (job) {
-        //emit job event with job loaded from db (smaller)
-        const jobDb = await jobRepository.fetchActiveJobByUserId(userId)
-        socket.emit(jobSocketEvents.update, jobDb)
+        socket.emit(jobSocketEvents.update, job.toSummary())
       }
 
       socket.on('disconnect', () => {
@@ -48,37 +49,39 @@ const notifyUser = (job) => {
 const startJob = async (job) => {
   addJobToCache(job)
 
-  const jobDb = await insertJobAndInnerJobs(job)
+  const jobDb = await db.tx(async t =>
+    await insertJobAndInnerJobs(job, t)
+  )
 
   job
-    .onStart(updateJobStatusFromEvent)
-    .onProgress(async event => await updateJobProgress(event.jobId, event.totalItems, event.processedItems))
-    .onFail(updateJobStatusFromEvent)
-    .onComplete(updateJobStatusFromEvent)
-    .onCancel(updateJobStatusFromEvent)
-    .onEnd(async () => removeJobFromCache(job.userId))
-    .onInnerJobEvent(async event => {
-      if (event.status === jobStatus.running) {
-        await updateJobProgress(event.jobId, event.total, event.processed)
-      } else {
+    .onEvent(async event => {
+      if (event.type === jobEventTypes.statusChange) {
         await updateJobStatusFromEvent(event)
+      } else {
+        await updateJobProgress(event.jobId, event.total, event.processed)
       }
+      if (isJobEnded(job)) {
+        removeJobFromCache(job.userId)
+      }
+      notifyUser(job.toSummary())
     })
+    .start()
 
-  job.start()
-
-  notifyUser(jobDb)
+  notifyUser(job.toSummary())
 
   return jobDb
 }
 
-const insertJobAndInnerJobs = async job => {
-  console.log('inserting job', job.props.name)
-  const jobDb = await jobRepository.insertJob(job)
+/**
+ * Inserts job and its inner jobs into the db
+ */
+const insertJobAndInnerJobs = async (job, t) => {
+  const jobDb = await jobRepository.insertJob(job, t)
   job.id = jobDb.id
 
   for (const innerJob of job.innerJobs) {
-    await insertJobAndInnerJobs(innerJob)
+    innerJob.parentUUID = job.uuid
+    await insertJobAndInnerJobs(innerJob, t)
   }
 
   return jobDb
@@ -89,24 +92,12 @@ const insertJobAndInnerJobs = async job => {
  */
 
 const updateJobStatusFromEvent = async jobEvent => {
-  console.log('job event', jobEvent)
-
-  const {jobId, status, totalItems, processedItems, errors = {}} = jobEvent
-  await updateJobStatus(jobId, status, totalItems, processedItems, {errors})
-}
-
-const updateJobStatus = async (jobId, status, total, processed, props = {}) => {
-  const job = await jobRepository.updateJobStatus(jobId, status, total, processed, props)
-  notifyUser(job)
+  const {jobId, status, total, processed, result = {}, errors = {}} = jobEvent
+  await jobRepository.updateJobStatus(jobId, status, total, processed, {result, errors})
 }
 
 const updateJobProgress = async (jobId, total, processed) => {
   throttle(jobRepository.updateJobProgress, `job_${jobId}`, 1000)(jobId, total, processed)
-
-  const job = await jobRepository.fetchJobById(jobId)
-  if (job) {
-    notifyUser(job)
-  }
 }
 
 const cancelActiveJobByUserId = async (userId) => {
@@ -130,7 +121,5 @@ module.exports = {
   //CREATE
   startJob,
   //UPDATE
-  updateJobProgress,
-  updateJobStatus,
   cancelActiveJobByUserId,
 }

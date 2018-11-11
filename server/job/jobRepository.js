@@ -7,10 +7,10 @@ const {jobStatus, isJobStatusEnded} = require('../../common/job/job')
 
 const insertJob = async (job, client = db) =>
   await client.one(`
-        INSERT INTO job (uuid, user_id, survey_id, props)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO job (uuid, user_id, survey_id, props, parent_uuid)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *`,
-    [job.uuid, job.userId, job.surveyId, job.props],
+    [job.uuid, job.userId, job.surveyId, job.props, job.parentUUID],
     camelize
   )
 
@@ -18,7 +18,7 @@ const insertJob = async (job, client = db) =>
 
 const fetchJobById = async (id, client = db) =>
   await client.oneOrNone(
-      `SELECT * FROM job
+    `SELECT * FROM job
      WHERE id = $1`,
     [id],
     camelize
