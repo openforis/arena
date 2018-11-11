@@ -1,4 +1,5 @@
 import './style/surveyForm.scss'
+import './style/react-grid-layout.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'

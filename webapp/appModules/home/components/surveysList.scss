@@ -27,6 +27,8 @@ $rowBorder: 1px solid rgba($white, 0.4);
 .surveys-list__rows {
   position: absolute;
   top: 85px;
+  right: 0;
+  left: 0;
   height: calc(100% - 85px);
 
   display: grid;

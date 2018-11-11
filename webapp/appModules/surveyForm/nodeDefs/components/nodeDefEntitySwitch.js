@@ -1,5 +1,3 @@
-import '../../style/react-grid-layout.scss'
-
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -63,11 +61,6 @@ class NodeDefEntitySwitch extends React.Component {
 
     return null
   }
-}
-
-NodeDefEntitySwitch.defaultProps = {
-  entityDef: {},
-  edit: false,
 }
 
 const mapStateToProps = (state, props) => ({
