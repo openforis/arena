@@ -80,7 +80,7 @@ const insertJobAndInnerJobs = async (job, t) => {
   job.id = jobDb.id
 
   for (const innerJob of job.innerJobs) {
-    innerJob.parentUUID = job.uuid
+    innerJob.parentId = job.id
     await insertJobAndInnerJobs(innerJob, t)
   }
 
