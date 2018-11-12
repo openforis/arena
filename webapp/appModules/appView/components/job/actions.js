@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { getActiveJob, getActiveJobOnCompleteCallback } from './appJobState'
-import Job from '../../../../common/job/job'
+import Job from '../../../../../common/job/job'
 
 export const appJobStart = 'app/job/start'
 export const appJobActiveUpdate = 'app/job/active/update'
