@@ -2,12 +2,8 @@ const db = require('../db/db')
 
 const {throttle} = require('../../common/functionsDefer')
 
-const {
-  jobSocketEvents,
-  isJobEnded,
-} = require('../../common/job/job')
-
-const {jobEventTypes} = require('./job')
+const {jobEvents} = require('./job')
+const jobSocketEvents = require('../../common/job/jobSocketEvents')
 
 const jobRepository = require('./jobRepository')
 
@@ -25,7 +21,7 @@ const init = (io) => {
       const job = getJobFromCache(userId)
 
       if (job) {
-        socket.emit(jobSocketEvents.update, job.toSummary())
+        notifyUser(job)
       }
 
       socket.on('disconnect', () => {
@@ -39,7 +35,7 @@ const init = (io) => {
 const notifyUser = (job) => {
   const socket = userSockets[job.userId]
   if (socket)
-    throttle((job) => socket.emit(jobSocketEvents.update, job), `socket_${job.id}`, 250)(job)
+    throttle((job) => socket.emit(jobSocketEvents.update, job.toJSON()), `socket_${job.id}`, 250)(job)
 }
 
 /**
@@ -49,27 +45,27 @@ const notifyUser = (job) => {
 const startJob = async (job) => {
   addJobToCache(job)
 
-  const jobDb = await db.tx(async t =>
+  await db.tx(async t =>
     await insertJobAndInnerJobs(job, t)
   )
 
   job
     .onEvent(async event => {
-      if (event.type === jobEventTypes.statusChange) {
+      if (event.type === jobEvents.statusChange) {
         await updateJobStatusFromEvent(event)
       } else {
         await updateJobProgress(event.jobId, event.total, event.processed)
       }
-      if (isJobEnded(job)) {
+      if (job.isEnded()) {
         removeJobFromCache(job.userId)
       }
-      notifyUser(job.toSummary())
+      notifyUser(job)
     })
     .start()
 
-  notifyUser(job.toSummary())
+  notifyUser(job)
 
-  return jobDb
+  return job.toJSON()
 }
 
 /**
@@ -102,7 +98,7 @@ const updateJobProgress = async (jobId, total, processed) => {
 
 const cancelActiveJobByUserId = async (userId) => {
   const job = getJobFromCache(userId)
-  if (job && !isJobEnded(job)) {
+  if (job && !job.isEnded()) {
     job.cancel()
   }
 }

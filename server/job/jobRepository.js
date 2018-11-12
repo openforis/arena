@@ -1,7 +1,7 @@
 const db = require('../db/db')
 const camelize = require('camelize')
 
-const {jobStatus, isJobStatusEnded} = require('../../common/job/job')
+const {jobStatus} = require('./job')
 
 // ============== CREATE
 
@@ -18,7 +18,7 @@ const insertJob = async (job, client = db) =>
 
 const fetchJobById = async (id, client = db) =>
   await client.oneOrNone(
-    `SELECT * FROM job
+      `SELECT * FROM job
      WHERE id = $1`,
     [id],
     camelize
@@ -46,7 +46,14 @@ const updateJobStatus = async (id, status, total, processed, props = {}, client 
         date_ended = $5
      WHERE id = $6
      RETURNING *`,
-    [status, total, processed, props, isJobStatusEnded(status) ? new Date() : null, id],
+    [
+      status,
+      total,
+      processed,
+      props,
+      status === jobStatus.completed || status === jobStatus.failed || jobStatus.canceled ? new Date() : null,
+      id
+    ],
     camelize
   )
 

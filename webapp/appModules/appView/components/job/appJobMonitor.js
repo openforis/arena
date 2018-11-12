@@ -12,17 +12,6 @@ import {
 
 import AppJobErrors from './appJobErrors'
 
-import {
-  getJobName,
-  getJobStatus,
-  getJobProgressPercent,
-  getJobInnerJobs,
-  isJobRunning,
-  isJobEnded,
-  isJobFailed,
-  jobStatus,
-} from '../../../../../common/job/job'
-
 import { cancelActiveJob, hideAppJobMonitor } from './actions'
 import { getActiveJob } from './appJobState'
 
@@ -33,23 +22,21 @@ const ProgressBar = ({progress, className}) => (
 )
 
 const JobStatus = ({job}) => {
-  const jobProgressPercent = job ? getJobProgressPercent(job) : 0
   return <div className="app-job-monitor">
-    <h4 className="app-job-monitor__status">{getJobStatus(job)}
+    <h4 className="app-job-monitor__status">{job.status}
       {
-        isJobRunning(job) && jobProgressPercent < 100 &&
-        <span> ({jobProgressPercent}%)</span>
+        job.running && job.jobProgressPercent < 100 &&
+        <span> ({job.progressPercent}%)</span>
       }
     </h4>
-    <ProgressBar progress={jobProgressPercent} className={isJobFailed(job) ? 'error' : ''}/>
-
+    <ProgressBar progress={job.progressPercent} className={job.failed ? 'error' : ''}/>
     <AppJobErrors job={job}/>
   </div>
 }
 
 const InnerJobStatus = ({innerJob}) =>
-  <div className={`inner-job${isJobFailed(innerJob) ? ' failed' : ''}`}>
-    <div className="header">{getJobName(innerJob)}</div>
+  <div className={`inner-job${innerJob.failed ? ' failed' : ''}`}>
+    <div className="header">{innerJob.props.name}</div>
     <JobStatus job={innerJob}/>
   </div>
 
@@ -70,13 +57,13 @@ class AppJobMonitor extends React.Component {
 
   render () {
     const {job, cancelActiveJob, hideAppJobMonitor} = this.props
-    const innerJobs = getJobInnerJobs(job)
-    return job && job.status !== jobStatus.canceled
+    const innerJobs = job ? job.innerJobs : null
+    return job && !job.canceled
       ? (
         <Modal isOpen="true">
 
           <ModalHeader>
-            <div className="app-job-monitor__header">Job: {getJobName(job)}</div>
+            <div className="app-job-monitor__header">Job: {job.props.name}</div>
           </ModalHeader>
 
           <ModalBody>
@@ -91,13 +78,13 @@ class AppJobMonitor extends React.Component {
           <ModalFooter>
             <button className="btn btn-of modal-footer__item"
                     onClick={() => cancelActiveJob()}
-                    aria-disabled={!isJobRunning(job)}>
+                    aria-disabled={!job.running}>
               Cancel
             </button>
 
             <button className="btn btn-of modal-footer__item"
                     onClick={() => hideAppJobMonitor()}
-                    aria-disabled={!isJobEnded(job)}>
+                    aria-disabled={!job.ended}>
               Close
             </button>
           </ModalFooter>

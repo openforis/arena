@@ -3,10 +3,9 @@ const R = require('ramda')
 
 const {languageCodes} = require('../../common/app/languages')
 const {isNotBlank} = require('../../common/stringUtils')
-const {jobStatus} = require('../../common/job/job')
 const Taxonomy = require('../../common/survey/taxonomy')
-const {Job} = require('../../server/job/job')
-const {validateTaxon} = require('../../server/taxonomy/taxonomyValidator')
+const {Job} = require('../job/job')
+const {validateTaxon} = require('../taxonomy/taxonomyValidator')
 
 const requiredColumns = [
   'code',
@@ -28,7 +27,7 @@ class TaxonomyImportJob extends Job {
     this.csvStreamEnded = false
   }
 
-  async process () {
+  async execute () {
     console.log(`parsing csv file. size ${this.inputBuffer.length}`)
 
     this.result = {
@@ -40,7 +39,7 @@ class TaxonomyImportJob extends Job {
     console.log(`headers processed. valid: ${validHeaders}`)
 
     if (!validHeaders) {
-      this.changeStatus(jobStatus.failed)
+      this.setStatusFailed()
       return
     }
     this.processed = 0
@@ -102,10 +101,10 @@ class TaxonomyImportJob extends Job {
     if (this.csvStreamEnded) {
       const hasErrors = !R.isEmpty(R.keys(this.errors))
       if (hasErrors) {
-        this.changeStatus(jobStatus.failed)
+        this.setStatusFailed()
       } else {
         await this.taxaPersistFunction(surveyId, taxonomyId, result.taxa, result.vernacularLanguageCodes)
-        this.changeStatus(jobStatus.completed)
+        this.setStatusCompleted()
       }
     }
   }

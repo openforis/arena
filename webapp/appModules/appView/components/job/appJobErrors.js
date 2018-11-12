@@ -1,18 +1,13 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import {
-  getJobErrors,
-  isJobFailed,
-} from '../../../../../common/job/job'
-
 import { getValidationFieldMessagesHTML } from '../../../../appUtils/validationUtils'
 
 const AppJobErrors = ({job}) => {
 
-  const errors = getJobErrors(job)
+  const errors = R.pathOr([], ['props', 'errors'], job)
 
-  return isJobFailed(job) && !R.isEmpty(errors)
+  return job.failed && !R.isEmpty(errors)
     ? (
       <div className="app-job-monitor__errors">
         <div className="header">

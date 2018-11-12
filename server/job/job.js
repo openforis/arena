@@ -1,9 +1,15 @@
 const {uuidv4} = require('../../common/uuid')
 
-const {jobStatus} = require('../../common/job/job')
-const JobCommon = require('../../common/job/job')
+const jobStatus = {
+  pending: 'pending',
+  initialized: 'initialized',
+  running: 'running',
+  completed: 'completed',
+  canceled: 'canceled',
+  failed: 'failed',
+}
 
-const jobEventTypes = {
+const jobEvents = {
   statusChange: 'statusChange', //job has changed its status
   progress: 'progress', //job is running and the processed items changed
 }
@@ -54,7 +60,7 @@ class Job {
    */
   start () {
     this.startTime = new Date()
-    this.changeStatus(jobStatus.running)
+    this.setStatus(jobStatus.running)
 
     const innerJobsSize = this.innerJobs.length
     if (innerJobsSize > 0) {
@@ -65,10 +71,10 @@ class Job {
         .then(total => {
           this.total = total
           try {
-            this.process()
+            this.execute()
           } catch (e) {
             this.errors = [e.toString()]
-            this.changeStatus(jobStatus.failed)
+            this.setStatusFailed()
           }
         })
     }
@@ -77,7 +83,7 @@ class Job {
   /**
    * Abstract method to be extended by subclasses
    */
-  process () {}
+  execute () {}
 
   /**
    * To be extended by subclasses
@@ -99,13 +105,13 @@ class Job {
         switch (event.status) {
           case jobStatus.failed:
           case jobStatus.canceled:
-            this.changeStatus(event.status)
+            this.setStatus(event.status)
             break
           case jobStatus.completed:
             this.incrementProcessedItems()
 
             if (this.processed === this.innerJobs.length) {
-              this.changeStatus(jobStatus.completed)
+              this.setStatusCompleted()
             } else {
               this.startNextInnerJob()
             }
@@ -116,7 +122,7 @@ class Job {
   }
 
   cancel () {
-    this.changeStatus(jobStatus.canceled)
+    this.setStatus(jobStatus.canceled)
   }
 
   onEvent (listener) {
@@ -125,29 +131,53 @@ class Job {
   }
 
   isCancelled () {
-    return JobCommon.isJobCanceled(this)
+    return this.status === jobStatus.canceled
   }
 
-  changeStatus (status) {
+  isEnded () {
+    switch (this.status) {
+      case jobStatus.completed:
+      case jobStatus.failed:
+      case jobStatus.canceled:
+        return true
+      default:
+        return false
+    }
+  }
+
+  getProgressPercent () {
+    const partial = this.status === jobStatus.completed ?
+      100
+      : this.total > 0 ?
+        Math.floor(100 * this.processed / this.total)
+        : 0
+
+    return this.innerJobs.length === 0 || partial === 100 ?
+      partial
+      : partial + Math.floor(this.innerJobs[this.currentInnerJobIndex].getProgressPercent() / this.total)
+  }
+
+  setStatus (status) {
     this.status = status
 
-    if (status === jobStatus.completed) {
-      this.endTime = new Date()
-      const elapsedSeconds = (this.endTime.getTime() - this.startTime.getTime()) / 1000
-
-      console.log(`job '${JobCommon.getJobName(this)}' completed in ${elapsedSeconds}s`)
-    }
-    //notify event
-    const event = this.createJobEvent(jobEventTypes.statusChange)
+    const event = this.createJobEvent(jobEvents.statusChange)
     if (this.status === jobStatus.failed) {
       event.errors = this.errors
     }
     this.notifyEvent(event)
   }
 
+  setStatusCompleted () {
+    this.setStatus(jobStatus.completed)
+  }
+
+  setStatusFailed () {
+    this.setStatus(jobStatus.failed)
+  }
+
   incrementProcessedItems () {
     this.processed++
-    this.notifyEvent(this.createJobEvent(jobEventTypes.progress))
+    this.notifyEvent(this.createJobEvent(jobEvents.progress))
   }
 
   notifyEvent (event) {
@@ -160,13 +190,12 @@ class Job {
     return new JobEvent(type, this.id, this.status, this.total, this.processed)
   }
 
-  toSummary () {
+  toJSON () {
     return {
       id: this.id,
       uuid: this.uuid,
       userId: this.userId,
       surveyId: this.surveyId,
-      status: this.status,
       props: {
         name: this.props.name,
         result: this.status === jobStatus.completed ? this.result : {},
@@ -174,13 +203,22 @@ class Job {
       },
       total: this.total,
       processed: this.processed,
-      innerJobs: this.innerJobs.map(j => j.toSummary())
+      progressPercent: this.getProgressPercent(),
+      innerJobs: this.innerJobs.map(j => j.toJSON()),
+      //status
+      status: this.status,
+      completed: this.status === jobStatus.completed,
+      canceled: this.status === jobStatus.canceled,
+      failed: this.status === jobStatus.failed,
+      running: this.status === jobStatus.running,
+      ended: this.isEnded(),
     }
   }
 
 }
 
 module.exports = {
-  jobEventTypes,
+  jobStatus,
+  jobEvents,
   Job,
 }
