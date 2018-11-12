@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { getNodeValue } from '../../../../../common/record/node'
+import { FormItem } from '../../../../commonComponents/form/input'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+import { getNodeValue } from '../../../../../common/record/node'
 
-import NodeDefFormItem from './nodeDefFormItem'
 
 const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value, entry}) => {
   const node = entry ? nodes[0] : null
@@ -53,9 +53,9 @@ const NodeDefBoolean = props => {
 
   } else {
 
-    return <NodeDefFormItem {...props}>
+    return <FormItem label={label}>
       <Buttons {...props}/>
-    </NodeDefFormItem>
+    </FormItem>
 
   }
 

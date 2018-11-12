@@ -3,8 +3,8 @@ import * as R from 'ramda'
 
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
-import NodeDefFormItem from './nodeDefFormItem'
 import NodeDefDeleteButton from '../nodeDefDeleteButton'
+import { FormItem } from '../../../../commonComponents/form/input'
 
 import { elementOffset } from '../../../../appUtils/domUtils'
 
@@ -60,9 +60,9 @@ const NodeDefFile = props => {
   // EDIT MODE
 
   if (edit)
-    return <NodeDefFormItem {...props}>
+    return <FormItem label={label}>
       <NodeDefFileInput {...props} />
-    </NodeDefFormItem>
+    </FormItem>
 
   // ENTRY MODE
 
@@ -73,7 +73,7 @@ const NodeDefFile = props => {
     const {height} = domElem ? elementOffset(domElem) : {height: 80}
 
     return (
-      <NodeDefFormItem {...props}>
+      <FormItem label={label}>
         <div className="overflowYAuto" style={{maxHeight: height}}>
           {
             nodes.map((n, i) =>
@@ -81,7 +81,7 @@ const NodeDefFile = props => {
             )
           }
         </div>
-      </NodeDefFormItem>
+      </FormItem>
     )
   }
 }

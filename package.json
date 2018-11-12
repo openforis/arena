@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "webpack -p --config webpack.config.js",
-    "build-prod": "webpack --env production -p --config webpack.config.js",
+    "build-prod": "cross-env-shell NODE_ENV=production BUILD_REPORT=true webpack -p --config webpack.config.js",
     "build:watch": "webpack --config webpack.config.js --watch",
     "clean": "rm -rf dist/",
     "start": "node server/server.js",
@@ -53,6 +53,7 @@
     "bluebird": "^3.5.2",
     "body-parser": "^1.18.3",
     "camelize": "^1.0.0",
+    "cluster": "^0.7.7",
     "compression": "^1.7.3",
     "connect-pg-simple": "^5.0.0",
     "cookie-parser": "^1.4.3",

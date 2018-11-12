@@ -8,13 +8,13 @@ import {
 const TableRow = props => {
 
   const {
-    item, tableSelectedItemUUID, itemLabelFunction,
+    item, selectedItemUUID, itemLabelFunction,
     canSelect, onSelect, onEdit, canDelete, onDelete,
   } = props
 
   const name = R.defaultTo('--- undefined name ---', itemLabelFunction(item))
 
-  const selected = item.uuid === tableSelectedItemUUID
+  const selected = item.uuid === selectedItemUUID
 
   return (
     <div className="items__table-row">

@@ -1,23 +1,22 @@
-import './app/style.scss'
-
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { Switch, Route, Redirect } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
-import DynamicImport from './commonComponents/DynamicImport'
+import DynamicImport from '../commonComponents/DynamicImport'
 
-import loginAnimation from './login/components/loginAnimation'
-import appAnimation from './app/components/appAnimation'
+import loginAnimation from '../login/components/loginAnimation'
+import appAnimation from './appAnimation'
 
-import LoginView from './login/components/loginView'
+import LoginView from '../login/components/loginView'
 
-import { initApp } from './app/actions'
-import { getUser, isReady } from './app/appState'
-import { activeJobUpdate } from './app/components/job/actions'
-import { getLocationPathname } from './appUtils/routerUtils'
-import { jobSocketEvents } from '../common/job/job'
-import { openSocket, closeSocket, onSocketEvent } from './app/appWebSocket'
+import { initApp } from './actions'
+import { getUser, isReady } from './appState'
+import { getLocationPathname } from '../appUtils/routerUtils'
+
+import { jobSocketEvents } from '../../common/job/job'
+import { openSocket, closeSocket, onSocketEvent } from './appWebSocket'
+import { activeJobUpdate } from '../appModules/appView/components/job/actions'
 
 const loginUri = '/'
 
@@ -81,7 +80,7 @@ class AppRouterSwitch extends React.Component {
 
                   <Route exact path="/" component={LoginView}/>
                   <Route path="/app" render={(props) =>
-                    <DynamicImport load={() => import('./app/app')}>
+                    <DynamicImport load={() => import('../appModules/appView/appViewExport')}>
                       {(Component) => Component === null ? null : <Component {...props} />}
                     </DynamicImport>
                   }/>

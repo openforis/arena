@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 
-import { startJob, updateActiveJob } from './components/job/appJobState'
+import { startJob, updateActiveJob } from '../appModules/appView/components/job/appJobState'
 import { assocAppError, dissocAppError, getAppErrors, logoutUser } from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
 
@@ -20,7 +20,7 @@ import { loginSuccess } from '../login/actions'
  * App Jobs
  * ======
  */
-import { appJobStart, appJobActiveUpdate } from './components/job/actions'
+import { appJobStart, appJobActiveUpdate } from '../appModules/appView/components/job/actions'
 
 const actionHandlers = {
 

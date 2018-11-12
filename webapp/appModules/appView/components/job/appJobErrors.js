@@ -4,9 +4,9 @@ import * as R from 'ramda'
 import {
   getJobErrors,
   isJobFailed,
-} from '../../../../common/job/job'
+} from '../../../../../common/job/job'
 
-import { getValidationFieldMessagesHTML } from '../../../appUtils/validationUtils'
+import { getValidationFieldMessagesHTML } from '../../../../appUtils/validationUtils'
 
 const AppJobErrors = ({job}) => {
 

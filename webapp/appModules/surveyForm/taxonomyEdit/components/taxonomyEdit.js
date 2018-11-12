@@ -23,7 +23,7 @@ import {
 } from '../taxonomyEditState'
 
 import { getSurvey } from '../../../../survey/surveyState'
-import { getActiveJob } from '../../../../app/components/job/appJobState'
+import { getActiveJob } from '../../../appView/components/job/appJobState'
 import { getStateSurveyId } from '../../../../survey/surveyState'
 
 import {

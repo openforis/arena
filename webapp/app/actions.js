@@ -1,7 +1,6 @@
 import axios from 'axios'
 
 import { appStatus } from './appState'
-import { stopAppJobMonitoring } from './components/job/actions'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'

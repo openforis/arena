@@ -11,11 +11,14 @@ const mode = {
   development: 'development',
   production: 'production'
 }
+
 const prodBuild = process.env.NODE_ENV === mode.production
+const buildReport = process.env.BUILD_REPORT === 'true'
 
 const lastCommit = process.env.SOURCE_VERSION || 'N/A'
 const versionString = lastCommit + '_' + new Date().toISOString()
 
+// ==== init plugins
 const plugins = [
   new MiniCssExtractPlugin({
     filename: 'styles-[hash].css'
@@ -32,9 +35,13 @@ const plugins = [
       }
     }
   ),
-  // new BundleAnalyzerPlugin()
 ]
 
+if (buildReport) {
+  plugins.push(new BundleAnalyzerPlugin())
+}
+
+// ====== webpack config
 const webPackConfig = {
   entry: ['@babel/polyfill', './webapp/main.js'],
   mode: prodBuild ? mode.production : mode.development,
@@ -72,21 +79,22 @@ const webPackConfig = {
 }
 
 // if (prodBuild) {
-  const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
-  webpack.optimization = {
-    minimizer: [
-      new UglifyJsPlugin({
-        parallel: true,
-        uglifyOptions: {
-          compress: true,
-          output: {comments: false},
-        },
-        sourceMap: true
-      }),
-      new OptimizeCSSAssetsPlugin({})
-    ]
-  }
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+
+webpack.optimization = {
+  minimizer: [
+    new UglifyJsPlugin({
+      parallel: true,
+      uglifyOptions: {
+        compress: true,
+        output: {comments: false},
+      },
+      sourceMap: true
+    }),
+    new OptimizeCSSAssetsPlugin({})
+  ]
+}
 
 // }
 // else {

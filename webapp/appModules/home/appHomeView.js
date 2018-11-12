@@ -5,14 +5,14 @@ import { withRouter } from 'react-router-dom'
 import AddSurveyForm from './components/addSurveyForm'
 import SurveysList from './components/surveysList'
 
-import { appModuleUri} from '../appModules'
+import { appModuleUri } from '../appModules'
 import { getNewSurvey, getSurveys } from './homeState'
 import { appModules } from '../appModules'
 
 import Survey from '../../../common/survey/survey'
 import { getSurvey } from '../../survey/surveyState'
 
-import { fetchSurveys} from './actions'
+import { fetchSurveys } from './actions'
 import { createSurvey, resetNewSurvey, updateNewSurveyProp } from './actions'
 import { setActiveSurvey } from '../../survey/actions'
 
@@ -37,17 +37,30 @@ class AppHomeView extends React.Component {
   }
 
   render () {
+    const {
+      newSurvey,
+      updateNewSurveyProp,
+      createSurvey,
+      surveys,
+      setActiveSurvey,
+      surveyInfo,
+    } = this.props
+
     return (
       <div style={{
         display: 'grid',
         gridTemplateRows: '90px 2rem .95fr',
       }}>
 
-        <AddSurveyForm {...this.props}/>
+        <AddSurveyForm newSurvey={newSurvey}
+                       updateNewSurveyProp={updateNewSurveyProp}
+                       createSurvey={createSurvey}/>
 
         <div/>
 
-        <SurveysList {...this.props}/>
+        <SurveysList surveys={surveys}
+                     surveyInfo={surveyInfo}
+                     setActiveSurvey={setActiveSurvey}/>
 
       </div>
     )

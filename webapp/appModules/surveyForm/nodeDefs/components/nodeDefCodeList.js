@@ -5,10 +5,9 @@ import { connect } from 'react-redux'
 import axios from 'axios'
 import * as R from 'ramda'
 
-import NodeDefFormItem from './nodeDefFormItem'
-
 import CodeListDropdown from './codeList/codeListDropdown'
 import CodeListCheckbox from './codeList/codeListCheckbox'
+import { FormItem } from '../../../../commonComponents/form/input'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import Survey from '../../../../../common/survey/survey'
@@ -82,9 +81,9 @@ class NodeDefCodeList extends React.Component {
 
     // EDIT MODE
     if (edit)
-      return <NodeDefFormItem label={label}>
+      return <FormItem label={label}>
         <CodeListDropdown {...this.props} />
-      </NodeDefFormItem>
+      </FormItem>
 
     // ENTRY MODE
     if (renderType === nodeDefRenderType.tableBody) {
@@ -92,10 +91,10 @@ class NodeDefCodeList extends React.Component {
                                items={items}/>
     } else {
       return (
-        <NodeDefFormItem label={label}>
+        <FormItem label={label}>
           <CodeListRenderer {...this.props}
                             items={items}/>
-        </NodeDefFormItem>
+        </FormItem>
       )
     }
   }
@@ -117,6 +116,7 @@ const mapStateToProps = (state, props) => {
     : null
 
   return {
+    surveyInfo: surveyInfo,
     language: Survey.getDefaultLanguage(surveyInfo),
     nodeDefParentCodeUUID: NodeDef.getNodeDefParentCodeUUID(nodeDef),
     ancestorCodes,

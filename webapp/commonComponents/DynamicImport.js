@@ -1,5 +1,5 @@
 import React from 'react'
-import { injectReducers } from '../store'
+import { injectReducers } from '../app/store'
 
 export default class DynamicImport extends React.Component {
 
