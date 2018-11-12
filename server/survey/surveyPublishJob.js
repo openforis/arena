@@ -5,6 +5,7 @@ const db = require('../db/db')
 const {Job} = require('../job/job')
 
 const CodeList = require('../../common/survey/codeList')
+const Taxonomy = require('../../common/survey/taxonomy')
 const NodeDef = require('../../common/survey/nodeDef')
 const {jobStatus} = require('../../common/job/job')
 const {isValid} = require('../../common/validation/validator')
@@ -31,7 +32,6 @@ class NodeDefsValidationJob extends Job {
       this.changeStatus(jobStatus.completed)
     } else {
       this.errors = R.reduce((acc, nodeDef) => R.assoc(NodeDef.getNodeDefName(nodeDef), nodeDef.validation.fields, acc), {}, invalidNodeDefs)
-      console.log(this.errors)
       this.changeStatus(jobStatus.failed)
     }
   }
@@ -44,7 +44,7 @@ class CodeListsValidationJob extends Job {
   }
 
   async process () {
-    const codeLists = await CodeListManager.fetchCodeListsBySurveyId(this.surveyId, true)
+    const codeLists = await CodeListManager.fetchCodeListsBySurveyId(this.surveyId, true, true)
 
     const invalidCodeLists = R.filter(codeList => !isValid(codeList.validation), codeLists)
 
@@ -55,6 +55,29 @@ class CodeListsValidationJob extends Job {
         (acc, codeList) => R.assoc(CodeList.getCodeListName(codeList), codeList.validation.fields, acc),
         {},
         invalidCodeLists
+      )
+      this.changeStatus(jobStatus.failed)
+    }
+  }
+}
+
+class TaxonomiesValidationJob extends Job {
+  constructor (userId, surveyId) {
+    super(userId, surveyId, 'taxonomies validation')
+  }
+
+  async process () {
+    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true)
+
+    const invalidTaxonomies = R.filter(taxonomy => !isValid(taxonomy.validation), taxonomies)
+
+    if (R.isEmpty(invalidTaxonomies)) {
+      this.changeStatus(jobStatus.completed)
+    } else {
+      this.errors = R.reduce(
+        (acc, taxonomy) => R.assoc(Taxonomy.getTaxonomyName(taxonomy), taxonomy.validation.fields, acc),
+        {},
+        invalidTaxonomies
       )
       this.changeStatus(jobStatus.failed)
     }
@@ -91,6 +114,7 @@ class SurveyPublishJob extends Job {
     super(userId, surveyId, 'survey publish', [
       new NodeDefsValidationJob(userId, surveyId),
       new CodeListsValidationJob(userId, surveyId),
+      new TaxonomiesValidationJob(userId, surveyId),
       new PublishPropsJob(userId, surveyId),
     ])
   }

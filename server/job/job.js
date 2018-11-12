@@ -31,6 +31,7 @@ class Job {
     }
     this.status = jobStatus.pending
     this.startTime = null
+    this.endTime = null
     this.total = 0
     this.processed = 0
     this.result = {}
@@ -78,6 +79,9 @@ class Job {
    */
   process () {}
 
+  /**
+   * To be extended by subclasses
+   */
   calculateTotal () {
     return new Promise((resolve) => resolve(0))
   }
@@ -99,10 +103,11 @@ class Job {
             break
           case jobStatus.completed:
             this.incrementProcessedItems()
-            if (this.processed < this.innerJobs.length) {
-              this.startNextInnerJob()
-            } else {
+
+            if (this.processed === this.innerJobs.length) {
               this.changeStatus(jobStatus.completed)
+            } else {
+              this.startNextInnerJob()
             }
             break
         }
@@ -127,25 +132,22 @@ class Job {
     this.status = status
 
     if (status === jobStatus.completed) {
-      const end = new Date()
-      const elapsedSeconds = (end.getTime() - this.startTime.getTime()) / 1000
+      this.endTime = new Date()
+      const elapsedSeconds = (this.endTime.getTime() - this.startTime.getTime()) / 1000
 
       console.log(`job '${JobCommon.getJobName(this)}' completed in ${elapsedSeconds}s`)
     }
-    this.notifyStatusChangeEvent()
-  }
-
-  incrementProcessedItems () {
-    this.processed++
-    this.notifyEvent(this.createJobEvent(jobEventTypes.progress))
-  }
-
-  notifyStatusChangeEvent () {
+    //notify event
     const event = this.createJobEvent(jobEventTypes.statusChange)
     if (this.status === jobStatus.failed) {
       event.errors = this.errors
     }
     this.notifyEvent(event)
+  }
+
+  incrementProcessedItems () {
+    this.processed++
+    this.notifyEvent(this.createJobEvent(jobEventTypes.progress))
   }
 
   notifyEvent (event) {
