@@ -2,8 +2,8 @@ import React from 'react'
 
 import component from './appView'
 
-import homeReducer from '../appModules/home/reducer'
-import surveyFormReducer from '../appModules/surveyForm/reducer'
+import homeReducer from '../home/reducer'
+import surveyFormReducer from '../surveyForm/reducer'
 
 const reducers = [
   {name: 'home', fn: homeReducer},

@@ -8,7 +8,7 @@ import {
   ModalBody,
   ModalHeader,
   ModalFooter,
-} from '../../../commonComponents/modal'
+} from '../../../../commonComponents/modal'
 
 import AppJobErrors from './appJobErrors'
 
@@ -20,9 +20,9 @@ import {
   isJobEnded,
   isJobFailed,
   jobStatus,
-} from '../../../../common/job/job'
+} from '../../../../../common/job/job'
 
-import { cancelActiveJob, hideAppJobMonitor } from '../job/actions'
+import { cancelActiveJob, hideAppJobMonitor } from './actions'
 import { getActiveJob } from './appJobState'
 
 const ProgressBar = ({progress, className}) => (

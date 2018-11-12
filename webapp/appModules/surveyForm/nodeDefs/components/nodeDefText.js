@@ -1,21 +1,20 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { Input } from '../../../../commonComponents/form/input'
-import NodeDefFormItem from './nodeDefFormItem'
+import { FormItem, Input } from '../../../../commonComponents/form/input'
 import NodeDefDeleteButton from '../nodeDefDeleteButton'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 import NodeDef from '../../../../../common/survey/nodeDef'
 
-import { getNodeValue } from '../../../../../common/record/node'
+import Node from '../../../../../common/record/node'
 import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
 import { elementOffset } from '../../../../appUtils/domUtils'
 
 const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
   <Input readOnly={edit}
          {...getNodeDefInputTextProps(nodeDef)}
-         value={getNodeValue(node, '')}
+         value={Node.getNodeValue(node, '')}
          onChange={(e) =>
            updateNode(nodeDef, node, e.target.value)
          }
@@ -24,8 +23,8 @@ const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
 const NodeDefText = props => {
 
   const {
-    nodeDef, nodes, parentNode,
-    entry, edit, label, renderType
+    nodeDef, nodes, parentNode, entry,
+    edit, label, renderType, removeNode
   } = props
 
   // table header
@@ -38,9 +37,9 @@ const NodeDefText = props => {
   // EDIT MODE
 
   if (edit)
-    return <NodeDefFormItem {...props}>
+    return <FormItem label={label}>
       <NodeDefTextInput {...props} />
-    </NodeDefFormItem>
+    </FormItem>
 
   // ENTRY MODE
 
@@ -51,7 +50,7 @@ const NodeDefText = props => {
     const {height} = domElem ? elementOffset(domElem) : {height: 80}
 
     return (
-      <NodeDefFormItem {...props}>
+      <FormItem label={label}>
         <div className="overflowYAuto" style={{display: 'grid', alignContent: 'center',  height}}>
           {
             nodes.map(n =>
@@ -64,14 +63,18 @@ const NodeDefText = props => {
                 <NodeDefTextInput {...props} node={n}/>
 
                 {!n.placeholder && NodeDef.isNodeDefMultiple(nodeDef) &&
-                  <NodeDefDeleteButton {...props} node={n}/>
+                <NodeDefDeleteButton nodeDef={nodeDef}
+                                     node={n}
+                                     disabled={edit || R.isEmpty(Node.getNodeValue(n))}
+                                     showConfirm={true}
+                                     removeNode={removeNode}/>
                 }
 
               </div>
             )
           }
         </div>
-      </NodeDefFormItem>
+      </FormItem>
     )
   }
 }

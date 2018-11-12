@@ -6,9 +6,9 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import * as R from 'ramda'
 
-import { getAppErrors, getAppState } from '../../appState'
+import { getAppErrors, getAppState } from '../../../../app/appState'
 
-import { closeAppError } from '../../actions'
+import { closeAppError } from '../../../../app/actions'
 
 const AppError = ({error, closeAppError}) => (
   <div className="app-errors__error">

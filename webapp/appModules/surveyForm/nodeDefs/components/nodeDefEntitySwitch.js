@@ -1,5 +1,3 @@
-import '../../style/react-grid-layout.scss'
-
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -19,20 +17,50 @@ import { getSurvey } from '../../../../survey/surveyState'
 class NodeDefEntitySwitch extends React.Component {
 
   render () {
-    const {nodeDef} = this.props
+    const {
+      entry,
+      nodeDef,
+      childDefs,
+      edit,
+      nodes,
+      parentNode,
+      label,
+      updateNode,
+      setFormPageNode,
+      selectedNodeUUID,
+      putNodeDefProp,
+      removeNode,
+      locked,
+    } = this.props
 
     if (isRenderForm(nodeDef))
-      return <NodeDefEntityForm {...this.props} />
+      return <NodeDefEntityForm label={label}
+                                entry={entry}
+                                nodeDef={nodeDef}
+                                childDefs={childDefs}
+                                edit={edit}
+                                nodes={nodes}
+                                parentNode={parentNode}
+                                updateNode={updateNode}
+                                putNodeDefProp={putNodeDefProp}
+                                locked={locked}/>
     else if (isRenderTable(nodeDef))
-      return <NodeDefEntityTable {...this.props} />
+      return <NodeDefEntityTable label={label}
+                                 entry={entry}
+                                 nodeDef={nodeDef}
+                                 childDefs={childDefs}
+                                 edit={edit}
+                                 nodes={nodes}
+                                 parentNode={parentNode}
+                                 setFormPageNode={setFormPageNode}
+                                 selectedNodeUUID={selectedNodeUUID}
+                                 updateNode={updateNode}
+                                 putNodeDefProp={putNodeDefProp}
+                                 removeNode={removeNode}
+                                 locked={locked}/>
 
     return null
   }
-}
-
-NodeDefEntitySwitch.defaultProps = {
-  entityDef: {},
-  edit: false,
 }
 
 const mapStateToProps = (state, props) => ({

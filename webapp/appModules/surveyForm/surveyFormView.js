@@ -1,4 +1,5 @@
 import './style/surveyForm.scss'
+import './style/react-grid-layout.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -29,37 +30,33 @@ const SurveyFormView = (props) => {
 
   return nodeDef
     ? (
-      <React.Fragment>
+      <div className={`survey-form${edit ? ' edit' : ''}`}>
+
+        {
+          edit &&
+          <NodeDefEdit/>
+        }
+
+        <FormNavigation edit={edit}/>
+
+        {
+          nodeDef && (edit || (entry && recordLoaded))
+            ? <NodeDefSwitch surveyInfo={surveyInfo}
+                             nodeDef={nodeDef}
+                             edit={edit}
+                             entry={entry}
+                             recordId={recordId}
+                             parentNode={parentNode}/>
+            : <div/>
+        }
 
         {
           edit
-            ? <NodeDefEdit/>
+            ? <FormActions/>
             : null
         }
 
-        <div className={`survey-form${edit ? ' edit' : ''}`}>
-
-          <FormNavigation edit={edit}/>
-
-          {
-            nodeDef && (edit || (entry && recordLoaded))
-              ? <NodeDefSwitch surveyInfo={surveyInfo}
-                               nodeDef={nodeDef}
-                               edit={edit}
-                               entry={entry}
-                               recordId={recordId}
-                               parentNode={parentNode}/>
-              : <div/>
-          }
-
-          {
-            edit
-              ? <FormActions/>
-              : null
-          }
-
-        </div>
-      </React.Fragment>
+      </div>
     )
     : null
 
@@ -72,7 +69,7 @@ SurveyFormView.defaultProps = {
   edit: false,
   // can entry data
   entry: false,
-  // if record to edit had been loaded
+  // if record to edit has been loaded
   recordLoaded: null,
   // recordId of current record
   recordId: null,
@@ -85,7 +82,6 @@ const mapStateToProps = (state, props) => {
   const record = getRecord(surveyForm)
 
   const mapEntryProps = () => ({
-    // rootNode: getRootNode(getRecord(survey)),
     recordLoaded: !!record,
     parentNode: nodeDef ? getFormPageParentNode(survey, nodeDef)(surveyForm) : null,
     recordId: record ? record.id : null,

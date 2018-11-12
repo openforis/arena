@@ -20,9 +20,18 @@ const defaultSteps = {
   '3': {name: 'analysis', prev: '2'},
 }
 
+const rolesKey = {
+  surveyAdmin: 'surveyAdmin',
+  surveyEditor: 'surveyEditor',
+  dataEditor: 'dataEditor',
+  dataCleanser: 'dataCleanser',
+  dataAnalyst: 'dataAnalyst',
+
+}
+
 const roles = {
 
-  'surveyAdmin': {
+  [rolesKey.surveyAdmin]: {
     labels: {},
     descriptions: {},
     permissions: [
@@ -34,33 +43,43 @@ const roles = {
     dataSteps: ['1', '2', '3']
   },
 
-  'surveyEditor': {
+  [rolesKey.surveyEditor]: {
     labels: {},
     descriptions: {},
     permissions: [permissions.surveyEdit, permissions.recordView, permissions.recordCreate, permissions.recordDataEdit],
     dataSteps: ['1', '2', '3']
   },
 
-  'dataEditor': {
+  [rolesKey.dataEditor]: {
     labels: {},
     descriptions: {},
     permissions: [permissions.recordView, permissions.recordCreate, permissions.recordDataEdit],
     dataSteps: [{'1': 'owned'}],
   },
 
-  'dataCleanser': {
+  [rolesKey.dataCleanser]: {
     labels: {},
     descriptions: {},
     permissions: [permissions.recordView, permissions.recordCreate, permissions.recordDataEdit],
     dataSteps: [{'1': 'all'}, {'2': 'all'}],
   },
 
-  'dataAnalyst': {
+  [rolesKey.dataAnalyst]: {
     labels: {},
     descriptions: {},
     permissions: [permissions.recordView, permissions.recordCreate, permissions.recordDataEdit],
     dataSteps: [{'1': 'all'}, {'2': 'all'}, {'3': 'all'}],
   },
+}
+
+const systemAdminGroup = {
+  labels: {en: 'System Administrators'},
+  descriptions: {en: 'OF Arena system administrators'},
+  role: null,
+  dataCondition: null,
+
+  // table group_user
+  userIds: [1, 2, 3, 4],
 }
 
 const group = {
@@ -70,7 +89,40 @@ const group = {
   dataCondition: null,
 
   // table group_survey
-  surveyIds: [1, 2, 3, 4],
+  // surveyIds: [1, 2, 3, 4],
   // table group_user
-  userIds: [1, 2, 3, 4],
+  // userIds: [1, 2, 3, 4],
 }
+
+const defaultSurveyGroups = [
+  {
+    role: rolesKey.surveyAdmin,
+    labels: {en: ''},
+    descriptions: {en: ''},
+    dataCondition:null,
+  },
+  {
+    role: rolesKey.surveyEditor,
+    labels: {en: ''},
+    descriptions: {en: ''},
+    dataCondition:null,
+  },
+  {
+    role: rolesKey.dataEditor,
+    labels: {en: ''},
+    descriptions: {en: ''},
+    dataCondition:null,
+  },
+  {
+    role: rolesKey.dataCleanser,
+    labels: {en: ''},
+    descriptions: {en: ''},
+    dataCondition:null,
+  },
+  {
+    role: rolesKey.dataAnalyst,
+    labels: {en: ''},
+    descriptions: {en: ''},
+    dataCondition:null,
+  }
+]

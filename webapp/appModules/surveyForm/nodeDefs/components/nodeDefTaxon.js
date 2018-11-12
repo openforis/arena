@@ -5,7 +5,6 @@ import axios from 'axios'
 import * as R from 'ramda'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
-import NodeDefFormItem from './nodeDefFormItem'
 import AutocompleteDialog from '../../../../commonComponents/form/autocompleteDialog'
 
 import { toQueryString } from '../../../../../server/serverUtils/request'
@@ -17,7 +16,7 @@ import Node from '../../../../../common/record/node'
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 import { getNodeDefDefaultValue } from '../nodeDefSystemProps'
-import { getSurvey } from '../../../../survey/surveyState'
+import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
 
 const fields = {
   code: 'code',
@@ -226,7 +225,7 @@ class NodeDefTaxon extends React.Component {
     }
 
     return (
-      <NodeDefFormItem label={label}>
+      <FormItem label={label}>
         <div className="node-def__taxon-wrapper">
           <FormItem label="Code">
             {codeInputField}
@@ -240,7 +239,7 @@ class NodeDefTaxon extends React.Component {
         </div>
 
         {autocompleteDialog}
-      </NodeDefFormItem>
+      </FormItem>
     )
   }
 }
@@ -248,7 +247,8 @@ class NodeDefTaxon extends React.Component {
 const mapStateToProps = (state, props) => ({
   taxonomy: Survey.getTaxonomyByUUID(
     NodeDef.getNodeDefTaxonomyUUID(props.nodeDef)
-  )(getSurvey(state))
+  )(getSurvey(state)),
+  surveyInfo: getStateSurveyInfo(state)
 })
 
 export default connect(mapStateToProps)(NodeDefTaxon)

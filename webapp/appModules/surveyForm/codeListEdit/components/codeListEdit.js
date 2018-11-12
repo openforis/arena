@@ -1,6 +1,7 @@
 import './codeListEdit.scss'
 
 import React from 'react'
+import { connect } from 'react-redux'
 
 import { isBlank } from '../../../../../common/stringUtils'
 
@@ -10,6 +11,11 @@ import CodeListEditLevel from './codeListEditLevel'
 import CodeList from '../../../../../common/survey/codeList'
 import { normalizeName } from '../../../../../common/stringUtils'
 import { getFieldValidation } from '../../../../../common/validation/validator'
+import {
+  putCodeListProp,
+  createCodeListLevel,
+  setCodeListForEdit
+} from '../../codeListEdit/actions'
 
 const CodeListEdit = props => {
 
@@ -59,4 +65,13 @@ const CodeListEdit = props => {
   )
 }
 
-export default CodeListEdit
+const mapStateToProps = state => ({})
+
+export default connect(
+  null,
+  {
+    putCodeListProp,
+    createCodeListLevel,
+    setCodeListForEdit,
+  }
+)(CodeListEdit)

@@ -2,9 +2,9 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import * as R from 'ramda'
 
-import { appModuleUri } from '../../../appModules/appModules'
-import { appModules } from '../../../appModules/appModules'
-import { getLocationPathname } from '../../../appUtils/routerUtils'
+import { appModuleUri } from '../../../appModules'
+import { appModules } from '../../../appModules'
+import { getLocationPathname } from '../../../../appUtils/routerUtils'
 
 const modules = [
   {
@@ -44,12 +44,12 @@ const modules = [
 
 const AppSideBarModule = (props) => {
   const {
-    history, module, surveyInfo,
+    pathname, module, surveyInfo,
     //module props
     icon, label, showLabel = false, disabled = false,
   } = props
 
-  const active = getLocationPathname(history) === appModuleUri(module)
+  const active = pathname === appModuleUri(module)
   const requireSurvey = module !== appModules.home
 
   return (
@@ -73,7 +73,7 @@ const AppSideBarModule = (props) => {
   )
 }
 
-const AppSideBarModules = ({history, surveyInfo, opened}) => (
+const AppSideBarModules = ({pathname, surveyInfo, opened}) => (
   <div style={{
     display: 'grid',
     gridRowGap: '1.5rem',
@@ -82,7 +82,7 @@ const AppSideBarModules = ({history, surveyInfo, opened}) => (
       modules.map((m, i) => (
         <AppSideBarModule key={i}
                           {...m}
-                          history={history}
+                          pathname={pathname}
                           surveyInfo={surveyInfo}
                           showLabel={opened}
         />
