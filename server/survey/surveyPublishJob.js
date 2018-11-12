@@ -7,7 +7,7 @@ const {Job} = require('../job/job')
 const CodeList = require('../../common/survey/codeList')
 const Taxonomy = require('../../common/survey/taxonomy')
 const NodeDef = require('../../common/survey/nodeDef')
-const {isValid} = require('../../common/validation/validator')
+const {isValid, getInvalidFieldValidations} = require('../../common/validation/validator')
 
 const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
@@ -30,7 +30,7 @@ class NodeDefsValidationJob extends Job {
     if (R.isEmpty(invalidNodeDefs)) {
       this.setStatusCompleted()
     } else {
-      this.errors = R.reduce((acc, nodeDef) => R.assoc(NodeDef.getNodeDefName(nodeDef), nodeDef.validation.fields, acc), {}, invalidNodeDefs)
+      this.errors = R.reduce((acc, nodeDef) => R.assoc(NodeDef.getNodeDefName(nodeDef), getInvalidFieldValidations(nodeDef.validation), acc), {}, invalidNodeDefs)
       this.setStatusFailed()
     }
   }
@@ -43,18 +43,20 @@ class CodeListsValidationJob extends Job {
   }
 
   async execute () {
-    const codeLists = await CodeListManager.fetchCodeListsBySurveyId(this.surveyId, true, true)
+    const codeLists = await CodeListManager.fetchCodeListsBySurveyId(this.surveyId, true, false)
 
-    const invalidCodeLists = R.filter(codeList => !isValid(codeList.validation), codeLists)
+    this.total = codeLists.length
 
-    if (R.isEmpty(invalidCodeLists)) {
+    for (const codeList of codeLists) {
+      const validatedCodeList = await CodeListManager.validateCodeList(this.surveyId, codeLists, codeList, true)
+      if (!isValid(validatedCodeList)) {
+        this.errors[CodeList.getCodeListName(validatedCodeList)] = getInvalidFieldValidations(validatedCodeList.validation)
+      }
+      this.incrementProcessedItems()
+    }
+    if (R.isEmpty(this.errors)) {
       this.setStatusCompleted()
     } else {
-      this.errors = R.reduce(
-        (acc, codeList) => R.assoc(CodeList.getCodeListName(codeList), codeList.validation.fields, acc),
-        {},
-        invalidCodeLists
-      )
       this.setStatusFailed()
     }
   }
@@ -74,7 +76,7 @@ class TaxonomiesValidationJob extends Job {
       this.setStatusCompleted()
     } else {
       this.errors = R.reduce(
-        (acc, taxonomy) => R.assoc(Taxonomy.getTaxonomyName(taxonomy), taxonomy.validation.fields, acc),
+        (acc, taxonomy) => R.assoc(Taxonomy.getTaxonomyName(taxonomy), getInvalidFieldValidations(taxonomy.validation), acc),
         {},
         invalidTaxonomies
       )
