@@ -18,8 +18,9 @@ const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/no
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const {publishTaxonomiesProps} = require('../taxonomy/taxonomyManager')
-const {publishCodeListsProps} = require('../codeList/codeListManager')
+const {getDefaultSurveyGroups} = require('../group/groupUtils')
+const {createGroup, addUserToGroup, addSurveyToGroup} = require('../group/groupRepository')
+
 const JobManager = require('../job/jobManager')
 
 const assocSurveyInfo = info => ({info})
@@ -37,9 +38,26 @@ const createSurvey = async (user, {name, label, lang}) => {
         steps: {...Survey.defaultSteps},
       }
 
-      const survey = await surveyRepository.insertSurvey(props, user.id, t)
+      const userId = user.id
+
+      // create the survey
+      const survey = await surveyRepository.insertSurvey(props, userId, t)
       const {id: surveyId} = survey
 
+      // create default groups
+      getDefaultSurveyGroups(Survey.getName(survey), lang)
+        .forEach(async (defaultGroup) => {
+          const {labels, descriptions, role, dataCondition} = defaultGroup
+          const {id: groupId} = await createGroup(labels, descriptions, role, dataCondition, t)
+
+          if (role === 'surveyAdmin') {
+            // TODO don't insert if the user belong to system administrators
+            await addUserToGroup(groupId, userId, t)
+          }
+          addSurveyToGroup(groupId, surveyId, t)
+        })
+
+      // create survey's root entity props
       const rootEntityDefProps = {
         name: 'root_entity',
         labels: {[lang]: 'Root entity'},
@@ -53,7 +71,6 @@ const createSurvey = async (user, {name, label, lang}) => {
       await updateUserPref(user, userPrefNames.survey, surveyId, t)
 
       return survey
-
     }
   )
 
