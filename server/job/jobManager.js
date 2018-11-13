@@ -1,16 +1,14 @@
-const {uuidv4} = require('../../common/uuid')
+const db = require('../db/db')
+
 const {throttle} = require('../../common/functionsDefer')
 
-const {
-  jobSocketEvents,
-  jobStatus,
-  isJobEnded,
-  isJobCanceled,
-} = require('../../common/job/job')
+const {jobEvents} = require('./job')
+const jobSocketEvents = require('../../common/job/jobSocketEvents')
 
 const jobRepository = require('./jobRepository')
 
 const userSockets = {}
+const userJobs = {}
 
 const init = (io) => {
 
@@ -19,11 +17,16 @@ const init = (io) => {
     const userId = socket.request.session.passport.user
     if (userId) {
       userSockets[userId] = socket
-      const job = await jobRepository.fetchActiveJobByUserId(userId)
+
+      const job = getJobFromCache(userId)
 
       if (job) {
-        socket.emit(jobSocketEvents.update, job)
+        notifyUser(job)
       }
+
+      socket.on('disconnect', () => {
+        delete userSockets[userId]
+      })
     }
   })
 
@@ -32,37 +35,49 @@ const init = (io) => {
 const notifyUser = (job) => {
   const socket = userSockets[job.userId]
   if (socket)
-    throttle((job) => socket.emit(jobSocketEvents.update, job), `socket_${job.id}`, 250)(job)
+    throttle((job) => socket.emit(jobSocketEvents.update, job.toJSON()), `socket_${job.id}`, 250)(job)
 }
 
 /**
  * ====== CREATE
  */
-const createJob = async (userId, surveyId, name, onCancel = null) => {
-  const job = {
-    uuid: uuidv4(),
-    userId,
-    surveyId,
-    props: {
-      name,
-    },
-  }
-  const jobDb = await jobRepository.insertJob(job)
+
+const startJob = async (job) => {
+  addJobToCache(job)
+
+  await db.tx(async t =>
+    await insertJobAndInnerJobs(job, t)
+  )
+
+  job
+    .onEvent(async event => {
+      if (event.type === jobEvents.statusChange) {
+        await updateJobStatusFromEvent(event)
+      } else {
+        await updateJobProgress(event.jobId, event.total, event.processed)
+      }
+      if (job.isEnded()) {
+        removeJobFromCache(job.userId)
+      }
+      notifyUser(job)
+    })
+    .start()
 
   notifyUser(job)
 
-  if (onCancel) {
-    //check every second if the job has been canceled and execute "onCancel" in that case
-    const jobCheckInterval = setInterval(async () => {
-      const reloadedJob = await jobRepository.fetchJobById(jobDb.id)
+  return job.toJSON()
+}
 
-      if (reloadedJob && isJobCanceled(reloadedJob)) {
-        onCancel()
-      }
-      if (reloadedJob === null || isJobEnded(reloadedJob)) {
-        clearInterval(jobCheckInterval)
-      }
-    }, 1000)
+/**
+ * Inserts job and its inner jobs into the db
+ */
+const insertJobAndInnerJobs = async (job, t) => {
+  const jobDb = await jobRepository.insertJob(job, t)
+  job.id = jobDb.id
+
+  for (const innerJob of job.innerJobs) {
+    innerJob.parentId = job.id
+    await insertJobAndInnerJobs(innerJob, t)
   }
 
   return jobDb
@@ -71,37 +86,36 @@ const createJob = async (userId, surveyId, name, onCancel = null) => {
 /**
  * ====== UPDATE
  */
-const updateJobStatus = async (jobId, status, total, processed, props = {}) => {
-  const job = await jobRepository.updateJobStatus(jobId, status, total, processed, props)
-  notifyUser(job)
+
+const updateJobStatusFromEvent = async jobEvent => {
+  const {jobId, status, total, processed, result = {}, errors = {}} = jobEvent
+  await jobRepository.updateJobStatus(jobId, status, total, processed, {result, errors})
 }
 
 const updateJobProgress = async (jobId, total, processed) => {
   throttle(jobRepository.updateJobProgress, `job_${jobId}`, 1000)(jobId, total, processed)
-
-  const job = await jobRepository.fetchJobById(jobId)
-  if (job) {
-    notifyUser(job)
-  }
 }
 
 const cancelActiveJobByUserId = async (userId) => {
-  const job = await jobRepository.fetchActiveJobByUserId(userId)
-  if (job && !isJobEnded(job)) {
-    await jobRepository.updateJobStatus(job.id, jobStatus.canceled, job.total, job.processed)
-    notifyUser(job)
+  const job = getJobFromCache(userId)
+  if (job && !job.isEnded()) {
+    job.cancel()
   }
 }
+
+/**
+ * ====== JOB CACHE
+ */
+const addJobToCache = job => userJobs['' + job.userId] = job
+
+const removeJobFromCache = userId => delete userJobs['' + userId]
+
+const getJobFromCache = userId => userJobs[userId]
 
 module.exports = {
   init,
   //CREATE
-  createJob,
-  //READ
-  fetchJobById: jobRepository.fetchJobById,
-
+  startJob,
   //UPDATE
-  updateJobProgress,
-  updateJobStatus,
   cancelActiveJobByUserId,
 }

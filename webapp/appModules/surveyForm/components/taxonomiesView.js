@@ -19,6 +19,13 @@ import {
 import { getSurveyForm } from '../surveyFormState'
 
 class TaxonomiesView extends React.Component {
+
+  componentWillUnmount () {
+    const {taxonomy, setTaxonomyForEdit} = this.props
+    if (taxonomy)
+      setTaxonomyForEdit(null)
+  }
+
   render () {
     const {
       taxonomy,

@@ -14,7 +14,7 @@ import { initApp } from './actions'
 import { getUser, isReady } from './appState'
 import { getLocationPathname } from '../appUtils/routerUtils'
 
-import { jobSocketEvents } from '../../common/job/job'
+import jobSocketEvents from '../../common/job/jobSocketEvents'
 import { openSocket, closeSocket, onSocketEvent } from './appWebSocket'
 import { activeJobUpdate } from '../appModules/appView/components/job/actions'
 

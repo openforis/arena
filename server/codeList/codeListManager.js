@@ -9,14 +9,13 @@ const codeListValidator = require('../codeList/codeListValidator')
 const CodeList = require('../../common/survey/codeList')
 
 // ====== VALIDATION
-const assocCodeListValidation = async (codeList, codeListsWithLevels, codeListItems) => ({
-  ...codeList,
-  validation: await codeListValidator.validateCodeList(codeListsWithLevels, codeList, codeListItems)
-})
-
 const validateCodeList = async (surveyId, codeLists, codeList, draft) => {
   const codeListItems = await codeListRepository.fetchCodeListItemsByCodeListId(surveyId, codeList.id, draft)
-  return await assocCodeListValidation(codeList, codeLists, codeListItems)
+
+  return {
+    ...codeList,
+    validation: await codeListValidator.validateCodeList(codeLists, codeList, codeListItems)
+  }
 }
 
 // ====== CREATE
@@ -158,6 +157,9 @@ const deleteCodeListItem = async (surveyId, codeListItemId) =>
 
 module.exports = {
 
+  //VALIDATION
+  validateCodeList,
+
   //CREATE
   insertCodeList,
   insertCodeListLevel,
@@ -176,6 +178,7 @@ module.exports = {
   updateCodeListLevelProp,
   updateCodeListItemProp,
 
+  //DELETE
   deleteCodeList,
   deleteCodeListLevel,
   deleteCodeListItem,

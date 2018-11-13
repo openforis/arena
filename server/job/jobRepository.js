@@ -1,16 +1,16 @@
 const db = require('../db/db')
 const camelize = require('camelize')
 
-const {jobStatus, isJobStatusEnded} = require('../../common/job/job')
+const {jobStatus} = require('./job')
 
 // ============== CREATE
 
 const insertJob = async (job, client = db) =>
   await client.one(`
-        INSERT INTO job (uuid, user_id, survey_id, props)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO job (uuid, user_id, survey_id, props, parent_id)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *`,
-    [job.uuid, job.userId, job.surveyId, job.props],
+    [job.uuid, job.userId, job.surveyId, job.props, job.parentId],
     camelize
   )
 
@@ -28,7 +28,7 @@ const fetchActiveJobByUserId = async (userId, client = db) =>
   await client.oneOrNone(
     `SELECT * FROM job
      WHERE user_id = $1
-       AND status IN ('${jobStatus.created}', '${jobStatus.running}')`,
+       AND status IN ('${jobStatus.pending}', '${jobStatus.running}')`,
     [userId],
     camelize
   )
@@ -46,7 +46,14 @@ const updateJobStatus = async (id, status, total, processed, props = {}, client 
         date_ended = $5
      WHERE id = $6
      RETURNING *`,
-    [status, total, processed, props, isJobStatusEnded(status) ? new Date() : null, id],
+    [
+      status,
+      total,
+      processed,
+      props,
+      status === jobStatus.succeeded || status === jobStatus.failed || jobStatus.canceled ? new Date() : null,
+      id
+    ],
     camelize
   )
 

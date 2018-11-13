@@ -23,3 +23,5 @@ export const updateActiveJob = (job) =>
         actJob => R.assoc(activeJob, actJob)(state)
       )(state) :
       R.dissoc(activeJob)(state)
+
+export const getActiveJobOnCompleteCallback = R.propOr(null, 'onComplete')

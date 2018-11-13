@@ -4,6 +4,7 @@ import { getStateSurveyId } from './surveyState'
 import { getUser } from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 import { appUserPrefUpdate } from '../app/actions'
+import { showAppJobMonitor } from '../appModules/appView/components/job/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
@@ -59,9 +60,12 @@ export const setActiveSurvey = (surveyId, draft = true) =>
 export const publishSurvey = () => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
 
-  dispatch({type: surveyPublish})
+  const {data} = await axios.put(`/api/survey/${surveyId}/publish`)
 
-  await axios.put(`/api/survey/${surveyId}/publish`)
+  dispatch(showAppJobMonitor(data.job, () => {
+    //publish job complete
+    dispatch({type: surveyPublish})
+  }))
 }
 
 // == DELETE

@@ -12,16 +12,6 @@ import {
 
 import AppJobErrors from './appJobErrors'
 
-import {
-  getJobName,
-  getJobStatus,
-  getJobProgressPercent,
-  isJobRunning,
-  isJobEnded,
-  isJobFailed,
-  jobStatus,
-} from '../../../../../common/job/job'
-
 import { cancelActiveJob, hideAppJobMonitor } from './actions'
 import { getActiveJob } from './appJobState'
 
@@ -31,45 +21,70 @@ const ProgressBar = ({progress, className}) => (
   </div>
 )
 
+const JobStatus = ({job}) => {
+  return <div className="app-job-monitor">
+    <h4 className="app-job-monitor__status">{job.status}
+      {
+        job.running && job.jobProgressPercent < 100 &&
+        <span> ({job.progressPercent}%)</span>
+      }
+    </h4>
+    <ProgressBar progress={job.progressPercent} className={job.failed ? 'error' : ''}/>
+    <AppJobErrors job={job}/>
+  </div>
+}
+
+const InnerJobStatus = ({innerJob}) =>
+  <div className={`inner-job${innerJob.failed ? ' failed' : ''}`}>
+    <div className="header">{innerJob.name}</div>
+    <JobStatus job={innerJob}/>
+  </div>
+
+const InnerJobs = ({innerJobs}) =>
+  <div className="app-job-monitor_inner-jobs">
+    <div className="header">Inner Jobs</div>
+    <div className="inner-jobs-wrapper">
+      {
+        innerJobs.map(innerJob => (
+          <InnerJobStatus key={innerJob.uuid}
+                          innerJob={innerJob}/>
+        ))
+      }
+    </div>
+  </div>
+
 class AppJobMonitor extends React.Component {
 
   render () {
     const {job, cancelActiveJob, hideAppJobMonitor} = this.props
-
-    const jobProgressPercent = job ? getJobProgressPercent(job) : 0
-
-    return job && job.status !== jobStatus.canceled
+    const innerJobs = job ? job.innerJobs : null
+    return job && !job.canceled
       ? (
         <Modal isOpen="true">
 
           <ModalHeader>
-            <div className="app-job-monitor__header">Job: {getJobName(job)}</div>
+            <div className="app-job-monitor__header">Job: {job.name}</div>
           </ModalHeader>
 
           <ModalBody>
-            <div className="app-job-monitor">
-              <h4 className="app-job-monitor__status">{getJobStatus(job)}
-                {
-                  isJobRunning(job) && jobProgressPercent < 100 &&
-                  <span> ({jobProgressPercent}%)</span>
-                }
-              </h4>
-              <ProgressBar progress={jobProgressPercent} className={isJobFailed(job) ? 'error' : ''}/>
+            <JobStatus job={job}/>
+            {
+              innerJobs.length > 0 &&
+              <InnerJobs innerJobs={innerJobs}/>
+            }
 
-              <AppJobErrors job={job}/>
-            </div>
           </ModalBody>
 
           <ModalFooter>
             <button className="btn btn-of modal-footer__item"
                     onClick={() => cancelActiveJob()}
-                    aria-disabled={!isJobRunning(job)}>
+                    aria-disabled={!job.running}>
               Cancel
             </button>
 
             <button className="btn btn-of modal-footer__item"
                     onClick={() => hideAppJobMonitor()}
-                    aria-disabled={!isJobEnded(job)}>
+                    aria-disabled={!job.ended}>
               Close
             </button>
           </ModalFooter>
