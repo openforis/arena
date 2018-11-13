@@ -151,7 +151,7 @@ class Job {
         Math.floor(100 * this.processed / this.total)
         : 0
 
-    return this.innerJobs.length === 0 || partial === 100 ?
+    return this.innerJobs.length === 0 || this.currentInnerJobIndex < 0 || partial === 100 ?
       partial
       : partial + Math.floor(this.innerJobs[this.currentInnerJobIndex].getProgressPercent() / this.total)
   }

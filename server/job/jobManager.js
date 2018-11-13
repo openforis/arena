@@ -10,6 +10,16 @@ const jobRepository = require('./jobRepository')
 const userSockets = {}
 const userJobs = {}
 
+
+/**
+ * ====== JOB CACHE
+ */
+const addJobToCache = job => userJobs['' + job.userId] = job
+
+const removeJobFromCache = userId => delete userJobs['' + userId]
+
+const getJobFromCache = userId => userJobs[userId]
+
 const init = (io) => {
 
   io.on('connection', async socket => {
@@ -43,27 +53,27 @@ const notifyUser = (job) => {
  */
 
 const startJob = async (job) => {
-  addJobToCache(job)
-
   await db.tx(async t =>
     await insertJobAndInnerJobs(job, t)
   )
 
+  addJobToCache(job)
+
   job
-    .onEvent(async event => {
-      if (event.type === jobEvents.statusChange) {
-        await updateJobStatusFromEvent(event)
+    .onEvent(async jobEvent => {
+      if (jobEvent.type === jobEvents.statusChange) {
+        await updateJobStatusFromEvent(jobEvent)
       } else {
-        await updateJobProgress(event.jobId, event.total, event.processed)
+        await updateJobProgress(jobEvent.jobId, jobEvent.total, jobEvent.processed)
       }
+
+      notifyUser(job)
+
       if (job.isEnded()) {
         removeJobFromCache(job.userId)
       }
-      notifyUser(job)
     })
     .start()
-
-  notifyUser(job)
 
   return job.toJSON()
 }
@@ -103,19 +113,12 @@ const cancelActiveJobByUserId = async (userId) => {
   }
 }
 
-/**
- * ====== JOB CACHE
- */
-const addJobToCache = job => userJobs['' + job.userId] = job
-
-const removeJobFromCache = userId => delete userJobs['' + userId]
-
-const getJobFromCache = userId => userJobs[userId]
-
 module.exports = {
   init,
   //CREATE
   startJob,
   //UPDATE
+  updateJobStatusFromEvent,
+  updateJobProgress,
   cancelActiveJobByUserId,
 }

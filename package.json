@@ -8,12 +8,12 @@
   "scripts": {
     "build": "webpack -p --config webpack.config.js",
     "build-prod": "cross-env-shell NODE_ENV=production BUILD_REPORT=true webpack -p --config webpack.config.js",
-    "build:watch": "webpack --config webpack.config.js --watch",
+    "build:watch": "webpack --config webpack.config.js --watch --experimental-worker",
     "clean": "rm -rf dist/",
     "start": "node server/server.js",
     "postinstall": "webpack --config webpack.config.js",
     "watch": "cross-env-shell NODE_ENV=development \"yarn build:watch & yarn watch:server\"",
-    "watch:server": "nodemon -e js --watch server server/server.js",
+    "watch:server": "nodemon -e js --watch server --experimental-worker server/server.js",
     "create-migration": "./server/db/migration/create-migration.sh",
     "test": "mocha-webpack --webpack-config webpack.config-test.js \"test/it/*.js\""
   },
