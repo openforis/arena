@@ -18,7 +18,7 @@ export const cancelActiveJob = () => async (dispatch) => {
 
 export const activeJobUpdate = job =>
   (dispatch, getState) => {
-    if (job && job.completed) {
+    if (job && job.succeeded) {
       const stateJob = getActiveJob(getState())
       const onComplete = getActiveJobOnCompleteCallback(stateJob)
       if (stateJob && onComplete) {

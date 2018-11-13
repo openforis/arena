@@ -2,9 +2,8 @@ const {uuidv4} = require('../../common/uuid')
 
 const jobStatus = {
   pending: 'pending',
-  initialized: 'initialized',
   running: 'running',
-  completed: 'completed',
+  succeeded: 'succeeded',
   canceled: 'canceled',
   failed: 'failed',
 }
@@ -54,7 +53,7 @@ class Job {
    * Called by JobManager.
    * It starts the job execution.
    * If there are inner jobs, they are executed in order,
-   * otherwise the "process' method will be invoked.
+   * otherwise the "execute' method will be invoked.
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
    */
@@ -107,11 +106,11 @@ class Job {
           case jobStatus.canceled:
             this.setStatus(event.status)
             break
-          case jobStatus.completed:
+          case jobStatus.succeeded:
             this.incrementProcessedItems()
 
             if (this.processed === this.innerJobs.length) {
-              this.setStatusCompleted()
+              this.setStatusSucceeded()
             } else {
               this.startNextInnerJob()
             }
@@ -136,7 +135,7 @@ class Job {
 
   isEnded () {
     switch (this.status) {
-      case jobStatus.completed:
+      case jobStatus.succeeded:
       case jobStatus.failed:
       case jobStatus.canceled:
         return true
@@ -146,7 +145,7 @@ class Job {
   }
 
   getProgressPercent () {
-    const partial = this.status === jobStatus.completed ?
+    const partial = this.status === jobStatus.succeeded ?
       100
       : this.total > 0 ?
         Math.floor(100 * this.processed / this.total)
@@ -167,8 +166,8 @@ class Job {
     this.notifyEvent(event)
   }
 
-  setStatusCompleted () {
-    this.setStatus(jobStatus.completed)
+  setStatusSucceeded () {
+    this.setStatus(jobStatus.succeeded)
   }
 
   setStatusFailed () {
@@ -196,18 +195,17 @@ class Job {
       uuid: this.uuid,
       userId: this.userId,
       surveyId: this.surveyId,
-      props: {
-        name: this.props.name,
-        result: this.status === jobStatus.completed ? this.result : {},
-        errors: this.status === jobStatus.failed ? this.errors : {},
-      },
+      name: this.props.name,
+      result: this.status === jobStatus.succeeded ? this.result : {},
+      errors: this.status === jobStatus.failed ? this.errors : {},
       total: this.total,
       processed: this.processed,
       progressPercent: this.getProgressPercent(),
       innerJobs: this.innerJobs.map(j => j.toJSON()),
+
       //status
       status: this.status,
-      completed: this.status === jobStatus.completed,
+      succeeded: this.status === jobStatus.succeeded,
       canceled: this.status === jobStatus.canceled,
       failed: this.status === jobStatus.failed,
       running: this.status === jobStatus.running,

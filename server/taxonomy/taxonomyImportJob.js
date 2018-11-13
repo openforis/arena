@@ -104,7 +104,7 @@ class TaxonomyImportJob extends Job {
         this.setStatusFailed()
       } else {
         await this.taxaPersistFunction(surveyId, taxonomyId, result.taxa, result.vernacularLanguageCodes)
-        this.setStatusCompleted()
+        this.setStatusSucceeded()
       }
     }
   }

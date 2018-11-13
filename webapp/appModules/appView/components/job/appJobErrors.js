@@ -5,7 +5,7 @@ import { getValidationFieldMessagesHTML } from '../../../../appUtils/validationU
 
 const AppJobErrors = ({job}) => {
 
-  const errors = R.pathOr([], ['props', 'errors'], job)
+  const errors = R.propOr([], 'errors', job)
 
   return job.failed && !R.isEmpty(errors)
     ? (

@@ -28,7 +28,7 @@ class NodeDefsValidationJob extends Job {
     const invalidNodeDefs = R.filter(nodeDef => !isValid(nodeDef), validatedNodeDefs)
 
     if (R.isEmpty(invalidNodeDefs)) {
-      this.setStatusCompleted()
+      this.setStatusSucceeded()
     } else {
       this.errors = R.reduce((acc, nodeDef) => R.assoc(NodeDef.getNodeDefName(nodeDef), getInvalidFieldValidations(nodeDef.validation), acc), {}, invalidNodeDefs)
       this.setStatusFailed()
@@ -55,7 +55,7 @@ class CodeListsValidationJob extends Job {
       this.incrementProcessedItems()
     }
     if (R.isEmpty(this.errors)) {
-      this.setStatusCompleted()
+      this.setStatusSucceeded()
     } else {
       this.setStatusFailed()
     }
@@ -73,7 +73,7 @@ class TaxonomiesValidationJob extends Job {
     const invalidTaxonomies = R.filter(taxonomy => !isValid(taxonomy.validation), taxonomies)
 
     if (R.isEmpty(invalidTaxonomies)) {
-      this.setStatusCompleted()
+      this.setStatusSucceeded()
     } else {
       this.errors = R.reduce(
         (acc, taxonomy) => R.assoc(Taxonomy.getTaxonomyName(taxonomy), getInvalidFieldValidations(taxonomy.validation), acc),
@@ -104,7 +104,7 @@ class PublishPropsJob extends Job {
 
       await SurveyRepository.publishSurveyProps(id, t)
 
-      this.setStatusCompleted()
+      this.setStatusSucceeded()
     })
   }
 }

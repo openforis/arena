@@ -21,6 +21,12 @@ import {
 
 class CodeListsView extends React.Component {
 
+  componentWillUnmount () {
+    const {codeList, setCodeListForEdit} = this.props
+    if (codeList)
+      setCodeListForEdit(null)
+  }
+
   render () {
 
     const {

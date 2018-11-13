@@ -51,7 +51,7 @@ const updateJobStatus = async (id, status, total, processed, props = {}, client 
       total,
       processed,
       props,
-      status === jobStatus.completed || status === jobStatus.failed || jobStatus.canceled ? new Date() : null,
+      status === jobStatus.succeeded || status === jobStatus.failed || jobStatus.canceled ? new Date() : null,
       id
     ],
     camelize

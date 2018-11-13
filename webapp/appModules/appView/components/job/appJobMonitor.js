@@ -36,7 +36,7 @@ const JobStatus = ({job}) => {
 
 const InnerJobStatus = ({innerJob}) =>
   <div className={`inner-job${innerJob.failed ? ' failed' : ''}`}>
-    <div className="header">{innerJob.props.name}</div>
+    <div className="header">{innerJob.name}</div>
     <JobStatus job={innerJob}/>
   </div>
 
@@ -63,7 +63,7 @@ class AppJobMonitor extends React.Component {
         <Modal isOpen="true">
 
           <ModalHeader>
-            <div className="app-job-monitor__header">Job: {job.props.name}</div>
+            <div className="app-job-monitor__header">Job: {job.name}</div>
           </ModalHeader>
 
           <ModalBody>
