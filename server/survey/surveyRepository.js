@@ -21,12 +21,11 @@ const insertSurvey = async (props, userId, client = db) =>
 
 // ============== READ
 
-//TODO : Check why we need fetchAllSurveys and fetchSurveys
-const fetchAllSurveys = async (client = db) =>
+const fetchAllSurveyIds = async (client = db) =>
   await client.map(
-      `SELECT * FROM survey`,
+      `SELECT id FROM survey`,
     [],
-    def => dbTransformCallback(def)
+    record => record.id
   )
 
 const fetchSurveys = async (client = db) =>
@@ -104,7 +103,7 @@ module.exports = {
   insertSurvey,
 
   // READ
-  fetchAllSurveys,
+  fetchAllSurveyIds,
   fetchSurveys,
   getSurveysByName,
   getSurveyById,

@@ -17,14 +17,14 @@ const getJobClass = jobType => {
   }
 }
 
-const checkIsJobCanceled = job => {
+const startCheckJobCanceledMonitor = job => {
   setTimeout(async () => {
     const reloadedJob = await JobManager.fetchJobById(job.id)
     if (reloadedJob.status === jobStatus.canceled) {
       job.cancel()
     }
     if (!job.isEnded()) {
-      checkIsJobCanceled(job)
+      startCheckJobCanceledMonitor(job)
     }
   }, 2000)
 }
@@ -34,7 +34,7 @@ const startJob = async (job) => {
 
   parentPort.postMessage({type: jobEvents.created, masterJobId: job.id, jobId: job.id, userId: job.userId})
 
-  checkIsJobCanceled(job)
+  startCheckJobCanceledMonitor(job)
 
   job
     .onEvent(jobEvent => {
