@@ -1,5 +1,4 @@
 const R = require('ramda')
-//const {Worker} = require('webworker-threads')
 
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/dbMigrator')
@@ -9,7 +8,6 @@ const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const surveyRepository = require('../survey/surveyRepository')
 const Survey = require('../../common/survey/survey')
-const SurveyPublishJob = require('./publish/surveyPublishJob')
 const {validateSurvey} = require('../survey/surveyValidator')
 
 const nodeDefRepository = require('../nodeDef/nodeDefRepository')
@@ -19,8 +17,8 @@ const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/no
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const JobManager = require('../job/jobManager')
-const {startSurveyPublish} = require('./publish/surveyPublishWorker')
+const {executeJobThread} = require('../job/jobManager')
+const {jobTypes} = require('../job/jobProps')
 
 const assocSurveyInfo = info => ({info})
 
@@ -108,9 +106,8 @@ const updateSurveyProp = async (id, key, value, user) =>
     await surveyRepository.updateSurveyProp(id, key, value)
   )
 
-const publishSurvey = async (id, user) =>
-  startSurveyPublish(user.id, id)
-
+const publishSurvey = async (surveyId, user) =>
+  executeJobThread(jobTypes.surveyPublish, {userId: user.id, surveyId})
 
 // ====== DELETE
 const deleteSurvey = async (id, user) => {

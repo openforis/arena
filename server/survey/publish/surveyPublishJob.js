@@ -7,8 +7,10 @@ const SurveyPropsPublishJob = require('./surveyPropsPublishJob')
 
 class SurveyPublishJob extends Job {
 
-  constructor (userId, surveyId) {
-    super(userId, surveyId, 'survey publish', [
+  constructor (params) {
+    const {userId, surveyId} = params
+
+    super(userId, surveyId, 'survey-publish', [
       new NodeDefsValidationJob(userId, surveyId),
       new CodeListsValidationJob(userId, surveyId),
       new TaxonomiesValidationJob(userId, surveyId),

@@ -1,17 +1,6 @@
+const {jobEvents, jobStatus} = require('./jobProps')
+
 const {uuidv4} = require('../../common/uuid')
-
-const jobStatus = {
-  pending: 'pending',
-  running: 'running',
-  succeeded: 'succeeded',
-  canceled: 'canceled',
-  failed: 'failed',
-}
-
-const jobEvents = {
-  statusChange: 'statusChange', //job has changed its status
-  progress: 'progress', //job is running and the processed items changed
-}
 
 class JobEvent {
 
@@ -216,7 +205,5 @@ class Job {
 }
 
 module.exports = {
-  jobStatus,
-  jobEvents,
   Job,
 }
