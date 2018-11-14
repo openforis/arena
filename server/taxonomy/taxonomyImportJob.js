@@ -111,7 +111,6 @@ class TaxonomyImportJob extends Job {
   }
 
   validateHeaders (columns) {
-    console.log(columns)
     const missingColumns = R.difference(requiredColumns, columns)
     if (R.isEmpty(missingColumns)) {
       return true

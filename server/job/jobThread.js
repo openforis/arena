@@ -2,7 +2,7 @@ const {Worker, isMainThread, parentPort, workerData} = require('worker_threads')
 
 const {throttle} = require('../../common/functionsDefer')
 
-const {jobTypes, jobEvents} = require('./jobUtils')
+const {jobTypes, jobEvents, jobStatus} = require('./jobUtils')
 const JobManager = require('./jobManager')
 
 const SurveyPublishJob = require('../survey/publish/surveyPublishJob')
@@ -17,13 +17,30 @@ const getJobClass = jobType => {
   }
 }
 
+const checkIsJobCanceled = job => {
+  setTimeout(async () => {
+    const reloadedJob = await JobManager.fetchJobById(job.id)
+    if (reloadedJob.status === jobStatus.canceled) {
+      job.cancel()
+    }
+    if (!job.isEnded()) {
+      checkIsJobCanceled(job)
+    }
+  }, 2000)
+}
+
 const startJob = async (job) => {
   await JobManager.insertJob(job)
 
   parentPort.postMessage({type: jobEvents.created, masterJobId: job.id, jobId: job.id, userId: job.userId})
 
+  checkIsJobCanceled(job)
+
   job
-    .onEvent(handleJobEvent)
+    .onEvent(jobEvent => {
+
+      handleJobEvent(jobEvent)
+    })
     .start()
 }
 
