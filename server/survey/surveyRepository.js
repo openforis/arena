@@ -29,16 +29,27 @@ const fetchAllSurveys = async (client = db) =>
     def => dbTransformCallback(def)
   )
 
-const fetchSurveys = async (client = db) =>
+const fetchSurveys = async (userId, client = db) =>
   await client.map(`
-    SELECT 
-      s.*, ${selectDate('n.date_created', 'date_created')},nm.date_modified
+    SELECT
+      s.*, ${selectDate('n.date_created', 'date_created')}, nm.date_modified, gr.permissions
     FROM survey s
+
+    -- get user's permissions on this survey
+    JOIN survey_group sg
+      ON s.id = sg.survey_id
+    JOIN user_group ug
+      ON sg.group_id = ug.group_id AND ug.user_id = $1
+    JOIN "group" g
+      ON g.id = sg.group_id
+    JOIN "group_role" gr
+      ON gr.id = g.role_id
+
     JOIN node_def n
       ON s.id = n.survey_id
       AND n.parent_id IS NULL
     JOIN (
-        SELECT 
+        SELECT
           survey_id, ${selectDate('MAX(date_modified)', 'date_modified')}
         FROM node_def
         GROUP BY survey_id
@@ -46,7 +57,7 @@ const fetchSurveys = async (client = db) =>
       ON s.id = nm.survey_id
     ORDER BY s.id
     `,
-    [],
+    [userId],
     def => dbTransformCallback(def, true)
   )
 
@@ -69,7 +80,7 @@ const updateSurveyProp = async (surveyId, key, value, client = db) => {
   const prop = {[key]: value}
 
   return await client.one(`
-    UPDATE survey 
+    UPDATE survey
     SET props_draft = props_draft || $1,
     draft = true
     WHERE id = $2

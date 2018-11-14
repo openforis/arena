@@ -10,3 +10,9 @@ const rolesKey = {
 module.exports = {
   rolesKey
 }
+
+const defaultSteps = {
+  '1': {name: 'entry'},
+  '2': {name: 'cleansing', prev: '1'},
+  '3': {name: 'analysis', prev: '2'},
+}
