@@ -2,7 +2,7 @@ const {Worker, isMainThread, parentPort, workerData} = require('worker_threads')
 
 const {throttle} = require('../../common/functionsDefer')
 
-const {jobTypes, jobEvents, jobStatus} = require('./jobUtils')
+const {jobTypes, jobEvents, jobStatus, jobToJSON} = require('./jobUtils')
 const JobManager = require('./jobManager')
 
 const SurveyPublishJob = require('../survey/publish/surveyPublishJob')
@@ -29,19 +29,16 @@ const startCheckJobCanceledMonitor = job => {
   }, 2000)
 }
 
-const startJob = async (job) => {
+const createJob = async (jobType, params) => {
+  const jobClass = getJobClass(jobType)
+
+  const job = new jobClass(params)
+
+  parentPort.postMessage({type: jobEvents.created, job: jobToJSON(job)})
+
   await JobManager.insertJob(job)
 
-  parentPort.postMessage({type: jobEvents.created, masterJobId: job.id, jobId: job.id, userId: job.userId})
-
-  startCheckJobCanceledMonitor(job)
-
-  job
-    .onEvent(jobEvent => {
-
-      handleJobEvent(jobEvent)
-    })
-    .start()
+  return job
 }
 
 const handleJobEvent = async jobEvent => {
@@ -64,15 +61,10 @@ const executeJobThread = (jobType, params) => {
     const worker = new Worker(__filename, {workerData: {jobType, params}})
 
     worker.on('message', async jobEvent => {
-      if (jobEvent.type === jobEvents.creationFailed) {
-        resolve(null) //TODO handle errors from caller
+      if (jobEvent.type === jobEvents.created) {
+        resolve(jobEvent.job)
       } else {
         const job = await JobManager.fetchJobById(jobEvent.masterJobId)
-
-        if (jobEvent.type === jobEvents.created) {
-          resolve(job)
-        }
-
         JobManager.notifyJobUpdate(job)
       }
     })
@@ -84,10 +76,16 @@ const executeJobThread = (jobType, params) => {
  */
 if (!isMainThread) {
   const {params, jobType} = workerData
-  const jobClass = getJobClass(jobType)
 
-  const job = new jobClass(params)
-  startJob(job)
+  createJob(jobType, params)
+    .then(job => {
+
+      startCheckJobCanceledMonitor(job)
+
+      job
+        .onEvent(handleJobEvent)
+        .start()
+    })
 }
 
 module.exports = {

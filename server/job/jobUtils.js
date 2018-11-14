@@ -10,7 +10,6 @@ const jobStatus = {
 
 const jobEvents = {
   created: 'created',
-  creationFailed: 'creationFailed',
   statusChange: 'statusChange', //job has changed its status
   progress: 'progress', //job is running and the processed items changed
 }
