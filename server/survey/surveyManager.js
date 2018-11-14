@@ -17,8 +17,8 @@ const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/no
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const {executeJobThread} = require('../job/jobManager')
-const {jobTypes} = require('../job/jobProps')
+const {executeJobThread} = require('../job/jobThread')
+const {jobTypes} = require('../job/jobUtils')
 
 const assocSurveyInfo = info => ({info})
 
@@ -107,7 +107,7 @@ const updateSurveyProp = async (id, key, value, user) =>
   )
 
 const publishSurvey = async (surveyId, user) =>
-  executeJobThread(jobTypes.surveyPublish, {userId: user.id, surveyId})
+  await executeJobThread(jobTypes.surveyPublish, {userId: user.id, surveyId})
 
 // ====== DELETE
 const deleteSurvey = async (id, user) => {

@@ -7,10 +7,9 @@ const {isValid, getInvalidFieldValidations} = require('../../../common/validatio
 
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
-
 class TaxonomiesValidationJob extends Job {
   constructor (userId, surveyId) {
-    super(userId, surveyId, 'taxonomies validation')
+    super(userId, surveyId, 'taxonomies-validation')
   }
 
   async execute () {

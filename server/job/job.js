@@ -1,12 +1,15 @@
-const {jobEvents, jobStatus} = require('./jobProps')
+const R = require('ramda')
+
+const {jobEvents, jobStatus} = require('./jobUtils')
 
 const {uuidv4} = require('../../common/uuid')
 
 class JobEvent {
 
-  constructor (type, jobId, status, total, processed) {
+  constructor (type, jobId, masterJobId, status, total, processed) {
     this.type = type
     this.jobId = jobId
+    this.masterJobId = masterJobId
     this.status = status
     this.total = total
     this.processed = processed
@@ -17,12 +20,12 @@ class Job {
 
   constructor (userId, surveyId, name, innerJobs = []) {
     this.id = null
+    this.parentId = null
+    this.masterJobId = null //id of the master job (parentId === null for that job)
     this.uuid = uuidv4()
     this.userId = userId
     this.surveyId = surveyId
-    this.props = {
-      name,
-    }
+    this.name = name
     this.status = jobStatus.pending
     this.startTime = null
     this.endTime = null
@@ -175,33 +178,8 @@ class Job {
   }
 
   createJobEvent (type) {
-    return new JobEvent(type, this.id, this.status, this.total, this.processed)
+    return new JobEvent(type, this.id, this.masterJobId, this.status, this.total, this.processed)
   }
-
-  toJSON () {
-    return {
-      id: this.id,
-      uuid: this.uuid,
-      userId: this.userId,
-      surveyId: this.surveyId,
-      name: this.props.name,
-      result: this.status === jobStatus.succeeded ? this.result : {},
-      errors: this.status === jobStatus.failed ? this.errors : {},
-      total: this.total,
-      processed: this.processed,
-      progressPercent: this.getProgressPercent(),
-      innerJobs: this.innerJobs.map(j => j.toJSON()),
-
-      //status
-      status: this.status,
-      succeeded: this.status === jobStatus.succeeded,
-      canceled: this.status === jobStatus.canceled,
-      failed: this.status === jobStatus.failed,
-      running: this.status === jobStatus.running,
-      ended: this.isEnded(),
-    }
-  }
-
 }
 
 module.exports = {

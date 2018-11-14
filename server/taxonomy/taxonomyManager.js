@@ -6,11 +6,7 @@ const {publishSurveySchemaTableProps, markSurveyDraft} = require('../survey/surv
 
 const Taxonomy = require('../../common/survey/taxonomy')
 
-const JobManager = require('../job/jobManager')
-
-const TaxonomyImportJob = require('./taxonomyImportJob')
-
-const TaxonomyRepository = require('../../server/taxonomy/taxonomyRepository')
+const TaxonomyRepository = require('./taxonomyRepository')
 const {validateTaxonomy} = require('./taxonomyValidator')
 
 /**
@@ -30,15 +26,6 @@ const persistTaxa = async (surveyId, taxonomyId, taxa, vernacularLanguageCodes) 
 
     await markSurveyDraft(surveyId, t)
   })
-}
-
-const startTaxonomyImportJob = async (userId, surveyId, taxonomyId, inputBuffer) => {
-  const taxaPersistFunction = async (surveyId, taxonomyId, taxa, vernacularLanguageCodes) =>
-    await persistTaxa(surveyId, taxonomyId, taxa, vernacularLanguageCodes)
-
-  return await JobManager.startJob(
-    new TaxonomyImportJob(userId, surveyId, 'import taxa', taxonomyId, inputBuffer, taxaPersistFunction)
-  )
 }
 
 /**
@@ -146,8 +133,6 @@ const deleteTaxonomy = async (surveyId, taxonomyId) =>
 module.exports = {
   //CREATE
   createTaxonomy,
-  startTaxonomyImportJob,
-  persistTaxa,
 
   //READ
   fetchTaxonomyById,
@@ -157,6 +142,7 @@ module.exports = {
   fetchTaxaByProp,
 
   //UPDATE
+  persistTaxa,
   publishTaxonomiesProps,
   updateTaxonomyProp,
   deleteTaxonomy

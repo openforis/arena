@@ -11,7 +11,7 @@ const NodeDefRepository = require('../../nodeDef/nodeDefRepository')
 class NodeDefsValidationJob extends Job {
 
   constructor (userId, surveyId) {
-    super(userId, surveyId, 'node definitions validation')
+    super(userId, surveyId, 'node-defs-validation')
   }
 
   async execute () {

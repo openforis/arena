@@ -1,7 +1,7 @@
 const db = require('../db/db')
 const camelize = require('camelize')
 
-const {jobStatus} = require('./job')
+const {jobStatus} = require('./jobUtils')
 
 // ============== CREATE
 
@@ -10,7 +10,7 @@ const insertJob = async (job, client = db) =>
         INSERT INTO job (uuid, user_id, survey_id, props, parent_id)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING *`,
-    [job.uuid, job.userId, job.surveyId, job.props, job.parentId],
+    [job.uuid, job.userId, job.surveyId, {name: job.name}, job.parentId],
     camelize
   )
 
@@ -24,11 +24,21 @@ const fetchJobById = async (id, client = db) =>
     camelize
   )
 
+const fetchJobsByParentId = async (parentId, client = db) =>
+  await client.any(
+      `SELECT * FROM job
+     WHERE parent_id = $1
+     ORDER BY id`,
+    [parentId],
+    camelize
+  )
+
 const fetchActiveJobByUserId = async (userId, client = db) =>
   await client.oneOrNone(
     `SELECT * FROM job
      WHERE user_id = $1
-       AND status IN ('${jobStatus.pending}', '${jobStatus.running}')`,
+       AND status IN ('${jobStatus.pending}', '${jobStatus.running}')
+       AND parent_id is null`,
     [userId],
     camelize
   )
@@ -74,6 +84,7 @@ module.exports = {
   insertJob,
   //READ
   fetchJobById,
+  fetchJobsByParentId,
   fetchActiveJobByUserId,
   //UPDATE
   updateJobProgress,

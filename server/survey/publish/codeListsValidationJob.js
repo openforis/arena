@@ -10,7 +10,7 @@ const CodeListManager = require('../../codeList/codeListManager')
 class CodeListsValidationJob extends Job {
 
   constructor (userId, surveyId) {
-    super(userId, surveyId, 'code lists validation')
+    super(userId, surveyId, 'code-lists-validation')
   }
 
   async execute () {

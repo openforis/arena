@@ -14,7 +14,7 @@ import { initApp } from './actions'
 import { getUser, isReady } from './appState'
 import { getLocationPathname } from '../appUtils/routerUtils'
 
-import jobSocketEvents from '../../common/job/jobSocketEvents'
+import { jobEvents } from '../../common/ws/wsEvents'
 import { openSocket, closeSocket, onSocketEvent } from './appWebSocket'
 import { activeJobUpdate } from '../appModules/appView/components/job/actions'
 
@@ -31,8 +31,9 @@ class AppRouterSwitch extends React.Component {
     const {user: prevUser} = prevProps
 
     if (user && !prevUser) {
-      openSocket()
-      onSocketEvent(jobSocketEvents.update, this.props.activeJobUpdate)
+      openSocket({
+        [jobEvents.update]: this.props.activeJobUpdate
+      })
     } else if (prevUser && !user) {
       closeSocket()
     }

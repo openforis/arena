@@ -1,21 +1,22 @@
-const path = require('path')
-const {Worker} = require('worker_threads')
+const R = require('ramda')
+
+const db = require('../db/db')
 
 const {throttle} = require('../../common/functionsDefer')
+const {jobEvents} = require('../../common/ws/wsEvents')
 
-const jobSocketEvents = require('../../common/job/jobSocketEvents')
+const JobRepository = require('./jobRepository')
+const {jobStatus, jobToJSON} = require('./jobUtils')
 
-const userSockets = {}
-const userJobs = {}
+// ==== USER SOCKETS
 
-/**
- * ====== JOB CACHE
- */
-const addJobToCache = job => userJobs['' + job.userId] = job
+let userSockets = {}
 
-const removeJobFromCache = userId => delete userJobs['' + userId]
+const getUserSockets = userId => R.prop(userId, userSockets)
 
-const getJobFromCache = userId => userJobs[userId]
+const addUserSocket = (userId, socket) => userSockets = R.assocPath([userId, socket.id], socket, userSockets)
+
+const deleteUserSocket = (userId, socketId) => userSockets = R.dissocPath([userId, socketId], userSockets)
 
 const init = (io) => {
 
@@ -23,45 +24,98 @@ const init = (io) => {
     // Send a JOB_UPDATE message if the user has an active job
     const userId = socket.request.session.passport.user
     if (userId) {
-      userSockets[userId] = socket
+      addUserSocket(userId, socket)
 
-      const job = getJobFromCache(userId)
+      const job = await fetchActiveJobByUserId(userId)
 
       if (job) {
-        notifyUser(job)
+        notifyJobUpdate(job)
       }
 
       socket.on('disconnect', () => {
-        delete userSockets[userId]
+        deleteUserSocket(userId, socket.id)
       })
     }
   })
 
 }
 
-const notifyUser = (job) => {
-  const socket = userSockets[job.userId]
-  if (socket)
-    throttle((job) => socket.emit(jobSocketEvents.update, job.toJSON()), `socket_${job.id}`, 250)(job)
-}
-
-const cancelActiveJobByUserId = async (userId) => {
-  const job = getJobFromCache(userId)
-  if (job && !job.isEnded()) {
-    job.cancel()
+const notifyJobUpdate = async job => {
+  const sockets = getUserSockets(job.userId)
+  if (sockets && !R.isEmpty(sockets)) {
+    R.forEachObjIndexed((socket) => {
+      throttle(job => socket.emit(jobEvents.update, jobToJSON(job)), `socket_${socket.id}`, 250)(job)
+    }, sockets)
   }
 }
 
-const executeJobThread = (jobType, params) => {
-  const worker = new Worker(path.resolve(__dirname, 'jobThread.js'), {workerData: {jobType, params}})
+const assocInnerJobs = async job => {
+  if (job) {
+    const innerJobs = await JobRepository.fetchJobsByParentId(job.id)
 
-  worker.on('message', msg => {
-    console.log('job started', msg)
-  })
+    return {
+      ...job,
+      innerJobs
+    }
+  } else {
+    return null
+  }
+}
+
+// ====== CREATE
+
+const insertJobAndInnerJobs = async (job, t) => {
+  const jobDb = await JobRepository.insertJob(job, t)
+  job.id = jobDb.id
+  job.masterJobId = job.masterJobId ? job.masterJobId : job.id
+
+  for (const innerJob of job.innerJobs) {
+    innerJob.parentId = job.id
+    innerJob.masterJobId = job.masterJobId
+    await insertJobAndInnerJobs(innerJob, t)
+  }
+}
+
+const insertJob = async (job) => {
+  await db.tx(async t =>
+    await insertJobAndInnerJobs(job, t)
+  )
+}
+
+// ====== READ
+
+const fetchActiveJobByUserId = async userId => {
+  const job = await JobRepository.fetchActiveJobByUserId(userId)
+  return await assocInnerJobs(job)
+
+}
+
+const fetchJobById = async id => {
+  const job = await JobRepository.fetchJobById(id)
+  return await assocInnerJobs(job)
+}
+
+// ====== UPDATE
+
+const cancelActiveJobByUserId = async (userId) => {
+  const job = await JobRepository.fetchActiveJobByUserId(userId)
+  if (job &&
+    job.status !== jobStatus.succeeded &&
+    job.status !== jobStatus.failed &&
+    job.status !== jobStatus.canceled) {
+    await JobRepository.updateJobStatus(job.id, jobStatus.canceled, job.total, job.processed)
+  }
 }
 
 module.exports = {
-  executeJobThread,
   init,
+  notifyJobUpdate,
+  //CREATE
+  insertJob,
+  //READ
+  fetchJobById,
+  //UPDATE
+  updateJobStatus: JobRepository.updateJobStatus,
+  updateJobProgress: JobRepository.updateJobProgress,
   cancelActiveJobByUserId,
 }

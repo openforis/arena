@@ -1,64 +1,78 @@
-const {isMainThread, parentPort, workerData} = require('worker_threads')
+const {Worker, isMainThread, parentPort, workerData} = require('worker_threads')
 
-const db = require('../db/db')
 const {throttle} = require('../../common/functionsDefer')
 
-const jobRepository = require('./jobRepository')
-const {getJobClass} = require('./jobProps')
+const {jobTypes, jobEvents} = require('./jobUtils')
+const JobManager = require('./jobManager')
+
+const SurveyPublishJob = require('../survey/publish/surveyPublishJob')
+const TaxonomyImportJob = require('../taxonomy/taxonomyImportJob')
+
+const getJobClass = jobType => {
+  switch (jobType) {
+    case jobTypes.surveyPublish:
+      return SurveyPublishJob
+    case jobTypes.taxonomyImport:
+      return TaxonomyImportJob
+  }
+}
 
 const startJob = async (job) => {
-  await db.tx(async t =>
-    await insertJobAndInnerJobs(job, t)
-  )
+  await JobManager.insertJob(job)
 
-  // addJobToCache(job)
+  parentPort.postMessage({type: jobEvents.created, masterJobId: job.id, jobId: job.id, userId: job.userId})
 
   job
-    .onEvent(async jobEvent => {
-      parentPort.postMessage(jobEvent)
-
-      if (jobEvent.type === jobEvents.statusChange) {
-        await updateJobStatusFromEvent(jobEvent)
-      } else {
-        await updateJobProgress(jobEvent.jobId, jobEvent.total, jobEvent.processed)
-      }
-
-      // notifyUser(job)
-
-      // if (job.isEnded()) {
-      //   removeJobFromCache(job.userId)
-      // }
-
-    })
+    .onEvent(handleJobEvent)
     .start()
 }
 
-const insertJobAndInnerJobs = async (job, t) => {
-  const jobDb = await jobRepository.insertJob(job, t)
-  job.id = jobDb.id
+const handleJobEvent = async jobEvent => {
+  const {jobId, status, total, processed, result = {}, errors = {}} = jobEvent
 
-  for (const innerJob of job.innerJobs) {
-    innerJob.parentId = job.id
-    await insertJobAndInnerJobs(innerJob, t)
+  if (jobEvent.type === jobEvents.statusChange) {
+    await JobManager.updateJobStatus(jobId, status, total, processed, {result, errors})
+  } else {
+    throttle(JobManager.updateJobProgress, `job_${jobId}`, 1000)(jobId, total, processed)
   }
 
-  return jobDb
+  parentPort.postMessage(jobEvent)
 }
 
-const updateJobStatusFromEvent = async jobEvent => {
-  const {jobId, status, total, processed, result = {}, errors = {}} = jobEvent
-  await jobRepository.updateJobStatus(jobId, status, total, processed, {result, errors})
+/**
+ * Runs in main thread
+ */
+const executeJobThread = (jobType, params) => {
+  return new Promise((resolve) => {
+    const worker = new Worker(__filename, {workerData: {jobType, params}})
+
+    worker.on('message', async jobEvent => {
+      if (jobEvent.type === jobEvents.creationFailed) {
+        resolve(null) //TODO handle errors from caller
+      } else {
+        const job = await JobManager.fetchJobById(jobEvent.masterJobId)
+
+        if (jobEvent.type === jobEvents.created) {
+          resolve(job)
+        }
+
+        JobManager.notifyJobUpdate(job)
+      }
+    })
+  })
 }
 
-const updateJobProgress = async (jobId, total, processed) => {
-  throttle(jobRepository.updateJobProgress, `job_${jobId}`, 1000)(jobId, total, processed)
-}
-
+/**
+ * Runs in worker thread
+ */
 if (!isMainThread) {
   const {params, jobType} = workerData
   const jobClass = getJobClass(jobType)
 
   const job = new jobClass(params)
-  // job.start()
   startJob(job)
+}
+
+module.exports = {
+  executeJobThread,
 }

@@ -10,7 +10,7 @@ const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 class SurveyPropsPublishJob extends Job {
 
   constructor (userId, surveyId) {
-    super(userId, surveyId, 'publish survey attributes')
+    super(userId, surveyId, 'survey-props-publish')
   }
 
   async execute () {
