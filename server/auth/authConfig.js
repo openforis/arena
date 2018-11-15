@@ -2,7 +2,7 @@ const passport = require('passport')
 
 const localStrategy = require('./authConfigLocalStrategy')
 
-const {findUserById} = require('../user/userRepository')
+const {findUserById} = require('../user/userManager')
 
 module.exports.init = app => {
 

@@ -1,6 +1,5 @@
 const {sendErr, sendOk} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
-const {getUserRolesForSurvey} = require('../authGroup/authGroupRepository')
 
 const {
   createNodeDef,

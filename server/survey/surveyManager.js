@@ -15,7 +15,7 @@ const nodeDefRepository = require('../nodeDef/nodeDefRepository')
 const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
 const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/nodeDefLayout')
 
-const {deleteUserPref, updateUserPref} = require('../user/userRepository')
+const {deleteUserPref, updateUserPref} = require('../user/userManager')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
 const {getDefaultSurveyGroups} = require('../../common/auth/authGroups')
