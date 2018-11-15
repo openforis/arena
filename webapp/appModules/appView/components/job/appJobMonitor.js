@@ -6,7 +6,6 @@ import { connect } from 'react-redux'
 import {
   Modal,
   ModalBody,
-  ModalHeader,
   ModalFooter,
 } from '../../../../commonComponents/modal'
 
@@ -15,42 +14,31 @@ import AppJobErrors from './appJobErrors'
 import { cancelActiveJob, hideAppJobMonitor } from './actions'
 import { getActiveJob } from './appJobState'
 
-const ProgressBar = ({progress, className}) => (
-  <div className={`progress-bar ${className ? className : ''}`}>
+const ProgressBar = ({progress, className = ''}) => (
+  <div className={`progress-bar ${className}`}>
     <div className="filler" style={{width: `${progress}%`}}/>
+    <span className="progress">({progress}%)</span>
   </div>
 )
 
-const JobStatus = ({job}) => {
-  return <div className="app-job-monitor">
-    <h4 className="app-job-monitor__status">{job.status}
-      {
-        job.running && job.jobProgressPercent < 100 &&
-        <span> ({job.progressPercent}%)</span>
-      }
-    </h4>
-    <ProgressBar progress={job.progressPercent} className={job.failed ? 'error' : ''}/>
-    <AppJobErrors job={job}/>
-  </div>
-}
-
-const InnerJobStatus = ({innerJob}) =>
-  <div className={`inner-job${innerJob.failed ? ' failed' : ''}`}>
-    <div className="header">{innerJob.name}</div>
-    <JobStatus job={innerJob}/>
-  </div>
+const JobProgress = ({job}) =>
+  <ProgressBar progress={job.progressPercent} className={job.status}/>
 
 const InnerJobs = ({innerJobs}) =>
-  <div className="app-job-monitor_inner-jobs">
-    <div className="header">Inner Jobs</div>
-    <div className="inner-jobs-wrapper">
-      {
-        innerJobs.map(innerJob => (
-          <InnerJobStatus key={innerJob.uuid}
-                          innerJob={innerJob}/>
-        ))
-      }
-    </div>
+  innerJobs.length > 0 &&
+  <div className="app-job-monitor__inner-jobs">
+    {
+      innerJobs.map((innerJob, i) => (
+        <React.Fragment>
+          <div key={i}
+               className="job">
+            <div className="name">{i + 1}. {innerJob.name}</div>
+            <JobProgress job={innerJob}/>
+          </div>
+          <AppJobErrors job={innerJob}/>
+        </React.Fragment>
+      ))
+    }
   </div>
 
 class AppJobMonitor extends React.Component {
@@ -60,19 +48,14 @@ class AppJobMonitor extends React.Component {
     const innerJobs = job ? job.innerJobs : null
     return job && !job.canceled
       ? (
-        <Modal isOpen="true">
-
-          <ModalHeader>
-            <div className="app-job-monitor__header">Job: {job.name}</div>
-          </ModalHeader>
+        <Modal className="app-job-monitor">
 
           <ModalBody>
-            <JobStatus job={job}/>
-            {
-              innerJobs.length > 0 &&
-              <InnerJobs innerJobs={innerJobs}/>
-            }
+            <div className="app-job-monitor__header">Job: {job.name}</div>
+            <JobProgress job={job}/>
+            <AppJobErrors job={job}/>
 
+            <InnerJobs innerJobs={innerJobs}/>
           </ModalBody>
 
           <ModalFooter>
