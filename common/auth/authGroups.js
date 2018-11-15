@@ -1,3 +1,19 @@
+const permissions = {
+  surveyCreate: 'surveyCreate',
+  // only owner and administrator can delete survey
+  // edit survey info props, edit nodeDefs, edit codeLists, edit taxonomies, publishSurvey
+  surveyEdit: 'surveyEdit',
+
+  recordCreate: 'recordCreate',
+  recordDataEdit: 'recordDataEdit',
+  recordView: 'recordView',
+
+  userInvite: 'userInvite',
+
+  // only owner and admin - for now
+  permissionsEdit: 'permissionsEdit',
+}
+
 const groupNames = {
   surveyAdmin: 'survey Admin',
   surveyEditor: 'surveyEditor',

@@ -12,11 +12,11 @@ const findUserById = async (userId, client = db) => {
     SELECT ${selectFieldsCommaSep} FROM "user" WHERE id = $1
   `, [userId])
 
-  const roles = await client.any(`
-    SELECT role FROM user_role WHERE user_id = $1
+  const groups = await client.any(`
+    SELECT * FROM auth_group_user WHERE user_id = $1
   `, [user.id])
 
-  return {...user, roles}
+  return {...user, groups}
 }
 
 const findUserByEmailAndPassword = async (email, password) => {
