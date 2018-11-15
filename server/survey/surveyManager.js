@@ -15,11 +15,12 @@ const nodeDefRepository = require('../nodeDef/nodeDefRepository')
 const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
 const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/nodeDefLayout')
 
-const {deleteUserPref, updateUserPref} = require('../user/userManager')
+const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const {getDefaultSurveyGroups} = require('../../common/auth/authGroups')
-const {createGroup} = require('../authGroup/authGroupRepository')
+const { groupNames } = require('../../common/auth/authGroups')
+const {createDefaultSurveyGroups, addUserToGroup, addSurveyToGroup} = require('../authGroup/authGroupRepository')
+const { isSystemAdmin } = require('../../common/auth/authManager')
 
 const JobManager = require('../job/jobManager')
 
@@ -56,22 +57,16 @@ const createSurvey = async (user, {name, label, lang}) => {
       }
       await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
-      // create default groups for this survey
-      const surveyGroups = getDefaultSurveyGroups(Survey.getName(survey), lang)
-
-      surveyGroups.forEach(async (defaultGroup) => {
-        const {name, permissions, labels, descriptions} = defaultGroup
-        const {id: groupId} = await createGroup(name, permissions, labels, descriptions, t)
-
-        // if (name === roles.surveyAdmin) {
-        //   // TODO don't insert if the user belong to system administrators
-        //   addUserToGroup(groupId, userId, t)
-        // }
-        // addSurveyToGroup(groupId, surveyId, t)
-      })
-
       // update user prefs
       await updateUserPref(user, userPrefNames.survey, surveyId, t)
+
+      // create default groups for this survey
+      const groups = await createDefaultSurveyGroups(Survey.getName(survey), lang, t)
+      await t.batch(groups.map(g => addSurveyToGroup(g.id, surveyId, t)))
+      if (!isSystemAdmin(user)) {
+        surveyAdminGroup = groups.find(g => g.name === groupNames.surveyAdmin)
+        await addUserToGroup(surveyAdminGroup.id, user.id, t)
+      }
 
       return survey
     }

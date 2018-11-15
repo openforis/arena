@@ -1,51 +1,54 @@
 const db = require('../db/db')
 
-// in sql queries, group table must be surrounded by "" e.g. "group"
+const Promise = require('bluebird')
+
+const {getDefaultSurveyGroups} = require('../../common/auth/authGroups')
 
 // ==== CREATE
 
-const createGroup = async (name, permissions, labels, descriptions, client = db) => {
-  return await client.one(`
-    INSERT INTO 
-      auth_group (name, permissions, labels, descriptions)
-    VALUES 
-      ($1, $2, $3, $4)
-    RETURNING *
-    `,
-    [name, JSON.stringify(permissions), labels, descriptions]
-  )
+const createGroup = (name, permissions, labels, descriptions, client = db) =>
+  client.one(`
+    INSERT INTO auth_group (name, permissions, labels, descriptions)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *`,
+    [name, JSON.stringify(permissions), labels, descriptions])
+
+const createDefaultSurveyGroups = (surveyName, lang, client = db) => {
+  const surveyGroups = getDefaultSurveyGroups(surveyName, lang)
+  return client.batch(surveyGroups.map(
+    ({name, permissions, labels, descriptions}) => createGroup(name, permissions, labels, descriptions, client)))
 }
 
 // ==== READ
-// const getUserRolesForSurvey = async (userId, surveyId, client = db) =>
-//   await client.one(`
-//     SELECT permissions FROM survey
-//     JOIN survey_group sg ON sg.survey_id = $1
-//     JOIN user_group ug ON ug.user_id = $2 AND ug.group_id = sg.group_id
-//     JOIN "group" ON "group".id = sg.group_id
-//     JOIN group_role ON "group".role_id = group_role.id
-//     WHERE survey.id = 1`,
-//     [surveyId, userId])
+const getUserGroups = (userId, client = db) =>
+  client.any(`
+    SELECT auth_group.* 
+    FROM auth_group_user, auth_group 
+    WHERE auth_group_user.user_id = $1 
+    AND auth_group.id = auth_group_user.group_id`,
+    userId)
 
-// const findGroupById = async (groupId, client = db) => {
-//   const group = await client.one(`
-//     SELECT * FROM "group" WHERE id = $1`, [groupId])
 
-//   return group
-// }
+getSurveyGroups = (surveyId, client = db) =>
+  client.any(`
+    SELECT auth_group.* 
+    FROM auth_group_survey, auth_group 
+    WHERE auth_group_survey.survey_id = $1 
+    AND auth_group.id = auth_group_survey.group_id`,
+    surveyId)
 
-// // ==== UPDATE
+// ==== UPDATE
 
-addUserToGroup = async (groupId, userId, client = db) =>
-  await client.one(`
-    INSERT INTO "user_group" (group_id, user_id)
+addUserToGroup = (groupId, userId, client = db) =>
+  client.one(`
+    INSERT INTO auth_group_user (group_id, user_id)
     VALUES ($1, $2)
     RETURNING *`,
     [groupId, userId])
 
-addSurveyToGroup = async (groupId, surveyId, client = db) =>
-  await client.one(`
-    INSERT INTO "survey_group" (group_id, survey_id)
+addSurveyToGroup = (groupId, surveyId, client = db) =>
+  client.one(`
+    INSERT INTO auth_group_survey (group_id, survey_id)
     VALUES ($1, $2)
     RETURNING *`,
     [groupId, surveyId])
@@ -55,14 +58,14 @@ addSurveyToGroup = async (groupId, surveyId, client = db) =>
 module.exports = {
   // CREATE
   createGroup,
+  createDefaultSurveyGroups,
 
   // READ
-  // getUserRolesForSurvey,
+  getUserGroups,
+  getSurveyGroups,
   // findGroupById,
 
-  // // UPDATE
-  addUserToGroup,
-  addSurveyToGroup
+  // UPDATE
 
   // DELETE
 }

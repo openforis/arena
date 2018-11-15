@@ -52,11 +52,13 @@ CREATE TABLE
 
 
 
-INSERT INTO auth_group (name, labels, descriptions)
+INSERT INTO auth_group (name, labels, descriptions, permissions, data_steps)
 VALUES (
-    'admin',
+    'systemAdmin',
     '{"en": "System Administrators"}',
-    '{"en": "OF Arena system administrators"}'
+    '{"en": "OF Arena system administrators"}',
+    NULL,
+    NULL
 );
 
 

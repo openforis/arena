@@ -1,26 +1,25 @@
 const db = require('../db/db')
 const {comparePassword} = require('./userUtils')
 
+const {getUserGroups} = require('../authGroup/authGroupRepository')
+
 const selectFields = ['id', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.join(',')
 
 // in sql queries, user table must be surrounded by "" e.g. "user"
 
 // ==== READ
+
 const findUserById = async (userId, client = db) => {
   const user = await client.one(`
     SELECT ${selectFieldsCommaSep} FROM "user" WHERE id = $1
   `, [userId])
-
-  const groups = await client.any(`
-    SELECT * FROM auth_group_user WHERE user_id = $1
-  `, [user.id])
-
-  return {...user, groups}
+  
+  return user
 }
 
-const findUserByEmailAndPassword = async (email, password) => {
-  const userPwd = await db.oneOrNone(`
+const findUserByEmailAndPassword = async (email, password, client = db) => {
+  const userPwd = await client.oneOrNone(`
     SELECT id, password 
     FROM "user" 
     WHERE LOWER(email) = LOWER($1)`

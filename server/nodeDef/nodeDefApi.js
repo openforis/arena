@@ -8,7 +8,7 @@ const {
 } = require('./nodeDefManager')
 
 const {fetchSurveyNodeDefs} = require('./../survey/surveyManager')
-const {canEdit} = require('../authGroup/authGroupManager')
+const {getUserPermissionsForSurvey, canEditSurvey} = require('../authGroup/authGroupManager')
 
 module.exports.init = app => {
 
@@ -21,8 +21,8 @@ module.exports.init = app => {
 
       // Check if user can edit
       console.log('-----------------')
-      console.log(await canEdit(user, surveyId))
-
+      console.log(await getUserPermissionsForSurvey(user.id, surveyId))
+      console.log(await canEditSurvey(user.id, surveyId))
 
       const nodeDef = await createNodeDef(surveyId, parentId, uuid, type, props)
 
