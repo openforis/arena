@@ -5,7 +5,6 @@ const {migrateSurveySchema} = require('../db/migration/dbMigrator')
 const {uuidv4} = require('../../common/uuid')
 
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
-const {roles} = require('../../common/group/defaults')
 
 const surveyRepository = require('../survey/surveyRepository')
 const Survey = require('../../common/survey/survey')
@@ -19,8 +18,8 @@ const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/no
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const {getDefaultSurveyGroups} = require('../group/groupUtils')
-const {createGroup, addUserToGroup, addSurveyToGroup} = require('../group/groupRepository')
+const {getDefaultSurveyGroups} = require('../../common/auth/authGroups')
+const {createGroup} = require('../authGroup/authGroupRepository')
 
 const JobManager = require('../job/jobManager')
 
@@ -47,19 +46,6 @@ const createSurvey = async (user, {name, label, lang}) => {
       const survey = await surveyRepository.insertSurvey(props, userId, t)
       const {id: surveyId} = survey
 
-      // create default groups for this survey
-      getDefaultSurveyGroups(Survey.getName(survey), lang)
-        .forEach(async (defaultGroup) => {
-          const {labels, descriptions, role, dataCondition} = defaultGroup
-          const {id: groupId} = await createGroup(labels, descriptions, role, dataCondition, t)
-
-          if (role === roles.surveyAdmin) {
-            // TODO don't insert if the user belong to system administrators
-            addUserToGroup(groupId, userId, t)
-          }
-          addSurveyToGroup(groupId, surveyId, t)
-        })
-
       // create survey's root entity props
       const rootEntityDefProps = {
         name: 'root_entity',
@@ -69,6 +55,20 @@ const createSurvey = async (user, {name, label, lang}) => {
         [nodeDefLayoutProps.render]: nodeDefRenderType.form,
       }
       await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
+
+      // create default groups for this survey
+      const surveyGroups = getDefaultSurveyGroups(Survey.getName(survey), lang)
+
+      surveyGroups.forEach(async (defaultGroup) => {
+        const {name, permissions, labels, descriptions} = defaultGroup
+        const {id: groupId} = await createGroup(name, permissions, labels, descriptions, t)
+
+        // if (name === roles.surveyAdmin) {
+        //   // TODO don't insert if the user belong to system administrators
+        //   addUserToGroup(groupId, userId, t)
+        // }
+        // addSurveyToGroup(groupId, surveyId, t)
+      })
 
       // update user prefs
       await updateUserPref(user, userPrefNames.survey, surveyId, t)

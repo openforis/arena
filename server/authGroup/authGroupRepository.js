@@ -2,20 +2,22 @@ const db = require('../db/db')
 
 // in sql queries, group table must be surrounded by "" e.g. "group"
 
-
 // ==== CREATE
 
-const createGroup = async (labels, descriptions, role, dataCondition, client = db) => {
+const createGroup = async (name, permissions, labels, descriptions, client = db) => {
   return await client.one(`
-    INSERT INTO "group" (labels, descriptions, role_id, data_condition)
-    SELECT $1, $2, group_role.id, $4 FROM group_role WHERE group_role.role = $3
-    --VALUES ($1, $2, SELECT id FROM group_role WHERE role=$3, $4)
-    RETURNING *`,
-  [labels, descriptions, role, dataCondition])
+    INSERT INTO 
+      auth_group (name, permissions, labels, descriptions)
+    VALUES 
+      ($1, $2, $3, $4)
+    RETURNING *
+    `,
+    [name, JSON.stringify(permissions), labels, descriptions]
+  )
 }
 
 // ==== READ
-const getUserRolesForSurvey = async (userId, surveyId, client=db) =>
+const getUserRolesForSurvey = async (userId, surveyId, client = db) =>
   await client.one(`
     SELECT permissions FROM survey
     JOIN survey_group sg ON sg.survey_id = $1

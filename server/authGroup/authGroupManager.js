@@ -1,5 +1,4 @@
-const {getUserRolesForSurvey} = require('./groupRepository')
-const {roles} = require('../../common/group/defaults')
+const {getUserRolesForSurvey} = require('./authGroupRepository')
 
 const canEdit = async function (user, surveyId) {
   const permissions = await getUserRolesForSurvey(user.id, surveyId)

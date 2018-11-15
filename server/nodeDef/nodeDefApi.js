@@ -1,6 +1,6 @@
 const {sendErr, sendOk} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
-const {getUserRolesForSurvey} = require('../group/groupRepository')
+const {getUserRolesForSurvey} = require('../authGroup/authGroupRepository')
 
 const {
   createNodeDef,
@@ -9,7 +9,7 @@ const {
 } = require('./nodeDefManager')
 
 const {fetchSurveyNodeDefs} = require('./../survey/surveyManager')
-const {canEdit} = require('./../group/groupManager')
+const {canEdit} = require('../authGroup/authGroupManager')
 
 module.exports.init = app => {
 
