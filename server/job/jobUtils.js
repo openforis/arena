@@ -42,21 +42,25 @@ const calculateProgress = job => {
   }
 }
 
-const jobToJSON = job => ({
-  ...job,
+const jobToJSON = job =>
+  R.dissoc('props', {
+    ...job,
 
-  innerJobs: R.map(j => jobToJSON(j), R.propOr([], 'innerJobs', job)),
+    innerJobs: R.map(j => jobToJSON(j), R.propOr([], 'innerJobs', job)),
 
-  //STATUS
-  pending: job.status === jobStatus.pending,
-  running: job.status === jobStatus.running,
-  succeeded: job.status === jobStatus.succeeded,
-  canceled: job.status === jobStatus.canceled,
-  failed: job.status === jobStatus.failed,
-  ended: R.contains(job.status, [jobStatus.succeeded, jobStatus.canceled, jobStatus.failed]),
+    errors: R.propOr(R.pathOr({}, ['props', 'errors'], job), 'errors', job),
 
-  progressPercent: calculateProgress(job),
-})
+    //STATUS
+    status: job.status,
+    pending: job.status === jobStatus.pending,
+    running: job.status === jobStatus.running,
+    succeeded: job.status === jobStatus.succeeded,
+    canceled: job.status === jobStatus.canceled,
+    failed: job.status === jobStatus.failed,
+    ended: R.contains(job.status, [jobStatus.succeeded, jobStatus.canceled, jobStatus.failed]),
+
+    progressPercent: calculateProgress(job),
+  })
 
 module.exports = {
   jobStatus,

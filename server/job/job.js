@@ -1,5 +1,3 @@
-const R = require('ramda')
-
 const {jobEvents, jobStatus} = require('./jobUtils')
 
 const {uuidv4} = require('../../common/uuid')
@@ -18,14 +16,14 @@ class JobEvent {
 
 class Job {
 
-  constructor (userId, surveyId, name, innerJobs = []) {
+  constructor (type, userId, surveyId, innerJobs = []) {
     this.id = null
     this.parentId = null
     this.masterJobId = null //id of the master job (parentId === null for that job)
     this.uuid = uuidv4()
     this.userId = userId
     this.surveyId = surveyId
-    this.name = name
+    this.type = type
     this.status = jobStatus.pending
     this.startTime = null
     this.endTime = null
@@ -136,18 +134,6 @@ class Job {
     }
   }
 
-  getProgressPercent () {
-    const partial = this.status === jobStatus.succeeded ?
-      100
-      : this.total > 0 ?
-        Math.floor(100 * this.processed / this.total)
-        : 0
-
-    return this.innerJobs.length === 0 || this.currentInnerJobIndex < 0 || partial === 100 ?
-      partial
-      : partial + Math.floor(this.innerJobs[this.currentInnerJobIndex].getProgressPercent() / this.total)
-  }
-
   setStatus (status) {
     this.status = status
 
@@ -182,6 +168,4 @@ class Job {
   }
 }
 
-module.exports = {
-  Job,
-}
+module.exports = Job

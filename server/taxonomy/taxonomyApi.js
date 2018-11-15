@@ -2,10 +2,9 @@ const {sendOk, sendErr} = require('../serverUtils/response')
 const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
-const {executeJobThread} = require('../job/jobThread')
-const {jobTypes} = require('../job/jobUtils')
-
+const JobManager = require('../job/jobManager')
 const TaxonomyManager = require('./taxonomyManager')
+const TaxonomyImportJob = require('./taxonomyImportJob')
 
 module.exports.init = app => {
 
@@ -115,7 +114,7 @@ module.exports.init = app => {
 
       const file = req.files.file
 
-      const job = await executeJobThread(jobTypes.taxonomyImport, {
+      const job = await JobManager.executeJobThread(TaxonomyImportJob, {
         userId: user.id,
         surveyId,
         taxonomyId,

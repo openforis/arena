@@ -98,6 +98,19 @@ const deleteSurvey = async (id, client = db) => {
   await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
 }
 
+const deleteSurveyLabel = async (id, langCode, client = db) =>
+  await deleteSurveyProp(id, ['labels', langCode], client)
+
+const deleteSurveyDescription = async (id, langCode, client = db) =>
+  await deleteSurveyProp(id, ['descriptions', langCode], client)
+
+const deleteSurveyProp = async (id, deletePath, client = db) =>
+  await client.none(`
+    UPDATE survey 
+    SET props = props #- '{${deletePath.join(',')}}'
+    WHERE id = $1`,
+    [id])
+
 module.exports = {
   // CREATE
   insertSurvey,
@@ -114,4 +127,6 @@ module.exports = {
 
   //DELETE
   deleteSurvey,
+  deleteSurveyLabel,
+  deleteSurveyDescription,
 }

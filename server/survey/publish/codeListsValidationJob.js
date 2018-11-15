@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const {Job} = require('../../job/job')
+const Job = require('../../job/job')
 
 const CodeList = require('../../../common/survey/codeList')
 const {isValid, getInvalidFieldValidations} = require('../../../common/validation/validator')
@@ -10,7 +10,7 @@ const CodeListManager = require('../../codeList/codeListManager')
 class CodeListsValidationJob extends Job {
 
   constructor (userId, surveyId) {
-    super(userId, surveyId, 'code-lists-validation')
+    super('code-lists-validation', userId, surveyId)
   }
 
   async execute () {

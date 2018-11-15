@@ -44,6 +44,10 @@ const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordId, clie
     , def => dbTransformCallback(def, true)
   )
 
+const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>
+  await client.none(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.${tableName} SET props = props #- '{${deletePath.join(',')}}'`)
+
 module.exports = {
   getSurveyDBSchema,
 
@@ -52,4 +56,5 @@ module.exports = {
 
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
+  deleteSurveySchemaTableProp,
 }

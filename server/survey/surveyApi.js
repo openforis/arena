@@ -12,7 +12,6 @@ const {
   fetchSurveyNodeDefs,
 
   updateSurveyProp,
-  publishSurvey,
 
   deleteSurvey,
 } = require('./surveyManager')
@@ -21,6 +20,10 @@ const {
   validateNewSurvey,
   validateSurvey,
 } = require('./surveyValidator')
+
+const JobManager = require('../job/jobManager')
+
+const SurveyPublishJob = require('./publish/surveyPublishJob')
 
 module.exports.init = app => {
 
@@ -108,8 +111,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'id')
       const user = req.user
 
-      const job = await publishSurvey(surveyId, user)
-
+      const job = await JobManager.executeJobThread(SurveyPublishJob, {userId: user.id, surveyId})
       res.json({job})
     } catch (err) {
       sendErr(res, err)

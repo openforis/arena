@@ -1,4 +1,6 @@
+const {Worker} = require('worker_threads')
 const R = require('ramda')
+const path = require('path')
 
 const db = require('../db/db')
 
@@ -21,7 +23,6 @@ const deleteUserSocket = (userId, socketId) => userSockets = R.dissocPath([userI
 const init = (io) => {
 
   io.on('connection', async socket => {
-    // Send a JOB_UPDATE message if the user has an active job
     const userId = socket.request.session.passport.user
     if (userId) {
       addUserSocket(userId, socket)
@@ -29,6 +30,7 @@ const init = (io) => {
       const job = await fetchActiveJobByUserId(userId)
 
       if (job) {
+        // Send a JOB_UPDATE message if the user has an active job
         notifyJobUpdate(job)
       }
 
@@ -74,12 +76,29 @@ const insertJobAndInnerJobs = async (job, t) => {
     innerJob.masterJobId = job.masterJobId
     await insertJobAndInnerJobs(innerJob, t)
   }
+
+  return job
 }
 
-const insertJob = async (job) => {
+const insertJob = async (job) =>
   await db.tx(async t =>
     await insertJobAndInnerJobs(job, t)
   )
+
+const executeJobThread = async (jobClass, params) => {
+  const job = new jobClass(params)
+
+  insertJob(job)
+    .then(() => {
+      const worker = new Worker(path.resolve(__dirname, 'jobThread.js'), {workerData: {job: jobToJSON(job), params}})
+
+      worker.on('message', async jobEvent => {
+        const job = await fetchJobById(jobEvent.masterJobId)
+        notifyJobUpdate(job)
+      })
+    })
+
+  return jobToJSON(job)
 }
 
 // ====== READ
@@ -109,7 +128,7 @@ const cancelActiveJobByUserId = async (userId) => {
 
 module.exports = {
   init,
-  notifyJobUpdate,
+  executeJobThread,
   //CREATE
   insertJob,
   //READ

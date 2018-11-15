@@ -1,8 +1,8 @@
-const {Worker, isMainThread, parentPort, workerData} = require('worker_threads')
+const {parentPort, workerData} = require('worker_threads')
 
 const {throttle} = require('../../common/functionsDefer')
 
-const {jobTypes, jobEvents, jobStatus, jobToJSON} = require('./jobUtils')
+const {jobTypes, jobEvents, jobStatus} = require('./jobUtils')
 const JobManager = require('./jobManager')
 
 const SurveyPublishJob = require('../survey/publish/surveyPublishJob')
@@ -17,6 +17,26 @@ const getJobClass = jobType => {
   }
 }
 
+const copyJobId = (fromJob, toJob) => {
+  toJob.id = fromJob.id
+  toJob.uuid = fromJob.uuid
+  toJob.masterJobId = fromJob.masterJobId
+
+  fromJob.innerJobs.forEach((fromInnerJob, idx) => {
+    const toInnerJob = toJob.innerJobs[idx]
+    copyJobId(fromInnerJob, toInnerJob)
+  })
+}
+
+const createJob = (jobData, params) => {
+  const jobClass = getJobClass(jobData.type)
+
+  const job = new jobClass(params)
+  copyJobId(jobData, job)
+
+  return job
+}
+
 const startCheckJobCanceledMonitor = job => {
   setTimeout(async () => {
     const reloadedJob = await JobManager.fetchJobById(job.id)
@@ -27,18 +47,6 @@ const startCheckJobCanceledMonitor = job => {
       startCheckJobCanceledMonitor(job)
     }
   }, 2000)
-}
-
-const createJob = async (jobType, params) => {
-  const jobClass = getJobClass(jobType)
-
-  const job = new jobClass(params)
-
-  parentPort.postMessage({type: jobEvents.created, job: jobToJSON(job)})
-
-  await JobManager.insertJob(job)
-
-  return job
 }
 
 const handleJobEvent = async jobEvent => {
@@ -53,41 +61,16 @@ const handleJobEvent = async jobEvent => {
   parentPort.postMessage(jobEvent)
 }
 
-/**
- * Runs in main thread
- */
-const executeJobThread = (jobType, params) => {
-  return new Promise((resolve) => {
-    const worker = new Worker(__filename, {workerData: {jobType, params}})
+const execute = () => {
+  const {job: jobData, params} = workerData
 
-    worker.on('message', async jobEvent => {
-      if (jobEvent.type === jobEvents.created) {
-        resolve(jobEvent.job)
-      } else {
-        const job = await JobManager.fetchJobById(jobEvent.masterJobId)
-        JobManager.notifyJobUpdate(job)
-      }
-    })
-  })
+  const job = createJob(jobData, params)
+
+  startCheckJobCanceledMonitor(job)
+
+  job
+    .onEvent(handleJobEvent)
+    .start()
 }
 
-/**
- * Runs in worker thread
- */
-if (!isMainThread) {
-  const {params, jobType} = workerData
-
-  createJob(jobType, params)
-    .then(job => {
-
-      startCheckJobCanceledMonitor(job)
-
-      job
-        .onEvent(handleJobEvent)
-        .start()
-    })
-}
-
-module.exports = {
-  executeJobThread,
-}
+execute()

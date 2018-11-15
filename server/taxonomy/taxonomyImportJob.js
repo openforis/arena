@@ -1,7 +1,8 @@
 const fastcsv = require('fast-csv')
 const R = require('ramda')
 
-const {Job} = require('../job/job')
+const Job = require('../job/job')
+const {jobTypes} = require('../job/jobUtils')
 
 const {languageCodes} = require('../../common/app/languages')
 const {isNotBlank} = require('../../common/stringUtils')
@@ -22,7 +23,7 @@ class TaxonomyImportJob extends Job {
   constructor (params) {
     const {userId, surveyId, taxonomyId, csvString} = params
 
-    super(userId, surveyId, 'taxonomy-import')
+    super(jobTypes.taxonomyImport, userId, surveyId)
 
     this.taxonomyId = taxonomyId
     this.csvString = csvString
@@ -37,7 +38,6 @@ class TaxonomyImportJob extends Job {
     }
 
     const validHeaders = await this.processHeaders()
-    console.log(`headers processed. valid: ${validHeaders}`)
 
     if (!validHeaders) {
       this.setStatusFailed()

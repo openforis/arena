@@ -1,4 +1,4 @@
-const {Job} = require('../../job/job')
+const Job = require('../../job/job')
 
 const {getInvalidFieldValidations} = require('../../../common/validation/validator')
 
@@ -8,7 +8,7 @@ const {validateSurvey} = require('../../survey/surveyValidator')
 class SurveyInfoValidationJob extends Job {
 
   constructor (userId, surveyId) {
-    super(userId, surveyId, 'survey-info-validation')
+    super('survey-info-validation', userId, surveyId)
   }
 
   async execute () {

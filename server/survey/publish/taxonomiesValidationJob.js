@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const {Job} = require('../../job/job')
+const Job = require('../../job/job')
 
 const Taxonomy = require('../../../common/survey/taxonomy')
 const {isValid, getInvalidFieldValidations} = require('../../../common/validation/validator')
@@ -9,7 +9,7 @@ const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
 class TaxonomiesValidationJob extends Job {
   constructor (userId, surveyId) {
-    super(userId, surveyId, 'taxonomies-validation')
+    super('taxonomies-validation', userId, surveyId)
   }
 
   async execute () {

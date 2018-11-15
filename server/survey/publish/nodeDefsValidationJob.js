@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const {Job} = require('../../job/job')
+const Job = require('../../job/job')
 
 const NodeDef = require('../../../common/survey/nodeDef')
 const {isValid, getInvalidFieldValidations} = require('../../../common/validation/validator')
@@ -11,7 +11,7 @@ const NodeDefRepository = require('../../nodeDef/nodeDefRepository')
 class NodeDefsValidationJob extends Job {
 
   constructor (userId, surveyId) {
-    super(userId, surveyId, 'node-defs-validation')
+    super('node-defs-validation', userId, surveyId)
   }
 
   async execute () {
