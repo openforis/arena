@@ -14,7 +14,17 @@ const createGroup = async (labels, descriptions, role, dataCondition, client = d
   [labels, descriptions, role, dataCondition])
 }
 
-// // ==== READ
+// ==== READ
+const getUserRolesForSurvey = async (userId, surveyId, client=db) =>
+  await client.one(`
+    SELECT permissions FROM survey
+    JOIN survey_group sg ON sg.survey_id = $1
+    JOIN user_group ug ON ug.user_id = $2 AND ug.group_id = sg.group_id
+    JOIN "group" ON "group".id = sg.group_id
+    JOIN group_role ON "group".role_id = group_role.id
+    WHERE survey.id = 1`,
+    [surveyId, userId])
+
 // const findGroupById = async (groupId, client = db) => {
 //   const group = await client.one(`
 //     SELECT * FROM "group" WHERE id = $1`, [groupId])
@@ -45,6 +55,7 @@ module.exports = {
   createGroup,
 
   // READ
+  getUserRolesForSurvey,
   // findGroupById,
 
   // // UPDATE

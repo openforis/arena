@@ -1,5 +1,6 @@
 const {sendErr, sendOk} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
+const {getUserRolesForSurvey} = require('../group/groupRepository')
 
 const {
   createNodeDef,
@@ -8,6 +9,7 @@ const {
 } = require('./nodeDefManager')
 
 const {fetchSurveyNodeDefs} = require('./../survey/surveyManager')
+const {canEdit} = require('./../group/groupManager')
 
 module.exports.init = app => {
 
@@ -15,8 +17,13 @@ module.exports.init = app => {
 
   app.post('/nodeDef', async (req, res) => {
     try {
-      const {body: nodeDefRequest} = req
+      const {body: nodeDefRequest, user} = req
       const {surveyId, parentId, uuid, type, props} = nodeDefRequest
+
+      // Check if user can edit
+      console.log('-----------------')
+      console.log(await canEdit(user, surveyId))
+
 
       const nodeDef = await createNodeDef(surveyId, parentId, uuid, type, props)
 

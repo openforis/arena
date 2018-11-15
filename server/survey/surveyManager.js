@@ -5,7 +5,7 @@ const {migrateSurveySchema} = require('../db/migration/dbMigrator')
 const {uuidv4} = require('../../common/uuid')
 
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
-const {rolesKey} = require('../../common/group/defaults')
+const {roles} = require('../../common/group/defaults')
 
 const surveyRepository = require('../survey/surveyRepository')
 const Survey = require('../../common/survey/survey')
@@ -25,6 +25,8 @@ const {createGroup, addUserToGroup, addSurveyToGroup} = require('../group/groupR
 const JobManager = require('../job/jobManager')
 
 const assocSurveyInfo = info => ({info})
+
+const canEditSurvey = (survey) => survey.permissions.includes('surveyEdit') // TODO use key isntead of 'surveyEdit'
 
 // ====== CREATE
 const createSurvey = async (user, {name, label, lang}) => {
@@ -51,9 +53,9 @@ const createSurvey = async (user, {name, label, lang}) => {
           const {labels, descriptions, role, dataCondition} = defaultGroup
           const {id: groupId} = await createGroup(labels, descriptions, role, dataCondition, t)
 
-          if (role === rolesKey.surveyAdmin) {
+          if (role === roles.surveyAdmin) {
             // TODO don't insert if the user belong to system administrators
-            await addUserToGroup(groupId, userId, t)
+            addUserToGroup(groupId, userId, t)
           }
           addSurveyToGroup(groupId, surveyId, t)
         })
@@ -99,8 +101,6 @@ const fetchUserSurveys = async (user) => R.map(
   assocSurveyInfo,
   R.filter(canEditSurvey, await surveyRepository.fetchSurveys(user.id))
 )
-
-const canEditSurvey = (survey) => survey.permissions.includes('surveyEdit') // TODO use key isntead of 'surveyEdit'
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
