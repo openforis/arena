@@ -137,7 +137,7 @@ class Job {
     return this
   }
 
-  isCancelled () {
+  isCanceled () {
     return this.status === jobStatus.canceled
   }
 

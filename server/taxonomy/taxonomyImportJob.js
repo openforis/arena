@@ -17,6 +17,59 @@ const requiredColumns = [
   'scientific_name',
 ]
 
+class CSVRowProvider {
+
+  constructor (csvString) {
+    this.currentRowData = null
+    this.canceled = false
+    this.csvStreamEnded = false
+
+    this.csvStream = fastcsv.fromString(csvString, {headers: true})
+      .on('data', data => this.onData(data))
+      .on('end', () => this.onStreamEnd())
+    this.csvStream.pause()
+  }
+
+  onData (data) {
+    this.csvStream.pause()
+
+    if (this.canceled) {
+      this.csvStream.destroy()
+      this.csvStreamEnded = true
+      this.currentRowData = null
+    } else {
+      this.currentRowData = data
+    }
+  }
+
+  onStreamEnd () {
+    this.csvStreamEnded = true
+  }
+
+  async next () {
+    return new Promise(resolve => {
+      if (this.csvStreamEnded) {
+        resolve(null)
+      } else {
+        this.currentRowData = null
+
+        setTimeout(() => {
+          if (this.currentRowData) {
+            resolve(this.currentRowData)
+          }
+        }, 30)
+
+        this.csvStream.resume()
+      }
+    })
+  }
+
+  cancel () {
+    this.canceled = true
+  }
+
+}
+
 class TaxonomyImportJob extends Job {
 
   constructor (params) {
@@ -26,11 +79,11 @@ class TaxonomyImportJob extends Job {
 
     this.taxonomyId = taxonomyId
     this.csvString = csvString
-
-    this.csvStreamEnded = false
   }
 
   async execute () {
+    const {surveyId, taxonomyId} = this
+
     this.result = {
       taxa: [],
       vernacularLanguageCodes: [],
@@ -44,21 +97,26 @@ class TaxonomyImportJob extends Job {
     }
     this.processed = 0
 
-    const csvStream = fastcsv.fromString(this.csvString, {headers: true})
-      .on('data', async data => {
-        csvStream.pause()
+    const csvRowProvider = new CSVRowProvider(this.csvString)
 
-        if (this.isCancelled()) {
-          csvStream.destroy()
-        } else {
-          await this.processRow(data)
-          csvStream.resume()
-        }
-      })
-      .on('end', () => {
-        this.csvStreamEnded = true
-        //do not throw immediately "end" event, last item still being processed
-      })
+    let row = await csvRowProvider.next()
+
+    while (row && !this.isCanceled()) {
+      if (this.isCanceled()) {
+        csvRowProvider.cancel()
+      } else {
+        await this.processRow(row)
+      }
+      row = await csvRowProvider.next()
+    }
+
+    const hasErrors = !R.isEmpty(R.keys(this.errors))
+    if (hasErrors) {
+      this.setStatusFailed()
+    } else {
+      await TaxonomyManager.persistTaxa(surveyId, taxonomyId, this.result.taxa, this.result.vernacularLanguageCodes)
+      this.setStatusSucceeded()
+    }
   }
 
   calculateTotal () {
@@ -87,7 +145,7 @@ class TaxonomyImportJob extends Job {
   }
 
   async processRow (data) {
-    const {result, surveyId, taxonomyId} = this
+    const {result} = this
 
     const taxonParseResult = await this.parseTaxon(data)
 
@@ -97,16 +155,6 @@ class TaxonomyImportJob extends Job {
       this.errors['' + (this.processed + 1)] = taxonParseResult.errors
     }
     this.incrementProcessedItems()
-
-    if (this.csvStreamEnded) {
-      const hasErrors = !R.isEmpty(R.keys(this.errors))
-      if (hasErrors) {
-        this.setStatusFailed()
-      } else {
-        await TaxonomyManager.persistTaxa(surveyId, taxonomyId, result.taxa, result.vernacularLanguageCodes)
-        this.setStatusSucceeded()
-      }
-    }
   }
 
   validateHeaders (columns) {
