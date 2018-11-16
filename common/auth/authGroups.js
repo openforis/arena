@@ -86,6 +86,7 @@ const getDefaultSurveyGroups = (surveyName, lang) => [
 ]
 
 module.exports = {
+  permissions,
   groupNames,
   getDefaultSurveyGroups
 }

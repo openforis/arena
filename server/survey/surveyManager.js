@@ -26,7 +26,7 @@ const JobManager = require('../job/jobManager')
 
 const assocSurveyInfo = info => ({info})
 
-const canEditSurvey = (survey) => true // survey.permissions.includes('surveyEdit') // TODO use key isntead of 'surveyEdit'
+const canEditSurvey = (survey) => true // TODO
 
 // ====== CREATE
 const createSurvey = async (user, {name, label, lang}) => {
@@ -64,7 +64,7 @@ const createSurvey = async (user, {name, label, lang}) => {
       const groups = await createDefaultSurveyGroups(Survey.getName(survey), lang, t)
       await t.batch(groups.map(g => addSurveyToGroup(g.id, surveyId, t)))
       if (!isSystemAdmin(user)) {
-        surveyAdminGroup = groups.find(g => g.name === groupNames.surveyAdmin)
+        const surveyAdminGroup = groups.find(g => g.name === groupNames.surveyAdmin)
         await addUserToGroup(surveyAdminGroup.id, user.id, t)
       }
 

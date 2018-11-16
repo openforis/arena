@@ -1,8 +1,6 @@
 const db = require('../db/db')
 const {comparePassword} = require('./userUtils')
 
-const {getUserGroups} = require('../authGroup/authGroupRepository')
-
 const selectFields = ['id', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.join(',')
 

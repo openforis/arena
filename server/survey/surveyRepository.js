@@ -35,17 +35,6 @@ const fetchSurveys = async (userId, client = db) =>
       s.*, ${selectDate('n.date_created', 'date_created')}, nm.date_modified
       --, gr.permissions
     FROM survey s
-
-    -- get user's permissions on this survey
---    JOIN survey_group sg
-  --    ON s.id = sg.survey_id
-    --JOIN user_group ug
-      --ON sg.group_id = ug.group_id AND ug.user_id = $1
-    --JOIN "group" g
-      --ON g.id = sg.group_id
-    --JOIN "group_role" gr
-      --ON gr.id = g.role_id
-
     JOIN node_def n
       ON s.id = n.survey_id
       AND n.parent_id IS NULL
