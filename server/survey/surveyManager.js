@@ -63,7 +63,7 @@ const createSurvey = async (user, {name, label, lang}) => {
       survey = R.assoc('authGroups', authGroups, survey)
 
       if (!isSystemAdmin(user)) {
-        await authGroupRepository.addUserToGroup(Survey.getAuthGroupAdmin(Survey.getSurveyInfo(survey)).id, user.id, t)
+        await authGroupRepository.insertUserGroup(Survey.getAuthGroupAdmin(Survey.getSurveyInfo(survey)).id, user.id, t)
       }
 
       return survey
@@ -79,13 +79,9 @@ const createSurvey = async (user, {name, label, lang}) => {
 // ====== READ
 const fetchSurveyById = async (id, draft = false, validate = false) => {
   const survey = await surveyRepository.getSurveyById(id, draft)
-  // const codeLists = await fetchCodeListsBySurveyId(id, draft)
-  // const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
 
   return assocSurveyInfo({
     ...survey,
-    // codeLists: toUUIDIndexedObj(codeLists),
-    // taxonomies: toUUIDIndexedObj(taxonomies),
     validation: validate ? await validateSurvey(survey) : null
   })
 }

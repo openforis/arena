@@ -8,13 +8,10 @@ const selectFieldsCommaSep = selectFields.join(',')
 
 // ==== READ
 
-const findUserById = async (userId, client = db) => {
-  const user = await client.one(`
+const findUserById = async (userId, client = db) =>
+  await client.one(`
     SELECT ${selectFieldsCommaSep} FROM "user" WHERE id = $1
   `, [userId])
-  
-  return user
-}
 
 const findUserByEmailAndPassword = async (email, password, client = db) => {
   const userPwd = await client.oneOrNone(`

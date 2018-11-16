@@ -1,28 +1,36 @@
+const Promise = require('bluebird')
+
 const userRepository = require('./userRepository')
 
-const {getUserGroups} = require('../authGroup/authGroupRepository')
+const {fetchUserGroups} = require('../authGroup/authGroupRepository')
 
 // ==== READ
 
 const findUserById = async (userId) => {
-  const user = userRepository.findUserById(userId)
-  const groups = getUserGroups(userId)
+  const userFetchPromise = userRepository.findUserById(userId)
 
-  return {...(await user), groups: await groups}
+  const [user, groups] = await Promise.all([userFetchPromise, fetchUserGroups(userId)])
+
+  return {...user, groups}
 }
 
-const findUserByEmailAndPassword = (email, password) =>
-  userRepository.findUserByEmailAndPassword(email, password)
+const findUserByEmailAndPassword = async (email, password) => {
+  const user = await userRepository.findUserByEmailAndPassword(email, password)
+
+  const groups = await fetchUserGroups(user.id)
+
+  return {...user, groups}
+}
 
 // ==== UPDATE
 
-const updateUserPref = (user, name, value) =>
-  userRepository.updateUserPref(user, name, value)
+const updateUserPref = async (user, name, value) =>
+  await userRepository.updateUserPref(user, name, value)
 
 // ==== DELETE
 
-const deleteUserPref = (user, name) =>
-  userRepository.deleteUserPref(user, name)
+const deleteUserPref = async (user, name) =>
+  await userRepository.deleteUserPref(user, name)
 
 module.exports = {
   // READ
