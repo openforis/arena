@@ -7,8 +7,8 @@ const {validateSurvey} = require('../../survey/surveyValidator')
 
 class SurveyInfoValidationJob extends Job {
 
-  constructor (userId, surveyId) {
-    super('survey-info-validation', userId, surveyId)
+  constructor (params) {
+    super(SurveyInfoValidationJob.type, params)
   }
 
   async execute () {
@@ -25,5 +25,7 @@ class SurveyInfoValidationJob extends Job {
     }
   }
 }
+
+SurveyInfoValidationJob.type = 'SurveyInfoValidationJob'
 
 module.exports = SurveyInfoValidationJob

@@ -111,7 +111,11 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'id')
       const user = req.user
 
-      const job = await JobManager.executeJobThread(SurveyPublishJob, {userId: user.id, surveyId})
+      const params = {userId: user.id, surveyId}
+      const job = new SurveyPublishJob(params)
+
+      JobManager.executeJobThread(job)
+
       res.json({job})
     } catch (err) {
       sendErr(res, err)

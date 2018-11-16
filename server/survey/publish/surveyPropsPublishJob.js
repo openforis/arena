@@ -22,8 +22,8 @@ const determineDeletedLanguages = async (surveyId, t) => {
 
 class SurveyPropsPublishJob extends Job {
 
-  constructor (userId, surveyId) {
-    super('survey-props-publish', userId, surveyId)
+  constructor (params) {
+    super(SurveyPropsPublishJob.type, params)
   }
 
   async execute () {
@@ -80,5 +80,7 @@ class SurveyPropsPublishJob extends Job {
     }
   }
 }
+
+SurveyPropsPublishJob.type = 'SurveyPropsPublishJob'
 
 module.exports = SurveyPropsPublishJob

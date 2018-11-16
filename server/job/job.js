@@ -16,13 +16,18 @@ class JobEvent {
 
 class Job {
 
-  constructor (type, userId, surveyId, innerJobs = []) {
-    this.id = null
-    this.parentId = null
-    this.masterJobId = null //id of the master job (parentId === null for that job)
-    this.uuid = uuidv4()
+  constructor (type, params, innerJobs = []) {
+    this.params = params
+
+    const {userId, surveyId, id = null, parentId = null, masterJobId = null} = params
+
     this.userId = userId
     this.surveyId = surveyId
+    this.id = id
+    this.parentId = parentId
+    this.masterJobId = masterJobId //id of the master job (parentId === null for that job)
+
+    this.uuid = uuidv4()
     this.type = type
     this.status = jobStatus.pending
     this.startTime = null

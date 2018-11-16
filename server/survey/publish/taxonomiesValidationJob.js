@@ -8,8 +8,8 @@ const {isValid, getInvalidFieldValidations} = require('../../../common/validatio
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
 class TaxonomiesValidationJob extends Job {
-  constructor (userId, surveyId) {
-    super('taxonomies-validation', userId, surveyId)
+  constructor (params) {
+    super(TaxonomiesValidationJob.type, params)
   }
 
   async execute () {
@@ -29,5 +29,7 @@ class TaxonomiesValidationJob extends Job {
     }
   }
 }
+
+TaxonomiesValidationJob.type = 'TaxonomiesValidationJob'
 
 module.exports = TaxonomiesValidationJob

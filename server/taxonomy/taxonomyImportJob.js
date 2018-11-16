@@ -2,7 +2,6 @@ const fastcsv = require('fast-csv')
 const R = require('ramda')
 
 const Job = require('../job/job')
-const {jobTypes} = require('../job/jobUtils')
 
 const {languageCodes} = require('../../common/app/languages')
 const {isNotBlank} = require('../../common/stringUtils')
@@ -23,7 +22,7 @@ class TaxonomyImportJob extends Job {
   constructor (params) {
     const {userId, surveyId, taxonomyId, csvString} = params
 
-    super(jobTypes.taxonomyImport, userId, surveyId)
+    super(TaxonomyImportJob.type, userId, surveyId)
 
     this.taxonomyId = taxonomyId
     this.csvString = csvString
@@ -146,5 +145,7 @@ class TaxonomyImportJob extends Job {
   }
 
 }
+
+TaxonomyImportJob.type = 'TaxonomyImportJob'
 
 module.exports = TaxonomyImportJob

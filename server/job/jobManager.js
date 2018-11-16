@@ -8,6 +8,7 @@ const {throttle} = require('../../common/functionsDefer')
 const {jobEvents} = require('../../common/ws/wsEvents')
 
 const JobRepository = require('./jobRepository')
+const JobSerialzier = require('./jobSerializer')
 const {jobStatus, jobToJSON} = require('./jobUtils')
 
 // ==== USER SOCKETS
@@ -51,19 +52,6 @@ const notifyJobUpdate = async job => {
   }
 }
 
-const assocInnerJobs = async job => {
-  if (job) {
-    const innerJobs = await JobRepository.fetchJobsByParentId(job.id)
-
-    return {
-      ...job,
-      innerJobs
-    }
-  } else {
-    return null
-  }
-}
-
 // ====== CREATE
 
 const insertJobAndInnerJobs = async (job, t) => {
@@ -85,23 +73,25 @@ const insertJob = async (job) =>
     await insertJobAndInnerJobs(job, t)
   )
 
-const executeJobThread = async (jobClass, params) => {
-  const job = new jobClass(params)
-
-  insertJob(job)
-    .then(() => {
-      const worker = new Worker(path.resolve(__dirname, 'jobThread.js'), {workerData: {job: jobToJSON(job), params}})
-
-      worker.on('message', async jobEvent => {
-        const job = await fetchJobById(jobEvent.masterJobId)
-        notifyJobUpdate(job)
-      })
-    })
-
-  return jobToJSON(job)
+const createJobInstance = async (masterJobId, params) => {
+  const jobDbMaster = await fetchJobById(masterJobId)
+  return JobSerialzier.deserializeJob(jobDbMaster, params)
 }
 
 // ====== READ
+
+const assocInnerJobs = async job => {
+  if (job) {
+    const innerJobs = await JobRepository.fetchJobsByParentId(job.id)
+
+    return {
+      ...job,
+      innerJobs
+    }
+  } else {
+    return null
+  }
+}
 
 const fetchActiveJobByUserId = async userId => {
   const job = await JobRepository.fetchActiveJobByUserId(userId)
@@ -126,15 +116,40 @@ const cancelActiveJobByUserId = async (userId) => {
   }
 }
 
+// ====== EXECUTE
+
+const executeJobThread = (job) => {
+
+  insertJob(job)
+    .then(jobDb => {
+      const worker = new Worker(
+        path.resolve(__dirname, 'jobThread.js'),
+        {workerData: {jobId: jobDb.id, params: job.params}}
+      )
+
+      worker.on('message', async jobEvent => {
+        const job = await fetchJobById(jobEvent.masterJobId)
+        await notifyJobUpdate(job)
+      })
+    })
+
+}
+
 module.exports = {
   init,
-  executeJobThread,
+
   //CREATE
   insertJob,
+  createJobInstance,
+
   //READ
   fetchJobById,
+
   //UPDATE
   updateJobStatus: JobRepository.updateJobStatus,
   updateJobProgress: JobRepository.updateJobProgress,
   cancelActiveJobByUserId,
+
+  // EXECUTE
+  executeJobThread,
 }

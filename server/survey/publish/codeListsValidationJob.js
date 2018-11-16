@@ -9,8 +9,8 @@ const CodeListManager = require('../../codeList/codeListManager')
 
 class CodeListsValidationJob extends Job {
 
-  constructor (userId, surveyId) {
-    super('code-lists-validation', userId, surveyId)
+  constructor (params) {
+    super(CodeListsValidationJob.type, params)
   }
 
   async execute () {
@@ -32,5 +32,7 @@ class CodeListsValidationJob extends Job {
     }
   }
 }
+
+CodeListsValidationJob.type = 'CodeListsValidationJob'
 
 module.exports = CodeListsValidationJob

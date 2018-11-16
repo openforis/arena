@@ -10,8 +10,8 @@ const NodeDefRepository = require('../../nodeDef/nodeDefRepository')
 
 class NodeDefsValidationJob extends Job {
 
-  constructor (userId, surveyId) {
-    super('node-defs-validation', userId, surveyId)
+  constructor (params) {
+    super(NodeDefsValidationJob.type, params)
   }
 
   async execute () {
@@ -28,5 +28,7 @@ class NodeDefsValidationJob extends Job {
     }
   }
 }
+
+NodeDefsValidationJob.type = 'NodeDefsValidationJob'
 
 module.exports = NodeDefsValidationJob

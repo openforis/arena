@@ -14,11 +14,6 @@ const jobEvents = {
   progress: 'progress', //job is running and the processed items changed
 }
 
-const jobTypes = {
-  surveyPublish: 'surveyPublish',
-  taxonomyImport: 'taxonomyImport',
-}
-
 const calculateProgress = job => {
   const partialProgress = job.status === jobStatus.succeeded ?
     100
@@ -65,7 +60,6 @@ const jobToJSON = job =>
 module.exports = {
   jobStatus,
   jobEvents,
-  jobTypes,
 
   jobToJSON,
 }
