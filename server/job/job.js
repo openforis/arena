@@ -4,10 +4,8 @@ const {uuidv4} = require('../../common/uuid')
 
 class JobEvent {
 
-  constructor (type, jobId, masterJobId, status, total, processed) {
+  constructor (type, status, total, processed) {
     this.type = type
-    this.jobId = jobId
-    this.masterJobId = masterJobId
     this.status = status
     this.total = total
     this.processed = processed
@@ -19,13 +17,10 @@ class Job {
   constructor (type, params, innerJobs = []) {
     this.params = params
 
-    const {userId, surveyId, id = null, parentId = null, masterJobId = null} = params
+    const {userId, surveyId} = params
 
     this.userId = userId
     this.surveyId = surveyId
-    this.id = id
-    this.parentId = parentId
-    this.masterJobId = masterJobId //id of the master job (parentId === null for that job)
 
     this.uuid = uuidv4()
     this.type = type
@@ -86,37 +81,55 @@ class Job {
     return new Promise((resolve) => resolve(0))
   }
 
+  getCurrentInnerJob () {
+    return this.innerJobs[this.currentInnerJobIndex]
+  }
+
   startNextInnerJob () {
     this.currentInnerJobIndex++
-    const innerJob = this.innerJobs[this.currentInnerJobIndex]
+
+    const innerJob = this.getCurrentInnerJob()
 
     innerJob.context = this.context
 
     innerJob
       .onEvent(event => {
-        this.notifyEvent(event) //propagate events to parent job
-
-        switch (event.status) {
-          case jobStatus.failed:
-          case jobStatus.canceled:
-            this.setStatus(event.status)
-            break
-          case jobStatus.succeeded:
-            this.incrementProcessedItems()
-
-            if (this.processed === this.innerJobs.length) {
-              this.setStatusSucceeded()
-            } else {
-              this.startNextInnerJob()
-            }
-            break
-        }
+        this.handleInnerJobEvent(event)
       })
       .start()
   }
 
+  handleInnerJobEvent (event) {
+    this.notifyEvent(event) //propagate events to parent job
+
+    switch (event.status) {
+      case jobStatus.failed:
+      case jobStatus.canceled:
+        //cancel or fail even parent job
+        this.setStatus(event.status)
+        break
+      case jobStatus.succeeded:
+        this.incrementProcessedItems()
+
+        if (this.processed === this.innerJobs.length) {
+          this.setStatusSucceeded()
+        } else {
+          this.startNextInnerJob()
+        }
+        break
+    }
+  }
+
   cancel () {
-    this.setStatus(jobStatus.canceled)
+    if (this.currentInnerJobIndex >= 0) {
+      const innerJob = this.getCurrentInnerJob()
+      if (innerJob.isRunning()) {
+        innerJob.cancel()
+        //parent job will be canceled by the inner job event listener
+      }
+    } else {
+      this.setStatus(jobStatus.canceled)
+    }
   }
 
   onEvent (listener) {
@@ -126,6 +139,10 @@ class Job {
 
   isCancelled () {
     return this.status === jobStatus.canceled
+  }
+
+  isRunning () {
+    return this.status === jobStatus.running
   }
 
   isEnded () {
@@ -169,7 +186,48 @@ class Job {
   }
 
   createJobEvent (type) {
-    return new JobEvent(type, this.id, this.masterJobId, this.status, this.total, this.processed)
+    return new JobEvent(type, this.status, this.total, this.processed)
+  }
+
+  calculateProgress () {
+    const partialProgress = this.status === jobStatus.succeeded ?
+      100
+      : this.total > 0 ?
+        Math.floor(100 * this.processed / this.total)
+        : 0
+
+    if (this.innerJobs.length === 0 || this.currentInnerJobIndex < 0 || partialProgress === 100) {
+      return partialProgress
+    } else {
+      return partialProgress + Math.floor(this.getCurrentInnerJob().calculateProgress() / this.total)
+    }
+  }
+
+  toJSON () {
+    return {
+      type: this.type,
+      userId: this.params.userId,
+      surveyId: this.params.surveyId,
+
+      innerJobs: this.innerJobs.map(j => j.toJSON()),
+
+      //status
+      status: this.status,
+      pending: this.status === jobStatus.pending,
+      running: this.status === jobStatus.running,
+      succeeded: this.status === jobStatus.succeeded,
+      canceled: this.status === jobStatus.canceled,
+      failed: this.status === jobStatus.failed,
+      ended: this.isEnded(),
+
+      total: this.total,
+      processed: this.processed,
+      progressPercent: this.calculateProgress(),
+
+      //output
+      errors: jobStatus.failed ? this.errors : null,
+      result: jobStatus.succeeded ? this.result : null,
+    }
   }
 }
 

@@ -21,25 +21,13 @@ const jobClasses = [
 
 const getJobClass = jobType => R.find(R.propEq('type', jobType), jobClasses)
 
-const createJob = (jobDb, params, parentId = null) => {
-  // first create instance of inner jobs
-  const innerJobs = jobDb.innerJobs ?
-    jobDb.innerJobs.map(
-      innerJob => createJob(innerJob, params, jobDb.id)
-    )
-    : []
+const createJob = (jobType, params) => {
+  const jobClass = getJobClass(jobType)
 
-  const jobClass = getJobClass(jobDb.type)
-
-  // create instance
-  return new jobClass(
-    {...params, id: jobDb.id, parentId},
-    innerJobs
-  )
+  return new jobClass(params)
 }
 
-const deserializeJob = (jobDb, params) => createJob(jobDb, {...params, masterJobId: jobDb.id})
 
 module.exports = {
-  deserializeJob
+  createJob,
 }

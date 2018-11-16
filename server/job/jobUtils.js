@@ -14,52 +14,13 @@ const jobEvents = {
   progress: 'progress', //job is running and the processed items changed
 }
 
-const calculateProgress = job => {
-  const partialProgress = job.status === jobStatus.succeeded ?
-    100
-    : job.total > 0 ?
-      Math.floor(100 * job.processed / job.total)
-      : 0
-
-  const innerJobs = job.innerJobs ? job.innerJobs : []
-
-  const currentInnerJobIndex = innerJobs ?
-    R.findLastIndex(j =>
-      j.status === jobStatus.running ||
-      j.status === jobStatus.failed ||
-      j.status === jobStatus.canceled
-      , innerJobs) : -1
-
-  if (innerJobs.length === 0 || currentInnerJobIndex < 0 || partialProgress === 100) {
-    return partialProgress
-  } else {
-    return partialProgress + Math.floor(calculateProgress(innerJobs[currentInnerJobIndex]) / job.total)
-  }
+const jobThreadMessageTypes = {
+  fetchJob: 'fetchJob',
+  cancelJob: 'cancelJob',
 }
-
-const jobToJSON = job =>
-  R.dissoc('props', {
-    ...job,
-
-    innerJobs: R.map(j => jobToJSON(j), R.propOr([], 'innerJobs', job)),
-
-    errors: R.propOr(R.pathOr({}, ['props', 'errors'], job), 'errors', job),
-
-    //STATUS
-    status: job.status,
-    pending: job.status === jobStatus.pending,
-    running: job.status === jobStatus.running,
-    succeeded: job.status === jobStatus.succeeded,
-    canceled: job.status === jobStatus.canceled,
-    failed: job.status === jobStatus.failed,
-    ended: R.contains(job.status, [jobStatus.succeeded, jobStatus.canceled, jobStatus.failed]),
-
-    progressPercent: calculateProgress(job),
-  })
 
 module.exports = {
   jobStatus,
   jobEvents,
-
-  jobToJSON,
+  jobThreadMessageTypes,
 }

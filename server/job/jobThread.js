@@ -1,46 +1,41 @@
 const {parentPort, workerData} = require('worker_threads')
 
-const {throttle} = require('../../common/functionsDefer')
+const {jobThreadMessageTypes} = require('./jobUtils')
 
-const {jobEvents, jobStatus} = require('./jobUtils')
-const JobManager = require('./jobManager')
+const JobCreator = require('./jobCreator')
 
-const startCheckJobCanceledMonitor = job => {
-  setTimeout(async () => {
-    const reloadedJob = await JobManager.fetchJobById(job.id)
-    if (reloadedJob.status === jobStatus.canceled) {
-      job.cancel()
-    }
-    if (!job.isEnded()) {
-      startCheckJobCanceledMonitor(job)
-    }
-  }, 2000)
+/**
+ * Active job
+ */
+let job = null
+
+const sendJobToParentThread = () => {
+  parentPort.postMessage(job.toJSON())
 }
 
-const handleJobEvent = async jobEvent => {
-  const {jobId, status, total, processed, result = {}, errors = {}} = jobEvent
-
-  if (jobEvent.type === jobEvents.statusChange) {
-    await JobManager.updateJobStatus(jobId, status, total, processed, {result, errors})
-  } else {
-    throttle(JobManager.updateJobProgress, `job_${jobId}`, 1000)(jobId, total, processed)
-  }
-
-  parentPort.postMessage(jobEvent)
+const handleJobEvent = async () => {
+  sendJobToParentThread()
 }
 
 const execute = () => {
-  const {jobId, params} = workerData
+  const {jobType, params} = workerData
 
-  JobManager.createJobInstance(jobId, params)
-    .then(job => {
+  job = JobCreator.createJob(jobType, params)
 
-      startCheckJobCanceledMonitor(job)
-
-      job
-        .onEvent(handleJobEvent)
-        .start()
-    })
+  job
+    .onEvent(handleJobEvent)
+    .start()
 }
 
 execute()
+
+parentPort.on('message', function (msg) {
+  switch (msg.type) {
+    case jobThreadMessageTypes.fetchJob:
+      sendJobToParentThread()
+      break
+    case jobThreadMessageTypes.cancelJob:
+      job.cancel()
+      break
+  }
+})
