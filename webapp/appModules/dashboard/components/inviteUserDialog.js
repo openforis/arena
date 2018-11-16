@@ -1,6 +1,7 @@
-import React from 'react'
-
 import './inviteUserDialog.scss'
+
+import React from 'react'
+import * as R from 'ramda'
 
 import Dropdown from '../../../commonComponents/form/dropdown'
 
@@ -11,11 +12,13 @@ import {
   ModalFooter,
 } from '../../../commonComponents/modal'
 
+import { groupNames } from '../../../../common/auth/authGroups'
+
 export default class DeleteSurveyDialog extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
-    this.state = { 
+    this.state = {
       email: '',
       group: '',
       enableInvite: false
@@ -23,7 +26,7 @@ export default class DeleteSurveyDialog extends React.Component {
     this.emailChanged = this.emailChanged.bind(this)
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.setState({
       email: '',
       group: '',
@@ -32,25 +35,30 @@ export default class DeleteSurveyDialog extends React.Component {
     this.nameInput.focus()
   }
 
-  componentDidUpdate(_, prevState) {
+  componentDidUpdate (_, prevState) {
     // TODO check if email is valid
     // TODO email autocomplete
     if (prevState.email !== this.state.email ||
-        prevState.group !== this.state.group) {
+      prevState.group !== this.state.group) {
       this.setState({enableInvite: this.state.email && this.state.group})
     }
   }
 
-  emailChanged(event) {
+  emailChanged (event) {
     this.setState({email: event.target.value})
   }
 
-  groupChanged(group) {
+  groupChanged (group) {
     this.setState({group: group.name})
   }
 
-  render() {
-    const { groups, onInvite, onCancel } = this.props
+  render () {
+    const {onInvite, onCancel} = this.props
+
+    const groups = R.pipe(
+      R.values,
+      R.map(g => ({key: g, name: g}))
+    )(groupNames)
 
     return (
       <Modal isOpen={true}>
@@ -61,39 +69,36 @@ export default class DeleteSurveyDialog extends React.Component {
         <ModalBody>
           <div className="user-invite-dialog__body">
 
-            <div className="text-center">
-              email:
-            </div>
             <input className="email-input"
                    type="text"
                    value={this.state.email}
                    onChange={this.emailChanged}
-                   ref={input => this.nameInput = input} />
-            <div className="text-center">
-              group:
-            </div>
+                   ref={input => this.nameInput = input}
+                   placeholder="User's email"/>
+
             <Dropdown disabled={false}
-                      items={[{ id: 1, name: 'Dummy Group 1' }, { id: 2, name: 'Dummy Group 2' }, { id: 2, name: 'Dummy Group 3'}]}
+                      items={groups}
                       itemKeyProp={i => i.id}
                       itemLabelFunction={i => i.name}
-                      // validation={}
+              // validation={}
                       selection={null}
-                      onChange={group => this.groupChanged(group)} />
+                      onChange={group => this.groupChanged(group)}
+                      placeholder="User's group"/>
           </div>
         </ModalBody>
 
         <ModalFooter>
           <div>
             <button className="btn btn-of modal-footer__item"
-              onClick={onCancel}>
-              <span className="icon icon-cross icon-14px icon-left" />
+                    onClick={onCancel}>
+              <span className="icon icon-cross icon-12px icon-left"/>
               Cancel
             </button>
 
             <button className="btn btn-of modal-footer__item"
-              onClick={onInvite}
-              aria-disabled={!this.state.enableInvite}>
-              <span className="icon icon-user-plus icon-14px icon-left" />
+                    onClick={onInvite}
+                    aria-disabled={!this.state.enableInvite}>
+              <span className="icon icon-user-plus icon-12px icon-left"/>
               Invite
             </button>
           </div>
