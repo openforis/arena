@@ -29,9 +29,8 @@ const InnerJobs = ({innerJobs}) =>
   <div className="app-job-monitor__inner-jobs">
     {
       innerJobs.map((innerJob, i) => (
-        <React.Fragment>
-          <div key={i}
-               className="job">
+        <React.Fragment key={i}>
+          <div className="job">
             <div className="name">{i + 1}. {innerJob.type}</div>
             <JobProgress job={innerJob}/>
           </div>

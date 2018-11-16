@@ -20,7 +20,7 @@ class SurveyInfoValidationJob extends Job {
     if (validation.valid) {
       this.setStatusSucceeded()
     } else {
-      this.errors = getInvalidFieldValidations(validation)
+      this.errors = {surveyInfo: getInvalidFieldValidations(validation)}
       this.setStatusFailed()
     }
   }
