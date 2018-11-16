@@ -34,7 +34,6 @@ const execute = () => {
 
   JobManager.createJobInstance(jobId, params)
     .then(job => {
-      console.log('++++++ createJobInstance ', JSON.stringify(job))
 
       startCheckJobCanceledMonitor(job)
 
