@@ -20,9 +20,9 @@ const requiredColumns = [
 class TaxonomyImportJob extends Job {
 
   constructor (params) {
-    const {userId, surveyId, taxonomyId, csvString} = params
+    const {taxonomyId, csvString} = params
 
-    super(TaxonomyImportJob.type, userId, surveyId)
+    super(TaxonomyImportJob.type, params)
 
     this.taxonomyId = taxonomyId
     this.csvString = csvString

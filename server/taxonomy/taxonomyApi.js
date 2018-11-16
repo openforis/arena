@@ -3,6 +3,7 @@ const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/reque
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const JobManager = require('../job/jobManager')
+const {jobToJSON} = require('../job/jobUtils')
 const TaxonomyManager = require('./taxonomyManager')
 const TaxonomyImportJob = require('./taxonomyImportJob')
 
@@ -114,14 +115,16 @@ module.exports.init = app => {
 
       const file = req.files.file
 
-      const job = await JobManager.executeJobThread(TaxonomyImportJob, {
+      const job = new TaxonomyImportJob({
         userId: user.id,
         surveyId,
         taxonomyId,
         csvString: file.data.toString('utf8')
       })
 
-      res.json({job})
+      JobManager.executeJobThread(job)
+
+      res.json({job: jobToJSON(job)})
     } catch (err) {
       sendErr(res, err)
     }

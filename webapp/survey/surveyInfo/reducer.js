@@ -9,7 +9,7 @@ import { loginSuccess } from '../../login/actions'
 import { appStatusChange } from '../../app/actions'
 
 // survey actions
-import { surveyCreate, surveyUpdate, surveyPublish } from '../actions'
+import { surveyCreate, surveyUpdate } from '../actions'
 
 // surveyInfo actions
 import { surveyInfoPropUpdate, surveyInfoValidationUpdate } from './actions'
@@ -33,8 +33,6 @@ const actionHandlers = {
   // Survey Update
   [surveyCreate]: (state, {survey}) => Survey.getSurveyInfo(survey),
   [surveyUpdate]: (state, {survey}) => Survey.getSurveyInfo(survey),
-
-  [surveyPublish]: markPublished,
 
   // survey info update
   [surveyInfoPropUpdate]: (state, {key, value}) => assocSurveyInfoProp(key, value)(state),

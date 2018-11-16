@@ -8,7 +8,7 @@ const {throttle} = require('../../common/functionsDefer')
 const {jobEvents} = require('../../common/ws/wsEvents')
 
 const JobRepository = require('./jobRepository')
-const JobSerialzier = require('./jobSerializer')
+const JobSerializer = require('./jobSerializer')
 const {jobStatus, jobToJSON} = require('./jobUtils')
 
 // ==== USER SOCKETS
@@ -43,7 +43,7 @@ const init = (io) => {
 
 }
 
-const notifyJobUpdate = async job => {
+const notifyJobUpdate = job => {
   const sockets = getUserSockets(job.userId)
   if (sockets && !R.isEmpty(sockets)) {
     R.forEachObjIndexed((socket) => {
@@ -75,7 +75,7 @@ const insertJob = async (job) =>
 
 const createJobInstance = async (masterJobId, params) => {
   const jobDbMaster = await fetchJobById(masterJobId)
-  return JobSerialzier.deserializeJob(jobDbMaster, params)
+  return JobSerializer.deserializeJob(jobDbMaster, params)
 }
 
 // ====== READ

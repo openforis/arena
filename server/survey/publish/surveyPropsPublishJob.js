@@ -61,21 +61,23 @@ class SurveyPropsPublishJob extends Job {
   }
 
   async removeDeletedLanguagesLabels (deletedLanguages, t) {
+    const surveyId = this.params.surveyId
+
     for (let i = 0; i < deletedLanguages.length; i++) {
       const langCode = deletedLanguages[i]
 
       //SURVEY
-      await SurveyRepository.deleteSurveyLabel(id, langCode, t)
-      await SurveyRepository.deleteSurveyDescription(id, langCode, t)
+      await SurveyRepository.deleteSurveyLabel(surveyId, langCode, t)
+      await SurveyRepository.deleteSurveyDescription(surveyId, langCode, t)
       this.incrementProcessedItems()
 
       //NODE DEFS
-      await NodeDefRepository.deleteNodeDefsLabels(id, langCode, t)
-      await NodeDefRepository.deleteNodeDefsDescriptions(id, langCode, t)
+      await NodeDefRepository.deleteNodeDefsLabels(surveyId, langCode, t)
+      await NodeDefRepository.deleteNodeDefsDescriptions(surveyId, langCode, t)
       this.incrementProcessedItems()
 
       //CODE LIST ITEMS
-      await CodeListRepository.deleteCodeListsItemsLabels(id, langCode, t)
+      await CodeListRepository.deleteCodeListsItemsLabels(surveyId, langCode, t)
       this.incrementProcessedItems()
     }
   }
