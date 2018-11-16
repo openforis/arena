@@ -28,65 +28,7 @@ const groupNames = {
   guest: 'guest',
 }
 
-const getDefaultSurveyGroups = (surveyName, lang) => [
-  {
-    name: groupNames.surveyAdmin,
-    permissions: [
-      permissions.permissionsEdit,
-      permissions.surveyEdit,
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordDataEdit,
-      permissions.userInvite
-    ],
-    labels: {[lang]: 'Survey administrators'},
-    descriptions: {[lang]: `Administrators of the ${surveyName} survey`},
-  },
-  {
-    name: groupNames.surveyEditor,
-    permissions: [
-      permissions.surveyEdit,
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordDataEdit
-    ],
-    labels: {en: 'Survey editors'},
-    descriptions: {[lang]: `Editors of the ${surveyName} survey`},
-  },
-  {
-    name: groupNames.dataEditor,
-    permissions: [
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordDataEdit
-    ],
-    labels: {en: 'Data editors'},
-    descriptions: {[lang]: `Data editors of the ${surveyName} survey`},
-  },
-  {
-    name: groupNames.dataCleanser,
-    permissions: [
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordDataEdit
-    ],
-    labels: {en: 'Data cleansers'},
-    descriptions: {[lang]: `Data cleansers of the ${surveyName} survey`},
-  },
-  {
-    name: groupNames.dataAnalyst,
-    permissions: [
-      permissions.recordView,
-      permissions.recordCreate,
-      permissions.recordDataEdit
-    ],
-    labels: {en: 'Data analysts'},
-    descriptions: {[lang]: `Data analysts of the ${surveyName} survey`},
-  }
-]
-
 module.exports = {
   permissions,
   groupNames,
-  getDefaultSurveyGroups
 }

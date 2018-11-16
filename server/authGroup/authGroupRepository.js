@@ -1,30 +1,33 @@
+const Promise = require('bluebird')
 const camelize = require('camelize')
 const db = require('../db/db')
-
-const {getDefaultSurveyGroups} = require('../../common/auth/authGroups')
 
 const dbTransformCallback = camelize
 
 // ==== CREATE
 
-const createGroup = (name, permissions, labels, descriptions, client = db) =>
-  client.one(`
+const insertGroup = async (authGroup, client = db) =>
+  await client.one(`
     INSERT INTO auth_group (name, permissions, labels, descriptions)
     VALUES ($1, $2, $3, $4)
     RETURNING *`,
     [
-      name,
-      JSON.stringify(permissions),
-      JSON.stringify(labels),
-      JSON.stringify(descriptions),
+      authGroup.name,
+      JSON.stringify(authGroup.permissions),
+      JSON.stringify(authGroup.labels),
+      JSON.stringify(authGroup.descriptions),
     ],
-    dbTransformCallback)
+    dbTransformCallback
+  )
 
-const createDefaultSurveyGroups = (surveyName, lang, client = db) => {
-  const surveyGroups = getDefaultSurveyGroups(surveyName, lang)
-  return client.batch(surveyGroups.map(
-    ({name, permissions, labels, descriptions}) => createGroup(name, permissions, labels, descriptions, client)))
-}
+const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
+  await Promise.all(surveyGroups.map(
+    async authGroup => {
+      const persistedGroup = await insertGroup(authGroup, client)
+      await addSurveyToGroup(persistedGroup.id, surveyId, client)
+      return persistedGroup
+    }
+  ))
 
 // ==== READ
 const getUserGroups = (userId, client = db) =>
@@ -35,7 +38,6 @@ const getUserGroups = (userId, client = db) =>
     AND auth_group.id = auth_group_user.group_id`,
     userId,
     dbTransformCallback)
-
 
 const getSurveyGroups = (surveyId, client = db) =>
   client.any(`
@@ -68,8 +70,7 @@ const addSurveyToGroup = (groupId, surveyId, client = db) =>
 
 module.exports = {
   // CREATE
-  // createGroup,
-  createDefaultSurveyGroups,
+  createSurveyGroups,
 
   // READ
   getUserGroups,

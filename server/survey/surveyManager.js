@@ -18,15 +18,12 @@ const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/no
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const { groupNames } = require('../../common/auth/authGroups')
-const {createDefaultSurveyGroups, addUserToGroup, addSurveyToGroup} = require('../authGroup/authGroupRepository')
-const { isSystemAdmin } = require('../../common/auth/authManager')
+const authGroupRepository = require('../authGroup/authGroupRepository')
+const {isSystemAdmin} = require('../../common/auth/authManager')
 
 const JobManager = require('../job/jobManager')
 
 const assocSurveyInfo = info => ({info})
-
-const canEditSurvey = (survey) => true // TODO
 
 // ====== CREATE
 const createSurvey = async (user, {name, label, lang}) => {
@@ -44,7 +41,7 @@ const createSurvey = async (user, {name, label, lang}) => {
       const userId = user.id
 
       // create the survey
-      const survey = await surveyRepository.insertSurvey(props, userId, t)
+      let survey = await surveyRepository.insertSurvey(props, userId, t)
       const {id: surveyId} = survey
 
       // create survey's root entity props
@@ -61,11 +58,12 @@ const createSurvey = async (user, {name, label, lang}) => {
       await updateUserPref(user, userPrefNames.survey, surveyId, t)
 
       // create default groups for this survey
-      const groups = await createDefaultSurveyGroups(Survey.getName(survey), lang, t)
-      await t.batch(groups.map(g => addSurveyToGroup(g.id, surveyId, t)))
+
+      const authGroups = await authGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
+      survey = R.assoc('authGroups', authGroups, survey)
+
       if (!isSystemAdmin(user)) {
-        const surveyAdminGroup = groups.find(g => g.name === groupNames.surveyAdmin)
-        await addUserToGroup(surveyAdminGroup.id, user.id, t)
+        await authGroupRepository.addUserToGroup(Survey.getAuthGroupAdmin(Survey.getSurveyInfo(survey)).id, user.id, t)
       }
 
       return survey
@@ -94,7 +92,7 @@ const fetchSurveyById = async (id, draft = false, validate = false) => {
 
 const fetchUserSurveys = async (user) => R.map(
   assocSurveyInfo,
-  R.filter(canEditSurvey, await surveyRepository.fetchSurveys(user.id))
+  await surveyRepository.fetchSurveys(user.id)
 )
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
