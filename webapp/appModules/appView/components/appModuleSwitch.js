@@ -29,9 +29,9 @@ const AppModuleSwitch = (props) => (
       classNames="app-module__fade">
 
       <Switch location={props.location}>
-        <Route exact path={appModuleUri(appModules.home)} component={Home}/>
-        <Route exact path={appModuleUri(appModules.dashboard)} component={Dashboard}/>
-        <Route exact path={appModuleUri(appModules.designer)} component={Designer}/>
+        <Route path={appModuleUri(appModules.home)} component={Home}/>
+        <Route path={appModuleUri(appModules.dashboard)} component={Dashboard}/>
+        <Route path={appModuleUri(appModules.designer)} component={Designer}/>
         <Route exact path={appModuleUri(appModules.data)} component={Data}/>
         <Route exact path={appModuleUri(appModules.dataRecord)} component={DataRecord}/>
       </Switch>
