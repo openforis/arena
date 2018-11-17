@@ -25,39 +25,38 @@ class DesignerView extends React.Component {
   }
 
   render () {
-    console.log(this.props.location)
+    const {history, location} = this.props
+
     return (
       <TabBar
-        className="survey-designer grid100"
-        location={this.props.location}
+        className="designer"
+        location={location}
+        history={history}
         tabs={[
 
           {
             label: 'Survey Info',
             component: SurveyInfo,
-            routes: [
-              appModuleUri(appModules.dashboard),
-              appModuleUri(dashboardModules.surveyInfo),
-            ]
+            path: appModuleUri(appModules.designer),
           },
 
           {
             label: 'Form Designer',
             component: SurveyFormView,
-            route: appModuleUri(dashboardModules.formDesigner),
+            path: appModuleUri(dashboardModules.formDesigner),
             props: {edit: true, draft: true},
           },
 
           {
             label: 'Code Lists',
             component: CodeLists,
-            route: appModuleUri(dashboardModules.codeLists)
+            path: appModuleUri(dashboardModules.codeLists)
           },
 
           {
             label: 'Taxonomies',
             component: TaxonomiesView,
-            route: appModuleUri(dashboardModules.taxonomies)
+            path: appModuleUri(dashboardModules.taxonomies)
           },
 
         ]}

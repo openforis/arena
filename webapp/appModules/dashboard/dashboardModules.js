@@ -1,11 +1,13 @@
 import { appModules } from '../appModules'
 
 export const dashboardModules = {
-  surveyInfo: `${appModules.dashboard}/surveyInfo`,
 
-  formDesigner: `${appModules.dashboard}/formDesigner`,
+  surveyInfo: `${appModules.designer}/surveyInfo`,
 
-  codeLists: `${appModules.dashboard}/codeLists`,
+  formDesigner: `${appModules.designer}/formDesigner`,
 
-  taxonomies: `${appModules.dashboard}/taxonomies`,
+  codeLists: `${appModules.designer}/codeLists`,
+
+  taxonomies: `${appModules.designer}/taxonomies`,
+
 }

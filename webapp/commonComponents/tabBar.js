@@ -1,4 +1,41 @@
+import './tabBar.scss'
+
 import React from 'react'
+import { Switch, Route } from 'react-router'
+
+const TabBarButtons = ({tabs, location, selection, onClick}) => (
+  <div className="flex-center">
+    {
+      tabs.map((tab, i) => {
+        const active = location
+          ? location.pathname === tab.path
+          : i === selection
+
+        return (
+          <button key={i}
+                  className={`btn btn-of${active ? ' active' : ''}`}
+                  onClick={() => onClick(i)}>
+            {tab.label}
+          </button>
+        )
+      })
+    }
+  </div>
+)
+
+const TabBarComponent = ({tab}) => React.createElement(tab.component, tab.props)
+
+const TabBarSwitch = ({tabs, location}) => (
+  <Switch location={location}>
+    {
+      tabs.map((tab, i) =>
+        <Route key={i} exact path={tab.path} render={() =>
+          <TabBarComponent tab={tab}/>
+        }/>
+      )
+    }
+  </Switch>
+)
 
 class TabBar extends React.Component {
 
@@ -9,29 +46,26 @@ class TabBar extends React.Component {
   }
 
   render () {
-    const {tabs, ...rest} = this.props
+    const {tabs, location, history, className} = this.props
     const {selection} = this.state
 
     return (
-      <div {...rest} style={{
-        display: 'grid',
-        gridTemplateRows: '60px 1fr',
-      }}>
-        <div className="flex-center">
-          {
-            tabs.map((tab, i) => {
-              return (
-                <button key={i}
-                        className={`btn btn-of${i === selection ? ' active' : ''}`}
-                        onClick={() => this.setState({selection: i})}>
-                  {tab.label}
-                </button>
-              )
-            })
-          }
-        </div>
+      <div className={`tab-bar ${className}`}>
 
-        {React.createElement(tabs[selection].component, tabs[selection].props)}
+        <TabBarButtons tabs={tabs}
+                       location={location}
+                       selection={this.state.selection}
+                       onClick={tabIndex => location
+                         ? history.push(tabs[tabIndex].path)
+                         : this.setState({selection: tabIndex})
+                       }/>
+
+
+        {
+          location
+            ? <TabBarSwitch tabs={tabs} location={location}/>
+            : <TabBarComponent tab={tabs[selection]}/>
+        }
 
       </div>
     )
@@ -40,8 +74,12 @@ class TabBar extends React.Component {
 }
 
 TabBar.defaultProps = {
+  className: '',
   selection: 0,
-  tabs: []
+  tabs: [],
+  // pass location and history if components should be rendered based on url path
+  location: null,
+  history: null,
 }
 
 export default TabBar

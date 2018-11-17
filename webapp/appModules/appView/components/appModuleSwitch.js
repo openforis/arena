@@ -24,7 +24,8 @@ const DataRecord = AppModuleHOC(DataRecordView)
 const AppModuleSwitch = (props) => (
   <TransitionGroup className="app__modules">
     <CSSTransition
-      key={props.location.key}
+      // avoid css transition when changing location within subroutes
+      key={props.location.pathname.split('/')[2]}
       timeout={200}
       classNames="app-module__fade">
 
