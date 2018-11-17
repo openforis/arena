@@ -10,33 +10,6 @@
   grid-template-columns: 60px 1fr;
 }
 
-.app-sidebar {
-  background-color: rgba($brown, 0.4);
-  border-right: 1px solid rgba($white, 0.1);
-  display: grid;
-  grid-template-rows: 50px .8fr .2fr;
-  align-items: center;
-  justify-content: center;
-  justify-items: center;
-}
-
-.btn-of-sidebar {
-  color: rgba($white, 0.5);
-  border-bottom: 1px solid rgba($white, 0.5) !important;
-  text-transform: uppercase;
-  font-weight: 100;
-  letter-spacing: -0.10rem;
-  font-size: .8rem;
-  padding: .3rem .5rem .15rem;
-
-  &:hover {
-    background-color: rgba($white,.1);
-    color: rgba($white,.75);
-    border-bottom: 1px solid rgba($white, 0.75) !important;
-  }
-}
-
-
 .app__modules {
   position: relative;
   display: grid;

@@ -1,12 +1,7 @@
 import React from 'react'
 
 const AppSideBarFooter = ({logout, opened}) => (
-  <div style={{
-    display: 'grid',
-    justifyItems: 'center',
-    alignContent: 'space-around',
-    height: '100%',
-  }}>
+  <div className="app-sidebar__footer">
     <a className="btn btn-s btn-of-light-xs"
        onClick={() => logout()}
        style={{
@@ -22,7 +17,7 @@ const AppSideBarFooter = ({logout, opened}) => (
       }
     </a>
 
-    <a className="btn btn-of-link btn-of-sidebar"
+    <a className="btn btn-of-link app-sidebar__btn-of"
        href="http://www.openforis.org"
        target="_blank">
       {

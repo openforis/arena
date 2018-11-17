@@ -1,3 +1,5 @@
+import './appSideBar.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -35,17 +37,10 @@ class AppSideBar extends React.Component {
       <div className="app-sidebar">
 
         {/*toggle sidebar */}
-        <div style={{
-          display: 'grid',
-          width: '100%',
-          justifyItems: 'end',
-          opacity: '.5',
-        }}>
-          <a className="btn btn-s btn-of-light-xs no-border"
-             onClick={() => this.toggleOpen()}>
-            <span className={`icon icon-${opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
-          </a>
-        </div>
+        <a className="btn btn-s btn-of-light-xs no-border app-sidebar__btn-toggle"
+           onClick={() => this.toggleOpen()}>
+          <span className={`icon icon-${opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
+        </a>
 
         <AppSideBarModules pathname={pathname}
                            surveyInfo={surveyInfo}

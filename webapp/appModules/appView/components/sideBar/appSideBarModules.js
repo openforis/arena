@@ -4,7 +4,6 @@ import * as R from 'ramda'
 
 import { appModuleUri } from '../../../appModules'
 import { appModules } from '../../../appModules'
-import { getLocationPathname } from '../../../../appUtils/routerUtils'
 
 const modules = [
   {
@@ -49,7 +48,7 @@ const AppSideBarModule = (props) => {
     icon, label, showLabel = false, disabled = false,
   } = props
 
-  const active = pathname === appModuleUri(module)
+  const active = R.startsWith(appModuleUri(module), pathname)
   const requireSurvey = module !== appModules.home
 
   return (
@@ -74,10 +73,7 @@ const AppSideBarModule = (props) => {
 }
 
 const AppSideBarModules = ({pathname, surveyInfo, opened}) => (
-  <div style={{
-    display: 'grid',
-    gridRowGap: '1.5rem',
-  }}>
+  <div className="app-sidebar__modules">
     {
       modules.map((m, i) => (
         <AppSideBarModule key={i}
