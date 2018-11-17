@@ -1,4 +1,4 @@
-import './style.scss'
+import './designerView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -11,6 +11,8 @@ import TaxonomiesView from '../surveyForm/components/taxonomiesView'
 
 import { initSurveyDefs } from '../../survey/actions'
 import { resetForm } from '../surveyForm/actions'
+import { appModules, appModuleUri } from '../appModules'
+import { dashboardModules } from '../dashboard/dashboardModules'
 
 class DesignerView extends React.Component {
 
@@ -23,15 +25,42 @@ class DesignerView extends React.Component {
   }
 
   render () {
+    const {history, location} = this.props
+
     return (
       <TabBar
-        className="survey-designer grid100"
+        className="designer"
+        location={location}
+        history={history}
         tabs={[
-          {label: 'Survey Info', component: SurveyInfo},
-          {label: 'Form Designer', component: SurveyFormView, props: {edit: true, draft: true}},
-          {label: 'Code Lists', component: CodeLists},
-          {label: 'Taxonomies', component: TaxonomiesView},
-        ]}/>
+
+          {
+            label: 'Survey Info',
+            component: SurveyInfo,
+            path: appModuleUri(appModules.designer),
+          },
+
+          {
+            label: 'Form Designer',
+            component: SurveyFormView,
+            path: appModuleUri(dashboardModules.formDesigner),
+            props: {edit: true, draft: true},
+          },
+
+          {
+            label: 'Code Lists',
+            component: CodeLists,
+            path: appModuleUri(dashboardModules.codeLists)
+          },
+
+          {
+            label: 'Taxonomies',
+            component: TaxonomiesView,
+            path: appModuleUri(dashboardModules.taxonomies)
+          },
+
+        ]}
+      />
     )
   }
 }

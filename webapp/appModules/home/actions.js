@@ -2,7 +2,7 @@ import axios from 'axios'
 import * as R from 'ramda'
 
 import { surveyCreate } from '../../survey/actions'
-import { getNewSurvey } from './homeState'
+import { getNewSurvey } from './appHomeState'
 
 export const homeNewSurveyUpdate = 'home/newSurvey/update'
 export const homeSurveysUpdate = 'home/surveys/update'
