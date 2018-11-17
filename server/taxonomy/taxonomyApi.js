@@ -57,12 +57,16 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyId = getRestParam(req, 'taxonomyId')
       const draft = getBoolParam(req, 'draft')
-      const limit = getRestParam(req, 'limit')
+      const limit = getRestParam(req, 'limit', 25)
       const offset = getRestParam(req, 'offset', 0)
       const filter = getJsonParam(req, 'filter')
       const sort = {field: 'scientificName', asc: true}
 
-      const taxa = await TaxonomyManager.fetchTaxaByProp(surveyId, taxonomyId, filter, sort, limit, offset, draft)
+      const params = {
+        filter, sort, limit, offset
+      }
+
+      const taxa = await TaxonomyManager.fetchTaxaByPropLike(surveyId, taxonomyId, params, draft)
 
       res.json({taxa})
     } catch (err) {

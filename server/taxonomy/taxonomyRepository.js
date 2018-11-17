@@ -1,9 +1,11 @@
-const db = require('../db/db')
 const R = require('ramda')
+
+const db = require('../db/db')
 
 const {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
+  updateSurveySchemaTableProps,
   deleteSurveySchemaTableRecord
 } = require('../survey/surveySchemaRepositoryUtils')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
@@ -51,6 +53,9 @@ const insertTaxa = async (surveyId, taxa, client = db) => {
   )
 }
 
+const insertTaxon = async (surveyId, taxon, client = db) =>
+  await insertTaxa(surveyId, [taxon], client)
+
 // ============== READ
 
 const fetchTaxonomyById = async (surveyId, id, draft = false, client = db) =>
@@ -76,17 +81,26 @@ const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false, client
     [taxonomyId],
     record => record.count)
 
-const fetchTaxaByProp = async (surveyId,
-                               taxonomyId,
-                               filter,
-                               sort = {field: 'scientificName', asc: true},
-                               limit = 25,
-                               offset = 0,
-                               draft = false,
-                               client = db) => {
+const fetchTaxaByPropLike = async (surveyId,
+                                   taxonomyId,
+                                   params = {},
+                                   draft = false,
+                                   client = db) => {
+  const {
+    filter,
+    sort = {field: 'scientificName', asc: true},
+    limit = 25,
+    offset = 0
+  } = params
+
   const filterProp = R.head(R.keys(filter))
   const filterValue = R.prop(filterProp)(filter)
-  const searchValue = filterValue ? R.pipe(R.trim, R.toLower)(filterValue) : null
+  const searchValue = filterValue ?
+    R.pipe(
+      R.trim,
+      R.toLower,
+      R.replace('*', '%')
+    )(filterValue) : null
 
   if (searchValue && filterProp === 'vernacularName') {
     return fetchTaxaByVernacularName(surveyId, taxonomyId, searchValue, sort, limit, offset, draft, client)
@@ -97,7 +111,7 @@ const fetchTaxaByProp = async (surveyId,
       `SELECT * FROM (
           SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
           WHERE taxonomy_id = $1 
-            ${searchValue ? `AND lower(${propsCol}->>'${filterProp}') LIKE '%${searchValue}%'` : ''}
+            ${searchValue ? `AND lower(${propsCol}->>'${filterProp}') LIKE '${searchValue}'` : ''}
           ORDER BY ${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
         ) AS sorted_taxa 
           LIMIT ${limit ? limit : 'ALL'} 
@@ -137,10 +151,24 @@ const fetchTaxaByVernacularName = async (surveyId,
   )
 }
 
+const fetchTaxonByCode = async (surveyId, taxonomyId, code, draft = false, client = db) => {
+  const propsCol = draft ? 'props_draft' : 'props'
+  return await client.oneOrNone(
+    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
+      WHERE taxonomy_id = $1 
+      AND lower(${propsCol}->>'code') = $2`,
+    [taxonomyId, R.toLower(code)],
+    record => record ? dbTransformCallback(record, draft): null
+  )
+}
+
 // ============== UPDATE
 
 const updateTaxonomyProp = async (surveyId, taxonomyId, key, value, client = db) =>
   await updateSurveySchemaTableProp(surveyId, 'taxonomy', taxonomyId, key, value, client)
+
+const updateTaxon = async (surveyId, taxonId, props, client = db) =>
+  await updateSurveySchemaTableProps(surveyId, 'taxon', taxonId, props, client)
 
 // ============== DELETE
 
@@ -158,15 +186,18 @@ module.exports = {
   //CREATE
   insertTaxonomy,
   insertTaxa,
+  insertTaxon,
 
   //READ
   fetchTaxonomyById,
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyId,
-  fetchTaxaByProp,
+  fetchTaxaByPropLike,
+  fetchTaxonByCode,
 
   //UPDATE
   updateTaxonomyProp,
+  updateTaxon,
 
   //DELETE
   deleteTaxonomy,

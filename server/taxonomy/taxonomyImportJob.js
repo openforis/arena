@@ -1,14 +1,17 @@
-const fastcsv = require('fast-csv')
 const R = require('ramda')
+
+const db = require('../db/db')
 
 const Job = require('../job/job')
 
 const {languageCodes} = require('../../common/app/languages')
 const {isNotBlank} = require('../../common/stringUtils')
+const {isValid} = require('../../common/validation/validator')
 const Taxonomy = require('../../common/survey/taxonomy')
 
 const {validateTaxon} = require('../taxonomy/taxonomyValidator')
 const TaxonomyManager = require('./taxonomyManager')
+const CSVParser = require('./csvParser')
 
 const requiredColumns = [
   'code',
@@ -17,57 +20,14 @@ const requiredColumns = [
   'scientific_name',
 ]
 
-class CSVRowProvider {
-
-  constructor (csvString) {
-    this.currentRowData = null
-    this.canceled = false
-    this.csvStreamEnded = false
-
-    this.csvStream = fastcsv.fromString(csvString, {headers: true})
-      .on('data', data => this.onData(data))
-      .on('end', () => this.onStreamEnd())
-    this.csvStream.pause()
+const getDuplicateFieldFromError = error => {
+  const violatedConstrainName = 'getErrors' in error ? error.getErrors()[0].constraint : null
+  switch (violatedConstrainName) {
+    case 'taxon_props_draft_scientific_name_idx':
+      return 'scientificName'
+    default:
+      return 'code'
   }
-
-  onData (data) {
-    this.csvStream.pause()
-
-    if (this.canceled) {
-      this.csvStream.destroy()
-      this.csvStreamEnded = true
-      this.currentRowData = null
-    } else {
-      this.currentRowData = data
-    }
-  }
-
-  onStreamEnd () {
-    this.csvStreamEnded = true
-  }
-
-  async next () {
-    return new Promise(resolve => {
-      if (this.csvStreamEnded) {
-        resolve(null)
-      } else {
-        this.currentRowData = null
-
-        setTimeout(() => {
-          if (this.currentRowData) {
-            resolve(this.currentRowData)
-          }
-        }, 30)
-
-        this.csvStream.resume()
-      }
-    })
-  }
-
-  cancel () {
-    this.canceled = true
-  }
-
 }
 
 class TaxonomyImportJob extends Job {
@@ -84,10 +44,7 @@ class TaxonomyImportJob extends Job {
   async execute () {
     const {surveyId, taxonomyId} = this
 
-    this.result = {
-      taxa: [],
-      vernacularLanguageCodes: [],
-    }
+    this.vernacularLanguageCodes = []
 
     const validHeaders = await this.processHeaders()
 
@@ -97,62 +54,63 @@ class TaxonomyImportJob extends Job {
     }
     this.processed = 0
 
-    const csvRowProvider = new CSVRowProvider(this.csvString)
+    const csvParser = new CSVParser(this.csvString)
 
-    let row = await csvRowProvider.next()
+    await db.tx(async t => {
+      let row = await csvParser.next()
 
-    while (row && !this.isCanceled()) {
-      if (this.isCanceled()) {
-        csvRowProvider.cancel()
-      } else {
-        await this.processRow(row)
-      }
-      row = await csvRowProvider.next()
-    }
-
-    const hasErrors = !R.isEmpty(R.keys(this.errors))
-    if (hasErrors) {
-      this.setStatusFailed()
-    } else {
-      await TaxonomyManager.persistTaxa(surveyId, taxonomyId, this.result.taxa, this.result.vernacularLanguageCodes)
-      this.setStatusSucceeded()
-    }
-  }
-
-  calculateTotal () {
-    const csvString = this.csvString
-    return new Promise(resolve => {
-      let count = 0
-      fastcsv.fromString(csvString, {headers: true})
-        .on('data', () => count++)
-        .on('end', () => resolve(count))
-    })
-  }
-
-  processHeaders () {
-    const $this = this
-    return new Promise(function (resolve) {
-      const csvStream = fastcsv.fromString($this.csvString, {headers: false})
-      csvStream.on('data', async columns => {
-        csvStream.destroy() //stop streaming CSV
-        const validHeaders = $this.validateHeaders(columns)
-        if (validHeaders) {
-          $this.result.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, columns)
+      while (row) {
+        if (this.isCanceled()) {
+          csvParser.cancel()
+          break
+        } else {
+          await this.processRow(row, t)
         }
-        resolve(validHeaders)
-      })
+        row = await csvParser.next()
+      }
+      if (!this.isCanceled()) {
+        const hasErrors = !R.isEmpty(R.keys(this.errors))
+        if (hasErrors) {
+          this.setStatusFailed()
+        } else {
+          await TaxonomyManager.updateTaxonomyProp(surveyId, taxonomyId,
+            'vernacularLanguageCodes', this.vernacularLanguageCodes, t)
+          this.setStatusSucceeded()
+        }
+      }
     })
   }
 
-  async processRow (data) {
-    const {result} = this
+  async calculateTotal () {
+    const csvParser = new CSVParser(this.csvString)
+    return await csvParser.calculateSize()
+  }
 
-    const taxonParseResult = await this.parseTaxon(data)
+  async processHeaders () {
+    const csvParser = new CSVParser(this.csvString, false)
+    let headers = await csvParser.next()
+    csvParser.cancel()
+    const validHeaders = this.validateHeaders(headers)
+    if (validHeaders) {
+      this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, headers)
+    }
+    return validHeaders
+  }
 
-    if (taxonParseResult.taxon) {
-      result.taxa.push(taxonParseResult.taxon)
+  async processRow (data, t) {
+    const {surveyId} = this
+
+    const taxon = await this.parseTaxon(data)
+
+    if (isValid(taxon)) {
+      try {
+        await TaxonomyManager.saveTaxon(surveyId, taxon, t)
+      } catch (e) {
+        const duplicateField = getDuplicateFieldFromError(e)
+        this.addError({[duplicateField]: {valid: false, errors: ['duplicate']}})
+      }
     } else {
-      this.errors['' + (this.processed + 1)] = taxonParseResult.errors
+      this.addError(taxon.validation.fields)
     }
     this.incrementProcessedItems()
   }
@@ -162,7 +120,7 @@ class TaxonomyImportJob extends Job {
     if (R.isEmpty(missingColumns)) {
       return true
     } else {
-      this.errors[0] = `Missing required columns: ${R.join(', ', missingColumns)}`
+      this.addError(`Missing required columns: ${R.join(', ', missingColumns)}`)
       return false
     }
   }
@@ -178,20 +136,24 @@ class TaxonomyImportJob extends Job {
       vernacularNames: this.parseVernacularNames(vernacularNames)
     })(Taxonomy.newTaxon(this.taxonomyId))
 
-    const validation = await validateTaxon(this.result.taxa, taxon)
+    const validation = await validateTaxon([], taxon) //do not validate code and scientific name uniqueness
 
-    return validation.valid
-      ? {taxon}
-      : {errors: validation.fields}
+    return {
+      ...taxon,
+      validation
+    }
   }
 
   parseVernacularNames (vernacularNames) {
     return R.reduce((acc, langCode) => {
       const vernacularName = vernacularNames[langCode]
       return isNotBlank(vernacularName) ? R.assoc(langCode, vernacularName, acc) : acc
-    }, {}, this.result.vernacularLanguageCodes)
+    }, {}, this.vernacularLanguageCodes)
   }
 
+  addError (error) {
+    this.errors['' + (this.processed + 1)] = error
+  }
 }
 
 TaxonomyImportJob.type = 'TaxonomyImportJob'

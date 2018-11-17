@@ -150,7 +150,7 @@ class NodeDefTaxon extends React.Component {
       limit: 20,
       offset: 0,
       filter: {
-        [field]: value,
+        [field]: `*${value}*`,
       }
     }
 
