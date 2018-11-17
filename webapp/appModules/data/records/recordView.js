@@ -1,12 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import SurveyFormView from '../surveyForm/surveyFormView'
+import SurveyFormView from '../../surveyForm/surveyFormView'
 
-import { initSurveyDefs } from '../../survey/actions'
-import { resetForm } from '../surveyForm/actions'
+import { initSurveyDefs } from '../../../survey/actions'
+import { resetForm } from '../../surveyForm/actions'
 
-class DataRecordView extends React.Component {
+class RecordView extends React.Component {
 
   componentDidMount () {
     const {resetForm, initSurveyDefs} = this.props
@@ -25,4 +25,4 @@ class DataRecordView extends React.Component {
 export default connect(
   null,
   {initSurveyDefs, resetForm}
-)(DataRecordView)
+)(RecordView)
