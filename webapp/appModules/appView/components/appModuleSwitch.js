@@ -26,7 +26,7 @@ const AppModuleSwitch = (props) => (
     <CSSTransition
       // avoid css transition when changing location within subroutes
       key={props.location.pathname.split('/')[2]}
-      timeout={200}
+      timeout={150}
       classNames="app-module__fade">
 
       <Switch location={props.location}>
