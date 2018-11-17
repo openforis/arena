@@ -2,17 +2,16 @@
 @import "../../style/layout";
 
 .app__container {
-
   @extend .full-screen-fixed;
 
   z-index: $zIndex1App;
-  display: grid;
-  grid-template-columns: 60px 1fr;
+  display: flex;
 }
 
 .app__modules {
   position: relative;
   display: grid;
+  flex-grow: 1;
 }
 
 .app-module {

@@ -1,7 +1,12 @@
 @import "../../../../style/vars";
 
+$sidebarWidthClosed: 60px;
+$sidebarWidthOpened: 200px;
+$sidebarTransition: width 100ms ease-in;
+
 .app-sidebar {
   position: relative;
+  width: $sidebarWidthClosed;
   background-color: rgba($brown, 0.4);
   border-right: 1px solid rgba($white, 0.1);
 
@@ -10,6 +15,17 @@
   align-items: center;
   justify-content: center;
   justify-items: center;
+
+  transition: $sidebarTransition;
+
+  &.opened {
+    width: $sidebarWidthOpened;
+
+    .app-sidebar__module_label {
+      width: auto;
+      height: auto;
+    }
+  }
 }
 
 .app-sidebar__btn-of {
@@ -30,14 +46,27 @@
 
 .app-sidebar__btn-toggle {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: $sidebarWidthClosed / 4;
+  right: $sidebarWidthClosed / 4;
   opacity: .75;
 }
 
 .app-sidebar__modules {
   display: grid;
   grid-row-gap: 1.5rem;
+}
+
+.app-sidebar__module {
+  display: flex;
+  align-items: baseline;
+}
+
+.app-sidebar__module_label {
+  display: block;
+  width: 0px;
+  height: 0px;
+  overflow: hidden;
+  transition: $sidebarTransition;
 }
 
 .app-sidebar__footer {
