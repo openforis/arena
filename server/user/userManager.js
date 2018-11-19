@@ -17,8 +17,9 @@ const findUserById = async (userId) => {
 const findUserByEmailAndPassword = async (email, password) => {
   const user = await userRepository.findUserByEmailAndPassword(email, password)
 
-  const authGroups = await fetchUserGroups(user.id)
+  if (!user) return null
 
+  const authGroups = await fetchUserGroups(user.id)
   return {...user, authGroups}
 }
 

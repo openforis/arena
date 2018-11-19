@@ -28,7 +28,7 @@ module.exports = {
   isDraft: SurveyInfo.isDraft,
   isValid: SurveyInfo.isValid,
 
-  getAuthGroupAdmin: SurveyInfo.getAuthGroupAdmin,
+  getSurveyAdminGroup: SurveyInfo.getSurveyAdminGroup,
 
   // ====== READ nodeDefs
   getNodeDefs: SurveyNodeDefs.getNodeDefs,

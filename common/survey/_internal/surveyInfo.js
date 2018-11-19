@@ -51,7 +51,7 @@ const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 // ====== AUTH GROUPS
 
-const getAuthGroupAdmin = R.pipe(
+const getSurveyAdminGroup = R.pipe(
   R.prop('authGroups'),
   R.find(g => g.name === groupNames.surveyAdmin)
 )
@@ -72,7 +72,7 @@ module.exports = {
   getDefaultStep,
 
   // ====== AUTH GROUPS
-  getAuthGroupAdmin,
+  getSurveyAdminGroup,
 
   // ====== UTILS
   isValid,

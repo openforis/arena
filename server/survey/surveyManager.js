@@ -64,7 +64,7 @@ const createSurvey = async (user, {name, label, lang}) => {
       survey = R.assoc('authGroups', authGroups, survey)
 
       if (!isSystemAdmin(user)) {
-        await authGroupRepository.insertUserGroup(Survey.getAuthGroupAdmin(Survey.getSurveyInfo(survey)).id, user.id, t)
+        await authGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
       }
 
       return survey

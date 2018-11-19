@@ -12,16 +12,17 @@ const surveyAdminGroup = (survey) => R.pipe(
   R.find(R.propEq('name', groupNames.surveyAdmin))
 )(survey)
 
-const getUserPermissionsForSurvey = (user, survey) =>
-  R.pipe(
+const getSurveyUserPermissions = (user, survey) => {
+  return R.pipe(
     R.innerJoin((ug, sg) => ug.id === sg.id),
     R.head, // there's only one group per user per survey
     R.propOr([], 'permissions'),
-  )(user.authGroups, survey.info.authGroups)
+  )(user.authGroups, R.pathOr([], ['info', 'authGroups'], survey))
+}
 
 const hasPermission = (permission) => (user, survey) =>
   user && survey
-    ? (isSystemAdmin(user) || R.contains(permission, getUserPermissionsForSurvey(user, survey)))
+    ? (isSystemAdmin(user) || R.contains(permission, getSurveyUserPermissions(user, survey)))
     : false
 
 // const hasPermission = (user, survey, permission) =>
