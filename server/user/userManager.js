@@ -6,9 +6,6 @@ const {fetchUserGroups} = require('../authGroup/authGroupRepository')
 
 // ==== READ
 
-const fetchUsers = async (filter, limit, offset) =>
-  await userRepository.fetchUsers(filter, limit, offset)
-
 const findUserById = async (userId) => {
   const userFetchPromise = userRepository.findUserById(userId)
 
@@ -37,7 +34,6 @@ const deleteUserPref = async (user, name) =>
 
 module.exports = {
   // READ
-  fetchUsers,
   findUserById,
   findUserByEmailAndPassword,
 

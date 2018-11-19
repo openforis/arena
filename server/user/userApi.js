@@ -1,25 +1,12 @@
-const {getRestParam, getJsonParam} = require('../serverUtils/request')
+const {getRestParam} = require('../serverUtils/request')
 const {sendOk, sendErr} = require('../serverUtils/response')
 
-const {updateUserPref, fetchUsers} = require('./userManager')
+const {updateUserPref} = require('./userManager')
 
 module.exports.init = app => {
-  // === READ
-  app.get('/users', async(req, res) => {
-    try {
-      const limit = getRestParam(req, 'limit')
-      const offset = getRestParam(req, 'offset', 0)
-      const filter = getJsonParam(req, 'filter')
-
-      const users = await fetchUsers(filter, limit, offset)
-
-      res.json(users)
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
 
   // ==== UPDATE
+
   app.post('/user/:userId/pref/:name/:value', async (req, res) => {
     try {
       const {user} = req

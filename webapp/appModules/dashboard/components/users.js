@@ -89,7 +89,7 @@ class Users extends React.Component {
 
         {showInviteDialog &&
           <InviteUserDialog onCancel={() => this.toggleInviteUserDialog(false)}
-                            onInvite={() => alert('TODO')}/>
+                            onInvite={() => {alert('TODO'); this.toggleInviteUserDialog(false)}}/>
         }
 
       </div>

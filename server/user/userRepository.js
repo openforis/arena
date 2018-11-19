@@ -8,23 +8,6 @@ const selectFieldsCommaSep = selectFields.join(',')
 
 // in sql queries, user table must be surrounded by "" e.g. "user"
 
-// ==== READ
-
-const fetchUsers = async (filter, limit, offset, client = db) =>  {
-  const filterProp = R.head(R.keys(filter))
-  const filterValue = R.prop(filterProp)(filter)
-  const searchValue = filterValue ? R.pipe(R.trim, R.toLower)(filterValue) : null
-
-  return await client.any(`
-    SELECT ${selectFieldsCommaSep}
-    FROM "user"
-    WHERE ${searchValue ? `lower(${filterProp}) LIKE '%${searchValue}%'` : ''}
-    LIMIT ${limit ? limit : 'ALL'}
-    OFFSET $1`
-  , offset)
-}
-// ${searchValue ? `AND lower(${propsCol}->>'${filterProp}') LIKE '%${searchValue}%'` : ''}
-
 const findUserById = async (userId, client = db) =>
   await client.one(`
     SELECT ${selectFieldsCommaSep} FROM "user" WHERE id = $1
@@ -74,7 +57,6 @@ const deleteUserPref = async (user, name, client = db) => {
 
 module.exports = {
   // READ
-  fetchUsers,
   findUserById,
   findUserByEmailAndPassword,
 

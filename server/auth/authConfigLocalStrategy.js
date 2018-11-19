@@ -1,6 +1,6 @@
 const LocalStrategy = require('passport-local')
 
-const {validEmail} = require('../../common/user/userUtils')
+const {validEmail} = require('../../common/user/user')
 const {findUserByEmailAndPassword} = require('../user/userManager')
 
 const verifyCallback = async (req, email, password, done) => {
