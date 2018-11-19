@@ -15,7 +15,7 @@ module.exports.init = app => {
 
   app.post('/nodeDef', async (req, res) => {
     try {
-      const {body: nodeDefRequest, user} = req
+      const {body: nodeDefRequest} = req
       const {surveyId, parentId, uuid, type, props} = nodeDefRequest
 
       const nodeDef = await createNodeDef(surveyId, parentId, uuid, type, props)

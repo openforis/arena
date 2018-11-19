@@ -80,6 +80,4 @@ module.exports = {
 
   // UPDATE
   insertUserGroup,
-
-  // DELETE
 }

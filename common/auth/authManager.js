@@ -25,15 +25,10 @@ const hasPermission = (permission) => (user, survey) =>
     ? (isSystemAdmin(user) || R.contains(permission, getSurveyUserPermissions(user, survey)))
     : false
 
-// const hasPermission = (user, survey, permission) =>
-//   isSystemAdmin(user)
-//   || R.contains(permission, getUserPermissionsForSurvey(user, survey))
-
 const canEditSurvey = hasPermission(permissions.surveyEdit)
 
 module.exports = {
   isSystemAdmin,
   canEditSurvey,
   surveyAdminGroup,
-  // canInviteUsers
 }

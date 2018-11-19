@@ -29,7 +29,7 @@ const fetchAllSurveys = async (client = db) =>
     def => dbTransformCallback(def)
   )
 
-const fetchSurveys = async (userId, client = db) =>
+const fetchSurveys = async (client = db) =>
   await client.map(`
     SELECT
       s.*, ${selectDate('n.date_created', 'date_created')}, nm.date_modified
@@ -47,7 +47,7 @@ const fetchSurveys = async (userId, client = db) =>
       ON s.id = nm.survey_id
     ORDER BY s.id
     `,
-    [userId],
+    [],
     def => dbTransformCallback(def, true)
   )
 

@@ -90,7 +90,7 @@ const fetchSurveyById = async (id, draft = false, validate = false) => {
 }
 
 const fetchUserSurveys = async (user) => {
-  const surveys = await surveyRepository.fetchSurveys(user.id)
+  const surveys = await surveyRepository.fetchSurveys()
   const surveysAuthGroups = await Promise.all(surveys.map(s => authGroupRepository.fetchSurveyGroups(s.id)))
 
   return R.map(
