@@ -1,4 +1,4 @@
-import './style.scss'
+import './dashboardView.scss'
 
 import React from 'react'
 import { withRouter } from 'react-router'

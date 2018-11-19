@@ -9,7 +9,7 @@ const AppJobErrors = ({job}) => {
 
   return job.failed && !R.isEmpty(errors)
     ? (
-      <div className="app-job-monitor__errors">
+      <div className="app-job-monitor__job-errors">
         <div className="header">
           <div>Item</div>
           <div>Errors</div>

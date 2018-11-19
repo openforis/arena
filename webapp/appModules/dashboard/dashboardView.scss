@@ -1,0 +1,29 @@
+@import "../../style/vars";
+
+.app-dashboard {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: .2fr .8fr;
+  justify-content: center;
+}
+
+.app-dashboard__modules {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background-color: rgba($blue2, 0.1);
+}
+
+.app-dashboard__module {
+  padding: 1.5rem .5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-row-gap: 2.5rem;
+  justify-items: center;
+  align-content: start;
+}
+
+.app-dashboard__module-item {
+  @extend .app-dashboard__module;
+  padding: 0;
+  grid-row-gap: .5rem;
+}

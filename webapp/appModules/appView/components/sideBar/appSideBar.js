@@ -1,10 +1,12 @@
+import './appSideBar.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
 import AppSideBarFooter from './appSideBarFooter'
 import AppSideBarModules from './appSideBarModules'
 
-import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
+import { getStateSurveyInfo } from '../../../../survey/surveyState'
 import { getUser } from '../../../../app/appState'
 import { logout } from '../../../../app/actions'
 
@@ -13,15 +15,12 @@ class AppSideBar extends React.Component {
   constructor () {
     super()
     this.state = {opened: false}
+    this.element = React.createRef()
   }
 
   toggleOpen () {
-    const {opened} = this.state
-
-    const width = opened ? 60 : 200
-    document.getElementsByClassName('app__container')[0].style.gridTemplateColumns = `${width}px 1fr`
-
-    this.setState({opened: !opened})
+    this.element.current.classList.toggle('opened')
+    this.setState({opened: !this.state.opened})
 
     //react-grid-layout re-render
     // window.dispatchEvent(new Event('resize'))
@@ -32,24 +31,17 @@ class AppSideBar extends React.Component {
     const {pathname, user, surveyInfo, logout} = this.props
 
     return (
-      <div className="app-sidebar">
+      <div className="app-sidebar" ref={this.element}>
 
         {/*toggle sidebar */}
-        <div style={{
-          display: 'grid',
-          width: '100%',
-          justifyItems: 'end',
-          opacity: '.5',
-        }}>
-          <a className="btn btn-s btn-of-light-xs no-border"
-             onClick={() => this.toggleOpen()}>
-            <span className={`icon icon-${opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
-          </a>
-        </div>
+        <a className="btn btn-s btn-of-light-xs no-border app-sidebar__btn-toggle"
+           onClick={() => this.toggleOpen()}>
+          <span className={`icon icon-${opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
+        </a>
 
         <AppSideBarModules pathname={pathname}
                            surveyInfo={surveyInfo}
-                           opened={opened}/>
+                           sideBarOpened={opened}/>
 
         <AppSideBarFooter surveyInfo={surveyInfo}
                           user={user}

@@ -13,11 +13,4 @@ export const appModules = {
   users: 'users',
 }
 
-export const actionTypes = {
-  appModulesDashboardDataLoaded: 'appModules/dashboardData/loaded',
-  appModulesDataLoaded: 'appModules/data/loaded',
-}
-
-//default home is dashboard
 export const appModuleUri = (module = appModules.home) => `/${[app, module].join('/')}/`
-

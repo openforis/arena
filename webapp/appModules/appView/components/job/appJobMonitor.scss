@@ -1,13 +1,9 @@
 @import "../../../../style/vars";
 
 .app-job-monitor {
-  display: grid;
-  justify-items: center;
-  grid-row-gap: .5rem;
-}
-
-.app-job-monitor__status {
-  text-transform: uppercase;
+  .modal-body {
+    padding-top: 0;
+  }
 }
 
 .app-job-monitor__header {
@@ -16,9 +12,10 @@
   text-transform: uppercase;
   font-size: 1rem;
   font-weight: 400;
+  margin-bottom: 1rem;
 }
 
-.app-job-monitor__errors {
+.app-job-monitor__job-errors {
   justify-self: stretch;
 
   .header, .row {
@@ -41,34 +38,31 @@
   }
 }
 
-.app-job-monitor_inner-jobs {
+.app-job-monitor__inner-jobs {
+  max-height: 45vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 2rem;
+  padding: 2rem 1.5rem 0 1.5rem;
+  background-color: rgba($grey, 0.05);
 
-  .header {
-    text-align: center;
-    text-transform: uppercase;
+  .job {
+    display: grid;
+    grid-template-columns: .5fr .5fr;
+
+    .name {
+      font-size: .9rem;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
   }
 
-  .inner-jobs-wrapper {
-    height: 35vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+  > div {
+    margin-bottom: 2rem;
+  }
 
-    .inner-job {
-      border-bottom: 1px dotted rgba($white, 0.35);
-    }
-
-    .inner-job.failed {
-      border: 2px dashed rgba($white, 0.35);
-      background-color: rgba($white, 0.1);
-
-      .app-job-monitor__errors {
-        margin: 2rem;
-
-        .header {
-          text-align: left;
-        }
-      }
-    }
+  .app-job-monitor__job-errors {
+    padding: 0 1rem 2rem 1rem;
   }
 }
 
@@ -76,18 +70,40 @@
   position: relative;
   height: 1rem;
   width: 100%;
-  border: 1px solid rgba($blue3, .4);
 
-  .filler {
-    background: rgba($blue3, .8);
-    height: 100%;
-    transition: width .2s ease-in;
+  .progress {
+    font-size: .75rem;
+    text-transform: uppercase;
+    position: absolute;
+    left: .2rem;
+    top: 0;
+    font-weight: 400;
   }
 
-  &.error {
-    border: 1px solid rgba($red, .4);
+  .filler {
+    transition: width .2s ease-in;
+    height: 100%;
+  }
+
+  &.running {
     .filler {
+      border: 1px solid rgba($blue3, .4);
+      background: rgba($blue3, .8);
+    }
+  }
+
+  &.failed {
+    .filler {
+      border: 1px solid rgba($red, .4);
       background: rgba($red, .8);
+      width: 100% !important;
+    }
+  }
+
+  &.succeeded {
+    .filler {
+      border: 1px solid rgba($greenLight, .4);
+      background: rgba($greenLight, .8);
     }
   }
 }

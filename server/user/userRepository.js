@@ -1,6 +1,4 @@
 const db = require('../db/db')
-const R = require('ramda')
-
 const {comparePassword} = require('./userUtils')
 
 const selectFields = ['id', 'name', 'email', 'prefs']
@@ -8,6 +6,7 @@ const selectFieldsCommaSep = selectFields.join(',')
 
 // in sql queries, user table must be surrounded by "" e.g. "user"
 
+// ==== READ
 const findUserById = async (userId, client = db) =>
   await client.one(`
     SELECT ${selectFieldsCommaSep} FROM "user" WHERE id = $1

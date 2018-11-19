@@ -1,3 +1,5 @@
+import './surveyInfo.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -64,11 +66,11 @@ class SurveyInfo extends React.Component {
             <span className="icon icon-checkmark2 icon-16px icon-left"/> Publish
           </button>
 
-          <button className="btn btn-of-light">
+          <button className="btn btn-of-light" aria-disabled={true}>
             <span className="icon icon-download3 icon-16px icon-left"/> Export
           </button>
 
-          <button className="btn btn-of-light">
+          <button className="btn btn-of-light" aria-disabled={true}>
             <span className="icon icon-upload3 icon-16px icon-left"/> Import
           </button>
 

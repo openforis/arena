@@ -4,7 +4,6 @@ import * as R from 'ramda'
 
 import { appModuleUri } from '../../../appModules'
 import { appModules } from '../../../appModules'
-import { getLocationPathname } from '../../../../appUtils/routerUtils'
 
 const modules = [
   {
@@ -46,23 +45,19 @@ const AppSideBarModule = (props) => {
   const {
     pathname, module, surveyInfo,
     //module props
-    icon, label, showLabel = false, disabled = false,
+    icon, label, sideBarOpened = false, disabled = false,
   } = props
 
-  const active = pathname === appModuleUri(module)
+  const active = R.startsWith(appModuleUri(module), pathname)
   const requireSurvey = module !== appModules.home
 
   return (
     <React.Fragment>
-      <Link className={`btn btn-s btn-of-light-xs${active ? ' active' : ''}`}
+      <Link className={`btn btn-s btn-of-light-xs app-sidebar__module${active ? ' active' : ''}`}
             to={appModuleUri(module)}
             aria-disabled={disabled || (requireSurvey && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo)))}>
-        <span className={`icon icon-${icon} icon-20px${showLabel ? ' icon-left' : ''}`}></span>
-        {
-          showLabel
-            ? <span>{label}</span>
-            : null
-        }
+        <span className={`icon icon-${icon} icon-20px${sideBarOpened ? ' icon-left' : ''}`}></span>
+        <span className="app-sidebar__module_label">{label}</span>
       </Link>
       {
         module === appModules.home
@@ -73,18 +68,15 @@ const AppSideBarModule = (props) => {
   )
 }
 
-const AppSideBarModules = ({pathname, surveyInfo, opened}) => (
-  <div style={{
-    display: 'grid',
-    gridRowGap: '1.5rem',
-  }}>
+const AppSideBarModules = ({pathname, surveyInfo, sideBarOpened}) => (
+  <div className="app-sidebar__modules">
     {
       modules.map((m, i) => (
         <AppSideBarModule key={i}
                           {...m}
                           pathname={pathname}
                           surveyInfo={surveyInfo}
-                          showLabel={opened}
+                          sideBarOpened={sideBarOpened}
         />
       ))
     }

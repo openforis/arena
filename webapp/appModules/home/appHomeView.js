@@ -1,3 +1,5 @@
+import './appHomeView.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -6,7 +8,7 @@ import AddSurveyForm from './components/addSurveyForm'
 import SurveysList from './components/surveysList'
 
 import { appModuleUri } from '../appModules'
-import { getNewSurvey, getSurveys } from './homeState'
+import { getNewSurvey, getSurveys } from './appHomeState'
 import { appModules } from '../appModules'
 
 import Survey from '../../../common/survey/survey'
@@ -47,16 +49,11 @@ class AppHomeView extends React.Component {
     } = this.props
 
     return (
-      <div style={{
-        display: 'grid',
-        gridTemplateRows: '90px 2rem .95fr',
-      }}>
+      <div className="app-home">
 
         <AddSurveyForm newSurvey={newSurvey}
                        updateNewSurveyProp={updateNewSurveyProp}
                        createSurvey={createSurvey}/>
-
-        <div/>
 
         <SurveysList surveys={surveys}
                      surveyInfo={surveyInfo}
