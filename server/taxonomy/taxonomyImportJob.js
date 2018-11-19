@@ -61,24 +61,38 @@ class TaxonomyImportJob extends Job {
 
       while (row) {
         if (this.isCanceled()) {
-          csvParser.cancel()
+          csvParser.destroy()
           break
         } else {
           await this.processRow(row, t)
         }
         row = await csvParser.next()
       }
-      if (!this.isCanceled()) {
+      if (this.isCanceled()) {
+        throw new Error('canceled')
+      } else {
         const hasErrors = !R.isEmpty(R.keys(this.errors))
         if (hasErrors) {
           this.setStatusFailed()
+          throw new Error('errors found; rollback transaction')
         } else {
           await TaxonomyManager.updateTaxonomyProp(surveyId, taxonomyId,
             'vernacularLanguageCodes', this.vernacularLanguageCodes, t)
           this.setStatusSucceeded()
         }
       }
+    }).catch(e => {
+      if (this.isRunning()) {
+        this.addError({
+          all: {
+            valid: false,
+            errors: [e.toString()]
+          }
+        })
+        this.setStatusFailed()
+      }
     })
+    csvParser.destroy()
   }
 
   async calculateTotal () {
@@ -89,7 +103,7 @@ class TaxonomyImportJob extends Job {
   async processHeaders () {
     const csvParser = new CSVParser(this.csvString, false)
     let headers = await csvParser.next()
-    csvParser.cancel()
+    csvParser.destroy()
     const validHeaders = this.validateHeaders(headers)
     if (validHeaders) {
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, headers)
@@ -120,7 +134,12 @@ class TaxonomyImportJob extends Job {
     if (R.isEmpty(missingColumns)) {
       return true
     } else {
-      this.addError(`Missing required columns: ${R.join(', ', missingColumns)}`)
+      this.addError({
+        all: {
+          valid: false,
+          errors: [`Missing required columns: ${R.join(', ', missingColumns)}`]
+        }
+      })
       return false
     }
   }

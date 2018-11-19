@@ -3,7 +3,7 @@ const fastcsv = require('fast-csv')
 class CSVParser {
 
   constructor (csvString, readHeaders = true) {
-    this.canceled = false
+    this.destroyed = false
     this.csvStreamEnded = false
     this.csvString = csvString
     this.rowReadyListener = null
@@ -43,17 +43,23 @@ class CSVParser {
       if (this.csvStreamEnded) {
         resolve(null)
       } else {
-
-        this.rowReadyListener = row => resolve(row)
-
+        this.rowReadyListener = row => {
+          this.rowReadyListener = null
+          resolve(row)
+        }
         this.csvStream.resume()
       }
     })
   }
 
-  cancel () {
-    this.canceled = true
-    this.csvStream.destroy()
+  destroy () {
+    if (!this.destroyed) {
+      this.csvStream.destroy()
+      this.csvStream = null
+      this.csvString = null
+      this.rowReadyListener = null
+      this.destroyed = true
+    }
   }
 }
 
