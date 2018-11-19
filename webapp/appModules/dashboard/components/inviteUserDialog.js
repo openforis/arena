@@ -36,7 +36,11 @@ class InviteUserDialog extends React.Component {
 
   componentDidMount () {
     this.emailInput.current.focus()
-    window.addEventListener('keydown', (e) => this.onKeyDown(e))
+    window.addEventListener('keydown', this)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('keydown', this)
   }
 
   componentDidUpdate (_, prevState) {
@@ -46,18 +50,20 @@ class InviteUserDialog extends React.Component {
     }
   }
 
-  onKeyDown (e) {
+  handleEvent (e) {
     const {onInvite, onCancel} = this.props
 
-    switch (e.keyCode) {
-      case KeyboardMap.Enter:
-        if (this.state.enableInvite) {
-          onInvite()
-        }
-        break
-      case KeyboardMap.Esc:
-        onCancel()
-        break
+    if (e.type === 'keydown') {
+      switch (e.keyCode) {
+        case KeyboardMap.Enter:
+          if (this.state.enableInvite) {
+            onInvite()
+          }
+          break
+        case KeyboardMap.Esc:
+          onCancel()
+          break
+      }
     }
   }
 
