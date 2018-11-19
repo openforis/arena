@@ -7,15 +7,20 @@ import * as R from 'ramda'
 import { appModuleUri } from '../../appModules'
 import { appModules } from '../../appModules'
 
+import { getUser } from '../../../app/appState'
+import { getSurvey } from '../../../survey/surveyState'
+
+import {canEditSurvey} from '../../../../common/auth/authManager'
+
 class Designer extends React.Component {
 
   render () {
-    const {surveyDesigner} = this.props
+    const {surveyDesigner, user, survey} = this.props
 
     const {
       entityDefns,
       attributeDefns,
-      pages
+      pages,
     } = surveyDesigner
 
     const count = R.prop('count')
@@ -43,11 +48,14 @@ class Designer extends React.Component {
               )
           }
 
-          <Link to={appModuleUri(appModules.designer)} className="btn btn-of">
-            <span className="icon icon-quill icon-left"></span>
-            Design
-          </Link>
-
+          {
+            canEditSurvey(user, survey) && (
+              <Link to={appModuleUri(appModules.designer)} className="btn btn-of">
+                <span className="icon icon-quill icon-left"></span>
+                Design
+              </Link>
+            )
+          }
         </div>
     )
   }
@@ -64,6 +72,8 @@ Designer.defaultProps = {
 }
 
 const mapStateToProps = state => ({
+  user: getUser(state),
+  survey: getSurvey(state)
 })
 
 export default connect(mapStateToProps)(Designer)

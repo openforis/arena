@@ -14,13 +14,13 @@ export const exportReducer = actionHandlers =>
 
 export const assocActionProps = (state, {type, ...props}) => ({...state, ...props})
 
-export const dissocStateProps = (state, props) =>
-  R.reduce(
+export const dissocStateProps = (state, props) => {
+  return R.reduce(
     (s, prop) => R.dissoc(prop, s),
     state,
     R.insertAll(0, props, [])
   )
-
+}
 export const debounceAction = (action, key, delay = 500) => {
   action.meta = {
     debounce: {

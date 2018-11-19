@@ -5,6 +5,7 @@ import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 import { startJob, updateActiveJob } from '../appModules/appView/components/job/appJobState'
 import { assocAppError, dissocAppError, getAppErrors, logoutUser } from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
+import { isSystemAdmin, surveyAdminGroup } from '../../common/auth/authManager'
 
 import {
   appStatusChange,
@@ -21,6 +22,7 @@ import { loginSuccess } from '../login/actions'
  * ======
  */
 import { appJobStart, appJobActiveUpdate } from '../appModules/appView/components/job/actions'
+import { surveyCreate } from '../survey/actions'
 
 const actionHandlers = {
 
@@ -57,6 +59,20 @@ const actionHandlers = {
   )(state),
 
   [appErrorDelete]: (state, {error}) => dissocAppError(error)(state),
+
+  [surveyCreate]: (state, {survey}) => {
+    // On survey create, add current user to new survey's surveyAdmin group
+    const user = R.prop('user', state)
+    if (isSystemAdmin(user)) return state
+
+    const authGroups = R.pipe(
+      R.prop('authGroups'),
+      R.append(surveyAdminGroup(survey))
+    )(user)
+
+    return R.assocPath(['user', 'authGroups'], authGroups, state)
+  },
+
 }
 
 export default exportReducer(actionHandlers)

@@ -1,4 +1,5 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/dbMigrator')
@@ -79,17 +80,24 @@ const createSurvey = async (user, {name, label, lang}) => {
 // ====== READ
 const fetchSurveyById = async (id, draft = false, validate = false) => {
   const survey = await surveyRepository.getSurveyById(id, draft)
+  const authGroups = await authGroupRepository.fetchSurveyGroups(survey.id)
 
   return assocSurveyInfo({
     ...survey,
+    authGroups,
     validation: validate ? await validateSurvey(survey) : null
   })
 }
 
-const fetchUserSurveys = async (user) => R.map(
-  assocSurveyInfo,
-  await surveyRepository.fetchSurveys(user.id)
-)
+const fetchUserSurveys = async (user) => {
+  const surveys = await surveyRepository.fetchSurveys(user.id)
+  const surveysAuthGroups = await Promise.all(surveys.map(s => authGroupRepository.fetchSurveyGroups(s.id)))
+
+  return R.map(
+    assocSurveyInfo,
+    surveys.map((s, i) => ({...s, authGroup: surveysAuthGroups[i]})) // TODO
+  )
+}
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)

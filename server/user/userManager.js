@@ -6,20 +6,23 @@ const {fetchUserGroups} = require('../authGroup/authGroupRepository')
 
 // ==== READ
 
+const fetchUsers = async (filter, limit, offset) =>
+  await userRepository.fetchUsers(filter, limit, offset)
+
 const findUserById = async (userId) => {
   const userFetchPromise = userRepository.findUserById(userId)
 
-  const [user, groups] = await Promise.all([userFetchPromise, fetchUserGroups(userId)])
+  const [user, authGroups] = await Promise.all([userFetchPromise, fetchUserGroups(userId)])
 
-  return {...user, groups}
+  return {...user, authGroups}
 }
 
 const findUserByEmailAndPassword = async (email, password) => {
   const user = await userRepository.findUserByEmailAndPassword(email, password)
 
-  const groups = await fetchUserGroups(user.id)
+  const authGroups = await fetchUserGroups(user.id)
 
-  return {...user, groups}
+  return {...user, authGroups}
 }
 
 // ==== UPDATE
@@ -34,6 +37,7 @@ const deleteUserPref = async (user, name) =>
 
 module.exports = {
   // READ
+  fetchUsers,
   findUserById,
   findUserByEmailAndPassword,
 
