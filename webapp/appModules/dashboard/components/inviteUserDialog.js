@@ -141,7 +141,6 @@ class InviteUserDialog extends React.Component {
 
           <div className="user-invite-dialog__body">
             <Input ref={this.emailInput}
-                   className="email-input"
                    value={this.state.email}
                    disabled={false}
                    validation={this.state.emailErrors}
