@@ -33,11 +33,11 @@ const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = fal
     : taxonomies
 }
 
-const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate = false) => {
-  const taxonomy = await TaxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft)
+const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate = false, client = db) => {
+  const taxonomy = await TaxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft, client)
 
   if (validate) {
-    const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft)
+    const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
     return {
       ...taxonomy,
       validation: await validateTaxonomy(taxonomies, taxonomy)
@@ -100,20 +100,52 @@ const updateTaxonomyProp = async (surveyId, taxonomyId, key, value, client = db)
     return updatedTaxonomy
   })
 
+const saveTaxa = async (surveyId, taxa, client = db) =>
+  await client.tx(async t => {
+    taxa.map(async taxon => {
+      const taxonDb = await TaxonomyRepository.insertOrUpdateTaxon(surveyId, taxon, t)
+      await TaxonomyRepository.insertOrUpdateVernacularNames(surveyId, taxonDb.uuid, Taxonomy.getTaxonVernacularNames(taxon), t)
+    })
+    await markSurveyDraft(surveyId, t)
+  })
+
+const checkPublishedTaxonNotUpdated = async (surveyId, newTaxon, t) => {
+  const oldTaxon = await TaxonomyRepository.fetchTaxonByCode(surveyId, newTaxon.taxonomyId, Taxonomy.getTaxonCode(newTaxon), true, t)
+  if (oldTaxon && oldTaxon.published) {
+    if (Taxonomy.getTaxonScientificName(oldTaxon) !== Taxonomy.getTaxonScientificName(newTaxon)) {
+      return false
+    }
+    const oldVernacularNames = await TaxonomyRepository.fetchTaxonVernacularNames(surveyId, oldTaxon.uuid, true, t)
+
+    const newVernacularNames = Taxonomy.getTaxonVernacularNames(newTaxon)
+    if (oldVernacularNames && (
+      //vernacular names removed
+      !R.isEmpty(R.difference(R.keys(oldVernacularNames), R.keys(newVernacularNames)))
+      ||
+      //vernacular names changed
+      R.any(langCode => {
+        const oldVernacularName = oldVernacularNames[langCode]
+        return oldVernacularName && oldVernacularName !== newVernacularNames[langCode]
+      })(R.keys(newVernacularNames))
+    )) {
+      return false
+    }
+  }
+  return true
+}
+
 const saveTaxon = async (surveyId, taxon, client = db) =>
   await client.tx(async t => {
-    const oldTaxon = await TaxonomyRepository.fetchTaxonByCode(
-      surveyId,
-      taxon.taxonomyId,
-      Taxonomy.getTaxonCode(taxon),
-      true,
-      t)
-    if (oldTaxon) {
-      await TaxonomyRepository.updateTaxon(surveyId, oldTaxon.id, taxon.props, t)
+    if (checkPublishedTaxonNotUpdated(surveyId, taxon, t)) {
+      const taxonDb = await TaxonomyRepository.insertOrUpdateTaxon(surveyId, taxon, t)
+      const newVernacularNames = Taxonomy.getTaxonVernacularNames(taxon)
+      if (newVernacularNames) {
+        await TaxonomyRepository.insertOrUpdateVernacularNames(surveyId, taxonDb.uuid, newVernacularNames, t)
+      }
+      return taxonDb
     } else {
-      await TaxonomyRepository.insertTaxon(surveyId, taxon, t)
+      throw new Error('cannot modify published taxon properties')
     }
-    await markSurveyDraft(surveyId, t)
   })
 
 // ============== DELETE
@@ -128,6 +160,7 @@ const deleteTaxonomy = async (surveyId, taxonomyId) =>
 module.exports = {
   //CREATE
   createTaxonomy,
+  insertTaxa: TaxonomyRepository.insertTaxa,
 
   //READ
   fetchTaxonomyById,
@@ -135,13 +168,14 @@ module.exports = {
   exportTaxa,
   countTaxaByTaxonomyId: TaxonomyRepository.countTaxaByTaxonomyId,
   fetchTaxaByPropLike: TaxonomyRepository.fetchTaxaByPropLike,
-  fetchTaxonByCode: TaxonomyRepository.fetchTaxonByCode,
 
   //UPDATE
   publishTaxonomiesProps,
   updateTaxonomyProp,
+  saveTaxa,
   saveTaxon,
 
   //DELETE
-  deleteTaxonomy
+  deleteTaxonomy,
+  deleteDraftTaxaByTaxonomyId: TaxonomyRepository.deleteDraftTaxaByTaxonomyId,
 }

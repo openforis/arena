@@ -189,46 +189,6 @@ class Job {
     return new JobEvent(type, this.status, this.total, this.processed)
   }
 
-  calculateProgress () {
-    const partialProgress = this.status === jobStatus.succeeded ?
-      100
-      : this.total > 0 ?
-        Math.floor(100 * this.processed / this.total)
-        : 0
-
-    if (this.innerJobs.length === 0 || this.currentInnerJobIndex < 0 || partialProgress === 100) {
-      return partialProgress
-    } else {
-      return partialProgress + Math.floor(this.getCurrentInnerJob().calculateProgress() / this.total)
-    }
-  }
-
-  toJSON () {
-    return {
-      type: this.type,
-      userId: this.params.userId,
-      surveyId: this.params.surveyId,
-
-      innerJobs: this.innerJobs.map(j => j.toJSON()),
-
-      //status
-      status: this.status,
-      pending: this.status === jobStatus.pending,
-      running: this.status === jobStatus.running,
-      succeeded: this.status === jobStatus.succeeded,
-      canceled: this.status === jobStatus.canceled,
-      failed: this.status === jobStatus.failed,
-      ended: this.isEnded(),
-
-      total: this.total,
-      processed: this.processed,
-      progressPercent: this.calculateProgress(),
-
-      //output
-      errors: jobStatus.failed ? this.errors : null,
-      result: jobStatus.succeeded ? this.result : null,
-    }
-  }
 }
 
 module.exports = Job

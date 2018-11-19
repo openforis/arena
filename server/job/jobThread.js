@@ -1,6 +1,6 @@
 const {parentPort, workerData} = require('worker_threads')
 
-const {jobThreadMessageTypes} = require('./jobUtils')
+const {jobThreadMessageTypes, jobToJSON} = require('./jobUtils')
 
 const JobCreator = require('./jobCreator')
 
@@ -10,7 +10,7 @@ const JobCreator = require('./jobCreator')
 let job = null
 
 const sendJobToParentThread = () => {
-  parentPort.postMessage(job.toJSON())
+  parentPort.postMessage(jobToJSON(job))
 }
 
 const handleJobEvent = async () => {

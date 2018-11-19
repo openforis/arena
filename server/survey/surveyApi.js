@@ -12,6 +12,7 @@ const {
 } = require('./surveyValidator')
 
 const JobManager = require('../job/jobManager')
+const {jobToJSON} = require('../job/jobUtils')
 
 const SurveyPublishJob = require('./publish/surveyPublishJob')
 
@@ -108,7 +109,7 @@ module.exports.init = app => {
 
       JobManager.executeJobThread(job)
 
-      res.json({job: job.toJSON()})
+      res.json({job: jobToJSON(job)})
     } catch (err) {
       sendErr(res, err)
     }

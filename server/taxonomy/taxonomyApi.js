@@ -3,6 +3,7 @@ const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/reque
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const JobManager = require('../job/jobManager')
+const {jobToJSON} = require('../job/jobUtils')
 const TaxonomyManager = require('./taxonomyManager')
 const TaxonomyImportJob = require('./taxonomyImportJob')
 
@@ -127,7 +128,7 @@ module.exports.init = app => {
 
       JobManager.executeJobThread(job)
 
-      res.json({job: job.toJSON()})
+      res.json({job: jobToJSON(job)})
     } catch (err) {
       sendErr(res, err)
     }

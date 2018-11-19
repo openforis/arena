@@ -21,14 +21,17 @@ const requiredColumns = [
 ]
 
 const getDuplicateFieldFromError = error => {
-  const violatedConstrainName = 'getErrors' in error ? error.getErrors()[0].constraint : null
-  switch (violatedConstrainName) {
+  switch (error.constraint) {
     case 'taxon_props_draft_scientific_name_idx':
       return 'scientificName'
-    default:
+    case 'taxon_props_draft_code_idx':
       return 'code'
+    default:
+      return null
   }
 }
+
+const taxaInsertBufferSize = 500
 
 class TaxonomyImportJob extends Job {
 
@@ -39,6 +42,11 @@ class TaxonomyImportJob extends Job {
 
     this.taxonomyId = taxonomyId
     this.csvString = csvString
+
+    this.codesToRow = {} //maps codes to csv file rows
+    this.scientificNamesToRow = {} //maps scientific names to csv file rows
+    this.updatingPublishedTaxonomy = false
+    this.taxaInsertBuffer = []
   }
 
   async execute () {
@@ -57,6 +65,15 @@ class TaxonomyImportJob extends Job {
     const csvParser = new CSVParser(this.csvString)
 
     await db.tx(async t => {
+      const taxonomy = await TaxonomyManager.fetchTaxonomyById(surveyId, taxonomyId, true, false, t)
+
+      this.updatingPublishedTaxonomy = taxonomy.published
+
+      if (!this.updatingPublishedTaxonomy) {
+        //delete old draft taxa
+        await TaxonomyManager.deleteDraftTaxaByTaxonomyId(surveyId, taxonomyId, t)
+      }
+
       let row = await csvParser.next()
 
       while (row) {
@@ -68,27 +85,27 @@ class TaxonomyImportJob extends Job {
         }
         row = await csvParser.next()
       }
+
       if (this.isCanceled()) {
-        throw new Error('canceled')
+        throw new Error('canceled; rollback transaction')
       } else {
         const hasErrors = !R.isEmpty(R.keys(this.errors))
         if (hasErrors) {
           this.setStatusFailed()
           throw new Error('errors found; rollback transaction')
         } else {
+          await this.flushTaxaInsertBuffer(t)
+
+          //set vernacular lang codes in taxonomy
           await TaxonomyManager.updateTaxonomyProp(surveyId, taxonomyId,
             'vernacularLanguageCodes', this.vernacularLanguageCodes, t)
+
           this.setStatusSucceeded()
         }
       }
     }).catch(e => {
       if (this.isRunning()) {
-        this.addError({
-          all: {
-            valid: false,
-            errors: [e.toString()]
-          }
-        })
+        this.addError({all: {valid: false, errors: [e.toString()]}})
         this.setStatusFailed()
       }
     })
@@ -112,16 +129,22 @@ class TaxonomyImportJob extends Job {
   }
 
   async processRow (data, t) {
-    const {surveyId} = this
-
     const taxon = await this.parseTaxon(data)
 
     if (isValid(taxon)) {
-      try {
-        await TaxonomyManager.saveTaxon(surveyId, taxon, t)
-      } catch (e) {
-        const duplicateField = getDuplicateFieldFromError(e)
-        this.addError({[duplicateField]: {valid: false, errors: ['duplicate']}})
+      if (this.updatingPublishedTaxonomy) {
+        try {
+          await TaxonomyManager.saveTaxon(this.surveyId, taxon, t)
+        } catch (e) {
+          const duplicateField = getDuplicateFieldFromError(e)
+          if (duplicateField) {
+            this.addDuplicateError(duplicateField)
+          } else {
+            this.addError(e.toString())
+          }
+        }
+      } else {
+        await this.addTaxonToInsertBuffer(taxon, t)
       }
     } else {
       this.addError(taxon.validation.fields)
@@ -155,7 +178,34 @@ class TaxonomyImportJob extends Job {
       vernacularNames: this.parseVernacularNames(vernacularNames)
     })(Taxonomy.newTaxon(this.taxonomyId))
 
+    return await this.validateTaxon(taxon)
+  }
+
+  async validateTaxon (taxon) {
     const validation = await validateTaxon([], taxon) //do not validate code and scientific name uniqueness
+
+    //validate taxon uniqueness among inserted values
+    if (validation.valid) {
+      const code = Taxonomy.getTaxonCode(taxon)
+      const duplicateCodeRow = this.codesToRow[code]
+
+      if (duplicateCodeRow) {
+        validation.fields['code'] = {valid: false, errors: ['duplicate']}
+      } else {
+        this.codesToRow[code] = this.processed + 1
+      }
+
+      const scientificName = Taxonomy.getTaxonScientificName(taxon)
+      const duplicateScientificNameRow = this.scientificNamesToRow[scientificName]
+
+      if (duplicateScientificNameRow) {
+        validation.fields['scientificName'] = {valid: false, errors: ['duplicate']}
+      } else {
+        this.scientificNamesToRow[scientificName] = this.processed + 1
+      }
+
+      validation.valid = !(duplicateCodeRow || duplicateScientificNameRow)
+    }
 
     return {
       ...taxon,
@@ -172,6 +222,25 @@ class TaxonomyImportJob extends Job {
 
   addError (error) {
     this.errors['' + (this.processed + 1)] = error
+  }
+
+  addDuplicateError (duplicateField) {
+    this.addError({[duplicateField]: {valid: false, errors: ['duplicate']}})
+  }
+
+  async addTaxonToInsertBuffer (taxon, t) {
+    this.taxaInsertBuffer.push(taxon)
+
+    if (this.taxaInsertBuffer.length === taxaInsertBufferSize) {
+      await this.flushTaxaInsertBuffer(t)
+    }
+  }
+
+  async flushTaxaInsertBuffer (t) {
+    if (this.taxaInsertBuffer.length > 0) {
+      await TaxonomyManager.saveTaxa(this.surveyId, this.taxaInsertBuffer, t)
+      this.taxaInsertBuffer.length = 0
+    }
   }
 }
 
