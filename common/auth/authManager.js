@@ -19,10 +19,10 @@ const getUserPermissionsForSurvey = (user, survey) =>
     R.propOr([], 'permissions'),
   )(user.authGroups, survey.info.authGroups)
 
-const hasPermission = (permission) =>
-  (user, survey) =>
-    isSystemAdmin(user)
-    || R.contains(permission, getUserPermissionsForSurvey(user, survey))
+const hasPermission = (permission) => (user, survey) =>
+  user && survey
+    ? (isSystemAdmin(user) || R.contains(permission, getUserPermissionsForSurvey(user, survey)))
+    : false
 
 // const hasPermission = (user, survey, permission) =>
 //   isSystemAdmin(user)
