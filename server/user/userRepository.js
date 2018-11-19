@@ -1,5 +1,6 @@
 const db = require('../db/db')
 const {comparePassword} = require('./userUtils')
+const {userPrefNames} = require('../../common/user/userPrefs')
 
 const selectFields = ['id', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.join(',')

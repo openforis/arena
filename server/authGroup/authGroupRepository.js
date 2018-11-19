@@ -70,6 +70,14 @@ const insertUserGroup = async (groupId, userId, client = db) =>
 
 // ==== DELETE
 
+const deleteSurveyGroups = async (surveyId, client = db) =>
+  await client.result(`
+    DELETE FROM auth_group USING auth_group_survey
+    WHERE auth_group.id = auth_group_survey.group_id
+    AND auth_group_survey.survey_id = $1
+  `, surveyId)
+
+
 module.exports = {
   // CREATE
   createSurveyGroups,
@@ -80,4 +88,7 @@ module.exports = {
 
   // UPDATE
   insertUserGroup,
+
+  // DELETE
+  deleteSurveyGroups,
 }

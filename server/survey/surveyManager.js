@@ -136,6 +136,7 @@ const deleteSurvey = async (id, user) => {
     if (userPrefSurveyId === id)
       await deleteUserPref(user, userPrefNames.survey, t)
 
+    await authGroupRepository.deleteSurveyGroups(id, t)
     await surveyRepository.deleteSurvey(id, t)
   })
 }
