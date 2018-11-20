@@ -7,12 +7,10 @@ export const recordsListInit = 'data/records/list/init'
 
 const limit = 15
 
-const getRecords = (surveyId, offset = 0) => axios.get(`/api/survey/${surveyId}/records`, {
-  params: {
-    offset,
-    limit
-  }
-})
+const getRecords = (surveyId, offset = 0) => axios.get(
+  `/api/survey/${surveyId}/records`,
+  {params: {offset, limit}}
+)
 
 export const initRecordsList = () => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())

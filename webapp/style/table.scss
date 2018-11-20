@@ -2,6 +2,7 @@
 
 $rowHeight: 35px;
 $rowBorder: 1px solid rgba($white, 0.4);
+$tableRowsHeight: calc(100% - 87px);
 
 .table {
   overflow: hidden;
@@ -27,7 +28,7 @@ $rowBorder: 1px solid rgba($white, 0.4);
 .table__rows {
   position: absolute;
   overflow-y: auto;
-  height: calc(100% - 87px);
+  height: $tableRowsHeight;
   right: 0;
   left: 0;
 }
@@ -67,4 +68,24 @@ $rowBorder: 1px solid rgba($white, 0.4);
   background-color: rgba($white, 0.1);
   text-transform: uppercase;
   font-size: .8rem;
+}
+
+.table__paginator {
+  justify-self: center;
+  align-self: center;
+  position: absolute;
+  top: $tableRowsHeight;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+
+  button {
+    padding: .5rem;
+    margin: 0 .2rem;
+  }
+
+  .page-count {
+    margin: 0 .8rem;
+    align-self: center;
+  }
 }

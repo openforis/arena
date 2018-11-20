@@ -153,7 +153,7 @@ module.exports = {
   // createNode,
   //==== READ
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
-  fetchRecordsBySurveyId: RecordRepository.fetchRecordsBySurveyId,
+  fetchRecordsSummaryBySurveyId: RecordRepository.fetchRecordsSummaryBySurveyId,
 
   fetchNodeFileByUUID: NodeRepository.fetchNodeFileByUUID,
 

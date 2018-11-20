@@ -4,7 +4,7 @@ const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
 
 const RecordManager = require('./recordManager')
-const {getNodeValue} = require('../../common/record/node')
+const Node = require('../../common/record/node')
 
 module.exports.init = app => {
 
@@ -57,10 +57,10 @@ module.exports.init = app => {
   app.get('/survey/:surveyId/records', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const limit = getRestParam(req, 'limit', 25)
-      const offset = getRestParam(req, 'offset', 0)
+      const limit = getRestParam(req, 'limit')
+      const offset = getRestParam(req, 'offset')
 
-      const records = await RecordManager.fetchRecordsBySurveyId(surveyId, offset, limit)
+      const records = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, offset, limit)
       res.json({records})
     } catch (err) {
       sendErr(res, err)
@@ -72,7 +72,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const recordId = getRestParam(req, 'recordId')
 
-      const record = await fetchRecordById(surveyId, recordId)
+      const record = await RecordManager.fetchRecordById(surveyId, recordId)
       res.json({record})
     } catch (err) {
       sendErr(res, err)
@@ -85,7 +85,7 @@ module.exports.init = app => {
       const nodeUUID = getRestParam(req, 'nodeUUID')
 
       const node = await RecordManager.fetchNodeFileByUUID(surveyId, nodeUUID)
-      const value = getNodeValue(node)
+      const value = Node.getNodeValue(node)
 
       res.setHeader('Content-disposition', `attachment; filename=${value.fileName}`)
       // res.set('Content-Type', 'text/csv')

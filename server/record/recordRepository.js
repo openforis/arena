@@ -30,8 +30,8 @@ const insertRecord = async (record, client = db) =>
 const countRecordsBySurveyId = async (surveyId, client = db) =>
   await client.one(`SELECT count(*) FROM ${getSurveyDBSchema(surveyId)}.record`)
 
-const fetchRecordsBySurveyId = async (surveyId, offset, limit, client = db) =>
-  await client.any(`
+const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) =>
+  await client.map(`
     SELECT ${recordSelectFields}
     FROM ${getSurveyDBSchema(surveyId)}.record
     LIMIT $1
@@ -56,7 +56,7 @@ module.exports = {
 
   // READ
   countRecordsBySurveyId,
-  fetchRecordsBySurveyId,
+  fetchRecordsSummaryBySurveyId,
   fetchRecordById,
 
   //UPDATE
