@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 
 import { startJob, updateActiveJob } from '../appModules/appView/components/job/appJobState'
-import { assocAppError, dissocAppError, getAppErrors, logoutUser, getUser } from './appState'
+import { assocAppError, dissocAppError, getAppErrors, logoutUser } from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
 import { isSystemAdmin, surveyAdminGroup } from '../../common/auth/authManager'
 import Survey from '../../common/survey/survey'

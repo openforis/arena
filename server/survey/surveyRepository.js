@@ -32,7 +32,6 @@ const fetchSurveys = async (client = db) =>
   await client.map(`
     SELECT
       s.*, ${selectDate('n.date_created', 'date_created')}, nm.date_modified
-      --, gr.permissions
     FROM survey s
     JOIN node_def n
       ON s.id = n.survey_id
