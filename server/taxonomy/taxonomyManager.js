@@ -100,54 +100,6 @@ const updateTaxonomyProp = async (surveyId, taxonomyId, key, value, client = db)
     return updatedTaxonomy
   })
 
-const saveTaxa = async (surveyId, taxa, client = db) =>
-  await client.tx(async t => {
-    taxa.map(async taxon => {
-      const taxonDb = await TaxonomyRepository.insertOrUpdateTaxon(surveyId, taxon, t)
-      await TaxonomyRepository.insertOrUpdateVernacularNames(surveyId, taxonDb.uuid, Taxonomy.getTaxonVernacularNames(taxon), t)
-    })
-    await markSurveyDraft(surveyId, t)
-  })
-
-const checkPublishedTaxonNotUpdated = async (surveyId, newTaxon, t) => {
-  const oldTaxon = await TaxonomyRepository.fetchTaxonByCode(surveyId, newTaxon.taxonomyId, Taxonomy.getTaxonCode(newTaxon), true, t)
-  if (oldTaxon && oldTaxon.published) {
-    if (Taxonomy.getTaxonScientificName(oldTaxon) !== Taxonomy.getTaxonScientificName(newTaxon)) {
-      return false
-    }
-    const oldVernacularNames = await TaxonomyRepository.fetchTaxonVernacularNames(surveyId, oldTaxon.uuid, true, t)
-
-    const newVernacularNames = Taxonomy.getTaxonVernacularNames(newTaxon)
-    if (oldVernacularNames && (
-      //vernacular names removed
-      !R.isEmpty(R.difference(R.keys(oldVernacularNames), R.keys(newVernacularNames)))
-      ||
-      //vernacular names changed
-      R.any(langCode => {
-        const oldVernacularName = oldVernacularNames[langCode]
-        return oldVernacularName && oldVernacularName !== newVernacularNames[langCode]
-      })(R.keys(newVernacularNames))
-    )) {
-      return false
-    }
-  }
-  return true
-}
-
-const saveTaxon = async (surveyId, taxon, client = db) =>
-  await client.tx(async t => {
-    if (checkPublishedTaxonNotUpdated(surveyId, taxon, t)) {
-      const taxonDb = await TaxonomyRepository.insertOrUpdateTaxon(surveyId, taxon, t)
-      const newVernacularNames = Taxonomy.getTaxonVernacularNames(taxon)
-      if (newVernacularNames) {
-        await TaxonomyRepository.insertOrUpdateVernacularNames(surveyId, taxonDb.uuid, newVernacularNames, t)
-      }
-      return taxonDb
-    } else {
-      throw new Error('cannot modify published taxon properties')
-    }
-  })
-
 // ============== DELETE
 
 const deleteTaxonomy = async (surveyId, taxonomyId) =>
@@ -172,8 +124,6 @@ module.exports = {
   //UPDATE
   publishTaxonomiesProps,
   updateTaxonomyProp,
-  saveTaxa,
-  saveTaxon,
 
   //DELETE
   deleteTaxonomy,

@@ -5,7 +5,6 @@ const db = require('../db/db')
 const {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
-  updateSurveySchemaTableProps,
   deleteSurveySchemaTableRecord
 } = require('../survey/surveySchemaRepositoryUtils')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
@@ -22,22 +21,19 @@ const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
     record => dbTransformCallback(record, true)
   )
 
-const insertTaxa = async (surveyId, taxa, client = db) => {
-  await client.tx(t =>
-    t.batch(R.reduce((acc, taxon) => {
-        const taxonInsertPromise = insertOrUpdateTaxon(surveyId, taxon, t)
+const insertTaxa = async (surveyId, taxa, client = db) =>
+  await client.batch(R.reduce((acc, taxon) => {
+      const taxonInsertPromise = insertOrUpdateTaxon(surveyId, taxon, client)
 
-        const vernacularNameInsertPromises = insertOrUpdateVernacularNames(
-          surveyId, taxon.uuid, Taxonomy.getTaxonVernacularNames(taxon), t)
+      const vernacularNameInsertPromises = insertOrUpdateVernacularNames(
+        surveyId, taxon.uuid, Taxonomy.getTaxonVernacularNames(taxon), client)
 
-        return R.pipe(
-          R.append(taxonInsertPromise),
-          R.concat(vernacularNameInsertPromises)
-        )(acc)
-      }, [], taxa)
-    )
+      return R.pipe(
+        R.append(taxonInsertPromise),
+        R.concat(vernacularNameInsertPromises)
+      )(acc)
+    }, [], taxa)
   )
-}
 
 const insertOrUpdateTaxon = (surveyId, taxon, client = db) =>
   client.one(
@@ -51,7 +47,7 @@ const insertOrUpdateTaxon = (surveyId, taxon, client = db) =>
   )
 
 const insertOrUpdateVernacularNames = (surveyId, taxonUUID, vernacularNames, client = db) =>
-  R.keys(vernacularNames).map(async lang => {
+  R.keys(vernacularNames).map(lang => {
     const vn = R.prop(lang, vernacularNames)
     return client.one(
       `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name (taxon_uuid, props_draft)
@@ -159,25 +155,6 @@ const fetchTaxaByVernacularName = async (surveyId,
   )
 }
 
-const fetchTaxonVernacularNames = async (surveyId, taxonUUID, draft = false, client = db) =>
-  await client.map(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name
-     WHERE taxon_uuid = $1`,
-    [taxonUUID],
-    record => dbTransformCallback(record, draft)
-  )
-
-const fetchTaxonByCode = async (surveyId, taxonomyId, code, draft = false, client = db) => {
-  const propsCol = draft ? 'props_draft' : 'props'
-  return await client.oneOrNone(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
-      WHERE taxonomy_id = $1 
-      AND lower(${propsCol}->>'code') = $2`,
-    [taxonomyId, R.toLower(code)],
-    record => record ? dbTransformCallback(record, draft) : null
-  )
-}
-
 // ============== UPDATE
 
 const updateTaxonomyProp = async (surveyId, taxonomyId, key, value, client = db) =>
@@ -200,16 +177,12 @@ module.exports = {
   //CREATE
   insertTaxonomy,
   insertTaxa,
-  insertOrUpdateTaxon,
-  insertOrUpdateVernacularNames,
 
   //READ
   fetchTaxonomyById,
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyId,
   fetchTaxaByPropLike,
-  fetchTaxonByCode,
-  fetchTaxonVernacularNames,
 
   //UPDATE
   updateTaxonomyProp,

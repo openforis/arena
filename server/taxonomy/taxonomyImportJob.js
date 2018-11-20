@@ -20,17 +20,6 @@ const requiredColumns = [
   'scientific_name',
 ]
 
-const getDuplicateFieldFromError = error => {
-  switch (error.constraint) {
-    case 'taxon_props_draft_scientific_name_idx':
-      return 'scientificName'
-    case 'taxon_props_draft_code_idx':
-      return 'code'
-    default:
-      return null
-  }
-}
-
 const taxaInsertBufferSize = 500
 
 class TaxonomyImportJob extends Job {
@@ -45,7 +34,6 @@ class TaxonomyImportJob extends Job {
 
     this.codesToRow = {} //maps codes to csv file rows
     this.scientificNamesToRow = {} //maps scientific names to csv file rows
-    this.updatingPublishedTaxonomy = false
     this.taxaInsertBuffer = []
   }
 
@@ -67,12 +55,12 @@ class TaxonomyImportJob extends Job {
     await db.tx(async t => {
       const taxonomy = await TaxonomyManager.fetchTaxonomyById(surveyId, taxonomyId, true, false, t)
 
-      this.updatingPublishedTaxonomy = taxonomy.published
-
-      if (!this.updatingPublishedTaxonomy) {
-        //delete old draft taxa
-        await TaxonomyManager.deleteDraftTaxaByTaxonomyId(surveyId, taxonomyId, t)
+      if (taxonomy.published) {
+        throw new Error('cannot overwrite published taxa')
       }
+
+      //delete old draft taxa
+      await TaxonomyManager.deleteDraftTaxaByTaxonomyId(surveyId, taxonomyId, t)
 
       let row = await csvParser.next()
 
@@ -132,20 +120,7 @@ class TaxonomyImportJob extends Job {
     const taxon = await this.parseTaxon(data)
 
     if (isValid(taxon)) {
-      if (this.updatingPublishedTaxonomy) {
-        try {
-          await TaxonomyManager.saveTaxon(this.surveyId, taxon, t)
-        } catch (e) {
-          const duplicateField = getDuplicateFieldFromError(e)
-          if (duplicateField) {
-            this.addDuplicateError(duplicateField)
-          } else {
-            this.addError(e.toString())
-          }
-        }
-      } else {
-        await this.addTaxonToInsertBuffer(taxon, t)
-      }
+      await this.addTaxonToInsertBuffer(taxon, t)
     } else {
       this.addError(taxon.validation.fields)
     }
@@ -224,10 +199,6 @@ class TaxonomyImportJob extends Job {
     this.errors['' + (this.processed + 1)] = error
   }
 
-  addDuplicateError (duplicateField) {
-    this.addError({[duplicateField]: {valid: false, errors: ['duplicate']}})
-  }
-
   async addTaxonToInsertBuffer (taxon, t) {
     this.taxaInsertBuffer.push(taxon)
 
@@ -238,7 +209,7 @@ class TaxonomyImportJob extends Job {
 
   async flushTaxaInsertBuffer (t) {
     if (this.taxaInsertBuffer.length > 0) {
-      await TaxonomyManager.saveTaxa(this.surveyId, this.taxaInsertBuffer, t)
+      await TaxonomyManager.insertTaxa(this.surveyId, this.taxaInsertBuffer, t)
       this.taxaInsertBuffer.length = 0
     }
   }
