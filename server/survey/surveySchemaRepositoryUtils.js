@@ -22,10 +22,11 @@ const publishSurveySchemaTableProps = async (surveyId, tableName, client = db) =
       props_draft = '{}'::jsonb
   `)
 
-const updateSurveySchemaTableProp = async (surveyId, tableName, recordId, key, value, client = db) => {
-  const props = {[key]: value}
+const updateSurveySchemaTableProp = async (surveyId, tableName, recordId, key, value, client = db) =>
+  await updateSurveySchemaTableProps(surveyId, tableName, recordId, {[key]: value}, client)
 
-  return await client.one(
+const updateSurveySchemaTableProps = async (surveyId, tableName, recordId, props, client = db) =>
+  await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
      SET props_draft = props_draft || $1
      WHERE id = $2
@@ -33,7 +34,6 @@ const updateSurveySchemaTableProp = async (surveyId, tableName, recordId, key, v
     , [JSON.stringify(props), recordId]
     , def => dbTransformCallback(def, true)
   )
-}
 
 const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordId, client = db) =>
   await client.one(`
@@ -44,6 +44,10 @@ const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordId, clie
     , def => dbTransformCallback(def, true)
   )
 
+const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>
+  await client.none(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.${tableName} SET props = props #- '{${deletePath.join(',')}}'`)
+
 module.exports = {
   getSurveyDBSchema,
 
@@ -51,5 +55,7 @@ module.exports = {
   publishSurveySchemaTableProps,
 
   updateSurveySchemaTableProp,
+  updateSurveySchemaTableProps,
   deleteSurveySchemaTableRecord,
+  deleteSurveySchemaTableProp,
 }

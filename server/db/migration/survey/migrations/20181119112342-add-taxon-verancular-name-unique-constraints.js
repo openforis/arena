@@ -19,7 +19,7 @@ exports.setup = function(options, seedLink) {
 };
 
 exports.up = function(db) {
-  var filePath = path.join(__dirname, 'sqls', '20181109161945-update-job-table-up.sql');
+  var filePath = path.join(__dirname, 'sqls', '20181119112342-add-taxon-verancular-name-unique-constraints-up.sql');
   return new Promise( function( resolve, reject ) {
     fs.readFile(filePath, {encoding: 'utf-8'}, function(err,data){
       if (err) return reject(err);
@@ -34,7 +34,7 @@ exports.up = function(db) {
 };
 
 exports.down = function(db) {
-  var filePath = path.join(__dirname, 'sqls', '20181109161945-update-job-table-down.sql');
+  var filePath = path.join(__dirname, 'sqls', '20181119112342-add-taxon-verancular-name-unique-constraints-down.sql');
   return new Promise( function( resolve, reject ) {
     fs.readFile(filePath, {encoding: 'utf-8'}, function(err,data){
       if (err) return reject(err);

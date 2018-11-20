@@ -8,7 +8,7 @@ const config = require('./migrationConfig')
 const {getProcessNodeEnv} = require('../../../common/processUtils')
 const {getSurveyDBSchema} = require('../../../server/survey/surveySchemaRepositoryUtils')
 
-const {fetchAllSurveys} = require('../../survey/surveyRepository')
+const {fetchAllSurveyIds} = require('../../survey/surveyRepository')
 
 const env = getProcessNodeEnv()
 
@@ -52,13 +52,12 @@ const migrateSurveySchema = async(surveyId) => {
 }
 
 const migrateSurveySchemas = async () => {
-  const surveys = await fetchAllSurveys()
+  const surveyIds = await fetchAllSurveyIds()
 
-  console.log(`starting data schemas migrations for ${surveys.length} surveys`)
+  console.log(`starting data schemas migrations for ${surveyIds.length} surveys`)
 
-  for (let i = 0; i < surveys.length; i++) {
-    const survey = surveys[i]
-    await migrateSurveySchema(survey.id)
+  for (let i = 0; i < surveyIds.length; i++) {
+    await migrateSurveySchema(surveyIds[i])
   }
   console.log(`data schemas migrations completed`)
 }

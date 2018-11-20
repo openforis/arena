@@ -1,12 +1,12 @@
 import io from 'socket.io-client'
+import * as R from 'ramda'
 
 let socket = null
 
-export const openSocket = () => {
+export const openSocket = (eventHandlers = {}) => {
   socket = io(window.location.origin)
+  R.forEachObjIndexed((fn, eventName) => socket.on(eventName, fn), eventHandlers)
 }
-
-export const onSocketEvent = (name, fn) => socket.on(name, fn)
 
 export const closeSocket = () => {
   socket.close()
