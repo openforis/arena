@@ -4,6 +4,7 @@ import Promise from 'bluebird'
 import { getStateSurveyId } from '../../../survey/surveyState'
 
 export const recordsListInit = 'data/records/list/init'
+export const recordsListUpdate = 'data/records/list/update'
 
 const limit = 15
 
@@ -28,4 +29,16 @@ export const initRecordsList = () => async (dispatch, getState) => {
     count: countResp.data.count,
     list: recordsResp.data.records,
   })
+}
+
+export const fetchRecords = (offset = 0) => async (dispatch, getState) => {
+  const surveyId = getStateSurveyId(getState())
+  const {data} = await getRecords(surveyId, offset)
+
+  dispatch({
+    type: recordsListUpdate,
+    offset,
+    list: data.records,
+  })
+
 }
