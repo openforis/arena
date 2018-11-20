@@ -2,7 +2,7 @@ import React from 'react'
 import { Route, Switch } from 'react-router'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
-import DataRecordView from '../../data/records/record'
+import DataRecordView from '../../data/records/components/record'
 import DesignerView from '../../designer/designerView'
 import HomeView from '../../home/appHomeView'
 import DashboardView from '../../dashboard/dashboardView'

@@ -4,7 +4,7 @@ import React from 'react'
 
 import TabBar from '../../commonComponents/tabBar'
 
-import Records from './records/records'
+import Records from './records/components/records'
 
 import { appModules, appModuleUri } from '../appModules'
 

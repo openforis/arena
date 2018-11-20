@@ -27,22 +27,36 @@ const insertRecord = async (record, client = db) =>
 
 // ============== READ
 
-const fetchRecordById = async (surveyId, recordId, client = db) => {
-  const record = await client.one(
+const countRecordsBySurveyId = async (surveyId, client = db) =>
+  await client.one(`SELECT count(*) FROM ${getSurveyDBSchema(surveyId)}.record`)
+
+const fetchRecordsBySurveyId = async (surveyId, offset, limit, client = db) =>
+  await client.any(`
+    SELECT ${recordSelectFields}
+    FROM ${getSurveyDBSchema(surveyId)}.record
+    LIMIT $1
+    OFFSET $2
+  `,
+    [limit, offset],
+    dbTransformCallback(surveyId)
+  )
+
+const fetchRecordById = async (surveyId, recordId, client = db) =>
+  await client.one(
     `SELECT 
      ${recordSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.record WHERE id = $1`,
     [recordId],
     dbTransformCallback(surveyId)
   )
-  return record
-}
 
 module.exports = {
   // CREATE
   insertRecord,
 
   // READ
+  countRecordsBySurveyId,
+  fetchRecordsBySurveyId,
   fetchRecordById,
 
   //UPDATE

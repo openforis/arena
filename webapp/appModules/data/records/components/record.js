@@ -1,10 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import SurveyFormView from '../../surveyForm/surveyFormView'
+import SurveyFormView from '../../../surveyForm/surveyFormView'
 
-import { initSurveyDefs } from '../../../survey/actions'
-import { resetForm } from '../../surveyForm/actions'
+import { initSurveyDefs } from '../../../../survey/actions'
+import { resetForm } from '../../../surveyForm/actions'
 
 class Record extends React.Component {
 
