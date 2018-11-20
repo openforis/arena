@@ -54,17 +54,21 @@ const RecordRow = ({idx, record, style}) => (
   <div className="table__row" style={style}>
     <div>{idx + 1}</div>
     <div>{getRelativeDate(record.dateCreated)}</div>
+    <div>{getRelativeDate(record.dateModified)}</div>
+    <div>{record.ownerName}</div>
   </div>
 )
 
 const RecordsTable = ({records, offset, limit, count}) => {
-  const style = {gridTemplateColumns: '.5fr .5fr'}
+  const style = {gridTemplateColumns: 'repeat(4, .25fr)'}
 
   return (
     <React.Fragment>
       <div className="table__row-header" style={style}>
         <div>Record #</div>
         <div>Date created</div>
+        <div>Date Modified</div>
+        <div>Owner</div>
       </div>
 
       <div className="table__rows">
