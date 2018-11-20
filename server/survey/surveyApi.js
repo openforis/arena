@@ -4,23 +4,17 @@ const {
   getBoolParam,
 } = require('../serverUtils/request')
 
-const {
-  createSurvey,
-
-  fetchSurveyById,
-  fetchUserSurveysInfo,
-  fetchSurveyNodeDefs,
-
-  updateSurveyProp,
-  publishSurvey,
-
-  deleteSurvey,
-} = require('./surveyManager')
+const SurveyManager = require('./surveyManager')
 
 const {
   validateNewSurvey,
   validateSurvey,
 } = require('./surveyValidator')
+
+const JobManager = require('../job/jobManager')
+const {jobToJSON} = require('../job/jobUtils')
+
+const SurveyPublishJob = require('./publish/surveyPublishJob')
 
 module.exports.init = app => {
 
@@ -32,7 +26,7 @@ module.exports.init = app => {
       const validation = await validateNewSurvey(body)
 
       if (validation.valid) {
-        const survey = await createSurvey(user, body)
+        const survey = await SurveyManager.createSurvey(user, body)
 
         res.json({survey})
       } else {
@@ -50,7 +44,7 @@ module.exports.init = app => {
     try {
       const {user} = req
 
-      const surveys = await fetchUserSurveysInfo(user)
+      const surveys = await SurveyManager.fetchUserSurveysInfo(user)
 
       res.json({surveys})
     } catch (err) {
@@ -63,7 +57,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'id')
       const draft = getBoolParam(req, 'draft')
 
-      const survey = await fetchSurveyById(surveyId, draft)
+      const survey = await SurveyManager.fetchSurveyById(surveyId, draft)
 
       res.json({survey})
     } catch (err) {
@@ -77,7 +71,7 @@ module.exports.init = app => {
       const draft = getBoolParam(req, 'draft')
       const validate = getBoolParam(req, 'validate')
 
-      const nodeDefs = await fetchSurveyNodeDefs(surveyId, draft, validate)
+      const nodeDefs = await SurveyManager.fetchSurveyNodeDefs(surveyId, draft, validate)
 
       res.json({nodeDefs})
     } catch (err) {
@@ -94,7 +88,7 @@ module.exports.init = app => {
 
       const surveyId = getRestParam(req, 'id')
 
-      const survey = await updateSurveyProp(surveyId, key, value, user)
+      const survey = await SurveyManager.updateSurveyProp(surveyId, key, value, user)
       const validation = await validateSurvey(survey, key)
 
       res.json({validation})
@@ -108,9 +102,14 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'id')
       const user = req.user
 
-      const job = await publishSurvey(surveyId, user)
+      const job = new SurveyPublishJob({
+        userId: user.id,
+        surveyId
+      })
 
-      res.json({job})
+      JobManager.executeJobThread(job)
+
+      res.json({job: jobToJSON(job)})
     } catch (err) {
       sendErr(res, err)
     }
@@ -121,7 +120,7 @@ module.exports.init = app => {
   app.delete('/survey/:id', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'id')
-      await deleteSurvey(surveyId, req.user)
+      await SurveyManager.deleteSurvey(surveyId, req.user)
 
       sendOk(res)
     } catch (err) {

@@ -9,7 +9,6 @@ const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const surveyRepository = require('../survey/surveyRepository')
 const Survey = require('../../common/survey/survey')
-const SurveyPublishJob = require('../survey/surveyPublishJob')
 const {validateSurvey} = require('../survey/surveyValidator')
 
 const nodeDefRepository = require('../nodeDef/nodeDefRepository')
@@ -21,8 +20,6 @@ const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPref
 
 const authGroupRepository = require('../authGroup/authGroupRepository')
 const {isSystemAdmin} = require('../../common/auth/authManager')
-
-const JobManager = require('../job/jobManager')
 
 const assocSurveyInfo = info => ({info})
 
@@ -120,9 +117,6 @@ const updateSurveyProp = async (id, key, value, user) =>
     await surveyRepository.updateSurveyProp(id, key, value)
   )
 
-const publishSurvey = async (id, user) =>
-  await JobManager.startJob(new SurveyPublishJob(user.id, id))
-
 // ====== DELETE
 const deleteSurvey = async (id, user) => {
   await db.tx(async t => {
@@ -146,7 +140,6 @@ module.exports = {
 
   // ====== UPDATE
   updateSurveyProp,
-  publishSurvey,
 
 // ====== DELETE
   deleteSurvey,

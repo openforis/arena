@@ -1,7 +1,13 @@
-const db = require('../db/db')
 const R = require('ramda')
 
-const {getSurveyDBSchema, updateSurveySchemaTableProp, deleteSurveySchemaTableRecord} = require('../survey/surveySchemaRepositoryUtils')
+const db = require('../db/db')
+
+const {
+  getSurveyDBSchema,
+  updateSurveySchemaTableProp,
+  deleteSurveySchemaTableRecord,
+  deleteSurveySchemaTableProp
+} = require('../survey/surveySchemaRepositoryUtils')
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 const CodeList = require('../../common/survey/codeList')
 
@@ -119,6 +125,9 @@ const deleteCodeListLevel = async (surveyId, codeListLevelId, client = db) =>
 const deleteCodeListItem = async (surveyId, codeListItemId, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'code_list_item', codeListItemId, client)
 
+const deleteCodeListsItemsLabels = async (surveyId, langCode, client = db) =>
+  await deleteSurveySchemaTableProp(surveyId, 'code_list_item', ['labels', langCode], client)
+
 module.exports = {
   //CREATE
   insertCodeList,
@@ -141,4 +150,6 @@ module.exports = {
   deleteCodeList,
   deleteCodeListLevel,
   deleteCodeListItem,
+
+  deleteCodeListsItemsLabels,
 }

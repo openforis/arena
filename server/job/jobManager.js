@@ -1,121 +1,99 @@
-const db = require('../db/db')
+const {Worker} = require('worker_threads')
+const R = require('ramda')
+const path = require('path')
 
 const {throttle} = require('../../common/functionsDefer')
+const {jobEvents} = require('../../common/ws/wsEvents')
 
-const {jobEvents} = require('./job')
-const jobSocketEvents = require('../../common/job/jobSocketEvents')
+const {jobThreadMessageTypes} = require('./jobUtils')
 
-const jobRepository = require('./jobRepository')
+// ==== USER SOCKETS
 
-const userSockets = {}
-const userJobs = {}
+let userSockets = {}
+
+const getUserSockets = userId => R.prop(userId, userSockets)
+
+const addUserSocket = (userId, socket) => userSockets = R.assocPath([userId, socket.id], socket, userSockets)
+
+const deleteUserSocket = (userId, socketId) => userSockets = R.dissocPath([userId, socketId], userSockets)
+
+// USER JOB WORKERS
+
+const userJobWorkers = {}
+
+const getUserJobWorker = userId => userJobWorkers[userId]
+
+const addUserJobWorker = (userId, worker) => userJobWorkers[userId] = worker
+
+const deleteUserJobWorker = userId => delete userJobWorkers[userId]
 
 const init = (io) => {
 
   io.on('connection', async socket => {
-    // Send a JOB_UPDATE message if the user has an active job
     const userId = socket.request.session.passport.user
     if (userId) {
-      userSockets[userId] = socket
+      addUserSocket(userId, socket)
 
-      const job = getJobFromCache(userId)
-
-      if (job) {
-        notifyUser(job)
+      const jobWorker = getUserJobWorker(userId)
+      if (jobWorker) {
+        jobWorker.postMessage({type: jobThreadMessageTypes.fetchJob})
       }
 
       socket.on('disconnect', () => {
-        delete userSockets[userId]
+        deleteUserSocket(userId, socket.id)
       })
     }
   })
 
 }
 
-const notifyUser = (job) => {
-  const socket = userSockets[job.userId]
-  if (socket)
-    throttle((job) => socket.emit(jobSocketEvents.update, job.toJSON()), `socket_${job.id}`, 250)(job)
-}
+const notifyJobUpdate = job => {
+  const userId = job.userId
 
-/**
- * ====== CREATE
- */
-
-const startJob = async (job) => {
-  addJobToCache(job)
-
-  await db.tx(async t =>
-    await insertJobAndInnerJobs(job, t)
-  )
-
-  job
-    .onEvent(async event => {
-      if (event.type === jobEvents.statusChange) {
-        await updateJobStatusFromEvent(event)
-      } else {
-        await updateJobProgress(event.jobId, event.total, event.processed)
-      }
-      if (job.isEnded()) {
-        removeJobFromCache(job.userId)
-      }
-      notifyUser(job)
-    })
-    .start()
-
-  notifyUser(job)
-
-  return job.toJSON()
-}
-
-/**
- * Inserts job and its inner jobs into the db
- */
-const insertJobAndInnerJobs = async (job, t) => {
-  const jobDb = await jobRepository.insertJob(job, t)
-  job.id = jobDb.id
-
-  for (const innerJob of job.innerJobs) {
-    innerJob.parentId = job.id
-    await insertJobAndInnerJobs(innerJob, t)
+  const sockets = getUserSockets(userId)
+  if (sockets && !R.isEmpty(sockets)) {
+    R.forEachObjIndexed((socket) => {
+      throttle(job => socket.emit(jobEvents.update, job), `socket_${socket.id}`, 500)(job)
+    }, sockets)
   }
 
-  return jobDb
+  if (job.ended) {
+    deleteUserJobWorker(userId)
+  }
 }
 
-/**
- * ====== UPDATE
- */
-
-const updateJobStatusFromEvent = async jobEvent => {
-  const {jobId, status, total, processed, result = {}, errors = {}} = jobEvent
-  await jobRepository.updateJobStatus(jobId, status, total, processed, {result, errors})
-}
-
-const updateJobProgress = async (jobId, total, processed) => {
-  throttle(jobRepository.updateJobProgress, `job_${jobId}`, 1000)(jobId, total, processed)
-}
+// ====== UPDATE
 
 const cancelActiveJobByUserId = async (userId) => {
-  const job = getJobFromCache(userId)
-  if (job && !job.isEnded()) {
-    job.cancel()
+  const jobWorker = getUserJobWorker(userId)
+  if (jobWorker) {
+    jobWorker.postMessage({type: jobThreadMessageTypes.cancelJob})
   }
 }
 
-/**
- * ====== JOB CACHE
- */
-const addJobToCache = job => userJobs['' + job.userId] = job
+// ====== EXECUTE
 
-const removeJobFromCache = userId => delete userJobs['' + userId]
+const executeJobThread = (job) => {
 
-const getJobFromCache = userId => userJobs[userId]
+  const worker = new Worker(
+    path.resolve(__dirname, 'jobThread.js'),
+    {workerData: {jobType: job.type, params: job.params}}
+  )
+
+  worker.on('message', async job =>
+    await notifyJobUpdate(job)
+  )
+
+  const userId = job.params.userId
+  if (userId) {
+    addUserJobWorker(userId, worker)
+  }
+}
 
 module.exports = {
   init,
-  //CREATE
-  startJob,
-  //UPDATE
+
+  executeJobThread,
+
   cancelActiveJobByUserId,
 }

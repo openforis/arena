@@ -3,7 +3,7 @@ import axios from 'axios'
 import { debounceAction } from '../../../appUtils/reduxUtils'
 import Taxonomy from '../../../../common/survey/taxonomy'
 
-import { getStateSurveyId, getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyId } from '../../../survey/surveyState'
 import { showAppJobMonitor } from '../../appView/components/job/actions'
 import { getTaxonomyEditTaxaPerPage } from './taxonomyEditState'
 import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../../../survey/taxonomies/actions'

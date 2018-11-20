@@ -21,12 +21,11 @@ const insertSurvey = async (props, userId, client = db) =>
 
 // ============== READ
 
-//TODO : Check why we need fetchAllSurveys and fetchSurveys
-const fetchAllSurveys = async (client = db) =>
+const fetchAllSurveyIds = async (client = db) =>
   await client.map(
-      `SELECT * FROM survey`,
+      `SELECT id FROM survey`,
     [],
-    def => dbTransformCallback(def)
+    record => record.id
   )
 
 const fetchSurveys = async (client = db) =>
@@ -100,12 +99,25 @@ const deleteSurvey = async (id, client = db) => {
   await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
 }
 
+const deleteSurveyLabel = async (id, langCode, client = db) =>
+  await deleteSurveyProp(id, ['labels', langCode], client)
+
+const deleteSurveyDescription = async (id, langCode, client = db) =>
+  await deleteSurveyProp(id, ['descriptions', langCode], client)
+
+const deleteSurveyProp = async (id, deletePath, client = db) =>
+  await client.none(`
+    UPDATE survey 
+    SET props = props #- '{${deletePath.join(',')}}'
+    WHERE id = $1`,
+    [id])
+
 module.exports = {
   // CREATE
   insertSurvey,
 
   // READ
-  fetchAllSurveys,
+  fetchAllSurveyIds,
   fetchSurveys,
   getSurveysByName,
   getSurveyById,
@@ -116,4 +128,6 @@ module.exports = {
 
   //DELETE
   deleteSurvey,
+  deleteSurveyLabel,
+  deleteSurveyDescription,
 }
