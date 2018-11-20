@@ -40,8 +40,8 @@ const insertOrUpdateTaxon = (surveyId, taxon, client = db) =>
     `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon (uuid, taxonomy_id, props_draft)
       VALUES ($1, $2, $3)
       ON CONFLICT (taxonomy_id, (props_draft->>'code')) DO
-        UPDATE SET deleted = false, props_draft = ${getSurveyDBSchema(surveyId)}.taxon.props_draft || $3
-    RETURNING *`,
+        UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon.props_draft || $3
+      RETURNING *`,
     [taxon.uuid, taxon.taxonomyId, taxon.props],
     record => dbTransformCallback(record, true)
   )
