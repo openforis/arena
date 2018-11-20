@@ -89,15 +89,10 @@ const fetchSurveyById = async (id, draft = false, validate = false) => {
   })
 }
 
-const fetchUserSurveys = async (user) => {
-  const surveys = await surveyRepository.fetchSurveys()
-  const surveysAuthGroups = await Promise.all(surveys.map(s => authGroupRepository.fetchSurveyGroups(s.id)))
-
-  return R.map(
-    assocSurveyInfo,
-    surveys.map((s, i) => ({...s, authGroup: surveysAuthGroups[i]})) // TODO
-  )
-}
+const fetchUserSurveysInfo = async (user) => R.map(
+  assocSurveyInfo,
+  await surveyRepository.fetchSurveys()
+)
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
   const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
@@ -136,7 +131,6 @@ const deleteSurvey = async (id, user) => {
     if (userPrefSurveyId === id)
       await deleteUserPref(user, userPrefNames.survey, t)
 
-    await authGroupRepository.deleteSurveyGroups(id, t)
     await surveyRepository.deleteSurvey(id, t)
   })
 }
@@ -147,7 +141,7 @@ module.exports = {
 
   // ====== READ
   fetchSurveyById,
-  fetchUserSurveys,
+  fetchUserSurveysInfo,
   fetchSurveyNodeDefs,
 
   // ====== UPDATE

@@ -6,13 +6,14 @@ const dbTransformCallback = camelize
 
 // ==== CREATE
 
-const insertGroup = async (authGroup, client = db) =>
+const insertGroup = async (authGroup, surveyId, client = db) =>
   await client.one(`
-    INSERT INTO auth_group (name, permissions, labels, descriptions)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO auth_group (name, survey_id, permissions, labels, descriptions)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING *`,
     [
       authGroup.name,
+      surveyId,
       JSON.stringify(authGroup.permissions),
       JSON.stringify(authGroup.labels),
       JSON.stringify(authGroup.descriptions),
@@ -22,31 +23,17 @@ const insertGroup = async (authGroup, client = db) =>
 
 const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
   await Promise.all(surveyGroups.map(
-    async authGroup => {
-      const persistedGroup = await insertGroup(authGroup, client)
-      await insertSurveyGroup(persistedGroup.id, surveyId, client)
-      return persistedGroup
-    }
+    authGroup => insertGroup(authGroup, surveyId, client)
   ))
-
-const insertSurveyGroup = async (groupId, surveyId, client = db) =>
-  await client.one(`
-    INSERT INTO auth_group_survey (group_id, survey_id)
-    VALUES ($1, $2)
-    RETURNING *`,
-    [groupId, surveyId],
-    dbTransformCallback)
 
 // ==== READ
 
 const fetchSurveyGroups = async (surveyId, client = db) =>
   await client.any(`
-    SELECT auth_group.* 
-    FROM auth_group_survey, auth_group 
-    WHERE auth_group_survey.survey_id = $1 
-    AND auth_group.id = auth_group_survey.group_id`,
-    surveyId,
-    dbTransformCallback)
+    SELECT auth_group.*
+    FROM auth_group
+    WHERE auth_group.survey_id = $1`,
+    surveyId)
 
 const fetchUserGroups = async (userId, client = db) =>
   await client.any(`
@@ -68,16 +55,6 @@ const insertUserGroup = async (groupId, userId, client = db) =>
     [groupId, userId],
     dbTransformCallback)
 
-// ==== DELETE
-
-const deleteSurveyGroups = async (surveyId, client = db) =>
-  await client.result(`
-    DELETE FROM auth_group USING auth_group_survey
-    WHERE auth_group.id = auth_group_survey.group_id
-    AND auth_group_survey.survey_id = $1
-  `, surveyId)
-
-
 module.exports = {
   // CREATE
   createSurveyGroups,
@@ -88,7 +65,4 @@ module.exports = {
 
   // UPDATE
   insertUserGroup,
-
-  // DELETE
-  deleteSurveyGroups,
 }

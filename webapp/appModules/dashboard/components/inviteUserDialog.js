@@ -36,11 +36,6 @@ class InviteUserDialog extends React.Component {
 
   componentDidMount () {
     this.emailInput.current.focus()
-    window.addEventListener('keydown', this)
-  }
-
-  componentWillUnmount () {
-    window.removeEventListener('keydown', this)
   }
 
   componentDidUpdate (_, prevState) {
@@ -50,24 +45,7 @@ class InviteUserDialog extends React.Component {
     }
   }
 
-  handleEvent (e) {
-    const {onInvite, onCancel} = this.props
-
-    if (e.type === 'keydown') {
-      switch (e.keyCode) {
-        case KeyboardMap.Enter:
-          if (this.state.enableInvite) {
-            onInvite()
-          }
-          break
-        case KeyboardMap.Esc:
-          onCancel()
-          break
-      }
-    }
-  }
-
-  async onEmailChange (email) {
+  onEmailChange (email) {
     this.setState({
       email,
       emailErrors: validEmail(email) ? {} : {errors: ['Invalid email']},
@@ -88,13 +66,12 @@ class InviteUserDialog extends React.Component {
     )(survey.info.authGroups)
 
     return (
-      <Modal isOpen={true}>
+      <Modal isOpen={true} closeOnEsc={true} onClose={onCancel}>
         <ModalHeader>
           <h5 className="user-invite-dialog__header">Invite user</h5>
         </ModalHeader>
 
         <ModalBody>
-
           <div className="user-invite-dialog__body">
             <Input ref={this.emailInput}
                    value={this.state.email}

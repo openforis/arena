@@ -31,7 +31,7 @@ const updateUserPref = async (user, name, value) =>
 // ==== DELETE
 
 const deleteUserPref = async (user, name) => ({
-  ...(userRepository.deleteUserPref(user, name)),
+  ...(await userRepository.deleteUserPref(user, name)),
   authGroups: await fetchUserGroups(user.id)
 })
 

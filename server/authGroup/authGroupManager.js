@@ -9,8 +9,8 @@ const getUserPermissionsForSurvey = (userAuthGroups, surveyAuthGroups) =>
     R.propOr([], 'permissions')
   )(userAuthGroups, surveyAuthGroups)
 
-const canEditSurvey = async (user, survey) =>
-  R.contains(permissions.surveyEdit, await getUserPermissionsForSurvey(user.authGroups, survey.authGroups))
+const canEditSurvey = (user, survey) =>
+  R.contains(permissions.surveyEdit, getUserPermissionsForSurvey(user.authGroups, survey.authGroups))
 
 module.exports = {
   canEditSurvey,

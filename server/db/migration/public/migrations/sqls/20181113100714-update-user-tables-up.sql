@@ -14,9 +14,6 @@ DROP TABLE
     IF EXISTS "group";
 
 DROP TABLE
-    IF EXISTS "auth_group_survey";
-
-DROP TABLE
     IF EXISTS "auth_group_user";
 
 DROP TABLE
@@ -27,6 +24,7 @@ CREATE TABLE
     (
         id bigserial NOT NULL,
         name VARCHAR(255) NOT NULL,
+        survey_id bigint REFERENCES survey (id) ON DELETE CASCADE,
         labels jsonb DEFAULT '{}'::jsonb,
         descriptions jsonb DEFAULT '{}'::jsonb,
         permissions jsonb DEFAULT '{}'::jsonb,
@@ -42,16 +40,6 @@ CREATE TABLE
         PRIMARY KEY (user_id, group_id)
     );
 
-CREATE TABLE
-    auth_group_survey
-    (
-        survey_id bigint REFERENCES "survey" (id) ON DELETE CASCADE,
-        group_id bigint REFERENCES "auth_group" (id) ON DELETE CASCADE,
-        PRIMARY KEY (survey_id, group_id)
-    );
-
-
-
 INSERT INTO auth_group (name, labels, descriptions, permissions, data_steps)
 VALUES (
     'systemAdmin',
@@ -60,7 +48,6 @@ VALUES (
     NULL,
     NULL
 );
-
 
 INSERT INTO auth_group_user (user_id, group_id)
 SELECT id, currval(pg_get_serial_sequence('auth_group','id'))

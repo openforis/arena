@@ -8,7 +8,7 @@ const {
   createSurvey,
 
   fetchSurveyById,
-  fetchUserSurveys,
+  fetchUserSurveysInfo,
   fetchSurveyNodeDefs,
 
   updateSurveyProp,
@@ -50,7 +50,7 @@ module.exports.init = app => {
     try {
       const {user} = req
 
-      const surveys = await fetchUserSurveys(user)
+      const surveys = await fetchUserSurveysInfo(user)
 
       res.json({surveys})
     } catch (err) {

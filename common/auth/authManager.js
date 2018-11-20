@@ -7,11 +7,6 @@ const isSystemAdmin = user => R.any(
   user.authGroups
 )
 
-const surveyAdminGroup = (survey) => R.pipe(
-  R.path(['info', 'authGroups']),
-  R.find(R.propEq('name', groupNames.surveyAdmin))
-)(survey)
-
 const getSurveyUserPermissions = (user, survey) => {
   return R.pipe(
     R.innerJoin((ug, sg) => ug.id === sg.id),
@@ -30,5 +25,4 @@ const canEditSurvey = hasPermission(permissions.surveyEdit)
 module.exports = {
   isSystemAdmin,
   canEditSurvey,
-  surveyAdminGroup,
 }

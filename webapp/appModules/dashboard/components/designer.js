@@ -48,15 +48,12 @@ class Designer extends React.Component {
               )
           }
 
-          {
-            canEditSurvey(user, survey) && (
-              <Link to={appModuleUri(appModules.designer)} className="btn btn-of">
-                <span className="icon icon-quill icon-left"></span>
-                Design
-              </Link>
-            )
-          }
+          <Link to={appModuleUri(appModules.designer)} className="btn btn-of">
+            <span className="icon icon-quill icon-left"></span>
+            Design
+          </Link>
         </div>
+
     )
   }
 
