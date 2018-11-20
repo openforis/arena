@@ -5,15 +5,6 @@ DROP TABLE
     IF EXISTS role;
 
 DROP TABLE
-    IF EXISTS user_group;
-
-DROP TABLE
-    IF EXISTS survey_group;
-
-DROP TABLE
-    IF EXISTS "group";
-
-DROP TABLE
     IF EXISTS "auth_group_user";
 
 DROP TABLE
@@ -43,8 +34,8 @@ CREATE TABLE
 INSERT INTO auth_group (name, labels, descriptions, permissions, data_steps)
 VALUES (
     'systemAdmin',
-    '{"en": "System Administrators"}',
-    '{"en": "OF Arena system administrators"}',
+    '{"en": "System Administrators"}'::jsonb,
+    '{"en": "OF Arena system administrators"}'::jsonb,
     NULL,
     NULL
 );
