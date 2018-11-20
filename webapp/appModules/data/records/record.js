@@ -6,7 +6,7 @@ import SurveyFormView from '../../surveyForm/surveyFormView'
 import { initSurveyDefs } from '../../../survey/actions'
 import { resetForm } from '../../surveyForm/actions'
 
-class RecordView extends React.Component {
+class Record extends React.Component {
 
   componentDidMount () {
     const {resetForm, initSurveyDefs} = this.props
@@ -25,4 +25,4 @@ class RecordView extends React.Component {
 export default connect(
   null,
   {initSurveyDefs, resetForm}
-)(RecordView)
+)(Record)
