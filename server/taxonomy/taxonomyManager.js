@@ -1,16 +1,13 @@
 const R = require('ramda')
-const db = require('../db/db')
 const fastcsv = require('fast-csv')
+
+const db = require('../db/db')
 
 const {publishSurveySchemaTableProps, markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
 
 const Taxonomy = require('../../common/survey/taxonomy')
 
-const JobManager = require('../job/jobManager')
-
-const TaxonomyImportJob = require('./taxonomyImportJob')
-
-const TaxonomyRepository = require('../../server/taxonomy/taxonomyRepository')
+const TaxonomyRepository = require('./taxonomyRepository')
 const {validateTaxonomy} = require('./taxonomyValidator')
 
 /**
@@ -18,28 +15,6 @@ const {validateTaxonomy} = require('./taxonomyValidator')
  */
 const createTaxonomy = async (surveyId, taxonomy) =>
   await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy)
-
-const persistTaxa = async (surveyId, taxonomyId, taxa, vernacularLanguageCodes) => {
-  await db.tx(async t => {
-    await TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyId, {
-      key: 'vernacularLanguageCodes',
-      value: vernacularLanguageCodes
-    }, true, t)
-    await TaxonomyRepository.deleteTaxaByTaxonomyId(surveyId, taxonomyId, t)
-    await TaxonomyRepository.insertTaxa(surveyId, taxa, t)
-
-    await markSurveyDraft(surveyId, t)
-  })
-}
-
-const startTaxonomyImportJob = async (userId, surveyId, taxonomyId, inputBuffer) => {
-  const taxaPersistFunction = async (surveyId, taxonomyId, taxa, vernacularLanguageCodes) =>
-    await persistTaxa(surveyId, taxonomyId, taxa, vernacularLanguageCodes)
-
-  return await JobManager.startJob(
-    new TaxonomyImportJob(userId, surveyId, 'import taxa', taxonomyId, inputBuffer, taxaPersistFunction)
-  )
-}
 
 /**
  * ====== READ
@@ -58,11 +33,11 @@ const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = fal
     : taxonomies
 }
 
-const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate = false) => {
-  const taxonomy = await TaxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft)
+const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate = false, client = db) => {
+  const taxonomy = await TaxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft, client)
 
   if (validate) {
-    const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft)
+    const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
     return {
       ...taxonomy,
       validation: await validateTaxonomy(taxonomies, taxonomy)
@@ -71,12 +46,6 @@ const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate =
     return taxonomy
   }
 }
-
-const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false) =>
-  await TaxonomyRepository.countTaxaByTaxonomyId(surveyId, taxonomyId, draft)
-
-const fetchTaxaByProp = async (surveyId, taxonomyId, filter, sort, limit, offset, draft) =>
-  await TaxonomyRepository.fetchTaxaByProp(surveyId, taxonomyId, filter, sort, limit, offset, draft)
 
 const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   console.log('start csv export')
@@ -97,10 +66,7 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   csvStream.write(R.concat(fixedHeaders, vernacularLanguageCodes))
 
   //write taxa
-  const taxa = await TaxonomyRepository.fetchTaxaByProp(surveyId, taxonomyId, null, {
-    field: 'scientificName',
-    asc: true
-  }, null, null, draft)
+  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyId, null, draft)
 
   taxa.forEach(taxon => {
     csvStream.write(R.concat([
@@ -125,8 +91,8 @@ const publishTaxonomiesProps = async (surveyId, client = db) => {
   await publishSurveySchemaTableProps(surveyId, 'taxon_vernacular_name', client)
 }
 
-const updateTaxonomyProp = async (surveyId, taxonomyId, key, value) =>
-  await db.tx(async t => {
+const updateTaxonomyProp = async (surveyId, taxonomyId, key, value, client = db) =>
+  await client.tx(async t => {
     const updatedTaxonomy = await TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyId, key, value)
 
     await markSurveyDraft(surveyId, t)
@@ -146,18 +112,20 @@ const deleteTaxonomy = async (surveyId, taxonomyId) =>
 module.exports = {
   //CREATE
   createTaxonomy,
-  startTaxonomyImportJob,
-  persistTaxa,
+  insertTaxa: TaxonomyRepository.insertTaxa,
 
   //READ
   fetchTaxonomyById,
   fetchTaxonomiesBySurveyId,
   exportTaxa,
-  countTaxaByTaxonomyId,
-  fetchTaxaByProp,
+  countTaxaByTaxonomyId: TaxonomyRepository.countTaxaByTaxonomyId,
+  fetchTaxaByPropLike: TaxonomyRepository.fetchTaxaByPropLike,
 
   //UPDATE
   publishTaxonomiesProps,
   updateTaxonomyProp,
-  deleteTaxonomy
+
+  //DELETE
+  deleteTaxonomy,
+  deleteDraftTaxaByTaxonomyId: TaxonomyRepository.deleteDraftTaxaByTaxonomyId,
 }

@@ -2,15 +2,10 @@ const {sendOk, sendErr} = require('../serverUtils/response')
 const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
-const {
-  countTaxaByTaxonomyId,
-  fetchTaxaByProp,
-  fetchTaxonomyById,
-  createTaxonomy,
-  updateTaxonomyProp,
-  deleteTaxonomy
-} = require('./taxonomyManager')
-const {fetchTaxonomiesBySurveyId, startTaxonomyImportJob, exportTaxa} = require('./taxonomyManager')
+const JobManager = require('../job/jobManager')
+const {jobToJSON} = require('../job/jobUtils')
+const TaxonomyManager = require('./taxonomyManager')
+const TaxonomyImportJob = require('./taxonomyImportJob')
 
 module.exports.init = app => {
 
@@ -20,7 +15,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const {body} = req
 
-      const taxonomy = await createTaxonomy(surveyId, body)
+      const taxonomy = await TaxonomyManager.createTaxonomy(surveyId, body)
 
       res.json({taxonomy})
     } catch (err) {
@@ -36,7 +31,7 @@ module.exports.init = app => {
       const draft = getBoolParam(req, 'draft')
       const validate = getBoolParam(req, 'validate')
 
-      const taxonomies = await fetchTaxonomiesBySurveyId(surveyId, draft, validate)
+      const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(surveyId, draft, validate)
 
       res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
     } catch (err) {
@@ -50,7 +45,7 @@ module.exports.init = app => {
       const taxonomyId = getRestParam(req, 'taxonomyId')
       const draft = getBoolParam(req, 'draft')
 
-      const count = await countTaxaByTaxonomyId(surveyId, taxonomyId, draft)
+      const count = await TaxonomyManager.countTaxaByTaxonomyId(surveyId, taxonomyId, draft)
 
       res.json({count})
     } catch (err) {
@@ -63,12 +58,16 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyId = getRestParam(req, 'taxonomyId')
       const draft = getBoolParam(req, 'draft')
-      const limit = getRestParam(req, 'limit')
+      const limit = getRestParam(req, 'limit', 25)
       const offset = getRestParam(req, 'offset', 0)
       const filter = getJsonParam(req, 'filter')
       const sort = {field: 'scientificName', asc: true}
 
-      const taxa = await fetchTaxaByProp(surveyId, taxonomyId, filter, sort, limit, offset, draft)
+      const params = {
+        filter, sort, limit, offset
+      }
+
+      const taxa = await TaxonomyManager.fetchTaxaByPropLike(surveyId, taxonomyId, params, draft)
 
       res.json({taxa})
     } catch (err) {
@@ -86,7 +85,7 @@ module.exports.init = app => {
       res.setHeader('Content-disposition', `attachment; filename=${fileName}`)
       res.set('Content-Type', 'text/csv')
 
-      await exportTaxa(surveyId, taxonomyId, res, draft)
+      await TaxonomyManager.exportTaxa(surveyId, taxonomyId, res, draft)
 
       res.end()
     } catch (err) {
@@ -103,8 +102,8 @@ module.exports.init = app => {
       const {body} = req
       const {key, value} = body
 
-      await updateTaxonomyProp(surveyId, taxonomyId, key, value)
-      const taxonomy = await fetchTaxonomyById(surveyId, taxonomyId, true, true)
+      await TaxonomyManager.updateTaxonomyProp(surveyId, taxonomyId, key, value)
+      const taxonomy = await TaxonomyManager.fetchTaxonomyById(surveyId, taxonomyId, true, true)
 
       res.json({taxonomy})
     } catch (err) {
@@ -119,9 +118,17 @@ module.exports.init = app => {
       const taxonomyId = getRestParam(req, 'taxonomyId')
 
       const file = req.files.file
-      const job = await startTaxonomyImportJob(user.id, surveyId, taxonomyId, file.data)
 
-      res.json({job})
+      const job = new TaxonomyImportJob({
+        userId: user.id,
+        surveyId,
+        taxonomyId,
+        csvString: file.data.toString('utf8')
+      })
+
+      JobManager.executeJobThread(job)
+
+      res.json({job: jobToJSON(job)})
     } catch (err) {
       sendErr(res, err)
     }
@@ -134,7 +141,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyId = getRestParam(req, 'taxonomyId')
 
-      await deleteTaxonomy(surveyId, taxonomyId)
+      await TaxonomyManager.deleteTaxonomy(surveyId, taxonomyId)
 
       sendOk(res)
     } catch (err) {

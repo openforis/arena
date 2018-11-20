@@ -8,7 +8,6 @@ import { showAppJobMonitor } from '../appModules/appView/components/job/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
-export const surveyPublish = 'survey/publish'
 export const surveyDefsLoad = 'survey/defs/load'
 
 const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
@@ -52,7 +51,6 @@ export const setActiveSurvey = (surveyId, draft = true) =>
     const user = getUser(getState())
     await axios.post(`/api/user/${user.id}/pref/${userPrefNames.survey}/${surveyId}`)
     dispatch({type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId})
-
   }
 
 // ==== UPDATE
@@ -63,8 +61,8 @@ export const publishSurvey = () => async (dispatch, getState) => {
   const {data} = await axios.put(`/api/survey/${surveyId}/publish`)
 
   dispatch(showAppJobMonitor(data.job, () => {
-    //publish job complete
-    dispatch({type: surveyPublish})
+    //reload survey
+    dispatch(setActiveSurvey(surveyId, true))
   }))
 }
 

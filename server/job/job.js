@@ -1,23 +1,11 @@
+const {jobEvents, jobStatus} = require('./jobUtils')
+
 const {uuidv4} = require('../../common/uuid')
-
-const jobStatus = {
-  pending: 'pending',
-  running: 'running',
-  succeeded: 'succeeded',
-  canceled: 'canceled',
-  failed: 'failed',
-}
-
-const jobEvents = {
-  statusChange: 'statusChange', //job has changed its status
-  progress: 'progress', //job is running and the processed items changed
-}
 
 class JobEvent {
 
-  constructor (type, jobId, status, total, processed) {
+  constructor (type, status, total, processed) {
     this.type = type
-    this.jobId = jobId
     this.status = status
     this.total = total
     this.processed = processed
@@ -26,14 +14,16 @@ class JobEvent {
 
 class Job {
 
-  constructor (userId, surveyId, name, innerJobs = []) {
-    this.id = null
-    this.uuid = uuidv4()
+  constructor (type, params, innerJobs = []) {
+    this.params = params
+
+    const {userId, surveyId} = params
+
     this.userId = userId
     this.surveyId = surveyId
-    this.props = {
-      name,
-    }
+
+    this.uuid = uuidv4()
+    this.type = type
     this.status = jobStatus.pending
     this.startTime = null
     this.endTime = null
@@ -91,37 +81,55 @@ class Job {
     return new Promise((resolve) => resolve(0))
   }
 
+  getCurrentInnerJob () {
+    return this.innerJobs[this.currentInnerJobIndex]
+  }
+
   startNextInnerJob () {
     this.currentInnerJobIndex++
-    const innerJob = this.innerJobs[this.currentInnerJobIndex]
+
+    const innerJob = this.getCurrentInnerJob()
 
     innerJob.context = this.context
 
     innerJob
       .onEvent(event => {
-        this.notifyEvent(event) //propagate events to parent job
-
-        switch (event.status) {
-          case jobStatus.failed:
-          case jobStatus.canceled:
-            this.setStatus(event.status)
-            break
-          case jobStatus.succeeded:
-            this.incrementProcessedItems()
-
-            if (this.processed === this.innerJobs.length) {
-              this.setStatusSucceeded()
-            } else {
-              this.startNextInnerJob()
-            }
-            break
-        }
+        this.handleInnerJobEvent(event)
       })
       .start()
   }
 
+  handleInnerJobEvent (event) {
+    this.notifyEvent(event) //propagate events to parent job
+
+    switch (event.status) {
+      case jobStatus.failed:
+      case jobStatus.canceled:
+        //cancel or fail even parent job
+        this.setStatus(event.status)
+        break
+      case jobStatus.succeeded:
+        this.incrementProcessedItems()
+
+        if (this.processed === this.innerJobs.length) {
+          this.setStatusSucceeded()
+        } else {
+          this.startNextInnerJob()
+        }
+        break
+    }
+  }
+
   cancel () {
-    this.setStatus(jobStatus.canceled)
+    if (this.currentInnerJobIndex >= 0) {
+      const innerJob = this.getCurrentInnerJob()
+      if (innerJob.isRunning()) {
+        innerJob.cancel()
+        //parent job will be canceled by the inner job event listener
+      }
+    } else {
+      this.setStatus(jobStatus.canceled)
+    }
   }
 
   onEvent (listener) {
@@ -129,8 +137,12 @@ class Job {
     return this
   }
 
-  isCancelled () {
+  isCanceled () {
     return this.status === jobStatus.canceled
+  }
+
+  isRunning () {
+    return this.status === jobStatus.running
   }
 
   isEnded () {
@@ -142,18 +154,6 @@ class Job {
       default:
         return false
     }
-  }
-
-  getProgressPercent () {
-    const partial = this.status === jobStatus.succeeded ?
-      100
-      : this.total > 0 ?
-        Math.floor(100 * this.processed / this.total)
-        : 0
-
-    return this.innerJobs.length === 0 || partial === 100 ?
-      partial
-      : partial + Math.floor(this.innerJobs[this.currentInnerJobIndex].getProgressPercent() / this.total)
   }
 
   setStatus (status) {
@@ -186,37 +186,9 @@ class Job {
   }
 
   createJobEvent (type) {
-    return new JobEvent(type, this.id, this.status, this.total, this.processed)
-  }
-
-  toJSON () {
-    return {
-      id: this.id,
-      uuid: this.uuid,
-      userId: this.userId,
-      surveyId: this.surveyId,
-      name: this.props.name,
-      result: this.status === jobStatus.succeeded ? this.result : {},
-      errors: this.status === jobStatus.failed ? this.errors : {},
-      total: this.total,
-      processed: this.processed,
-      progressPercent: this.getProgressPercent(),
-      innerJobs: this.innerJobs.map(j => j.toJSON()),
-
-      //status
-      status: this.status,
-      succeeded: this.status === jobStatus.succeeded,
-      canceled: this.status === jobStatus.canceled,
-      failed: this.status === jobStatus.failed,
-      running: this.status === jobStatus.running,
-      ended: this.isEnded(),
-    }
+    return new JobEvent(type, this.status, this.total, this.processed)
   }
 
 }
 
-module.exports = {
-  jobStatus,
-  jobEvents,
-  Job,
-}
+module.exports = Job

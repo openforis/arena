@@ -75,6 +75,8 @@ class TaxonomyEdit extends React.Component {
 
           <div className="button-bar">
             <UploadButton label="CSV import"
+                          disabled={taxonomy.published}
+                          title={taxonomy.published ? 'Import not allowed for published Taxonomy' : null}
                           onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
 
             <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/export?draft=true`}

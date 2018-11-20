@@ -29,10 +29,9 @@ const InnerJobs = ({innerJobs}) =>
   <div className="app-job-monitor__inner-jobs">
     {
       innerJobs.map((innerJob, i) => (
-        <React.Fragment>
-          <div key={i}
-               className="job">
-            <div className="name">{i + 1}. {innerJob.name}</div>
+        <React.Fragment key={i}>
+          <div className="job">
+            <div className="name">{i + 1}. {innerJob.type}</div>
             <JobProgress job={innerJob}/>
           </div>
           <AppJobErrors job={innerJob}/>
@@ -51,7 +50,7 @@ class AppJobMonitor extends React.Component {
         <Modal className="app-job-monitor">
 
           <ModalBody>
-            <div className="app-job-monitor__header">Job: {job.name}</div>
+            <div className="app-job-monitor__header">Job: {job.type}</div>
             <JobProgress job={job}/>
             <AppJobErrors job={job}/>
 

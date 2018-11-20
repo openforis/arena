@@ -135,6 +135,19 @@ const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
     `, [surveyId]
   )
 
+const deleteNodeDefsLabels = async (surveyId, langCode, client = db) =>
+  await deleteNodeDefsProp(surveyId, ['labels', langCode], client)
+
+const deleteNodeDefsDescriptions = async (surveyId, langCode, client = db) =>
+  await deleteNodeDefsProp(surveyId, ['descriptions', langCode], client)
+
+const deleteNodeDefsProp = async (surveyId, deletePath, client = db) =>
+  await client.none(`
+    UPDATE node_def 
+    SET props = props #- '{${deletePath.join(',')}}'
+    WHERE survey_id = $1`,
+    [surveyId])
+
 module.exports = {
   //utils
   dbTransformCallback,
@@ -157,4 +170,6 @@ module.exports = {
   //DELETE
   markNodeDefDeleted,
   permanentlyDeleteNodeDefs,
+  deleteNodeDefsLabels,
+  deleteNodeDefsDescriptions,
 }
