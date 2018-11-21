@@ -45,6 +45,10 @@ class Record extends React.Component {
       history.replace(appModuleUri(appModules.data))
   }
 
+  componentWillUnmount () {
+    this.props.resetForm()
+  }
+
   render () {
     const {recordId} = this.props
 
