@@ -57,6 +57,9 @@ const RecordsTablePaginator = ({offset, limit, count, fetchRecords}) => {
 const RecordRow = ({idx, offset, record, style}) => (
   <div className="table__row" style={style}>
     <div>{idx + offset + 1}</div>
+    {
+      JSON.parse(record.keys).map((k, i) => <div key={i}>{record[k]}</div>)
+    }
     <div>{getRelativeDate(record.dateCreated)}</div>
     <div>{getRelativeDate(record.dateModified)}</div>
     <div>{record.ownerName}</div>
@@ -64,12 +67,18 @@ const RecordRow = ({idx, offset, record, style}) => (
 )
 
 const RecordsTable = ({records, offset, limit, count, fetchRecords}) => {
-  const style = {gridTemplateColumns: 'repeat(4, .25fr)'}
+  const keys = JSON.parse(records[0].keys)
+  const noCols = 4 + keys.length
+
+  const style = {gridTemplateColumns: `repeat(${noCols}, ${1 / noCols}fr)`}
 
   return (
     <React.Fragment>
       <div className="table__row-header" style={style}>
         <div>Record #</div>
+        {
+          keys.map((k, i) => <div key={i}>{k}</div>)
+        }
         <div>Date created</div>
         <div>Date Modified</div>
         <div>Owner</div>

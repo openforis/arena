@@ -30,18 +30,44 @@ const insertRecord = async (record, client = db) =>
 const countRecordsBySurveyId = async (surveyId, client = db) =>
   await client.one(`SELECT count(*) FROM ${getSurveyDBSchema(surveyId)}.record`)
 
-const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) =>
-  await client.map(`
+const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) => {
+
+  // fetch nodeDef keys
+  const nodeDefKeys = await client.any(`
+    SELECT id, props->>'name' as name 
+    FROM node_def n      
+    WHERE n.survey_id = $1
+    AND props->>'key' = $2
+  `,
+    [surveyId, 'true']
+  )
+
+  // select nodeDef keys
+  const keyNames = nodeDefKeys.map((nodeDefKey, i) => camelize(nodeDefKey.name))
+
+  // select nodeDef key values
+  const nodeDefKeyValues = nodeDefKeys.map((nodeDefKey, i) => `
+    n${i}.value as ${nodeDefKey.name} 
+  `).join(', ')
+
+  // join with node key values
+  const nodeDefKeyJoins = nodeDefKeys.map((nodeDefKey, i) => `
+    LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.node as n${i}
+      ON r.id = n${i}.record_id
+      AND n${i}.node_def_id = ${nodeDefKey.id}
+  `).join(' ')
+
+  return await client.map(`
     SELECT 
       r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')},
       n.date_modified,
-      u.name as owner_name
+      u.name as owner_name,
+      '${JSON.stringify(keyNames)}' as keys,
+      ${nodeDefKeyValues}
     FROM ${getSurveyDBSchema(surveyId)}.record r
-    
     -- GET OWNER NAME
     JOIN "user" u
       ON r.owner_id = u.id
-    
     -- GET LAST MODIFIED NODE DATE
     JOIN (
          SELECT 
@@ -50,13 +76,14 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
          GROUP BY record_id
     ) as n
       ON r.id = n.record_id
-      
+    ${nodeDefKeyJoins}
     LIMIT $1
     OFFSET $2
   `,
     [limit, offset],
     dbTransformCallback(surveyId)
   )
+}
 
 const fetchRecordById = async (surveyId, recordId, client = db) =>
   await client.one(
