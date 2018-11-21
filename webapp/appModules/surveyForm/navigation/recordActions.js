@@ -1,13 +1,16 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
-const RecordActions = ({entry}) => (
+import { deleteRecord } from '../record/actions'
+
+const RecordActions = ({entry, deleteRecord}) => (
   entry
     ? (
       <div className="survey-form__nav-record-actions">
         <button className="btn-s btn-of btn-danger"
                 onClick={() =>
                   window.confirm('Are you sure you want to delete this record? This operation cannot be undone')
-                    ? null
+                    ? deleteRecord()
                     : null
                 }
                 aria-disabled={false}>
@@ -19,4 +22,4 @@ const RecordActions = ({entry}) => (
     : null
 )
 
-export default RecordActions
+export default connect(null, {deleteRecord})(RecordActions)

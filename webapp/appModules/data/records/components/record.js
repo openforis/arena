@@ -11,6 +11,8 @@ import { initSurveyDefs } from '../../../../survey/actions'
 import { resetForm } from '../../../surveyForm/actions'
 import { createRecord, fetchRecord } from '../../../surveyForm/record/actions'
 
+import { appModules, appModuleUri } from '../../../appModules'
+
 class Record extends React.Component {
 
   componentDidMount () {
@@ -34,10 +36,19 @@ class Record extends React.Component {
 
   }
 
-  render () {
-    const {ready} = this.props
+  componentDidUpdate (prevProps) {
+    const {recordId, history} = this.props
+    const {recordId: prevRecordId} = prevProps
 
-    return ready
+    // record has been deleted
+    if (prevRecordId && !recordId)
+      history.replace(appModuleUri(appModules.data))
+  }
+
+  render () {
+    const {recordId} = this.props
+
+    return recordId
       ? <SurveyFormView draft={false} edit={false} entry={true}/>
       : null
   }
@@ -47,7 +58,7 @@ const mapStateToProps = state => {
   const record = getRecord(getSurveyForm(state))
 
   return {
-    ready: !R.isEmpty(record)
+    recordId: R.prop('id', record)
   }
 }
 

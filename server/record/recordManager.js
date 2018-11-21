@@ -13,6 +13,8 @@ const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
 
+const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
+
 /**
  * ===================
  * CREATE
@@ -74,7 +76,7 @@ const fetchRecordById = async (surveyId, recordId) => {
   const record = await RecordRepository.fetchRecordById(surveyId, recordId)
   const nodes = await NodeRepository.fetchNodesByRecordId(surveyId, recordId)
 
-  return {...record, nodes}
+  return {...record, nodes: toUUIDIndexedObj(nodes)}
 }
 
 /**
@@ -109,6 +111,9 @@ const resetNodeValue = async (survey, record, nodeUUID, client = db) => {
  * DELETE
  * ===================
  */
+const deleteRecord = async (surveyId, recordId) =>
+  await RecordRepository.deleteRecord(surveyId, recordId)
+
 const deleteNode = async (surveyId, nodeUUID, client = db) =>
   await client.tx(async t => {
     const node = await NodeRepository.deleteNode(surveyId, nodeUUID, t)
@@ -158,6 +163,7 @@ module.exports = {
   createRecord,
   persistNode,
   // createNode,
+
   //==== READ
   fetchRecordById,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
@@ -166,6 +172,8 @@ module.exports = {
 
   //==== UPDATE
   // NodeRepository.updateNodeValue,
+
   //==== DELETE
+  deleteRecord,
   deleteNode,
 }

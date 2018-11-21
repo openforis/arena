@@ -95,6 +95,15 @@ const fetchRecordById = async (surveyId, recordId, client = db) =>
     dbTransformCallback(surveyId)
   )
 
+// ============== DELETE
+const deleteRecord = async (surveyId, recordId, client = db) =>
+  await client.query(`
+    DELETE FROM ${getSurveyDBSchema(surveyId)}.record 
+    WHERE id = $1
+  `,
+    [recordId]
+  )
+
 module.exports = {
   // CREATE
   insertRecord,
@@ -104,5 +113,8 @@ module.exports = {
   fetchRecordsSummaryBySurveyId,
   fetchRecordById,
 
-  //UPDATE
+  // UPDATE
+
+  // DELETE
+  deleteRecord,
 }

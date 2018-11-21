@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const {getRestParam} = require('../serverUtils/request')
-const {sendErr} = require('../serverUtils/response')
+const {sendErr, sendOk} = require('../serverUtils/response')
 
 const RecordManager = require('./recordManager')
 const Node = require('../../common/record/node')
@@ -100,6 +100,17 @@ module.exports.init = app => {
   // ==== UPDATE
 
   // ==== DELETE
+  app.delete('/survey/:surveyId/record/:recordId', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const recordId = getRestParam(req, 'recordId')
+
+      await RecordManager.deleteRecord(surveyId, recordId)
+      sendOk(res)
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
 
   app.delete('/survey/:surveyId/record/:recordId/node/:nodeUUID', async (req, res) => {
     try {
