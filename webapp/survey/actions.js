@@ -8,6 +8,7 @@ import { showAppJobMonitor } from '../appModules/appView/components/job/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
+export const surveyDelete = 'survey/delete'
 export const surveyDefsLoad = 'survey/defs/load'
 
 const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
@@ -72,6 +73,6 @@ export const deleteSurvey = () => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
   await axios.delete(`/api/survey/${surveyId}`)
 
-  dispatchCurrentSurveyUpdate(dispatch, null)
+  dispatch({type: surveyDelete, surveyId})
 }
 

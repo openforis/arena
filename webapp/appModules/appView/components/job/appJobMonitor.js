@@ -47,7 +47,7 @@ class AppJobMonitor extends React.Component {
     const innerJobs = job ? job.innerJobs : null
     return job && !job.canceled
       ? (
-        <Modal className="app-job-monitor">
+        <Modal className="app-job-monitor" closeOnEsc={false}>
 
           <ModalBody>
             <div className="app-job-monitor__header">Job: {job.type}</div>

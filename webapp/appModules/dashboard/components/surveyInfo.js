@@ -81,8 +81,7 @@ class SurveyInfo extends React.Component {
           </button>
 
           {showDialog &&
-          <DeleteSurveyDialog show={showDialog}
-                              onCancel={() => this.toggleDeleteConfirmDialog(false)}
+          <DeleteSurveyDialog onCancel={() => this.toggleDeleteConfirmDialog(false)}
                               onDelete={() => deleteSurvey()}
                               surveyName={Survey.getName(surveyInfo)}/>
           }

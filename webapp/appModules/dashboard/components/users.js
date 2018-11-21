@@ -3,12 +3,29 @@ import { connect } from 'react-redux'
 
 import * as R from 'ramda'
 
-const canInviteUsers = false
+import InviteUserDialog from './inviteUserDialog'
+
+const canInviteUsers = true
 
 class Users extends React.Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      showInviteDialog: false
+    }
+  }
+
+  toggleInviteUserDialog(show) {
+    this.setState({
+      showInviteDialog: show
+    })
+  }
 
   render () {
     const {users} = this.props
+    const { showInviteDialog } = this.state
+    
     const roleKeys = R.keys(users)
 
     const roleUsersCount = role => R.prop('count', users[role])
@@ -46,7 +63,7 @@ class Users extends React.Component {
         {
           canInviteUsers
             ? (
-              <button className="btn btn-of">
+              <button className="btn btn-of" onClick={() => this.toggleInviteUserDialog(true)}>
                 <span className="icon icon-user-plus icon-left"/>
                 Invite
               </button>
@@ -69,6 +86,12 @@ class Users extends React.Component {
             )
             : (null)
         }
+
+        {showInviteDialog &&
+          <InviteUserDialog onCancel={() => this.toggleInviteUserDialog(false)}
+                            onInvite={() => {alert('TODO'); this.toggleInviteUserDialog(false)}}/>
+        }
+
       </div>
     )
   }

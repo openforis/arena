@@ -1,4 +1,5 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/dbMigrator')
@@ -17,6 +18,9 @@ const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/no
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
+const authGroupRepository = require('../authGroup/authGroupRepository')
+const {isSystemAdmin} = require('../../common/auth/authManager')
+
 const assocSurveyInfo = info => ({info})
 
 // ====== CREATE
@@ -32,9 +36,13 @@ const createSurvey = async (user, {name, label, lang}) => {
         steps: {...Survey.defaultSteps},
       }
 
-      const survey = await surveyRepository.insertSurvey(props, user.id, t)
+      const userId = user.id
+
+      // create the survey
+      let survey = await surveyRepository.insertSurvey(props, userId, t)
       const {id: surveyId} = survey
 
+      // create survey's root entity props
       const rootEntityDefProps = {
         name: 'root_entity',
         labels: {[lang]: 'Root entity'},
@@ -47,8 +55,16 @@ const createSurvey = async (user, {name, label, lang}) => {
       // update user prefs
       await updateUserPref(user, userPrefNames.survey, surveyId, t)
 
-      return survey
+      // create default groups for this survey
 
+      const authGroups = await authGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
+      survey = R.assoc('authGroups', authGroups, survey)
+
+      if (!isSystemAdmin(user)) {
+        await authGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
+      }
+
+      return survey
     }
   )
 
@@ -61,18 +77,16 @@ const createSurvey = async (user, {name, label, lang}) => {
 // ====== READ
 const fetchSurveyById = async (id, draft = false, validate = false) => {
   const survey = await surveyRepository.getSurveyById(id, draft)
-  // const codeLists = await fetchCodeListsBySurveyId(id, draft)
-  // const taxonomies = await fetchTaxonomiesBySurveyId(id, draft)
+  const authGroups = await authGroupRepository.fetchSurveyGroups(survey.id)
 
   return assocSurveyInfo({
     ...survey,
-    // codeLists: toUUIDIndexedObj(codeLists),
-    // taxonomies: toUUIDIndexedObj(taxonomies),
+    authGroups,
     validation: validate ? await validateSurvey(survey) : null
   })
 }
 
-const fetchUserSurveys = async (user) => R.map(
+const fetchUserSurveysInfo = async (user) => R.map(
   assocSurveyInfo,
   await surveyRepository.fetchSurveys()
 )
@@ -121,7 +135,7 @@ module.exports = {
 
   // ====== READ
   fetchSurveyById,
-  fetchUserSurveys,
+  fetchUserSurveysInfo,
   fetchSurveyNodeDefs,
 
   // ====== UPDATE

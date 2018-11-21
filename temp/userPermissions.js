@@ -26,7 +26,6 @@ const rolesKey = {
   dataEditor: 'dataEditor',
   dataCleanser: 'dataCleanser',
   dataAnalyst: 'dataAnalyst',
-
 }
 
 const roles = {

@@ -1,6 +1,6 @@
 import { exportReducer } from '../../../appUtils/reduxUtils'
 
-import { surveyUpdate } from '../../../survey/actions'
+import { surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../actions'
 
 import {
@@ -34,6 +34,7 @@ import {
 const actionHandlers = {
   // reset form
   [surveyUpdate]: () => ({}),
+  [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
   [codeListEditUpdate]: (state, {codeListUUID}) => initCodeListEdit(codeListUUID),

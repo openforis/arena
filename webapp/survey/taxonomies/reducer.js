@@ -1,15 +1,16 @@
 import { exportReducer } from '../../appUtils/reduxUtils'
 import * as R from 'ramda'
 
-import { surveyCreate, surveyDefsLoad, surveyUpdate } from '../actions'
+import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
 
-import {  taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from './actions'
+import { taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from './actions'
 import { taxonomyCreate } from './actions'
 
 const actionHandlers = {
   // reset state
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
+  [surveyDelete]: () => ({}),
 
   [surveyDefsLoad]: (state, {taxonomies}) => taxonomies,
 

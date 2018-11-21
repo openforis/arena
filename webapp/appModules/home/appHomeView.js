@@ -15,7 +15,7 @@ import Survey from '../../../common/survey/survey'
 import { getSurvey } from '../../survey/surveyState'
 
 import { fetchSurveys } from './actions'
-import { createSurvey, resetNewSurvey, updateNewSurveyProp } from './actions'
+import { createSurvey, updateNewSurveyProp } from './actions'
 import { setActiveSurvey } from '../../survey/actions'
 
 class AppHomeView extends React.Component {
@@ -32,10 +32,6 @@ class AppHomeView extends React.Component {
     if (surveyInfo && (!prevSurveyInfo || surveyInfo.id !== prevSurveyInfo.id)) {
       history.push(appModuleUri(appModules.dashboard))
     }
-  }
-
-  componentWillUnmount () {
-    this.props.resetNewSurvey()
   }
 
   render () {
@@ -75,7 +71,6 @@ export default withRouter(connect(
   {
     createSurvey,
     updateNewSurveyProp,
-    resetNewSurvey,
     fetchSurveys,
     setActiveSurvey,
   }

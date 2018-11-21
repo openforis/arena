@@ -41,8 +41,6 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
   }
 
 }
-export const resetNewSurvey = () => dispatch =>
-  dispatch({type: homeNewSurveyUpdate, newSurvey: null})
 
 // ====== SURVEYS LIST
 
