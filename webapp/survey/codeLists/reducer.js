@@ -2,7 +2,7 @@ import * as R from 'ramda'
 
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import { surveyCreate, surveyDefsLoad, surveyUpdate } from '../actions'
+import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
 
 import {
   codeListCreate,
@@ -18,6 +18,7 @@ const actionHandlers = {
   // reset state
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
+  [surveyDelete]: () => ({}),
 
   [surveyDefsLoad]: (state, {codeLists}) => codeLists,
 

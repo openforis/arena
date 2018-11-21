@@ -2,7 +2,7 @@ const db = require('../server/db/db')
 
 const {deleteSurvey} = require('../server/survey/surveyManager')
 
-const {findUserByEmailAndPassword} = require('../server/user/userRepository')
+const {findUserByEmailAndPassword} = require('../server/user/userManager')
 const {setUserPref, userPrefNames} = require('../common/user/userPrefs')
 
 const Survey = require('../common/survey/survey')

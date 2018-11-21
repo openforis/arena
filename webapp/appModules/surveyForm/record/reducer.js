@@ -2,7 +2,7 @@ import { exportReducer } from '../../../appUtils/reduxUtils'
 
 import { assocNodes, deleteNode } from '../../../../common/record/record'
 
-import { surveyUpdate } from '../../../survey/actions'
+import { surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../actions'
 
 import { nodeDelete, nodesUpdate, recordCreate } from './actions'
@@ -10,6 +10,7 @@ import { nodeDelete, nodesUpdate, recordCreate } from './actions'
 const actionHandlers = {
   // reset form
   [surveyUpdate]: () => ({}),
+  [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
   [recordCreate]: (state, {record}) => record,

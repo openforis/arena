@@ -1,18 +1,15 @@
 const R = require('ramda')
 
-const defaultSteps = {
-  '1': {name: 'entry'},
-  '2': {name: 'cleansing', prev: '1'},
-  '3': {name: 'analysis', prev: '2'},
-}
-
 const SurveyInfo = require('./_internal/surveyInfo')
 const SurveyNodeDefs = require('./_internal/surveyNodeDefs')
 const SurveyCodeLists = require('./_internal/surveyCodeLists')
 const SurveyTaxonomies = require('./_internal/surveyTaxonomies')
+const SurveyDefaults = require('./_internal/surveyDefaults')
 
 module.exports = {
-  defaultSteps,
+  // ====== DEFAULTS
+  defaultSteps: SurveyDefaults.defaultSteps,
+  getDefaultAuthGroups: SurveyDefaults.getDefaultAuthGroups,
 
   // READ
   getSurveyInfo: SurveyInfo.getInfo,
@@ -30,6 +27,9 @@ module.exports = {
   isPublished: SurveyInfo.isPublished,
   isDraft: SurveyInfo.isDraft,
   isValid: SurveyInfo.isValid,
+
+  getAuthGroups: SurveyInfo.getAuthGroups,
+  getSurveyAdminGroup: SurveyInfo.getSurveyAdminGroup,
 
   // ====== READ nodeDefs
   getNodeDefs: SurveyNodeDefs.getNodeDefs,
@@ -64,4 +64,5 @@ module.exports = {
   getTaxonomiesArray: SurveyTaxonomies.getTaxonomiesArray,
   getTaxonomyByUUID: SurveyTaxonomies.getTaxonomyByUUID,
   assocTaxonomies: SurveyTaxonomies.assocTaxonomies,
+
 }

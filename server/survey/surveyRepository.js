@@ -30,14 +30,14 @@ const fetchAllSurveyIds = async (client = db) =>
 
 const fetchSurveys = async (client = db) =>
   await client.map(`
-    SELECT 
-      s.*, ${selectDate('n.date_created', 'date_created')},nm.date_modified
+    SELECT
+      s.*, ${selectDate('n.date_created', 'date_created')}, nm.date_modified
     FROM survey s
     JOIN node_def n
       ON s.id = n.survey_id
       AND n.parent_id IS NULL
     JOIN (
-        SELECT 
+        SELECT
           survey_id, ${selectDate('MAX(date_modified)', 'date_modified')}
         FROM node_def
         GROUP BY survey_id
@@ -68,7 +68,7 @@ const updateSurveyProp = async (surveyId, key, value, client = db) => {
   const prop = {[key]: value}
 
   return await client.one(`
-    UPDATE survey 
+    UPDATE survey
     SET props_draft = props_draft || $1,
     draft = true
     WHERE id = $2

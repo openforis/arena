@@ -5,7 +5,7 @@ import codeListEdit from './codeListEdit/reducer'
 import taxonomyEdit from './taxonomyEdit/reducer'
 import record from './record/reducer'
 
-import { surveyUpdate } from '../../survey/actions'
+import { surveyDelete, surveyUpdate } from '../../survey/actions'
 
 import {
   formActivePageNodeDefUpdate,
@@ -28,6 +28,7 @@ import {
 const actionHandlers = {
   // reset form
   [surveyUpdate]: () => ({}),
+  [surveyDelete]: () => ({}),
 
   [formReset]: () => ({}),
 

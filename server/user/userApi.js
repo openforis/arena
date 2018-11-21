@@ -1,11 +1,12 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendOk, sendErr} = require('../serverUtils/response')
 
-const {updateUserPref} = require('./userRepository')
+const {updateUserPref} = require('./userManager')
 
 module.exports.init = app => {
 
   // ==== UPDATE
+
   app.post('/user/:userId/pref/:name/:value', async (req, res) => {
     try {
       const {user} = req

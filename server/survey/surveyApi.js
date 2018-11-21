@@ -44,7 +44,7 @@ module.exports.init = app => {
     try {
       const {user} = req
 
-      const surveys = await SurveyManager.fetchUserSurveys(user)
+      const surveys = await SurveyManager.fetchUserSurveysInfo(user)
 
       res.json({surveys})
     } catch (err) {

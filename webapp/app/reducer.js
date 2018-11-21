@@ -3,7 +3,14 @@ import * as R from 'ramda'
 import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 
 import { startJob, updateActiveJob } from '../appModules/appView/components/job/appJobState'
-import { assocAppError, dissocAppError, getAppErrors, logoutUser } from './appState'
+import {
+  assocAppError,
+  assocSurveyAdminGroup,
+  dissocAppError,
+  dissocSurveyGroups,
+  getAppErrors,
+  logoutUser
+} from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
 
 import {
@@ -21,11 +28,13 @@ import { loginSuccess } from '../login/actions'
  * ======
  */
 import { appJobStart, appJobActiveUpdate } from '../appModules/appView/components/job/actions'
+import { surveyCreate, surveyDelete } from '../survey/actions'
 
 const actionHandlers = {
 
   [appStatusChange]: (state, {survey, ...props}) => assocActionProps(state, props),
 
+  // ====== user
   // user and current survey are properties of app state
   [loginSuccess]: (state, {survey, ...props}) => assocActionProps(state, props),
 
@@ -40,7 +49,11 @@ const actionHandlers = {
 
   [appUserLogout]: (state, action) => logoutUser(state),
 
-  //app job
+  [surveyCreate]: (state, {survey: {info}}) => assocSurveyAdminGroup(info)(state),
+
+  [surveyDelete]: (state, {surveyId}) => dissocSurveyGroups(surveyId)(state),
+
+  // ====== app job
   [appJobStart]: (state, {job, onComplete, autoHide}) =>
     startJob(job, onComplete, autoHide)(state),
 
@@ -57,6 +70,7 @@ const actionHandlers = {
   )(state),
 
   [appErrorDelete]: (state, {error}) => dissocAppError(error)(state),
+
 }
 
 export default exportReducer(actionHandlers)
