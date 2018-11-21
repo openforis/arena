@@ -34,7 +34,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
   await client.map(`
     SELECT 
       r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')},
-      --n.date_modified,
+      n.date_modified,
       u.name as owner_name
     FROM ${getSurveyDBSchema(surveyId)}.record r
     
@@ -43,13 +43,13 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
       ON r.owner_id = u.id
     
     -- GET LAST MODIFIED NODE DATE
-    -- JOIN (
---         SELECT 
-   --        record_id, ${selectDate('MAX(date_modified)', 'date_modified')}
-      --   FROM ${getSurveyDBSchema(surveyId)}.node
-        -- GROUP BY record_id
-      -- ) as n
-      -- ON r.id = n.record_id
+    JOIN (
+         SELECT 
+           record_id, ${selectDate('MAX(date_modified)', 'date_modified')}
+         FROM ${getSurveyDBSchema(surveyId)}.node
+         GROUP BY record_id
+    ) as n
+      ON r.id = n.record_id
       
     LIMIT $1
     OFFSET $2
