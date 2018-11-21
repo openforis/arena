@@ -63,14 +63,19 @@ const RecordRow = ({idx, offset, record, style, keys}) => (
     <div>{getRelativeDate(record.dateCreated)}</div>
     <div>{getRelativeDate(record.dateModified)}</div>
     <div>{record.ownerName}</div>
+    <div>
+      <Link to={appModuleUri(dataModules.record) + record.id} className="btn btn-s btn-of-light-xs">
+        <span className="icon icon-pencil2 icon-12px"></span>
+      </Link>
+    </div>
   </div>
 )
 
 const RecordsTable = ({records, offset}) => {
   const keys = JSON.parse(records[0].keys)
-  const noCols = 4 + keys.length
+  const noCols = 3 + keys.length
 
-  const style = {gridTemplateColumns: `repeat(${noCols}, ${1 / noCols}fr)`}
+  const style = {gridTemplateColumns: `100px repeat(${noCols}, ${1 / noCols}fr) 50px`}
 
   return (
     <React.Fragment>
