@@ -1,17 +1,18 @@
 const R = require('ramda')
 
-const {permissions} = require('../../common/auth/authGroups')
+const UnauthorizedError = require('./unauthorizedError')
 
-const getUserPermissionsForSurvey = (userAuthGroups, surveyAuthGroups) =>
-  R.pipe(
-    R.innerJoin((ug, sg) => ug.id === sg.id),
-    R.head, // there's only one group per user per survey
-    R.propOr([], 'permissions')
-  )(userAuthGroups, surveyAuthGroups)
+const {canEditSurvey} = require('../../common/auth/authManager')
+const {getSurveyById} = require('../survey/surveyRepository')
 
-const canEditSurvey = (user, survey) =>
-  R.contains(permissions.surveyEdit, getUserPermissionsForSurvey(user.authGroups, survey.authGroups))
+const checkPermission = fn => async (user, surveyId) => {
+  if (!fn(user, await getSurveyById(surveyId))) {
+    throw new UnauthorizedError(`User ${user.name} is not authorized. surveyId: ${surveyId}, permission: ${fn.permissionName}`)
+  }
+}
+
+const checkEditSurvey = checkPermission(canEditSurvey)
 
 module.exports = {
-  canEditSurvey,
+  checkEditSurvey,
 }

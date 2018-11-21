@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/dbMigrator')

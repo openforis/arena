@@ -5,6 +5,7 @@ const {
 } = require('../serverUtils/request')
 
 const SurveyManager = require('./surveyManager')
+const {checkEditSurvey} = require('../authGroup/authGroupManager')
 
 const {
   validateNewSurvey,
@@ -102,6 +103,8 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'id')
       const user = req.user
 
+      await checkEditSurvey(user, surveyId)
+
       const job = new SurveyPublishJob({
         userId: user.id,
         surveyId
@@ -120,6 +123,10 @@ module.exports.init = app => {
   app.delete('/survey/:id', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'id')
+      const user = req.user
+
+      await checkEditSurvey(user, surveyId)
+
       await SurveyManager.deleteSurvey(surveyId, req.user)
 
       sendOk(res)
