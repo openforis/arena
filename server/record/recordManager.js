@@ -70,6 +70,13 @@ const createNode = async (nodeDef, nodeReq, file, client = db) => {
  * READ
  * ===================
  */
+const fetchRecordById = async (surveyId, recordId) => {
+  const record = await RecordRepository.fetchRecordById(surveyId, recordId)
+  const nodes = await NodeRepository.fetchNodesByRecordId(surveyId, recordId)
+
+  return {...record, nodes}
+}
+
 /**
  * ===================
  * UPDATE
@@ -152,9 +159,9 @@ module.exports = {
   persistNode,
   // createNode,
   //==== READ
+  fetchRecordById,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId: RecordRepository.fetchRecordsSummaryBySurveyId,
-
   fetchNodeFileByUUID: NodeRepository.fetchNodeFileByUUID,
 
   //==== UPDATE
