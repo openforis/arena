@@ -21,3 +21,28 @@
   flex-direction: column;
 }
 
+.node-def__text-multiple-text-input-wrapper {
+  display: grid;
+  grid-template-columns: .9fr .1fr;
+}
+
+.node-def__text-multiple-table-cell {
+  display: grid;
+  grid-template-columns: 1fr 40px;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: .5rem;
+
+  .values-summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.node-def__multiple-nodes-edit-modal {
+
+  .modal-body {
+    height: 40vh;
+  }
+}

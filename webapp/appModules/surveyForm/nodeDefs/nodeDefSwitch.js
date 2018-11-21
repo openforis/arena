@@ -7,7 +7,7 @@ import NodeDef from '../../../../common/survey/nodeDef'
 import Record from '../../../../common/record/record'
 import Layout from '../../../../common/survey/nodeDefLayout'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
 
 import { setFormNodeDefEdit, setFormNodeDefUnlocked } from '../actions'
 import { getSurveyForm, isNodeDefFormLocked } from '../surveyFormState'
@@ -143,7 +143,7 @@ NodeDefSwitch.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const {nodeDef, parentNode, entry} = props
-  const survey = getSurvey(state)
+  const surveyInfo = getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
 
   const mapEntryProps = () => ({
@@ -157,7 +157,7 @@ const mapStateToProps = (state, props) => {
   return {
     // always unlocking attributes
     locked: NodeDef.isNodeDefEntity(nodeDef) ? isNodeDefFormLocked(nodeDef)(surveyForm) : false,
-    label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(survey)),
+    label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
     ...entry ? mapEntryProps() : {},
   }
 }

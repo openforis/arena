@@ -4,12 +4,11 @@ import * as R from 'ramda'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
 import NodeDefDeleteButton from '../nodeDefDeleteButton'
-import { FormItem } from '../../../../commonComponents/form/input'
+import NodeDefAtomic from './nodeDefAtomic'
 
-import { elementOffset } from '../../../../appUtils/domUtils'
+import { extendToParentHeight } from '../../../../appUtils/domUtils'
 
 import { getNodeValue, getNodeFileName } from '../../../../../common/record/node'
-import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
 const getFileExtension = R.pipe(
   getNodeFileName,
@@ -28,7 +27,7 @@ const getFileName = node => R.pipe(
     : fileName + '.' + getFileExtension(node)
 )(node)
 
-const NodeDefFileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode, removeNode}) =>
+const FileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode, removeNode}) =>
   node
     ? <div className="node-def__file-input">
       <UploadButton disabled={edit}
@@ -37,7 +36,8 @@ const NodeDefFileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode
 
       <DownloadButton href={`/api/survey/${surveyInfo.id}/record/${recordId}/nodes/${node.uuid}/file`}
                       disabled={edit || R.isEmpty(getNodeValue(node))}
-                      label={getFileName(node)}/>
+                      label={getFileName(node)}
+                      title={getNodeFileName(node) === getFileName(node) ? null : getNodeFileName(node)}/>
 
       <NodeDefDeleteButton nodeDef={nodeDef}
                            node={node}
@@ -47,43 +47,24 @@ const NodeDefFileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode
     </div>
     : null
 
-const NodeDefFile = props => {
-  const {nodeDef, edit, nodes, renderType, label} = props
+const MultipleFileInput = props => {
+  const {nodes} = props
 
-  // table header
-  if (renderType === nodeDefRenderType.tableHeader) {
-    return <label className="node-def__table-header">
-      {label}
-    </label>
-  }
-
-  // EDIT MODE
-
-  if (edit)
-    return <FormItem label={label}>
-      <NodeDefFileInput {...props} />
-    </FormItem>
-
-  // ENTRY MODE
-
-  if (renderType === nodeDefRenderType.tableBody) {
-    return <NodeDefFileInput {...props} node={nodes[0]}/>
-  } else {
-    const domElem = document.getElementById(nodeDef.uuid)
-    const {height} = domElem ? elementOffset(domElem) : {height: 80}
-
-    return (
-      <FormItem label={label}>
-        <div className="overflowYAuto" style={{maxHeight: height}}>
-          {
-            nodes.map((n, i) =>
-              <NodeDefFileInput key={i} {...props} node={n}/>
-            )
-          }
-        </div>
-      </FormItem>
-    )
-  }
+  return <div className="overflowYAuto"
+              ref={elem => extendToParentHeight(elem)}>
+    {
+      nodes.map((n, i) =>
+        <FileInput key={i}
+                   {...props}
+                   node={n}/>
+      )
+    }
+  </div>
 }
+
+const NodeDefFile = props =>
+  <NodeDefAtomic {...props}
+                 singleNodeDefComponent={FileInput}
+                 multipleNodeDefComponent={MultipleFileInput}/>
 
 export default NodeDefFile

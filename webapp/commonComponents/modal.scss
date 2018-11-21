@@ -33,11 +33,14 @@ $borderRadius: 2px;
 }
 
 .modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   border-top-left-radius: $borderRadius;
   border-top-right-radius: $borderRadius;
+
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
 }
 
 .modal-header-center {

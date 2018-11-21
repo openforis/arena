@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 
 import {
   Modal,
+  ModalHeader,
   ModalBody,
   ModalFooter,
 } from '../../../../commonComponents/modal'
@@ -49,8 +50,9 @@ class AppJobMonitor extends React.Component {
       ? (
         <Modal className="app-job-monitor" closeOnEsc={false}>
 
+          <ModalHeader>Job: {job.type}</ModalHeader>
+
           <ModalBody>
-            <div className="app-job-monitor__header">Job: {job.type}</div>
             <JobProgress job={job}/>
             <AppJobErrors job={job}/>
 

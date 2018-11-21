@@ -1,82 +1,59 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { FormItem, Input } from '../../../../commonComponents/form/input'
-import NodeDefDeleteButton from '../nodeDefDeleteButton'
+import { extendToParentHeight } from '../../../../appUtils/domUtils'
 
-import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+import { Input } from '../../../../commonComponents/form/input'
+import NodeDefDeleteButton from '../nodeDefDeleteButton'
+import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
+
 import NodeDef from '../../../../../common/survey/nodeDef'
 
 import Node from '../../../../../common/record/node'
-import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
-import { elementOffset } from '../../../../appUtils/domUtils'
+import NodeDefAtomic from './nodeDefAtomic'
 
-const NodeDefTextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
+const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
   <Input readOnly={edit}
          {...getNodeDefInputTextProps(nodeDef)}
          value={Node.getNodeValue(node, '')}
-         onChange={(e) =>
-           updateNode(nodeDef, node, e.target.value)
-         }
+         onValueChange={value => updateNode(nodeDef, node, value)}
   />
 
-const NodeDefText = props => {
+const MultipleTextInput = props => {
+  const {nodeDef, nodes, removeNode} = props
 
-  const {
-    nodeDef, nodes, parentNode, entry,
-    edit, label, renderType, removeNode
-  } = props
+  return <div className="overflowYAuto"
+              ref={elem => extendToParentHeight(elem)}
+              style={{
+                display: 'grid',
+                alignContent: 'center',
+              }}>
+    {
+      nodes.map(n =>
+        <div key={`nodeDefTextInput_${n.uuid}`}
+             className="node-def__text-multiple-text-input-wrapper">
 
-  // table header
-  if (renderType === nodeDefRenderType.tableHeader) {
-    return <label className="node-def__table-header">
-      {label}
-    </label>
-  }
+          <TextInput {...props}
+                     node={n}/>
 
-  // EDIT MODE
-
-  if (edit)
-    return <FormItem label={label}>
-      <NodeDefTextInput {...props} />
-    </FormItem>
-
-  // ENTRY MODE
-
-  if (entry && renderType === nodeDefRenderType.tableBody)
-    return <NodeDefTextInput {...props} node={nodes[0]}/>
-  else {
-    const domElem = document.getElementById(nodeDef.uuid)
-    const {height} = domElem ? elementOffset(domElem) : {height: 80}
-
-    return (
-      <FormItem label={label}>
-        <div className="overflowYAuto" style={{display: 'grid', alignContent: 'center',  height}}>
-          {
-            nodes.map(n =>
-              <div key={`nodeDefTextInput_${n.uuid}`}
-                   style={{
-                     display: 'grid',
-                     gridTemplateColumns: '.9fr .1fr'
-                   }}>
-
-                <NodeDefTextInput {...props} node={n}/>
-
-                {!n.placeholder && NodeDef.isNodeDefMultiple(nodeDef) &&
-                <NodeDefDeleteButton nodeDef={nodeDef}
-                                     node={n}
-                                     disabled={edit || R.isEmpty(Node.getNodeValue(n))}
-                                     showConfirm={true}
-                                     removeNode={removeNode}/>
-                }
-
-              </div>
-            )
+          {!n.placeholder && NodeDef.isNodeDefMultiple(nodeDef) &&
+          <NodeDefDeleteButton nodeDef={nodeDef}
+                               node={n}
+                               disabled={R.isEmpty(Node.getNodeValue(n))}
+                               showConfirm={true}
+                               removeNode={removeNode}/>
           }
+
         </div>
-      </FormItem>
-    )
-  }
+      )
+    }
+  </div>
 }
+
+const NodeDefText = props =>
+
+  <NodeDefAtomic {...props}
+                 singleNodeDefComponent={TextInput}
+                 multipleNodeDefComponent={MultipleTextInput}/>
 
 export default NodeDefText
