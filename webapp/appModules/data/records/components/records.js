@@ -5,6 +5,8 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import * as R from 'ramda'
 
+import Survey from '../../../../../common/survey/survey'
+
 import { appModuleUri } from '../../../appModules'
 import { dataModules } from '../../dataModules'
 
@@ -12,6 +14,7 @@ import { getRecordsCount, getRecordsLimit, getRecordsList, getRecordsOffset } fr
 import { getRelativeDate } from '../../../../appUtils/dateUtils'
 
 import { initRecordsList, fetchRecords } from '../actions'
+import { getStateSurveyInfo } from '../../../../survey/surveyState'
 
 const RecordsTablePaginator = ({offset, limit, count, fetchRecords}) => {
   const currentPage = (offset / limit) + 1
@@ -93,17 +96,21 @@ class Records extends React.Component {
 
   render () {
 
-    const {records} = this.props
+    const {surveyInfo, records} = this.props
 
     return (
       <div className="records table">
 
         <div className="table__header">
           <h5>Records</h5>
-          <Link to={appModuleUri(dataModules.record)} className="btn btn-s btn-of records__btn-add-record">
-            <span className="icon icon-plus icon-12px icon-left"></span>
-            new
-          </Link>
+
+          {
+            Survey.isPublished(surveyInfo) &&
+            <Link to={appModuleUri(dataModules.record)} className="btn btn-s btn-of records__btn-add-record">
+              <span className="icon icon-plus icon-12px icon-left"></span>
+              new
+            </Link>
+          }
         </div>
 
         {
@@ -119,6 +126,7 @@ class Records extends React.Component {
 }
 
 const mapStateToProps = state => ({
+  surveyInfo: getStateSurveyInfo(state),
   records: getRecordsList(state),
   offset: getRecordsOffset(state),
   limit: getRecordsLimit(state),
