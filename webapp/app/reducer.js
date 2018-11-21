@@ -3,10 +3,15 @@ import * as R from 'ramda'
 import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 
 import { startJob, updateActiveJob } from '../appModules/appView/components/job/appJobState'
-import { assocAppError, dissocAppError, getAppErrors, logoutUser } from './appState'
+import {
+  assocAppError,
+  assocSurveyAdminGroup,
+  dissocAppError,
+  dissocSurveyGroups,
+  getAppErrors,
+  logoutUser
+} from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
-import { isSystemAdmin, surveyAdminGroup } from '../../common/auth/authManager'
-import Survey from '../../common/survey/survey'
 
 import {
   appStatusChange,
@@ -23,12 +28,13 @@ import { loginSuccess } from '../login/actions'
  * ======
  */
 import { appJobStart, appJobActiveUpdate } from '../appModules/appView/components/job/actions'
-import { surveyCreate } from '../survey/actions'
+import { surveyCreate, surveyDelete } from '../survey/actions'
 
 const actionHandlers = {
 
   [appStatusChange]: (state, {survey, ...props}) => assocActionProps(state, props),
 
+  // ====== user
   // user and current survey are properties of app state
   [loginSuccess]: (state, {survey, ...props}) => assocActionProps(state, props),
 
@@ -43,7 +49,11 @@ const actionHandlers = {
 
   [appUserLogout]: (state, action) => logoutUser(state),
 
-  //app job
+  [surveyCreate]: (state, {survey: {info}}) => assocSurveyAdminGroup(info)(state),
+
+  [surveyDelete]: (state, {surveyId}) => dissocSurveyGroups(surveyId)(state),
+
+  // ====== app job
   [appJobStart]: (state, {job, onComplete, autoHide}) =>
     startJob(job, onComplete, autoHide)(state),
 
@@ -60,19 +70,6 @@ const actionHandlers = {
   )(state),
 
   [appErrorDelete]: (state, {error}) => dissocAppError(error)(state),
-
-  [surveyCreate]: (state, {survey: {info}}) => {
-    // On survey create, add current user to new survey's surveyAdmin group
-    const user = R.prop('user', state)
-    if (isSystemAdmin(user)) return state
-
-    const authGroups = R.pipe(
-      R.prop('authGroups'),
-      R.append(Survey.getSurveyAdminGroup(info))
-    )(user)
-
-    return R.assocPath(['user', 'authGroups'], authGroups, state)
-  },
 
 }
 

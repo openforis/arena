@@ -29,14 +29,17 @@ const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
 // ==== READ
 
 const fetchSurveyGroups = async (surveyId, client = db) =>
-  await client.any(`
+  await client.map(`
     SELECT auth_group.*
     FROM auth_group
-    WHERE auth_group.survey_id = $1`,
-    surveyId)
+    WHERE auth_group.survey_id = $1`
+    ,
+    [surveyId],
+    dbTransformCallback
+  )
 
 const fetchUserGroups = async (userId, client = db) =>
-  await client.any(`
+  await client.map(`
     SELECT auth_group.* 
     FROM auth_group_user, auth_group 
     WHERE auth_group_user.user_id = $1 
@@ -53,7 +56,8 @@ const insertUserGroup = async (groupId, userId, client = db) =>
     VALUES ($1, $2)
     RETURNING *`,
     [groupId, userId],
-    dbTransformCallback)
+    dbTransformCallback
+  )
 
 module.exports = {
   // CREATE

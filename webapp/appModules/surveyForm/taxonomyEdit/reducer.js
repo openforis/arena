@@ -1,6 +1,6 @@
 import { exportReducer } from '../../../appUtils/reduxUtils'
 
-import { surveyUpdate } from '../../../survey/actions'
+import { surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../actions'
 
 import { taxonomyEditPropsUpdate, taxonomyEditUpdate } from './actions'
@@ -10,6 +10,7 @@ import { taxonomyCreate } from '../../../survey/taxonomies/actions'
 const actionHandlers = {
   // reset form
   [surveyUpdate]: () => ({}),
+  [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
   [taxonomyEditUpdate]: (state, {taxonomyUUID}) => initTaxonomyEdit(taxonomyUUID),

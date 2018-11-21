@@ -29,9 +29,7 @@ export class Modal extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = {
-      closed: false
-    }
+    this.state = {closed: false}
   }
 
   componentDidMount () {

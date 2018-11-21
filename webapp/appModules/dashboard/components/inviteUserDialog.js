@@ -7,10 +7,9 @@ import * as R from 'ramda'
 import { Input } from '../../../commonComponents/form/input'
 import Dropdown from '../../../commonComponents/form/dropdown'
 
-import { getSurvey } from '../../../survey/surveyState'
+import Survey from '../../../../common/survey/survey'
+import { getStateSurveyInfo } from '../../../survey/surveyState'
 import { validEmail } from '../../../../common/user/user'
-
-import KeyboardMap from '../../../appUtils/keyboardMap'
 
 import {
   Modal,
@@ -40,7 +39,7 @@ class InviteUserDialog extends React.Component {
 
   componentDidUpdate (_, prevState) {
     if (prevState.email !== this.state.email
-        || prevState.group !== this.state.group) {
+      || prevState.group !== this.state.group) {
       this.setState({enableInvite: validEmail(this.state.email) && this.state.group})
     }
   }
@@ -60,10 +59,10 @@ class InviteUserDialog extends React.Component {
   }
 
   render () {
-    const {onInvite, onCancel, survey} = this.props
-    const groups = R.map(
-      g => ({key: g.id, name: g.name})
-    )(survey.info.authGroups)
+    const {onInvite, onCancel, surveyInfo} = this.props
+
+    const groups = Survey.getAuthGroups(surveyInfo)
+    const lang = Survey.getDefaultLanguage(surveyInfo)
 
     return (
       <Modal isOpen={true} closeOnEsc={true} onClose={onCancel}>
@@ -81,8 +80,8 @@ class InviteUserDialog extends React.Component {
 
             <Dropdown disabled={false}
                       items={groups}
-                      itemKeyProp={'key'}
-                      itemLabelProp={'name'}
+                      itemKeyProp="id"
+                      itemLabelFunction={group => R.path(['labels', lang], group)}
                       validation={this.state.groupErrors}
                       selection={null}
                       onChange={group => this.onSelectedGroupChange(group)}
@@ -112,7 +111,7 @@ class InviteUserDialog extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  survey: getSurvey(state)
+  surveyInfo: getStateSurveyInfo(state)
 })
 
 export default connect(mapStateToProps)(InviteUserDialog)
