@@ -28,7 +28,7 @@ const fetchAllSurveyIds = async (client = db) =>
     record => record.id
   )
 
-const fetchSurveys = async (client = db) =>
+const fetchSurveys = async (user, checkAccess = true, client = db) =>
   await client.map(`
     SELECT
       s.*, ${selectDate('n.date_created', 'date_created')}, nm.date_modified
@@ -43,9 +43,16 @@ const fetchSurveys = async (client = db) =>
         GROUP BY survey_id
       ) as nm
       ON s.id = nm.survey_id
+    ${checkAccess ? `
+    JOIN auth_group g
+      ON s.id = g.survey_id
+    JOIN auth_group_user gu
+      ON gu.group_id = g.id AND gu.user_id = $1`
+    :
+    ''}
     ORDER BY s.id
     `,
-    [],
+    [user.id],
     def => dbTransformCallback(def, true)
   )
 
