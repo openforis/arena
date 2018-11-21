@@ -135,6 +135,7 @@ $tableBorder: 1px solid rgba($white, .7);
 }
 
 .node-def__table-row {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 40px;
   border-bottom: $tableBorder;
