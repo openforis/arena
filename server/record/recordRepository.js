@@ -62,8 +62,8 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
       r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')},
       n.date_modified,
       u.name as owner_name,
-      '${JSON.stringify(keyNames)}' as keys,
-      ${nodeDefKeyValues}
+      '${JSON.stringify(keyNames)}' as keys
+      ${R.isEmpty(keyNames) ? '' : ',' + nodeDefKeyValues}
     FROM ${getSurveyDBSchema(surveyId)}.record r
     -- GET OWNER NAME
     JOIN "user" u
@@ -76,7 +76,8 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
          GROUP BY record_id
     ) as n
       ON r.id = n.record_id
-    ${nodeDefKeyJoins}
+    ${R.isEmpty(keyNames) ? '' : nodeDefKeyJoins}
+    ORDER BY r.id DESC
     LIMIT $1
     OFFSET $2
   `,

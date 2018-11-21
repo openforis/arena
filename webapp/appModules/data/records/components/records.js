@@ -26,39 +26,39 @@ const RecordsTablePaginator = ({offset, limit, count, fetchRecords}) => {
       <button className="btn btn-of-light"
               aria-disabled={count < limit || currentPage === 1}
               onClick={() => fetchRecords(0)}>
-        <span className="icon icon-backward2 icon-16px"/>
+        <span className="icon icon-backward2 icon-14px"/>
       </button>
       <button className="btn btn-of-light"
               aria-disabled={currentPage === 1}
               onClick={() => fetchRecords(offset - limit)}
               style={{transform: 'scaleX(-1)'}}>
-        <span className="icon icon-play3 icon-16px"/>
+        <span className="icon icon-play3 icon-14px"/>
       </button>
 
-      <span className="page-count">
-      Page {currentPage} of {totalPage}
+      <span className="counts">
+      {offset + 1}-{Math.min(offset + limit, count)} of {count}
       </span>
 
       <button className="btn btn-of-light"
               aria-disabled={currentPage === totalPage}
               onClick={() => fetchRecords(offset + limit)}>
-        <span className="icon icon-play3 icon-16px"/>
+        <span className="icon icon-play3 icon-14px"/>
       </button>
       <button className="btn btn-of-light"
               aria-disabled={currentPage === totalPage}
               onClick={() => fetchRecords((totalPage - 1) * limit)}>
-        <span className="icon icon-forward3 icon-16px"/>
+        <span className="icon icon-forward3 icon-14px"/>
       </button>
 
     </div>
   )
 }
 
-const RecordRow = ({idx, offset, record, style}) => (
+const RecordRow = ({idx, offset, record, style, keys}) => (
   <div className="table__row" style={style}>
     <div>{idx + offset + 1}</div>
     {
-      JSON.parse(record.keys).map((k, i) => <div key={i}>{record[k]}</div>)
+      keys.map((k, i) => <div key={i}>{record[k]}</div>)
     }
     <div>{getRelativeDate(record.dateCreated)}</div>
     <div>{getRelativeDate(record.dateModified)}</div>
@@ -66,7 +66,7 @@ const RecordRow = ({idx, offset, record, style}) => (
   </div>
 )
 
-const RecordsTable = ({records, offset, limit, count, fetchRecords}) => {
+const RecordsTable = ({records, offset}) => {
   const keys = JSON.parse(records[0].keys)
   const noCols = 4 + keys.length
 
@@ -87,12 +87,11 @@ const RecordsTable = ({records, offset, limit, count, fetchRecords}) => {
       <div className="table__rows">
         {
           records.map((record, i) =>
-            <RecordRow key={i} idx={i} offset={offset} record={record} style={style}/>
+            <RecordRow key={i} idx={i} offset={offset} record={record} style={style} keys={keys}/>
           )
         }
       </div>
 
-      <RecordsTablePaginator offset={offset} limit={limit} count={count} fetchRecords={fetchRecords}/>
     </React.Fragment>
   )
 }
@@ -105,27 +104,39 @@ class Records extends React.Component {
 
   render () {
 
-    const {surveyInfo, records} = this.props
+    const {
+      surveyInfo, records,
+      offset, limit, count,
+      fetchRecords,
+    } = this.props
+
+    const hasRecords = !R.isEmpty(records)
 
     return (
       <div className="records table">
 
         <div className="table__header">
-          <h5>Records</h5>
+          {
+            Survey.isPublished(surveyInfo)
+              ? (
+                <Link to={appModuleUri(dataModules.record)} className="btn btn-s btn-of">
+                  <span className="icon icon-plus icon-12px icon-left"></span>
+                  new
+                </Link>
+              )
+              : <div/>
+          }
 
           {
-            Survey.isPublished(surveyInfo) &&
-            <Link to={appModuleUri(dataModules.record)} className="btn btn-s btn-of records__btn-add-record">
-              <span className="icon icon-plus icon-12px icon-left"></span>
-              new
-            </Link>
+            hasRecords &&
+            <RecordsTablePaginator offset={offset} limit={limit} count={count} fetchRecords={fetchRecords}/>
           }
         </div>
 
         {
-          R.isEmpty(records)
-            ? <div className="table__empty-rows">No records added</div>
-            : <RecordsTable {...this.props}/>
+          hasRecords
+            ? <RecordsTable {...this.props}/>
+            : <div className="table__empty-rows">No records added</div>
         }
 
       </div>

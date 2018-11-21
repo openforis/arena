@@ -2,7 +2,7 @@
 
 $rowHeight: 35px;
 $rowBorder: 1px solid rgba($white, 0.4);
-$tableRowsHeight: calc(100% - 87px);
+$tableRowsHeight: calc(100% - 77px);
 
 .table {
   overflow: hidden;
@@ -10,11 +10,10 @@ $tableRowsHeight: calc(100% - 87px);
 }
 
 .table__header {
-  height: 50px;
-  text-transform: uppercase;
+  height: 40px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .table__empty-rows {
@@ -71,20 +70,14 @@ $tableRowsHeight: calc(100% - 87px);
 }
 
 .table__paginator {
-  justify-self: center;
-  align-self: center;
-  position: absolute;
-  top: $tableRowsHeight;
-  display: flex;
-  justify-content: center;
-  width: 100%;
-
   button {
-    padding: .5rem;
+    padding: .3rem;
     margin: 0 .2rem;
   }
 
-  .page-count {
+  .counts {
+    font-weight: 200;
+    font-size: 0.9rem;
     margin: 0 .8rem;
     align-self: center;
   }
