@@ -88,7 +88,7 @@ const fetchSurveyById = async (id, draft = false, validate = false) => {
 
 const fetchUserSurveysInfo = async (user) => R.map(
   assocSurveyInfo,
-  await surveyRepository.fetchSurveys()
+  await surveyRepository.fetchSurveys(user, !isSystemAdmin(user))
 )
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
@@ -111,7 +111,7 @@ const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) =>
   return toUUIDIndexedObj(nodeDefs)
 }
 
-// ====== UPATE
+// ====== UPDATE
 const updateSurveyProp = async (id, key, value, user) =>
   assocSurveyInfo(
     await surveyRepository.updateSurveyProp(id, key, value)
