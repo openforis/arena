@@ -3,7 +3,6 @@ import * as R from 'ramda'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import NodeDef from '../../../../common/survey/nodeDef'
-import Node from '../../../../common/record/node'
 
 import NodeDefEntitySwitch from './components/nodeDefEntitySwitch'
 import NodeDefFile from './components/nodeDefFile'
@@ -104,14 +103,13 @@ export const nodeDefSystemProps = {
   [nodeDefType.coordinate]: {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
-    fields: ['x', 'y', 'srs'],
     defaultValue: {x: '', y: '', srs: ''},
+    formFields: ['x', 'y', 'srs'],
   },
 
   [nodeDefType.taxon]: {
     component: NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left"/>,
-    fields: ['code', 'scientific_name', 'vernacular_name'],
     defaultValue: {
       code: '',
       family: '',
@@ -119,13 +117,13 @@ export const nodeDefSystemProps = {
       scientificName: '',
       vernacularName: '',
       vernacularLanguage: '',
-    }
+    },
+    formFields: ['code', 'scientific_name', 'vernacular_name'],
   },
 
   [nodeDefType.file]: {
     component: NodeDefFile,
     icon: <span className="icon icon-file-picture icon-left"/>,
-    nodeToStringFunction: Node.getNodeFileName
   },
 
   [nodeDefType.entity]: {
@@ -156,15 +154,12 @@ export const getNodeDefComponent = nodeDef =>
     NodeDefText
   )(nodeDefSystemProps)
 
-export const getNodeDefFields = nodeDef =>
+export const getNodeDefFormFields = nodeDef =>
   getProp(
     nodeDef.type,
-    'fields',
-    ['single_field']
+    'formFields',
+    ['field']
   )(nodeDefSystemProps)
-
-export const getNodeDefFieldsCount = nodeDef =>
-  getNodeDefFields(nodeDef).length
 
 export const getNodeDefDefaultValue = nodeDef =>
   getProp(
@@ -177,11 +172,4 @@ export const getNodeDefDefaultLayoutPropsByType = type =>
     type,
     'defaultLayoutProps',
     {}
-  )(nodeDefSystemProps)
-
-export const getNodeToStringFunction = type =>
-  getProp(
-    type,
-    'nodeToStringFunction',
-    node => node.value ? node.value.toString() : ''
   )(nodeDefSystemProps)

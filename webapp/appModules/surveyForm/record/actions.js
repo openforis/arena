@@ -123,10 +123,10 @@ export const removeNode = (nodeDef, node) => async dispatch => {
 export const deleteRecord = () => async (dispatch, getState) => {
   const state = getState()
 
-  dispatch({type: recordDelete})
-
   const surveyId = getStateSurveyId(state)
   const record = getRecord(getSurveyForm(state))
 
   await axios.delete(`/api/survey/${surveyId}/record/${record.id}`)
+
+  dispatch({type: recordDelete})
 }

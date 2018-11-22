@@ -126,12 +126,16 @@ $tableBorder: 1px solid rgba($white, .7);
 }
 
 .node-def__table-header {
-  justify-self: center;
-  align-self: center;
-  text-transform: uppercase;
-  font-weight: 400;
-  display: flex;
-  align-items: center;
+  display: grid;
+
+  label {
+    justify-self: center;
+    align-self: center;
+    text-transform: uppercase;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+  }
 }
 
 .node-def__table-row {

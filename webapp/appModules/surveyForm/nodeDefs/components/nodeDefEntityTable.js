@@ -10,7 +10,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive)
 
 import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefFieldsCount } from '../nodeDefSystemProps'
+import { getNodeDefFormFields } from '../nodeDefSystemProps'
 import { elementOffset } from '../../../../appUtils/domUtils'
 
 import { newNode } from '../../../../../common/record/node'
@@ -28,7 +28,7 @@ const EntityTableRow = (props) => {
 
   const childDefsLayout = R.reduce(
     (layout, childDef) => {
-      const count = getNodeDefFieldsCount(childDef)
+      const count = getNodeDefFormFields(childDef).length
       const {columns} = layout
       return R.pipe(
         R.assoc('columns', columns + count),
@@ -136,7 +136,7 @@ class NodeDefEntityTable extends React.Component {
       <div className="node-def__table">
 
         <div className="node-def__table-header">
-          <h5>{label}</h5>
+          <label>{label}</label>
           {
             entry
               ? <button className="btn btn-s btn-of-light-xs"

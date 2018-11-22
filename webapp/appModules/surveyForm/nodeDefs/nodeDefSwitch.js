@@ -4,7 +4,6 @@ import * as R from 'ramda'
 
 import NodeDefFormItem from './components/nodeDefFormItem'
 import NodeDefTableHeader from './components/nodeDefTableHeader'
-import NodeDefMultipleTableBody from './components/nodeDefMultipleTableBody'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
@@ -17,10 +16,11 @@ import { setFormNodeDefEdit, setFormNodeDefUnlocked } from '../actions'
 import { getSurveyForm, isNodeDefFormLocked } from '../surveyFormState'
 
 import { putNodeDefProp, removeNodeDef } from '../../../survey/nodeDefs/actions'
-import { getNodeDefComponent, getNodeDefDefaultValue } from './nodeDefSystemProps'
+import { getNodeDefDefaultValue } from './nodeDefSystemProps'
 
 import { getRecord } from '../record/recordState'
 import { createNodePlaceholder, updateNode, removeNode } from '../record/actions'
+import NodeDefTableBody from './components/nodeDefTableBody'
 
 class NodeDefSwitch extends React.Component {
 
@@ -136,23 +136,11 @@ class NodeDefSwitch extends React.Component {
       }
 
       {
-        renderType === Layout.nodeDefRenderType.tableHeader //TABLE HEADER
-
+        renderType === Layout.nodeDefRenderType.tableHeader
           ? <NodeDefTableHeader nodeDef={nodeDef} label={label}/>
-
-          : renderType === Layout.nodeDefRenderType.tableBody // TABLE BODY
-
-          ? NodeDef.isNodeDefMultiple(nodeDef) || NodeDef.isNodeDefCodeList(nodeDef)
-
-            ? <NodeDefMultipleTableBody {...this.props} />  // multiple attributes or code list
-
-            : React.createElement(getNodeDefComponent(nodeDef), {...this.props}) // single attributes
-
-          : NodeDef.isNodeDefEntity(nodeDef)
-
-            ? React.createElement(getNodeDefComponent(nodeDef), {...this.props})  // FORM (entity)
-
-            : <NodeDefFormItem {...this.props} />  // FORM (attribute)
+          : renderType === Layout.nodeDefRenderType.tableBody
+          ? <NodeDefTableBody {...this.props}/>
+          : <NodeDefFormItem {...this.props} />
       }
 
     </div>

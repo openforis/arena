@@ -1,20 +1,27 @@
 import React from 'react'
 
-import { getNodeDefFields } from '../nodeDefSystemProps'
+import { getNodeDefFormFields } from '../nodeDefSystemProps'
 
 const NodeDefTableHeader = props => {
   const {label, nodeDef} = props
 
-  const fields = getNodeDefFields(nodeDef)
+  const fields = getNodeDefFormFields(nodeDef)
 
-  return <div style={{display: 'grid', gridTemplateColumns: `repeat(${fields.length}, auto)`}}>
-    <label className="node-def__table-header"
-           style={{gridColumn: `1 / span ${fields.length}`}}>{label}</label>
-    {
-      fields.length > 1 &&
-        fields.map(field => <div key={field} className="node-def__table-header">{field}</div>)
-    }
-  </div>
+  return (
+    <div className="node-def__table-header" style={{gridTemplateColumns: `repeat(${fields.length}, auto)`}}>
+
+      <label style={{gridColumn: `1 / span ${fields.length}`}}>{label}</label>
+
+      {
+        fields.length > 1 &&
+        fields.map(field =>
+          <label key={field}>{field}</label>
+        )
+      }
+
+    </div>
+
+  )
 }
 
 export default NodeDefTableHeader
