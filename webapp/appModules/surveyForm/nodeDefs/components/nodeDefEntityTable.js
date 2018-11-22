@@ -135,8 +135,8 @@ class NodeDefEntityTable extends React.Component {
     return (
       <div className="node-def__table">
 
-        <div className="node-def__table-header">
-          <label>{label}</label>
+        <div className="node-def__table-entity-header">
+          <h5>{label}</h5>
           {
             entry
               ? <button className="btn btn-s btn-of-light-xs"

@@ -25,7 +25,7 @@ export const getViewportDimensions = () => ({
   height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
 })
 
-export const extendToParentHeight = elem => {
+export const limitToParentHeight = elem => {
   if (elem)
-    elem.style.height = elem.parentElement.clientHeight + 'px'
+    elem.style.maxHeight = elem.parentElement.clientHeight + 'px'
 }

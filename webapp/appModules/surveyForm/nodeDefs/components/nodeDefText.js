@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { extendToParentHeight } from '../../../../appUtils/domUtils'
+import { limitToParentHeight } from '../../../../appUtils/domUtils'
 
 import { Input } from '../../../../commonComponents/form/input'
 import NodeDefDeleteButton from '../nodeDefDeleteButton'
@@ -22,11 +22,7 @@ const MultipleTextInput = props => {
   const {nodeDef, nodes, removeNode} = props
 
   return <div className="overflowYAuto"
-              ref={elem => extendToParentHeight(elem)}
-              style={{
-                display: 'grid',
-                alignContent: 'center',
-              }}>
+              ref={elem => limitToParentHeight(elem)}>
     {
       nodes.map(n =>
         <div key={`nodeDefTextInput_${n.uuid}`}
@@ -51,7 +47,9 @@ const MultipleTextInput = props => {
 
 const NodeDefText = props =>
   props.edit
-    ? <TextInput {...props} />
-    : <MultipleTextInput {...props} />
+    ? <TextInput {...props}/>
+    : NodeDef.isNodeDefMultiple(props.nodeDef)
+    ? <MultipleTextInput {...props} />
+    : <TextInput {...props} node={props.nodes[0]}/>
 
 export default NodeDefText

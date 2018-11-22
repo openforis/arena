@@ -5,7 +5,7 @@ import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
 import NodeDefDeleteButton from '../nodeDefDeleteButton'
 
-import { extendToParentHeight } from '../../../../appUtils/domUtils'
+import { limitToParentHeight } from '../../../../appUtils/domUtils'
 
 import { getNodeValue, getNodeFileName } from '../../../../../common/record/node'
 
@@ -50,7 +50,7 @@ const MultipleFileInput = props => {
   const {nodes} = props
 
   return <div className="overflowYAuto"
-              ref={elem => extendToParentHeight(elem)}>
+              ref={elem => limitToParentHeight(elem)}>
     {
       nodes.map((n, i) =>
         <FileInput key={i}

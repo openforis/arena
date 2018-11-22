@@ -28,7 +28,7 @@
 
 .node-def__text-multiple-table-cell {
   display: grid;
-  grid-template-columns: 1fr 40px;
+  grid-template-columns: 1fr auto;
   align-items: center;
   padding-left: 1rem;
   padding-right: .5rem;

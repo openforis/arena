@@ -125,6 +125,15 @@ $tableBorder: 1px solid rgba($white, .7);
   grid-template-rows: 30px 50px 1fr;
 }
 
+.node-def__table-entity-header {
+  justify-self: center;
+  align-self: center;
+  text-transform: uppercase;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+}
+
 .node-def__table-header {
   display: grid;
 
@@ -133,8 +142,6 @@ $tableBorder: 1px solid rgba($white, .7);
     align-self: center;
     text-transform: uppercase;
     font-weight: 400;
-    display: flex;
-    align-items: center;
   }
 }
 
