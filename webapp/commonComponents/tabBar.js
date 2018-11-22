@@ -11,26 +11,28 @@ const TabBarButtons = ({tabs, location, selection, onClick}) => (
           ? location.pathname === tab.path
           : i === selection
 
-        return (
-          <button key={i}
-                  className={`btn btn-of${active ? ' active' : ''}`}
-                  onClick={() => onClick(i)}>
-            {tab.label}
-          </button>
-        )
+        return tab.showTab === false
+          ? null
+          : (
+            <button key={i}
+                    className={`btn btn-of${active ? ' active' : ''}`}
+                    onClick={() => onClick(i)}>
+              {tab.label}
+            </button>
+          )
       })
     }
   </div>
 )
 
-const TabBarComponent = ({tab}) => React.createElement(tab.component, tab.props)
+const TabBarComponent = ({tab, ...rest}) => React.createElement(tab.component, {...tab.props, ...rest})
 
 const TabBarSwitch = ({tabs, location}) => (
   <Switch location={location}>
     {
       tabs.map((tab, i) =>
-        <Route key={i} exact path={tab.path} render={() =>
-          <TabBarComponent tab={tab}/>
+        <Route key={i} exact path={tab.path} render={props =>
+          <TabBarComponent tab={tab} {...props}/>
         }/>
       )
     }

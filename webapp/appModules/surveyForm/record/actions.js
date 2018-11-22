@@ -4,15 +4,18 @@ import axios from 'axios'
 import { debounceAction } from '../../../appUtils/reduxUtils'
 
 import Survey from '../../../../common/survey/survey'
+import { newRecord } from '../../../../common/record/record'
+import { newNodePlaceholder } from '../../../../common/record/node'
+
 import { getStateSurveyId, getStateSurveyInfo } from '../../../survey/surveyState'
 import { getUser } from '../../../app/appState'
 import { getRecord } from './recordState'
-
-import { newRecord, getParentNode } from '../../../../common/record/record'
-import { newNodePlaceholder } from '../../../../common/record/node'
 import { getSurveyForm } from '../surveyFormState'
 
 export const recordCreate = 'survey/record/create'
+export const recordLoad = 'survey/record/load'
+export const recordDelete = 'survey/record/delete'
+
 export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
 
@@ -47,7 +50,16 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
     const node = newNodePlaceholder(nodeDef, parentNode, defaultValue)
     dispatchNodesUpdate(dispatch, {[node.uuid]: node})
   }
-
+/**
+ * ============
+ * READ
+ * ============
+ */
+export const fetchRecord = recordId => async (dispatch, getState) => {
+  const surveyId = getStateSurveyId(getState())
+  const {data} = await axios.get(`/api/survey/${surveyId}/record/${recordId}`)
+  dispatch({type: recordLoad, record: data.record})
+}
 /**
  * ============
  * UPDATE
@@ -106,4 +118,15 @@ export const removeNode = (nodeDef, node) => async dispatch => {
   } catch (e) {
     console.log(e)
   }
+}
+
+export const deleteRecord = () => async (dispatch, getState) => {
+  const state = getState()
+
+  dispatch({type: recordDelete})
+
+  const surveyId = getStateSurveyId(state)
+  const record = getRecord(getSurveyForm(state))
+
+  await axios.delete(`/api/survey/${surveyId}/record/${record.id}`)
 }

@@ -1,0 +1,84 @@
+@import "../style/vars";
+
+$rowHeight: 35px;
+$rowBorder: 1px solid rgba($white, 0.4);
+$tableRowsHeight: calc(100% - 77px);
+
+.table {
+  overflow: hidden;
+  position: relative;
+}
+
+.table__header {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table__empty-rows {
+  text-transform: uppercase;
+  font-style: italic;
+  text-align: center;
+  font-weight: 200;
+  margin-top: 2rem;
+}
+
+.table__rows {
+  position: absolute;
+  overflow-y: auto;
+  height: $tableRowsHeight;
+  right: 0;
+  left: 0;
+}
+
+.table__row {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  border-bottom: $rowBorder;
+  border-right: $rowBorder;
+  border-left: $rowBorder;
+  height: $rowHeight;
+
+  &.active {
+    background-color: rgba($white, .2);
+  }
+
+  > div {
+    //width: calc(100% / 6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn {
+    font-weight: 400;
+    font-size: 0.7rem;
+  }
+}
+
+.table__row-header {
+  @extend .table__row;
+  border-right: none;
+  border-left: none;
+  border-bottom-width: 2px;
+  font-weight: 400;
+  background-color: rgba($white, 0.1);
+  text-transform: uppercase;
+  font-size: .8rem;
+}
+
+.table__paginator {
+  button {
+    padding: .3rem;
+    margin: 0 .2rem;
+  }
+
+  .counts {
+    font-weight: 200;
+    font-size: 0.9rem;
+    margin: 0 .8rem;
+    align-self: center;
+  }
+}

@@ -63,7 +63,8 @@ const EntityTableRow = (props) => {
                             isDraggable={false}
                             isResizable={false}
                             compactType={'horizontal'}
-                            margin={[0, 0]}>
+                            margin={[0, 0]}
+                            useCSSTransforms={false}>
         {
           childDefs
             .map((childDef, i) => {

@@ -1,7 +1,9 @@
 import './surveyInfo.scss'
 
 import React from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 
 import DeleteSurveyDialog from './deleteSurveyDialog'
 
@@ -100,11 +102,9 @@ const mapStateToProps = state => {
   const user = getUser(state)
   const surveyInfo = getStateSurveyInfo(state)
 
-  return {
-    surveyInfo,
-    canEdit: canEditSurvey(user, surveyInfo)
-  }
-}
+const enhance = compose(
+  withRouter,
+  connect(mapStateToProps, {publishSurvey, deleteSurvey})
+)
 
-export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfo)
-
+export default enhance(SurveyInfo)

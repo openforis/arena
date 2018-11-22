@@ -25,7 +25,6 @@ const modules = [
     module: appModules.data,
     icon: 'table2',
     label: 'Data',
-    disabled: true,
   },
   {
     module: appModules.analysis,

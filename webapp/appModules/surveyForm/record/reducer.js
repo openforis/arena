@@ -5,7 +5,7 @@ import { assocNodes, deleteNode } from '../../../../common/record/record'
 import { surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../actions'
 
-import { nodeDelete, nodesUpdate, recordCreate } from './actions'
+import { nodeDelete, nodesUpdate, recordCreate, recordDelete, recordLoad } from './actions'
 
 const actionHandlers = {
   // reset form
@@ -13,12 +13,14 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
+  // record updates
   [recordCreate]: (state, {record}) => record,
+  [recordLoad]: (state, {record}) => record,
+  [recordDelete]: () => ({}),
 
+  // node updates
   [nodesUpdate]: (state, {nodes}) => assocNodes(nodes)(state),
-
   [nodeDelete]: (state, {node}) => deleteNode(node)(state),
-
 }
 
 export default exportReducer(actionHandlers)
