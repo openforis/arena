@@ -10,7 +10,7 @@ import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
 import { setFormActivePage } from '../actions'
 import { getFormPageParentNode, getSurveyForm, isNodeDefFormActivePage } from '../surveyFormState'
 
-const FormNavigationItem = (props) => {
+const NavigationButton = (props) => {
   const {
     nodeDef,
     childDefs,
@@ -38,10 +38,10 @@ const FormNavigationItem = (props) => {
 
       {
         outerPageChildDefs.map((child, i) =>
-          <FormNavigationItemConnect key={child.uuid}
-                                     level={level + 1}
-                                     nodeDef={child}
-                                     edit={edit}
+          <NodeDefNavigation key={child.uuid}
+                             level={level + 1}
+                             nodeDef={child}
+                             edit={edit}
           />
         )
       }
@@ -68,22 +68,6 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-const FormNavigationItemConnect = connect(
-  mapStateToProps,
-  {setFormActivePage}
-)(FormNavigationItem)
+const NodeDefNavigation = connect(mapStateToProps, {setFormActivePage})(NavigationButton)
 
-const FormNavigation = ({edit}) => {
-
-  return (
-    <div className="survey-form__nav" style={{
-      display: 'flex',
-      alignItems: 'flex-end',
-    }}>
-      <FormNavigationItemConnect edit={edit}
-                                 level={0}/>
-    </div>
-  )
-}
-
-export default FormNavigation
+export default NodeDefNavigation

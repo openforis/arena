@@ -29,6 +29,23 @@ $tableBorder: 1px solid rgba($white, .7);
   }
 }
 
+.survey-form__nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+.survey-form__nav-node-def-navigation {
+  display: flex;
+  align-items: flex-end;
+}
+
+.survey-form__nav-record-actions {
+  align-self: center;
+  > * {
+    margin: 0 1rem;
+  }
+}
+
 .survey-form__node-def-edit {
   position: absolute;
   width: 100%;
@@ -118,6 +135,7 @@ $tableBorder: 1px solid rgba($white, .7);
 }
 
 .node-def__table-row {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 40px;
   border-bottom: $tableBorder;

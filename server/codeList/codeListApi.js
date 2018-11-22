@@ -32,6 +32,7 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/codeLists', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
+
       const {body} = req
 
       const codeList = await insertCodeList(surveyId, body)

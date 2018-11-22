@@ -5,6 +5,7 @@ const {
 } = require('../serverUtils/request')
 
 const SurveyManager = require('./surveyManager')
+const {requireEditPermission} = require('../authGroup/authMiddleware')
 
 const {
   validateNewSurvey,
@@ -97,9 +98,9 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/survey/:id/publish', async (req, res) => {
+  app.put('/survey/:surveyId/publish', requireEditPermission, async (req, res) => {
     try {
-      const surveyId = getRestParam(req, 'id')
+      const surveyId = getRestParam(req, 'surveyId')
       const user = req.user
 
       const job = new SurveyPublishJob({
@@ -117,9 +118,11 @@ module.exports.init = app => {
 
   // ==== DELETE
 
-  app.delete('/survey/:id', async (req, res) => {
+  app.delete('/survey/:surveyId', requireEditPermission, async (req, res) => {
     try {
-      const surveyId = getRestParam(req, 'id')
+      const surveyId = getRestParam(req, 'surveyId')
+      const user = req.user
+
       await SurveyManager.deleteSurvey(surveyId, req.user)
 
       sendOk(res)

@@ -76,6 +76,22 @@ const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
     res => dbTransformCallback(res, draft)
   )
 
+const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
+  const rootNodeDef = await fetchRootNodeDef(surveyId, draft, client)
+
+  return await client.map(`
+    SELECT ${nodeDefSelectFields}
+    FROM node_def 
+    WHERE survey_id = $1
+    AND deleted IS NOT TRUE
+    AND parent_id = $2
+    AND props->>'key' = $3
+    ORDER BY id`,
+    [surveyId, rootNodeDef.id, 'true'],
+    res => dbTransformCallback(res, draft)
+  )
+}
+
 // ============== UPDATE
 
 const updateNodeDefProp = async (nodeDefId, key, value, client = db) => {
@@ -162,6 +178,7 @@ module.exports = {
   fetchNodeDefsBySurveyId,
   fetchRootNodeDef,
   fetchNodeDefsByParentId,
+  fetchRootNodeDefKeysBySurveyId,
 
   //UPDATE
   updateNodeDefProp,

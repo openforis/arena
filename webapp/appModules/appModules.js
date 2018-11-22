@@ -5,10 +5,7 @@ export const appModules = {
   dashboard: 'dashboard',
   survey: 'survey',
   designer: 'designer',
-
   data: 'data',
-  dataRecord: 'data/record',
-
   analysis: 'analysis',
   users: 'users',
 }

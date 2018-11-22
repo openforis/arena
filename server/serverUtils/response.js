@@ -1,3 +1,5 @@
+const UnauthorizedError = require('../authGroup/unauthorizedError')
+
 const status = {
   ok: 'ok',
   error: 'error'
@@ -9,11 +11,19 @@ const sendErr = (res, err) => {
   console.log("=== ERROR ")
   console.log(err)
 
-  res.status(500).json({
-    status: status.error,
-    error: 'Could not serve',
-    err
-  })
+  if (err instanceof UnauthorizedError) {
+    res.status(403).json({
+      status: status.error,
+      error: err.message,
+      err
+    })
+  } else {
+    res.status(500).json({
+      status: status.error,
+      error: 'Could not serve',
+      err
+    })
+  }
 }
 
 module.exports = {

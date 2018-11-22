@@ -1,13 +1,17 @@
 import './surveyInfo.scss'
 
 import React from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 
 import DeleteSurveyDialog from './deleteSurveyDialog'
 
 import Survey from '../../../../common/survey/survey'
+import { canEditSurvey } from '../../../../common/auth/authManager'
 
 import { getStateSurveyInfo } from '../../../survey/surveyState'
+import { getUser } from '../../../app/appState'
 import { deleteSurvey, publishSurvey } from '../../../survey/actions'
 import { appModules } from '../../appModules'
 import { appModuleUri } from '../../appModules'
@@ -39,7 +43,7 @@ class SurveyInfo extends React.Component {
   }
 
   render () {
-    const {surveyInfo, deleteSurvey, publishSurvey} = this.props
+    const {surveyInfo, deleteSurvey, publishSurvey, canEdit} = this.props
     const {showDialog} = this.state
 
     return (
@@ -59,12 +63,14 @@ class SurveyInfo extends React.Component {
         </h4>
 
         <div className="button-bar">
+          {canEdit &&
           <button className="btn btn-of-light" aria-disabled={!Survey.isDraft(surveyInfo)}
                   onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
                     ? publishSurvey()
                     : null}>
             <span className="icon icon-checkmark2 icon-16px icon-left"/> Publish
           </button>
+          }
 
           <button className="btn btn-of-light" aria-disabled={true}>
             <span className="icon icon-download3 icon-16px icon-left"/> Export
@@ -74,9 +80,11 @@ class SurveyInfo extends React.Component {
             <span className="icon icon-upload3 icon-16px icon-left"/> Import
           </button>
 
+          {canEdit &&
           <button className="btn btn-of-light" onClick={() => this.toggleDeleteConfirmDialog(true)}>
             <span className="icon icon-bin icon-16px icon-left"/> Delete
           </button>
+          }
 
           {showDialog &&
           <DeleteSurveyDialog onCancel={() => this.toggleDeleteConfirmDialog(false)}
@@ -90,8 +98,19 @@ class SurveyInfo extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
-  surveyInfo: getStateSurveyInfo(state),
-})
+const mapStateToProps = state => {
+  const user = getUser(state)
+  const surveyInfo = getStateSurveyInfo(state)
 
-export default connect(mapStateToProps, {publishSurvey, deleteSurvey})(SurveyInfo)
+  return {
+    surveyInfo,
+    canEdit: canEditSurvey(user, surveyInfo)
+  }
+}
+
+const enhance = compose(
+  withRouter,
+  connect(mapStateToProps, {publishSurvey, deleteSurvey})
+)
+
+export default enhance(SurveyInfo)

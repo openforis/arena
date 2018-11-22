@@ -4,7 +4,7 @@ import './style/react-grid-layout.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import FormNavigation from './components/formNavigation'
+import FormNavigation from './navigation/formNavigation'
 import FormActions from './components/formActions'
 import NodeDefEdit from './nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
@@ -37,7 +37,7 @@ const SurveyFormView = (props) => {
           <NodeDefEdit/>
         }
 
-        <FormNavigation edit={edit}/>
+        <FormNavigation edit={edit} entry={entry}/>
 
         {
           nodeDef && (edit || (entry && recordLoaded))

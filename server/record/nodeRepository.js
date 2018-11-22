@@ -45,19 +45,18 @@ const fetchNodeByUUID = async (surveyId, uuid, client = db) =>
     dbTransformCallback
   )
 
- const fetchNodeFileByUUID = async (surveyId, uuid, client = db) =>
+const fetchNodeFileByUUID = async (surveyId, uuid, client = db) =>
   await client.oneOrNone(`
     SELECT value, file FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1`,
     [uuid]
   )
 
-
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUUID, value, fileContent = null, client = db) =>
   await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
-    SET value = $1, file = $2
+    SET value = $1, file = $2, date_modified = now()
     WHERE uuid = $3
     RETURNING ${nodeColumns}
     `, [value ? JSON.stringify(value) : null, fileContent, nodeUUID],
