@@ -28,5 +28,4 @@ const canEditSurvey = R.partial(hasPermission, [permissions.surveyEdit])
 module.exports = {
   isSystemAdmin,
   canEditSurvey,
-  hasPermission
 }

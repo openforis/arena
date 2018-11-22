@@ -65,7 +65,7 @@ class SurveyInfo extends React.Component {
           <label className="form-label">SRS</label>
           <SrsAutocomplete selection={surveySrs}
                            validation={getFieldValidation('srs')}
-                           onChange={srs => console.log(srs) || updateSurveyInfoProp('srs', srs)}/>
+                           onChange={srs => updateSurveyInfoProp('srs', srs)}/>
         </div>
 
         <LabelsEditorComponent labels={Survey.getLabels(surveyInfo)}

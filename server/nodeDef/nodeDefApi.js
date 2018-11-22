@@ -1,23 +1,34 @@
+const R = require('ramda')
+
 const {sendErr, sendOk} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
-const {
-  requireNodeDefPropEditPermission,
-  requireNodeDefEditPermission
-} = require('../authGroup/authMiddleware')
+
+const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 
 const {
   createNodeDef,
   updateNodeDefProp,
   markNodeDefDeleted,
+  fetchNodeDef
 } = require('./nodeDefManager')
 
 const {fetchSurveyNodeDefs} = require('./../survey/surveyManager')
+
+const UnauthorizedError = require('../authGroup/unauthorizedError')
+
+async function checkSurveyId (nodeDefId, reqSurveyId) {
+  const nodeDef = await fetchNodeDef(nodeDefId)
+  const nodeDefSurveyId = R.prop('surveyId', nodeDef)
+  if (nodeDefSurveyId !== reqSurveyId) {
+    throw new UnauthorizedError(`Not authorized`)
+  }
+}
 
 module.exports.init = app => {
 
   // ==== CREATE
 
-  app.post('/nodeDef', requireNodeDefEditPermission, async (req, res) => {
+  app.post('/survey/:surveyId/nodeDef', requireSurveyEditPermission, async (req, res) => {
     try {
       const {body: nodeDefRequest} = req
       const {surveyId, parentId, uuid, type, props} = nodeDefRequest
@@ -34,14 +45,17 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/nodeDef/:nodeDefId/prop', requireNodeDefPropEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/nodeDef/:nodeDefId/prop', requireSurveyEditPermission, async (req, res) => {
     try {
       const {body} = req
       const {key, value} = body
       const nodeDefId = getRestParam(req, 'nodeDefId')
+      const surveyId = getRestParam(req, 'surveyId')
 
-      const nodeDef = await updateNodeDefProp(nodeDefId, key, value)
-      const nodeDefs = await fetchSurveyNodeDefs(nodeDef.surveyId, true, true)
+      await checkSurveyId(nodeDefId, 1000)
+
+      await updateNodeDefProp(nodeDefId, key, value)
+      const nodeDefs = await fetchSurveyNodeDefs(surveyId, true, true)
 
       res.json({nodeDefs})
     } catch (err) {
@@ -51,9 +65,12 @@ module.exports.init = app => {
 
   // ==== DELETE
 
-  app.delete('/nodeDef/:nodeDefId', requireNodeDefPropEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/nodeDef/:nodeDefId', requireSurveyEditPermission, async (req, res) => {
     try {
       const nodeDefId = getRestParam(req, 'nodeDefId')
+      const surveyId = getRestParam(req, 'surveyId')
+
+      await checkSurveyId(nodeDefId, surveyId)
 
       await markNodeDefDeleted(nodeDefId)
 
