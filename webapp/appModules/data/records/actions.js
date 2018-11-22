@@ -28,6 +28,7 @@ export const initRecordsList = () => async (dispatch, getState) => {
     limit,
     count: countResp.data.count,
     list: recordsResp.data.records,
+    nodeDefKeys: recordsResp.data.nodeDefKeys,
   })
 }
 

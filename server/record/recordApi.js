@@ -60,8 +60,8 @@ module.exports.init = app => {
       const limit = getRestParam(req, 'limit')
       const offset = getRestParam(req, 'offset')
 
-      const records = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, offset, limit)
-      res.json({records})
+      const recordsSummary = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, offset, limit)
+      res.json(recordsSummary)
     } catch (err) {
       sendErr(res, err)
     }

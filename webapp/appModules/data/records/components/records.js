@@ -4,13 +4,21 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import * as R from 'ramda'
+import camelize from 'camelize'
 
 import Survey from '../../../../../common/survey/survey'
+import NodeDef from '../../../../../common/survey/nodeDef'
 
 import { appModuleUri } from '../../../appModules'
 import { dataModules } from '../../dataModules'
 
-import { getRecordsCount, getRecordsLimit, getRecordsList, getRecordsOffset } from '../recordsState'
+import {
+  getRecordsCount,
+  getRecordsLimit,
+  getRecordsList,
+  getRecordsNodeDefKeys,
+  getRecordsOffset
+} from '../recordsState'
 import { getRelativeDate } from '../../../../appUtils/dateUtils'
 
 import { initRecordsList, fetchRecords } from '../actions'
@@ -54,11 +62,13 @@ const RecordsTablePaginator = ({offset, limit, count, fetchRecords}) => {
   )
 }
 
-const RecordRow = ({idx, offset, record, style, keys}) => (
+const RecordRow = ({idx, offset, record, style, nodeDefKeys}) => (
   <div className="table__row" style={style}>
     <div>{idx + offset + 1}</div>
     {
-      keys.map((k, i) => <div key={i}>{record[k]}</div>)
+      nodeDefKeys.map((n, i) =>
+        <div key={i}>{record[camelize(NodeDef.getNodeDefName(n))]}</div>
+      )
     }
     <div>{getRelativeDate(record.dateCreated)}</div>
     <div>{getRelativeDate(record.dateModified)}</div>
@@ -71,9 +81,8 @@ const RecordRow = ({idx, offset, record, style, keys}) => (
   </div>
 )
 
-const RecordsTable = ({records, offset}) => {
-  const keys = JSON.parse(records[0].keys)
-  const noCols = 3 + keys.length
+const RecordsTable = ({records, offset, nodeDefKeys, lang}) => {
+  const noCols = 3 + nodeDefKeys.length
 
   const style = {gridTemplateColumns: `100px repeat(${noCols}, ${1 / noCols}fr) 50px`}
 
@@ -82,7 +91,7 @@ const RecordsTable = ({records, offset}) => {
       <div className="table__row-header" style={style}>
         <div>Record #</div>
         {
-          keys.map((k, i) => <div key={i}>{k}</div>)
+          nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getNodeDefLabel(k, lang)}</div>)
         }
         <div>Date created</div>
         <div>Date Modified</div>
@@ -92,7 +101,7 @@ const RecordsTable = ({records, offset}) => {
       <div className="table__rows">
         {
           records.map((record, i) =>
-            <RecordRow key={i} idx={i} offset={offset} record={record} style={style} keys={keys}/>
+            <RecordRow key={i} idx={i} offset={offset} record={record} style={style} nodeDefKeys={nodeDefKeys}/>
           )
         }
       </div>
@@ -150,12 +159,17 @@ class Records extends React.Component {
 
 }
 
-const mapStateToProps = state => ({
-  surveyInfo: getStateSurveyInfo(state),
-  records: getRecordsList(state),
-  offset: getRecordsOffset(state),
-  limit: getRecordsLimit(state),
-  count: getRecordsCount(state),
-})
+const mapStateToProps = state => {
+  const surveyInfo = getStateSurveyInfo(state)
+  return {
+    surveyInfo,
+    records: getRecordsList(state),
+    nodeDefKeys: getRecordsNodeDefKeys(state),
+    offset: getRecordsOffset(state),
+    limit: getRecordsLimit(state),
+    count: getRecordsCount(state),
+    lang: Survey.getDefaultLanguage(surveyInfo)
+  }
+}
 
 export default connect(mapStateToProps, {initRecordsList, fetchRecords})(Records)

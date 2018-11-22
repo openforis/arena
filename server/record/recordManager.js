@@ -67,11 +67,20 @@ const createNode = async (nodeDef, nodeReq, file, client = db) => {
 
   return R.merge({[node.uuid]: node}, childNodes)
 }
+
 /**
  * ===================
  * READ
  * ===================
  */
+const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit) => {
+  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId)
+  return {
+    nodeDefKeys,
+    records: await RecordRepository.fetchRecordsSummaryBySurveyId(surveyId, nodeDefKeys, offset, limit)
+  }
+}
+
 const fetchRecordById = async (surveyId, recordId) => {
   const record = await RecordRepository.fetchRecordById(surveyId, recordId)
   const nodes = await NodeRepository.fetchNodesByRecordId(surveyId, recordId)
@@ -167,7 +176,7 @@ module.exports = {
   //==== READ
   fetchRecordById,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
-  fetchRecordsSummaryBySurveyId: RecordRepository.fetchRecordsSummaryBySurveyId,
+  fetchRecordsSummaryBySurveyId,
   fetchNodeFileByUUID: NodeRepository.fetchNodeFileByUUID,
 
   //==== UPDATE
