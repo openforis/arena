@@ -15,18 +15,18 @@ const getSurveyUserPermissions = (user, surveyInfo) => {
   )(user.authGroups, R.pathOr([], ['authGroups'], surveyInfo))
 }
 
-const hasPermission = permission => {
-  const fn = (user, surveyInfo) =>
+const hasPermission = (permission, user, surveyInfo) =>
     user && surveyInfo &&
-    (isSystemAdmin(user) || R.contains(permission, getSurveyUserPermissions(user, surveyInfo)))
-  fn.permissionName = permission
+    (
+      isSystemAdmin(user)
+      ||
+      R.contains(permission, getSurveyUserPermissions(user, surveyInfo))
+    )
 
-  return fn
-}
-
-const canEditSurvey = hasPermission(permissions.surveyEdit)
+const canEditSurvey = R.partial(hasPermission, [permissions.surveyEdit])
 
 module.exports = {
   isSystemAdmin,
   canEditSurvey,
+  hasPermission
 }

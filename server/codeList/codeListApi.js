@@ -2,6 +2,7 @@ const {sendOk, sendErr} = require('../serverUtils/response')
 
 const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
 
+const {requireEditPermission} = require('../authGroup/authMiddleware')
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const {
@@ -32,6 +33,7 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/codeLists', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
+
       const {body} = req
 
       const codeList = await insertCodeList(surveyId, body)
