@@ -7,22 +7,26 @@ const isSystemAdmin = user => R.any(
   user.authGroups
 )
 
-const getSurveyUserPermissions = (user, survey) => {
+const getSurveyUserPermissions = (user, surveyInfo) => {
   return R.pipe(
     R.innerJoin((ug, sg) => ug.id === sg.id),
     R.head, // there's only one group per user per survey
     R.propOr([], 'permissions'),
-  )(user.authGroups, R.pathOr([], ['info', 'authGroups'], survey))
+  )(user.authGroups, R.pathOr([], ['authGroups'], surveyInfo))
 }
 
-const hasPermission = (permission) => (user, survey) =>
-  user && survey
-    ? (isSystemAdmin(user) || R.contains(permission, getSurveyUserPermissions(user, survey)))
-    : false
+const hasPermission = (permission, user, surveyInfo) =>
+    user && surveyInfo &&
+    (
+      isSystemAdmin(user)
+      ||
+      R.contains(permission, getSurveyUserPermissions(user, surveyInfo))
+    )
 
-const canEditSurvey = hasPermission(permissions.surveyEdit)
+const canEditSurvey = R.partial(hasPermission, [permissions.surveyEdit])
 
 module.exports = {
   isSystemAdmin,
   canEditSurvey,
+  hasPermission
 }
