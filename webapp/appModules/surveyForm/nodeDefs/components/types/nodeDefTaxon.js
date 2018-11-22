@@ -1,6 +1,6 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import ReactDOM from 'react-dom'
+import { connect } from 'react-redux'
 import axios from 'axios'
 import * as R from 'ramda'
 
@@ -145,12 +145,17 @@ class NodeDefTaxon extends React.Component {
   async loadTaxa (field, value) {
     const {surveyInfo, taxonomy} = this.props
 
+    const searchValue =
+      field === fields.code
+        ? `${value}*` //starts with value
+        : `*${value}*` //contains value
+
     const params = {
       draft: false,
       limit: 20,
       offset: 0,
       filter: {
-        [field]: `*${value}*`,
+        [field]: searchValue,
       }
     }
 
@@ -160,7 +165,7 @@ class NodeDefTaxon extends React.Component {
 
   render () {
     const {
-      edit, label, renderType
+      edit, renderType
     } = this.props
 
     const {
@@ -172,18 +177,6 @@ class NodeDefTaxon extends React.Component {
       autocompleteTaxa,
       autocompleteInputField,
     } = this.state
-
-    // table header
-    if (renderType === nodeDefRenderType.tableHeader) {
-      return <div className="node-def__table-row-taxon">
-        <label className="node-def__table-header" style={{gridColumn: '1 / span 4'}}>
-          {label}
-        </label>
-        <label className="node-def__table-header">Code</label>
-        <label className="node-def__table-header">Scientific Name</label>
-        <label className="node-def__table-header">Vernacular Name</label>
-      </div>
-    }
 
     const codeInputField = <Input ref={this.codeField}
                                   readOnly={edit}
@@ -225,21 +218,19 @@ class NodeDefTaxon extends React.Component {
     }
 
     return (
-      <FormItem label={label}>
-        <div className="node-def__taxon-wrapper">
-          <FormItem label="Code">
-            {codeInputField}
-          </FormItem>
-          <FormItem label="Scientific Name">
-            {scientificNameInputField}
-          </FormItem>
-          <FormItem label="Vernacular Name">
-            {vernacularNameInputField}
-          </FormItem>
-        </div>
+      <div className="node-def__taxon-wrapper">
+        <FormItem label="Code">
+          {codeInputField}
+        </FormItem>
+        <FormItem label="Scientific Name">
+          {scientificNameInputField}
+        </FormItem>
+        <FormItem label="Vernacular Name">
+          {vernacularNameInputField}
+        </FormItem>
 
         {autocompleteDialog}
-      </FormItem>
+      </div>
     )
   }
 }
