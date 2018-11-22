@@ -1,13 +1,13 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import UploadButton from '../../../../commonComponents/form/uploadButton'
-import DownloadButton from '../../../../commonComponents/form/downloadButton'
-import NodeDefDeleteButton from '../nodeDefDeleteButton'
+import UploadButton from '../../../../../commonComponents/form/uploadButton'
+import DownloadButton from '../../../../../commonComponents/form/downloadButton'
+import NodeDeleteButton from '../nodeDeleteButton'
 
-import { limitToParentHeight } from '../../../../appUtils/domUtils'
+import { limitToParentHeight } from '../../../../../appUtils/domUtils'
 
-import { getNodeValue, getNodeFileName } from '../../../../../common/record/node'
+import { getNodeValue, getNodeFileName } from '../../../../../../common/record/node'
 
 const getFileExtension = R.pipe(
   getNodeFileName,
@@ -38,11 +38,11 @@ const FileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode, remov
                       label={getFileName(node)}
                       title={getNodeFileName(node) === getFileName(node) ? null : getNodeFileName(node)}/>
 
-      <NodeDefDeleteButton nodeDef={nodeDef}
-                           node={node}
-                           disabled={edit || R.isEmpty(getNodeValue(node))}
-                           showConfirm={true}
-                           removeNode={removeNode}/>
+      <NodeDeleteButton nodeDef={nodeDef}
+                        node={node}
+                        disabled={edit || R.isEmpty(getNodeValue(node))}
+                        showConfirm={true}
+                        removeNode={removeNode}/>
     </div>
     : null
 

@@ -4,13 +4,13 @@ import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import NodeDef from '../../../../common/survey/nodeDef'
 
-import NodeDefEntitySwitch from './components/nodeDefEntitySwitch'
-import NodeDefFile from './components/nodeDefFile'
-import NodeDefTaxon from './components/nodeDefTaxon'
-import NodeDefCoordinate from './components/nodeDefCoordinate'
-import NodeDefCodeList from './components/nodeDefCodeList'
-import NodeDefBoolean from './components/nodeDefBoolean'
-import NodeDefText from './components/nodeDefText'
+import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
+import NodeDefFile from './components/types/nodeDefFile'
+import NodeDefTaxon from './components/types/nodeDefTaxon'
+import NodeDefCoordinate from './components/types/nodeDefCoordinate'
+import NodeDefCodeList from './components/types/nodeDefCodeList'
+import NodeDefBoolean from './components/types/nodeDefBoolean'
+import NodeDefText from './components/types/nodeDefText'
 
 import {
   nodeDefLayoutProps,

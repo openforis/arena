@@ -1,19 +1,19 @@
-import '../../style/react-grid-layout.scss'
+import '../../../style/react-grid-layout.scss'
 
 import React from 'react'
 import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
-import NodeDefSwitch from '../nodeDefSwitch'
+import NodeDefSwitch from '../../nodeDefSwitch'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefFormFields } from '../nodeDefSystemProps'
-import { elementOffset } from '../../../../appUtils/domUtils'
+import { getNodeDefFormFields } from '../../nodeDefSystemProps'
+import { elementOffset } from '../../../../../appUtils/domUtils'
 
-import { newNode } from '../../../../../common/record/node'
+import { newNode } from '../../../../../../common/record/node'
 
 const rowHeight = 50
 

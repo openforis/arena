@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { getNodeValue } from '../../../../../common/record/node'
+import { getNodeValue } from '../../../../../../common/record/node'
 
 const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value, entry}) => {
   const node = entry ? nodes[0] : null

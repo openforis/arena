@@ -4,19 +4,19 @@ import ReactDOM from 'react-dom'
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { FormItem, Input } from '../../../../commonComponents/form/input'
-import AutocompleteDialog from '../../../../commonComponents/form/autocompleteDialog'
+import { FormItem, Input } from '../../../../../commonComponents/form/input'
+import AutocompleteDialog from '../../../../../commonComponents/form/autocompleteDialog'
 
-import { toQueryString } from '../../../../../server/serverUtils/request'
+import { toQueryString } from '../../../../../../server/serverUtils/request'
 
-import Survey from '../../../../../common/survey/survey'
-import Taxon from '../../../../../common/survey/taxonomy'
-import NodeDef from '../../../../../common/survey/nodeDef'
-import Node from '../../../../../common/record/node'
+import Survey from '../../../../../../common/survey/survey'
+import Taxon from '../../../../../../common/survey/taxonomy'
+import NodeDef from '../../../../../../common/survey/nodeDef'
+import Node from '../../../../../../common/record/node'
 
-import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
-import { getNodeDefDefaultValue } from '../nodeDefSystemProps'
-import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
+import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
+import { getNodeDefDefaultValue } from '../../nodeDefSystemProps'
+import { getStateSurveyInfo, getSurvey } from '../../../../../survey/surveyState'
 
 const fields = {
   code: 'code',

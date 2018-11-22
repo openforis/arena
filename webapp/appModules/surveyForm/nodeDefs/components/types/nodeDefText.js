@@ -1,15 +1,15 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { limitToParentHeight } from '../../../../appUtils/domUtils'
+import { limitToParentHeight } from '../../../../../appUtils/domUtils'
 
-import { Input } from '../../../../commonComponents/form/input'
-import NodeDefDeleteButton from '../nodeDefDeleteButton'
-import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
+import { Input } from '../../../../../commonComponents/form/input'
+import NodeDeleteButton from '../nodeDeleteButton'
+import { getNodeDefInputTextProps } from '../../nodeDefSystemProps'
 
-import NodeDef from '../../../../../common/survey/nodeDef'
+import NodeDef from '../../../../../../common/survey/nodeDef'
 
-import Node from '../../../../../common/record/node'
+import Node from '../../../../../../common/record/node'
 
 const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
   <Input readOnly={edit}
@@ -32,11 +32,11 @@ const MultipleTextInput = props => {
                      node={n}/>
 
           {!n.placeholder && NodeDef.isNodeDefMultiple(nodeDef) &&
-          <NodeDefDeleteButton nodeDef={nodeDef}
-                               node={n}
-                               disabled={R.isEmpty(Node.getNodeValue(n))}
-                               showConfirm={true}
-                               removeNode={removeNode}/>
+          <NodeDeleteButton nodeDef={nodeDef}
+                            node={n}
+                            disabled={R.isEmpty(Node.getNodeValue(n))}
+                            showConfirm={true}
+                            removeNode={removeNode}/>
           }
 
         </div>

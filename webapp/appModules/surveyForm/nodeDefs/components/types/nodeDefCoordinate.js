@@ -1,13 +1,13 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { FormItem, Input } from '../../../../commonComponents/form/input'
-import Dropdown from '../../../../commonComponents/form/dropdown'
+import { FormItem, Input } from '../../../../../commonComponents/form/input'
+import Dropdown from '../../../../../commonComponents/form/dropdown'
 
-import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
 
-import Survey from '../../../../../common/survey/survey'
-import { getNodeDefDefaultValue } from '../nodeDefSystemProps'
+import Survey from '../../../../../../common/survey/survey'
+import { getNodeDefDefaultValue } from '../../nodeDefSystemProps'
 
 class NodeDefCoordinate extends React.Component {
 

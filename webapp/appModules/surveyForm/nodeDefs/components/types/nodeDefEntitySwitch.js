@@ -4,15 +4,15 @@ import { connect } from 'react-redux'
 import NodeDefEntityTable from './nodeDefEntityTable'
 import NodeDefEntityForm from './nodeDefEntityForm'
 
-import Survey from '../../../../../common/survey/survey'
+import Survey from '../../../../../../common/survey/survey'
 
 import {
   isRenderForm,
   isRenderTable,
-} from '../../../../../common/survey/nodeDefLayout'
+} from '../../../../../../common/survey/nodeDefLayout'
 
-import { putNodeDefProp, } from '../../../../survey/nodeDefs/actions'
-import { getSurvey } from '../../../../survey/surveyState'
+import { putNodeDefProp, } from '../../../../../survey/nodeDefs/actions'
+import { getSurvey } from '../../../../../survey/surveyState'
 
 class NodeDefEntitySwitch extends React.Component {
 

@@ -46,6 +46,11 @@ $tableBorder: 1px solid rgba($white, .7);
   }
 }
 
+.node-def__form_page {
+  position: relative;
+  overflow-y: auto;
+}
+
 .survey-form__node-def-edit {
   position: absolute;
   width: 100%;
@@ -77,11 +82,6 @@ $tableBorder: 1px solid rgba($white, .7);
   display: grid;
   position: relative;
   height: 100%;
-}
-
-.node-def__form_page {
-  position: relative;
-  overflow-y: auto;
 }
 
 .node-def__form-actions {

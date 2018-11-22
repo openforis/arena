@@ -1,27 +1,27 @@
-import '../nodeDefs.scss'
+import '../../nodeDefs.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import * as R from 'ramda'
 
-import CodeListDropdown from './codeList/codeListDropdown'
-import CodeListCheckbox from './codeList/codeListCheckbox'
+import NodeDefCodeListDropdown from './nodeDefCodeListDropdown'
+import NodeDefCodeListCheckbox from './nodeDefCodeListCheckbox'
 
-import NodeDef from '../../../../../common/survey/nodeDef'
-import Survey from '../../../../../common/survey/survey'
-import Record from '../../../../../common/record/record'
-import { isRenderDropdown } from '../../../../../common/survey/nodeDefLayout'
+import NodeDef from '../../../../../../common/survey/nodeDef'
+import Survey from '../../../../../../common/survey/survey'
+import Record from '../../../../../../common/record/record'
+import { isRenderDropdown } from '../../../../../../common/survey/nodeDefLayout'
 
-import { toQueryString } from '../../../../../server/serverUtils/request'
-import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
-import { getRecord } from '../../record/recordState'
-import { getSurveyForm } from '../../surveyFormState'
+import { toQueryString } from '../../../../../../server/serverUtils/request'
+import { getStateSurveyInfo, getSurvey } from '../../../../../survey/surveyState'
+import { getRecord } from '../../../record/recordState'
+import { getSurveyForm } from '../../../surveyFormState'
 
 const CodeListRenderer = props =>
   isRenderDropdown(props.nodeDef)
-    ? <CodeListDropdown {...props}/>
-    : <CodeListCheckbox {...props}/>
+    ? <NodeDefCodeListDropdown {...props}/>
+    : <NodeDefCodeListCheckbox {...props}/>
 
 class NodeDefCodeList extends React.Component {
 
@@ -73,7 +73,7 @@ class NodeDefCodeList extends React.Component {
 
     // EDIT MODE
     if (edit)
-      return <CodeListDropdown {...this.props} />
+      return <NodeDefCodeListDropdown {...this.props} />
 
     // ENTRY MODE
     return <CodeListRenderer {...this.props}
