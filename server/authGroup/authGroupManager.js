@@ -2,11 +2,13 @@ const R = require('ramda')
 
 const UnauthorizedError = require('./unauthorizedError')
 
+const Survey = require('../../common/survey/survey')
 const {canEditSurvey} = require('../../common/auth/authManager')
-const {getSurveyById} = require('../survey/surveyRepository')
+const {fetchSurveyById} = require('../survey/surveyManager')
 
 const checkPermission = fn => async (user, surveyId) => {
-  if (!fn(user, await getSurveyById(surveyId))) {
+  const survey = await fetchSurveyById(surveyId)
+  if (!fn(user, Survey.getSurveyInfo(survey))) {
     throw new UnauthorizedError(`User ${user.name} is not authorized. surveyId: ${surveyId}, permission: ${fn.permissionName}`)
   }
 }

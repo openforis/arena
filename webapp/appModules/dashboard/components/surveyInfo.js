@@ -102,6 +102,12 @@ const mapStateToProps = state => {
   const user = getUser(state)
   const surveyInfo = getStateSurveyInfo(state)
 
+  return {
+    surveyInfo,
+    canEdit: canEditSurvey(user, surveyInfo)
+  }
+}
+
 const enhance = compose(
   withRouter,
   connect(mapStateToProps, {publishSurvey, deleteSurvey})

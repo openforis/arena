@@ -28,6 +28,5 @@ const canEditSurvey = hasPermission(permissions.surveyEdit)
 
 module.exports = {
   isSystemAdmin,
-  hasPermission,
   canEditSurvey,
 }
