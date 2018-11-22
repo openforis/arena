@@ -7,10 +7,12 @@ const {jobToJSON} = require('../job/jobUtils')
 const TaxonomyManager = require('./taxonomyManager')
 const TaxonomyImportJob = require('./taxonomyImportJob')
 
+const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
+
 module.exports.init = app => {
 
   // ====== CREATE
-  app.post('/survey/:surveyId/taxonomies', async (req, res) => {
+  app.post('/survey/:surveyId/taxonomies', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const {body} = req
@@ -95,7 +97,7 @@ module.exports.init = app => {
 
   // ====== UPDATE
 
-  app.put('/survey/:surveyId/taxonomies/:taxonomyId', async (req, res) => {
+  app.put('/survey/:surveyId/taxonomies/:taxonomyId', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyId = getRestParam(req, 'taxonomyId')
@@ -111,7 +113,7 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/survey/:surveyId/taxonomies/:taxonomyId/upload', async (req, res) => {
+  app.post('/survey/:surveyId/taxonomies/:taxonomyId/upload', requireSurveyEditPermission, async (req, res) => {
     try {
       const user = req.user
       const surveyId = getRestParam(req, 'surveyId')
@@ -136,7 +138,7 @@ module.exports.init = app => {
 
   // ====== DELETE
 
-  app.delete('/survey/:surveyId/taxonomies/:taxonomyId', async (req, res) => {
+  app.delete('/survey/:surveyId/taxonomies/:taxonomyId', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyId = getRestParam(req, 'taxonomyId')

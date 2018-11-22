@@ -1,5 +1,9 @@
 const {sendErr, sendOk} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
+const {
+  requireNodeDefPropEditPermission,
+  requireNodeDefEditPermission
+} = require('../authGroup/authMiddleware')
 
 const {
   createNodeDef,
@@ -13,7 +17,7 @@ module.exports.init = app => {
 
   // ==== CREATE
 
-  app.post('/nodeDef', async (req, res) => {
+  app.post('/nodeDef', requireNodeDefEditPermission, async (req, res) => {
     try {
       const {body: nodeDefRequest} = req
       const {surveyId, parentId, uuid, type, props} = nodeDefRequest
@@ -30,11 +34,11 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/nodeDef/:id/prop', async (req, res) => {
+  app.put('/nodeDef/:nodeDefId/prop', requireNodeDefPropEditPermission, async (req, res) => {
     try {
       const {body} = req
       const {key, value} = body
-      const nodeDefId = getRestParam(req, 'id')
+      const nodeDefId = getRestParam(req, 'nodeDefId')
 
       const nodeDef = await updateNodeDefProp(nodeDefId, key, value)
       const nodeDefs = await fetchSurveyNodeDefs(nodeDef.surveyId, true, true)
@@ -47,9 +51,9 @@ module.exports.init = app => {
 
   // ==== DELETE
 
-  app.delete('/nodeDef/:id', async (req, res) => {
+  app.delete('/nodeDef/:nodeDefId', requireNodeDefPropEditPermission, async (req, res) => {
     try {
-      const nodeDefId = getRestParam(req, 'id')
+      const nodeDefId = getRestParam(req, 'nodeDefId')
 
       await markNodeDefDeleted(nodeDefId)
 

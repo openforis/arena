@@ -87,7 +87,8 @@ const fetchSurveyById = async (id, draft = false, validate = false) => {
 
 const fetchUserSurveysInfo = async (user) => R.map(
   assocSurveyInfo,
-  await surveyRepository.fetchSurveys(user, !isSystemAdmin(user))
+  await surveyRepository.fetchSurveys(user, false)
+  // await surveyRepository.fetchSurveys(user, !isSystemAdmin(user))
 )
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {

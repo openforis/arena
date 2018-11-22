@@ -5,7 +5,7 @@ const {
 } = require('../serverUtils/request')
 
 const SurveyManager = require('./surveyManager')
-const {requireEditPermission} = require('../authGroup/authMiddleware')
+const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 
 const {
   validateNewSurvey,
@@ -82,12 +82,12 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/survey/:id/prop', async (req, res) => {
+  app.put('/survey/:surveyId/prop', requireSurveyEditPermission, async (req, res) => {
     try {
       const {body, user} = req
       const {key, value} = body
 
-      const surveyId = getRestParam(req, 'id')
+      const surveyId = getRestParam(req, 'surveyId')
 
       const survey = await SurveyManager.updateSurveyProp(surveyId, key, value, user)
       const validation = await validateSurvey(survey, key)
@@ -98,7 +98,7 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/survey/:surveyId/publish', requireEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/publish', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const user = req.user
@@ -118,7 +118,7 @@ module.exports.init = app => {
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId', requireEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const user = req.user
