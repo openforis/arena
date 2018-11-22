@@ -60,7 +60,8 @@ const EntityForm = props => {
                               isDraggable={edit && !locked}
                               isResizable={edit && !locked}
         //TODO decide if verticalCompact
-                              compactType={'vertical'}>
+                              compactType={'vertical'}
+                              useCSSTransforms={false}>
 
         {
           innerPageChildren
