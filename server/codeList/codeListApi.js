@@ -2,7 +2,6 @@ const {sendOk, sendErr} = require('../serverUtils/response')
 
 const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
 
-const {requireEditPermission} = require('../authGroup/authMiddleware')
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const {
