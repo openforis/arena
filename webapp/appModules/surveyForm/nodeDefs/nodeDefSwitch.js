@@ -54,6 +54,9 @@ class NodeDefSwitch extends React.Component {
       edit,
       locked,
 
+      renderType,
+      label,
+
       setFormNodeDefEdit,
       putNodeDefProp,
       setFormNodeDefUnlocked,
@@ -129,7 +132,11 @@ class NodeDefSwitch extends React.Component {
       }
 
       {
-        React.createElement(getNodeDefComponent(nodeDef), {...this.props})
+        renderType === Layout.nodeDefRenderType.tableHeader
+          ? <NodeDefTableHeader nodeDef={nodeDef} label={label} />
+          : renderType === Layout.nodeDefRenderType.tableBody && NodeDef.isNodeDefMultiple(nodeDef)
+          ? <NodeDefMultipleTableBody {...this.props} />
+          : React.createElement(getNodeDefComponent(nodeDef), {...this.props})
       }
 
     </div>
