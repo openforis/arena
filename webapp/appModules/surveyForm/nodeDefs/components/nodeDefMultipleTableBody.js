@@ -1,10 +1,11 @@
 import React from 'react'
-import * as R from 'ramda'
-import Node from '../../../../../common/record/node'
 import ReactDOM from 'react-dom'
-import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
+import * as R from 'ramda'
 
-class NodeDefMultipleInTable extends React.Component {
+import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
+import { getNodeToStringFunction } from '../nodeDefSystemProps'
+
+class NodeDefMultipleTableBody extends React.Component {
 
   constructor (props) {
     super(props)
@@ -21,6 +22,7 @@ class NodeDefMultipleInTable extends React.Component {
   }
 
   render () {
+    const {nodeDef} = this.props
     const {editDialogOpen} = this.state
 
     if (editDialogOpen) {
@@ -32,9 +34,11 @@ class NodeDefMultipleInTable extends React.Component {
     } else {
       const {nodes} = this.props
 
+      const nodeToStringFunction = getNodeToStringFunction(nodeDef)
+
       const valuesSummary = R.pipe(
         R.reject(R.propEq('placeholder', true)),
-        R.map(Node.getNodeValue),
+        R.map(nodeToStringFunction),
         R.join(', '),
       )(nodes)
 
@@ -49,4 +53,4 @@ class NodeDefMultipleInTable extends React.Component {
   }
 }
 
-export default NodeDefMultipleInTable
+export default NodeDefMultipleTableBody

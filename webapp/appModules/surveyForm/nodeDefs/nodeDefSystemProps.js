@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import NodeDef from '../../../../common/survey/nodeDef'
+import Node from '../../../../common/record/node'
 
 import NodeDefEntitySwitch from './components/nodeDefEntitySwitch'
 import NodeDefFile from './components/nodeDefFile'
@@ -97,20 +98,20 @@ export const nodeDefSystemProps = {
     component: NodeDefCodeList,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
-    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.dropdown}
+    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.dropdown},
   },
 
   [nodeDefType.coordinate]: {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
-    fieldsCount: 3,
+    fields: ['x', 'y', 'srs'],
     defaultValue: {x: '', y: '', srs: ''},
   },
 
   [nodeDefType.taxon]: {
     component: NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left"/>,
-    fieldsCount: 3,
+    fields: ['code', 'scientific_name', 'vernacular_name'],
     defaultValue: {
       code: '',
       family: '',
@@ -124,6 +125,7 @@ export const nodeDefSystemProps = {
   [nodeDefType.file]: {
     component: NodeDefFile,
     icon: <span className="icon icon-file-picture icon-left"/>,
+    nodeToStringFunction: Node.getNodeFileName
   },
 
   [nodeDefType.entity]: {
@@ -154,12 +156,15 @@ export const getNodeDefComponent = nodeDef =>
     NodeDefText
   )(nodeDefSystemProps)
 
-export const getNodeDefFieldsCount = nodeDef =>
+export const getNodeDefFields = nodeDef =>
   getProp(
     nodeDef.type,
-    'fieldsCount',
-    1
+    'fields',
+    ['single_field']
   )(nodeDefSystemProps)
+
+export const getNodeDefFieldsCount = nodeDef =>
+  getNodeDefFields(nodeDef).length
 
 export const getNodeDefDefaultValue = nodeDef =>
   getProp(
@@ -172,4 +177,11 @@ export const getNodeDefDefaultLayoutPropsByType = type =>
     type,
     'defaultLayoutProps',
     {}
+  )(nodeDefSystemProps)
+
+export const getNodeToStringFunction = type =>
+  getProp(
+    type,
+    'nodeToStringFunction',
+    node => node.value ? node.value.toString() : ''
   )(nodeDefSystemProps)

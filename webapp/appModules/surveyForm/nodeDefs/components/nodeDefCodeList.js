@@ -7,12 +7,11 @@ import * as R from 'ramda'
 
 import CodeListDropdown from './codeList/codeListDropdown'
 import CodeListCheckbox from './codeList/codeListCheckbox'
-import { FormItem } from '../../../../commonComponents/form/input'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import Survey from '../../../../../common/survey/survey'
 import Record from '../../../../../common/record/record'
-import { isRenderDropdown, nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+import { isRenderDropdown } from '../../../../../common/survey/nodeDefLayout'
 
 import { toQueryString } from '../../../../../server/serverUtils/request'
 import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
@@ -69,34 +68,16 @@ class NodeDefCodeList extends React.Component {
   }
 
   render () {
-    const {edit, label, renderType} = this.props
+    const {edit} = this.props
     const {items} = this.state
-
-    // table header
-    if (renderType === nodeDefRenderType.tableHeader) {
-      return <label className="node-def__table-header">
-        {label}
-      </label>
-    }
 
     // EDIT MODE
     if (edit)
-      return <FormItem label={label}>
-        <CodeListDropdown {...this.props} />
-      </FormItem>
+      return <CodeListDropdown {...this.props} />
 
     // ENTRY MODE
-    if (renderType === nodeDefRenderType.tableBody) {
-      return <CodeListRenderer {...this.props}
-                               items={items}/>
-    } else {
-      return (
-        <FormItem label={label}>
-          <CodeListRenderer {...this.props}
-                            items={items}/>
-        </FormItem>
-      )
-    }
+    return <CodeListRenderer {...this.props}
+                             items={items}/>
   }
 }
 

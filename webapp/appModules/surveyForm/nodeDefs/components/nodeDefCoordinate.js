@@ -22,18 +22,6 @@ class NodeDefCoordinate extends React.Component {
   render () {
     const {surveyInfo, nodeDef, nodes, edit, entry, renderType, label} = this.props
 
-    // table header
-    if (renderType === nodeDefRenderType.tableHeader) {
-      return <div className="node-def__table-row-coordinate">
-        <label className="node-def__table-header" style={{gridColumn: '1 / span 3'}}>
-          {label}
-        </label>
-        <div className="node-def__table-header">X</div>
-        <div className="node-def__table-header">Y</div>
-        <div className="node-def__table-header">SRS</div>
-      </div>
-    }
-
     const node = entry ? nodes[0] : null
     const value = node ? node.value : getNodeDefDefaultValue(nodeDef)
 
@@ -67,23 +55,21 @@ class NodeDefCoordinate extends React.Component {
     }
 
     return (
-      <FormItem label={label}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr',
-          rowGap: '.3rem',
-        }}>
-          <FormItem label="X">
-            {xInput}
-          </FormItem>
-          <FormItem label="Y">
-            {yInput}
-          </FormItem>
-          <FormItem label="SRS">
-            {srsDropdown}
-          </FormItem>
-        </div>
-      </FormItem>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        rowGap: '.3rem',
+      }}>
+        <FormItem label="X">
+          {xInput}
+        </FormItem>
+        <FormItem label="Y">
+          {yInput}
+        </FormItem>
+        <FormItem label="SRS">
+          {srsDropdown}
+        </FormItem>
+      </div>
     )
   }
 }

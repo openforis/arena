@@ -2,12 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
+import NodeDefFormItem from './components/nodeDefFormItem'
+import NodeDefTableHeader from './components/nodeDefTableHeader'
+import NodeDefMultipleTableBody from './components/nodeDefMultipleTableBody'
+
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import Record from '../../../../common/record/record'
 import Layout from '../../../../common/survey/nodeDefLayout'
 
-import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyInfo } from '../../../survey/surveyState'
 
 import { setFormNodeDefEdit, setFormNodeDefUnlocked } from '../actions'
 import { getSurveyForm, isNodeDefFormLocked } from '../surveyFormState'
@@ -132,11 +136,23 @@ class NodeDefSwitch extends React.Component {
       }
 
       {
-        renderType === Layout.nodeDefRenderType.tableHeader
-          ? <NodeDefTableHeader nodeDef={nodeDef} label={label} />
-          : renderType === Layout.nodeDefRenderType.tableBody && NodeDef.isNodeDefMultiple(nodeDef)
-          ? <NodeDefMultipleTableBody {...this.props} />
-          : React.createElement(getNodeDefComponent(nodeDef), {...this.props})
+        renderType === Layout.nodeDefRenderType.tableHeader //TABLE HEADER
+
+          ? <NodeDefTableHeader nodeDef={nodeDef} label={label}/>
+
+          : renderType === Layout.nodeDefRenderType.tableBody // TABLE BODY
+
+          ? NodeDef.isNodeDefMultiple(nodeDef) || NodeDef.isNodeDefCodeList(nodeDef)
+
+            ? <NodeDefMultipleTableBody {...this.props} />  // multiple attributes or code list
+
+            : React.createElement(getNodeDefComponent(nodeDef), {...this.props}) // single attributes
+
+          : NodeDef.isNodeDefEntity(nodeDef)
+
+            ? React.createElement(getNodeDefComponent(nodeDef), {...this.props})  // FORM (entity)
+
+            : <NodeDefFormItem {...this.props} />  // FORM (attribute)
       }
 
     </div>

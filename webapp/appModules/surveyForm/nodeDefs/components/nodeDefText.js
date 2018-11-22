@@ -10,7 +10,6 @@ import { getNodeDefInputTextProps } from '../nodeDefSystemProps'
 import NodeDef from '../../../../../common/survey/nodeDef'
 
 import Node from '../../../../../common/record/node'
-import NodeDefAtomic from './nodeDefAtomic'
 
 const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
   <Input readOnly={edit}
@@ -51,9 +50,8 @@ const MultipleTextInput = props => {
 }
 
 const NodeDefText = props =>
-
-  <NodeDefAtomic {...props}
-                 singleNodeDefComponent={TextInput}
-                 multipleNodeDefComponent={MultipleTextInput}/>
+  props.edit
+    ? <TextInput {...props} />
+    : <MultipleTextInput {...props} />
 
 export default NodeDefText

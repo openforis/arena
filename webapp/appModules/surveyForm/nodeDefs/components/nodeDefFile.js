@@ -4,7 +4,6 @@ import * as R from 'ramda'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
 import NodeDefDeleteButton from '../nodeDefDeleteButton'
-import NodeDefAtomic from './nodeDefAtomic'
 
 import { extendToParentHeight } from '../../../../appUtils/domUtils'
 
@@ -63,8 +62,8 @@ const MultipleFileInput = props => {
 }
 
 const NodeDefFile = props =>
-  <NodeDefAtomic {...props}
-                 singleNodeDefComponent={FileInput}
-                 multipleNodeDefComponent={MultipleFileInput}/>
+  props.edit
+    ? <FileInput {...props}/>
+    : <MultipleFileInput {...props}/>
 
 export default NodeDefFile

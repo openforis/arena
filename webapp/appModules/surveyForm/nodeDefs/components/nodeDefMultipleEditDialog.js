@@ -1,11 +1,10 @@
 import React from 'react'
 
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../../../commonComponents/modal'
+import { getNodeDefComponent } from '../nodeDefSystemProps'
 
 const NodeDefMultipleEditDialog = props => {
-  const {label, onClose, multipleNodeDefComponent} = props
-
-  const MultipleNodeDefComponent = multipleNodeDefComponent
+  const {nodeDef, label, onClose} = props
 
   return (
     <Modal isOpen={true}
@@ -15,7 +14,9 @@ const NodeDefMultipleEditDialog = props => {
       <ModalHeader>{label}</ModalHeader>
 
       <ModalBody>
-        <MultipleNodeDefComponent {...props}/>
+        {
+          React.createElement(getNodeDefComponent(nodeDef), {...props})
+        }
       </ModalBody>
 
       <ModalFooter>
