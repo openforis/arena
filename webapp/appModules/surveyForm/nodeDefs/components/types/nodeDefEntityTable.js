@@ -4,6 +4,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import NodeDefSwitch from '../../nodeDefSwitch'
+import NodeDeleteButton from '../nodeDeleteButton'
 
 import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
 import { getNodeDefFormFields } from '../../nodeDefSystemProps'
@@ -45,20 +46,8 @@ const EntityTableRow = (props) => {
       }
 
       {
-        renderType === nodeDefRenderType.tableBody ?
-          <button className="btn btn-s btn-of-light-xs"
-                  style={{
-                    alignSelf: 'center',
-                    justifySelf: 'center',
-                  }}
-                  onClick={() =>
-                    window.confirm('Are you sure you want to delete this entity?')
-                      ? removeNode(nodeDef, node)
-                      : null
-                  }>
-            <span className="icon icon-bin icon-12px"/>
-          </button>
-          : null
+        renderType === nodeDefRenderType.tableBody &&
+          <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={removeNode}/>
       }
 
     </div>
