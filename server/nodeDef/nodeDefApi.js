@@ -16,7 +16,7 @@ const {fetchSurveyNodeDefs} = require('./../survey/surveyManager')
 
 const UnauthorizedError = require('../authGroup/unauthorizedError')
 
-async function checkSurveyId (nodeDefId, reqSurveyId) {
+const checkSurveyId = async (nodeDefId, reqSurveyId) => {
   const nodeDef = await fetchNodeDef(nodeDefId)
   const nodeDefSurveyId = R.prop('surveyId', nodeDef)
   if (nodeDefSurveyId !== reqSurveyId) {
@@ -49,10 +49,11 @@ module.exports.init = app => {
     try {
       const {body} = req
       const {key, value} = body
+
       const nodeDefId = getRestParam(req, 'nodeDefId')
       const surveyId = getRestParam(req, 'surveyId')
 
-      await checkSurveyId(nodeDefId, 1000)
+      await checkSurveyId(nodeDefId, surveyId)
 
       await updateNodeDefProp(nodeDefId, key, value)
       const nodeDefs = await fetchSurveyNodeDefs(surveyId, true, true)
