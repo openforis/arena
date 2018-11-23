@@ -24,6 +24,12 @@ const fields = {
   vernacularName: 'vernacularName',
 }
 
+const defaultFieldValues = {
+  code: '',
+  scientificName: '',
+  vernacularName: ''
+}
+
 const TaxonAutocompleteItemRenderer = props => {
   const {item: taxon, ...otherProps} = props
 
@@ -53,14 +59,49 @@ class NodeDefTaxon extends React.Component {
     this.scientificNameField = React.createRef()
     this.vernacularNameField = React.createRef()
 
-    const value = this.getTaxonNodeValue()
-
     this.state = {
-      ...value,
+      ...defaultFieldValues,
       dirty: false,
       autocompleteOpened: false,
       autocompleteTaxa: [],
       autocompleteInputField: null,
+    }
+  }
+
+  async componentDidMount () {
+    if (this.props.entry) {
+      await this.loadSelectedTaxon()
+    }
+  }
+
+  async componentDidUpdate (prevProps) {
+    if (this.props.entry && !R.equals(prevProps.nodes, this.props.nodes)) {
+      await this.loadSelectedTaxon()
+    }
+  }
+
+  async loadSelectedTaxon () {
+    const {nodes} = this.props
+    const node = nodes[0]
+
+    let taxa = null
+    const vernacularNameUUID = Node.getNodeVernacularNameUUID(node)
+    if (vernacularNameUUID) {
+      taxa = await this.loadTaxa('vernacularNameUUID', vernacularNameUUID, true)
+    } else {
+      const taxonUUID = Node.getNodeTaxonUUID(node)
+      if (taxonUUID) {
+        taxa = await this.loadTaxa('uuid', taxonUUID, true)
+      }
+    }
+    if (taxa) {
+      const taxon = R.head(taxa)
+      this.setState({
+        code: Taxon.getTaxonCode(taxon),
+        scientificName: Taxon.getTaxonScientificName(taxon),
+      })
+    } else {
+      this.setState(defaultFieldValues)
     }
   }
 
@@ -70,13 +111,6 @@ class NodeDefTaxon extends React.Component {
       scientificName: this.scientificNameField,
       vernacularName: this.vernacularNameField,
     }
-  }
-
-  getTaxonNodeValue () {
-    const {nodeDef, edit, nodes} = this.props
-    const node = edit ? null : nodes[0]
-
-    return Node.getNodeValue(node, getNodeDefDefaultValue(nodeDef))
   }
 
   async onInputFieldChange (field, value) {
@@ -98,22 +132,16 @@ class NodeDefTaxon extends React.Component {
     })
 
     if (autocompleteOpened) {
-      await this.loadTaxa(field, value)
+      await this.loadAutocompleteTaxa(field, value)
     }
   }
 
   onTaxonSelect (taxonSearchResult) {
     const value = {
-      code: Taxon.getTaxonCode(taxonSearchResult),
-      family: Taxon.getTaxonFamily(taxonSearchResult),
-      genus: Taxon.getTaxonGenus(taxonSearchResult),
-      scientificName: Taxon.getTaxonScientificName(taxonSearchResult),
+      taxonUUID: taxonSearchResult.uuid
     }
     const nodeValue = taxonSearchResult.vernacularName
-      ? R.pipe(
-        R.assoc('vernacularName', R.prop('vernacularName', taxonSearchResult)),
-        R.assoc('vernacularLanguage', R.prop('vernacularLanguage', taxonSearchResult))
-      )(value)
+      ? R.assoc('vernacularNameUUID', R.prop('vernacularNameUUID', taxonSearchResult), value)
       : value
 
     this.onValueChange(nodeValue)
@@ -142,11 +170,12 @@ class NodeDefTaxon extends React.Component {
     })
   }
 
-  async loadTaxa (field, value) {
+  async loadTaxa (field, value, strict = false) {
     const {surveyInfo, taxonomy} = this.props
 
     const searchValue =
-      field === fields.code
+      strict ? value
+        : field === fields.code
         ? `${value}*` //starts with value
         : `*${value}*` //contains value
 
@@ -160,7 +189,12 @@ class NodeDefTaxon extends React.Component {
     }
 
     const {data} = await axios.get(`/api/survey/${surveyInfo.id}/taxonomies/${taxonomy.id}/taxa?${toQueryString(params)}`)
-    this.setState({autocompleteTaxa: data.taxa})
+    return data.taxa
+  }
+
+  async loadAutocompleteTaxa (field, value) {
+    const taxa = await this.loadTaxa(field, value)
+    this.setState({autocompleteTaxa: taxa})
   }
 
   render () {

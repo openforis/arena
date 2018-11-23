@@ -10,6 +10,14 @@ const {
 const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
 const Taxonomy = require('../../common/survey/taxonomy')
 
+const filterProps = {
+  uuid: 'uuid',
+  code: 'code',
+  scientificName: 'scientificName',
+  vernacularName: 'vernacularName',
+  vernacularNameUUID: 'vernacularNameUUID',
+}
+
 // ============== CREATE
 
 const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
@@ -99,30 +107,43 @@ const fetchTaxaByPropLike = async (surveyId,
 
   const filterProp = R.head(R.keys(filter))
   const filterValue = R.prop(filterProp)(filter)
-  const searchValue = filterValue ?
-    R.pipe(
-      R.trim,
-      R.toLower,
-      R.replace(/\*/g, '%')
-    )(filterValue) : null
 
-  if (searchValue && filterProp === 'vernacularName') {
-    return fetchTaxaByVernacularName(surveyId, taxonomyId, searchValue, sort, limit, offset, draft, client)
+  if (filterValue) {
+    const searchValue =
+      R.pipe(
+        R.trim,
+        R.toLower,
+        R.replace(/\*/g, '%')
+      )(filterValue)
+
+    switch (filterProp) {
+      case filterProps.vernacularName:
+        return fetchTaxaByVernacularName(surveyId, taxonomyId, searchValue, sort, limit, offset, draft, client)
+      case filterProps.uuid:
+        const taxon = await fetchTaxonByUUID(surveyId, searchValue, draft, client)
+        return taxon ? [taxon] : []
+      case filterProps.vernacularNameUUID:
+        const vernacularName = await fetchTaxonVernacularNameByUUID(surveyId, searchValue, draft, client)
+        return vernacularName ? [vernacularName] : []
+      default:
+
+        const propsCol = draft ? 'props_draft' : 'props'
+
+        return await client.map(
+          `SELECT * FROM (
+              SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
+              WHERE taxonomy_id = $1 
+                ${searchValue ? `AND lower(${propsCol}->>'${filterProp}') LIKE '${searchValue}'` : ''}
+              ORDER BY ${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
+            ) AS sorted_taxa 
+              LIMIT ${limit ? limit : 'ALL'} 
+              OFFSET $2`,
+          [taxonomyId, offset],
+          record => dbTransformCallback(record, draft)
+        )
+    }
   } else {
-    const propsCol = draft ? 'props_draft' : 'props'
-
-    return await client.map(
-      `SELECT * FROM (
-          SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
-          WHERE taxonomy_id = $1 
-            ${searchValue ? `AND lower(${propsCol}->>'${filterProp}') LIKE '${searchValue}'` : ''}
-          ORDER BY ${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
-        ) AS sorted_taxa 
-          LIMIT ${limit ? limit : 'ALL'} 
-          OFFSET $2`,
-      [taxonomyId, offset],
-      record => dbTransformCallback(record, draft)
-    )
+    return []
   }
 }
 
@@ -139,6 +160,7 @@ const fetchTaxaByVernacularName = async (surveyId,
   return await client.map(
     `SELECT * FROM (
         SELECT t.*, 
+          vn.uuid AS vernacular_uuid,
           vn.${propsCol}->>'name' AS vernacular_name, 
           vn.${propsCol}->>'lang' AS vernacular_language
         FROM ${getSurveyDBSchema(surveyId)}.taxon t
@@ -154,6 +176,28 @@ const fetchTaxaByVernacularName = async (surveyId,
     record => dbTransformCallback(record, draft)
   )
 }
+
+const fetchTaxonVernacularNameByUUID = async (surveyId, uuid, draft = false, client = db) =>
+  await client.one(
+    `SELECT t.*, 
+       vn.uuid AS vernacular_uuid,
+       vn.${propsCol}->>'name' AS vernacular_name, 
+       vn.${propsCol}->>'lang' AS vernacular_language
+     FROM ${getSurveyDBSchema(surveyId)}.taxon t
+       LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
+       ON vn.taxon_uuid = t.uuid
+     WHERE vn.uuid = $1
+    `, [uuid],
+    record => dbTransformCallback(record, draft)
+  )
+
+const fetchTaxonByUUID = async (surveyId, uuid, draft = false, client = db) =>
+  await client.one(
+    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
+     WHERE uuid = $1
+    `, [uuid],
+    record => dbTransformCallback(record, draft)
+  )
 
 // ============== UPDATE
 

@@ -8,6 +8,7 @@ import NodeDeleteButton from '../nodeDeleteButton'
 import { limitToParentHeight } from '../../../../../appUtils/domUtils'
 
 import { getNodeValue, getNodeFileName } from '../../../../../../common/record/node'
+import NodeDef from '../../../../../../common/survey/nodeDef'
 
 const getFileExtension = R.pipe(
   getNodeFileName,
@@ -64,6 +65,8 @@ const MultipleFileInput = props => {
 const NodeDefFile = props =>
   props.edit
     ? <FileInput {...props}/>
-    : <MultipleFileInput {...props}/>
+    : NodeDef.isNodeDefMultiple(props.nodeDef)
+    ? <MultipleFileInput {...props}/>
+    : <FileInput {...props} node={props.nodes[0]}/>
 
 export default NodeDefFile
