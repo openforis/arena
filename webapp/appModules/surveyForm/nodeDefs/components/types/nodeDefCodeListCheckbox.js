@@ -8,26 +8,25 @@ import Node from '../../../../../../common/record/node'
 const Checkbox = props => {
   const {language, edit, item, nodeDef, parentNode, nodes, updateNode, removeNode} = props
 
-  const itemCode = CodeList.getCodeListItemCode(item)
-  const matchingNode = R.find(node => Node.getNodeValue(node).code === itemCode)(nodes)
-  const selected = !R.isNil(matchingNode)
+  const itemUUID = item.uuid
+  const node = R.find(node => Node.getNodeItemUUID(node) === itemUUID)(nodes)
 
   return (
     <button
-      className={`btn btn-of-light ${selected ? 'active' : ''}`}
+      className={`btn btn-of-light ${node ? 'active' : ''}`}
       style={{
         pointerEvents: 'all',
       }}
       aria-disabled={edit}
       onClick={() => {
-        if (selected) {
-          removeNode(nodeDef, matchingNode)
+        if (node) {
+          removeNode(nodeDef, node)
         } else {
           const nodeToUpdate =
             (NodeDef.isNodeDefMultiple(nodeDef) || R.isEmpty(nodes))
               ? Node.newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
               : nodes[0]
-          updateNode(nodeDef, nodeToUpdate, {code: itemCode})
+          updateNode(nodeDef, nodeToUpdate, {itemUUID})
         }
       }}>
       {CodeList.getCodeListItemLabel(language)(item)}

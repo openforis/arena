@@ -45,7 +45,7 @@ export const setCodeListItemForEdit = (codeList, level, item, edit = true) => as
   dispatch({type: codeListEditLevelActiveItemUpdate, levelIndex: level.index, itemUUID})
 
   //load child items
-  dispatch(loadCodeListLevelItems(codeList.id, level.index + 1, item.id))
+  dispatch(loadCodeListLevelItems(codeList.id, level.index + 1, item.uuid))
 }
 
 //======
@@ -84,7 +84,7 @@ export const createCodeListItem = (codeList, level, parentItem) => async (dispat
 //======
 
 // load items for specified level
-const loadCodeListLevelItems = (codeListId, levelIndex = 0, parentId = null) =>
+const loadCodeListLevelItems = (codeListId, levelIndex = 0, parentUUID = null) =>
   async (dispatch, getState) => {
     //reset level items first
     dispatch({type: codeListItemsUpdate, levelIndex, items: null})
@@ -93,7 +93,7 @@ const loadCodeListLevelItems = (codeListId, levelIndex = 0, parentId = null) =>
     const {data} = await axios.get(`/api/survey/${surveyId}/codeLists/${codeListId}/items`, {
       params: {
         draft: true,
-        parentId
+        parentUUID
       }
     })
     const items = toUUIDIndexedObj(data.items)

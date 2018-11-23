@@ -69,34 +69,28 @@ const getParentNode = node => node.parentId
     ? getNodeByUUID(node.parentUUID)
     : R.F
 
-const getNodeCodeParentAttribute = (survey, parentNode, nodeDef) =>
-  record => {
-    const parentCodeDefUUID = NodeDef.getNodeDefParentCodeUUID(nodeDef)
-    if (parentCodeDefUUID) {
-      const parentCodeDef = Survey.getNodeDefByUUID(parentCodeDefUUID)(survey)
-      let parentEntity = parentNode
-      while (parentEntity) {
-        const parentCodes = getNodeChildrenByDefId(parentEntity, parentCodeDef.id)(record)
-        if (!R.isEmpty(parentCodes)) {
-          return R.head(parentCodes)
-        }
-        parentEntity = getParentNode(parentEntity)(record)
+const findNodeInAncestorEntities = (parentNode, predicate) => record => {
+  let parentEntity = parentNode
+  while (parentEntity) {
+    const children = getNodeChildren(parentEntity)(record)
+    for (let child of children) {
+      if (predicate(child)) {
+        return child
       }
     }
-    return null
+    parentEntity = getParentNode(parentEntity)(record)
   }
+  return null
+}
 
-const getNodeCodeAncestorValues = (survey, parentNode, nodeDef) =>
+const getParentCodeAttribute = (survey, parentNode, nodeDef) =>
   record => {
-    const parentCodeAttribute = getNodeCodeParentAttribute(survey, parentNode, nodeDef)(record)
-    if (parentCodeAttribute) {
-      const parentCodeDef = Survey.getNodeDefById(Node.getNodeDefId(parentCodeAttribute))(survey)
-      const ancestorCodes = getNodeCodeAncestorValues(survey, getParentNode(parentCodeAttribute)(record), parentCodeDef)(record)
-      const parentCodeAttrValue = R.propOr(null, 'code', Node.getNodeValue(parentCodeAttribute))
-      return R.append(parentCodeAttrValue, ancestorCodes)
-    } else {
-      return []
-    }
+    const parentCodeDef = Survey.getNodeDefByUUID(NodeDef.getNodeDefParentCodeUUID(nodeDef))(survey)
+    return parentCodeDef
+      ? findNodeInAncestorEntities(parentNode,
+        node => Node.getNodeDefId(node) === parentCodeDef.id
+      )(record)
+      : null
   }
 
 const getNodeCodeDependentAttributes = (survey, node) =>
@@ -152,8 +146,7 @@ module.exports = {
   getNodeChildrenByDefId,
   getRootNode,
   getNodeByUUID,
-  getParentNode,
-  getNodeCodeAncestorValues,
+  getParentCodeAttribute,
   getNodeCodeDependentAttributes,
 
   // ====== UPDATE

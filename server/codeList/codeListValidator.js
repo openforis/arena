@@ -41,16 +41,16 @@ const itemValidators = (items) => ({
   'props.code': [validateRequired, validateItemPropUniqueness(items)],
 })
 
-const validateItem = async (codeList, items, itemId) => {
-  const item = R.find(R.propEq('id', itemId))(items)
-  const validation = await validate(item, itemValidators(items.filter(i => i.parentId === item.parentId)))
+const validateItem = async (codeList, items, itemUUID) => {
+  const item = R.find(R.propEq('uuid', itemUUID))(items)
+  const validation = await validate(item, itemValidators(items.filter(i => i.parentUUID === item.parentUUID)))
 
   const isLeaf = CodeList.isCodeListItemLeaf(item)(codeList)
 
   if (isLeaf) {
     return {[item.uuid]: validation}
   } else {
-    const childValidations = await validateItemsByParentId(codeList, items, item.id)
+    const childValidations = await validateItemsByParentUUID(codeList, items, item.uuid)
 
     const childrenValid = childValidations.valid
 
@@ -68,12 +68,12 @@ const validateItem = async (codeList, items, itemId) => {
 
 }
 
-const validateItemsByParentId = async (codeList, items, parentItemId) => {
-  const children = R.filter(R.propEq('parentId', parentItemId), items)
+const validateItemsByParentUUID = async (codeList, items, parentItemUUID) => {
+  const children = R.filter(R.propEq('parentUUID', parentItemUUID), items)
   const emptyChildren = R.isEmpty(children)
 
   const childValidations = await Promise.all(children.map(
-    async child => await validateItem(codeList, items, child.id)
+    async child => await validateItem(codeList, items, child.uuid)
   ))
 
   const childrenValid =
@@ -95,7 +95,7 @@ const validateCodeListProps = async (codeLists, codeList) =>
 const validateCodeList = async (codeLists, codeList, items) => {
   const codeListValidation = await validateCodeListProps(codeLists, codeList)
   const levelsValidation = await validateLevels(codeList)
-  const itemsValidation = await validateItemsByParentId(codeList, items, null)
+  const itemsValidation = await validateItemsByParentUUID(codeList, items, null)
 
   const valid = codeListValidation.valid && levelsValidation.valid && itemsValidation.valid
 

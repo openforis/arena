@@ -90,15 +90,6 @@ const fetchCodeListsBySurveyId = async (surveyId, draft = false, validate = true
     : codeListsWithLevels
 }
 
-const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = false) =>
-  await codeListRepository.fetchCodeListItemsByCodeListId(surveyId, codeListId, draft)
-
-const fetchCodeListItemsByParentId = async (surveyId, codeListId, parentId = null, draft = false) =>
-  await codeListRepository.fetchCodeListItemsByParentId(surveyId, codeListId, parentId, draft)
-
-const fetchCodeListItemsByAncestorCodes = async (surveyId, codeListId, ancestorCodes, draft = false) =>
-  await codeListRepository.fetchCodeListItemsByAncestorCodes(surveyId, codeListId, ancestorCodes, draft)
-
 // ====== UPDATE
 
 const publishCodeListsProps = async (surveyId, client = db) => {
@@ -168,9 +159,9 @@ module.exports = {
   //READ
   fetchCodeListById,
   fetchCodeListsBySurveyId,
-  fetchCodeListItemsByCodeListId,
-  fetchCodeListItemsByParentId,
-  fetchCodeListItemsByAncestorCodes,
+  fetchCodeListItemsByCodeListId: codeListRepository.fetchCodeListItemsByCodeListId,
+  fetchCodeListItemsByParentUUID: codeListRepository.fetchCodeListItemsByParentUUID,
+  fetchCodeListItemByUUID: codeListRepository.fetchCodeListItemByUUID,
 
   //UPDATE
   publishCodeListsProps,
