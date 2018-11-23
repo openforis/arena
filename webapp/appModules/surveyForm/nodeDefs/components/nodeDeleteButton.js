@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default ({nodeDef, node, disabled, showConfirm = false, removeNode}) =>
+export default ({nodeDef, node, disabled = false, showConfirm = true, removeNode}) =>
   <button className="btn btn-s btn-of-light-xs btn-delete"
           style={{
             alignSelf: 'center',

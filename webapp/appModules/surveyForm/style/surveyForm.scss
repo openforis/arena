@@ -1,6 +1,8 @@
 @import "../../../style/vars";
 
-$tableBorder: 1px solid rgba($white, .7);
+$tableBorderColor: rgba($white, .7);
+$tableBorder: 1px solid $tableBorderColor;
+$tableRowHeaderHeight: 40px;
 
 .survey-form {
   display: grid;
@@ -119,23 +121,56 @@ $tableBorder: 1px solid rgba($white, .7);
   letter-spacing: 0px;
 }
 
+//===
+//nodeDefEntity table
+//===
 .node-def__table {
   display: grid;
   align-self: start;
-  grid-template-rows: 30px 50px 1fr;
+  grid-template-rows: $tableRowHeaderHeight 1fr;
+  position: relative;
+  height: 100%;
 }
 
-.node-def__table-entity-header {
+.node-def__table-header {
   justify-self: center;
   align-self: center;
   text-transform: uppercase;
   font-weight: 400;
   display: flex;
   align-items: center;
+  height: $tableRowHeaderHeight;
 }
 
-.node-def__table-header {
+.node-def__table-rows {
+  position: absolute;
+  top: 40px;
+  width: 100%;
+  height: calc(100% - 40px);
+  overflow-x: auto;
+}
+
+.node-def__table-row-header {
+  position: absolute;
+  display: flex;
+  height: $tableRowHeaderHeight;
+  //width: 100%;
+  background-color: rgba($white, 0.1);
+  border-bottom: 2px solid $tableBorderColor;
+
+  .react-grid-item {
+    border-right: 1px solid transparent;
+
+    &:first-child {
+      border-left: 1px solid transparent;
+    }
+  }
+
+}
+
+.node-def__table-column-header {
   display: grid;
+  //height: $tableRowHeaderHeight;
 
   label {
     justify-self: center;
@@ -145,11 +180,38 @@ $tableBorder: 1px solid rgba($white, .7);
   }
 }
 
+.node-def__table-data-rows {
+  position: absolute;
+  top: 40px;
+  height: calc(100% - 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .node-def__table-row {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr 40px;
-  border-bottom: $tableBorder;
+  display: flex;
+
+  .form-input {
+    border: none;
+    padding: 0 .5rem;
+  }
+
+  .react-grid-item {
+    border-right: $tableBorder;
+    border-bottom: $tableBorder;
+
+    &:first-child {
+      border-left: $tableBorder;
+    }
+  }
+
+}
+
+.node-def__table-data-composite-attr {
+  > div:not(:last-child) {
+    border-right: $tableBorder;
+  }
 }
 
 .node-def__table-row-coordinate {
@@ -162,29 +224,3 @@ $tableBorder: 1px solid rgba($white, .7);
   grid-template-columns: .2fr .5fr .3fr;
 }
 
-.node-def__table-data-rows {
-  display: grid;
-  overflow-y: scroll;
-  position: absolute;
-  width: 100%;
-  top: 80px;
-
-  .form-input {
-    border: none;
-  }
-
-  .react-grid-item {
-    border-right: $tableBorder;
-
-    &:first-child {
-      border-left: $tableBorder;
-    }
-  }
-
-  .node-def__table-data-composite-attr {
-    > div:not(:last-child) {
-      border-right: $tableBorder;
-    }
-  }
-
-}
