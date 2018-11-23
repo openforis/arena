@@ -8,6 +8,18 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 import CodeList from '../../../../../../common/survey/codeList'
 import Node from '../../../../../../common/record/node'
 
+const determineNodeToUpdate = (nodes, parentNode, multiple) => {
+  const placeholder = R.find(R.propEq('placeholder', true))(nodes)
+
+  return (
+    placeholder
+      ? placeholder
+      : nodes.length === 1 && !multiple
+      ? nodes[0]
+      : Node.newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
+  )
+}
+
 const NodeDefCodeListDropdown = props => {
   const {language, edit, nodeDef, nodes, items = []} = props
 
@@ -15,41 +27,34 @@ const NodeDefCodeListDropdown = props => {
 
   const disabled = R.isEmpty(items)
 
-  const selectedCodes = R.pipe(
+  const selectedItemUUIDs = R.pipe(
     R.values,
     R.reject(node => node.placeholder),
-    R.map(n => Node.getNodeValue(n).code),
-    R.reject(R.isNil)
+    R.map(n => Node.getNodeValue(n).itemUUID),
+    R.reject(R.isNil),
   )(nodes)
 
-  const selectedItems = R.filter(item => R.contains(CodeList.getCodeListItemCode(item))(selectedCodes))(items)
+  const selectedItems = R.filter(item => R.contains(item.uuid)(selectedItemUUIDs))(items)
 
   const handleSelectedItemsChange = (newSelectedItems) => {
     const {nodeDef, nodes, parentNode, removeNode, updateNode} = props
 
-    const newSelectedCodes = newSelectedItems.map(item => CodeList.getCodeListItemCode(item))
+    const newSelectedItem = R.head(R.difference(newSelectedItems, selectedItems))
 
     if (multiple) {
       //remove deselected node
-      const removedNode = R.find(n => !R.contains(Node.getNodeValue(n).code, newSelectedCodes))(nodes)
-      if (removedNode && removedNode.id) {
-        removeNode(nodeDef, removedNode)
+      const deselectedItem = R.head(R.difference(selectedItems, newSelectedItems))
+      if (deselectedItem) {
+        const removedNode = R.find(n => Node.getNodeValue(n).itemUUID === deselectedItem.uuid)(nodes)
+        if (removedNode && removedNode.id) {
+          removeNode(nodeDef, removedNode)
+        }
       }
     }
-    //add new node or update existing one
-    const newSelectedCode = R.pipe(
-      R.find(code => !R.contains(code, selectedCodes)),
-      R.defaultTo(null),
-    )(newSelectedCodes)
 
-    const placeholder = R.find(R.propEq('placeholder', true))(nodes)
-    const nodeToUpdate = placeholder
-      ? placeholder
-      : nodes.length === 1 && !multiple
-        ? nodes[0]
-        : Node.newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
+    const nodeToUpdate = determineNodeToUpdate(nodes, parentNode, multiple)
 
-    updateNode(nodeDef, nodeToUpdate, {code: newSelectedCode})
+    updateNode(nodeDef, nodeToUpdate, {itemUUID: newSelectedItem ? newSelectedItem.uuid : null})
   }
 
   return multiple

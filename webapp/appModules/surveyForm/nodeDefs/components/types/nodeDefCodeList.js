@@ -18,11 +18,6 @@ import { getStateSurveyInfo, getSurvey } from '../../../../../survey/surveyState
 import { getRecord } from '../../../record/recordState'
 import { getSurveyForm } from '../../../surveyFormState'
 
-const CodeListRenderer = props =>
-  isRenderDropdown(props.nodeDef)
-    ? <NodeDefCodeListDropdown {...props}/>
-    : <NodeDefCodeListCheckbox {...props}/>
-
 class NodeDefCodeList extends React.Component {
 
   constructor (props) {
@@ -68,16 +63,22 @@ class NodeDefCodeList extends React.Component {
   }
 
   render () {
-    const {edit} = this.props
+    const {edit, nodeDef} = this.props
     const {items} = this.state
 
-    // EDIT MODE
-    if (edit)
-      return <NodeDefCodeListDropdown {...this.props} />
-
-    // ENTRY MODE
-    return <CodeListRenderer {...this.props}
-                             items={items}/>
+    return edit
+      ? (
+        // EDIT MODE
+        <NodeDefCodeListDropdown {...this.props} />
+      )
+      : (
+        // ENTRY MODE
+        isRenderDropdown(nodeDef)
+          ? <NodeDefCodeListDropdown {...this.props}
+                                     items={items}/>
+          : <NodeDefCodeListCheckbox {...this.props}
+                                     items={items}/>
+      )
   }
 }
 
