@@ -103,7 +103,7 @@ const fetchTaxaByPropLike = async (surveyId,
     R.pipe(
       R.trim,
       R.toLower,
-      R.replace('*', '%')
+      R.replace(/\*/g, '%')
     )(filterValue) : null
 
   if (searchValue && filterProp === 'vernacularName') {

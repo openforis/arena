@@ -1,21 +1,21 @@
-import '../../style/react-grid-layout.scss'
+import '../../../style/react-grid-layout.scss'
 
 import React from 'react'
 import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
-import NodeDefSwitch from '../nodeDefSwitch'
+import NodeDefSwitch from '../../nodeDefSwitch'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefFieldsCount } from '../nodeDefSystemProps'
-import { elementOffset } from '../../../../appUtils/domUtils'
+import { getNodeDefFormFields } from '../../nodeDefSystemProps'
+import { elementOffset } from '../../../../../appUtils/domUtils'
 
-import { newNode } from '../../../../../common/record/node'
+import { newNode } from '../../../../../../common/record/node'
 
-const rowHeight = 50
+const rowHeight = 35
 
 const EntityTableRow = (props) => {
 
@@ -28,7 +28,7 @@ const EntityTableRow = (props) => {
 
   const childDefsLayout = R.reduce(
     (layout, childDef) => {
-      const count = getNodeDefFieldsCount(childDef)
+      const count = getNodeDefFormFields(childDef).length
       const {columns} = layout
       return R.pipe(
         R.assoc('columns', columns + count),
@@ -135,7 +135,7 @@ class NodeDefEntityTable extends React.Component {
     return (
       <div className="node-def__table">
 
-        <div className="node-def__table-header">
+        <div className="node-def__table-entity-header">
           <h5>{label}</h5>
           {
             entry

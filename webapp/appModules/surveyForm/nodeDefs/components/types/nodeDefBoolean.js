@@ -1,10 +1,6 @@
 import React from 'react'
 
-import { FormItem } from '../../../../commonComponents/form/input'
-
-import { nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
-import { getNodeValue } from '../../../../../common/record/node'
-
+import { getNodeValue } from '../../../../../../common/record/node'
 
 const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value, entry}) => {
   const node = entry ? nodes[0] : null
@@ -23,7 +19,8 @@ const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value,
 
 }
 
-const Buttons = props =>
+const NodeDefBoolean = props =>
+
   <div style={{borderBottom: 'none', textAlign: 'center'}}>
 
     <Button {...props}
@@ -37,28 +34,5 @@ const Buttons = props =>
             value="false"/>
 
   </div>
-
-const NodeDefBoolean = props => {
-  const {renderType, label} = props
-
-  if (renderType === nodeDefRenderType.tableHeader) {
-
-    return <label className="node-def__table-header">
-      {label}
-    </label>
-
-  } else if (renderType === nodeDefRenderType.tableBody) {
-
-    return <Buttons {...props}/>
-
-  } else {
-
-    return <FormItem label={label}>
-      <Buttons {...props}/>
-    </FormItem>
-
-  }
-
-}
 
 export default NodeDefBoolean

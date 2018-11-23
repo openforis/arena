@@ -18,6 +18,9 @@ export const Input = React.forwardRef((props, ref) => {
     validation = {},
     disabled = false,
     mask = false,
+    onChange,
+    onValueChange,
+    value,
     ...inputProps
   } = props
 
@@ -29,6 +32,14 @@ export const Input = React.forwardRef((props, ref) => {
                 className="form-input"
                 aria-disabled={disabled}
                 isControlled={true}
+                value={value}
+                onChange={(e, {caretPosition, value: newValue}) => {
+                  if (onChange)
+                    onChange(e)
+                  if (onValueChange && value !== newValue) {
+                    onValueChange(newValue)
+                  }
+                }}
                 {...inputProps}
       />
     </TooltipError>

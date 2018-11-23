@@ -2,21 +2,25 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
+import NodeDefFormItem from './components/nodeDefFormItem'
+import NodeDefTableHeader from './components/nodeDefTableHeader'
+
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import Record from '../../../../common/record/record'
 import Layout from '../../../../common/survey/nodeDefLayout'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyInfo } from '../../../survey/surveyState'
 
 import { setFormNodeDefEdit, setFormNodeDefUnlocked } from '../actions'
 import { getSurveyForm, isNodeDefFormLocked } from '../surveyFormState'
 
 import { putNodeDefProp, removeNodeDef } from '../../../survey/nodeDefs/actions'
-import { getNodeDefComponent, getNodeDefDefaultValue } from './nodeDefSystemProps'
+import { getNodeDefDefaultValue } from './nodeDefSystemProps'
 
 import { getRecord } from '../record/recordState'
 import { createNodePlaceholder, updateNode, removeNode } from '../record/actions'
+import NodeDefTableBody from './components/nodeDefTableBody'
 
 class NodeDefSwitch extends React.Component {
 
@@ -53,6 +57,9 @@ class NodeDefSwitch extends React.Component {
       nodeDef,
       edit,
       locked,
+
+      renderType,
+      label,
 
       setFormNodeDefEdit,
       putNodeDefProp,
@@ -129,7 +136,11 @@ class NodeDefSwitch extends React.Component {
       }
 
       {
-        React.createElement(getNodeDefComponent(nodeDef), {...this.props})
+        renderType === Layout.nodeDefRenderType.tableHeader
+          ? <NodeDefTableHeader nodeDef={nodeDef} label={label}/>
+          : renderType === Layout.nodeDefRenderType.tableBody
+          ? <NodeDefTableBody {...this.props}/>
+          : <NodeDefFormItem {...this.props} />
       }
 
     </div>
@@ -143,7 +154,7 @@ NodeDefSwitch.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const {nodeDef, parentNode, entry} = props
-  const survey = getSurvey(state)
+  const surveyInfo = getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
 
   const mapEntryProps = () => ({
@@ -157,7 +168,7 @@ const mapStateToProps = (state, props) => {
   return {
     // always unlocking attributes
     locked: NodeDef.isNodeDefEntity(nodeDef) ? isNodeDefFormLocked(nodeDef)(surveyForm) : false,
-    label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(survey)),
+    label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
     ...entry ? mapEntryProps() : {},
   }
 }

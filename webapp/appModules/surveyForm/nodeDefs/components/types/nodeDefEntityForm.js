@@ -1,26 +1,26 @@
-import '../../style/react-grid-layout.scss'
+import '../../../style/react-grid-layout.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
-import NodeDefSwitch from '../nodeDefSwitch'
+import NodeDefSwitch from '../../nodeDefSwitch'
 
-const ResponsiveGridLayout = WidthProvider(Responsive)
-
-import NodeDef from '../../../../../common/survey/nodeDef'
-import { newNode } from '../../../../../common/record/node'
+import NodeDef from '../../../../../../common/survey/nodeDef'
+import { newNode } from '../../../../../../common/record/node'
 
 import {
   nodeDefLayoutProps,
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
-} from '../../../../../common/survey/nodeDefLayout'
-import { getFormPageNodeUUID, getSurveyForm } from '../../../../appModules/surveyForm/surveyFormState'
+} from '../../../../../../common/survey/nodeDefLayout'
+import { getFormPageNodeUUID, getSurveyForm } from '../../../../../appModules/surveyForm/surveyFormState'
 
-import { setFormPageNode } from '../../actions'
+import { setFormPageNode } from '../../../actions'
+
+const ResponsiveGridLayout = WidthProvider(Responsive)
 
 const EntityForm = props => {
   const {
@@ -59,8 +59,7 @@ const EntityForm = props => {
                               onLayoutChange={onLayoutChange}
                               isDraggable={edit && !locked}
                               isResizable={edit && !locked}
-        //TODO decide if verticalCompact
-                              compactType={'vertical'}
+                              verticalCompact={false}
                               useCSSTransforms={false}>
 
         {
