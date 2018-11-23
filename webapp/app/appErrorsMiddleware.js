@@ -6,7 +6,7 @@ import { appErrorCreate } from './actions'
 const createAxiosMiddleware = (axios) => ({ dispatch, getState }) => {
 
   axios.interceptors.response.use(null, (error) => {
-    const message = R.path(['response', 'data', 'error'], error) || error.message
+    const message = R.pathOr(error.message, ['response', 'data', 'error'], error)
     dispatch({type: appErrorCreate, error: {...error, message}})
 
     return Promise.reject(error);

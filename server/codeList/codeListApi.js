@@ -20,6 +20,8 @@ const {
   deleteCodeListItem,
 } = require('../codeList/codeListManager')
 
+const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
+
 const sendValidatedCodeList = async (surveyId, codeListId, res, rest = {}) => {
   const codeList = await fetchCodeListById(surveyId, codeListId, true, true)
 
@@ -29,7 +31,7 @@ const sendValidatedCodeList = async (surveyId, codeListId, res, rest = {}) => {
 module.exports.init = app => {
 
   // ==== CREATE
-  app.post('/survey/:surveyId/codeLists', async (req, res) => {
+  app.post('/survey/:surveyId/codeLists', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
 
@@ -43,7 +45,7 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/survey/:surveyId/codeLists/:codeListId/levels', async (req, res) => {
+  app.post('/survey/:surveyId/codeLists/:codeListId/levels', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
@@ -57,7 +59,7 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/survey/:surveyId/codeLists/:codeListId/items', async (req, res) => {
+  app.post('/survey/:surveyId/codeLists/:codeListId/items', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
@@ -122,7 +124,7 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/codeLists/:codeListId', async (req, res) => {
+  app.put('/survey/:surveyId/codeLists/:codeListId', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
@@ -137,7 +139,7 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/survey/:surveyId/codeLists/:codeListId/levels/:levelId', async (req, res) => {
+  app.put('/survey/:surveyId/codeLists/:codeListId/levels/:levelId', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
@@ -153,7 +155,7 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/survey/:surveyId/codeLists/:codeListId/items/:itemId', async (req, res) => {
+  app.put('/survey/:surveyId/codeLists/:codeListId/items/:itemId', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
@@ -171,7 +173,7 @@ module.exports.init = app => {
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId/codeLists/:codeListId', async (req, res) => {
+  app.delete('/survey/:surveyId/codeLists/:codeListId', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
@@ -184,7 +186,7 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/codeLists/:codeListId/levels/:levelId', async (req, res) => {
+  app.delete('/survey/:surveyId/codeLists/:codeListId/levels/:levelId', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
@@ -198,7 +200,7 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/codeLists/:codeListId/items/:itemId', async (req, res) => {
+  app.delete('/survey/:surveyId/codeLists/:codeListId/items/:itemId', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
