@@ -29,15 +29,12 @@ const newNodePlaceholder = (nodeDef, parentNode, value = null) =>
  * ======
  */
 
-const getNodeValue = (node = {}, defaultValue = {}) => R.pipe(
-  R.prop('value'),
-  R.defaultTo(defaultValue)
-)(node)
+const getNodeValue = (node = {}, defaultValue = {}) =>
+  R.propOr(defaultValue, 'value', node)
 
-const getNodeFileName = R.pipe(
+const getNodeValueProp = (prop, defaultValue = null) => R.pipe(
   getNodeValue,
-  R.prop('fileName'),
-  R.defaultTo(''),
+  R.propOr(defaultValue, prop),
 )
 
 /**
@@ -73,7 +70,8 @@ module.exports = {
   getNodeValue,
   getNodeDefId: R.prop('nodeDefId'),
   getNodeRecordId: R.prop('recordId'),
-  getNodeFileName,
+  getNodeFileName: getNodeValueProp('fileName', ''),
+  getNodeItemUUID: getNodeValueProp('itemUUID'),
 
   // ==== UTILS
   isNodeValueBlank,

@@ -8,8 +8,12 @@ const {
   deleteSurveySchemaTableRecord,
   deleteSurveySchemaTableProp
 } = require('../survey/surveySchemaRepositoryUtils')
-const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
-const CodeList = require('../../common/survey/codeList')
+const NodeDefRepository = require('../nodeDef/nodeDefRepository')
+
+const dbTransformCallback = (record, draft) => R.pipe(
+  R.assoc('parentUUID', R.prop('parent_uuid')(record)),
+  R.dissoc('parentUuid')
+)(NodeDefRepository.dbTransformCallback(record, draft))
 
 // ============== CREATE
 
@@ -33,10 +37,10 @@ const insertCodeListLevel = async (surveyId, codeListId, level, client = db) =>
 
 const insertCodeListItem = async (surveyId, item, client = db) =>
   await client.one(`
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.code_list_item (uuid, level_id, parent_id, props_draft)
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.code_list_item (uuid, level_id, parent_uuid, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [item.uuid, item.levelId, item.parentId, item.props],
+    [item.uuid, item.levelId, item.parentUUID, item.props],
     def => dbTransformCallback(def, true)
   )
 
@@ -77,31 +81,37 @@ const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = fals
     : R.filter(item => item.published)(items)
 }
 
-const fetchCodeListItemsByParentId = async (surveyId, codeListId, parentId = null, draft = false, client = db) => {
-  const items = await fetchCodeListItemsByCodeListId(surveyId, codeListId, draft, client)
-  return filterCodeListItemsByParentId(items, parentId)
+const fetchCodeListItemsByParentUUID = async (surveyId, codeListId, parentUUID = null, draft = false, client = db) => {
+  const items = await client.map(`
+    SELECT i.* 
+    FROM ${getSurveyDBSchema(surveyId)}.code_list_item i
+    JOIN ${getSurveyDBSchema(surveyId)}.code_list_level l 
+      ON l.id = i.level_id
+      AND l.code_list_id = $1
+    WHERE i.parent_uuid ${
+      parentUUID
+        ? `= '${parentUUID}'`
+        : 'IS NULL'
+      }
+    ORDER BY i.id
+  `,
+    [codeListId],
+    def => dbTransformCallback(def, draft)
+  )
+
+  return draft
+    ? items
+    : R.filter(item => item.published)(items)
 }
 
-const filterCodeListItemsByParentId = (allItems, parentId) =>
-  R.filter(R.propEq('parentId', parentId))(allItems)
-
-const filterCodeListItemsByAncestorCodes = (allItems, ancestorCodes) => {
-  if (R.isEmpty(ancestorCodes)) {
-    return filterCodeListItemsByParentId(allItems, null)
-  } else {
-    const previousLevelItems = filterCodeListItemsByAncestorCodes(allItems, R.take(ancestorCodes.length - 1, ancestorCodes))
-    const lastCode = R.last(ancestorCodes)
-    const previousLevelParentItem = R.find(item => CodeList.getCodeListItemCode(item) === lastCode)(previousLevelItems)
-    return previousLevelParentItem
-      ? filterCodeListItemsByParentId(allItems, previousLevelParentItem.id)
-      : []
-  }
-}
-
-const fetchCodeListItemsByAncestorCodes = async (surveyId, codeListId, ancestorCodes, draft = false, client = db) => {
-  const allItems = await fetchCodeListItemsByCodeListId(surveyId, codeListId, draft, client)
-  return filterCodeListItemsByAncestorCodes(allItems, ancestorCodes)
-}
+const fetchCodeListItemByUUID = async (surveyId, itemUUID, draft = false, client = db) =>
+  await client.one(
+    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list_item
+     WHERE uuid = $1
+    `,
+    [itemUUID],
+    def => dbTransformCallback(def, draft)
+  )
 
 // ============== UPDATE
 
@@ -138,8 +148,8 @@ module.exports = {
   fetchCodeListsBySurveyId,
   fetchCodeListLevelsByCodeListId,
   fetchCodeListItemsByCodeListId,
-  fetchCodeListItemsByParentId,
-  fetchCodeListItemsByAncestorCodes,
+  fetchCodeListItemsByParentUUID,
+  fetchCodeListItemByUUID,
 
   //UPDATE
   updateCodeListProp,

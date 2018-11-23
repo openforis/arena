@@ -9,7 +9,7 @@ const Checkbox = props => {
   const {language, edit, item, nodeDef, parentNode, nodes, updateNode, removeNode} = props
 
   const itemUUID = item.uuid
-  const node = R.find(node => Node.getNodeValue(node).itemUUID === itemUUID)(nodes)
+  const node = R.find(node => Node.getNodeItemUUID(node) === itemUUID)(nodes)
 
   return (
     <button

@@ -29,8 +29,8 @@ const NodeDefCodeListDropdown = props => {
 
   const selectedItemUUIDs = R.pipe(
     R.values,
-    R.reject(node => node.placeholder),
-    R.map(n => Node.getNodeValue(n).itemUUID),
+    R.reject(R.propEq('placeholder', true)),
+    R.map(Node.getNodeItemUUID),
     R.reject(R.isNil),
   )(nodes)
 
