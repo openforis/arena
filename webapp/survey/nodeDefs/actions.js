@@ -25,7 +25,7 @@ export const createNodeDef = (parentId, type, props) => async (dispatch, getStat
 }
 
 // ==== UPDATE
-export const putNodeDefProp = (nodeDef, key, value) => async (dispatch, getState) => {
+export const putNodeDefProp = (nodeDef, key, value) => async (dispatch) => {
   dispatch({type: nodeDefPropUpdate, nodeDefUUID: nodeDef.uuid, key, value})
 
   const {surveyId} = nodeDef
@@ -33,7 +33,7 @@ export const putNodeDefProp = (nodeDef, key, value) => async (dispatch, getState
 }
 
 // ==== DELETE
-export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
+export const removeNodeDef = (nodeDef) => async (dispatch) => {
   dispatch({type: nodeDefDelete, nodeDef})
 
   const {surveyId} = nodeDef
