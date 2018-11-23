@@ -15,7 +15,7 @@ import { elementOffset } from '../../../../../appUtils/domUtils'
 
 import { newNode } from '../../../../../../common/record/node'
 
-const rowHeight = 50
+const rowHeight = 35
 
 const EntityTableRow = (props) => {
 

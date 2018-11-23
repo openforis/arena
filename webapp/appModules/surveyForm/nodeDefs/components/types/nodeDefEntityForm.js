@@ -59,8 +59,7 @@ const EntityForm = props => {
                               onLayoutChange={onLayoutChange}
                               isDraggable={edit && !locked}
                               isResizable={edit && !locked}
-        //TODO decide if verticalCompact
-                              compactType={'vertical'}
+                              verticalCompact={false}
                               useCSSTransforms={false}>
 
         {
