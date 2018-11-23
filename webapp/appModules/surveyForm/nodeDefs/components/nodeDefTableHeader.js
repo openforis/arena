@@ -8,7 +8,7 @@ const NodeDefTableHeader = props => {
   const fields = getNodeDefFormFields(nodeDef)
 
   return (
-    <div className="node-def__table-header" style={{gridTemplateColumns: `repeat(${fields.length}, auto)`}}>
+    <div className="node-def__table-column-header" style={{gridTemplateColumns: `repeat(${fields.length}, auto)`}}>
 
       <label style={{gridColumn: `1 / span ${fields.length}`}}>{label}</label>
 

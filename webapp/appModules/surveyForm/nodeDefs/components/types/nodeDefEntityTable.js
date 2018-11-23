@@ -3,19 +3,12 @@ import '../../../style/react-grid-layout.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { Responsive, WidthProvider } from 'react-grid-layout'
 import NodeDefSwitch from '../../nodeDefSwitch'
 
-const ResponsiveGridLayout = WidthProvider(Responsive)
-
 import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
-
 import { getNodeDefFormFields } from '../../nodeDefSystemProps'
-import { elementOffset } from '../../../../../appUtils/domUtils'
 
 import { newNode } from '../../../../../../common/record/node'
-
-const rowHeight = 35
 
 const EntityTableRow = (props) => {
 
@@ -26,51 +19,19 @@ const EntityTableRow = (props) => {
     i = 'header',
   } = props
 
-  const childDefsLayout = R.reduce(
-    (layout, childDef) => {
-      const count = getNodeDefFormFields(childDef).length
-      const {columns} = layout
-      return R.pipe(
-        R.assoc('columns', columns + count),
-        R.assoc(
-          childDef.uuid,
-          {i: childDef.uuid, w: count, x: columns, y: 0, h: 1,}
-        )
-      )(layout)
-    },
-    {columns: 0},
-    childDefs
-  )
-  const {columns} = childDefsLayout
+  const className = `node-def__table-row${renderType === nodeDefRenderType.tableHeader ? '-header' : ''}`
 
   return (
-    <div className="node-def__table-row" id={`${nodeDef.uuid}_${i}`}>
+    <div className={className}
+         id={`${nodeDef.uuid}_${i}`}>
 
-      <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
-                            autoSize={false}
-                            rowHeight={rowHeight - 1}
-                            cols={{
-                              lg: columns || 1,
-                              md: columns || 1,
-                              sm: columns || 1,
-                              xs: 1,
-                              xxs: 1
-                            }}
-                            containerPadding={[0, 0]}
-        // layouts={{}}
-        //                     onLayoutChange={this.onLayoutChange}
-        //                     isDraggable={edit && !locked}
-                            isDraggable={false}
-                            isResizable={false}
-                            compactType={'horizontal'}
-                            margin={[0, 0]}
-                            useCSSTransforms={false}>
-        {
-          childDefs
-            .map((childDef, i) => {
-                const childDefLayout = R.prop(childDef.uuid, childDefsLayout)
+      {
+        childDefs
+          .map((childDef, i) => {
+              const {length} = getNodeDefFormFields(childDef)
 
-                return <div key={childDef.uuid} data-grid={{...childDefLayout}}>
+              return (
+                <div key={childDef.uuid} className="react-grid-item" style={{minWidth: 160 * length + 'px'}}>
                   <NodeDefSwitch key={i}
                                  {...props}
                                  node={null}
@@ -78,11 +39,10 @@ const EntityTableRow = (props) => {
                                  parentNode={node}
                                  renderType={renderType}/>
                 </div>
-              }
-            )
-        }
-
-      </ResponsiveGridLayout>
+              )
+            }
+          )
+      }
 
       {
         renderType === nodeDefRenderType.tableBody ?
@@ -129,13 +89,10 @@ class NodeDefEntityTable extends React.Component {
       updateNode,
     } = this.props
 
-    const domElem = document.getElementById(nodeDef.uuid)
-    const {height} = domElem ? elementOffset(domElem) : {height: 80}
-
     return (
       <div className="node-def__table">
 
-        <div className="node-def__table-entity-header">
+        <div className="node-def__table-header">
           <h5>{label}</h5>
           {
             entry
@@ -152,38 +109,36 @@ class NodeDefEntityTable extends React.Component {
           }
         </div>
 
-        {
-          edit || !R.isEmpty(nodes) ?
 
-            <EntityTableRow {...this.props}
-                            node={null}
-                            renderType={nodeDefRenderType.tableHeader}/>
-            : null
-        }
+        <div className="node-def__table-rows">
+          {
+            edit || !R.isEmpty(nodes) ?
 
-        {
-          entry ?
-            R.isEmpty(nodes)
-              ? <h5><i>No data added</i></h5>
-              : <div className="node-def__table-data-rows"
-                     style={{
-                       gridTemplateRows: `repeat(${nodes.length}, ${rowHeight}px)`,
-                       maxHeight: height - 80,
-                     }}>
-                {
-                  nodes.map((node, i) =>
-                    <EntityTableRow key={i}
-                                    i={i}
-                                    {...this.props}
-                                    node={node}
-                                    nodes={null}
-                                    renderType={nodeDefRenderType.tableBody}/>
-                  )
-                }
-              </div>
-            : null
-        }
+              <EntityTableRow {...this.props}
+                              node={null}
+                              renderType={nodeDefRenderType.tableHeader}/>
+              : null
+          }
 
+          {
+            entry ?
+              R.isEmpty(nodes)
+                ? <h5><i>No data added</i></h5>
+                : (
+                  <div className="node-def__table-data-rows">
+                    {nodes.map((node, i) =>
+                      <EntityTableRow key={i}
+                                      i={i}
+                                      {...this.props}
+                                      node={node}
+                                      nodes={null}
+                                      renderType={nodeDefRenderType.tableBody}/>
+                    )}
+                  </div>
+                )
+              : null
+          }
+        </div>
       </div>
     )
   }
