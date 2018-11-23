@@ -93,7 +93,7 @@ const mapStateToProps = state => {
 
   return {
     surveyInfo: surveyInfo,
-    readOnly: !canEditSurvey(user, surveyInfo)
+    readOnly: !canEditSurvey(user, surveyInfo),
   }
 }
 

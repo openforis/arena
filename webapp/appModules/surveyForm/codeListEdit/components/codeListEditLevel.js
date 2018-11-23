@@ -23,6 +23,10 @@ import { putCodeListItemProp, putCodeListLevelProp } from '../actions'
 import { deleteCodeListItem, deleteCodeListLevel, setCodeListItemForEdit } from '../actions'
 import { getSurveyForm } from '../../surveyFormState'
 
+import { getUser } from '../../../../app/appState'
+import { canEditSurvey } from '../../../../../common/auth/authManager'
+import ReadOnlyWrapper from '../../../../commonComponents/form/readOnlyWrapper'
+
 class CodeListEditLevel extends React.Component {
 
   handleDelete () {
@@ -40,7 +44,8 @@ class CodeListEditLevel extends React.Component {
     const {
       codeList, level, parentItem, items, activeItemUUID, canAddItem,
       canBeDeleted, language,
-      createCodeListItem, putCodeListLevelProp, putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
+      createCodeListItem, putCodeListLevelProp, putCodeListItemProp,
+      setCodeListItemForEdit, deleteCodeListItem, readOnly,
     } = this.props
 
     const validation = CodeList.getCodeListLevelValidation(level.index)(codeList)
@@ -49,28 +54,32 @@ class CodeListEditLevel extends React.Component {
 
       <div className="code-lists__edit-level-header">
         <h4 className="label">Level {level.index + 1}</h4>
-        <button className="btn btn-s btn-of-light-xs"
-                onClick={() => this.handleDelete()}
-                aria-disabled={!canBeDeleted}>
-          <span className="icon icon-bin2 icon-12px"/>
-        </button>
+        <ReadOnlyWrapper readOnly={readOnly}>
+          <button className="btn btn-s btn-of-light-xs"
+                  onClick={() => this.handleDelete()}
+                  aria-disabled={!canBeDeleted}>
+            <span className="icon icon-bin2 icon-12px"/>
+          </button>
+        </ReadOnlyWrapper>
       </div>
 
       <FormItem label={'name'}>
         <Input value={CodeList.getCodeListLevelName(level)}
                validation={getFieldValidation('name')(validation)}
-               onChange={e => putCodeListLevelProp(codeList, level, 'name', normalizeName(e.target.value))}/>
+               onChange={e => putCodeListLevelProp(codeList, level, 'name', normalizeName(e.target.value))}
+               readOnly={readOnly}/>
       </FormItem>
 
       <div className="code-lists__edit-level-items-header">
         <h5 className="label">Items</h5>
-
-        <button className="btn btn-s btn-of-light-xs btn-add-item"
-                aria-disabled={!canAddItem}
-                onClick={() => createCodeListItem(codeList, level, parentItem)}>
-          <span className="icon icon-plus icon-12px icon-left"/>
-          ADD
-        </button>
+        <ReadOnlyWrapper readOnly={readOnly}>
+          <button className="btn btn-s btn-of-light-xs btn-add-item"
+                  aria-disabled={!canAddItem}
+                  onClick={() => createCodeListItem(codeList, level, parentItem)}>
+            <span className="icon icon-plus icon-12px icon-left"/>
+            ADD
+          </button>
+        </ReadOnlyWrapper>
       </div>
 
       <div className="code-lists__edit-level-items">
@@ -84,7 +93,8 @@ class CodeListEditLevel extends React.Component {
                               active={item.uuid === activeItemUUID}
                               putCodeListItemProp={putCodeListItemProp}
                               setCodeListItemForEdit={setCodeListItemForEdit}
-                              deleteCodeListItem={deleteCodeListItem}/>
+                              deleteCodeListItem={deleteCodeListItem}
+                              readOnly={readOnly}/>
           )
         }
       </div>
@@ -109,6 +119,8 @@ const mapStateToProps = (state, props) => {
   const items = canAddItem ? getCodeListEditLevelItemsArray(index)(surveyForm) : []
   const canBeDeleted = CodeList.isCodeListLevelDeleteAllowed(level)(codeList)
 
+  const user = getUser(state)
+
   return {
     language,
     codeList,
@@ -117,6 +129,7 @@ const mapStateToProps = (state, props) => {
     parentItem,
     canAddItem,
     canBeDeleted,
+    readOnly: !canEditSurvey(user, surveyInfo),
   }
 }
 

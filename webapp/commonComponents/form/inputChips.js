@@ -4,6 +4,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Dropdown from './dropdown'
+import ReadOnlyWrapper from './readOnlyWrapper'
 
 const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
   R.is(Object, item) ?
@@ -36,14 +37,12 @@ const Chip = props => {
     <div className="btn-of btn-s form-input-chip-item">
       {getItemLabel(item, itemLabelFunction, itemLabelProp)}
 
-      {
-        canBeRemoved ? (
-          <button className="btn-of-light-xs btn-s btn-remove"
-                  onClick={() => onDelete(item)}>
-            <span className="icon icon-cross icon-8px"/>
-          </button>
-        ) : null
-      }
+      <ReadOnlyWrapper readOnly={!canBeRemoved}>
+        <button className="btn-of-light-xs btn-s btn-remove"
+                onClick={() => onDelete(item)}>
+          <span className="icon icon-cross icon-8px"/>
+        </button>
+      </ReadOnlyWrapper>
 
     </div>
 
@@ -105,23 +104,21 @@ const InputChips = (props) => {
         )
       }
 
-      {
-        !readOnly ? (
-          <Dropdown items={dropdownItems}
-                    itemsLookupFunction={dropdownItemsLookupFunction}
-                    itemKeyProp={itemKeyProp}
-                    itemKeyFunction={itemKeyFunction}
-                    itemLabelFunction={itemLabelFunction}
-                    itemLabelProp={itemLabelProp}
-                    onChange={onDropdownChange}
-                    selection={null}
-                    clearOnSelection={true}
-                    autocompleteMinChars={dropdownAutocompleteMinChars}
-                    readOnly={readOnly}
-                    disabled={disabled}
-                    validation={validation}/>
-        ) : null
-      }
+      <ReadOnlyWrapper readOnly={readOnly}>
+        <Dropdown items={dropdownItems}
+                  itemsLookupFunction={dropdownItemsLookupFunction}
+                  itemKeyProp={itemKeyProp}
+                  itemKeyFunction={itemKeyFunction}
+                  itemLabelFunction={itemLabelFunction}
+                  itemLabelProp={itemLabelProp}
+                  onChange={onDropdownChange}
+                  selection={null}
+                  clearOnSelection={true}
+                  autocompleteMinChars={dropdownAutocompleteMinChars}
+                  readOnly={readOnly}
+                  disabled={disabled}
+                  validation={validation}/>
+      </ReadOnlyWrapper>
     </div>
   )
 }

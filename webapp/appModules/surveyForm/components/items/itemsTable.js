@@ -5,11 +5,13 @@ import {
   isValid
 } from '../../../../../common/validation/validator'
 
+import ReadOnlyWrapper from '../../../../commonComponents/form/readOnlyWrapper'
+
 const TableRow = props => {
 
   const {
     item, selectedItemUUID, itemLabelFunction,
-    canSelect, onSelect, onEdit, canDelete, onDelete,
+    canSelect, onSelect, onEdit, canDelete, onDelete, readOnly,
   } = props
 
   const name = R.defaultTo('--- undefined name ---', itemLabelFunction(item))
@@ -49,16 +51,17 @@ const TableRow = props => {
         Edit
       </button>
 
-      <button className="btn btn-s btn-of-light-xs"
-              onClick={() => {
-                if (canDelete(item)) {
-                  onDelete(item)
-                }
-              }}>
-        <span className="icon icon-bin2 icon-12px icon-left"/>
-        Delete
-      </button>
-
+      <ReadOnlyWrapper readOnly={readOnly}>
+        <button className="btn btn-s btn-of-light-xs"
+                onClick={() => {
+                  if (canDelete(item)) {
+                    onDelete(item)
+                  }
+                }}>
+          <span className="icon icon-bin2 icon-12px icon-left"/>
+          Delete
+        </button>
+      </ReadOnlyWrapper>
     </div>
   )
 }
