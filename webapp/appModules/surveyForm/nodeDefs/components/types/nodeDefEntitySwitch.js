@@ -4,21 +4,22 @@ import { connect } from 'react-redux'
 import NodeDefEntityTable from './nodeDefEntityTable'
 import NodeDefEntityForm from './nodeDefEntityForm'
 
-import Survey from '../../../../../common/survey/survey'
+import Survey from '../../../../../../common/survey/survey'
 
 import {
   isRenderForm,
   isRenderTable,
-} from '../../../../../common/survey/nodeDefLayout'
+} from '../../../../../../common/survey/nodeDefLayout'
 
-import { putNodeDefProp, } from '../../../../survey/nodeDefs/actions'
-import { getSurvey } from '../../../../survey/surveyState'
+import { putNodeDefProp, } from '../../../../../survey/nodeDefs/actions'
+import { getSurvey } from '../../../../../survey/surveyState'
 
 class NodeDefEntitySwitch extends React.Component {
 
   render () {
     const {
       entry,
+      surveyInfo,
       nodeDef,
       childDefs,
       edit,
@@ -36,6 +37,7 @@ class NodeDefEntitySwitch extends React.Component {
     if (isRenderForm(nodeDef))
       return <NodeDefEntityForm label={label}
                                 entry={entry}
+                                surveyInfo={surveyInfo}
                                 nodeDef={nodeDef}
                                 childDefs={childDefs}
                                 edit={edit}
@@ -47,6 +49,7 @@ class NodeDefEntitySwitch extends React.Component {
     else if (isRenderTable(nodeDef))
       return <NodeDefEntityTable label={label}
                                  entry={entry}
+                                 surveyInfo={surveyInfo}
                                  nodeDef={nodeDef}
                                  childDefs={childDefs}
                                  edit={edit}

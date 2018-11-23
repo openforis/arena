@@ -8,7 +8,7 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 import CodeList from '../../../../../../common/survey/codeList'
 import Node from '../../../../../../common/record/node'
 
-const CodeListDropdown = props => {
+const NodeDefCodeListDropdown = props => {
   const {language, edit, nodeDef, nodes, items = []} = props
 
   let multiple = NodeDef.isNodeDefMultiple(nodeDef)
@@ -70,4 +70,4 @@ const CodeListDropdown = props => {
                 onChange={item => handleSelectedItemsChange(item ? [item] : [])}/>
 }
 
-export default CodeListDropdown
+export default NodeDefCodeListDropdown

@@ -1,3 +1,5 @@
+import './uploadButton.scss'
+
 import React from 'react'
 
 class UploadButton extends React.Component {

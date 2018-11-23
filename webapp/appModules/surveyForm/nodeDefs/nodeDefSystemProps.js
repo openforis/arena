@@ -4,13 +4,13 @@ import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import NodeDef from '../../../../common/survey/nodeDef'
 
-import NodeDefEntitySwitch from './components/nodeDefEntitySwitch'
-import NodeDefFile from './components/nodeDefFile'
-import NodeDefTaxon from './components/nodeDefTaxon'
-import NodeDefCoordinate from './components/nodeDefCoordinate'
-import NodeDefCodeList from './components/nodeDefCodeList'
-import NodeDefBoolean from './components/nodeDefBoolean'
-import NodeDefText from './components/nodeDefText'
+import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
+import NodeDefFile from './components/types/nodeDefFile'
+import NodeDefTaxon from './components/types/nodeDefTaxon'
+import NodeDefCoordinate from './components/types/nodeDefCoordinate'
+import NodeDefCodeList from './components/types/nodeDefCodeList'
+import NodeDefBoolean from './components/types/nodeDefBoolean'
+import NodeDefText from './components/types/nodeDefText'
 
 import {
   nodeDefLayoutProps,
@@ -97,20 +97,19 @@ export const nodeDefSystemProps = {
     component: NodeDefCodeList,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
-    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.dropdown}
+    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.dropdown},
   },
 
   [nodeDefType.coordinate]: {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
-    fieldsCount: 3,
     defaultValue: {x: '', y: '', srs: ''},
+    formFields: ['x', 'y', 'srs'],
   },
 
   [nodeDefType.taxon]: {
     component: NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left"/>,
-    fieldsCount: 3,
     defaultValue: {
       code: '',
       family: '',
@@ -118,7 +117,8 @@ export const nodeDefSystemProps = {
       scientificName: '',
       vernacularName: '',
       vernacularLanguage: '',
-    }
+    },
+    formFields: ['code', 'scientific_name', 'vernacular_name'],
   },
 
   [nodeDefType.file]: {
@@ -154,11 +154,11 @@ export const getNodeDefComponent = nodeDef =>
     NodeDefText
   )(nodeDefSystemProps)
 
-export const getNodeDefFieldsCount = nodeDef =>
+export const getNodeDefFormFields = nodeDef =>
   getProp(
     nodeDef.type,
-    'fieldsCount',
-    1
+    'formFields',
+    ['field']
   )(nodeDefSystemProps)
 
 export const getNodeDefDefaultValue = nodeDef =>

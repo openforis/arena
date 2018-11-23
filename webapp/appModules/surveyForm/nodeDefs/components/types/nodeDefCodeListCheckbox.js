@@ -35,7 +35,7 @@ const Checkbox = props => {
   )
 }
 
-const CodeListCheckbox = props => {
+const NodeDefCodeListCheckbox = props => {
   const {items = []} = props
 
   const disabled = R.isEmpty(items)
@@ -52,4 +52,4 @@ const CodeListCheckbox = props => {
   </div>
 }
 
-export default CodeListCheckbox
+export default NodeDefCodeListCheckbox

@@ -46,6 +46,11 @@ $tableBorder: 1px solid rgba($white, .7);
   }
 }
 
+.node-def__form_page {
+  position: relative;
+  overflow-y: auto;
+}
+
 .survey-form__node-def-edit {
   position: absolute;
   width: 100%;
@@ -77,11 +82,6 @@ $tableBorder: 1px solid rgba($white, .7);
   display: grid;
   position: relative;
   height: 100%;
-}
-
-.node-def__form_page {
-  position: relative;
-  overflow-y: auto;
 }
 
 .node-def__form-actions {
@@ -125,13 +125,24 @@ $tableBorder: 1px solid rgba($white, .7);
   grid-template-rows: 30px 50px 1fr;
 }
 
-.node-def__table-header {
+.node-def__table-entity-header {
   justify-self: center;
   align-self: center;
   text-transform: uppercase;
   font-weight: 400;
   display: flex;
   align-items: center;
+}
+
+.node-def__table-header {
+  display: grid;
+
+  label {
+    justify-self: center;
+    align-self: center;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
 }
 
 .node-def__table-row {

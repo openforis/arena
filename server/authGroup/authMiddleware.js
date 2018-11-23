@@ -1,8 +1,9 @@
 const {getRestParam} = require('../serverUtils/request')
 const {sendErr} = require('../serverUtils/response')
-const {fetchSurveyById} = require('../survey/surveyManager')
 
+const {fetchSurveyById} = require('../survey/surveyManager')
 const {canEditSurvey} = require('../../common/auth/authManager')
+const Survey = require('../../common/survey/survey')
 
 const UnauthorizedError = require('./unauthorizedError')
 
@@ -10,7 +11,7 @@ const requireSurveyPermission = (permissionFn) =>
   async (req, res, next) => {
     const {user} = req
     const survey = await fetchSurveyById(getRestParam(req, 'surveyId'))
-    if (permissionFn(user, survey)) {
+    if (permissionFn(user, Survey.getSurveyInfo(survey))) {
       next()
     } else {
       sendErr(res, new UnauthorizedError(`User ${user.name} is not authorized`))
