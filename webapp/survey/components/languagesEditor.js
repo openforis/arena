@@ -17,7 +17,7 @@ class LanguagesEditor extends React.Component {
   }
 
   render () {
-    const {surveyInfo} = this.props
+    const {surveyInfo, readOnly} = this.props
 
     const surveyLanguages = Survey.getLanguages(surveyInfo)
 
@@ -29,7 +29,8 @@ class LanguagesEditor extends React.Component {
                   itemKeyProp="key"
                   selection={selection}
                   onChange={(selectedItems) => this.onLanguagesChange(selectedItems)}
-                  requiredItems={1}/>
+                  requiredItems={1}
+                  readOnly={readOnly}/>
     </div>
   }
 }

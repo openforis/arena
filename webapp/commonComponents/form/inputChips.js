@@ -36,11 +36,14 @@ const Chip = props => {
     <div className="btn-of btn-s form-input-chip-item">
       {getItemLabel(item, itemLabelFunction, itemLabelProp)}
 
-      <button className="btn-of-light-xs btn-s btn-remove"
-              onClick={() => onDelete(item)}
-              aria-disabled={!canBeRemoved}>
-        <span className="icon icon-cross icon-8px"/>
-      </button>
+      {
+        canBeRemoved ? (
+          <button className="btn-of-light-xs btn-s btn-remove"
+                  onClick={() => onDelete(item)}>
+            <span className="icon icon-cross icon-8px"/>
+          </button>
+        ) : null
+      }
 
     </div>
 
@@ -62,7 +65,7 @@ const InputChips = (props) => {
     dropdownAutocompleteMinChars,
     readOnly,
     disabled,
-    validation
+    validation,
   } = props
 
   const onDropdownChange = (item) => {
@@ -83,7 +86,7 @@ const InputChips = (props) => {
   const dropdownItems = rejectSelectedItems(items)
 
   const dropdownItemsLookupFunction = itemsLookupFunction ?
-      async value => rejectSelectedItems(await itemsLookupFunction(value))
+    async value => rejectSelectedItems(await itemsLookupFunction(value))
     : null
 
   return (
@@ -101,19 +104,24 @@ const InputChips = (props) => {
           />
         )
       }
-      <Dropdown items={dropdownItems}
-                itemsLookupFunction={dropdownItemsLookupFunction}
-                itemKeyProp={itemKeyProp}
-                itemKeyFunction={itemKeyFunction}
-                itemLabelFunction={itemLabelFunction}
-                itemLabelProp={itemLabelProp}
-                onChange={onDropdownChange}
-                selection={null}
-                clearOnSelection={true}
-                autocompleteMinChars={dropdownAutocompleteMinChars}
-                readOnly={readOnly}
-                disabled={disabled}
-                validation={validation}/>
+
+      {
+        !readOnly ? (
+          <Dropdown items={dropdownItems}
+                    itemsLookupFunction={dropdownItemsLookupFunction}
+                    itemKeyProp={itemKeyProp}
+                    itemKeyFunction={itemKeyFunction}
+                    itemLabelFunction={itemLabelFunction}
+                    itemLabelProp={itemLabelProp}
+                    onChange={onDropdownChange}
+                    selection={null}
+                    clearOnSelection={true}
+                    autocompleteMinChars={dropdownAutocompleteMinChars}
+                    readOnly={readOnly}
+                    disabled={disabled}
+                    validation={validation}/>
+        ) : null
+      }
     </div>
   )
 }

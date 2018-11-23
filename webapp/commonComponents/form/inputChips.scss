@@ -20,10 +20,9 @@
 }
 
 .form-input-chip-item {
-  display: grid;
-  grid-template-columns: 1fr 30px;
+  display: flex;
+  height: 17px;
   align-items: center;
-  column-gap: 0.3rem;
   margin: 0.25rem 0.3rem;
   font-size: 0.7rem;
   padding: 0.25rem 0.5rem;
@@ -31,5 +30,6 @@
 
   .btn-remove {
     padding: .2rem .5rem;
+    margin-left: 0.3rem;
   }
 }
