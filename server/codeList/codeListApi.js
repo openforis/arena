@@ -10,8 +10,8 @@ const {
   insertCodeListItem,
   fetchCodeListById,
   fetchCodeListsBySurveyId,
-  fetchCodeListItemsByParentId,
-  fetchCodeListItemsByAncestorCodes,
+  fetchCodeListItemsByParentUUID,
+  fetchCodeListItemByUUID,
   updateCodeListProp,
   updateCodeListLevelProp,
   updateCodeListItemProp,
@@ -90,15 +90,15 @@ module.exports.init = app => {
     }
   })
 
-  // fetch code list items by parent id
+  // fetch code list items by parent item UUID
   app.get('/survey/:surveyId/codeLists/:codeListId/items', async (req, res) => {
     try {
       const draft = getBoolParam(req, 'draft')
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
-      const parentId = getRestParam(req, 'parentId')
+      const parentUUID = getRestParam(req, 'parentUUID')
 
-      const items = await fetchCodeListItemsByParentId(surveyId, codeListId, parentId, draft)
+      const items = await fetchCodeListItemsByParentUUID(surveyId, codeListId, parentUUID, draft)
 
       res.json({items})
     } catch (err) {
@@ -106,17 +106,15 @@ module.exports.init = app => {
     }
   })
 
-  // fetch code list items by ancestor codes
-  app.get('/survey/:surveyId/codeLists/:codeListId/candidateItems', async (req, res) => {
+  app.get('/survey/:surveyId/codeLists/items/:itemUUID', async (req, res) => {
     try {
       const draft = getBoolParam(req, 'draft')
       const surveyId = getRestParam(req, 'surveyId')
-      const codeListId = getRestParam(req, 'codeListId')
-      const ancestorCodes = getJsonParam(req, 'ancestorCodes')
+      const itemUUID = getRestParam(req, 'itemUUID')
 
-      const items = await fetchCodeListItemsByAncestorCodes(surveyId, codeListId, ancestorCodes, draft)
+      const item = await fetchCodeListItemByUUID(surveyId, itemUUID, draft)
 
-      res.json({items})
+      res.json({item})
     } catch (err) {
       sendErr(res, err)
     }

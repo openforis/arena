@@ -1,28 +1,68 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as R from 'ramda'
+import axios from 'axios'
+import Promise from 'bluebird'
 
 import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 
+import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
+import CodeList from '../../../../../common/survey/codeList'
 import Node from '../../../../../common/record/node'
 
 import { getNodeDefComponent } from '../nodeDefSystemProps'
 
-const getNodeValues =
-  R.pipe(
+const getNodeValues = async (surveyInfo, nodes) => {
+  const nodeValues = R.pipe(
     R.reject(R.propEq('placeholder', true)),
-    R.map(node => Node.getNodeValue(node)),
-    R.map(nodeValue => nodeValue.fileName ? nodeValue.fileName : nodeValue),
-    R.join(', '),
+    R.map(Node.getNodeValue),
+  )(nodes)
+
+  const stringNodeValues = await Promise.all(
+    nodeValues.map(
+      async nodeValue =>
+        nodeValue.fileName ? nodeValue.fileName
+          : nodeValue.itemUUID ? await loadCodeListItemLabel(surveyInfo, nodeValue.itemUUID)
+          : nodeValue
+    )
   )
+
+  return R.join(', ', stringNodeValues)
+}
+
+const loadCodeListItemLabel = async (surveyInfo, itemUUID) => {
+  const {data} = await axios.get(`/api/survey/${surveyInfo.id}/codeLists/items/${itemUUID}`)
+  return CodeList.getCodeListItemLabel(Survey.getDefaultLanguage(surveyInfo))(data.item)
+}
 
 class NodeDefMultipleTableBody extends React.Component {
 
   constructor (props) {
     super(props)
 
-    this.state = {editDialogOpen: false}
+    this.state = {
+      editDialogOpen: false,
+      nodeValues: '',
+    }
+  }
+
+  async componentDidMount () {
+    await this.loadNodeValues()
+  }
+
+  async componentDidUpdate (prevProps) {
+    const {nodes: prevNodes} = prevProps
+
+    if (!R.equals(prevNodes, this.props.nodes)) {
+      await this.loadNodeValues()
+    }
+  }
+
+  async loadNodeValues () {
+    this.setState({
+      nodeValues: await getNodeValues(this.props.surveyInfo, this.props.nodes)
+    })
   }
 
   toggleEditDialogOpen (open) {
@@ -40,16 +80,14 @@ class NodeDefMultipleTableBody extends React.Component {
       )
       : (
         <div className="node-def__text-multiple-table-cell">
-          <span className="values-summary">{getNodeValues(this.props.nodes)}</span>
+          <span className="values-summary">{this.state.nodeValues}</span>
           <button className="btn-s btn-of-light-xs"
                   onClick={() => this.toggleEditDialogOpen(true)}>
             <span className="icon icon-pencil2 icon-12px"/>
           </button>
         </div>
       )
-
   }
-
 }
 
 const NodeDefTableBody = props => {
