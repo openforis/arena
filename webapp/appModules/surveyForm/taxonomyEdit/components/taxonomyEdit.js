@@ -46,20 +46,11 @@ class TaxonomyEdit extends React.Component {
     }
   }
 
-  onDone () {
-    const {taxonomy, setTaxonomyForEdit, readOnly} = this.props
-
-    if (!readOnly && isBlank(Taxonomy.getTaxonomyName(taxonomy))) {
-      alert('Please specify a name')
-    } else {
-      setTaxonomyForEdit(null)
-    }
-  }
-
   render () {
     const {
       surveyId, taxonomy, taxaCurrentPage, taxaTotalPages, taxaPerPage, taxa,
-      loadTaxaPage, putTaxonomyProp, uploadTaxonomyFile, readOnly
+      loadTaxaPage, putTaxonomyProp, uploadTaxonomyFile, setTaxonomyForEdit,
+      readOnly,
     } = this.props
 
     const {validation} = taxonomy
@@ -104,7 +95,7 @@ class TaxonomyEdit extends React.Component {
 
         <div style={{justifySelf: 'center'}}>
           <button className="btn btn-of-light"
-                  onClick={() => this.onDone()}>
+                  onClick={() => setTaxonomyForEdit(null)}>
             Done
           </button>
         </div>
