@@ -98,7 +98,7 @@ const updateNodeValue = async (surveyId, nodeUUID, value, file, client = db) =>
     const node = await NodeRepository.updateNode(surveyId, nodeUUID, value, file ? file.data : null, client)
 
     const survey = Survey.assocNodeDefs(
-      await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, false, t)
+      await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, false, true, t)
     )(await SurveyRepository.getSurveyById(surveyId, false, t))
 
     const recordId = Node.getNodeRecordId(node)

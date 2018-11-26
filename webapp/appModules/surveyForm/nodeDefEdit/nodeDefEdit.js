@@ -11,6 +11,12 @@ import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
 import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
 import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
+import DefaultValues from './defaultValues'
+
+const tabs = {
+  info: 'info',
+  defaultValues: 'defaultValues',
+}
 
 class NodeDefEdit extends React.Component {
 
@@ -20,6 +26,7 @@ class NodeDefEdit extends React.Component {
     this.state = {
       editingCodeList: false,
       editingTaxonomy: false,
+      selectedTab: tabs.info,
     }
   }
 
@@ -30,10 +37,16 @@ class NodeDefEdit extends React.Component {
 
   render () {
     const {
-      nodeDef, putNodeDefProp,
+      nodeDef,
+      putNodeDefProp,
       canUpdateCodeList
     } = this.props
-    const {editingCodeList, editingTaxonomy} = this.state
+
+    const {
+      editingCodeList,
+      editingTaxonomy,
+      selectedTab
+    } = this.state
 
     return nodeDef
       ? (
@@ -51,19 +64,39 @@ class NodeDefEdit extends React.Component {
                               onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
                               selectedItemUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}
                               onClose={() => this.setState({editingTaxonomy: false})}/>
-              :
-              <div className="form">
-                <CommonProps nodeDef={nodeDef}
-                             putNodeDefProp={putNodeDefProp}
-                             toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
-                             toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
+              : <div className={`tab-bar`}>
+                <div className="flex-center">
+                  <button className={`btn btn-of${selectedTab === tabs.info ? ' active' : ''}`}
+                          onClick={() => this.setState({selectedTab: tabs.info})}>
+                    Info
+                  </button>
+                  <button className={`btn btn-of${selectedTab === tabs.defaultValues ? ' active' : ''}`}
+                          onClick={() => this.setState({selectedTab: tabs.defaultValues})}>
+                    Default values
+                  </button>
+                </div>
+                <div className="form">
+                  {
+                    selectedTab === tabs.info &&
+                    <CommonProps nodeDef={nodeDef}
+                                 putNodeDefProp={putNodeDefProp}
+                                 toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
+                                 toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
+                  }
+                  {
+                    selectedTab === tabs.defaultValues &&
+                    <DefaultValues nodeDef={nodeDef}
+                                   putNodeDefProp={putNodeDefProp}/>
 
+                  }
+                </div>
                 <div style={{justifySelf: 'center'}}>
                   <button className="btn btn-of-light"
                           onClick={() => this.close()}>Done
                   </button>
                 </div>
               </div>
+
           }
         </div>
       )

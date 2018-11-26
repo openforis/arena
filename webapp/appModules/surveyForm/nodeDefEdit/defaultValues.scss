@@ -1,0 +1,10 @@
+.table.default-values {
+  width: 60vw;
+  height: 30vh;
+  margin: auto;
+
+  .table__row-header,
+  .table__row {
+    grid-template-columns: .5fr .4fr 30px;
+  }
+}

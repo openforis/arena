@@ -85,6 +85,9 @@ module.exports = {
   getNodeDefParentCodeUUID: getProp('parentCodeUUID'),
   getNodeDefTaxonomyUUID: getProp('taxonomyUUID'),
 
+  //advanced props
+  getDefaultValues: getProp('defaultValues', []),
+
   isNodeDefKey,
   isNodeDefMultiple,
   isNodeDefRoot,
