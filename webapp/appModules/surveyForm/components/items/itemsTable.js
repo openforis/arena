@@ -19,48 +19,48 @@ const TableRow = props => {
   return (
     <div className="items__table-row">
       <div>
-        {name}
+        {name && <span style={{marginRight: '2rem'}}>{name}</span>}
         {
-          isValid(item)
-            ? null
-            : (
-              <span className="error-badge" style={{marginLeft: '2rem'}}>
-                <span className="icon icon-warning icon-12px icon-left"/>
-                <span>INVALID</span>
-              </span>
-            )
+          !isValid(item) && (
+            <span className="error-badge">
+              <span className="icon icon-warning icon-12px icon-left"/>
+              <span>INVALID</span>
+            </span>
+          )
         }
       </div>
 
-      {
-        onSelect &&
-        (canSelect || selected)
-          ? <button className={`btn btn-s btn-of-light-xs${selected ? ' active' : ''}`}
+      <div>
+        <div class="align-right">
+          {
+            onSelect && (canSelect || selected) &&
+            <button className={`btn btn-s btn-of-light-xs${selected ? ' active' : ''}`}
                     onClick={() => onSelect(item)}>
-            <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`}/>
-            {selected ? 'Selected' : 'Select'}
+              <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`}/>
+              {selected ? 'Selected' : 'Select'}
+            </button>
+          }
+
+          <button className="btn btn-s btn-of-light-xs"
+                  onClick={() => onEdit(item)}>
+            <span className={`icon icon-${readOnly ? 'eye' : 'pencil2'} icon-12px icon-left`}/>
+            {readOnly ? 'View' : 'Edit'}
           </button>
-          : <div/>
-      }
 
-      <button className="btn btn-s btn-of-light-xs"
-              onClick={() => onEdit(item)}>
-        <span className={`icon icon-${readOnly ? 'eye' : 'pencil2'} icon-12px icon-left`} />
-        {readOnly ? 'View' : 'Edit'}
-      </button>
-
-      {
-        !readOnly &&
-        <button className="btn btn-s btn-of-light-xs"
-                onClick={() => {
-                  if (canDelete(item)) {
-                    onDelete(item)
-                  }
-                }}>
-          <span className="icon icon-bin2 icon-12px icon-left"/>
-          Delete
-        </button>
-      }
+          {
+            !readOnly &&
+            <button className="btn btn-s btn-of-light-xs"
+                    onClick={() => {
+                      if (canDelete(item)) {
+                        onDelete(item)
+                      }
+                    }}>
+              <span className="icon icon-bin2 icon-12px icon-left"/>
+              Delete
+            </button>
+          }
+        </div>
+      </div>
     </div>
   )
 }

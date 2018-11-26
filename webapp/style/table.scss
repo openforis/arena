@@ -1,7 +1,6 @@
 @import "../style/vars";
 
 $rowHeight: 35px;
-$rowBorder: 1px solid rgba($white, 0.4);
 $tableRowsHeight: calc(100% - 77px);
 
 .table {
@@ -36,9 +35,9 @@ $tableRowsHeight: calc(100% - 77px);
   display: grid;
   align-items: center;
   justify-items: center;
-  border-bottom: $rowBorder;
-  border-right: $rowBorder;
-  border-left: $rowBorder;
+  border-bottom: $itemsTableRowBorder;
+  border-right: $itemsTableRowBorder;
+  border-left: $itemsTableRowBorder;
   height: $rowHeight;
 
   &.active {
