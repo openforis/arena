@@ -15,21 +15,9 @@ const mergeProps = def => {
   )(def)
 }
 
-const propsToCamelCase = obj => {
-  const result = camelize(obj)
-  R.forEach(prop => {
-    if (R.endsWith('Uuid', prop)) {
-      result[R.take(prop.length - 4) + 'UUID'] = result[prop]
-      delete result[prop]
-    }
-  }, R.keys(result))
-
-  return result
-}
-
 const defDbTransformCallback = (def, draft = false) => def
   ? R.pipe(
-    propsToCamelCase,
+    camelize,
     def => draft
       ? mergeProps(def, draft)
       : R.omit(['propsDraft'], def),
@@ -39,7 +27,10 @@ const defDbTransformCallback = (def, draft = false) => def
 // READ
 const getProps = R.propOr({}, 'props')
 
-const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.propOr(defaultTo, prop))
+const getProp = (prop, defaultTo = null) => R.pipe(
+  getProps,
+  R.propOr(defaultTo, prop)
+)
 
 const getLabels = getProp('labels', {})
 

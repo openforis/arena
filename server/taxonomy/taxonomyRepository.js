@@ -7,8 +7,23 @@ const {
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord
 } = require('../survey/surveySchemaRepositoryUtils')
-const {dbTransformCallback} = require('../nodeDef/nodeDefRepository')
+const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 const Taxonomy = require('../../common/survey/taxonomy')
+
+const dbTransformCallback = obj => {
+  const result = NodeDefRepository.dbTransformCallback(obj)
+
+  //transform props ending in ...Uuid into ...UUID
+  R.forEach(prop => {
+    if (R.length(prop) > 4 && R.endsWith('Uuid', prop)) {
+      result[R.take(prop.length - 4, prop) + 'UUID'] = result[prop]
+      delete result[prop]
+    }
+  })
+  (R.keys(result))
+
+  return result
+}
 
 const filterProps = {
   uuid: 'uuid',
@@ -160,7 +175,7 @@ const fetchTaxaByVernacularName = async (surveyId,
   return await client.map(
     `SELECT * FROM (
         SELECT t.*, 
-          vn.uuid AS vernacular_uuid,
+          vn.uuid AS vernacular_name_uuid,
           vn.${propsCol}->>'name' AS vernacular_name, 
           vn.${propsCol}->>'lang' AS vernacular_language
         FROM ${getSurveyDBSchema(surveyId)}.taxon t
@@ -177,10 +192,12 @@ const fetchTaxaByVernacularName = async (surveyId,
   )
 }
 
-const fetchTaxonVernacularNameByUUID = async (surveyId, uuid, draft = false, client = db) =>
-  await client.one(
+const fetchTaxonVernacularNameByUUID = async (surveyId, uuid, draft = false, client = db) => {
+  const propsCol = draft ? 'props_draft' : 'props'
+
+  return await client.one(
     `SELECT t.*, 
-       vn.uuid AS vernacular_uuid,
+       vn.uuid AS vernacular_name_uuid,
        vn.${propsCol}->>'name' AS vernacular_name, 
        vn.${propsCol}->>'lang' AS vernacular_language
      FROM ${getSurveyDBSchema(surveyId)}.taxon t
@@ -190,6 +207,7 @@ const fetchTaxonVernacularNameByUUID = async (surveyId, uuid, draft = false, cli
     `, [uuid],
     record => dbTransformCallback(record, draft)
   )
+}
 
 const fetchTaxonByUUID = async (surveyId, uuid, draft = false, client = db) =>
   await client.one(

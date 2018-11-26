@@ -15,7 +15,6 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../common/record/node'
 
 import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
-import { getNodeDefDefaultValue } from '../../nodeDefSystemProps'
 import { getStateSurveyInfo, getSurvey } from '../../../../../survey/surveyState'
 
 const fields = {
@@ -36,7 +35,7 @@ const TaxonAutocompleteItemRenderer = props => {
   const vernacularNames = Taxon.getTaxonVernacularNames(taxon)
   const vernacularNamesString = R.pipe(
     R.keys, //vernacular language codes
-    R.map(langCode => `${langCode}: ${R.prop(langCode, vernacularNames)}`),
+    R.map(langCode => `${R.prop(langCode, vernacularNames)} (${langCode})`),
     R.join(' / ')
   )(vernacularNames)
 
@@ -84,24 +83,27 @@ class NodeDefTaxon extends React.Component {
     const {nodes} = this.props
     const node = nodes[0]
 
-    let taxa = null
+    let filterProp = null, filterPropValue = null
     const vernacularNameUUID = Node.getNodeVernacularNameUUID(node)
+
     if (vernacularNameUUID) {
-      taxa = await this.loadTaxa('vernacularNameUUID', vernacularNameUUID, true)
+      filterProp = 'vernacularNameUUID'
+      filterPropValue = vernacularNameUUID
     } else {
-      const taxonUUID = Node.getNodeTaxonUUID(node)
-      if (taxonUUID) {
-        taxa = await this.loadTaxa('uuid', taxonUUID, true)
-      }
+      filterProp = 'uuid'
+      filterPropValue = Node.getNodeTaxonUUID(node)
     }
-    if (taxa) {
+    const taxa = await this.loadTaxa(filterProp, filterPropValue, true)
+
+    if (R.isEmpty(taxa)) {
+      this.setState(defaultFieldValues)
+    } else {
       const taxon = R.head(taxa)
       this.setState({
         code: Taxon.getTaxonCode(taxon),
         scientificName: Taxon.getTaxonScientificName(taxon),
+        vernacularName: taxon.vernacularName,
       })
-    } else {
-      this.setState(defaultFieldValues)
     }
   }
 
@@ -116,7 +118,7 @@ class NodeDefTaxon extends React.Component {
   async onInputFieldChange (field, value) {
     //reset other fields values
 
-    const fieldValues = R.assoc(field, value)(getNodeDefDefaultValue(this.props.nodeDef))
+    const fieldValues = R.assoc(field, value)(defaultFieldValues)
 
     const autocompleteOpened = !R.isEmpty(value)
 
