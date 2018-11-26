@@ -40,12 +40,12 @@
     margin-left: 1rem;
   }
 
-  .align-right {
-    float: right;
+  .items__table-row-buttons {
+    display: flex;
+    justify-content: flex-end;
 
     button {
       margin-right: 1rem;
     }
   }
 }
-
