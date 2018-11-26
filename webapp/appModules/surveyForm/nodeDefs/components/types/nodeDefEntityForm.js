@@ -27,6 +27,7 @@ const EntityForm = props => {
     nodeDef,
     childDefs,
     edit,
+    canEditDef,
     locked,
     node,
     putNodeDefProp,
@@ -72,7 +73,8 @@ const EntityForm = props => {
                                recordId={recordId}
                                surveyInfo={surveyInfo}
                                nodeDef={childDef}
-                               parentNode={node}/>
+                               parentNode={node}
+                               canEditDef={canEditDef}/>
               </div>
             )
         }

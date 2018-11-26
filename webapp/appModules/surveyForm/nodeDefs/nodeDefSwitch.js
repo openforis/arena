@@ -57,6 +57,7 @@ class NodeDefSwitch extends React.Component {
       nodeDef,
       edit,
       locked,
+      canEditDef,
 
       renderType,
       label,
@@ -82,7 +83,7 @@ class NodeDefSwitch extends React.Component {
       }
 
       {
-        edit ?
+        edit && canEditDef && (
           <div className="node-def__form-actions">
             {
               !locked &&
@@ -132,7 +133,7 @@ class NodeDefSwitch extends React.Component {
             }
 
           </div>
-          : null
+        )
       }
 
       {
@@ -150,6 +151,8 @@ class NodeDefSwitch extends React.Component {
 
 NodeDefSwitch.defaultProps = {
   locked: true,
+  // specified when can edit node definition
+  canEditDef: false,
 }
 
 const mapStateToProps = (state, props) => {
