@@ -13,15 +13,18 @@ import { initSurveyDefs } from '../../survey/actions'
 import { resetForm } from '../surveyForm/actions'
 import { appModules, appModuleUri } from '../appModules'
 import { dashboardModules } from '../dashboard/dashboardModules'
+import { getUser } from '../../app/appState'
+import { getStateSurveyInfo } from '../../survey/surveyState'
+
+import { canEditSurvey } from '../../../common/auth/authManager'
 
 class DesignerView extends React.Component {
 
   componentDidMount () {
-    const {resetForm, initSurveyDefs} = this.props
+    const {resetForm, initSurveyDefs, canEdit} = this.props
 
     resetForm()
-    //TODO edit and validate based on user role
-    initSurveyDefs(true, true)
+    initSurveyDefs(canEdit, canEdit)
   }
 
   render () {
@@ -65,7 +68,16 @@ class DesignerView extends React.Component {
   }
 }
 
+const mapStateToProps = state => {
+  const user = getUser(state)
+  const surveyInfo = getStateSurveyInfo(state)
+
+  return {
+    canEdit: canEditSurvey(user, surveyInfo)
+  }
+}
+
 export default connect(
-  null,
+  mapStateToProps,
   {initSurveyDefs, resetForm}
 )(DesignerView)
