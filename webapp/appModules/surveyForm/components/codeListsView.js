@@ -7,8 +7,10 @@ import CodeListEdit from '../codeListEdit/components/codeListEdit'
 
 import Survey from '../../../../common/survey/survey'
 import CodeList from '../../../../common/survey/codeList'
+import { canEditSurvey } from '../../../../common/auth/authManager'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getUser } from '../../../app/appState'
+import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
 import { getCodeListEditCodeList } from '../codeListEdit/codeListEditState'
 import { getSurveyForm } from '../surveyFormState'
 
@@ -18,6 +20,7 @@ import {
   deleteCodeList,
   setCodeListForEdit,
 } from '../codeListEdit/actions'
+
 
 class CodeListsView extends React.Component {
 
@@ -31,8 +34,8 @@ class CodeListsView extends React.Component {
 
     const {
       codeLists, codeList, selectedItemUUID,
-      createCodeList, deleteCodeList, onEdit, onSelect,
-      onClose, canSelect, setCodeListForEdit
+      createCodeList, deleteCodeList, onSelect,
+      onClose, canSelect, setCodeListForEdit, readOnly
     } = this.props
 
     const canDeleteCodeList = codeList => codeList.usedByNodeDefs
@@ -52,12 +55,15 @@ class CodeListsView extends React.Component {
                       onDelete={deleteCodeList}
                       canSelect={canSelect}
                       onSelect={onSelect}
-                      onClose={onClose}/>
+                      onClose={onClose}
+                      readOnly={readOnly}/>
   }
 }
 
 const mapStateToProps = (state) => {
   const survey = getSurvey(state)
+  const surveyInfo = getStateSurveyInfo(state)
+  const user = getUser(state)
 
   const codeLists = R.pipe(
     Survey.getCodeListsArray,
@@ -70,6 +76,7 @@ const mapStateToProps = (state) => {
   return {
     codeLists,
     codeList: getCodeListEditCodeList(survey)(getSurveyForm(state)),
+    readOnly: !canEditSurvey(user, surveyInfo)
   }
 }
 

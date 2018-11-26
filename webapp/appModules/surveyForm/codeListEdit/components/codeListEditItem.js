@@ -45,7 +45,7 @@ class CodeListEditItem extends React.Component {
     const {
       codeList, level, item, active,
       putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
-      language
+      language, readOnly
     } = this.props
 
     const validation = CodeList.getCodeListItemValidation(item)(codeList)
@@ -90,23 +90,27 @@ class CodeListEditItem extends React.Component {
                   <Input value={CodeList.getCodeListItemCode(item)}
                          disabled={disabled}
                          validation={getFieldValidation('code')(validation)}
-                         onChange={e => putCodeListItemProp(codeList, level, item, 'code', normalizeName(e.target.value))}/>
+                         onChange={e => putCodeListItemProp(codeList, level, item, 'code', normalizeName(e.target.value))}
+                         readOnly={readOnly}/>
                 </FormItem>
 
                 <LabelsEditor labels={CodeList.getCodeListItemLabels(item)}
-                              onChange={(labelItem) => this.onPropLabelsChange(labelItem)}/>
+                              onChange={(labelItem) => this.onPropLabelsChange(labelItem)}
+                              readOnly={readOnly}/>
 
-                <button className="btn btn-of-light btn-delete"
-                        aria-disabled={disabled}
-                        onClick={() => {
-                          if (confirm('Delete the item with all children? This operation cannot be undone')) {
-                            deleteCodeListItem(codeList, level, item)
-                          }
-                        }}>
-                  <span className="icon icon-bin2 icon-12px icon-left"/>
-                  Delete Item
-                </button>
-
+                {
+                  !readOnly &&
+                  <button className="btn btn-of-light btn-delete"
+                          aria-disabled={disabled}
+                          onClick={() => {
+                            if (confirm('Delete the item with all children? This operation cannot be undone')) {
+                              deleteCodeListItem(codeList, level, item)
+                            }
+                          }}>
+                    <span className="icon icon-bin2 icon-12px icon-left"/>
+                    Delete Item
+                  </button>
+                }
               </React.Fragment>
             )
             : (

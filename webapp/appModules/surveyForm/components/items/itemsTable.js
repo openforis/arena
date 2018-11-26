@@ -9,7 +9,7 @@ const TableRow = props => {
 
   const {
     item, selectedItemUUID, itemLabelFunction,
-    canSelect, onSelect, onEdit, canDelete, onDelete,
+    canSelect, onSelect, onEdit, canDelete, onDelete, readOnly,
   } = props
 
   const name = R.defaultTo('--- undefined name ---', itemLabelFunction(item))
@@ -45,20 +45,22 @@ const TableRow = props => {
 
       <button className="btn btn-s btn-of-light-xs"
               onClick={() => onEdit(item)}>
-        <span className="icon icon-pencil2 icon-12px icon-left"/>
-        Edit
+        <span className={`icon icon-${readOnly ? 'eye' : 'pencil2'} icon-12px icon-left`} />
+        {readOnly ? 'View' : 'Edit'}
       </button>
 
-      <button className="btn btn-s btn-of-light-xs"
-              onClick={() => {
-                if (canDelete(item)) {
-                  onDelete(item)
-                }
-              }}>
-        <span className="icon icon-bin2 icon-12px icon-left"/>
-        Delete
-      </button>
-
+      {
+        !readOnly &&
+        <button className="btn btn-s btn-of-light-xs"
+                onClick={() => {
+                  if (canDelete(item)) {
+                    onDelete(item)
+                  }
+                }}>
+          <span className="icon icon-bin2 icon-12px icon-left"/>
+          Delete
+        </button>
+      }
     </div>
   )
 }

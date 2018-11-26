@@ -7,9 +7,11 @@ import TaxonomyEdit from '../taxonomyEdit/components/taxonomyEdit'
 
 import Survey from '../../../../common/survey/survey'
 import Taxonomy from '../../../../common/survey/taxonomy'
+import { canEditSurvey } from '../../../../common/auth/authManager'
 
-import { getSurvey } from '../../../survey/surveyState'
+import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
 import { getTaxonomyEditTaxonomy } from '../taxonomyEdit/taxonomyEditState'
+import { getUser } from '../../../app/appState'
 
 import {
   createTaxonomy,
@@ -37,6 +39,7 @@ class TaxonomiesView extends React.Component {
       canSelect,
       onSelect,
       onClose,
+      readOnly,
     } = this.props
 
     const canDelete = taxonomy => taxonomy.usedByNodeDefs
@@ -56,13 +59,16 @@ class TaxonomiesView extends React.Component {
                       onDelete={deleteTaxonomy}
                       canSelect={canSelect}
                       onSelect={onSelect}
-                      onClose={onClose}/>
+                      onClose={onClose}
+                      readOnly={readOnly}/>
   }
 }
 
 const mapStateToProps = state => {
   const survey = getSurvey(state)
   const surveyForm = getSurveyForm(state)
+  const user = getUser(state)
+  const surveyInfo = getStateSurveyInfo(state)
 
   const taxonomies = R.pipe(
     Survey.getTaxonomiesArray,
@@ -75,6 +81,7 @@ const mapStateToProps = state => {
   return {
     taxonomies,
     taxonomy: getTaxonomyEditTaxonomy(survey)(surveyForm),
+    readOnly: !canEditSurvey(user, surveyInfo),
   }
 }
 

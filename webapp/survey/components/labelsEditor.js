@@ -19,7 +19,7 @@ const LabelBadge = ({lang}) => (
   </div>
 )
 
-const LabelRow = ({label = '', lang, onChange}) => (
+const LabelRow = ({label = '', lang, onChange, readOnly}) => (
   <div className="labels-editor__label">
 
     <LabelBadge lang={lang}/>
@@ -29,7 +29,8 @@ const LabelRow = ({label = '', lang, onChange}) => (
                lang,
                label: e.target.value
              }
-           )}/>
+           )}
+           readOnly={readOnly}/>
   </div>
 )
 
@@ -52,6 +53,7 @@ class LabelsEditor extends React.Component {
       onChange,
       maxPreview = 2,
       canTogglePreview = true,
+      readOnly,
     } = this.props
 
     const displayLangs = this.isPreview()
@@ -85,7 +87,8 @@ class LabelsEditor extends React.Component {
               <LabelRow key={lang}
                         lang={lang}
                         label={R.prop(lang)(labels)}
-                        onChange={onChange}/>
+                        onChange={onChange}
+                        readOnly={readOnly}/>
             )
           }
         </div>

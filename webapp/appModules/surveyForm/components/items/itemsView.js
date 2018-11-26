@@ -4,16 +4,18 @@ import React from 'react'
 import ItemsTable from './itemsTable'
 
 const Header = props => {
-  const {headerText, onAdd} = props
+  const {headerText, onAdd, readOnly} = props
 
   return <div className="items__header">
     <h5>{headerText}</h5>
-
-    <button className="btn btn-s btn-of-light-xs"
-            onClick={onAdd}>
-      <span className="icon icon-plus icon-16px icon-left"/>
-      ADD
-    </button>
+    {
+      !readOnly &&
+      <button className="btn btn-s btn-of-light-xs"
+              onClick={onAdd}>
+        <span className="icon icon-plus icon-16px icon-left"/>
+        ADD
+      </button>
+    }
   </div>
 }
 
@@ -34,7 +36,7 @@ const ItemsView = (props) => {
     : (
       <div className="items">
         <Header {...props}/>
-        <ItemsTable {...props} />
+        <ItemsTable {...props}/>
         {
           onClose
             ? <div style={{justifySelf: 'center'}}>

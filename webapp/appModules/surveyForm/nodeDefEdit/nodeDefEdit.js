@@ -45,7 +45,6 @@ class NodeDefEdit extends React.Component {
                              onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
                              selectedItemUUID={NodeDef.getNodeDefCodeListUUID(nodeDef)}
                              onClose={() => this.setState({editingCodeList: false})}/>
-
               : editingTaxonomy
               ?
               <TaxonomiesView canSelect={true}
