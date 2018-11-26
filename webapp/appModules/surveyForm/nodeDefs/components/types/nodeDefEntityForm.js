@@ -60,7 +60,7 @@ const EntityForm = props => {
                               onLayoutChange={onLayoutChange}
                               isDraggable={edit && !locked}
                               isResizable={edit && !locked}
-                              verticalCompact={false}
+                              compactType={null}
                               useCSSTransforms={false}>
 
         {
