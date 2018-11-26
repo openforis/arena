@@ -17,3 +17,16 @@ export const getStateSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
 
 export const getStateSurveyId = R.pipe(getStateSurveyInfo, R.prop('id'))
 
+// STATUS
+const status = 'status'
+const defsFetched = 'defsFetched'
+const defsDraftFetched = 'defsDraftFetched'
+
+export const surveyDefsFetched = R.pathEq([survey, status, defsFetched], true)
+
+export const surveyDefsDraftFetched = R.pathEq([survey, status, defsDraftFetched], true)
+
+export const setSurveyDefsFetched = draft => R.pipe(
+  R.assoc(defsFetched, true),
+  R.assoc(defsDraftFetched, draft),
+)

@@ -8,14 +8,16 @@ $tableRowHeaderHeight: 40px;
   display: grid;
   grid-template-rows: 50px 1fr;
 
-  //edit mode
   &.edit {
     grid-template-columns: 1fr 200px;
 
     .survey-form__nav {
       grid-column: 1/3;
     }
+  }
 
+  //edit mode
+  &.form-designer {
     .react-grid-item {
       border: 1px dashed rgba($blue1, .7);
 

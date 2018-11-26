@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { getStateSurveyId } from './surveyState'
+import { getStateSurveyId, surveyDefsFetched, surveyDefsDraftFetched } from './surveyState'
 import { getUser } from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 import { appUserPrefUpdate } from '../app/actions'
@@ -24,20 +24,29 @@ const fetchTaxonomies = (surveyId, draft = false, validate = false) =>
   axios.get(`/api/survey/${surveyId}/taxonomies?draft=${draft}&validate=${validate}`)
 
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
-  const surveyId = getStateSurveyId(getState())
+  const state = getState()
 
-  const res = await Promise.all([
-    fetchNodeDefs(surveyId, draft, validate),
-    fetchCodeLists(surveyId, draft, validate),
-    fetchTaxonomies(surveyId, draft, validate),
-  ])
+  if (
+    !surveyDefsFetched(state) ||
+    (surveyDefsDraftFetched(state) !== draft)
+  ) {
 
-  dispatch({
-    type: surveyDefsLoad,
-    nodeDefs: res[0].data.nodeDefs,
-    codeLists: res[1].data.codeLists,
-    taxonomies: res[2].data.taxonomies
-  })
+    const surveyId = getStateSurveyId(state)
+
+    const res = await Promise.all([
+      fetchNodeDefs(surveyId, draft, validate),
+      fetchCodeLists(surveyId, draft, validate),
+      fetchTaxonomies(surveyId, draft, validate),
+    ])
+
+    dispatch({
+      type: surveyDefsLoad,
+      nodeDefs: res[0].data.nodeDefs,
+      codeLists: res[1].data.codeLists,
+      taxonomies: res[2].data.taxonomies,
+      draft
+    })
+  }
 
 }
 

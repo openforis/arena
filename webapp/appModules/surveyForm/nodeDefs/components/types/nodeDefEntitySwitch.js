@@ -32,6 +32,7 @@ class NodeDefEntitySwitch extends React.Component {
       putNodeDefProp,
       removeNode,
       locked,
+      canEditDef,
     } = this.props
 
     if (isRenderForm(nodeDef))
@@ -45,7 +46,8 @@ class NodeDefEntitySwitch extends React.Component {
                                 parentNode={parentNode}
                                 updateNode={updateNode}
                                 putNodeDefProp={putNodeDefProp}
-                                locked={locked}/>
+                                locked={locked}
+                                canEditDef={canEditDef}/>
     else if (isRenderTable(nodeDef))
       return <NodeDefEntityTable label={label}
                                  entry={entry}
@@ -60,7 +62,8 @@ class NodeDefEntitySwitch extends React.Component {
                                  updateNode={updateNode}
                                  putNodeDefProp={putNodeDefProp}
                                  removeNode={removeNode}
-                                 locked={locked}/>
+                                 locked={locked}
+                                 canEditDef={canEditDef}/>
 
     return null
   }
