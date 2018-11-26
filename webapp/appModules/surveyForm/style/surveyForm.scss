@@ -27,6 +27,7 @@ $tableRowHeaderHeight: 40px;
       }
 
     }
+
     .node-def__form_page {
       border: 2px dashed rgba($white, .4);
     }
@@ -45,14 +46,10 @@ $tableRowHeaderHeight: 40px;
 
 .survey-form__nav-record-actions {
   align-self: center;
+
   > * {
     margin: 0 1rem;
   }
-}
-
-.node-def__form_page {
-  position: relative;
-  overflow-y: auto;
 }
 
 .survey-form__node-def-edit {
@@ -79,9 +76,17 @@ $tableRowHeaderHeight: 40px;
   grid-template-columns: .65fr;
   background-color: rgba($yellow, 0.06);
   border-left: none !important;
+  border: 2px dashed rgba(222, 220, 203, 0.4);
 }
 
+// ======
 // NODE DEF
+// ======
+.node-def__form_page {
+  position: relative;
+  overflow-y: auto;
+}
+
 .node-def__form {
   display: grid;
   position: relative;
@@ -161,6 +166,7 @@ $tableRowHeaderHeight: 40px;
   border-bottom: 2px solid $tableBorderColor;
 
   .react-grid-item {
+    display: grid;
     border-right: 1px solid transparent;
 
     &:first-child {
@@ -211,6 +217,8 @@ $tableRowHeaderHeight: 40px;
 }
 
 .node-def__table-data-composite-attr {
+  height: 100%;
+
   > div:not(:last-child) {
     border-right: $tableBorder;
   }
@@ -226,3 +234,18 @@ $tableRowHeaderHeight: 40px;
   grid-template-columns: .2fr .5fr .3fr;
 }
 
+// == data entry
+.node-def__entry-multiple {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  .nodes {
+    position: absolute;
+    max-height: 100%;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+  }
+}
