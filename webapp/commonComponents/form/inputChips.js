@@ -29,6 +29,7 @@ const Chip = props => {
     itemLabelProp,
     onDelete,
     canBeRemoved,
+    readOnly,
   } = props
 
   return <div className="form-input">
@@ -37,9 +38,10 @@ const Chip = props => {
       {getItemLabel(item, itemLabelFunction, itemLabelProp)}
 
       {
-        canBeRemoved &&
+        !readOnly &&
         <button className="btn-of-light-xs btn-s btn-remove"
-                onClick={() => onDelete(item)}>
+                onClick={() => onDelete(item)}
+                aria-disabled={!canBeRemoved}>
           <span className="icon icon-cross icon-8px"/>
         </button>
       }
@@ -98,8 +100,8 @@ const InputChips = (props) => {
                 itemLabelFunction={itemLabelFunction}
                 itemLabelProp={itemLabelProp}
                 onDelete={removeItem}
-                canBeRemoved={!readOnly && selection.length > requiredItems}
-          />
+                canBeRemoved={selection.length > requiredItems}
+                readOnly={readOnly}/>
         )
       }
 
