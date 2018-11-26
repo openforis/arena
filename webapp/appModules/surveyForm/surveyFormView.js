@@ -31,9 +31,15 @@ const SurveyFormView = (props) => {
 
   const editAllowed = edit && canEdit
 
+  const className = editAllowed
+    ? ' form-designer edit'
+    : edit
+      ? ' form-designer'
+      : ''
+
   return nodeDef
     ? (
-      <div className={`survey-form form-designer${editAllowed ? ' edit' : ''}`}>
+      <div className={`survey-form${className}`}>
 
         {
           editAllowed &&
