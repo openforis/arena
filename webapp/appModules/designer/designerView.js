@@ -28,7 +28,7 @@ class DesignerView extends React.Component {
   }
 
   render () {
-    const {history, location} = this.props
+    const {history, location, canEdit} = this.props
 
     return (
       <TabBar
@@ -47,7 +47,7 @@ class DesignerView extends React.Component {
             label: 'Form Designer',
             component: SurveyFormView,
             path: appModuleUri(dashboardModules.formDesigner),
-            props: {edit: true, draft: true},
+            props: {edit: true, draft: true, canEdit},
           },
 
           {

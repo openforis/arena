@@ -22,18 +22,21 @@ const SurveyFormView = (props) => {
     nodeDef,
     edit,
     entry,
+    canEdit,
 
     recordLoaded,
     recordId,
     parentNode
   } = props
 
+  const editAllowed = edit && canEdit
+
   return nodeDef
     ? (
-      <div className={`survey-form${edit ? ' edit' : ''}`}>
+      <div className={`survey-form form-designer${editAllowed ? ' edit' : ''}`}>
 
         {
-          edit &&
+          editAllowed &&
           <NodeDefEdit/>
         }
 
@@ -51,7 +54,7 @@ const SurveyFormView = (props) => {
         }
 
         {
-          edit
+          editAllowed
             ? <FormActions/>
             : null
         }
@@ -65,10 +68,12 @@ const SurveyFormView = (props) => {
 SurveyFormView.defaultProps = {
   // current nodeDef page
   nodeDef: null,
-  // can edit form
+  // form in edit mode
   edit: false,
-  // can entry data
+  // form in data entry mode
   entry: false,
+  // can edit the form definition
+  canEdit: false,
   // if record to edit has been loaded
   recordLoaded: null,
   // recordId of current record
