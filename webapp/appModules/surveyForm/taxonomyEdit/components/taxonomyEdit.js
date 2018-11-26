@@ -10,7 +10,6 @@ import DownloadButton from '../../../../commonComponents/form/downloadButton'
 import TaxonTable from './taxonTable'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'
-import { isBlank } from '../../../../../common/stringUtils'
 import { normalizeName } from '../../../../../common/stringUtils'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
