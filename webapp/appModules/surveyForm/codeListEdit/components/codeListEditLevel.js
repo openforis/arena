@@ -25,7 +25,6 @@ import { getSurveyForm } from '../../surveyFormState'
 
 import { getUser } from '../../../../app/appState'
 import { canEditSurvey } from '../../../../../common/auth/authManager'
-import ReadOnlyWrapper from '../../../../commonComponents/form/readOnlyWrapper'
 
 class CodeListEditLevel extends React.Component {
 
@@ -54,13 +53,14 @@ class CodeListEditLevel extends React.Component {
 
       <div className="code-lists__edit-level-header">
         <h4 className="label">Level {level.index + 1}</h4>
-        <ReadOnlyWrapper readOnly={readOnly}>
+        {
+          !readOnly &&
           <button className="btn btn-s btn-of-light-xs"
                   onClick={() => this.handleDelete()}
                   aria-disabled={!canBeDeleted}>
             <span className="icon icon-bin2 icon-12px"/>
           </button>
-        </ReadOnlyWrapper>
+        }
       </div>
 
       <FormItem label={'name'}>
@@ -72,14 +72,15 @@ class CodeListEditLevel extends React.Component {
 
       <div className="code-lists__edit-level-items-header">
         <h5 className="label">Items</h5>
-        <ReadOnlyWrapper readOnly={readOnly}>
+        {
+          !readOnly &&
           <button className="btn btn-s btn-of-light-xs btn-add-item"
                   aria-disabled={!canAddItem}
                   onClick={() => createCodeListItem(codeList, level, parentItem)}>
             <span className="icon icon-plus icon-12px icon-left"/>
             ADD
           </button>
-        </ReadOnlyWrapper>
+        }
       </div>
 
       <div className="code-lists__edit-level-items">

@@ -7,7 +7,6 @@ import { connect } from 'react-redux'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
-import ReadOnlyWrapper from '../../../../commonComponents/form/readOnlyWrapper'
 import TaxonTable from './taxonTable'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'
@@ -76,7 +75,8 @@ class TaxonomyEdit extends React.Component {
                    readOnly={readOnly}/>
           </FormItem>
 
-          <ReadOnlyWrapper readOnly={readOnly}>
+          {
+            !readOnly &&
             <div className="button-bar">
               <UploadButton label="CSV import"
                             disabled={taxonomy.published}
@@ -87,7 +87,7 @@ class TaxonomyEdit extends React.Component {
                               disabled={R.isEmpty(taxa)}
                               label="CSV Export"/>
             </div>
-          </ReadOnlyWrapper>
+          }
         </div>
 
 

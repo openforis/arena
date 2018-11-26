@@ -16,12 +16,12 @@ const getSurveyUserPermissions = (user, surveyInfo) => {
 }
 
 const hasPermission = (permission, user, surveyInfo) =>
-    user && surveyInfo &&
-    (
-      isSystemAdmin(user)
-      ||
-      R.contains(permission, getSurveyUserPermissions(user, surveyInfo))
-    )
+  user && surveyInfo &&
+  (
+    isSystemAdmin(user)
+    ||
+    R.contains(permission, getSurveyUserPermissions(user, surveyInfo))
+  )
 
 const canEditSurvey = R.partial(hasPermission, [permissions.surveyEdit])
 

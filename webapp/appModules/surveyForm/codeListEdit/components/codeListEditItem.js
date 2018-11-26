@@ -8,7 +8,6 @@ import { normalizeName } from '../../../../../common/stringUtils'
 
 import CodeList from '../../../../../common/survey/codeList'
 import { getFieldValidation } from '../../../../../common/validation/validator'
-import ReadOnlyWrapper from '../../../../commonComponents/form/readOnlyWrapper'
 
 class CodeListEditItem extends React.Component {
 
@@ -99,7 +98,8 @@ class CodeListEditItem extends React.Component {
                               onChange={(labelItem) => this.onPropLabelsChange(labelItem)}
                               readOnly={readOnly}/>
 
-                <ReadOnlyWrapper readOnly={readOnly}>
+                {
+                  !readOnly &&
                   <button className="btn btn-of-light btn-delete"
                           aria-disabled={disabled}
                           onClick={() => {
@@ -110,7 +110,7 @@ class CodeListEditItem extends React.Component {
                     <span className="icon icon-bin2 icon-12px icon-left"/>
                     Delete Item
                   </button>
-                </ReadOnlyWrapper>
+                }
               </React.Fragment>
             )
             : (

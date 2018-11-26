@@ -4,7 +4,6 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Dropdown from './dropdown'
-import ReadOnlyWrapper from './readOnlyWrapper'
 
 const extractValueFromFunctionOrProp = (item, func, prop, defaultProp) =>
   R.is(Object, item) ?
@@ -37,13 +36,13 @@ const Chip = props => {
     <div className="btn-of btn-s form-input-chip-item">
       {getItemLabel(item, itemLabelFunction, itemLabelProp)}
 
-      <ReadOnlyWrapper readOnly={!canBeRemoved}>
+      {
+        canBeRemoved &&
         <button className="btn-of-light-xs btn-s btn-remove"
                 onClick={() => onDelete(item)}>
           <span className="icon icon-cross icon-8px"/>
         </button>
-      </ReadOnlyWrapper>
-
+      }
     </div>
 
   </div>
@@ -104,7 +103,8 @@ const InputChips = (props) => {
         )
       }
 
-      <ReadOnlyWrapper readOnly={readOnly}>
+      {
+        !readOnly &&
         <Dropdown items={dropdownItems}
                   itemsLookupFunction={dropdownItemsLookupFunction}
                   itemKeyProp={itemKeyProp}
@@ -118,7 +118,7 @@ const InputChips = (props) => {
                   readOnly={readOnly}
                   disabled={disabled}
                   validation={validation}/>
-      </ReadOnlyWrapper>
+      }
     </div>
   )
 }

@@ -5,8 +5,6 @@ import {
   isValid
 } from '../../../../../common/validation/validator'
 
-import ReadOnlyWrapper from '../../../../commonComponents/form/readOnlyWrapper'
-
 const TableRow = props => {
 
   const {
@@ -47,11 +45,12 @@ const TableRow = props => {
 
       <button className="btn btn-s btn-of-light-xs"
               onClick={() => onEdit(item)}>
-        <span className="icon icon-pencil2 icon-12px icon-left"/>
-        Edit
+        <span className={`icon icon-${readOnly ? 'eye' : 'pencil2'} icon-12px icon-left`} />
+        {readOnly ? 'View' : 'Edit'}
       </button>
 
-      <ReadOnlyWrapper readOnly={readOnly}>
+      {
+        !readOnly &&
         <button className="btn btn-s btn-of-light-xs"
                 onClick={() => {
                   if (canDelete(item)) {
@@ -61,7 +60,7 @@ const TableRow = props => {
           <span className="icon icon-bin2 icon-12px icon-left"/>
           Delete
         </button>
-      </ReadOnlyWrapper>
+      }
     </div>
   )
 }

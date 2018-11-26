@@ -13,9 +13,8 @@ import { getFieldValidation } from '../../../../../common/validation/validator'
 import {
   putCodeListProp,
   createCodeListLevel,
-  setCodeListForEdit
+  setCodeListForEdit,
 } from '../../codeListEdit/actions'
-import ReadOnlyWrapper from '../../../../commonComponents/form/readOnlyWrapper'
 
 import { canEditSurvey } from '../../../../../common/auth/authManager'
 import { getUser } from '../../../../app/appState'
@@ -51,14 +50,15 @@ const CodeListEdit = props => {
           )
         }
 
-        <ReadOnlyWrapper readOnly={readOnly}>
+        {
+          !readOnly &&
           <button className="btn btn-s btn-of-light-xs btn-add-level"
                   onClick={() => createCodeListLevel(codeList)}
                   aria-disabled={levels.length === 5}>
             <span className="icon icon-plus icon-16px icon-left"/>
             ADD LEVEL
           </button>
-        </ReadOnlyWrapper>
+        }
       </div>
 
       <div style={{justifySelf: 'center'}}>
