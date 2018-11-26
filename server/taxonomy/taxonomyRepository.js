@@ -10,8 +10,8 @@ const {
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 const Taxonomy = require('../../common/survey/taxonomy')
 
-const dbTransformCallback = obj => {
-  const result = NodeDefRepository.dbTransformCallback(obj)
+const dbTransformCallback = (obj, draft) => {
+  const result = NodeDefRepository.dbTransformCallback(obj, draft)
 
   //transform props ending in ...Uuid into ...UUID
   R.forEach(prop => {
@@ -123,42 +123,39 @@ const fetchTaxaByPropLike = async (surveyId,
   const filterProp = R.head(R.keys(filter))
   const filterValue = R.prop(filterProp)(filter)
 
-  if (filterValue) {
-    const searchValue =
-      R.pipe(
-        R.trim,
-        R.toLower,
-        R.replace(/\*/g, '%')
-      )(filterValue)
+  const searchValue = filterValue ?
+    R.pipe(
+      R.trim,
+      R.toLower,
+      R.replace(/\*/g, '%')
+    )(filterValue)
+    : null
 
-    switch (filterProp) {
-      case filterProps.vernacularName:
-        return fetchTaxaByVernacularName(surveyId, taxonomyId, searchValue, sort, limit, offset, draft, client)
-      case filterProps.uuid:
-        const taxon = await fetchTaxonByUUID(surveyId, searchValue, draft, client)
-        return taxon ? [taxon] : []
-      case filterProps.vernacularNameUUID:
-        const vernacularName = await fetchTaxonVernacularNameByUUID(surveyId, searchValue, draft, client)
-        return vernacularName ? [vernacularName] : []
-      default:
+  switch (filterProp) {
+    case filterProps.vernacularName:
+      return fetchTaxaByVernacularName(surveyId, taxonomyId, searchValue, sort, limit, offset, draft, client)
+    case filterProps.uuid:
+      const taxon = await fetchTaxonByUUID(surveyId, searchValue, draft, client)
+      return taxon ? [taxon] : []
+    case filterProps.vernacularNameUUID:
+      const vernacularName = await fetchTaxonVernacularNameByUUID(surveyId, searchValue, draft, client)
+      return vernacularName ? [vernacularName] : []
+    default:
 
-        const propsCol = draft ? 'props_draft' : 'props'
+      const propsCol = draft ? 'props_draft' : 'props'
 
-        return await client.map(
-          `SELECT * FROM (
-              SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
-              WHERE taxonomy_id = $1 
-                ${searchValue ? `AND lower(${propsCol}->>'${filterProp}') LIKE '${searchValue}'` : ''}
-              ORDER BY ${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
-            ) AS sorted_taxa 
-              LIMIT ${limit ? limit : 'ALL'} 
-              OFFSET $2`,
-          [taxonomyId, offset],
-          record => dbTransformCallback(record, draft)
-        )
-    }
-  } else {
-    return []
+      return await client.map(
+        `SELECT * FROM (
+            SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
+            WHERE taxonomy_id = $1 
+              ${searchValue ? `AND lower(${propsCol}->>'${filterProp}') LIKE '${searchValue}'` : ''}
+            ORDER BY ${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
+          ) AS sorted_taxa 
+            LIMIT ${limit ? limit : 'ALL'} 
+            OFFSET $2`,
+        [taxonomyId, offset],
+        record => dbTransformCallback(record, draft)
+      )
   }
 }
 

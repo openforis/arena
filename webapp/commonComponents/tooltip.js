@@ -8,7 +8,7 @@ const Tooltip = ({children, type = null, messages = []}) => {
   const hasMessages = !R.isEmpty(messages)
 
   return <div className={hasMessages ? `tooltip${type ? '-' + type : ''}` : ''}
-              style={{display: 'grid'}}>
+              style={{display: 'grid', width: '100%', height: '100%'}}>
 
     <React.Fragment>
       {children}
