@@ -27,7 +27,10 @@ const defDbTransformCallback = (def, draft = false) => def
 // READ
 const getProps = R.propOr({}, 'props')
 
-const getProp = (prop, defaultTo = null) => R.pipe(getProps, R.propOr(defaultTo, prop))
+const getProp = (prop, defaultTo = null) => R.pipe(
+  getProps,
+  R.propOr(defaultTo, prop)
+)
 
 const getLabels = getProp('labels', {})
 

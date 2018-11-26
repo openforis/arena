@@ -40,10 +40,8 @@ class NodeDefCodeList extends React.Component {
     const {parentCodeDefUUID, parentItemUUID} = this.props
 
     if (parentCodeDefUUID) {
-      const {parentItemUUID: prevParentItemUUID} = prevProps
-
       //parent item changed, reload items
-      if (parentItemUUID !== prevParentItemUUID) {
+      if (parentItemUUID !== prevProps.parentItemUUID) {
         await this.loadCodeListItems()
       }
     }
