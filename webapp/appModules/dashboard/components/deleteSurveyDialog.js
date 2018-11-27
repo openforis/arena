@@ -32,7 +32,7 @@ export default class DeleteSurveyDialog extends React.Component {
     return (
       <Modal isOpen={true} onClose={() => onCancel()}>
         <ModalHeader>
-          <h5 className="survey-delete-dialog__header">Are you sure you want to delete this?</h5>
+          <h5 className="survey-delete-dialog__header">Are you sure you want to delete this survey?</h5>
         </ModalHeader>
 
         <ModalBody>
