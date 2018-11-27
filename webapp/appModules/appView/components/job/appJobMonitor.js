@@ -50,7 +50,7 @@ class AppJobMonitor extends React.Component {
       ? (
         <Modal className="app-job-monitor" closeOnEsc={false}>
 
-          <ModalHeader>Job: {job.type}</ModalHeader>
+          <ModalHeader>{job.type}</ModalHeader>
 
           <ModalBody>
             <JobProgress job={job}/>
