@@ -3,10 +3,10 @@ import './defaultValues.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { Input } from '../../../commonComponents/form/input'
+import { Input } from '../../../../commonComponents/form/input'
 
-import NodeDef from '../../../../common/survey/nodeDef'
-import NodeDefExpression from '../../../../common/survey/nodeDefExpression'
+import NodeDef from '../../../../../common/survey/nodeDef'
+import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
 
 const DefaultValueRow = ({defaultValue, onUpdate, onDelete, readOnly}) =>
   <div className="table__row">
@@ -48,7 +48,7 @@ const onDefaultValueDelete = (nodeDef, defaultValues, defaultValue, putNodeDefPr
   }
 }
 
-const DefaultValues = props => {
+const AdvancedProps = props => {
   const {
     nodeDef,
     putNodeDefProp,
@@ -58,30 +58,33 @@ const DefaultValues = props => {
   const uiDefaultValues = R.append(NodeDefExpression.createExpressionPlaceholder(), defaultValues)
 
   return (
-    <div className="table default-values">
+    <div className="form">
 
-      <h5>Default values</h5>
+      <div className="table default-values">
 
-      <div className="table__row-header">
-        <div>Value</div>
-        <div>If</div>
-        <div/>
-      </div>
+        <h5>Default values</h5>
 
-      <div className="table__rows">
-        {
-          uiDefaultValues.map(defaultValue =>
-            <DefaultValueRow {...props}
-                             key={defaultValue.uuid}
-                             defaultValue={defaultValue}
-                             onDelete={defaultValue => onDefaultValueDelete(nodeDef, uiDefaultValues, defaultValue, putNodeDefProp)}
-                             onUpdate={defaultValue => onDefaultValueUpdate(nodeDef, uiDefaultValues, defaultValue, putNodeDefProp)}
-            />
-          )
-        }
+        <div className="table__row-header">
+          <div>Value</div>
+          <div>If</div>
+          <div/>
+        </div>
+
+        <div className="table__rows">
+          {
+            uiDefaultValues.map(defaultValue =>
+              <DefaultValueRow {...props}
+                               key={defaultValue.uuid}
+                               defaultValue={defaultValue}
+                               onDelete={defaultValue => onDefaultValueDelete(nodeDef, uiDefaultValues, defaultValue, putNodeDefProp)}
+                               onUpdate={defaultValue => onDefaultValueUpdate(nodeDef, uiDefaultValues, defaultValue, putNodeDefProp)}
+              />
+            )
+          }
+        </div>
       </div>
     </div>
   )
 }
 
-export default DefaultValues
+export default AdvancedProps

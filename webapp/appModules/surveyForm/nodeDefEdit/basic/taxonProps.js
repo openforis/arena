@@ -1,17 +1,17 @@
 import React from 'react'
 
-import { FormItem } from '../../../commonComponents/form/input'
-import Dropdown from '../../../commonComponents/form/dropdown'
+import { FormItem } from '../../../../commonComponents/form/input'
+import Dropdown from '../../../../commonComponents/form/dropdown'
 
-import Taxonomy from '../../../../common/survey/taxonomy'
-import NodeDef from '../../../../common/survey/nodeDef'
-import Survey from '../../../../common/survey/survey'
-import { getFieldValidation, getValidation } from '../../../../common/validation/validator'
+import Taxonomy from '../../../../../common/survey/taxonomy'
+import NodeDef from '../../../../../common/survey/nodeDef'
+import Survey from '../../../../../common/survey/survey'
+import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
 import connect from 'react-redux/es/connect/connect'
-import { getSurvey } from '../../../survey/surveyState'
-import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
-import { putNodeDefProp } from '../../../survey/nodeDefs/actions'
-import { createTaxonomy, deleteTaxonomy } from '../taxonomyEdit/actions'
+import { getSurvey } from '../../../../survey/surveyState'
+import { getFormNodeDefEdit, getSurveyForm } from '../../surveyFormState'
+import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
+import { createTaxonomy, deleteTaxonomy } from '../../taxonomyEdit/actions'
 
 const TaxonProps = (props) => {
   const {
