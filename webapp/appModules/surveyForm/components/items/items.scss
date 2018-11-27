@@ -1,37 +1,28 @@
 @import "../../../../style/vars";
 
 .items {
-  display: grid;
-  grid-template-rows: 5rem 1fr 5rem;
-  height: 100%;
-}
+  margin: 2rem 5rem 0 5rem;
 
-.items__header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2rem;
+  .table__row, .table__row-header {
+    grid-template-columns: 1fr 300px;
 
-  button {
-    margin-left: 1rem;
-  }
-}
+    .name {
+      justify-self: start;
+      padding: 0 2rem;
 
-.items__table {
-  margin: 2rem 10rem;
-  max-height: calc(100vh - 14rem);
-  overflow-y: auto;
-}
+      .error-badge {
+        margin-left: 2rem;
+      }
+    }
 
-.items__table-row {
-  display: grid;
-  grid-template-columns: 1fr repeat(3, 100px);
-  grid-auto-rows: 35px;
-  align-items: center;
-  border-bottom: 1px solid rgba($white, 0.5);
+    .buttons {
+      justify-self: end;
 
-  button {
-    justify-self: center;
+      > * {
+        margin: 0 .5rem;
+      }
+    }
+
   }
 }
 
