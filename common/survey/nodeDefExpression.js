@@ -4,7 +4,7 @@ const {uuidv4} = require('./../uuid')
 const expressionProp = 'expression'
 const applyIfProp = 'applyIf'
 
-const createDefaultValuePlaceholder = () => ({
+const createExpressionPlaceholder = () => ({
   uuid: uuidv4(),
   placeholder: true,
   expression: '',
@@ -13,13 +13,13 @@ const createDefaultValuePlaceholder = () => ({
 
 module.exports = {
   //CREATE
-  createDefaultValuePlaceholder,
+  createExpressionPlaceholder,
 
   //READ
   getExpression: R.prop(expressionProp),
   getApplyIf: R.prop(applyIfProp),
 
   //UPDATE
-  setExpression: expression => R.assoc(expressionProp, expression),
-  setApplyIf: applyIf => R.assoc(applyIfProp, applyIf),
+  assocExpression: expression => R.assoc(expressionProp, expression),
+  assocApplyIf: applyIf => R.assoc(applyIfProp, applyIf),
 }

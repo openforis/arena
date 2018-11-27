@@ -6,17 +6,17 @@ import * as R from 'ramda'
 import { Input } from '../../../commonComponents/form/input'
 
 import NodeDef from '../../../../common/survey/nodeDef'
-import DefaultValue from '../../../../common/survey/defaultValue'
+import NodeDefExpression from '../../../../common/survey/nodeDefExpression'
 
 const DefaultValueRow = ({defaultValue, onUpdate, onDelete, readOnly}) =>
   <div className="table__row">
     <div>
-      <Input value={DefaultValue.getExpression(defaultValue)}
-             onValueChange={value => onUpdate(DefaultValue.setExpression(value)(defaultValue))}/>
+      <Input value={NodeDefExpression.getExpression(defaultValue)}
+             onValueChange={value => onUpdate(NodeDefExpression.assocExpression(value)(defaultValue))}/>
     </div>
     <div>
-      <Input value={DefaultValue.getApplyIf(defaultValue)}
-             onValueChange={value => onUpdate(DefaultValue.setApplyIf(value)(defaultValue))}/>
+      <Input value={NodeDefExpression.getApplyIf(defaultValue)}
+             onValueChange={value => onUpdate(NodeDefExpression.assocApplyIf(value)(defaultValue))}/>
     </div>
     <div>
       {!defaultValue.placeholder &&
@@ -53,10 +53,9 @@ const DefaultValues = props => {
     nodeDef,
     putNodeDefProp,
   } = props
-  //const validation = getValidation(nodeDef)
 
   const defaultValues = NodeDef.getDefaultValues(nodeDef)
-  const uiDefaultValues = R.append(DefaultValue.createDefaultValuePlaceholder(), defaultValues)
+  const uiDefaultValues = R.append(NodeDefExpression.createExpressionPlaceholder(), defaultValues)
 
   return (
     <div className="table default-values">
