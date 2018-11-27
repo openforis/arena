@@ -63,13 +63,13 @@ const CodeListProps = (props) => {
                     toggleCodeListEdit(true)
                   }}>
 
-            <span className="icon icon-plus icon-16px icon-left"/>
+            <span className="icon icon-plus icon-12px icon-left"/>
             ADD
           </button>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
                   onClick={() => toggleCodeListEdit(true)}>
-            <span className="icon icon-list icon-16px icon-left"/>
+            <span className="icon icon-list icon-12px icon-left"/>
             MANAGE
           </button>
         </div>

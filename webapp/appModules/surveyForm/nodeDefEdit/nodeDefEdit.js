@@ -1,3 +1,5 @@
+import './nodeDefEdit.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -12,6 +14,7 @@ import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
 import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
 import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
+
 import DefaultValues from './defaultValues'
 
 class NodeDefEdit extends React.Component {
@@ -43,7 +46,7 @@ class NodeDefEdit extends React.Component {
 
     return nodeDef
       ? (
-        <div className="survey-form__node-def-edit">
+        <div className="node-def-edit">
           {
             editingCodeList
               ? <CodeListsView canSelect={canUpdateCodeList}
@@ -56,7 +59,7 @@ class NodeDefEdit extends React.Component {
                                 selectedItemUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}
                                 onClose={() => this.setState({editingTaxonomy: false})}/>
               : (
-                <div>
+                <div className="node-def-edit__container">
                   <TabBar
                     tabs={[
                       {
@@ -78,11 +81,11 @@ class NodeDefEdit extends React.Component {
                         )
                       }
                     ]}/>
-                  <div className="flex-center">
-                    <button className="btn btn-of-light"
-                            onClick={() => this.close()}>Done
-                    </button>
-                  </div>
+
+                  <button className="btn btn-of-light btn-close"
+                          onClick={() => this.close()}>Done
+                  </button>
+
                 </div>
               )
           }
