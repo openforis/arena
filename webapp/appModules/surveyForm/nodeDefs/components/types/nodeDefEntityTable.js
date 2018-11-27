@@ -82,7 +82,7 @@ class NodeDefEntityTable extends React.Component {
       <div className="node-def__table">
 
         <div className="node-def__table-header">
-          <h5>{label}</h5>
+          <div>{label}</div>
           {
             entry
               ? <button className="btn btn-s btn-of-light-xs"

@@ -1,7 +1,7 @@
 @import "../../../style/vars";
 
 .survey-delete-dialog__header {
-  font-weight: 400;
+  font-weight: 600;
   text-transform: uppercase;
   width: 100%;
   text-align: center;
@@ -14,7 +14,6 @@
   .highlight {
     background-color: $yellow;
     color: black;
-    font-weight: 400;
     line-height: 3rem;
     text-align: center;
   }

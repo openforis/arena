@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:100,200,400,600,800,900');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:200,400,600,800');
 @import "./vars";
 @import "./layout";
 @import "./formBase";
@@ -17,7 +17,7 @@ body, html {
 
 body {
   margin: 0;
-  font-weight: 200;
+  font-weight: 400;
   letter-spacing: 1px;
   color: $white;
 }
@@ -79,7 +79,6 @@ body {
   background-color: rgba($red, 0.4);
   left: 0;
   font-size: .9rem;
-  font-weight: 400;
   padding: .1rem .5rem;
 }
 
@@ -104,7 +103,6 @@ body {
   padding: .15rem .3rem;
   border-radius: $ofBorderRadius;
   font-size: .7rem;
-  font-weight: 400;
 }
 
 .no-border {

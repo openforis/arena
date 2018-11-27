@@ -68,9 +68,9 @@ const Header = ({onAdd, readOnly}) => (
   !readOnly &&
   <div className="table__header">
 
-    <button className="btn btn-s btn-of-light-xs"
+    <button className="btn btn-s btn-of-light"
             onClick={onAdd}>
-      <span className="icon icon-plus icon-16px icon-left"/>
+      <span className="icon icon-plus icon-12px icon-left"/>
       ADD
     </button>
   </div>

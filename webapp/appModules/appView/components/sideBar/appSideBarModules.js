@@ -52,7 +52,7 @@ const AppSideBarModule = (props) => {
 
   return (
     <React.Fragment>
-      <Link className={`btn btn-s btn-of-light-xs app-sidebar__module${active ? ' active' : ''}`}
+      <Link className={`btn btn-s btn-of-light-s app-sidebar__module${active ? ' active' : ''}`}
             to={appModuleUri(module)}
             aria-disabled={disabled || (requireSurvey && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo)))}>
         <span className={`icon icon-${icon} icon-20px${sideBarOpened ? ' icon-left' : ''}`}></span>
