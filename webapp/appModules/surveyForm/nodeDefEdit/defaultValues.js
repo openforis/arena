@@ -59,11 +59,15 @@ const DefaultValues = props => {
 
   return (
     <div className="table default-values">
+
+      <h5>Default values</h5>
+
       <div className="table__row-header">
         <div>Value</div>
         <div>If</div>
-        <div></div>
+        <div/>
       </div>
+
       <div className="table__rows">
         {
           uiDefaultValues.map(defaultValue =>

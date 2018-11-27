@@ -5,6 +5,10 @@
 
   .table__row-header,
   .table__row {
-    grid-template-columns: .5fr .4fr 30px;
+    grid-template-columns: .5fr .5fr 40px;
+
+    > div {
+      width: 100%;
+    }
   }
 }
