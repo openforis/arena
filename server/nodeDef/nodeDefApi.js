@@ -1,5 +1,3 @@
-const R = require('ramda')
-
 const {sendErr, sendOk} = require('../serverUtils/response')
 const {getRestParam} = require('../serverUtils/request')
 
@@ -9,16 +7,15 @@ const {
   createNodeDef,
   updateNodeDefProp,
   markNodeDefDeleted,
-  fetchNodeDef
+  fetchNodeDefSurveyId,
 } = require('./nodeDefManager')
 
-const {fetchSurveyNodeDefs} = require('./../survey/surveyManager')
+const SurveyManager = require('./../survey/surveyManager')
 
 const UnauthorizedError = require('../authGroup/unauthorizedError')
 
 const checkSurveyId = async (nodeDefId, reqSurveyId) => {
-  const nodeDef = await fetchNodeDef(nodeDefId)
-  const nodeDefSurveyId = R.prop('surveyId', nodeDef)
+  const nodeDefSurveyId = await fetchNodeDefSurveyId(nodeDefId)
   if (nodeDefSurveyId !== reqSurveyId) {
     throw new UnauthorizedError(`Not authorized`)
   }
@@ -48,15 +45,15 @@ module.exports.init = app => {
   app.put('/survey/:surveyId/nodeDef/:nodeDefId/prop', requireSurveyEditPermission, async (req, res) => {
     try {
       const {body} = req
-      const {key, value} = body
+      const {key, value, advanced} = body
 
       const nodeDefId = getRestParam(req, 'nodeDefId')
       const surveyId = getRestParam(req, 'surveyId')
 
       await checkSurveyId(nodeDefId, surveyId)
 
-      await updateNodeDefProp(nodeDefId, key, value)
-      const nodeDefs = await fetchSurveyNodeDefs(surveyId, true, true)
+      await updateNodeDefProp(nodeDefId, key, value, advanced)
+      const nodeDefs = await SurveyManager.fetchSurveyNodeDefs(surveyId, true, true)
 
       res.json({nodeDefs})
     } catch (err) {

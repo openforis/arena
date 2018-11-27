@@ -15,7 +15,9 @@ const dbTransformCallback = (def, draft = false) => R.pipe(
   R.partialRight(defDbTransformCallback, [draft]),
 )(def)
 
-const nodeDefSelectFields = `id, uuid, survey_id, parent_id, type, deleted, props, props_draft, 
+const nodeDefSelectFields = (advanced = false) => `id, uuid, survey_id, parent_id, type, deleted, 
+      props${advanced ? ' || props_advanced' : ''} as props, 
+      props_draft${advanced ? ' || props_advanced_draft' : ''} as  props_draft,
      ${selectDate('date_created')}, ${selectDate('date_modified')}`
 
 // ============== CREATE
@@ -35,18 +37,18 @@ const createEntityDef = async (surveyId, parentId, uuid, props, client = db) =>
 
 // ============== READ
 
-const fetchNodeDef = async (nodeDefId = null, draft, client = db) =>
+const fetchNodeDefSurveyId = async (nodeDefId = null, draft, client = db) =>
   await client.one(
-    `SELECT ${nodeDefSelectFields}
+      `SELECT survey_id
      FROM node_def 
      WHERE id = $1`,
     [nodeDefId],
-    res => dbTransformCallback(res, draft)
+    record => record.survey_id
   )
 
-const fetchNodeDefsBySurveyId = async (surveyId, draft, client = db) =>
+const fetchNodeDefsBySurveyId = async (surveyId, draft, advanced = false, client = db) =>
   await client.map(`
-    SELECT ${nodeDefSelectFields}
+    SELECT ${nodeDefSelectFields(advanced)}
     FROM node_def 
     WHERE survey_id = $1
     AND deleted IS NOT TRUE
@@ -57,7 +59,7 @@ const fetchNodeDefsBySurveyId = async (surveyId, draft, client = db) =>
 
 const fetchRootNodeDef = async (surveyId, draft, client = db) =>
   await client.one(
-    `SELECT ${nodeDefSelectFields}
+    `SELECT ${nodeDefSelectFields()}
      FROM node_def 
      WHERE parent_id IS NULL
      AND survey_id =$1`,
@@ -67,7 +69,7 @@ const fetchRootNodeDef = async (surveyId, draft, client = db) =>
 
 const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
   await client.map(`
-    SELECT ${nodeDefSelectFields}
+    SELECT ${nodeDefSelectFields()}
     FROM node_def 
     WHERE parent_id = $1
     AND deleted IS NOT TRUE
@@ -80,7 +82,7 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
   const rootNodeDef = await fetchRootNodeDef(surveyId, draft, client)
 
   return await client.map(`
-    SELECT ${nodeDefSelectFields}
+    SELECT ${nodeDefSelectFields()}
     FROM node_def 
     WHERE survey_id = $1
     AND deleted IS NOT TRUE
@@ -94,15 +96,16 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
 
 // ============== UPDATE
 
-const updateNodeDefProp = async (nodeDefId, key, value, client = db) => {
+const updateNodeDefProp = async (nodeDefId, key, value, advanced = false, client = db) => {
   const prop = {[key]: value}
+  const propsCol = `props${advanced ? '_advanced' : ''}_draft`
 
   return await client.one(`
     UPDATE node_def 
-    SET props_draft = props_draft || $1,
+    SET ${propsCol} = ${propsCol} || $1,
     date_modified = timezone('UTC'::text, now())
     WHERE id = $2
-    RETURNING ${nodeDefSelectFields}
+    RETURNING ${nodeDefSelectFields()}
   `, [JSON.stringify(prop), nodeDefId],
     def => dbTransformCallback(def, true) //always loading draft when creating or updating a nodeDef
   )
@@ -114,7 +117,9 @@ const publishNodeDefsProps = async (surveyId, client = db) =>
         node_def n
     SET
         props = props || props_draft,
-        props_draft = '{}'::jsonb
+        props_draft = '{}'::jsonb,
+        props_advanced = props_advanced || props_advanced_draft,
+        props_advanced_draft = '{}'::jsonb
     WHERE
         n.survey_id = $1
     `, [surveyId]
@@ -127,7 +132,7 @@ const markNodeDefDeleted = async (nodeDefId, client = db) => {
     UPDATE node_def 
     SET deleted = true
     WHERE id = $1
-    RETURNING ${nodeDefSelectFields}
+    RETURNING ${nodeDefSelectFields()}
   `,
     [nodeDefId],
     def => dbTransformCallback(def, true)
@@ -167,14 +172,13 @@ const deleteNodeDefsProp = async (surveyId, deletePath, client = db) =>
 module.exports = {
   //utils
   dbTransformCallback,
-  nodeDefSelectFields,
 
   //CREATE
   createNodeDef,
   createEntityDef,
 
   //READ
-  fetchNodeDef,
+  fetchNodeDefSurveyId,
   fetchNodeDefsBySurveyId,
   fetchRootNodeDef,
   fetchNodeDefsByParentId,

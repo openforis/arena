@@ -25,7 +25,10 @@ const TabBarButtons = ({tabs, location, selection, onClick}) => (
   </div>
 )
 
-const TabBarComponent = ({tab, ...rest}) => React.createElement(tab.component, {...tab.props, ...rest})
+const TabBarComponent = ({tab, ...rest}) =>
+ typeof tab.component === 'object'
+    ? tab.component
+    : React.createElement(tab.component, {...tab.props, ...rest})
 
 const TabBarSwitch = ({tabs, location}) => (
   <Switch location={location}>

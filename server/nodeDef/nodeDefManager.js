@@ -4,8 +4,8 @@ const nodeDefRepository = require('./nodeDefRepository')
 
 const {markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
 
-const fetchNodeDef = async (nodeDefId, draft) =>
-  await nodeDefRepository.fetchNodeDef(nodeDefId, draft)
+const fetchNodeDefSurveyId = async (nodeDefId) =>
+  await nodeDefRepository.fetchNodeDefSurveyId(nodeDefId)
 
 const createNodeDef = async (surveyId, parentId, uuid, type, props) =>
   await db.tx(async t => {
@@ -16,9 +16,9 @@ const createNodeDef = async (surveyId, parentId, uuid, type, props) =>
     return nodeDef
   })
 
-const updateNodeDefProp = async (nodeDefId, key, value) =>
+const updateNodeDefProp = async (nodeDefId, key, value, advanced = false) =>
   await db.tx(async t => {
-    const nodeDef = await nodeDefRepository.updateNodeDefProp(nodeDefId, key, value, t)
+    const nodeDef = await nodeDefRepository.updateNodeDefProp(nodeDefId, key, value, advanced, t)
 
     await markSurveyDraft(nodeDef.surveyId, t)
 
@@ -35,7 +35,7 @@ const markNodeDefDeleted = async (nodeDefId) =>
   })
 
 module.exports = {
-  fetchNodeDef,
+  fetchNodeDefSurveyId,
   createNodeDef,
   updateNodeDefProp,
   markNodeDefDeleted,

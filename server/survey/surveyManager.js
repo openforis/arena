@@ -91,7 +91,9 @@ const fetchUserSurveysInfo = async (user) => R.map(
 )
 
 const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
-  const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft)
+  const advanced = validate //load advanced props when validating
+
+  const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced)
 
   const nodeDefsResult = R.reduce(
     (acc, nodeDef) => draft

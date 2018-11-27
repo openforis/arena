@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import CommonProps from './commonProps'
+import TabBar from '../../../commonComponents/tabBar'
 import CodeListsView from '../components/codeListsView'
 import TaxonomiesView from '../components/taxonomiesView'
 
@@ -11,6 +12,7 @@ import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
 import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
 import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
+import DefaultValues from './defaultValues'
 
 class NodeDefEdit extends React.Component {
 
@@ -19,51 +21,70 @@ class NodeDefEdit extends React.Component {
 
     this.state = {
       editingCodeList: false,
-      editingTaxonomy: false,
+      editingTaxonomy: false
     }
   }
 
   close () {
-    const {closeFormNodeDefEdit} = this.props
-    closeFormNodeDefEdit()
+    this.props.closeFormNodeDefEdit()
   }
 
   render () {
     const {
-      nodeDef, putNodeDefProp,
+      nodeDef,
+      putNodeDefProp,
       canUpdateCodeList
     } = this.props
-    const {editingCodeList, editingTaxonomy} = this.state
+
+    const {
+      editingCodeList,
+      editingTaxonomy,
+    } = this.state
 
     return nodeDef
       ? (
         <div className="survey-form__node-def-edit">
           {
             editingCodeList
-              ?
-              <CodeListsView canSelect={canUpdateCodeList}
-                             onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
-                             selectedItemUUID={NodeDef.getNodeDefCodeListUUID(nodeDef)}
-                             onClose={() => this.setState({editingCodeList: false})}/>
+              ? <CodeListsView canSelect={canUpdateCodeList}
+                               onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
+                               selectedItemUUID={NodeDef.getNodeDefCodeListUUID(nodeDef)}
+                               onClose={() => this.setState({editingCodeList: false})}/>
               : editingTaxonomy
-              ?
-              <TaxonomiesView canSelect={true}
-                              onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
-                              selectedItemUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}
-                              onClose={() => this.setState({editingTaxonomy: false})}/>
-              :
-              <div className="form">
-                <CommonProps nodeDef={nodeDef}
-                             putNodeDefProp={putNodeDefProp}
-                             toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
-                             toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
-
-                <div style={{justifySelf: 'center'}}>
-                  <button className="btn btn-of-light"
-                          onClick={() => this.close()}>Done
-                  </button>
+              ? <TaxonomiesView canSelect={true}
+                                onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
+                                selectedItemUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}
+                                onClose={() => this.setState({editingTaxonomy: false})}/>
+              : (
+                <div>
+                  <TabBar
+                    tabs={[
+                      {
+                        label: 'Basic',
+                        component: (
+                          <div className="form">
+                            <CommonProps nodeDef={nodeDef}
+                                         putNodeDefProp={putNodeDefProp}
+                                         toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
+                                         toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
+                          </div>
+                        ),
+                      },
+                      {
+                        label: 'Advanced',
+                        component: (
+                          <DefaultValues nodeDef={nodeDef}
+                                         putNodeDefProp={putNodeDefProp}/>
+                        )
+                      }
+                    ]}/>
+                  <div className="flex-center">
+                    <button className="btn btn-of-light"
+                            onClick={() => this.close()}>Done
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )
           }
         </div>
       )
