@@ -15,6 +15,10 @@ const sendJobToParentThread = () => {
 
 const handleJobEvent = async () => {
   sendJobToParentThread()
+
+  if (job.isEnded()) {
+    parentPort.close()
+  }
 }
 
 const execute = () => {
@@ -29,7 +33,7 @@ const execute = () => {
 
 execute()
 
-parentPort.on('message', function (msg) {
+parentPort.on('message', msg => {
   switch (msg.type) {
     case jobThreadMessageTypes.fetchJob:
       sendJobToParentThread()
@@ -39,3 +43,4 @@ parentPort.on('message', function (msg) {
       break
   }
 })
+

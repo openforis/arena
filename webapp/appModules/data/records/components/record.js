@@ -9,11 +9,17 @@ import { getSurveyForm } from '../../../surveyForm/surveyFormState'
 
 import { initSurveyDefs } from '../../../../survey/actions'
 import { resetForm } from '../../../surveyForm/actions'
-import { createRecord, fetchRecord } from '../../../surveyForm/record/actions'
+import { createRecord, fetchRecord, checkoutRecord } from '../../../surveyForm/record/actions'
 
 import { appModules, appModuleUri } from '../../../appModules'
 
 class Record extends React.Component {
+
+  constructor (props) {
+    super(props)
+
+    this.componentUnload = this.componentUnload.bind(this)
+  }
 
   componentDidMount () {
     const {
@@ -34,6 +40,7 @@ class Record extends React.Component {
       createRecord()
     }
 
+    window.addEventListener('beforeunload', this.componentUnload)
   }
 
   componentDidUpdate (prevProps) {
@@ -47,6 +54,12 @@ class Record extends React.Component {
 
   componentWillUnmount () {
     this.props.resetForm()
+    this.componentUnload()
+    window.removeEventListener('beforeunload', this.componentUnload)
+  }
+
+  componentUnload () {
+    this.props.checkoutRecord()
   }
 
   render () {
@@ -70,6 +83,6 @@ export default connect(
   mapStateToProps,
   {
     initSurveyDefs, resetForm,
-    createRecord, fetchRecord
+    createRecord, fetchRecord, checkoutRecord
   }
 )(Record)

@@ -10,7 +10,7 @@ const accessControlMiddleware = require('./config/accessControlMiddleware')
 const authConfig = require('./auth/authConfig')
 const authApi = require('./auth/authApi')
 const apiRouter = require('./config/apiRouter')
-const socketMiddleware = require('./config/socketMiddleware')
+const WebSocketManager = require('./webSocket/webSocketManager')
 
 module.exports = () => {
 
@@ -49,6 +49,6 @@ module.exports = () => {
   })
 
 // ====== socket middleware
-  socketMiddleware.init(server, sessionMiddleware)
+  WebSocketManager.init(server, sessionMiddleware)
 
 }
