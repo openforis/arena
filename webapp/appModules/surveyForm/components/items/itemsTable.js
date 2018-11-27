@@ -17,9 +17,10 @@ const TableRow = props => {
   const selected = item.uuid === selectedItemUUID
 
   return (
-    <div className="items__table-row">
-      <div>
-        {name && <span style={{marginRight: '2rem'}}>{name}</span>}
+    <div className="table__row">
+
+      <div className="name">
+        {name}
         {
           !isValid(item) && (
             <span className="error-badge">
@@ -30,7 +31,7 @@ const TableRow = props => {
         }
       </div>
 
-      <div className="items__table-row-buttons">
+      <div className="buttons">
         {
           onSelect && (canSelect || selected) &&
           <button className={`btn btn-s btn-of-light-xs${selected ? ' active' : ''}`}
@@ -63,20 +64,46 @@ const TableRow = props => {
   )
 }
 
+const Header = ({onAdd, readOnly}) => (
+  !readOnly &&
+  <div className="table__header">
+
+    <button className="btn btn-s btn-of-light-xs"
+            onClick={onAdd}>
+      <span className="icon icon-plus icon-16px icon-left"/>
+      ADD
+    </button>
+  </div>
+)
+
 const ItemsTable = (props) => {
   const {items} = props
+
   return (
-    R.isEmpty(items)
-      ? <div>No items added</div>
-      : <div className="items__table">
-        {
-          items.map(item =>
-            <TableRow {...props}
-                      key={item.uuid}
-                      item={item}
-            />)
-        }
-      </div>
+    <React.Fragment>
+
+      <Header {...props}/>
+
+      {
+        R.isEmpty(items)
+          ? <div className="table__empty-rows">No items added</div>
+          : (
+            <div className="table">
+              <div className="table__row-header">
+                <div className="name">Name</div>
+                <div/>
+              </div>
+              {
+                items.map(item =>
+                  <TableRow {...props}
+                            key={item.uuid}
+                            item={item}
+                  />)
+              }
+            </div>
+          )
+      }
+    </React.Fragment>
   )
 }
 
