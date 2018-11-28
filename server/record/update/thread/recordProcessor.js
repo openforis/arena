@@ -28,15 +28,15 @@ const persistNode = async (surveyId, nodeReq, file, client = db) => {
  * Create a new node, and recursively creates inner nodes
  *
  * @param nodeDef
- * @param nodeReq
+ * @param nodeToInsert
  * @param file
  * @param client
  * @returns {Promise<void>}
  */
-const createNode = async (nodeDef, nodeReq, file, client = db) => {
+const createNode = async (nodeDef, nodeToInsert, file, client = db) => {
 
   // insert node
-  const node = await NodeRepository.insertNode(nodeDef.surveyId, nodeReq, file ? file.data : null, client)
+  const node = await NodeRepository.insertNode(nodeDef.surveyId, nodeToInsert, file ? file.data : null, client)
 
   // add children if entity
   const childDefs = NodeDef.isNodeDefEntity(nodeDef)
@@ -144,7 +144,6 @@ const resetNodeValue = async (survey, record, nodeUUID, client = db) => {
 }
 
 module.exports = {
-  createNode,
   persistNode,
   deleteNode,
 }

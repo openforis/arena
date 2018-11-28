@@ -36,7 +36,7 @@ class RecordUpdateThread extends Thread {
     let nodes = null
 
     switch (msg.type) {
-      case messageTypes.updateNode:
+      case messageTypes.persistNode:
         nodes = await RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file)
         break
 

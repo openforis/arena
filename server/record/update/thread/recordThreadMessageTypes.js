@@ -1,6 +1,5 @@
 const types = {
-  createNode: 'createNode',
-  updateNode: 'updateNode',
+  persistNode: 'persistNode',
   deleteNode: 'deleteNode',
 }
 

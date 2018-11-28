@@ -9,7 +9,6 @@ const Node = require('../../common/record/node')
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
-const RecordProcessor = require('./update/thread/recordProcessor')
 
 /**
  * ===================
@@ -19,16 +18,18 @@ const RecordProcessor = require('./update/thread/recordProcessor')
 const createRecord = async (userId, recordToCreate) =>
   await db.tx(
     async t => {
+
+      RecordUpdateManager.checkIn(userId)
+
       const record = await RecordRepository.insertRecord(recordToCreate, t)
       const {surveyId, id: recordId} = record
 
       const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
+      const rootNode = Node.newNode(rootNodeDef.id, recordId)
 
-      const nodes = await RecordProcessor.createNode(rootNodeDef, Node.newNode(rootNodeDef.id, recordId), null, t)
+      persistNode(userId, surveyId, rootNode)
 
-      RecordUpdateManager.checkIn(userId)
-
-      return R.assoc('nodes', nodes, record)
+      return record
     }
   )
 
@@ -58,9 +59,8 @@ const fetchRecordById = async (surveyId, recordId) => {
  * ===================
  */
 
-const persistNode = (userId, surveyId, node, file) => {
+const persistNode = (userId, surveyId, node, file) =>
   RecordUpdateManager.persistNode(userId, surveyId, node, file)
-}
 
 /**
  * ===================
@@ -70,8 +70,8 @@ const persistNode = (userId, surveyId, node, file) => {
 const deleteRecord = async (surveyId, recordId) =>
   await RecordRepository.deleteRecord(surveyId, recordId)
 
-const deleteNode = async (userId, surveyId, nodeUUID) =>
-  await RecordUpdateManager.deleteNode(userId, surveyId, nodeUUID)
+const deleteNode = (userId, surveyId, nodeUUID) =>
+  RecordUpdateManager.deleteNode(userId, surveyId, nodeUUID)
 
 /**
  * ==================

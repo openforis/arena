@@ -48,7 +48,7 @@ const checkOut = userId => {
  */
 const persistNode = (userId, surveyId, node, file) => {
   const updateWorker = recordUpdateThreads.getThread(userId)
-  updateWorker.postMessage({type: recordThreadMessageTypes.updateNode, surveyId, node, file})
+  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, surveyId, node, file})
 }
 
 const deleteNode = (userId, surveyId, nodeUUID) => {
