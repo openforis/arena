@@ -1,7 +1,12 @@
 @import "../../../../style/vars";
 
 .items {
-  margin: 2rem 5rem 0 5rem;
+  margin: 0 5rem;
+  height: 100%;
+
+  .table {
+    height: calc(100% - 100px);
+  }
 
   .table__row, .table__row-header {
     grid-template-columns: 1fr 300px;
@@ -26,3 +31,6 @@
   }
 }
 
+.items__footer {
+  text-align: center;
+}
