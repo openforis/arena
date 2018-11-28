@@ -93,13 +93,15 @@ const ItemsTable = (props) => {
                 <div className="name">Name</div>
                 <div/>
               </div>
-              {
-                items.map(item =>
-                  <TableRow {...props}
-                            key={item.uuid}
-                            item={item}
-                  />)
-              }
+              <div className="table__rows">
+                {
+                  items.map(item =>
+                    <TableRow {...props}
+                              key={item.uuid}
+                              item={item}
+                    />)
+                }
+              </div>
             </div>
           )
       }

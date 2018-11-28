@@ -1,25 +1,25 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { FormItem } from '../../../commonComponents/form/input'
-import Dropdown from '../../../commonComponents/form/dropdown'
+import { FormItem } from '../../../../commonComponents/form/input'
+import Dropdown from '../../../../commonComponents/form/dropdown'
 
-import NodeDef from '../../../../common/survey/nodeDef'
-import CodeList from '../../../../common/survey/codeList'
-import Validator from '../../../../common/validation/validator'
+import NodeDef from '../../../../../common/survey/nodeDef'
+import CodeList from '../../../../../common/survey/codeList'
+import Validator from '../../../../../common/validation/validator'
 
 import {
   isRenderCheckbox,
   isRenderDropdown,
   nodeDefLayoutProps,
   nodeDefRenderType
-} from '../../../../common/survey/nodeDefLayout'
-import { getSurvey } from '../../../survey/surveyState'
-import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
-import Survey from '../../../../common/survey/survey'
+} from '../../../../../common/survey/nodeDefLayout'
+import { getSurvey } from '../../../../survey/surveyState'
+import { getFormNodeDefEdit, getSurveyForm } from '../../surveyFormState'
+import Survey from '../../../../../common/survey/survey'
 import connect from 'react-redux/es/connect/connect'
-import { putNodeDefProp } from '../../../survey/nodeDefs/actions'
-import { createCodeList, deleteCodeList } from '../codeListEdit/actions'
+import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
+import { createCodeList, deleteCodeList } from '../../codeListEdit/actions'
 
 const CodeListProps = (props) => {
   const {
@@ -63,13 +63,13 @@ const CodeListProps = (props) => {
                     toggleCodeListEdit(true)
                   }}>
 
-            <span className="icon icon-plus icon-16px icon-left"/>
+            <span className="icon icon-plus icon-12px icon-left"/>
             ADD
           </button>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
                   onClick={() => toggleCodeListEdit(true)}>
-            <span className="icon icon-list icon-16px icon-left"/>
+            <span className="icon icon-list icon-12px icon-left"/>
             MANAGE
           </button>
         </div>

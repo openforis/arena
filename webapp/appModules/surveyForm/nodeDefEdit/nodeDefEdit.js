@@ -1,8 +1,11 @@
+import './nodeDefEdit.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
-import CommonProps from './commonProps'
 import TabBar from '../../../commonComponents/tabBar'
+import BasicProps from './basic/basicProps'
+import AdvancedProps from './advanced/advancedProps'
 import CodeListsView from '../components/codeListsView'
 import TaxonomiesView from '../components/taxonomiesView'
 
@@ -12,7 +15,6 @@ import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
 import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
 import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
-import DefaultValues from './defaultValues'
 
 class NodeDefEdit extends React.Component {
 
@@ -43,7 +45,7 @@ class NodeDefEdit extends React.Component {
 
     return nodeDef
       ? (
-        <div className="survey-form__node-def-edit">
+        <div className="node-def-edit">
           {
             editingCodeList
               ? <CodeListsView canSelect={canUpdateCodeList}
@@ -56,33 +58,31 @@ class NodeDefEdit extends React.Component {
                                 selectedItemUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}
                                 onClose={() => this.setState({editingTaxonomy: false})}/>
               : (
-                <div>
+                <div className="node-def-edit__container">
                   <TabBar
                     tabs={[
                       {
                         label: 'Basic',
                         component: (
-                          <div className="form">
-                            <CommonProps nodeDef={nodeDef}
-                                         putNodeDefProp={putNodeDefProp}
-                                         toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
-                                         toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
-                          </div>
+                          <BasicProps nodeDef={nodeDef}
+                                      putNodeDefProp={putNodeDefProp}
+                                      toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
+                                      toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
                         ),
                       },
                       {
                         label: 'Advanced',
                         component: (
-                          <DefaultValues nodeDef={nodeDef}
+                          <AdvancedProps nodeDef={nodeDef}
                                          putNodeDefProp={putNodeDefProp}/>
                         )
                       }
                     ]}/>
-                  <div className="flex-center">
-                    <button className="btn btn-of-light"
-                            onClick={() => this.close()}>Done
-                    </button>
-                  </div>
+
+                  <button className="btn btn-of-light btn-close"
+                          onClick={() => this.close()}>Done
+                  </button>
+
                 </div>
               )
           }

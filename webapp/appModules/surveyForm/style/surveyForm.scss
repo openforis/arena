@@ -52,21 +52,6 @@ $tableRowHeaderHeight: 40px;
   }
 }
 
-.survey-form__node-def-edit {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0px;
-  left: 0px;
-  padding-top: 3rem;
-  z-index: $zIndex10TopOfApp;
-  background-color: rgba($greyDark, 0.95);
-
-  .form {
-    grid-row-gap: 1.5rem;
-  }
-}
-
 .survey-form__actions {
   position: relative;
   display: grid;
