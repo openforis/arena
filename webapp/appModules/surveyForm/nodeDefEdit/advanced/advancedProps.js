@@ -1,5 +1,3 @@
-import './defaultValues.scss'
-
 import React from 'react'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
