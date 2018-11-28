@@ -1,5 +1,5 @@
 const jobEvents = {
-  update: 'JOB_UPDATE',
+  update: 'jobUpdate',
 }
 
 const recordEvents = {
