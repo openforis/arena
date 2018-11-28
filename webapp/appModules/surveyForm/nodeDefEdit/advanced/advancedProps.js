@@ -15,7 +15,8 @@ const AdvancedProps = props => {
                       putNodeDefProp={putNodeDefProp}
                       label="Default values"
                       values={NodeDef.getDefaultValues(nodeDef)}
-                      readOnly={readOnly}/>
+                      readOnly={readOnly}
+                      propName="defaultValues"/>
 
 
     </div>
