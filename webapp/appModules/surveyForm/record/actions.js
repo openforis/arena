@@ -19,7 +19,9 @@ export const recordDelete = 'survey/record/delete'
 export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
 
-const dispatchNodesUpdate = (dispatch, nodes) => dispatch({type: nodesUpdate, nodes})
+export const recordNodesUpdate = nodes =>
+  dispatch =>
+    dispatch({type: nodesUpdate, nodes})
 
 /**
  * ============
@@ -48,18 +50,19 @@ export const createRecord = () => async (dispatch, getState) => {
 export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
   dispatch => {
     const node = newNodePlaceholder(nodeDef, parentNode, defaultValue)
-    dispatchNodesUpdate(dispatch, {[node.uuid]: node})
+    recordNodesUpdate({[node.uuid]: node})(dispatch)
   }
 /**
  * ============
  * READ
  * ============
  */
-export const fetchRecord = recordId => async (dispatch, getState) => {
+export const checkInRecord = recordId => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.get(`/api/survey/${surveyId}/record/${recordId}`)
+  const {data} = await axios.post(`/api/survey/${surveyId}/record/${recordId}/checkin`)
   dispatch({type: recordLoad, record: data.record})
 }
+
 /**
  * ============
  * UPDATE
@@ -73,7 +76,7 @@ export const updateNode = (nodeDef, node, value, file = null) => dispatch => {
     R.assoc('value', value),
   )(node)
 
-  dispatchNodesUpdate(dispatch, {[node.uuid]: nodeToUpdate})
+  recordNodesUpdate({[node.uuid]: nodeToUpdate})(dispatch)
   dispatch(_updateNodeDebounced(nodeToUpdate, file, node.placeholder ? 0 : 500))
 }
 
@@ -95,8 +98,7 @@ const _updateNodeDebounced = (node, file, delay) => {
         : {}
 
       const surveyId = getStateSurveyId(getState())
-      const {data} = await axios.post(`/api/survey/${surveyId}/record/${node.recordId}/node`, formData, config)
-      dispatchNodesUpdate(dispatch, data.nodes)
+      await axios.post(`/api/survey/${surveyId}/record/${node.recordId}/node`, formData, config)
     } catch (e) {
       console.log(e)
     }
@@ -114,7 +116,7 @@ export const removeNode = (nodeDef, node) => async dispatch => {
     dispatch({type: nodeDelete, node})
 
     const {data} = await axios.delete(`/api/survey/${nodeDef.surveyId}/record/${node.recordId}/node/${node.uuid}`)
-    dispatchNodesUpdate(dispatch, data.nodes)
+    recordNodesUpdate(data.nodes)(dispatch)
   } catch (e) {
     console.log(e)
   }
@@ -129,4 +131,18 @@ export const deleteRecord = () => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${surveyId}/record/${record.id}`)
 
   dispatch({type: recordDelete})
+}
+
+/**
+ * ============
+ * UTILS
+ * ============
+ */
+export const checkOutRecord = () => async (dispatch, getState) => {
+  const state = getState()
+
+  const surveyId = getStateSurveyId(state)
+  const record = getRecord(getSurveyForm(state))
+
+  await axios.post(`/api/survey/${surveyId}/record/${record.id}/checkout`)
 }

@@ -18,7 +18,7 @@ module.exports.init = app => {
         throw new Error('Error record create. User is different')
       }
 
-      const record = await RecordManager.createRecord(recordReq)
+      const record = await RecordManager.createRecord(user.id, recordReq)
 
       res.json({record})
     } catch (err) {
@@ -28,13 +28,15 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/record/:recordId/node', async (req, res) => {
     try {
+      const user = req.user
       const node = JSON.parse(req.body.node)
       const file = R.path(['files', 'file'])(req)
 
       const surveyId = getRestParam(req, 'surveyId')
-      const nodes = await RecordManager.persistNode(surveyId, node, file)
 
-      res.json({nodes})
+      RecordManager.persistNode(user.id, surveyId, node, file)
+
+      sendOk(res)
     } catch (err) {
       sendErr(res, err)
     }
@@ -67,18 +69,6 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordId', async (req, res) => {
-    try {
-      const surveyId = getRestParam(req, 'surveyId')
-      const recordId = getRestParam(req, 'recordId')
-
-      const record = await RecordManager.fetchRecordById(surveyId, recordId)
-      res.json({record})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
-
   app.get('/survey/:surveyId/record/:recordId/nodes/:nodeUUID/file', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
@@ -99,6 +89,33 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
+  // RECORD Check in / out
+  app.post('/survey/:surveyId/record/:recordId/checkin', async (req, res) => {
+    try {
+      const user = req.user
+      const surveyId = getRestParam(req, 'surveyId')
+      const recordId = getRestParam(req, 'recordId')
+
+      const record = await RecordManager.checkInRecord(user.id, surveyId, recordId)
+
+      res.json({record})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.post('/survey/:surveyId/record/:recordId/checkout', async (req, res) => {
+    try {
+      const user = req.user
+
+      RecordManager.checkOutRecord(user.id)
+
+      sendOk(res)
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
   // ==== DELETE
   app.delete('/survey/:surveyId/record/:recordId', async (req, res) => {
     try {
@@ -106,6 +123,7 @@ module.exports.init = app => {
       const recordId = getRestParam(req, 'recordId')
 
       await RecordManager.deleteRecord(surveyId, recordId)
+
       sendOk(res)
     } catch (err) {
       sendErr(res, err)
@@ -116,11 +134,13 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUUID = getRestParam(req, 'nodeUUID')
+      const user = req.user
 
-      const nodes = await RecordManager.deleteNode(surveyId, nodeUUID)
+      const nodes = await RecordManager.deleteNode(user.id, surveyId, nodeUUID)
       res.json({nodes})
     } catch (err) {
       sendErr(res, err)
     }
   })
+
 }

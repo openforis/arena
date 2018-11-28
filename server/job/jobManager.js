@@ -1,73 +1,32 @@
-const {Worker} = require('worker_threads')
-const R = require('ramda')
 const path = require('path')
 
-const {throttle} = require('../../common/functionsDefer')
-const {jobEvents} = require('../../common/ws/wsEvents')
+const {jobEvents} = require('../../common/webSocket/webSocketEvents')
 
 const {jobThreadMessageTypes} = require('./jobUtils')
-
-// ==== USER SOCKETS
-
-let userSockets = {}
-
-const getUserSockets = userId => R.prop(userId, userSockets)
-
-const addUserSocket = (userId, socket) => userSockets = R.assocPath([userId, socket.id], socket, userSockets)
-
-const deleteUserSocket = (userId, socketId) => userSockets = R.dissocPath([userId, socketId], userSockets)
+const ThreadsCache = require('../threads/threadsCache')
+const Thread = require('../threads/threadManager')
+const WebSocketManager = require('../webSocket/webSocketManager')
 
 // USER JOB WORKERS
 
-const userJobWorkers = {}
-
-const getUserJobWorker = userId => userJobWorkers[userId]
-
-const addUserJobWorker = (userId, worker) => userJobWorkers[userId] = worker
-
-const deleteUserJobWorker = userId => delete userJobWorkers[userId]
-
-const init = (io) => {
-
-  io.on('connection', async socket => {
-    const userId = socket.request.session.passport.user
-    if (userId) {
-      addUserSocket(userId, socket)
-
-      const jobWorker = getUserJobWorker(userId)
-      if (jobWorker) {
-        jobWorker.postMessage({type: jobThreadMessageTypes.fetchJob})
-      }
-
-      socket.on('disconnect', () => {
-        deleteUserSocket(userId, socket.id)
-      })
-    }
-  })
-
-}
+const userJobThreads = new ThreadsCache()
 
 const notifyJobUpdate = job => {
   const userId = job.userId
 
-  const sockets = getUserSockets(userId)
-  if (sockets && !R.isEmpty(sockets)) {
-    R.forEachObjIndexed((socket) => {
-      throttle(job => socket.emit(jobEvents.update, job), `socket_${socket.id}`, 500)(job)
-    }, sockets)
-  }
+  WebSocketManager.notifyUser(userId, jobEvents.update, job)
 
   if (job.ended) {
-    deleteUserJobWorker(userId)
+    userJobThreads.removeThread(userId)
   }
 }
 
 // ====== UPDATE
 
 const cancelActiveJobByUserId = async (userId) => {
-  const jobWorker = getUserJobWorker(userId)
-  if (jobWorker) {
-    jobWorker.postMessage({type: jobThreadMessageTypes.cancelJob})
+  const jobThread = userJobThreads.getThread(userId)
+  if (jobThread) {
+    jobThread.postMessage({type: jobThreadMessageTypes.cancelJob})
   }
 }
 
@@ -75,24 +34,16 @@ const cancelActiveJobByUserId = async (userId) => {
 
 const executeJobThread = (job) => {
 
-  const worker = new Worker(
+  const thread = new Thread(
     path.resolve(__dirname, 'jobThread.js'),
-    {workerData: {jobType: job.type, params: job.params}}
+    {jobType: job.type, params: job.params},
+    async job => await notifyJobUpdate(job)
   )
 
-  worker.on('message', async job =>
-    await notifyJobUpdate(job)
-  )
-
-  const userId = job.params.userId
-  if (userId) {
-    addUserJobWorker(userId, worker)
-  }
+  userJobThreads.putThread(job.params.userId, thread)
 }
 
 module.exports = {
-  init,
-
   executeJobThread,
 
   cancelActiveJobByUserId,
