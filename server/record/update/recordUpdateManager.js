@@ -51,6 +51,13 @@ const persistNode = (userId, surveyId, node, file) => {
   updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, surveyId, node, file})
 }
 
+/**
+ * Notify thread to delete a node
+ *
+ * @param userId
+ * @param surveyId
+ * @param nodeUUID
+ */
 const deleteNode = (userId, surveyId, nodeUUID) => {
   const updateWorker = recordUpdateThreads.getThread(userId)
   updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, surveyId, nodeUUID})

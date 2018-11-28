@@ -89,6 +89,33 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
+  // RECORD Check in / out
+  app.post('/survey/:surveyId/record/:recordId/checkin', async (req, res) => {
+    try {
+      const user = req.user
+      const surveyId = getRestParam(req, 'surveyId')
+      const recordId = getRestParam(req, 'recordId')
+
+      const record = await RecordManager.checkInRecord(user.id, surveyId, recordId)
+
+      res.json({record})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.post('/survey/:surveyId/record/:recordId/checkout', async (req, res) => {
+    try {
+      const user = req.user
+
+      RecordManager.checkOutRecord(user.id)
+
+      sendOk(res)
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
   // ==== DELETE
   app.delete('/survey/:surveyId/record/:recordId', async (req, res) => {
     try {
@@ -116,30 +143,4 @@ module.exports.init = app => {
     }
   })
 
-  // ==== RECORD Check in / out
-  app.post('/survey/:surveyId/record/:recordId/checkin', async (req, res) => {
-    try {
-      const user = req.user
-      const surveyId = getRestParam(req, 'surveyId')
-      const recordId = getRestParam(req, 'recordId')
-
-      const record = await RecordManager.checkInRecord(user.id, surveyId, recordId)
-
-      res.json({record})
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
-
-  app.post('/survey/:surveyId/record/:recordId/checkout', async (req, res) => {
-    try {
-      const user = req.user
-
-      RecordManager.checkOutRecord(user.id)
-
-      sendOk(res)
-    } catch (err) {
-      sendErr(res, err)
-    }
-  })
 }

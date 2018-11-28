@@ -15,23 +15,22 @@ const RecordUpdateManager = require('./update/recordUpdateManager')
  * CREATE
  * ===================
  */
-const createRecord = async (userId, recordToCreate) =>
-  await db.tx(
-    async t => {
+const createRecord = async (userId, recordToCreate) => await db.tx(
+  async t => {
 
-      RecordUpdateManager.checkIn(userId)
+    RecordUpdateManager.checkIn(userId)
 
-      const record = await RecordRepository.insertRecord(recordToCreate, t)
-      const {surveyId, id: recordId} = record
+    const record = await RecordRepository.insertRecord(recordToCreate, t)
+    const {surveyId, id: recordId} = record
 
-      const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
-      const rootNode = Node.newNode(rootNodeDef.id, recordId)
+    const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
+    const rootNode = Node.newNode(rootNodeDef.id, recordId)
 
-      persistNode(userId, surveyId, rootNode)
+    persistNode(userId, surveyId, rootNode)
 
-      return record
-    }
-  )
+    return record
+  }
+)
 
 /**
  * ===================
@@ -59,19 +58,16 @@ const fetchRecordById = async (surveyId, recordId) => {
  * ===================
  */
 
-const persistNode = (userId, surveyId, node, file) =>
-  RecordUpdateManager.persistNode(userId, surveyId, node, file)
+const persistNode = (userId, surveyId, node, file) => RecordUpdateManager.persistNode(userId, surveyId, node, file)
 
 /**
  * ===================
  * DELETE
  * ===================
  */
-const deleteRecord = async (surveyId, recordId) =>
-  await RecordRepository.deleteRecord(surveyId, recordId)
+const deleteRecord = async (surveyId, recordId) => await RecordRepository.deleteRecord(surveyId, recordId)
 
-const deleteNode = (userId, surveyId, nodeUUID) =>
-  RecordUpdateManager.deleteNode(userId, surveyId, nodeUUID)
+const deleteNode = (userId, surveyId, nodeUUID) => RecordUpdateManager.deleteNode(userId, surveyId, nodeUUID)
 
 /**
  * ==================
@@ -79,20 +75,20 @@ const deleteNode = (userId, surveyId, nodeUUID) =>
  * ==================
  */
 const checkInRecord = async (userId, surveyId, recordId) => {
-  const record = await fetchRecordById(surveyId, recordId)
-
   RecordUpdateManager.checkIn(userId)
-
-  return record
+  return await fetchRecordById(surveyId, recordId)
 }
 
-const checkOutRecord = RecordUpdateManager.checkOut
+const checkOutRecord = userId => {
+  setTimeout(
+    () => RecordUpdateManager.checkOut(userId),
+    1000
+  )
+}
 
 module.exports = {
   //==== CREATE
   createRecord,
-  persistNode,
-  // createNode,
 
   //==== READ
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
@@ -100,7 +96,7 @@ module.exports = {
   fetchNodeFileByUUID: NodeRepository.fetchNodeFileByUUID,
 
   //==== UPDATE
-  // NodeRepository.updateNodeValue,
+  persistNode,
 
   //==== DELETE
   deleteRecord,
