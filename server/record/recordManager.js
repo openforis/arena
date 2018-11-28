@@ -1,6 +1,5 @@
 const R = require('ramda')
 const Promise = require('bluebird')
-const path = require('path')
 
 const db = require('../db/db')
 
@@ -17,26 +16,7 @@ const NodeRepository = require('../record/nodeRepository')
 
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
-const ThreadsCache = require('../threads/threadsCache')
-const Thread = require('../threads/thread')
-const recordThreadMessageTypes = require('./recordThreadMessageTypes')
-const WebSocketManager = require('../webSocket/webSocketManager')
-const {recordEvents} = require('../../common/webSocket/webSocketEvents')
-
-const recordUpdateThreads = new ThreadsCache()
-
-const createRecordUpdateThread = (userId) => {
-  const thread = new Thread(
-    path.resolve(__dirname, 'recordUpdateThread.js'),
-    {},
-    nodes => WebSocketManager.notifyUser(userId, recordEvents.nodesUpdate, nodes),
-    () => recordUpdateThreads.removeThread(userId)
-  )
-
-  recordUpdateThreads.putThread(userId, thread)
-
-  return thread
-}
+const RecordUpdateManager = require('./update/recordUpdateManager')
 
 /**
  * ===================
@@ -53,19 +33,17 @@ const createRecord = async (userId, recordToCreate) =>
 
       const nodes = await createNode(rootNodeDef, Node.newNode(rootNodeDef.id, recordId), null, t)
 
-      createRecordUpdateThread(userId)
+      RecordUpdateManager.checkIn(userId)
 
       return R.assoc('nodes', nodes, record)
     }
   )
 
 const persistNodeAsync = (userId, surveyId, node, file) => {
-  const updateWorker = recordUpdateThreads.getThread(userId)
-
-  updateWorker.postMessage({type: recordThreadMessageTypes.updateNode, surveyId, node, file})
-
+  RecordUpdateManager.persistNode(userId, surveyId, node, file)
 }
 
+// INVOKED BY THREAD
 const persistNode = async (surveyId, nodeReq, file, client = db) => {
   const {nodeDefId, value, uuid} = nodeReq
 
@@ -207,16 +185,12 @@ const onNodeUpdate = async (survey, record, node, client = db) => {
 const checkInRecord = async (userId, surveyId, recordId) => {
   const record = await fetchRecordById(surveyId, recordId)
 
-  createRecordUpdateThread(userId)
+  RecordUpdateManager.checkIn(userId)
 
   return record
 }
 
-const checkOutRecord = userId => {
-  const updateWorker = recordUpdateThreads.getThread(userId)
-
-  updateWorker.terminate()
-}
+const checkOutRecord = RecordUpdateManager.checkOut
 
 module.exports = {
   //==== CREATE

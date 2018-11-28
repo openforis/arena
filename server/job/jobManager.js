@@ -4,7 +4,7 @@ const {jobEvents} = require('../../common/webSocket/webSocketEvents')
 
 const {jobThreadMessageTypes} = require('./jobUtils')
 const ThreadsCache = require('../threads/threadsCache')
-const Thread = require('../threads/thread')
+const Thread = require('../threads/threadManager')
 const WebSocketManager = require('../webSocket/webSocketManager')
 
 // USER JOB WORKERS

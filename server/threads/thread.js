@@ -1,26 +1,27 @@
-const {Worker} = require('worker_threads')
+const {parentPort} = require('worker_threads')
 
+/**
+ * Base class for thread execution in Worker Pool
+ */
 class Thread {
-
-  constructor (filePath, data, messageHandler, exitHandler = null) {
-    this.worker = new Worker(filePath, {workerData: data})
-      .on('message', messageHandler)
-      .on('exit', () => {
-        console.log(`thread ${this.threadId} ended`)
-        if (exitHandler)
-          exitHandler()
-      })
-    this.threadId = this.worker.threadId
-
-    console.log(`thread ${this.threadId} created`)
+  constructor () {
+    parentPort.on('message', this.onMessage.bind(this))
   }
 
-  postMessage (message) {
-    this.worker.postMessage(message)
+  /**
+   * send message to main event loop
+   * @param msg
+   */
+  postMessage (msg) {
+    parentPort.postMessage(msg)
   }
 
-  terminate () {
-    this.worker.terminate()
+  /**
+   * receive message from main event loop
+   * @param msg
+   */
+  onMessage (msg) {
+    //TO OVERRIDE
   }
 
 }
