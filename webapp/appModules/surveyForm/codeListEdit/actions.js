@@ -17,7 +17,8 @@ import {
   codeListLevelDelete,
   codeListLevelPropUpdate,
   codeListPropUpdate,
-  codeListUpdate
+  codeListUpdate,
+  codeListsUpdate,
 } from '../../../survey/codeLists/actions'
 
 // code list editor
@@ -110,7 +111,7 @@ export const putCodeListProp = (codeList, key, value) => async (dispatch, getSta
   const action = async () => {
     const surveyId = getStateSurveyId(getState())
     const {data} = await axios.put(`/api/survey/${surveyId}/codeLists/${codeList.id}`, {key, value})
-    dispatchCodeListUpdate(dispatch, data.codeList)
+    dispatch({type: codeListsUpdate, codeLists: data.codeLists})
   }
 
   dispatch(debounceAction(action, `${codeListPropUpdate}_${codeList.uuid}`))

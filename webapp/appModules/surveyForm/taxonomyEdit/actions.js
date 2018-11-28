@@ -6,7 +6,13 @@ import Taxonomy from '../../../../common/survey/taxonomy'
 import { getStateSurveyId } from '../../../survey/surveyState'
 import { showAppJobMonitor } from '../../appView/components/job/actions'
 import { getTaxonomyEditTaxaPerPage } from './taxonomyEditState'
-import { taxonomyCreate, taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../../../survey/taxonomies/actions'
+import {
+  taxonomyCreate,
+  taxonomyDelete,
+  taxonomyPropUpdate,
+  taxonomyUpdate,
+  taxonomiesUpdate
+} from '../../../survey/taxonomies/actions'
 import { getSurveyForm } from '../surveyFormState'
 
 // taxonomy editor actions
@@ -71,7 +77,7 @@ export const putTaxonomyProp = (taxonomy, key, value) => async (dispatch, getSta
   const action = async () => {
     const surveyId = getStateSurveyId(getState())
     const {data} = await axios.put(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}`, {key, value})
-    dispatchTaxonomyUpdate(dispatch, data.taxonomy)
+    dispatch({type: taxonomiesUpdate, taxonomies: data.taxonomies})
   }
   dispatch(debounceAction(action, `${taxonomyPropUpdate}_${taxonomy.uuid}`))
 }

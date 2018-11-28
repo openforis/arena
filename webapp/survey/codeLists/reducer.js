@@ -7,6 +7,7 @@ import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../act
 import {
   codeListCreate,
   codeListUpdate,
+  codeListsUpdate,
   codeListPropUpdate,
   codeListDelete,
   codeListLevelPropUpdate,
@@ -26,6 +27,8 @@ const actionHandlers = {
   [codeListCreate]: (state, {codeList}) => R.assoc(codeList.uuid, codeList, state),
 
   [codeListUpdate]: (state, {codeList}) => R.assoc(codeList.uuid, codeList, state),
+
+  [codeListsUpdate]: (state, {codeLists}) => codeLists,
 
   [codeListPropUpdate]: (state, {codeList, key, value}) => R.pipe(
     R.assocPath([codeList.uuid, 'props', key], value),

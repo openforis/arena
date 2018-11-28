@@ -105,9 +105,9 @@ module.exports.init = app => {
       const {key, value} = body
 
       await TaxonomyManager.updateTaxonomyProp(surveyId, taxonomyId, key, value)
-      const taxonomy = await TaxonomyManager.fetchTaxonomyById(surveyId, taxonomyId, true, true)
+      const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(surveyId, true, true)
 
-      res.json({taxonomy})
+      res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
     } catch (err) {
       sendErr(res, err)
     }

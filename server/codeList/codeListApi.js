@@ -131,7 +131,9 @@ module.exports.init = app => {
 
       await updateCodeListProp(surveyId, codeListId, key, value)
 
-      await sendValidatedCodeList(surveyId, codeListId, res)
+      const codeLists = await fetchCodeListsBySurveyId(surveyId, true, true)
+
+      res.json({codeLists: toUUIDIndexedObj(codeLists)})
     } catch (err) {
       sendErr(res, err)
     }

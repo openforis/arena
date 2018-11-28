@@ -12,11 +12,13 @@ const CodeList = require('../../common/survey/codeList')
 const validateCodeList = async (surveyId, codeLists, codeList, draft) => {
   const codeListItems = await codeListRepository.fetchCodeListItemsByCodeListId(surveyId, codeList.id, draft)
 
-  return {
-    ...codeList,
-    validation: await codeListValidator.validateCodeList(codeLists, codeList, codeListItems)
-  }
+  return await assocCodeListValidation(codeList, codeLists, codeListItems)
 }
+
+const assocCodeListValidation = async (codeList, codeLists = [], codeListItems = []) => ({
+  ...codeList,
+  validation: await codeListValidator.validateCodeList(codeLists, codeList, codeListItems)
+})
 
 // ====== CREATE
 
@@ -33,7 +35,7 @@ const insertCodeList = async (surveyId, codeList) =>
     )
     await markSurveyDraft(surveyId, t)
 
-    return CodeList.assocCodeListLevelsArray(insertedLevels)(insertedCodeList)
+    return await assocCodeListValidation(CodeList.assocCodeListLevelsArray(insertedLevels)(insertedCodeList))
   })
 
 const insertCodeListLevel = async (surveyId, codeListId, level) =>
