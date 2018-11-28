@@ -32,7 +32,7 @@ const EntityTableRow = (props) => {
               const {length} = getNodeDefFormFields(childDef)
 
               return (
-                <div key={childDef.uuid} className="react-grid-item" style={{minWidth: 160 * length + 'px'}}>
+                <div key={childDef.uuid} className="react-grid-item" style={{width: 160 * length + 'px'}}>
                   <NodeDefSwitch key={i}
                                  {...props}
                                  node={null}
