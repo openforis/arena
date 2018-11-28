@@ -3,13 +3,13 @@ const path = require('path')
 const {jobEvents} = require('../../common/webSocket/webSocketEvents')
 
 const {jobThreadMessageTypes} = require('./jobUtils')
-const UserThreadsCache = require('../threads/userThreadsCache')
+const ThreadsCache = require('../threads/threadsCache')
 const Thread = require('../threads/thread')
 const WebSocketManager = require('../webSocket/webSocketManager')
 
 // USER JOB WORKERS
 
-const userJobThreads = new UserThreadsCache()
+const userJobThreads = new ThreadsCache()
 
 const notifyJobUpdate = job => {
   const userId = job.userId
@@ -17,14 +17,14 @@ const notifyJobUpdate = job => {
   WebSocketManager.notifyUser(userId, jobEvents.update, job)
 
   if (job.ended) {
-    userJobThreads.removeUserThread(userId)
+    userJobThreads.removeThread(userId)
   }
 }
 
 // ====== UPDATE
 
 const cancelActiveJobByUserId = async (userId) => {
-  const jobThread = userJobThreads.getUserThread(userId)
+  const jobThread = userJobThreads.getThread(userId)
   if (jobThread) {
     jobThread.postMessage({type: jobThreadMessageTypes.cancelJob})
   }
@@ -40,7 +40,7 @@ const executeJobThread = (job) => {
     async job => await notifyJobUpdate(job)
   )
 
-  userJobThreads.putUserThread(job.params.userId, thread)
+  userJobThreads.putThread(job.params.userId, thread)
 }
 
 module.exports = {

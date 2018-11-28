@@ -9,7 +9,7 @@ import { getSurveyForm } from '../../../surveyForm/surveyFormState'
 
 import { initSurveyDefs } from '../../../../survey/actions'
 import { resetForm } from '../../../surveyForm/actions'
-import { createRecord, fetchRecord, checkoutRecord } from '../../../surveyForm/record/actions'
+import { createRecord, checkInRecord, checkOutRecord } from '../../../surveyForm/record/actions'
 
 import { appModules, appModuleUri } from '../../../appModules'
 
@@ -24,7 +24,7 @@ class Record extends React.Component {
   componentDidMount () {
     const {
       resetForm, initSurveyDefs,
-      createRecord, fetchRecord,
+      createRecord, checkInRecord,
       match
     } = this.props
 
@@ -35,7 +35,7 @@ class Record extends React.Component {
 
     const recordId = R.path(['params', 'recordId'], match)
     if (recordId) {
-      fetchRecord(recordId)
+      checkInRecord(recordId)
     } else {
       createRecord()
     }
@@ -59,7 +59,7 @@ class Record extends React.Component {
   }
 
   componentUnload () {
-    this.props.checkoutRecord()
+    this.props.checkOutRecord()
   }
 
   render () {
@@ -83,6 +83,6 @@ export default connect(
   mapStateToProps,
   {
     initSurveyDefs, resetForm,
-    createRecord, fetchRecord, checkoutRecord
+    createRecord, checkInRecord, checkOutRecord,
   }
 )(Record)

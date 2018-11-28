@@ -57,11 +57,12 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
  * READ
  * ============
  */
-export const fetchRecord = recordId => async (dispatch, getState) => {
+export const checkInRecord = recordId => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.get(`/api/survey/${surveyId}/record/${recordId}`)
+  const {data} = await axios.post(`/api/survey/${surveyId}/record/${recordId}/checkin`)
   dispatch({type: recordLoad, record: data.record})
 }
+
 /**
  * ============
  * UPDATE
@@ -132,7 +133,12 @@ export const deleteRecord = () => async (dispatch, getState) => {
   dispatch({type: recordDelete})
 }
 
-export const checkoutRecord = () => async (dispatch, getState) => {
+/**
+ * ============
+ * UTILS
+ * ============
+ */
+export const checkOutRecord = () => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = getStateSurveyId(state)

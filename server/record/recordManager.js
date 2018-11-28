@@ -1,5 +1,7 @@
 const R = require('ramda')
 const Promise = require('bluebird')
+const path = require('path')
+
 const db = require('../db/db')
 
 const Survey = require('../../common/survey/survey')
@@ -15,12 +17,33 @@ const NodeRepository = require('../record/nodeRepository')
 
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
+const ThreadsCache = require('../threads/threadsCache')
+const Thread = require('../threads/thread')
+const recordThreadMessageTypes = require('./recordThreadMessageTypes')
+const WebSocketManager = require('../webSocket/webSocketManager')
+const {recordEvents} = require('../../common/webSocket/webSocketEvents')
+
+const recordUpdateThreads = new ThreadsCache()
+
+const createRecordUpdateThread = (userId) => {
+  const thread = new Thread(
+    path.resolve(__dirname, 'recordUpdateThread.js'),
+    {},
+    nodes => WebSocketManager.notifyUser(userId, recordEvents.nodesUpdate, nodes),
+    () => recordUpdateThreads.removeThread(userId)
+  )
+
+  recordUpdateThreads.putThread(userId, thread)
+
+  return thread
+}
+
 /**
  * ===================
  * CREATE
  * ===================
  */
-const createRecord = async (recordToCreate) =>
+const createRecord = async (userId, recordToCreate) =>
   await db.tx(
     async t => {
       const record = await RecordRepository.insertRecord(recordToCreate, t)
@@ -30,9 +53,18 @@ const createRecord = async (recordToCreate) =>
 
       const nodes = await createNode(rootNodeDef, Node.newNode(rootNodeDef.id, recordId), null, t)
 
+      createRecordUpdateThread(userId)
+
       return R.assoc('nodes', nodes, record)
     }
   )
+
+const persistNodeAsync = (userId, surveyId, node, file) => {
+  const updateWorker = recordUpdateThreads.getThread(userId)
+
+  updateWorker.postMessage({type: recordThreadMessageTypes.updateNode, surveyId, node, file})
+
+}
 
 const persistNode = async (surveyId, nodeReq, file, client = db) => {
   const {nodeDefId, value, uuid} = nodeReq
@@ -167,14 +199,33 @@ const onNodeUpdate = async (survey, record, node, client = db) => {
   return R.merge({[node.uuid]: node}, R.mergeAll(clearedDependentCodeAttributes))
 }
 
+/**
+ * ==================
+ * UTILS
+ * ==================
+ */
+const checkInRecord = async (userId, surveyId, recordId) => {
+  const record = await fetchRecordById(surveyId, recordId)
+
+  createRecordUpdateThread(userId)
+
+  return record
+}
+
+const checkOutRecord = userId => {
+  const updateWorker = recordUpdateThreads.getThread(userId)
+
+  updateWorker.postMessage({type: recordThreadMessageTypes.disconnect})
+}
+
 module.exports = {
   //==== CREATE
   createRecord,
   persistNode,
+  persistNodeAsync,
   // createNode,
 
   //==== READ
-  fetchRecordById,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchNodeFileByUUID: NodeRepository.fetchNodeFileByUUID,
@@ -185,4 +236,8 @@ module.exports = {
   //==== DELETE
   deleteRecord,
   deleteNode,
+
+  //==== UTILS
+  checkInRecord,
+  checkOutRecord,
 }
