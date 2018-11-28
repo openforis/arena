@@ -34,7 +34,7 @@ module.exports.init = app => {
 
       const surveyId = getRestParam(req, 'surveyId')
 
-      RecordManager.persistNodeAsync(user.id, surveyId, node, file)
+      RecordManager.persistNode(user.id, surveyId, node, file)
 
       sendOk(res)
     } catch (err) {
@@ -107,15 +107,16 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUUID = getRestParam(req, 'nodeUUID')
+      const user = req.user
 
-      const nodes = await RecordManager.deleteNode(surveyId, nodeUUID)
+      const nodes = await RecordManager.deleteNode(user.id, surveyId, nodeUUID)
       res.json({nodes})
     } catch (err) {
       sendErr(res, err)
     }
   })
 
-  // ==== UTILS
+  // ==== RECORD Check in / out
   app.post('/survey/:surveyId/record/:recordId/checkin', async (req, res) => {
     try {
       const user = req.user

@@ -1,10 +1,8 @@
-const RecordManager = require('../recordManager')
+const RecordProcessor = require('./recordProcessor')
 const messageTypes = require('./recordThreadMessageTypes')
-const Thread = require('../../threads/thread')
+const Thread = require('../../../threads/thread')
 
-const Queue = require('../../../common/queue')
-
-//TODO move  RecordManager.persistNode / RecordManager.deleteNode
+const Queue = require('../../../../common/queue')
 
 class RecordUpdateThread extends Thread {
 
@@ -26,12 +24,7 @@ class RecordUpdateThread extends Thread {
       this.processing = true
 
       const msg = this.queue.dequeue()
-
-      switch (msg.type) {
-        case messageTypes.updateNode:
-          await this.updateNode(msg.surveyId, msg.node, msg.file)
-          break
-      }
+      await this.processMessage(msg)
 
       this.processing = false
 
@@ -39,8 +32,18 @@ class RecordUpdateThread extends Thread {
     }
   }
 
-  async updateNode (surveyId, node, file) {
-    const nodes = await RecordManager.persistNode(surveyId, node, file)
+  async processMessage (msg) {
+    let nodes = null
+
+    switch (msg.type) {
+      case messageTypes.updateNode:
+        nodes = await RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file)
+        break
+
+      case messageTypes.deleteNode:
+        nodes = await RecordProcessor.deleteNode(msg.surveyId, msg.nodeUUID)
+        break
+    }
 
     this.postMessage(nodes)
   }

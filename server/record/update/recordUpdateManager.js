@@ -6,13 +6,13 @@ const {recordEvents} = require('../../../common/webSocket/webSocketEvents')
 const ThreadsCache = require('../../threads/threadsCache')
 const ThreadManager = require('../../threads/threadManager')
 
-const recordThreadMessageTypes = require('./recordThreadMessageTypes')
+const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 
 const recordUpdateThreads = new ThreadsCache()
 
 const createRecordUpdateThread = (userId) => {
   const thread = new ThreadManager(
-    path.resolve(__dirname, 'recordUpdateThread.js'),
+    path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
     {},
     nodes => WebSocketManager.notifyUser(userId, recordEvents.nodesUpdate, nodes),
     () => recordUpdateThreads.removeThread(userId)
@@ -48,12 +48,18 @@ const checkOut = userId => {
  */
 const persistNode = (userId, surveyId, node, file) => {
   const updateWorker = recordUpdateThreads.getThread(userId)
-
   updateWorker.postMessage({type: recordThreadMessageTypes.updateNode, surveyId, node, file})
-
 }
+
+const deleteNode = (userId, surveyId, nodeUUID) => {
+  const updateWorker = recordUpdateThreads.getThread(userId)
+  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, surveyId, nodeUUID})
+}
+
 module.exports = {
   checkIn,
   checkOut,
+
   persistNode,
+  deleteNode,
 }
