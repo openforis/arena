@@ -15,8 +15,5 @@ parentPort.on('message', function (msg) {
     case messageTypes.updateNode:
       updateNode(msg.surveyId, msg.node, msg.file)
       break
-    case messageTypes.disconnect:
-      parentPort.close()
-      break
   }
 })

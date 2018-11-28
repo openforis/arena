@@ -18,6 +18,11 @@ class Thread {
   postMessage (message) {
     this.worker.postMessage(message)
   }
+
+  terminate () {
+    this.worker.terminate()
+  }
+
 }
 
 module.exports = Thread

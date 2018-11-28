@@ -215,7 +215,7 @@ const checkInRecord = async (userId, surveyId, recordId) => {
 const checkOutRecord = userId => {
   const updateWorker = recordUpdateThreads.getThread(userId)
 
-  updateWorker.postMessage({type: recordThreadMessageTypes.disconnect})
+  updateWorker.terminate()
 }
 
 module.exports = {
