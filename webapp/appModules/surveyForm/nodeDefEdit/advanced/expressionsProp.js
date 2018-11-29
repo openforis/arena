@@ -24,14 +24,14 @@ const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
     <div className="expression-item">
       <div className="label">Expression</div>
       <Input value={NodeDefExpression.getExpression(expression)}
-             onValueChange={value => onUpdate(NodeDefExpression.assocExpression(value)(expression))}/>
+             onChange={value => onUpdate(NodeDefExpression.assocExpression(value)(expression))}/>
     </div>
     {
       applyIf &&
       <div className="expression-item">
         <div className="label">Apply If</div>
         <Input value={NodeDefExpression.getApplyIf(expression)}
-               onValueChange={value => onUpdate(NodeDefExpression.assocApplyIf(value)(expression))}/>
+               onChange={value => onUpdate(NodeDefExpression.assocApplyIf(value)(expression))}/>
       </div>
     }
 

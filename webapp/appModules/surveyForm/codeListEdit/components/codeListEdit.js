@@ -38,7 +38,7 @@ const CodeListEdit = props => {
       <FormItem label="Code list name">
         <Input value={codeListName}
                validation={getFieldValidation('name')(validation)}
-               onChange={e => putCodeListProp(codeList, 'name', normalizeName(e.target.value))}
+               onChange={value => putCodeListProp(codeList, 'name', normalizeName(value))}
                readOnly={readOnly}/>
       </FormItem>
 

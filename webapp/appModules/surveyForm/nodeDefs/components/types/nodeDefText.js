@@ -13,7 +13,7 @@ const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
   <Input readOnly={edit}
          {...getNodeDefInputTextProps(nodeDef)}
          value={Node.getNodeValue(node, '')}
-         onValueChange={value => updateNode(nodeDef, node, value)}
+         onChange={value => updateNode(nodeDef, node, value)}
   />
 
 const MultipleTextInput = props => {

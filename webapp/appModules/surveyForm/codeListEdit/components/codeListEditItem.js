@@ -90,7 +90,7 @@ class CodeListEditItem extends React.Component {
                   <Input value={CodeList.getCodeListItemCode(item)}
                          disabled={disabled}
                          validation={getFieldValidation('code')(validation)}
-                         onChange={e => putCodeListItemProp(codeList, level, item, 'code', normalizeName(e.target.value))}
+                         onChange={value => putCodeListItemProp(codeList, level, item, 'code', normalizeName(value))}
                          readOnly={readOnly}/>
                 </FormItem>
 

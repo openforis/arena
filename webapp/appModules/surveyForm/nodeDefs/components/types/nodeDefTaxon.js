@@ -228,17 +228,17 @@ class NodeDefTaxon extends React.Component {
     const codeInputField = <Input ref={this.codeField}
                                   readOnly={edit}
                                   value={code}
-                                  onChange={(e) => this.onInputFieldChange(fields.code, e.target.value)}/>
+                                  onChange={value => this.onInputFieldChange(fields.code, value)}/>
 
     const scientificNameInputField = <Input ref={this.scientificNameField}
                                             readOnly={edit}
                                             value={scientificName}
-                                            onChange={(e) => this.onInputFieldChange(fields.scientificName, e.target.value)}/>
+                                            onChange={value => this.onInputFieldChange(fields.scientificName, value)}/>
 
     const vernacularNameInputField = <Input ref={this.vernacularNameField}
                                             readOnly={edit}
                                             value={vernacularName}
-                                            onChange={(e) => this.onInputFieldChange(fields.vernacularName, e.target.value)}/>
+                                            onChange={value => this.onInputFieldChange(fields.vernacularName, value)}/>
 
     const autocompleteDialog =
       autocompleteOpened

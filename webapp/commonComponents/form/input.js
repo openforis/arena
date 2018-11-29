@@ -34,10 +34,8 @@ export const Input = React.forwardRef((props, ref) => {
                 isControlled={true}
                 value={value}
                 onChange={(e, {caretPosition, value: newValue}) => {
-                  if (onChange)
-                    onChange(e)
-                  if (onValueChange && value !== newValue) {
-                    onValueChange(newValue)
+                  if (onChange && value !== newValue) {
+                    onChange(newValue)
                   }
                 }}
                 {...inputProps}

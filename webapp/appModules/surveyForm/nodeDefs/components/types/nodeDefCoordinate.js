@@ -31,12 +31,12 @@ class NodeDefCoordinate extends React.Component {
     const xInput = <Input ref="xInput"
                           readOnly={edit}
                           value={value.x}
-                          onChange={(e) => this.handleInputChange(node, 'x', e.target.value)}/>
+                          onChange={value => this.handleInputChange(node, 'x', value)}/>
 
     const yInput = <Input ref="yInput"
                           readOnly={edit}
                           value={value.y}
-                          onChange={(e) => this.handleInputChange(node, 'y', e.target.value)}/>
+                          onChange={value => this.handleInputChange(node, 'y', value)}/>
 
     const srsDropdown = <Dropdown ref="srsDropdown"
                                   readOnly={edit}
