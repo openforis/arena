@@ -61,7 +61,7 @@ class TaxonomyEdit extends React.Component {
           <FormItem label="Taxonomy name">
             <Input value={Taxonomy.getTaxonomyName(taxonomy)}
                    validation={getFieldValidation('name')(validation)}
-                   onChange={e => putTaxonomyProp(taxonomy, 'name', normalizeName(e.target.value))}
+                   onChange={value => putTaxonomyProp(taxonomy, 'name', normalizeName(value))}
                    readOnly={readOnly}/>
           </FormItem>
 

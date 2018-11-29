@@ -76,7 +76,7 @@ class InviteUserDialog extends React.Component {
                    value={this.state.email}
                    disabled={false}
                    validation={this.state.emailErrors}
-                   onChange={event => this.onEmailChange(event.target.value)}/>
+                   onChange={value => this.onEmailChange(value)}/>
 
             <Dropdown disabled={false}
                       items={groups}

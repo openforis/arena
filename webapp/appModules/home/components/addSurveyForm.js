@@ -26,13 +26,13 @@ const AddSurveyForm = (props) => {
         <Input placeholder="Name"
                value={name}
                validation={getFieldValidation('name')(validation)}
-               onChange={e => updateNewSurveyProp('name', normalizeName(e.target.value))}/>
+               onChange={value => updateNewSurveyProp('name', normalizeName(value))}/>
       </div>
       <div>
         <Input placeholder="Label"
                value={label}
                validation={getFieldValidation('label')(validation)}
-               onChange={e => updateNewSurveyProp('label', e.target.value)}/>
+               onChange={value => updateNewSurveyProp('label', value)}/>
       </div>
       <div>
         <LanguageDropdown placeholder="Language"

@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:200,400,600,800');
 @import "./vars";
 @import "./layout";
+@import "./layoutMixins";
 @import "./formBase";
 @import "./ico";
 @import "./table";
@@ -23,19 +24,17 @@ body {
 }
 
 .main__bg {
-  @extend .full-screen-fixed;
+  @include full-screen-fixed();
   background-size: cover;
   background-position: center;
 }
 
 .main__bg1 {
-  @extend .full-screen-fixed;
   @extend .main__bg;
   background-image: url("/img/landing-bg.jpg");
 }
 
 .main__bg2 {
-  @extend .full-screen-fixed;
   @extend .main__bg;
   background-image: url("/img/landing-bg2.jpg");
   transform: scale(1.1, 1.1);

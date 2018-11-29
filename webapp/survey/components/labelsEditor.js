@@ -25,9 +25,9 @@ const LabelRow = ({label = '', lang, onChange, readOnly}) => (
     <LabelBadge lang={lang}/>
 
     <Input value={label}
-           onChange={e => onChange({
+           onChange={value => onChange({
                lang,
-               label: e.target.value
+               label: value
              }
            )}
            readOnly={readOnly}/>

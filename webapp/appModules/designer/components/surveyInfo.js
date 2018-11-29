@@ -58,7 +58,7 @@ class SurveyInfo extends React.Component {
             <label className="form-label">Name</label>
             <Input value={Survey.getName(surveyInfo)}
                    validation={getFieldValidation('name')(validation)}
-                   onChange={e => updateSurveyInfoProp('name', normalizeName(e.target.value))}
+                   onChange={value => updateSurveyInfoProp('name', normalizeName(value))}
                    readOnly={readOnly}/>
 
           </div>

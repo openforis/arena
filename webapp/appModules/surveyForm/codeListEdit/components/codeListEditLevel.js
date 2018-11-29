@@ -66,7 +66,7 @@ class CodeListEditLevel extends React.Component {
       <FormItem label={'name'}>
         <Input value={CodeList.getCodeListLevelName(level)}
                validation={getFieldValidation('name')(validation)}
-               onChange={e => putCodeListLevelProp(codeList, level, 'name', normalizeName(e.target.value))}
+               onChange={value => putCodeListLevelProp(codeList, level, 'name', normalizeName(value))}
                readOnly={readOnly}/>
       </FormItem>
 

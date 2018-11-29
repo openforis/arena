@@ -33,7 +33,7 @@ const BasicProps = props => {
       <FormItem label={'name'}>
         <Input value={NodeDef.getNodeDefName(nodeDef)}
                validation={getFieldValidation('name')(validation)}
-               onChange={e => putNodeDefProp(nodeDef, 'name', normalizeName(e.target.value))}/>
+               onChange={value => putNodeDefProp(nodeDef, 'name', normalizeName(value))}/>
       </FormItem>
 
       <LabelsEditor labels={NodeDef.getNodeDefLabels(nodeDef)}

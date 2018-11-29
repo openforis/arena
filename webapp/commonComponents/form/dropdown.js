@@ -75,9 +75,7 @@ class Dropdown extends React.Component {
     })
   }
 
-  async onInputChange (evt) {
-    const {value = ''} = evt.target
-
+  async onInputChange (value = '') {
     const {items, autocompleteMinChars, itemsLookupFunction, onChange} = this.props
 
     const searchValue = R.trim(value)
@@ -183,7 +181,7 @@ class Dropdown extends React.Component {
              validation={validation}
              readOnly={readOnly}
              disabled={disabled}
-             onChange={e => this.onInputChange(e)}
+             onChange={value => this.onInputChange(value)}
              onFocus={e => this.onInputFocus(e)}/>
 
       <span className="icon icon-menu2 icon-24px"
