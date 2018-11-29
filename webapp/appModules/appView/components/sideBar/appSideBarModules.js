@@ -56,7 +56,11 @@ const AppSideBarModule = (props) => {
             to={appModuleUri(module)}
             aria-disabled={disabled || (requireSurvey && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo)))}>
         <span className={`icon icon-${icon} icon-20px${sideBarOpened ? ' icon-left' : ''}`}></span>
-        <span className="app-sidebar__module_label">{label}</span>
+        {
+          sideBarOpened &&
+          <span>{label}</span>
+        }
+
       </Link>
       {
         module === appModules.home
