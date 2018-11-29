@@ -1,8 +1,8 @@
 @import "../../style/vars";
-@import "../../style/layout";
+@import "../../style/layoutMixins";
 
 .app__container {
-  @extend .full-screen-fixed;
+  @include full-screen-fixed();
 
   z-index: $zIndex1App;
   display: flex;
