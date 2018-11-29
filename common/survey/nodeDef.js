@@ -76,6 +76,8 @@ module.exports = {
   newNodeDef,
 
   //READ
+  getProp,
+
   getNodeDefType,
   getNodeDefName,
   getNodeDefLabels: getLabels,

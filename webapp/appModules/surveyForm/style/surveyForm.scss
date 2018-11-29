@@ -76,6 +76,10 @@ $tableRowHeaderHeight: 40px;
   display: grid;
   position: relative;
   height: 100%;
+
+  .form-input{
+    text-overflow: ellipsis;
+  }
 }
 
 .node-def__form-actions {
@@ -189,6 +193,7 @@ $tableRowHeaderHeight: 40px;
   .form-input {
     border: none;
     padding: 0 .5rem;
+    overflow: hidden;
   }
 
   .react-grid-item {

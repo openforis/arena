@@ -52,35 +52,37 @@ class SurveyInfo extends React.Component {
     const surveySrs = Survey.getSRS(surveyInfo)
 
     return (
-      <div className="form">
-        <div className="form-item">
-          <label className="form-label">Name</label>
-          <Input value={Survey.getName(surveyInfo)}
-                 validation={getFieldValidation('name')(validation)}
-                 onChange={e => updateSurveyInfoProp('name', normalizeName(e.target.value))}
-                 readOnly={readOnly}/>
+      <div className="designer__survey-info">
+        <div className="form">
+          <div className="form-item">
+            <label className="form-label">Name</label>
+            <Input value={Survey.getName(surveyInfo)}
+                   validation={getFieldValidation('name')(validation)}
+                   onChange={e => updateSurveyInfoProp('name', normalizeName(e.target.value))}
+                   readOnly={readOnly}/>
+
+          </div>
+
+          <LanguagesEditorComponent readOnly={readOnly}/>
+
+          <div className="form-item">
+            <label className="form-label">SRS</label>
+            <SrsAutocomplete selection={surveySrs}
+                             validation={getFieldValidation('srs')}
+                             onChange={srs => updateSurveyInfoProp('srs', srs)}
+                             readOnly={readOnly}/>
+          </div>
+
+          <LabelsEditorComponent labels={Survey.getLabels(surveyInfo)}
+                                 onChange={(item) => this.onPropLabelsChange(item, 'labels', Survey.getLabels(surveyInfo))}
+                                 readOnly={readOnly}/>
+
+          <LabelsEditorComponent formLabel="Description(s)"
+                                 labels={Survey.getDescriptions(surveyInfo)}
+                                 onChange={(item) => this.onPropLabelsChange(item, 'descriptions', Survey.getDescriptions(surveyInfo))}
+                                 readOnly={readOnly}/>
 
         </div>
-
-        <LanguagesEditorComponent readOnly={readOnly}/>
-
-        <div className="form-item">
-          <label className="form-label">SRS</label>
-          <SrsAutocomplete selection={surveySrs}
-                           validation={getFieldValidation('srs')}
-                           onChange={srs => updateSurveyInfoProp('srs', srs)}
-                           readOnly={readOnly}/>
-        </div>
-
-        <LabelsEditorComponent labels={Survey.getLabels(surveyInfo)}
-                               onChange={(item) => this.onPropLabelsChange(item, 'labels', Survey.getLabels(surveyInfo))}
-                               readOnly={readOnly}/>
-
-        <LabelsEditorComponent formLabel="Description(s)"
-                               labels={Survey.getDescriptions(surveyInfo)}
-                               onChange={(item) => this.onPropLabelsChange(item, 'descriptions', Survey.getDescriptions(surveyInfo))}
-                               readOnly={readOnly}/>
-
       </div>
     )
   }
