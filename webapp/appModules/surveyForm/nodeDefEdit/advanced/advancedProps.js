@@ -1,7 +1,6 @@
 import React from 'react'
 
-import NodeDef from '../../../../../common/survey/nodeDef'
-import ExpressionProp from './expressionProp'
+import ExpressionsProp from './expressionsProp'
 
 const AdvancedProps = props => {
   const {nodeDef, putNodeDefProp, readOnly} = props
@@ -9,12 +8,19 @@ const AdvancedProps = props => {
   return (
     <div className="form">
 
-      <ExpressionProp nodeDef={nodeDef}
-                      putNodeDefProp={putNodeDefProp}
-                      label="Default values"
-                      values={NodeDef.getDefaultValues(nodeDef)}
-                      readOnly={readOnly}
-                      propName="defaultValues"/>
+      <ExpressionsProp nodeDef={nodeDef}
+                       putNodeDefProp={putNodeDefProp}
+                       label="Default values"
+                       readOnly={readOnly}
+                       propName="defaultValues"/>
+
+      <ExpressionsProp nodeDef={nodeDef}
+                       putNodeDefProp={putNodeDefProp}
+                       label="Applicable if"
+                       readOnly={readOnly}
+                       propName="applicable"
+                       applyIf={false}
+                       multiple={false}/>
 
 
     </div>
