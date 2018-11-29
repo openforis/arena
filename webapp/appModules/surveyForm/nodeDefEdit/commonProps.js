@@ -8,9 +8,9 @@ import CodeListProps from './codeListProps'
 import TaxonProps from './taxonProps'
 
 import NodeDef from '../../../../common/survey/nodeDef'
-import { getFieldValidation, getValidation } from '../../../../common/validation/validator'
+import { isRenderTable } from '../../../../common/survey/nodeDefLayout'
 
-import { isRenderTable, } from '../../../../common/survey/nodeDefLayout'
+import { getFieldValidation, getValidation } from '../../../../common/validation/validator'
 
 import { normalizeName } from '../../../../common/stringUtils'
 
@@ -20,9 +20,12 @@ const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValu
 
 const CommonProps = props => {
   const {
-    nodeDef, putNodeDefProp, toggleTaxonomyEdit, toggleCodeListEdit
+    nodeDef, nodeDefKeyEditDisabled,
+    putNodeDefProp, toggleTaxonomyEdit, toggleCodeListEdit
   } = props
   const validation = getValidation(nodeDef)
+
+  const multiplicityEditDisabled = NodeDef.isNodeDefPublished(nodeDef) || isRenderTable(nodeDef) || NodeDef.isNodeDefKey(nodeDef)
 
   return (
     <React.Fragment>
@@ -58,9 +61,10 @@ const CommonProps = props => {
       }
 
       {
-        !NodeDef.isNodeDefEntity(nodeDef) &&
+        NodeDef.canNodeDefBeKey(nodeDef) &&
         <FormItem label={'key'}>
           <Checkbox checked={NodeDef.isNodeDefKey(nodeDef)}
+                    disabled={nodeDefKeyEditDisabled}
                     onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
         </FormItem>
       }
@@ -69,7 +73,7 @@ const CommonProps = props => {
         NodeDef.canNodeDefBeMultiple(nodeDef) &&
         <FormItem label={'multiple'}>
           <Checkbox checked={NodeDef.isNodeDefMultiple(nodeDef)}
-                    disabled={isRenderTable(nodeDef)}
+                    disabled={multiplicityEditDisabled}
                     onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
         </FormItem>
       }

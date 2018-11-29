@@ -1,14 +1,15 @@
 const {
   validate,
   validateRequired,
-  validateItemPropUniqueness
+  validateItemPropUniqueness,
+  validateNotKeyword
 } = require('../../common/validation/validator')
 
 /**
  * ====== TAXONOMY
  */
 const taxonomyValidators = (taxonomies) => ({
-  'props.name': [validateRequired, validateItemPropUniqueness(taxonomies)],
+  'props.name': [validateRequired, validateNotKeyword, validateItemPropUniqueness(taxonomies)],
 })
 
 const validateTaxonomy = async (taxonomies, taxonomy) =>

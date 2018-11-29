@@ -27,6 +27,11 @@ const getNodeDefById = id => R.pipe(
 
 const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
 
+const getNodeDefKeys = nodeDef => R.pipe(
+  getNodeDefChildren(nodeDef),
+  R.filter(n => NodeDef.isNodeDefKey(n))
+)
+
 const getNodeDefsByCodeListUUID = (uuid) => R.pipe(
   getNodeDefsArray,
   R.filter(R.pathEq(['props', 'codeListUUID'], uuid))
@@ -43,7 +48,7 @@ const assocNodeDefs = newNodeDefs => R.assoc(nodeDefs, newNodeDefs)
 
 // ====== UTILS
 
-const getNodeDefParent = nodeDef => getNodeDefById(nodeDef.parentId)
+const getNodeDefParent = nodeDef => getNodeDefById(NodeDef.getNodeDefParentId(nodeDef))
 
 const getNodeDefAncestors = nodeDef =>
   survey => {
@@ -120,7 +125,6 @@ const canUpdateCodeList = nodeDef =>
     return !isNodeDefParentCode(nodeDef)(survey)
   }
 
-
 module.exports = {
   getNodeDefs,
   getNodeDefsArray,
@@ -129,6 +133,7 @@ module.exports = {
   getRootNodeDef,
   getNodeDefByUUID,
   getNodeDefChildren,
+  getNodeDefKeys,
 
   getNodeDefsByCodeListUUID,
   getNodeDefsByTaxonomyUUID,
