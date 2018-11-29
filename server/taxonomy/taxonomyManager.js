@@ -14,7 +14,7 @@ const {validateTaxonomy} = require('./taxonomyValidator')
  * ====== CREATE
  */
 const createTaxonomy = async (surveyId, taxonomy) =>
-  await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy)
+  await assocTaxonomyValidation(await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy))
 
 /**
  * ====== READ
@@ -24,24 +24,22 @@ const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = fal
 
   return validate
     ? await Promise.all(
-      taxonomies.map(async taxonomy => ({
-          ...taxonomy,
-          validation: await validateTaxonomy(taxonomies, taxonomy)
-        })
-      )
+      taxonomies.map(async taxonomy => await assocTaxonomyValidation(taxonomy, taxonomies))
     )
     : taxonomies
 }
+
+const assocTaxonomyValidation = async (taxonomy, taxonomies = []) => ({
+  ...taxonomy,
+  validation: await validateTaxonomy(taxonomies, taxonomy)
+})
 
 const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate = false, client = db) => {
   const taxonomy = await TaxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft, client)
 
   if (validate) {
     const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
-    return {
-      ...taxonomy,
-      validation: await validateTaxonomy(taxonomies, taxonomy)
-    }
+    return await assocTaxonomyValidation(taxonomy, taxonomies)
   } else {
     return taxonomy
   }

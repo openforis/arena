@@ -83,7 +83,23 @@ class NodeDefTaxon extends React.Component {
     const {nodes} = this.props
     const node = nodes[0]
 
-    let filterProp = null, filterPropValue = null
+    const taxon = node ? await this.loadTaxonByNode(node) : null
+
+    if (taxon) {
+      this.setState({
+        code: Taxon.getTaxonCode(taxon),
+        scientificName: Taxon.getTaxonScientificName(taxon),
+        vernacularName: taxon.vernacularName,
+      })
+    } else {
+      this.setState(defaultFieldValues)
+    }
+  }
+
+  async loadTaxonByNode (node) {
+    let filterProp = null
+    let filterPropValue = null
+
     const vernacularNameUUID = Node.getNodeVernacularNameUUID(node)
 
     if (vernacularNameUUID) {
@@ -93,17 +109,12 @@ class NodeDefTaxon extends React.Component {
       filterProp = 'uuid'
       filterPropValue = Node.getNodeTaxonUUID(node)
     }
-    const taxa = await this.loadTaxa(filterProp, filterPropValue, true)
 
-    if (R.isEmpty(taxa)) {
-      this.setState(defaultFieldValues)
+    if (filterPropValue) {
+      const taxa = await this.loadTaxa(filterProp, filterPropValue, true)
+      return R.head(taxa)
     } else {
-      const taxon = R.head(taxa)
-      this.setState({
-        code: Taxon.getTaxonCode(taxon),
-        scientificName: Taxon.getTaxonScientificName(taxon),
-        vernacularName: taxon.vernacularName,
-      })
+      return null
     }
   }
 

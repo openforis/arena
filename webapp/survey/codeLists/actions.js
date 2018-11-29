@@ -1,6 +1,7 @@
 // code list
 export const codeListCreate = 'survey/codeList/create'
 export const codeListUpdate = 'survey/codeList/update'
+export const codeListsUpdate = 'survey/codeLists/update'
 export const codeListPropUpdate = 'survey/codeList/prop/update'
 export const codeListDelete = 'survey/codeList/delete'
 

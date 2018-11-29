@@ -9,6 +9,7 @@ const ThreadManager = require('../../threads/threadManager')
 const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 
 const recordUpdateThreads = new ThreadsCache()
+const checkOutTimeoutsByUserId = {}
 
 const createRecordUpdateThread = (userId) => {
   const thread = new ThreadManager(
@@ -27,15 +28,31 @@ const createRecordUpdateThread = (userId) => {
  * Start record update thread
  * @param userId
  */
-const checkIn = createRecordUpdateThread
+const checkIn = userId => {
+  cancelCheckOut(userId)
+  if (!recordUpdateThreads.getThread(userId)) {
+    createRecordUpdateThread(userId)
+  }
+}
 
 /**
  * Stop record update thread
  * @param userId
  */
 const checkOut = userId => {
-  const updateWorker = recordUpdateThreads.getThread(userId)
-  updateWorker.terminate()
+  checkOutTimeoutsByUserId[userId] = setTimeout(() => {
+    const updateWorker = recordUpdateThreads.getThread(userId)
+    if (updateWorker)
+      updateWorker.terminate()
+
+    delete checkOutTimeoutsByUserId[userId]
+  }, 1000)
+}
+
+const cancelCheckOut = userId => {
+  const timeout = checkOutTimeoutsByUserId[userId]
+  if (timeout)
+    clearTimeout(timeout)
 }
 
 /**

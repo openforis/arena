@@ -79,12 +79,7 @@ const checkInRecord = async (userId, surveyId, recordId) => {
   return await fetchRecordById(surveyId, recordId)
 }
 
-const checkOutRecord = userId => {
-  setTimeout(
-    () => RecordUpdateManager.checkOut(userId),
-    1000
-  )
-}
+const checkOutRecord = RecordUpdateManager.checkOut
 
 module.exports = {
   //==== CREATE

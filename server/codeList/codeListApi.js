@@ -1,6 +1,6 @@
-const {sendOk, sendErr} = require('../serverUtils/response')
+const {sendErr} = require('../serverUtils/response')
 
-const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
+const {getRestParam, getBoolParam} = require('../serverUtils/request')
 
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
@@ -24,8 +24,12 @@ const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 
 const sendValidatedCodeList = async (surveyId, codeListId, res, rest = {}) => {
   const codeList = await fetchCodeListById(surveyId, codeListId, true, true)
-
   res.json({codeList, ...rest})
+}
+
+const sendCodeLists = async (res, surveyId, draft, validate) => {
+  const codeLists = await fetchCodeListsBySurveyId(surveyId, draft, validate)
+  res.json({codeLists: toUUIDIndexedObj(codeLists)})
 }
 
 module.exports.init = app => {
@@ -82,9 +86,7 @@ module.exports.init = app => {
       const draft = getBoolParam(req, 'draft')
       const validate = getBoolParam(req, 'validate')
 
-      const codeLists = await fetchCodeListsBySurveyId(surveyId, draft, validate)
-
-      res.json({codeLists: toUUIDIndexedObj(codeLists)})
+      await sendCodeLists(res, surveyId, draft, validate)
     } catch (err) {
       sendErr(res, err)
     }
@@ -131,7 +133,7 @@ module.exports.init = app => {
 
       await updateCodeListProp(surveyId, codeListId, key, value)
 
-      await sendValidatedCodeList(surveyId, codeListId, res)
+      await sendCodeLists(res, surveyId, true, true)
     } catch (err) {
       sendErr(res, err)
     }
@@ -178,7 +180,7 @@ module.exports.init = app => {
 
       await deleteCodeList(surveyId, codeListId)
 
-      sendOk(res)
+      await sendCodeLists(res, surveyId, true, true)
     } catch (err) {
       sendErr(res, err)
     }

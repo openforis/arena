@@ -1,4 +1,4 @@
-const {sendOk, sendErr} = require('../serverUtils/response')
+const {sendErr} = require('../serverUtils/response')
 const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
 const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
 
@@ -8,6 +8,11 @@ const TaxonomyManager = require('./taxonomyManager')
 const TaxonomyImportJob = require('./taxonomyImportJob')
 
 const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
+
+const sendTaxonomies = async (res, surveyId, draft, validate) => {
+  const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(surveyId, draft, validate)
+  res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
+}
 
 module.exports.init = app => {
 
@@ -33,9 +38,7 @@ module.exports.init = app => {
       const draft = getBoolParam(req, 'draft')
       const validate = getBoolParam(req, 'validate')
 
-      const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(surveyId, draft, validate)
-
-      res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
+      await sendTaxonomies(res, surveyId, draft, validate)
     } catch (err) {
       sendErr(res, err)
     }
@@ -105,9 +108,8 @@ module.exports.init = app => {
       const {key, value} = body
 
       await TaxonomyManager.updateTaxonomyProp(surveyId, taxonomyId, key, value)
-      const taxonomy = await TaxonomyManager.fetchTaxonomyById(surveyId, taxonomyId, true, true)
 
-      res.json({taxonomy})
+      await sendTaxonomies(res, surveyId, true, true)
     } catch (err) {
       sendErr(res, err)
     }
@@ -145,7 +147,7 @@ module.exports.init = app => {
 
       await TaxonomyManager.deleteTaxonomy(surveyId, taxonomyId)
 
-      sendOk(res)
+      await sendTaxonomies(res, surveyId, true, true)
     } catch (err) {
       sendErr(res, err)
     }

@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
 
-import { taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from './actions'
+import { taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate, taxonomiesUpdate } from './actions'
 import { taxonomyCreate } from './actions'
 
 const actionHandlers = {
@@ -19,6 +19,8 @@ const actionHandlers = {
 
   // update
   [taxonomyUpdate]: (state, {taxonomy}) => R.assoc(taxonomy.uuid, taxonomy)(state),
+
+  [taxonomiesUpdate]: (state, {taxonomies}) => taxonomies,
 
   [taxonomyPropUpdate]: (state, {taxonomy, key, value}) => R.pipe(
     R.assocPath([taxonomy.uuid, 'props', key], value),
