@@ -40,6 +40,7 @@ module.exports = {
   getNodeDefsByCodeListUUID: SurveyNodeDefs.getNodeDefsByCodeListUUID,
   getNodeDefsByTaxonomyUUID: SurveyNodeDefs.getNodeDefsByTaxonomyUUID,
   getNodeDefParent: SurveyNodeDefs.getNodeDefParent,
+  getNodeDefKeys: SurveyNodeDefs.getNodeDefKeys,
   isNodeDefAncestor: SurveyNodeDefs.isNodeDefAncestor,
 
   // ====== UPDATE nodeDefs

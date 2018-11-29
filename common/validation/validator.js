@@ -1,7 +1,24 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const getProp = propName => R.path(propName.split('.'))
+const keywords = [
+  'date_created',
+  'date_modified',
+  'file',
+  'id',
+  'node_def_id',
+  'owner_id',
+  'parent_id',
+  'props',
+  'props_draft',
+  'props_advanced',
+  'record_id',
+  'step',
+  'uuid',
+  'value',
+]
+
+const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
 
 const validateProp = async (obj, prop, validations = []) => {
   const errors = R.reject(
@@ -69,6 +86,11 @@ const validateItemPropUniqueness = items =>
       : null
   }
 
+const validateNotKeyword = (propName, item) =>
+  R.contains(getProp(propName)(item), keywords)
+    ? 'keyword'
+    : null
+
 //==== getters
 
 const getValidation = R.propOr({valid: true}, 'validation')
@@ -108,6 +130,7 @@ module.exports = {
   validateProp,
   validateRequired,
   validateItemPropUniqueness,
+  validateNotKeyword,
 
   getValidation,
   isValid,

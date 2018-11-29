@@ -1,19 +1,20 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {validate, validateRequired, validateItemPropUniqueness} = require('../../common/validation/validator')
+const {
+  validate,
+  validateRequired,
+  validateItemPropUniqueness,
+  validateNotKeyword
+} = require('../../common/validation/validator')
 
 const CodeList = require('../../common/survey/codeList')
 
-const codeListValidators = (codeLists) => ({
-  'props.name': [validateRequired, validateItemPropUniqueness(codeLists)],
-})
+// ====== LEVELS
 
 const levelValidators = (levels) => ({
-  'props.name': [validateRequired, validateItemPropUniqueness(levels)],
+  'props.name': [validateRequired, validateNotKeyword, validateItemPropUniqueness(levels)],
 })
-
-// ====== LEVELS
 
 const validateLevel = async (levels, level) =>
   await validate(level, levelValidators(levels))
@@ -38,7 +39,7 @@ const validateLevels = async (codeList) => {
 // ====== ITEMS
 
 const itemValidators = (items) => ({
-  'props.code': [validateRequired, validateItemPropUniqueness(items)],
+  'props.code': [validateRequired, validateNotKeyword, validateItemPropUniqueness(items)],
 })
 
 const validateItem = async (codeList, items, itemUUID) => {
@@ -88,6 +89,12 @@ const validateItemsByParentUUID = async (codeList, items, parentItemUUID) => {
     errors: emptyChildren ? ['emptyChildren'] : !childrenValid ? ['invalidChildren'] : []
   }
 }
+
+// ====== CODE LIST
+
+const codeListValidators = (codeLists) => ({
+  'props.name': [validateRequired, validateNotKeyword, validateItemPropUniqueness(codeLists)],
+})
 
 const validateCodeListProps = async (codeLists, codeList) =>
   await validate(codeList, codeListValidators(codeLists))

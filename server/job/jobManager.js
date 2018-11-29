@@ -17,6 +17,8 @@ const notifyJobUpdate = job => {
   WebSocketManager.notifyUser(userId, jobEvents.update, job)
 
   if (job.ended) {
+    const thread = userJobThreads.getThread(userId)
+    thread.terminate()
     userJobThreads.removeThread(userId)
   }
 }
@@ -36,7 +38,7 @@ const executeJobThread = (job) => {
 
   const thread = new Thread(
     path.resolve(__dirname, 'jobThread.js'),
-    {jobType: job.type, params: job.params},
+    {jobType: job.type, jobParams: job.params},
     async job => await notifyJobUpdate(job)
   )
 

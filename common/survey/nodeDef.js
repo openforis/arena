@@ -26,6 +26,8 @@ const nodeDefType = {
   entity: 'entity',
 }
 
+const maxKeyAttributes = 3
+
 // ==== CREATE
 
 const newNodeDef = (surveyId, parentId, type, props) => ({
@@ -40,16 +42,19 @@ const newNodeDef = (surveyId, parentId, type, props) => ({
 
 const getNodeDefType = R.prop('type')
 const getNodeDefName = getProp('name', '')
+const getNodeDefParentId = R.prop('parentId')
 
 const isNodeDefKey = R.pipe(getProp('key'), R.equals(true))
 const isNodeDefMultiple = R.pipe(getProp('multiple'), R.equals(true))
-const isNodeDefRoot = R.pipe(R.prop('parentId'), R.isNil)
+const isNodeDefRoot = R.pipe(getNodeDefParentId, R.isNil)
 
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
 const isNodeDefCodeList = isNodeDefType(nodeDefType.codeList)
 const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
+
+const isNodeDefPublished = R.propEq('published', true)
 
 // ==== UPDATE
 
@@ -58,7 +63,28 @@ const canNodeDefBeMultiple = nodeDef =>
   (isNodeDefEntity(nodeDef) && !isNodeDefRoot(nodeDef)) ||
   R.contains(
     getNodeDefType(nodeDef),
-    [nodeDefType.decimal, nodeDefType.codeList, nodeDefType.file, nodeDefType.integer, nodeDefType.text]
+    [
+      nodeDefType.decimal,
+      nodeDefType.codeList,
+      nodeDefType.file,
+      nodeDefType.integer,
+      nodeDefType.text
+    ]
+  )
+
+const canNodeDefBeKey = nodeDef =>
+  R.contains(
+    getNodeDefType(nodeDef),
+    [
+      nodeDefType.date,
+      nodeDefType.decimal,
+      nodeDefType.codeList,
+      nodeDefType.coordinate,
+      nodeDefType.integer,
+      nodeDefType.taxon,
+      nodeDefType.text,
+      nodeDefType.time
+    ]
   )
 
 const getNodeDefLabel = (nodeDef, lang) => {
@@ -71,6 +97,7 @@ const getNodeDefLabel = (nodeDef, lang) => {
 
 module.exports = {
   nodeDefType,
+  maxKeyAttributes,
 
   //CREATE
   newNodeDef,
@@ -80,6 +107,7 @@ module.exports = {
 
   getNodeDefType,
   getNodeDefName,
+  getNodeDefParentId,
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
@@ -97,8 +125,10 @@ module.exports = {
   isNodeDefSingleEntity,
   isNodeDefCodeList,
   isNodeDefTaxon,
+  isNodeDefPublished,
 
   //UTILS
   canNodeDefBeMultiple,
+  canNodeDefBeKey,
   getNodeDefLabel,
 }

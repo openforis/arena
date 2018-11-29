@@ -14,20 +14,18 @@ class Checkbox extends React.Component {
       checked,
       label,
       onChange,
-      disabled = false,
-      radio = false,
+      disabled,
+      radio,
     } = this.props
-
-    const {valid = true} = validation
 
     return (
       <div style={{justifySelf: 'start'}}>
-        <TooltipError message={valid ? null : validation.error}>
+        <TooltipError messages={validation.errors}>
 
-          <button className="btn btn-s btn-transparent"
+          <button className="btn btn-s btn-transparent btn-checkbox"
                   onClick={() => onChange(!checked)}
                   aria-disabled={disabled}>
-            <span className={`icon icon-${radio ? 'radio': 'checkbox'}-${!checked ? 'un' : ''}checked icon-24px`}/>
+            <span className={`icon icon-${radio ? 'radio' : 'checkbox'}-${!checked ? 'un' : ''}checked icon-24px`}/>
             {label}
           </button>
 
@@ -40,6 +38,7 @@ class Checkbox extends React.Component {
 Checkbox.defaultProps = {
   checked: false,
   disabled: false,
+  radio: false,
   validation: {},
 }
 

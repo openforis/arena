@@ -4,6 +4,8 @@ import * as R from 'ramda'
 
 import NodeDefFormItem from './components/nodeDefFormItem'
 import NodeDefTableHeader from './components/nodeDefTableHeader'
+import NodeDefTableBody from './components/nodeDefTableBody'
+import ErrorBadge from '../../../commonComponents/errorBadge'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
@@ -20,7 +22,6 @@ import { getNodeDefDefaultValue } from './nodeDefSystemProps'
 
 import { getRecord } from '../record/recordState'
 import { createNodePlaceholder, updateNode, removeNode } from '../record/actions'
-import NodeDefTableBody from './components/nodeDefTableBody'
 
 class NodeDefSwitch extends React.Component {
 
@@ -69,18 +70,11 @@ class NodeDefSwitch extends React.Component {
     } = this.props
 
     const isRoot = NodeDef.isNodeDefRoot(nodeDef)
-    const invalid = nodeDef.validation && !nodeDef.validation.valid
     const isPage = !!Layout.getPageUUID(nodeDef)
 
     return <div className={`${isPage ? 'node-def__form_page' : 'node-def__form'}`} ref="nodeDefElem">
-      {
-        invalid ?
-          <div className="node-def__form-error error-badge">
-            <span className="icon icon-warning icon-16px icon-left"/>
-            <span>INVALID</span>
-          </div>
-          : null
-      }
+
+      <ErrorBadge validation={nodeDef.validation}/>
 
       {
         edit && canEditDef && (

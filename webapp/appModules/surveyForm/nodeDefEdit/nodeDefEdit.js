@@ -9,6 +9,7 @@ import AdvancedProps from './advanced/advancedProps'
 import CodeListsView from '../components/codeListsView'
 import TaxonomiesView from '../components/taxonomiesView'
 
+import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 
 import { getSurvey } from '../../../survey/surveyState'
@@ -34,6 +35,7 @@ class NodeDefEdit extends React.Component {
   render () {
     const {
       nodeDef,
+      nodeDefKeyEditDisabled,
       putNodeDefProp,
       canUpdateCodeList
     } = this.props
@@ -65,6 +67,7 @@ class NodeDefEdit extends React.Component {
                         label: 'Basic',
                         component: (
                           <BasicProps nodeDef={nodeDef}
+                                      nodeDefKeyEditDisabled={nodeDefKeyEditDisabled}
                                       putNodeDefProp={putNodeDefProp}
                                       toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
                                       toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
@@ -96,13 +99,23 @@ class NodeDefEdit extends React.Component {
 NodeDefEdit.defaultProps = {
   nodeDef: null,
 }
+
 const mapStateToProps = state => {
   const survey = getSurvey(state)
   const surveyForm = getSurveyForm(state)
   const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
 
+  let nodeDefKeyEditDisabled = false
+  if (nodeDef) {
+    const parent = Survey.getNodeDefParent(nodeDef)(survey)
+    const keyDefs = Survey.getNodeDefKeys(parent)(survey)
+
+    nodeDefKeyEditDisabled = !NodeDef.isNodeDefKey(nodeDef) && keyDefs.length >= NodeDef.maxKeyAttributes
+  }
+
   return {
-    nodeDef
+    nodeDef,
+    nodeDefKeyEditDisabled
   }
 }
 
