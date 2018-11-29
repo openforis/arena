@@ -55,11 +55,14 @@ class ExpressionsProp extends React.Component {
   }
 
   handleUpdate (expression) {
-    const {values} = this.props
-
-    const index = this.getExpressionIndex(expression)
-    const newValues = R.update(index, expression, values)
-    this.updateExpressions(newValues)
+    if (NodeDefExpression.isEmpty(expression)) {
+      this.handleDelete(expression)
+    } else {
+      const {values} = this.props
+      const index = this.getExpressionIndex(expression)
+      const newValues = R.update(index, expression, values)
+      this.updateExpressions(newValues)
+    }
   }
 
   updateExpressions (expressions) {

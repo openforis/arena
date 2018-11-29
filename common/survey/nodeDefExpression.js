@@ -1,5 +1,6 @@
 const R = require('ramda')
 const {uuidv4} = require('./../uuid')
+const {isBlank} = require('../stringUtils')
 
 const expressionProp = 'expression'
 const applyIfProp = 'applyIf'
@@ -16,6 +17,8 @@ const assocProp = (propName, value) => R.pipe(
   R.dissoc('placeholder'),
 )
 
+const isEmpty = (expression = {}) => isBlank(expression.expression) && isBlank(expression.applyIf)
+
 module.exports = {
   //CREATE
   createExpressionPlaceholder,
@@ -23,6 +26,7 @@ module.exports = {
   //READ
   getExpression: R.prop(expressionProp),
   getApplyIf: R.prop(applyIfProp),
+  isEmpty,
 
   //UPDATE
   assocExpression: expression => assocProp(expressionProp, expression),

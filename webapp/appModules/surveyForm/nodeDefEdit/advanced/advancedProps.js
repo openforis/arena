@@ -16,6 +16,12 @@ const AdvancedProps = props => {
 
       <ExpressionsProp nodeDef={nodeDef}
                        putNodeDefProp={putNodeDefProp}
+                       label="Calculated values"
+                       readOnly={readOnly}
+                       propName="calculatedValues"/>
+
+      <ExpressionsProp nodeDef={nodeDef}
+                       putNodeDefProp={putNodeDefProp}
                        label="Applicable if"
                        readOnly={readOnly}
                        propName="applicable"
