@@ -9,25 +9,6 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 
-const onUpdate = (nodeDef, values, value, putNodeDefProp, propName) => {
-  const updatedValue = R.dissoc('placeholder', value)
-  const newValues = R.pipe(
-    R.update(R.findIndex(R.propEq('uuid', value.uuid))(values), updatedValue),
-    R.reject(R.propEq('placeholder', true)),
-  )(values)
-  putNodeDefProp(nodeDef, propName, newValues, true)
-}
-
-const onDelete = (nodeDef, values, value, putNodeDefProp, propName) => {
-  if (window.confirm('Delete this default value?')) {
-    const newValues = R.pipe(
-      R.remove(R.findIndex(R.propEq('uuid', value.uuid))(values), 1),
-      R.reject(R.propEq('placeholder', true)),
-    )(values)
-    putNodeDefProp(nodeDef, propName, newValues, true)
-  }
-}
-
 const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
   <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
@@ -57,29 +38,63 @@ const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
   </div>
 )
 
-const ExpressionsProp = (props) => {
-  const {
-    nodeDef, putNodeDefProp,
-    label, propName, values, readOnly, applyIf
-  } = props
+class ExpressionsProp extends React.Component {
 
-  return (
-    <FormItem label={label}>
-      <div className="node-def-edit__expressions">
-        {
-          values.map((value, i) =>
-            <Expression key={i}
-                        expression={value}
-                        applyIf={applyIf}
-                        onDelete={value => onDelete(nodeDef, values, value, putNodeDefProp, propName)}
-                        onUpdate={value => onUpdate(nodeDef, values, value, putNodeDefProp, propName)}
-                        readOnly={readOnly}/>
-          )
+  getExpressionIndex (expression) {
+    return R.findIndex(R.propEq('uuid', expression.uuid), this.props.values)
+  }
 
-        }
-      </div>
-    </FormItem>
-  )
+  handleDelete (expression) {
+    const {values} = this.props
+
+    if (window.confirm('Delete this default expression?')) {
+      const index = this.getExpressionIndex(expression)
+      const newValues = R.remove(index, 1, values)
+      this.updateExpressions(newValues)
+    }
+  }
+
+  handleUpdate (expression) {
+    const {values} = this.props
+
+    const index = this.getExpressionIndex(expression)
+    const newValues = R.update(index, expression, values)
+    this.updateExpressions(newValues)
+  }
+
+  updateExpressions (expressions) {
+    const {nodeDef, putNodeDefProp, propName} = this.props
+
+    putNodeDefProp(
+      nodeDef,
+      propName,
+      R.reject(R.propEq('placeholder', true), expressions),
+      true
+    )
+
+  }
+
+  render () {
+    const {label, readOnly, applyIf, values} = this.props
+
+    return (
+      <FormItem label={label}>
+        <div className="node-def-edit__expressions">
+          {
+            values.map((value, i) =>
+              <Expression key={i}
+                          expression={value}
+                          applyIf={applyIf}
+                          onDelete={this.handleDelete.bind(this)}
+                          onUpdate={this.handleUpdate.bind(this)}
+                          readOnly={readOnly}/>
+            )
+
+          }
+        </div>
+      </FormItem>
+    )
+  }
 }
 
 ExpressionsProp.defaultProps = {

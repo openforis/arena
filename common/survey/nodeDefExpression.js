@@ -11,6 +11,11 @@ const createExpressionPlaceholder = () => ({
   applyIf: '',
 })
 
+const assocProp = (propName, value) => R.pipe(
+  R.assoc(propName, value),
+  R.dissoc('placeholder'),
+)
+
 module.exports = {
   //CREATE
   createExpressionPlaceholder,
@@ -20,6 +25,6 @@ module.exports = {
   getApplyIf: R.prop(applyIfProp),
 
   //UPDATE
-  assocExpression: expression => R.assoc(expressionProp, expression),
-  assocApplyIf: applyIf => R.assoc(applyIfProp, applyIf),
+  assocExpression: expression => assocProp(expressionProp, expression),
+  assocApplyIf: applyIf => assocProp(applyIfProp, applyIf),
 }
