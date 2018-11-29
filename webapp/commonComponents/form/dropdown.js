@@ -111,7 +111,7 @@ class Dropdown extends React.Component {
   }
 
   onInputFocus () {
-    if (!this.isOpened() && !R.isEmpty(this.state.items) && this.props.selection === null) {
+    if (!this.isOpened() && !R.isEmpty(this.state.items)) {
       this.toggleOpened()
     }
   }
