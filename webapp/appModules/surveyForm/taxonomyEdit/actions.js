@@ -108,6 +108,7 @@ export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
   dispatch({type: taxonomyDelete, taxonomy})
 
   const surveyId = getStateSurveyId(getState())
-  await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}`)
+  const {data} = await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}`)
+  dispatch({type: taxonomiesUpdate, taxonomies: data.taxonomies})
 }
 

@@ -151,7 +151,8 @@ export const deleteCodeList = codeList => async (dispatch, getState) => {
 
   //delete code list and items from db
   const surveyId = getStateSurveyId(getState())
-  await axios.delete(`/api/survey/${surveyId}/codeLists/${codeList.id}`)
+  const {data} = await axios.delete(`/api/survey/${surveyId}/codeLists/${codeList.id}`)
+  dispatch({type: codeListsUpdate, codeLists: data.codeLists})
 }
 
 export const deleteCodeListLevel = (codeList, level) => async (dispatch, getState) => {
