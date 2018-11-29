@@ -8,6 +8,7 @@ const getFieldError = (field) => R.pipe(
 
 export const getValidationFieldMessagesHTML = error => R.pipe(
   R.keys,
+  R.filter(key => R.pathEq([key, 'valid'], false, error)),
   R.addIndex(R.map)(
     (field, i) =>
       <div key={i}>

@@ -39,6 +39,7 @@ $tableRowsHeight: calc(100% - 77px);
   border-right: $rowBorder;
   border-left: $rowBorder;
   height: $rowHeight;
+  position: relative;
 
   &.active {
     background-color: rgba($white, .2);

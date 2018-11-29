@@ -1,9 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import {
-  isValid
-} from '../../../../../common/validation/validator'
+import ErrorBadge from '../../../../commonComponents/errorBadge'
 
 const TableRow = props => {
 
@@ -21,14 +19,7 @@ const TableRow = props => {
 
       <div className="name">
         {name}
-        {
-          !isValid(item) && (
-            <span className="error-badge">
-              <span className="icon icon-warning icon-12px icon-left"/>
-              <span>INVALID</span>
-            </span>
-          )
-        }
+        <ErrorBadge validation={item.validation}/>
       </div>
 
       <div className="buttons">

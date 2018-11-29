@@ -1,0 +1,31 @@
+@import "../style/vars";
+
+.error-badge {
+  position: absolute;
+  z-index: $zIndex30ErrorBadge;
+  background-color: $redDark;
+  padding: .5rem .5rem;
+  display: grid;
+  grid-row-gap: 1rem;
+  align-items: center;
+  font-size: .8rem;
+  font-weight: 600;
+
+  &:hover {
+    cursor: pointer;
+    padding-bottom: 1rem;
+    z-index: $zIndex31ErrorBadgeHover;
+
+    .error-badge__messages {
+      display: block;
+    }
+  }
+}
+
+.error-badge__warning {
+  justify-self: start;
+}
+
+.error-badge__messages {
+  display: none;
+}
