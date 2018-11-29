@@ -1,10 +1,11 @@
-const {parentPort} = require('worker_threads')
+const {parentPort, workerData} = require('worker_threads')
 
 /**
  * Base class for thread execution in Worker Pool
  */
 class Thread {
   constructor () {
+    this.params = {...workerData}
     parentPort.on('message', this.onMessage.bind(this))
   }
 

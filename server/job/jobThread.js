@@ -1,46 +1,39 @@
-const {parentPort, workerData} = require('worker_threads')
+const Thread = require('../threads/thread')
 
 const {jobThreadMessageTypes, jobToJSON} = require('./jobUtils')
-
 const JobCreator = require('./jobCreator')
 
-/**
- * Active job
- */
-let job = null
+class JobThread extends Thread {
 
-const sendJobToParentThread = () => {
-  parentPort.postMessage(jobToJSON(job))
-}
+  constructor () {
+    super()
 
-const handleJobEvent = async () => {
-  sendJobToParentThread()
+    this.createJob()
+  }
 
-  if (job.isEnded()) {
-    parentPort.close()
+  createJob () {
+    const {jobType, jobParams} = this.params
+
+    this.job = JobCreator.createJob(jobType, jobParams)
+
+    this.job.onEvent(() => this.sendJobToParentThread())
+    this.job.start()
+  }
+
+  onMessage (msg) {
+    switch (msg.type) {
+      case jobThreadMessageTypes.fetchJob:
+        this.sendJobToParentThread()
+        break
+      case jobThreadMessageTypes.cancelJob:
+        this.job.cancel()
+        break
+    }
+  }
+
+  sendJobToParentThread () {
+    this.postMessage(jobToJSON(this.job))
   }
 }
 
-const execute = () => {
-  const {jobType, params} = workerData
-
-  job = JobCreator.createJob(jobType, params)
-
-  job
-    .onEvent(handleJobEvent)
-    .start()
-}
-
-execute()
-
-parentPort.on('message', msg => {
-  switch (msg.type) {
-    case jobThreadMessageTypes.fetchJob:
-      sendJobToParentThread()
-      break
-    case jobThreadMessageTypes.cancelJob:
-      job.cancel()
-      break
-  }
-})
-
+new JobThread()
