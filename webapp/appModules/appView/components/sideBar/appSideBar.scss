@@ -20,11 +20,6 @@ $sidebarTransition: width 100ms ease-in;
 
   &.opened {
     width: $sidebarWidthOpened;
-
-    .app-sidebar__module_label {
-      width: auto;
-      height: auto;
-    }
   }
 }
 
@@ -59,14 +54,6 @@ $sidebarTransition: width 100ms ease-in;
 .app-sidebar__module {
   display: flex;
   align-items: baseline;
-}
-
-.app-sidebar__module_label {
-  display: block;
-  width: 0px;
-  height: 0px;
-  overflow: hidden;
-  transition: $sidebarTransition;
 }
 
 .app-sidebar__footer {

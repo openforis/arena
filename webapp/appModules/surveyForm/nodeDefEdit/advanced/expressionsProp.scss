@@ -1,0 +1,41 @@
+@import "../../../../style/vars";
+
+
+.node-def-edit__expressions {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.node-def-edit__expression {
+  position: relative;
+  padding: 1rem;
+  margin: 1rem;
+  border: 1px solid rgba($white, 0.35);
+
+  &.placeholder {
+    border: 1px dashed rgba($white, 0.25);
+    background-color: rgba($white, 0.1);
+  }
+
+  .expression-item {
+    display: flex;
+
+    .label {
+      text-align: center;
+      align-self: flex-end;
+      width: 100px;
+      font-weight: 600;
+      font-size: .65rem;
+      text-transform: uppercase;
+      background-color: rgba($white, 0.1);
+      border-radius: 3px;
+      padding: .15rem .3rem;
+    }
+  }
+
+  .btn-delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}

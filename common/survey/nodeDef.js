@@ -103,6 +103,8 @@ module.exports = {
   newNodeDef,
 
   //READ
+  getProp,
+
   getNodeDefType,
   getNodeDefName,
   getNodeDefParentId,

@@ -1,24 +1,24 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { FormItem, Input } from '../../../commonComponents/form/input'
-import Checkbox from '../../../commonComponents/form/checkbox'
-import LabelsEditor from '../../../survey/components/labelsEditor'
+import { FormItem, Input } from '../../../../commonComponents/form/input'
+import Checkbox from '../../../../commonComponents/form/checkbox'
+import LabelsEditor from '../../../../survey/components/labelsEditor'
 import CodeListProps from './codeListProps'
 import TaxonProps from './taxonProps'
 
-import NodeDef from '../../../../common/survey/nodeDef'
-import { isRenderTable } from '../../../../common/survey/nodeDefLayout'
+import NodeDef from '../../../../../common/survey/nodeDef'
+import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
 
-import { getFieldValidation, getValidation } from '../../../../common/validation/validator'
+import { isRenderTable, } from '../../../../../common/survey/nodeDefLayout'
 
-import { normalizeName } from '../../../../common/stringUtils'
+import { normalizeName } from '../../../../../common/stringUtils'
 
 const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValue) => {
   putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
 }
 
-const CommonProps = props => {
+const BasicProps = props => {
   const {
     nodeDef, nodeDefKeyEditDisabled,
     putNodeDefProp, toggleTaxonomyEdit, toggleCodeListEdit
@@ -28,7 +28,7 @@ const CommonProps = props => {
   const multiplicityEditDisabled = NodeDef.isNodeDefPublished(nodeDef) || isRenderTable(nodeDef) || NodeDef.isNodeDefKey(nodeDef)
 
   return (
-    <React.Fragment>
+    <div className="form">
       <FormItem label={'type'}>
         <label>{nodeDef.type}</label>
       </FormItem>
@@ -78,8 +78,8 @@ const CommonProps = props => {
         </FormItem>
       }
 
-    </React.Fragment>
+    </div>
   )
 }
 
-export default CommonProps
+export default BasicProps

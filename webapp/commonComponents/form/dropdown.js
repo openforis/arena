@@ -36,11 +36,18 @@ class Dropdown extends React.Component {
     const {items, selection, autocompleteMinChars} = this.props
     const {items: prevItems, selection: prevSelection} = prevProps
 
-    if (!R.equals(prevItems, items) || !R.equals(selection, prevSelection))
+    if (!R.equals(prevItems, items)) {
       this.setState({
         displayValue: this.getItemLabel(selection),
         items: autocompleteMinChars > 0 ? [] : items,
       })
+    }
+
+    if (selection && !R.equals(selection, prevSelection)) {
+      this.setState({
+        displayValue: this.getItemLabel(selection),
+      })
+    }
   }
 
   toggleOpened (callback = null) {
@@ -104,7 +111,7 @@ class Dropdown extends React.Component {
   }
 
   onInputFocus () {
-    if (!this.isOpened() && !R.isEmpty(this.state.items) && this.props.selection === null) {
+    if (!this.isOpened() && !R.isEmpty(this.state.items)) {
       this.toggleOpened()
     }
   }
