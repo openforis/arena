@@ -35,7 +35,7 @@ const fetchSurveys = async (user, checkAccess = true, client = db) =>
     FROM survey s
     JOIN node_def n
       ON s.id = n.survey_id
-      AND n.parent_id IS NULL
+      AND n.parent_uuid IS NULL
     JOIN (
         SELECT
           survey_id, ${selectDate('MAX(date_modified)', 'date_modified')}

@@ -30,10 +30,10 @@ const maxKeyAttributes = 3
 
 // ==== CREATE
 
-const newNodeDef = (surveyId, parentId, type, props) => ({
+const newNodeDef = (surveyId, parentUuid, type, props) => ({
   surveyId,
   uuid: uuidv4(),
-  parentId,
+  parentUuid,
   type,
   props,
 })
@@ -42,11 +42,11 @@ const newNodeDef = (surveyId, parentId, type, props) => ({
 
 const getNodeDefType = R.prop('type')
 const getNodeDefName = getProp('name', '')
-const getNodeDefParentId = R.prop('parentId')
+const getNodeDefParentUuid = R.prop('parentUuid')
 
 const isNodeDefKey = R.pipe(getProp('key'), R.equals(true))
 const isNodeDefMultiple = R.pipe(getProp('multiple'), R.equals(true))
-const isNodeDefRoot = R.pipe(getNodeDefParentId, R.isNil)
+const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
 
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
@@ -107,7 +107,7 @@ module.exports = {
 
   getNodeDefType,
   getNodeDefName,
-  getNodeDefParentId,
+  getNodeDefParentUuid,
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),

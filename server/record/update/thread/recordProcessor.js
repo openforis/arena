@@ -40,7 +40,7 @@ const createNode = async (nodeDef, nodeToInsert, file, client = db) => {
 
   // add children if entity
   const childDefs = NodeDef.isNodeDefEntity(nodeDef)
-    ? await NodeDefRepository.fetchNodeDefsByParentId(nodeDef.id)
+    ? await NodeDefRepository.fetchNodeDefsByParentUuid(nodeDef.uuid)
     : []
 
   // insert only child single entities

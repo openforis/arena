@@ -4,30 +4,30 @@ const nodeDefRepository = require('./nodeDefRepository')
 
 const {markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
 
-const fetchNodeDefSurveyId = async (nodeDefId) =>
-  await nodeDefRepository.fetchNodeDefSurveyId(nodeDefId)
+const fetchNodeDefSurveyId = async (nodeDefUuid) =>
+  await nodeDefRepository.fetchNodeDefSurveyId(nodeDefUuid)
 
-const createNodeDef = async (surveyId, parentId, uuid, type, props) =>
+const createNodeDef = async (surveyId, parentUuid, uuid, type, props) =>
   await db.tx(async t => {
-    const nodeDef = await nodeDefRepository.createNodeDef(surveyId, parentId, uuid, type, props, t)
+    const nodeDef = await nodeDefRepository.createNodeDef(surveyId, parentUuid, uuid, type, props, t)
 
     await markSurveyDraft(surveyId, t)
 
     return nodeDef
   })
 
-const updateNodeDefProp = async (nodeDefId, key, value, advanced = false) =>
+const updateNodeDefProp = async (nodeDefUuid, key, value, advanced = false) =>
   await db.tx(async t => {
-    const nodeDef = await nodeDefRepository.updateNodeDefProp(nodeDefId, key, value, advanced, t)
+    const nodeDef = await nodeDefRepository.updateNodeDefProp(nodeDefUuid, key, value, advanced, t)
 
     await markSurveyDraft(nodeDef.surveyId, t)
 
     return nodeDef
   })
 
-const markNodeDefDeleted = async (nodeDefId) =>
+const markNodeDefDeleted = async (nodeDefUuid) =>
   await db.tx(async t => {
-    const nodeDef = await nodeDefRepository.markNodeDefDeleted(nodeDefId, t)
+    const nodeDef = await nodeDefRepository.markNodeDefDeleted(nodeDefUuid, t)
 
     await markSurveyDraft(nodeDef.surveyId, t)
 

@@ -96,7 +96,7 @@ class FormActions extends React.Component {
 
   addNodeDef (type, props) {
     const {nodeDef, createNodeDef} = this.props
-    createNodeDef(nodeDef.id, type, props)
+    createNodeDef(nodeDef.uuid, type, props)
   }
 
   render () {

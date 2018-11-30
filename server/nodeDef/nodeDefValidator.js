@@ -24,7 +24,7 @@ const validateKeyAttributes = (nodeDefs) =>
   (propName, nodeDef) => {
     if (NodeDef.isNodeDefEntity(nodeDef)) {
       const keyAttributesCount = R.pipe(
-        R.filter(n => NodeDef.getNodeDefParentId(n) === nodeDef.id && NodeDef.isNodeDefKey(n)),
+        R.filter(n => NodeDef.getNodeDefParentUuid(n) === nodeDef.uuid && NodeDef.isNodeDefKey(n)),
         R.length
       )(nodeDefs)
 
@@ -41,7 +41,7 @@ const validateKey = nodeDefs =>
   (propName, nodeDef) => {
     if (!NodeDef.isNodeDefEntity(nodeDef) && NodeDef.isNodeDefKey(nodeDef)) {
       const keyAttributesCount = R.pipe(
-        R.filter(n => NodeDef.getNodeDefParentId(n) === NodeDef.getNodeDefParentId(nodeDef) && NodeDef.isNodeDefKey(n)),
+        R.filter(n => NodeDef.getNodeDefParentUuid(n) === NodeDef.getNodeDefParentUuid(nodeDef) && NodeDef.isNodeDefKey(n)),
         R.length
       )(nodeDefs)
 

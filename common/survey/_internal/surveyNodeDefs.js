@@ -11,12 +11,12 @@ const getNodeDefs = R.propOr({}, nodeDefs)
 
 const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
-const getNodeDefsByParentId = parentId => R.pipe(
+const getNodeDefsByParentUuid = parentUuid => R.pipe(
   getNodeDefsArray,
-  R.filter(R.propEq('parentId', parentId)),
+  R.filter(R.propEq('parentUuid', parentUuid)),
 )
 
-const getRootNodeDef = R.pipe(getNodeDefsByParentId(null), R.head)
+const getRootNodeDef = R.pipe(getNodeDefsByParentUuid(null), R.head)
 
 const getNodeDefByUUID = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
@@ -25,7 +25,7 @@ const getNodeDefById = id => R.pipe(
   R.find(R.propEq('id', id)),
 )
 
-const getNodeDefChildren = nodeDef => getNodeDefsByParentId(nodeDef.id)
+const getNodeDefChildren = nodeDef => getNodeDefsByParentUuid(nodeDef.uuid)
 
 const getNodeDefKeys = nodeDef => R.pipe(
   getNodeDefChildren(nodeDef),
@@ -48,7 +48,7 @@ const assocNodeDefs = newNodeDefs => R.assoc(nodeDefs, newNodeDefs)
 
 // ====== UTILS
 
-const getNodeDefParent = nodeDef => getNodeDefById(NodeDef.getNodeDefParentId(nodeDef))
+const getNodeDefParent = nodeDef => getNodeDefByUUID(NodeDef.getNodeDefParentUuid(nodeDef))
 
 const getNodeDefAncestors = nodeDef =>
   survey => {
@@ -66,7 +66,7 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       return false
 
     const nodeDefParent = getNodeDefParent(nodeDefDescendant)(survey)
-    return nodeDefParent.id === nodeDefAncestor.id
+    return nodeDefParent.uuid === nodeDefAncestor.uuid
       ? true
       : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }

@@ -14,8 +14,8 @@ const SurveyManager = require('./../survey/surveyManager')
 
 const UnauthorizedError = require('../authGroup/unauthorizedError')
 
-const checkSurveyId = async (nodeDefId, reqSurveyId) => {
-  const nodeDefSurveyId = await fetchNodeDefSurveyId(nodeDefId)
+const checkSurveyId = async (nodeDefUuid, reqSurveyId) => {
+  const nodeDefSurveyId = await fetchNodeDefSurveyId(nodeDefUuid)
   if (nodeDefSurveyId !== reqSurveyId) {
     throw new UnauthorizedError(`Not authorized`)
   }
@@ -28,9 +28,9 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/nodeDef', requireSurveyEditPermission, async (req, res) => {
     try {
       const {body: nodeDefRequest} = req
-      const {surveyId, parentId, uuid, type, props} = nodeDefRequest
+      const {surveyId, parentUuid, uuid, type, props} = nodeDefRequest
 
-      const nodeDef = await createNodeDef(surveyId, parentId, uuid, type, props)
+      const nodeDef = await createNodeDef(surveyId, parentUuid, uuid, type, props)
 
       res.json({nodeDef})
     } catch (err) {
@@ -42,17 +42,17 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/nodeDef/:nodeDefId/prop', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/nodeDef/:nodeDefUuid/prop', requireSurveyEditPermission, async (req, res) => {
     try {
       const {body} = req
       const {key, value, advanced} = body
 
-      const nodeDefId = getRestParam(req, 'nodeDefId')
+      const nodeDefUuid = getRestParam(req, 'nodeDefUuid')
       const surveyId = getRestParam(req, 'surveyId')
 
-      await checkSurveyId(nodeDefId, surveyId)
+      await checkSurveyId(nodeDefUuid, surveyId)
 
-      await updateNodeDefProp(nodeDefId, key, value, advanced)
+      await updateNodeDefProp(nodeDefUuid, key, value, advanced)
       const nodeDefs = await SurveyManager.fetchSurveyNodeDefs(surveyId, true, true)
 
       res.json({nodeDefs})
@@ -63,14 +63,14 @@ module.exports.init = app => {
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId/nodeDef/:nodeDefId', requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/nodeDef/:nodeDefUuid', requireSurveyEditPermission, async (req, res) => {
     try {
-      const nodeDefId = getRestParam(req, 'nodeDefId')
+      const nodeDefUuid = getRestParam(req, 'nodeDefUuid')
       const surveyId = getRestParam(req, 'surveyId')
 
-      await checkSurveyId(nodeDefId, surveyId)
+      await checkSurveyId(nodeDefUuid, surveyId)
 
-      await markNodeDefDeleted(nodeDefId)
+      await markNodeDefDeleted(nodeDefUuid)
 
       sendOk(res)
     } catch (e) {

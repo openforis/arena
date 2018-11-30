@@ -14,9 +14,9 @@ export const nodeDefDelete = 'nodeDef/delete'
 
 // ==== CREATE
 
-export const createNodeDef = (parentId, type, props) => async (dispatch, getState) => {
+export const createNodeDef = (parentUuid, type, props) => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
-  const nodeDef = NodeDef.newNodeDef(surveyId, parentId, type, props)
+  const nodeDef = NodeDef.newNodeDef(surveyId, parentUuid, type, props)
 
   dispatch({type: nodeDefCreate, nodeDef})
 
@@ -37,12 +37,12 @@ export const removeNodeDef = (nodeDef) => async (dispatch) => {
   dispatch({type: nodeDefDelete, nodeDef})
 
   const {surveyId} = nodeDef
-  await axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDef.id}`)
+  await axios.delete(`/api/survey/${surveyId}/nodeDef/${nodeDef.uuid}`)
 }
 
 const _putNodeDefProp = (nodeDef, surveyId, key, value, advanced) => {
   const action = async dispatch => {
-    const {data} = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDef.id}/prop`, {key, value, advanced})
+    const {data} = await axios.put(`/api/survey/${surveyId}/nodeDef/${nodeDef.uuid}/prop`, {key, value, advanced})
 
     //update node defs with their validation status
     const {nodeDefs} = data

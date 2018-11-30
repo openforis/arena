@@ -25,7 +25,7 @@ CREATE TABLE
   uuid                 uuid      NOT NULL DEFAULT uuid_generate_v4(),
 
   survey_id            bigint    NOT NULL,
-  parent_id            bigint,
+  parent_uuid          uuid,
   type                 varchar   NOT NULL,
 
   deleted              boolean   NOT NULL DEFAULT false,
@@ -40,8 +40,9 @@ CREATE TABLE
   date_modified        TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
 
   PRIMARY KEY (id),
+  CONSTRAINT node_def_uuid_idx UNIQUE (uuid),
   CONSTRAINT node_def_survey_fk FOREIGN KEY (survey_id) REFERENCES "survey" ("id") ON DELETE CASCADE,
-  CONSTRAINT node_def_parent_fk FOREIGN KEY (parent_id) REFERENCES "node_def" ("id") ON DELETE CASCADE
+  CONSTRAINT node_def_parent_fk FOREIGN KEY (parent_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE
 );
 
 
