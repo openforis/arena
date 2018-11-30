@@ -95,7 +95,7 @@ export const getFormPageParentNode = (survey, nodeDef) =>
         return Record.getRootNode(record)
       } else {
         const parentNodeUUID = R.path(getSurveyFormPageNodePath(nodeDefParent))(surveyForm)
-        const node = Record.getNodeByUUID(parentNodeUUID)(record)
+        const node = Record.getNodeByUuid(parentNodeUUID)(record)
         return node
       }
 

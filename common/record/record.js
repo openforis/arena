@@ -42,9 +42,7 @@ const findNodes = predicate => R.pipe(
   // }),
 )
 
-const getNodeChildren = node => findNodes(
-  n => n.parentId ? n.parentId === node.id : n.parentUUID === node.uuid
-)
+const getNodeChildren = node => findNodes(n => Node.getParentUuid(n) === node.uuid)
 
 const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
   getNodeChildren(parentNode),
@@ -53,21 +51,12 @@ const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
 
 const getRootNode = R.pipe(
   getNodesArray,
-  R.find(R.propEq('parentId', null)),
+  R.find(R.propEq('parentUuid', null)),
 )
 
-const getNodeByUUID = uuid => R.path([nodes, uuid])
+const getNodeByUuid = uuid => R.path([nodes, uuid])
 
-const getNodeById = id => R.pipe(
-  getNodesArray,
-  R.find(R.propEq('id', id))
-)
-
-const getParentNode = node => node.parentId
-  ? getNodeById(node.parentId)
-  : node.parentUUID
-    ? getNodeByUUID(node.parentUUID)
-    : R.F
+const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
 
 const findNodeInAncestorEntities = (parentNode, predicate) => record => {
   let parentEntity = parentNode
@@ -161,7 +150,7 @@ module.exports = {
   getNodesArray,
   getNodeChildrenByDefUuid,
   getRootNode,
-  getNodeByUUID,
+  getNodeByUuid,
 
   // testing
   getCodeUUIDsHierarchy,

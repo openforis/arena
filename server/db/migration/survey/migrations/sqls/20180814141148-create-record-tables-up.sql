@@ -17,7 +17,7 @@ CREATE TABLE
   id            bigserial NOT NULL,
   uuid          uuid      NOT NULL DEFAULT uuid_generate_v4(),
   record_id     bigint    NOT NULL,
-  parent_id     bigint,
+  parent_uuid   uuid,
   node_def_uuid uuid      NOT NULL,
   value         jsonb,
   file          bytea,
@@ -28,6 +28,6 @@ CREATE TABLE
   CONSTRAINT node_uuid_idx UNIQUE (uuid),
   CONSTRAINT node_record_fk FOREIGN KEY (record_id) REFERENCES "record" ("id") ON DELETE CASCADE,
   CONSTRAINT node_node_def_fk FOREIGN KEY (node_def_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE,
-  CONSTRAINT node_parent_fk FOREIGN KEY (parent_id) REFERENCES "node" ("id") ON DELETE CASCADE
+  CONSTRAINT node_parent_fk FOREIGN KEY (parent_uuid) REFERENCES "node" ("uuid") ON DELETE CASCADE
 );
 

@@ -7,25 +7,19 @@ const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryU
 const dbTransformCallback = camelize
 
 // All columns but 'file'
-const nodeColumns = 'id, uuid, record_id, parent_id, node_def_uuid, value, date_created'
+const nodeColumns = 'id, uuid, record_id, parent_uuid, node_def_uuid, value, date_created'
 
 // ============== CREATE
 
-const insertNode = async (surveyId, node, fileContent, client = db) => {
-  const parent = await client.oneOrNone(`
-    SELECT id FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = $1
-    `,
-    [node.parentUUID])
-
-  return await client.one(`
+const insertNode = async (surveyId, node, fileContent, client = db) =>
+  await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-    (uuid, record_id, parent_id, node_def_uuid, value, file)
+    (uuid, record_id, parent_uuid, node_def_uuid, value, file)
     VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING ${nodeColumns}`,
-    [node.uuid, node.recordId, parent ? parent.id : null, Node.getNodeDefUuid(node), node.value ? JSON.stringify(node.value) : null, fileContent],
+    [node.uuid, node.recordId, Node.getParentUuid(node), Node.getNodeDefUuid(node), node.value ? JSON.stringify(node.value) : null, fileContent],
     dbTransformCallback
   )
-}
 
 // ============== READ
 
@@ -33,7 +27,7 @@ const fetchNodesByRecordId = async (surveyId, recordId, client = db) =>
   await client.map(`
     SELECT ${nodeColumns} FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE record_id = $1
-    ORDER BY parent_id, id`,
+    ORDER BY id`,
     [recordId],
     dbTransformCallback
   )

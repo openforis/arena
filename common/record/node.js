@@ -9,12 +9,12 @@ const {isBlank} = require('../stringUtils')
  * ======
  */
 
-const newNode = (nodeDefUuid, recordId, parentUUID = null, placeholder = false, value = null) => {
+const newNode = (nodeDefUuid, recordId, parentUuid = null, placeholder = false, value = null) => {
   return {
     uuid: uuidv4(),
     nodeDefUuid,
     recordId,
-    parentUUID,
+    parentUuid,
     placeholder,
     value,
   }
@@ -68,6 +68,7 @@ module.exports = {
 
   // ==== READ
   getNodeValue,
+  getParentUuid: R.prop('parentUuid'),
   getNodeDefUuid: R.prop('nodeDefUuid'),
   getNodeRecordId: R.prop('recordId'),
   getNodeFileName: getNodeValueProp('fileName', ''),
