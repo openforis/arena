@@ -7,7 +7,7 @@ const pgPromiseOptions = {
   }
 }
 
-const pgp = require('pg-promise')(pgPromiseOptions)
+const pgp = require('pg-promise')({})
 
 const configCommon = {
   // how long a client is allowed to remain idle before being closed

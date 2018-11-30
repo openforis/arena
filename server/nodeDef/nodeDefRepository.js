@@ -84,7 +84,7 @@ const fetchNodeDefsByParentUuid = async (parentUuid, draft, client = db) =>
     WHERE parent_uuid = $1
     AND deleted IS NOT TRUE
     ORDER BY id`,
-    [parentId],
+    [parentUuid],
     res => dbTransformCallback(res, draft)
   )
 

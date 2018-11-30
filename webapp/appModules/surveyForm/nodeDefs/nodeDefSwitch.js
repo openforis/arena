@@ -158,7 +158,7 @@ const mapStateToProps = (state, props) => {
     nodes: NodeDef.isNodeDefRoot(nodeDef)
       ? [Record.getRootNode(getRecord(surveyForm))]
       : parentNode
-        ? Record.getNodeChildrenByDefId(parentNode, nodeDef.id)(getRecord(surveyForm))
+        ? Record.getNodeChildrenByDefUuid(parentNode, nodeDef.uuid)(getRecord(surveyForm))
         : []
   })
 
