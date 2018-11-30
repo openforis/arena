@@ -75,9 +75,9 @@ const persistNode = (userId, surveyId, node, file) => {
  * @param surveyId
  * @param nodeUUID
  */
-const deleteNode = (userId, surveyId, nodeUUID) => {
+const deleteNode = (userId, surveyId, nodeUuid) => {
   const updateWorker = recordUpdateThreads.getThread(userId)
-  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, surveyId, nodeUUID})
+  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, surveyId, nodeUuid})
 }
 
 module.exports = {

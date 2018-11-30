@@ -82,9 +82,9 @@ const updateNodeValue = async (surveyId, nodeUUID, value, file, client = db) =>
  * @param client
  * @returns {Promise<*|Promise<*>>}
  */
-const deleteNode = async (surveyId, nodeUUID, client = db) =>
+const deleteNode = async (surveyId, nodeUuid, client = db) =>
   await client.tx(async t => {
-    const node = await NodeRepository.deleteNode(surveyId, nodeUUID, t)
+    const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
     node.deleted = true
 
     return await processNodeUpdate(surveyId, node, t)

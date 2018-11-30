@@ -65,12 +65,12 @@ const updateNode = async (surveyId, nodeUUID, value, fileContent = null, client 
   )
 
 // ============== DELETE
-const deleteNode = async (surveyId, nodeUUID, client = db) =>
+const deleteNode = async (surveyId, nodeUuid, client = db) =>
   await client.one(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1
     RETURNING ${nodeColumns}
-    `, [nodeUUID],
+    `, [nodeUuid],
     dbTransformCallback
   )
 

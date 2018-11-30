@@ -67,7 +67,7 @@ const persistNode = (userId, surveyId, node, file) => RecordUpdateManager.persis
  */
 const deleteRecord = async (surveyId, recordId) => await RecordRepository.deleteRecord(surveyId, recordId)
 
-const deleteNode = (userId, surveyId, nodeUUID) => RecordUpdateManager.deleteNode(userId, surveyId, nodeUUID)
+const deleteNode = (userId, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(userId, surveyId, nodeUuid)
 
 /**
  * ==================
