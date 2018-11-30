@@ -107,8 +107,8 @@ const mapStateToProps = state => {
 
   let nodeDefKeyEditDisabled = false
   if (nodeDef) {
-    const parent = Survey.getNodeDefParent(nodeDef)(survey)
-    const keyDefs = Survey.getNodeDefKeys(parent)(survey)
+    const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+    const keyDefs = parentDef ? Survey.getNodeDefKeys(parentDef)(survey) : []
 
     nodeDefKeyEditDisabled = !NodeDef.isNodeDefKey(nodeDef) && keyDefs.length >= NodeDef.maxKeyAttributes
   }
