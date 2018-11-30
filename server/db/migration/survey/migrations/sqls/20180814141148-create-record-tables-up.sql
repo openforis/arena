@@ -1,9 +1,3 @@
-CREATE EXTENSION
-IF NOT EXISTS "uuid-ossp";
-
-DROP TABLE
-    IF EXISTS record_update_log CASCADE;
-
 DROP TABLE
     IF EXISTS node CASCADE;
 
@@ -17,7 +11,7 @@ CREATE TABLE
         uuid uuid NOT NULL DEFAULT uuid_generate_v4(),
         owner_id bigint NOT NULL,
         step varchar(63) NOT NULL,
-        date_created TIMESTAMP without TIME zone DEFAULT now() NOT NULL,
+        date_created TIMESTAMP without TIME zone DEFAULT (now() AT TIME ZONE 'UTC')) NOT NULL,
         PRIMARY KEY (id)
     );
 
@@ -30,18 +24,9 @@ CREATE TABLE
         parent_id bigint,
         node_def_id bigint NOT NULL,
         value jsonb,
-        date_created TIMESTAMP without TIME zone DEFAULT now() NOT NULL,
-        PRIMARY KEY (id)
-    );
-
-CREATE TABLE
-    record_update_log
-    (
-        id bigserial NOT NULL,
-        action varchar(31) NOT NULL,
-        user_id bigint,
-        node jsonb NOT NULL,
-        date_created TIMESTAMP without TIME zone DEFAULT now() NOT NULL,
+        file bytea,
+        date_created TIMESTAMP without TIME zone DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
+        date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
         PRIMARY KEY (id)
     );
 
@@ -52,10 +37,5 @@ ALTER TABLE
     node ADD CONSTRAINT node_record_fk FOREIGN KEY (record_id) REFERENCES "record" ("id") ON DELETE CASCADE;
 
 ALTER TABLE
-    node ADD CONSTRAINT node_parent_fk FOREIGN KEY (parent_id) REFERENCES "node" ("id") ON DELETE CASCADE;
-
-ALTER TABLE
     node ADD CONSTRAINT node_node_def_fk FOREIGN KEY (node_def_id) REFERENCES "node_def" ("id") ON DELETE CASCADE;
 
-ALTER TABLE
-    record_update_log ADD CONSTRAINT record_update_log_user_fk FOREIGN KEY (user_id) REFERENCES "user" ("id");
