@@ -1,12 +1,13 @@
 const camelize = require('camelize')
 const db = require('../db/db')
 
+const Node = require('../../common/record/node')
 const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
 
 const dbTransformCallback = camelize
 
 // All columns but 'file'
-const nodeColumns = 'id, uuid, record_id, parent_id, node_def_id, value, date_created'
+const nodeColumns = 'id, uuid, record_id, parent_id, node_def_uuid, value, date_created'
 
 // ============== CREATE
 
@@ -18,10 +19,10 @@ const insertNode = async (surveyId, node, fileContent, client = db) => {
 
   return await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-    (uuid, record_id, parent_id, node_def_id, value, file)
+    (uuid, record_id, parent_id, node_def_uuid, value, file)
     VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING ${nodeColumns}`,
-    [node.uuid, node.recordId, parent ? parent.id : null, node.nodeDefId, node.value ? JSON.stringify(node.value) : null, fileContent],
+    [node.uuid, node.recordId, parent ? parent.id : null, Node.getNodeDefUuid(node), node.value ? JSON.stringify(node.value) : null, fileContent],
     dbTransformCallback
   )
 }

@@ -42,7 +42,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset, limi
   const nodeDefKeyJoins = nodeDefKeys.map((nodeDefKey, i) => `
     LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.node as n${i}
       ON r.id = n${i}.record_id
-      AND n${i}.node_def_id = ${nodeDefKey.id}
+      AND n${i}.node_def_uuid = '${nodeDefKey.uuid}'
   `).join(' ')
 
   return await client.map(`

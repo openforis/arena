@@ -16,7 +16,7 @@ const determineNodeToUpdate = (nodes, parentNode, multiple) => {
       ? placeholder
       : nodes.length === 1 && !multiple
       ? nodes[0]
-      : Node.newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
+      : Node.newNode(nodeDef.uuid, parentNode.recordId, parentNode.uuid)
   )
 }
 

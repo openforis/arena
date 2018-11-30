@@ -24,7 +24,7 @@ const createRecord = async (userId, recordToCreate) => await db.tx(
     const {surveyId, id: recordId} = record
 
     const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
-    const rootNode = Node.newNode(rootNodeDef.id, recordId)
+    const rootNode = Node.newNode(rootNodeDef.uuid, recordId)
 
     persistNode(userId, surveyId, rootNode)
 

@@ -68,12 +68,12 @@ const fetchRootNodeDef = async (surveyId, draft, client = db) =>
     res => dbTransformCallback(res, draft)
   )
 
-const fetchNodeDef = async (nodeDefId, draft, client = db) =>
+const fetchNodeDefByUuid = async (nodeDefUuid, draft, client = db) =>
   await client.one(
     `SELECT ${nodeDefSelectFields()}
      FROM node_def 
-     WHERE id = $1`,
-    [nodeDefId],
+     WHERE uuid = $1`,
+    [nodeDefUuid],
     res => dbTransformCallback(res, draft)
   )
 
@@ -192,7 +192,7 @@ module.exports = {
   fetchNodeDefSurveyId,
   fetchNodeDefsBySurveyId,
   fetchRootNodeDef,
-  fetchNodeDef,
+  fetchNodeDefByUuid,
   fetchNodeDefsByParentUuid,
   fetchRootNodeDefKeysBySurveyId,
 

@@ -14,14 +14,14 @@ const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const RecordRepository = require('../../../record/recordRepository')
 const NodeRepository = require('../../../record/nodeRepository')
 
-const persistNode = async (surveyId, nodeReq, file, client = db) => {
-  const {nodeDefId, value, uuid} = nodeReq
+const persistNode = async (surveyId, node, file, client = db) => {
+  const {uuid} = node
 
-  const node = await NodeRepository.fetchNodeByUUID(surveyId, uuid, client)
+  const nodeDb = await NodeRepository.fetchNodeByUUID(surveyId, uuid, client)
 
-  return node
-    ? await updateNodeValue(surveyId, uuid, value, file, client)
-    : await createNode(await NodeDefRepository.fetchNodeDef(nodeDefId), nodeReq, file, client)
+  return nodeDb
+    ? await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), file, client)
+    : await createNode(await NodeDefRepository.fetchNodeDefByUuid(Node.getNodeDefUuid(node)), node, file, client)
 }
 
 /**
@@ -49,7 +49,7 @@ const createNode = async (nodeDef, nodeToInsert, file, client = db) => {
       childDefs
         .filter(NodeDef.isNodeDefSingleEntity)
         .map(
-          async childDef => await createNode(childDef, Node.newNode(childDef.id, node.recordId, node.uuid), null, client)
+          async childDef => await createNode(childDef, Node.newNode(childDef.uuid, node.recordId, node.uuid), null, client)
         )
     )
   )
@@ -124,7 +124,7 @@ const onNodeUpdate = async (survey, record, node, client = db) => {
 
   const clearedDependentCodeAttributes = await Promise.all(
     dependentCodeAttributes.map(async n => {
-      const nDef = Survey.getNodeDefById(Node.getNodeDefId(n))(survey)
+      const nDef = Survey.getNodeDefByUUID(Node.getNodeDefUuid(n))(survey)
       if (NodeDef.isNodeDefMultiple(nDef)) {
         //delete node
         return await deleteNodeInternal(survey, record, n.uuid, client)

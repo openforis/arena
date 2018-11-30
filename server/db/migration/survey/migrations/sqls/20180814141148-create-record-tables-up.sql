@@ -18,15 +18,16 @@ CREATE TABLE
   uuid          uuid      NOT NULL DEFAULT uuid_generate_v4(),
   record_id     bigint    NOT NULL,
   parent_id     bigint,
-  node_def_id   bigint    NOT NULL,
+  node_def_uuid uuid      NOT NULL,
   value         jsonb,
   file          bytea,
   date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
   date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
 
   PRIMARY KEY (id),
+  CONSTRAINT node_uuid_idx UNIQUE (uuid),
   CONSTRAINT node_record_fk FOREIGN KEY (record_id) REFERENCES "record" ("id") ON DELETE CASCADE,
-  CONSTRAINT node_node_def_fk FOREIGN KEY (node_def_id) REFERENCES "node_def" ("id") ON DELETE CASCADE,
+  CONSTRAINT node_node_def_fk FOREIGN KEY (node_def_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE,
   CONSTRAINT node_parent_fk FOREIGN KEY (parent_id) REFERENCES "node" ("id") ON DELETE CASCADE
 );
 

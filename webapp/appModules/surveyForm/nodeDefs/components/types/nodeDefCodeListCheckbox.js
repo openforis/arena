@@ -24,7 +24,7 @@ const Checkbox = props => {
         } else {
           const nodeToUpdate =
             (NodeDef.isNodeDefMultiple(nodeDef) || R.isEmpty(nodes))
-              ? Node.newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
+              ? Node.newNode(nodeDef.uuid, parentNode.recordId, parentNode.uuid)
               : nodes[0]
           updateNode(nodeDef, nodeToUpdate, {itemUUID, h: codeUUIDsHierarchy})
         }

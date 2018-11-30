@@ -89,7 +89,7 @@ const getParentCodeAttribute = (survey, parentNode, nodeDef) =>
 
     return parentCodeDef
       ? findNodeInAncestorEntities(parentNode,
-        node => Node.getNodeDefId(node) === parentCodeDef.id
+        node => Node.getNodeDefUuid(node) === parentCodeDef.uuid
       )(record)
       : null
   }
@@ -103,7 +103,7 @@ const getCodeUUIDsHierarchy = (survey, parentEntity, nodeDef) => record => {
       getCodeUUIDsHierarchy(
         survey,
         getParentNode(parentCode)(record),
-        Survey.getNodeDefById(Node.getNodeDefId(parentCode))(survey)
+        Survey.getNodeDefByUUID(Node.getNodeDefUuid(parentCode))(survey)
       )(record),
     )
     : []
@@ -111,11 +111,11 @@ const getCodeUUIDsHierarchy = (survey, parentEntity, nodeDef) => record => {
 
 const getNodeCodeDependentAttributes = (survey, node) =>
   record => {
-    const nodeDef = Survey.getNodeDefById(Node.getNodeDefId(node))(survey)
+    const nodeDef = Survey.getNodeDefByUUID(Node.getNodeDefUuid(node))(survey)
 
     return Survey.isNodeDefParentCode(nodeDef)(survey)
       ? findNodes(n => {
-        const def = Survey.getNodeDefById(Node.getNodeDefId(n))(survey)
+        const def = Survey.getNodeDefByUUID(Node.getNodeDefUuid(n))(survey)
         return NodeDef.getNodeDefParentCodeUUID(def) === nodeDef.uuid
       })(record)
       : []
