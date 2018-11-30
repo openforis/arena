@@ -6,7 +6,7 @@ import CodeList from '../../../../../../common/survey/codeList'
 import Node from '../../../../../../common/record/node'
 
 const Checkbox = props => {
-  const {language, edit, item, nodeDef, parentNode, nodes, updateNode, removeNode} = props
+  const {language, edit, item, nodeDef, parentNode, nodes, updateNode, removeNode, codeUUIDsHierarchy} = props
 
   const itemUUID = item.uuid
   const node = R.find(node => Node.getNodeItemUUID(node) === itemUUID)(nodes)
@@ -26,7 +26,7 @@ const Checkbox = props => {
             (NodeDef.isNodeDefMultiple(nodeDef) || R.isEmpty(nodes))
               ? Node.newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
               : nodes[0]
-          updateNode(nodeDef, nodeToUpdate, {itemUUID})
+          updateNode(nodeDef, nodeToUpdate, {itemUUID, h: codeUUIDsHierarchy})
         }
       }}>
       {CodeList.getCodeListItemLabel(language)(item)}

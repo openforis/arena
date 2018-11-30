@@ -94,6 +94,9 @@ const mapStateToProps = (state, props) => {
   const codeListLevelIndex = Survey.getNodeDefCodeListLevelIndex(nodeDef)(survey)
   const codeList = Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey)
 
+
+  const codeUUIDsHierarchy = Record.getCodeUUIDsHierarchy(survey, parentNode, nodeDef)(record)
+
   return {
     surveyInfo: surveyInfo,
     language: Survey.getDefaultLanguage(surveyInfo),
@@ -101,6 +104,7 @@ const mapStateToProps = (state, props) => {
     codeListId: codeList ? codeList.id : null,
     codeListLevelIndex,
     parentItemUUID,
+    codeUUIDsHierarchy,
   }
 }
 

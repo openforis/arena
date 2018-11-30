@@ -21,7 +21,7 @@ const determineNodeToUpdate = (nodes, parentNode, multiple) => {
 }
 
 const NodeDefCodeListDropdown = props => {
-  const {language, edit, nodeDef, nodes, items = []} = props
+  const {language, edit, nodeDef, nodes, items = [], codeUUIDsHierarchy} = props
 
   let multiple = NodeDef.isNodeDefMultiple(nodeDef)
 
@@ -54,7 +54,7 @@ const NodeDefCodeListDropdown = props => {
 
     const nodeToUpdate = determineNodeToUpdate(nodes, parentNode, multiple)
 
-    updateNode(nodeDef, nodeToUpdate, {itemUUID: newSelectedItem ? newSelectedItem.uuid : null})
+    updateNode(nodeDef, nodeToUpdate, {itemUUID: newSelectedItem ? newSelectedItem.uuid : null, h: codeUUIDsHierarchy})
   }
 
   return multiple
