@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE
   survey
 (
@@ -12,7 +14,8 @@ CREATE TABLE
 
   owner_id    bigint    NOT NULL,
 
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT survey_user_fk FOREIGN KEY (owner_id) REFERENCES "user" ("id")
 );
 
 CREATE TABLE
@@ -36,25 +39,10 @@ CREATE TABLE
   date_created         TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
   date_modified        TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
 
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT node_def_survey_fk FOREIGN KEY (survey_id) REFERENCES "survey" ("id") ON DELETE CASCADE,
+  CONSTRAINT node_def_parent_fk FOREIGN KEY (parent_id) REFERENCES "node_def" ("id") ON DELETE CASCADE
 );
 
-ALTER TABLE
-  survey
-  ADD CONSTRAINT survey_user_fk
-    FOREIGN KEY (owner_id)
-      REFERENCES "user" ("id");
 
-ALTER TABLE
-  node_def
-  ADD CONSTRAINT node_def_survey_fk
-    FOREIGN KEY (survey_id)
-      REFERENCES "survey" ("id")
-      ON DELETE CASCADE;
 
-ALTER TABLE
-  node_def
-  ADD CONSTRAINT node_def_parent_fk
-    FOREIGN KEY (parent_id)
-      REFERENCES "node_def" ("id")
-      ON DELETE CASCADE;
