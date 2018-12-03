@@ -85,6 +85,14 @@ $tableRowHeaderHeight: 40px;
     padding-bottom: .1rem;
     opacity: .8;
   }
+
+  .btn-add-node-def {
+    background-color: rgba($green, 0.3);
+
+    &:hover {
+      background-color: rgba($green, 0.85);
+    }
+  }
 }
 
 // ======

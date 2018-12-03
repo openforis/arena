@@ -26,7 +26,7 @@ const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
         : null
 
     }
-    <button className="btn btn-s btn-of-light-s"
+    <button className="btn btn-s btn-of-light-s btn-add-node-def"
             onClick={() => addNodeDef(type, nodeDefProps)}
             aria-disabled={!enabled}>
       {getNodeDefIconByType(type)}{type}
@@ -57,7 +57,7 @@ const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
         )
     }
 
-    <button className="btn btn-s btn-of-light-xs"
+    <button className="btn btn-s btn-of-light-xs btn-add-node-def"
             aria-disabled={!canAddEntity}
             onClick={() => addNodeDef(
               NodeDef.nodeDefType.entity,
