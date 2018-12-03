@@ -41,7 +41,7 @@ const CodeProps = (props) => {
   return (
     <React.Fragment>
 
-      <FormItem label={'Code List'}>
+      <FormItem label={'Category'}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr repeat(2, 100px)',

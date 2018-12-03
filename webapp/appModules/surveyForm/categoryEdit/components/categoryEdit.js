@@ -30,13 +30,14 @@ const CategoryEdit = props => {
 
   return (
     <div className="category-edit">
-
-      <FormItem label="Category name">
-        <Input value={Category.getName(category)}
-               validation={getFieldValidation('name')(validation)}
-               onChange={value => putCategoryProp(category, 'name', normalizeName(value))}
-               readOnly={readOnly}/>
-      </FormItem>
+      <div>
+        <FormItem label="Category name">
+          <Input value={Category.getName(category)}
+                 validation={getFieldValidation('name')(validation)}
+                 onChange={value => putCategoryProp(category, 'name', normalizeName(value))}
+                 readOnly={readOnly}/>
+        </FormItem>
+      </div>
 
       <div className="category-edit__levels">
         {

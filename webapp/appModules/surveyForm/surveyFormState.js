@@ -29,7 +29,7 @@ export const assocFormActivePage = (nodeDef) =>
 
 export const getFormActivePageNodeDef = survey =>
   surveyForm => R.pipe(
-    Survey.getNodeDefByUUID(R.path(formPagePath, surveyForm)),
+    Survey.getNodeDefByUuid(R.path(formPagePath, surveyForm)),
     R.defaultTo(Survey.getRootNodeDef(survey))
   )(survey)
 
@@ -47,7 +47,7 @@ export const assocFormNodeDefEdit = nodeDef =>
   R.assoc(nodeDefEdit, nodeDef ? nodeDef.uuid : null)
 
 export const getFormNodeDefEdit = survey =>
-  surveyForm => Survey.getNodeDefByUUID(
+  surveyForm => Survey.getNodeDefByUuid(
     R.path(nodeDefEditPath, surveyForm)
   )(survey)
 
@@ -59,7 +59,7 @@ export const assocNodeDefFormUnlocked = nodeDef =>
   R.assoc(nodeDefUnlocked, nodeDef ? nodeDef.uuid : null)
 
 export const getNodeDefFormUnlocked = survey =>
-  surveyForm => Survey.getNodeDefByUUID(
+  surveyForm => Survey.getNodeDefByUuid(
     R.path(nodeDefEntityUnlockedPath, surveyForm)
   )(survey)
 

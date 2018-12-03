@@ -67,7 +67,7 @@ const updateCodeListTest = async () => {
 }
 
 module.exports = {
-  //code list
+  //category
   createCodeListTest,
   updateCodeListTest,
 
