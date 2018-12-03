@@ -47,7 +47,7 @@ const fetchNodeFileByUUID = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
-const fetchNodesByParentCodeNodeUUID = async (surveyId, recordId, parentCodeNodeUUID, client = db) =>
+const fetchDescendantNodesByCodeUuid = async (surveyId, recordId, parentCodeNodeUUID, client = db) =>
   await client.map(`
     SELECT ${nodeColumns} FROM ${getSurveyDBSchema(surveyId)}.node n
     WHERE n.record_id = $1
@@ -86,7 +86,7 @@ module.exports = {
   fetchNodesByRecordId,
   fetchNodeByUUID,
   fetchNodeFileByUUID,
-  fetchNodesByParentCodeNodeUUID,
+  fetchDescendantNodesByCodeUuid,
 
   //UPDATE
   updateNode,
