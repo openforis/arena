@@ -21,7 +21,7 @@ const persistNode = async (surveyId, node, file, client = db) => {
 
   return nodeDb
     ? await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), file, client)
-    : await createNode(await NodeDefRepository.fetchNodeDefByUuid(Node.getNodeDefUuid(node)), node, file, client)
+    : await createNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, file, client)
 }
 
 /**
@@ -33,14 +33,14 @@ const persistNode = async (surveyId, node, file, client = db) => {
  * @param client
  * @returns {Promise<void>}
  */
-const createNode = async (nodeDef, nodeToInsert, file, client = db) => {
+const createNode = async (surveyId, nodeDef, nodeToInsert, file, client = db) => {
 
   // insert node
-  const node = await NodeRepository.insertNode(nodeDef.surveyId, nodeToInsert, file ? file.data : null, client)
+  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, file ? file.data : null, client)
 
   // add children if entity
   const childDefs = NodeDef.isNodeDefEntity(nodeDef)
-    ? await NodeDefRepository.fetchNodeDefsByParentUuid(nodeDef.uuid)
+    ? await NodeDefRepository.fetchNodeDefsByParentUuid(surveyId, nodeDef.uuid)
     : []
 
   // insert only child single entities
@@ -49,7 +49,7 @@ const createNode = async (nodeDef, nodeToInsert, file, client = db) => {
       childDefs
         .filter(NodeDef.isNodeDefSingleEntity)
         .map(
-          async childDef => await createNode(childDef, Node.newNode(childDef.uuid, node.recordId, node.uuid), null, client)
+          async childDef => await createNode(surveyId, childDef, Node.newNode(childDef.uuid, node.recordId, node.uuid), null, client)
         )
     )
   )

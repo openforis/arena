@@ -1,4 +1,30 @@
 CREATE TABLE
+  node_def
+(
+  id                   bigserial NOT NULL,
+  uuid                 uuid      NOT NULL DEFAULT uuid_generate_v4(),
+
+  parent_uuid          uuid,
+  type                 varchar   NOT NULL,
+
+  deleted              boolean   NOT NULL DEFAULT false,
+
+  props                jsonb              DEFAULT '{}'::jsonb,
+  props_draft          jsonb              DEFAULT '{}'::jsonb,
+
+  props_advanced       jsonb              DEFAULT '{}'::jsonb,
+  props_advanced_draft jsonb              DEFAULT '{}'::jsonb,
+
+  date_created         TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
+  date_modified        TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
+
+  PRIMARY KEY (id),
+  CONSTRAINT node_def_uuid_idx UNIQUE (uuid),
+  CONSTRAINT node_def_parent_fk FOREIGN KEY (parent_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE
+);
+
+
+CREATE TABLE
   record
 (
   id           bigserial   NOT NULL,

@@ -1,11 +1,15 @@
 const db = require('../db/db')
-const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
+const R  = require('ramda')
 
+const {getSurveyDBSchema, dbTransformCallback} = require('./surveySchemaRepositoryUtils')
 const {selectDate} = require('../db/dbUtils')
 
-const {
-  defDbTransformCallback: dbTransformCallback
-} = require('../../common/survey/surveyUtils')
+const surveySelectFields = (alias = '') => {
+  const prefix = alias ? alias + '.' : ''
+  return `${prefix}id, ${prefix}uuid, ${prefix}published, ${prefix}draft, ${prefix}props, ${prefix}props_draft, ${prefix}owner_id,
+  ${selectDate(`${prefix}date_created`, 'date_created')}, 
+  ${selectDate(`${prefix}date_modified`, 'date_modified')}`
+}
 
 // ============== CREATE
 
@@ -13,7 +17,7 @@ const insertSurvey = async (props, userId, client = db) =>
   await client.one(`
       INSERT INTO survey (owner_id, props_draft)
       VALUES ($1, $2)
-      RETURNING *
+      RETURNING ${surveySelectFields()}
     `,
     [userId, props],
     def => dbTransformCallback(def, true)
@@ -22,27 +26,12 @@ const insertSurvey = async (props, userId, client = db) =>
 // ============== READ
 
 const fetchAllSurveyIds = async (client = db) =>
-  await client.map(
-      `SELECT id FROM survey`,
-    [],
-    record => record.id
-  )
+  await client.map(`SELECT id FROM survey`, [], R.prop('id'))
 
 const fetchSurveys = async (user, checkAccess = true, client = db) =>
   await client.map(`
-    SELECT
-      s.*, ${selectDate('n.date_created', 'date_created')}, nm.date_modified
+    SELECT ${surveySelectFields('s')}
     FROM survey s
-    JOIN node_def n
-      ON s.id = n.survey_id
-      AND n.parent_uuid IS NULL
-    JOIN (
-        SELECT
-          survey_id, ${selectDate('MAX(date_modified)', 'date_modified')}
-        FROM node_def
-        GROUP BY survey_id
-      ) as nm
-      ON s.id = nm.survey_id
     ${checkAccess ? `
     JOIN auth_group g
       ON s.id = g.survey_id
@@ -58,14 +47,14 @@ const fetchSurveys = async (user, checkAccess = true, client = db) =>
 
 const getSurveysByName = async (surveyName, client = db) =>
   await client.map(
-      `SELECT * FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
+      `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
     def => dbTransformCallback(def)
   )
 
 const getSurveyById = async (surveyId, draft = false, client = db) =>
   await client.one(
-      `SELECT * FROM survey WHERE id = $1`,
+      `SELECT ${surveySelectFields()} FROM survey WHERE id = $1`,
     [surveyId],
     def => dbTransformCallback(def, draft)
   )
@@ -79,7 +68,7 @@ const updateSurveyProp = async (surveyId, key, value, client = db) => {
     SET props_draft = props_draft || $1,
     draft = true
     WHERE id = $2
-    RETURNING *
+    RETURNING ${surveySelectFields()}
   `, [JSON.stringify(prop), surveyId],
     def => dbTransformCallback(def, true)
   )
@@ -88,14 +77,14 @@ const updateSurveyProp = async (surveyId, key, value, client = db) => {
 const publishSurveyProps = async (surveyId, client = db) =>
   await client.query(`
     UPDATE
-        survey n
+        survey
     SET
         props = props || props_draft,
         props_draft = '{}'::jsonb,
         draft = false,
         published = true
     WHERE
-        n.id = $1
+        id = $1
     `, [surveyId]
   )
 

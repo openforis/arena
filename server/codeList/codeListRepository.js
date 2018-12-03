@@ -6,14 +6,15 @@ const {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
-  deleteSurveySchemaTableProp
+  deleteSurveySchemaTableProp,
+  dbTransformCallback
 } = require('../survey/surveySchemaRepositoryUtils')
-const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 
-const dbTransformCallback = (record, draft) => R.pipe(
+//TODO USE parentUuid
+const codeListDbTransformCallback = (record, draft) => R.pipe(
   R.assoc('parentUUID', R.prop('parent_uuid')(record)),
   R.dissoc('parentUuid')
-)(NodeDefRepository.dbTransformCallback(record, draft))
+)(dbTransformCallback(record, draft))
 
 // ============== CREATE
 
@@ -23,7 +24,7 @@ const insertCodeList = async (surveyId, codeList, client = db) =>
         VALUES ($1, $2)
         RETURNING *`,
     [codeList.uuid, codeList.props],
-    def => dbTransformCallback(def, true)
+    def => codeListDbTransformCallback(def, true)
   )
 
 const insertCodeListLevel = async (surveyId, codeListId, level, client = db) =>
@@ -32,7 +33,7 @@ const insertCodeListLevel = async (surveyId, codeListId, level, client = db) =>
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
     [level.uuid, codeListId, level.index, level.props],
-    def => dbTransformCallback(def, true)
+    def => codeListDbTransformCallback(def, true)
   )
 
 const insertCodeListItem = async (surveyId, item, client = db) =>
@@ -41,7 +42,7 @@ const insertCodeListItem = async (surveyId, item, client = db) =>
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
     [item.uuid, item.levelId, item.parentUUID, item.props],
-    def => dbTransformCallback(def, true)
+    def => codeListDbTransformCallback(def, true)
   )
 
 // ============== READ
@@ -51,7 +52,7 @@ const fetchCodeListsBySurveyId = async (surveyId, draft = false, client = db) =>
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list
     ORDER BY id`,
     [],
-    def => dbTransformCallback(def, draft)
+    def => codeListDbTransformCallback(def, draft)
   )
 
 const fetchCodeListLevelsByCodeListId = async (surveyId, codeListId, draft = false, client = db) =>
@@ -60,7 +61,7 @@ const fetchCodeListLevelsByCodeListId = async (surveyId, codeListId, draft = fal
      WHERE code_list_id = $1
      ORDER BY index`,
     [codeListId],
-    def => dbTransformCallback(def, draft)
+    def => codeListDbTransformCallback(def, draft)
   )
 
 const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = false, client = db) => {
@@ -73,7 +74,7 @@ const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = fals
      ORDER BY i.id
     `,
     [codeListId],
-    def => dbTransformCallback(def, draft)
+    def => codeListDbTransformCallback(def, draft)
   )
 
   return draft
@@ -96,7 +97,7 @@ const fetchCodeListItemsByParentUUID = async (surveyId, codeListId, parentUUID =
     ORDER BY i.id
   `,
     [codeListId],
-    def => dbTransformCallback(def, draft)
+    def => codeListDbTransformCallback(def, draft)
   )
 
   return draft
@@ -110,7 +111,7 @@ const fetchCodeListItemByUUID = async (surveyId, itemUUID, draft = false, client
      WHERE uuid = $1
     `,
     [itemUUID],
-    def => dbTransformCallback(def, draft)
+    def => codeListDbTransformCallback(def, draft)
   )
 
 // ============== UPDATE

@@ -111,11 +111,12 @@ const _updateNodeDebounced = (node, file, delay) => {
  * DELETE
  * ============
  */
-export const removeNode = (nodeDef, node) => async dispatch => {
+export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   try {
     dispatch({type: nodeDelete, node})
 
-    const {data} = await axios.delete(`/api/survey/${nodeDef.surveyId}/record/${node.recordId}/node/${node.uuid}`)
+    const surveyId = getStateSurveyId(getState())
+    const {data} = await axios.delete(`/api/survey/${surveyId}/record/${node.recordId}/node/${node.uuid}`)
     recordNodesUpdate(data.nodes)(dispatch)
   } catch (e) {
     console.log(e)

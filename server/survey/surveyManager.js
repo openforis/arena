@@ -49,6 +49,10 @@ const createSurvey = async (user, {name, label, lang}) => {
         [nodeDefLayoutProps.pageUUID]: uuidv4(),
         [nodeDefLayoutProps.render]: nodeDefRenderType.form,
       }
+
+      //create survey data schema
+      await migrateSurveySchema(survey.id)
+
       await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
       // update user prefs
@@ -66,9 +70,6 @@ const createSurvey = async (user, {name, label, lang}) => {
       return survey
     }
   )
-
-  //create survey data schema
-  await migrateSurveySchema(survey.id)
 
   return assocSurveyInfo(survey)
 }

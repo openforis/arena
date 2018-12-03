@@ -3,23 +3,10 @@ const {getRestParam} = require('../serverUtils/request')
 
 const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 
-const {
-  createNodeDef,
-  updateNodeDefProp,
-  markNodeDefDeleted,
-  fetchNodeDefSurveyId,
-} = require('./nodeDefManager')
-
 const SurveyManager = require('./../survey/surveyManager')
+const NodeDefManager = require('./nodeDefManager')
 
 const UnauthorizedError = require('../authGroup/unauthorizedError')
-
-const checkSurveyId = async (nodeDefUuid, reqSurveyId) => {
-  const nodeDefSurveyId = await fetchNodeDefSurveyId(nodeDefUuid)
-  if (nodeDefSurveyId !== reqSurveyId) {
-    throw new UnauthorizedError(`Not authorized`)
-  }
-}
 
 module.exports.init = app => {
 
@@ -30,7 +17,7 @@ module.exports.init = app => {
       const {body: nodeDefRequest} = req
       const {surveyId, parentUuid, uuid, type, props} = nodeDefRequest
 
-      const nodeDef = await createNodeDef(surveyId, parentUuid, uuid, type, props)
+      const nodeDef = await NodeDefManager.createNodeDef(surveyId, parentUuid, uuid, type, props)
 
       res.json({nodeDef})
     } catch (err) {
@@ -50,9 +37,7 @@ module.exports.init = app => {
       const nodeDefUuid = getRestParam(req, 'nodeDefUuid')
       const surveyId = getRestParam(req, 'surveyId')
 
-      await checkSurveyId(nodeDefUuid, surveyId)
-
-      await updateNodeDefProp(nodeDefUuid, key, value, advanced)
+      await NodeDefManager.updateNodeDefProp(surveyId, nodeDefUuid, key, value, advanced)
       const nodeDefs = await SurveyManager.fetchSurveyNodeDefs(surveyId, true, true)
 
       res.json({nodeDefs})
@@ -68,9 +53,7 @@ module.exports.init = app => {
       const nodeDefUuid = getRestParam(req, 'nodeDefUuid')
       const surveyId = getRestParam(req, 'surveyId')
 
-      await checkSurveyId(nodeDefUuid, surveyId)
-
-      await markNodeDefDeleted(nodeDefUuid)
+      await NodeDefManager.markNodeDefDeleted(surveyId, nodeDefUuid)
 
       sendOk(res)
     } catch (e) {
