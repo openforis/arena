@@ -63,7 +63,7 @@ const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
               NodeDef.nodeDefType.entity,
               {
                 [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-                [nodeDefLayoutProps.pageUUID]: uuidv4(),
+                [nodeDefLayoutProps.pageUuid]: uuidv4(),
               }
             )}>
       <span className="icon icon-insert-template icon-left"/>

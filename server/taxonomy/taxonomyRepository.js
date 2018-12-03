@@ -121,10 +121,10 @@ const fetchTaxaByPropLike = async (surveyId,
     case filterProps.vernacularName:
       return fetchTaxaByVernacularName(surveyId, taxonomyId, searchValue, sort, limit, offset, draft, client)
     case filterProps.uuid:
-      const taxon = await fetchTaxonByUUID(surveyId, searchValue, draft, client)
+      const taxon = await fetchTaxonByUuid(surveyId, searchValue, draft, client)
       return taxon ? [taxon] : []
     case filterProps.vernacularNameUuid:
-      const vernacularName = await fetchTaxonVernacularNameByUUID(surveyId, searchValue, draft, client)
+      const vernacularName = await fetchTaxonVernacularNameByUuid(surveyId, searchValue, draft, client)
       return vernacularName ? [vernacularName] : []
     default:
 
@@ -175,7 +175,7 @@ const fetchTaxaByVernacularName = async (surveyId,
   )
 }
 
-const fetchTaxonVernacularNameByUUID = async (surveyId, uuid, draft = false, client = db) => {
+const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, client = db) => {
   const propsCol = draft ? 'props_draft' : 'props'
 
   return await client.one(
@@ -192,7 +192,7 @@ const fetchTaxonVernacularNameByUUID = async (surveyId, uuid, draft = false, cli
   )
 }
 
-const fetchTaxonByUUID = async (surveyId, uuid, draft = false, client = db) =>
+const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
   await client.one(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
      WHERE uuid = $1

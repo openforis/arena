@@ -26,7 +26,7 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
 
 // ==== UPDATE
 export const putNodeDefProp = (nodeDef, key, value, advanced = false) => async (dispatch) => {
-  dispatch({type: nodeDefPropUpdate, nodeDefUUID: nodeDef.uuid, key, value, advanced})
+  dispatch({type: nodeDefPropUpdate, nodeDefUuid: nodeDef.uuid, key, value, advanced})
 
   dispatch(_putNodeDefProp(nodeDef, key, value, advanced))
 }

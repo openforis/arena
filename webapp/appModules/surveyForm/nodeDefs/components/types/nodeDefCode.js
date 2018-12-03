@@ -77,14 +77,14 @@ class NodeDefCode extends React.Component {
     const {nodes} = this.props
     const {items} = this.state
 
-    const selectedItemUUIDs = R.pipe(
+    const selectedItemUuids = R.pipe(
       R.values,
       R.reject(R.propEq('placeholder', true)),
       R.map(Node.getNodeItemUuid),
       R.reject(R.isNil),
     )(nodes)
 
-    return R.filter(item => R.includes(item.uuid)(selectedItemUUIDs))(items)
+    return R.filter(item => R.includes(item.uuid)(selectedItemUuids))(items)
   }
 
   handleSelectedItemsChange (newSelectedItems) {

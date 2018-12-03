@@ -16,7 +16,7 @@ const nodeDefRenderType = {
 
 const nodeDefLayoutPropertyName = 'props'
 const nodeDefLayoutProps = {
-  pageUUID: 'layoutPageUUID', // uuid
+  pageUuid: 'layoutPageUuid', // uuid
   render: 'layoutRender', // nodeDefRenderType
   columns: 'layoutColumns', //int
   layout: 'layoutReactDataGrid', // rdg
@@ -37,14 +37,14 @@ const isRenderForm = isRenderType(nodeDefRenderType.form)
 const isRenderDropdown = isRenderType(nodeDefRenderType.dropdown)
 const isRenderCheckbox = isRenderType(nodeDefRenderType.checkbox)
 
-const getPageUUID = getProp(nodeDefLayoutProps.pageUUID)
+const getPageUuid = getProp(nodeDefLayoutProps.pageUuid)
 const getNoColumns = R.pipe(
   getProp(nodeDefLayoutProps.columns, '3'),
   parseInt
 )
 const getLayout = getProp(nodeDefLayoutProps.layout, [])
 
-const hasPage = R.pipe(getPageUUID, R.isNil, R.not)
+const hasPage = R.pipe(getPageUuid, R.isNil, R.not)
 const filterInnerPageChildren = R.reject(hasPage)
 const filterOuterPageChildren = R.filter(hasPage)
 
@@ -58,7 +58,7 @@ module.exports = {
   isRenderCheckbox,
   getNoColumns,
   getLayout,
-  getPageUUID,
+  getPageUuid,
 
   filterInnerPageChildren,
   filterOuterPageChildren,

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { toUUIDIndexedObj } from '../../../../common/survey/surveyUtils'
+import { toUuidIndexedObj } from '../../../../common/survey/surveyUtils'
 import { getStateSurveyId } from '../../../survey/surveyState'
 
 import Category from '../../../../common/survey/category'
@@ -94,7 +94,7 @@ const loadLevelItems = (categoryId, levelIndex = 0, parentUuid = null) =>
       `/api/survey/${surveyId}/categories/${categoryId}/items`,
       {params: {draft: true, parentUuid}}
     )
-    const items = toUUIDIndexedObj(data.items)
+    const items = toUuidIndexedObj(data.items)
     dispatch({type: categoryItemsUpdate, levelIndex, items})
   }
 

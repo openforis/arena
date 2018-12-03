@@ -83,13 +83,13 @@ const getParentCodeAttribute = (survey, parentNode, nodeDef) =>
       : null
   }
 
-const getCodeUUIDsHierarchy = (survey, parentEntity, nodeDef) => record => {
+const getCodeUuidsHierarchy = (survey, parentEntity, nodeDef) => record => {
   const parentCode = getParentCodeAttribute(survey, parentEntity, nodeDef)(record)
 
   return parentCode
     ? R.append(
       parentCode.uuid,
-      getCodeUUIDsHierarchy(
+      getCodeUuidsHierarchy(
         survey,
         getParentNode(parentCode)(record),
         Survey.getNodeDefByUuid(Node.getNodeDefUuid(parentCode))(survey)
@@ -141,7 +141,7 @@ module.exports = {
   getNodeByUuid,
 
   // testing
-  getCodeUuidsHierarchy: getCodeUUIDsHierarchy,
+  getCodeUuidsHierarchy: getCodeUuidsHierarchy,
   getParentCodeAttribute,
 
   // ====== UPDATE

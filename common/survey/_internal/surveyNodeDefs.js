@@ -3,7 +3,7 @@ const R = require('ramda')
 const SurveyCategories = require('./surveyCategories')
 const NodeDef = require('./../nodeDef')
 const Category = require('../category')
-const {toUUIDIndexedObj} = require('./../surveyUtils')
+const {toUuidIndexedObj} = require('./../surveyUtils')
 
 const nodeDefs = 'nodeDefs'
 
@@ -45,7 +45,7 @@ const getNodeDefsByTaxonomyUuid = (uuid) => R.pipe(
 
 // ====== UPDATE
 
-const assocNodeDefs = nodeDefsArray => R.assoc(nodeDefs, toUUIDIndexedObj(nodeDefsArray))
+const assocNodeDefs = nodeDefsArray => R.assoc(nodeDefs, toUuidIndexedObj(nodeDefsArray))
 
 // ====== UTILS
 

@@ -31,7 +31,7 @@ const actionHandlers = {
 
   [nodeDefUpdate]: (state, {nodeDef}) => assocNodeDef(nodeDef)(state),
 
-  [nodeDefPropUpdate]: (state, {nodeDefUUID, key, value}) => assocNodeDefProp(nodeDefUUID, key, value)(state),
+  [nodeDefPropUpdate]: (state, {nodeDefUuid, key, value}) => assocNodeDefProp(nodeDefUuid, key, value)(state),
 
   [nodeDefDelete]: (state, {nodeDef}) => dissocNodeDef(nodeDef)(state),
 

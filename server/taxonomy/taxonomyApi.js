@@ -1,6 +1,6 @@
 const {sendErr} = require('../serverUtils/response')
 const {getRestParam, getBoolParam, getJsonParam} = require('../serverUtils/request')
-const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
+const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
 const JobManager = require('../job/jobManager')
 const {jobToJSON} = require('../job/jobUtils')
@@ -11,7 +11,7 @@ const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(surveyId, draft, validate)
-  res.json({taxonomies: toUUIDIndexedObj(taxonomies)})
+  res.json({taxonomies: toUuidIndexedObj(taxonomies)})
 }
 
 module.exports.init = app => {

@@ -32,7 +32,7 @@ class TaxonomiesView extends React.Component {
     const {
       taxonomy,
       taxonomies,
-      selectedItemUUID,
+      selectedItemUuid,
       createTaxonomy,
       setTaxonomyForEdit,
       deleteTaxonomy,
@@ -52,7 +52,7 @@ class TaxonomiesView extends React.Component {
                       itemLabelFunction={taxonomy => Taxonomy.getTaxonomyName(taxonomy)}
                       editedItem={taxonomy}
                       items={taxonomies}
-                      selectedItemUUID={selectedItemUUID}
+                      selectedItemUuid={selectedItemUuid}
                       onAdd={createTaxonomy}
                       onEdit={setTaxonomyForEdit}
                       canDelete={canDelete}

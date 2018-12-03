@@ -16,7 +16,7 @@ import {
   getLayout,
   getNoColumns,
 } from '../../../../../../common/survey/nodeDefLayout'
-import { getFormPageNodeUUID, getSurveyForm } from '../../../../../appModules/surveyForm/surveyFormState'
+import { getFormPageNodeUuid, getSurveyForm } from '../../../../../appModules/surveyForm/surveyFormState'
 
 import { setFormPageNode } from '../../../actions'
 
@@ -141,10 +141,10 @@ const NodeSelect = props => {
 
 class NodeDefEntityForm extends React.Component {
 
-  getNode (nodeUUID) {
+  getNode (nodeUuid) {
     const {nodes} = this.props
-    return nodeUUID
-      ? R.find(R.propEq('uuid', nodeUUID), nodes)
+    return nodeUuid
+      ? R.find(R.propEq('uuid', nodeUuid), nodes)
       : null
   }
 
@@ -152,12 +152,12 @@ class NodeDefEntityForm extends React.Component {
     const {nodeDef, setFormPageNode, nodes, entry} = this.props
 
     if (entry && !NodeDef.isNodeDefMultiple(nodeDef)) {
-      const nodeUUID = R.pipe(
+      const nodeUuid = R.pipe(
         R.head,
         R.prop('uuid')
       )(nodes)
 
-      setFormPageNode(nodeDef, nodeUUID)
+      setFormPageNode(nodeDef, nodeUuid)
     }
   }
 
@@ -180,7 +180,7 @@ class NodeDefEntityForm extends React.Component {
       nodes,
 
       setFormPageNode,
-      selectedNodeUUID,
+      selectedNodeUuid,
     } = this.props
 
     // edit survey mode
@@ -189,13 +189,13 @@ class NodeDefEntityForm extends React.Component {
 
     // entry multiple entity
     if (entry && NodeDef.isNodeDefMultiple(nodeDef)) {
-      const node = this.getNode(selectedNodeUUID)
+      const node = this.getNode(selectedNodeUuid)
 
       return <div>
 
         <NodeSelect {...this.props}
                     selectedNode={node}
-                    onChange={selectedNodeUUID => setFormPageNode(nodeDef, selectedNodeUUID)}/>
+                    onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}/>
 
         {
           node
@@ -215,7 +215,7 @@ class NodeDefEntityForm extends React.Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  selectedNodeUUID: getFormPageNodeUUID(props.nodeDef)(getSurveyForm(state))
+  selectedNodeUuid: getFormPageNodeUuid(props.nodeDef)(getSurveyForm(state))
 })
 
 export default connect(

@@ -11,7 +11,7 @@ const NodeRepository = require('../../../record/nodeRepository')
 const persistNode = async (surveyId, node, file, client = db) => {
   const {uuid} = node
 
-  const nodeDb = await NodeRepository.fetchNodeByUUID(surveyId, uuid, client)
+  const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, client)
 
   return nodeDb
     ? await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), file, client)
@@ -50,9 +50,9 @@ const createNode = async (surveyId, nodeDef, nodeToInsert, file, client = db) =>
  * Update a node value
  *
  */
-const updateNodeValue = async (surveyId, nodeUUID, value, file, client = db) =>
+const updateNodeValue = async (surveyId, nodeUuid, value, file, client = db) =>
   await client.tx(async t => {
-    const node = await NodeRepository.updateNode(surveyId, nodeUUID, value, file ? file.data : null, client)
+    const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, file ? file.data : null, client)
 
     return await onNodeUpdate(surveyId, node, t)
   })

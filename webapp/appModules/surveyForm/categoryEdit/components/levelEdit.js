@@ -41,7 +41,7 @@ class LevelEdit extends React.Component {
 
   render () {
     const {
-      category, level, parentItem, items, activeItemUUID, canAddItem,
+      category, level, parentItem, items, activeItemUuid, canAddItem,
       canBeDeleted, language,
       createCategoryLevelItem, putCategoryLevelProp, putCategoryItemProp,
       setCategoryItemForEdit, deleteCategoryItem, readOnly,
@@ -91,7 +91,7 @@ class LevelEdit extends React.Component {
                       category={category}
                       level={level}
                       item={item}
-                      active={item.uuid === activeItemUUID}
+                      active={item.uuid === activeItemUuid}
                       putCategoryItemProp={putCategoryItemProp}
                       setCategoryItemForEdit={setCategoryItemForEdit}
                       deleteCategoryItem={deleteCategoryItem}
@@ -126,7 +126,7 @@ const mapStateToProps = (state, props) => {
     language,
     category,
     items,
-    activeItemUUID: activeItem ? activeItem.uuid : null,
+    activeItemUuid: activeItem ? activeItem.uuid : null,
     parentItem,
     canAddItem,
     canBeDeleted,

@@ -18,11 +18,11 @@ const setProp = (key, value) => R.assocPath(['props', key], value)
 // UTILS
 const toIndexedObj = (array, prop) => R.reduce((acc, item) => R.assoc(R.prop(prop)(item), item)(acc), {})(array)
 
-const toUUIDIndexedObj = R.partialRight(toIndexedObj, ['uuid'])
+const toUuidIndexedObj = R.partialRight(toIndexedObj, ['uuid'])
 
 module.exports = {
   toIndexedObj,
-  toUUIDIndexedObj,
+  toUuidIndexedObj,
 
   // PROPS
   getProps,

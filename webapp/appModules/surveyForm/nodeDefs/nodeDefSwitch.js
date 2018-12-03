@@ -70,7 +70,7 @@ class NodeDefSwitch extends React.Component {
     } = this.props
 
     const isRoot = NodeDef.isNodeDefRoot(nodeDef)
-    const isPage = !!Layout.getPageUUID(nodeDef)
+    const isPage = !!Layout.getPageUuid(nodeDef)
 
     return <div className={`${isPage ? 'node-def__form_page' : 'node-def__form'}`} ref="nodeDefElem">
 

@@ -2,7 +2,7 @@ const {sendErr} = require('../serverUtils/response')
 
 const {getRestParam, getBoolParam} = require('../serverUtils/request')
 
-const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
+const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 
 const CategoryManager = require('./categoryManager')
@@ -14,7 +14,7 @@ const sendValidatedCategory = async (surveyId, categoryId, res, rest = {}) => {
 
 const sendCategories = async (res, surveyId, draft, validate) => {
   const categories = await CategoryManager.fetchCategoriesBySurveyId(surveyId, draft, validate)
-  res.json({categories: toUUIDIndexedObj(categories)})
+  res.json({categories: toUuidIndexedObj(categories)})
 }
 
 module.exports.init = app => {
@@ -77,7 +77,7 @@ module.exports.init = app => {
     }
   })
 
-  // fetch items by parent item UUID
+  // fetch items by parent item Uuid
   app.get('/survey/:surveyId/categories/:categoryId/items', async (req, res) => {
     try {
       const draft = getBoolParam(req, 'draft')

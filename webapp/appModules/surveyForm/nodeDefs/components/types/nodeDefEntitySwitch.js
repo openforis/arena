@@ -28,7 +28,7 @@ class NodeDefEntitySwitch extends React.Component {
       label,
       updateNode,
       setFormPageNode,
-      selectedNodeUUID,
+      selectedNodeUuid,
       putNodeDefProp,
       removeNode,
       locked,
@@ -58,7 +58,7 @@ class NodeDefEntitySwitch extends React.Component {
                                  nodes={nodes}
                                  parentNode={parentNode}
                                  setFormPageNode={setFormPageNode}
-                                 selectedNodeUUID={selectedNodeUUID}
+                                 selectedNodeUuid={selectedNodeUuid}
                                  updateNode={updateNode}
                                  putNodeDefProp={putNodeDefProp}
                                  removeNode={removeNode}

@@ -73,7 +73,7 @@ const persistNode = (userId, surveyId, node, file) => {
  *
  * @param userId
  * @param surveyId
- * @param nodeUUID
+ * @param nodeUuid
  */
 const deleteNode = (userId, surveyId, nodeUuid) => {
   const updateWorker = recordUpdateThreads.getThread(userId)

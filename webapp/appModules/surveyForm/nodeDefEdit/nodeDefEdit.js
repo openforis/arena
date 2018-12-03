@@ -52,12 +52,12 @@ class NodeDefEdit extends React.Component {
             editingCategory
               ? <CategoriesView canSelect={canUpdateCategory}
                                 onSelect={category => putNodeDefProp(nodeDef, 'categoryUuid', category.uuid)}
-                                selectedItemUUID={NodeDef.getNodeDefCategoryUuid(nodeDef)}
+                                selectedItemUuid={NodeDef.getNodeDefCategoryUuid(nodeDef)}
                                 onClose={() => this.setState({editingCategory: false})}/>
               : editingTaxonomy
               ? <TaxonomiesView canSelect={true}
                                 onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUuid', taxonomy.uuid)}
-                                selectedItemUUID={NodeDef.getNodeDefTaxonomyUuid(nodeDef)}
+                                selectedItemUuid={NodeDef.getNodeDefTaxonomyUuid(nodeDef)}
                                 onClose={() => this.setState({editingTaxonomy: false})}/>
               : (
                 <div className="node-def-edit__container">

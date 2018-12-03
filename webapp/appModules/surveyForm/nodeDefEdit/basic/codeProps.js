@@ -98,7 +98,7 @@ const CodeProps = (props) => {
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={NodeDef.getNodeDefName}
-                    onChange={def => putNodeDefProp(nodeDef, 'parentCodeUUID', def ? def.uuid : null)}/>
+                    onChange={def => putNodeDefProp(nodeDef, 'parentCodeUuid', def ? def.uuid : null)}/>
         </div>
       </FormItem>
     </React.Fragment>

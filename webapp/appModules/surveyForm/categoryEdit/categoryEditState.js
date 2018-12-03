@@ -10,14 +10,14 @@ const surveyState = {
     categoryEdit: {
       uuid: '',
       levelItems: {
-        0: {'itemUUID': {}},
-        1: {'itemUUID': {}},
-        2: {'itemUUID': {}},
+        0: {'itemUuid': {}},
+        1: {'itemUuid': {}},
+        2: {'itemUuid': {}},
       },
       levelActiveItems: {
-        0: 'itemUUID',
-        1: 'itemUUID',
-        2: 'itemUUID',
+        0: 'itemUuid',
+        1: 'itemUuid',
+        2: 'itemUuid',
       }
     },
 
@@ -77,17 +77,17 @@ export const dissocLevelItem = (levelIndex, itemUuid) => R.pipe(
 // ==== level active item(s)
 const getLevelActiveItems = R.pathOr({}, [categoryEdit, levelActiveItems])
 
-const getLevelActiveItemUUID = levelIndex => R.pipe(
+const getLevelActiveItemUuid = levelIndex => R.pipe(
   getLevelActiveItems,
   R.prop(levelIndex),
 )
 
 export const getCategoryEditLevelActiveItem = levelIndex =>
   surveyForm => R.pipe(
-    getLevelActiveItemUUID(levelIndex),
-    activeItemUUID => {
+    getLevelActiveItemUuid(levelIndex),
+    activeItemUuid => {
       const levelItems = getCategoryEditLevelItemsArray(levelIndex)(surveyForm)
-      return R.find(item => item.uuid === activeItemUUID, levelItems)
+      return R.find(item => item.uuid === activeItemUuid, levelItems)
     },
   )(surveyForm)
 

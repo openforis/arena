@@ -31,7 +31,7 @@ class CategoriesView extends React.Component {
   render () {
 
     const {
-      categories, category, selectedItemUUID,
+      categories, category, selectedItemUuid,
       createCategory, deleteCategory, setCategoryForEdit,
       onSelect, onClose, canSelect,
       readOnly
@@ -47,7 +47,7 @@ class CategoriesView extends React.Component {
                       itemLabelFunction={category => Category.getName(category)}
                       editedItem={category}
                       items={categories}
-                      selectedItemUUID={selectedItemUUID}
+                      selectedItemUuid={selectedItemUuid}
                       onAdd={createCategory}
                       onEdit={setCategoryForEdit}
                       canDelete={canDeleteCategory}

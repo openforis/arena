@@ -6,7 +6,7 @@ const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
 const Node = require('../../common/record/node')
 
-const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
+const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
 
@@ -49,7 +49,7 @@ const fetchRecordById = async (surveyId, recordId) => {
   const record = await RecordRepository.fetchRecordById(surveyId, recordId)
   const nodes = await NodeRepository.fetchNodesByRecordId(surveyId, recordId)
 
-  return {...record, nodes: toUUIDIndexedObj(nodes)}
+  return {...record, nodes: toUuidIndexedObj(nodes)}
 }
 
 /**
@@ -88,7 +88,7 @@ module.exports = {
   //==== READ
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
-  fetchNodeFileByUUID: NodeRepository.fetchNodeFileByUUID,
+  fetchNodeFileByUuid: NodeRepository.fetchNodeFileByUuid,
 
   //==== UPDATE
   persistNode,

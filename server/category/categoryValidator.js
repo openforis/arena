@@ -54,7 +54,7 @@ const validateItem = async (category, items, itemUuid) => {
   if (isLeaf) {
     return {[item.uuid]: validation}
   } else {
-    const childValidations = await validateItemsByParentUUID(category, items, item.uuid)
+    const childValidations = await validateItemsByParentUuid(category, items, item.uuid)
 
     const childrenValid = childValidations.valid
 
@@ -72,7 +72,7 @@ const validateItem = async (category, items, itemUuid) => {
 
 }
 
-const validateItemsByParentUUID = async (category, items, parentItemUuid) => {
+const validateItemsByParentUuid = async (category, items, parentItemUuid) => {
   const children = getChildrenItems(items, parentItemUuid)
   const emptyChildren = R.isEmpty(children)
 
@@ -105,7 +105,7 @@ const validateCategoryProps = async (categories, category) =>
 const validateCategory = async (categories, category, items) => {
   const categoryValidation = await validateCategoryProps(categories, category)
   const levelsValidation = await validateLevels(category)
-  const itemsValidation = await validateItemsByParentUUID(category, items, null)
+  const itemsValidation = await validateItemsByParentUuid(category, items, null)
 
   const valid = categoryValidation.valid && levelsValidation.valid && itemsValidation.valid
 
