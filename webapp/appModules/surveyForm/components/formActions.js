@@ -86,7 +86,7 @@ class FormActions extends React.Component {
     const {opened} = this.state
 
     const width = opened ? 33 : 200
-    document.getElementsByClassName('survey-form')[0].style.gridTemplateColumns = `1fr ${width}px`
+    document.getElementsByClassName('survey-form')[0].classList.toggle('form-actions-off')// .style.gridTemplateColumns = `1fr ${width}px`
 
     this.setState({opened: !opened})
 
@@ -106,12 +106,10 @@ class FormActions extends React.Component {
     return (
       <div className="survey-form__actions">
 
-        <div style={{opacity: '0.5', position: 'absolute'}}>
-          <a className="btn btn-s btn-of-light-xs no-border"
-             onClick={() => this.toggleOpen()}>
-            <span className={`icon icon-${this.state.opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
-          </a>
-        </div>
+        <button className="btn btn-s btn-of-light-xs no-border btn-toggle"
+                onClick={() => this.toggleOpen()}>
+          <span className={`icon icon-${this.state.opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
+        </button>
 
         {
           this.state.opened ?

@@ -77,13 +77,13 @@ const CodeProps = (props) => {
 
       <FormItem label={'Display As'}>
         <div>
-          <button className={`btn btn-of-light ${isRenderDropdown(nodeDef) ? 'active' : ''}`}
-                  onClick={() => putNodeDefProp(nodeDef, nodeDefLayoutProps.render, nodeDefRenderType.dropdown)}>
-            Dropdown
-          </button>
           <button className={`btn btn-of-light ${isRenderCheckbox(nodeDef) ? 'active' : ''}`}
                   onClick={() => putNodeDefProp(nodeDef, nodeDefLayoutProps.render, nodeDefRenderType.checkbox)}>
             Checkbox
+          </button>
+          <button className={`btn btn-of-light ${isRenderDropdown(nodeDef) ? 'active' : ''}`}
+                  onClick={() => putNodeDefProp(nodeDef, nodeDefLayoutProps.render, nodeDefRenderType.dropdown)}>
+            Dropdown
           </button>
         </div>
       </FormItem>

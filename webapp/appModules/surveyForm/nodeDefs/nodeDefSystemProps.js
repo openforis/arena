@@ -97,7 +97,7 @@ export const nodeDefSystemProps = {
     component: NodeDefCodeList,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
-    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.dropdown},
+    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.checkbox},
   },
 
   [nodeDefType.coordinate]: {
