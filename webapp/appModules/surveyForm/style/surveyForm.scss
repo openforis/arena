@@ -93,10 +93,6 @@ $tableRowHeaderHeight: 40px;
 .node-def__form_page {
   position: relative;
   overflow-y: auto;
-
-  .node-def__form-actions {
-    right: 1rem;
-  }
 }
 
 .node-def__form {
@@ -111,7 +107,7 @@ $tableRowHeaderHeight: 40px;
 
 .node-def__form-actions {
   position: absolute;
-  right: 0;
+  right: 1rem;
   background-color: rgba($greyDark, 0.9);
   padding: .2rem .3rem;
   z-index: $zIndex1App;

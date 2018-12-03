@@ -32,10 +32,10 @@ const nodeDef = {
     calculated: false, //boolean expression
     defaultValues: [], //expression
 
-    //nodeDefCodeList
-    categoryUUID: id,
+    //nodeDefCode
+    categoryUuid: id,
     //or
-    parentCodeUUID: id,
+    parentCodeUuid: id,
 
     //all
     validations: [], //nodeDefValidation
