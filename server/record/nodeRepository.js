@@ -47,6 +47,16 @@ const fetchNodeFileByUUID = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
+const fetchNodesByParentCodeNodeUUID = async (surveyId, recordId, parentCodeNodeUUID, client = db) =>
+  await client.map(`
+    SELECT ${nodeColumns} FROM ${getSurveyDBSchema(surveyId)}.node n
+    WHERE n.record_id = $1
+      AND n.value @> '{"h": ["${parentCodeNodeUUID}"]}'
+    ORDER BY id`,
+    [recordId],
+    dbTransformCallback
+  )
+
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUUID, value, fileContent = null, client = db) =>
   await client.one(`
@@ -76,6 +86,7 @@ module.exports = {
   fetchNodesByRecordId,
   fetchNodeByUUID,
   fetchNodeFileByUUID,
+  fetchNodesByParentCodeNodeUUID,
 
   //UPDATE
   updateNode,

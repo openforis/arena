@@ -98,18 +98,6 @@ const getCodeUUIDsHierarchy = (survey, parentEntity, nodeDef) => record => {
     : []
 }
 
-const getNodeCodeDependentAttributes = (survey, node) =>
-  record => {
-    const nodeDef = Survey.getNodeDefByUUID(Node.getNodeDefUuid(node))(survey)
-
-    return Survey.isNodeDefParentCode(nodeDef)(survey)
-      ? findNodes(n => {
-        const def = Survey.getNodeDefByUUID(Node.getNodeDefUuid(n))(survey)
-        return NodeDef.getNodeDefParentCodeUUID(def) === nodeDef.uuid
-      })(record)
-      : []
-  }
-
 // ====== UPDATE
 
 const assocNodes = nodes =>
@@ -155,7 +143,6 @@ module.exports = {
   // testing
   getCodeUUIDsHierarchy,
   getParentCodeAttribute,
-  getNodeCodeDependentAttributes,
 
   // ====== UPDATE
   assocNodes,

@@ -120,7 +120,7 @@ const deleteNodeInternal = async (survey, record, nodeUUID, client = db) => {
 
 const onNodeUpdate = async (survey, record, node, client = db) => {
   //delete dependent code nodes
-  const dependentCodeAttributes = Record.getNodeCodeDependentAttributes(survey, node)(record)
+  const dependentCodeAttributes = NodeRepository.fetchNodesByParentCodeNodeUUID(survey.id, record.id, node.uuid)
 
   const clearedDependentCodeAttributes = await Promise.all(
     dependentCodeAttributes.map(async n => {
