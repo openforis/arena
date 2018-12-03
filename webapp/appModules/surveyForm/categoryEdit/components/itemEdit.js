@@ -6,10 +6,10 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 
 import { normalizeName } from '../../../../../common/stringUtils'
 
-import CodeList from '../../../../../common/survey/codeList'
+import Category from '../../../../../common/survey/category'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
-class CodeListEditItem extends React.Component {
+class ItemEdit extends React.Component {
 
   constructor (props) {
     super(props)
@@ -31,24 +31,24 @@ class CodeListEditItem extends React.Component {
   }
 
   onPropLabelsChange (labelItem) {
-    const {codeList, level, item, putCodeListItemProp} = this.props
-    putCodeListItemProp(
-      codeList,
+    const {category, level, item, putCategoryItemProp} = this.props
+    putCategoryItemProp(
+      category,
       level,
       item,
       'labels',
-      R.assoc(labelItem.lang, labelItem.label, CodeList.getCodeListItemLabels(item))
+      R.assoc(labelItem.lang, labelItem.label, Category.getItemLabels(item))
     )
   }
 
   render () {
     const {
-      codeList, level, item, active,
-      putCodeListItemProp, setCodeListItemForEdit, deleteCodeListItem,
+      category, level, item, active,
+      putCategoryItemProp, setCategoryItemForEdit, deleteCategoryItem,
       language, readOnly
     } = this.props
 
-    const validation = CodeList.getCodeListItemValidation(item)(codeList)
+    const validation = Category.getItemValidation(item)(category)
     const validationGlobalErrorMessage = validation.valid
       ? null
       : R.pipe(
@@ -65,8 +65,8 @@ class CodeListEditItem extends React.Component {
 
     const disabled = item.published
     return (
-      <div className={`code-lists__edit-item ${active ? 'active' : ''}`}
-           onClick={() => active ? null : setCodeListItemForEdit(codeList, level, item, true)}
+      <div className={`category-edit__item ${active ? 'active' : ''}`}
+           onClick={() => active ? null : setCategoryItemForEdit(category, level, item, true)}
            ref={this.elemRef}>
         {
           !validation.valid &&
@@ -82,19 +82,19 @@ class CodeListEditItem extends React.Component {
               <React.Fragment>
 
                 <button className="btn-s btn-of-light-xs btn-close"
-                        onClick={() => setCodeListItemForEdit(codeList, level, item, false)}>
+                        onClick={() => setCategoryItemForEdit(category, level, item, false)}>
                   <span className="icon icon-arrow-up icon-12px"/>
                 </button>
 
                 <FormItem label={'code'}>
-                  <Input value={CodeList.getCodeListItemCode(item)}
+                  <Input value={Category.getItemCode(item)}
                          disabled={disabled}
                          validation={getFieldValidation('code')(validation)}
-                         onChange={value => putCodeListItemProp(codeList, level, item, 'code', normalizeName(value))}
+                         onChange={value => putCategoryItemProp(category, level, item, 'code', normalizeName(value))}
                          readOnly={readOnly}/>
                 </FormItem>
 
-                <LabelsEditor labels={CodeList.getCodeListItemLabels(item)}
+                <LabelsEditor labels={Category.getItemLabels(item)}
                               onChange={(labelItem) => this.onPropLabelsChange(labelItem)}
                               readOnly={readOnly}/>
 
@@ -104,7 +104,7 @@ class CodeListEditItem extends React.Component {
                           aria-disabled={disabled}
                           onClick={() => {
                             if (confirm('Delete the item with all children? This operation cannot be undone')) {
-                              deleteCodeListItem(codeList, level, item)
+                              deleteCategoryItem(category, level, item)
                             }
                           }}>
                     <span className="icon icon-bin2 icon-12px icon-left"/>
@@ -115,9 +115,9 @@ class CodeListEditItem extends React.Component {
             )
             : (
               <React.Fragment>
-                <div>{CodeList.getCodeListItemCode(item)}</div>
+                <div>{Category.getItemCode(item)}</div>
                 <div>{'\xA0'}-{'\xA0'}</div>
-                <div>{CodeList.getCodeListItemLabel(language)(item)}</div>
+                <div>{Category.getItemLabel(language)(item)}</div>
               </React.Fragment>
             )
         }
@@ -126,4 +126,4 @@ class CodeListEditItem extends React.Component {
   }
 }
 
-export default CodeListEditItem
+export default ItemEdit

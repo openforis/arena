@@ -17,12 +17,12 @@ import { surveyInfoPropUpdate, surveyInfoValidationUpdate } from './actions'
 // nodeDefs actions
 import { nodeDefCreate, nodeDefDelete, nodeDefPropUpdate, nodeDefUpdate } from '../nodeDefs/actions'
 
-// codeList actions
-import { codeListCreate } from '../codeLists/actions'
+// category actions
+import { categoryCreate } from '../categories/actions'
 
 // taxonomies actions
 import { taxonomyCreate } from '../taxonomies/actions'
-import { codeListDelete, codeListUpdate } from '../codeLists/actions'
+import { categoryDelete, categoryUpdate } from '../categories/actions'
 import { taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomies/actions'
 
 const actionHandlers = {
@@ -47,9 +47,9 @@ const actionHandlers = {
   [nodeDefDelete]: markDraft,
 
   // CodeList
-  [codeListCreate]: markDraft,
-  [codeListUpdate]: markDraft,
-  [codeListDelete]: markDraft,
+  [categoryCreate]: markDraft,
+  [categoryUpdate]: markDraft,
+  [categoryDelete]: markDraft,
 
   // taxonomies
   [taxonomyCreate]: markDraft,

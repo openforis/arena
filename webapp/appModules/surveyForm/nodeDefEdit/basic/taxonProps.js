@@ -36,9 +36,9 @@ const TaxonProps = (props) => {
           <Dropdown items={taxonomies}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={Taxonomy.getTaxonomyName}
-                    validation={getFieldValidation('taxonomyUUID')(validation)}
+                    validation={getFieldValidation('taxonomyUuid')(validation)}
                     selection={taxonomy}
-                    onChange={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy ? taxonomy.uuid : null)}/>
+                    onChange={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUuid', taxonomy ? taxonomy.uuid : null)}/>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
                   onClick={() => {
@@ -68,7 +68,7 @@ const mapStateToProps = state => {
   const isTaxon = NodeDef.isNodeDefTaxon(nodeDef)
 
   return {
-    taxonomy: isTaxon ? Survey.getTaxonomyByUUID(NodeDef.getNodeDefTaxonomyUUID(nodeDef))(survey) : null,
+    taxonomy: isTaxon ? Survey.getTaxonomyByUuid(NodeDef.getNodeDefTaxonomyUuid(nodeDef))(survey) : null,
     taxonomies: isTaxon ? Survey.getTaxonomiesArray(survey) : null,
   }
 }

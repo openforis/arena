@@ -33,7 +33,7 @@ const nodeDef = {
     defaultValues: [], //expression
 
     //nodeDefCodeList
-    codeListUUID: id,
+    categoryUUID: id,
     //or
     parentCodeUUID: id,
 

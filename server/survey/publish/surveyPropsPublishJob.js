@@ -6,8 +6,8 @@ const Job = require('../../job/job')
 
 const NodeDefRepository = require('../../nodeDef/nodeDefRepository')
 const SurveyRepository = require('../surveyRepository')
-const CodeListManager = require('../../codeList/codeListManager')
-const CodeListRepository = require('../../codeList/codeListRepository')
+const CodeListManager = require('../../category/categoryManager')
+const CodeListRepository = require('../../category/categoryRepository')
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
 const determineDeletedLanguages = async (surveyId, t) => {
@@ -42,7 +42,7 @@ class SurveyPropsPublishJob extends Job {
 
       this.incrementProcessedItems()
 
-      await CodeListManager.publishCodeListsProps(id, t)
+      await CodeListManager.publishProps(id, t)
 
       this.incrementProcessedItems()
 
@@ -77,7 +77,7 @@ class SurveyPropsPublishJob extends Job {
       this.incrementProcessedItems()
 
       //CODE LIST ITEMS
-      await CodeListRepository.deleteCodeListsItemsLabels(surveyId, langCode, t)
+      await CodeListRepository.deleteItemLabels(surveyId, langCode, t)
       this.incrementProcessedItems()
     }
   }

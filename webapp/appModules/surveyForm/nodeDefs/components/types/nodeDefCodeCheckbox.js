@@ -1,8 +1,8 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import CodeList from '../../../../../../common/survey/codeList'
 import Node from '../../../../../../common/record/node'
+import Category from '../../../../../../common/survey/category'
 
 const Checkbox = props => {
   const {language, edit, item, nodes, selectedItems, onSelectedItemsChange} = props
@@ -24,12 +24,12 @@ const Checkbox = props => {
           : R.append(item, selectedItems)
         onSelectedItemsChange(newSelectedItems)
       }}>
-      {CodeList.getCodeListItemLabel(language)(item)}
+      {Category.getItemLabel(language)(item)}
     </button>
   )
 }
 
-const NodeDefCodeListCheckbox = props => {
+const NodeDefCodeCheckbox = props => {
   const {items = []} = props
 
   const disabled = R.isEmpty(items)
@@ -46,4 +46,4 @@ const NodeDefCodeListCheckbox = props => {
   </div>
 }
 
-export default NodeDefCodeListCheckbox
+export default NodeDefCodeCheckbox

@@ -74,7 +74,7 @@ const findNodeInAncestorEntities = (parentNode, predicate) => record => {
 
 const getParentCodeAttribute = (survey, parentNode, nodeDef) =>
   record => {
-    const parentCodeDef = Survey.getNodeDefByUUID(NodeDef.getNodeDefParentCodeUUID(nodeDef))(survey)
+    const parentCodeDef = Survey.getNodeDefByUUID(NodeDef.getNodeDefParentCodeDefUuid(nodeDef))(survey)
 
     return parentCodeDef
       ? findNodeInAncestorEntities(parentNode,
@@ -141,7 +141,7 @@ module.exports = {
   getNodeByUuid,
 
   // testing
-  getCodeUUIDsHierarchy,
+  getCodeUuidsHierarchy: getCodeUUIDsHierarchy,
   getParentCodeAttribute,
 
   // ====== UPDATE

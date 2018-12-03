@@ -74,7 +74,7 @@ const mapStateToProps = state => {
     Survey.getTaxonomiesArray,
     R.map(t => ({
       ...t,
-      usedByNodeDefs: Survey.getNodeDefsByTaxonomyUUID(t.uuid)(survey).length > 0
+      usedByNodeDefs: Survey.getNodeDefsByTaxonomyUuid(t.uuid)(survey).length > 0
     }))
   )(survey)
 
