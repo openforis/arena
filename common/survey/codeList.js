@@ -72,7 +72,7 @@ const newCodeListItem = (levelId, parentItem = null, props = {}) => {
   return {
     uuid: uuidv4(),
     levelId,
-    parentUUID: parentItem ? parentItem.uuid : null,
+    parentUuid: parentItem ? parentItem.uuid : null,
     props,
   }
 }

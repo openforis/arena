@@ -59,8 +59,8 @@ const actionHandlers = {
   [codeListItemDelete]: (state, {level, item}) => dissocLevelItem(level.index, item.uuid)(state),
 
   // ===== code list active item
-  [codeListEditLevelActiveItemUpdate]: (state, {levelIndex, itemUUID}) =>
-    assocLevelActiveItem(levelIndex, itemUUID)(state),
+  [codeListEditLevelActiveItemUpdate]: (state, {levelIndex, itemUuid}) =>
+    assocLevelActiveItem(levelIndex, itemUuid)(state),
 }
 
 export default exportReducer(actionHandlers)

@@ -111,8 +111,8 @@ export const nodeDefSystemProps = {
     component: NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left"/>,
     defaultValue: {
-      taxonUUID: null,
-      vernacularNameUUID: null,
+      taxonUuid: null,
+      vernacularNameUuid: null,
     },
     formFields: ['code', 'scientific_name', 'vernacular_name'],
   },

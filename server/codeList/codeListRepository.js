@@ -10,12 +10,6 @@ const {
   dbTransformCallback
 } = require('../survey/surveySchemaRepositoryUtils')
 
-//TODO USE parentUuid
-const codeListDbTransformCallback = (record, draft) => R.pipe(
-  R.assoc('parentUUID', R.prop('parent_uuid')(record)),
-  R.dissoc('parentUuid')
-)(dbTransformCallback(record, draft))
-
 // ============== CREATE
 
 const insertCodeList = async (surveyId, codeList, client = db) =>
@@ -24,7 +18,7 @@ const insertCodeList = async (surveyId, codeList, client = db) =>
         VALUES ($1, $2)
         RETURNING *`,
     [codeList.uuid, codeList.props],
-    def => codeListDbTransformCallback(def, true)
+    def => dbTransformCallback(def, true, true)
   )
 
 const insertCodeListLevel = async (surveyId, codeListId, level, client = db) =>
@@ -33,7 +27,7 @@ const insertCodeListLevel = async (surveyId, codeListId, level, client = db) =>
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
     [level.uuid, codeListId, level.index, level.props],
-    def => codeListDbTransformCallback(def, true)
+    def => dbTransformCallback(def, true, true)
   )
 
 const insertCodeListItem = async (surveyId, item, client = db) =>
@@ -41,8 +35,8 @@ const insertCodeListItem = async (surveyId, item, client = db) =>
         INSERT INTO ${getSurveyDBSchema(surveyId)}.code_list_item (uuid, level_id, parent_uuid, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [item.uuid, item.levelId, item.parentUUID, item.props],
-    def => codeListDbTransformCallback(def, true)
+    [item.uuid, item.levelId, item.parentUuid, item.props],
+    def => dbTransformCallback(def, true, true)
   )
 
 // ============== READ
@@ -52,7 +46,7 @@ const fetchCodeListsBySurveyId = async (surveyId, draft = false, client = db) =>
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list
     ORDER BY id`,
     [],
-    def => codeListDbTransformCallback(def, draft)
+    def => dbTransformCallback(def, draft, true)
   )
 
 const fetchCodeListLevelsByCodeListId = async (surveyId, codeListId, draft = false, client = db) =>
@@ -61,7 +55,7 @@ const fetchCodeListLevelsByCodeListId = async (surveyId, codeListId, draft = fal
      WHERE code_list_id = $1
      ORDER BY index`,
     [codeListId],
-    def => codeListDbTransformCallback(def, draft)
+    def => dbTransformCallback(def, draft, true)
   )
 
 const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = false, client = db) => {
@@ -74,7 +68,7 @@ const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = fals
      ORDER BY i.id
     `,
     [codeListId],
-    def => codeListDbTransformCallback(def, draft)
+    def => dbTransformCallback(def, draft, true)
   )
 
   return draft
@@ -82,7 +76,7 @@ const fetchCodeListItemsByCodeListId = async (surveyId, codeListId, draft = fals
     : R.filter(item => item.published)(items)
 }
 
-const fetchCodeListItemsByParentUUID = async (surveyId, codeListId, parentUUID = null, draft = false, client = db) => {
+const fetchCodeListItemsByParentUUID = async (surveyId, codeListId, parentUuid = null, draft = false, client = db) => {
   const items = await client.map(`
     SELECT i.* 
     FROM ${getSurveyDBSchema(surveyId)}.code_list_item i
@@ -90,14 +84,14 @@ const fetchCodeListItemsByParentUUID = async (surveyId, codeListId, parentUUID =
       ON l.id = i.level_id
       AND l.code_list_id = $1
     WHERE i.parent_uuid ${
-      parentUUID
-        ? `= '${parentUUID}'`
+      parentUuid
+        ? `= '${parentUuid}'`
         : 'IS NULL'
       }
     ORDER BY i.id
   `,
     [codeListId],
-    def => codeListDbTransformCallback(def, draft)
+    def => dbTransformCallback(def, draft, true)
   )
 
   return draft
@@ -105,13 +99,13 @@ const fetchCodeListItemsByParentUUID = async (surveyId, codeListId, parentUUID =
     : R.filter(item => item.published)(items)
 }
 
-const fetchCodeListItemByUUID = async (surveyId, itemUUID, draft = false, client = db) =>
+const fetchCodeListItemByUUID = async (surveyId, itemUuid, draft = false, client = db) =>
   await client.one(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.code_list_item
      WHERE uuid = $1
     `,
-    [itemUUID],
-    def => codeListDbTransformCallback(def, draft)
+    [itemUuid],
+    def => dbTransformCallback(def, draft, true)
   )
 
 // ============== UPDATE

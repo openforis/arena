@@ -23,7 +23,7 @@ const getNodeValues = async (surveyInfo, nodes) => {
     nodeValues.map(
       async nodeValue =>
         nodeValue.fileName ? nodeValue.fileName
-          : nodeValue.itemUUID ? await loadCodeListItemLabel(surveyInfo, nodeValue.itemUUID)
+          : nodeValue.itemUuid ? await loadCodeListItemLabel(surveyInfo, nodeValue.itemUuid)
           : nodeValue
     )
   )
@@ -31,8 +31,8 @@ const getNodeValues = async (surveyInfo, nodes) => {
   return R.join(', ', stringNodeValues)
 }
 
-const loadCodeListItemLabel = async (surveyInfo, itemUUID) => {
-  const {data} = await axios.get(`/api/survey/${surveyInfo.id}/codeLists/items/${itemUUID}`)
+const loadCodeListItemLabel = async (surveyInfo, itemUuid) => {
+  const {data} = await axios.get(`/api/survey/${surveyInfo.id}/codeLists/items/${itemUuid}`)
   return CodeList.getCodeListItemLabel(Survey.getDefaultLanguage(surveyInfo))(data.item)
 }
 

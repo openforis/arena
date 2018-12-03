@@ -98,9 +98,9 @@ module.exports.init = app => {
       const draft = getBoolParam(req, 'draft')
       const surveyId = getRestParam(req, 'surveyId')
       const codeListId = getRestParam(req, 'codeListId')
-      const parentUUID = getRestParam(req, 'parentUUID')
+      const parentUuid = getRestParam(req, 'parentUuid')
 
-      const items = await fetchCodeListItemsByParentUUID(surveyId, codeListId, parentUUID, draft)
+      const items = await fetchCodeListItemsByParentUUID(surveyId, codeListId, parentUuid, draft)
 
       res.json({items})
     } catch (err) {
@@ -108,13 +108,13 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/codeLists/items/:itemUUID', async (req, res) => {
+  app.get('/survey/:surveyId/codeLists/items/:itemUuid', async (req, res) => {
     try {
       const draft = getBoolParam(req, 'draft')
       const surveyId = getRestParam(req, 'surveyId')
-      const itemUUID = getRestParam(req, 'itemUUID')
+      const itemUuid = getRestParam(req, 'itemUuid')
 
-      const item = await fetchCodeListItemByUUID(surveyId, itemUUID, draft)
+      const item = await fetchCodeListItemByUUID(surveyId, itemUuid, draft)
 
       res.json({item})
     } catch (err) {

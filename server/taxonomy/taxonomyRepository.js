@@ -11,27 +11,12 @@ const {
 
 const Taxonomy = require('../../common/survey/taxonomy')
 
-const taxonomyDbTransformCallback = (obj, draft) => {
-  const result = dbTransformCallback(obj, draft)
-
-  //transform props ending in ...Uuid into ...UUID
-  R.forEach(prop => {
-    if (R.length(prop) > 4 && R.endsWith('Uuid', prop)) {
-      result[R.take(prop.length - 4, prop) + 'UUID'] = result[prop]
-      delete result[prop]
-    }
-  })
-  (R.keys(result))
-
-  return result
-}
-
 const filterProps = {
   uuid: 'uuid',
   code: 'code',
   scientificName: 'scientificName',
   vernacularName: 'vernacularName',
-  vernacularNameUUID: 'vernacularNameUUID',
+  vernacularNameUuid: 'vernacularNameUuid',
 }
 
 // ============== CREATE
@@ -42,7 +27,7 @@ const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
         VALUES ($1, $2)
         RETURNING *`,
     [taxonomy.uuid, taxonomy.props],
-    record => taxonomyDbTransformCallback(record, true)
+    record => dbTransformCallback(record, true, true)
   )
 
 const insertTaxa = async (surveyId, taxa, client = db) =>
@@ -67,10 +52,10 @@ const insertOrUpdateTaxon = (surveyId, taxon, client = db) =>
         UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon.props_draft || $3
       RETURNING *`,
     [taxon.uuid, taxon.taxonomyId, taxon.props],
-    record => taxonomyDbTransformCallback(record, true)
+    record => dbTransformCallback(record, true, true)
   )
 
-const insertOrUpdateVernacularNames = (surveyId, taxonUUID, vernacularNames, client = db) =>
+const insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, client = db) =>
   R.keys(vernacularNames).map(lang => {
     const vn = R.prop(lang, vernacularNames)
     return client.one(
@@ -79,8 +64,8 @@ const insertOrUpdateVernacularNames = (surveyId, taxonUUID, vernacularNames, cli
         ON CONFLICT (taxon_uuid, (props_draft->>'lang')) DO
          UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props_draft || $2
         RETURNING *`,
-      [taxonUUID, {lang: lang, name: vn}],
-      record => taxonomyDbTransformCallback(record, true)
+      [taxonUuid, {lang: lang, name: vn}],
+      record => dbTransformCallback(record, true, true)
     )
   })
 
@@ -91,14 +76,14 @@ const fetchTaxonomyById = async (surveyId, id, draft = false, client = db) =>
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxonomy
      WHERE id = $1`,
     [id],
-    record => taxonomyDbTransformCallback(record, draft)
+    record => dbTransformCallback(record, draft, true)
   )
 
 const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, client = db) =>
   await client.map(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxonomy`,
     [],
-    record => taxonomyDbTransformCallback(record, draft)
+    record => dbTransformCallback(record, draft, true)
   )
 
 const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false, client = db) =>
@@ -107,7 +92,7 @@ const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false, client
       FROM ${getSurveyDBSchema(surveyId)}.taxon
       WHERE taxonomy_id = $1`,
     [taxonomyId],
-    record => record.count)
+    R.prop('count'))
 
 const fetchTaxaByPropLike = async (surveyId,
                                    taxonomyId,
@@ -138,7 +123,7 @@ const fetchTaxaByPropLike = async (surveyId,
     case filterProps.uuid:
       const taxon = await fetchTaxonByUUID(surveyId, searchValue, draft, client)
       return taxon ? [taxon] : []
-    case filterProps.vernacularNameUUID:
+    case filterProps.vernacularNameUuid:
       const vernacularName = await fetchTaxonVernacularNameByUUID(surveyId, searchValue, draft, client)
       return vernacularName ? [vernacularName] : []
     default:
@@ -155,7 +140,7 @@ const fetchTaxaByPropLike = async (surveyId,
             LIMIT ${limit ? limit : 'ALL'} 
             OFFSET $2`,
         [taxonomyId, offset],
-        record => taxonomyDbTransformCallback(record, draft)
+        record => dbTransformCallback(record, draft, true)
       )
   }
 }
@@ -186,7 +171,7 @@ const fetchTaxaByVernacularName = async (surveyId,
         LIMIT ${limit ? limit : 'ALL'} 
         OFFSET $2`,
     [taxonomyId, offset],
-    record => taxonomyDbTransformCallback(record, draft)
+    record => dbTransformCallback(record, draft, true)
   )
 }
 
@@ -203,7 +188,7 @@ const fetchTaxonVernacularNameByUUID = async (surveyId, uuid, draft = false, cli
        ON vn.taxon_uuid = t.uuid
      WHERE vn.uuid = $1
     `, [uuid],
-    record => taxonomyDbTransformCallback(record, draft)
+    record => dbTransformCallback(record, draft, true)
   )
 }
 
@@ -212,7 +197,7 @@ const fetchTaxonByUUID = async (surveyId, uuid, draft = false, client = db) =>
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
      WHERE uuid = $1
     `, [uuid],
-    record => taxonomyDbTransformCallback(record, draft)
+    record => dbTransformCallback(record, draft, true)
   )
 
 // ============== UPDATE

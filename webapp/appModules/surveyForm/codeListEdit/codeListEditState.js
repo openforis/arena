@@ -69,9 +69,9 @@ export const createLevelItem = (levelIndex, item) => R.pipe(
   assocLevelActiveItem(levelIndex, item.uuid),
 )
 
-export const dissocLevelItem = (levelIndex, itemUUID) => R.pipe(
+export const dissocLevelItem = (levelIndex, itemUuid) => R.pipe(
   assocLevelActiveItem(levelIndex, null),
-  R.dissocPath([levelItems, levelIndex, itemUUID])
+  R.dissocPath([levelItems, levelIndex, itemUuid])
 )
 
 // ==== level active item(s)
@@ -91,11 +91,11 @@ export const getCodeListEditLevelActiveItem = levelIndex =>
     },
   )(surveyForm)
 
-export const assocLevelActiveItem = (levelIndex, itemUUID) => R.pipe(
+export const assocLevelActiveItem = (levelIndex, itemUuid) => R.pipe(
   resetNextLevels(levelIndex, levelItems),
   resetNextLevels(levelIndex, levelActiveItems),
-  state => itemUUID
-    ? R.assocPath([levelActiveItems, levelIndex], itemUUID, state)
+  state => itemUuid
+    ? R.assocPath([levelActiveItems, levelIndex], itemUuid, state)
     : R.dissocPath([levelActiveItems, levelIndex], state),
 )
 

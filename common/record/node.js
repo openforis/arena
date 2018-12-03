@@ -72,9 +72,9 @@ module.exports = {
   getNodeDefUuid: R.prop('nodeDefUuid'),
   getNodeRecordId: R.prop('recordId'),
   getNodeFileName: getNodeValueProp('fileName', ''),
-  getNodeItemUUID: getNodeValueProp('itemUUID'),
-  getNodeTaxonUUID: getNodeValueProp('taxonUUID'),
-  getNodeVernacularNameUUID: getNodeValueProp('vernacularNameUUID'),
+  getNodeItemUuid: getNodeValueProp('itemUuid'),
+  getNodeTaxonUuid: getNodeValueProp('taxonUuid'),
+  getNodeVernacularNameUuid: getNodeValueProp('vernacularNameUuid'),
 
   // ==== UTILS
   isNodeValueBlank,

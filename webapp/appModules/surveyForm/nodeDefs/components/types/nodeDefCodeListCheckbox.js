@@ -8,8 +8,8 @@ import Node from '../../../../../../common/record/node'
 const Checkbox = props => {
   const {language, edit, item, nodeDef, parentNode, nodes, updateNode, removeNode, codeUUIDsHierarchy} = props
 
-  const itemUUID = item.uuid
-  const node = R.find(node => Node.getNodeItemUUID(node) === itemUUID)(nodes)
+  const itemUuid = item.uuid
+  const node = R.find(node => Node.getNodeItemUuid(node) === itemUuid)(nodes)
 
   return (
     <button
@@ -26,7 +26,7 @@ const Checkbox = props => {
             (NodeDef.isNodeDefMultiple(nodeDef) || R.isEmpty(nodes))
               ? Node.newNode(nodeDef.uuid, parentNode.recordId, parentNode.uuid)
               : nodes[0]
-          updateNode(nodeDef, nodeToUpdate, {itemUUID, h: codeUUIDsHierarchy})
+          updateNode(nodeDef, nodeToUpdate, {itemUuid, h: codeUUIDsHierarchy})
         }
       }}>
       {CodeList.getCodeListItemLabel(language)(item)}

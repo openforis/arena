@@ -30,7 +30,7 @@ const NodeDefCodeListDropdown = props => {
   const selectedItemUUIDs = R.pipe(
     R.values,
     R.reject(R.propEq('placeholder', true)),
-    R.map(Node.getNodeItemUUID),
+    R.map(Node.getNodeItemUuid),
     R.reject(R.isNil),
   )(nodes)
 
@@ -45,7 +45,7 @@ const NodeDefCodeListDropdown = props => {
       //remove deselected node
       const deselectedItem = R.head(R.difference(selectedItems, newSelectedItems))
       if (deselectedItem) {
-        const removedNode = R.find(n => Node.getNodeValue(n).itemUUID === deselectedItem.uuid)(nodes)
+        const removedNode = R.find(n => Node.getNodeValue(n).itemUuid === deselectedItem.uuid)(nodes)
         if (removedNode && removedNode.id) {
           removeNode(nodeDef, removedNode)
         }
@@ -54,7 +54,7 @@ const NodeDefCodeListDropdown = props => {
 
     const nodeToUpdate = determineNodeToUpdate(nodes, parentNode, multiple)
 
-    updateNode(nodeDef, nodeToUpdate, {itemUUID: newSelectedItem ? newSelectedItem.uuid : null, h: codeUUIDsHierarchy})
+    updateNode(nodeDef, nodeToUpdate, {itemUuid: newSelectedItem ? newSelectedItem.uuid : null, h: codeUUIDsHierarchy})
   }
 
   return multiple

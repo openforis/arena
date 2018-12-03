@@ -51,7 +51,7 @@ class NodeDefCodeList extends React.Component {
     const {surveyInfo, codeListId, codeListLevelIndex, parentItemUUID} = this.props
 
     if (codeListId && (parentItemUUID || codeListLevelIndex === 0)) {
-      const params = {draft: false, parentUUID: parentItemUUID}
+      const params = {draft: false, parentUuid: parentItemUUID}
       const {data} = await axios.get(`/api/survey/${surveyInfo.id}/codeLists/${codeListId}/items?${toQueryString(params)}`)
 
       this.setState({items: data.items})
@@ -89,7 +89,7 @@ const mapStateToProps = (state, props) => {
   const {nodeDef, parentNode} = props
 
   const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-  const parentItemUUID = Node.getNodeItemUUID(parentCodeAttribute)
+  const parentItemUUID = Node.getNodeItemUuid(parentCodeAttribute)
 
   const codeListLevelIndex = Survey.getNodeDefCodeListLevelIndex(nodeDef)(survey)
   const codeList = Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey)

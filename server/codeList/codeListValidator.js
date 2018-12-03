@@ -42,9 +42,12 @@ const itemValidators = (items) => ({
   'props.code': [validateRequired, validateNotKeyword, validateItemPropUniqueness(items)],
 })
 
-const validateItem = async (codeList, items, itemUUID) => {
-  const item = R.find(R.propEq('uuid', itemUUID))(items)
-  const validation = await validate(item, itemValidators(items.filter(i => i.parentUUID === item.parentUUID)))
+const getChildrenItems = (items, parentItemUuid) =>
+  items.filter(R.propEq('parentUuid', parentItemUuid))
+
+const validateItem = async (codeList, items, itemUuid) => {
+  const item = R.find(R.propEq('uuid', itemUuid))(items)
+  const validation = await validate(item, itemValidators(getChildrenItems(items, item.parentUuid)))
 
   const isLeaf = CodeList.isCodeListItemLeaf(item)(codeList)
 
@@ -69,8 +72,8 @@ const validateItem = async (codeList, items, itemUUID) => {
 
 }
 
-const validateItemsByParentUUID = async (codeList, items, parentItemUUID) => {
-  const children = R.filter(R.propEq('parentUUID', parentItemUUID), items)
+const validateItemsByParentUUID = async (codeList, items, parentItemUuid) => {
+  const children = getChildrenItems(items, parentItemUuid)
   const emptyChildren = R.isEmpty(children)
 
   const childValidations = await Promise.all(children.map(
