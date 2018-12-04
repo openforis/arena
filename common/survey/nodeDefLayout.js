@@ -4,7 +4,7 @@ const nodeDefRenderType = {
   // entity
   form: 'form',
   table: 'table',
-  //codelist
+  // code
   dropdown: 'dropdown',
   checkbox: 'checkbox',
 

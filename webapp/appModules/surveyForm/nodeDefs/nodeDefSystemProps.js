@@ -8,7 +8,7 @@ import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'
 import NodeDefTaxon from './components/types/nodeDefTaxon'
 import NodeDefCoordinate from './components/types/nodeDefCoordinate'
-import NodeDefCodeList from './components/types/nodeDefCode'
+import NodeDefCode from './components/types/nodeDefCode'
 import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
 
@@ -94,7 +94,7 @@ export const nodeDefSystemProps = {
   },
 
   [nodeDefType.code]: {
-    component: NodeDefCodeList,
+    component: NodeDefCode,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
     defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.checkbox},

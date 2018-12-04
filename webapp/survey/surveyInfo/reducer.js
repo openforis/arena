@@ -40,18 +40,18 @@ const actionHandlers = {
 
   [surveyInfoValidationUpdate]: (state, {validation}) => assocSurveyInfoValidation(validation)(state),
 
-  //NODEDEF
+  // NodeDef
   [nodeDefCreate]: markDraft,
   [nodeDefUpdate]: markDraft,
   [nodeDefPropUpdate]: markDraft,
   [nodeDefDelete]: markDraft,
 
-  // CodeList
+  // Category
   [categoryCreate]: markDraft,
   [categoryUpdate]: markDraft,
   [categoryDelete]: markDraft,
 
-  // taxonomies
+  // Taxonomy
   [taxonomyCreate]: markDraft,
   [taxonomyUpdate]: markDraft,
   [taxonomyPropUpdate]: markDraft,

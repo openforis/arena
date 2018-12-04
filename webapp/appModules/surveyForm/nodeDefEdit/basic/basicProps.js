@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
-import CodeListProps from './codeProps'
+import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -48,9 +48,9 @@ const BasicProps = props => {
 
       {
         NodeDef.isNodeDefCode(nodeDef) &&
-        <CodeListProps nodeDef={nodeDef}
-                       toggleCategoryEdit={toggleCategoryEdit}
-                       putNodeDefProp={putNodeDefProp}/>
+        <CodeProps nodeDef={nodeDef}
+                   toggleCategoryEdit={toggleCategoryEdit}
+                   putNodeDefProp={putNodeDefProp}/>
       }
 
       {

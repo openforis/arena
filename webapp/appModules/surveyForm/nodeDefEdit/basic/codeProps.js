@@ -5,7 +5,7 @@ import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
-import CodeList from '../../../../../common/survey/category'
+import Category from '../../../../../common/survey/category'
 import Validator from '../../../../../common/validation/validator'
 
 import {
@@ -49,11 +49,11 @@ const CodeProps = (props) => {
           <Dropdown disabled={disabled}
                     items={categories}
                     itemKeyProp={'uuid'}
-                    itemLabelFunction={CodeList.getName}
+                    itemLabelFunction={Category.getName}
                     validation={Validator.getFieldValidation('categoryUuid')(validation)}
                     selection={category}
                     onChange={category => {
-                      putNodeDefProp(nodeDef, 'parentCodeUuid', null) //reset parent code
+                      putNodeDefProp(nodeDef, 'parentCodeDefUuid', null) //reset parent code
                       putNodeDefProp(nodeDef, 'categoryUuid', category ? category.uuid : null)
                     }}/>
           <button className="btn btn-s btn-of-light-xs"
@@ -98,7 +98,7 @@ const CodeProps = (props) => {
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={NodeDef.getNodeDefName}
-                    onChange={def => putNodeDefProp(nodeDef, 'parentCodeUuid', def ? def.uuid : null)}/>
+                    onChange={def => putNodeDefProp(nodeDef, 'parentCodeDefUuid', def ? def.uuid : null)}/>
         </div>
       </FormItem>
     </React.Fragment>

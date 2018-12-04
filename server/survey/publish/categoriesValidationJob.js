@@ -33,6 +33,6 @@ class CategoriesValidationJob extends Job {
   }
 }
 
-CategoriesValidationJob.type = 'CodeListsValidationJob'
+CategoriesValidationJob.type = 'CategoriesValidationJob'
 
 module.exports = CategoriesValidationJob

@@ -31,7 +31,7 @@ class NodeDefCode extends React.Component {
     const {edit} = this.props
 
     if (!edit) {
-      await this.loadCodeListItems()
+      await this.loadCategoryItems()
     }
   }
 
@@ -41,12 +41,12 @@ class NodeDefCode extends React.Component {
     if (parentCodeDefUuid) {
       //parent item changed, reload items
       if (parentItemUuid !== prevProps.parentItemUuid) {
-        await this.loadCodeListItems()
+        await this.loadCategoryItems()
       }
     }
   }
 
-  async loadCodeListItems () {
+  async loadCategoryItems () {
     const {surveyInfo, categoryId, categoryLevelIndex, parentItemUuid} = this.props
 
     if (categoryId && (parentItemUuid || categoryLevelIndex === 0)) {

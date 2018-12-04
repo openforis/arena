@@ -35,7 +35,7 @@ const nodeDef = {
     //nodeDefCode
     categoryUuid: id,
     //or
-    parentCodeUuid: id,
+    parentCodeDefUuid: id,
 
     //all
     validations: [], //nodeDefValidation

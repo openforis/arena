@@ -72,12 +72,12 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }
 
-// ====== NODE DEFS CODE LIST UTILS
+// ====== NODE DEFS CODE UTILS
 const getNodeDefParentCode = nodeDef => getNodeDefByUuid(NodeDef.getNodeDefParentCodeDefUuid(nodeDef))
 
 const isNodeDefParentCode = nodeDef => R.pipe(
   getNodeDefsArray,
-  R.any(R.pathEq(['props', 'parentCodeUuid'], nodeDef.uuid)),
+  R.any(def => NodeDef.getNodeDefParentCodeDefUuid(def) === nodeDef.uuid),
 )
 
 const getNodeDefCodeCandidateParents = nodeDef =>
@@ -147,7 +147,7 @@ module.exports = {
   getNodeDefAncestors,
   isNodeDefAncestor,
 
-  // ====== NodeDef CodeList
+  // ====== NodeDef Code
   getNodeDefCategoryLevelIndex,
   getNodeDefParentCode,
   getNodeDefCodeCandidateParents,
