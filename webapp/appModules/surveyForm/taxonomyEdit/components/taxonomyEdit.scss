@@ -70,11 +70,8 @@
 
 .taxonomy-edit__header {
   display: grid;
-  grid-template-columns: .1fr .7fr .2fr;
-
-  .error-badge {
-    position: relative;
-  }
+  grid-template-columns: .75fr .25fr;
+  position: relative;
 
   .button-bar {
     display: flex;

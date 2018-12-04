@@ -42,6 +42,12 @@ export const createTaxonomy = () => async (dispatch, getState) => {
 
 // ====== READ
 
+const fetchTaxonomy = (surveyId, taxonomyId) =>
+  async dispatch => {
+    const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyId}?draft=true&validate=true`)
+    dispatchTaxonomyUpdate(dispatch, data.taxonomy)
+  }
+
 const ROWS_PER_PAGE = 15
 
 export const reloadTaxa = (taxonomy) => async (dispatch, getState) => {
@@ -97,6 +103,8 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
 
   dispatch(showAppJobMonitor(data.job, () => {
     //import complete
+    dispatch(fetchTaxonomy(surveyId, taxonomy.id))
+
     dispatch(reloadTaxa(taxonomy))
     //mark survey draft
     dispatchTaxonomyUpdate(dispatch, taxonomy)

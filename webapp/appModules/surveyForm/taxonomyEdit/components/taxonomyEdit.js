@@ -76,7 +76,6 @@ class TaxonomyEdit extends React.Component {
               !readOnly &&
               <UploadButton label="CSV import"
                             disabled={taxonomy.published}
-                            title={taxonomy.published ? 'Import not allowed for published Taxonomy' : null}
                             onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
 
             }
