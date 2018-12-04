@@ -3,7 +3,7 @@ import './errorBadge.scss'
 import React from 'react'
 import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
 
-const ErrorBadge = ({validation, showInvalidLabel}) => {
+const ErrorBadge = ({validation, showLabel}) => {
 
   const invalid = validation && !validation.valid
 
@@ -13,7 +13,7 @@ const ErrorBadge = ({validation, showInvalidLabel}) => {
         <div className="error-badge__warning">
           <span className="icon icon-warning icon-12px icon-left"/>
           {
-            showInvalidLabel &&
+            showLabel &&
             <span>INVALID</span>
           }
         </div>
@@ -29,7 +29,7 @@ const ErrorBadge = ({validation, showInvalidLabel}) => {
 
 ErrorBadge.defaultProps = {
   validation: null,
-  showInvalidLabel: true,
+  showLabel: true,
 }
 
 export default ErrorBadge

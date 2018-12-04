@@ -55,7 +55,7 @@ class ItemEdit extends React.Component {
       <div className={`category-edit__item ${active ? 'active' : ''}`}
            onClick={() => active ? null : setCategoryItemForEdit(category, level, item, true)}
            ref={this.elemRef}>
-        <ErrorBadge validation={validation} showInvalidLabel={false}/>
+        <ErrorBadge validation={validation} showLabel={false}/>
         {
           active
             ? (
