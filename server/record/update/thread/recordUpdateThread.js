@@ -44,7 +44,8 @@ class RecordUpdateThread extends Thread {
       switch (msg.type) {
         case messageTypes.persistNode:
           nodes = await RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file, t)
-          logMessage = R.omit(['user', 'type', 'surveyId'], msg)
+          console.log(msg)
+          logMessage = msg.node
           break
         case messageTypes.deleteNode:
           nodes = await RecordProcessor.deleteNode(msg.surveyId, msg.nodeUuid, t)

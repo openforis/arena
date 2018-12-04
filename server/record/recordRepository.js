@@ -86,7 +86,7 @@ const fetchRecordById = async (surveyId, recordId, client = db) =>
 // ============== DELETE
 const deleteRecord = async (user, surveyId, recordId, client = db) =>
   await client.tx(async t => {
-    const log = logActivity(user, surveyId, 'deleteRecord', recordId, t)
+    const log = logActivity(user, surveyId, 'deleteRecord', {recordId}, t)
     const query = await t.query(`
       DELETE FROM ${getSurveyDBSchema(surveyId)}.record
       WHERE id = $1

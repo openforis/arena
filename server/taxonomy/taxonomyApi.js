@@ -20,9 +20,9 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/taxonomies', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const {body} = req
+      const {body, user} = req
 
-      const taxonomy = await TaxonomyManager.createTaxonomy(surveyId, body)
+      const taxonomy = await TaxonomyManager.createTaxonomy(user, surveyId, body)
 
       res.json({taxonomy})
     } catch (err) {
@@ -104,10 +104,10 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyId = getRestParam(req, 'taxonomyId')
-      const {body} = req
+      const {body, user} = req
       const {key, value} = body
 
-      await TaxonomyManager.updateTaxonomyProp(surveyId, taxonomyId, key, value)
+      await TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomyId, key, value)
 
       await sendTaxonomies(res, surveyId, true, true)
     } catch (err) {
@@ -144,8 +144,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyId = getRestParam(req, 'taxonomyId')
+      const {user} = req
 
-      await TaxonomyManager.deleteTaxonomy(surveyId, taxonomyId)
+      await TaxonomyManager.deleteTaxonomy(user, surveyId, taxonomyId)
 
       await sendTaxonomies(res, surveyId, true, true)
     } catch (err) {

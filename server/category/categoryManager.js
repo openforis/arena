@@ -60,7 +60,7 @@ const insertItem = async (user, surveyId, item) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, 'insertCategoryLevel', {item}, t)
+    await logActivity(user, surveyId, 'insertCategoryItem', item, t)
 
     return itemDb
   })
