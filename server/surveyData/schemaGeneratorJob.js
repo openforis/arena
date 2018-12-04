@@ -1,5 +1,4 @@
 const R = require('ramda')
-const db = require('../db/db')
 const Job = require('../job/job')
 
 const SurveyManager = require('../survey/surveyManager')
@@ -18,8 +17,7 @@ class SchemaGeneratorJob extends Job {
     const survey = await this.getSurvey()
 
     const nodeDefs = R.pipe(
-      Survey.getNodeDefs,
-      R.values,
+      Survey.getNodeDefsArray,
       R.filter(nodeDef => NodeDef.isNodeDefEntity(nodeDef) || NodeDef.isNodeDefMultiple(nodeDef))
     )(survey)
 
@@ -31,8 +29,9 @@ class SchemaGeneratorJob extends Job {
     await DataSchema.createSchema(surveyId)
     this.incrementProcessedItems()
 
+    // create data tables
     for (const nodeDef of nodeDefs) {
-      await DataSchema.createNodeDefTable(surveyId, nodeDef)
+      await DataSchema.createNodeDefTable(survey, nodeDef)
       this.incrementProcessedItems()
     }
 

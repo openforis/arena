@@ -31,6 +31,7 @@ module.exports = {
 
   // ====== READ nodeDefs
   getNodeDefs: SurveyNodeDefs.getNodeDefs,
+  getNodeDefsArray: SurveyNodeDefs.getNodeDefsArray,
   getNodeDefByUuid: SurveyNodeDefs.getNodeDefByUuid,
   // getNodeDefById: SurveyNodeDefs.getNodeDefById,
   getRootNodeDef: SurveyNodeDefs.getRootNodeDef,
