@@ -3,6 +3,7 @@ const Promise = require('bluebird')
 const userRepository = require('./userRepository')
 
 const {fetchUserGroups} = require('../authGroup/authGroupRepository')
+const {comparePassword} = require('./userUtils')
 
 // ==== READ
 
@@ -15,12 +16,14 @@ const findUserById = async (userId) => {
 }
 
 const findUserByEmailAndPassword = async (email, password) => {
-  const user = await userRepository.findUserByEmailAndPassword(email, password)
+  const user = await userRepository.findUserByEmail(email)
 
-  if (!user) return null
+  if (user && await comparePassword(password, user.password)) {
+    const authGroups = await fetchUserGroups(user.id)
+    return {...user, authGroups}
+  }
 
-  const authGroups = await fetchUserGroups(user.id)
-  return {...user, authGroups}
+  return null
 }
 
 // ==== UPDATE
