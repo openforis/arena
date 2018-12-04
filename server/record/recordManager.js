@@ -1,4 +1,3 @@
-const R = require('ramda')
 const db = require('../db/db')
 
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
@@ -15,10 +14,10 @@ const RecordUpdateManager = require('./update/recordUpdateManager')
  * CREATE
  * ===================
  */
-const createRecord = async (userId, recordToCreate) => await db.tx(
+const createRecord = async (user, recordToCreate) => await db.tx(
   async t => {
 
-    RecordUpdateManager.checkIn(userId)
+    RecordUpdateManager.checkIn(user.id)
 
     const record = await RecordRepository.insertRecord(recordToCreate, t)
     const {surveyId, id: recordId} = record
@@ -26,7 +25,7 @@ const createRecord = async (userId, recordToCreate) => await db.tx(
     const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
     const rootNode = Node.newNode(rootNodeDef.uuid, recordId)
 
-    persistNode(userId, surveyId, rootNode)
+    persistNode(user, surveyId, rootNode)
 
     return record
   }
@@ -58,16 +57,16 @@ const fetchRecordById = async (surveyId, recordId) => {
  * ===================
  */
 
-const persistNode = (userId, surveyId, node, file) => RecordUpdateManager.persistNode(userId, surveyId, node, file)
+const persistNode = (user, surveyId, node, file) => RecordUpdateManager.persistNode(user, surveyId, node, file)
 
 /**
  * ===================
  * DELETE
  * ===================
  */
-const deleteRecord = async (surveyId, recordId) => await RecordRepository.deleteRecord(surveyId, recordId)
+const deleteRecord = async (user, surveyId, recordId) => await RecordRepository.deleteRecord(user, surveyId, recordId)
 
-const deleteNode = (userId, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(userId, surveyId, nodeUuid)
+const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(user, surveyId, nodeUuid)
 
 /**
  * ==================

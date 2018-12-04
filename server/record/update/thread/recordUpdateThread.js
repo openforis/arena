@@ -1,7 +1,10 @@
 const RecordProcessor = require('./recordProcessor')
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
+const R = require('ramda')
 
+const db = require('../../../db/db')
+const {logActivity} = require('../../../activityLog/activityLogger')
 const Queue = require('../../../../common/queue')
 
 class RecordUpdateThread extends Thread {
@@ -33,19 +36,25 @@ class RecordUpdateThread extends Thread {
   }
 
   async processMessage (msg) {
-    let nodes = null
+    await db.tx(async t => {
+      let nodesPromise = null
+      switch (msg.type) {
+        case messageTypes.persistNode:
+          nodesPromise = RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file, t)
+          break
+        case messageTypes.deleteNode:
+          nodesPromise = RecordProcessor.deleteNode(msg.surveyId, msg.nodeUuid, t)
+          break
+      }
 
-    switch (msg.type) {
-      case messageTypes.persistNode:
-        nodes = await RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file)
-        break
+      const {user, surveyId, type} = msg
+      const logPromise = logActivity(user, surveyId, type, R.omit(['user', 'type', 'surveyId'], msg), t)
 
-      case messageTypes.deleteNode:
-        nodes = await RecordProcessor.deleteNode(msg.surveyId, msg.nodeUuid)
-        break
-    }
+      const nodes = await nodesPromise
+      await logPromise
 
-    this.postMessage(nodes)
+      this.postMessage(nodes)
+    })
   }
 
 }

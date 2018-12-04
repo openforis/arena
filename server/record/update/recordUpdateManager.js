@@ -63,9 +63,9 @@ const cancelCheckOut = userId => {
  * @param node
  * @param file
  */
-const persistNode = (userId, surveyId, node, file) => {
-  const updateWorker = recordUpdateThreads.getThread(userId)
-  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, surveyId, node, file})
+const persistNode = (user, surveyId, node, file) => {
+  const updateWorker = recordUpdateThreads.getThread(user.id)
+  updateWorker.postMessage({user, type: recordThreadMessageTypes.persistNode, surveyId, node, file})
 }
 
 /**
@@ -75,9 +75,9 @@ const persistNode = (userId, surveyId, node, file) => {
  * @param surveyId
  * @param nodeUuid
  */
-const deleteNode = (userId, surveyId, nodeUuid) => {
-  const updateWorker = recordUpdateThreads.getThread(userId)
-  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, surveyId, nodeUuid})
+const deleteNode = (user, surveyId, nodeUuid) => {
+  const updateWorker = recordUpdateThreads.getThread(user.id)
+  updateWorker.postMessage({user, type: recordThreadMessageTypes.deleteNode, surveyId, nodeUuid})
 }
 
 module.exports = {

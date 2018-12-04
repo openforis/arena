@@ -18,7 +18,7 @@ module.exports.init = app => {
         throw new Error('Error record create. User is different')
       }
 
-      const record = await RecordManager.createRecord(user.id, recordReq)
+      const record = await RecordManager.createRecord(user, recordReq)
 
       res.json({record})
     } catch (err) {
@@ -34,7 +34,7 @@ module.exports.init = app => {
 
       const surveyId = getRestParam(req, 'surveyId')
 
-      RecordManager.persistNode(user.id, surveyId, node, file)
+      RecordManager.persistNode(user, surveyId, node, file)
 
       sendOk(res)
     } catch (err) {
@@ -121,8 +121,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const recordId = getRestParam(req, 'recordId')
+      const user = req.user
 
-      await RecordManager.deleteRecord(surveyId, recordId)
+      await RecordManager.deleteRecord(user, surveyId, recordId)
 
       sendOk(res)
     } catch (err) {
@@ -136,7 +137,7 @@ module.exports.init = app => {
       const nodeUuid = getRestParam(req, 'nodeUuid')
       const user = req.user
 
-      const nodes = await RecordManager.deleteNode(user.id, surveyId, nodeUuid)
+      const nodes = await RecordManager.deleteNode(user, surveyId, nodeUuid)
       res.json({nodes})
     } catch (err) {
       sendErr(res, err)
