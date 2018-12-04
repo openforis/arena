@@ -13,7 +13,7 @@ const createCategoryTest = async () => {
 
   expect(category.id).to.exist
 
-  const reloadedCategory = await CategoryManager.fetchCategoryById(surveyId, category.id, true, false)
+  const reloadedCategory = await CategoryManager.fetchCategoryById(surveyId, category.id, true, true)
 
   expect(reloadedCategory).to.deep.equal(category)
 }
