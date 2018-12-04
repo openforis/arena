@@ -5,9 +5,9 @@ import InputChips from '../../../../../commonComponents/form/inputChips'
 import Dropdown from '../../../../../commonComponents/form/dropdown'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
-import CodeList from '../../../../../../common/survey/codeList'
+import Category from '../../../../../../common/survey/category'
 
-const NodeDefCodeListDropdown = props => {
+const NodeDefCodeDropdown = props => {
   const {language, edit, nodeDef, items = [], selectedItems = [], onSelectedItemsChange} = props
 
   const disabled = R.isEmpty(items)
@@ -17,7 +17,7 @@ const NodeDefCodeListDropdown = props => {
                   items={items}
                   disabled={disabled}
                   itemKeyProp="uuid"
-                  itemLabelFunction={CodeList.getCodeListItemLabel(language)}
+                  itemLabelFunction={Category.getItemLabel(language)}
                   selection={selectedItems}
                   onChange={selectedItems => onSelectedItemsChange(selectedItems)}/>
 
@@ -25,9 +25,9 @@ const NodeDefCodeListDropdown = props => {
                 items={items}
                 disabled={disabled}
                 itemKeyProp="uuid"
-                itemLabelFunction={CodeList.getCodeListItemLabel(language)}
+                itemLabelFunction={Category.getItemLabel(language)}
                 selection={R.head(selectedItems)}
                 onChange={item => onSelectedItemsChange(item ? [item] : [])}/>
 }
 
-export default NodeDefCodeListDropdown
+export default NodeDefCodeDropdown

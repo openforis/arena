@@ -6,7 +6,7 @@ export const dashboardModules = {
 
   formDesigner: `${appModules.designer}/formDesigner`,
 
-  codeLists: `${appModules.designer}/codeLists`,
+  categories: `${appModules.designer}/categories`,
 
   taxonomies: `${appModules.designer}/taxonomies`,
 

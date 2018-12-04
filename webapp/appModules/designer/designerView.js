@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import TabBar from '../../commonComponents/tabBar'
 import SurveyInfo from './components/surveyInfo'
 import SurveyFormView from '../surveyForm/surveyFormView'
-import CodeLists from '../surveyForm/components/codeListsView'
+import Categories from '../surveyForm/components/categoriesView'
 import TaxonomiesView from '../surveyForm/components/taxonomiesView'
 
 import { initSurveyDefs } from '../../survey/actions'
@@ -51,9 +51,9 @@ class DesignerView extends React.Component {
           },
 
           {
-            label: 'Code Lists',
-            component: CodeLists,
-            path: appModuleUri(dashboardModules.codeLists)
+            label: 'Categories',
+            component: Categories,
+            path: appModuleUri(dashboardModules.categories)
           },
 
           {

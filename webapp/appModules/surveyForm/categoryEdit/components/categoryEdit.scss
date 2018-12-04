@@ -1,13 +1,13 @@
 @import "../../../../style/vars";
 
-.code-lists__edit {
+.category-edit {
   display: grid;
   grid-template-rows: 5rem 1fr 5rem;
   align-items: center;
   margin: 0 5rem;
 }
 
-.code-lists__edit-levels {
+.category-edit__levels {
   display: flex;
   //justify-content: center;
   overflow-x: auto;
@@ -18,7 +18,7 @@
   }
 }
 
-.code-lists__edit-level {
+.category-edit__level {
   min-width: 370px;
   display: grid;
   align-content: start;
@@ -32,7 +32,7 @@
   }
 }
 
-.code-lists__edit-level-header {
+.category-edit__level-header {
   display: flex;
   justify-content: space-between;
 
@@ -41,7 +41,7 @@
   }
 }
 
-.code-lists__edit-level-items-header {
+.category-edit__level-items-header {
   display: flex;
   justify-content: center;
   margin-top: 3rem;
@@ -55,12 +55,12 @@
   }
 }
 
-.code-lists__edit-level-items {
+.category-edit__level-items {
   height: calc(100vh - 25rem);
   overflow-y: auto;
 }
 
-.code-lists__edit-item {
+.category-edit__item {
   position: relative;
   border-bottom: 1px dotted rgba($white, 0.35);
   display: grid;

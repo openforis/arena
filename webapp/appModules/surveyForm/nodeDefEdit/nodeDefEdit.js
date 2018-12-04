@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import TabBar from '../../../commonComponents/tabBar'
 import BasicProps from './basic/basicProps'
 import AdvancedProps from './advanced/advancedProps'
-import CodeListsView from '../components/codeListsView'
+import CategoriesView from '../components/categoriesView'
 import TaxonomiesView from '../components/taxonomiesView'
 
 import Survey from '../../../../common/survey/survey'
@@ -23,7 +23,7 @@ class NodeDefEdit extends React.Component {
     super(props)
 
     this.state = {
-      editingCodeList: false,
+      editingCategory: false,
       editingTaxonomy: false
     }
   }
@@ -37,11 +37,11 @@ class NodeDefEdit extends React.Component {
       nodeDef,
       nodeDefKeyEditDisabled,
       putNodeDefProp,
-      canUpdateCodeList
+      canUpdateCategory
     } = this.props
 
     const {
-      editingCodeList,
+      editingCategory,
       editingTaxonomy,
     } = this.state
 
@@ -49,15 +49,15 @@ class NodeDefEdit extends React.Component {
       ? (
         <div className="node-def-edit">
           {
-            editingCodeList
-              ? <CodeListsView canSelect={canUpdateCodeList}
-                               onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
-                               selectedItemUUID={NodeDef.getNodeDefCodeListUUID(nodeDef)}
-                               onClose={() => this.setState({editingCodeList: false})}/>
+            editingCategory
+              ? <CategoriesView canSelect={canUpdateCategory}
+                                onSelect={category => putNodeDefProp(nodeDef, 'categoryUuid', category.uuid)}
+                                selectedItemUuid={NodeDef.getNodeDefCategoryUuid(nodeDef)}
+                                onClose={() => this.setState({editingCategory: false})}/>
               : editingTaxonomy
               ? <TaxonomiesView canSelect={true}
-                                onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
-                                selectedItemUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}
+                                onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUuid', taxonomy.uuid)}
+                                selectedItemUuid={NodeDef.getNodeDefTaxonomyUuid(nodeDef)}
                                 onClose={() => this.setState({editingTaxonomy: false})}/>
               : (
                 <div className="node-def-edit__container">
@@ -69,7 +69,7 @@ class NodeDefEdit extends React.Component {
                           <BasicProps nodeDef={nodeDef}
                                       nodeDefKeyEditDisabled={nodeDefKeyEditDisabled}
                                       putNodeDefProp={putNodeDefProp}
-                                      toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
+                                      toggleCategoryEdit={(editing) => this.setState({editingCategory: editing})}
                                       toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
                         ),
                       },

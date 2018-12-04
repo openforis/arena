@@ -32,7 +32,7 @@ const fetchNodesByRecordId = async (surveyId, recordId, client = db) =>
     dbTransformCallback
   )
 
-const fetchNodeByUUID = async (surveyId, uuid, client = db) =>
+const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
   await client.oneOrNone(`
     SELECT ${nodeColumns} FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1`,
@@ -40,31 +40,31 @@ const fetchNodeByUUID = async (surveyId, uuid, client = db) =>
     dbTransformCallback
   )
 
-const fetchNodeFileByUUID = async (surveyId, uuid, client = db) =>
+const fetchNodeFileByUuid = async (surveyId, uuid, client = db) =>
   await client.oneOrNone(`
     SELECT value, file FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1`,
     [uuid]
   )
 
-const fetchDescendantNodesByCodeUuid = async (surveyId, recordId, parentCodeNodeUUID, client = db) =>
+const fetchDescendantNodesByCodeUuid = async (surveyId, recordId, parentCodeNodeUuid, client = db) =>
   await client.map(`
     SELECT ${nodeColumns} FROM ${getSurveyDBSchema(surveyId)}.node n
     WHERE n.record_id = $1
-      AND n.value @> '{"h": ["${parentCodeNodeUUID}"]}'
+      AND n.value @> '{"h": ["${parentCodeNodeUuid}"]}'
     ORDER BY id`,
     [recordId],
     dbTransformCallback
   )
 
 // ============== UPDATE
-const updateNode = async (surveyId, nodeUUID, value, fileContent = null, client = db) =>
+const updateNode = async (surveyId, nodeUuid, value, fileContent = null, client = db) =>
   await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1, file = $2, date_modified = now()
     WHERE uuid = $3
     RETURNING ${nodeColumns}
-    `, [value ? JSON.stringify(value) : null, fileContent, nodeUUID],
+    `, [value ? JSON.stringify(value) : null, fileContent, nodeUuid],
     dbTransformCallback
   )
 
@@ -84,8 +84,8 @@ module.exports = {
 
   //READ
   fetchNodesByRecordId,
-  fetchNodeByUUID,
-  fetchNodeFileByUUID,
+  fetchNodeByUuid,
+  fetchNodeFileByUuid,
   fetchDescendantNodesByCodeUuid,
 
   //UPDATE

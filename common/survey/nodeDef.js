@@ -19,7 +19,7 @@ const nodeDefType = {
   date: 'date',
   time: 'time',
   boolean: 'boolean',
-  codeList: 'codeList',
+  code: 'code',
   coordinate: 'coordinate',
   taxon: 'taxon',
   file: 'file',
@@ -51,7 +51,7 @@ const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
-const isNodeDefCodeList = isNodeDefType(nodeDefType.codeList)
+const isNodeDefCode = isNodeDefType(nodeDefType.code)
 const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
 const isNodeDefPublished = R.propEq('published', true)
@@ -65,7 +65,7 @@ const canNodeDefBeMultiple = nodeDef =>
     getNodeDefType(nodeDef),
     [
       nodeDefType.decimal,
-      nodeDefType.codeList,
+      nodeDefType.code,
       nodeDefType.file,
       nodeDefType.integer,
       nodeDefType.text
@@ -73,12 +73,12 @@ const canNodeDefBeMultiple = nodeDef =>
   )
 
 const canNodeDefBeKey = nodeDef =>
-  R.contains(
+  R.includes(
     getNodeDefType(nodeDef),
     [
       nodeDefType.date,
       nodeDefType.decimal,
-      nodeDefType.codeList,
+      nodeDefType.code,
       nodeDefType.coordinate,
       nodeDefType.integer,
       nodeDefType.taxon,
@@ -111,9 +111,9 @@ module.exports = {
   getNodeDefLabels: getLabels,
   getNodeDefDescriptions: getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
-  getNodeDefCodeListUUID: getProp('codeListUUID'),
-  getNodeDefParentCodeUUID: getProp('parentCodeUUID'),
-  getNodeDefTaxonomyUUID: getProp('taxonomyUUID'),
+  getNodeDefCategoryUuid: getProp('categoryUuid'),
+  getNodeDefParentCodeDefUuid: getProp('parentCodeDefUuid'),
+  getNodeDefTaxonomyUuid: getProp('taxonomyUuid'),
 
   //advanced props
   getDefaultValues: getProp('defaultValues', []),
@@ -123,7 +123,7 @@ module.exports = {
   isNodeDefRoot,
   isNodeDefEntity,
   isNodeDefSingleEntity,
-  isNodeDefCodeList,
+  isNodeDefCode,
   isNodeDefTaxon,
   isNodeDefPublished,
 

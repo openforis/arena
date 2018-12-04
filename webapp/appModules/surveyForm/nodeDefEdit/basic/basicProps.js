@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
-import CodeListProps from './codeListProps'
+import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -21,7 +21,7 @@ const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValu
 const BasicProps = props => {
   const {
     nodeDef, nodeDefKeyEditDisabled,
-    putNodeDefProp, toggleTaxonomyEdit, toggleCodeListEdit
+    putNodeDefProp, toggleTaxonomyEdit, toggleCategoryEdit
   } = props
   const validation = getValidation(nodeDef)
 
@@ -47,10 +47,10 @@ const BasicProps = props => {
                     onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'descriptions', NodeDef.getNodeDefDescriptions(nodeDef))}/>
 
       {
-        NodeDef.isNodeDefCodeList(nodeDef) &&
-        <CodeListProps nodeDef={nodeDef}
-                       toggleCodeListEdit={toggleCodeListEdit}
-                       putNodeDefProp={putNodeDefProp}/>
+        NodeDef.isNodeDefCode(nodeDef) &&
+        <CodeProps nodeDef={nodeDef}
+                   toggleCategoryEdit={toggleCategoryEdit}
+                   putNodeDefProp={putNodeDefProp}/>
       }
 
       {

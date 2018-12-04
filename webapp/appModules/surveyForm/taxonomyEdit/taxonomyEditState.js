@@ -8,7 +8,7 @@ const surveyState = {
     //....
     // loaded taxonomy
     taxonomyEdit: {
-      taxonomyUUID: '',
+      taxonomyUuid: '',
       taxa: [],
       currentPage: 0,
       totalPages: 0,
@@ -19,15 +19,15 @@ const surveyState = {
 }
 
 const taxonomyEdit = 'taxonomyEdit'
-const taxonomyUUID = 'taxonomyUUID'
+const taxonomyUuid = 'taxonomyUuid'
 
 // ==== taxonomy for edit
-export const initTaxonomyEdit = uuid => uuid ? {taxonomyUUID: uuid} : null
+export const initTaxonomyEdit = uuid => uuid ? {[taxonomyUuid]: uuid} : null
 
 export const getTaxonomyEditTaxonomy = survey =>
   surveyForm => R.pipe(
-    R.path([taxonomyEdit, taxonomyUUID]),
-    uuid => Survey.getTaxonomyByUUID(uuid)(survey),
+    R.path([taxonomyEdit, taxonomyUuid]),
+    uuid => Survey.getTaxonomyByUuid(uuid)(survey),
   )(surveyForm)
 
 // ==== taxonomyEdit Props

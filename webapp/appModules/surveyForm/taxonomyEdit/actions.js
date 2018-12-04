@@ -26,7 +26,7 @@ const dispatchTaxonomyEditPropsUpdate = (dispatch, props) => dispatch({type: tax
 // ====== SET TAXONOMY FOR EDIT
 
 export const setTaxonomyForEdit = taxonomy => dispatch =>
-  dispatch({type: taxonomyEditUpdate, taxonomyUUID: taxonomy ? taxonomy.uuid : null})
+  dispatch({type: taxonomyEditUpdate, taxonomyUuid: taxonomy ? taxonomy.uuid : null})
 
 // ====== CREATE
 

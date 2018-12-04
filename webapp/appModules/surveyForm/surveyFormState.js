@@ -4,7 +4,7 @@ import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
 import Record from '../../../common/record/record'
 
-import { getPageUUID } from '../../../common/survey/nodeDefLayout'
+import { getPageUuid } from '../../../common/survey/nodeDefLayout'
 import { getRecord } from './record/recordState'
 
 export const getSurveyForm = R.prop('surveyForm')
@@ -18,18 +18,18 @@ const props = 'props'
 
 // ====== current form page nodeDef
 
-const pageNodeDefUUID = 'pageNodeDefUUID'
-const formPagePath = [props, pageNodeDefUUID]
+const pageNodeDefUuid = 'pageNodeDefUuid'
+const formPagePath = [props, pageNodeDefUuid]
 
 export const assocFormActivePage = (nodeDef) =>
   R.assoc(
-    pageNodeDefUUID,
+    pageNodeDefUuid,
     nodeDef ? nodeDef.uuid : null
   )
 
 export const getFormActivePageNodeDef = survey =>
   surveyForm => R.pipe(
-    Survey.getNodeDefByUUID(R.path(formPagePath, surveyForm)),
+    Survey.getNodeDefByUuid(R.path(formPagePath, surveyForm)),
     R.defaultTo(Survey.getRootNodeDef(survey))
   )(survey)
 
@@ -47,7 +47,7 @@ export const assocFormNodeDefEdit = nodeDef =>
   R.assoc(nodeDefEdit, nodeDef ? nodeDef.uuid : null)
 
 export const getFormNodeDefEdit = survey =>
-  surveyForm => Survey.getNodeDefByUUID(
+  surveyForm => Survey.getNodeDefByUuid(
     R.path(nodeDefEditPath, surveyForm)
   )(survey)
 
@@ -59,7 +59,7 @@ export const assocNodeDefFormUnlocked = nodeDef =>
   R.assoc(nodeDefUnlocked, nodeDef ? nodeDef.uuid : null)
 
 export const getNodeDefFormUnlocked = survey =>
-  surveyForm => Survey.getNodeDefByUUID(
+  surveyForm => Survey.getNodeDefByUuid(
     R.path(nodeDefEntityUnlockedPath, surveyForm)
   )(survey)
 
@@ -74,14 +74,14 @@ export const isNodeDefFormLocked = (nodeDef) => R.pipe(
 const pageNodes = 'pageNodes'
 const getSurveyFormPageNodePath = nodeDef => [props, pageNodes, nodeDef.uuid]
 
-export const assocFormPageNode = (nodeDef, nodeUUID) => {
+export const assocFormPageNode = (nodeDef, nodeUuid) => {
   const path = [pageNodes, nodeDef.uuid]
-  return nodeUUID
-    ? R.assocPath(path, nodeUUID)
+  return nodeUuid
+    ? R.assocPath(path, nodeUuid)
     : R.dissocPath(path)
 }
 
-export const getFormPageNodeUUID = nodeDef =>
+export const getFormPageNodeUuid = nodeDef =>
   R.path(getSurveyFormPageNodePath(nodeDef))
 
 export const getFormPageParentNode = (survey, nodeDef) =>
@@ -94,8 +94,8 @@ export const getFormPageParentNode = (survey, nodeDef) =>
       if (NodeDef.isNodeDefRoot(nodeDefParent)) {
         return Record.getRootNode(record)
       } else {
-        const parentNodeUUID = R.path(getSurveyFormPageNodePath(nodeDefParent))(surveyForm)
-        const node = Record.getNodeByUuid(parentNodeUUID)(record)
+        const parentNodeUuid = R.path(getSurveyFormPageNodePath(nodeDefParent))(surveyForm)
+        const node = Record.getNodeByUuid(parentNodeUuid)(record)
         return node
       }
 
@@ -115,7 +115,7 @@ export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
       assocNodeDefFormUnlocked(nodeDef),
       // if entity renders in its own page, assoc active page
       R.ifElse(
-        () => !!getPageUUID(nodeDef),
+        () => !!getPageUuid(nodeDef),
         assocFormActivePage(nodeDef),
         R.identity
       )

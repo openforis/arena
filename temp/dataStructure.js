@@ -24,7 +24,7 @@ const nodeDef = {
 
     // entity:
     ///layout
-    pageUUID: null, // uuid - if this entity renders in its own page
+    pageUuid: null, // uuid - if this entity renders in its own page
     render: 'form', //|| table
     layout: [],// rect-grid-layout layout value
 
@@ -32,10 +32,10 @@ const nodeDef = {
     calculated: false, //boolean expression
     defaultValues: [], //expression
 
-    //nodeDefCodeList
-    codeListUUID: id,
+    //nodeDefCode
+    categoryUuid: id,
     //or
-    parentCodeUUID: id,
+    parentCodeDefUuid: id,
 
     //all
     validations: [], //nodeDefValidation

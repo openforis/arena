@@ -1,14 +1,14 @@
 const Job = require('../../job/job')
 
 const NodeDefsValidationJob = require('./nodeDefsValidationJob')
-const CodeListsValidationJob = require('./codeListsValidationJob')
+const CategoriesValidationJob = require('./categoriesValidationJob')
 const TaxonomiesValidationJob = require('./taxonomiesValidationJob')
 const SurveyInfoValidationJob = require('./surveyInfoValidationJob')
 const SurveyPropsPublishJob = require('./surveyPropsPublishJob')
 
 const getDefaultInnerJobs = (params) => [
   new NodeDefsValidationJob(params),
-  new CodeListsValidationJob(params),
+  new CategoriesValidationJob(params),
   new TaxonomiesValidationJob(params),
   new SurveyInfoValidationJob(params),
   new SurveyPropsPublishJob(params),

@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import codeListEdit from './codeListEdit/reducer'
+import categoryEdit from './categoryEdit/reducer'
 import taxonomyEdit from './taxonomyEdit/reducer'
 import record from './record/reducer'
 
@@ -48,7 +48,7 @@ const props = exportReducer(actionHandlers)
 
 export default combineReducers({
   props,
-  codeListEdit,
+  categoryEdit,
   taxonomyEdit,
   record,
 })

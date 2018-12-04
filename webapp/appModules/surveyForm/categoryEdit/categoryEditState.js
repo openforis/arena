@@ -7,37 +7,37 @@ import { getSurveyForm } from '../surveyFormState'
 const surveyState = {
   survey: {
     //....
-    codeListEdit: {
+    categoryEdit: {
       uuid: '',
       levelItems: {
-        0: {'itemUUID': {}},
-        1: {'itemUUID': {}},
-        2: {'itemUUID': {}},
+        0: {'itemUuid': {}},
+        1: {'itemUuid': {}},
+        2: {'itemUuid': {}},
       },
       levelActiveItems: {
-        0: 'itemUUID',
-        1: 'itemUUID',
-        2: 'itemUUID',
+        0: 'itemUuid',
+        1: 'itemUuid',
+        2: 'itemUuid',
       }
     },
 
   },
 }
 
-const codeListEdit = 'codeListEdit'
+const categoryEdit = 'categoryEdit'
 
-const codeListUUID = 'codeListUUID'
+const categoryUuid = 'categoryUuid'
 const levelItems = 'levelItems'
 const levelActiveItems = 'levelActiveItems'
 
-// ==== current editing codeList
+// ==== current editing category
 
-export const initCodeListEdit = (codeListUUID) => codeListUUID ? {codeListUUID} : null
+export const initCategoryEdit = (categoryUuid) => categoryUuid ? {categoryUuid} : null
 
-export const getCodeListEditCodeList = survey =>
+export const getCategoryForEdit = survey =>
   surveyForm => R.pipe(
-    R.path([codeListEdit, codeListUUID]),
-    codeListUUUID => Survey.getCodeListByUUID(codeListUUUID)(survey),
+    R.path([categoryEdit, categoryUuid]),
+    categoryUuid => Survey.getCategoryByUuid(categoryUuid)(survey),
   )(surveyForm)
 
 // ==== level
@@ -51,8 +51,8 @@ export const dissocLevel = levelIndex => R.pipe(
 export const assocLevelItems = (levelIndex, items) =>
   R.assocPath([levelItems, levelIndex], items)
 
-export const getCodeListEditLevelItemsArray = (levelIndex) => R.pipe(
-  R.pathOr({}, [codeListEdit, levelItems, levelIndex]),
+export const getCategoryEditLevelItemsArray = (levelIndex) => R.pipe(
+  R.pathOr({}, [categoryEdit, levelItems, levelIndex]),
   R.values,
   R.sort((a, b) => Number(a.id) - Number(b.id)),
 )
@@ -75,19 +75,19 @@ export const dissocLevelItem = (levelIndex, itemUuid) => R.pipe(
 )
 
 // ==== level active item(s)
-const getLevelActiveItems = R.pathOr({}, [codeListEdit, levelActiveItems])
+const getLevelActiveItems = R.pathOr({}, [categoryEdit, levelActiveItems])
 
-const getLevelActiveItemUUID = levelIndex => R.pipe(
+const getLevelActiveItemUuid = levelIndex => R.pipe(
   getLevelActiveItems,
   R.prop(levelIndex),
 )
 
-export const getCodeListEditLevelActiveItem = levelIndex =>
+export const getCategoryEditLevelActiveItem = levelIndex =>
   surveyForm => R.pipe(
-    getLevelActiveItemUUID(levelIndex),
-    activeItemUUID => {
-      const levelItems = getCodeListEditLevelItemsArray(levelIndex)(surveyForm)
-      return R.find(item => item.uuid === activeItemUUID, levelItems)
+    getLevelActiveItemUuid(levelIndex),
+    activeItemUuid => {
+      const levelItems = getCategoryEditLevelItemsArray(levelIndex)(surveyForm)
+      return R.find(item => item.uuid === activeItemUuid, levelItems)
     },
   )(surveyForm)
 
@@ -100,13 +100,13 @@ export const assocLevelActiveItem = (levelIndex, itemUuid) => R.pipe(
 )
 
 const resetNextLevels = (levelIndex, prop) =>
-  codeListEditState => R.reduce(
+  categoryEditState => R.reduce(
     (acc, idx) => idx > levelIndex ? R.dissocPath([prop, idx], acc) : acc,
-    codeListEditState,
+    categoryEditState,
     R.pipe(
       R.prop(prop),
       R.keys,
       R.map(k => +k)
-    )(codeListEditState)
+    )(categoryEditState)
   )
 

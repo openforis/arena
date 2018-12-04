@@ -6,13 +6,13 @@ import ErrorBadge from '../../../../commonComponents/errorBadge'
 const TableRow = props => {
 
   const {
-    item, selectedItemUUID, itemLabelFunction,
+    item, selectedItemUuid, itemLabelFunction,
     canSelect, onSelect, onEdit, canDelete, onDelete, readOnly,
   } = props
 
   const name = R.defaultTo('--- undefined name ---', itemLabelFunction(item))
 
-  const selected = item.uuid === selectedItemUUID
+  const selected = item.uuid === selectedItemUuid
 
   return (
     <div className="table__row">

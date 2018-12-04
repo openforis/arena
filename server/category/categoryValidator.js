@@ -8,7 +8,7 @@ const {
   validateNotKeyword
 } = require('../../common/validation/validator')
 
-const CodeList = require('../../common/survey/codeList')
+const Category = require('../../common/survey/category')
 
 // ====== LEVELS
 
@@ -19,8 +19,8 @@ const levelValidators = (levels) => ({
 const validateLevel = async (levels, level) =>
   await validate(level, levelValidators(levels))
 
-const validateLevels = async (codeList) => {
-  const levels = CodeList.getCodeListLevelsArray(codeList)
+const validateLevels = async (category) => {
+  const levels = Category.getLevelsArray(category)
 
   const validations = await Promise.all(
     levels.map(
@@ -45,16 +45,16 @@ const itemValidators = (items) => ({
 const getChildrenItems = (items, parentItemUuid) =>
   items.filter(R.propEq('parentUuid', parentItemUuid))
 
-const validateItem = async (codeList, items, itemUuid) => {
+const validateItem = async (category, items, itemUuid) => {
   const item = R.find(R.propEq('uuid', itemUuid))(items)
   const validation = await validate(item, itemValidators(getChildrenItems(items, item.parentUuid)))
 
-  const isLeaf = CodeList.isCodeListItemLeaf(item)(codeList)
+  const isLeaf = Category.isItemLeaf(item)(category)
 
   if (isLeaf) {
     return {[item.uuid]: validation}
   } else {
-    const childValidations = await validateItemsByParentUUID(codeList, items, item.uuid)
+    const childValidations = await validateItemsByParentUuid(category, items, item.uuid)
 
     const childrenValid = childValidations.valid
 
@@ -72,12 +72,12 @@ const validateItem = async (codeList, items, itemUuid) => {
 
 }
 
-const validateItemsByParentUUID = async (codeList, items, parentItemUuid) => {
+const validateItemsByParentUuid = async (category, items, parentItemUuid) => {
   const children = getChildrenItems(items, parentItemUuid)
   const emptyChildren = R.isEmpty(children)
 
   const childValidations = await Promise.all(children.map(
-    async child => await validateItem(codeList, items, child.uuid)
+    async child => await validateItem(category, items, child.uuid)
   ))
 
   const childrenValid =
@@ -93,30 +93,30 @@ const validateItemsByParentUUID = async (codeList, items, parentItemUuid) => {
   }
 }
 
-// ====== CODE LIST
+// ====== CATEGORY
 
-const codeListValidators = (codeLists) => ({
-  'props.name': [validateRequired, validateNotKeyword, validateItemPropUniqueness(codeLists)],
+const categoryValidators = (categories) => ({
+  'props.name': [validateRequired, validateNotKeyword, validateItemPropUniqueness(categories)],
 })
 
-const validateCodeListProps = async (codeLists, codeList) =>
-  await validate(codeList, codeListValidators(codeLists))
+const validateCategoryProps = async (categories, category) =>
+  await validate(category, categoryValidators(categories))
 
-const validateCodeList = async (codeLists, codeList, items) => {
-  const codeListValidation = await validateCodeListProps(codeLists, codeList)
-  const levelsValidation = await validateLevels(codeList)
-  const itemsValidation = await validateItemsByParentUUID(codeList, items, null)
+const validateCategory = async (categories, category, items) => {
+  const categoryValidation = await validateCategoryProps(categories, category)
+  const levelsValidation = await validateLevels(category)
+  const itemsValidation = await validateItemsByParentUuid(category, items, null)
 
-  const valid = codeListValidation.valid && levelsValidation.valid && itemsValidation.valid
+  const valid = categoryValidation.valid && levelsValidation.valid && itemsValidation.valid
 
   return R.pipe(
     R.assoc('valid', valid),
     R.assocPath(['fields', 'levels'], levelsValidation),
     R.assocPath(['fields', 'items'], itemsValidation),
-  )(codeListValidation)
+  )(categoryValidation)
 
 }
 
 module.exports = {
-  validateCodeList,
+  validateCategory,
 }

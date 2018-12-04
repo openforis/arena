@@ -3,19 +3,19 @@ const R = require('ramda')
 const taxonomies = 'taxonomies'
 
 // ====== READ
-const getSurveyTaxonomies = R.propOr({}, taxonomies)
+const getTaxonomies = R.propOr({}, taxonomies)
 
-const getTaxonomiesArray = R.pipe(getSurveyTaxonomies, R.values)
+const getTaxonomiesArray = R.pipe(getTaxonomies, R.values)
 
-const getSurveyTaxonomyByUUID = uuid => R.pipe(getSurveyTaxonomies, R.prop(uuid))
+const getTaxonomyByUuid = uuid => R.pipe(getTaxonomies, R.prop(uuid))
 
 // ====== UPDATE
 const assocTaxonomies = newTaxonomies => R.assoc(taxonomies, newTaxonomies)
 
 module.exports = {
-  getSurveyTaxonomies,
+  getTaxonomies,
   getTaxonomiesArray,
-  getTaxonomyByUUID: getSurveyTaxonomyByUUID,
+  getTaxonomyByUuid,
 
   assocTaxonomies,
 }

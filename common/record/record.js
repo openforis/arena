@@ -74,7 +74,7 @@ const findNodeInAncestorEntities = (parentNode, predicate) => record => {
 
 const getParentCodeAttribute = (survey, parentNode, nodeDef) =>
   record => {
-    const parentCodeDef = Survey.getNodeDefByUUID(NodeDef.getNodeDefParentCodeUUID(nodeDef))(survey)
+    const parentCodeDef = Survey.getNodeDefByUuid(NodeDef.getNodeDefParentCodeDefUuid(nodeDef))(survey)
 
     return parentCodeDef
       ? findNodeInAncestorEntities(parentNode,
@@ -83,16 +83,16 @@ const getParentCodeAttribute = (survey, parentNode, nodeDef) =>
       : null
   }
 
-const getCodeUUIDsHierarchy = (survey, parentEntity, nodeDef) => record => {
+const getCodeUuidsHierarchy = (survey, parentEntity, nodeDef) => record => {
   const parentCode = getParentCodeAttribute(survey, parentEntity, nodeDef)(record)
 
   return parentCode
     ? R.append(
       parentCode.uuid,
-      getCodeUUIDsHierarchy(
+      getCodeUuidsHierarchy(
         survey,
         getParentNode(parentCode)(record),
-        Survey.getNodeDefByUUID(Node.getNodeDefUuid(parentCode))(survey)
+        Survey.getNodeDefByUuid(Node.getNodeDefUuid(parentCode))(survey)
       )(record),
     )
     : []
@@ -141,7 +141,7 @@ module.exports = {
   getNodeByUuid,
 
   // testing
-  getCodeUUIDsHierarchy,
+  getCodeUuidsHierarchy: getCodeUuidsHierarchy,
   getParentCodeAttribute,
 
   // ====== UPDATE

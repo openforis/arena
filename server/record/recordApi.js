@@ -69,12 +69,12 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordId/nodes/:nodeUUID/file', async (req, res) => {
+  app.get('/survey/:surveyId/record/:recordId/nodes/:nodeUuid/file', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const nodeUUID = getRestParam(req, 'nodeUUID')
+      const nodeUuid = getRestParam(req, 'nodeUuid')
 
-      const node = await RecordManager.fetchNodeFileByUUID(surveyId, nodeUUID)
+      const node = await RecordManager.fetchNodeFileByUuid(surveyId, nodeUuid)
       const value = Node.getNodeValue(node)
 
       res.setHeader('Content-disposition', `attachment; filename=${value.fileName}`)

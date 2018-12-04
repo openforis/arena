@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const SurveyCodeLists = require('./surveyCodeLists')
+const SurveyCategories = require('./surveyCategories')
 const NodeDef = require('./../nodeDef')
-const CodeList = require('./../codeList')
-const {toUUIDIndexedObj} = require('./../surveyUtils')
+const Category = require('../category')
+const {toUuidIndexedObj} = require('./../surveyUtils')
 
 const nodeDefs = 'nodeDefs'
 
@@ -19,7 +19,7 @@ const getNodeDefsByParentUuid = parentUuid => R.pipe(
 
 const getRootNodeDef = R.pipe(getNodeDefsByParentUuid(null), R.head)
 
-const getNodeDefByUUID = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
+const getNodeDefByUuid = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
 // const getNodeDefById = id => R.pipe(
 //   getNodeDefsArray,
@@ -33,23 +33,23 @@ const getNodeDefKeys = nodeDef => R.pipe(
   R.filter(n => NodeDef.isNodeDefKey(n))
 )
 
-const getNodeDefsByCodeListUUID = (uuid) => R.pipe(
+const getNodeDefsByCategoryUuid = (uuid) => R.pipe(
   getNodeDefsArray,
-  R.filter(R.pathEq(['props', 'codeListUUID'], uuid))
+  R.filter(R.pathEq(['props', 'categoryUuid'], uuid))
 )
 
-const getNodeDefsByTaxonomyUUID = (uuid) => R.pipe(
+const getNodeDefsByTaxonomyUuid = (uuid) => R.pipe(
   getNodeDefsArray,
-  R.filter(R.pathEq(['props', 'taxonomyUUID'], uuid))
+  R.filter(R.pathEq(['props', 'taxonomyUuid'], uuid))
 )
 
 // ====== UPDATE
 
-const assocNodeDefs = nodeDefsArray => R.assoc(nodeDefs, toUUIDIndexedObj(nodeDefsArray))
+const assocNodeDefs = nodeDefsArray => R.assoc(nodeDefs, toUuidIndexedObj(nodeDefsArray))
 
 // ====== UTILS
 
-const getNodeDefParent = nodeDef => getNodeDefByUUID(NodeDef.getNodeDefParentUuid(nodeDef))
+const getNodeDefParent = nodeDef => getNodeDefByUuid(NodeDef.getNodeDefParentUuid(nodeDef))
 
 const getNodeDefAncestors = nodeDef =>
   survey => {
@@ -72,20 +72,20 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }
 
-// ====== NODE DEFS CODE LIST UTILS
-const getNodeDefParentCode = nodeDef => getNodeDefByUUID(NodeDef.getNodeDefParentCodeUUID(nodeDef))
+// ====== NODE DEFS CODE UTILS
+const getNodeDefParentCode = nodeDef => getNodeDefByUuid(NodeDef.getNodeDefParentCodeDefUuid(nodeDef))
 
 const isNodeDefParentCode = nodeDef => R.pipe(
   getNodeDefsArray,
-  R.any(R.pathEq(['props', 'parentCodeUUID'], nodeDef.uuid)),
+  R.any(def => NodeDef.getNodeDefParentCodeDefUuid(def) === nodeDef.uuid),
 )
 
 const getNodeDefCodeCandidateParents = nodeDef =>
   survey => {
-    const codeList = SurveyCodeLists.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey)
+    const category = SurveyCategories.getCategoryByUuid(NodeDef.getNodeDefCategoryUuid(nodeDef))(survey)
 
-    if (codeList) {
-      const codeListLevelsLength = CodeList.getCodeListLevelsLength(codeList)
+    if (category) {
+      const levelsLength = Category.getLevelsArray(category).length
       const ancestors = getNodeDefAncestors(nodeDef)(survey)
 
       return R.reduce(
@@ -93,14 +93,14 @@ const getNodeDefCodeCandidateParents = nodeDef =>
           R.pipe(
             getNodeDefChildren(ancestor),
             R.reject(n =>
-              // reject different codeList nodeDef
-              NodeDef.getNodeDefCodeListUUID(n) !== codeList.uuid
+              // reject different code nodeDef
+              NodeDef.getNodeDefCategoryUuid(n) !== category.uuid
               ||
               // or itself
               n.uuid === nodeDef.uuid
               ||
               // leaves nodeDef
-              getNodeDefCodeListLevelIndex(n)(survey) === codeListLevelsLength - 1
+              getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
             ),
             R.concat(acc),
           )(survey),
@@ -113,15 +113,15 @@ const getNodeDefCodeCandidateParents = nodeDef =>
     }
   }
 
-const getNodeDefCodeListLevelIndex = nodeDef =>
+const getNodeDefCategoryLevelIndex = nodeDef =>
   survey => {
     const parentCodeNodeDef = getNodeDefParentCode(nodeDef)(survey)
     return parentCodeNodeDef
-      ? 1 + getNodeDefCodeListLevelIndex(parentCodeNodeDef)(survey)
+      ? 1 + getNodeDefCategoryLevelIndex(parentCodeNodeDef)(survey)
       : 0
   }
 
-const canUpdateCodeList = nodeDef =>
+const canUpdateCategory = nodeDef =>
   survey => {
     return !isNodeDefParentCode(nodeDef)(survey)
   }
@@ -132,12 +132,12 @@ module.exports = {
 
   // getNodeDefById,
   getRootNodeDef,
-  getNodeDefByUUID,
+  getNodeDefByUuid,
   getNodeDefChildren,
   getNodeDefKeys,
 
-  getNodeDefsByCodeListUUID,
-  getNodeDefsByTaxonomyUUID,
+  getNodeDefsByCategoryUuid,
+  getNodeDefsByTaxonomyUuid,
 
   // ====== UPDATE
   assocNodeDefs,
@@ -147,10 +147,10 @@ module.exports = {
   getNodeDefAncestors,
   isNodeDefAncestor,
 
-  // ====== NodeDef CodeList
-  getNodeDefCodeListLevelIndex,
+  // ====== NodeDef Code
+  getNodeDefCategoryLevelIndex,
   getNodeDefParentCode,
   getNodeDefCodeCandidateParents,
   isNodeDefParentCode,
-  canUpdateCodeList,
+  canUpdateCategory,
 }

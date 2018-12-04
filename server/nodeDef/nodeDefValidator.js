@@ -10,8 +10,8 @@ const {
 
 const NodeDef = require('../../common/survey/nodeDef')
 
-const validateCodeList = async (propName, nodeDef) =>
-  NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.codeList
+const validateCategory = async (propName, nodeDef) =>
+  NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.code
     ? validateRequired(propName, nodeDef)
     : null
 
@@ -58,8 +58,8 @@ const propsValidations = nodeDefs => ({
     validateNotKeyword,
     validateItemPropUniqueness(nodeDefs)
   ],
-  'props.codeListUUID': [validateCodeList],
-  'props.taxonomyUUID': [validateTaxonomy],
+  'props.categoryUuid': [validateCategory],
+  'props.taxonomyUuid': [validateTaxonomy],
   'props.key': [validateKey(nodeDefs)],
   'keyAttributes': [validateKeyAttributes(nodeDefs)]
 })

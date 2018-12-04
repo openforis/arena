@@ -5,7 +5,7 @@ import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
-import CodeList from '../../../../../common/survey/codeList'
+import Category from '../../../../../common/survey/category'
 import Validator from '../../../../../common/validation/validator'
 
 import {
@@ -19,48 +19,48 @@ import { getFormNodeDefEdit, getSurveyForm } from '../../surveyFormState'
 import Survey from '../../../../../common/survey/survey'
 import connect from 'react-redux/es/connect/connect'
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
-import { createCodeList, deleteCodeList } from '../../codeListEdit/actions'
+import { createCategory, deleteCategory } from '../../categoryEdit/actions'
 
-const CodeListProps = (props) => {
+const CodeProps = (props) => {
   const {
     nodeDef,
     putNodeDefProp,
-    codeLists,
-    canUpdateCodeList,
-    codeList,
+    categories,
+    canUpdateCategory,
+    category,
     candidateParentCodeNodeDefs,
     parentCodeDef,
-    createCodeList,
-    toggleCodeListEdit,
+    createCategory,
+    toggleCategoryEdit,
   } = props
 
   const validation = Validator.getValidation(nodeDef)
 
-  const disabled = !canUpdateCodeList
+  const disabled = !canUpdateCategory
 
   return (
     <React.Fragment>
 
-      <FormItem label={'Code List'}>
+      <FormItem label={'Category'}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr repeat(2, 100px)',
         }}>
           <Dropdown disabled={disabled}
-                    items={codeLists}
+                    items={categories}
                     itemKeyProp={'uuid'}
-                    itemLabelFunction={CodeList.getCodeListName}
-                    validation={Validator.getFieldValidation('codeListUUID')(validation)}
-                    selection={codeList}
-                    onChange={codeList => {
-                      putNodeDefProp(nodeDef, 'parentCodeUUID', null) //reset parent code
-                      putNodeDefProp(nodeDef, 'codeListUUID', codeList ? codeList.uuid : null)
+                    itemLabelFunction={Category.getName}
+                    validation={Validator.getFieldValidation('categoryUuid')(validation)}
+                    selection={category}
+                    onChange={category => {
+                      putNodeDefProp(nodeDef, 'parentCodeDefUuid', null) //reset parent code
+                      putNodeDefProp(nodeDef, 'categoryUuid', category ? category.uuid : null)
                     }}/>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
                   onClick={() => {
-                    createCodeList()
-                    toggleCodeListEdit(true)
+                    createCategory()
+                    toggleCategoryEdit(true)
                   }}>
 
             <span className="icon icon-plus icon-12px icon-left"/>
@@ -68,7 +68,7 @@ const CodeListProps = (props) => {
           </button>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
-                  onClick={() => toggleCodeListEdit(true)}>
+                  onClick={() => toggleCategoryEdit(true)}>
             <span className="icon icon-list icon-12px icon-left"/>
             MANAGE
           </button>
@@ -77,13 +77,13 @@ const CodeListProps = (props) => {
 
       <FormItem label={'Display As'}>
         <div>
-          <button className={`btn btn-of-light ${isRenderDropdown(nodeDef) ? 'active' : ''}`}
-                  onClick={() => putNodeDefProp(nodeDef, nodeDefLayoutProps.render, nodeDefRenderType.dropdown)}>
-            Dropdown
-          </button>
           <button className={`btn btn-of-light ${isRenderCheckbox(nodeDef) ? 'active' : ''}`}
                   onClick={() => putNodeDefProp(nodeDef, nodeDefLayoutProps.render, nodeDefRenderType.checkbox)}>
             Checkbox
+          </button>
+          <button className={`btn btn-of-light ${isRenderDropdown(nodeDef) ? 'active' : ''}`}
+                  onClick={() => putNodeDefProp(nodeDef, nodeDefLayoutProps.render, nodeDefRenderType.dropdown)}>
+            Dropdown
           </button>
         </div>
       </FormItem>
@@ -98,7 +98,7 @@ const CodeListProps = (props) => {
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={NodeDef.getNodeDefName}
-                    onChange={def => putNodeDefProp(nodeDef, 'parentCodeUUID', def ? def.uuid : null)}/>
+                    onChange={def => putNodeDefProp(nodeDef, 'parentCodeDefUuid', def ? def.uuid : null)}/>
         </div>
       </FormItem>
     </React.Fragment>
@@ -110,14 +110,14 @@ const mapStateToProps = state => {
   const surveyForm = getSurveyForm(state)
   const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
 
-  const isCodeList = NodeDef.isNodeDefCodeList(nodeDef)
+  const isCode = NodeDef.isNodeDefCode(nodeDef)
 
   return {
-    codeLists: isCodeList ? Survey.getCodeListsArray(survey) : null,
-    canUpdateCodeList: isCodeList ? Survey.canUpdateCodeList(nodeDef)(survey) : false,
-    codeList: isCodeList ? Survey.getCodeListByUUID(NodeDef.getNodeDefCodeListUUID(nodeDef))(survey) : null,
-    candidateParentCodeNodeDefs: isCodeList ? Survey.getNodeDefCodeCandidateParents(nodeDef)(survey) : null,
-    parentCodeDef: isCodeList ? Survey.getNodeDefParentCode(nodeDef)(survey) : null,
+    categories: isCode ? Survey.getCategoriesArray(survey) : null,
+    canUpdateCategory: isCode ? Survey.canUpdateCategory(nodeDef)(survey) : false,
+    category: isCode ? Survey.getCategoryByUuid(NodeDef.getNodeDefCategoryUuid(nodeDef))(survey) : null,
+    candidateParentCodeNodeDefs: isCode ? Survey.getNodeDefCodeCandidateParents(nodeDef)(survey) : null,
+    parentCodeDef: isCode ? Survey.getNodeDefParentCode(nodeDef)(survey) : null,
   }
 }
 
@@ -125,8 +125,8 @@ export default connect(
   mapStateToProps,
   {
     putNodeDefProp,
-    createCodeList,
-    deleteCodeList,
+    createCategory,
+    deleteCategory,
   }
-)(CodeListProps)
+)(CodeProps)
 

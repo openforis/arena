@@ -58,26 +58,29 @@ class TaxonomyEdit extends React.Component {
       <div className="taxonomy-edit">
 
         <div className="taxonomy-edit__header">
+
           <FormItem label="Taxonomy name">
-            <Input value={Taxonomy.getTaxonomyName(taxonomy)}
-                   validation={getFieldValidation('name')(validation)}
-                   onChange={value => putTaxonomyProp(taxonomy, 'name', normalizeName(value))}
-                   readOnly={readOnly}/>
+            <div>
+              <Input value={Taxonomy.getTaxonomyName(taxonomy)}
+                     validation={getFieldValidation('name')(validation)}
+                     onChange={value => putTaxonomyProp(taxonomy, 'name', normalizeName(value))}
+                     readOnly={readOnly}/>
+            </div>
           </FormItem>
 
-          {
-            !readOnly &&
-            <div className="button-bar">
+          <div className="button-bar">
+            {
+              !readOnly &&
               <UploadButton label="CSV import"
                             disabled={taxonomy.published}
                             title={taxonomy.published ? 'Import not allowed for published Taxonomy' : null}
                             onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
 
-              <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/export?draft=true`}
-                              disabled={R.isEmpty(taxa)}
-                              label="CSV Export"/>
-            </div>
-          }
+            }
+            <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/export?draft=true`}
+                            disabled={R.isEmpty(taxa)}
+                            label="CSV Export"/>
+          </div>
         </div>
 
 
