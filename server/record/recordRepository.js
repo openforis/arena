@@ -32,7 +32,7 @@ const insertRecord = async (record, client = db) =>
 const countRecordsBySurveyId = async (surveyId, client = db) =>
   await client.one(`SELECT count(*) FROM ${getSurveyDBSchema(surveyId)}.record`)
 
-const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset, limit, client = db) => {
+const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset = 0, limit = null, client = db) => {
   // select nodeDef key values
   const nodeDefKeyValues = nodeDefKeys.map((nodeDefKey, i) => `
     n${i}.value as ${NodeDef.getNodeDefName(nodeDefKey)} 
@@ -65,10 +65,10 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset, limi
       ON r.id = n.record_id
     ${R.isEmpty(nodeDefKeys) ? '' : nodeDefKeyJoins}
     ORDER BY r.id DESC
-    LIMIT $1
-    OFFSET $2
+    LIMIT ${limit ? limit : 'ALL'}
+    OFFSET ${offset}
   `,
-    [limit, offset],
+    [],
     dbTransformCallback(surveyId)
   )
 }

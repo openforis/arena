@@ -86,6 +86,7 @@ module.exports = {
   createRecord,
 
   //==== READ
+  fetchRecordById,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchNodeFileByUuid: NodeRepository.fetchNodeFileByUuid,
