@@ -29,9 +29,9 @@ const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = fal
     : taxonomies
 }
 
-const assocTaxonomyValidation = async (taxonomy, taxonomies = []) => ({
+const assocTaxonomyValidation = async (taxonomy, taxonomies = [], taxaCount = 0) => ({
   ...taxonomy,
-  validation: await validateTaxonomy(taxonomies, taxonomy)
+  validation: await validateTaxonomy(taxonomies, taxonomy, taxaCount)
 })
 
 const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate = false, client = db) => {
@@ -39,7 +39,8 @@ const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate =
 
   if (validate) {
     const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
-    return await assocTaxonomyValidation(taxonomy, taxonomies)
+    const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyId(surveyId, taxonomyId, client)
+    return await assocTaxonomyValidation(taxonomy, taxonomies, taxaCount)
   } else {
     return taxonomy
   }

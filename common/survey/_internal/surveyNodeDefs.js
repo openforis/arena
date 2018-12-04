@@ -93,13 +93,16 @@ const getNodeDefCodeCandidateParents = nodeDef =>
           R.pipe(
             getNodeDefChildren(ancestor),
             R.reject(n =>
-              // reject different code nodeDef
+              // reject multiple attributes
+              NodeDef.isNodeDefMultiple(n)
+              ||
+              // or different category nodeDef
               NodeDef.getNodeDefCategoryUuid(n) !== category.uuid
               ||
               // or itself
               n.uuid === nodeDef.uuid
               ||
-              // leaves nodeDef
+              // or leaves nodeDef
               getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
             ),
             R.concat(acc),

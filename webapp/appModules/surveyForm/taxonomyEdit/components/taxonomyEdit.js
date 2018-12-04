@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
+import ErrorBadge from '../../../../commonComponents/errorBadge'
 import TaxonTable from './taxonTable'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'
@@ -58,6 +59,8 @@ class TaxonomyEdit extends React.Component {
       <div className="taxonomy-edit">
 
         <div className="taxonomy-edit__header">
+
+          <ErrorBadge validation={validation}/>
 
           <FormItem label="Taxonomy name">
             <div>

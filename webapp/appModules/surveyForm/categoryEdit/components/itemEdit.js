@@ -3,6 +3,7 @@ import * as R from 'ramda'
 
 import LabelsEditor from '../../../../survey/components/labelsEditor'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
+import ErrorBadge from '../../../../commonComponents/errorBadge'
 
 import { normalizeName } from '../../../../../common/stringUtils'
 
@@ -49,33 +50,12 @@ class ItemEdit extends React.Component {
     } = this.props
 
     const validation = Category.getItemValidation(item)(category)
-    const validationGlobalErrorMessage = validation.valid
-      ? null
-      : R.pipe(
-        R.keys,
-        R.reject(field => getFieldValidation(field)(validation).valid),
-        R.map(field => {
-          const fieldValidation = getFieldValidation(field)(validation)
-          const fieldErrors = R.propOr([], 'errors', fieldValidation)
-          const fieldErrorMessage = R.isEmpty(fieldErrors) ? 'Invalid' : R.join(', ', fieldErrors)
-          return `${field}: ${fieldErrorMessage}`
-        }),
-        R.join('\n'),
-      )(validation.fields)
-
     const disabled = item.published
     return (
       <div className={`category-edit__item ${active ? 'active' : ''}`}
            onClick={() => active ? null : setCategoryItemForEdit(category, level, item, true)}
            ref={this.elemRef}>
-        {
-          !validation.valid &&
-          <span className="error-badge"
-                title={validationGlobalErrorMessage}>
-              <span className="icon icon-warning icon-12px"/>
-            </span>
-        }
-
+        <ErrorBadge validation={validation} showInvalidLabel={false}/>
         {
           active
             ? (

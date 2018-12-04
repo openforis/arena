@@ -2,7 +2,7 @@ import * as R from 'ramda'
 import React from 'react'
 
 const getFieldError = (field) => R.pipe(
-  R.path([field, 'errors']),
+  R.pathOr([], [field, 'errors']),
   R.join(', ')
 )
 
