@@ -24,9 +24,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
 
-      const {body} = req
+      const {body, user} = req
 
-      const category = await CategoryManager.insertCategory(surveyId, body)
+      const category = await CategoryManager.insertCategory(user, surveyId, body)
 
       res.json({category})
     } catch (err) {
@@ -38,9 +38,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const {body} = req
+      const {body, user} = req
 
-      await CategoryManager.insertLevel(surveyId, categoryId, body)
+      await CategoryManager.insertLevel(user, surveyId, categoryId, body)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -53,9 +53,9 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
 
-      const {body} = req
+      const {body, user} = req
 
-      const item = await CategoryManager.insertItem(surveyId, body)
+      const item = await CategoryManager.insertItem(user, surveyId, body)
 
       await sendValidatedCategory(surveyId, categoryId, res, {item})
     } catch (err) {
@@ -113,10 +113,10 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const {body} = req
+      const {body, user} = req
       const {key, value} = body
 
-      await CategoryManager.updateCategoryProp(surveyId, categoryId, key, value)
+      await CategoryManager.updateCategoryProp(user, surveyId, categoryId, key, value)
 
       await sendCategories(res, surveyId, true, true)
     } catch (err) {
@@ -129,10 +129,10 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
       const levelId = getRestParam(req, 'levelId')
-      const {body} = req
+      const {body, user} = req
       const {key, value} = body
 
-      await CategoryManager.updateLevelProp(surveyId, levelId, key, value)
+      await CategoryManager.updateLevelProp(user, surveyId, levelId, key, value)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -145,10 +145,10 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
       const itemId = getRestParam(req, 'itemId')
-      const {body} = req
+      const {body, user} = req
       const {key, value} = body
 
-      await CategoryManager.updateItemProp(surveyId, itemId, key, value)
+      await CategoryManager.updateItemProp(user, surveyId, itemId, key, value)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -162,8 +162,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
+      const {user} = req
 
-      await CategoryManager.deleteCategory(surveyId, categoryId)
+      await CategoryManager.deleteCategory(user, surveyId, categoryId)
 
       await sendCategories(res, surveyId, true, true)
     } catch (err) {
@@ -176,8 +177,9 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
       const levelId = getRestParam(req, 'levelId')
+      const {user} = req
 
-      await CategoryManager.deleteLevel(surveyId, levelId)
+      await CategoryManager.deleteLevel(user, surveyId, levelId)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -190,8 +192,9 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
       const itemId = getRestParam(req, 'itemId')
+      const {user} = req
 
-      await CategoryManager.deleteItem(surveyId, itemId)
+      await CategoryManager.deleteItem(user, surveyId, itemId)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {

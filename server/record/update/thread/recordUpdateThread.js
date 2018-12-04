@@ -18,7 +18,8 @@ class RecordUpdateThread extends Thread {
   onMessage (msg) {
     this.queue.enqueue(msg)
     this.processNext()
-      .then(() => {})
+      .then(() => {
+      })
   }
 
   async processNext () {
@@ -37,21 +38,22 @@ class RecordUpdateThread extends Thread {
 
   async processMessage (msg) {
     await db.tx(async t => {
-      let nodesPromise = null
+      let nodes = null
+      let logMessage
+
       switch (msg.type) {
         case messageTypes.persistNode:
-          nodesPromise = RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file, t)
+          nodes = await RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file, t)
+          logMessage = R.omit(['user', 'type', 'surveyId'], msg)
           break
         case messageTypes.deleteNode:
-          nodesPromise = RecordProcessor.deleteNode(msg.surveyId, msg.nodeUuid, t)
+          nodes = await RecordProcessor.deleteNode(msg.surveyId, msg.nodeUuid, t)
+          logMessage = {nodeUuid: msg.nodeUuid}
           break
       }
 
       const {user, surveyId, type} = msg
-      const logPromise = logActivity(user, surveyId, type, R.omit(['user', 'type', 'surveyId'], msg), t)
-
-      const nodes = await nodesPromise
-      await logPromise
+      await logActivity(user, surveyId, type, logMessage, t)
 
       this.postMessage(nodes)
     })

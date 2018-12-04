@@ -14,10 +14,10 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/nodeDef', requireSurveyEditPermission, async (req, res) => {
     try {
-      const {body: nodeDefRequest} = req
+      const {body: nodeDefRequest, user} = req
       const {surveyId, parentUuid, uuid, type, props} = nodeDefRequest
 
-      const nodeDef = await NodeDefManager.createNodeDef(surveyId, parentUuid, uuid, type, props)
+      const nodeDef = await NodeDefManager.createNodeDef(user, surveyId, parentUuid, uuid, type, props)
 
       res.json({nodeDef})
     } catch (err) {
@@ -31,13 +31,13 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/nodeDef/:nodeDefUuid/prop', requireSurveyEditPermission, async (req, res) => {
     try {
-      const {body} = req
+      const {body, user} = req
       const {key, value, advanced} = body
 
       const nodeDefUuid = getRestParam(req, 'nodeDefUuid')
       const surveyId = getRestParam(req, 'surveyId')
 
-      await NodeDefManager.updateNodeDefProp(surveyId, nodeDefUuid, key, value, advanced)
+      await NodeDefManager.updateNodeDefProp(user, surveyId, nodeDefUuid, key, value, advanced)
       const nodeDefs = await SurveyManager.fetchSurveyNodeDefs(surveyId, true, true)
 
       res.json({nodeDefs})
@@ -50,10 +50,11 @@ module.exports.init = app => {
 
   app.delete('/survey/:surveyId/nodeDef/:nodeDefUuid', requireSurveyEditPermission, async (req, res) => {
     try {
+      const {user} = req
       const nodeDefUuid = getRestParam(req, 'nodeDefUuid')
       const surveyId = getRestParam(req, 'surveyId')
 
-      await NodeDefManager.markNodeDefDeleted(surveyId, nodeDefUuid)
+      await NodeDefManager.markNodeDefDeleted(user, surveyId, nodeDefUuid)
 
       sendOk(res)
     } catch (e) {
