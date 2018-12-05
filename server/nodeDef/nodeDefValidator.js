@@ -20,13 +20,30 @@ const validateTaxonomy = async (propName, nodeDef) =>
     ? validateRequired(propName, nodeDef)
     : null
 
+const getChildren = nodeDefEntity => allNodeDefs =>
+  R.filter(n => NodeDef.getNodeDefParentUuid(n) === nodeDefEntity.uuid)(allNodeDefs)
+
+const validateChildren = (nodeDefs) =>
+  (propName, nodeDef) => {
+    if (NodeDef.isNodeDefEntity(nodeDef)) {
+      const children = getChildren(nodeDef)(nodeDefs)
+      if (R.isEmpty(children)) {
+        return 'empty'
+      }
+    }
+    return null
+  }
+
+const countKeyAttributes = nodeDefEntity => allNodeDefs => R.pipe(
+  getChildren(nodeDefEntity),
+  R.filter(NodeDef.isNodeDefKey),
+  R.length
+)(allNodeDefs)
+
 const validateKeyAttributes = (nodeDefs) =>
   (propName, nodeDef) => {
     if (NodeDef.isNodeDefEntity(nodeDef)) {
-      const keyAttributesCount = R.pipe(
-        R.filter(n => NodeDef.getNodeDefParentUuid(n) === nodeDef.uuid && NodeDef.isNodeDefKey(n)),
-        R.length
-      )(nodeDefs)
+      const keyAttributesCount = countKeyAttributes(nodeDef)(nodeDefs)
 
       if (NodeDef.isNodeDefRoot(nodeDef) && keyAttributesCount === 0) {
         return 'empty'
@@ -40,10 +57,7 @@ const validateKeyAttributes = (nodeDefs) =>
 const validateKey = nodeDefs =>
   (propName, nodeDef) => {
     if (!NodeDef.isNodeDefEntity(nodeDef) && NodeDef.isNodeDefKey(nodeDef)) {
-      const keyAttributesCount = R.pipe(
-        R.filter(n => NodeDef.getNodeDefParentUuid(n) === NodeDef.getNodeDefParentUuid(nodeDef) && NodeDef.isNodeDefKey(n)),
-        R.length
-      )(nodeDefs)
+      const keyAttributesCount = countKeyAttributes(nodeDef)(nodeDefs)
 
       if (keyAttributesCount > NodeDef.maxKeyAttributes) {
         return 'exceedingMax'
@@ -61,7 +75,8 @@ const propsValidations = nodeDefs => ({
   'props.categoryUuid': [validateCategory],
   'props.taxonomyUuid': [validateTaxonomy],
   'props.key': [validateKey(nodeDefs)],
-  'keyAttributes': [validateKeyAttributes(nodeDefs)]
+  'keyAttributes': [validateKeyAttributes(nodeDefs)],
+  'children': [validateChildren(nodeDefs)]
 })
 
 const validateNodeDef = async (nodeDefs, nodeDef) =>

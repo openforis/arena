@@ -92,7 +92,8 @@ const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false, client
       FROM ${getSurveyDBSchema(surveyId)}.taxon
       WHERE taxonomy_id = $1`,
     [taxonomyId],
-    R.prop('count'))
+    r => parseInt(r.count)
+  )
 
 const fetchTaxaByPropLike = async (surveyId,
                                    taxonomyId,

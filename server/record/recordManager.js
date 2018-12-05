@@ -4,7 +4,9 @@ const db = require('../db/db')
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
+const FileManager = require('../file/fileManager')
 const Node = require('../../common/record/node')
+const File = require('../../common/file/file')
 
 const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
@@ -58,7 +60,26 @@ const fetchRecordById = async (surveyId, recordId) => {
  * ===================
  */
 
-const persistNode = (userId, surveyId, node, file) => RecordUpdateManager.persistNode(userId, surveyId, node, file)
+const persistNode = (userId, surveyId, node, fileReq) => {
+  let nodeToPersist
+  if (fileReq) {
+    //save file to "file" table and set fileUuid and fileName into node value
+    const file = File.createFile(fileReq)
+
+    FileManager.insertFile(surveyId, file)
+
+    const nodeValue = {
+      fileUuid: file.uuid,
+      fileName: File.getName(file),
+      fileSize: File.getSize(file)
+    }
+
+    nodeToPersist = Node.assocValue(nodeValue, node)
+  } else {
+    nodeToPersist = node
+  }
+  RecordUpdateManager.persistNode(userId, surveyId, nodeToPersist)
+}
 
 /**
  * ===================
@@ -89,7 +110,7 @@ module.exports = {
   fetchRecordById,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
-  fetchNodeFileByUuid: NodeRepository.fetchNodeFileByUuid,
+  fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
 
   //==== UPDATE
   persistNode,

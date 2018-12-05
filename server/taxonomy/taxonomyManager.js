@@ -8,13 +8,13 @@ const {publishSurveySchemaTableProps, markSurveyDraft} = require('../survey/surv
 const Taxonomy = require('../../common/survey/taxonomy')
 
 const TaxonomyRepository = require('./taxonomyRepository')
-const {validateTaxonomy} = require('./taxonomyValidator')
+const TaxonomyValidator = require('./taxonomyValidator')
 
 /**
  * ====== CREATE
  */
 const createTaxonomy = async (surveyId, taxonomy) =>
-  await assocTaxonomyValidation(await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy))
+  await validateTaxonomy(surveyId, [], await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy))
 
 /**
  * ====== READ
@@ -24,22 +24,26 @@ const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = fal
 
   return validate
     ? await Promise.all(
-      taxonomies.map(async taxonomy => await assocTaxonomyValidation(taxonomy, taxonomies))
+      taxonomies.map(async taxonomy => await validateTaxonomy(surveyId, taxonomies, taxonomy))
     )
     : taxonomies
 }
 
-const assocTaxonomyValidation = async (taxonomy, taxonomies = []) => ({
-  ...taxonomy,
-  validation: await validateTaxonomy(taxonomies, taxonomy)
-})
+const validateTaxonomy = async (surveyId, taxonomies = [], taxonomy, client = db) => {
+  const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyId(surveyId, taxonomy.id, client)
+
+  return {
+    ...taxonomy,
+    validation: await TaxonomyValidator.validateTaxonomy(taxonomies, taxonomy, taxaCount)
+  }
+}
 
 const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate = false, client = db) => {
   const taxonomy = await TaxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft, client)
 
   if (validate) {
     const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
-    return await assocTaxonomyValidation(taxonomy, taxonomies)
+    return await validateTaxonomy(surveyId, taxonomies, taxonomy, client)
   } else {
     return taxonomy
   }

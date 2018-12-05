@@ -8,24 +8,24 @@ const Node = require('../../../../common/record/node')
 const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const NodeRepository = require('../../../record/nodeRepository')
 
-const persistNode = async (surveyId, node, file, client = db) => {
+const persistNode = async (surveyId, node, client = db) => {
   const {uuid} = node
 
   const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, client)
 
   return nodeDb
-    ? await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), file, client)
-    : await createNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, file, client)
+    ? await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), client)
+    : await createNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, client)
 }
 
 /**
  * Create a new node, and recursively creates inner nodes
  *
  */
-const createNode = async (surveyId, nodeDef, nodeToInsert, file, client = db) => {
+const createNode = async (surveyId, nodeDef, nodeToInsert, client = db) => {
 
   // insert node
-  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, file ? file.data : null, client)
+  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, client)
 
   // add children if entity
   const childDefs = NodeDef.isNodeDefEntity(nodeDef)
@@ -50,9 +50,9 @@ const createNode = async (surveyId, nodeDef, nodeToInsert, file, client = db) =>
  * Update a node value
  *
  */
-const updateNodeValue = async (surveyId, nodeUuid, value, file, client = db) =>
+const updateNodeValue = async (surveyId, nodeUuid, value, client = db) =>
   await client.tx(async t => {
-    const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, file ? file.data : null, client)
+    const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, client)
 
     return await onNodeUpdate(surveyId, node, t)
   })

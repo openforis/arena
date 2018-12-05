@@ -127,6 +127,7 @@ module.exports = {
 
   //READ
   getLevelName: getProp('name'),
+  getLevelIndex: R.prop('index'),
   getLevelValidation: levelIndex => R.pipe(
     getValidation,
     getFieldValidation('levels'),

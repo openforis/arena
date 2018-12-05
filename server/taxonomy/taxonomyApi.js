@@ -44,6 +44,21 @@ module.exports.init = app => {
     }
   })
 
+  app.get('/survey/:surveyId/taxonomies/:taxonomyId', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const draft = getBoolParam(req, 'draft')
+      const validate = getBoolParam(req, 'validate')
+
+      const taxonomy = await TaxonomyManager.fetchTaxonomyById(surveyId, taxonomyId, draft, validate)
+
+      res.json({taxonomy})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
   app.get('/survey/:surveyId/taxonomies/:taxonomyId/taxa/count', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
