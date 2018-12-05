@@ -1,4 +1,6 @@
 const R = require('ramda')
+const Promise = require('bluebird')
+
 const db = require('../db/db')
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
@@ -51,17 +53,22 @@ const insertIntoTable = async (survey, nodeDef, record) => {
 
   const nodes = Record.getNodesByDefUuid(nodeDef.uuid)(record)
 
+  const nodeValues = await Promise.all(nodes.map(async node =>
+    await DataTable.getRowValues(survey, nodeDef, record, node)
+  ))
+
   await db.tx(async t => await t.batch(
-    nodes.map(node => t.query(`
+    nodeValues.map(nodeValue => t.query(`
       INSERT INTO 
         ${getSchemaName(getSurveyId(survey))}.${getTableName(survey, nodeDef)}
         (${columnNames.join(',')})
       VALUES 
         (${columnNames.map((nodeDef, i) => `$${i + 1}`).join(',')})
       `,
-      [...DataTable.getRowValues(survey, nodeDef, record, node)]
+      [...nodeValue]
     ))
   ))
+
 }
 
 module.exports = {

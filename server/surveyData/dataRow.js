@@ -1,4 +1,5 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
@@ -20,15 +21,14 @@ const getNodeCol = (nodeDefCol, record, node) => {
 
 }
 
-const getValues = (survey, nodeDefRow, record, nodeRow, nodeDefColumns) =>
-  R.flatten(
-    nodeDefColumns.map(nodeDefCol => {
-        const nodeCol = getNodeCol(nodeDefCol, record, nodeRow)
-        return DataCol.getValues(survey, nodeDefCol, record, nodeRow, nodeCol)
-      }
-    )
+const getValues = async (survey, nodeDefRow, record, nodeRow, nodeDefColumns) => {
+  const values = await Promise.all(nodeDefColumns.map(async nodeDefCol => {
+      const nodeCol = getNodeCol(nodeDefCol, record, nodeRow)
+      return await DataCol.getValues(survey, nodeDefCol, record, nodeRow, nodeCol)
+    })
   )
-
+  return R.flatten(values)
+}
 module.exports = {
   getValues,
 }

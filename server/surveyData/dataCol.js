@@ -1,7 +1,11 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
+const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
 const Node = require('../../common/record/node')
+const CategoryManager = require('../category/categoryManager')
+
 const {nodeDefType} = NodeDef
 
 const nodeDefColumnFields = {
@@ -31,15 +35,18 @@ const getNamesAndType = nodeDef => R.pipe(
   ),
 )(nodeDef)
 
-const getValueProcessorFn = (nodeDef, colName) => {
+const getValueProcessorFn = (survey, nodeDef) => {
   const nodeDefName = NodeDef.getNodeDefName(nodeDef)
   const fns = {
-    [nodeDefType.code]: (node) => colName === nodeDefName + '_' + 'code'
-      //TODO
-      ? Node.getNodeValue(node).itemUuid
-      //'label'
-      : Node.getNodeValue(node).itemUuid + '_ label'
-    ,
+    [nodeDefType.code]: async (node, colName) => {
+      const surveyInfo = Survey.getSurveyInfo(survey)
+      const item = await CategoryManager.fetchItemByUuid(surveyInfo.id, Node.getNodeValue(node).itemUuid)
+
+      return colName === nodeDefName + '_' + 'code'
+        ? R.pathOr(null, ['props', 'code'], item)
+        //'label'
+        : R.pathOr(null, ['props', 'labels', Survey.getDefaultLanguage(surveyInfo)], item)
+    }
   }
 
   const defaultFn = (node) => Node.getNodeValue(node, null)
@@ -48,14 +55,16 @@ const getValueProcessorFn = (nodeDef, colName) => {
   return fn ? fn : defaultFn
 }
 
-const getValues = (survey, nodeDefCol, record, nodeRow, nodeCol = {}) => {
-  const _getValues = () => R.pipe(
-    getNames,
-    R.map(R.pipe(
-      colName => getValueProcessorFn(nodeDefCol, colName),
-      fn => fn(nodeCol),
-    ))
-  )(nodeDefCol)
+const getValues = async (survey, nodeDefCol, record, nodeRow, nodeCol = {}) => {
+  const _getValues = async () => {
+    const valueFn = getValueProcessorFn(survey, nodeDefCol)
+    const names = getNames(nodeDefCol)
+    return await Promise.all(
+      names.map(async colName =>
+        await valueFn(nodeCol, colName)
+      )
+    )
+  }
 
   // entity column
   return NodeDef.isNodeDefEntity(nodeDefCol)
@@ -63,7 +72,7 @@ const getValues = (survey, nodeDefCol, record, nodeRow, nodeCol = {}) => {
     // attribute column in multiple attribute table (value of its own table)
     : Node.getNodeDefUuid(nodeRow) === nodeDefCol.uuid
       ? [nodeRow.value]
-      : _getValues()
+      : await _getValues()
 }
 
 module.exports = {

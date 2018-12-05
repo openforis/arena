@@ -1,4 +1,5 @@
 const R = require('ramda')
+
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
 const DataRow = require('./dataRow')
@@ -40,12 +41,10 @@ const getColumnNamesAndType = (survey, nodeDef) => [
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType))
 ]
 
-const getRowValues = (survey, nodeDef, record, node) => [
-  node.uuid,
-  ...R.flatten(
-    DataRow.getValues(survey, nodeDef, record, node, getNodeDefColumns(survey, nodeDef))
-  )
-]
+const getRowValues = async (survey, nodeDef, record, node) => {
+  const rowValues = await DataRow.getValues(survey, nodeDef, record, node, getNodeDefColumns(survey, nodeDef))
+  return [node.uuid, ...R.flatten(rowValues)]
+}
 
 module.exports = {
   getColumnNames,
