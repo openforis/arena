@@ -100,14 +100,14 @@ module.exports.init = app => {
 
   // ====== UPDATE
 
-  app.put('/survey/:surveyId/taxonomies/:taxonomyId', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/taxonomies/:taxonomyUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
       const {body, user} = req
       const {key, value} = body
 
-      await TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomyId, key, value)
+      await TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomyUuid, key, value)
 
       await sendTaxonomies(res, surveyId, true, true)
     } catch (err) {
@@ -140,13 +140,13 @@ module.exports.init = app => {
 
   // ====== DELETE
 
-  app.delete('/survey/:surveyId/taxonomies/:taxonomyId', requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/taxonomies/:taxonomyUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
       const {user} = req
 
-      await TaxonomyManager.deleteTaxonomy(user, surveyId, taxonomyId)
+      await TaxonomyManager.deleteTaxonomy(user, surveyId, taxonomyUuid)
 
       await sendTaxonomies(res, surveyId, true, true)
     } catch (err) {

@@ -117,13 +117,13 @@ module.exports.init = app => {
   })
 
   // ==== DELETE
-  app.delete('/survey/:surveyId/record/:recordId', async (req, res) => {
+  app.delete('/survey/:surveyId/record/:recordUuid', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const recordId = getRestParam(req, 'recordId')
+      const recordUuid = getRestParam(req, 'recordUuid')
       const user = req.user
 
-      await RecordManager.deleteRecord(user, surveyId, recordId)
+      await RecordManager.deleteRecord(user, surveyId, recordUuid)
 
       sendOk(res)
     } catch (err) {

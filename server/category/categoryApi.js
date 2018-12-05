@@ -109,14 +109,14 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/categories/:categoryId', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/categories/:categoryUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const categoryId = getRestParam(req, 'categoryId')
+      const categoryUuid = getRestParam(req, 'categoryUuid')
       const {body, user} = req
       const {key, value} = body
 
-      await CategoryManager.updateCategoryProp(user, surveyId, categoryId, key, value)
+      await CategoryManager.updateCategoryProp(user, surveyId, categoryUuid, key, value)
 
       await sendCategories(res, surveyId, true, true)
     } catch (err) {
@@ -124,15 +124,15 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/survey/:surveyId/categories/:categoryId/levels/:levelId', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/categories/:categoryId/levels/:levelUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const levelId = getRestParam(req, 'levelId')
+      const levelUuid = getRestParam(req, 'levelUuid')
       const {body, user} = req
       const {key, value} = body
 
-      await CategoryManager.updateLevelProp(user, surveyId, levelId, key, value)
+      await CategoryManager.updateLevelProp(user, surveyId, levelUuid, key, value)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -140,15 +140,15 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/survey/:surveyId/categories/:categoryId/items/:itemId', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/categories/:categoryId/items/:itemUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const itemId = getRestParam(req, 'itemId')
+      const itemUuid = getRestParam(req, 'itemUuid')
       const {body, user} = req
       const {key, value} = body
 
-      await CategoryManager.updateItemProp(user, surveyId, itemId, key, value)
+      await CategoryManager.updateItemProp(user, surveyId, itemUuid, key, value)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -158,13 +158,13 @@ module.exports.init = app => {
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId/categories/:categoryId', requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/categories/:categoryUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const categoryId = getRestParam(req, 'categoryId')
+      const categoryUuid = getRestParam(req, 'categoryId')
       const {user} = req
 
-      await CategoryManager.deleteCategory(user, surveyId, categoryId)
+      await CategoryManager.deleteCategory(user, surveyId, categoryUuid)
 
       await sendCategories(res, surveyId, true, true)
     } catch (err) {
@@ -172,14 +172,14 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/categories/:categoryId/levels/:levelId', requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/categories/:categoryId/levels/:levelUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const levelId = getRestParam(req, 'levelId')
+      const levelUuid = getRestParam(req, 'levelUuid')
       const {user} = req
 
-      await CategoryManager.deleteLevel(user, surveyId, levelId)
+      await CategoryManager.deleteLevel(user, surveyId, levelUuid)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -187,14 +187,14 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/categories/:categoryId/items/:itemId', requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/categories/:categoryId/items/:itemUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const itemId = getRestParam(req, 'itemId')
+      const itemUuid = getRestParam(req, 'itemUuid')
       const {user} = req
 
-      await CategoryManager.deleteItem(user, surveyId, itemId)
+      await CategoryManager.deleteItem(user, surveyId, itemUuid)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {

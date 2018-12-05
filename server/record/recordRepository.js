@@ -36,7 +36,7 @@ const countRecordsBySurveyId = async (surveyId, client = db) =>
 const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset, limit, client = db) => {
   // select nodeDef key values
   const nodeDefKeyValues = nodeDefKeys.map((nodeDefKey, i) => `
-    n${i}.value as ${NodeDef.getNodeDefName(nodeDefKey)} 
+    n${i}.value as "${NodeDef.getNodeDefName(nodeDefKey)}" 
   `).join(', ')
 
   // join with node key values
@@ -45,6 +45,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset, limi
       ON r.id = n${i}.record_id
       AND n${i}.node_def_uuid = '${nodeDefKey.uuid}'
   `).join(' ')
+
 
   return await client.map(`
     SELECT 
@@ -84,14 +85,14 @@ const fetchRecordById = async (surveyId, recordId, client = db) =>
   )
 
 // ============== DELETE
-const deleteRecord = async (user, surveyId, recordId, client = db) =>
+const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
   await client.tx(async t => {
-    const log = logActivity(user, surveyId, activityType.record.delete, {recordId}, t)
+    const log = logActivity(user, surveyId, activityType.record.delete, {recordUuid}, t)
     const query = await t.query(`
       DELETE FROM ${getSurveyDBSchema(surveyId)}.record
-      WHERE id = $1
+      WHERE uuid = $1
       `,
-      [recordId]
+      [recordUuid]
     )
 
     await log

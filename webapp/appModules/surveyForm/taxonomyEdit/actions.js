@@ -76,7 +76,7 @@ export const putTaxonomyProp = (taxonomy, key, value) => async (dispatch, getSta
 
   const action = async () => {
     const surveyId = getStateSurveyId(getState())
-    const {data} = await axios.put(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}`, {key, value})
+    const {data} = await axios.put(`/api/survey/${surveyId}/taxonomies/${taxonomy.uuid}`, {key, value})
     dispatch({type: taxonomiesUpdate, taxonomies: data.taxonomies})
   }
   dispatch(debounceAction(action, `${taxonomyPropUpdate}_${taxonomy.uuid}`))
@@ -108,7 +108,7 @@ export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
   dispatch({type: taxonomyDelete, taxonomy})
 
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}`)
+  const {data} = await axios.delete(`/api/survey/${surveyId}/taxonomies/${taxonomy.uuid}`)
   dispatch({type: taxonomiesUpdate, taxonomies: data.taxonomies})
 }
 
