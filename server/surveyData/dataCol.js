@@ -36,14 +36,14 @@ const getNamesAndType = nodeDef => R.pipe(
   ),
 )(nodeDef)
 
-const getValueProcessorFn = (survey, nodeDef) => {
-  const nodeDefName = NodeDef.getNodeDefName(nodeDef)
+const getValueProcessorFn = async (survey, nodeDefCol, nodeCol) => {
+  const nodeDefName = NodeDef.getNodeDefName(nodeDefCol)
   const fns = {
-    [nodeDefType.code]: async (node, colName) => {
+    [nodeDefType.code]: async () => {
       const surveyInfo = Survey.getSurveyInfo(survey)
-      const item = await CategoryManager.fetchItemByUuid(surveyInfo.id, Node.getNodeValue(node).itemUuid)
+      const item = await CategoryManager.fetchItemByUuid(surveyInfo.id, Node.getNodeValue(nodeCol).itemUuid)
 
-      return colName === nodeDefName + '_' + 'code'
+      return (node, colName) => colName === nodeDefName + '_' + 'code'
         ? SurveyUtils.getProp('code')(item)
         //'label'
         : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
@@ -52,18 +52,15 @@ const getValueProcessorFn = (survey, nodeDef) => {
 
   const defaultFn = (node) => Node.getNodeValue(node, null)
 
-  const fn = fns[NodeDef.getNodeDefType(nodeDef)]
-  return fn ? fn : defaultFn
+  const fn = fns[NodeDef.getNodeDefType(nodeDefCol)]
+  return fn ? await fn() : defaultFn
 }
 
 const getValues = async (survey, nodeDefCol, record, nodeRow, nodeCol = {}) => {
   const _getValues = async () => {
-    const valueFn = getValueProcessorFn(survey, nodeDefCol)
-    const names = getNames(nodeDefCol)
-    return await Promise.all(
-      names.map(async colName =>
-        await valueFn(nodeCol, colName)
-      )
+    const valueFn = await getValueProcessorFn(survey, nodeDefCol, nodeCol)
+    return getNames(nodeDefCol).map(colName =>
+      valueFn(nodeCol, colName)
     )
   }
 
