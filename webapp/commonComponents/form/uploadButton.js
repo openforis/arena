@@ -1,6 +1,12 @@
 import './uploadButton.scss'
 
 import React from 'react'
+import * as R from 'ramda'
+
+const checkFilesSize = (files, maxSizeMB) =>
+  R.find(file => file.size > maxSizeMB * 1024 * 1024, files)
+    ? alert(`File exceeds maximum size (${maxSizeMB}MB)`)
+    : true
 
 class UploadButton extends React.Component {
 
@@ -11,14 +17,19 @@ class UploadButton extends React.Component {
   }
 
   render () {
-    const {disabled, label, onChange, showLabel} = this.props
+    const {disabled, label, onChange, showLabel, maxSize} = this.props
 
     return <React.Fragment>
       <input
         ref={this.fileInput}
         type="file"
         style={{display: 'none'}}
-        onChange={() => onChange(this.fileInput.current.files)}/>
+        onChange={() => {
+          const files = this.fileInput.current.files
+          if (checkFilesSize(files, maxSize)) {
+            onChange(files)
+          }
+        }}/>
 
       <button className="btn btn-of btn-upload"
               aria-disabled={disabled}
@@ -39,7 +50,8 @@ UploadButton.defaultProps = {
   disabled: false,
   label: 'Upload',
   onChange: null,
-  showLabel: true
+  showLabel: true,
+  maxSize: 10 //mega bytes
 }
 
 export default UploadButton
