@@ -5,7 +5,7 @@ const SurveyManager = require('../survey/surveyManager')
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
 const RecordManager = require('../record/recordManager')
-const DataSchema = require('./dataSchema')
+const SchemaGenerator = require('./schemaGenerator')
 
 class SchemaGeneratorJob extends Job {
 
@@ -27,15 +27,15 @@ class SchemaGeneratorJob extends Job {
 
     this.total = 2 + nodeDefs.length + (recordSummaries.length * nodeDefs.length)
 
-    await DataSchema.dropSchema(surveyId)
+    await SchemaGenerator.dropSchema(surveyId)
     this.incrementProcessedItems()
 
-    await DataSchema.createSchema(surveyId)
+    await SchemaGenerator.createSchema(surveyId)
     this.incrementProcessedItems()
 
     // create data tables
     for (const nodeDef of nodeDefs) {
-      await DataSchema.createNodeDefTable(survey, nodeDef)
+      await SchemaGenerator.createNodeDefTable(survey, nodeDef)
       this.incrementProcessedItems()
     }
 
@@ -43,7 +43,7 @@ class SchemaGeneratorJob extends Job {
     for (const recordSummary of recordSummaries) {
       const record = await RecordManager.fetchRecordById(surveyId, recordSummary.id)
       for (const nodeDef of nodeDefs) {
-        await DataSchema.populateNodeDefTable(survey, nodeDef, record)
+        await SchemaGenerator.populateNodeDefTable(survey, nodeDef, record)
         this.incrementProcessedItems()
       }
     }

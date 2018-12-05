@@ -40,7 +40,9 @@ module.exports = {
   getNodeDefsByTaxonomyUuid: SurveyNodeDefs.getNodeDefsByTaxonomyUuid,
   getNodeDefParent: SurveyNodeDefs.getNodeDefParent,
   getNodeDefKeys: SurveyNodeDefs.getNodeDefKeys,
+  // hierarchy
   isNodeDefAncestor: SurveyNodeDefs.isNodeDefAncestor,
+  getAncestorsHierarchy: SurveyNodeDefs.getAncestorsHierarchy,
 
   // ====== UPDATE nodeDefs
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,
