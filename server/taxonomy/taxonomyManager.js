@@ -10,7 +10,7 @@ const Taxonomy = require('../../common/survey/taxonomy')
 const TaxonomyRepository = require('./taxonomyRepository')
 const {validateTaxonomy} = require('./taxonomyValidator')
 
-const {logActivity} = require('../activityLog/activityLogger')
+const {logActivity, activityType} = require('../activityLog/activityLogger')
 
 /**
  * ====== CREATE
@@ -19,7 +19,7 @@ const createTaxonomy = async (user, surveyId, taxonomy) =>
   await db.tx(async t => {
     await assocTaxonomyValidation(await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy, t))
 
-    await logActivity(user, surveyId, 'createTaxonomy', taxonomy, t)
+    await logActivity(user, surveyId, activityType.taxonomy.create, taxonomy, t)
   })
 
 /**
@@ -101,7 +101,7 @@ const updateTaxonomyProp = async (user, surveyId, taxonomyId, key, value, client
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, 'updateTaxonomyProp', {key, value}, t)
+    await logActivity(user, surveyId, activityType.taxonomy.propUpdate, {key, value}, t)
 
     return updatedTaxonomy
   })
@@ -114,7 +114,7 @@ const deleteTaxonomy = async (user, surveyId, taxonomyId) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, 'deleteTaxonomy', {taxonomyId}, t)
+    await logActivity(user, surveyId, activityType.taxonomy.delete, {taxonomyId}, t)
   })
 
 module.exports = {

@@ -4,7 +4,7 @@ const nodeDefRepository = require('./nodeDefRepository')
 
 const {markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
 
-const {logActivity} = require('../activityLog/activityLogger')
+const {logActivity, activityType} = require('../activityLog/activityLogger')
 
 const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props) =>
   await db.tx(async t => {
@@ -12,7 +12,7 @@ const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, 'createNodeDef', {parentUuid, uuid, type, props}, t)
+    await logActivity(user, surveyId, activityType.nodeDef.create, {parentUuid, uuid, type, props}, t)
 
     return nodeDef
   })
@@ -23,7 +23,7 @@ const updateNodeDefProp = async (user, surveyId, nodeDefUuid, key, value, advanc
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, 'updateNodeDefProp', {nodeDefUuid, key, value, advanced}, t)
+    await logActivity(user, surveyId, activityType.nodeDef.update, {nodeDefUuid, key, value, advanced}, t)
 
     return nodeDef
   })
@@ -34,7 +34,7 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, 'markNodeDefDeleted', {nodeDefUuid}, t)
+    await logActivity(user, surveyId, activityType.nodeDef.markDeleted, {nodeDefUuid}, t)
 
     return nodeDef
   })
