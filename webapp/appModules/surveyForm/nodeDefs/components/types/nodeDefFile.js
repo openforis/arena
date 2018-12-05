@@ -17,7 +17,7 @@ const FileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode, remov
                   showLabel={false}
                   onChange={files => updateNode(nodeDef, node, null, files[0])}/>
 
-    <DownloadButton href={`/api/survey/${surveyInfo.id}/record/${recordId}/nodes/${node.uuid}/file`}
+    <DownloadButton href={edit ? null : `/api/survey/${surveyInfo.id}/record/${recordId}/nodes/${node.uuid}/file`}
                     disabled={!fileUploaded}
                     label={truncatedFileName}
                     title={fileName === truncatedFileName ? null : fileName}/>
