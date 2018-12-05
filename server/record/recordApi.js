@@ -1,10 +1,12 @@
 const R = require('ramda')
 
 const {getRestParam} = require('../serverUtils/request')
-const {sendErr, sendOk} = require('../serverUtils/response')
+const {sendErr, sendOk, sendFile} = require('../serverUtils/response')
+
+const Node = require('../../common/record/node')
 
 const RecordManager = require('./recordManager')
-const Node = require('../../common/record/node')
+const FileManager = require('../file/fileManager')
 
 module.exports.init = app => {
 
@@ -74,14 +76,10 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUuid = getRestParam(req, 'nodeUuid')
 
-      const node = await RecordManager.fetchNodeFileByUuid(surveyId, nodeUuid)
-      const value = Node.getNodeValue(node)
+      const node = await RecordManager.fetchNodeByUuid(surveyId, nodeUuid)
+      const file = await FileManager.fetchFileByUuid(surveyId, R.prop('fileUuid', Node.getNodeValue(node)))
 
-      res.setHeader('Content-disposition', `attachment; filename=${value.fileName}`)
-      // res.set('Content-Type', 'text/csv')
-
-      res.write(node.file, 'binary')
-      res.end(null, 'binary')
+      sendFile(res, file)
     } catch (err) {
       sendErr(res, err)
     }
