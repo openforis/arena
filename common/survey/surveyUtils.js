@@ -1,7 +1,6 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
-
 // READ
 const getProps = R.propOr({}, 'props')
 
@@ -11,6 +10,11 @@ const getProp = (prop, defaultTo = null) => R.pipe(
 )
 
 const getLabels = getProp('labels', {})
+
+const getLabel = (lang, defaultTo = null) => R.pipe(
+  getLabels,
+  R.propOr(defaultTo, lang)
+)
 
 //UPDATE
 const setProp = (key, value) => R.assocPath(['props', key], value)
@@ -27,7 +31,9 @@ module.exports = {
   // PROPS
   getProps,
   getProp,
-  getLabels,
-
   setProp,
+
+  // LABELS
+  getLabels,
+  getLabel,
 }

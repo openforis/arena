@@ -2,6 +2,7 @@ const R = require('ramda')
 const Promise = require('bluebird')
 
 const Survey = require('../../common/survey/survey')
+const SurveyUtils = require('../../common/survey/surveyUtils')
 const NodeDef = require('../../common/survey/nodeDef')
 const Node = require('../../common/record/node')
 const CategoryManager = require('../category/categoryManager')
@@ -43,9 +44,9 @@ const getValueProcessorFn = (survey, nodeDef) => {
       const item = await CategoryManager.fetchItemByUuid(surveyInfo.id, Node.getNodeValue(node).itemUuid)
 
       return colName === nodeDefName + '_' + 'code'
-        ? R.pathOr(null, ['props', 'code'], item)
+        ? SurveyUtils.getProp('code')(item)
         //'label'
-        : R.pathOr(null, ['props', 'labels', Survey.getDefaultLanguage(surveyInfo)], item)
+        : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
     }
   }
 
