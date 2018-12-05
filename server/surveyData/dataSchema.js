@@ -1,13 +1,23 @@
 const R = require('ramda')
 const db = require('../db/db')
 const Survey = require('../../common/survey/survey')
+const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
-const DataTable = require('./nodeDefDataTable')
+const DataTable = require('./DataTable')
 
 const getSurveyId = R.pipe(Survey.getSurveyInfo, R.prop('id'))
 
-// ==== Schema
 const getSchemaName = surveyId => `survey_${surveyId}_data`
+
+const getTableName = (survey, nodeDef) => {
+  const prefix = NodeDef.isNodeDefEntity(nodeDef)
+    ? nodeDef.id
+    : `${Survey.getNodeDefParent(nodeDef)(survey).id}_${nodeDef.id}`
+
+  return `_${prefix}_data`
+}
+
+// ==== Schema
 
 const dropSchema = async surveyId =>
   await db.query(`DROP SCHEMA IF EXISTS ${getSchemaName(surveyId)} CASCADE`)
@@ -15,22 +25,19 @@ const dropSchema = async surveyId =>
 const createSchema = async surveyId =>
   await db.query(`CREATE SCHEMA ${getSchemaName(surveyId)}`)
 
-// ==== NodeDef Tables
+// ==== Tables
 
-const createNodeDefTable = async (survey, nodeDef) => {
-
-  const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDef)
-  const sqlColumns = R.flatten(nodeDefColumns.map(DataTable.getColumnsWithType))
+const createTable = async (survey, nodeDef) => {
+  const cols = DataTable.getColumnNamesAndType(survey, nodeDef)
 
   await db.query(`
     CREATE TABLE
-      ${getSchemaName(getSurveyId(survey))}.${DataTable.getTableName(survey, nodeDef)}
+      ${getSchemaName(getSurveyId(survey))}.${getTableName(survey, nodeDef)}
     (
       id          bigserial NOT NULL,
-      uuid        uuid      NOT NULL,
       date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
-      ${sqlColumns.join(',')},
+      ${cols.join(',')},
       PRIMARY KEY (id)
     )
   `)
@@ -38,33 +45,21 @@ const createNodeDefTable = async (survey, nodeDef) => {
 
 // ==== DATA INSERT
 
-const populateNodeDefTable = async (survey, nodeDef, record) => {
+const insertIntoTable = async (survey, nodeDef, record) => {
 
-  const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDef)
+  const columnNames = DataTable.getColumnNames(survey, nodeDef)
 
-  const columnNames = ['uuid', ...R.flatten(nodeDefColumns.map(DataTable.getColumnNames))]
-  const rowValues = (node) => {
-    const v = [
-      node.uuid,
-      ...R.flatten(
-        nodeDefColumns.map(nodeDef =>
-          DataTable.getColumnValues(survey, nodeDef, record, node)
-        )
-      )
-    ]
-    return v
-  }
   const nodes = Record.getNodesByDefUuid(nodeDef.uuid)(record)
 
   await db.tx(async t => await t.batch(
     nodes.map(node => t.query(`
       INSERT INTO 
-        ${getSchemaName(getSurveyId(survey))}.${DataTable.getTableName(survey, nodeDef)}
+        ${getSchemaName(getSurveyId(survey))}.${getTableName(survey, nodeDef)}
         (${columnNames.join(',')})
       VALUES 
         (${columnNames.map((nodeDef, i) => `$${i + 1}`).join(',')})
       `,
-      [...rowValues(node)]
+      [...DataTable.getRowValues(survey, nodeDef, record, node)]
     ))
   ))
 }
@@ -72,7 +67,7 @@ const populateNodeDefTable = async (survey, nodeDef, record) => {
 module.exports = {
   dropSchema,
   createSchema,
-  createNodeDefTable,
 
-  populateNodeDefTable,
+  createTable,
+  insertIntoTable,
 }

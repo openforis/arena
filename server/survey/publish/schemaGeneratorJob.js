@@ -1,11 +1,11 @@
 const R = require('ramda')
-const Job = require('../job/job')
+const Job = require('../../job/job')
 
-const SurveyManager = require('../survey/surveyManager')
-const Survey = require('../../common/survey/survey')
-const NodeDef = require('../../common/survey/nodeDef')
-const RecordManager = require('../record/recordManager')
-const SchemaGenerator = require('./schemaGenerator')
+const SurveyManager = require('../surveyManager')
+const Survey = require('../../../common/survey/survey')
+const NodeDef = require('../../../common/survey/nodeDef')
+const RecordManager = require('../../record/recordManager')
+const DataSchema = require('../../surveyData/dataSchema')
 
 class SchemaGeneratorJob extends Job {
 
@@ -25,17 +25,15 @@ class SchemaGeneratorJob extends Job {
 
     const {records: recordSummaries} = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, 0)
 
-    this.total = 2 + nodeDefs.length + (recordSummaries.length * nodeDefs.length)
+    this.total = 1 + nodeDefs.length + (recordSummaries.length * nodeDefs.length)
 
-    await SchemaGenerator.dropSchema(surveyId)
-    this.incrementProcessedItems()
-
-    await SchemaGenerator.createSchema(surveyId)
+    await DataSchema.dropSchema(surveyId)
+    await DataSchema.createSchema(surveyId)
     this.incrementProcessedItems()
 
     // create data tables
     for (const nodeDef of nodeDefs) {
-      await SchemaGenerator.createNodeDefTable(survey, nodeDef)
+      await DataSchema.createTable(survey, nodeDef)
       this.incrementProcessedItems()
     }
 
@@ -43,7 +41,7 @@ class SchemaGeneratorJob extends Job {
     for (const recordSummary of recordSummaries) {
       const record = await RecordManager.fetchRecordById(surveyId, recordSummary.id)
       for (const nodeDef of nodeDefs) {
-        await SchemaGenerator.populateNodeDefTable(survey, nodeDef, record)
+        await DataSchema.insertIntoTable(survey, nodeDef, record)
         this.incrementProcessedItems()
       }
     }
