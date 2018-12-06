@@ -4,9 +4,11 @@ const db = require('../db/db')
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
+const FileManager = require('../file/fileManager')
 const Node = require('../../common/record/node')
+const File = require('../../common/file/file')
 
-const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
+const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
 
@@ -24,7 +26,7 @@ const createRecord = async (userId, recordToCreate) => await db.tx(
     const {surveyId, id: recordId} = record
 
     const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
-    const rootNode = Node.newNode(rootNodeDef.id, recordId)
+    const rootNode = Node.newNode(rootNodeDef.uuid, recordId)
 
     persistNode(userId, surveyId, rootNode)
 
@@ -49,7 +51,7 @@ const fetchRecordById = async (surveyId, recordId) => {
   const record = await RecordRepository.fetchRecordById(surveyId, recordId)
   const nodes = await NodeRepository.fetchNodesByRecordId(surveyId, recordId)
 
-  return {...record, nodes: toUUIDIndexedObj(nodes)}
+  return {...record, nodes: toUuidIndexedObj(nodes)}
 }
 
 /**
@@ -58,7 +60,26 @@ const fetchRecordById = async (surveyId, recordId) => {
  * ===================
  */
 
-const persistNode = (userId, surveyId, node, file) => RecordUpdateManager.persistNode(userId, surveyId, node, file)
+const persistNode = (userId, surveyId, node, fileReq) => {
+  let nodeToPersist
+  if (fileReq) {
+    //save file to "file" table and set fileUuid and fileName into node value
+    const file = File.createFile(fileReq)
+
+    FileManager.insertFile(surveyId, file)
+
+    const nodeValue = {
+      fileUuid: file.uuid,
+      fileName: File.getName(file),
+      fileSize: File.getSize(file)
+    }
+
+    nodeToPersist = Node.assocValue(nodeValue, node)
+  } else {
+    nodeToPersist = node
+  }
+  RecordUpdateManager.persistNode(userId, surveyId, nodeToPersist)
+}
 
 /**
  * ===================
@@ -67,7 +88,7 @@ const persistNode = (userId, surveyId, node, file) => RecordUpdateManager.persis
  */
 const deleteRecord = async (surveyId, recordId) => await RecordRepository.deleteRecord(surveyId, recordId)
 
-const deleteNode = (userId, surveyId, nodeUUID) => RecordUpdateManager.deleteNode(userId, surveyId, nodeUUID)
+const deleteNode = (userId, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(userId, surveyId, nodeUuid)
 
 /**
  * ==================
@@ -88,7 +109,7 @@ module.exports = {
   //==== READ
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
-  fetchNodeFileByUUID: NodeRepository.fetchNodeFileByUUID,
+  fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
 
   //==== UPDATE
   persistNode,

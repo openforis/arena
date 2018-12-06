@@ -32,7 +32,7 @@ class TaxonomiesView extends React.Component {
     const {
       taxonomy,
       taxonomies,
-      selectedItemUUID,
+      selectedItemUuid,
       createTaxonomy,
       setTaxonomyForEdit,
       deleteTaxonomy,
@@ -52,7 +52,7 @@ class TaxonomiesView extends React.Component {
                       itemLabelFunction={taxonomy => Taxonomy.getTaxonomyName(taxonomy)}
                       editedItem={taxonomy}
                       items={taxonomies}
-                      selectedItemUUID={selectedItemUUID}
+                      selectedItemUuid={selectedItemUuid}
                       onAdd={createTaxonomy}
                       onEdit={setTaxonomyForEdit}
                       canDelete={canDelete}
@@ -74,7 +74,7 @@ const mapStateToProps = state => {
     Survey.getTaxonomiesArray,
     R.map(t => ({
       ...t,
-      usedByNodeDefs: Survey.getNodeDefsByTaxonomyUUID(t.uuid)(survey).length > 0
+      usedByNodeDefs: Survey.getNodeDefsByTaxonomyUuid(t.uuid)(survey).length > 0
     }))
   )(survey)
 

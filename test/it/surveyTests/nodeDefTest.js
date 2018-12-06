@@ -11,12 +11,12 @@ const fetchRootNodeDef = async () => {
   return await NodeDefRepository.fetchRootNodeDef(Survey.getSurveyInfo(survey).id, true)
 }
 
-const createNodeDef = async (parentNodeId, type, name) => {
+const createNodeDef = async (parentNodeUuid, type, name) => {
   const survey = getContextSurvey()
   const surveyInfo = Survey.getSurveyInfo(survey)
 
-  const nodeDefReq = NodeDefTest.newNodeDef(surveyInfo.id, parentNodeId, type, {name})
-  return await NodeDefRepository.createNodeDef(surveyInfo.id, parentNodeId, nodeDefReq.uuid, type, nodeDefReq.props)
+  const nodeDefReq = NodeDefTest.newNodeDef(surveyInfo.id, parentNodeUuid, type, {name})
+  return await NodeDefRepository.createNodeDef(surveyInfo.id, parentNodeUuid, nodeDefReq.uuid, type, nodeDefReq.props)
 }
 
 const createNodeDefsTest = async () => {
@@ -26,13 +26,12 @@ const createNodeDefsTest = async () => {
   const rootDef = await fetchRootNodeDef()
 
   const type = NodeDefTest.nodeDefType.text
-  const nodeDefReq = NodeDefTest.newNodeDef(surveyInfo.id, rootDef.id, type, {name: 'node_def_' + type})
-  const nodeDefDb = await NodeDefRepository.createNodeDef(surveyInfo.id, rootDef.id, nodeDefReq.uuid, type, nodeDefReq.props)
+  const nodeDefReq = NodeDefTest.newNodeDef(surveyInfo.id, rootDef.uuid, type, {name: 'node_def_' + type})
+  const nodeDefDb = await NodeDefRepository.createNodeDef(surveyInfo.id, rootDef.uuid, nodeDefReq.uuid, type, nodeDefReq.props)
 
   expect(nodeDefDb.id).to.not.be.undefined
   expect(nodeDefDb.type).to.equal(type)
-  expect(nodeDefDb.surveyId).to.equal(surveyInfo.id)
-  expect(nodeDefDb.parentId).to.equal(nodeDefReq.parentId)
+  expect(nodeDefDb.parentUuid).to.equal(nodeDefReq.parentUuid)
   expect(nodeDefDb.uuid).to.equal(nodeDefReq.uuid)
   expect(nodeDefDb.props).to.eql(nodeDefReq.props)
 }
@@ -43,11 +42,11 @@ const updateNodeDefTest = async () => {
 
   const rootDef = await fetchRootNodeDef()
 
-  const nodeDef1 = await createNodeDef(rootDef.id, NodeDefTest.nodeDefType.text, 'node_def_1')
-  const nodeDef2 = await createNodeDef(rootDef.id, NodeDefTest.nodeDefType.boolean, 'node_def_2')
+  const nodeDef1 = await createNodeDef(rootDef.uuid, NodeDefTest.nodeDefType.text, 'node_def_1')
+  const nodeDef2 = await createNodeDef(rootDef.uuid, NodeDefTest.nodeDefType.boolean, 'node_def_2')
 
   const newName = 'node_def_1_new'
-  const updatedNodeDef = await NodeDefRepository.updateNodeDefProp(nodeDef1.id, 'name', newName)
+  const updatedNodeDef = await NodeDefRepository.updateNodeDefProp(surveyInfo.id, nodeDef1.uuid, 'name', newName)
 
   expect(NodeDefTest.getNodeDefName(updatedNodeDef)).to.equal(newName)
 

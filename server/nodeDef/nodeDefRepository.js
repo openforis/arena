@@ -1,90 +1,71 @@
-const R = require('ramda')
 const Promise = require('bluebird')
 
 const db = require('../db/db')
 const {selectDate} = require('../db/dbUtils')
+const {getSurveyDBSchema, dbTransformCallback} = require('../survey/surveySchemaRepositoryUtils')
 
-const {defDbTransformCallback} = require('../../common/survey/surveyUtils')
 const NodeDef = require('../../common/survey/nodeDef')
 
-const dbTransformCallback = (def, draft = false) => R.pipe(
-  // assoc published and draft properties based on props
-  R.assoc('published', !R.isEmpty(def.props)),
-  R.assoc('draft', !R.isEmpty(def.props_draft)),
-  // apply db conversion
-  R.partialRight(defDbTransformCallback, [draft]),
-)(def)
-
-const nodeDefSelectFields = (advanced = false) => `id, uuid, survey_id, parent_id, type, deleted, 
-      props${advanced ? ' || props_advanced' : ''} as props, 
-      props_draft${advanced ? ' || props_advanced_draft' : ''} as  props_draft,
-     ${selectDate('date_created')}, ${selectDate('date_modified')}`
+const nodeDefSelectFields = (advanced = false) =>
+  `id, uuid, parent_uuid, type, deleted, ${selectDate('date_created')}, ${selectDate('date_modified')},  
+    props${advanced ? ' || props_advanced' : ''} as props, 
+    props_draft${advanced ? ' || props_advanced_draft' : ''} as  props_draft`
 
 // ============== CREATE
 
-const createNodeDef = async (surveyId, parentId, uuid, type, props, client = db) =>
+const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = db) =>
   await client.one(`
-    INSERT INTO node_def (survey_id, parent_id, uuid, type, props_draft)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING * 
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
+          (parent_uuid, uuid, type, props_draft)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
     `,
-    [surveyId, parentId, uuid, type, props],
-    def => dbTransformCallback(def, true) //always loading draft when creating or updating a nodeDef
+    [parentUuid, uuid, type, props],
+    def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 
-const createEntityDef = async (surveyId, parentId, uuid, props, client = db) =>
-  await createNodeDef(surveyId, parentId, uuid, NodeDef.nodeDefType.entity, props, client)
+const createEntityDef = async (surveyId, parentUuid, uuid, props, client = db) =>
+  await createNodeDef(surveyId, parentUuid, uuid, NodeDef.nodeDefType.entity, props, client)
 
 // ============== READ
-
-const fetchNodeDefSurveyId = async (nodeDefId = null, draft, client = db) =>
-  await client.one(
-      `SELECT survey_id
-     FROM node_def 
-     WHERE id = $1`,
-    [nodeDefId],
-    record => record.survey_id
-  )
 
 const fetchNodeDefsBySurveyId = async (surveyId, draft, advanced = false, client = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields(advanced)}
-    FROM node_def 
-    WHERE survey_id = $1
-    AND deleted IS NOT TRUE
+    FROM ${getSurveyDBSchema(surveyId)}.node_def 
+    WHERE deleted IS NOT TRUE
     ORDER BY id`,
-    [surveyId],
-    res => dbTransformCallback(res, draft)
+    [],
+    res => dbTransformCallback(res, draft, true)
   )
 
 const fetchRootNodeDef = async (surveyId, draft, client = db) =>
   await client.one(
     `SELECT ${nodeDefSelectFields()}
-     FROM node_def 
-     WHERE parent_id IS NULL
-     AND survey_id =$1`,
-    [surveyId],
-    res => dbTransformCallback(res, draft)
+     FROM ${getSurveyDBSchema(surveyId)}.node_def 
+     WHERE parent_uuid IS NULL`,
+    [],
+    res => dbTransformCallback(res, draft, true)
   )
 
-const fetchNodeDef = async (nodeDefId, draft, client = db) =>
+const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, client = db) =>
   await client.one(
     `SELECT ${nodeDefSelectFields()}
-     FROM node_def 
-     WHERE id =$1`,
-    [nodeDefId],
-    res => dbTransformCallback(res, draft)
+     FROM ${getSurveyDBSchema(surveyId)}.node_def 
+     WHERE uuid = $1`,
+    [nodeDefUuid],
+    res => dbTransformCallback(res, draft, true)
   )
 
-const fetchNodeDefsByParentId = async (parentId, draft, client = db) =>
+const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = db) =>
   await client.map(`
     SELECT ${nodeDefSelectFields()}
-    FROM node_def 
-    WHERE parent_id = $1
+    FROM ${getSurveyDBSchema(surveyId)}.node_def 
+    WHERE parent_uuid = $1
     AND deleted IS NOT TRUE
     ORDER BY id`,
-    [parentId],
-    res => dbTransformCallback(res, draft)
+    [parentUuid],
+    res => dbTransformCallback(res, draft, true)
   )
 
 const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
@@ -92,64 +73,60 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
 
   return await client.map(`
     SELECT ${nodeDefSelectFields()}
-    FROM node_def 
-    WHERE survey_id = $1
-    AND deleted IS NOT TRUE
-    AND parent_id = $2
-    AND props->>'key' = $3
+    FROM ${getSurveyDBSchema(surveyId)}.node_def 
+    WHERE deleted IS NOT TRUE
+    AND parent_uuid = $1
+    AND props->>'key' = $2
     ORDER BY id`,
-    [surveyId, rootNodeDef.id, 'true'],
-    res => dbTransformCallback(res, draft)
+    [rootNodeDef.uuid, 'true'],
+    res => dbTransformCallback(res, draft, true)
   )
 }
 
 // ============== UPDATE
 
-const updateNodeDefProp = async (nodeDefId, key, value, advanced = false, client = db) => {
+const updateNodeDefProp = async (surveyId, nodeDefUuid, key, value, advanced = false, client = db) => {
   const prop = {[key]: value}
   const propsCol = `props${advanced ? '_advanced' : ''}_draft`
 
   return await client.one(`
-    UPDATE node_def 
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET ${propsCol} = ${propsCol} || $1,
     date_modified = timezone('UTC'::text, now())
-    WHERE id = $2
+    WHERE uuid = $2
     RETURNING ${nodeDefSelectFields()}
-  `, [JSON.stringify(prop), nodeDefId],
-    def => dbTransformCallback(def, true) //always loading draft when creating or updating a nodeDef
+  `, [JSON.stringify(prop), nodeDefUuid],
+    def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 }
 
 const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`
-    UPDATE
-        node_def n
-    SET
-        props = props || props_draft,
-        props_draft = '{}'::jsonb,
-        props_advanced = props_advanced || props_advanced_draft,
-        props_advanced_draft = '{}'::jsonb
-    WHERE
-        n.survey_id = $1
-    `, [surveyId]
-  )
+        UPDATE
+          ${getSurveyDBSchema(surveyId)}.node_def
+        SET
+          props = props || props_draft,
+          props_draft = '{}'::jsonb,
+          props_advanced = props_advanced || props_advanced_draft,
+          props_advanced_draft = '{}'::jsonb
+    `)
 
 // ============== DELETE
 
-const markNodeDefDeleted = async (nodeDefId, client = db) => {
+const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = db) => {
   const nodeDef = await client.one(`
-    UPDATE node_def 
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET deleted = true
-    WHERE id = $1
+    WHERE uuid = $1
     RETURNING ${nodeDefSelectFields()}
   `,
-    [nodeDefId],
-    def => dbTransformCallback(def, true)
+    [nodeDefUuid],
+    def => dbTransformCallback(def, true, true)
   )
 
-  const childNodeDefs = await fetchNodeDefsByParentId(nodeDefId, true, client)
+  const childNodeDefs = await fetchNodeDefsByParentUuid(surveyId, nodeDefUuid, true, client)
   await Promise.all(childNodeDefs.map(async childNodeDef =>
-    await markNodeDefDeleted(childNodeDef.id, client)
+    await markNodeDefDeleted(surveyId, childNodeDef.uuid, client)
   ))
 
   return nodeDef
@@ -157,13 +134,12 @@ const markNodeDefDeleted = async (nodeDefId, client = db) => {
 
 const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
   await client.query(`
-    DELETE FROM
-        node_def
-    WHERE
-        deleted = true
-    AND survey_id = $1
-    `, [surveyId]
-  )
+        DELETE
+        FROM
+          ${getSurveyDBSchema(surveyId)}.node_def
+        WHERE
+          deleted = true
+    `)
 
 const deleteNodeDefsLabels = async (surveyId, langCode, client = db) =>
   await deleteNodeDefsProp(surveyId, ['labels', langCode], client)
@@ -173,25 +149,21 @@ const deleteNodeDefsDescriptions = async (surveyId, langCode, client = db) =>
 
 const deleteNodeDefsProp = async (surveyId, deletePath, client = db) =>
   await client.none(`
-    UPDATE node_def 
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props = props #- '{${deletePath.join(',')}}'
-    WHERE survey_id = $1`,
-    [surveyId])
+    `)
 
 module.exports = {
-  //utils
-  dbTransformCallback,
 
   //CREATE
   createNodeDef,
   createEntityDef,
 
   //READ
-  fetchNodeDefSurveyId,
   fetchNodeDefsBySurveyId,
   fetchRootNodeDef,
-  fetchNodeDef,
-  fetchNodeDefsByParentId,
+  fetchNodeDefByUuid,
+  fetchNodeDefsByParentUuid,
   fetchRootNodeDefKeysBySurveyId,
 
   //UPDATE

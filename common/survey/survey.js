@@ -1,8 +1,6 @@
-const R = require('ramda')
-
 const SurveyInfo = require('./_internal/surveyInfo')
 const SurveyNodeDefs = require('./_internal/surveyNodeDefs')
-const SurveyCodeLists = require('./_internal/surveyCodeLists')
+const SurveyCategories = require('./_internal/surveyCategories')
 const SurveyTaxonomies = require('./_internal/surveyTaxonomies')
 const SurveyDefaults = require('./_internal/surveyDefaults')
 
@@ -33,12 +31,12 @@ module.exports = {
 
   // ====== READ nodeDefs
   getNodeDefs: SurveyNodeDefs.getNodeDefs,
-  getNodeDefByUUID: SurveyNodeDefs.getNodeDefByUUID,
-  getNodeDefById: SurveyNodeDefs.getNodeDefById,
+  getNodeDefByUuid: SurveyNodeDefs.getNodeDefByUuid,
+  // getNodeDefById: SurveyNodeDefs.getNodeDefById,
   getRootNodeDef: SurveyNodeDefs.getRootNodeDef,
   getNodeDefChildren: SurveyNodeDefs.getNodeDefChildren,
-  getNodeDefsByCodeListUUID: SurveyNodeDefs.getNodeDefsByCodeListUUID,
-  getNodeDefsByTaxonomyUUID: SurveyNodeDefs.getNodeDefsByTaxonomyUUID,
+  getNodeDefsByCategoryUuid: SurveyNodeDefs.getNodeDefsByCategoryUuid,
+  getNodeDefsByTaxonomyUuid: SurveyNodeDefs.getNodeDefsByTaxonomyUuid,
   getNodeDefParent: SurveyNodeDefs.getNodeDefParent,
   getNodeDefKeys: SurveyNodeDefs.getNodeDefKeys,
   isNodeDefAncestor: SurveyNodeDefs.isNodeDefAncestor,
@@ -46,24 +44,25 @@ module.exports = {
   // ====== UPDATE nodeDefs
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,
 
-  // ====== NodeDef CodeList
-  getNodeDefCodeListLevelIndex: SurveyNodeDefs.getNodeDefCodeListLevelIndex,
+  // ====== NodeDef Code
+  getNodeDefCategoryLevelIndex: SurveyNodeDefs.getNodeDefCategoryLevelIndex,
   getNodeDefParentCode: SurveyNodeDefs.getNodeDefParentCode,
   getNodeDefCodeCandidateParents: SurveyNodeDefs.getNodeDefCodeCandidateParents,
-  canUpdateCodeList: SurveyNodeDefs.canUpdateCodeList,
+
+  //TODO check where used
+  canUpdateCategory: SurveyNodeDefs.canUpdateCategory,
   isNodeDefParentCode: SurveyNodeDefs.isNodeDefParentCode,
 
-  // ====== CodeLists
+  // ====== Categories
 
-  getCodeLists: SurveyCodeLists.getCodeLists,
-  getCodeListsArray: SurveyCodeLists.getCodeListsArray,
-  getCodeListByUUID: SurveyCodeLists.getCodeListByUUID,
-  assocCodeLists: SurveyCodeLists.assocCodeLists,
+  getCategories: SurveyCategories.getCategories,
+  getCategoriesArray: SurveyCategories.getCategoriesArray,
+  getCategoryByUuid: SurveyCategories.getCategoryByUuid,
+  assocCategories: SurveyCategories.assocCategories,
 
   // ====== Taxonomies
 
   getTaxonomiesArray: SurveyTaxonomies.getTaxonomiesArray,
-  getTaxonomyByUUID: SurveyTaxonomies.getTaxonomyByUUID,
+  getTaxonomyByUuid: SurveyTaxonomies.getTaxonomyByUuid,
   assocTaxonomies: SurveyTaxonomies.assocTaxonomies,
-
 }

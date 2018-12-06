@@ -26,7 +26,7 @@ const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
         : null
 
     }
-    <button className="btn btn-s btn-of-light-s"
+    <button className="btn btn-s btn-of-light-s btn-add-node-def"
             onClick={() => addNodeDef(type, nodeDefProps)}
             aria-disabled={!enabled}>
       {getNodeDefIconByType(type)}{type}
@@ -57,13 +57,13 @@ const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
         )
     }
 
-    <button className="btn btn-s btn-of-light-xs"
+    <button className="btn btn-s btn-of-light-xs btn-add-node-def"
             aria-disabled={!canAddEntity}
             onClick={() => addNodeDef(
               NodeDef.nodeDefType.entity,
               {
                 [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-                [nodeDefLayoutProps.pageUUID]: uuidv4(),
+                [nodeDefLayoutProps.pageUuid]: uuidv4(),
               }
             )}>
       <span className="icon icon-insert-template icon-left"/>
@@ -86,7 +86,7 @@ class FormActions extends React.Component {
     const {opened} = this.state
 
     const width = opened ? 33 : 200
-    document.getElementsByClassName('survey-form')[0].style.gridTemplateColumns = `1fr ${width}px`
+    document.getElementsByClassName('survey-form')[0].classList.toggle('form-actions-off')// .style.gridTemplateColumns = `1fr ${width}px`
 
     this.setState({opened: !opened})
 
@@ -96,7 +96,7 @@ class FormActions extends React.Component {
 
   addNodeDef (type, props) {
     const {nodeDef, createNodeDef} = this.props
-    createNodeDef(nodeDef.id, type, props)
+    createNodeDef(nodeDef.uuid, type, props)
   }
 
   render () {
@@ -106,12 +106,10 @@ class FormActions extends React.Component {
     return (
       <div className="survey-form__actions">
 
-        <div style={{opacity: '0.5', position: 'absolute'}}>
-          <a className="btn btn-s btn-of-light-xs no-border"
-             onClick={() => this.toggleOpen()}>
-            <span className={`icon icon-${this.state.opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
-          </a>
-        </div>
+        <button className="btn btn-s btn-of-light-xs no-border btn-toggle"
+                onClick={() => this.toggleOpen()}>
+          <span className={`icon icon-${this.state.opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
+        </button>
 
         {
           this.state.opened ?

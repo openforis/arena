@@ -4,13 +4,11 @@ import * as R from 'ramda'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
-import CodeListProps from './codeListProps'
+import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
-
-import { isRenderTable, } from '../../../../../common/survey/nodeDefLayout'
 
 import { normalizeName } from '../../../../../common/stringUtils'
 
@@ -20,12 +18,10 @@ const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValu
 
 const BasicProps = props => {
   const {
-    nodeDef, nodeDefKeyEditDisabled,
-    putNodeDefProp, toggleTaxonomyEdit, toggleCodeListEdit
+    nodeDef, nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
+    putNodeDefProp, toggleTaxonomyEdit, toggleCategoryEdit
   } = props
   const validation = getValidation(nodeDef)
-
-  const multiplicityEditDisabled = NodeDef.isNodeDefPublished(nodeDef) || isRenderTable(nodeDef) || NodeDef.isNodeDefKey(nodeDef)
 
   return (
     <div className="form">
@@ -47,10 +43,10 @@ const BasicProps = props => {
                     onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'descriptions', NodeDef.getNodeDefDescriptions(nodeDef))}/>
 
       {
-        NodeDef.isNodeDefCodeList(nodeDef) &&
-        <CodeListProps nodeDef={nodeDef}
-                       toggleCodeListEdit={toggleCodeListEdit}
-                       putNodeDefProp={putNodeDefProp}/>
+        NodeDef.isNodeDefCode(nodeDef) &&
+        <CodeProps nodeDef={nodeDef}
+                   toggleCategoryEdit={toggleCategoryEdit}
+                   putNodeDefProp={putNodeDefProp}/>
       }
 
       {
@@ -73,7 +69,7 @@ const BasicProps = props => {
         NodeDef.canNodeDefBeMultiple(nodeDef) &&
         <FormItem label={'multiple'}>
           <Checkbox checked={NodeDef.isNodeDefMultiple(nodeDef)}
-                    disabled={multiplicityEditDisabled}
+                    disabled={nodeDefMultipleEditDisabled}
                     onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
         </FormItem>
       }

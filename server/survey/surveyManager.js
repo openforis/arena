@@ -4,7 +4,7 @@ const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/dbMigrator')
 const {uuidv4} = require('../../common/uuid')
 
-const {toUUIDIndexedObj} = require('../../common/survey/surveyUtils')
+const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
 const surveyRepository = require('../survey/surveyRepository')
 const Survey = require('../../common/survey/survey')
@@ -46,9 +46,13 @@ const createSurvey = async (user, {name, label, lang}) => {
         name: 'root_entity',
         labels: {[lang]: 'Root entity'},
         multiple: false,
-        [nodeDefLayoutProps.pageUUID]: uuidv4(),
+        [nodeDefLayoutProps.pageUuid]: uuidv4(),
         [nodeDefLayoutProps.render]: nodeDefRenderType.form,
       }
+
+      //create survey data schema
+      await migrateSurveySchema(survey.id)
+
       await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
 
       // update user prefs
@@ -66,9 +70,6 @@ const createSurvey = async (user, {name, label, lang}) => {
       return survey
     }
   )
-
-  //create survey data schema
-  await migrateSurveySchema(survey.id)
 
   return assocSurveyInfo(survey)
 }
@@ -109,7 +110,7 @@ const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) =>
     ? await validateNodeDefs(nodeDefsResult)
     : nodeDefsResult
 
-  return toUUIDIndexedObj(nodeDefs)
+  return toUuidIndexedObj(nodeDefs)
 }
 
 // ====== UPDATE

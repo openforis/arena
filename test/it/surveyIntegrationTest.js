@@ -5,7 +5,7 @@ const {initTestContext, destroyTestContext} = require('./../testContext')
 
 const surveyIntegrationTest = require('./surveyTests/surveyTest')
 const nodeDefTest = require('./surveyTests/nodeDefTest')
-const codeListTest = require('./surveyTests/codeListTest')
+const categoryTest = require('./surveyTests/categoryTest')
 
 before(initTestContext)
 
@@ -15,15 +15,15 @@ describe('Survey Test', () => {
 
   it('Create Survey', surveyIntegrationTest.createSurveyTest)
 
-  // ==== CODE LIST
+  // ==== CATEGORY
 
-  it('Create Code List', codeListTest.createCodeListTest)
+  it('Create Category', categoryTest.createCategoryTest)
 
-  it('Create Code List Level', codeListTest.createCodeListLevelTest)
+  it('Create Category Level', categoryTest.createCategoryLevelTest)
 
-  it('Create Code List Item', codeListTest.createCodeListItemTest)
+  it('Create Category Item', categoryTest.createCategoryItemTest)
 
-  it('Update Code List', codeListTest.updateCodeListTest)
+  it('Update Category', categoryTest.updateCategoryTest)
 
   // ==== NODE DEF
 

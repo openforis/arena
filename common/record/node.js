@@ -3,25 +3,27 @@ const R = require('ramda')
 const {uuidv4} = require('./../uuid')
 const {isBlank} = require('../stringUtils')
 
+const valuePropName = 'value'
+
 /**
  * ======
  * CREATE
  * ======
  */
 
-const newNode = (nodeDefId, recordId, parentUUID = null, placeholder = false, value = null) => {
+const newNode = (nodeDefUuid, recordId, parentUuid = null, placeholder = false, value = null) => {
   return {
     uuid: uuidv4(),
-    nodeDefId,
+    nodeDefUuid,
     recordId,
-    parentUUID,
+    parentUuid,
     placeholder,
     value,
   }
 }
 
 const newNodePlaceholder = (nodeDef, parentNode, value = null) =>
-  newNode(nodeDef.id, parentNode.recordId, parentNode.uuid, true, value)
+  newNode(nodeDef.uuid, parentNode.recordId, parentNode.uuid, true, value)
 
 /**
  * ======
@@ -30,7 +32,7 @@ const newNodePlaceholder = (nodeDef, parentNode, value = null) =>
  */
 
 const getNodeValue = (node = {}, defaultValue = {}) =>
-  R.propOr(defaultValue, 'value', node)
+  R.propOr(defaultValue, valuePropName, node)
 
 const getNodeValueProp = (prop, defaultValue = null) => R.pipe(
   getNodeValue,
@@ -68,12 +70,16 @@ module.exports = {
 
   // ==== READ
   getNodeValue,
-  getNodeDefId: R.prop('nodeDefId'),
+  getParentUuid: R.prop('parentUuid'),
+  getNodeDefUuid: R.prop('nodeDefUuid'),
   getNodeRecordId: R.prop('recordId'),
   getNodeFileName: getNodeValueProp('fileName', ''),
-  getNodeItemUUID: getNodeValueProp('itemUUID'),
-  getNodeTaxonUUID: getNodeValueProp('taxonUUID'),
-  getNodeVernacularNameUUID: getNodeValueProp('vernacularNameUUID'),
+  getNodeItemUuid: getNodeValueProp('itemUuid'),
+  getNodeTaxonUuid: getNodeValueProp('taxonUuid'),
+  getNodeVernacularNameUuid: getNodeValueProp('vernacularNameUuid'),
+
+  // ==== UPDATE
+  assocValue: R.assoc(valuePropName),
 
   // ==== UTILS
   isNodeValueBlank,

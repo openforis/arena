@@ -41,7 +41,7 @@ class RecordUpdateThread extends Thread {
         break
 
       case messageTypes.deleteNode:
-        nodes = await RecordProcessor.deleteNode(msg.surveyId, msg.nodeUUID)
+        nodes = await RecordProcessor.deleteNode(msg.surveyId, msg.nodeUuid)
         break
     }
 

@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import TabBar from '../../../commonComponents/tabBar'
 import BasicProps from './basic/basicProps'
 import AdvancedProps from './advanced/advancedProps'
-import CodeListsView from '../components/codeListsView'
+import CategoriesView from '../components/categoriesView'
 import TaxonomiesView from '../components/taxonomiesView'
 
 import Survey from '../../../../common/survey/survey'
@@ -16,6 +16,7 @@ import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
 import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
 import { getFormNodeDefEdit, getSurveyForm } from '../surveyFormState'
+import { isRenderTable } from '../../../../common/survey/nodeDefLayout'
 
 class NodeDefEdit extends React.Component {
 
@@ -23,7 +24,7 @@ class NodeDefEdit extends React.Component {
     super(props)
 
     this.state = {
-      editingCodeList: false,
+      editingCategory: false,
       editingTaxonomy: false
     }
   }
@@ -36,12 +37,13 @@ class NodeDefEdit extends React.Component {
     const {
       nodeDef,
       nodeDefKeyEditDisabled,
+      nodeDefMultipleEditDisabled,
       putNodeDefProp,
-      canUpdateCodeList
+      canUpdateCategory
     } = this.props
 
     const {
-      editingCodeList,
+      editingCategory,
       editingTaxonomy,
     } = this.state
 
@@ -49,15 +51,15 @@ class NodeDefEdit extends React.Component {
       ? (
         <div className="node-def-edit">
           {
-            editingCodeList
-              ? <CodeListsView canSelect={canUpdateCodeList}
-                               onSelect={codeList => putNodeDefProp(nodeDef, 'codeListUUID', codeList.uuid)}
-                               selectedItemUUID={NodeDef.getNodeDefCodeListUUID(nodeDef)}
-                               onClose={() => this.setState({editingCodeList: false})}/>
+            editingCategory
+              ? <CategoriesView canSelect={canUpdateCategory}
+                                onSelect={category => putNodeDefProp(nodeDef, 'categoryUuid', category.uuid)}
+                                selectedItemUuid={NodeDef.getNodeDefCategoryUuid(nodeDef)}
+                                onClose={() => this.setState({editingCategory: false})}/>
               : editingTaxonomy
               ? <TaxonomiesView canSelect={true}
-                                onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUUID', taxonomy.uuid)}
-                                selectedItemUUID={NodeDef.getNodeDefTaxonomyUUID(nodeDef)}
+                                onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUuid', taxonomy.uuid)}
+                                selectedItemUuid={NodeDef.getNodeDefTaxonomyUuid(nodeDef)}
                                 onClose={() => this.setState({editingTaxonomy: false})}/>
               : (
                 <div className="node-def-edit__container">
@@ -68,8 +70,9 @@ class NodeDefEdit extends React.Component {
                         component: (
                           <BasicProps nodeDef={nodeDef}
                                       nodeDefKeyEditDisabled={nodeDefKeyEditDisabled}
+                                      nodeDefMultipleEditDisabled={nodeDefMultipleEditDisabled}
                                       putNodeDefProp={putNodeDefProp}
-                                      toggleCodeListEdit={(editing) => this.setState({editingCodeList: editing})}
+                                      toggleCategoryEdit={(editing) => this.setState({editingCategory: editing})}
                                       toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
                         ),
                       },
@@ -100,22 +103,34 @@ NodeDefEdit.defaultProps = {
   nodeDef: null,
 }
 
+const isNodeDefKeyEditDisabled = (nodeDef, survey) =>
+  !nodeDef ||
+  NodeDef.isNodeDefRoot(nodeDef) ||
+  NodeDef.isNodeDefMultiple(nodeDef) ||
+  (
+    !NodeDef.isNodeDefKey(nodeDef) &&
+    Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes
+  )
+
+const isNodeDefMultipleEditDisabled = (nodeDef, survey) =>
+  !nodeDef ||
+  NodeDef.isNodeDefPublished(nodeDef) ||
+  NodeDef.isNodeDefKey(nodeDef) ||
+  isRenderTable(nodeDef) ||
+  Survey.isNodeDefParentCode(nodeDef)(survey)
+
 const mapStateToProps = state => {
   const survey = getSurvey(state)
   const surveyForm = getSurveyForm(state)
   const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
 
-  let nodeDefKeyEditDisabled = false
-  if (nodeDef) {
-    const parent = Survey.getNodeDefParent(nodeDef)(survey)
-    const keyDefs = Survey.getNodeDefKeys(parent)(survey)
-
-    nodeDefKeyEditDisabled = !NodeDef.isNodeDefKey(nodeDef) && keyDefs.length >= NodeDef.maxKeyAttributes
-  }
+  const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(nodeDef, survey)
+  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(nodeDef, survey)
 
   return {
     nodeDef,
-    nodeDefKeyEditDisabled
+    nodeDefKeyEditDisabled,
+    nodeDefMultipleEditDisabled
   }
 }
 

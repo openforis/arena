@@ -9,7 +9,7 @@ import NodeDeleteButton from '../nodeDeleteButton'
 import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
 import { getNodeDefFormFields } from '../../nodeDefSystemProps'
 
-import { newNode } from '../../../../../../common/record/node'
+import Node from '../../../../../../common/record/node'
 
 const EntityTableRow = (props) => {
 
@@ -88,7 +88,7 @@ class NodeDefEntityTable extends React.Component {
               ? <button className="btn btn-s btn-of-light-xs"
                         style={{marginLeft: '10px'}}
                         onClick={() => {
-                          const entity = newNode(nodeDef.id, parentNode.recordId, parentNode.uuid)
+                          const entity = Node.newNode(nodeDef.uuid, parentNode.recordId, parentNode.uuid)
                           updateNode(nodeDef, entity)
                         }}>
                 <span className="icon icon-plus icon-12px icon-left"></span>

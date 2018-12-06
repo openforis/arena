@@ -8,7 +8,7 @@ import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
-import CodeList from '../../../../../common/survey/codeList'
+import Category from '../../../../../common/survey/category'
 import Node from '../../../../../common/record/node'
 
 import { getNodeDefComponent } from '../nodeDefSystemProps'
@@ -23,7 +23,7 @@ const getNodeValues = async (surveyInfo, nodes) => {
     nodeValues.map(
       async nodeValue =>
         nodeValue.fileName ? nodeValue.fileName
-          : nodeValue.itemUUID ? await loadCodeListItemLabel(surveyInfo, nodeValue.itemUUID)
+          : nodeValue.itemUuid ? await loadCategoryItemLabel(surveyInfo, nodeValue.itemUuid)
           : nodeValue
     )
   )
@@ -31,9 +31,9 @@ const getNodeValues = async (surveyInfo, nodes) => {
   return R.join(', ', stringNodeValues)
 }
 
-const loadCodeListItemLabel = async (surveyInfo, itemUUID) => {
-  const {data} = await axios.get(`/api/survey/${surveyInfo.id}/codeLists/items/${itemUUID}`)
-  return CodeList.getCodeListItemLabel(Survey.getDefaultLanguage(surveyInfo))(data.item)
+const loadCategoryItemLabel = async (surveyInfo, itemUuid) => {
+  const {data} = await axios.get(`/api/survey/${surveyInfo.id}/categories/items/${itemUuid}`)
+  return Category.getItemLabel(Survey.getDefaultLanguage(surveyInfo))(data.item)
 }
 
 class NodeDefMultipleTableBody extends React.Component {
@@ -94,7 +94,7 @@ const NodeDefTableBody = props => {
   const {nodeDef} = props
 
   return (
-    NodeDef.isNodeDefMultiple(nodeDef) || NodeDef.isNodeDefCodeList(nodeDef)
+    NodeDef.isNodeDefMultiple(nodeDef) || NodeDef.isNodeDefCode(nodeDef)
       ? <NodeDefMultipleTableBody {...props}/>
       : React.createElement(getNodeDefComponent(nodeDef), {...props})
   )

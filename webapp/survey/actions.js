@@ -17,8 +17,8 @@ const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
 const fetchNodeDefs = (surveyId, draft = false, validate = false) =>
   axios.get(`/api/survey/${surveyId}/nodeDefs?draft=${draft}&validate=${validate}`)
 
-const fetchCodeLists = (surveyId, draft = false, validate = false) =>
-  axios.get(`/api/survey/${surveyId}/codeLists?draft=${draft}&validate=${validate}`)
+const fetchCategories = (surveyId, draft = false, validate = false) =>
+  axios.get(`/api/survey/${surveyId}/categories?draft=${draft}&validate=${validate}`)
 
 const fetchTaxonomies = (surveyId, draft = false, validate = false) =>
   axios.get(`/api/survey/${surveyId}/taxonomies?draft=${draft}&validate=${validate}`)
@@ -35,14 +35,14 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
 
     const res = await Promise.all([
       fetchNodeDefs(surveyId, draft, validate),
-      fetchCodeLists(surveyId, draft, validate),
+      fetchCategories(surveyId, draft, validate),
       fetchTaxonomies(surveyId, draft, validate),
     ])
 
     dispatch({
       type: surveyDefsLoad,
       nodeDefs: res[0].data.nodeDefs,
-      codeLists: res[1].data.codeLists,
+      categories: res[1].data.categories,
       taxonomies: res[2].data.taxonomies,
       draft
     })

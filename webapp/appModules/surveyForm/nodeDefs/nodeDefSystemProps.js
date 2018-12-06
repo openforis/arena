@@ -8,7 +8,7 @@ import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'
 import NodeDefTaxon from './components/types/nodeDefTaxon'
 import NodeDefCoordinate from './components/types/nodeDefCoordinate'
-import NodeDefCodeList from './components/types/nodeDefCodeList'
+import NodeDefCode from './components/types/nodeDefCode'
 import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
 
@@ -93,11 +93,11 @@ export const nodeDefSystemProps = {
     defaultValue: '',
   },
 
-  [nodeDefType.codeList]: {
-    component: NodeDefCodeList,
+  [nodeDefType.code]: {
+    component: NodeDefCode,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
-    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.dropdown},
+    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.checkbox},
   },
 
   [nodeDefType.coordinate]: {
@@ -111,8 +111,8 @@ export const nodeDefSystemProps = {
     component: NodeDefTaxon,
     icon: <span className="icon icon-leaf icon-left"/>,
     defaultValue: {
-      taxonUUID: null,
-      vernacularNameUUID: null,
+      taxonUuid: null,
+      vernacularNameUuid: null,
     },
     formFields: ['code', 'scientific_name', 'vernacular_name'],
   },

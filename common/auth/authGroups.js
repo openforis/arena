@@ -3,7 +3,7 @@ const permissions = {
   surveyCreate: 'surveyCreate',
 
   // only owner and administrator can delete survey
-  // edit survey info props, edit nodeDefs, edit codeLists, edit taxonomies, publishSurvey
+  // edit survey info props, edit nodeDefs, edit categories, edit taxonomies, publishSurvey
   surveyEdit: 'surveyEdit',
 
   // records

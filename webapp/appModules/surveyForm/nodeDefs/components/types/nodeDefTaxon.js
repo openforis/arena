@@ -91,8 +91,6 @@ class NodeDefTaxon extends React.Component {
         scientificName: Taxon.getTaxonScientificName(taxon),
         vernacularName: taxon.vernacularName,
       })
-    } else {
-      this.setState(defaultFieldValues)
     }
   }
 
@@ -100,14 +98,14 @@ class NodeDefTaxon extends React.Component {
     let filterProp = null
     let filterPropValue = null
 
-    const vernacularNameUUID = Node.getNodeVernacularNameUUID(node)
+    const vernacularNameUuid = Node.getNodeVernacularNameUuid(node)
 
-    if (vernacularNameUUID) {
-      filterProp = 'vernacularNameUUID'
-      filterPropValue = vernacularNameUUID
+    if (vernacularNameUuid) {
+      filterProp = 'vernacularNameUuid'
+      filterPropValue = vernacularNameUuid
     } else {
       filterProp = 'uuid'
-      filterPropValue = Node.getNodeTaxonUUID(node)
+      filterPropValue = Node.getNodeTaxonUuid(node)
     }
 
     if (filterPropValue) {
@@ -151,10 +149,10 @@ class NodeDefTaxon extends React.Component {
 
   onTaxonSelect (taxonSearchResult) {
     const value = {
-      taxonUUID: taxonSearchResult.uuid
+      taxonUuid: taxonSearchResult.uuid
     }
     const nodeValue = taxonSearchResult.vernacularName
-      ? R.assoc('vernacularNameUUID', R.prop('vernacularNameUUID', taxonSearchResult), value)
+      ? R.assoc('vernacularNameUuid', R.prop('vernacularNameUuid', taxonSearchResult), value)
       : value
 
     this.onValueChange(nodeValue)
@@ -283,8 +281,8 @@ class NodeDefTaxon extends React.Component {
 }
 
 const mapStateToProps = (state, props) => ({
-  taxonomy: Survey.getTaxonomyByUUID(
-    NodeDef.getNodeDefTaxonomyUUID(props.nodeDef)
+  taxonomy: Survey.getTaxonomyByUuid(
+    NodeDef.getNodeDefTaxonomyUuid(props.nodeDef)
   )(getSurvey(state)),
   surveyInfo: getStateSurveyInfo(state)
 })

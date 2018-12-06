@@ -1,0 +1,89 @@
+import React from 'react'
+import { connect } from 'react-redux'
+import * as R from 'ramda'
+
+import ItemsView from './items/itemsView'
+import CategoryEdit from '../categoryEdit/components/categoryEdit'
+
+import Survey from '../../../../common/survey/survey'
+import Category from '../../../../common/survey/category'
+import { canEditSurvey } from '../../../../common/auth/authManager'
+
+import { getUser } from '../../../app/appState'
+import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
+import { getCategoryForEdit } from '../categoryEdit/categoryEditState'
+import { getSurveyForm } from '../surveyFormState'
+
+import {
+  createCategory,
+  deleteCategory,
+  setCategoryForEdit,
+} from '../categoryEdit/actions'
+
+class CategoriesView extends React.Component {
+
+  componentWillUnmount () {
+    const {category, setCategoryForEdit} = this.props
+    if (category)
+      setCategoryForEdit(null)
+  }
+
+  render () {
+
+    const {
+      categories, category, selectedItemUuid,
+      createCategory, deleteCategory, setCategoryForEdit,
+      onSelect, onClose, canSelect,
+      readOnly
+    } = this.props
+
+    const canDeleteCategory = category => category.usedByNodeDefs
+      ? alert('This category is used by some node definitions and cannot be removed')
+      : window.confirm(`Delete the category ${Category.getName(category)}? This operation cannot be undone.`)
+
+    return <ItemsView headerText="Categories"
+                      itemEditComponent={CategoryEdit}
+                      itemEditProp="category"
+                      itemLabelFunction={category => Category.getName(category)}
+                      editedItem={category}
+                      items={categories}
+                      selectedItemUuid={selectedItemUuid}
+                      onAdd={createCategory}
+                      onEdit={setCategoryForEdit}
+                      canDelete={canDeleteCategory}
+                      onDelete={deleteCategory}
+                      canSelect={canSelect}
+                      onSelect={onSelect}
+                      onClose={onClose}
+                      readOnly={readOnly}/>
+  }
+}
+
+const mapStateToProps = (state) => {
+  const survey = getSurvey(state)
+  const surveyInfo = getStateSurveyInfo(state)
+  const user = getUser(state)
+
+  const categories = R.pipe(
+    Survey.getCategoriesArray,
+    R.map(category => ({
+      ...category,
+      usedByNodeDefs: Survey.getNodeDefsByCategoryUuid(category.uuid)(survey).length > 0
+    }))
+  )(survey)
+
+  return {
+    categories,
+    category: getCategoryForEdit(survey)(getSurveyForm(state)),
+    readOnly: !canEditSurvey(user, surveyInfo)
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  {
+    createCategory,
+    deleteCategory,
+    setCategoryForEdit,
+  }
+)(CategoriesView)
