@@ -34,6 +34,7 @@ CREATE TABLE
   date_created TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
 
   PRIMARY KEY (id),
+  CONSTRAINT record_uuid_idx UNIQUE (uuid),
   CONSTRAINT record_user_fk FOREIGN KEY (owner_id) REFERENCES "user" ("id")
 );
 

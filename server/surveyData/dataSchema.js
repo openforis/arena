@@ -8,6 +8,7 @@ const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 
 const SurveyManager = require('../survey/surveyManager')
+const SurveyRepositoryUtils = require('../survey/surveySchemaRepositoryUtils')
 const NodeDefManager = require('../nodeDef/nodeDefManager')
 
 const DataTable = require('./DataTable')
@@ -53,6 +54,7 @@ const createTable = async (survey, nodeDef) => {
       date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       ${cols.join(',')},
       CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_uuid_unique_ix1 UNIQUE (uuid),
+      CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_record_fk FOREIGN KEY (${DataTable.colNameRecordUuuid}) REFERENCES ${SurveyRepositoryUtils.getSurveyDBSchema(getSurveyId(survey))}.record (uuid) ON DELETE CASCADE,
       ${R.isEmpty(ancestors) ? '' : ancestors.map(getConstraintFk(nodeDef)).join(',') + ', '}
       PRIMARY KEY (id)
     )
@@ -128,8 +130,6 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
       } : null
     })
   )
-
-  //TODO hierarchical delete of entities
 
   await client.batch(
     R.pipe(

@@ -5,6 +5,9 @@ const NodeDef = require('../../common/survey/nodeDef')
 const DataRow = require('./dataRow')
 const DataCol = require('./dataCol')
 
+const colNameRecordUuuid = 'record_uuid'
+const colNameUuuid = 'uuid'
+
 const getNodeDefColumns = (survey, nodeDef) => {
   if (NodeDef.isNodeDefEntity(nodeDef)) {
 // entity table
@@ -32,21 +35,25 @@ const getNodeDefColumns = (survey, nodeDef) => {
 }
 
 const getColumnNames = (survey, nodeDef) => [
-  'uuid',
+  colNameUuuid,
+  colNameRecordUuuid,
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNames))
 ]
 
 const getColumnNamesAndType = (survey, nodeDef) => [
-  'uuid uuid NOT NULL',
+  colNameUuuid + ' uuid NOT NULL',
+  colNameRecordUuuid + ' uuid NOT NULL',
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType))
 ]
 
 const getRowValues = async (survey, nodeDef, record, node) => {
   const rowValues = await DataRow.getValues(Survey.getSurveyInfo(survey), nodeDef, record, node, getNodeDefColumns(survey, nodeDef))
-  return [node.uuid, ...R.flatten(rowValues)]
+  return [node.uuid, record.uuid, ...R.flatten(rowValues)]
 }
 
 module.exports = {
+  colNameRecordUuuid,
+  colNameUuuid,
   getColumnNames,
   getColumnNamesAndType,
   getRowValues,
