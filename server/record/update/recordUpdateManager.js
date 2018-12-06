@@ -56,6 +56,17 @@ const cancelCheckOut = userId => {
 }
 
 /**
+ * Create a new record
+ *
+ * @param user
+ * @param record
+ */
+const createRecord = (user, record) => {
+  const updateWorker = recordUpdateThreads.getThread(user.id)
+  updateWorker.postMessage({type: recordThreadMessageTypes.createRecord, user, record})
+}
+
+/**
  * Notify thread to create or update a node
  *
  * @param user
@@ -64,7 +75,7 @@ const cancelCheckOut = userId => {
  */
 const persistNode = (user, surveyId, node) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({user, type: recordThreadMessageTypes.persistNode, surveyId, node})
+  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, user, surveyId, node})
 }
 
 /**
@@ -76,13 +87,14 @@ const persistNode = (user, surveyId, node) => {
  */
 const deleteNode = (user, surveyId, nodeUuid) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({user, type: recordThreadMessageTypes.deleteNode, surveyId, nodeUuid})
+  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, user, surveyId, nodeUuid})
 }
 
 module.exports = {
   checkIn,
   checkOut,
 
+  createRecord,
   persistNode,
   deleteNode,
 }

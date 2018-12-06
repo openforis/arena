@@ -5,17 +5,36 @@ const db = require('../../../db/db')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
+const RecordRepository = require('../../../record/recordRepository')
 const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const NodeRepository = require('../../../record/nodeRepository')
 
-const persistNode = async (surveyId, node, client = db) => {
+const {logActivity, activityType} = require('../../../activityLog/activityLogger')
+
+const createRecord = async(user, recordToCreate, client = db) => {
+  const record = await RecordRepository.insertRecord(recordToCreate, client)
+  const {surveyId, id: recordId} = record
+
+  const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, client)
+  const rootNode = Node.newNode(rootNodeDef.uuid, recordId)
+
+  return persistNode(user, surveyId, rootNode)
+}
+
+const persistNode = async (user, surveyId, node, client = db) => {
   const {uuid} = node
 
-  const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, client)
+  return await client.tx(async t => {
+    const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)
 
-  return nodeDb
-    ? await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), client)
-    : await createNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, client)
+    if (nodeDb) {
+      await logActivity(user, surveyId, activityType.record.nodeUpdateValue, R.pick(['uuid', 'value'], node), t)
+      return await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), t)
+    } else {
+      await logActivity(user, surveyId, activityType.record.nodeCreate, node, t)
+      return await createNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, t)
+    }
+  })
 }
 
 /**
@@ -61,9 +80,11 @@ const updateNodeValue = async (surveyId, nodeUuid, value, client = db) =>
  * Delete a node
  *
  */
-const deleteNode = async (surveyId, nodeUuid, client = db) =>
+const deleteNode = async (user, surveyId, nodeUuid, client = db) =>
   await client.tx(async t => {
     const node = await deleteNodeInternal(surveyId, nodeUuid, t)
+
+    await logActivity(user, surveyId, activityType.record.nodeDelete, {nodeUuid}, t)
 
     return await onNodeUpdate(surveyId, node, t)
   })
@@ -85,6 +106,7 @@ const deleteNodeInternal = async (surveyId, nodeUuid, client) => {
 }
 
 module.exports = {
+  createRecord,
   persistNode,
   deleteNode,
 }

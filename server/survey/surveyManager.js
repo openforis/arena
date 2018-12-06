@@ -40,7 +40,7 @@ const createSurvey = async (user, {name, label, lang}) => {
       const userId = user.id
 
       // create the survey
-      let survey = await surveyRepository.insertSurvey(props, userId, t)
+      const survey = await surveyRepository.insertSurvey(props, userId, t)
       const {id: surveyId} = survey
 
       // create survey's root entity props
@@ -63,13 +63,13 @@ const createSurvey = async (user, {name, label, lang}) => {
       // create default groups for this survey
 
       const authGroups = await authGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
-      survey = R.assoc('authGroups', authGroups, survey)
+      survey.authGroups = authGroups
 
       if (!isSystemAdmin(user)) {
         await authGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
       }
 
-      logActivity(user, surveyId, activityType.survey.create, {name, label, lang}, t)
+      logActivity(user, surveyId, activityType.survey.create, {name, label, lang, uuid: survey.uuid}, t)
 
       return survey
     }
