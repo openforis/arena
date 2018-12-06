@@ -122,7 +122,8 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
           : isMultiple
             ? getTableName(survey, nodeDefParent, nodeDef)
             : getTableName(survey, nodeDefParent),
-        colNames: node.created && isEntity ? ['uuid'] : DataCol.getNames(nodeDef),
+        //=========TODO on insert record_uuid is required, pass it when merge with recordUuid update
+        colNames: node.created && hasTable ? ['uuid'] : DataCol.getNames(nodeDef),
         colValues: await DataCol.getValues(Survey.getSurveyInfo(survey), nodeDef, node),
         rowUuid: hasTable
           ? node.uuid

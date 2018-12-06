@@ -21,8 +21,14 @@ const persistNode = async (surveyId, node, client = db) => {
 
 //always returning parentNode, used in dataSchema.updateTableNodes
 const addParentNode = async (surveyId, node, nodes, client = db) => {
-  const parentNode = await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), client)
-  return R.mergeRight({[node.uuid]: node, [parentNode.uuid]: parentNode}, nodes)
+  const parentUuid = Node.getParentUuid(node)
+  const parentNode = parentUuid ? await NodeRepository.fetchNodeByUuid(surveyId, parentUuid, client) : null
+  return R.mergeRight({
+      [node.uuid]: node,
+      ...parentNode ? {[parentNode.uuid]: parentNode} : {}
+    },
+    nodes
+  )
 }
 
 const insertNode = async (surveyId, nodeDef, node, client = db) => {

@@ -17,12 +17,38 @@ class SchemaGeneratorJob extends Job {
     const {surveyId} = this.params
     const survey = await this.getSurvey()
 
-    const {records: recordSummaries} = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, 0)
-
     // entities or multiple attributes
     const hasTable = nodeDef => NodeDef.isNodeDefEntity(nodeDef) || NodeDef.isNodeDefMultiple(nodeDef)
     const nodeDefs = R.pipe(Survey.getNodeDefsArray, R.filter(hasTable))(survey)
+
+    // const filterFn = nodeDef => NodeDef.isNodeDefEntity(nodeDef) || NodeDef.isNodeDefMultiple(nodeDef)
+    // let length = 1
+    // let depth = 1
+    // const h = (array, nodeDef) => {
+    //   const childDefs = NodeDef.isNodeDefEntity(nodeDef) ? R.pipe(
+    //     Survey.getNodeDefChildren(nodeDef),
+    //     R.filter(filterFn)
+    //   )(survey) : []
+    //
+    //   // maybe useless
+    //   if (filterFn(nodeDef)) {
+    //     length += childDefs.length
+    //     const res = R.append({
+    //         ...nodeDef,
+    //         children: R.reduce(h, [], childDefs)
+    //       },
+    //       array)
+    //     return res
+    //   }
+    // }
+    //
+    // const hierarchy = h([], rootDef)
+    //
+    // console.log('+++ hierarchy ', JSON.stringify(hierarchy))
+    // console.log('+++ hierarchy length', JSON.stringify(length))
+
     const rootDef = Survey.getRootNodeDef(survey)
+    const {records: recordSummaries} = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, 0)
 
     this.total = 1 + nodeDefs.length + (recordSummaries.length * nodeDefs.length)
 
@@ -33,9 +59,7 @@ class SchemaGeneratorJob extends Job {
 
     const traverse = async (nodeDef, fn) => {
       await fn(nodeDef)
-
       const childDefs = R.pipe(Survey.getNodeDefChildren(nodeDef), R.filter(hasTable))(survey)
-
       for (const childDef of childDefs) {
         await traverse(childDef, fn)
       }
