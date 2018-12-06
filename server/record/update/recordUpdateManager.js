@@ -58,20 +58,19 @@ const cancelCheckOut = userId => {
 /**
  * Notify thread to create or update a node
  *
- * @param userId
+ * @param user
  * @param surveyId
  * @param node
- * @param file
  */
-const persistNode = (user, surveyId, node, file) => {
+const persistNode = (user, surveyId, node) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({user, type: recordThreadMessageTypes.persistNode, surveyId, node, file})
+  updateWorker.postMessage({user, type: recordThreadMessageTypes.persistNode, surveyId, node})
 }
 
 /**
  * Notify thread to delete a node
  *
- * @param userId
+ * @param user
  * @param surveyId
  * @param nodeUuid
  */

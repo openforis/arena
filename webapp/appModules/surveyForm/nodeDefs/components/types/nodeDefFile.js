@@ -1,49 +1,34 @@
 import React from 'react'
-import * as R from 'ramda'
 
 import UploadButton from '../../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../../commonComponents/form/downloadButton'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-import { getNodeValue, getNodeFileName } from '../../../../../../common/record/node'
-import NodeDef from '../../../../../../common/survey/nodeDef'
+import Node from '../../../../../../common/record/node'
+import File from '../../../../../../common/file/file'
 
-const getFileExtension = R.pipe(
-  getNodeFileName,
-  R.split('.'),
-  R.tail,
-)
+const FileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode, removeNode}) => {
+  const fileName = Node.getNodeFileName(node)
+  const truncatedFileName = File.truncateFileName(fileName)
+  const fileUploaded = !edit && fileName
 
-const getFileName = node => R.pipe(
-  getNodeFileName,
-  fileName => R.slice(0, fileName.lastIndexOf('.'))(fileName),
-  fileName => fileName.length > 15
-    ? R.slice(0, 15, fileName) + '..'
-    : fileName,
-  fileName => R.isEmpty(fileName)
-    ? ''
-    : fileName + '.' + getFileExtension(node)
-)(node)
+  return <div className="node-def__file-input">
+    <UploadButton disabled={edit}
+                  showLabel={false}
+                  onChange={files => updateNode(nodeDef, node, null, files[0])}/>
 
-const FileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode, removeNode}) =>
-  node
-    ? <div className="node-def__file-input">
-      <UploadButton disabled={edit}
-                    showLabel={false}
-                    onChange={files => updateNode(nodeDef, node, {fileName: files[0].name}, files[0])}/>
+    <DownloadButton href={edit ? null : `/api/survey/${surveyInfo.id}/record/${recordId}/nodes/${node.uuid}/file`}
+                    disabled={!fileUploaded}
+                    label={truncatedFileName}
+                    title={fileName === truncatedFileName ? null : fileName}/>
 
-      <DownloadButton href={`/api/survey/${surveyInfo.id}/record/${recordId}/nodes/${node.uuid}/file`}
-                      disabled={edit || R.isEmpty(getNodeValue(node))}
-                      label={getFileName(node)}
-                      title={getNodeFileName(node) === getFileName(node) ? null : getNodeFileName(node)}/>
-
-      <NodeDeleteButton nodeDef={nodeDef}
-                        node={node}
-                        disabled={edit || R.isEmpty(getNodeValue(node))}
-                        showConfirm={true}
-                        removeNode={removeNode}/>
-    </div>
-    : null
+    <NodeDeleteButton nodeDef={nodeDef}
+                      node={node}
+                      disabled={!fileUploaded}
+                      showConfirm={true}
+                      removeNode={removeNode}/>
+  </div>
+}
 
 const MultipleFileInput = props => {
   const {nodes} = props
@@ -64,8 +49,6 @@ const MultipleFileInput = props => {
 const NodeDefFile = props =>
   props.edit
     ? <FileInput {...props}/>
-    : NodeDef.isNodeDefMultiple(props.nodeDef)
-    ? <MultipleFileInput {...props}/>
-    : <FileInput {...props} node={props.nodes[0]}/>
+    : <MultipleFileInput {...props}/>
 
 export default NodeDefFile

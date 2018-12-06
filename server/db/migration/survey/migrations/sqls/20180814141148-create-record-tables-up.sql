@@ -46,7 +46,6 @@ CREATE TABLE
   parent_uuid   uuid,
   node_def_uuid uuid      NOT NULL,
   value         jsonb,
-  file          bytea,
   date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
   date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
 

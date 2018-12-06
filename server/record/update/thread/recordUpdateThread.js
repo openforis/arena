@@ -43,7 +43,7 @@ class RecordUpdateThread extends Thread {
 
       switch (msg.type) {
         case messageTypes.persistNode:
-          nodes = await RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file, t)
+          nodes = await RecordProcessor.persistNode(msg.surveyId, msg.node, t)
           logType = activityType.record.nodePersist
           logMessage = msg.node
           break

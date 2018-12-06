@@ -3,6 +3,8 @@ const R = require('ramda')
 const {uuidv4} = require('./../uuid')
 const {isBlank} = require('../stringUtils')
 
+const valuePropName = 'value'
+
 /**
  * ======
  * CREATE
@@ -30,7 +32,7 @@ const newNodePlaceholder = (nodeDef, parentNode, value = null) =>
  */
 
 const getNodeValue = (node = {}, defaultValue = {}) =>
-  R.propOr(defaultValue, 'value', node)
+  R.propOr(defaultValue, valuePropName, node)
 
 const getNodeValueProp = (prop, defaultValue = null) => R.pipe(
   getNodeValue,
@@ -75,6 +77,9 @@ module.exports = {
   getNodeItemUuid: getNodeValueProp('itemUuid'),
   getNodeTaxonUuid: getNodeValueProp('taxonUuid'),
   getNodeVernacularNameUuid: getNodeValueProp('vernacularNameUuid'),
+
+  // ==== UPDATE
+  assocValue: R.assoc(valuePropName),
 
   // ==== UTILS
   isNodeValueBlank,

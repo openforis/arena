@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
+import ErrorBadge from '../../../../commonComponents/errorBadge'
 import TaxonTable from './taxonTable'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'
@@ -29,7 +30,7 @@ import {
   setTaxonomyForEdit,
   putTaxonomyProp,
   uploadTaxonomyFile,
-  reloadTaxa,
+  initTaxaList,
   loadTaxa,
 } from '../actions'
 import { getSurveyForm } from '../../surveyFormState'
@@ -38,17 +39,17 @@ import { canEditSurvey } from '../../../../../common/auth/authManager'
 class TaxonomyEdit extends React.Component {
 
   async componentDidMount () {
-    const {taxonomy, reloadTaxa} = this.props
+    const {taxonomy, initTaxaList} = this.props
 
     if (taxonomy.id) {
-      reloadTaxa(taxonomy)
+      initTaxaList(taxonomy)
     }
   }
 
   render () {
     const {
       surveyId, taxonomy, taxaCurrentPage, taxaTotalPages, taxaPerPage, taxa,
-      loadTaxaPage, putTaxonomyProp, uploadTaxonomyFile, setTaxonomyForEdit,
+      loadTaxa, putTaxonomyProp, uploadTaxonomyFile, setTaxonomyForEdit,
       readOnly,
     } = this.props
 
@@ -58,6 +59,8 @@ class TaxonomyEdit extends React.Component {
       <div className="taxonomy-edit">
 
         <div className="taxonomy-edit__header">
+
+          <ErrorBadge validation={validation}/>
 
           <FormItem label="Taxonomy name">
             <div>
@@ -73,7 +76,6 @@ class TaxonomyEdit extends React.Component {
               !readOnly &&
               <UploadButton label="CSV import"
                             disabled={taxonomy.published}
-                            title={taxonomy.published ? 'Import not allowed for published Taxonomy' : null}
                             onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
 
             }
@@ -92,7 +94,7 @@ class TaxonomyEdit extends React.Component {
                           currentPage={taxaCurrentPage}
                           totalPages={taxaTotalPages}
                           rowsPerPage={taxaPerPage}
-                          onPageChange={(page) => loadTaxaPage(taxonomy, page)}/>
+                          onPageChange={(page) => loadTaxa(taxonomy, page)}/>
         }
 
         <div style={{justifySelf: 'center'}}>
@@ -128,6 +130,6 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   {
-    setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile, reloadTaxa, loadTaxaPage: loadTaxa,
+    setTaxonomyForEdit, putTaxonomyProp, uploadTaxonomyFile, initTaxaList, loadTaxa,
   }
 )(TaxonomyEdit)
