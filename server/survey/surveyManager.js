@@ -138,6 +138,8 @@ module.exports = {
   // ====== READ
   fetchSurveyById,
   fetchUserSurveysInfo,
+
+  //TODO move to NodeDefManager
   fetchSurveyNodeDefs,
 
   // ====== UPDATE

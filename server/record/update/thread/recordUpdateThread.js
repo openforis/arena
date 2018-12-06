@@ -3,6 +3,7 @@ const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
 const Queue = require('../../../../common/queue')
+const DataSchema = require('../../../surveyData/dataSchema')
 
 class RecordUpdateThread extends Thread {
 
@@ -44,7 +45,7 @@ class RecordUpdateThread extends Thread {
         nodes = await RecordProcessor.deleteNode(msg.surveyId, msg.nodeUuid)
         break
     }
-
+    await DataSchema.updateTableNodes(msg.surveyId, nodes)
     this.postMessage(nodes)
   }
 

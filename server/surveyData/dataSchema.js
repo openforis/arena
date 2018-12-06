@@ -5,7 +5,13 @@ const db = require('../db/db')
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
+const Node = require('../../common/record/node')
+
+const SurveyManager = require('../survey/surveyManager')
+const NodeDefManager = require('../nodeDef/nodeDefManager')
+
 const DataTable = require('./DataTable')
+const DataCol = require('./dataCol')
 
 const getSurveyId = R.pipe(Survey.getSurveyInfo, R.prop('id'))
 
@@ -45,8 +51,6 @@ const createTable = async (survey, nodeDef) => {
   `)
 }
 
-// ==== DATA INSERT
-
 const insertIntoTable = async (survey, nodeDef, record) => {
 
   const columnNames = DataTable.getColumnNames(survey, nodeDef)
@@ -71,10 +75,52 @@ const insertIntoTable = async (survey, nodeDef, record) => {
 
 }
 
+const updateTableNodes = async (surveyId, nodes) => {
+  const survey = await SurveyManager.fetchSurveyById(surveyId)
+  // console.log('======== nodes ', JSON.stringify(nodes))
+  const nodeDefUuids = R.pipe(
+    R.keys,
+    R.map(k => Node.getNodeDefUuid(nodes[k])),
+    R.uniq
+  )(nodes)
+  // console.log('======== nodeDefUuids ', JSON.stringify(nodeDefUuids))
+
+  const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, nodeDefUuids)
+
+  // const nodeRows =  await NodeDefManager.fetchNodeDefsByUuid(
+  //   surveyId,
+  //   R.pipe(
+  //     R.map(R.prop('uuid')),
+  //     R.uniq
+  //   )(nodes)
+  // )
+
+  console.log('======== nodeDefs ', JSON.stringify(nodeDefs))
+  // await db.tx(async t => await t.batch(
+  //   nodes.map(node => {
+  //     const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
+  // const colNames = DataCol.getNames(nodeDef)
+  // const colValues= DataCol.getValues()
+  //
+  //     return t.query(`
+  //       UPDATE
+  //         ${getSchemaName(getSurveyId(survey))}.${getTableName(survey, nodeDef)}
+  //         (${columnNames.join(',')})
+  //       VALUES
+  //         (${columnNames.map((nodeDef, i) => `$${i + 1}`).join(',')})
+  //       `,
+  //         [...nodeValue]
+  //     )
+  //   })
+  // ))
+
+}
+
 module.exports = {
   dropSchema,
   createSchema,
 
   createTable,
   insertIntoTable,
+  updateTableNodes,
 }

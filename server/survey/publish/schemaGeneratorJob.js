@@ -27,6 +27,7 @@ class SchemaGeneratorJob extends Job {
 
     this.total = 1 + nodeDefs.length + (recordSummaries.length * nodeDefs.length)
 
+    // drop and create schema
     await DataSchema.dropSchema(surveyId)
     await DataSchema.createSchema(surveyId)
     this.incrementProcessedItems()
