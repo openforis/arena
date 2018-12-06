@@ -60,7 +60,8 @@ const insertIntoTable = async (survey, nodeDef, record) => {
   const nodeValues = await Promise.all(nodes.map(async node =>
     await DataTable.getRowValues(survey, nodeDef, record, node)
   ))
-
+console.log("===columnNames " , columnNames)
+console.log("===nodeValues " , JSON.stringify(nodeValues))
   await db.tx(async t => await t.batch(
     nodeValues.map(nodeValue => t.query(`
       INSERT INTO 
@@ -75,7 +76,7 @@ const insertIntoTable = async (survey, nodeDef, record) => {
 
 }
 
-const updateTableNodes = async (surveyId, nodes) => {
+const updateTableNodes = async (surveyId, nodes, client = db) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   // console.log('======== nodes ', JSON.stringify(nodes))
   const nodeDefUuids = R.pipe(
@@ -95,7 +96,7 @@ const updateTableNodes = async (surveyId, nodes) => {
   //   )(nodes)
   // )
 
-  console.log('======== nodeDefs ', JSON.stringify(nodeDefs))
+  // console.log('======== nodeDefs ', JSON.stringify(nodeDefs))
   // await db.tx(async t => await t.batch(
   //   nodes.map(node => {
   //     const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]

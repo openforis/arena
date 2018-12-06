@@ -1,3 +1,4 @@
+const db = require('../../../db/db')
 const RecordProcessor = require('./recordProcessor')
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
@@ -36,17 +37,23 @@ class RecordUpdateThread extends Thread {
   async processMessage (msg) {
     let nodes = null
 
-    switch (msg.type) {
-      case messageTypes.persistNode:
-        nodes = await RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file)
-        break
+    await db.tx(async t => {
+      const {surveyId} = msg
 
-      case messageTypes.deleteNode:
-        nodes = await RecordProcessor.deleteNode(msg.surveyId, msg.nodeUuid)
-        break
-    }
-    await DataSchema.updateTableNodes(msg.surveyId, nodes)
-    this.postMessage(nodes)
+      switch (msg.type) {
+        case messageTypes.persistNode:
+          nodes = await RecordProcessor.persistNode(surveyId, msg.node, msg.file, t)
+          break
+
+        case messageTypes.deleteNode:
+          nodes = await RecordProcessor.deleteNode(surveyId, msg.nodeUuid, t)
+          break
+      }
+
+      this.postMessage(nodes)
+
+      await DataSchema.updateTableNodes(msg.surveyId, nodes, t)
+    })
   }
 
 }

@@ -42,7 +42,7 @@ const getColumnNamesAndType = (survey, nodeDef) => [
 ]
 
 const getRowValues = async (survey, nodeDef, record, node) => {
-  const rowValues = await DataRow.getValues(survey, nodeDef, record, node, getNodeDefColumns(survey, nodeDef))
+  const rowValues = await DataRow.getValues(Survey.getSurveyInfo(survey), nodeDef, record, node, getNodeDefColumns(survey, nodeDef))
   return [node.uuid, ...R.flatten(rowValues)]
 }
 

@@ -1,7 +1,6 @@
 const R = require('ramda')
 
 const NodeDef = require('../../common/survey/nodeDef')
-const Node = require('../../common/record/node')
 const ColProps = require('./dataColProps')
 
 const getDefaultColumnName = nodeDef => NodeDef.isNodeDefEntity(nodeDef)
@@ -25,10 +24,10 @@ const getNamesAndType = nodeDef => R.pipe(
   ),
 )(nodeDef)
 
-const getValues = async (survey, nodeDefCol, record, nodeRow, nodeCol = {}) => {
+const getValues = async (surveyInfo, nodeDefCol, nodeCol = {}) => {
   const _getValues = async () => {
     const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
-    const valueFn = await valueFnProcessor(survey, nodeDefCol, nodeCol)
+    const valueFn = await valueFnProcessor(surveyInfo, nodeDefCol, nodeCol)
 
     return getNames(nodeDefCol).map(colName =>
       valueFn(nodeCol, colName)
@@ -39,9 +38,7 @@ const getValues = async (survey, nodeDefCol, record, nodeRow, nodeCol = {}) => {
   return NodeDef.isNodeDefEntity(nodeDefCol)
     ? [R.propOr(null, 'uuid', nodeCol)]
     // attribute column in multiple attribute table (value of its own table)
-    : Node.getNodeDefUuid(nodeRow) === nodeDefCol.uuid
-      ? [nodeRow.value]
-      : await _getValues()
+    : await _getValues()
 }
 
 module.exports = {

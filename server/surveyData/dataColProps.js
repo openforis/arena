@@ -14,7 +14,7 @@ const {nodeDefType} = NodeDef
 const cols = 'cols'
 const colValueProcessor = 'colValueProcessor'
 
-const nodeValuePropProcessor = (survey, nodeDefCol, nodeCol) =>
+const nodeValuePropProcessor = (surveyInfo, nodeDefCol, nodeCol) =>
   (node, colName) => {
     const nodeValue = Node.getNodeValue(node)
     //remove nodeDefName from col name
@@ -30,8 +30,7 @@ const props = {
   [nodeDefType.code]: {
     [cols]: ['code', 'label'],
 
-    [colValueProcessor]: async (survey, nodeDefCol, nodeCol) => {
-      const surveyInfo = Survey.getSurveyInfo(survey)
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const nodeDefName = NodeDef.getNodeDefName(nodeDefCol)
       const item = await CategoryManager.fetchItemByUuid(surveyInfo.id, Node.getNodeValue(nodeCol).itemUuid)
 
@@ -46,8 +45,7 @@ const props = {
     [cols]: ['code', 'scientific_name'],
     //?, 'vernacular_names?'],
 
-    [colValueProcessor]: async (survey, nodeDefCol, nodeCol) => {
-      const surveyInfo = Survey.getSurveyInfo(survey)
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const nodeDefName = NodeDef.getNodeDefName(nodeDefCol)
       const items = await TaxonomyManager.fetchTaxaByPropLike(surveyInfo.id, null, {filter: {uuid: Node.getNodeValue(nodeCol).taxonUuid}})
       const item = R.pipe(R.head, R.defaultTo({}))(items)
