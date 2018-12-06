@@ -83,41 +83,82 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, nodeDefUuids)
 
+  const types = {insert: 'insert', update: 'update', delete: 'delete'}
+
   const updates = await Promise.all(
     R.values(nodes).map(async node => {
 
-      if (node.updated) {
-        const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
-        const nodeDefParent = nodeDefs[NodeDef.getNodeDefParentUuid(nodeDef)]
-        return {
-          colNames: DataCol.getNames(nodeDef),
-          colValues: await DataCol.getValues(Survey.getSurveyInfo(survey), nodeDef, node),
-          tableName: NodeDef.isNodeDefMultiple(nodeDef)
+      const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
+      const nodeDefParent = nodeDefs[NodeDef.getNodeDefParentUuid(nodeDef)]
+      const nodeParent = nodes[Node.getParentUuid(node)]
+
+      const isMultiple = NodeDef.isNodeDefMultiple(nodeDef)
+      const isEntity = NodeDef.isNodeDefEntity(nodeDef)
+      const hasTable = isEntity || isMultiple
+
+      const type = node.created && hasTable
+        ? types.insert
+        : node.updated || node.created
+          ? types.update
+          : node.deleted && hasTable
+            ? types.delete
+            : node.deleted
+              ? types.update
+              : null
+
+      return type ? {
+        type,
+        tableName: isEntity
+          ? getTableName(survey, nodeDef)
+          : isMultiple
             ? getTableName(survey, nodeDefParent, nodeDef)
             : getTableName(survey, nodeDefParent),
-          rowUuid: NodeDef.isNodeDefMultiple(nodeDef)
-            ? node.uuid
-            : nodes[Node.getParentUuid(node)].uuid
-        }
-      }
-
-      return null
+        colNames: node.created && isEntity ? ['uuid'] : DataCol.getNames(nodeDef),
+        colValues: await DataCol.getValues(Survey.getSurveyInfo(survey), nodeDef, node),
+        rowUuid: hasTable
+          ? node.uuid
+          : nodeParent.uuid
+      } : null
     })
   )
 
-  // console.log('=== updates ', JSON.stringify(updates))
+  //TODO hierarchical delete of entities
+
   await client.batch(
     R.pipe(
       R.values,
       R.reject(R.isNil),
       R.map(
-        update => client.query(`
-            UPDATE ${getSchemaName(getSurveyId(survey))}.${update.tableName}
+        update => update.type === types.update
+          ? (
+            client.query(
+              `UPDATE ${getSchemaName(getSurveyId(survey))}.${update.tableName}
                SET ${update.colNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
-               WHERE uuid = $1
-            `,
-          [update.rowUuid, ...update.colValues]
-        )
+               WHERE uuid = $1`,
+              [update.rowUuid, ...update.colValues]
+            )
+          )
+          : update.type === types.insert
+            ? (
+              client.query(
+                `INSERT INTO ${getSchemaName(getSurveyId(survey))}.${update.tableName}
+                   (${update.colNames.join(',')})
+                   VALUES 
+                   (${update.colNames.map((col, i) => `$${i + 1}`).join(',')})
+                  `,
+                update.colValues
+              )
+            )
+            : update.type === types.delete
+              ? (
+                client.query(
+                  `DELETE FROM ${getSchemaName(getSurveyId(survey))}.${update.tableName}
+                   WHERE uuid = $1
+                  `,
+                  update.colValues[0]
+                )
+              )
+              : null
       )
     )(updates)
   )

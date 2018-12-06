@@ -3,6 +3,7 @@ const Promise = require('bluebird')
 
 const db = require('../../../db/db')
 
+const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
 const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
@@ -15,7 +16,18 @@ const persistNode = async (surveyId, node, client = db) => {
 
   return nodeDb
     ? await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), client)
-    : await createNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, client)
+    : await insertNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, client)
+}
+
+//always returning parentNode, used in dataSchema.updateTableNodes
+const addParentNode = async (surveyId, node, nodes, client = db) => {
+  const parentNode = await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), client)
+  return R.mergeRight({[node.uuid]: node, [parentNode.uuid]: parentNode}, nodes)
+}
+
+const insertNode = async (surveyId, nodeDef, node, client = db) => {
+  const nodesToReturn = await createNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, client)
+  return await addParentNode(surveyId, node, nodesToReturn, client)
 }
 
 /**
@@ -71,18 +83,10 @@ const deleteNode = async (surveyId, nodeUuid, client = db) =>
 const onNodeUpdate = async (surveyId, node, client = db) => {
   //delete dependent code nodes
   const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordId, node.uuid)
-
-  //always returning parentNode, used in dataSchema.updateTableNodes
-  const parentNode = await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), client)
-
-  const nodesToReturn = [
-    ...await Promise.all(
-      descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, nodeCode.uuid, client))
-    ),
-    {[parentNode.uuid]: parentNode}
-  ]
-
-  return R.mergeLeft({[node.uuid]: node}, R.mergeAll(nodesToReturn))
+  const nodesToReturn = await Promise.all(
+    descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, nodeCode.uuid, client))
+  )
+  return await addParentNode(surveyId, node, SurveyUtils.toUuidIndexedObj(nodesToReturn), client)
 }
 
 module.exports = {
