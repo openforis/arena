@@ -1,4 +1,6 @@
 const R = require('ramda')
+const camelize = require('camelize')
+const toSnakeCase = require('to-snake-case')
 
 const Survey = require('../../common/survey/survey')
 const SurveyUtils = require('../../common/survey/surveyUtils')
@@ -11,6 +13,18 @@ const {nodeDefType} = NodeDef
 
 const cols = 'cols'
 const colValueProcessor = 'colValueProcessor'
+
+const nodeValuePropProcessor = (survey, nodeDefCol, nodeCol) =>
+  (node, colName) => {
+    const nodeValue = Node.getNodeValue(node)
+    //remove nodeDefName from col name
+    const colProp = R.pipe(
+      R.replace(toSnakeCase(NodeDef.getNodeDefName(nodeDefCol)) + '_', ''),
+      camelize,
+    )(colName)
+
+    return R.propOr(null, colProp, nodeValue)
+  }
 
 const props = {
   [nodeDefType.code]: {
@@ -26,10 +40,6 @@ const props = {
         //'label'
         : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
     }
-  },
-
-  [nodeDefType.coordinate]: {
-    [cols]: ['x', 'y', 'srs'],
   },
 
   [nodeDefType.taxon]: {
@@ -48,6 +58,16 @@ const props = {
         : SurveyUtils.getProp('scientificName')(item)
     }
 
+  },
+
+  [nodeDefType.coordinate]: {
+    [cols]: ['x', 'y', 'srs'],
+    [colValueProcessor]: nodeValuePropProcessor
+  },
+
+  [nodeDefType.file]: {
+    [cols]: ['file_uuid', 'file_name'],
+    [colValueProcessor]: nodeValuePropProcessor
   },
 
 }
