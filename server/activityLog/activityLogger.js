@@ -24,6 +24,7 @@ const activityType = {
   taxonomy: {
     create: 'taxonomyCreate',
     propUpdate: 'taxonomyPropUpdate',
+    taxonInsert: 'taxonInsert',
     delete: 'taxonomyDelete',
   },
   record: {
@@ -34,12 +35,18 @@ const activityType = {
 }
 
 const logActivity = async (user, surveyId, type, params, client) =>
-  await client.none(`
+  client.none(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_email, params)
     VALUES ($1, $2, $3::jsonb)`,
     [type, user.email, params])
 
+const logActivities = async (user, surveyId, activities, client) =>
+  await client.batch([
+    activities.map(activity => logActivity(user, surveyId, activity.type, activity.params, client))
+  ])
+
 module.exports = {
   logActivity,
+  logActivities,
   activityType,
 }

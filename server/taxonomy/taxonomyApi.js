@@ -125,6 +125,7 @@ module.exports.init = app => {
 
       const job = new TaxonomyImportJob({
         userId: user.id,
+        user,
         surveyId,
         taxonomyId,
         csvString: file.data.toString('utf8')
