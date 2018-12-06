@@ -5,6 +5,7 @@ const SurveyUtils = require('../../common/survey/surveyUtils')
 const NodeDef = require('../../common/survey/nodeDef')
 const Node = require('../../common/record/node')
 const CategoryManager = require('../category/categoryManager')
+const TaxonomyManager = require('../taxonomy/taxonomyManager')
 
 const {nodeDefType} = NodeDef
 
@@ -32,7 +33,21 @@ const props = {
   },
 
   [nodeDefType.taxon]: {
-    [cols]: ['code', 'scientific_name', 'vernacular_name'],
+    [cols]: ['code', 'scientific_name'],
+    //?, 'vernacular_names?'],
+
+    [colValueProcessor]: async (survey, nodeDefCol, nodeCol) => {
+      const surveyInfo = Survey.getSurveyInfo(survey)
+      const nodeDefName = NodeDef.getNodeDefName(nodeDefCol)
+      const items = await TaxonomyManager.fetchTaxaByPropLike(surveyInfo.id, null, {filter: {uuid: Node.getNodeValue(nodeCol).taxonUuid}})
+      const item = R.pipe(R.head, R.defaultTo({}))(items)
+
+      return (node, colName) => colName === nodeDefName + '_' + 'code'
+        ? SurveyUtils.getProp('code')(item)
+        //scientific_name
+        : SurveyUtils.getProp('scientificName')(item)
+    }
+
   },
 
 }
