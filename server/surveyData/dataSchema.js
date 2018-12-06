@@ -39,6 +39,11 @@ const getTableNameFromSurvey = (survey, nodeDef) =>
 const createTable = async (survey, nodeDef) => {
   const cols = DataTable.getColumnNamesAndType(survey, nodeDef)
 
+  const ancestors = Survey.getAncestorsHierarchy(nodeDef)(survey)
+
+  const getConstraintFk = nodeDef => ancestor =>
+    `CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_${NodeDef.getNodeDefName(ancestor)}fk FOREIGN KEY (${DataCol.getNames(ancestor)[0]}) REFERENCES ${getSchemaName(getSurveyId(survey))}.${getTableName(survey, ancestor)} (uuid) ON DELETE CASCADE`
+
   await db.query(`
     CREATE TABLE
       ${getSchemaName(getSurveyId(survey))}.${getTableNameFromSurvey(survey, nodeDef)}
@@ -47,6 +52,8 @@ const createTable = async (survey, nodeDef) => {
       date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       ${cols.join(',')},
+      CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_uuid_unique_ix1 UNIQUE (uuid),
+      ${R.isEmpty(ancestors) ? '' : ancestors.map(getConstraintFk(nodeDef)).join(',') + ', '}
       PRIMARY KEY (id)
     )
   `)

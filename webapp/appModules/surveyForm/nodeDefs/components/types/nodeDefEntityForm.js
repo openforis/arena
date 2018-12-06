@@ -94,6 +94,7 @@ const NodeSelect = props => {
     <div style={{
       display: 'flex',
       justifyContent: 'center',
+      margin: '.5rem 10rem',
     }}>
 
       <select aria-disabled={R.isEmpty(nodes)}
@@ -191,7 +192,7 @@ class NodeDefEntityForm extends React.Component {
     if (entry && NodeDef.isNodeDefMultiple(nodeDef)) {
       const node = this.getNode(selectedNodeUuid)
 
-      return <div>
+      return <div style={{position: 'relative'}}>
 
         <NodeSelect {...this.props}
                     selectedNode={node}
