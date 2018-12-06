@@ -105,6 +105,7 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
     })
   )
 
+  // console.log('=== updates ', JSON.stringify(updates))
   await client.batch(
     R.pipe(
       R.values,

@@ -13,7 +13,7 @@ const insertNode = async (surveyId, node, client = db) =>
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
     (uuid, record_id, parent_uuid, node_def_uuid, value)
     VALUES ($1, $2, $3, $4, $5)
-    RETURNING *`,
+    RETURNING *, true as created`,
     [node.uuid, node.recordId, Node.getParentUuid(node), Node.getNodeDefUuid(node), node.value ? JSON.stringify(node.value) : null],
     dbTransformCallback
   )
@@ -53,7 +53,7 @@ const updateNode = async (surveyId, nodeUuid, value, client = db) =>
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1, date_modified = now()
     WHERE uuid = $2
-    RETURNING *
+    RETURNING *, true as updated
     `, [value ? JSON.stringify(value) : null, nodeUuid],
     dbTransformCallback
   )
@@ -63,7 +63,7 @@ const deleteNode = async (surveyId, nodeUuid, client = db) =>
   await client.one(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1
-    RETURNING *
+    RETURNING *,'{}' as value, true as deleted
     `, [nodeUuid],
     dbTransformCallback
   )

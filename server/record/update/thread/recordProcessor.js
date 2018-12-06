@@ -63,7 +63,7 @@ const updateNodeValue = async (surveyId, nodeUuid, value, client = db) =>
  */
 const deleteNode = async (surveyId, nodeUuid, client = db) =>
   await client.tx(async t => {
-    const node = await deleteNodeInternal(surveyId, nodeUuid, t)
+    const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
     return await onNodeUpdate(surveyId, node, t)
   })
@@ -77,20 +77,12 @@ const onNodeUpdate = async (surveyId, node, client = db) => {
 
   const nodesToReturn = [
     ...await Promise.all(
-      descendantCodes.map(async nodeCode => await deleteNodeInternal(surveyId, nodeCode.uuid, client))
+      descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, nodeCode.uuid, client))
     ),
-    {[parentNode.uuid]: {...parentNode, updated: false}}
+    {[parentNode.uuid]: parentNode}
   ]
 
-  return R.mergeLeft(
-    {[node.uuid]: {...node, updated: !node.deleted}},
-    R.mergeAll(nodesToReturn)
-  )
-}
-
-const deleteNodeInternal = async (surveyId, nodeUuid, client) => {
-  const node = await NodeRepository.deleteNode(surveyId, nodeUuid, client)
-  return {...node, deleted: true, value: {}}
+  return R.mergeLeft({[node.uuid]: node}, R.mergeAll(nodesToReturn))
 }
 
 module.exports = {

@@ -32,7 +32,8 @@ const props = {
 
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const nodeDefName = NodeDef.getNodeDefName(nodeDefCol)
-      const item = await CategoryManager.fetchItemByUuid(surveyInfo.id, Node.getNodeValue(nodeCol).itemUuid)
+      const {itemUuid} = Node.getNodeValue(nodeCol)
+      const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid) : {}
 
       return (node, colName) => colName === nodeDefName + '_' + 'code'
         ? SurveyUtils.getProp('code')(item)
