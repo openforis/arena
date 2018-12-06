@@ -61,11 +61,10 @@ const cancelCheckOut = userId => {
  * @param userId
  * @param surveyId
  * @param node
- * @param file
  */
-const persistNode = (userId, surveyId, node, file) => {
+const persistNode = (userId, surveyId, node) => {
   const updateWorker = recordUpdateThreads.getThread(userId)
-  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, surveyId, node, file})
+  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, surveyId, node})
 }
 
 /**

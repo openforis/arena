@@ -20,8 +20,9 @@ module.exports = () => {
   app.use(bodyParser.json({limit: '5000kb'}))
   app.use(cookieParser())
   app.use(fileUpload({
-    //limit upload to 50MB
-    limits: {fileSize: 50 * 1024 * 1024},
+    //limit upload to 10MB
+    limits: {fileSize: 10 * 1024 * 1024},
+    abortOnLimit: true
   }))
 
   headerMiddleware.init(app)

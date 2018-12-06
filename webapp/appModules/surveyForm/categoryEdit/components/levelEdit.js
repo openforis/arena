@@ -3,6 +3,7 @@ import * as R from 'ramda'
 import { connect } from 'react-redux'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
+import ErrorBadge from '../../../../commonComponents/errorBadge'
 import ItemEdit from './itemEdit'
 
 import { normalizeName } from '../../../../../common/stringUtils'
@@ -52,7 +53,10 @@ class LevelEdit extends React.Component {
     return <div className="category-edit__level">
 
       <div className="category-edit__level-header">
-        <h4 className="label">Level {level.index + 1}</h4>
+        <h4 className="label">
+          <ErrorBadge validation={validation}/>
+          Level {level.index + 1}
+        </h4>
         {
           !readOnly &&
           <button className="btn btn-s btn-of-light-xs"

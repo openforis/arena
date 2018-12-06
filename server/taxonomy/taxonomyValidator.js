@@ -8,15 +8,19 @@ const {
 /**
  * ====== TAXONOMY
  */
-const taxonomyValidators = (taxonomies) => ({
+const validateNotEmptyTaxa = taxaCount => () =>
+  taxaCount === 0 ? ['empty'] : null
+
+const taxonomyValidators = (taxonomies, taxaCount) => ({
   'props.name': [validateRequired, validateNotKeyword, validateItemPropUniqueness(taxonomies)],
+  'taxa': [validateNotEmptyTaxa(taxaCount)]
 })
 
-const validateTaxonomy = async (taxonomies, taxonomy) =>
-  await validate(taxonomy, taxonomyValidators(taxonomies))
+const validateTaxonomy = async (taxonomies, taxonomy, taxaCount) =>
+  await validate(taxonomy, taxonomyValidators(taxonomies, taxaCount))
 
 /**
- * ====== TAXONOMY
+ * ====== TAXON
  */
 const taxonValidators = (taxa) => ({
   'props.family': [validateRequired],
