@@ -16,22 +16,11 @@ const RecordUpdateManager = require('./update/recordUpdateManager')
  * CREATE
  * ===================
  */
-const createRecord = async (user, recordToCreate) => await db.tx(
-  async t => {
+const createRecord = (user, surveyId, record) => {
+  RecordUpdateManager.checkIn(user.id)
 
-    RecordUpdateManager.checkIn(user.id)
-
-    const record = await RecordRepository.insertRecord(recordToCreate, t)
-    const {surveyId, id: recordId} = record
-
-    const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
-    const rootNode = Node.newNode(rootNodeDef.uuid, recordId)
-
-    persistNode(user, surveyId, rootNode)
-
-    return record
-  }
-)
+  RecordUpdateManager.createRecord(user, surveyId, record)
+}
 
 /**
  * ===================
@@ -46,9 +35,9 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit) => {
   }
 }
 
-const fetchRecordById = async (surveyId, recordId) => {
-  const record = await RecordRepository.fetchRecordById(surveyId, recordId)
-  const nodes = await NodeRepository.fetchNodesByRecordId(surveyId, recordId)
+const fetchRecordByUuid = async (surveyId, recordUuid) => {
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid)
 
   return {...record, nodes: toUuidIndexedObj(nodes)}
 }
@@ -94,9 +83,9 @@ const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(
  * CHECK IN / OUT RECORD
  * ==================
  */
-const checkInRecord = async (userId, surveyId, recordId) => {
+const checkInRecord = async (userId, surveyId, recordUuid) => {
   RecordUpdateManager.checkIn(userId)
-  return await fetchRecordById(surveyId, recordId)
+  return await fetchRecordByUuid(surveyId, recordUuid)
 }
 
 const checkOutRecord = RecordUpdateManager.checkOut

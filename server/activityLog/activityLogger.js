@@ -28,9 +28,10 @@ const activityType = {
     delete: 'taxonomyDelete',
   },
   record: {
+    create: 'recordCreate',
+    delete: 'recordDelete',
     nodeCreate: 'nodeCreate',
     nodeUpdateValue: 'nodeUpdateValue',
-    delete: 'recordDelete',
     nodeDelete: 'nodeDelete',
   },
 }

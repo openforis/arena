@@ -11,15 +11,18 @@ const NodeRepository = require('../../../record/nodeRepository')
 
 const {logActivity, activityType} = require('../../../activityLog/activityLogger')
 
-const createRecord = async(user, recordToCreate, client = db) => {
-  const record = await RecordRepository.insertRecord(recordToCreate, client)
-  const {surveyId, id: recordId} = record
+const createRecord = async (user, surveyId, recordToCreate, client = db) =>
+  await client.tx(async t => {
+    const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
+    const {uuid: recordUuid} = record
 
-  const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, client)
-  const rootNode = Node.newNode(rootNodeDef.uuid, recordId)
+    await logActivity(user, surveyId, activityType.record.create, recordToCreate, t)
 
-  return persistNode(user, surveyId, rootNode)
-}
+    const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
+    const rootNode = Node.newNode(rootNodeDef.uuid, recordUuid)
+
+    return persistNode(user, surveyId, rootNode, t)
+  })
 
 const persistNode = async (user, surveyId, node, client = db) => {
   const {uuid} = node
@@ -57,7 +60,9 @@ const createNode = async (surveyId, nodeDef, nodeToInsert, client = db) => {
       childDefs
         .filter(NodeDef.isNodeDefSingleEntity)
         .map(
-          async childDef => await createNode(surveyId, childDef, Node.newNode(childDef.uuid, node.recordId, node.uuid), null, client)
+          async childDef => await createNode(surveyId, childDef,
+            Node.newNode(childDef.uuid, node.recordUuid, node.uuid),
+            null, client)
         )
     )
   )
@@ -91,7 +96,7 @@ const deleteNode = async (user, surveyId, nodeUuid, client = db) =>
 
 const onNodeUpdate = async (surveyId, node, client = db) => {
   //delete dependent code nodes
-  const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordId, node.uuid)
+  const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordUuid, node.uuid)
 
   const clearedDependentCodeAttributes = await Promise.all(
     descendantCodes.map(async nodeCode => await deleteNodeInternal(surveyId, nodeCode.uuid, client))

@@ -7,7 +7,7 @@ import NodeDeleteButton from '../nodeDeleteButton'
 import Node from '../../../../../../common/record/node'
 import File from '../../../../../../common/file/file'
 
-const FileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode, removeNode}) => {
+const FileInput = ({surveyInfo, nodeDef, edit, recordUuid, node, updateNode, removeNode}) => {
   const fileName = Node.getNodeFileName(node)
   const truncatedFileName = File.truncateFileName(fileName)
   const fileUploaded = !edit && fileName
@@ -17,7 +17,7 @@ const FileInput = ({surveyInfo, nodeDef, edit, recordId, node, updateNode, remov
                   showLabel={false}
                   onChange={files => updateNode(nodeDef, node, null, files[0])}/>
 
-    <DownloadButton href={edit ? null : `/api/survey/${surveyInfo.id}/record/${recordId}/nodes/${node.uuid}/file`}
+    <DownloadButton href={edit ? null : `/api/survey/${surveyInfo.id}/record/${recordUuid}/nodes/${node.uuid}/file`}
                     disabled={!fileUploaded}
                     label={truncatedFileName}
                     title={fileName === truncatedFileName ? null : fileName}/>

@@ -88,10 +88,10 @@ class NodeDefEntityTable extends React.Component {
               ? <button className="btn btn-s btn-of-light-xs"
                         style={{marginLeft: '10px'}}
                         onClick={() => {
-                          const entity = Node.newNode(nodeDef.uuid, parentNode.recordId, parentNode.uuid)
+                          const entity = Node.newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
                           updateNode(nodeDef, entity)
                         }}>
-                <span className="icon icon-plus icon-12px icon-left"></span>
+                <span className="icon icon-plus icon-12px icon-left"/>
                 ADD
               </button>
               : null

@@ -14,21 +14,24 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/record', async (req, res) => {
     try {
       const {user} = req
-      const recordReq = req.body
+      const surveyId = getRestParam(req, 'surveyId')
 
-      if (recordReq.ownerId !== user.id) {
-        throw new Error('Error record create. User is different')
+      const record = req.body
+
+      if (record.ownerId !== user.id) {
+        sendErr('Error record create. User is different')
+        return
       }
 
-      const record = await RecordManager.createRecord(user, recordReq)
+      RecordManager.createRecord(user, surveyId, record)
 
-      res.json({record})
+      sendOk(res)
     } catch (err) {
       sendErr(res, err)
     }
   })
 
-  app.post('/survey/:surveyId/record/:recordId/node', async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/node', async (req, res) => {
     try {
       const user = req.user
       const node = JSON.parse(req.body.node)
@@ -71,7 +74,7 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordId/nodes/:nodeUuid/file', async (req, res) => {
+  app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUuid = getRestParam(req, 'nodeUuid')
@@ -88,13 +91,13 @@ module.exports.init = app => {
   // ==== UPDATE
 
   // RECORD Check in / out
-  app.post('/survey/:surveyId/record/:recordId/checkin', async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/checkin', async (req, res) => {
     try {
       const user = req.user
       const surveyId = getRestParam(req, 'surveyId')
-      const recordId = getRestParam(req, 'recordId')
+      const recordUuid = getRestParam(req, 'recordUuid')
 
-      const record = await RecordManager.checkInRecord(user.id, surveyId, recordId)
+      const record = await RecordManager.checkInRecord(user.id, surveyId, recordUuid)
 
       res.json({record})
     } catch (err) {
@@ -102,7 +105,7 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/survey/:surveyId/record/:recordId/checkout', async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/checkout', async (req, res) => {
     try {
       const user = req.user
 
@@ -129,7 +132,7 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/record/:recordId/node/:nodeUuid', async (req, res) => {
+  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUuid = getRestParam(req, 'nodeUuid')

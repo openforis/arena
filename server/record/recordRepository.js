@@ -18,14 +18,14 @@ const dbTransformCallback = (surveyId) => R.pipe(
 
 // ============== CREATE
 
-const insertRecord = async (record, client = db) =>
+const insertRecord = async (surveyId, record, client = db) =>
   await client.one(`
-    INSERT INTO ${getSurveyDBSchema(record.surveyId)}.record 
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.record 
     (owner_id, uuid, step)
     VALUES ($1, $2, $3)
     RETURNING ${recordSelectFields}`,
     [record.ownerId, record.uuid, record.step],
-    dbTransformCallback(record.surveyId)
+    dbTransformCallback(surveyId)
   )
 
 // ============== READ
@@ -42,7 +42,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset, limi
   // join with node key values
   const nodeDefKeyJoins = nodeDefKeys.map((nodeDefKey, i) => `
     LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.node as n${i}
-      ON r.id = n${i}.record_id
+      ON r.uuid = n${i}.record_uuid
       AND n${i}.node_def_uuid = '${nodeDefKey.uuid}'
   `).join(' ')
 
@@ -60,11 +60,11 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset, limi
     -- GET LAST MODIFIED NODE DATE
     JOIN (
          SELECT 
-           record_id, ${selectDate('MAX(date_modified)', 'date_modified')}
+           record_uuid, ${selectDate('MAX(date_modified)', 'date_modified')}
          FROM ${getSurveyDBSchema(surveyId)}.node
-         GROUP BY record_id
+         GROUP BY record_uuid
     ) as n
-      ON r.id = n.record_id
+      ON r.uuid = n.record_uuid
     ${R.isEmpty(nodeDefKeys) ? '' : nodeDefKeyJoins}
     ORDER BY r.id DESC
     LIMIT $1
@@ -75,12 +75,12 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset, limi
   )
 }
 
-const fetchRecordById = async (surveyId, recordId, client = db) =>
+const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   await client.one(
     `SELECT 
      ${recordSelectFields}
-     FROM ${getSurveyDBSchema(surveyId)}.record WHERE id = $1`,
-    [recordId],
+     FROM ${getSurveyDBSchema(surveyId)}.record WHERE uuid = $1`,
+    [recordUuid],
     dbTransformCallback(surveyId)
   )
 
@@ -106,7 +106,7 @@ module.exports = {
   // READ
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
-  fetchRecordById,
+  fetchRecordByUuid,
 
   // UPDATE
 

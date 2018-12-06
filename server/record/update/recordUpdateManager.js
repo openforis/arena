@@ -59,11 +59,12 @@ const cancelCheckOut = userId => {
  * Create a new record
  *
  * @param user
+ * @param surveyId
  * @param record
  */
-const createRecord = (user, record) => {
+const createRecord = (user, surveyId, record) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.createRecord, user, record})
+  updateWorker.postMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
 }
 
 /**

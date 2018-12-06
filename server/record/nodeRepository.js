@@ -11,21 +11,21 @@ const dbTransformCallback = camelize
 const insertNode = async (surveyId, node, client = db) =>
   await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-    (uuid, record_id, parent_uuid, node_def_uuid, value)
+    (uuid, record_uuid, parent_uuid, node_def_uuid, value)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *`,
-    [node.uuid, node.recordId, Node.getParentUuid(node), Node.getNodeDefUuid(node), node.value ? JSON.stringify(node.value) : null],
+    [node.uuid, node.recordUuid, Node.getParentUuid(node), Node.getNodeDefUuid(node), node.value ? JSON.stringify(node.value) : null],
     dbTransformCallback
   )
 
 // ============== READ
 
-const fetchNodesByRecordId = async (surveyId, recordId, client = db) =>
+const fetchNodesByRecordUuid = async (surveyId, recordUuid, client = db) =>
   await client.map(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_id = $1
+    WHERE record_uuid = $1
     ORDER BY id`,
-    [recordId],
+    [recordUuid],
     dbTransformCallback
   )
 
@@ -37,13 +37,13 @@ const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
     dbTransformCallback
   )
 
-const fetchDescendantNodesByCodeUuid = async (surveyId, recordId, parentCodeNodeUuid, client = db) =>
+const fetchDescendantNodesByCodeUuid = async (surveyId, recordUuid, parentCodeNodeUuid, client = db) =>
   await client.map(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node n
-    WHERE n.record_id = $1
+    WHERE n.record_uuid = $1
       AND n.value @> '{"h": ["${parentCodeNodeUuid}"]}'
     ORDER BY id`,
-    [recordId],
+    [recordUuid],
     dbTransformCallback
   )
 
@@ -73,7 +73,7 @@ module.exports = {
   insertNode,
 
   //READ
-  fetchNodesByRecordId,
+  fetchNodesByRecordUuid,
   fetchNodeByUuid,
   fetchDescendantNodesByCodeUuid,
 
