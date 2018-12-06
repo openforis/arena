@@ -72,11 +72,20 @@ const onNodeUpdate = async (surveyId, node, client = db) => {
   //delete dependent code nodes
   const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordId, node.uuid)
 
-  const clearedDependentCodeAttributes = await Promise.all(
-    descendantCodes.map(async nodeCode => await deleteNodeInternal(surveyId, nodeCode.uuid, client))
-  )
+  //always returning parentNode, used in dataSchema.updateTableNodes
+  const parentNode = await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), client)
 
-  return R.mergeLeft({[node.uuid]: node}, R.mergeAll(clearedDependentCodeAttributes))
+  const nodesToReturn = [
+    ...await Promise.all(
+      descendantCodes.map(async nodeCode => await deleteNodeInternal(surveyId, nodeCode.uuid, client))
+    ),
+    {[parentNode.uuid]: {...parentNode, updated: false}}
+  ]
+
+  return R.mergeLeft(
+    {[node.uuid]: {...node, updated: !node.deleted}},
+    R.mergeAll(nodesToReturn)
+  )
 }
 
 const deleteNodeInternal = async (surveyId, nodeUuid, client) => {

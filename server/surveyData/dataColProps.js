@@ -47,7 +47,8 @@ const props = {
 
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const nodeDefName = NodeDef.getNodeDefName(nodeDefCol)
-      const items = await TaxonomyManager.fetchTaxaByPropLike(surveyInfo.id, null, {filter: {uuid: Node.getNodeValue(nodeCol).taxonUuid}})
+      const {taxonUuid} = Node.getNodeValue(nodeCol)
+      const items = taxonUuid ? await TaxonomyManager.fetchTaxaByPropLike(surveyInfo.id, null, {filter: {uuid: taxonUuid}}) : []
       const item = R.pipe(R.head, R.defaultTo({}))(items)
 
       return (node, colName) => colName === nodeDefName + '_' + 'code'

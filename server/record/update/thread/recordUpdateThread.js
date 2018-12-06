@@ -52,7 +52,7 @@ class RecordUpdateThread extends Thread {
 
       this.postMessage(nodes)
 
-      await DataSchema.updateTableNodes(msg.surveyId, nodes, t)
+      await DataSchema.updateTableNodes(surveyId, nodes, t)
     })
   }
 

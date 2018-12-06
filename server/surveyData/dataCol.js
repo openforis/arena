@@ -28,10 +28,10 @@ const getValues = async (surveyInfo, nodeDefCol, nodeCol = {}) => {
   const _getValues = async () => {
     const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
     const valueFn = await valueFnProcessor(surveyInfo, nodeDefCol, nodeCol)
-
-    return getNames(nodeDefCol).map(colName =>
+    const values = getNames(nodeDefCol).map(colName =>
       valueFn(nodeCol, colName)
     )
+    return values
   }
 
   // entity column

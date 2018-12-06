@@ -15,17 +15,8 @@ const DataCol = require('./dataCol')
 
 const getSurveyId = R.pipe(Survey.getSurveyInfo, R.prop('id'))
 
-const getSchemaName = surveyId => `survey_${surveyId}_data`
-
-const getTableName = (survey, nodeDef) => {
-  const prefix = NodeDef.isNodeDefEntity(nodeDef)
-    ? nodeDef.id
-    : `${Survey.getNodeDefParent(nodeDef)(survey).id}_${nodeDef.id}`
-
-  return `_${prefix}_data`
-}
-
 // ==== Schema
+const getSchemaName = surveyId => `survey_${surveyId}_data`
 
 const dropSchema = async surveyId =>
   await db.query(`DROP SCHEMA IF EXISTS ${getSchemaName(surveyId)} CASCADE`)
@@ -35,12 +26,22 @@ const createSchema = async surveyId =>
 
 // ==== Tables
 
+const getTableName = (survey, nodeDef, nodeDefChild = null) => {
+  const childName = nodeDefChild ? `_${nodeDefChild.id}` : ''
+  return `_${nodeDef.id}${childName}_data`
+}
+
+const getTableNameFromSurvey = (survey, nodeDef) =>
+  NodeDef.isNodeDefMultiple(nodeDef) && !NodeDef.isNodeDefEntity(nodeDef)
+    ? getTableName(survey, Survey.getNodeDefParent(nodeDef)(survey), nodeDef)
+    : getTableName(survey, nodeDef)
+
 const createTable = async (survey, nodeDef) => {
   const cols = DataTable.getColumnNamesAndType(survey, nodeDef)
 
   await db.query(`
     CREATE TABLE
-      ${getSchemaName(getSurveyId(survey))}.${getTableName(survey, nodeDef)}
+      ${getSchemaName(getSurveyId(survey))}.${getTableNameFromSurvey(survey, nodeDef)}
     (
       id          bigserial NOT NULL,
       date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
@@ -52,20 +53,16 @@ const createTable = async (survey, nodeDef) => {
 }
 
 const insertIntoTable = async (survey, nodeDef, record) => {
-
   const columnNames = DataTable.getColumnNames(survey, nodeDef)
-
   const nodes = Record.getNodesByDefUuid(nodeDef.uuid)(record)
-
   const nodeValues = await Promise.all(nodes.map(async node =>
     await DataTable.getRowValues(survey, nodeDef, record, node)
   ))
-console.log("===columnNames " , columnNames)
-console.log("===nodeValues " , JSON.stringify(nodeValues))
+
   await db.tx(async t => await t.batch(
     nodeValues.map(nodeValue => t.query(`
       INSERT INTO 
-        ${getSchemaName(getSurveyId(survey))}.${getTableName(survey, nodeDef)}
+        ${getSchemaName(getSurveyId(survey))}.${getTableNameFromSurvey(survey, nodeDef)}
         (${columnNames.join(',')})
       VALUES 
         (${columnNames.map((nodeDef, i) => `$${i + 1}`).join(',')})
@@ -77,43 +74,52 @@ console.log("===nodeValues " , JSON.stringify(nodeValues))
 }
 
 const updateTableNodes = async (surveyId, nodes, client = db) => {
-  const survey = await SurveyManager.fetchSurveyById(surveyId)
-  // console.log('======== nodes ', JSON.stringify(nodes))
   const nodeDefUuids = R.pipe(
     R.keys,
-    R.map(k => Node.getNodeDefUuid(nodes[k])),
+    R.map(key => Node.getNodeDefUuid(nodes[key])),
     R.uniq
   )(nodes)
-  // console.log('======== nodeDefUuids ', JSON.stringify(nodeDefUuids))
 
+  const survey = await SurveyManager.fetchSurveyById(surveyId)
   const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, nodeDefUuids)
 
-  // const nodeRows =  await NodeDefManager.fetchNodeDefsByUuid(
-  //   surveyId,
-  //   R.pipe(
-  //     R.map(R.prop('uuid')),
-  //     R.uniq
-  //   )(nodes)
-  // )
+  const updates = await Promise.all(
+    R.values(nodes).map(async node => {
 
-  // console.log('======== nodeDefs ', JSON.stringify(nodeDefs))
-  // await db.tx(async t => await t.batch(
-  //   nodes.map(node => {
-  //     const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
-  // const colNames = DataCol.getNames(nodeDef)
-  // const colValues= DataCol.getValues()
-  //
-  //     return t.query(`
-  //       UPDATE
-  //         ${getSchemaName(getSurveyId(survey))}.${getTableName(survey, nodeDef)}
-  //         (${columnNames.join(',')})
-  //       VALUES
-  //         (${columnNames.map((nodeDef, i) => `$${i + 1}`).join(',')})
-  //       `,
-  //         [...nodeValue]
-  //     )
-  //   })
-  // ))
+      if (node.updated) {
+        const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
+        const nodeDefParent = nodeDefs[NodeDef.getNodeDefParentUuid(nodeDef)]
+        return {
+          colNames: DataCol.getNames(nodeDef),
+          colValues: await DataCol.getValues(Survey.getSurveyInfo(survey), nodeDef, node),
+          tableName: NodeDef.isNodeDefMultiple(nodeDef)
+            ? getTableName(survey, nodeDefParent, nodeDef)
+            : getTableName(survey, nodeDefParent),
+          rowUuid: NodeDef.isNodeDefMultiple(nodeDef)
+            ? node.uuid
+            : nodes[Node.getParentUuid(node)].uuid
+        }
+      }
+
+      return null
+    })
+  )
+
+  await client.batch(
+    R.pipe(
+      R.values,
+      R.reject(R.isNil),
+      R.map(
+        update => client.query(`
+            UPDATE ${getSchemaName(getSurveyId(survey))}.${update.tableName}
+               SET ${update.colNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
+               WHERE uuid = $1
+            `,
+          [update.rowUuid, ...update.colValues]
+        )
+      )
+    )(updates)
+  )
 
 }
 
