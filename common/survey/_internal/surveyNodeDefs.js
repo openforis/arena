@@ -72,6 +72,35 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }
 
+const getHierarchy = (filterFn = NodeDef.isNodeDefEntity) =>
+  survey => {
+
+    let length = 1
+    const h = (array, nodeDef) => {
+      const childDefs = NodeDef.isNodeDefEntity(nodeDef)
+        ? R.pipe(getNodeDefChildren(nodeDef), R.filter(filterFn))(survey)
+        : []
+
+      length += childDefs.length
+      const item = {...nodeDef, children: R.reduce(h, [], childDefs)}
+      return R.append(item, array)
+    }
+
+    return {
+      root: h([], getRootNodeDef(survey))[0],
+      length
+    }
+
+  }
+
+const traverseHierarchyItem = async (nodeDefItem, visitorFn) => {
+  await visitorFn(nodeDefItem)
+  const children = R.propOr([], 'children', nodeDefItem)
+  for (const child of children) {
+    await traverseHierarchyItem(child, visitorFn)
+  }
+}
+
 // ====== NODE DEFS CODE UTILS
 const getNodeDefParentCode = nodeDef => getNodeDefByUuid(NodeDef.getNodeDefParentCodeDefUuid(nodeDef))
 
@@ -148,7 +177,9 @@ module.exports = {
   // ====== HIERARCHY
   getNodeDefParent,
   getAncestorsHierarchy,
+  getHierarchy,
   isNodeDefAncestor,
+  traverseHierarchyItem,
 
   // ====== NodeDef Code
   getNodeDefCategoryLevelIndex,
