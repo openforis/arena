@@ -51,7 +51,7 @@ const deleteNode = async (user, surveyId, nodeUuid, t) => {
 // Internal methods
 //==========
 
-//always assoc parentNode, used in dataSchema.updateTableNodes
+//always assoc parentNode, used in surveyRdbManager.updateTableNodes
 const assocParentNode = async (surveyId, node, nodes, t) => {
   const parentUuid = Node.getParentUuid(node)
   const parentNode = parentUuid && !nodes[parentUuid] ? await NodeRepository.fetchNodeByUuid(surveyId, parentUuid, t) : null

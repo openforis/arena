@@ -4,7 +4,7 @@ const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
 const Queue = require('../../../../common/queue')
-const DataSchema = require('../../../surveyRdb/surveyRdbManager')
+const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
 
 class RecordUpdateThread extends Thread {
 
@@ -56,7 +56,7 @@ class RecordUpdateThread extends Thread {
       this.postMessage(nodes)
 
       try {
-        await DataSchema.updateTableNodes(surveyId, nodes, t)
+        await SurveyRdbManager.updateTableNodes(surveyId, nodes, t)
       } catch (e) {
         console.log("error updating survey data schema", e)
       }

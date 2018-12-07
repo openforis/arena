@@ -46,7 +46,6 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset = 0, 
       AND n${i}.node_def_uuid = '${nodeDefKey.uuid}'
   `).join(' ')
 
-
   return await client.map(`
     SELECT 
       r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')},
@@ -87,16 +86,14 @@ const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
 // ============== DELETE
 const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
   await client.tx(async t => {
-    const log = logActivity(user, surveyId, activityType.record.delete, {recordUuid}, t)
-    const query = await t.query(`
+    await logActivity(user, surveyId, activityType.record.delete, {recordUuid}, t)
+
+    return await t.query(`
       DELETE FROM ${getSurveyDBSchema(surveyId)}.record
       WHERE uuid = $1
       `,
       [recordUuid]
     )
-
-    await log
-    await query
   })
 
 module.exports = {
