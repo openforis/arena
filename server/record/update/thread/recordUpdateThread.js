@@ -1,8 +1,10 @@
+const db = require('../../../db/db')
 const RecordProcessor = require('./recordProcessor')
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
 const Queue = require('../../../../common/queue')
+const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
 
 class RecordUpdateThread extends Thread {
 
@@ -14,9 +16,9 @@ class RecordUpdateThread extends Thread {
 
   onMessage (msg) {
     this.queue.enqueue(msg)
+
     this.processNext()
-      .then(() => {
-      })
+      .then(() => {})
   }
 
   async processNext () {
@@ -36,19 +38,29 @@ class RecordUpdateThread extends Thread {
   async processMessage (msg) {
     let nodes = null
 
-    switch (msg.type) {
-      case messageTypes.persistNode:
-        nodes = await RecordProcessor.persistNode(msg.user, msg.surveyId, msg.node)
-        break
-      case messageTypes.deleteNode:
-        nodes = await RecordProcessor.deleteNode(msg.user, msg.surveyId, msg.nodeUuid)
-        break
-      case messageTypes.createRecord:
-        nodes = await RecordProcessor.createRecord(msg.user, msg.surveyId, msg.record)
+    await db.tx(async t => {
+      const {user, surveyId} = msg
 
-    }
+      switch (msg.type) {
+        case messageTypes.createRecord:
+          nodes = await RecordProcessor.createRecord(user, surveyId, msg.record, t)
+          break
+        case messageTypes.persistNode:
+          nodes = await RecordProcessor.persistNode(user, surveyId, msg.node, t)
+          break
+        case messageTypes.deleteNode:
+          nodes = await RecordProcessor.deleteNode(user, surveyId, msg.nodeUuid, t)
+          break
+      }
 
-    this.postMessage(nodes)
+      this.postMessage(nodes)
+
+      try {
+        await SurveyRdbManager.updateTableNodes(surveyId, nodes, t)
+      } catch (e) {
+        console.log("error updating survey data schema", e)
+      }
+    })
   }
 
 }

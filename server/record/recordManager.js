@@ -95,6 +95,7 @@ module.exports = {
   createRecord,
 
   //==== READ
+  fetchRecordByUuid,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,

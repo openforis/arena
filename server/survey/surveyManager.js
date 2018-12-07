@@ -69,7 +69,7 @@ const createSurvey = async (user, {name, label, lang}) => {
         await authGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
       }
 
-      logActivity(user, surveyId, activityType.survey.create, {name, label, lang, uuid: survey.uuid}, t)
+      await logActivity(user, surveyId, activityType.survey.create, {name, label, lang, uuid: survey.uuid}, t)
 
       return survey
     }
@@ -121,11 +121,9 @@ const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) =>
 const updateSurveyProp = async (id, key, value, user) =>
   await db.tx(
     async t => {
-      assocSurveyInfo(
-        await surveyRepository.updateSurveyProp(id, key, value)
-      )
+      await logActivity(user, id, activityType.survey.propUpdate, {key, value}, t)
 
-      logActivity(user, id, activityType.survey.propUpdate, {key, value}, t)
+      return assocSurveyInfo(await surveyRepository.updateSurveyProp(id, key, value))
     })
 
 // ====== DELETE
@@ -147,6 +145,8 @@ module.exports = {
   // ====== READ
   fetchSurveyById,
   fetchUserSurveysInfo,
+
+  //TODO move to NodeDefManager
   fetchSurveyNodeDefs,
 
   // ====== UPDATE

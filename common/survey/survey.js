@@ -31,6 +31,7 @@ module.exports = {
 
   // ====== READ nodeDefs
   getNodeDefs: SurveyNodeDefs.getNodeDefs,
+  getNodeDefsArray: SurveyNodeDefs.getNodeDefsArray,
   getNodeDefByUuid: SurveyNodeDefs.getNodeDefByUuid,
   // getNodeDefById: SurveyNodeDefs.getNodeDefById,
   getRootNodeDef: SurveyNodeDefs.getRootNodeDef,
@@ -39,7 +40,11 @@ module.exports = {
   getNodeDefsByTaxonomyUuid: SurveyNodeDefs.getNodeDefsByTaxonomyUuid,
   getNodeDefParent: SurveyNodeDefs.getNodeDefParent,
   getNodeDefKeys: SurveyNodeDefs.getNodeDefKeys,
+  // hierarchy
   isNodeDefAncestor: SurveyNodeDefs.isNodeDefAncestor,
+  getAncestorsHierarchy: SurveyNodeDefs.getAncestorsHierarchy,
+  getHierarchy: SurveyNodeDefs.getHierarchy,
+  traverseHierarchyItem: SurveyNodeDefs.traverseHierarchyItem,
 
   // ====== UPDATE nodeDefs
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,

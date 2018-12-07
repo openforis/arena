@@ -1,5 +1,4 @@
 const db = require('../db/db')
-const {comparePassword} = require('./userUtils')
 
 const selectFields = ['id', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.join(',')
@@ -14,18 +13,13 @@ const findUserById = async (userId, client = db) =>
     [userId]
   )
 
-const findUserByEmailAndPassword = async (email, password, client = db) => {
-  const userPwd = await client.oneOrNone(`
-    SELECT id, password 
+const findUserByEmail = async (email, client = db) =>
+  await client.oneOrNone(`
+    SELECT ${selectFieldsCommaSep}, password
     FROM "user" 
-    WHERE LOWER(email) = LOWER($1)`
-    , [email])
-
-  return (userPwd && await comparePassword(password, userPwd.password))
-    ? await findUserById(userPwd.id)
-    : null
-
-}
+    WHERE LOWER(email) = LOWER($1)`,
+    [email]
+  )
 
 // ==== UPDATE
 
@@ -59,7 +53,7 @@ const deleteUserPref = async (user, name, client = db) => {
 module.exports = {
   // READ
   findUserById,
-  findUserByEmailAndPassword,
+  findUserByEmail,
 
   // UPDATE
   updateUserPref,

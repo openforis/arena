@@ -48,6 +48,11 @@ const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
   R.filter(n => Node.getNodeDefUuid(n) === nodeDefUuid),
 )(record)
 
+const getNodesByDefUuid = (nodeDefUuid) => record => R.pipe(
+  getNodesArray,
+  R.filter(n => Node.getNodeDefUuid(n) === nodeDefUuid),
+)(record)
+
 const getRootNode = R.pipe(
   getNodesArray,
   R.find(R.propEq('parentUuid', null)),
@@ -135,9 +140,11 @@ module.exports = {
   // ====== READ
   getNodes,
   getNodesArray,
+  getNodesByDefUuid,
   getNodeChildrenByDefUuid,
   getRootNode,
   getNodeByUuid,
+  getParentNode,
 
   // testing
   getCodeUuidsHierarchy: getCodeUuidsHierarchy,

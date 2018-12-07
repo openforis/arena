@@ -72,7 +72,7 @@ module.exports = {
   getNodeValue,
   getParentUuid: R.prop('parentUuid'),
   getNodeDefUuid: R.prop('nodeDefUuid'),
-  getNodeRecordUuid: R.prop('recordUuid'),
+  getRecordUuid: R.prop('recordUuid'),
   getNodeFileName: getNodeValueProp('fileName', ''),
   getNodeItemUuid: getNodeValueProp('itemUuid'),
   getNodeTaxonUuid: getNodeValueProp('taxonUuid'),

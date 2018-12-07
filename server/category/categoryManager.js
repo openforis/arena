@@ -26,7 +26,7 @@ const assocValidation = async (category, categories = [], items = []) => ({
 // ====== CREATE
 
 const insertCategory = async (user, surveyId, category) =>
-  db.tx(async t => {
+  await db.tx(async t => {
     const categoryDb = await CategoryRepository.insertCategory(surveyId, category, t)
     const levels = Category.getLevelsArray(category)
 
@@ -44,7 +44,7 @@ const insertCategory = async (user, surveyId, category) =>
   })
 
 const insertLevel = async (user, surveyId, categoryId, level) =>
-  db.tx(async t => {
+  await db.tx(async t => {
     const levelDb = await CategoryRepository.insertLevel(surveyId, categoryId, level, t)
 
     await markSurveyDraft(surveyId, t)
@@ -55,7 +55,7 @@ const insertLevel = async (user, surveyId, categoryId, level) =>
   })
 
 const insertItem = async (user, surveyId, item) =>
-  db.tx(async t => {
+  await db.tx(async t => {
     const itemDb = await CategoryRepository.insertItem(surveyId, item, t)
 
     await markSurveyDraft(surveyId, t)
@@ -112,7 +112,7 @@ const publishProps = async (surveyId, client = db) => {
 }
 
 const updateCategoryProp = async (user, surveyId, categoryUuid, key, value) =>
-  db.tx(async t => {
+  await db.tx(async t => {
     const category = await CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, t)
 
     await markSurveyDraft(surveyId, t)
@@ -123,7 +123,7 @@ const updateCategoryProp = async (user, surveyId, categoryUuid, key, value) =>
   })
 
 const updateLevelProp = async (user, surveyId, levelUuid, key, value) =>
-  db.tx(async t => {
+  await db.tx(async t => {
     const level = await CategoryRepository.updateLevelProp(surveyId, levelUuid, key, value, t)
 
     await markSurveyDraft(surveyId, t)
@@ -134,7 +134,7 @@ const updateLevelProp = async (user, surveyId, levelUuid, key, value) =>
   })
 
 const updateItemProp = async (user, surveyId, itemUuid, key, value) =>
-  db.tx(async t => {
+  await db.tx(async t => {
     const item = await CategoryRepository.updateItemProp(surveyId, itemUuid, key, value, t)
 
     await markSurveyDraft(surveyId, t)
@@ -146,7 +146,7 @@ const updateItemProp = async (user, surveyId, itemUuid, key, value) =>
 
 // ====== DELETE
 const deleteCategory = async (user, categoryUuid, categoryId) =>
-  db.tx(async t => {
+  await db.tx(async t => {
     await CategoryRepository.deleteCategory(categoryUuid, categoryId, t)
     await markSurveyDraft(surveyId, t)
 
@@ -154,7 +154,7 @@ const deleteCategory = async (user, categoryUuid, categoryId) =>
   })
 
 const deleteLevel = async (user, surveyId, levelUuid) =>
-  db.tx(async t => {
+  await db.tx(async t => {
     await CategoryRepository.deleteLevel(surveyId, levelUuid, t)
     await markSurveyDraft(surveyId, t)
 
@@ -162,7 +162,7 @@ const deleteLevel = async (user, surveyId, levelUuid) =>
   })
 
 const deleteItem = async (user, surveyId, itemUuid) =>
-  db.tx(async t => {
+  await db.tx(async t => {
     await CategoryRepository.deleteItem(surveyId, itemUuid, t)
     await markSurveyDraft(surveyId, t)
 

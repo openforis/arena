@@ -47,17 +47,17 @@ const getNodeDefsByTaxonomyUuid = (uuid) => R.pipe(
 
 const assocNodeDefs = nodeDefsArray => R.assoc(nodeDefs, toUuidIndexedObj(nodeDefsArray))
 
-// ====== UTILS
+// ====== HIERARCHY
 
 const getNodeDefParent = nodeDef => getNodeDefByUuid(NodeDef.getNodeDefParentUuid(nodeDef))
 
-const getNodeDefAncestors = nodeDef =>
+const getAncestorsHierarchy = nodeDef =>
   survey => {
     if (NodeDef.isNodeDefRoot(nodeDef)) {
       return []
     } else {
       const parent = getNodeDefParent(nodeDef)(survey)
-      return R.append(parent, getNodeDefAncestors(parent)(survey))
+      return R.append(parent, getAncestorsHierarchy(parent)(survey))
     }
   }
 
@@ -71,6 +71,35 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       ? true
       : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }
+
+const getHierarchy = (filterFn = NodeDef.isNodeDefEntity) =>
+  survey => {
+
+    let length = 1
+    const h = (array, nodeDef) => {
+      const childDefs = NodeDef.isNodeDefEntity(nodeDef)
+        ? R.pipe(getNodeDefChildren(nodeDef), R.filter(filterFn))(survey)
+        : []
+
+      length += childDefs.length
+      const item = {...nodeDef, children: R.reduce(h, [], childDefs)}
+      return R.append(item, array)
+    }
+
+    return {
+      root: h([], getRootNodeDef(survey))[0],
+      length
+    }
+
+  }
+
+const traverseHierarchyItem = async (nodeDefItem, visitorFn) => {
+  await visitorFn(nodeDefItem)
+  const children = R.propOr([], 'children', nodeDefItem)
+  for (const child of children) {
+    await traverseHierarchyItem(child, visitorFn)
+  }
+}
 
 // ====== NODE DEFS CODE UTILS
 const getNodeDefParentCode = nodeDef => getNodeDefByUuid(NodeDef.getNodeDefParentCodeDefUuid(nodeDef))
@@ -86,7 +115,7 @@ const getNodeDefCodeCandidateParents = nodeDef =>
 
     if (category) {
       const levelsLength = Category.getLevelsArray(category).length
-      const ancestors = getNodeDefAncestors(nodeDef)(survey)
+      const ancestors = getAncestorsHierarchy(nodeDef)(survey)
 
       return R.reduce(
         (acc, ancestor) =>
@@ -145,10 +174,12 @@ module.exports = {
   // ====== UPDATE
   assocNodeDefs,
 
-  // ====== UTILS
+  // ====== HIERARCHY
   getNodeDefParent,
-  getNodeDefAncestors,
+  getAncestorsHierarchy,
+  getHierarchy,
   isNodeDefAncestor,
+  traverseHierarchyItem,
 
   // ====== NodeDef Code
   getNodeDefCategoryLevelIndex,
