@@ -3,12 +3,12 @@ const Promise = require('bluebird')
 
 const db = require('../db/db')
 const Survey = require('../../common/survey/survey')
+const SurveyUtils = require('../../common/survey/surveyUtils')
 const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 
 const SurveyManager = require('../survey/surveyManager')
-const SurveyRepositoryUtils = require('../survey/surveySchemaRepositoryUtils')
 const NodeDefManager = require('../nodeDef/nodeDefManager')
 
 const DataTable = require('./dataTable')
@@ -27,35 +27,29 @@ const createSchema = async surveyId =>
 
 // ==== Tables
 
-const getTableName = (survey, nodeDef, nodeDefChild = null) => {
-  const childName = nodeDefChild ? `_${nodeDefChild.id}` : ''
-  return `_${nodeDef.id}${childName}_data`
-}
-
 const getTableNameFromSurvey = (survey, nodeDef) =>
   NodeDef.isNodeDefMultiple(nodeDef) && !NodeDef.isNodeDefEntity(nodeDef)
-    ? getTableName(survey, Survey.getNodeDefParent(nodeDef)(survey), nodeDef)
-    : getTableName(survey, nodeDef)
+    ? DataTable.getTableName(Survey.getNodeDefParent(nodeDef)(survey), nodeDef)
+    : DataTable.getTableName(nodeDef)
 
 const createTable = async (survey, nodeDef) => {
   const cols = DataTable.getColumnNamesAndType(survey, nodeDef)
 
-  const ancestors = Survey.getAncestorsHierarchy(nodeDef)(survey)
-
-  const getConstraintFk = nodeDef => ancestor =>
-    `CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_${NodeDef.getNodeDefName(ancestor)}fk FOREIGN KEY (${DataCol.getNames(ancestor)[0]}) REFERENCES ${getSchemaName(getSurveyId(survey))}.${getTableName(survey, ancestor)} (uuid) ON DELETE CASCADE`
+  const surveyId = getSurveyId(survey)
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const schemaName = getSchemaName(surveyId)
+  const tableName = getTableNameFromSurvey(survey, nodeDef)
 
   await db.query(`
     CREATE TABLE
-      ${getSchemaName(getSurveyId(survey))}.${getTableNameFromSurvey(survey, nodeDef)}
+      ${schemaName}.${tableName}
     (
       id          bigserial NOT NULL,
       date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       ${cols.join(',')},
       CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_uuid_unique_ix1 UNIQUE (uuid),
-      CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_record_fk FOREIGN KEY (${DataTable.colNameRecordUuuid}) REFERENCES ${SurveyRepositoryUtils.getSurveyDBSchema(getSurveyId(survey))}.record (uuid) ON DELETE CASCADE,
-      ${R.isEmpty(ancestors) ? '' : ancestors.map(getConstraintFk(nodeDef)).join(',') + ', '}
+      ${DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent)},
       PRIMARY KEY (id)
     )
   `)
@@ -103,6 +97,7 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
 
       const isMultiple = NodeDef.isNodeDefMultiple(nodeDef)
       const isEntity = NodeDef.isNodeDefEntity(nodeDef)
+      const isRoot = NodeDef.isNodeDefRoot(nodeDef)
       const hasTable = isEntity || isMultiple
 
       const type = node.created && hasTable
@@ -118,13 +113,19 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
       return type ? {
         type,
         tableName: isEntity
-          ? getTableName(survey, nodeDef)
+          ? DataTable.getTableName(nodeDef)
           : isMultiple
-            ? getTableName(survey, nodeDefParent, nodeDef)
-            : getTableName(survey, nodeDefParent),
-        //=========TODO on insert record_uuid is required, pass it when merge with recordUuid update
-        colNames: node.created && hasTable ? ['uuid'] : DataCol.getNames(nodeDef),
-        colValues: await DataCol.getValues(Survey.getSurveyInfo(survey), nodeDef, node),
+            ? DataTable.getTableName(nodeDefParent, nodeDef)
+            : DataTable.getTableName(nodeDefParent),
+
+        colNames: type === types.insert
+          ? [DataTable.colNameUuuid, isRoot ? DataTable.colNameRecordUuuid : DataTable.colNameParentUuuid]
+          : DataCol.getNames(nodeDef),
+
+        colValues: type === types.insert
+          ? [SurveyUtils.getUuid(node), isRoot ? Node.getRecordUuid(node) : Node.getParentUuid(node)]
+          : await DataCol.getValues(Survey.getSurveyInfo(survey), nodeDef, node),
+
         rowUuid: hasTable
           ? node.uuid
           : nodeParent.uuid
@@ -134,10 +135,9 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
 
   await client.batch(
     R.pipe(
-      R.values,
       R.reject(R.isNil),
-      R.map(
-        update => update.type === types.update
+      R.map(update =>
+        update.type === types.update
           ? (
             client.query(
               `UPDATE ${getSchemaName(getSurveyId(survey))}.${update.tableName}
@@ -147,26 +147,26 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
             )
           )
           : update.type === types.insert
-            ? (
-              client.query(
-                `INSERT INTO ${getSchemaName(getSurveyId(survey))}.${update.tableName}
+          ? (
+            client.query(
+              `INSERT INTO ${getSchemaName(getSurveyId(survey))}.${update.tableName}
                    (${update.colNames.join(',')})
                    VALUES 
                    (${update.colNames.map((col, i) => `$${i + 1}`).join(',')})
                   `,
-                update.colValues
-              )
+              update.colValues
             )
-            : update.type === types.delete
-              ? (
-                client.query(
-                  `DELETE FROM ${getSchemaName(getSurveyId(survey))}.${update.tableName}
+          )
+          : update.type === types.delete
+            ? (
+              client.query(
+                `DELETE FROM ${getSchemaName(getSurveyId(survey))}.${update.tableName}
                    WHERE uuid = $1
                   `,
-                  update.colValues[0]
-                )
+                update.rowUuid
               )
-              : null
+            )
+            : null
       )
     )(updates)
   )

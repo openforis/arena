@@ -51,6 +51,7 @@ const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
+const isNodeDefSingleAttribute = nodeDef => !(isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef))
 const isNodeDefCode = isNodeDefType(nodeDefType.code)
 const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
@@ -123,6 +124,7 @@ module.exports = {
   isNodeDefRoot,
   isNodeDefEntity,
   isNodeDefSingleEntity,
+  isNodeDefSingleAttribute,
   isNodeDefCode,
   isNodeDefTaxon,
   isNodeDefPublished,

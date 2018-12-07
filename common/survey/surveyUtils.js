@@ -19,15 +19,16 @@ const getLabel = (lang, defaultTo = null) => R.pipe(
 //UPDATE
 const setProp = (key, value) => R.assocPath(['props', key], value)
 
-// UTILS
+// UTILS / uuid
 const toIndexedObj = (array, prop) => R.reduce((acc, item) => R.assoc(R.prop(prop)(item), item)(acc), {})(array)
 
-const toUuidIndexedObj = R.partialRight(toIndexedObj, ['uuid'])
+const uuid = 'uuid'
+
+const getUuid = R.prop(uuid)
+
+const toUuidIndexedObj = R.partialRight(toIndexedObj, [uuid])
 
 module.exports = {
-  toIndexedObj,
-  toUuidIndexedObj,
-
   // PROPS
   getProps,
   getProp,
@@ -36,4 +37,10 @@ module.exports = {
   // LABELS
   getLabels,
   getLabel,
+
+  // UTILS / uuid
+  toIndexedObj,
+  toUuidIndexedObj,
+  getUuid,
+
 }
