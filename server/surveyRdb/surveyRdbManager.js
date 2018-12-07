@@ -179,5 +179,6 @@ module.exports = {
 
   createTable,
   insertIntoTable,
+
   updateTableNodes,
 }

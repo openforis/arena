@@ -4,12 +4,13 @@ const SurveyManager = require('../surveyManager')
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 const RecordManager = require('../../record/recordManager')
-const DataSchema = require('../../surveyData/dataSchema')
 
-class SchemaGeneratorJob extends Job {
+const SurveyRdbManager = require('../../surveyRdb/surveyRdbManager')
+
+class SurveyRdbGeneratorJob extends Job {
 
   constructor (params) {
-    super(SchemaGeneratorJob.type, params)
+    super(SurveyRdbGeneratorJob.type, params)
   }
 
   async execute () {
@@ -23,20 +24,20 @@ class SchemaGeneratorJob extends Job {
     this.total = 1 + length + (recordSummaries.length * length)
 
     //1 ==== drop and create schema
-    await DataSchema.dropSchema(surveyId)
-    await DataSchema.createSchema(surveyId)
+    await SurveyRdbManager.dropSchema(surveyId)
+    await SurveyRdbManager.createSchema(surveyId)
     this.incrementProcessedItems()
 
     //2 ==== create data tables
     const createTable = async nodeDef => {
-      await DataSchema.createTable(survey, nodeDef)
+      await SurveyRdbManager.createTable(survey, nodeDef)
       this.incrementProcessedItems()
     }
     await Survey.traverseHierarchyItem(root, createTable)
 
     //3 ==== insert records
     const insertIntoTable = record => async (nodeDef) => {
-      await DataSchema.insertIntoTable(survey, nodeDef, record)
+      await SurveyRdbManager.insertIntoTable(survey, nodeDef, record)
       this.incrementProcessedItems()
     }
     for (const recordSummary of recordSummaries) {
@@ -57,6 +58,6 @@ class SchemaGeneratorJob extends Job {
 
 }
 
-SchemaGeneratorJob.type = 'SchemaGeneratorJob'
+SurveyRdbGeneratorJob.type = 'SchemaGeneratorJob'
 
-module.exports = SchemaGeneratorJob
+module.exports = SurveyRdbGeneratorJob

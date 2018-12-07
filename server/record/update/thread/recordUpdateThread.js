@@ -4,7 +4,7 @@ const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
 const Queue = require('../../../../common/queue')
-const DataSchema = require('../../../surveyData/dataSchema')
+const DataSchema = require('../../../surveyRdb/surveyRdbManager')
 
 class RecordUpdateThread extends Thread {
 
