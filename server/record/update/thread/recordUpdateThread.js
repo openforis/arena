@@ -16,14 +16,9 @@ class RecordUpdateThread extends Thread {
 
   onMessage (msg) {
     this.queue.enqueue(msg)
-    try{
 
     this.processNext()
-      .then(() => {
-      })
-    }catch (e) {
-      console.log("= ========= ERRR " , e)
-    }
+      .then(() => {})
   }
 
   async processNext () {
@@ -42,14 +37,14 @@ class RecordUpdateThread extends Thread {
 
   async processMessage (msg) {
     let nodes = null
-console.log("+++MSG " , msg)
+
     await db.tx(async t => {
       const {user, surveyId} = msg
 
       switch (msg.type) {
         case messageTypes.createRecord:
           nodes = await RecordProcessor.createRecord(user, surveyId, msg.record, t)
-
+          break
         case messageTypes.persistNode:
           nodes = await RecordProcessor.persistNode(user, surveyId, msg.node, t)
           break
@@ -60,7 +55,11 @@ console.log("+++MSG " , msg)
 
       this.postMessage(nodes)
 
-      await DataSchema.updateTableNodes(surveyId, nodes, t)
+      try {
+        await DataSchema.updateTableNodes(surveyId, nodes, t)
+      } catch (e) {
+        console.log("error updating survey data schema", e)
+      }
     })
   }
 

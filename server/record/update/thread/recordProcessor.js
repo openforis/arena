@@ -24,7 +24,7 @@ const createRecord = async (user, surveyId, recordToCreate, t) => {
   const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
   const rootNode = Node.newNode(rootNodeDef.uuid, recordUuid)
 
-  return persistNode(user, surveyId, rootNode, t)
+  return await persistNode(user, surveyId, rootNode, t)
 }
 
 const persistNode = async (user, surveyId, node, t) => {
@@ -37,7 +37,6 @@ const persistNode = async (user, surveyId, node, t) => {
   } else {
     return await insertNode(surveyId, node, user, t)
   }
-
 }
 
 const deleteNode = async (user, surveyId, nodeUuid, t) => {

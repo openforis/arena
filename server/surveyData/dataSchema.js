@@ -11,7 +11,7 @@ const SurveyManager = require('../survey/surveyManager')
 const SurveyRepositoryUtils = require('../survey/surveySchemaRepositoryUtils')
 const NodeDefManager = require('../nodeDef/nodeDefManager')
 
-const DataTable = require('./DataTable')
+const DataTable = require('./dataTable')
 const DataCol = require('./dataCol')
 
 const getSurveyId = R.pipe(Survey.getSurveyInfo, R.prop('id'))
