@@ -11,19 +11,19 @@ const valuePropName = 'value'
  * ======
  */
 
-const newNode = (nodeDefUuid, recordId, parentUuid = null, placeholder = false, value = null) => {
-  return {
+const newNode = (nodeDefUuid, recordUuid, parentUuid = null, value = null) => ({
     uuid: uuidv4(),
     nodeDefUuid,
-    recordId,
+    recordUuid,
     parentUuid,
-    placeholder,
     value,
   }
-}
+)
 
-const newNodePlaceholder = (nodeDef, parentNode, value = null) =>
-  newNode(nodeDef.uuid, parentNode.recordId, parentNode.uuid, true, value)
+const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
+  ...newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid, value),
+  placeholder: true
+})
 
 /**
  * ======
@@ -72,7 +72,7 @@ module.exports = {
   getNodeValue,
   getParentUuid: R.prop('parentUuid'),
   getNodeDefUuid: R.prop('nodeDefUuid'),
-  getNodeRecordId: R.prop('recordId'),
+  getNodeRecordUuid: R.prop('recordUuid'),
   getNodeFileName: getNodeValueProp('fileName', ''),
   getNodeItemUuid: getNodeValueProp('itemUuid'),
   getNodeTaxonUuid: getNodeValueProp('taxonUuid'),

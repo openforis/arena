@@ -79,7 +79,7 @@ const node = {
   id,
   uuid: null,
   surveyId: id,
-  recordId: id,
+  recordUuid: id,
   parentId: id, // can be null
   nodeDefId: id,
   // value is a key value pairs object where
@@ -100,7 +100,7 @@ const recordCommand = {
   action: null, //recordActions
   userId: id,
   surveyId: id,
-  recordId: id,
+  recordUuid: id,
   parentId: id, //only for addNode action
   nodeDefId: id,
   nodeId: id, //only for updateNode, deleteNode actions

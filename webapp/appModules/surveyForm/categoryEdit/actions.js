@@ -107,7 +107,7 @@ export const putCategoryProp = (category, key, value) => async (dispatch, getSta
 
   const action = async () => {
     const surveyId = getStateSurveyId(getState())
-    const {data} = await axios.put(`/api/survey/${surveyId}/categories/${category.id}`, {key, value})
+    const {data} = await axios.put(`/api/survey/${surveyId}/categories/${category.uuid}`, {key, value})
     dispatch({type: categoriesUpdate, categories: data.categories})
   }
 
@@ -120,7 +120,7 @@ export const putCategoryLevelProp = (category, level, key, value) => async (disp
   const action = async () => {
     const surveyId = getStateSurveyId(getState())
     const {data} = await axios.put(
-      `/api/survey/${surveyId}/categories/${category.id}/levels/${level.id}`,
+      `/api/survey/${surveyId}/categories/${category.id}/levels/${level.uuid}`,
       {key, value}
     )
     dispatchCategoryUpdate(dispatch, data.category)
@@ -134,7 +134,7 @@ export const putCategoryItemProp = (category, level, item, key, value) => async 
 
   const action = async () => {
     const surveyId = getStateSurveyId(getState())
-    const {data} = await axios.put(`/api/survey/${surveyId}/categories/${category.id}/items/${item.id}`, {key, value})
+    const {data} = await axios.put(`/api/survey/${surveyId}/categories/${category.id}/items/${item.uuid}`, {key, value})
     dispatchCategoryUpdate(dispatch, data.category)
   }
 
@@ -149,7 +149,7 @@ export const deleteCategory = category => async (dispatch, getState) => {
   dispatch({type: categoryDelete, category})
 
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.delete(`/api/survey/${surveyId}/categories/${category.id}`)
+  const {data} = await axios.delete(`/api/survey/${surveyId}/categories/${category.uuid}`)
   dispatch({type: categoriesUpdate, categories: data.categories})
 }
 
@@ -158,7 +158,7 @@ export const deleteCategoryLevel = (category, level) => async (dispatch, getStat
 
   //delete level and items from db
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.delete(`/api/survey/${surveyId}/categories/${category.id}/levels/${level.id}`)
+  const {data} = await axios.delete(`/api/survey/${surveyId}/categories/${category.id}/levels/${level.uuid}`)
   dispatchCategoryUpdate(dispatch, data.category)
 }
 
@@ -166,6 +166,6 @@ export const deleteCategoryItem = (category, level, item) => async (dispatch, ge
   dispatch({type: categoryItemDelete, item, level})
 
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.delete(`/api/survey/${surveyId}/categories/${category.id}/items/${item.id}`)
+  const {data} = await axios.delete(`/api/survey/${surveyId}/categories/${category.id}/items/${item.uuid}`)
   dispatchCategoryUpdate(dispatch, data.category)
 }

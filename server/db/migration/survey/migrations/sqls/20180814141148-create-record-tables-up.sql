@@ -34,6 +34,7 @@ CREATE TABLE
   date_created TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
 
   PRIMARY KEY (id),
+  CONSTRAINT record_uuid_idx UNIQUE (uuid),
   CONSTRAINT record_user_fk FOREIGN KEY (owner_id) REFERENCES "user" ("id")
 );
 
@@ -42,7 +43,7 @@ CREATE TABLE
 (
   id            bigserial NOT NULL,
   uuid          uuid      NOT NULL DEFAULT uuid_generate_v4(),
-  record_id     bigint    NOT NULL,
+  record_uuid   uuid      NOT NULL,
   parent_uuid   uuid,
   node_def_uuid uuid      NOT NULL,
   value         jsonb,
@@ -51,7 +52,7 @@ CREATE TABLE
 
   PRIMARY KEY (id),
   CONSTRAINT node_uuid_idx UNIQUE (uuid),
-  CONSTRAINT node_record_fk FOREIGN KEY (record_id) REFERENCES "record" ("id") ON DELETE CASCADE,
+  CONSTRAINT node_record_fk FOREIGN KEY (record_uuid) REFERENCES "record" ("uuid") ON DELETE CASCADE,
   CONSTRAINT node_node_def_fk FOREIGN KEY (node_def_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE,
   CONSTRAINT node_parent_fk FOREIGN KEY (parent_uuid) REFERENCES "node" ("uuid") ON DELETE CASCADE
 );

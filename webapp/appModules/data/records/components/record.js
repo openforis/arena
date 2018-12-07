@@ -33,9 +33,9 @@ class Record extends React.Component {
     // TODO load defs only if they don't exist or previously loaded draft for editing nodeDefs
     initSurveyDefs(false, false)
 
-    const recordId = R.path(['params', 'recordId'], match)
-    if (recordId) {
-      checkInRecord(recordId)
+    const recordUuid = R.path(['params', 'recordUuid'], match)
+    if (recordUuid) {
+      checkInRecord(recordUuid)
     } else {
       createRecord()
     }
@@ -44,11 +44,11 @@ class Record extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const {recordId, history} = this.props
-    const {recordId: prevRecordId} = prevProps
+    const {recordUuid, history} = this.props
+    const {recordUuid: prevRecordUuid} = prevProps
 
     // record has been deleted
-    if (prevRecordId && !recordId)
+    if (prevRecordUuid && !recordUuid)
       history.replace(appModuleUri(appModules.data))
   }
 
@@ -63,9 +63,9 @@ class Record extends React.Component {
   }
 
   render () {
-    const {recordId} = this.props
+    const {recordUuid} = this.props
 
-    return recordId
+    return recordUuid
       ? <SurveyFormView draft={false} edit={false} entry={true}/>
       : null
   }
@@ -75,7 +75,7 @@ const mapStateToProps = state => {
   const record = getRecord(getSurveyForm(state))
 
   return {
-    recordId: R.prop('id', record)
+    recordUuid: R.prop('uuid', record)
   }
 }
 

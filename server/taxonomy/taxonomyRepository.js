@@ -203,13 +203,13 @@ const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
 
 // ============== UPDATE
 
-const updateTaxonomyProp = async (surveyId, taxonomyId, key, value, client = db) =>
-  await updateSurveySchemaTableProp(surveyId, 'taxonomy', taxonomyId, key, value, client)
+const updateTaxonomyProp = async (surveyId, taxonomyUuid, key, value, client = db) =>
+  await updateSurveySchemaTableProp(surveyId, 'taxonomy', taxonomyUuid, key, value, client)
 
 // ============== DELETE
 
-const deleteTaxonomy = async (surveyId, taxonomyId, client = db) =>
-  await deleteSurveySchemaTableRecord(surveyId, 'taxonomy', taxonomyId, client)
+const deleteTaxonomy = async (surveyId, taxonomyUuid, client = db) =>
+  await deleteSurveySchemaTableRecord(surveyId, 'taxonomy', taxonomyUuid, client)
 
 const deleteDraftTaxaByTaxonomyId = async (surveyId, taxonomyId, client = db) =>
   await client.none(

@@ -5,17 +5,39 @@ const db = require('../../../db/db')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
+const RecordRepository = require('../../../record/recordRepository')
 const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const NodeRepository = require('../../../record/nodeRepository')
 
-const persistNode = async (surveyId, node, client = db) => {
+const {logActivity, activityType} = require('../../../activityLog/activityLogger')
+
+const createRecord = async (user, surveyId, recordToCreate, client = db) =>
+  await client.tx(async t => {
+    const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
+    const {uuid: recordUuid} = record
+
+    await logActivity(user, surveyId, activityType.record.create, recordToCreate, t)
+
+    const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
+    const rootNode = Node.newNode(rootNodeDef.uuid, recordUuid)
+
+    return persistNode(user, surveyId, rootNode, t)
+  })
+
+const persistNode = async (user, surveyId, node, client = db) => {
   const {uuid} = node
 
-  const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, client)
+  return await client.tx(async t => {
+    const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)
 
-  return nodeDb
-    ? await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), client)
-    : await createNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, client)
+    if (nodeDb) {
+      await logActivity(user, surveyId, activityType.record.nodeUpdateValue, R.pick(['uuid', 'value'], node), t)
+      return await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), t)
+    } else {
+      await logActivity(user, surveyId, activityType.record.nodeCreate, node, t)
+      return await createNode(surveyId, await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node)), node, t)
+    }
+  })
 }
 
 /**
@@ -38,7 +60,9 @@ const createNode = async (surveyId, nodeDef, nodeToInsert, client = db) => {
       childDefs
         .filter(NodeDef.isNodeDefSingleEntity)
         .map(
-          async childDef => await createNode(surveyId, childDef, Node.newNode(childDef.uuid, node.recordId, node.uuid), null, client)
+          async childDef => await createNode(surveyId, childDef,
+            Node.newNode(childDef.uuid, node.recordUuid, node.uuid),
+            null, client)
         )
     )
   )
@@ -61,16 +85,18 @@ const updateNodeValue = async (surveyId, nodeUuid, value, client = db) =>
  * Delete a node
  *
  */
-const deleteNode = async (surveyId, nodeUuid, client = db) =>
+const deleteNode = async (user, surveyId, nodeUuid, client = db) =>
   await client.tx(async t => {
     const node = await deleteNodeInternal(surveyId, nodeUuid, t)
+
+    await logActivity(user, surveyId, activityType.record.nodeDelete, {nodeUuid}, t)
 
     return await onNodeUpdate(surveyId, node, t)
   })
 
 const onNodeUpdate = async (surveyId, node, client = db) => {
   //delete dependent code nodes
-  const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordId, node.uuid)
+  const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordUuid, node.uuid)
 
   const clearedDependentCodeAttributes = await Promise.all(
     descendantCodes.map(async nodeCode => await deleteNodeInternal(surveyId, nodeCode.uuid, client))
@@ -85,6 +111,7 @@ const deleteNodeInternal = async (surveyId, nodeUuid, client) => {
 }
 
 module.exports = {
+  createRecord,
   persistNode,
   deleteNode,
 }

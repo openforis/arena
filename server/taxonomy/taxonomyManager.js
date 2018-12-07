@@ -10,11 +10,17 @@ const Taxonomy = require('../../common/survey/taxonomy')
 const TaxonomyRepository = require('./taxonomyRepository')
 const TaxonomyValidator = require('./taxonomyValidator')
 
+const {logActivity, logActivities, activityType} = require('../activityLog/activityLogger')
+
 /**
  * ====== CREATE
  */
-const createTaxonomy = async (surveyId, taxonomy) =>
-  await validateTaxonomy(surveyId, [], await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy))
+const createTaxonomy = async (user, surveyId, taxonomy) =>
+  await db.tx(async t => {
+    await logActivity(user, surveyId, activityType.taxonomy.create, taxonomy, t)
+
+    return await validateTaxonomy(surveyId, [], await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy))
+  })
 
 /**
  * ====== READ
@@ -93,28 +99,44 @@ const publishTaxonomiesProps = async (surveyId, client = db) => {
   await publishSurveySchemaTableProps(surveyId, 'taxon_vernacular_name', client)
 }
 
-const updateTaxonomyProp = async (surveyId, taxonomyId, key, value, client = db) =>
+const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, client = db) =>
   await client.tx(async t => {
-    const updatedTaxonomy = await TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyId, key, value)
+    const updatedTaxonomy = await TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value)
 
     await markSurveyDraft(surveyId, t)
+
+    await logActivity(user, surveyId, activityType.taxonomy.propUpdate, {taxonomyUuid, key, value}, t)
 
     return updatedTaxonomy
   })
 
 // ============== DELETE
 
-const deleteTaxonomy = async (surveyId, taxonomyId) =>
+const deleteTaxonomy = async (user, surveyId, taxonomyUuid) =>
   await db.tx(async t => {
-    await TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyId)
+    await TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid)
 
     await markSurveyDraft(surveyId, t)
+
+    await logActivity(user, surveyId, activityType.taxonomy.delete, {taxonomyUuid}, t)
   })
+
+const insertTaxa = (user, surveyId, taxa, client = db) => {
+  const activities = taxa.map(taxon => ({
+    type: activityType.taxonomy.taxonInsert,
+    params: taxon,
+  }))
+
+  return Promise.all([
+    TaxonomyRepository.insertTaxa(surveyId, taxa, client),
+    logActivities(user, surveyId, activities, client),
+  ])
+}
 
 module.exports = {
   //CREATE
   createTaxonomy,
-  insertTaxa: TaxonomyRepository.insertTaxa,
+  insertTaxa,
 
   //READ
   fetchTaxonomyById,

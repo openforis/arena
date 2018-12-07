@@ -110,19 +110,19 @@ const fetchItemByUuid = async (surveyId, itemUuid, draft = false, client = db) =
 
 // ============== UPDATE
 
-const updateCategoryProp = async (surveyId, categoryId, key, value, client = db) =>
-  await updateSurveySchemaTableProp(surveyId, 'category', categoryId, key, value, client)
+const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
+  await updateSurveySchemaTableProp(surveyId, 'category', categoryUuid, key, value, client)
 
-const updateLevelProp = async (surveyId, levelId, key, value, client = db) =>
-  await updateSurveySchemaTableProp(surveyId, 'category_level', levelId, key, value, client)
+const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>
+  await updateSurveySchemaTableProp(surveyId, 'category_level', levelUuid, key, value, client)
 
-const updateItemProp = async (surveyId, itemId, key, value, client = db) =>
-  await updateSurveySchemaTableProp(surveyId, 'category_item', itemId, key, value, client)
+const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
+  await updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
 
 // ============== DELETE
 
-const deleteCategory = async (surveyId, categoryId, client = db) =>
-  await deleteSurveySchemaTableRecord(surveyId, 'category', categoryId, client)
+const deleteCategory = async (surveyId, categoryUuid, client = db) =>
+  await deleteSurveySchemaTableRecord(surveyId, 'category', categoryUuid, client)
 
 const deleteLevel = async (surveyId, levelId, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category_level', levelId, client)

@@ -25,7 +25,7 @@ const SurveyFormView = (props) => {
     canEdit,
 
     recordLoaded,
-    recordId,
+    recordUuid,
     parentNode
   } = props
 
@@ -54,7 +54,7 @@ const SurveyFormView = (props) => {
                              nodeDef={nodeDef}
                              edit={edit}
                              entry={entry}
-                             recordId={recordId}
+                             recordUuid={recordUuid}
                              parentNode={parentNode}
                              canEditDef={canEdit}/>
             : <div/>
@@ -83,8 +83,8 @@ SurveyFormView.defaultProps = {
   canEdit: false,
   // if record to edit has been loaded
   recordLoaded: null,
-  // recordId of current record
-  recordId: null,
+  // uuid of current record
+  recordUuid: null,
 }
 
 const mapStateToProps = (state, props) => {
@@ -96,7 +96,7 @@ const mapStateToProps = (state, props) => {
   const mapEntryProps = () => ({
     recordLoaded: !!record,
     parentNode: nodeDef ? getFormPageParentNode(survey, nodeDef)(surveyForm) : null,
-    recordId: record ? record.id : null,
+    recordUuid: record ? record.uuid : null,
   })
 
   return {

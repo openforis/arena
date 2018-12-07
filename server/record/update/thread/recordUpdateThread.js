@@ -15,7 +15,8 @@ class RecordUpdateThread extends Thread {
   onMessage (msg) {
     this.queue.enqueue(msg)
     this.processNext()
-      .then(() => {})
+      .then(() => {
+      })
   }
 
   async processNext () {
@@ -37,12 +38,14 @@ class RecordUpdateThread extends Thread {
 
     switch (msg.type) {
       case messageTypes.persistNode:
-        nodes = await RecordProcessor.persistNode(msg.surveyId, msg.node, msg.file)
+        nodes = await RecordProcessor.persistNode(msg.user, msg.surveyId, msg.node)
         break
-
       case messageTypes.deleteNode:
-        nodes = await RecordProcessor.deleteNode(msg.surveyId, msg.nodeUuid)
+        nodes = await RecordProcessor.deleteNode(msg.user, msg.surveyId, msg.nodeUuid)
         break
+      case messageTypes.createRecord:
+        nodes = await RecordProcessor.createRecord(msg.user, msg.surveyId, msg.record)
+
     }
 
     this.postMessage(nodes)
