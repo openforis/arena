@@ -47,7 +47,8 @@ class NodeDefEntitySwitch extends React.Component {
                                 updateNode={updateNode}
                                 putNodeDefProp={putNodeDefProp}
                                 locked={locked}
-                                canEditDef={canEditDef}/>
+                                canEditDef={canEditDef}
+                                removeNode={removeNode}/>
     else if (isRenderTable(nodeDef))
       return <NodeDefEntityTable label={label}
                                  entry={entry}

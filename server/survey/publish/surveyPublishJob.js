@@ -5,7 +5,7 @@ const CategoriesValidationJob = require('./categoriesValidationJob')
 const TaxonomiesValidationJob = require('./taxonomiesValidationJob')
 const SurveyInfoValidationJob = require('./surveyInfoValidationJob')
 const SurveyPropsPublishJob = require('./surveyPropsPublishJob')
-const SchemaGeneratorJob = require('../../surveyData/schemaGeneratorJob')
+const SchemaGeneratorJob = require('./schemaGeneratorJob')
 
 const getDefaultInnerJobs = (params) => [
   new NodeDefsValidationJob(params),

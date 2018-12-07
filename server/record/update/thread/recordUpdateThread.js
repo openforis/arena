@@ -1,8 +1,10 @@
+const db = require('../../../db/db')
 const RecordProcessor = require('./recordProcessor')
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
 const Queue = require('../../../../common/queue')
+const DataSchema = require('../../../surveyData/dataSchema')
 
 class RecordUpdateThread extends Thread {
 
@@ -14,9 +16,14 @@ class RecordUpdateThread extends Thread {
 
   onMessage (msg) {
     this.queue.enqueue(msg)
+    try{
+
     this.processNext()
       .then(() => {
       })
+    }catch (e) {
+      console.log("= ========= ERRR " , e)
+    }
   }
 
   async processNext () {
@@ -35,20 +42,26 @@ class RecordUpdateThread extends Thread {
 
   async processMessage (msg) {
     let nodes = null
+console.log("+++MSG " , msg)
+    await db.tx(async t => {
+      const {user, surveyId} = msg
 
-    switch (msg.type) {
-      case messageTypes.persistNode:
-        nodes = await RecordProcessor.persistNode(msg.user, msg.surveyId, msg.node)
-        break
-      case messageTypes.deleteNode:
-        nodes = await RecordProcessor.deleteNode(msg.user, msg.surveyId, msg.nodeUuid)
-        break
-      case messageTypes.createRecord:
-        nodes = await RecordProcessor.createRecord(msg.user, msg.surveyId, msg.record)
+      switch (msg.type) {
+        case messageTypes.createRecord:
+          nodes = await RecordProcessor.createRecord(user, surveyId, msg.record, t)
 
-    }
+        case messageTypes.persistNode:
+          nodes = await RecordProcessor.persistNode(user, surveyId, msg.node, t)
+          break
+        case messageTypes.deleteNode:
+          nodes = await RecordProcessor.deleteNode(user, surveyId, msg.nodeUuid, t)
+          break
+      }
 
-    this.postMessage(nodes)
+      this.postMessage(nodes)
+
+      await DataSchema.updateTableNodes(surveyId, nodes, t)
+    })
   }
 
 }
