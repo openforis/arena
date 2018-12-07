@@ -1,10 +1,11 @@
-const R = require('ramda')
 const db = require('../db/db')
 
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
+const FileManager = require('../file/fileManager')
 const Node = require('../../common/record/node')
+const File = require('../../common/file/file')
 
 const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
@@ -15,22 +16,11 @@ const RecordUpdateManager = require('./update/recordUpdateManager')
  * CREATE
  * ===================
  */
-const createRecord = async (userId, recordToCreate) => await db.tx(
-  async t => {
+const createRecord = (user, surveyId, record) => {
+  RecordUpdateManager.checkIn(user.id)
 
-    RecordUpdateManager.checkIn(userId)
-
-    const record = await RecordRepository.insertRecord(recordToCreate, t)
-    const {surveyId, id: recordId} = record
-
-    const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
-    const rootNode = Node.newNode(rootNodeDef.uuid, recordId)
-
-    persistNode(userId, surveyId, rootNode)
-
-    return record
-  }
-)
+  RecordUpdateManager.createRecord(user, surveyId, record)
+}
 
 /**
  * ===================
@@ -45,9 +35,9 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit) => {
   }
 }
 
-const fetchRecordById = async (surveyId, recordId) => {
-  const record = await RecordRepository.fetchRecordById(surveyId, recordId)
-  const nodes = await NodeRepository.fetchNodesByRecordId(surveyId, recordId)
+const fetchRecordByUuid = async (surveyId, recordUuid) => {
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid)
 
   return {...record, nodes: toUuidIndexedObj(nodes)}
 }
@@ -58,25 +48,44 @@ const fetchRecordById = async (surveyId, recordId) => {
  * ===================
  */
 
-const persistNode = (userId, surveyId, node, file) => RecordUpdateManager.persistNode(userId, surveyId, node, file)
+const persistNode = (user, surveyId, node, fileReq) => {
+  let nodeToPersist
+  if (fileReq) {
+    //save file to "file" table and set fileUuid and fileName into node value
+    const file = File.createFile(fileReq)
+
+    FileManager.insertFile(surveyId, file)
+
+    const nodeValue = {
+      fileUuid: file.uuid,
+      fileName: File.getName(file),
+      fileSize: File.getSize(file)
+    }
+
+    nodeToPersist = Node.assocValue(nodeValue, node)
+  } else {
+    nodeToPersist = node
+  }
+  RecordUpdateManager.persistNode(user, surveyId, nodeToPersist)
+}
 
 /**
  * ===================
  * DELETE
  * ===================
  */
-const deleteRecord = async (surveyId, recordId) => await RecordRepository.deleteRecord(surveyId, recordId)
+const deleteRecord = async (user, surveyId, recordUuid) => await RecordRepository.deleteRecord(user, surveyId, recordUuid)
 
-const deleteNode = (userId, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(userId, surveyId, nodeUuid)
+const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(user, surveyId, nodeUuid)
 
 /**
  * ==================
  * CHECK IN / OUT RECORD
  * ==================
  */
-const checkInRecord = async (userId, surveyId, recordId) => {
+const checkInRecord = async (userId, surveyId, recordUuid) => {
   RecordUpdateManager.checkIn(userId)
-  return await fetchRecordById(surveyId, recordId)
+  return await fetchRecordByUuid(surveyId, recordUuid)
 }
 
 const checkOutRecord = RecordUpdateManager.checkOut
@@ -89,7 +98,7 @@ module.exports = {
   fetchRecordById,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
-  fetchNodeFileByUuid: NodeRepository.fetchNodeFileByUuid,
+  fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
 
   //==== UPDATE
   persistNode,

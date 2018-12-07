@@ -56,34 +56,46 @@ const cancelCheckOut = userId => {
 }
 
 /**
+ * Create a new record
+ *
+ * @param user
+ * @param surveyId
+ * @param record
+ */
+const createRecord = (user, surveyId, record) => {
+  const updateWorker = recordUpdateThreads.getThread(user.id)
+  updateWorker.postMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
+}
+
+/**
  * Notify thread to create or update a node
  *
- * @param userId
+ * @param user
  * @param surveyId
  * @param node
- * @param file
  */
-const persistNode = (userId, surveyId, node, file) => {
-  const updateWorker = recordUpdateThreads.getThread(userId)
-  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, surveyId, node, file})
+const persistNode = (user, surveyId, node) => {
+  const updateWorker = recordUpdateThreads.getThread(user.id)
+  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, user, surveyId, node})
 }
 
 /**
  * Notify thread to delete a node
  *
- * @param userId
+ * @param user
  * @param surveyId
  * @param nodeUuid
  */
-const deleteNode = (userId, surveyId, nodeUuid) => {
-  const updateWorker = recordUpdateThreads.getThread(userId)
-  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, surveyId, nodeUuid})
+const deleteNode = (user, surveyId, nodeUuid) => {
+  const updateWorker = recordUpdateThreads.getThread(user.id)
+  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, user, surveyId, nodeUuid})
 }
 
 module.exports = {
   checkIn,
   checkOut,
 
+  createRecord,
   persistNode,
   deleteNode,
 }

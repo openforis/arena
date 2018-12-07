@@ -69,7 +69,7 @@ class NodeDefCode extends React.Component {
         ? placeholder
         : nodes.length === 1 && !NodeDef.isNodeDefMultiple(nodeDef)
         ? nodes[0]
-        : Node.newNode(nodeDef.uuid, parentNode.recordId, parentNode.uuid)
+        : Node.newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
     )
   }
 

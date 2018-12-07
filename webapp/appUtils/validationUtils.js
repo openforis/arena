@@ -1,9 +1,13 @@
 import * as R from 'ramda'
 import React from 'react'
 
-const getFieldError = (field) => R.pipe(
-  R.path([field, 'errors']),
-  R.join(', ')
+const getFieldError = field => R.pipe(
+  R.pathOr([], [field, 'errors']),
+  R.ifElse(
+    R.isEmpty,
+    () => 'invalid', //default error message
+    R.join(', ')
+  )
 )
 
 export const getValidationFieldMessagesHTML = error => R.pipe(

@@ -24,9 +24,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
 
-      const {body} = req
+      const {body, user} = req
 
-      const category = await CategoryManager.insertCategory(surveyId, body)
+      const category = await CategoryManager.insertCategory(user, surveyId, body)
 
       res.json({category})
     } catch (err) {
@@ -38,9 +38,9 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const {body} = req
+      const {body, user} = req
 
-      await CategoryManager.insertLevel(surveyId, categoryId, body)
+      await CategoryManager.insertLevel(user, surveyId, categoryId, body)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -53,9 +53,9 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
 
-      const {body} = req
+      const {body, user} = req
 
-      const item = await CategoryManager.insertItem(surveyId, body)
+      const item = await CategoryManager.insertItem(user, surveyId, body)
 
       await sendValidatedCategory(surveyId, categoryId, res, {item})
     } catch (err) {
@@ -109,14 +109,14 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/categories/:categoryId', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/categories/:categoryUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const categoryId = getRestParam(req, 'categoryId')
-      const {body} = req
+      const categoryUuid = getRestParam(req, 'categoryUuid')
+      const {body, user} = req
       const {key, value} = body
 
-      await CategoryManager.updateCategoryProp(surveyId, categoryId, key, value)
+      await CategoryManager.updateCategoryProp(user, surveyId, categoryUuid, key, value)
 
       await sendCategories(res, surveyId, true, true)
     } catch (err) {
@@ -124,15 +124,15 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/survey/:surveyId/categories/:categoryId/levels/:levelId', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/categories/:categoryId/levels/:levelUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const levelId = getRestParam(req, 'levelId')
-      const {body} = req
+      const levelUuid = getRestParam(req, 'levelUuid')
+      const {body, user} = req
       const {key, value} = body
 
-      await CategoryManager.updateLevelProp(surveyId, levelId, key, value)
+      await CategoryManager.updateLevelProp(user, surveyId, levelUuid, key, value)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -140,15 +140,15 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/survey/:surveyId/categories/:categoryId/items/:itemId', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/categories/:categoryId/items/:itemUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const itemId = getRestParam(req, 'itemId')
-      const {body} = req
+      const itemUuid = getRestParam(req, 'itemUuid')
+      const {body, user} = req
       const {key, value} = body
 
-      await CategoryManager.updateItemProp(surveyId, itemId, key, value)
+      await CategoryManager.updateItemProp(user, surveyId, itemUuid, key, value)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -158,12 +158,13 @@ module.exports.init = app => {
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId/categories/:categoryId', requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/categories/:categoryUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const categoryId = getRestParam(req, 'categoryId')
+      const categoryUuid = getRestParam(req, 'categoryId')
+      const {user} = req
 
-      await CategoryManager.deleteCategory(surveyId, categoryId)
+      await CategoryManager.deleteCategory(user, surveyId, categoryUuid)
 
       await sendCategories(res, surveyId, true, true)
     } catch (err) {
@@ -171,13 +172,14 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/categories/:categoryId/levels/:levelId', requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/categories/:categoryId/levels/:levelUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const levelId = getRestParam(req, 'levelId')
+      const levelUuid = getRestParam(req, 'levelUuid')
+      const {user} = req
 
-      await CategoryManager.deleteLevel(surveyId, levelId)
+      await CategoryManager.deleteLevel(user, surveyId, levelUuid)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {
@@ -185,13 +187,14 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/categories/:categoryId/items/:itemId', requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/categories/:categoryId/items/:itemUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryId = getRestParam(req, 'categoryId')
-      const itemId = getRestParam(req, 'itemId')
+      const itemUuid = getRestParam(req, 'itemUuid')
+      const {user} = req
 
-      await CategoryManager.deleteItem(surveyId, itemId)
+      await CategoryManager.deleteItem(user, surveyId, itemUuid)
 
       await sendValidatedCategory(surveyId, categoryId, res)
     } catch (err) {

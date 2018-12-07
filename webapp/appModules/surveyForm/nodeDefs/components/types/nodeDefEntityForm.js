@@ -32,7 +32,7 @@ const EntityForm = props => {
     node,
     putNodeDefProp,
     entry,
-    recordId,
+    recordUuid,
     surveyInfo
   } = props
 
@@ -70,7 +70,7 @@ const EntityForm = props => {
                 <NodeDefSwitch key={i}
                                edit={edit}
                                entry={entry}
-                               recordId={recordId}
+                               recordUuid={recordUuid}
                                surveyInfo={surveyInfo}
                                nodeDef={childDef}
                                parentNode={node}
@@ -127,7 +127,7 @@ const NodeSelect = props => {
       <button className="btn btn-s btn-of-light-xs"
               style={{marginLeft: '50px'}}
               onClick={() => {
-                const entity = newNode(nodeDef.uuid, parentNode.recordId, parentNode.uuid)
+                const entity = newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
                 updateNode(nodeDef, entity)
                 onChange(entity.uuid)
               }}>

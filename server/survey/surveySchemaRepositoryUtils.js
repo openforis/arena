@@ -45,22 +45,22 @@ const publishSurveySchemaTableProps = async (surveyId, tableName, client = db) =
       props_draft = '{}'::jsonb
   `)
 
-const updateSurveySchemaTableProp = async (surveyId, tableName, recordId, key, value, client = db) =>
+const updateSurveySchemaTableProp = async (surveyId, tableName, recordUuid, key, value, client = db) =>
   await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.${tableName}
      SET props_draft = props_draft || $1
-     WHERE id = $2
+     WHERE uuid = $2
      RETURNING *`
-    , [JSON.stringify({[key]: value}), recordId]
+    , [JSON.stringify({[key]: value}), recordUuid]
     , def => dbTransformCallback(def, true)
   )
 
-const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordId, client = db) =>
+const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordUuid, client = db) =>
   await client.one(`
     DELETE 
     FROM ${getSurveyDBSchema(surveyId)}.${tableName} 
-    WHERE id = $1 RETURNING *`
-    , [recordId]
+    WHERE uuid = $1 RETURNING *`
+    , [recordUuid]
     , def => dbTransformCallback(def, true)
   )
 

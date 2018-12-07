@@ -42,7 +42,7 @@ class DataView extends React.Component {
             {
               label: 'Record',
               component: Record,
-              path: appModuleUri(dataModules.record) + ':recordId/',
+              path: appModuleUri(dataModules.record) + ':recordUuid/',
               showTab: false,
             },
 

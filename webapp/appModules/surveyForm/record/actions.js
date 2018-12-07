@@ -37,10 +37,11 @@ export const createRecord = () => async (dispatch, getState) => {
     const surveyInfo = getStateSurveyInfo(state)
     const step = Survey.getDefaultStep(surveyInfo)
 
-    const record = newRecord(user, surveyId, step)
+    const record = newRecord(user, step)
 
-    const {data} = await axios.post(`/api/survey/${surveyId}/record`, record)
-    dispatch({type: recordCreate, record: data.record})
+    axios.post(`/api/survey/${surveyId}/record`, record)
+
+    dispatch({type: recordCreate, record})
 
   } catch (e) {
     console.log(e)
@@ -57,9 +58,9 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
  * READ
  * ============
  */
-export const checkInRecord = recordId => async (dispatch, getState) => {
+export const checkInRecord = recordUuid => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.post(`/api/survey/${surveyId}/record/${recordId}/checkin`)
+  const {data} = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
   dispatch({type: recordLoad, record: data.record})
 }
 
@@ -98,7 +99,7 @@ const _updateNodeDebounced = (node, file, delay) => {
         : {}
 
       const surveyId = getStateSurveyId(getState())
-      await axios.post(`/api/survey/${surveyId}/record/${node.recordId}/node`, formData, config)
+      await axios.post(`/api/survey/${surveyId}/record/${node.recordUuid}/node`, formData, config)
     } catch (e) {
       console.log(e)
     }
@@ -116,7 +117,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
     dispatch({type: nodeDelete, node})
 
     const surveyId = getStateSurveyId(getState())
-    const {data} = await axios.delete(`/api/survey/${surveyId}/record/${node.recordId}/node/${node.uuid}`)
+    const {data} = await axios.delete(`/api/survey/${surveyId}/record/${node.recordUuid}/node/${node.uuid}`)
     recordNodesUpdate(data.nodes)(dispatch)
   } catch (e) {
     console.log(e)
@@ -129,7 +130,7 @@ export const deleteRecord = () => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(state)
   const record = getRecord(getSurveyForm(state))
 
-  await axios.delete(`/api/survey/${surveyId}/record/${record.id}`)
+  await axios.delete(`/api/survey/${surveyId}/record/${record.uuid}`)
 
   dispatch({type: recordDelete})
 }
@@ -145,5 +146,5 @@ export const checkOutRecord = () => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(state)
   const record = getRecord(getSurveyForm(state))
 
-  await axios.post(`/api/survey/${surveyId}/record/${record.id}/checkout`)
+  await axios.post(`/api/survey/${surveyId}/record/${record.uuid}/checkout`)
 }

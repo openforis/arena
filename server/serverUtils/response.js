@@ -1,5 +1,7 @@
 const UnauthorizedError = require('../authGroup/unauthorizedError')
 
+const File = require('../../common/file/file')
+
 const status = {
   ok: 'ok',
   error: 'error'
@@ -8,7 +10,7 @@ const status = {
 const sendOk = res => res.json({status: status.ok})
 
 const sendErr = (res, err) => {
-  console.log("=== ERROR ")
+  console.log('=== ERROR ')
   console.log(err)
 
   if (err instanceof UnauthorizedError) {
@@ -26,7 +28,17 @@ const sendErr = (res, err) => {
   }
 }
 
+const sendFile = (res, file) => {
+  res.setHeader('Content-Disposition', `attachment; filename=${File.getName(file)}`)
+  res.setHeader('Content-Length', File.getSize(file))
+  // res.set('Content-Type', 'text/csv')
+
+  res.write(file.content, 'binary')
+  res.end(null, 'binary')
+}
+
 module.exports = {
   sendOk,
-  sendErr
+  sendErr,
+  sendFile
 }

@@ -27,7 +27,7 @@ module.exports.init = app => {
       const validation = await validateNewSurvey(body)
 
       if (validation.valid) {
-        const survey = await SurveyManager.createSurvey(user, body)
+          const survey = await SurveyManager.createSurvey(user, body)
 
         res.json({survey})
       } else {

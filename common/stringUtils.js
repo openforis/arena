@@ -6,7 +6,11 @@ const leftTrim = R.replace(/^\s+/, '')
 
 const toLower = (a = '') => R.toLower(a.toString())
 
-const contains = (a = '', b = '') => R.contains(toLower(a), toLower(b))
+const truncate = maxLength =>
+  text =>
+    text.length > maxLength ? text.substring(0, maxLength) + '...' : text
+
+const contains = (a = '', b = '') => R.includes(toLower(a), toLower(b))
 
 const isBlank = R.pipe(trim, R.isEmpty)
 
@@ -24,7 +28,7 @@ const normalizeName = R.pipe(
 module.exports = {
   trim,
   leftTrim,
-  toLower,
+  truncate,
   contains,
 
   isBlank,
@@ -33,4 +37,5 @@ module.exports = {
   isString,
 
   normalizeName,
+
 }

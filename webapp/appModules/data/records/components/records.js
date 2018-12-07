@@ -74,7 +74,7 @@ const RecordRow = ({idx, offset, record, style, nodeDefKeys}) => (
     <div>{getRelativeDate(record.dateModified)}</div>
     <div>{record.ownerName}</div>
     <div>
-      <Link to={appModuleUri(dataModules.record) + record.id} className="btn btn-s btn-of-light-xs">
+      <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn btn-s btn-of-light-xs">
         <span className="icon icon-pencil2 icon-12px"></span>
       </Link>
     </div>

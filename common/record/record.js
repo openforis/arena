@@ -10,10 +10,9 @@ const nodes = 'nodes'
 
 // ====== CREATE
 
-const newRecord = (user, surveyId, step) => {
+const newRecord = (user, step) => {
   return {
     uuid: uuidv4(),
-    surveyId,
     ownerId: user.id,
     step,
   }

@@ -10,8 +10,6 @@ import TaxonProps from './taxonProps'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
 
-import { isRenderTable, } from '../../../../../common/survey/nodeDefLayout'
-
 import { normalizeName } from '../../../../../common/stringUtils'
 
 const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValue) => {
@@ -20,12 +18,10 @@ const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValu
 
 const BasicProps = props => {
   const {
-    nodeDef, nodeDefKeyEditDisabled,
+    nodeDef, nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
     putNodeDefProp, toggleTaxonomyEdit, toggleCategoryEdit
   } = props
   const validation = getValidation(nodeDef)
-
-  const multiplicityEditDisabled = NodeDef.isNodeDefPublished(nodeDef) || isRenderTable(nodeDef) || NodeDef.isNodeDefKey(nodeDef)
 
   return (
     <div className="form">
@@ -73,7 +69,7 @@ const BasicProps = props => {
         NodeDef.canNodeDefBeMultiple(nodeDef) &&
         <FormItem label={'multiple'}>
           <Checkbox checked={NodeDef.isNodeDefMultiple(nodeDef)}
-                    disabled={multiplicityEditDisabled}
+                    disabled={nodeDefMultipleEditDisabled}
                     onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
         </FormItem>
       }
