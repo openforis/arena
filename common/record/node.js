@@ -39,6 +39,12 @@ const getNodeValueProp = (prop, defaultValue = null) => R.pipe(
   R.propOr(defaultValue, prop),
 )
 
+const getNodeDefUuids = nodes => R.pipe(
+  R.keys,
+  R.map(key => Node.getNodeDefUuid(nodes[key])),
+  R.uniq
+)(nodes)
+
 /**
  * ======
  * UPDATE
@@ -77,6 +83,8 @@ module.exports = {
   getNodeItemUuid: getNodeValueProp('itemUuid'),
   getNodeTaxonUuid: getNodeValueProp('taxonUuid'),
   getNodeVernacularNameUuid: getNodeValueProp('vernacularNameUuid'),
+
+  getNodeDefUuids,
 
   // ==== UPDATE
   assocValue: R.assoc(valuePropName),

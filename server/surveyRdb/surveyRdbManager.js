@@ -13,6 +13,7 @@ const NodeDefManager = require('../nodeDef/nodeDefManager')
 
 const DataTable = require('./dataTable')
 const DataCol = require('./dataCol')
+const NodeUpdate = require('./nodeUpdate')
 
 const getSurveyId = R.pipe(Survey.getSurveyInfo, R.prop('id'))
 
@@ -68,7 +69,7 @@ const insertIntoTable = async (survey, nodeDef, record) => {
         ${getSchemaName(getSurveyId(survey))}.${getTableNameFromSurvey(survey, nodeDef)}
         (${columnNames.join(',')})
       VALUES 
-        (${columnNames.map((nodeDef, i) => `$${i + 1}`).join(',')})
+        (${columnNames.map((_, i) => `$${i + 1}`).join(',')})
       `,
       [...nodeValue]
     ))
@@ -77,67 +78,15 @@ const insertIntoTable = async (survey, nodeDef, record) => {
 }
 
 const updateTableNodes = async (surveyId, nodes, client = db) => {
-  const nodeDefUuids = R.pipe(
-    R.keys,
-    R.map(key => Node.getNodeDefUuid(nodes[key])),
-    R.uniq
-  )(nodes)
-
   const survey = await SurveyManager.fetchSurveyById(surveyId)
-  const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, nodeDefUuids)
-
-  const types = {insert: 'insert', update: 'update', delete: 'delete'}
-
-  const updates = await Promise.all(
-    R.values(nodes).map(async node => {
-
-      const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
-      const nodeDefParent = nodeDefs[NodeDef.getNodeDefParentUuid(nodeDef)]
-      const nodeParent = nodes[Node.getParentUuid(node)]
-
-      const isMultiple = NodeDef.isNodeDefMultiple(nodeDef)
-      const isEntity = NodeDef.isNodeDefEntity(nodeDef)
-      const isRoot = NodeDef.isNodeDefRoot(nodeDef)
-      const hasTable = isEntity || isMultiple
-
-      const type = node.created && hasTable
-        ? types.insert
-        : node.updated || node.created
-          ? types.update
-          : node.deleted && hasTable
-            ? types.delete
-            : node.deleted
-              ? types.update
-              : null
-
-      return type ? {
-        type,
-        tableName: isEntity
-          ? DataTable.getTableName(nodeDef)
-          : isMultiple
-            ? DataTable.getTableName(nodeDefParent, nodeDef)
-            : DataTable.getTableName(nodeDefParent),
-
-        colNames: type === types.insert
-          ? [DataTable.colNameUuuid, isRoot ? DataTable.colNameRecordUuuid : DataTable.colNameParentUuuid]
-          : DataCol.getNames(nodeDef),
-
-        colValues: type === types.insert
-          ? [SurveyUtils.getUuid(node), isRoot ? Node.getRecordUuid(node) : Node.getParentUuid(node)]
-          : await DataCol.getValues(Survey.getSurveyInfo(survey), nodeDef, node),
-
-        rowUuid: hasTable
-          ? node.uuid
-          : nodeParent.uuid
-      } : null
-    })
-  )
+  const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes))
+  const updates = await NodeUpdate.toUpdates(nodes, nodeDefs)
 
   await client.batch(
     R.pipe(
       R.reject(R.isNil),
       R.map(update =>
-        update.type === types.update
+        NodeUpdate.isUpdate(update)
           ? (
             client.query(
               `UPDATE ${getSchemaName(getSurveyId(survey))}.${update.tableName}
@@ -146,7 +95,7 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
               [update.rowUuid, ...update.colValues]
             )
           )
-          : update.type === types.insert
+          : NodeUpdate.isInsert(update)
           ? (
             client.query(
               `INSERT INTO ${getSchemaName(getSurveyId(survey))}.${update.tableName}
@@ -157,7 +106,7 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
               update.colValues
             )
           )
-          : update.type === types.delete
+          : NodeUpdate.isDelete(update)
             ? (
               client.query(
                 `DELETE FROM ${getSchemaName(getSurveyId(survey))}.${update.tableName}
