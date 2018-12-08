@@ -5,7 +5,7 @@ const db = require('../db/db')
 const {selectDate} = require('../db/dbUtils')
 
 const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
-const {logActivity, activityType} = require('../activityLog/activityLogger')
+const ActivityLog = require('../activityLog/activityLogger')
 
 const NodeDef = require('../../common/survey/nodeDef')
 
@@ -86,7 +86,7 @@ const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
 // ============== DELETE
 const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
   await client.tx(async t => {
-    await logActivity(user, surveyId, activityType.record.delete, {recordUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.record.delete, {recordUuid}, t)
 
     return await t.query(`
       DELETE FROM ${getSurveyDBSchema(surveyId)}.record

@@ -1,4 +1,5 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 const fastcsv = require('fast-csv')
 
 const db = require('../db/db')
@@ -10,14 +11,14 @@ const Taxonomy = require('../../common/survey/taxonomy')
 const TaxonomyRepository = require('./taxonomyRepository')
 const TaxonomyValidator = require('./taxonomyValidator')
 
-const {logActivity, logActivities, activityType} = require('../activityLog/activityLogger')
+const ActivityLog = require('../activityLog/activityLogger')
 
 /**
  * ====== CREATE
  */
 const createTaxonomy = async (user, surveyId, taxonomy) =>
   await db.tx(async t => {
-    await logActivity(user, surveyId, activityType.taxonomy.create, taxonomy, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomy.create, taxonomy, t)
 
     return await validateTaxonomy(surveyId, [], await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy))
   })
@@ -105,7 +106,7 @@ const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, clie
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.taxonomy.propUpdate, {taxonomyUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomy.propUpdate, {taxonomyUuid, key, value}, t)
 
     return updatedTaxonomy
   })
@@ -118,18 +119,18 @@ const deleteTaxonomy = async (user, surveyId, taxonomyUuid) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.taxonomy.delete, {taxonomyUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomy.delete, {taxonomyUuid}, t)
   })
 
 const insertTaxa = (user, surveyId, taxa, client = db) => {
   const activities = taxa.map(taxon => ({
-    type: activityType.taxonomy.taxonInsert,
+    type: ActivityLog.type.taxonomy.taxonInsert,
     params: taxon,
   }))
 
   return Promise.all([
     TaxonomyRepository.insertTaxa(surveyId, taxa, client),
-    logActivities(user, surveyId, activities, client),
+    logMany(user, surveyId, activities, client),
   ])
 }
 

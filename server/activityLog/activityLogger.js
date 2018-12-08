@@ -1,6 +1,6 @@
 const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
 
-const activityType = {
+const type = {
   survey: {
     create: 'surveyCreate',
     propUpdate: 'surveyPropUpdate',
@@ -37,19 +37,19 @@ const activityType = {
   },
 }
 
-const logActivity = async (user, surveyId, type, params, client) =>
+const log = async (user, surveyId, type, params, client) =>
   client.none(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_email, params)
     VALUES ($1, $2, $3::jsonb)`,
     [type, user.email, params])
 
-const logActivities = async (user, surveyId, activities, client) =>
+const logMany = async (user, surveyId, activities, client) =>
   await client.batch([
-    activities.map(activity => logActivity(user, surveyId, activity.type, activity.params, client))
+    activities.map(activity => log(user, surveyId, activity.type, activity.params, client))
   ])
 
 module.exports = {
-  logActivity,
-  logActivities,
-  activityType,
+  log,
+  logMany,
+  type: type,
 }

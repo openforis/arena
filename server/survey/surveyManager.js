@@ -20,7 +20,7 @@ const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPref
 const authGroupRepository = require('../authGroup/authGroupRepository')
 const {isSystemAdmin} = require('../../common/auth/authManager')
 
-const {logActivity, activityType} = require('../activityLog/activityLogger')
+const ActivityLog = require('../activityLog/activityLogger')
 
 const assocSurveyInfo = info => ({info})
 
@@ -69,7 +69,7 @@ const createSurvey = async (user, {name, label, lang}) => {
         await authGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
       }
 
-      await logActivity(user, surveyId, activityType.survey.create, {name, label, lang, uuid: survey.uuid}, t)
+      await ActivityLog.log(user, surveyId, ActivityLog.type.survey.create, {name, label, lang, uuid: survey.uuid}, t)
 
       return survey
     }
@@ -121,7 +121,7 @@ const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) =>
 const updateSurveyProp = async (id, key, value, user) =>
   await db.tx(
     async t => {
-      await logActivity(user, id, activityType.survey.propUpdate, {key, value}, t)
+      await ActivityLog.log(user, id, ActivityLog.type.survey.propUpdate, {key, value}, t)
 
       return assocSurveyInfo(await surveyRepository.updateSurveyProp(id, key, value))
     })
