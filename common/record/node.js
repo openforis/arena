@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const {uuidv4} = require('./../uuid')
 const {isBlank} = require('../stringUtils')
+const SurveyUtils = require('../survey/surveyUtils')
 
 const valuePropName = 'value'
 
@@ -39,9 +40,11 @@ const getNodeValueProp = (prop, defaultValue = null) => R.pipe(
   R.propOr(defaultValue, prop),
 )
 
+const getNodeDefUuid = R.prop('nodeDefUuid')
+
 const getNodeDefUuids = nodes => R.pipe(
   R.keys,
-  R.map(key => Node.getNodeDefUuid(nodes[key])),
+  R.map(key => getNodeDefUuid(nodes[key])),
   R.uniq
 )(nodes)
 
@@ -75,10 +78,11 @@ module.exports = {
   newNodePlaceholder,
 
   // ==== READ
-  getNodeValue,
-  getParentUuid: R.prop('parentUuid'),
-  getNodeDefUuid: R.prop('nodeDefUuid'),
+  getUuid: SurveyUtils.getUuid,
+  getParentUuid: SurveyUtils.getParentUuid,
   getRecordUuid: R.prop('recordUuid'),
+  getNodeValue,
+  getNodeDefUuid,
   getNodeFileName: getNodeValueProp('fileName', ''),
   getNodeItemUuid: getNodeValueProp('itemUuid'),
   getNodeTaxonUuid: getNodeValueProp('taxonUuid'),

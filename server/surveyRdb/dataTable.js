@@ -23,10 +23,17 @@ const getNodeDefColumns = (survey, nodeDef) =>
     // multiple attr table
     : [nodeDef]
 
-const getTableName = (nodeDef, nodeDefChild = null) => {
+const _getTableName = (nodeDef, nodeDefChild = null) => {
   const childName = nodeDefChild ? `_${nodeDefChild.id}` : ''
   return `_${nodeDef.id}${childName}_data`
 }
+
+const getTableName = (nodeDef, nodeDefParent) =>
+  NodeDef.isNodeDefEntity(nodeDef)
+    ? _getTableName(nodeDef)
+    : NodeDef.isNodeDefMultiple(nodeDef)
+    ? _getTableName(nodeDefParent, nodeDef)
+    : _getTableName(nodeDefParent)
 
 const getColumnNames = (survey, nodeDef) => [
   colNameUuuid,

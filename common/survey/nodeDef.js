@@ -1,10 +1,7 @@
 const R = require('ramda')
 const {uuidv4} = require('../uuid')
 
-const {
-  getProp,
-  getLabels,
-} = require('./surveyUtils')
+const SurveyUtils = require('./surveyUtils')
 
 const {isBlank} = require('../stringUtils')
 
@@ -41,12 +38,12 @@ const newNodeDef = (surveyId, parentUuid, type, props) => ({
 // ==== READ
 
 const getNodeDefType = R.prop('type')
-const getNodeDefName = getProp('name', '')
-const getNodeDefParentUuid = R.prop('parentUuid')
+const getNodeDefName = SurveyUtils.getProp('name', '')
+const getNodeDefParentUuid = SurveyUtils.getParentUuid
 
-const isNodeDefKey = R.pipe(getProp('key'), R.equals(true))
+const isNodeDefKey = R.pipe(SurveyUtils.getProp('key'), R.equals(true))
 const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
-const isNodeDefMultiple = R.pipe(getProp('multiple'), R.equals(true))
+const isNodeDefMultiple = R.pipe(SurveyUtils.getProp('multiple'), R.equals(true))
 
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
@@ -105,20 +102,20 @@ module.exports = {
   newNodeDef,
 
   //READ
-  getProp,
+  getProp: SurveyUtils.getProp,
 
   getNodeDefType,
   getNodeDefName,
   getNodeDefParentUuid,
-  getNodeDefLabels: getLabels,
-  getNodeDefDescriptions: getProp('descriptions', {}),
+  getNodeDefLabels: SurveyUtils.getLabels,
+  getNodeDefDescriptions: SurveyUtils.getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
-  getNodeDefCategoryUuid: getProp('categoryUuid'),
-  getNodeDefParentCodeDefUuid: getProp('parentCodeDefUuid'),
-  getNodeDefTaxonomyUuid: getProp('taxonomyUuid'),
+  getNodeDefCategoryUuid: SurveyUtils.getProp('categoryUuid'),
+  getNodeDefParentCodeDefUuid: SurveyUtils.getProp('parentCodeDefUuid'),
+  getNodeDefTaxonomyUuid: SurveyUtils.getProp('taxonomyUuid'),
 
   //advanced props
-  getDefaultValues: getProp('defaultValues', []),
+  getDefaultValues: SurveyUtils.getProp('defaultValues', []),
 
   isNodeDefKey,
   isNodeDefMultiple,
