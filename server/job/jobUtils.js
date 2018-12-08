@@ -35,8 +35,8 @@ const calculateJobProgress = job => {
 
 const jobToJSON = job => ({
   type: job.type,
-  userId: job.params.userId,
-  surveyId: job.params.surveyId,
+  userId: job.userId,
+  surveyId: job.surveyId,
 
   innerJobs: job.innerJobs.map(j => jobToJSON(j)),
 

@@ -139,7 +139,6 @@ module.exports.init = app => {
       const file = req.files.file
 
       const job = new TaxonomyImportJob({
-        userId: user.id,
         user,
         surveyId,
         taxonomyId,

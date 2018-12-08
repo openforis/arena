@@ -104,7 +104,7 @@ module.exports.init = app => {
       const user = req.user
 
       const job = new SurveyPublishJob({
-        userId: user.id,
+        user,
         surveyId
       })
 

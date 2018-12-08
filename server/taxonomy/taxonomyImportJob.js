@@ -86,7 +86,7 @@ class TaxonomyImportJob extends Job {
 
           //set vernacular lang codes in taxonomy
           //set log to false temporarily; set user to null as it's only needed for logging
-          await TaxonomyManager.updateTaxonomyProp(this.params.user, surveyId, taxonomy.uuid,
+          await TaxonomyManager.updateTaxonomyProp(this.user, surveyId, taxonomy.uuid,
             'vernacularLanguageCodes', this.vernacularLanguageCodes, t)
 
           this.setStatusSucceeded()
@@ -210,7 +210,7 @@ class TaxonomyImportJob extends Job {
 
   async flushTaxaInsertBuffer (t) {
     if (this.taxaInsertBuffer.length > 0) {
-      await TaxonomyManager.insertTaxa(this.params.user, this.surveyId, this.taxaInsertBuffer, t)
+      await TaxonomyManager.insertTaxa(this.user, this.surveyId, this.taxaInsertBuffer, t)
       this.taxaInsertBuffer.length = 0
     }
   }
