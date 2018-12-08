@@ -50,6 +50,7 @@ const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
 const isNodeDefSingleAttribute = nodeDef => !(isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef))
+const isNodeDefMultipleAttribute = nodeDef => !isNodeDefEntity(nodeDef) && isNodeDefMultiple(nodeDef)
 const isNodeDefCode = isNodeDefType(nodeDefType.code)
 const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
@@ -125,6 +126,7 @@ module.exports = {
   isNodeDefEntityOrMultiple,
   isNodeDefSingleEntity,
   isNodeDefSingleAttribute,
+  isNodeDefMultipleAttribute,
   isNodeDefCode,
   isNodeDefTaxon,
   isNodeDefPublished,

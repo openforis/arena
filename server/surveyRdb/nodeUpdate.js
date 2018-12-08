@@ -24,14 +24,28 @@ const getType = (nodeDef, node) =>
         : null
 
 const getColNames = (nodeDef, type) =>
-  type === types.insert
-    ? [DataTable.colNameUuuid, NodeDef.isNodeDefRoot(nodeDef) ? DataTable.colNameRecordUuuid : DataTable.colNameParentUuuid]
+  R.flatten(type === types.insert
+    ? [
+      DataTable.colNameUuuid,
+      NodeDef.isNodeDefMultipleAttribute(nodeDef)
+        ? [DataTable.colNameParentUuuid, ...DataCol.getNames(nodeDef)]
+        //entity
+        : NodeDef.isNodeDefRoot(nodeDef) ? DataTable.colNameRecordUuuid : DataTable.colNameParentUuuid
+    ]
     : DataCol.getNames(nodeDef)
+  )
 
 const getColValues = async (surveyInfo, nodeDef, node, type) =>
-  type === types.insert
-    ? [Node.getUuid(node), NodeDef.isNodeDefRoot(nodeDef) ? Node.getRecordUuid(node) : Node.getParentUuid(node)]
+  R.flatten(type === types.insert
+    ? [
+      Node.getUuid(node),
+      NodeDef.isNodeDefMultipleAttribute(nodeDef)
+        ? [Node.getParentUuid(node), ...await Promise.all(DataCol.getValues(surveyInfo, nodeDef, node))]
+        //entity
+        : NodeDef.isNodeDefRoot(nodeDef) ? Node.getRecordUuid(node) : Node.getParentUuid(node)
+    ]
     : await DataCol.getValues(surveyInfo, nodeDef, node)
+  )
 
 const getRowUuid = (nodeDef, node, nodeParent) =>
   hasTable(nodeDef)
