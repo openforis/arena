@@ -77,7 +77,7 @@ const persistNode = (user, surveyId, node, fileReq) => {
  */
 const deleteRecord = async (user, surveyId, recordUuid) =>
   await db.tx(async t => {
-    await ActivityLog.log(user, surveyId, ActivityLog.type.record.delete, {recordUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, {recordUuid}, t)
     await RecordRepository.deleteRecord(user, surveyId, recordUuid, t)
   })
 

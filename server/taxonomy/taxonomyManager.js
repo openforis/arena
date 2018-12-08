@@ -18,7 +18,7 @@ const ActivityLog = require('../activityLog/activityLogger')
  */
 const createTaxonomy = async (user, surveyId, taxonomy) =>
   await db.tx(async t => {
-    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomy.create, taxonomy, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, t)
 
     return await validateTaxonomy(surveyId, [], await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy))
   })
@@ -106,7 +106,7 @@ const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, clie
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomy.propUpdate, {taxonomyUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, {taxonomyUuid, key, value}, t)
 
     return updatedTaxonomy
   })
@@ -119,18 +119,18 @@ const deleteTaxonomy = async (user, surveyId, taxonomyUuid) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomy.delete, {taxonomyUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, {taxonomyUuid}, t)
   })
 
 const insertTaxa = (user, surveyId, taxa, client = db) => {
   const activities = taxa.map(taxon => ({
-    type: ActivityLog.type.taxonomy.taxonInsert,
+    type: ActivityLog.type.taxonInsert,
     params: taxon,
   }))
 
   return Promise.all([
     TaxonomyRepository.insertTaxa(surveyId, taxa, client),
-    logMany(user, surveyId, activities, client),
+    ActivityLog.logMany(user, surveyId, activities, client),
   ])
 }
 

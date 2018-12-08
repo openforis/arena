@@ -69,7 +69,7 @@ const createSurvey = async (user, {name, label, lang}) => {
         await authGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
       }
 
-      await ActivityLog.log(user, surveyId, ActivityLog.type.survey.create, {name, label, lang, uuid: survey.uuid}, t)
+      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, {name, label, lang, uuid: survey.uuid}, t)
 
       return survey
     }
@@ -121,7 +121,7 @@ const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) =>
 const updateSurveyProp = async (id, key, value, user) =>
   await db.tx(
     async t => {
-      await ActivityLog.log(user, id, ActivityLog.type.survey.propUpdate, {key, value}, t)
+      await ActivityLog.log(user, id, ActivityLog.type.surveyPropUpdate, {key, value}, t)
 
       return assocSurveyInfo(await surveyRepository.updateSurveyProp(id, key, value))
     })

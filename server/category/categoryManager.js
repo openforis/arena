@@ -38,7 +38,7 @@ const insertCategory = async (user, surveyId, category) =>
     )
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.category.insert, category, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryInsert, category, t)
 
     return await assocValidation(Category.assocLevelsArray(levelsDb)(categoryDb))
   })
@@ -49,7 +49,7 @@ const insertLevel = async (user, surveyId, categoryId, level) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.category.levelInsert, {categoryId, level}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, {categoryId, level}, t)
 
     return levelDb
   })
@@ -60,7 +60,7 @@ const insertItem = async (user, surveyId, item) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.category.itemInsert, item, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemInsert, item, t)
 
     return itemDb
   })
@@ -117,7 +117,7 @@ const updateCategoryProp = async (user, surveyId, categoryUuid, key, value) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.category.propUpdate, {categoryUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryPropUpdate, {categoryUuid, key, value}, t)
 
     return category
   })
@@ -128,7 +128,7 @@ const updateLevelProp = async (user, surveyId, levelUuid, key, value) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.category.levelPropUpdate, {levelUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelPropUpdate, {levelUuid, key, value}, t)
 
     return level
   })
@@ -139,7 +139,7 @@ const updateItemProp = async (user, surveyId, itemUuid, key, value) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.category.itemPropUpdate, {itemUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemPropUpdate, {itemUuid, key, value}, t)
 
     return item
   })
@@ -150,7 +150,7 @@ const deleteCategory = async (user, surveyId, categoryUuid) =>
     await CategoryRepository.deleteCategory(surveyId, categoryUuid, t)
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.category.delete, {categoryUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryDelete, {categoryUuid}, t)
   })
 
 const deleteLevel = async (user, surveyId, levelUuid) =>
@@ -158,7 +158,7 @@ const deleteLevel = async (user, surveyId, levelUuid) =>
     await CategoryRepository.deleteLevel(surveyId, levelUuid, t)
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.category.levelDelete, {levelUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, {levelUuid}, t)
   })
 
 const deleteItem = async (user, surveyId, itemUuid) =>
@@ -166,7 +166,7 @@ const deleteItem = async (user, surveyId, itemUuid) =>
     await CategoryRepository.deleteItem(surveyId, itemUuid, t)
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.category.itemDelete, {itemUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemDelete, {itemUuid}, t)
   })
 
 module.exports = {

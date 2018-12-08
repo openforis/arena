@@ -19,7 +19,7 @@ const createRecord = async (user, surveyId, recordToCreate, t) => {
   const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
   const {uuid: recordUuid} = record
 
-  await ActivityLog.log(user, surveyId, ActivityLog.type.record.create, recordToCreate, t)
+  await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
 
   const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
   const rootNode = Node.newNode(rootNodeDef.uuid, recordUuid)
@@ -32,7 +32,7 @@ const persistNode = async (user, surveyId, node, t) => {
   const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)
 
   if (nodeDb) {
-    await ActivityLog.log(user, surveyId, ActivityLog.type.record.nodeUpdateValue, R.pick(['uuid', 'value'], node), t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
     return await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), t)
   } else {
     return await insertNode(surveyId, node, user, t)
@@ -42,7 +42,7 @@ const persistNode = async (user, surveyId, node, t) => {
 const deleteNode = async (user, surveyId, nodeUuid, t) => {
   const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
-  await ActivityLog.log(user, surveyId, ActivityLog.type.record.nodeDelete, {nodeUuid}, t)
+  await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, {nodeUuid}, t)
 
   return await onNodeUpdate(surveyId, node, t)
 }
@@ -71,7 +71,7 @@ const insertNode = async (surveyId, node, user, t) => {
 }
 
 const insertNodeRecursively = async (surveyId, nodeDef, nodeToInsert, user, t) => {
-  await ActivityLog.log(user, surveyId, ActivityLog.type.record.nodeCreate, nodeToInsert, t)
+  await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
 
   // insert node
   const node = await NodeRepository.insertNode(surveyId, nodeToInsert, t)
