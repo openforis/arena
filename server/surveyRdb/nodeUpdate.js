@@ -4,8 +4,9 @@ const Promise = require('bluebird')
 const NodeDef = require('../../common/survey/nodeDef')
 const Node = require('../../common/record/node')
 
-const DataTable = require('./dataTable')
-const DataCol = require('./dataCol')
+const DataSchema = require('./schemaRdb/dataSchema')
+const DataTable = require('./schemaRdb/dataTable')
+const DataCol = require('./schemaRdb/dataCol')
 
 const types = {insert: 'insert', update: 'update', delete: 'delete'}
 
@@ -46,6 +47,7 @@ const toUpdates = async (surveyInfo, nodes, nodeDefs) => {
 
       return type ? {
           type,
+          schemaName: DataSchema.getName(surveyInfo.id),
           tableName: DataTable.getTableName(nodeDef, nodeDefParent),
           colNames: getColNames(nodeDef, type),
           colValues: await getColValues(surveyInfo, nodeDef, node, type),
@@ -54,7 +56,6 @@ const toUpdates = async (surveyInfo, nodes, nodeDefs) => {
         : null
     })
   )
-
   return R.reject(R.isNil, updates)
 }
 

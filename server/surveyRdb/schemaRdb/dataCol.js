@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const NodeDef = require('../../common/survey/nodeDef')
+const NodeDef = require('../../../common/survey/nodeDef')
 const ColProps = require('./dataColProps')
 
 const getDefaultColumnName = nodeDef => NodeDef.isNodeDefEntity(nodeDef)

@@ -1,70 +1,59 @@
-const R = require('ramda')
-const Promise = require('bluebird')
-
 const db = require('../db/db')
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
-const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 
 const SurveyManager = require('../survey/surveyManager')
 const NodeDefManager = require('../nodeDef/nodeDefManager')
 
-const DataTable = require('./dataTable')
+const DataSchema = require('./schemaRdb/dataSchema')
+const DataTable = require('./schemaRdb/dataTable')
+const NodeInsert = require('./nodeInsert')
 const NodeUpdate = require('./nodeUpdate')
 
-const getSurveyId = R.pipe(Survey.getSurveyInfo, R.prop('id'))
-
 // ==== Schema
-const getSchemaName = surveyId => `survey_${surveyId}_data`
+const dropSchema = async surveyId => await db.query(`DROP SCHEMA IF EXISTS ${DataSchema.getName(surveyId)} CASCADE`)
 
-const dropSchema = async surveyId =>
-  await db.query(`DROP SCHEMA IF EXISTS ${getSchemaName(surveyId)} CASCADE`)
-
-const createSchema = async surveyId =>
-  await db.query(`CREATE SCHEMA ${getSchemaName(surveyId)}`)
+const createSchema = async surveyId => await db.query(`CREATE SCHEMA ${DataSchema.getName(surveyId)}`)
 
 // ==== Tables
 
 const createTable = async (survey, nodeDef) => {
-  const cols = DataTable.getColumnNamesAndType(survey, nodeDef)
 
-  const surveyId = getSurveyId(survey)
+  const surveyId = Survey.getSurveyInfo(survey).id
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const schemaName = getSchemaName(surveyId)
+  const schemaName = DataSchema.getName(surveyId)
+  const tableName = DataTable.getTableName(nodeDef, nodeDefParent)
+  const cols = DataTable.getColumnNamesAndType(survey, nodeDef)
+  const parentForeignKey = DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent)
+  const uuidUniqueIdx = `CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_uuid_unique_ix1 UNIQUE (uuid)`
 
   await db.query(`
     CREATE TABLE
-      ${schemaName}.${DataTable.getTableName(nodeDef, nodeDefParent)}
+      ${schemaName}.${tableName}
     (
       id          bigserial NOT NULL,
       date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       ${cols.join(',')},
-      CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_uuid_unique_ix1 UNIQUE (uuid),
-      ${DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent)},
+      ${uuidUniqueIdx},
+      ${parentForeignKey},
       PRIMARY KEY (id)
     )
   `)
 }
-
 const insertIntoTable = async (survey, nodeDef, record) => {
-  const columnNames = DataTable.getColumnNames(survey, nodeDef)
-  const nodes = Record.getNodesByDefUuid(nodeDef.uuid)(record)
-  const nodeValues = await Promise.all(nodes.map(async node =>
-    await DataTable.getRowValues(survey, nodeDef, record, node)
-  ))
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+  const inserts = await NodeInsert.toInserts(survey, nodeDef, record)
 
   await db.tx(async t => await t.batch(
-    nodeValues.map(nodeValue => t.query(`
-      INSERT INTO 
-        ${getSchemaName(getSurveyId(survey))}.${DataTable.getTableName(nodeDef, nodeDefParent)}
-        (${columnNames.join(',')})
-      VALUES 
-        (${columnNames.map((_, i) => `$${i + 1}`).join(',')})
+    inserts.map(insert => t.query(`
+      INSERT INTO
+        ${insert.schemaName}.${insert.tableName}
+        (${insert.colNames.join(',')})
+      VALUES
+        (${insert.colNames.map((_, i) => `$${i + 1}`).join(',')})
       `,
-      [...nodeValue]
+      insert.values
     ))
   ))
 
@@ -80,7 +69,7 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
       NodeUpdate.isUpdate(update)
         ? (
           client.query(
-            `UPDATE ${getSchemaName(getSurveyId(survey))}.${update.tableName}
+            `UPDATE ${update.schemaName}.${update.tableName}
                SET ${update.colNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
                WHERE uuid = $1`,
             [update.rowUuid, ...update.colValues]
@@ -89,7 +78,7 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
         : NodeUpdate.isInsert(update)
         ? (
           client.query(
-            `INSERT INTO ${getSchemaName(getSurveyId(survey))}.${update.tableName}
+            `INSERT INTO ${update.schemaName}.${update.tableName}
                    (${update.colNames.join(',')})
                    VALUES 
                    (${update.colNames.map((col, i) => `$${i + 1}`).join(',')})
@@ -100,7 +89,7 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
         : NodeUpdate.isDelete(update)
           ? (
             client.query(
-              `DELETE FROM ${getSchemaName(getSurveyId(survey))}.${update.tableName}
+              `DELETE FROM ${update.schemaName}.${update.tableName}
                    WHERE uuid = $1
                   `,
               update.rowUuid

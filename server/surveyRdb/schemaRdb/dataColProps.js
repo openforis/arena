@@ -2,12 +2,12 @@ const R = require('ramda')
 const camelize = require('camelize')
 const toSnakeCase = require('to-snake-case')
 
-const Survey = require('../../common/survey/survey')
-const SurveyUtils = require('../../common/survey/surveyUtils')
-const NodeDef = require('../../common/survey/nodeDef')
-const Node = require('../../common/record/node')
-const CategoryManager = require('../category/categoryManager')
-const TaxonomyManager = require('../taxonomy/taxonomyManager')
+const Survey = require('../../../common/survey/survey')
+const SurveyUtils = require('../../../common/survey/surveyUtils')
+const NodeDef = require('../../../common/survey/nodeDef')
+const Node = require('../../../common/record/node')
+const CategoryManager = require('../../category/categoryManager')
+const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
 const {nodeDefType} = NodeDef
 
