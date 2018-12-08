@@ -1,17 +1,17 @@
 const db = require('../db/db')
 const Survey = require('../../common/survey/survey')
-const NodeDef = require('../../common/survey/nodeDef')
 const Node = require('../../common/record/node')
 
 const SurveyManager = require('../survey/surveyManager')
 const NodeDefManager = require('../nodeDef/nodeDefManager')
 
 const DataSchema = require('./schemaRdb/dataSchema')
-const DataTable = require('./schemaRdb/dataTable')
 const NodeInsert = require('./nodeInsert')
 const NodeUpdate = require('./nodeUpdate')
+const TableViewCreate = require('./tableViewCreate')
 
 // ==== Schema
+
 const dropSchema = async surveyId => await db.query(`DROP SCHEMA IF EXISTS ${DataSchema.getName(surveyId)} CASCADE`)
 
 const createSchema = async surveyId => await db.query(`CREATE SCHEMA ${DataSchema.getName(surveyId)}`)
@@ -19,29 +19,31 @@ const createSchema = async surveyId => await db.query(`CREATE SCHEMA ${DataSchem
 // ==== Tables
 
 const createTable = async (survey, nodeDef) => {
-
-  const surveyId = Survey.getSurveyInfo(survey).id
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  const schemaName = DataSchema.getName(surveyId)
-  const tableName = DataTable.getTableName(nodeDef, nodeDefParent)
-  const cols = DataTable.getColumnNamesAndType(survey, nodeDef)
-  const parentForeignKey = DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent)
-  const uuidUniqueIdx = `CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_uuid_unique_ix1 UNIQUE (uuid)`
+  const tableViewCreate = TableViewCreate.toTableViewCreate(survey, nodeDef)
 
   await db.query(`
     CREATE TABLE
-      ${schemaName}.${tableName}
+      ${tableViewCreate.schemaName}.${tableViewCreate.tableName}
     (
       id          bigserial NOT NULL,
       date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
-      ${cols.join(',')},
-      ${uuidUniqueIdx},
-      ${parentForeignKey},
+      ${tableViewCreate.tableColsAndType.join(',')},
+      ${tableViewCreate.uuidUniqueIdx},
+      ${tableViewCreate.parentForeignKey},
       PRIMARY KEY (id)
     )
   `)
+
+  await db.query(`
+    CREATE VIEW
+      ${tableViewCreate.schemaName}.${tableViewCreate.viewName} AS 
+      SELECT ${tableViewCreate.viewSelectFields.join(',')}
+      FROM ${tableViewCreate.viewSelectFrom}
+      ${tableViewCreate.viewJoin}
+  `)
 }
+
 const insertIntoTable = async (survey, nodeDef, record) => {
   const inserts = await NodeInsert.toInserts(survey, nodeDef, record)
 

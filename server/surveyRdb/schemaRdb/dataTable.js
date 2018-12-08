@@ -23,17 +23,17 @@ const getNodeDefColumns = (survey, nodeDef) =>
     // multiple attr table
     : [nodeDef]
 
-const _getTableName = (nodeDef, nodeDefChild = null) => {
+const tableName = (nodeDef, nodeDefChild = null) => {
   const childName = nodeDefChild ? `_${nodeDefChild.id}` : ''
   return `_${nodeDef.id}${childName}_data`
 }
 
 const getTableName = (nodeDef, nodeDefParent) =>
   NodeDef.isNodeDefEntity(nodeDef)
-    ? _getTableName(nodeDef)
+    ? tableName(nodeDef)
     : NodeDef.isNodeDefMultiple(nodeDef)
-    ? _getTableName(nodeDefParent, nodeDef)
-    : _getTableName(nodeDefParent)
+    ? tableName(nodeDefParent, nodeDef)
+    : tableName(nodeDefParent)
 
 const getColumnNames = (survey, nodeDef) => [
   colNameUuuid,
@@ -46,15 +46,6 @@ const getColumnNamesAndType = (survey, nodeDef) => [
   (NodeDef.isNodeDefRoot(nodeDef) ? colNameRecordUuuid : colNameParentUuuid) + ' uuid NOT NULL',
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType))
 ]
-
-const getRowValues = async (survey, nodeDef, record, node) => {
-  const rowValues = await DataRow.getValues(Survey.getSurveyInfo(survey), nodeDef, record, node, getNodeDefColumns(survey, nodeDef))
-  return [
-    node.uuid,
-    NodeDef.isNodeDefRoot(nodeDef) ? record.uuid : Node.getParentUuid(node),
-    ...R.flatten(rowValues)
-  ]
-}
 
 const getParentForeignKey = (surveyId, schemaName, nodeDef, nodeDefParent = null) => {
   const getConstraintFk = (schemaName, referencedTableName, constraint, foreignKey) => `
@@ -78,15 +69,28 @@ const getParentForeignKey = (surveyId, schemaName, nodeDef, nodeDefParent = null
     )
 }
 
+const getUuidUniqueConstraint = nodeDef => `CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_uuid_unique_ix1 UNIQUE (${colNameUuuid})`
+
+const getRowValues = async (survey, nodeDef, record, node) => {
+  const rowValues = await DataRow.getValues(Survey.getSurveyInfo(survey), nodeDef, record, node, getNodeDefColumns(survey, nodeDef))
+  return [
+    node.uuid,
+    NodeDef.isNodeDefRoot(nodeDef) ? record.uuid : Node.getParentUuid(node),
+    ...R.flatten(rowValues)
+  ]
+}
+
 module.exports = {
   colNameUuuid,
   colNameParentUuuid,
   colNameRecordUuuid,
+  getNodeDefColumns,
 
   getTableName,
   getColumnNames,
   getColumnNamesAndType,
   getParentForeignKey,
+  getUuidUniqueConstraint,
 
   getRowValues,
 }
