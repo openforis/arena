@@ -16,29 +16,18 @@ const getNames = nodeDef => {
     )
 }
 
-const getNamesAndType = nodeDef => R.pipe(
-  getNames,
-  R.map(col => NodeDef.isNodeDefEntity(nodeDef)
-    ? `${col} uuid`
-    : `${col} VARCHAR`
-  ),
-)(nodeDef)
+const getNamesAndType = nodeDefCol =>
+  getNames(nodeDefCol).map(col =>
+    `${col} ${ColProps.getColTypeProcessor(nodeDefCol)(col)}`
+  )
 
 const getValues = async (surveyInfo, nodeDefCol, nodeCol = {}) => {
-  const _getValues = async () => {
-    const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
-    const valueFn = await valueFnProcessor(surveyInfo, nodeDefCol, nodeCol)
-    const values = getNames(nodeDefCol).map(colName =>
-      valueFn(nodeCol, colName)
-    )
-    return values
-  }
-
-  // entity column
-  return NodeDef.isNodeDefEntity(nodeDefCol)
-    ? [R.propOr(null, 'uuid', nodeCol)]
-    // attribute column in multiple attribute table (value of its own table)
-    : await _getValues()
+  const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
+  const valueFn = await valueFnProcessor(surveyInfo, nodeDefCol, nodeCol)
+  const values = getNames(nodeDefCol).map(colName =>
+    valueFn(nodeCol, colName)
+  )
+  return values
 }
 
 module.exports = {

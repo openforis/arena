@@ -38,8 +38,8 @@ module.exports = {
   getLabel,
 
   // UTILS / uuid
-  getUuid: R.prop(uuid),
-  getParentUuid: R.prop(parentUuid),
+  getUuid: R.propOr(null, uuid),
+  getParentUuid: R.propOr(null, parentUuid),
   toIndexedObj,
   toUuidIndexedObj,
 }

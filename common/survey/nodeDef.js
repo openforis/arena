@@ -103,6 +103,7 @@ module.exports = {
 
   //READ
   getProp: SurveyUtils.getProp,
+  getLabel: SurveyUtils.getLabel,
 
   getNodeDefType,
   getNodeDefName,

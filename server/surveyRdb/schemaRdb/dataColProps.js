@@ -3,7 +3,6 @@ const camelize = require('camelize')
 const toSnakeCase = require('to-snake-case')
 
 const Survey = require('../../../common/survey/survey')
-const SurveyUtils = require('../../../common/survey/surveyUtils')
 const NodeDef = require('../../../common/survey/nodeDef')
 const Node = require('../../../common/record/node')
 const CategoryManager = require('../../category/categoryManager')
@@ -13,63 +12,70 @@ const {nodeDefType} = NodeDef
 
 const cols = 'cols'
 const colValueProcessor = 'colValueProcessor'
+const colTypeProcessor = 'colTypeProcessor'
+
+const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => {
+//remove nodeDefName from col name
+  const prop = R.pipe(
+    R.replace(toSnakeCase(NodeDef.getNodeDefName(nodeDefCol)) + '_', ''),
+    camelize,
+  )(colName)
+
+  return isInProps
+    ? NodeDef.getProp(prop)(item)
+    : R.propOr(null, prop, item)
+}
 
 const nodeValuePropProcessor = (surveyInfo, nodeDefCol, nodeCol) =>
   (node, colName) => {
     const nodeValue = Node.getNodeValue(node)
-    //remove nodeDefName from col name
-    const colProp = R.pipe(
-      R.replace(toSnakeCase(NodeDef.getNodeDefName(nodeDefCol)) + '_', ''),
-      camelize,
-    )(colName)
-
-    return R.propOr(null, colProp, nodeValue)
+    return getValueFromItem(nodeDefCol, colName, nodeValue)
   }
 
 const props = {
+  [nodeDefType.entity]: {
+    [colValueProcessor]: () => () => Node.getUuid,
+    [colTypeProcessor]: () => () => 'uuid',
+  },
+
+  [nodeDefType.integer]: {
+    [colTypeProcessor]: () => () => 'integer',
+  },
+
   [nodeDefType.code]: {
     [cols]: ['code', 'label'],
 
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
-      const nodeDefName = NodeDef.getNodeDefName(nodeDefCol)
       const {itemUuid} = Node.getNodeValue(nodeCol)
       const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid) : {}
 
-      return (node, colName) => colName === nodeDefName + '_' + 'code'
-        ? SurveyUtils.getProp('code')(item)
+      return (node, colName) => R.endsWith('_code', colName)
+        ? getValueFromItem(nodeDefCol, colName, item, true)
         //'label'
-        : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
-    }
+        : NodeDef.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+    },
   },
 
   [nodeDefType.taxon]: {
-    [cols]: ['code', 'scientific_name'],
-    //?, 'vernacular_names?'],
-
+    [cols]: ['code', 'scientific_name'], //?, 'vernacular_names?'],
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
-      const nodeDefName = NodeDef.getNodeDefName(nodeDefCol)
       const {taxonUuid} = Node.getNodeValue(nodeCol)
       const items = taxonUuid ? await TaxonomyManager.fetchTaxaByPropLike(surveyInfo.id, null, {filter: {uuid: taxonUuid}}) : []
       const item = R.pipe(R.head, R.defaultTo({}))(items)
 
-      return (node, colName) => colName === nodeDefName + '_' + 'code'
-        ? SurveyUtils.getProp('code')(item)
-        //scientific_name
-        : SurveyUtils.getProp('scientificName')(item)
-    }
-
+      return (node, colName) => getValueFromItem(nodeDefCol, colName, item, true)
+    },
   },
 
   [nodeDefType.coordinate]: {
     [cols]: ['x', 'y', 'srs'],
-    [colValueProcessor]: nodeValuePropProcessor
+    [colValueProcessor]: nodeValuePropProcessor,
   },
 
   [nodeDefType.file]: {
     [cols]: ['file_uuid', 'file_name'],
-    [colValueProcessor]: nodeValuePropProcessor
+    [colValueProcessor]: nodeValuePropProcessor,
   },
-
 }
 
 const getCols = nodeDef => R.propOr(
@@ -84,7 +90,14 @@ const getColValueProcessor = nodeDef => R.propOr(
   props[NodeDef.getNodeDefType(nodeDef)]
 )
 
+const getColTypeProcessor = nodeDef => R.propOr(
+  nodeDef => colName => `VARCHAR`,
+  colTypeProcessor,
+  props[NodeDef.getNodeDefType(nodeDef)]
+)(nodeDef)
+
 module.exports = {
   getCols,
   getColValueProcessor,
+  getColTypeProcessor,
 }
