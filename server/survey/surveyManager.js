@@ -11,7 +11,6 @@ const Survey = require('../../common/survey/survey')
 const {validateSurvey} = require('../survey/surveyValidator')
 
 const nodeDefRepository = require('../nodeDef/nodeDefRepository')
-const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
 const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/nodeDefLayout')
 
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
@@ -95,28 +94,6 @@ const fetchUserSurveysInfo = async (user) => R.map(
   await surveyRepository.fetchSurveys(user, !isSystemAdmin(user))
 )
 
-const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
-  const advanced = validate //load advanced props when validating
-
-  const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced)
-
-  const nodeDefsResult = R.reduce(
-    (acc, nodeDef) => draft
-      ? R.append(nodeDef, acc)
-      // remove draft and unpublished nodeDef
-      : nodeDef.draft && !nodeDef.published
-        ? acc
-        : R.append(nodeDef, acc),
-    [],
-    nodeDefsDB
-  )
-  const nodeDefs = validate
-    ? await validateNodeDefs(nodeDefsResult)
-    : nodeDefsResult
-
-  return toUuidIndexedObj(nodeDefs)
-}
-
 // ====== UPDATE
 const updateSurveyProp = async (id, key, value, user) =>
   await db.tx(
@@ -145,9 +122,6 @@ module.exports = {
   // ====== READ
   fetchSurveyById,
   fetchUserSurveysInfo,
-
-  //TODO move to NodeDefManager
-  fetchSurveyNodeDefs,
 
   // ====== UPDATE
   updateSurveyProp,

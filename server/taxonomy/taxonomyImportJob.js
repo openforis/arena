@@ -210,7 +210,7 @@ class TaxonomyImportJob extends Job {
 
   async flushTaxaInsertBuffer (t) {
     if (this.taxaInsertBuffer.length > 0) {
-      await TaxonomyManager.insertTaxa(this.user, this.surveyId, this.taxaInsertBuffer, t)
+      await TaxonomyManager.insertTaxa(this.surveyId, this.taxaInsertBuffer, this.user, t)
       this.taxaInsertBuffer.length = 0
     }
   }

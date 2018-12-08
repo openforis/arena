@@ -1,12 +1,9 @@
 const {sendErr, sendOk} = require('../serverUtils/response')
-const {getRestParam} = require('../serverUtils/request')
+const {getRestParam,getBoolParam} = require('../serverUtils/request')
 
 const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 
-const SurveyManager = require('./../survey/surveyManager')
 const NodeDefManager = require('./nodeDefManager')
-
-const UnauthorizedError = require('../authGroup/unauthorizedError')
 
 module.exports.init = app => {
 
@@ -27,6 +24,20 @@ module.exports.init = app => {
 
   // ==== READ
 
+  app.get(`/survey/:surveyId/nodeDefs`, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const draft = getBoolParam(req, 'draft')
+      const validate = getBoolParam(req, 'validate')
+
+      const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, validate)
+
+      res.json({nodeDefs})
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
   // ==== UPDATE
 
   app.put('/survey/:surveyId/nodeDef/:nodeDefUuid/prop', requireSurveyEditPermission, async (req, res) => {
@@ -38,7 +49,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
 
       await NodeDefManager.updateNodeDefProp(user, surveyId, nodeDefUuid, key, value, advanced)
-      const nodeDefs = await SurveyManager.fetchSurveyNodeDefs(surveyId, true, true)
+      const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, true, true)
 
       res.json({nodeDefs})
     } catch (err) {

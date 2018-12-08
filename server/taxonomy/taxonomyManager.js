@@ -122,7 +122,7 @@ const deleteTaxonomy = async (user, surveyId, taxonomyUuid) =>
     await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, {taxonomyUuid}, t)
   })
 
-const insertTaxa = (user, surveyId, taxa, client = db) => {
+const insertTaxa = (surveyId, taxa, user, client = db) => {
   const activities = taxa.map(taxon => ({
     type: ActivityLog.type.taxonInsert,
     params: taxon,
