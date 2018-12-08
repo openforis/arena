@@ -4,6 +4,7 @@ const activityType = {
   survey: {
     create: 'surveyCreate',
     propUpdate: 'surveyPropUpdate',
+    publish: 'surveyPublish',
   },
   nodeDef: {
     create: 'nodeDefCreate',

@@ -75,7 +75,7 @@ const updateSurveyProp = async (surveyId, key, value, client = db) => {
 }
 
 const publishSurveyProps = async (surveyId, client = db) =>
-  await client.query(`
+  await client.one(`
     UPDATE
         survey
     SET
@@ -85,6 +85,7 @@ const publishSurveyProps = async (surveyId, client = db) =>
         published = true
     WHERE
         id = $1
+    RETURNING ${surveySelectFields()}
     `, [surveyId]
   )
 
