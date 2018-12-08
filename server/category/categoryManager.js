@@ -145,9 +145,9 @@ const updateItemProp = async (user, surveyId, itemUuid, key, value) =>
   })
 
 // ====== DELETE
-const deleteCategory = async (user, categoryUuid, categoryId) =>
+const deleteCategory = async (user, surveyId, categoryUuid) =>
   await db.tx(async t => {
-    await CategoryRepository.deleteCategory(categoryUuid, categoryId, t)
+    await CategoryRepository.deleteCategory(surveyId, categoryUuid, t)
     await markSurveyDraft(surveyId, t)
 
     await logActivity(user, surveyId, activityType.category.delete, {categoryUuid}, t)

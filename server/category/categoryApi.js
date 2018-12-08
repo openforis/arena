@@ -161,7 +161,7 @@ module.exports.init = app => {
   app.delete('/survey/:surveyId/categories/:categoryUuid', requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const categoryUuid = getRestParam(req, 'categoryId')
+      const categoryUuid = getRestParam(req, 'categoryUuid')
       const {user} = req
 
       await CategoryManager.deleteCategory(user, surveyId, categoryUuid)
