@@ -13,13 +13,13 @@ const toTableViewCreate = (survey, nodeDef) => {
   return {
     schemaName,
     tableName,
-    tableColsAndType: DataTable.getColumnNamesAndType(survey, nodeDef),
+    colsAndType: DataTable.getColumnNamesAndType(survey, nodeDef),
     parentForeignKey: DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent),
     uuidUniqueIdx: DataTable.getUuidUniqueConstraint(nodeDef),
 
     viewName: DataView.getName(nodeDef, nodeDefParent),
-    viewSelectFields: DataView.getSelectFields(survey, nodeDef),
-    viewSelectFrom: `${schemaName}.${tableName} as ${DataView.alias}`,
+    viewFields: DataView.getSelectFields(survey, nodeDef),
+    viewFrom: `${schemaName}.${tableName} as ${DataView.alias}`,
     viewJoin: DataView.getJoin(schemaName, nodeDef, nodeDefParent),
   }
 }
