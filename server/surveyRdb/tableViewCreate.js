@@ -24,6 +24,32 @@ const toTableViewCreate = (survey, nodeDef) => {
   }
 }
 
+const run = async (survey, nodeDef, client) => {
+  const tableViewCreate = toTableViewCreate(survey, nodeDef)
+
+  await client.query(`
+    CREATE TABLE
+      ${tableViewCreate.schemaName}.${tableViewCreate.tableName}
+    (
+      id          bigserial NOT NULL,
+      date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
+      date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
+      ${tableViewCreate.colsAndType.join(',')},
+      ${tableViewCreate.uuidUniqueIdx},
+      ${tableViewCreate.parentForeignKey},
+      PRIMARY KEY (id)
+    )
+  `)
+
+  await client.query(`
+    CREATE VIEW
+      ${tableViewCreate.schemaName}.${tableViewCreate.viewName} AS 
+      SELECT ${tableViewCreate.viewFields.join(',')}
+      FROM ${tableViewCreate.viewFrom}
+      ${tableViewCreate.viewJoin}
+  `)
+}
+
 module.exports = {
-  toTableViewCreate
+  run
 }

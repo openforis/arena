@@ -10,6 +10,8 @@ const DataCol = require('./schemaRdb/dataCol')
 
 const types = {insert: 'insert', update: 'update', delete: 'delete'}
 
+// ==== parsing
+
 const hasTable = NodeDef.isNodeDefEntityOrMultiple
 
 const getType = (nodeDef, node) =>
@@ -73,14 +75,45 @@ const toUpdates = async (surveyInfo, nodes, nodeDefs) => {
   return R.reject(R.isNil, updates)
 }
 
+// ==== execution
+
 const isType = type => R.propEq('type', type)
-const isInsert = isType(types.insert)
-const isUpdate = isType(types.update)
-const isDelete = isType(types.delete)
+
+const runUpdate = (update, client) =>
+  client.query(
+    `UPDATE ${update.schemaName}.${update.tableName}
+      SET ${update.colNames.map((col, i) => `${col} = $${i + 2}`).join(',')}
+      WHERE uuid = $1`,
+    [update.rowUuid, ...update.colValues]
+  )
+
+const runInsert = (update, client) =>
+  client.query(
+    `INSERT INTO ${update.schemaName}.${update.tableName}
+      (${update.colNames.join(',')})
+      VALUES 
+      (${update.colNames.map((col, i) => `$${i + 1}`).join(',')})`,
+    update.colValues
+  )
+
+const runDelete = (update, client) =>
+  client.query(
+    `DELETE FROM ${update.schemaName}.${update.tableName} WHERE uuid = $1`,
+    update.rowUuid
+  )
+
+const run = async (surveyInfo, nodes, nodeDefs, client) => {
+  const updates = await toUpdates(surveyInfo, nodes, nodeDefs)
+  await client.batch(
+    updates.map(update =>
+      isType(types.update)(update)
+        ? runUpdate(update, client)
+        : isType(types.insert)(update) ? runInsert(update, client)
+        : runDelete(update, client)
+    )
+  )
+}
 
 module.exports = {
-  isInsert,
-  isUpdate,
-  isDelete,
-  toUpdates,
+  run,
 }
