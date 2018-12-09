@@ -21,21 +21,21 @@ const insertCategory = async (surveyId, category, client = db) =>
     def => dbTransformCallback(def, true, true)
   )
 
-const insertLevel = async (surveyId, categoryId, level, client = db) =>
+const insertLevel = async (surveyId, categoryUuid, level, client = db) =>
   await client.one(`
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_id, index, props_draft)
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [level.uuid, categoryId, level.index, level.props],
+    [level.uuid, categoryUuid, level.index, level.props],
     def => dbTransformCallback(def, true, true)
   )
 
 const insertItem = async (surveyId, item, client = db) =>
   await client.one(`
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.category_item (uuid, level_id, parent_uuid, props_draft)
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.category_item (uuid, level_uuid, parent_uuid, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [item.uuid, item.levelId, item.parentUuid, item.props],
+    [item.uuid, item.levelUuid, item.parentUuid, item.props],
     def => dbTransformCallback(def, true, true)
   )
 
@@ -49,25 +49,25 @@ const fetchCategoriesBySurveyId = async (surveyId, draft = false, client = db) =
     def => dbTransformCallback(def, draft, true)
   )
 
-const fetchLevelsByCategoryId = async (surveyId, categoryId, draft = false, client = db) =>
+const fetchLevelsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) =>
   await client.map(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.category_level
-     WHERE category_id = $1
+     WHERE category_uuid = $1
      ORDER BY index`,
-    [categoryId],
+    [categoryUuid],
     def => dbTransformCallback(def, draft, true)
   )
 
-const fetchItemsByCategoryId = async (surveyId, categoryId, draft = false, client = db) => {
+const fetchItemsByCategoryUuid = async (surveyId, categoryUuid, draft = false, client = db) => {
   const items = await client.map(`
       SELECT i.* 
       FROM ${getSurveyDBSchema(surveyId)}.category_item i
       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
-        ON l.id = i.level_id
-        AND l.category_id = $1
+        ON l.uuid = i.level_uuid
+        AND l.category_uuid = $1
      ORDER BY i.id
     `,
-    [categoryId],
+    [categoryUuid],
     def => dbTransformCallback(def, draft, true)
   )
 
@@ -76,13 +76,13 @@ const fetchItemsByCategoryId = async (surveyId, categoryId, draft = false, clien
     : R.filter(item => item.published)(items)
 }
 
-const fetchItemsByParentUuid = async (surveyId, categoryId, parentUuid = null, draft = false, client = db) => {
+const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null, draft = false, client = db) => {
   const items = await client.map(`
     SELECT i.* 
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
     JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
-      ON l.id = i.level_id
-      AND l.category_id = $1
+      ON l.uuid = i.level_uuid
+      AND l.category_uuid = $1
     WHERE i.parent_uuid ${
       parentUuid
         ? `= '${parentUuid}'`
@@ -90,7 +90,7 @@ const fetchItemsByParentUuid = async (surveyId, categoryId, parentUuid = null, d
       }
     ORDER BY i.id
   `,
-    [categoryId],
+    [categoryUuid],
     def => dbTransformCallback(def, draft, true)
   )
 
@@ -124,11 +124,11 @@ const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
 const deleteCategory = async (surveyId, categoryUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category', categoryUuid, client)
 
-const deleteLevel = async (surveyId, levelId, client = db) =>
-  await deleteSurveySchemaTableRecord(surveyId, 'category_level', levelId, client)
+const deleteLevel = async (surveyId, levelUuid, client = db) =>
+  await deleteSurveySchemaTableRecord(surveyId, 'category_level', levelUuid, client)
 
-const deleteItem = async (surveyId, itemId, client = db) =>
-  await deleteSurveySchemaTableRecord(surveyId, 'category_item', itemId, client)
+const deleteItem = async (surveyId, itemUuid, client = db) =>
+  await deleteSurveySchemaTableRecord(surveyId, 'category_item', itemUuid, client)
 
 const deleteItemLabels = async (surveyId, langCode, client = db) =>
   await deleteSurveySchemaTableProp(surveyId, 'category_item', ['labels', langCode], client)
@@ -141,8 +141,8 @@ module.exports = {
 
   //READ
   fetchCategoriesBySurveyId,
-  fetchLevelsByCategoryId,
-  fetchItemsByCategoryId,
+  fetchLevelsByCategoryUuid,
+  fetchItemsByCategoryUuid,
   fetchItemsByParentUuid,
   fetchItemByUuid,
 

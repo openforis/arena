@@ -1,5 +1,5 @@
 const R = require('ramda')
-const Survey = require('../../../common/survey/survey')
+
 const NodeDef = require('../../../common/survey/nodeDef')
 
 const DataTable = require('./../schemaRdb/dataTable')
@@ -9,17 +9,6 @@ const getName = (nodeDef, nodeDefParent) => DataTable.getTableName(nodeDef, node
 
 const alias = `a`
 const aliasParent = `p`
-const getNodeDefColumns = (survey, nodeDef) => {
-  const tableColumns = DataTable.getNodeDefColumns(survey, nodeDef)
-  const nodeDefCols = NodeDef.isNodeDefEntity(nodeDef) ?
-    [nodeDef, ...tableColumns]
-    : tableColumns
-
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
-  return nodeDefParent
-    ? [...getNodeDefColumns(survey, nodeDefParent), ...nodeDefCols]
-    : nodeDefCols
-}
 
 const getColUuid = nodeDef => `${NodeDef.getNodeDefName(nodeDef)}_${DataTable.colNameUuuid}`
 

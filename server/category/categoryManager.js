@@ -13,7 +13,7 @@ const ActivityLog = require('../activityLog/activityLogger')
 
 // ====== VALIDATION
 const validateCategory = async (surveyId, categories, category, draft) => {
-  const items = await CategoryRepository.fetchItemsByCategoryId(surveyId, category.id, draft)
+  const items = await CategoryRepository.fetchItemsByCategoryUuid(surveyId, category.uuid, draft)
 
   return await assocValidation(category, categories, items)
 }
@@ -33,7 +33,7 @@ const insertCategory = async (user, surveyId, category) =>
     //insert levels
     const levelsDb = await Promise.all(
       levels.map(async level =>
-        await CategoryRepository.insertLevel(surveyId, categoryDb.id, level, t)
+        await CategoryRepository.insertLevel(surveyId, categoryDb.uuid, level, t)
       )
     )
     await markSurveyDraft(surveyId, t)
@@ -43,13 +43,13 @@ const insertCategory = async (user, surveyId, category) =>
     return await assocValidation(Category.assocLevelsArray(levelsDb)(categoryDb))
   })
 
-const insertLevel = async (user, surveyId, categoryId, level) =>
+const insertLevel = async (user, surveyId, categoryUuid, level) =>
   await db.tx(async t => {
-    const levelDb = await CategoryRepository.insertLevel(surveyId, categoryId, level, t)
+    const levelDb = await CategoryRepository.insertLevel(surveyId, categoryUuid, level, t)
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, {categoryId, level}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, {categoryUuid, level}, t)
 
     return levelDb
   })
@@ -73,16 +73,16 @@ const fetchCategoriesAndLevels = async (surveyId, draft) => {
     categoriesDb.map(async category => ({
       ...category,
       levels: toIndexedObj(
-        await CategoryRepository.fetchLevelsByCategoryId(surveyId, category.id, draft),
+        await CategoryRepository.fetchLevelsByCategoryUuid(surveyId, category.uuid, draft),
         'index'
       ),
     }))
   )
 }
 
-const fetchCategoryById = async (surveyId, categoryId, draft = false, validate = true) => {
+const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, validate = true) => {
   const categories = await fetchCategoriesAndLevels(surveyId, draft)
-  const category = R.find(R.propEq('id', categoryId))(categories)
+  const category = R.find(R.propEq('uuid', categoryUuid))(categories)
 
   return validate
     ? await validateCategory(surveyId, categories, category, draft)
@@ -180,9 +180,9 @@ module.exports = {
   insertItem,
 
   //READ
-  fetchCategoryById,
+  fetchCategoryByUuid,
   fetchCategoriesBySurveyId,
-  fetchItemsByCategoryId: CategoryRepository.fetchItemsByCategoryId,
+  fetchItemsByCategoryUuid: CategoryRepository.fetchItemsByCategoryUuid,
   fetchItemsByParentUuid: CategoryRepository.fetchItemsByParentUuid,
   fetchItemByUuid: CategoryRepository.fetchItemByUuid,
 

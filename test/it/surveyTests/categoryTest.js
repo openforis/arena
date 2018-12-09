@@ -8,12 +8,13 @@ const createCategoryTest = async () => {
   const surveyId = getContextSurveyId()
 
   const categoryReq = CategoryTest.newCategory({name: 'category_test'})
-
+console.log("=== surveyId ", surveyId)
+console.log("=== categoryReq ", categoryReq)
   const category = await CategoryManager.insertCategory(surveyId, categoryReq)
 
-  expect(category.id).to.exist
+  expect(category.uuid).to.exist
 
-  const reloadedCategory = await CategoryManager.fetchCategoryById(surveyId, category.id, true, true)
+  const reloadedCategory = await CategoryManager.fetchCategoryByUuid(surveyId, category.uuid, true, true)
 
   expect(reloadedCategory).to.deep.equal(category)
 }
@@ -24,14 +25,14 @@ const createCategoryLevelTest = async () => {
   const category = (await CategoryManager.fetchCategoriesBySurveyId(surveyId, true, false))[0]
 
   const levelReq = CategoryTest.newLevel(category)
-  const level = await CategoryManager.insertLevel(surveyId, category.id, levelReq)
+  const level = await CategoryManager.insertLevel(surveyId, category.uuid, levelReq)
 
   expect(CategoryTest.getLevelName(level)).to.be.equal(CategoryTest.getLevelName(levelReq))
 
   //inserted level should be the 2nd
   expect(level.index).to.be.equal(1)
 
-  const reloadedCategory = await CategoryManager.fetchCategoryById(surveyId, category.id, true, false)
+  const reloadedCategory = await CategoryManager.fetchCategoryByUuid(surveyId, category.uuid, true, false)
 
   //levels must be 2
   expect(CategoryTest.getLevelsArray(reloadedCategory).length).to.be.equal(2)
@@ -47,7 +48,7 @@ const createCategoryItemTest = async () => {
   const itemCode = '1'
   const itemLabel = 'Value 1'
 
-  const itemReq = CategoryTest.newItem(level.id, null, {code: itemCode, labels: {en: itemLabel}})
+  const itemReq = CategoryTest.newItem(level.uuid, null, {code: itemCode, labels: {en: itemLabel}})
 
   const item = await CategoryManager.insertItem(surveyId, itemReq)
 
@@ -61,7 +62,7 @@ const updateCategoryTest = async () => {
   const category = (await CategoryManager.fetchCategoriesBySurveyId(surveyId, true, false))[0]
 
   const newName = 'category_modified'
-  const updatedCategory = await CategoryManager.updateCategoryProp(surveyId, category.id, 'name', newName)
+  const updatedCategory = await CategoryManager.updateCategoryProp(surveyId, category.uuid, 'name', newName)
 
   expect(CategoryTest.getName(updatedCategory)).to.be.equal(newName)
 }
