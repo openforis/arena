@@ -43,13 +43,13 @@ export const createTaxonomy = () => async (dispatch, getState) => {
 
 // ====== READ
 
-const countTaxa = async (surveyId, taxonomyId) => {
-  const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyId}/taxa/count?draft=true`)
+const countTaxa = async (surveyId, taxonomyUuid) => {
+  const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa/count?draft=true`)
   return data.count
 }
 
-const fetchTaxa = async (surveyId, taxonomyId, offset, limit) => {
-  const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyId}/taxa`, {
+const fetchTaxa = async (surveyId, taxonomyUuid, offset, limit) => {
+  const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`, {
     params: {
       draft: true,
       limit,
@@ -59,8 +59,8 @@ const fetchTaxa = async (surveyId, taxonomyId, offset, limit) => {
   return data.taxa
 }
 
-const fetchTaxonomy = (surveyId, taxonomyId) => async dispatch => {
-    const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyId}?draft=true&validate=true`)
+const fetchTaxonomy = (surveyId, taxonomyUuid) => async dispatch => {
+    const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}?draft=true&validate=true`)
     dispatchTaxonomyUpdate(dispatch, data.taxonomy)
   }
 
@@ -70,8 +70,8 @@ export const initTaxaList = taxonomy => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
 
   const [count, taxa] = await Promise.all([
-    await countTaxa(surveyId, taxonomy.id),
-    await fetchTaxa(surveyId, taxonomy.id, 0, ROWS_PER_PAGE)
+    await countTaxa(surveyId, taxonomy.uuid),
+    await fetchTaxa(surveyId, taxonomy.uuid, 0, ROWS_PER_PAGE)
   ])
 
   dispatchTaxonomyEditPropsUpdate(dispatch, {
@@ -88,7 +88,7 @@ export const loadTaxa = (taxonomy, page = 1) => async (dispatch, getState) => {
   const surveyForm = getSurveyForm(state)
   const surveyId = getStateSurveyId(state)
   const rowsPerPage = getTaxonomyEditTaxaPerPage(surveyForm)
-  const taxa = await fetchTaxa(surveyId, taxonomy.id, (page - 1) * rowsPerPage, rowsPerPage)
+  const taxa = await fetchTaxa(surveyId, taxonomy.uuid, (page - 1) * rowsPerPage, rowsPerPage)
 
   dispatchTaxonomyEditPropsUpdate(dispatch, {taxa})
 }
@@ -116,11 +116,11 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
   }
 
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.post(`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/upload`, formData, config)
+  const {data} = await axios.post(`/api/survey/${surveyId}/taxonomies/${taxonomy.uuid}/upload`, formData, config)
 
   dispatch(showAppJobMonitor(data.job, () => {
     //on import complete validate taxonomy and reload taxa
-    dispatch(fetchTaxonomy(surveyId, taxonomy.id))
+    dispatch(fetchTaxonomy(surveyId, taxonomy.uuid))
     dispatch(initTaxaList(taxonomy))
   }))
 }

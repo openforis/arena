@@ -46,12 +46,12 @@ const insertTaxa = async (surveyId, taxa, client = db) =>
 
 const insertOrUpdateTaxon = (surveyId, taxon, client = db) =>
   client.one(
-    `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon (uuid, taxonomy_id, props_draft)
+    `INSERT INTO ${getSurveyDBSchema(surveyId)}.taxon (uuid, taxonomy_uuid, props_draft)
       VALUES ($1, $2, $3)
-      ON CONFLICT (taxonomy_id, (props_draft->>'code')) DO
+      ON CONFLICT (taxonomy_uuid, (props_draft->>'code')) DO
         UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon.props_draft || $3
       RETURNING *`,
-    [taxon.uuid, taxon.taxonomyId, taxon.props],
+    [taxon.uuid, taxon.taxonomyUuid, taxon.props],
     record => dbTransformCallback(record, true, true)
   )
 
@@ -71,11 +71,11 @@ const insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, cli
 
 // ============== READ
 
-const fetchTaxonomyById = async (surveyId, id, draft = false, client = db) =>
+const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client = db) =>
   await client.one(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxonomy
-     WHERE id = $1`,
-    [id],
+     WHERE uuid = $1`,
+    [uuid],
     record => dbTransformCallback(record, draft, true)
   )
 
@@ -86,17 +86,17 @@ const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, client = db) =
     record => dbTransformCallback(record, draft, true)
   )
 
-const countTaxaByTaxonomyId = async (surveyId, taxonomyId, draft = false, client = db) =>
+const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, client = db) =>
   await client.one(`
       SELECT COUNT(*) 
       FROM ${getSurveyDBSchema(surveyId)}.taxon
-      WHERE taxonomy_id = $1`,
-    [taxonomyId],
+      WHERE taxonomy_uuid = $1`,
+    [taxonomyUuid],
     r => parseInt(r.count)
   )
 
 const fetchTaxaByPropLike = async (surveyId,
-                                   taxonomyId,
+                                   taxonomyUuid,
                                    params = {},
                                    draft = false,
                                    client = db) => {
@@ -120,7 +120,7 @@ const fetchTaxaByPropLike = async (surveyId,
 
   switch (filterProp) {
     case filterProps.vernacularName:
-      return fetchTaxaByVernacularName(surveyId, taxonomyId, searchValue, sort, limit, offset, draft, client)
+      return fetchTaxaByVernacularName(surveyId, taxonomyUuid, searchValue, sort, limit, offset, draft, client)
     case filterProps.uuid:
       const taxon = await fetchTaxonByUuid(surveyId, searchValue, draft, client)
       return taxon ? [taxon] : []
@@ -134,20 +134,20 @@ const fetchTaxaByPropLike = async (surveyId,
       return await client.map(
         `SELECT * FROM (
             SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
-            WHERE taxonomy_id = $1 
+            WHERE taxonomy_uuid = $1 
               ${searchValue ? `AND lower(${propsCol}->>'${filterProp}') LIKE '${searchValue}'` : ''}
             ORDER BY ${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
           ) AS sorted_taxa 
             LIMIT ${limit ? limit : 'ALL'} 
             OFFSET $2`,
-        [taxonomyId, offset],
+        [taxonomyUuid, offset],
         record => dbTransformCallback(record, draft, true)
       )
   }
 }
 
 const fetchTaxaByVernacularName = async (surveyId,
-                                         taxonomyId,
+                                         taxonomyUuid,
                                          searchValue,
                                          sort = {field: 'scientificName', asc: true},
                                          limit = 25,
@@ -165,13 +165,13 @@ const fetchTaxaByVernacularName = async (surveyId,
         FROM ${getSurveyDBSchema(surveyId)}.taxon t
           LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
           ON vn.taxon_uuid = t.uuid
-        WHERE t.taxonomy_id = $1 
+        WHERE t.taxonomy_uuid = $1 
           AND lower(vn.${propsCol}->>'name') LIKE '%${searchValue}%'
         ORDER BY t.${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
       ) AS sorted_taxa 
         LIMIT ${limit ? limit : 'ALL'} 
         OFFSET $2`,
-    [taxonomyId, offset],
+    [taxonomyUuid, offset],
     record => dbTransformCallback(record, draft, true)
   )
 }
@@ -211,12 +211,12 @@ const updateTaxonomyProp = async (surveyId, taxonomyUuid, key, value, client = d
 const deleteTaxonomy = async (surveyId, taxonomyUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'taxonomy', taxonomyUuid, client)
 
-const deleteDraftTaxaByTaxonomyId = async (surveyId, taxonomyId, client = db) =>
+const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client = db) =>
   await client.none(
     `DELETE FROM ${getSurveyDBSchema(surveyId)}.taxon
-     WHERE taxonomy_id = $1
+     WHERE taxonomy_uuid = $1
        AND props::text = '{}'::text`,
-    [taxonomyId]
+    [taxonomyUuid]
   )
 
 module.exports = {
@@ -225,9 +225,9 @@ module.exports = {
   insertTaxa,
 
   //READ
-  fetchTaxonomyById,
   fetchTaxonomiesBySurveyId,
-  countTaxaByTaxonomyId,
+  fetchTaxonomyByUuid,
+  countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike,
 
   //UPDATE
@@ -235,5 +235,5 @@ module.exports = {
 
   //DELETE
   deleteTaxonomy,
-  deleteDraftTaxaByTaxonomyId,
+  deleteDraftTaxaByTaxonomyUuid,
 }

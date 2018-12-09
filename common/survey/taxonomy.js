@@ -12,9 +12,9 @@ const newTaxonomy = () => ({
   props: {},
 })
 
-const newTaxon = (taxonomyId) => ({
+const newTaxon = (taxonomyUuid) => ({
   uuid: uuidv4(),
-  taxonomyId,
+  taxonomyUuid,
   props: {},
 })
 

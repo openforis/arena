@@ -37,7 +37,7 @@ const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = fal
 }
 
 const validateTaxonomy = async (surveyId, taxonomies = [], taxonomy, client = db) => {
-  const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyId(surveyId, taxonomy.id, client)
+  const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyUuid(surveyId, taxonomy.uuid, client)
 
   return {
     ...taxonomy,
@@ -45,8 +45,8 @@ const validateTaxonomy = async (surveyId, taxonomies = [], taxonomy, client = db
   }
 }
 
-const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate = false, client = db) => {
-  const taxonomy = await TaxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft, client)
+const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false, validate = false, client = db) => {
+  const taxonomy = await TaxonomyRepository.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft, client)
 
   if (validate) {
     const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
@@ -56,10 +56,10 @@ const fetchTaxonomyById = async (surveyId, taxonomyId, draft = false, validate =
   }
 }
 
-const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
+const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   console.log('start csv export')
 
-  const taxonomy = await TaxonomyRepository.fetchTaxonomyById(surveyId, taxonomyId, draft)
+  const taxonomy = await TaxonomyRepository.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
   const vernacularLanguageCodes = Taxonomy.getTaxonomyVernacularLanguageCodes(taxonomy)
 
   const csvStream = fastcsv.createWriteStream({headers: true})
@@ -75,7 +75,7 @@ const exportTaxa = async (surveyId, taxonomyId, output, draft = false) => {
   csvStream.write(R.concat(fixedHeaders, vernacularLanguageCodes))
 
   //write taxa
-  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyId, null, draft)
+  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, null, draft)
 
   taxa.forEach(taxon => {
     csvStream.write(R.concat([
@@ -140,10 +140,10 @@ module.exports = {
   insertTaxa,
 
   //READ
-  fetchTaxonomyById,
+  fetchTaxonomyByUuid,
   fetchTaxonomiesBySurveyId,
   exportTaxa,
-  countTaxaByTaxonomyId: TaxonomyRepository.countTaxaByTaxonomyId,
+  countTaxaByTaxonomyUuid: TaxonomyRepository.countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike: TaxonomyRepository.fetchTaxaByPropLike,
 
   //UPDATE
@@ -152,5 +152,5 @@ module.exports = {
 
   //DELETE
   deleteTaxonomy,
-  deleteDraftTaxaByTaxonomyId: TaxonomyRepository.deleteDraftTaxaByTaxonomyId,
+  deleteDraftTaxaByTaxonomyUuid: TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid,
 }

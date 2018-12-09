@@ -199,7 +199,7 @@ class NodeDefTaxon extends React.Component {
       }
     }
 
-    const {data} = await axios.get(`/api/survey/${surveyInfo.id}/taxonomies/${taxonomy.id}/taxa?${toQueryString(params)}`)
+    const {data} = await axios.get(`/api/survey/${surveyInfo.id}/taxonomies/${taxonomy.uuid}/taxa?${toQueryString(params)}`)
     return data.taxa
   }
 
