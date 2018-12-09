@@ -32,14 +32,26 @@ const nodeValuePropProcessor = (surveyInfo, nodeDefCol, nodeCol) =>
     return getValueFromItem(nodeDefCol, colName, nodeValue)
   }
 
+const sqlTypes = {
+  uuid: 'UUID',
+  varchar: 'VARCHAR',
+  integer: 'INTEGER',
+  decimal: `DECIMAL(${16 + 6}, 6)`,
+}
+
 const props = {
   [nodeDefType.entity]: {
     [colValueProcessor]: () => () => Node.getUuid,
-    [colTypeProcessor]: () => () => 'uuid',
+    [colTypeProcessor]: () => () => sqlTypes.uuid,
   },
 
   [nodeDefType.integer]: {
-    [colTypeProcessor]: () => () => 'integer',
+    [colTypeProcessor]: () => () => sqlTypes.integer,
+  },
+
+  [nodeDefType.decimal]: {
+    //TODO used in ui nodeDefSystemProps
+    [colTypeProcessor]: () => () => sqlTypes.decimal,
   },
 
   [nodeDefType.code]: {
@@ -49,7 +61,7 @@ const props = {
       const {itemUuid} = Node.getNodeValue(nodeCol)
       const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid) : {}
 
-      return (node, colName) => R.endsWith('_code', colName)
+      return (node, colName) => R.endsWith('code', colName)
         ? getValueFromItem(nodeDefCol, colName, item, true)
         //'label'
         : NodeDef.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
@@ -75,6 +87,7 @@ const props = {
   [nodeDefType.file]: {
     [cols]: ['file_uuid', 'file_name'],
     [colValueProcessor]: nodeValuePropProcessor,
+    [colTypeProcessor]: () => colName => R.endsWith('file_uuid', colName) ? sqlTypes.uuid : sqlTypes.varchar,
   },
 }
 

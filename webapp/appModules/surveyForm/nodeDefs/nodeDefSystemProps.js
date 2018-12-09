@@ -50,7 +50,7 @@ export const nodeDefSystemProps = {
         thousandsSeparatorSymbol: ',',
         allowDecimal: true,
         decimalSymbol: '.',
-        decimalLimit: 4,
+        decimalLimit: 6,
         integerLimit: 16,
         requireDecimal: false,
         allowNegative: true,
