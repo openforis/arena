@@ -103,11 +103,11 @@ const updateNodeDefProp = async (surveyId, nodeDefUuid, key, value, advanced = f
 
   return await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
-    SET ${propsCol} = ${propsCol} || $1,
+    SET ${propsCol} = ${propsCol} || $1::jsonb,
     date_modified = timezone('UTC'::text, now())
     WHERE uuid = $2
     RETURNING ${nodeDefSelectFields()}
-  `, [JSON.stringify(prop), nodeDefUuid],
+  `, [prop, nodeDefUuid],
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 }

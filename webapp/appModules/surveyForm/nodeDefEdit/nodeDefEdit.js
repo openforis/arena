@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import TabBar from '../../../commonComponents/tabBar'
 import BasicProps from './basic/basicProps'
 import AdvancedProps from './advanced/advancedProps'
+import ValidationsProps from './validations/validationsProps'
 import CategoriesView from '../components/categoriesView'
 import TaxonomiesView from '../components/taxonomiesView'
 
@@ -81,6 +82,13 @@ class NodeDefEdit extends React.Component {
                         component: (
                           <AdvancedProps nodeDef={nodeDef}
                                          putNodeDefProp={putNodeDefProp}/>
+                        )
+                      },
+                      {
+                        label: 'Validations',
+                        component: (
+                          <ValidationsProps nodeDef={nodeDef}
+                                            putNodeDefProp={putNodeDefProp}/>
                         )
                       }
                     ]}/>

@@ -1,8 +1,10 @@
 import axios from 'axios'
+import * as R from 'ramda'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 
 import NodeDef from '../../../common/survey/nodeDef'
+import NodeDefValidations from '../../../common/survey/nodeDefValidations'
 import { getStateSurveyId } from '../surveyState'
 
 export const nodeDefsLoad = 'nodeDefs/load'
@@ -43,13 +45,27 @@ const _putNodeDefProp = (nodeDef, key, value, advanced) => {
   const action = async (dispatch, getState) => {
     const surveyId = getStateSurveyId(getState())
 
-    const {data} = await axios.put(
-      `/api/survey/${surveyId}/nodeDef/${nodeDef.uuid}/prop`,
-      {key, value, advanced}
-    )
+    const putProp = async (nodeDef, key, value, advanced) => {
+      const {data} = await axios.put(
+        `/api/survey/${surveyId}/nodeDef/${nodeDef.uuid}/prop`,
+        {key, value, advanced}
+      )
+      return data.nodeDefs
+    }
 
-    //update node defs with their validation status
-    const {nodeDefs} = data
+    let nodeDefs = await putProp(nodeDef, key, value, advanced)
+
+    if (key === 'multiple') {
+      const validations = value
+        ? NodeDefValidations.assocRequired(null)(NodeDef.getNodeDefValidations(nodeDef))
+        : R.pipe(
+          NodeDefValidations.assocMinCount(null),
+          NodeDefValidations.assocMaxCount(null),
+        )(NodeDef.getNodeDefValidations(nodeDef))
+
+      nodeDefs = await putProp(nodeDef, 'validations', validations, true)
+    }
+
     dispatch({type: nodeDefsLoad, nodeDefs})
   }
 
