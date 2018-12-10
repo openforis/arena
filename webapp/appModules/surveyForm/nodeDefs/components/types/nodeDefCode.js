@@ -47,11 +47,11 @@ class NodeDefCode extends React.Component {
   }
 
   async loadCategoryItems () {
-    const {surveyInfo, categoryId, categoryLevelIndex, parentItemUuid} = this.props
+    const {surveyInfo, categoryUuid, categoryLevelIndex, parentItemUuid} = this.props
 
-    if (categoryId && (parentItemUuid || categoryLevelIndex === 0)) {
+    if (categoryUuid && (parentItemUuid || categoryLevelIndex === 0)) {
       const params = {draft: false, parentUuid: parentItemUuid}
-      const {data} = await axios.get(`/api/survey/${surveyInfo.id}/categories/${categoryId}/items?${toQueryString(params)}`)
+      const {data} = await axios.get(`/api/survey/${surveyInfo.id}/categories/${categoryUuid}/items?${toQueryString(params)}`)
 
       this.setState({items: data.items})
     } else {
@@ -154,7 +154,7 @@ const mapStateToProps = (state, props) => {
     language: Survey.getDefaultLanguage(surveyInfo),
 
     parentCodeDefUuid: NodeDef.getNodeDefParentCodeDefUuid(nodeDef),
-    categoryId: category ? category.id : null,
+    categoryUuid: category ? category.uuid : null,
     categoryLevelIndex: categoryLevelIndex,
     parentItemUuid: Node.getNodeItemUuid(parentCodeAttribute),
     codeUuidsHierarchy: Record.getCodeUuidsHierarchy(survey, parentNode, nodeDef)(record),

@@ -9,11 +9,11 @@ const CategoryRepository = require('./categoryRepository')
 const CategoryValidator = require('./categoryValidator')
 const Category = require('../../common/survey/category')
 
-const {logActivity, activityType} = require('../activityLog/activityLogger')
+const ActivityLog = require('../activityLog/activityLogger')
 
 // ====== VALIDATION
 const validateCategory = async (surveyId, categories, category, draft) => {
-  const items = await CategoryRepository.fetchItemsByCategoryId(surveyId, category.id, draft)
+  const items = await CategoryRepository.fetchItemsByCategoryUuid(surveyId, category.uuid, draft)
 
   return await assocValidation(category, categories, items)
 }
@@ -33,23 +33,23 @@ const insertCategory = async (user, surveyId, category) =>
     //insert levels
     const levelsDb = await Promise.all(
       levels.map(async level =>
-        await CategoryRepository.insertLevel(surveyId, categoryDb.id, level, t)
+        await CategoryRepository.insertLevel(surveyId, categoryDb.uuid, level, t)
       )
     )
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.category.insert, category, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryInsert, category, t)
 
     return await assocValidation(Category.assocLevelsArray(levelsDb)(categoryDb))
   })
 
-const insertLevel = async (user, surveyId, categoryId, level) =>
+const insertLevel = async (user, surveyId, categoryUuid, level) =>
   await db.tx(async t => {
-    const levelDb = await CategoryRepository.insertLevel(surveyId, categoryId, level, t)
+    const levelDb = await CategoryRepository.insertLevel(surveyId, categoryUuid, level, t)
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.category.levelInsert, {categoryId, level}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, {categoryUuid, level}, t)
 
     return levelDb
   })
@@ -60,7 +60,7 @@ const insertItem = async (user, surveyId, item) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.category.itemInsert, item, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemInsert, item, t)
 
     return itemDb
   })
@@ -73,16 +73,16 @@ const fetchCategoriesAndLevels = async (surveyId, draft) => {
     categoriesDb.map(async category => ({
       ...category,
       levels: toIndexedObj(
-        await CategoryRepository.fetchLevelsByCategoryId(surveyId, category.id, draft),
+        await CategoryRepository.fetchLevelsByCategoryUuid(surveyId, category.uuid, draft),
         'index'
       ),
     }))
   )
 }
 
-const fetchCategoryById = async (surveyId, categoryId, draft = false, validate = true) => {
+const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, validate = true) => {
   const categories = await fetchCategoriesAndLevels(surveyId, draft)
-  const category = R.find(R.propEq('id', categoryId))(categories)
+  const category = R.find(R.propEq('uuid', categoryUuid))(categories)
 
   return validate
     ? await validateCategory(surveyId, categories, category, draft)
@@ -117,7 +117,7 @@ const updateCategoryProp = async (user, surveyId, categoryUuid, key, value) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.category.propUpdate, {categoryUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryPropUpdate, {categoryUuid, key, value}, t)
 
     return category
   })
@@ -128,7 +128,7 @@ const updateLevelProp = async (user, surveyId, levelUuid, key, value) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.category.levelPropUpdate, {levelUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelPropUpdate, {levelUuid, key, value}, t)
 
     return level
   })
@@ -139,7 +139,7 @@ const updateItemProp = async (user, surveyId, itemUuid, key, value) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.category.itemPropUpdate, {itemUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemPropUpdate, {itemUuid, key, value}, t)
 
     return item
   })
@@ -150,7 +150,7 @@ const deleteCategory = async (user, surveyId, categoryUuid) =>
     await CategoryRepository.deleteCategory(surveyId, categoryUuid, t)
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.category.delete, {categoryUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryDelete, {categoryUuid}, t)
   })
 
 const deleteLevel = async (user, surveyId, levelUuid) =>
@@ -158,7 +158,7 @@ const deleteLevel = async (user, surveyId, levelUuid) =>
     await CategoryRepository.deleteLevel(surveyId, levelUuid, t)
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.category.levelDelete, {levelUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, {levelUuid}, t)
   })
 
 const deleteItem = async (user, surveyId, itemUuid) =>
@@ -166,7 +166,7 @@ const deleteItem = async (user, surveyId, itemUuid) =>
     await CategoryRepository.deleteItem(surveyId, itemUuid, t)
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.category.itemDelete, {itemUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemDelete, {itemUuid}, t)
   })
 
 module.exports = {
@@ -180,9 +180,9 @@ module.exports = {
   insertItem,
 
   //READ
-  fetchCategoryById,
+  fetchCategoryByUuid,
   fetchCategoriesBySurveyId,
-  fetchItemsByCategoryId: CategoryRepository.fetchItemsByCategoryId,
+  fetchItemsByCategoryUuid: CategoryRepository.fetchItemsByCategoryUuid,
   fetchItemsByParentUuid: CategoryRepository.fetchItemsByParentUuid,
   fetchItemByUuid: CategoryRepository.fetchItemByUuid,
 

@@ -42,7 +42,7 @@ const executeJobThread = (job) => {
     async job => await notifyJobUpdate(job)
   )
 
-  userJobThreads.putThread(job.params.userId, thread)
+  userJobThreads.putThread(job.userId, thread)
 }
 
 module.exports = {

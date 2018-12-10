@@ -5,21 +5,23 @@ CREATE TABLE
   uuid        uuid      NOT NULL DEFAULT uuid_generate_v4(),
   props       jsonb              DEFAULT '{}'::jsonb,
   props_draft jsonb              DEFAULT '{}'::jsonb,
-  PRIMARY KEY (id)
+
+  PRIMARY KEY (id),
+  CONSTRAINT taxonomy_uuid_key UNIQUE (uuid)
 );
 
 CREATE TABLE
   taxon
 (
-  id          bigserial NOT NULL,
-  uuid        uuid      NOT NULL DEFAULT uuid_generate_v4(),
-  taxonomy_id bigint    NOT NULL,
-  props       jsonb              DEFAULT '{}'::jsonb,
-  props_draft jsonb              DEFAULT '{}'::jsonb,
+  id            bigserial NOT NULL,
+  uuid          uuid      NOT NULL DEFAULT uuid_generate_v4(),
+  taxonomy_uuid uuid      NOT NULL,
+  props         jsonb              DEFAULT '{}'::jsonb,
+  props_draft   jsonb              DEFAULT '{}'::jsonb,
 
   PRIMARY KEY (id),
   CONSTRAINT taxon_uuid_key UNIQUE (uuid),
-  CONSTRAINT taxon_taxonomy_fk FOREIGN KEY (taxonomy_id) REFERENCES taxonomy (id) ON DELETE CASCADE
+  CONSTRAINT taxon_taxonomy_fk FOREIGN KEY (taxonomy_uuid) REFERENCES taxonomy (uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE
@@ -32,24 +34,25 @@ CREATE TABLE
   props_draft jsonb              DEFAULT '{}'::jsonb,
 
   PRIMARY KEY (id),
+  CONSTRAINT taxon_vernacular_name_uuid_key UNIQUE (uuid),
   CONSTRAINT taxon_vernacular_name_taxon_fk FOREIGN KEY (taxon_uuid) REFERENCES taxon (uuid) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX
 taxon_props_code_idx
-ON taxon (taxonomy_id, (props->>'code'));
+ON taxon (taxonomy_uuid, (props->>'code'));
 
 CREATE UNIQUE INDEX
 taxon_props_scientific_name_idx
-ON taxon (taxonomy_id, (props->>'scientificName'));
+ON taxon (taxonomy_uuid, (props->>'scientificName'));
 
 CREATE UNIQUE INDEX
 taxon_props_draft_code_idx
-ON taxon (taxonomy_id, (props_draft->>'code'));
+ON taxon (taxonomy_uuid, (props_draft->>'code'));
 
 CREATE UNIQUE INDEX
 taxon_props_draft_scientific_name_idx
-ON taxon (taxonomy_id,  (props_draft->>'scientificName'));
+ON taxon (taxonomy_uuid,  (props_draft->>'scientificName'));
 
 CREATE UNIQUE INDEX
 taxon_vernacular_name_props_lang_idx

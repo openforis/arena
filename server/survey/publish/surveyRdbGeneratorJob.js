@@ -1,6 +1,7 @@
 const Job = require('../../job/job')
 
 const SurveyManager = require('../surveyManager')
+const NodeDefManager = require('../../nodeDef/nodeDefManager')
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 const RecordManager = require('../../record/recordManager')
@@ -51,7 +52,7 @@ class SurveyRdbGeneratorJob extends Job {
   async getSurvey () {
     const {surveyId} = this.params
     const survey = await SurveyManager.fetchSurveyById(surveyId)
-    const nodeDefs = await SurveyManager.fetchSurveyNodeDefs(surveyId)
+    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId)
 
     return {...survey, nodeDefs}
   }

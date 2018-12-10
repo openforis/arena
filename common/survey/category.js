@@ -30,9 +30,9 @@ const getLevelsArray = R.pipe(
   R.sortBy(R.prop('index'))
 )
 
-const getLevelById = id => R.pipe(
+const getLevelByUuid = uuid => R.pipe(
   getLevelsArray,
-  R.find(R.propEq('id', id)),
+  R.find(R.propEq('uuid', uuid)),
 )
 const getLevelByIndex = idx => R.path(['levels', idx])
 
@@ -48,7 +48,7 @@ const newLevel = (category) => {
 
   return {
     uuid: uuidv4(),
-    categoryId: R.prop('id')(category),
+    categoryUuid: R.prop('uuid')(category),
     index,
     props: {
       name: 'level_' + (index + 1),
@@ -61,10 +61,10 @@ const newLevel = (category) => {
  * ITEM
  */
 // ====== CREATE
-const newItem = (levelId, parentItem = null, props = {}) => {
+const newItem = (levelUuid, parentItem = null, props = {}) => {
   return {
     uuid: uuidv4(),
-    levelId,
+    levelUuid,
     parentUuid: parentItem ? parentItem.uuid : null,
     props,
   }
@@ -85,8 +85,8 @@ const getItemLabel = language =>
 
 const isItemLeaf = item =>
   category => R.pipe(
-    R.prop('levelId'),
-    levelId => getLevelById(levelId)(category),
+    R.prop('levelUuid'),
+    levelUuid => getLevelByUuid(levelUuid)(category),
     level => getLevelsArray(category).length === level.index + 1
   )(item)
 

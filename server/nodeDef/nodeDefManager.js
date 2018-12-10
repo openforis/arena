@@ -4,10 +4,11 @@ const db = require('../db/db')
 const SurveyUtils = require('../../common/survey/surveyUtils')
 
 const NodeDefRepository = require('./nodeDefRepository')
+const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
 
 const {markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
 
-const {logActivity, activityType} = require('../activityLog/activityLogger')
+const ActivityLog = require('../activityLog/activityLogger')
 
 // ======= CREATE
 
@@ -17,17 +18,14 @@ const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.nodeDef.create, {parentUuid, uuid, type, props}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, {parentUuid, uuid, type, props}, t)
 
     return nodeDef
   })
 
 // ======= READ
 
-const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, validate = false) => {
-
-  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsByUuid(surveyId, nodeDefUuids, draft, validate)
-
+const processNodeDefs = async (nodeDefsDb, draft, validate ) => {
   const nodeDefsResult = R.reduce(
     (acc, nodeDef) => draft
       ? R.append(nodeDef, acc)
@@ -36,15 +34,23 @@ const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, v
         ? acc
         : R.append(nodeDef, acc),
     [],
-    nodeDefsDB
+    nodeDefsDb
   )
-  //TODO
-  // const nodeDefs = validate
-  //   ? await validateNodeDefs(nodeDefsResult)
-  //   : nodeDefsResult
-  // return SurveyUtils.toUuidIndexedObj(nodeDefs)
+  const nodeDefs = validate
+    ? await validateNodeDefs(nodeDefsResult)
+    : nodeDefsResult
 
-  return SurveyUtils.toUuidIndexedObj(nodeDefsResult)
+  return SurveyUtils.toUuidIndexedObj(nodeDefs)
+}
+
+const fetchNodeDefsBySurveyId = async (surveyId, draft = false, validate = false) => {
+  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, validate)
+  return await processNodeDefs(nodeDefsDB, draft, validate)
+}
+
+const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, validate = false) => {
+  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsByUuid(surveyId, nodeDefUuids, draft, validate)
+  return await processNodeDefs(nodeDefsDB, draft, validate)
 }
 
 // ======= UPDATE
@@ -55,7 +61,7 @@ const updateNodeDefProp = async (user, surveyId, nodeDefUuid, key, value, advanc
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.nodeDef.update, {nodeDefUuid, key, value, advanced}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, {nodeDefUuid, key, value, advanced}, t)
 
     return nodeDef
   })
@@ -68,17 +74,22 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await logActivity(user, surveyId, activityType.nodeDef.markDeleted, {nodeDefUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, {nodeDefUuid}, t)
 
     return nodeDef
   })
 
 module.exports = {
+  //CREATE
   createNodeDef,
 
+  //READ
+  fetchNodeDefsBySurveyId,
   fetchNodeDefsByUuid,
 
+  //UPDATE
   updateNodeDefProp,
 
+  //DELETE
   markNodeDefDeleted,
 }

@@ -10,6 +10,7 @@ const File = require('../../common/file/file')
 const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
+const ActivityLog = require('../activityLog/activityLogger')
 
 /**
  * ===================
@@ -74,7 +75,11 @@ const persistNode = (user, surveyId, node, fileReq) => {
  * DELETE
  * ===================
  */
-const deleteRecord = async (user, surveyId, recordUuid) => await RecordRepository.deleteRecord(user, surveyId, recordUuid)
+const deleteRecord = async (user, surveyId, recordUuid) =>
+  await db.tx(async t => {
+    await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, {recordUuid}, t)
+    await RecordRepository.deleteRecord(user, surveyId, recordUuid, t)
+  })
 
 const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(user, surveyId, nodeUuid)
 

@@ -17,9 +17,10 @@ class Job {
   constructor (type, params, innerJobs = []) {
     this.params = params
 
-    const {userId, surveyId} = params
+    const {user, surveyId} = params
 
-    this.userId = userId
+    this.user = user
+    this.userId = user.id
     this.surveyId = surveyId
 
     this.uuid = uuidv4()

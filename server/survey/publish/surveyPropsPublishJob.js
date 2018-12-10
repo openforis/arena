@@ -10,6 +10,8 @@ const CategoryManager = require('../../category/categoryManager')
 const CategoryRepository = require('../../category/categoryRepository')
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
+const ActivityLog = require('../../activityLog/activityLogger')
+
 const determineDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyRepository.getSurveyById(surveyId, true, t)
   if (survey.published) {
@@ -35,26 +37,23 @@ class SurveyPropsPublishJob extends Job {
       const deletedLanguages = await determineDeletedLanguages(id, t)
 
       await NodeDefRepository.publishNodeDefsProps(id, t)
-
       this.incrementProcessedItems()
 
       await NodeDefRepository.permanentlyDeleteNodeDefs(id, t)
-
       this.incrementProcessedItems()
 
       await CategoryManager.publishProps(id, t)
-
       this.incrementProcessedItems()
 
       await TaxonomyManager.publishTaxonomiesProps(id, t)
-
       this.incrementProcessedItems()
 
-      await SurveyRepository.publishSurveyProps(id, t)
-
+      const surveyInfo = await SurveyRepository.publishSurveyProps(id, t)
       this.incrementProcessedItems()
 
       await this.removeDeletedLanguagesLabels(deletedLanguages, t)
+
+      await ActivityLog.log(this.user, id, ActivityLog.type.surveyPublish, {surveyUuid: surveyInfo.uuid}, t)
 
       this.setStatusSucceeded()
     })
@@ -63,8 +62,7 @@ class SurveyPropsPublishJob extends Job {
   async removeDeletedLanguagesLabels (deletedLanguages, t) {
     const surveyId = this.params.surveyId
 
-    for (let i = 0; i < deletedLanguages.length; i++) {
-      const langCode = deletedLanguages[i]
+    for (const langCode of deletedLanguages) {
 
       //SURVEY
       await SurveyRepository.deleteSurveyLabel(surveyId, langCode, t)

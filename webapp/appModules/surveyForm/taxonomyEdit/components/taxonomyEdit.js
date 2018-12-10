@@ -41,7 +41,7 @@ class TaxonomyEdit extends React.Component {
   async componentDidMount () {
     const {taxonomy, initTaxaList} = this.props
 
-    if (taxonomy.id) {
+    if (taxonomy.uuid) {
       initTaxaList(taxonomy)
     }
   }
@@ -79,7 +79,7 @@ class TaxonomyEdit extends React.Component {
                             onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
 
             }
-            <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${taxonomy.id}/export?draft=true`}
+            <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${taxonomy.uuid}/export?draft=true`}
                             disabled={R.isEmpty(taxa)}
                             label="CSV Export"/>
           </div>

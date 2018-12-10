@@ -44,14 +44,14 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/taxonomies/:taxonomyId', async (req, res) => {
+  app.get('/survey/:surveyId/taxonomies/:taxonomyUuid', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
       const draft = getBoolParam(req, 'draft')
       const validate = getBoolParam(req, 'validate')
 
-      const taxonomy = await TaxonomyManager.fetchTaxonomyById(surveyId, taxonomyId, draft, validate)
+      const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft, validate)
 
       res.json({taxonomy})
     } catch (err) {
@@ -59,13 +59,13 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/taxonomies/:taxonomyId/taxa/count', async (req, res) => {
+  app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/taxa/count', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
       const draft = getBoolParam(req, 'draft')
 
-      const count = await TaxonomyManager.countTaxaByTaxonomyId(surveyId, taxonomyId, draft)
+      const count = await TaxonomyManager.countTaxaByTaxonomyUuid(surveyId, taxonomyUuid, draft)
 
       res.json({count})
     } catch (err) {
@@ -73,10 +73,10 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/taxonomies/:taxonomyId/taxa', async (req, res) => {
+  app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/taxa', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
       const draft = getBoolParam(req, 'draft')
       const limit = getRestParam(req, 'limit', 25)
       const offset = getRestParam(req, 'offset', 0)
@@ -87,7 +87,7 @@ module.exports.init = app => {
         filter, sort, limit, offset
       }
 
-      const taxa = await TaxonomyManager.fetchTaxaByPropLike(surveyId, taxonomyId, params, draft)
+      const taxa = await TaxonomyManager.fetchTaxaByPropLike(surveyId, taxonomyUuid, params, draft)
 
       res.json({taxa})
     } catch (err) {
@@ -95,17 +95,17 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/taxonomies/:taxonomyId/export', async (req, res) => {
+  app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/export', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
       const draft = getBoolParam(req, 'draft')
 
-      const fileName = `taxonomy_${taxonomyId}.csv`
+      const fileName = `taxonomy_${taxonomyUuid}.csv`
       res.setHeader('Content-disposition', `attachment; filename=${fileName}`)
       res.set('Content-Type', 'text/csv')
 
-      await TaxonomyManager.exportTaxa(surveyId, taxonomyId, res, draft)
+      await TaxonomyManager.exportTaxa(surveyId, taxonomyUuid, res, draft)
 
       res.end()
     } catch (err) {
@@ -130,19 +130,18 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/survey/:surveyId/taxonomies/:taxonomyId/upload', requireSurveyEditPermission, async (req, res) => {
+  app.post('/survey/:surveyId/taxonomies/:taxonomyUuid/upload', requireSurveyEditPermission, async (req, res) => {
     try {
       const user = req.user
       const surveyId = getRestParam(req, 'surveyId')
-      const taxonomyId = getRestParam(req, 'taxonomyId')
+      const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
 
       const file = req.files.file
 
       const job = new TaxonomyImportJob({
-        userId: user.id,
         user,
         surveyId,
-        taxonomyId,
+        taxonomyUuid,
         csvString: file.data.toString('utf8')
       })
 

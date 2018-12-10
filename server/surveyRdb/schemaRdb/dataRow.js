@@ -1,9 +1,9 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const NodeDef = require('../../common/survey/nodeDef')
-const Record = require('../../common/record/record')
-const Node = require('../../common/record/node')
+const NodeDef = require('../../../common/survey/nodeDef')
+const Record = require('../../../common/record/record')
+const Node = require('../../../common/record/node')
 const DataCol = require('./dataCol')
 
 const getNodeCol = (nodeDefCol, record, nodeRow) => {

@@ -25,11 +25,11 @@ const taxaInsertBufferSize = 500
 class TaxonomyImportJob extends Job {
 
   constructor (params) {
-    const {taxonomyId, csvString} = params
+    const {taxonomyUuid, csvString} = params
 
     super(TaxonomyImportJob.type, params)
 
-    this.taxonomyId = taxonomyId
+    this.taxonomyUuid = taxonomyUuid
     this.csvString = csvString
 
     this.codesToRow = {} //maps codes to csv file rows
@@ -38,7 +38,7 @@ class TaxonomyImportJob extends Job {
   }
 
   async execute () {
-    const {surveyId, taxonomyId} = this
+    const {surveyId, taxonomyUuid} = this
 
     this.vernacularLanguageCodes = []
 
@@ -53,14 +53,14 @@ class TaxonomyImportJob extends Job {
     const csvParser = new CSVParser(this.csvString)
 
     await db.tx(async t => {
-      const taxonomy = await TaxonomyManager.fetchTaxonomyById(surveyId, taxonomyId, true, false, t)
+      const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, t)
 
       if (taxonomy.published) {
         throw new Error('cannot overwrite published taxa')
       }
 
       //delete old draft taxa
-      await TaxonomyManager.deleteDraftTaxaByTaxonomyId(surveyId, taxonomyId, t)
+      await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t)
 
       let row = await csvParser.next()
 
@@ -86,7 +86,7 @@ class TaxonomyImportJob extends Job {
 
           //set vernacular lang codes in taxonomy
           //set log to false temporarily; set user to null as it's only needed for logging
-          await TaxonomyManager.updateTaxonomyProp(this.params.user, surveyId, taxonomy.uuid,
+          await TaxonomyManager.updateTaxonomyProp(this.user, surveyId, taxonomy.uuid,
             'vernacularLanguageCodes', this.vernacularLanguageCodes, t)
 
           this.setStatusSucceeded()
@@ -152,7 +152,7 @@ class TaxonomyImportJob extends Job {
       genus,
       scientificName: scientific_name,
       vernacularNames: this.parseVernacularNames(vernacularNames)
-    })(Taxonomy.newTaxon(this.taxonomyId))
+    })(Taxonomy.newTaxon(this.taxonomyUuid))
 
     return await this.validateTaxon(taxon)
   }
@@ -210,7 +210,7 @@ class TaxonomyImportJob extends Job {
 
   async flushTaxaInsertBuffer (t) {
     if (this.taxaInsertBuffer.length > 0) {
-      await TaxonomyManager.insertTaxa(this.params.user, this.surveyId, this.taxaInsertBuffer, t)
+      await TaxonomyManager.insertTaxa(this.surveyId, this.taxaInsertBuffer, this.user, t)
       this.taxaInsertBuffer.length = 0
     }
   }

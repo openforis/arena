@@ -20,14 +20,14 @@ const getExtension = fileName => R.pipe(
   R.tail,
 )(fileName)
 
-const truncateFileName = fileName => {
+const truncateFileName = (fileName, maxLength = 10) => {
   if (fileName && !R.isEmpty(fileName)) {
 
     const extension = getExtension(fileName)
 
     return R.pipe(
       R.dropLast(extension.length + 1),
-      truncate(15),
+      truncate(maxLength),
       name => name + '.' + extension
     )(fileName)
   } else {

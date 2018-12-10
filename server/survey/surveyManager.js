@@ -11,7 +11,6 @@ const Survey = require('../../common/survey/survey')
 const {validateSurvey} = require('../survey/surveyValidator')
 
 const nodeDefRepository = require('../nodeDef/nodeDefRepository')
-const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
 const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/nodeDefLayout')
 
 const {deleteUserPref, updateUserPref} = require('../user/userRepository')
@@ -20,7 +19,7 @@ const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPref
 const authGroupRepository = require('../authGroup/authGroupRepository')
 const {isSystemAdmin} = require('../../common/auth/authManager')
 
-const {logActivity, activityType} = require('../activityLog/activityLogger')
+const ActivityLog = require('../activityLog/activityLogger')
 
 const assocSurveyInfo = info => ({info})
 
@@ -69,7 +68,7 @@ const createSurvey = async (user, {name, label, lang}) => {
         await authGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
       }
 
-      await logActivity(user, surveyId, activityType.survey.create, {name, label, lang, uuid: survey.uuid}, t)
+      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, {name, label, lang, uuid: survey.uuid}, t)
 
       return survey
     }
@@ -95,33 +94,11 @@ const fetchUserSurveysInfo = async (user) => R.map(
   await surveyRepository.fetchSurveys(user, !isSystemAdmin(user))
 )
 
-const fetchSurveyNodeDefs = async (surveyId, draft = false, validate = false) => {
-  const advanced = validate //load advanced props when validating
-
-  const nodeDefsDB = await nodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced)
-
-  const nodeDefsResult = R.reduce(
-    (acc, nodeDef) => draft
-      ? R.append(nodeDef, acc)
-      // remove draft and unpublished nodeDef
-      : nodeDef.draft && !nodeDef.published
-        ? acc
-        : R.append(nodeDef, acc),
-    [],
-    nodeDefsDB
-  )
-  const nodeDefs = validate
-    ? await validateNodeDefs(nodeDefsResult)
-    : nodeDefsResult
-
-  return toUuidIndexedObj(nodeDefs)
-}
-
 // ====== UPDATE
 const updateSurveyProp = async (id, key, value, user) =>
   await db.tx(
     async t => {
-      await logActivity(user, id, activityType.survey.propUpdate, {key, value}, t)
+      await ActivityLog.log(user, id, ActivityLog.type.surveyPropUpdate, {key, value}, t)
 
       return assocSurveyInfo(await surveyRepository.updateSurveyProp(id, key, value))
     })
@@ -145,9 +122,6 @@ module.exports = {
   // ====== READ
   fetchSurveyById,
   fetchUserSurveysInfo,
-
-  //TODO move to NodeDefManager
-  fetchSurveyNodeDefs,
 
   // ====== UPDATE
   updateSurveyProp,
