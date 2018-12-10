@@ -50,16 +50,22 @@ export const dissocSurveyGroups = surveyId =>
   }
 
 // ==== APP ERRORS
-const errors = 'errors'
+const errorsKey = 'errors'
 
 export const getAppState = R.prop(app)
 
-export const assocAppError = error => R.assocPath([errors, error.id + ''], error)
+export const assocAppError = error => R.assocPath([errorsKey, error.id + ''], error)
 
-export const dissocAppError = error => R.dissocPath([errors, error.id + ''])
+export const dissocAppError = error => R.dissocPath([errorsKey, error.id + ''])
 
 export const getAppErrors = R.pipe(
-  R.prop(errors),
+  R.prop(errorsKey),
   R.values,
   R.sort((a, b) => +b.id - +a.id)
 )
+
+const systemErrorKey = 'systemError'
+
+export const assocSystemError = (error) => R.assoc(systemErrorKey, error)
+
+export const getSystemError = R.path([app, systemErrorKey])

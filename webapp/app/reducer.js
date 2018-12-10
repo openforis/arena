@@ -5,6 +5,7 @@ import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
 import { startJob, updateActiveJob } from '../appModules/appView/components/job/appJobState'
 import {
   assocAppError,
+  assocSystemError,
   assocSurveyAdminGroup,
   dissocAppError,
   dissocSurveyGroups,
@@ -19,6 +20,7 @@ import {
   appUserPrefUpdate,
   appErrorCreate,
   appErrorDelete,
+  systemErrorThrow,
 } from './actions'
 import { loginSuccess } from '../login/actions'
 
@@ -70,6 +72,8 @@ const actionHandlers = {
   )(state),
 
   [appErrorDelete]: (state, {error}) => dissocAppError(error)(state),
+
+  [systemErrorThrow]: (state, {error}) => assocSystemError(error)(state),
 
 }
 

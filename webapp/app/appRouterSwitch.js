@@ -10,8 +10,8 @@ import appAnimation from './appAnimation'
 
 import LoginView from '../login/components/loginView'
 
-import { initApp } from './actions'
-import { getUser, isReady } from './appState'
+import { throwSystemError, initApp } from './actions'
+import * as AppState from './appState'
 import { getLocationPathname } from '../appUtils/routerUtils'
 
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
@@ -28,14 +28,14 @@ class AppRouterSwitch extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const {user, activeJobUpdate, recordNodesUpdate} = this.props
+    const {user, activeJobUpdate, recordNodesUpdate, throwSystemError} = this.props
     const {user: prevUser} = prevProps
 
     if (user && !prevUser) {
       openSocket({
         [WebSocketEvents.jobUpdate]: activeJobUpdate,
         [WebSocketEvents.nodesUpdate]: recordNodesUpdate,
-        [WebSocketEvents.error]: (error) => alert('error ', error),
+        [WebSocketEvents.error]: throwSystemError,
       })
     } else if (prevUser && !user) {
       closeSocket()
@@ -47,7 +47,7 @@ class AppRouterSwitch extends React.Component {
   }
 
   render () {
-    const {location, isReady, user} = this.props
+    const {location, isReady, user, systemError} = this.props
 
     const isLogin = getLocationPathname(this.props) === loginUri
 
@@ -72,27 +72,42 @@ class AppRouterSwitch extends React.Component {
             <div className="main__bg2"/>
             <div className="main__bg-overlay"/>
 
-            <TransitionGroup component={null}>
-              <Transition
-                key={key}
-                appear={true}
-                timeout={2000}
-                onEnter={onEnter}
-                onExit={onExit}>
+            {
+              systemError
+                ? (
+                  <div className="main__system-error">
+                    <div className="main__system-error-container">
+                      <span className="icon icon-warning icon-24px icon-left"/>
+                      Oooops! Something went wrong. Try to refresh the page.
+                      <div className="error">{systemError}</div>
+                    </div>
+                  </div>
+                )
+                : (
+                  <TransitionGroup component={null}>
+                    <Transition
+                      key={key}
+                      appear={true}
+                      timeout={2000}
+                      onEnter={onEnter}
+                      onExit={onExit}>
 
-                <Switch location={location}>
+                      <Switch location={location}>
 
-                  <Route exact path="/" component={LoginView}/>
-                  <Route path="/app" render={(props) =>
-                    <DynamicImport load={() => import('../appModules/appView/appViewExport')}>
-                      {(Component) => Component === null ? null : <Component {...props} />}
-                    </DynamicImport>
-                  }/>
+                        <Route exact path="/" component={LoginView}/>
+                        <Route path="/app" render={(props) =>
+                          <DynamicImport load={() => import('../appModules/appView/appViewExport')}>
+                            {(Component) => Component === null ? null : <Component {...props} />}
+                          </DynamicImport>
+                        }/>
 
-                </Switch>
+                      </Switch>
 
-              </Transition>
-            </TransitionGroup>
+                    </Transition>
+                  </TransitionGroup>
+                )
+            }
+
           </React.Fragment>
         )
         : (
@@ -103,15 +118,17 @@ class AppRouterSwitch extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  isReady: isReady(state),
-  user: getUser(state)
+  isReady: AppState.isReady(state),
+  user: AppState.getUser(state),
+  systemError: AppState.getSystemError(state),
 })
 
 export default withRouter(
   connect(mapStateToProps, {
     initApp,
     activeJobUpdate,
-    recordNodesUpdate
+    recordNodesUpdate,
+    throwSystemError,
   })
   (AppRouterSwitch)
 )

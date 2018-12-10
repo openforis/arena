@@ -58,6 +58,23 @@ body {
   width: 100%;
 }
 
+.main__system-error {
+  @extend .main__bg;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.main__system-error-container {
+  padding: 1rem;
+  background-color: $yellow;
+  color: black;
+  line-height: 3rem;
+  text-align: center;
+}
+
 .hidden-transition {
   visibility: hidden;
   opacity: 0;

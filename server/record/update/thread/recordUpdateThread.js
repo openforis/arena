@@ -39,7 +39,7 @@ class RecordUpdateThread extends Thread {
 
     await db.tx(async t => {
       const {user, surveyId} = msg
-      throw new Error('error')
+
       switch (msg.type) {
         case messageTypes.createRecord:
           nodes = await RecordProcessor.createRecord(user, surveyId, msg.record, t)
