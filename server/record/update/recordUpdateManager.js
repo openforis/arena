@@ -1,7 +1,7 @@
 const path = require('path')
 
 const WebSocketManager = require('../../webSocket/webSocketManager')
-const {recordEvents} = require('../../../common/webSocket/webSocketEvents')
+const WebSocketEvents = require('../../../common/webSocket/webSocketEvents')
 
 const ThreadsCache = require('../../threads/threadsCache')
 const ThreadManager = require('../../threads/threadManager')
@@ -11,11 +11,12 @@ const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 const recordUpdateThreads = new ThreadsCache()
 const checkOutTimeoutsByUserId = {}
 
-const createRecordUpdateThread = (userId) => {
+const createRecordUpdateThread = (user, surveyId) => {
+  const userId = user.id
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
-    {},
-    nodes => WebSocketManager.notifyUser(userId, recordEvents.nodesUpdate, nodes),
+    {user, surveyId},
+    nodes => WebSocketManager.notifyUser(userId, WebSocketEvents.nodesUpdate, nodes),
     () => recordUpdateThreads.removeThread(userId)
   )
 
@@ -26,12 +27,11 @@ const createRecordUpdateThread = (userId) => {
 
 /**
  * Start record update thread
- * @param userId
  */
-const checkIn = userId => {
-  cancelCheckOut(userId)
-  if (!recordUpdateThreads.getThread(userId)) {
-    createRecordUpdateThread(userId)
+const checkIn = (user, surveyId) => {
+  cancelCheckOut(user.id)
+  if (!recordUpdateThreads.getThread(user.id)) {
+    createRecordUpdateThread(user, surveyId)
   }
 }
 

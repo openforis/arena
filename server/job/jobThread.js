@@ -20,7 +20,7 @@ class JobThread extends Thread {
     this.job.start()
   }
 
-  onMessage (msg) {
+  async onMessage (msg) {
     switch (msg.type) {
       case jobThreadMessageTypes.fetchJob:
         this.sendJobToParentThread()

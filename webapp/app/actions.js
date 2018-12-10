@@ -30,8 +30,6 @@ export const logout = () => async dispatch => {
   }
 }
 
-
-
 // ====== ERRORS HANDLING
 
 export const appErrorCreate = 'app/error/create'
@@ -39,3 +37,8 @@ export const appErrorDelete = 'app/error/delete'
 
 export const closeAppError = error => dispatch =>
   dispatch({type: appErrorDelete, error})
+
+export const systemErrorThrow = 'system/error'
+
+export const throwSystemError = error => dispatch =>
+  dispatch({type: systemErrorThrow, error})

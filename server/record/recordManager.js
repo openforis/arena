@@ -18,7 +18,7 @@ const ActivityLog = require('../activityLog/activityLogger')
  * ===================
  */
 const createRecord = (user, surveyId, record) => {
-  RecordUpdateManager.checkIn(user.id)
+  RecordUpdateManager.checkIn(user, surveyId)
 
   RecordUpdateManager.createRecord(user, surveyId, record)
 }
@@ -88,8 +88,8 @@ const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(
  * CHECK IN / OUT RECORD
  * ==================
  */
-const checkInRecord = async (userId, surveyId, recordUuid) => {
-  RecordUpdateManager.checkIn(userId)
+const checkInRecord = async (user, surveyId, recordUuid) => {
+  RecordUpdateManager.checkIn(user, surveyId)
   return await fetchRecordByUuid(surveyId, recordUuid)
 }
 
