@@ -1,4 +1,4 @@
-const {getContextSurveyId} = require('./../../testContext')
+const {getContextSurveyId, getContextUser} = require('./../../testContext')
 const {expect} = require('chai')
 
 const CategoryManager = require('../../../server/category/categoryManager')
@@ -6,11 +6,10 @@ const CategoryTest = require('../../../common/survey/category')
 
 const createCategoryTest = async () => {
   const surveyId = getContextSurveyId()
+  const user = getContextUser()
 
   const categoryReq = CategoryTest.newCategory({name: 'category_test'})
-console.log("=== surveyId ", surveyId)
-console.log("=== categoryReq ", categoryReq)
-  const category = await CategoryManager.insertCategory(surveyId, categoryReq)
+  const category = await CategoryManager.insertCategory(user, surveyId, categoryReq)
 
   expect(category.uuid).to.exist
 
@@ -21,11 +20,12 @@ console.log("=== categoryReq ", categoryReq)
 
 const createCategoryLevelTest = async () => {
   const surveyId = getContextSurveyId()
+  const user = getContextUser()
 
   const category = (await CategoryManager.fetchCategoriesBySurveyId(surveyId, true, false))[0]
 
   const levelReq = CategoryTest.newLevel(category)
-  const level = await CategoryManager.insertLevel(surveyId, category.uuid, levelReq)
+  const level = await CategoryManager.insertLevel(user, surveyId, category.uuid, levelReq)
 
   expect(CategoryTest.getLevelName(level)).to.be.equal(CategoryTest.getLevelName(levelReq))
 
@@ -40,6 +40,7 @@ const createCategoryLevelTest = async () => {
 
 const createCategoryItemTest = async () => {
   const surveyId = getContextSurveyId()
+  const user = getContextUser()
 
   const category = (await CategoryManager.fetchCategoriesBySurveyId(surveyId, true, false))[0]
 
@@ -50,7 +51,7 @@ const createCategoryItemTest = async () => {
 
   const itemReq = CategoryTest.newItem(level.uuid, null, {code: itemCode, labels: {en: itemLabel}})
 
-  const item = await CategoryManager.insertItem(surveyId, itemReq)
+  const item = await CategoryManager.insertItem(user, surveyId, itemReq)
 
   expect(CategoryTest.getItemCode(item)).to.be.equal(itemCode)
   expect(CategoryTest.getItemLabel('en')(item)).to.be.equal(itemLabel)
@@ -58,11 +59,12 @@ const createCategoryItemTest = async () => {
 
 const updateCategoryTest = async () => {
   const surveyId = getContextSurveyId()
+  const user = getContextUser()
 
   const category = (await CategoryManager.fetchCategoriesBySurveyId(surveyId, true, false))[0]
 
   const newName = 'category_modified'
-  const updatedCategory = await CategoryManager.updateCategoryProp(surveyId, category.uuid, 'name', newName)
+  const updatedCategory = await CategoryManager.updateCategoryProp(user, surveyId, category.uuid, 'name', newName)
 
   expect(CategoryTest.getName(updatedCategory)).to.be.equal(newName)
 }
