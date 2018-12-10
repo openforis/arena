@@ -45,26 +45,28 @@ const _putNodeDefProp = (nodeDef, key, value, advanced) => {
   const action = async (dispatch, getState) => {
     const surveyId = getStateSurveyId(getState())
 
-    const putProp = async (nodeDef, key, value, advanced) => {
+    const putProps = async (nodeDef, props) => {
       const {data} = await axios.put(
-        `/api/survey/${surveyId}/nodeDef/${nodeDef.uuid}/prop`,
-        {key, value, advanced}
+        `/api/survey/${surveyId}/nodeDef/${nodeDef.uuid}/props`,
+        props
       )
       return data.nodeDefs
     }
 
-    let nodeDefs = await putProp(nodeDef, key, value, advanced)
+    const propsToUpdate = [{key, value, advanced}]
 
     if (key === 'multiple') {
       const validations = value
-        ? NodeDefValidations.assocRequired(null)(NodeDef.getNodeDefValidations(nodeDef))
+        ? NodeDefValidations.dissocRequired()(NodeDef.getNodeDefValidations(nodeDef))
         : R.pipe(
-          NodeDefValidations.assocMinCount(null),
-          NodeDefValidations.assocMaxCount(null),
+          NodeDefValidations.dissocMinCount(),
+          NodeDefValidations.dissocMaxCount(),
         )(NodeDef.getNodeDefValidations(nodeDef))
 
-      nodeDefs = await putProp(nodeDef, 'validations', validations, true)
+      propsToUpdate.push({key: 'validations', validations, advanced: true})
     }
+
+    const nodeDefs = await putProps(nodeDef, propsToUpdate)
 
     dispatch({type: nodeDefsLoad, nodeDefs})
   }

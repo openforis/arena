@@ -1,4 +1,5 @@
 const Promise = require('bluebird')
+const R = require('ramda')
 
 const db = require('../db/db')
 const {selectDate} = require('../db/dbUtils')
@@ -97,20 +98,29 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
 
 // ============== UPDATE
 
-const updateNodeDefProp = async (surveyId, nodeDefUuid, key, value, advanced = false, client = db) => {
-  const prop = {[key]: value}
-  const propsCol = `props${advanced ? '_advanced' : ''}_draft`
+const updateNodeDefProps = async (surveyId, nodeDefUuid, propsArray, client = db) => {
+  const props = R.pipe(
+    R.filter(R.propEq('advanced', false)),
+    R.reduce((acc, prop) => R.assoc(prop.key, prop.value)(acc), {})
+  )(propsArray)
+
+  const advancedProps = R.pipe(
+    R.filter(R.propEq('advanced', true)),
+    R.reduce((acc, prop) => R.assoc(prop.key, prop.value)(acc), {})
+  )(propsArray)
 
   return await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
-    SET ${propsCol} = ${propsCol} || $1::jsonb,
-    date_modified = timezone('UTC'::text, now())
-    WHERE uuid = $2
+    SET props_draft = props_draft || $1::jsonb,
+      props_advanced_draft = props_advanced_draft || $2::jsonb,
+      date_modified = timezone('UTC'::text, now())
+    WHERE uuid = $3
     RETURNING ${nodeDefSelectFields()}
-  `, [prop, nodeDefUuid],
+  `, [props, advancedProps, nodeDefUuid],
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 }
+
 
 const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`
@@ -180,7 +190,7 @@ module.exports = {
   fetchRootNodeDefKeysBySurveyId,
 
   //UPDATE
-  updateNodeDefProp,
+  updateNodeDefProps,
   publishNodeDefsProps,
 
   //DELETE

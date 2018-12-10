@@ -132,7 +132,7 @@ module.exports = {
   isNodeDefPublished,
 
   //validations
-  getNodeDefValidations: SurveyUtils.getProp('validations'),
+  getNodeDefValidations: SurveyUtils.getProp('validations', {}),
 
   //UTILS
   canNodeDefBeMultiple,
