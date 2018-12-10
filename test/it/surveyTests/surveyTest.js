@@ -1,5 +1,5 @@
-const {setContextSurvey, getContextUser, getContextSurvey} = require('./../../testContext')
-const {assert, expect} = require('chai')
+const {setContextSurvey, getContextUser} = require('./../../testContext')
+const {assert} = require('chai')
 const {uuidv4} = require('../../../common/uuid')
 
 const {createSurvey} = require('../../../server/survey/surveyManager')
