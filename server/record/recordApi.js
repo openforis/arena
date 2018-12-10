@@ -97,7 +97,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const recordUuid = getRestParam(req, 'recordUuid')
 
-      const record = await RecordManager.checkInRecord(user.id, surveyId, recordUuid)
+      const record = await RecordManager.checkInRecord(user, surveyId, recordUuid)
 
       res.json({record})
     } catch (err) {

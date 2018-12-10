@@ -14,8 +14,8 @@ import { initApp } from './actions'
 import { getUser, isReady } from './appState'
 import { getLocationPathname } from '../appUtils/routerUtils'
 
-import { jobEvents, recordEvents } from '../../common/webSocket/webSocketEvents'
-import { openSocket, closeSocket, onSocketEvent } from './appWebSocket'
+import WebSocketEvents from '../../common/webSocket/webSocketEvents'
+import { openSocket, closeSocket } from './appWebSocket'
 import { activeJobUpdate } from '../appModules/appView/components/job/actions'
 import { recordNodesUpdate } from '../appModules/surveyForm/record/actions'
 
@@ -33,8 +33,9 @@ class AppRouterSwitch extends React.Component {
 
     if (user && !prevUser) {
       openSocket({
-        [jobEvents.update]: activeJobUpdate,
-        [recordEvents.nodesUpdate]: recordNodesUpdate
+        [WebSocketEvents.jobUpdate]: activeJobUpdate,
+        [WebSocketEvents.nodesUpdate]: recordNodesUpdate,
+        [WebSocketEvents.error]: (error) => alert('error ', error),
       })
     } else if (prevUser && !user) {
       closeSocket()

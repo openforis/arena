@@ -1,12 +1,7 @@
-const jobEvents = {
-  update: 'jobUpdate',
-}
-
-const recordEvents = {
+const webSocketEvents = {
+  jobUpdate: 'jobUpdate',
   nodesUpdate: 'nodesUpdate',
+  error: 'threadError'
 }
 
-module.exports = {
-  jobEvents,
-  recordEvents,
-}
+module.exports = webSocketEvents

@@ -1,11 +1,11 @@
 const path = require('path')
 
-const {jobEvents} = require('../../common/webSocket/webSocketEvents')
-
 const {jobThreadMessageTypes} = require('./jobUtils')
 const ThreadsCache = require('../threads/threadsCache')
-const Thread = require('../threads/threadManager')
+const ThreadManager = require('../threads/threadManager')
+
 const WebSocketManager = require('../webSocket/webSocketManager')
+const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
 
 // USER JOB WORKERS
 
@@ -14,7 +14,7 @@ const userJobThreads = new ThreadsCache()
 const notifyJobUpdate = job => {
   const userId = job.userId
 
-  WebSocketManager.notifyUser(userId, jobEvents.update, job)
+  WebSocketManager.notifyUser(userId, WebSocketEvents.jobUpdate, job)
 
   if (job.ended) {
     const thread = userJobThreads.getThread(userId)
@@ -36,7 +36,7 @@ const cancelActiveJobByUserId = async (userId) => {
 
 const executeJobThread = (job) => {
 
-  const thread = new Thread(
+  const thread = new ThreadManager(
     path.resolve(__dirname, 'jobThread.js'),
     {jobType: job.type, jobParams: job.params},
     async job => await notifyJobUpdate(job)
