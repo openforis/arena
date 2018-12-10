@@ -38,6 +38,9 @@ class TaxonomyImportJob extends Job {
   }
 
   async execute () {
+    let csvParser = new CSVParser(this.csvString)
+    this.total = await csvParser.calculateSize()
+
     const {surveyId, taxonomyUuid} = this
 
     this.vernacularLanguageCodes = []
@@ -50,7 +53,7 @@ class TaxonomyImportJob extends Job {
     }
     this.processed = 0
 
-    const csvParser = new CSVParser(this.csvString)
+    csvParser = new CSVParser(this.csvString)
 
     await db.tx(async t => {
       const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, t)
@@ -92,18 +95,9 @@ class TaxonomyImportJob extends Job {
           this.setStatusSucceeded()
         }
       }
-    }).catch(e => {
-      if (this.isRunning()) {
-        this.addError({all: {valid: false, errors: [e.toString()]}})
-        this.setStatusFailed()
-      }
     })
-    csvParser.destroy()
-  }
 
-  async calculateTotal () {
-    const csvParser = new CSVParser(this.csvString)
-    return await csvParser.calculateSize()
+    csvParser.destroy()
   }
 
   async processHeaders () {
@@ -194,10 +188,6 @@ class TaxonomyImportJob extends Job {
       const vernacularName = vernacularNames[langCode]
       return isNotBlank(vernacularName) ? R.assoc(langCode, vernacularName, acc) : acc
     }, {}, this.vernacularLanguageCodes)
-  }
-
-  addError (error) {
-    this.errors['' + (this.processed + 1)] = error
   }
 
   async addTaxonToInsertBuffer (taxon, t) {

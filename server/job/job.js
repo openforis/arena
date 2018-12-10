@@ -48,7 +48,7 @@ class Job {
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
    */
-  start () {
+  async start () {
     this.startTime = new Date()
     this.setStatus(jobStatus.running)
 
@@ -57,30 +57,23 @@ class Job {
       this.total = innerJobsSize
       this.startNextInnerJob()
     } else {
-      this.calculateTotal()
-        .then(total => {
-          this.total = total
-          try {
-            this.execute()
-          } catch (e) {
-            this.errors = [e.toString()]
-            this.setStatusFailed()
-          }
-        })
+      try {
+        await this.execute()
+      } catch (e) {
+        this.addError({systemError: {valid: false, errors: [e.toString()]}})
+        this.setStatusFailed()
+      }
     }
+  }
+
+  addError (error) {
+    this.errors['' + (this.processed + 1)] = error
   }
 
   /**
    * Abstract method to be extended by subclasses
    */
-  execute () {}
-
-  /**
-   * To be extended by subclasses
-   */
-  calculateTotal () {
-    return new Promise((resolve) => resolve(0))
-  }
+  async execute () {}
 
   getCurrentInnerJob () {
     return this.innerJobs[this.currentInnerJobIndex]
