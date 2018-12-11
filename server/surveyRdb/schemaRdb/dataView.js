@@ -5,7 +5,9 @@ const NodeDef = require('../../../common/survey/nodeDef')
 const DataTable = require('./../schemaRdb/dataTable')
 const DataCol = require('./../schemaRdb/dataCol')
 
-const getName = (nodeDef, nodeDefParent) => DataTable.getTableName(nodeDef, nodeDefParent) + '_view'
+const viewSuffix = '_view'
+const getName = (nodeDefName, nodeDefChildName) => DataTable.getName(nodeDefName, nodeDefChildName) + viewSuffix
+const getNameFromDefs = (nodeDef, nodeDefParent) => DataTable.getNameFromDefs(nodeDef, nodeDefParent) + viewSuffix
 
 const alias = `a`
 const aliasParent = `p`
@@ -34,7 +36,7 @@ const getSelectFields = (survey, nodeDef) => {
 const getJoin = (schemaName, nodeDef, nodeDefParent) =>
   nodeDefParent
     ? `JOIN 
-       ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}
+       ${schemaName}.${getNameFromDefs(nodeDefParent)} as ${aliasParent}
        ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
       `
     : ''
@@ -42,6 +44,7 @@ const getJoin = (schemaName, nodeDef, nodeDefParent) =>
 module.exports = {
   alias,
   aliasParent,
+  getNameFromDefs,
   getName,
   getSelectFields,
   getJoin,

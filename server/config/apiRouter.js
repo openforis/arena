@@ -17,6 +17,8 @@ require('../job/jobApi').init(router)
 
 require('../record/recordApi').init(router)
 
+require('../surveyRdb/surveyRdbApi').init(router)
+
 module.exports = {
   router
 }
