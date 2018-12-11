@@ -1,5 +1,4 @@
 import axios from 'axios'
-import * as R from 'ramda'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 
@@ -57,13 +56,10 @@ const _putNodeDefProp = (nodeDef, key, value, advanced) => {
 
     if (key === 'multiple') {
       const validations = value
-        ? NodeDefValidations.dissocRequired()(NodeDef.getNodeDefValidations(nodeDef))
-        : R.pipe(
-          NodeDefValidations.dissocMinCount(),
-          NodeDefValidations.dissocMaxCount(),
-        )(NodeDef.getNodeDefValidations(nodeDef))
+        ? NodeDefValidations.dissocRequired(NodeDef.getNodeDefValidations(nodeDef))
+        : NodeDefValidations.dissocCount(NodeDef.getNodeDefValidations(nodeDef))
 
-      propsToUpdate.push({key: 'validations', validations, advanced: true})
+      propsToUpdate.push({key: 'validations', value: validations, advanced: true})
     }
 
     const nodeDefs = await putProps(nodeDef, propsToUpdate)

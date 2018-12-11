@@ -112,8 +112,8 @@ const updateNodeDefProps = async (surveyId, nodeDefUuid, propsArray, client = db
   return await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props_draft = props_draft || $1::jsonb,
-      props_advanced_draft = props_advanced_draft || $2::jsonb,
-      date_modified = timezone('UTC'::text, now())
+        props_advanced_draft = props_advanced_draft || $2::jsonb,
+        date_modified = timezone('UTC'::text, now())
     WHERE uuid = $3
     RETURNING ${nodeDefSelectFields()}
   `, [props, advancedProps, nodeDefUuid],
