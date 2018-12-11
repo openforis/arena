@@ -55,13 +55,13 @@ const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, v
 
 // ======= UPDATE
 
-const updateNodeDefProp = async (user, surveyId, nodeDefUuid, key, value, advanced = false) =>
+const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props) =>
   await db.tx(async t => {
-    const nodeDef = await NodeDefRepository.updateNodeDefProp(surveyId, nodeDefUuid, key, value, advanced, t)
+    const nodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, t)
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, {nodeDefUuid, key, value, advanced}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, {nodeDefUuid, props}, t)
 
     return nodeDef
   })
@@ -88,7 +88,7 @@ module.exports = {
   fetchNodeDefsByUuid,
 
   //UPDATE
-  updateNodeDefProp,
+  updateNodeDefProps,
 
   //DELETE
   markNodeDefDeleted,

@@ -124,5 +124,21 @@ body {
   grid-template-rows: 1fr;
 }
 
+// badge
+.badge {
+  position: absolute;
+  z-index: $zIndex5Badge;
+  padding: .5rem .5rem;
+  display: grid;
+  grid-row-gap: 1rem;
+  align-items: center;
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.badge__content {
+  justify-self: start;
+}
+
 
 

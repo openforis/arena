@@ -40,15 +40,15 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/nodeDef/:nodeDefUuid/prop', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/nodeDef/:nodeDefUuid/props', requireSurveyEditPermission, async (req, res) => {
     try {
       const {body, user} = req
-      const {key, value, advanced} = body
+      const props = body
 
       const nodeDefUuid = getRestParam(req, 'nodeDefUuid')
       const surveyId = getRestParam(req, 'surveyId')
 
-      await NodeDefManager.updateNodeDefProp(user, surveyId, nodeDefUuid, key, value, advanced)
+      await NodeDefManager.updateNodeDefProps(user, surveyId, nodeDefUuid, props)
       const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, true, true)
 
       res.json({nodeDefs})

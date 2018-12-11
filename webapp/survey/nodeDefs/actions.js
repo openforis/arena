@@ -3,6 +3,7 @@ import axios from 'axios'
 import { debounceAction } from '../../appUtils/reduxUtils'
 
 import NodeDef from '../../../common/survey/nodeDef'
+import NodeDefValidations from '../../../common/survey/nodeDefValidations'
 import { getStateSurveyId } from '../surveyState'
 
 export const nodeDefsLoad = 'nodeDefs/load'
@@ -43,13 +44,26 @@ const _putNodeDefProp = (nodeDef, key, value, advanced) => {
   const action = async (dispatch, getState) => {
     const surveyId = getStateSurveyId(getState())
 
-    const {data} = await axios.put(
-      `/api/survey/${surveyId}/nodeDef/${nodeDef.uuid}/prop`,
-      {key, value, advanced}
-    )
+    const putProps = async (nodeDef, props) => {
+      const {data} = await axios.put(
+        `/api/survey/${surveyId}/nodeDef/${nodeDef.uuid}/props`,
+        props
+      )
+      return data.nodeDefs
+    }
 
-    //update node defs with their validation status
-    const {nodeDefs} = data
+    const propsToUpdate = [{key, value, advanced}]
+
+    if (key === 'multiple') {
+      const validations = value
+        ? NodeDefValidations.dissocRequired(NodeDef.getNodeDefValidations(nodeDef))
+        : NodeDefValidations.dissocCount(NodeDef.getNodeDefValidations(nodeDef))
+
+      propsToUpdate.push({key: 'validations', value: validations, advanced: true})
+    }
+
+    const nodeDefs = await putProps(nodeDef, propsToUpdate)
+
     dispatch({type: nodeDefsLoad, nodeDefs})
   }
 

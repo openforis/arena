@@ -131,6 +131,9 @@ module.exports = {
   isNodeDefTaxon,
   isNodeDefPublished,
 
+  //validations
+  getNodeDefValidations: SurveyUtils.getProp('validations', {}),
+
   //UTILS
   canNodeDefBeMultiple,
   canNodeDefBeKey,
