@@ -26,12 +26,12 @@ const createTaxonomy = async (user, surveyId, taxonomy) =>
 /**
  * ====== READ
  */
-const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = false) => {
-  const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft)
+const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = false, client = db) => {
+  const taxonomies = await TaxonomyRepository.fetchTaxonomiesBySurveyId(surveyId, draft, client)
 
   return validate
     ? await Promise.all(
-      taxonomies.map(async taxonomy => await validateTaxonomy(surveyId, taxonomies, taxonomy))
+      taxonomies.map(async taxonomy => await validateTaxonomy(surveyId, taxonomies, taxonomy, client))
     )
     : taxonomies
 }

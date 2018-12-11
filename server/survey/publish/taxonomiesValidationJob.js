@@ -12,14 +12,12 @@ class TaxonomiesValidationJob extends Job {
     super(TaxonomiesValidationJob.type, params)
   }
 
-  async execute () {
-    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true)
+  async execute (tx) {
+    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId(this.surveyId, true, true, tx)
 
     const invalidTaxonomies = R.filter(taxonomy => !isValid(taxonomy), taxonomies)
 
-    if (R.isEmpty(invalidTaxonomies)) {
-      this.setStatusSucceeded()
-    } else {
+    if (!R.isEmpty(invalidTaxonomies)) {
       this.errors = R.reduce(
         (acc, taxonomy) => R.assoc(Taxonomy.getTaxonomyName(taxonomy), getInvalidFieldValidations(taxonomy.validation), acc),
         {},

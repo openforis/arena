@@ -1,3 +1,5 @@
+const db = require('../db/db')
+
 const {jobEvents, jobStatus} = require('./jobUtils')
 
 const {uuidv4} = require('../../common/uuid')
@@ -48,21 +50,26 @@ class Job {
    * This method should never be extended by subclasses;
    * extend the "process" method instead.
    */
-  async start () {
-    this.startTime = new Date()
-    this.setStatus(jobStatus.running)
+  async start (client = db) {
+    try {
+      await client.tx(async tx => {
+        this.startTime = new Date()
+        this.setStatus(jobStatus.running)
 
-    const innerJobsSize = this.innerJobs.length
-    if (innerJobsSize > 0) {
-      this.total = innerJobsSize
-      this.startNextInnerJob()
-    } else {
-      try {
-        await this.execute()
-      } catch (e) {
-        this.addError({systemError: {valid: false, errors: [e.toString()]}})
-        this.setStatusFailed()
+        const innerJobsSize = this.innerJobs.length
+        if (innerJobsSize > 0) {
+          this.total = innerJobsSize
+          await this.startNextInnerJob(tx)
+        } else {
+          await this.execute(tx)
+        }
+      })
+      if (this.isRunning()) {
+        this.setStatusSucceeded()
       }
+    } catch (e) {
+      this.addError({systemError: {valid: false, errors: [e.toString()]}})
+      this.setStatusFailed()
     }
   }
 
@@ -72,28 +79,35 @@ class Job {
 
   /**
    * Abstract method to be extended by subclasses
+   *
+   * @param tx DB transaction
    */
-  async execute () {}
+  async execute (tx) {}
 
   getCurrentInnerJob () {
     return this.innerJobs[this.currentInnerJobIndex]
   }
 
-  startNextInnerJob () {
-    this.currentInnerJobIndex++
+  async startNextInnerJob (tx) {
+    return new Promise(async resolve => {
+      this.currentInnerJobIndex++
 
-    const innerJob = this.getCurrentInnerJob()
+      const innerJob = this.getCurrentInnerJob()
 
-    innerJob.context = this.context
+      innerJob.context = this.context
 
-    innerJob
-      .onEvent(event => {
-        this.handleInnerJobEvent(event)
-      })
-      .start()
+      await innerJob
+        .onEvent(async event => {
+          await this.handleInnerJobEvent(event)
+          if (innerJob.isEnded()) {
+            resolve()
+          }
+        })
+        .start(tx)
+    })
   }
 
-  handleInnerJobEvent (event) {
+  async handleInnerJobEvent (event) {
     this.notifyEvent(event) //propagate events to parent job
 
     switch (event.status) {
@@ -105,10 +119,8 @@ class Job {
       case jobStatus.succeeded:
         this.incrementProcessedItems()
 
-        if (this.processed === this.innerJobs.length) {
-          this.setStatusSucceeded()
-        } else {
-          this.startNextInnerJob()
+        if (this.processed !== this.innerJobs.length) {
+          await this.startNextInnerJob()
         }
         break
     }

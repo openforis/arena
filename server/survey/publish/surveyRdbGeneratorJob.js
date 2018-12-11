@@ -14,16 +14,17 @@ class SurveyRdbGeneratorJob extends Job {
     super(SurveyRdbGeneratorJob.type, params)
   }
 
-  async execute () {
+  async execute (tx) {
     const {surveyId} = this.params
     const survey = await this.getSurvey()
 
     //get entities or multiple attributes tables
     const {root, length} = Survey.getHierarchy(NodeDef.isNodeDefEntityOrMultiple)(survey)
-    const {records: recordSummaries} = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, 0)
+    const {records: recordSummaries} = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, 0, null, tx)
 
     this.total = 1 + length + (recordSummaries.length * length)
 
+    console.log(this.total)
     //1 ==== drop and create schema
     await SurveyRdbManager.dropSchema(surveyId)
     await SurveyRdbManager.createSchema(surveyId)
@@ -38,15 +39,13 @@ class SurveyRdbGeneratorJob extends Job {
 
     //3 ==== insert records
     const insertIntoTable = record => async (nodeDef) => {
-      await SurveyRdbManager.insertIntoTable(survey, nodeDef, record)
+      await SurveyRdbManager.insertIntoTable(survey, nodeDef, record, tx)
       this.incrementProcessedItems()
     }
     for (const recordSummary of recordSummaries) {
-      const record = await RecordManager.fetchRecordByUuid(surveyId, recordSummary.uuid)
+      const record = await RecordManager.fetchRecordByUuid(surveyId, recordSummary.uuid, tx)
       await Survey.traverseHierarchyItem(root, insertIntoTable(record))
     }
-
-    this.setStatusSucceeded()
   }
 
   async getSurvey () {
@@ -59,6 +58,6 @@ class SurveyRdbGeneratorJob extends Job {
 
 }
 
-SurveyRdbGeneratorJob.type = 'SchemaGeneratorJob'
+SurveyRdbGeneratorJob.type = 'SurveyRdbGeneratorJob'
 
 module.exports = SurveyRdbGeneratorJob
