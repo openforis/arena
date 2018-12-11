@@ -6,4 +6,7 @@ export const dataModules = {
 
   // records list
   records: `${appModules.data}/records`,
+
+  dataVis: `${appModules.data}/dataVis`,
+
 }

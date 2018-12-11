@@ -1,4 +1,4 @@
-import './records.scss'
+import './recordsView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -110,7 +110,7 @@ const RecordsTable = ({records, offset, nodeDefKeys, lang}) => {
   )
 }
 
-class Records extends React.Component {
+class RecordsView extends React.Component {
 
   componentDidMount () {
     this.props.initRecordsList()
@@ -172,4 +172,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, {initRecordsList, fetchRecords})(Records)
+export default connect(mapStateToProps, {initRecordsList, fetchRecords})(RecordsView)

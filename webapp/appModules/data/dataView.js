@@ -1,17 +1,24 @@
 import './dataView.scss'
 
 import React from 'react'
-import { Route } from 'react-router'
+import { connect } from 'react-redux'
 
 import TabBar from '../../commonComponents/tabBar'
 
-import Records from './records/components/records'
-import Record from './records/components/record'
+import RecordsView from './records/components/recordsView'
+import RecordView from './records/components/recordView'
+import DataVisView from './dataVis/dataVisView'
 
 import { appModules, appModuleUri } from '../appModules'
 import { dataModules } from './dataModules'
 
+import { initSurveyDefs } from '../../survey/actions'
+
 class DataView extends React.Component {
+  componentDidMount () {
+    const {initSurveyDefs} = this.props
+    initSurveyDefs()
+  }
 
   render () {
     const {history, location} = this.props
@@ -26,14 +33,14 @@ class DataView extends React.Component {
 
             {
               label: 'Records',
-              component: Records,
+              component: RecordsView,
               path: appModuleUri(appModules.data),
             },
 
             // add record
             {
               label: 'Record',
-              component: Record,
+              component: RecordView,
               path: appModuleUri(dataModules.record),
               showTab: false,
             },
@@ -41,9 +48,16 @@ class DataView extends React.Component {
             //edit record
             {
               label: 'Record',
-              component: Record,
+              component: RecordView,
               path: appModuleUri(dataModules.record) + ':recordUuid/',
               showTab: false,
+            },
+
+            //edit record
+            {
+              label: 'Data visualization',
+              component: DataVisView,
+              path: appModuleUri(dataModules.dataVis),
             },
 
           ]}
@@ -55,4 +69,4 @@ class DataView extends React.Component {
 
 }
 
-export default DataView
+export default connect(null, {initSurveyDefs})(DataView)

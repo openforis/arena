@@ -155,6 +155,8 @@ class Dropdown extends React.Component {
       validation = {},
       readOnly,
       disabled,
+
+      autocompleteDialogClassName,
     } = this.props
 
     const {
@@ -200,7 +202,8 @@ class Dropdown extends React.Component {
                                 itemKeyFunction={item => this.getItemKey(item)}
                                 inputField={this.getInputField()}
                                 onItemSelect={item => this.onSelectionChange(item)}
-                                onClose={() => this.toggleOpened()}/>,
+                                onClose={() => this.toggleOpened()}
+                                className={autocompleteDialogClassName}/>,
             document.body
           )
           : null
@@ -223,6 +226,8 @@ Dropdown.defaultProps = {
   itemKeyFunction: null,
   itemLabelProp: null,
   itemLabelFunction: null,
+
+  autocompleteDialogClassName: null,
 }
 
 export default Dropdown

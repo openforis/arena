@@ -93,11 +93,11 @@ const getHierarchy = (filterFn = NodeDef.isNodeDefEntity) =>
 
   }
 
-const traverseHierarchyItem = async (nodeDefItem, visitorFn) => {
-  await visitorFn(nodeDefItem)
+const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) => {
+  await visitorFn(nodeDefItem, depth)
   const children = R.propOr([], 'children', nodeDefItem)
   for (const child of children) {
-    await traverseHierarchyItem(child, visitorFn)
+    await traverseHierarchyItem(child, visitorFn, depth + 1)
   }
 }
 
