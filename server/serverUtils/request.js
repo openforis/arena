@@ -31,9 +31,18 @@ const toQueryString = obj =>
     }
   }, '')(R.keys(obj))
 
+const getRequiredParam = (req, param) => {
+  const value = getRestParam(req, param, '')
+  if (R.isEmpty(value))
+    throw new Error(`${param} is required`)
+  else
+    return value
+}
+
 module.exports = {
   getRestParam,
   getBoolParam,
   getJsonParam,
   toQueryString,
+  getRequiredParam,
 }

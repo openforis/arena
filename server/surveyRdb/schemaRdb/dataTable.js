@@ -23,17 +23,21 @@ const getNodeDefColumns = (survey, nodeDef) =>
     // multiple attr table
     : [nodeDef]
 
-const tableName = (nodeDef, nodeDefChild = null) => {
-  const childName = nodeDefChild ? `_${nodeDefChild.id}` : ''
-  return `_${nodeDef.id}${childName}_data`
+const getName = (nodeDefName, nodeDefChildName = '') => {
+  const child = R.isEmpty(nodeDefChildName) ? '' : `_${nodeDefChildName}`
+  return `data_${nodeDefName}${child}`
 }
 
-const getTableName = (nodeDef, nodeDefParent) =>
-  NodeDef.isNodeDefEntity(nodeDef)
-    ? tableName(nodeDef)
+const getNameFromDefs = (nodeDef, nodeDefParent) => {
+  const nodeDefName = NodeDef.getNodeDefName(nodeDef)
+  const nodeDefParentName = NodeDef.getNodeDefName(nodeDefParent)
+
+  return NodeDef.isNodeDefEntity(nodeDef)
+    ? getName(nodeDefName)
     : NodeDef.isNodeDefMultiple(nodeDef)
-    ? tableName(nodeDefParent, nodeDef)
-    : tableName(nodeDefParent)
+      ? getName(nodeDefParentName, nodeDefName)
+      : getName(nodeDefParentName)
+}
 
 const getColumnNames = (survey, nodeDef) => [
   colNameUuuid,
@@ -63,7 +67,7 @@ const getParentForeignKey = (surveyId, schemaName, nodeDef, nodeDefParent = null
     )
     : getConstraintFk(
       schemaName,
-      getTableName(nodeDefParent),
+      getNameFromDefs(nodeDefParent),
       NodeDef.getNodeDefName(nodeDef) + '_' + NodeDef.getNodeDefName(nodeDefParent),
       colNameParentUuuid
     )
@@ -86,7 +90,8 @@ module.exports = {
   colNameRecordUuuid,
   getNodeDefColumns,
 
-  getTableName,
+  getNameFromDefs,
+  getName,
   getColumnNames,
   getColumnNamesAndType,
   getParentForeignKey,

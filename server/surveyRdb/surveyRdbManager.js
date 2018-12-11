@@ -6,9 +6,10 @@ const SurveyManager = require('../survey/surveyManager')
 const NodeDefManager = require('../nodeDef/nodeDefManager')
 
 const DataSchema = require('./schemaRdb/dataSchema')
-const NodesInsert = require('./nodesInsert')
-const NodesUpdate = require('./nodesUpdate')
-const TableViewCreate = require('./tableViewCreate')
+const NodesInsert = require('./dbActions/nodesInsert')
+const NodesUpdate = require('./dbActions/nodesUpdate')
+const TableViewCreate = require('./dbActions/tableViewCreate')
+const TableViewQuery = require('./dbActions/tableViewQuery')
 
 // ==== DDL
 
@@ -32,12 +33,16 @@ const updateTableNodes = async (surveyId, nodes, client = db) => {
   await NodesUpdate.run(Survey.getSurveyInfo(survey), nodes, nodeDefs, client)
 }
 
+const queryTable = async (surveyId, tableName, cols = [],
+                          offset = 0, limit = 20, client = db) =>
+  await TableViewQuery.run(surveyId, tableName, cols, offset, limit, client)
+
 module.exports = {
   dropSchema,
   createSchema,
-
   createTable,
-  insertIntoTable,
 
+  insertIntoTable,
   updateTableNodes,
+  queryTable,
 }

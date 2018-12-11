@@ -22,8 +22,8 @@ const sendErr = (res, err) => {
   } else {
     res.status(500).json({
       status: status.error,
-      error: 'Could not serve',
-      err
+      error: 'Could not serve: ' + err.toString(),
+      err,
     })
   }
 }

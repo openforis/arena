@@ -1,15 +1,15 @@
-const Survey = require('../../common/survey/survey')
+const Survey = require('../../../common/survey/survey')
 
-const DataSchema = require('./schemaRdb/dataSchema')
-const DataTable = require('./schemaRdb/dataTable')
-const DataView = require('./schemaRdb/dataView')
+const DataSchema = require('../schemaRdb/dataSchema')
+const DataTable = require('../schemaRdb/dataTable')
+const DataView = require('../schemaRdb/dataView')
 
 const toTableViewCreate = (survey, nodeDef) => {
   const surveyId = Survey.getSurveyInfo(survey).id
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
   const schemaName = DataSchema.getName(surveyId)
-  const tableName = DataTable.getTableName(nodeDef, nodeDefParent)
+  const tableName = DataTable.getNameFromDefs(nodeDef, nodeDefParent)
   return {
     schemaName,
     tableName,
@@ -17,7 +17,7 @@ const toTableViewCreate = (survey, nodeDef) => {
     parentForeignKey: DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent),
     uuidUniqueIdx: DataTable.getUuidUniqueConstraint(nodeDef),
 
-    viewName: DataView.getName(nodeDef, nodeDefParent),
+    viewName: DataView.getNameFromDefs(nodeDef, nodeDefParent),
     viewFields: DataView.getSelectFields(survey, nodeDef),
     viewFrom: `${schemaName}.${tableName} as ${DataView.alias}`,
     viewJoin: DataView.getJoin(schemaName, nodeDef, nodeDefParent),
