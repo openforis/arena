@@ -24,8 +24,8 @@ const getNodeDefColumns = (survey, nodeDef) =>
     : [nodeDef]
 
 const tableName = (nodeDef, nodeDefChild = null) => {
-  const childName = nodeDefChild ? `_${nodeDefChild.id}` : ''
-  return `_${nodeDef.id}${childName}_data`
+  const childName = nodeDefChild ? `_${NodeDef.getNodeDefName(nodeDefChild)}` : ''
+  return `data_${NodeDef.getNodeDefName(nodeDef)}${childName}`
 }
 
 const getTableName = (nodeDef, nodeDefParent) =>
