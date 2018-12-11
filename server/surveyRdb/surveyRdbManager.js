@@ -13,14 +13,14 @@ const TableViewQuery = require('./dbActions/tableViewQuery')
 
 // ==== DDL
 
-const dropSchema = async surveyId =>
-  await db.query(`DROP SCHEMA IF EXISTS ${DataSchema.getName(surveyId)} CASCADE`)
+const dropSchema = async (surveyId, client = db) =>
+  await client.query(`DROP SCHEMA IF EXISTS ${DataSchema.getName(surveyId)} CASCADE`)
 
-const createSchema = async surveyId =>
-  await db.query(`CREATE SCHEMA ${DataSchema.getName(surveyId)}`)
+const createSchema = async (surveyId, client = db) =>
+  await client.query(`CREATE SCHEMA ${DataSchema.getName(surveyId)}`)
 
-const createTable = async (survey, nodeDef) =>
-  await TableViewCreate.run(survey, nodeDef, db)
+const createTable = async (survey, nodeDef, client = db) =>
+  await TableViewCreate.run(survey, nodeDef, client)
 
 // ==== DML
 
@@ -28,8 +28,8 @@ const insertIntoTable = async (survey, nodeDef, record, client = db) =>
   await NodesInsert.run(survey, nodeDef, record, client)
 
 const updateTableNodes = async (surveyId, nodes, client = db) => {
-  const survey = await SurveyManager.fetchSurveyById(surveyId)
-  const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes))
+  const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, client)
+  const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, client)
   await NodesUpdate.run(Survey.getSurveyInfo(survey), nodes, nodeDefs, client)
 }
 
