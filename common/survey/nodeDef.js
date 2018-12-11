@@ -88,7 +88,7 @@ const canNodeDefBeKey = nodeDef =>
   )
 
 const getNodeDefLabel = (nodeDef, lang) => {
-  const label = R.path(['props', 'labels', lang], nodeDef)
+  const label = SurveyUtils.getLabel(lang)(nodeDef)
   return isBlank(label)
     ? getNodeDefName(nodeDef)
     : label
@@ -104,7 +104,6 @@ module.exports = {
 
   //READ
   getProp: SurveyUtils.getProp,
-  getLabel: SurveyUtils.getLabel,
 
   getNodeDefType,
   getNodeDefName,

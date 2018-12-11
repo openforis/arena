@@ -1,5 +1,4 @@
 const R = require('ramda')
-const camelize = require('camelize')
 
 // READ
 const getProps = R.propOr({}, 'props')

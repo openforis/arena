@@ -13,11 +13,10 @@ import * as SurveyState from '../../../../survey/surveyState'
 const EntitySelector = ({hierarchy, lang}) => {
   const entities = []
   const traverse = (nodeDef, depth) => {
-    const name = NodeDef.getNodeDefName(nodeDef)
-    const label = NodeDef.getLabel(lang, name)(nodeDef)
+    const label = NodeDef.getNodeDefLabel(lang)(nodeDef)
     entities.push({
       key: NodeDef.getNodeDefName(nodeDef),
-      value: R.range(0, depth).map(i => '\xA0\xA0\xA0\xA0').join('\xA0') + label
+      value: R.range(0, depth).map(i => '\xA0\xA0\xA0\xA0\xA0').join('') + label
     })
   }
   Survey.traverseHierarchyItem(hierarchy.root, traverse)
@@ -42,7 +41,7 @@ const NodeDefSelector = (props) => {
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   return {
-    lang: Survey.getDefaultLanguage(survey),
+    lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
     hierarchy: Survey.getHierarchy()(survey),
   }
 }
