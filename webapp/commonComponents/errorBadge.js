@@ -9,15 +9,15 @@ const ErrorBadge = ({validation, showLabel}) => {
 
   return invalid
     ? (
-      <div className="error-badge">
-        <div className="error-badge__warning">
+      <div className="badge error-badge">
+        <div className="badge__content">
           <span className="icon icon-warning icon-12px icon-left"/>
           {
             showLabel &&
             <span>INVALID</span>
           }
         </div>
-        <div className="error-badge__messages">
+        <div className="messages">
           {
             getValidationFieldMessagesHTML(validation.fields)
           }

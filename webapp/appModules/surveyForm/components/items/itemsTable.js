@@ -2,6 +2,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import ErrorBadge from '../../../../commonComponents/errorBadge'
+import WarningBadge from '../../../../commonComponents/warningBadge'
 
 const TableRow = props => {
 
@@ -20,6 +21,7 @@ const TableRow = props => {
       <div className="name">
         {name}
         <ErrorBadge validation={item.validation}/>
+        <WarningBadge show={!item.usedByNodeDefs} label="Unused"/>
       </div>
 
       <div className="buttons">
