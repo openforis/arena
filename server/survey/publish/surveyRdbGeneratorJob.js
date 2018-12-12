@@ -14,51 +14,49 @@ class SurveyRdbGeneratorJob extends Job {
     super(SurveyRdbGeneratorJob.type, params)
   }
 
-  async execute () {
+  async execute (tx) {
     const {surveyId} = this.params
-    const survey = await this.getSurvey()
+    const survey = await this.getSurvey(tx)
 
     //get entities or multiple attributes tables
     const {root, length} = Survey.getHierarchy(NodeDef.isNodeDefEntityOrMultiple)(survey)
-    const {records: recordSummaries} = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, 0)
+    const {records: recordSummaries} = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, 0, null, tx)
 
     this.total = 1 + length + (recordSummaries.length * length)
 
     //1 ==== drop and create schema
-    await SurveyRdbManager.dropSchema(surveyId)
-    await SurveyRdbManager.createSchema(surveyId)
+    await SurveyRdbManager.dropSchema(surveyId, tx)
+    await SurveyRdbManager.createSchema(surveyId, tx)
     this.incrementProcessedItems()
 
     //2 ==== create data tables
     const createTable = async nodeDef => {
-      await SurveyRdbManager.createTable(survey, nodeDef)
+      await SurveyRdbManager.createTable(survey, nodeDef, tx)
       this.incrementProcessedItems()
     }
     await Survey.traverseHierarchyItem(root, createTable)
 
     //3 ==== insert records
     const insertIntoTable = record => async (nodeDef) => {
-      await SurveyRdbManager.insertIntoTable(survey, nodeDef, record)
+      await SurveyRdbManager.insertIntoTable(survey, nodeDef, record, tx)
       this.incrementProcessedItems()
     }
     for (const recordSummary of recordSummaries) {
-      const record = await RecordManager.fetchRecordByUuid(surveyId, recordSummary.uuid)
+      const record = await RecordManager.fetchRecordByUuid(surveyId, recordSummary.uuid, tx)
       await Survey.traverseHierarchyItem(root, insertIntoTable(record))
     }
-
-    this.setStatusSucceeded()
   }
 
-  async getSurvey () {
+  async getSurvey (tx) {
     const {surveyId} = this.params
-    const survey = await SurveyManager.fetchSurveyById(surveyId)
-    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId)
+    const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, tx)
+    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, false, false, tx)
 
     return {...survey, nodeDefs}
   }
 
 }
 
-SurveyRdbGeneratorJob.type = 'SchemaGeneratorJob'
+SurveyRdbGeneratorJob.type = 'SurveyRdbGeneratorJob'
 
 module.exports = SurveyRdbGeneratorJob

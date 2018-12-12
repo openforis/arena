@@ -28,17 +28,17 @@ const createRecord = (user, surveyId, record) => {
  * READ
  * ===================
  */
-const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit) => {
-  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId)
+const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) => {
+  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, false, client)
   return {
     nodeDefKeys,
-    records: await RecordRepository.fetchRecordsSummaryBySurveyId(surveyId, nodeDefKeys, offset, limit)
+    records: await RecordRepository.fetchRecordsSummaryBySurveyId(surveyId, nodeDefKeys, offset, limit, client)
   }
 }
 
-const fetchRecordByUuid = async (surveyId, recordUuid) => {
-  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
-  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid)
+const fetchRecordByUuid = async (surveyId, recordUuid, client = db) => {
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
 
   return {...record, nodes: toUuidIndexedObj(nodes)}
 }

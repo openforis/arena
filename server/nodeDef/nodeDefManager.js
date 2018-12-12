@@ -43,8 +43,8 @@ const processNodeDefs = async (nodeDefsDb, draft, validate ) => {
   return SurveyUtils.toUuidIndexedObj(nodeDefs)
 }
 
-const fetchNodeDefsBySurveyId = async (surveyId, draft = false, validate = false) => {
-  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, validate)
+const fetchNodeDefsBySurveyId = async (surveyId, draft = false, validate = false, client = db) => {
+  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, validate, client)
   return await processNodeDefs(nodeDefsDB, draft, validate)
 }
 
@@ -89,7 +89,11 @@ module.exports = {
 
   //UPDATE
   updateNodeDefProps,
+  publishNodeDefsProps: NodeDefRepository.publishNodeDefsProps,
 
   //DELETE
   markNodeDefDeleted,
+  permanentlyDeleteNodeDefs: NodeDefRepository.permanentlyDeleteNodeDefs,
+  deleteNodeDefsLabels: NodeDefRepository.deleteNodeDefsLabels,
+  deleteNodeDefsDescriptions: NodeDefRepository.deleteNodeDefsDescriptions,
 }

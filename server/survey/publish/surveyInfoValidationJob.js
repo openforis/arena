@@ -1,9 +1,8 @@
 const Job = require('../../job/job')
 
-const {getInvalidFieldValidations} = require('../../../common/validation/validator')
+const Validator = require('../../../common/validation/validator')
 
-const SurveyRepository = require('../../survey/surveyRepository')
-const {validateSurvey} = require('../../survey/surveyValidator')
+const SurveyManager = require('../../survey/surveyManager')
 
 class SurveyInfoValidationJob extends Job {
 
@@ -11,16 +10,11 @@ class SurveyInfoValidationJob extends Job {
     super(SurveyInfoValidationJob.type, params)
   }
 
-  async execute () {
-    const surveyDb = await SurveyRepository.getSurveyById(this.surveyId, true)
-    const survey = {
-      info: {...surveyDb}
-    }
-    const validation = await validateSurvey(survey)
-    if (validation.valid) {
-      this.setStatusSucceeded()
-    } else {
-      this.errors = {surveyInfo: getInvalidFieldValidations(validation)}
+  async execute (tx) {
+    const survey = await SurveyManager.fetchSurveyById(this.surveyId, true, true, tx)
+
+    if (!Validator.isValid(survey)) {
+      this.errors = {surveyInfo: Validator.getInvalidFieldValidations(validation)}
       this.setStatusFailed()
     }
   }
