@@ -26,6 +26,8 @@ const errorKeys = {
   keyword: 'keyword',
 }
 
+const validValidation = {valid: true, errors: []}
+
 const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
 
 const validateProp = async (obj, prop, validations = []) => {
@@ -97,14 +99,11 @@ const validateNotKeyword = (propName, item) =>
 
 //==== getters
 
-const getValidation = R.propOr({valid: true}, 'validation')
+const getValidation = R.propOr(validValidation, 'validation')
 
 const isValid = R.pipe(getValidation, R.propEq('valid', true))
 
-const getFieldValidation = field => R.pathOr(
-  {valid: true, errors: []},
-  ['fields', field]
-)
+const getFieldValidation = field => R.pathOr(validValidation, ['fields', field])
 
 const getInvalidFieldValidations = R.pipe(
   R.prop('fields'),

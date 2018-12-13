@@ -23,4 +23,5 @@ module.exports = {
 
   //EXPRESSIONS
   getExpressions: R.propOr([], (keys.expressions)),
+  assocExpressions: expressions => R.assoc(keys.expressions, expressions),
 }

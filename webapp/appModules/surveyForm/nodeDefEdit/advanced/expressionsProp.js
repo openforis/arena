@@ -4,8 +4,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
 import NodeDef from '../../../../../common/survey/nodeDef'
+import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
 import Validator from '../../../../../common/validation/validator'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
@@ -41,35 +41,10 @@ const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly, validati
   </div>
 )
 
-class ExpressionsProp extends React.Component {
+class _NodeDefExpressionsProp extends React.Component {
 
-  getExpressionIndex (expression) {
-    return R.findIndex(R.propEq('uuid', expression.uuid), this.props.values)
-  }
-
-  handleDelete (expression) {
-    const {values} = this.props
-
-    if (window.confirm('Delete this default expression?')) {
-      const index = this.getExpressionIndex(expression)
-      const newValues = R.remove(index, 1, values)
-      this.updateExpressions(newValues)
-    }
-  }
-
-  handleUpdate (expression) {
-    if (NodeDefExpression.isEmpty(expression)) {
-      this.handleDelete(expression)
-    } else {
-      const {values} = this.props
-      const index = this.getExpressionIndex(expression)
-      const newValues = R.update(index, expression, values)
-      this.updateExpressions(newValues)
-    }
-  }
-
-  updateExpressions (expressions) {
-    const {nodeDef, putNodeDefProp, propName} = this.props
+  onExpressionsUpdate (expressions) {
+    const {nodeDef, propName, putNodeDefProp} = this.props
 
     putNodeDefProp(
       nodeDef,
@@ -77,6 +52,48 @@ class ExpressionsProp extends React.Component {
       R.reject(R.propEq('placeholder', true), expressions),
       true
     )
+  }
+
+  render () {
+    const {label, readOnly, applyIf, nodeDef, propName, validation} = this.props
+
+    const values = NodeDef.getProp(propName, [])(nodeDef)
+
+    return <ExpressionsProp label={label}
+                            readOnly={readOnly}
+                            applyIf={applyIf}
+                            values={values}
+                            validation={validation}
+                            onChange={this.onExpressionsUpdate.bind(this)}/>
+  }
+
+}
+
+class ExpressionsProp extends React.Component {
+
+  getExpressionIndex (expression) {
+    R.findIndex(R.propEq('uuid', expression.uuid), this.props.values)
+  }
+
+  handleDelete (expression) {
+    if (window.confirm('Delete this default expression?')) {
+      const index = this.getExpressionIndex(expression)
+      const newValues = R.remove(index, 1, this.props.values)
+      this.onChange(newValues)
+    }
+  }
+
+  handleUpdate (expression) {
+
+    if (NodeDefExpression.isEmpty(expression)) {
+      this.handleDelete(expression)
+    } else {
+      const {values, onChange} = this.props
+
+      const index = this.getExpressionIndex(expression)
+      const newValues = R.update(index, expression, values)
+      onChange(newValues)
+    }
   }
 
   render () {
@@ -104,46 +121,36 @@ class ExpressionsProp extends React.Component {
 }
 
 ExpressionsProp.defaultProps = {
-  nodeDef: null,
-  putNodeDefProp: null,
-
   label: '',
-  propName: '',
   applyIf: true,
   multiple: true,
   readOnly: false,
 
   // array of expressions
   values: [],
+
+  validation: null
 }
 
 const mapStateToProps = (state, props) => {
   const {
-    nodeDef,
-    propName,
-    multiple = ExpressionsProp.defaultProps.multiple
+    values,
+    multiple = ExpressionsProp.defaultProps.multiple,
   } = props
 
-  const values = R.pipe(
-    NodeDef.getProp(propName, []),
-    R.ifElse(
-      values => multiple === true || R.isEmpty(values),
-      R.append(NodeDefExpression.createExpressionPlaceholder()),
-      R.identity
-    )
-  )(nodeDef)
-
-  const getNestedFieldValidation = (validation, fieldPath) => {
-    const fieldValidation = Validator.getFieldValidation(R.head(fieldPath))(validation)
-    return fieldPath.length === 1
-      ? fieldValidation
-      : getNestedFieldValidation(fieldValidation, R.takeLast(fieldPath.length - 1, fieldPath))
-  }
+  const shownValues = multiple === true || R.isEmpty(values)
+    ? R.append(NodeDefExpression.createExpressionPlaceholder())(values)
+    : values
 
   return {
-    values,
-    validation: getNestedFieldValidation(NodeDef.getNodeDefValidation(nodeDef), propName.split('.')),
+    values: shownValues,
   }
 }
 
 export default connect(mapStateToProps)(ExpressionsProp)
+
+const mapStateToProps2 = (state, props) => {
+  return {}
+}
+
+export const NodeDefExpressionsProp = connect(mapStateToProps2)(_NodeDefExpressionsProp)
