@@ -9,8 +9,14 @@ const {
 } = require('../../common/validation/validator')
 
 const NodeDef = require('../../common/survey/nodeDef')
+const NodeDefLayout = require('../../common/survey/nodeDefLayout')
 
 const NodeDefExpressionValidator = require('./nodeDefExpressionValidator')
+
+const errorKeys = {
+  empty: 'empty',
+  exceedingMax: 'exceedingMax',
+}
 
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.code
@@ -30,7 +36,7 @@ const validateChildren = (nodeDefs) =>
     if (NodeDef.isNodeDefEntity(nodeDef)) {
       const children = getChildren(nodeDef)(nodeDefs)
       if (R.isEmpty(children)) {
-        return 'empty'
+        return errorKeys.empty
       }
     }
     return null
@@ -47,10 +53,11 @@ const validateKeyAttributes = (nodeDefs) =>
     if (NodeDef.isNodeDefEntity(nodeDef)) {
       const keyAttributesCount = countKeyAttributes(nodeDef)(nodeDefs)
 
-      if (NodeDef.isNodeDefRoot(nodeDef) && keyAttributesCount === 0) {
-        return 'empty'
+      if (keyAttributesCount === 0 &&
+        (NodeDef.isNodeDefRoot(nodeDef) || NodeDefLayout.isRenderForm(nodeDef))) {
+        return errorKeys.empty
       } else if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return 'exceedingMax'
+        return errorKeys.exceedingMax
       }
     }
     return null
@@ -62,7 +69,7 @@ const validateKey = nodeDefs =>
       const keyAttributesCount = countKeyAttributes(nodeDef)(nodeDefs)
 
       if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return 'exceedingMax'
+        return errorKeys.exceedingMax
       }
     }
     return null
