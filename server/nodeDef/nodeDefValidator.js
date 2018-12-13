@@ -10,6 +10,8 @@ const {
 
 const NodeDef = require('../../common/survey/nodeDef')
 
+const NodeDefExpressionValidator = require('./nodeDefExpressionValidator')
+
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.code
     ? validateRequired(propName, nodeDef)
@@ -79,8 +81,33 @@ const propsValidations = nodeDefs => ({
   'children': [validateChildren(nodeDefs)]
 })
 
-const validateNodeDef = async (nodeDefs, nodeDef) =>
-  await validate(nodeDef, propsValidations(nodeDefs))
+const validateAdvancedProps = async nodeDef => {
+  const validations = {
+    defaultValues: await NodeDefExpressionValidator.validateMultiple(NodeDef.getDefaultValues(nodeDef)),
+    calculatedValues: await NodeDefExpressionValidator.validateMultiple(NodeDef.getCalculatedValues(nodeDef)),
+    applicable: await NodeDefExpressionValidator.validateMultiple(NodeDef.getApplicable(nodeDef)),
+    expressions: await NodeDefExpressionValidator.validateMultiple(NodeDef.getExpressions(nodeDef)),
+  }
+  const invalidValidations = R.reject(R.propEq('valid', true), validations)
+
+  return {
+    fields: invalidValidations,
+    valid: R.isEmpty(invalidValidations),
+  }
+}
+
+const validateNodeDef = async (nodeDefs, nodeDef) => {
+  const nodeDefValidation = await validate(nodeDef, propsValidations(nodeDefs))
+
+  const advancedPropsValidation = await validateAdvancedProps(nodeDef)
+
+  const validation = R.pipe(
+    R.mergeDeepLeft(advancedPropsValidation),
+    R.assoc('valid', nodeDefValidation.valid && advancedPropsValidation.valid)
+  )(nodeDefValidation)
+
+  return validation.valid ? null : validation
+}
 
 const validateNodeDefs = async (nodeDefs) =>
   await Promise.all(nodeDefs.map(async n => ({

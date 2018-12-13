@@ -118,6 +118,9 @@ module.exports = {
 
   //advanced props
   getDefaultValues: SurveyUtils.getProp('defaultValues', []),
+  getCalculatedValues: SurveyUtils.getProp('calculatedValues', []),
+  getApplicable: SurveyUtils.getProp('applicable', []),
+  getExpressions: SurveyUtils.getProp('expressions', []),
 
   isNodeDefKey,
   isNodeDefMultiple,

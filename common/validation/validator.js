@@ -45,11 +45,7 @@ const validate = async (obj, propsValidations) => {
         )
     )
   )
-  const fieldValidationsInvalid = R.reduce(
-    (acc, field) => acc[field].valid ? R.dissoc(field, acc) : acc,
-    fieldValidations,
-    R.keys(fieldValidations)
-  )
+  const fieldValidationsInvalid = R.reject(R.propEq('valid', true), fieldValidations)
 
   return {
     valid: !R.any(

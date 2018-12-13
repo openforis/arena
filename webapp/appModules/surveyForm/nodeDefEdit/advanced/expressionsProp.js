@@ -6,10 +6,11 @@ import * as R from 'ramda'
 
 import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
 import NodeDef from '../../../../../common/survey/nodeDef'
+import Validator from '../../../../../common/validation/validator'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 
-const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
+const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly, validation}) => (
   <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
     {
@@ -24,6 +25,7 @@ const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
     <div className="expression-item">
       <div className="label">Expression</div>
       <Input value={NodeDefExpression.getExpression(expression)}
+             validation={Validator.getFieldValidation('expression')(validation)}
              onChange={value => onUpdate(NodeDefExpression.assocExpression(value)(expression))}/>
     </div>
     {
@@ -31,6 +33,7 @@ const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
       <div className="expression-item">
         <div className="label">Apply If</div>
         <Input value={NodeDefExpression.getApplyIf(expression)}
+               validation={Validator.getFieldValidation('applyIf')(validation)}
                onChange={value => onUpdate(NodeDefExpression.assocApplyIf(value)(expression))}/>
       </div>
     }
@@ -78,7 +81,7 @@ class ExpressionsProp extends React.Component {
   }
 
   render () {
-    const {label, readOnly, applyIf, values} = this.props
+    const {label, readOnly, applyIf, values, validation} = this.props
 
     return (
       <FormItem label={label}>
@@ -88,6 +91,7 @@ class ExpressionsProp extends React.Component {
               <Expression key={i}
                           expression={value}
                           applyIf={applyIf}
+                          validation={Validator.getFieldValidation(i)(validation)}
                           onDelete={this.handleDelete.bind(this)}
                           onUpdate={this.handleUpdate.bind(this)}
                           readOnly={readOnly}/>
@@ -131,7 +135,8 @@ const mapStateToProps = (state, props) => {
   )(nodeDef)
 
   return {
-    values
+    values,
+    validation: Validator.getFieldValidation(propName)(NodeDef.getNodeDefValidation(nodeDef)),
   }
 }
 
