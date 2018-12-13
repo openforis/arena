@@ -7,9 +7,9 @@ const ExprParser = require('../../common/exprParser/exprParser')
 const getProp = (propName, item) => R.pathOr('', propName.split('.'), item)
 
 const validateExpressionProp = async (propName, item) =>
-  await validateExpression(getProp(propName, item))
+  await validateJsExpression(getProp(propName, item))
 
-const validateExpression = async expr => {
+const validateJsExpression = async expr => {
   const validation = ExprParser.validateExpression(expr)
   return validation.valid ? null : validation.errors[0]
 }
@@ -19,15 +19,15 @@ const propsValidations = {
   'applyIf': [validateExpressionProp]
 }
 
-const validate = async nodeDefExpression =>
+const validateExpression = async nodeDefExpression =>
   await Validator.validate(nodeDefExpression, propsValidations)
 
-const validateMultiple = async nodeDefExpressions => {
+const validate = async nodeDefExpressions => {
   const result = {fields: {}}
 
   for (let i = 0; i < nodeDefExpressions.length; i++) {
     const nodeDefExpression = nodeDefExpressions[i]
-    result.fields['' + i] = await validate(nodeDefExpression)
+    result.fields['' + i] = await validateExpression(nodeDefExpression)
   }
 
   result.valid = R.pipe(
@@ -39,5 +39,5 @@ const validateMultiple = async nodeDefExpressions => {
 }
 
 module.exports = {
-  validateMultiple
+  validate
 }

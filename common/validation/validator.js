@@ -19,6 +19,13 @@ const keywords = [
   'value',
 ]
 
+const errorKeys = {
+  duplicate: 'duplicate',
+  empty: 'empty',
+  exceedingMax: 'exceedingMax',
+  keyword: 'keyword',
+}
+
 const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
 
 const validateProp = async (obj, prop, validations = []) => {
@@ -63,7 +70,7 @@ const validateRequired = (propName, obj) => {
   )(obj)
 
   return R.isEmpty(value)
-    ? 'empty'
+    ? errorKeys.empty
     : null
 }
 
@@ -79,13 +86,13 @@ const validateItemPropUniqueness = items =>
       , items)
 
     return hasDuplicates
-      ? 'duplicate'
+      ? errorKeys.duplicate
       : null
   }
 
 const validateNotKeyword = (propName, item) =>
   R.contains(getProp(propName)(item), keywords)
-    ? 'keyword'
+    ? errorKeys.keyword
     : null
 
 //==== getters
@@ -96,7 +103,7 @@ const isValid = R.pipe(getValidation, R.propEq('valid', true))
 
 const getFieldValidation = field => R.pathOr(
   {valid: true, errors: []},
-  ['fields', field],
+  ['fields', field]
 )
 
 const getInvalidFieldValidations = R.pipe(
@@ -123,6 +130,8 @@ const dissocFieldValidation = key => R.pipe(
 )
 
 module.exports = {
+  errorKeys,
+
   validate,
   validateProp,
   validateRequired,

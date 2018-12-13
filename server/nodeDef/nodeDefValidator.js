@@ -2,6 +2,7 @@ const R = require('ramda')
 const Promise = require('bluebird')
 
 const {
+  errorKeys,
   validate,
   validateItemPropUniqueness,
   validateRequired,
@@ -12,11 +13,7 @@ const NodeDef = require('../../common/survey/nodeDef')
 const NodeDefLayout = require('../../common/survey/nodeDefLayout')
 
 const NodeDefExpressionValidator = require('./nodeDefExpressionValidator')
-
-const errorKeys = {
-  empty: 'empty',
-  exceedingMax: 'exceedingMax',
-}
+const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
 
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.code
@@ -90,10 +87,10 @@ const propsValidations = nodeDefs => ({
 
 const validateAdvancedProps = async nodeDef => {
   const validations = {
-    defaultValues: await NodeDefExpressionValidator.validateMultiple(NodeDef.getDefaultValues(nodeDef)),
-    calculatedValues: await NodeDefExpressionValidator.validateMultiple(NodeDef.getCalculatedValues(nodeDef)),
-    applicable: await NodeDefExpressionValidator.validateMultiple(NodeDef.getApplicable(nodeDef)),
-    expressions: await NodeDefExpressionValidator.validateMultiple(NodeDef.getExpressions(nodeDef)),
+    defaultValues: await NodeDefExpressionValidator.validate(NodeDef.getDefaultValues(nodeDef)),
+    calculatedValues: await NodeDefExpressionValidator.validate(NodeDef.getCalculatedValues(nodeDef)),
+    applicable: await NodeDefExpressionValidator.validate(NodeDef.getApplicable(nodeDef)),
+    validations: await NodeDefValidationsValidator.validate(NodeDef.getNodeDefValidations(nodeDef)),
   }
   const invalidValidations = R.reject(R.propEq('valid', true), validations)
 

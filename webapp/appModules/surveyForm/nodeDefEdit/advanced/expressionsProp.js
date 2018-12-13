@@ -77,7 +77,6 @@ class ExpressionsProp extends React.Component {
       R.reject(R.propEq('placeholder', true), expressions),
       true
     )
-
   }
 
   render () {
@@ -134,9 +133,16 @@ const mapStateToProps = (state, props) => {
     )
   )(nodeDef)
 
+  const getNestedFieldValidation = (validation, fieldPath) => {
+    const fieldValidation = Validator.getFieldValidation(R.head(fieldPath))(validation)
+    return fieldPath.length === 1
+      ? fieldValidation
+      : getNestedFieldValidation(fieldValidation, R.takeLast(fieldPath.length - 1, fieldPath))
+  }
+
   return {
     values,
-    validation: Validator.getFieldValidation(propName)(NodeDef.getNodeDefValidation(nodeDef)),
+    validation: getNestedFieldValidation(NodeDef.getNodeDefValidation(nodeDef), propName.split('.')),
   }
 }
 

@@ -8,8 +8,8 @@ import NodeDef from '../../../common/survey/nodeDef'
 export const assocNodeDef = nodeDef => R.assoc(nodeDef.uuid, nodeDef)
 
 export const assocNodeDefProp = (nodeDefUuid, key, value) => R.pipe(
-  R.assocPath([nodeDefUuid, 'props', key], value),
-  R.dissocPath([nodeDefUuid, 'validation', 'fields', key]),
+  R.assocPath(R.concat([nodeDefUuid, 'props'], R.split('.', key)), value),
+  R.dissocPath([nodeDefUuid, 'validation', 'fields', key]), //TODO handle dissoc nested objects validation
 )
 
 // ====== DELETE

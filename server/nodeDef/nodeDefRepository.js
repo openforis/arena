@@ -64,7 +64,7 @@ const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, v
   return await client.map(
     `SELECT ${nodeDefSelectFields(advanced)}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
-     WHERE uuid in (${nodeDefUuids.map((uuid,i)=>`$${i+1}`).join(',')})`,
+     WHERE uuid in (${nodeDefUuids.map((uuid, i) => `$${i + 1}`).join(',')})`,
     [...nodeDefUuids],
     res => dbTransformCallback(res, draft, true)
   )
@@ -99,14 +99,18 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
 // ============== UPDATE
 
 const updateNodeDefProps = async (surveyId, nodeDefUuid, propsArray, client = db) => {
+
+  const toIndexedProps = propsArray =>
+    R.reduce((acc, prop) => R.assocPath(R.split('.', prop.key), prop.value)(acc), {}, propsArray)
+
   const props = R.pipe(
     R.filter(R.propEq('advanced', false)),
-    R.reduce((acc, prop) => R.assoc(prop.key, prop.value)(acc), {})
+    toIndexedProps
   )(propsArray)
 
   const advancedProps = R.pipe(
     R.filter(R.propEq('advanced', true)),
-    R.reduce((acc, prop) => R.assoc(prop.key, prop.value)(acc), {})
+    toIndexedProps
   )(propsArray)
 
   return await client.one(`
@@ -120,7 +124,6 @@ const updateNodeDefProps = async (surveyId, nodeDefUuid, propsArray, client = db
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 }
-
 
 const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`

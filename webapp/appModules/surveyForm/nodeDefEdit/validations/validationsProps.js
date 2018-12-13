@@ -47,7 +47,7 @@ const ValidationsProps = props => {
       <ExpressionsProp nodeDef={nodeDef}
                        putNodeDefProp={putNodeDefProp}
                        label="Expressions"
-                       propName="expressions"
+                       propName="validations.expressions"
                        readOnly={readOnly}/>
     </div>
   )

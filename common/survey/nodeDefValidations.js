@@ -5,11 +5,12 @@ const keys = {
   count: 'count',
   min: 'min',
   max: 'max',
+  expressions: 'expressions'
 }
 
 module.exports = {
   //REQUIRED
-  isRequired: R.prop(keys.required),
+  isRequired: R.propOr(false, keys.required),
   assocRequired: required => R.assoc(keys.required, required),
   dissocRequired: R.dissoc(keys.required),
 
@@ -19,4 +20,7 @@ module.exports = {
   assocMinCount: minCount => R.assocPath([keys.count, keys.min], minCount),
   assocMaxCount: maxCount => R.assocPath([keys.count, keys.max], maxCount),
   dissocCount: R.dissoc(keys.count),
+
+  //EXPRESSIONS
+  getExpressions: R.propOr([], (keys.expressions)),
 }
