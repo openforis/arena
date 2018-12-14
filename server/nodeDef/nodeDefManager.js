@@ -25,7 +25,7 @@ const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props) =>
 
 // ======= READ
 
-const processNodeDefs = async (nodeDefsDb, draft, validate ) => {
+const processNodeDefs = async (nodeDefsDb, draft, validate) => {
   const nodeDefsResult = R.reduce(
     (acc, nodeDef) => draft
       ? R.append(nodeDef, acc)
@@ -43,8 +43,8 @@ const processNodeDefs = async (nodeDefsDb, draft, validate ) => {
   return SurveyUtils.toUuidIndexedObj(nodeDefs)
 }
 
-const fetchNodeDefsBySurveyId = async (surveyId, draft = false, validate = false, client = db) => {
-  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, validate, client)
+const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
+  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced, client)
   return await processNodeDefs(nodeDefsDB, draft, validate)
 }
 

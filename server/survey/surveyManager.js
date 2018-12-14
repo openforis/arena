@@ -123,6 +123,7 @@ module.exports = {
   // ====== UPDATE
   updateSurveyProp,
   publishSurveyProps: SurveyRepository.publishSurveyProps,
+  updateSurveyDependencyGraphs: SurveyRepository.updateSurveyDependencyGraphs,
 
   // ====== DELETE
   deleteSurvey,

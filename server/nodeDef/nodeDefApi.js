@@ -1,5 +1,5 @@
 const {sendErr, sendOk} = require('../serverUtils/response')
-const {getRestParam,getBoolParam} = require('../serverUtils/request')
+const {getRestParam, getBoolParam} = require('../serverUtils/request')
 
 const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 
@@ -29,8 +29,9 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const draft = getBoolParam(req, 'draft')
       const validate = getBoolParam(req, 'validate')
+      const advanced = validate //fetch advanced props if validating
 
-      const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, validate)
+      const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate)
 
       res.json({nodeDefs})
     } catch (err) {
@@ -49,7 +50,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
 
       await NodeDefManager.updateNodeDefProps(user, surveyId, nodeDefUuid, props)
-      const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, true, true)
+      const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, true, true, true)
 
       res.json({nodeDefs})
     } catch (err) {

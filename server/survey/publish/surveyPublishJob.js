@@ -5,6 +5,7 @@ const CategoriesValidationJob = require('./categoriesValidationJob')
 const TaxonomiesValidationJob = require('./taxonomiesValidationJob')
 const SurveyInfoValidationJob = require('./surveyInfoValidationJob')
 const SurveyPropsPublishJob = require('./surveyPropsPublishJob')
+const SurveyDependencyGraphsGenerationJob = require('./surveyDependencyGraphsGenerationJob')
 const SurveyRdbGeneratorJob = require('./surveyRdbGeneratorJob')
 
 class SurveyPublishJob extends Job {
@@ -16,6 +17,7 @@ class SurveyPublishJob extends Job {
       new TaxonomiesValidationJob(params),
       new SurveyInfoValidationJob(params),
       new SurveyPropsPublishJob(params),
+      new SurveyDependencyGraphsGenerationJob(params),
       new SurveyRdbGeneratorJob(params),
     ])
   }
