@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 
-import ExpressionsProp from '../advanced/expressionsProp'
+import { ExpressionsProp } from '../advanced/expressionsProp'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'

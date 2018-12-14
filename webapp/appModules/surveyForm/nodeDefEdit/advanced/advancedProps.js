@@ -1,6 +1,7 @@
 import React from 'react'
 
-import {NodeDefExpressionsProp} from './expressionsProp'
+import { NodeDefExpressionsProp } from './expressionsProp'
+
 import Validator from '../../../../../common/validation/validator'
 
 const AdvancedProps = props => {
