@@ -13,8 +13,15 @@ const nodeDefSelectFields = (advanced = false) =>
 // ============== CREATE
 
 const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = db) => {
+
+  const parentH = parentUuid ?
+    await client.one(
+      `SELECT id, meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node_def WHERE uuid = $1`,
+      [parentUuid]
+    ) : {}
+
   const meta = {
-    h: await fetchParentNodeDefHierarchy(surveyId, parentUuid, client)
+    h: R.isEmpty(parentH) ? [] : R.append(Number(parentH.id), parentH.h)
   }
 
   return await client.one(`
@@ -95,16 +102,6 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
     res => dbTransformCallback(res, draft, true)
   )
 }
-
-const fetchParentNodeDefHierarchy = async (surveyId, nodeDefUuid, client = db) =>
-  nodeDefUuid
-    ? await client.one(`
-        SELECT id, meta->'h' as h
-        FROM ${getSurveyDBSchema(surveyId)}.node_def 
-        WHERE uuid = $1`,
-    [nodeDefUuid],
-    row => R.append(Number(row.id), row.h))
-    : []
 
 // ============== UPDATE
 
