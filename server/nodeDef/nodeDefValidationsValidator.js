@@ -7,6 +7,7 @@ const validate = async nodeDefValidations => {
   const fieldValidations = {
     expressions: await NodeDefExpressionValidator.validate(NodeDefValidations.getExpressions(nodeDefValidations)),
   }
+  //TODO why filtering again?
   const invalidFieldValidations = R.reject(R.propEq('valid', true), fieldValidations)
 
   return {
