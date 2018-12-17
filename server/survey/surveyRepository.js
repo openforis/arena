@@ -1,7 +1,7 @@
 const db = require('../db/db')
 const R = require('ramda')
 
-const {getSurveyDBSchema, dbTransformCallback} = require('./surveySchemaRepositoryUtils')
+const {dbTransformCallback} = require('./surveySchemaRepositoryUtils')
 const {selectDate} = require('../db/dbUtils')
 
 const surveySelectFields = (alias = '') => {
@@ -103,10 +103,8 @@ const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client =
 }
 
 // ============== DELETE
-const deleteSurvey = async (id, client = db) => {
-  await client.query(`DROP SCHEMA ${getSurveyDBSchema(id)} CASCADE`)
+const deleteSurvey = async (id, client = db) =>
   await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
-}
 
 const deleteSurveyLabel = async (id, langCode, client = db) =>
   await deleteSurveyProp(id, ['labels', langCode], client)

@@ -2,6 +2,7 @@ const R = require('ramda')
 const {uuidv4} = require('../uuid')
 
 const SurveyUtils = require('./surveyUtils')
+const NodeDefValidations = require('./nodeDefValidations')
 
 const {isBlank} = require('../stringUtils')
 
@@ -56,6 +57,16 @@ const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
 const isNodeDefPublished = R.propEq('published', true)
 
+const getNodeDefLabel = (nodeDef, lang) => {
+  const label = R.path(['props', 'labels', lang], nodeDef)
+  return isBlank(label)
+    ? getNodeDefName(nodeDef)
+    : label
+
+}
+
+const getValidations = SurveyUtils.getProp('validations', {})
+
 // ==== UPDATE
 
 // ==== UTILS
@@ -87,13 +98,6 @@ const canNodeDefBeKey = nodeDef =>
     ]
   )
 
-const getNodeDefLabel = (nodeDef, lang) => {
-  const label = R.path(['props', 'labels', lang], nodeDef)
-  return isBlank(label)
-    ? getNodeDefName(nodeDef)
-    : label
-
-}
 
 module.exports = {
   nodeDefType,
@@ -116,9 +120,6 @@ module.exports = {
   getNodeDefParentCodeDefUuid: SurveyUtils.getProp('parentCodeDefUuid'),
   getNodeDefTaxonomyUuid: SurveyUtils.getProp('taxonomyUuid'),
 
-  //advanced props
-  getDefaultValues: SurveyUtils.getProp('defaultValues', []),
-
   isNodeDefKey,
   isNodeDefMultiple,
   isNodeDefRoot,
@@ -131,8 +132,15 @@ module.exports = {
   isNodeDefTaxon,
   isNodeDefPublished,
 
-  //validations
-  getNodeDefValidations: SurveyUtils.getProp('validations', {}),
+  //advanced props
+  getDefaultValues: SurveyUtils.getProp('defaultValues', []),
+  getCalculatedValues: SurveyUtils.getProp('calculatedValues', []),
+  getApplicable: SurveyUtils.getProp('applicable', []),
+  getValidations,
+  getValidationExpressions: R.pipe(
+    getValidations,
+    NodeDefValidations.getExpressions,
+  ),
 
   //UTILS
   canNodeDefBeMultiple,

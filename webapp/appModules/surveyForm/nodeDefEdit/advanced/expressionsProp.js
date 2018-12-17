@@ -1,15 +1,15 @@
 import './expressionsProp.scss'
 
 import React from 'react'
-import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
 import NodeDef from '../../../../../common/survey/nodeDef'
+import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
+import Validator from '../../../../../common/validation/validator'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 
-const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
+const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly, validation}) => (
   <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
     {
@@ -24,6 +24,7 @@ const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
     <div className="expression-item">
       <div className="label">Expression</div>
       <Input value={NodeDefExpression.getExpression(expression)}
+             validation={Validator.getFieldValidation('expression')(validation)}
              onChange={value => onUpdate(NodeDefExpression.assocExpression(value)(expression))}/>
     </div>
     {
@@ -31,6 +32,7 @@ const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
       <div className="expression-item">
         <div className="label">Apply If</div>
         <Input value={NodeDefExpression.getApplyIf(expression)}
+               validation={Validator.getFieldValidation('applyIf')(validation)}
                onChange={value => onUpdate(NodeDefExpression.assocApplyIf(value)(expression))}/>
       </div>
     }
@@ -38,19 +40,47 @@ const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly}) => (
   </div>
 )
 
-class ExpressionsProp extends React.Component {
+export class ExpressionsProp extends React.Component {
+
+  constructor (props) {
+    super(props)
+
+    this.state = {uiValues: []}
+  }
+
+  static getDerivedStateFromProps (props, state) {
+    const {values, multiple} = props
+    const {uiValues: oldUiValues} = state
+
+    const uiValues = R.clone(values)
+
+    if (R.isEmpty(values) || multiple) {
+      const placeholder = R.pipe(
+        R.find(NodeDefExpression.isPlaceholder),
+        R.defaultTo(NodeDefExpression.createExpressionPlaceholder())
+      )(oldUiValues)
+
+      uiValues.push(placeholder)
+    }
+    return {
+      uiValues
+    }
+  }
 
   getExpressionIndex (expression) {
-    return R.findIndex(R.propEq('uuid', expression.uuid), this.props.values)
+    return R.findIndex(R.propEq('uuid', expression.uuid), this.state.uiValues)
+  }
+
+  handleValuesUpdate (newValues) {
+    this.setState({uiValues: newValues})
+    this.props.onChange(R.reject(NodeDefExpression.isPlaceholder, newValues))
   }
 
   handleDelete (expression) {
-    const {values} = this.props
-
-    if (window.confirm('Delete this default expression?')) {
+    if (window.confirm('Delete this expression?')) {
       const index = this.getExpressionIndex(expression)
-      const newValues = R.remove(index, 1, values)
-      this.updateExpressions(newValues)
+      const newValues = R.remove(index, 1, this.state.uiValues)
+      this.handleValuesUpdate(newValues)
     }
   }
 
@@ -58,36 +88,25 @@ class ExpressionsProp extends React.Component {
     if (NodeDefExpression.isEmpty(expression)) {
       this.handleDelete(expression)
     } else {
-      const {values} = this.props
       const index = this.getExpressionIndex(expression)
-      const newValues = R.update(index, expression, values)
-      this.updateExpressions(newValues)
+      const newValues = R.update(index, expression, this.state.uiValues)
+      this.handleValuesUpdate(newValues)
     }
   }
 
-  updateExpressions (expressions) {
-    const {nodeDef, putNodeDefProp, propName} = this.props
-
-    putNodeDefProp(
-      nodeDef,
-      propName,
-      R.reject(R.propEq('placeholder', true), expressions),
-      true
-    )
-
-  }
-
   render () {
-    const {label, readOnly, applyIf, values} = this.props
+    const {label, readOnly, applyIf, validation} = this.props
+    const {uiValues} = this.state
 
     return (
       <FormItem label={label}>
         <div className="node-def-edit__expressions">
           {
-            values.map((value, i) =>
+            uiValues.map((value, i) =>
               <Expression key={i}
                           expression={value}
                           applyIf={applyIf}
+                          validation={Validator.getFieldValidation(i)(validation)}
                           onDelete={this.handleDelete.bind(this)}
                           onUpdate={this.handleUpdate.bind(this)}
                           readOnly={readOnly}/>
@@ -101,38 +120,50 @@ class ExpressionsProp extends React.Component {
 }
 
 ExpressionsProp.defaultProps = {
-  nodeDef: null,
-  putNodeDefProp: null,
-
   label: '',
-  propName: '',
   applyIf: true,
   multiple: true,
   readOnly: false,
 
   // array of expressions
   values: [],
+
+  validation: null
 }
 
-const mapStateToProps = (state, props) => {
-  const {
-    nodeDef,
-    propName,
-    multiple = ExpressionsProp.defaultProps.multiple
-  } = props
+export const NodeDefExpressionsProp = props => {
+  const {nodeDef, propName, validation, label, multiple, applyIf, readOnly, putNodeDefProp} = props
 
-  const values = R.pipe(
-    NodeDef.getProp(propName, []),
-    R.ifElse(
-      values => multiple === true || R.isEmpty(values),
-      R.append(NodeDefExpression.createExpressionPlaceholder()),
-      R.identity
+  const values = NodeDef.getProp(propName, [])(nodeDef)
+
+  const onExpressionsUpdate = expressions => {
+    putNodeDefProp(
+      nodeDef,
+      propName,
+      R.reject(NodeDefExpression.isPlaceholder, expressions),
+      true
     )
-  )(nodeDef)
-
-  return {
-    values
   }
+
+  return <ExpressionsProp label={label}
+                          readOnly={readOnly}
+                          applyIf={applyIf}
+                          multiple={multiple}
+                          values={values}
+                          validation={validation}
+                          onChange={onExpressionsUpdate}/>
+
 }
 
-export default connect(mapStateToProps)(ExpressionsProp)
+
+NodeDefExpressionsProp.defaultProps = {
+  nodeDef: null,
+  propName: null,
+  label: '',
+
+  applyIf: true,
+  multiple: true,
+  readOnly: false,
+
+  validation: null
+}

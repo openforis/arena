@@ -34,21 +34,18 @@ const addDeps = (survey, nodeDef, type, expressions) =>
     return graph
   }
 //====== CREATE
-const buildGraphs = survey => {
-  let graph = {}
-  const nodeDefs = Survey.getNodeDefsArray(survey)
-
-  for (const nodeDef of nodeDefs) {
-    graph = addDeps(survey, nodeDef, keys.defaultValues, NodeDef.getDefaultValues(nodeDef))(graph)
-    //TODO use NodeDef function
-    graph = addDeps(survey, nodeDef, keys.calculatedValues, R.pathOr([], ['props', 'calculatedValues'], nodeDef))(graph)
-    graph = addDeps(survey, nodeDef, keys.applicable, R.pathOr([], ['props', 'applicable'], nodeDef))(graph)
-    graph = addDeps(survey, nodeDef, keys.validations, R.pathOr([], ['props', 'validations', 'expressions'], nodeDef))(graph)
-  }
-
-  return graph
-}
-
+const buildGraphs = survey =>
+  R.reduce(
+    (graph, nodeDef) => R.pipe(
+      addDeps(survey, nodeDef, keys.defaultValues, NodeDef.getDefaultValues(nodeDef)),
+      addDeps(survey, nodeDef, keys.calculatedValues, NodeDef.getCalculatedValues(nodeDef)),
+      addDeps(survey, nodeDef, keys.applicable, NodeDef.getApplicable(nodeDef)),
+      addDeps(survey, nodeDef, keys.validations, NodeDef.getValidationExpressions(nodeDef))
+    )(graph),
+    {},
+    Survey.getNodeDefsArray(survey)
+  )
+  
 module.exports = {
   buildGraph: buildGraphs
 }

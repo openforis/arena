@@ -106,14 +106,18 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
 // ============== UPDATE
 
 const updateNodeDefProps = async (surveyId, nodeDefUuid, propsArray, client = db) => {
+
+  const toIndexedProps = propsArray =>
+    R.reduce((acc, prop) => R.assocPath(R.split('.', prop.key), prop.value)(acc), {}, propsArray)
+
   const props = R.pipe(
     R.filter(R.propEq('advanced', false)),
-    R.reduce((acc, prop) => R.assoc(prop.key, prop.value)(acc), {})
+    toIndexedProps
   )(propsArray)
 
   const advancedProps = R.pipe(
     R.filter(R.propEq('advanced', true)),
-    R.reduce((acc, prop) => R.assoc(prop.key, prop.value)(acc), {})
+    toIndexedProps
   )(propsArray)
 
   return await client.one(`

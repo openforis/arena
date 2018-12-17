@@ -3,6 +3,8 @@ const R = require('ramda')
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/dbMigrator')
 const {uuidv4} = require('../../common/uuid')
+const {getSurveyDBSchema} = require('./surveySchemaRepositoryUtils')
+const SurveyRdbManager = require('../surveyRdb/surveyRdbManager')
 
 const SurveyRepository = require('../survey/surveyRepository')
 const Survey = require('../../common/survey/survey')
@@ -113,6 +115,9 @@ const deleteSurvey = async (id, user) => {
     const userPrefSurveyId = getUserPrefSurveyId(user)
     if (userPrefSurveyId === id)
       await UserRepository.deleteUserPref(user, userPrefNames.survey, t)
+
+    await t.query(`DROP SCHEMA ${getSurveyDBSchema(id)} CASCADE`)
+    await SurveyRdbManager.dropSchema(id, t)
 
     await SurveyRepository.deleteSurvey(id, t)
   })

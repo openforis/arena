@@ -2,10 +2,13 @@ const R = require('ramda')
 const {uuidv4} = require('./../uuid')
 const {isBlank} = require('../stringUtils')
 
-const expressionProp = 'expression'
-const applyIfProp = 'applyIf'
-
 // ====== CREATE
+const keys = {
+  placeholder: 'placeholder',
+  expression: 'expression',
+  applyIf: 'applyIf',
+}
+
 const createExpressionPlaceholder = () => ({
   uuid: uuidv4(),
   placeholder: true,
@@ -14,16 +17,18 @@ const createExpressionPlaceholder = () => ({
 })
 
 // ====== READ
-const getExpression = R.prop(expressionProp)
+const getExpression = R.prop(keys.expression)
 
-const getApplyIf = R.prop(applyIfProp)
+const getApplyIf = R.prop(keys.applyIf)
 
-const isEmpty = (expression = {}) => isBlank(expression.expression) && isBlank(expression.applyIf)
+const isPlaceholder = R.propEq(keys.placeholder, true)
+
+const isEmpty = (expression = {}) => isBlank(getExpression(expression)) && isBlank(getApplyIf(expression))
 
 // ====== UPDATE
 const assocProp = (propName, value) => R.pipe(
   R.assoc(propName, value),
-  R.dissoc('placeholder'),
+  R.dissoc(keys.placeholder),
 )
 
 // ====== UTILS
@@ -58,10 +63,11 @@ module.exports = {
   getExpression,
   getApplyIf,
   isEmpty,
+  isPlaceholder,
 
   //UPDATE
-  assocExpression: expression => assocProp(expressionProp, expression),
-  assocApplyIf: applyIf => assocProp(applyIfProp, applyIf),
+  assocExpression: expression => assocProp(keys.expression, expression),
+  assocApplyIf: applyIf => assocProp(keys.applyIf, applyIf),
 
   //UTILS
   findReferencedNodeDefs
