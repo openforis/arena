@@ -3,7 +3,7 @@ const R = require('ramda')
 const Job = require('../../job/job')
 
 const NodeDef = require('../../../common/survey/nodeDef')
-const {isValid, getInvalidFieldValidations} = require('../../../common/validation/validator')
+const Validator = require('../../../common/validation/validator')
 
 const NodeDefManager = require('../../nodeDef/nodeDefManager')
 
@@ -14,12 +14,16 @@ class NodeDefsValidationJob extends Job {
   }
 
   async execute (tx) {
-    const validatedNodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(this.surveyId, true, true, tx)
+    const validatedIndexedNodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(this.surveyId, true, true, tx)
 
-    const invalidNodeDefs = R.filter(nodeDef => !isValid(nodeDef), validatedNodeDefs)
+    const invalidNodeDefs = R.pipe(
+      R.values,
+      R.reject(nodeDef => Validator.isValid(nodeDef))
+    )(validatedIndexedNodeDefs)
 
     if (!R.isEmpty(invalidNodeDefs)) {
-      this.errors = R.reduce((acc, nodeDef) => R.assoc(NodeDef.getNodeDefName(nodeDef), getInvalidFieldValidations(nodeDef.validation), acc), {}, invalidNodeDefs)
+      this.errors = R.reduce((acc, nodeDef) => R.assoc(NodeDef.getNodeDefName(nodeDef),
+        Validator.getInvalidFieldValidations(nodeDef.validation), acc), {}, invalidNodeDefs)
       this.setStatusFailed()
     }
   }

@@ -116,9 +116,6 @@ module.exports = {
   getNodeDefParentCodeDefUuid: SurveyUtils.getProp('parentCodeDefUuid'),
   getNodeDefTaxonomyUuid: SurveyUtils.getProp('taxonomyUuid'),
 
-  //advanced props
-  getDefaultValues: SurveyUtils.getProp('defaultValues', []),
-
   isNodeDefKey,
   isNodeDefMultiple,
   isNodeDefRoot,
@@ -131,7 +128,10 @@ module.exports = {
   isNodeDefTaxon,
   isNodeDefPublished,
 
-  //validations
+  //advanced props
+  getDefaultValues: SurveyUtils.getProp('defaultValues', []),
+  getCalculatedValues: SurveyUtils.getProp('calculatedValues', []),
+  getApplicable: SurveyUtils.getProp('applicable', []),
   getNodeDefValidations: SurveyUtils.getProp('validations', {}),
 
   //UTILS

@@ -1,32 +1,39 @@
 import React from 'react'
 
-import ExpressionsProp from './expressionsProp'
+import { NodeDefExpressionsProp } from './expressionsProp'
+
+import Validator from '../../../../../common/validation/validator'
 
 const AdvancedProps = props => {
   const {nodeDef, putNodeDefProp, readOnly} = props
 
+  const {validation} = nodeDef
+
   return (
     <div className="form">
 
-      <ExpressionsProp nodeDef={nodeDef}
-                       putNodeDefProp={putNodeDefProp}
-                       label="Default values"
-                       readOnly={readOnly}
-                       propName="defaultValues"/>
+      <NodeDefExpressionsProp nodeDef={nodeDef}
+                              putNodeDefProp={putNodeDefProp}
+                              label="Default values"
+                              readOnly={readOnly}
+                              propName="defaultValues"
+                              validation={Validator.getFieldValidation('defaultValues')(validation)}/>
 
-      <ExpressionsProp nodeDef={nodeDef}
-                       putNodeDefProp={putNodeDefProp}
-                       label="Calculated values"
-                       readOnly={readOnly}
-                       propName="calculatedValues"/>
+      <NodeDefExpressionsProp nodeDef={nodeDef}
+                              putNodeDefProp={putNodeDefProp}
+                              label="Calculated values"
+                              readOnly={readOnly}
+                              propName="calculatedValues"
+                              validation={Validator.getFieldValidation('calculatedValues')(validation)}/>
 
-      <ExpressionsProp nodeDef={nodeDef}
-                       putNodeDefProp={putNodeDefProp}
-                       label="Applicable if"
-                       readOnly={readOnly}
-                       propName="applicable"
-                       applyIf={false}
-                       multiple={false}/>
+      <NodeDefExpressionsProp nodeDef={nodeDef}
+                              putNodeDefProp={putNodeDefProp}
+                              label="Applicable if"
+                              readOnly={readOnly}
+                              propName="applicable"
+                              applyIf={false}
+                              multiple={false}
+                              validation={Validator.getFieldValidation('applicable')(validation)}/>
 
 
     </div>

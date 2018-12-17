@@ -2,6 +2,7 @@ const R = require('ramda')
 const Promise = require('bluebird')
 
 const {
+  errorKeys,
   validate,
   validateItemPropUniqueness,
   validateRequired,
@@ -9,6 +10,10 @@ const {
 } = require('../../common/validation/validator')
 
 const NodeDef = require('../../common/survey/nodeDef')
+const NodeDefLayout = require('../../common/survey/nodeDefLayout')
+
+const NodeDefExpressionValidator = require('./nodeDefExpressionValidator')
+const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
 
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.code
@@ -28,7 +33,7 @@ const validateChildren = (nodeDefs) =>
     if (NodeDef.isNodeDefEntity(nodeDef)) {
       const children = getChildren(nodeDef)(nodeDefs)
       if (R.isEmpty(children)) {
-        return 'empty'
+        return errorKeys.empty
       }
     }
     return null
@@ -45,10 +50,11 @@ const validateKeyAttributes = (nodeDefs) =>
     if (NodeDef.isNodeDefEntity(nodeDef)) {
       const keyAttributesCount = countKeyAttributes(nodeDef)(nodeDefs)
 
-      if (NodeDef.isNodeDefRoot(nodeDef) && keyAttributesCount === 0) {
-        return 'empty'
+      if (keyAttributesCount === 0 &&
+        (NodeDef.isNodeDefRoot(nodeDef) || NodeDefLayout.isRenderForm(nodeDef))) {
+        return errorKeys.empty
       } else if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return 'exceedingMax'
+        return errorKeys.exceedingMax
       }
     }
     return null
@@ -60,7 +66,7 @@ const validateKey = nodeDefs =>
       const keyAttributesCount = countKeyAttributes(nodeDef)(nodeDefs)
 
       if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return 'exceedingMax'
+        return errorKeys.exceedingMax
       }
     }
     return null
@@ -79,8 +85,33 @@ const propsValidations = nodeDefs => ({
   'children': [validateChildren(nodeDefs)]
 })
 
-const validateNodeDef = async (nodeDefs, nodeDef) =>
-  await validate(nodeDef, propsValidations(nodeDefs))
+const validateAdvancedProps = async nodeDef => {
+  const validations = {
+    defaultValues: await NodeDefExpressionValidator.validate(NodeDef.getDefaultValues(nodeDef)),
+    calculatedValues: await NodeDefExpressionValidator.validate(NodeDef.getCalculatedValues(nodeDef)),
+    applicable: await NodeDefExpressionValidator.validate(NodeDef.getApplicable(nodeDef)),
+    validations: await NodeDefValidationsValidator.validate(NodeDef.getNodeDefValidations(nodeDef)),
+  }
+  const invalidValidations = R.reject(R.propEq('valid', true), validations)
+
+  return {
+    fields: invalidValidations,
+    valid: R.isEmpty(invalidValidations),
+  }
+}
+
+const validateNodeDef = async (nodeDefs, nodeDef) => {
+  const nodeDefValidation = await validate(nodeDef, propsValidations(nodeDefs))
+
+  const advancedPropsValidation = await validateAdvancedProps(nodeDef)
+
+  const validation = R.pipe(
+    R.mergeDeepLeft(advancedPropsValidation),
+    R.assoc('valid', nodeDefValidation.valid && advancedPropsValidation.valid)
+  )(nodeDefValidation)
+
+  return validation.valid ? null : validation
+}
 
 const validateNodeDefs = async (nodeDefs) =>
   await Promise.all(nodeDefs.map(async n => ({
