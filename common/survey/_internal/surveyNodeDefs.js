@@ -3,12 +3,11 @@ const R = require('ramda')
 const SurveyCategories = require('./surveyCategories')
 const NodeDef = require('./../nodeDef')
 const Category = require('../category')
-const {toUuidIndexedObj} = require('./../surveyUtils')
 
-const nodeDefs = 'nodeDefs'
+const nodeDefsKey = 'nodeDefs'
 
 // ====== READ
-const getNodeDefs = R.propOr({}, nodeDefs)
+const getNodeDefs = R.propOr({}, nodeDefsKey)
 
 const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
@@ -33,6 +32,11 @@ const getNodeDefKeys = nodeDef => R.pipe(
   R.filter(n => NodeDef.isNodeDefKey(n))
 )
 
+const getNodeDefByName = (name) => R.pipe(
+  getNodeDefsArray,
+  R.find(R.pathEq(['props', 'name'], name))
+)
+
 const getNodeDefsByCategoryUuid = (uuid) => R.pipe(
   getNodeDefsArray,
   R.filter(R.pathEq(['props', 'categoryUuid'], uuid))
@@ -45,7 +49,7 @@ const getNodeDefsByTaxonomyUuid = (uuid) => R.pipe(
 
 // ====== UPDATE
 
-const assocNodeDefs = nodeDefsArray => R.assoc(nodeDefs, toUuidIndexedObj(nodeDefsArray))
+const assocNodeDefs = nodeDefs => R.assoc(nodeDefsKey, nodeDefs)
 
 // ====== HIERARCHY
 
@@ -167,6 +171,7 @@ module.exports = {
   getNodeDefByUuid,
   getNodeDefChildren,
   getNodeDefKeys,
+  getNodeDefByName,
 
   getNodeDefsByCategoryUuid,
   getNodeDefsByTaxonomyUuid,

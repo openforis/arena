@@ -5,8 +5,6 @@ const db = require('../db/db')
 const {selectDate} = require('../db/dbUtils')
 const {getSurveyDBSchema, dbTransformCallback} = require('../survey/surveySchemaRepositoryUtils')
 
-const NodeDef = require('../../common/survey/nodeDef')
-
 const nodeDefSelectFields = (advanced = false) =>
   `id, uuid, parent_uuid, type, deleted, ${selectDate('date_created')}, ${selectDate('date_modified')},  
     props${advanced ? ' || props_advanced' : ''} as props, 
@@ -29,9 +27,6 @@ const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = d
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 }
-
-const createEntityDef = async (surveyId, parentUuid, uuid, props, client = db) =>
-  await createNodeDef(surveyId, parentUuid, uuid, NodeDef.nodeDefType.entity, props, client)
 
 // ============== READ
 
@@ -193,7 +188,6 @@ module.exports = {
 
   //CREATE
   createNodeDef,
-  createEntityDef,
 
   //READ
   fetchNodeDefsBySurveyId,

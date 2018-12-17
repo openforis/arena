@@ -2,6 +2,7 @@ const R = require('ramda')
 const db = require('../db/db')
 
 const SurveyUtils = require('../../common/survey/surveyUtils')
+const NodeDef = require('../../common/survey/nodeDef')
 
 const NodeDefRepository = require('./nodeDefRepository')
 const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
@@ -12,8 +13,8 @@ const ActivityLog = require('../activityLog/activityLogger')
 
 // ======= CREATE
 
-const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props) =>
-  await db.tx(async t => {
+const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props, client = db) =>
+  await client.tx(async t => {
     const nodeDef = await NodeDefRepository.createNodeDef(surveyId, parentUuid, uuid, type, props, t)
 
     await markSurveyDraft(surveyId, t)
@@ -22,6 +23,9 @@ const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props) =>
 
     return nodeDef
   })
+
+const createEntityDef = async (user, surveyId, parentUuid, uuid, props, client = db) =>
+  await createNodeDef(user, surveyId, parentUuid, uuid, NodeDef.nodeDefType.entity, props, client)
 
 // ======= READ
 
@@ -82,6 +86,7 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
 module.exports = {
   //CREATE
   createNodeDef,
+  createEntityDef,
 
   //READ
   fetchNodeDefsBySurveyId,
