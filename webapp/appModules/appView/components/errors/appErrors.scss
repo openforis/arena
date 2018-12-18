@@ -16,7 +16,7 @@
 .app-errors__error {
   background-color: rgba($red, .98);
   margin: 0 .5rem;
-  height: 100px;
+  min-height: 100px;
   padding: .5rem;
   border-radius: .5rem;
   position: relative;

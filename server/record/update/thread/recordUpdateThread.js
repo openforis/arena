@@ -41,9 +41,6 @@ class RecordUpdateThread extends Thread {
       const {user, surveyId} = msg
 
       switch (msg.type) {
-        case messageTypes.createRecord:
-          nodes = await RecordProcessor.createRecord(user, surveyId, msg.record, t)
-          break
         case messageTypes.persistNode:
           nodes = await RecordProcessor.persistNode(user, surveyId, msg.node, t)
           break

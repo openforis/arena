@@ -1,7 +1,6 @@
 import './dataView.scss'
 
 import React from 'react'
-import { Route } from 'react-router'
 
 import TabBar from '../../commonComponents/tabBar'
 
@@ -28,14 +27,6 @@ class DataView extends React.Component {
               label: 'Records',
               component: Records,
               path: appModuleUri(appModules.data),
-            },
-
-            // add record
-            {
-              label: 'Record',
-              component: Record,
-              path: appModuleUri(dataModules.record),
-              showTab: false,
             },
 
             //edit record
