@@ -37,6 +37,7 @@ const sqlTypes = {
   varchar: 'VARCHAR',
   integer: 'INTEGER',
   decimal: `DECIMAL(${16 + 6}, 6)`,
+  point: (srid) => `geometry(Point, ${srid})`,
 }
 
 const props = {
@@ -80,8 +81,11 @@ const props = {
   },
 
   [nodeDefType.coordinate]: {
-    [cols]: ['x', 'y', 'srs'],
-    [colValueProcessor]: nodeValuePropProcessor,
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
+      const {x, y, srs} = Node.getNodeValue(nodeCol)
+      return () => x && y && srs ? `SRID=${srs};POINT(${x} ${y})` : null
+    },
+    [colTypeProcessor]: () => () => sqlTypes.point(-1), // Set srid to -1 (undefined)
   },
 
   [nodeDefType.file]: {

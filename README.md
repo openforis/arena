@@ -28,8 +28,11 @@ To constantly build it when something changes, run:
 
 If you have a Docker server configured locally, just run this command:
 
-```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgres:10.4```
+```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgres:10.4```~~
 
+To install PostGIS together with PostgreSQL, run the following command instead (temporary solution):
+
+```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena kartoza/postgis:10.0-2.4```
 
 Add the db configurations to the **`.env`** file [(see .env section)](#env-file)
 
