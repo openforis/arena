@@ -49,7 +49,7 @@ const callExpression = async (expr, ctx) => {
   )
   const res = await R.apply(fn, args)
 
-  console.log('== CALLEE = RES ', res)
+  // console.log('== CALLEE = RES ', res)
   return res
 }
 
@@ -100,11 +100,9 @@ const defaultFunctions = {
 const evalExpression = async (expr, ctx) => {
   const functions = R.pipe(
     R.prop('functions'),
-    R.mergeLeft(defaultFunctions)
+    R.mergeRight(defaultFunctions)
   )(ctx)
 
-  console.log('functions',functions)
-  console.log('ctx',ctx.functions)
   return await functions[expr.type](expr, ctx)
 }
 

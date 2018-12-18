@@ -33,11 +33,10 @@ const getNodeDefChildByName = (nodeDef, childName) =>
     R.find(childDef => childName === NodeDef.getNodeDefName(childDef))
   )
 
-const getNodeDefSiblingByName = (nodeDef, name) =>
-  R.pipe(
-    getNodeDefParent(nodeDef),
-    getNodeDefChildByName(nodeDef, name)
-  )
+const getNodeDefSiblingByName = (nodeDef, name) => survey => {
+  const parentDef = getNodeDefParent(nodeDef)(survey)
+  return getNodeDefChildByName(parentDef, name)(survey)
+}
 
 const getNodeDefKeys = nodeDef => R.pipe(
   getNodeDefChildren(nodeDef),

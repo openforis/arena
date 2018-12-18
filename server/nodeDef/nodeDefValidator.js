@@ -10,6 +10,7 @@ const {
 } = require('../../common/validation/validator')
 
 const Survey = require('../../common/survey/survey')
+const SurveyUtils = require('../../common/survey/surveyUtils')
 const NodeDef = require('../../common/survey/nodeDef')
 const NodeDefLayout = require('../../common/survey/nodeDefLayout')
 
@@ -89,10 +90,10 @@ const propsValidations = (survey, nodeDef) => ({
 
 const validateAdvancedProps = async (survey, nodeDef) => {
   const validations = {
-    defaultValues: await NodeDefExpressionsValidator.validate(survey, nodeDef)('props.defaultValues', nodeDef),
+    defaultValues: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getDefaultValues(nodeDef)),
     calculatedValues: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getCalculatedValues(nodeDef)),
     applicable: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getApplicable(nodeDef)),
-    validations: await NodeDefValidationsValidator.validate(survey, nodeDef, NodeDef.getValidations(nodeDef)),
+    validations: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getValidationExpressions(nodeDef)),
   }
   const invalidValidations = R.reject(R.propEq('valid', true), validations)
 
@@ -118,10 +119,16 @@ const validateNodeDef = async (survey, nodeDef) => {
 const validateNodeDefs = async (nodeDefs) => {
   const survey = Survey.assocNodeDefs(nodeDefs)({})
 
-  return await Promise.all(nodeDefs.map(async n => ({
-    ...n,
-    validation: await validateNodeDef(survey, n)
-  })))
+  const nodeDefsValidated = await Promise.all(
+    Survey.getNodeDefsArray(survey).map(
+      async n => ({
+        ...n,
+        validation: await validateNodeDef(survey, n)
+      })
+    )
+  )
+
+  return SurveyUtils.toUuidIndexedObj(nodeDefsValidated)
 }
 
 module.exports = {
