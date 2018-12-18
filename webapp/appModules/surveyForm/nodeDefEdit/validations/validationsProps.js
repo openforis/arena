@@ -14,7 +14,7 @@ const ValidationsProps = props => {
   const {nodeDef, readOnly, putNodeDefProp} = props
 
   const {validation} = nodeDef
-  const nodeDefValidations = NodeDef.getNodeDefValidations(nodeDef)
+  const nodeDefValidations = NodeDef.getValidations(nodeDef)
 
   const handleValidationsUpdate = validations =>
     putNodeDefProp(nodeDef, 'validations', validations, true)

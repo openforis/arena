@@ -15,6 +15,8 @@ CREATE TABLE
   props         jsonb              DEFAULT '{}'::jsonb,
   props_draft   jsonb              DEFAULT '{}'::jsonb,
 
+  meta          jsonb              DEFAULT '{}'::jsonb,
+
   owner_id      bigint    NOT NULL,
 
   PRIMARY KEY (id),

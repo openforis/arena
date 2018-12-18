@@ -14,16 +14,19 @@ class NodeDefsValidationJob extends Job {
   }
 
   async execute (tx) {
-    const validatedIndexedNodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(this.surveyId, true, true, tx)
+    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(this.surveyId, true, true, true, tx)
 
-    const invalidNodeDefs = R.pipe(
+    const nodeDefsInvalid = R.pipe(
       R.values,
       R.reject(nodeDef => Validator.isValid(nodeDef))
-    )(validatedIndexedNodeDefs)
+    )(nodeDefs)
 
-    if (!R.isEmpty(invalidNodeDefs)) {
-      this.errors = R.reduce((acc, nodeDef) => R.assoc(NodeDef.getNodeDefName(nodeDef),
-        Validator.getInvalidFieldValidations(nodeDef.validation), acc), {}, invalidNodeDefs)
+    if (!R.isEmpty(nodeDefsInvalid)) {
+      this.errors = R.reduce(
+        (acc, nodeDef) => R.assoc(NodeDef.getNodeDefName(nodeDef), Validator.getInvalidFieldValidations(nodeDef.validation), acc),
+        {},
+        nodeDefsInvalid
+      )
       this.setStatusFailed()
     }
   }

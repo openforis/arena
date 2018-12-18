@@ -1,7 +1,7 @@
 const db = require('../db/db')
-const R  = require('ramda')
+const R = require('ramda')
 
-const {getSurveyDBSchema, dbTransformCallback} = require('./surveySchemaRepositoryUtils')
+const {dbTransformCallback} = require('./surveySchemaRepositoryUtils')
 const {selectDate} = require('../db/dbUtils')
 
 const surveySelectFields = (alias = '') => {
@@ -47,14 +47,14 @@ const fetchSurveys = async (user, checkAccess = true, client = db) =>
 
 const getSurveysByName = async (surveyName, client = db) =>
   await client.map(
-      `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
+    `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
     def => dbTransformCallback(def)
   )
 
 const getSurveyById = async (surveyId, draft = false, client = db) =>
   await client.one(
-      `SELECT ${surveySelectFields()} FROM survey WHERE id = $1`,
+    `SELECT ${surveySelectFields()} FROM survey WHERE id = $1`,
     [surveyId],
     def => dbTransformCallback(def, draft)
   )
@@ -89,11 +89,22 @@ const publishSurveyProps = async (surveyId, client = db) =>
     `, [surveyId]
   )
 
-// ============== DELETE
-const deleteSurvey = async (id, client = db) => {
-  await client.query(`DROP SCHEMA ${getSurveyDBSchema(id)} CASCADE`)
-  await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
+const updateSurveyDependencyGraphs = async (surveyId, dependencyGraphs, client = db) => {
+  const meta = {
+    dependencyGraphs
+  }
+  return await client.one(`
+    UPDATE survey
+    SET meta = meta || $1::jsonb
+    WHERE id = $2
+    RETURNING ${surveySelectFields()}
+    `, [meta, surveyId]
+  )
 }
+
+// ============== DELETE
+const deleteSurvey = async (id, client = db) =>
+  await client.one(`DELETE FROM survey WHERE id = $1 RETURNING id`, [id])
 
 const deleteSurveyLabel = async (id, langCode, client = db) =>
   await deleteSurveyProp(id, ['labels', langCode], client)
@@ -121,6 +132,7 @@ module.exports = {
   //UPDATE
   updateSurveyProp,
   publishSurveyProps,
+  updateSurveyDependencyGraphs,
 
   //DELETE
   deleteSurvey,

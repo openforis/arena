@@ -51,7 +51,11 @@ const validateKeyAttributes = (nodeDefs) =>
       const keyAttributesCount = countKeyAttributes(nodeDef)(nodeDefs)
 
       if (keyAttributesCount === 0 &&
-        (NodeDef.isNodeDefRoot(nodeDef) || NodeDefLayout.isRenderForm(nodeDef))) {
+        (
+          NodeDef.isNodeDefRoot(nodeDef) ||
+          (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isNodeDefMultiple(nodeDef))
+        )
+      ) {
         return errorKeys.empty
       } else if (keyAttributesCount > NodeDef.maxKeyAttributes) {
         return errorKeys.exceedingMax
@@ -90,7 +94,7 @@ const validateAdvancedProps = async nodeDef => {
     defaultValues: await NodeDefExpressionValidator.validate(NodeDef.getDefaultValues(nodeDef)),
     calculatedValues: await NodeDefExpressionValidator.validate(NodeDef.getCalculatedValues(nodeDef)),
     applicable: await NodeDefExpressionValidator.validate(NodeDef.getApplicable(nodeDef)),
-    validations: await NodeDefValidationsValidator.validate(NodeDef.getNodeDefValidations(nodeDef)),
+    validations: await NodeDefValidationsValidator.validate(NodeDef.getValidations(nodeDef)),
   }
   const invalidValidations = R.reject(R.propEq('valid', true), validations)
 
