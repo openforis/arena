@@ -8,6 +8,9 @@ const Node = require('../../../common/record/node')
 const CategoryManager = require('../../category/categoryManager')
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
+const {isBlank, trim} = require('../../../common/stringUtils')
+const {isValid} = require('../../../common/dateUtils')
+
 const {nodeDefType} = NodeDef
 
 const cols = 'cols'
@@ -37,7 +40,9 @@ const sqlTypes = {
   varchar: 'VARCHAR',
   integer: 'INTEGER',
   decimal: `DECIMAL(${16 + 6}, 6)`,
-  point: (srid) => `geometry(Point, ${srid})`,
+  date: 'DATE',
+  time: 'TIME WITHOUT TIME ZONE',
+  point: 'geometry(Point)',
 }
 
 const props = {
@@ -53,6 +58,22 @@ const props = {
   [nodeDefType.decimal]: {
     //TODO used in ui nodeDefSystemProps
     [colTypeProcessor]: () => () => sqlTypes.decimal,
+  },
+
+  [nodeDefType.date]: {
+    [colTypeProcessor]: () => () => sqlTypes.date,
+    [colValueProcessor]: (surveyInfo, nodeDefCol, nodeCol) => {
+      const [day, month, year] = Node.getNodeValue(nodeCol, '').split('/').map(trim)
+      return () => isValid(year, month, day) ? `${year}-${month}-${day}` : null
+    }
+  },
+
+  [nodeDefType.time]: {
+    [colTypeProcessor]: () => () => sqlTypes.time,
+    [colValueProcessor]: (surveyInfo, nodeDefCol, nodeCol) => {
+      const [hour, minute] = Node.getNodeValue(nodeCol, '').split(':').map(trim)
+      return () => hour !== '' && minute !== '' ? `${hour}:${minute}:00` : null
+    }
   },
 
   [nodeDefType.code]: {
@@ -83,9 +104,10 @@ const props = {
   [nodeDefType.coordinate]: {
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const {x, y, srs} = Node.getNodeValue(nodeCol)
-      return () => x && y && srs ? `SRID=${srs};POINT(${x} ${y})` : null
+      const srid = isBlank(srs) ? Survey.getDefaultSRS(surveyInfo).code : srs
+      return () => isBlank(x) || isBlank(y) ? null : `SRID=${srid};POINT(${x} ${y})`
     },
-    [colTypeProcessor]: () => () => sqlTypes.point(-1), // Set srid to -1 (undefined)
+    [colTypeProcessor]: () => () => sqlTypes.point,
   },
 
   [nodeDefType.file]: {

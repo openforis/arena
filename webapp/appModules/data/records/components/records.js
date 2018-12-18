@@ -19,7 +19,7 @@ import {
   getRecordsNodeDefKeys,
   getRecordsOffset
 } from '../recordsState'
-import { getRelativeDate } from '../../../../appUtils/dateUtils'
+import { getRelativeDate } from '../../../../../common/dateUtils'
 
 import { initRecordsList, fetchRecords } from '../actions'
 import { getStateSurveyInfo } from '../../../../survey/surveyState'

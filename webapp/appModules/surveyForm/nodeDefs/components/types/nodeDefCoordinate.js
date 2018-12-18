@@ -2,6 +2,8 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { FormItem, Input } from '../../../../../commonComponents/form/input'
+import createNumberMask from 'text-mask-addons/dist/createNumberMask';
+
 import Dropdown from '../../../../../commonComponents/form/dropdown'
 
 import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
@@ -10,6 +12,18 @@ import Survey from '../../../../../../common/survey/survey'
 import { getNodeDefDefaultValue } from '../../nodeDefSystemProps'
 
 class NodeDefCoordinate extends React.Component {
+
+  constructor(props) {
+    super(props)
+
+    this.numberMask = createNumberMask({
+      prefix: '',
+      includeThousandsSeparator: false,
+      allowDecimal: true,
+      decimalLimit: 12,
+      allowNegative: true,
+    })
+  }
 
   handleInputChange (node, field, value) {
     const {nodeDef, updateNode} = this.props
@@ -29,11 +43,13 @@ class NodeDefCoordinate extends React.Component {
     const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)
 
     const xInput = <Input ref="xInput"
+                          mask={this.numberMask}
                           readOnly={edit}
                           value={value.x}
                           onChange={value => this.handleInputChange(node, 'x', value)}/>
 
     const yInput = <Input ref="yInput"
+                          mask={this.numberMask}
                           readOnly={edit}
                           value={value.y}
                           onChange={value => this.handleInputChange(node, 'y', value)}/>
