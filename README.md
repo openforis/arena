@@ -31,8 +31,6 @@ If you have a Docker server configured locally, just run this command:
 
 ```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena mdillon/postgis:11```
 
-```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena kartoza/postgis:10.0-2.4```
-
 Add the db configurations to the **`.env`** file [(see .env section)](#env-file)
 
 #### To restart the database server
