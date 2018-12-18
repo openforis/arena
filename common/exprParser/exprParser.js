@@ -49,9 +49,8 @@ const callExpression = async (expr, ctx) => {
   )
   const res = await R.apply(fn, args)
 
-  // console.log('== CALLEE = RES ', res)
+  console.log('== CALLEE = RES ', res)
   return res
-
 }
 
 const literalExpression = expr => {
@@ -101,34 +100,18 @@ const defaultFunctions = {
 const evalExpression = async (expr, ctx) => {
   const functions = R.pipe(
     R.prop('functions'),
-    R.merge(defaultFunctions)
+    R.mergeLeft(defaultFunctions)
   )(ctx)
 
+  console.log('functions',functions)
+  console.log('ctx',ctx.functions)
   return await functions[expr.type](expr, ctx)
 }
 
-const evalQuery = async (query, ctx) => {
-  const expr = jsep(query)
-  return await evalExpression(expr, ctx)
-}
-
-const validateExpression = query => {
-  try {
-    jsep(query)
-    return {
-      valid: true
-    }
-  } catch (e) {
-    return {
-      valid: false,
-      errors: [e.description]
-    }
-  }
-}
+const evalQuery = async (query, ctx) => await evalExpression(jsep(query), ctx)
 
 module.exports = {
   expressionTypes,
   evalExpression,
   evalQuery,
-  validateExpression
 }

@@ -27,6 +27,18 @@ const getNodeDefByUuid = uuid => R.pipe(getNodeDefs, R.propOr(null, uuid))
 
 const getNodeDefChildren = nodeDef => getNodeDefsByParentUuid(nodeDef.uuid)
 
+const getNodeDefChildByName = (nodeDef, childName) =>
+  R.pipe(
+    getNodeDefChildren(nodeDef),
+    R.find(childDef => childName === NodeDef.getNodeDefName(childDef))
+  )
+
+const getNodeDefSiblingByName = (nodeDef, name) =>
+  R.pipe(
+    getNodeDefParent(nodeDef),
+    getNodeDefChildByName(nodeDef, name)
+  )
+
 const getNodeDefKeys = nodeDef => R.pipe(
   getNodeDefChildren(nodeDef),
   R.filter(n => NodeDef.isNodeDefKey(n))
@@ -170,6 +182,8 @@ module.exports = {
   getRootNodeDef,
   getNodeDefByUuid,
   getNodeDefChildren,
+  getNodeDefChildByName,
+  getNodeDefSiblingByName,
   getNodeDefKeys,
   getNodeDefByName,
 

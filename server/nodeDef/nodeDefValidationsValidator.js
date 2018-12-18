@@ -1,20 +1,12 @@
-const R = require('ramda')
+const Validator = require('../../common/validation/validator')
+const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 
-const NodeDefValidations = require('../../common/survey/nodeDefValidations')
-const NodeDefExpressionValidator = require('./nodeDefExpressionValidator')
+const propsValidations = (survey, nodeDef) => ({
+  'expressions': [NodeDefExpressionsValidator.validate(survey, nodeDef)]
+})
 
-const validate = async nodeDefValidations => {
-  const fieldValidations = {
-    expressions: await NodeDefExpressionValidator.validate(NodeDefValidations.getExpressions(nodeDefValidations)),
-  }
-  //TODO why filtering again?
-  const invalidFieldValidations = R.reject(R.propEq('valid', true), fieldValidations)
-
-  return {
-    valid: R.isEmpty(invalidFieldValidations),
-    fields: invalidFieldValidations
-  }
-}
+const validate = async (survey, nodeDef, nodeDefValidations) =>
+  await Validator.validate(nodeDefValidations, propsValidations(survey, nodeDef))
 
 module.exports = {
   validate
