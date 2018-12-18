@@ -2,6 +2,7 @@ const R = require('ramda')
 const Promise = require('bluebird')
 
 const {
+  errorKeys,
   validate,
   validateRequired,
   validateItemPropUniqueness,
@@ -51,12 +52,12 @@ const getChildrenItems = (items, parentItemUuid) =>
 
 const validateNotEmptyChildrenItems = (isLeaf, items) => (propName, item) =>
   !isLeaf && R.isEmpty(getChildrenItems(items, item.uuid))
-    ? 'empty'
+    ? errorKeys.empty
     : null
 
 const validateNotEmptyFirstLevelItems = items => (propName, level) =>
   Category.getLevelIndex(level) === 0 && R.isEmpty(getChildrenItems(items, null))
-    ? 'empty'
+    ? errorKeys.empty
     : null
 
 const validateItem = async (category, items, itemUuid) => {

@@ -1,5 +1,6 @@
 const Promise = require('bluebird')
 const R = require('ramda')
+
 const db = require('../db/db')
 
 const {publishSurveySchemaTableProps, markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
@@ -66,14 +67,14 @@ const insertItem = async (user, surveyId, item) =>
   })
 
 // ====== READ
-const fetchCategoriesAndLevels = async (surveyId, draft) => {
-  const categoriesDb = await CategoryRepository.fetchCategoriesBySurveyId(surveyId, draft)
+const fetchCategoriesAndLevels = async (surveyId, draft, client = db) => {
+  const categoriesDb = await CategoryRepository.fetchCategoriesBySurveyId(surveyId, draft, client)
 
   return await Promise.all(
     categoriesDb.map(async category => ({
       ...category,
       levels: toIndexedObj(
-        await CategoryRepository.fetchLevelsByCategoryUuid(surveyId, category.uuid, draft),
+        await CategoryRepository.fetchLevelsByCategoryUuid(surveyId, category.uuid, draft, client),
         'index'
       ),
     }))
@@ -89,8 +90,8 @@ const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, valida
     : category
 }
 
-const fetchCategoriesBySurveyId = async (surveyId, draft = false, validate = true) => {
-  const categories = await fetchCategoriesAndLevels(surveyId, draft)
+const fetchCategoriesBySurveyId = async (surveyId, draft = false, validate = true, client = db) => {
+  const categories = await fetchCategoriesAndLevels(surveyId, draft, client)
 
   return validate
     ? await Promise.all(
@@ -196,4 +197,5 @@ module.exports = {
   deleteCategory,
   deleteLevel,
   deleteItem,
+  deleteItemLabels: CategoryRepository.deleteItemLabels
 }

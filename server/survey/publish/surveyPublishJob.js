@@ -5,25 +5,22 @@ const CategoriesValidationJob = require('./categoriesValidationJob')
 const TaxonomiesValidationJob = require('./taxonomiesValidationJob')
 const SurveyInfoValidationJob = require('./surveyInfoValidationJob')
 const SurveyPropsPublishJob = require('./surveyPropsPublishJob')
+const SurveyDependencyGraphsGenerationJob = require('./surveyDependencyGraphsGenerationJob')
 const SurveyRdbGeneratorJob = require('./surveyRdbGeneratorJob')
-
-const getDefaultInnerJobs = (params) => [
-  new NodeDefsValidationJob(params),
-  new CategoriesValidationJob(params),
-  new TaxonomiesValidationJob(params),
-  new SurveyInfoValidationJob(params),
-  new SurveyPropsPublishJob(params),
-  new SurveyRdbGeneratorJob(params),
-]
 
 class SurveyPublishJob extends Job {
 
-  constructor (params, innerJobs = getDefaultInnerJobs(params)) {
-
-    super(SurveyPublishJob.type, params, innerJobs)
-
+  constructor (params) {
+    super(SurveyPublishJob.type, params, [
+      new NodeDefsValidationJob(params),
+      new CategoriesValidationJob(params),
+      new TaxonomiesValidationJob(params),
+      new SurveyInfoValidationJob(params),
+      new SurveyPropsPublishJob(params),
+      new SurveyDependencyGraphsGenerationJob(params),
+      new SurveyRdbGeneratorJob(params),
+    ])
   }
-
 }
 
 SurveyPublishJob.type = 'SurveyPublishJob'

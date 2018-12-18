@@ -1,7 +1,5 @@
 const R = require('ramda')
 
-const db = require('../db/db')
-
 const Job = require('../job/job')
 
 const {languageCodes} = require('../../common/app/languages')
@@ -37,7 +35,7 @@ class TaxonomyImportJob extends Job {
     this.taxaInsertBuffer = []
   }
 
-  async execute () {
+  async execute (tx) {
     let csvParser = new CSVParser(this.csvString)
     this.total = await csvParser.calculateSize()
 
@@ -55,47 +53,43 @@ class TaxonomyImportJob extends Job {
 
     csvParser = new CSVParser(this.csvString)
 
-    await db.tx(async t => {
-      const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, t)
+    const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
-      if (taxonomy.published) {
-        throw new Error('cannot overwrite published taxa')
-      }
+    if (taxonomy.published) {
+      throw new Error('cannot overwrite published taxa')
+    }
 
-      //delete old draft taxa
-      await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t)
+    //delete old draft taxa
+    await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)
 
-      let row = await csvParser.next()
+    let row = await csvParser.next()
 
-      while (row) {
-        if (this.isCanceled()) {
-          csvParser.destroy()
-          break
-        } else {
-          await this.processRow(row, t)
-        }
-        row = await csvParser.next()
-      }
-
+    while (row) {
       if (this.isCanceled()) {
-        throw new Error('canceled; rollback transaction')
+        csvParser.destroy()
+        break
       } else {
-        const hasErrors = !R.isEmpty(R.keys(this.errors))
-        if (hasErrors) {
-          this.setStatusFailed()
-          throw new Error('errors found; rollback transaction')
-        } else {
-          await this.flushTaxaInsertBuffer(t)
-
-          //set vernacular lang codes in taxonomy
-          //set log to false temporarily; set user to null as it's only needed for logging
-          await TaxonomyManager.updateTaxonomyProp(this.user, surveyId, taxonomy.uuid,
-            'vernacularLanguageCodes', this.vernacularLanguageCodes, t)
-
-          this.setStatusSucceeded()
-        }
+        await this.processRow(row, tx)
       }
-    })
+      row = await csvParser.next()
+    }
+
+    if (this.isCanceled()) {
+      throw new Error('canceled; rollback transaction')
+    } else {
+      const hasErrors = !R.isEmpty(R.keys(this.errors))
+      if (hasErrors) {
+        this.setStatusFailed()
+        throw new Error('errors found; rollback transaction')
+      } else {
+        await this.flushTaxaInsertBuffer(tx)
+
+        //set vernacular lang codes in taxonomy
+        //set log to false temporarily; set user to null as it's only needed for logging
+        await TaxonomyManager.updateTaxonomyProp(this.user, surveyId, taxonomy.uuid,
+          'vernacularLanguageCodes', this.vernacularLanguageCodes, tx)
+      }
+    }
 
     csvParser.destroy()
   }

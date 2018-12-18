@@ -1,23 +1,24 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/dbMigrator')
 const {uuidv4} = require('../../common/uuid')
+const {getSurveyDBSchema} = require('./surveySchemaRepositoryUtils')
+const SurveyRdbManager = require('../surveyRdb/surveyRdbManager')
 
-const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
-
-const surveyRepository = require('../survey/surveyRepository')
+const SurveyRepository = require('../survey/surveyRepository')
 const Survey = require('../../common/survey/survey')
-const {validateSurvey} = require('../survey/surveyValidator')
+const SurveyValidator = require('../survey/surveyValidator')
 
-const nodeDefRepository = require('../nodeDef/nodeDefRepository')
+const NodeDefManager = require('../nodeDef/nodeDefManager')
 const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/nodeDefLayout')
 
-const {deleteUserPref, updateUserPref} = require('../user/userRepository')
+const UserRepository = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
 
-const authGroupRepository = require('../authGroup/authGroupRepository')
-const {isSystemAdmin} = require('../../common/auth/authManager')
+const AuthGroupRepository = require('../authGroup/authGroupRepository')
+const AuthManager = require('../../common/auth/authManager')
 
 const ActivityLog = require('../activityLog/activityLogger')
 
@@ -39,7 +40,7 @@ const createSurvey = async (user, {name, label, lang}) => {
       const userId = user.id
 
       // create the survey
-      const survey = await surveyRepository.insertSurvey(props, userId, t)
+      const survey = await SurveyRepository.insertSurvey(props, userId, t)
       const {id: surveyId} = survey
 
       // create survey's root entity props
@@ -54,18 +55,17 @@ const createSurvey = async (user, {name, label, lang}) => {
       //create survey data schema
       await migrateSurveySchema(survey.id)
 
-      await nodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
+      await NodeDefManager.createEntityDef(user, surveyId, null, uuidv4(), rootEntityDefProps, t)
 
       // update user prefs
-      await updateUserPref(user, userPrefNames.survey, surveyId, t)
+      await UserRepository.updateUserPref(user, userPrefNames.survey, surveyId, t)
 
       // create default groups for this survey
 
-      const authGroups = await authGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
-      survey.authGroups = authGroups
+      survey.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
 
-      if (!isSystemAdmin(user)) {
-        await authGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
+      if (!AuthManager.isSystemAdmin(user)) {
+        await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
       }
 
       await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, {name, label, lang, uuid: survey.uuid}, t)
@@ -78,29 +78,38 @@ const createSurvey = async (user, {name, label, lang}) => {
 }
 
 // ====== READ
-const fetchSurveyById = async (id, draft = false, validate = false) => {
-  const survey = await surveyRepository.getSurveyById(id, draft)
-  const authGroups = await authGroupRepository.fetchSurveyGroups(survey.id)
+const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
+  const surveyInfo = await SurveyRepository.getSurveyById(surveyId, draft, client)
+  const authGroups = await AuthGroupRepository.fetchSurveyGroups(surveyInfo.id, client)
 
   return assocSurveyInfo({
-    ...survey,
+    ...surveyInfo,
     authGroups,
-    validation: validate ? await validateSurvey(survey) : null
+    validation: validate ? await SurveyValidator.validateSurveyInfo(surveyInfo) : null
   })
+}
+
+const fetchSurveyAndNodeDefsBySurveyId = async (id, draft = false, advanced = false, validate = false, client = db) => {
+  const survey = await fetchSurveyById(id, draft, validate, client)
+  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(id, draft, advanced, validate, client)
+  return Survey.assocNodeDefs(nodeDefs)(survey)
 }
 
 const fetchUserSurveysInfo = async (user) => R.map(
   assocSurveyInfo,
-  await surveyRepository.fetchSurveys(user, !isSystemAdmin(user))
+  await SurveyRepository.fetchSurveys(user, !AuthManager.isSystemAdmin(user))
 )
 
 // ====== UPDATE
-const updateSurveyProp = async (id, key, value, user) =>
+const updateSurveyProp = async (surveyId, key, value, user) =>
   await db.tx(
     async t => {
-      await ActivityLog.log(user, id, ActivityLog.type.surveyPropUpdate, {key, value}, t)
+      await Promise.all([
+        ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, {key, value}, t),
+        SurveyRepository.updateSurveyProp(surveyId, key, value, t)
+      ])
 
-      return assocSurveyInfo(await surveyRepository.updateSurveyProp(id, key, value))
+      return await fetchSurveyById(surveyId, true, true, t)
     })
 
 // ====== DELETE
@@ -109,9 +118,12 @@ const deleteSurvey = async (id, user) => {
 
     const userPrefSurveyId = getUserPrefSurveyId(user)
     if (userPrefSurveyId === id)
-      await deleteUserPref(user, userPrefNames.survey, t)
+      await UserRepository.deleteUserPref(user, userPrefNames.survey, t)
 
-    await surveyRepository.deleteSurvey(id, t)
+    await t.query(`DROP SCHEMA ${getSurveyDBSchema(id)} CASCADE`)
+    await SurveyRdbManager.dropSchema(id, t)
+
+    await SurveyRepository.deleteSurvey(id, t)
   })
 }
 
@@ -121,11 +133,16 @@ module.exports = {
 
   // ====== READ
   fetchSurveyById,
+  fetchSurveyAndNodeDefsBySurveyId,
   fetchUserSurveysInfo,
 
   // ====== UPDATE
   updateSurveyProp,
+  publishSurveyProps: SurveyRepository.publishSurveyProps,
+  updateSurveyDependencyGraphs: SurveyRepository.updateSurveyDependencyGraphs,
 
-// ====== DELETE
+  // ====== DELETE
   deleteSurvey,
+  deleteSurveyLabel: SurveyRepository.deleteSurveyLabel,
+  deleteSurveyDescription: SurveyRepository.deleteSurveyDescription
 }

@@ -1,4 +1,11 @@
 const path = require('path')
+const db = require('../../db/db')
+
+const SurveyManager = require('../../survey/surveyManager')
+const NodeDefManager = require('../../nodeDef/nodeDefManager')
+const SurveyRdbManager = require('../../surveyRdb/surveyRdbManager')
+const Survey = require('../../../common/survey/survey')
+const Node = require('../../../common/record/node')
 
 const WebSocketManager = require('../../webSocket/webSocketManager')
 const WebSocketEvents = require('../../../common/webSocket/webSocketEvents')
@@ -10,6 +17,9 @@ const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 
 const recordUpdateThreads = new ThreadsCache()
 const checkOutTimeoutsByUserId = {}
+
+// const RecordProcessor = require('./thread/recordProcessor')
+const RecordUpdateThread = require('./thread/recordUpdateThread')
 
 const createRecordUpdateThread = (user, surveyId) => {
   const userId = user.id
@@ -56,15 +66,17 @@ const cancelCheckOut = userId => {
 }
 
 /**
- * Create a new record
+ * Create a new record and adds the root entity
+ * It internally uses an instance of RecordUpdateThread to simulate the behaviour in the main event loop
  *
  * @param user
  * @param surveyId
  * @param record
+ * @returns {Promise<void>}
  */
-const createRecord = (user, surveyId, record) => {
-  const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
+const createRecord = async (user, surveyId, record) => {
+  const recordUpdateThread = RecordUpdateThread.newInstance()
+  await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
 }
 
 /**

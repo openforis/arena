@@ -1,10 +1,18 @@
+const {isMainThread} = require('worker_threads')
+
 const db = require('../../../db/db')
+
 const RecordProcessor = require('./recordProcessor')
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
-const Queue = require('../../../../common/queue')
+const SurveyManager = require('../../../survey/surveyManager')
+const NodeDefManager = require('../../../nodeDef/nodeDefManager')
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
+
+const Survey = require('../../../../common/survey/survey')
+const Node = require('../../../../common/record/node')
+const Queue = require('../../../../common/queue')
 
 class RecordUpdateThread extends Thread {
 
@@ -52,13 +60,21 @@ class RecordUpdateThread extends Thread {
           break
       }
 
-      this.postMessage(nodes)
+      if (!isMainThread)
+        this.postMessage(nodes)
 
-      await SurveyRdbManager.updateTableNodes(surveyId, nodes, t)
+      const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
+      const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, t)
+      await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, nodes, t)
 
     })
   }
 
 }
 
-new RecordUpdateThread()
+if (!isMainThread)
+  new RecordUpdateThread()
+
+module.exports = {
+  newInstance: () => new RecordUpdateThread()
+}

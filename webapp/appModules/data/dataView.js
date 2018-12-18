@@ -37,14 +37,6 @@ class DataView extends React.Component {
               path: appModuleUri(appModules.data),
             },
 
-            // add record
-            {
-              label: 'Record',
-              component: RecordView,
-              path: appModuleUri(dataModules.record),
-              showTab: false,
-            },
-
             //edit record
             {
               label: 'Record',
@@ -55,7 +47,7 @@ class DataView extends React.Component {
 
             //edit record
             {
-              label: 'Data visualization',
+              label: 'Data vis',
               component: DataVisView,
               path: appModuleUri(dataModules.dataVis),
             },

@@ -4,11 +4,13 @@ import * as R from 'ramda'
 
 import SurveyFormView from '../../../surveyForm/surveyFormView'
 
-import { getRecord } from '../../../surveyForm/record/recordState'
-import { getSurveyForm } from '../../../surveyForm/surveyFormState'
+import Record from '../../../../../common/record/record'
+
+import * as RecordState from '../../../surveyForm/record/recordState'
+import * as SurveyFormState from '../../../surveyForm/surveyFormState'
 
 import { resetForm } from '../../../surveyForm/actions'
-import { createRecord, checkInRecord, checkOutRecord } from '../../../surveyForm/record/actions'
+import { checkInRecord, checkOutRecord } from '../../../surveyForm/record/actions'
 
 import { appModules, appModuleUri } from '../../../appModules'
 
@@ -21,20 +23,8 @@ class RecordView extends React.Component {
   }
 
   componentDidMount () {
-    const {
-      resetForm,
-      createRecord, checkInRecord,
-      match
-    } = this.props
-
-    resetForm()
-
-    const recordUuid = R.path(['params', 'recordUuid'], match)
-    if (recordUuid) {
-      checkInRecord(recordUuid)
-    } else {
-      createRecord()
-    }
+    const {checkInRecord, recordUuidUrlParam} = this.props
+    checkInRecord(recordUuidUrlParam)
 
     window.addEventListener('beforeunload', this.componentUnload)
   }
@@ -45,16 +35,16 @@ class RecordView extends React.Component {
 
     // record has been deleted
     if (prevRecordUuid && !recordUuid)
-      history.replace(appModuleUri(appModules.data))
+      history.push(appModuleUri(appModules.data))
   }
 
   componentWillUnmount () {
-    this.props.resetForm()
     this.componentUnload()
     window.removeEventListener('beforeunload', this.componentUnload)
   }
 
   componentUnload () {
+    this.props.resetForm()
     this.props.checkOutRecord()
   }
 
@@ -67,18 +57,17 @@ class RecordView extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
-  const record = getRecord(getSurveyForm(state))
+const mapStateToProps = (state, {match}) => {
+  const surveyForm = SurveyFormState.getSurveyForm(state)
+  const record = RecordState.getRecord(surveyForm)
 
   return {
-    recordUuid: R.prop('uuid', record)
+    recordUuid: Record.getUuid(record),
+    recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
   }
 }
 
 export default connect(
   mapStateToProps,
-  {
-    resetForm,
-    createRecord, checkInRecord, checkOutRecord,
-  }
+  {resetForm, checkInRecord, checkOutRecord}
 )(RecordView)

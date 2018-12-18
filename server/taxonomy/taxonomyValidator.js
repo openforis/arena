@@ -1,4 +1,5 @@
 const {
+  errorKeys,
   validate,
   validateRequired,
   validateItemPropUniqueness,
@@ -9,7 +10,7 @@ const {
  * ====== TAXONOMY
  */
 const validateNotEmptyTaxa = taxaCount => () =>
-  taxaCount === 0 ? ['empty'] : null
+  taxaCount === 0 ? [errorKeys.empty] : null
 
 const taxonomyValidators = (taxonomies, taxaCount) => ({
   'props.name': [validateRequired, validateNotKeyword, validateItemPropUniqueness(taxonomies)],

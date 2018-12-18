@@ -1,21 +1,18 @@
 const R = require('ramda')
 
-const db = require('../../db/db')
-
 const Job = require('../../job/job')
 
-const NodeDefRepository = require('../../nodeDef/nodeDefRepository')
-const SurveyRepository = require('../surveyRepository')
+const NodeDefManager = require('../../nodeDef/nodeDefManager')
+const SurveyManager = require('../surveyManager')
 const CategoryManager = require('../../category/categoryManager')
-const CategoryRepository = require('../../category/categoryRepository')
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
 const determineDeletedLanguages = async (surveyId, t) => {
-  const survey = await SurveyRepository.getSurveyById(surveyId, true, t)
+  const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, t)
   if (survey.published) {
-    const publishedSurvey = await SurveyRepository.getSurveyById(surveyId, false, t)
+    const publishedSurvey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
     return R.difference(publishedSurvey.props.languages, survey.props.languages)
   } else {
     return []
@@ -28,35 +25,34 @@ class SurveyPropsPublishJob extends Job {
     super(SurveyPropsPublishJob.type, params)
   }
 
-  async execute () {
+  async execute (tx) {
     this.total = 8
 
     const id = this.surveyId
 
-    await db.tx(async t => {
-      const deletedLanguages = await determineDeletedLanguages(id, t)
+    const deletedLanguages = await determineDeletedLanguages(id, tx)
+    this.incrementProcessedItems()
 
-      await NodeDefRepository.publishNodeDefsProps(id, t)
-      this.incrementProcessedItems()
+    await NodeDefManager.publishNodeDefsProps(id, tx)
+    this.incrementProcessedItems()
 
-      await NodeDefRepository.permanentlyDeleteNodeDefs(id, t)
-      this.incrementProcessedItems()
+    await NodeDefManager.permanentlyDeleteNodeDefs(id, tx)
+    this.incrementProcessedItems()
 
-      await CategoryManager.publishProps(id, t)
-      this.incrementProcessedItems()
+    await CategoryManager.publishProps(id, tx)
+    this.incrementProcessedItems()
 
-      await TaxonomyManager.publishTaxonomiesProps(id, t)
-      this.incrementProcessedItems()
+    await TaxonomyManager.publishTaxonomiesProps(id, tx)
+    this.incrementProcessedItems()
 
-      const surveyInfo = await SurveyRepository.publishSurveyProps(id, t)
-      this.incrementProcessedItems()
+    const surveyInfo = await SurveyManager.publishSurveyProps(id, tx)
+    this.incrementProcessedItems()
 
-      await this.removeDeletedLanguagesLabels(deletedLanguages, t)
+    await this.removeDeletedLanguagesLabels(deletedLanguages, tx)
+    this.incrementProcessedItems()
 
-      await ActivityLog.log(this.user, id, ActivityLog.type.surveyPublish, {surveyUuid: surveyInfo.uuid}, t)
-
-      this.setStatusSucceeded()
-    })
+    await ActivityLog.log(this.user, id, ActivityLog.type.surveyPublish, {surveyUuid: surveyInfo.uuid}, tx)
+    this.incrementProcessedItems()
   }
 
   async removeDeletedLanguagesLabels (deletedLanguages, t) {
@@ -65,18 +61,15 @@ class SurveyPropsPublishJob extends Job {
     for (const langCode of deletedLanguages) {
 
       //SURVEY
-      await SurveyRepository.deleteSurveyLabel(surveyId, langCode, t)
-      await SurveyRepository.deleteSurveyDescription(surveyId, langCode, t)
-      this.incrementProcessedItems()
+      await SurveyManager.deleteSurveyLabel(surveyId, langCode, t)
+      await SurveyManager.deleteSurveyDescription(surveyId, langCode, t)
 
       //NODE DEFS
-      await NodeDefRepository.deleteNodeDefsLabels(surveyId, langCode, t)
-      await NodeDefRepository.deleteNodeDefsDescriptions(surveyId, langCode, t)
-      this.incrementProcessedItems()
+      await NodeDefManager.deleteNodeDefsLabels(surveyId, langCode, t)
+      await NodeDefManager.deleteNodeDefsDescriptions(surveyId, langCode, t)
 
       //CATEGORY ITEMS
-      await CategoryRepository.deleteItemLabels(surveyId, langCode, t)
-      this.incrementProcessedItems()
+      await CategoryManager.deleteItemLabels(surveyId, langCode, t)
     }
   }
 }

@@ -5,7 +5,7 @@ const getProps = R.propOr({}, 'props')
 
 const getProp = (prop, defaultTo = null) => R.pipe(
   getProps,
-  R.propOr(defaultTo, prop)
+  R.pathOr(defaultTo, prop.split('.'))
 )
 
 const getLabels = getProp('labels', {})

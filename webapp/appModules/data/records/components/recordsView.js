@@ -12,17 +12,13 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 import { appModuleUri } from '../../../appModules'
 import { dataModules } from '../../dataModules'
 
-import {
-  getRecordsCount,
-  getRecordsLimit,
-  getRecordsList,
-  getRecordsNodeDefKeys,
-  getRecordsOffset
-} from '../recordsState'
 import { getRelativeDate } from '../../../../appUtils/dateUtils'
 
 import { initRecordsList, fetchRecords } from '../actions'
-import { getStateSurveyInfo } from '../../../../survey/surveyState'
+import { createRecord } from '../../../surveyForm/record/actions'
+
+import * as RecordsState from '../recordsState'
+import * as SurveyState from '../../../../survey/surveyState'
 
 const RecordsTablePaginator = ({offset, limit, count, fetchRecords}) => {
   const currentPage = (offset / limit) + 1
@@ -121,7 +117,7 @@ class RecordsView extends React.Component {
     const {
       surveyInfo, records,
       offset, limit, count,
-      fetchRecords,
+      fetchRecords, createRecord, history
     } = this.props
 
     const hasRecords = !R.isEmpty(records)
@@ -133,10 +129,10 @@ class RecordsView extends React.Component {
           {
             Survey.isPublished(surveyInfo)
               ? (
-                <Link to={appModuleUri(dataModules.record)} className="btn btn-s btn-of">
+                <button onClick={() => createRecord(history)} className="btn btn-s btn-of">
                   <span className="icon icon-plus icon-12px icon-left"></span>
                   new
-                </Link>
+                </button>
               )
               : <div/>
           }
@@ -160,16 +156,19 @@ class RecordsView extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const surveyInfo = getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getStateSurveyInfo(state)
   return {
     surveyInfo,
-    records: getRecordsList(state),
-    nodeDefKeys: getRecordsNodeDefKeys(state),
-    offset: getRecordsOffset(state),
-    limit: getRecordsLimit(state),
-    count: getRecordsCount(state),
+    records: RecordsState.getRecordsList(state),
+    nodeDefKeys: RecordsState.getRecordsNodeDefKeys(state),
+    offset: RecordsState.getRecordsOffset(state),
+    limit: RecordsState.getRecordsLimit(state),
+    count: RecordsState.getRecordsCount(state),
     lang: Survey.getDefaultLanguage(surveyInfo)
   }
 }
 
-export default connect(mapStateToProps, {initRecordsList, fetchRecords})(RecordsView)
+export default connect(
+  mapStateToProps,
+  {initRecordsList, fetchRecords, createRecord}
+)(RecordsView)

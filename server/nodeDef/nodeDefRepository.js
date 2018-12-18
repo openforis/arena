@@ -5,8 +5,6 @@ const db = require('../db/db')
 const {selectDate} = require('../db/dbUtils')
 const {getSurveyDBSchema, dbTransformCallback} = require('../survey/surveySchemaRepositoryUtils')
 
-const NodeDef = require('../../common/survey/nodeDef')
-
 const nodeDefSelectFields = (advanced = false) =>
   `id, uuid, parent_uuid, type, deleted, ${selectDate('date_created')}, ${selectDate('date_modified')},  
     props${advanced ? ' || props_advanced' : ''} as props, 
@@ -14,19 +12,28 @@ const nodeDefSelectFields = (advanced = false) =>
 
 // ============== CREATE
 
-const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = db) =>
-  await client.one(`
+const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = db) => {
+
+  const parentH = parentUuid ?
+    await client.one(
+      `SELECT id, meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node_def WHERE uuid = $1`,
+      [parentUuid]
+    ) : {}
+
+  const meta = {
+    h: R.isEmpty(parentH) ? [] : R.append(Number(parentH.id), parentH.h)
+  }
+
+  return await client.one(`
         INSERT INTO ${getSurveyDBSchema(surveyId)}.node_def 
-          (parent_uuid, uuid, type, props_draft)
-        VALUES ($1, $2, $3, $4)
+          (parent_uuid, uuid, type, props_draft, meta)
+        VALUES ($1, $2, $3, $4, $5::jsonb)
         RETURNING *
     `,
-    [parentUuid, uuid, type, props],
+    [parentUuid, uuid, type, props, meta],
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
-
-const createEntityDef = async (surveyId, parentUuid, uuid, props, client = db) =>
-  await createNodeDef(surveyId, parentUuid, uuid, NodeDef.nodeDefType.entity, props, client)
+}
 
 // ============== READ
 
@@ -64,7 +71,7 @@ const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, v
   return await client.map(
     `SELECT ${nodeDefSelectFields(advanced)}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
-     WHERE uuid in (${nodeDefUuids.map((uuid,i)=>`$${i+1}`).join(',')})`,
+     WHERE uuid in (${nodeDefUuids.map((uuid, i) => `$${i + 1}`).join(',')})`,
     [...nodeDefUuids],
     res => dbTransformCallback(res, draft, true)
   )
@@ -99,14 +106,18 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
 // ============== UPDATE
 
 const updateNodeDefProps = async (surveyId, nodeDefUuid, propsArray, client = db) => {
+
+  const toIndexedProps = propsArray =>
+    R.reduce((acc, prop) => R.assocPath(R.split('.', prop.key), prop.value)(acc), {}, propsArray)
+
   const props = R.pipe(
     R.filter(R.propEq('advanced', false)),
-    R.reduce((acc, prop) => R.assoc(prop.key, prop.value)(acc), {})
+    toIndexedProps
   )(propsArray)
 
   const advancedProps = R.pipe(
     R.filter(R.propEq('advanced', true)),
-    R.reduce((acc, prop) => R.assoc(prop.key, prop.value)(acc), {})
+    toIndexedProps
   )(propsArray)
 
   return await client.one(`
@@ -120,7 +131,6 @@ const updateNodeDefProps = async (surveyId, nodeDefUuid, propsArray, client = db
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 }
-
 
 const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`
@@ -179,7 +189,6 @@ module.exports = {
 
   //CREATE
   createNodeDef,
-  createEntityDef,
 
   //READ
   fetchNodeDefsBySurveyId,

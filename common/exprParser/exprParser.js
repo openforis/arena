@@ -112,8 +112,23 @@ const evalQuery = async (query, ctx) => {
   return await evalExpression(expr, ctx)
 }
 
+const validateExpression = query => {
+  try {
+    jsep(query)
+    return {
+      valid: true
+    }
+  } catch (e) {
+    return {
+      valid: false,
+      errors: [e.description]
+    }
+  }
+}
+
 module.exports = {
   expressionTypes,
   evalExpression,
-  evalQuery
+  evalQuery,
+  validateExpression
 }

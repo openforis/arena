@@ -9,12 +9,16 @@ import { appModules } from '../../appModules'
 import { getStateSurveyInfo } from '../../../survey/surveyState'
 
 import Survey from '../../../../common/survey/survey'
-import { dataModules } from '../../data/dataModules'
+import { createRecord } from '../../surveyForm/record/actions'
 
 class Data extends React.Component {
 
   render () {
-    const {surveyInfo, dataExplorer: {entities}} = this.props
+    const {
+      surveyInfo,
+      createRecord, history,
+      dataExplorer: {entities}
+    } = this.props
 
     const entityCount = entity => R.path([entity, 'count'])(entities)
 
@@ -68,11 +72,11 @@ class Data extends React.Component {
           {
             Survey.isPublished(surveyInfo) ?
               <div className="app-dashboard__module-item">
-                <Link className="btn btn-of"
-                      to={appModuleUri(dataModules.record)}>
+                <button className="btn btn-of"
+                        onClick={() => createRecord(history)}>
                   <span className="icon icon-plus icon-left"/>
                   Record
-                </Link>
+                </button>
               </div>
               : null
           }
@@ -98,4 +102,4 @@ const mapStateToProps = state => ({
   surveyInfo: getStateSurveyInfo(state),
 })
 
-export default connect(mapStateToProps)(Data)
+export default connect(mapStateToProps, {createRecord})(Data)

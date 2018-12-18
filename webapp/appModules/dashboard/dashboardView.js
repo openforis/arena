@@ -8,7 +8,7 @@ import Data from './components/data'
 import Analysis from './components/analysis'
 import Users from './components/users'
 
-const DashboardView = () => (
+const DashboardView = ({history}) => (
 
   <div className="app-dashboard">
 
@@ -18,7 +18,7 @@ const DashboardView = () => (
 
       <Designer/>
 
-      <Data/>
+      <Data history={history}/>
 
       <Analysis/>
 

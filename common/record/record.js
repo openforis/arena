@@ -1,8 +1,9 @@
 const R = require('ramda')
 const {uuidv4} = require('./../uuid')
 
-const NodeDef = require('../survey/nodeDef')
 const Survey = require('../survey/survey')
+const SurveyUtils = require('../survey/surveyUtils')
+const NodeDef = require('../survey/nodeDef')
 const Node = require('../record/node')
 
 // ====== UTILS
@@ -138,6 +139,7 @@ module.exports = {
   newRecord,
 
   // ====== READ
+  getUuid: SurveyUtils.getUuid,
   getNodes,
   getNodesArray,
   getNodesByDefUuid,
