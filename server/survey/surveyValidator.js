@@ -15,7 +15,7 @@ const validateSurveyNameUniqueness = async (propName, survey) => {
     : null
 }
 
-const surveyPropsValidations = {
+const surveyInfoPropsValidations = {
   'props.name': [validateRequired, validateNotKeyword, validateSurveyNameUniqueness],
   'props.languages': [validateRequired],
   'props.srs': [validateRequired],
@@ -29,10 +29,10 @@ const newSurveyPropsValidations = {
 const validateNewSurvey = async survey =>
   await validate(survey, newSurveyPropsValidations)
 
-const validateSurvey = async survey =>
-  await validate(Survey.getSurveyInfo(survey), surveyPropsValidations)
+const validateSurveyInfo = async surveyInfo =>
+  await validate(surveyInfo, surveyInfoPropsValidations)
 
 module.exports = {
   validateNewSurvey,
-  validateSurvey,
+  validateSurveyInfo,
 }

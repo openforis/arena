@@ -1,4 +1,5 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/dbMigrator')
@@ -75,14 +76,14 @@ const createSurvey = async (user, {name, label, lang}) => {
 }
 
 // ====== READ
-const fetchSurveyById = async (id, draft = false, validate = false, client = db) => {
-  const survey = await SurveyRepository.getSurveyById(id, draft, client)
-  const authGroups = await AuthGroupRepository.fetchSurveyGroups(survey.id, client)
+const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
+  const surveyInfo = await SurveyRepository.getSurveyById(surveyId, draft, client)
+  const authGroups = await AuthGroupRepository.fetchSurveyGroups(surveyInfo.id, client)
 
   return assocSurveyInfo({
-    ...survey,
+    ...surveyInfo,
     authGroups,
-    validation: validate ? await SurveyValidator.validateSurvey(survey) : null
+    validation: validate ? await SurveyValidator.validateSurveyInfo(surveyInfo) : null
   })
 }
 
@@ -92,12 +93,15 @@ const fetchUserSurveysInfo = async (user) => R.map(
 )
 
 // ====== UPDATE
-const updateSurveyProp = async (id, key, value, user) =>
+const updateSurveyProp = async (surveyId, key, value, user) =>
   await db.tx(
     async t => {
-      await ActivityLog.log(user, id, ActivityLog.type.surveyPropUpdate, {key, value}, t)
+      await Promise.all([
+        ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, {key, value}, t),
+        SurveyRepository.updateSurveyProp(surveyId, key, value, t)
+      ])
 
-      return assocSurveyInfo(await SurveyRepository.updateSurveyProp(id, key, value))
+      return await fetchSurveyById(surveyId, true, true, t)
     })
 
 // ====== DELETE
