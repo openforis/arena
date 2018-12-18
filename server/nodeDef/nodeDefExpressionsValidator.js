@@ -1,4 +1,5 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const Validator = require('../../common/validation/validator')
 const Survey = require('../../common/survey/survey')
@@ -59,11 +60,14 @@ const validateExpression = async (survey, nodeDef, nodeDefExpression) =>
     }
   )
 
-const validate = (survey, nodeDef, nodeDefExpressions) => {
+const validate = async (survey, nodeDef, nodeDefExpressions) => {
   const result = {fields: {}}
-  nodeDefExpressions.forEach(async (nodeDefExpression, i) =>
-    result.fields['' + i] = await validateExpression(survey, nodeDef, nodeDefExpression)
+  const array = await Promise.all(
+    nodeDefExpressions.map(async nodeDefExpression =>
+      await validateExpression(survey, nodeDef, nodeDefExpression)
+    )
   )
+  array.forEach((res, i) => result.fields[i + ''] = res)
 
   result.valid = R.pipe(
     R.values,
