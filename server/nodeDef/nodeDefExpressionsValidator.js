@@ -2,28 +2,47 @@ const R = require('ramda')
 
 const Validator = require('../../common/validation/validator')
 const Survey = require('../../common/survey/survey')
-const {expressionTypes, evalQuery} = require('../../common/exprParser/exprParser')
+const NodeDef = require('../../common/survey/nodeDef')
+const ExprParser = require('../../common/exprParser/exprParser')
+const {expressionTypes} = ExprParser
 
-const getExprCtx = (survey, nodeDef) => ({
-  node: {
-    ...nodeDef,
-    parent: () => Survey.getNodeDefParent(nodeDef)(survey),
-    node: name => Survey.getNodeDefChildByName(nodeDef, name)(survey),
-    sibling: name => Survey.getNodeDefSiblingByName(nodeDef, name)(survey)
+const bindNode = (survey, nodeDef) => ({
+  ...nodeDef,
+  parent: () => {
+    const def = Survey.getNodeDefParent(nodeDef)(survey)
+    if (!def) throw new Error('Unable to find parent of ' + NodeDef.getNodeDefName(nodeDef))
+    return bindNode(survey, def)
   },
-  functions: {
-    [expressionTypes.ThisExpression]: (expr, {node}) => node
+  node: name => {
+    const def = Survey.getNodeDefChildByName(nodeDef, name)(survey)
+    if (!def) throw new Error('Unable to find node with name ' + name)
+    return bindNode(survey, def)
   },
+  sibling: name => {
+    const def = Survey.getNodeDefSiblingByName(nodeDef, name)(survey)
+    if (!def) throw new Error('Unable to find sibling with name ' + name)
+    return bindNode(survey, def)
+  }
 })
 
 const validateNodeDefExpr = async (survey, nodeDef, expr) => {
   try {
-    await evalQuery(expr, getExprCtx(survey, nodeDef))
+    await ExprParser.evalQuery(
+      expr,
+      {
+        node: bindNode(survey, nodeDef),
+        functions: {
+          [expressionTypes.ThisExpression]: (expr, {node}) => node
+        },
+      }
+    )
+
     return null
   } catch (e) {
     return e.toString()
   }
 }
+
 const validateExpressionProp = (survey, nodeDef) =>
   async (propName, item) => {
     const expr = R.pathOr(null, propName.split('.'), item)
