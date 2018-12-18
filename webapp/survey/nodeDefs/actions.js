@@ -56,8 +56,8 @@ const _putNodeDefProp = (nodeDef, key, value, advanced) => {
 
     if (key === 'multiple') {
       const validations = value
-        ? NodeDefValidations.dissocRequired(NodeDef.getNodeDefValidations(nodeDef))
-        : NodeDefValidations.dissocCount(NodeDef.getNodeDefValidations(nodeDef))
+        ? NodeDefValidations.dissocRequired(NodeDef.getValidations(nodeDef))
+        : NodeDefValidations.dissocCount(NodeDef.getValidations(nodeDef))
 
       propsToUpdate.push({key: 'validations', value: validations, advanced: true})
     }

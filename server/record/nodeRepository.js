@@ -1,4 +1,6 @@
 const camelize = require('camelize')
+const R = require('ramda')
+
 const db = require('../db/db')
 
 const Node = require('../../common/record/node')
@@ -8,15 +10,19 @@ const dbTransformCallback = camelize
 
 // ============== CREATE
 
-const insertNode = async (surveyId, node, client = db) =>
-  await client.one(`
+const insertNode = async (surveyId, node, client = db) => {
+  const meta = {
+    h: await fetchParentNodeHierarchy(surveyId, Node.getParentUuid(node), client)
+  }
+  return await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-    (uuid, record_uuid, parent_uuid, node_def_uuid, value)
-    VALUES ($1, $2, $3, $4, $5)
+    (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
+    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
     RETURNING *, true as created`,
-    [node.uuid, node.recordUuid, Node.getParentUuid(node), Node.getNodeDefUuid(node), node.value ? JSON.stringify(node.value) : null],
+    [node.uuid, node.recordUuid, Node.getParentUuid(node), Node.getNodeDefUuid(node), node.value, meta],
     dbTransformCallback
   )
+}
 
 // ============== READ
 
@@ -46,6 +52,16 @@ const fetchDescendantNodesByCodeUuid = async (surveyId, recordUuid, parentCodeNo
     [recordUuid],
     dbTransformCallback
   )
+
+const fetchParentNodeHierarchy = async (surveyId, nodeUuid, client = db) =>
+  nodeUuid
+    ? await client.one(`
+        SELECT id, meta->'h' as h
+        FROM ${getSurveyDBSchema(surveyId)}.node 
+        WHERE uuid = $1`,
+    [nodeUuid],
+    row => R.append(Number(row.id), row.h))
+    : []
 
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUuid, value, client = db) =>

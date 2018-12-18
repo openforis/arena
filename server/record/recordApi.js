@@ -23,7 +23,7 @@ module.exports.init = app => {
         return
       }
 
-      RecordManager.createRecord(user, surveyId, record)
+      await RecordManager.createRecord(user, surveyId, record)
 
       sendOk(res)
     } catch (err) {

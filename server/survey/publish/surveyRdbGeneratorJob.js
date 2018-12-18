@@ -50,7 +50,7 @@ class SurveyRdbGeneratorJob extends Job {
   async getSurvey (tx) {
     const {surveyId} = this.params
     const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, tx)
-    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, false, false, tx)
+    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, false, false, false, tx)
 
     return {...survey, nodeDefs}
   }

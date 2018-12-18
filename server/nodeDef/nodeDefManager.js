@@ -2,6 +2,7 @@ const R = require('ramda')
 const db = require('../db/db')
 
 const SurveyUtils = require('../../common/survey/surveyUtils')
+const NodeDef = require('../../common/survey/nodeDef')
 
 const NodeDefRepository = require('./nodeDefRepository')
 const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
@@ -12,8 +13,8 @@ const ActivityLog = require('../activityLog/activityLogger')
 
 // ======= CREATE
 
-const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props) =>
-  await db.tx(async t => {
+const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props, client = db) =>
+  await client.tx(async t => {
     const nodeDef = await NodeDefRepository.createNodeDef(surveyId, parentUuid, uuid, type, props, t)
 
     await markSurveyDraft(surveyId, t)
@@ -23,9 +24,12 @@ const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props) =>
     return nodeDef
   })
 
+const createEntityDef = async (user, surveyId, parentUuid, uuid, props, client = db) =>
+  await createNodeDef(user, surveyId, parentUuid, uuid, NodeDef.nodeDefType.entity, props, client)
+
 // ======= READ
 
-const processNodeDefs = async (nodeDefsDb, draft, validate ) => {
+const processNodeDefs = async (nodeDefsDb, draft, validate) => {
   const nodeDefsResult = R.reduce(
     (acc, nodeDef) => draft
       ? R.append(nodeDef, acc)
@@ -43,8 +47,8 @@ const processNodeDefs = async (nodeDefsDb, draft, validate ) => {
   return SurveyUtils.toUuidIndexedObj(nodeDefs)
 }
 
-const fetchNodeDefsBySurveyId = async (surveyId, draft = false, validate = false, client = db) => {
-  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, validate, client)
+const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
+  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced, client)
   return await processNodeDefs(nodeDefsDB, draft, validate)
 }
 
@@ -82,6 +86,7 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
 module.exports = {
   //CREATE
   createNodeDef,
+  createEntityDef,
 
   //READ
   fetchNodeDefsBySurveyId,

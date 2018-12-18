@@ -8,13 +8,15 @@ import { withRouter } from 'react-router'
 import DeleteSurveyDialog from './deleteSurveyDialog'
 
 import Survey from '../../../../common/survey/survey'
-import { canEditSurvey } from '../../../../common/auth/authManager'
+import AuthManager from '../../../../common/auth/authManager'
+import Validator from '../../../../common/validation/validator'
 
 import { getStateSurveyInfo } from '../../../survey/surveyState'
 import { getUser } from '../../../app/appState'
 import { deleteSurvey, publishSurvey } from '../../../survey/actions'
 import { appModules } from '../../appModules'
 import { appModuleUri } from '../../appModules'
+import ErrorBadge from '../../../commonComponents/errorBadge'
 
 class SurveyInfo extends React.Component {
 
@@ -48,6 +50,8 @@ class SurveyInfo extends React.Component {
 
     return (
       <div className="app-dashboard__survey-info">
+
+        <ErrorBadge validation={Validator.getValidation(surveyInfo)}/>
 
         <div className="survey-status">
           {
@@ -104,7 +108,7 @@ const mapStateToProps = state => {
 
   return {
     surveyInfo,
-    canEdit: canEditSurvey(user, surveyInfo)
+    canEdit: AuthManager.canEditSurvey(user, surveyInfo)
   }
 }
 

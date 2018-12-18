@@ -1,14 +1,17 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const db = require('../db/db')
 const {migrateSurveySchema} = require('../db/migration/dbMigrator')
 const {uuidv4} = require('../../common/uuid')
+const {getSurveyDBSchema} = require('./surveySchemaRepositoryUtils')
+const SurveyRdbManager = require('../surveyRdb/surveyRdbManager')
 
 const SurveyRepository = require('../survey/surveyRepository')
 const Survey = require('../../common/survey/survey')
 const SurveyValidator = require('../survey/surveyValidator')
 
-const NodeDefRepository = require('../nodeDef/nodeDefRepository')
+const NodeDefManager = require('../nodeDef/nodeDefManager')
 const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/nodeDefLayout')
 
 const UserRepository = require('../user/userRepository')
@@ -52,7 +55,7 @@ const createSurvey = async (user, {name, label, lang}) => {
       //create survey data schema
       await migrateSurveySchema(survey.id)
 
-      await NodeDefRepository.createEntityDef(surveyId, null, uuidv4(), rootEntityDefProps, t)
+      await NodeDefManager.createEntityDef(user, surveyId, null, uuidv4(), rootEntityDefProps, t)
 
       // update user prefs
       await UserRepository.updateUserPref(user, userPrefNames.survey, surveyId, t)
@@ -75,15 +78,21 @@ const createSurvey = async (user, {name, label, lang}) => {
 }
 
 // ====== READ
-const fetchSurveyById = async (id, draft = false, validate = false, client = db) => {
-  const survey = await SurveyRepository.getSurveyById(id, draft, client)
-  const authGroups = await AuthGroupRepository.fetchSurveyGroups(survey.id, client)
+const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
+  const surveyInfo = await SurveyRepository.getSurveyById(surveyId, draft, client)
+  const authGroups = await AuthGroupRepository.fetchSurveyGroups(surveyInfo.id, client)
 
   return assocSurveyInfo({
-    ...survey,
+    ...surveyInfo,
     authGroups,
-    validation: validate ? await SurveyValidator.validateSurvey(survey) : null
+    validation: validate ? await SurveyValidator.validateSurveyInfo(surveyInfo) : null
   })
+}
+
+const fetchSurveyAndNodeDefsBySurveyId = async (id, draft = false, advanced = false, validate = false, client = db) => {
+  const survey = await fetchSurveyById(id, draft, validate, client)
+  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(id, draft, advanced, validate, client)
+  return Survey.assocNodeDefs(nodeDefs)(survey)
 }
 
 const fetchUserSurveysInfo = async (user) => R.map(
@@ -92,12 +101,15 @@ const fetchUserSurveysInfo = async (user) => R.map(
 )
 
 // ====== UPDATE
-const updateSurveyProp = async (id, key, value, user) =>
+const updateSurveyProp = async (surveyId, key, value, user) =>
   await db.tx(
     async t => {
-      await ActivityLog.log(user, id, ActivityLog.type.surveyPropUpdate, {key, value}, t)
+      await Promise.all([
+        ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, {key, value}, t),
+        SurveyRepository.updateSurveyProp(surveyId, key, value, t)
+      ])
 
-      return assocSurveyInfo(await SurveyRepository.updateSurveyProp(id, key, value))
+      return await fetchSurveyById(surveyId, true, true, t)
     })
 
 // ====== DELETE
@@ -107,6 +119,9 @@ const deleteSurvey = async (id, user) => {
     const userPrefSurveyId = getUserPrefSurveyId(user)
     if (userPrefSurveyId === id)
       await UserRepository.deleteUserPref(user, userPrefNames.survey, t)
+
+    await t.query(`DROP SCHEMA ${getSurveyDBSchema(id)} CASCADE`)
+    await SurveyRdbManager.dropSchema(id, t)
 
     await SurveyRepository.deleteSurvey(id, t)
   })
@@ -118,11 +133,13 @@ module.exports = {
 
   // ====== READ
   fetchSurveyById,
+  fetchSurveyAndNodeDefsBySurveyId,
   fetchUserSurveysInfo,
 
   // ====== UPDATE
   updateSurveyProp,
   publishSurveyProps: SurveyRepository.publishSurveyProps,
+  updateSurveyDependencyGraphs: SurveyRepository.updateSurveyDependencyGraphs,
 
   // ====== DELETE
   deleteSurvey,

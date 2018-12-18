@@ -15,6 +15,8 @@ CREATE TABLE
   props_advanced       jsonb              DEFAULT '{}'::jsonb,
   props_advanced_draft jsonb              DEFAULT '{}'::jsonb,
 
+  meta                 jsonb              DEFAULT '{}'::jsonb,
+
   date_created         TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
   date_modified        TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
 
@@ -47,6 +49,7 @@ CREATE TABLE
   parent_uuid   uuid,
   node_def_uuid uuid      NOT NULL,
   value         jsonb,
+  meta          jsonb     NOT NULL DEFAULT '{}'::jsonb,
   date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
   date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
 

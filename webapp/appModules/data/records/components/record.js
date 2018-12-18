@@ -9,7 +9,7 @@ import { getSurveyForm } from '../../../surveyForm/surveyFormState'
 
 import { initSurveyDefs } from '../../../../survey/actions'
 import { resetForm } from '../../../surveyForm/actions'
-import { createRecord, checkInRecord, checkOutRecord } from '../../../surveyForm/record/actions'
+import { checkInRecord, checkOutRecord } from '../../../surveyForm/record/actions'
 
 import { appModules, appModuleUri } from '../../../appModules'
 
@@ -23,22 +23,14 @@ class Record extends React.Component {
 
   componentDidMount () {
     const {
-      resetForm, initSurveyDefs,
-      createRecord, checkInRecord,
-      match
+      initSurveyDefs, checkInRecord,
+      recordUuidUrlParam,
     } = this.props
-
-    resetForm()
 
     // TODO load defs only if they don't exist or previously loaded draft for editing nodeDefs
     initSurveyDefs(false, false)
 
-    const recordUuid = R.path(['params', 'recordUuid'], match)
-    if (recordUuid) {
-      checkInRecord(recordUuid)
-    } else {
-      createRecord()
-    }
+    checkInRecord(recordUuidUrlParam)
 
     window.addEventListener('beforeunload', this.componentUnload)
   }
@@ -49,16 +41,16 @@ class Record extends React.Component {
 
     // record has been deleted
     if (prevRecordUuid && !recordUuid)
-      history.replace(appModuleUri(appModules.data))
+      history.push(appModuleUri(appModules.data))
   }
 
   componentWillUnmount () {
-    this.props.resetForm()
     this.componentUnload()
     window.removeEventListener('beforeunload', this.componentUnload)
   }
 
   componentUnload () {
+    this.props.resetForm()
     this.props.checkOutRecord()
   }
 
@@ -71,11 +63,13 @@ class Record extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, {match}) => {
   const record = getRecord(getSurveyForm(state))
+  const recordUuidUrlParam = R.path(['params', 'recordUuid'], match)
 
   return {
-    recordUuid: R.prop('uuid', record)
+    recordUuid: R.prop('uuid', record),
+    recordUuidUrlParam,
   }
 }
 
@@ -83,6 +77,6 @@ export default connect(
   mapStateToProps,
   {
     initSurveyDefs, resetForm,
-    createRecord, checkInRecord, checkOutRecord,
+    checkInRecord, checkOutRecord,
   }
 )(Record)

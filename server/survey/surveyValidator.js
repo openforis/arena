@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const Survey = require('../../common/survey/survey')
 
-const {validate, validateRequired, validateNotKeyword} = require('../../common/validation/validator')
+const {errorKeys, validate, validateRequired, validateNotKeyword} = require('../../common/validation/validator')
 
 const {getSurveysByName} = require('./surveyRepository')
 
@@ -11,11 +11,11 @@ const validateSurveyNameUniqueness = async (propName, survey) => {
   const surveysByName = await getSurveysByName(surveyName)
 
   return !R.isEmpty(surveysByName) && R.find(s => s.id !== survey.id, surveysByName)
-    ? 'duplicate'
+    ? errorKeys.duplicate
     : null
 }
 
-const surveyPropsValidations = {
+const surveyInfoPropsValidations = {
   'props.name': [validateRequired, validateNotKeyword, validateSurveyNameUniqueness],
   'props.languages': [validateRequired],
   'props.srs': [validateRequired],
@@ -29,10 +29,10 @@ const newSurveyPropsValidations = {
 const validateNewSurvey = async survey =>
   await validate(survey, newSurveyPropsValidations)
 
-const validateSurvey = async survey =>
-  await validate(Survey.getSurveyInfo(survey), surveyPropsValidations)
+const validateSurveyInfo = async surveyInfo =>
+  await validate(surveyInfo, surveyInfoPropsValidations)
 
 module.exports = {
   validateNewSurvey,
-  validateSurvey,
+  validateSurveyInfo,
 }

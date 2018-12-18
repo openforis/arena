@@ -22,6 +22,7 @@ import {
 import { getRelativeDate } from '../../../../../common/dateUtils'
 
 import { initRecordsList, fetchRecords } from '../actions'
+import { createRecord } from '../../../surveyForm/record/actions'
 import { getStateSurveyInfo } from '../../../../survey/surveyState'
 
 const RecordsTablePaginator = ({offset, limit, count, fetchRecords}) => {
@@ -121,7 +122,7 @@ class Records extends React.Component {
     const {
       surveyInfo, records,
       offset, limit, count,
-      fetchRecords,
+      fetchRecords, createRecord, history
     } = this.props
 
     const hasRecords = !R.isEmpty(records)
@@ -133,10 +134,10 @@ class Records extends React.Component {
           {
             Survey.isPublished(surveyInfo)
               ? (
-                <Link to={appModuleUri(dataModules.record)} className="btn btn-s btn-of">
+                <button onClick={() => createRecord(history)} className="btn btn-s btn-of">
                   <span className="icon icon-plus icon-12px icon-left"></span>
                   new
-                </Link>
+                </button>
               )
               : <div/>
           }
@@ -172,4 +173,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, {initRecordsList, fetchRecords})(Records)
+export default connect(mapStateToProps, {initRecordsList, fetchRecords, createRecord})(Records)
