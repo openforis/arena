@@ -72,9 +72,11 @@ class RecordUpdateThread extends Thread {
 
 }
 
+const newInstance = () => new RecordUpdateThread()
+
 if (!isMainThread)
-  new RecordUpdateThread()
+  newInstance()
 
 module.exports = {
-  newInstance: () => new RecordUpdateThread()
+  newInstance
 }
