@@ -37,7 +37,6 @@ const validateNodeDefExpr = async (survey, nodeDef, expr) => {
         },
       }
     )
-
     return null
   } catch (e) {
     return e.toString()
@@ -62,17 +61,17 @@ const validateExpression = async (survey, nodeDef, nodeDefExpression) =>
 
 const validate = async (survey, nodeDef, nodeDefExpressions) => {
   const result = {fields: {}}
-  const array = await Promise.all(
+
+  const validations = await Promise.all(
     nodeDefExpressions.map(async nodeDefExpression =>
       await validateExpression(survey, nodeDef, nodeDefExpression)
     )
   )
-  array.forEach((res, i) => result.fields[i + ''] = res)
 
-  result.valid = R.pipe(
-    R.values,
-    R.none(v => !v.valid)
-  )(result.fields)
+  validations.forEach((validation, i) => {
+    result.fields[i + ''] = validation
+    result.valid &= validation.valid
+  })
 
   return result
 }

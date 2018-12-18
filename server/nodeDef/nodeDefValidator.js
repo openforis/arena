@@ -93,7 +93,7 @@ const validateAdvancedProps = async (survey, nodeDef) => {
     defaultValues: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getDefaultValues(nodeDef)),
     calculatedValues: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getCalculatedValues(nodeDef)),
     applicable: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getApplicable(nodeDef)),
-    validations: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getValidationExpressions(nodeDef)),
+    validations: await NodeDefValidationsValidator.validate(survey, nodeDef, NodeDef.getValidations(nodeDef)),
   }
   const invalidValidations = R.reject(R.propEq('valid', true), validations)
 

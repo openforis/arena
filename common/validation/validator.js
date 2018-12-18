@@ -24,6 +24,8 @@ const errorKeys = {
   empty: 'empty',
   exceedingMax: 'exceedingMax',
   keyword: 'keyword',
+  invalidNumber: 'invalidNumber',
+  zeroOrNegative: 'zeroOrNegative',
 }
 
 const validValidation = {valid: true, errors: []}
@@ -97,6 +99,21 @@ const validateNotKeyword = (propName, item) =>
     ? errorKeys.keyword
     : null
 
+const validateNumber = (propName, item) => {
+  const value = getProp(propName)(item)
+  return value && isNaN(value) ? errorKeys.invalidNumber : null
+}
+
+const validatePositiveNumber = (propName, item) => {
+  const invalidNumberError = validateNumber(propName, item)
+  if (invalidNumberError) {
+    return invalidNumberError
+  } else {
+    const value = getProp(propName)(item)
+    return !value && value > 0 ? null : errorKeys.zeroOrNegative
+  }
+}
+
 //==== getters
 
 const getValidation = R.propOr(validValidation, 'validation')
@@ -136,6 +153,7 @@ module.exports = {
   validateRequired,
   validateItemPropUniqueness,
   validateNotKeyword,
+  validatePositiveNumber,
 
   getValidation,
   isValid,

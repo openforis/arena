@@ -47,10 +47,16 @@ const callExpression = async (expr, ctx) => {
   const args = await Promise.all(
     exprArgs.map(async arg => await evalExpression(arg, ctx))
   )
-  const res = await R.apply(fn, args)
 
-  // console.log('== CALLEE = RES ', res)
-  return res
+  if (fn) {
+    const res = await R.apply(fn, args)
+
+    // console.log('== CALLEE = RES ', res)
+    return res
+  } else {
+    const fnName = R.pathOr('', ['property', 'name'])(callee)
+    throw new Error(`Undefined function '${fnName}' or wrong parameter types`)
+  }
 }
 
 const literalExpression = expr => {
@@ -103,7 +109,11 @@ const evalExpression = async (expr, ctx) => {
     R.mergeRight(defaultFunctions)
   )(ctx)
 
-  return await functions[expr.type](expr, ctx)
+  const fn = functions[expr.type]
+  if (fn)
+    return await fn(expr, ctx)
+  else
+    throw new Error(`Unsupported function type: ${expr.type}`)
 }
 
 const evalQuery = async (query, ctx) => await evalExpression(jsep(query), ctx)
