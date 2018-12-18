@@ -101,6 +101,14 @@ const traverseHierarchyItem = async (nodeDefItem, visitorFn, depth = 0) => {
   }
 }
 
+const traverseHierarchyItemSync = (nodeDefItem, visitorFn, depth = 0) => {
+  visitorFn(nodeDefItem, depth)
+  const children = R.propOr([], 'children', nodeDefItem)
+  for (const child of children) {
+    traverseHierarchyItemSync(child, visitorFn, depth + 1)
+  }
+}
+
 // ====== NODE DEFS CODE UTILS
 const getNodeDefParentCode = nodeDef => getNodeDefByUuid(NodeDef.getNodeDefParentCodeDefUuid(nodeDef))
 
@@ -180,6 +188,7 @@ module.exports = {
   getHierarchy,
   isNodeDefAncestor,
   traverseHierarchyItem,
+  traverseHierarchyItemSync,
 
   // ====== NodeDef Code
   getNodeDefCategoryLevelIndex,

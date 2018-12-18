@@ -1,3 +1,5 @@
+import './dataVisView.scss'
+
 import React from 'react'
 
 import NodeDefSelector from './components/nodeDefSelector'

@@ -45,6 +45,7 @@ module.exports = {
   getAncestorsHierarchy: SurveyNodeDefs.getAncestorsHierarchy,
   getHierarchy: SurveyNodeDefs.getHierarchy,
   traverseHierarchyItem: SurveyNodeDefs.traverseHierarchyItem,
+  traverseHierarchyItemSync: SurveyNodeDefs.traverseHierarchyItemSync,
 
   // ====== UPDATE nodeDefs
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,

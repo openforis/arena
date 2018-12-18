@@ -103,6 +103,7 @@ module.exports = {
   newNodeDef,
 
   //READ
+  getUuid: SurveyUtils.getUuid,
   getProp: SurveyUtils.getProp,
 
   getNodeDefType,

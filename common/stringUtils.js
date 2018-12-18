@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const nbsp = '\xA0'
+
 const trim = R.pipe(R.defaultTo(''), R.trim)
 
 const leftTrim = R.replace(/^\s+/, '')
@@ -26,6 +28,8 @@ const normalizeName = R.pipe(
 )
 
 module.exports = {
+  nbsp,
+
   trim,
   leftTrim,
   truncate,
