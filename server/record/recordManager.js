@@ -10,6 +10,7 @@ const File = require('../../common/file/file')
 const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
+const RecordProcessor = require('./update/thread/recordProcessor')
 const ActivityLog = require('../activityLog/activityLogger')
 
 /**
@@ -17,11 +18,9 @@ const ActivityLog = require('../activityLog/activityLogger')
  * CREATE
  * ===================
  */
-const createRecord = (user, surveyId, record) => {
-  RecordUpdateManager.checkIn(user, surveyId)
-
-  RecordUpdateManager.createRecord(user, surveyId, record)
-}
+const createRecord = async (user, surveyId, record) => await db.tx(
+  async t => await RecordProcessor.createRecord(user, surveyId, record, t)
+)
 
 /**
  * ===================

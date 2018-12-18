@@ -3,16 +3,22 @@ const passport = require('passport')
 const {sendOk} = require('../serverUtils/response')
 
 const {userPrefNames, getUserPrefSurveyId} = require('../../common/user/userPrefs')
-const {fetchSurveyById} = require('../survey/surveyManager')
-const {deleteUserPref} = require('../user/userManager')
+
+const AuthManager = require('../../common/auth/authManager')
+const SurveyManager = require('../survey/surveyManager')
+const UserManager = require('../user/userManager')
+
+const Survey = require('../../common/survey/survey')
 
 const sendResponse = (res, user, survey = null) => res.json({user, survey})
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
-    const draft = true //TODO
+    let survey = await SurveyManager.fetchSurveyById(surveyId, false, false)
 
-    const survey = await fetchSurveyById(surveyId, draft)
+    if (AuthManager.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
+      survey = await SurveyManager.fetchSurveyById(surveyId, true, true)
+    }
 
     sendResponse(
       res,
@@ -25,7 +31,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
     // removing user pref
     sendResponse(
       res,
-      await deleteUserPref(user, userPrefNames.survey)
+      await UserManager.deleteUserPref(user, userPrefNames.survey)
     )
   }
 }

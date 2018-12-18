@@ -56,18 +56,6 @@ const cancelCheckOut = userId => {
 }
 
 /**
- * Create a new record
- *
- * @param user
- * @param surveyId
- * @param record
- */
-const createRecord = (user, surveyId, record) => {
-  const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
-}
-
-/**
  * Notify thread to create or update a node
  *
  * @param user
@@ -95,7 +83,6 @@ module.exports = {
   checkIn,
   checkOut,
 
-  createRecord,
   persistNode,
   deleteNode,
 }

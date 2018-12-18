@@ -12,6 +12,9 @@ import { getUser } from '../../../app/appState'
 import { getRecord } from './recordState'
 import { getSurveyForm } from '../surveyFormState'
 
+import { appModuleUri } from '../../appModules'
+import { dataModules } from '../../data/dataModules'
+
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
 export const recordDelete = 'survey/record/delete'
@@ -28,24 +31,16 @@ export const recordNodesUpdate = nodes =>
  * CREATE
  * ============
  */
-export const createRecord = () => async (dispatch, getState) => {
-  try {
-    const state = getState()
+export const createRecord = (history) => async (dispatch, getState) => {
+  const state = getState()
+  const user = getUser(state)
+  const surveyInfo = getStateSurveyInfo(state)
 
-    const user = getUser(state)
-    const surveyId = getStateSurveyId(state)
-    const surveyInfo = getStateSurveyInfo(state)
-    const step = Survey.getDefaultStep(surveyInfo)
+  const record = newRecord(user, Survey.getDefaultStep(surveyInfo))
 
-    const record = newRecord(user, step)
+  await axios.post(`/api/survey/${surveyInfo.id}/record`, record)
 
-    axios.post(`/api/survey/${surveyId}/record`, record)
-
-    dispatch({type: recordCreate, record})
-
-  } catch (e) {
-    console.log(e)
-  }
+  history.push(appModuleUri(dataModules.record) + record.uuid)
 }
 
 export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
