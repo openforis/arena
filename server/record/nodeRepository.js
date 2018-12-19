@@ -11,15 +11,24 @@ const dbTransformCallback = camelize
 // ============== CREATE
 
 const insertNode = async (surveyId, node, client = db) => {
+  const parentUuid = Node.getParentUuid(node)
+
+  const parentH = parentUuid
+    ? await client.one(
+      `SELECT id, meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = $1`,
+      [parentUuid]
+    ) : []
+
   const meta = {
-    h: await fetchParentNodeHierarchy(surveyId, Node.getParentUuid(node), client)
+    h: R.isEmpty(parentH) ? [] : R.append(Number(parentH.id), parentH.h)
   }
+
   return await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
     (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
     VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
     RETURNING *, true as created`,
-    [node.uuid, node.recordUuid, Node.getParentUuid(node), Node.getNodeDefUuid(node), node.value, meta],
+    [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), node.value, meta],
     dbTransformCallback
   )
 }

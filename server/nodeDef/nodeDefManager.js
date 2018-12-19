@@ -5,7 +5,7 @@ const SurveyUtils = require('../../common/survey/surveyUtils')
 const NodeDef = require('../../common/survey/nodeDef')
 
 const NodeDefRepository = require('./nodeDefRepository')
-const {validateNodeDefs} = require('../nodeDef/nodeDefValidator')
+const NodeDefValidator = require('../nodeDef/nodeDefValidator')
 
 const {markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
 
@@ -30,21 +30,22 @@ const createEntityDef = async (user, surveyId, parentUuid, uuid, props, client =
 // ======= READ
 
 const processNodeDefs = async (nodeDefsDb, draft, validate) => {
-  const nodeDefsResult = R.reduce(
-    (acc, nodeDef) => draft
-      ? R.append(nodeDef, acc)
-      // remove draft and unpublished nodeDef
-      : nodeDef.draft && !nodeDef.published
-        ? acc
-        : R.append(nodeDef, acc),
-    [],
-    nodeDefsDb
-  )
-  const nodeDefs = validate
-    ? await validateNodeDefs(nodeDefsResult)
-    : nodeDefsResult
+  const nodeDefsResult = R.pipe(
+    R.reduce(
+      (acc, nodeDef) => draft
+        ? R.append(nodeDef, acc)
+        // remove draft and unpublished nodeDef
+        : nodeDef.draft && !nodeDef.published
+          ? acc
+          : R.append(nodeDef, acc),
+      [],
+    ),
+    SurveyUtils.toUuidIndexedObj
+  )(nodeDefsDb)
 
-  return SurveyUtils.toUuidIndexedObj(nodeDefs)
+  return validate
+    ? await NodeDefValidator.validateNodeDefs(nodeDefsResult)
+    : nodeDefsResult
 }
 
 const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
