@@ -46,11 +46,11 @@ class DataView extends React.Component {
             },
 
             //edit record
-            {
-              label: 'Data vis',
-              component: DataVisView,
-              path: appModuleUri(dataModules.dataVis),
-            },
+            // {
+            //   label: 'Data vis',
+            //   component: DataVisView,
+            //   path: appModuleUri(dataModules.dataVis),
+            // },
 
           ]}
         />
