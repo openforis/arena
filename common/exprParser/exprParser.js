@@ -31,9 +31,12 @@ const memberExpression = async (expr, ctx) => {
   const objectRes = await evalExpression(object, ctx)
   const propertyRes = await evalExpression(property, ctx)
 
-  return isString(objectRes)
-    ? eval(`${objectRes}.${propertyRes}`)
-    : R.prop(propertyRes, objectRes)
+  if (isString(objectRes))
+    return eval(`${objectRes}.${propertyRes}`)
+  else if (R.has(propertyRes, objectRes))
+    return R.prop(propertyRes, objectRes)
+  else
+    throw new Error(`Invalid property ${propertyRes}`)
 }
 
 const callExpression = async (expr, ctx) => {

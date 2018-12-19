@@ -9,6 +9,7 @@ const {expressionTypes} = ExprParser
 
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
+  value: {}, //simulates node value
   parent: () => {
     const def = Survey.getNodeDefParent(nodeDef)(survey)
     if (!def) throw new Error('Unable to find parent of ' + NodeDef.getNodeDefName(nodeDef))
