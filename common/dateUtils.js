@@ -12,13 +12,7 @@ const {
   isValid: fnsIsValid,
 } = require('date-fns')
 
-const addTrailingZeroes = (n, length) => {
-  const str = n + ''
-  if (str.length > length) {
-    return str
-  }
-  return '0'.repeat(length - str.length) + str
-}
+const {isBlank} = require('../common/stringUtils')
 
 const getRelativeDate = date => {
 
@@ -60,25 +54,21 @@ const compareDatesDesc = compareDesc
  * @param day
  * @returns {boolean}
  */
-const isValid = (year, month, day) => {
+const isValidDate = (year, month, day) => {
   if (!(year && month && day)) {
     return false
   }
 
-  const mm = addTrailingZeroes(month, 2)
-  const dd = addTrailingZeroes(day, 2)
-  const yyyy = addTrailingZeroes(year, 4)
-
-  const date = (new Date(`${yyyy}-${mm}-${dd}T00:00:00Z`))
+  const date = (new Date(year, month - 1, day))
 
   return !!fnsIsValid(date)
-    && date.getUTCFullYear() === +year
-    && date.getUTCMonth() + 1 === +month
-    && date.getUTCDate() === +day
+    && date.getFullYear() === +year
+    && date.getMonth() + 1 === +month
+    && date.getDate() === +day
 }
 
 module.exports = {
   getRelativeDate,
   compareDatesDesc,
-  isValid,
+  isValidDate,
 }

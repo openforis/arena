@@ -10,7 +10,7 @@ const CategoryManager = require('../../category/categoryManager')
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
 const {isBlank, trim} = require('../../../common/stringUtils')
-const {isValid} = require('../../../common/dateUtils')
+const {isValidDate} = require('../../../common/dateUtils')
 
 const {nodeDefType} = NodeDef
 
@@ -65,7 +65,7 @@ const props = {
     [colTypeProcessor]: () => () => sqlTypes.date,
     [colValueProcessor]: (surveyInfo, nodeDefCol, nodeCol) => {
       const [day, month, year] = Node.getNodeValue(nodeCol, '').split('/').map(trim)
-      return () => isValid(year, month, day) ? `${year}-${month}-${day}` : null
+      return () => isValidDate(year, month, day) ? `${year}-${month}-${day}` : null
     }
   },
 
