@@ -1,48 +1,47 @@
+import './variablesSelector.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
-import * as SurveyState from '../../../../survey/surveyState'
 
+import * as SurveyState from '../../../../survey/surveyState'
 import * as NodeDefUiProps from '../../../surveyForm/nodeDefs/nodeDefSystemProps'
 
-const VariablesSelectorEntity = ({nodeDef, lang}) => (
-  <React.Fragment>
-    <div>{NodeDef.getNodeDefLabel(nodeDef, lang)}</div>
-    <VariablesSelectorConnect nodeDefUuid={NodeDef.getUuid(nodeDef)}/>
-  </React.Fragment>
-)
-
-class VariablesSelector extends React.Component {
+class Variables extends React.Component {
   render () {
     const {nodeDefParent, childDefs, lang} = this.props
 
     return childDefs
       ? (
-        <div>
+        <React.Fragment>
           {
             childDefs.map(nodeDef => NodeDef.isNodeDefEntity(nodeDef) ?
               null :
-              <button key={nodeDef.id} className="btn btn-of-light">
+              <button key={nodeDef.id} className="btn btn-s btn-of-light">
                 {NodeDefUiProps.getNodeDefIconByType(NodeDef.getNodeDefType(nodeDef))}
                 {NodeDef.getNodeDefLabel(nodeDef, lang)}
               </button>
             )
           }
+
           {
             nodeDefParent &&
-            <VariablesSelectorEntity nodeDef={nodeDefParent} lang={lang}/>
+            <React.Fragment>
+              <div className="node-def-label">{NodeDef.getNodeDefLabel(nodeDefParent, lang)}</div>
+              <VariablesConnect nodeDefUuid={NodeDef.getUuid(nodeDefParent)} lang={lang}/>
+            </React.Fragment>
           }
-        </div>
+
+        </React.Fragment>
       )
       : null
   }
 }
 
-VariablesSelector.defaultProps = {
-  entityUuid: null,
+Variables.defaultProps = {
+  nodeDefUuid: null,
   lang: null,
 }
 
@@ -58,9 +57,29 @@ const mapStateToProps = (state, props) => {
   return {
     nodeDefParent,
     childDefs,
-    lang: Survey.getDefaultLanguage(survey)
   }
 }
+const VariablesConnect = connect(mapStateToProps)(Variables)
 
-const VariablesSelectorConnect = connect(mapStateToProps)(VariablesSelector)
-export default VariablesSelectorConnect
+class VariablesSelector extends React.PureComponent {
+
+  render () {
+    const {nodeDefUuid, lang} = this.props
+
+    return (
+      <div className="variables-selector">
+        <div className="variables-selector__container">
+          <VariablesConnect nodeDefUuid={nodeDefUuid} lang={lang}/>
+        </div>
+      </div>
+    )
+  }
+
+}
+
+VariablesSelector.defaultProps = {
+  nodeDefUuid: null,
+  lang: null,
+}
+
+export default VariablesSelector

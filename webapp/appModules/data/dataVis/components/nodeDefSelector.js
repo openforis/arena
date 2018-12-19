@@ -49,7 +49,7 @@ class NodeDefSelector extends React.Component {
         <TableSelector hierarchy={hierarchy} nodeDefUuid={nodeDefUuid}
                        lang={lang} onChange={nodeDefUuid => this.setState({nodeDefUuid})}/>
 
-        <VariablesSelector nodeDefUuid={nodeDefUuid}/>
+        <VariablesSelector nodeDefUuid={nodeDefUuid} lang={lang}/>
 
         <button className="btn btn-of-light btn-sync">
           Sync
