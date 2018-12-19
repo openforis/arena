@@ -1,19 +1,22 @@
 const R = require('ramda')
 
 const NodeDefValidations = require('../../common/survey/nodeDefValidations')
-const NodeDefExpressionValidator = require('./nodeDefExpressionValidator')
+const NodeDef = require('../../common/survey/nodeDef')
+const Validator = require('../../common/validation/validator')
+const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 
-const validate = async nodeDefValidations => {
-  const fieldValidations = {
-    expressions: await NodeDefExpressionValidator.validate(NodeDefValidations.getExpressions(nodeDefValidations)),
-  }
-  //TODO why filtering again?
-  const invalidFieldValidations = R.reject(R.propEq('valid', true), fieldValidations)
+const validate = async (survey, nodeDef, nodeDefValidations) => {
+  const validation = NodeDef.isNodeDefMultiple(nodeDef)
+    ? await Validator.validate(nodeDefValidations, {
+      'count.min': [Validator.validatePositiveNumber],
+      'count.max': [Validator.validatePositiveNumber],
+    })
+    : {}
 
-  return {
-    valid: R.isEmpty(invalidFieldValidations),
-    fields: invalidFieldValidations
-  }
+  return R.pipe(
+    R.assocPath(['fields', 'expressions'], await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations))),
+    Validator.cleanup
+  )(validation)
 }
 
 module.exports = {
