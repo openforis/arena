@@ -3,6 +3,7 @@ const camelize = require('camelize')
 const toSnakeCase = require('to-snake-case')
 
 const Survey = require('../../../common/survey/survey')
+const SurveyUtils = require('../../../common/survey/surveyUtils')
 const NodeDef = require('../../../common/survey/nodeDef')
 const Node = require('../../../common/record/node')
 const CategoryManager = require('../../category/categoryManager')
@@ -64,7 +65,7 @@ const props = {
       return (node, colName) => R.endsWith('code', colName)
         ? getValueFromItem(nodeDefCol, colName, item, true)
         //'label'
-        : NodeDef.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+        : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
     },
   },
 

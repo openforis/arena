@@ -1,4 +1,4 @@
-import './records.scss'
+import './recordsView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -12,18 +12,13 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 import { appModuleUri } from '../../../appModules'
 import { dataModules } from '../../dataModules'
 
-import {
-  getRecordsCount,
-  getRecordsLimit,
-  getRecordsList,
-  getRecordsNodeDefKeys,
-  getRecordsOffset
-} from '../recordsState'
 import { getRelativeDate } from '../../../../appUtils/dateUtils'
 
 import { initRecordsList, fetchRecords } from '../actions'
 import { createRecord } from '../../../surveyForm/record/actions'
-import { getStateSurveyInfo } from '../../../../survey/surveyState'
+
+import * as RecordsState from '../recordsState'
+import * as SurveyState from '../../../../survey/surveyState'
 
 const RecordsTablePaginator = ({offset, limit, count, fetchRecords}) => {
   const currentPage = (offset / limit) + 1
@@ -111,7 +106,7 @@ const RecordsTable = ({records, offset, nodeDefKeys, lang}) => {
   )
 }
 
-class Records extends React.Component {
+class RecordsView extends React.Component {
 
   componentDidMount () {
     this.props.initRecordsList()
@@ -161,16 +156,19 @@ class Records extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const surveyInfo = getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getStateSurveyInfo(state)
   return {
     surveyInfo,
-    records: getRecordsList(state),
-    nodeDefKeys: getRecordsNodeDefKeys(state),
-    offset: getRecordsOffset(state),
-    limit: getRecordsLimit(state),
-    count: getRecordsCount(state),
+    records: RecordsState.getRecordsList(state),
+    nodeDefKeys: RecordsState.getRecordsNodeDefKeys(state),
+    offset: RecordsState.getRecordsOffset(state),
+    limit: RecordsState.getRecordsLimit(state),
+    count: RecordsState.getRecordsCount(state),
     lang: Survey.getDefaultLanguage(surveyInfo)
   }
 }
 
-export default connect(mapStateToProps, {initRecordsList, fetchRecords, createRecord})(Records)
+export default connect(
+  mapStateToProps,
+  {initRecordsList, fetchRecords, createRecord}
+)(RecordsView)

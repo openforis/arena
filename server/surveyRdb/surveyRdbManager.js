@@ -1,9 +1,5 @@
 const db = require('../db/db')
-const Survey = require('../../common/survey/survey')
-const Node = require('../../common/record/node')
-
-const SurveyManager = require('../survey/surveyManager')
-const NodeDefManager = require('../nodeDef/nodeDefManager')
+//surveyRdbManger cannot use SurveyManager - loop dependencies
 
 const DataSchema = require('./schemaRdb/dataSchema')
 const NodesInsert = require('./dbActions/nodesInsert')
@@ -27,11 +23,8 @@ const createTable = async (survey, nodeDef, client = db) =>
 const insertIntoTable = async (survey, nodeDef, record, client = db) =>
   await NodesInsert.run(survey, nodeDef, record, client)
 
-const updateTableNodes = async (surveyId, nodes, client = db) => {
-  const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, client)
-  const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, client)
-  await NodesUpdate.run(Survey.getSurveyInfo(survey), nodes, nodeDefs, client)
-}
+const updateTableNodes = async (surveyInfo, nodeDefs, nodes, client = db) =>
+  await NodesUpdate.run(surveyInfo, nodeDefs, nodes, client)
 
 const queryTable = async (surveyId, tableName, cols = [],
                           offset = 0, limit = 20, client = db) =>

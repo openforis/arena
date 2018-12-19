@@ -1,4 +1,4 @@
-const {parentPort, workerData} = require('worker_threads')
+const {parentPort, workerData, isMainThread} = require('worker_threads')
 
 /**
  * Base class for thread execution in Worker Pool
@@ -10,7 +10,8 @@ class Thread {
     this.user = this.params.user
     this.surveyId = this.params.surveyId
 
-    parentPort.on('message', this.messageHandler.bind(this))
+    if (!isMainThread)
+      parentPort.on('message', this.messageHandler.bind(this))
   }
 
   async messageHandler (msg) {

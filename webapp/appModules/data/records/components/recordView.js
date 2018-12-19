@@ -4,16 +4,17 @@ import * as R from 'ramda'
 
 import SurveyFormView from '../../../surveyForm/surveyFormView'
 
-import { getRecord } from '../../../surveyForm/record/recordState'
-import { getSurveyForm } from '../../../surveyForm/surveyFormState'
+import Record from '../../../../../common/record/record'
 
-import { initSurveyDefs } from '../../../../survey/actions'
+import * as RecordState from '../../../surveyForm/record/recordState'
+import * as SurveyFormState from '../../../surveyForm/surveyFormState'
+
 import { resetForm } from '../../../surveyForm/actions'
 import { checkInRecord, checkOutRecord } from '../../../surveyForm/record/actions'
 
 import { appModules, appModuleUri } from '../../../appModules'
 
-class Record extends React.Component {
+class RecordView extends React.Component {
 
   constructor (props) {
     super(props)
@@ -22,14 +23,7 @@ class Record extends React.Component {
   }
 
   componentDidMount () {
-    const {
-      initSurveyDefs, checkInRecord,
-      recordUuidUrlParam,
-    } = this.props
-
-    // TODO load defs only if they don't exist or previously loaded draft for editing nodeDefs
-    initSurveyDefs(false, false)
-
+    const {checkInRecord, recordUuidUrlParam} = this.props
     checkInRecord(recordUuidUrlParam)
 
     window.addEventListener('beforeunload', this.componentUnload)
@@ -64,19 +58,16 @@ class Record extends React.Component {
 }
 
 const mapStateToProps = (state, {match}) => {
-  const record = getRecord(getSurveyForm(state))
-  const recordUuidUrlParam = R.path(['params', 'recordUuid'], match)
+  const surveyForm = SurveyFormState.getSurveyForm(state)
+  const record = RecordState.getRecord(surveyForm)
 
   return {
-    recordUuid: R.prop('uuid', record),
-    recordUuidUrlParam,
+    recordUuid: Record.getUuid(record),
+    recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
   }
 }
 
 export default connect(
   mapStateToProps,
-  {
-    initSurveyDefs, resetForm,
-    checkInRecord, checkOutRecord,
-  }
-)(Record)
+  {resetForm, checkInRecord, checkOutRecord}
+)(RecordView)

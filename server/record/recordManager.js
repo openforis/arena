@@ -4,13 +4,13 @@ const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
 const FileManager = require('../file/fileManager')
+
 const Node = require('../../common/record/node')
 const File = require('../../common/file/file')
 
 const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
-const RecordProcessor = require('./update/thread/recordProcessor')
 const ActivityLog = require('../activityLog/activityLogger')
 
 /**
@@ -18,9 +18,8 @@ const ActivityLog = require('../activityLog/activityLogger')
  * CREATE
  * ===================
  */
-const createRecord = async (user, surveyId, record) => await db.tx(
-  async t => await RecordProcessor.createRecord(user, surveyId, record, t)
-)
+const createRecord = async (user, surveyId, record) =>
+  await RecordUpdateManager.createRecord(user, surveyId, record)
 
 /**
  * ===================
