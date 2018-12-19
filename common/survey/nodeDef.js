@@ -98,7 +98,6 @@ const canNodeDefBeKey = nodeDef =>
     ]
   )
 
-
 module.exports = {
   nodeDefType,
   maxKeyAttributes,
@@ -107,13 +106,14 @@ module.exports = {
   newNodeDef,
 
   //READ
+  getUuid: SurveyUtils.getUuid,
   getProp: SurveyUtils.getProp,
-  getLabel: SurveyUtils.getLabel,
 
   getNodeDefType,
   getNodeDefName,
   getNodeDefParentUuid,
   getNodeDefLabels: SurveyUtils.getLabels,
+  getNodeDefLabel,
   getNodeDefDescriptions: SurveyUtils.getProp('descriptions', {}),
   getNodeDefValidation: R.prop(validation),
   getNodeDefCategoryUuid: SurveyUtils.getProp('categoryUuid'),
@@ -145,5 +145,4 @@ module.exports = {
   //UTILS
   canNodeDefBeMultiple,
   canNodeDefBeKey,
-  getNodeDefLabel,
 }

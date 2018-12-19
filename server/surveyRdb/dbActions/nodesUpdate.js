@@ -54,7 +54,7 @@ const getRowUuid = (nodeDef, node, nodeParent) =>
     ? Node.getUuid(node)
     : Node.getUuid(nodeParent)
 
-const toUpdates = async (surveyInfo, nodes, nodeDefs) => {
+const toUpdates = async (surveyInfo, nodeDefs, nodes) => {
   const updates = await Promise.all(
     R.values(nodes).map(async node => {
       const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
@@ -102,8 +102,8 @@ const runDelete = (update, client) =>
     update.rowUuid
   )
 
-const run = async (surveyInfo, nodes, nodeDefs, client) => {
-  const updates = await toUpdates(surveyInfo, nodes, nodeDefs)
+const run = async (surveyInfo, nodeDefs, nodes, client) => {
+  const updates = await toUpdates(surveyInfo, nodeDefs, nodes)
   await client.batch(
     updates.map(update =>
       isType(types.update)(update)
