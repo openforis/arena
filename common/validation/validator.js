@@ -28,7 +28,16 @@ const errorKeys = {
   zeroOrNegative: 'zeroOrNegative',
 }
 
-const validValidation = {valid: true, errors: []}
+const keys = {
+  fields: 'fields',
+  valid: 'valid',
+  errors: 'errors'
+}
+
+const validValidation = {
+  [keys.valid]: true,
+  [keys.errors]: []
+}
 
 const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
 
@@ -56,15 +65,7 @@ const validate = async (obj, propsValidations) => {
         )
     )
   )
-  const fieldValidationsInvalid = R.reject(R.propEq('valid', true), fieldValidations)
-
-  return {
-    valid: !R.any(
-      prop => R.pathEq([prop, 'valid'], false, fieldValidationsInvalid),
-      R.keys(fieldValidationsInvalid),
-    ),
-    fields: fieldValidationsInvalid
-  }
+  return cleanup({[keys.fields]: fieldValidations})
 }
 
 const validateRequired = (propName, obj) => {
@@ -110,7 +111,7 @@ const validatePositiveNumber = (propName, item) => {
     return invalidNumberError
   } else {
     const value = getProp(propName)(item)
-    return !value && value > 0 ? null : errorKeys.zeroOrNegative
+    return !value || value > 0 ? null : errorKeys.zeroOrNegative
   }
 }
 
@@ -118,31 +119,28 @@ const validatePositiveNumber = (propName, item) => {
 
 const getValidation = R.propOr(validValidation, 'validation')
 
-const isValid = R.pipe(getValidation, R.propEq('valid', true))
+const isValid = R.pipe(getValidation, R.propEq(keys.valid, true))
 
-const getFieldValidation = field => R.pathOr(validValidation, ['fields', field])
+const getFieldValidations = R.propOr({}, keys.fields)
+
+const getFieldValidation = field => R.pathOr(validValidation, [keys.fields, field])
 
 const getInvalidFieldValidations = R.pipe(
-  R.prop('fields'),
-  R.reject(fieldValidation => fieldValidation.valid)
+  R.prop(keys.fields),
+  R.reject(R.propEq(keys.valid, true))
 )
 
 //==== update
-const assocValidation = validation => R.assoc('validation', validation)
-
-const updateValidationStatus = validation => {
-  const invalid = R.any(R.propEq('valid', false))(R.values(validation.fields))
-  return R.assoc('valid', !invalid, validation)
-}
-
-const updateFieldValidation = (key, fieldValidation) => R.pipe(
-  R.assocPath(['fields', key], fieldValidation),
-  updateValidationStatus,
-)
-
-const dissocFieldValidation = key => R.pipe(
-  R.dissocPath(['fields', key]),
-  updateValidationStatus,
+/**
+ * Removes valid fields validations and updates 'valid' attribute
+ */
+const cleanup = R.pipe(
+  getFieldValidations,
+  R.reject(R.propEq(keys.valid, true)),
+  invalidFieldValidations => ({
+    [keys.fields]: invalidFieldValidations,
+    [keys.valid]: R.isEmpty(invalidFieldValidations)
+  }),
 )
 
 module.exports = {
@@ -158,10 +156,8 @@ module.exports = {
   getValidation,
   isValid,
   getFieldValidation,
+  getFieldValidations,
   getInvalidFieldValidations,
 
-  assocValidation,
-  updateFieldValidation,
-  dissocFieldValidation,
-  updateValidationStatus,
+  cleanup
 }

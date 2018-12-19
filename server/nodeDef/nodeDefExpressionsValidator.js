@@ -60,7 +60,7 @@ const validateExpression = async (survey, nodeDef, nodeDefExpression) =>
   )
 
 const validate = async (survey, nodeDef, nodeDefExpressions) => {
-  const result = {fields: {}}
+  const result = {valid: true, fields: {}}
 
   const validations = await Promise.all(
     nodeDefExpressions.map(async nodeDefExpression =>
@@ -70,7 +70,7 @@ const validate = async (survey, nodeDef, nodeDefExpressions) => {
 
   validations.forEach((validation, i) => {
     result.fields[i + ''] = validation
-    result.valid &= validation.valid
+    result.valid = result.valid && validation.valid
   })
 
   return result
