@@ -4,21 +4,26 @@ const Promise = require('bluebird')
 const Validator = require('../../common/validation/validator')
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
+const NodeDefExpression = require('../../common/survey/nodeDefExpression')
 const ExprParser = require('../../common/exprParser/exprParser')
 const {expressionTypes} = ExprParser
 
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
-  value: {}, //simulates node value
+  value: 1, //simulates node value
   parent: () => {
     const def = Survey.getNodeDefParent(nodeDef)(survey)
     if (!def) throw new Error('Unable to find parent of ' + NodeDef.getNodeDefName(nodeDef))
     return bindNode(survey, def)
   },
   node: name => {
-    const def = Survey.getNodeDefChildByName(nodeDef, name)(survey)
-    if (!def) throw new Error('Unable to find node with name ' + name)
-    return bindNode(survey, def)
+    if (NodeDef.isNodeDefEntity(nodeDef)) {
+      const def = Survey.getNodeDefChildByName(nodeDef, name)(survey)
+      if (!def) throw new Error('Unable to find node with name ' + name)
+      return bindNode(survey, def)
+    } else {
+      throw new Error(`Cannot get child '${name}' from attribute ${NodeDef.getNodeDefName(nodeDef)}`)
+    }
   },
   sibling: name => {
     const def = Survey.getNodeDefSiblingByName(nodeDef, name)(survey)
@@ -47,16 +52,15 @@ const validateNodeDefExpr = async (survey, nodeDef, expr) => {
 const validateExpressionProp = (survey, nodeDef) =>
   async (propName, item) => {
     const expr = R.pathOr(null, propName.split('.'), item)
-    const errorMsg = expr ? await validateNodeDefExpr(survey, nodeDef, expr) : null
-    return errorMsg
+    return expr ? await validateNodeDefExpr(survey, nodeDef, expr) : null
   }
 
 const validateExpression = async (survey, nodeDef, nodeDefExpression) =>
   await Validator.validate(
     nodeDefExpression,
     {
-      'expression': [Validator.validateRequired, validateExpressionProp(survey, nodeDef)],
-      'applyIf': [validateExpressionProp(survey, nodeDef)]
+      [NodeDefExpression.keys.expression]: [Validator.validateRequired, validateExpressionProp(survey, nodeDef)],
+      [NodeDefExpression.keys.applyIf]: [validateExpressionProp(survey, nodeDef)]
     }
   )
 

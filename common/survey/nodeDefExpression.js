@@ -2,12 +2,13 @@ const R = require('ramda')
 const {uuidv4} = require('./../uuid')
 const {isBlank} = require('../stringUtils')
 
-// ====== CREATE
 const keys = {
   placeholder: 'placeholder',
   expression: 'expression',
   applyIf: 'applyIf',
 }
+
+// ====== CREATE
 
 const createExpressionPlaceholder = () => ({
   uuid: uuidv4(),
@@ -17,6 +18,7 @@ const createExpressionPlaceholder = () => ({
 })
 
 // ====== READ
+
 const getExpression = R.prop(keys.expression)
 
 const getApplyIf = R.prop(keys.applyIf)
@@ -26,12 +28,14 @@ const isPlaceholder = R.propEq(keys.placeholder, true)
 const isEmpty = (expression = {}) => isBlank(getExpression(expression)) && isBlank(getApplyIf(expression))
 
 // ====== UPDATE
+
 const assocProp = (propName, value) => R.pipe(
   R.assoc(propName, value),
   R.dissoc(keys.placeholder),
 )
 
 // ====== UTILS
+
 const extractNodeDefNames = (jsExpr = '') => {
   if (isBlank(jsExpr))
     return []
@@ -56,6 +60,8 @@ const findReferencedNodeDefs = nodeDefExpressions => {
 }
 
 module.exports = {
+  keys,
+
   //CREATE
   createExpressionPlaceholder,
 
