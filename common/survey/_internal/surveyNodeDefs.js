@@ -13,7 +13,7 @@ const getNodeDefsArray = R.pipe(getNodeDefs, R.values)
 
 const getNodeDefsByParentUuid = parentUuid => R.pipe(
   getNodeDefsArray,
-  R.filter(R.propEq('parentUuid', parentUuid)),
+  R.filter(R.propEq(NodeDef.propKeys.parentUuid, parentUuid)),
 )
 
 const getRootNodeDef = R.pipe(getNodeDefsByParentUuid(null), R.head)
@@ -45,17 +45,17 @@ const getNodeDefKeys = nodeDef => R.pipe(
 
 const getNodeDefByName = (name) => R.pipe(
   getNodeDefsArray,
-  R.find(R.pathEq(['props', 'name'], name))
+  R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name))
 )
 
 const getNodeDefsByCategoryUuid = (uuid) => R.pipe(
   getNodeDefsArray,
-  R.filter(R.pathEq(['props', 'categoryUuid'], uuid))
+  R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid))
 )
 
 const getNodeDefsByTaxonomyUuid = (uuid) => R.pipe(
   getNodeDefsArray,
-  R.filter(R.pathEq(['props', 'taxonomyUuid'], uuid))
+  R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid))
 )
 
 // ====== UPDATE

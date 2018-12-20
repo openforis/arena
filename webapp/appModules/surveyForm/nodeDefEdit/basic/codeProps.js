@@ -1,25 +1,28 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
+import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import Category from '../../../../../common/survey/category'
 import Validator from '../../../../../common/validation/validator'
-
 import {
   isRenderCheckbox,
   isRenderDropdown,
   nodeDefLayoutProps,
   nodeDefRenderType
 } from '../../../../../common/survey/nodeDefLayout'
+
 import { getSurvey } from '../../../../survey/surveyState'
 import { getFormNodeDefEdit, getSurveyForm } from '../../surveyFormState'
-import Survey from '../../../../../common/survey/survey'
-import connect from 'react-redux/es/connect/connect'
+
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../../categoryEdit/actions'
+
+const {propKeys} = NodeDef
 
 const CodeProps = (props) => {
   const {
@@ -38,6 +41,11 @@ const CodeProps = (props) => {
 
   const disabled = !canUpdateCategory
 
+  const putCategoryProp = category => {
+    putNodeDefProp(nodeDef, propKeys.parentCodeDefUuid, null) //reset parent code
+    putNodeDefProp(nodeDef, propKeys.categoryUuid, category ? category.uuid : null)
+  }
+
   return (
     <React.Fragment>
 
@@ -50,16 +58,13 @@ const CodeProps = (props) => {
                     items={categories}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={Category.getName}
-                    validation={Validator.getFieldValidation('categoryUuid')(validation)}
+                    validation={Validator.getFieldValidation(propKeys.categoryUuid)(validation)}
                     selection={category}
-                    onChange={category => {
-                      putNodeDefProp(nodeDef, 'parentCodeDefUuid', null) //reset parent code
-                      putNodeDefProp(nodeDef, 'categoryUuid', category ? category.uuid : null)
-                    }}/>
+                    onChange={putCategoryProp}/>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
-                  onClick={() => {
-                    createCategory()
+                  onClick={async () => {
+                    putCategoryProp(await createCategory())
                     toggleCategoryEdit(true)
                   }}>
 
@@ -98,7 +103,7 @@ const CodeProps = (props) => {
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={NodeDef.getNodeDefName}
-                    onChange={def => putNodeDefProp(nodeDef, 'parentCodeDefUuid', def ? def.uuid : null)}/>
+                    onChange={def => putNodeDefProp(nodeDef, propKeys.parentCodeDefUuid, def ? def.uuid : null)}/>
         </div>
       </FormItem>
     </React.Fragment>
@@ -114,7 +119,7 @@ const mapStateToProps = state => {
 
   return {
     categories: isCode ? Survey.getCategoriesArray(survey) : null,
-    canUpdateCategory: isCode ? Survey.canUpdateCategory(nodeDef)(survey) : false,
+    canUpdateCategory: isCode && Survey.canUpdateCategory(nodeDef)(survey),
     category: isCode ? Survey.getCategoryByUuid(NodeDef.getNodeDefCategoryUuid(nodeDef))(survey) : null,
     candidateParentCodeNodeDefs: isCode ? Survey.getNodeDefCodeCandidateParents(nodeDef)(survey) : null,
     parentCodeDef: isCode ? Survey.getNodeDefParentCode(nodeDef)(survey) : null,
