@@ -56,7 +56,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset = 0, 
     JOIN "user" u
       ON r.owner_id = u.id
     -- GET LAST MODIFIED NODE DATE
-    JOIN (
+    LEFT OUTER JOIN (
          SELECT 
            record_uuid, ${selectDate('MAX(date_modified)', 'date_modified')}
          FROM ${getSurveyDBSchema(surveyId)}.node
