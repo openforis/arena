@@ -10,6 +10,16 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'
 import Validator from '../../../../../common/validation/validator'
 
+import createNumberMask from 'text-mask-addons/dist/createNumberMask'
+
+const integerMask = createNumberMask({
+  prefix: '',
+  suffix: '',
+  includeThousandsSeparator: false,
+  allowNegative: false,
+  allowLeadingZeroes: false,
+})
+
 const ValidationsProps = props => {
   const {nodeDef, readOnly, putNodeDefProp} = props
 
@@ -28,7 +38,11 @@ const ValidationsProps = props => {
               <FormItem label="Min Count">
                 <Input value={NodeDefValidations.getMinCount(nodeDefValidations)}
                        disabled={readOnly}
-                       validation={Validator.getFieldValidation('validations.count.min')(validation)}
+                       validation={R.pipe(
+                         Validator.getFieldValidation('validations'),
+                         Validator.getFieldValidation('min'),
+                       )(validation)}
+                       mask={integerMask}
                        onChange={value => handleValidationsUpdate(
                          NodeDefValidations.assocMinCount(value)(nodeDefValidations)
                        )}/>
@@ -36,7 +50,11 @@ const ValidationsProps = props => {
               <FormItem label="Max Count">
                 <Input value={NodeDefValidations.getMaxCount(nodeDefValidations)}
                        disabled={readOnly}
-                       validation={Validator.getFieldValidation('validations.count.max')(validation)}
+                       validation={R.pipe(
+                         Validator.getFieldValidation('validations'),
+                         Validator.getFieldValidation('max'),
+                       )(validation)}
+                       mask={integerMask}
                        onChange={value => handleValidationsUpdate(
                          NodeDefValidations.assocMaxCount(value)(nodeDefValidations)
                        )}/>

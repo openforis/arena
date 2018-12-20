@@ -31,9 +31,12 @@ const memberExpression = async (expr, ctx) => {
   const objectRes = await evalExpression(object, ctx)
   const propertyRes = await evalExpression(property, ctx)
 
-  return isString(objectRes)
-    ? eval(`${objectRes}.${propertyRes}`)
-    : R.prop(propertyRes, objectRes)
+  if (isString(objectRes))
+    return eval(`${objectRes}.${propertyRes}`)
+  else if (R.has(propertyRes, objectRes))
+    return R.prop(propertyRes, objectRes)
+  else
+    throw new Error(`Invalid property ${propertyRes}`)
 }
 
 const callExpression = async (expr, ctx) => {
@@ -47,11 +50,16 @@ const callExpression = async (expr, ctx) => {
   const args = await Promise.all(
     exprArgs.map(async arg => await evalExpression(arg, ctx))
   )
-  const res = await R.apply(fn, args)
 
-  // console.log('== CALLEE = RES ', res)
-  return res
+  if (fn) {
+    const res = await R.apply(fn, args)
 
+    // console.log('== CALLEE = RES ', res)
+    return res
+  } else {
+    const fnName = R.pathOr('', ['property', 'name'])(callee)
+    throw new Error(`Undefined function '${fnName}' or wrong parameter types`)
+  }
 }
 
 const literalExpression = expr => {
@@ -101,34 +109,20 @@ const defaultFunctions = {
 const evalExpression = async (expr, ctx) => {
   const functions = R.pipe(
     R.prop('functions'),
-    R.merge(defaultFunctions)
+    R.mergeRight(defaultFunctions)
   )(ctx)
 
-  return await functions[expr.type](expr, ctx)
+  const fn = functions[expr.type]
+  if (fn)
+    return await fn(expr, ctx)
+  else
+    throw new Error(`Unsupported function type: ${expr.type}`)
 }
 
-const evalQuery = async (query, ctx) => {
-  const expr = jsep(query)
-  return await evalExpression(expr, ctx)
-}
-
-const validateExpression = query => {
-  try {
-    jsep(query)
-    return {
-      valid: true
-    }
-  } catch (e) {
-    return {
-      valid: false,
-      errors: [e.description]
-    }
-  }
-}
+const evalQuery = async (query, ctx) => await evalExpression(jsep(query), ctx)
 
 module.exports = {
   expressionTypes,
   evalExpression,
   evalQuery,
-  validateExpression
 }
