@@ -59,6 +59,7 @@ class Job {
         try {
           await this.execute(tx)
         } catch (e) {
+          console.log('** Error in job ', e)
           this.addError({systemError: {valid: false, errors: [e.toString()]}})
           this.setStatusFailed()
         }

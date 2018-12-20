@@ -55,7 +55,7 @@ const compareDatesDesc = compareDesc
  * @returns {boolean}
  */
 const isValidDate = (year, month, day) => {
-  if (!(year && month && day)) {
+  if (isBlank(year) || isBlank(month) || isBlank(day)) {
     return false
   }
 
@@ -67,8 +67,14 @@ const isValidDate = (year, month, day) => {
     && date.getDate() === +day
 }
 
+const isValidTime = (hour = '', minutes = '') =>
+  isBlank(hour) || isBlank(minutes)
+    ? false
+    : +hour >= 0 && +hour < 24 && +minutes >= 0 && +minutes < 60
+
 module.exports = {
   getRelativeDate,
   compareDatesDesc,
   isValidDate,
+  isValidTime,
 }

@@ -80,7 +80,7 @@ class NodeDefCode extends React.Component {
     const selectedItemUuids = R.pipe(
       R.values,
       R.reject(R.propEq('placeholder', true)),
-      R.map(Node.getNodeItemUuid),
+      R.map(Node.getCategoryItemUuid),
       R.reject(R.isNil),
     )(nodes)
 
@@ -98,7 +98,7 @@ class NodeDefCode extends React.Component {
     if (multiple) {
       const deselectedItem = R.head(R.difference(selectedItems, newSelectedItems))
       if (deselectedItem) {
-        removeNode(nodeDef, R.find(n => Node.getNodeItemUuid(n) === deselectedItem.uuid)(nodes))
+        removeNode(nodeDef, R.find(n => Node.getCategoryItemUuid(n) === deselectedItem.uuid)(nodes))
       }
     }
 
@@ -156,7 +156,7 @@ const mapStateToProps = (state, props) => {
     parentCodeDefUuid: NodeDef.getNodeDefParentCodeDefUuid(nodeDef),
     categoryUuid: category ? category.uuid : null,
     categoryLevelIndex: categoryLevelIndex,
-    parentItemUuid: Node.getNodeItemUuid(parentCodeAttribute),
+    parentItemUuid: Node.getCategoryItemUuid(parentCodeAttribute),
     codeUuidsHierarchy: Record.getCodeUuidsHierarchy(survey, parentNode, nodeDef)(record),
   }
 }
