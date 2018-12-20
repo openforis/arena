@@ -1,10 +1,10 @@
 const R = require('ramda')
 
 const {uuidv4} = require('./../uuid')
-const {isBlank} = require('../stringUtils')
+const {isBlank, trim} = require('../stringUtils')
 const SurveyUtils = require('../survey/surveyUtils')
 
-const valuePropName = 'value'
+const valueKey = 'value'
 
 /**
  * ======
@@ -33,7 +33,7 @@ const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
  */
 
 const getNodeValue = (node = {}, defaultValue = {}) =>
-  R.propOr(defaultValue, valuePropName, node)
+  R.propOr(defaultValue, valueKey, node)
 
 const getNodeValueProp = (prop, defaultValue = null) => R.pipe(
   getNodeValue,
@@ -83,17 +83,65 @@ module.exports = {
   getRecordUuid: R.prop('recordUuid'),
   getNodeValue,
   getNodeDefUuid,
-  getNodeFileName: getNodeValueProp('fileName', ''),
-  getNodeItemUuid: getNodeValueProp('itemUuid'),
-  getNodeTaxonUuid: getNodeValueProp('taxonUuid'),
-  getNodeVernacularNameUuid: getNodeValueProp('vernacularNameUuid'),
 
   getNodeDefUuids,
 
   // ==== UPDATE
-  assocValue: R.assoc(valuePropName),
+  assocValue: R.assoc(valueKey),
 
   // ==== UTILS
   isNodeValueBlank,
   isNodeValueNotBlank,
+
+  // ====== Node Value extractor
+
+  // date
+  getDateYear: R.pipe(
+    R.partialRight(getNodeValue, ['//']),
+    R.split('/'),
+    R.prop(2),
+    trim,
+  ),
+  getDateMonth: R.pipe(
+    R.partialRight(getNodeValue, ['//']),
+    R.split('/'),
+    R.prop(1),
+    trim
+  ),
+  getDateDay: R.pipe(
+    R.partialRight(getNodeValue, ['//']),
+    R.split('/'),
+    R.prop(0),
+    trim
+  ),
+
+  // time
+  getTimeHour: R.pipe(
+    R.partialRight(getNodeValue, [':']),
+    R.split(':'),
+    R.prop(0),
+    trim
+  ),
+  getTimeMinute: R.pipe(
+    R.partialRight(getNodeValue, [':']),
+    R.split(':'),
+    R.prop(1),
+    trim
+  ),
+
+  // coordinate
+  getCoordinateX: getNodeValueProp('x'),
+  getCoordinateY: getNodeValueProp('y'),
+  getCoordinateSrs: (node, defaultValue = null) => getNodeValueProp('srs', defaultValue)(node),
+
+  // file
+  getNodeFileName: getNodeValueProp('fileName', ''),
+
+  // code
+  getCategoryItemUuid: getNodeValueProp('itemUuid'),
+
+  // taxon
+  getNodeTaxonUuid: getNodeValueProp('taxonUuid'),
+  getNodeVernacularNameUuid: getNodeValueProp('vernacularNameUuid'),
+
 }

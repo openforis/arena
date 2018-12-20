@@ -21,6 +21,8 @@ const getDefaultLanguage = R.pipe(getLanguages, R.head)
 
 const getSRS = getProp('srs', [])
 
+const getDefaultSRS = R.pipe(getSRS, R.head)
+
 const getLabels = getProp('labels', {})
 
 const getDefaultLabel = surveyInfo => {
@@ -70,6 +72,7 @@ module.exports = {
   getLanguages,
   getDefaultLanguage,
   getSRS,
+  getDefaultSRS,
   getLabels,
   getDefaultLabel,
   getStatus,

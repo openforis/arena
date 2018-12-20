@@ -9,6 +9,9 @@ const Node = require('../../../common/record/node')
 const CategoryManager = require('../../category/categoryManager')
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
+const {isBlank} = require('../../../common/stringUtils')
+const DateTimeUtils = require('../../../common/dateUtils')
+
 const {nodeDefType} = NodeDef
 
 const cols = 'cols'
@@ -38,6 +41,9 @@ const sqlTypes = {
   varchar: 'VARCHAR',
   integer: 'INTEGER',
   decimal: `DECIMAL(${16 + 6}, 6)`,
+  date: 'DATE',
+  time: 'TIME WITHOUT TIME ZONE',
+  point: 'geometry(Point)',
 }
 
 const props = {
@@ -51,15 +57,30 @@ const props = {
   },
 
   [nodeDefType.decimal]: {
-    //TODO used in ui nodeDefSystemProps
     [colTypeProcessor]: () => () => sqlTypes.decimal,
+  },
+
+  [nodeDefType.date]: {
+    [colTypeProcessor]: () => () => sqlTypes.date,
+    [colValueProcessor]: (surveyInfo, nodeDefCol, nodeCol) => {
+      const [year, month, day] = [Node.getDateYear(nodeCol), Node.getDateMonth(nodeCol), Node.getDateDay(nodeCol)]
+      return () => DateTimeUtils.isValidDate(year, month, day) ? `${year}-${month}-${day}` : null
+    }
+  },
+
+  [nodeDefType.time]: {
+    [colTypeProcessor]: () => () => sqlTypes.time,
+    [colValueProcessor]: (surveyInfo, nodeDefCol, nodeCol) => {
+      const [hour, minute] = [Node.getTimeHour(nodeCol), Node.getTimeMinute(nodeCol)]
+      return () => DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${minute}:00` : null
+    }
   },
 
   [nodeDefType.code]: {
     [cols]: ['code', 'label'],
 
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
-      const {itemUuid} = Node.getNodeValue(nodeCol)
+      const itemUuid = Node.getCategoryItemUuid(nodeCol)
       const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid) : {}
 
       return (node, colName) => R.endsWith('code', colName)
@@ -72,7 +93,7 @@ const props = {
   [nodeDefType.taxon]: {
     [cols]: ['code', 'scientific_name'], //?, 'vernacular_names?'],
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
-      const {taxonUuid} = Node.getNodeValue(nodeCol)
+      const taxonUuid = Node.getNodeTaxonUuid(nodeCol)
       const items = taxonUuid ? await TaxonomyManager.fetchTaxaByPropLike(surveyInfo.id, null, {filter: {uuid: taxonUuid}}) : []
       const item = R.pipe(R.head, R.defaultTo({}))(items)
 
@@ -81,8 +102,12 @@ const props = {
   },
 
   [nodeDefType.coordinate]: {
-    [cols]: ['x', 'y', 'srs'],
-    [colValueProcessor]: nodeValuePropProcessor,
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
+      const defaultSrsCode = Survey.getDefaultSRS(surveyInfo).code
+      const [x, y, srs] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol, defaultSrsCode)]
+      return () => isBlank(x) || isBlank(y) ? null : `SRID=${srs};POINT(${x} ${y})`
+    },
+    [colTypeProcessor]: () => () => sqlTypes.point,
   },
 
   [nodeDefType.file]: {

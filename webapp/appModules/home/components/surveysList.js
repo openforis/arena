@@ -4,7 +4,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Survey from '../../../../common/survey/survey'
-import { getRelativeDate, compareDatesDesc } from '../../../appUtils/dateUtils'
+import { getRelativeDate, compareDatesDesc } from '../../../../common/dateUtils'
 
 const SurveyRow = ({surveyInfoRow, surveyInfo, setActiveSurvey}) => {
   const surveyId = surveyInfoRow.id

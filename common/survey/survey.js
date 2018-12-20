@@ -21,6 +21,7 @@ module.exports = {
   getDescriptions: SurveyInfo.getDescriptions,
   getDefaultStep: SurveyInfo.getDefaultStep,
   getSRS: SurveyInfo.getSRS,
+  getDefaultSRS: SurveyInfo.getDefaultSRS,
   getStatus: SurveyInfo.getStatus,
   isPublished: SurveyInfo.isPublished,
   isDraft: SurveyInfo.isDraft,

@@ -28,8 +28,8 @@ To constantly build it when something changes, run:
 
 If you have a Docker server configured locally, just run this command:
 
-```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgres:10.4```
 
+```sudo docker run -d --name of-arena-dev-db -p 5444:5432 -e POSTGRES_DB=of-arena-dev -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena mdillon/postgis:11```
 
 Add the db configurations to the **`.env`** file [(see .env section)](#env-file)
 
