@@ -13,6 +13,10 @@ import { getFormNodeDefEdit, getSurveyForm } from '../../surveyFormState'
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 import { createTaxonomy, deleteTaxonomy } from '../../taxonomyEdit/actions'
 
+const keys = {
+  taxonomyUuid: 'taxonomyUuid'
+}
+
 const TaxonProps = (props) => {
   const {
     nodeDef,
@@ -25,6 +29,8 @@ const TaxonProps = (props) => {
 
   const validation = getValidation(nodeDef)
 
+  const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, keys.taxonomyUuid, taxonomy ? taxonomy.uuid : null)
+
   return (
     <React.Fragment>
 
@@ -36,13 +42,13 @@ const TaxonProps = (props) => {
           <Dropdown items={taxonomies}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={Taxonomy.getTaxonomyName}
-                    validation={getFieldValidation('taxonomyUuid')(validation)}
+                    validation={getFieldValidation(keys.taxonomyUuid)(validation)}
                     selection={taxonomy}
-                    onChange={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUuid', taxonomy ? taxonomy.uuid : null)}/>
+                    onChange={putTaxonomyProp}/>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
-                  onClick={() => {
-                    createTaxonomy()
+                  onClick={async () => {
+                    putTaxonomyProp(await createTaxonomy())
                     toggleTaxonomyEdit(true)
                   }}>
             <span className="icon icon-plus icon-12px icon-left"/>

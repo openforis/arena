@@ -20,8 +20,6 @@ import { getSurveyForm } from '../surveyFormState'
 export const taxonomyEditUpdate = 'survey/taxonomyEdit/update'
 export const taxonomyEditPropsUpdate = 'survey/taxonomyEdit/props/update'
 
-const dispatchTaxonomyUpdate = (dispatch, taxonomy) => dispatch({type: taxonomyUpdate, taxonomy})
-
 const dispatchTaxonomyEditPropsUpdate = (dispatch, props) => dispatch({type: taxonomyEditPropsUpdate, ...props})
 
 // ====== SET TAXONOMY FOR EDIT
@@ -32,13 +30,14 @@ export const setTaxonomyForEdit = taxonomy => dispatch =>
 // ====== CREATE
 
 export const createTaxonomy = () => async (dispatch, getState) => {
-  const taxonomy = Taxonomy.newTaxonomy()
+  const surveyId = getStateSurveyId(getState())
+  const {data} = await axios.post(`/api/survey/${surveyId}/taxonomies`, Taxonomy.newTaxonomy())
+
+  const taxonomy = data.taxonomy
+
   dispatch({type: taxonomyCreate, taxonomy})
 
-  const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.post(`/api/survey/${surveyId}/taxonomies`, taxonomy)
-
-  dispatchTaxonomyUpdate(dispatch, data.taxonomy)
+  return taxonomy
 }
 
 // ====== READ
@@ -60,9 +59,9 @@ const fetchTaxa = async (surveyId, taxonomyUuid, offset, limit) => {
 }
 
 const fetchTaxonomy = (surveyId, taxonomyUuid) => async dispatch => {
-    const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}?draft=true&validate=true`)
-    dispatchTaxonomyUpdate(dispatch, data.taxonomy)
-  }
+  const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}?draft=true&validate=true`)
+  dispatch({type: taxonomyUpdate, taxonomy: data.taxonomy})
+}
 
 const ROWS_PER_PAGE = 15
 
