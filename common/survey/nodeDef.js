@@ -114,7 +114,6 @@ const canNodeDefBeKey = nodeDef =>
       nodeDefType.date,
       nodeDefType.decimal,
       nodeDefType.code,
-      nodeDefType.coordinate,
       nodeDefType.integer,
       nodeDefType.taxon,
       nodeDefType.text,
