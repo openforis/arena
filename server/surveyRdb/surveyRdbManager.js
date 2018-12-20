@@ -28,7 +28,10 @@ const updateTableNodes = async (surveyInfo, nodeDefs, nodes, client = db) =>
 
 const queryTable = async (surveyId, tableName, cols = [],
                           offset = 0, limit = 20, client = db) =>
-  await TableViewQuery.run(surveyId, tableName, cols, offset, limit, client)
+  await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, client)
+
+const countTable = async (surveyId, tableName, client = db) =>
+  await TableViewQuery.runCount(surveyId, tableName, client)
 
 module.exports = {
   dropSchema,
@@ -38,4 +41,5 @@ module.exports = {
   insertIntoTable,
   updateTableNodes,
   queryTable,
+  countTable,
 }

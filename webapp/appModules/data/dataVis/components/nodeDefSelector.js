@@ -12,6 +12,8 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 import * as SurveyState from '../../../../survey/surveyState'
 import { nbsp } from '../../../../../common/stringUtils'
 
+import { initDataTable } from '../actions'
+
 const TableSelector = ({hierarchy, nodeDefUuid, lang, onChange}) => {
   const entities = []
   const traverse = (nodeDef, depth) => {
@@ -36,12 +38,15 @@ const TableSelector = ({hierarchy, nodeDefUuid, lang, onChange}) => {
 class NodeDefSelector extends React.Component {
   constructor () {
     super()
-    this.state = {nodeDefUuid: null, nodeDefVariableUuids: {}}
+    this.state = {nodeDefUuid: null, nodeDefVariableUuids: []}
   }
 
   render () {
-    const {hierarchy, lang} = this.props
-    const {nodeDefUuid} = this.state
+    const {
+      hierarchy, lang,
+      initDataTable,
+    } = this.props
+    const {nodeDefUuid, nodeDefVariableUuids} = this.state
 
     return (
       <div className="node-def-selector">
@@ -49,9 +54,13 @@ class NodeDefSelector extends React.Component {
         <TableSelector hierarchy={hierarchy} nodeDefUuid={nodeDefUuid}
                        lang={lang} onChange={nodeDefUuid => this.setState({nodeDefUuid})}/>
 
-        <VariablesSelector nodeDefUuid={nodeDefUuid} lang={lang} />
+        <VariablesSelector nodeDefUuid={nodeDefUuid} lang={lang}
+                           onChange={nodeDefVariableUuids => this.setState({nodeDefVariableUuids})}/>
 
-        <button className="btn btn-of-light btn-sync">
+        <button className="btn btn-of-light btn-sync"
+                onClick={() => R.isEmpty(nodeDefVariableUuids)
+                  ? alert('Please select at least one attribute')
+                  : initDataTable(nodeDefUuid, nodeDefVariableUuids)}>
           Sync
           <span className="icon icon-loop icon-16px icon-right"/>
           {/*<span className="icon icon-spinner10 icon-20px icon-right"/>*/}
@@ -70,7 +79,8 @@ const mapStateToProps = state => {
 }
 
 export default connect(
-  mapStateToProps
+  mapStateToProps,
+  {initDataTable}
 )(NodeDefSelector)
 
 

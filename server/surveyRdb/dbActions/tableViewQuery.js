@@ -2,8 +2,9 @@ const camelize = require('camelize')
 
 const DataSchema = require('../schemaRdb/dataSchema')
 
-const run = async (surveyId, tableName, cols, offset, limit, client) => {
+const runSelect = async (surveyId, tableName, cols, offset, limit, client) => {
   const schemaName = DataSchema.getName(surveyId)
+
   return await client.map(`
     SELECT ${cols.join(', ')} 
     FROM ${schemaName}.${tableName}
@@ -11,9 +12,17 @@ const run = async (surveyId, tableName, cols, offset, limit, client) => {
     OFFSET ${offset}
     `,
     [],
-    camelize)
+    camelize
+  )
+}
+
+const runCount = async (surveyId, tableName, client) => {
+  const schemaName = DataSchema.getName(surveyId)
+
+  return await client.one(`SELECT count(*) FROM ${schemaName}.${tableName}`)
 }
 
 module.exports = {
-  run
+  runSelect,
+  runCount,
 }

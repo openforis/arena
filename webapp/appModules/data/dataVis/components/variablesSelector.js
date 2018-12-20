@@ -85,12 +85,15 @@ class VariablesSelector extends React.PureComponent {
   }
 
   toggleNodeDefVariable (nodeDefUuid) {
-    const {nodeDefVariableUuids} = this.state
+    const {onChange} = this.props
+    const {nodeDefVariableUuids: nodeDefVariableUuidsState} = this.state
 
-    const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefVariableUuids)
+    const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefVariableUuidsState)
     const fn = idx >= 0 ? R.remove(idx, 1) : R.append(nodeDefUuid)
+    const nodeDefVariableUuids = fn(nodeDefVariableUuidsState)
 
-    this.setState({nodeDefVariableUuids: fn(nodeDefVariableUuids)})
+    this.setState({nodeDefVariableUuids})
+    onChange(nodeDefVariableUuids)
   }
 
   render () {
