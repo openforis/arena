@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import { deleteRecord } from '../record/actions'
 
-const RecordActions = ({entry, deleteRecord}) => (
+const FormEntryActions = ({entry, deleteRecord}) => (
   entry
     ? (
       <div className="survey-form__nav-record-actions">
@@ -22,4 +22,4 @@ const RecordActions = ({entry, deleteRecord}) => (
     : null
 )
 
-export default connect(null, {deleteRecord})(RecordActions)
+export default connect(null, {deleteRecord})(FormEntryActions)
