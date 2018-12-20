@@ -12,7 +12,7 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 import { appModuleUri } from '../../../appModules'
 import { dataModules } from '../../dataModules'
 
-import { getRelativeDate } from '../../../../appUtils/dateUtils'
+import { getRelativeDate } from '../../../../../common/dateUtils'
 
 import { initRecordsList, fetchRecords } from '../actions'
 import { createRecord } from '../../../surveyForm/record/actions'

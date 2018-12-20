@@ -138,7 +138,8 @@ const mapStateToProps = state => {
   return {
     nodeDef,
     nodeDefKeyEditDisabled,
-    nodeDefMultipleEditDisabled
+    nodeDefMultipleEditDisabled,
+    canUpdateCategory: NodeDef.isNodeDefCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey)
   }
 }
 

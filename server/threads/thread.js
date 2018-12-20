@@ -18,6 +18,7 @@ class Thread {
     try {
       await this.onMessage(msg)
     } catch (e) {
+      console.log('** Error in thread ', e)
       this.postMessage({type: 'error', error: e.toString()})
     }
   }

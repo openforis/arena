@@ -17,6 +17,8 @@ const NodeDefLayout = require('../../common/survey/nodeDefLayout')
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
 
+const {keys, propKeys} = NodeDef
+
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.code
     ? validateRequired(propName, nodeDef)
@@ -75,15 +77,15 @@ const validateKey = survey =>
     return null
   }
 
-const propsValidations = (survey, nodeDef) => ({
-  'props.name': [
+const propsValidations = survey => ({
+  [`${keys.props}.${propKeys.name}`]: [
     validateRequired,
     validateNotKeyword,
     validateItemPropUniqueness(Survey.getNodeDefsArray(survey))
   ],
-  'props.categoryUuid': [validateCategory],
-  'props.taxonomyUuid': [validateTaxonomy],
-  'props.key': [validateKey(survey)],
+  [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
+  [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
+  [`${keys.props}.${propKeys.key}`]: [validateKey(survey)],
   'keyAttributes': [validateKeyAttributes(survey)],
   'children': [validateChildren(survey)],
 })
@@ -104,7 +106,7 @@ const validateAdvancedProps = async (survey, nodeDef) => {
 }
 
 const validateNodeDef = async (survey, nodeDef) => {
-  const nodeDefValidation = await validate(nodeDef, propsValidations(survey, nodeDef))
+  const nodeDefValidation = await validate(nodeDef, propsValidations(survey))
 
   const advancedPropsValidation = await validateAdvancedProps(survey, nodeDef)
 

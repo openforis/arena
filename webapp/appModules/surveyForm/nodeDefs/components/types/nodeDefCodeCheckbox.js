@@ -8,7 +8,7 @@ const Checkbox = props => {
   const {language, edit, item, nodes, selectedItems, onSelectedItemsChange} = props
 
   const itemUuid = item.uuid
-  const node = R.find(node => Node.getNodeItemUuid(node) === itemUuid)(nodes)
+  const node = R.find(node => Node.getCategoryItemUuid(node) === itemUuid)(nodes)
   const selected = !!node
 
   return (
