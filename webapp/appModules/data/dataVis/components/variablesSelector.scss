@@ -26,4 +26,10 @@
     text-align: center;
     padding: .3rem 0;
   }
+
+  .btn-node-def {
+    &.active {
+      pointer-events: auto;
+    }
+  }
 }

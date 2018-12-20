@@ -18,7 +18,7 @@ const TableSelector = ({hierarchy, nodeDefUuid, lang, onChange}) => {
     const label = NodeDef.getNodeDefLabel(nodeDef, lang)
     entities.push({
       key: NodeDef.getUuid(nodeDef),
-      value: R.range(0, depth).map(i => nbsp + nbsp + nbsp + nbsp + nbsp).join('') + label
+      value: nbsp + R.repeat(nbsp + nbsp, depth).join('') + label
     })
   }
   Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
@@ -36,7 +36,7 @@ const TableSelector = ({hierarchy, nodeDefUuid, lang, onChange}) => {
 class NodeDefSelector extends React.Component {
   constructor () {
     super()
-    this.state = {nodeDefUuid: null}
+    this.state = {nodeDefUuid: null, nodeDefVariableUuids: {}}
   }
 
   render () {
@@ -49,7 +49,7 @@ class NodeDefSelector extends React.Component {
         <TableSelector hierarchy={hierarchy} nodeDefUuid={nodeDefUuid}
                        lang={lang} onChange={nodeDefUuid => this.setState({nodeDefUuid})}/>
 
-        <VariablesSelector nodeDefUuid={nodeDefUuid} lang={lang}/>
+        <VariablesSelector nodeDefUuid={nodeDefUuid} lang={lang} />
 
         <button className="btn btn-of-light btn-sync">
           Sync
