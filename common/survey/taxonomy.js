@@ -6,37 +6,60 @@ const {
   getProp,
 } = require('./surveyUtils')
 
+const taxonomyPropKeys = {
+  name: 'name',
+  vernacularLanguageCodes: 'vernacularLanguageCodes',
+}
+
+const taxonPropKeys = {
+  code: 'code',
+  family: 'family',
+  genus: 'genus',
+  scientificName: 'scientificName',
+  vernacularNames: 'vernacularNames',
+}
+
 // ====== CREATE
 const newTaxonomy = () => ({
   uuid: uuidv4(),
   props: {},
 })
 
-const newTaxon = (taxonomyUuid) => ({
+const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularNames = {}) => ({
   uuid: uuidv4(),
   taxonomyUuid,
-  props: {},
+  props: {
+    [taxonPropKeys.code]: code,
+    [taxonPropKeys.family]: family,
+    [taxonPropKeys.genus]: genus,
+    [taxonPropKeys.scientificName]: scientificName,
+    [taxonPropKeys.vernacularNames]: vernacularNames
+  },
 })
 
 // ====== READ
+const getTaxonVernacularNames = getProp(taxonPropKeys.vernacularNames, {})
+
 const getTaxonVernacularName = lang => R.pipe(
-  getProp('vernacularNames', {}),
+  getTaxonVernacularNames,
   R.prop(lang),
 )
 
 module.exports = {
+  taxonPropKeys,
+
   //CREATE
   newTaxonomy,
   newTaxon,
 
   //READ
-  getTaxonomyName: getProp('name', ''),
-  getTaxonomyVernacularLanguageCodes: getProp('vernacularLanguageCodes', []),
-  getTaxonCode: getProp('code', ''),
-  getTaxonFamily: getProp('family', ''),
-  getTaxonGenus: getProp('genus', ''),
-  getTaxonScientificName: getProp('scientificName', ''),
-  getTaxonVernacularNames: getProp('vernacularNames', {}),
+  getTaxonomyName: getProp(taxonomyPropKeys.name, ''),
+  getTaxonomyVernacularLanguageCodes: getProp(taxonomyPropKeys.vernacularLanguageCodes, []),
+  getTaxonCode: getProp(taxonPropKeys.code, ''),
+  getTaxonFamily: getProp(taxonPropKeys.family, ''),
+  getTaxonGenus: getProp(taxonPropKeys.genus, ''),
+  getTaxonScientificName: getProp(taxonPropKeys.scientificName, ''),
+  getTaxonVernacularNames,
   getTaxonVernacularName,
 
   // UPDATE

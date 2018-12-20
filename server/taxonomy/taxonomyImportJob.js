@@ -4,12 +4,14 @@ const Job = require('../job/job')
 
 const {languageCodes} = require('../../common/app/languages')
 const {isNotBlank} = require('../../common/stringUtils')
-const {isValid} = require('../../common/validation/validator')
+const Validator = require('../../common/validation/validator')
 const Taxonomy = require('../../common/survey/taxonomy')
 
-const {validateTaxon} = require('../taxonomy/taxonomyValidator')
+const TaxonomyValidator = require('../taxonomy/taxonomyValidator')
 const TaxonomyManager = require('./taxonomyManager')
 const CSVParser = require('./csvParser')
+
+const {taxonPropKeys} = Taxonomy
 
 const requiredColumns = [
   'code',
@@ -19,6 +21,11 @@ const requiredColumns = [
 ]
 
 const taxaInsertBufferSize = 500
+
+const createPredefinedTaxa = (taxonomy) => [
+  Taxonomy.newTaxon(taxonomy.uuid, 'UNK', 'Unknown', 'Unknown', 'Unknown'),
+  Taxonomy.newTaxon(taxonomy.uuid, 'UNL', 'Unlisted', 'Unlisted', 'Unlisted')
+]
 
 class TaxonomyImportJob extends Job {
 
@@ -36,12 +43,9 @@ class TaxonomyImportJob extends Job {
   }
 
   async execute (tx) {
-    let csvParser = new CSVParser(this.csvString)
-    this.total = await csvParser.calculateSize()
+    const {surveyId, taxonomyUuid, csvString} = this
 
-    const {surveyId, taxonomyUuid} = this
-
-    this.vernacularLanguageCodes = []
+    this.total = await new CSVParser(csvString).calculateSize()
 
     const validHeaders = await this.processHeaders()
 
@@ -49,9 +53,6 @@ class TaxonomyImportJob extends Job {
       this.setStatusFailed()
       return
     }
-    this.processed = 0
-
-    csvParser = new CSVParser(this.csvString)
 
     const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
@@ -62,36 +63,33 @@ class TaxonomyImportJob extends Job {
     //delete old draft taxa
     await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)
 
-    let row = await csvParser.next()
+    const csvParser = new CSVParser(csvString)
 
-    while (row) {
-      if (this.isCanceled()) {
+    try {
+      this.processed = 0
+
+      let row = await csvParser.next()
+
+      while (row) {
+        if (this.isCanceled()) {
+          break
+        } else {
+          await this.processRow(row, tx)
+        }
+        row = await csvParser.next()
+      }
+
+      if (this.isRunning()) {
+        if (R.isEmpty(this.errors)) {
+          await this.finalizeImport(taxonomy, tx)
+        } else {
+          this.setStatusFailed()
+        }
+      }
+    } finally {
+      if (csvParser)
         csvParser.destroy()
-        break
-      } else {
-        await this.processRow(row, tx)
-      }
-      row = await csvParser.next()
     }
-
-    if (this.isCanceled()) {
-      throw new Error('canceled; rollback transaction')
-    } else {
-      const hasErrors = !R.isEmpty(R.keys(this.errors))
-      if (hasErrors) {
-        this.setStatusFailed()
-        throw new Error('errors found; rollback transaction')
-      } else {
-        await this.flushTaxaInsertBuffer(tx)
-
-        //set vernacular lang codes in taxonomy
-        //set log to false temporarily; set user to null as it's only needed for logging
-        await TaxonomyManager.updateTaxonomyProp(this.user, surveyId, taxonomy.uuid,
-          'vernacularLanguageCodes', this.vernacularLanguageCodes, tx)
-      }
-    }
-
-    csvParser.destroy()
   }
 
   async processHeaders () {
@@ -108,7 +106,7 @@ class TaxonomyImportJob extends Job {
   async processRow (data, t) {
     const taxon = await this.parseTaxon(data)
 
-    if (isValid(taxon)) {
+    if (Validator.isValid(taxon)) {
       await this.addTaxonToInsertBuffer(taxon, t)
     } else {
       this.addError(taxon.validation.fields)
@@ -134,27 +132,21 @@ class TaxonomyImportJob extends Job {
   async parseTaxon (data) {
     const {family, genus, scientific_name, code, ...vernacularNames} = data
 
-    const taxon = R.assoc('props', {
-      code,
-      family,
-      genus,
-      scientificName: scientific_name,
-      vernacularNames: this.parseVernacularNames(vernacularNames)
-    })(Taxonomy.newTaxon(this.taxonomyUuid))
+    const taxon = Taxonomy.newTaxon(this.taxonomyUuid, code, family, genus, scientific_name, this.parseVernacularNames(vernacularNames))
 
     return await this.validateTaxon(taxon)
   }
 
   async validateTaxon (taxon) {
-    const validation = await validateTaxon([], taxon) //do not validate code and scientific name uniqueness
+    const validation = await TaxonomyValidator.validateTaxon([], taxon) //do not validate code and scientific name uniqueness
 
     //validate taxon uniqueness among inserted values
     if (validation.valid) {
-      const code = Taxonomy.getTaxonCode(taxon)
+      const code = R.pipe(Taxonomy.getTaxonCode, R.toUpper)(taxon)
       const duplicateCodeRow = this.codesToRow[code]
 
       if (duplicateCodeRow) {
-        validation.fields['code'] = {valid: false, errors: ['duplicate']}
+        validation.fields[taxonPropKeys.code] = {valid: false, errors: [Validator.errorKeys.duplicate]}
       } else {
         this.codesToRow[code] = this.processed + 1
       }
@@ -163,7 +155,7 @@ class TaxonomyImportJob extends Job {
       const duplicateScientificNameRow = this.scientificNamesToRow[scientificName]
 
       if (duplicateScientificNameRow) {
-        validation.fields['scientificName'] = {valid: false, errors: ['duplicate']}
+        validation.fields[taxonPropKeys.scientificName] = {valid: false, errors: [Validator.errorKeys.duplicate]}
       } else {
         this.scientificNamesToRow[scientificName] = this.processed + 1
       }
@@ -196,6 +188,27 @@ class TaxonomyImportJob extends Job {
     if (this.taxaInsertBuffer.length > 0) {
       await TaxonomyManager.insertTaxa(this.surveyId, this.taxaInsertBuffer, this.user, t)
       this.taxaInsertBuffer.length = 0
+    }
+  }
+
+  async finalizeImport (taxonomy, t) {
+    const {user, surveyId} = this
+
+    await this.flushTaxaInsertBuffer(t)
+
+    //set vernacular lang codes in taxonomy
+    //set log to false temporarily; set user to null as it's only needed for logging
+    await TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomy.uuid,
+      'vernacularLanguageCodes', this.vernacularLanguageCodes, t)
+
+    //insert predefined taxa (UNL - UNK)
+    const predefinedTaxaToInsert = R.pipe(
+      createPredefinedTaxa,
+      R.filter(taxon => !this.codesToRow[Taxonomy.getTaxonCode(taxon)])
+    )(taxonomy)
+
+    if (!R.isEmpty(predefinedTaxaToInsert)) {
+      await TaxonomyManager.insertTaxa(surveyId, predefinedTaxaToInsert, user, t)
     }
   }
 }
