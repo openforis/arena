@@ -21,6 +21,11 @@ import connect from 'react-redux/es/connect/connect'
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../../categoryEdit/actions'
 
+const keys = {
+  categoryUuid: 'categoryUuid',
+  parentCodeDefUuid: 'parentCodeDefUuid'
+}
+
 const CodeProps = (props) => {
   const {
     nodeDef,
@@ -38,6 +43,11 @@ const CodeProps = (props) => {
 
   const disabled = !canUpdateCategory
 
+  const putCategoryProp = category => {
+    putNodeDefProp(nodeDef, keys.parentCodeDefUuid, null) //reset parent code
+    putNodeDefProp(nodeDef, keys.categoryUuid, category ? category.uuid : null)
+  }
+
   return (
     <React.Fragment>
 
@@ -50,16 +60,13 @@ const CodeProps = (props) => {
                     items={categories}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={Category.getName}
-                    validation={Validator.getFieldValidation('categoryUuid')(validation)}
+                    validation={Validator.getFieldValidation(keys.categoryUuid)(validation)}
                     selection={category}
-                    onChange={category => {
-                      putNodeDefProp(nodeDef, 'parentCodeDefUuid', null) //reset parent code
-                      putNodeDefProp(nodeDef, 'categoryUuid', category ? category.uuid : null)
-                    }}/>
+                    onChange={putCategoryProp}/>
           <button className="btn btn-s btn-of-light-xs"
                   style={{justifySelf: 'center'}}
-                  onClick={() => {
-                    createCategory()
+                  onClick={async () => {
+                    putCategoryProp(await createCategory())
                     toggleCategoryEdit(true)
                   }}>
 
@@ -98,7 +105,7 @@ const CodeProps = (props) => {
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={NodeDef.getNodeDefName}
-                    onChange={def => putNodeDefProp(nodeDef, 'parentCodeDefUuid', def ? def.uuid : null)}/>
+                    onChange={def => putNodeDefProp(nodeDef, keys.parentCodeDefUuid, def ? def.uuid : null)}/>
         </div>
       </FormItem>
     </React.Fragment>
@@ -114,7 +121,7 @@ const mapStateToProps = state => {
 
   return {
     categories: isCode ? Survey.getCategoriesArray(survey) : null,
-    canUpdateCategory: isCode ? Survey.canUpdateCategory(nodeDef)(survey) : false,
+    canUpdateCategory: isCode && Survey.canUpdateCategory(nodeDef)(survey),
     category: isCode ? Survey.getCategoryByUuid(NodeDef.getNodeDefCategoryUuid(nodeDef))(survey) : null,
     candidateParentCodeNodeDefs: isCode ? Survey.getNodeDefCodeCandidateParents(nodeDef)(survey) : null,
     parentCodeDef: isCode ? Survey.getNodeDefParentCode(nodeDef)(survey) : null,

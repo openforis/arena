@@ -53,11 +53,14 @@ export const setCategoryItemForEdit = (category, level, item, edit = true) => as
 //======
 
 export const createCategory = () => async (dispatch, getState) => {
-  const category = Category.newCategory()
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.post(`/api/survey/${surveyId}/categories`, category)
+  const {data} = await axios.post(`/api/survey/${surveyId}/categories`, Category.newCategory())
 
-  dispatch({type: categoryCreate, category: data.category})
+  const category = data.category
+
+  dispatch({type: categoryCreate, category})
+
+  return category
 }
 
 export const createCategoryLevel = (category) => async (dispatch, getState) => {
