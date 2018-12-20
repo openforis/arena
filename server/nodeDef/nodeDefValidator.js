@@ -17,6 +17,8 @@ const NodeDefLayout = require('../../common/survey/nodeDefLayout')
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
 
+const {keys, propKeys} = NodeDef
+
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.code
     ? validateRequired(propName, nodeDef)
@@ -76,14 +78,14 @@ const validateKey = survey =>
   }
 
 const propsValidations = survey => ({
-  [`props.${NodeDef.propKeys.name}`]: [
+  [`${keys.props}.${propKeys.name}`]: [
     validateRequired,
     validateNotKeyword,
     validateItemPropUniqueness(Survey.getNodeDefsArray(survey))
   ],
-  [`props.${NodeDef.propKeys.categoryUuid}`]: [validateCategory],
-  [`props.${NodeDef.propKeys.taxonomyUuid}`]: [validateTaxonomy],
-  [`props.${NodeDef.propKeys.key}`]: [validateKey(survey)],
+  [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
+  [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
+  [`${keys.props}.${propKeys.key}`]: [validateKey(survey)],
   'keyAttributes': [validateKeyAttributes(survey)],
   'children': [validateChildren(survey)],
 })

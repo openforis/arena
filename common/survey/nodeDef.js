@@ -6,8 +6,6 @@ const NodeDefValidations = require('./nodeDefValidations')
 
 const {isBlank} = require('../stringUtils')
 
-const validation = 'validation'
-
 // ======== NODE DEF PROPERTIES
 
 const nodeDefType = {
@@ -24,6 +22,11 @@ const nodeDefType = {
   entity: 'entity',
 }
 
+const keys = {
+  props: 'props',
+  validation : 'validation',
+}
+
 const propKeys = {
   applicable: 'applicable',
   calculatedValues: 'calculatedValues',
@@ -34,7 +37,6 @@ const propKeys = {
   multiple: 'multiple',
   name: 'name',
   parentUuid: 'parentUuid',
-  props: 'props',
   published: 'published',
   type: 'type',
   validations: 'validations',
@@ -80,7 +82,7 @@ const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 const isNodeDefPublished = R.propEq(propKeys.published, true)
 
 const getNodeDefLabel = (nodeDef, lang) => {
-  const label = R.path([propKeys.props, propKeys.labels, lang], nodeDef)
+  const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
   return isBlank(label)
     ? getNodeDefName(nodeDef)
     : label
@@ -122,6 +124,7 @@ const canNodeDefBeKey = nodeDef =>
 
 module.exports = {
   nodeDefType,
+  keys,
   propKeys,
   maxKeyAttributes,
 
@@ -138,7 +141,7 @@ module.exports = {
   getNodeDefLabels: SurveyUtils.getLabels,
   getNodeDefLabel,
   getNodeDefDescriptions: SurveyUtils.getProp(propKeys.descriptions, {}),
-  getNodeDefValidation: R.prop(validation),
+  getNodeDefValidation: R.prop(keys.validation),
   getNodeDefCategoryUuid: SurveyUtils.getProp(propKeys.categoryUuid),
   getNodeDefParentCodeDefUuid: SurveyUtils.getProp(propKeys.parentCodeDefUuid),
   getNodeDefTaxonomyUuid: SurveyUtils.getProp(propKeys.taxonomyUuid),
