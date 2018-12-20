@@ -24,6 +24,28 @@ const nodeDefType = {
   entity: 'entity',
 }
 
+const propKeys = {
+  applicable: 'applicable',
+  calculatedValues: 'calculatedValues',
+  defaultValues: 'defaultValues',
+  descriptions: 'descriptions',
+  key: 'key',
+  labels: 'labels',
+  multiple: 'multiple',
+  name: 'name',
+  parentUuid: 'parentUuid',
+  props: 'props',
+  published: 'published',
+  type: 'type',
+  validations: 'validations',
+
+  //code
+  categoryUuid: 'categoryUuid',
+  parentCodeDefUuid: 'parentCodeDefUuid',
+  //taxon
+  taxonomyUuid: 'taxonomyUuid'
+}
+
 const maxKeyAttributes = 3
 
 // ==== CREATE
@@ -38,13 +60,13 @@ const newNodeDef = (surveyId, parentUuid, type, props) => ({
 
 // ==== READ
 
-const getNodeDefType = R.prop('type')
-const getNodeDefName = SurveyUtils.getProp('name', '')
+const getNodeDefType = R.prop(propKeys.type)
+const getNodeDefName = SurveyUtils.getProp(propKeys.name, '')
 const getNodeDefParentUuid = SurveyUtils.getParentUuid
 
-const isNodeDefKey = R.pipe(SurveyUtils.getProp('key'), R.equals(true))
+const isNodeDefKey = R.pipe(SurveyUtils.getProp(propKeys.key), R.equals(true))
 const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
-const isNodeDefMultiple = R.pipe(SurveyUtils.getProp('multiple'), R.equals(true))
+const isNodeDefMultiple = R.pipe(SurveyUtils.getProp(propKeys.multiple), R.equals(true))
 
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
@@ -55,17 +77,17 @@ const isNodeDefMultipleAttribute = nodeDef => !isNodeDefEntity(nodeDef) && isNod
 const isNodeDefCode = isNodeDefType(nodeDefType.code)
 const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
-const isNodeDefPublished = R.propEq('published', true)
+const isNodeDefPublished = R.propEq(propKeys.published, true)
 
 const getNodeDefLabel = (nodeDef, lang) => {
-  const label = R.path(['props', 'labels', lang], nodeDef)
+  const label = R.path([propKeys.props, propKeys.labels, lang], nodeDef)
   return isBlank(label)
     ? getNodeDefName(nodeDef)
     : label
 
 }
 
-const getValidations = SurveyUtils.getProp('validations', {})
+const getValidations = SurveyUtils.getProp(propKeys.validations, {})
 
 // ==== UPDATE
 
@@ -100,6 +122,7 @@ const canNodeDefBeKey = nodeDef =>
 
 module.exports = {
   nodeDefType,
+  propKeys,
   maxKeyAttributes,
 
   //CREATE
@@ -114,11 +137,11 @@ module.exports = {
   getNodeDefParentUuid,
   getNodeDefLabels: SurveyUtils.getLabels,
   getNodeDefLabel,
-  getNodeDefDescriptions: SurveyUtils.getProp('descriptions', {}),
+  getNodeDefDescriptions: SurveyUtils.getProp(propKeys.descriptions, {}),
   getNodeDefValidation: R.prop(validation),
-  getNodeDefCategoryUuid: SurveyUtils.getProp('categoryUuid'),
-  getNodeDefParentCodeDefUuid: SurveyUtils.getProp('parentCodeDefUuid'),
-  getNodeDefTaxonomyUuid: SurveyUtils.getProp('taxonomyUuid'),
+  getNodeDefCategoryUuid: SurveyUtils.getProp(propKeys.categoryUuid),
+  getNodeDefParentCodeDefUuid: SurveyUtils.getProp(propKeys.parentCodeDefUuid),
+  getNodeDefTaxonomyUuid: SurveyUtils.getProp(propKeys.taxonomyUuid),
 
   isNodeDefKey,
   isNodeDefMultiple,
@@ -133,9 +156,9 @@ module.exports = {
   isNodeDefPublished,
 
   //advanced props
-  getDefaultValues: SurveyUtils.getProp('defaultValues', []),
-  getCalculatedValues: SurveyUtils.getProp('calculatedValues', []),
-  getApplicable: SurveyUtils.getProp('applicable', []),
+  getDefaultValues: SurveyUtils.getProp(propKeys.defaultValues, []),
+  getCalculatedValues: SurveyUtils.getProp(propKeys.calculatedValues, []),
+  getApplicable: SurveyUtils.getProp(propKeys.applicable, []),
   getValidations,
   getValidationExpressions: R.pipe(
     getValidations,

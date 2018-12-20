@@ -1,21 +1,21 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
 import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
-import Taxonomy from '../../../../../common/survey/taxonomy'
-import NodeDef from '../../../../../common/survey/nodeDef'
 import Survey from '../../../../../common/survey/survey'
-import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
-import connect from 'react-redux/es/connect/connect'
+import NodeDef from '../../../../../common/survey/nodeDef'
+import Taxonomy from '../../../../../common/survey/taxonomy'
+import Validator from '../../../../../common/validation/validator'
+
 import { getSurvey } from '../../../../survey/surveyState'
 import { getFormNodeDefEdit, getSurveyForm } from '../../surveyFormState'
+
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 import { createTaxonomy, deleteTaxonomy } from '../../taxonomyEdit/actions'
 
-const keys = {
-  taxonomyUuid: 'taxonomyUuid'
-}
+const {propKeys} = NodeDef
 
 const TaxonProps = (props) => {
   const {
@@ -27,9 +27,9 @@ const TaxonProps = (props) => {
     toggleTaxonomyEdit,
   } = props
 
-  const validation = getValidation(nodeDef)
+  const validation = Validator.getValidation(nodeDef)
 
-  const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, keys.taxonomyUuid, taxonomy ? taxonomy.uuid : null)
+  const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, propKeys.taxonomyUuid, taxonomy ? taxonomy.uuid : null)
 
   return (
     <React.Fragment>
@@ -42,7 +42,7 @@ const TaxonProps = (props) => {
           <Dropdown items={taxonomies}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={Taxonomy.getTaxonomyName}
-                    validation={getFieldValidation(keys.taxonomyUuid)(validation)}
+                    validation={Validator.getFieldValidation(propKeys.taxonomyUuid)(validation)}
                     selection={taxonomy}
                     onChange={putTaxonomyProp}/>
           <button className="btn btn-s btn-of-light-xs"
