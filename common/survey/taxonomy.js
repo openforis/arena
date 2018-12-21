@@ -17,6 +17,7 @@ const taxonPropKeys = {
   genus: 'genus',
   scientificName: 'scientificName',
   vernacularNames: 'vernacularNames',
+  vernacularNameUuid: 'vernacularNameUuid',
 }
 
 // ====== CREATE
@@ -47,6 +48,8 @@ const getTaxonVernacularName = lang => R.pipe(
 
 module.exports = {
   taxonPropKeys,
+  unlistedCode: 'UNL',
+  unknownCode: 'UNK',
 
   //CREATE
   newTaxonomy,
@@ -61,6 +64,7 @@ module.exports = {
   getTaxonScientificName: getProp(taxonPropKeys.scientificName, ''),
   getTaxonVernacularNames,
   getTaxonVernacularName,
+  getTaxonVernacularNameUuid: getProp(taxonPropKeys.vernacularNameUuid),
 
   // UPDATE
   assocTaxonomyProp: setProp,

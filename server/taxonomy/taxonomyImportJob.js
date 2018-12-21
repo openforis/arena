@@ -23,8 +23,8 @@ const requiredColumns = [
 const taxaInsertBufferSize = 500
 
 const createPredefinedTaxa = (taxonomy) => [
-  Taxonomy.newTaxon(taxonomy.uuid, 'UNK', 'Unknown', 'Unknown', 'Unknown'),
-  Taxonomy.newTaxon(taxonomy.uuid, 'UNL', 'Unlisted', 'Unlisted', 'Unlisted')
+  Taxonomy.newTaxon(taxonomy.uuid, Taxonomy.unknownCode, 'Unknown', 'Unknown', 'Unknown'),
+  Taxonomy.newTaxon(taxonomy.uuid, Taxonomy.unlistedCode, 'Unlisted', 'Unlisted', 'Unlisted')
 ]
 
 class TaxonomyImportJob extends Job {
@@ -65,31 +65,28 @@ class TaxonomyImportJob extends Job {
 
     const csvParser = new CSVParser(csvString)
 
-    try {
-      this.processed = 0
+    this.processed = 0
 
-      let row = await csvParser.next()
+    let row = await csvParser.next()
 
-      while (row) {
-        if (this.isCanceled()) {
-          break
-        } else {
-          await this.processRow(row, tx)
-        }
-        row = await csvParser.next()
+    while (row) {
+      if (this.isCanceled()) {
+        break
+      } else {
+        await this.processRow(row, tx)
       }
-
-      if (this.isRunning()) {
-        if (R.isEmpty(this.errors)) {
-          await this.finalizeImport(taxonomy, tx)
-        } else {
-          this.setStatusFailed()
-        }
-      }
-    } finally {
-      if (csvParser)
-        csvParser.destroy()
+      row = await csvParser.next()
     }
+
+    if (this.isRunning()) {
+      if (R.isEmpty(this.errors)) {
+        await this.finalizeImport(taxonomy, tx)
+      } else {
+        this.setStatusFailed()
+      }
+    }
+
+    csvParser.destroy()
   }
 
   async processHeaders () {
