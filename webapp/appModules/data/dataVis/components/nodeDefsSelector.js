@@ -28,7 +28,7 @@ const TableSelector = ({hierarchy, nodeDefUuid, lang, onChange}) => {
   return (
     <Dropdown className="node-def-dropdown"
               items={entities} selection={entities.find(R.propEq('key', nodeDefUuid))}
-              autocompleteDialogClassName="entity-selector__autocomplete-dialog"
+              autocompleteDialogClassName="node-def-dropdown__autocomplete-dialog"
               onChange={item => onChange(R.prop('key', item))}
     />
   )

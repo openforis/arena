@@ -18,6 +18,7 @@
 
   .node-def-dropdown {
     background-color: rgba($white, 0.15);
+    height: 30px;
 
     input {
       justify-self: center;
@@ -50,4 +51,12 @@
     }
   }
 
+}
+
+
+.node-def-dropdown__autocomplete-dialog {
+  .dropdown__list-item {
+
+    text-align: left !important;
+  }
 }

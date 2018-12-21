@@ -1,3 +1,5 @@
+import './dataTable.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
@@ -12,47 +14,46 @@ import { updateDataTable, resetDataTable } from '../actions'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
+import { elementOffset } from '../../../../appUtils/domUtils'
 
-const TableNodeDefCols = ({nodeDefCols, row, lang}) => (
+const defaultColWidth = 80
+
+const TableNodeDefCols = ({nodeDefCols, row, lang, colWidth}) => (
   nodeDefCols.map(nodeDef =>
-    <NodeDefTableColumn key={nodeDef.id} nodeDef={nodeDef} row={row} lang={lang}/>
+    <NodeDefTableColumn key={nodeDef.id}
+                        nodeDef={nodeDef} row={row}
+                        lang={lang} colWidth={colWidth}/>
   )
 )
 
-const TableRows = ({nodeDefCols, data, offset, style}) => (
+const TableRows = ({nodeDefCols, colNames, data, offset, lang, colWidth}) => (
   <div className="table__rows">
-    {
-      data.map((row, i) =>
-        <div key={i} className="table__row" style={style}>
-          <div>{i + offset + 1}</div>
-          <TableNodeDefCols nodeDefCols={nodeDefCols} row={row}/>
-        </div>
-      )
-    }
+
+    <div className="table__row-header">
+      <div style={{width: defaultColWidth}}>Row #</div>
+      <TableNodeDefCols nodeDefCols={nodeDefCols} lang={lang} colWidth={colWidth}/>
+    </div>
+
+
+    <div className="table__data-rows">
+      {
+        data.map((row, i) =>
+          <div key={i} className="table__row">
+            <div style={{width: defaultColWidth}}>{i + offset + 1}</div>
+            <TableNodeDefCols nodeDefCols={nodeDefCols} row={row} colWidth={colWidth}/>
+          </div>
+        )
+      }
+    </div>
   </div>
 )
 
-const TableBody = ({nodeDefCols, colNames, data, offset, lang}) => {
-  const noDefCols = colNames.length
-  const style = {gridTemplateColumns: `100px repeat(${noDefCols}, ${1 / noDefCols}fr)`}
-
-  return (
-    <React.Fragment>
-
-      <div className="table__row-header" style={style}>
-        <div>Row #</div>
-        <TableNodeDefCols nodeDefCols={nodeDefCols} lang={lang}/>
-      </div>
-
-      <TableRows nodeDefCols={nodeDefCols} data={data}
-                 style={style} offset={offset}/>
-
-
-    </React.Fragment>
-  )
-}
-
 class DataTable extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.tableRef = React.createRef()
+  }
 
   componentWillUnmount () {
     this.props.resetDataTable()
@@ -61,23 +62,37 @@ class DataTable extends React.Component {
   render () {
     const {nodeDefCols, colNames, data, offset, limit, count, lang, updateDataTable} = this.props
 
-    return R.isEmpty(data)
-      ? null
-      : (
-        <div className="data-vis__data-table table">
+    const {width = defaultColWidth} = elementOffset(this.tableRef.current)
+    const widthMax = width - defaultColWidth
+    const colWidthMin = 150
 
-          <div className="table__header">
-            <div/>
-            <TablePaginator offset={offset} limit={limit} count={count}
-                            fetchFn={updateDataTable}/>
-          </div>
+    const colWidth = widthMax > colNames.length * colWidthMin
+      ? widthMax / colNames.length
+      : colWidthMin
 
-          <TableBody nodeDefCols={nodeDefCols} colNames={colNames}
-                     data={data} offset={offset}
-                     lang={lang}/>
+    return (
+      <div className="data-vis__data-table table" ref={this.tableRef}>
+        {
+          R.isEmpty(data)
+            ? null
+            : (
+              <React.Fragment>
+                <div className="table__header">
+                  <div/>
+                  <TablePaginator offset={offset} limit={limit} count={count}
+                                  fetchFn={updateDataTable}/>
+                </div>
 
-        </div>
-      )
+                <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
+                           data={data} offset={offset}
+                           lang={lang}
+                           colWidth={colWidth}/>
+              </React.Fragment>
+            )
+        }
+
+      </div>
+    )
   }
 
 }

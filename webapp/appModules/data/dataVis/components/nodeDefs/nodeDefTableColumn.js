@@ -4,17 +4,17 @@ import React from 'react'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
 
-const NodeDefTableColumn = ({nodeDef, row, lang}) => {
+const NodeDefTableColumn = ({nodeDef, row, lang, colWidth}) => {
   const colNames = NodeDefTable.getColNames(nodeDef)
 
   return (
     <React.Fragment>
       {
         colNames.map((col, i) =>
-          row
-            ? <div key={i}>{row[col]}</div>
-            : <div key={i}>{NodeDef.getNodeDefLabel(nodeDef, lang)}</div>
-            // : <div key={i}>{col}</div>
+            row
+              ? <div key={i} style={{width: colWidth}}>{row[col]}</div>
+              : <div key={i} style={{width: colWidth}}>{NodeDef.getNodeDefLabel(nodeDef, lang)}</div>
+          // : <div key={i}>{col}</div>
         )
       }
 
