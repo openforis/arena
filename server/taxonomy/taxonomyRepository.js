@@ -229,6 +229,7 @@ module.exports = {
   fetchTaxonomyByUuid,
   countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike,
+  fetchTaxonByUuid,
 
   //UPDATE
   updateTaxonomyProp,

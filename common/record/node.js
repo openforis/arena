@@ -4,7 +4,28 @@ const {uuidv4} = require('./../uuid')
 const {isBlank, trim} = require('../stringUtils')
 const SurveyUtils = require('../survey/surveyUtils')
 
-const valueKey = 'value'
+const keys = {
+  value: 'value'
+}
+
+const valuePropKeys = {
+  // code
+  itemUuid: 'itemUuid',
+
+  // coordinate
+  x: 'x',
+  y: 'y',
+  srs: 'srs',
+
+  // file
+  fileName: 'fileName',
+
+  // taxon
+  taxonUuid: 'taxonUuid',
+  vernacularNameUuid: 'vernacularNameUuid',
+  scientificName: 'scientificName',
+  vernacularName: 'vernacularName',
+}
 
 /**
  * ======
@@ -33,7 +54,7 @@ const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
  */
 
 const getNodeValue = (node = {}, defaultValue = {}) =>
-  R.propOr(defaultValue, valueKey, node)
+  R.propOr(defaultValue, keys.value, node)
 
 const getNodeValueProp = (prop, defaultValue = null) => R.pipe(
   getNodeValue,
@@ -73,6 +94,8 @@ const isNodeValueBlank = value => {
 const isNodeValueNotBlank = R.pipe(isNodeValueBlank, R.not)
 
 module.exports = {
+  valuePropKeys,
+
   // ==== CREATE
   newNode,
   newNodePlaceholder,
@@ -87,7 +110,7 @@ module.exports = {
   getNodeDefUuids,
 
   // ==== UPDATE
-  assocValue: R.assoc(valueKey),
+  assocValue: R.assoc(keys.value),
 
   // ==== UTILS
   isNodeValueBlank,
@@ -130,18 +153,19 @@ module.exports = {
   ),
 
   // coordinate
-  getCoordinateX: getNodeValueProp('x'),
-  getCoordinateY: getNodeValueProp('y'),
-  getCoordinateSrs: (node, defaultValue = null) => getNodeValueProp('srs', defaultValue)(node),
+  getCoordinateX: getNodeValueProp(valuePropKeys.x),
+  getCoordinateY: getNodeValueProp(valuePropKeys.y),
+  getCoordinateSrs: (node, defaultValue = null) => getNodeValueProp(valuePropKeys.srs, defaultValue)(node),
 
   // file
-  getNodeFileName: getNodeValueProp('fileName', ''),
+  getNodeFileName: getNodeValueProp(valuePropKeys.fileName, ''),
 
   // code
-  getCategoryItemUuid: getNodeValueProp('itemUuid'),
+  getCategoryItemUuid: getNodeValueProp(valuePropKeys.itemUuid),
 
   // taxon
-  getNodeTaxonUuid: getNodeValueProp('taxonUuid'),
-  getNodeVernacularNameUuid: getNodeValueProp('vernacularNameUuid'),
-
+  getNodeTaxonUuid: getNodeValueProp(valuePropKeys.taxonUuid),
+  getNodeVernacularNameUuid: getNodeValueProp(valuePropKeys.vernacularNameUuid),
+  getNodeScientificName: getNodeValueProp(valuePropKeys.scientificName),
+  getNodeVernacularName: getNodeValueProp(valuePropKeys.vernacularName),
 }

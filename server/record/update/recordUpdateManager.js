@@ -50,13 +50,16 @@ const checkIn = (user, surveyId) => {
  * @param userId
  */
 const checkOut = userId => {
-  checkOutTimeoutsByUserId[userId] = setTimeout(() => {
-    const updateWorker = recordUpdateThreads.getThread(userId)
-    if (updateWorker)
-      updateWorker.terminate()
+  if (!checkOutTimeoutsByUserId[userId]) {
+    checkOutTimeoutsByUserId[userId] = setTimeout(() => {
+      const updateWorker = recordUpdateThreads.getThread(userId)
+      if (updateWorker) {
+        updateWorker.terminate()
+      }
 
-    delete checkOutTimeoutsByUserId[userId]
-  }, 1000)
+      delete checkOutTimeoutsByUserId[userId]
+    }, 1000)
+  }
 }
 
 const cancelCheckOut = userId => {
