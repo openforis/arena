@@ -2,7 +2,6 @@ const {uuidv4} = require('../uuid')
 const R = require('ramda')
 
 const {
-  setProp,
   getProp,
 } = require('./surveyUtils')
 
@@ -19,6 +18,9 @@ const taxonPropKeys = {
   vernacularNames: 'vernacularNames',
   vernacularNameUuid: 'vernacularNameUuid',
 }
+
+const unlistedCode = 'UNL'
+const unknownCode = 'UNK'
 
 // ====== CREATE
 const newTaxonomy = () => ({
@@ -39,6 +41,8 @@ const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularN
 })
 
 // ====== READ
+const getTaxonCode = getProp(taxonPropKeys.code, '')
+
 const getTaxonVernacularNames = getProp(taxonPropKeys.vernacularNames, {})
 
 const getTaxonVernacularName = lang => R.pipe(
@@ -48,8 +52,8 @@ const getTaxonVernacularName = lang => R.pipe(
 
 module.exports = {
   taxonPropKeys,
-  unlistedCode: 'UNL',
-  unknownCode: 'UNK',
+  unlistedCode,
+  unknownCode,
 
   //CREATE
   newTaxonomy,
@@ -58,14 +62,12 @@ module.exports = {
   //READ
   getTaxonomyName: getProp(taxonomyPropKeys.name, ''),
   getTaxonomyVernacularLanguageCodes: getProp(taxonomyPropKeys.vernacularLanguageCodes, []),
-  getTaxonCode: getProp(taxonPropKeys.code, ''),
+  getTaxonCode,
   getTaxonFamily: getProp(taxonPropKeys.family, ''),
   getTaxonGenus: getProp(taxonPropKeys.genus, ''),
   getTaxonScientificName: getProp(taxonPropKeys.scientificName, ''),
   getTaxonVernacularNames,
   getTaxonVernacularName,
   getTaxonVernacularNameUuid: getProp(taxonPropKeys.vernacularNameUuid),
-
-  // UPDATE
-  assocTaxonomyProp: setProp,
+  isUnlistedTaxon: R.pipe(getTaxonCode, R.equals(unlistedCode)),
 }

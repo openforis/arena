@@ -137,8 +137,9 @@ class NodeDefTaxon extends React.Component {
     const node = nodes[0]
 
     if (taxon) {
+      const unlisted = Taxonomy.isUnlistedTaxon(taxon)
+
       const code = Taxonomy.getTaxonCode(taxon)
-      const unlisted = code === Taxonomy.unlistedCode
       const scientificName = unlisted ? Node.getNodeScientificName(node) : Taxonomy.getTaxonScientificName(taxon)
       const vernacularName = unlisted ? Node.getNodeVernacularName(node) : taxon.vernacularName
 
@@ -204,7 +205,7 @@ class NodeDefTaxon extends React.Component {
   onTaxonSelect (item) {
     let nodeValue = null
 
-    if (Taxonomy.getTaxonCode(item) === Taxonomy.unlistedCode) {
+    if (Taxonomy.isUnlistedTaxon(item)) {
       const {scientificName, vernacularName} = this.state
       //unlisted item
       nodeValue = {
