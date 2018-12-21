@@ -26,7 +26,7 @@ const TabBarButtons = ({tabs, location, selection, onClick}) => (
 )
 
 const TabBarComponent = ({tab, ...rest}) =>
- typeof tab.component === 'object'
+  typeof tab.component === 'object'
     ? tab.component
     : React.createElement(tab.component, {...tab.props, ...rest})
 

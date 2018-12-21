@@ -35,6 +35,8 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
 }
 
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) => {
+  if (recordUuid === 'preview') return {preview: true} // TODO
+
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
   const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
 

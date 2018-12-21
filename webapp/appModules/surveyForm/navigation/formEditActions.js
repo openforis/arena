@@ -1,14 +1,22 @@
 import React from 'react'
-import { appModules, appModuleUri } from '../../appModules'
+import { appModuleUri } from '../../appModules'
+import { dashboardModules } from '../../dashboard/dashboardModules'
 import { Link } from 'react-router-dom'
-import { dataModules } from '../../data/dataModules'
 
-const FormEditActions = () => (
+const FormEditActions = ({preview}) => (
   <div className="survey-form__nav-record-actions">
-    <Link to={`${appModuleUri(dataModules.record)}preview`} className="btn btn-of">
-      <span className="icon icon-eye icon-12px icon-left"/>
-      Preview
-    </Link>
+    {
+      preview ?
+        <Link to={`${appModuleUri(dashboardModules.formDesigner)}`} className="btn btn-of">
+          <span className="icon icon-pencil icon-12px icon-left"/>
+          Design
+        </Link>
+        :
+        <Link to={`${appModuleUri(dashboardModules.formDesigner)}?preview=true`} className="btn btn-of">
+          <span className="icon icon-eye icon-12px icon-left"/>
+          Preview
+        </Link>
+    }
   </div>
 )
 

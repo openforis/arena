@@ -4,7 +4,7 @@ import NodeDefNavigation from './nodeDefNavigation'
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
 
-const FormNavigation = ({edit, entry}) => {
+const FormNavigation = ({edit, entry, preview}) => {
 
   return (
     <div className="survey-form__nav">
@@ -16,7 +16,7 @@ const FormNavigation = ({edit, entry}) => {
 
       {
         edit ?
-          <FormEditActions/>
+          <FormEditActions preview={preview}/>
           :
           <FormEntryActions entry={entry}/>
       }

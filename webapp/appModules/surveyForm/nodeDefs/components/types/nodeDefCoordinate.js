@@ -34,7 +34,7 @@ class NodeDefCoordinate extends React.Component {
   }
 
   render () {
-    const {surveyInfo, nodeDef, nodes, edit, entry, renderType, label} = this.props
+    const {surveyInfo, nodeDef, nodes, edit, entry, preview, renderType} = this.props
 
     const node = entry ? nodes[0] : null
     const value = node ? node.value : getNodeDefDefaultValue(nodeDef)
@@ -44,18 +44,18 @@ class NodeDefCoordinate extends React.Component {
 
     const xInput = <Input ref="xInput"
                           mask={this.numberMask}
-                          readOnly={edit}
+                          readOnly={edit && !preview}
                           value={value.x}
                           onChange={value => this.handleInputChange(node, 'x', value)}/>
 
     const yInput = <Input ref="yInput"
                           mask={this.numberMask}
-                          readOnly={edit}
+                          readOnly={edit && !preview}
                           value={value.y}
                           onChange={value => this.handleInputChange(node, 'y', value)}/>
 
     const srsDropdown = <Dropdown ref="srsDropdown"
-                                  readOnly={edit}
+                                  readOnly={edit && !preview}
                                   items={surveySrs}
                                   itemKeyProp="code"
                                   itemLabelProp="name"
