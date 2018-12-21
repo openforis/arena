@@ -1,4 +1,5 @@
 const R = require('ramda')
+const toSnakeCase = require('to-snake-case')
 
 const Survey = require('../survey/survey')
 const NodeDef = require('../survey/nodeDef')
@@ -60,6 +61,13 @@ const getColNamesByUuids = nodeDefUuidCols =>
     nodeDefUuidCols
   )
 
+const extractColName = (nodeDef, col) => R.replace(
+  //TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
+  toSnakeCase(NodeDef.getNodeDefName(nodeDef)) + '_',
+  '',
+  col
+)
+
 module.exports = {
   getTableName,
   getViewName,
@@ -67,4 +75,5 @@ module.exports = {
 
   getColNames,
   getColNamesByUuids,
+  extractColName,
 }

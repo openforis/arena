@@ -5,6 +5,7 @@ const toSnakeCase = require('to-snake-case')
 const Survey = require('../../../common/survey/survey')
 const SurveyUtils = require('../../../common/survey/surveyUtils')
 const NodeDef = require('../../../common/survey/nodeDef')
+const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
 const Taxonomy = require('../../../common/survey/taxonomy')
 const Node = require('../../../common/record/node')
 const CategoryManager = require('../../category/categoryManager')
@@ -19,11 +20,8 @@ const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'
 
 const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => {
-//remove nodeDefName from col name
-  const prop = R.pipe(
-    R.replace(toSnakeCase(NodeDef.getNodeDefName(nodeDefCol)) + '_', ''),
-    camelize,
-  )(colName)
+  //remove nodeDefName from col name
+  const prop = camelize(NodeDefTable.extractColName(nodeDefCol, colName))
 
   return isInProps
     ? NodeDef.getProp(prop)(item)

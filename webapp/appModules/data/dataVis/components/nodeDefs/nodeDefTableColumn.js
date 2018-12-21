@@ -1,24 +1,33 @@
 import React from 'react'
 
-// import { nodeDefSystemProps } from '../../../../surveyForm/nodeDefs/nodeDefSystemProps'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
 
 const NodeDefTableColumn = ({nodeDef, row, lang, colWidth}) => {
   const colNames = NodeDefTable.getColNames(nodeDef)
+  const noCols = colNames.length
 
   return (
-    <React.Fragment>
+    <div style={{width: colWidth * noCols, display: 'flex', flexWrap: 'wrap'}}>
+
+      {
+        !row &&
+        <div style={{width: '100%'}}>{NodeDef.getNodeDefLabel(nodeDef, lang)}</div>
+      }
+
       {
         colNames.map((col, i) =>
-            row
-              ? <div key={i} style={{width: colWidth}}>{row[col]}</div>
-              : <div key={i} style={{width: colWidth}}>{NodeDef.getNodeDefLabel(nodeDef, lang)}</div>
-          // : <div key={i}>{col}</div>
+          row
+            ? <div key={i} style={{width: (1 / noCols * 100) + '%'}}>{row[col]}</div>
+            : !row && noCols > 1
+            ? <div key={i} style={{width: (1 / noCols * 100) + '%'}}>
+              {NodeDefTable.extractColName(nodeDef, col)}
+            </div>
+            : null
         )
       }
 
-    </React.Fragment>
+    </div>
   )
 }
 
