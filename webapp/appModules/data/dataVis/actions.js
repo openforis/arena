@@ -1,19 +1,17 @@
 import axios from 'axios'
 import Promise from 'bluebird'
 
-import Survey from '../../../../common/survey/survey'
-import NodeDef from '../../../../common/survey/nodeDef'
+import NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
 import * as SurveyState from '../../../survey/surveyState'
 
-export const dataVisListInit = 'data/dataVis/list/init'
-export const dataVisListUpdate = 'data/dataVis/list/update'
+export const dataVisTableInit = 'data/dataVis/table/init'
+export const dataVisTableUpdate = 'data/dataVis/table/update'
 
 const limit = 15
 
-
 const queryTable = (surveyId, tableName, cols, offset = 0) => axios.get(
-  `/api/surveyRdb/${surveyId}/${tableName}/count`,
-  {params: {offset, limit}}
+  `/api/surveyRdb/${surveyId}/${tableName}/query?cols=${JSON.stringify(cols)}&offset=${offset}&limit=${limit}`,
+  // {params: {cols: JSON.stringify(cols), offset, limit}}
 )
 
 export const initDataTable = (nodeDefUuidTable, nodeDefUuidCols) => async (dispatch, getState) => {
@@ -22,21 +20,18 @@ export const initDataTable = (nodeDefUuidTable, nodeDefUuidCols) => async (dispa
   const survey = SurveyState.getSurvey(state)
   const surveyId = SurveyState.getStateSurveyId(state)
 
-  //TODO add surveyRdb meta to common folder
-  const nodeDefTable = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
-  const tableName = 'data_' + NodeDef.getNodeDefName(nodeDefTable)
+  const tableName = NodeDefTable.getViewName(nodeDefUuidTable)(survey)
+  const cols = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 
   const offset = 0
 
-  // console.log(nodeDefUuidCols)
-
   const [countResp, dataResp] = await Promise.all([
-    axios.get(`/api/surveyRdb/${surveyId}/${tableName}/count`),
-    queryTable(surveyId, tableName, offset)
+    axios.get(`/api/surveyRdb/${surveyId}/${tableName}/query/count`),
+    queryTable(surveyId, tableName, cols, offset)
   ])
 
   dispatch({
-    type: dataVisListInit,
+    type: dataVisTableInit,
     offset,
     limit,
     count: countResp.data.count,

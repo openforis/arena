@@ -14,7 +14,6 @@ const DateTimeUtils = require('../../../common/dateUtils')
 
 const {nodeDefType} = NodeDef
 
-const cols = 'cols'
 const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'
 
@@ -77,8 +76,6 @@ const props = {
   },
 
   [nodeDefType.code]: {
-    [cols]: ['code', 'label'],
-
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
       const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid) : {}
@@ -91,7 +88,6 @@ const props = {
   },
 
   [nodeDefType.taxon]: {
-    [cols]: ['code', 'scientific_name'], //?, 'vernacular_names?'],
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const taxonUuid = Node.getNodeTaxonUuid(nodeCol)
       const items = taxonUuid ? await TaxonomyManager.fetchTaxaByPropLike(surveyInfo.id, null, {filter: {uuid: taxonUuid}}) : []
@@ -111,17 +107,10 @@ const props = {
   },
 
   [nodeDefType.file]: {
-    [cols]: ['file_uuid', 'file_name'],
     [colValueProcessor]: nodeValuePropProcessor,
     [colTypeProcessor]: () => colName => R.endsWith('file_uuid', colName) ? sqlTypes.uuid : sqlTypes.varchar,
   },
 }
-
-const getCols = nodeDef => R.propOr(
-  [],
-  cols,
-  props[NodeDef.getNodeDefType(nodeDef)]
-)
 
 const getColValueProcessor = nodeDef => R.propOr(
   () => (node) => Node.getNodeValue(node, null),
@@ -136,7 +125,6 @@ const getColTypeProcessor = nodeDef => R.propOr(
 )(nodeDef)
 
 module.exports = {
-  getCols,
   getColValueProcessor,
   getColTypeProcessor,
 }

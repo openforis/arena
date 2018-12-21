@@ -1,4 +1,4 @@
-import './nodeDefSelector.scss'
+import './nodeDefsSelector.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -26,16 +26,15 @@ const TableSelector = ({hierarchy, nodeDefUuid, lang, onChange}) => {
   Survey.traverseHierarchyItemSync(hierarchy.root, traverse)
 
   return (
-    <div className="form-item">
-      <div>Entity</div>
-      <Dropdown items={entities} selection={entities.find(R.propEq('key', nodeDefUuid))}
-                autocompleteDialogClassName="entity-selector__autocomplete-dialog"
-                onChange={item => onChange(R.prop('key', item))}/>
-    </div>
+    <Dropdown className="node-def-dropdown"
+              items={entities} selection={entities.find(R.propEq('key', nodeDefUuid))}
+              autocompleteDialogClassName="entity-selector__autocomplete-dialog"
+              onChange={item => onChange(R.prop('key', item))}
+    />
   )
 }
 
-class NodeDefSelector extends React.Component {
+class NodeDefsSelector extends React.Component {
   constructor () {
     super()
     this.state = {nodeDefUuid: null, nodeDefVariableUuids: []}
@@ -49,18 +48,21 @@ class NodeDefSelector extends React.Component {
     const {nodeDefUuid, nodeDefVariableUuids} = this.state
 
     return (
-      <div className="node-def-selector">
+      <div className="node-defs-selector">
 
-        <TableSelector hierarchy={hierarchy} nodeDefUuid={nodeDefUuid}
-                       lang={lang} onChange={nodeDefUuid => this.setState({nodeDefUuid})}/>
+        <div className="variables-selector">
+          <div className="variables-selector__container">
+            <TableSelector hierarchy={hierarchy} nodeDefUuid={nodeDefUuid}
+                           lang={lang} onChange={nodeDefUuid => this.setState({nodeDefUuid})}/>
 
-        <VariablesSelector nodeDefUuid={nodeDefUuid} lang={lang}
-                           onChange={nodeDefVariableUuids => this.setState({nodeDefVariableUuids})}/>
+            <VariablesSelector nodeDefUuid={nodeDefUuid} lang={lang}
+                               onChange={nodeDefVariableUuids => this.setState({nodeDefVariableUuids})}/>
+          </div>
+        </div>
 
         <button className="btn btn-of-light btn-sync"
-                onClick={() => R.isEmpty(nodeDefVariableUuids)
-                  ? alert('Please select at least one attribute')
-                  : initDataTable(nodeDefUuid, nodeDefVariableUuids)}>
+                onClick={() => initDataTable(nodeDefUuid, nodeDefVariableUuids)}
+                aria-disabled={R.isEmpty(nodeDefVariableUuids)}>
           Sync
           <span className="icon icon-loop icon-16px icon-right"/>
           {/*<span className="icon icon-spinner10 icon-20px icon-right"/>*/}
@@ -81,6 +83,6 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   {initDataTable}
-)(NodeDefSelector)
+)(NodeDefsSelector)
 
 

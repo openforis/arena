@@ -25,7 +25,7 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/surveyRdb/:surveyId/:tableName/count', async (req, res) => {
+  app.get('/surveyRdb/:surveyId/:tableName/query/count', async (req, res) => {
     try {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
       const tableName = Request.getRequiredParam(req, 'tableName')

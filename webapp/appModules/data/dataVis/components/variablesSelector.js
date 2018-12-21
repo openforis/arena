@@ -31,8 +31,8 @@ class Variables extends React.Component {
                     <button key={childDefUuid}
                             className={`btn btn-s btn-of-light btn-node-def${R.includes(childDefUuid, nodeDefVariableUuids) ? ' active' : ''}`}
                             onClick={() => toggleNodeDefVariable(childDefUuid)}>
-                      {NodeDefUiProps.getNodeDefIconByType(NodeDef.getNodeDefType(childDef))}
                       {NodeDef.getNodeDefLabel(childDef, lang)}
+                      {NodeDefUiProps.getNodeDefIconByType(NodeDef.getNodeDefType(childDef))}
                     </button>
                   )
               }
@@ -85,15 +85,25 @@ class VariablesSelector extends React.PureComponent {
   }
 
   toggleNodeDefVariable (nodeDefUuid) {
-    const {onChange} = this.props
     const {nodeDefVariableUuids: nodeDefVariableUuidsState} = this.state
 
     const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefVariableUuidsState)
     const fn = idx >= 0 ? R.remove(idx, 1) : R.append(nodeDefUuid)
     const nodeDefVariableUuids = fn(nodeDefVariableUuidsState)
 
+    this.updateNodeDefVariableUuids(nodeDefVariableUuids)
+  }
+
+  updateNodeDefVariableUuids (nodeDefVariableUuids) {
     this.setState({nodeDefVariableUuids})
-    onChange(nodeDefVariableUuids)
+    this.props.onChange(nodeDefVariableUuids)
+  }
+
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    const {nodeDefUuid} = this.props
+    const {nodeDefUuid: nodeDefUuidPrev} = prevProps
+    if (nodeDefUuid !== nodeDefUuidPrev)
+      this.updateNodeDefVariableUuids([])
   }
 
   render () {
@@ -101,13 +111,9 @@ class VariablesSelector extends React.PureComponent {
     const {nodeDefVariableUuids} = this.state
 
     return (
-      <div className="variables-selector">
-        <div className="variables-selector__container">
-          <VariablesConnect nodeDefUuid={nodeDefUuid} lang={lang}
-                            nodeDefVariableUuids={nodeDefVariableUuids}
-                            toggleNodeDefVariable={this.toggleNodeDefVariable.bind(this)}/>
-        </div>
-      </div>
+      <VariablesConnect nodeDefUuid={nodeDefUuid} lang={lang}
+                        nodeDefVariableUuids={nodeDefVariableUuids}
+                        toggleNodeDefVariable={this.toggleNodeDefVariable.bind(this)}/>
     )
   }
 
