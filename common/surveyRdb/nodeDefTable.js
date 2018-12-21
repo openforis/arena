@@ -32,8 +32,8 @@ const cols = {
 
 const getCols = nodeDef => R.propOr(
   [],
-  cols,
-  cols[NodeDef.getNodeDefType(nodeDef)]
+  NodeDef.getNodeDefType(nodeDef),
+  cols
 )
 
 const getDefaultColumnName = nodeDef => NodeDef.isNodeDefEntity(nodeDef)

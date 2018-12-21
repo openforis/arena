@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import TablePaginator from '../../../../commonComponents/table/tablePaginator'
+import NodeDefTableColumn from './nodeDefs/nodeDefTableColumn'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as DataVisState from '../dataVisState'
@@ -10,57 +11,46 @@ import * as DataVisState from '../dataVisState'
 import { updateDataTable, resetDataTable } from '../actions'
 
 import Survey from '../../../../../common/survey/survey'
-import NodeDef from '../../../../../common/survey/nodeDef'
+import NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 
-const TableRow = ({idx, offset, style, nodeDefCols, row}) => (
-  <div className="table__row" style={style}>
-    <div>{idx + offset + 1}</div>
+const TableNodeDefCols = ({nodeDefCols, row, lang}) => (
+  nodeDefCols.map(nodeDef =>
+    <NodeDefTableColumn key={nodeDef.id} nodeDef={nodeDef} row={row} lang={lang}/>
+  )
+)
+
+const TableRows = ({nodeDefCols, data, offset, style}) => (
+  <div className="table__rows">
     {
-      nodeDefCols.map(nodeDef =>
-        <div key={nodeDef.id}>
-          {row[NodeDef.getNodeDefName(nodeDef)]}
+      data.map((row, i) =>
+        <div key={i} className="table__row" style={style}>
+          <div>{i + offset + 1}</div>
+          <TableNodeDefCols nodeDefCols={nodeDefCols} row={row}/>
         </div>
       )
     }
   </div>
 )
 
-const TableBody = ({nodeDefCols, data, offset, lang}) => {
-  const noDefCols = nodeDefCols.length
+const TableBody = ({nodeDefCols, colNames, data, offset, lang}) => {
+  const noDefCols = colNames.length
   const style = {gridTemplateColumns: `100px repeat(${noDefCols}, ${1 / noDefCols}fr)`}
 
   return (
     <React.Fragment>
+
       <div className="table__row-header" style={style}>
         <div>Row #</div>
-        {
-          nodeDefCols.map(nodeDef =>
-            <div key={nodeDef.id}>{NodeDef.getNodeDefLabel(nodeDef, lang)}</div>
-          )
-        }
+        <TableNodeDefCols nodeDefCols={nodeDefCols} lang={lang}/>
       </div>
 
-      <div className="table__rows">
-        {
-          data.map((row, i) =>
-            <TableRow key={i} idx={i} style={style}
-                      offset={offset} nodeDefCols={nodeDefCols}
-                      row={row}/>
-          )
-        }
-      </div>
+      <TableRows nodeDefCols={nodeDefCols} data={data}
+                 style={style} offset={offset}/>
+
 
     </React.Fragment>
   )
 }
-
-const TableHeader = ({offset, limit, count, fetchFn}) => (
-  <div className="table__header">
-    <div/>
-    <TablePaginator offset={offset} limit={limit} count={count}
-                    fetchFn={fetchFn}/>
-  </div>
-)
 
 class DataTable extends React.Component {
 
@@ -69,17 +59,22 @@ class DataTable extends React.Component {
   }
 
   render () {
-    const {nodeDefCols, data, offset, limit, count, lang, updateDataTable} = this.props
+    const {nodeDefCols, colNames, data, offset, limit, count, lang, updateDataTable} = this.props
 
     return R.isEmpty(data)
       ? null
       : (
         <div className="data-vis__data-table table">
 
-          <TableHeader offset={offset} limit={limit} count={count}
-                       fetchFn={updateDataTable}/>
+          <div className="table__header">
+            <div/>
+            <TablePaginator offset={offset} limit={limit} count={count}
+                            fetchFn={updateDataTable}/>
+          </div>
 
-          <TableBody nodeDefCols={nodeDefCols} data={data} offset={offset} lang={lang}/>
+          <TableBody nodeDefCols={nodeDefCols} colNames={colNames}
+                     data={data} offset={offset}
+                     lang={lang}/>
 
         </div>
       )
@@ -89,8 +84,13 @@ class DataTable extends React.Component {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
+  const nodeDefUuidCols = DataVisState.getTableNodeDefUuidCols(state)
+  const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
+  const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
+
   return {
-    nodeDefCols: Survey.getNodeDefsByUuids(DataVisState.getTableNodeDefUuidCols(state))(survey),
+    nodeDefCols,
+    colNames,
     data: DataVisState.getTableData(state),
     offset: DataVisState.getTableOffset(state),
     limit: DataVisState.getTableLimit(state),
