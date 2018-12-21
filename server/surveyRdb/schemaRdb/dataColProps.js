@@ -5,6 +5,7 @@ const toSnakeCase = require('to-snake-case')
 const Survey = require('../../../common/survey/survey')
 const SurveyUtils = require('../../../common/survey/surveyUtils')
 const NodeDef = require('../../../common/survey/nodeDef')
+const Taxonomy = require('../../../common/survey/taxonomy')
 const Node = require('../../../common/record/node')
 const CategoryManager = require('../../category/categoryManager')
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
@@ -94,10 +95,14 @@ const props = {
     [cols]: ['code', 'scientific_name'], //?, 'vernacular_names?'],
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const taxonUuid = Node.getNodeTaxonUuid(nodeCol)
-      const items = taxonUuid ? await TaxonomyManager.fetchTaxaByPropLike(surveyInfo.id, null, {filter: {uuid: taxonUuid}}) : []
-      const item = R.pipe(R.head, R.defaultTo({}))(items)
-
-      return (node, colName) => getValueFromItem(nodeDefCol, colName, item, true)
+      const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid) : []
+      return (node, colName) =>
+        R.endsWith('code', colName)
+          ? Taxonomy.getTaxonCode(taxon)
+          // scientific_name
+          : Taxonomy.isUnlistedTaxon(taxon)
+          ? Node.getNodeScientificName(node) //from node value
+          : Taxonomy.getTaxonScientificName(taxon) //from taxon item
     },
   },
 

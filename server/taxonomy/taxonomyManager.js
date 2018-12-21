@@ -56,6 +56,23 @@ const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false, valida
   }
 }
 
+const fetchTaxaByPropLike = async (surveyId, taxonomyUuid, params = {},  draft = false) => {
+  const taxaDb = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, params, draft)
+
+  return R.isEmpty(taxaDb) && params.includeUnlUnk
+    ? [
+      await fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unknownCode, draft),
+      await fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unlistedCode, draft),
+    ]
+    : taxaDb
+}
+
+const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false) => {
+  const params = {limit: 1, offset: 0, filter: {code}}
+  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, params, draft)
+  return R.head(taxa)
+}
+
 const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   console.log('start csv export')
 
@@ -144,7 +161,9 @@ module.exports = {
   fetchTaxonomiesBySurveyId,
   exportTaxa,
   countTaxaByTaxonomyUuid: TaxonomyRepository.countTaxaByTaxonomyUuid,
-  fetchTaxaByPropLike: TaxonomyRepository.fetchTaxaByPropLike,
+  fetchTaxaByPropLike,
+  fetchTaxonByUuid: TaxonomyRepository.fetchTaxonByUuid,
+  fetchTaxonByCode,
 
   //UPDATE
   publishTaxonomiesProps,

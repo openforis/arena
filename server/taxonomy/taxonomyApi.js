@@ -80,11 +80,12 @@ module.exports.init = app => {
       const draft = getBoolParam(req, 'draft')
       const limit = getRestParam(req, 'limit', 25)
       const offset = getRestParam(req, 'offset', 0)
+      const includeUnlUnk = getRestParam(req, 'includeUnlUnk', false)
       const filter = getJsonParam(req, 'filter')
       const sort = {field: 'scientificName', asc: true}
 
       const params = {
-        filter, sort, limit, offset
+        filter, sort, limit, offset, includeUnlUnk
       }
 
       const taxa = await TaxonomyManager.fetchTaxaByPropLike(surveyId, taxonomyUuid, params, draft)
