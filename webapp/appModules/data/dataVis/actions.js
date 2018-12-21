@@ -20,7 +20,7 @@ export const initDataTable = (nodeDefUuidTable, nodeDefUuidCols) => async (dispa
   const survey = SurveyState.getSurvey(state)
   const surveyId = SurveyState.getStateSurveyId(state)
 
-  const tableName = NodeDefTable.getViewName(nodeDefUuidTable)(survey)
+  const tableName = NodeDefTable.getViewNameByUuid(nodeDefUuidTable)(survey)
   const cols = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 
   const offset = 0

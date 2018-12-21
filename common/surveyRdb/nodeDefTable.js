@@ -3,7 +3,22 @@ const R = require('ramda')
 const Survey = require('../survey/survey')
 const NodeDef = require('../survey/nodeDef')
 
-const getViewName = nodeDefUuid => R.pipe(
+const composeTableName = (nodeDefName, nodeDefParentName = '') => `data_${nodeDefParentName}${nodeDefName}`
+
+const getTableName = (nodeDef, nodeDefParent) => {
+  const nodeDefName = NodeDef.getNodeDefName(nodeDef)
+  const nodeDefParentName = NodeDef.getNodeDefName(nodeDefParent)
+
+  return NodeDef.isNodeDefEntity(nodeDef)
+    ? composeTableName(nodeDefName)
+    : NodeDef.isNodeDefMultiple(nodeDef)
+      ? composeTableName(nodeDefName, nodeDefParentName)
+      : composeTableName(nodeDefParentName)
+}
+
+const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefParent) + '_view'
+
+const getViewNameByUuid = nodeDefUuid => R.pipe(
   Survey.getNodeDefByUuid(nodeDefUuid),
   nodeDef => 'data_' + NodeDef.getNodeDefName(nodeDef) + '_view'
 )
@@ -46,7 +61,9 @@ const getColNamesByUuids = nodeDefUuidCols =>
   )
 
 module.exports = {
+  getTableName,
   getViewName,
+  getViewNameByUuid,
 
   getColNames,
   getColNamesByUuids,
