@@ -72,6 +72,23 @@
   flex-wrap: wrap;
   padding: 1rem;
   justify-content: center;
+
+  .btn-node-def-type {
+    font-size: .7rem;
+    font-weight: 400;
+
+    .icon-left{
+      margin-left: 0px !important;
+      &.icon {
+      font-size: 14px !important;
+      }
+      //transform: scale(.8,.8);
+    }
+
+    &.active {
+      pointer-events: auto;
+    }
+  }
 }
 
 .node-def-dropdown__autocomplete-dialog {

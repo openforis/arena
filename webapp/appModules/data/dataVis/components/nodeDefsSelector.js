@@ -36,9 +36,16 @@ const TableSelector = ({hierarchy, nodeDefUuid, lang, onChange}) => {
 }
 
 class NodeDefsSelector extends React.Component {
-  constructor () {
-    super()
-    this.state = {nodeDefUuid: null, nodeDefVariableUuids: [], showSettings: false}
+
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      nodeDefUuid: null,
+      nodeDefVariableUuids: [],
+      showSettings: false,
+      filterTypes: [],
+    }
   }
 
   render () {
@@ -46,7 +53,7 @@ class NodeDefsSelector extends React.Component {
       hierarchy, lang,
       initDataTable,
     } = this.props
-    const {nodeDefUuid, nodeDefVariableUuids, showSettings} = this.state
+    const {nodeDefUuid, nodeDefVariableUuids, showSettings, filterTypes} = this.state
 
     return (
       <div className="node-defs-selector">
@@ -70,7 +77,13 @@ class NodeDefsSelector extends React.Component {
                 {
                   R.keys(NodeDef.nodeDefType).map(type =>
                     NodeDef.nodeDefType.entity !== type
-                      ? <button key={type} className="btn btn-s btn-of-light-s">
+                      ? <button key={type}
+                                className={`btn btn-s btn-of-light-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
+                                onClick={() => {
+                                  const idx = R.findIndex(R.equals(type), filterTypes)
+                                  const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
+                                  this.setState({filterTypes: fn(filterTypes)})
+                                }}>
                         {NodeDefUiProps.getNodeDefIconByType(type)} {type}</button>
                       : null
                   )
@@ -79,7 +92,8 @@ class NodeDefsSelector extends React.Component {
             }
 
             <VariablesSelector nodeDefUuid={nodeDefUuid} lang={lang}
-                               onChange={nodeDefVariableUuids => this.setState({nodeDefVariableUuids})}/>
+                               onChange={nodeDefVariableUuids => this.setState({nodeDefVariableUuids})}
+                               filterTypes={filterTypes}/>
           </div>
         </div>
 

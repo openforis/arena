@@ -79,31 +79,29 @@ class DataTable extends React.Component {
 
     return (
       <div className="data-vis__data-table table" ref={this.tableRef}>
-        {
-          R.isEmpty(data)
-            ? null
-            : (
-              <React.Fragment>
-                <div className="table__header">
-                  <div>
-                    <input type="text" className="form-input" style={{width: '300px'}}
-                           onChange={e => this.setState({filter: trim(e.target.value)})}/>
-                    <button className="btn btn-s btn-of-light"
-                            onClick={() => updateDataFilter(filterLocal)}
-                            aria-disabled={filter === filterLocal}>
-                      <span className="icon icon-filter icon-14px"/>
-                    </button>
-                  </div>
-                  <TablePaginator offset={offset} limit={limit} count={count}
-                                  fetchFn={updateDataTable}/>
-                </div>
+        <div className="table__header">
+          <div>
+            <input type="text" className="form-input" style={{width: '300px'}}
+                   onChange={e => this.setState({filter: trim(e.target.value)})}/>
+            <button className="btn btn-s btn-of-light"
+                    onClick={() => updateDataFilter(filterLocal)}
+                    aria-disabled={filter === filterLocal}>
+              <span className="icon icon-filter icon-14px"/>
+            </button>
+          </div>
+          {
+            !R.isEmpty(data) &&
+            <TablePaginator offset={offset} limit={limit} count={count}
+                            fetchFn={updateDataTable}/>
+          }
+        </div>
 
-                <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
-                           data={data} offset={offset}
-                           lang={lang}
-                           colWidth={colWidth}/>
-              </React.Fragment>
-            )
+        {
+          !R.isEmpty(data) &&
+          <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
+                     data={data} offset={offset}
+                     lang={lang}
+                     colWidth={colWidth}/>
         }
 
       </div>
