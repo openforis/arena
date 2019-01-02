@@ -8,7 +8,8 @@ const {getSurveyDBSchema, dbTransformCallback} = require('../survey/surveySchema
 const nodeDefSelectFields = (advanced = false) =>
   `id, uuid, parent_uuid, type, deleted, ${selectDate('date_created')}, ${selectDate('date_modified')},  
     props${advanced ? ' || props_advanced' : ''} as props, 
-    props_draft${advanced ? ' || props_advanced_draft' : ''} as  props_draft`
+    props_draft${advanced ? ' || props_advanced_draft' : ''} as  props_draft,
+    meta`
 
 // ============== CREATE
 
@@ -16,12 +17,12 @@ const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = d
 
   const parentH = parentUuid ?
     await client.one(
-      `SELECT id, meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node_def WHERE uuid = $1`,
+      `SELECT meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node_def WHERE uuid = $1`,
       [parentUuid]
     ) : {}
 
   const meta = {
-    h: R.isEmpty(parentH) ? [] : R.append(Number(parentH.id), parentH.h)
+    h: R.isEmpty(parentH) ? [] : R.append(parentUuid, parentH.h)
   }
 
   return await client.one(`

@@ -59,6 +59,21 @@ const getSurveyById = async (surveyId, draft = false, client = db) =>
     def => dbTransformCallback(def, draft)
   )
 
+const fetchDepedenciesByNodeDefUuid = async (surveyId, dependencyType, nodeDefUuid, client = db) =>
+  await client.oneOrNone(
+    `SELECT meta#>'{dependencyGraphs, ${dependencyType}, ${nodeDefUuid}}' as dependencies FROM survey WHERE id = $1`,
+    [surveyId],
+    R.prop('dependencies')
+  )
+/*
+const fetchDependencySourcesByNodeDefUuid = async (surveyId, dependencyType, nodeDefUuid, client = db) =>
+  await client.any(
+    `SELECT meta#>'{dependencyGraphs, ${dependencyType}}' -> 0
+     FROM survey
+    WHERE meta#>'{dependencyGraphs, ${dependencyType}}' @> '{["${nodeDefUuid}"]}'`
+  )
+*/
+
 // ============== UPDATE
 const updateSurveyProp = async (surveyId, key, value, client = db) => {
   const prop = {[key]: value}
@@ -128,6 +143,7 @@ module.exports = {
   fetchSurveys,
   getSurveysByName,
   getSurveyById,
+  fetchDepedenciesByNodeDefUuid,
 
   //UPDATE
   updateSurveyProp,
