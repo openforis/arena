@@ -1,13 +1,11 @@
 const R = require('ramda')
 
 const NodeDef = require('../../../common/survey/nodeDef')
-
+const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
 const DataTable = require('./../schemaRdb/dataTable')
 const DataCol = require('./../schemaRdb/dataCol')
 
-const viewSuffix = '_view'
-const getName = (nodeDefName, nodeDefChildName) => DataTable.getName(nodeDefName, nodeDefChildName) + viewSuffix
-const getNameFromDefs = (nodeDef, nodeDefParent) => DataTable.getNameFromDefs(nodeDef, nodeDefParent) + viewSuffix
+const getName = NodeDefTable.getViewName
 
 const alias = `a`
 const aliasParent = `p`
@@ -36,7 +34,7 @@ const getSelectFields = (survey, nodeDef) => {
 const getJoin = (schemaName, nodeDef, nodeDefParent) =>
   nodeDefParent
     ? `JOIN 
-       ${schemaName}.${getNameFromDefs(nodeDefParent)} as ${aliasParent}
+       ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}
        ON ${aliasParent}.${getColUuid(nodeDefParent)} = ${alias}.${DataTable.colNameParentUuuid}
       `
     : ''
@@ -44,7 +42,6 @@ const getJoin = (schemaName, nodeDef, nodeDefParent) =>
 module.exports = {
   alias,
   aliasParent,
-  getNameFromDefs,
   getName,
   getSelectFields,
   getJoin,

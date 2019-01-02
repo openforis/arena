@@ -5,6 +5,7 @@ const toSnakeCase = require('to-snake-case')
 const Survey = require('../../../common/survey/survey')
 const SurveyUtils = require('../../../common/survey/surveyUtils')
 const NodeDef = require('../../../common/survey/nodeDef')
+const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
 const Taxonomy = require('../../../common/survey/taxonomy')
 const Node = require('../../../common/record/node')
 const CategoryManager = require('../../category/categoryManager')
@@ -15,16 +16,12 @@ const DateTimeUtils = require('../../../common/dateUtils')
 
 const {nodeDefType} = NodeDef
 
-const cols = 'cols'
 const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'
 
 const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => {
-//remove nodeDefName from col name
-  const prop = R.pipe(
-    R.replace(toSnakeCase(NodeDef.getNodeDefName(nodeDefCol)) + '_', ''),
-    camelize,
-  )(colName)
+  //remove nodeDefName from col name
+  const prop = camelize(NodeDefTable.extractColName(nodeDefCol, colName))
 
   return isInProps
     ? NodeDef.getProp(prop)(item)
@@ -78,8 +75,6 @@ const props = {
   },
 
   [nodeDefType.code]: {
-    [cols]: ['code', 'label'],
-
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
       const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid) : {}
@@ -92,7 +87,6 @@ const props = {
   },
 
   [nodeDefType.taxon]: {
-    [cols]: ['code', 'scientific_name'], //?, 'vernacular_names?'],
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
       const taxonUuid = Node.getNodeTaxonUuid(nodeCol)
       const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid) : []
@@ -116,17 +110,10 @@ const props = {
   },
 
   [nodeDefType.file]: {
-    [cols]: ['file_uuid', 'file_name'],
     [colValueProcessor]: nodeValuePropProcessor,
     [colTypeProcessor]: () => colName => R.endsWith('file_uuid', colName) ? sqlTypes.uuid : sqlTypes.varchar,
   },
 }
-
-const getCols = nodeDef => R.propOr(
-  [],
-  cols,
-  props[NodeDef.getNodeDefType(nodeDef)]
-)
 
 const getColValueProcessor = nodeDef => R.propOr(
   () => (node) => Node.getNodeValue(node, null),
@@ -141,7 +128,6 @@ const getColTypeProcessor = nodeDef => R.propOr(
 )(nodeDef)
 
 module.exports = {
-  getCols,
   getColValueProcessor,
   getColTypeProcessor,
 }

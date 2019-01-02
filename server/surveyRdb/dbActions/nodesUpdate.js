@@ -64,7 +64,7 @@ const toUpdates = async (surveyInfo, nodeDefs, nodes) => {
       return type ? {
           type,
           schemaName: DataSchema.getName(surveyInfo.id),
-          tableName: DataTable.getNameFromDefs(nodeDef, nodeDefParent),
+          tableName: DataTable.getName(nodeDef, nodeDefParent),
           colNames: getColNames(nodeDef, type),
           colValues: await getColValues(surveyInfo, nodeDef, node, type),
           rowUuid: getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])

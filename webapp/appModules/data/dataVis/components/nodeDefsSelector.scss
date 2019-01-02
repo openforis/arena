@@ -1,0 +1,9 @@
+.node-defs-selector {
+  display: grid;
+  grid-template-rows: 1fr 50px;
+
+  .btn-sync {
+    justify-self: center;
+    align-self: center;
+  }
+}

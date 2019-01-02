@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
+const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
 const Node = require('../../../common/record/node')
 const DataRow = require('./dataRow')
 const DataCol = require('./dataCol')
@@ -23,21 +24,7 @@ const getNodeDefColumns = (survey, nodeDef) =>
     // multiple attr table
     : [nodeDef]
 
-const getName = (nodeDefName, nodeDefChildName = '') => {
-  const child = R.isEmpty(nodeDefChildName) ? '' : `_${nodeDefChildName}`
-  return `data_${nodeDefName}${child}`
-}
-
-const getNameFromDefs = (nodeDef, nodeDefParent) => {
-  const nodeDefName = NodeDef.getNodeDefName(nodeDef)
-  const nodeDefParentName = NodeDef.getNodeDefName(nodeDefParent)
-
-  return NodeDef.isNodeDefEntity(nodeDef)
-    ? getName(nodeDefName)
-    : NodeDef.isNodeDefMultiple(nodeDef)
-      ? getName(nodeDefParentName, nodeDefName)
-      : getName(nodeDefParentName)
-}
+const getName = NodeDefTable.getTableName
 
 const getColumnNames = (survey, nodeDef) => [
   colNameUuuid,
@@ -67,7 +54,7 @@ const getParentForeignKey = (surveyId, schemaName, nodeDef, nodeDefParent = null
     )
     : getConstraintFk(
       schemaName,
-      getNameFromDefs(nodeDefParent),
+      getName(nodeDefParent),
       NodeDef.getNodeDefName(nodeDef) + '_' + NodeDef.getNodeDefName(nodeDefParent),
       colNameParentUuuid
     )
@@ -90,7 +77,6 @@ module.exports = {
   colNameRecordUuuid,
   getNodeDefColumns,
 
-  getNameFromDefs,
   getName,
   getColumnNames,
   getColumnNamesAndType,

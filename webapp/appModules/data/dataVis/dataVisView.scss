@@ -1,4 +1,5 @@
 .data-vis {
   display: grid;
-  grid-template-columns: 400px 1fr;
+  grid-template-columns: 250px .95fr;
+  justify-content: center;
 }
