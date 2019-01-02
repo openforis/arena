@@ -13,11 +13,12 @@ module.exports.init = app => {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
       const tableName = Request.getRequiredParam(req, 'tableName')
 
+      const cols = Request.getJsonParam(req, 'cols', [])
       const offset = Request.getRestParam(req, 'offset')
       const limit = Request.getRestParam(req, 'limit')
-      const cols = Request.getJsonParam(req, 'cols', [])
+      const filter = Request.getRestParam(req, 'filter', '')
 
-      const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit)
+      const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit, filter)
 
       res.json(rows)
     } catch (err) {
@@ -29,8 +30,9 @@ module.exports.init = app => {
     try {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
       const tableName = Request.getRequiredParam(req, 'tableName')
+      const filter = Request.getRestParam(req, 'filter', '')
 
-      const count = await SurveyRdbManager.countTable(surveyId, tableName)
+      const count = await SurveyRdbManager.countTable(surveyId, tableName, filter)
 
       res.json(count)
     } catch (err) {
