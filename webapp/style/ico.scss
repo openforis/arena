@@ -69,6 +69,12 @@
   margin-left: 5px;
 }
 
+.icon-reverse {
+  color: $grey2;
+  background-color: $white;
+  padding: 4px;
+}
+
 .icon-home:before {
   content: "\e900";
 }
