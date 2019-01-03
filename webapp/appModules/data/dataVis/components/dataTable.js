@@ -10,11 +10,12 @@ import NodeDefTableColumn from './nodeDefs/nodeDefTableColumn'
 import * as SurveyState from '../../../../survey/surveyState'
 import * as DataVisState from '../dataVisState'
 
-import { updateDataTable, resetDataTable } from '../actions'
+import { updateDataTable, resetDataTable, updateDataFilter } from '../actions'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 import { elementOffset } from '../../../../appUtils/domUtils'
+import { trim } from '../../../../../common/stringUtils'
 
 const defaultColWidth = 80
 
@@ -52,6 +53,7 @@ class DataTable extends React.Component {
 
   constructor (props) {
     super(props)
+    this.state = {filter: ''}
     this.tableRef = React.createRef()
   }
 
@@ -60,7 +62,12 @@ class DataTable extends React.Component {
   }
 
   render () {
-    const {nodeDefCols, colNames, data, offset, limit, count, lang, updateDataTable} = this.props
+    const {
+      nodeDefCols, colNames, data,
+      offset, limit, filter, count, lang,
+      updateDataTable, updateDataFilter,
+    } = this.props
+    const {filter: filterLocal} = this.state
 
     const {width = defaultColWidth} = elementOffset(this.tableRef.current)
     const widthMax = width - defaultColWidth
@@ -72,23 +79,29 @@ class DataTable extends React.Component {
 
     return (
       <div className="data-vis__data-table table" ref={this.tableRef}>
-        {
-          R.isEmpty(data)
-            ? null
-            : (
-              <React.Fragment>
-                <div className="table__header">
-                  <div/>
-                  <TablePaginator offset={offset} limit={limit} count={count}
-                                  fetchFn={updateDataTable}/>
-                </div>
+        <div className="table__header">
+          <div>
+            <input type="text" className="form-input" style={{width: '300px'}}
+                   onChange={e => this.setState({filter: trim(e.target.value)})}/>
+            <button className="btn btn-s btn-of-light"
+                    onClick={() => updateDataFilter(filterLocal)}
+                    aria-disabled={filter === filterLocal}>
+              <span className="icon icon-filter icon-14px"/>
+            </button>
+          </div>
+          {
+            !R.isEmpty(data) &&
+            <TablePaginator offset={offset} limit={limit} count={count}
+                            fetchFn={updateDataTable}/>
+          }
+        </div>
 
-                <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
-                           data={data} offset={offset}
-                           lang={lang}
-                           colWidth={colWidth}/>
-              </React.Fragment>
-            )
+        {
+          !R.isEmpty(data) &&
+          <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
+                     data={data} offset={offset}
+                     lang={lang}
+                     colWidth={colWidth}/>
         }
 
       </div>
@@ -109,9 +122,10 @@ const mapStateToProps = state => {
     data: DataVisState.getTableData(state),
     offset: DataVisState.getTableOffset(state),
     limit: DataVisState.getTableLimit(state),
+    filter: DataVisState.getTableFilter(state),
     count: DataVisState.getTableCount(state),
     lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
   }
 }
 
-export default connect(mapStateToProps, {updateDataTable, resetDataTable})(DataTable)
+export default connect(mapStateToProps, {updateDataTable, resetDataTable, updateDataFilter})(DataTable)

@@ -24,7 +24,7 @@ const nodeDefType = {
 
 const keys = {
   props: 'props',
-  validation : 'validation',
+  validation: 'validation',
 }
 
 const propKeys = {
@@ -69,13 +69,16 @@ const getNodeDefParentUuid = SurveyUtils.getParentUuid
 const isNodeDefKey = R.pipe(SurveyUtils.getProp(propKeys.key), R.equals(true))
 const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
 const isNodeDefMultiple = R.pipe(SurveyUtils.getProp(propKeys.multiple), R.equals(true))
-
+const isNodeDefSingle = R.pipe(isNodeDefMultiple, R.not)
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
+
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
-const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
-const isNodeDefSingleAttribute = nodeDef => !(isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef))
-const isNodeDefMultipleAttribute = nodeDef => !isNodeDefEntity(nodeDef) && isNodeDefMultiple(nodeDef)
+const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefSingle(nodeDef)
+
+const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
+const isNodeDefSingleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefSingle(nodeDef)
+const isNodeDefMultipleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefMultiple(nodeDef)
 const isNodeDefCode = isNodeDefType(nodeDefType.code)
 const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
@@ -151,6 +154,7 @@ module.exports = {
   isNodeDefEntity,
   isNodeDefEntityOrMultiple,
   isNodeDefSingleEntity,
+  isNodeDefAttribute,
   isNodeDefSingleAttribute,
   isNodeDefMultipleAttribute,
   isNodeDefCode,
