@@ -24,12 +24,12 @@ const NodeDefBoolean = props =>
   <div style={{borderBottom: 'none', textAlign: 'center'}}>
 
     <Button {...props}
-            disabled={props.edit && !props.preview}
+            disabled={props.edit}
             label="TRUE"
             value="true"/>
 
     <Button {...props}
-            disabled={props.edit && !props.preview}
+            disabled={props.edit}
             label="FALSE"
             value="false"/>
 

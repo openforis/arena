@@ -1,23 +1,40 @@
 import React from 'react'
+import { withRouter } from 'react-router-dom'
+import connect from 'react-redux/es/connect/connect'
+
+import axios from 'axios'
+
 import { appModuleUri } from '../../appModules'
 import { dashboardModules } from '../../dashboard/dashboardModules'
-import { Link } from 'react-router-dom'
+import { getUser } from '../../../app/appState'
+import { getSurvey } from '../../../survey/surveyState'
+import { newRecord } from '../../../../common/record/record'
+import Survey from '../../../../common/survey/survey'
 
-const FormEditActions = ({preview}) => (
-  <div className="survey-form__nav-record-actions">
-    {
-      preview ?
-        <Link to={`${appModuleUri(dashboardModules.formDesigner)}`} className="btn btn-of">
-          <span className="icon icon-pencil icon-12px icon-left"/>
-          Design
-        </Link>
-        :
-        <Link to={`${appModuleUri(dashboardModules.formDesigner)}?preview=true`} className="btn btn-of">
-          <span className="icon icon-eye icon-12px icon-left"/>
-          Preview
-        </Link>
-    }
-  </div>
-)
+class FormEditActions extends React.Component {
+  render () {
+    return <div className="survey-form__nav-record-actions">
+      <div className="btn btn-of" onClick={() => this.previewRecord()}>
+        <span className="icon icon-eye icon-12px icon-left"/>
+        Preview
+      </div>
+    </div>
+  }
 
-export default FormEditActions
+  async previewRecord () {
+    // TODO: posting new record for testing purposes. The record will be created server side
+    const {history, user, surveyInfo} = this.props
+    const record = newRecord(user, Survey.getDefaultStep(surveyInfo))
+
+    await axios.post(`/api/survey/${surveyInfo.id}/record`, record)
+
+    history.push(`${appModuleUri(dashboardModules.formDesigner)}preview/${record.uuid}`)
+  }
+}
+
+const mapStateToProps = state => ({
+  user: getUser(state),
+  surveyInfo: Survey.getSurveyInfo(getSurvey(state)),
+})
+
+export default withRouter(connect(mapStateToProps)(FormEditActions))

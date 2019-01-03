@@ -9,9 +9,9 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 
 import Node from '../../../../../../common/record/node'
 
-const TextInput = ({nodeDef, node, parentNode, edit, preview, updateNode}) => (
+const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) => (
   <div>
-    <Input readOnly={edit && !preview}
+    <Input readOnly={edit}
            {...getNodeDefInputTextProps(nodeDef)}
            value={Node.getNodeValue(node, '')}
            onChange={value => updateNode(nodeDef, node, value)}

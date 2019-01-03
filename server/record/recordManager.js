@@ -35,8 +35,6 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
 }
 
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) => {
-  if (recordUuid === 'preview') return {preview: true} // TODO
-
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
   const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
 
@@ -89,7 +87,9 @@ const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(
  * ==================
  */
 const checkInRecord = async (user, surveyId, recordUuid) => {
-  RecordUpdateManager.checkIn(user, surveyId)
+  const preview = recordUuid === 'preview'
+
+  RecordUpdateManager.checkIn(user, surveyId, preview)
   return await fetchRecordByUuid(surveyId, recordUuid)
 }
 

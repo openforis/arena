@@ -8,7 +8,6 @@ const FormNavigation = ({edit, entry, preview}) => {
 
   return (
     <div className="survey-form__nav">
-
       <div className="survey-form__nav-node-def-navigation">
         <NodeDefNavigation edit={edit}
                            level={0}/>
@@ -16,9 +15,9 @@ const FormNavigation = ({edit, entry, preview}) => {
 
       {
         edit ?
-          <FormEditActions preview={preview}/>
+          <FormEditActions/>
           :
-          <FormEntryActions entry={entry}/>
+          <FormEntryActions entry={entry} preview={preview}/>
       }
     </div>
   )

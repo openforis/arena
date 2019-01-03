@@ -20,7 +20,6 @@ class NodeDefEntitySwitch extends React.Component {
     const {
       edit,
       entry,
-      preview,
       surveyInfo,
       nodeDef,
       childDefs,
@@ -43,7 +42,6 @@ class NodeDefEntitySwitch extends React.Component {
                                 childDefs={childDefs}
                                 edit={edit}
                                 entry={entry}
-                                preview={preview}
                                 nodes={nodes}
                                 parentNode={parentNode}
                                 updateNode={updateNode}
@@ -58,7 +56,6 @@ class NodeDefEntitySwitch extends React.Component {
                                  childDefs={childDefs}
                                  edit={edit}
                                  entry={entry}
-                                 preview={preview}
                                  nodes={nodes}
                                  parentNode={parentNode}
                                  setFormPageNode={setFormPageNode}

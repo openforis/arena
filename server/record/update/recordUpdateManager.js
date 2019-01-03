@@ -1,11 +1,4 @@
 const path = require('path')
-const db = require('../../db/db')
-
-const SurveyManager = require('../../survey/surveyManager')
-const NodeDefManager = require('../../nodeDef/nodeDefManager')
-const SurveyRdbManager = require('../../surveyRdb/surveyRdbManager')
-const Survey = require('../../../common/survey/survey')
-const Node = require('../../../common/record/node')
 
 const WebSocketManager = require('../../webSocket/webSocketManager')
 const WebSocketEvents = require('../../../common/webSocket/webSocketEvents')
@@ -21,7 +14,7 @@ const checkOutTimeoutsByUserId = {}
 // const RecordProcessor = require('./thread/recordProcessor')
 const RecordUpdateThread = require('./thread/recordUpdateThread')
 
-const createRecordUpdateThread = (user, surveyId) => {
+const createRecordUpdateThread = (user, surveyId, preview) => {
   const userId = user.id
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
@@ -38,10 +31,10 @@ const createRecordUpdateThread = (user, surveyId) => {
 /**
  * Start record update thread
  */
-const checkIn = (user, surveyId) => {
+const checkIn = (user, surveyId, preview = false) => {
   cancelCheckOut(user.id)
   if (!recordUpdateThreads.getThread(user.id)) {
-    createRecordUpdateThread(user, surveyId)
+    createRecordUpdateThread(user, surveyId, preview)
   }
 }
 

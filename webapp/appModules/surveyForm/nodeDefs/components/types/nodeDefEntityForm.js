@@ -32,7 +32,6 @@ const EntityForm = props => {
     node,
     putNodeDefProp,
     entry,
-    preview,
     recordUuid,
     surveyInfo
   } = props
@@ -71,7 +70,6 @@ const EntityForm = props => {
                 <NodeDefSwitch key={i}
                                edit={edit}
                                entry={entry}
-                               preview={preview}
                                recordUuid={recordUuid}
                                surveyInfo={surveyInfo}
                                nodeDef={childDef}

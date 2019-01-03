@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import TabBar from '../../commonComponents/tabBar'
 import SurveyInfo from './components/surveyInfo'
 import SurveyFormView from '../surveyForm/surveyFormView'
+import RecordView from '../data/records/components/recordView'
 import Categories from '../surveyForm/components/categoriesView'
 import TaxonomiesView from '../surveyForm/components/taxonomiesView'
 
@@ -29,7 +30,6 @@ class DesignerView extends React.Component {
 
   render () {
     const {history, location, canEdit} = this.props
-    const preview = location.search.includes('preview=true')
 
     return (
       <TabBar
@@ -48,7 +48,16 @@ class DesignerView extends React.Component {
             label: 'Form Designer',
             component: SurveyFormView,
             path: appModuleUri(dashboardModules.formDesigner),
-            props: {edit: true, draft: true, canEdit, preview},
+            props: {edit: true, draft: true, canEdit},
+          },
+
+          {
+            label: 'Form preview',
+            component: RecordView,
+            // TODO recordUuid is there for testing purposes - will be deleted
+            path: `${appModuleUri(dashboardModules.formDesigner)}preview/:recordUuid`,
+            props: {edit: true, draft: true, canEdit, preview: true},
+            showTab: false,
           },
 
           {

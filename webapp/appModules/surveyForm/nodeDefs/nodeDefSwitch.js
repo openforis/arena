@@ -57,7 +57,6 @@ class NodeDefSwitch extends React.Component {
     const {
       nodeDef,
       edit,
-      preview,
       locked,
       canEditDef,
 
@@ -78,7 +77,7 @@ class NodeDefSwitch extends React.Component {
       <ErrorBadge validation={nodeDef.validation}/>
 
       {
-        edit && canEditDef && !preview && (
+        edit && canEditDef && (
           <div className="node-def__form-actions">
             {
               !locked &&
