@@ -57,7 +57,6 @@
     padding: 0;
     height: 30px;
     width: 30px;
-    border: none;
 
     .icon {
       color: rgba($white, .7);
@@ -72,17 +71,19 @@
   flex-wrap: wrap;
   padding: 1rem;
   justify-content: center;
+  margin-top: -.3rem;
 
   .btn-node-def-type {
     font-size: .7rem;
     font-weight: 400;
+    padding: .3rem .5rem;
 
-    .icon-left{
+    .icon-left {
       margin-left: 0px !important;
-      &.icon {
+    }
+
+    .icon {
       font-size: 14px !important;
-      }
-      //transform: scale(.8,.8);
     }
 
     &.active {

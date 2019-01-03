@@ -53,8 +53,18 @@ class DataTable extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {filter: ''}
+    this.state = {filter: '', firstFilter: true}
     this.tableRef = React.createRef()
+  }
+
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    const {filter} = this.props
+    const {filter: filterPrev} = prevProps
+
+    const {firstFilter} = this.state
+    // on new search, reset local filter
+    if (!firstFilter && R.isEmpty(filter) && !R.isEmpty(filterPrev))
+      this.setState({filter: ''})
   }
 
   componentWillUnmount () {
@@ -82,9 +92,13 @@ class DataTable extends React.Component {
         <div className="table__header">
           <div>
             <input type="text" className="form-input" style={{width: '300px'}}
+                   value={filterLocal}
                    onChange={e => this.setState({filter: trim(e.target.value)})}/>
             <button className="btn btn-s btn-of-light"
-                    onClick={() => updateDataFilter(filterLocal)}
+                    onClick={() => {
+                      updateDataFilter(filterLocal)
+                      this.setState({firstFilter: false})
+                    }}
                     aria-disabled={filter === filterLocal}>
               <span className="icon icon-filter icon-14px"/>
             </button>
