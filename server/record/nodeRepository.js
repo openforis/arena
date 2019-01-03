@@ -81,15 +81,27 @@ const fetchDescendantNodesByCodeUuid = async (surveyId, recordUuid, parentCodeNo
     dbTransformCallback
   )
 
-const fetchDescendantNodesByNodeDefUuid = async (surveyId, recordUuid, commonParentNodeUuid, nodeDefUuid, client = db) =>
+const fetchDescendantNodesByNodeDefUuid = async (surveyId, recordUuid, parentNodeUuid, nodeDefUuid, client = db) =>
   await client.map(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node n
     WHERE n.record_uuid = $1
       AND n.node_def_uuid = $2
-      AND n.meta @> '{"h": ["${commonParentNodeUuid}"]}'`,
+      AND n.meta @> '{"h": ["${parentNodeUuid}"]}'`,
     [recordUuid, nodeDefUuid],
     dbTransformCallback
   )
+
+const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
+  const nodes = await client.map(`
+    SELECT * FROM  ${getSurveyDBSchema(surveyId)}.node n
+    WHERE n.record_uuid = $1
+      AND n.parent_uuid = $2
+      AND n.node_def_uuid = $3`,
+    [recordUuid, nodeUuid, childDefUUid],
+    dbTransformCallback
+  )
+  return R.head(nodes)
+}
 
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUuid, value, client = db) =>
@@ -122,6 +134,7 @@ module.exports = {
   fetchAncestorByNodeDefUuid,
   fetchDescendantNodesByCodeUuid,
   fetchDescendantNodesByNodeDefUuid,
+  fetchChildNodeByNodeDefUuid,
 
   //UPDATE
   updateNode,

@@ -57,26 +57,23 @@ const fetchRootNodeDef = async (surveyId, draft, client = db) =>
     res => dbTransformCallback(res, draft, true)
   )
 
-const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, client = db) =>
+const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced = false, client = db) =>
   await client.one(
-    `SELECT ${nodeDefSelectFields()}
+    `SELECT ${nodeDefSelectFields(advanced)}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
      WHERE uuid = $1`,
     [nodeDefUuid],
     res => dbTransformCallback(res, draft, true)
   )
 
-const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, validate = false, client = db) => {
-  const advanced = validate //load advanced props when validating
-
-  return await client.map(
+const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, advanced = false, client = db) =>
+  await client.map(
     `SELECT ${nodeDefSelectFields(advanced)}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
      WHERE uuid in (${nodeDefUuids.map((uuid, i) => `$${i + 1}`).join(',')})`,
     [...nodeDefUuids],
     res => dbTransformCallback(res, draft, true)
   )
-}
 
 const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = db) =>
   await client.map(`

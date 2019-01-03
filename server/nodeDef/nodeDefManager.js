@@ -92,6 +92,7 @@ module.exports = {
   //READ
   fetchNodeDefsBySurveyId,
   fetchNodeDefsByUuid,
+  fetchNodeDefByUuid: NodeDefRepository.fetchNodeDefByUuid,
 
   //UPDATE
   updateNodeDefProps,

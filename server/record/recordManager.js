@@ -102,7 +102,7 @@ module.exports = {
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
-  fetchAncestors: NodeRepository.fetchAncestors,
+  fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,
 
   //==== UPDATE
   persistNode,

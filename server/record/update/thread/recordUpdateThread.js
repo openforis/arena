@@ -1,5 +1,7 @@
 const {isMainThread} = require('worker_threads')
 
+const R = require('ramda')
+
 const db = require('../../../db/db')
 
 const RecordProcessor = require('./recordProcessor')
@@ -14,12 +16,19 @@ const Survey = require('../../../../common/survey/survey')
 const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
 
+const DefaultValuesCalculator = require('./defaultValuesCalculator')
+
 class RecordUpdateThread extends Thread {
 
-  constructor () {
-    super()
+  constructor (params) {
+    super(params)
     this.queue = new Queue()
     this.processing = false
+
+    // init survey
+    if (this.params.surveyId)
+      SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.params.surveyId, false, true, false)
+        .then(survey => this.survey = survey)
   }
 
   async onMessage (msg) {
@@ -63,16 +72,19 @@ class RecordUpdateThread extends Thread {
       if (!isMainThread)
         this.postMessage(nodes)
 
-      const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
-      const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, t)
-      await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, nodes, t)
+      //default values
+      const defaultValuesUpdatedNodes = await DefaultValuesCalculator.applyDefaultValuesToDependentNodes(user, this.survey, nodes, t)
+      if (!R.isEmpty(defaultValuesUpdatedNodes) && !isMainThread)
+        this.postMessage(defaultValuesUpdatedNodes)
 
+      const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, t)
+      await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(this.survey), nodeDefs, nodes, t)
     })
   }
 
 }
 
-const newInstance = () => new RecordUpdateThread()
+const newInstance = (params) => new RecordUpdateThread(params)
 
 if (!isMainThread)
   newInstance()

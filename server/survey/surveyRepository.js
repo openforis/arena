@@ -65,14 +65,6 @@ const fetchDepedenciesByNodeDefUuid = async (surveyId, dependencyType, nodeDefUu
     [surveyId],
     R.prop('dependencies')
   )
-/*
-const fetchDependencySourcesByNodeDefUuid = async (surveyId, dependencyType, nodeDefUuid, client = db) =>
-  await client.any(
-    `SELECT meta#>'{dependencyGraphs, ${dependencyType}}' -> 0
-     FROM survey
-    WHERE meta#>'{dependencyGraphs, ${dependencyType}}' @> '{["${nodeDefUuid}"]}'`
-  )
-*/
 
 // ============== UPDATE
 const updateSurveyProp = async (surveyId, key, value, client = db) => {

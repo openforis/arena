@@ -3,16 +3,11 @@ const Promise = require('bluebird')
 
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../common/survey/nodeDef')
-const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
-
-const SurveyManager = require('../../../survey/surveyManager')
 
 const RecordRepository = require('../../../record/recordRepository')
 const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const NodeRepository = require('../../../record/nodeRepository')
-
-const {dependencyTypes} = require('../../../survey/surveyDependenchyGraph')
 
 const ActivityLog = require('../../../activityLog/activityLogger')
 
@@ -82,22 +77,6 @@ const insertNodeRecursively = async (surveyId, nodeDef, nodeToInsert, user, t) =
   // insert node
   const node = await NodeRepository.insertNode(surveyId, nodeToInsert, t)
 
-  // find dependent nodes
-  const dependencies = await SurveyManager.fetchDepedenciesByNodeDefUuid(surveyId, dependencyTypes.defaultValues, nodeDef.uuid, t)
-
-  if (dependencies) {
-    const dependentDefs = await NodeDefRepository.fetchNodeDefsByUuid(surveyId, dependencies, false, t)
-    for (const dependentDef of dependentDefs) {
-      const commonParentDefUuid = R.last(R.intersection(nodeDef.meta.h, dependentDef.meta.h))
-      const commonParentNode = await NodeRepository.fetchAncestorByNodeDefUuid(surveyId, node.uuid, commonParentDefUuid, t)
-
-      const dependants = await NodeRepository.fetchDescendantNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), commonParentNode.uuid, dependentDef.uuid, t)
-
-      console.log(dependants)
-    }
-  }
-
-
   // add children if entity
   const childDefs = NodeDef.isNodeDefEntity(nodeDef)
     ? await NodeDefRepository.fetchNodeDefsByParentUuid(surveyId, nodeDef.uuid)
@@ -113,20 +92,6 @@ const insertNodeRecursively = async (surveyId, nodeDef, nodeToInsert, user, t) =
     )
   )
   return R.mergeLeft({[node.uuid]: node}, childNodes)
-}
-
-const findDescendants = (record, parentNode, descendantDefsUuids) => {
-  const descendants = []
-
-  const children = Record.getNodeChildrenByDefUuid(parentNode, R.head(descendantDefsUuids))(record)
-  if (R.length(descendantDefsUuids) === 1) {
-    return children
-  } else {
-    for (const child of children) {
-      descendants.push.apply(findDescendants(record, child, R.takeLast(descendantDefsUuids.length - 1, descendantDefsUuids)))
-    }
-  }
-  return descendants
 }
 
 // ==== UPDATE
