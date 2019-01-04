@@ -69,6 +69,7 @@ const getNodeDefParentUuid = SurveyUtils.getParentUuid
 const isNodeDefKey = R.pipe(SurveyUtils.getProp(propKeys.key), R.equals(true))
 const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
 const isNodeDefMultiple = R.pipe(SurveyUtils.getProp(propKeys.multiple), R.equals(true))
+const isNodeDefSingle = R.pipe(isNodeDefMultiple, R.not)
 
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
@@ -147,6 +148,7 @@ module.exports = {
 
   isNodeDefKey,
   isNodeDefMultiple,
+  isNodeDefSingle,
   isNodeDefRoot,
   isNodeDefEntity,
   isNodeDefEntityOrMultiple,

@@ -1,16 +1,13 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const StringUtils = require('../../../../common/stringUtils')
-const ArrayUtils = require('../../../../common/arrayUtils')
 
 const Node = require('../../../../common/record/node')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Survey = require('../../../../common/survey/survey')
-const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
 const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 
-const {dependencyTypes} = require('../../../survey/surveyDependenchyGraph')
-const RecordDependencyManager = require('../../recordDependencyManager')
 const RecordExprParser = require('../../../record/recordExprParser')
 const RecordProcessor = require('./recordProcessor')
 
@@ -26,29 +23,24 @@ const applyDefaultValue = async (user, survey, node, tx) => {
 
       console.log(`update node ${NodeDef.getNodeDefName(nodeDef)} with value ${value}`)
 
-      return R.values(await RecordProcessor.persistNode(user, surveyId, Node.assocValue(value)(node), tx))
+      return await RecordProcessor.persistNode(user, surveyId, Node.assocValue(value)(node), tx)
     }
   }
   return []
 }
 
-const applyDefaultValuesToDependentNodes = async (user, survey, nodes, tx) => {
-  const updatedNodes = []
 
-  for (const node of R.values(nodes)) {
-    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-    const dependentNodes = await RecordDependencyManager.fetchDependentNodes(Survey.getSurveyInfo(survey).id, node, nodeDef, dependencyTypes.defaultValues, tx)
-
-    for (const dependentNode of dependentNodes) {
-      if (Node.isNodeValueBlank(Node.getNodeValue(dependentNode, null))) {
-        ArrayUtils.pushAll(updatedNodes, await applyDefaultValue(user, survey, dependentNode, tx))
-      }
-    }
-  }
-
-  return toUuidIndexedObj(updatedNodes)
-}
+const applyDefaultValues = async (user, survey, nodes, tx) =>
+  R.mergeAll(
+    await Promise.all(
+      R.values(nodes).map(async node =>
+        Node.isNodeValueBlank(Node.getNodeValue(node, null))
+          ? await applyDefaultValue(user, survey, node, tx)
+          : {}
+      )
+    )
+  )
 
 module.exports = {
-  applyDefaultValuesToDependentNodes
+  applyDefaultValues
 }

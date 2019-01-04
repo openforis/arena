@@ -73,9 +73,12 @@ class RecordUpdateThread extends Thread {
         this.postMessage(nodes)
 
       //default values
-      const defaultValuesUpdatedNodes = await DefaultValuesCalculator.applyDefaultValuesToDependentNodes(user, this.survey, nodes, t)
+      const defaultValuesUpdatedNodes = await DefaultValuesCalculator.applyDefaultValues(user, this.survey, nodes, t)
       if (!R.isEmpty(defaultValuesUpdatedNodes) && !isMainThread)
         this.postMessage(defaultValuesUpdatedNodes)
+
+      //update rdb data tables
+      nodes = R.mergeRight(nodes, defaultValuesUpdatedNodes)
 
       const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, t)
       await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(this.survey), nodeDefs, nodes, t)

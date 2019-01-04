@@ -81,14 +81,14 @@ const insertNodeRecursively = async (surveyId, nodeDef, nodeToInsert, user, t) =
   const childDefs = NodeDef.isNodeDefEntity(nodeDef)
     ? await NodeDefRepository.fetchNodeDefsByParentUuid(surveyId, nodeDef.uuid)
     : []
-  // insert only child single entities
+  // insert only child single nodes
   const childNodes = R.mergeAll(
     await Promise.all(
       childDefs
-        .filter(NodeDef.isNodeDefSingleEntity)
+        .filter(NodeDef.isNodeDefSingle)
         .map(async childDef =>
-          await insertNodeRecursively(surveyId, childDef, Node.newNode(childDef.uuid, node.recordUuid, node.uuid), user, t)
-        )
+        await insertNodeRecursively(surveyId, childDef, Node.newNode(childDef.uuid, node.recordUuid, node.uuid), user, t)
+      )
     )
   )
   return R.mergeLeft({[node.uuid]: node}, childNodes)
