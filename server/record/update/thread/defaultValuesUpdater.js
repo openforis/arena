@@ -21,20 +21,19 @@ const applyDefaultValue = async (user, survey, node, tx) => {
     if (StringUtils.isBlank(applyIf) || await RecordExprParser.evalNodeQuery(survey, node, applyIf, tx)) {
       const value = await RecordExprParser.evalNodeQuery(survey, node, NodeDefExpression.getExpression(defaultValue), tx)
 
-      console.log(`update node ${NodeDef.getNodeDefName(nodeDef)} with value ${value}`)
+      //console.log(`update node ${NodeDef.getNodeDefName(nodeDef)} with value ${value}`)
 
       return await RecordProcessor.persistNode(user, surveyId, Node.assocValue(value)(node), tx)
     }
   }
-  return []
+  return {}
 }
-
 
 const applyDefaultValues = async (user, survey, nodes, tx) =>
   R.mergeAll(
     await Promise.all(
       R.values(nodes).map(async node =>
-        Node.isNodeValueBlank(Node.getNodeValue(node, null))
+        Node.isApplicable(node) && Node.isNodeValueBlank(Node.getNodeValue(node, null))
           ? await applyDefaultValue(user, survey, node, tx)
           : {}
       )

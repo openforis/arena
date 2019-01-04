@@ -24,7 +24,7 @@ const nodeDefType = {
 
 const keys = {
   props: 'props',
-  validation : 'validation',
+  validation: 'validation',
 }
 
 const propKeys = {

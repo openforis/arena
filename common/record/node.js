@@ -5,7 +5,9 @@ const {isBlank, trim} = require('../stringUtils')
 const SurveyUtils = require('../survey/surveyUtils')
 
 const keys = {
-  value: 'value'
+  recordUuid: 'recordUuid',
+  value: 'value',
+  applicable: 'applicable'
 }
 
 const valuePropKeys = {
@@ -103,9 +105,10 @@ module.exports = {
   // ==== READ
   getUuid: SurveyUtils.getUuid,
   getParentUuid: SurveyUtils.getParentUuid,
-  getRecordUuid: R.prop('recordUuid'),
+  getRecordUuid: R.prop(keys.recordUuid),
   getNodeValue,
   getNodeDefUuid,
+  isApplicable: R.propOr(true, keys.applicable),
 
   getNodeDefUuids,
 

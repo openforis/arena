@@ -6,7 +6,8 @@ const {
   validate,
   validateItemPropUniqueness,
   validateRequired,
-  validateNotKeyword
+  validateNotKeyword,
+  cleanup
 } = require('../../common/validation/validator')
 
 const Survey = require('../../common/survey/survey')
@@ -97,12 +98,11 @@ const validateAdvancedProps = async (survey, nodeDef) => {
     applicable: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getApplicable(nodeDef)),
     validations: await NodeDefValidationsValidator.validate(survey, nodeDef, NodeDef.getValidations(nodeDef)),
   }
-  const invalidValidations = R.reject(R.propEq('valid', true), validations)
 
-  return {
-    fields: invalidValidations,
-    valid: R.isEmpty(invalidValidations),
-  }
+  return cleanup({
+    fields: validations,
+    valid: true,
+  })
 }
 
 const validateNodeDef = async (survey, nodeDef) => {

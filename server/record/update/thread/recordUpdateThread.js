@@ -16,7 +16,8 @@ const Survey = require('../../../../common/survey/survey')
 const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
 
-const DefaultValuesCalculator = require('./defaultValuesCalculator')
+const DefaultValuesUpdater = require('./defaultValuesUpdater')
+const ApplicableIfUpdater = require('./applicableIfIUpdater')
 
 class RecordUpdateThread extends Thread {
 
@@ -52,10 +53,10 @@ class RecordUpdateThread extends Thread {
   }
 
   async processMessage (msg) {
-    let nodes = null
-
     await db.tx(async t => {
       const {user, surveyId} = msg
+
+      let nodes = null
 
       switch (msg.type) {
         case messageTypes.createRecord:
@@ -72,8 +73,17 @@ class RecordUpdateThread extends Thread {
       if (!isMainThread)
         this.postMessage(nodes)
 
-      //default values
-      const defaultValuesUpdatedNodes = await DefaultValuesCalculator.applyDefaultValues(user, this.survey, nodes, t)
+      //update applicability
+      const applicableUpdatedNodes = await ApplicableIfUpdater.updateDependentNodesApplicability(user, this.survey, nodes, t)
+
+      if (!R.isEmpty(applicableUpdatedNodes) && !isMainThread)
+        this.postMessage(applicableUpdatedNodes)
+
+      nodes = R.mergeRight(nodes, applicableUpdatedNodes)
+
+      //apply default values
+      const defaultValuesUpdatedNodes = await DefaultValuesUpdater.applyDefaultValues(user, this.survey, nodes, t)
+
       if (!R.isEmpty(defaultValuesUpdatedNodes) && !isMainThread)
         this.postMessage(defaultValuesUpdatedNodes)
 
