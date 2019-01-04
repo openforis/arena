@@ -81,6 +81,11 @@ const identifierExpression = expr => {
   return R.prop('name')(expr)
 }
 
+const groupExpression = async (expr, ctx) => {
+  const {argument} = expr
+  return await evalExpression(argument, ctx)
+}
+
 const expressionTypes = {
   // 'Compound'
   Identifier: 'Identifier',
@@ -93,6 +98,9 @@ const expressionTypes = {
   LogicalExpression: 'LogicalExpression',
   // 'ConditionalExpression'
   // 'ArrayExpression'
+
+  // custom - not managed by jsep
+  GroupExpression: 'GroupExpression',
 }
 
 const defaultFunctions = {
@@ -104,6 +112,7 @@ const defaultFunctions = {
   [expressionTypes.UnaryExpression]: unaryExpression,
   [expressionTypes.BinaryExpression]: binaryExpression,
   [expressionTypes.LogicalExpression]: binaryExpression,
+  [expressionTypes.GroupExpression]: groupExpression,
 }
 
 const evalExpression = async (expr, ctx) => {

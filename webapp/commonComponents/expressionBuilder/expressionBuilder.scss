@@ -10,6 +10,10 @@
     position: fixed;
     min-width: 600px;
     z-index: $zIndex10TopOfApp;
+
+    .query {
+      background-color: rgba($white, .15);
+    }
   }
 }
 
@@ -17,12 +21,12 @@
   position: absolute;
   padding: 0;
   border-radius: 50% !important;
-  background-color: rgba($red, 0.4);
+  background-color: rgba($red, 0.6);
   border: 1px solid rgba($red, 0.5) !important;
   width: 1.5rem;
   height: 1.5rem;
-  top: -.5rem;
-  left: -.5rem;
+  top: -.7rem;
+  left: -.75rem;
 
   .icon {
     opacity: .3;
@@ -50,6 +54,11 @@
 
     &.form-input {
       width: 300px;
+    }
+
+    .placeholder {
+      opacity: .35;
+      font-style: italic;
     }
   }
 }

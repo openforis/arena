@@ -1,0 +1,16 @@
+.expression-editor__container {
+
+  .binary {
+    display: flex;
+
+    > div {
+      padding: .1rem .2rem;
+    }
+  }
+
+  input {
+    padding: 0;
+    text-align: center;
+    height: 100%;
+  }
+}

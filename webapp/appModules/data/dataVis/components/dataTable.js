@@ -53,17 +53,7 @@ class DataTable extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {filter: '', showDataFilter: false}
     this.tableRef = React.createRef()
-  }
-
-  componentDidUpdate (prevProps, prevState, snapshot) {
-    const {filter} = this.props
-    const {filter: filterPrev} = prevProps
-
-    // on new search, reset local filter
-    if (R.isEmpty(filter) && !R.isEmpty(filterPrev))
-      this.setState({filter: ''})
   }
 
   componentWillUnmount () {
@@ -76,7 +66,6 @@ class DataTable extends React.Component {
       offset, limit, filter, count, lang,
       updateDataTable, updateDataFilter,
     } = this.props
-    const {filter: filterLocal, showDataFilter} = this.state
 
     const {width = defaultColWidth} = elementOffset(this.tableRef.current)
     const widthMax = width - defaultColWidth
@@ -97,7 +86,7 @@ class DataTable extends React.Component {
                 <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
                       style={{opacity: R.isEmpty(filter) ? 0.5 : 1}}/>
                 <ExpressionBuilder nodeDefUuid={nodeDefUuidTable}
-                                   query={filterLocal}
+                                   query={filter}
                                    onChange={query => updateDataFilter(query)}/>
               </React.Fragment>
             }

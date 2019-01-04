@@ -3,21 +3,16 @@ import './expressionBuilder.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
-import jsep from 'jsep'
 import memoize from 'memoize-one'
 
-const keys = {
-  openBracket: ' _OP_B ',
-  closeBracket: ' _CL_B ',
-  nullPlaceholder: ' _NULL ',
-}
-jsep.addUnaryOp(keys.openBracket)
-jsep.addUnaryOp(keys.closeBracket)
+import ExpressionEditor from './editor/expressionEditor'
 
 import * as SurveyState from '../../survey/surveyState'
 import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
 import NodeDefTable from '../../../common/surveyRdb/nodeDefTable'
+import sqlTypes from '../../../common/surveyRdb/sqlTypes'
+
 import { elementOffset } from '../../appUtils/domUtils'
 
 class ExpressionBuilder extends React.Component {
@@ -25,24 +20,12 @@ class ExpressionBuilder extends React.Component {
   constructor (props) {
     super(props)
 
-    const {query} = props
-    this.state = {edit: false, query, expr: this.getExpr(query)}
-    //TODO flat ast tree for edit
+    this.state = {edit: false}
 
     this.elementRef = React.createRef()
 
     this.toggleEdit = this.toggleEdit.bind(this)
     this.getStyle = memoize(this.getStyle.bind(this))
-  }
-
-  getExpr (query) {
-    const queryStr = R.pipe(
-      query => R.isEmpty(query) ? ' + ' : query,
-      R.replace(/\(/g, keys.openBracket),
-      R.replace(/\)/g, keys.closeBracket + keys.nullPlaceholder),
-    )(query)
-
-    return jsep(queryStr)
   }
 
   getStyle (edit) {
@@ -53,9 +36,9 @@ class ExpressionBuilder extends React.Component {
       : {}
   }
 
-  applyChange (value) {
+  applyChange (query) {
     const {onChange} = this.props
-    onChange && onChange(value)
+    onChange && onChange(query)
 
     this.toggleEdit()
   }
@@ -65,8 +48,8 @@ class ExpressionBuilder extends React.Component {
   }
 
   render () {
-    const {variables} = this.props
-    const {edit, query, expr} = this.state
+    const {query, variables} = this.props
+    const {edit} = this.state
 
     return <div className={`expression-builder${edit ? ' edit' : ''}`}
                 ref={this.elementRef}
@@ -74,35 +57,10 @@ class ExpressionBuilder extends React.Component {
       {
         edit
           ? (
-            <React.Fragment>
-
-              <button className="btn btn-of expression-builder__btn-close"
-                      onClick={this.toggleEdit}>
-                <span className="icon icon-cross icon-8px"/>
-              </button>
-
-              <div className="expression-builder__query-container">
-                <input type="text" className="form-input query"
-                       value={query}
-                       onChange={e => this.setState({query: e.target.value})}/>
-              </div>
-
-              <div>{JSON.stringify(expr)}</div>
-
-              <div className="expression-builder__footer">
-                <button className="btn btn-xs btn-of"
-                        onClick={() => this.applyChange('')}>
-                  <span className="icon icon-undo2 icon-16px icon-left"/> Reset
-                </button>
-
-                <button className="btn btn-xs btn-of"
-                        onClick={() => this.applyChange(query)}>
-                  <span className="icon icon-checkmark icon-16px icon-left"/> Apply
-                </button>
-
-              </div>
-
-            </React.Fragment>
+            <ExpressionEditor query={query}
+                              variables={variables}
+                              onClose={this.toggleEdit}
+                              onChange={query => this.applyChange(query)}/>
           )
           : (
             <div className="expression-builder__query-container">
@@ -137,15 +95,18 @@ const mapStateToProps = (state, props) => {
 
   const getVariables = (nodeDef) => {
     const variables = R.pipe(
-      R.map(nodeDef =>
-        NodeDef.isNodeDefEntity(nodeDef)
-          ? null
-          : NodeDefTable.getColNames(nodeDef)
-            .map(col => ({
-              label: col,
-              type: 'integer',
-              value: col,
-            }))
+      R.map(nodeDef => {
+          if (NodeDef.isNodeDefEntity(nodeDef))
+            return null
+          const colNames = NodeDefTable.getColNames(nodeDef)
+          return colNames.map(col => ({
+            label: NodeDef.getNodeDefLabel(nodeDef, lang) + (colNames.length === 1 ? '' : NodeDefTable.extractColName(nodeDef, col)),
+            type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
+              NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
+                : sqlTypes.varchar,
+            value: col,
+          }))
+        }
       ),
       R.flatten,
       R.reject(R.isNil),
