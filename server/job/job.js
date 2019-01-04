@@ -64,6 +64,9 @@ class Job {
           this.setStatusFailed()
         }
       }
+      if (!this.isRunning()) {
+        throw new Error('Job canceled or errors found; rollback transaction')
+      }
     })
     if (this.isRunning()) {
       this.setStatusSucceeded()

@@ -8,17 +8,33 @@ const SurveyRdbManager = require('./surveyRdbManager')
 
 module.exports.init = app => {
 
-  app.get('/surveyRdb/:surveyId/query', async (req, res) => {
+  app.get('/surveyRdb/:surveyId/:tableName/query', async (req, res) => {
     try {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
+      const tableName = Request.getRequiredParam(req, 'tableName')
+
+      const cols = Request.getJsonParam(req, 'cols', [])
       const offset = Request.getRestParam(req, 'offset')
       const limit = Request.getRestParam(req, 'limit')
-      const tableName = Request.getRequiredParam(req, 'tableName')
-      const cols = Request.getJsonParam(req, 'cols', [])
+      const filter = Request.getRestParam(req, 'filter', '')
 
-      const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit)
+      const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit, filter)
 
       res.json(rows)
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.get('/surveyRdb/:surveyId/:tableName/query/count', async (req, res) => {
+    try {
+      const surveyId = Request.getRequiredParam(req, 'surveyId')
+      const tableName = Request.getRequiredParam(req, 'tableName')
+      const filter = Request.getRestParam(req, 'filter', '')
+
+      const count = await SurveyRdbManager.countTable(surveyId, tableName, filter)
+
+      res.json(count)
     } catch (err) {
       sendErr(res, err)
     }

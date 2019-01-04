@@ -20,7 +20,7 @@ const toInserts = async (survey, nodeDef, record) => {
 
   return insertValues.map(values => ({
     schemaName: DataSchema.getName(Survey.getSurveyInfo(survey).id),
-    tableName: DataTable.getNameFromDefs(nodeDef, nodeDefParent),
+    tableName: DataTable.getName(nodeDef, nodeDefParent),
     colNames: DataTable.getColumnNames(survey, nodeDef),
     values
   }))

@@ -31,6 +31,7 @@ class DataView extends React.Component {
           history={history}
           tabs={[
 
+            // records list
             {
               label: 'Records',
               component: RecordsView,
@@ -45,12 +46,12 @@ class DataView extends React.Component {
               showTab: false,
             },
 
-            //edit record
-            // {
-            //   label: 'Data vis',
-            //   component: DataVisView,
-            //   path: appModuleUri(dataModules.dataVis),
-            // },
+            // data visualization
+            {
+              label: 'Data vis',
+              component: DataVisView,
+              path: appModuleUri(dataModules.dataVis),
+            },
 
           ]}
         />
