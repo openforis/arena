@@ -1,11 +1,11 @@
-import './expressionBuilder.scss'
+import './expression.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 import memoize from 'memoize-one'
 
-import ExpressionEditor from './editor/expressionEditor'
+import Editor from './editor/editor'
 
 import * as SurveyState from '../../survey/surveyState'
 import Survey from '../../../common/survey/survey'
@@ -15,7 +15,7 @@ import sqlTypes from '../../../common/surveyRdb/sqlTypes'
 
 import { elementOffset } from '../../appUtils/domUtils'
 
-class ExpressionBuilder extends React.Component {
+class Expression extends React.Component {
 
   constructor (props) {
     super(props)
@@ -51,19 +51,19 @@ class ExpressionBuilder extends React.Component {
     const {query, variables} = this.props
     const {edit} = this.state
 
-    return <div className={`expression-builder${edit ? ' edit' : ''}`}
+    return <div className={`expression${edit ? ' edit' : ''}`}
                 ref={this.elementRef}
                 style={this.getStyle(edit)}>
       {
         edit
           ? (
-            <ExpressionEditor query={query}
-                              variables={variables}
-                              onClose={this.toggleEdit}
-                              onChange={query => this.applyChange(query)}/>
+            <Editor query={query}
+                    variables={variables}
+                    onClose={this.toggleEdit}
+                    onChange={query => this.applyChange(query)}/>
           )
           : (
-            <div className="expression-builder__query-container">
+            <div className="expression__query-container">
               {
                 !R.isEmpty(query) &&
                 <div className="query">{query}</div>
@@ -80,7 +80,7 @@ class ExpressionBuilder extends React.Component {
   }
 }
 
-ExpressionBuilder.defaultProps = {
+Expression.defaultProps = {
   nodeDefUuid: '',
   query: '',
   onChange: null,
@@ -91,7 +91,7 @@ const mapStateToProps = (state, props) => {
   const {nodeDefUuid} = props
 
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const lang = Survey.getDefaultLanguage(survey)
+  const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
   const getVariables = (nodeDef) => {
     const variables = R.pipe(
@@ -100,7 +100,7 @@ const mapStateToProps = (state, props) => {
             return null
           const colNames = NodeDefTable.getColNames(nodeDef)
           return colNames.map(col => ({
-            label: NodeDef.getNodeDefLabel(nodeDef, lang) + (colNames.length === 1 ? '' : NodeDefTable.extractColName(nodeDef, col)),
+            label: NodeDef.getNodeDefLabel(nodeDef, lang) + (colNames.length === 1 ? '' : ' - ' + NodeDefTable.extractColName(nodeDef, col)),
             type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
               NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
                 : sqlTypes.varchar,
@@ -124,4 +124,4 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps)(ExpressionBuilder)
+export default connect(mapStateToProps)(Expression)

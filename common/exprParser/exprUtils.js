@@ -1,7 +1,27 @@
 const R = require('ramda')
 
 const {expressionTypes} = require('./exprParser')
-const {trim} = require('../stringUtils')
+const {trim, isNotBlank} = require('../stringUtils')
+
+const propValid = prop => R.pipe(R.prop(prop), isNotBlank)
+const binaryValid = node => isValid(node.left) && propValid('operator')(node) && isValid(node.right)
+
+const fnsValid = {
+  [expressionTypes.Identifier]: propValid('name'),
+  // [expressionTypes.MemberExpression]: memberExpression,
+  [expressionTypes.Literal]: propValid('raw'),
+  // [expressionTypes.ThisExpression]: thisExpression,
+  // [expressionTypes.CallExpression]: callExpression,
+  // [expressionTypes.UnaryExpression]: unaryExpression,
+  [expressionTypes.BinaryExpression]: binaryValid,
+  [expressionTypes.LogicalExpression]: binaryValid,
+  // [expressionTypes.GroupExpression]: groupExpression,
+}
+
+const isValid = expr => {
+  const fn = fnsValid[R.prop('type', expr)]
+  return fn(expr)
+}
 
 const identifier = R.prop('name')
 const literal = R.prop('raw')
@@ -26,4 +46,5 @@ const toString = expr => {
 
 module.exports = {
   toString,
+  isValid,
 }

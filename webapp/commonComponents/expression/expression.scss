@@ -1,0 +1,37 @@
+@import "../../style/vars";
+
+.expression {
+  display: grid;
+  grid-row-gap: 3rem;
+
+  &.edit {
+    background-color: rgba($grey2, .95);
+    position: fixed;
+    min-width: 600px;
+    z-index: $zIndex10TopOfApp;
+
+    .query {
+      background-color: rgba($white, .15);
+    }
+  }
+}
+
+.expression__query-container {
+  display: flex;
+  align-items: center;
+
+  .query {
+    max-width: 300px;
+    padding: .5rem 1rem;
+    font-size: .9rem;
+
+    .placeholder {
+      opacity: .35;
+      font-style: italic;
+    }
+
+    &.invalid {
+      background-color: rgba($red, .25);
+    }
+  }
+}

@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import TablePaginator from '../../../../commonComponents/table/tablePaginator'
 import NodeDefTableColumn from './nodeDefs/nodeDefTableColumn'
-import ExpressionBuilder from '../../../../commonComponents/expressionBuilder/expressionBuilder'
+import ExpressionBuilder from '../../../../commonComponents/expression/expression'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as DataVisState from '../dataVisState'

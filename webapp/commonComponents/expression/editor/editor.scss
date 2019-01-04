@@ -1,0 +1,76 @@
+@import "../../../style/vars";
+
+.expression-editor__btn-close {
+  position: absolute;
+  padding: 0;
+  border-radius: 50% !important;
+  background-color: rgba($red, 0.6);
+  border: 1px solid rgba($red, 0.5) !important;
+  width: 1.5rem;
+  height: 1.5rem;
+  top: -.7rem;
+  left: -.75rem;
+
+  .icon {
+    opacity: .3;
+    transition: opacity 250ms ease-out;
+  }
+
+  &:hover {
+    background-color: rgba($red, 0.65);
+    border: 1px solid rgba($red, 0.1) !important;
+
+    .icon {
+      opacity: .8;
+    }
+  }
+}
+
+.expression-editor__expr-container {
+
+  .binary {
+    display: flex;
+
+    > div {
+      padding: .1rem .2rem;
+      margin: 0 .35rem;
+    }
+
+    .btns {
+      margin-left: 2rem;
+
+      > * {
+        margin: 0 .2rem;
+        font-weight: 600;
+        font-size: .7rem;
+      }
+
+      .btn-delete {
+        margin-left: 2rem;
+      }
+    }
+  }
+
+  .logical {
+
+    > .btns {
+      margin: 1rem 0 1rem 1rem;
+    }
+  }
+
+  input {
+    padding: 0;
+    text-align: center;
+    height: 100%;
+  }
+}
+
+.expression-editor__footer {
+  text-align: center;
+  margin-top: 2rem;
+
+  > button {
+    margin: 0px .3rem;
+    font-weight: 600;
+  }
+}

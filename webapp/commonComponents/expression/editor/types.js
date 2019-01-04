@@ -1,0 +1,156 @@
+import React from 'react'
+import * as R from 'ramda'
+
+import { expressionTypes } from '../../../../common/exprParser/exprParser'
+import Dropdown from '../../form/dropdown'
+
+const logicalOperators = {
+  and: {key: '&&', value: '&&'},
+  or: {key: '||', value: '||'},
+}
+
+const comparisonOperators = {
+  eq: {key: '===', value: '==='},
+  notEq: {key: '!==', value: '!=='},
+  gt: {key: '>', value: '>'},
+  less: {key: '<', value: '<'},
+  gtOrEq: {key: '>=', value: '>='},
+  lessOrEq: {key: '<=', value: '<='},
+}
+const arithmeticOperators = {
+  add: {key: '+', value: '+'},
+  sub: {key: '-', value: '-'},
+  mul: {key: '*', value: '*'},
+  div: {key: '/', value: '/'},
+  mod: {key: '%', value: '%'},
+}
+
+const Logical = (props) => {
+  const {node, onChange, canDelete = false} = props
+  const {left, right, operator} = node
+  return (
+    <div className="logical">
+      <TypeSwitch {...props}
+                  node={left}
+                  canDelete={canDelete}
+                  onChange={item => onChange(R.assoc('left', item, node))}
+                  onDelete={() => onChange(right)}/>
+
+      <div className="btns">
+        <button className={`btn btn-s btn-of-light${operator === logicalOperators.or.key ? ' active' : ''}`}
+                onClick={() => onChange(R.assoc('operator', logicalOperators.or.key, node))}>
+          OR
+        </button>
+        <button className={`btn btn-s btn-of-light${operator === logicalOperators.and.key ? ' active' : ''}`}
+                onClick={() => onChange(R.assoc('operator', logicalOperators.and.key, node))}>
+          AND
+        </button>
+      </div>
+
+      <TypeSwitch {...props}
+                  node={right}
+                  canDelete={true}
+                  onChange={item => onChange(R.assoc('right', item, node))}
+                  onDelete={() => onChange(left)}/>
+    </div>
+  )
+}
+
+const Binary = (props) => {
+  const {
+    node, onChange,
+    canDelete = false, onDelete,
+  } = props
+  const {left, right, operator} = node
+  const operators = R.values(comparisonOperators)
+
+  const addLogicalExpr = (operator) => onChange(
+    {
+      type: expressionTypes.LogicalExpression,
+      operator,
+      left: node,
+      right: {
+        type: expressionTypes.BinaryExpression, operator: '',
+        left: {type: expressionTypes.Identifier, name: ''},
+        right: {type: expressionTypes.Literal, value: null, raw: ''}
+      }
+    }
+  )
+
+  return (
+    <div className="binary">
+      <TypeSwitch {...props} node={left}
+                  onChange={item => onChange(R.assoc('left', item, node))}/>
+
+      <Dropdown items={operators} inputSize={7}
+                selection={R.find(R.propEq('key', operator), operators)}
+                onChange={item => onChange(
+                  R.assoc('operator', R.propOr('', 'key', item), node)
+                )}/>
+
+      <TypeSwitch {...props} node={right}
+                  onChange={item => onChange(R.assoc('right', item, node))}/>
+
+      <div className="btns">
+        <span className="icon icon-plus icon-8px"/>
+
+        <button className="btn btn-s btn-of-light"
+                onClick={() => addLogicalExpr(logicalOperators.or.value)}>
+          OR
+        </button>
+        <button className="btn btn-s btn-of-light"
+                onClick={() => addLogicalExpr(logicalOperators.and.value)}>
+          AND
+        </button>
+
+        <button className="btn btn-s btn-of-light btn-delete"
+                onClick={onDelete}
+                aria-disabled={!canDelete}>
+          <span className="icon icon-bin icon-12px"/>
+        </button>
+      </div>
+    </div>
+  )
+}
+
+const Identifier = ({node, variables, onChange}) => (
+  <Dropdown items={variables}
+            selection={R.find(R.propEq('value', node.name), variables)}
+            itemLabelProp="label" itemKeyProp="value"
+            inputSize={25}
+            onChange={item => onChange(
+              R.assoc('name', R.propOr('', 'value', item), node)
+            )}/>
+)
+
+const Literal = ({node, onChange}) => (
+  <div>
+    <input className="form-input" value={node.raw}
+           size={25}
+           onChange={e => onChange(R.pipe(
+             R.assoc('raw', e.target.value),
+             R.assoc('value', e.target.value),
+           )(node))}/>
+  </div>
+)
+
+const components = {
+  [expressionTypes.Identifier]: Identifier,
+  // [expressionTypes.MemberExpression]: memberExpression,
+  [expressionTypes.Literal]: Literal,
+  // [expressionTypes.ThisExpression]: thisExpression,
+  // [expressionTypes.CallExpression]: callExpression,
+  // [expressionTypes.UnaryExpression]: unaryExpression,
+  [expressionTypes.BinaryExpression]: Binary,
+  [expressionTypes.LogicalExpression]: Logical,
+  // [expressionTypes.GroupExpression]: groupExpression,
+}
+
+export const TypeSwitch = (props) => {
+  const component = components[R.path(['node', 'type'], props)]
+  return React.createElement(component, props)
+}
+
+
+
+
