@@ -58,6 +58,31 @@
     }
   }
 
+  .group {
+    display: grid;
+    grid-template-columns: 1rem 1fr 1rem;
+    padding: .3rem;
+    border: 1px solid rgba($white, .1);
+
+    .bracket {
+      font-size: 1.3rem;
+
+      &.open {
+        justify-self: end;
+      }
+
+      &.close {
+        align-self: end;
+      }
+    }
+
+    .btns {
+      grid-column: 2;
+      margin-top: 1rem;
+      margin-left: 2rem;
+    }
+  }
+
   input {
     padding: 0;
     text-align: center;

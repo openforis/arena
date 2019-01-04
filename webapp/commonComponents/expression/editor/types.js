@@ -25,6 +25,69 @@ const arithmeticOperators = {
   mod: {key: '%', value: '%'},
 }
 
+const EditButtons = (props) => {
+  const {
+    node, onChange,
+    canDelete = false, onDelete,
+  } = props
+
+  const addLogicalExpr = (operator) => onChange(
+    {
+      type: expressionTypes.LogicalExpression,
+      operator,
+      left: node,
+      right: {
+        type: expressionTypes.BinaryExpression, operator: '',
+        left: {type: expressionTypes.Identifier, name: ''},
+        right: {type: expressionTypes.Literal, value: null, raw: ''}
+      }
+    }
+  )
+
+  return (
+    <div className="btns">
+      <span className="icon icon-plus icon-8px"/>
+
+      <button className="btn btn-s btn-of-light"
+              onClick={() => addLogicalExpr(logicalOperators.or.value)}>
+        OR
+      </button>
+      <button className="btn btn-s btn-of-light"
+              onClick={() => addLogicalExpr(logicalOperators.and.value)}>
+        AND
+      </button>
+
+      <button className="btn btn-s btn-of-light btn-delete"
+              onClick={onDelete}
+              aria-disabled={!canDelete}>
+        <span className="icon icon-bin icon-12px"/>
+      </button>
+    </div>
+  )
+}
+
+const Group = (props) => {
+  const {
+    node, onChange,
+    canDelete,
+    level = 0
+  } = props
+  const {argument} = node
+
+  return (
+    <div className="group">
+      <div className="bracket open">(</div>
+      <TypeSwitch {...props}
+                  level={level + 1}
+                  node={argument}
+                  onChange={item => onChange(R.assoc('argument', item, node))}/>
+      <div className="bracket close">)</div>
+      <EditButtons node={node} onChange={onChange}
+                   onDelete={() => onChange(argument)} canDelete={true}/>
+    </div>
+  )
+}
+
 const Logical = (props) => {
   const {node, onChange, canDelete = false} = props
   const {left, right, operator} = node
@@ -45,6 +108,14 @@ const Logical = (props) => {
                 onClick={() => onChange(R.assoc('operator', logicalOperators.and.key, node))}>
           AND
         </button>
+
+        <button className={`btn btn-s btn-of-light`}
+                onClick={() => onChange({
+                  type: expressionTypes.GroupExpression,
+                  argument: node,
+                })}>
+          group ()
+        </button>
       </div>
 
       <TypeSwitch {...props}
@@ -64,19 +135,6 @@ const Binary = (props) => {
   const {left, right, operator} = node
   const operators = R.values(comparisonOperators)
 
-  const addLogicalExpr = (operator) => onChange(
-    {
-      type: expressionTypes.LogicalExpression,
-      operator,
-      left: node,
-      right: {
-        type: expressionTypes.BinaryExpression, operator: '',
-        left: {type: expressionTypes.Identifier, name: ''},
-        right: {type: expressionTypes.Literal, value: null, raw: ''}
-      }
-    }
-  )
-
   return (
     <div className="binary">
       <TypeSwitch {...props} node={left}
@@ -91,24 +149,9 @@ const Binary = (props) => {
       <TypeSwitch {...props} node={right}
                   onChange={item => onChange(R.assoc('right', item, node))}/>
 
-      <div className="btns">
-        <span className="icon icon-plus icon-8px"/>
+      <EditButtons node={node} onChange={onChange}
+                   onDelete={onDelete} canDelete={canDelete}/>
 
-        <button className="btn btn-s btn-of-light"
-                onClick={() => addLogicalExpr(logicalOperators.or.value)}>
-          OR
-        </button>
-        <button className="btn btn-s btn-of-light"
-                onClick={() => addLogicalExpr(logicalOperators.and.value)}>
-          AND
-        </button>
-
-        <button className="btn btn-s btn-of-light btn-delete"
-                onClick={onDelete}
-                aria-disabled={!canDelete}>
-          <span className="icon icon-bin icon-12px"/>
-        </button>
-      </div>
     </div>
   )
 }
@@ -143,7 +186,7 @@ const components = {
   // [expressionTypes.UnaryExpression]: unaryExpression,
   [expressionTypes.BinaryExpression]: Binary,
   [expressionTypes.LogicalExpression]: Logical,
-  // [expressionTypes.GroupExpression]: groupExpression,
+  [expressionTypes.GroupExpression]: Group,
 }
 
 export const TypeSwitch = (props) => {

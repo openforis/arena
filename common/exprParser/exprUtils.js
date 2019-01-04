@@ -15,7 +15,7 @@ const fnsValid = {
   // [expressionTypes.UnaryExpression]: unaryExpression,
   [expressionTypes.BinaryExpression]: binaryValid,
   [expressionTypes.LogicalExpression]: binaryValid,
-  // [expressionTypes.GroupExpression]: groupExpression,
+  [expressionTypes.GroupExpression]: node => isValid(node.argument),
 }
 
 const isValid = expr => {
@@ -36,7 +36,7 @@ const fns = {
   // [expressionTypes.UnaryExpression]: unaryExpression,
   [expressionTypes.BinaryExpression]: binary,
   [expressionTypes.LogicalExpression]: binary,
-  // [expressionTypes.GroupExpression]: groupExpression,
+  [expressionTypes.GroupExpression]: node => `(${toString(node.argument)})`,
 }
 
 const toString = expr => {
