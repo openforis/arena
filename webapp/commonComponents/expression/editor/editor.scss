@@ -35,51 +35,64 @@
       padding: .1rem .2rem;
       margin: 0 .35rem;
     }
-
-    .btns {
-      margin-left: 2rem;
-
-      > * {
-        margin: 0 .2rem;
-        font-weight: 600;
-        font-size: .7rem;
-      }
-
-      .btn-delete {
-        margin-left: 2rem;
-      }
-    }
   }
 
   .logical {
 
     > .btns {
-      margin: 1rem 0 1rem 1rem;
+      margin: 1rem 0 1rem 1rem !important;
     }
   }
 
   .group {
     display: grid;
-    grid-template-columns: 1rem 1fr 1rem;
-    padding: .3rem;
-    border: 1px solid rgba($white, .1);
+    grid-template-columns: 1.5rem 1fr 1.5rem;
+    padding: .5rem;
+    border: 1px dotted rgba($white, .45);
 
-    .bracket {
-      font-size: 1.3rem;
+    .footer {
+      display: flex;
+      grid-column: 1 / span 2;
+      margin-top: 1rem;
+    }
+  }
 
-      &.open {
-        justify-self: end;
+  .btns {
+    margin-left: 2rem !important;
+    display: flex;
+    align-items: center;
+
+    > * {
+      margin: 0 .2rem;
+      font-weight: 600;
+      font-size: .7rem;
+    }
+
+    .icon-plus {
+      color: rgba($white, 0.6);
+    }
+
+    button {
+      background-color: rgba($white, 0.1);
+      border-color: rgba($white, 0.1) !important;
+
+      &:hover {
+        background-color: rgba($white, 0.6);
       }
 
-      &.close {
-        align-self: end;
+      &.active {
+        background-color: rgba($white, 0.6) !important;
       }
     }
 
-    .btns {
-      grid-column: 2;
-      margin-top: 1rem;
+    .btn-delete {
       margin-left: 2rem;
+      background-color: rgba(220, 66, 66, 0.3);
+      color: $white;
+
+      &:hover {
+        background-color: rgba(220, 66, 66, 0.7);
+      }
     }
   }
 

@@ -60,7 +60,7 @@ const EditButtons = (props) => {
       <button className="btn btn-s btn-of-light btn-delete"
               onClick={onDelete}
               aria-disabled={!canDelete}>
-        <span className="icon icon-bin icon-12px"/>
+        <span className="icon icon-bin icon-10px"/>
       </button>
     </div>
   )
@@ -76,14 +76,16 @@ const Group = (props) => {
 
   return (
     <div className="group">
-      <div className="bracket open">(</div>
+      <h3>(</h3>
       <TypeSwitch {...props}
                   level={level + 1}
                   node={argument}
                   onChange={item => onChange(R.assoc('argument', item, node))}/>
-      <div className="bracket close">)</div>
+      <div className="footer">
+        <h3>)</h3>
       <EditButtons node={node} onChange={onChange}
                    onDelete={() => onChange(argument)} canDelete={true}/>
+      </div>
     </div>
   )
 }
