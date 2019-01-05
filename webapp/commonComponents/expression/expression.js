@@ -12,6 +12,7 @@ import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
 import NodeDefTable from '../../../common/surveyRdb/nodeDefTable'
 import sqlTypes from '../../../common/surveyRdb/sqlTypes'
+import { mode } from '../../../common/exprParser/exprUtils'
 
 import { elementOffset } from '../../appUtils/domUtils'
 
@@ -48,7 +49,7 @@ class Expression extends React.Component {
   }
 
   render () {
-    const {query, variables} = this.props
+    const {query, variables, mode} = this.props
     const {edit} = this.state
 
     return <div className={`expression${edit ? ' edit' : ''}`}
@@ -60,7 +61,8 @@ class Expression extends React.Component {
             <Editor query={query}
                     variables={variables}
                     onClose={this.toggleEdit}
-                    onChange={query => this.applyChange(query)}/>
+                    onChange={query => this.applyChange(query)}
+                    mode={mode}/>
           )
           : (
             <div className="expression__query-container">
@@ -83,6 +85,7 @@ class Expression extends React.Component {
 Expression.defaultProps = {
   nodeDefUuid: '',
   query: '',
+  mode: mode.json,
   onChange: null,
 }
 

@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import TablePaginator from '../../../../commonComponents/table/tablePaginator'
 import NodeDefTableColumn from './nodeDefs/nodeDefTableColumn'
-import ExpressionBuilder from '../../../../commonComponents/expression/expression'
+import ExpressionComponent from '../../../../commonComponents/expression/expression'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as DataVisState from '../dataVisState'
@@ -16,6 +16,7 @@ import { updateDataTable, resetDataTable, updateDataFilter } from '../actions'
 import Survey from '../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 import { elementOffset } from '../../../../appUtils/domUtils'
+import Expression from '../../../../../common/exprParser/exprUtils'
 
 const defaultColWidth = 80
 
@@ -85,9 +86,10 @@ class DataTable extends React.Component {
               <React.Fragment>
                 <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
                       style={{opacity: R.isEmpty(filter) ? 0.5 : 1}}/>
-                <ExpressionBuilder nodeDefUuid={nodeDefUuidTable}
-                                   query={filter}
-                                   onChange={query => updateDataFilter(query)}/>
+                <ExpressionComponent nodeDefUuid={nodeDefUuidTable}
+                                     query={filter}
+                                     onChange={query => updateDataFilter(query)}
+                                     mode={Expression.mode.sql}/>
               </React.Fragment>
             }
           </div>

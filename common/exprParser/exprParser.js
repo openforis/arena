@@ -133,5 +133,7 @@ const evalQuery = async (query, ctx) => await evalExpression(jsep(query), ctx)
 module.exports = {
   expressionTypes,
   evalExpression,
+
+  //@deprecated TODO use expression.evalString
   evalQuery,
 }

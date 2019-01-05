@@ -2,8 +2,8 @@ import './editor.scss'
 
 import React from 'react'
 import * as R from 'ramda'
-import jsep from '../../../../common/exprParser/jsep'
-import ExprUtils from '../../../../common/exprParser/exprUtils'
+
+import Expression from '../../../../common/exprParser/exprUtils'
 import { expressionTypes } from '../../../../common/exprParser/exprParser'
 import { TypeSwitch } from './types'
 
@@ -18,25 +18,21 @@ class Editor extends React.Component {
   constructor (props) {
     super(props)
 
-    const {query} = props
-    const expr = R.isEmpty(query) ? defaultExpression : jsep(query)
+    const {query, mode} = props
+    const expr = R.isEmpty(query) ? defaultExpression : Expression.fromString(query, mode)
 
     this.state = {
-      query, queryDraft: ExprUtils.toString(expr),
+      query, queryDraft: Expression.toString(expr, mode),
       expr, exprDraft: expr, exprDraftValid: true,
     }
   }
 
   updateDraft (exprDraft) {
     this.setState({
-      queryDraft: ExprUtils.toString(exprDraft),
+      queryDraft: Expression.toString(exprDraft, this.props.mode),
       exprDraft,
-      exprDraftValid: ExprUtils.isValid(exprDraft),
+      exprDraftValid: Expression.isValid(exprDraft),
     })
-  }
-
-  getDraftToString () {
-    return ExprUtils.toString(this.state.exprDraft)
   }
 
   render () {
@@ -59,8 +55,6 @@ class Editor extends React.Component {
           }
         </div>
       </div>
-
-      {/*<div>{JSON.stringify(exprDraft)}</div>*/}
 
       <div className="expression-editor__expr-container">
         <TypeSwitch variables={variables} node={exprDraft}
@@ -88,6 +82,7 @@ class Editor extends React.Component {
 
 Editor.defaultProps = {
   query: '',
+  mode: Expression.mode.json,
   onClose: null,
   onChange: null,
 }

@@ -10,13 +10,14 @@ const logicalOperators = {
 }
 
 const comparisonOperators = {
-  eq: {key: '===', value: '==='},
-  notEq: {key: '!==', value: '!=='},
+  eq: {key: '===', value: '='},
+  notEq: {key: '!==', value: '!='},
   gt: {key: '>', value: '>'},
   less: {key: '<', value: '<'},
   gtOrEq: {key: '>=', value: '>='},
   lessOrEq: {key: '<=', value: '<='},
 }
+
 const arithmeticOperators = {
   add: {key: '+', value: '+'},
   sub: {key: '-', value: '-'},
@@ -46,18 +47,18 @@ const EditButtons = (props) => {
 
   return (
     <div className="btns">
-      <span className="icon icon-plus icon-8px"/>
+      <div className="btns__add">
+        <button className="btn btn-s btn-of-light"
+                onClick={() => addLogicalExpr(logicalOperators.or.value)}>
+          <span className="icon icon-plus icon-8px"/> OR
+        </button>
+        <button className="btn btn-s btn-of-light"
+                onClick={() => addLogicalExpr(logicalOperators.and.value)}>
+          <span className="icon icon-plus icon-8px"/> AND
+        </button>
+      </div>
 
-      <button className="btn btn-s btn-of-light"
-              onClick={() => addLogicalExpr(logicalOperators.or.value)}>
-        OR
-      </button>
-      <button className="btn btn-s btn-of-light"
-              onClick={() => addLogicalExpr(logicalOperators.and.value)}>
-        AND
-      </button>
-
-      <button className="btn btn-s btn-of-light btn-delete"
+      <button className="btn btn-s btn-of-light btn-delete btns__last"
               onClick={onDelete}
               aria-disabled={!canDelete}>
         <span className="icon icon-bin icon-10px"/>
@@ -83,8 +84,8 @@ const Group = (props) => {
                   onChange={item => onChange(R.assoc('argument', item, node))}/>
       <div className="footer">
         <h3>)</h3>
-      <EditButtons node={node} onChange={onChange}
-                   onDelete={() => onChange(argument)} canDelete={true}/>
+        <EditButtons node={node} onChange={onChange}
+                     onDelete={() => onChange(argument)} canDelete={true}/>
       </div>
     </div>
   )
@@ -102,16 +103,19 @@ const Logical = (props) => {
                   onDelete={() => onChange(right)}/>
 
       <div className="btns">
-        <button className={`btn btn-s btn-of-light${operator === logicalOperators.or.key ? ' active' : ''}`}
-                onClick={() => onChange(R.assoc('operator', logicalOperators.or.key, node))}>
-          OR
-        </button>
-        <button className={`btn btn-s btn-of-light${operator === logicalOperators.and.key ? ' active' : ''}`}
-                onClick={() => onChange(R.assoc('operator', logicalOperators.and.key, node))}>
-          AND
-        </button>
 
-        <button className={`btn btn-s btn-of-light`}
+        <div className="btns__add">
+          <button className={`btn btn-s btn-of-light${operator === logicalOperators.or.key ? ' active' : ''}`}
+                  onClick={() => onChange(R.assoc('operator', logicalOperators.or.key, node))}>
+            OR
+          </button>
+          <button className={`btn btn-s btn-of-light${operator === logicalOperators.and.key ? ' active' : ''}`}
+                  onClick={() => onChange(R.assoc('operator', logicalOperators.and.key, node))}>
+            AND
+          </button>
+        </div>
+
+        <button className="btn btn-s btn-of-light btns__last"
                 onClick={() => onChange({
                   type: expressionTypes.GroupExpression,
                   argument: node,

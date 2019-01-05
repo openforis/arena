@@ -27,45 +27,22 @@
 }
 
 .expression-editor__expr-container {
+  overflow-y: scroll;
+  padding-bottom: 1px;
 
-  .binary {
-    display: flex;
-
-    > div {
-      padding: .1rem .2rem;
-      margin: 0 .35rem;
-    }
-  }
-
-  .logical {
-
-    > .btns {
-      margin: 1rem 0 1rem 1rem !important;
-    }
-  }
-
-  .group {
-    display: grid;
-    grid-template-columns: 1.5rem 1fr 1.5rem;
-    padding: .5rem;
-    border: 1px dotted rgba($white, .45);
-
-    .footer {
-      display: flex;
-      grid-column: 1 / span 2;
-      margin-top: 1rem;
-    }
-  }
-
+  //common
   .btns {
-    margin-left: 2rem !important;
-    display: flex;
+    display: grid;
+    grid-template-columns: 2rem auto 1fr auto;
     align-items: center;
+    width: 100%;
 
-    > * {
-      margin: 0 .2rem;
-      font-weight: 600;
-      font-size: .7rem;
+    .btns__add {
+      grid-column: 2;
+    }
+
+    .btns__last {
+      grid-column: 4;
     }
 
     .icon-plus {
@@ -75,6 +52,8 @@
     button {
       background-color: rgba($white, 0.1);
       border-color: rgba($white, 0.1) !important;
+      font-weight: 600;
+      font-size: .7rem;
 
       &:hover {
         background-color: rgba($white, 0.6);
@@ -86,12 +65,11 @@
     }
 
     .btn-delete {
-      margin-left: 2rem;
-      background-color: rgba(220, 66, 66, 0.3);
+      background-color: rgba($red, 0.3);
       color: $white;
 
       &:hover {
-        background-color: rgba(220, 66, 66, 0.7);
+        background-color: rgba($red, 0.7);
       }
     }
   }
@@ -100,7 +78,37 @@
     padding: 0;
     text-align: center;
     height: 100%;
+    border-bottom: 1px solid rgba($white, 0.1) !important;
+    background-color: rgba($white, 0.1);
   }
+
+  //types
+  .binary {
+    display: flex;
+
+    .btns {
+      width: 200px;
+    }
+  }
+
+  .logical {
+    display: grid;
+    grid-row-gap: .8rem;
+  }
+
+  .group {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    padding: .5rem;
+    border: 1px dotted rgba($white, .2);
+
+    .footer {
+      display: flex;
+      grid-column: 1 / span 2;
+      margin-top: 1rem;
+    }
+  }
+
 }
 
 .expression-editor__footer {
