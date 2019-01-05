@@ -3,14 +3,13 @@ import './editor.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import Expression from '../../../../common/exprParser/exprUtils'
-import { expressionTypes } from '../../../../common/exprParser/exprParser'
+import Expression from '../../../../common/exprParser/expression'
 import { TypeSwitch } from './types'
 
 const defaultExpression = {
-  type: expressionTypes.BinaryExpression, operator: '',
-  left: {type: expressionTypes.Identifier, name: ''},
-  right: {type: expressionTypes.Literal, value: null, raw: ''}
+  type: Expression.types.BinaryExpression, operator: '',
+  left: {type: Expression.types.Identifier, name: ''},
+  right: {type: Expression.types.Literal, value: null, raw: ''}
 }
 
 class Editor extends React.Component {
@@ -82,7 +81,7 @@ class Editor extends React.Component {
 
 Editor.defaultProps = {
   query: '',
-  mode: Expression.mode.json,
+  mode: Expression.modes.json,
   onClose: null,
   onChange: null,
 }

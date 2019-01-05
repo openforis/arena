@@ -15,8 +15,9 @@ import { updateDataTable, resetDataTable, updateDataFilter } from '../actions'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
+import Expression from '../../../../../common/exprParser/expression'
+
 import { elementOffset } from '../../../../appUtils/domUtils'
-import Expression from '../../../../../common/exprParser/exprUtils'
 
 const defaultColWidth = 80
 
@@ -89,7 +90,7 @@ class DataTable extends React.Component {
                 <ExpressionComponent nodeDefUuid={nodeDefUuidTable}
                                      query={filter}
                                      onChange={query => updateDataFilter(query)}
-                                     mode={Expression.mode.sql}/>
+                                     mode={Expression.modes.sql}/>
               </React.Fragment>
             }
           </div>

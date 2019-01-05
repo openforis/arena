@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import { expressionTypes } from '../../../../common/exprParser/exprParser'
+import Expression from '../../../../common/exprParser/expression'
 import Dropdown from '../../form/dropdown'
 
 const logicalOperators = {
@@ -34,13 +34,13 @@ const EditButtons = (props) => {
 
   const addLogicalExpr = (operator) => onChange(
     {
-      type: expressionTypes.LogicalExpression,
+      type: Expression.types.LogicalExpression,
       operator,
       left: node,
       right: {
-        type: expressionTypes.BinaryExpression, operator: '',
-        left: {type: expressionTypes.Identifier, name: ''},
-        right: {type: expressionTypes.Literal, value: null, raw: ''}
+        type: Expression.types.BinaryExpression, operator: '',
+        left: {type: Expression.types.Identifier, name: ''},
+        right: {type: Expression.types.Literal, value: null, raw: ''}
       }
     }
   )
@@ -117,7 +117,7 @@ const Logical = (props) => {
 
         <button className="btn btn-s btn-of-light btns__last"
                 onClick={() => onChange({
-                  type: expressionTypes.GroupExpression,
+                  type: Expression.types.GroupExpression,
                   argument: node,
                 })}>
           group ()
@@ -184,15 +184,15 @@ const Literal = ({node, onChange}) => (
 )
 
 const components = {
-  [expressionTypes.Identifier]: Identifier,
-  // [expressionTypes.MemberExpression]: memberExpression,
-  [expressionTypes.Literal]: Literal,
-  // [expressionTypes.ThisExpression]: thisExpression,
-  // [expressionTypes.CallExpression]: callExpression,
-  // [expressionTypes.UnaryExpression]: unaryExpression,
-  [expressionTypes.BinaryExpression]: Binary,
-  [expressionTypes.LogicalExpression]: Logical,
-  [expressionTypes.GroupExpression]: Group,
+  [Expression.types.Identifier]: Identifier,
+  // [Expression.types.MemberExpression]: memberExpression,
+  [Expression.types.Literal]: Literal,
+  // [Expression.types.ThisExpression]: thisExpression,
+  // [Expression.types.CallExpression]: callExpression,
+  // [Expression.types.UnaryExpression]: unaryExpression,
+  [Expression.types.BinaryExpression]: Binary,
+  [Expression.types.LogicalExpression]: Logical,
+  [Expression.types.GroupExpression]: Group,
 }
 
 export const TypeSwitch = (props) => {

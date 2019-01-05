@@ -12,11 +12,12 @@ import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
 import NodeDefTable from '../../../common/surveyRdb/nodeDefTable'
 import sqlTypes from '../../../common/surveyRdb/sqlTypes'
-import { mode } from '../../../common/exprParser/exprUtils'
+
+import Expression from '../../../common/exprParser/expression'
 
 import { elementOffset } from '../../appUtils/domUtils'
 
-class Expression extends React.Component {
+class ExpressionComponent extends React.Component {
 
   constructor (props) {
     super(props)
@@ -82,10 +83,10 @@ class Expression extends React.Component {
   }
 }
 
-Expression.defaultProps = {
+ExpressionComponent.defaultProps = {
   nodeDefUuid: '',
   query: '',
-  mode: mode.json,
+  mode: Expression.modes.json,
   onChange: null,
 }
 
@@ -127,4 +128,4 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(mapStateToProps)(Expression)
+export default connect(mapStateToProps)(ExpressionComponent)

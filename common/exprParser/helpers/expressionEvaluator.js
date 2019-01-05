@@ -1,9 +1,10 @@
 const R = require('ramda')
-const jsep = require('jsep')
 const Promise = require('bluebird')
-const {isString} = require('../stringUtils')
 
-const unaryExpression = async (expr, ctx) => {
+const {types} = require('./expressionUtils')
+const {isString} = require('../../stringUtils')
+
+const unaryEval = async (expr, ctx) => {
   const {argument, operator} = expr
   const res = await evalExpression(argument, ctx)
   const x = `${operator} ${JSON.stringify(res)}`
@@ -12,7 +13,7 @@ const unaryExpression = async (expr, ctx) => {
   return eval(x)
 }
 
-const binaryExpression = async (expr, ctx) => {
+const binaryEval = async (expr, ctx) => {
   const {left, right, operator} = expr
   const leftResult = await evalExpression(left, ctx)
   const rightResult = await evalExpression(right, ctx)
@@ -22,7 +23,7 @@ const binaryExpression = async (expr, ctx) => {
   return eval(x)
 }
 
-const memberExpression = async (expr, ctx) => {
+const memberEval = async (expr, ctx) => {
   // console.log('== member')
   // console.log(expr)
 
@@ -39,7 +40,7 @@ const memberExpression = async (expr, ctx) => {
     throw new Error(`Invalid property ${propertyRes}`)
 }
 
-const callExpression = async (expr, ctx) => {
+const callEval = async (expr, ctx) => {
   // console.log('== call')
   // console.log(expr)
 
@@ -62,63 +63,46 @@ const callExpression = async (expr, ctx) => {
   }
 }
 
-const literalExpression = expr => {
+const literalEval = expr => {
   // console.log('== literal ')
   // console.log(expr)
   return R.prop('value')(expr)
 }
 
-const thisExpression = expr => {
+const thisEval = expr => {
   // console.log('== this ')
   // console.log(expr)
   //
   return 'this'
 }
 
-const identifierExpression = expr => {
+const identifierEval = expr => {
   // console.log('== identifierExpression ')
   // console.log(expr)
   return R.prop('name')(expr)
 }
 
-const groupExpression = async (expr, ctx) => {
+const groupEval = async (expr, ctx) => {
   const {argument} = expr
   return await evalExpression(argument, ctx)
 }
 
-const expressionTypes = {
-  // 'Compound'
-  Identifier: 'Identifier',
-  MemberExpression: 'MemberExpression',
-  Literal: 'Literal',
-  ThisExpression: 'ThisExpression',
-  CallExpression: 'CallExpression',
-  UnaryExpression: 'UnaryExpression',
-  BinaryExpression: 'BinaryExpression',
-  LogicalExpression: 'LogicalExpression',
-  // 'ConditionalExpression'
-  // 'ArrayExpression'
-
-  // custom - not managed by jsep
-  GroupExpression: 'GroupExpression',
-}
-
-const defaultFunctions = {
-  [expressionTypes.Identifier]: identifierExpression,
-  [expressionTypes.MemberExpression]: memberExpression,
-  [expressionTypes.Literal]: literalExpression,
-  [expressionTypes.ThisExpression]: thisExpression,
-  [expressionTypes.CallExpression]: callExpression,
-  [expressionTypes.UnaryExpression]: unaryExpression,
-  [expressionTypes.BinaryExpression]: binaryExpression,
-  [expressionTypes.LogicalExpression]: binaryExpression,
-  [expressionTypes.GroupExpression]: groupExpression,
+const typeFns = {
+  [types.Identifier]: identifierEval,
+  [types.MemberExpression]: memberEval,
+  [types.Literal]: literalEval,
+  [types.ThisExpression]: thisEval,
+  [types.CallExpression]: callEval,
+  [types.UnaryExpression]: unaryEval,
+  [types.BinaryExpression]: binaryEval,
+  [types.LogicalExpression]: binaryEval,
+  [types.GroupExpression]: groupEval,
 }
 
 const evalExpression = async (expr, ctx) => {
   const functions = R.pipe(
     R.prop('functions'),
-    R.mergeRight(defaultFunctions)
+    R.mergeRight(typeFns)
   )(ctx)
 
   const fn = functions[expr.type]
@@ -128,12 +112,6 @@ const evalExpression = async (expr, ctx) => {
     throw new Error(`Unsupported function type: ${expr.type}`)
 }
 
-const evalQuery = async (query, ctx) => await evalExpression(jsep(query), ctx)
-
 module.exports = {
-  expressionTypes,
   evalExpression,
-
-  //@deprecated TODO use expression.evalString
-  evalQuery,
 }
