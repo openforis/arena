@@ -27,8 +27,8 @@
 }
 
 .expression-editor__expr-container {
-  overflow-y: scroll;
-  padding-bottom: 1px;
+  overflow: auto;
+  padding-bottom: 2rem;
 
   //common
   .btns {
@@ -113,7 +113,7 @@
 
 .expression-editor__footer {
   text-align: center;
-  margin-top: 2rem;
+  align-self: end;
 
   > button {
     margin: 0px .3rem;
