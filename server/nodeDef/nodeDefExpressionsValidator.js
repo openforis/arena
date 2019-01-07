@@ -5,8 +5,7 @@ const Validator = require('../../common/validation/validator')
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
 const NodeDefExpression = require('../../common/survey/nodeDefExpression')
-const ExprParser = require('../../common/exprParser/exprParser')
-const {expressionTypes} = ExprParser
+const Expression = require('../../common/exprParser/expression')
 
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
@@ -34,12 +33,12 @@ const bindNode = (survey, nodeDef) => ({
 
 const validateNodeDefExpr = async (survey, nodeDef, expr) => {
   try {
-    await ExprParser.evalQuery(
+    await Expression.evalString(
       expr,
       {
         node: bindNode(survey, nodeDef),
         functions: {
-          [expressionTypes.ThisExpression]: (expr, {node}) => node
+          [Expression.types.ThisExpression]: (expr, {node}) => node
         },
       }
     )

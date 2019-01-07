@@ -79,6 +79,9 @@ const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefSi
 const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
 const isNodeDefSingleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefSingle(nodeDef)
 const isNodeDefMultipleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefMultiple(nodeDef)
+
+const isNodeDefInteger = isNodeDefType(nodeDefType.integer)
+const isNodeDefDecimal = isNodeDefType(nodeDefType.decimal)
 const isNodeDefCode = isNodeDefType(nodeDefType.code)
 const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
@@ -157,8 +160,12 @@ module.exports = {
   isNodeDefAttribute,
   isNodeDefSingleAttribute,
   isNodeDefMultipleAttribute,
+
+  isNodeDefInteger,
+  isNodeDefDecimal,
   isNodeDefCode,
   isNodeDefTaxon,
+
   isNodeDefPublished,
 
   //advanced props
