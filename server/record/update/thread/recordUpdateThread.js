@@ -1,6 +1,7 @@
 const {isMainThread} = require('worker_threads')
 
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const db = require('../../../db/db')
 
@@ -12,12 +13,18 @@ const SurveyManager = require('../../../survey/surveyManager')
 const NodeDefManager = require('../../../nodeDef/nodeDefManager')
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
 
+const NodeRepository = require('../../../record/nodeRepository')
+
 const Survey = require('../../../../common/survey/survey')
+const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
 const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
 
 const DefaultValuesUpdater = require('./defaultValuesUpdater')
 const ApplicableIfUpdater = require('./applicableIfIUpdater')
+
+const RecordDependencyManager = require('../../recordDependencyManager')
+const {dependencyTypes} = require('../../../survey/surveyDependenchyGraph')
 
 class RecordUpdateThread extends Thread {
 
@@ -73,28 +80,76 @@ class RecordUpdateThread extends Thread {
       if (!isMainThread)
         this.postMessage(nodes)
 
-      //update applicability
-      const applicableUpdatedNodes = await ApplicableIfUpdater.updateDependentNodesApplicability(user, this.survey, nodes, t)
+      let allUpdatedNodes = R.clone(nodes)
+      let updatedNodes = R.clone(nodes)
+      let iterationCount = 0
+      do {
+        updatedNodes = await this.afterNodeValuesUpdated(user, updatedNodes, t)
+        allUpdatedNodes = R.mergeRight(allUpdatedNodes, updatedNodes)
+        iterationCount ++
 
-      if (!R.isEmpty(applicableUpdatedNodes) && !isMainThread)
-        this.postMessage(applicableUpdatedNodes)
+        //console.log(iterationCount)
+      } while (!R.isEmpty(updatedNodes) && iterationCount < 5)
 
-      nodes = R.mergeRight(nodes, applicableUpdatedNodes)
-
-      //apply default values
-      const defaultValuesUpdatedNodes = await DefaultValuesUpdater.applyDefaultValues(user, this.survey, nodes, t)
-
-      if (!R.isEmpty(defaultValuesUpdatedNodes) && !isMainThread)
-        this.postMessage(defaultValuesUpdatedNodes)
+      console.log(allUpdatedNodes)
 
       //update rdb data tables
-      nodes = R.mergeRight(nodes, defaultValuesUpdatedNodes)
-
-      const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, t)
-      await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(this.survey), nodeDefs, nodes, t)
+      const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(allUpdatedNodes), false, false, t)
+      await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(this.survey), nodeDefs, allUpdatedNodes, t)
     })
   }
 
+  async afterNodeValuesUpdated (user, nodes, t) {
+    let updatedNodes = R.clone(nodes)
+
+    //update applicability
+    const nodesArray = R.values(nodes)
+    const applicableUpdatedNodes = await ApplicableIfUpdater.updateNodesApplicability(user, this.survey, nodesArray, nodeUpdater, t)
+
+    const dependentApplicableUpdatedNodes = R.mergeAll(
+      await Promise.all(
+        nodesArray.map(async node => {
+          const dependents = await RecordDependencyManager.fetchDependentNodes(this.survey, node, dependencyTypes.applicable, t)
+          return await ApplicableIfUpdater.updateNodesApplicability(user, this.survey, dependents, nodeUpdater, t)
+        })
+      )
+    )
+
+    const allApplicableUpdatedNodes = R.mergeRight(applicableUpdatedNodes, dependentApplicableUpdatedNodes)
+
+    if (!R.isEmpty(allApplicableUpdatedNodes) && !isMainThread)
+      this.postMessage(allApplicableUpdatedNodes)
+
+    updatedNodes = R.mergeRight(updatedNodes, allApplicableUpdatedNodes)
+
+    //apply default values
+    const defaultValuesDependentNodes = R.mergeAll(
+      await Promise.all(
+        R.values(nodes).map(async node => {
+          const dependents = await RecordDependencyManager.fetchDependentNodes(this.survey, node, dependencyTypes.defaultValues, t)
+          return toUuidIndexedObj(dependents)
+        })
+      )
+    )
+    updatedNodes = R.mergeRight(updatedNodes, defaultValuesDependentNodes)
+
+    const defaultValuesUpdatedNodes = await DefaultValuesUpdater.applyDefaultValues(user, this.survey, nodes, nodeUpdater, t)
+
+    if (!R.isEmpty(defaultValuesUpdatedNodes) && !isMainThread)
+      this.postMessage(defaultValuesUpdatedNodes)
+
+    updatedNodes = R.mergeRight(updatedNodes, defaultValuesUpdatedNodes)
+
+    return updatedNodes
+  }
+}
+
+const nodeUpdater = {
+  applyDefaultValue: async (user, surveyId, node, value, tx) =>
+    await NodeRepository.updateNode(surveyId, node.uuid, value, {[Node.metaKeys.defaultValue]: true}, tx),
+
+  updateApplicability: async (user, survey, node, applicable, tx) =>
+    await NodeRepository.updateChildrenApplicability(Survey.getSurveyInfo(survey).id, Node.getParentUuid(node), Node.getNodeDefUuid(node), applicable, tx)
 }
 
 const newInstance = (params) => new RecordUpdateThread(params)

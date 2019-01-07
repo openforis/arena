@@ -97,7 +97,7 @@ const insertNodeRecursively = async (surveyId, nodeDef, nodeToInsert, user, t) =
 // ==== UPDATE
 
 const updateNodeValue = async (surveyId, nodeUuid, value, t) => {
-  const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, t)
+  const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, {[Node.metaKeys.defaultValue]: false}, t)
   return await onNodeUpdate(surveyId, node, t)
 }
 

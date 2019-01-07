@@ -73,6 +73,7 @@ const isNodeDefSingle = R.pipe(isNodeDefMultiple, R.not)
 
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
+const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
 const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
 const isNodeDefSingleAttribute = nodeDef => !(isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef))
@@ -122,6 +123,16 @@ const canNodeDefBeKey = nodeDef =>
     ]
   )
 
+const canNodeDefHaveDefaultValue = nodeDef =>
+  R.includes(
+    getNodeDefType(nodeDef),
+    [
+      nodeDefType.decimal,
+      nodeDefType.integer,
+      nodeDefType.text,
+    ]
+  )
+
 module.exports = {
   nodeDefType,
   keys,
@@ -151,6 +162,7 @@ module.exports = {
   isNodeDefSingle,
   isNodeDefRoot,
   isNodeDefEntity,
+  isNodeDefAttribute,
   isNodeDefEntityOrMultiple,
   isNodeDefSingleEntity,
   isNodeDefSingleAttribute,
@@ -172,4 +184,5 @@ module.exports = {
   //UTILS
   canNodeDefBeMultiple,
   canNodeDefBeKey,
+  canNodeDefHaveDefaultValue,
 }

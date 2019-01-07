@@ -3,6 +3,7 @@ import React from 'react'
 import { NodeDefExpressionsProp } from './expressionsProp'
 
 import Validator from '../../../../../common/validation/validator'
+import NodeDef from '../../../../../common/survey/nodeDef'
 
 const AdvancedProps = props => {
   const {nodeDef, putNodeDefProp, readOnly} = props
@@ -12,12 +13,16 @@ const AdvancedProps = props => {
   return (
     <div className="form">
 
-      <NodeDefExpressionsProp nodeDef={nodeDef}
-                              putNodeDefProp={putNodeDefProp}
-                              label="Default values"
-                              readOnly={readOnly}
-                              propName="defaultValues"
-                              validation={Validator.getFieldValidation('defaultValues')(validation)}/>
+      {
+        NodeDef.canNodeDefHaveDefaultValue(nodeDef) &&
+
+        <NodeDefExpressionsProp nodeDef={nodeDef}
+                                putNodeDefProp={putNodeDefProp}
+                                label="Default values"
+                                readOnly={readOnly}
+                                propName="defaultValues"
+                                validation={Validator.getFieldValidation('defaultValues')(validation)}/>
+      }
 
       <NodeDefExpressionsProp nodeDef={nodeDef}
                               putNodeDefProp={putNodeDefProp}

@@ -9,10 +9,8 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const Survey = require('../../../../common/survey/survey')
 const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 
-const {dependencyTypes} = require('../../../survey/surveyDependenchyGraph')
 const RecordExprParser = require('../../../record/recordExprParser')
-const RecordDependencyManager = require('../../recordDependencyManager')
-const RecordProcessor = require('./recordProcessor')
+const NodeRepository = require('../../../record/nodeRepository')
 
 const isApplicable = async (survey, node, tx) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
@@ -27,24 +25,28 @@ const isApplicable = async (survey, node, tx) => {
     : await RecordExprParser.evalNodeQuery(survey, node, applicableIfExpr, tx)
 }
 
-const updateDependentNodesApplicability = async (user, survey, nodes, tx) =>
+const updateNodesApplicability = async (user, survey, nodes, nodeUpdater, tx) =>
   R.mergeAll(
     await Promise.all(
-      R.values(nodes).map(async node => {
-        const dependents = await RecordDependencyManager.fetchDependentNodes(survey, node, dependencyTypes.applicable, tx)
+      nodes.map(async node => {
+        const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
-        return toUuidIndexedObj(
-          await Promise.all(
-            dependents.map(async dependent => ({
-                ...dependent,
-                applicable: await isApplicable(survey, dependent, tx)
-              })
-            )
-          ))
+        if (!NodeDef.isNodeDefRoot(nodeDef)) {
+          const surveyId = Survey.getSurveyInfo(survey).id
+          const parentNode = await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), tx)
+
+          const newApplicability = await isApplicable(survey, node, tx)
+
+          if (newApplicability !== Node.isChildApplicable(Node.getNodeDefUuid(node))(parentNode)) {
+            await nodeUpdater.updateApplicability(user, survey, node, newApplicability, tx)
+            return toUuidIndexedObj(await NodeRepository.fetchChildNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), parentNode.uuid, Node.getNodeDefUuid(node), tx))
+          }
+        }
+        return {}
       })
     )
   )
 
 module.exports = {
-  updateDependentNodesApplicability
+  updateNodesApplicability
 }
