@@ -54,14 +54,16 @@ const validateExpressionProp = (survey, nodeDef) =>
     return expr ? await validateNodeDefExpr(survey, nodeDef, expr) : null
   }
 
-const validateExpression = async (survey, nodeDef, nodeDefExpression) =>
-  await Validator.validate(
+const validateExpression = async (survey, nodeDef, nodeDefExpression) => {
+  const validation = await Validator.validate(
     nodeDefExpression,
     {
       [NodeDefExpression.keys.expression]: [Validator.validateRequired, validateExpressionProp(survey, nodeDef)],
       [NodeDefExpression.keys.applyIf]: [validateExpressionProp(survey, nodeDef)]
     }
   )
+  return validation.valid ? validation : null
+}
 
 const validate = async (survey, nodeDef, nodeDefExpressions) => {
   const result = {valid: true, fields: {}}
@@ -74,7 +76,7 @@ const validate = async (survey, nodeDef, nodeDefExpressions) => {
 
   validations.forEach((validation, i) => {
     result.fields[i + ''] = validation
-    result.valid = result.valid && validation.valid
+    result.valid = result.valid && (!validation || validation.valid)
   })
 
   return result

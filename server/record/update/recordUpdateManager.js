@@ -78,7 +78,7 @@ const cancelCheckOut = userId => {
  * @returns {Promise<void>}
  */
 const createRecord = async (user, surveyId, record) => {
-  const recordUpdateThread = RecordUpdateThread.newInstance()
+  const recordUpdateThread = RecordUpdateThread.newInstance({user, surveyId})
   await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
 }
 

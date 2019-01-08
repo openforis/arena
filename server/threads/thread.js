@@ -5,8 +5,9 @@ const {parentPort, workerData, isMainThread} = require('worker_threads')
  */
 class Thread {
 
-  constructor () {
-    this.params = {...workerData}
+  constructor (params) {
+    this.params = params ? params : {...workerData}
+
     this.user = this.params.user
     this.surveyId = this.params.surveyId
 

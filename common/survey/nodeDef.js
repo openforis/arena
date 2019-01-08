@@ -70,13 +70,13 @@ const isNodeDefKey = R.pipe(SurveyUtils.getProp(propKeys.key), R.equals(true))
 const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
 const isNodeDefMultiple = R.pipe(SurveyUtils.getProp(propKeys.multiple), R.equals(true))
 const isNodeDefSingle = R.pipe(isNodeDefMultiple, R.not)
+
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
 
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
+const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
 const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefSingle(nodeDef)
-
-const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
 const isNodeDefSingleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefSingle(nodeDef)
 const isNodeDefMultipleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefMultiple(nodeDef)
 
@@ -127,6 +127,16 @@ const canNodeDefBeKey = nodeDef =>
     ]
   )
 
+const canNodeDefHaveDefaultValue = nodeDef =>
+  R.includes(
+    getNodeDefType(nodeDef),
+    [
+      nodeDefType.decimal,
+      nodeDefType.integer,
+      nodeDefType.text,
+    ]
+  )
+
 module.exports = {
   nodeDefType,
   keys,
@@ -153,11 +163,12 @@ module.exports = {
 
   isNodeDefKey,
   isNodeDefMultiple,
+  isNodeDefSingle,
   isNodeDefRoot,
   isNodeDefEntity,
+  isNodeDefAttribute,
   isNodeDefEntityOrMultiple,
   isNodeDefSingleEntity,
-  isNodeDefAttribute,
   isNodeDefSingleAttribute,
   isNodeDefMultipleAttribute,
 
@@ -181,4 +192,5 @@ module.exports = {
   //UTILS
   canNodeDefBeMultiple,
   canNodeDefBeKey,
+  canNodeDefHaveDefaultValue,
 }

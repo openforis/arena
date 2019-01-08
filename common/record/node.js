@@ -5,7 +5,14 @@ const {isBlank, trim} = require('../stringUtils')
 const SurveyUtils = require('../survey/surveyUtils')
 
 const keys = {
-  value: 'value'
+  recordUuid: 'recordUuid',
+  value: 'value',
+  meta: 'meta',
+}
+
+const metaKeys = {
+  childApplicability: 'childApplicability',
+  defaultValue: 'defaultValue',
 }
 
 const valuePropKeys = {
@@ -94,7 +101,9 @@ const isNodeValueBlank = value => {
 const isNodeValueNotBlank = R.pipe(isNodeValueBlank, R.not)
 
 module.exports = {
+  keys,
   valuePropKeys,
+  metaKeys,
 
   // ==== CREATE
   newNode,
@@ -103,11 +112,14 @@ module.exports = {
   // ==== READ
   getUuid: SurveyUtils.getUuid,
   getParentUuid: SurveyUtils.getParentUuid,
-  getRecordUuid: R.prop('recordUuid'),
+  getRecordUuid: R.prop(keys.recordUuid),
   getNodeValue,
   getNodeDefUuid,
+  isChildApplicable: childDefUuid => R.path([keys.meta, metaKeys.childApplicability, childDefUuid]),
 
   getNodeDefUuids,
+
+  isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
 
   // ==== UPDATE
   assocValue: R.assoc(keys.value),

@@ -4,6 +4,7 @@ const Promise = require('bluebird')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
+
 const RecordRepository = require('../../../record/recordRepository')
 const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const NodeRepository = require('../../../record/nodeRepository')
@@ -80,14 +81,14 @@ const insertNodeRecursively = async (surveyId, nodeDef, nodeToInsert, user, t) =
   const childDefs = NodeDef.isNodeDefEntity(nodeDef)
     ? await NodeDefRepository.fetchNodeDefsByParentUuid(surveyId, nodeDef.uuid)
     : []
-  // insert only child single entities
+  // insert only child single nodes
   const childNodes = R.mergeAll(
     await Promise.all(
       childDefs
-        .filter(NodeDef.isNodeDefSingleEntity)
+        .filter(NodeDef.isNodeDefSingle)
         .map(async childDef =>
-          await insertNodeRecursively(surveyId, childDef, Node.newNode(childDef.uuid, node.recordUuid, node.uuid), user, t)
-        )
+        await insertNodeRecursively(surveyId, childDef, Node.newNode(childDef.uuid, node.recordUuid, node.uuid), user, t)
+      )
     )
   )
   return R.mergeLeft({[node.uuid]: node}, childNodes)
@@ -96,7 +97,7 @@ const insertNodeRecursively = async (surveyId, nodeDef, nodeToInsert, user, t) =
 // ==== UPDATE
 
 const updateNodeValue = async (surveyId, nodeUuid, value, t) => {
-  const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, t)
+  const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, {[Node.metaKeys.defaultValue]: false}, t)
   return await onNodeUpdate(surveyId, node, t)
 }
 
