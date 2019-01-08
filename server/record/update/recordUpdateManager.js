@@ -11,6 +11,8 @@ const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 const recordUpdateThreads = new ThreadsCache()
 const checkOutTimeoutsByUserId = {}
 
+const {isPreviewRecord} = require('../../../common/record/record')
+
 // const RecordProcessor = require('./thread/recordProcessor')
 const RecordUpdateThread = require('./thread/recordUpdateThread')
 
@@ -31,7 +33,7 @@ const createRecordUpdateThread = (user, surveyId, preview) => {
 /**
  * Start record update thread
  */
-const checkIn = (user, surveyId, preview = false) => {
+const checkIn = (user, surveyId, preview) => {
   cancelCheckOut(user.id)
   if (!recordUpdateThreads.getThread(user.id)) {
     createRecordUpdateThread(user, surveyId, preview)
@@ -71,7 +73,9 @@ const cancelCheckOut = userId => {
  * @returns {Promise<void>}
  */
 const createRecord = async (user, surveyId, record) => {
-  const recordUpdateThread = RecordUpdateThread.newInstance()
+  const preview = isPreviewRecord(record)
+
+  const recordUpdateThread = RecordUpdateThread.newInstance(preview)
   await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
 }
 

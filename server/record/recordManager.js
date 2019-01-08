@@ -3,10 +3,12 @@ const db = require('../db/db')
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
+const NodePreviewRepository = require('../record/NodePreviewRepository')
 const FileManager = require('../file/fileManager')
 
 const Node = require('../../common/record/node')
 const File = require('../../common/file/file')
+const {preview} = require('../../common/record/record')
 
 const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
@@ -35,8 +37,11 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
 }
 
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) => {
-  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
-  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
+  const record = recordUuid !== preview ?
+    await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
+    : {uuid: preview}
+
+  const nodes = await NodePreviewRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
 
   return {...record, nodes: toUuidIndexedObj(nodes)}
 }
@@ -87,10 +92,16 @@ const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(
  * ==================
  */
 const checkInRecord = async (user, surveyId, recordUuid) => {
-  const preview = recordUuid === 'preview'
+  const isPreview = recordUuid === preview
 
-  RecordUpdateManager.checkIn(user, surveyId, preview)
+  RecordUpdateManager.checkIn(user, surveyId, isPreview)
+
   return await fetchRecordByUuid(surveyId, recordUuid)
+
+  // return !preview ?
+  //   return await fetchRecordByUuid(surveyId, recordUuid, preview)
+  //   :
+  //   {uuid: preview}
 }
 
 const checkOutRecord = RecordUpdateManager.checkOut

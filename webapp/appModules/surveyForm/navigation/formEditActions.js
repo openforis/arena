@@ -8,8 +8,8 @@ import { appModuleUri } from '../../appModules'
 import { dashboardModules } from '../../dashboard/dashboardModules'
 import { getUser } from '../../../app/appState'
 import { getSurvey } from '../../../survey/surveyState'
-import { newRecord } from '../../../../common/record/record'
 import Survey from '../../../../common/survey/survey'
+import { preview } from '../../../../common/record/record'
 
 class FormEditActions extends React.Component {
   render () {
@@ -22,13 +22,12 @@ class FormEditActions extends React.Component {
   }
 
   async previewRecord () {
-    // TODO: posting new record for testing purposes. The record will be created server side
-    const {history, user, surveyInfo} = this.props
-    const record = newRecord(user, Survey.getDefaultStep(surveyInfo))
+    const {history, user} = this.props
+    const surveyId = this.props.surveyInfo.id
 
-    await axios.post(`/api/survey/${surveyInfo.id}/record`, record)
+    await axios.post(`/api/survey/${surveyId}/record`, {uuid: preview, ownerId: user.id})
 
-    history.push(`${appModuleUri(dashboardModules.formDesigner)}preview/${record.uuid}`)
+    history.push(`${appModuleUri(dashboardModules.formDesigner)}preview`)
   }
 }
 

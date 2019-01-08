@@ -55,7 +55,7 @@ class DesignerView extends React.Component {
             label: 'Form preview',
             component: RecordView,
             // TODO recordUuid is there for testing purposes - will be deleted
-            path: `${appModuleUri(dashboardModules.formDesigner)}preview/:recordUuid`,
+            path: `${appModuleUri(dashboardModules.formDesigner)}preview`,
             props: {edit: true, draft: true, canEdit, preview: true},
             showTab: false,
           },

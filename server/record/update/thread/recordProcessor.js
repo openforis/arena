@@ -4,6 +4,7 @@ const Promise = require('bluebird')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
+const {preview} = require('../../../../common/record/record')
 const RecordRepository = require('../../../record/recordRepository')
 const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const NodeRepository = require('../../../record/nodeRepository')
@@ -14,37 +15,43 @@ const ActivityLog = require('../../../activityLog/activityLogger')
 // Exported methods
 //==========
 
-const createRecord = async (user, surveyId, recordToCreate, t) => {
+const createRecord = async (repository, user, surveyId, recordToCreate, t) => {
+  const {uuid} = recordToCreate
+  let recordUuid
 
-  const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
-  const {uuid: recordUuid} = record
+  if (uuid !== preview) {
+    const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
+    recordUuid = record.uuid
 
-  await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
+  } else {
+    recordUuid = uuid
+  }
 
   const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
   const rootNode = Node.newNode(rootNodeDef.uuid, recordUuid)
 
-  return await persistNode(user, surveyId, rootNode, t)
+  return await persistNode(repository, user, surveyId, rootNode, t)
 }
 
-const persistNode = async (user, surveyId, node, t) => {
+const persistNode = async (repository, user, surveyId, node, t) => {
   const {uuid} = node
-  const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)
+  const nodeDb = await repository.fetchNodeByUuid(surveyId, uuid, t)
 
   if (nodeDb) {
     await ActivityLog.log(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
-    return await updateNodeValue(surveyId, uuid, Node.getNodeValue(node), t)
+    return await updateNodeValue(repository, surveyId, uuid, Node.getNodeValue(node), t)
   } else {
-    return await insertNode(surveyId, node, user, t)
+    return await insertNode(repository, surveyId, node, user, t)
   }
 }
 
-const deleteNode = async (user, surveyId, nodeUuid, t) => {
-  const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
+const deleteNode = async (repository, user, surveyId, nodeUuid, t) => {
+  const node = await repository.deleteNode(surveyId, nodeUuid, t)
 
   await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, {nodeUuid}, t)
 
-  return await onNodeUpdate(surveyId, node, t)
+  return await onNodeUpdate(repository, surveyId, node, t)
 }
 
 //==========
@@ -64,17 +71,17 @@ const assocParentNode = async (surveyId, node, nodes, t) => {
 }
 
 // ==== CREATE
-const insertNode = async (surveyId, node, user, t) => {
+const insertNode = async (repository, surveyId, node, user, t) => {
   const nodeDef = await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node), t)
-  const nodesToReturn = await insertNodeRecursively(surveyId, nodeDef, node, user, t)
+  const nodesToReturn = await insertNodeRecursively(repository, surveyId, nodeDef, node, user, t)
   return await assocParentNode(surveyId, node, nodesToReturn, t)
 }
 
-const insertNodeRecursively = async (surveyId, nodeDef, nodeToInsert, user, t) => {
+const insertNodeRecursively = async (repository, surveyId, nodeDef, nodeToInsert, user, t) => {
   await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
 
   // insert node
-  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, t)
+  const node = await repository.insertNode(surveyId, nodeToInsert, t)
 
   // add children if entity
   const childDefs = NodeDef.isNodeDefEntity(nodeDef)
@@ -95,16 +102,16 @@ const insertNodeRecursively = async (surveyId, nodeDef, nodeToInsert, user, t) =
 
 // ==== UPDATE
 
-const updateNodeValue = async (surveyId, nodeUuid, value, t) => {
+const updateNodeValue = async (repository, surveyId, nodeUuid, value, t) => {
   const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, t)
-  return await onNodeUpdate(surveyId, node, t)
+  return await onNodeUpdate(repository, surveyId, node, t)
 }
 
-const onNodeUpdate = async (surveyId, node, t) => {
+const onNodeUpdate = async (repository, surveyId, node, t) => {
   //delete dependent code nodes
-  const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordUuid, node.uuid)
+  const descendantCodes = await repository.fetchDescendantNodesByCodeUuid(surveyId, node.recordUuid, node.uuid)
   const nodesToReturn = await Promise.all(
-    descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, nodeCode.uuid, t))
+    descendantCodes.map(async nodeCode => await repository.deleteNode(surveyId, nodeCode.uuid, t))
   )
   return await assocParentNode(surveyId, node, SurveyUtils.toUuidIndexedObj(nodesToReturn), t)
 }

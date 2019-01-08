@@ -8,6 +8,7 @@ const Node = require('../record/node')
 
 // ====== UTILS
 const nodes = 'nodes'
+const preview = 'preview'
 
 // ====== CREATE
 
@@ -134,6 +135,9 @@ const deleteNode = node =>
       )
   }
 
+// ====== UTILS
+const isPreviewRecord = R.propEq('uuid', preview)
+
 module.exports = {
   // ====== CREATE
   newRecord,
@@ -158,4 +162,8 @@ module.exports = {
   // ====== DELETE
 
   deleteNode,
+
+  // ====== UTILS
+  preview,
+  isPreviewRecord,
 }

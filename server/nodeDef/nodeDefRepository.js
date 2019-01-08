@@ -13,7 +13,6 @@ const nodeDefSelectFields = (advanced = false) =>
 // ============== CREATE
 
 const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = db) => {
-
   const parentH = parentUuid ?
     await client.one(
       `SELECT id, meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node_def WHERE uuid = $1`,

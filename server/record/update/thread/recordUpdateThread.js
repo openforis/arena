@@ -16,19 +16,23 @@ const Queue = require('../../../../common/queue')
 
 class RecordUpdateThread extends Thread {
 
-  constructor () {
+  constructor(preview) {
     super()
+
+    this.preview = preview
+    this.repository = preview ? require('../../nodePreviewRepository') : require('../../nodeRepository')
+
     this.queue = new Queue()
     this.processing = false
   }
 
-  async onMessage (msg) {
+  async onMessage(msg) {
     this.queue.enqueue(msg)
 
     await this.processNext()
   }
 
-  async processNext () {
+  async processNext() {
     if (!(this.processing || this.queue.isEmpty())) {
 
       this.processing = true
@@ -42,7 +46,7 @@ class RecordUpdateThread extends Thread {
     }
   }
 
-  async processMessage (msg) {
+  async processMessage(msg) {
     let nodes = null
 
     await db.tx(async t => {
@@ -50,29 +54,30 @@ class RecordUpdateThread extends Thread {
 
       switch (msg.type) {
         case messageTypes.createRecord:
-          nodes = await RecordProcessor.createRecord(user, surveyId, msg.record, t)
+          nodes = await RecordProcessor.createRecord(this.repository, user, surveyId, msg.record, t)
           break
         case messageTypes.persistNode:
-          nodes = await RecordProcessor.persistNode(user, surveyId, msg.node, t)
+          nodes = await RecordProcessor.persistNode(this.repository, user, surveyId, msg.node, t)
           break
         case messageTypes.deleteNode:
-          nodes = await RecordProcessor.deleteNode(user, surveyId, msg.nodeUuid, t)
+          nodes = await RecordProcessor.deleteNode(this.repository, user, surveyId, msg.nodeUuid, t)
           break
       }
 
       if (!isMainThread)
         this.postMessage(nodes)
 
-      const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
-      const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, t)
-      await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, nodes, t)
-
+      if (!this.preview) {
+        const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
+        const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, t)
+        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, nodes, t)
+      }
     })
   }
 
 }
 
-const newInstance = () => new RecordUpdateThread()
+const newInstance = (preview = false) => new RecordUpdateThread(preview)
 
 if (!isMainThread)
   newInstance()

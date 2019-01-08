@@ -24,8 +24,8 @@ class RecordView extends React.Component {
 
   componentDidMount () {
     const {checkInRecord, recordUuidUrlParam} = this.props
-    // const recordUuid = preview ? 'preview' : recordUuidUrlParam
-    checkInRecord(recordUuidUrlParam)
+
+    checkInRecord(recordUuidUrlParam || Record.preview) // TODO preview user constant instead of 'preview'
 
     window.addEventListener('beforeunload', this.componentUnload)
   }
@@ -52,7 +52,7 @@ class RecordView extends React.Component {
   render () {
     const {recordUuid, preview} = this.props
 
-    return recordUuid
+    return recordUuid || preview
       ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true}/>
       : null
   }
