@@ -10,43 +10,49 @@ const Survey = require('../../../../common/survey/survey')
 const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 
 const RecordExprParser = require('../../../record/recordExprParser')
-const NodeRepository = require('../../../record/nodeRepository')
 
-const isApplicable = async (survey, node, tx) => {
-  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-  const applicableIfExpr = R.pipe(
-    NodeDef.getApplicable,
-    R.head,
-    NodeDefExpression.getExpression
-  )(nodeDef)
+class ApplicableIfUpdater {
 
-  return StringUtils.isBlank(applicableIfExpr)
-    ? true
-    : await RecordExprParser.evalNodeQuery(survey, node, applicableIfExpr, tx)
-}
+  constructor (nodeRepository) {
+    this.nodeRepository = nodeRepository
+  }
 
-const updateNodesApplicability = async (user, survey, nodes, nodeUpdater, tx) =>
-  R.mergeAll(
-    await Promise.all(
-      nodes.map(async node => {
-        const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  async updateNodesApplicability (user, survey, nodesArray, nodeUpdater, tx) {
+    return R.mergeAll(
+      await Promise.all(
+        nodesArray.map(async node => {
+          const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
-        if (!NodeDef.isNodeDefRoot(nodeDef)) {
-          const surveyId = Survey.getSurveyInfo(survey).id
-          const parentNode = await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), tx)
+          if (!NodeDef.isNodeDefRoot(nodeDef)) {
+            const surveyId = Survey.getSurveyInfo(survey).id
+            const parentNode = await this.nodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), tx)
 
-          const newApplicability = await isApplicable(survey, node, tx)
+            const newApplicability = await this._isApplicable(survey, node, tx)
 
-          if (newApplicability !== Node.isChildApplicable(Node.getNodeDefUuid(node))(parentNode)) {
-            await nodeUpdater.updateApplicability(user, survey, node, newApplicability, tx)
-            return toUuidIndexedObj(await NodeRepository.fetchChildNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), parentNode.uuid, Node.getNodeDefUuid(node), tx))
+            if (newApplicability !== Node.isChildApplicable(Node.getNodeDefUuid(node))(parentNode)) {
+              await this.nodeRepository.updateChildrenApplicability(surveyId, Node.getParentUuid(node), NodeDef.getUuid(nodeDef), newApplicability, tx)
+              return toUuidIndexedObj(await this.nodeRepository.fetchChildNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), parentNode.uuid, Node.getNodeDefUuid(node), tx))
+            }
           }
-        }
-        return {}
-      })
+          return {}
+        })
+      )
     )
-  )
+  }
 
-module.exports = {
-  updateNodesApplicability
+  async _isApplicable (survey, node, tx) {
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+    const applicableIfExpr = R.pipe(
+      NodeDef.getApplicable,
+      R.head,
+      NodeDefExpression.getExpression
+    )(nodeDef)
+
+    return StringUtils.isBlank(applicableIfExpr)
+      ? true
+      : await RecordExprParser.evalNodeQuery(node, applicableIfExpr)
+  }
+
 }
+
+module.exports = ApplicableIfUpdater

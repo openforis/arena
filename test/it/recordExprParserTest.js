@@ -51,7 +51,7 @@ describe('RecordExprParser Test', () => {
 
     it(q, async () => {
 
-      const res = await evalNodeQuery({}, node, q)
+      const res = await evalNodeQuery(node, q)
 
       if (R.isEmpty(resKeys)) {
         assert.equal(res, r)
