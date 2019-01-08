@@ -3,7 +3,6 @@ const db = require('../db/db')
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
-const NodePreviewRepository = require('../record/NodePreviewRepository')
 const FileManager = require('../file/fileManager')
 
 const Node = require('../../common/record/node')

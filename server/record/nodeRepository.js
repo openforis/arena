@@ -36,7 +36,6 @@ const insertNode = async (surveyId, node, client = db) => {
 // ============== READ
 
 const fetchNodesByRecordUuid = async (surveyId, recordUuid, client = db) =>
-  console.log('fetchNodesByRecordUuid') ||
   await client.map(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE record_uuid = $1
