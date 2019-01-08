@@ -41,7 +41,7 @@ const fetchRecordByUuid = async (surveyId, recordUuid, client = db) => {
     await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
     : {uuid: preview}
 
-  const nodes = await NodePreviewRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
 
   return {...record, nodes: toUuidIndexedObj(nodes)}
 }
