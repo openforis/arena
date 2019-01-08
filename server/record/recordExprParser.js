@@ -1,13 +1,13 @@
-const {expressionTypes, evalQuery} = require('../../common/exprParser/exprParser')
+const Expression = require('../../common/exprParser/expression')
 
 const evalNodeQuery = async (node, query) => {
   const ctx = {
     node,
     functions: {
-      [expressionTypes.ThisExpression]: (expr, {node}) => node
+      [Expression.types.ThisExpression]: (expr, {node}) => node
     },
   }
-  return await evalQuery(query, ctx)
+  return await Expression.evalString(query, ctx)
 }
 
 module.exports = {

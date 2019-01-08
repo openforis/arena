@@ -37,6 +37,10 @@
   font-size: 8px !important;
 }
 
+.icon-10px {
+  font-size: 10px !important;
+}
+
 .icon-12px {
   font-size: 12px !important;
 }
@@ -67,6 +71,12 @@
 
 .icon-right {
   margin-left: 5px;
+}
+
+.icon-reverse {
+  color: $grey2;
+  background-color: $white;
+  padding: 4px;
 }
 
 .icon-home:before {

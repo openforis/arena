@@ -72,12 +72,16 @@ const isNodeDefMultiple = R.pipe(SurveyUtils.getProp(propKeys.multiple), R.equal
 const isNodeDefSingle = R.pipe(isNodeDefMultiple, R.not)
 
 const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
+
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
 const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
-const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && !isNodeDefMultiple(nodeDef)
-const isNodeDefSingleAttribute = nodeDef => !(isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef))
-const isNodeDefMultipleAttribute = nodeDef => !isNodeDefEntity(nodeDef) && isNodeDefMultiple(nodeDef)
+const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefSingle(nodeDef)
+const isNodeDefSingleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefSingle(nodeDef)
+const isNodeDefMultipleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefMultiple(nodeDef)
+
+const isNodeDefInteger = isNodeDefType(nodeDefType.integer)
+const isNodeDefDecimal = isNodeDefType(nodeDefType.decimal)
 const isNodeDefCode = isNodeDefType(nodeDefType.code)
 const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
@@ -167,8 +171,12 @@ module.exports = {
   isNodeDefSingleEntity,
   isNodeDefSingleAttribute,
   isNodeDefMultipleAttribute,
+
+  isNodeDefInteger,
+  isNodeDefDecimal,
   isNodeDefCode,
   isNodeDefTaxon,
+
   isNodeDefPublished,
 
   //advanced props

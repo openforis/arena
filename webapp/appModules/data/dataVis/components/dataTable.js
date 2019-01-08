@@ -6,14 +6,17 @@ import * as R from 'ramda'
 
 import TablePaginator from '../../../../commonComponents/table/tablePaginator'
 import NodeDefTableColumn from './nodeDefs/nodeDefTableColumn'
+import ExpressionComponent from '../../../../commonComponents/expression/expression'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as DataVisState from '../dataVisState'
 
-import { updateDataTable, resetDataTable } from '../actions'
+import { updateDataTable, resetDataTable, updateDataFilter } from '../actions'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
+import Expression from '../../../../../common/exprParser/expression'
+
 import { elementOffset } from '../../../../appUtils/domUtils'
 
 const defaultColWidth = 80
@@ -60,7 +63,11 @@ class DataTable extends React.Component {
   }
 
   render () {
-    const {nodeDefCols, colNames, data, offset, limit, count, lang, updateDataTable} = this.props
+    const {
+      nodeDefUuidTable, nodeDefCols, colNames, data,
+      offset, limit, filter, count, lang,
+      updateDataTable, updateDataFilter,
+    } = this.props
 
     const {width = defaultColWidth} = elementOffset(this.tableRef.current)
     const widthMax = width - defaultColWidth
@@ -72,23 +79,36 @@ class DataTable extends React.Component {
 
     return (
       <div className="data-vis__data-table table" ref={this.tableRef}>
-        {
-          R.isEmpty(data)
-            ? null
-            : (
-              <React.Fragment>
-                <div className="table__header">
-                  <div/>
-                  <TablePaginator offset={offset} limit={limit} count={count}
-                                  fetchFn={updateDataTable}/>
-                </div>
 
-                <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
-                           data={data} offset={offset}
-                           lang={lang}
-                           colWidth={colWidth}/>
+        <div className="table__header">
+          <div className="filter-container">
+            {
+              nodeDefUuidTable &&
+              <React.Fragment>
+                <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
+                      style={{opacity: R.isEmpty(filter) ? 0.5 : 1}}/>
+                <ExpressionComponent nodeDefUuid={nodeDefUuidTable}
+                                     query={filter}
+                                     onChange={query => updateDataFilter(query)}
+                                     mode={Expression.modes.sql}/>
               </React.Fragment>
-            )
+            }
+          </div>
+
+          {
+            !R.isEmpty(data) &&
+            <TablePaginator offset={offset} limit={limit} count={count}
+                            fetchFn={updateDataTable}/>
+          }
+        </div>
+
+
+        {
+          !R.isEmpty(data) &&
+          <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
+                     data={data} offset={offset}
+                     lang={lang}
+                     colWidth={colWidth}/>
         }
 
       </div>
@@ -99,19 +119,22 @@ class DataTable extends React.Component {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
+  const nodeDefUuidTable = DataVisState.getTableNodeDefUuidTable(state)
   const nodeDefUuidCols = DataVisState.getTableNodeDefUuidCols(state)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 
   return {
+    nodeDefUuidTable,
     nodeDefCols,
     colNames,
     data: DataVisState.getTableData(state),
     offset: DataVisState.getTableOffset(state),
     limit: DataVisState.getTableLimit(state),
+    filter: DataVisState.getTableFilter(state),
     count: DataVisState.getTableCount(state),
     lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
   }
 }
 
-export default connect(mapStateToProps, {updateDataTable, resetDataTable})(DataTable)
+export default connect(mapStateToProps, {updateDataTable, resetDataTable, updateDataFilter})(DataTable)

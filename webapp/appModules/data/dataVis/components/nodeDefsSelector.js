@@ -3,6 +3,7 @@ import './nodeDefsSelector.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+import { nbsp } from '../../../../../common/stringUtils'
 
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import VariablesSelector from './variablesSelector'
@@ -10,7 +11,7 @@ import VariablesSelector from './variablesSelector'
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import * as SurveyState from '../../../../survey/surveyState'
-import { nbsp } from '../../../../../common/stringUtils'
+import * as NodeDefUiProps from '../../../surveyForm/nodeDefs/nodeDefSystemProps'
 
 import { initDataTable } from '../actions'
 
@@ -35,9 +36,16 @@ const TableSelector = ({hierarchy, nodeDefUuid, lang, onChange}) => {
 }
 
 class NodeDefsSelector extends React.Component {
-  constructor () {
-    super()
-    this.state = {nodeDefUuid: null, nodeDefVariableUuids: []}
+
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      nodeDefUuid: null,
+      nodeDefVariableUuids: [],
+      showSettings: false,
+      filterTypes: [],
+    }
   }
 
   render () {
@@ -45,18 +53,47 @@ class NodeDefsSelector extends React.Component {
       hierarchy, lang,
       initDataTable,
     } = this.props
-    const {nodeDefUuid, nodeDefVariableUuids} = this.state
+    const {nodeDefUuid, nodeDefVariableUuids, showSettings, filterTypes} = this.state
 
     return (
       <div className="node-defs-selector">
 
         <div className="variables-selector">
           <div className="variables-selector__container">
-            <TableSelector hierarchy={hierarchy} nodeDefUuid={nodeDefUuid}
-                           lang={lang} onChange={nodeDefUuid => this.setState({nodeDefUuid})}/>
+
+            <div>
+              <button className="btn btn-s btn-of-light-xs btn-toggle-vars-filter"
+                      aria-disabled={R.isNil(nodeDefUuid)}
+                      onClick={() => this.setState(state => ({showSettings: !state.showSettings}))}>
+                <span className="icon icon-cog icon-12px"/>
+              </button>
+              <TableSelector hierarchy={hierarchy} nodeDefUuid={nodeDefUuid}
+                             lang={lang} onChange={nodeDefUuid => this.setState({nodeDefUuid})}/>
+            </div>
+
+            {
+              showSettings &&
+              <div className="variables-selector__settings">
+                {
+                  R.keys(NodeDef.nodeDefType).map(type =>
+                    NodeDef.nodeDefType.entity !== type
+                      ? <button key={type}
+                                className={`btn btn-s btn-of-light-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
+                                onClick={() => {
+                                  const idx = R.findIndex(R.equals(type), filterTypes)
+                                  const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)
+                                  this.setState({filterTypes: fn(filterTypes)})
+                                }}>
+                        {NodeDefUiProps.getNodeDefIconByType(type)} {type}</button>
+                      : null
+                  )
+                }
+              </div>
+            }
 
             <VariablesSelector nodeDefUuid={nodeDefUuid} lang={lang}
-                               onChange={nodeDefVariableUuids => this.setState({nodeDefVariableUuids})}/>
+                               onChange={nodeDefVariableUuids => this.setState({nodeDefVariableUuids})}
+                               filterTypes={filterTypes}/>
           </div>
         </div>
 

@@ -11,7 +11,7 @@
 .variables-selector__container {
   position: absolute;
   height: 100%;
-  min-width: 90%;
+  width: 100%;
   display: grid;
   align-content: start;
   grid-row-gap: .3rem;
@@ -51,8 +51,46 @@
     }
   }
 
+
+  .btn-toggle-vars-filter {
+    position: absolute;
+    padding: 0;
+    height: 30px;
+    width: 30px;
+
+    .icon {
+      color: rgba($white, .7);
+    }
+  }
+
 }
 
+.variables-selector__settings {
+  background-color: rgba($grey, .1);
+  display: flex;
+  flex-wrap: wrap;
+  padding: 1rem;
+  justify-content: center;
+  margin-top: -.3rem;
+
+  .btn-node-def-type {
+    font-size: .7rem;
+    font-weight: 400;
+    padding: .3rem .5rem;
+
+    .icon-left {
+      margin-left: 0px !important;
+    }
+
+    .icon {
+      font-size: 14px !important;
+    }
+
+    &.active {
+      pointer-events: auto;
+    }
+  }
+}
 
 .node-def-dropdown__autocomplete-dialog {
   .dropdown__list-item {

@@ -14,8 +14,12 @@ class Variables extends React.Component {
   render () {
     const {
       nodeDefParent, childDefs, lang,
-      nodeDefVariableUuids, toggleNodeDefVariable
+      nodeDefVariableUuids, toggleNodeDefVariable,
+      filterTypes,
     } = this.props
+
+    const filtered = nodeDef => NodeDef.isNodeDefAttribute(nodeDef) &&
+      (R.isEmpty(filterTypes) || R.includes(NodeDef.getNodeDefType(nodeDef), filterTypes))
 
     return childDefs
       ? (
@@ -25,9 +29,8 @@ class Variables extends React.Component {
               childDef => {
                 const childDefUuid = NodeDef.getUuid(childDef)
 
-                return NodeDef.isNodeDefEntity(childDef)
-                  ? null
-                  : (
+                return filtered(childDef)
+                  ? (
                     <button key={childDefUuid}
                             className={`btn btn-s btn-of-light btn-node-def${R.includes(childDefUuid, nodeDefVariableUuids) ? ' active' : ''}`}
                             onClick={() => toggleNodeDefVariable(childDefUuid)}>
@@ -35,6 +38,7 @@ class Variables extends React.Component {
                       {NodeDefUiProps.getNodeDefIconByType(NodeDef.getNodeDefType(childDef))}
                     </button>
                   )
+                  : null
               }
             )
           }
@@ -46,7 +50,8 @@ class Variables extends React.Component {
               <VariablesConnect nodeDefUuid={NodeDef.getUuid(nodeDefParent)}
                                 lang={lang}
                                 nodeDefVariableUuids={nodeDefVariableUuids}
-                                toggleNodeDefVariable={toggleNodeDefVariable}/>
+                                toggleNodeDefVariable={toggleNodeDefVariable}
+                                filterTypes={filterTypes}/>
             </React.Fragment>
           }
 
@@ -107,13 +112,14 @@ class VariablesSelector extends React.PureComponent {
   }
 
   render () {
-    const {nodeDefUuid, lang} = this.props
+    const {nodeDefUuid, lang, filterTypes} = this.props
     const {nodeDefVariableUuids} = this.state
 
     return (
       <VariablesConnect nodeDefUuid={nodeDefUuid} lang={lang}
                         nodeDefVariableUuids={nodeDefVariableUuids}
-                        toggleNodeDefVariable={this.toggleNodeDefVariable.bind(this)}/>
+                        toggleNodeDefVariable={this.toggleNodeDefVariable.bind(this)}
+                        filterTypes={filterTypes}/>
     )
   }
 
@@ -122,6 +128,7 @@ class VariablesSelector extends React.PureComponent {
 VariablesSelector.defaultProps = {
   nodeDefUuid: null,
   lang: null,
+  filterTypes: [],
 }
 
 export default VariablesSelector
