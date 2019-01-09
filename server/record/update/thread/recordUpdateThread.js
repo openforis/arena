@@ -16,17 +16,18 @@ const NodeRepository = require('../../../record/nodeRepository')
 const Survey = require('../../../../common/survey/survey')
 const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
+const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
 
 const DependentNodesUpdater = require('./dependentNodesUpdater')
 
 class RecordUpdateThread extends Thread {
 
-  constructor (params = {}) {
+  constructor (params) {
     super(params)
 
     this.queue = new Queue()
     this.processing = false
-    this.preview = params.preview
+    this.preview = R.propOr(false, 'preview', params)
     this.processor = new RecordProcessor(this.preview)
   }
 
@@ -97,7 +98,7 @@ class RecordUpdateThread extends Thread {
       //3. update survey rdb
 
       if (!this.preview) {
-        const nodeDefs = Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey)
+        const nodeDefs = toUuidIndexedObj(Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey))
         await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodes, t)
       }
     })
