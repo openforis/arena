@@ -24,16 +24,15 @@ class RecordUpdateThread extends Thread {
   constructor (params = {}) {
     super(params)
 
-    const {preview} = params
-
     this.queue = new Queue()
     this.processing = false
-    this.processor = new RecordProcessor(preview)
+    this.preview = params.preview
+    this.processor = new RecordProcessor(this.preview)
   }
 
   async getSurvey (tx) {
     if (!this.survey)
-      this.survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, false, true, false, tx)
+      this.survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.preview, true, false, tx)
 
     return this.survey
   }
@@ -93,12 +92,13 @@ class RecordUpdateThread extends Thread {
       if (!R.isEmpty(updatedDependentNodes))
         this._postMessage(updatedDependentNodes)
 
+      const updatedNodes = R.mergeRight(nodes, updatedDependentNodes)
+
       //3. update survey rdb
-      const allUpdatedNodes = R.mergeRight(nodes, updatedDependentNodes)
 
       if (!this.preview) {
-        const nodeDefs = Survey.getNodeDefsByUuids(Node.getNodeDefUuids(allUpdatedNodes))(survey)
-        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, allUpdatedNodes, t)
+        const nodeDefs = Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey)
+        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodes, t)
       }
     })
   }
