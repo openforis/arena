@@ -46,7 +46,7 @@ const fetchNodeByUuid = (surveyId, uuid) => R.prop(uuid, nodes)
 
 const fetchDescendantNodesByCodeUuid = (surveyId, recordUuid, parentCodeNodeUuid) =>
   R.pipe(
-    R.filter(n => R.equals(n.value.h, [parentCodeNodeUuid]),
+    R.filter(n => R.equals(n.value.h, [parentCodeNodeUuid])),
     R.sortBy(n => n.id),
   )(nodes)
 
