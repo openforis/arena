@@ -25,11 +25,12 @@ class DefaultValuesUpdater {
       const applyIfExpr = NodeDefExpression.getApplyIf(defaultValue)
 
       if (StringUtils.isBlank(applyIfExpr) || await RecordExprParser.evalNodeQuery(node, applyIfExpr)) {
-
         const value = await RecordExprParser.evalNodeQuery(node, NodeDefExpression.getExpression(defaultValue))
 
         const oldValue = Node.getNodeValue(node)
-        if (oldValue !== value) {
+        if (R.equals(oldValue, value)) {
+          return {}
+        } else {
           console.log(`apply default value ${value} to node ${NodeDef.getNodeDefName(nodeDef)}`)
           return toUuidIndexedObj([await this.nodeRepository.updateNode(surveyId, Node.getUuid(node), value, {[Node.metaKeys.defaultValue]: true}, tx)])
         }
