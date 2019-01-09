@@ -19,7 +19,7 @@ module.exports.init = app => {
       const record = req.body
 
       if (record.ownerId !== user.id) {
-        sendErr('Error record create. User is different')
+        sendErr(res, 'Error record create. User is different')
         return
       }
 

@@ -20,7 +20,7 @@ const createRecordUpdateThread = (user, surveyId, preview) => {
   const userId = user.id
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
-    {user, surveyId},
+    {user, surveyId, preview},
     nodes => WebSocketManager.notifyUser(userId, WebSocketEvents.nodesUpdate, nodes),
     () => recordUpdateThreads.removeThread(userId)
   )

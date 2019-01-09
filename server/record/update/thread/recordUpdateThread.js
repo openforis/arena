@@ -19,7 +19,7 @@ class RecordUpdateThread extends Thread {
   constructor (preview) {
     super()
 
-    this.preview = preview
+    this.preview = preview || this.params.preview
     this.processor = new RecordProcessor(this.preview)
 
     this.queue = new Queue()

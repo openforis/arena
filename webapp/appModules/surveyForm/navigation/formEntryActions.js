@@ -24,7 +24,7 @@ const FormEntryActions = ({entry, preview, deleteRecord}) => (
           </button>
           :
           <Link to={appModuleUri(dashboardModules.formDesigner)} className="btn btn-of">
-            <span className="icon icon-bin icon-12px icon-left"/>
+            <span className="icon icon-quill icon-12px icon-left"/>
             Design
           </Link>
       }
