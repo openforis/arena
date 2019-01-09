@@ -6,7 +6,15 @@ const db = require('../db/db')
 const Node = require('../../common/record/node')
 const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
 
-const dbTransformCallback = camelize
+//camelize all but "meta"
+const dbTransformCallback = node =>
+  node
+    ? R.pipe(
+    R.dissoc(Node.keys.meta),
+    camelize,
+    R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node))
+    )(node)
+    : null
 
 // ============== CREATE
 
@@ -15,12 +23,13 @@ const insertNode = async (surveyId, node, client = db) => {
 
   const parentH = parentUuid
     ? await client.one(
-      `SELECT id, meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = $1`,
+      `SELECT meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = $1`,
       [parentUuid]
     ) : []
 
   const meta = {
-    h: R.isEmpty(parentH) ? [] : R.append(Number(parentH.id), parentH.h)
+    h: R.isEmpty(parentH) ? [] : R.append(parentUuid, parentH.h),
+    [Node.metaKeys.childApplicability]: {} //applicability of child nodes
   }
 
   return await client.one(`
@@ -52,6 +61,25 @@ const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
     dbTransformCallback
   )
 
+const fetchAncestorByNodeDefUuid = async (surveyId, nodeUuid, ancestorNodeDefUuid, client = db) => {
+  const hierarchy = await client.one(
+    `SELECT meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = $1`,
+    [nodeUuid],
+    R.prop('h')
+  )
+  if (R.isEmpty(hierarchy)) {
+    return []
+  } else {
+    return await client.one(
+      `SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
+       WHERE uuid in (${R.pipe(R.map(el => `'${el}'`), R.join(', '))(hierarchy)})
+        AND node_def_uuid = $1`,
+      [ancestorNodeDefUuid],
+      dbTransformCallback
+    )
+  }
+}
+
 const fetchDescendantNodesByCodeUuid = async (surveyId, recordUuid, parentCodeNodeUuid, client = db) =>
   await client.map(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node n
@@ -62,24 +90,51 @@ const fetchDescendantNodesByCodeUuid = async (surveyId, recordUuid, parentCodeNo
     dbTransformCallback
   )
 
-const fetchParentNodeHierarchy = async (surveyId, nodeUuid, client = db) =>
-  nodeUuid
-    ? await client.one(`
-        SELECT id, meta->'h' as h
-        FROM ${getSurveyDBSchema(surveyId)}.node 
-        WHERE uuid = $1`,
-    [nodeUuid],
-    row => R.append(Number(row.id), row.h))
-    : []
+const fetchDescendantNodesByNodeDefUuid = async (surveyId, recordUuid, parentNodeUuid, nodeDefUuid, client = db) =>
+  await client.map(`
+    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node n
+    WHERE n.record_uuid = $1
+      AND n.node_def_uuid = $2
+      AND n.meta @> '{"h": ["${parentNodeUuid}"]}'`,
+    [recordUuid, nodeDefUuid],
+    dbTransformCallback
+  )
+
+const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
+  await client.map(`
+    SELECT * FROM  ${getSurveyDBSchema(surveyId)}.node n
+    WHERE n.record_uuid = $1
+      AND n.parent_uuid = $2
+      AND n.node_def_uuid = $3`,
+    [recordUuid, nodeUuid, childDefUUid],
+    dbTransformCallback
+  )
+
+const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
+  const nodes = await fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
+  return R.head(nodes)
+}
 
 // ============== UPDATE
-const updateNode = async (surveyId, nodeUuid, value, client = db) =>
+const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
   await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
-    SET value = $1, date_modified = now()
-    WHERE uuid = $2
+    SET value = $1,
+    meta = meta || $2::jsonb, 
+    date_modified = now()
+    WHERE uuid = $3
     RETURNING *, true as updated
-    `, [value ? JSON.stringify(value) : null, nodeUuid],
+    `, [value ? JSON.stringify(value) : null, meta, nodeUuid],
+    dbTransformCallback
+  )
+
+const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUuid, applicable, client = db) =>
+  await client.one(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.node
+    SET meta = jsonb_set(meta, '{"${Node.metaKeys.childApplicability}", "${childDefUuid}"}', '${applicable}')
+    WHERE uuid = $1
+    RETURNING *`,
+    [parentNodeUuid],
     dbTransformCallback
   )
 
@@ -100,10 +155,15 @@ module.exports = {
   //READ
   fetchNodesByRecordUuid,
   fetchNodeByUuid,
+  fetchAncestorByNodeDefUuid,
   fetchDescendantNodesByCodeUuid,
+  fetchDescendantNodesByNodeDefUuid,
+  fetchChildNodeByNodeDefUuid,
+  fetchChildNodesByNodeDefUuid,
 
   //UPDATE
   updateNode,
+  updateChildrenApplicability,
 
   //DELETE
   deleteNode,

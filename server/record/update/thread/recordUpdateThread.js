@@ -1,5 +1,7 @@
 const {isMainThread} = require('worker_threads')
 
+const R = require('ramda')
+
 const db = require('../../../db/db')
 
 const RecordProcessor = require('./recordProcessor')
@@ -7,23 +9,33 @@ const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
 const SurveyManager = require('../../../survey/surveyManager')
-const NodeDefManager = require('../../../nodeDef/nodeDefManager')
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
+
+const NodeRepository = require('../../../record/nodeRepository')
 
 const Survey = require('../../../../common/survey/survey')
 const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
 
+const DependentNodesUpdater = require('./dependentNodesUpdater')
+
 class RecordUpdateThread extends Thread {
 
-  constructor (preview) {
-    super()
+  constructor (params = {}) {
+    super(params)
 
-    this.preview = preview || this.params.preview
-    this.processor = new RecordProcessor(this.preview)
+    const {preview} = params
 
     this.queue = new Queue()
     this.processing = false
+    this.processor = new RecordProcessor(preview)
+  }
+
+  async getSurvey (tx) {
+    if (!this.survey)
+      this.survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, false, true, false, tx)
+
+    return this.survey
   }
 
   async onMessage (msg) {
@@ -46,12 +58,18 @@ class RecordUpdateThread extends Thread {
     }
   }
 
-  async processMessage (msg) {
-    let nodes = null
+  _postMessage (msg) {
+    if (!isMainThread)
+      this.postMessage(msg)
+  }
 
+  async processMessage (msg) {
     await db.tx(async t => {
       const {user, surveyId} = msg
 
+      let nodes = null
+
+      // 1. update nodes
       switch (msg.type) {
         case messageTypes.createRecord:
           nodes = await this.processor.createRecord(user, surveyId, msg.record, t)
@@ -64,20 +82,54 @@ class RecordUpdateThread extends Thread {
           break
       }
 
-      if (!isMainThread)
-        this.postMessage(nodes)
+      this._postMessage(nodes)
+
+      const survey = await this.getSurvey(t)
+
+      // 2. update applicable, defaultValues of dependent nodes
+      const updatedDependentNodes = await new DependentNodesUpdater(survey, NodeRepository, bindNode)
+        .updateDependentNodes(user, nodes, t)
+
+      if (!R.isEmpty(updatedDependentNodes))
+        this._postMessage(updatedDependentNodes)
+
+      //3. update survey rdb
+      const allUpdatedNodes = R.mergeRight(nodes, updatedDependentNodes)
 
       if (!this.preview) {
-        const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
-        const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(nodes), false, false, t)
-        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, nodes, t)
+        const nodeDefs = Survey.getNodeDefsByUuids(Node.getNodeDefUuids(allUpdatedNodes))(survey)
+        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, allUpdatedNodes, t)
       }
     })
   }
-
 }
 
-const newInstance = (preview = false) => new RecordUpdateThread(preview)
+const bindNode = (survey, node, tx) => {
+  const surveyId = Survey.getSurveyInfo(survey).id
+
+  return {
+    ...node,
+
+    parent: async () => bindNode(survey, await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), tx), tx),
+
+    node: async name => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      const childDef = Survey.getNodeDefChildByName(nodeDef, name)(survey)
+      const child = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), node.uuid, childDef.uuid, tx)
+      return child ? bindNode(survey, child, tx) : null
+    },
+
+    sibling: async name => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+      const childDef = Survey.getNodeDefChildByName(parentDef, name)(survey)
+      const sibling = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getParentUuid(node), childDef.uuid, tx)
+      return sibling ? bindNode(survey, sibling, tx) : null
+    }
+  }
+}
+
+const newInstance = (params) => new RecordUpdateThread(params)
 
 if (!isMainThread)
   newInstance()

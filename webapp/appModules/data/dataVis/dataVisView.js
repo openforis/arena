@@ -11,7 +11,7 @@ const DataVisView = (props) => {
     <div className="data-vis">
 
       <NodeDefsSelector/>
-
+      <div/>
       <DataTable/>
 
     </div>

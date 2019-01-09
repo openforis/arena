@@ -1,6 +1,6 @@
 const {assert} = require('chai')
 
-const {evalQuery} = require('../../common/exprParser/exprParser')
+const {evalString} = require('../../common/exprParser/expression')
 
 const queries = [
   {q: '1 + 1', r: 2},
@@ -17,7 +17,7 @@ describe('ExprParser test', () => {
 
   queries.forEach(query =>
     it(query.q, async () => {
-      const res = await evalQuery(query.q)
+      const res = await evalString(query.q)
       assert.equal(res, query.r)
     })
   )

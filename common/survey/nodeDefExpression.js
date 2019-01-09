@@ -1,4 +1,5 @@
 const R = require('ramda')
+
 const {uuidv4} = require('./../uuid')
 const {isBlank} = require('../stringUtils')
 
@@ -50,14 +51,17 @@ const extractNodeDefNames = (jsExpr = '') => {
   return names
 }
 
-const findReferencedNodeDefs = nodeDefExpressions => {
-  const names = []
-  for (const nodeDefExpr of nodeDefExpressions) {
-    names.push.apply(names, extractNodeDefNames(getExpression(nodeDefExpr)))
-    names.push.apply(names, extractNodeDefNames(getApplyIf(nodeDefExpr)))
-  }
-  return names
-}
+const findReferencedNodeDefs = nodeDefExpressions =>
+  R.pipe(
+    R.reduce((acc, nodeDefExpr) =>
+        R.pipe(
+          R.concat(extractNodeDefNames(getExpression(nodeDefExpr))),
+          R.concat(extractNodeDefNames(getApplyIf(nodeDefExpr))),
+        )(acc),
+      []
+    ),
+    R.uniq
+  )(nodeDefExpressions)
 
 module.exports = {
   keys,

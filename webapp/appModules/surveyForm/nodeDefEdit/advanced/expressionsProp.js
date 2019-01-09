@@ -155,7 +155,6 @@ export const NodeDefExpressionsProp = props => {
 
 }
 
-
 NodeDefExpressionsProp.defaultProps = {
   nodeDef: null,
   propName: null,

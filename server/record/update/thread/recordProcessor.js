@@ -108,7 +108,7 @@ class RecordProcessor {
     const childNodes = R.mergeAll(
       await Promise.all(
         childDefs
-          .filter(NodeDef.isNodeDefSingleEntity)
+          .filter(NodeDef.isNodeDefSingle)
           .map(async childDef =>
             await this._insertNodeRecursively(surveyId, childDef, Node.newNode(childDef.uuid, node.recordUuid, node.uuid), user, t)
           )

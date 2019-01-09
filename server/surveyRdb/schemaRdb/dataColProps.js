@@ -5,16 +5,17 @@ const toSnakeCase = require('to-snake-case')
 const Survey = require('../../../common/survey/survey')
 const SurveyUtils = require('../../../common/survey/surveyUtils')
 const NodeDef = require('../../../common/survey/nodeDef')
-const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
 const Taxonomy = require('../../../common/survey/taxonomy')
 const Node = require('../../../common/record/node')
 const CategoryManager = require('../../category/categoryManager')
 const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
+const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
+const sqlTypes = require('../../../common/surveyRdb/sqlTypes')
+const {nodeDefType} = NodeDef
+
 const {isBlank} = require('../../../common/stringUtils')
 const DateTimeUtils = require('../../../common/dateUtils')
-
-const {nodeDefType} = NodeDef
 
 const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'
@@ -33,16 +34,6 @@ const nodeValuePropProcessor = (surveyInfo, nodeDefCol, nodeCol) =>
     const nodeValue = Node.getNodeValue(node)
     return getValueFromItem(nodeDefCol, colName, nodeValue)
   }
-
-const sqlTypes = {
-  uuid: 'UUID',
-  varchar: 'VARCHAR',
-  integer: 'INTEGER',
-  decimal: `DECIMAL(${16 + 6}, 6)`,
-  date: 'DATE',
-  time: 'TIME WITHOUT TIME ZONE',
-  point: 'geometry(Point)',
-}
 
 const props = {
   [nodeDefType.entity]: {

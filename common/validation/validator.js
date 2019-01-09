@@ -136,7 +136,7 @@ const getInvalidFieldValidations = R.pipe(
  */
 const cleanup = R.pipe(
   getFieldValidations,
-  R.reject(R.propEq(keys.valid, true)),
+  R.reject(v => !v || R.propEq(keys.valid, true)(v)),
   invalidFieldValidations => ({
     [keys.fields]: invalidFieldValidations,
     [keys.valid]: R.isEmpty(invalidFieldValidations)

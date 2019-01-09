@@ -5,6 +5,13 @@ $rowHeaderHeight: 45px;
 .data-vis__data-table {
   position: relative;
 
+  .table__header {
+    .filter-container {
+      display: flex;
+      align-items: center;
+    }
+  }
+
   .table__rows {
     overflow-y: hidden;
     overflow-x: auto;

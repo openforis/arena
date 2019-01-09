@@ -73,9 +73,7 @@ const cancelCheckOut = userId => {
  * @returns {Promise<void>}
  */
 const createRecord = async (user, surveyId, record) => {
-  const preview = isPreviewRecord(record)
-
-  const recordUpdateThread = RecordUpdateThread.newInstance(preview)
+  const recordUpdateThread = RecordUpdateThread.newInstance({user, surveyId, preview: isPreviewRecord(record)})
   await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
 }
 

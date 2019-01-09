@@ -4,7 +4,7 @@ const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
 const NodeDefExpression = require('../../common/survey/nodeDefExpression')
 
-const keys = {
+const dependencyTypes = {
   defaultValues: 'defaultValues',
   applicable: 'applicable',
   validations: 'validations',
@@ -34,18 +34,19 @@ const addDeps = (survey, nodeDef, type, expressions) =>
     return graph
   }
 //====== CREATE
-const buildGraphs = survey =>
+const buildGraph = survey =>
   R.reduce(
     (graph, nodeDef) => R.pipe(
-      addDeps(survey, nodeDef, keys.defaultValues, NodeDef.getDefaultValues(nodeDef)),
-      addDeps(survey, nodeDef, keys.calculatedValues, NodeDef.getCalculatedValues(nodeDef)),
-      addDeps(survey, nodeDef, keys.applicable, NodeDef.getApplicable(nodeDef)),
-      addDeps(survey, nodeDef, keys.validations, NodeDef.getValidationExpressions(nodeDef))
+      addDeps(survey, nodeDef, dependencyTypes.defaultValues, NodeDef.getDefaultValues(nodeDef)),
+      addDeps(survey, nodeDef, dependencyTypes.calculatedValues, NodeDef.getCalculatedValues(nodeDef)),
+      addDeps(survey, nodeDef, dependencyTypes.applicable, NodeDef.getApplicable(nodeDef)),
+      addDeps(survey, nodeDef, dependencyTypes.validations, NodeDef.getValidationExpressions(nodeDef))
     )(graph),
     {},
     Survey.getNodeDefsArray(survey)
   )
   
 module.exports = {
-  buildGraph: buildGraphs
+  dependencyTypes,
+  buildGraph
 }

@@ -68,6 +68,11 @@ button, .btn {
   font-size: 0.8rem;
 }
 
+.btn-xs {
+  padding: .3rem;
+  font-size: 0.8rem;
+}
+
 .btn-of {
   @include of;
   text-transform: uppercase;
