@@ -108,8 +108,10 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/record/:recordUuid/checkout', async (req, res) => {
     try {
       const user = req.user
+      const surveyId = getRestParam(req, 'surveyId')
+      const recordUuid = getRestParam(req, 'recordUuid')
 
-      RecordManager.checkOutRecord(user.id)
+      await RecordManager.checkOutRecord(user, surveyId, recordUuid)
 
       sendOk(res)
     } catch (err) {

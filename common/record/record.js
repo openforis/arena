@@ -9,6 +9,8 @@ const Node = require('../record/node')
 
 const keys = {
   nodes: 'nodes',
+  ownerId: 'ownerId',
+  step: 'step',
   preview: 'preview',
 }
 // ====== CREATE
@@ -143,6 +145,11 @@ module.exports = {
 
   // ====== READ
   getUuid: SurveyUtils.getUuid,
+  isPreview: R.propEq(keys.preview, true),
+  getOwnerId: R.prop(keys.ownerId),
+  getStep: R.prop(keys.step),
+
+
   getNodes,
   getNodesArray,
   getNodesByDefUuid,
@@ -150,8 +157,6 @@ module.exports = {
   getRootNode,
   getNodeByUuid,
   getParentNode,
-
-  isPreview: R.propEq(keys.preview, true),
 
   // testing
   getCodeUuidsHierarchy: getCodeUuidsHierarchy,

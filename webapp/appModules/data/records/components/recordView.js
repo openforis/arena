@@ -45,8 +45,8 @@ class RecordView extends React.Component {
   }
 
   componentUnload () {
-    this.props.resetForm()
     this.props.checkOutRecord()
+    this.props.resetForm()
   }
 
   render () {

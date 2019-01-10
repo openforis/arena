@@ -34,11 +34,14 @@ CREATE TABLE
   owner_id     bigint      NOT NULL,
   step         varchar(63) NOT NULL,
   date_created TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
+  preview      boolean DEFAULT TRUE,
 
   PRIMARY KEY (id),
   CONSTRAINT record_uuid_idx UNIQUE (uuid),
   CONSTRAINT record_user_fk FOREIGN KEY (owner_id) REFERENCES "user" ("id")
 );
+
+CREATE INDEX record_preview_idx ON record(preview);
 
 CREATE TABLE
   node

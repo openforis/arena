@@ -24,7 +24,7 @@ const FormEntryActions = ({entry, preview, deleteRecord}) => (
           </button>
           :
           <Link to={appModuleUri(designerModules.formDesigner)} className="btn btn-of">
-            <span className="icon icon-quill icon-12px icon-left"/>
+            <span className="icon icon-eye-blocked icon-12px icon-left"/>
             Close preview
           </Link>
       }

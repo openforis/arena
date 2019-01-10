@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const db = require('../db/db')
 
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
@@ -10,6 +12,7 @@ const Node = require('../../common/record/node')
 const File = require('../../common/file/file')
 
 const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
+const {isBlank} = require('../../common/stringUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
 const ActivityLog = require('../activityLog/activityLogger')
@@ -93,7 +96,31 @@ const checkInRecord = async (user, surveyId, recordUuid) => {
   return record
 }
 
-const checkOutRecord = RecordUpdateManager.checkOut
+const checkOutRecord = async (user, surveyId, recordUuid) => {
+  const record = await fetchRecordByUuid(surveyId, recordUuid)
+
+  if (Record.isPreview(record)) {
+    await deleteRecordPreview(user, surveyId, record)
+  }
+
+  RecordUpdateManager.checkOut(user.id)
+}
+
+const deleteRecordPreview = async (user, surveyId, record) =>
+  await db.tx(async t => {
+    const fileUuids = R.pipe(
+      Record.getNodesArray,
+      R.map(Node.getNodeFileUuid),
+      R.reject(isBlank),
+    )(record)
+    // delete record and files
+    await Promise.all([
+        RecordRepository.deleteRecord(user, surveyId, Record.getUuid(record), t),
+        ...fileUuids.map(fileUuid => FileManager.deleteFileByUuid(surveyId, fileUuid, t)),
+      ]
+    )
+
+  })
 
 module.exports = {
   //==== CREATE
