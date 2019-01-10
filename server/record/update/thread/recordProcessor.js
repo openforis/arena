@@ -2,12 +2,12 @@ const R = require('ramda')
 const Promise = require('bluebird')
 
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
+const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
 const Record = require('../../../../common/record/record')
 
 const RecordRepository = require('../../../record/recordRepository')
-const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const NodeRepository = require('../../../record/nodeRepository')
 
 const ActivityLog = require('../../../activityLog/activityLogger')
@@ -27,17 +27,21 @@ class RecordProcessor {
       await R.apply(ActivityLog.log, arguments)
   }
 
-  async createRecord (user, surveyId, recordToCreate, t) {
+  async createRecord (user, survey, recordToCreate, t) {
+    const surveyId = Survey.getId(survey)
+
     await RecordRepository.insertRecord(surveyId, recordToCreate, t)
     await this.logActivity(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
 
-    const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
+    const rootNodeDef = Survey.getRootNodeDef(survey)
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(recordToCreate))
-    return await this.persistNode(user, surveyId, rootNode, t)
+    return await this.persistNode(user, survey, rootNode, t)
   }
 
-  async persistNode (user, surveyId, node, t) {
+  async persistNode (user, survey, node, t) {
     const {uuid} = node
+
+    const surveyId = Survey.getId(survey)
 
     const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)
 
@@ -47,11 +51,13 @@ class RecordProcessor {
       return await this._updateNodeValue(surveyId, uuid, Node.getNodeValue(node), t)
     } else {
       // create
-      return await this._insertNode(surveyId, node, user, t)
+      return await this._insertNode(survey, node, user, t)
     }
   }
 
-  async deleteNode (user, surveyId, nodeUuid, t) {
+  async deleteNode (user, survey, nodeUuid, t) {
+    const surveyId = Survey.getId(survey)
+
     const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
     await this.logActivity(user, surveyId, ActivityLog.type.nodeDelete, {nodeUuid}, t)
@@ -63,26 +69,15 @@ class RecordProcessor {
   // Internal methods
   //==========
 
-  //always assoc parentNode, used in surveyRdbManager.updateTableNodes
-  async _assocParentNode (surveyId, node, nodes, t) {
-    const parentUuid = Node.getParentUuid(node)
-    const parentNode = parentUuid && !nodes[parentUuid] ? await NodeRepository.fetchNodeByUuid(surveyId, parentUuid, t) : null
-    return R.mergeRight({
-        [node.uuid]: node,
-        ...parentNode ? {[parentNode.uuid]: parentNode} : {}
-      },
-      nodes
-    )
-  }
-
   // ==== CREATE
-  async _insertNode (surveyId, node, user, t) {
-    const nodeDef = await NodeDefRepository.fetchNodeDefByUuid(surveyId, Node.getNodeDefUuid(node), t)
-    const nodesToReturn = await this._insertNodeRecursively(surveyId, nodeDef, node, user, t)
-    return await this._assocParentNode(surveyId, node, nodesToReturn, t)
+  async _insertNode (survey, node, user, t) {
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+    const nodesToReturn = await this._insertNodeRecursively(survey, nodeDef, node, user, t)
+    return await assocParentNode(Survey.getId(survey), node, nodesToReturn, t)
   }
 
-  async _insertNodeRecursively (surveyId, nodeDef, nodeToInsert, user, t) {
+  async _insertNodeRecursively (survey, nodeDef, nodeToInsert, user, t) {
+    const surveyId = Survey.getId(survey)
     await this.logActivity(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
 
     // insert node
@@ -90,15 +85,16 @@ class RecordProcessor {
 
     // add children if entity
     const childDefs = NodeDef.isNodeDefEntity(nodeDef)
-      ? await NodeDefRepository.fetchNodeDefsByParentUuid(surveyId, nodeDef.uuid, this.preview)
+      ? Survey.getNodeDefChildren(nodeDef)(survey)
       : []
+
     // insert only child single entities
     const childNodes = R.mergeAll(
       await Promise.all(
         childDefs
           .filter(NodeDef.isNodeDefSingle)
           .map(async childDef =>
-            await this._insertNodeRecursively(surveyId, childDef, Node.newNode(childDef.uuid, node.recordUuid, node.uuid), user, t)
+            await this._insertNodeRecursively(survey, childDef, Node.newNode(childDef.uuid, node.recordUuid, node.uuid), user, t)
           )
       )
     )
@@ -114,12 +110,24 @@ class RecordProcessor {
 
   async _onNodeUpdate (surveyId, node, t) {
     // delete dependent code nodes
-    const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordUuid, node.uuid)
+    const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordUuid, node.uuid, t)
     const nodesToReturn = await Promise.all(
       descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, nodeCode.uuid, t))
     )
-    return await this._assocParentNode(surveyId, node, SurveyUtils.toUuidIndexedObj(nodesToReturn), t)
+    return await assocParentNode(surveyId, node, SurveyUtils.toUuidIndexedObj(nodesToReturn), t)
   }
+}
+
+//always assoc parentNode, used in surveyRdbManager.updateTableNodes
+const assocParentNode = async (surveyId, node, nodes, t) => {
+  const parentUuid = Node.getParentUuid(node)
+  const parentNode = parentUuid && !nodes[parentUuid] ? await NodeRepository.fetchNodeByUuid(surveyId, parentUuid, t) : null
+  return R.mergeRight({
+      [node.uuid]: node,
+      ...parentNode ? {[parentNode.uuid]: parentNode} : {}
+    },
+    nodes
+  )
 }
 
 module.exports = RecordProcessor

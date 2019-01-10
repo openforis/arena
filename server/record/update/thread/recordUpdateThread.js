@@ -11,8 +11,6 @@ const Thread = require('../../../threads/thread')
 const SurveyManager = require('../../../survey/surveyManager')
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
 
-const NodeRepository = require('../../../record/nodeRepository')
-
 const Survey = require('../../../../common/survey/survey')
 const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
@@ -64,30 +62,29 @@ class RecordUpdateThread extends Thread {
 
   async processMessage (msg) {
     await db.tx(async t => {
-      const {user, surveyId} = msg
+      const {user} = msg
+
+      const survey = await this.getSurvey(t)
 
       let nodes = null
 
       // 1. update nodes
       switch (msg.type) {
         case messageTypes.createRecord:
-          nodes = await this.processor.createRecord(user, surveyId, msg.record, t)
+          nodes = await this.processor.createRecord(user, survey, msg.record, t)
           break
         case messageTypes.persistNode:
-          nodes = await this.processor.persistNode(user, surveyId, msg.node, t)
+          nodes = await this.processor.persistNode(user, survey, msg.node, t)
           break
         case messageTypes.deleteNode:
-          nodes = await this.processor.deleteNode(user, surveyId, msg.nodeUuid, t)
+          nodes = await this.processor.deleteNode(user, survey, msg.nodeUuid, t)
           break
       }
 
       this._postMessage(nodes)
 
-      const survey = await this.getSurvey(t)
-
       // 2. update applicable, defaultValues of dependent nodes
-      const updatedDependentNodes = await new DependentNodesUpdater(survey, NodeRepository)
-        .updateDependentNodes(user, nodes, t)
+      const updatedDependentNodes = await DependentNodesUpdater.updateDependentNodes(user, survey, nodes, t)
 
       if (!R.isEmpty(updatedDependentNodes))
         this._postMessage(updatedDependentNodes)

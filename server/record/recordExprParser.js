@@ -1,3 +1,5 @@
+const Survey = require('../../common/survey/survey')
+const Node = require('../../common/record/node')
 const Expression = require('../../common/exprParser/expression')
 const NodeRepository = require('./nodeRepository')
 
