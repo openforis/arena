@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const {dependencyTypes} = require('../../../survey/surveyDependenchyGraph')
 
-const RecordDependencyManager = require('../../recordDependencyManager')
+const RecordDependencyManager = require('./recordDependencyManager')
 
 const DefaultValuesUpdater = require('./defaultValuesUpdater')
 const ApplicableIfUpdater = require('./applicableIfIUpdater')

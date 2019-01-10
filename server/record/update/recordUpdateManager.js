@@ -73,7 +73,7 @@ const cancelCheckOut = userId => {
  */
 const createRecord = async (user, surveyId, record) => {
   const recordUpdateThread = RecordUpdateThread.newInstance({user, surveyId, preview: Record.isPreview(record)})
-  await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
+  await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, record})
 }
 
 /**
@@ -85,7 +85,7 @@ const createRecord = async (user, surveyId, record) => {
  */
 const persistNode = (user, surveyId, node) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, user, surveyId, node})
+  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, node})
 }
 
 /**
@@ -97,7 +97,7 @@ const persistNode = (user, surveyId, node) => {
  */
 const deleteNode = (user, surveyId, nodeUuid) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, user, surveyId, nodeUuid})
+  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, nodeUuid})
 }
 
 module.exports = {

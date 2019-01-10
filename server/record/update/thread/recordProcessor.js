@@ -10,11 +10,14 @@ const Record = require('../../../../common/record/record')
 const RecordRepository = require('../../../record/recordRepository')
 const NodeRepository = require('../../../record/nodeRepository')
 
+const DependentNodesUpdater = require('./dependentNodesUpdater')
+
 const ActivityLog = require('../../../activityLog/activityLogger')
 
 class RecordProcessor {
 
-  constructor (preview) {
+  constructor (nodesUpdateListener, preview) {
+    this.nodesUpdateListener = nodesUpdateListener
     this.preview = preview
   }
 
@@ -35,6 +38,7 @@ class RecordProcessor {
 
     const rootNodeDef = Survey.getRootNodeDef(survey)
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(recordToCreate))
+
     return await this.persistNode(user, survey, rootNode, t)
   }
 
@@ -45,14 +49,20 @@ class RecordProcessor {
 
     const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)
 
+    let updatedNodes
+
     if (nodeDb) {
       // update
       await this.logActivity(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
-      return await this._updateNodeValue(surveyId, uuid, Node.getNodeValue(node), t)
+      updatedNodes = await this._updateNodeValue(surveyId, uuid, Node.getNodeValue(node), t)
     } else {
       // create
-      return await this._insertNode(survey, node, user, t)
+      updatedNodes = await this._insertNode(survey, node, user, t)
     }
+
+    this._notifyNodesUpdate(updatedNodes)
+
+    return this._updateDependentNodes(user, survey, updatedNodes, t)
   }
 
   async deleteNode (user, survey, nodeUuid, t) {
@@ -62,7 +72,11 @@ class RecordProcessor {
 
     await this.logActivity(user, surveyId, ActivityLog.type.nodeDelete, {nodeUuid}, t)
 
-    return await this._onNodeUpdate(surveyId, node, t)
+    const updatedNodes = await this._onNodeUpdate(surveyId, node, t)
+
+    this._notifyNodesUpdate(updatedNodes)
+
+    return this._updateDependentNodes(user, survey, updatedNodes, t)
   }
 
   //==========
@@ -115,6 +129,19 @@ class RecordProcessor {
       descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, nodeCode.uuid, t))
     )
     return await assocParentNode(surveyId, node, SurveyUtils.toUuidIndexedObj(nodesToReturn), t)
+  }
+
+  // ==== UTILS
+
+  _notifyNodesUpdate (nodes) {
+    if (!R.isEmpty(nodes))
+      this.nodesUpdateListener(nodes)
+  }
+
+  async _updateDependentNodes (user, survey, nodes, t) {
+    const updatedDependentNodes = await DependentNodesUpdater.updateDependentNodes(user, survey, nodes, t)
+    this._notifyNodesUpdate(updatedDependentNodes)
+    return R.mergeRight(nodes, updatedDependentNodes)
   }
 }
 

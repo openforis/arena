@@ -16,8 +16,6 @@ const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
 const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
 
-const DependentNodesUpdater = require('./dependentNodesUpdater')
-
 class RecordUpdateThread extends Thread {
 
   constructor (paramsObj) {
@@ -26,7 +24,7 @@ class RecordUpdateThread extends Thread {
     this.queue = new Queue()
     this.processing = false
     this.preview = R.propOr(false, 'preview', this.params)
-    this.processor = new RecordProcessor(this.preview)
+    this.processor = new RecordProcessor(this._postMessage.bind(this), this.preview)
   }
 
   async getSurvey (tx) {
@@ -62,37 +60,26 @@ class RecordUpdateThread extends Thread {
 
   async processMessage (msg) {
     await db.tx(async t => {
-      const {user} = msg
 
+      const user = this.getUser()
       const survey = await this.getSurvey(t)
 
-      let nodes = null
+      let updatedNodes = null
 
-      // 1. update nodes
+      // 1. update node and dependent nodes
       switch (msg.type) {
         case messageTypes.createRecord:
-          nodes = await this.processor.createRecord(user, survey, msg.record, t)
+          updatedNodes = await this.processor.createRecord(user, survey, msg.record, t)
           break
         case messageTypes.persistNode:
-          nodes = await this.processor.persistNode(user, survey, msg.node, t)
+          updatedNodes = await this.processor.persistNode(user, survey, msg.node, t)
           break
         case messageTypes.deleteNode:
-          nodes = await this.processor.deleteNode(user, survey, msg.nodeUuid, t)
+          updatedNodes = await this.processor.deleteNode(user, survey, msg.nodeUuid, t)
           break
       }
 
-      this._postMessage(nodes)
-
-      // 2. update applicable, defaultValues of dependent nodes
-      const updatedDependentNodes = await DependentNodesUpdater.updateDependentNodes(user, survey, nodes, t)
-
-      if (!R.isEmpty(updatedDependentNodes))
-        this._postMessage(updatedDependentNodes)
-
-      const updatedNodes = R.mergeRight(nodes, updatedDependentNodes)
-
-      //3. update survey rdb
-
+      //2. update survey rdb
       if (!this.preview) {
         const nodeDefs = toUuidIndexedObj(
           Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey)
