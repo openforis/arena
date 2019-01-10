@@ -24,9 +24,9 @@ class DefaultValuesUpdater {
     for (const defaultValue of NodeDef.getDefaultValues(nodeDef)) {
       const applyIfExpr = NodeDefExpression.getApplyIf(defaultValue)
 
-      if (StringUtils.isBlank(applyIfExpr) || await RecordExprParser.evalNodeQuery(node, applyIfExpr)) {
+      if (StringUtils.isBlank(applyIfExpr) || await RecordExprParser.evalNodeQuery(survey, node, applyIfExpr, tx)) {
 
-        const value = await RecordExprParser.evalNodeQuery(node, NodeDefExpression.getExpression(defaultValue))
+        const value = await RecordExprParser.evalNodeQuery(survey, node, NodeDefExpression.getExpression(defaultValue), tx)
 
         const oldValue = Node.getNodeValue(node)
         if (oldValue !== value) {

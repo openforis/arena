@@ -13,7 +13,7 @@ import TaxonomiesView from '../surveyForm/components/taxonomiesView'
 import { initSurveyDefs } from '../../survey/actions'
 import { resetForm } from '../surveyForm/actions'
 import { appModules, appModuleUri } from '../appModules'
-import { dashboardModules } from '../dashboard/dashboardModules'
+import { designerModules } from './designerModules'
 import { getUser } from '../../app/appState'
 import { getStateSurveyInfo } from '../../survey/surveyState'
 
@@ -47,15 +47,14 @@ class DesignerView extends React.Component {
           {
             label: 'Form Designer',
             component: SurveyFormView,
-            path: appModuleUri(dashboardModules.formDesigner),
+            path: appModuleUri(designerModules.formDesigner),
             props: {edit: true, draft: true, canEdit},
           },
 
           {
             label: 'Form preview',
             component: RecordView,
-            // TODO recordUuid is there for testing purposes - will be deleted
-            path: `${appModuleUri(dashboardModules.formDesigner)}preview`,
+            path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
             props: {edit: true, draft: true, canEdit, preview: true},
             showTab: false,
           },
@@ -63,13 +62,13 @@ class DesignerView extends React.Component {
           {
             label: 'Categories',
             component: Categories,
-            path: appModuleUri(dashboardModules.categories)
+            path: appModuleUri(designerModules.categories)
           },
 
           {
             label: 'Taxonomies',
             component: TaxonomiesView,
-            path: appModuleUri(dashboardModules.taxonomies)
+            path: appModuleUri(designerModules.taxonomies)
           },
 
         ]}

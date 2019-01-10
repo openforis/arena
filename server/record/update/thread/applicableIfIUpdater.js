@@ -32,7 +32,7 @@ class ApplicableIfUpdater {
       const surveyId = Survey.getSurveyInfo(survey).id
       const parentNode = await this.nodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), tx)
 
-      const newApplicability = await this._isApplicable(survey, node)
+      const newApplicability = await this._isApplicable(survey, node, tx)
 
       if (newApplicability !== Node.isChildApplicable(Node.getNodeDefUuid(node))(parentNode)) {
         await this.nodeRepository.updateChildrenApplicability(surveyId, Node.getParentUuid(node), NodeDef.getUuid(nodeDef), newApplicability, tx)
@@ -43,7 +43,7 @@ class ApplicableIfUpdater {
     return {}
   }
 
-  async _isApplicable (survey, node) {
+  async _isApplicable (survey, node, client) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const applicableIfExpr = R.pipe(
       NodeDef.getApplicable,
@@ -53,7 +53,7 @@ class ApplicableIfUpdater {
 
     return StringUtils.isBlank(applicableIfExpr)
       ? true
-      : await RecordExprParser.evalNodeQuery(node, applicableIfExpr)
+      : await RecordExprParser.evalNodeQuery(survey, node, applicableIfExpr, client)
   }
 
 }

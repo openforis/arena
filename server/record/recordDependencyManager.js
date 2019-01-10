@@ -9,16 +9,14 @@ const NodeDefRepository = require('../nodeDef/nodeDefRepository')
 
 class RecordDependencyManager {
 
-  constructor (nodeRepository, nodeBindFunction) {
+  constructor (nodeRepository) {
     this.nodeRepository = nodeRepository
-    this.nodeBindFunction = nodeBindFunction
   }
 
   async fetchDependentNodesByNode (survey, node, dependencyType, tx) {
     const surveyId = Survey.getSurveyInfo(survey).id
 
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-
     const dependentUuids = await SurveyRepository.fetchDepedenciesByNodeDefUuid(surveyId, dependencyType, nodeDef.uuid, tx)
 
     if (dependentUuids) {
@@ -40,7 +38,6 @@ class RecordDependencyManager {
       return R.pipe(
         R.flatten,
         R.uniq,
-        R.map(n => this.nodeBindFunction(survey, n, tx)),
       )(dependentsPerDef)
     } else {
       return []

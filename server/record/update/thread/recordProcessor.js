@@ -9,7 +9,6 @@ const Record = require('../../../../common/record/record')
 const RecordRepository = require('../../../record/recordRepository')
 const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const NodeRepository = require('../../../record/nodeRepository')
-const inMemoryNodeRepository = require('./inMemoryNodeRepository')
 
 const ActivityLog = require('../../../activityLog/activityLogger')
 
@@ -17,8 +16,6 @@ class RecordProcessor {
 
   constructor (preview) {
     this.preview = preview
-    this.recordPreview = preview ? {uuid: 'preview'} : null
-    this.nodeRepository = preview ? inMemoryNodeRepository : NodeRepository
   }
 
   isPreview () {
@@ -31,25 +28,18 @@ class RecordProcessor {
   }
 
   async createRecord (user, surveyId, recordToCreate, t) {
-    const {uuid} = recordToCreate
-
-    if (!this.isPreview()) {
-      await RecordRepository.insertRecord(surveyId, recordToCreate, t)
-      await this.logActivity(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
-    }
+    await RecordRepository.insertRecord(surveyId, recordToCreate, t)
+    await this.logActivity(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
 
     const rootNodeDef = await NodeDefRepository.fetchRootNodeDef(surveyId, false, t)
-    const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), uuid)
-
+    const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(recordToCreate))
     return await this.persistNode(user, surveyId, rootNode, t)
   }
 
   async persistNode (user, surveyId, node, t) {
     const {uuid} = node
 
-    const nodeDb = this.isPreview()
-      ? Record.getNodeByUuid(uuid)(this.recordPreview)
-      : await this.nodeRepository.fetchNodeByUuid(surveyId, uuid, t)
+    const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)
 
     if (nodeDb) {
       // update
@@ -62,9 +52,7 @@ class RecordProcessor {
   }
 
   async deleteNode (user, surveyId, nodeUuid, t) {
-    const node = this.isPreview()
-      ? {uuid: nodeUuid, deleted: true, value: {}}
-      : await this.nodeRepository.deleteNode(surveyId, nodeUuid, t)
+    const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
     await this.logActivity(user, surveyId, ActivityLog.type.nodeDelete, {nodeUuid}, t)
 
@@ -78,7 +66,7 @@ class RecordProcessor {
   //always assoc parentNode, used in surveyRdbManager.updateTableNodes
   async _assocParentNode (surveyId, node, nodes, t) {
     const parentUuid = Node.getParentUuid(node)
-    const parentNode = parentUuid && !nodes[parentUuid] ? await this.nodeRepository.fetchNodeByUuid(surveyId, parentUuid, t) : null
+    const parentNode = parentUuid && !nodes[parentUuid] ? await NodeRepository.fetchNodeByUuid(surveyId, parentUuid, t) : null
     return R.mergeRight({
         [node.uuid]: node,
         ...parentNode ? {[parentNode.uuid]: parentNode} : {}
@@ -98,11 +86,11 @@ class RecordProcessor {
     await this.logActivity(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
 
     // insert node
-    const node = await this.nodeRepository.insertNode(surveyId, nodeToInsert, t)
+    const node = await NodeRepository.insertNode(surveyId, nodeToInsert, t)
 
     // add children if entity
     const childDefs = NodeDef.isNodeDefEntity(nodeDef)
-      ? await NodeDefRepository.fetchNodeDefsByParentUuid(surveyId, nodeDef.uuid)
+      ? await NodeDefRepository.fetchNodeDefsByParentUuid(surveyId, nodeDef.uuid, this.preview)
       : []
     // insert only child single entities
     const childNodes = R.mergeAll(
@@ -120,15 +108,15 @@ class RecordProcessor {
   // ==== UPDATE
 
   async _updateNodeValue (surveyId, nodeUuid, value, t) {
-    const node = await this.nodeRepository.updateNode(surveyId, nodeUuid, value, t)
+    const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, t)
     return await this._onNodeUpdate(surveyId, node, t)
   }
 
   async _onNodeUpdate (surveyId, node, t) {
     // delete dependent code nodes
-    const descendantCodes = await this.nodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordUuid, node.uuid)
+    const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordUuid, node.uuid)
     const nodesToReturn = await Promise.all(
-      descendantCodes.map(async nodeCode => await this.nodeRepository.deleteNode(surveyId, nodeCode.uuid, t))
+      descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, nodeCode.uuid, t))
     )
     return await this._assocParentNode(surveyId, node, SurveyUtils.toUuidIndexedObj(nodesToReturn), t)
   }

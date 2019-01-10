@@ -7,22 +7,23 @@ const RecordDependencyManager = require('../../recordDependencyManager')
 const DefaultValuesUpdater = require('./defaultValuesUpdater')
 const ApplicableIfUpdater = require('./applicableIfIUpdater')
 
+const NodeRepository = require('../../../record/nodeRepository')
+
 /**
  * Class responsible for updating applicable and default values
  */
 class DependentNodesUpdater {
 
-  constructor (survey, nodeRepository, nodeBindFunction) {
+  constructor (survey) {
     this.survey = survey
-    this.nodeBindFunction = nodeBindFunction
 
-    this.recordDependencyManager = new RecordDependencyManager(nodeRepository, nodeBindFunction)
-    this.defaultValuesUpdater = new DefaultValuesUpdater(nodeRepository)
-    this.applicableIfUpdater = new ApplicableIfUpdater(nodeRepository)
+    this.recordDependencyManager = new RecordDependencyManager(NodeRepository)
+    this.defaultValuesUpdater = new DefaultValuesUpdater(NodeRepository)
+    this.applicableIfUpdater = new ApplicableIfUpdater(NodeRepository)
   }
 
   async updateDependentNodes (user, nodes, t) {
-    let nodesToVisit = R.clone(nodes)
+    let nodesToVisit = nodes
     let allUpdatedNodes = {}
     let lastUpdatedNodes = {}
 
@@ -38,14 +39,9 @@ class DependentNodesUpdater {
   }
 
   async _updateDependentNodesInternal (user, nodes, t) {
-
-    const boundNodes = R.pipe(
-      R.values,
-      R.map(node => this.nodeBindFunction(this.survey, node, t))
-    )(nodes)
-
-    const nodesApplicability = await this.updateApplicability(user, boundNodes, t)
-    const nodesDefaultValues = await this.applyDefaultValues(user, boundNodes, t)
+    const nodesArray = R.values(nodes)
+    const nodesApplicability = await this.updateApplicability(user, nodesArray, t)
+    const nodesDefaultValues = await this.applyDefaultValues(user, nodesArray, t)
 
     return R.mergeRight(nodesApplicability, nodesDefaultValues)
   }

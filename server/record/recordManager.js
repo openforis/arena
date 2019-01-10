@@ -5,9 +5,9 @@ const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
 const FileManager = require('../file/fileManager')
 
+const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 const File = require('../../common/file/file')
-const {preview} = require('../../common/record/record')
 
 const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
 
@@ -36,25 +36,10 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
 }
 
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) => {
-  if (recordUuid === preview) {
-    return {
-      uuid: preview,
-      nodes: {
-        'root': {
-          parentUuid: null,
-          recordUuid: 'preview',
-          uuid: 'root',
-          value: null,
-        }
-      }
-    }
-  } else {
-    const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
 
-    const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
-
-    return {...record, nodes: toUuidIndexedObj(nodes)}
-  }
+  return {...record, nodes: toUuidIndexedObj(nodes)}
 }
 
 /**
@@ -103,14 +88,9 @@ const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(
  * ==================
  */
 const checkInRecord = async (user, surveyId, recordUuid) => {
-  RecordUpdateManager.checkIn(user, surveyId, recordUuid === preview)
-
-  return await fetchRecordByUuid(surveyId, recordUuid)
-
-  // return !preview ?
-  //   return await fetchRecordByUuid(surveyId, recordUuid, preview)
-  //   :
-  //   {uuid: preview}
+  const record = await fetchRecordByUuid(surveyId, recordUuid)
+  RecordUpdateManager.checkIn(user, surveyId, Record.isPreview(record))
+  return record
 }
 
 const checkOutRecord = RecordUpdateManager.checkOut

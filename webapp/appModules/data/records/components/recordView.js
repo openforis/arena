@@ -25,7 +25,7 @@ class RecordView extends React.Component {
   componentDidMount () {
     const {checkInRecord, recordUuidUrlParam} = this.props
 
-    checkInRecord(recordUuidUrlParam || Record.preview) // TODO preview user constant instead of 'preview'
+    checkInRecord(recordUuidUrlParam)
 
     window.addEventListener('beforeunload', this.componentUnload)
   }

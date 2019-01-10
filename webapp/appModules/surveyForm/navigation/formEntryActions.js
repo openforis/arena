@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { deleteRecord } from '../record/actions'
 import { appModuleUri } from '../../appModules'
-import { dashboardModules } from '../../dashboard/dashboardModules'
+import { designerModules } from '../../designer/designerModules'
 
 const FormEntryActions = ({entry, preview, deleteRecord}) => (
   entry && (
@@ -23,9 +23,9 @@ const FormEntryActions = ({entry, preview, deleteRecord}) => (
             Delete
           </button>
           :
-          <Link to={appModuleUri(dashboardModules.formDesigner)} className="btn btn-of">
+          <Link to={appModuleUri(designerModules.formDesigner)} className="btn btn-of">
             <span className="icon icon-quill icon-12px icon-left"/>
-            Design
+            Close preview
           </Link>
       }
     </div>

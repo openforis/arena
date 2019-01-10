@@ -6,23 +6,25 @@ const SurveyUtils = require('../survey/surveyUtils')
 const NodeDef = require('../survey/nodeDef')
 const Node = require('../record/node')
 
-// ====== UTILS
-const nodes = 'nodes'
-const preview = 'preview'
 
+const keys = {
+  nodes: 'nodes',
+  preview: 'preview',
+}
 // ====== CREATE
 
-const newRecord = (user, step) => {
+const newRecord = (user, step, preview = false) => {
   return {
     uuid: uuidv4(),
     ownerId: user.id,
     step,
+    preview
   }
 }
 
 // ====== READ
 const getNodes = R.pipe(
-  R.prop(nodes),
+  R.prop(keys.nodes),
   R.defaultTo({}),
 )
 
@@ -60,7 +62,7 @@ const getRootNode = R.pipe(
   R.find(R.propEq('parentUuid', null)),
 )
 
-const getNodeByUuid = uuid => R.path([nodes, uuid])
+const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
 
 const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
 
@@ -135,9 +137,6 @@ const deleteNode = node =>
       )
   }
 
-// ====== UTILS
-const isPreviewRecord = R.propEq('uuid', preview)
-
 module.exports = {
   // ====== CREATE
   newRecord,
@@ -152,6 +151,8 @@ module.exports = {
   getNodeByUuid,
   getParentNode,
 
+  isPreview: R.propEq(keys.preview, true),
+
   // testing
   getCodeUuidsHierarchy: getCodeUuidsHierarchy,
   getParentCodeAttribute,
@@ -162,8 +163,4 @@ module.exports = {
   // ====== DELETE
 
   deleteNode,
-
-  // ====== UTILS
-  preview,
-  isPreviewRecord,
 }

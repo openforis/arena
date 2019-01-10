@@ -1,39 +1,22 @@
 import React from 'react'
+import { compose } from 'redux'
+import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import connect from 'react-redux/es/connect/connect'
 
-import axios from 'axios'
+import { createRecord } from './../../surveyForm/record/actions'
 
-import { appModuleUri } from '../../appModules'
-import { dashboardModules } from '../../dashboard/dashboardModules'
-import { getUser } from '../../../app/appState'
-import { getSurvey } from '../../../survey/surveyState'
-import Survey from '../../../../common/survey/survey'
-import { preview } from '../../../../common/record/record'
+const FormEditActions = ({history, createRecord}) => (
+  <div className="survey-form__nav-record-actions">
+    <button className="btn btn-of" onClick={() => createRecord(history, true)}>
+      <span className="icon icon-eye icon-12px icon-left"/>
+      Preview
+    </button>
+  </div>
+)
 
-class FormEditActions extends React.Component {
-  render () {
-    return <div className="survey-form__nav-record-actions">
-      <div className="btn btn-of" onClick={() => this.previewRecord()}>
-        <span className="icon icon-eye icon-12px icon-left"/>
-        Preview
-      </div>
-    </div>
-  }
+const enhance = compose(
+  withRouter,
+  connect(null, {createRecord})
+)
 
-  async previewRecord () {
-    const {history, user} = this.props
-    const surveyId = this.props.surveyInfo.id
-
-    await axios.post(`/api/survey/${surveyId}/record`, {uuid: preview, ownerId: user.id})
-
-    history.push(`${appModuleUri(dashboardModules.formDesigner)}preview`)
-  }
-}
-
-const mapStateToProps = state => ({
-  user: getUser(state),
-  surveyInfo: Survey.getSurveyInfo(getSurvey(state)),
-})
-
-export default withRouter(connect(mapStateToProps)(FormEditActions))
+export default enhance(FormEditActions)

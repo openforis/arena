@@ -4,8 +4,8 @@ import axios from 'axios'
 import { debounceAction } from '../../../appUtils/reduxUtils'
 
 import Survey from '../../../../common/survey/survey'
-import { newRecord } from '../../../../common/record/record'
-import { newNodePlaceholder } from '../../../../common/record/node'
+import Record from '../../../../common/record/record'
+import Node from '../../../../common/record/node'
 
 import { getStateSurveyId, getStateSurveyInfo } from '../../../survey/surveyState'
 import { getUser } from '../../../app/appState'
@@ -14,6 +14,7 @@ import { getSurveyForm } from '../surveyFormState'
 
 import { appModuleUri } from '../../appModules'
 import { dataModules } from '../../data/dataModules'
+import { designerModules } from '../../designer/designerModules'
 
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
@@ -31,21 +32,22 @@ export const recordNodesUpdate = nodes =>
  * CREATE
  * ============
  */
-export const createRecord = (history) => async (dispatch, getState) => {
+export const createRecord = (history, preview = false) => async (dispatch, getState) => {
   const state = getState()
   const user = getUser(state)
   const surveyInfo = getStateSurveyInfo(state)
 
-  const record = newRecord(user, Survey.getDefaultStep(surveyInfo))
+  const record = Record.newRecord(user, Survey.getDefaultStep(surveyInfo), preview)
 
   await axios.post(`/api/survey/${surveyInfo.id}/record`, record)
 
-  history.push(appModuleUri(dataModules.record) + record.uuid)
+  const moduleUri = appModuleUri(preview ? designerModules.recordPreview : dataModules.record)
+  history.push(moduleUri + record.uuid)
 }
 
 export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
   dispatch => {
-    const node = newNodePlaceholder(nodeDef, parentNode, defaultValue)
+    const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
     recordNodesUpdate({[node.uuid]: node})(dispatch)
   }
 /**

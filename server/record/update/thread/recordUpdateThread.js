@@ -22,19 +22,18 @@ const DependentNodesUpdater = require('./dependentNodesUpdater')
 
 class RecordUpdateThread extends Thread {
 
-  constructor (params) {
-    super(params)
+  constructor (paramsObj) {
+    super(paramsObj)
 
     this.queue = new Queue()
     this.processing = false
-    this.preview = R.propOr(false, 'preview', params)
+    this.preview = R.propOr(false, 'preview', this.params)
     this.processor = new RecordProcessor(this.preview)
   }
 
   async getSurvey (tx) {
     if (!this.survey)
       this.survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.preview, true, false, tx)
-
     return this.survey
   }
 
@@ -87,7 +86,7 @@ class RecordUpdateThread extends Thread {
       const survey = await this.getSurvey(t)
 
       // 2. update applicable, defaultValues of dependent nodes
-      const updatedDependentNodes = await new DependentNodesUpdater(survey, NodeRepository, bindNode)
+      const updatedDependentNodes = await new DependentNodesUpdater(survey, NodeRepository)
         .updateDependentNodes(user, nodes, t)
 
       if (!R.isEmpty(updatedDependentNodes))
@@ -102,31 +101,6 @@ class RecordUpdateThread extends Thread {
         await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodes, t)
       }
     })
-  }
-}
-
-const bindNode = (survey, node, tx) => {
-  const surveyId = Survey.getSurveyInfo(survey).id
-
-  return {
-    ...node,
-
-    parent: async () => bindNode(survey, await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), tx), tx),
-
-    node: async name => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const childDef = Survey.getNodeDefChildByName(nodeDef, name)(survey)
-      const child = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), node.uuid, childDef.uuid, tx)
-      return child ? bindNode(survey, child, tx) : null
-    },
-
-    sibling: async name => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
-      const childDef = Survey.getNodeDefChildByName(parentDef, name)(survey)
-      const sibling = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getParentUuid(node), childDef.uuid, tx)
-      return sibling ? bindNode(survey, sibling, tx) : null
-    }
   }
 }
 
