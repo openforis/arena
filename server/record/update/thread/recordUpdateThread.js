@@ -97,7 +97,9 @@ class RecordUpdateThread extends Thread {
       //3. update survey rdb
 
       if (!this.preview) {
-        const nodeDefs = toUuidIndexedObj(Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey))
+        const nodeDefs = toUuidIndexedObj(
+          Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey)
+        )
         await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodes, t)
       }
     })
