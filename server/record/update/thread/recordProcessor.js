@@ -108,11 +108,11 @@ class RecordProcessor {
         childDefs
           .filter(NodeDef.isNodeDefSingle)
           .map(async childDef =>
-            await this._insertNodeRecursively(survey, childDef, Node.newNode(childDef.uuid, node.recordUuid, node.uuid), user, t)
+            await this._insertNodeRecursively(survey, childDef, Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), Node.getUuid(node)), user, t)
           )
       )
     )
-    return R.mergeLeft({[node.uuid]: node}, childNodes)
+    return R.mergeLeft({[Node.getUuid(node)]: node}, childNodes)
   }
 
   // ==== UPDATE
@@ -124,9 +124,9 @@ class RecordProcessor {
 
   async _onNodeUpdate (surveyId, node, t) {
     // delete dependent code nodes
-    const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, node.recordUuid, node.uuid, t)
+    const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, Node.getRecordUuid(node), Node.getUuid(node), t)
     const nodesToReturn = await Promise.all(
-      descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, nodeCode.uuid, t))
+      descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t))
     )
     return await assocParentNode(surveyId, node, SurveyUtils.toUuidIndexedObj(nodesToReturn), t)
   }
@@ -150,8 +150,8 @@ const assocParentNode = async (surveyId, node, nodes, t) => {
   const parentUuid = Node.getParentUuid(node)
   const parentNode = parentUuid && !nodes[parentUuid] ? await NodeRepository.fetchNodeByUuid(surveyId, parentUuid, t) : null
   return R.mergeRight({
-      [node.uuid]: node,
-      ...parentNode ? {[parentNode.uuid]: parentNode} : {}
+      [Node.getUuid(node)]: node,
+      ...parentNode ? {[Node.getUuid(parentNode)]: parentNode} : {}
     },
     nodes
   )

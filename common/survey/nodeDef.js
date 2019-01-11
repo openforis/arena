@@ -25,6 +25,7 @@ const nodeDefType = {
 const keys = {
   props: 'props',
   validation: 'validation',
+  meta: 'meta',
 }
 
 const propKeys = {
@@ -46,6 +47,10 @@ const propKeys = {
   parentCodeDefUuid: 'parentCodeDefUuid',
   //taxon
   taxonomyUuid: 'taxonomyUuid'
+}
+
+const metaKeys = {
+  h: 'h',
 }
 
 const maxKeyAttributes = 3
@@ -96,6 +101,9 @@ const getNodeDefLabel = (nodeDef, lang) => {
 }
 
 const getValidations = SurveyUtils.getProp(propKeys.validations, {})
+
+// ==== READ meta
+const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
 // ==== UPDATE
 
@@ -189,6 +197,9 @@ module.exports = {
     getValidations,
     NodeDefValidations.getExpressions,
   ),
+
+  // meta
+  getMetaHierarchy,
 
   //UTILS
   canNodeDefBeMultiple,

@@ -1,4 +1,5 @@
 const Survey = require('../../common/survey/survey')
+const NodeDef = require('../../common/survey/nodeDef')
 const Node = require('../../common/record/node')
 const Expression = require('../../common/exprParser/expression')
 const NodeRepository = require('./nodeRepository')
@@ -14,7 +15,7 @@ const evalNodeQuery = async (survey, node, query, client) => {
 }
 
 const bindNode = (survey, node, tx) => {
-  const surveyId = Survey.getSurveyInfo(survey).id
+  const surveyId = Survey.getId(survey)
 
   return {
     ...node,
@@ -24,7 +25,7 @@ const bindNode = (survey, node, tx) => {
     node: async name => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       const childDef = Survey.getNodeDefChildByName(nodeDef, name)(survey)
-      const child = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), node.uuid, childDef.uuid, tx)
+      const child = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getUuid(node), NodeDef.getUuid(childDef), tx)
       return child ? bindNode(survey, child, tx) : null
     },
 
@@ -32,7 +33,7 @@ const bindNode = (survey, node, tx) => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
       const childDef = Survey.getNodeDefChildByName(parentDef, name)(survey)
-      const sibling = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getParentUuid(node), childDef.uuid, tx)
+      const sibling = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getParentUuid(node), NodeDef.getUuid(childDef), tx)
       return sibling ? bindNode(survey, sibling, tx) : null
     }
   }

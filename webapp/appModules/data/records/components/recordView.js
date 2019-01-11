@@ -52,7 +52,7 @@ class RecordView extends React.Component {
   render () {
     const {recordUuid, preview} = this.props
 
-    return recordUuid || preview
+    return recordUuid
       ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true}/>
       : null
   }

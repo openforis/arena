@@ -30,7 +30,7 @@ const updateNodeApplicability = async (survey, node, tx) => {
 
     if (newApplicability !== Node.isChildApplicable(Node.getNodeDefUuid(node))(parentNode)) {
       await NodeRepository.updateChildrenApplicability(surveyId, Node.getParentUuid(node), NodeDef.getUuid(nodeDef), newApplicability, tx)
-      return toUuidIndexedObj(await NodeRepository.fetchChildNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), parentNode.uuid, Node.getNodeDefUuid(node), tx))
+      return toUuidIndexedObj(await NodeRepository.fetchChildNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getUuid(parentNode), Node.getNodeDefUuid(node), tx))
     }
   }
   return {}

@@ -1,5 +1,6 @@
 const R = require('ramda')
 
+const Node = require('../../../../common/record/node')
 const {dependencyTypes} = require('../../../survey/surveyDependenchyGraph')
 
 const RecordDependencyManager = require('./recordDependencyManager')
@@ -19,7 +20,7 @@ const updateDependentNodes = async (user, survey, nodes, t) => {
   while (!R.isEmpty(nodesToVisit)) {
     lastUpdatedNodes = await updateDependentNodesInternal(user, survey, nodesToVisit, t)
 
-    nodesToVisit = R.reject(node => R.includes(node.uuid, R.keys(allUpdatedNodes)))(lastUpdatedNodes)
+    nodesToVisit = R.reject(node => R.includes(Node.getUuid(node), R.keys(allUpdatedNodes)))(lastUpdatedNodes)
 
     allUpdatedNodes = R.mergeRight(allUpdatedNodes, lastUpdatedNodes)
   }
