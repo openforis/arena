@@ -34,7 +34,7 @@ CREATE TABLE
   owner_id     bigint      NOT NULL,
   step         varchar(63) NOT NULL,
   date_created TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
-  preview      boolean DEFAULT TRUE,
+  preview      boolean     DEFAULT FALSE,
 
   PRIMARY KEY (id),
   CONSTRAINT record_uuid_idx UNIQUE (uuid),
