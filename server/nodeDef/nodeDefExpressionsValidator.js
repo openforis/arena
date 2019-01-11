@@ -62,7 +62,7 @@ const validateExpression = async (survey, nodeDef, nodeDefExpression) => {
       [NodeDefExpression.keys.applyIf]: [validateExpressionProp(survey, nodeDef)]
     }
   )
-  return validation.valid ? validation : null
+  return validation
 }
 
 const validate = async (survey, nodeDef, nodeDefExpressions) => {
