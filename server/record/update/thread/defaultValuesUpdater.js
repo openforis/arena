@@ -10,52 +10,47 @@ const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
 const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 
 const RecordExprParser = require('../../../record/recordExprParser')
+const NodeRepository = require('../../../record/nodeRepository')
 
-class DefaultValuesUpdater {
+const applyDefaultValue = async (user, survey, node, tx) => {
+  const surveyId = Survey.getSurveyInfo(survey).id
+  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
-  constructor (nodeRepository) {
-    this.nodeRepository = nodeRepository
-  }
+  for (const defaultValue of NodeDef.getDefaultValues(nodeDef)) {
+    const applyIfExpr = NodeDefExpression.getApplyIf(defaultValue)
 
-  async applyDefaultValue (user, survey, node, tx) {
-    const surveyId = Survey.getSurveyInfo(survey).id
-    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+    if (StringUtils.isBlank(applyIfExpr) || await RecordExprParser.evalNodeQuery(survey, node, applyIfExpr, tx)) {
 
-    for (const defaultValue of NodeDef.getDefaultValues(nodeDef)) {
-      const applyIfExpr = NodeDefExpression.getApplyIf(defaultValue)
+      const value = await RecordExprParser.evalNodeQuery(survey, node, NodeDefExpression.getExpression(defaultValue), tx)
+      const oldValue = Node.getNodeValue(node)
 
-      if (StringUtils.isBlank(applyIfExpr) || await RecordExprParser.evalNodeQuery(node, applyIfExpr)) {
+      return R.equals(oldValue, value)
+        ? {}
+        : toUuidIndexedObj([await NodeRepository.updateNode(surveyId, Node.getUuid(node), value, {[Node.metaKeys.defaultValue]: true}, tx)])
 
-        const value = await RecordExprParser.evalNodeQuery(node, NodeDefExpression.getExpression(defaultValue))
-
-        const oldValue = Node.getNodeValue(node)
-        if (oldValue !== value) {
-          console.log(`apply default value ${value} to node ${NodeDef.getNodeDefName(nodeDef)}`)
-          return toUuidIndexedObj([await this.nodeRepository.updateNode(surveyId, Node.getUuid(node), value, {[Node.metaKeys.defaultValue]: true}, tx)])
-        }
-      }
     }
-    return {}
   }
-
-  async applyDefaultValues (user, survey, nodesArray, tx) {
-    return R.mergeAll(
-      await Promise.all(
-        nodesArray.map(
-          async node => {
-            const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-
-            if (NodeDef.isNodeDefAttribute(nodeDef) &&
-              (Node.isNodeValueBlank(Node.getNodeValue(node, null)) || Node.isDefaultValueApplied(node))
-            ) {
-              return await this.applyDefaultValue(user, survey, node, tx)
-            }
-            return {}
-          }
-        )
-      )
-    )
-  }
+  return {}
 }
 
-module.exports = DefaultValuesUpdater
+const applyDefaultValues = async (user, survey, nodesArray, tx) =>
+  R.mergeAll(
+    await Promise.all(
+      nodesArray.map(
+        async node => {
+          const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+
+          if (NodeDef.isNodeDefAttribute(nodeDef) &&
+            (Node.isNodeValueBlank(Node.getNodeValue(node, null)) || Node.isDefaultValueApplied(node))
+          ) {
+            return await applyDefaultValue(user, survey, node, tx)
+          }
+          return {}
+        }
+      )
+    )
+  )
+
+module.exports = {
+  applyDefaultValues
+}

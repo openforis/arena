@@ -6,4 +6,7 @@ module.exports = {
 
   //READ
   fetchFileByUuid: FileRepository.fetchFileByUuid,
+
+  //DELETE
+  deleteFileByUuid: FileRepository.deleteFileByUuid,
 }

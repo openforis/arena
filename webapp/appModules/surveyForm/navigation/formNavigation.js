@@ -1,20 +1,24 @@
 import React from 'react'
 
 import NodeDefNavigation from './nodeDefNavigation'
-import RecordActions from './recordActions'
+import FormEntryActions from './formEntryActions'
+import FormEditActions from './formEditActions'
 
-const FormNavigation = ({edit, entry}) => {
+const FormNavigation = ({edit, entry, preview}) => {
 
   return (
     <div className="survey-form__nav">
-
       <div className="survey-form__nav-node-def-navigation">
         <NodeDefNavigation edit={edit}
                            level={0}/>
       </div>
 
-      <RecordActions entry={entry}/>
-
+      {
+        edit ?
+          <FormEditActions/>
+          :
+          <FormEntryActions entry={entry} preview={preview}/>
+      }
     </div>
   )
 }

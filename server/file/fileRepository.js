@@ -24,10 +24,22 @@ const fetchFileByUuid = async (surveyId, uuid, client = db) =>
     [uuid]
   )
 
+// ============== DELETE
+const deleteFileByUuid = async (surveyId, uuid, client = db) =>
+  await client.query(`
+    DELETE FROM ${getSurveyDBSchema(surveyId)}.file
+    WHERE uuid = $1`,
+    [uuid]
+  )
+
+
 module.exports = {
   //CREATE
   insertFile,
 
   //READ
   fetchFileByUuid,
+
+  //DELETE
+  deleteFileByUuid
 }

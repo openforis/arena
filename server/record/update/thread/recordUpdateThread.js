@@ -9,37 +9,28 @@ const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
 const SurveyManager = require('../../../survey/surveyManager')
-const NodeDefManager = require('../../../nodeDef/nodeDefManager')
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
-
-const NodeRepository = require('../../../record/nodeRepository')
 
 const Survey = require('../../../../common/survey/survey')
 const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
-
-const DependentNodesUpdater = require('./dependentNodesUpdater')
+const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
 
 class RecordUpdateThread extends Thread {
 
-  constructor (params) {
-    super(params)
+  constructor (paramsObj) {
+    super(paramsObj)
+
     this.queue = new Queue()
     this.processing = false
+    this.preview = R.propOr(false, 'preview', this.params)
+    this.processor = new RecordProcessor(this._postMessage.bind(this), this.preview)
+  }
 
-    // init survey
-    if (this.params.surveyId) {
-      SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.params.surveyId, false, true, false)
-        .then(survey => {
-          this.survey = survey
-
-          /*
-          NodeRepository methods needed:
-          updateNode, updateChildrenApplicability, fetchNodeByUuid, fetchAncestorByNodeDefUuid, fetchDescendantNodesByNodeDefUuid, fetchChildNodesByNodeDefUuid
-           */
-          this.dependentNodesUpdater = new DependentNodesUpdater(this.survey, NodeRepository, bindNode)
-        })
-    }
+  async getSurvey (tx) {
+    if (!this.survey)
+      this.survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.preview, true, false, tx)
+    return this.survey
   }
 
   async onMessage (msg) {
@@ -62,66 +53,40 @@ class RecordUpdateThread extends Thread {
     }
   }
 
+  _postMessage (msg) {
+    if (!isMainThread)
+      this.postMessage(msg)
+  }
+
   async processMessage (msg) {
     await db.tx(async t => {
-      const {user, surveyId} = msg
 
-      let nodes = null
+      const user = this.getUser()
+      const survey = await this.getSurvey(t)
 
+      let updatedNodes = null
+
+      // 1. update node and dependent nodes
       switch (msg.type) {
         case messageTypes.createRecord:
-          nodes = await RecordProcessor.createRecord(user, surveyId, msg.record, t)
+          updatedNodes = await this.processor.createRecord(user, survey, msg.record, t)
           break
         case messageTypes.persistNode:
-          nodes = await RecordProcessor.persistNode(user, surveyId, msg.node, t)
+          updatedNodes = await this.processor.persistNode(user, survey, msg.node, t)
           break
         case messageTypes.deleteNode:
-          nodes = await RecordProcessor.deleteNode(user, surveyId, msg.nodeUuid, t)
+          updatedNodes = await this.processor.deleteNode(user, survey, msg.nodeUuid, t)
           break
       }
 
-      if (!isMainThread)
-        this.postMessage(nodes)
-
-      const updatedDependentNodes = this.dependentNodesUpdater
-        ? await this.dependentNodesUpdater.updateDependentNodes(user, nodes, t)
-        : {}
-
-      if (!R.isEmpty(updatedDependentNodes))
-        this.postMessage(updatedDependentNodes)
-
-      const allUpdatedNodes = R.mergeRight(nodes, updatedDependentNodes)
-
-      //update rdb data tables
-      const nodeDefs = await NodeDefManager.fetchNodeDefsByUuid(surveyId, Node.getNodeDefUuids(allUpdatedNodes), false, false, t)
-      await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(this.survey), nodeDefs, allUpdatedNodes, t)
+      //2. update survey rdb
+      if (!this.preview) {
+        const nodeDefs = toUuidIndexedObj(
+          Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey)
+        )
+        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodes, t)
+      }
     })
-  }
-
-}
-
-const bindNode = (survey, node, tx) => {
-  const surveyId = Survey.getSurveyInfo(survey).id
-
-  return {
-    ...node,
-
-    parent: async () => bindNode(survey, await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), tx), tx),
-
-    node: async name => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const childDef = Survey.getNodeDefChildByName(nodeDef, name)(survey)
-      const child = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), node.uuid, childDef.uuid, tx)
-      return child ? bindNode(survey, child, tx) : null
-    },
-
-    sibling: async name => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
-      const childDef = Survey.getNodeDefChildByName(parentDef, name)(survey)
-      const sibling = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getParentUuid(node), childDef.uuid, tx)
-      return sibling ? bindNode(survey, sibling, tx) : null
-    }
   }
 }
 

@@ -18,11 +18,11 @@ class NodeDefEntitySwitch extends React.Component {
 
   render () {
     const {
+      edit,
       entry,
       surveyInfo,
       nodeDef,
       childDefs,
-      edit,
       nodes,
       parentNode,
       label,
@@ -37,11 +37,11 @@ class NodeDefEntitySwitch extends React.Component {
 
     if (isRenderForm(nodeDef))
       return <NodeDefEntityForm label={label}
-                                entry={entry}
                                 surveyInfo={surveyInfo}
                                 nodeDef={nodeDef}
                                 childDefs={childDefs}
                                 edit={edit}
+                                entry={entry}
                                 nodes={nodes}
                                 parentNode={parentNode}
                                 updateNode={updateNode}
@@ -51,11 +51,11 @@ class NodeDefEntitySwitch extends React.Component {
                                 removeNode={removeNode}/>
     else if (isRenderTable(nodeDef))
       return <NodeDefEntityTable label={label}
-                                 entry={entry}
                                  surveyInfo={surveyInfo}
                                  nodeDef={nodeDef}
                                  childDefs={childDefs}
                                  edit={edit}
+                                 entry={entry}
                                  nodes={nodes}
                                  parentNode={parentNode}
                                  setFormPageNode={setFormPageNode}

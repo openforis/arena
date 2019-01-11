@@ -29,7 +29,7 @@ class Thread {
    * @param msg
    */
   postMessage (msg) {
-    parentPort.postMessage({user: this.user, surveyId: this.surveyId, msg})
+    parentPort.postMessage({user: this.getUser(), surveyId: this.getSurveyId(), msg})
   }
 
   /**
@@ -38,6 +38,14 @@ class Thread {
    */
   async onMessage (msg) {
     //TO OVERRIDE
+  }
+
+  getUser () {
+    return this.params.user
+  }
+
+  getSurveyId () {
+    return this.params.surveyId
   }
 
 }

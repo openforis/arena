@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const SurveyInfo = require('./_internal/surveyInfo')
 const SurveyNodeDefs = require('./_internal/surveyNodeDefs')
 const SurveyCategories = require('./_internal/surveyCategories')
@@ -10,6 +12,7 @@ module.exports = {
   getDefaultAuthGroups: SurveyDefaults.getDefaultAuthGroups,
 
   // READ
+  getId: R.pipe(SurveyInfo.getInfo, R.prop('id')),
   getSurveyInfo: SurveyInfo.getInfo,
 
   // === context is surveyInfo

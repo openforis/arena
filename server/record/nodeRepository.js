@@ -124,7 +124,7 @@ const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
     date_modified = now()
     WHERE uuid = $3
     RETURNING *, true as updated
-    `, [value ? JSON.stringify(value) : null, meta, nodeUuid],
+    `, [R.isNil(value) ? null : JSON.stringify(value), meta, nodeUuid],
     dbTransformCallback
   )
 

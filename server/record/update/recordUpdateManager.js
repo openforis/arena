@@ -1,11 +1,4 @@
 const path = require('path')
-const db = require('../../db/db')
-
-const SurveyManager = require('../../survey/surveyManager')
-const NodeDefManager = require('../../nodeDef/nodeDefManager')
-const SurveyRdbManager = require('../../surveyRdb/surveyRdbManager')
-const Survey = require('../../../common/survey/survey')
-const Node = require('../../../common/record/node')
 
 const WebSocketManager = require('../../webSocket/webSocketManager')
 const WebSocketEvents = require('../../../common/webSocket/webSocketEvents')
@@ -18,14 +11,15 @@ const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 const recordUpdateThreads = new ThreadsCache()
 const checkOutTimeoutsByUserId = {}
 
-// const RecordProcessor = require('./thread/recordProcessor')
+const Record = require('../../../common/record/record')
+
 const RecordUpdateThread = require('./thread/recordUpdateThread')
 
-const createRecordUpdateThread = (user, surveyId) => {
+const createRecordUpdateThread = (user, surveyId, preview) => {
   const userId = user.id
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
-    {user, surveyId},
+    {user, surveyId, preview},
     nodes => WebSocketManager.notifyUser(userId, WebSocketEvents.nodesUpdate, nodes),
     () => recordUpdateThreads.removeThread(userId)
   )
@@ -38,10 +32,10 @@ const createRecordUpdateThread = (user, surveyId) => {
 /**
  * Start record update thread
  */
-const checkIn = (user, surveyId) => {
+const checkIn = (user, surveyId, preview) => {
   cancelCheckOut(user.id)
   if (!recordUpdateThreads.getThread(user.id)) {
-    createRecordUpdateThread(user, surveyId)
+    createRecordUpdateThread(user, surveyId, preview)
   }
 }
 
@@ -78,8 +72,8 @@ const cancelCheckOut = userId => {
  * @returns {Promise<void>}
  */
 const createRecord = async (user, surveyId, record) => {
-  const recordUpdateThread = RecordUpdateThread.newInstance({user, surveyId})
-  await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, user, surveyId, record})
+  const recordUpdateThread = RecordUpdateThread.newInstance({user, surveyId, preview: Record.isPreview(record)})
+  await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, record})
 }
 
 /**
@@ -91,7 +85,7 @@ const createRecord = async (user, surveyId, record) => {
  */
 const persistNode = (user, surveyId, node) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, user, surveyId, node})
+  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, node})
 }
 
 /**
@@ -103,7 +97,7 @@ const persistNode = (user, surveyId, node) => {
  */
 const deleteNode = (user, surveyId, nodeUuid) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, user, surveyId, nodeUuid})
+  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, nodeUuid})
 }
 
 module.exports = {

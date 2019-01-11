@@ -26,6 +26,7 @@ const valuePropKeys = {
 
   // file
   fileName: 'fileName',
+  fileUuid: 'fileUuid',
 
   // taxon
   taxonUuid: 'taxonUuid',
@@ -171,6 +172,7 @@ module.exports = {
 
   // file
   getNodeFileName: getNodeValueProp(valuePropKeys.fileName, ''),
+  getNodeFileUuid: getNodeValueProp(valuePropKeys.fileUuid, ''),
 
   // code
   getCategoryItemUuid: getNodeValueProp(valuePropKeys.itemUuid),

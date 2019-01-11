@@ -3,27 +3,42 @@ const {groupNames} = require('../../auth/authGroups')
 
 const {getProp} = require('../surveyUtils')
 
-const info = 'info'
-const getInfo = R.propOr({}, info)
+const keys = {
+  info: 'info',
+  id: 'id',
+  name: 'name',
+  descriptions: 'descriptions',
+  published: 'published',
+  draft: 'draft',
+  languages: 'languages',
+  srs: 'srs',
+  labels: 'labels',
+  steps: 'steps',
+  authGroups: 'authGroups',
+}
+
+const getInfo = R.propOr({}, keys.info)
 
 // ====== READ surveyInfo
-const getName = getProp('name', '')
+const getId = R.prop(keys.id)
 
-const getDescriptions = getProp('descriptions', {})
+const getName = getProp(keys.name, '')
 
-const isPublished = R.propEq('published', true)
+const getDescriptions = getProp(keys.descriptions, {})
 
-const isDraft = R.propEq('draft', true)
+const isPublished = R.propEq(keys.published, true)
 
-const getLanguages = getProp('languages', [])
+const isDraft = R.propEq(keys.draft, true)
+
+const getLanguages = getProp(keys.languages, [])
 
 const getDefaultLanguage = R.pipe(getLanguages, R.head)
 
-const getSRS = getProp('srs', [])
+const getSRS = getProp(keys.srs, [])
 
 const getDefaultSRS = R.pipe(getSRS, R.head)
 
-const getLabels = getProp('labels', {})
+const getLabels = getProp(keys.labels, {})
 
 const getDefaultLabel = surveyInfo => {
   const labels = getLabels(surveyInfo)
@@ -41,7 +56,7 @@ const getStatus = surveyInfo =>
       : ''
 
 const getDefaultStep = R.pipe(
-  getProp('steps'),
+  getProp(keys.steps),
   R.toPairs,
   R.find(s => !s[1].prev),
   R.head
@@ -53,9 +68,7 @@ const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 // ====== AUTH GROUPS
 
-const authGroups = 'authGroups'
-
-const getAuthGroups = R.prop(authGroups)
+const getAuthGroups = R.prop(keys.authGroups)
 
 const getSurveyAdminGroup = R.pipe(
   getAuthGroups,
@@ -65,6 +78,7 @@ const getSurveyAdminGroup = R.pipe(
 module.exports = {
   getInfo,
 
+  getId,
   isPublished,
   isDraft,
   getName,

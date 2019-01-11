@@ -34,7 +34,7 @@ class NodeDefCoordinate extends React.Component {
   }
 
   render () {
-    const {surveyInfo, nodeDef, nodes, edit, entry, renderType, label} = this.props
+    const {surveyInfo, nodeDef, nodes, edit, entry, renderType} = this.props
 
     const node = entry ? nodes[0] : null
     const value = node ? node.value : getNodeDefDefaultValue(nodeDef)

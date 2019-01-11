@@ -24,6 +24,7 @@ class RecordView extends React.Component {
 
   componentDidMount () {
     const {checkInRecord, recordUuidUrlParam} = this.props
+
     checkInRecord(recordUuidUrlParam)
 
     window.addEventListener('beforeunload', this.componentUnload)
@@ -44,15 +45,15 @@ class RecordView extends React.Component {
   }
 
   componentUnload () {
-    this.props.resetForm()
     this.props.checkOutRecord()
+    this.props.resetForm()
   }
 
   render () {
-    const {recordUuid} = this.props
+    const {recordUuid, preview} = this.props
 
     return recordUuid
-      ? <SurveyFormView draft={false} edit={false} entry={true}/>
+      ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true}/>
       : null
   }
 }

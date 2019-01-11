@@ -6,22 +6,27 @@ const SurveyUtils = require('../survey/surveyUtils')
 const NodeDef = require('../survey/nodeDef')
 const Node = require('../record/node')
 
-// ====== UTILS
-const nodes = 'nodes'
 
+const keys = {
+  nodes: 'nodes',
+  ownerId: 'ownerId',
+  step: 'step',
+  preview: 'preview',
+}
 // ====== CREATE
 
-const newRecord = (user, step) => {
+const newRecord = (user, step, preview = false) => {
   return {
     uuid: uuidv4(),
     ownerId: user.id,
     step,
+    preview
   }
 }
 
 // ====== READ
 const getNodes = R.pipe(
-  R.prop(nodes),
+  R.prop(keys.nodes),
   R.defaultTo({}),
 )
 
@@ -59,7 +64,7 @@ const getRootNode = R.pipe(
   R.find(R.propEq('parentUuid', null)),
 )
 
-const getNodeByUuid = uuid => R.path([nodes, uuid])
+const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
 
 const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
 
@@ -140,6 +145,11 @@ module.exports = {
 
   // ====== READ
   getUuid: SurveyUtils.getUuid,
+  isPreview: R.propEq(keys.preview, true),
+  getOwnerId: R.prop(keys.ownerId),
+  getStep: R.prop(keys.step),
+
+
   getNodes,
   getNodesArray,
   getNodesByDefUuid,

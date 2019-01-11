@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const db = require('../db/db')
 
 const NodeDefRepository = require('../nodeDef/nodeDefRepository')
@@ -5,10 +7,12 @@ const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
 const FileManager = require('../file/fileManager')
 
+const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 const File = require('../../common/file/file')
 
 const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
+const {isBlank} = require('../../common/stringUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
 const ActivityLog = require('../activityLog/activityLogger')
@@ -87,11 +91,36 @@ const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(
  * ==================
  */
 const checkInRecord = async (user, surveyId, recordUuid) => {
-  RecordUpdateManager.checkIn(user, surveyId)
-  return await fetchRecordByUuid(surveyId, recordUuid)
+  const record = await fetchRecordByUuid(surveyId, recordUuid)
+  RecordUpdateManager.checkIn(user, surveyId, Record.isPreview(record))
+  return record
 }
 
-const checkOutRecord = RecordUpdateManager.checkOut
+const checkOutRecord = async (user, surveyId, recordUuid) => {
+  const record = await fetchRecordByUuid(surveyId, recordUuid)
+
+  if (Record.isPreview(record)) {
+    await deleteRecordPreview(user, surveyId, record)
+  }
+
+  RecordUpdateManager.checkOut(user.id)
+}
+
+const deleteRecordPreview = async (user, surveyId, record) =>
+  await db.tx(async t => {
+    const fileUuids = R.pipe(
+      Record.getNodesArray,
+      R.map(Node.getNodeFileUuid),
+      R.reject(isBlank),
+    )(record)
+    // delete record and files
+    await Promise.all([
+        RecordRepository.deleteRecord(user, surveyId, Record.getUuid(record), t),
+        ...fileUuids.map(fileUuid => FileManager.deleteFileByUuid(surveyId, fileUuid, t)),
+      ]
+    )
+
+  })
 
 module.exports = {
   //==== CREATE
