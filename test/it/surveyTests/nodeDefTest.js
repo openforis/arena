@@ -1,10 +1,9 @@
-const {getContextSurvey, fetchFullContextSurvey} = require('./../../testContext')
-const {assert, expect} = require('chai')
+const {getContextSurvey} = require('./../../testContext')
+const {expect} = require('chai')
 const R = require('ramda')
 
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
-const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 
 const NodeDefRepository = require('../../../server/nodeDef/nodeDefRepository')
 
@@ -48,7 +47,11 @@ const updateNodeDefTest = async () => {
   const nodeDef2 = await createNodeDef(rootDef.uuid, NodeDef.nodeDefType.boolean, 'node_def_2')
 
   const newName = 'node_def_1_new'
-  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyInfo.id, nodeDef1.uuid, [{key: 'name', value: newName, advanced: false}])
+  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyInfo.id, nodeDef1.uuid, [{
+    key: 'name',
+    value: newName,
+    advanced: false
+  }])
 
   expect(NodeDef.getNodeDefName(updatedNodeDef)).to.equal(newName)
 
@@ -63,37 +66,7 @@ const updateNodeDefTest = async () => {
   expect(NodeDef.getNodeDefName(reloadedNodeDef2)).to.equal(NodeDef.getNodeDefName(nodeDef2))
 }
 
-const updateNodeDefAdvancedPropsTest = async() => {
-  const survey = await fetchFullContextSurvey()
-  const rootDef = Survey.getRootNodeDef(survey)
-  const nodeDef = Survey.getNodeDefChildByName(rootDef, 'node_def_text')(survey)
-
-  console.log(nodeDef)
-
-  const defaultValue1 = R.pipe(
-    NodeDefExpression.createExpressionPlaceholder(),
-    NodeDefExpression.assocExpression('1'),
-    NodeDefExpression.assocApplyIf('false')
-  )({})
-
-  const defaultValue2 = R.pipe(
-    NodeDefExpression.createExpressionPlaceholder(),
-    NodeDefExpression.assocExpression('2')
-  )({})
-
-  const defaultValues = [defaultValue1, defaultValue2]
-
-  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(Survey.getId(survey), NodeDef.getUuid(nodeDef),
-    [{key: NodeDef.propKeys.defaultValues, value: defaultValues, advanced: true}])
-
-  const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyInfo.id, true, true)
-  const reloadedNodeDef = R.find(R.propEq('uuid', NodeDef.getUuid(updatedNodeDef)))(nodeDefs)
-
-  expect(NodeDef.getDefaultValues(reloadedNodeDef)).to.equal(defaultValues)
-}
-
 module.exports = {
   createNodeDefsTest,
   updateNodeDefTest,
-  updateNodeDefAdvancedPropsTest,
 }

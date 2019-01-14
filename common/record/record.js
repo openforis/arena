@@ -5,7 +5,7 @@ const Survey = require('../survey/survey')
 const SurveyUtils = require('../survey/surveyUtils')
 const NodeDef = require('../survey/nodeDef')
 const Node = require('../record/node')
-
+const User = require('../user/user')
 
 const keys = {
   nodes: 'nodes',
@@ -15,14 +15,12 @@ const keys = {
 }
 // ====== CREATE
 
-const newRecord = (user, step, preview = false) => {
-  return {
-    uuid: uuidv4(),
-    ownerId: user.id,
-    step,
-    preview
-  }
-}
+const newRecord = (user, step, preview = false) => ({
+  uuid: uuidv4(),
+  ownerId: User.getId(user),
+  step,
+  preview
+})
 
 // ====== READ
 const getNodes = R.pipe(
@@ -148,7 +146,6 @@ module.exports = {
   isPreview: R.propEq(keys.preview, true),
   getOwnerId: R.prop(keys.ownerId),
   getStep: R.prop(keys.step),
-
 
   getNodes,
   getNodesArray,

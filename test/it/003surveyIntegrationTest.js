@@ -1,5 +1,4 @@
 require('dotenv').config()
-// const R = require('ramda')
 
 const {initTestContext, destroyTestContext} = require('./../testContext')
 
@@ -13,25 +12,23 @@ describe('Survey Test', () => {
 
   // ==== SURVEY
 
-  it('Create Survey', surveyIntegrationTest.createSurveyTest)
+  it('Create Survey', async () => await surveyIntegrationTest.createSurveyTest())
 
   // ==== CATEGORY
 
-  it('Create Category', categoryTest.createCategoryTest)
+  it('Create Category', async () => await categoryTest.createCategoryTest())
 
-  it('Create Category Level', categoryTest.createCategoryLevelTest)
+  it('Create Category Level', async () => await categoryTest.createCategoryLevelTest())
 
-  it('Create Category Item', categoryTest.createCategoryItemTest)
+  it('Create Category Item', async () => await categoryTest.createCategoryItemTest())
 
-  it('Update Category', categoryTest.updateCategoryTest)
+  it('Update Category', async () => await categoryTest.updateCategoryTest())
 
   // ==== NODE DEF
 
-  it('Create Node Defs', nodeDefTest.createNodeDefsTest)
+  it('Create Node Defs', async () => await nodeDefTest.createNodeDefsTest())
 
-  it('Update Node Def', nodeDefTest.updateNodeDefTest)
-
-  it('Update Node Def advanced props', nodeDefTest.updateNodeDefAdvancedPropsTest)
+  it('Update Node Def', async () => await nodeDefTest.updateNodeDefTest())
 
 })
 
