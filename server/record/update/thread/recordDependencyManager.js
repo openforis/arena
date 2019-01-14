@@ -6,7 +6,6 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
 
 const SurveyRepository = require('../../../survey/surveyRepository')
-const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
 const NodeRepository = require('../../nodeRepository')
 
 const fetchDependentNodesByNode = async (survey, node, dependencyType, tx) => {
@@ -17,7 +16,7 @@ const fetchDependentNodesByNode = async (survey, node, dependencyType, tx) => {
   const dependentUuids = await SurveyRepository.fetchDepedenciesByNodeDefUuid(surveyId, dependencyType, nodeDefUuid, tx)
 
   if (dependentUuids) {
-    const dependentDefs = await NodeDefRepository.fetchNodeDefsByUuid(surveyId, dependentUuids, false, tx)
+    const dependentDefs = Survey.getNodeDefsByUuids(dependentUuids)(survey)
 
     const dependentsPerDef = await Promise.all(
       dependentDefs.map(async dependentDef => {
