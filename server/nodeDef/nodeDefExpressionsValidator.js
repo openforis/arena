@@ -54,12 +54,25 @@ const validateExpressionProp = (survey, nodeDef) =>
     return expr ? await validateNodeDefExpr(survey, nodeDef, expr) : null
   }
 
-const validateExpression = async (survey, nodeDef, nodeDefExpression) => {
+const validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
+  async (propName, nodeDefExpression) => {
+    const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
+    return R.isEmpty(expr) && i < nodeDefExpressions.length - 1
+      ? 'only_last_can_have_empty_apply_if'
+      : null
+  }
+
+const validateExpression = async (survey, nodeDef, nodeDefExpressions, i) => {
+  const nodeDefExpression = nodeDefExpressions[i]
   const validation = await Validator.validate(
     nodeDefExpression,
     {
       [NodeDefExpression.keys.expression]: [Validator.validateRequired, validateExpressionProp(survey, nodeDef)],
-      [NodeDefExpression.keys.applyIf]: [validateExpressionProp(survey, nodeDef)]
+      [NodeDefExpression.keys.applyIf]: [
+        validateExpressionProp(survey, nodeDef),
+        Validator.validateItemPropUniqueness(nodeDefExpressions),
+        validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
+      ]
     }
   )
   return validation
@@ -67,10 +80,11 @@ const validateExpression = async (survey, nodeDef, nodeDefExpression) => {
 
 const validate = async (survey, nodeDef, nodeDefExpressions) => {
   const result = {valid: true, fields: {}}
+  const range = R.range(0, nodeDefExpressions.length)
 
   const validations = await Promise.all(
-    nodeDefExpressions.map(async nodeDefExpression =>
-      await validateExpression(survey, nodeDef, nodeDefExpression)
+    range.map(async i =>
+      await validateExpression(survey, nodeDef, nodeDefExpressions, i)
     )
   )
 
