@@ -12,7 +12,6 @@ const testSurvey = {
 }
 
 const createSurveyTest = async () => {
-
   const survey = await createSurvey(getContextUser(), testSurvey)
 
   setContextSurvey(survey)

@@ -1,10 +1,11 @@
 const {getContextSurvey} = require('./../../testContext')
-const {assert, expect} = require('chai')
+const {expect} = require('chai')
 const R = require('ramda')
 
-const NodeDefRepository = require('../../../server/nodeDef/nodeDefRepository')
-const NodeDef = require('../../../common/survey/nodeDef')
 const Survey = require('../../../common/survey/survey')
+const NodeDef = require('../../../common/survey/nodeDef')
+
+const NodeDefRepository = require('../../../server/nodeDef/nodeDefRepository')
 
 const fetchRootNodeDef = async () => {
   const survey = getContextSurvey()
@@ -46,7 +47,11 @@ const updateNodeDefTest = async () => {
   const nodeDef2 = await createNodeDef(rootDef.uuid, NodeDef.nodeDefType.boolean, 'node_def_2')
 
   const newName = 'node_def_1_new'
-  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyInfo.id, nodeDef1.uuid, [{key: 'name', value: newName, advanced: false}])
+  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyInfo.id, nodeDef1.uuid, [{
+    key: 'name',
+    value: newName,
+    advanced: false
+  }])
 
   expect(NodeDef.getNodeDefName(updatedNodeDef)).to.equal(newName)
 

@@ -1,11 +1,11 @@
-const db = require('../server/db/db')
-
 const {deleteSurvey} = require('../server/survey/surveyManager')
 
 const {findUserByEmailAndPassword} = require('../server/user/userManager')
 const {setUserPref, userPrefNames} = require('../common/user/userPrefs')
 
 const Survey = require('../common/survey/survey')
+
+const SurveyManager = require('../server/survey/surveyManager')
 
 let user = null
 let survey = null
@@ -19,13 +19,16 @@ const initTestContext = async () => {
 }
 
 const destroyTestContext = async () => {
-  await deleteSurvey(survey.info.id, user)
+  await deleteSurvey(Survey.getId(survey), user)
 }
 
 const setContextSurvey = s => {
   survey = s
-  user = setUserPref(userPrefNames.survey, survey.id)(user)
+  user = setUserPref(userPrefNames.survey, Survey.getId(survey))(user)
 }
+
+const fetchFullContextSurvey = async(draft = true, advanced = true) =>
+  await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(Survey.getId(survey), draft, advanced)
 
 module.exports = {
   initTestContext,
@@ -34,7 +37,8 @@ module.exports = {
   getContextUser: () => user,
 
   getContextSurvey: () => survey,
-  getContextSurveyId: () => Survey.getSurveyInfo(survey).id,
+  fetchFullContextSurvey,
+  getContextSurveyId: () => Survey.getId(survey),
   setContextSurvey
 }
 

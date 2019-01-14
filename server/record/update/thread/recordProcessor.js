@@ -16,7 +16,7 @@ const ActivityLog = require('../../../activityLog/activityLogger')
 
 class RecordProcessor {
 
-  constructor (nodesUpdateListener, preview) {
+  constructor (nodesUpdateListener = null, preview = false) {
     this.nodesUpdateListener = nodesUpdateListener
     this.preview = preview
   }
@@ -134,7 +134,7 @@ class RecordProcessor {
   // ==== UTILS
 
   _notifyNodesUpdate (nodes) {
-    if (!R.isEmpty(nodes))
+    if (!R.isEmpty(nodes) && this.nodesUpdateListener)
       this.nodesUpdateListener(nodes)
   }
 

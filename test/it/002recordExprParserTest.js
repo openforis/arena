@@ -3,18 +3,19 @@ const {assert} = require('chai')
 
 const {evalNodeQuery} = require('../../server/record/recordExprParser')
 
+const survey = {}
 const tree = {id: 2, value: 12, name: 'tree'}
 const root = {id: 1, name: 'root'}
 const newNode = name => ({id: 3, value: 18, name})
 
-const bindNodeFunctions = (node) => ({
+const bindNodeFunctions = (survey, node) => ({
   ...node,
-  parent: async () => node.id === 1 ? null : bindNodeFunctions(root),
-  node: async name => bindNodeFunctions(newNode(name)),
-  sibling: async name => bindNodeFunctions(newNode(name)),
+  parent: async () => node.id === 1 ? null : bindNodeFunctions(survey, root),
+  node: async name => bindNodeFunctions(survey, newNode(name)),
+  sibling: async name => bindNodeFunctions(survey, newNode(name)),
 })
 
-const node = bindNodeFunctions(tree)
+const node = bindNodeFunctions(survey, tree)
 
 const queries = [
   {q: 'this.value + 1', r: 13},
@@ -51,7 +52,7 @@ describe('RecordExprParser Test', () => {
 
     it(q, async () => {
 
-      const res = await evalNodeQuery(node, q)
+      const res = await evalNodeQuery(survey, node, q, null, bindNodeFunctions)
 
       if (R.isEmpty(resKeys)) {
         assert.equal(res, r)

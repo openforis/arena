@@ -48,6 +48,16 @@ const getNodeDefByName = (name) => R.pipe(
   R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name))
 )
 
+/**
+ * Returns a node def in the specified path (root not included).
+ * E.g. path = ['plot', 'tree', 'dbh']
+ */
+const getNodeDefByPath = path =>
+  survey => R.pipe(
+    getRootNodeDef,
+    rootDef => R.reduce((currentParent, childName) => getNodeDefChildByName(currentParent, childName)(survey), rootDef, path)
+  )(survey)
+
 const getNodeDefsByCategoryUuid = (uuid) => R.pipe(
   getNodeDefsArray,
   R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid))
@@ -194,6 +204,7 @@ module.exports = {
   getNodeDefSiblingByName,
   getNodeDefKeys,
   getNodeDefByName,
+  getNodeDefByPath,
 
   getNodeDefsByCategoryUuid,
   getNodeDefsByTaxonomyUuid,

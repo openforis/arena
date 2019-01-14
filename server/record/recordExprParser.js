@@ -4,9 +4,9 @@ const Node = require('../../common/record/node')
 const Expression = require('../../common/exprParser/expression')
 const NodeRepository = require('./nodeRepository')
 
-const evalNodeQuery = async (survey, node, query, client) => {
+const evalNodeQuery = async (survey, node, query, client, bindNodeFn = bindNode) => {
   const ctx = {
-    node: bindNode(survey, node, client),
+    node: bindNodeFn(survey, node, client),
     functions: {
       [Expression.types.ThisExpression]: (expr, {node}) => node
     },

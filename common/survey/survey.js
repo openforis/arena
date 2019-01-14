@@ -44,6 +44,7 @@ module.exports = {
   getNodeDefChildByName: SurveyNodeDefs.getNodeDefChildByName,
   getNodeDefSiblingByName: SurveyNodeDefs.getNodeDefSiblingByName,
   getNodeDefByName: SurveyNodeDefs.getNodeDefByName,
+  getNodeDefByPath: SurveyNodeDefs.getNodeDefByPath,
   getNodeDefsByCategoryUuid: SurveyNodeDefs.getNodeDefsByCategoryUuid,
   getNodeDefsByTaxonomyUuid: SurveyNodeDefs.getNodeDefsByTaxonomyUuid,
   getNodeDefParent: SurveyNodeDefs.getNodeDefParent,
