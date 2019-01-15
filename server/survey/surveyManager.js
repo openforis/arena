@@ -12,7 +12,7 @@ const Survey = require('../../common/survey/survey')
 const SurveyValidator = require('../survey/surveyValidator')
 
 const NodeDefManager = require('../nodeDef/nodeDefManager')
-const {nodeDefLayoutProps, nodeDefRenderType,} = require('../../common/survey/nodeDefLayout')
+const {nodeDefLayoutProps, nodeDefRenderType} = require('../../common/survey/nodeDefLayout')
 
 const UserRepository = require('../user/userRepository')
 const {getUserPrefSurveyId, userPrefNames} = require('../../common/user/userPrefs')
@@ -135,6 +135,7 @@ module.exports = {
   fetchSurveyById,
   fetchSurveyAndNodeDefsBySurveyId,
   fetchUserSurveysInfo,
+  fetchDepedencies: SurveyRepository.fetchDepedencies,
 
   // ====== UPDATE
   updateSurveyProp,
@@ -144,5 +145,5 @@ module.exports = {
   // ====== DELETE
   deleteSurvey,
   deleteSurveyLabel: SurveyRepository.deleteSurveyLabel,
-  deleteSurveyDescription: SurveyRepository.deleteSurveyDescription
+  deleteSurveyDescription: SurveyRepository.deleteSurveyDescription,
 }

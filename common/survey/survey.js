@@ -5,6 +5,7 @@ const SurveyNodeDefs = require('./_internal/surveyNodeDefs')
 const SurveyCategories = require('./_internal/surveyCategories')
 const SurveyTaxonomies = require('./_internal/surveyTaxonomies')
 const SurveyDefaults = require('./_internal/surveyDefaults')
+const SurveyDependencies = require('./_internal/surveyDependencies')
 
 module.exports = {
   // ====== DEFAULTS
@@ -55,6 +56,9 @@ module.exports = {
   getHierarchy: SurveyNodeDefs.getHierarchy,
   traverseHierarchyItem: SurveyNodeDefs.traverseHierarchyItem,
   traverseHierarchyItemSync: SurveyNodeDefs.traverseHierarchyItemSync,
+
+  // ====== READ dependencies
+  getDepedenciesByNodeDefUuid: SurveyDependencies.getDepedenciesByNodeDefUuid,
 
   // ====== UPDATE nodeDefs
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,

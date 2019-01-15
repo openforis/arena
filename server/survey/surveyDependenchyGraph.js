@@ -45,7 +45,7 @@ const buildGraph = survey =>
     {},
     Survey.getNodeDefsArray(survey)
   )
-  
+
 module.exports = {
   dependencyTypes,
   buildGraph

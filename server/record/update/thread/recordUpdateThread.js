@@ -9,6 +9,7 @@ const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
 const SurveyManager = require('../../../survey/surveyManager')
+const surveyDependencyGraph = require('../../../survey/surveyDependenchyGraph')
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
 
 const Survey = require('../../../../common/survey/survey')
@@ -28,8 +29,18 @@ class RecordUpdateThread extends Thread {
   }
 
   async getSurvey (tx) {
-    if (!this.survey)
-      this.survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.preview, true, false, tx)
+    if (!this.survey) {
+      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.preview, true, false, tx)
+
+      // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
+      let dependencyGraph = this.preview ?
+        surveyDependencyGraph.buildGraph(surveyDb)
+        :
+        await SurveyManager.fetchDepedencies(this.surveyId)
+
+      this.survey = R.assoc('dependencyGraph', dependencyGraph, surveyDb)
+    }
+
     return this.survey
   }
 
