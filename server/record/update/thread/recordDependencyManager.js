@@ -13,7 +13,7 @@ const fetchDependentNodesByNode = async (survey, node, dependencyType, tx) => {
 
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const dependentUuids = Survey.getDepedenciesByNodeDefUuid(survey, dependencyType, nodeDefUuid)
+  const dependentUuids = Survey.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
 
   if (dependentUuids) {
     const dependentDefs = Survey.getNodeDefsByUuids(dependentUuids)(survey)

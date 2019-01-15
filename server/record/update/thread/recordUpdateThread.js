@@ -33,10 +33,9 @@ class RecordUpdateThread extends Thread {
       const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.preview, true, false, tx)
 
       // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
-      let dependencyGraph = this.preview ?
-        surveyDependencyGraph.buildGraph(surveyDb)
-        :
-        await SurveyManager.fetchDepedencies(this.surveyId)
+      let dependencyGraph = this.preview
+        ? surveyDependencyGraph.buildGraph(surveyDb)
+        : await SurveyManager.fetchDepedencies(this.surveyId)
 
       this.survey = R.assoc('dependencyGraph', dependencyGraph, surveyDb)
     }

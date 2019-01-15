@@ -1,8 +1,8 @@
 const R = require('ramda')
 
-const getDepedenciesByNodeDefUuid = (survey, dependencyType, nodeDefUuid) =>
-  R.path(['dependencyGraph', dependencyType, nodeDefUuid], survey)
+const getNodeDefDependencies = (nodeDefUuid, dependencyType) =>
+  R.path(['dependencyGraph', dependencyType, nodeDefUuid])
 
 module.exports = {
-  getDepedenciesByNodeDefUuid,
+  getNodeDefDependencies,
 }

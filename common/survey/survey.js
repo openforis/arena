@@ -58,7 +58,7 @@ module.exports = {
   traverseHierarchyItemSync: SurveyNodeDefs.traverseHierarchyItemSync,
 
   // ====== READ dependencies
-  getDepedenciesByNodeDefUuid: SurveyDependencies.getDepedenciesByNodeDefUuid,
+  getNodeDefDependencies: SurveyDependencies.getNodeDefDependencies,
 
   // ====== UPDATE nodeDefs
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,

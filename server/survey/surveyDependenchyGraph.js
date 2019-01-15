@@ -28,8 +28,7 @@ const addDeps = (survey, nodeDef, type, expressions) =>
 
     for (const refName of refNames) {
       const nodeDefRef = Survey.getNodeDefByName(refName)(survey)
-      // TODO use NodeDef.getUuid
-      graph = addDep(type, nodeDefRef.uuid, nodeDef.uuid)(graph)
+      graph = addDep(type, NodeDef.getUuid(nodeDefRef), NodeDef.getUuid(nodeDef))(graph)
     }
     return graph
   }
