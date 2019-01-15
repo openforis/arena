@@ -1,6 +1,3 @@
-const R = require('ramda')
-const Promise = require('bluebird')
-
 const StringUtils = require('../../../../common/stringUtils')
 const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
 
@@ -12,43 +9,41 @@ const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 const RecordExprParser = require('../../../record/recordExprParser')
 const NodeRepository = require('../../../record/nodeRepository')
 
-const updateNodesApplicability = async (user, survey, nodesArray, tx) =>
-  R.mergeAll(
-    await Promise.all(
-      nodesArray.map(async node => await updateNodeApplicability(survey, node, tx))
-    )
-  )
+const NodesUpdater = require('./nodesUpdater')
 
-const updateNodeApplicability = async (survey, node, tx) => {
-  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+class ApplicableUpdater extends NodesUpdater {
 
-  if (!NodeDef.isNodeDefRoot(nodeDef)) {
-    const surveyId = Survey.getSurveyInfo(survey).id
+  getNodeDefExpressions (nodeDef) {
+    return NodeDef.getApplicable(nodeDef)
+  }
+
+  includeNode (node, nodeDef) {
+    return !NodeDef.isNodeDefRoot(nodeDef)
+  }
+
+  async updateNode (node, applicableExpr, tx) {
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(this.survey)
+
+    const surveyId = Survey.getId(this.survey)
     const parentNode = await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), tx)
 
-    const newApplicability = await isApplicable(survey, node, tx)
+    const newApplicability = await this._isApplicable(node, applicableExpr, tx)
 
     if (newApplicability !== Node.isChildApplicable(Node.getNodeDefUuid(node))(parentNode)) {
       await NodeRepository.updateChildrenApplicability(surveyId, Node.getParentUuid(node), NodeDef.getUuid(nodeDef), newApplicability, tx)
       return toUuidIndexedObj(await NodeRepository.fetchChildNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getUuid(parentNode), Node.getNodeDefUuid(node), tx))
+    } else {
+      return {}
     }
   }
-  return {}
+
+  async _isApplicable (node, applicableExpr, client) {
+    const expression = NodeDefExpression.getExpression(applicableExpr)
+
+    return StringUtils.isBlank(expression)
+      ? true
+      : await RecordExprParser.evalNodeQuery(this.survey, node, expression, client)
+  }
 }
 
-const isApplicable = async (survey, node, client) => {
-  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-  const applicableIfExpr = R.pipe(
-    NodeDef.getApplicable,
-    R.head,
-    NodeDefExpression.getExpression
-  )(nodeDef)
-
-  return StringUtils.isBlank(applicableIfExpr)
-    ? true
-    : await RecordExprParser.evalNodeQuery(survey, node, applicableIfExpr, client)
-}
-
-module.exports = {
-  updateNodesApplicability
-}
+module.exports = ApplicableUpdater

@@ -6,7 +6,8 @@ const {dependencyTypes} = require('../../../survey/surveyDependenchyGraph')
 const RecordDependencyManager = require('./recordDependencyManager')
 
 const DefaultValuesUpdater = require('./defaultValuesUpdater')
-const ApplicableIfUpdater = require('./applicableIfIUpdater')
+const ApplicableUpdater = require('./applicableUpdater')
+const CalculatedValuesUpdater = require('./calculatedValuesUpdater')
 
 /**
  * Class responsible for updating applicable and default values
@@ -30,24 +31,31 @@ const updateDependentNodes = async (user, survey, nodes, t) => {
 
 const updateDependentNodesInternal = async (user, survey, nodes, t) => {
   const nodesArray = R.values(nodes)
+
   const nodesApplicability = await updateApplicability(user, survey, nodesArray, t)
+  const nodesCalculatedValues = await applyCalculatedValues(user, survey, nodesArray, t)
   const nodesDefaultValues = await applyDefaultValues(user, survey, nodesArray, t)
 
-  return R.mergeRight(nodesApplicability, nodesDefaultValues)
+  return R.pipe(
+    R.mergeRight(nodesCalculatedValues),
+    R.mergeRight(nodesDefaultValues),
+  )(nodesApplicability)
 }
 
 const updateApplicability = async (user, survey, nodesArray, t) => {
   const dependents = await RecordDependencyManager.fetchDependentNodes(survey, nodesArray, dependencyTypes.applicable, t)
+  return new ApplicableUpdater(user, survey).updateNodes(R.concat(dependents, nodesArray), t)
+}
 
-  return await ApplicableIfUpdater.updateNodesApplicability(user, survey, R.concat(dependents, nodesArray), t)
+const applyCalculatedValues = async (user, survey, nodesArray, t) => {
+  const dependents = await RecordDependencyManager.fetchDependentNodes(survey, nodesArray, dependencyTypes.calculatedValues, t)
+  return new CalculatedValuesUpdater(user, survey).updateNodes(R.concat(dependents, nodesArray), t)
 }
 
 const applyDefaultValues = async (user, survey, nodesArray, t) => {
-  const defaultValuesDependentNodes = await RecordDependencyManager.fetchDependentNodes(survey, nodesArray, dependencyTypes.defaultValues, t)
-
-  const defaultValueToRecalculatedNodes = R.concat(defaultValuesDependentNodes, nodesArray)
-
-  return await DefaultValuesUpdater.applyDefaultValues(user, survey, defaultValueToRecalculatedNodes, t)
+  const dependents = await RecordDependencyManager.fetchDependentNodes(survey, nodesArray, dependencyTypes.defaultValues, t)
+  const calculatedValuesDependents = await RecordDependencyManager.fetchDependentNodes(survey, nodesArray, dependencyTypes.calculatedValues, t)
+  return new DefaultValuesUpdater(user, survey).updateNodes(R.reduce(R.concat, [], [dependents, calculatedValuesDependents, nodesArray]), t)
 }
 
 module.exports = {
