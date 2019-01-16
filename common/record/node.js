@@ -88,7 +88,8 @@ const getNodeDefUuids = nodes => R.pipe(
  * UTILS
  * ======
  */
-const isNodeValueBlank = value => {
+const isNodeValueBlank = node => {
+  const value = getNodeValue(node, null)
 
   if (R.isNil(value))
     return true
@@ -98,8 +99,6 @@ const isNodeValueBlank = value => {
 
   return false
 }
-
-const isNodeValueNotBlank = R.pipe(isNodeValueBlank, R.not)
 
 module.exports = {
   keys,
@@ -127,7 +126,6 @@ module.exports = {
 
   // ==== UTILS
   isNodeValueBlank,
-  isNodeValueNotBlank,
 
   // ====== Node Value extractor
 
