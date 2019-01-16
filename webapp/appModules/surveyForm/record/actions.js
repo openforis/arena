@@ -42,13 +42,13 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
   await axios.post(`/api/survey/${surveyInfo.id}/record`, record)
 
   const moduleUri = appModuleUri(preview ? designerModules.recordPreview : dataModules.record)
-  history.push(moduleUri + record.uuid)
+  history.push(moduleUri + Record.getUuid(record))
 }
 
 export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
   dispatch => {
     const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
-    recordNodesUpdate({[node.uuid]: node})(dispatch)
+    recordNodesUpdate({[Node.getUuid(node)]: node})(dispatch)
   }
 /**
  * ============
@@ -74,7 +74,7 @@ export const updateNode = (nodeDef, node, value, file = null) => dispatch => {
     R.assoc('value', value),
   )(node)
 
-  recordNodesUpdate({[node.uuid]: nodeToUpdate})(dispatch)
+  recordNodesUpdate({[Node.getUuid(node)]: nodeToUpdate})(dispatch)
   dispatch(_updateNodeDebounced(nodeToUpdate, file, node.placeholder ? 0 : 500))
 }
 
@@ -96,12 +96,12 @@ const _updateNodeDebounced = (node, file, delay) => {
         : {}
 
       const surveyId = getStateSurveyId(getState())
-      await axios.post(`/api/survey/${surveyId}/record/${node.recordUuid}/node`, formData, config)
+      await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData, config)
     } catch (e) {
       console.log(e)
     }
   }
-  return debounceAction(action, `node_update_${node.uuid}`, delay)
+  return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)
 }
 
 /**
@@ -114,7 +114,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
     dispatch({type: nodeDelete, node})
 
     const surveyId = getStateSurveyId(getState())
-    const {data} = await axios.delete(`/api/survey/${surveyId}/record/${node.recordUuid}/node/${node.uuid}`)
+    const {data} = await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
     recordNodesUpdate(data.nodes)(dispatch)
   } catch (e) {
     console.log(e)
@@ -127,7 +127,7 @@ export const deleteRecord = () => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(state)
   const record = getRecord(getSurveyForm(state))
 
-  await axios.delete(`/api/survey/${surveyId}/record/${record.uuid}`)
+  await axios.delete(`/api/survey/${surveyId}/record/${Record.getUuid(record)}`)
 
   dispatch({type: recordDelete})
 }
@@ -143,5 +143,5 @@ export const checkOutRecord = () => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(state)
   const record = getRecord(getSurveyForm(state))
 
-  await axios.post(`/api/survey/${surveyId}/record/${record.uuid}/checkout`)
+  await axios.post(`/api/survey/${surveyId}/record/${Record.getUuid(record)}/checkout`)
 }
