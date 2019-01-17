@@ -139,10 +139,12 @@ const canNodeDefHaveDefaultValue = nodeDef =>
   R.includes(
     getNodeDefType(nodeDef),
     [
+      nodeDefType.boolean,
+      nodeDefType.code,
       nodeDefType.decimal,
       nodeDefType.integer,
+      nodeDefType.taxon,
       nodeDefType.text,
-      nodeDefType.boolean,
     ]
   )
 

@@ -9,12 +9,13 @@ import AutocompleteDialog from '../../../../../commonComponents/form/autocomplet
 
 import { toQueryString } from '../../../../../../server/serverUtils/request'
 
+import Survey from '../../../../../../common/survey/survey'
 import Taxonomy from '../../../../../../common/survey/taxonomy'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../common/record/node'
 
 import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
-import { getStateSurveyId } from '../../../../../survey/surveyState'
+import * as SurveyState from '../../../../../survey/surveyState'
 
 const {valuePropKeys} = Node
 
@@ -39,7 +40,7 @@ const defaultState = {
   autocompleteInputField: null,
 }
 
-const loadTaxa = async (surveyId, taxonomyUuid, field, value, strict = false) => {
+const loadTaxa = async (surveyId, taxonomyUuid, draft, field, value, strict = false) => {
   const searchValue =
     strict ? value
       : field === fields.code
@@ -47,7 +48,7 @@ const loadTaxa = async (surveyId, taxonomyUuid, field, value, strict = false) =>
       : `*${value}*` //contains value
 
   const params = {
-    draft: false,
+    draft,
     limit: 20,
     offset: 0,
     filter: {
@@ -60,14 +61,14 @@ const loadTaxa = async (surveyId, taxonomyUuid, field, value, strict = false) =>
   return data.taxa
 }
 
-const loadTaxonByNode = async (surveyId, taxonomyUuid, node) => {
+const loadTaxonByNode = async (surveyId, taxonomyUuid, draft, node) => {
   const vernacularNameUuid = Node.getNodeVernacularNameUuid(node)
 
   const filterProp = vernacularNameUuid ? valuePropKeys.vernacularNameUuid : 'uuid'
   const filterPropValue = vernacularNameUuid ? vernacularNameUuid : Node.getNodeTaxonUuid(node)
 
   return filterPropValue
-    ? R.head(await loadTaxa(surveyId, taxonomyUuid, filterProp, filterPropValue, true))
+    ? R.head(await loadTaxa(surveyId, taxonomyUuid, draft, filterProp, filterPropValue, true))
     : null
 }
 
@@ -124,10 +125,10 @@ class NodeDefTaxon extends React.Component {
   }
 
   async loadSelectedTaxonFromNode () {
-    const {surveyId, taxonomyUuid, nodes} = this.props
+    const {surveyId, taxonomyUuid, nodes, draft} = this.props
     const node = nodes[0]
 
-    const taxon = node ? await loadTaxonByNode(surveyId, taxonomyUuid, node) : null
+    const taxon = node ? await loadTaxonByNode(surveyId, taxonomyUuid, draft, node) : null
 
     this.updateStateFromTaxon(taxon)
   }
@@ -158,7 +159,10 @@ class NodeDefTaxon extends React.Component {
   }
 
   async onInputFieldChange (field, value) {
-    if (this.state.code === Taxonomy.unlistedCode && field !== fields.code) {
+    const {draft} = this.props
+    const {code} = this.state
+
+    if (code === Taxonomy.unlistedCode && field !== fields.code) {
       this.handleUnlistedSpeciesFieldChange(field, value)
     } else {
       //reset other field values
@@ -179,7 +183,7 @@ class NodeDefTaxon extends React.Component {
         this.updateNodeValue(null)
       } else {
         //show autocomplete
-        await this.loadAutocompleteTaxa(field, value)
+        await this.loadAutocompleteTaxa(field, value, draft)
       }
     }
   }
@@ -239,10 +243,10 @@ class NodeDefTaxon extends React.Component {
     this.updateStateFromTaxon(this.state.selectedTaxon)
   }
 
-  async loadAutocompleteTaxa (field, value) {
+  async loadAutocompleteTaxa (field, value, draft) {
     const {surveyId, taxonomyUuid} = this.props
 
-    const taxa = await loadTaxa(surveyId, taxonomyUuid, field, value)
+    const taxa = await loadTaxa(surveyId, taxonomyUuid, draft, field, value)
     this.setState({autocompleteTaxa: taxa})
   }
 
@@ -318,9 +322,13 @@ class NodeDefTaxon extends React.Component {
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  taxonomyUuid: NodeDef.getNodeDefTaxonomyUuid(props.nodeDef),
-  surveyId: getStateSurveyId(state)
-})
+const mapStateToProps = (state, props) => {
+  const survey = SurveyState.getSurvey(state)
+  return {
+    taxonomyUuid: NodeDef.getNodeDefTaxonomyUuid(props.nodeDef),
+    surveyId: Survey.getId(survey),
+    draft: Survey.isDraft(Survey.getSurveyInfo(survey)),
+  }
+}
 
 export default connect(mapStateToProps)(NodeDefTaxon)
