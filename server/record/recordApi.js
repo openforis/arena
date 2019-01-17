@@ -8,6 +8,8 @@ const Node = require('../../common/record/node')
 const RecordManager = require('./recordManager')
 const FileManager = require('../file/fileManager')
 
+const {requireRecordEditPermission} = require('../authGroup/authMiddleware')
+
 module.exports.init = app => {
 
   // ==== CREATE
@@ -91,7 +93,7 @@ module.exports.init = app => {
   // ==== UPDATE
 
   // RECORD Check in / out
-  app.post('/survey/:surveyId/record/:recordUuid/checkin', async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordEditPermission, async (req, res) => {
     try {
       const user = req.user
       const surveyId = getRestParam(req, 'surveyId')

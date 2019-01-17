@@ -19,6 +19,8 @@ const getDefaultAuthGroups = (lang) => [
     ],
     labels: {[lang]: 'Survey administrators'},
     descriptions: {[lang]: `Full rights`},
+
+    dataSteps: {'1': 'all', '2': 'all', '3': 'all'},
   },
   {
     name: groupNames.surveyEditor,
@@ -30,6 +32,8 @@ const getDefaultAuthGroups = (lang) => [
     ],
     labels: {en: 'Survey editors'},
     descriptions: {[lang]: `Can edit survey, records, invite users`},
+
+    dataSteps: {'1': 'all', '2': 'all', '3': 'all'},
   },
   {
     name: groupNames.dataEditor,
@@ -40,6 +44,8 @@ const getDefaultAuthGroups = (lang) => [
     ],
     labels: {en: 'Data editors'},
     descriptions: {[lang]: `Can edit records in data entry step`},
+
+    dataSteps: {'1': 'own'}
   },
   {
     name: groupNames.dataCleanser,
@@ -50,6 +56,8 @@ const getDefaultAuthGroups = (lang) => [
     ],
     labels: {en: 'Data cleansers'},
     descriptions: {[lang]: `Can edit records in data cleansing step`},
+
+    dataSteps: {'1': 'all', '2': 'all'},
   },
   {
     name: groupNames.dataAnalyst,
@@ -60,6 +68,8 @@ const getDefaultAuthGroups = (lang) => [
     ],
     labels: {en: 'Data analysts'},
     descriptions: {[lang]: `Can edit records in data analysis step`},
+
+    dataSteps: {'1': 'all', '2': 'all', '3': 'all'},
   }
 ]
 
