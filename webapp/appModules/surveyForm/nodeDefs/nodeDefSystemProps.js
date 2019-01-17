@@ -3,13 +3,14 @@ import * as R from 'ramda'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import NodeDef from '../../../../common/survey/nodeDef'
+import Node from '../../../../common/record/node'
 
+import NodeDefBoolean from './components/types/nodeDefBoolean'
+import NodeDefCode from './components/types/nodeDefCode'
+import NodeDefCoordinate from './components/types/nodeDefCoordinate'
 import NodeDefEntitySwitch from './components/types/nodeDefEntitySwitch'
 import NodeDefFile from './components/types/nodeDefFile'
 import NodeDefTaxon from './components/types/nodeDefTaxon'
-import NodeDefCoordinate from './components/types/nodeDefCoordinate'
-import NodeDefCode from './components/types/nodeDefCode'
-import NodeDefBoolean from './components/types/nodeDefBoolean'
 import NodeDefText from './components/types/nodeDefText'
 
 import {
@@ -75,6 +76,28 @@ export const nodeDefSystemProps = {
       placeholderChar: '\u2000',
     },
     defaultValue: '',
+    valueToStringFn: value => {
+      const getField = (name, length) => R.pipe(
+        R.propOr('', name),
+        v => v.padStart(length, ' ')
+      )
+      return value ?
+        [
+          getField(Node.valuePropKeys.day, 2)(value),
+          getField(Node.valuePropKeys.month, 2)(value),
+          getField(Node.valuePropKeys.year, 4)(value)
+        ].join('/')
+        : ''
+    },
+    stringToValueFn: str => {
+      let year, month, day
+      [year, month, day] = R.pipe(
+        R.defaultTo('//'),
+        R.split('/'),
+        R.map(R.trim)
+      )(str)
+      return {year, month, day}
+    },
   },
 
   [nodeDefType.time]: {
@@ -168,4 +191,18 @@ export const getNodeDefDefaultLayoutPropsByType = type =>
     type,
     'defaultLayoutProps',
     {}
+  )(nodeDefSystemProps)
+
+export const getNodeDefValueToStringFn = nodeDef =>
+  getProp(
+    NodeDef.getType(nodeDef),
+    'valueToStringFn',
+    R.identity,
+  )(nodeDefSystemProps)
+
+export const getNodeDefStringToValueFn = nodeDef =>
+  getProp(
+    NodeDef.getType(nodeDef),
+    'stringToValueFn',
+    R.identity,
   )(nodeDefSystemProps)

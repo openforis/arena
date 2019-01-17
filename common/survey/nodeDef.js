@@ -67,7 +67,7 @@ const newNodeDef = (surveyId, parentUuid, type, props) => ({
 
 // ==== READ
 
-const getNodeDefType = R.prop(propKeys.type)
+const getType = R.prop(propKeys.type)
 const getNodeDefName = SurveyUtils.getProp(propKeys.name, '')
 const getNodeDefParentUuid = SurveyUtils.getParentUuid
 
@@ -76,7 +76,7 @@ const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
 const isNodeDefMultiple = R.pipe(SurveyUtils.getProp(propKeys.multiple), R.equals(true))
 const isNodeDefSingle = R.pipe(isNodeDefMultiple, R.not)
 
-const isNodeDefType = type => R.pipe(getNodeDefType, R.equals(type))
+const isNodeDefType = type => R.pipe(getType, R.equals(type))
 
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
@@ -111,7 +111,7 @@ const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 const canNodeDefBeMultiple = nodeDef =>
   (isNodeDefEntity(nodeDef) && !isNodeDefRoot(nodeDef)) ||
   R.includes(
-    getNodeDefType(nodeDef),
+    getType(nodeDef),
     [
       nodeDefType.decimal,
       nodeDefType.code,
@@ -123,7 +123,7 @@ const canNodeDefBeMultiple = nodeDef =>
 
 const canNodeDefBeKey = nodeDef =>
   R.includes(
-    getNodeDefType(nodeDef),
+    getType(nodeDef),
     [
       nodeDefType.date,
       nodeDefType.decimal,
@@ -137,7 +137,7 @@ const canNodeDefBeKey = nodeDef =>
 
 const canNodeDefHaveDefaultValue = nodeDef =>
   R.includes(
-    getNodeDefType(nodeDef),
+    getType(nodeDef),
     [
       nodeDefType.boolean,
       nodeDefType.code,
@@ -161,7 +161,7 @@ module.exports = {
   getUuid: SurveyUtils.getUuid,
   getProp: SurveyUtils.getProp,
 
-  getNodeDefType,
+  getType,
   getNodeDefName,
   getNodeDefParentUuid,
   getNodeDefLabels: SurveyUtils.getLabels,
