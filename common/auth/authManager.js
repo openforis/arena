@@ -24,7 +24,7 @@ const getRecordUserPermissions = (user, record) =>
 
 const getRecordDataStep = R.prop('step')
 
-const getUserDataSteps = R.pathOr([])
+// const getUserDataSteps = R.pathOr([])
 
 
 const hasSurveyPermission = (permission, user, surveyInfo) =>
@@ -42,7 +42,7 @@ const canEditRecord = (user, record) => {
   // level = 'all' or 'own'
   const level = R.path(['dataSteps', recordDataStep], recordUserPermissions)
 
-  return level === 'all' || allOrOwn === 'own' && Record.getOwnerId(record) === user.id
+  return level === 'all' || level === 'own' && Record.getOwnerId(record) === user.id
 }
 
 const canEditSurvey = R.partial(hasSurveyPermission, [permissions.surveyEdit])

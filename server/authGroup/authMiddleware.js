@@ -43,6 +43,9 @@ const requireRecordPermission = (permissionFn) =>
   }
 
 module.exports = {
+  // Survey
   requireSurveyEditPermission: requireSurveyPermission(canEditSurvey),
+
+  // Record
   requireRecordEditPermission: requireRecordPermission(canEditRecord),
 }
