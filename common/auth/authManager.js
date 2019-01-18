@@ -1,56 +1,54 @@
 const R = require('ramda')
 
 const Record = require('../record/record')
+const User = require('../user/user')
 
-const {groupNames, permissions} = require('./authGroups')
+const {
+  groupNames,
+  permissions,
+  keys,
+} = require('./authGroups')
 
 const isSystemAdmin = user => R.any(
   group => group.name === groupNames.systemAdmin,
-  user.authGroups,
+  user.authGroups
 )
+
+// Survey
 
 const getSurveyUserPermissions = (user, surveyInfo) => {
   return R.pipe(
     R.innerJoin((ug, sg) => ug.id === sg.id),
     R.head, // there's only one group per user per survey
-    R.propOr([], 'permissions'),
-  )(user.authGroups, R.pathOr([], ['authGroups'], surveyInfo))
+    R.propOr([], keys.permissions)
+  )(user.authGroups, R.pathOr([], [keys.authGroups], surveyInfo))
 }
 
-const getRecordUserPermissions = (user, record) =>
-  R.find(R.propEq('surveyId', R.prop('surveyId', record)))
-    (R.prop('authGroups', user))
+const hasSurveyPermission = (permission) => (user, surveyInfo) =>
+  user && surveyInfo && (
+    isSystemAdmin(user) ||
+    R.includes(permission, getSurveyUserPermissions(user, surveyInfo)))
 
+const canEditSurvey = hasSurveyPermission(permissions.surveyEdit)
 
-const getRecordDataStep = R.prop('step')
-
-// const getUserDataSteps = R.pathOr([])
-
-
-const hasSurveyPermission = (permission, user, surveyInfo) =>
-  user && surveyInfo &&
-  (
-    isSystemAdmin(user)
-    ||
-    R.includes(permission, getSurveyUserPermissions(user, surveyInfo))
-  )
+// Record
 
 const canEditRecord = (user, record) => {
-  const recordDataStep = getRecordDataStep(record)
-  const recordUserPermissions = getRecordUserPermissions(user, record)
+  if (isSystemAdmin(user)) return true
 
-  // level = 'all' or 'own'
-  const level = R.path(['dataSteps', recordDataStep], recordUserPermissions)
+  const recordDataStep = Record.getStep(record)
+  const recordUserPermissions = User.getRecordPermissions(record)(user)
 
-  return level === 'all' || level === 'own' && Record.getOwnerId(record) === user.id
+  // level = 'all' or 'own'. If 'own', user can only edit the records that he created
+  // If 'all', he can edit all survey's records
+  const level = R.path([keys.dataSteps, recordDataStep], recordUserPermissions)
+
+  return level === keys.all || (level === keys.own && Record.getOwnerId(record) === user.id)
 }
 
-const canEditSurvey = R.partial(hasSurveyPermission, [permissions.surveyEdit])
+const canCreateRecord = hasSurveyPermission(permissions.recordCreate)
 
-// const canCreateRecord = R.partial(hasRecordPermission, [permissions.recordCreate])
-
-// const canEditRecord = R.partial(hasRecordEditPermission, [permissions.recordDataEdit])
-// const canViewRecord = R.partial(hasRecordPermission, [permissions.recordView])
+// const canViewRecord = hasSurveyPermission(permissions.recordView)
 
 module.exports = {
   isSystemAdmin,
@@ -59,11 +57,6 @@ module.exports = {
   canEditSurvey,
 
   // Record permissions
-  // canCreateRecord,
+  canCreateRecord,
   canEditRecord,
-  // canViewRecord,
 }
-
-
-// TODO
-// dataSteps should be called recordEditSteps? The only apply to record edit permissions

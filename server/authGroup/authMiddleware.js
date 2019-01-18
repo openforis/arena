@@ -6,6 +6,7 @@ const {fetchRecordByUuid} = require('../record/recordManager')
 
 const {
   canEditSurvey,
+  canCreateRecord,
   canEditRecord,
 } = require('../../common/auth/authManager')
 const Survey = require('../../common/survey/survey')
@@ -32,9 +33,7 @@ const requireRecordPermission = (permissionFn) =>
     const recordUuid = getRestParam(req, 'recordUuid')
 
     const record = await fetchRecordByUuid(surveyId, recordUuid)
-    // console.log(record)
 
-    // TODO check that record.surveUid and surveyId match
     if (permissionFn(user, record)) {
       next()
     } else {
@@ -47,5 +46,6 @@ module.exports = {
   requireSurveyEditPermission: requireSurveyPermission(canEditSurvey),
 
   // Record
+  requireRecordCreatePermission: requireSurveyPermission(canCreateRecord),
   requireRecordEditPermission: requireRecordPermission(canEditRecord),
 }

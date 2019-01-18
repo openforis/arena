@@ -1,3 +1,11 @@
+const keys = {
+  authGroups: 'authGroups',
+  permissions: 'permissions',
+  dataSteps: 'dataSteps',
+  all: 'all',
+  own: 'own',
+}
+
 const permissions = {
   // surveys
   surveyCreate: 'surveyCreate',
@@ -30,6 +38,7 @@ const groupNames = {
 }
 
 module.exports = {
+  keys,
   permissions,
   groupNames,
 }

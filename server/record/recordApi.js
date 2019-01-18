@@ -8,12 +8,15 @@ const Node = require('../../common/record/node')
 const RecordManager = require('./recordManager')
 const FileManager = require('../file/fileManager')
 
-const {requireRecordEditPermission} = require('../authGroup/authMiddleware')
+const {
+  requireRecordEditPermission,
+  requireRecordCreatePermission,
+} = require('../authGroup/authMiddleware')
 
 module.exports.init = app => {
 
   // ==== CREATE
-  app.post('/survey/:surveyId/record', async (req, res) => {
+  app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res) => {
     try {
       const {user} = req
       const surveyId = getRestParam(req, 'surveyId')
@@ -33,7 +36,7 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/survey/:surveyId/record/:recordUuid/node', async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res) => {
     try {
       const user = req.user
       const node = JSON.parse(req.body.node)
