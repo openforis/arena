@@ -9,11 +9,9 @@ import Editor from './editor/editor'
 
 import * as SurveyState from '../../survey/surveyState'
 import Survey from '../../../common/survey/survey'
-import NodeDef from '../../../common/survey/nodeDef'
-import NodeDefTable from '../../../common/surveyRdb/nodeDefTable'
-import sqlTypes from '../../../common/surveyRdb/sqlTypes'
 
 import Expression from '../../../common/exprParser/expression'
+import * as ExpressionVariables from './expressionVariables'
 
 import { elementOffset } from '../../appUtils/domUtils'
 
@@ -92,39 +90,16 @@ ExpressionComponent.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
-  const {nodeDefUuid} = props
+  const {
+    nodeDefUuid,
+    mode = ExpressionComponent.defaultProps.mode
+  } = props
 
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+  const variables = ExpressionVariables.getVariables(survey, nodeDef, mode)
 
-  const getVariables = (nodeDef) => {
-    const variables = R.pipe(
-      R.map(nodeDef => {
-          if (NodeDef.isNodeDefEntity(nodeDef))
-            return null
-          const colNames = NodeDefTable.getColNames(nodeDef)
-          return colNames.map(col => ({
-            label: NodeDef.getNodeDefLabel(nodeDef, lang) + (colNames.length === 1 ? '' : ' - ' + NodeDefTable.extractColName(nodeDef, col)),
-            type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
-              NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
-                : sqlTypes.varchar,
-            value: col,
-          }))
-        }
-      ),
-      R.flatten,
-      R.reject(R.isNil),
-    )(Survey.getNodeDefChildren(nodeDef)(survey))
-
-    return NodeDef.isNodeDefRoot(nodeDef)
-      ? variables
-      : R.concat(
-        variables,
-        getVariables(Survey.getNodeDefParent(nodeDef)(survey))
-      )
-  }
   return {
-    variables: getVariables(nodeDef)
+    variables
   }
 }
 

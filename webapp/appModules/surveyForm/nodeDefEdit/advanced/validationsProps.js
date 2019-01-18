@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 
-import { ExpressionsProp } from '../advanced/expressionsProp'
+import { ExpressionsProp } from './expressionsProp'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'
@@ -21,9 +21,11 @@ const integerMask = createNumberMask({
 })
 
 const ValidationsProps = props => {
-  const {nodeDef, readOnly, putNodeDefProp} = props
+  const {nodeDef, nodeDefParent, readOnly, putNodeDefProp} = props
 
-  const {validation} = nodeDef
+  const validation = NodeDef.getNodeDefValidation(nodeDef)
+  const nodeDefParentUuid = NodeDef.getUuid(nodeDefParent)
+
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
 
   const handleValidationsUpdate = validations =>
@@ -82,7 +84,8 @@ const ValidationsProps = props => {
                        )(validation)}
                        onChange={expressions => handleValidationsUpdate(
                          NodeDefValidations.assocExpressions(expressions)(nodeDefValidations)
-                       )}/>
+                       )}
+                       nodeDefUuid={nodeDefParentUuid}/>
     </div>
   )
 }

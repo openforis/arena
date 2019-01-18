@@ -175,6 +175,19 @@ const Identifier = ({node, variables, onChange}) => (
             )}/>
 )
 
+const Member = ({node, variables, onChange}) => {
+  const nodeIdentifier = {
+    type: Expression.types.Identifier,
+    name: Expression.toString(node)
+  }
+
+  return (
+    <Identifier node={nodeIdentifier}
+                variables={variables}
+                onChange={onChange}/>
+  )
+}
+
 const Literal = ({node, onChange}) => (
   <div className="literal">
     <input className="form-input" value={node.raw}
@@ -188,7 +201,7 @@ const Literal = ({node, onChange}) => (
 
 const components = {
   [Expression.types.Identifier]: Identifier,
-  // [Expression.types.MemberExpression]: memberExpression,
+  [Expression.types.MemberExpression]: Member,
   [Expression.types.Literal]: Literal,
   // [Expression.types.ThisExpression]: thisExpression,
   // [Expression.types.CallExpression]: callExpression,

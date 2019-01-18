@@ -8,8 +8,9 @@ import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
 import Validator from '../../../../../common/validation/validator'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
+import ExpressionComponent from '../../../../commonComponents/expression/expression'
 
-const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly, validation}) => (
+const ExpressionProp = ({nodeDefUuid, expression, applyIf, onUpdate, onDelete, readOnly, validation}) => (
   <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
     {
@@ -23,9 +24,13 @@ const Expression = ({expression, applyIf, onUpdate, onDelete, readOnly, validati
 
     <div className="expression-item">
       <div className="label">Expression</div>
-      <Input value={NodeDefExpression.getExpression(expression)}
-             validation={Validator.getFieldValidation('expression')(validation)}
-             onChange={value => onUpdate(NodeDefExpression.assocExpression(value)(expression))}/>
+
+      <ExpressionComponent nodeDefUuid={nodeDefUuid}
+                           query={NodeDefExpression.getExpression(expression)}
+                           onChange={expr =>
+                             onUpdate(NodeDefExpression.assocExpression(expr)(expression))
+                           }/>
+
     </div>
     {
       applyIf &&
@@ -95,7 +100,7 @@ export class ExpressionsProp extends React.Component {
   }
 
   render () {
-    const {label, readOnly, applyIf, validation} = this.props
+    const {nodeDefUuid, label, readOnly, applyIf, validation} = this.props
     const {uiValues} = this.state
 
     return (
@@ -103,13 +108,14 @@ export class ExpressionsProp extends React.Component {
         <div className="node-def-edit__expressions">
           {
             uiValues.map((value, i) =>
-              <Expression key={i}
+              <ExpressionProp key={i}
                           expression={value}
                           applyIf={applyIf}
                           validation={Validator.getFieldValidation(i)(validation)}
                           onDelete={this.handleDelete.bind(this)}
                           onUpdate={this.handleUpdate.bind(this)}
-                          readOnly={readOnly}/>
+                          readOnly={readOnly}
+                          nodeDefUuid={nodeDefUuid}/>
             )
 
           }
@@ -124,7 +130,7 @@ ExpressionsProp.defaultProps = {
   applyIf: true,
   multiple: true,
   readOnly: false,
-
+  nodeDefUuid: null,
   // array of expressions
   values: [],
 
@@ -132,7 +138,7 @@ ExpressionsProp.defaultProps = {
 }
 
 export const NodeDefExpressionsProp = props => {
-  const {nodeDef, propName, validation, label, multiple, applyIf, readOnly, putNodeDefProp} = props
+  const {nodeDef, nodeDefUuid, propName, validation, label, multiple, applyIf, readOnly, putNodeDefProp} = props
 
   const values = NodeDef.getProp(propName, [])(nodeDef)
 
@@ -151,12 +157,14 @@ export const NodeDefExpressionsProp = props => {
                           multiple={multiple}
                           values={values}
                           validation={validation}
-                          onChange={onExpressionsUpdate}/>
+                          onChange={onExpressionsUpdate}
+                          nodeDefUuid={nodeDefUuid}/>
 
 }
 
 NodeDefExpressionsProp.defaultProps = {
   nodeDef: null,
+  nodeDefUuid: null,
   propName: null,
   label: '',
 
