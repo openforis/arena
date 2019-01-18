@@ -1,4 +1,5 @@
 const {groupNames, permissions} = require('../../auth/authGroups')
+const {keys: authGroupKeys} = require('../../auth/authGroups')
 
 const defaultSteps = {
   '1': {name: 'entry'},
@@ -6,7 +7,7 @@ const defaultSteps = {
   '3': {name: 'analysis', prev: '2'},
 }
 
-const getDefaultAuthGroups = (lang) => [
+const getDefaultAuthGroups = lang => [
   {
     name: groupNames.surveyAdmin,
     permissions: [
@@ -15,12 +16,16 @@ const getDefaultAuthGroups = (lang) => [
       permissions.recordView,
       permissions.recordCreate,
       permissions.recordDataEdit,
-      permissions.userInvite
+      permissions.userInvite,
     ],
     labels: {[lang]: 'Survey administrators'},
     descriptions: {[lang]: `Full rights`},
 
-    dataSteps: {'1': 'all', '2': 'all', '3': 'all'},
+    recordSteps: {
+      '1': authGroupKeys.all,
+      '2': authGroupKeys.all,
+      '3': authGroupKeys.all,
+    },
   },
   {
     name: groupNames.surveyEditor,
@@ -28,48 +33,61 @@ const getDefaultAuthGroups = (lang) => [
       permissions.surveyEdit,
       permissions.recordView,
       permissions.recordCreate,
-      permissions.recordDataEdit
+      permissions.recordDataEdit,
     ],
     labels: {en: 'Survey editors'},
     descriptions: {[lang]: `Can edit survey, records, invite users`},
 
-    dataSteps: {'1': 'all', '2': 'all', '3': 'all'},
+    recordSteps: {
+      '1': authGroupKeys.all,
+      '2': authGroupKeys.all,
+      '3': authGroupKeys.all,
+    },
   },
   {
     name: groupNames.dataEditor,
     permissions: [
       permissions.recordView,
       permissions.recordCreate,
-      permissions.recordDataEdit
+      permissions.recordDataEdit,
     ],
     labels: {en: 'Data editors'},
     descriptions: {[lang]: `Can edit records in data entry step`},
 
-    dataSteps: {'1': 'own'}
+    recordSteps: {
+      '1': authGroupKeys.own,
+    },
   },
   {
     name: groupNames.dataCleanser,
     permissions: [
       permissions.recordView,
       permissions.recordCreate,
-      permissions.recordDataEdit
+      permissions.recordDataEdit,
     ],
     labels: {en: 'Data cleansers'},
     descriptions: {[lang]: `Can edit records in data cleansing step`},
 
-    dataSteps: {'1': 'all', '2': 'all'},
+    recordSteps: {
+      '1': authGroupKeys.all,
+      '2': authGroupKeys.all,
+    },
   },
   {
     name: groupNames.dataAnalyst,
     permissions: [
       permissions.recordView,
       permissions.recordCreate,
-      permissions.recordDataEdit
+      permissions.recordDataEdit,
     ],
     labels: {en: 'Data analysts'},
     descriptions: {[lang]: `Can edit records in data analysis step`},
 
-    dataSteps: {'1': 'all', '2': 'all', '3': 'all'},
+    recordSteps: {
+      '1': authGroupKeys.all,
+      '2': authGroupKeys.all,
+      '3': authGroupKeys.all,
+    },
   }
 ]
 

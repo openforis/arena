@@ -41,7 +41,7 @@ const canEditRecord = (user, record) => {
 
   // level = 'all' or 'own'. If 'own', user can only edit the records that he created
   // If 'all', he can edit all survey's records
-  const level = R.path([keys.dataSteps, recordDataStep], recordUserPermissions)
+  const level = R.path([keys.recordSteps, recordDataStep], recordUserPermissions)
 
   return level === keys.all || (level === keys.own && Record.getOwnerId(record) === user.id)
 }

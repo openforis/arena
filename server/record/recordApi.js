@@ -125,7 +125,7 @@ module.exports.init = app => {
   })
 
   // ==== DELETE
-  app.delete('/survey/:surveyId/record/:recordUuid', async (req, res) => {
+  app.delete('/survey/:surveyId/record/:recordUuid', requireRecordEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const recordUuid = getRestParam(req, 'recordUuid')
@@ -139,7 +139,7 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', async (req, res) => {
+  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUuid = getRestParam(req, 'nodeUuid')

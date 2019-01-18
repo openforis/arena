@@ -1,7 +1,7 @@
 const keys = {
   authGroups: 'authGroups',
   permissions: 'permissions',
-  dataSteps: 'dataSteps',
+  recordSteps: 'recordSteps',
   all: 'all',
   own: 'own',
 }
