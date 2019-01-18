@@ -13,7 +13,7 @@
     "start": "node server/server.js",
     "postinstall": "webpack --config webpack.config.js",
     "watch": "cross-env-shell NODE_ENV=development \"yarn build:watch & yarn watch:server\"",
-    "watch:server": "nodemon -e js --watch server --experimental-worker server/server.js",
+    "watch:server": "nodemon -e js --watch server --experimental-worker --inspect server/server.js",
     "create-migration": "./server/db/migration/create-migration.sh",
     "test": "mocha-webpack --webpack-config webpack.config-test.js \"test/it/*.js\""
   },

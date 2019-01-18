@@ -139,14 +139,17 @@ const Binary = (props) => {
     canDelete = false, onDelete,
   } = props
   const {left, right, operator} = node
-  const operators = R.values(comparisonOperators)
+  const operators = R.concat(
+    R.values(arithmeticOperators),
+    R.values(comparisonOperators)
+  )
 
   return (
     <div className="binary">
       <TypeSwitch {...props} node={left}
                   onChange={item => onChange(R.assoc('left', item, node))}/>
 
-      <Dropdown items={operators} inputSize={7}
+      <Dropdown items={operators} inputSize={10}
                 selection={R.find(R.propEq('key', operator), operators)}
                 onChange={item => onChange(
                   R.assoc('operator', R.propOr('', 'key', item), node)
@@ -173,7 +176,7 @@ const Identifier = ({node, variables, onChange}) => (
 )
 
 const Literal = ({node, onChange}) => (
-  <div>
+  <div className="literal">
     <input className="form-input" value={node.raw}
            size={25}
            onChange={e => onChange(R.pipe(
