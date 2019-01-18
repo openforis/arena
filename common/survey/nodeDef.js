@@ -141,10 +141,12 @@ const canNodeDefHaveDefaultValue = nodeDef =>
     [
       nodeDefType.boolean,
       nodeDefType.code,
+      nodeDefType.date,
       nodeDefType.decimal,
       nodeDefType.integer,
       nodeDefType.taxon,
       nodeDefType.text,
+      nodeDefType.time,
     ]
   )
 

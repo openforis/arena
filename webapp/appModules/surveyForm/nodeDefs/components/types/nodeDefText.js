@@ -9,14 +9,15 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 
 import Node from '../../../../../../common/record/node'
 
-const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) =>
+const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) => (
   <div>
     <Input readOnly={edit}
            {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
-           value={NodeDefUI.getNodeDefValueToStringFn(nodeDef)(Node.getNodeValue(node, ''))}
-           onChange={value => updateNode(nodeDef, node, NodeDefUI.getNodeDefStringToValueFn(nodeDef)(value))}
+           value={Node.getNodeValue(node, '')}
+           onChange={value => updateNode(nodeDef, node, value)}
     />
   </div>
+)
 
 const MultipleTextInput = props => {
   const {nodeDef, nodes, removeNode} = props

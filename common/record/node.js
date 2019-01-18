@@ -24,11 +24,6 @@ const valuePropKeys = {
   y: 'y',
   srs: 'srs',
 
-  //date
-  year: 'year',
-  month: 'month',
-  day: 'day',
-
   // file
   fileName: 'fileName',
   fileUuid: 'fileUuid',
