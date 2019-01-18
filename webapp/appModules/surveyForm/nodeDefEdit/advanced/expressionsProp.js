@@ -32,13 +32,17 @@ const ExpressionProp = ({nodeDefUuid, expression, applyIf, onUpdate, onDelete, r
                            }/>
 
     </div>
+
     {
       applyIf &&
       <div className="expression-item">
         <div className="label">Apply If</div>
-        <Input value={NodeDefExpression.getApplyIf(expression)}
-               validation={Validator.getFieldValidation('applyIf')(validation)}
-               onChange={value => onUpdate(NodeDefExpression.assocApplyIf(value)(expression))}/>
+
+        <ExpressionComponent nodeDefUuid={nodeDefUuid}
+                             query={NodeDefExpression.getApplyIf(expression)}
+                             onChange={expr =>
+                               onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
+                             }/>
       </div>
     }
 
@@ -109,13 +113,13 @@ export class ExpressionsProp extends React.Component {
           {
             uiValues.map((value, i) =>
               <ExpressionProp key={i}
-                          expression={value}
-                          applyIf={applyIf}
-                          validation={Validator.getFieldValidation(i)(validation)}
-                          onDelete={this.handleDelete.bind(this)}
-                          onUpdate={this.handleUpdate.bind(this)}
-                          readOnly={readOnly}
-                          nodeDefUuid={nodeDefUuid}/>
+                              expression={value}
+                              applyIf={applyIf}
+                              validation={Validator.getFieldValidation(i)(validation)}
+                              onDelete={this.handleDelete.bind(this)}
+                              onUpdate={this.handleUpdate.bind(this)}
+                              readOnly={readOnly}
+                              nodeDefUuid={nodeDefUuid}/>
             )
 
           }
