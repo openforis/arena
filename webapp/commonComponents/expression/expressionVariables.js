@@ -7,20 +7,21 @@ import sqlTypes from '../../../common/surveyRdb/sqlTypes'
 
 import Expression from '../../../common/exprParser/expression'
 
-const getJsVariables = (nodeDef, lang) => {
+const getJsVariables = (nodeDef, lang, depth) => {
   const nodeDefName = NodeDef.getNodeDefName(nodeDef)
 
+  const parentFnCalls = R.repeat('parent()', depth).join('.')
+
   return [{
-    value: `this.parent('${nodeDefName}').value`,
+    value: `this.${parentFnCalls}.node('${nodeDefName}').value`,
 
-    label: nodeDefName + '.value',
+    label: NodeDef.getNodeDefLabel(nodeDef, lang) + ' - Value',
 
-    type:  NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
+    type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
       NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
         : sqlTypes.varchar,
   }]
 }
-
 
 const getSqlVariables = (nodeDef, lang) => {
   const colNames = NodeDefTable.getColNames(nodeDef)
@@ -41,7 +42,7 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const getChildDefVariables = (survey, nodeDef, mode) => {
+const getChildDefVariables = (survey, nodeDef, mode, depth) => {
   const lang = Survey.getDefaultLanguage(
     Survey.getSurveyInfo(survey)
   )
@@ -54,7 +55,7 @@ const getChildDefVariables = (survey, nodeDef, mode) => {
         else if (mode === Expression.modes.sql)
           return getSqlVariables(childDef, lang)
         else if (mode === Expression.modes.json)
-          return getJsVariables(childDef, lang)
+          return getJsVariables(childDef, lang, depth)
       }
     ),
     R.flatten,
@@ -62,9 +63,9 @@ const getChildDefVariables = (survey, nodeDef, mode) => {
   )(survey)
 }
 
-export const getVariables = (survey, nodeDef, mode) => {
+export const getVariables = (survey, nodeDef, mode, depth = 1) => {
 
-  const variables = getChildDefVariables(survey, nodeDef, mode)
+  const variables = getChildDefVariables(survey, nodeDef, mode, depth)
 
   return NodeDef.isNodeDefRoot(nodeDef)
     ? variables
@@ -73,7 +74,8 @@ export const getVariables = (survey, nodeDef, mode) => {
       getVariables(
         survey,
         Survey.getNodeDefParent(nodeDef)(survey),
-        mode
+        mode,
+        depth + 1
       )
     )
 }
