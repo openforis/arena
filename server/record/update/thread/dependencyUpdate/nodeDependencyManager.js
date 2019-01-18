@@ -28,7 +28,7 @@ const fetchDependentNodes = async (survey, node, dependencyType, tx) => {
         //2 find common parent node
         const commonParentNode = await NodeRepository.fetchAncestorByNodeDefUuid(surveyId, Node.getUuid(node), commonParentDefUuid, tx)
 
-        //3 find descendent nodes of common parent node with nodeDefUuid = dependentDef uuid
+        //3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
         return await NodeRepository.fetchDescendantNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getUuid(commonParentNode), NodeDef.getUuid(dependentDef), tx)
       })
     )

@@ -1,6 +1,6 @@
 {
   "license": "MIT",
-  "name": "OpenForisArena",
+  "name": "open-foris-arena",
   "engines": {
     "node": ">=10.13.0",
     "yarn": ">=1.12.3"

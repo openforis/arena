@@ -124,9 +124,10 @@ const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
     date_modified = now()
     WHERE uuid = $3
     RETURNING *, true as updated
-    `, [R.isNil(value) ? null : JSON.stringify(value), meta, nodeUuid],
+    `, [stringifyValue(value), meta, nodeUuid],
     dbTransformCallback
   )
+
 const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUuid, applicable, client = db) =>
   await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
@@ -146,6 +147,26 @@ const deleteNode = async (surveyId, nodeUuid, client = db) =>
     `, [nodeUuid],
     dbTransformCallback
   )
+
+const stringifyValue = value => {
+  const isJsonString = str => {
+    try {
+      return R.is(Object, JSON.parse(str))
+    } catch (e) {
+      return false
+    }
+  }
+
+  return R.ifElse(
+    R.isNil,
+    R.identity,
+    R.ifElse(
+      v => R.is(String, v) && isJsonString(v),
+      R.identity,
+      v => JSON.stringify(v)
+    )
+  )(value)
+}
 
 module.exports = {
   //CREATE

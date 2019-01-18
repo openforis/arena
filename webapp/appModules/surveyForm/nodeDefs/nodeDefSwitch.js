@@ -10,6 +10,7 @@ import ErrorBadge from '../../../commonComponents/errorBadge'
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import Record from '../../../../common/record/record'
+import Node from '../../../../common/record/node'
 import Layout from '../../../../common/survey/nodeDefLayout'
 
 import { getStateSurveyInfo } from '../../../survey/surveyState'
@@ -57,11 +58,13 @@ class NodeDefSwitch extends React.Component {
     const {
       nodeDef,
       edit,
+      entry,
       locked,
       canEditDef,
 
       renderType,
       label,
+      applicable,
 
       setFormNodeDefEdit,
       putNodeDefProp,
@@ -72,9 +75,13 @@ class NodeDefSwitch extends React.Component {
     const isRoot = NodeDef.isNodeDefRoot(nodeDef)
     const isPage = !!Layout.getPageUuid(nodeDef)
 
-    return <div className={`${isPage ? 'node-def__form_page' : 'node-def__form'}`} ref="nodeDefElem">
+    return <div className={`${isPage ? 'node-def__form_page' : 'node-def__form'}${applicable ? '' : ' node-def__not-applicable'}`}
+                ref="nodeDefElem">
 
-      <ErrorBadge validation={nodeDef.validation}/>
+      {
+        !entry &&
+        <ErrorBadge validation={nodeDef.validation}/>
+      }
 
       {
         edit && canEditDef && (
@@ -159,13 +166,16 @@ const mapStateToProps = (state, props) => {
       ? [Record.getRootNode(getRecord(surveyForm))]
       : parentNode
         ? Record.getNodeChildrenByDefUuid(parentNode, nodeDef.uuid)(getRecord(surveyForm))
-        : []
+        : [],
   })
 
   return {
     // always unlocking attributes
     locked: NodeDef.isNodeDefEntity(nodeDef) ? isNodeDefFormLocked(nodeDef)(surveyForm) : false,
     label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
+    applicable: parentNode
+      ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
+      : true,
     ...entry ? mapEntryProps() : {},
   }
 }
