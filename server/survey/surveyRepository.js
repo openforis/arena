@@ -59,9 +59,9 @@ const getSurveyById = async (surveyId, draft = false, client = db) =>
     def => dbTransformCallback(def, draft)
   )
 
-const fetchDepedenciesByNodeDefUuid = async (surveyId, dependencyType, nodeDefUuid, client = db) =>
+const fetchDepedencies = async (surveyId, client = db) =>
   await client.oneOrNone(
-    `SELECT meta#>'{dependencyGraphs, ${dependencyType}, ${nodeDefUuid}}' as dependencies FROM survey WHERE id = $1`,
+    `SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1`,
     [surveyId],
     R.prop('dependencies')
   )
@@ -135,7 +135,7 @@ module.exports = {
   fetchSurveys,
   getSurveysByName,
   getSurveyById,
-  fetchDepedenciesByNodeDefUuid,
+  fetchDepedencies,
 
   //UPDATE
   updateSurveyProp,

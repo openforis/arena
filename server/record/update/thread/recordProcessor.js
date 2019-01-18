@@ -10,7 +10,7 @@ const Record = require('../../../../common/record/record')
 const RecordRepository = require('../../../record/recordRepository')
 const NodeRepository = require('../../../record/nodeRepository')
 
-const DependentNodesUpdater = require('./dependentNodesUpdater')
+const DependentNodesUpdater = require('./dependencyUpdate/dependentNodesUpdater')
 
 const ActivityLog = require('../../../activityLog/activityLogger')
 
@@ -118,7 +118,7 @@ class RecordProcessor {
   // ==== UPDATE
 
   async _updateNodeValue (surveyId, nodeUuid, value, t) {
-    const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, t)
+    const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, {[Node.metaKeys.defaultValue]: false}, t)
     return await this._onNodeUpdate(surveyId, node, t)
   }
 
@@ -139,7 +139,7 @@ class RecordProcessor {
   }
 
   async _updateDependentNodes (user, survey, nodes, t) {
-    const updatedDependentNodes = await DependentNodesUpdater.updateDependentNodes(user, survey, nodes, t)
+    const updatedDependentNodes = await DependentNodesUpdater.updateNodes(user, survey, nodes, t)
     this._notifyNodesUpdate(updatedDependentNodes)
     return R.mergeRight(nodes, updatedDependentNodes)
   }

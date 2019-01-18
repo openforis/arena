@@ -13,6 +13,14 @@ const AdvancedProps = props => {
   return (
     <div className="form">
 
+
+      <NodeDefExpressionsProp nodeDef={nodeDef}
+                              putNodeDefProp={putNodeDefProp}
+                              label="Calculated values"
+                              readOnly={readOnly}
+                              propName="calculatedValues"
+                              validation={Validator.getFieldValidation('calculatedValues')(validation)}/>
+
       {
         NodeDef.canNodeDefHaveDefaultValue(nodeDef) &&
 
@@ -23,13 +31,6 @@ const AdvancedProps = props => {
                                 propName="defaultValues"
                                 validation={Validator.getFieldValidation('defaultValues')(validation)}/>
       }
-
-      <NodeDefExpressionsProp nodeDef={nodeDef}
-                              putNodeDefProp={putNodeDefProp}
-                              label="Calculated values"
-                              readOnly={readOnly}
-                              propName="calculatedValues"
-                              validation={Validator.getFieldValidation('calculatedValues')(validation)}/>
 
       <NodeDefExpressionsProp nodeDef={nodeDef}
                               putNodeDefProp={putNodeDefProp}
