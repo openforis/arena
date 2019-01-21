@@ -5,7 +5,7 @@ const {isBlank, trim} = require('../stringUtils')
 const SurveyUtils = require('../survey/surveyUtils')
 
 const keys = {
-  uuid: 'uuid',
+  uuid: SurveyUtils.keys.uuid,
   recordUuid: 'recordUuid',
   value: 'value',
   meta: 'meta',
