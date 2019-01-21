@@ -115,7 +115,7 @@ module.exports = {
   getRecordUuid: R.prop(keys.recordUuid),
   getNodeValue,
   getNodeDefUuid,
-  isChildApplicable: childDefUuid => R.path([keys.meta, metaKeys.childApplicability, childDefUuid]),
+  isChildApplicable: childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid]),
 
   getNodeDefUuids,
 

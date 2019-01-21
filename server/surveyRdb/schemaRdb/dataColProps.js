@@ -109,13 +109,13 @@ const props = {
 const getColValueProcessor = nodeDef => R.propOr(
   () => (node) => Node.getNodeValue(node, null),
   colValueProcessor,
-  props[NodeDef.getNodeDefType(nodeDef)]
+  props[NodeDef.getType(nodeDef)]
 )
 
 const getColTypeProcessor = nodeDef => R.propOr(
   nodeDef => colName => `VARCHAR`,
   colTypeProcessor,
-  props[NodeDef.getNodeDefType(nodeDef)]
+  props[NodeDef.getType(nodeDef)]
 )(nodeDef)
 
 module.exports = {

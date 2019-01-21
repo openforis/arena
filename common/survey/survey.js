@@ -13,7 +13,7 @@ module.exports = {
   getDefaultAuthGroups: SurveyDefaults.getDefaultAuthGroups,
 
   // READ
-  getId: R.pipe(SurveyInfo.getInfo, R.prop('id')),
+  getId: R.pipe(SurveyInfo.getInfo, SurveyInfo.getId),
   getSurveyInfo: SurveyInfo.getInfo,
 
   // === context is surveyInfo

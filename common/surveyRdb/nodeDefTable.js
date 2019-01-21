@@ -33,7 +33,7 @@ const cols = {
 
 const getCols = nodeDef => R.propOr(
   [],
-  NodeDef.getNodeDefType(nodeDef),
+  NodeDef.getType(nodeDef),
   cols
 )
 

@@ -62,7 +62,7 @@ const updateNodeDefTest = async () => {
 
   //do not modify existing nodes
   const reloadedNodeDef2 = R.find(n => n.id === nodeDef2.id)(nodeDefs)
-  expect(NodeDef.getNodeDefType(reloadedNodeDef2)).to.equal(NodeDef.getNodeDefType(nodeDef2))
+  expect(NodeDef.getType(reloadedNodeDef2)).to.equal(NodeDef.getType(nodeDef2))
   expect(NodeDef.getNodeDefName(reloadedNodeDef2)).to.equal(NodeDef.getNodeDefName(nodeDef2))
 }
 
