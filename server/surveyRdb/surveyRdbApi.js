@@ -6,9 +6,13 @@ const Request = require('../serverUtils/request')
 //const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 const SurveyRdbManager = require('./surveyRdbManager')
 
+const {
+  requireRecordListViewPermission,
+} = require('../authGroup/authMiddleware')
+
 module.exports.init = app => {
 
-  app.get('/surveyRdb/:surveyId/:tableName/query', async (req, res) => {
+  app.get('/surveyRdb/:surveyId/:tableName/query', requireRecordListViewPermission, async (req, res) => {
     try {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
       const tableName = Request.getRequiredParam(req, 'tableName')
@@ -26,7 +30,7 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/surveyRdb/:surveyId/:tableName/query/count', async (req, res) => {
+  app.get('/surveyRdb/:surveyId/:tableName/query/count', requireRecordListViewPermission, async (req, res) => {
     try {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
       const tableName = Request.getRequiredParam(req, 'tableName')

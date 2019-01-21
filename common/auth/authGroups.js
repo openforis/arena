@@ -16,7 +16,7 @@ const permissions = {
 
   // records
   recordCreate: 'recordCreate',
-  recordDataEdit: 'recordDataEdit',
+  recordEdit: 'recordEdit',
   recordView: 'recordView',
 
   // users
@@ -34,7 +34,7 @@ const groupNames = {
   dataEditor: 'dataEditor',
   dataCleanser: 'dataCleanser',
   dataAnalyst: 'dataAnalyst',
-  guest: 'guest',
+  surveyGuest: 'surveyGuest',
 }
 
 module.exports = {

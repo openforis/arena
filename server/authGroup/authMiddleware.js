@@ -5,15 +5,18 @@ const {fetchSurveyById} = require('../survey/surveyManager')
 const {fetchRecordByUuid} = require('../record/recordManager')
 
 const {
+  canViewSurvey,
   canEditSurvey,
   canCreateRecord,
   canEditRecord,
+  canViewRecord,
+
 } = require('../../common/auth/authManager')
 const Survey = require('../../common/survey/survey')
 
 const UnauthorizedError = require('./unauthorizedError')
 
-const requireSurveyPermission = (permissionFn) =>
+const requireSurveyPermission = permissionFn =>
   async (req, res, next) => {
     const {user} = req
     const survey = await fetchSurveyById(getRestParam(req, 'surveyId'))
@@ -46,6 +49,8 @@ module.exports = {
   requireSurveyEditPermission: requireSurveyPermission(canEditSurvey),
 
   // Record
+  requireRecordListViewPermission: requireSurveyPermission(canViewSurvey),
   requireRecordCreatePermission: requireSurveyPermission(canCreateRecord),
   requireRecordEditPermission: requireRecordPermission(canEditRecord),
+  requireRecordViewPermission: requireRecordPermission(canViewRecord),
 }

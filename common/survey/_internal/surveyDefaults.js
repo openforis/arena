@@ -15,7 +15,7 @@ const getDefaultAuthGroups = lang => [
       permissions.surveyEdit,
       permissions.recordView,
       permissions.recordCreate,
-      permissions.recordDataEdit,
+      permissions.recordEdit,
       permissions.userInvite,
     ],
     labels: {[lang]: 'Survey administrators'},
@@ -33,9 +33,9 @@ const getDefaultAuthGroups = lang => [
       permissions.surveyEdit,
       permissions.recordView,
       permissions.recordCreate,
-      permissions.recordDataEdit,
+      permissions.recordEdit,
     ],
-    labels: {en: 'Survey editors'},
+    labels: {[lang]: 'Survey editors'},
     descriptions: {[lang]: `Can edit survey, records, invite users`},
 
     recordSteps: {
@@ -49,9 +49,9 @@ const getDefaultAuthGroups = lang => [
     permissions: [
       permissions.recordView,
       permissions.recordCreate,
-      permissions.recordDataEdit,
+      permissions.recordEdit,
     ],
-    labels: {en: 'Data editors'},
+    labels: {[lang]: 'Data editors'},
     descriptions: {[lang]: `Can edit records in data entry step`},
 
     recordSteps: {
@@ -63,9 +63,9 @@ const getDefaultAuthGroups = lang => [
     permissions: [
       permissions.recordView,
       permissions.recordCreate,
-      permissions.recordDataEdit,
+      permissions.recordEdit,
     ],
-    labels: {en: 'Data cleansers'},
+    labels: {[lang]: 'Data cleansers'},
     descriptions: {[lang]: `Can edit records in data cleansing step`},
 
     recordSteps: {
@@ -78,9 +78,9 @@ const getDefaultAuthGroups = lang => [
     permissions: [
       permissions.recordView,
       permissions.recordCreate,
-      permissions.recordDataEdit,
+      permissions.recordEdit,
     ],
-    labels: {en: 'Data analysts'},
+    labels: {[lang]: 'Data analysts'},
     descriptions: {[lang]: `Can edit records in data analysis step`},
 
     recordSteps: {
@@ -88,7 +88,12 @@ const getDefaultAuthGroups = lang => [
       '2': authGroupKeys.all,
       '3': authGroupKeys.all,
     },
-  }
+  },
+  {
+    name: groupNames.surveyGuest,
+    labels: {[lang]: 'Survey guest'},
+    descriptions: {[lang]: `Can view records`},
+  },
 ]
 
 module.exports = {

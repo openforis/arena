@@ -17,7 +17,6 @@
       "exports": "always-multiline"
     }],
     "object-curly-spacing": ["error", "never"],
-    // "object-curly-spacing": "off",
     "curly": "off",
     "padded-blocks": "off",
     "eol-last": "off",

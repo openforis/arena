@@ -9,8 +9,10 @@ const RecordManager = require('./recordManager')
 const FileManager = require('../file/fileManager')
 
 const {
+  requireRecordListViewPermission,
   requireRecordEditPermission,
   requireRecordCreatePermission,
+  requireRecordViewPermission,
 } = require('../authGroup/authMiddleware')
 
 module.exports.init = app => {
@@ -54,7 +56,7 @@ module.exports.init = app => {
 
   // ==== READ
 
-  app.get('/survey/:surveyId/records/count', async (req, res) => {
+  app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
 
@@ -66,7 +68,7 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/records', async (req, res) => {
+  app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const limit = getRestParam(req, 'limit')
@@ -79,7 +81,7 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', async (req, res) => {
+  app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', requireRecordViewPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUuid = getRestParam(req, 'nodeUuid')

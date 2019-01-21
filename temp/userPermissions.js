@@ -5,7 +5,7 @@ const permissions = {
   surveyEdit: 'surveyEdit',
 
   recordCreate: 'recordCreate',
-  recordDataEdit: 'recordDataEdit',
+  recordEdit: 'recordEdit',
   recordView: 'recordView',
 
   userInvite: 'userInvite',
@@ -35,7 +35,7 @@ const roles = {
     permissions: [
       permissions.permissionsEdit,
       permissions.surveyEdit,
-      permissions.recordView, permissions.recordCreate, permissions.recordDataEdit,
+      permissions.recordView, permissions.recordCreate, permissions.recordEdit,
       permissions.userInvite,
     ],
     recordSteps: ['1', '2', '3'],
@@ -44,28 +44,28 @@ const roles = {
   [rolesKey.surveyEditor]: {
     labels: {},
     descriptions: {},
-    permissions: [permissions.surveyEdit, permissions.recordView, permissions.recordCreate, permissions.recordDataEdit],
+    permissions: [permissions.surveyEdit, permissions.recordView, permissions.recordCreate, permissions.recordEdit],
     recordSteps: ['1', '2', '3'],
   },
 
   [rolesKey.dataEditor]: {
     labels: {},
     descriptions: {},
-    permissions: [permissions.recordView, permissions.recordCreate, permissions.recordDataEdit],
+    permissions: [permissions.recordView, permissions.recordCreate, permissions.recordEdit],
     recordSteps: [{'1': 'owned'}],
   },
 
   [rolesKey.dataCleanser]: {
     labels: {},
     descriptions: {},
-    permissions: [permissions.recordView, permissions.recordCreate, permissions.recordDataEdit],
+    permissions: [permissions.recordView, permissions.recordCreate, permissions.recordEdit],
     recordSteps: [{'1': 'all'}, {'2': 'all'}],
   },
 
   [rolesKey.dataAnalyst]: {
     labels: {},
     descriptions: {},
-    permissions: [permissions.recordView, permissions.recordCreate, permissions.recordDataEdit],
+    permissions: [permissions.recordView, permissions.recordCreate, permissions.recordEdit],
     recordSteps: [{'1': 'all'}, {'2': 'all'}, {'3': 'all'}],
   },
 }
