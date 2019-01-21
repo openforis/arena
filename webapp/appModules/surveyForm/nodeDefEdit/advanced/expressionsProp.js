@@ -7,10 +7,10 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
 import Validator from '../../../../../common/validation/validator'
 
-import { FormItem, Input } from '../../../../commonComponents/form/input'
+import { FormItem } from '../../../../commonComponents/form/input'
 import ExpressionComponent from '../../../../commonComponents/expression/expression'
 
-const ExpressionProp = ({nodeDefUuid, expression, applyIf, onUpdate, onDelete, readOnly, validation}) => (
+const ExpressionProp = ({nodeDefUuid, expression, applyIf, onUpdate, onDelete, readOnly, isContextParent}) => (
   <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
     {
@@ -29,8 +29,8 @@ const ExpressionProp = ({nodeDefUuid, expression, applyIf, onUpdate, onDelete, r
                            query={NodeDefExpression.getExpression(expression)}
                            onChange={expr =>
                              onUpdate(NodeDefExpression.assocExpression(expr)(expression))
-                           }/>
-
+                           }
+                           isContextParent={isContextParent}/>
     </div>
 
     {
@@ -42,7 +42,8 @@ const ExpressionProp = ({nodeDefUuid, expression, applyIf, onUpdate, onDelete, r
                              query={NodeDefExpression.getApplyIf(expression)}
                              onChange={expr =>
                                onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
-                             }/>
+                             }
+                             isContextParent={isContextParent}/>
       </div>
     }
 
@@ -104,7 +105,7 @@ export class ExpressionsProp extends React.Component {
   }
 
   render () {
-    const {nodeDefUuid, label, readOnly, applyIf, validation} = this.props
+    const {nodeDefUuid, label, readOnly, applyIf, validation, isContextParent} = this.props
     const {uiValues} = this.state
 
     return (
@@ -119,7 +120,8 @@ export class ExpressionsProp extends React.Component {
                               onDelete={this.handleDelete.bind(this)}
                               onUpdate={this.handleUpdate.bind(this)}
                               readOnly={readOnly}
-                              nodeDefUuid={nodeDefUuid}/>
+                              nodeDefUuid={nodeDefUuid}
+                              isContextParent={isContextParent}/>
             )
 
           }
@@ -138,11 +140,13 @@ ExpressionsProp.defaultProps = {
   // array of expressions
   values: [],
 
-  validation: null
+  validation: null,
+
+  isContextParent: false,
 }
 
 export const NodeDefExpressionsProp = props => {
-  const {nodeDef, nodeDefUuid, propName, validation, label, multiple, applyIf, readOnly, putNodeDefProp} = props
+  const {nodeDef, nodeDefUuid, propName, validation, label, multiple, applyIf, readOnly, putNodeDefProp, isContextParent} = props
 
   const values = NodeDef.getProp(propName, [])(nodeDef)
 
@@ -162,7 +166,8 @@ export const NodeDefExpressionsProp = props => {
                           values={values}
                           validation={validation}
                           onChange={onExpressionsUpdate}
-                          nodeDefUuid={nodeDefUuid}/>
+                          nodeDefUuid={nodeDefUuid}
+                          isContextParent={isContextParent}/>
 
 }
 
@@ -176,5 +181,6 @@ NodeDefExpressionsProp.defaultProps = {
   multiple: true,
   readOnly: false,
 
-  validation: null
+  validation: null,
+  isContextParent: false,
 }

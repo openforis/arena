@@ -10,10 +10,12 @@ import Expression from '../../../common/exprParser/expression'
 const getJsVariables = (nodeDef, lang, depth) => {
   const nodeDefName = NodeDef.getNodeDefName(nodeDef)
 
-  const parentFnCalls = R.repeat('parent()', depth).join('.')
+  const parentFnCalls = depth > 0
+    ? '.' + R.repeat('parent()', depth).join('.')
+    : ''
 
   return [{
-    value: `this.${parentFnCalls}.node('${nodeDefName}').value()`,
+    value: `this${parentFnCalls}.node('${nodeDefName}').value()`,
 
     label: NodeDef.getNodeDefLabel(nodeDef, lang) + ' - Value',
 

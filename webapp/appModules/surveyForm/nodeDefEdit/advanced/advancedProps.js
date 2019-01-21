@@ -43,7 +43,8 @@ const AdvancedProps = props => {
                               applyIf={false}
                               multiple={false}
                               validation={Validator.getFieldValidation('applicable')(validation)}
-                              nodeDefUuid={nodeDefParentUuid}/>
+                              nodeDefUuid={nodeDefParentUuid}
+                              isContextParent={true}/>
 
 
     </div>

@@ -86,17 +86,20 @@ ExpressionComponent.defaultProps = {
   query: '',
   mode: Expression.modes.json,
   onChange: null,
+  isContextParent: false,
 }
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const {
     nodeDefUuid,
-    mode = ExpressionComponent.defaultProps.mode
+    mode = ExpressionComponent.defaultProps.mode,
+    isContextParent = ExpressionComponent.defaultProps.isContextParent,
   } = props
 
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const variables = ExpressionVariables.getVariables(survey, nodeDef, mode)
+  const depth = isContextParent ? 0 : 1
+  const variables = ExpressionVariables.getVariables(survey, nodeDef, mode, depth)
 
   return {
     variables
