@@ -12,7 +12,7 @@ import { getUser } from '../../../app/appState'
 import { getRecord } from './recordState'
 import { getSurveyForm } from '../surveyFormState'
 
-import { appModuleUri } from '../../appModules'
+import { appModules, appModuleUri } from '../../appModules'
 import { dataModules } from '../../data/dataModules'
 import { designerModules } from '../../designer/designerModules'
 
@@ -55,11 +55,6 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
  * READ
  * ============
  */
-export const checkInRecord = recordUuid => async (dispatch, getState) => {
-  const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
-  dispatch({type: recordLoad, record: data.record})
-}
 
 /**
  * ============
@@ -121,27 +116,35 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   }
 }
 
-export const deleteRecord = () => async (dispatch, getState) => {
+export const deleteRecord = (history) => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = getStateSurveyId(state)
   const record = getRecord(getSurveyForm(state))
+  const recordUuid = Record.getUuid(record)
 
-  await axios.delete(`/api/survey/${surveyId}/record/${Record.getUuid(record)}`)
-
-  dispatch({type: recordDelete})
+  // 1. checkout (close server thread)
+  await checkOutRecord(recordUuid)(dispatch, getState)
+  // 2. perform server side delete
+  await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
+  // 3. remove record from redux state
+  await dispatch({type: recordDelete})
+  // 4. redirect to default data module (records view)
+  history.push(appModuleUri(appModules.data))
 }
 
 /**
  * ============
- * UTILS
+ * Check in / check out record
  * ============
  */
-export const checkOutRecord = () => async (dispatch, getState) => {
-  const state = getState()
+export const checkInRecord = recordUuid => async (dispatch, getState) => {
+  const surveyId = getStateSurveyId(getState())
+  const {data} = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
+  dispatch({type: recordLoad, record: data.record})
+}
 
-  const surveyId = getStateSurveyId(state)
-  const record = getRecord(getSurveyForm(state))
-
-  await axios.post(`/api/survey/${surveyId}/record/${Record.getUuid(record)}/checkout`)
+export const checkOutRecord = recordUuid => async (dispatch, getState) => {
+  const surveyId = getStateSurveyId(getState())
+  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)
 }

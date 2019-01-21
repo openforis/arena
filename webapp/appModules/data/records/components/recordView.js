@@ -30,29 +30,24 @@ class RecordView extends React.Component {
     window.addEventListener('beforeunload', this.componentUnload)
   }
 
-  componentDidUpdate (prevProps) {
-    const {recordUuid, history} = this.props
-    const {recordUuid: prevRecordUuid} = prevProps
-
-    // record has been deleted
-    if (prevRecordUuid && !recordUuid)
-      history.push(appModuleUri(appModules.data))
-  }
-
   componentWillUnmount () {
     this.componentUnload()
     window.removeEventListener('beforeunload', this.componentUnload)
   }
 
   componentUnload () {
-    this.props.checkOutRecord()
-    this.props.resetForm()
+    const {recordUuidUrlParam, recordLoaded, checkOutRecord, resetForm} = this.props
+
+    if (recordLoaded)
+      checkOutRecord(recordUuidUrlParam)
+
+    resetForm()
   }
 
   render () {
-    const {recordUuid, preview} = this.props
+    const {recordLoaded, preview} = this.props
 
-    return recordUuid
+    return recordLoaded
       ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true}/>
       : null
   }
@@ -63,7 +58,7 @@ const mapStateToProps = (state, {match}) => {
   const record = RecordState.getRecord(surveyForm)
 
   return {
-    recordUuid: Record.getUuid(record),
+    recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
   }
 }
