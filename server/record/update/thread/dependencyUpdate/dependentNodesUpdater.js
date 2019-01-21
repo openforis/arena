@@ -2,8 +2,10 @@ const R = require('ramda')
 const Promise = require('bluebird')
 
 const StringUtils = require('../../../../../common/stringUtils')
+const Queue = require('../../../../../common/queue')
 
 const Survey = require('../../../../../common/survey/survey')
+const SurveyUtils = require('../../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
 const Node = require('../../../../../common/record/node')
@@ -19,26 +21,43 @@ const RecordExprParser = require('../../../recordExprParser')
  */
 
 const updateNodes = async (user, survey, nodes, tx) => {
-  let nodesToVisit = nodes
-  let allUpdatedNodes = {}
-  let lastUpdatedNodes = {}
+  let allUpdatedNodes = R.values(nodes)
 
-  while (!R.isEmpty(nodesToVisit)) {
+  const nodesToVisit = new Queue(R.values(nodes))
+  const visitedNodeUuids = []
 
-    for (const node of R.values(nodesToVisit)) {
+  while (!nodesToVisit.isEmpty()) {
+    const node = nodesToVisit.dequeue()
+    const nodeUuid = Node.getUuid(node)
 
-      lastUpdatedNodes = await updateNode(user, survey, node, tx)
+    // visit only unvisited nodes
+    if (!R.includes(nodeUuid, visitedNodeUuids)) {
 
-      nodesToVisit = R.reject(
-        node => R.includes(Node.getUuid(node), R.keys(allUpdatedNodes))
-      )(lastUpdatedNodes)
+      // update node
+      const lastUpdatedNodes = await updateNode(user, survey, node, tx)
 
-      allUpdatedNodes = R.mergeRight(allUpdatedNodes, lastUpdatedNodes)
+      // mark updated nodes to visit
+      const nodesUpdatedArray = R.values(lastUpdatedNodes)
+      nodesToVisit.enqueueItems(nodesUpdatedArray)
+
+      // update nodes to return
+      for (const nodeUpdated of nodesUpdatedArray) {
+        const idx = R.findIndex(
+          R.propEq(Node.keys.uuid, Node.getUuid(nodeUpdated))
+        )(allUpdatedNodes)
+
+        idx >= 0
+          ? allUpdatedNodes[idx] = R.mergeDeepLeft(allUpdatedNodes[idx], nodeUpdated)
+          : allUpdatedNodes.push(nodeUpdated)
+
+      }
+
+      // mark node visited
+      visitedNodeUuids.push(nodeUuid)
     }
-
   }
 
-  return allUpdatedNodes
+  return SurveyUtils.toUuidIndexedObj(allUpdatedNodes)
 }
 
 const updateNode = async (user, survey, node, tx) => {
@@ -51,8 +70,6 @@ const updateNode = async (user, survey, node, tx) => {
     R.mergeRight(nodesCalculatedValues),
     R.mergeRight(nodesDefaultValues),
   )(nodesApplicability)
-
-  // return nodesDefaultValues
 }
 
 const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx) => {
@@ -88,7 +105,7 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
       const nodeDef = getNodeDef(survey, node)
       const expressions = getExpressionsFn(nodeDef)
 
-      if(R.isEmpty(expressions))
+      if (R.isEmpty(expressions))
         return {}
 
       //3. get expression
@@ -104,7 +121,6 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
       return await isApplicableExpr
         ? NodeDependencyManager.persistDependentNodeApplicable(survey, node, value, tx)
         : NodeDependencyManager.persistDependentNodeValue(survey, node, value, isDefaultValuesExpr, tx)
-
     })
   )
 

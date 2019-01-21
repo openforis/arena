@@ -1,11 +1,17 @@
 class Queue {
 
-  constructor () {
-    this.data = []
+  constructor (data = []) {
+    this.data = data
   }
 
   enqueue (item) {
     this.data.unshift(item)
+  }
+
+  enqueueItems (items) {
+    for (const item of items) {
+      this.enqueue(item)
+    }
   }
 
   dequeue () {
