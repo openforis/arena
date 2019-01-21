@@ -2,18 +2,19 @@ import './style/surveyForm.scss'
 import './style/react-grid-layout.scss'
 
 import React from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 import FormNavigation from './navigation/formNavigation'
 import FormActions from './components/formActions'
 import NodeDefEdit from './nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
-import { getStateSurveyInfo, getSurvey } from '../../survey/surveyState'
-
-import { getFormActivePageNodeDef, getFormPageParentNode, getSurveyForm } from './surveyFormState'
-
-import { getRecord } from './record/recordState'
+import Survey from '../../../common/survey/survey'
+import * as SurveyState from '../../survey/surveyState'
+import * as SurveyFormState from './surveyFormState'
+import * as RecordState from './record/recordState'
 
 const SurveyFormView = (props) => {
 
@@ -25,9 +26,10 @@ const SurveyFormView = (props) => {
     preview,
     canEdit,
 
-    recordLoaded,
     recordUuid,
     parentNode,
+
+    history,
   } = props
 
   const editAllowed = edit && canEdit && !preview
@@ -47,10 +49,10 @@ const SurveyFormView = (props) => {
           <NodeDefEdit/>
         }
 
-        <FormNavigation edit={edit} entry={entry} preview={preview}/>
+        <FormNavigation edit={edit} entry={entry} preview={preview} history={history}/>
 
         {
-          nodeDef && (edit || (entry && recordLoaded))
+          nodeDef
             ? <NodeDefSwitch surveyInfo={surveyInfo}
                              nodeDef={nodeDef}
                              edit={edit}
@@ -84,26 +86,24 @@ SurveyFormView.defaultProps = {
   preview: false,
   // can edit the form definition
   canEdit: false,
-  // if record to edit has been loaded
-  recordLoaded: null,
   // uuid of current record
   recordUuid: null,
 }
 
 const mapStateToProps = (state, props) => {
-  const survey = getSurvey(state)
-  const surveyForm = getSurveyForm(state)
-  const nodeDef = getFormActivePageNodeDef(survey)(surveyForm)
-  const record = getRecord(surveyForm)
+  const survey = SurveyState.getSurvey(state)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyForm = SurveyFormState.getSurveyForm(state)
+  const nodeDef = SurveyFormState.getFormActivePageNodeDef(survey)(surveyForm)
+  const record = RecordState.getRecord(surveyForm)
 
   const mapEntryProps = () => ({
-    recordLoaded: !!record,
-    parentNode: nodeDef ? getFormPageParentNode(survey, nodeDef)(surveyForm) : null,
+    parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(survey, nodeDef)(surveyForm) : null,
     recordUuid: record ? record.uuid : null,
   })
 
   return {
-    surveyInfo: getStateSurveyInfo(state),
+    surveyInfo,
     nodeDef,
     ...props.entry
       ? mapEntryProps()
@@ -112,4 +112,8 @@ const mapStateToProps = (state, props) => {
 
 }
 
-export default connect(mapStateToProps)(SurveyFormView)
+const enhance = compose(
+  withRouter,
+  connect(mapStateToProps)
+)
+export default enhance(SurveyFormView)

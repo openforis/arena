@@ -6,7 +6,7 @@ import { deleteRecord } from '../record/actions'
 import { appModuleUri } from '../../appModules'
 import { designerModules } from '../../designer/designerModules'
 
-const FormEntryActions = ({entry, preview, deleteRecord}) => (
+const FormEntryActions = ({entry, preview, deleteRecord, history}) => (
   entry && (
     <div className="survey-form__nav-record-actions">
       {
@@ -15,7 +15,7 @@ const FormEntryActions = ({entry, preview, deleteRecord}) => (
           <button className="btn-s btn-of btn-danger"
                   onClick={() =>
                     window.confirm('Are you sure you want to delete this record? This operation cannot be undone')
-                      ? deleteRecord()
+                      ? deleteRecord(history)
                       : null
                   }
                   aria-disabled={false}>

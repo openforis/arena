@@ -5,6 +5,7 @@ const {isBlank, trim} = require('../stringUtils')
 const SurveyUtils = require('../survey/surveyUtils')
 
 const keys = {
+  uuid: SurveyUtils.keys.uuid,
   recordUuid: 'recordUuid',
   value: 'value',
   meta: 'meta',
@@ -97,7 +98,7 @@ const isNodeValueBlank = node => {
   if (R.is(String, value))
     return isBlank(value)
 
-  return false
+  return R.isEmpty(value)
 }
 
 module.exports = {

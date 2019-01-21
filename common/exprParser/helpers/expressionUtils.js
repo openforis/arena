@@ -31,7 +31,7 @@ const typeProps = {
     isValid: propValid('name'),
   },
   [types.MemberExpression]: {
-    // toString: TODO,
+    toString: node => `${toString(node.object)}.${toString(node.property)}`,
     // isValid: TODO,
   },
   [types.Literal]: {
@@ -43,7 +43,7 @@ const typeProps = {
     isValid: () => true,
   },
   [types.CallExpression]: {
-    // toString: TODO,
+    toString: node => `${toString(node.callee)}(${node.arguments.map(toString).join(',')})`,
     // isValid: TODO,
   },
   [types.UnaryExpression]: {
@@ -72,7 +72,6 @@ const toString = expr => trim(
 
 const isValid = expr =>
   getTypeProp(expr.type, 'isValid')(expr)
-
 
 module.exports = {
   types,

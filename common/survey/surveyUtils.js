@@ -1,7 +1,13 @@
 const R = require('ramda')
 
+const keys = {
+  uuid: 'uuid',
+  parentUuid: 'parentUuid',
+  props: 'props',
+}
+
 // READ
-const getProps = R.propOr({}, 'props')
+const getProps = R.propOr({}, keys.props)
 
 const getProp = (prop, defaultTo = null) => R.pipe(
   getProps,
@@ -16,17 +22,21 @@ const getLabel = (lang, defaultTo = null) => R.pipe(
 )
 
 //UPDATE
-const setProp = (key, value) => R.assocPath(['props', key], value)
+const setProp = (key, value) => R.assocPath([keys.props, key], value)
 
 // UTILS / uuid
-const uuid = 'uuid'
-const parentUuid = 'parentUuid'
 
-const toIndexedObj = (array, prop) => R.reduce((acc, item) => R.assoc(R.prop(prop)(item), item)(acc), {})(array)
+const toIndexedObj = (array, prop) => R.reduce(
+  (acc, item) => R.assoc(R.prop(prop)(item), item)(acc),
+  {},
+  array
+)
 
-const toUuidIndexedObj = R.partialRight(toIndexedObj, [uuid])
+const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
 module.exports = {
+  keys,
+
   // PROPS
   getProps,
   getProp,
@@ -37,8 +47,8 @@ module.exports = {
   getLabel,
 
   // UTILS / uuid
-  getUuid: R.propOr(null, uuid),
-  getParentUuid: R.propOr(null, parentUuid),
+  getUuid: R.propOr(null, keys.uuid),
+  getParentUuid: R.propOr(null, keys.parentUuid),
   toIndexedObj,
   toUuidIndexedObj,
 }

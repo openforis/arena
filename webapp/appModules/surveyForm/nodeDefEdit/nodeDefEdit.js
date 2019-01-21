@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import TabBar from '../../../commonComponents/tabBar'
 import BasicProps from './basic/basicProps'
 import AdvancedProps from './advanced/advancedProps'
-import ValidationsProps from './validations/validationsProps'
+import ValidationsProps from './advanced/validationsProps'
 import CategoriesView from '../components/categoriesView'
 import TaxonomiesView from '../components/taxonomiesView'
 
@@ -37,6 +37,7 @@ class NodeDefEdit extends React.Component {
   render () {
     const {
       nodeDef,
+      nodeDefParent,
       nodeDefKeyEditDisabled,
       nodeDefMultipleEditDisabled,
       putNodeDefProp,
@@ -81,6 +82,7 @@ class NodeDefEdit extends React.Component {
                         label: 'Advanced',
                         component: (
                           <AdvancedProps nodeDef={nodeDef}
+                                         nodeDefParent={nodeDefParent}
                                          putNodeDefProp={putNodeDefProp}/>
                         )
                       },
@@ -88,6 +90,7 @@ class NodeDefEdit extends React.Component {
                         label: 'Validations',
                         component: (
                           <ValidationsProps nodeDef={nodeDef}
+                                            nodeDefParent={nodeDefParent}
                                             putNodeDefProp={putNodeDefProp}/>
                         )
                       }
@@ -109,6 +112,7 @@ class NodeDefEdit extends React.Component {
 
 NodeDefEdit.defaultProps = {
   nodeDef: null,
+  nodeDefParent: null,
 }
 
 const isNodeDefKeyEditDisabled = (nodeDef, survey) =>
@@ -131,12 +135,16 @@ const mapStateToProps = state => {
   const survey = getSurvey(state)
   const surveyForm = getSurveyForm(state)
   const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
+  const nodeDefParent = Survey.getNodeDefByUuid(
+    NodeDef.getNodeDefParentUuid(nodeDef)
+  )(survey)
 
   const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(nodeDef, survey)
   const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(nodeDef, survey)
 
   return {
     nodeDef,
+    nodeDefParent,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
     canUpdateCategory: NodeDef.isNodeDefCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey)

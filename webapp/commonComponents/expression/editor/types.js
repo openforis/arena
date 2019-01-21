@@ -139,14 +139,17 @@ const Binary = (props) => {
     canDelete = false, onDelete,
   } = props
   const {left, right, operator} = node
-  const operators = R.values(comparisonOperators)
+  const operators = R.concat(
+    R.values(arithmeticOperators),
+    R.values(comparisonOperators)
+  )
 
   return (
     <div className="binary">
       <TypeSwitch {...props} node={left}
                   onChange={item => onChange(R.assoc('left', item, node))}/>
 
-      <Dropdown items={operators} inputSize={7}
+      <Dropdown items={operators} inputSize={10}
                 selection={R.find(R.propEq('key', operator), operators)}
                 onChange={item => onChange(
                   R.assoc('operator', R.propOr('', 'key', item), node)
@@ -172,8 +175,34 @@ const Identifier = ({node, variables, onChange}) => (
             )}/>
 )
 
+const Member = ({node, variables, onChange}) => {
+  const nodeIdentifier = {
+    type: Expression.types.Identifier,
+    name: Expression.toString(node)
+  }
+
+  return (
+    <Identifier node={nodeIdentifier}
+                variables={variables}
+                onChange={onChange}/>
+  )
+}
+
+const Call = ({node, variables, onChange}) => {
+  const nodeIdentifier = {
+    type: Expression.types.Identifier,
+    name: Expression.toString(node)
+  }
+
+  return (
+    <Identifier node={nodeIdentifier}
+                variables={variables}
+                onChange={onChange}/>
+  )
+}
+
 const Literal = ({node, onChange}) => (
-  <div>
+  <div className="literal">
     <input className="form-input" value={node.raw}
            size={25}
            onChange={e => onChange(R.pipe(
@@ -185,10 +214,10 @@ const Literal = ({node, onChange}) => (
 
 const components = {
   [Expression.types.Identifier]: Identifier,
-  // [Expression.types.MemberExpression]: memberExpression,
+  [Expression.types.MemberExpression]: Member,
   [Expression.types.Literal]: Literal,
   // [Expression.types.ThisExpression]: thisExpression,
-  // [Expression.types.CallExpression]: callExpression,
+  [Expression.types.CallExpression]: Call,
   // [Expression.types.UnaryExpression]: unaryExpression,
   [Expression.types.BinaryExpression]: Binary,
   [Expression.types.LogicalExpression]: Logical,

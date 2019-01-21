@@ -29,6 +29,7 @@
 .expression-editor__expr-container {
   overflow: auto;
   padding-bottom: 2rem;
+  position: relative;
 
   //common
   .btns {
@@ -89,6 +90,12 @@
     .btns {
       width: 200px;
     }
+
+    .dropdown, .literal {
+      margin-right: 1.5rem;
+    }
+
+
   }
 
   .logical {

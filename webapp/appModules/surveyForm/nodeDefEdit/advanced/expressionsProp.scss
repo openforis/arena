@@ -19,10 +19,11 @@
 
   .expression-item {
     display: flex;
+    height: 35px;
 
     .label {
       text-align: center;
-      align-self: flex-end;
+      align-self: center;
       width: 100px;
       font-weight: 600;
       font-size: .65rem;
@@ -30,6 +31,17 @@
       background-color: rgba($white, 0.1);
       border-radius: 3px;
       padding: .15rem .3rem;
+    }
+
+    .expression__query-container {
+      .btn-edit {
+        padding: .3rem;
+        margin-left: 1rem;
+
+        .icon {
+          font-size: 12px !important;
+        }
+      }
     }
   }
 
