@@ -13,7 +13,7 @@ const getJsVariables = (nodeDef, lang, depth) => {
   const parentFnCalls = R.repeat('parent()', depth).join('.')
 
   return [{
-    value: `this.${parentFnCalls}.node('${nodeDefName}').value`,
+    value: `this.${parentFnCalls}.node('${nodeDefName}').value()`,
 
     label: NodeDef.getNodeDefLabel(nodeDef, lang) + ' - Value',
 

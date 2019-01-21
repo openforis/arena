@@ -17,6 +17,10 @@ const binaryEval = async (expr, ctx) => {
   const {left, right, operator} = expr
   const leftResult = await evalExpression(left, ctx)
   const rightResult = await evalExpression(right, ctx)
+
+  if(R.isNil(leftResult) || R.isNil(rightResult))
+    return null
+
   const x = `${JSON.stringify(leftResult)} ${operator} ${JSON.stringify(rightResult)}`
   // console.log('=== BINARY')
   // console.log(x)

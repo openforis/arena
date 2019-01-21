@@ -98,7 +98,7 @@ const isNodeValueBlank = node => {
   if (R.is(String, value))
     return isBlank(value)
 
-  return false
+  return R.isEmpty(value)
 }
 
 module.exports = {

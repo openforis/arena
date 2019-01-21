@@ -35,6 +35,20 @@ const bindNode = (survey, node, tx) => {
       const childDef = Survey.getNodeDefChildByName(parentDef, name)(survey)
       const sibling = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getParentUuid(node), NodeDef.getUuid(childDef), tx)
       return sibling ? bindNode(survey, sibling, tx) : null
+    },
+
+    value: async () => {
+      if (Node.isNodeValueBlank(node)) {
+        return null
+      }
+
+      const value = Node.getNodeValue(node)
+      const nodeDefUuid = Node.getNodeDefUuid(node)
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+      return NodeDef.isNodeDefDecimal(nodeDef) || NodeDef.isNodeDefInteger(nodeDef)
+        ? Number(value)
+        : value
     }
   }
 }
