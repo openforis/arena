@@ -74,7 +74,7 @@ export const nodeDefSystemProps = {
       showMask: true,
       placeholderChar: '\u2000',
     },
-    defaultValue: '',
+    defaultValue: ''
   },
 
   [nodeDefType.time]: {

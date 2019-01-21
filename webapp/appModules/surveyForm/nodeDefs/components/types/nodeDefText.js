@@ -3,7 +3,7 @@ import * as R from 'ramda'
 
 import { Input } from '../../../../../commonComponents/form/input'
 import NodeDeleteButton from '../nodeDeleteButton'
-import { getNodeDefInputTextProps } from '../../nodeDefSystemProps'
+import * as NodeDefUI from '../../nodeDefSystemProps'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
 
@@ -12,7 +12,7 @@ import Node from '../../../../../../common/record/node'
 const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) => (
   <div>
     <Input readOnly={edit}
-           {...getNodeDefInputTextProps(nodeDef)}
+           {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
            value={Node.getNodeValue(node, '')}
            onChange={value => updateNode(nodeDef, node, value)}
     />

@@ -5,7 +5,34 @@ const {getProp, toIndexedObj} = require('./surveyUtils')
 
 const {getValidation, getFieldValidation} = require('../validation/validator')
 
-const levels = 'levels'
+const keys = {
+  uuid: 'uuid',
+  levels: 'levels',
+  props: 'props'
+}
+
+const props = {
+  name: 'name'
+}
+
+const levelKeys = {
+  categoryUuid: 'categoryUuid',
+  index: 'index'
+}
+
+const levelProps = {
+  name: 'name'
+}
+
+const itemKeys = {
+  parentUuid: 'parentUuid',
+  levelUuid: 'levelUuid'
+}
+
+const itemProps = {
+  code: 'code',
+  labels: 'labels'
+}
 
 /**
  * CATEGORY
@@ -13,17 +40,18 @@ const levels = 'levels'
 // ====== CREATE
 const newCategory = (props = {}) => {
   const category = {
-    uuid: uuidv4(),
+    [keys.uuid]: uuidv4(),
     props,
   }
   return {
     ...category,
-    levels: [newLevel(category)]
+    [keys.levels]: [newLevel(category)]
   }
 }
 
 // ====== READ
-const getLevels = R.propOr([], levels)
+const getUuid = R.prop(keys.uuid)
+const getLevels = R.propOr([], keys.levels)
 const getLevelsArray = R.pipe(
   getLevels,
   R.values,
@@ -34,10 +62,10 @@ const getLevelByUuid = uuid => R.pipe(
   getLevelsArray,
   R.find(R.propEq('uuid', uuid)),
 )
-const getLevelByIndex = idx => R.path(['levels', idx])
+const getLevelByIndex = idx => R.path([keys.levels, idx])
 
 // ====== UPDATE
-const assocLevelsArray = array => R.assoc(levels, toIndexedObj(array, 'index'))
+const assocLevelsArray = array => R.assoc(keys.levels, toIndexedObj(array, 'index'))
 
 /**
  * LEVEL
@@ -47,10 +75,10 @@ const newLevel = (category) => {
   const index = getLevelsArray(category).length
 
   return {
-    uuid: uuidv4(),
-    categoryUuid: R.prop('uuid')(category),
-    index,
-    props: {
+    [keys.uuid]: uuidv4(),
+    [levelKeys.categoryUuid]: getUuid(category),
+    [levelKeys.index]: index,
+    [keys.props]: {
       name: 'level_' + (index + 1),
     }
   }
@@ -63,17 +91,17 @@ const newLevel = (category) => {
 // ====== CREATE
 const newItem = (levelUuid, parentItem = null, props = {}) => {
   return {
-    uuid: uuidv4(),
-    levelUuid,
-    parentUuid: parentItem ? parentItem.uuid : null,
-    props,
+    [keys.uuid]: uuidv4(),
+    [itemKeys.levelUuid]: levelUuid,
+    [itemKeys.parentUuid]: parentItem ? parentItem.uuid : null,
+    [keys.props]: props,
   }
 }
 
 // ====== READ
-const getItemCode = getProp('code')
+const getItemCode = getProp(itemProps.code)
 
-const getItemLabels = getProp('labels')
+const getItemLabels = getProp(itemProps.labels)
 
 const getItemLabel = language =>
   item =>
@@ -85,7 +113,7 @@ const getItemLabel = language =>
 
 const isItemLeaf = item =>
   category => R.pipe(
-    R.prop('levelUuid'),
+    R.prop(itemKeys.levelUuid),
     levelUuid => getLevelByUuid(levelUuid)(category),
     level => getLevelsArray(category).length === level.index + 1
   )(item)
@@ -114,7 +142,8 @@ module.exports = {
   newCategory,
 
   //READ
-  getName: getProp('name'),
+  getUuid,
+  getName: getProp(props.name),
   getLevelsArray,
   getLevelByIndex,
 
@@ -126,11 +155,11 @@ module.exports = {
   newLevel,
 
   //READ
-  getLevelName: getProp('name'),
-  getLevelIndex: R.prop('index'),
+  getLevelName: getProp(levelProps.name),
+  getLevelIndex: R.prop(levelKeys.index),
   getLevelValidation: levelIndex => R.pipe(
     getValidation,
-    getFieldValidation('levels'),
+    getFieldValidation(keys.levels),
     getFieldValidation(levelIndex),
   ),
   //UPDATE

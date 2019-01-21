@@ -19,7 +19,7 @@ class Variables extends React.Component {
     } = this.props
 
     const filtered = nodeDef => NodeDef.isNodeDefAttribute(nodeDef) &&
-      (R.isEmpty(filterTypes) || R.includes(NodeDef.getNodeDefType(nodeDef), filterTypes))
+      (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
 
     return childDefs
       ? (
@@ -35,7 +35,7 @@ class Variables extends React.Component {
                             className={`btn btn-s btn-of-light btn-node-def${R.includes(childDefUuid, nodeDefVariableUuids) ? ' active' : ''}`}
                             onClick={() => toggleNodeDefVariable(childDefUuid)}>
                       {NodeDef.getNodeDefLabel(childDef, lang)}
-                      {NodeDefUiProps.getNodeDefIconByType(NodeDef.getNodeDefType(childDef))}
+                      {NodeDefUiProps.getNodeDefIconByType(NodeDef.getType(childDef))}
                     </button>
                   )
                   : null

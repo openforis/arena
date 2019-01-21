@@ -21,12 +21,12 @@ const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
 const {keys, propKeys} = NodeDef
 
 const validateCategory = async (propName, nodeDef) =>
-  NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.code
+  NodeDef.getType(nodeDef) === NodeDef.nodeDefType.code
     ? validateRequired(propName, nodeDef)
     : null
 
 const validateTaxonomy = async (propName, nodeDef) =>
-  NodeDef.getNodeDefType(nodeDef) === NodeDef.nodeDefType.taxon
+  NodeDef.getType(nodeDef) === NodeDef.nodeDefType.taxon
     ? validateRequired(propName, nodeDef)
     : null
 

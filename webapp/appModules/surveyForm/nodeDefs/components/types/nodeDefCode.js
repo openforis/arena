@@ -10,11 +10,11 @@ import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import Survey from '../../../../../../common/survey/survey'
+import Category from '../../../../../../common/survey/category'
 import Record from '../../../../../../common/record/record'
 import Node from '../../../../../../common/record/node'
 import { isRenderDropdown } from '../../../../../../common/survey/nodeDefLayout'
 
-import { toQueryString } from '../../../../../../server/serverUtils/request'
 import { getStateSurveyInfo, getSurvey } from '../../../../../survey/surveyState'
 import { getRecord } from '../../../record/recordState'
 import { getSurveyForm } from '../../../surveyFormState'
@@ -47,16 +47,18 @@ class NodeDefCode extends React.Component {
   }
 
   async loadCategoryItems () {
-    const {surveyInfo, categoryUuid, categoryLevelIndex, parentItemUuid} = this.props
+    const {surveyInfo, categoryUuid, categoryLevelIndex, parentItemUuid, draft} = this.props
+
+    let items = []
 
     if (categoryUuid && (parentItemUuid || categoryLevelIndex === 0)) {
-      const params = {draft: false, parentUuid: parentItemUuid}
-      const {data} = await axios.get(`/api/survey/${surveyInfo.id}/categories/${categoryUuid}/items?${toQueryString(params)}`)
-
-      this.setState({items: data.items})
-    } else {
-      this.setState({items: []})
+      const {data} = await axios.get(
+        `/api/survey/${surveyInfo.id}/categories/${categoryUuid}/items`,
+        {params: {draft, parentUuid: parentItemUuid}}
+      )
+      items = data.items
     }
+    this.setState({items})
   }
 
   determineNodeToUpdate () {
@@ -150,11 +152,12 @@ const mapStateToProps = (state, props) => {
   const category = Survey.getCategoryByUuid(NodeDef.getNodeDefCategoryUuid(nodeDef))(survey)
 
   return {
-    surveyInfo: surveyInfo,
+    surveyInfo,
+    draft: Survey.isDraft(surveyInfo),
     language: Survey.getDefaultLanguage(surveyInfo),
 
     parentCodeDefUuid: NodeDef.getNodeDefParentCodeDefUuid(nodeDef),
-    categoryUuid: category ? category.uuid : null,
+    categoryUuid: category ? Category.getUuid(category) : null,
     categoryLevelIndex: categoryLevelIndex,
     parentItemUuid: Node.getCategoryItemUuid(parentCodeAttribute),
     codeUuidsHierarchy: Record.getCodeUuidsHierarchy(survey, parentNode, nodeDef)(record),

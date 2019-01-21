@@ -19,7 +19,6 @@ export const Input = React.forwardRef((props, ref) => {
     disabled = false,
     mask = false,
     onChange,
-    onValueChange,
     value,
     ...inputProps
   } = props
