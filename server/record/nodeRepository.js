@@ -90,13 +90,13 @@ const fetchDescendantNodesByCodeUuid = async (surveyId, recordUuid, parentCodeNo
     dbTransformCallback
   )
 
-const fetchDescendantNodesByNodeDefUuid = async (surveyId, recordUuid, parentNodeUuid, nodeDefUuid, client = db) =>
+const fetchSelfOrDescendantNodes = async (surveyId, nodeDefUuid, recordUuid, parentNodeUuid, client = db) =>
   await client.map(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node n
     WHERE n.record_uuid = $1
       AND n.node_def_uuid = $2
-      AND n.meta @> '{"h": ["${parentNodeUuid}"]}'`,
-    [recordUuid, nodeDefUuid],
+      AND (n.uuid = $3 OR n.meta @> '{"h": ["${parentNodeUuid}"]}')`,
+    [recordUuid, nodeDefUuid, parentNodeUuid],
     dbTransformCallback
   )
 
@@ -177,7 +177,7 @@ module.exports = {
   fetchNodeByUuid,
   fetchAncestorByNodeDefUuid,
   fetchDescendantNodesByCodeUuid,
-  fetchDescendantNodesByNodeDefUuid,
+  fetchSelfOrDescendantNodes,
   fetchChildNodeByNodeDefUuid,
   fetchChildNodesByNodeDefUuid,
 

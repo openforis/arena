@@ -47,7 +47,7 @@ const updateNodes = async (user, survey, nodes, tx) => {
         )(allUpdatedNodes)
 
         idx >= 0
-          ? allUpdatedNodes[idx] = R.mergeDeepLeft(allUpdatedNodes[idx], nodeUpdated)
+          ? allUpdatedNodes[idx] = R.mergeDeepRight(allUpdatedNodes[idx], nodeUpdated)
           : allUpdatedNodes.push(nodeUpdated)
 
       }
@@ -86,13 +86,14 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
 
   // filter nodes to update
   const nodesToUpdate = R.pipe(
-    R.append(node),
-    R.filter(n => {
-        const nodeDef = getNodeDef(survey, n)
-        return NodeDef.isNodeDefAttribute(nodeDef) && (
-          !isDefaultValuesExpr ||
-          Node.isNodeValueBlank(n) ||
-          Node.isDefaultValueApplied(n)
+    R.filter(o => {
+        const {nodeCtx: n, nodeDef} = o
+
+        return isApplicableExpr || (
+          NodeDef.isNodeDefAttribute(nodeDef) && (
+            Node.isNodeValueBlank(n) ||
+            Node.isDefaultValueApplied(n)
+          )
         )
       }
     )
@@ -100,38 +101,37 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
 
   //2. update expr to node and dependent nodes
   const nodesUpdated = await Promise.all(
-    nodesToUpdate.map(async node => {
+    nodesToUpdate.map(async o => {
+      const {nodeCtx, nodeDef} = o
 
-      const nodeDef = getNodeDef(survey, node)
       const expressions = getExpressionsFn(nodeDef)
 
       if (R.isEmpty(expressions))
         return {}
 
       //3. get expression
-      const expr = await getApplicableExpression(survey, node, expressions, tx)
+      const expr = await getApplicableExpression(survey, nodeCtx, expressions, tx)
 
       //4. eval expr
       const value = expr
-        ? await RecordExprParser.evalNodeQuery(survey, node, expr, tx)
-        : isApplicableExpr
-          ? true : null
+        ? await RecordExprParser.evalNodeQuery(survey, nodeCtx, expr, tx)
+        : null
 
       //5. persist updated node value, and return updated node
       return await isApplicableExpr
-        ? NodeDependencyManager.persistDependentNodeApplicable(survey, node, value, tx)
-        : NodeDependencyManager.persistDependentNodeValue(survey, node, value, isDefaultValuesExpr, tx)
+        ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, value || false, tx)
+        : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, value, isDefaultValuesExpr, tx)
     })
   )
 
   return R.mergeAll(nodesUpdated)
 }
 
-const getApplicableExpression = async (survey, node, expressions, tx) => {
+const getApplicableExpression = async (survey, nodeCtx, expressions, tx) => {
   for (const expression of expressions) {
     const applyIfExpr = NodeDefExpression.getApplyIf(expression)
 
-    if (StringUtils.isBlank(applyIfExpr) || await RecordExprParser.evalNodeQuery(survey, node, applyIfExpr, tx))
+    if (StringUtils.isBlank(applyIfExpr) || await RecordExprParser.evalNodeQuery(survey, nodeCtx, applyIfExpr, tx))
       return NodeDefExpression.getExpression(expression)
   }
 

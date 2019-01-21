@@ -7,12 +7,15 @@ const Node = require('../../../../../common/record/node')
 
 const NodeRepository = require('../../../nodeRepository')
 
+const {dependencyTypes} = require('../../../../survey/surveyDependenchyGraph')
+
 const fetchDependentNodes = async (survey, node, dependencyType, tx) => {
   const surveyId = Survey.getId(survey)
 
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const dependentUuids = Survey.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
+  const isDependencyApplicable = dependencyType === dependencyTypes.applicable
 
   if (dependentUuids) {
     const dependentDefs = Survey.getNodeDefsByUuids(dependentUuids)(survey)
@@ -26,16 +29,34 @@ const fetchDependentNodes = async (survey, node, dependencyType, tx) => {
         )(NodeDef.getMetaHierarchy(dependentDef))
 
         //2 find common parent node
-        const commonParentNode = await NodeRepository.fetchAncestorByNodeDefUuid(surveyId, Node.getUuid(node), commonParentDefUuid, tx)
+        const commonParentNode = await NodeRepository.fetchAncestorByNodeDefUuid(
+          surveyId,
+          Node.getUuid(node),
+          commonParentDefUuid,
+          tx
+        )
 
         //3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
-        return await NodeRepository.fetchDescendantNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getUuid(commonParentNode), NodeDef.getUuid(dependentDef), tx)
+        const nodeDefUuidDependent = isDependencyApplicable
+          ? NodeDef.getNodeDefParentUuid(dependentDef)
+          : NodeDef.getUuid(dependentDef)
+
+        const dependentNodes = await NodeRepository.fetchSelfOrDescendantNodes(
+          surveyId,
+          nodeDefUuidDependent,
+          Node.getRecordUuid(node),
+          Node.getUuid(commonParentNode),
+          tx
+        )
+
+        return dependentNodes.map(nodeCtx => ({
+          nodeDef: dependentDef,
+          nodeCtx
+        }))
       })
     )
-    return R.pipe(
-      R.flatten,
-      R.uniq,
-    )(dependentsPerDef)
+
+    return R.flatten(dependentsPerDef)
   } else {
     return []
   }
@@ -57,19 +78,17 @@ const persistDependentNodeValue = async (survey, node, value, isDefaultValue, tx
     }
 }
 
-const persistDependentNodeApplicable = async (survey, node, applicable, tx) => {
+const persistDependentNodeApplicable = async (survey, nodeDefUuid, nodeCtx, applicable, tx) => {
   const surveyId = Survey.getId(survey)
-  const parentUuid = Node.getParentUuid(node)
-  const parentNode = await NodeRepository.fetchNodeByUuid(surveyId, parentUuid, tx)
+  const nodeCtxUuid = Node.getUuid(nodeCtx)
 
-  const nodeDefUuid = Node.getNodeDefUuid(node)
-  const applicableOld = Node.isChildApplicable(nodeDefUuid)(parentNode)
+  const applicableOld = Node.isChildApplicable(nodeDefUuid)(nodeCtx)
 
   if (applicable !== applicableOld) {
     return {
-      [parentUuid]: await NodeRepository.updateChildrenApplicability(
+      [nodeCtxUuid]: await NodeRepository.updateChildrenApplicability(
         surveyId,
-        parentUuid,
+        nodeCtxUuid,
         nodeDefUuid,
         applicable,
         tx

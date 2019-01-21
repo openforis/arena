@@ -1,7 +1,8 @@
 class Queue {
 
-  constructor (data = []) {
-    this.data = data
+  constructor (items = []) {
+    this.data = []
+    this.enqueueItems(items)
   }
 
   enqueue (item) {
