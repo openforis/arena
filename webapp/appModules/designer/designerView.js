@@ -22,14 +22,14 @@ import { canEditSurvey } from '../../../common/auth/authManager'
 class DesignerView extends React.Component {
 
   componentDidMount () {
-    const {resetForm, initSurveyDefs, canEdit} = this.props
+    const {resetForm, initSurveyDefs, canEditDef} = this.props
 
     resetForm()
-    initSurveyDefs(canEdit, canEdit)
+    initSurveyDefs(canEditDef, canEditDef)
   }
 
   render () {
-    const {history, location, canEdit} = this.props
+    const {history, location, canEditDef} = this.props
 
     return (
       <TabBar
@@ -48,14 +48,14 @@ class DesignerView extends React.Component {
             label: 'Form Designer',
             component: SurveyFormView,
             path: appModuleUri(designerModules.formDesigner),
-            props: {edit: true, draft: true, canEdit},
+            props: {edit: true, draft: true, canEditDef},
           },
 
           {
             label: 'Form preview',
             component: RecordView,
             path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
-            props: {edit: true, draft: true, canEdit, preview: true},
+            props: {edit: true, draft: true, canEditDef, preview: true},
             showTab: false,
           },
 
@@ -82,7 +82,7 @@ const mapStateToProps = state => {
   const surveyInfo = getStateSurveyInfo(state)
 
   return {
-    canEdit: canEditSurvey(user, surveyInfo)
+    canEditDef: canEditSurvey(user, surveyInfo),
   }
 }
 
