@@ -7,52 +7,66 @@ const {
   groupNames,
   permissions,
   keys,
+  getAuthGroups,
 } = require('./authGroups')
 
 const isSystemAdmin = user => R.any(
   group => group.name === groupNames.systemAdmin
 )(user.authGroups)
 
-// Survey
+// ======
+// ====== Survey
+// ======
 
-const getSurveyUserGroups = R.innerJoin((userGroup, surveyGroup) => userGroup.id === surveyGroup.id)
+const getSurveyUserGroups = (user, surveyInfo) => {
+  const userGroups = getAuthGroups(user)
+  const surveyGroups = getAuthGroups(surveyInfo)
+  return R.innerJoin(
+    (userGroup, surveyGroup) => userGroup.id === surveyGroup.id,
+    userGroups,
+    surveyGroups
+  )
+}
 
 const getSurveyUserPermissions = (user, surveyInfo) =>
   R.pipe(
     getSurveyUserGroups,
     R.head, // there's only one group per user per survey
     R.propOr([], keys.permissions)
-  )(user.authGroups, R.pathOr([], [keys.authGroups], surveyInfo))
+  )(user, surveyInfo)
 
 const hasSurveyPermission = (permission) => (user, surveyInfo) =>
   user && surveyInfo && (
     isSystemAdmin(user) ||
-    R.includes(permission, getSurveyUserPermissions(user, surveyInfo)))
+    R.includes(permission, getSurveyUserPermissions(user, surveyInfo))
+  )
 
-const canEditSurvey = hasSurveyPermission(permissions.surveyEdit)
-
-/**
- * User can view the survey - checks that the given user belongs to a group for the given survey
- *
- * @param user
- * @param surveyInfo
- */
+// READ
 const canViewSurvey = (user, surveyInfo) =>
+  isSystemAdmin(user) ||
   R.pipe(
     getSurveyUserGroups,
-    R.isEmpty, R.not
-  )(user.authGroups, R.pathOr([], [keys.authGroups], surveyInfo))
+    R.isEmpty,
+    R.not
+  )(user, surveyInfo)
 
-// Record
+// UPDATE
+const canEditSurvey = hasSurveyPermission(permissions.surveyEdit)
 
-/**
- * User can the given record
- *
- * @param user
- * @param record
- */
+// ======
+// ====== Record
+// ======
+
+// CREATE
+const canCreateRecord = hasSurveyPermission(permissions.recordCreate)
+
+// READ
+const canViewRecord = hasSurveyPermission(permissions.recordView)
+
+// UPDATE
 const canEditRecord = (user, record) => {
-  if (isSystemAdmin(user)) return true
+  if (isSystemAdmin(user))
+    return true
 
   const recordDataStep = Record.getStep(record)
   const recordUserPermissions = User.getRecordPermissions(record)(user)
@@ -63,16 +77,6 @@ const canEditRecord = (user, record) => {
 
   return level === keys.all || (level === keys.own && Record.getOwnerId(record) === user.id)
 }
-
-/**
- * User can create a new record in a given survey(info)
- *
- * @param user
- * @param surveyInfo
- */
-const canCreateRecord = hasSurveyPermission(permissions.recordCreate)
-
-const canViewRecord = hasSurveyPermission(permissions.recordView)
 
 module.exports = {
   isSystemAdmin,
