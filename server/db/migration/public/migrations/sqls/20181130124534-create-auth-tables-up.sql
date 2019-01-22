@@ -7,7 +7,7 @@ CREATE TABLE
   labels       jsonb DEFAULT '{}'::jsonb,
   descriptions jsonb DEFAULT '{}'::jsonb,
   permissions  jsonb DEFAULT '{}'::jsonb,
-  data_steps   jsonb DEFAULT '{}'::jsonb,
+  record_steps   jsonb DEFAULT '{}'::jsonb,
   PRIMARY KEY (id)
 );
 
@@ -25,7 +25,7 @@ INSERT INTO
 VALUES
 ('Admin', 'admin@openforis.org', '$2b$10$PGiD7cS.ESkAI4NIbuJ.9OYDEsfnMl8wNoETWoi03JWhXXJIwLDte');
 
-INSERT INTO auth_group (name, labels, descriptions, permissions, data_steps)
+INSERT INTO auth_group (name, labels, descriptions, permissions, record_steps)
 VALUES ('systemAdmin',
         '{"en": "System Administrators"}'::jsonb,
         '{"en": "OF Arena system administrators"}'::jsonb,

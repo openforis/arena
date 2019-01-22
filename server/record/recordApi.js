@@ -8,10 +8,17 @@ const Node = require('../../common/record/node')
 const RecordManager = require('./recordManager')
 const FileManager = require('../file/fileManager')
 
+const {
+  requireRecordListViewPermission,
+  requireRecordEditPermission,
+  requireRecordCreatePermission,
+  requireRecordViewPermission,
+} = require('../authGroup/authMiddleware')
+
 module.exports.init = app => {
 
   // ==== CREATE
-  app.post('/survey/:surveyId/record', async (req, res) => {
+  app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res) => {
     try {
       const {user} = req
       const surveyId = getRestParam(req, 'surveyId')
@@ -31,7 +38,7 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/survey/:surveyId/record/:recordUuid/node', async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res) => {
     try {
       const user = req.user
       const node = JSON.parse(req.body.node)
@@ -49,7 +56,7 @@ module.exports.init = app => {
 
   // ==== READ
 
-  app.get('/survey/:surveyId/records/count', async (req, res) => {
+  app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
 
@@ -61,7 +68,7 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/records', async (req, res) => {
+  app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const limit = getRestParam(req, 'limit')
@@ -74,7 +81,7 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', async (req, res) => {
+  app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', requireRecordViewPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUuid = getRestParam(req, 'nodeUuid')
@@ -91,7 +98,7 @@ module.exports.init = app => {
   // ==== UPDATE
 
   // RECORD Check in / out
-  app.post('/survey/:surveyId/record/:recordUuid/checkin', async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordEditPermission, async (req, res) => {
     try {
       const user = req.user
       const surveyId = getRestParam(req, 'surveyId')
@@ -120,7 +127,7 @@ module.exports.init = app => {
   })
 
   // ==== DELETE
-  app.delete('/survey/:surveyId/record/:recordUuid', async (req, res) => {
+  app.delete('/survey/:surveyId/record/:recordUuid', requireRecordEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const recordUuid = getRestParam(req, 'recordUuid')
@@ -134,7 +141,7 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', async (req, res) => {
+  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const nodeUuid = getRestParam(req, 'nodeUuid')

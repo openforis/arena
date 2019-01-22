@@ -1,3 +1,13 @@
+const R = require('ramda')
+
+const keys = {
+  authGroups: 'authGroups',
+  permissions: 'permissions',
+  recordSteps: 'recordSteps',
+  all: 'all',
+  own: 'own',
+}
+
 const permissions = {
   // surveys
   surveyCreate: 'surveyCreate',
@@ -8,7 +18,7 @@ const permissions = {
 
   // records
   recordCreate: 'recordCreate',
-  recordDataEdit: 'recordDataEdit',
+  recordEdit: 'recordEdit',
   recordView: 'recordView',
 
   // users
@@ -26,10 +36,15 @@ const groupNames = {
   dataEditor: 'dataEditor',
   dataCleanser: 'dataCleanser',
   dataAnalyst: 'dataAnalyst',
-  guest: 'guest',
+  surveyGuest: 'surveyGuest',
 }
 
+const getAuthGroups = R.propOr([], keys.authGroups)
+
 module.exports = {
+  keys,
   permissions,
   groupNames,
+
+  getAuthGroups,
 }

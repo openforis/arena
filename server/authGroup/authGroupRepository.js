@@ -8,8 +8,8 @@ const dbTransformCallback = camelize
 
 const insertGroup = async (authGroup, surveyId, client = db) =>
   await client.one(`
-    INSERT INTO auth_group (name, survey_id, permissions, labels, descriptions)
-    VALUES ($1, $2, $3, $4, $5)
+    INSERT INTO auth_group (name, survey_id, permissions, labels, descriptions, record_steps)
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *`,
     [
       authGroup.name,
@@ -17,6 +17,7 @@ const insertGroup = async (authGroup, surveyId, client = db) =>
       JSON.stringify(authGroup.permissions),
       JSON.stringify(authGroup.labels),
       JSON.stringify(authGroup.descriptions),
+      JSON.stringify(authGroup.recordSteps),
     ],
     dbTransformCallback
   )
