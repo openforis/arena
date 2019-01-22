@@ -1,13 +1,13 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const Survey = require('../../../../../common/survey/survey')
-const NodeDef = require('../../../../../common/survey/nodeDef')
-const Node = require('../../../../../common/record/node')
+const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
+const Node = require('../../../../common/record/node')
 
-const NodeRepository = require('../../../nodeRepository')
+const NodeRepository = require('../../nodeRepository')
 
-const {dependencyTypes} = require('../../../../survey/surveyDependenchyGraph')
+const {dependencyTypes} = require('../../../survey/surveyDependenchyGraph')
 
 const fetchDependentNodes = async (survey, node, dependencyType, tx) => {
   const surveyId = Survey.getId(survey)

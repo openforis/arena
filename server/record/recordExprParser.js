@@ -1,8 +1,10 @@
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
+const NodeDefExpression = require('../../common/survey/nodeDefExpression')
 const Node = require('../../common/record/node')
 const Expression = require('../../common/exprParser/expression')
 const NodeRepository = require('./nodeRepository')
+const StringUtils = require('../../common/stringUtils')
 
 const evalNodeQuery = async (survey, node, query, client, bindNodeFn = bindNode) => {
   const ctx = {
@@ -53,6 +55,27 @@ const bindNode = (survey, node, tx) => {
   }
 }
 
+const getApplicableExpressions = async (survey, nodeCtx, expressions, tx, stopAtFirstFound = false) => {
+  const applicableExpressions = []
+  for (const expression of expressions) {
+    const applyIfExpr = NodeDefExpression.getApplyIf(expression)
+
+    if (StringUtils.isBlank(applyIfExpr) || await evalNodeQuery(survey, nodeCtx, applyIfExpr, tx)) {
+      const expr = NodeDefExpression.getExpression(expression)
+      if (stopAtFirstFound)
+        return expr
+      else
+        applicableExpressions.push(expr)
+    }
+  }
+  return applicableExpressions
+}
+
+const getApplicableExpression = async (survey, nodeCtx, expressions, tx) =>
+  R.head(getApplicableExpressions(survey, nodeCtx, expressions, tx))
+
 module.exports = {
   evalNodeQuery,
+  getApplicableExpressions,
+  getApplicableExpression
 }

@@ -25,7 +25,7 @@ class RecordUpdateThread extends Thread {
     this.queue = new Queue()
     this.processing = false
     this.preview = R.propOr(false, 'preview', this.params)
-    this.processor = new RecordProcessor(this._postMessage.bind(this), this.preview)
+    this.processor = new RecordProcessor(this.notifyNodesUpdate.bind(this), this.notifyNodesValidationUpdate.bind(this), this.preview)
   }
 
   async getSurvey (tx) {
@@ -61,6 +61,14 @@ class RecordUpdateThread extends Thread {
 
       await this.processNext()
     }
+  }
+
+  notifyNodesUpdate (nodes) {
+    this._postMessage({nodes})
+  }
+
+  notifyNodesValidationUpdate (nodesValidation) {
+    this._postMessage({nodesValidation})
   }
 
   _postMessage (msg) {

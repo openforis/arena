@@ -11,13 +11,15 @@ const RecordRepository = require('../../../record/recordRepository')
 const NodeRepository = require('../../../record/nodeRepository')
 
 const DependentNodesUpdater = require('./dependencyUpdate/dependentNodesUpdater')
+const RecordValidator = require('./recordValidator')
 
 const ActivityLog = require('../../../activityLog/activityLogger')
 
 class RecordProcessor {
 
-  constructor (nodesUpdateListener = null, preview = false) {
+  constructor (nodesUpdateListener = null, nodesValidationChangeListener = null, preview = false) {
     this.nodesUpdateListener = nodesUpdateListener
+    this.nodesValidationChangeListener = nodesValidationChangeListener
     this.preview = preview
   }
 
@@ -62,7 +64,7 @@ class RecordProcessor {
 
     this._notifyNodesUpdate(updatedNodes)
 
-    return this._updateDependentNodes(user, survey, updatedNodes, t)
+    return this._updateAndValidateDependentNodes(user, survey, updatedNodes, t)
   }
 
   async deleteNode (user, survey, nodeUuid, t) {
@@ -76,7 +78,7 @@ class RecordProcessor {
 
     this._notifyNodesUpdate(updatedNodes)
 
-    return this._updateDependentNodes(user, survey, updatedNodes, t)
+    return this._updateAndValidateDependentNodes(user, survey, updatedNodes, t)
   }
 
   //==========
@@ -138,9 +140,20 @@ class RecordProcessor {
       this.nodesUpdateListener(nodes)
   }
 
-  async _updateDependentNodes (user, survey, nodes, t) {
-    const updatedDependentNodes = await DependentNodesUpdater.updateNodes(user, survey, nodes, t)
+  _notifyNodesValidationChange (nodesValidation) {
+    if (!R.isEmpty(nodesValidation) && this.nodesValidationChangeListener)
+      this.nodesValidationChangeListener(nodesValidation)
+  }
+
+  async _updateAndValidateDependentNodes (user, survey, nodes, t) {
+    const updatedDependentNodes = await DependentNodesUpdater.updateNodes(survey, nodes, t)
     this._notifyNodesUpdate(updatedDependentNodes)
+
+    const nodesValidation = await RecordValidator.validateNodes(survey, nodes, t)
+    this._notifyNodesValidationChange(nodesValidation)
+
+    console.log('nodesValidation', JSON.stringify(nodesValidation))
+
     return R.mergeRight(nodes, updatedDependentNodes)
   }
 }

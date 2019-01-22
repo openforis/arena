@@ -42,7 +42,7 @@ const extractNodeDefNames = (jsExpr = '') => {
     return []
 
   const names = []
-  const regex = /(node|sibling)\('(\w+)'\)/g
+  const regex = /(node|sibling)\(['"](\w+)['"]\)/g
 
   let matches
   while (matches = regex.exec(jsExpr)) {
