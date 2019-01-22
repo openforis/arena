@@ -10,7 +10,6 @@ const {
   canCreateRecord,
   canEditRecord,
   canViewRecord,
-
 } = require('../../common/auth/authManager')
 const Survey = require('../../common/survey/survey')
 
@@ -52,5 +51,5 @@ module.exports = {
   requireRecordListViewPermission: requireSurveyPermission(canViewSurvey),
   requireRecordCreatePermission: requireSurveyPermission(canCreateRecord),
   requireRecordEditPermission: requireRecordPermission(canEditRecord),
-  requireRecordViewPermission: requireRecordPermission(canViewRecord),
+  requireRecordViewPermission: requireSurveyPermission(canViewRecord),
 }

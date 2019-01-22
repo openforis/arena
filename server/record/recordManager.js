@@ -17,6 +17,8 @@ const {isBlank} = require('../../common/stringUtils')
 const RecordUpdateManager = require('./update/recordUpdateManager')
 const ActivityLog = require('../activityLog/activityLogger')
 
+const {canEditRecord} = require('../../common/auth/authManager')
+
 /**
  * ===================
  * CREATE
@@ -92,7 +94,11 @@ const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(
  */
 const checkInRecord = async (user, surveyId, recordUuid) => {
   const record = await fetchRecordByUuid(surveyId, recordUuid)
-  RecordUpdateManager.checkIn(user, surveyId, Record.isPreview(record))
+
+  if (canEditRecord(user, record)) {
+    RecordUpdateManager.checkIn(user, surveyId, Record.isPreview(record))
+  }
+
   return record
 }
 
