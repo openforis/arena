@@ -9,6 +9,7 @@ import ErrorBadge from '../../../commonComponents/errorBadge'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
+import Validator from '../../../../common/validation/validator'
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
 import Layout from '../../../../common/survey/nodeDefLayout'
@@ -25,6 +26,12 @@ import { getRecord } from '../record/recordState'
 import { createNodePlaceholder, updateNode, removeNode } from '../record/actions'
 
 class NodeDefSwitch extends React.Component {
+
+  constructor (props) {
+    super(props)
+
+    this.element = React.createRef()
+  }
 
   checkNodePlaceholder () {
     const {entry, nodes, nodeDef, parentNode, createNodePlaceholder} = this.props
@@ -45,13 +52,17 @@ class NodeDefSwitch extends React.Component {
     const {nodeDef, edit} = this.props
 
     if (edit && !nodeDef.id)
-      this.refs.nodeDefElem.scrollIntoView()
+      this.element.current.scrollIntoView()
 
     this.checkNodePlaceholder()
   }
 
-  componentDidUpdate () {
+  componentDidUpdate (prevProps) {
     this.checkNodePlaceholder()
+
+    if (prevProps.valid !== this.props.valid) {
+      this.element.current.parentNode.classList.toggle('node-def__invalid')
+    }
   }
 
   render () {
@@ -75,8 +86,9 @@ class NodeDefSwitch extends React.Component {
     const isRoot = NodeDef.isNodeDefRoot(nodeDef)
     const isPage = !!Layout.getPageUuid(nodeDef)
 
-    return <div className={`${isPage ? 'node-def__form_page' : 'node-def__form'}${applicable ? '' : ' node-def__not-applicable'}`}
-                ref="nodeDefElem">
+    return <div
+      className={`${isPage ? 'node-def__form_page' : 'node-def__form'}${applicable ? '' : ' node-def__not-applicable'}`}
+      ref={this.element}>
 
       {
         !entry &&
@@ -154,20 +166,33 @@ NodeDefSwitch.defaultProps = {
   locked: true,
   // specified when can edit node definition
   canEditDef: false,
+
+  valid: true
 }
 
 const mapStateToProps = (state, props) => {
   const {nodeDef, parentNode, entry} = props
   const surveyInfo = getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
+  const record = getRecord(surveyForm)
+  const recordValidation = Record.getValidation(record)
 
-  const mapEntryProps = () => ({
-    nodes: NodeDef.isNodeDefRoot(nodeDef)
-      ? [Record.getRootNode(getRecord(surveyForm))]
+  const mapEntryProps = () => {
+    const nodes = NodeDef.isNodeDefRoot(nodeDef)
+      ? [Record.getRootNode(record)]
       : parentNode
-        ? Record.getNodeChildrenByDefUuid(parentNode, nodeDef.uuid)(getRecord(surveyForm))
-        : [],
-  })
+        ? Record.getNodeChildrenByDefUuid(parentNode, nodeDef.uuid)(record)
+        : []
+
+    const validatedNodes = nodes.map(
+      n => Node.assocValidation(Validator.getFieldValidation(Node.getUuid(n))(recordValidation))(n)
+    )
+
+    return {
+      nodes: validatedNodes,
+      valid: R.all(Validator.isValid, validatedNodes)
+    }
+  }
 
   return {
     // always unlocking attributes

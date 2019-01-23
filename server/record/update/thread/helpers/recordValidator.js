@@ -1,17 +1,18 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {dependencyTypes} = require('../../../survey/surveyDependenchyGraph')
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const NodeDefValidations = require('../../../../common/survey/nodeDefValidations')
-const Node = require('../../../../common/record/node')
-const Validator = require('../../../../common/validation/validator')
+const {dependencyTypes} = require('../../../../survey/surveyDependenchyGraph')
+const Survey = require('../../../../../common/survey/survey')
+const NodeDef = require('../../../../../common/survey/nodeDef')
+const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
+const NodeDefValidations = require('../../../../../common/survey/nodeDefValidations')
+const Node = require('../../../../../common/record/node')
+const Validator = require('../../../../../common/validation/validator')
 
-const NodeDependencyManager = require('./nodeDependencyManager')
-const RecordExprParser = require('../../recordExprParser')
+const NodeDependencyManager = require('../nodeDependencyManager')
+const RecordExprParser = require('../../../recordExprParser')
 
-const DateTimeUtils = require('../../../../common/dateUtils')
+const DateTimeUtils = require('../../../../../common/dateUtils')
 
 const errorKeys = {
   required: 'required',
@@ -65,15 +66,26 @@ const validateNodeValidations = (survey, nodeDef, tx) => async (propName, node) 
 
   const applicableExpressionsEvaluated = await Promise.all(
     applicableExpressions.map(
-      async expr =>
-        await RecordExprParser.evalNodeQuery(survey, node, expr, tx)
+      async expr => {
+        const valid = await RecordExprParser.evalNodeQuery(survey, node, NodeDefExpression.getExpression(expr), tx)
+        const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+        const message = NodeDefExpression.getMessage(defaultLang, errorKeys.invalidValue)(expr)
+
+        return {
+          valid,
+          message
+        }
+      }
     ))
 
-  const allValid = R.none(R.equals(false), applicableExpressionsEvaluated)
+  const invalidExpressions = R.filter(R.propEq('valid', false), applicableExpressionsEvaluated)
 
-  return allValid
+  return R.isEmpty(invalidExpressions)
     ? null
-    : errorKeys.invalidValue
+    : R.pipe(
+      R.pluck('message'),
+      R.join('\n')
+    )(invalidExpressions)
 }
 
 const validateNodes = async (survey, nodes, tx) => {

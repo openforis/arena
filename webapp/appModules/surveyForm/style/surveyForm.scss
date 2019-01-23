@@ -118,6 +118,10 @@ $tableRowHeaderHeight: 40px;
   opacity: .6;
 }
 
+.node-def__invalid {
+  border: 1px solid rgba($red, .8);
+}
+
 .node-def__form-actions {
   position: absolute;
   right: 1rem;

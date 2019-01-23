@@ -2,7 +2,6 @@ const R = require('ramda')
 const path = require('path')
 
 const WebSocketManager = require('../../webSocket/webSocketManager')
-const WebSocketEvents = require('../../../common/webSocket/webSocketEvents')
 
 const ThreadsCache = require('../../threads/threadsCache')
 const ThreadManager = require('../../threads/threadManager')
@@ -21,13 +20,7 @@ const createRecordUpdateThread = (user, surveyId, preview) => {
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
     {user, surveyId, preview},
-    msg => {
-      if (R.has('nodes')) {
-        WebSocketManager.notifyUser(userId, WebSocketEvents.nodesUpdate, R.prop('nodes', msg))
-      } else if (R.has('nodesValidation')) {
-        WebSocketManager.notifyUser(userId, WebSocketEvents.nodesUpdate, R.prop('nodesValidation', msg))
-      }
-    },
+    msg => WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg)),
     () => recordUpdateThreads.removeThread(userId)
   )
 

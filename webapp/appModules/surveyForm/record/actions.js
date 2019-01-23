@@ -22,10 +22,15 @@ export const recordDelete = 'survey/record/delete'
 
 export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
+export const validationsUpdate = 'survey/record/validation/update'
 
 export const recordNodesUpdate = nodes =>
   dispatch =>
     dispatch({type: nodesUpdate, nodes})
+
+export const nodeValidationsUpdate = validations =>
+  dispatch =>
+    dispatch({type: validationsUpdate, validations})
 
 /**
  * ============

@@ -4,7 +4,7 @@ const R = require('ramda')
 
 const db = require('../../../db/db')
 
-const RecordProcessor = require('./recordProcessor')
+const RecordUpdater = require('./helpers/recordUpdater')
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
@@ -17,6 +17,11 @@ const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
 const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
 
+const DependentNodesUpdater = require('./helpers/dependentNodesUpdater')
+const RecordValidator = require('./helpers/recordValidator')
+
+const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
+
 class RecordUpdateThread extends Thread {
 
   constructor (paramsObj) {
@@ -25,7 +30,7 @@ class RecordUpdateThread extends Thread {
     this.queue = new Queue()
     this.processing = false
     this.preview = R.propOr(false, 'preview', this.params)
-    this.processor = new RecordProcessor(this.notifyNodesUpdate.bind(this), this.notifyNodesValidationUpdate.bind(this), this.preview)
+    this.recordUpdater = new RecordUpdater(this.preview)
   }
 
   async getSurvey (tx) {
@@ -37,7 +42,7 @@ class RecordUpdateThread extends Thread {
         ? surveyDependencyGraph.buildGraph(surveyDb)
         : await SurveyManager.fetchDepedencies(this.surveyId)
 
-      this.survey = R.assoc('dependencyGraph', dependencyGraph, surveyDb)
+      this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
     }
 
     return this.survey
@@ -63,17 +68,9 @@ class RecordUpdateThread extends Thread {
     }
   }
 
-  notifyNodesUpdate (nodes) {
-    this._postMessage({nodes})
-  }
-
-  notifyNodesValidationUpdate (nodesValidation) {
-    this._postMessage({nodesValidation})
-  }
-
-  _postMessage (msg) {
+  _postMessage (type, content) {
     if (!isMainThread)
-      this.postMessage(msg)
+      this.postMessage({type, content})
   }
 
   async processMessage (msg) {
@@ -84,20 +81,29 @@ class RecordUpdateThread extends Thread {
 
       let updatedNodes = null
 
-      // 1. update node and dependent nodes
+      // 1. update node
       switch (msg.type) {
         case messageTypes.createRecord:
-          updatedNodes = await this.processor.createRecord(user, survey, msg.record, t)
+          updatedNodes = await this.recordUpdater.createRecord(user, survey, msg.record, t)
           break
         case messageTypes.persistNode:
-          updatedNodes = await this.processor.persistNode(user, survey, msg.node, t)
+          updatedNodes = await this.recordUpdater.persistNode(user, survey, msg.node, t)
           break
         case messageTypes.deleteNode:
-          updatedNodes = await this.processor.deleteNode(user, survey, msg.nodeUuid, t)
+          updatedNodes = await this.recordUpdater.deleteNode(user, survey, msg.nodeUuid, t)
           break
       }
+      this._postMessage(WebSocketEvents.nodesUpdate, updatedNodes)
 
-      //2. update survey rdb
+      // 2. update dependent nodes
+      const updatedDependentNodes = await DependentNodesUpdater.updateNodes(survey, updatedNodes, t)
+      this._postMessage(WebSocketEvents.nodesUpdate, updatedDependentNodes)
+
+      // 3. update node validations
+      const validations = await RecordValidator.validateNodes(survey, updatedNodes, t)
+      this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
+
+      // 4. update survey rdb
       if (!this.preview) {
         const nodeDefs = toUuidIndexedObj(
           Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey)

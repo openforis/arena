@@ -31,7 +31,8 @@ const errorKeys = {
 const keys = {
   fields: 'fields',
   valid: 'valid',
-  errors: 'errors'
+  errors: 'errors',
+  validation: 'validation'
 }
 
 const validValidation = {
@@ -117,7 +118,7 @@ const validatePositiveNumber = (propName, item) => {
 
 //==== getters
 
-const getValidation = R.propOr(validValidation, 'validation')
+const getValidation = R.propOr(validValidation, keys.validation)
 
 const isValid = R.pipe(getValidation, R.propEq(keys.valid, true))
 
@@ -143,6 +144,16 @@ const cleanup = R.pipe(
   }),
 )
 
+const assocValidation = v => R.assoc(keys.validation, v)
+
+const mergeValidation = validation =>
+  obj => R.pipe(
+    getValidation,
+    R.mergeLeft(validation),
+    cleanup,
+    v => assocValidation(v)(obj)
+  )(obj)
+
 module.exports = {
   errorKeys,
 
@@ -153,11 +164,15 @@ module.exports = {
   validateNotKeyword,
   validatePositiveNumber,
 
+  // READ
   getValidation,
   isValid,
   getFieldValidation,
   getFieldValidations,
   getInvalidFieldValidations,
 
-  cleanup
+  // UPDATE
+  cleanup,
+  assocValidation,
+  mergeValidation
 }

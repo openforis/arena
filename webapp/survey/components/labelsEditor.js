@@ -48,11 +48,11 @@ class LabelsEditor extends React.Component {
   render () {
     const {
       labels,
-      formLabel = 'Label(s)',
+      formLabel,
       languages,
       onChange,
-      maxPreview = 2,
-      canTogglePreview = true,
+      maxPreview,
+      canTogglePreview,
       readOnly,
     } = this.props
 
@@ -101,6 +101,12 @@ class LabelsEditor extends React.Component {
 
 LabelsEditor.defaultProps = {
   languages: [],
+  labels: [],
+  formLabel: 'Label(s)',
+  onChange: null,
+  maxPreview: 2,
+  canTogglePreview: true,
+  readOnly: false,
 }
 
 const mapStateToProps = state => ({

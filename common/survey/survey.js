@@ -60,8 +60,9 @@ module.exports = {
   // ====== READ dependencies
   getNodeDefDependencies: SurveyDependencies.getNodeDefDependencies,
 
-  // ====== UPDATE nodeDefs
+  // ====== UPDATE
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,
+  assocDependencyGraph: SurveyDependencies.assocDependencyGraph,
 
   // ====== NodeDef Code
   getNodeDefCategoryLevelIndex: SurveyNodeDefs.getNodeDefCategoryLevelIndex,
