@@ -23,17 +23,17 @@ const EditButtons = (props) => {
     }
   )
 
-  const { logicalOperators } = Expression.operators
+  const { logical } = Expression.operators
 
   return (
     <div className="btns">
       <div className="btns__add">
         <button className="btn btn-s btn-of-light"
-                onClick={() => addLogicalExpr(logicalOperators.or.value)}>
+                onClick={() => addLogicalExpr(logical.or.value)}>
           <span className="icon icon-plus icon-8px"/> OR
         </button>
         <button className="btn btn-s btn-of-light"
-                onClick={() => addLogicalExpr(logicalOperators.and.value)}>
+                onClick={() => addLogicalExpr(logical.and.value)}>
           <span className="icon icon-plus icon-8px"/> AND
         </button>
       </div>
@@ -74,7 +74,7 @@ const Group = (props) => {
 const Logical = (props) => {
   const { node, onChange, canDelete = false } = props
   const { left, right, operator } = node
-  const { logicalOperators } = Expression.operators
+  const { logical } = Expression.operators
 
   return (
     <div className="logical">
@@ -87,12 +87,12 @@ const Logical = (props) => {
       <div className="btns">
 
         <div className="btns__add">
-          <button className={`btn btn-s btn-of-light${operator === logicalOperators.or.key ? ' active' : ''}`}
-                  onClick={() => onChange(R.assoc('operator', logicalOperators.or.key, node))}>
+          <button className={`btn btn-s btn-of-light${operator === logical.or.key ? ' active' : ''}`}
+                  onClick={() => onChange(R.assoc('operator', logical.or.key, node))}>
             OR
           </button>
-          <button className={`btn btn-s btn-of-light${operator === logicalOperators.and.key ? ' active' : ''}`}
-                  onClick={() => onChange(R.assoc('operator', logicalOperators.and.key, node))}>
+          <button className={`btn btn-s btn-of-light${operator === logical.and.key ? ' active' : ''}`}
+                  onClick={() => onChange(R.assoc('operator', logical.and.key, node))}>
             AND
           </button>
         </div>
