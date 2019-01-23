@@ -77,20 +77,3 @@ FOO_COOKIE_SECRET=my-cookie-secret-key
 email:admin@openforis.org 
 
 pwd:admin 
-
-
-## Setup eslint on IntelliJ IDEA
-
-### Enable ESLint
-
-Open the *Settings/Preferences* dialog and choose *JavaScript* under *Languages and Frameworks*. Choose *ESLint* under *Code Quality Tool*. Select the *Enable* Checkbox.
-
-Make sure that *Node Interpreter* points to the right Node.js path.
-
-Make sure that the *ESLint Package* field points to the right ESLint package (it should be *.../arena/node_modules/eslint*).
-
-Under *Configuration File* choose *Automatic search*.
-
-### Import code style from ESLint
-
-Open the `.eslintrc.json` file and answer yes to the question "Apply code style from ESLint?" question on top of the file.
