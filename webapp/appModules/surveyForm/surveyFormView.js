@@ -25,6 +25,7 @@ const SurveyFormView = (props) => {
     entry,
     preview,
     canEditDef,
+    canEditRecord,
 
     recordUuid,
     parentNode,
@@ -59,7 +60,8 @@ const SurveyFormView = (props) => {
                              entry={entry}
                              recordUuid={recordUuid}
                              parentNode={parentNode}
-                             canEditDef={canEditDef}/>
+                             canEditDef={canEditDef}
+                             canEditRecord={canEditRecord}/>
             : <div/>
         }
 

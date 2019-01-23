@@ -48,7 +48,7 @@ class RecordView extends React.Component {
     const {recordLoaded, preview} = this.props
 
     return recordLoaded
-      ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true}/>
+      ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true} canEditRecord={false}/>
       : null
   }
 }
