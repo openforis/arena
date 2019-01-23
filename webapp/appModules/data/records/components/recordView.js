@@ -4,15 +4,14 @@ import * as R from 'ramda'
 
 import SurveyFormView from '../../../surveyForm/surveyFormView'
 
-import Record from '../../../../../common/record/record'
-
+import * as AppState from '../../../../app/appState'
 import * as RecordState from '../../../surveyForm/record/recordState'
 import * as SurveyFormState from '../../../surveyForm/surveyFormState'
 
 import { resetForm } from '../../../surveyForm/actions'
 import { checkInRecord, checkOutRecord } from '../../../surveyForm/record/actions'
 
-import { appModules, appModuleUri } from '../../../appModules'
+import { canEditRecord } from '../../../../../common/auth/authManager'
 
 class RecordView extends React.Component {
 
@@ -45,19 +44,22 @@ class RecordView extends React.Component {
   }
 
   render () {
-    const {recordLoaded, preview} = this.props
+    const {recordLoaded, preview, user, record} = this.props
 
     return recordLoaded
-      ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true} canEditRecord={false}/>
+      ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true} canEditRecord={canEditRecord(user, record)}/>
       : null
   }
 }
 
 const mapStateToProps = (state, {match}) => {
   const surveyForm = SurveyFormState.getSurveyForm(state)
+  const user = AppState.getUser(state)
   const record = RecordState.getRecord(surveyForm)
 
   return {
+    user,
+    record,
     recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
   }

@@ -9,9 +9,9 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 
 import Node from '../../../../../../common/record/node'
 
-const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) => (
+const TextInput = ({nodeDef, node, edit, updateNode, canEditRecord}) => (
   <div>
-    <Input readOnly={edit}
+    <Input aria-disabled={edit || !canEditRecord}
            {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
            value={Node.getNodeValue(node, '')}
            onChange={value => updateNode(nodeDef, node, value)}
@@ -20,19 +20,21 @@ const TextInput = ({nodeDef, node, parentNode, edit, updateNode}) => (
 )
 
 const MultipleTextInput = props => {
-  const {nodeDef, nodes, removeNode} = props
+  const {nodeDef, nodes, removeNode, canEditRecord} = props
+  console.log(props)
 
   return <div className="node-def__entry-multiple">
     <div className="nodes">
       {
         nodes.map(n =>
+          (!n.placeholder || canEditRecord) &&
           <div key={`nodeDefTextInput_${n.uuid}`}
                className="node-def__text-multiple-text-input-wrapper">
 
             <TextInput {...props}
                        node={n}/>
 
-            {!n.placeholder && NodeDef.isNodeDefMultiple(nodeDef) &&
+            {!n.placeholder && NodeDef.isNodeDefMultiple(nodeDef) && canEditRecord &&
             <NodeDeleteButton nodeDef={nodeDef}
                               node={n}
                               disabled={R.isEmpty(Node.getNodeValue(n))}

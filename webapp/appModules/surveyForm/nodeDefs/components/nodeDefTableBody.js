@@ -83,7 +83,11 @@ class NodeDefMultipleTableBody extends React.Component {
           <span className="values-summary">{this.state.nodeValues}</span>
           <button className="btn-s btn-of-light-xs"
                   onClick={() => this.toggleEditDialogOpen(true)}>
-            <span className="icon icon-pencil2 icon-12px"/>
+            {
+              this.props.canEditRecord
+                ? <span className="icon icon-pencil2 icon-12px" />
+                : <span className="icon icon-eye icon-12px"/>
+            }
           </button>
         </div>
       )
