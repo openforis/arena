@@ -1,8 +1,11 @@
 const R = require('ramda')
 
 const jsep = require('./helpers/jsep')
-const { evalExpression } = require('./helpers/expressionEvaluator')
-const { types, toString: toStringUtils, isValid: isValidUtils } = require('./helpers/expressionUtils')
+const { evalExpression } = require('./helpers/evaluator')
+const { toString: toStringUtils, isValid } = require('./helpers/utils')
+const { types } = require('./helpers/types')
+
+const operators = require('./helpers/operators')
 
 const modes = {
   json: 'json',
@@ -39,8 +42,6 @@ const fromString = (string, exprMode = modes.json) => {
 
 const evalString = async (query, ctx) =>
   await evalExpression(fromString(query), ctx)
-
-const isValid = isValidUtils
 
 // ====== Type checking
 
@@ -85,4 +86,7 @@ module.exports = {
   newLiteral,
   newIdentifier,
   newBinary,
+
+  // operators
+  operators,
 }

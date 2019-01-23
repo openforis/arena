@@ -4,28 +4,6 @@ import * as R from 'ramda'
 import Expression from '../../../../common/exprParser/expression'
 import Dropdown from '../../form/dropdown'
 
-const logicalOperators = {
-  and: { key: '&&', value: '&&' },
-  or: { key: '||', value: '||' },
-}
-
-const comparisonOperators = {
-  eq: { key: '===', value: '=' },
-  notEq: { key: '!==', value: '!=' },
-  gt: { key: '>', value: '>' },
-  less: { key: '<', value: '<' },
-  gtOrEq: { key: '>=', value: '>=' },
-  lessOrEq: { key: '<=', value: '<=' },
-}
-
-const arithmeticOperators = {
-  add: { key: '+', value: '+' },
-  sub: { key: '-', value: '-' },
-  mul: { key: '*', value: '*' },
-  div: { key: '/', value: '/' },
-  mod: { key: '%', value: '%' },
-}
-
 const EditButtons = (props) => {
   const {
     node, onChange,
@@ -44,6 +22,8 @@ const EditButtons = (props) => {
       }
     }
   )
+
+  const { logicalOperators } = Expression.operators
 
   return (
     <div className="btns">
@@ -94,6 +74,8 @@ const Group = (props) => {
 const Logical = (props) => {
   const { node, onChange, canDelete = false } = props
   const { left, right, operator } = node
+  const { logicalOperators } = Expression.operators
+
   return (
     <div className="logical">
       <ExpressionNode {...props}
@@ -139,16 +121,18 @@ const BinaryOperand = ({ type, node, ...props }) => {
 
   return (
     <React.Fragment>
-      <button className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? '' : ' active'}`}
-              onClick={() => onChange(
-                R.assoc(type, Expression.newIdentifier(), node)
-              )}>
+      <button
+        className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? '' : ' active'}`}
+        onClick={() => onChange(
+          R.assoc(type, Expression.newIdentifier(), node)
+        )}>
         Var
       </button>
-      <button className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
-              onClick={() => onChange(
-                R.assoc(type, Expression.newLiteral(), node)
-              )}>
+      <button
+        className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
+        onClick={() => onChange(
+          R.assoc(type, Expression.newLiteral(), node)
+        )}>
         Const
       </button>
 
@@ -163,19 +147,14 @@ const Binary = (props) => {
     node, onChange,
     canDelete = false, onDelete,
   } = props
-  const { left, right, operator } = node
-  const operators = R.concat(
-    R.values(arithmeticOperators),
-    R.values(comparisonOperators)
-  )
 
   return (
     <div className="binary">
 
       <BinaryOperand {...props} type="left"/>
 
-      <Dropdown items={operators} inputSize={10}
-                selection={R.find(R.propEq('key', operator), operators)}
+      <Dropdown items={Expression.operators.binaryValues} inputSize={10}
+                selection={Expression.operators.findBinary(node.operator)}
                 onChange={item => onChange(
                   R.assoc('operator', R.propOr('', 'key', item), node)
                 )}/>

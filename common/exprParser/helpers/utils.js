@@ -1,22 +1,7 @@
 const R = require('ramda')
 
 const { trim, isNotBlank } = require('../../stringUtils')
-
-const types = {
-  // 'Compound'
-  Identifier: 'Identifier',
-  MemberExpression: 'MemberExpression',
-  Literal: 'Literal',
-  ThisExpression: 'ThisExpression',
-  CallExpression: 'CallExpression',
-  UnaryExpression: 'UnaryExpression',
-  BinaryExpression: 'BinaryExpression',
-  LogicalExpression: 'LogicalExpression',
-  // 'ConditionalExpression'
-  // 'ArrayExpression'
-  // custom - not managed by jsep
-  GroupExpression: 'GroupExpression',
-}
+const { types } = require('./types')
 
 // toString
 const binaryToString = node => `${toString(node.left)} ${node.operator} ${toString(node.right)}`
@@ -32,7 +17,7 @@ const typeProps = {
   },
   [types.MemberExpression]: {
     toString: node => `${toString(node.object)}.${toString(node.property)}`,
-    // isValid: TODO,
+    isValid: node => isValid(node.object) && isValid(node.property),
   },
   [types.Literal]: {
     toString: R.prop('raw'),
@@ -44,7 +29,7 @@ const typeProps = {
   },
   [types.CallExpression]: {
     toString: node => `${toString(node.callee)}(${node.arguments.map(toString).join(',')})`,
-    // isValid: TODO,
+    isValid: node => isValid((node.callee)),
   },
   [types.UnaryExpression]: {
     toString: node => `${node.operator} ${toString(node.argument)}`,
@@ -74,8 +59,6 @@ const isValid = expr =>
   getTypeProp(expr.type, 'isValid')(expr)
 
 module.exports = {
-  types,
-
   toString,
   isValid,
 }
