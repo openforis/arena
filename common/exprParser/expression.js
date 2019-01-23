@@ -47,8 +47,6 @@ const evalString = async (query, ctx) =>
 
 const isType = type => R.propEq('type', type)
 
-const isLiteral = isType(types.Literal)
-
 // ====== Instance creators
 
 const newLiteral = () => ({
@@ -62,11 +60,11 @@ const newIdentifier = () => ({
   name: ''
 })
 
-const newBinary = () => ({
+const newBinary = (left = newIdentifier(), right, operator = '') => ({
   type: types.BinaryExpression,
-  operator: '',
-  left: newIdentifier(),
-  right: newLiteral()
+  operator,
+  left,
+  right
 
 })
 
@@ -80,7 +78,9 @@ module.exports = {
   isValid,
 
   // Type checking
-  isLiteral,
+  isLiteral: isType(types.Literal),
+  isCompound: isType(types.Compound),
+  isBinary: isType(types.BinaryExpression),
 
   // Instance creators
   newLiteral,

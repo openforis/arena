@@ -1,5 +1,5 @@
 const types = {
-  // 'Compound'
+  Compound: 'Compound',
   Identifier: 'Identifier',
   MemberExpression: 'MemberExpression',
   Literal: 'Literal',

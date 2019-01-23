@@ -6,15 +6,30 @@ import * as R from 'ramda'
 import Expression from '../../../../common/exprParser/expression'
 import { ExpressionNode } from './types'
 
-const defaultExpression = Expression.newBinary()
+import { isNotBlank } from '../../../../common/stringUtils'
 
 class Editor extends React.Component {
 
   constructor (props) {
     super(props)
 
-    const {query, mode} = props
-    const expr = R.isEmpty(query) ? defaultExpression : Expression.fromString(query, mode)
+    const { query, mode, canBeConstant } = props
+
+    const exprQuery = Expression.fromString(query, mode)
+    const isCompound = Expression.isCompound(exprQuery)
+    const isBinary = Expression.isBinary(exprQuery)
+    const expr = isBinary
+      ? exprQuery
+      : Expression.newBinary(
+        isCompound && canBeConstant
+          ? Expression.newLiteral()
+          : isCompound
+          ? Expression.newIdentifier()
+          : exprQuery,
+        Expression.newLiteral()
+      )
+
+    // if(Expression.isLiteral(expr))
 
     this.state = {
       query, queryDraft: Expression.toString(expr, mode),
@@ -22,17 +37,32 @@ class Editor extends React.Component {
     }
   }
 
+  isExprValid (expr) {
+    const { canBeConstant } = this.props
+    try {
+
+      const exprString = Expression.toString(expr)
+      const exprToValidate = canBeConstant && isNotBlank(exprString)
+        ? Expression.fromString(exprString)
+        : expr
+
+      return Expression.isValid(exprToValidate)
+    } catch (e) {
+      return false
+    }
+  }
+
   updateDraft (exprDraft) {
     this.setState({
       queryDraft: Expression.toString(exprDraft, this.props.mode),
       exprDraft,
-      exprDraftValid: Expression.isValid(exprDraft),
+      exprDraftValid: this.isExprValid(exprDraft),
     })
   }
 
   render () {
-    const {query, queryDraft, exprDraft, exprDraftValid} = this.state
-    const {variables, onClose, onChange} = this.props
+    const { query, queryDraft, exprDraft, exprDraftValid } = this.state
+    const { variables, onClose, onChange } = this.props
 
     return <React.Fragment>
 

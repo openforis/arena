@@ -18,8 +18,9 @@
   }
 
   .expression-item {
-    display: flex;
     height: 35px;
+    display: grid;
+    grid-template-columns: auto 1fr;
 
     .label {
       text-align: center;
