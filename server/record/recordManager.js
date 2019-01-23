@@ -1,4 +1,5 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
 const db = require('../db/db')
 
@@ -11,13 +12,13 @@ const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 const File = require('../../common/file/file')
 
-const {toUuidIndexedObj} = require('../../common/survey/surveyUtils')
-const {isBlank} = require('../../common/stringUtils')
+const { toUuidIndexedObj } = require('../../common/survey/surveyUtils')
+const { isBlank } = require('../../common/stringUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
 const ActivityLog = require('../activityLog/activityLogger')
 
-const {canEditRecord} = require('../../common/auth/authManager')
+const { canEditRecord } = require('../../common/auth/authManager')
 
 /**
  * ===================
@@ -42,9 +43,14 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
 
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) => {
   const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
+  return record
+}
+
+const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, client = db) => {
+  const record = await fetchRecordByUuid(surveyId, recordUuid, client)
   const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
 
-  return {...record, nodes: toUuidIndexedObj(nodes)}
+  return { ...record, nodes: toUuidIndexedObj(nodes) }
 }
 
 /**
@@ -81,7 +87,7 @@ const persistNode = (user, surveyId, node, fileReq) => {
  */
 const deleteRecord = async (user, surveyId, recordUuid) =>
   await db.tx(async t => {
-    await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, {recordUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, { recordUuid }, t)
     await RecordRepository.deleteRecord(user, surveyId, recordUuid, t)
   })
 
@@ -93,7 +99,7 @@ const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(
  * ==================
  */
 const checkInRecord = async (user, surveyId, recordUuid) => {
-  const record = await fetchRecordByUuid(surveyId, recordUuid)
+  const record = await fetchRecordAndNodesByUuid(surveyId, recordUuid)
 
   if (canEditRecord(user, record)) {
     RecordUpdateManager.checkIn(user, surveyId, Record.isPreview(record))
@@ -106,14 +112,16 @@ const checkOutRecord = async (user, surveyId, recordUuid) => {
   const record = await fetchRecordByUuid(surveyId, recordUuid)
 
   if (Record.isPreview(record)) {
-    await deleteRecordPreview(user, surveyId, record)
+    await deleteRecordPreview(user, surveyId, recordUuid)
   }
 
   RecordUpdateManager.checkOut(user.id)
 }
 
-const deleteRecordPreview = async (user, surveyId, record) =>
+const deleteRecordPreview = async (user, surveyId, recordUuid) =>
   await db.tx(async t => {
+    const record = await fetchRecordAndNodesByUuid(surveyId, recordUuid, t)
+
     const fileUuids = R.pipe(
       Record.getNodesArray,
       R.map(Node.getNodeFileUuid),
@@ -134,6 +142,7 @@ module.exports = {
 
   //==== READ
   fetchRecordByUuid,
+  fetchRecordAndNodesByUuid,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
