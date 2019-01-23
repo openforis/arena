@@ -1,8 +1,8 @@
 const R = require('ramda')
 
 const jsep = require('./helpers/jsep')
-const {evalExpression} = require('./helpers/expressionEvaluator')
-const {types, toString: toStringUtils, isValid: isValidUtils} = require('./helpers/expressionUtils')
+const { evalExpression } = require('./helpers/expressionEvaluator')
+const { types, toString: toStringUtils, isValid: isValidUtils } = require('./helpers/expressionUtils')
 
 const modes = {
   json: 'json',
@@ -30,6 +30,8 @@ const fromString = (string, exprMode = modes.json) => {
       R.replace(/OR/g, '||'),
       R.replace(/=/g, '==='),
       R.replace(/!===/g, '!=='),
+      R.replace(/>===/g, '>='),
+      R.replace(/<===/g, '<='),
     )(string)
 
   return jsep(exprString)
@@ -40,6 +42,33 @@ const evalString = async (query, ctx) =>
 
 const isValid = isValidUtils
 
+// ====== Type checking
+
+const isType = type => R.propEq('type', type)
+
+const isLiteral = isType(types.Literal)
+
+// ====== Instance creators
+
+const newLiteral = () => ({
+  type: types.Literal,
+  value: null,
+  raw: '',
+})
+
+const newIdentifier = () => ({
+  type: types.Identifier,
+  name: ''
+})
+
+const newBinary = () => ({
+  type: types.BinaryExpression,
+  operator: '',
+  left: newIdentifier(),
+  right: newLiteral()
+
+})
+
 module.exports = {
   types,
   modes,
@@ -48,4 +77,12 @@ module.exports = {
   fromString,
   evalString,
   isValid,
+
+  // Type checking
+  isLiteral,
+
+  // Instance creators
+  newLiteral,
+  newIdentifier,
+  newBinary,
 }

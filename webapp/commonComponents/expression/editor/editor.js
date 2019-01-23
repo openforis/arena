@@ -4,13 +4,9 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Expression from '../../../../common/exprParser/expression'
-import { TypeSwitch } from './types'
+import { ExpressionNode } from './types'
 
-const defaultExpression = {
-  type: Expression.types.BinaryExpression, operator: '',
-  left: {type: Expression.types.Identifier, name: ''},
-  right: {type: Expression.types.Literal, value: null, raw: ''}
-}
+const defaultExpression = Expression.newBinary()
 
 class Editor extends React.Component {
 
@@ -56,8 +52,8 @@ class Editor extends React.Component {
       </div>
 
       <div className="expression-editor__expr-container">
-        <TypeSwitch variables={variables} node={exprDraft}
-                    onChange={this.updateDraft.bind(this)}/>
+        <ExpressionNode variables={variables} node={exprDraft}
+                        onChange={this.updateDraft.bind(this)}/>
       </div>
 
       <div className="expression-editor__footer">

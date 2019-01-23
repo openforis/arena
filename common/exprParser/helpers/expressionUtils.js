@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const {trim, isNotBlank} = require('../../stringUtils')
+const { trim, isNotBlank } = require('../../stringUtils')
 
 const types = {
   // 'Compound'
