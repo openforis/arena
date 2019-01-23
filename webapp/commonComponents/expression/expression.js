@@ -20,7 +20,7 @@ class ExpressionComponent extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = {edit: false}
+    this.state = { edit: false }
 
     this.elementRef = React.createRef()
 
@@ -32,24 +32,24 @@ class ExpressionComponent extends React.Component {
     const elemOffset = edit ? elementOffset(this.elementRef.current) : null
     const padding = 20
     return elemOffset
-      ? {padding, top: (elemOffset.top - padding) + 'px', left: (elemOffset.left - padding) + 'px'}
+      ? { padding, top: (elemOffset.top - padding) + 'px', left: (elemOffset.left - padding) + 'px' }
       : {}
   }
 
   applyChange (query) {
-    const {onChange} = this.props
+    const { onChange } = this.props
     onChange && onChange(query)
 
     this.toggleEdit()
   }
 
   toggleEdit () {
-    this.setState(state => ({edit: !state.edit}))
+    this.setState(state => ({ edit: !state.edit }))
   }
 
   render () {
-    const {query, variables, mode} = this.props
-    const {edit} = this.state
+    const { query, variables, mode, canBeConstant } = this.props
+    const { edit } = this.state
 
     return <div className={`expression${edit ? ' edit' : ''}`}
                 ref={this.elementRef}
@@ -61,7 +61,8 @@ class ExpressionComponent extends React.Component {
                     variables={variables}
                     onClose={this.toggleEdit}
                     onChange={query => this.applyChange(query)}
-                    mode={mode}/>
+                    mode={mode}
+                    canBeConstant={canBeConstant}/>
           )
           : (
             <div className="expression__query-container">
@@ -87,6 +88,7 @@ ExpressionComponent.defaultProps = {
   mode: Expression.modes.json,
   onChange: null,
   isContextParent: false,
+  canBeConstant: false,
 }
 
 const mapStateToProps = (state, props) => {
