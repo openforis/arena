@@ -4,28 +4,6 @@ import * as R from 'ramda'
 import Expression from '../../../../common/exprParser/expression'
 import Dropdown from '../../form/dropdown'
 
-const logicalOperators = {
-  and: {key: '&&', value: '&&'},
-  or: {key: '||', value: '||'},
-}
-
-const comparisonOperators = {
-  eq: {key: '===', value: '='},
-  notEq: {key: '!==', value: '!='},
-  gt: {key: '>', value: '>'},
-  less: {key: '<', value: '<'},
-  gtOrEq: {key: '>=', value: '>='},
-  lessOrEq: {key: '<=', value: '<='},
-}
-
-const arithmeticOperators = {
-  add: {key: '+', value: '+'},
-  sub: {key: '-', value: '-'},
-  mul: {key: '*', value: '*'},
-  div: {key: '/', value: '/'},
-  mod: {key: '%', value: '%'},
-}
-
 const EditButtons = (props) => {
   const {
     node, onChange,
@@ -39,21 +17,23 @@ const EditButtons = (props) => {
       left: node,
       right: {
         type: Expression.types.BinaryExpression, operator: '',
-        left: {type: Expression.types.Identifier, name: ''},
-        right: {type: Expression.types.Literal, value: null, raw: ''}
+        left: { type: Expression.types.Identifier, name: '' },
+        right: { type: Expression.types.Literal, value: null, raw: '' }
       }
     }
   )
+
+  const { logical } = Expression.operators
 
   return (
     <div className="btns">
       <div className="btns__add">
         <button className="btn btn-s btn-of-light"
-                onClick={() => addLogicalExpr(logicalOperators.or.value)}>
+                onClick={() => addLogicalExpr(logical.or.value)}>
           <span className="icon icon-plus icon-8px"/> OR
         </button>
         <button className="btn btn-s btn-of-light"
-                onClick={() => addLogicalExpr(logicalOperators.and.value)}>
+                onClick={() => addLogicalExpr(logical.and.value)}>
           <span className="icon icon-plus icon-8px"/> AND
         </button>
       </div>
@@ -73,15 +53,15 @@ const Group = (props) => {
     canDelete,
     level = 0
   } = props
-  const {argument} = node
+  const { argument } = node
 
   return (
     <div className="group">
       <h3>(</h3>
-      <TypeSwitch {...props}
-                  level={level + 1}
-                  node={argument}
-                  onChange={item => onChange(R.assoc('argument', item, node))}/>
+      <ExpressionNode {...props}
+                      level={level + 1}
+                      node={argument}
+                      onChange={item => onChange(R.assoc('argument', item, node))}/>
       <div className="footer">
         <h3>)</h3>
         <EditButtons node={node} onChange={onChange}
@@ -92,25 +72,27 @@ const Group = (props) => {
 }
 
 const Logical = (props) => {
-  const {node, onChange, canDelete = false} = props
-  const {left, right, operator} = node
+  const { node, onChange, canDelete = false } = props
+  const { left, right, operator } = node
+  const { logical } = Expression.operators
+
   return (
     <div className="logical">
-      <TypeSwitch {...props}
-                  node={left}
-                  canDelete={canDelete}
-                  onChange={item => onChange(R.assoc('left', item, node))}
-                  onDelete={() => onChange(right)}/>
+      <ExpressionNode {...props}
+                      node={left}
+                      canDelete={canDelete}
+                      onChange={item => onChange(R.assoc('left', item, node))}
+                      onDelete={() => onChange(right)}/>
 
       <div className="btns">
 
         <div className="btns__add">
-          <button className={`btn btn-s btn-of-light${operator === logicalOperators.or.key ? ' active' : ''}`}
-                  onClick={() => onChange(R.assoc('operator', logicalOperators.or.key, node))}>
+          <button className={`btn btn-s btn-of-light${operator === logical.or.key ? ' active' : ''}`}
+                  onClick={() => onChange(R.assoc('operator', logical.or.key, node))}>
             OR
           </button>
-          <button className={`btn btn-s btn-of-light${operator === logicalOperators.and.key ? ' active' : ''}`}
-                  onClick={() => onChange(R.assoc('operator', logicalOperators.and.key, node))}>
+          <button className={`btn btn-s btn-of-light${operator === logical.and.key ? ' active' : ''}`}
+                  onClick={() => onChange(R.assoc('operator', logical.and.key, node))}>
             AND
           </button>
         </div>
@@ -124,12 +106,39 @@ const Logical = (props) => {
         </button>
       </div>
 
-      <TypeSwitch {...props}
-                  node={right}
-                  canDelete={true}
-                  onChange={item => onChange(R.assoc('right', item, node))}
-                  onDelete={() => onChange(left)}/>
+      <ExpressionNode {...props}
+                      node={right}
+                      canDelete={true}
+                      onChange={item => onChange(R.assoc('right', item, node))}
+                      onDelete={() => onChange(left)}/>
     </div>
+  )
+}
+
+const BinaryOperand = ({ type, node, ...props }) => {
+  const { onChange } = props
+  const nodeOperand = R.prop(type, node)
+
+  return (
+    <React.Fragment>
+      <button
+        className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? '' : ' active'}`}
+        onClick={() => onChange(
+          R.assoc(type, Expression.newIdentifier(), node)
+        )}>
+        Var
+      </button>
+      <button
+        className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
+        onClick={() => onChange(
+          R.assoc(type, Expression.newLiteral(), node)
+        )}>
+        Const
+      </button>
+
+      <ExpressionNode {...props} node={nodeOperand}
+                      onChange={item => onChange(R.assoc(type, item, node))}/>
+    </React.Fragment>
   )
 }
 
@@ -138,25 +147,19 @@ const Binary = (props) => {
     node, onChange,
     canDelete = false, onDelete,
   } = props
-  const {left, right, operator} = node
-  const operators = R.concat(
-    R.values(arithmeticOperators),
-    R.values(comparisonOperators)
-  )
 
   return (
     <div className="binary">
-      <TypeSwitch {...props} node={left}
-                  onChange={item => onChange(R.assoc('left', item, node))}/>
 
-      <Dropdown items={operators} inputSize={10}
-                selection={R.find(R.propEq('key', operator), operators)}
+      <BinaryOperand {...props} type="left"/>
+
+      <Dropdown items={Expression.operators.binaryValues} inputSize={10}
+                selection={Expression.operators.findBinary(node.operator)}
                 onChange={item => onChange(
                   R.assoc('operator', R.propOr('', 'key', item), node)
                 )}/>
 
-      <TypeSwitch {...props} node={right}
-                  onChange={item => onChange(R.assoc('right', item, node))}/>
+      <BinaryOperand {...props} type="right"/>
 
       <EditButtons node={node} onChange={onChange}
                    onDelete={onDelete} canDelete={canDelete}/>
@@ -165,7 +168,7 @@ const Binary = (props) => {
   )
 }
 
-const Identifier = ({node, variables, onChange}) => (
+const Identifier = ({ node, variables, onChange }) => (
   <Dropdown items={variables}
             selection={R.find(R.propEq('value', node.name), variables)}
             itemLabelProp="label" itemKeyProp="value"
@@ -175,7 +178,7 @@ const Identifier = ({node, variables, onChange}) => (
             )}/>
 )
 
-const Member = ({node, variables, onChange}) => {
+const Member = ({ node, variables, onChange }) => {
   const nodeIdentifier = {
     type: Expression.types.Identifier,
     name: Expression.toString(node)
@@ -188,7 +191,7 @@ const Member = ({node, variables, onChange}) => {
   )
 }
 
-const Call = ({node, variables, onChange}) => {
+const Call = ({ node, variables, onChange }) => {
   const nodeIdentifier = {
     type: Expression.types.Identifier,
     name: Expression.toString(node)
@@ -201,7 +204,7 @@ const Call = ({node, variables, onChange}) => {
   )
 }
 
-const Literal = ({node, onChange}) => (
+const Literal = ({ node, onChange }) => (
   <div className="literal">
     <input className="form-input" value={node.raw}
            size={25}
@@ -224,7 +227,7 @@ const components = {
   [Expression.types.GroupExpression]: Group,
 }
 
-export const TypeSwitch = (props) => {
+export const ExpressionNode = (props) => {
   const component = components[R.path(['node', 'type'], props)]
   return React.createElement(component, props)
 }

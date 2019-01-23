@@ -6,7 +6,7 @@ import Validator from '../../../../../common/validation/validator'
 import NodeDef from '../../../../../common/survey/nodeDef'
 
 const AdvancedProps = props => {
-  const {nodeDef, nodeDefParent, putNodeDefProp, readOnly} = props
+  const { nodeDef, nodeDefParent, putNodeDefProp, readOnly } = props
 
   const validation = NodeDef.getNodeDefValidation(nodeDef)
   const nodeDefParentUuid = NodeDef.getUuid(nodeDefParent)
@@ -21,7 +21,8 @@ const AdvancedProps = props => {
                               readOnly={readOnly}
                               propName="calculatedValues"
                               validation={Validator.getFieldValidation('calculatedValues')(validation)}
-                              nodeDefUuid={nodeDefParentUuid}/>
+                              nodeDefUuid={nodeDefParentUuid}
+                              canBeConstant={true}/>
 
       {
         NodeDef.canNodeDefHaveDefaultValue(nodeDef) &&
@@ -32,7 +33,8 @@ const AdvancedProps = props => {
                                 readOnly={readOnly}
                                 propName="defaultValues"
                                 validation={Validator.getFieldValidation('defaultValues')(validation)}
-                                nodeDefUuid={nodeDefParentUuid}/>
+                                nodeDefUuid={nodeDefParentUuid}
+                                canBeConstant={true}/>
       }
 
       <NodeDefExpressionsProp nodeDef={nodeDef}
