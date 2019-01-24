@@ -2,9 +2,9 @@ const R = require('ramda')
 const camelize = require('camelize')
 
 const db = require('../db/db')
-const {selectDate} = require('../db/dbUtils')
+const { selectDate } = require('../db/dbUtils')
 
-const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema } = require('../../server/survey/surveySchemaRepositoryUtils')
 
 const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')

@@ -252,7 +252,7 @@ class NodeDefTaxon extends React.Component {
 
   render () {
     const {
-      edit, renderType
+      edit, renderType, canEditRecord
     } = this.props
 
     const {
@@ -266,16 +266,19 @@ class NodeDefTaxon extends React.Component {
     } = this.state
 
     const codeInputField = <Input ref={this.codeField}
+                                  aria-disabled={edit || !canEditRecord}
                                   readOnly={edit}
                                   value={code}
                                   onChange={value => this.onInputFieldChange(fields.code, value)}/>
 
     const scientificNameInputField = <Input ref={this.scientificNameField}
+                                            aria-disabled={edit || !canEditRecord}
                                             readOnly={edit}
                                             value={scientificName}
                                             onChange={value => this.onInputFieldChange(fields.scientificName, value)}/>
 
     const vernacularNameInputField = <Input ref={this.vernacularNameField}
+                                            aria-disabled={edit || !canEditRecord}
                                             readOnly={edit}
                                             value={vernacularName}
                                             onChange={value => this.onInputFieldChange(fields.vernacularName, value)}/>

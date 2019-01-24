@@ -45,7 +45,7 @@ class SurveyInfo extends React.Component {
   }
 
   render () {
-    const {surveyInfo, deleteSurvey, publishSurvey, canEdit} = this.props
+    const {surveyInfo, deleteSurvey, publishSurvey, canEditDef} = this.props
     const {showDialog} = this.state
 
     return (
@@ -67,7 +67,7 @@ class SurveyInfo extends React.Component {
         </h4>
 
         <div className="button-bar">
-          {canEdit &&
+          {canEditDef &&
           <button className="btn btn-of-light" aria-disabled={!Survey.isDraft(surveyInfo)}
                   onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
                     ? publishSurvey()
@@ -84,7 +84,7 @@ class SurveyInfo extends React.Component {
             <span className="icon icon-upload3 icon-16px icon-left"/> Import
           </button>
 
-          {canEdit &&
+          {canEditDef &&
           <button className="btn btn-of-light" onClick={() => this.toggleDeleteConfirmDialog(true)}>
             <span className="icon icon-bin icon-16px icon-left"/> Delete
           </button>
@@ -108,7 +108,7 @@ const mapStateToProps = state => {
 
   return {
     surveyInfo,
-    canEdit: AuthManager.canEditSurvey(user, surveyInfo)
+    canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
   }
 }
 

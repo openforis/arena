@@ -42,7 +42,7 @@ class SurveyRdbGeneratorJob extends Job {
       this.incrementProcessedItems()
     }
     for (const recordSummary of recordSummaries) {
-      const record = await RecordManager.fetchRecordByUuid(surveyId, recordSummary.uuid, tx)
+      const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordSummary.uuid, tx)
       await Survey.traverseHierarchyItem(root, insertIntoTable(record))
     }
   }

@@ -10,9 +10,11 @@ const {
   getAuthGroups,
 } = require('./authGroups')
 
-const isSystemAdmin = user => R.any(
-  group => group.name === groupNames.systemAdmin
-)(user.authGroups)
+const isSystemAdmin = user =>
+  user &&
+  R.any(
+    group => group.name === groupNames.systemAdmin
+  )(user.authGroups)
 
 // ======
 // ====== Survey
@@ -65,6 +67,9 @@ const canViewRecord = hasSurveyPermission(permissions.recordView)
 
 // UPDATE
 const canEditRecord = (user, record) => {
+  if (!(user && record))
+    return false
+
   if (isSystemAdmin(user))
     return true
 
