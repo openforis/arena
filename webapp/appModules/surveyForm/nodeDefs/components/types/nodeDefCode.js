@@ -24,11 +24,11 @@ class NodeDefCode extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = {items: []}
+    this.state = { items: [] }
   }
 
   async componentDidMount () {
-    const {edit} = this.props
+    const { edit } = this.props
 
     if (!edit) {
       await this.loadCategoryItems()
@@ -36,7 +36,7 @@ class NodeDefCode extends React.Component {
   }
 
   async componentDidUpdate (prevProps) {
-    const {parentCodeDefUuid, parentItemUuid} = this.props
+    const { parentCodeDefUuid, parentItemUuid } = this.props
 
     if (parentCodeDefUuid) {
       //parent item changed, reload items
@@ -47,22 +47,22 @@ class NodeDefCode extends React.Component {
   }
 
   async loadCategoryItems () {
-    const {surveyInfo, categoryUuid, categoryLevelIndex, parentItemUuid, draft} = this.props
+    const { surveyInfo, categoryUuid, categoryLevelIndex, parentItemUuid, draft } = this.props
 
     let items = []
 
     if (categoryUuid && (parentItemUuid || categoryLevelIndex === 0)) {
-      const {data} = await axios.get(
+      const { data } = await axios.get(
         `/api/survey/${surveyInfo.id}/categories/${categoryUuid}/items`,
-        {params: {draft, parentUuid: parentItemUuid}}
+        { params: { draft, parentUuid: parentItemUuid } }
       )
       items = data.items
     }
-    this.setState({items})
+    this.setState({ items })
   }
 
   determineNodeToUpdate () {
-    const {nodeDef, nodes, parentNode} = this.props
+    const { nodeDef, nodes, parentNode } = this.props
 
     const placeholder = R.find(R.propEq('placeholder', true))(nodes)
 
@@ -76,8 +76,8 @@ class NodeDefCode extends React.Component {
   }
 
   getSelectedItems () {
-    const {nodes} = this.props
-    const {items} = this.state
+    const { nodes } = this.props
+    const { items } = this.state
 
     const selectedItemUuids = R.pipe(
       R.values,
@@ -90,7 +90,7 @@ class NodeDefCode extends React.Component {
   }
 
   handleSelectedItemsChange (newSelectedItems) {
-    const {nodeDef, nodes, codeUuidsHierarchy, removeNode, updateNode} = this.props
+    const { nodeDef, nodes, codeUuidsHierarchy, removeNode, updateNode } = this.props
 
     const selectedItems = this.getSelectedItems()
 
@@ -109,32 +109,30 @@ class NodeDefCode extends React.Component {
 
     const nodeToUpdate = this.determineNodeToUpdate()
 
-    updateNode(nodeDef, nodeToUpdate, {itemUuid: newSelectedItem ? newSelectedItem.uuid : null, h: codeUuidsHierarchy})
+    updateNode(nodeDef, nodeToUpdate, {
+      itemUuid: newSelectedItem ? newSelectedItem.uuid : null,
+      h: codeUuidsHierarchy
+    })
   }
 
   render () {
-    const {edit, nodeDef} = this.props
-    const {items} = this.state
+    const { nodeDef } = this.props
+    const { items } = this.state
 
     const selectedItems = this.getSelectedItems()
 
-    return edit
-      ? (
-        // EDIT MODE
-        <NodeDefCodeDropdown {...this.props} />
-      )
-      : (
-        // ENTRY MODE
-        isRenderDropdown(nodeDef)
-          ? <NodeDefCodeDropdown {...this.props}
-                                 items={items}
-                                 selectedItems={selectedItems}
-                                 onSelectedItemsChange={this.handleSelectedItemsChange.bind(this)}/>
-          : <NodeDefCodeCheckbox {...this.props}
-                                 items={items}
-                                 selectedItems={selectedItems}
-                                 onSelectedItemsChange={this.handleSelectedItemsChange.bind(this)}/>
-      )
+    return (
+      isRenderDropdown(nodeDef)
+        ? <NodeDefCodeDropdown {...this.props}
+                               items={items}
+                               selectedItems={selectedItems}
+                               onSelectedItemsChange={this.handleSelectedItemsChange.bind(this)}/>
+        : <NodeDefCodeCheckbox {...this.props}
+                               items={items}
+                               selectedItems={selectedItems}
+                               onSelectedItemsChange={this.handleSelectedItemsChange.bind(this)}/>
+    )
+
   }
 }
 
@@ -144,7 +142,7 @@ const mapStateToProps = (state, props) => {
   const surveyInfo = getStateSurveyInfo(state)
 
   const record = getRecord(surveyForm)
-  const {nodeDef, parentNode} = props
+  const { nodeDef, parentNode } = props
 
   const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
 

@@ -5,6 +5,8 @@ import categoryEdit from './categoryEdit/reducer'
 import taxonomyEdit from './taxonomyEdit/reducer'
 import record from './record/reducer'
 
+import { appUserLogout } from '../../app/actions'
+
 import { surveyDelete, surveyUpdate } from '../../survey/actions'
 
 import {
@@ -27,21 +29,24 @@ import {
 
 const actionHandlers = {
   // reset form
+  [appUserLogout]: () => ({}),
+
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
   [formReset]: () => ({}),
 
-  [formNodeDefEditUpdate]: (state, {nodeDef}) => assocFormNodeDefEdit(nodeDef)(state),
+  // form actions
+  [formNodeDefEditUpdate]: (state, { nodeDef }) => assocFormNodeDefEdit(nodeDef)(state),
 
-  [formNodeDefUnlockedUpdate]: (state, {nodeDef}) => assocNodeDefFormUnlocked(nodeDef)(state),
+  [formNodeDefUnlockedUpdate]: (state, { nodeDef }) => assocNodeDefFormUnlocked(nodeDef)(state),
 
-  [formActivePageNodeDefUpdate]: (state, {nodeDef}) => assocFormActivePage(nodeDef)(state),
+  [formActivePageNodeDefUpdate]: (state, { nodeDef }) => assocFormActivePage(nodeDef)(state),
 
-  [formPageNodeUpdate]: (state, {nodeDef, node}) => assocFormPageNode(nodeDef, node)(state),
+  [formPageNodeUpdate]: (state, { nodeDef, node }) => assocFormPageNode(nodeDef, node)(state),
 
   // node def
-  [nodeDefCreate]: (state, {nodeDef}) => assocParamsOnNodeDefCreate(nodeDef)(state)
+  [nodeDefCreate]: (state, { nodeDef }) => assocParamsOnNodeDefCreate(nodeDef)(state)
 }
 
 const props = exportReducer(actionHandlers)

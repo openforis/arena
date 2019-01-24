@@ -34,46 +34,46 @@ import { surveyCreate, surveyDelete } from '../survey/actions'
 
 const actionHandlers = {
 
-  [appStatusChange]: (state, {survey, ...props}) => assocActionProps(state, props),
+  [appStatusChange]: (state, { survey, ...props }) => assocActionProps(state, props),
 
   // ====== user
   // user and current survey are properties of app state
-  [loginSuccess]: (state, {survey, ...props}) => assocActionProps(state, props),
+  [loginSuccess]: (state, { survey, ...props }) => assocActionProps(state, props),
 
-  [appUserPrefUpdate]: (state, {name, value}) => {
+  [appUserPrefUpdate]: (state, { name, value }) => {
     const user = R.pipe(
       R.prop('user'),
       setUserPref(name, value)
     )(state)
 
-    return assocActionProps(state, {user})
+    return assocActionProps(state, { user })
   },
 
-  [appUserLogout]: (state, action) => logoutUser(state),
+  [appUserLogout]: (state) => logoutUser(state),
 
-  [surveyCreate]: (state, {survey: {info}}) => assocSurveyAdminGroup(info)(state),
+  [surveyCreate]: (state, { survey: { info } }) => assocSurveyAdminGroup(info)(state),
 
-  [surveyDelete]: (state, {surveyId}) => dissocSurveyGroups(surveyId)(state),
+  [surveyDelete]: (state, { surveyId }) => dissocSurveyGroups(surveyId)(state),
 
   // ====== app job
-  [appJobStart]: (state, {job, onComplete, autoHide}) =>
+  [appJobStart]: (state, { job, onComplete, autoHide }) =>
     startJob(job, onComplete, autoHide)(state),
 
-  [appJobActiveUpdate]: (state, {job}) =>
+  [appJobActiveUpdate]: (state, { job }) =>
     updateActiveJob(job)(state),
 
   // ===== app errors
-  [appErrorCreate]: (state, {error}) => R.pipe(
+  [appErrorCreate]: (state, { error }) => R.pipe(
     getAppErrors,
     R.head,
-    R.defaultTo({id: -1}),
+    R.defaultTo({ id: -1 }),
     last => 1 + last.id,
-    id => assocAppError({id, ...error})(state)
+    id => assocAppError({ id, ...error })(state)
   )(state),
 
-  [appErrorDelete]: (state, {error}) => dissocAppError(error)(state),
+  [appErrorDelete]: (state, { error }) => dissocAppError(error)(state),
 
-  [systemErrorThrow]: (state, {error}) => assocSystemError(error)(state),
+  [systemErrorThrow]: (state, { error }) => assocSystemError(error)(state),
 
 }
 

@@ -1,16 +1,17 @@
 const passport = require('passport')
 
-const {sendOk} = require('../serverUtils/response')
+const { sendOk } = require('../serverUtils/response')
 
-const {userPrefNames, getUserPrefSurveyId} = require('../../common/user/userPrefs')
+const { userPrefNames, getUserPrefSurveyId } = require('../../common/user/userPrefs')
 
 const AuthManager = require('../../common/auth/authManager')
 const SurveyManager = require('../survey/surveyManager')
 const UserManager = require('../user/userManager')
+const RecordUpdateManager = require('../record/update/recordUpdateManager')
 
 const Survey = require('../../common/survey/survey')
 
-const sendResponse = (res, user, survey = null) => res.json({user, survey})
+const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
@@ -60,6 +61,10 @@ module.exports.init = app => {
   })
 
   app.post('/auth/logout', (req, res) => {
+    // before logout checkOut record if there's an opened thread
+    const { user } = req
+    RecordUpdateManager.checkOut(user.id)
+
     req.logout()
     sendOk(res)
   })
