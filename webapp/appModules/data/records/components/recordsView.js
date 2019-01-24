@@ -10,6 +10,7 @@ import TablePaginator from '../../../../commonComponents/table/tablePaginator'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
+import AuthManager from '../../../../../common/auth/authManager'
 
 import { appModuleUri } from '../../../appModules'
 import { dataModules } from '../../dataModules'
@@ -19,10 +20,11 @@ import { getRelativeDate } from '../../../../../common/dateUtils'
 import { initRecordsList, fetchRecords } from '../actions'
 import { createRecord } from '../../../surveyForm/record/actions'
 
+import * as UserState from '../../../../app/appState'
 import * as RecordsState from '../recordsState'
 import * as SurveyState from '../../../../survey/surveyState'
 
-const RecordRow = ({idx, offset, record, style, nodeDefKeys}) => (
+const RecordRow = ({idx, offset, record, style, nodeDefKeys, canEdit}) => (
   <div className="table__row" style={style}>
     <div>{idx + offset + 1}</div>
     {
@@ -35,13 +37,13 @@ const RecordRow = ({idx, offset, record, style, nodeDefKeys}) => (
     <div>{record.ownerName}</div>
     <div>
       <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn btn-s btn-of-light-xs">
-        <span className="icon icon-pencil2 icon-12px"></span>
+        <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}></span>
       </Link>
     </div>
   </div>
 )
 
-const RecordsTable = ({records, offset, nodeDefKeys, lang}) => {
+const RecordsTable = ({user, records, offset, nodeDefKeys, lang}) => {
   const noCols = 3 + nodeDefKeys.length
 
   const style = {gridTemplateColumns: `100px repeat(${noCols}, ${1 / noCols}fr) 50px`}
@@ -61,7 +63,13 @@ const RecordsTable = ({records, offset, nodeDefKeys, lang}) => {
       <div className="table__rows">
         {
           records.map((record, i) =>
-            <RecordRow key={i} idx={i} offset={offset} record={record} style={style} nodeDefKeys={nodeDefKeys}/>
+            <RecordRow key={i}
+                       idx={i}
+                       offset={offset}
+                       record={record}
+                       style={style}
+                       nodeDefKeys={nodeDefKeys}
+                       canEdit={AuthManager.canEditRecord(user, record)}/>
           )
         }
       </div>
@@ -123,6 +131,7 @@ class RecordsView extends React.Component {
 const mapStateToProps = state => {
   const surveyInfo = SurveyState.getStateSurveyInfo(state)
   return {
+    user: UserState.getUser(state),
     surveyInfo,
     records: RecordsState.getRecordsList(state),
     nodeDefKeys: RecordsState.getRecordsNodeDefKeys(state),
@@ -135,5 +144,9 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  {initRecordsList, fetchRecords, createRecord}
+  {
+    initRecordsList,
+    fetchRecords,
+    createRecord
+  }
 )(RecordsView)

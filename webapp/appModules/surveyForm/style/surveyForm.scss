@@ -111,6 +111,10 @@ $tableRowHeaderHeight: 40px;
   .form-input {
     text-overflow: ellipsis;
   }
+
+  *[aria-disabled="true"] {
+    opacity: .8;
+  }
 }
 
 .node-def__not-applicable {

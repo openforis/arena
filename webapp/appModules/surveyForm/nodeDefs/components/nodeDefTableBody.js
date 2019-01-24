@@ -70,6 +70,8 @@ class NodeDefMultipleTableBody extends React.Component {
   }
 
   render () {
+    const {canEditRecord} = this.props
+    
     return this.state.editDialogOpen
       ? (
         ReactDOM.createPortal(
@@ -83,7 +85,7 @@ class NodeDefMultipleTableBody extends React.Component {
           <span className="values-summary">{this.state.nodeValues}</span>
           <button className="btn-s btn-of-light-xs"
                   onClick={() => this.toggleEditDialogOpen(true)}>
-            <span className="icon icon-pencil2 icon-12px"/>
+              <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`}/>
           </button>
         </div>
       )

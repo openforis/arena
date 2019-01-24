@@ -98,7 +98,7 @@ module.exports.init = app => {
   // ==== UPDATE
 
   // RECORD Check in / out
-  app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordEditPermission, async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordViewPermission, async (req, res) => {
     try {
       const user = req.user
       const surveyId = getRestParam(req, 'surveyId')

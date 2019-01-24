@@ -24,7 +24,8 @@ const SurveyFormView = (props) => {
     edit,
     entry,
     preview,
-    canEdit,
+    canEditDef,
+    canEditRecord,
 
     recordUuid,
     parentNode,
@@ -32,7 +33,7 @@ const SurveyFormView = (props) => {
     history,
   } = props
 
-  const editAllowed = edit && canEdit && !preview
+  const editAllowed = edit && canEditDef && !preview
 
   const className = editAllowed
     ? ' form-designer edit'
@@ -49,7 +50,7 @@ const SurveyFormView = (props) => {
           <NodeDefEdit/>
         }
 
-        <FormNavigation edit={edit} entry={entry} preview={preview} history={history}/>
+        <FormNavigation edit={edit} entry={entry && canEditRecord} preview={preview} history={history}/>
 
         {
           nodeDef
@@ -59,7 +60,8 @@ const SurveyFormView = (props) => {
                              entry={entry}
                              recordUuid={recordUuid}
                              parentNode={parentNode}
-                             canEditDef={canEdit}/>
+                             canEditDef={canEditDef}
+                             canEditRecord={canEditRecord}/>
             : <div/>
         }
 
@@ -85,7 +87,7 @@ SurveyFormView.defaultProps = {
   // form in preview mode
   preview: false,
   // can edit the form definition
-  canEdit: false,
+  canEditDef: false,
   // uuid of current record
   recordUuid: null,
 }

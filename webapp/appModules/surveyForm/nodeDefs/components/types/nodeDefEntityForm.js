@@ -28,6 +28,7 @@ const EntityForm = props => {
     childDefs,
     edit,
     canEditDef,
+    canEditRecord,
     locked,
     node,
     putNodeDefProp,
@@ -74,7 +75,8 @@ const EntityForm = props => {
                                surveyInfo={surveyInfo}
                                nodeDef={childDef}
                                parentNode={node}
-                               canEditDef={canEditDef}/>
+                               canEditDef={canEditDef}
+                               canEditRecord={canEditRecord}/>
               </div>
             )
         }
@@ -87,7 +89,7 @@ const EntityForm = props => {
 const NodeSelect = props => {
   const {
     nodeDef, nodes, parentNode, selectedNode,
-    updateNode, removeNode, onChange,
+    updateNode, removeNode, onChange, canEditRecord
   } = props
 
   return (
@@ -112,30 +114,33 @@ const NodeSelect = props => {
         }
       </select>
 
-      <button className="btn btn-s btn-of-light-xs"
-              style={{marginLeft: '5px'}}
-              aria-disabled={!selectedNode}
-              onClick={() => {
-                if (window.confirm('Are you sure you want to delete this entity?')) {
-                  onChange(null)
-                  removeNode(nodeDef, selectedNode)
-                }
-              }}>
-        <span className="icon icon-bin icon-12px icon-left"/>
-        DELETE
-      </button>
-
-      <button className="btn btn-s btn-of-light-xs"
-              style={{marginLeft: '50px'}}
-              onClick={() => {
-                const entity = newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
-                updateNode(nodeDef, entity)
-                onChange(entity.uuid)
-              }}>
-        <span className="icon icon-plus icon-16px icon-left"></span>
-        ADD
-      </button>
-
+      {
+        canEditRecord &&
+        <React.Fragment>
+          <button className="btn btn-s btn-of-light-xs"
+                  style={{marginLeft: '5px'}}
+                  aria-disabled={!selectedNode}
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this entity?')) {
+                      onChange(null)
+                      removeNode(nodeDef, selectedNode)
+                    }
+                  }}>
+            <span className="icon icon-bin icon-12px icon-left"/>
+            DELETE
+          </button>
+          <button className="btn btn-s btn-of-light-xs"
+                  style={{marginLeft: '50px'}}
+                  onClick={() => {
+                    const entity = newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
+                    updateNode(nodeDef, entity)
+                    onChange(entity.uuid)
+                  }}>
+            <span className="icon icon-plus icon-16px icon-left"></span>
+            ADD
+          </button>
+        </React.Fragment>
+      }
     </div>
   )
 }

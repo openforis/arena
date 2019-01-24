@@ -18,6 +18,7 @@ const EntityTableRow = (props) => {
     renderType,
     removeNode,
     i = 'header',
+    canEditRecord,
   } = props
 
   const className = `node-def__table-row${renderType === nodeDefRenderType.tableHeader ? '-header' : ''}`
@@ -46,7 +47,7 @@ const EntityTableRow = (props) => {
       }
 
       {
-        renderType === nodeDefRenderType.tableBody &&
+        renderType === nodeDefRenderType.tableBody && canEditRecord &&
           <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={removeNode}/>
       }
 
@@ -76,6 +77,7 @@ class NodeDefEntityTable extends React.Component {
       parentNode,
       label,
       updateNode,
+      canEditRecord,
     } = this.props
 
     return (
@@ -84,7 +86,7 @@ class NodeDefEntityTable extends React.Component {
         <div className="node-def__table-header">
           <div>{label}</div>
           {
-            entry
+            entry && canEditRecord
               ? <button className="btn btn-s btn-of-light-xs"
                         style={{marginLeft: '10px'}}
                         onClick={() => {

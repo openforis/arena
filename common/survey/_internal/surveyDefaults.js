@@ -88,12 +88,13 @@ const getDefaultAuthGroups = lang => [
       '2': authGroupKeys.all,
       '3': authGroupKeys.all,
     },
-  },
-  {
-    name: groupNames.surveyGuest,
-    labels: {[lang]: 'Survey guest'},
-    descriptions: {[lang]: `Can view records`},
-  },
+  }
+  // ,
+  // {
+  //   name: groupNames.surveyGuest,
+  //   labels: {[lang]: 'Survey guest'},
+  //   descriptions: {[lang]: `Can view records`},
+  // },
 ]
 
 module.exports = {

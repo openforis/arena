@@ -11,7 +11,7 @@ import { FormItem } from '../../../../commonComponents/form/input'
 import ExpressionComponent from '../../../../commonComponents/expression/expression'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
 
-const ExpressionProp = ({nodeDefUuid, expression, applyIf, readOnly, showLabels, isContextParent, onUpdate, onDelete}) => (
+const ExpressionProp = ({ nodeDefUuid, expression, applyIf, showLabels, readOnly, isContextParent, canBeConstant, onUpdate, onDelete }) => (
   <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
     {
@@ -31,7 +31,8 @@ const ExpressionProp = ({nodeDefUuid, expression, applyIf, readOnly, showLabels,
                            onChange={expr =>
                              onUpdate(NodeDefExpression.assocExpression(expr)(expression))
                            }
-                           isContextParent={isContextParent}/>
+                           isContextParent={isContextParent}
+                           canBeConstant={canBeConstant}/>
     </div>
 
     {
@@ -44,7 +45,8 @@ const ExpressionProp = ({nodeDefUuid, expression, applyIf, readOnly, showLabels,
                              onChange={expr =>
                                onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
                              }
-                             isContextParent={isContextParent}/>
+                             isContextParent={isContextParent}
+                             canBeConstant={canBeConstant}/>
       </div>
     }
 
@@ -66,12 +68,12 @@ export class ExpressionsProp extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = {uiValues: []}
+    this.state = { uiValues: [] }
   }
 
   static getDerivedStateFromProps (props, state) {
-    const {values, multiple} = props
-    const {uiValues: oldUiValues} = state
+    const { values, multiple } = props
+    const { uiValues: oldUiValues } = state
 
     const uiValues = R.clone(values)
 
@@ -93,7 +95,7 @@ export class ExpressionsProp extends React.Component {
   }
 
   handleValuesUpdate (newValues) {
-    this.setState({uiValues: newValues})
+    this.setState({ uiValues: newValues })
     this.props.onChange(R.reject(NodeDefExpression.isPlaceholder, newValues))
   }
 
@@ -116,8 +118,8 @@ export class ExpressionsProp extends React.Component {
   }
 
   render () {
-    const {nodeDefUuid, label, readOnly, applyIf, showLabels, validation, isContextParent} = this.props
-    const {uiValues} = this.state
+    const { nodeDefUuid, label, readOnly, applyIf, showLabels, validation, isContextParent, canBeConstant } = this.props
+    const { uiValues } = this.state
 
     return (
       <FormItem label={label}>
@@ -133,7 +135,8 @@ export class ExpressionsProp extends React.Component {
                               onUpdate={this.handleUpdate.bind(this)}
                               readOnly={readOnly}
                               nodeDefUuid={nodeDefUuid}
-                              isContextParent={isContextParent}/>
+                              isContextParent={isContextParent}
+                              canBeConstant={canBeConstant}/>
             )
 
           }
@@ -156,10 +159,14 @@ ExpressionsProp.defaultProps = {
   validation: null,
 
   isContextParent: false,
+  canBeConstant: false,
 }
 
 export const NodeDefExpressionsProp = props => {
-  const {nodeDef, nodeDefUuid, propName, validation, label, multiple, applyIf, readOnly, showLabels, putNodeDefProp, isContextParent} = props
+  const {
+    nodeDef, nodeDefUuid, propName, validation, label, multiple, applyIf, showLabels, readOnly, putNodeDefProp,
+    isContextParent, canBeConstant
+  } = props
 
   const values = NodeDef.getProp(propName, [])(nodeDef)
 
@@ -181,7 +188,8 @@ export const NodeDefExpressionsProp = props => {
                           validation={validation}
                           onChange={onExpressionsUpdate}
                           nodeDefUuid={nodeDefUuid}
-                          isContextParent={isContextParent}/>
+                          isContextParent={isContextParent}
+                          canBeConstant={canBeConstant}/>
 
 }
 
@@ -198,4 +206,5 @@ NodeDefExpressionsProp.defaultProps = {
 
   validation: null,
   isContextParent: false,
+  canBeConstant: false,
 }

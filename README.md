@@ -77,4 +77,3 @@ FOO_COOKIE_SECRET=my-cookie-secret-key
 email:admin@openforis.org 
 
 pwd:admin 
-
