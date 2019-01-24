@@ -11,7 +11,7 @@ import * as SurveyFormState from '../../../surveyForm/surveyFormState'
 import { resetForm } from '../../../surveyForm/actions'
 import { checkInRecord, checkOutRecord } from '../../../surveyForm/record/actions'
 
-import { canEditRecord } from '../../../../../common/auth/authManager'
+import AuthManager from '../../../../../common/auth/authManager'
 
 class RecordView extends React.Component {
 
@@ -44,10 +44,10 @@ class RecordView extends React.Component {
   }
 
   render () {
-    const {recordLoaded, preview, user, record} = this.props
+    const {recordLoaded, preview, canEditRecord} = this.props
 
     return recordLoaded
-      ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true} canEditRecord={canEditRecord(user, record)}/>
+      ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true} canEditRecord={canEditRecord}/>
       : null
   }
 }
@@ -60,6 +60,7 @@ const mapStateToProps = (state, {match}) => {
   return {
     user,
     record,
+    canEditRecord: AuthManager.canEditRecord(user, record),
     recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
   }

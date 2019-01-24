@@ -10,7 +10,7 @@ import TablePaginator from '../../../../commonComponents/table/tablePaginator'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
-import { canEditRecord } from '../../../../../common/auth/authManager'
+import AuthManager from '../../../../../common/auth/authManager'
 
 import { appModuleUri } from '../../../appModules'
 import { dataModules } from '../../dataModules'
@@ -36,15 +36,9 @@ const RecordRow = ({idx, offset, record, style, nodeDefKeys, canEdit}) => (
     <div>{getRelativeDate(record.dateModified)}</div>
     <div>{record.ownerName}</div>
     <div>
-      {
-        canEdit
-          ? <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn btn-s btn-of-light-xs">
-            <span className="icon icon-pencil2 icon-12px"></span>
-          </Link>
-          : <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn btn-s btn-of-light-xs">
-            <span className="icon icon-eye icon-12px"></span>
-          </Link>
-      }
+      <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn btn-s btn-of-light-xs">
+        <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}></span>
+      </Link>
     </div>
   </div>
 )
@@ -75,7 +69,7 @@ const RecordsTable = ({user, records, offset, nodeDefKeys, lang}) => {
                        record={record}
                        style={style}
                        nodeDefKeys={nodeDefKeys}
-                       canEdit={canEditRecord(user, record)}/>
+                       canEdit={AuthManager.canEditRecord(user, record)}/>
           )
         }
       </div>
