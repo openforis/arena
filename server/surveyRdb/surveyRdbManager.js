@@ -1,7 +1,8 @@
 const db = require('../db/db')
 //surveyRdbManger cannot use SurveyManager - loop dependencies
 
-const DataSchema = require('./schemaRdb/dataSchema')
+const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
+
 const NodesInsert = require('./dbActions/nodesInsert')
 const NodesUpdate = require('./dbActions/nodesUpdate')
 const TableViewCreate = require('./dbActions/tableViewCreate')
@@ -10,10 +11,10 @@ const TableViewQuery = require('./dbActions/tableViewQuery')
 // ==== DDL
 
 const dropSchema = async (surveyId, client = db) =>
-  await client.query(`DROP SCHEMA IF EXISTS ${DataSchema.getName(surveyId)} CASCADE`)
+  await client.query(`DROP SCHEMA IF EXISTS ${SchemaRdb.getName(surveyId)} CASCADE`)
 
 const createSchema = async (surveyId, client = db) =>
-  await client.query(`CREATE SCHEMA ${DataSchema.getName(surveyId)}`)
+  await client.query(`CREATE SCHEMA ${SchemaRdb.getName(surveyId)}`)
 
 const createTable = async (survey, nodeDef, client = db) =>
   await TableViewCreate.run(survey, nodeDef, client)

@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const DataSchema = require('../schemaRdb/dataSchema')
+const SchemaRdb = require('../../../common/surveyRdb/schemaRdb')
 
 const runSelect = async (surveyId, tableName, cols, offset, limit, filter = '', client) => {
-  const schemaName = DataSchema.getName(surveyId)
+  const schemaName = SchemaRdb.getName(surveyId)
 
   return await client.any(`
     SELECT ${cols.join(', ')} 
@@ -17,7 +17,7 @@ const runSelect = async (surveyId, tableName, cols, offset, limit, filter = '', 
 }
 
 const runCount = async (surveyId, tableName, filter = '', client) => {
-  const schemaName = DataSchema.getName(surveyId)
+  const schemaName = SchemaRdb.getName(surveyId)
 
   return await client.one(`
     SELECT count(*) 

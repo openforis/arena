@@ -1,6 +1,6 @@
 const Survey = require('../../../common/survey/survey')
+const SchemaRdb = require('../../../common/surveyRdb/schemaRdb')
 
-const DataSchema = require('../schemaRdb/dataSchema')
 const DataTable = require('../schemaRdb/dataTable')
 const DataView = require('../schemaRdb/dataView')
 
@@ -8,7 +8,7 @@ const toTableViewCreate = (survey, nodeDef) => {
   const surveyId = Survey.getSurveyInfo(survey).id
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
-  const schemaName = DataSchema.getName(surveyId)
+  const schemaName = SchemaRdb.getName(surveyId)
   const tableName = DataTable.getName(nodeDef, nodeDefParent)
   return {
     schemaName,
