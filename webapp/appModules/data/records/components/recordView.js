@@ -58,8 +58,6 @@ const mapStateToProps = (state, {match}) => {
   const record = RecordState.getRecord(surveyForm)
 
   return {
-    user,
-    record,
     canEditRecord: AuthManager.canEditRecord(user, record),
     recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
