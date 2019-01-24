@@ -1,5 +1,7 @@
 import { exportReducer } from '../../../appUtils/reduxUtils'
 
+import { appUserLogout } from '../../../app/actions'
+
 import { surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../actions'
 
@@ -33,32 +35,34 @@ import {
 
 const actionHandlers = {
   // reset form
+  [appUserLogout]: () => ({}),
+
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [categoryEditUpdate]: (state, {categoryUuid}) => initCategoryEdit(categoryUuid),
+  [categoryEditUpdate]: (state, { categoryUuid }) => initCategoryEdit(categoryUuid),
 
   // category
-  [categoryCreate]: (state, {category}) => initCategoryEdit(category.uuid),
+  [categoryCreate]: (state, { category }) => initCategoryEdit(category.uuid),
 
   // ===== category level
-  [categoryLevelDelete]: (state, {level}) => dissocLevel(level.index)(state),
+  [categoryLevelDelete]: (state, { level }) => dissocLevel(level.index)(state),
 
   // ===== category level items
-  [categoryItemsUpdate]: (state, {levelIndex, items}) => assocLevelItems(levelIndex, items)(state),
+  [categoryItemsUpdate]: (state, { levelIndex, items }) => assocLevelItems(levelIndex, items)(state),
 
   // ===== category level item
-  [categoryItemCreate]: (state, {level, item}) => createLevelItem(level.index, item)(state),
+  [categoryItemCreate]: (state, { level, item }) => createLevelItem(level.index, item)(state),
 
-  [categoryItemUpdate]: (state, {level, item}) => assocLevelItem(level.index, item)(state),
+  [categoryItemUpdate]: (state, { level, item }) => assocLevelItem(level.index, item)(state),
 
-  [categoryItemPropUpdate]: (state, {level, item, key, value}) => assocLevelItemProp(level, item, key, value)(state),
+  [categoryItemPropUpdate]: (state, { level, item, key, value }) => assocLevelItemProp(level, item, key, value)(state),
 
-  [categoryItemDelete]: (state, {level, item}) => dissocLevelItem(level.index, item.uuid)(state),
+  [categoryItemDelete]: (state, { level, item }) => dissocLevelItem(level.index, item.uuid)(state),
 
   // ===== category level active item
-  [categoryEditLevelActiveItemUpdate]: (state, {levelIndex, itemUuid}) =>
+  [categoryEditLevelActiveItemUpdate]: (state, { levelIndex, itemUuid }) =>
     assocLevelActiveItem(levelIndex, itemUuid)(state),
 }
 

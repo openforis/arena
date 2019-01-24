@@ -6,7 +6,7 @@ import { assocSurveyInfoProp, assocSurveyInfoValidation, markDraft, markPublishe
 
 // app actions
 import { loginSuccess } from '../../login/actions'
-import { appStatusChange } from '../../app/actions'
+import { appStatusChange, appUserLogout } from '../../app/actions'
 
 // survey actions
 import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
@@ -27,18 +27,19 @@ import { taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomie
 
 const actionHandlers = {
   // app initialization
-  [appStatusChange]: (state, {survey}) => Survey.getSurveyInfo(survey),
-  [loginSuccess]: (state, {survey}) => Survey.getSurveyInfo(survey),
+  [appStatusChange]: (state, { survey }) => Survey.getSurveyInfo(survey),
+  [loginSuccess]: (state, { survey }) => Survey.getSurveyInfo(survey),
+  [appUserLogout]: () => ({}),
 
   // Survey Update
-  [surveyCreate]: (state, {survey}) => Survey.getSurveyInfo(survey),
-  [surveyUpdate]: (state, {survey}) => Survey.getSurveyInfo(survey),
+  [surveyCreate]: (state, { survey }) => Survey.getSurveyInfo(survey),
+  [surveyUpdate]: (state, { survey }) => Survey.getSurveyInfo(survey),
   [surveyDelete]: () => ({}),
 
   // survey info update
-  [surveyInfoPropUpdate]: (state, {key, value}) => assocSurveyInfoProp(key, value)(state),
+  [surveyInfoPropUpdate]: (state, { key, value }) => assocSurveyInfoProp(key, value)(state),
 
-  [surveyInfoValidationUpdate]: (state, {validation}) => assocSurveyInfoValidation(validation)(state),
+  [surveyInfoValidationUpdate]: (state, { validation }) => assocSurveyInfoValidation(validation)(state),
 
   // NodeDef
   [nodeDefCreate]: markDraft,

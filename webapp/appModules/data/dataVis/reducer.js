@@ -1,10 +1,13 @@
 import { exportReducer } from '../../../appUtils/reduxUtils'
 
+import { appUserLogout } from '../../../app/actions'
+
 import { dataVisTableInit, dataVisTableReset, dataVisTableUpdate, dataVisTableFilterUpdate } from './actions'
 
 import * as DataVisState from './dataVisState'
 
 const actionHandlers = {
+  [appUserLogout]: () => ({}),
 
   [dataVisTableInit]: (
     state,

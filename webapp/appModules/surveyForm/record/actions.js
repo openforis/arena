@@ -135,5 +135,7 @@ export const checkInRecord = recordUuid => async (dispatch, getState) => {
 
 export const checkOutRecord = recordUuid => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
-  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)
+  // checkout can be called after logout, therefore checking if survey still exists in state
+  if (surveyId)
+    await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)
 }
