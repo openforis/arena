@@ -24,7 +24,7 @@ import * as UserState from '../../../../app/appState'
 import * as RecordsState from '../recordsState'
 import * as SurveyState from '../../../../survey/surveyState'
 
-const RecordRow = ({idx, offset, record, style, nodeDefKeys, canEdit}) => (
+const RecordRow = ({ idx, offset, record, style, nodeDefKeys, canEdit }) => (
   <div className="table__row" style={style}>
     <div>{idx + offset + 1}</div>
     {
@@ -35,6 +35,7 @@ const RecordRow = ({idx, offset, record, style, nodeDefKeys, canEdit}) => (
     <div>{getRelativeDate(record.dateCreated)}</div>
     <div>{getRelativeDate(record.dateModified)}</div>
     <div>{record.ownerName}</div>
+    <div>{record.step}</div>
     <div>
       <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn btn-s btn-of-light-xs">
         <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}></span>
@@ -43,10 +44,10 @@ const RecordRow = ({idx, offset, record, style, nodeDefKeys, canEdit}) => (
   </div>
 )
 
-const RecordsTable = ({user, records, offset, nodeDefKeys, lang}) => {
+const RecordsTable = ({ user, records, offset, nodeDefKeys, lang }) => {
   const noCols = 3 + nodeDefKeys.length
 
-  const style = {gridTemplateColumns: `100px repeat(${noCols}, ${1 / noCols}fr) 50px`}
+  const style = { gridTemplateColumns: `70px repeat(${noCols}, ${1 / noCols}fr) 50px 50px` }
 
   return (
     <React.Fragment>
@@ -58,6 +59,7 @@ const RecordsTable = ({user, records, offset, nodeDefKeys, lang}) => {
         <div>Date created</div>
         <div>Date Modified</div>
         <div>Owner</div>
+        <div>Step</div>
       </div>
 
       <div className="table__rows">

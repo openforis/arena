@@ -9,6 +9,9 @@ const { getSurveyDBSchema } = require('../../server/survey/surveySchemaRepositor
 const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
 
+const NodeDefTable = require('../../common/surveyRdb/nodeDefTable')
+const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
+
 const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}, preview`
 
 const dbTransformCallback = (surveyId) => R.pipe(
@@ -33,25 +36,21 @@ const insertRecord = async (surveyId, record, client = db) =>
 const countRecordsBySurveyId = async (surveyId, client = db) =>
   await client.one(`SELECT count(*) FROM ${getSurveyDBSchema(surveyId)}.record WHERE preview = FALSE`)
 
-const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset = 0, limit = null, client = db) => {
-  // select nodeDef key values
-  const nodeDefKeyValues = nodeDefKeys.map((nodeDefKey, i) => `
-    n${i}.value as "${NodeDef.getNodeDefName(nodeDefKey)}" 
-  `).join(', ')
+const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys, offset = 0, limit = null, client = db) => {
 
-  // join with node key values
-  const nodeDefKeyJoins = nodeDefKeys.map((nodeDefKey, i) => `
-    LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.node as n${i}
-      ON r.uuid = n${i}.record_uuid
-      AND n${i}.node_def_uuid = '${nodeDefKey.uuid}'
-  `).join(' ')
+  const rootEntityTableAlias = 'n0'
+  const getNodeDefKeyColName = R.pipe(NodeDefTable.getColNames, R.head)
+  const getNodeDefKeyColAlias = NodeDef.getNodeDefName
+  const nodeDefKeysSelect = nodeDefKeys.map(
+    nodeDefKey => `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
+  ).join(',')
 
   return await client.map(`
     SELECT 
       r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')},
       n.date_modified,
-      u.name as owner_name
-      ${R.isEmpty(nodeDefKeys) ? '' : ',' + nodeDefKeyValues}
+      u.name as owner_name,
+      ${nodeDefKeysSelect}
     FROM ${getSurveyDBSchema(surveyId)}.record r
     -- GET OWNER NAME
     JOIN "user" u
@@ -64,7 +63,10 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefKeys, offset = 0, 
          GROUP BY record_uuid
     ) as n
       ON r.uuid = n.record_uuid
-    ${R.isEmpty(nodeDefKeys) ? '' : nodeDefKeyJoins}
+    -- join with root entity table to get node key values 
+    LEFT OUTER JOIN
+      ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
+    ON r.uuid = ${rootEntityTableAlias}.record_uuid
     WHERE r.preview = FALSE
     ORDER BY r.id DESC
     LIMIT ${limit ? limit : 'ALL'}

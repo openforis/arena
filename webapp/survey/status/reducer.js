@@ -1,17 +1,20 @@
 import { exportReducer } from '../../appUtils/reduxUtils'
 
-import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
+import { appUserLogout } from '../../app/actions'
 
+import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
 
 import { setSurveyDefsFetched } from '../surveyState'
 
 const actionHandlers = {
   // reset state
+  [appUserLogout]: () => ({}),
+
   [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [surveyDefsLoad]: (state, {draft}) => setSurveyDefsFetched(draft)(state),
+  [surveyDefsLoad]: (state, { draft }) => setSurveyDefsFetched(draft)(state),
 
 }
 

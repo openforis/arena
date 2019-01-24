@@ -3,8 +3,8 @@ const Promise = require('bluebird')
 
 const NodeDef = require('../../../common/survey/nodeDef')
 const Node = require('../../../common/record/node')
+const SchemaRdb = require('../../../common/surveyRdb/schemaRdb')
 
-const DataSchema = require('../schemaRdb/dataSchema')
 const DataTable = require('../schemaRdb/dataTable')
 const DataCol = require('../schemaRdb/dataCol')
 
@@ -63,7 +63,7 @@ const toUpdates = async (surveyInfo, nodeDefs, nodes) => {
 
       return type ? {
           type,
-          schemaName: DataSchema.getName(surveyInfo.id),
+          schemaName: SchemaRdb.getName(surveyInfo.id),
           tableName: DataTable.getName(nodeDef, nodeDefParent),
           colNames: getColNames(nodeDef, type),
           colValues: await getColValues(surveyInfo, nodeDef, node, type),

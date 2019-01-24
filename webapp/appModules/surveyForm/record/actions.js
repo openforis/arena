@@ -26,7 +26,7 @@ export const validationsUpdate = 'survey/record/validation/update'
 
 export const recordNodesUpdate = nodes =>
   dispatch =>
-    dispatch({type: nodesUpdate, nodes})
+    dispatch({ type: nodesUpdate, nodes })
 
 export const nodeValidationsUpdate = validations =>
   dispatch =>
@@ -53,7 +53,7 @@ export const createRecord = (history, preview = false) => async (dispatch, getSt
 export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
   dispatch => {
     const node = Node.newNodePlaceholder(nodeDef, parentNode, defaultValue)
-    recordNodesUpdate({[Node.getUuid(node)]: node})(dispatch)
+    recordNodesUpdate({ [Node.getUuid(node)]: node })(dispatch)
   }
 /**
  * ============
@@ -74,33 +74,26 @@ export const updateNode = (nodeDef, node, value, file = null) => dispatch => {
     R.assoc('value', value),
   )(node)
 
-  recordNodesUpdate({[Node.getUuid(node)]: nodeToUpdate})(dispatch)
+  recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate })(dispatch)
   dispatch(_updateNodeDebounced(nodeToUpdate, file, node.placeholder ? 0 : 500))
 }
 
 const _updateNodeDebounced = (node, file, delay) => {
   const action = async (dispatch, getState) => {
-    try {
-      const formData = new FormData()
-      formData.append('node', JSON.stringify(node))
+    const formData = new FormData()
+    formData.append('node', JSON.stringify(node))
 
-      if (file)
-        formData.append('file', file)
+    if (file)
+      formData.append('file', file)
 
-      const config = file
-        ? {
-          headers: {
-            'content-type': 'multipart/form-data'
-          }
-        }
-        : {}
+    const config = file
+      ? { headers: { 'content-type': 'multipart/form-data' } }
+      : {}
 
-      const surveyId = getStateSurveyId(getState())
-      await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData, config)
-    } catch (e) {
-      console.log(e)
-    }
+    const surveyId = getStateSurveyId(getState())
+    await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData, config)
   }
+
   return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)
 }
 
@@ -110,15 +103,11 @@ const _updateNodeDebounced = (node, file, delay) => {
  * ============
  */
 export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
-  try {
-    dispatch({type: nodeDelete, node})
+  dispatch({ type: nodeDelete, node })
 
-    const surveyId = getStateSurveyId(getState())
-    const {data} = await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
-    recordNodesUpdate(data.nodes)(dispatch)
-  } catch (e) {
-    console.log(e)
-  }
+  const surveyId = getStateSurveyId(getState())
+  const { data } = await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
+  recordNodesUpdate(data.nodes)(dispatch)
 }
 
 export const deleteRecord = (history) => async (dispatch, getState) => {
@@ -133,7 +122,7 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
   // 2. perform server side delete
   await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
   // 3. remove record from redux state
-  await dispatch({type: recordDelete})
+  await dispatch({ type: recordDelete })
   // 4. redirect to default data module (records view)
   history.push(appModuleUri(appModules.data))
 }
@@ -145,11 +134,13 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
  */
 export const checkInRecord = recordUuid => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
-  const {data} = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
-  dispatch({type: recordLoad, record: data.record})
+  const { data } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
+  dispatch({ type: recordLoad, record: data.record })
 }
 
 export const checkOutRecord = recordUuid => async (dispatch, getState) => {
   const surveyId = getStateSurveyId(getState())
-  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)
+  // checkout can be called after logout, therefore checking if survey still exists in state
+  if (surveyId)
+    await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)
 }

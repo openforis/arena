@@ -69,7 +69,6 @@ class NodeDefSwitch extends React.Component {
     const {
       nodeDef,
       edit,
-      entry,
       locked,
       canEditDef,
 
@@ -86,14 +85,14 @@ class NodeDefSwitch extends React.Component {
     const isRoot = NodeDef.isNodeDefRoot(nodeDef)
     const isPage = !!Layout.getPageUuid(nodeDef)
 
-    return <div
-      className={`${isPage ? 'node-def__form_page' : 'node-def__form'}${applicable ? '' : ' node-def__not-applicable'}`}
-      ref={this.element}>
+    const className =
+      'node-def__form'
+      + (isPage ? '_page' : '')
+      + (applicable ? '' : ' node-def__not-applicable')
 
-      {
-        !entry &&
-        <ErrorBadge validation={nodeDef.validation}/>
-      }
+    return <div className={className} ref={this.element}>
+
+      <ErrorBadge validation={nodeDef.validation}/>
 
       {
         edit && canEditDef && (

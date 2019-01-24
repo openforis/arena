@@ -2,8 +2,8 @@ const Promise = require('bluebird')
 
 const Survey = require('../../../common/survey/survey')
 const Record = require('../../../common/record/record')
+const SchemaRdb = require('../../../common/surveyRdb/schemaRdb')
 
-const DataSchema = require('../schemaRdb/dataSchema')
 const DataTable = require('../schemaRdb/dataTable')
 
 const getInsertValues = async (survey, nodeDef, record) => {
@@ -19,7 +19,7 @@ const toInserts = async (survey, nodeDef, record) => {
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
   return insertValues.map(values => ({
-    schemaName: DataSchema.getName(Survey.getSurveyInfo(survey).id),
+    schemaName: SchemaRdb.getName(Survey.getSurveyInfo(survey).id),
     tableName: DataTable.getName(nodeDef, nodeDefParent),
     colNames: DataTable.getColumnNames(survey, nodeDef),
     values
