@@ -35,9 +35,12 @@ const createRecord = async (user, surveyId, record) =>
  */
 const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) => {
   const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, false, client)
+  const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, false, client)
+  const records = await RecordRepository.fetchRecordsSummaryBySurveyId(surveyId, nodeDefRoot, nodeDefKeys, offset, limit, client)
+
   return {
     nodeDefKeys,
-    records: await RecordRepository.fetchRecordsSummaryBySurveyId(surveyId, nodeDefKeys, offset, limit, client)
+    records
   }
 }
 
