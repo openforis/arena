@@ -2,17 +2,17 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 
-import { deleteRecord, promoteRecord, demoteRecord } from '../record/actions'
+import { deleteRecord, updateRecordStep } from '../record/actions'
 import { appModuleUri } from '../../appModules'
 import { designerModules } from '../../designer/designerModules'
 
-const RecordEntryButtons = ({ deleteRecord, promoteRecord, demoteRecord, history }) => (
+const RecordEntryButtons = ({ deleteRecord, updateRecordStep, recordStep, history }) => (
   <React.Fragment>
     <button className="btn-s btn-of btn-transparent"
             style={{ marginRight: 5 }}
             onClick={() =>
               window.confirm('Are sure you want to demote this record? You won\'t be able to edit it anymore')
-                ? demoteRecord(history)
+                ? updateRecordStep(+recordStep -1, history)
                 : null}>
       <span className="icon icon-point-left icon-16px"/>
     </button>
@@ -23,7 +23,7 @@ const RecordEntryButtons = ({ deleteRecord, promoteRecord, demoteRecord, history
             style={{ marginLeft: 5 }}
             onClick={() =>
               window.confirm('Are sure you want to promote this record? You won\'t be able to edit it anymore')
-                ? promoteRecord(history)
+                ? updateRecordStep(+recordStep + 1, history)
                 : null}>
       <span className="icon icon-point-right icon-16px"/>
     </button>
@@ -41,7 +41,7 @@ const RecordEntryButtons = ({ deleteRecord, promoteRecord, demoteRecord, history
   </React.Fragment>
 )
 
-const FormEntryActions = ({ entry, preview, deleteRecord, promoteRecord, demoteRecord, history }) =>
+const FormEntryActions = ({ entry, preview, deleteRecord, updateRecordStep, recordStep, history }) =>
   entry &&
   <div className="survey-form__nav-record-actions">
     {
@@ -53,9 +53,9 @@ const FormEntryActions = ({ entry, preview, deleteRecord, promoteRecord, demoteR
           </Link>
         ) :
         (
-          <RecordEntryButtons history={history} deleteRecord={deleteRecord} promoteRecord={promoteRecord} demoteRecord={demoteRecord}/>
+          <RecordEntryButtons history={history} deleteRecord={deleteRecord} updateRecordStep={updateRecordStep} recordStep={recordStep}/>
         )
     }
   </div>
 
-export default connect(null, { deleteRecord, promoteRecord, demoteRecord })(FormEntryActions)
+export default connect(null, { deleteRecord, updateRecordStep })(FormEntryActions)

@@ -90,7 +90,7 @@ const updateRecordStep = (surveyId, recordUuid, step) => {
 
   // check if the user is allowed to set the new step
   if (Math.abs(step - currentStep) > 1 || step < 0 || R.keys(Survey.defaultSteps).indexOf(step) === -1) {
-    throw new Error('Can\t update step')
+    throw new Error('Can\'t update step')
   }
 
   RecordRepository.updateRecordStep(surveyId, recordUuid, step)
