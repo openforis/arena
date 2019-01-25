@@ -34,7 +34,7 @@ class NodeDefSwitch extends React.Component {
   }
 
   checkNodePlaceholder () {
-    const {entry, nodes, nodeDef, parentNode, createNodePlaceholder} = this.props
+    const { entry, nodes, nodeDef, parentNode, createNodePlaceholder } = this.props
 
     if (entry && !NodeDef.isNodeDefEntity(nodeDef) && (R.isEmpty(nodes) || NodeDef.isNodeDefMultiple(nodeDef))) {
       const hasNotPlaceholder = R.pipe(
@@ -49,7 +49,7 @@ class NodeDefSwitch extends React.Component {
   }
 
   componentDidMount () {
-    const {nodeDef, edit} = this.props
+    const { nodeDef, edit } = this.props
 
     if (edit && !nodeDef.id)
       this.element.current.scrollIntoView()
@@ -85,8 +85,7 @@ class NodeDefSwitch extends React.Component {
     const isRoot = NodeDef.isNodeDefRoot(nodeDef)
     const isPage = !!Layout.getPageUuid(nodeDef)
 
-    const className =
-      'node-def__form'
+    const className = 'node-def__form'
       + (isPage ? '_page' : '')
       + (applicable ? '' : ' node-def__not-applicable')
 
@@ -170,7 +169,7 @@ NodeDefSwitch.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const {nodeDef, parentNode, entry} = props
+  const { nodeDef, parentNode, entry } = props
   const surveyInfo = getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
   const record = getRecord(surveyForm)

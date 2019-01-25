@@ -12,9 +12,9 @@ const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
 const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
 const sqlTypes = require('../../../common/surveyRdb/sqlTypes')
-const {nodeDefType} = NodeDef
+const { nodeDefType } = NodeDef
 
-const {isBlank} = require('../../../common/stringUtils')
+const { isBlank } = require('../../../common/stringUtils')
 const DateTimeUtils = require('../../../common/dateUtils')
 
 const colValueProcessor = 'colValueProcessor'
@@ -107,7 +107,10 @@ const props = {
 }
 
 const getColValueProcessor = nodeDef => R.propOr(
-  () => (node) => Node.getNodeValue(node, null),
+  () => (node) => {
+    const value = Node.getNodeValue(node, null)
+    return isBlank(value) ? null : value
+  },
   colValueProcessor,
   props[NodeDef.getType(nodeDef)]
 )
