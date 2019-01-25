@@ -111,12 +111,17 @@ const getItemLabel = language =>
       R.defaultTo(getItemCode(item))
     )(item)
 
+const getItemLevelIndex = item =>
+    category => R.pipe(
+      R.prop(itemKeys.levelUuid),
+      levelUuid => getLevelByUuid(levelUuid)(category),
+      getLevelIndex,
+    )(item)
+
+
 const isItemLeaf = item =>
-  category => R.pipe(
-    R.prop(itemKeys.levelUuid),
-    levelUuid => getLevelByUuid(levelUuid)(category),
-    level => getLevelsArray(category).length === level.index + 1
-  )(item)
+  category =>
+    getItemLevelIndex(item)(category) === getLevelsArray(category).length - 1
 
 const getItemValidation = item => R.pipe(
   getValidation,
@@ -173,6 +178,7 @@ module.exports = {
   getItemLabels,
   getItemLabel,
   getItemValidation,
+  getItemLevelIndex,
   isItemLeaf,
 
   //UTILS
