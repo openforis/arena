@@ -86,6 +86,17 @@ const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
     dbTransformCallback(surveyId)
   )
 
+// ============== UPDATE
+
+const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
+  await client.none(`
+      UPDATE ${getSurveyDBSchema(surveyId)}.record
+      SET step = $1
+      WHERE uuid = $2`,
+    [step, recordUuid]
+  )
+
+
 // ============== DELETE
 const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
   await client.query(`
@@ -105,7 +116,8 @@ module.exports = {
   fetchRecordByUuid,
 
   // UPDATE
-
+  updateRecordStep,
+   
   // DELETE
   deleteRecord,
 }

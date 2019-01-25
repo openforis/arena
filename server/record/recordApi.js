@@ -97,6 +97,21 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
+  // RECORD promote / demote
+  app.post('/survey/:surveyId/record/:recordUuid/updateStep', requireRecordEditPermission, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const recordUuid = getRestParam(req, 'recordUuid')
+      const step = req.body.step
+
+      RecordManager.updateRecordStep(surveyId, recordUuid, step)
+
+      sendOk(res)
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
   // RECORD Check in / out
   app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordViewPermission, async (req, res) => {
     try {

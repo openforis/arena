@@ -8,6 +8,7 @@ const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
 const FileManager = require('../file/fileManager')
 
+const Survey = require('../../common/survey/survey')
 const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 const File = require('../../common/file/file')
@@ -83,6 +84,18 @@ const persistNode = (user, surveyId, node, fileReq) => {
   RecordUpdateManager.persistNode(user, surveyId, nodeToPersist)
 }
 
+const updateRecordStep = (surveyId, recordUuid, step) => {
+  const record = RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
+  const currentStep = Record.getStep(record)
+
+  // check if the user is allowed to set the new step
+  if (Math.abs(step - currentStep) > 1 || step < 0 || R.keys(Survey.defaultSteps).indexOf(step) === -1) {
+    throw new Error('Can\t update step')
+  }
+
+  RecordRepository.updateRecordStep(surveyId, recordUuid, step)
+}
+
 /**
  * ===================
  * DELETE
@@ -153,6 +166,7 @@ module.exports = {
 
   //==== UPDATE
   persistNode,
+  updateRecordStep,
 
   //==== DELETE
   deleteRecord,

@@ -92,6 +92,39 @@ const _updateNodeDebounced = (node, file, delay) => {
   return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)
 }
 
+// TODO
+export const demoteRecord = (history) => async (dispatch, getState) => {
+  const state = getState()
+
+  const surveyId = getStateSurveyId(state)
+  const record = getRecord(getSurveyForm(state))
+  const recordUuid = Record.getUuid(record)
+
+  const step = +Record.getStep(record)
+
+  const formData = new FormData()
+  formData.append('step', step - 1)
+  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/updateStep`, formData)
+
+  history.push(appModuleUri(appModules.data))
+}
+
+export const promoteRecord = (history) => async (dispatch, getState) => {
+  const state = getState()
+
+  const surveyId = getStateSurveyId(state)
+  const record = getRecord(getSurveyForm(state))
+  const recordUuid = Record.getUuid(record)
+
+  const step = +Record.getStep(record)
+
+  const formData = new FormData()
+  formData.append('step', step + 1)
+  await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/updateStep`, formData)
+
+  history.push(appModuleUri(appModules.data))
+}
+
 /**
  * ============
  * DELETE
