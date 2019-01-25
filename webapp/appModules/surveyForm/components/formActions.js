@@ -2,11 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { uuidv4 } from '../../../../common/uuid'
-
 import NodeDef from '../../../../common/survey/nodeDef'
 
-import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
 import { getSurvey } from '../../../survey/surveyState'
@@ -15,32 +12,8 @@ import { createNodeDef } from '../../../survey/nodeDefs/actions'
 import { getNodeDefFormUnlocked, getSurveyForm } from '../surveyFormState'
 import { setFormNodeDefUnlocked } from '../actions'
 
-const AddNodeDefButton = ({ type, addNodeDef, enabled }) => {
-  const isEntity = type === NodeDef.nodeDefType.entity
-  const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
-
-  return <React.Fragment key={type}>
-    {
-      isEntity ?
-        <div className="separator-of"/>
-        : null
-
-    }
-    <button className="btn btn-s btn-of-light-s btn-add-node-def"
-            onClick={() => addNodeDef(type, nodeDefProps)}
-            aria-disabled={!enabled}>
-      {getNodeDefIconByType(type)}{type}
-    </button>
-  </React.Fragment>
-}
-
-const AddNodeDefButtons = ({ addNodeDef, nodeDef }) => {
-  const enabled = nodeDef && NodeDef.isNodeDefEntity(nodeDef)
-
-  const canAddAttribute = enabled
-  const canAddEntity = enabled && isRenderForm(nodeDef)
-
-  return <React.Fragment>
+const AddNodeDefButtons = ({ addNodeDef }) => (
+  <React.Fragment>
     <div/>
     <div/>
     <div/>
@@ -50,34 +23,26 @@ const AddNodeDefButtons = ({ addNodeDef, nodeDef }) => {
 
     {
       R.values(NodeDef.nodeDefType)
-        .map(type =>
-          <AddNodeDefButton key={type} type={type}
-                            addNodeDef={addNodeDef}
-                            enabled={type === NodeDef.nodeDefType.entity ? canAddEntity : canAddAttribute}/>
-        )
+        .map(type => {
+          const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
+
+          return (
+            <button key={type}
+                    className="btn btn-s btn-of-light-s btn-add-node-def"
+                    onClick={() => addNodeDef(type, nodeDefProps)}>
+              {getNodeDefIconByType(type)}{type}
+            </button>
+          )
+        })
     }
 
-    <button className="btn btn-s btn-of-light-xs btn-add-node-def"
-            aria-disabled={!canAddEntity}
-            onClick={() => addNodeDef(
-              NodeDef.nodeDefType.entity,
-              {
-                [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-                [nodeDefLayoutProps.pageUuid]: uuidv4(),
-              }
-            )}>
-      <span className="icon icon-insert-template icon-left"/>
-      Entity New Page
-    </button>
-
   </React.Fragment>
-}
+)
 
 class FormActions extends React.Component {
 
-  constructor () {
-    super()
-
+  constructor (props) {
+    super(props)
     this.addNodeDef = this.addNodeDef.bind(this)
   }
 
@@ -101,12 +66,10 @@ class FormActions extends React.Component {
   }
 
   render () {
-
     const { nodeDef, setFormNodeDefUnlocked } = this.props
 
     return (
       <div className="survey-form__actions">
-
         {
           nodeDef &&
           <React.Fragment>
@@ -118,7 +81,6 @@ class FormActions extends React.Component {
             <AddNodeDefButtons nodeDef={nodeDef} addNodeDef={this.addNodeDef}/>
           </React.Fragment>
         }
-
       </div>
 
     )
