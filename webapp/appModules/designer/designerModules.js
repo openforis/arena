@@ -6,7 +6,7 @@ export const designerModules = {
 
   formDesigner: `${appModules.designer}/formDesigner`,
 
-  recordPreview: `${appModules.designer}/recordPreview`,
+  recordPreview: `${appModules.designer}/formDesigner/preview`,
 
   categories: `${appModules.designer}/categories`,
 
