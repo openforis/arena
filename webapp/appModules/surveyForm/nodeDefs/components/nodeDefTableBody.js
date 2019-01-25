@@ -16,7 +16,8 @@ import { getNodeDefComponent } from '../nodeDefSystemProps'
 const getNodeValues = async (surveyInfo, nodes) => {
   const nodeValues = R.pipe(
     R.reject(R.propEq('placeholder', true)),
-    R.map(Node.getNodeValue),
+    R.map(n => Node.getNodeValue(n, null)),
+    R.reject(R.isNil),
   )(nodes)
 
   const stringNodeValues = await Promise.all(
@@ -32,7 +33,7 @@ const getNodeValues = async (surveyInfo, nodes) => {
 }
 
 const loadCategoryItemLabel = async (surveyInfo, itemUuid) => {
-  const {data} = await axios.get(`/api/survey/${surveyInfo.id}/categories/items/${itemUuid}`)
+  const { data } = await axios.get(`/api/survey/${surveyInfo.id}/categories/items/${itemUuid}`)
   return Category.getItemLabel(Survey.getDefaultLanguage(surveyInfo))(data.item)
 }
 
@@ -42,7 +43,7 @@ class NodeDefMultipleTableBody extends React.Component {
     super(props)
 
     this.state = {
-      editDialogOpen: false,
+      showEditDialog: false,
       nodeValues: '',
     }
   }
@@ -52,7 +53,7 @@ class NodeDefMultipleTableBody extends React.Component {
   }
 
   async componentDidUpdate (prevProps) {
-    const {nodes: prevNodes} = prevProps
+    const { nodes: prevNodes } = prevProps
 
     if (!R.equals(prevNodes, this.props.nodes)) {
       await this.loadNodeValues()
@@ -60,23 +61,24 @@ class NodeDefMultipleTableBody extends React.Component {
   }
 
   async loadNodeValues () {
-    this.setState({
-      nodeValues: await getNodeValues(this.props.surveyInfo, this.props.nodes)
-    })
+    const { surveyInfo, nodes } = this.props
+    const nodeValues = await getNodeValues(surveyInfo, nodes)
+
+    this.setState({ nodeValues })
   }
 
-  toggleEditDialogOpen (open) {
-    this.setState({editDialogOpen: open})
+  setShowEditDialog (showEditDialog) {
+    this.setState({ showEditDialog })
   }
 
   render () {
-    const {canEditRecord} = this.props
-    
-    return this.state.editDialogOpen
+    const { canEditRecord } = this.props
+
+    return this.state.showEditDialog
       ? (
         ReactDOM.createPortal(
           <NodeDefMultipleEditDialog {...this.props}
-                                     onClose={() => this.toggleEditDialogOpen(false)}/>,
+                                     onClose={() => this.setShowEditDialog(false)}/>,
           document.body
         )
       )
@@ -84,8 +86,8 @@ class NodeDefMultipleTableBody extends React.Component {
         <div className="node-def__text-multiple-table-cell">
           <span className="values-summary">{this.state.nodeValues}</span>
           <button className="btn-s btn-of-light-xs"
-                  onClick={() => this.toggleEditDialogOpen(true)}>
-              <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`}/>
+                  onClick={() => this.setShowEditDialog(true)}>
+            <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`}/>
           </button>
         </div>
       )
@@ -93,12 +95,12 @@ class NodeDefMultipleTableBody extends React.Component {
 }
 
 const NodeDefTableBody = props => {
-  const {nodeDef} = props
+  const { nodeDef } = props
 
   return (
     NodeDef.isNodeDefMultiple(nodeDef) || NodeDef.isNodeDefCode(nodeDef)
       ? <NodeDefMultipleTableBody {...props}/>
-      : React.createElement(getNodeDefComponent(nodeDef), {...props})
+      : React.createElement(getNodeDefComponent(nodeDef), { ...props })
   )
 }
 

@@ -1,4 +1,4 @@
-import '../../../style/react-grid-layout.scss'
+import './nodeDefEntityForm.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -8,7 +8,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout'
 import NodeDefSwitch from '../../nodeDefSwitch'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
-import { newNode } from '../../../../../../common/record/node'
+import Node from '../../../../../../common/record/node'
 
 import {
   nodeDefLayoutProps,
@@ -16,9 +16,10 @@ import {
   getLayout,
   getNoColumns,
 } from '../../../../../../common/survey/nodeDefLayout'
-import { getFormPageNodeUuid, getSurveyForm } from '../../../../../appModules/surveyForm/surveyFormState'
 
-import { setFormPageNode } from '../../../actions'
+import { setFormPageNode, getNodeKeyLabelValues } from '../../../actions'
+
+import * as SurveyFormState from '../../../../../appModules/surveyForm/surveyFormState'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -52,11 +53,11 @@ const EntityForm = props => {
 
   return (
     innerPageChildren.length > 0
-      ? <ResponsiveGridLayout breakpoints={{lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0}}
+      ? <ResponsiveGridLayout breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                               autoSize={false}
                               rowHeight={edit ? 80 : 50}
-                              cols={{lg: columns, md: columns, sm: columns, xs: 1, xxs: 1}}
-                              layouts={{lg: rdgLayout, md: rdgLayout, sm: rdgLayout}}
+                              cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
+                              layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
                               containerPadding={edit ? [40, 30] : [30, 30]}
                               onLayoutChange={onLayoutChange}
                               isDraggable={edit && !locked}
@@ -88,27 +89,23 @@ const EntityForm = props => {
 
 const NodeSelect = props => {
   const {
-    nodeDef, nodes, parentNode, selectedNode,
+    nodeDef, nodes, parentNode, selectedNode, getNodeKeyLabelValues,
     updateNode, removeNode, onChange, canEditRecord
   } = props
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      margin: '.5rem 10rem',
-    }}>
+    <div className="node-def-entity-form__actions">
 
-      <select aria-disabled={R.isEmpty(nodes)}
+      <select className="node-select"
               value={selectedNode ? selectedNode.uuid : 'placeholder'}
-              onChange={e => onChange(e.target.value)}>
+              onChange={e => onChange(e.target.value)}
+              aria-disabled={R.isEmpty(nodes)}>
         <option value='placeholder' disabled hidden={true}>Select</option>
         {
           nodes.map(n =>
-            <option key={n.uuid}
-                    value={n.uuid}>
-              {/*//TODO add key attribute*/}
-              {n.uuid}
+            <option key={Node.getUuid(n)}
+                    value={Node.getUuid(n)}>
+              {getNodeKeyLabelValues(n)}
             </option>
           )
         }
@@ -118,7 +115,7 @@ const NodeSelect = props => {
         canEditRecord &&
         <React.Fragment>
           <button className="btn btn-s btn-of-light-xs"
-                  style={{marginLeft: '5px'}}
+                  style={{ marginLeft: '5px' }}
                   aria-disabled={!selectedNode}
                   onClick={() => {
                     if (window.confirm('Are you sure you want to delete this entity?')) {
@@ -130,9 +127,9 @@ const NodeSelect = props => {
             DELETE
           </button>
           <button className="btn btn-s btn-of-light-xs"
-                  style={{marginLeft: '50px'}}
+                  style={{ marginLeft: '50px' }}
                   onClick={() => {
-                    const entity = newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
+                    const entity = Node.newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
                     updateNode(nodeDef, entity)
                     onChange(entity.uuid)
                   }}>
@@ -147,15 +144,8 @@ const NodeSelect = props => {
 
 class NodeDefEntityForm extends React.Component {
 
-  getNode (nodeUuid) {
-    const {nodes} = this.props
-    return nodeUuid
-      ? R.find(R.propEq('uuid', nodeUuid), nodes)
-      : null
-  }
-
   checkNodePage () {
-    const {nodeDef, setFormPageNode, nodes, entry} = this.props
+    const { nodeDef, setFormPageNode, nodes, entry } = this.props
 
     if (entry && !NodeDef.isNodeDefMultiple(nodeDef)) {
       const nodeUuid = R.pipe(
@@ -172,9 +162,9 @@ class NodeDefEntityForm extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const {nodeDef} = this.props
-    const {nodeDef: prevNodeDef} = prevProps
-    if (nodeDef.uuid !== prevNodeDef.uuid)
+    const { nodeDef } = this.props
+    const { nodeDef: prevNodeDef } = prevProps
+    if (NodeDef.getUuid(nodeDef) !== NodeDef.getUuid(prevNodeDef))
       this.checkNodePage()
   }
 
@@ -186,45 +176,47 @@ class NodeDefEntityForm extends React.Component {
       nodes,
 
       setFormPageNode,
-      selectedNodeUuid,
+      selectedNode,
+      getNodeKeyLabelValues,
     } = this.props
 
-    // edit survey mode
-    if (edit)
-      return <EntityForm {...this.props} />
+    return entry && NodeDef.isNodeDefMultiple(nodeDef)
+      ? (
+        <div className="node-def-entity-form__wrapper">
+          <NodeSelect {...this.props}
+                      selectedNode={selectedNode}
+                      getNodeKeyLabelValues={getNodeKeyLabelValues}
+                      onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}/>
 
-    // entry multiple entity
-    if (entry && NodeDef.isNodeDefMultiple(nodeDef)) {
-      const node = this.getNode(selectedNodeUuid)
+          {
+            selectedNode
+              ? <EntityForm {...this.props} node={selectedNode}/>
+              : null
+          }
+        </div>
+      )
+      : (
+        <EntityForm {...this.props} node={entry ? nodes[0] : null}/>
+      )
 
-      return <div style={{position: 'relative'}}>
-
-        <NodeSelect {...this.props}
-                    selectedNode={node}
-                    onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}/>
-
-        {
-          node
-            ? <EntityForm {...this.props} node={node}/>
-            : null
-        }
-      </div>
-    }
-
-    // entry single entity
-    if (entry && !NodeDef.isNodeDefMultiple(nodeDef))
-      return <EntityForm {...this.props}
-                         node={nodes[0]}/>
-
-    return null
   }
 }
 
-const mapStateToProps = (state, props) => ({
-  selectedNodeUuid: getFormPageNodeUuid(props.nodeDef)(getSurveyForm(state))
-})
+const mapStateToProps = (state, props) => {
+  const { nodeDef, nodes } = props
+
+  const surveyForm = SurveyFormState.getSurveyForm(state)
+  const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(surveyForm)
+  const selectedNode = selectedNodeUuid && nodes
+    ? R.find(R.propEq('uuid', selectedNodeUuid), nodes)
+    : null
+
+  return {
+    selectedNode,
+  }
+}
 
 export default connect(
   mapStateToProps,
-  {setFormPageNode}
+  { setFormPageNode, getNodeKeyLabelValues }
 )(NodeDefEntityForm)

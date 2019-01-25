@@ -1,14 +1,14 @@
 import './tabBar.scss'
 
 import React from 'react'
-import { Switch, Route } from 'react-router'
+import { Switch, Route, matchPath } from 'react-router'
 
-const TabBarButtons = ({tabs, location, selection, onClick}) => (
+const TabBarButtons = ({ tabs, location, selection, onClick }) => (
   <div className="flex-center">
     {
       tabs.map((tab, i) => {
         const active = location
-          ? location.pathname === tab.path
+          ? matchPath(location.pathname, tab.path)
           : i === selection
 
         return tab.showTab === false
@@ -25,12 +25,12 @@ const TabBarButtons = ({tabs, location, selection, onClick}) => (
   </div>
 )
 
-const TabBarComponent = ({tab, ...rest}) =>
+const TabBarComponent = ({ tab, ...rest }) =>
   typeof tab.component === 'object'
     ? tab.component
-    : React.createElement(tab.component, {...tab.props, ...rest})
+    : React.createElement(tab.component, { ...tab.props, ...rest })
 
-const TabBarSwitch = ({tabs, location}) => (
+const TabBarSwitch = ({ tabs, location }) => (
   <Switch location={location}>
     {
       tabs.map((tab, i) =>
@@ -47,12 +47,12 @@ class TabBar extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = {selection: TabBar.defaultProps.selection}
+    this.state = { selection: TabBar.defaultProps.selection }
   }
 
   render () {
-    const {tabs, location, history, className} = this.props
-    const {selection} = this.state
+    const { tabs, location, history, className } = this.props
+    const { selection } = this.state
 
     return (
       <div className={`tab-bar ${className}`}>
@@ -62,7 +62,7 @@ class TabBar extends React.Component {
                        selection={this.state.selection}
                        onClick={tabIndex => location
                          ? history.push(tabs[tabIndex].path)
-                         : this.setState({selection: tabIndex})
+                         : this.setState({ selection: tabIndex })
                        }/>
 
 
