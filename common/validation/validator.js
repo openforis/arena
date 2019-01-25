@@ -36,8 +36,7 @@ const keys = {
 }
 
 const validValidation = {
-  [keys.valid]: true,
-  [keys.errors]: []
+  [keys.valid]: true
 }
 
 const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
@@ -66,7 +65,7 @@ const validate = async (obj, propsValidations) => {
         )
     )
   )
-  return cleanup({[keys.fields]: fieldValidations})
+  return cleanup({ [keys.fields]: fieldValidations })
 }
 
 const validateRequired = (propName, obj) => {
@@ -127,7 +126,7 @@ const getFieldValidations = R.propOr({}, keys.fields)
 const getFieldValidation = field => R.pathOr(validValidation, [keys.fields, field])
 
 const getInvalidFieldValidations = R.pipe(
-  R.prop(keys.fields),
+  getFieldValidations,
   R.reject(R.propEq(keys.valid, true))
 )
 
@@ -136,12 +135,15 @@ const getInvalidFieldValidations = R.pipe(
  * Removes valid fields validations and updates 'valid' attribute
  */
 const cleanup = R.pipe(
-  getFieldValidations,
-  R.reject(v => !v || R.propEq(keys.valid, true)(v)),
-  invalidFieldValidations => ({
-    [keys.fields]: invalidFieldValidations,
-    [keys.valid]: R.isEmpty(invalidFieldValidations)
-  }),
+  getInvalidFieldValidations,
+  R.ifElse(
+    R.isEmpty,
+    () => validValidation,
+    invalidFieldValidations => ({
+      [keys.valid]: false,
+      [keys.fields]: invalidFieldValidations
+    }),
+  ),
 )
 
 const assocValidation = v => R.assoc(keys.validation, v)

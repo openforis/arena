@@ -19,6 +19,7 @@ const RecordExprParser = require('../../../recordExprParser')
 
 const CategoryManager = require('../../../../category/categoryManager')
 const TaxonomyManager = require('../../../../taxonomy/taxonomyManager')
+const RecordRepository = require('../../../../record/recordRepository')
 
 const errorKeys = {
   required: 'required',
@@ -111,11 +112,11 @@ const validateNodeValidations = (survey, nodeDef, tx) => async (propName, node) 
     )(invalidExpressions)
 }
 
-const validateNodes = async (survey, nodes, tx) => {
+const validateNodes = async (survey, recordUuid, nodes, tx) => {
 
   const validatedNodeUuids = []
 
-  const nodesValidation = await Promise.all(
+  const nodesValidationArray = await Promise.all(
     R.values(nodes).map(
       async node => {
         const nodeDependents = await NodeDependencyManager.fetchDependentNodes(
@@ -153,14 +154,28 @@ const validateNodes = async (survey, nodes, tx) => {
           })
         )
 
-
-        return R.flatten(nodesValidated)
+        return nodesValidated
       })
   )
 
-  return {
-    fields: R.mergeAll(nodesValidation),
+  const nodesValidation = {
+    fields: R.pipe(
+      R.flatten,
+      R.mergeAll
+    )(nodesValidationArray)
   }
+
+  // persist validation
+  const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, tx)
+
+  const recordValidationUpdated = R.pipe(
+    Validator.mergeValidation(nodesValidation),
+    Validator.getValidation
+  )(record)
+
+  await RecordRepository.updateValidation(Survey.getId(survey), recordUuid, recordValidationUpdated, tx)
+
+  return nodesValidation
 }
 
 const validateCode = async (survey, nodeDef, node) => {

@@ -105,7 +105,7 @@ const checkInRecord = async (user, surveyId, recordUuid) => {
   const record = await fetchRecordAndNodesByUuid(surveyId, recordUuid)
 
   if (canEditRecord(user, record)) {
-    RecordUpdateManager.checkIn(user, surveyId, Record.isPreview(record))
+    RecordUpdateManager.checkIn(user, surveyId, recordUuid, Record.isPreview(record))
   }
 
   return record

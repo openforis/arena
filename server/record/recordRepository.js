@@ -12,7 +12,7 @@ const Record = require('../../common/record/record')
 const NodeDefTable = require('../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
 
-const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}, preview`
+const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}, preview, validation`
 
 const dbTransformCallback = (surveyId) => R.pipe(
   camelize,
@@ -86,6 +86,16 @@ const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
     dbTransformCallback(surveyId)
   )
 
+// ============== UPDATE
+const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
+  await client.one(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.record 
+     SET validation = $1::jsonb
+     WHERE uuid = $2
+    RETURNING ${recordSelectFields}`,
+    [validation, recordUuid]
+  )
+
 // ============== DELETE
 const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
   await client.query(`
@@ -105,6 +115,7 @@ module.exports = {
   fetchRecordByUuid,
 
   // UPDATE
+  updateValidation,
 
   // DELETE
   deleteRecord,

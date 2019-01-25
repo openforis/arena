@@ -30,6 +30,7 @@ class RecordUpdateThread extends Thread {
     this.queue = new Queue()
     this.processing = false
     this.preview = R.propOr(false, 'preview', this.params)
+    this.recordUuid = R.prop('recordUuid', this.params)
     this.recordUpdater = new RecordUpdater(this.preview)
   }
 
@@ -100,7 +101,7 @@ class RecordUpdateThread extends Thread {
       this._postMessage(WebSocketEvents.nodesUpdate, updatedDependentNodes)
 
       // 3. update node validations
-      const validations = await RecordValidator.validateNodes(survey, updatedNodes, t)
+      const validations = await RecordValidator.validateNodes(survey, this.recordUuid, updatedNodes, t)
       this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
 
       // 4. update survey rdb
