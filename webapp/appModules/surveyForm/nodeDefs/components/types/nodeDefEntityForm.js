@@ -207,7 +207,7 @@ const mapStateToProps = (state, props) => {
 
   const surveyForm = SurveyFormState.getSurveyForm(state)
   const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(surveyForm)
-  const selectedNode = selectedNodeUuid
+  const selectedNode = selectedNodeUuid && nodes
     ? R.find(R.propEq('uuid', selectedNodeUuid), nodes)
     : null
 
