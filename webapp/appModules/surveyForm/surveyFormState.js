@@ -63,12 +63,6 @@ export const getNodeDefFormUnlocked = survey =>
     R.path(nodeDefEntityUnlockedPath, surveyForm)
   )(survey)
 
-export const isNodeDefFormLocked = (nodeDef) => R.pipe(
-  R.path(nodeDefEntityUnlockedPath),
-  R.equals(nodeDef.uuid),
-  R.not,
-)
-
 // ====== current list of form pages
 
 const pageNodes = 'pageNodes'

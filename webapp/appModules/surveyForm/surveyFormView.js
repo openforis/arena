@@ -36,7 +36,7 @@ const SurveyFormView = (props) => {
   const editAllowed = edit && canEditDef && !preview
 
   const className = editAllowed
-    ? ' form-designer edit'
+    ? ' form-designer edit form-actions-off'
     : edit && !preview
       ? ' form-designer'
       : ''

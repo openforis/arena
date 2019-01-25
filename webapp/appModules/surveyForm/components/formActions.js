@@ -4,7 +4,6 @@ import * as R from 'ramda'
 
 import { uuidv4 } from '../../../../common/uuid'
 
-import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 
 import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
@@ -13,9 +12,10 @@ import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nod
 import { getSurvey } from '../../../survey/surveyState'
 
 import { createNodeDef } from '../../../survey/nodeDefs/actions'
-import { getFormActivePageNodeDef, getNodeDefFormUnlocked, getSurveyForm } from '../surveyFormState'
+import { getNodeDefFormUnlocked, getSurveyForm } from '../surveyFormState'
+import { setFormNodeDefUnlocked } from '../actions'
 
-const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
+const AddNodeDefButton = ({ type, addNodeDef, enabled }) => {
   const isEntity = type === NodeDef.nodeDefType.entity
   const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
 
@@ -34,7 +34,7 @@ const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
   </React.Fragment>
 }
 
-const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
+const AddNodeDefButtons = ({ addNodeDef, nodeDef }) => {
   const enabled = nodeDef && NodeDef.isNodeDefEntity(nodeDef)
 
   const canAddAttribute = enabled
@@ -77,44 +77,46 @@ class FormActions extends React.Component {
 
   constructor () {
     super()
-    this.state = {opened: true}
 
     this.addNodeDef = this.addNodeDef.bind(this)
   }
 
-  toggleOpen () {
-    const {opened} = this.state
+  componentDidUpdate (prevProps) {
+    const { nodeDef } = this.props
+    const { nodeDef: nodeDefPrev } = prevProps
 
-    const width = opened ? 33 : 200
-    document.getElementsByClassName('survey-form')[0].classList.toggle('form-actions-off')// .style.gridTemplateColumns = `1fr ${width}px`
+    if ((nodeDef && !nodeDefPrev) || (!nodeDef && nodeDefPrev)) {
 
-    this.setState({opened: !opened})
+      const surveyFormElement = document.getElementsByClassName('survey-form')[0]
+      surveyFormElement.classList.toggle('form-actions-off')
 
-    //react-grid-layout re-render
-    window.dispatchEvent(new Event('resize'))
+      //react-grid-layout re-render
+      window.dispatchEvent(new Event('resize'))
+    }
   }
 
   addNodeDef (type, props) {
-    const {nodeDef, createNodeDef} = this.props
+    const { nodeDef, createNodeDef } = this.props
     createNodeDef(nodeDef.uuid, type, props)
   }
 
   render () {
 
-    const {nodeDef} = this.props
+    const { nodeDef, setFormNodeDefUnlocked } = this.props
 
     return (
       <div className="survey-form__actions">
 
-        <button className="btn btn-s btn-of-light-xs no-border btn-toggle"
-                onClick={() => this.toggleOpen()}>
-          <span className={`icon icon-${this.state.opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
-        </button>
-
         {
-          this.state.opened ?
+          nodeDef &&
+          <React.Fragment>
+            <button className="btn btn-s btn-of-light-xs no-border btn-toggle"
+                    onClick={() => setFormNodeDefUnlocked(null)}>
+              <span className="icon icon-cross icon-16px"/>
+            </button>
+
             <AddNodeDefButtons nodeDef={nodeDef} addNodeDef={this.addNodeDef}/>
-            : null
+          </React.Fragment>
         }
 
       </div>
@@ -128,20 +130,11 @@ const mapStateToProps = state => {
   const survey = getSurvey(state)
   const surveyForm = getSurveyForm(state)
 
-  const nodeDefUnlocked = getNodeDefFormUnlocked(survey)(surveyForm)
-  const nodeDefActivePage = getFormActivePageNodeDef(survey)(surveyForm)
-
-  const nodeDef = nodeDefUnlocked &&
-  (
-    nodeDefActivePage.uuid === nodeDefUnlocked.uuid ||
-    Survey.isNodeDefAncestor(nodeDefActivePage, nodeDefUnlocked)(survey)
-  )
-    ? nodeDefUnlocked
-    : null
+  const nodeDef = getNodeDefFormUnlocked(survey)(surveyForm)
 
   return {
     nodeDef
   }
 }
 
-export default connect(mapStateToProps, {createNodeDef})(FormActions)
+export default connect(mapStateToProps, { createNodeDef, setFormNodeDefUnlocked })(FormActions)
