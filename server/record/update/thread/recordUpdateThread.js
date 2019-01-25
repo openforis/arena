@@ -1,4 +1,4 @@
-const {isMainThread} = require('worker_threads')
+const { isMainThread } = require('worker_threads')
 
 const R = require('ramda')
 
@@ -15,7 +15,7 @@ const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
 const Survey = require('../../../../common/survey/survey')
 const Node = require('../../../../common/record/node')
 const Queue = require('../../../../common/queue')
-const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
+const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const DependentNodesUpdater = require('./helpers/dependentNodesUpdater')
 const RecordValidator = require('./helpers/recordValidator')
@@ -70,7 +70,7 @@ class RecordUpdateThread extends Thread {
 
   _postMessage (type, content) {
     if (!isMainThread)
-      this.postMessage({type, content})
+      this.postMessage({ type, content })
   }
 
   async processMessage (msg) {

@@ -1,9 +1,12 @@
 const R = require('ramda')
 const Promise = require('bluebird')
+const DateTimeUtils = require('../../../../../common/dateUtils')
+const NumberUtils = require('../../../../../common/numberUtils')
 
-const {dependencyTypes} = require('../../../../survey/surveyDependenchyGraph')
+const { dependencyTypes } = require('../../../../survey/surveyDependenchyGraph')
 const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
+const { nodeDefType } = NodeDef
 const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
 const NodeDefValidations = require('../../../../../common/survey/nodeDefValidations')
 const Category = require('../../../../../common/survey/category')
@@ -17,17 +20,9 @@ const RecordExprParser = require('../../../recordExprParser')
 const CategoryManager = require('../../../../category/categoryManager')
 const TaxonomyManager = require('../../../../taxonomy/taxonomyManager')
 
-const DateTimeUtils = require('../../../../../common/dateUtils')
-
 const errorKeys = {
   required: 'required',
-  invalidValue: 'invalidValue',
-  // code
-  categoryItemNotFound: 'categoryItemNotFound',
-  categoryItemLevelInvalid: 'categoryItemLevelInvalid',
-  // taxon
-  taxonNotFound: 'taxonNotFound',
-  taxonVernacularNameNotFound: 'taxonVernacularNameNotFound',
+  invalidType: 'invalidType',
 }
 
 const validateRequired = (survey, nodeDef) =>
@@ -35,40 +30,52 @@ const validateRequired = (survey, nodeDef) =>
     ? errorKeys.required
     : null
 
+const typeValidatorFns = {
+  [nodeDefType.boolean]: (survey, nodeDef, node, value) =>
+    R.includes(value, ['true', 'false']),
+
+  [nodeDefType.code]: (survey, nodeDef, node, value) =>
+    validateCode(survey, nodeDef, node),
+
+  [nodeDefType.coordinate]: (survey, nodeDef, node, value) =>
+    NumberUtils.isFloat(Node.getCoordinateX(node)) &&
+    NumberUtils.isFloat(Node.getCoordinateY(node)) &&
+    R.includes(Node.getCoordinateSrs(node), Survey.getSRS(survey)),
+
+  [nodeDefType.date]: (survey, nodeDef, node, value) => {
+    const [year, month, day] = [Node.getDateYear(node), Node.getDateMonth(node), Node.getDateDay(node)]
+    return DateTimeUtils.isValidDate(year, month, day)
+  },
+
+  [nodeDefType.decimal]: (survey, nodeDef, node, value) =>
+    NumberUtils.isFloat(value),
+
+  [nodeDefType.file]: (survey, nodeDef, node, value) => true,
+
+  [nodeDefType.integer]: (survey, nodeDef, node, value) =>
+    NumberUtils.isInteger(value),
+
+  [nodeDefType.taxon]: (survey, nodeDef, node, value) =>
+    validateTaxon(survey, nodeDef, node),
+
+  [nodeDefType.text]: (survey, nodeDef, node, value) =>
+    R.is(String, value),
+
+  [nodeDefType.time]: (survey, nodeDef, node, value) => {
+    const [hour, minute] = [Node.getTimeHour(node), Node.getTimeMinute(node)]
+    return DateTimeUtils.isValidTime(hour, minute)
+  },
+}
+
 const validateValueType = (survey, nodeDef) =>
   async (propName, node) => {
+
     if (Node.isNodeValueBlank(node))
       return null
 
-    const value = Node.getNodeValue(node)
-
-    switch (NodeDef.getType(nodeDef)) {
-      case NodeDef.nodeDefType.boolean:
-        return R.includes(value, ['true', 'false']) ? null : errorKeys.invalidValue
-      case NodeDef.nodeDefType.code:
-        return await validateCode(survey, nodeDef, node)
-      case NodeDef.nodeDefType.coordinate:
-        return isFloat(Node.getCoordinateX(node))
-        && isFloat(Node.getCoordinateY(node))
-        && R.includes(Node.getCoordinateSrs(node), Survey.getSRS(survey))
-          ? null : errorKeys.invalidValue
-      case NodeDef.nodeDefType.date:
-        const [year, month, day] = [Node.getDateYear(node), Node.getDateMonth(node), Node.getDateDay(node)]
-        return DateTimeUtils.isValidDate(year, month, day) ? null : errorKeys.invalidValue
-      case NodeDef.nodeDefType.decimal:
-        return isFloat(value) ? null : errorKeys.invalidValue
-      case NodeDef.nodeDefType.file:
-        return null //TODO
-      case NodeDef.nodeDefType.integer:
-        return isInteger(value) ? null : errorKeys.invalidValue
-      case NodeDef.nodeDefType.time:
-        const [hour, minute] = [Node.getTimeHour(node), Node.getTimeMinute(node)]
-        return DateTimeUtils.isValidTime(hour, minute) ? null : errorKeys.invalidValue
-      case NodeDef.nodeDefType.taxon:
-        return await validateTaxon(survey, nodeDef, node)
-      case NodeDef.nodeDefType.text:
-        return R.is(String, value)
-    }
+    const typeValidatorFn = typeValidatorFns[NodeDef.getType(nodeDef)]
+    const valid = await typeValidatorFn(survey, nodeDef, node, Node.getNodeValue(node))
+    return valid ? null : errorKeys.invalidType
   }
 
 const validateNodeValidations = (survey, nodeDef, tx) => async (propName, node) => {
@@ -85,7 +92,7 @@ const validateNodeValidations = (survey, nodeDef, tx) => async (propName, node) 
       async expr => {
         const valid = await RecordExprParser.evalNodeQuery(survey, node, NodeDefExpression.getExpression(expr), tx)
         const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-        const message = NodeDefExpression.getMessage(defaultLang, errorKeys.invalidValue)(expr)
+        const message = NodeDefExpression.getMessage(defaultLang, errorKeys.invalidType)(expr)
 
         return {
           valid,
@@ -108,103 +115,106 @@ const validateNodes = async (survey, nodes, tx) => {
 
   const validatedNodeUuids = []
 
-  const validationsByNode = R.pipe(
-    R.flatten,
-    R.mergeAll,
-  )(await Promise.all(R.values(nodes).map(
-    async node => {
-      const nodeDependents = await NodeDependencyManager.fetchDependentNodes(
-        survey,
-        node,
-        dependencyTypes.validations,
-        tx
-      )
+  const nodesValidation = await Promise.all(
+    R.values(nodes).map(
+      async node => {
+        const nodeDependents = await NodeDependencyManager.fetchDependentNodes(
+          survey,
+          node,
+          dependencyTypes.validations,
+          tx
+        )
 
-      const nodesToValidate = R.pipe(
-        R.append({
-          nodeCtx: node,
-          nodeDef: Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-        }),
-        R.reject(o => NodeDef.isNodeDefEntity(o.nodeDef) || R.includes(Node.getUuid(o.nodeCtx), validatedNodeUuids)),
-      )(nodeDependents)
+        const nodesToValidate = R.pipe(
+          R.append({
+            nodeCtx: node,
+            nodeDef: Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+          }),
+          R.reject(o => NodeDef.isNodeDefEntity(o.nodeDef) || R.includes(Node.getUuid(o.nodeCtx), validatedNodeUuids)),
+        )(nodeDependents)
 
-      const nodesValidated = await Promise.all(
-        nodesToValidate.map(async o => {
-          const {nodeCtx, nodeDef} = o
-          return {
-            [Node.getUuid(nodeCtx)]: await Validator.validate(nodeCtx, {
-              [Node.keys.value]: [
-                validateRequired(survey, nodeDef),
-                validateValueType(survey, nodeDef),
-                validateNodeValidations(survey, nodeDef)
-              ]
-            })
-          }
-        })
-      )
+        const nodesValidated = await Promise.all(
+          nodesToValidate.map(async o => {
+            const { nodeCtx, nodeDef } = o
+            const nodeUuid = Node.getUuid(nodeCtx)
 
-      validatedNodeUuids.push(R.pluck(Node.keys.uuid, nodesToValidate))
+            // mark node validated
+            validatedNodeUuids.push(nodeUuid)
 
-      return nodesValidated
-    }))
+            return {
+              [nodeUuid]: await Validator.validate(nodeCtx, {
+                [Node.keys.value]: [
+                  validateRequired(survey, nodeDef),
+                  validateValueType(survey, nodeDef),
+                  validateNodeValidations(survey, nodeDef)
+                ]
+              })
+            }
+          })
+        )
+
+
+        return R.flatten(nodesValidated)
+      })
   )
+
   return {
-    fields: validationsByNode
+    fields: R.mergeAll(nodesValidation),
   }
 }
 
 const validateCode = async (survey, nodeDef, node) => {
   const itemUuid = Node.getCategoryItemUuid(node)
   if (!itemUuid)
-    return null
+    return true
 
-  const item = await CategoryManager.fetchItemByUuid(itemUuid)
+  const surveyId = Survey.getId(survey)
+  const isSurveyDraft = Survey.isDraft(Survey.getSurveyInfo(survey))
+
+  const item = await CategoryManager.fetchItemByUuid(surveyId, itemUuid, isSurveyDraft)
 
   // item not found
   if (!item)
-    return errorKeys.categoryItemNotFound
+    return false
 
+  const categoryUuid = NodeDef.getNodeDefCategoryUuid(nodeDef)
   const category = await CategoryManager.fetchCategoryByUuid(
-    Survey.getId(survey),
-    NodeDef.getNodeDefCategoryUuid(nodeDef),
-    Survey.isDraft(survey),
-    false
+    surveyId, categoryUuid, isSurveyDraft, false
   )
   const nodeDefLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   const itemLevelIndex = Category.getItemLevelIndex(item)(category)
 
   // item category level different from node def category level
   if (nodeDefLevelIndex !== itemLevelIndex)
-    return errorKeys.categoryItemLevelInvalid
+    return false
 
-  return null
+  return true
 }
 
 const validateTaxon = async (survey, nodeDef, node) => {
   const taxonUuid = Node.getNodeTaxonUuid(node)
   if (!taxonUuid)
-    return null
+    return true
+
+  const surveyId = Survey.getId(survey)
+  const isSurveyDraft = Survey.isDraft(Survey.getSurveyInfo(survey))
 
   // taxon not found
-  const taxon = await TaxonomyManager.fetchTaxonByUuid(Survey.getId(survey), taxonUuid, Survey.isDraft(survey))
+  const taxon = await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid, isSurveyDraft)
   if (!taxon)
-    return errorKeys.taxonNotFound
+    return false
 
   const vernacularNameUuid = Node.getNodeVernacularNameUuid(node)
   if (!vernacularNameUuid)
-    return null
+    return true
 
   // vernacular name not found
-  const vernacularName = await TaxonomyManager.fetchTaxonVernacularNameByUuid(Survey.getId(survey), vernacularNameUuid, Survey.isDraft(survey))
+  const vernacularName = await TaxonomyManager.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, isSurveyDraft)
   if (!vernacularName)
-    return errorKeys.taxonVernacularNameNotFound
+    return false
 
-  return null
+  return true
 }
-
-const isInteger = value => /^\d+$/.test(value)
-
-const isFloat = value => /^\d+(\.\d+)?$/.test(value)
 
 module.exports = {
   validateNodes
