@@ -1,11 +1,11 @@
 const {groupNames, permissions} = require('../../auth/authGroups')
 const {keys: authGroupKeys} = require('../../auth/authGroups')
 
-const defaultSteps = {
-  '1': {name: 'entry'},
-  '2': {name: 'cleansing', prev: '1'},
-  '3': {name: 'analysis', prev: '2'},
-}
+const defaultSteps = [
+  { id: '1', name: 'entry' },
+  { id: '2', name: 'cleansing' },
+  { id: '3', name: 'analysis' },
+]
 
 const getDefaultAuthGroups = lang => [
   {

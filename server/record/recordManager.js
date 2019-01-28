@@ -8,6 +8,8 @@ const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
 const FileManager = require('../file/fileManager')
 
+const SurveyManager = require('../survey/surveyManager')
+
 const Survey = require('../../common/survey/survey')
 const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
@@ -84,16 +86,20 @@ const persistNode = (user, surveyId, node, fileReq) => {
   RecordUpdateManager.persistNode(user, surveyId, nodeToPersist)
 }
 
-const updateRecordStep = (surveyId, recordUuid, step) => {
-  const record = RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
-  const currentStep = Record.getStep(record)
+const updateRecordStep = async (surveyId, recordUuid, stepId) => {
+  const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById(surveyId))
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
 
-  // check if the user is allowed to set the new step
-  if (Math.abs(step - currentStep) > 1 || step < 0 || R.keys(Survey.defaultSteps).indexOf(step) === -1) {
+  // check if the step exists and that is't adjacent to the current one
+  const currentStepId = Record.getStep(record)
+  const nextStepId = R.prop('id', Survey.getNextStep(currentStepId)(surveyInfo))
+  const previousStepId = R.prop('id', Survey.getPreviousStep(currentStepId)(surveyInfo))
+  
+  if (stepId !== nextStepId && stepId !== previousStepId) {
     throw new Error('Can\'t update step')
   }
 
-  RecordRepository.updateRecordStep(surveyId, recordUuid, step)
+  RecordRepository.updateRecordStep(surveyId, recordUuid, stepId)
 }
 
 /**
