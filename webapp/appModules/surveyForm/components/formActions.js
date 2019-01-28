@@ -7,7 +7,7 @@ import NodeDef from '../../../../common/survey/nodeDef'
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
 import { createNodeDef } from '../../../survey/nodeDefs/actions'
-import { setFormNodeDefUnlocked } from '../actions'
+import { setFormNodeDefAddChildTo } from '../actions'
 
 import * as SurveyFormState from '../surveyFormState'
 
@@ -65,7 +65,7 @@ class FormActions extends React.Component {
   }
 
   render () {
-    const { nodeDef, setFormNodeDefUnlocked } = this.props
+    const { nodeDef, setFormNodeDefAddChildTo } = this.props
 
     return (
       <div className="survey-form__actions">
@@ -73,7 +73,7 @@ class FormActions extends React.Component {
           nodeDef &&
           <React.Fragment>
             <button className="btn btn-s btn-of-light-xs no-border btn-toggle"
-                    onClick={() => setFormNodeDefUnlocked(null)}>
+                    onClick={() => setFormNodeDefAddChildTo(null)}>
               <span className="icon icon-cross icon-16px"/>
             </button>
 
@@ -93,5 +93,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { createNodeDef, setFormNodeDefUnlocked }
+  { createNodeDef, setFormNodeDefAddChildTo }
 )(FormActions)

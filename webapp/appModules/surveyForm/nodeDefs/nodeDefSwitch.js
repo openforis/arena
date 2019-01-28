@@ -15,7 +15,7 @@ import Layout from '../../../../common/survey/nodeDefLayout'
 
 import { getStateSurveyInfo } from '../../../survey/surveyState'
 
-import { setFormNodeDefEdit, setFormNodeDefUnlocked } from '../actions'
+import { setFormNodeDefEdit, setFormNodeDefAddChildTo } from '../actions'
 import { getSurveyForm } from '../surveyFormState'
 
 import { putNodeDefProp, removeNodeDef } from '../../../survey/nodeDefs/actions'
@@ -66,7 +66,7 @@ class NodeDefSwitch extends React.Component {
 
       setFormNodeDefEdit,
       putNodeDefProp,
-      setFormNodeDefUnlocked,
+      setFormNodeDefAddChildTo,
       removeNodeDef,
     } = this.props
 
@@ -105,7 +105,7 @@ class NodeDefSwitch extends React.Component {
             {
               NodeDef.isNodeDefEntity(nodeDef) &&
               <button className="btn-s btn-of-light-xs"
-                      onClick={() => setFormNodeDefUnlocked(nodeDef)}>
+                      onClick={() => setFormNodeDefAddChildTo(nodeDef)}>
                 <span className="icon icon-plus icon-12px"/>
               </button>
             }
@@ -171,7 +171,7 @@ const mapStateToProps = (state, props) => {
 export default connect(
   mapStateToProps,
   {
-    setFormNodeDefEdit, setFormNodeDefUnlocked,
+    setFormNodeDefEdit, setFormNodeDefAddChildTo,
     putNodeDefProp, removeNodeDef,
     updateNode, removeNode, createNodePlaceholder,
   }
