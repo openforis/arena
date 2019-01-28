@@ -17,7 +17,7 @@ $tableRowHeaderHeight: 40px;
     grid-template-columns: 1fr 200px;
 
     &.form-actions-off {
-      grid-template-columns: 1fr 33px;
+      grid-template-columns: 1fr 0px;
 
       .survey-form__actions {
         .btn-toggle {

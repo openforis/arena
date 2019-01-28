@@ -83,7 +83,10 @@ const RecordsTable = ({ user, records, offset, nodeDefKeys, lang }) => {
 class RecordsView extends React.Component {
 
   componentDidMount () {
-    this.props.initRecordsList()
+    const { surveyInfo, initRecordsList } = this.props
+
+    if (Survey.isPublished(surveyInfo))
+      initRecordsList()
   }
 
   render () {
@@ -132,6 +135,7 @@ class RecordsView extends React.Component {
 
 const mapStateToProps = state => {
   const surveyInfo = SurveyState.getStateSurveyInfo(state)
+
   return {
     user: UserState.getUser(state),
     surveyInfo,
