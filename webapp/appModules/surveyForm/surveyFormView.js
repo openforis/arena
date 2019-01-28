@@ -14,7 +14,6 @@ import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 import Survey from '../../../common/survey/survey'
 import * as SurveyState from '../../survey/surveyState'
 import * as SurveyFormState from './surveyFormState'
-import Record from '../../../common/record/record'
 import * as RecordState from './record/recordState'
 
 const SurveyFormView = (props) => {
@@ -27,8 +26,7 @@ const SurveyFormView = (props) => {
     preview,
     canEditDef,
     canEditRecord,
-    recordStep,
-    
+
     recordUuid,
     parentNode,
 
@@ -52,7 +50,7 @@ const SurveyFormView = (props) => {
           <NodeDefEdit/>
         }
 
-        <FormNavigation edit={edit} entry={entry && canEditRecord} preview={preview} history={history} recordStep={recordStep}/>
+        <FormNavigation edit={edit} entry={entry && canEditRecord} preview={preview} history={history}/>
 
         {
           nodeDef
@@ -104,7 +102,6 @@ const mapStateToProps = (state, props) => {
   const mapEntryProps = () => ({
     parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(survey, nodeDef)(surveyForm) : null,
     recordUuid: record ? record.uuid : null,
-    recordStep: Record.getStep(record)
   })
 
   return {

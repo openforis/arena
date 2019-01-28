@@ -1,10 +1,19 @@
+import * as R from 'ramda'
+
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 
+import Survey from '../../../../common/survey/survey'
+import Record from '../../../../common/record/record'
+
 import { deleteRecord, updateRecordStep } from '../record/actions'
 import { appModuleUri } from '../../appModules'
 import { designerModules } from '../../designer/designerModules'
+
+
+import * as RecordState from '../../surveyForm/record/recordState'
+import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
 const RecordEntryButtons = ({ deleteRecord, updateRecordStep, recordStep, history }) => (
   <React.Fragment>
@@ -17,7 +26,7 @@ const RecordEntryButtons = ({ deleteRecord, updateRecordStep, recordStep, histor
       <span className="icon icon-point-left icon-16px"/>
     </button>
 
-    Step 1
+    Step {recordStep} ({R.path([recordStep, 'name'], Survey.defaultSteps)})
 
     <button className="btn-s btn-of btn-transparent"
             style={{ marginLeft: 5 }}
@@ -41,7 +50,7 @@ const RecordEntryButtons = ({ deleteRecord, updateRecordStep, recordStep, histor
   </React.Fragment>
 )
 
-const FormEntryActions = ({ entry, preview, deleteRecord, updateRecordStep, recordStep, history }) =>
+const FormEntryActions = ({ entry, preview, deleteRecord, recordStep, updateRecordStep,history }) =>
   entry &&
   <div className="survey-form__nav-record-actions">
     {
@@ -58,4 +67,13 @@ const FormEntryActions = ({ entry, preview, deleteRecord, updateRecordStep, reco
     }
   </div>
 
-export default connect(null, { deleteRecord, updateRecordStep })(FormEntryActions)
+const mapStateToProps = (state) => {
+  const surveyForm = SurveyFormState.getSurveyForm(state)
+  const record = RecordState.getRecord(surveyForm)
+
+  return {
+    recordStep: Record.getStep(record)
+  }
+}
+
+export default connect(mapStateToProps, { deleteRecord, updateRecordStep })(FormEntryActions)
