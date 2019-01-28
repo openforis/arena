@@ -1,11 +1,15 @@
 import './errorBadge.scss'
 
 import React from 'react'
+import * as R from 'ramda'
+
 import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
 
 const ErrorBadge = ({ validation, showLabel }) => {
 
   const invalid = validation && !validation.valid
+
+  const validationFields = invalid ? getValidationFieldMessagesHTML(validation.fields) : []
 
   return invalid
     ? (
@@ -17,11 +21,13 @@ const ErrorBadge = ({ validation, showLabel }) => {
             <span>INVALID</span>
           }
         </div>
-        <div className="messages">
-          {
-            getValidationFieldMessagesHTML(validation.fields)
-          }
-        </div>
+
+        {
+          !R.isEmpty(validationFields) &&
+          <div className="messages">
+            {validationFields}
+          </div>
+        }
       </div>
     )
     : null

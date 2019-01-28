@@ -15,13 +15,16 @@ const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
 
 const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}, preview, validation`
 
-const dbTransformCallback = (surveyId) => record => {
+const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
   const validation = Record.getValidation(record)
   return R.pipe(
     R.dissoc(Validator.keys.validation),
     camelize,
     R.assoc('surveyId', surveyId),
-    R.assoc(Validator.keys.validation, validation),
+    R.assoc(
+      Validator.keys.validation,
+      includeValidationFields ? validation : { [Validator.keys.valid]: Validator.isValidationValid(validation) },
+    ),
   )(record)
 }
 
@@ -79,7 +82,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
     OFFSET ${offset}
   `,
     [],
-    dbTransformCallback(surveyId)
+    dbTransformCallback(surveyId, false)
   )
 }
 

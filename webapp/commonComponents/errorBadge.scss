@@ -9,10 +9,10 @@
 
   &:hover {
     cursor: pointer;
-    padding-bottom: 1rem;
     z-index: $zIndex6ErrorBadgeHover;
 
     .messages {
+      padding-bottom: 1rem;
       display: block;
     }
   }
