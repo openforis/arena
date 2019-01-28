@@ -57,10 +57,32 @@ const getStatus = surveyInfo =>
 
 const getDefaultStep = R.pipe(
   getProp(keys.steps),
-  R.toPairs,
-  R.find(s => !s[1].prev),
-  R.head
+  R.head,
+  R.prop('id')
 )
+
+const getStepName = step => surveyInfo => {
+  const steps = getProp(keys.steps)(surveyInfo)
+
+  return R.pipe(
+    R.find(s => s.id === step),
+    R.prop(keys.name)
+  )(steps)
+}
+
+const getNextStep = step => surveyInfo => {
+  const steps = getProp(keys.steps)(surveyInfo)
+
+  const stepPosition = R.findIndex(R.propEq(keys.id, step))(steps)
+  return R.nth(stepPosition + 1, steps)
+}
+
+const getPreviousStep = step => surveyInfo => {
+  const steps = getProp(keys.steps)(surveyInfo)
+
+  const stepPosition = R.findIndex(R.propEq(keys.id, step))(steps)
+  return stepPosition > 0 ? R.nth(stepPosition - 1, steps) : null
+}
 
 // ====== UTILS
 
@@ -91,6 +113,9 @@ module.exports = {
   getDefaultLabel,
   getStatus,
   getDefaultStep,
+  getStepName,
+  getNextStep,
+  getPreviousStep,
 
   // ====== AUTH GROUPS
   getAuthGroups,

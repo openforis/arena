@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -11,31 +9,45 @@ import { deleteRecord, updateRecordStep } from '../record/actions'
 import { appModuleUri } from '../../appModules'
 import { designerModules } from '../../designer/designerModules'
 
-
+import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from '../../surveyForm/record/recordState'
 import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
-const RecordEntryButtons = ({ deleteRecord, updateRecordStep, recordStep, history }) => (
+const RecordEntryButtons = ({
+  deleteRecord,
+  updateRecordStep,
+  recordStep,
+  nextStep,
+  previousStep,
+  recordStepName,
+  history
+}) => (
   <React.Fragment>
-    <button className="btn-s btn-of btn-transparent"
-            style={{ marginRight: 5 }}
-            onClick={() =>
-              window.confirm('Are sure you want to demote this record? You won\'t be able to edit it anymore')
-                ? updateRecordStep(+recordStep -1, history)
-                : null}>
-      <span className="icon icon-point-left icon-16px"/>
-    </button>
+    {
+      previousStep &&
+      <button className="btn-s btn-of btn-transparent"
+              style={{ marginRight: 5 }}
+              onClick={() =>
+                window.confirm('Are sure you want to demote this record?')
+                  ? updateRecordStep(previousStep.id, history)
+                  : null}>
+        <span className="icon icon-point-left icon-16px"/>
+      </button>
+    }
 
-    Step {recordStep} ({R.path([recordStep, 'name'], Survey.defaultSteps)})
+    Step {recordStep} ({recordStepName})
 
-    <button className="btn-s btn-of btn-transparent"
-            style={{ marginLeft: 5 }}
-            onClick={() =>
-              window.confirm('Are sure you want to promote this record? You won\'t be able to edit it anymore')
-                ? updateRecordStep(+recordStep + 1, history)
-                : null}>
-      <span className="icon icon-point-right icon-16px"/>
-    </button>
+    {
+      nextStep &&
+      <button className="btn-s btn-of btn-transparent"
+        style={{ marginLeft: 5 }}
+        onClick={() =>
+          window.confirm('Are sure you want to demote this record? You won\'t be able to edit it anymore')
+          ? updateRecordStep(nextStep.id, history)
+          : null}>
+        <span className="icon icon-point-right icon-16px" />
+      </button>
+    }
 
     <button className="btn-s btn-of btn-danger"
             onClick={() =>
@@ -50,7 +62,17 @@ const RecordEntryButtons = ({ deleteRecord, updateRecordStep, recordStep, histor
   </React.Fragment>
 )
 
-const FormEntryActions = ({ entry, preview, deleteRecord, recordStep, updateRecordStep,history }) =>
+const FormEntryActions = ({
+  entry,
+  preview,
+  deleteRecord,
+  recordStep,
+  nextStep,
+  previousStep,
+  recordStepName, 
+  updateRecordStep,
+  history
+}) =>
   entry &&
   <div className="survey-form__nav-record-actions">
     {
@@ -62,17 +84,29 @@ const FormEntryActions = ({ entry, preview, deleteRecord, recordStep, updateReco
           </Link>
         ) :
         (
-          <RecordEntryButtons history={history} deleteRecord={deleteRecord} updateRecordStep={updateRecordStep} recordStep={recordStep}/>
+          <RecordEntryButtons history={history}
+                              deleteRecord={deleteRecord}
+                              updateRecordStep={updateRecordStep}
+                              recordStep={recordStep}
+                              nextStep={nextStep}
+                              previousStep={previousStep}
+                              recordStepName={recordStepName}/>
         )
     }
   </div>
 
 const mapStateToProps = (state) => {
+  const surveyInfo = Survey.getSurveyInfo(SurveyState.getSurvey(state))
   const surveyForm = SurveyFormState.getSurveyForm(state)
   const record = RecordState.getRecord(surveyForm)
 
+  const recordStep = Record.getStep(record)
+
   return {
-    recordStep: Record.getStep(record)
+    recordStep: recordStep,
+    recordStepName: Survey.getStepName(recordStep)(surveyInfo),
+    nextStep: Survey.getNextStep(recordStep)(surveyInfo),
+    previousStep: Survey.getPreviousStep(recordStep)(surveyInfo)
   }
 }
 
