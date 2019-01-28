@@ -3,7 +3,7 @@ import './errorBadge.scss'
 import React from 'react'
 import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
 
-const ErrorBadge = ({validation, showLabel}) => {
+const ErrorBadge = ({ validation, showLabel }) => {
 
   const invalid = validation && !validation.valid
 
@@ -11,7 +11,7 @@ const ErrorBadge = ({validation, showLabel}) => {
     ? (
       <div className="badge error-badge">
         <div className="badge__content">
-          <span className="icon icon-warning icon-12px icon-left"/>
+          <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`}/>
           {
             showLabel &&
             <span>INVALID</span>

@@ -123,7 +123,16 @@ $tableRowHeaderHeight: 40px;
 }
 
 .node-def__invalid {
-  border: 1px solid rgba($red, .8);
+  //border: 1px solid rgba($redDark, .8);
+
+  input {
+    background-color: rgba($red, .15);
+    border-bottom: 1px solid rgba($red, .85);
+
+    &:focus, &:hover {
+      background-color: rgba($red, .2);
+    }
+  }
 }
 
 .node-def__form-actions {

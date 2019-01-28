@@ -48,20 +48,25 @@ class NodeDefSwitch extends React.Component {
     }
   }
 
+  toggleErrorClass () {
+    this.element.current.parentNode.classList.toggle('node-def__invalid')
+  }
+
   componentDidMount () {
-    const { nodeDef, edit } = this.props
+    const { nodeDef, edit, valid } = this.props
 
     if (edit && !nodeDef.id)
       this.element.current.scrollIntoView()
 
     this.checkNodePlaceholder()
+    if (!valid)
+      this.toggleErrorClass()
   }
 
   componentDidUpdate (prevProps) {
     this.checkNodePlaceholder()
-
     if (prevProps.valid !== this.props.valid) {
-      this.element.current.parentNode.classList.toggle('node-def__invalid')
+      this.toggleErrorClass()
     }
   }
 
@@ -79,6 +84,7 @@ class NodeDefSwitch extends React.Component {
       putNodeDefProp,
       setFormNodeDefAddChildTo,
       removeNodeDef,
+      validation,
     } = this.props
 
     const isRoot = NodeDef.isNodeDefRoot(nodeDef)
@@ -90,7 +96,7 @@ class NodeDefSwitch extends React.Component {
 
     return <div className={className} ref={this.element}>
 
-      <ErrorBadge validation={nodeDef.validation}/>
+      <ErrorBadge validation={validation} showLabel={edit}/>
 
       {
         edit && canEditDef && (
@@ -170,16 +176,24 @@ const mapStateToProps = (state, props) => {
     const nodes = NodeDef.isNodeDefRoot(nodeDef)
       ? [Record.getRootNode(record)]
       : parentNode
-        ? Record.getNodeChildrenByDefUuid(parentNode, nodeDef.uuid)(record)
+        ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
         : []
 
-    const validatedNodes = nodes.map(
-      n => Node.assocValidation(Validator.getFieldValidation(Node.getUuid(n))(recordValidation))(n)
+    const validation = NodeDef.isNodeDefSingleAttribute(nodeDef) && !R.isEmpty(nodes)
+      ? Validator.getFieldValidation(Node.getUuid(nodes[0]))(recordValidation)
+      : null //TODO for multiple nodes get validation from parent
+
+    const nodesValidated = nodes.map(
+      n => {
+        const nodeValidation = Validator.getFieldValidation(Node.getUuid(n))(recordValidation)
+        return Node.assocValidation(nodeValidation)(n)
+      }
     )
 
     return {
-      nodes: validatedNodes,
-      valid: R.all(Validator.isValid, validatedNodes)
+      nodes: nodesValidated,
+      validation,
+      valid: Validator.isValidationValid(validation)
     }
   }
 
@@ -188,7 +202,9 @@ const mapStateToProps = (state, props) => {
     applicable: parentNode
       ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
       : true,
-    ...entry ? mapEntryProps() : {},
+    ...entry
+      ? mapEntryProps()
+      : { validation: Validator.getValidation(nodeDef) },
   }
 }
 

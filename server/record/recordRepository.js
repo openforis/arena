@@ -8,16 +8,22 @@ const { getSurveyDBSchema } = require('../../server/survey/surveySchemaRepositor
 
 const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
+const Validator = require('../../common/validation/validator')
 
 const NodeDefTable = require('../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
 
 const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}, preview, validation`
 
-const dbTransformCallback = (surveyId) => R.pipe(
-  camelize,
-  R.assoc('surveyId', surveyId)
-)
+const dbTransformCallback = (surveyId) => record => {
+  const validation = Record.getValidation(record)
+  return R.pipe(
+    R.dissoc(Validator.keys.validation),
+    camelize,
+    R.assoc('surveyId', surveyId),
+    R.assoc(Validator.keys.validation, validation),
+  )(record)
+}
 
 // ============== CREATE
 
@@ -47,7 +53,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
 
   return await client.map(`
     SELECT 
-      r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')},
+      r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')}, validation,
       n.date_modified,
       u.name as owner_name,
       ${nodeDefKeysSelect}

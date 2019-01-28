@@ -41,7 +41,7 @@ class RecordUpdateThread extends Thread {
       // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
       let dependencyGraph = this.preview
         ? surveyDependencyGraph.buildGraph(surveyDb)
-        : await SurveyManager.fetchDepedencies(this.surveyId)
+        : await SurveyManager.fetchDependencies(this.surveyId)
 
       this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
     }

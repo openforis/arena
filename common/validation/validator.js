@@ -116,10 +116,13 @@ const validatePositiveNumber = (propName, item) => {
 }
 
 //==== getters
-
 const getValidation = R.propOr(validValidation, keys.validation)
 
-const isValid = R.pipe(getValidation, R.propEq(keys.valid, true))
+//TODO rename to isValid
+const isValidationValid = R.pipe(R.defaultTo(validValidation), R.propEq(keys.valid, true))
+
+//TODO rename to isObjValid
+const isValid = R.pipe(getValidation, isValidationValid)
 
 const getFieldValidations = R.propOr({}, keys.fields)
 
@@ -157,6 +160,7 @@ const mergeValidation = validation =>
   )(obj)
 
 module.exports = {
+  keys,
   errorKeys,
 
   validate,
@@ -168,6 +172,7 @@ module.exports = {
 
   // READ
   getValidation,
+  isValidationValid,
   isValid,
   getFieldValidation,
   getFieldValidations,

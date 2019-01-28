@@ -59,7 +59,7 @@ const getSurveyById = async (surveyId, draft = false, client = db) =>
     def => dbTransformCallback(def, draft)
   )
 
-const fetchDepedencies = async (surveyId, client = db) =>
+const fetchDependencies = async (surveyId, client = db) =>
   await client.oneOrNone(
     `SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1`,
     [surveyId],
@@ -135,7 +135,7 @@ module.exports = {
   fetchSurveys,
   getSurveysByName,
   getSurveyById,
-  fetchDepedencies,
+  fetchDependencies,
 
   //UPDATE
   updateSurveyProp,
