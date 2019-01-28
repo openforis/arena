@@ -96,11 +96,11 @@ const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyForm = SurveyFormState.getSurveyForm(state)
-  const nodeDef = SurveyFormState.getFormActivePageNodeDef(survey)(surveyForm)
+  const nodeDef = SurveyFormState.getFormActivePageNodeDef(state)
   const record = RecordState.getRecord(surveyForm)
 
   const mapEntryProps = () => ({
-    parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(survey, nodeDef)(surveyForm) : null,
+    parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,
     recordUuid: record ? record.uuid : null,
   })
 

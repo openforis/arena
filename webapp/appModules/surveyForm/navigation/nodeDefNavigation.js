@@ -9,8 +9,8 @@ import { uuidv4 } from '../../../../common/uuid'
 
 import { filterOuterPageChildren, nodeDefLayoutProps, nodeDefRenderType } from '../../../../common/survey/nodeDefLayout'
 
-import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
-import { getFormPageParentNode, getSurveyForm, isNodeDefFormActivePage } from '../surveyFormState'
+import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyFormState from '../surveyFormState'
 
 import { setFormActivePage } from '../actions'
 import { createNodeDef } from '../../../survey/nodeDefs/actions'
@@ -73,20 +73,20 @@ const NavigationButton = (props) => {
 }
 
 const mapStateToProps = (state, props) => {
-  const survey = getSurvey(state)
-  const surveyInfo = getStateSurveyInfo(state)
+  const survey = SurveyState.getSurvey(state)
+  const surveyInfo = SurveyState.getStateSurveyInfo(state)
   const rootNodeDef = Survey.getRootNodeDef(survey)
-  const surveyForm = getSurveyForm(state)
 
   const { edit, nodeDef = rootNodeDef } = props
-  const parentNode = getFormPageParentNode(survey, nodeDef)(surveyForm)
+
+  const parentNode = SurveyFormState.getFormPageParentNode(nodeDef)(state)
 
   return {
     nodeDef,
     childDefs: Survey.getNodeDefChildren(nodeDef)(survey),
     label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
 
-    active: isNodeDefFormActivePage(survey, nodeDef)(surveyForm),
+    active: SurveyFormState.isNodeDefFormActivePage(nodeDef)(state),
     enabled: edit || NodeDef.isNodeDefRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
   }
 }

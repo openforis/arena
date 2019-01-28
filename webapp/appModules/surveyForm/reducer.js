@@ -23,7 +23,7 @@ import {
   assocFormActivePage,
   assocFormNodeDefEdit,
   assocFormPageNode,
-  assocNodeDefFormUnlocked,
+  assocNodeDefAddChildTo,
   assocParamsOnNodeDefCreate,
 } from './surveyFormState'
 
@@ -39,7 +39,7 @@ const actionHandlers = {
   // form actions
   [formNodeDefEditUpdate]: (state, { nodeDef }) => assocFormNodeDefEdit(nodeDef)(state),
 
-  [formNodeDefUnlockedUpdate]: (state, { nodeDef }) => assocNodeDefFormUnlocked(nodeDef)(state),
+  [formNodeDefUnlockedUpdate]: (state, { nodeDef }) => assocNodeDefAddChildTo(nodeDef)(state),
 
   [formActivePageNodeDefUpdate]: (state, { nodeDef }) => assocFormActivePage(nodeDef)(state),
 

@@ -6,11 +6,10 @@ import NodeDef from '../../../../common/survey/nodeDef'
 
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
-import { getSurvey } from '../../../survey/surveyState'
-
 import { createNodeDef } from '../../../survey/nodeDefs/actions'
-import { getNodeDefFormUnlocked, getSurveyForm } from '../surveyFormState'
 import { setFormNodeDefUnlocked } from '../actions'
+
+import * as SurveyFormState from '../surveyFormState'
 
 const AddNodeDefButtons = ({ addNodeDef }) => (
   <React.Fragment>
@@ -88,15 +87,11 @@ class FormActions extends React.Component {
 
 }
 
-const mapStateToProps = state => {
-  const survey = getSurvey(state)
-  const surveyForm = getSurveyForm(state)
+const mapStateToProps = state => ({
+  nodeDef: SurveyFormState.getNodeDefAddChildTo(state)
+})
 
-  const nodeDef = getNodeDefFormUnlocked(survey)(surveyForm)
-
-  return {
-    nodeDef
-  }
-}
-
-export default connect(mapStateToProps, { createNodeDef, setFormNodeDefUnlocked })(FormActions)
+export default connect(
+  mapStateToProps,
+  { createNodeDef, setFormNodeDefUnlocked }
+)(FormActions)
