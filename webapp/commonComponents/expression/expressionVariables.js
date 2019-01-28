@@ -32,10 +32,10 @@ const getSqlVariables = (nodeDef, lang) => {
 
     value: col,
 
-    label: NodeDef.getNodeDefLabel(nodeDef, lang)
-      + (colNames.length === 1
-          ? '' : ' - ' + NodeDefTable.extractColName(nodeDef, col)
-      ),
+    label: NodeDef.getNodeDefLabel(nodeDef, lang) + (
+      colNames.length === 1
+        ? '' : ' - ' + NodeDefTable.extractColName(nodeDef, col)
+    ),
 
     type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
       NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
@@ -52,7 +52,7 @@ const getChildDefVariables = (survey, nodeDef, mode, depth) => {
   return R.pipe(
     Survey.getNodeDefChildren(nodeDef),
     R.map(childDef => {
-        if (NodeDef.isNodeDefEntity(childDef))
+        if (NodeDef.isNodeDefEntity(childDef) || NodeDef.isNodeDefCoordinate(childDef) || NodeDef.isNodeDefFile(childDef))
           return null
         else if (mode === Expression.modes.sql)
           return getSqlVariables(childDef, lang)

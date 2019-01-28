@@ -1,10 +1,10 @@
 const R = require('ramda')
-const {uuidv4} = require('../uuid')
+const { uuidv4 } = require('../uuid')
 
 const SurveyUtils = require('./surveyUtils')
 const NodeDefValidations = require('./nodeDefValidations')
 
-const {isBlank} = require('../stringUtils')
+const { isBlank } = require('../stringUtils')
 
 // ======== NODE DEF PROPERTIES
 
@@ -79,9 +79,10 @@ const isNodeDefSingle = R.pipe(isNodeDefMultiple, R.not)
 const isNodeDefType = type => R.pipe(getType, R.equals(type))
 
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
-const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
-const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefSingle(nodeDef)
+const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
+
+const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
 const isNodeDefSingleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefSingle(nodeDef)
 const isNodeDefMultipleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefMultiple(nodeDef)
 
@@ -89,6 +90,8 @@ const isNodeDefInteger = isNodeDefType(nodeDefType.integer)
 const isNodeDefDecimal = isNodeDefType(nodeDefType.decimal)
 const isNodeDefCode = isNodeDefType(nodeDefType.code)
 const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
+const isNodeDefCoordinate = isNodeDefType(nodeDefType.coordinate)
+const isNodeDefFile = isNodeDefType(nodeDefType.file)
 
 const isNodeDefPublished = R.propEq(propKeys.published, true)
 
@@ -189,6 +192,8 @@ module.exports = {
   isNodeDefDecimal,
   isNodeDefCode,
   isNodeDefTaxon,
+  isNodeDefCoordinate,
+  isNodeDefFile,
 
   isNodeDefPublished,
 
