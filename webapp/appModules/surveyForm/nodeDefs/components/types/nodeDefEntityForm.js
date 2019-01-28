@@ -58,7 +58,7 @@ const EntityForm = props => {
                               rowHeight={edit ? 80 : 50}
                               cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
                               layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
-                              containerPadding={edit ? [40, 30] : [30, 30]}
+                              containerPadding={edit ? [80, 30] : [30, 30]}
                               onLayoutChange={onLayoutChange}
                               isDraggable={edit && !locked}
                               isResizable={edit && !locked}
@@ -205,8 +205,7 @@ class NodeDefEntityForm extends React.Component {
 const mapStateToProps = (state, props) => {
   const { nodeDef, nodes } = props
 
-  const surveyForm = SurveyFormState.getSurveyForm(state)
-  const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(surveyForm)
+  const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
   const selectedNode = selectedNodeUuid && nodes
     ? R.find(R.propEq('uuid', selectedNodeUuid), nodes)
     : null
