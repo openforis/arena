@@ -15,7 +15,7 @@ const getJsVariables = (nodeDef, lang, depth) => {
     : ''
 
   return [{
-    value: `this${parentFnCalls}.node('${nodeDefName}').value()`,
+    value: `this${parentFnCalls}.node('${nodeDefName}').getValue()`,
 
     label: NodeDef.getNodeDefLabel(nodeDef, lang) + ' - Value',
 

@@ -147,7 +147,7 @@ const validateNodes = async (survey, recordUuid, nodes, tx) => {
                 [Node.keys.value]: [
                   validateRequired(survey, nodeDef),
                   validateValueType(survey, nodeDef),
-                  validateNodeValidations(survey, nodeDef)
+                  validateNodeValidations(survey, nodeDef, tx)
                 ]
               })
             }
