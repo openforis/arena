@@ -92,6 +92,15 @@ const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
     dbTransformCallback(surveyId)
   )
 
+const fetchRecordUuids = async (surveyId, client = db) => await client.map(
+  `SELECT uuid 
+  FROM ${getSurveyDBSchema(surveyId)}.record 
+  WHERE preview = FALSE
+  `,
+  [],
+  R.prop('uuid')
+)
+
 // ============== UPDATE
 const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
   await client.one(
@@ -119,6 +128,7 @@ module.exports = {
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchRecordByUuid,
+  fetchRecordUuids,
 
   // UPDATE
   updateValidation,

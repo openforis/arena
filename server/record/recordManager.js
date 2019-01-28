@@ -148,6 +148,8 @@ module.exports = {
   fetchRecordAndNodesByUuid,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
+  fetchRecordUuids: RecordRepository.fetchRecordUuids,
+
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
   fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,
 
