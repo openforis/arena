@@ -92,26 +92,40 @@ const fetchDescendantNodesByCodeUuid = async (surveyId, recordUuid, parentCodeNo
 
 const fetchSelfOrDescendantNodes = async (surveyId, nodeDefUuid, recordUuid, parentNodeUuid, client = db) =>
   await client.map(`
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node n
-    WHERE n.record_uuid = $1
-      AND n.node_def_uuid = $2
-      AND (n.uuid = $3 OR n.meta @> '{"h": ["${parentNodeUuid}"]}')`,
+    SELECT * 
+    FROM ${getSurveyDBSchema(surveyId)}.node
+    WHERE record_uuid = $1
+      AND node_def_uuid = $2
+      AND (uuid = $3 OR meta @> '{"h": ["${parentNodeUuid}"]}')`,
     [recordUuid, nodeDefUuid, parentNodeUuid],
     dbTransformCallback
   )
 
 const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
   const nodes = await client.map(`
-    SELECT * FROM  ${getSurveyDBSchema(surveyId)}.node n
-    WHERE n.record_uuid = $1
-      AND n.parent_uuid = $2
-      AND n.node_def_uuid = $3`,
+    SELECT * 
+    FROM ${getSurveyDBSchema(surveyId)}.node
+    WHERE record_uuid = $1
+      AND parent_uuid = $2
+      AND node_def_uuid = $3`,
     [recordUuid, nodeUuid, childDefUUid],
     dbTransformCallback
   )
 
   return R.head(nodes)
 }
+
+const countChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
+  await client.one(`
+    SELECT COUNT(*) as cnt
+    FROM ${getSurveyDBSchema(surveyId)}.node
+    WHERE record_uuid = $1
+      AND parent_uuid = $2
+      AND node_def_uuid = $3`,
+    [recordUuid, nodeUuid, childDefUUid],
+    obj => R.pipe(R.prop('cnt'), Number)(obj)
+  )
+
 
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
@@ -177,6 +191,7 @@ module.exports = {
   fetchDescendantNodesByCodeUuid,
   fetchSelfOrDescendantNodes,
   fetchChildNodeByNodeDefUuid,
+  countChildNodesByNodeDefUuid,
 
   //UPDATE
   updateNode,

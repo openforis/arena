@@ -21,7 +21,7 @@ const integerMask = createNumberMask({
 })
 
 const ValidationsProps = props => {
-  const {nodeDef, nodeDefParent, readOnly, putNodeDefProp} = props
+  const { nodeDef, nodeDefParent, readOnly, putNodeDefProp } = props
 
   const validation = NodeDef.getNodeDefValidation(nodeDef)
   const nodeDefParentUuid = NodeDef.getUuid(nodeDefParent)
@@ -63,7 +63,8 @@ const ValidationsProps = props => {
               </FormItem>
             </React.Fragment>
           )
-          : (
+          : !NodeDef.isNodeDefKey(nodeDef)
+          ? (
             <FormItem label={'required'}>
               <Checkbox checked={NodeDefValidations.isRequired(nodeDefValidations)}
                         disabled={readOnly}
@@ -72,6 +73,7 @@ const ValidationsProps = props => {
                         )}/>
             </FormItem>
           )
+          : null
       }
 
       <ExpressionsProp label="Expressions"
