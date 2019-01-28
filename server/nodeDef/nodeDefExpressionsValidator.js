@@ -10,7 +10,8 @@ const Expression = require('../../common/exprParser/expression')
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
   value: 1, //simulates node value
-  getValue: () => 1, //simulates node value
+  //simulates node value
+  getValue: () => NodeDef.isNodeDefCode(nodeDef) || NodeDef.isNodeDefTaxon(nodeDef) ? { code: '' } : 1,
   parent: () => {
     const def = Survey.getNodeDefParent(nodeDef)(survey)
     if (!def) throw new Error('Unable to find parent of ' + NodeDef.getNodeDefName(nodeDef))

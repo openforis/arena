@@ -1,12 +1,16 @@
 const R = require('ramda')
 
+const StringUtils = require('../../common/stringUtils')
+
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
 const NodeDefExpression = require('../../common/survey/nodeDefExpression')
 const Node = require('../../common/record/node')
 const Expression = require('../../common/exprParser/expression')
+
 const NodeRepository = require('./nodeRepository')
-const StringUtils = require('../../common/stringUtils')
+const CategoryManager = require('../category/categoryManager')
+const TaxonomyManager = require('../taxonomy/taxonomyManager')
 
 const evalNodeQuery = async (survey, node, query, client, bindNodeFn = bindNode) => {
   const ctx = {
@@ -50,9 +54,21 @@ const bindNode = (survey, node, tx) => {
         return null
       }
 
-      const value = Node.getNodeValue(node)
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      const surveyId = Survey.getId(survey)
+
+      if (NodeDef.isNodeDefCode(nodeDef)) {
+        const itemUuid = Node.getCategoryItemUuid(node)
+        return itemUuid ? await CategoryManager.fetchItemByUuid(surveyId, itemUuid) : {}
+      }
+
+      if (NodeDef.isNodeDefTaxon(nodeDef)) {
+        const taxonUuid = Node.getNodeTaxonUuid(node)
+        return taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid) : {}
+      }
+
+      const value = Node.getNodeValue(node)
 
       return NodeDef.isNodeDefDecimal(nodeDef) || NodeDef.isNodeDefInteger(nodeDef)
         ? Number(value)

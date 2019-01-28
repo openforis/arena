@@ -14,10 +14,14 @@ const getJsVariables = (nodeDef, lang, depth) => {
     ? '.' + R.repeat('parent()', depth).join('.')
     : ''
 
-  return [{
-    value: `this${parentFnCalls}.node('${nodeDefName}').getValue()`,
+  const valueProp = NodeDef.isNodeDefCode(nodeDef) || NodeDef.isNodeDefTaxon(nodeDef)
+    ? '.code'
+    : ''
 
-    label: NodeDef.getNodeDefLabel(nodeDef, lang) + ' - Value',
+  return [{
+    value: `this${parentFnCalls}.node('${nodeDefName}').getValue()${valueProp}`,
+
+    label: `${NodeDef.getNodeDefLabel(nodeDef, lang)}.getValue()${valueProp}`,
 
     type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
       NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
