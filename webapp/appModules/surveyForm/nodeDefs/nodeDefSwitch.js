@@ -9,6 +9,7 @@ import ErrorBadge from '../../../commonComponents/errorBadge'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
+import Validator from '../../../../common/validation/validator'
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
 import Layout from '../../../../common/survey/nodeDefLayout'
@@ -26,6 +27,12 @@ import { createNodePlaceholder, updateNode, removeNode } from '../record/actions
 
 class NodeDefSwitch extends React.Component {
 
+  constructor (props) {
+    super(props)
+
+    this.element = React.createRef()
+  }
+
   checkNodePlaceholder () {
     const { entry, nodes, nodeDef, parentNode, createNodePlaceholder } = this.props
 
@@ -41,17 +48,26 @@ class NodeDefSwitch extends React.Component {
     }
   }
 
-  componentDidMount () {
-    const { nodeDef, edit } = this.props
-
-    if (edit && !nodeDef.id)
-      this.refs.nodeDefElem.scrollIntoView()
-
-    this.checkNodePlaceholder()
+  toggleErrorClass () {
+    this.element.current.parentNode.classList.toggle('node-def__invalid')
   }
 
-  componentDidUpdate () {
+  componentDidMount () {
+    const { nodeDef, edit, valid } = this.props
+
+    if (edit && !nodeDef.id)
+      this.element.current.scrollIntoView()
+
     this.checkNodePlaceholder()
+    if (!valid)
+      this.toggleErrorClass()
+  }
+
+  componentDidUpdate (prevProps) {
+    this.checkNodePlaceholder()
+    if (prevProps.valid !== this.props.valid) {
+      this.toggleErrorClass()
+    }
   }
 
   render () {
@@ -68,18 +84,19 @@ class NodeDefSwitch extends React.Component {
       putNodeDefProp,
       setFormNodeDefAddChildTo,
       removeNodeDef,
+      validation,
     } = this.props
 
     const isRoot = NodeDef.isNodeDefRoot(nodeDef)
     const isPage = !!Layout.getPageUuid(nodeDef)
 
-    let className = 'node-def__form'
-    className += isPage ? '_page' : ''
-    className += applicable ? '' : ' node-def__not-applicable'
+    const className = 'node-def__form'
+      + (isPage ? '_page' : '')
+      + (applicable ? '' : ' node-def__not-applicable')
 
-    return <div className={className} ref="nodeDefElem">
+    return <div className={className} ref={this.element}>
 
-      <ErrorBadge validation={nodeDef.validation}/>
+      <ErrorBadge validation={validation} showLabel={edit}/>
 
       {
         edit && canEditDef && (
@@ -144,27 +161,50 @@ class NodeDefSwitch extends React.Component {
 NodeDefSwitch.defaultProps = {
   // specified when can edit node definition
   canEditDef: false,
+
+  valid: true
 }
 
 const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, entry } = props
   const surveyInfo = getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
+  const record = getRecord(surveyForm)
+  const recordValidation = Record.getValidation(record)
 
-  const mapEntryProps = () => ({
-    nodes: NodeDef.isNodeDefRoot(nodeDef)
-      ? [Record.getRootNode(getRecord(surveyForm))]
+  const mapEntryProps = () => {
+    const nodes = NodeDef.isNodeDefRoot(nodeDef)
+      ? [Record.getRootNode(record)]
       : parentNode
-        ? Record.getNodeChildrenByDefUuid(parentNode, nodeDef.uuid)(getRecord(surveyForm))
-        : [],
-  })
+        ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
+        : []
+
+    const validation = NodeDef.isNodeDefSingleAttribute(nodeDef) && !R.isEmpty(nodes)
+      ? Validator.getFieldValidation(Node.getUuid(nodes[0]))(recordValidation)
+      : null //TODO for multiple nodes get validation from parent
+
+    const nodesValidated = nodes.map(
+      n => {
+        const nodeValidation = Validator.getFieldValidation(Node.getUuid(n))(recordValidation)
+        return Node.assocValidation(nodeValidation)(n)
+      }
+    )
+
+    return {
+      nodes: nodesValidated,
+      validation,
+      valid: Validator.isValidationValid(validation)
+    }
+  }
 
   return {
     label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
     applicable: parentNode
       ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
       : true,
-    ...entry ? mapEntryProps() : {},
+    ...entry
+      ? mapEntryProps()
+      : { validation: Validator.getValidation(nodeDef) },
   }
 }
 

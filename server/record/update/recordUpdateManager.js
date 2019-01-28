@@ -1,7 +1,7 @@
+const R = require('ramda')
 const path = require('path')
 
 const WebSocketManager = require('../../webSocket/webSocketManager')
-const WebSocketEvents = require('../../../common/webSocket/webSocketEvents')
 
 const ThreadsCache = require('../../threads/threadsCache')
 const ThreadManager = require('../../threads/threadManager')
@@ -15,12 +15,12 @@ const Record = require('../../../common/record/record')
 
 const RecordUpdateThread = require('./thread/recordUpdateThread')
 
-const createRecordUpdateThread = (user, surveyId, preview) => {
+const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
   const userId = user.id
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
-    {user, surveyId, preview},
-    nodes => WebSocketManager.notifyUser(userId, WebSocketEvents.nodesUpdate, nodes),
+    {user, surveyId, recordUuid, preview},
+    msg => WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg)),
     () => recordUpdateThreads.removeThread(userId)
   )
 
@@ -32,10 +32,10 @@ const createRecordUpdateThread = (user, surveyId, preview) => {
 /**
  * Start record update thread
  */
-const checkIn = (user, surveyId, preview) => {
+const checkIn = (user, surveyId, recordUuid, preview) => {
   cancelCheckOut(user.id)
   if (!recordUpdateThreads.getThread(user.id)) {
-    createRecordUpdateThread(user, surveyId, preview)
+    createRecordUpdateThread(user, surveyId, recordUuid, preview)
   }
 }
 
@@ -72,7 +72,12 @@ const cancelCheckOut = userId => {
  * @returns {Promise<void>}
  */
 const createRecord = async (user, surveyId, record) => {
-  const recordUpdateThread = RecordUpdateThread.newInstance({user, surveyId, preview: Record.isPreview(record)})
+  const recordUpdateThread = RecordUpdateThread.newInstance({
+    user,
+    surveyId,
+    recordUuid: Record.getUuid(record),
+    preview: Record.isPreview(record)
+  })
   await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, record})
 }
 

@@ -122,6 +122,19 @@ $tableRowHeaderHeight: 40px;
   opacity: .6;
 }
 
+.node-def__invalid {
+  //border: 1px solid rgba($redDark, .8);
+
+  input {
+    background-color: rgba($red, .15);
+    border-bottom: 1px solid rgba($red, .85);
+
+    &:focus, &:hover {
+      background-color: rgba($red, .2);
+    }
+  }
+}
+
 .node-def__form-actions {
   position: absolute;
   right: 1rem;

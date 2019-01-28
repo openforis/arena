@@ -7,6 +7,7 @@ const keys = {
   placeholder: 'placeholder',
   expression: 'expression',
   applyIf: 'applyIf',
+  messages: 'messages',
 }
 
 // ====== CREATE
@@ -24,6 +25,8 @@ const getExpression = R.prop(keys.expression)
 
 const getApplyIf = R.prop(keys.applyIf)
 
+const getMessages = R.prop(keys.messages)
+
 const isPlaceholder = R.propEq(keys.placeholder, true)
 
 const isEmpty = (expression = {}) => isBlank(getExpression(expression)) && isBlank(getApplyIf(expression))
@@ -35,6 +38,13 @@ const assocProp = (propName, value) => R.pipe(
   R.dissoc(keys.placeholder),
 )
 
+const assocMessage = message =>
+  nodeDefExpression => {
+    const messagesOld = getMessages(nodeDefExpression)
+    const messagesNew = R.assoc(message.lang, message.label, messagesOld)
+    return assocProp(keys.messages, messagesNew)(nodeDefExpression)
+  }
+
 // ====== UTILS
 
 const extractNodeDefNames = (jsExpr = '') => {
@@ -42,7 +52,7 @@ const extractNodeDefNames = (jsExpr = '') => {
     return []
 
   const names = []
-  const regex = /(node|sibling)\('(\w+)'\)/g
+  const regex = /(node|sibling)\(['"](\w+)['"]\)/g
 
   let matches
   while (matches = regex.exec(jsExpr)) {
@@ -72,12 +82,18 @@ module.exports = {
   //READ
   getExpression,
   getApplyIf,
+  getMessages,
+  getMessage: (lang, defaultValue = "") => R.pipe(
+    getMessages,
+    R.propOr(defaultValue, lang)
+  ),
   isEmpty,
   isPlaceholder,
 
   //UPDATE
   assocExpression: expression => assocProp(keys.expression, expression),
   assocApplyIf: applyIf => assocProp(keys.applyIf, applyIf),
+  assocMessage,
 
   //UTILS
   findReferencedNodeDefs

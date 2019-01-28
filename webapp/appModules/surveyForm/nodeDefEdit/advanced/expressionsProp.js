@@ -9,8 +9,9 @@ import Validator from '../../../../../common/validation/validator'
 
 import { FormItem } from '../../../../commonComponents/form/input'
 import ExpressionComponent from '../../../../commonComponents/expression/expression'
+import LabelsEditor from '../../../../survey/components/labelsEditor'
 
-const ExpressionProp = ({ nodeDefUuid, expression, applyIf, onUpdate, onDelete, readOnly, isContextParent, canBeConstant }) => (
+const ExpressionProp = ({ nodeDefUuid, expression, applyIf, showLabels, readOnly, isContextParent, canBeConstant, onUpdate, onDelete }) => (
   <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
     {
@@ -47,6 +48,16 @@ const ExpressionProp = ({ nodeDefUuid, expression, applyIf, onUpdate, onDelete, 
                              isContextParent={isContextParent}
                              canBeConstant={canBeConstant}/>
       </div>
+    }
+
+    {
+      showLabels &&
+      <LabelsEditor formLabel="Error message(s)"
+                    labels={NodeDefExpression.getMessages(expression)}
+                    onChange={labelItem =>
+                      onUpdate(NodeDefExpression.assocMessage(labelItem)(expression))
+                    }
+      />
     }
 
   </div>
@@ -107,7 +118,7 @@ export class ExpressionsProp extends React.Component {
   }
 
   render () {
-    const { nodeDefUuid, label, readOnly, applyIf, validation, isContextParent, canBeConstant } = this.props
+    const { nodeDefUuid, label, readOnly, applyIf, showLabels, validation, isContextParent, canBeConstant } = this.props
     const { uiValues } = this.state
 
     return (
@@ -118,6 +129,7 @@ export class ExpressionsProp extends React.Component {
               <ExpressionProp key={i}
                               expression={value}
                               applyIf={applyIf}
+                              showLabels={showLabels}
                               validation={Validator.getFieldValidation(i)(validation)}
                               onDelete={this.handleDelete.bind(this)}
                               onUpdate={this.handleUpdate.bind(this)}
@@ -137,6 +149,7 @@ export class ExpressionsProp extends React.Component {
 ExpressionsProp.defaultProps = {
   label: '',
   applyIf: true,
+  showLabels: false,
   multiple: true,
   readOnly: false,
   nodeDefUuid: null,
@@ -151,7 +164,7 @@ ExpressionsProp.defaultProps = {
 
 export const NodeDefExpressionsProp = props => {
   const {
-    nodeDef, nodeDefUuid, propName, validation, label, multiple, applyIf, readOnly, putNodeDefProp,
+    nodeDef, nodeDefUuid, propName, validation, label, multiple, applyIf, showLabels, readOnly, putNodeDefProp,
     isContextParent, canBeConstant
   } = props
 
@@ -171,6 +184,7 @@ export const NodeDefExpressionsProp = props => {
                           applyIf={applyIf}
                           multiple={multiple}
                           values={values}
+                          showLabels={showLabels}
                           validation={validation}
                           onChange={onExpressionsUpdate}
                           nodeDefUuid={nodeDefUuid}
@@ -186,6 +200,7 @@ NodeDefExpressionsProp.defaultProps = {
   label: '',
 
   applyIf: true,
+  showLabels: false,
   multiple: true,
   readOnly: false,
 

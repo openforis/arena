@@ -4,7 +4,6 @@ const Promise = require('bluebird')
 const StringUtils = require('../../../../../common/stringUtils')
 const Queue = require('../../../../../common/queue')
 
-const Survey = require('../../../../../common/survey/survey')
 const SurveyUtils = require('../../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
@@ -12,7 +11,7 @@ const Node = require('../../../../../common/record/node')
 
 const {dependencyTypes} = require('../../../../survey/surveyDependenchyGraph')
 
-const NodeDependencyManager = require('./nodeDependencyManager')
+const NodeDependencyManager = require('../nodeDependencyManager')
 
 const RecordExprParser = require('../../../recordExprParser')
 
@@ -20,7 +19,7 @@ const RecordExprParser = require('../../../recordExprParser')
  * Module responsible for updating applicable, calculated and default values
  */
 
-const updateNodes = async (user, survey, nodes, tx) => {
+const updateNodes = async (survey, nodes, tx) => {
   let allUpdatedNodes = R.values(nodes)
 
   const nodesToVisit = new Queue(R.values(nodes))
@@ -34,7 +33,7 @@ const updateNodes = async (user, survey, nodes, tx) => {
     if (!R.includes(nodeUuid, visitedNodeUuids)) {
 
       // update node
-      const lastUpdatedNodes = await updateNode(user, survey, node, tx)
+      const lastUpdatedNodes = await updateNode(survey, node, tx)
 
       // mark updated nodes to visit
       const nodesUpdatedArray = R.values(lastUpdatedNodes)
@@ -60,7 +59,7 @@ const updateNodes = async (user, survey, nodes, tx) => {
   return SurveyUtils.toUuidIndexedObj(allUpdatedNodes)
 }
 
-const updateNode = async (user, survey, node, tx) => {
+const updateNode = async (survey, node, tx) => {
 
   const nodesApplicability = await updateNodeExpr(survey, node, NodeDef.getApplicable, dependencyTypes.applicable, tx)
   const nodesCalculatedValues = await updateNodeExpr(survey, node, NodeDef.getCalculatedValues, dependencyTypes.calculatedValues, tx)
@@ -110,11 +109,11 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
         return {}
 
       //3. get expression
-      const expr = await getApplicableExpression(survey, nodeCtx, expressions, tx)
+      const expr = await RecordExprParser.getApplicableExpression(survey, nodeCtx, expressions, tx)
 
       //4. eval expr
       const value = expr
-        ? await RecordExprParser.evalNodeQuery(survey, nodeCtx, expr, tx)
+        ? await RecordExprParser.evalNodeQuery(survey, nodeCtx, NodeDefExpression.getExpression(expr), tx)
         : null
 
       //5. persist updated node value, and return updated node
@@ -125,22 +124,6 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
   )
 
   return R.mergeAll(nodesUpdated)
-}
-
-const getApplicableExpression = async (survey, nodeCtx, expressions, tx) => {
-  for (const expression of expressions) {
-    const applyIfExpr = NodeDefExpression.getApplyIf(expression)
-
-    if (StringUtils.isBlank(applyIfExpr) || await RecordExprParser.evalNodeQuery(survey, nodeCtx, applyIfExpr, tx))
-      return NodeDefExpression.getExpression(expression)
-  }
-
-  return null
-}
-
-const getNodeDef = (survey, node) => {
-  const nodeDefUuid = Node.getNodeDefUuid(node)
-  return Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 }
 
 module.exports = {

@@ -1,9 +1,9 @@
 const R = require('ramda')
-const {uuidv4} = require('../uuid')
+const { uuidv4 } = require('../uuid')
 
-const {getProp, toIndexedObj} = require('./surveyUtils')
+const { getProp, toIndexedObj } = require('./surveyUtils')
 
-const {getValidation, getFieldValidation} = require('../validation/validator')
+const { getValidation, getFieldValidation } = require('../validation/validator')
 
 const keys = {
   uuid: 'uuid',
@@ -84,6 +84,7 @@ const newLevel = (category) => {
   }
 }
 // ====== READ
+const getLevelIndex = R.prop(levelKeys.index)
 
 /**
  * ITEM
@@ -111,12 +112,16 @@ const getItemLabel = language =>
       R.defaultTo(getItemCode(item))
     )(item)
 
-const isItemLeaf = item =>
+const getItemLevelIndex = item =>
   category => R.pipe(
     R.prop(itemKeys.levelUuid),
     levelUuid => getLevelByUuid(levelUuid)(category),
-    level => getLevelsArray(category).length === level.index + 1
+    getLevelIndex,
   )(item)
+
+const isItemLeaf = item =>
+  category =>
+    getItemLevelIndex(item)(category) === getLevelsArray(category).length - 1
 
 const getItemValidation = item => R.pipe(
   getValidation,
@@ -156,7 +161,7 @@ module.exports = {
 
   //READ
   getLevelName: getProp(levelProps.name),
-  getLevelIndex: R.prop(levelKeys.index),
+  getLevelIndex,
   getLevelValidation: levelIndex => R.pipe(
     getValidation,
     getFieldValidation(keys.levels),
@@ -173,6 +178,7 @@ module.exports = {
   getItemLabels,
   getItemLabel,
   getItemValidation,
+  getItemLevelIndex,
   isItemLeaf,
 
   //UTILS

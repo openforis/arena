@@ -4,6 +4,7 @@ const {uuidv4} = require('./../uuid')
 const Survey = require('../survey/survey')
 const SurveyUtils = require('../survey/surveyUtils')
 const NodeDef = require('../survey/nodeDef')
+const Validator = require('../validation/validator')
 const Node = require('../record/node')
 const User = require('../user/user')
 
@@ -146,6 +147,7 @@ module.exports = {
   isPreview: R.propEq(keys.preview, true),
   getOwnerId: R.prop(keys.ownerId),
   getStep: R.prop(keys.step),
+  getValidation: Validator.getValidation,
 
   getNodes,
   getNodesArray,
@@ -161,6 +163,7 @@ module.exports = {
 
   // ====== UPDATE
   assocNodes,
+  mergeNodeValidations: Validator.mergeValidation,
 
   // ====== DELETE
 

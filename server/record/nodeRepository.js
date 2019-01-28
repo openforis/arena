@@ -4,7 +4,7 @@ const R = require('ramda')
 const db = require('../db/db')
 
 const Node = require('../../common/record/node')
-const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema } = require('../../server/survey/surveySchemaRepositoryUtils')
 
 //camelize all but "meta"
 const dbTransformCallback = node =>
@@ -100,8 +100,8 @@ const fetchSelfOrDescendantNodes = async (surveyId, nodeDefUuid, recordUuid, par
     dbTransformCallback
   )
 
-const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
-  await client.map(`
+const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
+  const nodes = await client.map(`
     SELECT * FROM  ${getSurveyDBSchema(surveyId)}.node n
     WHERE n.record_uuid = $1
       AND n.parent_uuid = $2
@@ -110,8 +110,6 @@ const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, chil
     dbTransformCallback
   )
 
-const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
-  const nodes = await fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
   return R.head(nodes)
 }
 
@@ -179,7 +177,6 @@ module.exports = {
   fetchDescendantNodesByCodeUuid,
   fetchSelfOrDescendantNodes,
   fetchChildNodeByNodeDefUuid,
-  fetchChildNodesByNodeDefUuid,
 
   //UPDATE
   updateNode,

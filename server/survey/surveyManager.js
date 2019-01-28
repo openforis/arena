@@ -133,7 +133,7 @@ module.exports = {
   fetchSurveyById,
   fetchSurveyAndNodeDefsBySurveyId,
   fetchUserSurveysInfo,
-  fetchDepedencies: SurveyRepository.fetchDepedencies,
+  fetchDependencies: SurveyRepository.fetchDependencies,
 
   // ====== UPDATE
   updateSurveyProp,

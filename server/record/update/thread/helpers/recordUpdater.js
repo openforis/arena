@@ -1,23 +1,20 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const SurveyUtils = require('../../../../common/survey/surveyUtils')
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const Node = require('../../../../common/record/node')
-const Record = require('../../../../common/record/record')
+const SurveyUtils = require('../../../../../common/survey/surveyUtils')
+const Survey = require('../../../../../common/survey/survey')
+const NodeDef = require('../../../../../common/survey/nodeDef')
+const Node = require('../../../../../common/record/node')
+const Record = require('../../../../../common/record/record')
 
-const RecordRepository = require('../../../record/recordRepository')
-const NodeRepository = require('../../../record/nodeRepository')
+const RecordRepository = require('../../../recordRepository')
+const NodeRepository = require('../../../nodeRepository')
 
-const DependentNodesUpdater = require('./dependencyUpdate/dependentNodesUpdater')
+const ActivityLog = require('../../../../activityLog/activityLogger')
 
-const ActivityLog = require('../../../activityLog/activityLogger')
+class RecordUpdater {
 
-class RecordProcessor {
-
-  constructor (nodesUpdateListener = null, preview = false) {
-    this.nodesUpdateListener = nodesUpdateListener
+  constructor (preview = false) {
     this.preview = preview
   }
 
@@ -60,9 +57,7 @@ class RecordProcessor {
       updatedNodes = await this._insertNode(survey, node, user, t)
     }
 
-    this._notifyNodesUpdate(updatedNodes)
-
-    return this._updateDependentNodes(user, survey, updatedNodes, t)
+    return updatedNodes
   }
 
   async deleteNode (user, survey, nodeUuid, t) {
@@ -72,11 +67,7 @@ class RecordProcessor {
 
     await this.logActivity(user, surveyId, ActivityLog.type.nodeDelete, {nodeUuid}, t)
 
-    const updatedNodes = await this._onNodeUpdate(surveyId, node, t)
-
-    this._notifyNodesUpdate(updatedNodes)
-
-    return this._updateDependentNodes(user, survey, updatedNodes, t)
+    return await this._onNodeUpdate(surveyId, node, t)
   }
 
   //==========
@@ -124,24 +115,12 @@ class RecordProcessor {
 
   async _onNodeUpdate (surveyId, node, t) {
     // delete dependent code nodes
+    // TODO check if it should be removed
     const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, Node.getRecordUuid(node), Node.getUuid(node), t)
     const nodesToReturn = await Promise.all(
       descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t))
     )
     return await assocParentNode(surveyId, node, SurveyUtils.toUuidIndexedObj(nodesToReturn), t)
-  }
-
-  // ==== UTILS
-
-  _notifyNodesUpdate (nodes) {
-    if (!R.isEmpty(nodes) && this.nodesUpdateListener)
-      this.nodesUpdateListener(nodes)
-  }
-
-  async _updateDependentNodes (user, survey, nodes, t) {
-    const updatedDependentNodes = await DependentNodesUpdater.updateNodes(user, survey, nodes, t)
-    this._notifyNodesUpdate(updatedDependentNodes)
-    return R.mergeRight(nodes, updatedDependentNodes)
   }
 }
 
@@ -157,4 +136,4 @@ const assocParentNode = async (surveyId, node, nodes, t) => {
   )
 }
 
-module.exports = RecordProcessor
+module.exports = RecordUpdater

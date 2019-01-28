@@ -230,6 +230,7 @@ module.exports = {
   countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike,
   fetchTaxonByUuid,
+  fetchTaxonVernacularNameByUuid,
 
   //UPDATE
   updateTaxonomyProp,

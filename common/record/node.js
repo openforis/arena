@@ -2,6 +2,8 @@ const R = require('ramda')
 
 const {uuidv4} = require('./../uuid')
 const {isBlank, trim} = require('../stringUtils')
+
+const Validator = require('../validation/validator')
 const SurveyUtils = require('../survey/surveyUtils')
 
 const keys = {
@@ -122,8 +124,11 @@ module.exports = {
 
   isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
 
+  getValidation: Validator.getValidation,
+
   // ==== UPDATE
   assocValue: R.assoc(keys.value),
+  assocValidation: Validator.assocValidation,
 
   // ==== UTILS
   isNodeValueBlank,

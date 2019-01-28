@@ -163,6 +163,7 @@ module.exports = {
   countTaxaByTaxonomyUuid: TaxonomyRepository.countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike,
   fetchTaxonByUuid: TaxonomyRepository.fetchTaxonByUuid,
+  fetchTaxonVernacularNameByUuid: TaxonomyRepository.fetchTaxonVernacularNameByUuid,
   fetchTaxonByCode,
 
   //UPDATE
