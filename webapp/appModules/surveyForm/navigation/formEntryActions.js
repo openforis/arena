@@ -13,6 +13,8 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from '../../surveyForm/record/recordState'
 import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
+import Tooltip from '../../../commonComponents/tooltip'
+
 const RecordEntryButtons = ({
   deleteRecord,
   updateRecordStep,
@@ -25,13 +27,13 @@ const RecordEntryButtons = ({
   <React.Fragment>
     {
       previousStep &&
-      <button className="btn-s btn-of btn-transparent"
+      <button className="btn-s btn-of"
               style={{ marginRight: 5 }}
               onClick={() =>
                 window.confirm('Are sure you want to demote this record?')
                   ? updateRecordStep(previousStep.id, history)
                   : null}>
-        <span className="icon icon-point-left icon-16px"/>
+        <span className="icon icon-reply icon-12px"/>
       </button>
     }
 
@@ -39,13 +41,13 @@ const RecordEntryButtons = ({
 
     {
       nextStep &&
-      <button className="btn-s btn-of btn-transparent"
+      <button className="btn-s btn-of"
         style={{ marginLeft: 5 }}
         onClick={() =>
           window.confirm('Are sure you want to demote this record? You won\'t be able to edit it anymore')
           ? updateRecordStep(nextStep.id, history)
           : null}>
-        <span className="icon icon-point-right icon-16px" />
+        <span className="icon icon-redo2 icon-12px" />
       </button>
     }
 
