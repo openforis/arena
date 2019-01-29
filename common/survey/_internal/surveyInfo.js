@@ -58,14 +58,14 @@ const getStatus = surveyInfo =>
 const getDefaultStep = R.pipe(
   getProp(keys.steps),
   R.head,
-  R.prop('id')
+  R.prop(keys.id)
 )
 
 const _getSteps = getProp(keys.steps)
 
 const getStepName = step => R.pipe(
   _getSteps,
-  R.find(s => s.id === step),
+  R.find(R.propEq(keys.id, step)),
   R.prop(keys.name)
 )
 const getStep = (stepId, increment) => surveyInfo => {
@@ -75,7 +75,7 @@ const getStep = (stepId, increment) => surveyInfo => {
     R.findIndex(R.propEq(keys.id, stepId)),
     idx => R.add(idx, increment),
     idx => idx >= 0 ? R.nth(idx, steps) : null
-  ) (steps)
+  )(steps)
 }
 
 const getNextStep = stepId => getStep(stepId, +1)

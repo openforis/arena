@@ -13,8 +13,6 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from '../../surveyForm/record/recordState'
 import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
-import Tooltip from '../../../commonComponents/tooltip'
-
 const RecordEntryButtons = ({
   deleteRecord,
   updateRecordStep,
