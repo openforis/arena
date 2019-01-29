@@ -7,6 +7,7 @@ const NodeDefValidations = require('../../../common/survey/nodeDefValidations')
 
 const Node = require('../../../common/record/node')
 const Validator = require('../../../common/validation/validator')
+const NumberUtils = require('../../../common/numberUtils')
 
 const NodeRepository = require('../nodeRepository')
 
@@ -21,16 +22,19 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
       async nodePointer => {
         const { nodeCtx, nodeDef } = nodePointer
         const validations = NodeDef.getValidations(nodeDef)
-        const minCount = NodeDefValidations.getMinCount(validations)
-        const maxCount = NodeDefValidations.getMaxCount(validations)
+        const minCount = NumberUtils.toNumber(NodeDefValidations.getMinCount(validations))
+        const maxCount = NumberUtils.toNumber(NodeDefValidations.getMaxCount(validations))
+
+        if(isNaN(minCount) && isNaN(maxCount))
+          return {}
 
         const nodeDefUuid = NodeDef.getUuid(nodeDef)
         const nodeCtxUuid = Node.getUuid(nodeCtx)
 
         const count = await NodeRepository.countChildNodesByNodeDefUuid(Survey.getId(survey), recordUuid, nodeCtxUuid, nodeDefUuid, tx)
 
-        const minCountValid = R.isEmpty(minCount) || count >= minCount
-        const maxCountValid = R.isEmpty(maxCount) || count <= maxCount
+        const minCountValid = isNaN(minCount) || count >= minCount
+        const maxCountValid = isNaN(maxCount) || count <= maxCount
 
         const childrenCountValidation = {
           [Validator.keys.valid]: minCountValid && maxCountValid,

@@ -9,6 +9,7 @@ const NodeRepository = require('../record/nodeRepository')
 const FileManager = require('../file/fileManager')
 
 const Record = require('../../common/record/record')
+const RecordStep = require('../../common/record/recordStep')
 const Node = require('../../common/record/node')
 const File = require('../../common/file/file')
 
@@ -83,6 +84,22 @@ const persistNode = (user, surveyId, node, fileReq) => {
   RecordUpdateManager.persistNode(user, surveyId, nodeToPersist)
 }
 
+const updateRecordStep = async (surveyId, recordUuid, stepId) => {
+  const record = await fetchRecordByUuid(surveyId, recordUuid)
+
+  // check if the step exists and that is't adjacent to the current one
+  const currentStepId = Record.getStep(record)
+  const stepCurrent = RecordStep.getStep(currentStepId)
+  const stepUpdate = RecordStep.getStep(stepId)
+
+  if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
+    await RecordRepository.updateRecordStep(surveyId, recordUuid, stepId)
+  } else {
+    throw new Error('Can\'t update step')
+  }
+
+}
+
 /**
  * ===================
  * DELETE
@@ -155,6 +172,7 @@ module.exports = {
 
   //==== UPDATE
   persistNode,
+  updateRecordStep,
 
   //==== DELETE
   deleteRecord,

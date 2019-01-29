@@ -123,7 +123,8 @@ $tableRowHeaderHeight: 40px;
 }
 
 .node-def__invalid {
-  //border: 1px solid rgba($redDark, .8);
+//  border: 1px solid rgba($red, .1);
+//  background-color: rgba($red, .1);
 
   input {
     background-color: rgba($red, .15);

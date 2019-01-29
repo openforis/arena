@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const {getRestParam} = require('../serverUtils/request')
-const {sendErr, sendOk, sendFile} = require('../serverUtils/response')
+const { getRestParam } = require('../serverUtils/request')
+const { sendErr, sendOk, sendFile } = require('../serverUtils/response')
 
 const Node = require('../../common/record/node')
 
@@ -20,7 +20,7 @@ module.exports.init = app => {
   // ==== CREATE
   app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res) => {
     try {
-      const {user} = req
+      const { user } = req
       const surveyId = getRestParam(req, 'surveyId')
 
       const record = req.body
@@ -97,6 +97,21 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
+  // RECORD promote / demote
+  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordEditPermission, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const recordUuid = getRestParam(req, 'recordUuid')
+      const step = req.body.step
+
+      await RecordManager.updateRecordStep(surveyId, recordUuid, step)
+
+      sendOk(res)
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
   // RECORD Check in / out
   app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordViewPermission, async (req, res) => {
     try {
@@ -106,7 +121,7 @@ module.exports.init = app => {
 
       const record = await RecordManager.checkInRecord(user, surveyId, recordUuid)
 
-      res.json({record})
+      res.json({ record })
     } catch (err) {
       sendErr(res, err)
     }
@@ -148,7 +163,7 @@ module.exports.init = app => {
       const user = req.user
 
       const nodes = await RecordManager.deleteNode(user, surveyId, nodeUuid)
-      res.json({nodes})
+      res.json({ nodes })
     } catch (err) {
       sendErr(res, err)
     }

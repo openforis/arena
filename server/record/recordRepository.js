@@ -105,6 +105,7 @@ const fetchRecordUuids = async (surveyId, client = db) => await client.map(
 )
 
 // ============== UPDATE
+
 const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
   await client.one(
     `UPDATE ${getSurveyDBSchema(surveyId)}.record 
@@ -114,7 +115,16 @@ const updateValidation = async (surveyId, recordUuid, validation, client = db) =
     [validation, recordUuid]
   )
 
+const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
+  await client.none(`
+      UPDATE ${getSurveyDBSchema(surveyId)}.record
+      SET step = $1
+      WHERE uuid = $2`,
+    [step, recordUuid]
+  )
+
 // ============== DELETE
+
 const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
   await client.query(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.record
@@ -135,6 +145,7 @@ module.exports = {
 
   // UPDATE
   updateValidation,
+  updateRecordStep,
 
   // DELETE
   deleteRecord,
