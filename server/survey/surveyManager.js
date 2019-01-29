@@ -34,7 +34,6 @@ const createSurvey = async (user, { name, label, lang }) => {
         labels: { [lang]: label },
         languages: [lang],
         srs: [{ code: '4326', name: 'GCS WGS 1984' }], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
-        steps: { ...Survey.defaultSteps },
       }
 
       const userId = user.id

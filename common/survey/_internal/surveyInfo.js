@@ -1,7 +1,7 @@
 const R = require('ramda')
-const {groupNames} = require('../../auth/authGroups')
+const { groupNames } = require('../../auth/authGroups')
 
-const {getProp} = require('../surveyUtils')
+const { getProp } = require('../surveyUtils')
 
 const keys = {
   info: 'info',
@@ -55,33 +55,6 @@ const getStatus = surveyInfo =>
       ? 'DRAFT'
       : ''
 
-const getDefaultStep = R.pipe(
-  getProp(keys.steps),
-  R.head,
-  R.prop(keys.id)
-)
-
-const _getSteps = getProp(keys.steps)
-
-const getStepName = step => R.pipe(
-  _getSteps,
-  R.find(R.propEq(keys.id, step)),
-  R.prop(keys.name)
-)
-const getStep = (stepId, increment) => surveyInfo => {
-  const steps = _getSteps(surveyInfo)
-
-  return R.pipe(
-    R.findIndex(R.propEq(keys.id, stepId)),
-    idx => R.add(idx, increment),
-    idx => idx >= 0 ? R.nth(idx, steps) : null
-  )(steps)
-}
-
-const getNextStep = stepId => getStep(stepId, +1)
-
-const getPreviousStep = stepId => getStep(stepId, -1)
-
 // ====== UTILS
 
 const isValid = surveyInfo => surveyInfo && surveyInfo.id
@@ -110,10 +83,6 @@ module.exports = {
   getLabels,
   getDefaultLabel,
   getStatus,
-  getDefaultStep,
-  getStepName,
-  getNextStep,
-  getPreviousStep,
 
   // ====== AUTH GROUPS
   getAuthGroups,

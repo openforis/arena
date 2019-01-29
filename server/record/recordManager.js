@@ -8,10 +8,8 @@ const RecordRepository = require('../record/recordRepository')
 const NodeRepository = require('../record/nodeRepository')
 const FileManager = require('../file/fileManager')
 
-const SurveyManager = require('../survey/surveyManager')
-
-const Survey = require('../../common/survey/survey')
 const Record = require('../../common/record/record')
+const RecordStep = require('../../common/record/recordStep')
 const Node = require('../../common/record/node')
 const File = require('../../common/file/file')
 
@@ -87,19 +85,19 @@ const persistNode = (user, surveyId, node, fileReq) => {
 }
 
 const updateRecordStep = async (surveyId, recordUuid, stepId) => {
-  const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById(surveyId))
-  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
+  const record = await fetchRecordByUuid(surveyId, recordUuid)
 
   // check if the step exists and that is't adjacent to the current one
   const currentStepId = Record.getStep(record)
-  const nextStepId = R.prop('id', Survey.getNextStep(currentStepId)(surveyInfo))
-  const previousStepId = R.prop('id', Survey.getPreviousStep(currentStepId)(surveyInfo))
-  
-  if (stepId !== nextStepId && stepId !== previousStepId) {
+  const stepCurrent = RecordStep.getStep(currentStepId)
+  const stepUpdate = RecordStep.getStep(stepId)
+
+  if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
+    await RecordRepository.updateRecordStep(surveyId, recordUuid, stepId)
+  } else {
     throw new Error('Can\'t update step')
   }
 
-  RecordRepository.updateRecordStep(surveyId, recordUuid, stepId)
 }
 
 /**
