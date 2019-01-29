@@ -1,11 +1,12 @@
 const R = require('ramda')
-const {uuidv4} = require('./../uuid')
+const { uuidv4 } = require('./../uuid')
 
 const Survey = require('../survey/survey')
 const SurveyUtils = require('../survey/surveyUtils')
 const NodeDef = require('../survey/nodeDef')
 const Node = require('../record/node')
 const User = require('../user/user')
+const RecordStep = require('./recordStep')
 
 const keys = {
   nodes: 'nodes',
@@ -15,10 +16,10 @@ const keys = {
 }
 // ====== CREATE
 
-const newRecord = (user, step, preview = false) => ({
+const newRecord = (user, preview = false) => ({
   uuid: uuidv4(),
   ownerId: User.getId(user),
-  step,
+  step: RecordStep.getDefaultStep(),
   preview
 })
 

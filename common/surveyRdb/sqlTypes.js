@@ -1,7 +1,7 @@
 const sqlTypes = {
   uuid: 'UUID',
   varchar: 'VARCHAR',
-  integer: 'INTEGER',
+  integer: 'BIGINT',
   decimal: `DECIMAL(${16 + 6}, 6)`,
   date: 'DATE',
   time: 'TIME WITHOUT TIME ZONE',

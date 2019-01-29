@@ -16,7 +16,7 @@ const FormNavigation = ({ edit, entry, preview, history }) => {
       {
         edit
           ? <FormEditActions/>
-          : <FormEntryActions entry={entry} preview={preview} history={history}/>
+          : <FormEntryActions preview={preview} history={history}/>
       }
     </div>
   )

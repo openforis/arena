@@ -21,7 +21,6 @@ const TextInput = ({nodeDef, node, edit, updateNode, canEditRecord}) => (
 
 const MultipleTextInput = props => {
   const {nodeDef, nodes, removeNode, canEditRecord} = props
-  console.log(props)
 
   return <div className="node-def__entry-multiple">
     <div className="nodes">

@@ -9,7 +9,6 @@ const SurveyDependencies = require('./_internal/surveyDependencies')
 
 module.exports = {
   // ====== DEFAULTS
-  defaultSteps: SurveyDefaults.defaultSteps,
   getDefaultAuthGroups: SurveyDefaults.getDefaultAuthGroups,
 
   // READ
@@ -23,7 +22,6 @@ module.exports = {
   getLabels: SurveyInfo.getLabels,
   getDefaultLabel: SurveyInfo.getDefaultLabel,
   getDescriptions: SurveyInfo.getDescriptions,
-  getDefaultStep: SurveyInfo.getDefaultStep,
   getSRS: SurveyInfo.getSRS,
   getDefaultSRS: SurveyInfo.getDefaultSRS,
   getStatus: SurveyInfo.getStatus,

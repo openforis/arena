@@ -1,7 +1,7 @@
 const R = require('ramda')
-const {groupNames} = require('../../auth/authGroups')
+const { groupNames } = require('../../auth/authGroups')
 
-const {getProp} = require('../surveyUtils')
+const { getProp } = require('../surveyUtils')
 
 const keys = {
   info: 'info',
@@ -55,13 +55,6 @@ const getStatus = surveyInfo =>
       ? 'DRAFT'
       : ''
 
-const getDefaultStep = R.pipe(
-  getProp(keys.steps),
-  R.toPairs,
-  R.find(s => !s[1].prev),
-  R.head
-)
-
 // ====== UTILS
 
 const isValid = surveyInfo => surveyInfo && surveyInfo.id
@@ -90,7 +83,6 @@ module.exports = {
   getLabels,
   getDefaultLabel,
   getStatus,
-  getDefaultStep,
 
   // ====== AUTH GROUPS
   getAuthGroups,

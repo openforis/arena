@@ -1,10 +1,10 @@
-const {expect} = require('chai')
+const { expect } = require('chai')
 const R = require('ramda')
 
 const db = require('../../../server/db/db')
 
 const Survey = require('../../../common/survey/survey')
-const {toUuidIndexedObj} = require('../../../common/survey/surveyUtils')
+const { toUuidIndexedObj } = require('../../../common/survey/surveyUtils')
 const NodeDef = require('../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 const Record = require('../../../common/record/record')
@@ -15,11 +15,11 @@ const NodeRepository = require('../../../server/record/nodeRepository')
 const RecordRepository = require('../../../server/record/recordRepository')
 const RecordProcessor = require('../../../server/record/update/thread/recordProcessor')
 
-const {getContextUser, getContextSurvey, fetchFullContextSurvey} = require('../../testContext')
+const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
 
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   await NodeDefRepository.updateNodeDefProps(Survey.getId(survey), NodeDef.getUuid(nodeDef),
-    [{key: NodeDef.propKeys.defaultValues, value: defaultValueExpressions, advanced: true}])
+    [{ key: NodeDef.propKeys.defaultValues, value: defaultValueExpressions, advanced: true }])
 }
 
 const recordCreationTest = async () => {
@@ -66,7 +66,7 @@ const defaultValueAppliedTest = async () => {
 
     const reloadedNodes = await NodeRepository.fetchNodesByRecordUuid(Survey.getId(survey), Record.getUuid(record), t)
 
-    const reloadedRecord = {...record, nodes: toUuidIndexedObj(reloadedNodes)}
+    const reloadedRecord = { ...record, nodes: toUuidIndexedObj(reloadedNodes) }
 
     const root = Record.getRootNode(reloadedRecord)
 
@@ -85,13 +85,7 @@ const newDefaultValue = (expression, applyIf = null) => R.pipe(
   NodeDefExpression.assocApplyIf(applyIf)
 )(NodeDefExpression.createExpressionPlaceholder())
 
-const newRecord = () => {
-  const user = getContextUser()
-  const survey = getContextSurvey()
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const defaultStep = Survey.getDefaultStep(surveyInfo)
-  return Record.newRecord(user, defaultStep)
-}
+const newRecord = () => Record.newRecord(getContextUser())
 
 module.exports = {
   recordCreationTest,
