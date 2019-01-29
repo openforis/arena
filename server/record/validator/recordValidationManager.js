@@ -12,8 +12,10 @@ const NodeRepository = require('../nodeRepository')
 
 const CountValidator = require('./helpers/countValidator')
 const DependentsValidator = require('./helpers/dependentNodesValidator')
+const RecordKeysUniquenessValidator = require('./helpers/recordKeysUniquenessValidator')
 
 const validateNodes = async (survey, recordUuid, nodes, tx) => {
+
 
   // 1. validate self and dependent nodes (validations/expressions)
   const nodesDependentValidations = await DependentsValidator.validateSelfAndDependentNodes(survey, recordUuid, nodes, tx)
@@ -22,12 +24,20 @@ const validateNodes = async (survey, recordUuid, nodes, tx) => {
   const nodePointers = await fetchNodePointers(survey, nodes, tx)
   const nodeCountValidations = await CountValidator.validateChildrenCount(survey, recordUuid, nodePointers, tx)
 
-  // 3. merge validations
+  // 3. validate record keys uniqueness
+  const recordKeysUniquenessValidations = Survey.isPublished(Survey.getSurveyInfo(survey)) && includesRecordKeys(survey, nodes)
+    ? await RecordKeysUniquenessValidator.validateKeysUniqueness(survey, recordUuid, tx)
+    : {}
+
+  // 4. merge validations
   const nodesValidation = {
-    fields: R.mergeLeft(nodeCountValidations, nodesDependentValidations)
+    fields: R.pipe(
+      R.mergeLeft(nodeCountValidations),
+      R.mergeLeft(recordKeysUniquenessValidations)
+    )(nodesDependentValidations)
   }
 
-  // persist validation
+  // 5. persist validation
   const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, tx)
 
   const recordValidationUpdated = R.pipe(
@@ -39,7 +49,6 @@ const validateNodes = async (survey, recordUuid, nodes, tx) => {
 
   return nodesValidation
 }
-
 
 const fetchNodePointers = async (survey, nodes, tx) => {
   const nodesArray = R.values(nodes)
@@ -78,6 +87,16 @@ const fetchNodePointers = async (survey, nodes, tx) => {
     R.uniq
   )(nodePointers)
 }
+
+const includesRecordKeys = (survey, nodes) => R.pipe(
+  R.values,
+  R.any(n => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(n))(survey)
+      const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+      return NodeDef.isNodeDefKey(nodeDef) && NodeDef.isNodeDefRoot(parentDef)
+    },
+  )
+)(nodes)
 
 module.exports = {
   validateNodes

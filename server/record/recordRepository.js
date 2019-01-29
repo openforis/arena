@@ -86,6 +86,32 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
   )
 }
 
+const fetchRecordsBySurveyIdAndKeys = async (surveyId, nodeDefRoot, nodeDefKeys, keys, client = db) => {
+  const rootEntityTableAlias = 'n0'
+  const getNodeDefKeyColName = R.pipe(NodeDefTable.getColNames, R.head)
+  const getNodeDefKeyColAlias = NodeDef.getNodeDefName
+
+  const nodeDefKeysSelect = nodeDefKeys.map(
+    nodeDefKey => `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
+  ).join(',')
+
+  const nodeDefKeysWhere = nodeDefKeys.map(
+    (nodeDefKey, idx) => `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} = '${keys[idx]}'`
+  ).join(',')
+
+  return await client.map(`
+    SELECT ${recordSelectFields}, ${nodeDefKeysSelect}
+    FROM ${getSurveyDBSchema(surveyId)}.record
+    LEFT OUTER JOIN
+      ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
+      ON uuid = ${rootEntityTableAlias}.record_uuid
+    WHERE ${nodeDefKeysWhere}
+  `,
+    [],
+    dbTransformCallback(surveyId, false)
+  )
+}
+
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   await client.one(
     `SELECT 
@@ -142,6 +168,7 @@ module.exports = {
   fetchRecordsSummaryBySurveyId,
   fetchRecordByUuid,
   fetchRecordUuids,
+  fetchRecordsBySurveyIdAndKeys,
 
   // UPDATE
   updateValidation,

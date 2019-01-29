@@ -10,6 +10,7 @@ const User = require('../user/user')
 const RecordStep = require('./recordStep')
 
 const keys = {
+  uuid: 'uuid',
   nodes: 'nodes',
   ownerId: 'ownerId',
   step: 'step',
@@ -18,10 +19,10 @@ const keys = {
 // ====== CREATE
 
 const newRecord = (user, preview = false) => ({
-  uuid: uuidv4(),
-  ownerId: User.getId(user),
-  step: RecordStep.getDefaultStep(),
-  preview
+  [keys.uuid]: uuidv4(),
+  [keys.ownerId]: User.getId(user),
+  [keys.step]: RecordStep.getDefaultStep(),
+  [keys.preview]: preview
 })
 
 // ====== READ
@@ -47,7 +48,7 @@ const findNodes = predicate => R.pipe(
   // }),
 )
 
-const getNodeChildren = node => findNodes(n => Node.getParentUuid(n) === node.uuid)
+const getNodeChildren = node => findNodes(n => Node.getParentUuid(n) === Node.getUuid(node))
 
 const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
   getNodeChildren(parentNode),
@@ -88,7 +89,7 @@ const getParentCodeAttribute = (survey, parentNode, nodeDef) =>
 
     return parentCodeDef
       ? findNodeInAncestorEntities(parentNode,
-        node => Node.getNodeDefUuid(node) === parentCodeDef.uuid
+        node => Node.getNodeDefUuid(node) === NodeDef.getUuid(parentCodeDef)
       )(record)
       : null
   }
@@ -98,7 +99,7 @@ const getCodeUuidsHierarchy = (survey, parentEntity, nodeDef) => record => {
 
   return parentCode
     ? R.append(
-      parentCode.uuid,
+      Node.getUuid(parentCode),
       getCodeUuidsHierarchy(
         survey,
         getParentNode(parentCode)(record),
@@ -124,7 +125,7 @@ const deleteNode = node =>
     //remove itself
     const updatedRecord = R.pipe(
       getNodes,
-      R.dissoc(node.uuid),
+      R.dissoc(Node.getUuid(node)),
       newNodes => R.assoc('nodes', newNodes, record)
     )(record)
 
@@ -140,6 +141,8 @@ const deleteNode = node =>
   }
 
 module.exports = {
+  keys,
+
   // ====== CREATE
   newRecord,
 

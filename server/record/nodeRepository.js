@@ -102,7 +102,7 @@ const fetchSelfOrDescendantNodes = async (surveyId, nodeDefUuid, recordUuid, par
   )
 
 const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
-  const nodes = fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
+  const nodes = await fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
   return R.head(nodes)
 }
 
@@ -111,7 +111,7 @@ const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, chil
     SELECT * 
     FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE record_uuid = $1
-      AND parent_uuid = $2
+      AND parent_uuid ${nodeUuid ? '= $2' : 'is null'}
       AND node_def_uuid = $3`,
     [recordUuid, nodeUuid, childDefUUid],
     dbTransformCallback
