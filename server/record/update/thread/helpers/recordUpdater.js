@@ -93,7 +93,7 @@ class RecordUpdater {
       ? Survey.getNodeDefChildren(nodeDef)(survey)
       : []
 
-    // insert only child single entities
+    // insert only child single nodes
     const childNodes = R.mergeAll(
       await Promise.all(
         childDefs
