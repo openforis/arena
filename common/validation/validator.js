@@ -151,10 +151,12 @@ const cleanup = R.pipe(
 
 const assocValidation = v => R.assoc(keys.validation, v)
 
+const assocFieldValidation = (field, validation) => R.assocPath([keys.fields, field], validation)
+
 const mergeValidation = validation =>
   obj => R.pipe(
     getValidation,
-    R.mergeLeft(validation),
+    R.mergeDeepLeft(validation),
     cleanup,
     v => assocValidation(v)(obj)
   )(obj)
@@ -181,5 +183,6 @@ module.exports = {
   // UPDATE
   cleanup,
   assocValidation,
+  assocFieldValidation,
   mergeValidation
 }

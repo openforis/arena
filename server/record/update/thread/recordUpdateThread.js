@@ -18,7 +18,7 @@ const Queue = require('../../../../common/queue')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const DependentNodesUpdater = require('./helpers/dependentNodesUpdater')
-const RecordValidator = require('./helpers/recordValidator')
+const RecordValidator = require('../../validator/recordValidator')
 
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 

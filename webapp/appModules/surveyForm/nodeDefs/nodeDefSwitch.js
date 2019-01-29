@@ -181,7 +181,11 @@ const mapStateToProps = (state, props) => {
 
     const validation = NodeDef.isNodeDefSingleAttribute(nodeDef) && !R.isEmpty(nodes)
       ? Validator.getFieldValidation(Node.getUuid(nodes[0]))(recordValidation)
-      : null //TODO for multiple nodes get validation from parent
+      : R.pipe(
+        Validator.getFieldValidation(Node.getUuid(parentNode)),
+        Validator.getFieldValidation('childrenCount'),
+        Validator.getFieldValidation(NodeDef.getUuid(nodeDef))
+      )(recordValidation)
 
     const nodesValidated = nodes.map(
       n => {

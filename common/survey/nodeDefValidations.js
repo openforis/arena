@@ -15,8 +15,14 @@ module.exports = {
   dissocRequired: R.dissoc(keys.required),
 
   //COUNT
-  getMinCount: R.path([keys.count, keys.min]),
-  getMaxCount: R.path([keys.count, keys.max]),
+  getMinCount: R.pipe(
+    R.path([keys.count, keys.min]),
+    Number
+  ),
+  getMaxCount: R.pipe(
+    R.path([keys.count, keys.max]),
+    Number
+  ),
   assocMinCount: minCount => R.assocPath([keys.count, keys.min], minCount),
   assocMaxCount: maxCount => R.assocPath([keys.count, keys.max], maxCount),
   dissocCount: R.dissoc(keys.count),

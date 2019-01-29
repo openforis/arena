@@ -1,35 +1,41 @@
 const R = require('ramda')
 const Promise = require('bluebird')
-const DateTimeUtils = require('../../../../../common/dateUtils')
-const NumberUtils = require('../../../../../common/numberUtils')
+const DateTimeUtils = require('../../../common/dateUtils')
+const NumberUtils = require('../../../common/numberUtils')
 
-const { dependencyTypes } = require('../../../../survey/surveyDependenchyGraph')
-const Survey = require('../../../../../common/survey/survey')
-const NodeDef = require('../../../../../common/survey/nodeDef')
+const { dependencyTypes } = require('../../survey/surveyDependenchyGraph')
+const Survey = require('../../../common/survey/survey')
+const NodeDef = require('../../../common/survey/nodeDef')
 const { nodeDefType } = NodeDef
-const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
-const NodeDefValidations = require('../../../../../common/survey/nodeDefValidations')
-const Category = require('../../../../../common/survey/category')
+const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
+const NodeDefValidations = require('../../../common/survey/nodeDefValidations')
+const Category = require('../../../common/survey/category')
 
-const Node = require('../../../../../common/record/node')
-const Validator = require('../../../../../common/validation/validator')
+const Node = require('../../../common/record/node')
+const Validator = require('../../../common/validation/validator')
 
-const NodeDependencyManager = require('../nodeDependencyManager')
-const RecordExprParser = require('../../../recordExprParser')
+const NodeDependencyManager = require('../update/thread/nodeDependencyManager')
+const RecordExprParser = require('../recordExprParser')
 
-const CategoryManager = require('../../../../category/categoryManager')
-const TaxonomyManager = require('../../../../taxonomy/taxonomyManager')
-const RecordRepository = require('../../../../record/recordRepository')
+const CategoryManager = require('../../category/categoryManager')
+const TaxonomyManager = require('../../taxonomy/taxonomyManager')
+const RecordRepository = require('../recordRepository')
+const NodeRepository = require('../nodeRepository')
+
+const NodeCountValidator = require('./nodeCountValidator')
 
 const errorKeys = {
   required: 'required',
   invalidType: 'invalidType',
+  invalidValue: 'invalidValue',
 }
 
 const validateRequired = (survey, nodeDef) =>
-  (propName, node) => Node.isNodeValueBlank(node) && NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
-    ? errorKeys.required
-    : null
+  (propName, node) =>
+    Node.isNodeValueBlank(node) &&
+    (NodeDef.isNodeDefKey(nodeDef) || NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef)))
+      ? errorKeys.required
+      : null
 
 const typeValidatorFns = {
   [nodeDefType.boolean]: (survey, nodeDef, node, value) =>
@@ -79,42 +85,70 @@ const validateValueType = (survey, nodeDef) =>
     return valid ? null : errorKeys.invalidType
   }
 
-const validateNodeValidations = (survey, nodeDef, tx) => async (propName, node) => {
-  if (Node.isNodeValueBlank(node)) {
-    return null
-  }
-  const validations = NodeDef.getValidations(nodeDef)
+const validateNodeValidations = (survey, nodeDef, tx) =>
+  async (propName, node) => {
+    if (Node.isNodeValueBlank(node)) {
+      return null
+    }
+    const validations = NodeDef.getValidations(nodeDef)
 
-  const expressions = NodeDefValidations.getExpressions(validations)
-  const applicableExpressions = await RecordExprParser.getApplicableExpressions(survey, node, expressions, tx)
+    const expressions = NodeDefValidations.getExpressions(validations)
+    const applicableExpressions = await RecordExprParser.getApplicableExpressions(survey, node, expressions, tx)
 
-  const applicableExpressionsEvaluated = await Promise.all(
-    applicableExpressions.map(
-      async expr => {
-        const valid = await RecordExprParser.evalNodeQuery(survey, node, NodeDefExpression.getExpression(expr), tx)
-        const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-        const message = NodeDefExpression.getMessage(defaultLang, errorKeys.invalidType)(expr)
+    const applicableExpressionsEvaluated = await Promise.all(
+      applicableExpressions.map(
+        async expr => {
+          const valid = await RecordExprParser.evalNodeQuery(survey, node, NodeDefExpression.getExpression(expr), tx)
+          const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+          const message = NodeDefExpression.getMessage(defaultLang, errorKeys.invalidValue)(expr)
 
-        return {
-          valid,
-          message
+          return {
+            valid,
+            message
+          }
         }
-      }
-    ))
+      ))
 
-  const invalidExpressions = R.filter(R.propEq('valid', false), applicableExpressionsEvaluated)
+    const invalidExpressions = R.filter(R.propEq('valid', false), applicableExpressionsEvaluated)
 
-  return R.isEmpty(invalidExpressions)
-    ? null
-    : R.pipe(
-      R.pluck('message'),
-      R.join('\n')
-    )(invalidExpressions)
-}
+    return R.isEmpty(invalidExpressions)
+      ? null
+      : R.pipe(
+        R.pluck('message'),
+        R.join('; ')
+      )(invalidExpressions)
+  }
 
 const validateNodes = async (survey, recordUuid, nodes, tx) => {
 
-  const validatedNodeUuids = []
+  // 1. validate self and dependent nodes (validations/expressions)
+  const nodesDependentValidations = await validateSelfAndDependentNodes(survey, recordUuid, nodes, tx)
+
+  // 2. validate min/max count
+  const nodePointers = await fetchNodePointers(survey, nodes, tx)
+  const nodeCountValidations = await NodeCountValidator.validateChildrenCount(survey, recordUuid, nodePointers, tx)
+
+  // 3. merge validations
+  const nodesValidation = {
+    fields: R.mergeLeft(nodeCountValidations, nodesDependentValidations)
+  }
+
+  // persist validation
+  const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, tx)
+
+  const recordValidationUpdated = R.pipe(
+    Validator.mergeValidation(nodesValidation),
+    Validator.getValidation
+  )(record)
+
+  await RecordRepository.updateValidation(Survey.getId(survey), recordUuid, recordValidationUpdated, tx)
+
+  return nodesValidation
+}
+
+const validateSelfAndDependentNodes = async (survey, recordUuid, nodes, tx) => {
+
+  const validatedNodeUuids = [] //used to avoid validating 2 times the same nodes
 
   const nodesValidationArray = await Promise.all(
     R.values(nodes).map(
@@ -158,24 +192,10 @@ const validateNodes = async (survey, recordUuid, nodes, tx) => {
       })
   )
 
-  const nodesValidation = {
-    fields: R.pipe(
-      R.flatten,
-      R.mergeAll
-    )(nodesValidationArray)
-  }
-
-  // persist validation
-  const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, tx)
-
-  const recordValidationUpdated = R.pipe(
-    Validator.mergeValidation(nodesValidation),
-    Validator.getValidation
-  )(record)
-
-  await RecordRepository.updateValidation(Survey.getId(survey), recordUuid, recordValidationUpdated, tx)
-
-  return nodesValidation
+  return R.pipe(
+    R.flatten,
+    R.mergeAll
+  )(nodesValidationArray)
 }
 
 const validateCode = async (survey, nodeDef, node) => {
@@ -229,6 +249,44 @@ const validateTaxon = async (survey, nodeDef, node) => {
     return false
 
   return true
+}
+
+const fetchNodePointers = async (survey, nodes, tx) => {
+  const nodesArray = R.values(nodes)
+
+  const nodePointers = await Promise.all(
+    nodesArray.map(
+      async node => {
+        const pointers = []
+        const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+
+        if (NodeDef.isNodeDefEntity(nodeDef)) {
+          const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
+
+          pointers.push(
+            childDefs.map(
+              childDef => ({
+                nodeCtx: node,
+                nodeDef: childDef
+              })
+            )
+          )
+        }
+        if (!NodeDef.isNodeDefRoot(nodeDef)) {
+          const parent = await NodeRepository.fetchNodeByUuid(Survey.getId(survey), Node.getParentUuid(node), tx)
+          pointers.push({
+            nodeCtx: parent,
+            nodeDef
+          })
+        }
+        return pointers
+      }
+    )
+  )
+  return R.pipe(
+    R.flatten,
+    R.uniq
+  )(nodePointers)
 }
 
 module.exports = {
