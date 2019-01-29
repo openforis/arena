@@ -36,7 +36,7 @@ class NodeDefSwitch extends React.Component {
   checkNodePlaceholder () {
     const { entry, nodes, nodeDef, parentNode, createNodePlaceholder } = this.props
 
-    if (entry && !NodeDef.isNodeDefEntity(nodeDef) && (R.isEmpty(nodes) || NodeDef.isNodeDefMultiple(nodeDef))) {
+    if (entry && NodeDef.isNodeDefMultipleAttribute(nodeDef) && R.isEmpty(nodes)) {
       const hasNotPlaceholder = R.pipe(
         R.find(R.propEq('placeholder', true)),
         R.isNil,
