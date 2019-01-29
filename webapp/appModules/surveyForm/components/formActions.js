@@ -2,45 +2,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import { uuidv4 } from '../../../../common/uuid'
-
-import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 
-import { nodeDefLayoutProps, nodeDefRenderType, isRenderForm } from '../../../../common/survey/nodeDefLayout'
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
-import { getSurvey } from '../../../survey/surveyState'
-
 import { createNodeDef } from '../../../survey/nodeDefs/actions'
-import { getFormActivePageNodeDef, getNodeDefFormUnlocked, getSurveyForm } from '../surveyFormState'
+import { setFormNodeDefAddChildTo } from '../actions'
 
-const AddNodeDefButton = ({type, addNodeDef, enabled}) => {
-  const isEntity = type === NodeDef.nodeDefType.entity
-  const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
+import * as SurveyFormState from '../surveyFormState'
 
-  return <React.Fragment key={type}>
-    {
-      isEntity ?
-        <div className="separator-of"/>
-        : null
-
-    }
-    <button className="btn btn-s btn-of-light-s btn-add-node-def"
-            onClick={() => addNodeDef(type, nodeDefProps)}
-            aria-disabled={!enabled}>
-      {getNodeDefIconByType(type)}{type}
-    </button>
-  </React.Fragment>
-}
-
-const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
-  const enabled = nodeDef && NodeDef.isNodeDefEntity(nodeDef)
-
-  const canAddAttribute = enabled
-  const canAddEntity = enabled && isRenderForm(nodeDef)
-
-  return <React.Fragment>
+const AddNodeDefButtons = ({ addNodeDef }) => (
+  <React.Fragment>
     <div/>
     <div/>
     <div/>
@@ -50,73 +22,64 @@ const AddNodeDefButtons = ({addNodeDef, nodeDef}) => {
 
     {
       R.values(NodeDef.nodeDefType)
-        .map(type =>
-          <AddNodeDefButton key={type} type={type}
-                            addNodeDef={addNodeDef}
-                            enabled={type === NodeDef.nodeDefType.entity ? canAddEntity : canAddAttribute}/>
-        )
+        .map(type => {
+          const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
+
+          return (
+            <button key={type}
+                    className="btn btn-s btn-of-light-s btn-add-node-def"
+                    onClick={() => addNodeDef(type, nodeDefProps)}>
+              {getNodeDefIconByType(type)}{type}
+            </button>
+          )
+        })
     }
 
-    <button className="btn btn-s btn-of-light-xs btn-add-node-def"
-            aria-disabled={!canAddEntity}
-            onClick={() => addNodeDef(
-              NodeDef.nodeDefType.entity,
-              {
-                [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-                [nodeDefLayoutProps.pageUuid]: uuidv4(),
-              }
-            )}>
-      <span className="icon icon-insert-template icon-left"/>
-      Entity New Page
-    </button>
-
   </React.Fragment>
-}
+)
 
 class FormActions extends React.Component {
 
-  constructor () {
-    super()
-    this.state = {opened: true}
-
+  constructor (props) {
+    super(props)
     this.addNodeDef = this.addNodeDef.bind(this)
   }
 
-  toggleOpen () {
-    const {opened} = this.state
+  componentDidUpdate (prevProps) {
+    const { nodeDef } = this.props
+    const { nodeDef: nodeDefPrev } = prevProps
 
-    const width = opened ? 33 : 200
-    document.getElementsByClassName('survey-form')[0].classList.toggle('form-actions-off')// .style.gridTemplateColumns = `1fr ${width}px`
+    if ((nodeDef && !nodeDefPrev) || (!nodeDef && nodeDefPrev)) {
 
-    this.setState({opened: !opened})
+      const surveyFormElement = document.getElementsByClassName('survey-form')[0]
+      surveyFormElement.classList.toggle('form-actions-off')
 
-    //react-grid-layout re-render
-    window.dispatchEvent(new Event('resize'))
+      //react-grid-layout re-render
+      window.dispatchEvent(new Event('resize'))
+    }
   }
 
   addNodeDef (type, props) {
-    const {nodeDef, createNodeDef} = this.props
+    const { nodeDef, createNodeDef } = this.props
     createNodeDef(nodeDef.uuid, type, props)
   }
 
   render () {
-
-    const {nodeDef} = this.props
+    const { nodeDef, setFormNodeDefAddChildTo } = this.props
 
     return (
       <div className="survey-form__actions">
-
-        <button className="btn btn-s btn-of-light-xs no-border btn-toggle"
-                onClick={() => this.toggleOpen()}>
-          <span className={`icon icon-${this.state.opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
-        </button>
-
         {
-          this.state.opened ?
-            <AddNodeDefButtons nodeDef={nodeDef} addNodeDef={this.addNodeDef}/>
-            : null
-        }
+          nodeDef &&
+          <React.Fragment>
+            <button className="btn btn-s btn-of-light-xs no-border btn-toggle"
+                    onClick={() => setFormNodeDefAddChildTo(null)}>
+              <span className="icon icon-cross icon-16px"/>
+            </button>
 
+            <AddNodeDefButtons nodeDef={nodeDef} addNodeDef={this.addNodeDef}/>
+          </React.Fragment>
+        }
       </div>
 
     )
@@ -124,24 +87,11 @@ class FormActions extends React.Component {
 
 }
 
-const mapStateToProps = state => {
-  const survey = getSurvey(state)
-  const surveyForm = getSurveyForm(state)
+const mapStateToProps = state => ({
+  nodeDef: SurveyFormState.getNodeDefAddChildTo(state)
+})
 
-  const nodeDefUnlocked = getNodeDefFormUnlocked(survey)(surveyForm)
-  const nodeDefActivePage = getFormActivePageNodeDef(survey)(surveyForm)
-
-  const nodeDef = nodeDefUnlocked &&
-  (
-    nodeDefActivePage.uuid === nodeDefUnlocked.uuid ||
-    Survey.isNodeDefAncestor(nodeDefActivePage, nodeDefUnlocked)(survey)
-  )
-    ? nodeDefUnlocked
-    : null
-
-  return {
-    nodeDef
-  }
-}
-
-export default connect(mapStateToProps, {createNodeDef})(FormActions)
+export default connect(
+  mapStateToProps,
+  { createNodeDef, setFormNodeDefAddChildTo }
+)(FormActions)

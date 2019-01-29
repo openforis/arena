@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 
 import Survey from '../../../../common/survey/survey'
-import { getSurveyForm } from '../surveyFormState'
 
 // DOCS
 const surveyState = {
