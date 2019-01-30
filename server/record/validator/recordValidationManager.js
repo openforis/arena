@@ -14,7 +14,7 @@ const CountValidator = require('./helpers/countValidator')
 const DependentsValidator = require('./helpers/dependentNodesValidator')
 const RecordKeysUniquenessValidator = require('./helpers/recordKeysUniquenessValidator')
 
-const validateNodes = async (survey, recordUuid, nodes, tx) => {
+const validateNodes = async (survey, recordUuid, nodes, preview, tx) => {
 
 
   // 1. validate self and dependent nodes (validations/expressions)
@@ -25,7 +25,7 @@ const validateNodes = async (survey, recordUuid, nodes, tx) => {
   const nodeCountValidations = await CountValidator.validateChildrenCount(survey, recordUuid, nodePointers, tx)
 
   // 3. validate record keys uniqueness
-  const recordKeysUniquenessValidations = Survey.isPublished(Survey.getSurveyInfo(survey)) && includesRecordKeys(survey, nodes)
+  const recordKeysUniquenessValidations = !preview && isNodeKeyUpdated(survey, nodes)
     ? await RecordKeysUniquenessValidator.validateKeysUniqueness(survey, recordUuid, tx)
     : {}
 
@@ -38,14 +38,15 @@ const validateNodes = async (survey, recordUuid, nodes, tx) => {
   }
 
   // 5. persist validation
-  const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, tx)
+  const surveyId = Survey.getId(survey)
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, tx)
 
   const recordValidationUpdated = R.pipe(
     Validator.mergeValidation(nodesValidation),
     Validator.getValidation
   )(record)
 
-  await RecordRepository.updateValidation(Survey.getId(survey), recordUuid, recordValidationUpdated, tx)
+  await RecordRepository.updateValidation(surveyId, recordUuid, recordValidationUpdated, tx)
 
   return nodesValidation
 }
@@ -88,7 +89,7 @@ const fetchNodePointers = async (survey, nodes, tx) => {
   )(nodePointers)
 }
 
-const includesRecordKeys = (survey, nodes) => R.pipe(
+const isNodeKeyUpdated = (survey, nodes) => R.pipe(
   R.values,
   R.any(n => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(n))(survey)
