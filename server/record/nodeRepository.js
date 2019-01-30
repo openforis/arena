@@ -102,30 +102,20 @@ const fetchSelfOrDescendantNodes = async (surveyId, nodeDefUuid, recordUuid, par
   )
 
 const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
-  const nodes = await client.map(`
+  const nodes = await fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
+  return R.head(nodes)
+}
+
+const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
+  await client.map(`
     SELECT * 
     FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE record_uuid = $1
-      AND parent_uuid = $2
+      AND parent_uuid ${nodeUuid ? '= $2' : 'is null'}
       AND node_def_uuid = $3`,
     [recordUuid, nodeUuid, childDefUUid],
     dbTransformCallback
   )
-
-  return R.head(nodes)
-}
-
-const countChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
-  await client.one(`
-    SELECT COUNT(*) as cnt
-    FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $1
-      AND parent_uuid = $2
-      AND node_def_uuid = $3`,
-    [recordUuid, nodeUuid, childDefUUid],
-    obj => R.pipe(R.prop('cnt'), Number)(obj)
-  )
-
 
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
@@ -191,7 +181,7 @@ module.exports = {
   fetchDescendantNodesByCodeUuid,
   fetchSelfOrDescendantNodes,
   fetchChildNodeByNodeDefUuid,
-  countChildNodesByNodeDefUuid,
+  fetchChildNodesByNodeDefUuid,
 
   //UPDATE
   updateNode,

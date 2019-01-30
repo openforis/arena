@@ -18,7 +18,7 @@ const Queue = require('../../../../common/queue')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const DependentNodesUpdater = require('./helpers/dependentNodesUpdater')
-const RecordValidator = require('../../validator/recordValidator')
+const RecordValidationManager = require('../../validator/recordValidationManager')
 
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 
@@ -101,7 +101,7 @@ class RecordUpdateThread extends Thread {
       this._postMessage(WebSocketEvents.nodesUpdate, updatedDependentNodes)
 
       // 3. update node validations
-      const validations = await RecordValidator.validateNodes(survey, this.recordUuid, updatedNodes, t)
+      const validations = await RecordValidationManager.validateNodes(survey, this.recordUuid, updatedNodes, t)
       this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
 
       // 4. update survey rdb

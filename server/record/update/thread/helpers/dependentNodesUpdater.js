@@ -11,7 +11,7 @@ const Node = require('../../../../../common/record/node')
 
 const {dependencyTypes} = require('../../../../survey/surveyDependenchyGraph')
 
-const NodeDependencyManager = require('../nodeDependencyManager')
+const NodeDependencyManager = require('../../../nodeDependencyManager')
 
 const RecordExprParser = require('../../../recordExprParser')
 
