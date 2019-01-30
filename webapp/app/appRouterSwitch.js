@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { Switch, Route, Redirect } from 'react-router'
+import { Switch, Route, matchPath } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
 import DynamicImport from '../commonComponents/DynamicImport'
 
@@ -28,8 +28,11 @@ class AppRouterSwitch extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const {user, activeJobUpdate, recordNodesUpdate, nodeValidationsUpdate, throwSystemError} = this.props
-    const {user: prevUser} = prevProps
+    const {
+      user, history,
+      activeJobUpdate, recordNodesUpdate, nodeValidationsUpdate, throwSystemError
+    } = this.props
+    const { user: prevUser } = prevProps
 
     if (user && !prevUser) {
       openSocket({
@@ -40,6 +43,8 @@ class AppRouterSwitch extends React.Component {
       })
     } else if (prevUser && !user) {
       closeSocket()
+      // logout - redirect to login page
+      history.push(loginUri)
     }
   }
 
@@ -48,7 +53,7 @@ class AppRouterSwitch extends React.Component {
   }
 
   render () {
-    const {location, isReady, user, systemError} = this.props
+    const { location, isReady, systemError } = this.props
 
     const isLogin = getLocationPathname(this.props) === loginUri
 
@@ -62,12 +67,6 @@ class AppRouterSwitch extends React.Component {
       isReady
         ? (
           <React.Fragment>
-
-            {
-              !user && !isLogin
-                ? <Redirect to={loginUri}/>
-                : null
-            }
 
             <div className="main__bg1"/>
             <div className="main__bg2"/>
