@@ -1,6 +1,5 @@
 const R = require('ramda')
 const camelize = require('camelize')
-const toSnakeCase = require('to-snake-case')
 
 const Survey = require('../../../common/survey/survey')
 const SurveyUtils = require('../../../common/survey/surveyUtils')

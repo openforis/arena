@@ -12,10 +12,9 @@ const NodeRepository = require('../nodeRepository')
 
 const CountValidator = require('./helpers/countValidator')
 const DependentsValidator = require('./helpers/dependentNodesValidator')
-const RecordKeysUniquenessValidator = require('./helpers/recordKeysUniquenessValidator')
+const KeysUniquenessValidator = require('./helpers/keysUniquenessValidator')
 
 const validateNodes = async (survey, recordUuid, nodes, tx) => {
-
 
   // 1. validate self and dependent nodes (validations/expressions)
   const nodesDependentValidations = await DependentsValidator.validateSelfAndDependentNodes(survey, recordUuid, nodes, tx)
@@ -26,7 +25,7 @@ const validateNodes = async (survey, recordUuid, nodes, tx) => {
 
   // 3. validate record keys uniqueness
   const recordKeysUniquenessValidations = Survey.isPublished(Survey.getSurveyInfo(survey)) && includesRecordKeys(survey, nodes)
-    ? await RecordKeysUniquenessValidator.validateKeysUniqueness(survey, recordUuid, tx)
+    ? await KeysUniquenessValidator.validateRecordKeysUniqueness(survey, recordUuid, tx)
     : {}
 
   // 4. merge validations

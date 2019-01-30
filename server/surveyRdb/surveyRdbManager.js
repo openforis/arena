@@ -34,6 +34,9 @@ const queryTable = async (surveyId, tableName, cols = [],
 const countTable = async (surveyId, tableName, filter, client = db) =>
   await TableViewQuery.runCount(surveyId, tableName, filter, client)
 
+const queryRootTableByRecordKeys = async (survey, recordUuid, client = db) =>
+  await TableViewQuery.queryRootTableByRecordKeys(survey, recordUuid, client)
+
 module.exports = {
   dropSchema,
   createSchema,
@@ -41,6 +44,8 @@ module.exports = {
 
   insertIntoTable,
   updateTableNodes,
+
   queryTable,
   countTable,
+  queryRootTableByRecordKeys,
 }
