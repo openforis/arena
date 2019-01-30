@@ -49,7 +49,9 @@ class NodeDefSwitch extends React.Component {
   }
 
   toggleErrorClass () {
-    this.element.current.parentNode.classList.toggle('node-def__invalid')
+    const { nodeDef } = this.props
+    if (NodeDef.isNodeDefAttribute(nodeDef))
+      this.element.current.classList.toggle('node-def__invalid')
   }
 
   componentDidMount () {
