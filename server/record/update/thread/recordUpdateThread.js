@@ -101,7 +101,7 @@ class RecordUpdateThread extends Thread {
       this._postMessage(WebSocketEvents.nodesUpdate, updatedDependentNodes)
 
       // 3. update node validations
-      const validations = await RecordValidationManager.validateNodes(survey, this.recordUuid, updatedNodes, t)
+      const validations = await RecordValidationManager.validateNodes(survey, this.recordUuid, updatedNodes, this.preview, t)
       this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
 
       // 4. update survey rdb

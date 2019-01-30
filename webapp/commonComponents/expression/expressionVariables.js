@@ -15,13 +15,13 @@ const getJsVariables = (nodeDef, lang, depth) => {
     : ''
 
   const valueProp = NodeDef.isNodeDefCode(nodeDef) || NodeDef.isNodeDefTaxon(nodeDef)
-    ? '.code'
+    ? '.props.code'
     : ''
 
   return [{
     value: `this${parentFnCalls}.node('${nodeDefName}').getValue()${valueProp}`,
 
-    label: `${NodeDef.getNodeDefLabel(nodeDef, lang)}.getValue()${valueProp}`,
+    label: NodeDef.getNodeDefLabel(nodeDef, lang),
 
     type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
       NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal

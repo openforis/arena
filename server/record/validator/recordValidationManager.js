@@ -14,7 +14,7 @@ const CountValidator = require('./helpers/countValidator')
 const DependentsValidator = require('./helpers/dependentNodesValidator')
 const KeysUniquenessValidator = require('./helpers/keysUniquenessValidator')
 
-const validateNodes = async (survey, recordUuid, nodes, tx) => {
+const validateNodes = async (survey, recordUuid, nodes, preview, tx) => {
 
   // 1. validate self and dependent nodes (validations/expressions)
   const nodesDependentValidations = await DependentsValidator.validateSelfAndDependentNodes(survey, recordUuid, nodes, tx)
@@ -24,27 +24,42 @@ const validateNodes = async (survey, recordUuid, nodes, tx) => {
   const nodeCountValidations = await CountValidator.validateChildrenCount(survey, recordUuid, nodePointers, tx)
 
   // 3. validate record keys uniqueness
-  const recordKeysUniquenessValidations = Survey.isPublished(Survey.getSurveyInfo(survey)) && includesRecordKeys(survey, nodes)
+  const recordKeysValidations = !preview && isRootNodeKeysUpdated(survey, nodes)
     ? await KeysUniquenessValidator.validateRecordKeysUniqueness(survey, recordUuid, tx)
     : {}
 
-  // 4. merge validations
+  // 4. validate entity keys uniqueness
+  const updatedEntities = await getUpdatedEntities(survey, nodes, tx)
+  const entityKeysValidationsArray = await Promise.all(
+    updatedEntities.map(
+      async nodeEntity =>
+        await KeysUniquenessValidator.validateEntityKeysUniqueness(survey, recordUuid, nodeEntity, tx)
+    )
+  )
+  const entityKeysValidations = R.pipe(
+    R.flatten,
+    R.mergeAll
+  )(entityKeysValidationsArray)
+
+  // 5. merge validations
   const nodesValidation = {
     fields: R.pipe(
       R.mergeLeft(nodeCountValidations),
-      R.mergeLeft(recordKeysUniquenessValidations)
+      R.mergeLeft(recordKeysValidations),
+      R.mergeLeft(entityKeysValidations)
     )(nodesDependentValidations)
   }
 
   // 5. persist validation
-  const record = await RecordRepository.fetchRecordByUuid(Survey.getId(survey), recordUuid, tx)
+  const surveyId = Survey.getId(survey)
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, tx)
 
   const recordValidationUpdated = R.pipe(
     Validator.mergeValidation(nodesValidation),
     Validator.getValidation
   )(record)
 
-  await RecordRepository.updateValidation(Survey.getId(survey), recordUuid, recordValidationUpdated, tx)
+  await RecordRepository.updateValidation(surveyId, recordUuid, recordValidationUpdated, tx)
 
   return nodesValidation
 }
@@ -87,7 +102,7 @@ const fetchNodePointers = async (survey, nodes, tx) => {
   )(nodePointers)
 }
 
-const includesRecordKeys = (survey, nodes) => R.pipe(
+const isRootNodeKeysUpdated = (survey, nodes) => R.pipe(
   R.values,
   R.any(n => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(n))(survey)
@@ -96,6 +111,25 @@ const includesRecordKeys = (survey, nodes) => R.pipe(
     },
   )
 )(nodes)
+
+const getUpdatedEntities = async (survey, nodes, tx) => {
+  const entities = await Promise.all(
+    R.values(nodes).map(
+      async node => {
+        const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+        const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+
+        if (NodeDef.isNodeDefKey(nodeDef) &&
+          !NodeDef.isNodeDefRoot(parentDef) &&
+          !R.isEmpty(Survey.getNodeDefKeys(parentDef)(survey))) {
+          return await NodeRepository.fetchNodeByUuid(Survey.getId(survey), Node.getParentUuid(node), tx)
+        } else {
+          return null
+        }
+      })
+  )
+  return R.reject(R.isNil, entities)
+}
 
 module.exports = {
   validateNodes

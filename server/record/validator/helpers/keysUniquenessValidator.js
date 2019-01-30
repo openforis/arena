@@ -22,20 +22,25 @@ const validationFields = {
 
 const validateEntityKeysUniqueness = async (survey, recordUuid, nodeEntity, tx) => {
 
-  // 1. find all sibling entities
   const entityDefUuid = Node.getNodeDefUuid(nodeEntity)
-  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)
+
+  // 1. find all sibling entities
 
   const surveyId = Survey.getId(survey)
   const entityUuid = Node.getUuid(nodeEntity)
 
   const allEntities = await NodeRepository.fetchChildNodesByNodeDefUuid(surveyId, recordUuid, Node.getParentUuid(nodeEntity), entityDefUuid, tx)
+
   const siblingEntities = R.reject(R.propEq(Node.keys.uuid, entityUuid), allEntities)
 
   // 2. fetch key values
 
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
+
   const keyValues = await fetchKeyValues(surveyId, recordUuid, entityUuid, keyDefs, tx)
+
+  console.log(keyValues)
 
   // 3. find duplicate sibling entity with same key values
 
@@ -59,7 +64,7 @@ const validateEntityKeysUniqueness = async (survey, recordUuid, nodeEntity, tx) 
 }
 
 const fetchKeyValues = async (surveyId, recordUuid, entityUuid, keyDefs, tx) => {
-  const keyNodes = await NodeRepository.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, entityUuid, keyDefs, tx)
+  const keyNodes = await NodeRepository.fetchChildNodesByNodeDefUuids(surveyId, recordUuid, entityUuid, R.pluck(NodeDef.keys.uuid, keyDefs), tx)
   return R.pluck(Node.keys.value, keyNodes)
 }
 

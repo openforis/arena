@@ -60,12 +60,12 @@ const bindNode = (survey, node, tx) => {
 
       if (NodeDef.isNodeDefCode(nodeDef)) {
         const itemUuid = Node.getCategoryItemUuid(node)
-        return itemUuid ? await CategoryManager.fetchItemByUuid(surveyId, itemUuid) : {}
+        return itemUuid ? await CategoryManager.fetchItemByUuid(surveyId, itemUuid) : null
       }
 
       if (NodeDef.isNodeDefTaxon(nodeDef)) {
         const taxonUuid = Node.getNodeTaxonUuid(node)
-        return taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid) : {}
+        return taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid) : null
       }
 
       const value = Node.getNodeValue(node)
