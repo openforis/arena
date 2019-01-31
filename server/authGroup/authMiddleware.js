@@ -1,5 +1,5 @@
-const {getRestParam} = require('../serverUtils/request')
-const {sendErr} = require('../serverUtils/response')
+const { getRestParam } = require('../serverUtils/request')
+const { sendErr } = require('../serverUtils/response')
 
 const SurveyManager = require('../survey/surveyManager')
 const RecordManager = require('../record/recordManager')
@@ -17,7 +17,7 @@ const UnauthorizedError = require('./unauthorizedError')
 
 const requireSurveyPermission = permissionFn =>
   async (req, res, next) => {
-    const {user} = req
+    const { user } = req
     const survey = await SurveyManager.fetchSurveyById(getRestParam(req, 'surveyId'))
 
     if (permissionFn(user, Survey.getSurveyInfo(survey))) {
@@ -29,7 +29,7 @@ const requireSurveyPermission = permissionFn =>
 
 const requireRecordPermission = (permissionFn) =>
   async (req, res, next) => {
-    const {user} = req
+    const { user } = req
 
     const surveyId = getRestParam(req, 'surveyId')
     const recordUuid = getRestParam(req, 'recordUuid')
@@ -45,6 +45,7 @@ const requireRecordPermission = (permissionFn) =>
 
 module.exports = {
   // Survey
+  requireSurveyViewPermission: requireSurveyPermission(canViewSurvey),
   requireSurveyEditPermission: requireSurveyPermission(canEditSurvey),
 
   // Record

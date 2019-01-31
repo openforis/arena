@@ -1,14 +1,14 @@
 const R = require('ramda')
 
-const {sendErr, sendOk} = require('../serverUtils/response')
-const {getRestParam, getBoolParam} = require('../serverUtils/request')
+const { sendErr, sendOk } = require('../serverUtils/response')
+const { getRestParam, getBoolParam } = require('../serverUtils/request')
 
 const Survey = require('../../common/survey/survey')
 const SurveyManager = require('./surveyManager')
 const SurveyValidator = require('./surveyValidator')
 const Validator = require('../../common/validation/validator')
 
-const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
+const AuthMiddleware = require('../authGroup/authMiddleware')
 
 const JobManager = require('../job/jobManager')
 const JobUtils = require('../job/jobUtils')
@@ -19,15 +19,15 @@ module.exports.init = app => {
   // ==== CREATE
   app.post('/survey', async (req, res) => {
     try {
-      const {user, body} = req
+      const { user, body } = req
       const validation = await SurveyValidator.validateNewSurvey(body)
 
       if (validation.valid) {
         const survey = await SurveyManager.createSurvey(user, body)
 
-        res.json({survey})
+        res.json({ survey })
       } else {
-        res.json({validation})
+        res.json({ validation })
       }
     } catch (err) {
       sendErr(res, err)
@@ -38,24 +38,24 @@ module.exports.init = app => {
   // ==== READ
   app.get('/surveys', async (req, res) => {
     try {
-      const {user} = req
+      const { user } = req
 
       const surveys = await SurveyManager.fetchUserSurveysInfo(user)
 
-      res.json({surveys})
+      res.json({ surveys })
     } catch (err) {
       sendErr(res, err)
     }
   })
 
-  app.get('/survey/:id', async (req, res) => {
+  app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
     try {
-      const surveyId = getRestParam(req, 'id')
+      const surveyId = getRestParam(req, 'surveyId')
       const draft = getBoolParam(req, 'draft')
 
       const survey = await SurveyManager.fetchSurveyById(surveyId, draft)
 
-      res.json({survey})
+      res.json({ survey })
     } catch (err) {
       sendErr(res, err)
     }
@@ -63,10 +63,10 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/prop', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/prop', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     try {
-      const {body, user} = req
-      const {key, value} = body
+      const { body, user } = req
+      const { key, value } = body
 
       const surveyId = getRestParam(req, 'surveyId')
 
@@ -75,24 +75,24 @@ module.exports.init = app => {
         Validator.getValidation
       )(await SurveyManager.updateSurveyProp(surveyId, key, value, user))
 
-      res.json({validation})
+      res.json({ validation })
     } catch (err) {
       sendErr(res, err)
     }
   })
 
-  app.put('/survey/:surveyId/publish', requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const user = req.user
 
-      const surveyPublishJob = new SurveyPublishJob({user, surveyId})
+      const surveyPublishJob = new SurveyPublishJob({ user, surveyId })
 
       JobManager.executeJobThread(surveyPublishJob)
 
       const job = JobUtils.jobToJSON(surveyPublishJob)
 
-      res.json({job})
+      res.json({ job })
     } catch (err) {
       sendErr(res, err)
     }
@@ -100,10 +100,10 @@ module.exports.init = app => {
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId', requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
-      const {user} = req
+      const { user } = req
 
       await SurveyManager.deleteSurvey(surveyId, user)
 
