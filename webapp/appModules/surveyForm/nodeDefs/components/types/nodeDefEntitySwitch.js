@@ -34,6 +34,7 @@ class NodeDefEntitySwitch extends React.Component {
       locked,
       canEditDef,
       canEditRecord,
+      canAddNode,
     } = this.props
 
     if (isRenderForm(nodeDef))
@@ -50,6 +51,7 @@ class NodeDefEntitySwitch extends React.Component {
                                 locked={locked}
                                 canEditDef={canEditDef}
                                 canEditRecord={canEditRecord}
+                                canAddNode={canAddNode}
                                 removeNode={removeNode}/>
     else if (isRenderTable(nodeDef))
       return <NodeDefEntityTable label={label}
@@ -67,7 +69,8 @@ class NodeDefEntitySwitch extends React.Component {
                                  removeNode={removeNode}
                                  locked={locked}
                                  canEditDef={canEditDef}
-                                 canEditRecord = {canEditRecord}/>
+                                 canEditRecord={canEditRecord}
+                                 canAddNode={canAddNode}/>
 
     return null
   }
@@ -79,5 +82,5 @@ const mapStateToProps = (state, props) => ({
 
 export default connect(
   mapStateToProps,
-  {putNodeDefProp}
+  { putNodeDefProp }
 )(NodeDefEntitySwitch)

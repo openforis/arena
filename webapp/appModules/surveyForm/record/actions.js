@@ -68,8 +68,8 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
 export const updateNode = (nodeDef, node, value, file = null) => dispatch => {
 
   const nodeToUpdate = R.pipe(
-    R.dissoc('placeholder'),
-    R.assoc('value', value),
+    R.dissoc(Node.keys.placeholder),
+    R.assoc(Node.keys.value, value),
   )(node)
 
   recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate })(dispatch)

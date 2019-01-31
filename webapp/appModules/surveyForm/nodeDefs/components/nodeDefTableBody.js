@@ -13,19 +13,20 @@ import Node from '../../../../../common/record/node'
 
 import { getNodeDefComponent } from '../nodeDefSystemProps'
 
-const getNodeValues = async (surveyInfo, nodes) => {
-  const nodeValues = R.pipe(
-    R.reject(R.propEq('placeholder', true)),
-    R.map(n => Node.getNodeValue(n, null)),
-    R.reject(R.isNil),
+const getNodeValues = async (surveyInfo, nodeDef, nodes) => {
+  const nonEmptyNodes = R.pipe(
+    R.reject(Node.isPlaceholder),
+    R.reject(Node.isNodeValueBlank),
   )(nodes)
 
   const stringNodeValues = await Promise.all(
-    nodeValues.map(
-      async nodeValue =>
-        nodeValue.fileName ? nodeValue.fileName
-          : nodeValue.itemUuid ? await loadCategoryItemLabel(surveyInfo, nodeValue.itemUuid)
-          : nodeValue
+    nonEmptyNodes.map(
+      async node =>
+        NodeDef.isNodeDefCode(nodeDef)
+          ? await loadCategoryItemLabel(surveyInfo, Node.getCategoryItemUuid(node))
+          : NodeDef.isNodeDefFile(nodeDef)
+          ? Node.getNodeFileName(node)
+          : Node.getNodeValue(node)
     )
   )
 
@@ -61,8 +62,8 @@ class NodeDefMultipleTableBody extends React.Component {
   }
 
   async loadNodeValues () {
-    const { surveyInfo, nodes } = this.props
-    const nodeValues = await getNodeValues(surveyInfo, nodes)
+    const { surveyInfo, nodeDef, nodes } = this.props
+    const nodeValues = await getNodeValues(surveyInfo, nodeDef, nodes)
 
     this.setState({ nodeValues })
   }

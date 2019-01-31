@@ -63,11 +63,13 @@ const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {
     const values = await DataCol.getValues(Survey.getSurveyInfo(survey), nodeDef, node)
     return R.head(values)
   }
-  
+
   const whereConditions = await Promise.all(
     keyNodes.map(
-      async node =>
-        `${getColName(node)} = '${await getColValue(node)}'`
+      async node => {
+        const colValue = await getColValue(node)
+        return `${getColName(node)} ${colValue === null ? ' IS NULL' : " = '" + colValue + "'"}`
+      }
     )
   )
 

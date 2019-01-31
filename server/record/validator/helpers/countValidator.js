@@ -6,6 +6,7 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const NodeDefValidations = require('../../../../common/survey/nodeDefValidations')
 
 const Node = require('../../../../common/record/node')
+const RecordValidation = require('../../../../common/record/recordValidation')
 const Validator = require('../../../../common/validation/validator')
 const NumberUtils = require('../../../../common/numberUtils')
 
@@ -41,9 +42,10 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
 
         const minCountValid = isNaN(minCount) || count >= minCount
         const maxCountValid = isNaN(maxCount) || count <= maxCount
+        const valid = minCountValid && maxCountValid
 
         const childrenCountValidation = {
-          [Validator.keys.valid]: minCountValid && maxCountValid,
+          [Validator.keys.valid]: valid,
           [Validator.keys.fields]: {
             'minCount': {
               [Validator.keys.valid]: minCountValid,
@@ -58,12 +60,13 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
         return {
           [nodeCtxUuid]: {
             [Validator.keys.fields]: {
-              'childrenCount': {
+              [RecordValidation.keys.childrenCount]: {
                 [Validator.keys.fields]: {
                   [nodeDefUuid]: childrenCountValidation
                 }
               }
-            }
+            },
+            [Validator.keys.valid]: valid
           }
         }
       }
