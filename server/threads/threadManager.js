@@ -1,4 +1,4 @@
-const {Worker} = require('worker_threads')
+const { Worker } = require('worker_threads')
 const WebSocketManager = require('../webSocket/webSocketManager')
 const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
 
@@ -7,8 +7,8 @@ const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
  */
 class ThreadManager {
 
-  constructor (filePath, data, messageHandler, exitHandler = null) {
-    this.worker = new Worker(filePath, {workerData: data})
+  constructor(filePath, data, messageHandler, exitHandler = null) {
+    this.worker = new Worker(filePath, { workerData: data })
     this.threadId = this.worker.threadId
 
     this.worker.on('message', this.messageHandlerWrapper.bind(this)(messageHandler))
@@ -22,8 +22,8 @@ class ThreadManager {
     console.log(`thread ${this.threadId} created`)
   }
 
-  messageHandlerWrapper (messageHandler) {
-    return ({user, surveyId, msg}) => {
+  messageHandlerWrapper(messageHandler) {
+    return ({ user, msg }) => {
       if (msg.type === 'error') {
         WebSocketManager.notifyUser(user.id, WebSocketEvents.error, msg.error)
       } else {
@@ -36,11 +36,11 @@ class ThreadManager {
    * Post a message to thread in worker pool
    * @param message
    */
-  postMessage (message) {
+  postMessage(message) {
     this.worker.postMessage(message)
   }
 
-  terminate () {
+  terminate() {
     this.worker.terminate()
   }
 

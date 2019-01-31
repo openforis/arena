@@ -15,19 +15,27 @@ const Record = require('../../../common/record/record')
 
 const RecordUpdateThread = require('./thread/recordUpdateThread')
 
-const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
+const createRecordUpdateThread = (usersByRecordUuid => (user, surveyId, recordUuid, preview) => {
   const userId = user.id
+  usersByRecordUuid = R.assocPath([recordUuid, userId], user, usersByRecordUuid)
+
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
-    {user, surveyId, recordUuid, preview},
-    msg => WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg)),
-    () => recordUpdateThreads.removeThread(userId)
+    { user, surveyId, recordUuid, preview },
+    msg => {
+      const userIds = R.pipe(R.prop(recordUuid), R.keys)(usersByRecordUuid)
+      userIds.forEach(id => WebSocketManager.notifyUser(id, msg.type, R.prop('content', msg)))
+    },
+    () => {
+      recordUpdateThreads.removeThread(userId)
+      R.dissocPath([recordUuid, userId], usersByRecordUuid)
+    }
   )
 
   recordUpdateThreads.putThread(userId, thread)
 
   return thread
-}
+})({})
 
 /**
  * Start record update thread
@@ -78,7 +86,7 @@ const createRecord = async (user, surveyId, record) => {
     recordUuid: Record.getUuid(record),
     preview: Record.isPreview(record)
   })
-  await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, record})
+  await recordUpdateThread.processMessage({ type: recordThreadMessageTypes.createRecord, record })
 }
 
 /**
@@ -90,7 +98,7 @@ const createRecord = async (user, surveyId, record) => {
  */
 const persistNode = (user, surveyId, node) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, node})
+  updateWorker.postMessage({ type: recordThreadMessageTypes.persistNode, node })
 }
 
 /**
@@ -102,7 +110,7 @@ const persistNode = (user, surveyId, node) => {
  */
 const deleteNode = (user, surveyId, nodeUuid) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, nodeUuid})
+  updateWorker.postMessage({ type: recordThreadMessageTypes.deleteNode, nodeUuid })
 }
 
 module.exports = {

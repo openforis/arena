@@ -1,6 +1,6 @@
 const path = require('path')
 
-const {jobThreadMessageTypes} = require('./jobUtils')
+const { jobThreadMessageTypes } = require('./jobUtils')
 const ThreadsCache = require('../threads/threadsCache')
 const ThreadManager = require('../threads/threadManager')
 
@@ -28,7 +28,7 @@ const notifyJobUpdate = job => {
 const cancelActiveJobByUserId = async (userId) => {
   const jobThread = userJobThreads.getThread(userId)
   if (jobThread) {
-    jobThread.postMessage({type: jobThreadMessageTypes.cancelJob})
+    jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
   }
 }
 
@@ -38,7 +38,7 @@ const executeJobThread = (job) => {
 
   const thread = new ThreadManager(
     path.resolve(__dirname, 'jobThread.js'),
-    {jobType: job.type, jobParams: job.params},
+    { jobType: job.type, jobParams: job.params },
     async job => await notifyJobUpdate(job)
   )
 
