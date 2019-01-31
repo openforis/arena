@@ -75,20 +75,22 @@ const ValidationsProps = props => {
           )
           : null
       }
-
-      <ExpressionsProp label="Expressions"
-                       readOnly={readOnly}
-                       applyIf={true}
-                       showLabels={true}
-                       values={NodeDefValidations.getExpressions(nodeDefValidations)}
-                       validation={R.pipe(
-                         Validator.getFieldValidation('validations'),
-                         Validator.getFieldValidation('expressions'),
-                       )(validation)}
-                       onChange={expressions => handleValidationsUpdate(
-                         NodeDefValidations.assocExpressions(expressions)(nodeDefValidations)
-                       )}
-                       nodeDefUuid={nodeDefParentUuid}/>
+      {
+        NodeDef.isNodeDefAttribute(nodeDef) &&
+        <ExpressionsProp label="Expressions"
+                         readOnly={readOnly}
+                         applyIf={true}
+                         showLabels={true}
+                         values={NodeDefValidations.getExpressions(nodeDefValidations)}
+                         validation={R.pipe(
+                           Validator.getFieldValidation('validations'),
+                           Validator.getFieldValidation('expressions'),
+                         )(validation)}
+                         onChange={expressions => handleValidationsUpdate(
+                           NodeDefValidations.assocExpressions(expressions)(nodeDefValidations)
+                         )}
+                         nodeDefUuid={nodeDefParentUuid}/>
+      }
     </div>
   )
 }

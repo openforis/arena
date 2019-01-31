@@ -38,8 +38,7 @@ const validateEntityKeysUniqueness = async (survey, recordUuid, nodeEntity, tx) 
             [Validator.keys.errors]: isDuplicate ? [errorKeys.duplicateEntity] : [],
             [Validator.keys.valid]: !isDuplicate
           }
-        },
-        [Validator.keys.valid]: !isDuplicate
+        }
       }
     })
   )

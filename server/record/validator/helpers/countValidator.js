@@ -21,19 +21,19 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
   const nodePointersValidated = await Promise.all(
     nodePointers.map(
       async nodePointer => {
-        const { nodeCtx, nodeDef } = nodePointer
-        const validations = NodeDef.getValidations(nodeDef)
+        const { node, childDef } = nodePointer
+        const validations = NodeDef.getValidations(childDef)
         const minCount = NumberUtils.toNumber(NodeDefValidations.getMinCount(validations))
         const maxCount = NumberUtils.toNumber(NodeDefValidations.getMaxCount(validations))
 
         if (isNaN(minCount) && isNaN(maxCount))
           return {}
 
-        const nodeDefUuid = NodeDef.getUuid(nodeDef)
-        const nodeCtxUuid = Node.getUuid(nodeCtx)
+        const childDefUuid = NodeDef.getUuid(childDef)
+        const nodeUuid = Node.getUuid(node)
 
-        const nodes = await NodeRepository.fetchChildNodesByNodeDefUuid(Survey.getId(survey), recordUuid, nodeCtxUuid, nodeDefUuid, tx)
-        const count = NodeDef.isNodeDefEntity(nodeDef)
+        const nodes = await NodeRepository.fetchChildNodesByNodeDefUuid(Survey.getId(survey), recordUuid, nodeUuid, childDefUuid, tx)
+        const count = NodeDef.isNodeDefEntity(childDef)
           ? nodes.length
           : R.pipe(
             R.reject(Node.isNodeValueBlank),
@@ -58,15 +58,15 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
           }
         }
         return {
-          [nodeCtxUuid]: {
+          [nodeUuid]: {
             [Validator.keys.fields]: {
               [RecordValidation.keys.childrenCount]: {
                 [Validator.keys.fields]: {
-                  [nodeDefUuid]: childrenCountValidation
-                }
+                  [childDefUuid]: childrenCountValidation
+                },
+                [Validator.keys.valid]: valid
               }
-            },
-            [Validator.keys.valid]: valid
+            }
           }
         }
       }
