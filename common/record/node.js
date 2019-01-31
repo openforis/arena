@@ -12,6 +12,7 @@ const keys = {
   value: 'value',
   meta: 'meta',
   placeholder: 'placeholder',
+  deleted: 'deleted'
 }
 
 const metaKeys = {

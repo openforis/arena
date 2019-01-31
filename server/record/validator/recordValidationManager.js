@@ -11,13 +11,13 @@ const RecordRepository = require('../recordRepository')
 const NodeRepository = require('../nodeRepository')
 
 const CountValidator = require('./helpers/countValidator')
-const DependentsValidator = require('./helpers/dependentNodesValidator')
+const ValidationExpressionsEvaluator = require('./helpers/validationExpressionsEvaluator')
 const KeysUniquenessValidator = require('./helpers/keysUniquenessValidator')
 
 const validateNodes = async (survey, recordUuid, nodes, preview, tx) => {
 
   // 1. validate self and dependent nodes (validations/expressions)
-  const nodesDependentValidations = await DependentsValidator.validateSelfAndDependentNodes(survey, recordUuid, nodes, tx)
+  const nodesDependentValidations = await ValidationExpressionsEvaluator.validateSelfAndDependentNodes(survey, recordUuid, nodes, tx)
 
   // 2. validate min/max count
   const nodePointers = await fetchNodePointers(survey, nodes, tx)
