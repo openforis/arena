@@ -10,16 +10,17 @@ const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 
 const recordUpdateThreads = new ThreadsCache()
 const checkOutTimeoutsByUserId = {}
+let recordUsersMap = {}
 
 const Record = require('../../../common/record/record')
 
 const RecordUpdateThread = require('./thread/recordUpdateThread')
 
-const createRecordUpdateThread = (usersByRecordUuid => (user, surveyId, recordUuid, preview) => {
-  // Uses usersByRecordUuid to manage many users editing the same record
+const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
+  // Uses recordUsersMap to manage many users editing the same record
   const userId = user.id
 
-  usersByRecordUuid = R.assocPath([recordUuid, userId], null, usersByRecordUuid)
+  recordUsersMap = R.assocPath([recordUuid, userId], null, recordUsersMap)
 
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
@@ -29,18 +30,18 @@ const createRecordUpdateThread = (usersByRecordUuid => (user, surveyId, recordUu
         R.prop(recordUuid),
         R.keys,
         R.forEach(id => WebSocketManager.notifyUser(id, msg.type, R.prop('content', msg)))
-      )(usersByRecordUuid)
+      )(recordUsersMap)
     },
     () => {
       recordUpdateThreads.removeThread(userId)
-      R.dissocPath([recordUuid, userId], usersByRecordUuid)
+      R.dissocPath([recordUuid, userId], recordUsersMap)
     }
   )
 
   recordUpdateThreads.putThread(userId, thread)
 
   return thread
-})({})
+}
 
 /**
  * Start record update thread

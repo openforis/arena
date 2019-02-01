@@ -24,7 +24,7 @@ const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 
 class RecordUpdateThread extends Thread {
 
-  constructor (paramsObj) {
+  constructor(paramsObj) {
     super(paramsObj)
 
     this.queue = new Queue()
@@ -34,7 +34,7 @@ class RecordUpdateThread extends Thread {
     this.recordUpdater = new RecordUpdater(this.preview)
   }
 
-  async getSurvey (tx) {
+  async getSurvey(tx) {
     if (!this.survey) {
       const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.preview, true, false, tx)
 
@@ -49,13 +49,13 @@ class RecordUpdateThread extends Thread {
     return this.survey
   }
 
-  async onMessage (msg) {
+  async onMessage(msg) {
     this.queue.enqueue(msg)
 
     await this.processNext()
   }
 
-  async processNext () {
+  async processNext() {
     if (!(this.processing || this.queue.isEmpty())) {
 
       this.processing = true
@@ -69,12 +69,12 @@ class RecordUpdateThread extends Thread {
     }
   }
 
-  _postMessage (type, content) {
+  _postMessage(type, content) {
     if (!(isMainThread || R.isEmpty(content)))
       this.postMessage({ type, content })
   }
 
-  async processMessage (msg) {
+  async processMessage(msg) {
     await db.tx(async t => {
 
       const user = this.getUser()

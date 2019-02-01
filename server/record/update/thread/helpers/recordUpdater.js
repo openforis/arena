@@ -40,8 +40,7 @@ class RecordUpdater {
   }
 
   async persistNode (user, survey, node, t) {
-    const {uuid} = node
-
+    const uuid = Node.getUuid(node)
     const surveyId = Survey.getId(survey)
 
     const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)

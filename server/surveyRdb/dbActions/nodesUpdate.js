@@ -88,7 +88,6 @@ const runUpdate = (update, client) =>
   )
 
 const runInsert = (update, client) =>
-  console.log(update) ||
   client.query(
     `INSERT INTO ${update.schemaName}.${update.tableName}
       (${update.colNames.join(',')})
