@@ -6,14 +6,13 @@ import NodeDefFormItem from './components/nodeDefFormItem'
 import NodeDefTableHeader from './components/nodeDefTableHeader'
 import NodeDefTableBody from './components/nodeDefTableBody'
 import NodeDefEditFormActions from './components/nodeDefEditFormActions'
-import ErrorBadge from '../../../commonComponents/errorBadge'
+import NodeDefErrorBadge from './components/nodeDefErrorBadge'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../../common/survey/nodeDefValidations'
 import Validator from '../../../../common/validation/validator'
 import Record from '../../../../common/record/record'
-import RecordValidation from '../../../../common/record/recordValidation'
 import Node from '../../../../common/record/node'
 import Layout from '../../../../common/survey/nodeDefLayout'
 
@@ -45,35 +44,25 @@ class NodeDefSwitch extends React.Component {
     }
   }
 
-  toggleErrorClass () {
-    const { nodeDef } = this.props
-    if (NodeDef.isNodeDefAttribute(nodeDef))
-      this.element.current.classList.toggle('node-def__invalid')
-  }
-
   componentDidMount () {
-    const { nodeDef, edit, valid } = this.props
+    const { nodeDef, edit } = this.props
 
     if (edit && !nodeDef.id)
       this.element.current.scrollIntoView()
 
     this.checkNodePlaceholder()
-    if (!valid)
-      this.toggleErrorClass()
   }
 
   componentDidUpdate (prevProps) {
     this.checkNodePlaceholder()
-    if (prevProps.valid !== this.props.valid) {
-      this.toggleErrorClass()
-    }
   }
 
   render () {
     const {
-      nodeDef, validation,
+      nodeDef,
       edit, canEditDef,
       renderType, label, applicable,
+      entry, parentNode, nodes
     } = this.props
 
     const isPage = !!Layout.getPageUuid(nodeDef)
@@ -85,7 +74,11 @@ class NodeDefSwitch extends React.Component {
     return (
       <div className={className} ref={this.element}>
 
-        <ErrorBadge validation={validation} showLabel={edit}/>
+        <NodeDefErrorBadge nodeDef={nodeDef}
+                           edit={edit}
+                           parentNode={parentNode}
+                           nodes={nodes}
+                           container={this.element}/>
 
         <NodeDefEditFormActions nodeDef={nodeDef}
                                 edit={edit}
@@ -129,16 +122,16 @@ const mapStateToProps = (state, props) => {
         ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
         : []
 
-    const recordValidation = Record.getValidation(record)
-
-    const validation = NodeDef.isNodeDefSingle(nodeDef) && !R.isEmpty(nodes)
-      ? Validator.getFieldValidation(Node.getUuid(nodes[0]))(recordValidation)
-      : RecordValidation.getChildrenCountValidation(parentNode, nodeDef)(recordValidation)
-
-    const nodesValidated = nodes.map(n => {
-      const nodeValidation = Validator.getFieldValidation(Node.getUuid(n))(recordValidation)
-      return Node.assocValidation(nodeValidation)(n)
-    })
+    const nodesValidated = R.pipe(
+      R.map(n =>
+        Validator.assocValidation(
+          R.pipe(
+            Validator.getValidation,
+            Validator.getFieldValidation(Node.getUuid(n)),
+          )(record)
+        )(n)
+      )
+    )(nodes)
 
     const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
     const canAddNode = parentNode &&
@@ -147,8 +140,6 @@ const mapStateToProps = (state, props) => {
 
     return {
       nodes: nodesValidated,
-      validation,
-      valid: Validator.isValidationValid(validation),
       canAddNode
     }
   }
@@ -160,7 +151,7 @@ const mapStateToProps = (state, props) => {
       : true,
     ...entry
       ? mapEntryProps()
-      : { validation: Validator.getValidation(nodeDef) },
+      : {},
   }
 }
 

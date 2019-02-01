@@ -62,6 +62,10 @@ const validateNodeValidations = (survey, nodeDef, tx) =>
   }
 
 const validateAttribute = async (survey, attribute, nodeDef, validatedNodeUuids, tx) => {
+  if (Node.isDeleted(attribute)) {
+    return null
+  }
+
   const nodeUuid = Node.getUuid(attribute)
 
   // mark attribute validated

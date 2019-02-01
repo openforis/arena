@@ -120,15 +120,17 @@ module.exports = {
   getRecordUuid: R.prop(keys.recordUuid),
   getNodeValue,
   getNodeDefUuid,
-  isChildApplicable: childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid]),
 
   getNodeDefUuids,
 
-  isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
+  isPlaceholder: R.propEq(keys.placeholder, true),
+  isDeleted: R.propEq(keys.deleted, true),
 
   getValidation: Validator.getValidation,
 
-  isPlaceholder: R.propEq(keys.placeholder, true),
+  // ==== READ metadata
+  isChildApplicable: childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid]),
+  isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
 
   // ==== UPDATE
   assocValue: R.assoc(keys.value),

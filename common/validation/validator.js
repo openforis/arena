@@ -143,6 +143,7 @@ const cleanup = validation => R.pipe(
   getInvalidFieldValidations,
   // cleanup field validations
   R.map(cleanup),
+  R.reject(isValidationValid),
   R.ifElse(
     R.isEmpty,
     () => validValidation,
@@ -187,6 +188,8 @@ const mergeValidation = validation =>
 module.exports = {
   keys,
   errorKeys,
+
+  validValidation,
 
   validate,
   validateProp,
