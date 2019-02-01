@@ -1,26 +1,24 @@
 const io = require('socket.io')()
 const R = require('ramda')
 
-const {throttle} = require('../../common/functionsDefer')
+const { throttle } = require('../../common/functionsDefer')
 
 // ==== USER SOCKETS
 
 let userSockets = {}
 
-const getUserSockets = userId => R.prop(userId, userSockets)
+const getUserSockets = userId => R.propOr({}, userId, userSockets)
 
 const addUserSocket = (userId, socket) => userSockets = R.assocPath([userId, socket.id], socket, userSockets)
 
 const deleteUserSocket = (userId, socketId) => userSockets = R.dissocPath([userId, socketId], userSockets)
 
-const notifyUser = (userId, eventType, message) => {
-  const sockets = getUserSockets(userId)
-  if (sockets && !R.isEmpty(sockets)) {
-    R.forEachObjIndexed((socket) => {
-      throttle(message => socket.emit(eventType, message), `socket_${socket.id}`, 500)(message)
-    }, sockets)
-  }
-}
+const notifyUser = (userId, eventType, message) => R.pipe(
+  getUserSockets,
+  R.forEachObjIndexed(
+    socket => socket.emit(eventType, message),
+  )
+)(userId)
 
 const init = (server, sessionMiddleware) => {
 

@@ -38,13 +38,22 @@ class NodeDefSwitch extends React.Component {
   checkNodePlaceholder () {
     const { entry, nodes, nodeDef, parentNode, createNodePlaceholder } = this.props
 
-    if (entry && NodeDef.isNodeDefMultipleAttribute(nodeDef) && R.isEmpty(nodes)) {
+    if (entry && NodeDef.isNodeDefMultipleAttribute(nodeDef)) {
+      const maxCount = R.pipe(
+        NodeDef.getValidations,
+        NodeDefValidations.getMaxCount,
+      )(nodeDef)
+
       const hasNotPlaceholder = R.pipe(
         R.find(Node.isPlaceholder),
         R.isNil,
       )(nodes)
 
-      if (hasNotPlaceholder && parentNode) {
+      if (
+        hasNotPlaceholder && parentNode &&
+        // don't add node placeholder when maxCount is reached
+        (!maxCount || R.length(nodes) < maxCount)
+      ) {
         createNodePlaceholder(nodeDef, parentNode, getNodeDefDefaultValue(nodeDef))
       }
     }
