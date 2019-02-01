@@ -8,7 +8,7 @@ const SchemaRdb = require('../../../common/surveyRdb/schemaRdb')
 const DataTable = require('../schemaRdb/dataTable')
 const DataCol = require('../schemaRdb/dataCol')
 
-const types = {insert: 'insert', update: 'update', delete: 'delete'}
+const types = { insert: 'insert', update: 'update', delete: 'delete' }
 
 // ==== parsing
 
@@ -18,12 +18,12 @@ const getType = (nodeDef, node) =>
   node.created && hasTable(nodeDef)
     ? types.insert
     : node.updated || node.created
-    ? types.update
-    : node.deleted && hasTable(nodeDef)
-      ? types.delete
-      : node.deleted
-        ? types.update
-        : null
+      ? types.update
+      : node.deleted && hasTable(nodeDef)
+        ? types.delete
+        : node.deleted
+          ? types.update
+          : null
 
 const getColNames = (nodeDef, type) =>
   R.flatten(type === types.insert
@@ -62,14 +62,14 @@ const toUpdates = async (surveyInfo, nodeDefs, nodes) => {
       const type = getType(nodeDef, node)
 
       return type ? {
-          type,
-          schemaName: SchemaRdb.getName(surveyInfo.id),
-          tableName: DataTable.getName(nodeDef, nodeDefParent),
-          colNames: getColNames(nodeDef, type),
-          colValues: await getColValues(surveyInfo, nodeDef, node, type),
-          rowUuid: getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])
-        }
-        : null
+        type,
+        schemaName: SchemaRdb.getName(surveyInfo.id),
+        tableName: DataTable.getName(nodeDef, nodeDefParent),
+        colNames: getColNames(nodeDef, type),
+        colValues: await getColValues(surveyInfo, nodeDef, node, type),
+        rowUuid: getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])
+      }
+      : null
     })
   )
   return R.reject(R.isNil, updates)
@@ -88,6 +88,7 @@ const runUpdate = (update, client) =>
   )
 
 const runInsert = (update, client) =>
+  console.log(update) ||
   client.query(
     `INSERT INTO ${update.schemaName}.${update.tableName}
       (${update.colNames.join(',')})
@@ -109,7 +110,7 @@ const run = async (surveyInfo, nodeDefs, nodes, client) => {
       isType(types.update)(update)
         ? runUpdate(update, client)
         : isType(types.insert)(update) ? runInsert(update, client)
-        : runDelete(update, client)
+          : runDelete(update, client)
     )
   )
 }

@@ -91,7 +91,8 @@ class RecordUpdateThread extends Thread {
           updatedNodes = await this.recordUpdater.persistNode(user, survey, msg.node, t)
           break
         case messageTypes.deleteNode:
-          updatedNodes = await this.recordUpdater.deleteNode(user, survey, msg.nodeUuid, t)
+          // If the record was already deleted (by another user) the repository delete method returns null
+          updatedNodes = await this.recordUpdater.deleteNode(user, survey, msg.nodeUuid, t) || {}
           break
       }
       this._postMessage(WebSocketEvents.nodesUpdate, updatedNodes)

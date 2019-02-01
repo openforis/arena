@@ -16,15 +16,20 @@ const Record = require('../../../common/record/record')
 const RecordUpdateThread = require('./thread/recordUpdateThread')
 
 const createRecordUpdateThread = (usersByRecordUuid => (user, surveyId, recordUuid, preview) => {
+  // Uses usersByRecordUuid to manage many users editing the same record
   const userId = user.id
-  usersByRecordUuid = R.assocPath([recordUuid, userId], user, usersByRecordUuid)
+
+  usersByRecordUuid = R.assocPath([recordUuid, userId], null, usersByRecordUuid)
 
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
     { user, surveyId, recordUuid, preview },
     msg => {
-      const userIds = R.pipe(R.prop(recordUuid), R.keys)(usersByRecordUuid)
-      userIds.forEach(id => WebSocketManager.notifyUser(id, msg.type, R.prop('content', msg)))
+      R.pipe(
+        R.prop(recordUuid),
+        R.keys,
+        R.forEach(id => WebSocketManager.notifyUser(id, msg.type, R.prop('content', msg)))
+      )(usersByRecordUuid)
     },
     () => {
       recordUpdateThreads.removeThread(userId)

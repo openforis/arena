@@ -1,8 +1,6 @@
 const io = require('socket.io')()
 const R = require('ramda')
 
-const { throttle } = require('../../common/functionsDefer')
-
 // ==== USER SOCKETS
 
 let userSockets = {}
