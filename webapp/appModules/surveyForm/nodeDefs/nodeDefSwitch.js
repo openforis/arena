@@ -5,6 +5,7 @@ import * as R from 'ramda'
 import NodeDefFormItem from './components/nodeDefFormItem'
 import NodeDefTableHeader from './components/nodeDefTableHeader'
 import NodeDefTableBody from './components/nodeDefTableBody'
+import NodeDefEditFormActions from './components/nodeDefEditFormActions'
 import ErrorBadge from '../../../commonComponents/errorBadge'
 
 import Survey from '../../../../common/survey/survey'
@@ -16,15 +17,15 @@ import RecordValidation from '../../../../common/record/recordValidation'
 import Node from '../../../../common/record/node'
 import Layout from '../../../../common/survey/nodeDefLayout'
 
-import { getStateSurveyInfo } from '../../../survey/surveyState'
+import * as SurveyState from '../../../survey/surveyState'
+import * as SurveyFormState from '../surveyFormState'
+import * as RecordState from '../record/recordState'
 
-import { setFormNodeDefEdit, setFormNodeDefAddChildTo } from '../actions'
-import { getSurveyForm } from '../surveyFormState'
-
-import { putNodeDefProp, removeNodeDef } from '../../../survey/nodeDefs/actions'
 import { getNodeDefDefaultValue } from './nodeDefSystemProps'
 
-import { getRecord } from '../record/recordState'
+// edit actions
+import { putNodeDefProp } from '../../../survey/nodeDefs/actions'
+// entry actions
 import { createNodePlaceholder, updateNode, removeNode } from '../record/actions'
 
 class NodeDefSwitch extends React.Component {
@@ -36,26 +37,11 @@ class NodeDefSwitch extends React.Component {
   }
 
   checkNodePlaceholder () {
-    const { entry, nodes, nodeDef, parentNode, createNodePlaceholder } = this.props
+    const { nodes, nodeDef, parentNode, createNodePlaceholder, canAddNode } = this.props
+    const hasNotPlaceholder = R.none(Node.isPlaceholder, nodes)
 
-    if (entry && NodeDef.isNodeDefMultipleAttribute(nodeDef)) {
-      const maxCount = R.pipe(
-        NodeDef.getValidations,
-        NodeDefValidations.getMaxCount,
-      )(nodeDef)
-
-      const hasNotPlaceholder = R.pipe(
-        R.find(Node.isPlaceholder),
-        R.isNil,
-      )(nodes)
-
-      if (
-        hasNotPlaceholder && parentNode &&
-        // don't add node placeholder when maxCount is reached
-        (!maxCount || R.length(nodes) < maxCount)
-      ) {
-        createNodePlaceholder(nodeDef, parentNode, getNodeDefDefaultValue(nodeDef))
-      }
+    if (canAddNode && NodeDef.isNodeDefMultipleAttribute(nodeDef) && hasNotPlaceholder) {
+      createNodePlaceholder(nodeDef, parentNode, getNodeDefDefaultValue(nodeDef))
     }
   }
 
@@ -85,88 +71,36 @@ class NodeDefSwitch extends React.Component {
 
   render () {
     const {
-      nodeDef,
-      edit,
-      canEditDef,
-
-      renderType,
-      label,
-      applicable,
-
-      setFormNodeDefEdit,
-      putNodeDefProp,
-      setFormNodeDefAddChildTo,
-      removeNodeDef,
-      validation,
+      nodeDef, validation,
+      edit, canEditDef,
+      renderType, label, applicable,
     } = this.props
 
-    const isRoot = NodeDef.isNodeDefRoot(nodeDef)
     const isPage = !!Layout.getPageUuid(nodeDef)
 
     const className = 'node-def__form'
       + (isPage ? '_page' : '')
       + (applicable ? '' : ' node-def__not-applicable')
 
-    return <div className={className} ref={this.element}>
+    return (
+      <div className={className} ref={this.element}>
 
-      <ErrorBadge validation={validation} showLabel={edit}/>
+        <ErrorBadge validation={validation} showLabel={edit}/>
 
-      {
-        edit && canEditDef && (
-          <div className="node-def__form-actions">
-            {
-              isPage &&
-              <div className="btn-of-light-xs node-def__form-root-actions">
-                columns
-                <input value={Layout.getNoColumns(nodeDef)}
-                       type="number" min="1" max="6"
-                       onChange={e => e.target.value > 0 ?
-                         putNodeDefProp(nodeDef, Layout.nodeDefLayoutProps.columns, e.target.value)
-                         : null
-                       }/>
-              </div>
-            }
+        <NodeDefEditFormActions nodeDef={nodeDef}
+                                edit={edit}
+                                canEditDef={canEditDef}/>
 
-            <button className="btn-s btn-of-light-xs"
-                    onClick={() => setFormNodeDefEdit(nodeDef)}>
-              <span className="icon icon-pencil2 icon-12px"/>
-            </button>
+        {
+          renderType === Layout.nodeDefRenderType.tableHeader
+            ? <NodeDefTableHeader nodeDef={nodeDef} label={label}/>
+            : renderType === Layout.nodeDefRenderType.tableBody
+            ? <NodeDefTableBody {...this.props}/>
+            : <NodeDefFormItem {...this.props} />
+        }
 
-            {
-              NodeDef.isNodeDefEntity(nodeDef) &&
-              <button className="btn-s btn-of-light-xs"
-                      onClick={() => setFormNodeDefAddChildTo(nodeDef)}>
-                <span className="icon icon-plus icon-12px"/>
-              </button>
-            }
-
-            {
-              isRoot ?
-                null
-                : <button className="btn-s btn-of-light-xs"
-                          aria-disabled={nodeDef.published}
-                          onClick={() => {
-                            window.confirm('Are you sure you want to permanently delete this node definition? This operation cannot be undone')
-                              ? removeNodeDef(nodeDef)
-                              : null
-                          }}>
-                  <span className="icon icon-bin2 icon-12px"/>
-                </button>
-            }
-
-          </div>
-        )
-      }
-
-      {
-        renderType === Layout.nodeDefRenderType.tableHeader
-          ? <NodeDefTableHeader nodeDef={nodeDef} label={label}/>
-          : renderType === Layout.nodeDefRenderType.tableBody
-          ? <NodeDefTableBody {...this.props}/>
-          : <NodeDefFormItem {...this.props} />
-      }
-
-    </div>
+      </div>
+    )
 
   }
 }
@@ -174,15 +108,19 @@ class NodeDefSwitch extends React.Component {
 NodeDefSwitch.defaultProps = {
   // specified when can edit node definition
   canEditDef: false,
+  valid: true,
 
-  valid: true
+  // entry default props
+  nodes: [],
+  canAddNode: false,
 }
 
 const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, entry } = props
-  const surveyInfo = getStateSurveyInfo(state)
-  const surveyForm = getSurveyForm(state)
-  const record = getRecord(surveyForm)
+
+  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyForm = SurveyFormState.getSurveyForm(state)
+  const record = RecordState.getRecord(surveyForm)
 
   const mapEntryProps = () => {
     const nodes = NodeDef.isNodeDefRoot(nodeDef)
@@ -197,15 +135,15 @@ const mapStateToProps = (state, props) => {
       ? Validator.getFieldValidation(Node.getUuid(nodes[0]))(recordValidation)
       : RecordValidation.getChildrenCountValidation(parentNode, nodeDef)(recordValidation)
 
-    const nodesValidated = nodes.map(
-      n => {
-        const nodeValidation = Validator.getFieldValidation(Node.getUuid(n))(recordValidation)
-        return Node.assocValidation(nodeValidation)(n)
-      }
-    )
+    const nodesValidated = nodes.map(n => {
+      const nodeValidation = Validator.getFieldValidation(Node.getUuid(n))(recordValidation)
+      return Node.assocValidation(nodeValidation)(n)
+    })
 
-    const maxCount = NodeDefValidations.getMaxCount(NodeDef.getValidations(nodeDef))
-    const canAddNode = !maxCount || R.length(nodes) < maxCount
+    const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
+    const canAddNode = parentNode &&
+      NodeDef.isNodeDefMultiple(nodeDef) &&
+      (R.isEmpty(maxCount) || R.length(nodes) < Number(maxCount))
 
     return {
       nodes: nodesValidated,
@@ -229,8 +167,7 @@ const mapStateToProps = (state, props) => {
 export default connect(
   mapStateToProps,
   {
-    setFormNodeDefEdit, setFormNodeDefAddChildTo,
-    putNodeDefProp, removeNodeDef,
-    updateNode, removeNode, createNodePlaceholder,
+    putNodeDefProp,
+    updateNode, removeNode, createNodePlaceholder
   }
 )(NodeDefSwitch)

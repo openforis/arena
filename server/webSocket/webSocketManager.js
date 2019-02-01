@@ -1,5 +1,6 @@
 const io = require('socket.io')()
 const R = require('ramda')
+const Request = require('../serverUtils/request')
 
 // ==== USER SOCKETS
 
@@ -28,17 +29,14 @@ const init = (server, sessionMiddleware) => {
   })
 
   io.on('connection', async socket => {
-    const userId = R.path(['request', 'session', 'passport', 'user'], socket)
+
+    const userId = R.pipe(
+      R.prop('request'),
+      Request.getSessionUserId,
+    )(socket)
+
     if (userId) {
       addUserSocket(userId, socket)
-
-      //TODO notify user immediately if there is a running job?
-      /*
-      const jobWorker = getUserJobWorker(userId)
-      if (jobWorker) {
-        jobWorker.postMessage({type: jobThreadMessageTypes.fetchJob})
-      }
-      */
 
       socket.on('disconnect', () => {
         deleteUserSocket(userId, socket.id)
