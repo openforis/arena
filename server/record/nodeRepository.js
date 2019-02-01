@@ -35,9 +35,9 @@ const insertNode = async (surveyId, node, client = db) => {
   return await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
     (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
-    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb)
     RETURNING *, true as created`,
-    [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), JSON.stringify(node.value), meta],
+    [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), stringifyValue(node.value), meta],
     dbTransformCallback
   )
 }
@@ -107,13 +107,16 @@ const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, child
 }
 
 const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
+  await fetchChildNodesByNodeDefUuids(surveyId, recordUuid, nodeUuid, [childDefUUid], client)
+
+const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
   await client.map(`
     SELECT * 
     FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE record_uuid = $1
       AND parent_uuid ${nodeUuid ? '= $2' : 'is null'}
-      AND node_def_uuid = $3`,
-    [recordUuid, nodeUuid, childDefUUid],
+      AND node_def_uuid IN ($3:csv)`,
+    [recordUuid, nodeUuid, childDefUUids],
     dbTransformCallback
   )
 
@@ -182,6 +185,7 @@ module.exports = {
   fetchSelfOrDescendantNodes,
   fetchChildNodeByNodeDefUuid,
   fetchChildNodesByNodeDefUuid,
+  fetchChildNodesByNodeDefUuids,
 
   //UPDATE
   updateNode,

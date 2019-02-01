@@ -23,6 +23,7 @@ const nodeDefType = {
 }
 
 const keys = {
+  uuid: 'uuid',
   props: 'props',
   validation: 'validation',
   meta: 'meta',

@@ -11,6 +11,8 @@ const keys = {
   recordUuid: 'recordUuid',
   value: 'value',
   meta: 'meta',
+  placeholder: 'placeholder',
+  deleted: 'deleted'
 }
 
 const metaKeys = {
@@ -55,7 +57,7 @@ const newNode = (nodeDefUuid, recordUuid, parentUuid = null, value = null) => ({
 
 const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
   ...newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid, value),
-  placeholder: true
+  [keys.placeholder]: true
 })
 
 /**
@@ -125,6 +127,8 @@ module.exports = {
   isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
 
   getValidation: Validator.getValidation,
+
+  isPlaceholder: R.propEq(keys.placeholder, true),
 
   // ==== UPDATE
   assocValue: R.assoc(keys.value),

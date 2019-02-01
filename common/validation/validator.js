@@ -133,25 +133,48 @@ const getInvalidFieldValidations = R.pipe(
   R.reject(R.propEq(keys.valid, true))
 )
 
+const getErrors = R.propOr([], keys.errors)
+
 //==== update
 /**
  * Removes valid fields validations and updates 'valid' attribute
  */
-const cleanup = R.pipe(
+const cleanup = validation => R.pipe(
   getInvalidFieldValidations,
+  // cleanup field validations
+  R.map(cleanup),
   R.ifElse(
     R.isEmpty,
     () => validValidation,
     invalidFieldValidations => ({
-      [keys.valid]: false,
-      [keys.fields]: invalidFieldValidations
+      [keys.fields]: invalidFieldValidations,
+      [keys.valid]: false
     }),
   ),
-)
+  // cleanup errors
+  newValidation => {
+    const errors = getErrors(validation)
+    return R.isEmpty(errors)
+      ? newValidation
+      : {
+        ...newValidation,
+        [keys.errors]: errors,
+        [keys.valid]: false
+      }
+  }
+)(validation)
 
 const assocValidation = v => R.assoc(keys.validation, v)
 
-const assocFieldValidation = (field, validation) => R.assocPath([keys.fields, field], validation)
+const assocFieldValidation = field => R.pipe(
+  R.assocPath([keys.fields, field]),
+  cleanup
+)
+
+const dissocFieldValidation = field => R.pipe(
+  R.dissocPath([keys.fields, field]),
+  cleanup
+)
 
 const mergeValidation = validation =>
   obj => R.pipe(
@@ -179,10 +202,12 @@ module.exports = {
   getFieldValidation,
   getFieldValidations,
   getInvalidFieldValidations,
+  getErrors,
 
   // UPDATE
   cleanup,
   assocValidation,
   assocFieldValidation,
+  dissocFieldValidation,
   mergeValidation
 }

@@ -61,48 +61,57 @@ const validateNodeValidations = (survey, nodeDef, tx) =>
       )(invalidExpressions)
   }
 
-const validateSelfAndDependentNodes = async (survey, recordUuid, nodes, tx) => {
+const validateAttribute = async (survey, attribute, nodeDef, validatedNodeUuids, tx) => {
+  const nodeUuid = Node.getUuid(attribute)
 
-  const validatedNodeUuids = [] //used to avoid validating 2 times the same nodes
+  // mark attribute validated
+  validatedNodeUuids.push(nodeUuid)
+
+  return {
+    [nodeUuid]: await Validator.validate(attribute, {
+      [Node.keys.value]: [
+        validateRequired(survey, nodeDef),
+        TypeValidator.validateValueType(survey, nodeDef),
+        validateNodeValidations(survey, nodeDef, tx)
+      ]
+    })
+  }
+}
+
+const validateSelfAndDependentAttributes = async (survey, nodes, tx) => {
+
+  const attributes = R.pipe(
+    R.values,
+    R.filter(node => NodeDef.isNodeDefAttribute(getNodeDef(survey, node)))
+  )(nodes)
+
+  const validatedAttributeUuids = [] //used to avoid validating 2 times the same attributes
 
   const nodesValidationArray = await Promise.all(
-    R.values(nodes).map(
-      async node => {
-        const nodeDependents = await NodeDependencyManager.fetchDependentNodes(
+    attributes.map(
+      async attribute => {
+        const dependents = await NodeDependencyManager.fetchDependentNodes(
           survey,
-          node,
+          attribute,
           dependencyTypes.validations,
           tx
         )
-
-        const nodesToValidate = R.pipe(
-          R.append({
-            nodeCtx: node,
-            nodeDef: Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-          }),
-          R.reject(o => NodeDef.isNodeDefEntity(o.nodeDef) || R.includes(Node.getUuid(o.nodeCtx), validatedNodeUuids)),
-        )(nodeDependents)
+        const attributeAndDependents =
+          R.includes(dep => R.equals(attribute, dep.nodeCtx))(dependents)
+            ? dependents
+            : R.append({
+              nodeDef: getNodeDef(survey, attribute),
+              nodeCtx: attribute
+            })(dependents)
 
         return await Promise.all(
-          nodesToValidate.map(async o => {
-            const { nodeCtx, nodeDef } = o
-            const nodeUuid = Node.getUuid(nodeCtx)
-
-            // mark node validated
-            validatedNodeUuids.push(nodeUuid)
-
-            return {
-              [nodeUuid]: await Validator.validate(nodeCtx, {
-                [Node.keys.value]: [
-                  validateRequired(survey, nodeDef),
-                  TypeValidator.validateValueType(survey, nodeDef),
-                  validateNodeValidations(survey, nodeDef, tx)
-                ]
-              })
-            }
-          })
+          attributeAndDependents.map(
+            async ({ nodeCtx, nodeDef }) =>
+              await validateAttribute(survey, nodeCtx, nodeDef, validatedAttributeUuids, tx)
+          )
         )
-      })
+      }
+    )
   )
 
   return R.pipe(
@@ -111,6 +120,9 @@ const validateSelfAndDependentNodes = async (survey, recordUuid, nodes, tx) => {
   )(nodesValidationArray)
 }
 
+const getNodeDef = (survey, node) =>
+  Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+
 module.exports = {
-  validateSelfAndDependentNodes
+  validateSelfAndDependentAttributes
 }

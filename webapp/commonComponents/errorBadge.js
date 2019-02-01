@@ -4,10 +4,11 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
+import Validator from '../../common/validation/validator'
 
 const ErrorBadge = ({ validation, showLabel }) => {
 
-  const invalid = validation && !validation.valid
+  const invalid = !Validator.isValidationValid(validation)
 
   const validationFields = invalid ? getValidationFieldMessagesHTML(validation.fields) : []
 

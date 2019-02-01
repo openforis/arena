@@ -113,31 +113,50 @@ const getCodeUuidsHierarchy = (survey, parentEntity, nodeDef) => record => {
 
 const assocNodes = nodes =>
   record => R.pipe(
-    R.merge(getNodes(record)),
+    getNodes,
+    R.mergeLeft(nodes),
+    mergedNodes => R.assoc('nodes', mergedNodes)(record),
     //remove deleted nodes
-    newNodes => R.reduce((acc, uuid) => R.prop(uuid)(newNodes).deleted ? R.dissoc(uuid)(acc) : acc, newNodes)(R.keys(newNodes)),
-    newNodes => R.assoc('nodes', newNodes, record)
-  )(nodes)
+    updatedRecord => {
+      const deletedNodes = R.pipe(
+        getNodes,
+        R.values,
+        R.filter(
+          R.propEq(Node.keys.deleted, true)
+        )
+      )(updatedRecord)
+
+      return R.reduce((acc, node) => deleteNode(node)(record), updatedRecord, deletedNodes)
+    }
+  )(record)
 
 // ====== DELETE
 const deleteNode = node =>
   record => {
-    //remove itself
-    const updatedRecord = R.pipe(
+    const nodeUuid = Node.getUuid(node)
+
+    // 1. remove node from record
+    const recordUpdated = R.pipe(
       getNodes,
-      R.dissoc(Node.getUuid(node)),
-      newNodes => R.assoc('nodes', newNodes, record)
+      R.dissoc(nodeUuid),
+      newNodes => R.assoc('nodes', newNodes, record),
     )(record)
 
-    //remove entity children recursively
-    const children = getNodeChildren(node)(updatedRecord)
-    return R.isEmpty(children)
-      ? updatedRecord
-      : R.reduce(
-        (recordCurrent, child) => deleteNode(child)(recordCurrent),
-        updatedRecord,
-        children
-      )
+    // 2. update validation
+    const recordValidationUpdated = R.pipe(
+      Validator.getValidation,
+      Validator.dissocFieldValidation(nodeUuid),
+      newValidation => Validator.assocValidation(newValidation)(recordUpdated)
+    )(recordUpdated)
+
+    // 3. remove entity children recursively
+    const children = getNodeChildren(node)(recordValidationUpdated)
+
+    return R.reduce(
+      (recordCurrent, child) => deleteNode(child)(recordCurrent),
+      recordValidationUpdated,
+      children
+    )
   }
 
 module.exports = {

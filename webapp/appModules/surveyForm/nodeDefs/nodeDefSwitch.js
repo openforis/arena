@@ -9,8 +9,10 @@ import ErrorBadge from '../../../commonComponents/errorBadge'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
+import NodeDefValidations from '../../../../common/survey/nodeDefValidations'
 import Validator from '../../../../common/validation/validator'
 import Record from '../../../../common/record/record'
+import RecordValidation from '../../../../common/record/recordValidation'
 import Node from '../../../../common/record/node'
 import Layout from '../../../../common/survey/nodeDefLayout'
 
@@ -36,13 +38,22 @@ class NodeDefSwitch extends React.Component {
   checkNodePlaceholder () {
     const { entry, nodes, nodeDef, parentNode, createNodePlaceholder } = this.props
 
-    if (entry && NodeDef.isNodeDefMultipleAttribute(nodeDef) && R.isEmpty(nodes)) {
+    if (entry && NodeDef.isNodeDefMultipleAttribute(nodeDef)) {
+      const maxCount = R.pipe(
+        NodeDef.getValidations,
+        NodeDefValidations.getMaxCount,
+      )(nodeDef)
+
       const hasNotPlaceholder = R.pipe(
-        R.find(R.propEq('placeholder', true)),
+        R.find(Node.isPlaceholder),
         R.isNil,
       )(nodes)
 
-      if (hasNotPlaceholder && parentNode) {
+      if (
+        hasNotPlaceholder && parentNode &&
+        // don't add node placeholder when maxCount is reached
+        (!maxCount || R.length(nodes) < maxCount)
+      ) {
         createNodePlaceholder(nodeDef, parentNode, getNodeDefDefaultValue(nodeDef))
       }
     }
@@ -172,7 +183,6 @@ const mapStateToProps = (state, props) => {
   const surveyInfo = getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
   const record = getRecord(surveyForm)
-  const recordValidation = Record.getValidation(record)
 
   const mapEntryProps = () => {
     const nodes = NodeDef.isNodeDefRoot(nodeDef)
@@ -181,13 +191,11 @@ const mapStateToProps = (state, props) => {
         ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
         : []
 
-    const validation = NodeDef.isNodeDefSingleAttribute(nodeDef) && !R.isEmpty(nodes)
+    const recordValidation = Record.getValidation(record)
+
+    const validation = NodeDef.isNodeDefSingle(nodeDef) && !R.isEmpty(nodes)
       ? Validator.getFieldValidation(Node.getUuid(nodes[0]))(recordValidation)
-      : R.pipe(
-        Validator.getFieldValidation(Node.getUuid(parentNode)),
-        Validator.getFieldValidation('childrenCount'),
-        Validator.getFieldValidation(NodeDef.getUuid(nodeDef))
-      )(recordValidation)
+      : RecordValidation.getChildrenCountValidation(parentNode, nodeDef)(recordValidation)
 
     const nodesValidated = nodes.map(
       n => {
@@ -196,10 +204,14 @@ const mapStateToProps = (state, props) => {
       }
     )
 
+    const maxCount = NodeDefValidations.getMaxCount(NodeDef.getValidations(nodeDef))
+    const canAddNode = !maxCount || R.length(nodes) < maxCount
+
     return {
       nodes: nodesValidated,
       validation,
-      valid: Validator.isValidationValid(validation)
+      valid: Validator.isValidationValid(validation),
+      canAddNode
     }
   }
 

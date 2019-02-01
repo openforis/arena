@@ -70,7 +70,7 @@ class RecordUpdateThread extends Thread {
   }
 
   _postMessage (type, content) {
-    if (!isMainThread)
+    if (!(isMainThread || R.isEmpty(content)))
       this.postMessage({ type, content })
   }
 

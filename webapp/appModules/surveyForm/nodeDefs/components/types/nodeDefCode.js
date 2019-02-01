@@ -62,7 +62,7 @@ class NodeDefCode extends React.Component {
   determineNodeToUpdate () {
     const { nodeDef, nodes, parentNode } = this.props
 
-    const placeholder = R.find(R.propEq('placeholder', true))(nodes)
+    const placeholder = R.find(Node.isPlaceholder)(nodes)
 
     return (
       placeholder
@@ -79,7 +79,7 @@ class NodeDefCode extends React.Component {
 
     const selectedItemUuids = R.pipe(
       R.values,
-      R.reject(R.propEq('placeholder', true)),
+      R.reject(Node.isPlaceholder),
       R.map(Node.getCategoryItemUuid),
       R.reject(R.isNil),
     )(nodes)

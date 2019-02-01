@@ -6,6 +6,7 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const NodeDefValidations = require('../../../../common/survey/nodeDefValidations')
 
 const Node = require('../../../../common/record/node')
+const RecordValidation = require('../../../../common/record/recordValidation')
 const Validator = require('../../../../common/validation/validator')
 const NumberUtils = require('../../../../common/numberUtils')
 
@@ -20,19 +21,19 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
   const nodePointersValidated = await Promise.all(
     nodePointers.map(
       async nodePointer => {
-        const { nodeCtx, nodeDef } = nodePointer
-        const validations = NodeDef.getValidations(nodeDef)
+        const { node, childDef } = nodePointer
+        const validations = NodeDef.getValidations(childDef)
         const minCount = NumberUtils.toNumber(NodeDefValidations.getMinCount(validations))
         const maxCount = NumberUtils.toNumber(NodeDefValidations.getMaxCount(validations))
 
         if (isNaN(minCount) && isNaN(maxCount))
           return {}
 
-        const nodeDefUuid = NodeDef.getUuid(nodeDef)
-        const nodeCtxUuid = Node.getUuid(nodeCtx)
+        const childDefUuid = NodeDef.getUuid(childDef)
+        const nodeUuid = Node.getUuid(node)
 
-        const nodes = await NodeRepository.fetchChildNodesByNodeDefUuid(Survey.getId(survey), recordUuid, nodeCtxUuid, nodeDefUuid, tx)
-        const count = NodeDef.isNodeDefEntity(nodeDef)
+        const nodes = await NodeRepository.fetchChildNodesByNodeDefUuid(Survey.getId(survey), recordUuid, nodeUuid, childDefUuid, tx)
+        const count = NodeDef.isNodeDefEntity(childDef)
           ? nodes.length
           : R.pipe(
             R.reject(Node.isNodeValueBlank),
@@ -41,9 +42,10 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
 
         const minCountValid = isNaN(minCount) || count >= minCount
         const maxCountValid = isNaN(maxCount) || count <= maxCount
+        const valid = minCountValid && maxCountValid
 
         const childrenCountValidation = {
-          [Validator.keys.valid]: minCountValid && maxCountValid,
+          [Validator.keys.valid]: valid,
           [Validator.keys.fields]: {
             'minCount': {
               [Validator.keys.valid]: minCountValid,
@@ -56,12 +58,13 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
           }
         }
         return {
-          [nodeCtxUuid]: {
+          [nodeUuid]: {
             [Validator.keys.fields]: {
-              'childrenCount': {
+              [RecordValidation.keys.childrenCount]: {
                 [Validator.keys.fields]: {
-                  [nodeDefUuid]: childrenCountValidation
-                }
+                  [childDefUuid]: childrenCountValidation
+                },
+                [Validator.keys.valid]: valid
               }
             }
           }
