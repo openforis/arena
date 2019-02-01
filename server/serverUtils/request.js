@@ -39,10 +39,17 @@ const getRequiredParam = (req, param) => {
     return value
 }
 
+//session
+
+const getSessionUserId = R.path(['session', 'passport', 'user'])
+
 module.exports = {
   getRestParam,
   getBoolParam,
   getJsonParam,
   toQueryString,
   getRequiredParam,
+
+  //session
+  getSessionUserId,
 }
