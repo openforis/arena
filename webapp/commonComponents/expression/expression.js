@@ -83,7 +83,8 @@ class ExpressionComponent extends React.Component {
 }
 
 ExpressionComponent.defaultProps = {
-  nodeDefUuid: '',
+  nodeDefUuidContext: '',
+  nodeDefUuidCurrent: null,
   query: '',
   mode: Expression.modes.json,
   onChange: null,
@@ -94,14 +95,16 @@ ExpressionComponent.defaultProps = {
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const {
-    nodeDefUuid,
+    nodeDefUuidContext,
+    nodeDefUuidCurrent,
     mode = ExpressionComponent.defaultProps.mode,
     isContextParent = ExpressionComponent.defaultProps.isContextParent,
   } = props
 
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
+  const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
   const depth = isContextParent ? 0 : 1
-  const variables = ExpressionVariables.getVariables(survey, nodeDef, mode, depth)
+  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth)
 
   return {
     variables

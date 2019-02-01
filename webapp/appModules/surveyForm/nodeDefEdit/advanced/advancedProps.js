@@ -9,7 +9,7 @@ const AdvancedProps = props => {
   const { nodeDef, nodeDefParent, putNodeDefProp, readOnly } = props
 
   const validation = NodeDef.getNodeDefValidation(nodeDef)
-  const nodeDefParentUuid = NodeDef.getUuid(nodeDefParent)
+  const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   return (
     <div className="form">
@@ -21,7 +21,7 @@ const AdvancedProps = props => {
                               readOnly={readOnly}
                               propName="calculatedValues"
                               validation={Validator.getFieldValidation('calculatedValues')(validation)}
-                              nodeDefUuid={nodeDefParentUuid}
+                              nodeDefUuidContext={nodeDefUuidContext}
                               canBeConstant={true}/>
 
       {
@@ -33,7 +33,7 @@ const AdvancedProps = props => {
                                 readOnly={readOnly}
                                 propName="defaultValues"
                                 validation={Validator.getFieldValidation('defaultValues')(validation)}
-                                nodeDefUuid={nodeDefParentUuid}
+                                nodeDefUuidContext={nodeDefUuidContext}
                                 canBeConstant={true}/>
       }
 
@@ -45,7 +45,7 @@ const AdvancedProps = props => {
                               applyIf={false}
                               multiple={false}
                               validation={Validator.getFieldValidation('applicable')(validation)}
-                              nodeDefUuid={nodeDefParentUuid}
+                              nodeDefUuidContext={nodeDefUuidContext}
                               isContextParent={true}/>
 
 

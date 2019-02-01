@@ -24,7 +24,7 @@ const ValidationsProps = props => {
   const { nodeDef, nodeDefParent, readOnly, putNodeDefProp } = props
 
   const validation = NodeDef.getNodeDefValidation(nodeDef)
-  const nodeDefParentUuid = NodeDef.getUuid(nodeDefParent)
+  const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
 
@@ -89,7 +89,7 @@ const ValidationsProps = props => {
                          onChange={expressions => handleValidationsUpdate(
                            NodeDefValidations.assocExpressions(expressions)(nodeDefValidations)
                          )}
-                         nodeDefUuid={nodeDefParentUuid}/>
+                         nodeDefUuidContext={nodeDefUuidContext}/>
       }
     </div>
   )

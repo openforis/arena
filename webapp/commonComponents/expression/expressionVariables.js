@@ -69,17 +69,17 @@ const getChildDefVariables = (survey, nodeDef, mode, depth) => {
   )(survey)
 }
 
-export const getVariables = (survey, nodeDef, mode, depth = 1) => {
+export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth = 1) => {
 
-  const variables = getChildDefVariables(survey, nodeDef, mode, depth)
+  const variables = getChildDefVariables(survey, nodeDefContext, mode, depth)
 
-  return NodeDef.isNodeDefRoot(nodeDef)
+  return NodeDef.isNodeDefRoot(nodeDefContext)
     ? variables
     : R.concat(
       variables,
       getVariables(
         survey,
-        Survey.getNodeDefParent(nodeDef)(survey),
+        Survey.getNodeDefParent(nodeDefContext)(survey),
         mode,
         depth + 1
       )
