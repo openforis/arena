@@ -62,7 +62,7 @@ const getNodesByDefUuid = (nodeDefUuid) => record => R.pipe(
 
 const getRootNode = R.pipe(
   getNodesArray,
-  R.find(R.propEq('parentUuid', null)),
+  R.find(R.propEq(Node.keys.parentUuid, null)),
 )
 
 const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
@@ -115,20 +115,25 @@ const assocNodes = nodes =>
   record => R.pipe(
     getNodes,
     R.mergeLeft(nodes),
-    mergedNodes => R.assoc('nodes', mergedNodes)(record),
-    //remove deleted nodes
-    updatedRecord => {
-      const deletedNodes = R.pipe(
-        getNodes,
-        R.values,
-        R.filter(
-          R.propEq(Node.keys.deleted, true)
-        )
-      )(updatedRecord)
-
-      return R.reduce((acc, node) => deleteNode(node)(record), updatedRecord, deletedNodes)
-    }
+    mergedNodes => R.assoc(keys.nodes, mergedNodes)(record),
+    removeDeletedNodes,
   )(record)
+
+const removeDeletedNodes = record => {
+  const deletedNodes = R.pipe(
+    getNodes,
+    R.values,
+    R.filter(
+      R.propEq(Node.keys.deleted, true)
+    )
+  )(record)
+
+  return R.reduce(
+    (updatedRecord, node) => deleteNode(node)(updatedRecord),
+    record,
+    deletedNodes
+  )
+}
 
 // ====== DELETE
 const deleteNode = node =>
@@ -139,7 +144,7 @@ const deleteNode = node =>
     const recordUpdated = R.pipe(
       getNodes,
       R.dissoc(nodeUuid),
-      newNodes => R.assoc('nodes', newNodes, record),
+      newNodes => R.assoc(keys.nodes, newNodes, record),
     )(record)
 
     // 2. update validation

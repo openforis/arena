@@ -1,14 +1,17 @@
 const R = require('ramda')
 
-const {uuidv4} = require('./../uuid')
-const {isBlank, trim} = require('../stringUtils')
+const { uuidv4 } = require('./../uuid')
+const { isBlank, trim } = require('../stringUtils')
 
 const Validator = require('../validation/validator')
+const NodeDef = require('../survey/nodeDef')
 const SurveyUtils = require('../survey/surveyUtils')
 
 const keys = {
   uuid: SurveyUtils.keys.uuid,
   recordUuid: 'recordUuid',
+  parentUuid: 'parentUuid',
+  nodeDefUuid: 'nodeDefUuid',
   value: 'value',
   meta: 'meta',
   placeholder: 'placeholder',
@@ -47,16 +50,15 @@ const valuePropKeys = {
  */
 
 const newNode = (nodeDefUuid, recordUuid, parentUuid = null, value = null) => ({
-    uuid: uuidv4(),
-    nodeDefUuid,
-    recordUuid,
-    parentUuid,
-    value,
-  }
-)
+  [keys.uuid]: uuidv4(),
+  [keys.nodeDefUuid]: nodeDefUuid,
+  [keys.recordUuid]: recordUuid,
+  [keys.parentUuid]: parentUuid,
+  [keys.value]: value,
+})
 
 const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
-  ...newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid, value),
+  ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), getUuid(parentNode), value),
   [keys.placeholder]: true
 })
 
@@ -66,6 +68,12 @@ const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
  * ======
  */
 
+const getUuid = SurveyUtils.getUuid
+
+const getParentUuid = SurveyUtils.getParentUuid
+
+const getRecordUuid = R.prop(keys.recordUuid)
+
 const getNodeValue = (node = {}, defaultValue = {}) =>
   R.propOr(defaultValue, keys.value, node)
 
@@ -74,7 +82,7 @@ const getNodeValueProp = (prop, defaultValue = null) => R.pipe(
   R.propOr(defaultValue, prop),
 )
 
-const getNodeDefUuid = R.prop('nodeDefUuid')
+const getNodeDefUuid = R.prop(keys.nodeDefUuid)
 
 const getNodeDefUuids = nodes => R.pipe(
   R.keys,
@@ -115,9 +123,9 @@ module.exports = {
   newNodePlaceholder,
 
   // ==== READ
-  getUuid: SurveyUtils.getUuid,
-  getParentUuid: SurveyUtils.getParentUuid,
-  getRecordUuid: R.prop(keys.recordUuid),
+  getUuid,
+  getParentUuid,
+  getRecordUuid,
   getNodeValue,
   getNodeDefUuid,
 
