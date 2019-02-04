@@ -54,7 +54,7 @@ const validateProp = async (obj, prop, validations = []) => {
   }
 }
 
-const validate = async (obj, propsValidations) => {
+const validate = async (obj, propsValidations, performCleanup = true) => {
   const fieldValidations = R.mergeAll(
     await Promise.all(
       R.keys(propsValidations)
@@ -65,7 +65,17 @@ const validate = async (obj, propsValidations) => {
         )
     )
   )
-  return cleanup({ [keys.fields]: fieldValidations })
+  const validation = {
+    [keys.fields]: fieldValidations,
+    [keys.valid]: R.pipe(
+      R.values,
+      R.all(isValidationValid)
+    )(fieldValidations)
+  }
+
+  return performCleanup
+    ? cleanup(validation)
+    : validation
 }
 
 const validateRequired = (propName, obj) => {
@@ -140,7 +150,7 @@ const getErrors = R.propOr([], keys.errors)
  * Removes valid fields validations and updates 'valid' attribute
  */
 const cleanup = validation => R.pipe(
-  getInvalidFieldValidations,
+  getFieldValidations,
   // cleanup field validations
   R.map(cleanup),
   R.reject(isValidationValid),
@@ -185,6 +195,20 @@ const mergeValidation = validation =>
     v => assocValidation(v)(obj)
   )(obj)
 
+const recalculateValidity = validation =>
+  R.pipe(
+    getFieldValidations,
+    // update validity in each field
+    R.map(recalculateValidity),
+    newFields => {
+      const errors = getErrors(validation)
+      return R.pipe(
+        R.assoc(keys.valid, R.all(isValidationValid, R.values(newFields)) && R.isEmpty(errors)),
+        R.assoc(keys.fields, newFields)
+      )(validation)
+    }
+  )(validation)
+
 module.exports = {
   keys,
   errorKeys,
@@ -212,5 +236,6 @@ module.exports = {
   assocValidation,
   assocFieldValidation,
   dissocFieldValidation,
-  mergeValidation
+  mergeValidation,
+  recalculateValidity
 }

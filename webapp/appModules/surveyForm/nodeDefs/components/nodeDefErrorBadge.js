@@ -8,7 +8,6 @@ import ErrorBadge from '../../../../commonComponents/errorBadge'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import Record from '../../../../../common/record/record'
 import RecordValidation from '../../../../../common/record/recordValidation'
-import Node from '../../../../../common/record/node'
 import Validator from '../../../../../common/validation/validator'
 
 import * as SurveyFormState from '../../surveyFormState'
@@ -46,12 +45,12 @@ const mapStateToProps = (state, props) => {
 
     if (NodeDef.isNodeDefSingle(nodeDef)) {
       if (!R.isEmpty(nodes))
-        validation = RecordValidation.getSingleNodeValidation(nodes[0])(recordValidation)
+        validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)
     } else if (node) {
       // "node" will be available only for multiple attributes
-      validation = RecordValidation.getSingleNodeValidation(node)(recordValidation)
+      validation = RecordValidation.getNodeValidation(node)(recordValidation)
     } else {
-      validation = RecordValidation.getMultipleNodeValidation(parentNode, nodeDef)(recordValidation)
+      validation = RecordValidation.getMultipleNodesValidation(parentNode, nodeDef)(recordValidation)
     }
   }
 

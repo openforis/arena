@@ -18,29 +18,26 @@ const errorKeys = {
 
 const validateEntityKeysUniqueness = async (survey, recordUuid, nodeEntity, tx) => {
 
-  // 1. find all entities
+  // 1. find all sibling entities
 
-  const surveyId = Survey.getId(survey)
-
-  const allEntities = await NodeRepository.fetchChildNodesByNodeDefUuid(surveyId, recordUuid,
+  const siblingEntities = await NodeRepository.fetchChildNodesByNodeDefUuid(Survey.getId(survey), recordUuid,
     Node.getParentUuid(nodeEntity), Node.getNodeDefUuid(nodeEntity), tx)
 
-  // 2. check if specified entity is duplicate
-
-  const isDuplicate = await isDuplicateEntity(survey, recordUuid, allEntities, nodeEntity, tx)
-
-  // 3. return entityKeys validation for each entity key attribute
+  // 2. validate all sibling entities uniqueness
 
   const entityValidations = await Promise.all(
-    allEntities.map(
-      async entity => {
-        const keyNodes = await fetchEntityKeyNodes(survey, recordUuid, entity, tx)
+    siblingEntities.map(
+      async siblingEntity => {
+        const isDuplicate = await isDuplicateEntity(survey, recordUuid, siblingEntities, siblingEntity, tx)
+
+        // 3. return entityKeys validation for each sibling entity key attribute
+        const keyNodes = await fetchEntityKeyNodes(survey, recordUuid, siblingEntity, tx)
         return keyNodes.map(
           keyNode => ({
             [Node.getUuid(keyNode)]: {
               [Validator.keys.fields]: {
-                [Node.keys.value]: {
-                  [Validator.keys.errors]: isDuplicate ? [errorKeys.duplicate] : [],
+                [RecordValidation.keys.entityKeys]: {
+                  [Validator.keys.errors]: isDuplicate ? [errorKeys.duplicateEntity] : [],
                   [Validator.keys.valid]: !isDuplicate
                 }
               }
@@ -56,12 +53,12 @@ const validateEntityKeysUniqueness = async (survey, recordUuid, nodeEntity, tx) 
   )(entityValidations)
 }
 
-const isDuplicateEntity = async (survey, recordUuid, allEntities, entity, tx) => {
+const isDuplicateEntity = async (survey, recordUuid, siblingEntitiesAndSelf, entity, tx) => {
   const entityUuid = Node.getUuid(entity)
 
   // 1. skip current entity among all entities
 
-  const siblingEntities = R.reject(R.propEq(Node.keys.uuid, entityUuid), allEntities)
+  const siblingEntities = R.reject(R.propEq(Node.keys.uuid, entityUuid), siblingEntitiesAndSelf)
 
   // 2. fetch key values
 
@@ -71,7 +68,6 @@ const isDuplicateEntity = async (survey, recordUuid, allEntities, entity, tx) =>
 
   for (const siblingEntity of siblingEntities) {
     const siblingKeyValues = await fetchKeyValues(survey, recordUuid, siblingEntity, tx)
-
     if (R.equals(keyValues, siblingKeyValues)) {
       return true
     }
@@ -104,12 +100,11 @@ const validateRecordKeysUniqueness = async (survey, recordUuid, tx) => {
     R.map(keyNode => ({
         [Node.getUuid(keyNode)]: {
           [Validator.keys.fields]: {
-            [Node.keys.value]: {
+            [RecordValidation.keys.recordKeys]: {
               [Validator.keys.errors]: isUnique ? [] : [errorKeys.duplicateRecordKey],
               [Validator.keys.valid]: isUnique
-            },
-          },
-          [Validator.keys.valid]: isUnique
+            }
+          }
         }
       })
     ),

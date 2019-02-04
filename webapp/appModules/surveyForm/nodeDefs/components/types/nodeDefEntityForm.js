@@ -6,7 +6,7 @@ import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import NodeDefSwitch from '../../nodeDefSwitch'
-import ErrorBadge from '../../../../../commonComponents/errorBadge'
+import NodeDefErrorBadge from '../nodeDefErrorBadge'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../common/record/record'
@@ -151,6 +151,12 @@ const NodeSelect = props => {
 
 class NodeDefEntityForm extends React.Component {
 
+  constructor (props) {
+    super(props)
+
+    this.formWrapper = new React.createRef()
+  }
+
   checkNodePage () {
     const { nodeDef, setFormPageNode, nodes, entry } = this.props
 
@@ -178,10 +184,10 @@ class NodeDefEntityForm extends React.Component {
   render () {
     const {
       nodeDef,
+      edit,
       entry,
+      parentNode,
       nodes,
-
-      validation,
 
       setFormPageNode,
       selectedNode,
@@ -190,8 +196,12 @@ class NodeDefEntityForm extends React.Component {
 
     return entry && NodeDef.isNodeDefMultiple(nodeDef)
       ? (
-        <div className="node-def-entity-form__wrapper">
-          <ErrorBadge validation={validation} showLabel={false}/>
+        <div className="node-def-entity-form__wrapper" ref={this.formWrapper}>
+          <NodeDefErrorBadge  nodeDef={nodeDef}
+                              edit={edit}
+                              parentNode={parentNode}
+                              nodes={nodes}
+                              container={this.formWrapper}/>
 
           <NodeSelect {...this.props}
                       selectedNode={selectedNode}

@@ -32,13 +32,13 @@ const validateNodes = async (survey, recordUuid, nodes, preview, tx) => {
   const entityKeysValidations = await validateEntityKeysUniqueness(survey, recordUuid, nodes, tx)
 
   // 5. merge validations
-  const nodesValidation = {
+  const nodesValidation = Validator.recalculateValidity({
     [Validator.keys.fields]: R.pipe(
       R.mergeDeepLeft(nodeCountValidations),
       R.mergeDeepLeft(recordKeysValidations),
       R.mergeDeepLeft(entityKeysValidations)
     )(attributeValidations)
-  }
+  })
 
   // 5. persist validation
   await persistValidation(survey, recordUuid, nodesValidation, tx)
@@ -47,7 +47,7 @@ const validateNodes = async (survey, recordUuid, nodes, preview, tx) => {
 }
 
 const validateEntityKeysUniqueness = async (survey, recordUuid, nodes, tx) => {
-  const updatedEntities = await getUpdatedEntities(survey, nodes, tx)
+  const updatedEntities = await getUpdatedEntitiesWithKeys(survey, nodes, tx)
   const entityKeysValidationsArray = await Promise.all(
     updatedEntities.map(
       async entity =>
@@ -112,16 +112,20 @@ const isRootNodeKeysUpdated = (survey, nodes) => R.pipe(
   )
 )(nodes)
 
-const getUpdatedEntities = async (survey, nodes, tx) => {
+const getUpdatedEntitiesWithKeys = async (survey, nodes, tx) => {
   const entities = await Promise.all(
     R.values(nodes).map(
       async node => {
         const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
         const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
 
-        if (NodeDef.isNodeDefKey(nodeDef) &&
+        if (NodeDef.isNodeDefEntity(nodeDef) && !R.isEmpty(Survey.getNodeDefKeys(nodeDef)(survey))) {
+          // updated node is an entity with keys
+          return node
+        } else if (NodeDef.isNodeDefKey(nodeDef) &&
           !NodeDef.isNodeDefRoot(parentDef) &&
           !R.isEmpty(Survey.getNodeDefKeys(parentDef)(survey))) {
+          // updated node is the key of a non-root entity with keys
           return await NodeRepository.fetchNodeByUuid(Survey.getId(survey), Node.getParentUuid(node), tx)
         } else {
           return null
