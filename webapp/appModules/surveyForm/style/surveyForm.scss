@@ -1,6 +1,6 @@
 @import "../../../style/vars";
 
-$tableBorderColor: rgba($white, .7);
+$tableBorderColor: rgba($white, .4);
 $tableBorder: 1px solid $tableBorderColor;
 $tableRowHeaderHeight: 40px;
 
@@ -121,9 +121,9 @@ $tableRowHeaderHeight: 40px;
     grid-template-columns: 175px 1fr;
   }
 
-  .badge {
-    position: fixed;
-  }
+  //.badge {
+  //  position: fixed;
+  //}
 
 }
 
@@ -194,6 +194,10 @@ $tableRowHeaderHeight: 40px;
   width: 100%;
   height: calc(100% - 40px);
   overflow-x: auto;
+  overflow-y: hidden;
+  //justify-self: center;
+  //display: grid;
+  //justify-items: center;
 }
 
 .node-def__table-row-header {
@@ -201,16 +205,15 @@ $tableRowHeaderHeight: 40px;
   display: flex;
   height: $tableRowHeaderHeight;
   //width: 100%;
-  background-color: rgba($white, 0.1);
-  border-bottom: 2px solid $tableBorderColor;
+  background-color: rgba($white, 0.2);
+  //border: 1px solid $tableBorderColor;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  //top: 4px;
 
   .react-grid-item {
     display: grid;
     border-right: 1px solid transparent;
-
-    &:first-child {
-      border-left: 1px solid transparent;
-    }
   }
 
 }
@@ -252,6 +255,12 @@ $tableRowHeaderHeight: 40px;
 
     &:first-child {
       border-left: $tableBorder;
+    }
+  }
+
+  &:first-child {
+    .react-grid-item {
+      border-top: $tableBorder;
     }
   }
 
