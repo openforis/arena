@@ -19,11 +19,12 @@ const NodeDefErrorBadge = props => {
   // update parent container invalid class
   const containerEl = container.current
 
-  if (NodeDef.isNodeDefAttribute(nodeDef) && containerEl) {
+  const canToggleClass = NodeDef.isNodeDefAttribute(nodeDef) && containerEl
+  if (canToggleClass) {
     if (Validator.isValidationValid(validation)) {
-      containerEl.classList.remove('node-def__invalid')
+      containerEl.parentNode.classList.remove('node-def__invalid')
     } else {
-      containerEl.classList.add('node-def__invalid')
+      containerEl.parentNode.classList.add('node-def__invalid')
     }
   }
 
@@ -31,7 +32,7 @@ const NodeDefErrorBadge = props => {
 }
 
 const mapStateToProps = (state, props) => {
-  const { nodeDef, parentNode, nodes, node, edit } = props
+  const {nodeDef, parentNode, nodes, node, edit} = props
 
   const surveyForm = SurveyFormState.getSurveyForm(state)
   const record = RecordState.getRecord(surveyForm)
@@ -44,6 +45,7 @@ const mapStateToProps = (state, props) => {
     const recordValidation = Record.getValidation(record)
 
     if (NodeDef.isNodeDefSingle(nodeDef)) {
+      //TODO : DON't the two following conditions return the same? : if !R.isEmpty(nodes) then you have node or not?
       if (!R.isEmpty(nodes))
         validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)
     } else if (node) {

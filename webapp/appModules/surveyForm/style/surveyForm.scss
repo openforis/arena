@@ -110,11 +110,21 @@ $tableRowHeaderHeight: 40px;
 
   .form-input {
     text-overflow: ellipsis;
+    text-align: right;
   }
 
   *[aria-disabled="true"] {
     opacity: .8;
   }
+
+  .form-item {
+    grid-template-columns: 175px 1fr;
+  }
+
+  .badge {
+    position: fixed;
+  }
+
 }
 
 .node-def__not-applicable {
@@ -123,17 +133,7 @@ $tableRowHeaderHeight: 40px;
 }
 
 .node-def__invalid {
-//  border: 1px solid rgba($red, .1);
-//  background-color: rgba($red, .1);
-
-  input {
-    background-color: rgba($red, .15);
-    border-bottom: 1px solid rgba($red, .85);
-
-    &:focus, &:hover {
-      background-color: rgba($red, .2);
-    }
-  }
+  background-color: rgba($red, .1);
 }
 
 .node-def__form-actions {

@@ -13,18 +13,18 @@ const NodeDefFormItem = props => {
   const labelComponent = <div>
     {
       NodeDef.isNodeDefKey(nodeDef) &&
-        <span className="icon icon-key2 icon-12px icon-left node-def__icon-key"/>
+      <span className="icon icon-key2 icon-12px icon-left node-def__icon-key"/>
     }
     {label}
   </div>
 
-  return (
-    NodeDef.isNodeDefEntity(nodeDef)
-      ? nodeDefComponent
-      : <FormItem label={labelComponent}>
+  return NodeDef.isNodeDefEntity(nodeDef)
+    ? nodeDefComponent
+    : (
+      <FormItem label={labelComponent}>
         {nodeDefComponent}
       </FormItem>
-  )
+    )
 
 }
 
