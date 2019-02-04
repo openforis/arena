@@ -82,6 +82,7 @@ const FormEntryActions = (props) => {
             </Link>
           )
           : (
+            props.entry &&
             <RecordEntryButtons history={history}
                                 deleteRecord={deleteRecord}
                                 updateRecordStep={updateRecordStep}

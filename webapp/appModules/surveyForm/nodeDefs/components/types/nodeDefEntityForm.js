@@ -60,13 +60,13 @@ const EntityForm = props => {
     innerPageChildren.length > 0
       ? <ResponsiveGridLayout breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                               autoSize={false}
-                              rowHeight={edit ? 80 : 50}
+                              rowHeight={edit && canEditDef? 80 : 50}
                               cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
                               layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
-                              containerPadding={edit ? [30, 50] : [30, 30]}
+                              containerPadding={edit && canEditDef ? [30, 50] : [30, 30]}
                               onLayoutChange={onLayoutChange}
-                              isDraggable={edit && !locked}
-                              isResizable={edit && !locked}
+                              isDraggable={edit && canEditDef && !locked}
+                              isResizable={edit && canEditDef && !locked}
                               compactType={null}
                               useCSSTransforms={false}>
 

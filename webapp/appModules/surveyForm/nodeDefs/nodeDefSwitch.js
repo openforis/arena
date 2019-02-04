@@ -26,7 +26,7 @@ import { getNodeDefDefaultValue } from './nodeDefSystemProps'
 // edit actions
 import { putNodeDefProp } from '../../../survey/nodeDefs/actions'
 // entry actions
-import { createNodePlaceholder, updateNode, removeNode } from '../record/actions'
+import { createNodePlaceholder, updateNode } from '../record/actions'
 
 class NodeDefSwitch extends React.Component {
 
@@ -37,7 +37,7 @@ class NodeDefSwitch extends React.Component {
   }
 
   checkNodePlaceholder () {
-    const { nodes, nodeDef, parentNode, createNodePlaceholder, canAddNode } = this.props
+    const { nodes, nodeDef, parentNode, createNodePlaceholder } = this.props
     const hasNotPlaceholder = R.none(Node.isPlaceholder, nodes)
 
     if (NodeDef.isNodeDefAttribute(nodeDef) && parentNode && hasNotPlaceholder) {
@@ -168,6 +168,6 @@ export default connect(
   mapStateToProps,
   {
     putNodeDefProp,
-    updateNode, removeNode, createNodePlaceholder
+    updateNode, createNodePlaceholder
   }
 )(NodeDefSwitch)

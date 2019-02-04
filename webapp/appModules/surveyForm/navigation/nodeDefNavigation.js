@@ -20,6 +20,7 @@ const NavigationButton = (props) => {
     nodeDef,
     childDefs,
     edit,
+    canEditDef,
 
     label,
     level,
@@ -48,12 +49,13 @@ const NavigationButton = (props) => {
                              level={level + 1}
                              nodeDef={child}
                              edit={edit}
+                             canEditDef={canEditDef}
           />
         )
       }
 
       {
-        edit && active &&
+        edit && active && canEditDef &&
         <button className="btn btn-of-light node-def-nav__btn-add-page"
                 style={{ height: `${100 - (level + 1) * 12.5}%` }}
                 onClick={() => createNodeDef(
