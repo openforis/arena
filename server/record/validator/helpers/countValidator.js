@@ -42,10 +42,9 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
 
         const minCountValid = isNaN(minCount) || count >= minCount
         const maxCountValid = isNaN(maxCount) || count <= maxCount
-        const valid = minCountValid && maxCountValid
 
         const childrenCountValidation = {
-          [Validator.keys.valid]: valid,
+          [Validator.keys.valid]: minCountValid && maxCountValid,
           [Validator.keys.fields]: {
             'minCount': {
               [Validator.keys.valid]: minCountValid,
@@ -64,7 +63,6 @@ const validateChildrenCount = async (survey, recordUuid, nodePointers, tx) => {
                 [Validator.keys.fields]: {
                   [childDefUuid]: childrenCountValidation
                 },
-                [Validator.keys.valid]: valid
               }
             }
           }

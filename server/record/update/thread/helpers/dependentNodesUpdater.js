@@ -1,7 +1,6 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const StringUtils = require('../../../../../common/stringUtils')
 const Queue = require('../../../../../common/queue')
 
 const SurveyUtils = require('../../../../../common/survey/surveyUtils')

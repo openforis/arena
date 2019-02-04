@@ -62,19 +62,25 @@ const validateNodeValidations = (survey, nodeDef, tx) =>
   }
 
 const validateAttribute = async (survey, attribute, nodeDef, validatedNodeUuids, tx) => {
+  if (Node.isDeleted(attribute)) {
+    return null
+  }
+
   const nodeUuid = Node.getUuid(attribute)
 
   // mark attribute validated
   validatedNodeUuids.push(nodeUuid)
 
+  const validation = await Validator.validate(attribute, {
+    [Node.keys.value]: [
+      validateRequired(survey, nodeDef),
+      TypeValidator.validateValueType(survey, nodeDef),
+      validateNodeValidations(survey, nodeDef, tx)
+    ]
+  }, false)
+
   return {
-    [nodeUuid]: await Validator.validate(attribute, {
-      [Node.keys.value]: [
-        validateRequired(survey, nodeDef),
-        TypeValidator.validateValueType(survey, nodeDef),
-        validateNodeValidations(survey, nodeDef, tx)
-      ]
-    })
+    [nodeUuid]: validation
   }
 }
 
@@ -87,7 +93,7 @@ const validateSelfAndDependentAttributes = async (survey, nodes, tx) => {
 
   const validatedAttributeUuids = [] //used to avoid validating 2 times the same attributes
 
-  const nodesValidationArray = await Promise.all(
+  const attributeValidationsArray = await Promise.all(
     attributes.map(
       async attribute => {
         const dependents = await NodeDependencyManager.fetchDependentNodes(
@@ -113,11 +119,10 @@ const validateSelfAndDependentAttributes = async (survey, nodes, tx) => {
       }
     )
   )
-
   return R.pipe(
     R.flatten,
     R.mergeAll
-  )(nodesValidationArray)
+  )(attributeValidationsArray)
 }
 
 const getNodeDef = (survey, node) =>

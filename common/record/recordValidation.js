@@ -16,9 +16,19 @@ const getChildrenCountValidation = (parentNode, childDef) => R.pipe(
   Validator.getFieldValidation(NodeDef.getUuid(childDef))
 )
 
+const getNodeValidation = node =>
+  R.pipe(
+    Validator.getFieldValidation(Node.getUuid(node)),
+    Validator.dissocFieldValidation(keys.childrenCount)
+  )
+
+const getMultipleNodesValidation = (parentNode, childDef) =>
+  getChildrenCountValidation(parentNode, childDef)
+
 module.exports = {
   keys,
 
   // READ
-  getChildrenCountValidation,
+  getNodeValidation,
+  getMultipleNodesValidation,
 }
