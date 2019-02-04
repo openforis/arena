@@ -89,7 +89,8 @@ const ValidationsProps = props => {
                          onChange={expressions => handleValidationsUpdate(
                            NodeDefValidations.assocExpressions(expressions)(nodeDefValidations)
                          )}
-                         nodeDefUuidContext={nodeDefUuidContext}/>
+                         nodeDefUuidContext={nodeDefUuidContext}
+                         nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}/>
       }
     </div>
   )

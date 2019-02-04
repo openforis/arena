@@ -7,19 +7,28 @@ import sqlTypes from '../../../common/surveyRdb/sqlTypes'
 
 import Expression from '../../../common/exprParser/expression'
 
-const getJsVariables = (nodeDef, lang, depth) => {
+const getJsVariables = (nodeDef, nodeDefCurrent, lang, depth) => {
   const nodeDefName = NodeDef.getNodeDefName(nodeDef)
 
-  const parentFnCalls = depth > 0
-    ? '.' + R.repeat('parent()', depth).join('.')
-    : ''
+  const getValueFnFromParent = () => {
+    const parentFnCalls = depth > 0
+      ? '.' + R.repeat('parent()', depth).join('.')
+      : ''
+    return `this${parentFnCalls}.node('${nodeDefName}').getValue()${valueProp}`
+  }
+
+  const getValueFnFromContextNode = () => `this.getValue()`
 
   const valueProp = NodeDef.isNodeDefCode(nodeDef) || NodeDef.isNodeDefTaxon(nodeDef)
     ? '.props.code'
     : ''
 
+  const valueFn = NodeDef.getUuid(nodeDef) === NodeDef.getUuid(nodeDefCurrent)
+    ? getValueFnFromContextNode()
+    : getValueFnFromParent()
+
   return [{
-    value: `this${parentFnCalls}.node('${nodeDefName}').getValue()${valueProp}`,
+    value: `${valueFn}${valueProp}`,
 
     label: NodeDef.getNodeDefLabel(nodeDef, lang),
 
@@ -48,20 +57,20 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const getChildDefVariables = (survey, nodeDef, mode, depth) => {
+const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth) => {
   const lang = Survey.getDefaultLanguage(
     Survey.getSurveyInfo(survey)
   )
 
   return R.pipe(
-    Survey.getNodeDefChildren(nodeDef),
+    Survey.getNodeDefChildren(nodeDefContext),
     R.map(childDef => {
         if (NodeDef.isNodeDefEntity(childDef) || NodeDef.isNodeDefCoordinate(childDef) || NodeDef.isNodeDefFile(childDef))
           return null
         else if (mode === Expression.modes.sql)
           return getSqlVariables(childDef, lang)
         else if (mode === Expression.modes.json)
-          return getJsVariables(childDef, lang, depth)
+          return getJsVariables(childDef, nodeDefCurrent, lang, depth)
       }
     ),
     R.flatten,
@@ -71,7 +80,7 @@ const getChildDefVariables = (survey, nodeDef, mode, depth) => {
 
 export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth = 1) => {
 
-  const variables = getChildDefVariables(survey, nodeDefContext, mode, depth)
+  const variables = getChildDefVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth)
 
   return NodeDef.isNodeDefRoot(nodeDefContext)
     ? variables
@@ -80,6 +89,7 @@ export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth
       getVariables(
         survey,
         Survey.getNodeDefParent(nodeDefContext)(survey),
+        null,
         mode,
         depth + 1
       )
