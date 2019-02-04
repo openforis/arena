@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import { combineReducers } from 'redux'
 import { exportReducer } from '../../appUtils/reduxUtils'
 
@@ -27,6 +29,8 @@ import {
   assocParamsOnNodeDefCreate,
 } from './surveyFormState'
 
+import { recordLoad } from './record/actions'
+
 const actionHandlers = {
   // reset form
   [appUserLogout]: () => ({}),
@@ -41,12 +45,19 @@ const actionHandlers = {
 
   [formNodeDefAddChildToUpdate]: (state, { nodeDef }) => assocNodeDefAddChildTo(nodeDef)(state),
 
-  [formActivePageNodeDefUpdate]: (state, { nodeDef }) => assocFormActivePage(nodeDef)(state),
+  [formActivePageNodeDefUpdate]: (state, { nodeDef }) =>
+    R.pipe(
+      assocFormActivePage(nodeDef),
+      assocNodeDefAddChildTo(null)
+    )(state),
 
   [formPageNodeUpdate]: (state, { nodeDef, node }) => assocFormPageNode(nodeDef, node)(state),
 
   // node def
-  [nodeDefCreate]: (state, { nodeDef }) => assocParamsOnNodeDefCreate(nodeDef)(state)
+  [nodeDefCreate]: (state, { nodeDef }) => assocParamsOnNodeDefCreate(nodeDef)(state),
+
+  // record (preview)
+  [recordLoad]: state => assocNodeDefAddChildTo(null)(state)
 }
 
 const props = exportReducer(actionHandlers)

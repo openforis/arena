@@ -10,31 +10,30 @@ const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 
 const recordUpdateThreads = new ThreadsCache()
 const checkOutTimeoutsByUserId = {}
-let recordUsersMap = {}
-
 const Record = require('../../../common/record/record')
 
 const RecordUpdateThread = require('./thread/recordUpdateThread')
 
+// Users edting the same record
+let recordUsersMap = {}
+const addRecordUser = (recordUuid, userId) => { recordUsersMap = R.assocPath([recordUuid, userId], null, recordUsersMap) }
+const getRecordUsers = recordUuid => R.pipe(R.prop(recordUuid), R.keys)(recordUsersMap)
+const removeRecordUser = (recordUuid, userId) => R.dissocPath([recordUuid, userId], recordUsersMap)
+
 const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
-  // Uses recordUsersMap to manage many users editing the same record
   const userId = user.id
 
-  recordUsersMap = R.assocPath([recordUuid, userId], null, recordUsersMap)
+  addRecordUser(recordUuid, userId)
 
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
     { user, surveyId, recordUuid, preview },
-    msg => {
-      R.pipe(
-        R.prop(recordUuid),
-        R.keys,
-        R.forEach(id => WebSocketManager.notifyUser(id, msg.type, R.prop('content', msg)))
-      )(recordUsersMap)
-    },
+    msg => getRecordUsers(recordUuid).forEach(userId =>
+      WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
+    ),
     () => {
       recordUpdateThreads.removeThread(userId)
-      R.dissocPath([recordUuid, userId], recordUsersMap)
+      removeRecordUser(recordUuid, userId)
     }
   )
 
