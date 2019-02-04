@@ -4,11 +4,12 @@ const Promise = require('bluebird')
 const Queue = require('../../../../../common/queue')
 
 const SurveyUtils = require('../../../../../common/survey/surveyUtils')
+const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
 const Node = require('../../../../../common/record/node')
 
-const {dependencyTypes} = require('../../../../survey/surveyDependenchyGraph')
+const { dependencyTypes } = require('../../../../survey/surveyDependenchyGraph')
 
 const NodeDependencyManager = require('../../../nodeDependencyManager')
 
@@ -84,8 +85,13 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
 
   // filter nodes to update
   const nodesToUpdate = R.pipe(
+    R.ifElse(
+      R.always(isDefaultValuesExpr),
+      R.append({ nodeCtx: node, nodeDef: Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey) }),
+      R.identity
+    ),
     R.filter(o => {
-        const {nodeCtx: n, nodeDef} = o
+        const { nodeCtx: n, nodeDef } = o
 
         return isApplicableExpr || (
           NodeDef.isNodeDefAttribute(nodeDef) && (
@@ -100,7 +106,7 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
   //2. update expr to node and dependent nodes
   const nodesUpdated = await Promise.all(
     nodesToUpdate.map(async o => {
-      const {nodeCtx, nodeDef} = o
+      const { nodeCtx, nodeDef } = o
 
       const expressions = getExpressionsFn(nodeDef)
 
