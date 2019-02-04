@@ -145,7 +145,7 @@ const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUui
 
 // ============== DELETE
 const deleteNode = async (surveyId, nodeUuid, client = db) =>
-  await client.one(`
+  await client.oneOrNone(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1
     RETURNING *,'{}' as value, true as deleted

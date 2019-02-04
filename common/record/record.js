@@ -53,6 +53,8 @@ const getNodeChildren = node => findNodes(n => Node.getParentUuid(n) === Node.ge
 const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
   getNodeChildren(parentNode),
   R.filter(n => Node.getNodeDefUuid(n) === nodeDefUuid),
+  // Put placeholder at the end for multiple nodes if another user is editing the same record
+  R.sortBy(R.propOr(false, Node.keys.placeholder))
 )(record)
 
 const getNodesByDefUuid = (nodeDefUuid) => record => R.pipe(

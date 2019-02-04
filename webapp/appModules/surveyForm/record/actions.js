@@ -28,7 +28,7 @@ export const recordNodesUpdate = nodes =>
 
 export const nodeValidationsUpdate = validations =>
   dispatch =>
-    dispatch({type: validationsUpdate, validations})
+    dispatch({ type: validationsUpdate, validations })
 
 /**
  * ============

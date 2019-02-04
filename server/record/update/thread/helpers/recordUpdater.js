@@ -40,8 +40,7 @@ class RecordUpdater {
   }
 
   async persistNode (user, survey, node, t) {
-    const {uuid} = node
-
+    const uuid = Node.getUuid(node)
     const surveyId = Survey.getId(survey)
 
     const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)
@@ -76,9 +75,20 @@ class RecordUpdater {
 
   // ==== CREATE
   async _insertNode (survey, node, user, t) {
-    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+    const surveyId = Survey.getId(survey)
+    const nodeDefUuid = Node.getNodeDefUuid(node)
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+    // If it's a code, don't insert if it has been inserted already (by another user)
+    if (NodeDef.isNodeDefCode(nodeDef)) {
+      const siblingNodes = await NodeRepository.fetchChildNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getParentUuid(node), nodeDefUuid, t)
+      if (R.any(n => R.equals(Node.getNodeValue(n), Node.getNodeValue(node)))(siblingNodes)) {
+        return {}
+      }
+    }
+
     const nodesToReturn = await this._insertNodeRecursively(survey, nodeDef, node, user, t)
-    return await assocParentNode(Survey.getId(survey), node, nodesToReturn, t)
+    return await assocParentNode(surveyId, node, nodesToReturn, t)
   }
 
   async _insertNodeRecursively (survey, nodeDef, nodeToInsert, user, t) {
