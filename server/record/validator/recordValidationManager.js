@@ -1,35 +1,34 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 
+const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 const Validator = require('../../../common/validation/validator')
 
 const RecordRepository = require('../recordRepository')
-const NodeRepository = require('../nodeRepository')
 
 const CountValidator = require('./helpers/countValidator')
 const AttributeValidator = require('./helpers/attributeValidator')
 const KeysUniquenessValidator = require('./helpers/keysUniquenessValidator')
 
-const validateNodes = async (survey, recordUuid, nodes, preview, tx) => {
+const validateNodes = async (survey, record, nodes, preview, tx) => {
 
   // 1. validate self and dependent attributes (validations/expressions)
   const attributeValidations = await AttributeValidator.validateSelfAndDependentAttributes(survey, nodes, tx)
 
   // 2. validate min/max count
-  const nodePointers = await fetchNodePointers(survey, nodes, tx)
-  const nodeCountValidations = await CountValidator.validateChildrenCount(survey, recordUuid, nodePointers, tx)
+  const nodePointers = fetchNodePointers(survey, record, nodes)
+  const nodeCountValidations = CountValidator.validateChildrenCount(record, nodePointers)
 
   // 3. validate record keys uniqueness
   const recordKeysValidations = !preview && isRootNodeKeysUpdated(survey, nodes)
-    ? await KeysUniquenessValidator.validateRecordKeysUniqueness(survey, recordUuid, tx)
+    ? await KeysUniquenessValidator.validateRecordKeysUniqueness(survey, record, tx)
     : {}
 
   // 4. validate entity keys uniqueness
-  const entityKeysValidations = await validateEntityKeysUniqueness(survey, recordUuid, nodes, tx)
+  const entityKeysValidations = validateEntityKeysUniqueness(survey, record, nodes)
 
   // 5. merge validations
   const nodesValidation = Validator.recalculateValidity({
@@ -41,61 +40,59 @@ const validateNodes = async (survey, recordUuid, nodes, preview, tx) => {
   })
 
   // 5. persist validation
-  await persistValidation(survey, recordUuid, nodesValidation, tx)
+  await persistValidation(survey, record, nodesValidation, tx)
 
   return nodesValidation
 }
 
-const validateEntityKeysUniqueness = async (survey, recordUuid, nodes, tx) => {
-  const updatedEntities = await getUpdatedEntitiesWithKeys(survey, nodes, tx)
-  const entityKeysValidationsArray = await Promise.all(
-    updatedEntities.map(
-      async entity =>
-        await KeysUniquenessValidator.validateEntityKeysUniqueness(survey, recordUuid, entity, tx)
-    )
+const validateEntityKeysUniqueness = (survey, record, nodes) => {
+  const updatedEntities = getUpdatedEntitiesWithKeys(survey, record, nodes)
+  const entityKeysValidationsArray = updatedEntities.map(
+    entity =>
+      KeysUniquenessValidator.validateEntityKeysUniqueness(survey, record, entity)
   )
+
   return R.pipe(
     R.flatten,
     R.mergeAll
   )(entityKeysValidationsArray)
 }
 
-const fetchNodePointers = async (survey, nodes, tx) => {
+const fetchNodePointers = (survey, record, nodes) => {
   const nodesArray = R.values(nodes)
 
-  const nodePointers = await Promise.all(
-    nodesArray.map(
-      async node => {
-        const pointers = []
-        const nodeDef = getNodeDef(survey, node)
+  const nodePointers = nodesArray.map(
+    node => {
+      const pointers = []
+      const nodeDef = getNodeDef(survey, node)
 
-        if (!NodeDef.isNodeDefRoot(nodeDef)) {
-          // add a pointer for every node
-          const parent = await NodeRepository.fetchNodeByUuid(Survey.getId(survey), Node.getParentUuid(node), tx)
-          pointers.push({
-            node: parent,
-            childDef: nodeDef
-          })
-        }
-
-        if (NodeDef.isNodeDefEntity(nodeDef)) {
-          // add children node pointers
-          const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
-
-          pointers.push(
-            childDefs.map(
-              childDef => ({
-                node,
-                childDef
-              })
-            )
-          )
-        }
-
-        return pointers
+      if (!NodeDef.isNodeDefRoot(nodeDef)) {
+        // add a pointer for every node
+        const parent = Record.getParentNode(node)(record)
+        pointers.push({
+          node: parent,
+          childDef: nodeDef
+        })
       }
-    )
+
+      if (NodeDef.isNodeDefEntity(nodeDef)) {
+        // add children node pointers
+        const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
+
+        pointers.push(
+          childDefs.map(
+            childDef => ({
+              node,
+              childDef
+            })
+          )
+        )
+      }
+
+      return pointers
+    }
   )
+
   return R.pipe(
     R.flatten,
     R.uniq
@@ -112,39 +109,37 @@ const isRootNodeKeysUpdated = (survey, nodes) => R.pipe(
   )
 )(nodes)
 
-const getUpdatedEntitiesWithKeys = async (survey, nodes, tx) => {
-  const entities = await Promise.all(
-    R.values(nodes).map(
-      async node => {
-        const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-        const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+const getUpdatedEntitiesWithKeys = (survey, record, nodes) => {
+  const entities = R.values(nodes).map(
+    node => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
 
-        if (NodeDef.isNodeDefEntity(nodeDef) && !R.isEmpty(Survey.getNodeDefKeys(nodeDef)(survey))) {
-          // updated node is an entity with keys
-          return node
-        } else if (NodeDef.isNodeDefKey(nodeDef) &&
-          !NodeDef.isNodeDefRoot(parentDef) &&
-          !R.isEmpty(Survey.getNodeDefKeys(parentDef)(survey))) {
-          // updated node is the key of a non-root entity with keys
-          return await NodeRepository.fetchNodeByUuid(Survey.getId(survey), Node.getParentUuid(node), tx)
-        } else {
-          return null
-        }
-      })
+      if (NodeDef.isNodeDefEntity(nodeDef) && !R.isEmpty(Survey.getNodeDefKeys(nodeDef)(survey))) {
+        // updated node is an entity with keys
+        return node
+      } else if (NodeDef.isNodeDefKey(nodeDef) &&
+        !NodeDef.isNodeDefRoot(parentDef) &&
+        !R.isEmpty(Survey.getNodeDefKeys(parentDef)(survey))) {
+        // updated node is the key of a non-root entity with keys
+        return Record.getParentNode(node)(record)
+      } else {
+        return null
+      }
+    }
   )
   return R.reject(R.isNil, entities)
 }
 
-const persistValidation = async (survey, recordUuid, nodesValidation, tx) => {
+const persistValidation = async (survey, record, nodesValidation, tx) => {
   const surveyId = Survey.getId(survey)
-  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, tx)
 
   const recordValidationUpdated = R.pipe(
     Validator.mergeValidation(nodesValidation),
     Validator.getValidation
   )(record)
 
-  await RecordRepository.updateValidation(surveyId, recordUuid, recordValidationUpdated, tx)
+  await RecordRepository.updateValidation(surveyId, Record.getUuid(record), recordValidationUpdated, tx)
 }
 
 const getNodeDef = (survey, node) =>

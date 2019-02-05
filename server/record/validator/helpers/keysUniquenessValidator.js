@@ -16,22 +16,21 @@ const errorKeys = {
   duplicateEntity: 'duplicateEntity'
 }
 
-const validateEntityKeysUniqueness = async (survey, recordUuid, nodeEntity, tx) => {
+const validateEntityKeysUniqueness = (survey, record, nodeEntity) => {
 
   // 1. find all sibling entities
 
-  const siblingEntities = await NodeRepository.fetchChildNodesByNodeDefUuid(Survey.getId(survey), recordUuid,
-    Node.getParentUuid(nodeEntity), Node.getNodeDefUuid(nodeEntity), tx)
+  const parentNode = Record.getParentNode(nodeEntity)(record)
+  const siblingEntities = Record.getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(nodeEntity))(record)
 
   // 2. validate all sibling entities uniqueness
 
-  const entityValidations = await Promise.all(
-    siblingEntities.map(
-      async siblingEntity => {
-        const isDuplicate = await isDuplicateEntity(survey, recordUuid, siblingEntities, siblingEntity, tx)
+  const entityValidations = siblingEntities.map(
+      siblingEntity => {
+        const isDuplicate = isDuplicateEntity(survey, record, siblingEntities, siblingEntity)
 
         // 3. return entityKeys validation for each sibling entity key attribute
-        const keyNodes = await fetchEntityKeyNodes(survey, recordUuid, siblingEntity, tx)
+        const keyNodes = fetchEntityKeyNodes(survey, record, siblingEntity)
         return keyNodes.map(
           keyNode => ({
             [Node.getUuid(keyNode)]: {
@@ -46,14 +45,13 @@ const validateEntityKeysUniqueness = async (survey, recordUuid, nodeEntity, tx) 
         )
       }
     )
-  )
   return R.pipe(
     R.flatten,
     R.mergeAll
   )(entityValidations)
 }
 
-const isDuplicateEntity = async (survey, recordUuid, siblingEntitiesAndSelf, entity, tx) => {
+const isDuplicateEntity = (survey, record, siblingEntitiesAndSelf, entity) => {
   const entityUuid = Node.getUuid(entity)
 
   // 1. skip current entity among all entities
@@ -62,12 +60,12 @@ const isDuplicateEntity = async (survey, recordUuid, siblingEntitiesAndSelf, ent
 
   // 2. fetch key values
 
-  const keyValues = await fetchKeyValues(survey, recordUuid, entity, tx)
+  const keyValues = fetchKeyValues(survey, record, entity)
 
   // 3. find duplicate sibling entity with same key values
 
   for (const siblingEntity of siblingEntities) {
-    const siblingKeyValues = await fetchKeyValues(survey, recordUuid, siblingEntity, tx)
+    const siblingKeyValues = fetchKeyValues(survey, record, siblingEntity)
     if (R.equals(keyValues, siblingKeyValues)) {
       return true
     }
@@ -75,7 +73,9 @@ const isDuplicateEntity = async (survey, recordUuid, siblingEntitiesAndSelf, ent
   return false
 }
 
-const validateRecordKeysUniqueness = async (survey, recordUuid, tx) => {
+const validateRecordKeysUniqueness = async (survey, record, tx) => {
+
+  const recordUuid = Record.getUuid(record)
 
   // 1. fetch records with same keys
   const records = await SurveyRdbManager.queryRootTableByRecordKeys(survey, recordUuid, tx)
@@ -88,12 +88,9 @@ const validateRecordKeysUniqueness = async (survey, recordUuid, tx) => {
   )(records)
 
   // 3. fetch key nodes
-  const surveyId = Survey.getId(survey)
+  const rootNode = Record.getRootNode(record)
 
-  const rootDef = Survey.getRootNodeDef(survey)
-  const rootNode = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, recordUuid, null, NodeDef.getUuid(rootDef), tx)
-
-  const keyNodes = await fetchEntityKeyNodes(survey, recordUuid, rootNode, tx)
+  const keyNodes = fetchEntityKeyNodes(survey, record, rootNode)
 
   // 4. associate validation error to each key node
   return R.pipe(
@@ -115,16 +112,19 @@ const validateRecordKeysUniqueness = async (survey, recordUuid, tx) => {
 
 // ==== UTILS
 
-const fetchKeyValues = async (survey, recordUuid, entity, tx) => {
-  const keyNodes = await fetchEntityKeyNodes(survey, recordUuid, entity, tx)
+const fetchKeyValues = (survey, record, entity) => {
+  const keyNodes = fetchEntityKeyNodes(survey, record, entity)
   return R.map(Node.getNodeValue)(keyNodes)
 }
 
-const fetchEntityKeyNodes = async (survey, recordUuid, entity, tx) => {
+const fetchEntityKeyNodes = (survey, record, entity) => {
   const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey)
   const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
-  const keyDefUuids = R.map(NodeDef.getUuid, keyDefs)
-  return await NodeRepository.fetchChildNodesByNodeDefUuids(Survey.getId(survey), recordUuid, Node.getUuid(entity), keyDefUuids, tx)
+
+  return R.pipe(
+    R.map(keyDef => R.head(Record.getNodeChildrenByDefUuid(entity, NodeDef.getUuid(keyDef))(record))),
+    R.flatten,
+  )(keyDefs)
 }
 
 module.exports = {

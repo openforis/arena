@@ -102,6 +102,7 @@ const validateSelfAndDependentAttributes = async (survey, nodes, tx) => {
           dependencyTypes.validations,
           tx
         )
+        // include attribute itself if it's not already included among dependents
         const attributeAndDependents =
           R.includes(dep => R.equals(attribute, dep.nodeCtx))(dependents)
             ? dependents
@@ -110,6 +111,7 @@ const validateSelfAndDependentAttributes = async (survey, nodes, tx) => {
               nodeCtx: attribute
             })(dependents)
 
+        // call validateAttribute for each attribute
         return await Promise.all(
           attributeAndDependents.map(
             async ({ nodeCtx, nodeDef }) =>

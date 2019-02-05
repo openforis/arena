@@ -12,8 +12,12 @@ const SurveyManager = require('../../../survey/surveyManager')
 const surveyDependencyGraph = require('../../../survey/surveyDependenchyGraph')
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
 
+const RecordRepository = require('../../recordRepository')
+const NodeRepository = require('../../nodeRepository')
+
 const Survey = require('../../../../common/survey/survey')
 const Node = require('../../../../common/record/node')
+const Record = require('../../../../common/record/record')
 const Queue = require('../../../../common/queue')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
@@ -24,7 +28,7 @@ const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 
 class RecordUpdateThread extends Thread {
 
-  constructor(paramsObj) {
+  constructor (paramsObj) {
     super(paramsObj)
 
     this.queue = new Queue()
@@ -34,7 +38,7 @@ class RecordUpdateThread extends Thread {
     this.recordUpdater = new RecordUpdater(this.preview)
   }
 
-  async getSurvey(tx) {
+  async getSurvey (tx) {
     if (!this.survey) {
       const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, this.preview, true, false, tx)
 
@@ -49,13 +53,28 @@ class RecordUpdateThread extends Thread {
     return this.survey
   }
 
-  async onMessage(msg) {
+  async getRecord (t) {
+    if (!this.record) {
+      const recordDb = await RecordRepository.fetchRecordByUuid(this.surveyId, this.recordUuid, t)
+      const nodes = await NodeRepository.fetchNodesByRecordUuid(this.surveyId, this.recordUuid, t)
+      this.record = Record.assocNodes(toUuidIndexedObj(nodes))(recordDb)
+    }
+    return this.record
+  }
+
+  async handleNodesUpdated (updatedNodes, t) {
+    const record = await this.getRecord(t)
+    this._postMessage(WebSocketEvents.nodesUpdate, updatedNodes)
+    this.record = Record.assocNodes(updatedNodes)(record)
+  }
+
+  async onMessage (msg) {
     this.queue.enqueue(msg)
 
     await this.processNext()
   }
 
-  async processNext() {
+  async processNext () {
     if (!(this.processing || this.queue.isEmpty())) {
 
       this.processing = true
@@ -69,12 +88,12 @@ class RecordUpdateThread extends Thread {
     }
   }
 
-  _postMessage(type, content) {
+  _postMessage (type, content) {
     if (!(isMainThread || R.isEmpty(content)))
       this.postMessage({ type, content })
   }
 
-  async processMessage(msg) {
+  async processMessage (msg) {
     await db.tx(async t => {
 
       const user = this.getUser()
@@ -95,17 +114,20 @@ class RecordUpdateThread extends Thread {
           updatedNodes = await this.recordUpdater.deleteNode(user, survey, msg.nodeUuid, t) || {}
           break
       }
-      this._postMessage(WebSocketEvents.nodesUpdate, updatedNodes)
+      await this.handleNodesUpdated(updatedNodes, t)
 
       // 2. update dependent nodes
       const updatedDependentNodes = await DependentNodesUpdater.updateNodes(survey, updatedNodes, t)
-      this._postMessage(WebSocketEvents.nodesUpdate, updatedDependentNodes)
+      await this.handleNodesUpdated(updatedDependentNodes, t)
 
       const updatedNodesAndDependents = R.mergeDeepRight(updatedNodes, updatedDependentNodes)
 
       // 3. update node validations
-      const validations = await RecordValidationManager.validateNodes(survey, this.recordUuid, updatedNodesAndDependents, this.preview, t)
+      const validations = await RecordValidationManager.validateNodes(survey, this.record, updatedNodesAndDependents, this.preview, t)
+      // 3a. notify user
       this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
+      // 3b. update record validation
+      this.record = Record.mergeNodeValidations(validations)(this.record)
 
       // 4. update survey rdb
       if (!this.preview) {

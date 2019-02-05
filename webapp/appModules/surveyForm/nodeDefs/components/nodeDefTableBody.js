@@ -21,21 +21,30 @@ const getNodeValues = async (surveyInfo, nodeDef, nodes) => {
 
   const stringNodeValues = await Promise.all(
     nonEmptyNodes.map(
-      async node =>
-        NodeDef.isNodeDefCode(nodeDef)
-          ? await loadCategoryItemLabel(surveyInfo, Node.getCategoryItemUuid(node))
-          : NodeDef.isNodeDefFile(nodeDef)
-          ? Node.getNodeFileName(node)
-          : Node.getNodeValue(node)
+      async node => {
+        if (NodeDef.isNodeDefCode(nodeDef)) {
+          const item = await loadCategoryItem(surveyInfo, Node.getCategoryItemUuid(node))
+          const label = Category.getItemLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+          return label || Category.getItemCode(item)
+        } else if (NodeDef.isNodeDefFile(nodeDef)) {
+          return Node.getNodeFileName(node)
+        } else {
+          return Node.getNodeValue(node)
+        }
+      }
     )
   )
 
   return R.join(', ', stringNodeValues)
 }
 
-const loadCategoryItemLabel = async (surveyInfo, itemUuid) => {
-  const { data } = await axios.get(`/api/survey/${surveyInfo.id}/categories/items/${itemUuid}`)
-  return Category.getItemLabel(Survey.getDefaultLanguage(surveyInfo))(data.item)
+const loadCategoryItem = async (surveyInfo, itemUuid) => {
+  const { data } = await axios.get(`/api/survey/${surveyInfo.id}/categories/items/${itemUuid}`, {
+    params: {
+      draft: Survey.isDraft(surveyInfo)
+    }
+  })
+  return data.item
 }
 
 class NodeDefMultipleTableBody extends React.Component {
