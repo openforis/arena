@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { Switch, Route, matchPath } from 'react-router'
+import { Switch, Route } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
 import DynamicImport from '../commonComponents/DynamicImport'
 
@@ -17,6 +17,7 @@ import { getLocationPathname } from '../appUtils/routerUtils'
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 import { openSocket, closeSocket } from './appWebSocket'
 import { activeJobUpdate } from '../appModules/appView/components/job/actions'
+import { appModules, appModuleUri } from '../appModules/appModules'
 import { recordNodesUpdate, nodeValidationsUpdate } from '../appModules/surveyForm/record/actions'
 
 const loginUri = '/'
@@ -39,6 +40,10 @@ class AppRouterSwitch extends React.Component {
         [WebSocketEvents.jobUpdate]: activeJobUpdate,
         [WebSocketEvents.nodesUpdate]: recordNodesUpdate,
         [WebSocketEvents.nodeValidationsUpdate]: nodeValidationsUpdate,
+        [WebSocketEvents.recordDelete]: () => {
+          alert('This record has just been deleted by another user')
+          history.push(appModuleUri(appModules.data))
+        },
         [WebSocketEvents.error]: throwSystemError,
       })
     } else if (prevUser && !user) {

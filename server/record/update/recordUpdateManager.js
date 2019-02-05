@@ -125,4 +125,6 @@ module.exports = {
   createRecord,
   persistNode,
   deleteNode,
+
+  getRecordUsers,
 }

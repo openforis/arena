@@ -21,6 +21,9 @@ const ActivityLog = require('../activityLog/activityLogger')
 
 const { canEditRecord } = require('../../common/auth/authManager')
 
+const WebSocketManager = require('../webSocket/webSocketManager')
+const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
+
 /**
  * ===================
  * CREATE
@@ -105,11 +108,20 @@ const updateRecordStep = async (surveyId, recordUuid, stepId) => {
  * DELETE
  * ===================
  */
-const deleteRecord = async (user, surveyId, recordUuid) =>
+const deleteRecord = async (user, surveyId, recordUuid) => {
   await db.tx(async t => {
     await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, { recordUuid }, t)
     await RecordRepository.deleteRecord(user, surveyId, recordUuid, t)
   })
+
+  const recordUsersIds = RecordUpdateManager.getRecordUsers(recordUuid)
+  recordUsersIds.forEach(id => {
+    if (id !== user.id) {
+      WebSocketManager.notifyUser(id, WebSocketEvents.recordDelete, recordUuid)
+    }
+    RecordUpdateManager.checkOut(user.id)
+  })
+}
 
 const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(user, surveyId, nodeUuid)
 
@@ -131,7 +143,7 @@ const checkInRecord = async (user, surveyId, recordUuid) => {
 const checkOutRecord = async (user, surveyId, recordUuid) => {
   const record = await fetchRecordByUuid(surveyId, recordUuid)
 
-  if (Record.isPreview(record)) {
+  if (record && Record.isPreview(record)) {
     await deleteRecordPreview(user, surveyId, recordUuid)
   }
 

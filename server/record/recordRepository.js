@@ -87,7 +87,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
 }
 
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
-  await client.one(
+  await client.oneOrNone(
     `SELECT 
      ${recordSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.record WHERE uuid = $1`,
