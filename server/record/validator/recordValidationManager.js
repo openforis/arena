@@ -16,7 +16,7 @@ const KeysUniquenessValidator = require('./helpers/keysUniquenessValidator')
 const validateNodes = async (survey, record, nodes, preview, tx) => {
 
   // 1. validate self and dependent attributes (validations/expressions)
-  const attributeValidations = await AttributeValidator.validateSelfAndDependentAttributes(survey, nodes, tx)
+  const attributeValidations = await AttributeValidator.validateSelfAndDependentAttributes(survey, record, nodes, tx)
 
   // 2. validate min/max count
   const nodePointers = fetchNodePointers(survey, record, nodes)

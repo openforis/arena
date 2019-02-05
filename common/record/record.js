@@ -71,16 +71,27 @@ const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
 
 const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
 
+const getAncestorEntities = entity =>
+  record => {
+    const ancestors = []
+
+    let parent = entity
+    while (parent) {
+      ancestors.push(parent)
+      parent = getParentNode(parent)(record)
+    }
+    return ancestors
+  }
+
 const findNodeInAncestorEntities = (parentNode, predicate) => record => {
-  let parentEntity = parentNode
-  while (parentEntity) {
-    const children = getNodeChildren(parentEntity)(record)
-    for (let child of children) {
+  const ancestors = getAncestorEntities(parentNode)(record)
+  for (const ancestor of ancestors) {
+    const children = getNodeChildren(ancestor)(record)
+    for (const child of children) {
       if (predicate(child)) {
         return child
       }
     }
-    parentEntity = getParentNode(parentEntity)(record)
   }
   return null
 }
@@ -110,6 +121,24 @@ const getCodeUuidsHierarchy = (survey, parentEntity, nodeDef) => record => {
     )
     : []
 }
+
+const getAncestorByNodeDefUuuid = (node, ancestorDefUuid) =>
+  record => {
+    const parentNode = getParentNode(node)(record)
+
+    return R.pipe(
+      getAncestorEntities(parentNode),
+      R.find(ancestor => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
+    )(record)
+  }
+
+const getDescendantsByNodeDefUuid = (node, descendantDefUuid) =>
+  findNodes(
+    R.and(
+      Node.isDescendantOf(node),
+      n => Node.getNodeDefUuid(n) === descendantDefUuid
+    )
+  )
 
 // ====== UPDATE
 
@@ -186,6 +215,8 @@ module.exports = {
   getRootNode,
   getNodeByUuid,
   getParentNode,
+  getAncestorByNodeDefUuuid,
+  getDescendantsByNodeDefUuid,
 
   // testing
   getCodeUuidsHierarchy: getCodeUuidsHierarchy,

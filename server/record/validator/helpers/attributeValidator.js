@@ -84,7 +84,7 @@ const validateAttribute = async (survey, attribute, nodeDef, validatedNodeUuids,
   }
 }
 
-const validateSelfAndDependentAttributes = async (survey, nodes, tx) => {
+const validateSelfAndDependentAttributes = async (survey, record, nodes, tx) => {
 
   const attributes = R.pipe(
     R.values,
@@ -96,12 +96,8 @@ const validateSelfAndDependentAttributes = async (survey, nodes, tx) => {
   const attributeValidationsArray = await Promise.all(
     attributes.map(
       async attribute => {
-        const dependents = await NodeDependencyManager.fetchDependentNodes(
-          survey,
-          attribute,
-          dependencyTypes.validations,
-          tx
-        )
+        const dependents = NodeDependencyManager.fetchDependentNodes(survey, record, attribute, dependencyTypes.validations)
+        
         // include attribute itself if it's not already included among dependents
         const attributeAndDependents =
           R.includes(dep => R.equals(attribute, dep.nodeCtx))(dependents)
