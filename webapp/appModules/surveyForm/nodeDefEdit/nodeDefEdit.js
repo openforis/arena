@@ -57,12 +57,12 @@ class NodeDefEdit extends React.Component {
               ? <CategoriesView canSelect={canUpdateCategory}
                                 onSelect={category => putNodeDefProp(nodeDef, 'categoryUuid', category.uuid)}
                                 selectedItemUuid={NodeDef.getNodeDefCategoryUuid(nodeDef)}
-                                onClose={() => this.setState({editingCategory: false})}/>
+                                onClose={() => this.setState({ editingCategory: false })}/>
               : editingTaxonomy
               ? <TaxonomiesView canSelect={true}
                                 onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUuid', taxonomy.uuid)}
                                 selectedItemUuid={NodeDef.getNodeDefTaxonomyUuid(nodeDef)}
-                                onClose={() => this.setState({editingTaxonomy: false})}/>
+                                onClose={() => this.setState({ editingTaxonomy: false })}/>
               : (
                 <div className="node-def-edit__container">
                   <TabBar
@@ -74,26 +74,30 @@ class NodeDefEdit extends React.Component {
                                       nodeDefKeyEditDisabled={nodeDefKeyEditDisabled}
                                       nodeDefMultipleEditDisabled={nodeDefMultipleEditDisabled}
                                       putNodeDefProp={putNodeDefProp}
-                                      toggleCategoryEdit={(editing) => this.setState({editingCategory: editing})}
-                                      toggleTaxonomyEdit={(editing) => this.setState({editingTaxonomy: editing})}/>
+                                      toggleCategoryEdit={(editing) => this.setState({ editingCategory: editing })}
+                                      toggleTaxonomyEdit={(editing) => this.setState({ editingTaxonomy: editing })}/>
                         ),
                       },
-                      {
-                        label: 'Advanced',
-                        component: (
-                          <AdvancedProps nodeDef={nodeDef}
-                                         nodeDefParent={nodeDefParent}
-                                         putNodeDefProp={putNodeDefProp}/>
-                        )
-                      },
-                      {
-                        label: 'Validations',
-                        component: (
-                          <ValidationsProps nodeDef={nodeDef}
-                                            nodeDefParent={nodeDefParent}
-                                            putNodeDefProp={putNodeDefProp}/>
-                        )
-                      }
+                      ...NodeDef.isNodeDefRoot(nodeDef)
+                        ? []
+                        : [
+                          {
+                            label: 'Advanced',
+                            component: (
+                              <AdvancedProps nodeDef={nodeDef}
+                                             nodeDefParent={nodeDefParent}
+                                             putNodeDefProp={putNodeDefProp}/>
+                            )
+                          },
+                          {
+                            label: 'Validations',
+                            component: (
+                              <ValidationsProps nodeDef={nodeDef}
+                                                nodeDefParent={nodeDefParent}
+                                                putNodeDefProp={putNodeDefProp}/>
+                            )
+                          }
+                        ]
                     ]}/>
 
                   <button className="btn btn-of-light btn-close"
@@ -153,5 +157,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  {putNodeDefProp, closeFormNodeDefEdit}
+  { putNodeDefProp, closeFormNodeDefEdit }
 )(NodeDefEdit)
