@@ -19,7 +19,7 @@ const RecordExprParser = require('../../../recordExprParser')
  * Module responsible for updating applicable, calculated and default values
  */
 
-const updateNodes = async (survey, nodes, tx) => {
+const updateNodes = async (survey, record, nodes, tx) => {
   let allUpdatedNodes = R.values(nodes)
 
   const nodesToVisit = new Queue(R.values(nodes))
@@ -33,7 +33,7 @@ const updateNodes = async (survey, nodes, tx) => {
     if (!R.includes(nodeUuid, visitedNodeUuids)) {
 
       // update node
-      const lastUpdatedNodes = await updateNode(survey, node, tx)
+      const lastUpdatedNodes = await updateNode(survey, record, node, tx)
 
       // mark updated nodes to visit
       const nodesUpdatedArray = R.values(lastUpdatedNodes)
@@ -59,11 +59,11 @@ const updateNodes = async (survey, nodes, tx) => {
   return SurveyUtils.toUuidIndexedObj(allUpdatedNodes)
 }
 
-const updateNode = async (survey, node, tx) => {
+const updateNode = async (survey, record, node, tx) => {
 
-  const nodesApplicability = await updateNodeExpr(survey, node, NodeDef.getApplicable, dependencyTypes.applicable, tx)
-  const nodesCalculatedValues = await updateNodeExpr(survey, node, NodeDef.getCalculatedValues, dependencyTypes.calculatedValues, tx)
-  const nodesDefaultValues = await updateNodeExpr(survey, node, NodeDef.getDefaultValues, dependencyTypes.defaultValues, tx)
+  const nodesApplicability = await updateNodeExpr(survey, record, node, NodeDef.getApplicable, dependencyTypes.applicable, tx)
+  const nodesCalculatedValues = await updateNodeExpr(survey, record, node, NodeDef.getCalculatedValues, dependencyTypes.calculatedValues, tx)
+  const nodesDefaultValues = await updateNodeExpr(survey, record, node, NodeDef.getDefaultValues, dependencyTypes.defaultValues, tx)
 
   return R.pipe(
     R.mergeRight(nodesCalculatedValues),
@@ -71,15 +71,10 @@ const updateNode = async (survey, node, tx) => {
   )(nodesApplicability)
 }
 
-const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx) => {
+const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependencyType, tx) => {
 
   //1. fetch dependent nodes
-  const nodeDependents = await NodeDependencyManager.fetchDependentNodes(
-    survey,
-    node,
-    dependencyType,
-    tx
-  )
+  const nodeDependents = NodeDependencyManager.fetchDependentNodes(survey, record, node, dependencyType)
   const isDefaultValuesExpr = dependencyType === dependencyTypes.defaultValues
   const isApplicableExpr = dependencyType === dependencyTypes.applicable
 

@@ -117,7 +117,7 @@ class RecordUpdateThread extends Thread {
       await this.handleNodesUpdated(updatedNodes, t)
 
       // 2. update dependent nodes
-      const updatedDependentNodes = await DependentNodesUpdater.updateNodes(survey, updatedNodes, t)
+      const updatedDependentNodes = await DependentNodesUpdater.updateNodes(survey, this.record, updatedNodes, t)
       await this.handleNodesUpdated(updatedDependentNodes, t)
 
       const updatedNodesAndDependents = R.mergeDeepRight(updatedNodes, updatedDependentNodes)

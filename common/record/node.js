@@ -90,6 +90,14 @@ const getNodeDefUuids = nodes => R.pipe(
   R.uniq
 )(nodes)
 
+const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
+
+const isDescendantOf = node =>
+  ancestor => R.includes(
+    getUuid(ancestor),
+    getHierarchy(node),
+  )
+
 /**
  * ======
  * UPDATE
@@ -139,6 +147,7 @@ module.exports = {
   // ==== READ metadata
   isChildApplicable: childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid]),
   isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
+  isDescendantOf,
 
   // ==== UPDATE
   assocValue: R.assoc(keys.value),
