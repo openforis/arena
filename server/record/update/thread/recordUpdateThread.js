@@ -82,7 +82,7 @@ class RecordUpdateThread extends Thread {
 
       let updatedNodes = null
 
-      // 1. update node
+      // 1. create record or update node
       switch (msg.type) {
         case messageTypes.createRecord:
           updatedNodes = await this.recordUpdater.createRecord(user, survey, msg.record, t)
@@ -101,16 +101,18 @@ class RecordUpdateThread extends Thread {
       const updatedDependentNodes = await DependentNodesUpdater.updateNodes(survey, updatedNodes, t)
       this._postMessage(WebSocketEvents.nodesUpdate, updatedDependentNodes)
 
+      const updatedNodesAndDependents = R.mergeDeepRight(updatedNodes, updatedDependentNodes)
+
       // 3. update node validations
-      const validations = await RecordValidationManager.validateNodes(survey, this.recordUuid, updatedNodes, this.preview, t)
+      const validations = await RecordValidationManager.validateNodes(survey, this.recordUuid, updatedNodesAndDependents, this.preview, t)
       this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
 
       // 4. update survey rdb
       if (!this.preview) {
         const nodeDefs = toUuidIndexedObj(
-          Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey)
+          Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
         )
-        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodes, t)
+        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodesAndDependents, t)
       }
     })
   }
