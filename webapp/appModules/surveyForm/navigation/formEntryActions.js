@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 import Record from '../../../../common/record/record'
 import RecordStep from '../../../../common/record/recordStep'
+import Validator from '../../../../common/validation/validator'
 
 import { deleteRecord, updateRecordStep } from '../record/actions'
 import { appModuleUri } from '../../appModules'
@@ -17,6 +18,7 @@ const RecordEntryButtons = (props) => {
   const {
     history,
     step, stepNext, stepPrev,
+    valid,
     deleteRecord, updateRecordStep,
   } = props
 
@@ -27,7 +29,7 @@ const RecordEntryButtons = (props) => {
         stepPrev &&
         <button className="btn-s btn-of"
                 onClick={() =>
-                  window.confirm(`Are sure you want to demote this record to ${RecordStep.getName(stepPrev)}?`)
+                  confirm(`Are sure you want to demote this record to ${RecordStep.getName(stepPrev)}?`)
                     ? updateRecordStep(RecordStep.getId(stepPrev), history)
                     : null
                 }>
@@ -41,9 +43,11 @@ const RecordEntryButtons = (props) => {
         stepNext &&
         <button className="btn-s btn-of"
                 onClick={() =>
-                  window.confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
+                  valid
+                    ? confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
                     ? updateRecordStep(RecordStep.getId(stepNext), history)
                     : null
+                    : alert('Cannot promote record: it contains errors.\nPlease fix them and try again.')
                 }>
           <span className="icon icon-redo2 icon-12px"/>
         </button>
@@ -68,6 +72,7 @@ const FormEntryActions = (props) => {
   const {
     history, preview,
     step, stepNext, stepPrev,
+    valid,
     deleteRecord, updateRecordStep,
   } = props
 
@@ -88,7 +93,8 @@ const FormEntryActions = (props) => {
                                 updateRecordStep={updateRecordStep}
                                 step={step}
                                 stepNext={stepNext}
-                                stepPrev={stepPrev}/>
+                                stepPrev={stepPrev}
+                                valid={valid}/>
           )
       }
     </div>
@@ -103,7 +109,8 @@ const mapStateToProps = (state) => {
   return {
     step: RecordStep.getStep(stepId),
     stepNext: RecordStep.getNextStep(stepId),
-    stepPrev: RecordStep.getPreviousStep(stepId)
+    stepPrev: RecordStep.getPreviousStep(stepId),
+    valid: Validator.isValid(record)
   }
 }
 

@@ -107,8 +107,9 @@ const props = {
 
 const getColValueProcessor = nodeDef => R.propOr(
   () => (node) => {
-    const value = Node.getNodeValue(node, null)
-    return isBlank(value) ? null : value
+    return Node.isNodeValueBlank(node)
+      ? null
+      : Node.getNodeValue(node)
   },
   colValueProcessor,
   props[NodeDef.getType(nodeDef)]
