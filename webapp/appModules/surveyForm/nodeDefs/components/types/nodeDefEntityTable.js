@@ -21,7 +21,8 @@ const EntityTableRow = (props) => {
     canEditRecord,
   } = props
 
-  const className = `node-def__table-row${renderType === nodeDefRenderType.tableHeader ? '-header' : ''}`
+  const className = `node-def__table-row` +
+    (renderType === nodeDefRenderType.tableHeader ? '-header' : '')
 
   return (
     <div className={className}
@@ -48,7 +49,9 @@ const EntityTableRow = (props) => {
 
       {
         renderType === nodeDefRenderType.tableBody && canEditRecord &&
-        <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={removeNode}/>
+        <NodeDeleteButton nodeDef={nodeDef}
+                          node={node}
+                          removeNode={removeNode}/>
       }
 
     </div>
