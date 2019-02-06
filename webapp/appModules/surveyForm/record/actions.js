@@ -125,7 +125,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   recordNodesUpdate(data.nodes)(dispatch)
 }
 
-export const deleteRecord = (history, server = true) => async (dispatch, getState) => {
+export const deleteRecord = (history) => async (dispatch, getState) => {
   const state = getState()
 
   const surveyId = SurveyState.getStateSurveyId(state)
@@ -135,7 +135,6 @@ export const deleteRecord = (history, server = true) => async (dispatch, getStat
   await checkOutRecord(recordUuid)(dispatch, getState)
   // 2. perform server side delete
   await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
-
   // 3. remove record from redux state and redirect to records view
   dispatchRecordDelete(history)(dispatch)
 }
