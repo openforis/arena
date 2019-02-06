@@ -114,8 +114,6 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
   RecordUpdateManager.notifyUsersRecordDeleted(recordUuid, user.id)
 }
 
-const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(user, surveyId, nodeUuid)
-
 /**
  * ==================
  * CHECK IN / OUT RECORD
@@ -179,7 +177,7 @@ module.exports = {
 
   //==== DELETE
   deleteRecord,
-  deleteNode,
+  deleteNode: RecordUpdateManager.deleteNode,
 
   //==== UTILS
   checkInRecord,

@@ -162,7 +162,7 @@ module.exports.init = app => {
       const nodeUuid = getRestParam(req, 'nodeUuid')
       const user = req.user
 
-      const nodes = await RecordManager.deleteNode(user, surveyId, nodeUuid)
+      const nodes = await RecordManager.deleteNode(user, nodeUuid)
       res.json({ nodes })
     } catch (err) {
       sendErr(res, err)

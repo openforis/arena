@@ -114,7 +114,7 @@ const persistNode = (user, surveyId, node) => {
  * @param surveyId
  * @param nodeUuid
  */
-const deleteNode = (user, surveyId, nodeUuid) => {
+const deleteNode = (user, nodeUuid) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
   updateWorker.postMessage({ type: recordThreadMessageTypes.deleteNode, nodeUuid })
 }
