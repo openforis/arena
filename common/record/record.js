@@ -54,8 +54,16 @@ const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
   getNodeChildren(parentNode),
   R.filter(n => Node.getNodeDefUuid(n) === nodeDefUuid),
   // Put placeholder at the end for multiple nodes if another user is editing the same record
-  R.sortBy(R.propOr(false, Node.keys.placeholder))
+  R.sortWith([
+    R.propOr(false, Node.keys.placeholder),
+    R.prop(Node.keys.id)
+  ])
 )(record)
+
+const getNodeSiblingsByDefUuid = (node, siblingDefUuid) => R.pipe(
+  getParentNode(node),
+  parentNode => getNodeChildrenByDefUuid(parentNode, siblingDefUuid)
+)
 
 const getNodesByDefUuid = (nodeDefUuid) => record => R.pipe(
   getNodesArray,
@@ -121,6 +129,11 @@ const getCodeUuidsHierarchy = (survey, parentEntity, nodeDef) => record => {
     )
     : []
 }
+
+const getDependentCodeAttributes = node => findNodes(n => {
+  const hierarchy = Node.getCategoryItemHierarchy(n)
+  return R.includes(Node.getUuid(node), hierarchy)
+})
 
 const getAncestorByNodeDefUuuid = (node, ancestorDefUuid) =>
   record => {
@@ -212,6 +225,7 @@ module.exports = {
   getNodesArray,
   getNodesByDefUuid,
   getNodeChildrenByDefUuid,
+  getNodeSiblingsByDefUuid,
   getRootNode,
   getNodeByUuid,
   getParentNode,
@@ -219,11 +233,13 @@ module.exports = {
   getDescendantsByNodeDefUuid,
 
   // testing
-  getCodeUuidsHierarchy: getCodeUuidsHierarchy,
+  getCodeUuidsHierarchy,
   getParentCodeAttribute,
+  getDependentCodeAttributes,
 
   // ====== UPDATE
   assocNodes,
+  assocNode: node => assocNodes({ [Node.getUuid(node)]: node }),
   mergeNodeValidations: Validator.mergeValidation,
 
   // ====== DELETE
