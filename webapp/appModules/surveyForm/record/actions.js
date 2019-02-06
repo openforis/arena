@@ -30,6 +30,12 @@ export const nodeValidationsUpdate = validations =>
   dispatch =>
     dispatch({ type: validationsUpdate, validations })
 
+export const dispatchRecordDelete = (history) =>
+  dispatch => {
+    dispatch({ type: recordDelete })
+    history.push(appModuleUri(appModules.data))
+  }
+
 /**
  * ============
  * CREATE
@@ -129,10 +135,8 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
   await checkOutRecord(recordUuid)(dispatch, getState)
   // 2. perform server side delete
   await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
-  // 3. remove record from redux state
-  await dispatch({ type: recordDelete })
-  // 4. redirect to default data module (records view)
-  history.push(appModuleUri(appModules.data))
+  // 3. remove record from redux state and redirect to records view
+  dispatchRecordDelete(history)(dispatch)
 }
 
 /**
