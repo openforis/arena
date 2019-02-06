@@ -7,6 +7,7 @@ import { Redirect } from 'react-router-dom'
 import TabBar from '../../commonComponents/tabBar'
 import SurveyInfo from './components/surveyInfo'
 import SurveyFormView from '../surveyForm/surveyFormView'
+import SurveyHierarchy from '../surveyForm/surveyHierarchy'
 import RecordView from '../data/records/components/recordView'
 import Categories from '../surveyForm/components/categoriesView'
 import TaxonomiesView from '../surveyForm/components/taxonomiesView'
@@ -54,6 +55,12 @@ class DesignerView extends React.Component {
               component: SurveyFormView,
               path: appModuleUri(designerModules.formDesigner),
               props: { edit: true, draft: true, canEditDef },
+            },
+
+            {
+              label: 'Hierarchy',
+              component: SurveyHierarchy,
+              path: appModuleUri(designerModules.surveyHierarchy)
             },
 
             {

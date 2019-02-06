@@ -6,6 +6,8 @@ export const designerModules = {
 
   formDesigner: `${appModules.designer}/formDesigner`,
 
+  surveyHierarchy: `${appModules.designer}/surveyHierarchy`,
+
   recordPreview: `${appModules.designer}/formDesigner/preview`,
 
   categories: `${appModules.designer}/categories`,
