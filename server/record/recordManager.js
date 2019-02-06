@@ -21,9 +21,6 @@ const ActivityLog = require('../activityLog/activityLogger')
 
 const { canEditRecord } = require('../../common/auth/authManager')
 
-const WebSocketManager = require('../webSocket/webSocketManager')
-const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
-
 /**
  * ===================
  * CREATE
@@ -114,13 +111,7 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
     await RecordRepository.deleteRecord(user, surveyId, recordUuid, t)
   })
 
-  const recordUsersIds = RecordUpdateManager.getRecordUsers(recordUuid)
-  recordUsersIds.forEach(id => {
-    if (id !== user.id) {
-      WebSocketManager.notifyUser(id, WebSocketEvents.recordDelete, recordUuid)
-    }
-    RecordUpdateManager.checkOut(id)
-  })
+  RecordUpdateManager.notifyUsersRecordDeleted(recordUuid, user.id)
 }
 
 const deleteNode = (user, surveyId, nodeUuid) => RecordUpdateManager.deleteNode(user, surveyId, nodeUuid)

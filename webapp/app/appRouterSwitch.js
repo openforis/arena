@@ -17,7 +17,7 @@ import { getLocationPathname } from '../appUtils/routerUtils'
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 import { openSocket, closeSocket } from './appWebSocket'
 import { activeJobUpdate } from '../appModules/appView/components/job/actions'
-import { recordNodesUpdate, nodeValidationsUpdate, deleteRecord } from '../appModules/surveyForm/record/actions'
+import { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete } from '../appModules/surveyForm/record/actions'
 
 const loginUri = '/'
 
@@ -30,7 +30,7 @@ class AppRouterSwitch extends React.Component {
   componentDidUpdate (prevProps) {
     const {
       user, history,
-      activeJobUpdate, recordNodesUpdate, deleteRecord, nodeValidationsUpdate, throwSystemError
+      activeJobUpdate, recordNodesUpdate, dispatchRecordDelete, nodeValidationsUpdate, throwSystemError
     } = this.props
     const { user: prevUser } = prevProps
 
@@ -41,7 +41,7 @@ class AppRouterSwitch extends React.Component {
         [WebSocketEvents.nodeValidationsUpdate]: nodeValidationsUpdate,
         [WebSocketEvents.recordDelete]: () => {
           alert('This record has just been deleted by another user')
-          deleteRecord(history, false)
+          dispatchRecordDelete(history)
         },
         [WebSocketEvents.error]: throwSystemError,
       })
@@ -132,7 +132,7 @@ export default withRouter(
     initApp,
     activeJobUpdate,
     recordNodesUpdate,
-    deleteRecord,
+    dispatchRecordDelete,
     nodeValidationsUpdate,
     throwSystemError,
   })

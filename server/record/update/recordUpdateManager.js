@@ -2,6 +2,7 @@ const R = require('ramda')
 const path = require('path')
 
 const WebSocketManager = require('../../webSocket/webSocketManager')
+const WebSocketEvents = require('../../../common/webSocket/webSocketEvents')
 
 const ThreadsCache = require('../../threads/threadsCache')
 const ThreadManager = require('../../threads/threadManager')
@@ -118,6 +119,24 @@ const deleteNode = (user, surveyId, nodeUuid) => {
   updateWorker.postMessage({ type: recordThreadMessageTypes.deleteNode, nodeUuid })
 }
 
+/**
+ * Notify users editing a record that the record has been deleted
+ * Also does the checkOuts
+ *
+ * @param recordUuid
+ * @param excludeUserId Do not notfy the user that has deleted the record
+ */
+const notifyUsersRecordDeleted = (recordUuid, userIdExclude) => {
+  const recordUsersIds = getRecordUsers(recordUuid)
+  
+  recordUsersIds.forEach(id => {
+    if (id !== userIdExclude) {
+      WebSocketManager.notifyUser(id, WebSocketEvents.recordDelete, recordUuid)
+      checkOut(id)
+    }
+  })
+}
+
 module.exports = {
   checkIn,
   checkOut,
@@ -126,5 +145,5 @@ module.exports = {
   persistNode,
   deleteNode,
 
-  getRecordUsers,
+  notifyUsersRecordDeleted,
 }
