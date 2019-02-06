@@ -17,7 +17,7 @@ import Node from '../../../../../../common/record/node'
 import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
 import * as SurveyState from '../../../../../survey/surveyState'
 
-const {valuePropKeys} = Node
+const { valuePropKeys } = Node
 
 const fields = {
   code: 'code',
@@ -57,23 +57,23 @@ const loadTaxa = async (surveyId, taxonomyUuid, draft, field, value, strict = fa
     includeUnlUnk: true
   }
 
-  const {data} = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa?${toQueryString(params)}`)
+  const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa?${toQueryString(params)}`)
   return data.taxa
 }
 
 const loadTaxonByNode = async (surveyId, taxonomyUuid, draft, node) => {
-  const vernacularNameUuid = Node.getNodeVernacularNameUuid(node)
-
-  const filterProp = vernacularNameUuid ? valuePropKeys.vernacularNameUuid : 'uuid'
-  const filterPropValue = vernacularNameUuid ? vernacularNameUuid : Node.getNodeTaxonUuid(node)
-
-  return filterPropValue
-    ? R.head(await loadTaxa(surveyId, taxonomyUuid, draft, filterProp, filterPropValue, true))
-    : null
+  const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxon`, {
+    params: {
+      taxonUuid: Node.getNodeTaxonUuid(node),
+      vernacularNameUuid: Node.getNodeVernacularNameUuid(node),
+      draft
+    }
+  })
+  return data.taxon
 }
 
 const TaxonAutocompleteItemRenderer = props => {
-  const {item: taxon, ...otherProps} = props
+  const { item: taxon, ...otherProps } = props
 
   const vernacularNames = Taxonomy.getTaxonVernacularNames(taxon)
   const vernacularNamesString = R.pipe(
@@ -88,7 +88,7 @@ const TaxonAutocompleteItemRenderer = props => {
               tabIndex="1">
     <div>{Taxonomy.getTaxonCode(taxon)}</div>
     <div>{Taxonomy.getTaxonScientificName(taxon)}</div>
-    <div style={{gridColumn: 2}}>{vernacularNamesString}</div>
+    <div style={{ gridColumn: 2 }}>{vernacularNamesString}</div>
   </div>
 }
 
@@ -125,16 +125,18 @@ class NodeDefTaxon extends React.Component {
   }
 
   async loadSelectedTaxonFromNode () {
-    const {surveyId, taxonomyUuid, nodes, draft} = this.props
+    const { surveyId, taxonomyUuid, nodes, draft } = this.props
     const node = nodes[0]
 
-    const taxon = node ? await loadTaxonByNode(surveyId, taxonomyUuid, draft, node) : null
+    const taxon = Node.isNodeValueBlank(node)
+      ? null
+      : await loadTaxonByNode(surveyId, taxonomyUuid, draft, node)
 
     this.updateStateFromTaxon(taxon)
   }
 
   updateStateFromTaxon (taxon) {
-    const {nodes} = this.props
+    const { nodes } = this.props
     const node = nodes[0]
 
     if (taxon) {
@@ -159,8 +161,8 @@ class NodeDefTaxon extends React.Component {
   }
 
   async onInputFieldChange (field, value) {
-    const {draft} = this.props
-    const {code} = this.state
+    const { draft } = this.props
+    const { code } = this.state
 
     if (code === Taxonomy.unlistedCode && field !== fields.code) {
       this.handleUnlistedSpeciesFieldChange(field, value)
@@ -210,7 +212,7 @@ class NodeDefTaxon extends React.Component {
     let nodeValue = null
 
     if (Taxonomy.isUnlistedTaxon(item)) {
-      const {scientificName, vernacularName} = this.state
+      const { scientificName, vernacularName } = this.state
       //unlisted item
       nodeValue = {
         [valuePropKeys.taxonUuid]: item.uuid,
@@ -233,7 +235,7 @@ class NodeDefTaxon extends React.Component {
   }
 
   updateNodeValue (value) {
-    const {nodeDef, nodes, updateNode} = this.props
+    const { nodeDef, nodes, updateNode } = this.props
 
     updateNode(nodeDef, nodes[0], value)
   }
@@ -244,10 +246,10 @@ class NodeDefTaxon extends React.Component {
   }
 
   async loadAutocompleteTaxa (field, value, draft) {
-    const {surveyId, taxonomyUuid} = this.props
+    const { surveyId, taxonomyUuid } = this.props
 
     const taxa = await loadTaxa(surveyId, taxonomyUuid, draft, field, value)
-    this.setState({autocompleteTaxa: taxa})
+    this.setState({ autocompleteTaxa: taxa })
   }
 
   render () {

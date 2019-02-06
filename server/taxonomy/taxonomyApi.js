@@ -96,6 +96,23 @@ module.exports.init = app => {
     }
   })
 
+  app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/taxon', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonUuid = getRestParam(req, 'taxonUuid')
+      const vernacularNameUuid = getRestParam(req, 'vernacularNameUuid')
+      const draft = getBoolParam(req, 'draft')
+
+      const taxon = vernacularNameUuid
+        ? await TaxonomyManager.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, draft)
+        : await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid, draft)
+
+      res.json({ taxon })
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
   app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/export', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')

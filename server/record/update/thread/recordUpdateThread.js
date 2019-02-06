@@ -122,7 +122,6 @@ class RecordUpdateThread extends Thread {
           break
         case messageTypes.deleteNode:
           await this.initRecord(t)
-          // If the record was already deleted (by another user) the repository delete method returns null
           updatedNodes = await this.recordUpdater.deleteNode(user, survey, this.record, msg.nodeUuid, t) || {}
           break
       }

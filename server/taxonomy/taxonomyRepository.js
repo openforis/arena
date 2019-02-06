@@ -64,7 +64,7 @@ const insertOrUpdateVernacularNames = (surveyId, taxonUuid, vernacularNames, cli
         ON CONFLICT (taxon_uuid, (props_draft->>'lang')) DO
          UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name.props_draft || $2
         RETURNING *`,
-      [taxonUuid, {lang: lang, name: vn}],
+      [taxonUuid, { lang: lang, name: vn }],
       record => dbTransformCallback(record, true, true)
     )
   })
@@ -102,7 +102,7 @@ const fetchTaxaByPropLike = async (surveyId,
                                    client = db) => {
   const {
     filter,
-    sort = {field: 'scientificName', asc: true},
+    sort = { field: 'scientificName', asc: true },
     limit = 25,
     offset = 0
   } = params
@@ -120,75 +120,65 @@ const fetchTaxaByPropLike = async (surveyId,
 
   switch (filterProp) {
     case filterProps.vernacularName:
-      return fetchTaxaByVernacularName(surveyId, taxonomyUuid, searchValue, sort, limit, offset, draft, client)
-    case filterProps.uuid:
-      const taxon = await fetchTaxonByUuid(surveyId, searchValue, draft, client)
-      return taxon ? [taxon] : []
-    case filterProps.vernacularNameUuid:
-      const vernacularName = await fetchTaxonVernacularNameByUuid(surveyId, searchValue, draft, client)
-      return vernacularName ? [vernacularName] : []
+      return fetchTaxaByVernacularName(surveyId, taxonomyUuid, searchValue, limit, offset, draft, client)
     default:
-
-      const propsCol = draft ? 'props_draft' : 'props'
+      const filterCondition = getPropFilterCondition(filterProp, searchValue, draft)
 
       return await client.map(
-        `SELECT * FROM (
-            SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
-            WHERE taxonomy_uuid = $1 
-              ${searchValue ? `AND lower(${propsCol}->>'${filterProp}') LIKE '${searchValue}'` : ''}
-            ORDER BY ${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
-          ) AS sorted_taxa 
-            LIMIT ${limit ? limit : 'ALL'} 
-            OFFSET $2`,
+        `SELECT * 
+         FROM ${getSurveyDBSchema(surveyId)}.taxon
+         WHERE taxonomy_uuid = $1 ${filterCondition ? ` AND ${filterCondition}` : ''}
+         ORDER BY
+          ${getPropCol(sort.field, true)} ${sort.asc ? 'ASC' : 'DESC'}, 
+          ${getPropCol(sort.field, false)} ${sort.asc ? 'ASC' : 'DESC'}
+         LIMIT ${limit ? limit : 'ALL'} 
+         OFFSET $2`,
         [taxonomyUuid, offset],
         record => dbTransformCallback(record, draft, true)
       )
   }
 }
 
+const getTaxonVernacularNameSelectFields = draft => `
+  t.*,
+  vn.uuid AS vernacular_name_uuid,
+  ${draft ? `COALESCE(vn.props_draft->>'name', vn.props->>'name')` : `vn.props->>'name'`} AS vernacular_name,
+  ${draft ? `COALESCE(vn.props_draft->>'lang', vn.props->>'lang')` : `vn.props->>'lang'`} AS vernacular_language
+`
+
 const fetchTaxaByVernacularName = async (surveyId,
                                          taxonomyUuid,
                                          searchValue,
-                                         sort = {field: 'scientificName', asc: true},
                                          limit = 25,
                                          offset = 0,
                                          draft = false,
                                          client = db) => {
-  const propsCol = draft ? 'props_draft' : 'props'
+  const filterCondition = getPropFilterCondition('name', searchValue, draft, 'vn.')
 
   return await client.map(
-    `SELECT * FROM (
-        SELECT t.*, 
-          vn.uuid AS vernacular_name_uuid,
-          vn.${propsCol}->>'name' AS vernacular_name, 
-          vn.${propsCol}->>'lang' AS vernacular_language
-        FROM ${getSurveyDBSchema(surveyId)}.taxon t
-          LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
-          ON vn.taxon_uuid = t.uuid
-        WHERE t.taxonomy_uuid = $1 
-          AND lower(vn.${propsCol}->>'name') LIKE '%${searchValue}%'
-        ORDER BY t.${propsCol}->>'${sort.field}' ${sort.asc ? 'ASC' : 'DESC'}
-      ) AS sorted_taxa 
-        LIMIT ${limit ? limit : 'ALL'} 
-        OFFSET $2`,
+    `SELECT ${getTaxonVernacularNameSelectFields(draft)}
+     FROM ${getSurveyDBSchema(surveyId)}.taxon t
+       LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
+       ON vn.taxon_uuid = t.uuid
+     WHERE t.taxonomy_uuid = $1 AND ${filterCondition}
+     ORDER BY 
+       ${getPropCol('scientificName', true, 't.')},
+       ${getPropCol('scientificName', false, 't.')}
+     LIMIT ${limit ? limit : 'ALL'}
+     OFFSET $2`,
     [taxonomyUuid, offset],
     record => dbTransformCallback(record, draft, true)
   )
 }
 
 const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, client = db) => {
-  const propsCol = draft ? 'props_draft' : 'props'
-
   return await client.one(
-    `SELECT t.*, 
-       vn.uuid AS vernacular_name_uuid,
-       vn.${propsCol}->>'name' AS vernacular_name, 
-       vn.${propsCol}->>'lang' AS vernacular_language
+    `SELECT ${getTaxonVernacularNameSelectFields(draft)}
      FROM ${getSurveyDBSchema(surveyId)}.taxon t
        LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
        ON vn.taxon_uuid = t.uuid
-     WHERE vn.uuid = $1
-    `, [uuid],
+     WHERE vn.uuid = $1`,
+    [uuid],
     record => dbTransformCallback(record, draft, true)
   )
 }
@@ -197,7 +187,8 @@ const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
   await client.one(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxon
      WHERE uuid = $1
-    `, [uuid],
+    `
+    , [uuid],
     record => dbTransformCallback(record, draft, true)
   )
 
@@ -215,9 +206,31 @@ const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client = db
   await client.none(
     `DELETE FROM ${getSurveyDBSchema(surveyId)}.taxon
      WHERE taxonomy_uuid = $1
-       AND props::text = '{}'::text`,
+       AND props::text = '{}'::text`
+    ,
     [taxonomyUuid]
   )
+
+const getPropCol = (propName, draft, columnPrefix = '') =>
+  columnPrefix + (draft ? 'props_draft' : 'props') +
+  `->>'${propName}'`
+
+const getPropFilterCondition = (propName, searchValue, draft, columnPrefix = '') => {
+
+  const getCondition = draft =>
+    `lower(${getPropCol(propName, draft, columnPrefix)}) LIKE '${searchValue}'`
+
+  return searchValue
+    ? draft
+      ?
+      `(
+        ${getPropCol(propName, true, columnPrefix)} IS NULL AND ${getCondition(false)}
+        OR
+        ${getPropCol(propName, true, columnPrefix)} IS NOT NULL AND ${getCondition(true)}
+      )`
+      : getCondition(false)
+    : ''
+}
 
 module.exports = {
   //CREATE

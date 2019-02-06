@@ -6,6 +6,8 @@ import Record from '../../../../common/record/record'
 import RecordStep from '../../../../common/record/recordStep'
 import Validator from '../../../../common/validation/validator'
 
+import ErrorBadge from '../../../commonComponents/errorBadge'
+
 import { deleteRecord, updateRecordStep } from '../record/actions'
 import { appModuleUri } from '../../appModules'
 import { designerModules } from '../../designer/designerModules'
@@ -23,7 +25,13 @@ const RecordEntryButtons = (props) => {
   } = props
 
   return (
-    <React.Fragment>
+    <div>
+
+      {
+        /*
+        <ErrorBadge validation={{valid}} label="invalidRecord"/>
+        */
+      }
 
       {
         stepPrev &&
@@ -37,17 +45,16 @@ const RecordEntryButtons = (props) => {
         </button>
       }
 
-      Step {RecordStep.getId(step)} ({RecordStep.getName(step)})
+      <span>Step {RecordStep.getId(step)} ({RecordStep.getName(step)})</span>
 
       {
         stepNext &&
         <button className="btn-s btn-of"
+                aria-disabled={!valid}
                 onClick={() =>
-                  valid
-                    ? confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
+                    confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
                     ? updateRecordStep(RecordStep.getId(stepNext), history)
                     : null
-                    : alert('Cannot promote record: it contains errors.\nPlease fix them and try again.')
                 }>
           <span className="icon icon-redo2 icon-12px"/>
         </button>
@@ -63,7 +70,7 @@ const RecordEntryButtons = (props) => {
         <span className="icon icon-bin icon-12px icon-left"/>
         Delete
       </button>
-    </React.Fragment>
+    </div>
   )
 }
 
