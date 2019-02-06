@@ -30,43 +30,40 @@ class RecordUpdater {
   async createRecord (user, survey, recordToCreate, t) {
     const surveyId = Survey.getId(survey)
 
-    await RecordRepository.insertRecord(surveyId, recordToCreate, t)
+    const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
     await this.logActivity(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
 
     const rootNodeDef = Survey.getRootNodeDef(survey)
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(recordToCreate))
 
-    return await this.persistNode(user, survey, rootNode, t)
+    return await this.persistNode(user, survey, record, rootNode, t)
   }
 
-  async persistNode (user, survey, node, t) {
+  async persistNode (user, survey, record, node, t) {
     const uuid = Node.getUuid(node)
-    const surveyId = Survey.getId(survey)
 
-    const nodeDb = await NodeRepository.fetchNodeByUuid(surveyId, uuid, t)
+    const existingNode = Record.getNodeByUuid(uuid)(record)
 
-    let updatedNodes
-
-    if (nodeDb) {
+    if (existingNode) {
       // update
-      await this.logActivity(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
-      updatedNodes = await this._updateNodeValue(surveyId, uuid, Node.getNodeValue(node), t)
+      await this.logActivity(user, Survey.getId(survey), ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
+      return await this._updateNodeValue(survey, record, uuid, Node.getNodeValue(node), t)
     } else {
       // create
-      updatedNodes = await this._insertNode(survey, node, user, t)
+      return await this._insertNode(survey, record, node, user, t)
     }
-
-    return updatedNodes
   }
 
-  async deleteNode (user, survey, nodeUuid, t) {
+  async deleteNode (user, survey, record, nodeUuid, t) {
     const surveyId = Survey.getId(survey)
 
     const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
-    await this.logActivity(user, surveyId, ActivityLog.type.nodeDelete, {nodeUuid}, t)
+    record = Record.assocNode(node)(record)
 
-    return await this._onNodeUpdate(surveyId, node, t)
+    await this.logActivity(user, surveyId, ActivityLog.type.nodeDelete, { nodeUuid }, t)
+
+    return await this._onNodeUpdate(survey, record, node, t)
   }
 
   //==========
@@ -74,29 +71,33 @@ class RecordUpdater {
   //==========
 
   // ==== CREATE
-  async _insertNode (survey, node, user, t) {
-    const surveyId = Survey.getId(survey)
+  async _insertNode (survey, record, node, user, t) {
     const nodeDefUuid = Node.getNodeDefUuid(node)
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
     // If it's a code, don't insert if it has been inserted already (by another user)
     if (NodeDef.isNodeDefCode(nodeDef)) {
-      const siblingNodes = await NodeRepository.fetchChildNodesByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getParentUuid(node), nodeDefUuid, t)
-      if (R.any(n => R.equals(Node.getNodeValue(n), Node.getNodeValue(node)))(siblingNodes)) {
+      const siblings = Record.getNodeSiblingsByDefUuid(node, nodeDefUuid)(record)
+      if (R.any(sibling => R.equals(Node.getNodeValue(sibling), Node.getNodeValue(node)))(siblings)) {
         return {}
       }
     }
 
-    const nodesToReturn = await this._insertNodeRecursively(survey, nodeDef, node, user, t)
-    return await assocParentNode(surveyId, node, nodesToReturn, t)
+    const nodesToReturn = await this._insertNodeRecursively(survey, nodeDef, record, node, user, t)
+
+    record = Record.assocNodes(nodesToReturn)(record)
+
+    return await assocParentNode(Survey.getId(survey), record, node, nodesToReturn)
   }
 
-  async _insertNodeRecursively (survey, nodeDef, nodeToInsert, user, t) {
+  async _insertNodeRecursively (survey, nodeDef, record, nodeToInsert, user, t) {
     const surveyId = Survey.getId(survey)
     await this.logActivity(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
 
     // insert node
     const node = await NodeRepository.insertNode(surveyId, nodeToInsert, t)
+
+    record = Record.assocNode(node)(record)
 
     // add children if entity
     const childDefs = NodeDef.isNodeDefEntity(nodeDef)
@@ -108,39 +109,58 @@ class RecordUpdater {
       await Promise.all(
         childDefs
           .filter(NodeDef.isNodeDefSingle)
-          .map(async childDef =>
-            await this._insertNodeRecursively(survey, childDef, Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), Node.getUuid(node)), user, t)
+          .map(async childDef => {
+              const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), Node.getUuid(node))
+              return await this._insertNodeRecursively(survey, childDef, record, childNode, user, t)
+            }
           )
       )
     )
-    return R.mergeLeft({[Node.getUuid(node)]: node}, childNodes)
+    return R.mergeLeft({ [Node.getUuid(node)]: node }, childNodes)
   }
 
   // ==== UPDATE
 
-  async _updateNodeValue (surveyId, nodeUuid, value, t) {
-    const node = await NodeRepository.updateNode(surveyId, nodeUuid, value, {[Node.metaKeys.defaultValue]: false}, t)
-    return await this._onNodeUpdate(surveyId, node, t)
+  async _updateNodeValue (survey, record, nodeUuid, value, t) {
+    const node = await NodeRepository.updateNode(Survey.getId(survey), nodeUuid, value, { [Node.metaKeys.defaultValue]: false }, t)
+    record = Record.assocNode(node)(record)
+    return await this._onNodeUpdate(survey, record, node, t)
   }
 
-  async _onNodeUpdate (surveyId, node, t) {
-    // delete dependent code nodes
+  async _onNodeUpdate (survey, record, node, t) {
     // TODO check if it should be removed
-    const descendantCodes = await NodeRepository.fetchDescendantNodesByCodeUuid(surveyId, Node.getRecordUuid(node), Node.getUuid(node), t)
-    const nodesToReturn = await Promise.all(
-      descendantCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t))
-    )
-    return await assocParentNode(surveyId, node, SurveyUtils.toUuidIndexedObj(nodesToReturn), t)
+    const surveyId = Survey.getId(survey)
+
+    let updatedNodes = {
+      [Node.getUuid(node)]: node
+    }
+
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+    if (NodeDef.isNodeDefCode(nodeDef)) {
+      // delete dependent code nodes
+
+      const dependentCodes = Record.getDependentCodeAttributes(node)(record)
+
+      if (!R.isEmpty(dependentCodes)) {
+
+        const deletedNodesArray = await Promise.all(
+          dependentCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t))
+        )
+        updatedNodes = R.mergeRight(updatedNodes, SurveyUtils.toUuidIndexedObj(deletedNodesArray))
+      }
+    }
+    record = Record.assocNodes(updatedNodes)(record)
+    return await assocParentNode(surveyId, record, node, updatedNodes)
   }
 }
 
 //always assoc parentNode, used in surveyRdbManager.updateTableNodes
-const assocParentNode = async (surveyId, node, nodes, t) => {
-  const parentUuid = Node.getParentUuid(node)
-  const parentNode = parentUuid && !nodes[parentUuid] ? await NodeRepository.fetchNodeByUuid(surveyId, parentUuid, t) : null
+const assocParentNode = async (surveyId, record, node, nodes) => {
+  const parentNode = Record.getParentNode(node)(record)
+
   return R.mergeRight({
       [Node.getUuid(node)]: node,
-      ...parentNode ? {[Node.getUuid(parentNode)]: parentNode} : {}
+      ...parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}
     },
     nodes
   )

@@ -8,6 +8,7 @@ const NodeDef = require('../survey/nodeDef')
 const SurveyUtils = require('../survey/surveyUtils')
 
 const keys = {
+  id: SurveyUtils.keys.id,
   uuid: SurveyUtils.keys.uuid,
   recordUuid: 'recordUuid',
   parentUuid: 'parentUuid',
@@ -19,6 +20,7 @@ const keys = {
 }
 
 const metaKeys = {
+  hierarchy: 'h',
   childApplicability: 'childApplicability',
   defaultValue: 'defaultValue',
 }
@@ -26,6 +28,7 @@ const metaKeys = {
 const valuePropKeys = {
   // code
   itemUuid: 'itemUuid',
+  hierarchy: 'h',
 
   // coordinate
   x: 'x',
@@ -203,6 +206,7 @@ module.exports = {
 
   // code
   getCategoryItemUuid: getNodeValueProp(valuePropKeys.itemUuid),
+  getCategoryItemHierarchy: getNodeValueProp(valuePropKeys.hierarchy, []),
 
   // taxon
   getNodeTaxonUuid: getNodeValueProp(valuePropKeys.taxonUuid),

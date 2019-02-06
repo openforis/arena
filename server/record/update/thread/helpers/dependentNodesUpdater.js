@@ -109,11 +109,11 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
         return {}
 
       //3. get expression
-      const expr = await RecordExprParser.getApplicableExpression(survey, nodeCtx, expressions, tx)
+      const expr = await RecordExprParser.getApplicableExpression(survey, record, nodeCtx, expressions, tx)
 
       //4. eval expr
       const value = expr
-        ? await RecordExprParser.evalNodeQuery(survey, nodeCtx, NodeDefExpression.getExpression(expr), tx)
+        ? await RecordExprParser.evalNodeQuery(survey, record, nodeCtx, NodeDefExpression.getExpression(expr), tx)
         : null
 
       //5. persist updated node value, and return updated node

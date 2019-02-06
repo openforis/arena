@@ -27,7 +27,7 @@ const validateRequired = (survey, nodeDef) =>
       ? errorKeys.required
       : null
 
-const validateNodeValidations = (survey, nodeDef, tx) =>
+const validateNodeValidations = (survey, record, nodeDef, tx) =>
   async (propName, node) => {
     if (Node.isNodeValueBlank(node)) {
       return null
@@ -35,12 +35,12 @@ const validateNodeValidations = (survey, nodeDef, tx) =>
     const validations = NodeDef.getValidations(nodeDef)
 
     const expressions = NodeDefValidations.getExpressions(validations)
-    const applicableExpressions = await RecordExprParser.getApplicableExpressions(survey, node, expressions, tx)
+    const applicableExpressions = await RecordExprParser.getApplicableExpressions(survey, record, node, expressions, tx)
 
     const applicableExpressionsEvaluated = await Promise.all(
       applicableExpressions.map(
         async expr => {
-          const valid = await RecordExprParser.evalNodeQuery(survey, node, NodeDefExpression.getExpression(expr), tx)
+          const valid = await RecordExprParser.evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expr), tx)
           const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
           const message = NodeDefExpression.getMessage(defaultLang, errorKeys.invalidValue)(expr)
 
@@ -61,7 +61,7 @@ const validateNodeValidations = (survey, nodeDef, tx) =>
       )(invalidExpressions)
   }
 
-const validateAttribute = async (survey, attribute, nodeDef, validatedNodeUuids, tx) => {
+const validateAttribute = async (survey, record, attribute, nodeDef, validatedNodeUuids, tx) => {
   if (Node.isDeleted(attribute)) {
     return null
   }
@@ -75,7 +75,7 @@ const validateAttribute = async (survey, attribute, nodeDef, validatedNodeUuids,
     [Node.keys.value]: [
       validateRequired(survey, nodeDef),
       TypeValidator.validateValueType(survey, nodeDef),
-      validateNodeValidations(survey, nodeDef, tx)
+      validateNodeValidations(survey, record, nodeDef, tx)
     ]
   }, false)
 
@@ -97,7 +97,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes, tx) => 
     attributes.map(
       async attribute => {
         const dependents = NodeDependencyManager.fetchDependentNodes(survey, record, attribute, dependencyTypes.validations)
-        
+
         // include attribute itself if it's not already included among dependents
         const attributeAndDependents =
           R.includes(dep => R.equals(attribute, dep.nodeCtx))(dependents)
@@ -111,7 +111,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes, tx) => 
         return await Promise.all(
           attributeAndDependents.map(
             async ({ nodeCtx, nodeDef }) =>
-              await validateAttribute(survey, nodeCtx, nodeDef, validatedAttributeUuids, tx)
+              await validateAttribute(survey, record, nodeCtx, nodeDef, validatedAttributeUuids, tx)
           )
         )
       }

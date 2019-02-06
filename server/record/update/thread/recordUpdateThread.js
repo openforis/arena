@@ -53,11 +53,15 @@ class RecordUpdateThread extends Thread {
     return this.survey
   }
 
+  async initRecord (t) {
+    const recordDb = await RecordRepository.fetchRecordByUuid(this.surveyId, this.recordUuid, t)
+    const nodes = await NodeRepository.fetchNodesByRecordUuid(this.surveyId, this.recordUuid, t)
+    this.record = Record.assocNodes(toUuidIndexedObj(nodes))(recordDb)
+  }
+
   async getRecord (t) {
     if (!this.record) {
-      const recordDb = await RecordRepository.fetchRecordByUuid(this.surveyId, this.recordUuid, t)
-      const nodes = await NodeRepository.fetchNodesByRecordUuid(this.surveyId, this.recordUuid, t)
-      this.record = Record.assocNodes(toUuidIndexedObj(nodes))(recordDb)
+      await this.initRecord(t)
     }
     return this.record
   }
@@ -66,6 +70,12 @@ class RecordUpdateThread extends Thread {
     const record = await this.getRecord(t)
     this._postMessage(WebSocketEvents.nodesUpdate, updatedNodes)
     this.record = Record.assocNodes(updatedNodes)(record)
+  }
+
+  async handleNodesValidationUpdated (validations, t) {
+    const record = await this.getRecord(t)
+    this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
+    this.record = Record.mergeNodeValidations(validations)(record)
   }
 
   async onMessage (msg) {
@@ -107,11 +117,13 @@ class RecordUpdateThread extends Thread {
           updatedNodes = await this.recordUpdater.createRecord(user, survey, msg.record, t)
           break
         case messageTypes.persistNode:
-          updatedNodes = await this.recordUpdater.persistNode(user, survey, msg.node, t)
+          await this.initRecord(t)
+          updatedNodes = await this.recordUpdater.persistNode(user, survey, this.record, msg.node, t)
           break
         case messageTypes.deleteNode:
+          await this.initRecord(t)
           // If the record was already deleted (by another user) the repository delete method returns null
-          updatedNodes = await this.recordUpdater.deleteNode(user, survey, msg.nodeUuid, t) || {}
+          updatedNodes = await this.recordUpdater.deleteNode(user, survey, this.record, msg.nodeUuid, t) || {}
           break
       }
       await this.handleNodesUpdated(updatedNodes, t)
@@ -124,10 +136,7 @@ class RecordUpdateThread extends Thread {
 
       // 3. update node validations
       const validations = await RecordValidationManager.validateNodes(survey, this.record, updatedNodesAndDependents, this.preview, t)
-      // 3a. notify user
-      this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
-      // 3b. update record validation
-      this.record = Record.mergeNodeValidations(validations)(this.record)
+      await this.handleNodesValidationUpdated(validations, t)
 
       // 4. update survey rdb
       if (!this.preview) {
