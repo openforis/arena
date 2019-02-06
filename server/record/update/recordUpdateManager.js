@@ -32,8 +32,8 @@ const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
       WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
     ),
     () => {
-      recordUpdateThreads.removeThread(userId)
       removeRecordUser(recordUuid, userId)
+      recordUpdateThreads.removeThread(userId)
     }
   )
 

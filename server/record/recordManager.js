@@ -119,7 +119,7 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
     if (id !== user.id) {
       WebSocketManager.notifyUser(id, WebSocketEvents.recordDelete, recordUuid)
     }
-    RecordUpdateManager.checkOut(user.id)
+    RecordUpdateManager.checkOut(id)
   })
 }
 
