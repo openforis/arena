@@ -24,16 +24,15 @@ const evalNodeQuery = async (survey, record, node, query, client, bindNodeFn = b
 
 const bindNode = (survey, record, node) => {
 
-  const getChildNode = node =>
-    name => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const childDef = Survey.getNodeDefChildByName(nodeDef, name)(survey)
-      const children = Record.getNodeChildrenByDefUuid(node, NodeDef.getUuid(childDef))(record)
+  const getChildNode = (parentNode, name) => {
+    const parentNodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(parentNode))(survey)
+    const childDef = Survey.getNodeDefChildByName(parentNodeDef, name)(survey)
+    const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
 
-      return R.isEmpty(children)
-        ? null
-        : bindNode(survey, record, R.head(children))
-    }
+    return R.isEmpty(children)
+      ? null
+      : bindNode(survey, record, R.head(children))
+  }
 
   return {
     ...node,
@@ -44,11 +43,11 @@ const bindNode = (survey, record, node) => {
       Record.getParentNode(node)(record)
     ),
 
-    node: name => getChildNode(node)(name),
+    node: name => getChildNode(node, name),
 
     sibling: async name => {
       const parentNode = Record.getParentNode(node)(record)
-      return getChildNode(parentNode)(name)
+      return getChildNode(parentNode, name)
     },
 
     getValue: async () => {
@@ -58,15 +57,16 @@ const bindNode = (survey, record, node) => {
 
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       const surveyId = Survey.getId(survey)
+      const draft = Survey.isDraft(Survey.getSurveyInfo(survey))
 
       if (NodeDef.isNodeDefCode(nodeDef)) {
         const itemUuid = Node.getCategoryItemUuid(node)
-        return itemUuid ? await CategoryManager.fetchItemByUuid(surveyId, itemUuid) : null
+        return itemUuid ? await CategoryManager.fetchItemByUuid(surveyId, itemUuid, draft) : null
       }
 
       if (NodeDef.isNodeDefTaxon(nodeDef)) {
         const taxonUuid = Node.getNodeTaxonUuid(node)
-        return taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid) : null
+        return taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid, draft) : null
       }
 
       const value = Node.getNodeValue(node)

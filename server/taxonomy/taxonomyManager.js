@@ -74,8 +74,8 @@ const fetchTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, dr
   return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
 }
 
-const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false) => {
-  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxonomy.taxonPropKeys.code, code, draft)
+const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
+  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxonomy.taxonPropKeys.code, code, draft, client)
   return R.head(taxa)
 }
 

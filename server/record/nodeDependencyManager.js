@@ -105,7 +105,8 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
     // valueExpr is the code of a category item
 
     // 1. find category items
-    const itemsInLevel = await CategoryManager.fetchItemsByLevelIndex(surveyId,
+    const itemsInLevel = await CategoryManager.fetchItemsByLevelIndex(
+      surveyId,
       NodeDef.getNodeDefCategoryUuid(nodeDef),
       Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey),
       draft,
@@ -115,9 +116,14 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
     const item = R.find(item => Category.getItemCode(item) === '' + valueExpr)(itemsInLevel)
 
     return item ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) } : null
-  } else if (NodeDef.isNodeDefTaxon(nodeDef) && R.is(String, valueExpr)) {
+  } else if (NodeDef.isNodeDefTaxon(nodeDef) && (R.is(String, valueExpr) || R.is(Number, valueExpr))) {
     // valueExpr is the code of a taxon
-    const item = TaxonomyManager.fetchTaxonByCode(surveyId, NodeDef.getNodeDefTaxonomyUuid(nodeDef), valueExpr, draft)
+    const item = await TaxonomyManager.fetchTaxonByCode(
+      surveyId,
+      NodeDef.getNodeDefTaxonomyUuid(nodeDef),
+      valueExpr,
+      draft,
+      tx)
     return item ? { [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(item) } : null
   } else {
     return valueExpr

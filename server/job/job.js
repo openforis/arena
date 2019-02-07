@@ -2,8 +2,7 @@ const db = require('../db/db')
 const { uuidv4 } = require('../../common/uuid')
 
 const { jobEvents, jobStatus } = require('./jobUtils')
-
-const progressNotifyThreshold = 1 //notify progress only every 1% change
+const { throttle } = require('../../common/functionsDefer')
 
 class JobEvent {
 
@@ -33,7 +32,6 @@ class Job {
     this.endTime = null
     this.total = 0
     this.processed = 0
-    this.lastNotifyProcessed = 0
     this.result = {}
     this.errors = {}
 
@@ -184,11 +182,11 @@ class Job {
   incrementProcessedItems () {
     this.processed++
 
-    //notify progress event only for increments greater then 1%
-    if (this.total <= 0 || (this.processed - this.lastNotifyProcessed) * 100 / this.total >= progressNotifyThreshold) {
-      this.lastNotifyProcessed = this.processed
-      this.notifyEvent(this.createJobEvent(jobEvents.progress))
-    }
+    throttle(
+      () => this.notifyEvent(this.createJobEvent(jobEvents.progress)),
+      `job-${this.uuid}-progress`,
+      1000
+    )()
   }
 
   notifyEvent (event) {
