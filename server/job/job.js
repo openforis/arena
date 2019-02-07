@@ -1,7 +1,9 @@
 const db = require('../db/db')
-const {uuidv4} = require('../../common/uuid')
+const { uuidv4 } = require('../../common/uuid')
 
-const {jobEvents, jobStatus} = require('./jobUtils')
+const { jobEvents, jobStatus } = require('./jobUtils')
+
+const progressNotifyThreshold = 1 //notify progress only every 1% change
 
 class JobEvent {
 
@@ -18,7 +20,7 @@ class Job {
   constructor (type, params, innerJobs = []) {
     this.params = params
 
-    const {user, surveyId} = params
+    const { user, surveyId } = params
 
     this.user = user
     this.userId = user.id
@@ -31,6 +33,7 @@ class Job {
     this.endTime = null
     this.total = 0
     this.processed = 0
+    this.lastNotifyProcessed = 0
     this.result = {}
     this.errors = {}
 
@@ -60,7 +63,7 @@ class Job {
           await this.execute(tx)
         } catch (e) {
           console.log('** Error in job ', e)
-          this.addError({systemError: {valid: false, errors: [e.toString()]}})
+          this.addError({ systemError: { valid: false, errors: [e.toString()] } })
           this.setStatusFailed()
         }
       }
@@ -180,7 +183,12 @@ class Job {
 
   incrementProcessedItems () {
     this.processed++
-    this.notifyEvent(this.createJobEvent(jobEvents.progress))
+
+    //notify progress event only for increments greater then 1%
+    if (this.total <= 0 || (this.processed - this.lastNotifyProcessed) * 100 / this.total >= progressNotifyThreshold) {
+      this.lastNotifyProcessed = this.processed
+      this.notifyEvent(this.createJobEvent(jobEvents.progress))
+    }
   }
 
   notifyEvent (event) {
@@ -192,7 +200,6 @@ class Job {
   createJobEvent (type) {
     return new JobEvent(type, this.status, this.total, this.processed)
   }
-
 }
 
 module.exports = Job

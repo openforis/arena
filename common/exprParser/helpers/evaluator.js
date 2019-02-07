@@ -42,6 +42,7 @@ const memberEval = async (expr, ctx) => {
     return eval(`${objectRes}.${propertyRes}`)
   else if (R.has(propertyRes, objectRes))
     return R.prop(propertyRes, objectRes)
+  else return null
 }
 
 const callEval = async (expr, ctx) => {

@@ -79,7 +79,7 @@ export const updateNode = (nodeDef, node, value, file = null) => dispatch => {
   )(node)
 
   recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate })(dispatch)
-  dispatch(_updateNodeDebounced(nodeToUpdate, file, node.placeholder ? 0 : 500))
+  dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
 }
 
 const _updateNodeDebounced = (node, file, delay) => {

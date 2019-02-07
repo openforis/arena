@@ -82,8 +82,8 @@ const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null,
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
     JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
       ON l.uuid = i.level_uuid
-      AND l.category_uuid = $1
-    WHERE i.parent_uuid ${
+    WHERE l.category_uuid = $1 
+      AND i.parent_uuid ${
       parentUuid
         ? `= '${parentUuid}'`
         : 'IS NULL'
@@ -102,10 +102,21 @@ const fetchItemsByParentUuid = async (surveyId, categoryUuid, parentUuid = null,
 const fetchItemByUuid = async (surveyId, itemUuid, draft = false, client = db) =>
   await client.one(
     `SELECT * FROM ${getSurveyDBSchema(surveyId)}.category_item
-     WHERE uuid = $1
-    `,
+     WHERE uuid = $1`,
     [itemUuid],
-    def => dbTransformCallback(def, draft, true)
+    item => dbTransformCallback(item, draft, true)
+  )
+
+const fetchItemsByLevelIndex = async (surveyId, categoryId, levelIndex, draft = false, client = db) =>
+  await client.map(
+    `SELECT i.* 
+     FROM ${getSurveyDBSchema(surveyId)}.category_item i
+       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+         ON l.uuid = i.level_uuid
+     WHERE l.category_uuid = $1
+       AND l.index = $2`,
+    [categoryId, levelIndex],
+    item => dbTransformCallback(item, draft, true)
   )
 
 // ============== UPDATE
@@ -145,6 +156,7 @@ module.exports = {
   fetchItemsByCategoryUuid,
   fetchItemsByParentUuid,
   fetchItemByUuid,
+  fetchItemsByLevelIndex,
 
   //UPDATE
   updateCategoryProp,

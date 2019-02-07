@@ -11,14 +11,6 @@ const {
 
 const Taxonomy = require('../../common/survey/taxonomy')
 
-const filterProps = {
-  uuid: 'uuid',
-  code: 'code',
-  scientificName: 'scientificName',
-  vernacularName: 'vernacularName',
-  vernacularNameUuid: 'vernacularNameUuid',
-}
-
 // ============== CREATE
 
 const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
@@ -95,64 +87,53 @@ const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, cl
     r => parseInt(r.count)
   )
 
+const fetchAllTaxa = async (surveyId, taxonomyUuid, draft = false, limit = null, offset = 0, client = db) =>
+  await client.map(
+    `SELECT * 
+     FROM ${getSurveyDBSchema(surveyId)}.taxon
+     WHERE taxonomy_uuid = $1
+     ORDER BY ${getPropDraftOrNot(Taxonomy.taxonPropKeys.scientificName, draft)} ASC 
+     LIMIT ${limit ? limit : 'ALL'} 
+     OFFSET $2`,
+    [taxonomyUuid, offset],
+    record => dbTransformCallback(record, draft, true)
+  )
+
 const fetchTaxaByPropLike = async (surveyId,
                                    taxonomyUuid,
-                                   params = {},
+                                   filterProp,
+                                   filterValue,
                                    draft = false,
                                    client = db) => {
-  const {
-    filter,
-    sort = { field: 'scientificName', asc: true },
-    limit = 25,
-    offset = 0
-  } = params
 
-  const filterProp = R.head(R.keys(filter))
-  const filterValue = R.prop(filterProp)(filter)
+  const searchValue = toSearchValue(filterValue)
 
-  const searchValue = filterValue ?
-    R.pipe(
-      R.trim,
-      R.toLower,
-      R.replace(/\*/g, '%')
-    )(filterValue)
-    : null
+  const filterCondition = getPropFilterCondition(filterProp, searchValue, draft)
 
-  switch (filterProp) {
-    case filterProps.vernacularName:
-      return fetchTaxaByVernacularName(surveyId, taxonomyUuid, searchValue, limit, offset, draft, client)
-    default:
-      const filterCondition = getPropFilterCondition(filterProp, searchValue, draft)
-
-      return await client.map(
-        `SELECT * 
-         FROM ${getSurveyDBSchema(surveyId)}.taxon
-         WHERE taxonomy_uuid = $1 ${filterCondition ? ` AND ${filterCondition}` : ''}
-         ORDER BY
-          ${getPropCol(sort.field, true)} ${sort.asc ? 'ASC' : 'DESC'}, 
-          ${getPropCol(sort.field, false)} ${sort.asc ? 'ASC' : 'DESC'}
-         LIMIT ${limit ? limit : 'ALL'} 
-         OFFSET $2`,
-        [taxonomyUuid, offset],
-        record => dbTransformCallback(record, draft, true)
-      )
-  }
+  return await client.map(
+    `SELECT * 
+       FROM ${getSurveyDBSchema(surveyId)}.taxon
+       WHERE taxonomy_uuid = $1 
+         ${filterCondition ? ` AND ${filterCondition}` : ''}
+       ORDER BY ${getPropDraftOrNot(filterProp, draft)} ASC
+       LIMIT 20`,
+    [taxonomyUuid],
+    record => dbTransformCallback(record, draft, true)
+  )
 }
 
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,
   vn.uuid AS vernacular_name_uuid,
-  ${draft ? `COALESCE(vn.props_draft->>'name', vn.props->>'name')` : `vn.props->>'name'`} AS vernacular_name,
-  ${draft ? `COALESCE(vn.props_draft->>'lang', vn.props->>'lang')` : `vn.props->>'lang'`} AS vernacular_language
-`
+  ${getPropDraftOrNot('name', draft, 'vn.')} AS vernacular_name,
+  ${getPropDraftOrNot('lang', draft, 'vn.')} AS vernacular_language`
 
 const fetchTaxaByVernacularName = async (surveyId,
                                          taxonomyUuid,
-                                         searchValue,
-                                         limit = 25,
-                                         offset = 0,
+                                         filterValue,
                                          draft = false,
                                          client = db) => {
+  const searchValue = toSearchValue(filterValue)
   const filterCondition = getPropFilterCondition('name', searchValue, draft, 'vn.')
 
   return await client.map(
@@ -161,12 +142,9 @@ const fetchTaxaByVernacularName = async (surveyId,
        LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
        ON vn.taxon_uuid = t.uuid
      WHERE t.taxonomy_uuid = $1 AND ${filterCondition}
-     ORDER BY 
-       ${getPropCol('scientificName', true, 't.')},
-       ${getPropCol('scientificName', false, 't.')}
-     LIMIT ${limit ? limit : 'ALL'}
-     OFFSET $2`,
-    [taxonomyUuid, offset],
+     ORDER BY ${getPropDraftOrNot(Taxonomy.taxonPropKeys.name, draft, 'vn.')} ASC
+     LIMIT 20`,
+    [taxonomyUuid],
     record => dbTransformCallback(record, draft, true)
   )
 }
@@ -211,26 +189,37 @@ const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client = db
     [taxonomyUuid]
   )
 
+/**
+ * If draft, returns something like prop_draft->>'propName', otherwise prop->>'propName'
+ */
 const getPropCol = (propName, draft, columnPrefix = '') =>
-  columnPrefix + (draft ? 'props_draft' : 'props') +
-  `->>'${propName}'`
+  `${columnPrefix} ${draft ? 'props_draft' : 'props'}->>'${propName}'`
 
+/**
+ * Combines a draft and a published column prop, if needed, using the COALESCE function
+ */
+const getPropDraftOrNot = (propName, draft, columnPrefix) =>
+  draft
+    ? `COALESCE(${getPropCol(propName, true, columnPrefix)}, ${getPropCol(propName, false, columnPrefix)})`
+    : getPropCol(propName, false, columnPrefix)
+
+/**
+ * Generates a filter condition like "lower(col) LIKE 'searchValue' where "col" is a json prop column
+ */
 const getPropFilterCondition = (propName, searchValue, draft, columnPrefix = '') => {
-
-  const getCondition = draft =>
-    `lower(${getPropCol(propName, draft, columnPrefix)}) LIKE '${searchValue}'`
-
   return searchValue
-    ? draft
-      ?
-      `(
-        ${getPropCol(propName, true, columnPrefix)} IS NULL AND ${getCondition(false)}
-        OR
-        ${getPropCol(propName, true, columnPrefix)} IS NOT NULL AND ${getCondition(true)}
-      )`
-      : getCondition(false)
+    ? `lower(${getPropDraftOrNot(propName, draft, columnPrefix)}) LIKE '${searchValue}'`
     : ''
 }
+
+const toSearchValue = filterValue =>
+  filterValue ?
+    R.pipe(
+      R.trim,
+      R.toLower,
+      R.replace(/\*/g, '%')
+    )(filterValue)
+    : null
 
 module.exports = {
   //CREATE
@@ -242,8 +231,10 @@ module.exports = {
   fetchTaxonomyByUuid,
   countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike,
+  fetchTaxaByVernacularName,
   fetchTaxonByUuid,
   fetchTaxonVernacularNameByUuid,
+  fetchAllTaxa,
 
   //UPDATE
   updateTaxonomyProp,

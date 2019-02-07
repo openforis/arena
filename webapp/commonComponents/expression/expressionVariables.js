@@ -14,7 +14,7 @@ const getJsVariables = (nodeDef, nodeDefCurrent, lang, depth) => {
     const parentFnCalls = depth > 0
       ? '.' + R.repeat('parent()', depth).join('.')
       : ''
-    return `this${parentFnCalls}.node('${nodeDefName}').getValue()${valueProp}`
+    return `this${parentFnCalls}.node('${nodeDefName}').getValue()`
   }
 
   const getValueFnFromContextNode = () => `this.getValue()`

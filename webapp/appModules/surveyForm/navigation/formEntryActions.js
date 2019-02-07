@@ -25,40 +25,38 @@ const RecordEntryButtons = (props) => {
   } = props
 
   return (
-    <div>
+    <React.Fragment>
 
-      {
-        /*
-        <ErrorBadge validation={{valid}} label="invalidRecord"/>
-        */
-      }
+      <ErrorBadge validation={{ valid }} label="invalidRecord"/>
 
-      {
-        stepPrev &&
-        <button className="btn-s btn-of"
-                onClick={() =>
-                  confirm(`Are sure you want to demote this record to ${RecordStep.getName(stepPrev)}?`)
-                    ? updateRecordStep(RecordStep.getId(stepPrev), history)
-                    : null
-                }>
-          <span className="icon icon-reply icon-12px"/>
-        </button>
-      }
+      <div className="survey-form__nav-record-actions-steps">
+        {
+          stepPrev &&
+          <button className="btn-s btn-of"
+                  onClick={() =>
+                    confirm(`Are sure you want to demote this record to ${RecordStep.getName(stepPrev)}?`)
+                      ? updateRecordStep(RecordStep.getId(stepPrev), history)
+                      : null
+                  }>
+            <span className="icon icon-reply icon-12px"/>
+          </button>
+        }
 
-      <span>Step {RecordStep.getId(step)} ({RecordStep.getName(step)})</span>
+        <span>Step {RecordStep.getId(step)} ({RecordStep.getName(step)})</span>
 
-      {
-        stepNext &&
-        <button className="btn-s btn-of"
-                aria-disabled={!valid}
-                onClick={() =>
+        {
+          stepNext &&
+          <button className="btn-s btn-of"
+                  aria-disabled={!valid}
+                  onClick={() =>
                     confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
-                    ? updateRecordStep(RecordStep.getId(stepNext), history)
-                    : null
-                }>
-          <span className="icon icon-redo2 icon-12px"/>
-        </button>
-      }
+                      ? updateRecordStep(RecordStep.getId(stepNext), history)
+                      : null
+                  }>
+            <span className="icon icon-redo2 icon-12px"/>
+          </button>
+        }
+      </div>
 
       <button className="btn-s btn-of btn-danger"
               onClick={() =>
@@ -70,7 +68,7 @@ const RecordEntryButtons = (props) => {
         <span className="icon icon-bin icon-12px icon-left"/>
         Delete
       </button>
-    </div>
+    </React.Fragment>
   )
 }
 

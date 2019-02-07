@@ -7,8 +7,6 @@ import * as R from 'ramda'
 import { FormItem, Input } from '../../../../../commonComponents/form/input'
 import AutocompleteDialog from '../../../../../commonComponents/form/autocompleteDialog'
 
-import { toQueryString } from '../../../../../../server/serverUtils/request'
-
 import Survey from '../../../../../../common/survey/survey'
 import Taxonomy from '../../../../../../common/survey/taxonomy'
 import NodeDef from '../../../../../../common/survey/nodeDef'
@@ -47,17 +45,14 @@ const loadTaxa = async (surveyId, taxonomyUuid, draft, field, value, strict = fa
       ? `${value}*` //starts with value
       : `*${value}*` //contains value
 
-  const params = {
-    draft,
-    limit: 20,
-    offset: 0,
-    filter: {
-      [field]: searchValue,
-    },
-    includeUnlUnk: true
-  }
-
-  const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa?${toQueryString(params)}`)
+  const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`, {
+    params: {
+      filterProp: field,
+      filterValue: searchValue,
+      includeUnlUnk: true,
+      draft
+    }
+  })
   return data.taxa
 }
 
