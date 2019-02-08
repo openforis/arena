@@ -156,12 +156,31 @@ const getDescendantsByNodeDefUuid = (node, descendantDefUuid) =>
 // ====== UPDATE
 
 const assocNodes = nodes =>
-  record => R.pipe(
-    getNodes,
-    R.mergeLeft(nodes),
-    mergedNodes => R.assoc(keys.nodes, mergedNodes)(record),
-    removeDeletedNodes,
-  )(record)
+  record => {
+    const dirtyNodes = R.pipe(
+      findNodes(Node.isDirty),
+      SurveyUtils.toUuidIndexedObj
+    )(record)
+
+    // exclude dirty nodes currently being edited by the user
+
+    const nodesToUpdate = R.filter(
+      n => {
+        const dirtyNode = R.prop(Node.getUuid(n), dirtyNodes)
+        return !dirtyNode ||
+          Node.isDirty(n) ||
+          Node.getNodeValue(dirtyNode) === Node.getNodeValue(n) ||
+          Node.isNodeValueBlank(dirtyNode) && Node.isDefaultValueApplied(n)
+      },
+      nodes)
+
+    return R.pipe(
+      getNodes,
+      R.mergeLeft(nodesToUpdate),
+      mergedNodes => R.assoc(keys.nodes, mergedNodes)(record),
+      removeDeletedNodes,
+    )(record)
+  }
 
 const removeDeletedNodes = record => {
   const deletedNodes = R.pipe(
