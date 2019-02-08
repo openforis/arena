@@ -1,6 +1,5 @@
 import React from 'react'
 import { Route, Switch } from 'react-router'
-import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import DesignerView from '../../designer/designerView'
 import HomeView from '../../home/appHomeView'
@@ -20,22 +19,16 @@ const Designer = AppModuleHOC(DesignerView)
 const Data = AppModuleHOC(DataView)
 
 const AppModuleSwitch = (props) => (
-  <TransitionGroup className="app__modules">
-    <CSSTransition
-      // avoid css transition when changing location within subroutes
-      key={props.location.pathname.split('/')[2]}
-      timeout={150}
-      classNames="app-module__fade">
+  <div className="app__modules">
 
-      <Switch location={props.location}>
-        <Route path={appModuleUri(appModules.home)} component={Home}/>
-        <Route path={appModuleUri(appModules.dashboard)} component={Dashboard}/>
-        <Route path={appModuleUri(appModules.designer)} component={Designer}/>
-        <Route path={appModuleUri(appModules.data)} component={Data}/>
-      </Switch>
+    <Switch location={props.location}>
+      <Route path={appModuleUri(appModules.home)} component={Home}/>
+      <Route path={appModuleUri(appModules.dashboard)} component={Dashboard}/>
+      <Route path={appModuleUri(appModules.designer)} component={Designer}/>
+      <Route path={appModuleUri(appModules.data)} component={Data}/>
+    </Switch>
 
-    </CSSTransition>
-  </TransitionGroup>
+  </div>
 )
 
 export default AppModuleSwitch

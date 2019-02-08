@@ -7,10 +7,12 @@ import * as R from 'ramda'
 import camelize from 'camelize'
 
 import TablePaginator from '../../../../commonComponents/table/tablePaginator'
+import ErrorBadge from '../../../../commonComponents/errorBadge'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import AuthManager from '../../../../../common/auth/authManager'
+import Validator from '../../../../../common/validation/validator'
 
 import { appModuleUri } from '../../../appModules'
 import { dataModules } from '../../dataModules'
@@ -26,7 +28,10 @@ import * as SurveyState from '../../../../survey/surveyState'
 
 const RecordRow = ({ idx, offset, record, style, nodeDefKeys, canEdit }) => (
   <div className="table__row" style={style}>
-    <div>{idx + offset + 1}</div>
+    <div>
+      <ErrorBadge validation={Validator.getValidation(record)} showLabel={false}/>
+      {idx + offset + 1}
+    </div>
     {
       nodeDefKeys.map((n, i) =>
         <div key={i}>{record[camelize(NodeDef.getNodeDefName(n))]}</div>

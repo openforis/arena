@@ -8,16 +8,25 @@ const { getSurveyDBSchema } = require('../../server/survey/surveySchemaRepositor
 
 const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
+const Validator = require('../../common/validation/validator')
 
 const NodeDefTable = require('../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
 
-const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}, preview`
+const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}, preview, validation`
 
-const dbTransformCallback = (surveyId) => R.pipe(
-  camelize,
-  R.assoc('surveyId', surveyId)
-)
+const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
+  const validation = Record.getValidation(record)
+  return R.pipe(
+    R.dissoc(Validator.keys.validation),
+    camelize,
+    R.assoc('surveyId', surveyId),
+    R.assoc(
+      Validator.keys.validation,
+      includeValidationFields ? validation : { [Validator.keys.valid]: Validator.isValidationValid(validation) },
+    ),
+  )(record)
+}
 
 // ============== CREATE
 
@@ -47,7 +56,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
 
   return await client.map(`
     SELECT 
-      r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')},
+      r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')}, validation,
       n.date_modified,
       u.name as owner_name,
       ${nodeDefKeysSelect}
@@ -73,12 +82,12 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
     OFFSET ${offset}
   `,
     [],
-    dbTransformCallback(surveyId)
+    dbTransformCallback(surveyId, false)
   )
 }
 
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
-  await client.one(
+  await client.oneOrNone(
     `SELECT 
      ${recordSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.record WHERE uuid = $1`,
@@ -86,7 +95,25 @@ const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
     dbTransformCallback(surveyId)
   )
 
+const fetchRecordUuids = async (surveyId, client = db) => await client.map(
+  `SELECT uuid 
+  FROM ${getSurveyDBSchema(surveyId)}.record 
+  WHERE preview = FALSE
+  `,
+  [],
+  R.prop('uuid')
+)
+
 // ============== UPDATE
+
+const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
+  await client.one(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.record 
+     SET validation = $1::jsonb
+     WHERE uuid = $2
+    RETURNING ${recordSelectFields}`,
+    [validation, recordUuid]
+  )
 
 const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
   await client.none(`
@@ -96,8 +123,8 @@ const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
     [step, recordUuid]
   )
 
-
 // ============== DELETE
+
 const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
   await client.query(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.record
@@ -114,10 +141,12 @@ module.exports = {
   countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchRecordByUuid,
+  fetchRecordUuids,
 
   // UPDATE
+  updateValidation,
   updateRecordStep,
-   
+
   // DELETE
   deleteRecord,
 }

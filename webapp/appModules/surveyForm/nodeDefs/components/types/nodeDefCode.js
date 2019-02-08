@@ -37,23 +37,21 @@ class NodeDefCode extends React.Component {
 
   async componentDidUpdate (prevProps) {
     const { parentCodeDefUuid, parentItemUuid } = this.props
+    const { parentItemUuid: prevParentItemUuid } = prevProps
 
-    if (parentCodeDefUuid) {
-      //parent item changed, reload items
-      if (parentItemUuid !== prevProps.parentItemUuid) {
-        await this.loadCategoryItems()
-      }
+    if (parentCodeDefUuid && parentItemUuid !== prevParentItemUuid) {
+      await this.loadCategoryItems()
     }
   }
 
   async loadCategoryItems () {
-    const { surveyInfo, categoryUuid, categoryLevelIndex, parentItemUuid, draft } = this.props
+    const { surveyId, categoryUuid, categoryLevelIndex, parentItemUuid, draft } = this.props
 
     let items = []
 
     if (categoryUuid && (parentItemUuid || categoryLevelIndex === 0)) {
       const { data } = await axios.get(
-        `/api/survey/${surveyInfo.id}/categories/${categoryUuid}/items`,
+        `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
         { params: { draft, parentUuid: parentItemUuid } }
       )
       items = data.items
@@ -64,12 +62,12 @@ class NodeDefCode extends React.Component {
   determineNodeToUpdate () {
     const { nodeDef, nodes, parentNode } = this.props
 
-    const placeholder = R.find(R.propEq('placeholder', true))(nodes)
+    const placeholder = R.find(Node.isPlaceholder)(nodes)
 
     return (
       placeholder
         ? placeholder
-        : nodes.length === 1 && !NodeDef.isNodeDefMultiple(nodeDef)
+        : NodeDef.isNodeDefSingle(nodeDef) && nodes.length === 1
         ? nodes[0]
         : Node.newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
     )
@@ -81,7 +79,7 @@ class NodeDefCode extends React.Component {
 
     const selectedItemUuids = R.pipe(
       R.values,
-      R.reject(R.propEq('placeholder', true)),
+      R.reject(Node.isPlaceholder),
       R.map(Node.getCategoryItemUuid),
       R.reject(R.isNil),
     )(nodes)
@@ -94,25 +92,31 @@ class NodeDefCode extends React.Component {
 
     const selectedItems = this.getSelectedItems()
 
-    const multiple = NodeDef.isNodeDefMultiple(nodeDef)
+    // handle one selected item change each time
 
-    //remove deselected node
-    if (multiple) {
+    // if multiple, remove deselected node
+    if (NodeDef.isNodeDefMultiple(nodeDef)) {
       const deselectedItem = R.head(R.difference(selectedItems, newSelectedItems))
       if (deselectedItem) {
-        removeNode(nodeDef, R.find(n => Node.getCategoryItemUuid(n) === deselectedItem.uuid)(nodes))
+        const nodeToRemove = R.find(n => Node.getCategoryItemUuid(n) === deselectedItem.uuid, nodes)
+        removeNode(nodeDef, nodeToRemove)
       }
     }
 
-    //handle one selected item change each time
     const newSelectedItem = R.head(R.difference(newSelectedItems, selectedItems))
 
-    const nodeToUpdate = this.determineNodeToUpdate()
-
-    updateNode(nodeDef, nodeToUpdate, {
-      itemUuid: newSelectedItem ? newSelectedItem.uuid : null,
-      h: codeUuidsHierarchy
-    })
+    // single attribute => always update value
+    // multiple attribute => insert new node only if there is a new selected item
+    if (newSelectedItem || NodeDef.isNodeDefSingle(nodeDef)) {
+      const nodeToUpdate = this.determineNodeToUpdate()
+      const value = newSelectedItem
+        ? {
+          itemUuid: newSelectedItem.uuid,
+          h: codeUuidsHierarchy
+        }
+        : null
+      updateNode(nodeDef, nodeToUpdate, value)
+    }
   }
 
   render () {
@@ -150,7 +154,7 @@ const mapStateToProps = (state, props) => {
   const category = Survey.getCategoryByUuid(NodeDef.getNodeDefCategoryUuid(nodeDef))(survey)
 
   return {
-    surveyInfo,
+    surveyId: Survey.getId(survey),
     draft: Survey.isDraft(surveyInfo),
     language: Survey.getDefaultLanguage(surveyInfo),
 

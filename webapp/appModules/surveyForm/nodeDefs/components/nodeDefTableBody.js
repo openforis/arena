@@ -13,28 +13,38 @@ import Node from '../../../../../common/record/node'
 
 import { getNodeDefComponent } from '../nodeDefSystemProps'
 
-const getNodeValues = async (surveyInfo, nodes) => {
-  const nodeValues = R.pipe(
-    R.reject(R.propEq('placeholder', true)),
-    R.map(n => Node.getNodeValue(n, null)),
-    R.reject(R.isNil),
+const getNodeValues = async (surveyInfo, nodeDef, nodes) => {
+  const nonEmptyNodes = R.pipe(
+    R.reject(Node.isPlaceholder),
+    R.reject(Node.isNodeValueBlank),
   )(nodes)
 
   const stringNodeValues = await Promise.all(
-    nodeValues.map(
-      async nodeValue =>
-        nodeValue.fileName ? nodeValue.fileName
-          : nodeValue.itemUuid ? await loadCategoryItemLabel(surveyInfo, nodeValue.itemUuid)
-          : nodeValue
+    nonEmptyNodes.map(
+      async node => {
+        if (NodeDef.isNodeDefCode(nodeDef)) {
+          const item = await loadCategoryItem(surveyInfo, Node.getCategoryItemUuid(node))
+          const label = Category.getItemLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+          return label || Category.getItemCode(item)
+        } else if (NodeDef.isNodeDefFile(nodeDef)) {
+          return Node.getNodeFileName(node)
+        } else {
+          return Node.getNodeValue(node)
+        }
+      }
     )
   )
 
   return R.join(', ', stringNodeValues)
 }
 
-const loadCategoryItemLabel = async (surveyInfo, itemUuid) => {
-  const { data } = await axios.get(`/api/survey/${surveyInfo.id}/categories/items/${itemUuid}`)
-  return Category.getItemLabel(Survey.getDefaultLanguage(surveyInfo))(data.item)
+const loadCategoryItem = async (surveyInfo, itemUuid) => {
+  const { data } = await axios.get(`/api/survey/${surveyInfo.id}/categories/items/${itemUuid}`, {
+    params: {
+      draft: Survey.isDraft(surveyInfo)
+    }
+  })
+  return data.item
 }
 
 class NodeDefMultipleTableBody extends React.Component {
@@ -61,8 +71,8 @@ class NodeDefMultipleTableBody extends React.Component {
   }
 
   async loadNodeValues () {
-    const { surveyInfo, nodes } = this.props
-    const nodeValues = await getNodeValues(surveyInfo, nodes)
+    const { surveyInfo, nodeDef, nodes } = this.props
+    const nodeValues = await getNodeValues(surveyInfo, nodeDef, nodes)
 
     this.setState({ nodeValues })
   }

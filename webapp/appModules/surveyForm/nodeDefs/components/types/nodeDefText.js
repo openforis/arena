@@ -2,14 +2,18 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { Input } from '../../../../../commonComponents/form/input'
+
 import NodeDeleteButton from '../nodeDeleteButton'
 import * as NodeDefUI from '../../nodeDefSystemProps'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
 
 import Node from '../../../../../../common/record/node'
+import NodeDefErrorBadge from '../nodeDefErrorBadge'
 
-const TextInput = ({nodeDef, node, edit, updateNode, canEditRecord}) => (
+const multipleNodesWrapper = React.createRef()
+
+const TextInput = ({ nodeDef, node, edit, updateNode, canEditRecord }) => (
   <div>
     <Input aria-disabled={edit || !canEditRecord}
            {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
@@ -20,7 +24,7 @@ const TextInput = ({nodeDef, node, edit, updateNode, canEditRecord}) => (
 )
 
 const MultipleTextInput = props => {
-  const {nodeDef, nodes, removeNode, canEditRecord} = props
+  const { nodeDef, parentNode, nodes, removeNode, canEditRecord } = props
 
   return <div className="node-def__entry-multiple">
     <div className="nodes">
@@ -28,7 +32,14 @@ const MultipleTextInput = props => {
         nodes.map(n =>
           (!n.placeholder || canEditRecord) &&
           <div key={`nodeDefTextInput_${n.uuid}`}
-               className="node-def__text-multiple-text-input-wrapper">
+               className={`node-def__text-multiple-text-input-wrapper`}
+                ref={multipleNodesWrapper}>
+
+            <NodeDefErrorBadge  nodeDef={nodeDef}
+                                edit={false}
+                                parentNode={parentNode}
+                                node={n}
+                                container={multipleNodesWrapper}/>
 
             <TextInput {...props}
                        node={n}/>

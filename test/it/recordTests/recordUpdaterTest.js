@@ -13,7 +13,7 @@ const Node = require('../../../common/record/node')
 const NodeDefRepository = require('../../../server/nodeDef/nodeDefRepository')
 const NodeRepository = require('../../../server/record/nodeRepository')
 const RecordRepository = require('../../../server/record/recordRepository')
-const RecordProcessor = require('../../../server/record/update/thread/recordProcessor')
+const RecordUpdater = require('../../../server/record/update/thread/helpers/recordUpdater')
 
 const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
 
@@ -28,9 +28,7 @@ const recordCreationTest = async () => {
 
   const record = newRecord()
 
-  const recordProcessor = new RecordProcessor()
-
-  const nodes = await recordProcessor.createRecord(user, survey, record, db)
+  const nodes = await new RecordUpdater().createRecord(user, survey, record, db)
 
   const reloadedRecord = RecordRepository.fetchRecordByUuid(Survey.getId(survey), Record.getUuid(record))
 
@@ -55,12 +53,11 @@ const defaultValueAppliedTest = async () => {
   survey = await fetchFullContextSurvey()
 
   //create record
-  const recordProcessor = new RecordProcessor()
 
   const record = newRecord()
 
   await db.tx(async t => {
-    await recordProcessor.createRecord(user, survey, record, t)
+    await new RecordUpdater().createRecord(user, survey, record, t)
 
     //reload record
 

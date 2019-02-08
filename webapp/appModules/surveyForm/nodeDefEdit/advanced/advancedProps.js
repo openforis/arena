@@ -9,32 +9,34 @@ const AdvancedProps = props => {
   const { nodeDef, nodeDefParent, putNodeDefProp, readOnly } = props
 
   const validation = NodeDef.getNodeDefValidation(nodeDef)
-  const nodeDefParentUuid = NodeDef.getUuid(nodeDefParent)
+  const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   return (
     <div className="form">
 
 
-      <NodeDefExpressionsProp nodeDef={nodeDef}
-                              putNodeDefProp={putNodeDefProp}
-                              label="Calculated values"
-                              readOnly={readOnly}
-                              propName="calculatedValues"
-                              validation={Validator.getFieldValidation('calculatedValues')(validation)}
-                              nodeDefUuid={nodeDefParentUuid}
-                              canBeConstant={true}/>
-
       {
         NodeDef.canNodeDefHaveDefaultValue(nodeDef) &&
+        <React.Fragment>
+          <NodeDefExpressionsProp nodeDef={nodeDef}
+                                  putNodeDefProp={putNodeDefProp}
+                                  label="Calculated values"
+                                  readOnly={readOnly}
+                                  propName="calculatedValues"
+                                  validation={Validator.getFieldValidation('calculatedValues')(validation)}
+                                  nodeDefUuidContext={nodeDefUuidContext}
+                                  canBeConstant={true}/>
 
-        <NodeDefExpressionsProp nodeDef={nodeDef}
-                                putNodeDefProp={putNodeDefProp}
-                                label="Default values"
-                                readOnly={readOnly}
-                                propName="defaultValues"
-                                validation={Validator.getFieldValidation('defaultValues')(validation)}
-                                nodeDefUuid={nodeDefParentUuid}
-                                canBeConstant={true}/>
+
+          <NodeDefExpressionsProp nodeDef={nodeDef}
+                                  putNodeDefProp={putNodeDefProp}
+                                  label="Default values"
+                                  readOnly={readOnly}
+                                  propName="defaultValues"
+                                  validation={Validator.getFieldValidation('defaultValues')(validation)}
+                                  nodeDefUuidContext={nodeDefUuidContext}
+                                  canBeConstant={true}/>
+        </React.Fragment>
       }
 
       <NodeDefExpressionsProp nodeDef={nodeDef}
@@ -45,7 +47,7 @@ const AdvancedProps = props => {
                               applyIf={false}
                               multiple={false}
                               validation={Validator.getFieldValidation('applicable')(validation)}
-                              nodeDefUuid={nodeDefParentUuid}
+                              nodeDefUuidContext={nodeDefUuidContext}
                               isContextParent={true}/>
 
 

@@ -1,50 +1,75 @@
+const R = require('ramda')
+
+const StringUtils = require('../../common/stringUtils')
+
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
+const NodeDefExpression = require('../../common/survey/nodeDefExpression')
+const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 const Expression = require('../../common/exprParser/expression')
-const NodeRepository = require('./nodeRepository')
 
-const evalNodeQuery = async (survey, node, query, client, bindNodeFn = bindNode) => {
+const CategoryManager = require('../category/categoryManager')
+const TaxonomyManager = require('../taxonomy/taxonomyManager')
+
+const evalNodeQuery = async (survey, record, node, query, client, bindNodeFn = bindNode) => {
   const ctx = {
-    node: bindNodeFn(survey, node, client),
+    node: bindNodeFn(survey, record, node),
     functions: {
-      [Expression.types.ThisExpression]: (expr, {node}) => node
+      [Expression.types.ThisExpression]: (expr, { node }) => node
     },
   }
   return await Expression.evalString(query, ctx)
 }
 
-const bindNode = (survey, node, tx) => {
-  const surveyId = Survey.getId(survey)
+const bindNode = (survey, record, node) => {
+
+  const getChildNode = (parentNode, name) => {
+    const parentNodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(parentNode))(survey)
+    const childDef = Survey.getNodeDefChildByName(parentNodeDef, name)(survey)
+    const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
+
+    return R.isEmpty(children)
+      ? null
+      : bindNode(survey, record, R.head(children))
+  }
 
   return {
     ...node,
 
-    parent: async () => bindNode(survey, await NodeRepository.fetchNodeByUuid(surveyId, Node.getParentUuid(node), tx), tx),
+    parent: async () => bindNode(
+      survey,
+      record,
+      Record.getParentNode(node)(record)
+    ),
 
-    node: async name => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const childDef = Survey.getNodeDefChildByName(nodeDef, name)(survey)
-      const child = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getUuid(node), NodeDef.getUuid(childDef), tx)
-      return child ? bindNode(survey, child, tx) : null
-    },
+    node: name => getChildNode(node, name),
 
     sibling: async name => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
-      const childDef = Survey.getNodeDefChildByName(parentDef, name)(survey)
-      const sibling = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, Node.getRecordUuid(node), Node.getParentUuid(node), NodeDef.getUuid(childDef), tx)
-      return sibling ? bindNode(survey, sibling, tx) : null
+      const parentNode = Record.getParentNode(node)(record)
+      return getChildNode(parentNode, name)
     },
 
-    value: async () => {
+    getValue: async () => {
       if (Node.isNodeValueBlank(node)) {
         return null
       }
 
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+      const surveyId = Survey.getId(survey)
+      const draft = Survey.isDraft(Survey.getSurveyInfo(survey))
+
+      if (NodeDef.isNodeDefCode(nodeDef)) {
+        const itemUuid = Node.getCategoryItemUuid(node)
+        return itemUuid ? await CategoryManager.fetchItemByUuid(surveyId, itemUuid, draft) : null
+      }
+
+      if (NodeDef.isNodeDefTaxon(nodeDef)) {
+        const taxonUuid = Node.getNodeTaxonUuid(node)
+        return taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid, draft) : null
+      }
+
       const value = Node.getNodeValue(node)
-      const nodeDefUuid = Node.getNodeDefUuid(node)
-      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
       return NodeDef.isNodeDefDecimal(nodeDef) || NodeDef.isNodeDefInteger(nodeDef)
         ? Number(value)
@@ -53,6 +78,26 @@ const bindNode = (survey, node, tx) => {
   }
 }
 
+const getApplicableExpressions = async (survey, record, nodeCtx, expressions, tx, stopAtFirstFound = false) => {
+  const applicableExpressions = []
+  for (const expression of expressions) {
+    const applyIfExpr = NodeDefExpression.getApplyIf(expression)
+
+    if (StringUtils.isBlank(applyIfExpr) || await evalNodeQuery(survey, record, nodeCtx, applyIfExpr, tx)) {
+      applicableExpressions.push(expression)
+
+      if (stopAtFirstFound)
+        return applicableExpressions
+    }
+  }
+  return applicableExpressions
+}
+
+const getApplicableExpression = async (survey, record, nodeCtx, expressions, tx) =>
+  R.head(await getApplicableExpressions(survey, record, nodeCtx, expressions, tx, true))
+
 module.exports = {
   evalNodeQuery,
+  getApplicableExpressions,
+  getApplicableExpression
 }

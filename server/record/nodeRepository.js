@@ -4,7 +4,7 @@ const R = require('ramda')
 const db = require('../db/db')
 
 const Node = require('../../common/record/node')
-const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema } = require('../../server/survey/surveySchemaRepositoryUtils')
 
 //camelize all but "meta"
 const dbTransformCallback = node =>
@@ -35,9 +35,9 @@ const insertNode = async (surveyId, node, client = db) => {
   return await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.node
     (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
-    VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb)
     RETURNING *, true as created`,
-    [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), JSON.stringify(node.value), meta],
+    [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), stringifyValue(node.value), meta],
     dbTransformCallback
   )
 }
@@ -92,21 +92,12 @@ const fetchDescendantNodesByCodeUuid = async (surveyId, recordUuid, parentCodeNo
 
 const fetchSelfOrDescendantNodes = async (surveyId, nodeDefUuid, recordUuid, parentNodeUuid, client = db) =>
   await client.map(`
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node n
-    WHERE n.record_uuid = $1
-      AND n.node_def_uuid = $2
-      AND (n.uuid = $3 OR n.meta @> '{"h": ["${parentNodeUuid}"]}')`,
+    SELECT * 
+    FROM ${getSurveyDBSchema(surveyId)}.node
+    WHERE record_uuid = $1
+      AND node_def_uuid = $2
+      AND (uuid = $3 OR meta @> '{"h": ["${parentNodeUuid}"]}')`,
     [recordUuid, nodeDefUuid, parentNodeUuid],
-    dbTransformCallback
-  )
-
-const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
-  await client.map(`
-    SELECT * FROM  ${getSurveyDBSchema(surveyId)}.node n
-    WHERE n.record_uuid = $1
-      AND n.parent_uuid = $2
-      AND n.node_def_uuid = $3`,
-    [recordUuid, nodeUuid, childDefUUid],
     dbTransformCallback
   )
 
@@ -114,6 +105,20 @@ const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, child
   const nodes = await fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
   return R.head(nodes)
 }
+
+const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
+  await fetchChildNodesByNodeDefUuids(surveyId, recordUuid, nodeUuid, [childDefUUid], client)
+
+const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
+  await client.map(`
+    SELECT * 
+    FROM ${getSurveyDBSchema(surveyId)}.node
+    WHERE record_uuid = $1
+      AND parent_uuid ${nodeUuid ? '= $2' : 'is null'}
+      AND node_def_uuid IN ($3:csv)`,
+    [recordUuid, nodeUuid, childDefUUids],
+    dbTransformCallback
+  )
 
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
@@ -140,7 +145,7 @@ const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUui
 
 // ============== DELETE
 const deleteNode = async (surveyId, nodeUuid, client = db) =>
-  await client.one(`
+  await client.oneOrNone(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1
     RETURNING *,'{}' as value, true as deleted
@@ -180,6 +185,7 @@ module.exports = {
   fetchSelfOrDescendantNodes,
   fetchChildNodeByNodeDefUuid,
   fetchChildNodesByNodeDefUuid,
+  fetchChildNodesByNodeDefUuids,
 
   //UPDATE
   updateNode,

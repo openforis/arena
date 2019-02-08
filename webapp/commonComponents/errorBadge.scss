@@ -4,16 +4,33 @@
   background-color: $redDark;
 
   .messages {
-    display: none;
+    visibility: hidden;
+    position: absolute;
+    background-color: $redDark;
+    padding: 1rem;
+    opacity: .95;
   }
 
   &:hover {
     cursor: pointer;
-    padding-bottom: 1rem;
     z-index: $zIndex6ErrorBadgeHover;
 
     .messages {
-      display: block;
+      visibility: visible;
+      position: fixed;
+      margin-top: 2.6rem;
+      border-radius: 0.4rem;
+      border: 1px solid $redDark;
+
+      :after {
+        content: "";
+        position: absolute;
+        bottom: 100%;
+        left: 1rem;
+        margin-left: -.5rem;
+        border: .5rem solid;
+        border-color: transparent transparent $redDark transparent;
+      }
     }
   }
 }

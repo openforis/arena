@@ -4,7 +4,7 @@ const fastcsv = require('fast-csv')
 
 const db = require('../db/db')
 
-const {publishSurveySchemaTableProps, markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
+const { publishSurveySchemaTableProps, markSurveyDraft } = require('../survey/surveySchemaRepositoryUtils')
 
 const Taxonomy = require('../../common/survey/taxonomy')
 
@@ -56,20 +56,26 @@ const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false, valida
   }
 }
 
-const fetchTaxaByPropLike = async (surveyId, taxonomyUuid, params = {},  draft = false) => {
-  const taxaDb = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, params, draft)
-
-  return R.isEmpty(taxaDb) && params.includeUnlUnk
+const includeUnknownUnlistedItems = async (surveyId, taxonomyUuid, taxa, includeUnlUnk, draft) =>
+  R.isEmpty(taxa) && includeUnlUnk
     ? [
       await fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unknownCode, draft),
       await fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unlistedCode, draft),
     ]
-    : taxaDb
+    : taxa
+
+const fetchTaxaByPropLike = async (surveyId, taxonomyUuid, filterProp, filterValue, draft = false, includeUnlUnk = false) => {
+  const taxaDb = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, filterProp, filterValue, draft)
+  return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
 }
 
-const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false) => {
-  const params = {limit: 1, offset: 0, filter: {code}}
-  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, params, draft)
+const fetchTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false) => {
+  const taxaDb = await TaxonomyRepository.fetchTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft)
+  return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
+}
+
+const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
+  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxonomy.taxonPropKeys.code, code, draft, client)
   return R.head(taxa)
 }
 
@@ -79,7 +85,7 @@ const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   const taxonomy = await TaxonomyRepository.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
   const vernacularLanguageCodes = Taxonomy.getTaxonomyVernacularLanguageCodes(taxonomy)
 
-  const csvStream = fastcsv.createWriteStream({headers: true})
+  const csvStream = fastcsv.createWriteStream({ headers: true })
   csvStream.pipe(output)
 
   const fixedHeaders = [
@@ -92,7 +98,7 @@ const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   csvStream.write(R.concat(fixedHeaders, vernacularLanguageCodes))
 
   //write taxa
-  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, null, draft)
+  const taxa = await TaxonomyRepository.fetchAllTaxa(surveyId, taxonomyUuid, draft)
 
   taxa.forEach(taxon => {
     csvStream.write(R.concat([
@@ -123,7 +129,7 @@ const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, clie
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, {taxonomyUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyPropUpdate, { taxonomyUuid, key, value }, t)
 
     return updatedTaxonomy
   })
@@ -136,7 +142,7 @@ const deleteTaxonomy = async (user, surveyId, taxonomyUuid) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, {taxonomyUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, { taxonomyUuid }, t)
   })
 
 const insertTaxa = (surveyId, taxa, user, client = db) => {
@@ -162,8 +168,11 @@ module.exports = {
   exportTaxa,
   countTaxaByTaxonomyUuid: TaxonomyRepository.countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike,
+  fetchTaxaByVernacularName,
   fetchTaxonByUuid: TaxonomyRepository.fetchTaxonByUuid,
   fetchTaxonByCode,
+  fetchTaxonVernacularNameByUuid: TaxonomyRepository.fetchTaxonVernacularNameByUuid,
+  fetchAllTaxa: TaxonomyRepository.fetchAllTaxa,
 
   //UPDATE
   publishTaxonomiesProps,

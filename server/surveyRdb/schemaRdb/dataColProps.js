@@ -1,6 +1,5 @@
 const R = require('ramda')
 const camelize = require('camelize')
-const toSnakeCase = require('to-snake-case')
 
 const Survey = require('../../../common/survey/survey')
 const SurveyUtils = require('../../../common/survey/surveyUtils')
@@ -12,9 +11,9 @@ const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
 const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
 const sqlTypes = require('../../../common/surveyRdb/sqlTypes')
-const {nodeDefType} = NodeDef
+const { nodeDefType } = NodeDef
 
-const {isBlank} = require('../../../common/stringUtils')
+const { isBlank } = require('../../../common/stringUtils')
 const DateTimeUtils = require('../../../common/dateUtils')
 
 const colValueProcessor = 'colValueProcessor'
@@ -107,7 +106,11 @@ const props = {
 }
 
 const getColValueProcessor = nodeDef => R.propOr(
-  () => (node) => Node.getNodeValue(node, null),
+  () => (node) => {
+    return Node.isNodeValueBlank(node)
+      ? null
+      : Node.getNodeValue(node)
+  },
   colValueProcessor,
   props[NodeDef.getType(nodeDef)]
 )

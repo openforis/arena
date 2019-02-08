@@ -1,18 +1,17 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const StringUtils = require('../../../../../common/stringUtils')
 const Queue = require('../../../../../common/queue')
 
-const Survey = require('../../../../../common/survey/survey')
 const SurveyUtils = require('../../../../../common/survey/surveyUtils')
+const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
 const Node = require('../../../../../common/record/node')
 
-const {dependencyTypes} = require('../../../../survey/surveyDependenchyGraph')
+const { dependencyTypes } = require('../../../../survey/surveyDependenchyGraph')
 
-const NodeDependencyManager = require('./nodeDependencyManager')
+const NodeDependencyManager = require('../../../nodeDependencyManager')
 
 const RecordExprParser = require('../../../recordExprParser')
 
@@ -20,7 +19,7 @@ const RecordExprParser = require('../../../recordExprParser')
  * Module responsible for updating applicable, calculated and default values
  */
 
-const updateNodes = async (user, survey, nodes, tx) => {
+const updateNodes = async (survey, record, nodes, tx) => {
   let allUpdatedNodes = R.values(nodes)
 
   const nodesToVisit = new Queue(R.values(nodes))
@@ -34,7 +33,7 @@ const updateNodes = async (user, survey, nodes, tx) => {
     if (!R.includes(nodeUuid, visitedNodeUuids)) {
 
       // update node
-      const lastUpdatedNodes = await updateNode(user, survey, node, tx)
+      const lastUpdatedNodes = await updateNode(survey, record, node, tx)
 
       // mark updated nodes to visit
       const nodesUpdatedArray = R.values(lastUpdatedNodes)
@@ -60,11 +59,11 @@ const updateNodes = async (user, survey, nodes, tx) => {
   return SurveyUtils.toUuidIndexedObj(allUpdatedNodes)
 }
 
-const updateNode = async (user, survey, node, tx) => {
+const updateNode = async (survey, record, node, tx) => {
 
-  const nodesApplicability = await updateNodeExpr(survey, node, NodeDef.getApplicable, dependencyTypes.applicable, tx)
-  const nodesCalculatedValues = await updateNodeExpr(survey, node, NodeDef.getCalculatedValues, dependencyTypes.calculatedValues, tx)
-  const nodesDefaultValues = await updateNodeExpr(survey, node, NodeDef.getDefaultValues, dependencyTypes.defaultValues, tx)
+  const nodesApplicability = await updateNodeExpr(survey, record, node, NodeDef.getApplicable, dependencyTypes.applicable, tx)
+  const nodesCalculatedValues = await updateNodeExpr(survey, record, node, NodeDef.getCalculatedValues, dependencyTypes.calculatedValues, tx)
+  const nodesDefaultValues = await updateNodeExpr(survey, record, node, NodeDef.getDefaultValues, dependencyTypes.defaultValues, tx)
 
   return R.pipe(
     R.mergeRight(nodesCalculatedValues),
@@ -72,22 +71,22 @@ const updateNode = async (user, survey, node, tx) => {
   )(nodesApplicability)
 }
 
-const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx) => {
+const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependencyType, tx) => {
 
   //1. fetch dependent nodes
-  const nodeDependents = await NodeDependencyManager.fetchDependentNodes(
-    survey,
-    node,
-    dependencyType,
-    tx
-  )
+  const nodeDependents = NodeDependencyManager.fetchDependentNodes(survey, record, node, dependencyType)
   const isDefaultValuesExpr = dependencyType === dependencyTypes.defaultValues
   const isApplicableExpr = dependencyType === dependencyTypes.applicable
 
   // filter nodes to update
   const nodesToUpdate = R.pipe(
+    R.ifElse(
+      R.always(isDefaultValuesExpr),
+      R.append({ nodeCtx: node, nodeDef: Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey) }),
+      R.identity
+    ),
     R.filter(o => {
-        const {nodeCtx: n, nodeDef} = o
+        const { nodeCtx: n, nodeDef } = o
 
         return isApplicableExpr || (
           NodeDef.isNodeDefAttribute(nodeDef) && (
@@ -102,7 +101,7 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
   //2. update expr to node and dependent nodes
   const nodesUpdated = await Promise.all(
     nodesToUpdate.map(async o => {
-      const {nodeCtx, nodeDef} = o
+      const { nodeCtx, nodeDef } = o
 
       const expressions = getExpressionsFn(nodeDef)
 
@@ -110,37 +109,21 @@ const updateNodeExpr = async (survey, node, getExpressionsFn, dependencyType, tx
         return {}
 
       //3. get expression
-      const expr = await getApplicableExpression(survey, nodeCtx, expressions, tx)
+      const expr = await RecordExprParser.getApplicableExpression(survey, record, nodeCtx, expressions, tx)
 
       //4. eval expr
-      const value = expr
-        ? await RecordExprParser.evalNodeQuery(survey, nodeCtx, expr, tx)
+      const valueExpr = expr
+        ? await RecordExprParser.evalNodeQuery(survey, record, nodeCtx, NodeDefExpression.getExpression(expr), tx)
         : null
 
       //5. persist updated node value, and return updated node
       return await isApplicableExpr
-        ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, value || false, tx)
-        : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, value, isDefaultValuesExpr, tx)
+        ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, valueExpr || false, tx)
+        : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, valueExpr, isDefaultValuesExpr, tx)
     })
   )
 
   return R.mergeAll(nodesUpdated)
-}
-
-const getApplicableExpression = async (survey, nodeCtx, expressions, tx) => {
-  for (const expression of expressions) {
-    const applyIfExpr = NodeDefExpression.getApplyIf(expression)
-
-    if (StringUtils.isBlank(applyIfExpr) || await RecordExprParser.evalNodeQuery(survey, nodeCtx, applyIfExpr, tx))
-      return NodeDefExpression.getExpression(expression)
-  }
-
-  return null
-}
-
-const getNodeDef = (survey, node) => {
-  const nodeDefUuid = Node.getNodeDefUuid(node)
-  return Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 }
 
 module.exports = {

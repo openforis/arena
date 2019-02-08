@@ -6,9 +6,12 @@ import * as R from 'ramda'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import NodeDefSwitch from '../../nodeDefSwitch'
+import NodeDefErrorBadge from '../nodeDefErrorBadge'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
+import Record from '../../../../../../common/record/record'
 import Node from '../../../../../../common/record/node'
+import Validator from '../../../../../../common/validation/validator'
 
 import {
   nodeDefLayoutProps,
@@ -20,6 +23,7 @@ import {
 import { setFormPageNode, getNodeKeyLabelValues } from '../../../actions'
 
 import * as SurveyFormState from '../../../../../appModules/surveyForm/surveyFormState'
+import * as RecordState from '../../../record/recordState'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -30,6 +34,7 @@ const EntityForm = props => {
     edit,
     canEditDef,
     canEditRecord,
+    canAddNode,
     locked,
     node,
     putNodeDefProp,
@@ -55,13 +60,13 @@ const EntityForm = props => {
     innerPageChildren.length > 0
       ? <ResponsiveGridLayout breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
                               autoSize={false}
-                              rowHeight={edit ? 80 : 50}
+                              rowHeight={edit && canEditDef? 80 : 50}
                               cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
                               layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
-                              containerPadding={edit ? [80, 30] : [30, 30]}
+                              containerPadding={edit && canEditDef ? [30, 50] : [30, 30]}
                               onLayoutChange={onLayoutChange}
-                              isDraggable={edit && !locked}
-                              isResizable={edit && !locked}
+                              isDraggable={edit && canEditDef && !locked}
+                              isResizable={edit && canEditDef && !locked}
                               compactType={null}
                               useCSSTransforms={false}>
 
@@ -77,7 +82,8 @@ const EntityForm = props => {
                                nodeDef={childDef}
                                parentNode={node}
                                canEditDef={canEditDef}
-                               canEditRecord={canEditRecord}/>
+                               canEditRecord={canEditRecord}
+                               canAddNode={canAddNode}/>
               </div>
             )
         }
@@ -90,7 +96,7 @@ const EntityForm = props => {
 const NodeSelect = props => {
   const {
     nodeDef, nodes, parentNode, selectedNode, getNodeKeyLabelValues,
-    updateNode, removeNode, onChange, canEditRecord
+    updateNode, removeNode, onChange, canEditRecord, canAddNode
   } = props
 
   return (
@@ -132,8 +138,9 @@ const NodeSelect = props => {
                     const entity = Node.newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
                     updateNode(nodeDef, entity)
                     onChange(entity.uuid)
-                  }}>
-            <span className="icon icon-plus icon-16px icon-left"></span>
+                  }}
+                  aria-disabled={!canAddNode}>
+            <span className="icon icon-plus icon-16px icon-left"/>
             ADD
           </button>
         </React.Fragment>
@@ -143,6 +150,12 @@ const NodeSelect = props => {
 }
 
 class NodeDefEntityForm extends React.Component {
+
+  constructor (props) {
+    super(props)
+
+    this.formWrapper = new React.createRef()
+  }
 
   checkNodePage () {
     const { nodeDef, setFormPageNode, nodes, entry } = this.props
@@ -173,6 +186,7 @@ class NodeDefEntityForm extends React.Component {
       nodeDef,
       edit,
       entry,
+      parentNode,
       nodes,
 
       setFormPageNode,
@@ -182,7 +196,13 @@ class NodeDefEntityForm extends React.Component {
 
     return entry && NodeDef.isNodeDefMultiple(nodeDef)
       ? (
-        <div className="node-def-entity-form__wrapper">
+        <div className="node-def-entity-form__wrapper" ref={this.formWrapper}>
+          <NodeDefErrorBadge  nodeDef={nodeDef}
+                              edit={edit}
+                              parentNode={parentNode}
+                              nodes={nodes}
+                              container={this.formWrapper}/>
+
           <NodeSelect {...this.props}
                       selectedNode={selectedNode}
                       getNodeKeyLabelValues={getNodeKeyLabelValues}
@@ -206,12 +226,22 @@ const mapStateToProps = (state, props) => {
   const { nodeDef, nodes } = props
 
   const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
+  const surveyForm = SurveyFormState.getSurveyForm(state)
+  const record = RecordState.getRecord(surveyForm)
+
   const selectedNode = selectedNodeUuid && nodes
     ? R.find(R.propEq('uuid', selectedNodeUuid), nodes)
     : null
 
+  const recordValidation = Record.getValidation(record)
+
+  const validation = NodeDef.isNodeDefEntity(nodeDef)
+    ? Validator.getFieldValidation(selectedNodeUuid)(recordValidation)
+    : {}
+
   return {
     selectedNode,
+    validation,
   }
 }
 

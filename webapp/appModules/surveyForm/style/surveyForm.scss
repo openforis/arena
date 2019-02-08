@@ -1,6 +1,6 @@
 @import "../../../style/vars";
 
-$tableBorderColor: rgba($white, .7);
+$tableBorderColor: rgba($white, .4);
 $tableBorder: 1px solid $tableBorderColor;
 $tableRowHeaderHeight: 40px;
 
@@ -17,7 +17,7 @@ $tableRowHeaderHeight: 40px;
     grid-template-columns: 1fr 200px;
 
     &.form-actions-off {
-      grid-template-columns: 1fr 0px;
+      grid-template-columns: 1fr 0;
 
       .survey-form__actions {
         .btn-toggle {
@@ -60,10 +60,19 @@ $tableRowHeaderHeight: 40px;
 }
 
 .survey-form__nav-record-actions {
+  display: flex;
   align-self: center;
 
   > * {
     margin: 0 1rem;
+  }
+
+  .error-badge {
+    position: relative;
+  }
+
+  .survey-form__nav-record-actions-steps > * {
+    margin: 0 .5rem;
   }
 }
 
@@ -110,16 +119,30 @@ $tableRowHeaderHeight: 40px;
 
   .form-input {
     text-overflow: ellipsis;
+    text-align: right;
   }
 
   *[aria-disabled="true"] {
     opacity: .8;
   }
+
+  .form-item {
+    grid-template-columns: 175px 1fr;
+  }
+
+  //.badge {
+  //  position: fixed;
+  //}
+
 }
 
 .node-def__not-applicable {
   background-color: rgba($white, 0.15);
   opacity: .6;
+}
+
+.node-def__invalid {
+  background-color: rgba($red, .1);
 }
 
 .node-def__form-actions {
@@ -150,7 +173,7 @@ $tableRowHeaderHeight: 40px;
 .node_def__icon {
   font-size: .8rem;
   font-weight: 600;
-  letter-spacing: 0px;
+  letter-spacing: 0;
 }
 
 //===
@@ -180,6 +203,10 @@ $tableRowHeaderHeight: 40px;
   width: 100%;
   height: calc(100% - 40px);
   overflow-x: auto;
+  overflow-y: hidden;
+  //justify-self: center;
+  //display: grid;
+  //justify-items: center;
 }
 
 .node-def__table-row-header {
@@ -187,16 +214,15 @@ $tableRowHeaderHeight: 40px;
   display: flex;
   height: $tableRowHeaderHeight;
   //width: 100%;
-  background-color: rgba($white, 0.1);
-  border-bottom: 2px solid $tableBorderColor;
+  background-color: rgba($white, 0.2);
+  //border: 1px solid $tableBorderColor;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  //top: 4px;
 
   .react-grid-item {
     display: grid;
     border-right: 1px solid transparent;
-
-    &:first-child {
-      border-left: 1px solid transparent;
-    }
   }
 
 }
@@ -238,6 +264,12 @@ $tableRowHeaderHeight: 40px;
 
     &:first-child {
       border-left: $tableBorder;
+    }
+  }
+
+  &:first-child {
+    .react-grid-item {
+      border-top: $tableBorder;
     }
   }
 

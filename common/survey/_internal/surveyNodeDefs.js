@@ -187,9 +187,8 @@ const getNodeDefCategoryLevelIndex = nodeDef =>
   }
 
 const canUpdateCategory = nodeDef =>
-  survey => {
-    return !isNodeDefParentCode(nodeDef)(survey)
-  }
+  survey =>
+    !(NodeDef.isNodeDefPublished(nodeDef) || isNodeDefParentCode(nodeDef)(survey))
 
 module.exports = {
   getNodeDefs,

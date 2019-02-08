@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { Switch, Route, Redirect } from 'react-router'
+import { Switch, Route } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
 import DynamicImport from '../commonComponents/DynamicImport'
 
@@ -17,7 +17,7 @@ import { getLocationPathname } from '../appUtils/routerUtils'
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 import { openSocket, closeSocket } from './appWebSocket'
 import { activeJobUpdate } from '../appModules/appView/components/job/actions'
-import { recordNodesUpdate } from '../appModules/surveyForm/record/actions'
+import { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete } from '../appModules/surveyForm/record/actions'
 
 const loginUri = '/'
 
@@ -28,17 +28,27 @@ class AppRouterSwitch extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const {user, activeJobUpdate, recordNodesUpdate, throwSystemError} = this.props
-    const {user: prevUser} = prevProps
+    const {
+      user, history,
+      activeJobUpdate, recordNodesUpdate, dispatchRecordDelete, nodeValidationsUpdate, throwSystemError
+    } = this.props
+    const { user: prevUser } = prevProps
 
     if (user && !prevUser) {
       openSocket({
         [WebSocketEvents.jobUpdate]: activeJobUpdate,
         [WebSocketEvents.nodesUpdate]: recordNodesUpdate,
+        [WebSocketEvents.nodeValidationsUpdate]: nodeValidationsUpdate,
+        [WebSocketEvents.recordDelete]: () => {
+          alert('This record has just been deleted by another user')
+          dispatchRecordDelete(history)
+        },
         [WebSocketEvents.error]: throwSystemError,
       })
     } else if (prevUser && !user) {
       closeSocket()
+      // logout - redirect to login page
+      history.push(loginUri)
     }
   }
 
@@ -47,7 +57,7 @@ class AppRouterSwitch extends React.Component {
   }
 
   render () {
-    const {location, isReady, user, systemError} = this.props
+    const { location, isReady, systemError } = this.props
 
     const isLogin = getLocationPathname(this.props) === loginUri
 
@@ -61,12 +71,6 @@ class AppRouterSwitch extends React.Component {
       isReady
         ? (
           <React.Fragment>
-
-            {
-              !user && !isLogin
-                ? <Redirect to={loginUri}/>
-                : null
-            }
 
             <div className="main__bg1"/>
             <div className="main__bg2"/>
@@ -128,6 +132,8 @@ export default withRouter(
     initApp,
     activeJobUpdate,
     recordNodesUpdate,
+    dispatchRecordDelete,
+    nodeValidationsUpdate,
     throwSystemError,
   })
   (AppRouterSwitch)

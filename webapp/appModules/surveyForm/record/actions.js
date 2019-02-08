@@ -20,10 +20,21 @@ export const recordDelete = 'survey/record/delete'
 
 export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
+export const validationsUpdate = 'survey/record/validation/update'
 
 export const recordNodesUpdate = nodes =>
   dispatch =>
     dispatch({ type: nodesUpdate, nodes })
+
+export const nodeValidationsUpdate = validations =>
+  dispatch =>
+    dispatch({ type: validationsUpdate, validations })
+
+export const dispatchRecordDelete = (history) =>
+  dispatch => {
+    dispatch({ type: recordDelete })
+    history.push(appModuleUri(appModules.data))
+  }
 
 /**
  * ============
@@ -63,12 +74,12 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
 export const updateNode = (nodeDef, node, value, file = null) => dispatch => {
 
   const nodeToUpdate = R.pipe(
-    R.dissoc('placeholder'),
-    R.assoc('value', value),
+    R.dissoc(Node.keys.placeholder),
+    R.assoc(Node.keys.value, value),
   )(node)
 
   recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate })(dispatch)
-  dispatch(_updateNodeDebounced(nodeToUpdate, file, node.placeholder ? 0 : 500))
+  dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
 }
 
 const _updateNodeDebounced = (node, file, delay) => {
@@ -124,10 +135,8 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
   await checkOutRecord(recordUuid)(dispatch, getState)
   // 2. perform server side delete
   await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
-  // 3. remove record from redux state
-  await dispatch({ type: recordDelete })
-  // 4. redirect to default data module (records view)
-  history.push(appModuleUri(appModules.data))
+  // 3. remove record from redux state and redirect to records view
+  dispatchRecordDelete(history)(dispatch)
 }
 
 /**

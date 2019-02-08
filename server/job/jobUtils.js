@@ -1,5 +1,3 @@
-const R = require('ramda')
-
 const jobStatus = {
   pending: 'pending',
   running: 'running',

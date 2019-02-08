@@ -1,11 +1,11 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const {types} = require('./types')
-const {isString} = require('../../stringUtils')
+const { types } = require('./types')
+const { isString } = require('../../stringUtils')
 
 const unaryEval = async (expr, ctx) => {
-  const {argument, operator} = expr
+  const { argument, operator } = expr
   const res = await evalExpression(argument, ctx)
   const x = `${operator} ${JSON.stringify(res)}`
   // console.log('=== UNARY')
@@ -14,7 +14,7 @@ const unaryEval = async (expr, ctx) => {
 }
 
 const binaryEval = async (expr, ctx) => {
-  const {left, right, operator} = expr
+  const { left, right, operator } = expr
   const leftResult = await evalExpression(left, ctx)
   const rightResult = await evalExpression(right, ctx)
 
@@ -31,17 +31,18 @@ const memberEval = async (expr, ctx) => {
   // console.log('== member')
   // console.log(expr)
 
-  const {object, property} = expr
+  const { object, property } = expr
 
   const objectRes = await evalExpression(object, ctx)
   const propertyRes = await evalExpression(property, ctx)
 
-  if (isString(objectRes))
+  if (!(objectRes && propertyRes))
+    return null
+  else if (isString(objectRes))
     return eval(`${objectRes}.${propertyRes}`)
   else if (R.has(propertyRes, objectRes))
     return R.prop(propertyRes, objectRes)
-  else
-    throw new Error(`Invalid property ${propertyRes}`)
+  else return null
 }
 
 const callEval = async (expr, ctx) => {
@@ -49,7 +50,7 @@ const callEval = async (expr, ctx) => {
   // console.log(expr)
 
   // arguments is a reserved word in strict mode
-  const {callee, arguments: exprArgs} = expr
+  const { callee, arguments: exprArgs } = expr
 
   const fn = await evalExpression(callee, ctx)
   const args = await Promise.all(
@@ -87,7 +88,7 @@ const identifierEval = expr => {
 }
 
 const groupEval = async (expr, ctx) => {
-  const {argument} = expr
+  const { argument } = expr
   return await evalExpression(argument, ctx)
 }
 

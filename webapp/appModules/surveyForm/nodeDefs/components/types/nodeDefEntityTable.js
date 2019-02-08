@@ -21,7 +21,8 @@ const EntityTableRow = (props) => {
     canEditRecord,
   } = props
 
-  const className = `node-def__table-row${renderType === nodeDefRenderType.tableHeader ? '-header' : ''}`
+  const className = `node-def__table-row` +
+    (renderType === nodeDefRenderType.tableHeader ? '-header' : '')
 
   return (
     <div className={className}
@@ -30,10 +31,10 @@ const EntityTableRow = (props) => {
       {
         childDefs
           .map((childDef, i) => {
-              const {length} = getNodeDefFormFields(childDef)
+              const { length } = getNodeDefFormFields(childDef)
 
               return (
-                <div key={childDef.uuid} className="react-grid-item" style={{width: 160 * length + 'px'}}>
+                <div key={childDef.uuid} className="react-grid-item" style={{ width: 160 * length + 'px' }}>
                   <NodeDefSwitch key={i}
                                  {...props}
                                  node={null}
@@ -48,7 +49,9 @@ const EntityTableRow = (props) => {
 
       {
         renderType === nodeDefRenderType.tableBody && canEditRecord &&
-          <NodeDeleteButton nodeDef={nodeDef} node={node} removeNode={removeNode}/>
+        <NodeDeleteButton nodeDef={nodeDef}
+                          node={node}
+                          removeNode={removeNode}/>
       }
 
     </div>
@@ -59,8 +62,8 @@ const EntityTableRow = (props) => {
 class NodeDefEntityTable extends React.Component {
 
   componentDidUpdate (prevProps) {
-    const {nodes, nodeDef} = this.props
-    const {nodes: prevNodes} = prevProps
+    const { nodes, nodeDef } = this.props
+    const { nodes: prevNodes } = prevProps
 
     if (nodes && !R.isEmpty(nodes) && nodes.length !== prevNodes.length) {
       const element = document.getElementById(`${nodeDef.uuid}_${nodes.length - 1}`)
@@ -78,6 +81,7 @@ class NodeDefEntityTable extends React.Component {
       label,
       updateNode,
       canEditRecord,
+      canAddNode,
     } = this.props
 
     return (
@@ -88,11 +92,12 @@ class NodeDefEntityTable extends React.Component {
           {
             entry && canEditRecord
               ? <button className="btn btn-s btn-of-light-xs"
-                        style={{marginLeft: '10px'}}
+                        style={{ marginLeft: '10px' }}
                         onClick={() => {
-                          const entity = Node.newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
+                          const entity = Node.newNodePlaceholder(nodeDef, parentNode)
                           updateNode(nodeDef, entity)
-                        }}>
+                        }}
+                        aria-disabled={!canAddNode}>
                 <span className="icon icon-plus icon-12px icon-left"/>
                 ADD
               </button>

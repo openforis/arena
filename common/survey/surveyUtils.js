@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const keys = {
+  id: 'id',
   uuid: 'uuid',
   parentUuid: 'parentUuid',
   props: 'props',

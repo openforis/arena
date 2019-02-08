@@ -21,10 +21,10 @@ const integerMask = createNumberMask({
 })
 
 const ValidationsProps = props => {
-  const {nodeDef, nodeDefParent, readOnly, putNodeDefProp} = props
+  const { nodeDef, nodeDefParent, readOnly, putNodeDefProp } = props
 
   const validation = NodeDef.getNodeDefValidation(nodeDef)
-  const nodeDefParentUuid = NodeDef.getUuid(nodeDefParent)
+  const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
 
@@ -63,7 +63,8 @@ const ValidationsProps = props => {
               </FormItem>
             </React.Fragment>
           )
-          : (
+          : !NodeDef.isNodeDefKey(nodeDef)
+          ? (
             <FormItem label={'required'}>
               <Checkbox checked={NodeDefValidations.isRequired(nodeDefValidations)}
                         disabled={readOnly}
@@ -72,20 +73,25 @@ const ValidationsProps = props => {
                         )}/>
             </FormItem>
           )
+          : null
       }
-
-      <ExpressionsProp label="Expressions"
-                       readOnly={readOnly}
-                       applyIf={true}
-                       values={NodeDefValidations.getExpressions(nodeDefValidations)}
-                       validation={R.pipe(
-                         Validator.getFieldValidation('validations'),
-                         Validator.getFieldValidation('expressions'),
-                       )(validation)}
-                       onChange={expressions => handleValidationsUpdate(
-                         NodeDefValidations.assocExpressions(expressions)(nodeDefValidations)
-                       )}
-                       nodeDefUuid={nodeDefParentUuid}/>
+      {
+        NodeDef.isNodeDefAttribute(nodeDef) &&
+        <ExpressionsProp label="Expressions"
+                         readOnly={readOnly}
+                         applyIf={true}
+                         showLabels={true}
+                         values={NodeDefValidations.getExpressions(nodeDefValidations)}
+                         validation={R.pipe(
+                           Validator.getFieldValidation('validations'),
+                           Validator.getFieldValidation('expressions'),
+                         )(validation)}
+                         onChange={expressions => handleValidationsUpdate(
+                           NodeDefValidations.assocExpressions(expressions)(nodeDefValidations)
+                         )}
+                         nodeDefUuidContext={nodeDefUuidContext}
+                         nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}/>
+      }
     </div>
   )
 }

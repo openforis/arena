@@ -15,14 +15,14 @@ class SurveyRdbGeneratorJob extends Job {
   }
 
   async execute (tx) {
-    const {surveyId} = this.params
+    const { surveyId } = this.params
     const survey = await this.getSurvey(tx)
 
     //get entities or multiple attributes tables
-    const {root, length} = Survey.getHierarchy(NodeDef.isNodeDefEntityOrMultiple)(survey)
-    const {records: recordSummaries} = await RecordManager.fetchRecordsSummaryBySurveyId(surveyId, 0, null, tx)
+    const { root, length } = Survey.getHierarchy(NodeDef.isNodeDefEntityOrMultiple)(survey)
+    const recordUuids = await RecordManager.fetchRecordUuids(surveyId, tx)
 
-    this.total = 1 + length + (recordSummaries.length * length)
+    this.total = 1 + length + (recordUuids.length * length)
 
     //1 ==== drop and create schema
     await SurveyRdbManager.dropSchema(surveyId, tx)
@@ -41,18 +41,18 @@ class SurveyRdbGeneratorJob extends Job {
       await SurveyRdbManager.insertIntoTable(survey, nodeDef, record, tx)
       this.incrementProcessedItems()
     }
-    for (const recordSummary of recordSummaries) {
-      const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordSummary.uuid, tx)
+    for (const recordUuid of recordUuids) {
+      const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, tx)
       await Survey.traverseHierarchyItem(root, insertIntoTable(record))
     }
   }
 
   async getSurvey (tx) {
-    const {surveyId} = this.params
+    const { surveyId } = this.params
     const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, tx)
     const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, false, false, false, tx)
 
-    return {...survey, nodeDefs}
+    return { ...survey, nodeDefs }
   }
 
 }

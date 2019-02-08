@@ -1,10 +1,10 @@
-const {isMainThread} = require('worker_threads')
+const { isMainThread } = require('worker_threads')
 
 const R = require('ramda')
 
 const db = require('../../../db/db')
 
-const RecordProcessor = require('./recordProcessor')
+const RecordUpdater = require('./helpers/recordUpdater')
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../threads/thread')
 
@@ -12,10 +12,19 @@ const SurveyManager = require('../../../survey/surveyManager')
 const surveyDependencyGraph = require('../../../survey/surveyDependenchyGraph')
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
 
+const RecordRepository = require('../../recordRepository')
+const NodeRepository = require('../../nodeRepository')
+
 const Survey = require('../../../../common/survey/survey')
 const Node = require('../../../../common/record/node')
+const Record = require('../../../../common/record/record')
 const Queue = require('../../../../common/queue')
-const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
+const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
+
+const DependentNodesUpdater = require('./helpers/dependentNodesUpdater')
+const RecordValidationManager = require('../../validator/recordValidationManager')
+
+const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 
 class RecordUpdateThread extends Thread {
 
@@ -25,7 +34,8 @@ class RecordUpdateThread extends Thread {
     this.queue = new Queue()
     this.processing = false
     this.preview = R.propOr(false, 'preview', this.params)
-    this.processor = new RecordProcessor(this._postMessage.bind(this), this.preview)
+    this.recordUuid = R.prop('recordUuid', this.params)
+    this.recordUpdater = new RecordUpdater(this.preview)
   }
 
   async getSurvey (tx) {
@@ -35,12 +45,37 @@ class RecordUpdateThread extends Thread {
       // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
       let dependencyGraph = this.preview
         ? surveyDependencyGraph.buildGraph(surveyDb)
-        : await SurveyManager.fetchDepedencies(this.surveyId)
+        : await SurveyManager.fetchDependencies(this.surveyId)
 
-      this.survey = R.assoc('dependencyGraph', dependencyGraph, surveyDb)
+      this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
     }
 
     return this.survey
+  }
+
+  async initRecord (t) {
+    const recordDb = await RecordRepository.fetchRecordByUuid(this.surveyId, this.recordUuid, t)
+    const nodes = await NodeRepository.fetchNodesByRecordUuid(this.surveyId, this.recordUuid, t)
+    this.record = Record.assocNodes(toUuidIndexedObj(nodes))(recordDb)
+  }
+
+  async getRecord (t) {
+    if (!this.record) {
+      await this.initRecord(t)
+    }
+    return this.record
+  }
+
+  async handleNodesUpdated (updatedNodes, t) {
+    const record = await this.getRecord(t)
+    this._postMessage(WebSocketEvents.nodesUpdate, updatedNodes)
+    this.record = Record.assocNodes(updatedNodes)(record)
+  }
+
+  async handleNodesValidationUpdated (validations, t) {
+    const record = await this.getRecord(t)
+    this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
+    this.record = Record.mergeNodeValidations(validations)(record)
   }
 
   async onMessage (msg) {
@@ -63,9 +98,9 @@ class RecordUpdateThread extends Thread {
     }
   }
 
-  _postMessage (msg) {
-    if (!isMainThread)
-      this.postMessage(msg)
+  _postMessage (type, content) {
+    if (!(isMainThread || R.isEmpty(content)))
+      this.postMessage({ type, content })
   }
 
   async processMessage (msg) {
@@ -76,25 +111,38 @@ class RecordUpdateThread extends Thread {
 
       let updatedNodes = null
 
-      // 1. update node and dependent nodes
+      // 1. create record or update node
       switch (msg.type) {
         case messageTypes.createRecord:
-          updatedNodes = await this.processor.createRecord(user, survey, msg.record, t)
+          updatedNodes = await this.recordUpdater.createRecord(user, survey, msg.record, t)
           break
         case messageTypes.persistNode:
-          updatedNodes = await this.processor.persistNode(user, survey, msg.node, t)
+          await this.initRecord(t)
+          updatedNodes = await this.recordUpdater.persistNode(user, survey, this.record, msg.node, t)
           break
         case messageTypes.deleteNode:
-          updatedNodes = await this.processor.deleteNode(user, survey, msg.nodeUuid, t)
+          await this.initRecord(t)
+          updatedNodes = await this.recordUpdater.deleteNode(user, survey, this.record, msg.nodeUuid, t) || {}
           break
       }
+      await this.handleNodesUpdated(updatedNodes, t)
 
-      //2. update survey rdb
+      // 2. update dependent nodes
+      const updatedDependentNodes = await DependentNodesUpdater.updateNodes(survey, this.record, updatedNodes, t)
+      await this.handleNodesUpdated(updatedDependentNodes, t)
+
+      const updatedNodesAndDependents = R.mergeDeepRight(updatedNodes, updatedDependentNodes)
+
+      // 3. update node validations
+      const validations = await RecordValidationManager.validateNodes(survey, this.record, updatedNodesAndDependents, this.preview, t)
+      await this.handleNodesValidationUpdated(validations, t)
+
+      // 4. update survey rdb
       if (!this.preview) {
         const nodeDefs = toUuidIndexedObj(
-          Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodes))(survey)
+          Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
         )
-        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodes, t)
+        await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodesAndDependents, t)
       }
     })
   }

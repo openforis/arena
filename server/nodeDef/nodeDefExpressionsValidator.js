@@ -10,7 +10,8 @@ const Expression = require('../../common/exprParser/expression')
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
   value: 1, //simulates node value
-  value: () => 1, //simulates node value
+  //simulates node value
+  getValue: () => NodeDef.isNodeDefCode(nodeDef) || NodeDef.isNodeDefTaxon(nodeDef) ? { props: { code: '' } } : 1,
   parent: () => {
     const def = Survey.getNodeDefParent(nodeDef)(survey)
     if (!def) throw new Error('Unable to find parent of ' + NodeDef.getNodeDefName(nodeDef))
@@ -39,7 +40,7 @@ const validateNodeDefExpr = async (survey, nodeDef, expr) => {
       {
         node: bindNode(survey, nodeDef),
         functions: {
-          [Expression.types.ThisExpression]: (expr, {node}) => node
+          [Expression.types.ThisExpression]: (expr, { node }) => node
         },
       }
     )
@@ -80,7 +81,7 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i) => {
 }
 
 const validate = async (survey, nodeDef, nodeDefExpressions) => {
-  const result = {valid: true, fields: {}}
+  const result = { valid: true, fields: {} }
   const range = R.range(0, nodeDefExpressions.length)
 
   const validations = await Promise.all(

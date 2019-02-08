@@ -21,7 +21,7 @@ import { elementOffset } from '../../../../appUtils/domUtils'
 
 const defaultColWidth = 80
 
-const TableNodeDefCols = ({nodeDefCols, row, lang, colWidth}) => (
+const TableNodeDefCols = ({ nodeDefCols, row, lang, colWidth }) => (
   nodeDefCols.map(nodeDef =>
     <NodeDefTableColumn key={nodeDef.id}
                         nodeDef={nodeDef} row={row}
@@ -29,11 +29,11 @@ const TableNodeDefCols = ({nodeDefCols, row, lang, colWidth}) => (
   )
 )
 
-const TableRows = ({nodeDefCols, colNames, data, offset, lang, colWidth}) => (
+const TableRows = ({ nodeDefCols, colNames, data, offset, lang, colWidth }) => (
   <div className="table__rows">
 
     <div className="table__row-header">
-      <div style={{width: defaultColWidth}}>Row #</div>
+      <div style={{ width: defaultColWidth }}>Row #</div>
       <TableNodeDefCols nodeDefCols={nodeDefCols} lang={lang} colWidth={colWidth}/>
     </div>
 
@@ -42,7 +42,7 @@ const TableRows = ({nodeDefCols, colNames, data, offset, lang, colWidth}) => (
       {
         data.map((row, i) =>
           <div key={i} className="table__row">
-            <div style={{width: defaultColWidth}}>{i + offset + 1}</div>
+            <div style={{ width: defaultColWidth }}>{i + offset + 1}</div>
             <TableNodeDefCols nodeDefCols={nodeDefCols} row={row} colWidth={colWidth}/>
           </div>
         )
@@ -64,12 +64,12 @@ class DataTable extends React.Component {
 
   render () {
     const {
-      nodeDefUuidTable, nodeDefCols, colNames, data,
+      nodeDefUuidContext, nodeDefCols, colNames, data,
       offset, limit, filter, count, lang,
       updateDataTable, updateDataFilter,
     } = this.props
 
-    const {width = defaultColWidth} = elementOffset(this.tableRef.current)
+    const { width = defaultColWidth } = elementOffset(this.tableRef.current)
     const widthMax = width - defaultColWidth
     const colWidthMin = 150
 
@@ -83,11 +83,11 @@ class DataTable extends React.Component {
         <div className="table__header">
           <div className="filter-container">
             {
-              nodeDefUuidTable &&
+              nodeDefUuidContext &&
               <React.Fragment>
                 <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
-                      style={{opacity: R.isEmpty(filter) ? 0.5 : 1}}/>
-                <ExpressionComponent nodeDefUuid={nodeDefUuidTable}
+                      style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }}/>
+                <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
                                      query={filter}
                                      onChange={query => updateDataFilter(query)}
                                      mode={Expression.modes.sql}/>
@@ -119,13 +119,13 @@ class DataTable extends React.Component {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const nodeDefUuidTable = DataVisState.getTableNodeDefUuidTable(state)
+  const nodeDefUuidContext = DataVisState.getTableNodeDefUuidTable(state)
   const nodeDefUuidCols = DataVisState.getTableNodeDefUuidCols(state)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 
   return {
-    nodeDefUuidTable,
+    nodeDefUuidContext,
     nodeDefCols,
     colNames,
     data: DataVisState.getTableData(state),
@@ -137,4 +137,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, {updateDataTable, resetDataTable, updateDataFilter})(DataTable)
+export default connect(mapStateToProps, { updateDataTable, resetDataTable, updateDataFilter })(DataTable)

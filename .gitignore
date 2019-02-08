@@ -21,6 +21,7 @@ dist/
 .idea/
 *.iml
 .vscode/
+.eslintrc.json
 
 # MacOS
 .DS_Store

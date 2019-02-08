@@ -4,6 +4,9 @@ import { connect } from 'react-redux'
 
 import Record from '../../../../common/record/record'
 import RecordStep from '../../../../common/record/recordStep'
+import Validator from '../../../../common/validation/validator'
+
+import ErrorBadge from '../../../commonComponents/errorBadge'
 
 import { deleteRecord, updateRecordStep } from '../record/actions'
 import { appModuleUri } from '../../appModules'
@@ -17,37 +20,43 @@ const RecordEntryButtons = (props) => {
   const {
     history,
     step, stepNext, stepPrev,
+    valid,
     deleteRecord, updateRecordStep,
   } = props
 
   return (
     <React.Fragment>
 
-      {
-        stepPrev &&
-        <button className="btn-s btn-of"
-                onClick={() =>
-                  window.confirm(`Are sure you want to demote this record to ${RecordStep.getName(stepPrev)}?`)
-                    ? updateRecordStep(RecordStep.getId(stepPrev), history)
-                    : null
-                }>
-          <span className="icon icon-reply icon-12px"/>
-        </button>
-      }
+      <ErrorBadge validation={{ valid }} label="invalidRecord"/>
 
-      Step {RecordStep.getId(step)} ({RecordStep.getName(step)})
+      <div className="survey-form__nav-record-actions-steps">
+        {
+          stepPrev &&
+          <button className="btn-s btn-of"
+                  onClick={() =>
+                    confirm(`Are sure you want to demote this record to ${RecordStep.getName(stepPrev)}?`)
+                      ? updateRecordStep(RecordStep.getId(stepPrev), history)
+                      : null
+                  }>
+            <span className="icon icon-reply icon-12px"/>
+          </button>
+        }
 
-      {
-        stepNext &&
-        <button className="btn-s btn-of"
-                onClick={() =>
-                  window.confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
-                    ? updateRecordStep(RecordStep.getId(stepNext), history)
-                    : null
-                }>
-          <span className="icon icon-redo2 icon-12px"/>
-        </button>
-      }
+        <span>Step {RecordStep.getId(step)} ({RecordStep.getName(step)})</span>
+
+        {
+          stepNext &&
+          <button className="btn-s btn-of"
+                  aria-disabled={!valid}
+                  onClick={() =>
+                    confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
+                      ? updateRecordStep(RecordStep.getId(stepNext), history)
+                      : null
+                  }>
+            <span className="icon icon-redo2 icon-12px"/>
+          </button>
+        }
+      </div>
 
       <button className="btn-s btn-of btn-danger"
               onClick={() =>
@@ -68,6 +77,7 @@ const FormEntryActions = (props) => {
   const {
     history, preview,
     step, stepNext, stepPrev,
+    valid,
     deleteRecord, updateRecordStep,
   } = props
 
@@ -82,12 +92,14 @@ const FormEntryActions = (props) => {
             </Link>
           )
           : (
+            props.entry &&
             <RecordEntryButtons history={history}
                                 deleteRecord={deleteRecord}
                                 updateRecordStep={updateRecordStep}
                                 step={step}
                                 stepNext={stepNext}
-                                stepPrev={stepPrev}/>
+                                stepPrev={stepPrev}
+                                valid={valid}/>
           )
       }
     </div>
@@ -102,7 +114,8 @@ const mapStateToProps = (state) => {
   return {
     step: RecordStep.getStep(stepId),
     stepNext: RecordStep.getNextStep(stepId),
-    stepPrev: RecordStep.getPreviousStep(stepId)
+    stepPrev: RecordStep.getPreviousStep(stepId),
+    valid: Validator.isValid(record)
   }
 }
 

@@ -1,27 +1,34 @@
 import './errorBadge.scss'
 
 import React from 'react'
+import * as R from 'ramda'
+
 import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
+import Validator from '../../common/validation/validator'
 
-const ErrorBadge = ({validation, showLabel}) => {
+const ErrorBadge = ({ validation, showLabel, label }) => {
 
-  const invalid = validation && !validation.valid
+  const invalid = !Validator.isValidationValid(validation)
+
+  const validationFields = invalid ? getValidationFieldMessagesHTML(validation.fields) : []
 
   return invalid
     ? (
       <div className="badge error-badge">
         <div className="badge__content">
-          <span className="icon icon-warning icon-12px icon-left"/>
+          <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`}/>
           {
             showLabel &&
-            <span>INVALID</span>
+            <span>{label}</span>
           }
         </div>
-        <div className="messages">
-          {
-            getValidationFieldMessagesHTML(validation.fields)
-          }
-        </div>
+
+        {
+          !R.isEmpty(validationFields) &&
+          <div className="messages">
+            {validationFields}
+          </div>
+        }
       </div>
     )
     : null
@@ -30,6 +37,7 @@ const ErrorBadge = ({validation, showLabel}) => {
 ErrorBadge.defaultProps = {
   validation: null,
   showLabel: true,
+  label: 'INVALID'
 }
 
 export default ErrorBadge

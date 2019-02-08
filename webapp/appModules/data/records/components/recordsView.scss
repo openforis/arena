@@ -1,3 +1,9 @@
 .records {
   margin: 0 4rem;
+
+  .table__row {
+    .error-badge {
+      left: 4rem;
+    }
+  }
 }

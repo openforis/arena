@@ -1,3 +1,4 @@
+const R = require('ramda')
 const path = require('path')
 
 const WebSocketManager = require('../../webSocket/webSocketManager')
@@ -10,18 +11,34 @@ const recordThreadMessageTypes = require('./thread/recordThreadMessageTypes')
 
 const recordUpdateThreads = new ThreadsCache()
 const checkOutTimeoutsByUserId = {}
-
 const Record = require('../../../common/record/record')
 
 const RecordUpdateThread = require('./thread/recordUpdateThread')
 
-const createRecordUpdateThread = (user, surveyId, preview) => {
+// Users editing the same record
+let recordUsersMap = {}
+const addRecordUser = (recordUuid, userId) => { recordUsersMap = R.assocPath([recordUuid, userId], null, recordUsersMap) }
+const getRecordUsers = recordUuid => R.pipe(R.prop(recordUuid), R.keys)(recordUsersMap)
+const removeRecordUser = (recordUuid, userId) => { recordUsersMap = R.dissocPath([recordUuid, userId], recordUsersMap) }
+
+const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
   const userId = user.id
+
+  addRecordUser(recordUuid, userId)
+
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
-    {user, surveyId, preview},
-    nodes => WebSocketManager.notifyUser(userId, WebSocketEvents.nodesUpdate, nodes),
-    () => recordUpdateThreads.removeThread(userId)
+    { user, surveyId, recordUuid, preview },
+    msg => {
+      const recordUsers = getRecordUsers(recordUuid)
+      recordUsers.forEach(userId =>
+        WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
+      )
+    },
+    () => {
+      removeRecordUser(recordUuid, userId)
+      recordUpdateThreads.removeThread(userId)
+    }
   )
 
   recordUpdateThreads.putThread(userId, thread)
@@ -32,10 +49,10 @@ const createRecordUpdateThread = (user, surveyId, preview) => {
 /**
  * Start record update thread
  */
-const checkIn = (user, surveyId, preview) => {
+const checkIn = (user, surveyId, recordUuid, preview) => {
   cancelCheckOut(user.id)
   if (!recordUpdateThreads.getThread(user.id)) {
-    createRecordUpdateThread(user, surveyId, preview)
+    createRecordUpdateThread(user, surveyId, recordUuid, preview)
   }
 }
 
@@ -50,7 +67,6 @@ const checkOut = userId => {
       if (updateWorker) {
         updateWorker.terminate()
       }
-
       delete checkOutTimeoutsByUserId[userId]
     }, 1000)
   }
@@ -58,8 +74,10 @@ const checkOut = userId => {
 
 const cancelCheckOut = userId => {
   const timeout = checkOutTimeoutsByUserId[userId]
-  if (timeout)
+  if (timeout) {
     clearTimeout(timeout)
+    delete checkOutTimeoutsByUserId[userId]
+  }
 }
 
 /**
@@ -72,8 +90,13 @@ const cancelCheckOut = userId => {
  * @returns {Promise<void>}
  */
 const createRecord = async (user, surveyId, record) => {
-  const recordUpdateThread = RecordUpdateThread.newInstance({user, surveyId, preview: Record.isPreview(record)})
-  await recordUpdateThread.processMessage({type: recordThreadMessageTypes.createRecord, record})
+  const recordUpdateThread = RecordUpdateThread.newInstance({
+    user,
+    surveyId,
+    recordUuid: Record.getUuid(record),
+    preview: Record.isPreview(record)
+  })
+  await recordUpdateThread.processMessage({ type: recordThreadMessageTypes.createRecord, record })
 }
 
 /**
@@ -85,19 +108,36 @@ const createRecord = async (user, surveyId, record) => {
  */
 const persistNode = (user, surveyId, node) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.persistNode, node})
+  updateWorker.postMessage({ type: recordThreadMessageTypes.persistNode, node })
 }
 
 /**
  * Notify thread to delete a node
  *
  * @param user
- * @param surveyId
  * @param nodeUuid
  */
-const deleteNode = (user, surveyId, nodeUuid) => {
+const deleteNode = (user, nodeUuid) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
-  updateWorker.postMessage({type: recordThreadMessageTypes.deleteNode, nodeUuid})
+  updateWorker.postMessage({ type: recordThreadMessageTypes.deleteNode, nodeUuid })
+}
+
+/**
+ * Notify users editing a record that the record has been deleted
+ * Also does the checkOuts
+ *
+ * @param recordUuid
+ * @param userIdExclude Do not notify the user that has deleted the record
+ */
+const notifyUsersRecordDeleted = (recordUuid, userIdExclude) => {
+  const recordUsersIds = getRecordUsers(recordUuid)
+
+  recordUsersIds.forEach(id => {
+    if (id !== userIdExclude) {
+      WebSocketManager.notifyUser(id, WebSocketEvents.recordDelete, recordUuid)
+      checkOut(id)
+    }
+  })
 }
 
 module.exports = {
@@ -107,4 +147,6 @@ module.exports = {
   createRecord,
   persistNode,
   deleteNode,
+
+  notifyUsersRecordDeleted,
 }
