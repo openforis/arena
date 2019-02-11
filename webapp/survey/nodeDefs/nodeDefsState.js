@@ -21,7 +21,9 @@ export const assocNodeDefs = nodeDefs => nodeDefsState => {
   return R.filter(
     nodeDef => {
       const dirtyDef = R.prop(NodeDef.getUuid(nodeDef), dirtyDefs)
-      return !dirtyDef || NodeDef.hasSameProps(dirtyDef)(nodeDef)
+      return !dirtyDef ||
+        NodeDef.isNodeDefRoot(nodeDef) || // TODO check if needed
+        NodeDef.hasSameProps(dirtyDef)(nodeDef)
     },
     nodeDefs
   )
