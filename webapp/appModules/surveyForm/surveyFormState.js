@@ -102,8 +102,7 @@ export const getFormPageParentNode = nodeDef =>
         return Record.getRootNode(record)
       } else {
         const parentNodeUuid = getFormPageNodeUuid(nodeDefParent)(state)
-        const node = Record.getNodeByUuid(parentNodeUuid)(record)
-        return node
+        return Record.getNodeByUuid(parentNodeUuid)(record)
       }
 
     }
@@ -118,6 +117,12 @@ export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
   R.ifElse(
     () => NodeDef.isNodeDefEntity(nodeDef) && !!getPageUuid(nodeDef),
     assocFormActivePage(nodeDef),
+    R.identity,
+  ),
+  // if is entity remove assocNodeDefAddChildTo
+  R.ifElse(
+    () => NodeDef.isNodeDefEntity(nodeDef),
+    assocNodeDefAddChildTo(null),
     R.identity,
   )
 )

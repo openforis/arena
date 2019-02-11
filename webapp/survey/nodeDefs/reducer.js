@@ -1,7 +1,3 @@
-import * as R from 'ramda'
-
-import NodeDef from '../../../common/survey/nodeDef'
-
 import { exportReducer } from '../../appUtils/reduxUtils'
 
 import { appUserLogout } from '../../app/actions'
@@ -19,7 +15,7 @@ import {
 import {
   assocNodeDef,
   assocNodeDefProp,
-  assocNodeDefs,
+  // assocNodeDefs,
   dissocNodeDef,
 } from './nodeDefsState'
 
@@ -31,7 +27,8 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [nodeDefsLoad]: (state = {}, { nodeDefs }) => assocNodeDefs(nodeDefs)(state),
+  // [nodeDefsLoad]: (state = {}, { nodeDefs }) => assocNodeDefs(nodeDefs)(state),
+  [nodeDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
 
   [surveyDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
 
