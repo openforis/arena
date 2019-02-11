@@ -50,7 +50,7 @@ class RecordUpdater {
       return await this._updateNodeValue(survey, record, uuid, Node.getNodeValue(node), t)
     } else {
       // create
-      return await this._insertNode(survey, record, node, user, t)
+      return await this.insertNode(survey, record, node, user, t)
     }
   }
 
@@ -77,7 +77,7 @@ class RecordUpdater {
   //==========
 
   // ==== CREATE
-  async _insertNode (survey, record, node, user, t) {
+  async insertNode (survey, record, node, user, t) {
     const nodeDefUuid = Node.getNodeDefUuid(node)
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 

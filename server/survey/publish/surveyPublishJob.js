@@ -7,6 +7,7 @@ const SurveyInfoValidationJob = require('./surveyInfoValidationJob')
 const SurveyPropsPublishJob = require('./surveyPropsPublishJob')
 const SurveyDependencyGraphsGenerationJob = require('./surveyDependencyGraphsGenerationJob')
 const SurveyRdbGeneratorJob = require('./surveyRdbGeneratorJob')
+const RecordInitializeJob = require('./recordInitializeJob')
 
 class SurveyPublishJob extends Job {
 
@@ -18,6 +19,7 @@ class SurveyPublishJob extends Job {
       new SurveyInfoValidationJob(params),
       new SurveyPropsPublishJob(params),
       new SurveyDependencyGraphsGenerationJob(params),
+      new RecordInitializeJob(params),
       new SurveyRdbGeneratorJob(params),
     ])
   }
