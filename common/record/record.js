@@ -169,7 +169,7 @@ const assocNodes = nodes =>
         const dirtyNode = R.prop(Node.getUuid(n), dirtyNodes)
         return !dirtyNode ||
           Node.isDirty(n) ||
-          Node.getNodeValue(dirtyNode) === Node.getNodeValue(n) ||
+          R.equals(Node.getNodeValue(dirtyNode), Node.getNodeValue(n)) ||
           Node.isNodeValueBlank(dirtyNode) && Node.isDefaultValueApplied(n)
       },
       nodes)
