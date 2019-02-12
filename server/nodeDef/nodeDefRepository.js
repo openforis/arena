@@ -10,10 +10,11 @@ const dbTransformCallback = (nodeDef, draft, advanced = false) => {
   const def = advanced ?
     R.pipe(
       def => R.isEmpty(nodeDef.props_advanced_draft)
-        ? R.assoc('draft_advanced', true, def)
-        : def,
+        ? def
+        : R.assoc('draft_advanced', true, def),
       R.assoc('props', R.mergeDeepLeft(nodeDef.props, nodeDef.props_advanced)),
       R.assoc('props_draft', R.mergeDeepLeft(nodeDef.props_draft, nodeDef.props_advanced_draft)),
+      R.omit(['props_advanced', 'props_advanced_draft'])
     )(nodeDef)
     : nodeDef
 

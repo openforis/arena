@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const { toUuidIndexedObj } = require('../../../common/survey/surveyUtils')
+
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
@@ -22,35 +24,52 @@ class RecordCheckJob extends Job {
   async execute (tx) {
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, true, true, false, tx)
 
-    const nodeDefsNew = R.pipe(
-      Survey.getNodeDefsArray,
-      R.reject(NodeDef.isNodeDefPublished)
-    )(survey)
+    const nodeDefsNew = []
+    const nodeDefsUpdated = []
 
-    const recordUuids = await RecordManager.fetchRecordUuids(this.surveyId, tx)
+    Survey.getNodeDefsArray(survey).forEach(def => {
+      if (!NodeDef.isNodeDefPublished(def)) {
+        nodeDefsNew.push(def)
+      } else if (R.prop(NodeDef.keys.draftAdvanced, def)) {
+        nodeDefsUpdated.push(def)
+      }
+    })
 
-    for (const recordUuid of recordUuids) {
-      const record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, tx)
-      await this.checkRecord(survey, nodeDefsNew, record, tx)
+    if (!(R.isEmpty(nodeDefsNew) && R.isEmpty(nodeDefsUpdated))) {
+      const recordUuids = await RecordManager.fetchRecordUuids(this.surveyId, tx)
+
+      for (const recordUuid of recordUuids) {
+        const record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, tx)
+        await this.checkRecord(survey, nodeDefsNew, nodeDefsUpdated, record, tx)
+      }
     }
   }
 
-  async checkRecord (survey, nodeDefsNew, record, tx) {
+  async checkRecord (survey, nodeDefsNew, nodeDefsUpdated, record, tx) {
     // 1. insert missing nodes
-    const recordWithAllNodes = await RecordMissingNodesCreator.insertMissingSingleNodes(survey, record, this.user, tx)
+    const missingNodesUpdated = await RecordMissingNodesCreator.insertMissingSingleNodes(survey, nodeDefsNew, record, this.user, tx)
+    record = Record.assocNodes(missingNodesUpdated)(record)
 
     // 2. apply default values
-    const recordWithDefaultValuesApplied = await applyDefaultValues(survey, recordWithAllNodes, tx)
+    const defaultValuesUpdated = await applyDefaultValues(survey, nodeDefsUpdated, record, missingNodesUpdated, tx)
+    record = Record.assocNodes(defaultValuesUpdated)(record)
 
     // 3. validate nodes
-    await RecordValidationManager.validateNodes(survey, recordWithDefaultValuesApplied,
-      Record.getNodes(recordWithDefaultValuesApplied), false, tx)
+    const nodesToValidate = R.mergeRight(missingNodesUpdated, defaultValuesUpdated)
+    await RecordValidationManager.validateNodes(survey, record, nodesToValidate, false, tx)
   }
 }
 
-const applyDefaultValues = async (survey, record, tx) => {
-  const updatedNodes = await DependentNodesUpdater.updateNodes(survey, record, Record.getNodes(record), tx)
-  return Record.assocNodes(updatedNodes)(record)
+const applyDefaultValues = async (survey, nodeDefsUpdated, record, newNodes, tx) => {
+  const updatedNodes = R.pipe(
+    R.map(def => Record.getNodesByDefUuid(NodeDef.getUuid(def))(record)),
+    R.flatten,
+    toUuidIndexedObj
+  )(nodeDefsUpdated)
+
+  const nodesToUpdate = R.mergeRight(newNodes, updatedNodes)
+
+  return await DependentNodesUpdater.updateNodes(survey, record, nodesToUpdate, tx)
 }
 
 RecordCheckJob.type = 'RecordCheckJob'

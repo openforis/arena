@@ -27,7 +27,7 @@ const keys = {
   props: 'props',
   validation: 'validation',
   meta: 'meta',
-  dirty: 'dirty',
+  draftAdvanced: 'draftAdvanced'
 }
 
 const propKeys = {
