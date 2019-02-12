@@ -62,7 +62,7 @@ class NodeDefSwitch extends React.Component {
       nodeDef,
       edit, canEditDef,
       renderType, label, applicable,
-      entry, parentNode, nodes
+      parentNode, nodes
     } = this.props
 
     const isPage = !!Layout.getPageUuid(nodeDef)

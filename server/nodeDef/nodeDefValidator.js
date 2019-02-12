@@ -7,6 +7,7 @@ const {
   validateItemPropUniqueness,
   validateRequired,
   validateNotKeyword,
+  validateName,
   cleanup
 } = require('../../common/validation/validator')
 
@@ -82,6 +83,7 @@ const propsValidations = survey => ({
   [`${keys.props}.${propKeys.name}`]: [
     validateRequired,
     validateNotKeyword,
+    validateName,
     validateItemPropUniqueness(Survey.getNodeDefsArray(survey))
   ],
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
@@ -135,5 +137,6 @@ const validateNodeDefs = async (nodeDefs) => {
 
 module.exports = {
   validateNodeDefs,
+  validateNodeDef,
 }
 

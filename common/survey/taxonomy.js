@@ -3,6 +3,7 @@ const R = require('ramda')
 
 const {
   getProp,
+  getUuid,
 } = require('./surveyUtils')
 
 const taxonomyPropKeys = {
@@ -17,6 +18,11 @@ const taxonPropKeys = {
   scientificName: 'scientificName',
   vernacularNames: 'vernacularNames',
   vernacularNameUuid: 'vernacularNameUuid',
+}
+
+const vernacularNamePropKeys = {
+  name: 'name',
+  lang: 'lang'
 }
 
 const unlistedCode = 'UNL'
@@ -52,6 +58,7 @@ const getTaxonVernacularName = lang => R.pipe(
 
 module.exports = {
   taxonPropKeys,
+  vernacularNamePropKeys,
   unlistedCode,
   unknownCode,
 
@@ -60,6 +67,7 @@ module.exports = {
   newTaxon,
 
   //READ
+  getUuid,
   getTaxonomyName: getProp(taxonomyPropKeys.name, ''),
   getTaxonomyVernacularLanguageCodes: getProp(taxonomyPropKeys.vernacularLanguageCodes, []),
   getTaxonCode,

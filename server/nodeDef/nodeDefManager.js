@@ -21,7 +21,10 @@ const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props, clie
 
     await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, {parentUuid, uuid, type, props}, t)
 
-    return nodeDef
+    return {
+      ...nodeDef,
+      validation: await NodeDefValidator.validateNodeDef({}, nodeDef)
+    }
   })
 
 const createEntityDef = async (user, surveyId, parentUuid, uuid, props, client = db) =>

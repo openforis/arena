@@ -26,6 +26,7 @@ const errorKeys = {
   keyword: 'keyword',
   invalidNumber: 'invalidNumber',
   zeroOrNegative: 'zeroOrNegative',
+  invalidName: 'invalidName'
 }
 
 const keys = {
@@ -38,6 +39,12 @@ const keys = {
 const validValidation = {
   [keys.valid]: true
 }
+
+/**
+ * Internal names must contain only lowercase letters, numbers and underscores,
+ * starting with a letter
+ */
+const validNameRegex = /^[a-z][a-z0-9_]*$/
 
 const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
 
@@ -109,6 +116,13 @@ const validateNotKeyword = (propName, item) =>
   R.contains(getProp(propName)(item), keywords)
     ? errorKeys.keyword
     : null
+
+const validateName = (propName, item) => {
+  const prop = getProp(propName)(item)
+  return !prop || validNameRegex.test(prop)
+    ? null
+    : errorKeys.invalidName
+}
 
 const validateNumber = (propName, item) => {
   const value = getProp(propName)(item)
@@ -220,6 +234,7 @@ module.exports = {
   validateRequired,
   validateItemPropUniqueness,
   validateNotKeyword,
+  validateName,
   validatePositiveNumber,
 
   // READ

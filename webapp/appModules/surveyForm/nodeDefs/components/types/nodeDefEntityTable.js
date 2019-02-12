@@ -94,7 +94,7 @@ class NodeDefEntityTable extends React.Component {
               ? <button className="btn btn-s btn-of-light-xs"
                         style={{ marginLeft: '10px' }}
                         onClick={() => {
-                          const entity = Node.newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
+                          const entity = Node.newNodePlaceholder(nodeDef, parentNode)
                           updateNode(nodeDef, entity)
                         }}
                         aria-disabled={!canAddNode}>

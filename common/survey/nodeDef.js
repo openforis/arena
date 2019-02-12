@@ -27,6 +27,7 @@ const keys = {
   props: 'props',
   validation: 'validation',
   meta: 'meta',
+  dirty: 'dirty',
 }
 
 const propKeys = {
@@ -197,6 +198,12 @@ module.exports = {
   isNodeDefFile,
 
   isNodeDefPublished,
+
+  isNodeDefDirty: R.propEq(keys.dirty, true),
+  hasSameProps: otherNodeDef => R.pipe(
+    R.prop(keys.props),
+    R.equals(R.prop(keys.props, otherNodeDef))
+  ),
 
   //advanced props
   getDefaultValues: SurveyUtils.getProp(propKeys.defaultValues, []),

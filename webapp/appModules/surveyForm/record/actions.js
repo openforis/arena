@@ -76,10 +76,11 @@ export const updateNode = (nodeDef, node, value, file = null) => dispatch => {
   const nodeToUpdate = R.pipe(
     R.dissoc(Node.keys.placeholder),
     R.assoc(Node.keys.value, value),
+    R.assoc(Node.keys.dirty, true)
   )(node)
 
   recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate })(dispatch)
-  dispatch(_updateNodeDebounced(nodeToUpdate, file, node.placeholder ? 0 : 500))
+  dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
 }
 
 const _updateNodeDebounced = (node, file, delay) => {

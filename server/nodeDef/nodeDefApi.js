@@ -29,7 +29,7 @@ module.exports.init = app => {
       const surveyId = getRestParam(req, 'surveyId')
       const draft = getBoolParam(req, 'draft')
       const validate = getBoolParam(req, 'validate')
-      const advanced = validate //fetch advanced props if validating
+      const advanced = true // always fetch advanced props (TODO fetch only what is needed)
 
       const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate)
 

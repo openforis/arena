@@ -17,7 +17,7 @@ $tableRowHeaderHeight: 40px;
     grid-template-columns: 1fr 200px;
 
     &.form-actions-off {
-      grid-template-columns: 1fr 0px;
+      grid-template-columns: 1fr 0;
 
       .survey-form__actions {
         .btn-toggle {
@@ -60,10 +60,19 @@ $tableRowHeaderHeight: 40px;
 }
 
 .survey-form__nav-record-actions {
+  display: flex;
   align-self: center;
 
   > * {
     margin: 0 1rem;
+  }
+
+  .error-badge {
+    position: relative;
+  }
+
+  .survey-form__nav-record-actions-steps > * {
+    margin: 0 .5rem;
   }
 }
 
@@ -164,7 +173,7 @@ $tableRowHeaderHeight: 40px;
 .node_def__icon {
   font-size: .8rem;
   font-weight: 600;
-  letter-spacing: 0px;
+  letter-spacing: 0;
 }
 
 //===

@@ -16,7 +16,8 @@ const keys = {
   value: 'value',
   meta: 'meta',
   placeholder: 'placeholder',
-  deleted: 'deleted'
+  deleted: 'deleted',
+  dirty: 'dirty'
 }
 
 const metaKeys = {
@@ -144,6 +145,7 @@ module.exports = {
 
   isPlaceholder: R.propEq(keys.placeholder, true),
   isDeleted: R.propEq(keys.deleted, true),
+  isDirty: R.propEq(keys.dirty, true),
 
   getValidation: Validator.getValidation,
 

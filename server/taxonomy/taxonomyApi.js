@@ -1,5 +1,5 @@
 const { sendErr } = require('../serverUtils/response')
-const { getRestParam, getBoolParam, getJsonParam } = require('../serverUtils/request')
+const { getRestParam, getBoolParam } = require('../serverUtils/request')
 const { toUuidIndexedObj } = require('../../common/survey/surveyUtils')
 
 const JobManager = require('../job/jobManager')
@@ -77,20 +77,43 @@ module.exports.init = app => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
+      const filterProp = getRestParam(req, 'filterProp')
+      const filterValue = getRestParam(req, 'filterValue')
+
       const draft = getBoolParam(req, 'draft')
-      const limit = getRestParam(req, 'limit', 25)
+      const limit = getRestParam(req, 'limit', 20)
       const offset = getRestParam(req, 'offset', 0)
       const includeUnlUnk = getRestParam(req, 'includeUnlUnk', false)
-      const filter = getJsonParam(req, 'filter')
-      const sort = { field: 'scientificName', asc: true }
 
-      const params = {
-        filter, sort, limit, offset, includeUnlUnk
+      let taxa
+      if (filterProp) {
+        if (filterProp === 'vernacularName') {
+          taxa = await TaxonomyManager.fetchTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+        } else {
+          taxa = await TaxonomyManager.fetchTaxaByPropLike(surveyId, taxonomyUuid, filterProp, filterValue, draft, includeUnlUnk)
+        }
+      } else {
+        taxa = await TaxonomyManager.fetchAllTaxa(surveyId, taxonomyUuid, draft, limit, offset)
       }
 
-      const taxa = await TaxonomyManager.fetchTaxaByPropLike(surveyId, taxonomyUuid, params, draft)
-
       res.json({ taxa })
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/taxon', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const taxonUuid = getRestParam(req, 'taxonUuid')
+      const vernacularNameUuid = getRestParam(req, 'vernacularNameUuid')
+      const draft = getBoolParam(req, 'draft')
+
+      const taxon = vernacularNameUuid
+        ? await TaxonomyManager.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, draft)
+        : await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid, draft)
+
+      res.json({ taxon })
     } catch (err) {
       sendErr(res, err)
     }

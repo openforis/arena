@@ -6,6 +6,8 @@ import Record from '../../../../common/record/record'
 import RecordStep from '../../../../common/record/recordStep'
 import Validator from '../../../../common/validation/validator'
 
+import ErrorBadge from '../../../commonComponents/errorBadge'
+
 import { deleteRecord, updateRecordStep } from '../record/actions'
 import { appModuleUri } from '../../appModules'
 import { designerModules } from '../../designer/designerModules'
@@ -25,33 +27,36 @@ const RecordEntryButtons = (props) => {
   return (
     <React.Fragment>
 
-      {
-        stepPrev &&
-        <button className="btn-s btn-of"
-                onClick={() =>
-                  confirm(`Are sure you want to demote this record to ${RecordStep.getName(stepPrev)}?`)
-                    ? updateRecordStep(RecordStep.getId(stepPrev), history)
-                    : null
-                }>
-          <span className="icon icon-reply icon-12px"/>
-        </button>
-      }
+      <ErrorBadge validation={{ valid }} label="invalidRecord"/>
 
-      Step {RecordStep.getId(step)} ({RecordStep.getName(step)})
+      <div className="survey-form__nav-record-actions-steps">
+        {
+          stepPrev &&
+          <button className="btn-s btn-of"
+                  onClick={() =>
+                    confirm(`Are sure you want to demote this record to ${RecordStep.getName(stepPrev)}?`)
+                      ? updateRecordStep(RecordStep.getId(stepPrev), history)
+                      : null
+                  }>
+            <span className="icon icon-reply icon-12px"/>
+          </button>
+        }
 
-      {
-        stepNext &&
-        <button className="btn-s btn-of"
-                onClick={() =>
-                  valid
-                    ? confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
-                    ? updateRecordStep(RecordStep.getId(stepNext), history)
-                    : null
-                    : alert('Cannot promote record: it contains errors.\nPlease fix them and try again.')
-                }>
-          <span className="icon icon-redo2 icon-12px"/>
-        </button>
-      }
+        <span>Step {RecordStep.getId(step)} ({RecordStep.getName(step)})</span>
+
+        {
+          stepNext &&
+          <button className="btn-s btn-of"
+                  aria-disabled={!valid}
+                  onClick={() =>
+                    confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
+                      ? updateRecordStep(RecordStep.getId(stepNext), history)
+                      : null
+                  }>
+            <span className="icon icon-redo2 icon-12px"/>
+          </button>
+        }
+      </div>
 
       <button className="btn-s btn-of btn-danger"
               onClick={() =>

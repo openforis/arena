@@ -1,7 +1,8 @@
 const db = require('../db/db')
-const {uuidv4} = require('../../common/uuid')
+const { uuidv4 } = require('../../common/uuid')
 
-const {jobEvents, jobStatus} = require('./jobUtils')
+const { jobEvents, jobStatus } = require('./jobUtils')
+const { throttle } = require('../../common/functionsDefer')
 
 class JobEvent {
 
@@ -18,7 +19,7 @@ class Job {
   constructor (type, params, innerJobs = []) {
     this.params = params
 
-    const {user, surveyId} = params
+    const { user, surveyId } = params
 
     this.user = user
     this.userId = user.id
@@ -60,7 +61,7 @@ class Job {
           await this.execute(tx)
         } catch (e) {
           console.log('** Error in job ', e)
-          this.addError({systemError: {valid: false, errors: [e.toString()]}})
+          this.addError({ systemError: { valid: false, errors: [e.toString()] } })
           this.setStatusFailed()
         }
       }
@@ -180,7 +181,12 @@ class Job {
 
   incrementProcessedItems () {
     this.processed++
-    this.notifyEvent(this.createJobEvent(jobEvents.progress))
+
+    throttle(
+      () => this.notifyEvent(this.createJobEvent(jobEvents.progress)),
+      `job-${this.uuid}-progress`,
+      1000
+    )()
   }
 
   notifyEvent (event) {
@@ -192,7 +198,6 @@ class Job {
   createJobEvent (type) {
     return new JobEvent(type, this.status, this.total, this.processed)
   }
-
 }
 
 module.exports = Job

@@ -6,7 +6,7 @@ import * as R from 'ramda'
 import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
 import Validator from '../../common/validation/validator'
 
-const ErrorBadge = ({ validation, showLabel }) => {
+const ErrorBadge = ({ validation, showLabel, label }) => {
 
   const invalid = !Validator.isValidationValid(validation)
 
@@ -19,7 +19,7 @@ const ErrorBadge = ({ validation, showLabel }) => {
           <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`}/>
           {
             showLabel &&
-            <span>INVALID</span>
+            <span>{label}</span>
           }
         </div>
 
@@ -37,6 +37,7 @@ const ErrorBadge = ({ validation, showLabel }) => {
 ErrorBadge.defaultProps = {
   validation: null,
   showLabel: true,
+  label: 'INVALID'
 }
 
 export default ErrorBadge

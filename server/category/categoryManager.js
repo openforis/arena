@@ -186,6 +186,7 @@ module.exports = {
   fetchItemsByCategoryUuid: CategoryRepository.fetchItemsByCategoryUuid,
   fetchItemsByParentUuid: CategoryRepository.fetchItemsByParentUuid,
   fetchItemByUuid: CategoryRepository.fetchItemByUuid,
+  fetchItemsByLevelIndex: CategoryRepository.fetchItemsByLevelIndex,
 
   //UPDATE
   publishProps,
