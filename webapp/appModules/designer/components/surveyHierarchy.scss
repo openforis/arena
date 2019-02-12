@@ -1,0 +1,69 @@
+// /** tree layout **/
+// .tree-layout {
+//   /* font: 9px; */
+//   font-size: 12px;
+// }
+// .tree-layout circle.leaf {
+//   fill: rgb(236, 240, 241);
+//   fill-opacity: .37;
+// }
+// .tree-layout circle.node {
+//   fill: #52849b;
+//   fill-opacity: .60;
+//   cursor: pointer;
+// }
+// .tree-layout .node text {
+//   fill: #FFF;
+// }
+// .tree-layout text.node {
+//   cursor: pointer;
+// }
+// .tree-layout path.link {
+//   fill: none;
+//   stroke: #BCE2F4;
+//   stroke-width: 1.5px;
+//   stroke-opacity: .2;
+// }
+@import "../../../style/vars";
+
+.survey-hierarchy {
+  display: grid;
+  grid-template-columns: .95fr 240px;
+
+}
+
+.survey-hierarchy__attributes {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  align-content: start;
+  grid-row-gap: .3rem;
+}
+
+.survey-hierarchy__tree {
+
+  .node {
+    cursor: pointer;
+
+    circle {
+      fill: #52849b;
+      fill-opacity: .60;
+
+      &:hover{
+        fill: #52849b;
+      }
+    }
+
+    text {
+      font-size: 12px;
+      fill: $white;
+    }
+  }
+
+  .link {
+    fill: none;
+    stroke: rgba($blue2, .8);
+    stroke-width: 1.5px;
+    stroke-opacity: .2;
+  }
+}
