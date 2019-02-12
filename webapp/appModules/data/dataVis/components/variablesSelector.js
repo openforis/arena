@@ -1,4 +1,4 @@
-import './variablesSelector.scss'
+import './tableSelector.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -16,6 +16,7 @@ class Variables extends React.Component {
       nodeDefParent, childDefs, lang,
       nodeDefVariableUuids, toggleNodeDefVariable,
       filterTypes,
+      showAncestors,
     } = this.props
 
     const filtered = nodeDef => NodeDef.isNodeDefAttribute(nodeDef) &&
@@ -44,14 +45,14 @@ class Variables extends React.Component {
           }
 
           {
-            nodeDefParent &&
+            nodeDefParent && showAncestors &&
             <React.Fragment>
               <div className="node-def-label">{NodeDef.getNodeDefLabel(nodeDefParent, lang)}</div>
               <VariablesConnect nodeDefUuid={NodeDef.getUuid(nodeDefParent)}
                                 lang={lang}
                                 nodeDefVariableUuids={nodeDefVariableUuids}
                                 toggleNodeDefVariable={toggleNodeDefVariable}
-                                filterTypes={filterTypes}/>
+                                filterTypes={filterTypes} />
             </React.Fragment>
           }
 
@@ -64,10 +65,11 @@ class Variables extends React.Component {
 Variables.defaultProps = {
   nodeDefUuid: null,
   lang: null,
+  showAncestors: true,
 }
 
 const mapStateToProps = (state, props) => {
-  const {nodeDefUuid} = props
+  const { nodeDefUuid } = props
   const survey = SurveyState.getSurvey(state)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -86,11 +88,11 @@ class VariablesSelector extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    this.state = {nodeDefVariableUuids: []}
+    this.state = { nodeDefVariableUuids: [] }
   }
 
   toggleNodeDefVariable (nodeDefUuid) {
-    const {nodeDefVariableUuids: nodeDefVariableUuidsState} = this.state
+    const { nodeDefVariableUuids: nodeDefVariableUuidsState } = this.state
 
     const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefVariableUuidsState)
     const fn = idx >= 0 ? R.remove(idx, 1) : R.append(nodeDefUuid)
@@ -100,26 +102,31 @@ class VariablesSelector extends React.PureComponent {
   }
 
   updateNodeDefVariableUuids (nodeDefVariableUuids) {
-    this.setState({nodeDefVariableUuids})
-    this.props.onChange(nodeDefVariableUuids)
+    const { canSelectVariables } = this.props
+
+    if (canSelectVariables) {
+      this.setState({ nodeDefVariableUuids })
+      this.props.onChange(nodeDefVariableUuids)
+    }
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
-    const {nodeDefUuid} = this.props
-    const {nodeDefUuid: nodeDefUuidPrev} = prevProps
+    const { nodeDefUuid } = this.props
+    const { nodeDefUuid: nodeDefUuidPrev } = prevProps
     if (nodeDefUuid !== nodeDefUuidPrev)
       this.updateNodeDefVariableUuids([])
   }
 
   render () {
-    const {nodeDefUuid, lang, filterTypes} = this.props
-    const {nodeDefVariableUuids} = this.state
+    const { nodeDefUuid, lang, filterTypes, showAncestors } = this.props
+    const { nodeDefVariableUuids } = this.state
 
     return (
       <VariablesConnect nodeDefUuid={nodeDefUuid} lang={lang}
                         nodeDefVariableUuids={nodeDefVariableUuids}
                         toggleNodeDefVariable={this.toggleNodeDefVariable.bind(this)}
-                        filterTypes={filterTypes}/>
+                        filterTypes={filterTypes}
+                        showAncestors={showAncestors} />
     )
   }
 
@@ -129,6 +136,7 @@ VariablesSelector.defaultProps = {
   nodeDefUuid: null,
   lang: null,
   filterTypes: [],
+  showAncestors: true,
 }
 
 export default VariablesSelector

@@ -1,6 +1,6 @@
 @import "../../../../style/vars";
 
-.variables-selector {
+.tables-selector {
   position: relative;
   height: 100%;
   overflow-y: auto;
@@ -8,7 +8,7 @@
   justify-items: center;
 }
 
-.variables-selector__container {
+.tables-selector__container {
   position: absolute;
   height: 100%;
   width: 100%;
@@ -62,10 +62,9 @@
       color: rgba($white, .7);
     }
   }
-
 }
 
-.variables-selector__settings {
+.tables-selector__settings {
   background-color: rgba($grey, .1);
   display: flex;
   flex-wrap: wrap;

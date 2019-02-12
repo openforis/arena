@@ -20,7 +20,7 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
     .attr('width', width + margin.right + margin.left)
     .attr('height', height + margin.top + margin.bottom)
     .append('g')
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+    .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
   const duration = 500
 
@@ -77,7 +77,7 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
     // Enter any new modes at the parent's previous position
     const nodeEnter = node.enter().append('g')
       .attr('class', 'node')
-      .attr('transform', d => 'translate(' + source.y0 + ',' + source.x0 + ')')
+      .attr('transform', d => `translate(${source.y0}, ${source.x0})`)
 
     // Add Circle for the nodes
     nodeEnter.append('circle')
@@ -94,8 +94,8 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
 
       .on('mouseover', (d, i, nodes) => d3.select(nodes[i]).attr('background-color', 'rgba(222, 220, 203, 0.25)'))
       .append('text')
-      .attr('dy', '.35rem')
-      .attr('x', d => d.children ? -(nodeLabelDist) : (nodeLabelDist))
+      .attr('alignment-baseline', 'middle')
+      .attr('x', d => d.children || d._children ? -(nodeLabelDist) : (nodeLabelDist))
       .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
       // .attr('text-anchor', d => 'end')
       .text(d => NodeDef.getNodeDefLabel(d.data, lang))
@@ -119,7 +119,7 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
     // Transition to the proper position for the node
     nodeUpdate.transition()
       .duration(duration)
-      .attr('transform', d => 'translate(' + d.y + ',' + d.x + ')')
+      .attr('transform', d => `translate(${d.y}, ${d.x})`)
 
     // Update the node attributes and style
     nodeUpdate.select('circle.node')
@@ -130,7 +130,7 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
     // Remove any exiting nodes
     const nodeExit = node.exit().transition()
       .duration(duration)
-      .attr('transform', d => 'translate(' + source.y + ',' + source.x + ')')
+      .attr('transform', d => `translate(${source.y}, ${source.x})`)
       .remove()
 
     // On exit reduce the node circles size to 0

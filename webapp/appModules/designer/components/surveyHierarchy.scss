@@ -29,15 +29,11 @@
 .survey-hierarchy {
   display: grid;
   grid-template-columns: .95fr 240px;
-
 }
 
 .survey-hierarchy__attributes {
   height: 100%;
   width: 100%;
-  display: grid;
-  align-content: start;
-  grid-row-gap: .3rem;
 }
 
 .survey-hierarchy__tree {
