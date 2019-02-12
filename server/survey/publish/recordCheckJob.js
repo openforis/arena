@@ -1,3 +1,7 @@
+const R = require('ramda')
+
+const Survey = require('../../../common/survey/survey')
+const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
 
 const SurveyManager = require('../../survey/surveyManager')
@@ -9,22 +13,29 @@ const RecordMissingNodesCreator = require('./helpers/recordMissingNodesCreator')
 
 const Job = require('../../job/job')
 
-class RecordInitializeJob extends Job {
+class RecordCheckJob extends Job {
 
   constructor (params) {
-    super(RecordInitializeJob.type, params)
+    super(RecordCheckJob.type, params)
   }
 
   async execute (tx) {
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, false, true, false, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, true, true, false, tx)
+
+    const nodeDefsNew = R.pipe(
+      Survey.getNodeDefsArray,
+      R.reject(NodeDef.isNodeDefPublished)
+    )(survey)
+
     const recordUuids = await RecordManager.fetchRecordUuids(this.surveyId, tx)
+
     for (const recordUuid of recordUuids) {
       const record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, tx)
-      await this.initializeRecord(survey, record, tx)
+      await this.checkRecord(survey, nodeDefsNew, record, tx)
     }
   }
 
-  async initializeRecord (survey, record, tx) {
+  async checkRecord (survey, nodeDefsNew, record, tx) {
     // 1. insert missing nodes
     const recordWithAllNodes = await RecordMissingNodesCreator.insertMissingSingleNodes(survey, record, this.user, tx)
 
@@ -42,6 +53,6 @@ const applyDefaultValues = async (survey, record, tx) => {
   return Record.assocNodes(updatedNodes)(record)
 }
 
-RecordInitializeJob.type = 'RecordInitializeJob'
+RecordCheckJob.type = 'RecordCheckJob'
 
-module.exports = RecordInitializeJob
+module.exports = RecordCheckJob

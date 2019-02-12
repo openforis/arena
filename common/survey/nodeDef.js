@@ -199,12 +199,6 @@ module.exports = {
 
   isNodeDefPublished,
 
-  isNodeDefDirty: R.propEq(keys.dirty, true),
-  hasSameProps: otherNodeDef => R.pipe(
-    R.prop(keys.props),
-    R.equals(R.prop(keys.props, otherNodeDef))
-  ),
-
   //advanced props
   getDefaultValues: SurveyUtils.getProp(propKeys.defaultValues, []),
   getCalculatedValues: SurveyUtils.getProp(propKeys.calculatedValues, []),
