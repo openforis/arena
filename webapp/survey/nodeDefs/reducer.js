@@ -15,6 +15,7 @@ import {
 import {
   assocNodeDef,
   assocNodeDefProp,
+  // assocNodeDefs,
   dissocNodeDef,
 } from './nodeDefsState'
 
@@ -26,7 +27,9 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
+  // [nodeDefsLoad]: (state = {}, { nodeDefs }) => assocNodeDefs(nodeDefs)(state),
   [nodeDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
+
   [surveyDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
 
   // single nodeDef actions
