@@ -1,118 +1,119 @@
 import * as d3 from 'd3'
+
 import NodeDef from '../../../../common/survey/nodeDef'
+
+const svgMargin = { top: 40, right: 100, bottom: 40, left: 100 }
 
 const nodeRadiusInit = 1e-6
 const nodeRadius = 10
 const nodeLabelDist = nodeRadius + 3
-const duration = 500
+const nodeLinkLength = 200
+
+const transitionDuration = 500
 
 export default class SurveyHierarchyTree {
-  constructor (treeElement, treeData, lang, onEntityClick) {
-    this.uuidNode = {}
+
+  constructor (domElement, data, lang, onEntityClick) {
+    this.nodesByUuidMap = {}
     this.lang = lang
-
+    this.data = data
+    this.domElement = domElement
     this.onEntityClick = onEntityClick
-    this.i = 0
 
+    this.svg = null
+    this.tree = null
+    this.root = null
+
+    this.initSvg()
+  }
+
+  collapseNode (node) {
+    if (node.children) {
+      node._children = node.children
+      node._children.forEach((child) => this.collapseNode(child))
+      node.children = null
+    }
+  }
+
+  toggleNode (node) {
+    if (node.children) {
+      this.collapseNode(node)
+    } else {
+      node.children = node._children
+      node._children = null
+    }
+
+    this.update(node)
+  }
+
+  initNode (node, collapseChildren = false) {
+    this.nodesByUuidMap[node.data.uuid] = node
+
+    if (node.children) {
+      node.children.forEach(childNode => {
+        this.initNode(childNode)
+
+        if (collapseChildren) {
+          this.collapseNode(childNode)
+        }
+      })
+
+    }
+  }
+
+  initSvg () {
     // Set the dimensions and margins of the diagram
-    const margin = { top: 40, right: 100, bottom: 40, left: 100 }
-    const width = treeElement.clientWidth - margin.left - margin.right
-    const height = treeElement.clientHeight - margin.top - margin.bottom
+
+    const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
+    const height = this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
 
     // append the svg object to the body of the page
     // appends a 'group' element to 'svg'
     // moves the 'group' element to the top left margin
-    this.svg = d3.select(treeElement)
+    this.svg = d3.select(this.domElement)
       .append('svg')
-      .attr('width', width + margin.right + margin.left)
-      .attr('height', height + margin.top + margin.bottom)
+      .attr('width', width + svgMargin.right + svgMargin.left)
+      .attr('height', height + svgMargin.top + svgMargin.bottom)
       .append('g')
-      .attr('transform', `translate(${margin.left}, ${margin.top})`)
+      .attr('transform', `translate(${svgMargin.left}, ${svgMargin.top})`)
 
     // declares a tree layout and assigns the size
-    this.treemap = d3.tree().size([height, width])
+    this.tree = d3.tree().size([height, width])
 
     // Assigns parent, children, height, depth
-    this.root = d3.hierarchy(treeData, d => d.children)
+    this.root = d3.hierarchy(this.data, d => d.children)
     this.root.x0 = height / 2
     this.root.y0 = 0
 
-    // build the uuidNode map
-    const flattenNodes = n => {
-      this.uuidNode[n.data.uuid] = n
-      if (n.children) n.children.forEach(c => flattenNodes(c))
-    }
-    flattenNodes(this.root)
-
-    const collapse = d => {
-      if (d.children) {
-        d._children = d.children
-        d._children.forEach(collapse)
-        d.children = null
-      }
-    }
-    // Collapse after the second level
-    this.root.children.forEach(collapse)
+    this.initNode(this.root, true)
 
     // Collapse the node and all it's children
     this.update(this.root)
   }
 
-  expandToNode (uuid) {
-    let currentUuid = uuid
-    while (this.uuidNode[currentUuid].parent) {
-      const n = this.uuidNode[currentUuid].parent
+  update (node) {
+    const treeData = this.tree(this.root)
 
-      if (n._children) {
-        n.children = n._children
-        n._children = null
-      }
-      currentUuid = n.data.uuid
-    }
+    const nodes = this.updateNodes(treeData, node)
 
-    this.update(this.root)
+    this.updateLinks(treeData, node)
 
-    const c = this.svg.selectAll('circle').filter(d => d.data.uuid === uuid)
-    c.style('stroke', 'rgba(255, 0, 0, 0)')
-      .style('stroke-width', 3)
-      .transition()
-      .duration(duration)
-      .style('stroke', 'rgba(255, 0, 0, 1)')
-      .transition()
-      .duration(1500)
-      .style('stroke', 'rgba(255, 0, 0, 0)')
+    // Store the old positions for transition
+    nodes.forEach(d => {
+      d.x0 = d.x
+      d.y0 = d.y
+    })
   }
 
-  update (source) {
-    // Assigns the x and y position for the nodes
-    const treeData = this.treemap(this.root)
+  updateNodes (treeData, source) {
 
     // Compute the new tree layout
     const nodes = treeData.descendants()
-
-    const links = treeData.descendants().slice(1)
-
     // Normalize for fixed-depth
-    nodes.forEach(d => { d.y = d.depth * 180 })
+    nodes.forEach(d => d.y = d.depth * nodeLinkLength)
 
-    // ****************** Nodes section ***************************
-
-    // Update the nodes...
     const node = this.svg.selectAll('g.node')
-      .data(nodes, d => d.id || (d.id = ++this.i))
-
-    // Toggle children on click
-    const expandNode = d => {
-      if (d.children) {
-        d._children = d.children
-        d.children = null
-      } else {
-        d.children = d._children
-        d._children = null
-      }
-
-      this.update(d)
-    }
+      .data(nodes)
 
     // Enter any new modes at the parent's previous position
     const nodeEnter = node.enter().append('g')
@@ -128,7 +129,7 @@ export default class SurveyHierarchyTree {
         .style('stroke', 'rgba(222, 220, 203, 1)')
         .style('stroke-width', 3))
       .on('mouseout', (d, i, nodes) => d3.select(nodes[i]).style('stroke', 'none'))
-      .on('click', expandNode)
+      .on('click', this.toggleNode.bind(this))
 
     // Add labels for the nodes
     nodeEnter.append('text')
@@ -137,25 +138,13 @@ export default class SurveyHierarchyTree {
       .attr('x', d => d.children || d._children ? -(nodeLabelDist) : (nodeLabelDist))
       .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
       .text(d => NodeDef.getNodeDefLabel(d.data, this.lang))
-    // .on('mouseover', (d, i, nodes) => d3.select(nodes[i]).append('rect')
-
-    // const paddingLeftRight = 18 // adjust the padding values depending on font and font size
-    // const paddingTopBottom = 5
-
-    // nodeEnter.append('rect')
-
-    // svg.selectAll('rect')
-    //   .attr('x', d => d.x - d.bb.width / 2 - paddingLeftRight / 2)
-    //   .attr('y', d => d.y - d.bb.height + paddingTopBottom / 2)
-    //   .attr('width', d => d.bb.width + paddingLeftRight)
-    //   .attr('height', d => d.bb.height + paddingTopBottom)
 
     // UPDATE
     const nodeUpdate = nodeEnter.merge(node)
 
     // Transition to the proper position for the node
     nodeUpdate.transition()
-      .duration(duration)
+      .duration(transitionDuration)
       .attr('transform', d => `translate(${d.y}, ${d.x})`)
 
     // Update the node attributes and style
@@ -166,7 +155,7 @@ export default class SurveyHierarchyTree {
 
     // Remove any exiting nodes
     const nodeExit = node.exit().transition()
-      .duration(duration)
+      .duration(transitionDuration)
       .attr('transform', d => `translate(${source.y}, ${source.x})`)
       .remove()
 
@@ -178,11 +167,15 @@ export default class SurveyHierarchyTree {
     nodeExit.select('text')
       .style('fill-opacity', nodeRadiusInit)
 
-    // ****************** links section ***************************
+    return nodes
+  }
+
+  updateLinks (treeData, node) {
+    const links = treeData.descendants().slice(1)
 
     // Update the links...
     const link = this.svg.selectAll('path.link')
-      .data(links, d => d.id)
+      .data(links, d => d.data.uuid)
 
     // Creates a curved (diagonal) path from parent to the child nodes
     const diagonal = (s, d) =>
@@ -195,7 +188,7 @@ export default class SurveyHierarchyTree {
     const linkEnter = link.enter().insert('path', 'g')
       .attr('class', 'link')
       .attr('d', d => {
-        const o = { x: source.x0, y: source.y0 }
+        const o = { x: node.x0, y: node.y0 }
         return diagonal(o, o)
       })
 
@@ -204,22 +197,44 @@ export default class SurveyHierarchyTree {
 
     // Transition back to the parent element position
     linkUpdate.transition()
-      .duration(duration)
+      .duration(transitionDuration)
       .attr('d', d => diagonal(d, d.parent))
 
     // Remove any exiting links
     link.exit().transition()
-      .duration(duration)
+      .duration(transitionDuration)
       .attr('d', d => {
-        const o = { x: source.x, y: source.y }
+        const o = { x: node.x, y: node.y }
         return diagonal(o, o)
       })
       .remove()
-
-    // Store the old positions for transition
-    nodes.forEach(d => {
-      d.x0 = d.x
-      d.y0 = d.y
-    })
   }
+
+  expandToNode (uuid) {
+    let currentUuid = uuid
+    while (this.nodesByUuidMap[currentUuid].parent) {
+      const n = this.nodesByUuidMap[currentUuid].parent
+
+      if (n._children) {
+        n.children = n._children
+        n._children = null
+      }
+      currentUuid = n.data.uuid
+    }
+
+    this.update(this.root)
+
+    const selectedCircle = this.svg.selectAll('circle')
+      .filter(d => d.data.uuid === uuid)
+
+    selectedCircle.style('stroke', 'rgba(255, 0, 0, 0)')
+      .style('stroke-width', 3)
+      .transition()
+      .duration(transitionDuration)
+      .style('stroke', 'rgba(255, 0, 0, 1)')
+      .transition()
+      .duration(1500)
+      .style('stroke', 'rgba(255, 0, 0, 0)')
+  }
+
 }

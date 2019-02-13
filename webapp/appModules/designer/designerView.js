@@ -45,7 +45,7 @@ class DesignerView extends React.Component {
           tabs={[
 
             {
-              label: 'Survey Info',
+              label: 'Info',
               component: SurveyInfo,
               path: appModuleUri(designerModules.surveyInfo),
             },
