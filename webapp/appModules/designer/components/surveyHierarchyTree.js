@@ -19,7 +19,10 @@ export default class SurveyHierarchyTree {
     this.lang = lang
     this.data = data
     this.domElement = domElement
-    this.onEntityClick = onEntityClick
+    this.onEntityClick = (nodeDefUuid) => {
+      onEntityClick(nodeDefUuid)
+      this.expandToNode(nodeDefUuid)
+    }
 
     this.svg = null
     this.tree = null
@@ -69,7 +72,7 @@ export default class SurveyHierarchyTree {
 
     const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
     const height = this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
-    
+
     this.svgWidth = width
 
     // append the svg object to the body of the page
@@ -137,19 +140,36 @@ export default class SurveyHierarchyTree {
 
     const hasChildren = d => d.children || d._children
 
-    // Add Circle for the nodes
-    nodeEnter.append('circle')
-      .attr('class', d => 'node' + (hasChildren(d) ? ' expandable' : '') + (d.children ? ' expanded' : ''))
-      .attr('r', nodeRadiusInit)
-      .on('click', this.toggleNode.bind(this))
-
     // Add labels for the nodes
-    nodeEnter.append('text')
+    const fo = nodeEnter
+      .append('foreignObject')
+      .attr('x', d => NodeDef.isNodeDefRoot(d.data) ? -100 : 0)
+      //.attr('y', d => hasChildren(d) ? -(nodeLabelDist * 3) : -nodeLabelDist)
+      .attr('y', -nodeLabelDist)
+      .attr('width', d => NodeDef.isNodeDefRoot(d.data) ? 150 : 100)
+      .attr('height', 30)
+
+    const grid = fo.append('xhtml:div')
+      .attr('class', 'node-grid')
+
+    grid.append('xhtml:a')
       .on('click', d => this.onEntityClick(d.data.uuid))
-      .attr('alignment-baseline', 'middle')
-      .attr('x', d => hasChildren(d) ? -(nodeLabelDist) : (nodeLabelDist))
-      .attr('text-anchor', d => hasChildren(d) ? 'end' : 'start')
+      // .attr('alignment-baseline', 'middle')
+      //.attr('x', d => hasChildren(d) ? -(nodeLabelDist) : (nodeLabelDist))
       .text(d => NodeDef.getNodeDefLabel(d.data, this.lang))
+
+    grid.append('xhtml:button')
+      .attr('class', 'btn btn-of-light-xs')
+      .style('display', d => hasChildren(d) ? 'block' : 'none')
+      .on('click', d => this.toggleNode(d))
+      .append('xhtml:span')
+      .attr('class', 'icon icon-tree icon-12px')
+
+    // Add Circle for the nodes
+    // nodeEnter.append('circle')
+    //   .attr('class', d => 'node' + (hasChildren(d) ? '' : ' leaf'))
+    //   .attr('r', nodeRadiusInit)
+    //   .on('click', this.toggleNode.bind(this))
 
     // UPDATE
     const nodeUpdate = nodeEnter.merge(node)
@@ -161,8 +181,8 @@ export default class SurveyHierarchyTree {
 
     // Update the node attributes and style
     nodeUpdate.select('circle.node')
-      .attr('r', nodeRadius)
-      .attr('class', d => 'node' + (hasChildren(d) ? ' expandable' : '') + (d.children ? ' expanded' : ''))
+      .attr('r', d => hasChildren(d) ? nodeRadius : nodeRadiusInit)
+      .attr('class', d => 'node' + (hasChildren(d) ? '' : ' leaf'))
 
     // Remove any exiting nodes
     const nodeExit = node.exit().transition()
@@ -235,18 +255,10 @@ export default class SurveyHierarchyTree {
 
     this.update(this.root)
 
-    const selectedCircle = this.svg.selectAll('circle')
+    this.svg.selectAll('.node-grid')
+      .attr('class', 'node-grid')
       .filter(d => d.data.uuid === uuid)
-
-    selectedCircle.style('stroke', 'rgba(204, 204, 255)')
-      .style('stroke-opacity', 0)
-      .style('stroke-width', 3)
-      .transition()
-      .duration(300)
-      .style('stroke-opacity', 1)
-      .transition()
-      .duration(1700)
-      .style('stroke-opacity', 0)
+      .attr('class', 'node-grid highilight')
   }
 
 }

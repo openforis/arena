@@ -18,45 +18,60 @@
 
   .node {
     circle {
-      fill: $white;
       fill-opacity: .4;
+      fill: $white;
 
-      &.expandable {
-        cursor: pointer;
-        fill-opacity: .5;
-
-        &:not(.expanded) {
-          fill: $blue1;
-          fill-opacity: .65;
-        }
-
-        &:hover {
+      &:not(.leaf) {
+        cursor: pointer;          
+        fill: $yellow;
+        fill-opacity: .7;
+      
+         &:hover {
           fill-opacity: .9;
         }
       }
+    
+    }
 
-      &.expanded {
-        fill-opacity: .4;
+    a {
+      cursor: pointer;
+      font-size: .9rem;
+      fill: $white;
+      letter-spacing: 0;
+      padding: .2rem .5rem;
+
+      &:hover {
+        background-color: rgba($white, .35) 
+      }
+    }
+  }
+
+  .node-grid {
+    display: flex;
+    align-items: center;    
+    border: 1px solid rgba($yellow, .2);
+    background-color: $yellowDark;
+    justify-content: space-around;
+    transition: background-color 1s ease;
+
+    .btn {
+      transform: rotate(-90deg);
+      padding: .3rem;
+      background-color: rgba($white, .2);
+      &:hover{
+        background-color: rgba($white, .5);
       }
     }
 
-    text {
-      cursor: pointer;
-      font-size: 13px;
-      fill: $white;
-      letter-spacing: 0;
-
-      &:hover {
-        text-decoration: underline;
-      }
+    &.highilight {
+      background-color: $yellowOpaque;
     }
   }
 
   .link {
     fill: none;
-    stroke: rgba($blue2, .8);
-    stroke-width: 1.5px;
-    stroke-opacity: .2;
+    stroke: rgba($yellow, .5);
+    stroke-width: 1px;
   }
 
   rect {
