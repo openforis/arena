@@ -16,18 +16,39 @@
   width: 100%;
   overflow: auto;
 
-
   .node {
-    cursor: pointer;
-
     circle {
-      fill: #52849b;
-      fill-opacity: .60;
+      fill: $white;
+      fill-opacity: .4;
+
+      &.expandable {
+        cursor: pointer;
+        fill-opacity: .5;
+
+        &:not(.expanded) {
+          fill: $blue1;
+          fill-opacity: .65;
+        }
+
+        &:hover {
+          fill-opacity: .9;
+        }
+      }
+
+      &.expanded {
+        fill-opacity: .4;
+      }
     }
 
     text {
-      font-size: 12px;
+      cursor: pointer;
+      font-size: 13px;
       fill: $white;
+      letter-spacing: 0;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 

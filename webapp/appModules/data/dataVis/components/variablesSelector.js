@@ -92,28 +92,28 @@ class VariablesSelector extends React.PureComponent {
   }
 
   toggleNodeDefVariable (nodeDefUuid) {
-    const { nodeDefVariableUuids: nodeDefVariableUuidsState } = this.state
-
-    const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefVariableUuidsState)
-    const fn = idx >= 0 ? R.remove(idx, 1) : R.append(nodeDefUuid)
-    const nodeDefVariableUuids = fn(nodeDefVariableUuidsState)
-
-    this.updateNodeDefVariableUuids(nodeDefVariableUuids)
-  }
-
-  updateNodeDefVariableUuids (nodeDefVariableUuids) {
     const { canSelectVariables } = this.props
 
     if (canSelectVariables) {
-      this.setState({ nodeDefVariableUuids })
-      this.props.onChange(nodeDefVariableUuids)
+      const { nodeDefVariableUuids: nodeDefVariableUuidsState } = this.state
+
+      const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefVariableUuidsState)
+      const fn = idx >= 0 ? R.remove(idx, 1) : R.append(nodeDefUuid)
+      const nodeDefVariableUuids = fn(nodeDefVariableUuidsState)
+
+      this.updateNodeDefVariableUuids(nodeDefVariableUuids)
     }
   }
 
+  updateNodeDefVariableUuids (nodeDefVariableUuids) {
+    this.setState({ nodeDefVariableUuids })
+    this.props.onChange(nodeDefVariableUuids)
+  }
+
   componentDidUpdate (prevProps, prevState, snapshot) {
-    const { nodeDefUuid } = this.props
+    const { nodeDefUuid, canSelectVariables } = this.props
     const { nodeDefUuid: nodeDefUuidPrev } = prevProps
-    if (nodeDefUuid !== nodeDefUuidPrev)
+    if (canSelectVariables && nodeDefUuid !== nodeDefUuidPrev)
       this.updateNodeDefVariableUuids([])
   }
 

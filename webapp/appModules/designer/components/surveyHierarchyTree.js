@@ -1,4 +1,5 @@
 import * as d3 from 'd3'
+import * as R from 'ramda'
 
 import NodeDef from '../../../../common/survey/nodeDef'
 
@@ -23,6 +24,8 @@ export default class SurveyHierarchyTree {
     this.svg = null
     this.tree = null
     this.root = null
+
+    this.svgWidth = null
 
     this.initSvg()
   }
@@ -66,6 +69,8 @@ export default class SurveyHierarchyTree {
 
     const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
     const height = this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
+    
+    this.svgWidth = width
 
     // append the svg object to the body of the page
     // appends a 'group' element to 'svg'
@@ -109,8 +114,18 @@ export default class SurveyHierarchyTree {
 
     // Compute the new tree layout
     const nodes = treeData.descendants()
+
     // Normalize for fixed-depth
-    nodes.forEach(d => d.y = d.depth * nodeLinkLength)
+    const maxDepth = R.pipe(
+      R.values,
+      R.filter(R.prop('children')),
+      R.map(R.prop('depth')),
+      R.reduce(R.max, -1),
+      R.inc
+    )(this.nodesByUuidMap)
+
+    if (nodeLinkLength * maxDepth + svgMargin.left < this.svgWidth)
+      nodes.forEach(d => { d.y = d.depth * nodeLinkLength })
 
     const node = this.svg.selectAll('g.node')
       .data(nodes)
@@ -120,23 +135,20 @@ export default class SurveyHierarchyTree {
       .attr('class', 'node')
       .attr('transform', d => `translate(${source.y0}, ${source.x0})`)
 
+    const hasChildren = d => d.children || d._children
+
     // Add Circle for the nodes
     nodeEnter.append('circle')
-      .attr('class', 'node')
+      .attr('class', d => 'node' + (hasChildren(d) ? ' expandable' : '') + (d.children ? ' expanded' : ''))
       .attr('r', nodeRadiusInit)
-      .style('fill', d => d._children ? 'lightsteelblue' : '#fff')
-      .on('mouseover', (d, i, nodes) => d3.select(nodes[i])
-        .style('stroke', 'rgba(222, 220, 203, 1)')
-        .style('stroke-width', 3))
-      .on('mouseout', (d, i, nodes) => d3.select(nodes[i]).style('stroke', 'none'))
       .on('click', this.toggleNode.bind(this))
 
     // Add labels for the nodes
     nodeEnter.append('text')
       .on('click', d => this.onEntityClick(d.data.uuid))
       .attr('alignment-baseline', 'middle')
-      .attr('x', d => d.children || d._children ? -(nodeLabelDist) : (nodeLabelDist))
-      .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
+      .attr('x', d => hasChildren(d) ? -(nodeLabelDist) : (nodeLabelDist))
+      .attr('text-anchor', d => hasChildren(d) ? 'end' : 'start')
       .text(d => NodeDef.getNodeDefLabel(d.data, this.lang))
 
     // UPDATE
@@ -150,8 +162,7 @@ export default class SurveyHierarchyTree {
     // Update the node attributes and style
     nodeUpdate.select('circle.node')
       .attr('r', nodeRadius)
-      .style('fill', d => d._children ? 'lightsteelblue' : '#fff')
-      .attr('cursor', 'pointer')
+      .attr('class', d => 'node' + (hasChildren(d) ? ' expandable' : '') + (d.children ? ' expanded' : ''))
 
     // Remove any exiting nodes
     const nodeExit = node.exit().transition()
@@ -227,14 +238,15 @@ export default class SurveyHierarchyTree {
     const selectedCircle = this.svg.selectAll('circle')
       .filter(d => d.data.uuid === uuid)
 
-    selectedCircle.style('stroke', 'rgba(255, 0, 0, 0)')
+    selectedCircle.style('stroke', 'rgba(204, 204, 255)')
+      .style('stroke-opacity', 0)
       .style('stroke-width', 3)
       .transition()
-      .duration(transitionDuration)
-      .style('stroke', 'rgba(255, 0, 0, 1)')
+      .duration(300)
+      .style('stroke-opacity', 1)
       .transition()
-      .duration(1500)
-      .style('stroke', 'rgba(255, 0, 0, 0)')
+      .duration(1700)
+      .style('stroke-opacity', 0)
   }
 
 }
