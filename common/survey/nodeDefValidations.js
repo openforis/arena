@@ -8,6 +8,22 @@ const keys = {
   expressions: 'expressions'
 }
 
+const dissocCount = R.dissoc(keys.count)
+
+const cleanupCount = validations =>
+  R.isEmpty(R.prop(keys.count, validations))
+    ? dissocCount(validations)
+    : validations
+
+const assocMinMaxCount = (key, value) => R.pipe(
+  R.ifElse(
+    R.always(R.isEmpty(value)),
+    R.dissocPath([keys.count, key]),
+    R.assocPath([keys.count, key], value)
+  ),
+  cleanupCount
+)
+
 module.exports = {
   //REQUIRED
   isRequired: R.propOr(false, keys.required),
@@ -19,9 +35,11 @@ module.exports = {
 
   getMaxCount: R.pathOr('', [keys.count, keys.max]),
 
-  assocMinCount: minCount => R.assocPath([keys.count, keys.min], minCount),
-  assocMaxCount: maxCount => R.assocPath([keys.count, keys.max], maxCount),
-  dissocCount: R.dissoc(keys.count),
+  assocMinCount: minCount => assocMinMaxCount(keys.min, minCount),
+
+  assocMaxCount: maxCount => assocMinMaxCount(keys.max, maxCount),
+
+  dissocCount,
 
   //EXPRESSIONS
   getExpressions: R.propOr([], (keys.expressions)),

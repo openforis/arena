@@ -38,9 +38,13 @@ class RecordCheckJob extends Job {
     if (!(R.isEmpty(nodeDefsNew) && R.isEmpty(nodeDefsUpdated))) {
       const recordUuids = await RecordManager.fetchRecordUuids(this.surveyId, tx)
 
+      this.total = R.length(recordUuids)
+
       for (const recordUuid of recordUuids) {
         const record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, tx)
         await this.checkRecord(survey, nodeDefsNew, nodeDefsUpdated, record, tx)
+
+        this.incrementProcessedItems()
       }
     }
   }
@@ -55,8 +59,7 @@ class RecordCheckJob extends Job {
     record = Record.assocNodes(defaultValuesUpdated)(record)
 
     // 3. validate nodes
-    const nodesToValidate = R.mergeRight(missingNodes, defaultValuesUpdated)
-    await RecordValidationManager.validateNodes(survey, record, nodesToValidate, false, tx)
+    await validateNodes(survey, R.concat(nodeDefsNew, nodeDefsUpdated), record, R.mergeRight(missingNodes, defaultValuesUpdated), tx)
   }
 }
 
@@ -70,6 +73,19 @@ const applyDefaultValues = async (survey, nodeDefsUpdated, record, newNodes, tx)
   const nodesToUpdate = R.mergeRight(newNodes, updatedNodes)
 
   return await DependentNodesUpdater.updateNodes(survey, record, nodesToUpdate, tx)
+}
+
+const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
+  // include parent nodes of new/updated node defs (needed for min/max count validation)
+  const nodeDefsParentNodes = R.pipe(
+    R.map(def => Record.getNodesByDefUuid(NodeDef.getNodeDefParentUuid(def))(record)),
+    R.flatten,
+    toUuidIndexedObj
+  )(nodeDefs)
+
+  const nodesToValidate = R.mergeRight(nodes, nodeDefsParentNodes)
+
+  await RecordValidationManager.validateNodes(survey, record, nodesToValidate, false, tx)
 }
 
 RecordCheckJob.type = 'RecordCheckJob'
