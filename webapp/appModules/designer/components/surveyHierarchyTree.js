@@ -4,48 +4,88 @@ import NodeDef from '../../../../common/survey/nodeDef'
 const nodeRadiusInit = 1e-6
 const nodeRadius = 10
 const nodeLabelDist = nodeRadius + 3
+const duration = 500
 
-export const init = (treeElement, treeData, lang, onEntityClick) => {
+export default class SurveyHierarchyTree {
+  constructor (treeElement, treeData, lang, onEntityClick) {
+    this.uuidNode = {}
+    this.lang = lang
 
-  // Set the dimensions and margins of the diagram
-  const margin = { top: 40, right: 100, bottom: 40, left: 100 }
-  const width = treeElement.clientWidth - margin.left - margin.right
-  const height = treeElement.clientHeight - margin.top - margin.bottom
+    this.onEntityClick = onEntityClick
+    this.i = 0
 
-  // append the svg object to the body of the page
-  // appends a 'group' element to 'svg'
-  // moves the 'group' element to the top left margin
-  const svg = d3.select(treeElement)
-    .append('svg')
-    .attr('width', width + margin.right + margin.left)
-    .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-    .attr('transform', `translate(${margin.left}, ${margin.top})`)
+    // Set the dimensions and margins of the diagram
+    const margin = { top: 40, right: 100, bottom: 40, left: 100 }
+    const width = treeElement.clientWidth - margin.left - margin.right
+    const height = treeElement.clientHeight - margin.top - margin.bottom
 
-  const duration = 500
+    // append the svg object to the body of the page
+    // appends a 'group' element to 'svg'
+    // moves the 'group' element to the top left margin
+    this.svg = d3.select(treeElement)
+      .append('svg')
+      .attr('width', width + margin.right + margin.left)
+      .attr('height', height + margin.top + margin.bottom)
+      .append('g')
+      .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-  // declares a tree layout and assigns the size
-  const treemap = d3.tree().size([height, width])
+    // declares a tree layout and assigns the size
+    this.treemap = d3.tree().size([height, width])
 
-  // Assigns parent, children, height, depth
-  const root = d3.hierarchy(treeData, d => d.children)
-  root.x0 = height / 2
-  root.y0 = 0
+    // Assigns parent, children, height, depth
+    this.root = d3.hierarchy(treeData, d => d.children)
+    this.root.x0 = height / 2
+    this.root.y0 = 0
 
-  const collapse = d => {
-    if (d.children) {
-      d._children = d.children
-      d._children.forEach(collapse)
-      d.children = null
+    // build the uuidNode map
+    const flattenNodes = n => {
+      this.uuidNode[n.data.uuid] = n
+      if (n.children) n.children.forEach(c => flattenNodes(c))
     }
-  }
-  // Collapse after the second level
-  root.children.forEach(collapse)
+    flattenNodes(this.root)
 
-  // Collapse the node and all it's children
-  const update = source => {
+    const collapse = d => {
+      if (d.children) {
+        d._children = d.children
+        d._children.forEach(collapse)
+        d.children = null
+      }
+    }
+    // Collapse after the second level
+    this.root.children.forEach(collapse)
+
+    // Collapse the node and all it's children
+    this.update(this.root)
+  }
+
+  expandToNode (uuid) {
+    let currentUuid = uuid
+    while (this.uuidNode[currentUuid].parent) {
+      const n = this.uuidNode[currentUuid].parent
+
+      if (n._children) {
+        n.children = n._children
+        n._children = null
+      }
+      currentUuid = n.data.uuid
+    }
+
+    this.update(this.root)
+
+    const c = this.svg.selectAll('circle').filter(d => d.data.uuid === uuid)
+    c.style('stroke', 'rgba(255, 0, 0, 0)')
+      .style('stroke-width', 3)
+      .transition()
+      .duration(duration)
+      .style('stroke', 'rgba(255, 0, 0, 1)')
+      .transition()
+      .duration(1500)
+      .style('stroke', 'rgba(255, 0, 0, 0)')
+  }
+
+  update (source) {
     // Assigns the x and y position for the nodes
-    const treeData = treemap(root)
+    const treeData = this.treemap(this.root)
 
     // Compute the new tree layout
     const nodes = treeData.descendants()
@@ -58,8 +98,8 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
     // ****************** Nodes section ***************************
 
     // Update the nodes...
-    const node = svg.selectAll('g.node')
-      .data(nodes)
+    const node = this.svg.selectAll('g.node')
+      .data(nodes, d => d.id || (d.id = ++this.i))
 
     // Toggle children on click
     const expandNode = d => {
@@ -71,7 +111,7 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
         d._children = null
       }
 
-      update(d)
+      this.update(d)
     }
 
     // Enter any new modes at the parent's previous position
@@ -84,23 +124,20 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
       .attr('class', 'node')
       .attr('r', nodeRadiusInit)
       .style('fill', d => d._children ? 'lightsteelblue' : '#fff')
-
+      .on('mouseover', (d, i, nodes) => d3.select(nodes[i])
+        .style('stroke', 'rgba(222, 220, 203, 1)')
+        .style('stroke-width', 3))
+      .on('mouseout', (d, i, nodes) => d3.select(nodes[i]).style('stroke', 'none'))
       .on('click', expandNode)
-      .on('mouseover', (d, i, nodes) => d3.select(nodes[i]).attr('background-color', 'rgba(222, 220, 203, 0.25)'))
 
     // Add labels for the nodes
-    nodeEnter.append('a')
-    // .attr('x', d => -18)
-
-      .on('mouseover', (d, i, nodes) => d3.select(nodes[i]).attr('background-color', 'rgba(222, 220, 203, 0.25)'))
-      .append('text')
+    nodeEnter.append('text')
+      .on('click', d => this.onEntityClick(d.data.uuid))
       .attr('alignment-baseline', 'middle')
       .attr('x', d => d.children || d._children ? -(nodeLabelDist) : (nodeLabelDist))
       .attr('text-anchor', d => d.children || d._children ? 'end' : 'start')
-      // .attr('text-anchor', d => 'end')
-      .text(d => NodeDef.getNodeDefLabel(d.data, lang))
-
-      .on('click', d => onEntityClick(d.data.uuid))
+      .text(d => NodeDef.getNodeDefLabel(d.data, this.lang))
+    // .on('mouseover', (d, i, nodes) => d3.select(nodes[i]).append('rect')
 
     // const paddingLeftRight = 18 // adjust the padding values depending on font and font size
     // const paddingTopBottom = 5
@@ -144,7 +181,7 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
     // ****************** links section ***************************
 
     // Update the links...
-    const link = svg.selectAll('path.link')
+    const link = this.svg.selectAll('path.link')
       .data(links, d => d.id)
 
     // Creates a curved (diagonal) path from parent to the child nodes
@@ -185,6 +222,4 @@ export const init = (treeElement, treeData, lang, onEntityClick) => {
       d.y0 = d.y
     })
   }
-
-  update(root)
 }

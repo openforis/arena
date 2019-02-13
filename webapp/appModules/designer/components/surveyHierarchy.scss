@@ -44,10 +44,6 @@
     circle {
       fill: #52849b;
       fill-opacity: .60;
-
-      &:hover{
-        fill: #52849b;
-      }
     }
 
     text {
@@ -62,4 +58,8 @@
     stroke-width: 1.5px;
     stroke-opacity: .2;
   }
+}
+rect {
+  fill:black;
+  stroke:none;
 }

@@ -4,12 +4,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import Survey from '../../../../common/survey/survey'
-// import NodeDef from '../../../../common/survey/nodeDef'
 
 import * as SurveyState from '../../../survey/surveyState'
-// import * as NodeDefUiProps from '../../surveyForm/nodeDefs/nodeDefSystemProps'
 
-import * as Tree from './surveyHierarchyTree'
+import Tree from './surveyHierarchyTree'
 
 import TableSelector from '../../data/dataVis/components/tableSelector'
 
@@ -41,7 +39,7 @@ class SurveyHierarchy extends React.Component {
     const treeElement = this.treeEl.current
     const onEntityClick = (selectedNodeDefUuid) => this.setState({ selectedNodeDefUuid })
 
-    Tree.init(treeElement, hierarchy.root, lang, onEntityClick)
+    this.tree = new Tree(treeElement, hierarchy.root, lang, onEntityClick)
   }
 
   render () {
@@ -58,6 +56,7 @@ class SurveyHierarchy extends React.Component {
                          lang={lang}
                          showAncestors={false}
                          canSelectVariables={false}
+                         onTableChange={uuid => this.tree.expandToNode(uuid)}
                          selectedTableUuid={selectedNodeDefUuid}/>
         </div>
 
