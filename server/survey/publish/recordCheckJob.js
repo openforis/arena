@@ -47,15 +47,15 @@ class RecordCheckJob extends Job {
 
   async checkRecord (survey, nodeDefsNew, nodeDefsUpdated, record, tx) {
     // 1. insert missing nodes
-    const missingNodesUpdated = await RecordMissingNodesCreator.insertMissingSingleNodes(survey, nodeDefsNew, record, this.user, tx)
-    record = Record.assocNodes(missingNodesUpdated)(record)
+    const missingNodes = await RecordMissingNodesCreator.insertMissingSingleNodes(survey, nodeDefsNew, record, this.user, tx)
+    record = Record.assocNodes(missingNodes)(record)
 
     // 2. apply default values
-    const defaultValuesUpdated = await applyDefaultValues(survey, nodeDefsUpdated, record, missingNodesUpdated, tx)
+    const defaultValuesUpdated = await applyDefaultValues(survey, nodeDefsUpdated, record, missingNodes, tx)
     record = Record.assocNodes(defaultValuesUpdated)(record)
 
     // 3. validate nodes
-    const nodesToValidate = R.mergeRight(missingNodesUpdated, defaultValuesUpdated)
+    const nodesToValidate = R.mergeRight(missingNodes, defaultValuesUpdated)
     await RecordValidationManager.validateNodes(survey, record, nodesToValidate, false, tx)
   }
 }

@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
 
@@ -8,22 +7,20 @@ const Node = require('../../../../common/record/node')
 
 const RecordUpdater = require('../../../record/update/thread/helpers/recordUpdater')
 
+/**
+ * Inserts missing single nodes.
+ * Returns an indexed object with all the inserted nodes.
+ */
 const insertMissingSingleNodes = async (survey, nodeDefsNew, record, user, tx) => {
-  const nodePointersDefsNew = R.pipe(
-    R.map(def => {
-      const parentNodes = Record.getNodesByDefUuid(NodeDef.getNodeDefParentUuid(def))(record)
-      return R.map(parentNode => ({ parentNode, childDef: def }))(parentNodes)
-    }),
-    R.flatten
-  )(nodeDefsNew)
-
-  const updatedNodesArray = await Promise.all(
-    nodePointersDefsNew.map(
-      async nodePointer => await insertMissingSingleNode(survey, nodePointer.childDef, record, nodePointer.parentNode, user, tx)
-    )
-  )
-
-  return R.flatten(updatedNodesArray)
+  let allInsertedNodes = {}
+  for (const nodeDef of nodeDefsNew) {
+    const parentNodes = Record.getNodesByDefUuid(NodeDef.getNodeDefParentUuid(nodeDef))(record)
+    for (const parentNode of parentNodes) {
+      const insertedNodes = await insertMissingSingleNode(survey, nodeDef, record, parentNode, user, tx)
+      allInsertedNodes = R.mergeRight(allInsertedNodes, insertedNodes)
+    }
+  }
+  return allInsertedNodes
 }
 
 const insertMissingSingleNode = async (survey, childDef, record, parentNode, user, tx) => {
