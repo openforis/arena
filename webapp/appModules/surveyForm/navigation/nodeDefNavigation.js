@@ -38,7 +38,7 @@ const NavigationButton = (props) => {
 
       <button className={`btn btn-of-light${active ? ' active' : ''}`}
               onClick={() => setFormActivePage(nodeDef)}
-              style={{ height: `${100 - level * 12.5}%` }}
+              style={{ height: `${100 - level * 7}%` }}
               aria-disabled={!enabled}>
         {label}
       </button>
@@ -55,9 +55,9 @@ const NavigationButton = (props) => {
       }
 
       {
-        edit && active && canEditDef &&
+        edit && active && canEditDef && level < 6 &&
         <button className="btn btn-of-light node-def-nav__btn-add-page"
-                style={{ height: `${100 - (level + 1) * 12.5}%` }}
+                style={{ height: `${100 - (level + 1) * 7}%` }}
                 onClick={() => createNodeDef(
                   NodeDef.getUuid(nodeDef),
                   NodeDef.nodeDefType.entity,

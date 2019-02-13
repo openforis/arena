@@ -75,7 +75,7 @@ const fetchNodePointers = (survey, record, nodes) => {
         })
       }
 
-      if (NodeDef.isNodeDefEntity(nodeDef)) {
+      if (NodeDef.isNodeDefEntity(nodeDef) && !Node.isDeleted(node)) {
         // add children node pointers
         const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
 
