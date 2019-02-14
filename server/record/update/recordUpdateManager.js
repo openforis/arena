@@ -13,30 +13,25 @@ const recordUpdateThreads = new ThreadsCache()
 const checkOutTimeoutsByUserId = {}
 const Record = require('../../../common/record/record')
 
+const RecordUsersMap = require('./recordUsersMap')
 const RecordUpdateThread = require('./thread/recordUpdateThread')
-
-// Users editing the same record
-let recordUsersMap = {}
-const addRecordUser = (recordUuid, userId) => { recordUsersMap = R.assocPath([recordUuid, userId], null, recordUsersMap) }
-const getRecordUsers = recordUuid => R.pipe(R.prop(recordUuid), R.keys)(recordUsersMap)
-const removeRecordUser = (recordUuid, userId) => { recordUsersMap = R.dissocPath([recordUuid, userId], recordUsersMap) }
 
 const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
   const userId = user.id
 
-  addRecordUser(recordUuid, userId)
+  RecordUsersMap.assocUserId(recordUuid, userId)
 
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
     { user, surveyId, recordUuid, preview },
     msg => {
-      const recordUsers = getRecordUsers(recordUuid)
-      recordUsers.forEach(userId =>
+      const userIds = RecordUsersMap.getUserIds(recordUuid)
+      userIds.forEach(userId =>
         WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
       )
     },
     () => {
-      removeRecordUser(recordUuid, userId)
+      RecordUsersMap.dissocUserId(recordUuid, userId)
       recordUpdateThreads.removeThread(userId)
     }
   )
@@ -83,11 +78,6 @@ const cancelCheckOut = userId => {
 /**
  * Create a new record and adds the root entity
  * It internally uses an instance of RecordUpdateThread to simulate the behaviour in the main event loop
- *
- * @param user
- * @param surveyId
- * @param record
- * @returns {Promise<void>}
  */
 const createRecord = async (user, surveyId, record) => {
   const recordUpdateThread = RecordUpdateThread.newInstance({
@@ -99,24 +89,11 @@ const createRecord = async (user, surveyId, record) => {
   await recordUpdateThread.processMessage({ type: recordThreadMessageTypes.createRecord, record })
 }
 
-/**
- * Notify thread to create or update a node
- *
- * @param user
- * @param surveyId
- * @param node
- */
 const persistNode = (user, surveyId, node) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
   updateWorker.postMessage({ type: recordThreadMessageTypes.persistNode, node })
 }
 
-/**
- * Notify thread to delete a node
- *
- * @param user
- * @param nodeUuid
- */
 const deleteNode = (user, nodeUuid) => {
   const updateWorker = recordUpdateThreads.getThread(user.id)
   updateWorker.postMessage({ type: recordThreadMessageTypes.deleteNode, nodeUuid })
@@ -130,7 +107,7 @@ const deleteNode = (user, nodeUuid) => {
  * @param userIdExclude Do not notify the user that has deleted the record
  */
 const notifyUsersRecordDeleted = (recordUuid, userIdExclude) => {
-  const recordUsersIds = getRecordUsers(recordUuid)
+  const recordUsersIds = RecordUsersMap.getUserIds(recordUuid)
 
   recordUsersIds.forEach(id => {
     if (id !== userIdExclude) {
@@ -139,6 +116,10 @@ const notifyUsersRecordDeleted = (recordUuid, userIdExclude) => {
     }
   })
 }
+
+// ==== UTILS
+
+const getEditingRecordUuids = RecordUsersMap.getRecordUuids
 
 module.exports = {
   checkIn,
@@ -149,4 +130,6 @@ module.exports = {
   deleteNode,
 
   notifyUsersRecordDeleted,
+
+  getEditingRecordUuids,
 }

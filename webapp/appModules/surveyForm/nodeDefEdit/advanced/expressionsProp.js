@@ -48,7 +48,7 @@ const ExpressionProp = ({ nodeDefUuidContext, nodeDefUuidCurrent, expression, ap
                                onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
                              }
                              isContextParent={isContextParent}
-                             canBeConstant={canBeConstant}/>
+                             canBeConstant={false}/>
       </div>
     }
 
