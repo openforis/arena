@@ -67,7 +67,8 @@ class Editor extends React.Component {
 
     const {
       variables, isBoolean,
-      onClose, onChange
+      onClose, onChange,
+      literalSearchParams,
     } = this.props
 
     return <React.Fragment>
@@ -90,7 +91,8 @@ class Editor extends React.Component {
       <div className="expression-editor__expr-container">
         <ExpressionNode variables={variables} node={exprDraft}
                         onChange={this.updateDraft.bind(this)}
-                        isBoolean={isBoolean}/>
+                        isBoolean={isBoolean}
+                        literalSearchParams={literalSearchParams}/>
       </div>
 
       <div className="expression-editor__footer">
@@ -118,6 +120,7 @@ Editor.defaultProps = {
   isBoolean: true,
   onClose: null,
   onChange: null,
+  literalSearchParams: null,
 }
 
 export default Editor

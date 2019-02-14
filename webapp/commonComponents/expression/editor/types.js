@@ -1,8 +1,10 @@
 import React from 'react'
 import * as R from 'ramda'
+import axios from 'axios'
+
+import Dropdown from '../../form/dropdown'
 
 import Expression from '../../../../common/exprParser/expression'
-import Dropdown from '../../form/dropdown'
 
 const EditButtons = (props) => {
   const {
@@ -221,16 +223,49 @@ const Call = ({ node, variables, onChange }) => {
   )
 }
 
-const Literal = ({ node, onChange }) => (
-  <div className="literal">
-    <input className="form-input" value={node.raw}
-           size={25}
-           onChange={e => onChange(R.pipe(
-             R.assoc('raw', e.target.value),
-             R.assoc('value', e.target.value),
-           )(node))}/>
-  </div>
-)
+const Literal = ({ node, onChange, literalSearchParams = null }) => {
+
+  const lookupFunction = async value => {
+    const params = {
+      ...literalSearchParams,
+      value
+    }
+    const { data } = await axios.get('/api/expression/literal/search', { params })
+    return data.items
+  }
+
+  return (
+    <div className="literal">
+
+      {
+        literalSearchParams
+          ? (
+            <Dropdown itemsLookupFunction={lookupFunction}
+                      itemKeyProp="key"
+                      itemLabelProp="label"
+                      onChange={item =>
+                        onChange(R.pipe(
+                          R.assoc('raw', item.key),
+                          R.assoc('value', item.key),
+                        )(node))
+                      }
+                      selection={null}/>
+          )
+          : (
+            <input className="form-input" value={node.raw}
+                   size={25}
+                   onChange={e =>
+                     onChange(R.pipe(
+                       R.assoc('raw', e.target.value),
+                       R.assoc('value', e.target.value),
+                     )(node))
+                   }/>
+          )
+      }
+
+    </div>
+  )
+}
 
 const components = {
   [Expression.types.Identifier]: Identifier,

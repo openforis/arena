@@ -27,7 +27,6 @@ const AdvancedProps = props => {
                                   nodeDefUuidContext={nodeDefUuidContext}
                                   canBeConstant={true}/>
 
-
           <NodeDefExpressionsProp nodeDef={nodeDef}
                                   putNodeDefProp={putNodeDefProp}
                                   label="Default values"

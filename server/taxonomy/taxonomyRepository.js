@@ -11,6 +11,14 @@ const {
 
 const Taxonomy = require('../../common/survey/taxonomy')
 
+const { isBlank } = require('../../common/stringUtils')
+
+const getTaxonVernacularNameSelectFields = draft => `
+  t.*,
+  vn.uuid AS vernacular_name_uuid,
+  ${getPropDraftOrNot('name', draft, 'vn.')} AS vernacular_name,
+  ${getPropDraftOrNot('lang', draft, 'vn.')} AS vernacular_language`
+
 // ============== CREATE
 
 const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
@@ -99,6 +107,18 @@ const fetchAllTaxa = async (surveyId, taxonomyUuid, draft = false, limit = null,
     record => dbTransformCallback(record, draft, true)
   )
 
+const fetchTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, orderByProp, draft, client) =>
+  await client.map(
+    `SELECT * 
+       FROM ${getSurveyDBSchema(surveyId)}.taxon
+       WHERE taxonomy_uuid = $1 
+         ${whereCondition ? ` AND (${whereCondition})` : ''}
+       ORDER BY ${getPropDraftOrNot(orderByProp, draft)} ASC
+       LIMIT 25`,
+    [taxonomyUuid],
+    taxon => dbTransformCallback(taxon, draft, true)
+  )
+
 const fetchTaxaByPropLike = async (surveyId,
                                    taxonomyUuid,
                                    filterProp,
@@ -107,26 +127,24 @@ const fetchTaxaByPropLike = async (surveyId,
                                    client = db) => {
 
   const searchValue = toSearchValue(filterValue)
-
   const filterCondition = getPropFilterCondition(filterProp, searchValue, draft)
 
-  return await client.map(
-    `SELECT * 
-       FROM ${getSurveyDBSchema(surveyId)}.taxon
-       WHERE taxonomy_uuid = $1 
-         ${filterCondition ? ` AND ${filterCondition}` : ''}
-       ORDER BY ${getPropDraftOrNot(filterProp, draft)} ASC
-       LIMIT 20`,
-    [taxonomyUuid],
-    record => dbTransformCallback(record, draft, true)
-  )
+  return await fetchTaxaByCondition(surveyId, taxonomyUuid, filterCondition, filterProp, draft, client)
 }
 
-const getTaxonVernacularNameSelectFields = draft => `
-  t.*,
-  vn.uuid AS vernacular_name_uuid,
-  ${getPropDraftOrNot('name', draft, 'vn.')} AS vernacular_name,
-  ${getPropDraftOrNot('lang', draft, 'vn.')} AS vernacular_language`
+const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) => {
+
+  const searchValue = toSearchValue(filterValue)
+  const whereCondition = isBlank(searchValue)
+    ? null
+    : `
+    ${getPropFilterCondition(Taxonomy.taxonPropKeys.scientificName, '%' + searchValue + '%', draft)} 
+     OR  
+    ${getPropFilterCondition(Taxonomy.taxonPropKeys.code, '%' + searchValue + '%', draft)}
+    `
+
+  return await fetchTaxaByCondition(surveyId, taxonomyUuid, whereCondition, Taxonomy.taxonPropKeys.scientificName, draft, client)
+}
 
 const fetchTaxaByVernacularName = async (surveyId,
                                          taxonomyUuid,
@@ -141,7 +159,8 @@ const fetchTaxaByVernacularName = async (surveyId,
      FROM ${getSurveyDBSchema(surveyId)}.taxon t
        LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
        ON vn.taxon_uuid = t.uuid
-     WHERE t.taxonomy_uuid = $1 AND ${filterCondition}
+     WHERE t.taxonomy_uuid = $1 
+      AND ${filterCondition}
      ORDER BY ${getPropDraftOrNot(Taxonomy.taxonPropKeys.name, draft, 'vn.')} ASC
      LIMIT 20`,
     [taxonomyUuid],
@@ -149,8 +168,8 @@ const fetchTaxaByVernacularName = async (surveyId,
   )
 }
 
-const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, client = db) => {
-  return await client.one(
+const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, client = db) =>
+  await client.one(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
      FROM ${getSurveyDBSchema(surveyId)}.taxon t
        LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
@@ -159,7 +178,6 @@ const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, cli
     [uuid],
     record => dbTransformCallback(record, draft, true)
   )
-}
 
 const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
   await client.one(
@@ -232,6 +250,7 @@ module.exports = {
   countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike,
   fetchTaxaByVernacularName,
+  findTaxaByCodeOrScientificName,
   fetchTaxonByUuid,
   fetchTaxonVernacularNameByUuid,
   fetchAllTaxa,

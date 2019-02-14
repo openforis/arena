@@ -169,6 +169,7 @@ module.exports = {
   countTaxaByTaxonomyUuid: TaxonomyRepository.countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike,
   fetchTaxaByVernacularName,
+  findTaxaByCodeOrScientificName: TaxonomyRepository.findTaxaByCodeOrScientificName,
   fetchTaxonByUuid: TaxonomyRepository.fetchTaxonByUuid,
   fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid: TaxonomyRepository.fetchTaxonVernacularNameByUuid,

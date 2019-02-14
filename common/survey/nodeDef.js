@@ -111,6 +111,8 @@ const getValidations = SurveyUtils.getProp(propKeys.validations, {})
 // ==== READ meta
 const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
+const getNodeDefParentCodeDefUuid = SurveyUtils.getProp(propKeys.parentCodeDefUuid)
+
 // ==== UPDATE
 
 // ==== UTILS
@@ -155,6 +157,8 @@ const canNodeDefHaveDefaultValue = nodeDef =>
       nodeDefType.time,
     ]
   )
+  // allow default value when parent code is null (for node def code)
+  && !getNodeDefParentCodeDefUuid(nodeDef)
 
 module.exports = {
   nodeDefType,
@@ -177,7 +181,7 @@ module.exports = {
   getNodeDefDescriptions: SurveyUtils.getProp(propKeys.descriptions, {}),
   getNodeDefValidation: R.prop(keys.validation),
   getNodeDefCategoryUuid: SurveyUtils.getProp(propKeys.categoryUuid),
-  getNodeDefParentCodeDefUuid: SurveyUtils.getProp(propKeys.parentCodeDefUuid),
+  getNodeDefParentCodeDefUuid,
   getNodeDefTaxonomyUuid: SurveyUtils.getProp(propKeys.taxonomyUuid),
 
   isNodeDefKey,
