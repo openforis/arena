@@ -7,7 +7,7 @@ import * as R from 'ramda'
 import Survey from '../../../../../common/survey/survey'
 import * as SurveyState from '../../../../survey/surveyState'
 
-import TableSelector from './tableSelector'
+import VariablesSelector from './VariablesSelector'
 
 import { initDataTable } from '../actions'
 
@@ -32,11 +32,11 @@ class NodeDefsSelector extends React.Component {
     return (
       <div className="node-defs-selector">
 
-        <TableSelector hierarchy={hierarchy}
-                       lang={lang}
-                       canSelectVariables={true}
-                       onVariablesChange={nodeDefVariableUuids => this.setState({ nodeDefVariableUuids })}
-                       onTableChange={nodeDefUuid => this.setState({ nodeDefUuid })}/>
+        <VariablesSelector hierarchy={hierarchy}
+                           lang={lang}
+                           canSelectVariables={true}
+                           onVariablesChange={nodeDefVariableUuids => this.setState({ nodeDefVariableUuids })}
+                           onTableChange={nodeDefUuid => this.setState({ nodeDefUuid })}/>
 
         <button className="btn btn-of-light btn-sync"
                 onClick={() => initDataTable(nodeDefUuid, nodeDefVariableUuids)}

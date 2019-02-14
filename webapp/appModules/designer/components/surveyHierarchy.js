@@ -9,7 +9,7 @@ import * as SurveyState from '../../../survey/surveyState'
 
 import Tree from './surveyHierarchyTree'
 
-import TableSelector from '../../data/dataVis/components/tableSelector'
+import VariablesSelector from '../../data/dataVis/components/VariablesSelector'
 
 class SurveyHierarchy extends React.Component {
 
@@ -52,12 +52,12 @@ class SurveyHierarchy extends React.Component {
         <div className="survey-hierarchy__tree" ref={this.treeEl}/>
 
         <div className="survey-hierarchy__attributes">
-          <TableSelector hierarchy={hierarchy}
-                         lang={lang}
-                         showAncestors={false}
-                         canSelectVariables={false}
-                         onTableChange={uuid => this.tree.expandToNode(uuid)}
-                         selectedTableUuid={selectedNodeDefUuid}/>
+          <VariablesSelector hierarchy={hierarchy}
+                             lang={lang}
+                             showAncestors={false}
+                             canSelectVariables={false}
+                             onTableChange={uuid => this.tree.expandToNode(uuid)}
+                             selectedTableUuid={selectedNodeDefUuid}/>
         </div>
 
       </div>
