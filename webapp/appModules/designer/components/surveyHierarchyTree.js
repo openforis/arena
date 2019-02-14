@@ -258,7 +258,7 @@ export default class SurveyHierarchyTree {
     this.svg.selectAll('.node-grid')
       .attr('class', 'node-grid')
       .filter(d => d.data.uuid === uuid)
-      .attr('class', 'node-grid highilight')
+      .attr('class', 'node-grid highlight')
   }
 
 }
