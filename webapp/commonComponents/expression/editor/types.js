@@ -223,48 +223,77 @@ const Call = ({ node, variables, onChange }) => {
   )
 }
 
-const Literal = ({ node, onChange, literalSearchParams = null }) => {
+class Literal extends React.Component {
 
-  const lookupFunction = async value => {
-    const params = {
-      ...literalSearchParams,
-      value
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      selection: null
     }
-    const { data } = await axios.get('/api/expression/literal/search', { params })
-    return data.items
   }
 
-  return (
-    <div className="literal">
+  async componentDidMount() {
+    const { node, literalSearchParams = null } = this.props
 
-      {
-        literalSearchParams
-          ? (
-            <Dropdown itemsLookupFunction={lookupFunction}
-                      itemKeyProp="key"
-                      itemLabelProp="label"
-                      onChange={item =>
-                        onChange(R.pipe(
-                          R.assoc('raw', item.key),
-                          R.assoc('value', item.key),
-                        )(node))
-                      }
-                      selection={null}/>
-          )
-          : (
-            <input className="form-input" value={node.raw}
-                   size={25}
-                   onChange={e =>
-                     onChange(R.pipe(
-                       R.assoc('raw', e.target.value),
-                       R.assoc('value', e.target.value),
-                     )(node))
-                   }/>
-          )
+    if (node.raw) {
+      const params = {
+        ...literalSearchParams,
+        value: node.raw
       }
+      const { data } = await axios.get('/api/expression/literal/item', { params })
 
-    </div>
-  )
+      this.setState({
+        selection: data.item
+      })
+    }
+  }
+
+  render() {
+    const { node, onChange, literalSearchParams = null } = this.props
+    const { selection } = this.state
+
+    const lookupFunction = async value => {
+      const params = {
+        ...literalSearchParams,
+        value
+      }
+      const { data } = await axios.get('/api/expression/literal/items', { params })
+      return data.items
+    }
+
+    return (
+      <div className="literal">
+
+        {
+          literalSearchParams
+            ? (
+              <Dropdown itemsLookupFunction={lookupFunction}
+                        itemKeyProp="key"
+                        itemLabelProp="label"
+                        onChange={item =>
+                          onChange(R.pipe(
+                            R.assoc('raw', item.key),
+                            R.assoc('value', item.key),
+                          )(node))
+                        }
+                        selection={selection}/>
+            )
+            : (
+              <input className="form-input" value={node.raw}
+                     size={25}
+                     onChange={e =>
+                       onChange(R.pipe(
+                         R.assoc('raw', e.target.value),
+                         R.assoc('value', e.target.value),
+                       )(node))
+                     }/>
+            )
+        }
+
+      </div>
+    )
+  }
 }
 
 const components = {

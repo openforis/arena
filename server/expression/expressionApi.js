@@ -11,10 +11,60 @@ const TaxonomyManager = require('../taxonomy/taxonomyManager')
 const { sendErr } = require('../serverUtils/response')
 const { getRestParam } = require('../serverUtils/request')
 
+const toItem = (type, lang = null) =>
+  item => item
+    ?
+    (
+      type === NodeDef.nodeDefType.code
+        ? {
+          key: Category.getItemCode(item),
+          label: Category.getItemLabel(lang)(item),
+        }
+        : {
+          key: Taxonomy.getTaxonCode(item),
+          label: Taxonomy.getTaxonScientificName(item),
+        }
+    )
+    : null
+
 module.exports.init = app => {
 
-  // ==== CREATE
-  app.get('/expression/literal/search', async (req, res) => {
+  // ==== READ
+  app.get('/expression/literal/item', async (req, res) => {
+    try {
+      const surveyId = getRestParam(req, 'surveyId')
+      const type = getRestParam(req, 'type')
+      const value = getRestParam(req, 'value')
+
+      if (NodeDef.nodeDefType.code === type) {
+        const categoryUuid = getRestParam(req, 'categoryUuid')
+        const lang = getRestParam(req, 'lang')
+
+        const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, 0, true)
+
+        const item = R.pipe(
+          R.find(item => Category.getItemCode(item) === value),
+          toItem(type, lang)
+        )(itemsDb)
+
+        res.json({ item })
+
+      } else if (NodeDef.nodeDefType.taxon === type) {
+        const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
+
+        const itemDb = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, true)
+
+        res.json({ item: toItem(type)(itemDb) })
+
+      } else {
+        throw new Error('invalid type ' + type)
+      }
+    } catch (err) {
+      sendErr(res, err)
+    }
+  })
+
+  app.get('/expression/literal/items', async (req, res) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const type = getRestParam(req, 'type')
@@ -39,10 +89,7 @@ module.exports.init = app => {
             })
           ),
           R.take(25),
-          R.map(item => ({
-            key: Category.getItemCode(item),
-            label: Category.getItemLabel(lang)(item),
-          }))
+          R.map(toItem(type, lang))
         )(itemsDb)
 
         res.json({ items })
@@ -52,21 +99,16 @@ module.exports.init = app => {
 
         const itemsDb = await TaxonomyManager.findTaxaByCodeOrScientificName(surveyId, taxonomyUuid, value, true)
 
-        const items = itemsDb.map(item => ({
-          key: Taxonomy.getTaxonCode(item),
-          label: Taxonomy.getTaxonScientificName(item),
-        }))
+        const items = itemsDb.map(toItem(type))
 
         res.json({ items })
 
       } else {
         throw new Error('invalid type ' + type)
       }
-
     } catch (err) {
       sendErr(res, err)
     }
-
   })
 
 }
