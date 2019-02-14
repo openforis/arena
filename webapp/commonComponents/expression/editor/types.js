@@ -146,6 +146,7 @@ const Binary = (props) => {
   const {
     node, onChange,
     canDelete = false, onDelete,
+    isBoolean
   } = props
 
   return (
@@ -161,8 +162,11 @@ const Binary = (props) => {
 
       <BinaryOperand {...props} type="right"/>
 
-      <EditButtons node={node} onChange={onChange}
-                   onDelete={onDelete} canDelete={canDelete}/>
+      {
+        isBoolean &&
+        <EditButtons node={node} onChange={onChange}
+                     onDelete={onDelete} canDelete={canDelete}/>
+      }
 
     </div>
   )

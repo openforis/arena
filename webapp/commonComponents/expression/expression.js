@@ -48,7 +48,12 @@ class ExpressionComponent extends React.Component {
   }
 
   render () {
-    const { query, variables, mode, canBeConstant } = this.props
+
+    const {
+      query, variables, mode,
+      canBeConstant, isBoolean
+    } = this.props
+
     const { edit } = this.state
 
     return <div className={`expression${edit ? ' edit' : ''}`}
@@ -62,7 +67,8 @@ class ExpressionComponent extends React.Component {
                     onClose={this.toggleEdit}
                     onChange={query => this.applyChange(query)}
                     mode={mode}
-                    canBeConstant={canBeConstant}/>
+                    canBeConstant={canBeConstant}
+                    isBoolean={isBoolean}/>
           )
           : (
             <div className="expression__query-container">
@@ -90,6 +96,7 @@ ExpressionComponent.defaultProps = {
   onChange: null,
   isContextParent: false,
   canBeConstant: false,
+  isBoolean: true,
 }
 
 const mapStateToProps = (state, props) => {

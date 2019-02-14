@@ -35,7 +35,8 @@ const AdvancedProps = props => {
                                   propName="defaultValues"
                                   validation={Validator.getFieldValidation('defaultValues')(validation)}
                                   nodeDefUuidContext={nodeDefUuidContext}
-                                  canBeConstant={true}/>
+                                  canBeConstant={true}
+                                  isBoolean={NodeDef.isNodeDefBoolean(nodeDef)}/>
         </React.Fragment>
       }
 

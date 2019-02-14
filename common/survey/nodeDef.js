@@ -88,12 +88,13 @@ const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
 const isNodeDefSingleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefSingle(nodeDef)
 const isNodeDefMultipleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefMultiple(nodeDef)
 
-const isNodeDefInteger = isNodeDefType(nodeDefType.integer)
-const isNodeDefDecimal = isNodeDefType(nodeDefType.decimal)
+const isNodeDefBoolean = isNodeDefType(nodeDefType.boolean)
 const isNodeDefCode = isNodeDefType(nodeDefType.code)
-const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 const isNodeDefCoordinate = isNodeDefType(nodeDefType.coordinate)
+const isNodeDefDecimal = isNodeDefType(nodeDefType.decimal)
 const isNodeDefFile = isNodeDefType(nodeDefType.file)
+const isNodeDefInteger = isNodeDefType(nodeDefType.integer)
+const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
 const isNodeDefPublished = R.propEq(propKeys.published, true)
 
@@ -190,12 +191,13 @@ module.exports = {
   isNodeDefSingleAttribute,
   isNodeDefMultipleAttribute,
 
-  isNodeDefInteger,
-  isNodeDefDecimal,
+  isNodeDefBoolean,
   isNodeDefCode,
-  isNodeDefTaxon,
   isNodeDefCoordinate,
+  isNodeDefDecimal,
   isNodeDefFile,
+  isNodeDefInteger,
+  isNodeDefTaxon,
 
   isNodeDefPublished,
 

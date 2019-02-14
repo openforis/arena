@@ -61,8 +61,15 @@ class Editor extends React.Component {
   }
 
   render () {
-    const { query, queryDraft, exprDraft, exprDraftValid } = this.state
-    const { variables, onClose, onChange } = this.props
+    const {
+      query, queryDraft,
+      exprDraft, exprDraftValid
+    } = this.state
+
+    const {
+      variables, isBoolean,
+      onClose, onChange
+    } = this.props
 
     return <React.Fragment>
 
@@ -83,7 +90,8 @@ class Editor extends React.Component {
 
       <div className="expression-editor__expr-container">
         <ExpressionNode variables={variables} node={exprDraft}
-                        onChange={this.updateDraft.bind(this)}/>
+                        onChange={this.updateDraft.bind(this)}
+                        isBoolean={isBoolean}/>
       </div>
 
       <div className="expression-editor__footer">
@@ -108,6 +116,7 @@ class Editor extends React.Component {
 Editor.defaultProps = {
   query: '',
   mode: Expression.modes.json,
+  isBoolean: true,
   onClose: null,
   onChange: null,
 }
