@@ -183,8 +183,8 @@ class VariablesSelector extends React.Component {
     const { nodeDefUuid, filterTypes, showSettings } = this.state
 
     return (
-      <div className="tables-selector">
-        <div className="tables-selector__container">
+      <div className="variables-selector">
+        <div className="variables-selector__container">
 
           <div>
             <button className="btn btn-s btn-of-light-xs btn-toggle-vars-filter"
@@ -199,7 +199,7 @@ class VariablesSelector extends React.Component {
 
           {
             showSettings &&
-            <div className="tables-selector__settings">
+            <div className="variables-selector__settings">
               {
                 R.keys(NodeDef.nodeDefType).map(type =>
                   NodeDef.nodeDefType.entity !== type
