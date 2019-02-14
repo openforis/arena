@@ -2,6 +2,7 @@ const camelize = require('camelize')
 const R = require('ramda')
 
 const db = require('../db/db')
+const { now } = require('../db/dbUtils')
 
 const Node = require('../../common/record/node')
 const { getSurveyDBSchema } = require('../../server/survey/surveySchemaRepositoryUtils')
@@ -126,7 +127,7 @@ const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1,
     meta = meta || $2::jsonb, 
-    date_modified = now()
+    date_modified = ${now}
     WHERE uuid = $3
     RETURNING *, true as updated
     `, [stringifyValue(value), meta, nodeUuid],

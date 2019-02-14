@@ -7,8 +7,6 @@ const RecordValidation = require('../../../../common/record/recordValidation')
 const Node = require('../../../../common/record/node')
 const Validator = require('../../../../common/validation/validator')
 
-const NodeRepository = require('../../nodeRepository')
-
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
 
 const errorKeys = {
@@ -83,7 +81,7 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
   // 2. check if record is unique
   const isUnique = R.pipe(
     // exclude current record
-    R.reject(R.propEq(Record.keys.uuid, recordUuid)),
+    R.reject(R.propEq('record_uuid', recordUuid)),
     R.isEmpty
   )(records)
 

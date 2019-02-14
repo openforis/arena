@@ -2,14 +2,29 @@ const Promise = require('bluebird')
 const R = require('ramda')
 
 const db = require('../db/db')
-const {selectDate} = require('../db/dbUtils')
-const {getSurveyDBSchema, dbTransformCallback} = require('../survey/surveySchemaRepositoryUtils')
+const { selectDate, now } = require('../db/dbUtils')
+const { getSurveyDBSchema, dbTransformCallback: dbTransformCallbackCommon } = require('../survey/surveySchemaRepositoryUtils')
 
-const nodeDefSelectFields = (advanced = false) =>
-  `id, uuid, parent_uuid, type, deleted, ${selectDate('date_created')}, ${selectDate('date_modified')},  
-    props${advanced ? ' || props_advanced' : ''} as props, 
-    props_draft${advanced ? ' || props_advanced_draft' : ''} as  props_draft,
-    meta`
+const dbTransformCallback = (nodeDef, draft, advanced = false) => {
+
+  const def = advanced ?
+    R.pipe(
+      def => R.isEmpty(nodeDef.props_advanced_draft)
+        ? def
+        : R.assoc('draft_advanced', true, def),
+      R.assoc('props', R.mergeDeepLeft(nodeDef.props, nodeDef.props_advanced)),
+      R.assoc('props_draft', R.mergeDeepLeft(nodeDef.props_draft, nodeDef.props_advanced_draft)),
+      R.omit(['props_advanced', 'props_advanced_draft'])
+    )(nodeDef)
+    : nodeDef
+
+  return dbTransformCallbackCommon(def, draft, true)
+
+}
+
+const nodeDefSelectFields =
+  `id, uuid, parent_uuid, type, deleted, ${selectDate('date_created')}, ${selectDate('date_modified')}, 
+  props, props_advanced, props_draft, props_advanced_draft, meta`
 
 // ============== CREATE
 
@@ -39,64 +54,64 @@ const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = d
 
 const fetchNodeDefsBySurveyId = async (surveyId, draft, advanced = false, client = db) =>
   await client.map(`
-    SELECT ${nodeDefSelectFields(advanced)}
+    SELECT ${nodeDefSelectFields}
     FROM ${getSurveyDBSchema(surveyId)}.node_def 
     WHERE deleted IS NOT TRUE
     ORDER BY id`,
     [],
-    res => dbTransformCallback(res, draft, true)
+    res => dbTransformCallback(res, draft, advanced)
   )
 
 const fetchRootNodeDef = async (surveyId, draft, client = db) =>
   await client.one(
-    `SELECT ${nodeDefSelectFields()}
+    `SELECT ${nodeDefSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
      WHERE parent_uuid IS NULL`,
     [],
-    res => dbTransformCallback(res, draft, true)
+    res => dbTransformCallback(res, draft, false)
   )
 
 const fetchNodeDefByUuid = async (surveyId, nodeDefUuid, draft, advanced = false, client = db) =>
   await client.one(
-    `SELECT ${nodeDefSelectFields(advanced)}
+    `SELECT ${nodeDefSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
      WHERE uuid = $1`,
     [nodeDefUuid],
-    res => dbTransformCallback(res, draft, true)
+    res => dbTransformCallback(res, draft, advanced)
   )
 
 const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, advanced = false, client = db) =>
   await client.map(
-    `SELECT ${nodeDefSelectFields(advanced)}
+    `SELECT ${nodeDefSelectFields}
      FROM ${getSurveyDBSchema(surveyId)}.node_def 
      WHERE uuid in (${nodeDefUuids.map((uuid, i) => `$${i + 1}`).join(',')})`,
     [...nodeDefUuids],
-    res => dbTransformCallback(res, draft, true)
+    res => dbTransformCallback(res, draft, advanced)
   )
 
 const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = db) =>
   await client.map(`
-    SELECT ${nodeDefSelectFields()}
+    SELECT ${nodeDefSelectFields}
     FROM ${getSurveyDBSchema(surveyId)}.node_def 
     WHERE parent_uuid = $1
     AND deleted IS NOT TRUE
     ORDER BY id`,
     [parentUuid],
-    res => dbTransformCallback(res, draft, true)
+    res => dbTransformCallback(res, draft, false)
   )
 
 const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
   const rootNodeDef = await fetchRootNodeDef(surveyId, draft, client)
 
   return await client.map(`
-    SELECT ${nodeDefSelectFields()}
+    SELECT ${nodeDefSelectFields}
     FROM ${getSurveyDBSchema(surveyId)}.node_def 
     WHERE deleted IS NOT TRUE
     AND parent_uuid = $1
     AND props->>'key' = $2
     ORDER BY id`,
     [rootNodeDef.uuid, 'true'],
-    res => dbTransformCallback(res, draft, true)
+    res => dbTransformCallback(res, draft, false)
   )
 }
 
@@ -121,9 +136,9 @@ const updateNodeDefProps = async (surveyId, nodeDefUuid, propsArray, client = db
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props_draft = props_draft || $1::jsonb,
         props_advanced_draft = props_advanced_draft || $2::jsonb,
-        date_modified = timezone('UTC'::text, now())
+        date_modified = ${now}
     WHERE uuid = $3
-    RETURNING ${nodeDefSelectFields()}
+    RETURNING ${nodeDefSelectFields}
   `, [props, advancedProps, nodeDefUuid],
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
@@ -147,7 +162,7 @@ const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = db) => {
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET deleted = true
     WHERE uuid = $1
-    RETURNING ${nodeDefSelectFields()}
+    RETURNING ${nodeDefSelectFields}
   `,
     [nodeDefUuid],
     def => dbTransformCallback(def, true, true)
@@ -192,7 +207,7 @@ module.exports = {
   fetchRootNodeDef,
   fetchNodeDefByUuid,
   fetchNodeDefsByUuid,
-  fetchNodeDefsByParentUuid,
+  // fetchNodeDefsByParentUuid,
   fetchRootNodeDefKeysBySurveyId,
 
   //UPDATE

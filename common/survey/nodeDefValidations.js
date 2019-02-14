@@ -8,6 +8,25 @@ const keys = {
   expressions: 'expressions'
 }
 
+const dissocCount = R.dissoc(keys.count)
+
+const getCountProp = key => R.pathOr('', [keys.count, key])
+
+const assocCountProp = key =>
+  value => R.pipe(
+    R.ifElse(
+      R.always(R.isEmpty(value)),
+      R.dissocPath([keys.count, key]),
+      R.assocPath([keys.count, key], value)
+    ),
+    // if validations count obj is empty, it gets removed from validations
+    R.ifElse(
+      R.pipe(R.prop(keys.count), R.isEmpty),
+      dissocCount,
+      R.identity
+    )
+  )
+
 module.exports = {
   //REQUIRED
   isRequired: R.propOr(false, keys.required),
@@ -15,13 +34,13 @@ module.exports = {
   dissocRequired: R.dissoc(keys.required),
 
   //COUNT
-  getMinCount: R.pathOr('', [keys.count, keys.min]),
+  getMinCount: getCountProp(keys.min),
+  getMaxCount: getCountProp(keys.max),
 
-  getMaxCount: R.pathOr('', [keys.count, keys.max]),
+  assocMinCount: assocCountProp(keys.min),
+  assocMaxCount: assocCountProp(keys.max),
 
-  assocMinCount: minCount => R.assocPath([keys.count, keys.min], minCount),
-  assocMaxCount: maxCount => R.assocPath([keys.count, keys.max], maxCount),
-  dissocCount: R.dissoc(keys.count),
+  dissocCount,
 
   //EXPRESSIONS
   getExpressions: R.propOr([], (keys.expressions)),

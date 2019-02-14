@@ -100,8 +100,9 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   const surveyId = Survey.getId(survey)
   const draft = Survey.isDraft(Survey.getSurveyInfo(survey))
+  const isExprPrimitive = R.is(String, valueExpr) || R.is(Number, valueExpr)
 
-  if (NodeDef.isNodeDefCode(nodeDef) && (R.is(String, valueExpr) || R.is(Number, valueExpr))) {
+  if (NodeDef.isNodeDefCode(nodeDef) && isExprPrimitive) {
     // valueExpr is the code of a category item
 
     // 1. find category items
@@ -116,7 +117,7 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
     const item = R.find(item => Category.getItemCode(item) === '' + valueExpr)(itemsInLevel)
 
     return item ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) } : null
-  } else if (NodeDef.isNodeDefTaxon(nodeDef) && (R.is(String, valueExpr) || R.is(Number, valueExpr))) {
+  } else if (NodeDef.isNodeDefTaxon(nodeDef) && isExprPrimitive) {
     // valueExpr is the code of a taxon
     const item = await TaxonomyManager.fetchTaxonByCode(
       surveyId,

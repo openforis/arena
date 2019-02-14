@@ -14,29 +14,32 @@ const errorKeys = {
   maxCountNodesExceeded: 'maxCountNodesExceeded'
 }
 
+const getCount = (record, parentNode, childDef) => {
+  const nodes = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
+
+  return NodeDef.isNodeDefEntity(childDef)
+    ? nodes.length
+    : R.pipe(
+      R.reject(Node.isNodeValueBlank),
+      R.length
+    )(nodes)
+}
+
 const validateChildrenCount = (record, nodePointers) => {
   const nodePointersValidated = nodePointers.map(
     nodePointer => {
       const { node, childDef } = nodePointer
+
       const validations = NodeDef.getValidations(childDef)
       const minCount = NumberUtils.toNumber(NodeDefValidations.getMinCount(validations))
       const maxCount = NumberUtils.toNumber(NodeDefValidations.getMaxCount(validations))
+      const hasMinCount = !isNaN(minCount)
+      const hasMaxCount = !isNaN(maxCount)
 
-      if (isNaN(minCount) && isNaN(maxCount))
-        return {}
+      const count = (hasMinCount || hasMaxCount) ? getCount(record, node, childDef) : 0
 
-      const nodes = Record.getNodeChildrenByDefUuid(node, NodeDef.getUuid(childDef))(record)
-
-      // TODO count only non-empty entities
-      const count = NodeDef.isNodeDefEntity(childDef)
-        ? nodes.length
-        : R.pipe(
-          R.reject(Node.isNodeValueBlank),
-          R.length
-        )(nodes)
-
-      const minCountValid = isNaN(minCount) || count >= minCount
-      const maxCountValid = isNaN(maxCount) || count <= maxCount
+      const minCountValid = !hasMinCount || count >= minCount
+      const maxCountValid = !hasMaxCount || count <= maxCount
 
       const childrenCountValidation = {
         [Validator.keys.valid]: minCountValid && maxCountValid,
@@ -51,6 +54,7 @@ const validateChildrenCount = (record, nodePointers) => {
           }
         }
       }
+
       return {
         [Node.getUuid(node)]: {
           [Validator.keys.fields]: {
@@ -62,6 +66,7 @@ const validateChildrenCount = (record, nodePointers) => {
           }
         }
       }
+
     }
   )
 

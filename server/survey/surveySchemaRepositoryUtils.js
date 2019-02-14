@@ -1,10 +1,14 @@
 const R = require('ramda')
 const camelize = require('camelize')
 const db = require('../db/db')
+const { now } = require('../db/dbUtils')
 
 const mergeProps = (def, draft) => {
-  const {props, propsDraft} = def
-  const propsMerged = draft ? R.mergeDeepRight(props, propsDraft, def) : props
+  const { props, propsDraft } = def
+
+  const propsMerged = draft
+    ? R.mergeRight(props, propsDraft, def)
+    : props
 
   return R.pipe(
     R.assoc('props', propsMerged),
@@ -32,7 +36,7 @@ const markSurveyDraft = async (surveyId, client = db) =>
   await client.query(`
     UPDATE survey
     SET draft         = true,
-        date_modified = now()
+        date_modified = ${now}
     WHERE id = $1
   `, [surveyId])
 
@@ -51,7 +55,7 @@ const updateSurveySchemaTableProp = async (surveyId, tableName, recordUuid, key,
      SET props_draft = props_draft || $1
      WHERE uuid = $2
      RETURNING *`
-    , [JSON.stringify({[key]: value}), recordUuid]
+    , [JSON.stringify({ [key]: value }), recordUuid]
     , def => dbTransformCallback(def, true)
   )
 
