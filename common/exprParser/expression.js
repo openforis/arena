@@ -60,12 +60,11 @@ const newIdentifier = () => ({
   name: ''
 })
 
-const newBinary = (left = newIdentifier(), right, operator = '') => ({
+const newBinary = (left, right, operator = '') => ({
   type: types.BinaryExpression,
   operator,
   left,
   right
-
 })
 
 module.exports = {
@@ -81,6 +80,7 @@ module.exports = {
   isLiteral: isType(types.Literal),
   isCompound: isType(types.Compound),
   isBinary: isType(types.BinaryExpression),
+  isIdentifier: isType(types.Identifier),
 
   // Instance creators
   newLiteral,

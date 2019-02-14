@@ -18,6 +18,7 @@ class Editor extends React.Component {
     const exprQuery = Expression.fromString(query, mode)
     const isCompound = Expression.isCompound(exprQuery)
     const isBinary = Expression.isBinary(exprQuery)
+
     const expr = isBinary
       ? exprQuery
       : Expression.newBinary(
@@ -28,8 +29,6 @@ class Editor extends React.Component {
           : exprQuery,
         Expression.newLiteral()
       )
-
-    // if(Expression.isLiteral(expr))
 
     this.state = {
       query, queryDraft: Expression.toString(expr, mode),

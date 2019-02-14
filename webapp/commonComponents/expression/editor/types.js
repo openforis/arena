@@ -116,13 +116,13 @@ const Logical = (props) => {
 }
 
 const BinaryOperand = ({ type, node, ...props }) => {
-  const { onChange } = props
+  const { isBoolean, onChange } = props
   const nodeOperand = R.prop(type, node)
 
   return (
     <React.Fragment>
       <button
-        className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? '' : ' active'}`}
+        className={`btn btn-s btn-of-light btn-switch-operand${Expression.isIdentifier(nodeOperand) ? ' active' : ''}`}
         onClick={() => onChange(
           R.assoc(type, Expression.newIdentifier(), node)
         )}>
@@ -130,6 +130,7 @@ const BinaryOperand = ({ type, node, ...props }) => {
       </button>
       <button
         className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
+        aria-disabled={type === 'left' && isBoolean}
         onClick={() => onChange(
           R.assoc(type, Expression.newLiteral(), node)
         )}>
@@ -149,23 +150,35 @@ const Binary = (props) => {
     isBoolean
   } = props
 
+  const isLeftIdentifier = R.pipe(
+    R.prop('left'),
+    Expression.isIdentifier
+  )(node)
+
   return (
     <div className="binary">
 
       <BinaryOperand {...props} type="left"/>
 
-      <Dropdown items={Expression.operators.binaryValues} inputSize={10}
-                selection={Expression.operators.findBinary(node.operator)}
-                onChange={item => onChange(
-                  R.assoc('operator', R.propOr('', 'key', item), node)
-                )}/>
-
-      <BinaryOperand {...props} type="right"/>
-
       {
-        isBoolean &&
-        <EditButtons node={node} onChange={onChange}
-                     onDelete={onDelete} canDelete={canDelete}/>
+        isLeftIdentifier &&
+        <React.Fragment>
+
+
+          <Dropdown items={Expression.operators.binaryValues} inputSize={10}
+                    selection={Expression.operators.findBinary(node.operator)}
+                    onChange={item => onChange(
+                      R.assoc('operator', R.propOr('', 'key', item), node)
+                    )}/>
+
+          <BinaryOperand {...props} type="right"/>
+
+          {
+            isBoolean &&
+            <EditButtons node={node} onChange={onChange}
+                         onDelete={onDelete} canDelete={canDelete}/>
+          }
+        </React.Fragment>
       }
 
     </div>
