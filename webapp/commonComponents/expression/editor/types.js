@@ -52,7 +52,6 @@ const EditButtons = (props) => {
 const Group = (props) => {
   const {
     node, onChange,
-    canDelete,
     level = 0
   } = props
   const { argument } = node
@@ -229,38 +228,62 @@ class Literal extends React.Component {
     super(props)
 
     this.state = {
-      selection: null
+      selection: null,
+      items: null
     }
   }
 
-  async componentDidMount() {
-    const { node, literalSearchParams = null } = this.props
-
-    if (node.raw) {
-      const params = {
-        ...literalSearchParams,
-        value: node.raw
-      }
-      const { data } = await axios.get('/api/expression/literal/item', { params })
-
+  async componentDidMount () {
+    const { literalSearchParams, node } = this.props
+    if (literalSearchParams) {
       this.setState({
-        selection: data.item
+        selection: await this.loadItem(node.raw),
+        items: await this.loadItems()
       })
     }
   }
 
-  render() {
-    const { node, onChange, literalSearchParams = null } = this.props
-    const { selection } = this.state
+  async loadItem (value) {
+    const { literalSearchParams } = this.props
 
-    const lookupFunction = async value => {
+    if (value) {
       const params = {
         ...literalSearchParams,
         value
       }
-      const { data } = await axios.get('/api/expression/literal/items', { params })
-      return data.items
+      const { data } = await axios.get('/api/expression/literal/item', { params })
+
+      return data.item
+    } else {
+      return null
     }
+  }
+
+  async loadItems (value = '') {
+    const { literalSearchParams } = this.props
+
+    const params = {
+      ...literalSearchParams,
+      value
+    }
+    const { data } = await axios.get('/api/expression/literal/items', { params })
+    return data.items
+  }
+
+  onChange (value) {
+    const { node, onChange } = this.props
+
+    onChange(R.pipe(
+      R.assoc('raw', value),
+      R.assoc('value', value),
+    )(node))
+  }
+
+  render () {
+    const { node, literalSearchParams } = this.props
+    const { items, selection } = this.state
+
+    const lookupFunction = async value => this.loadItems(value)
 
     return (
       <div className="literal">
@@ -268,32 +291,27 @@ class Literal extends React.Component {
         {
           literalSearchParams
             ? (
-              <Dropdown itemsLookupFunction={lookupFunction}
+              <Dropdown items={items}
+                        itemsLookupFunction={lookupFunction}
                         itemKeyProp="key"
                         itemLabelProp="label"
-                        onChange={item =>
-                          onChange(R.pipe(
-                            R.assoc('raw', item.key),
-                            R.assoc('value', item.key),
-                          )(node))
-                        }
+                        onChange={item => this.onChange(item.key)}
                         selection={selection}/>
             )
             : (
               <input className="form-input" value={node.raw}
                      size={25}
-                     onChange={e =>
-                       onChange(R.pipe(
-                         R.assoc('raw', e.target.value),
-                         R.assoc('value', e.target.value),
-                       )(node))
-                     }/>
+                     onChange={e => this.onChange(e.target.value)}/>
             )
         }
 
       </div>
     )
   }
+}
+
+Literal.defaultProps = {
+  literalSearchParams: null
 }
 
 const components = {

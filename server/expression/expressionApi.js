@@ -52,7 +52,7 @@ module.exports.init = app => {
       } else if (NodeDef.nodeDefType.taxon === type) {
         const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
 
-        const itemDb = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, true)
+        const itemDb = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, value, true)
 
         res.json({ item: toItem(type)(itemDb) })
 
