@@ -78,4 +78,5 @@ module.exports = {
   getTaxonVernacularName,
   getTaxonVernacularNameUuid: getProp(taxonPropKeys.vernacularNameUuid),
   isUnlistedTaxon: R.pipe(getTaxonCode, R.equals(unlistedCode)),
+  isUnknownTaxon: R.pipe(getTaxonCode, R.equals(unknownCode)),
 }

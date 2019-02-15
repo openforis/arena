@@ -222,6 +222,8 @@ const Call = ({ node, variables, onChange }) => {
   )
 }
 
+const getNodeRawValue = node => node.raw ? JSON.parse(node.raw) : ''
+
 class Literal extends React.Component {
 
   constructor (props) {
@@ -237,7 +239,7 @@ class Literal extends React.Component {
     const { literalSearchParams, node } = this.props
     if (literalSearchParams) {
       this.setState({
-        selection: await this.loadItem(node.raw),
+        selection: await this.loadItem(getNodeRawValue(node)),
         items: await this.loadItems()
       })
     }
@@ -270,8 +272,10 @@ class Literal extends React.Component {
     return data.items
   }
 
-  onChange (value) {
+  onChange (val) {
     const { node, onChange } = this.props
+
+    const value = JSON.stringify(val)
 
     onChange(R.pipe(
       R.assoc('raw', value),
@@ -283,11 +287,12 @@ class Literal extends React.Component {
     const { node, literalSearchParams } = this.props
     const { items, selection } = this.state
 
+    const value = getNodeRawValue(node)
+
     const lookupFunction = async value => this.loadItems(value)
 
     return (
       <div className="literal">
-
         {
           literalSearchParams
             ? (
@@ -299,7 +304,7 @@ class Literal extends React.Component {
                         selection={selection}/>
             )
             : (
-              <input className="form-input" value={node.raw}
+              <input className="form-input" value={value}
                      size={25}
                      onChange={e => this.onChange(e.target.value)}/>
             )
