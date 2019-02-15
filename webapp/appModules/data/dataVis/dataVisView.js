@@ -2,17 +2,14 @@ import './dataVisView.scss'
 
 import React from 'react'
 
-import NodeDefsSelector from './components/nodeDefsSelector'
-import DataTable from './components/dataTable'
+import DataQueryView from './dataQuery/dataQueryView'
 
 const DataVisView = (props) => {
 
   return (
     <div className="data-vis">
 
-      <NodeDefsSelector/>
-      <div/>
-      <DataTable/>
+      <DataQueryView/>
 
     </div>
   )

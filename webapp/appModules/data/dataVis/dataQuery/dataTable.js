@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import TablePaginator from '../../../../commonComponents/table/tablePaginator'
-import NodeDefTableColumn from './nodeDefs/nodeDefTableColumn'
+import NodeDefTableColumn from './nodeDefTableColumn'
 import ExpressionComponent from '../../../../commonComponents/expression/expression'
 
 import * as SurveyState from '../../../../survey/surveyState'

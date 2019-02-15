@@ -1,7 +1,7 @@
 import React from 'react'
 
-import NodeDef from '../../../../../../common/survey/nodeDef'
-import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
+import NodeDef from '../../../../../common/survey/nodeDef'
+import NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 
 const NodeDefTableColumn = ({nodeDef, row, lang, colWidth}) => {
   const colNames = NodeDefTable.getColNames(nodeDef)
