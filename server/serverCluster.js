@@ -11,6 +11,7 @@ const authConfig = require('./auth/authConfig')
 const authApi = require('./auth/authApi')
 const apiRouter = require('./config/apiRouter')
 const WebSocketManager = require('./webSocket/webSocketManager')
+const scheduler = require('./system/scheduler')
 
 module.exports = () => {
 
@@ -52,4 +53,6 @@ module.exports = () => {
 // ====== socket middleware
   WebSocketManager.init(server, sessionMiddleware)
 
+// ====== scheduler
+  scheduler.init()
 }

@@ -21,6 +21,8 @@ const ActivityLog = require('../activityLog/activityLogger')
 
 const { canEditRecord } = require('../../common/auth/authManager')
 
+const RecordUsersMap = require('./update/recordUsersMap')
+
 /**
  * ===================
  * CREATE
@@ -111,7 +113,13 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
     await RecordRepository.deleteRecord(user, surveyId, recordUuid, t)
   })
 
-  RecordUpdateManager.notifyUsersRecordDeleted(recordUuid, user.id)
+  RecordUpdateManager.notifyUsersRecordDeleted(surveyId, recordUuid, user.id)
+}
+
+const deleteStalePreviewRecords = () => {
+  // Surveys with old previews to delete
+  const targetSurveyIds = RecordUsersMap.getRecordUuids()
+  console.log(targetSurveyIds)
 }
 
 /**
@@ -178,6 +186,7 @@ module.exports = {
   //==== DELETE
   deleteRecord,
   deleteNode: RecordUpdateManager.deleteNode,
+  deleteStalePreviewRecords,
 
   //==== UTILS
   checkInRecord,

@@ -19,16 +19,18 @@ const RecordUpdateThread = require('./thread/recordUpdateThread')
 const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
   const userId = user.id
 
-  RecordUsersMap.assocUserId(recordUuid, userId)
+  RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
 
   const thread = new ThreadManager(
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
     { user, surveyId, recordUuid, preview },
     msg => {
-      const userIds = RecordUsersMap.getUserIds(recordUuid)
+      const userIds = RecordUsersMap.getUserIds(surveyId, recordUuid)
       userIds.forEach(userId =>
         WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
       )
+
+      if (preview) RecordUsersMap.touchPreviewRecord(recordUuid)
     },
     () => {
       RecordUsersMap.dissocUserId(recordUuid, userId)
@@ -106,7 +108,7 @@ const deleteNode = (user, nodeUuid) => {
  * @param recordUuid
  * @param userIdExclude Do not notify the user that has deleted the record
  */
-const notifyUsersRecordDeleted = (recordUuid, userIdExclude) => {
+const notifyUsersRecordDeleted = (surveyId, recordUuid, userIdExclude) => {
   const recordUsersIds = RecordUsersMap.getUserIds(recordUuid)
 
   recordUsersIds.forEach(id => {
