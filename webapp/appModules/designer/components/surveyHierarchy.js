@@ -9,7 +9,7 @@ import * as SurveyState from '../../../survey/surveyState'
 
 import Tree from './surveyHierarchyTree'
 
-import VariablesSelector from '../../data/dataVis/components/VariablesSelector'
+import VariablesSelector from '../../surveyVis/nodeDefsSelector/variablesSelector'
 
 class SurveyHierarchy extends React.Component {
 

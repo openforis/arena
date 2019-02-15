@@ -31,7 +31,7 @@ export const getTableNodeDefUuidTable = getTableProp(tableKeys.nodeDefUuidTable)
 export const getTableNodeDefUuidCols = getTableProp(tableKeys.nodeDefUuidCols, [])
 
 export const initTableData = (offset, limit, filter, count, data, nodeDefUuidTable, nodeDefUuidCols) =>
-  R.assoc(keys.table, {offset, limit, filter, count, data, nodeDefUuidTable, nodeDefUuidCols})
+  R.assoc(keys.table, { offset, limit, filter, count, data, nodeDefUuidTable, nodeDefUuidCols })
 
 export const updateTableData = (offset, data) => R.pipe(
   R.assocPath([keys.table, tableKeys.offset], offset),

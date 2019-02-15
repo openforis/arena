@@ -3,14 +3,14 @@ import './variablesSelector.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
-import { nbsp } from '../../../../../common/stringUtils'
+import { nbsp } from '../../../../common/stringUtils'
 
-import Dropdown from '../../../../commonComponents/form/dropdown'
+import Dropdown from '../../../commonComponents/form/dropdown'
 
-import Survey from '../../../../../common/survey/survey'
-import NodeDef from '../../../../../common/survey/nodeDef'
-import * as SurveyState from '../../../../survey/surveyState'
-import * as NodeDefUiProps from '../../../surveyForm/nodeDefs/nodeDefSystemProps'
+import Survey from '../../../../common/survey/survey'
+import NodeDef from '../../../../common/survey/nodeDef'
+import * as SurveyState from '../../../survey/surveyState'
+import * as NodeDefUiProps from '../../surveyForm/nodeDefs/nodeDefSystemProps'
 
 const TablesMenu = ({ hierarchy, nodeDefUuid, lang, onChange }) => {
   const entities = []
@@ -232,6 +232,7 @@ class VariablesSelector extends React.Component {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
+
   return {
     survey,
     lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),

@@ -1,6 +1,17 @@
 .data-query {
   display: grid;
-  grid-template-columns: 240px 10px .95fr;
+  grid-template-columns: 240px 1fr 10px;
+  grid-column-gap: 10px;
   justify-content: center;
   height: 100%;
+}
+
+.data-query__node-defs-selector {
+  display: grid;
+  grid-template-rows: 1fr 50px;
+
+  .btn-sync {
+    justify-self: center;
+    align-self: center;
+  }
 }

@@ -1,10 +1,11 @@
 import axios from 'axios'
 import Promise from 'bluebird'
-
-import * as DataVisState from './dataVisState'
+import * as R from 'ramda'
 
 import NodeDefTable from '../../../../common/surveyRdb/nodeDefTable'
+
 import * as SurveyState from '../../../survey/surveyState'
+import * as DataVisState from './dataVisState'
 
 export const dataVisTableInit = 'data/dataVis/table/init'
 export const dataVisTableUpdate = 'data/dataVis/table/update'
@@ -34,15 +35,16 @@ const getColNames = (state, nodeDefUuidCols) => {
   return NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 }
 
-export const initDataTable = (nodeDefUuidTable, nodeDefUuidCols, filter = defaults.filter) =>
+export const initDataTable = (nodeDefUuidTable, nodeDefUuidCols, queryFilter = null) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getStateSurveyId(state)
 
+    const filter = R.isNil(queryFilter) ? DataVisState.getTableFilter(state) : queryFilter
     const tableName = getTableName(state, nodeDefUuidTable)
     const cols = getColNames(state, nodeDefUuidCols)
 
-    const {offset, limit} = defaults
+    const { offset, limit } = defaults
 
     const [countResp, dataResp] = await Promise.all([
       axios.get(`/api/surveyRdb/${surveyId}/${tableName}/query/count?filter=${filter}`),
@@ -69,7 +71,7 @@ export const updateDataTable = (offset = 0) => async (dispatch, getState) => {
   const cols = getColNames(state, DataVisState.getTableNodeDefUuidCols(state))
   const filter = DataVisState.getTableFilter(state)
 
-  const {data} = await queryTable(surveyId, tableName, cols, offset, filter)
+  const { data } = await queryTable(surveyId, tableName, cols, offset, filter)
 
   dispatch({
     type: dataVisTableUpdate,
@@ -80,13 +82,12 @@ export const updateDataTable = (offset = 0) => async (dispatch, getState) => {
 }
 
 export const resetDataTable = () => dispatch =>
-  dispatch({type: dataVisTableReset})
+  dispatch({ type: dataVisTableReset })
 
-export const updateDataFilter = (filter = '') => async (dispatch, getState) => {
-  dispatch({type: dataVisTableFilterUpdate, filter})
-
+export const updateDataFilter = (filter) => async (dispatch, getState) => {
   const state = getState()
   const nodeDefUuidTable = DataVisState.getTableNodeDefUuidTable(state)
   const nodeDefUuidCols = DataVisState.getTableNodeDefUuidCols(state)
+
   dispatch(initDataTable(nodeDefUuidTable, nodeDefUuidCols, filter))
 }

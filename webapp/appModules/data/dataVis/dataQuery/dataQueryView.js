@@ -1,22 +1,58 @@
 import './dataQueryView.scss'
 
 import React from 'react'
+import { connect } from 'react-redux'
+import * as R from 'ramda'
 
-import NodeDefsSelector from '../components/nodeDefsSelector'
+import NodeDefsSelector from '../../../surveyVis/nodeDefsSelector/nodeDefsSelector'
 import DataTable from './dataTable'
 
-const DataQueryView = () => {
+import { initDataTable } from '../actions'
 
-  return (
-    <div className="data-query">
+class DataQueryView extends React.PureComponent {
 
-      <NodeDefsSelector/>
-      <div/>
-      <DataTable/>
+  constructor (props) {
+    super(props)
 
-    </div>
-  )
+    this.state = {
+      nodeDefUuid: null,
+      nodeDefAttributeUuids: [],
+    }
+  }
+
+  render () {
+    const { initDataTable } = this.props
+
+    const { nodeDefUuid, nodeDefAttributeUuids } = this.state
+
+    return (
+      <div className="data-query">
+
+        <div className="data-query__node-defs-selector">
+
+          <NodeDefsSelector
+            onChangeEntity={
+              nodeDefUuid => this.setState({ nodeDefUuid })
+            }
+            onChangeAttributes={
+              nodeDefAttributeUuids => this.setState({ nodeDefAttributeUuids })
+            }/>
+
+          <button className="btn btn-of-light btn-sync"
+                  onClick={() => initDataTable(nodeDefUuid, nodeDefAttributeUuids)}
+                  aria-disabled={R.isEmpty(nodeDefAttributeUuids)}>
+            View
+            <span className="icon icon-loop icon-16px icon-right"/>
+          </button>
+
+        </div>
+
+        <DataTable/>
+
+      </div>
+    )
+  }
 
 }
 
-export default DataQueryView
+export default connect(null, { initDataTable })(DataQueryView)
