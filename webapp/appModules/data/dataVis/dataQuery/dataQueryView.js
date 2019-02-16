@@ -4,8 +4,10 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDefsSelector from '../../../surveyVis/nodeDefsSelector/nodeDefsSelector'
+import NodeDefsSelectorView from '../../../surveyVis/nodeDefsSelector/nodeDefsSelectorView'
+
 import DataTable from './dataTable'
+import * as DataVisState from '../dataVisState'
 
 import { initDataTable } from '../actions'
 
@@ -15,32 +17,34 @@ class DataQueryView extends React.PureComponent {
     super(props)
 
     this.state = {
-      nodeDefUuid: null,
-      nodeDefAttributeUuids: [],
+      nodeDefUuidEntity: props.nodeDefUuidEntity,
+      nodeDefAttributeUuids: props.nodeDefUuidsAttributes,
     }
   }
 
   render () {
     const { initDataTable } = this.props
 
-    const { nodeDefUuid, nodeDefAttributeUuids } = this.state
+    const { nodeDefUuidEntity, nodeDefUuidsAttributes } = this.state
 
     return (
       <div className="data-query">
 
         <div className="data-query__node-defs-selector">
 
-          <NodeDefsSelector
+          <NodeDefsSelectorView
+            nodeDefUuidEntity={nodeDefUuidEntity}
+            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
             onChangeEntity={
-              nodeDefUuid => this.setState({ nodeDefUuid })
+              nodeDefUuidEntity => this.setState({ nodeDefUuidEntity })
             }
             onChangeAttributes={
-              nodeDefAttributeUuids => this.setState({ nodeDefAttributeUuids })
+              nodeDefUuidsAttributes => this.setState({ nodeDefUuidsAttributes })
             }/>
 
           <button className="btn btn-of-light btn-sync"
-                  onClick={() => initDataTable(nodeDefUuid, nodeDefAttributeUuids)}
-                  aria-disabled={R.isEmpty(nodeDefAttributeUuids)}>
+                  onClick={() => initDataTable(nodeDefUuidEntity, nodeDefUuidsAttributes)}
+                  aria-disabled={R.isEmpty(nodeDefUuidsAttributes)}>
             View
             <span className="icon icon-loop icon-16px icon-right"/>
           </button>
@@ -55,4 +59,14 @@ class DataQueryView extends React.PureComponent {
 
 }
 
-export default connect(null, { initDataTable })(DataQueryView)
+DataQueryView.defaultProps = {
+  nodeDefUuidEntity: '',
+  nodeDefUuidsAttributes: [],
+}
+
+const mapStateToProps = state => ({
+  nodeDefUuidEntity: DataVisState.getTableNodeDefUuidTable(state),
+  nodeDefUuidsAttributes: DataVisState.getTableNodeDefUuidCols(state)
+})
+
+export default connect(mapStateToProps, { initDataTable })(DataQueryView)

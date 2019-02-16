@@ -1,6 +1,6 @@
-@import "../../../style/vars";
+@import "../../../../style/vars";
 
-.variables-selector {
+.node-defs-selector {
   position: relative;
   height: 100%;
   overflow-y: auto;
@@ -8,7 +8,8 @@
   justify-items: center;
 }
 
-.variables-selector__container {
+
+.node-defs-selector__container {
   position: absolute;
   height: 100%;
   width: 100%;
@@ -16,20 +17,6 @@
   align-content: start;
   grid-row-gap: .3rem;
 
-  .node-def-dropdown {
-    background-color: rgba($white, 0.15);
-    height: 30px;
-
-    input {
-      justify-self: center;
-      border-bottom: none;
-      font-weight: 600;
-      font-size: .8rem;
-      width: 100%;
-      text-align: center;
-      padding: .3rem 0;
-    }
-  }
 
   .node-def-label {
     justify-self: center;
@@ -49,10 +36,15 @@
     &.active {
       pointer-events: auto;
     }
+
+    &[disabled] {
+      opacity: 1;
+      pointer-events: none;
+    }
   }
 
 
-  .btn-toggle-vars-filter {
+  .btn-toggle-settings {
     position: absolute;
     padding: 0;
     height: 30px;
@@ -64,7 +56,7 @@
   }
 }
 
-.variables-selector__settings {
+.node-defs-selector__settings {
   background-color: rgba($grey, .1);
   display: flex;
   flex-wrap: wrap;
@@ -91,7 +83,22 @@
   }
 }
 
-.node-def-dropdown__autocomplete-dialog {
+.node-defs-selector__entity-selector {
+  background-color: rgba($white, 0.15);
+  height: 30px;
+
+  input {
+    justify-self: center;
+    border-bottom: none;
+    font-weight: 600;
+    font-size: .8rem;
+    width: 100%;
+    text-align: center;
+    padding: .3rem 0;
+  }
+}
+
+.node-defs-selector__entity-selector-dialog {
   .dropdown__list-item {
 
     text-align: left !important;

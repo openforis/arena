@@ -8,8 +8,7 @@ import Survey from '../../../../common/survey/survey'
 import * as SurveyState from '../../../survey/surveyState'
 
 import Tree from './surveyHierarchyTree'
-
-import VariablesSelector from '../../surveyVis/nodeDefsSelector/variablesSelector'
+import NodeDefsSelectorView from '../../surveyVis/nodeDefsSelector/nodeDefsSelectorView'
 
 class SurveyHierarchy extends React.Component {
 
@@ -43,7 +42,6 @@ class SurveyHierarchy extends React.Component {
   }
 
   render () {
-    const { lang, hierarchy } = this.props
     const { selectedNodeDefUuid } = this.state
 
     return (
@@ -52,12 +50,15 @@ class SurveyHierarchy extends React.Component {
         <div className="survey-hierarchy__tree" ref={this.treeEl}/>
 
         <div className="survey-hierarchy__attributes">
-          <VariablesSelector hierarchy={hierarchy}
-                             lang={lang}
-                             showAncestors={false}
-                             canSelectVariables={false}
-                             onTableChange={uuid => this.tree.expandToNode(uuid)}
-                             selectedTableUuid={selectedNodeDefUuid}/>
+          <NodeDefsSelectorView
+            nodeDefUuidEntity={selectedNodeDefUuid}
+            onChangeEntity={
+              nodeDefUuidEntity => this.tree.expandToNode(nodeDefUuidEntity)
+            }
+            canSelectAttributes={false}
+            showAncestors={false}
+            />
+
         </div>
 
       </div>
