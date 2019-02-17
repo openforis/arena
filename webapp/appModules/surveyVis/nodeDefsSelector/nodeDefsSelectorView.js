@@ -38,17 +38,19 @@ class NodeDefsSelectorView extends React.PureComponent {
     const { nodeDefUuidsAttributes: nodeDefUuidsAttributesState } = this.state
 
     const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefUuidsAttributesState)
-    const fn = idx >= 0 ? R.remove(idx, 1) : R.append(nodeDefUuid)
+    const isDeleted = idx >= 0
+    const fn = isDeleted ? R.remove(idx, 1) : R.append(nodeDefUuid)
     const nodeDefUuidsAttributes = fn(nodeDefUuidsAttributesState)
 
     this.setState({ nodeDefUuidsAttributes })
-    this.props.onChangeAttributes(nodeDefUuidsAttributes)
+    this.props.onChangeAttributes(nodeDefUuidsAttributes, nodeDefUuid, isDeleted)
   }
 
   componentDidUpdate (prevProps, prevState, snapshot) {
     const { nodeDefUuidEntity } = this.props
     const { nodeDefUuidEntity: nodeDefUuidEntityPrev } = prevProps
     if (nodeDefUuidEntity !== nodeDefUuidEntityPrev)
+    // this.setState({ nodeDefUuidEntity })
       this.onChangeEntity(nodeDefUuidEntity)
   }
 
@@ -132,12 +134,12 @@ NodeDefsSelectorView.defaultProps = {
   hierarchy: null,
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
 
   return {
     lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
-    hierarchy: Survey.getHierarchy()(survey),
+    hierarchy: props.hierarchy || Survey.getHierarchy()(survey),
   }
 }
 

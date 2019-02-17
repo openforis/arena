@@ -4,16 +4,12 @@ import React from 'react'
 
 import DataQueryView from './dataQuery/dataQueryView'
 
-const DataVisView = (props) => {
+const DataVisView = () => (
+  <div className="data-vis">
 
-  return (
-    <div className="data-vis">
+    <DataQueryView/>
 
-      <DataQueryView/>
-
-    </div>
-  )
-
-}
+  </div>
+)
 
 export default DataVisView

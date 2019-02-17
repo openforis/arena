@@ -9,23 +9,17 @@ import {
   ModalBody,
   ModalFooter,
 } from '../../../../commonComponents/modal'
+import ProgressBar from '../../../../commonComponents/progressBar'
 
 import AppJobErrors from './appJobErrors'
 
 import { cancelActiveJob, hideAppJobMonitor } from './actions'
 import { getActiveJob } from './appJobState'
 
-const ProgressBar = ({progress, className = ''}) => (
-  <div className={`progress-bar ${className}`}>
-    <div className="filler" style={{width: `${progress}%`}}/>
-    <span className="progress">({progress}%)</span>
-  </div>
-)
-
-const JobProgress = ({job}) =>
+const JobProgress = ({ job }) =>
   <ProgressBar progress={job.progressPercent} className={job.status}/>
 
-const InnerJobs = ({innerJobs}) =>
+const InnerJobs = ({ innerJobs }) =>
   innerJobs.length > 0 &&
   <div className="app-job-monitor__inner-jobs">
     {
@@ -44,7 +38,7 @@ const InnerJobs = ({innerJobs}) =>
 class AppJobMonitor extends React.Component {
 
   render () {
-    const {job, cancelActiveJob, hideAppJobMonitor} = this.props
+    const { job, cancelActiveJob, hideAppJobMonitor } = this.props
     const innerJobs = job ? job.innerJobs : null
     return job && !job.canceled
       ? (
@@ -84,5 +78,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  {cancelActiveJob, hideAppJobMonitor,}
+  { cancelActiveJob, hideAppJobMonitor, }
 )(AppJobMonitor)

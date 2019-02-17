@@ -24,10 +24,10 @@ const getEntities = (hierarchy, lang) => {
 }
 
 const EntitySelector = (props) => {
-  const { hierarchy, nodeDefUuid, lang, onChange } = props
+  const { hierarchy, nodeDefUuidEntity, lang, onChange } = props
 
   const entities = getEntities(hierarchy, lang)
-  const selection = entities.find(R.propEq('key', nodeDefUuid))
+  const selection = entities.find(R.propEq('key', nodeDefUuidEntity))
 
   return (
     <Dropdown className="node-defs-selector__entity-selector"

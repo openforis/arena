@@ -1,57 +1,38 @@
-import './dataQueryView.scss'
+import './components/dataQueryView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import NodeDefsSelectorView from '../../../surveyVis/nodeDefsSelector/nodeDefsSelectorView'
 
-import DataTable from './dataTable'
-import * as DataVisState from '../dataVisState'
+import Table from './components/table'
 
-import { initDataTable } from '../actions'
+import { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols } from './actions'
+import * as DataQueryState from './dataQueryState'
 
 class DataQueryView extends React.PureComponent {
 
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      nodeDefUuidEntity: props.nodeDefUuidEntity,
-      nodeDefAttributeUuids: props.nodeDefUuidsAttributes,
-    }
+  componentDidMount () {
+    this.props.initTableData()
   }
 
   render () {
-    const { initDataTable } = this.props
-
-    const { nodeDefUuidEntity, nodeDefUuidsAttributes } = this.state
+    const {
+      nodeDefUuidEntity, nodeDefUuidsAttributes,
+      initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols
+    } = this.props
 
     return (
       <div className="data-query">
 
-        <div className="data-query__node-defs-selector">
+        <NodeDefsSelectorView
+          nodeDefUuidEntity={nodeDefUuidEntity}
+          nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+          onChangeEntity={updateTableNodeDefUuid}
+          onChangeAttributes={updateTableNodeDefUuidCols}
+        />
 
-          <NodeDefsSelectorView
-            nodeDefUuidEntity={nodeDefUuidEntity}
-            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-            onChangeEntity={
-              nodeDefUuidEntity => this.setState({ nodeDefUuidEntity })
-            }
-            onChangeAttributes={
-              nodeDefUuidsAttributes => this.setState({ nodeDefUuidsAttributes })
-            }/>
-
-          <button className="btn btn-of-light btn-sync"
-                  onClick={() => initDataTable(nodeDefUuidEntity, nodeDefUuidsAttributes)}
-                  aria-disabled={R.isEmpty(nodeDefUuidsAttributes)}>
-            View
-            <span className="icon icon-loop icon-16px icon-right"/>
-          </button>
-
-        </div>
-
-        <DataTable/>
+        <Table/>
 
       </div>
     )
@@ -65,8 +46,11 @@ DataQueryView.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  nodeDefUuidEntity: DataVisState.getTableNodeDefUuidTable(state),
-  nodeDefUuidsAttributes: DataVisState.getTableNodeDefUuidCols(state)
+  nodeDefUuidEntity: DataQueryState.getTableNodeDefUuidTable(state),
+  nodeDefUuidsAttributes: DataQueryState.getTableNodeDefUuidCols(state)
 })
 
-export default connect(mapStateToProps, { initDataTable })(DataQueryView)
+export default connect(
+  mapStateToProps,
+  { initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols }
+)(DataQueryView)

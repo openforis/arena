@@ -42,6 +42,7 @@ class SurveyHierarchy extends React.Component {
   }
 
   render () {
+    const { hierarchy } = this.props
     const { selectedNodeDefUuid } = this.state
 
     return (
@@ -51,13 +52,14 @@ class SurveyHierarchy extends React.Component {
 
         <div className="survey-hierarchy__attributes">
           <NodeDefsSelectorView
+            hierarchy={hierarchy}
             nodeDefUuidEntity={selectedNodeDefUuid}
             onChangeEntity={
               nodeDefUuidEntity => this.tree.expandToNode(nodeDefUuidEntity)
             }
             canSelectAttributes={false}
             showAncestors={false}
-            />
+          />
 
         </div>
 

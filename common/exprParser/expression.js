@@ -81,6 +81,7 @@ module.exports = {
   isLiteral: isType(types.Literal),
   isCompound: isType(types.Compound),
   isBinary: isType(types.BinaryExpression),
+  isLogical: isType(types.LogicalExpression),
 
   // Instance creators
   newLiteral,
