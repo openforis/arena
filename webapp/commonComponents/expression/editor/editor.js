@@ -4,7 +4,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Expression from '../../../../common/exprParser/expression'
-import { ExpressionNode } from './types'
+import ExpressionNode from './nodes/expressionNode'
 
 import { isNotBlank } from '../../../../common/stringUtils'
 
