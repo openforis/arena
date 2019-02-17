@@ -8,14 +8,14 @@ import Dropdown from '../../../form/dropdown'
 import EditButtons from './editButtons'
 import ExpressionNode from './expressionNode'
 
-const BinaryOperand = ({ type, node, ...props }) => {
+const BinaryOperand = ({ type, node, isLeftIdentifier, ...props }) => {
   const { isBoolean, onChange } = props
   const nodeOperand = R.prop(type, node)
 
   return (
     <React.Fragment>
       <button
-        className={`btn btn-s btn-of-light btn-switch-operand${Expression.isIdentifier(nodeOperand) ? ' active' : ''}`}
+        className={`btn btn-s btn-of-light btn-switch-operand${!Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
         onClick={() => onChange(
           R.assoc(type, Expression.newIdentifier(), node)
         )}>
@@ -24,14 +24,27 @@ const BinaryOperand = ({ type, node, ...props }) => {
       <button
         className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
         aria-disabled={type === 'left' && isBoolean}
-        onClick={() => onChange(
-          R.assoc(type, Expression.newLiteral(), node)
-        )}>
+        onClick={() => {
+          const nodeUpdate = !isLeftIdentifier ?
+            R.pipe(
+              R.assoc(type, Expression.newLiteral()),
+              R.assoc('operator', ''),
+              R.assoc('right', Expression.newIdentifier()),
+            )(node)
+            : R.assoc(type, Expression.newLiteral(), node)
+
+          onChange(nodeUpdate)
+        }}>
         Const
       </button>
 
-      <ExpressionNode {...props} node={nodeOperand}
-                      onChange={item => onChange(R.assoc(type, item, node))}/>
+      <ExpressionNode
+        {...props}
+        node={nodeOperand}
+        onChange={item => onChange(
+          R.assoc(type, item, node)
+        )}/>
+
     </React.Fragment>
   )
 }
@@ -43,18 +56,18 @@ const Binary = (props) => {
     isBoolean
   } = props
 
-  const isLeftIdentifier = R.pipe(
+  const isLeftLiteral = R.pipe(
     R.prop('left'),
-    Expression.isIdentifier
+    Expression.isLiteral
   )(node)
 
   return (
     <div className="binary">
 
-      <BinaryOperand {...props} type="left"/>
+      <BinaryOperand {...props} type="left" isLeftLiteral={isLeftLiteral}/>
 
       {
-        isLeftIdentifier &&
+        !isLeftLiteral &&
         <React.Fragment>
 
 
