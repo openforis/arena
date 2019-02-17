@@ -19,7 +19,7 @@ class DataQueryView extends React.PureComponent {
   render () {
     const {
       nodeDefUuidEntity, nodeDefUuidsAttributes,
-      initTableData, updateTableNodeDefUuid, updateTableNodeDefUuidCols
+      updateTableNodeDefUuid, updateTableNodeDefUuidCols
     } = this.props
 
     return (

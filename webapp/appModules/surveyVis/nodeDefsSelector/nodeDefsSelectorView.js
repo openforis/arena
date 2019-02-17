@@ -20,7 +20,7 @@ class NodeDefsSelectorView extends React.PureComponent {
 
     this.state = {
       nodeDefUuidEntity: props.nodeDefUuidEntity,
-      nodeDefUuidsAttributes: [],
+      nodeDefUuidsAttributes: props.nodeDefUuidsAttributes,
       filterTypes: [],
       showSettings: false,
     }

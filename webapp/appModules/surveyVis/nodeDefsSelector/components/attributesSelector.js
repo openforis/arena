@@ -66,7 +66,7 @@ const AttributesSelector = (props) => {
             nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}
             nodeDefUuidsAttributes={nodeDefUuidsAttributes}
             onToggleAttribute={onToggleAttribute}
-            filterTypes={[]}
+            filterTypes={filterTypes}
             canSelectAttributes={canSelectAttributes}
           />
         </React.Fragment>

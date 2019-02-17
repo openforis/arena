@@ -94,11 +94,10 @@ export const initTableData = (queryFilter = null) =>
     const state = getState()
     const surveyId = SurveyState.getStateSurveyId(state)
 
-    const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
-    const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
+    if (DataQueryState.hasTableAndCols(state)) {
 
-    if (!(R.isNil(nodeDefUuidTable) || R.isEmpty(nodeDefUuidCols))) {
-
+      const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
+      const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
       const filter = R.isNil(queryFilter) ? DataQueryState.getTableFilter(state) : queryFilter
       const tableName = getTableName(state, nodeDefUuidTable)
       const cols = getColNames(state, nodeDefUuidCols)
@@ -123,26 +122,11 @@ export const initTableData = (queryFilter = null) =>
     }
   }
 
-export const updateTableOffset = (offset = 0) => async (dispatch, getState) => {
-  const state = getState()
-  const surveyId = SurveyState.getStateSurveyId(state)
-
-  const tableName = getTableName(state, DataQueryState.getTableNodeDefUuidTable(state))
-  const cols = getColNames(state, DataQueryState.getTableNodeDefUuidCols(state))
-  const filter = DataQueryState.getTableFilter(state)
-
-  const { data } = await queryTable(surveyId, tableName, cols, offset, filter)
-
-  dispatch({
-    type: dataQueryTableDataUpdate,
-    offset,
-    data,
-  })
-
-}
-
-// export const resetTableData = () => dispatch =>
-//   dispatch({ type: dataQueryTableReset })
+export const updateTableOffset = (offset = 0) =>
+  async (dispatch, getState) => {
+    const data = await fetchData(getState(), null, offset)
+    dispatch({ type: dataQueryTableDataUpdate, offset, data })
+  }
 
 export const updateTableFilter = (filter) => dispatch =>
   dispatch(initTableData(filter))
