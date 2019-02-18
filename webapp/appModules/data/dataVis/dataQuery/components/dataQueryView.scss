@@ -1,8 +1,16 @@
-@import "../../../../style/vars";
+@import "../../../../../style/vars";
 
 $rowHeaderHeight: 45px;
 
-.data-vis__data-table {
+.data-query {
+  display: grid;
+  grid-template-columns: 240px 1fr 10px;
+  grid-column-gap: 10px;
+  justify-content: center;
+  height: 100%;
+}
+
+.data-query__table {
   position: relative;
 
   .table__header {
