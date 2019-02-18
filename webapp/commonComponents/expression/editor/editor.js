@@ -18,8 +18,9 @@ class Editor extends React.Component {
     const exprQuery = Expression.fromString(query, mode)
     const isCompound = Expression.isCompound(exprQuery)
     const isBinary = Expression.isBinary(exprQuery)
+    const isLogical = Expression.isLogical(exprQuery)
 
-    const expr = isBinary
+    const expr = isBinary || isLogical
       ? exprQuery
       : Expression.newBinary(
         isCompound && canBeConstant

@@ -8,7 +8,7 @@ import * as R from 'ramda'
 import { Input } from './input'
 import AutocompleteDialog from './autocompleteDialog'
 
-import { contains } from '../../../common/stringUtils'
+import { contains, trim } from '../../../common/stringUtils'
 
 const dropdownListItemClassName = 'dropdown__list-item'
 
@@ -17,7 +17,7 @@ class Dropdown extends React.Component {
   constructor (props) {
     super(props)
 
-    const {items, selection, autocompleteMinChars} = this.props
+    const { items, selection, autocompleteMinChars } = this.props
 
     this.state = {
       items: autocompleteMinChars > 0 ? [] : items,
@@ -33,8 +33,8 @@ class Dropdown extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const {items, selection, autocompleteMinChars} = this.props
-    const {items: prevItems, selection: prevSelection} = prevProps
+    const { items, selection, autocompleteMinChars } = this.props
+    const { items: prevItems, selection: prevSelection } = prevProps
 
     if (!R.equals(prevItems, items)) {
       this.setState({
@@ -63,8 +63,8 @@ class Dropdown extends React.Component {
   }
 
   onSelectionChange (item) {
-    const {onChange, clearOnSelection, itemsLookupFunction} = this.props
-    const {items} = this.state
+    const { onChange, clearOnSelection, itemsLookupFunction } = this.props
+    const { items } = this.state
 
     onChange(item)
 
@@ -76,7 +76,7 @@ class Dropdown extends React.Component {
   }
 
   async onInputChange (value = '') {
-    const {items, autocompleteMinChars, itemsLookupFunction, onChange} = this.props
+    const { items, autocompleteMinChars, itemsLookupFunction, onChange } = this.props
 
     const searchValue = R.trim(value)
 
@@ -122,12 +122,12 @@ class Dropdown extends React.Component {
   }
 
   getItemLabel (item = '') {
-    const {itemLabelFunction, itemLabelProp} = this.props
+    const { itemLabelFunction, itemLabelProp } = this.props
     return R.defaultTo('', this.extractValueFromFunctionOrProp(item, itemLabelFunction, itemLabelProp, 'value'))
   }
 
   getItemKey (item) {
-    const {itemKeyFunction, itemKeyProp} = this.props
+    const { itemKeyFunction, itemKeyProp } = this.props
     return this.extractValueFromFunctionOrProp(item, itemKeyFunction, itemKeyProp, 'key')
   }
 
@@ -165,7 +165,7 @@ class Dropdown extends React.Component {
     } = this.state
 
     const DropdownItemRenderer = props => {
-      const {item, ...otherProps} = props
+      const { item, ...otherProps } = props
 
       return <div {...otherProps}
                   className={dropdownListItemClassName}>
@@ -179,7 +179,7 @@ class Dropdown extends React.Component {
                 onBlur={e => this.onBlur(e)}>
       <Input ref={this.input}
              placeholder={placeholder}
-             value={displayValue}
+             value={trim(displayValue)}
              validation={validation}
              readOnly={readOnly}
              disabled={disabled}

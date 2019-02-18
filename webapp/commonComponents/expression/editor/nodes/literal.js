@@ -1,11 +1,11 @@
 import React from 'react'
 import axios from 'axios'
 import * as R from 'ramda'
+import Promise from 'bluebird'
 
 import Dropdown from '../../../form/dropdown'
 
 const getNodeRawValue = node => node.raw ? JSON.parse(node.raw) : ''
-
 
 class Literal extends React.Component {
 
@@ -18,22 +18,41 @@ class Literal extends React.Component {
     }
   }
 
+  getSearchParams () {
+    return this.props.literalSearchParams
+  }
+
+  hasSearchParams () {
+    return !!this.getSearchParams()
+  }
+
+  getNodeValue () {
+    const rawValue = R.pathOr(null, ['node', 'raw'], this.props)
+
+    return rawValue
+      ? this.hasSearchParams()
+        ? JSON.parse(rawValue) : rawValue
+      : ''
+  }
+
   async componentDidMount () {
-    const { literalSearchParams, node } = this.props
-    if (literalSearchParams) {
-      this.setState({
-        selection: await this.loadItem(getNodeRawValue(node)),
-        items: await this.loadItems()
-      })
+    if (this.hasSearchParams()) {
+
+      const [selection, items] = await Promise.all([
+        this.loadItem(),
+        this.loadItems()
+      ])
+
+      this.setState({ selection, items })
     }
   }
 
-  async loadItem (value) {
-    const { literalSearchParams } = this.props
+  async loadItem () {
+    const value = this.getNodeValue()
 
     if (value) {
       const params = {
-        ...literalSearchParams,
+        ...this.getSearchParams(),
         value
       }
       const { data } = await axios.get('/api/expression/literal/item', { params })
@@ -45,10 +64,8 @@ class Literal extends React.Component {
   }
 
   async loadItems (value = '') {
-    const { literalSearchParams } = this.props
-
     const params = {
-      ...literalSearchParams,
+      ...this.getSearchParams(),
       value
     }
     const { data } = await axios.get('/api/expression/literal/items', { params })
@@ -58,7 +75,7 @@ class Literal extends React.Component {
   onChange (val) {
     const { node, onChange } = this.props
 
-    const value = JSON.stringify(val)
+    const value = this.hasSearchParams() ? JSON.stringify(val) : val
 
     onChange(R.pipe(
       R.assoc('raw', value),
@@ -67,32 +84,31 @@ class Literal extends React.Component {
   }
 
   render () {
-    const { node, literalSearchParams } = this.props
     const { items, selection } = this.state
-
-    const value = getNodeRawValue(node)
-
-    const lookupFunction = async value => this.loadItems(value)
 
     return (
       <div className="literal">
         {
-          literalSearchParams
+
+          this.hasSearchParams()
             ? (
-              <Dropdown items={items}
-                        itemsLookupFunction={lookupFunction}
-                        itemKeyProp="key"
-                        itemLabelProp="label"
-                        onChange={item => this.onChange(item.key)}
-                        selection={selection}/>
+              <Dropdown
+                items={items}
+                itemsLookupFunction={this.loadItems.bind(this)}
+                itemKeyProp="key"
+                itemLabelProp="label"
+                onChange={item => this.onChange(item.key)}
+                selection={selection}/>
             )
             : (
-              <input className="form-input" value={value}
-                     size={25}
-                     onChange={e => this.onChange(e.target.value)}/>
+              <input
+                className="form-input"
+                value={this.getNodeValue()}
+                size={25}
+                onChange={e => this.onChange(e.target.value)}/>
             )
-        }
 
+        }
       </div>
     )
   }

@@ -18,14 +18,6 @@ const AdvancedProps = props => {
       {
         NodeDef.canNodeDefHaveDefaultValue(nodeDef) &&
         <React.Fragment>
-          <NodeDefExpressionsProp nodeDef={nodeDef}
-                                  putNodeDefProp={putNodeDefProp}
-                                  label="Calculated values"
-                                  readOnly={readOnly}
-                                  propName="calculatedValues"
-                                  validation={Validator.getFieldValidation('calculatedValues')(validation)}
-                                  nodeDefUuidContext={nodeDefUuidContext}
-                                  canBeConstant={true}/>
 
           <NodeDefExpressionsProp nodeDef={nodeDef}
                                   putNodeDefProp={putNodeDefProp}

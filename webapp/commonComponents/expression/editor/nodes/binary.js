@@ -8,9 +8,10 @@ import Dropdown from '../../../form/dropdown'
 import EditButtons from './editButtons'
 import ExpressionNode from './expressionNode'
 
-const BinaryOperand = ({ type, node, isLeftIdentifier, ...props }) => {
+const BinaryOperand = ({ type, node, ...props }) => {
   const { isBoolean, onChange } = props
   const nodeOperand = R.prop(type, node)
+  const isLeft = type === 'left'
 
   return (
     <React.Fragment>
@@ -23,9 +24,9 @@ const BinaryOperand = ({ type, node, isLeftIdentifier, ...props }) => {
       </button>
       <button
         className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
-        aria-disabled={type === 'left' && isBoolean}
+        aria-disabled={isLeft && isBoolean}
         onClick={() => {
-          const nodeUpdate = !isLeftIdentifier ?
+          const nodeUpdate = isLeft && !isBoolean ?
             R.pipe(
               R.assoc(type, Expression.newLiteral()),
               R.assoc('operator', ''),
@@ -64,10 +65,10 @@ const Binary = (props) => {
   return (
     <div className="binary">
 
-      <BinaryOperand {...props} type="left" isLeftLiteral={isLeftLiteral}/>
+      <BinaryOperand {...props} type="left"/>
 
       {
-        !isLeftLiteral &&
+        (isBoolean || !isLeftLiteral) &&
         <React.Fragment>
 
 
@@ -77,7 +78,7 @@ const Binary = (props) => {
                       R.assoc('operator', R.propOr('', 'key', item), node)
                     )}/>
 
-          <BinaryOperand {...props} type="right"/>
+          <BinaryOperand {...R.dissoc('literalSearchParams', props)} type="right"/>
 
           {
             isBoolean &&
