@@ -107,7 +107,7 @@ const fetchItemByUuid = async (surveyId, itemUuid, draft = false, client = db) =
     item => dbTransformCallback(item, draft, true)
   )
 
-const fetchItemsByLevelIndex = async (surveyId, categoryId, levelIndex, draft = false, client = db) =>
+const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft = false, client = db) =>
   await client.map(
     `SELECT i.* 
      FROM ${getSurveyDBSchema(surveyId)}.category_item i
@@ -115,7 +115,7 @@ const fetchItemsByLevelIndex = async (surveyId, categoryId, levelIndex, draft = 
          ON l.uuid = i.level_uuid
      WHERE l.category_uuid = $1
        AND l.index = $2`,
-    [categoryId, levelIndex],
+    [categoryUuid, levelIndex],
     item => dbTransformCallback(item, draft, true)
   )
 

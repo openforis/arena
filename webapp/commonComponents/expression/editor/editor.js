@@ -4,7 +4,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Expression from '../../../../common/exprParser/expression'
-import { ExpressionNode } from './types'
+import ExpressionNode from './nodes/expressionNode'
 
 import { isNotBlank } from '../../../../common/stringUtils'
 
@@ -19,6 +19,7 @@ class Editor extends React.Component {
     const isCompound = Expression.isCompound(exprQuery)
     const isBinary = Expression.isBinary(exprQuery)
     const isLogical = Expression.isLogical(exprQuery)
+
     const expr = isBinary || isLogical
       ? exprQuery
       : Expression.newBinary(
@@ -29,8 +30,6 @@ class Editor extends React.Component {
           : exprQuery,
         Expression.newLiteral()
       )
-
-    // if(Expression.isLiteral(expr))
 
     this.state = {
       query, queryDraft: Expression.toString(expr, mode),
@@ -62,8 +61,16 @@ class Editor extends React.Component {
   }
 
   render () {
-    const { query, queryDraft, exprDraft, exprDraftValid } = this.state
-    const { variables, onClose, onChange } = this.props
+    const {
+      query, queryDraft,
+      exprDraft, exprDraftValid
+    } = this.state
+
+    const {
+      variables, isBoolean,
+      onClose, onChange,
+      literalSearchParams,
+    } = this.props
 
     return <React.Fragment>
 
@@ -84,7 +91,9 @@ class Editor extends React.Component {
 
       <div className="expression-editor__expr-container">
         <ExpressionNode variables={variables} node={exprDraft}
-                        onChange={this.updateDraft.bind(this)}/>
+                        onChange={this.updateDraft.bind(this)}
+                        isBoolean={isBoolean}
+                        literalSearchParams={literalSearchParams}/>
       </div>
 
       <div className="expression-editor__footer">
@@ -109,8 +118,10 @@ class Editor extends React.Component {
 Editor.defaultProps = {
   query: '',
   mode: Expression.modes.json,
+  isBoolean: true,
   onClose: null,
   onChange: null,
+  literalSearchParams: null,
 }
 
 export default Editor

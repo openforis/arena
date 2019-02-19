@@ -6,13 +6,13 @@ const trim = R.pipe(R.defaultTo(''), R.trim)
 
 const leftTrim = R.replace(/^\s+/, '')
 
-const toLower = (a = '') => R.toLower(a.toString())
+const toLower = R.pipe(trim, R.toLower)
 
 const truncate = maxLength =>
   text =>
     text.length > maxLength ? text.substring(0, maxLength) + '...' : text
 
-const contains = (a = '', b = '') => R.includes(toLower(a), toLower(b))
+const contains = (value = '', string = '') => R.includes(toLower(value), toLower(string))
 
 const isBlank = R.pipe(trim, R.isEmpty)
 
