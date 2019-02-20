@@ -122,7 +122,7 @@ class RecordUpdateThread extends Thread {
           break
         case messageTypes.deleteNode:
           await this.initRecord(t)
-          updatedNodes = await this.recordUpdater.deleteNode(user, survey, this.record, msg.nodeUuid, t) || {}
+          updatedNodes = await this.recordUpdater.deleteNode(user, survey, this.record, msg.nodeUuid, t)
           break
       }
       await this.handleNodesUpdated(updatedNodes, t)

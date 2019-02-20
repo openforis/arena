@@ -132,7 +132,7 @@ const checkInRecord = async (user, surveyId, recordUuid) => {
 const checkOutRecord = async (user, surveyId, recordUuid) => {
   const record = await fetchRecordByUuid(surveyId, recordUuid)
 
-  if (record && Record.isPreview(record)) {
+  if (Record.isPreview(record)) {
     await deleteRecordPreview(user, surveyId, recordUuid)
   }
 

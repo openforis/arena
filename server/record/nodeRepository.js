@@ -55,7 +55,7 @@ const fetchNodesByRecordUuid = async (surveyId, recordUuid, client = db) =>
   )
 
 const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
-  await client.oneOrNone(`
+  await client.one(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1`,
     [uuid],
@@ -146,7 +146,7 @@ const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUui
 
 // ============== DELETE
 const deleteNode = async (surveyId, nodeUuid, client = db) =>
-  await client.oneOrNone(`
+  await client.one(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1
     RETURNING *,'{}' as value, true as deleted
