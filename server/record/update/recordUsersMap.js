@@ -18,7 +18,7 @@ const assocUser = (surveyId, recordUuid, user, preview) => {
   getUserIds(recordUuid).add(user.id)
 
   if (preview) {
-    previewRecordsMap.set(recordUuid, { surveyId, date: new Date(), user: user })
+    previewRecordsMap.set(recordUuid, { user, surveyId, date: new Date() })
   }
 }
 
@@ -33,8 +33,9 @@ const dissocUserId = (recordUuid, userId) => {
   }
 }
 
-const touchPreviewRecord = (recordUuid) => {
-  previewRecordsMap.set(recordUuid, new Date())
+const touchPreviewRecord = recordUuid => {
+  const previewData = previewRecordsMap.get(recordUuid)
+  previewRecordsMap.set(recordUuid, { ...previewData, date: new Date() })
 }
 
 const getStalePreviewRecordUuids = olderThan =>

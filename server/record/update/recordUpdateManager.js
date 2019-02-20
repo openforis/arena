@@ -25,12 +25,14 @@ const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
     path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
     { user, surveyId, recordUuid, preview },
     msg => {
-      const userIds = RecordUsersMap.getUserIds(surveyId, recordUuid)
+      const userIds = RecordUsersMap.getUserIds(recordUuid)
       userIds.forEach(userId =>
         WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
       )
 
-      if (preview) RecordUsersMap.touchPreviewRecord(recordUuid)
+      if (preview) {
+        RecordUsersMap.touchPreviewRecord(recordUuid)
+      }
     },
     () => {
       RecordUsersMap.dissocUserId(recordUuid, userId)
@@ -108,7 +110,7 @@ const deleteNode = (user, nodeUuid) => {
  * @param recordUuid
  * @param userIdExclude Do not notify the user that has deleted the record
  */
-const notifyUsersRecordDeleted = (surveyId, recordUuid, userIdExclude) => {
+const notifyUsersRecordDeleted = (recordUuid, userIdExclude) => {
   const recordUsersIds = RecordUsersMap.getUserIds(recordUuid)
 
   recordUsersIds.forEach(id => {

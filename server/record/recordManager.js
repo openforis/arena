@@ -21,8 +21,6 @@ const ActivityLog = require('../activityLog/activityLogger')
 
 const { canEditRecord } = require('../../common/auth/authManager')
 
-const RecordUsersMap = require('./update/recordUsersMap')
-
 /**
  * ===================
  * CREATE
