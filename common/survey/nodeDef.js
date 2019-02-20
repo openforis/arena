@@ -88,12 +88,13 @@ const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
 const isNodeDefSingleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefSingle(nodeDef)
 const isNodeDefMultipleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefMultiple(nodeDef)
 
-const isNodeDefInteger = isNodeDefType(nodeDefType.integer)
-const isNodeDefDecimal = isNodeDefType(nodeDefType.decimal)
+const isNodeDefBoolean = isNodeDefType(nodeDefType.boolean)
 const isNodeDefCode = isNodeDefType(nodeDefType.code)
-const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 const isNodeDefCoordinate = isNodeDefType(nodeDefType.coordinate)
+const isNodeDefDecimal = isNodeDefType(nodeDefType.decimal)
 const isNodeDefFile = isNodeDefType(nodeDefType.file)
+const isNodeDefInteger = isNodeDefType(nodeDefType.integer)
+const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
 
 const isNodeDefPublished = R.propEq(propKeys.published, true)
 
@@ -109,6 +110,8 @@ const getValidations = SurveyUtils.getProp(propKeys.validations, {})
 
 // ==== READ meta
 const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
+
+const getNodeDefParentCodeDefUuid = SurveyUtils.getProp(propKeys.parentCodeDefUuid)
 
 // ==== UPDATE
 
@@ -154,6 +157,8 @@ const canNodeDefHaveDefaultValue = nodeDef =>
       nodeDefType.time,
     ]
   )
+  // allow default value when parent code is null (for node def code)
+  && !getNodeDefParentCodeDefUuid(nodeDef)
 
 module.exports = {
   nodeDefType,
@@ -176,7 +181,7 @@ module.exports = {
   getNodeDefDescriptions: SurveyUtils.getProp(propKeys.descriptions, {}),
   getNodeDefValidation: R.prop(keys.validation),
   getNodeDefCategoryUuid: SurveyUtils.getProp(propKeys.categoryUuid),
-  getNodeDefParentCodeDefUuid: SurveyUtils.getProp(propKeys.parentCodeDefUuid),
+  getNodeDefParentCodeDefUuid,
   getNodeDefTaxonomyUuid: SurveyUtils.getProp(propKeys.taxonomyUuid),
 
   isNodeDefKey,
@@ -190,12 +195,13 @@ module.exports = {
   isNodeDefSingleAttribute,
   isNodeDefMultipleAttribute,
 
-  isNodeDefInteger,
-  isNodeDefDecimal,
+  isNodeDefBoolean,
   isNodeDefCode,
-  isNodeDefTaxon,
   isNodeDefCoordinate,
+  isNodeDefDecimal,
   isNodeDefFile,
+  isNodeDefInteger,
+  isNodeDefTaxon,
 
   isNodeDefPublished,
 

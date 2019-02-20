@@ -9,6 +9,7 @@ import Editor from './editor/editor'
 
 import * as SurveyState from '../../survey/surveyState'
 import Survey from '../../../common/survey/survey'
+import NodeDef from '../../../common/survey/nodeDef'
 
 import Expression from '../../../common/exprParser/expression'
 import * as ExpressionVariables from './expressionVariables'
@@ -48,7 +49,13 @@ class ExpressionComponent extends React.Component {
   }
 
   render () {
-    const { query, variables, mode, canBeConstant } = this.props
+
+    const {
+      query, variables, mode,
+      canBeConstant, isBoolean,
+      literalSearchParams,
+    } = this.props
+
     const { edit } = this.state
 
     return <div className={`expression${edit ? ' edit' : ''}`}
@@ -62,7 +69,9 @@ class ExpressionComponent extends React.Component {
                     onClose={this.toggleEdit}
                     onChange={query => this.applyChange(query)}
                     mode={mode}
-                    canBeConstant={canBeConstant}/>
+                    canBeConstant={canBeConstant}
+                    isBoolean={isBoolean}
+                    literalSearchParams={literalSearchParams}/>
           )
           : (
             <div className="expression__query-container">
@@ -90,10 +99,13 @@ ExpressionComponent.defaultProps = {
   onChange: null,
   isContextParent: false,
   canBeConstant: false,
+  isBoolean: true,
 }
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
+  const surveyId = SurveyState.getStateSurveyId(state)
+
   const {
     nodeDefUuidContext,
     nodeDefUuidCurrent,
@@ -106,8 +118,25 @@ const mapStateToProps = (state, props) => {
   const depth = isContextParent ? 0 : 1
   const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth)
 
+  const literalSearchParams = nodeDefCurrent && NodeDef.isNodeDefCode(nodeDefCurrent) ?
+    {
+      type: NodeDef.nodeDefType.code,
+      surveyId,
+      categoryUuid: NodeDef.getNodeDefCategoryUuid(nodeDefCurrent),
+      categoryLevelIndex: Survey.getNodeDefCategoryLevelIndex(nodeDefCurrent)(survey),
+      lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
+    }
+    : nodeDefCurrent && NodeDef.isNodeDefTaxon(nodeDefCurrent) ?
+      {
+        type: NodeDef.nodeDefType.taxon,
+        surveyId,
+        taxonomyUuid: NodeDef.getNodeDefTaxonomyUuid(nodeDefCurrent)
+      }
+      : null
+
   return {
-    variables
+    variables,
+    literalSearchParams,
   }
 }
 

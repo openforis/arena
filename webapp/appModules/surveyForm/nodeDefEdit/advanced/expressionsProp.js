@@ -11,59 +11,70 @@ import { FormItem } from '../../../../commonComponents/form/input'
 import ExpressionComponent from '../../../../commonComponents/expression/expression'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
 
-const ExpressionProp = ({ nodeDefUuidContext, nodeDefUuidCurrent, expression, applyIf, showLabels, readOnly, isContextParent, canBeConstant, onUpdate, onDelete }) => (
-  <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
+const ExpressionProp = (props) => {
 
-    {
-      !expression.placeholder &&
-      <button className="btn btn-s btn-transparent btn-delete"
-              aria-disabled={readOnly}
-              onClick={() => onDelete(expression)}>
-        <span className="icon icon-bin2 icon-12px"/>
-      </button>
-    }
+  const {
+    nodeDefUuidContext, nodeDefUuidCurrent,
+    expression, applyIf, showLabels, readOnly,
+    isContextParent, canBeConstant, isBoolean,
+    onUpdate, onDelete
+  } = props
 
-    <div className="expression-item">
-      <div className="label">Expression</div>
+  return (
+    <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
-      <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
-                           nodeDefUuidCurrent={nodeDefUuidCurrent}
-                           query={NodeDefExpression.getExpression(expression)}
-                           onChange={expr =>
-                             onUpdate(NodeDefExpression.assocExpression(expr)(expression))
-                           }
-                           isContextParent={isContextParent}
-                           canBeConstant={canBeConstant}/>
-    </div>
+      {
+        !expression.placeholder &&
+        <button className="btn btn-s btn-transparent btn-delete"
+                aria-disabled={readOnly}
+                onClick={() => onDelete(expression)}>
+          <span className="icon icon-bin2 icon-12px"/>
+        </button>
+      }
 
-    {
-      applyIf &&
       <div className="expression-item">
-        <div className="label">Apply If</div>
+        <div className="label">Expression</div>
 
         <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
                              nodeDefUuidCurrent={nodeDefUuidCurrent}
-                             query={NodeDefExpression.getApplyIf(expression)}
+                             query={NodeDefExpression.getExpression(expression)}
                              onChange={expr =>
-                               onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
+                               onUpdate(NodeDefExpression.assocExpression(expr)(expression))
                              }
                              isContextParent={isContextParent}
-                             canBeConstant={false}/>
+                             canBeConstant={canBeConstant}
+                             isBoolean={isBoolean}/>
       </div>
-    }
 
-    {
-      showLabels &&
-      <LabelsEditor formLabel="Error message(s)"
-                    labels={NodeDefExpression.getMessages(expression)}
-                    onChange={labelItem =>
-                      onUpdate(NodeDefExpression.assocMessage(labelItem)(expression))
-                    }
-      />
-    }
+      {
+        applyIf &&
+        <div className="expression-item">
+          <div className="label">Apply If</div>
 
-  </div>
-)
+          <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
+                               nodeDefUuidCurrent={nodeDefUuidCurrent}
+                               query={NodeDefExpression.getApplyIf(expression)}
+                               onChange={expr =>
+                                 onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
+                               }
+                               isContextParent={isContextParent}
+                               canBeConstant={false}/>
+        </div>
+      }
+
+      {
+        showLabels &&
+        <LabelsEditor formLabel="Error message(s)"
+                      labels={NodeDefExpression.getMessages(expression)}
+                      onChange={labelItem =>
+                        onUpdate(NodeDefExpression.assocMessage(labelItem)(expression))
+                      }
+        />
+      }
+
+    </div>
+  )
+}
 
 export class ExpressionsProp extends React.Component {
 
@@ -122,7 +133,8 @@ export class ExpressionsProp extends React.Component {
   render () {
     const {
       nodeDefUuidContext, nodeDefUuidCurrent,
-      label, readOnly, applyIf, showLabels, validation, isContextParent, canBeConstant
+      label, readOnly, applyIf, showLabels, validation,
+      isContextParent, canBeConstant, isBoolean,
     } = this.props
     const { uiValues } = this.state
 
@@ -142,7 +154,8 @@ export class ExpressionsProp extends React.Component {
                               nodeDefUuidContext={nodeDefUuidContext}
                               nodeDefUuidCurrent={nodeDefUuidCurrent}
                               isContextParent={isContextParent}
-                              canBeConstant={canBeConstant}/>
+                              canBeConstant={canBeConstant}
+                              isBoolean={isBoolean}/>
             )
 
           }
@@ -167,13 +180,14 @@ ExpressionsProp.defaultProps = {
 
   isContextParent: false,
   canBeConstant: false,
+  isBoolean: true,
 }
 
 export const NodeDefExpressionsProp = props => {
   const {
     nodeDef, nodeDefUuidContext,
     propName, validation, label, multiple, applyIf, showLabels, readOnly, putNodeDefProp,
-    isContextParent, canBeConstant
+    isContextParent, canBeConstant, isBoolean,
   } = props
 
   const values = NodeDef.getProp(propName, [])(nodeDef)
@@ -198,7 +212,8 @@ export const NodeDefExpressionsProp = props => {
                           nodeDefUuidContext={nodeDefUuidContext}
                           nodeDefUuidCurrent={NodeDef.getUuid(nodeDef)}
                           isContextParent={isContextParent}
-                          canBeConstant={canBeConstant}/>
+                          canBeConstant={canBeConstant}
+                          isBoolean={isBoolean}/>
 
 }
 
@@ -216,4 +231,5 @@ NodeDefExpressionsProp.defaultProps = {
   validation: null,
   isContextParent: false,
   canBeConstant: false,
+  isBoolean: true,
 }

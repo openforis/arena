@@ -32,7 +32,6 @@ const defaultFieldValues = {
 const defaultState = {
   ...defaultFieldValues,
   selectedTaxon: null,
-  dirty: false,
   autocompleteOpened: false,
   autocompleteTaxa: [],
   autocompleteInputField: null,
@@ -114,7 +113,15 @@ class NodeDefTaxon extends React.Component {
   }
 
   async componentDidUpdate (prevProps) {
-    if (this.props.entry && !R.equals(prevProps.nodes, this.props.nodes)) {
+    const node = R.head(this.props.nodes)
+    const prevNode = R.head(prevProps.nodes)
+
+    if (this.props.entry && !R.equals(prevNode, node) &&
+      (
+        Node.getNodeTaxonUuid(prevNode) !== Node.getNodeTaxonUuid(node) ||
+        Node.getNodeVernacularNameUuid(prevNode) !== Node.getNodeVernacularNameUuid(node)
+      )
+    ) {
       await this.loadSelectedTaxonFromNode()
     }
   }
@@ -127,22 +134,28 @@ class NodeDefTaxon extends React.Component {
       ? null
       : await loadTaxonByNode(surveyId, taxonomyUuid, draft, node)
 
-    this.updateStateFromTaxon(taxon)
+    this.updateStateFromTaxonSearchItem(taxon)
   }
 
-  updateStateFromTaxon (taxon) {
+  updateStateFromTaxonSearchItem (taxonSearchItem) {
     const { nodes } = this.props
     const node = nodes[0]
 
-    if (taxon) {
-      const unlisted = Taxonomy.isUnlistedTaxon(taxon)
+    if (taxonSearchItem) {
+      const unlisted = Taxonomy.isUnlistedTaxon(taxonSearchItem)
 
-      const code = Taxonomy.getTaxonCode(taxon)
-      const scientificName = unlisted ? Node.getNodeScientificName(node) : Taxonomy.getTaxonScientificName(taxon)
-      const vernacularName = unlisted ? Node.getNodeVernacularName(node) : taxon.vernacularName
+      const code = Taxonomy.getTaxonCode(taxonSearchItem)
+
+      const scientificName = unlisted
+        ? Node.getNodeScientificName(node)
+        : Taxonomy.getTaxonScientificName(taxonSearchItem)
+
+      const vernacularName = unlisted
+        ? Node.getNodeVernacularName(node)
+        : R.defaultTo('', taxonSearchItem.vernacularName)
 
       this.setState({
-        selectedTaxon: taxon,
+        selectedTaxon: taxonSearchItem,
         code,
         scientificName,
         vernacularName,
@@ -169,7 +182,6 @@ class NodeDefTaxon extends React.Component {
 
       this.setState({
         ...fieldValues,
-        dirty: true,
         autocompleteOpened: !emptyValue,
         autocompleteTaxa: [],
         autocompleteInputField: this.getInputFields()[field]
@@ -190,8 +202,7 @@ class NodeDefTaxon extends React.Component {
     const unlistedTaxonUuid = Node.getNodeTaxonUuid(node)
 
     this.setState({
-      [field]: value,
-      dirty: true
+      [field]: value
     })
     const scientificName = field === fields.scientificName ? value : Node.getNodeScientificName(node)
     const vernacularName = field === fields.vernacularName ? value : Node.getNodeVernacularName(node)
@@ -204,15 +215,25 @@ class NodeDefTaxon extends React.Component {
   }
 
   onTaxonSelect (item) {
+    const { scientificName, vernacularName } = this.state
+
     let nodeValue = null
 
     if (Taxonomy.isUnlistedTaxon(item)) {
-      const { scientificName, vernacularName } = this.state
-      //unlisted item
+      // unlisted item
+      // preserve scientific and vernacular name written by user
       nodeValue = {
         [valuePropKeys.taxonUuid]: item.uuid,
         [valuePropKeys.scientificName]: scientificName ? scientificName : Taxonomy.getTaxonScientificName(item),
-        [valuePropKeys.vernacularName]: vernacularName ? vernacularName : '',
+        [valuePropKeys.vernacularName]: vernacularName ? vernacularName : ''
+      }
+    } else if (Taxonomy.isUnknownTaxon(item)) {
+      // unknown item
+      // do not allow writing custom scientific and vernacular name
+      nodeValue = {
+        [valuePropKeys.taxonUuid]: item.uuid,
+        [valuePropKeys.scientificName]: Taxonomy.getTaxonScientificName(item),
+        [valuePropKeys.vernacularName]: ''
       }
     } else {
       //item in list
@@ -224,7 +245,7 @@ class NodeDefTaxon extends React.Component {
       }
     }
 
-    this.updateStateFromTaxon(item)
+    this.updateStateFromTaxonSearchItem(item)
 
     this.updateNodeValue(nodeValue)
   }
@@ -237,7 +258,7 @@ class NodeDefTaxon extends React.Component {
 
   onAutocompleteClose () {
     //reset state using previously selected taxon
-    this.updateStateFromTaxon(this.state.selectedTaxon)
+    this.updateStateFromTaxonSearchItem(this.state.selectedTaxon)
   }
 
   async loadAutocompleteTaxa (field, value, draft) {
