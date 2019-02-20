@@ -111,7 +111,7 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
     await RecordRepository.deleteRecord(user, surveyId, recordUuid, t)
   })
 
-  RecordUpdateManager.notifyUsersRecordDeleted(surveyId, recordUuid, user.id)
+  RecordUpdateManager.notifyUsersRecordDeleted(recordUuid, user.id)
 }
 
 /**

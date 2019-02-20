@@ -9,8 +9,6 @@ const getUserIds = recordUuid =>
     recordUserIdsMap.get(recordUuid)
   )
 
-const getRecordUuids = () => recordUserIdsMap.keys()
-
 const assocUser = (surveyId, recordUuid, user, preview) => {
   if (!recordUserIdsMap.has(recordUuid))
     recordUserIdsMap.set(recordUuid, new Set())
@@ -46,7 +44,6 @@ const getStalePreviewRecordUuids = olderThan =>
 // module.exports = RecordUsersMap
 module.exports = {
   getUserIds,
-  getRecordUuids,
 
   assocUser,
   dissocUserId,

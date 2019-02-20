@@ -123,8 +123,6 @@ const notifyUsersRecordDeleted = (recordUuid, userIdExclude) => {
 
 // ==== UTILS
 
-const getEditingRecordUuids = RecordUsersMap.getRecordUuids
-
 module.exports = {
   checkIn,
   checkOut,
@@ -134,6 +132,4 @@ module.exports = {
   deleteNode,
 
   notifyUsersRecordDeleted,
-
-  getEditingRecordUuids,
 }
