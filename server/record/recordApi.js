@@ -158,7 +158,6 @@ module.exports.init = app => {
 
   app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, async (req, res) => {
     try {
-      const surveyId = getRestParam(req, 'surveyId')
       const nodeUuid = getRestParam(req, 'nodeUuid')
       const user = req.user
 

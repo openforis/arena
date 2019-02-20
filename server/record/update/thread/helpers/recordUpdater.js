@@ -59,17 +59,11 @@ class RecordUpdater {
 
     const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
-    // If the record was already deleted (by another user) the repository delete method returns null and
-    // it doesn't have to be considered
-    if (node) {
-      record = Record.assocNode(node)(record)
+    record = Record.assocNode(node)(record)
 
-      await this.logActivity(user, surveyId, ActivityLog.type.nodeDelete, { nodeUuid }, t)
+    await this.logActivity(user, surveyId, ActivityLog.type.nodeDelete, { nodeUuid }, t)
 
-      return await this._onNodeUpdate(survey, record, node, t)
-    } else {
-      return {}
-    }
+    return await this._onNodeUpdate(survey, record, node, t)
   }
 
   //==========
