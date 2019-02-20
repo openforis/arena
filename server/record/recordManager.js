@@ -116,12 +116,6 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
   RecordUpdateManager.notifyUsersRecordDeleted(surveyId, recordUuid, user.id)
 }
 
-const deleteStalePreviewRecords = () => {
-  // Surveys with old previews to delete
-  const targetSurveyIds = RecordUsersMap.getRecordUuids()
-  console.log(targetSurveyIds)
-}
-
 /**
  * ==================
  * CHECK IN / OUT RECORD
@@ -186,7 +180,6 @@ module.exports = {
   //==== DELETE
   deleteRecord,
   deleteNode: RecordUpdateManager.deleteNode,
-  deleteStalePreviewRecords,
 
   //==== UTILS
   checkInRecord,

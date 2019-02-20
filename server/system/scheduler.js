@@ -4,7 +4,7 @@ const RecordManager = require('../record/recordManager')
 const RecordUsersMap = require('../record/update/recordUsersMap')
 
 const init = () => {
-  schedule.scheduleJob('*/1 * * * * *', () => {
+  schedule.scheduleJob('0 0 * * *', () => {
     // 24 hours ago
     const date = new Date()
     date.setHours(date.getHours() - 24)
