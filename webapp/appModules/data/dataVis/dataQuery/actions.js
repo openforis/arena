@@ -89,7 +89,7 @@ export const updateTableNodeDefUuidCols = (nodeDefUuidCols, nodeDefUuidCol = nul
 
   }
 
-export const initTableData = (queryFilter = null) =>
+export const initTableData = (queryFilter = null, querySort = null) =>
   async (dispatch, getState) => {
     const state = getState()
     const surveyId = SurveyState.getStateSurveyId(state)
@@ -130,3 +130,6 @@ export const updateTableOffset = (offset = 0) =>
 
 export const updateTableFilter = (filter) => dispatch =>
   dispatch(initTableData(filter))
+
+export const updateTableSort = (sort) => dispatch =>
+  dispatch(initTableData(null, sort))

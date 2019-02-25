@@ -14,9 +14,20 @@ $rowHeaderHeight: 45px;
   position: relative;
 
   .table__header {
-    .filter-container {
+    height: 80px;
+
+    .data-operations {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+
+      .filter-container, .sort-container {
+        display: flex;
+        align-items: center;
+      }
+
+      .sort-container {
+        margin-top: 5px;
+      }
     }
   }
 

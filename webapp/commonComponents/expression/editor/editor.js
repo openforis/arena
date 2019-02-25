@@ -26,8 +26,8 @@ class Editor extends React.Component {
         isCompound && canBeConstant
           ? Expression.newLiteral()
           : isCompound
-          ? Expression.newIdentifier()
-          : exprQuery,
+            ? Expression.newIdentifier()
+            : exprQuery,
         Expression.newLiteral()
       )
 
@@ -68,16 +68,11 @@ class Editor extends React.Component {
 
     const {
       variables, isBoolean,
-      onClose, onChange,
+      onChange,
       literalSearchParams,
     } = this.props
 
     return <React.Fragment>
-
-      <button className="btn btn-of expression-editor__btn-close"
-              onClick={onClose}>
-        <span className="icon icon-cross icon-8px"/>
-      </button>
 
       <div className="expression__query-container">
         <div className={`query${exprDraftValid ? '' : ' invalid'}`}>

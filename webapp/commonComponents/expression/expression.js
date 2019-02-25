@@ -6,6 +6,7 @@ import * as R from 'ramda'
 import memoize from 'memoize-one'
 
 import Editor from './editor/editor'
+import Popup from '../../commonComponents/popup'
 
 import * as SurveyState from '../../survey/surveyState'
 import Survey from '../../../common/survey/survey'
@@ -64,14 +65,16 @@ class ExpressionComponent extends React.Component {
       {
         edit
           ? (
-            <Editor query={query}
-                    variables={variables}
-                    onClose={this.toggleEdit}
-                    onChange={query => this.applyChange(query)}
-                    mode={mode}
-                    canBeConstant={canBeConstant}
-                    isBoolean={isBoolean}
-                    literalSearchParams={literalSearchParams}/>
+            <Popup onClose={this.toggleEdit}>
+              <Editor query={query}
+                      variables={variables}
+                      onClose={this.toggleEdit}
+                      onChange={query => this.applyChange(query)}
+                      mode={mode}
+                      canBeConstant={canBeConstant}
+                      isBoolean={isBoolean}
+                      literalSearchParams={literalSearchParams}/>
+            </Popup>
           )
           : (
             <div className="expression__query-container">

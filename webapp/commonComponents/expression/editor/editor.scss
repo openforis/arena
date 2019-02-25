@@ -1,31 +1,5 @@
 @import "../../../style/vars";
 
-.expression-editor__btn-close {
-  position: absolute;
-  padding: 0;
-  border-radius: 50% !important;
-  background-color: rgba($red, 0.6);
-  border: 1px solid rgba($red, 0.5) !important;
-  width: 1.5rem;
-  height: 1.5rem;
-  top: -.7rem;
-  left: -.75rem;
-
-  .icon {
-    opacity: .3;
-    transition: opacity 250ms ease-out;
-  }
-
-  &:hover {
-    background-color: rgba($red, 0.65);
-    border: 1px solid rgba($red, 0.1) !important;
-
-    .icon {
-      opacity: .8;
-    }
-  }
-}
-
 .expression-editor__expr-container {
   overflow: auto;
   padding-bottom: 2rem;

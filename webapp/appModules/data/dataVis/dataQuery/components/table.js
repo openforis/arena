@@ -5,10 +5,11 @@ import * as R from 'ramda'
 import TableRows from './tableRows'
 import TablePaginator from '../../../../../commonComponents/table/tablePaginator'
 import ExpressionComponent from '../../../../../commonComponents/expression/expression'
+import SortExpressionComponent from './sort/sortExpression'
 
 import * as SurveyState from '../../../../../survey/surveyState'
 
-import { updateTableFilter, updateTableOffset } from '../actions'
+import { updateTableFilter, updateTableOffset, updateTableSort } from '../actions'
 
 import Survey from '../../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
@@ -32,6 +33,7 @@ class Table extends React.Component {
       nodeDefUuidContext, nodeDefCols, colNames, data,
       offset, limit, filter, count, lang,
       updateTableOffset, updateTableFilter,
+      updateTableSort,
       showTable,
     } = this.props
 
@@ -49,18 +51,32 @@ class Table extends React.Component {
           showTable &&
           <React.Fragment>
             <div className="table__header">
-              <div className="filter-container">
-                {
-                  nodeDefUuidContext &&
-                  <React.Fragment>
-                <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
-                      style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }}/>
-                    <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
-                                         query={filter}
-                                         onChange={query => updateTableFilter(query)}
-                                         mode={Expression.modes.sql}/>
-                  </React.Fragment>
-                }
+              <div className="data-operations">
+                <div className="filter-container">
+                  {
+                    nodeDefUuidContext &&
+                    <React.Fragment>
+                      <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
+                            style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }}/>
+                      <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
+                                           query={filter}
+                                           onChange={query => updateTableFilter(query)}
+                                           mode={Expression.modes.sql}/>
+                    </React.Fragment>
+                  }
+                </div>
+                <div className="sort-container">
+                  {
+                    nodeDefUuidContext &&
+                    <React.Fragment>
+                      <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
+                            style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }} />
+                      <SortExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
+                                               onChange={sort => updateTableSort(sort)}
+                                               mode={Expression.modes.sql} />
+                    </React.Fragment>
+                  }
+                </div>
               </div>
 
               {
@@ -103,8 +119,8 @@ const mapStateToProps = state => {
     filter: DataQueryState.getTableFilter(state),
     count: DataQueryState.getTableCount(state),
     lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
-    showTable: DataQueryState.hasTableAndCols(state,)
+    showTable: DataQueryState.hasTableAndCols(state),
   }
 }
 
-export default connect(mapStateToProps, { updateTableOffset, updateTableFilter })(Table)
+export default connect(mapStateToProps, { updateTableOffset, updateTableFilter, updateTableSort })(Table)
