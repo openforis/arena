@@ -4,15 +4,16 @@ const compression = require('compression')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 
-const sessionMiddleware = require('./config/sessionMiddleware')
-const headerMiddleware = require('./config/headerMiddleware')
-const accessControlMiddleware = require('./config/accessControlMiddleware')
-const authConfig = require('./auth/authConfig')
-const authApi = require('./auth/authApi')
-const apiRouter = require('./config/apiRouter')
-const WebSocketManager = require('./webSocket/webSocketManager')
+const sessionMiddleware = require('./sessionMiddleware')
+const headerMiddleware = require('./headerMiddleware')
+const accessControlMiddleware = require('./accessControlMiddleware')
+const authConfig = require('../auth/authConfig')
+const authApi = require('../auth/authApi')
+const apiRouter = require('./apiRouter')
+const WebSocketManager = require('../webSocket/webSocketManager')
+const RecordPreviewCleanup = require('./recordPreviewCleanup')
 
-module.exports = () => {
+module.exports = async () => {
 
   const app = express()
 
@@ -33,9 +34,9 @@ module.exports = () => {
 
   app.use(compression({threshold: 512}))
 
-  app.use('/', express.static(`${__dirname}/../dist`))
-  app.use('/app*', express.static(`${__dirname}/../dist`))
-  app.use('/img/', express.static(`${__dirname}/../web-resources/img`))
+  app.use('/', express.static(`${__dirname}/../../dist`))
+  app.use('/app*', express.static(`${__dirname}/../../dist`))
+  app.use('/img/', express.static(`${__dirname}/../../web-resources/img`))
 // app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
 
 // ====== apis
@@ -52,4 +53,6 @@ module.exports = () => {
 // ====== socket middleware
   WebSocketManager.init(server, sessionMiddleware)
 
+// ====== scheduler
+  await RecordPreviewCleanup.init()
 }

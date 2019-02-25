@@ -129,6 +129,7 @@ module.exports = {
   createSurvey,
 
   // ====== READ
+  fetchAllSurveyIds: SurveyRepository.fetchAllSurveyIds,
   fetchSurveyById,
   fetchSurveyAndNodeDefsBySurveyId,
   fetchUserSurveysInfo,

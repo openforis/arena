@@ -1,19 +1,24 @@
 const R = require('ramda')
+const { isDateBefore } = require('../../../common/dateUtils')
 
 const recordUserIdsMap = new Map()
+const previewRecordsMap = new Map()
 
-const getUserIds = recordUuid => R.defaultTo(
-  [],
-  recordUserIdsMap.get(recordUuid)
-)
+const getUserIds = recordUuid =>
+  R.defaultTo(
+    [],
+    recordUserIdsMap.get(recordUuid)
+  )
 
-const getRecordUuids = recordUserIdsMap.keys
-
-const assocUserId = (recordUuid, userId) => {
+const assocUser = (surveyId, recordUuid, user, preview) => {
   if (!recordUserIdsMap.has(recordUuid))
     recordUserIdsMap.set(recordUuid, new Set())
 
-  getUserIds(recordUuid).add(userId)
+  getUserIds(recordUuid).add(user.id)
+
+  if (preview) {
+    previewRecordsMap.set(recordUuid, { user, surveyId, date: new Date() })
+  }
 }
 
 const dissocUserId = (recordUuid, userId) => {
@@ -21,14 +26,32 @@ const dissocUserId = (recordUuid, userId) => {
 
   userIds.delete(userId)
 
-  if (userIds.size === 0)
+  if (userIds.size === 0) {
     recordUserIdsMap.delete(recordUuid)
+    previewRecordsMap.delete(recordUuid)
+  }
+}
+
+const touchPreviewRecord = recordUuid => {
+  const previewData = previewRecordsMap.get(recordUuid)
+  previewRecordsMap.set(recordUuid, { ...previewData, date: new Date() })
+}
+
+const getStalePreviewRecordUuids = olderThan => {
+  const array = []
+  for (const [recordUuid, { date, surveyId, user }] of previewRecordsMap.entries()) {
+    if (isDateBefore(date, olderThan))
+      array.push({ recordUuid, surveyId, user })
+  }
+  return array
 }
 
 module.exports = {
   getUserIds,
-  getRecordUuids,
 
-  assocUserId,
+  assocUser,
   dissocUserId,
+
+  touchPreviewRecord,
+  getStalePreviewRecordUuids,
 }

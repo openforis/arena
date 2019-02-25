@@ -9,7 +9,7 @@ const FormNavigation = ({ edit, entry, preview, history, canEditDef }) => {
   return (
     <div className="survey-form__nav">
       <div className="survey-form__nav-node-def-navigation">
-        <NodeDefNavigation edit={edit && canEditDef}
+        <NodeDefNavigation edit={edit}
                            canEditDef={canEditDef}
                            level={0}/>
       </div>

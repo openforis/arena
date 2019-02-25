@@ -50,7 +50,7 @@ const EntityForm = props => {
   const onLayoutChange = (layout) => {
 
     //console.log(window.innerWidth) ||
-    edit && !locked && window.innerWidth > 1200 && layout.length > 0
+    edit && canEditDef && !locked && window.innerWidth > 1200 && layout.length > 0
     && layout.length === innerPageChildren.length
       ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
       : null
