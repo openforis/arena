@@ -3,7 +3,6 @@ const Promise = require('bluebird')
 
 const SurveyManager = require('../survey/surveyManager')
 const RecordManager = require('../record/recordManager')
-const RecordUsersMap = require('../record/update/recordUsersMap')
 
 const initSchedule = () =>
   schedule.scheduleJob('0 0 * * *', () => {
@@ -11,7 +10,7 @@ const initSchedule = () =>
     const date = new Date()
     date.setHours(date.getHours() - 24)
 
-    const stalePreviewRecords = RecordUsersMap.getStalePreviewRecordUuids(date)
+    const stalePreviewRecords = RecordManager.getStalePreviewRecordUuids(date)
 
     stalePreviewRecords.forEach(({ user, surveyId, recordUuid }) =>
       RecordManager.checkOutRecord(user, surveyId, recordUuid)

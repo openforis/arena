@@ -17,6 +17,8 @@ const { toUuidIndexedObj } = require('../../common/survey/surveyUtils')
 const { isBlank } = require('../../common/stringUtils')
 
 const RecordUpdateManager = require('./update/recordUpdateManager')
+const RecordUsersMap = require('./update/recordUsersMap')
+
 const ActivityLog = require('../activityLog/activityLogger')
 
 const { canEditRecord } = require('../../common/auth/authManager')
@@ -183,4 +185,5 @@ module.exports = {
   //==== UTILS
   checkInRecord,
   checkOutRecord,
+  getStalePreviewRecordUuids: RecordUsersMap.getStalePreviewRecordUuids,
 }
