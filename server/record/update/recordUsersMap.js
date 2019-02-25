@@ -1,4 +1,5 @@
 const R = require('ramda')
+const { isDateBefore } = require('../../../common/dateUtils')
 
 const recordUserIdsMap = new Map()
 const previewRecordsMap = new Map()
@@ -36,10 +37,14 @@ const touchPreviewRecord = recordUuid => {
   previewRecordsMap.set(recordUuid, { ...previewData, date: new Date() })
 }
 
-const getStalePreviewRecordUuids = olderThan =>
-  Array.from(previewRecordsMap.entries())
-    .filter(([_, { date }]) => date < olderThan)
-    .map(([recordUuid, { surveyId, user }]) => ({ surveyId, recordUuid, user }))
+const getStalePreviewRecordUuids = olderThan => {
+  const array = []
+  for (const [recordUuid, { date, surveyId, user }] of previewRecordsMap.entries()) {
+    if (isDateBefore(date, olderThan))
+      array.push({ recordUuid, surveyId, user })
+  }
+  return array
+}
 
 module.exports = {
   getUserIds,

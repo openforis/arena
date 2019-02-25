@@ -178,6 +178,7 @@ module.exports = {
   //==== DELETE
   deleteRecord,
   deleteNode: RecordUpdateManager.deleteNode,
+  deleteRecordsPreview: RecordRepository.deleteRecordsPreview,
 
   //==== UTILS
   checkInRecord,

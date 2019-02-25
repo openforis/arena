@@ -6,6 +6,7 @@ const {
   differenceInWeeks,
   differenceInDays,
   differenceInHours,
+  isBefore,
   format,
 
   compareDesc,
@@ -44,6 +45,7 @@ const getRelativeDate = date => {
 
 const compareDatesDesc = compareDesc
 
+const isDateBefore = isBefore
 /**
  * Checks if the date is valid. Takes into account leap years
  * (i.e. 2015/2/29 is not valid).
@@ -75,6 +77,8 @@ const isValidTime = (hour = '', minutes = '') =>
 module.exports = {
   getRelativeDate,
   compareDatesDesc,
+  isDateBefore,
+
   isValidDate,
   isValidTime,
 }
