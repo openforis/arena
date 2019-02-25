@@ -41,7 +41,6 @@ const getStalePreviewRecordUuids = olderThan =>
     .filter(([_, { date }]) => date < olderThan)
     .map(([recordUuid, { surveyId, user }]) => ({ surveyId, recordUuid, user }))
 
-// module.exports = RecordUsersMap
 module.exports = {
   getUserIds,
 

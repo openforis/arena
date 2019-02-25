@@ -11,7 +11,7 @@ const authConfig = require('./auth/authConfig')
 const authApi = require('./auth/authApi')
 const apiRouter = require('./config/apiRouter')
 const WebSocketManager = require('./webSocket/webSocketManager')
-const scheduler = require('./system/scheduler')
+const recordPreviewCleanupScheduler = require('./system/recordPreviewCleanupScheduler')
 
 module.exports = () => {
 
@@ -54,5 +54,5 @@ module.exports = () => {
   WebSocketManager.init(server, sessionMiddleware)
 
 // ====== scheduler
-  scheduler.init()
+  recordPreviewCleanupScheduler.init()
 }
