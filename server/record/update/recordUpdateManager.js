@@ -21,24 +21,22 @@ const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
 
   RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
 
-  const thread = new ThreadManager(
-    path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
-    { user, surveyId, recordUuid, preview },
-    msg => {
-      const userIds = RecordUsersMap.getUserIds(recordUuid)
-      userIds.forEach(userId =>
-        WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
-      )
+  const filePath = path.resolve(__dirname, 'thread', 'recordUpdateThread.js')
+  const data = { user, surveyId, recordUuid, preview }
 
-      if (preview) {
-        RecordUsersMap.touchPreviewRecord(recordUuid)
-      }
-    },
-    () => {
-      RecordUsersMap.dissocUserId(recordUuid, userId)
-      recordUpdateThreads.removeThread(userId)
-    }
-  )
+  const messageHandler = msg => {
+    const userIds = RecordUsersMap.getUserIds(recordUuid)
+    userIds.forEach(userId =>
+      WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
+    )
+  }
+
+  const exitHandler = () => {
+    RecordUsersMap.dissocUserId(recordUuid, userId)
+    recordUpdateThreads.removeThread(userId)
+  }
+
+  const thread = new ThreadManager(filePath, data, messageHandler, exitHandler)
 
   recordUpdateThreads.putThread(userId, thread)
 
