@@ -82,10 +82,9 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i) => {
 
 const validate = async (survey, nodeDef, nodeDefExpressions) => {
   const result = { valid: true, fields: {} }
-  const range = R.range(0, nodeDefExpressions.length)
 
   const validations = await Promise.all(
-    range.map(async i =>
+    nodeDefExpressions.map(async (nodeDefExpression, i) =>
       await validateExpression(survey, nodeDef, nodeDefExpressions, i)
     )
   )

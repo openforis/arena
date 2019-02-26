@@ -4,6 +4,8 @@ import { NodeDefExpressionsProp } from './expressionsProp'
 
 import Validator from '../../../../../common/validation/validator'
 import NodeDef from '../../../../../common/survey/nodeDef'
+import { FormItem } from '../../../../commonComponents/form/input'
+import Checkbox from '../../../../commonComponents/form/checkbox'
 
 const AdvancedProps = props => {
   const { nodeDef, nodeDefParent, putNodeDefProp, readOnly } = props
@@ -13,11 +15,16 @@ const AdvancedProps = props => {
 
   return (
     <div className="form">
-
-
       {
         NodeDef.canNodeDefHaveDefaultValue(nodeDef) &&
         <React.Fragment>
+
+          <FormItem label={'readOnly'}>
+            <Checkbox checked={NodeDef.isNodeDefReadOnly(nodeDef)}
+                      disabled={readOnly}
+                      validation={Validator.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
+                      onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.readOnly, checked)}/>
+          </FormItem>
 
           <NodeDefExpressionsProp nodeDef={nodeDef}
                                   putNodeDefProp={putNodeDefProp}
