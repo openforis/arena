@@ -101,9 +101,6 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
 
       const expressions = getExpressionsFn(nodeDef)
 
-      if (R.isEmpty(expressions))
-        return {}
-
       //3. get expression
       const expr = await RecordExprParser.getApplicableExpression(survey, record, nodeCtx, expressions, tx)
 
@@ -115,7 +112,7 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
       //5. persist updated node value, and return updated node
       return await isApplicableExpr
         ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, valueExpr || false, tx)
-        : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, valueExpr, isDefaultValuesExpr, tx)
+        : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, valueExpr, isDefaultValuesExpr && !R.isNil(expr), tx)
     })
   )
 
