@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { Switch, Route } from 'react-router'
 import { TransitionGroup, Transition } from 'react-transition-group'
-import DynamicImport from '../commonComponents/DynamicImport'
+import DynamicImport from '../commonComponents/dynamicImport'
 
 import loginAnimation from '../login/components/loginAnimation'
 import appAnimation from './appAnimation'
