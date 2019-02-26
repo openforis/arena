@@ -13,6 +13,10 @@
       background-color: rgba($red, .1);
     }
 
+    .tooltip-text {
+      bottom: 20%;
+    }
+
     &:hover {
       .tooltip-text {
         position: relative;
