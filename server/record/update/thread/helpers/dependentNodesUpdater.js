@@ -16,7 +16,7 @@ const NodeDependencyManager = require('../../../nodeDependencyManager')
 const RecordExprParser = require('../../../recordExprParser')
 
 /**
- * Module responsible for updating applicable, calculated and default values
+ * Module responsible for updating applicable and default values
  */
 
 const updateNodes = async (survey, record, nodes, tx) => {
@@ -62,13 +62,9 @@ const updateNodes = async (survey, record, nodes, tx) => {
 const updateNode = async (survey, record, node, tx) => {
 
   const nodesApplicability = await updateNodeExpr(survey, record, node, NodeDef.getApplicable, dependencyTypes.applicable, tx)
-  const nodesCalculatedValues = await updateNodeExpr(survey, record, node, NodeDef.getCalculatedValues, dependencyTypes.calculatedValues, tx)
   const nodesDefaultValues = await updateNodeExpr(survey, record, node, NodeDef.getDefaultValues, dependencyTypes.defaultValues, tx)
 
-  return R.pipe(
-    R.mergeRight(nodesCalculatedValues),
-    R.mergeRight(nodesDefaultValues),
-  )(nodesApplicability)
+  return R.mergeRight(nodesApplicability, nodesDefaultValues)
 }
 
 const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependencyType, tx) => {

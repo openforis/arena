@@ -96,7 +96,6 @@ const propsValidations = survey => ({
 const validateAdvancedProps = async (survey, nodeDef) => {
   const validations = {
     defaultValues: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getDefaultValues(nodeDef)),
-    calculatedValues: await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getCalculatedValues(nodeDef)),
     applicable: await NodeDefExpressionsValidator.validate(survey, Survey.getNodeDefParent(nodeDef)(survey), NodeDef.getApplicable(nodeDef)),
     validations: await NodeDefValidationsValidator.validate(survey, nodeDef, NodeDef.getValidations(nodeDef)),
   }
