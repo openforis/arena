@@ -2,7 +2,7 @@ import React from 'react'
 
 import { getNodeValue } from '../../../../../../common/record/node'
 
-const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value, entry, canEditRecord}) => {
+const Button = ({nodeDef, readOnly, parentNode, nodes, updateNode, label, disabled, value, entry, canEditRecord}) => {
   const node = entry ? nodes[0] : null
 
   const nodeValue = getNodeValue(node, '')
@@ -10,7 +10,7 @@ const Button = ({nodeDef, parentNode, nodes, updateNode, label, disabled, value,
   return (
     <button className="btn btn-s btn-transparent"
             style={{borderRadius: '.75rem'}}
-            aria-disabled={disabled || !canEditRecord}
+            aria-disabled={disabled || !canEditRecord || readOnly}
             onClick={() => updateNode(nodeDef, node, value)}>
       <span className={`icon icon-radio-${nodeValue === value ? 'checked2' : 'unchecked'} icon-left`}/>
       {label}

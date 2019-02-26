@@ -13,9 +13,9 @@ import NodeDefErrorBadge from '../nodeDefErrorBadge'
 
 const multipleNodesWrapper = React.createRef()
 
-const TextInput = ({ nodeDef, node, edit, updateNode, canEditRecord }) => (
+const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
   <div>
-    <Input aria-disabled={edit || !canEditRecord}
+    <Input aria-disabled={edit || !canEditRecord || readOnly}
            {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
            value={Node.getNodeValue(node, '')}
            onChange={value => updateNode(nodeDef, node, value)}
