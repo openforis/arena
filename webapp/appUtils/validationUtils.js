@@ -10,13 +10,18 @@ const getFieldError = field => R.pipe(
   )
 )
 
-export const getValidationFieldMessagesHTML = error => R.pipe(
+export const getValidationFieldMessages = validationFields => R.pipe(
   R.keys,
-  R.filter(key => R.pathEq([key, 'valid'], false, error)),
+  R.filter(key => R.pathEq([key, 'valid'], false, validationFields)),
+  R.map(field => `${field} : ${getFieldError(field)(validationFields)}`)
+)(validationFields)
+
+export const getValidationFieldMessagesHTML = R.pipe(
+  getValidationFieldMessages,
   R.addIndex(R.map)(
-    (field, i) =>
+    (msg, i) =>
       <div key={i}>
-        {`${field} : ${getFieldError(field)(error)}`}
+        {msg}
       </div>
   )
-)(error)
+)

@@ -126,14 +126,16 @@ const isNodeDefKeyEditDisabled = (nodeDef, survey) =>
   (
     !NodeDef.isNodeDefKey(nodeDef) &&
     Survey.getNodeDefKeys(Survey.getNodeDefParent(nodeDef)(survey))(survey).length >= NodeDef.maxKeyAttributes
-  )
+  ) ||
+  NodeDef.isNodeDefReadOnly(nodeDef)
 
 const isNodeDefMultipleEditDisabled = (nodeDef, survey) =>
   !nodeDef ||
   NodeDef.isNodeDefPublished(nodeDef) ||
   NodeDef.isNodeDefKey(nodeDef) ||
   isRenderTable(nodeDef) ||
-  Survey.isNodeDefParentCode(nodeDef)(survey)
+  Survey.isNodeDefParentCode(nodeDef)(survey) ||
+  NodeDef.isNodeDefReadOnly(nodeDef)
 
 const mapStateToProps = state => {
   const survey = getSurvey(state)

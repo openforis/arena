@@ -4,6 +4,26 @@
 .node-def-edit__expressions {
   max-height: 350px;
   overflow-y: auto;
+
+  //custom tooltip error
+  .tooltip-error {
+
+    .node-def-edit__expression {
+      border: 1px solid rgba($red, .6);
+      background-color: rgba($red, .1);
+    }
+
+    .tooltip-text {
+      bottom: 20%;
+    }
+
+    &:hover {
+      .tooltip-text {
+        position: relative;
+      }
+    }
+  }
+
 }
 
 .node-def-edit__expression {
