@@ -7,13 +7,13 @@ import NodeDeleteButton from '../nodeDeleteButton'
 import Node from '../../../../../../common/record/node'
 import File from '../../../../../../common/file/file'
 
-const FileInput = ({surveyInfo, nodeDef, edit, recordUuid, node, updateNode, removeNode}) => {
+const FileInput = ({ surveyInfo, nodeDef, readOnly, edit, recordUuid, node, canEditRecord, updateNode, removeNode }) => {
   const fileName = Node.getNodeFileName(node)
   const truncatedFileName = File.truncateFileName(fileName)
   const fileUploaded = !edit && fileName
 
   return <div className="node-def__file-input">
-    <UploadButton disabled={edit}
+    <UploadButton disabled={edit || !canEditRecord || readOnly}
                   showLabel={false}
                   onChange={files => updateNode(nodeDef, node, null, files[0])}/>
 
@@ -31,7 +31,7 @@ const FileInput = ({surveyInfo, nodeDef, edit, recordUuid, node, updateNode, rem
 }
 
 const MultipleFileInput = props => {
-  const {nodes} = props
+  const { nodes } = props
 
   return <div className="node-def__entry-multiple">
     <div className="nodes">

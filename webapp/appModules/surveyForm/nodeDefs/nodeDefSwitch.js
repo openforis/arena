@@ -140,7 +140,8 @@ const mapStateToProps = (state, props) => {
 
     return {
       nodes: nodesValidated,
-      canAddNode
+      canAddNode,
+      readOnly: NodeDef.isNodeDefReadOnly(nodeDef)
     }
   }
 

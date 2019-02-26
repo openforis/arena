@@ -19,7 +19,11 @@ const NodeDefLayout = require('../../common/survey/nodeDefLayout')
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
 
-const {keys, propKeys} = NodeDef
+const { keys, propKeys } = NodeDef
+
+const nodeDefErrorKeys = {
+  defaultValuesNotSpecified: 'defaultValuesNotSpecified'
+}
 
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.code
@@ -79,6 +83,11 @@ const validateKey = survey =>
     return null
   }
 
+const validateReadOnly = (propName, nodeDef) =>
+  NodeDef.isNodeDefReadOnly(nodeDef) && R.isEmpty(NodeDef.getDefaultValues(nodeDef))
+    ? nodeDefErrorKeys.defaultValuesNotSpecified
+    : null
+
 const propsValidations = survey => ({
   [`${keys.props}.${propKeys.name}`]: [
     validateRequired,
@@ -89,6 +98,7 @@ const propsValidations = survey => ({
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
   [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
   [`${keys.props}.${propKeys.key}`]: [validateKey(survey)],
+  [`${keys.props}.${propKeys.readOnly}`]: [validateReadOnly],
   'keyAttributes': [validateKeyAttributes(survey)],
   'children': [validateChildren(survey)],
 })
