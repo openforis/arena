@@ -8,7 +8,6 @@ const dependencyTypes = {
   defaultValues: 'defaultValues',
   applicable: 'applicable',
   validations: 'validations',
-  calculatedValues: 'calculatedValues',
 }
 
 const getDeps = (type, nodeDefUuid) => R.pathOr([], [type, nodeDefUuid])
@@ -37,7 +36,6 @@ const buildGraph = survey =>
   R.reduce(
     (graph, nodeDef) => R.pipe(
       addDeps(survey, nodeDef, dependencyTypes.defaultValues, NodeDef.getDefaultValues(nodeDef)),
-      addDeps(survey, nodeDef, dependencyTypes.calculatedValues, NodeDef.getCalculatedValues(nodeDef)),
       addDeps(survey, nodeDef, dependencyTypes.applicable, NodeDef.getApplicable(nodeDef)),
       addDeps(survey, nodeDef, dependencyTypes.validations, NodeDef.getValidationExpressions(nodeDef))
     )(graph),
