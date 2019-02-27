@@ -3,12 +3,16 @@ import './tooltip.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-const Tooltip = ({children, type = null, messages = []}) => {
+const Tooltip = ({ children, type = null, messages = [], position = 'top' }) => {
 
   const hasMessages = !R.isEmpty(messages)
 
-  return <div className={hasMessages ? `tooltip${type ? '-' + type : ''}` : ''}
-              style={{display: 'grid', width: '100%', height: '100%'}}>
+  const className = hasMessages
+    ? `tooltip${type ? '-' + type : ''} ${position}`
+    : ''
+
+  return <div className={className}
+              style={{ display: 'grid', width: '100%', height: '100%' }}>
 
     <React.Fragment>
       {children}
