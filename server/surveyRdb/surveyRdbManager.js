@@ -1,6 +1,3 @@
-const R = require('ramda')
-const fastcsv = require('fast-csv')
-
 const db = require('../db/db')
 //surveyRdbManger cannot use SurveyManager - loop dependencies
 
@@ -10,6 +7,7 @@ const NodesInsert = require('./dbActions/nodesInsert')
 const NodesUpdate = require('./dbActions/nodesUpdate')
 const TableViewCreate = require('./dbActions/tableViewCreate')
 const TableViewQuery = require('./dbActions/tableViewQuery')
+const TableViewExport = require('./dbActions/tableViewExport')
 
 // ==== DDL
 
@@ -40,33 +38,8 @@ const countTable = async (surveyId, tableName, filter, client = db) =>
 const queryRootTableByRecordKeys = async (survey, recordUuid, client = db) =>
   await TableViewQuery.queryRootTableByRecordKeys(survey, recordUuid, client)
 
-const exportTableToCSV = async (surveyId, tableName, cols, filter, output) => {
-  const csvStream = fastcsv.createWriteStream({ headers: true })
-  csvStream.pipe(output)
-
-  // 1. write headers
-  csvStream.write(cols)
-
-  let offset = 0
-  const limit = 10
-  let complete = false
-
-  // 2. write rows
-  while (!complete) {
-    const rows = await queryTable(surveyId, tableName, cols, offset, limit, filter)
-
-    rows.forEach(row => {
-      csvStream.write(R.values(row))
-    })
-
-    offset = offset + limit
-    if (rows.length < limit)
-      complete = true
-  }
-
-  // 3. close stream
-  csvStream.end()
-}
+const exportTableToCSV = async (surveyId, tableName, cols, filter, output, client = db) =>
+  await TableViewExport.exportToCSV(surveyId, tableName, cols, filter, output, client)
 
 module.exports = {
   dropSchema,
