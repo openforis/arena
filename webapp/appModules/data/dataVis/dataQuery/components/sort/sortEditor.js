@@ -129,7 +129,7 @@ class SortExpressionComponent extends React.Component {
   render () {
     const { edit, sortCriteria, unchosenVariables } = this.state
 
-    return <div className={`expression${edit ? ' edit' : ''}`}
+    return <div className={`sort-editor${edit ? ' edit' : ''}`}
                 ref={this.elementRef}
                 style={this.getStyle(edit)}>
       {
@@ -171,10 +171,10 @@ class SortExpressionComponent extends React.Component {
               </React.Fragment>
             </Popup>
           ) : (
-            <div className="expression__query-container">
+            <div className="sort__query-container">
               <button className="btn btn-s btn-of-light btn-edit"
                       onClick={this.toggleEdit}>
-                <span className="icon icon-sort-amount-asc icon-14px" />
+                <span className="icon icon-pencil2 icon-14px" />
               </button>
             </div>
           )

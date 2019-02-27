@@ -69,7 +69,7 @@ class Table extends React.Component {
                   {
                     nodeDefUuidContext &&
                     <React.Fragment>
-                      <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
+                      <span className="icon icon-sort-amount-asc icon-14px icon-left icon-reverse btn-of"
                             style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }} />
                       <SortEditor nodeDefUuidCols={nodeDefUuidCols}
                                   nodeDefUuidContext={nodeDefUuidContext}
