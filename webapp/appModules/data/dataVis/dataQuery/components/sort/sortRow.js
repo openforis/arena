@@ -1,11 +1,11 @@
-import './sortRow.css'
+import './sortEditor.scss'
 
 import React from 'react'
 
 import Dropdown from '../../../../../../commonComponents/form/dropdown'
 
 const SortRow = ({ variables, selectedVariable, onSelectVariable, selectedOrder, onSelectOrder, onDelete, isPlaceholder }) => (
-  <div className="sort_row">
+  <div className="sort-row">
     <Dropdown items={variables}
               selection={selectedVariable}
               itemLabelProp="label" itemKeyProp="value"
@@ -14,7 +14,7 @@ const SortRow = ({ variables, selectedVariable, onSelectVariable, selectedOrder,
 
     {
       !isPlaceholder &&
-      <React.Fragment>
+      <div className="sort-row__buttons">
         <button className={`btn btn-s btn-of-light btn-switch-operand${selectedOrder === 'asc' ? ' active' : ''}`}
                 onClick={() => onSelectOrder('asc')}>
           Asc
@@ -28,7 +28,7 @@ const SortRow = ({ variables, selectedVariable, onSelectVariable, selectedOrder,
                 aria-disabled={isPlaceholder}>
           <span className="icon icon-bin icon-10px" />
         </button>
-      </React.Fragment>
+      </div>
     }
   </div>
 )

@@ -1,4 +1,4 @@
-// import './expression.scss'
+import './sortEditor.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
@@ -123,20 +123,22 @@ class SortExpressionComponent extends React.Component {
           ? (
             <Popup onClose={this.toggleEdit}>
               <React.Fragment>
-                {sortCriteria.map((criteria, pos) =>
-                  <SortRow key={criteria.variable}
-                           variables={unchosenVariables}
-                           selectedVariable={criteria.variable}
-                           onSelectVariable={item => this.onSelectVariable(pos, item.value)}
-                           selectedOrder={criteria.order}
-                           onSelectOrder={order => this.onSelectOrder(pos, order)}
-                           onDelete={() => this.deleteCriteria(pos)}/>)}
-                {
-                  !!unchosenVariables.length && <SortRow variables={unchosenVariables}
-                                                         onSelectVariable={item => this.addCriteria(item)}
-                                                         isPlaceholder={true}></SortRow>
-                }
-                <div className="expression-editor__footer">
+                <div className="sort-editor__criteria">
+                  {sortCriteria.map((criteria, pos) =>
+                    <SortRow key={criteria.variable}
+                             variables={unchosenVariables}
+                             selectedVariable={criteria.variable}
+                             onSelectVariable={item => this.onSelectVariable(pos, item.value)}
+                             selectedOrder={criteria.order}
+                             onSelectOrder={order => this.onSelectOrder(pos, order)}
+                             onDelete={() => this.deleteCriteria(pos)}/>)}
+                  {
+                    !!unchosenVariables.length && <SortRow variables={unchosenVariables}
+                                                           onSelectVariable={item => this.addCriteria(item)}
+                                                           isPlaceholder={true}></SortRow>
+                  }
+                </div>
+                <div className="sort-editor__footer">
                   <button className="btn btn-xs btn-of"
                           onClick={() => onChange('')}
                           aria-disabled={!sortCriteria.length}>

@@ -5,7 +5,7 @@ import * as R from 'ramda'
 import TableRows from './tableRows'
 import TablePaginator from '../../../../../commonComponents/table/tablePaginator'
 import ExpressionComponent from '../../../../../commonComponents/expression/expression'
-import SortExpressionComponent from './sort/sortExpression'
+import SortEditor from './sort/sortEditor'
 
 import * as SurveyState from '../../../../../survey/surveyState'
 
@@ -71,9 +71,9 @@ class Table extends React.Component {
                     <React.Fragment>
                       <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
                             style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }} />
-                      <SortExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
-                                               onChange={sort => updateTableSort(sort)}
-                                               mode={Expression.modes.sql} />
+                      <SortEditor nodeDefUuidContext={nodeDefUuidContext}
+                                  onChange={sort => updateTableSort(sort)}
+                                  mode={Expression.modes.sql} />
                     </React.Fragment>
                   }
                 </div>

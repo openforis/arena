@@ -14,7 +14,6 @@ import {
 
 import {
   initTableData,
-  resetTableData,
   assocTableData,
   assocTableDataCol,
   assocTableFilter,

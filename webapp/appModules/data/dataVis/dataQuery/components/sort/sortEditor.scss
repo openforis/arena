@@ -1,0 +1,43 @@
+@import "../../../../../../style/vars";
+
+.sort-editor__criteria {
+  padding-bottom: 2rem;
+
+  .sort-row {
+    display: flex;
+    margin-bottom: .5rem;
+    
+    .sort-row__buttons {
+      padding-left: 1rem;
+
+      button {
+        background-color: rgba($white, 0.1);
+        border-color: rgba($white, 0.1) !important;
+        font-weight: 600;
+        font-size: .7rem;
+
+        &:hover {
+          background-color: rgba($white, 0.6);
+        }
+
+        &.active {
+          background-color: rgba($white, 0.6) !important;
+        }
+      }
+
+      .btns__last {
+        margin-left: .6rem;
+      }
+    }
+  }
+}
+
+.sort-editor__footer {
+  text-align: center;
+  align-self: end;
+
+  > button {
+    margin: 0px .3rem;
+    font-weight: 600;
+  }
+}
