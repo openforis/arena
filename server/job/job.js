@@ -34,6 +34,7 @@ class Job {
     this.processed = 0
     this.result = {}
     this.errors = {}
+    this.context = {} // object shared among nested jobs
 
     this.innerJobs = innerJobs
     this.currentInnerJobIndex = -1
@@ -92,6 +93,8 @@ class Job {
     //start each inner job and wait for it's completion before starting next one
     for (const innerJob of this.innerJobs) {
       ++this.currentInnerJobIndex
+
+      innerJob.context = this.context
 
       innerJob.onEvent(this.handleInnerJobEvent.bind(this))
 

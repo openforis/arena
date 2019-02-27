@@ -142,6 +142,10 @@ const isLevelDeleteAllowed = level => R.pipe(
 )
 
 module.exports = {
+  props,
+  levelProps,
+  itemProps,
+
   // ======
   //CREATE
   newCategory,

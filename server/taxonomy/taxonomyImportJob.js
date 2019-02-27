@@ -30,12 +30,12 @@ const createPredefinedTaxa = (taxonomy) => [
 class TaxonomyImportJob extends Job {
 
   constructor (params) {
-    const {taxonomyUuid, csvString} = params
-
     super(TaxonomyImportJob.type, params)
 
+    const {taxonomyUuid, filePath} = params
+
     this.taxonomyUuid = taxonomyUuid
-    this.csvString = csvString
+    this.filePath = filePath
 
     this.codesToRow = {} //maps codes to csv file rows
     this.scientificNamesToRow = {} //maps scientific names to csv file rows
@@ -43,9 +43,9 @@ class TaxonomyImportJob extends Job {
   }
 
   async execute (tx) {
-    const {surveyId, taxonomyUuid, csvString} = this
+    const {surveyId, taxonomyUuid, filePath} = this
 
-    this.total = await new CSVParser(csvString).calculateSize()
+    this.total = await new CSVParser(filePath).calculateSize()
 
     const validHeaders = await this.processHeaders()
 
@@ -63,7 +63,7 @@ class TaxonomyImportJob extends Job {
     //delete old draft taxa
     await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)
 
-    const csvParser = new CSVParser(csvString)
+    const csvParser = new CSVParser(filePath)
 
     this.processed = 0
 
@@ -90,8 +90,8 @@ class TaxonomyImportJob extends Job {
   }
 
   async processHeaders () {
-    const csvParser = new CSVParser(this.csvString, false)
-    let headers = await csvParser.next()
+    const csvParser = new CSVParser(this.filePath, false)
+    const headers = await csvParser.next()
     csvParser.destroy()
     const validHeaders = this.validateHeaders(headers)
     if (validHeaders) {

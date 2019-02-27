@@ -2,13 +2,13 @@ const fastcsv = require('fast-csv')
 
 class CSVParser {
 
-  constructor (csvString, readHeaders = true) {
+  constructor (filePath, readHeaders = true) {
     this.destroyed = false
     this.csvStreamEnded = false
-    this.csvString = csvString
+    this.filePath = filePath
     this.rowReadyListener = null
 
-    this.csvStream = fastcsv.fromString(this.csvString, {headers: readHeaders})
+    this.csvStream = fastcsv.fromPath(this.filePath, {headers: readHeaders})
       .on('data', data => this.onData(data))
       .on('end', () => this.onStreamEnd())
       .pause()
@@ -17,7 +17,7 @@ class CSVParser {
   calculateSize () {
     return new Promise(resolve => {
       let count = 0
-      fastcsv.fromString(this.csvString, {headers: true})
+      fastcsv.fromPath(this.filePath, {headers: true})
         .on('data', () => count++)
         .on('end', () => resolve(count))
     })
@@ -56,7 +56,7 @@ class CSVParser {
     if (!this.destroyed) {
       this.csvStream.destroy()
       this.csvStream = null
-      this.csvString = null
+      this.filePath = null
       this.rowReadyListener = null
       this.destroyed = true
     }

@@ -5,12 +5,13 @@ import LanguageDropdown from '../../../commonComponents/form/languageDropdown'
 
 import { getFieldValidation } from '../../../../common/validation/validator'
 import { normalizeName } from '../../../../common/stringUtils'
+import UploadButton from '../../../commonComponents/form/uploadButton'
 
 const AddSurveyForm = (props) => {
 
-  const {newSurvey, updateNewSurveyProp, createSurvey} = props
+  const { newSurvey, updateNewSurveyProp, createSurvey, importCollectSurveyFile } = props
 
-  const {name, label, lang, validation} = newSurvey
+  const { name, label, lang, validation } = newSurvey
 
   return (
     <div style={{
@@ -41,11 +42,13 @@ const AddSurveyForm = (props) => {
                           validation={getFieldValidation('lang')(validation)}/>
       </div>
       <button className="btn btn-of-light"
-              onClick={() => createSurvey({name, label, lang})}>
-        <span className="icon icon-plus icon-left"></span>
+              onClick={() => createSurvey({ name, label, lang })}>
+        <span className="icon icon-plus icon-left"/>
         Create Survey
       </button>
 
+      <UploadButton label="Import from Collect"
+                    onChange={files => importCollectSurveyFile(files[0])}/>
     </div>
   )
 }

@@ -15,7 +15,7 @@ import Survey from '../../../common/survey/survey'
 import { getSurvey } from '../../survey/surveyState'
 
 import { fetchSurveys } from './actions'
-import { createSurvey, updateNewSurveyProp } from './actions'
+import { createSurvey, updateNewSurveyProp, importCollectSurveyFile } from './actions'
 import { setActiveSurvey } from '../../survey/actions'
 
 class AppHomeView extends React.Component {
@@ -26,8 +26,8 @@ class AppHomeView extends React.Component {
 
   componentDidUpdate (prevProps) {
 
-    const {surveyInfo: prevSurveyInfo} = prevProps
-    const {surveyInfo, history} = this.props
+    const { surveyInfo: prevSurveyInfo } = prevProps
+    const { surveyInfo, history } = this.props
 
     if (surveyInfo && (!prevSurveyInfo || surveyInfo.id !== prevSurveyInfo.id)) {
       history.push(appModuleUri(appModules.dashboard))
@@ -39,8 +39,10 @@ class AppHomeView extends React.Component {
       newSurvey,
       updateNewSurveyProp,
       createSurvey,
-      surveys,
+      importCollectSurveyFile,
       setActiveSurvey,
+
+      surveys,
       surveyInfo,
     } = this.props
 
@@ -49,7 +51,8 @@ class AppHomeView extends React.Component {
 
         <AddSurveyForm newSurvey={newSurvey}
                        updateNewSurveyProp={updateNewSurveyProp}
-                       createSurvey={createSurvey}/>
+                       createSurvey={createSurvey}
+                       importCollectSurveyFile={importCollectSurveyFile}/>
 
         <SurveysList surveys={surveys}
                      surveyInfo={surveyInfo}
@@ -73,5 +76,6 @@ export default withRouter(connect(
     updateNewSurveyProp,
     fetchSurveys,
     setActiveSurvey,
+    importCollectSurveyFile
   }
 )(AppHomeView))

@@ -1,4 +1,5 @@
 const R = require('ramda')
+const fs = require('fs')
 
 const { sendErr, sendOk } = require('../serverUtils/response')
 const { getRestParam, getBoolParam } = require('../serverUtils/request')
@@ -11,8 +12,10 @@ const Validator = require('../../common/validation/validator')
 const AuthMiddleware = require('../authGroup/authMiddleware')
 
 const JobManager = require('../job/jobManager')
+const FileManager = require('../file/fileManager')
 const JobUtils = require('../job/jobUtils')
 const SurveyPublishJob = require('./publish/surveyPublishJob')
+const SurveyImportJob = require('./import/surveyImportJob')
 
 module.exports.init = app => {
 
@@ -33,6 +36,22 @@ module.exports.init = app => {
       sendErr(res, err)
     }
 
+  })
+
+  app.post('/survey/import-from-collect', async (req, res) => {
+    try {
+      const { user } = req
+
+      const file = req.files.file
+
+      const surveyImportJob = new SurveyImportJob({ user, filePath: file.tempFilePath })
+
+      JobManager.executeJobThread(surveyImportJob)
+
+      sendOk(res)
+    } catch (err) {
+      sendErr(res, err)
+    }
   })
 
   // ==== READ

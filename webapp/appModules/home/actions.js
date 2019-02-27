@@ -3,6 +3,8 @@ import * as R from 'ramda'
 
 import { surveyCreate } from '../../survey/actions'
 import { getNewSurvey } from './appHomeState'
+import { getStateSurveyId } from '../../survey/surveyState'
+import { showAppJobMonitor } from '../appView/components/job/actions'
 
 export const homeNewSurveyUpdate = 'home/newSurvey/update'
 export const homeSurveysUpdate = 'home/surveys/update'
@@ -40,6 +42,19 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
     })
   }
 
+}
+
+export const importCollectSurveyFile = file => async (dispatch) => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const config = {
+    headers: {
+      'content-type': 'multipart/form-data'
+    }
+  }
+
+  const {data} = await axios.post(`/api/survey/import-from-collect`, formData, config)
 }
 
 // ====== SURVEYS LIST

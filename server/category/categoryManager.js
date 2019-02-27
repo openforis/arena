@@ -26,8 +26,8 @@ const assocValidation = async (category, categories = [], items = []) => ({
 
 // ====== CREATE
 
-const insertCategory = async (user, surveyId, category) =>
-  await db.tx(async t => {
+const insertCategory = async (user, surveyId, category, client = db) =>
+  await client.tx(async t => {
     const categoryDb = await CategoryRepository.insertCategory(surveyId, category, t)
     const levels = Category.getLevelsArray(category)
 
@@ -44,8 +44,8 @@ const insertCategory = async (user, surveyId, category) =>
     return await assocValidation(Category.assocLevelsArray(levelsDb)(categoryDb))
   })
 
-const insertLevel = async (user, surveyId, categoryUuid, level) =>
-  await db.tx(async t => {
+const insertLevel = async (user, surveyId, categoryUuid, level, client = db) =>
+  await client.tx(async t => {
     const levelDb = await CategoryRepository.insertLevel(surveyId, categoryUuid, level, t)
 
     await markSurveyDraft(surveyId, t)
@@ -55,8 +55,8 @@ const insertLevel = async (user, surveyId, categoryUuid, level) =>
     return levelDb
   })
 
-const insertItem = async (user, surveyId, item) =>
-  await db.tx(async t => {
+const insertItem = async (user, surveyId, item, client = db) =>
+  await client.tx(async t => {
     const itemDb = await CategoryRepository.insertItem(surveyId, item, t)
 
     await markSurveyDraft(surveyId, t)
