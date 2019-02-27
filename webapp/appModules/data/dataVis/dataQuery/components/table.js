@@ -31,7 +31,7 @@ class Table extends React.Component {
   render () {
     const {
       nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames, data,
-      offset, limit, filter, count, lang,
+      offset, limit, filter, sort, count, lang,
       updateTableOffset, updateTableFilter,
       updateTableSort,
       showTable,
@@ -73,6 +73,7 @@ class Table extends React.Component {
                             style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }} />
                       <SortEditor nodeDefUuidCols={nodeDefUuidCols}
                                   nodeDefUuidContext={nodeDefUuidContext}
+                                  sort={sort}
                                   onChange={sort => updateTableSort(sort)}
                                   mode={Expression.modes.sql} />
                     </React.Fragment>
@@ -119,6 +120,7 @@ const mapStateToProps = state => {
     offset: DataQueryState.getTableOffset(state),
     limit: DataQueryState.getTableLimit(state),
     filter: DataQueryState.getTableFilter(state),
+    sort: DataQueryState.getTableSort(state),
     count: DataQueryState.getTableCount(state),
     lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
     showTable: DataQueryState.hasTableAndCols(state),

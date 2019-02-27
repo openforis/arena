@@ -4,8 +4,20 @@ import React from 'react'
 
 import Dropdown from '../../../../../../commonComponents/form/dropdown'
 
-const SortRow = ({ variables, selectedVariable, onSelectVariable, selectedOrder, onSelectOrder, onDelete, isPlaceholder }) => (
-  <div className="sort-row">
+const SortRow = (props) => {
+  const {
+    variables,
+    selectedVariable,
+    onSelectVariable,
+    selectedOrder,
+    onSelectOrder,
+    onDelete,
+    isPlaceholder,
+    isFirst,
+  } = props
+
+  return <div className="sort-row">
+    <div className={'sort-row__label'}>{ isFirst ? 'Order by:' : 'then by:' }</div>
     <Dropdown items={variables}
               selection={selectedVariable}
               itemLabelProp="label" itemKeyProp="value"
@@ -31,6 +43,6 @@ const SortRow = ({ variables, selectedVariable, onSelectVariable, selectedOrder,
       </div>
     }
   </div>
-)
+}
 
 export default SortRow

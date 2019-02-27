@@ -21,8 +21,9 @@ module.exports.init = app => {
       const offset = Request.getRestParam(req, 'offset')
       const limit = Request.getRestParam(req, 'limit')
       const filter = Request.getRestParam(req, 'filter', '')
+      const sort = Request.getRestParam(req, 'sort', '')
 
-      const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit, filter)
+      const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit, filter, sort)
 
       res.json(rows)
     } catch (err) {

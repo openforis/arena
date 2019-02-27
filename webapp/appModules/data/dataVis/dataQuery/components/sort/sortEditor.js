@@ -25,7 +25,7 @@ class SortExpressionComponent extends React.Component {
 
     this.state = {
       edit: false,
-      sortCriteria: [],
+      sortCriteria: R.clone(props.sort),
       availableVariables: [],
       unchosenVariables: []
     }
@@ -112,18 +112,21 @@ class SortExpressionComponent extends React.Component {
     () => this.refreshUnchosenVariables())
   }
 
-  serialize () {
-    const { sortCriteria } = this.state
+  applyChange (query) {
+    const { onChange } = this.props
 
-    return sortCriteria.map(c => `${c.variable} ${c.order}`).join(', ')
+    onChange && onChange(query)
+    this.toggleEdit()
+  }
+
+  reset () {
+    this.setState(
+      { sortCriteria: [] }
+    )
+    this.applyChange([])
   }
 
   render () {
-
-    const {
-      onChange,
-    } = this.props
-
     const { edit, sortCriteria, unchosenVariables } = this.state
 
     return <div className={`expression${edit ? ' edit' : ''}`}
@@ -142,22 +145,25 @@ class SortExpressionComponent extends React.Component {
                              onSelectVariable={item => this.onSelectVariable(pos, item.value)}
                              selectedOrder={criteria.order}
                              onSelectOrder={order => this.onSelectOrder(pos, order)}
-                             onDelete={() => this.deleteCriteria(pos)}/>)}
+                             onDelete={() => this.deleteCriteria(pos)}
+                             isFirst={!pos}/>)}
+
                   {
                     !!unchosenVariables.length && <SortRow variables={unchosenVariables}
                                                            onSelectVariable={item => this.addCriteria(item)}
-                                                           isPlaceholder={true}></SortRow>
+                                                           isPlaceholder={true}
+                                                           isFirst={!sortCriteria.length}></SortRow>
                   }
                 </div>
                 <div className="sort-editor__footer">
                   <button className="btn btn-xs btn-of"
-                          onClick={() => onChange('')}
+                          onClick={() => this.reset()}
                           aria-disabled={!sortCriteria.length}>
                     <span className="icon icon-undo2 icon-16px"/> Reset
                   </button>
 
                   <button className="btn btn-xs btn-of"
-                          onClick={() => onChange(sortCriteria)}
+                          onClick={() => this.applyChange(sortCriteria)}
                           aria-disabled={!sortCriteria.length}>
                     <span className="icon icon-checkmark icon-16px"/> Apply
                   </button>

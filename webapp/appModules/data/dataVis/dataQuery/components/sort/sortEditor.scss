@@ -7,6 +7,11 @@
     display: flex;
     margin-bottom: .5rem;
     
+    .sort-row__label {
+      width: 6rem;
+      font-size: 90%;
+    }
+
     .sort-row__buttons {
       padding-left: 1rem;
 
