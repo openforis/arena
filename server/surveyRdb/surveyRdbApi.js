@@ -1,9 +1,6 @@
-const R = require('ramda')
-
-const {sendErr} = require('../serverUtils/response')
 const Request = require('../serverUtils/request')
+const Response = require('../serverUtils/response')
 
-//const {requireSurveyEditPermission} = require('../authGroup/authMiddleware')
 const SurveyRdbManager = require('./surveyRdbManager')
 
 const {
@@ -26,7 +23,7 @@ module.exports.init = app => {
 
       res.json(rows)
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -40,7 +37,25 @@ module.exports.init = app => {
 
       res.json(count)
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
+
+  app.get('/surveyRdb/:surveyId/:tableName/export', requireRecordListViewPermission, async (req, res) => {
+    try {
+      const surveyId = Request.getRequiredParam(req, 'surveyId')
+      const tableName = Request.getRequiredParam(req, 'tableName')
+      const filter = Request.getRestParam(req, 'filter', '')
+      const cols = Request.getJsonParam(req, 'cols', [])
+
+      Response.sendFilePrepare(res, 'data.csv', null, Response.contentTypes.csv)
+
+      await SurveyRdbManager.exportTableToCSV(surveyId, tableName, cols, filter, res)
+
+      res.end()
+    } catch (err) {
+      Response.sendErr(res, err)
+    }
+  })
+
 }
