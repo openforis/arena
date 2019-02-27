@@ -23,18 +23,35 @@ class SortExpressionComponent extends React.Component {
   constructor (props) {
     super(props)
 
-    const { variables } = props
-
     this.state = {
       edit: false,
       sortCriteria: [],
-      unchosenVariables: variables
+      availableVariables: [],
+      unchosenVariables: []
     }
 
     this.elementRef = React.createRef()
 
     this.toggleEdit = this.toggleEdit.bind(this)
     this.getStyle = memoize(this.getStyle.bind(this))
+  }
+
+  componentDidUpdate (prevProps) {
+    const { availableVariables } = this.props
+    const { sortCriteria } = this.state
+
+    // Only show selected variables in the dropdown menu
+    if (availableVariables !== prevProps.availableVariables) {
+
+      // reset available variables and remove unavailable variables from criteria
+      const newSortCriteria = sortCriteria.filter(c => availableVariables.findIndex(v => v.value === c.variable) !== -1)
+
+      this.setState({
+        availableVariables,
+        sortCriteria: newSortCriteria,
+      },
+      () => this.refreshUnchosenVariables())
+    }
   }
 
   getStyle (edit) {
@@ -53,7 +70,10 @@ class SortExpressionComponent extends React.Component {
       R.assoc(key, value)
     )(sortCriteria)
 
-    this.setState({ sortCriteria: R.update(pos, newVarSortCriteria, sortCriteria) })
+    this.setState({
+      sortCriteria: R.update(pos, newVarSortCriteria, sortCriteria)
+    },
+    () => this.refreshUnchosenVariables())
   }
 
   onSelectVariable (pos, variable) {
@@ -65,12 +85,9 @@ class SortExpressionComponent extends React.Component {
   }
 
   refreshUnchosenVariables () {
-    const { sortCriteria } = this.state
-    const { variables } = this.props
+    const { availableVariables, sortCriteria } = this.state
 
-    const sortVariableNames = sortCriteria.map(c => c.variable)
-
-    const unchosenVariables = variables.filter(v => !sortVariableNames.find(sv => sv === v.value))
+    const unchosenVariables = availableVariables.filter(v => sortCriteria.findIndex(sc => sc.variable === v.value) === -1)
     this.setState({ unchosenVariables })
   }
 
@@ -95,11 +112,6 @@ class SortExpressionComponent extends React.Component {
     () => this.refreshUnchosenVariables())
   }
 
-  // componentDidUpdate (prevProps) {
-  //   console.log(prevProps)
-  //   console.log(this.props)
-  // }
-
   serialize () {
     const { sortCriteria } = this.state
 
@@ -109,7 +121,6 @@ class SortExpressionComponent extends React.Component {
   render () {
 
     const {
-      // query,
       onChange,
     } = this.props
 
@@ -155,10 +166,6 @@ class SortExpressionComponent extends React.Component {
             </Popup>
           ) : (
             <div className="expression__query-container">
-              {/* {
-                !R.isEmpty(query) &&
-                <div className="query">{query}</div>
-              } */}
               <button className="btn btn-s btn-of-light btn-edit"
                       onClick={this.toggleEdit}>
                 <span className="icon icon-sort-amount-asc icon-14px" />
@@ -171,10 +178,6 @@ class SortExpressionComponent extends React.Component {
   }
 }
 
-SortExpressionComponent.defaultProps = {
-  isContextParent: false,
-}
-
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
@@ -183,7 +186,7 @@ const mapStateToProps = (state, props) => {
     nodeDefUuidContext,
     nodeDefUuidCurrent,
     mode = SortExpressionComponent.defaultProps.mode,
-    isContextParent = SortExpressionComponent.defaultProps.isContextParent,
+    isContextParent = false,
   } = props
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
@@ -191,11 +194,11 @@ const mapStateToProps = (state, props) => {
   const depth = isContextParent ? 0 : 1
   const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth)
 
+  const availableVariables = variables.filter(v => nodeDefUuidCols.indexOf(v.uuid) !== -1)
+
   return {
-    variables,
-    nodeDefUuidCols,
+    availableVariables,
   }
 }
 
 export default connect(mapStateToProps)(SortExpressionComponent)
-

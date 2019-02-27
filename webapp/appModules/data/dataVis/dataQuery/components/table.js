@@ -30,7 +30,7 @@ class Table extends React.Component {
 
   render () {
     const {
-      nodeDefUuidContext, nodeDefCols, colNames, data,
+      nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames, data,
       offset, limit, filter, count, lang,
       updateTableOffset, updateTableFilter,
       updateTableSort,
@@ -71,7 +71,8 @@ class Table extends React.Component {
                     <React.Fragment>
                       <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
                             style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }} />
-                      <SortEditor nodeDefUuidContext={nodeDefUuidContext}
+                      <SortEditor nodeDefUuidCols={nodeDefUuidCols}
+                                  nodeDefUuidContext={nodeDefUuidContext}
                                   onChange={sort => updateTableSort(sort)}
                                   mode={Expression.modes.sql} />
                     </React.Fragment>
@@ -111,6 +112,7 @@ const mapStateToProps = state => {
 
   return {
     nodeDefUuidContext,
+    nodeDefUuidCols,
     nodeDefCols,
     colNames,
     data: DataQueryState.getTableData(state),

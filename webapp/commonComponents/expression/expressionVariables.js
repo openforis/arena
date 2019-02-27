@@ -32,8 +32,8 @@ const getJsVariables = (nodeDef, nodeDefCurrent, lang, depth) => {
 
     label: NodeDef.getNodeDefLabel(nodeDef, lang),
 
-    type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
-      NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
+    type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer
+      : NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
         : sqlTypes.varchar,
   }]
 }
@@ -54,6 +54,7 @@ const getSqlVariables = (nodeDef, lang) => {
       NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
         : sqlTypes.varchar,
 
+    uuid: NodeDef.getUuid(nodeDef)
   }))
 }
 
@@ -65,14 +66,13 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, dept
   return R.pipe(
     Survey.getNodeDefChildren(nodeDefContext),
     R.map(childDef => {
-        if (NodeDef.isNodeDefEntity(childDef) || NodeDef.isNodeDefCoordinate(childDef) || NodeDef.isNodeDefFile(childDef))
-          return null
-        else if (mode === Expression.modes.sql)
-          return getSqlVariables(childDef, lang)
-        else if (mode === Expression.modes.json)
-          return getJsVariables(childDef, nodeDefCurrent, lang, depth)
-      }
-    ),
+      if (NodeDef.isNodeDefEntity(childDef) || NodeDef.isNodeDefCoordinate(childDef) || NodeDef.isNodeDefFile(childDef))
+        return null
+      else if (mode === Expression.modes.sql)
+        return getSqlVariables(childDef, lang)
+      else if (mode === Expression.modes.json)
+        return getJsVariables(childDef, nodeDefCurrent, lang, depth)
+    }),
     R.flatten,
     R.reject(R.isNil),
   )(survey)
