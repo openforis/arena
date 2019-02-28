@@ -2,18 +2,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
+import TableHeader from './tableHeader'
 import TableRows from './tableRows'
-import TablePaginator from '../../../../../commonComponents/table/tablePaginator'
-import ExpressionComponent from '../../../../../commonComponents/expression/expression'
-import SortEditor from './sort/sortEditor'
 
 import * as SurveyState from '../../../../../survey/surveyState'
 
-import { updateTableFilter, updateTableOffset, updateTableSort } from '../actions'
-
 import Survey from '../../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
-import Expression from '../../../../../../common/exprParser/expression'
 
 import * as DataQueryState from '../dataQueryState'
 
@@ -30,11 +25,9 @@ class Table extends React.Component {
 
   render () {
     const {
-      nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames, data,
-      offset, limit, filter, sort, count, lang,
-      updateTableOffset, updateTableFilter,
-      updateTableSort,
-      showTable,
+      lang, data, showTable,
+      nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames,
+      offset, limit, filter, sort, count,
     } = this.props
 
     const { width = defaultColWidth } = elementOffset(this.tableRef.current)
@@ -45,52 +38,27 @@ class Table extends React.Component {
       ? widthMax / colNames.length
       : colWidthMin
 
+    const hasData = !R.isEmpty(data)
+
     return (
       <div className="data-query__table table" ref={this.tableRef}>
         {
           showTable &&
           <React.Fragment>
-            <div className="table__header">
-              <div className="data-operations">
-                <div className="filter-container">
-                  {
-                    nodeDefUuidContext &&
-                    <React.Fragment>
-                      <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
-                            style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }}/>
-                      <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
-                                           query={filter}
-                                           onChange={query => updateTableFilter(query)}
-                                           mode={Expression.modes.sql}/>
-                    </React.Fragment>
-                  }
-                </div>
-                <div className="sort-container">
-                  {
-                    nodeDefUuidContext &&
-                    <React.Fragment>
-                      <span className="icon icon-sort-amount-asc icon-14px icon-left icon-reverse btn-of"
-                            style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }} />
-                      <SortEditor nodeDefUuidCols={nodeDefUuidCols}
-                                  nodeDefUuidContext={nodeDefUuidContext}
-                                  sort={sort}
-                                  onChange={sort => updateTableSort(sort)}
-                                  mode={Expression.modes.sql} />
-                    </React.Fragment>
-                  }
-                </div>
-              </div>
-
-              {
-                !R.isEmpty(data) &&
-                <TablePaginator offset={offset} limit={limit} count={count}
-                                fetchFn={updateTableOffset}/>
-              }
-            </div>
-
+            <TableHeader
+              data={data}
+              nodeDefUuidContext={nodeDefUuidContext}
+              nodeDefUuidCols={nodeDefUuidCols}
+              filter={filter}
+              sort={sort}
+              limit={limit}
+              offset={offset}
+              count={count}
+              showPaginator={hasData}
+            />
 
             {
-              !R.isEmpty(data) &&
+              hasData &&
               <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
                          data={data} offset={offset}
                          lang={lang}
@@ -127,4 +95,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { updateTableOffset, updateTableFilter, updateTableSort })(Table)
+export default connect(mapStateToProps)(Table)

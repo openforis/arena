@@ -3,7 +3,6 @@ import './expression.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
-import memoize from 'memoize-one'
 
 import Editor from './editor/editor'
 import Popup from '../../commonComponents/popup'
@@ -15,8 +14,6 @@ import NodeDef from '../../../common/survey/nodeDef'
 import Expression from '../../../common/exprParser/expression'
 import * as ExpressionVariables from './expressionVariables'
 
-import { elementOffset } from '../../appUtils/domUtils'
-
 class ExpressionComponent extends React.Component {
 
   constructor (props) {
@@ -24,18 +21,7 @@ class ExpressionComponent extends React.Component {
 
     this.state = { edit: false }
 
-    this.elementRef = React.createRef()
-
     this.toggleEdit = this.toggleEdit.bind(this)
-    this.getStyle = memoize(this.getStyle.bind(this))
-  }
-
-  getStyle (edit) {
-    const elemOffset = edit ? elementOffset(this.elementRef.current) : null
-    const padding = 20
-    return elemOffset
-      ? { padding, top: (elemOffset.top - padding) + 'px', left: (elemOffset.left - padding) + 'px' }
-      : {}
   }
 
   applyChange (query) {
@@ -59,38 +45,44 @@ class ExpressionComponent extends React.Component {
 
     const { edit } = this.state
 
-    return <div className={`expression${edit ? ' edit' : ''}`}
-                ref={this.elementRef}
-                style={this.getStyle(edit)}>
-      {
-        edit
-          ? (
-            <Popup onClose={this.toggleEdit}>
-              <Editor query={query}
-                      variables={variables}
-                      onClose={this.toggleEdit}
-                      onChange={query => this.applyChange(query)}
-                      mode={mode}
-                      canBeConstant={canBeConstant}
-                      isBoolean={isBoolean}
-                      literalSearchParams={literalSearchParams}/>
-            </Popup>
-          )
-          : (
-            <div className="expression__query-container">
-              {
-                !R.isEmpty(query) &&
-                <div className="query">{query}</div>
-              }
-              <button className="btn btn-s btn-of-light btn-edit"
-                      onClick={this.toggleEdit}>
-                <span className="icon icon-pencil2 icon-14px"/>
-              </button>
-            </div>
-          )
-      }
+    return (
+      <div className={`expression${edit ? ' edit' : ''}`}>
 
-    </div>
+        {
+          edit
+            ? (
+              <Popup
+                onClose={this.toggleEdit}
+                padding={20}>
+
+                <Editor
+                  query={query}
+                  variables={variables}
+                  onClose={this.toggleEdit}
+                  onChange={query => this.applyChange(query)}
+                  mode={mode}
+                  canBeConstant={canBeConstant}
+                  isBoolean={isBoolean}
+                  literalSearchParams={literalSearchParams}/>
+
+              </Popup>
+            )
+            : (
+              <div className="expression__query-container">
+                {
+                  !R.isEmpty(query) &&
+                  <div className="query">{query}</div>
+                }
+                <button className="btn btn-s btn-of-light btn-edit"
+                        onClick={this.toggleEdit}>
+                  <span className="icon icon-pencil2 icon-14px"/>
+                </button>
+              </div>
+            )
+        }
+
+      </div>
+    )
   }
 }
 

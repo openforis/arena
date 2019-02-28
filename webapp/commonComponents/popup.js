@@ -1,19 +1,57 @@
 import './popup.scss'
 
 import React from 'react'
+import { elementOffset } from '../appUtils/domUtils'
 
-const Popup = ({ children, onClose }) => {
-  return <React.Fragment>
-    <button className="btn btn-of popup__btn-close"
-            onClick={onClose}>
-      <span className="icon icon-cross icon-8px" />
-    </button>
+class Popup extends React.PureComponent {
 
-    <div className="popup-container">
-      {children}
-    </div>
+  constructor (props) {
+    super(props)
 
-  </React.Fragment>
+    this.state = { style: {} }
+    this.elementRef = React.createRef()
+  }
+
+  getStyle () {
+    const { padding } = this.props
+    const elemOffset = elementOffset(this.elementRef.current)
+
+    return {
+      padding: padding + 'px',
+      top: (elemOffset.top - padding) + 'px',
+      left: (elemOffset.left - padding) + 'px'
+    }
+
+  }
+
+  componentDidMount () {
+    this.setState({ style: this.getStyle() })
+  }
+
+  render () {
+    const { children, onClose } = this.props
+    const { style } = this.state
+
+    return (
+      <div className="popup"
+           ref={this.elementRef}
+           style={style}>
+        <button className="btn btn-of popup__btn-close"
+                onClick={onClose}>
+          <span className="icon icon-cross icon-8px"/>
+        </button>
+
+        {children}
+
+      </div>
+    )
+
+  }
+}
+
+Popup.defaultProps = {
+  padding: 0,
+  onClose: () => {},
 }
 
 export default Popup
