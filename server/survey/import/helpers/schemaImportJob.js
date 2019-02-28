@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const { uuidv4 } = require('../../../../common/uuid')
 const NodeDef = require('../../../../common/survey/nodeDef')
+const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
 const { nodeDefType } = NodeDef
 const Category = require('../../../../common/survey/category')
 
@@ -27,6 +28,8 @@ class SchemaImportJob extends Job {
 
   constructor (params) {
     super('SchemaImportJob', params)
+
+    this.nodeNames = []
   }
 
   async execute (tx) {
@@ -42,14 +45,28 @@ class SchemaImportJob extends Job {
   /**
    * Inserts a node and
    */
-  async insertNodeDef (surveyId, parentUuid, nodeSource, type, tx) {
+  async insertNodeDef (surveyId, parentNodeDef, nodeSource, type, tx) {
+    const multiple = nodeSource._attr.multiple === 'true'
+
     const props = {
-      ...this.extractNodeDefProps(type, nodeSource),
-      [NodeDef.propKeys.name]: nodeSource._attributes.name,
+      ...this.extractNodeDefExtraProps(parentNodeDef, type, nodeSource),
+      [NodeDef.propKeys.name]: this.getUniqueNodeName(parentNodeDef, nodeSource._attr.name),
+      [NodeDef.propKeys.multiple]: multiple,
+      [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && nodeSource._attr.key === 'true'
     }
-    const nodeDef = await NodeDefManager.createNodeDef(this.user, surveyId, parentUuid, uuidv4(), type, props, tx)
+
+    if (type === NodeDef.nodeDefType.entity) {
+      props[NodeDefLayout.nodeDefLayoutProps.pageUuid] = uuidv4()
+      props[NodeDefLayout.nodeDefLayoutProps.render] = nodeSource._attr['n1:layout'] === 'table'
+        ? NodeDefLayout.nodeDefRenderType.table
+        : NodeDefLayout.nodeDefRenderType.form
+    }
+
+    const nodeDef = await NodeDefManager.createNodeDef(this.user, surveyId, NodeDef.getUuid(parentNodeDef), uuidv4(), type, props, tx)
 
     if (type === nodeDefType.entity) {
+      // insert child definitions
+      
       for (const childCollectType of R.keys(nodeSource)) {
         const childType = nodeDefTypesByCollectType[childCollectType]
 
@@ -61,17 +78,17 @@ class SchemaImportJob extends Job {
           )(nodeSource[childCollectType])
 
           for (const childSource of childSources) {
-            await this.insertNodeDef(surveyId, NodeDef.getUuid(nodeDef), childSource, childType, tx)
+            await this.insertNodeDef(surveyId, nodeDef, childSource, childType, tx)
           }
         }
       }
     }
   }
 
-  extractNodeDefProps (type, nodeSource) {
+  extractNodeDefExtraProps (parentNodeDef, type, nodeSource) {
     switch (type) {
       case nodeDefType.code:
-        const listName = nodeSource._attributes.list
+        const listName = nodeSource._attr.list
         const category = R.find(category => listName === Category.getName(category), this.context.categories)
 
         return {
@@ -80,6 +97,31 @@ class SchemaImportJob extends Job {
       default:
         return {}
     }
+  }
+
+  getUniqueNodeName (parentNodeDef, name) {
+    let finalName = name
+
+    if (R.includes(finalName, this.nodeNames)) {
+      // name is in use
+
+      // try to add parent node def name as prefix
+      if (parentNodeDef) {
+        finalName = `${NodeDef.getNodeDefName(parentNodeDef)}_${name}`
+      }
+      if (R.includes(finalName, this.nodeNames)) {
+        // try to make it unique by adding _# suffix
+        const prefix = name + '_'
+        let count = 1
+        finalName = prefix + count
+        while (R.includes(finalName, this.nodeNames)) {
+          finalName = prefix + (++count)
+        }
+      }
+    }
+    this.nodeNames.push(finalName)
+    return finalName
+
   }
 
 }

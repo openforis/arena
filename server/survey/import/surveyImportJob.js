@@ -3,6 +3,7 @@ const Job = require('../../job/job')
 const SurveySchemaReaderJob = require('./helpers/surveySchemaReaderJob')
 const SurveyCreatorJob = require('./helpers/surveyCreatorJob')
 const CategoriesImportJob = require('./helpers/categoriesImportJob')
+const TaxonomiesImportJob = require('./helpers/taxonomiesImportJob')
 const SchemaImportJob = require('./helpers/schemaImportJob')
 
 class SurveyImportJob extends Job {
@@ -11,6 +12,7 @@ class SurveyImportJob extends Job {
       new SurveySchemaReaderJob(params),
       new SurveyCreatorJob(params),
       new CategoriesImportJob(params),
+      new TaxonomiesImportJob(params),
       new SchemaImportJob(params)
     ])
   }

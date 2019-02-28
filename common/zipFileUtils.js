@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const StreamZip = require('node-stream-zip')
 
 const openFile = async file =>
@@ -14,14 +16,29 @@ const openFile = async file =>
 
     // Handle errors
     zip.on('error', err => console.log(err) || reject(err))
+
+    zip.en
   })
 
-const readEntry = async (zip, entryName) => {
-  const data = await zip.entryDataSync(entryName)
+const getEntryData = (zip, entryName) => zip.entryDataSync(entryName)
+
+const getEntryAsText = (zip, entryName) => {
+  const data = getEntryData(zip, entryName)
   return data.toString('utf8')
 }
 
+const getEntryStream = (zip, entryName) => zip.stream(entryName)
+
+const entries = (zip, path = '') => R.pipe(
+  R.keys,
+  R.filter(R.startsWith(path)),
+  R.map(entry => entry.substring(path.length))
+)(zip.entries())
+
 module.exports = {
   openFile,
-  readEntry
+  getEntryData,
+  getEntryAsText,
+  getEntryStream,
+  entries
 }

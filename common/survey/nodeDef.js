@@ -129,9 +129,10 @@ const canNodeDefBeMultiple = nodeDef =>
     ]
   )
 
-const canNodeDefBeKey = nodeDef =>
-  R.includes(
-    getType(nodeDef),
+const canNodeDefBeKey = nodeDef => canNodeDefTypeBeKey(getType(nodeDef))
+
+const canNodeDefTypeBeKey = type =>
+  R.includes(type,
     [
       nodeDefType.date,
       nodeDefType.decimal,
@@ -221,5 +222,6 @@ module.exports = {
   //UTILS
   canNodeDefBeMultiple,
   canNodeDefBeKey,
+  canNodeDefTypeBeKey,
   canNodeDefHaveDefaultValue,
 }

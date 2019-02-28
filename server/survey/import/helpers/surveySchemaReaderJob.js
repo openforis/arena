@@ -1,4 +1,4 @@
-const { xml2js } = require('xml-js')
+const parser = require('fast-xml-parser')
 const ZipFileUtils = require('../../../../common/zipFileUtils')
 
 const Job = require('../../../job/job')
@@ -14,12 +14,24 @@ class SurveySchemaReaderJob extends Job {
 
   async execute (tx) {
 
-    const zip = await ZipFileUtils.openFile(this.params.filePath)
+    const zipFile = await ZipFileUtils.openFile(this.params.filePath)
 
-    const idmlXml = await ZipFileUtils.readEntry(zip, 'idml.xml')
-    const idmlSource = xml2js(idmlXml, { compact: true, spaces: 4 })
+    this.context.zipFile = zipFile
 
-    this.context.surveySource = idmlSource.survey
+    const idmlXml = await ZipFileUtils.getEntryAsText(zipFile, 'idml.xml')
+
+    const options = {
+      attrNodeName: '_attr',
+      attributeNamePrefix: '',
+      textNodeName: '_text',
+      ignoreAttributes: false,
+      format: false,
+      indentBy: '  ',
+    }
+    const tObj = parser.getTraversalObj(idmlXml, options)
+    const jsonObj = parser.convertToJson(tObj, options)
+
+    this.context.surveySource = jsonObj.survey
   }
 }
 

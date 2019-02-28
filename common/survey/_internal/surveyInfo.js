@@ -69,6 +69,8 @@ const getSurveyAdminGroup = R.pipe(
 )
 
 module.exports = {
+  keys,
+
   getInfo,
 
   getId,

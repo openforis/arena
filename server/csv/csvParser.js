@@ -1,14 +1,19 @@
 const fastcsv = require('fast-csv')
+const R = require('ramda')
 
 class CSVParser {
 
-  constructor (filePath, readHeaders = true) {
+  constructor (filePathOrContent, readHeaders = true) {
     this.destroyed = false
     this.csvStreamEnded = false
-    this.filePath = filePath
+    this.filePathOrContent = filePathOrContent
     this.rowReadyListener = null
 
-    this.csvStream = fastcsv.fromPath(this.filePath, {headers: readHeaders})
+    this.csvStream = R.is(String, filePathOrContent)
+      ? fastcsv.fromPath(this.filePathOrContent, { headers: readHeaders })
+      : fastcsv.fromStream(this.filePathOrContent, { headers: readHeaders })
+
+    this.csvStream
       .on('data', data => this.onData(data))
       .on('end', () => this.onStreamEnd())
       .pause()
@@ -17,7 +22,7 @@ class CSVParser {
   calculateSize () {
     return new Promise(resolve => {
       let count = 0
-      fastcsv.fromPath(this.filePath, {headers: true})
+      fastcsv.fromPath(this.filePathOrContent, { headers: true })
         .on('data', () => count++)
         .on('end', () => resolve(count))
     })
