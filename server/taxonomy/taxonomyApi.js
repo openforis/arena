@@ -1,4 +1,4 @@
-const { sendErr } = require('../serverUtils/response')
+const Response = require('../serverUtils/response')
 const { getRestParam, getBoolParam } = require('../serverUtils/request')
 const { toUuidIndexedObj } = require('../../common/survey/surveyUtils')
 
@@ -26,7 +26,7 @@ module.exports.init = app => {
 
       res.json({ taxonomy })
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -40,7 +40,7 @@ module.exports.init = app => {
 
       await sendTaxonomies(res, surveyId, draft, validate)
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -55,7 +55,7 @@ module.exports.init = app => {
 
       res.json({ taxonomy })
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -69,7 +69,7 @@ module.exports.init = app => {
 
       res.json({ count })
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -98,7 +98,7 @@ module.exports.init = app => {
 
       res.json({ taxa })
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -115,7 +115,7 @@ module.exports.init = app => {
 
       res.json({ taxon })
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -125,15 +125,13 @@ module.exports.init = app => {
       const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
       const draft = getBoolParam(req, 'draft')
 
-      const fileName = `taxonomy_${taxonomyUuid}.csv`
-      res.setHeader('Content-disposition', `attachment; filename=${fileName}`)
-      res.set('Content-Type', 'text/csv')
+      Response.setContentTypeFile(res, `taxonomy_${taxonomyUuid}.csv`, null, Response.contentTypes.csv)
 
       await TaxonomyManager.exportTaxa(surveyId, taxonomyUuid, res, draft)
 
       res.end()
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -150,7 +148,7 @@ module.exports.init = app => {
 
       await sendTaxonomies(res, surveyId, true, true)
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -173,7 +171,7 @@ module.exports.init = app => {
 
       res.json({ job: jobToJSON(job) })
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -189,7 +187,7 @@ module.exports.init = app => {
 
       await sendTaxonomies(res, surveyId, true, true)
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 

@@ -5,6 +5,7 @@ import * as R from 'ramda'
 import TableRows from './tableRows'
 import TablePaginator from '../../../../../commonComponents/table/tablePaginator'
 import ExpressionComponent from '../../../../../commonComponents/expression/expression'
+import DownloadButton from '../../../../../commonComponents/form/downloadButton'
 
 import * as SurveyState from '../../../../../survey/surveyState'
 
@@ -33,6 +34,7 @@ class Table extends React.Component {
       offset, limit, filter, count, lang,
       updateTableOffset, updateTableFilter,
       showTable,
+      surveyId, tableName
     } = this.props
 
     const { width = defaultColWidth } = elementOffset(this.tableRef.current)
@@ -63,6 +65,9 @@ class Table extends React.Component {
                 }
               </div>
 
+              <DownloadButton href={`/api/surveyRdb/${surveyId}/${tableName}/export?filter=${filter}&cols=${JSON.stringify(colNames)}`}
+                              label="CSV"/>
+
               {
                 !R.isEmpty(data) &&
                 <TablePaginator offset={offset} limit={limit} count={count}
@@ -92,6 +97,7 @@ const mapStateToProps = state => {
   const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
+  const tableName = NodeDefTable.getViewNameByUuid(nodeDefUuidContext)(survey)
 
   return {
     nodeDefUuidContext,
@@ -103,7 +109,9 @@ const mapStateToProps = state => {
     filter: DataQueryState.getTableFilter(state),
     count: DataQueryState.getTableCount(state),
     lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
-    showTable: DataQueryState.hasTableAndCols(state,)
+    showTable: DataQueryState.hasTableAndCols(state),
+    surveyId: Survey.getId(survey),
+    tableName
   }
 }
 
