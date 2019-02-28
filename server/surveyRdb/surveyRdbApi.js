@@ -48,7 +48,7 @@ module.exports.init = app => {
       const filter = Request.getRestParam(req, 'filter', '')
       const cols = Request.getJsonParam(req, 'cols', [])
 
-      Response.sendFilePrepare(res, 'data.csv', null, Response.contentTypes.csv)
+      Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
 
       await SurveyRdbManager.exportTableToCSV(surveyId, tableName, cols, filter, res)
 

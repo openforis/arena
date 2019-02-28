@@ -11,7 +11,7 @@ const contentTypes = {
   csv: 'text/csv'
 }
 
-const sendOk = res => res.json({status: status.ok})
+const sendOk = res => res.json({ status: status.ok })
 
 const sendErr = (res, err) => {
   console.log('=== ERROR ')
@@ -33,12 +33,12 @@ const sendErr = (res, err) => {
 }
 
 const sendFile = (res, file) => {
-  sendFilePrepare(res, File.getName(file), File.getSize(file))
+  setContentTypeFile(res, File.getName(file), File.getSize(file))
   res.write(file.content, 'binary')
   res.end(null, 'binary')
 }
 
-const sendFilePrepare = (res, fileName, fileSize = null, contentType = null) => {
+const setContentTypeFile = (res, fileName, fileSize = null, contentType = null) => {
   res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
   if (fileSize)
     res.setHeader('Content-Length', fileSize)
@@ -52,5 +52,5 @@ module.exports = {
   sendOk,
   sendErr,
   sendFile,
-  sendFilePrepare
+  setContentTypeFile
 }

@@ -125,7 +125,7 @@ module.exports.init = app => {
       const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
       const draft = getBoolParam(req, 'draft')
 
-      Response.sendFilePrepare(res, `taxonomy_${taxonomyUuid}.csv`, null, Response.contentTypes.csv)
+      Response.setContentTypeFile(res, `taxonomy_${taxonomyUuid}.csv`, null, Response.contentTypes.csv)
 
       await TaxonomyManager.exportTaxa(surveyId, taxonomyUuid, res, draft)
 
