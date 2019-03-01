@@ -30,14 +30,11 @@ const getColNames = (state, nodeDefUuidCols) => {
   return NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 }
 
-const queryTable = (surveyId, tableName, cols, offset = 0, filter = '', sort = []) => {
-  const sortStr = sort.map(s => `${s.variable} ${s.order}`).join(', ')
-
-  return axios.get(
-    `/api/surveyRdb/${surveyId}/${tableName}/query?cols=${JSON.stringify(cols)}&offset=${offset}&limit=${defaults.limit}&filter=${filter}&sort=${sortStr}`,
+const queryTable = (surveyId, tableName, cols, offset = 0, filter = '', sort = '') =>
+  axios.get(
+    `/api/surveyRdb/${surveyId}/${tableName}/query?cols=${JSON.stringify(cols)}&offset=${offset}&limit=${defaults.limit}&filter=${filter}&sort=${sort}`,
     // {params: {cols: JSON.stringify(cols), offset, limit}}
   )
-}
 
 const fetchData = async (state, cols = null, offset = null, filter = null, sort = null) => {
   if (DataQueryState.hasTableAndCols(state)) {
@@ -86,7 +83,7 @@ export const updateTableNodeDefUuidCols = (nodeDefUuidCols, nodeDefUuidCol = nul
     } else if (nodeDefUuidColDeleted) {
       // reset data
       if (R.isEmpty(nodeDefUuidCols))
-        dispatch({ type: dataQueryTableDataUpdate, offset: 0, data: [], })
+        dispatch({ type: dataQueryTableDataUpdate, offset: 0, data: [] })
       // delete cols from data rows
       else
         dispatch({ type: dataQueryTableDataColDelete, cols: getColNames(state, [nodeDefUuidCol]) })
@@ -112,7 +109,7 @@ export const initTableData = (queryFilter = null, querySort = null) =>
 
       const [countResp, dataResp] = await Promise.all([
         axios.get(`/api/surveyRdb/${surveyId}/${tableName}/query/count?filter=${filter}`),
-        queryTable(surveyId, tableName, cols, offset, filter, sort)
+        queryTable(surveyId, tableName, cols, offset, filter, sort),
       ])
 
       dispatch({

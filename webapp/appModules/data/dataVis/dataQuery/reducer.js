@@ -47,7 +47,7 @@ const actionHandlers = {
 
   [dataQueryTableDataUpdate]: (state, { offset, data }) => assocTableData(offset, data)(state),
 
-  [dataQueryTableFilterUpdate]: (state, { filter }) => assocTableFilter(filter)(state)
+  [dataQueryTableFilterUpdate]: (state, { filter }) => assocTableFilter(filter)(state),
 }
 
 export default exportReducer(actionHandlers)

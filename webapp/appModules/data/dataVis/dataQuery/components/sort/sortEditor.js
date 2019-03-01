@@ -12,7 +12,6 @@ import SortRow from './sortRow'
 import * as SurveyState from '../../../../../../survey/surveyState'
 import Survey from '../../../../../../../common/survey/survey'
 
-import * as DataQueryState from '../../dataQueryState'
 import * as ExpressionVariables from '../../../../../../commonComponents/expression/expressionVariables'
 
 class SortExpressionComponent extends React.Component {
@@ -22,12 +21,13 @@ class SortExpressionComponent extends React.Component {
 
     this.state = {
       edit: false,
-      sortCriteria: R.clone(props.sort),
-      availableVariables: [],
-      unchosenVariables: []
+      sortCriteria: this.deserialize(props.sort),
+      unchosenVariables: [],
     }
+  }
 
-    this.toggleEdit = this.toggleEdit.bind(this)
+  componentDidMount () {
+    this.refreshUnchosenVariables()
   }
 
   componentDidUpdate (prevProps) {
@@ -38,12 +38,10 @@ class SortExpressionComponent extends React.Component {
     if (availableVariables !== prevProps.availableVariables) {
 
       // reset available variables and remove unavailable variables from criteria
-      const newSortCriteria = sortCriteria.filter(c => availableVariables.findIndex(v => v.value === c.variable) !== -1)
+      const newSortCriteria = R.filter(c => R.any(v => v.value === c.variable, availableVariables))(sortCriteria)
+      // const newSortCriteria = sortCriteria.filter(c => availableVariables.findIndex(v => v.value === c.variable) !== -1)
 
-      this.setState({
-          availableVariables,
-          sortCriteria: newSortCriteria,
-        },
+      this.setState({ sortCriteria: newSortCriteria },
         () => this.refreshUnchosenVariables())
     }
   }
@@ -56,9 +54,7 @@ class SortExpressionComponent extends React.Component {
       R.assoc(key, value)
     )(sortCriteria)
 
-    this.setState({
-        sortCriteria: R.update(pos, newVarSortCriteria, sortCriteria)
-      },
+    this.setState({ sortCriteria: R.update(pos, newVarSortCriteria, sortCriteria) },
       () => this.refreshUnchosenVariables())
   }
 
@@ -71,7 +67,8 @@ class SortExpressionComponent extends React.Component {
   }
 
   refreshUnchosenVariables () {
-    const { availableVariables, sortCriteria } = this.state
+    const { availableVariables } = this.props
+    const { sortCriteria } = this.state
 
     const unchosenVariables = availableVariables.filter(v => sortCriteria.findIndex(sc => sc.variable === v.value) === -1)
     this.setState({ unchosenVariables })
@@ -81,93 +78,93 @@ class SortExpressionComponent extends React.Component {
     const { sortCriteria } = this.state
 
     const newSortCriteria = R.append({ variable, order: 'asc' }, sortCriteria)
-    this.setState({
-        sortCriteria: newSortCriteria,
-      },
+    this.setState({ sortCriteria: newSortCriteria },
       () => this.refreshUnchosenVariables())
-  }
-
-  toggleEdit () {
-    this.setState(state => ({ edit: !state.edit }))
   }
 
   deleteCriteria (pos) {
-    this.setState({
-        sortCriteria: R.remove(pos, 1, this.state.sortCriteria)
-      },
+    this.setState({ sortCriteria: R.remove(pos, 1, this.state.sortCriteria) },
       () => this.refreshUnchosenVariables())
   }
 
-  applyChange (query) {
-    const { onChange } = this.props
+  applyChange () {
+    const { onChange, onClose } = this.props
 
-    onChange && onChange(query)
-    this.toggleEdit()
+    onChange && onChange(this.serialize())
+    onClose()
   }
 
   reset () {
-    this.setState(
-      { sortCriteria: [] }
-    )
-    this.applyChange([])
+    this.setState({ sortCriteria: [] },
+      () => this.applyChange())
+  }
+
+  serialize () {
+    const { sortCriteria } = this.state
+
+    return sortCriteria.map(s => `${s.variable} ${s.order}`).join(', ')
+  }
+
+  deserialize (sortStr) {
+    return !sortStr
+      ? []
+      : R.pipe(
+        R.split(','),
+        R.map(R.trim()),
+        R.map(R.split(/ +/)),
+        R.map(([variable, order]) => ({ variable, order }))
+      )(sortStr)
   }
 
   render () {
+    const { onClose } = this.props
     const { edit, sortCriteria, unchosenVariables } = this.state
 
     return (
       <div className={`sort-editor${edit ? ' edit' : ''}`}>
         {
-          edit
-            ? (
-              <Popup
-                onClose={this.toggleEdit}
-                padding={20}>
+          <Popup
+            onClose={onClose}
+            padding={20}>
 
-                <React.Fragment>
-                  <div className="sort-editor__criteria">
-                    {sortCriteria.map((criteria, pos) =>
-                      <SortRow key={criteria.variable}
-                               variables={unchosenVariables}
-                               selectedVariable={criteria.variable}
-                               onSelectVariable={item => this.onSelectVariable(pos, item.value)}
-                               selectedOrder={criteria.order}
-                               onSelectOrder={order => this.onSelectOrder(pos, order)}
-                               onDelete={() => this.deleteCriteria(pos)}
-                               isFirst={!pos}/>)}
+            <React.Fragment>
+              <div className="sort-editor__criteria">
+                {sortCriteria.map((criteria, pos) =>
+                  <SortRow
+                    key={criteria.variable}
+                    variables={unchosenVariables}
+                    selectedVariable={criteria.variable}
+                    onSelectVariable={item => this.onSelectVariable(pos, item.value)}
+                    selectedOrder={criteria.order}
+                    onSelectOrder={order => this.onSelectOrder(pos, order)}
+                    onDelete={() => this.deleteCriteria(pos)}
+                    isFirst={!pos}/>)}
 
-                    {
-                      !!unchosenVariables.length &&
-                      <SortRow variables={unchosenVariables}
-                               onSelectVariable={item => this.addCriteria(item)}
-                               isPlaceholder={true}
-                               isFirst={!sortCriteria.length}></SortRow>
-                    }
-                  </div>
-                  <div className="sort-editor__footer">
-                    <button className="btn btn-xs btn-of"
-                            onClick={() => this.reset()}
-                            aria-disabled={!sortCriteria.length}>
-                      <span className="icon icon-undo2 icon-16px"/> Reset
-                    </button>
+                {
+                  !!unchosenVariables.length &&
+                  <SortRow
+                    variables={unchosenVariables}
+                    onSelectVariable={item => this.addCriteria(item)}
+                    isPlaceholder={true}
+                    isFirst={!sortCriteria.length}/>
+                }
+              </div>
+              <div className="sort-editor__footer">
+                <button className="btn btn-xs btn-of"
+                        onClick={() => this.reset()}
+                        aria-disabled={!sortCriteria.length}>
+                  <span className="icon icon-undo2 icon-16px"/> Reset
+                </button>
 
-                    <button className="btn btn-xs btn-of"
-                            onClick={() => this.applyChange(sortCriteria)}
-                            aria-disabled={!sortCriteria.length}>
-                      <span className="icon icon-checkmark icon-16px"/> Apply
-                    </button>
-                  </div>
-                </React.Fragment>
-
-              </Popup>
-            ) : (
-              <div className="sort__query-container">
-                <button className="btn btn-s btn-of-light btn-edit"
-                        onClick={this.toggleEdit}>
-                  <span className="icon icon-pencil2 icon-14px"/>
+                <button className="btn btn-xs btn-of"
+                        onClick={() => this.applyChange()}
+                        aria-disabled={!sortCriteria.length}>
+                  <span className="icon icon-checkmark icon-16px"/> Apply
                 </button>
               </div>
-            )
+            </React.Fragment>
+
+          </Popup>
         }
 
       </div>
@@ -177,24 +174,21 @@ class SortExpressionComponent extends React.Component {
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
-  const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
 
   const {
     nodeDefUuidContext,
     nodeDefUuidCurrent,
-    isContextParent = false,
+    nodeDefUuidCols,
   } = props
 
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
   const mode = Expression.modes.sql
-  const depth = isContextParent ? 0 : 1
+  const depth = 0
   const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth)
 
-  const availableVariables = variables.filter(v => nodeDefUuidCols.indexOf(v.uuid) !== -1)
-
   return {
-    availableVariables,
+    availableVariables: variables.filter(v => nodeDefUuidCols.indexOf(v.uuid) !== -1),
   }
 }
 

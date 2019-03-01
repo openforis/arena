@@ -14,19 +14,14 @@ $rowHeaderHeight: 45px;
   position: relative;
 
   .table__header {
-    height: 80px;
+    height: 40px;
 
-    .data-operations {
+    .data-query-tools {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
 
-      .filter-container, .sort-container {
-        display: flex;
-        align-items: center;
-      }
-
-      .sort-container {
-        margin-top: 5px;
+      button.highlight {
+        background-color: rgba($yellow, .35) !important;
       }
     }
   }
