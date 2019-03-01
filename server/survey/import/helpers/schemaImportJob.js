@@ -5,10 +5,10 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
 const { nodeDefType } = NodeDef
 const Category = require('../../../../common/survey/category')
+const Taxonomy = require('../../../../common/survey/taxonomy')
 
 const Job = require('../../../job/job')
 
-// const SurveyManager = require('../../surveyManager')
 const NodeDefManager = require('../../../nodeDef/nodeDefManager')
 
 const nodeDefTypesByCollectType = {
@@ -37,9 +37,6 @@ class SchemaImportJob extends Job {
 
     // insert root entity and descendants recursively
     await this.insertNodeDef(surveyId, null, surveySource.schema.entity, NodeDef.nodeDefType.entity, tx)
-
-    // const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, true, false, false, tx)
-    // console.log(survey)
   }
 
   /**
@@ -66,7 +63,7 @@ class SchemaImportJob extends Job {
 
     if (type === nodeDefType.entity) {
       // insert child definitions
-      
+
       for (const childCollectType of R.keys(nodeSource)) {
         const childType = nodeDefTypesByCollectType[childCollectType]
 
@@ -89,10 +86,17 @@ class SchemaImportJob extends Job {
     switch (type) {
       case nodeDefType.code:
         const listName = nodeSource._attr.list
-        const category = R.find(category => listName === Category.getName(category), this.context.categories)
+        const category = R.find(c => listName === Category.getName(c), this.context.categories)
 
         return {
           [NodeDef.propKeys.categoryUuid]: Category.getUuid(category)
+        }
+      case nodeDefType.taxon:
+        const taxonomyName = nodeSource._attr.taxonomy
+        const taxonomy = R.find(t => taxonomyName === Taxonomy.getTaxonomyName(t), this.context.taxonomies)
+
+        return {
+          [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy)
         }
       default:
         return {}

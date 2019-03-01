@@ -9,7 +9,7 @@ import UploadButton from '../../../commonComponents/form/uploadButton'
 
 const AddSurveyForm = (props) => {
 
-  const { newSurvey, updateNewSurveyProp, createSurvey, importCollectSurveyFile } = props
+  const { newSurvey, updateNewSurveyProp, createSurvey, importCollectSurvey } = props
 
   const { name, label, lang, validation } = newSurvey
 
@@ -48,7 +48,7 @@ const AddSurveyForm = (props) => {
       </button>
 
       <UploadButton label="Import from Collect"
-                    onChange={files => importCollectSurveyFile(files[0])}/>
+                    onChange={files => importCollectSurvey(files[0])}/>
     </div>
   )
 }

@@ -15,7 +15,7 @@ import Survey from '../../../common/survey/survey'
 import { getSurvey } from '../../survey/surveyState'
 
 import { fetchSurveys } from './actions'
-import { createSurvey, updateNewSurveyProp, importCollectSurveyFile } from './actions'
+import { createSurvey, updateNewSurveyProp, importCollectSurvey } from './actions'
 import { setActiveSurvey } from '../../survey/actions'
 
 class AppHomeView extends React.Component {
@@ -39,7 +39,7 @@ class AppHomeView extends React.Component {
       newSurvey,
       updateNewSurveyProp,
       createSurvey,
-      importCollectSurveyFile,
+      importCollectSurvey,
       setActiveSurvey,
 
       surveys,
@@ -52,7 +52,7 @@ class AppHomeView extends React.Component {
         <AddSurveyForm newSurvey={newSurvey}
                        updateNewSurveyProp={updateNewSurveyProp}
                        createSurvey={createSurvey}
-                       importCollectSurveyFile={importCollectSurveyFile}/>
+                       importCollectSurvey={importCollectSurvey}/>
 
         <SurveysList surveys={surveys}
                      surveyInfo={surveyInfo}
@@ -76,6 +76,6 @@ export default withRouter(connect(
     updateNewSurveyProp,
     fetchSurveys,
     setActiveSurvey,
-    importCollectSurveyFile
+    importCollectSurvey
   }
 )(AppHomeView))

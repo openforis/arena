@@ -1,5 +1,4 @@
 const R = require('ramda')
-const fs = require('fs')
 
 const { sendErr, sendOk } = require('../serverUtils/response')
 const { getRestParam, getBoolParam } = require('../serverUtils/request')
@@ -12,7 +11,6 @@ const Validator = require('../../common/validation/validator')
 const AuthMiddleware = require('../authGroup/authMiddleware')
 
 const JobManager = require('../job/jobManager')
-const FileManager = require('../file/fileManager')
 const JobUtils = require('../job/jobUtils')
 const SurveyPublishJob = require('./publish/surveyPublishJob')
 const SurveyImportJob = require('./import/surveyImportJob')
@@ -48,7 +46,7 @@ module.exports.init = app => {
 
       JobManager.executeJobThread(surveyImportJob)
 
-      sendOk(res)
+      res.json({job: surveyImportJob})
     } catch (err) {
       sendErr(res, err)
     }

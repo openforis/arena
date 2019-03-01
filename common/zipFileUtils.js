@@ -16,8 +16,6 @@ const openFile = async file =>
 
     // Handle errors
     zip.on('error', err => console.log(err) || reject(err))
-
-    zip.en
   })
 
 const getEntryData = (zip, entryName) => zip.entryDataSync(entryName)
@@ -27,7 +25,9 @@ const getEntryAsText = (zip, entryName) => {
   return data.toString('utf8')
 }
 
-const getEntryStream = (zip, entryName) => zip.stream(entryName)
+const getEntryStream = async (zip, entryName) => new Promise(resolve =>
+  zip.stream(entryName, (err, stm) => resolve(stm))
+)
 
 const entries = (zip, path = '') => R.pipe(
   R.keys,
@@ -37,7 +37,6 @@ const entries = (zip, path = '') => R.pipe(
 
 module.exports = {
   openFile,
-  getEntryData,
   getEntryAsText,
   getEntryStream,
   entries
