@@ -201,6 +201,15 @@ class Job {
   createJobEvent (type) {
     return new JobEvent(type, this.status, this.total, this.processed)
   }
+
+  getContextProp (prop, defaultValue = null) {
+    const value = this.context[prop]
+    return value ? value : defaultValue
+  }
+
+  setContext (context) {
+    Object.assign(this.context, context)
+  }
 }
 
 module.exports = Job

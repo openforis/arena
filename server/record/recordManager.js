@@ -11,7 +11,7 @@ const FileManager = require('../file/fileManager')
 const Record = require('../../common/record/record')
 const RecordStep = require('../../common/record/recordStep')
 const Node = require('../../common/record/node')
-const File = require('../../common/file/file')
+const RecordFile = require('../../common/record/recordFile')
 
 const { toUuidIndexedObj } = require('../../common/survey/surveyUtils')
 const { isBlank } = require('../../common/stringUtils')
@@ -69,14 +69,14 @@ const persistNode = (user, surveyId, node, fileReq) => {
   let nodeToPersist
   if (fileReq) {
     //save file to "file" table and set fileUuid and fileName into node value
-    const file = File.createFile(fileReq)
+    const file = RecordFile.createFile(fileReq)
 
     FileManager.insertFile(surveyId, file)
 
     const nodeValue = {
       fileUuid: file.uuid,
-      fileName: File.getName(file),
-      fileSize: File.getSize(file)
+      fileName: RecordFile.getName(file),
+      fileSize: RecordFile.getSize(file)
     }
 
     nodeToPersist = Node.assocValue(nodeValue, node)

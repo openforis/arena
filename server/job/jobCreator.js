@@ -1,23 +1,12 @@
 const R = require('ramda')
 
-const SurveyImportJob = require('../survey/import/surveyImportJob')
 const SurveyPublishJob = require('../survey/publish/surveyPublishJob')
-const NodeDefsValidationJob = require('../survey/publish/nodeDefsValidationJob')
-const CategoriesValidationJob = require('../survey/publish/categoriesValidationJob')
-const SurveyInfoValidationJob = require('../survey/publish/surveyInfoValidationJob')
-const SurveyPropsPublishJob = require('../survey/publish/surveyPropsPublishJob')
-const TaxonomiesValidationJob = require('../survey/publish/taxonomiesValidationJob')
-
+const CollectSurveyImportJob = require('../survey/collectImport/collectSurveyImportJob')
 const TaxonomyImportJob = require('../taxonomy/taxonomyImportJob')
 
 const jobClasses = [
-  SurveyImportJob,
   SurveyPublishJob,
-  NodeDefsValidationJob,
-  CategoriesValidationJob,
-  SurveyInfoValidationJob,
-  SurveyPropsPublishJob,
-  TaxonomiesValidationJob,
+  CollectSurveyImportJob,
   TaxonomyImportJob,
 ]
 

@@ -1,7 +1,9 @@
 const parser = require('fast-xml-parser')
-const ZipFileUtils = require('../../../../common/zipFileUtils')
+const FileZipUtils = require('../../../../common/file/fileZipUtils')
 
 const Job = require('../../../job/job')
+
+const idmlXmlFileName = 'idml.xml'
 
 /**
  * Reads the schema from a Collect backup file and saves it into the job context under idmlSource property
@@ -14,11 +16,9 @@ class SurveySchemaReaderJob extends Job {
 
   async execute (tx) {
 
-    const zipFile = await ZipFileUtils.openFile(this.params.filePath)
+    const zipFile = await FileZipUtils.openFile(this.params.filePath)
 
-    this.context.zipFile = zipFile
-
-    const idmlXml = await ZipFileUtils.getEntryAsText(zipFile, 'idml.xml')
+    const idmlXml = await FileZipUtils.getEntryAsText(zipFile, idmlXmlFileName)
 
     const options = {
       attrNodeName: '_attr',
@@ -28,10 +28,12 @@ class SurveySchemaReaderJob extends Job {
       format: false,
       indentBy: '  ',
     }
-    const tObj = parser.getTraversalObj(idmlXml, options)
-    const jsonObj = parser.convertToJson(tObj, options)
+    const idmlTraversalObj = parser.getTraversalObj(idmlXml, options)
+    const idmlJsonObj = parser.convertToJson(idmlTraversalObj, options)
 
-    this.context.surveySource = jsonObj.survey
+    this.setContext({zipFile, surveySource: idmlJsonObj.survey})
+
+    console.log(this.context)
   }
 }
 

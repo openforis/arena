@@ -6,7 +6,7 @@ const Job = require('../../../job/job')
 
 const CategoryManager = require('../../../category/categoryManager')
 
-const XMLParseUtils = require('./xmlParseUtils')
+const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 
 /**
  * Inserts a category for each code list in the Collect survey.
@@ -21,9 +21,9 @@ class CategoriesImportJob extends Job {
   async execute (tx) {
     const { surveySource, surveyId } = this.context
 
-    this.context.categories = []
+    const categories = []
 
-    const codeLists = XMLParseUtils.getList(surveySource.codeLists.list)
+    const codeLists = CollectIdmlParseUtils.getList(surveySource.codeLists.list)
 
     this.total = codeLists.length
 
@@ -43,7 +43,7 @@ class CategoriesImportJob extends Job {
       const defaultLanguage = this.context.defaultLanguage
 
       for (const itemSource of R.pathOr([], ['items', 'item'], codeList)) {
-        const labels = XMLParseUtils.toLabels(itemSource.label, defaultLanguage)
+        const labels = CollectIdmlParseUtils.toLabels(itemSource.label, defaultLanguage)
 
         const itemParam = Category.newItem(levelUuid, null, {
           [Category.itemProps.code]: itemSource.code,
@@ -52,10 +52,12 @@ class CategoriesImportJob extends Job {
         await CategoryManager.insertItem(this.user, surveyId, itemParam, tx)
       }
 
-      this.context.categories.push(category)
+      categories.push(category)
 
       this.incrementProcessedItems()
     }
+
+    this.setContext({categories})
   }
 }
 

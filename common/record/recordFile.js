@@ -1,18 +1,28 @@
 const R = require('ramda')
 
-const {uuidv4} = require('./../uuid')
+const {uuidv4} = require('../uuid')
 
 const {truncate} = require('../stringUtils')
 
 const getProp = prop => R.path(['props', prop])
 
+const keys = {
+  props: 'props',
+  content: 'content'
+}
+
+const propKeys = {
+  name: 'name',
+  size: 'size'
+}
+
 const createFile = fileReq => ({
   uuid: uuidv4(),
-  props: {
-    name: fileReq.name,
-    size: fileReq.data.length,
+  [keys.props]: {
+    [propKeys.name]: fileReq.name,
+    [propKeys.size]: fileReq.data.length,
   },
-  content: fileReq.data
+  [keys.content]: fileReq.data
 })
 
 const getExtension = fileName => R.pipe(
@@ -40,8 +50,9 @@ module.exports = {
   createFile,
 
   // READ
-  getName: getProp('name'),
-  getSize: getProp('size'),
+  getName: getProp(propKeys.name),
+  getSize: getProp(propKeys.size),
+  getContent: getProp(keys.content),
 
   // UTILS
   truncateFileName,

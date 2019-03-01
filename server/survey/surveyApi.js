@@ -13,7 +13,7 @@ const AuthMiddleware = require('../authGroup/authMiddleware')
 const JobManager = require('../job/jobManager')
 const JobUtils = require('../job/jobUtils')
 const SurveyPublishJob = require('./publish/surveyPublishJob')
-const SurveyImportJob = require('./import/surveyImportJob')
+const CollectSurveyImportJob = require('./collectImport/collectSurveyImportJob')
 
 module.exports.init = app => {
 
@@ -42,11 +42,11 @@ module.exports.init = app => {
 
       const file = req.files.file
 
-      const surveyImportJob = new SurveyImportJob({ user, filePath: file.tempFilePath })
+      const job = new CollectSurveyImportJob({ user, filePath: file.tempFilePath })
 
-      JobManager.executeJobThread(surveyImportJob)
+      JobManager.executeJobThread(job)
 
-      res.json({job: surveyImportJob})
+      res.json({job})
     } catch (err) {
       sendErr(res, err)
     }

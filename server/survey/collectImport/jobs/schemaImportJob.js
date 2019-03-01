@@ -47,7 +47,7 @@ class SchemaImportJob extends Job {
 
     const props = {
       ...this.extractNodeDefExtraProps(parentNodeDef, type, nodeSource),
-      [NodeDef.propKeys.name]: this.getUniqueNodeName(parentNodeDef, nodeSource._attr.name),
+      [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, nodeSource._attr.name),
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && nodeSource._attr.key === 'true'
     }
@@ -86,14 +86,14 @@ class SchemaImportJob extends Job {
     switch (type) {
       case nodeDefType.code:
         const listName = nodeSource._attr.list
-        const category = R.find(c => listName === Category.getName(c), this.context.categories)
+        const category = R.find(c => listName === Category.getName(c), this.getContextProp('categories', []))
 
         return {
           [NodeDef.propKeys.categoryUuid]: Category.getUuid(category)
         }
       case nodeDefType.taxon:
         const taxonomyName = nodeSource._attr.taxonomy
-        const taxonomy = R.find(t => taxonomyName === Taxonomy.getTaxonomyName(t), this.context.taxonomies)
+        const taxonomy = R.find(t => taxonomyName === Taxonomy.getTaxonomyName(t), this.getContextProp('taxonomies', []))
 
         return {
           [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy)
@@ -103,7 +103,7 @@ class SchemaImportJob extends Job {
     }
   }
 
-  getUniqueNodeName (parentNodeDef, name) {
+  getUniqueNodeDefName (parentNodeDef, name) {
     let finalName = name
 
     if (R.includes(finalName, this.nodeNames)) {
@@ -125,7 +125,6 @@ class SchemaImportJob extends Job {
     }
     this.nodeNames.push(finalName)
     return finalName
-
   }
 
 }

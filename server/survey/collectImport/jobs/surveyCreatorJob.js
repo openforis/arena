@@ -7,7 +7,7 @@ const Job = require('../../../job/job')
 
 const SurveyManager = require('../../surveyManager')
 
-const XMLParseUtils = require('./xmlParseUtils')
+const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 
 class SurveyCreatorJob extends Job {
 
@@ -20,9 +20,9 @@ class SurveyCreatorJob extends Job {
 
     const uri = surveySource.uri
     const name = R.pipe(R.split('/'), R.last)(uri)
-    const languages = XMLParseUtils.getList(surveySource.language)
+    const languages = CollectIdmlParseUtils.getList(surveySource.language)
     const lang = languages[0]
-    const label = XMLParseUtils.toLabels(surveySource.project, lang)[lang]
+    const label = CollectIdmlParseUtils.toLabels(surveySource.project, lang)[lang]
 
     const survey = await SurveyManager.createSurvey(this.user, { name, label, lang }, false)
 
@@ -30,8 +30,7 @@ class SurveyCreatorJob extends Job {
 
     await SurveyManager.updateSurveyProp(surveyId, SurveyInfo.keys.languages, languages, this.user)
 
-    this.context.surveyId = surveyId
-    this.context.defaultLanguage = lang
+    this.setContext({surveyId, defaultLanguage: lang})
   }
 }
 

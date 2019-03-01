@@ -10,7 +10,7 @@ const Taxonomy = require('../../common/survey/taxonomy')
 const TaxonomyValidator = require('../taxonomy/taxonomyValidator')
 const TaxonomyManager = require('./taxonomyManager')
 const TaxonomyImportHelper = require('./taxonomyImportHelper')
-const CSVParser = require('../csv/csvParser')
+const CSVParser = require('../../common/file/csvParser')
 
 const {taxonPropKeys} = Taxonomy
 

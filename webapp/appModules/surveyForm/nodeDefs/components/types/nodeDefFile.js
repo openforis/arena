@@ -5,11 +5,11 @@ import DownloadButton from '../../../../../commonComponents/form/downloadButton'
 import NodeDeleteButton from '../nodeDeleteButton'
 
 import Node from '../../../../../../common/record/node'
-import File from '../../../../../../common/file/file'
+import RecordFile from '../../../../../../common/record/recordFile'
 
 const FileInput = ({ surveyInfo, nodeDef, readOnly, edit, recordUuid, node, canEditRecord, updateNode, removeNode }) => {
   const fileName = Node.getNodeFileName(node)
-  const truncatedFileName = File.truncateFileName(fileName)
+  const truncatedFileName = RecordFile.truncateFileName(fileName)
   const fileUploaded = !edit && fileName
 
   return <div className="node-def__file-input">

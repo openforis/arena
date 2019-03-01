@@ -4,6 +4,7 @@ const { getRestParam } = require('../serverUtils/request')
 const { sendErr, sendOk, sendFile } = require('../serverUtils/response')
 
 const Node = require('../../common/record/node')
+const RecordFile = require('../../common/record/recordFile')
 
 const RecordManager = require('./recordManager')
 const FileManager = require('../file/fileManager')
@@ -89,7 +90,7 @@ module.exports.init = app => {
       const node = await RecordManager.fetchNodeByUuid(surveyId, nodeUuid)
       const file = await FileManager.fetchFileByUuid(surveyId, R.prop('fileUuid', Node.getNodeValue(node)))
 
-      sendFile(res, file)
+      sendFile(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
     } catch (err) {
       sendErr(res, err)
     }
