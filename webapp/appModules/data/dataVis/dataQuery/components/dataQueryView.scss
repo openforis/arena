@@ -17,11 +17,17 @@ $rowHeaderHeight: 45px;
     height: 40px;
 
     .data-operations {
-      display: flex;
-      flex-direction: row;
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      grid-column-gap: .25rem;
 
-      button.highlight {
-        background-color: rgba($yellow, .35) !important;
+      .btn {
+        padding: .5rem;
+        font-size: 0.8rem;
+
+        &.highlight {
+          background-color: rgba($yellow, .35) !important;
+        }
       }
     }
   }
