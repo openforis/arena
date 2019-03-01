@@ -1,21 +1,11 @@
 @import "../../style/vars";
 
-.expression {
+.expression-editor {
   display: grid;
   grid-row-gap: 1.5rem;
-
-  .popup {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    grid-row-gap: 2rem;
-
-    .query {
-      background-color: rgba($white, .15);
-    }
-  }
 }
 
-.expression__query-container {
+.expression-editor__query-container {
   display: flex;
   align-items: center;
 

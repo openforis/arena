@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Expression from '../../../../../common/exprParser/expression'
+import Expression from '../../../../common/exprParser/expression'
 
 import ExpressionNode from './expressionNode'
 

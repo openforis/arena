@@ -1,9 +1,9 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import Expression from '../../../../../common/exprParser/expression'
+import Expression from '../../../../common/exprParser/expression'
 
-import Dropdown from '../../../form/dropdown'
+import Dropdown from '../../form/dropdown'
 
 import EditButtons from './editButtons'
 import ExpressionNode from './expressionNode'

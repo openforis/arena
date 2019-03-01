@@ -29,11 +29,11 @@ class Popup extends React.PureComponent {
   }
 
   render () {
-    const { children, onClose } = this.props
+    const { children, onClose, className } = this.props
     const { style } = this.state
 
     return (
-      <div className="popup"
+      <div className={`popup ${className}`}
            ref={this.elementRef}
            style={style}>
         <button className="btn btn-of popup__btn-close"
@@ -51,6 +51,7 @@ class Popup extends React.PureComponent {
 
 Popup.defaultProps = {
   padding: 0,
+  className: '',
   onClose: () => {},
 }
 

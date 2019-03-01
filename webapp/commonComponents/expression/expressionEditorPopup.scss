@@ -1,6 +1,16 @@
-@import "../../../style/vars";
+@import "../../style/vars";
 
-.expression-editor__expr-container {
+.expression-editor-popup {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-row-gap: 2rem;
+
+  .query {
+    background-color: rgba($white, .15);
+  }
+}
+
+.expression-editor-popup__expr-container {
   overflow: auto;
   position: relative;
 
@@ -99,7 +109,7 @@
 
 }
 
-.expression-editor__footer {
+.expression-editor-popup__footer {
   text-align: center;
   align-self: end;
 

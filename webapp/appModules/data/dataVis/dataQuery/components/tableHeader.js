@@ -1,20 +1,21 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import ExpressionComponent from '../../../../../commonComponents/expression/expression'
+import ExpressionEditorPopup from '../../../../../commonComponents/expression/expressionEditorPopup'
 import TablePaginator from '../../../../../commonComponents/table/tablePaginator'
-import BadgeTooltip from '../../../../../commonComponents/badgeTooltip'
-
 import SortEditor from './sort/sortEditor'
 
-import { updateTableFilter, updateTableOffset, updateTableSort } from '../actions'
-
 import Expression from '../../../../../../common/exprParser/expression'
+
+import { updateTableFilter, updateTableOffset, updateTableSort } from '../actions'
 
 class TableHeader extends React.Component {
 
   constructor (props) {
     super(props)
+
+    this.toggleExpressionEditor = this.toggleExpressionEditor.bind(this)
+    this.toggleSortEditor = this.toggleSortEditor.bind(this)
 
     this.state = {
       showExpressionEditor: false,
@@ -23,17 +24,17 @@ class TableHeader extends React.Component {
   }
 
   toggleExpressionEditor () {
-    this.setState({
-      showExpressionEditor: !this.state.showExpressionEdit,
-      showSortEditor: false,
-    })
+    this.setState(state => ({
+        showExpressionEditor: !state.showExpressionEditor,
+        showSortEditor: false,
+    }))
   }
 
   toggleSortEditor () {
-    this.setState({
-      showSortEditor: !this.state.showSortEditor,
+    this.setState(state => ({
       showExpressionEditor: false,
-    })
+      showSortEditor: !state.showSortEditor,
+    }))
   }
 
   render () {
@@ -50,36 +51,42 @@ class TableHeader extends React.Component {
     return (
       <div className="table__header">
 
-        <div className="data-query-tools">
+        <div className="data-operations">
           <button className={`btn btn-s btn-of-light btn-edit${filter ? ' highlight' : ''}`}
-                  onClick={() => this.toggleExpressionEditor()}>
-            <span className="icon icon-filter icon-14px" />
+                  onClick={this.toggleExpressionEditor}>
+            <span className="icon icon-filter icon-14px"/>
           </button>
           {
             showExpressionEditor &&
-              <ExpressionComponent
-                nodeDefUuidContext={nodeDefUuidContext}
-                query={filter}
-                onChange={updateTableFilter}
-                mode={Expression.modes.sql}/>
+            <ExpressionEditorPopup
+              nodeDefUuidContext={nodeDefUuidContext}
+              query={filter}
+              mode={Expression.modes.sql}
+              onChange={query => {
+                updateTableFilter(query)
+                this.toggleExpressionEditor()
+              }}
+              onClose={this.toggleExpressionEditor}
+            />
 
           }
 
           <button className={`btn btn-s btn-of-light btn-edit${sort ? ' highlight' : ''}`}
-                  onClick={() => this.toggleSortEditor()}>
-            <span className="icon icon-sort-amount-asc icon-14px" />
+                  onClick={this.toggleSortEditor}>
+            <span className="icon icon-sort-amount-asc icon-14px"/>
           </button>
           {
             showSortEditor &&
-              <SortEditor
-                nodeDefUuidCols={nodeDefUuidCols}
-                nodeDefUuidContext={nodeDefUuidContext}
-                sort={sort}
-                onChange={updateTableSort}
-                onClose={() => this.toggleSortEditor()} />
+            <SortEditor
+              nodeDefUuidCols={nodeDefUuidCols}
+              nodeDefUuidContext={nodeDefUuidContext}
+              sort={sort}
+              onChange={updateTableSort}
+              onClose={this.toggleSortEditor}/>
 
           }
         </div>
+
         {
           showPaginator &&
           <TablePaginator
@@ -94,7 +101,6 @@ class TableHeader extends React.Component {
     )
   }
 }
-
 
 TableHeader.defaultProps = {
   nodeDefUuidContext: null,

@@ -3,7 +3,7 @@ import axios from 'axios'
 import * as R from 'ramda'
 import Promise from 'bluebird'
 
-import Dropdown from '../../../form/dropdown'
+import Dropdown from '../../form/dropdown'
 
 const getNodeRawValue = node => node.raw ? JSON.parse(node.raw) : ''
 

@@ -8,7 +8,7 @@ import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
 import Validator from '../../../../../common/validation/validator'
 
 import { FormItem } from '../../../../commonComponents/form/input'
-import ExpressionComponent from '../../../../commonComponents/expression/expression'
+import ExpressionEditor from '../../../../commonComponents/expression/expressionEditor'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
 
 const ExpressionProp = (props) => {
@@ -35,15 +35,15 @@ const ExpressionProp = (props) => {
       <div className="expression-item">
         <div className="label">Expression</div>
 
-        <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
-                             nodeDefUuidCurrent={nodeDefUuidCurrent}
-                             query={NodeDefExpression.getExpression(expression)}
-                             onChange={expr =>
+        <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
+                          nodeDefUuidCurrent={nodeDefUuidCurrent}
+                          query={NodeDefExpression.getExpression(expression)}
+                          onChange={expr =>
                                onUpdate(NodeDefExpression.assocExpression(expr)(expression))
                              }
-                             isContextParent={isContextParent}
-                             canBeConstant={canBeConstant}
-                             isBoolean={isBoolean}/>
+                          isContextParent={isContextParent}
+                          canBeConstant={canBeConstant}
+                          isBoolean={isBoolean}/>
       </div>
 
       {
@@ -51,14 +51,14 @@ const ExpressionProp = (props) => {
         <div className="expression-item">
           <div className="label">Apply If</div>
 
-          <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
-                               nodeDefUuidCurrent={nodeDefUuidCurrent}
-                               query={NodeDefExpression.getApplyIf(expression)}
-                               onChange={expr =>
+          <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
+                            nodeDefUuidCurrent={nodeDefUuidCurrent}
+                            query={NodeDefExpression.getApplyIf(expression)}
+                            onChange={expr =>
                                  onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
                                }
-                               isContextParent={isContextParent}
-                               canBeConstant={false}/>
+                            isContextParent={isContextParent}
+                            canBeConstant={false}/>
         </div>
       }
 
