@@ -16,11 +16,12 @@ class Checkbox extends React.Component {
       onChange,
       disabled,
       radio,
+      tooltipErrorPosition
     } = this.props
 
     return (
-      <div style={{justifySelf: 'start'}}>
-        <TooltipError messages={validation.errors}>
+      <div style={{ justifySelf: 'start' }}>
+        <TooltipError messages={validation.errors} position={tooltipErrorPosition}>
 
           <button className="btn btn-s btn-transparent btn-checkbox"
                   onClick={() => onChange(!checked)}
@@ -40,6 +41,7 @@ Checkbox.defaultProps = {
   disabled: false,
   radio: false,
   validation: {},
+  tooltipErrorPosition: 'top',
 }
 
 export default Checkbox

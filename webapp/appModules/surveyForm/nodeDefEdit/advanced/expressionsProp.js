@@ -10,69 +10,76 @@ import Validator from '../../../../../common/validation/validator'
 import { FormItem } from '../../../../commonComponents/form/input'
 import ExpressionEditor from '../../../../commonComponents/expression/expressionEditor'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
+import { TooltipError } from '../../../../commonComponents/tooltip'
+
+import { getValidationFieldMessages } from '../../../../appUtils/validationUtils'
 
 const ExpressionProp = (props) => {
 
   const {
-    nodeDefUuidContext, nodeDefUuidCurrent,
+    nodeDefUuidContext, nodeDefUuidCurrent, validation,
     expression, applyIf, showLabels, readOnly,
     isContextParent, canBeConstant, isBoolean,
     onUpdate, onDelete
   } = props
 
+  const errorMessages = getValidationFieldMessages(Validator.getFieldValidations(validation))
+
   return (
-    <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
+    <TooltipError messages={errorMessages} position="bottom">
+      <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
-      {
-        !expression.placeholder &&
-        <button className="btn btn-s btn-transparent btn-delete"
-                aria-disabled={readOnly}
-                onClick={() => onDelete(expression)}>
-          <span className="icon icon-bin2 icon-12px"/>
-        </button>
-      }
+        {
+          !expression.placeholder &&
+          <button className="btn btn-s btn-transparent btn-delete"
+                  aria-disabled={readOnly}
+                  onClick={() => onDelete(expression)}>
+            <span className="icon icon-bin2 icon-12px"/>
+          </button>
+        }
 
-      <div className="expression-item">
-        <div className="label">Expression</div>
-
-        <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
-                          nodeDefUuidCurrent={nodeDefUuidCurrent}
-                          query={NodeDefExpression.getExpression(expression)}
-                          onChange={expr =>
-                               onUpdate(NodeDefExpression.assocExpression(expr)(expression))
-                             }
-                          isContextParent={isContextParent}
-                          canBeConstant={canBeConstant}
-                          isBoolean={isBoolean}/>
-      </div>
-
-      {
-        applyIf &&
         <div className="expression-item">
-          <div className="label">Apply If</div>
+          <div className="label">Expression</div>
 
           <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
                             nodeDefUuidCurrent={nodeDefUuidCurrent}
-                            query={NodeDefExpression.getApplyIf(expression)}
+                            query={NodeDefExpression.getExpression(expression)}
                             onChange={expr =>
-                                 onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
-                               }
+                              onUpdate(NodeDefExpression.assocExpression(expr)(expression))
+                            }
                             isContextParent={isContextParent}
-                            canBeConstant={false}/>
+                            canBeConstant={canBeConstant}
+                            isBoolean={isBoolean}/>
         </div>
-      }
 
-      {
-        showLabels &&
-        <LabelsEditor formLabel="Error message(s)"
-                      labels={NodeDefExpression.getMessages(expression)}
-                      onChange={labelItem =>
-                        onUpdate(NodeDefExpression.assocMessage(labelItem)(expression))
-                      }
-        />
-      }
+        {
+          applyIf &&
+          <div className="expression-item">
+            <div className="label">Apply If</div>
 
-    </div>
+            <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
+                              nodeDefUuidCurrent={nodeDefUuidCurrent}
+                              query={NodeDefExpression.getApplyIf(expression)}
+                              onChange={expr =>
+                                onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
+                              }
+                              isContextParent={isContextParent}
+                              canBeConstant={false}/>
+          </div>
+        }
+
+        {
+          showLabels &&
+          <LabelsEditor formLabel="Error message(s)"
+                        labels={NodeDefExpression.getMessages(expression)}
+                        onChange={labelItem =>
+                          onUpdate(NodeDefExpression.assocMessage(labelItem)(expression))
+                        }
+          />
+        }
+
+      </div>
+    </TooltipError>
   )
 }
 

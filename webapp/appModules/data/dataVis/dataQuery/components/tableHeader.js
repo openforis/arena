@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import ExpressionEditorPopup from '../../../../../commonComponents/expression/expressionEditorPopup'
 import TablePaginator from '../../../../../commonComponents/table/tablePaginator'
 import SortEditor from './sort/sortEditor'
+import DownloadButton from '../../../../../commonComponents/form/downloadButton'
 
 import Expression from '../../../../../../common/exprParser/expression'
 
@@ -25,8 +26,8 @@ class TableHeader extends React.Component {
 
   toggleExpressionEditor () {
     this.setState(state => ({
-        showExpressionEditor: !state.showExpressionEditor,
-        showSortEditor: false,
+      showExpressionEditor: !state.showExpressionEditor,
+      showSortEditor: false,
     }))
   }
 
@@ -42,12 +43,13 @@ class TableHeader extends React.Component {
     const { showExpressionEditor, showSortEditor } = this.state
 
     const {
-      nodeDefUuidContext, nodeDefUuidCols,
-      filter, sort, limit, offset, count,
+      surveyId, nodeDefUuidContext, nodeDefUuidCols,
+      tableName, colNames, filter, sort, limit, offset, count,
       updateTableFilter, updateTableOffset, updateTableSort,
       showPaginator,
     } = this.props
 
+    const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${filter}&sort=${sort}&cols=${JSON.stringify(colNames)}`
     return (
       <div className="table__header">
 
@@ -85,6 +87,12 @@ class TableHeader extends React.Component {
               onClose={this.toggleSortEditor}/>
 
           }
+
+          <DownloadButton
+            href={csvDownloadLink}
+            label="CSV"
+          />
+
         </div>
 
         {

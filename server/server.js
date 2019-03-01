@@ -2,11 +2,10 @@ require('dotenv').config()
 
 // const cluster = require('cluster')
 const dbMigrator = require('./db/migration/dbMigrator')
-const serverCluster = require('./serverCluster')
-
+const appCluster = require('./system/appCluster')
 
 dbMigrator.migrateAll()
-serverCluster()
+appCluster()
 
 // SERVER CLUSTERING DISABLED FOR NOW
 // if (cluster.isMaster) {

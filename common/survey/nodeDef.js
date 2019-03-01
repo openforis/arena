@@ -32,7 +32,6 @@ const keys = {
 
 const propKeys = {
   applicable: 'applicable',
-  calculatedValues: 'calculatedValues',
   defaultValues: 'defaultValues',
   descriptions: 'descriptions',
   key: 'key',
@@ -41,6 +40,7 @@ const propKeys = {
   name: 'name',
   parentUuid: 'parentUuid',
   published: 'published',
+  readOnly: 'readOnly',
   type: 'type',
   validations: 'validations',
 
@@ -194,6 +194,7 @@ module.exports = {
   isNodeDefSingleEntity,
   isNodeDefSingleAttribute,
   isNodeDefMultipleAttribute,
+  isNodeDefReadOnly: SurveyUtils.getProp(propKeys.readOnly, false),
 
   isNodeDefBoolean,
   isNodeDefCode,
@@ -207,7 +208,6 @@ module.exports = {
 
   //advanced props
   getDefaultValues: SurveyUtils.getProp(propKeys.defaultValues, []),
-  getCalculatedValues: SurveyUtils.getProp(propKeys.calculatedValues, []),
   getApplicable: SurveyUtils.getProp(propKeys.applicable, []),
   getValidations,
   getValidationExpressions: R.pipe(

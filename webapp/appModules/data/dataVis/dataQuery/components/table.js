@@ -25,9 +25,9 @@ class Table extends React.Component {
 
   render () {
     const {
-      lang, data, showTable,
+      surveyId, lang, data, showTable,
       nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames,
-      offset, limit, filter, sort, count,
+      tableName, offset, limit, filter, sort, count,
     } = this.props
 
     const { width = defaultColWidth } = elementOffset(this.tableRef.current)
@@ -45,10 +45,13 @@ class Table extends React.Component {
         {
           showTable &&
           <React.Fragment>
+
             <TableHeader
-              data={data}
+              surveyId={surveyId}
               nodeDefUuidContext={nodeDefUuidContext}
               nodeDefUuidCols={nodeDefUuidCols}
+              tableName={tableName}
+              colNames={colNames}
               filter={filter}
               sort={sort}
               limit={limit}
@@ -78,8 +81,11 @@ const mapStateToProps = state => {
   const nodeDefUuidCols = DataQueryState.getTableNodeDefUuidCols(state)
   const nodeDefCols = Survey.getNodeDefsByUuids(nodeDefUuidCols)(survey)
   const colNames = NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
+  const tableName = NodeDefTable.getViewNameByUuid(nodeDefUuidContext)(survey)
 
   return {
+    surveyId: Survey.getId(survey),
+    tableName,
     nodeDefUuidContext,
     nodeDefUuidCols,
     nodeDefCols,

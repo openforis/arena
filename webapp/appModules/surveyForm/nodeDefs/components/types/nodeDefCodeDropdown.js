@@ -8,11 +8,14 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 import Category from '../../../../../../common/survey/category'
 
 const NodeDefCodeDropdown = props => {
-  const {language, edit, nodeDef, items = [], selectedItems = [], onSelectedItemsChange, canEditRecord} = props
+  const {language, edit, nodeDef, readOnly, items = [], selectedItems = [], onSelectedItemsChange, canEditRecord} = props
+
+  const entryDisabled = edit || !canEditRecord || readOnly
 
   const disabled = R.isEmpty(items)
+
   return NodeDef.isNodeDefMultiple(nodeDef)
-    ? <InputChips readOnly={edit || !canEditRecord}
+    ? <InputChips readOnly={entryDisabled}
                   items={items}
                   disabled={disabled}
                   itemKeyProp="uuid"
@@ -20,9 +23,9 @@ const NodeDefCodeDropdown = props => {
                   selection={selectedItems}
                   onChange={selectedItems => onSelectedItemsChange(selectedItems)}/>
 
-    : <Dropdown readOnly={edit}
+    : <Dropdown readOnly={entryDisabled}
                 items={items}
-                disabled={disabled || !canEditRecord}
+                disabled={disabled}
                 itemKeyProp="uuid"
                 itemLabelFunction={Category.getItemLabel(language)}
                 selection={R.head(selectedItems)}

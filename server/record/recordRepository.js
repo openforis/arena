@@ -133,6 +133,14 @@ const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
     [recordUuid]
   )
 
+const deleteRecordsPreview = async (surveyId, client = db) =>
+  await client.any(`
+    DELETE FROM ${getSurveyDBSchema(surveyId)}.record
+    WHERE preview = $1
+    `,
+    [true]
+  )
+
 module.exports = {
   // CREATE
   insertRecord,
@@ -149,4 +157,5 @@ module.exports = {
 
   // DELETE
   deleteRecord,
+  deleteRecordsPreview,
 }

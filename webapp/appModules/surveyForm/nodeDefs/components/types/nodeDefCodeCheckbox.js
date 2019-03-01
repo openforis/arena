@@ -5,7 +5,7 @@ import Node from '../../../../../../common/record/node'
 import Category from '../../../../../../common/survey/category'
 
 const Checkbox = props => {
-  const { language, edit, item, nodes, selectedItems, onSelectedItemsChange, canEditRecord } = props
+  const { language, edit, item, nodes, selectedItems, onSelectedItemsChange, canEditRecord, readOnly } = props
 
   const itemUuid = item.uuid
   const node = R.find(node => Node.getCategoryItemUuid(node) === itemUuid)(nodes)
@@ -14,7 +14,7 @@ const Checkbox = props => {
   return (
     <button
       className={`btn btn-of-light btn-checkbox ${selected ? 'active' : ''}`}
-      aria-disabled={edit || !canEditRecord}
+      aria-disabled={edit || !canEditRecord || readOnly}
       onClick={() => {
         const newSelectedItems = selected
           ? R.remove(R.indexOf(item, selectedItems), 1, selectedItems)

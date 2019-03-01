@@ -16,23 +16,45 @@
     padding: .3rem 1rem;
 
     z-index: 1;
-    bottom: 125%;
-    left: 50%;
     margin-left: -60px;
     opacity: 0;
     transition: .3s;
     transform: translate3d(0px, 20px, 0px);
+
+    &::after {
+      content: "";
+      position: absolute;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+    }
   }
 
-  .tooltip-text::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: $blue1 transparent transparent transparent;
+
+  &.top {
+    .tooltip-text {
+      bottom: 125%;
+      left: 50%;
+
+      &::after {
+        top: 100%;
+        left: 50%;
+        border-color: $blue1 transparent transparent transparent;
+      }
+    }
+  }
+
+  &.bottom {
+    .tooltip-text {
+      bottom: -100%;
+      left: 10%;
+
+      &::after {
+        bottom: 100%;
+        left: 50%;
+        border-color: transparent transparent $blue1 transparent;
+      }
+    }
   }
 
   &:hover .tooltip-text {
@@ -50,11 +72,23 @@
     background-color: $red;
   }
 
-  .tooltip-text::after {
-    border-color: $red transparent transparent transparent;
+  &.top {
+    .tooltip-text::after {
+      border-color: $red transparent transparent transparent;
+    }
+  }
+
+  &.bottom {
+    .tooltip-text::after {
+      border-color: transparent transparent $red transparent;
+    }
   }
 
   .form-input {
     border-bottom: 2px solid rgba($red, .6);
+  }
+
+  .btn-checkbox .icon {
+    border: 2px solid rgba($red, .6)
   }
 }

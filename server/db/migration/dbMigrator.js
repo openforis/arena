@@ -5,10 +5,10 @@ const R = require('ramda')
 const db = require('../db')
 const config = require('./migrationConfig')
 
-const {getProcessNodeEnv} = require('../../../common/processUtils')
-const {getSurveyDBSchema} = require('../../../server/survey/surveySchemaRepositoryUtils')
+const { getProcessNodeEnv } = require('../../../common/processUtils')
+const { getSurveyDBSchema } = require('../../../server/survey/surveySchemaRepositoryUtils')
 
-const {fetchAllSurveyIds} = require('../../survey/surveyRepository')
+const { fetchAllSurveyIds } = require('../../survey/surveyRepository')
 
 const env = getProcessNodeEnv()
 
@@ -43,7 +43,7 @@ const migrateSchema = async (schema = publicSchema) => {
   await dbm.up()
 }
 
-const migrateSurveySchema = async(surveyId) => {
+const migrateSurveySchema = async (surveyId) => {
   console.log(`starting db migrations for survey ${surveyId}`)
 
   const schema = getSurveyDBSchema(surveyId)
@@ -62,7 +62,7 @@ const migrateSurveySchemas = async () => {
   console.log(`data schemas migrations completed`)
 }
 
-const migrateAll = async() => {
+const migrateAll = async () => {
   try {
     console.log('running database migrations')
 

@@ -7,6 +7,7 @@ const NodesInsert = require('./dbActions/nodesInsert')
 const NodesUpdate = require('./dbActions/nodesUpdate')
 const TableViewCreate = require('./dbActions/tableViewCreate')
 const TableViewQuery = require('./dbActions/tableViewQuery')
+const TableViewExport = require('./dbActions/tableViewExport')
 
 // ==== DDL
 
@@ -37,6 +38,9 @@ const countTable = async (surveyId, tableName, filter, client = db) =>
 const queryRootTableByRecordKeys = async (survey, recordUuid, client = db) =>
   await TableViewQuery.queryRootTableByRecordKeys(survey, recordUuid, client)
 
+const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output, client = db) =>
+  await TableViewExport.exportToCSV(surveyId, tableName, cols, filter, sort, output, client)
+
 module.exports = {
   dropSchema,
   createSchema,
@@ -48,4 +52,5 @@ module.exports = {
   queryTable,
   countTable,
   queryRootTableByRecordKeys,
+  exportTableToCSV,
 }

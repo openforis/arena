@@ -19,22 +19,24 @@ const RecordUpdateThread = require('./thread/recordUpdateThread')
 const createRecordUpdateThread = (user, surveyId, recordUuid, preview) => {
   const userId = user.id
 
-  RecordUsersMap.assocUserId(recordUuid, userId)
+  RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
 
-  const thread = new ThreadManager(
-    path.resolve(__dirname, 'thread', 'recordUpdateThread.js'),
-    { user, surveyId, recordUuid, preview },
-    msg => {
-      const userIds = RecordUsersMap.getUserIds(recordUuid)
-      userIds.forEach(userId =>
-        WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
-      )
-    },
-    () => {
-      RecordUsersMap.dissocUserId(recordUuid, userId)
-      recordUpdateThreads.removeThread(userId)
-    }
-  )
+  const filePath = path.resolve(__dirname, 'thread', 'recordUpdateThread.js')
+  const data = { user, surveyId, recordUuid, preview }
+
+  const messageHandler = msg => {
+    const userIds = RecordUsersMap.getUserIds(recordUuid)
+    userIds.forEach(userId =>
+      WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
+    )
+  }
+
+  const exitHandler = () => {
+    RecordUsersMap.dissocUserId(recordUuid, userId)
+    recordUpdateThreads.removeThread(userId)
+  }
+
+  const thread = new ThreadManager(filePath, data, messageHandler, exitHandler)
 
   recordUpdateThreads.putThread(userId, thread)
 
@@ -119,8 +121,6 @@ const notifyUsersRecordDeleted = (recordUuid, userIdExclude) => {
 
 // ==== UTILS
 
-const getEditingRecordUuids = RecordUsersMap.getRecordUuids
-
 module.exports = {
   checkIn,
   checkOut,
@@ -130,6 +130,4 @@ module.exports = {
   deleteNode,
 
   notifyUsersRecordDeleted,
-
-  getEditingRecordUuids,
 }

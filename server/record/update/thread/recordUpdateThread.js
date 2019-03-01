@@ -24,6 +24,8 @@ const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 const DependentNodesUpdater = require('./helpers/dependentNodesUpdater')
 const RecordValidationManager = require('../../validator/recordValidationManager')
 
+const RecordUsersMap = require('../recordUsersMap')
+
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 
 class RecordUpdateThread extends Thread {
@@ -34,7 +36,6 @@ class RecordUpdateThread extends Thread {
     this.queue = new Queue()
     this.processing = false
     this.preview = R.propOr(false, 'preview', this.params)
-    this.recordUuid = R.prop('recordUuid', this.params)
     this.recordUpdater = new RecordUpdater(this.preview)
   }
 
@@ -54,8 +55,9 @@ class RecordUpdateThread extends Thread {
   }
 
   async initRecord (t) {
-    const recordDb = await RecordRepository.fetchRecordByUuid(this.surveyId, this.recordUuid, t)
-    const nodes = await NodeRepository.fetchNodesByRecordUuid(this.surveyId, this.recordUuid, t)
+    const recordUuid = R.prop('recordUuid', this.params)
+    const recordDb = await RecordRepository.fetchRecordByUuid(this.surveyId, recordUuid, t)
+    const nodes = await NodeRepository.fetchNodesByRecordUuid(this.surveyId, recordUuid, t)
     this.record = Record.assocNodes(toUuidIndexedObj(nodes))(recordDb)
   }
 
@@ -137,8 +139,11 @@ class RecordUpdateThread extends Thread {
       const validations = await RecordValidationManager.validateNodes(survey, this.record, updatedNodesAndDependents, this.preview, t)
       await this.handleNodesValidationUpdated(validations, t)
 
-      // 4. update survey rdb
-      if (!this.preview) {
+      if (this.preview) {
+        // 4. touch preview record
+        RecordUsersMap.touchPreviewRecord(Record.getUuid(this.record))
+      } else {
+        // 4. OR update survey rdb
         const nodeDefs = toUuidIndexedObj(
           Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
         )

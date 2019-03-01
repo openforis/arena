@@ -29,7 +29,6 @@ const nodeDef = {
     layout: [],// rect-grid-layout layout value
 
     // not entity:
-    calculated: false, //boolean expression
     defaultValues: [], //expression
 
     //nodeDefCode
