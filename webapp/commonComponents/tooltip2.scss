@@ -1,0 +1,36 @@
+@import "../style/vars";
+
+
+.tooltip2 {
+  .message {
+    visibility: hidden;
+    position: absolute;
+    background-color: $yellow;
+    padding: 1rem;
+    opacity: .97;
+  }
+
+  &:hover {
+    cursor: pointer;
+    z-index: $zIndex6Tooltip;
+
+    .message {
+      color: black;
+      visibility: visible;
+      position: fixed;
+      margin-top: 0.5rem;
+      border-radius: 0.4rem;
+      border: 1px solid $yellow;
+
+      &:after {
+        content: "";
+        position: absolute;
+        bottom: 100%;
+        left: 1rem;
+        margin-left: -.5rem;
+        border: .5rem solid;
+        border-color: transparent transparent $yellow transparent;
+      }
+    }
+  }
+}

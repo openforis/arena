@@ -96,56 +96,52 @@ class SortExpressionComponent extends React.Component {
 
   render () {
     const { onClose } = this.props
-    const { edit, sortCriteria, unchosenVariables } = this.state
+    const { sortCriteria, unchosenVariables } = this.state
 
     return (
-      <div className={`sort-editor${edit ? ' edit' : ''}`}>
-        {
-          <Popup
-            onClose={onClose}
-            padding={20}>
+      <Popup
+        className="sort-editor-popup"
+        onClose={onClose}
+        padding={20}>
 
-            <React.Fragment>
-              <div className="sort-editor__criteria">
-                {sortCriteria.map((criteria, pos) =>
-                  <SortRow
-                    key={criteria.variable}
-                    variables={unchosenVariables}
-                    selectedVariable={criteria.variable}
-                    onSelectVariable={item => this.onSelectVariable(pos, item.value)}
-                    selectedOrder={criteria.order}
-                    onSelectOrder={order => this.onSelectOrder(pos, order)}
-                    onDelete={() => this.deleteCriteria(pos)}
-                    isFirst={!pos}/>)}
+        <React.Fragment>
+          <div className="sort-editor__criteria">
+            {sortCriteria.map((criteria, pos) =>
+              <SortRow
+                key={criteria.variable}
+                variables={unchosenVariables}
+                selectedVariable={criteria.variable}
+                onSelectVariable={item => this.onSelectVariable(pos, item.value)}
+                selectedOrder={criteria.order}
+                onSelectOrder={order => this.onSelectOrder(pos, order)}
+                onDelete={() => this.deleteCriteria(pos)}
+                isFirst={!pos}/>)}
 
-                {
-                  !!unchosenVariables.length &&
-                  <SortRow
-                    variables={unchosenVariables}
-                    onSelectVariable={item => this.addCriteria(item)}
-                    isPlaceholder={true}
-                    isFirst={!sortCriteria.length}/>
-                }
-              </div>
-              <div className="sort-editor__footer">
-                <button className="btn btn-xs btn-of"
-                        onClick={() => this.reset()}
-                        aria-disabled={!sortCriteria.length}>
-                  <span className="icon icon-undo2 icon-16px"/> Reset
-                </button>
+            {
+              !!unchosenVariables.length &&
+              <SortRow
+                variables={unchosenVariables}
+                onSelectVariable={item => this.addCriteria(item)}
+                isPlaceholder={true}
+                isFirst={!sortCriteria.length}/>
+            }
+          </div>
+          <div className="sort-editor__footer">
+            <button className="btn btn-xs btn-of"
+                    onClick={() => this.reset()}
+                    aria-disabled={!sortCriteria.length}>
+              <span className="icon icon-undo2 icon-16px"/> Reset
+            </button>
 
-                <button className="btn btn-xs btn-of"
-                        onClick={() => this.applyChange()}
-                        aria-disabled={!sortCriteria.length}>
-                  <span className="icon icon-checkmark icon-16px"/> Apply
-                </button>
-              </div>
-            </React.Fragment>
+            <button className="btn btn-xs btn-of"
+                    onClick={() => this.applyChange()}
+                    aria-disabled={!sortCriteria.length}>
+              <span className="icon icon-checkmark icon-16px"/> Apply
+            </button>
+          </div>
+        </React.Fragment>
 
-          </Popup>
-        }
-
-      </div>
+      </Popup>
     )
   }
 }

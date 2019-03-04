@@ -6,6 +6,8 @@ import * as R from 'ramda'
 import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
 import Validator from '../../common/validation/validator'
 
+import Tooltip from '../commonComponents/tooltip2'
+
 const ErrorBadge = ({ validation, showLabel, label }) => {
 
   const invalid = !Validator.isValidationValid(validation)
@@ -14,7 +16,9 @@ const ErrorBadge = ({ validation, showLabel, label }) => {
 
   return invalid
     ? (
-      <div className="badge error-badge">
+      <Tooltip
+        message={validationFields}
+        className="badge error-badge">
         <div className="badge__content">
           <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`}/>
           {
@@ -22,14 +26,7 @@ const ErrorBadge = ({ validation, showLabel, label }) => {
             <span>{label}</span>
           }
         </div>
-
-        {
-          !R.isEmpty(validationFields) &&
-          <div className="messages">
-            {validationFields}
-          </div>
-        }
-      </div>
+      </Tooltip>
     )
     : null
 }

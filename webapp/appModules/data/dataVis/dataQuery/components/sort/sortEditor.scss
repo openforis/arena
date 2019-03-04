@@ -1,13 +1,6 @@
 @import "../../../../../../style/vars";
 
-.sort-editor {
-  display: grid;
-  grid-row-gap: 1.5rem;
-
-  .popup {
-    grid-template-rows: auto 1fr auto;
-  }
-
+.sort-editor-popup {
   .sort-editor__criteria {
     padding-bottom: 2rem;
 

@@ -10,7 +10,7 @@
 
 .popup__btn-close {
   position: absolute;
-  padding: 0;
+  padding: 0 !important;
   border-radius: 50% !important;
   background-color: rgba($redDark, 0.95);
   border: 1px solid rgba($redDark, 0.5) !important;
