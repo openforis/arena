@@ -10,6 +10,7 @@ import {
   dataQueryTableInit,
   dataQueryTableDataUpdate,
   dataQueryTableFilterUpdate,
+  dataQueryTableSortUpdate,
 } from './actions'
 
 import {
@@ -17,6 +18,7 @@ import {
   assocTableData,
   assocTableDataCol,
   assocTableFilter,
+  assocTableSort,
   assocNodeDefUuidTable,
   assocNodeDefUuidCols, dissocTableDataCols,
 } from './dataQueryState'
@@ -48,6 +50,8 @@ const actionHandlers = {
   [dataQueryTableDataUpdate]: (state, { offset, data }) => assocTableData(offset, data)(state),
 
   [dataQueryTableFilterUpdate]: (state, { filter }) => assocTableFilter(filter)(state),
+
+  [dataQueryTableSortUpdate]: (state, { sort }) => assocTableSort(sort)(state),
 }
 
 export default exportReducer(actionHandlers)

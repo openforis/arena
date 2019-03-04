@@ -70,3 +70,4 @@ export const assocTableData = (offset, data) => R.pipe(
 
 export const assocTableFilter = filter => R.assocPath([keys.table, tableKeys.filter], filter)
 
+export const assocTableSort = sort => R.assocPath([keys.table, tableKeys.sort], sort)

@@ -2,7 +2,6 @@ import './sortEditor.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import Expression from '../../../../../../../common/exprParser/expression'
 
@@ -10,7 +9,10 @@ import Popup from '../../../../../../commonComponents/popup'
 import SortRow from './sortRow'
 
 import * as SurveyState from '../../../../../../survey/surveyState'
+
 import Survey from '../../../../../../../common/survey/survey'
+
+import * as Sort from './sort'
 
 import * as ExpressionVariables from '../../../../../../commonComponents/expression/expressionVariables'
 
@@ -21,7 +23,7 @@ class SortExpressionComponent extends React.Component {
 
     this.state = {
       edit: false,
-      sortCriteria: this.deserialize(props.sort),
+      sortCriteria: Sort.deserialize(props.sort),
       unchosenVariables: [],
     }
   }
@@ -32,88 +34,64 @@ class SortExpressionComponent extends React.Component {
 
   componentDidUpdate (prevProps) {
     const { availableVariables } = this.props
+    const { availableVariables: prevAvailableVariables } = prevProps
     const { sortCriteria } = this.state
 
     // Only show selected variables in the dropdown menu
-    if (availableVariables !== prevProps.availableVariables) {
-
+    if (availableVariables !== prevAvailableVariables) {
       // reset available variables and remove unavailable variables from criteria
-      const newSortCriteria = R.filter(c => R.any(v => v.value === c.variable, availableVariables))(sortCriteria)
-      // const newSortCriteria = sortCriteria.filter(c => availableVariables.findIndex(v => v.value === c.variable) !== -1)
+      const newSortCriteria = Sort.getNewCriteria(sortCriteria, availableVariables)
 
       this.setState({ sortCriteria: newSortCriteria },
         () => this.refreshUnchosenVariables())
     }
   }
 
-  updateSort (pos, key, value) {
+  onSelectVariable (pos, variable) {
     const { sortCriteria } = this.state
 
-    const newVarSortCriteria = R.pipe(
-      R.nth(pos),
-      R.assoc(key, value)
-    )(sortCriteria)
-
-    this.setState({ sortCriteria: R.update(pos, newVarSortCriteria, sortCriteria) },
+    this.setState({ sortCriteria: Sort.update(sortCriteria, pos, 'variable', variable) },
       () => this.refreshUnchosenVariables())
   }
 
-  onSelectVariable (pos, variable) {
-    this.updateSort(pos, 'variable', variable)
-  }
-
   onSelectOrder (pos, order) {
-    this.updateSort(pos, 'order', order)
+    const { sortCriteria } = this.state
+
+    this.setState({ sortCriteria: Sort.update(sortCriteria, pos, 'order', order) })
   }
 
   refreshUnchosenVariables () {
     const { availableVariables } = this.props
     const { sortCriteria } = this.state
 
-    const unchosenVariables = availableVariables.filter(v => sortCriteria.findIndex(sc => sc.variable === v.value) === -1)
-    this.setState({ unchosenVariables })
+    this.setState({ unchosenVariables: Sort.getUnchosenVariables(sortCriteria, availableVariables) })
   }
 
   addCriteria ({ value: variable }) {
     const { sortCriteria } = this.state
 
-    const newSortCriteria = R.append({ variable, order: 'asc' }, sortCriteria)
-    this.setState({ sortCriteria: newSortCriteria },
+    this.setState({ sortCriteria: Sort.addCriteria(sortCriteria, variable, 'asc') },
       () => this.refreshUnchosenVariables())
   }
 
   deleteCriteria (pos) {
-    this.setState({ sortCriteria: R.remove(pos, 1, this.state.sortCriteria) },
+    const { sortCriteria } = this.state
+
+    this.setState({ sortCriteria: Sort.deleteCriteria(sortCriteria, pos) },
       () => this.refreshUnchosenVariables())
   }
 
   applyChange () {
+    const { sortCriteria } = this.state
     const { onChange, onClose } = this.props
 
-    onChange && onChange(this.serialize())
+    onChange && onChange(Sort.serialize(sortCriteria))
     onClose()
   }
 
   reset () {
     this.setState({ sortCriteria: [] },
       () => this.applyChange())
-  }
-
-  serialize () {
-    const { sortCriteria } = this.state
-
-    return sortCriteria.map(s => `${s.variable} ${s.order}`).join(', ')
-  }
-
-  deserialize (sortStr) {
-    return !sortStr
-      ? []
-      : R.pipe(
-        R.split(','),
-        R.map(R.trim()),
-        R.map(R.split(/ +/)),
-        R.map(([variable, order]) => ({ variable, order }))
-      )(sortStr)
   }
 
   render () {

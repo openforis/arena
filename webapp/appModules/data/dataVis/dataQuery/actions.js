@@ -6,6 +6,8 @@ import * as SurveyState from '../../../../survey/surveyState'
 import * as DataQueryState from './dataQueryState'
 import NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 
+import * as Sort from './components/sort/sort'
+
 export const dataQueryTableNodeDefUuidUpdate = 'dataQuery/table/nodeDefUuid/update'
 export const dataQueryTableNodeDefUuidColsUpdate = 'dataQuery/table/nodeDefUuidCols/update'
 export const dataQueryTableInit = 'dataQuery/table/init'
@@ -13,6 +15,7 @@ export const dataQueryTableDataUpdate = 'dataQuery/table/data/update'
 export const dataQueryTableDataColUpdate = 'dataQuery/table/data/col/update'
 export const dataQueryTableDataColDelete = 'dataQuery/table/data/col/delete'
 export const dataQueryTableFilterUpdate = 'dataQuery/table/filter/update'
+export const dataQueryTableSortUpdate = 'dataQuery/table/sort/update'
 
 const defaults = {
   offset: 0,
@@ -66,6 +69,9 @@ export const updateTableNodeDefUuidCols = (nodeDefUuidCols, nodeDefUuidCol = nul
     const state = getState()
 
     dispatch({ type: dataQueryTableNodeDefUuidColsUpdate, nodeDefUuidCols })
+
+    const newSort = Sort.deleteVariablesByNames(DataQueryState.getTableSort(state), getColNames(state, nodeDefUuidCols))
+    dispatch({ type: dataQueryTableSortUpdate, sort: newSort })
 
     const fetch = !R.isEmpty(nodeDefUuidCols) &&
       !!nodeDefUuidCol &&
