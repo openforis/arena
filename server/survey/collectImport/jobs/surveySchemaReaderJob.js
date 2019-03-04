@@ -32,8 +32,6 @@ class SurveySchemaReaderJob extends Job {
     const idmlJsonObj = parser.convertToJson(idmlTraversalObj, options)
 
     this.setContext({zipFile, surveySource: idmlJsonObj.survey})
-
-    console.log(this.context)
   }
 }
 
