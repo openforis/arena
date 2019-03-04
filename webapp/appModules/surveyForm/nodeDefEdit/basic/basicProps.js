@@ -1,6 +1,8 @@
 import React from 'react'
 import * as R from 'ramda'
 
+import { uuidv4 } from '../../../../../common/uuid'
+
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
@@ -8,9 +10,11 @@ import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
 
 import { normalizeName } from '../../../../../common/stringUtils'
+import ButtonGroup, { ButtonGroupItem } from '../../../../commonComponents/form/buttonGroup'
 
 const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValue) => {
   putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
@@ -71,6 +75,44 @@ const BasicProps = props => {
           <Checkbox checked={NodeDef.isNodeDefMultiple(nodeDef)}
                     disabled={nodeDefMultipleEditDisabled}
                     onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
+        </FormItem>
+      }
+
+      {
+        NodeDef.isNodeDefEntity(nodeDef) && NodeDef.isNodeDefMultiple(nodeDef) &&
+        <FormItem label={'display as'}>
+          <ButtonGroup selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
+                       onChange={renderType => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, renderType)}
+                       items={[
+                         {
+                           key: NodeDefLayout.nodeDefRenderType.form,
+                           label: 'Form'
+                         },
+                         {
+                           key: NodeDefLayout.nodeDefRenderType.table,
+                           label: 'Table'
+                         }
+                       ]}
+          />
+        </FormItem>
+      }
+      {
+        NodeDef.isNodeDefEntity(nodeDef) &&
+        <FormItem label={'display in'}>
+          <ButtonGroup selectedItemKey={NodeDefLayout.getDisplayIn(nodeDef)}
+                       onChange={displayIn => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.pageUuid,
+                         displayIn === NodeDefLayout.nodeDefDisplayIn.parentPage ? null : uuidv4())}
+                       items={[
+                         {
+                           key: NodeDefLayout.nodeDefDisplayIn.parentPage,
+                           label: 'Parent page'
+                         },
+                         {
+                           key: NodeDefLayout.nodeDefDisplayIn.ownPage,
+                           label: 'Its own page'
+                         }
+                       ]}
+          />
         </FormItem>
       }
 

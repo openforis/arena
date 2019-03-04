@@ -2,8 +2,10 @@ import axios from 'axios'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 
+import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../common/survey/nodeDefValidations'
+import NodeDefLayout from '../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../surveyState'
 
@@ -12,6 +14,8 @@ export const nodeDefCreate = 'nodeDef/create'
 export const nodeDefUpdate = 'nodeDef/update'
 export const nodeDefPropUpdate = 'nodeDef/prop/update'
 export const nodeDefDelete = 'nodeDef/delete'
+
+import { setFormActivePage } from '../../appModules/surveyForm/actions'
 
 // ==== CREATE
 
@@ -45,7 +49,8 @@ export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
 
 const _putNodeDefProp = (nodeDef, key, value, advanced) => {
   const action = async (dispatch, getState) => {
-    const surveyId = SurveyState.getStateSurveyId(getState())
+    const survey = SurveyState.getSurvey(getState())
+    const surveyId = Survey.getId(survey)
 
     const putProps = async (nodeDef, props) => {
       const { data } = await axios.put(
@@ -68,6 +73,16 @@ const _putNodeDefProp = (nodeDef, key, value, advanced) => {
     const nodeDefs = await putProps(nodeDef, propsToUpdate)
 
     dispatch({ type: nodeDefsLoad, nodeDefs })
+
+    if (key === NodeDefLayout.nodeDefLayoutProps.pageUuid) {
+      // when changing displayIn (pageUuid) change form active page
+
+      const activePageNodeDef = value
+        ? nodeDef
+        : Survey.getNodeDefParent(nodeDef)(survey)
+
+      dispatch(setFormActivePage(activePageNodeDef))
+    }
   }
 
   return debounceAction(action, `${nodeDefPropUpdate}_${key}`)
