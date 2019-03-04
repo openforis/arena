@@ -20,7 +20,7 @@ class SurveyCreatorJob extends Job {
 
     const uri = surveySource.uri
     const name = R.pipe(R.split('/'), R.last)(uri)
-    const languages = CollectIdmlParseUtils.getList(surveySource.language)
+    const languages = CollectIdmlParseUtils.toList(surveySource.language)
     const lang = languages[0]
     const label = CollectIdmlParseUtils.toLabels(surveySource.project, lang)[lang]
 

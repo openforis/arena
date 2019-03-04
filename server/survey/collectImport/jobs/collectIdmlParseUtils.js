@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const toLabels = (labelSource, defaultLang, typeFilter = null) => {
-  const list = getList(labelSource)
+  const list = toList(labelSource)
 
   return R.reduce((acc, l) => {
     if (R.is(Object, l)) {
@@ -19,7 +19,7 @@ const toLabels = (labelSource, defaultLang, typeFilter = null) => {
   }, {}, list)
 }
 
-const getList = R.pipe(
+const toList = R.pipe(
   R.defaultTo([]),
   R.ifElse(
     R.is(Array),
@@ -28,7 +28,13 @@ const getList = R.pipe(
   )
 )
 
+const getList = path => R.pipe(
+  R.path(path),
+  toList
+)
+
 module.exports = {
   toLabels,
+  toList,
   getList,
 }

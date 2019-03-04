@@ -1,7 +1,7 @@
 const R = require('ramda')
 const { uuidv4 } = require('../uuid')
 
-const { getProp, toIndexedObj } = require('./surveyUtils')
+const { getProp, setProp, toIndexedObj } = require('./surveyUtils')
 
 const { getValidation, getFieldValidation } = require('../validation/validator')
 
@@ -66,6 +66,14 @@ const getLevelByIndex = idx => R.path([keys.levels, idx])
 
 // ====== UPDATE
 const assocLevelsArray = array => R.assoc(keys.levels, toIndexedObj(array, 'index'))
+
+const assocLevel = level =>
+  category =>
+    R.pipe(
+      getLevelsArray,
+      R.append(level),
+      levels => assocLevelsArray(levels)(category)
+    )(category)
 
 /**
  * LEVEL
@@ -157,7 +165,8 @@ module.exports = {
   getLevelByIndex,
 
   // UPDATE
-  assocLevelsArray: assocLevelsArray,
+  assocLevelsArray,
+  assocLevel,
 
   // ====== LEVEL
   //CREATE
@@ -172,6 +181,7 @@ module.exports = {
     getFieldValidation(levelIndex),
   ),
   //UPDATE
+  assocLevelName: name => setProp(levelProps.name, name),
 
   // ====== ITEM
   //CREATE

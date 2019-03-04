@@ -112,8 +112,8 @@ const publishProps = async (surveyId, client = db) => {
   await publishSurveySchemaTableProps(surveyId, 'category_item', client)
 }
 
-const updateCategoryProp = async (user, surveyId, categoryUuid, key, value) =>
-  await db.tx(async t => {
+const updateCategoryProp = async (user, surveyId, categoryUuid, key, value, client = db) =>
+  await client.tx(async t => {
     const category = await CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, t)
 
     await markSurveyDraft(surveyId, t)
@@ -123,8 +123,8 @@ const updateCategoryProp = async (user, surveyId, categoryUuid, key, value) =>
     return category
   })
 
-const updateLevelProp = async (user, surveyId, levelUuid, key, value) =>
-  await db.tx(async t => {
+const updateLevelProp = async (user, surveyId, levelUuid, key, value, client = db) =>
+  await client.tx(async t => {
     const level = await CategoryRepository.updateLevelProp(surveyId, levelUuid, key, value, t)
 
     await markSurveyDraft(surveyId, t)
@@ -134,8 +134,8 @@ const updateLevelProp = async (user, surveyId, levelUuid, key, value) =>
     return level
   })
 
-const updateItemProp = async (user, surveyId, itemUuid, key, value) =>
-  await db.tx(async t => {
+const updateItemProp = async (user, surveyId, itemUuid, key, value, client = db) =>
+  await client.tx(async t => {
     const item = await CategoryRepository.updateItemProp(surveyId, itemUuid, key, value, t)
 
     await markSurveyDraft(surveyId, t)
