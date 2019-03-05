@@ -5,7 +5,6 @@ import { getUser } from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 import { appUserPrefUpdate } from '../app/actions'
 import { showAppJobMonitor } from '../appModules/appView/components/job/actions'
-import Node from '../../common/record/node'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
