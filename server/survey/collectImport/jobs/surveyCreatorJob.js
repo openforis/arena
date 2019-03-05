@@ -1,7 +1,6 @@
 const R = require('ramda')
 
 const Survey = require('../../../../common/survey/survey')
-const SurveyInfo = require('../../../../common/survey/_internal/surveyInfo')
 
 const Job = require('../../../job/job')
 
@@ -28,7 +27,7 @@ class SurveyCreatorJob extends Job {
 
     const surveyId = Survey.getId(survey)
 
-    await SurveyManager.updateSurveyProp(surveyId, SurveyInfo.keys.languages, languages, this.user)
+    await SurveyManager.updateSurveyProp(surveyId, Survey.infoKeys.languages, languages, this.user)
 
     this.setContext({surveyId, defaultLanguage: lang})
   }
