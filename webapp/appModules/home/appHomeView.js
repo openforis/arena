@@ -74,8 +74,10 @@ export default withRouter(connect(
   {
     createSurvey,
     updateNewSurveyProp,
+    importCollectSurvey,
+
+
     fetchSurveys,
     setActiveSurvey,
-    importCollectSurvey
   }
 )(AppHomeView))

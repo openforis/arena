@@ -1,0 +1,47 @@
+@import "../../../../style/vars";
+
+.home-dashboard__survey-info {
+  grid-column: 1 / span 2;
+  background-color: rgba($brown, .2);
+  display: grid;
+  grid-template-columns: auto 1fr;
+
+  .btn {
+    //margin: 0 .5rem;
+    padding: .5rem;
+    font-size: .7rem;
+  }
+}
+
+.home-dashboard__survey-info-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.home-dashboard__survey-info-container {
+  display: grid;
+  grid-row-gap: .3rem;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+
+  .survey-status {
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    justify-self: right;
+  }
+
+  .survey-name {
+    justify-self: center;
+    font-size: 2rem;
+    text-transform: uppercase;
+  }
+
+  .row-btns {
+    display: flex;
+    justify-content: center;
+  }
+
+}

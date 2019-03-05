@@ -1,66 +1,62 @@
 import './surveyListView.scss'
 
 import React from 'react'
-import * as R from 'ramda'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
+import { compose } from 'redux'
+
+import SurveyListTable from './surveyListTable'
 
 import Survey from '../../../../common/survey/survey'
-import { getRelativeDate, compareDatesDesc } from '../../../../common/dateUtils'
 
-const SurveyRow = ({surveyInfoRow, surveyInfo, setActiveSurvey}) => {
-  const surveyId = surveyInfoRow.id
-  const active = surveyInfo && surveyId === surveyInfo.id
-  const activeClass = active ? ' active' : ''
+import * as AppHomeState from '../appHomeState'
+import * as SurveyState from '../../../survey/surveyState'
 
-  return (
-    <div className={`table__row${activeClass}`}>
-      <div>{Survey.getName(surveyInfoRow)}</div>
-      <div>{Survey.getDefaultLabel(surveyInfoRow)}</div>
-      <div>{getRelativeDate(surveyInfoRow.dateCreated)}</div>
-      <div>{getRelativeDate(surveyInfoRow.dateModified)}</div>
-      <div>{Survey.getStatus(surveyInfoRow)}</div>
-      <div>
-        <button className={`btn btn-s btn-of${activeClass}`}
-                onClick={() => setActiveSurvey(surveyId)}>
-          {active ? 'active' : 'activate'}
-        </button>
-      </div>
-    </div>
-  )
-}
+import { fetchSurveys } from '../actions'
+import { setActiveSurvey } from '../../../survey/actions'
 
-const SurveyList = (props) => {
-  const {surveys} = props
-  const surveyInfos = surveys.map(Survey.getSurveyInfo)
+import { appModuleUri } from '../../appModules'
+import { homeModules } from '../homeModules'
 
-  return R.isEmpty(surveys)
-    ? null
-    : (
-      <div className="surveys-list table">
-        <div className="table__header">
-          <h5>Surveys</h5>
-        </div>
+class SurveyListView extends React.Component {
 
-        <div className="table__row-header">
-          <div>Name</div>
-          <div>Label</div>
-          <div>Date created</div>
-          <div>Date last modified</div>
-          <div>Status</div>
-        </div>
+  componentDidMount () {
+    this.props.fetchSurveys()
+  }
 
+  componentDidUpdate (prevProps) {
+    const { surveyInfo, history } = this.props
+    const { surveyInfo: prevSurveyInfo } = prevProps
 
-        <div className="table__rows">
+    if (surveyInfo && (!prevSurveyInfo || surveyInfo.id !== prevSurveyInfo.id)) {
+      history.push(appModuleUri(homeModules.dashboard))
+    }
+  }
 
-          {
-            surveyInfos
-              .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
-              .map((surveyInfo, i) =>
-                <SurveyRow key={i} {...props} surveyInfoRow={surveyInfo}/>
-              )
-          }
-        </div>
-      </div>
+  render () {
+    const { surveyInfo, surveys, setActiveSurvey } = this.props
+
+    return (
+      <SurveyListTable
+        surveys={surveys}
+        surveyInfo={surveyInfo}
+        setActiveSurvey={setActiveSurvey}
+      />
     )
+  }
 }
 
-export default SurveyList
+const mapStateToProps = state => ({
+  surveyInfo: Survey.getSurveyInfo(SurveyState.getSurvey(state)),
+  surveys: AppHomeState.getSurveys(state)
+})
+
+const enhance = compose(
+  withRouter,
+  connect(
+    mapStateToProps,
+    { fetchSurveys, setActiveSurvey }
+  )
+)
+
+export default enhance(SurveyListView)

@@ -21,7 +21,7 @@ const AppHomeView = props => {
       <div className="app-home">
         <Switch location={location}>
           <Route path={appModuleUri(homeModules.dashboard)} component={DashboardView}/>
-          <Route path={appModuleUri(homeModules.surveys)} component={SurveyListView}/>
+          <Route path={appModuleUri(homeModules.surveyList)} component={SurveyListView}/>
         </Switch>
       </div>
     )

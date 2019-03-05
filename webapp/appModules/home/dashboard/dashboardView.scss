@@ -2,7 +2,14 @@
 
 .home-dashboard {
   display: grid;
-  grid-template-columns: .4fr .6fr;
+  grid-template-columns: .5fr .5fr;
+  grid-template-rows: 150px 1fr;
   justify-content: center;
-  background-color: rgba($purple, .1);
+  background-color: rgba($purple, .05);
+
+  .btn {
+    margin: 0 .5rem;
+    padding: .5rem;
+    font-size: .7rem;
+  }
 }

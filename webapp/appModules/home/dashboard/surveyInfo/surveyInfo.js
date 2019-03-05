@@ -1,4 +1,4 @@
-import './surveyActionsBar.scss'
+import './surveyInfo.scss'
 
 import React from 'react'
 import { compose } from 'redux'
@@ -7,9 +7,11 @@ import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 
 import DeleteSurveyDialog from './deleteSurveyDialog'
+import ErrorBadge from '../../../../commonComponents/errorBadge'
 
 import Survey from '../../../../../common/survey/survey'
 import AuthManager from '../../../../../common/auth/authManager'
+import Validator from '../../../../../common/validation/validator'
 
 import { appModuleUri } from '../../../appModules'
 import { designerModules } from '../../../designer/designerModules'
@@ -37,17 +39,44 @@ class SurveyActionBar extends React.Component {
 
     // redirecting when survey has been deleted
     if (Survey.isValid(prevSurveyInfo) && !Survey.isValid(surveyInfo)) {
-      history.push(appModuleUri(homeModules.surveys))
+      history.push(appModuleUri(homeModules.surveyList))
     }
   }
 
   render () {
-    const { surveyInfo, canEditDef } = this.props
+    const {
+      surveyInfo, canEditDef,
+      publishSurvey, deleteSurvey,
+    } = this.props
     const { showDeleteDialog } = this.state
 
     return (
-      <div className="home-dashboard__survey-actions-bar">
-        <div className="buttons-container">
+      <div className="home-dashboard__survey-info">
+
+        <ErrorBadge validation={Validator.getValidation(surveyInfo)}/>
+
+        <div className="home-dashboard__survey-info-side">
+          <Link to={appModuleUri(homeModules.surveyList)} className="btn btn-of-light">
+            <span className="icon icon-paragraph-justify icon-12px icon-left"/> Survey list
+          </Link>
+          <Link to={appModuleUri(homeModules.surveyNew)} className="btn btn-of-light">
+            <span className="icon icon-plus icon-12px icon-left"/> New Survey
+          </Link>
+        </div>
+
+        <div className="home-dashboard__survey-info-container">
+          <div className="survey-status">
+            {
+              Survey.isDraft(surveyInfo) &&
+              <span className="icon icon-warning icon-12px icon-left"/>
+            }
+
+            {Survey.getStatus(surveyInfo)}
+          </div>
+
+          <h4 className="survey-name">
+            {Survey.getName(surveyInfo)}
+          </h4>
 
           <div className="row-btns">
             <Link to={appModuleUri(designerModules.surveyInfo)} className="btn btn-of-light">
@@ -93,6 +122,7 @@ class SurveyActionBar extends React.Component {
           </div>
 
         </div>
+
       </div>
     )
   }
@@ -103,6 +133,7 @@ const mapStateToProps = state => {
   const surveyInfo = SurveyState.getStateSurveyInfo(state)
 
   return {
+    surveyInfo,
     canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
   }
 }
