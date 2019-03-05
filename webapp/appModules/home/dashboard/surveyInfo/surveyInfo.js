@@ -66,11 +66,11 @@ class SurveyInfo extends React.Component {
         <div className="home-dashboard__survey-info-side">
           <Link
             to={appModuleUri(homeModules.surveyList)} className="btn btn-of-light">
-            <span className="icon icon-paragraph-justify icon-12px icon-left"/> Survey list
+            <span className="icon icon-paragraph-justify icon-12px icon-left"/> My Surveys
           </Link>
           <Link
             to={appModuleUri(homeModules.surveyNew)} className="btn btn-of-light">
-            <span className="icon icon-plus icon-12px icon-left"/> New Survey
+            <span className="icon icon-plus icon-12px icon-left"/> Add a new Survey
           </Link>
         </div>
 

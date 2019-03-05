@@ -1,8 +1,11 @@
 import React from 'react'
-import * as R from 'ramda'
+import { Link } from 'react-router-dom'
 
 import Survey from '../../../../common/survey/survey'
 import { getRelativeDate, compareDatesDesc } from '../../../../common/dateUtils'
+
+import { appModuleUri } from '../../appModules'
+import { homeModules } from '../homeModules'
 
 const SurveyRow = ({ surveyInfoRow, surveyInfo, setActiveSurvey }) => {
   const surveyId = surveyInfoRow.id
@@ -33,7 +36,13 @@ const SurveyListTable = (props) => {
   return (
     <div className="survey-list table">
       <div className="table__header">
-        <h5>Surveys</h5>
+        <h5>
+          Surveys
+          <Link
+            to={appModuleUri(homeModules.surveyNew)} className="btn btn-xs btn-of-light">
+            <span className="icon icon-plus icon-12px icon-left"/> Add a new Survey
+          </Link>
+        </h5>
       </div>
 
       <div className="table__row-header">
