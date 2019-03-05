@@ -3,6 +3,8 @@ import * as R from 'ramda'
 import { combineReducers } from 'redux'
 import { exportReducer } from '../../appUtils/reduxUtils'
 
+import NodeDefLayout from '../../../common/survey/nodeDefLayout'
+
 import categoryEdit from './categoryEdit/reducer'
 import taxonomyEdit from './taxonomyEdit/reducer'
 import record from './record/reducer'
@@ -19,7 +21,7 @@ import {
   formReset
 } from './actions'
 
-import { nodeDefCreate } from '../../survey/nodeDefs/actions'
+import { nodeDefCreate, nodeDefPropUpdate } from '../../survey/nodeDefs/actions'
 
 import {
   assocFormActivePage,
@@ -55,6 +57,15 @@ const actionHandlers = {
 
   // node def
   [nodeDefCreate]: (state, { nodeDef }) => assocParamsOnNodeDefCreate(nodeDef)(state),
+  [nodeDefPropUpdate]: (state, { nodeDef, parentNodeDef, key, value }) => {
+    if (key === NodeDefLayout.nodeDefLayoutProps.pageUuid) {
+      // when changing displayIn (pageUuid) change form active page
+      const activePageNodeDef = value ? nodeDef : parentNodeDef
+      return assocFormActivePage(activePageNodeDef)(state)
+    } else {
+      return state
+    }
+  },
 
   // record (preview)
   [recordLoad]: state => assocNodeDefAddChildTo(null)(state)

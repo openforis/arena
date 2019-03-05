@@ -16,6 +16,28 @@ import { getFieldValidation, getValidation } from '../../../../../common/validat
 import { normalizeName } from '../../../../../common/stringUtils'
 import ButtonGroup, { ButtonGroupItem } from '../../../../commonComponents/form/buttonGroup'
 
+const displayAsItems = [
+  {
+    key: NodeDefLayout.nodeDefRenderType.form,
+    label: 'Form'
+  },
+  {
+    key: NodeDefLayout.nodeDefRenderType.table,
+    label: 'Table'
+  }
+]
+
+const displayInItems = [
+  {
+    key: NodeDefLayout.nodeDefDisplayIn.parentPage,
+    label: 'Parent page'
+  },
+  {
+    key: NodeDefLayout.nodeDefDisplayIn.ownPage,
+    label: 'Its own page'
+  }
+]
+
 const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValue) => {
   putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
 }
@@ -79,39 +101,21 @@ const BasicProps = props => {
       }
 
       {
-        NodeDef.isNodeDefEntity(nodeDef) && NodeDef.isNodeDefMultiple(nodeDef) &&
+        NodeDef.isNodeDefEntity(nodeDef) && !NodeDef.isNodeDefRoot(nodeDef) && NodeDef.isNodeDefMultiple(nodeDef) &&
         <FormItem label={'display as'}>
           <ButtonGroup selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
                        onChange={renderType => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, renderType)}
-                       items={[
-                         {
-                           key: NodeDefLayout.nodeDefRenderType.form,
-                           label: 'Form'
-                         },
-                         {
-                           key: NodeDefLayout.nodeDefRenderType.table,
-                           label: 'Table'
-                         }
-                       ]}
+                       items={displayAsItems}
           />
         </FormItem>
       }
       {
-        NodeDef.isNodeDefEntity(nodeDef) &&
+        NodeDef.isNodeDefEntity(nodeDef) && !NodeDef.isNodeDefRoot(nodeDef) &&
         <FormItem label={'display in'}>
           <ButtonGroup selectedItemKey={NodeDefLayout.getDisplayIn(nodeDef)}
                        onChange={displayIn => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.pageUuid,
                          displayIn === NodeDefLayout.nodeDefDisplayIn.parentPage ? null : uuidv4())}
-                       items={[
-                         {
-                           key: NodeDefLayout.nodeDefDisplayIn.parentPage,
-                           label: 'Parent page'
-                         },
-                         {
-                           key: NodeDefLayout.nodeDefDisplayIn.ownPage,
-                           label: 'Its own page'
-                         }
-                       ]}
+                       items={displayInItems}
           />
         </FormItem>
       }
