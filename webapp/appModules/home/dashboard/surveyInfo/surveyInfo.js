@@ -33,7 +33,7 @@ class SurveyInfo extends React.Component {
 
   render () {
     const {
-      surveyInfo, canEditDef,
+      surveyInfo, lang, canEditDef,
       publishSurvey, deleteSurvey,
     } = this.props
     const { showDeleteDialog } = this.state
@@ -54,7 +54,8 @@ class SurveyInfo extends React.Component {
 
           {
             canEditDef &&
-            <button className="btn btn-of-light" aria-disabled={!Survey.isDraft(surveyInfo)}
+            <button className="btn btn-of-light"
+                    aria-disabled={!Survey.isDraft(surveyInfo)}
                     onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
                       ? publishSurvey()
                       : null}>
@@ -78,7 +79,7 @@ class SurveyInfo extends React.Component {
 
           <div className="row">
             <h4 className="survey-name">
-              {Survey.getName(surveyInfo)}
+              {Survey.getDefaultLabel(surveyInfo, lang)}
             </h4>
 
             <Link to={appModuleUri(designerModules.surveyInfo)} className="btn btn-of-light">
@@ -132,9 +133,11 @@ class SurveyInfo extends React.Component {
 const mapStateToProps = state => {
   const user = AppState.getUser(state)
   const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const lang = Survey.getDefaultLanguage(surveyInfo)
 
   return {
     surveyInfo,
+    lang,
     canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
   }
 }
