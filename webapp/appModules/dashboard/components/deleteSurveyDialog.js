@@ -14,7 +14,7 @@ export default class DeleteSurveyDialog extends React.Component {
     super(props)
 
     this.state = {confirmName: ''}
-    this.confirmNameChanged = this.confirmNameChanged.bind(this)
+    this.confirmNameOnChange = this.confirmNameChanged.bind(this)
   }
 
   componentDidMount () {
