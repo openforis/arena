@@ -10,9 +10,10 @@ import UploadButton from '../../../commonComponents/form/uploadButton'
 import { getFieldValidation } from '../../../../common/validation/validator'
 import { normalizeName } from '../../../../common/stringUtils'
 
-import * as AppHomeState from '../appHomeState'
+import * as SurveyCreateState from './surveyCreateState'
 
-import { createSurvey, importCollectSurvey, updateNewSurveyProp } from '../actions'
+import { updateNewSurveyProp } from './actions'
+import { createSurvey, importCollectSurvey } from './actions'
 
 const SurveyCreateView = (props) => {
 
@@ -60,7 +61,7 @@ const SurveyCreateView = (props) => {
 }
 
 const mapStateToProps = state => ({
-  newSurvey: AppHomeState.getNewSurvey(state),
+  newSurvey: SurveyCreateState.getNewSurvey(state),
 })
 
 export default connect(

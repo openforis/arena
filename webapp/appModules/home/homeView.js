@@ -1,4 +1,4 @@
-import './appHomeView.scss'
+import './homeView.scss'
 
 import React from 'react'
 import { compose } from 'redux'
@@ -16,7 +16,7 @@ import * as SurveyState from '../../survey/surveyState'
 import { appModules, appModuleUri } from '../appModules'
 import { homeModules } from './homeModules'
 
-class AppHomeView extends React.Component {
+class HomeView extends React.Component {
 
   componentDidUpdate (prevProps) {
     const { surveyInfo, history } = this.props
@@ -69,4 +69,4 @@ const enhance = compose(
   connect(mapStateToProps)
 )
 
-export default enhance(AppHomeView)
+export default enhance(HomeView)

@@ -2,7 +2,7 @@ import React from 'react'
 import { Route, Switch } from 'react-router'
 
 import DesignerView from '../../designer/designerView'
-import HomeView from '../../home/appHomeViewRefactor'
+import HomeView from '../../home/homeView'
 import DashboardView from '../../dashboard/dashboardView'
 import DataView from '../../data/dataView'
 

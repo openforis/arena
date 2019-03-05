@@ -44,13 +44,23 @@ class SurveyInfo extends React.Component {
         <ErrorBadge
           validation={Validator.getValidation(surveyInfo)}/>
 
-        <div className="survey-status">
+        <div className="home-dashboard__survey-info-status">
           {
             Survey.isDraft(surveyInfo) &&
             <span className="icon icon-warning icon-12px icon-left"/>
           }
 
           {Survey.getStatus(surveyInfo)}
+
+          {
+            canEditDef &&
+            <button className="btn btn-of-light" aria-disabled={!Survey.isDraft(surveyInfo)}
+                    onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
+                      ? publishSurvey()
+                      : null}>
+              <span className="icon icon-checkmark2 icon-12px icon-left"/> Publish
+            </button>
+          }
         </div>
 
         <div className="home-dashboard__survey-info-side">
@@ -75,16 +85,6 @@ class SurveyInfo extends React.Component {
               <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`}/>
               {canEditDef ? 'Edit' : 'View'} Info
             </Link>
-
-            {
-              canEditDef &&
-              <button className="btn btn-of-light" aria-disabled={!Survey.isDraft(surveyInfo)}
-                      onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
-                        ? publishSurvey()
-                        : null}>
-                <span className="icon icon-checkmark2 icon-12px icon-left"/> Publish
-              </button>
-            }
 
             {
               canEditDef &&

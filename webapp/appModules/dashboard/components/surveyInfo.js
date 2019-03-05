@@ -53,7 +53,7 @@ class SurveyInfo extends React.Component {
 
         <ErrorBadge validation={Validator.getValidation(surveyInfo)}/>
 
-        <div className="survey-status">
+        <div className="home-dashboard__survey-info-status">
           {
             Survey.isDraft(surveyInfo) &&
             <span className="icon icon-warning icon-12px icon-left"/>
