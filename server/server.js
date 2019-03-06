@@ -4,8 +4,12 @@ require('dotenv').config()
 const dbMigrator = require('./db/migration/dbMigrator')
 const appCluster = require('./system/appCluster')
 
-dbMigrator.migrateAll()
-appCluster()
+const initialize = async () => {
+  await dbMigrator.migrateAll()
+  await appCluster()
+}
+
+initialize()
 
 // SERVER CLUSTERING DISABLED FOR NOW
 // if (cluster.isMaster) {
