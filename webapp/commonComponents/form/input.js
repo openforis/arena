@@ -2,7 +2,7 @@ import './form.scss'
 
 import React from 'react'
 
-import Tooltip from '../tooltip2'
+import Tooltip from '../tooltip'
 import { TextMask, InputAdapter } from 'react-text-mask-hoc'
 
 export const FormItem = ({ label, children }) => (

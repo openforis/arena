@@ -5,7 +5,7 @@ import React from 'react'
 import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
 import Validator from '../../common/validation/validator'
 
-import Tooltip from '../commonComponents/tooltip2'
+import Tooltip from './tooltip'
 
 const ErrorBadge = ({ validation, showLabel, label }) => {
 
