@@ -2,6 +2,7 @@ import './nodeDefEdit.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
 import TabBar from '../../../commonComponents/tabBar'
 import BasicProps from './basic/basicProps'
@@ -36,10 +37,9 @@ class NodeDefEdit extends React.Component {
 
   render () {
     const {
-      nodeDef,
-      nodeDefParent,
-      nodeDefKeyEditDisabled,
-      nodeDefMultipleEditDisabled,
+      nodeDef, nodeDefParent,
+      nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
+      displayAsEnabled, displayInEnabled,
       putNodeDefProp,
       canUpdateCategory
     } = this.props
@@ -73,6 +73,8 @@ class NodeDefEdit extends React.Component {
                           <BasicProps nodeDef={nodeDef}
                                       nodeDefKeyEditDisabled={nodeDefKeyEditDisabled}
                                       nodeDefMultipleEditDisabled={nodeDefMultipleEditDisabled}
+                                      displayAsEnabled={displayAsEnabled}
+                                      displayInEnabled={displayInEnabled}
                                       putNodeDefProp={putNodeDefProp}
                                       toggleCategoryEdit={(editing) => this.setState({ editingCategory: editing })}
                                       toggleTaxonomyEdit={(editing) => this.setState({ editingTaxonomy: editing })}/>
@@ -119,7 +121,7 @@ NodeDefEdit.defaultProps = {
   nodeDefParent: null,
 }
 
-const isNodeDefKeyEditDisabled = (nodeDef, survey) =>
+const isNodeDefKeyEditDisabled = (survey, nodeDef) =>
   !nodeDef ||
   NodeDef.isNodeDefRoot(nodeDef) ||
   NodeDef.isNodeDefMultiple(nodeDef) ||
@@ -129,13 +131,24 @@ const isNodeDefKeyEditDisabled = (nodeDef, survey) =>
   ) ||
   NodeDef.isNodeDefReadOnly(nodeDef)
 
-const isNodeDefMultipleEditDisabled = (nodeDef, survey) =>
+const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
   !nodeDef ||
   NodeDef.isNodeDefPublished(nodeDef) ||
   NodeDef.isNodeDefKey(nodeDef) ||
   isRenderTable(nodeDef) ||
   Survey.isNodeDefParentCode(nodeDef)(survey) ||
   NodeDef.isNodeDefReadOnly(nodeDef)
+
+const isDisplayAsEnabled = (survey, nodeDef) => {
+  const children = Survey.getNodeDefChildren(nodeDef)(survey)
+
+  return !NodeDef.isNodeDefRoot(nodeDef) &&
+    NodeDef.isNodeDefMultipleEntity(nodeDef) &&
+    R.none(NodeDef.isNodeDefEntity, children)
+}
+
+const isDisplayInEnabled = (nodeDef) =>
+  !NodeDef.isNodeDefRoot(nodeDef) && NodeDef.isNodeDefEntity(nodeDef)
 
 const mapStateToProps = state => {
   const survey = getSurvey(state)
@@ -145,14 +158,18 @@ const mapStateToProps = state => {
     NodeDef.getNodeDefParentUuid(nodeDef)
   )(survey)
 
-  const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(nodeDef, survey)
-  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(nodeDef, survey)
+  const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(survey, nodeDef)
+  const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, nodeDef)
+  const displayAsEnabled = nodeDef && isDisplayAsEnabled(survey, nodeDef)
+  const displayInEnabled = nodeDef && isDisplayInEnabled(nodeDef)
 
   return {
     nodeDef,
     nodeDefParent,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
+    displayAsEnabled,
+    displayInEnabled,
     canUpdateCategory: NodeDef.isNodeDefCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey)
   }
 }

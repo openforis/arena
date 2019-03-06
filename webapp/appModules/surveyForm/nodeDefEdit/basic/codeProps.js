@@ -8,21 +8,28 @@ import Dropdown from '../../../../commonComponents/form/dropdown'
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import Category from '../../../../../common/survey/category'
+import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 import Validator from '../../../../../common/validation/validator'
-import {
-  isRenderCheckbox,
-  isRenderDropdown,
-  nodeDefLayoutProps,
-  nodeDefRenderType
-} from '../../../../../common/survey/nodeDefLayout'
 
 import { getSurvey } from '../../../../survey/surveyState'
 import { getFormNodeDefEdit, getSurveyForm } from '../../surveyFormState'
 
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../../categoryEdit/actions'
+import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
 
-const {propKeys} = NodeDef
+const { propKeys } = NodeDef
+
+const displayAsItems = [
+  {
+    key: NodeDefLayout.nodeDefRenderType.checkbox,
+    label: 'Checkbox'
+  },
+  {
+    key: NodeDefLayout.nodeDefRenderType.dropdown,
+    label: 'Dropdown'
+  }
+]
 
 const CodeProps = (props) => {
   const {
@@ -62,7 +69,7 @@ const CodeProps = (props) => {
                     selection={category}
                     onChange={putCategoryProp}/>
           <button className="btn btn-s btn-of-light-xs"
-                  style={{justifySelf: 'center'}}
+                  style={{ justifySelf: 'center' }}
                   onClick={async () => {
                     putCategoryProp(await createCategory())
                     toggleCategoryEdit(true)
@@ -72,7 +79,7 @@ const CodeProps = (props) => {
             ADD
           </button>
           <button className="btn btn-s btn-of-light-xs"
-                  style={{justifySelf: 'center'}}
+                  style={{ justifySelf: 'center' }}
                   onClick={() => toggleCategoryEdit(true)}>
             <span className="icon icon-list icon-12px icon-left"/>
             MANAGE
@@ -81,16 +88,10 @@ const CodeProps = (props) => {
       </FormItem>
 
       <FormItem label={'Display As'}>
-        <div>
-          <button className={`btn btn-of-light ${isRenderCheckbox(nodeDef) ? 'active' : ''}`}
-                  onClick={() => putNodeDefProp(nodeDef, nodeDefLayoutProps.render, nodeDefRenderType.checkbox)}>
-            Checkbox
-          </button>
-          <button className={`btn btn-of-light ${isRenderDropdown(nodeDef) ? 'active' : ''}`}
-                  onClick={() => putNodeDefProp(nodeDef, nodeDefLayoutProps.render, nodeDefRenderType.dropdown)}>
-            Dropdown
-          </button>
-        </div>
+        <ButtonGroup selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
+                     onChange={render => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, render)}
+                     items={displayAsItems}
+        />
       </FormItem>
 
       <FormItem label={'Parent Code'}>

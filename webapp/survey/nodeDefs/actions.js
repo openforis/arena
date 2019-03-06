@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 
+import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../common/survey/nodeDefValidations'
 
@@ -26,8 +27,11 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
 }
 
 // ==== UPDATE
-export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => async (dispatch) => {
-  dispatch({ type: nodeDefPropUpdate, nodeDefUuid: nodeDef.uuid, key, value, advanced })
+export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => async (dispatch, getState) => {
+  const survey = SurveyState.getSurvey(getState())
+  const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
+
+  dispatch({ type: nodeDefPropUpdate, nodeDef, parentNodeDef, nodeDefUuid: nodeDef.uuid, key, value, advanced })
 
   dispatch(_putNodeDefProp(nodeDef, key, value, advanced))
 }

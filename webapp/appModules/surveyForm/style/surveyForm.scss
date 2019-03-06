@@ -36,6 +36,12 @@ $tableRowHeaderHeight: 40px;
     .react-grid-item {
       border: 1px dashed rgba($blue1, .7);
 
+      // inner page
+      &.node-def__inner-form {
+        border: 2px dashed rgba($white, .2);
+        border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+      }
+
       > .react-resizable-handle::after {
         border-right: 2px solid rgba($blue1, 0.7);
         border-bottom: 2px solid rgba($blue1, 0.7);
@@ -45,6 +51,13 @@ $tableRowHeaderHeight: 40px;
 
     .node-def__form_page {
       border: 2px dashed rgba($white, .4);
+    }
+  }
+
+  .react-grid-item {
+    &.node-def__inner-form {
+      border: 2px solid rgba($white, .2);
+      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
     }
   }
 }
@@ -174,6 +187,12 @@ $tableRowHeaderHeight: 40px;
   font-size: .8rem;
   font-weight: 600;
   letter-spacing: 0;
+}
+
+.node-def__inner-form-header {
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: center;
 }
 
 //===
