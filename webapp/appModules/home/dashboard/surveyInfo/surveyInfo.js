@@ -82,7 +82,7 @@ class SurveyInfo extends React.Component {
               {Survey.getDefaultLabel(surveyInfo, lang)}
             </h4>
 
-            <Link to={appModuleUri(designerModules.surveyInfo)} className="btn btn-of-light">
+            <Link to={appModuleUri(homeModules.surveyInfo)} className="btn btn-of-light">
               <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`}/>
               {canEditDef ? 'Edit' : 'View'} Info
             </Link>

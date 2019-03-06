@@ -9,6 +9,7 @@ import { Redirect } from 'react-router-dom'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
 import SurveyCreateView from './surveyCreate/surveyCreateView'
+import SurveyInfoView from './surveyInfo/surveyInfoView'
 
 import Survey from '../../../common/survey/survey'
 import * as SurveyState from '../../survey/surveyState'
@@ -54,6 +55,7 @@ class HomeView extends React.Component {
             <Route path={appModuleUri(homeModules.dashboard)} component={DashboardView}/>
             <Route path={appModuleUri(homeModules.surveyList)} component={SurveyListView}/>
             <Route path={appModuleUri(homeModules.surveyNew)} component={SurveyCreateView}/>
+            <Route path={appModuleUri(homeModules.surveyInfo)} component={SurveyInfoView}/>
           </Switch>
         </div>
       )

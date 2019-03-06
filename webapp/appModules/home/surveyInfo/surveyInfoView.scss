@@ -1,0 +1,11 @@
+.home-survey-info {
+  padding-top: 2rem;
+
+  .form {
+    max-height: calc(100vh - 100px);
+  }
+
+  .form-item {
+    grid-template-columns: .2fr .7fr;
+  }
+}
