@@ -172,6 +172,11 @@ class Job {
       event.errors = this.errors
     }
     this.notifyEvent(event)
+
+    if (this.status === jobStatus.succeeded
+      || this.status === jobStatus.failed) {
+      this.onFinish()
+    }
   }
 
   setStatusSucceeded () {
@@ -200,6 +205,10 @@ class Job {
 
   createJobEvent (type) {
     return new JobEvent(type, this.status, this.total, this.processed)
+  }
+
+  onFinish () {
+    // to be extended by subclasses
   }
 
   getContextProp (prop, defaultValue = null) {

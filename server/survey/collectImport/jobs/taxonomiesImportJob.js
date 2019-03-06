@@ -8,8 +8,6 @@ const Job = require('../../../job/job')
 const TaxonomyManager = require('../../../taxonomy/taxonomyManager')
 const TaxonomyImportHelper = require('../../../taxonomy/taxonomyImportHelper')
 
-const FileZipUtils = require('../../../../common/file/fileZipUtils')
-
 const CSVParser = require('../../../../common/file/csvParser')
 
 const speciesFilesPath = 'species/'
@@ -25,11 +23,11 @@ class TaxonomiesImportJob extends Job {
   }
 
   async execute (tx) {
-    const { zipFile } = this.context
+    const { collectSurveyFileZip } = this.context
 
     const taxonomies = []
 
-    const speciesFileNames = FileZipUtils.entries(zipFile, speciesFilesPath)
+    const speciesFileNames = collectSurveyFileZip.getEntryNames(speciesFilesPath)
 
     this.total = speciesFileNames.length
 
@@ -45,7 +43,7 @@ class TaxonomiesImportJob extends Job {
   }
 
   async importTaxonomyFromSpeciesFile (speciesFileName, tx) {
-    const { zipFile, surveyId } = this.context
+    const { collectSurveyFileZip, surveyId } = this.context
 
     const taxonomyName = speciesFileName.substring(0, speciesFileName.length - 4)
 
@@ -55,7 +53,7 @@ class TaxonomiesImportJob extends Job {
     const taxonomy = await TaxonomyManager.createTaxonomy(this.user, surveyId, taxonomyParam)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
-    const speciesFileStream = await FileZipUtils.getEntryStream(zipFile, `${speciesFilesPath}${speciesFileName}`)
+    const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
 
     const csvParser = new CSVParser(speciesFileStream, true)
 

@@ -35,10 +35,10 @@ class SchemaImportJob extends Job {
   }
 
   async execute (tx) {
-    const { surveySource, surveyId } = this.context
+    const { collectSurvey, surveyId } = this.context
 
     // insert root entity and descendants recursively
-    await this.insertNodeDef(surveyId, null, surveySource.schema.entity, NodeDef.nodeDefType.entity, tx)
+    await this.insertNodeDef(surveyId, null, collectSurvey.schema.entity, NodeDef.nodeDefType.entity, tx)
   }
 
   /**

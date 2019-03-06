@@ -19,11 +19,11 @@ class CategoriesImportJob extends Job {
   }
 
   async execute (tx) {
-    const { surveySource, surveyId, defaultLanguage } = this.context
+    const { collectSurvey, surveyId, defaultLanguage } = this.context
 
     const categories = []
 
-    const codeLists = CollectIdmlParseUtils.toList(surveySource.codeLists.list)
+    const codeLists = CollectIdmlParseUtils.toList(collectSurvey.codeLists.list)
 
     this.total = codeLists.length
 

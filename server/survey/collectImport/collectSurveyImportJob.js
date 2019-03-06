@@ -18,6 +18,13 @@ class CollectSurveyImportJob extends Job {
     ])
   }
 
+  onFinish () {
+    const { collectSurveyFileZip } = this.context
+
+    if (collectSurveyFileZip)
+      collectSurveyFileZip.close()
+  }
+
 }
 
 CollectSurveyImportJob.type = 'CollectSurveyImportJob'

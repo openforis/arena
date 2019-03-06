@@ -1,5 +1,5 @@
 const parser = require('fast-xml-parser')
-const FileZipUtils = require('../../../../common/file/fileZipUtils')
+const FileZip = require('../../../../common/file/fileZip')
 
 const Job = require('../../../job/job')
 
@@ -15,10 +15,10 @@ class SurveySchemaReaderJob extends Job {
   }
 
   async execute (tx) {
+    const collectSurveyFileZip = new FileZip(this.params.filePath)
+    await collectSurveyFileZip.init()
 
-    const zipFile = await FileZipUtils.openFile(this.params.filePath)
-
-    const idmlXml = await FileZipUtils.getEntryAsText(zipFile, idmlXmlFileName)
+    const idmlXml = await collectSurveyFileZip.getEntryAsText(idmlXmlFileName)
 
     const options = {
       attrNodeName: '_attr',
@@ -31,7 +31,7 @@ class SurveySchemaReaderJob extends Job {
     const idmlTraversalObj = parser.getTraversalObj(idmlXml, options)
     const idmlJsonObj = parser.convertToJson(idmlTraversalObj, options)
 
-    this.setContext({zipFile, surveySource: idmlJsonObj.survey})
+    this.setContext({ collectSurveyFileZip, collectSurvey: idmlJsonObj.survey })
   }
 }
 
