@@ -1,7 +1,5 @@
 const UnauthorizedError = require('../authGroup/unauthorizedError')
 
-const File = require('../../common/file/file')
-
 const status = {
   ok: 'ok',
   error: 'error'
@@ -32,9 +30,9 @@ const sendErr = (res, err) => {
   }
 }
 
-const sendFile = (res, file) => {
-  setContentTypeFile(res, File.getName(file), File.getSize(file))
-  res.write(file.content, 'binary')
+const sendFile = (res, name, content, size) => {
+  setContentTypeFile(res, name, size)
+  res.write(content, 'binary')
   res.end(null, 'binary')
 }
 

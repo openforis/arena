@@ -25,7 +25,7 @@ const ActivityLog = require('../activityLog/activityLogger')
 const assocSurveyInfo = info => ({ info })
 
 // ====== CREATE
-const createSurvey = async (user, { name, label, lang }) => {
+const createSurvey = async (user, { name, label, lang }, createRootEntity = true) => {
 
   const survey = await db.tx(
     async t => {
@@ -42,19 +42,21 @@ const createSurvey = async (user, { name, label, lang }) => {
       const survey = await SurveyRepository.insertSurvey(props, userId, t)
       const { id: surveyId } = survey
 
-      // create survey's root entity props
-      const rootEntityDefProps = {
-        name: 'root_entity',
-        labels: { [lang]: 'Root entity' },
-        multiple: false,
-        [nodeDefLayoutProps.pageUuid]: uuidv4(),
-        [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-      }
-
       //create survey data schema
       await migrateSurveySchema(survey.id)
 
-      await NodeDefManager.createEntityDef(user, surveyId, null, uuidv4(), rootEntityDefProps, t)
+      if (createRootEntity) {
+        // create survey's root entity
+        const rootEntityDefProps = {
+          name: 'root_entity',
+          labels: { [lang]: 'Root entity' },
+          multiple: false,
+          [nodeDefLayoutProps.pageUuid]: uuidv4(),
+          [nodeDefLayoutProps.render]: nodeDefRenderType.form,
+        }
+
+        await NodeDefManager.createEntityDef(user, surveyId, null, uuidv4(), rootEntityDefProps, t)
+      }
 
       // update user prefs
       await UserRepository.updateUserPref(user, userPrefNames.survey, surveyId, t)

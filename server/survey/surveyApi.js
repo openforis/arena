@@ -13,6 +13,7 @@ const AuthMiddleware = require('../authGroup/authMiddleware')
 const JobManager = require('../job/jobManager')
 const JobUtils = require('../job/jobUtils')
 const SurveyPublishJob = require('./publish/surveyPublishJob')
+const CollectSurveyImportJob = require('./collectImport/collectSurveyImportJob')
 
 module.exports.init = app => {
 
@@ -33,6 +34,22 @@ module.exports.init = app => {
       sendErr(res, err)
     }
 
+  })
+
+  app.post('/survey/import-from-collect', async (req, res) => {
+    try {
+      const { user } = req
+
+      const file = req.files.file
+
+      const job = new CollectSurveyImportJob({ user, filePath: file.tempFilePath })
+
+      JobManager.executeJobThread(job)
+
+      res.json({job})
+    } catch (err) {
+      sendErr(res, err)
+    }
   })
 
   // ==== READ

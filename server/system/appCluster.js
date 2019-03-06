@@ -23,7 +23,9 @@ module.exports = async () => {
   app.use(fileUpload({
     //limit upload to 10MB
     limits: {fileSize: 10 * 1024 * 1024},
-    abortOnLimit: true
+    abortOnLimit: true,
+    useTempFiles : true,
+    tempFileDir : '/tmp/'
   }))
 
   headerMiddleware.init(app)

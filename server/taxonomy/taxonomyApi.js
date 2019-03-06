@@ -164,7 +164,7 @@ module.exports.init = app => {
         user,
         surveyId,
         taxonomyUuid,
-        csvString: file.data.toString('utf8')
+        filePath: file.tempFilePath
       })
 
       JobManager.executeJobThread(job)
