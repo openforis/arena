@@ -22,6 +22,7 @@ module.exports = {
   getLanguages: SurveyInfo.getLanguages,
   getDefaultLanguage: SurveyInfo.getDefaultLanguage,
   getLabels: SurveyInfo.getLabels,
+  getLabel: SurveyInfo.getLabel,
   getDefaultLabel: SurveyInfo.getDefaultLabel,
   getDescriptions: SurveyInfo.getDescriptions,
   getSRS: SurveyInfo.getSRS,

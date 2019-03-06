@@ -103,7 +103,6 @@ const getNodeDefLabel = (nodeDef, lang) => {
   return isBlank(label)
     ? getNodeDefName(nodeDef)
     : label
-
 }
 
 const getValidations = SurveyUtils.getProp(propKeys.validations, {})

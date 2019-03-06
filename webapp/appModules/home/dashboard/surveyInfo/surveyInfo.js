@@ -79,7 +79,7 @@ class SurveyInfo extends React.Component {
 
           <div className="row">
             <h4 className="survey-name">
-              {Survey.getDefaultLabel(surveyInfo, lang)}
+              {Survey.getLabel(surveyInfo, lang)}
             </h4>
 
             <Link to={appModuleUri(homeModules.surveyInfo)} className="btn btn-of-light">
