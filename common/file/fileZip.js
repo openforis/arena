@@ -6,29 +6,29 @@ class FileZip {
 
   constructor (file) {
     this.file = file
-    this.zip = null // to be initialized in init method
+    this.streamZip = null // to be initialized in init method
   }
 
   async init () {
     return new Promise((resolve, reject) => {
-      const zip = new StreamZip({
+      const streamZip = new StreamZip({
         file: this.file,
         storeEntries: true
       })
 
-      zip.on('ready', () => {
+      streamZip.on('ready', () => {
         resolve()
       })
 
       // Handle errors
-      zip.on('error', err => console.log(err) || reject(err))
+      streamZip.on('error', err => console.log(err) || reject(err))
 
-      this.zip = zip
+      this.streamZip = streamZip
     })
   }
 
   getEntryData (entryName) {
-    return this.zip.entryDataSync(entryName)
+    return this.streamZip.entryDataSync(entryName)
   }
 
   getEntryAsText (entryName) {
@@ -38,7 +38,7 @@ class FileZip {
 
   async getEntryStream (entryName) {
     return new Promise(resolve =>
-      this.zip.stream(entryName, (err, stm) => resolve(stm))
+      this.streamZip.stream(entryName, (err, stm) => resolve(stm))
     )
   }
 
@@ -47,11 +47,11 @@ class FileZip {
       R.keys,
       R.filter(R.startsWith(path)),
       R.map(entry => entry.substring(path.length))
-    )(this.zip.entries())
+    )(this.streamZip.entries())
   }
 
   close () {
-    this.zip.close()
+    this.streamZip.close()
   }
 }
 
