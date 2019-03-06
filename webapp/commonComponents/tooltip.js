@@ -3,42 +3,53 @@ import './tooltip.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-const Tooltip = ({ children, type = null, messages = [], position = 'top' }) => {
+import { elementOffset } from '../appUtils/domUtils'
 
-  const hasMessages = !R.isEmpty(messages)
+class Tooltip extends React.Component {
 
-  const className = hasMessages
-    ? `tooltip${type ? '-' + type : ''} ${position}`
-    : ''
+  constructor (props) {
+    super(props)
 
-  return <div className={className}
-              style={{ display: 'grid', width: '100%', height: '100%' }}>
+    this.state = { style: {} }
+    this.elementRef = React.createRef()
+  }
 
-    <React.Fragment>
+  getStyle () {
+    const elemOffset = this.elementRef.current && elementOffset(this.elementRef.current.parentElement)
+
+    return elemOffset ? { top: elemOffset.top + elemOffset.height } : {}
+  }
+
+  mouseEnter () {
+    const style = this.getStyle()
+    if (!R.isEmpty(style)) this.setState({ style: this.getStyle() })
+  }
+
+  render () {
+    const { children, messages = [], className, style, type = '' } = this.props
+    const { style: msgStyle } = this.state
+
+    const tooltipClass = `tooltip${type ? '-' + type : ''}` + (className ? ` ${className}` : '')
+
+    return <div className={tooltipClass} style={style} onMouseEnter={() => this.mouseEnter()}>
       {children}
 
       {
-        hasMessages
-          ? (
-            <div className="tooltip-text">
-              {
-                messages.map((msg, i) =>
-                  <div key={i}>{msg}</div>
-                )
-              }
-            </div>
-          )
-          : null
+        !R.isEmpty(messages) &&
+        <div className="message" ref={this.elementRef} style={msgStyle}>
+          {
+            messages.map((msg, i) =>
+              <div key={i}>{msg}</div>
+            )
+          }
+        </div>
       }
-    </React.Fragment>
-
-  </div>
-
+    </div>
+  }
 }
 
-export const TooltipError = (props) => (
-  <Tooltip {...props}
-           type="error"/>
-)
+Tooltip.defaultProps = {
+  message: null,
+}
 
 export default Tooltip

@@ -10,7 +10,7 @@ import Validator from '../../../../../common/validation/validator'
 import { FormItem } from '../../../../commonComponents/form/input'
 import ExpressionEditor from '../../../../commonComponents/expression/expressionEditor'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
-import { TooltipError } from '../../../../commonComponents/tooltip'
+import Tooltip from '../../../../commonComponents/tooltip2'
 
 import { getValidationFieldMessages } from '../../../../appUtils/validationUtils'
 
@@ -26,7 +26,7 @@ const ExpressionProp = (props) => {
   const errorMessages = getValidationFieldMessages(Validator.getFieldValidations(validation))
 
   return (
-    <TooltipError messages={errorMessages} position="bottom">
+    <Tooltip messages={errorMessages} position="bottom" type={!R.isEmpty(errorMessages) ? 'error' : ''}>
       <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
         {
@@ -79,7 +79,7 @@ const ExpressionProp = (props) => {
         }
 
       </div>
-    </TooltipError>
+    </Tooltip>
   )
 }
 

@@ -5,7 +5,7 @@ import ExpressionEditorPopup from '../../../../../commonComponents/expression/ex
 import TablePaginator from '../../../../../commonComponents/table/tablePaginator'
 import SortEditor from './sort/sortEditor'
 import DownloadButton from '../../../../../commonComponents/form/downloadButton'
-import Tooltip2 from '../../../../../commonComponents/tooltip2'
+import Tooltip from '../../../../../commonComponents/tooltip'
 
 import Expression from '../../../../../../common/exprParser/expression'
 
@@ -55,12 +55,12 @@ class TableHeader extends React.Component {
       <div className="table__header">
 
         <div className="data-operations">
-          <Tooltip2 message={filter}>
+          <Tooltip messages={filter && [filter]}>
             <button className={`btn btn-s btn-of-light btn-edit${filter ? ' highlight' : ''}`}
                     onClick={this.toggleExpressionEditor}>
               <span className="icon icon-filter icon-16px"/>
             </button>
-          </Tooltip2>
+          </Tooltip>
           {
             showExpressionEditor &&
             <ExpressionEditorPopup
@@ -76,12 +76,12 @@ class TableHeader extends React.Component {
 
           }
 
-          <Tooltip2 message={sort}>
+          <Tooltip messages={sort && [sort]}>
             <button className={`btn btn-s btn-of-light btn-edit${sort ? ' highlight' : ''}`}
                     onClick={this.toggleSortEditor}>
               <span className="icon icon-sort-amount-asc icon-16px"/>
             </button>
-          </Tooltip2>
+          </Tooltip>
           {
             showSortEditor &&
             <SortEditor

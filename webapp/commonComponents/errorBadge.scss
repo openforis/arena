@@ -4,20 +4,18 @@
   background-color: $redDark !important;
   display: block !important;
 
-  .message {
-    background-color: $redDark !important;
-  }
+  // .message {
+  //   background-color: $redDark !important;
+  // }
 
-  &:hover {
-    .message {
-      color: white !important;
-      margin-top: 0.8rem !important;
-      margin-left: -0.5rem !important;
-      border: 1px solid $redDark !important;
+  // &:hover {
+  //   .message {
+  //     color: white !important;
+  //     border: 1px solid $redDark !important;
 
-      &:after {
-        border-color: transparent transparent $redDark transparent !important;
-      }
-    }
-  }
+  //     &:after {
+  //       border-color: transparent transparent $redDark transparent !important;
+  //     }
+  //   }
+  // }
 }
