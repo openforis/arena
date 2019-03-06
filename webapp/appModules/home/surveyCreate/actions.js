@@ -1,48 +1,46 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import {  surveyCreate } from '../../survey/actions'
-import { getNewSurvey } from './appHomeState'
-import { showAppJobMonitor } from '../appView/components/job/actions'
+import { surveyCreate } from '../../../survey/actions'
+import { showAppJobMonitor } from '../../appView/components/job/actions'
 
-export const homeNewSurveyUpdate = 'home/newSurvey/update'
-export const homeSurveysUpdate = 'home/surveys/update'
+import * as SurveyCreateState from './surveyCreateState'
 
-// ====== New Survey
+import { fetchSurveys } from '../surveyList/actions'
+
+export const surveyCreateNewSurveyUpdate = 'surveyCreate/newSurvey/update'
 
 export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
 
   const newSurvey = R.pipe(
-    getNewSurvey,
+    SurveyCreateState.getNewSurvey,
     R.dissocPath(['validation', 'fields', name]),
     R.assoc(name, value),
   )(getState())
 
-  dispatch({type: homeNewSurveyUpdate, newSurvey})
+  dispatch({ type: surveyCreateNewSurveyUpdate, newSurvey })
 
 }
-
 export const createSurvey = surveyProps => async (dispatch, getState) => {
 
-  const {data} = await axios.post('/api/survey', surveyProps)
+  const { data } = await axios.post('/api/survey', surveyProps)
 
-  const {survey} = data
+  const { survey } = data
   const valid = !!survey
 
   if (valid) {
-    dispatch({type: surveyCreate, survey})
+    dispatch({ type: surveyCreate, survey })
   } else {
     dispatch({
-      type: homeNewSurveyUpdate,
+      type: surveyCreateNewSurveyUpdate,
       newSurvey: {
-        ...getNewSurvey(getState()),
+        ...SurveyCreateState.getNewSurvey(getState()),
         ...data,
       }
     })
   }
 
 }
-
 export const importCollectSurvey = file =>
   async dispatch => {
     const formData = new FormData()
@@ -53,17 +51,7 @@ export const importCollectSurvey = file =>
     const { data } = await axios.post(`/api/survey/import-from-collect`, formData, config)
 
     dispatch(showAppJobMonitor(data.job, () => {
+      //TODO REMOVE THIS. dispatchCurrentSurveyUpdate should be dispatched. get survey from response
       dispatch(fetchSurveys())
     }))
   }
-
-// ====== SURVEYS LIST
-
-export const fetchSurveys = () => async dispatch => {
-  try {
-    const {data} = await axios.get('/api/surveys')
-
-    dispatch({type: homeSurveysUpdate, surveys: data.surveys})
-  } catch (e) {
-  }
-}

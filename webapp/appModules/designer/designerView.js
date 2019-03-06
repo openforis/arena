@@ -4,22 +4,23 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 
+import AuthManager from '../../../common/auth/authManager'
+
 import TabBar from '../../commonComponents/tabBar'
-import SurveyInfo from './components/surveyInfo'
 import SurveyFormView from '../surveyForm/surveyFormView'
 import SurveyHierarchy from './components/surveyHierarchy'
 import RecordView from '../data/records/components/recordView'
-import Categories from '../surveyForm/components/categoriesView'
+import CategoriesView from '../surveyForm/components/categoriesView'
 import TaxonomiesView from '../surveyForm/components/taxonomiesView'
+
+import { appModules, appModuleUri } from '../appModules'
+import { designerModules } from './designerModules'
+
+import * as AppState from '../../app/appState'
+import * as SurveyState from '../../survey/surveyState'
 
 import { initSurveyDefs } from '../../survey/actions'
 import { resetForm } from '../surveyForm/actions'
-import { appModules, appModuleUri } from '../appModules'
-import { designerModules } from './designerModules'
-import { getUser } from '../../app/appState'
-import { getStateSurveyInfo } from '../../survey/surveyState'
-
-import { canEditSurvey } from '../../../common/auth/authManager'
 
 class DesignerView extends React.Component {
 
@@ -35,7 +36,7 @@ class DesignerView extends React.Component {
 
     return location.pathname === appModuleUri(appModules.designer)
       ? (
-        <Redirect to={appModuleUri(designerModules.surveyInfo)}/>
+        <Redirect to={appModuleUri(designerModules.formDesigner)}/>
       )
       : (
         <TabBar
@@ -43,13 +44,6 @@ class DesignerView extends React.Component {
           location={location}
           history={history}
           tabs={[
-
-            {
-              label: 'Info',
-              component: SurveyInfo,
-              path: appModuleUri(designerModules.surveyInfo),
-            },
-
             {
               label: 'Form Designer',
               component: SurveyFormView,
@@ -73,7 +67,7 @@ class DesignerView extends React.Component {
 
             {
               label: 'Categories',
-              component: Categories,
+              component: CategoriesView,
               path: appModuleUri(designerModules.categories)
             },
 
@@ -90,11 +84,11 @@ class DesignerView extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const user = getUser(state)
-  const surveyInfo = getStateSurveyInfo(state)
+  const user = AppState.getUser(state)
+  const surveyInfo = SurveyState.getStateSurveyInfo(state)
 
   return {
-    canEditDef: canEditSurvey(user, surveyInfo),
+    canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
   }
 }
 

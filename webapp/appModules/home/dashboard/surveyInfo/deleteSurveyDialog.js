@@ -7,22 +7,23 @@ import {
   ModalBody,
   ModalHeader,
   ModalFooter,
-} from '../../../commonComponents/modal'
+} from '../../../../commonComponents/modal'
 
 export default class DeleteSurveyDialog extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {confirmName: ''}
-    this.confirmNameChanged = this.confirmNameChanged.bind(this)
+    this.confirmNameOnChange = this.confirmNameOnChange.bind(this)
+    this.confirmNameRef = React.createRef()
   }
 
   componentDidMount () {
     this.setState({confirmName: ''})
-    this.nameInput.focus()
+    this.confirmNameRef.current.focus()
   }
 
-  confirmNameChanged (event) {
+  confirmNameOnChange (event) {
     this.setState({confirmName: event.target.value})
   }
 
@@ -49,8 +50,8 @@ export default class DeleteSurveyDialog extends React.Component {
             <input type="text"
                    className="confirm-name"
                    value={this.state.confirmName}
-                   onChange={this.confirmNameChanged}
-                   ref={input => this.nameInput = input}/>
+                   onChange={this.confirmNameOnChange}
+                   ref={this.confirmNameRef}/>
           </div>
         </ModalBody>
 
