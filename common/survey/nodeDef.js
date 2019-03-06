@@ -82,6 +82,7 @@ const isNodeDefType = type => R.pipe(getType, R.equals(type))
 
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefSingle(nodeDef)
+const isNodeDefMultipleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefMultiple(nodeDef)
 const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
 
 const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
@@ -192,6 +193,7 @@ module.exports = {
   isNodeDefAttribute,
   isNodeDefEntityOrMultiple,
   isNodeDefSingleEntity,
+  isNodeDefMultipleEntity,
   isNodeDefSingleAttribute,
   isNodeDefMultipleAttribute,
   isNodeDefReadOnly: SurveyUtils.getProp(propKeys.readOnly, false),

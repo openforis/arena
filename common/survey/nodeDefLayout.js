@@ -44,18 +44,10 @@ const isRenderDropdown = isRenderType(nodeDefRenderType.dropdown)
 const isRenderCheckbox = isRenderType(nodeDefRenderType.checkbox)
 
 const getPageUuid = getProp(nodeDefLayoutProps.pageUuid)
+
 const getNoColumns = R.pipe(
   getProp(nodeDefLayoutProps.columns, '3'),
   parseInt
-)
-
-const getDisplayIn = R.pipe(
-  getPageUuid,
-  R.ifElse(
-    R.isNil,
-    R.always(nodeDefDisplayIn.parentPage),
-    R.always(nodeDefDisplayIn.ownPage)
-  )
 )
 
 const getLayout = getProp(nodeDefLayoutProps.layout, [])
@@ -63,6 +55,12 @@ const getLayout = getProp(nodeDefLayoutProps.layout, [])
 const hasPage = R.pipe(getPageUuid, R.isNil, R.not)
 const filterInnerPageChildren = R.reject(hasPage)
 const filterOuterPageChildren = R.filter(hasPage)
+
+const getDisplayIn = R.ifElse(
+  hasPage,
+  R.always(nodeDefDisplayIn.ownPage),
+  R.always(nodeDefDisplayIn.parentPage)
+)
 
 module.exports = {
   nodeDefRenderType,
@@ -77,6 +75,7 @@ module.exports = {
   getNoColumns,
   getLayout,
   getPageUuid,
+  hasPage,
   getDisplayIn,
   filterInnerPageChildren,
   filterOuterPageChildren,

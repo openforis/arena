@@ -57,6 +57,7 @@ const actionHandlers = {
 
   // node def
   [nodeDefCreate]: (state, { nodeDef }) => assocParamsOnNodeDefCreate(nodeDef)(state),
+
   [nodeDefPropUpdate]: (state, { nodeDef, parentNodeDef, key, value }) => {
     if (key === NodeDefLayout.nodeDefLayoutProps.pageUuid) {
       // when changing displayIn (pageUuid) change form active page

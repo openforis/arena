@@ -18,6 +18,8 @@ import {
   filterInnerPageChildren,
   getLayout,
   getNoColumns,
+  isRenderForm,
+  hasPage,
 } from '../../../../../../common/survey/nodeDefLayout'
 
 import { setFormPageNode, getNodeKeyLabelValues } from '../../../actions'
@@ -26,6 +28,13 @@ import * as SurveyFormState from '../../../../../appModules/surveyForm/surveyFor
 import * as RecordState from '../../../record/recordState'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
+
+const EntityFormHeader = ({ nodeDef, label }) => (
+  isRenderForm(nodeDef) && !hasPage(nodeDef) &&
+  <div className="node-def__inner-form-header">
+    {label}
+  </div>
+)
 
 const EntityForm = props => {
   const {
@@ -56,41 +65,44 @@ const EntityForm = props => {
       : null
   }
 
-  return (
-    innerPageChildren.length > 0
-      ? <ResponsiveGridLayout breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-                              autoSize={false}
-                              rowHeight={edit && canEditDef? 80 : 50}
-                              cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
-                              layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
-                              containerPadding={edit && canEditDef ? [30, 50] : [30, 30]}
-                              onLayoutChange={onLayoutChange}
-                              isDraggable={edit && canEditDef && !locked}
-                              isResizable={edit && canEditDef && !locked}
-                              compactType={null}
-                              useCSSTransforms={false}>
+  return innerPageChildren.length > 0
+    ? (
+      <ResponsiveGridLayout
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        autoSize={false}
+        rowHeight={edit && canEditDef ? 80 : 50}
+        cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
+        layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
+        containerPadding={edit && canEditDef ? [30, 50] : [30, 30]}
+        onLayoutChange={onLayoutChange}
+        isDraggable={edit && canEditDef && !locked}
+        isResizable={edit && canEditDef && !locked}
+        compactType={null}
+        useCSSTransforms={false}>
 
         {
           innerPageChildren
             .map((childDef, i) =>
-              <div key={childDef.uuid} id={childDef.uuid}>
-                <NodeDefSwitch key={i}
-                               edit={edit}
-                               entry={entry}
-                               recordUuid={recordUuid}
-                               surveyInfo={surveyInfo}
-                               nodeDef={childDef}
-                               parentNode={node}
-                               canEditDef={canEditDef}
-                               canEditRecord={canEditRecord}
-                               canAddNode={canAddNode}/>
+              <div key={childDef.uuid} id={childDef.uuid}
+                   className={NodeDef.isNodeDefEntity(childDef) && isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
+                <NodeDefSwitch
+                  key={i}
+                  edit={edit}
+                  entry={entry}
+                  recordUuid={recordUuid}
+                  surveyInfo={surveyInfo}
+                  nodeDef={childDef}
+                  parentNode={node}
+                  canEditDef={canEditDef}
+                  canEditRecord={canEditRecord}
+                  canAddNode={canAddNode}/>
               </div>
             )
         }
 
       </ResponsiveGridLayout>
-      : null
-  )
+    )
+    : null
 }
 
 const NodeSelect = props => {
@@ -183,11 +195,9 @@ class NodeDefEntityForm extends React.Component {
 
   render () {
     const {
-      nodeDef,
-      edit,
-      entry,
-      parentNode,
-      nodes,
+      nodeDef, label,
+      edit, entry,
+      parentNode, nodes,
 
       setFormPageNode,
       selectedNode,
@@ -197,16 +207,22 @@ class NodeDefEntityForm extends React.Component {
     return entry && NodeDef.isNodeDefMultiple(nodeDef)
       ? (
         <div className="node-def-entity-form__wrapper" ref={this.formWrapper}>
-          <NodeDefErrorBadge  nodeDef={nodeDef}
-                              edit={edit}
-                              parentNode={parentNode}
-                              nodes={nodes}
-                              container={this.formWrapper}/>
+          <NodeDefErrorBadge
+            nodeDef={nodeDef}
+            edit={edit}
+            parentNode={parentNode}
+            nodes={nodes}
+            container={this.formWrapper}/>
 
-          <NodeSelect {...this.props}
-                      selectedNode={selectedNode}
-                      getNodeKeyLabelValues={getNodeKeyLabelValues}
-                      onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}/>
+          <EntityFormHeader
+            nodeDef={nodeDef}
+            label={label}/>
+
+          <NodeSelect
+            {...this.props}
+            selectedNode={selectedNode}
+            getNodeKeyLabelValues={getNodeKeyLabelValues}
+            onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}/>
 
           {
             selectedNode
@@ -216,7 +232,16 @@ class NodeDefEntityForm extends React.Component {
         </div>
       )
       : (
-        <EntityForm {...this.props} node={entry ? nodes[0] : null}/>
+        <React.Fragment>
+          <EntityFormHeader
+            nodeDef={nodeDef}
+            label={label}/>
+
+          <EntityForm
+            {...this.props}
+            node={entry ? nodes[0] : null}
+          />
+        </React.Fragment>
       )
 
   }
