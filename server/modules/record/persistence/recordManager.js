@@ -17,10 +17,8 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
   }
 }
 
-const fetchRecordByUuid = async (surveyId, recordUuid, client = db) => {
-  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
-  return record
-}
+const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
+  await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
 
 const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, client = db) => {
   const record = await fetchRecordByUuid(surveyId, recordUuid, client)
@@ -32,9 +30,9 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, client = db) => {
 module.exports = {
   fetchRecordByUuid,
   fetchRecordAndNodesByUuid,
-  countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId,
   fetchRecordUuids: RecordRepository.fetchRecordUuids,
+  countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
 
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
   fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,

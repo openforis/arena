@@ -7,7 +7,7 @@ const { userPrefNames, getUserPrefSurveyId } = require('../../common/user/userPr
 const AuthManager = require('../../common/auth/authManager')
 const SurveyManager = require('../survey/surveyManager')
 const UserManager = require('../user/userManager')
-const RecordUpdateManager = require('../record/update/recordUpdateManager')
+const RecordService = require('../modules/record/service/recordService')
 
 const Survey = require('../../common/survey/survey')
 
@@ -63,7 +63,7 @@ module.exports.init = app => {
   app.post('/auth/logout', (req, res) => {
     // before logout checkOut record if there's an opened thread
     const { user } = req
-    RecordUpdateManager.checkOut(user.id)
+    RecordService.terminateUserThread(user.id)
 
     req.logout()
     sendOk(res)

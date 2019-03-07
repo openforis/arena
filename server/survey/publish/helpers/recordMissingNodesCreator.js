@@ -5,7 +5,7 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 
-const RecordUpdater = require('../../../record/update/thread/helpers/recordUpdater')
+const RecordUpdateManager = require('../../../modules/record/persistence/recordUpdateManager')
 
 /**
  * Inserts missing single nodes.
@@ -28,12 +28,11 @@ const insertMissingSingleNode = async (survey, childDef, record, parentNode, use
     const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
     if (R.isEmpty(children)) {
       const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), Node.getUuid(parentNode))
-      return await new RecordUpdater().insertNode(survey, record, childNode, user, tx)
+      return await RecordUpdateManager.insertNode(survey, record, childNode, user, tx)
     }
   }
   return {}
 }
-
 module.exports = {
   insertMissingSingleNodes
 }

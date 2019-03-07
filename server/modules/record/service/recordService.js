@@ -25,7 +25,7 @@ const checkOutTimeoutsByUserId = {}
  * THREAD
  * ======
  */
-const createThread = (user, surveyId, recordUuid, preview) => {
+const createUserThread = (user, surveyId, recordUuid, preview) => {
   const userId = user.id
 
   RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
@@ -50,7 +50,7 @@ const createThread = (user, surveyId, recordUuid, preview) => {
   return RecordThreads.putThreadByUserId(userId, thread)
 }
 
-const terminateThread = userId => {
+const terminateUserThread = userId => {
   if (!checkOutTimeoutsByUserId[userId])
     checkOutTimeoutsByUserId[userId] = setTimeout(
       () => {
@@ -76,7 +76,7 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
   recordUsersIds.forEach(userIdRecord => {
     if (userIdRecord !== user.id) {
       WebSocketManager.notifyUser(userIdRecord, WebSocketEvents.recordDelete, recordUuid)
-      terminateThread(userIdRecord)
+      terminateUserThread(userIdRecord)
     }
   })
 }
@@ -88,7 +88,7 @@ const checkIn = async (user, surveyId, recordUuid) => {
     cancelCheckOut(user.id)
     if (!RecordThreads.getThreadByUserId(user.id)) {
       //Start record update thread
-      createThread(user, surveyId, recordUuid, Record.isPreview(record))
+      createUserThread(user, surveyId, recordUuid, Record.isPreview(record))
     }
   }
 
@@ -102,7 +102,7 @@ const checkOut = async (user, surveyId, recordUuid) => {
     await RecordUpdateManager.deleteRecordPreview(user, surveyId, recordUuid)
   }
 
-  terminateThread(user.id)
+  terminateUserThread(user.id)
 }
 
 const cancelCheckOut = userId => {
@@ -153,6 +153,7 @@ module.exports = {
   createRecord: RecordUpdateManager.createRecord,
 
   //read
+  fetchRecordByUuid: RecordManager.fetchRecordByUuid,
   countRecordsBySurveyId: RecordManager.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId: RecordManager.fetchRecordsSummaryBySurveyId,
 
@@ -165,6 +166,7 @@ module.exports = {
 
   checkIn,
   checkOut,
+  terminateUserThread,
 
   //======  NODE
   fetchNodeByUuid: RecordManager.fetchNodeByUuid,

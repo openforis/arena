@@ -159,7 +159,6 @@ const _onNodesUpdate = async (survey, record, updatedNodes,
 module.exports = {
   // RECORD
   createRecord,
-
   updateRecordStep,
 
   deleteRecord,
@@ -167,6 +166,7 @@ module.exports = {
   deleteRecordsPreview: RecordRepository.deleteRecordsPreview,
 
   // NODE
+  insertNode: NodeUpdateManager.insertNode,
   persistNode,
   deleteNode,
 }

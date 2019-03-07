@@ -11,7 +11,7 @@ const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
 
 const DataCol = require('../schemaRdb/dataCol')
 
-const NodeRepository = require('../../record/nodeRepository')
+const NodeRepository = require('../../modules/record/persistence/nodeRepository')
 
 const runSelect = async (surveyId, tableName, cols, offset, limit, filter = '', client) => {
   const schemaName = SchemaRdb.getName(surveyId)

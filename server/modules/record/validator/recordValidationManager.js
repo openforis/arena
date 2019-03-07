@@ -9,9 +9,9 @@ const Validator = require('../../../../common/validation/validator')
 
 const RecordRepository = require('../persistence/recordRepository')
 
-const CountValidator = require('./helpers/countValidator')
-const AttributeValidator = require('./helpers/attributeValidator')
-const KeysUniquenessValidator = require('./helpers/keysUniquenessValidator')
+const CountValidator = require('./validators/countValidator')
+const AttributeValidator = require('./validators/attributeValidator')
+const KeysUniquenessValidator = require('./validators/keysUniquenessValidator')
 
 const validateNodes = async (survey, record, nodes, tx) => {
 

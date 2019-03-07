@@ -7,9 +7,9 @@ const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
 
 const SurveyManager = require('../../survey/surveyManager')
-const RecordManager = require('../../record/recordManager')
-const DependentNodesUpdater = require('../../record/update/thread/helpers/dependentNodesUpdater')
-const RecordValidationManager = require('../../record/validator/recordValidationManager')
+const RecordManager = require('../../modules/record/persistence/recordManager')
+const NodeDependentUpdateManager = require('../../modules/record/persistence/nodeDependentUpdateManager')
+const RecordValidationManager = require('../../modules/record/validator/recordValidationManager')
 
 const RecordMissingNodesCreator = require('./helpers/recordMissingNodesCreator')
 
@@ -72,7 +72,7 @@ const applyDefaultValues = async (survey, nodeDefsUpdated, record, newNodes, tx)
 
   const nodesToUpdate = R.mergeRight(newNodes, updatedNodes)
 
-  return await DependentNodesUpdater.updateNodes(survey, record, nodesToUpdate, tx)
+  return await NodeDependentUpdateManager.updateNodes(survey, record, nodesToUpdate, tx)
 }
 
 const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {

@@ -139,6 +139,7 @@ const deleteNode = async (user, survey, record, nodeUuid, t) => {
 }
 
 module.exports = {
+  insertNode,
   persistNode,
   deleteNode,
 }
