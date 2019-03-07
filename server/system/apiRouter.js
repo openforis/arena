@@ -12,7 +12,6 @@ require('../category/categoryApi').init(router)
 require('../taxonomy/taxonomyApi').init(router)
 require('../srs/srsApi').init(router)
 
-// require('../record/recordApi').init(router)
 require('../modules/record/api/recordApi').init(router)
 
 require('../surveyRdb/surveyRdbApi').init(router)

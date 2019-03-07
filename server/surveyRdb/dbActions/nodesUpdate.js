@@ -14,16 +14,21 @@ const types = { insert: 'insert', update: 'update', delete: 'delete' }
 
 const hasTable = NodeDef.isNodeDefEntityOrMultiple
 
-const getType = (nodeDef, node) =>
-  node.created && hasTable(nodeDef)
+const getType = (nodeDef, node) => {
+  const created = Node.isCreated(node)
+  const updated = Node.isUpdated(node)
+  const deleted = Node.isDeleted(node)
+
+  return created && hasTable(nodeDef)
     ? types.insert
-    : node.updated || node.created
+    : updated || created
       ? types.update
-      : node.deleted && hasTable(nodeDef)
+      : deleted && hasTable(nodeDef)
         ? types.delete
-        : node.deleted
+        : deleted
           ? types.update
           : null
+}
 
 const getColNames = (nodeDef, type) =>
   R.flatten(type === types.insert
@@ -62,14 +67,14 @@ const toUpdates = async (surveyInfo, nodeDefs, nodes) => {
       const type = getType(nodeDef, node)
 
       return type ? {
-        type,
-        schemaName: SchemaRdb.getName(surveyInfo.id),
-        tableName: DataTable.getName(nodeDef, nodeDefParent),
-        colNames: getColNames(nodeDef, type),
-        colValues: await getColValues(surveyInfo, nodeDef, node, type),
-        rowUuid: getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])
-      }
-      : null
+          type,
+          schemaName: SchemaRdb.getName(surveyInfo.id),
+          tableName: DataTable.getName(nodeDef, nodeDefParent),
+          colNames: getColNames(nodeDef, type),
+          colValues: await getColValues(surveyInfo, nodeDef, node, type),
+          rowUuid: getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])
+        }
+        : null
     })
   )
   return R.reject(R.isNil, updates)
@@ -109,7 +114,7 @@ const run = async (surveyInfo, nodeDefs, nodes, client) => {
       isType(types.update)(update)
         ? runUpdate(update, client)
         : isType(types.insert)(update) ? runInsert(update, client)
-          : runDelete(update, client)
+        : runDelete(update, client)
     )
   )
 }

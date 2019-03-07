@@ -21,9 +21,10 @@ const recordThreadMessageTypes = require('./update/thread/recordThreadMessageTyp
 const checkOutTimeoutsByUserId = {}
 
 /**
- * ====== THREAD
+ * ======
+ * THREAD
+ * ======
  */
-
 const createThread = (user, surveyId, recordUuid, preview) => {
   const userId = user.id
 
@@ -146,22 +147,26 @@ const deleteNode = (user, nodeUuid) => {
 }
 
 module.exports = {
-  //RECORD
+  //====== RECORD
 
   //create
   createRecord: RecordUpdateManager.createRecord,
+
   //read
   countRecordsBySurveyId: RecordManager.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId: RecordManager.fetchRecordsSummaryBySurveyId,
+
   //update
   updateRecordStep: RecordUpdateManager.updateRecordStep,
+
   // delete
   deleteRecord,
+  deleteRecordsPreview: RecordUpdateManager.deleteRecordsPreview,
 
   checkIn,
   checkOut,
 
-  // NODE
+  //======  NODE
   fetchNodeByUuid: RecordManager.fetchNodeByUuid,
   persistNode,
   deleteNode,
