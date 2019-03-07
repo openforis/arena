@@ -7,6 +7,7 @@ const router = express.Router()
 require('../user/userApi').init(router)
 
 require('../survey/surveyApi').init(router)
+require('../modules/survey/api').init(router)
 require('../nodeDef/nodeDefApi').init(router)
 require('../category/categoryApi').init(router)
 require('../taxonomy/taxonomyApi').init(router)
