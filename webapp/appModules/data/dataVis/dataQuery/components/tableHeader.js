@@ -22,6 +22,7 @@ class TableHeader extends React.Component {
     this.state = {
       showExpressionEditor: false,
       showSortEditor: false,
+      sortMsg: '',
     }
   }
 
@@ -39,18 +40,27 @@ class TableHeader extends React.Component {
     }))
   }
 
+  updateSort (sort, sortMsg) {
+    const { updateTableSort } = this.props
+
+    updateTableSort(sort)
+    this.setState({ sortMsg })
+  }
+
   render () {
 
-    const { showExpressionEditor, showSortEditor } = this.state
+    const { showExpressionEditor, showSortEditor, sortMsg } = this.state
 
     const {
       surveyId, nodeDefUuidContext, nodeDefUuidCols,
       tableName, colNames, filter, sort, limit, offset, count,
-      updateTableFilter, updateTableOffset, updateTableSort,
+      updateTableFilter, updateTableOffset,
       showPaginator,
     } = this.props
 
     const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${filter}&sort=${sort}&cols=${JSON.stringify(colNames)}`
+    const sortMessage = sort.length ? [sortMsg] : []
+
     return (
       <div className="table__header">
 
@@ -76,8 +86,8 @@ class TableHeader extends React.Component {
 
           }
 
-          <Tooltip messages={sort && [sort]}>
-            <button className={`btn btn-s btn-of-light btn-edit${sort ? ' highlight' : ''}`}
+          <Tooltip messages={sortMessage}>
+            <button className={`btn btn-s btn-of-light btn-edit${sort.length ? ' highlight' : ''}`}
                     onClick={this.toggleSortEditor}>
               <span className="icon icon-sort-amount-asc icon-16px"/>
             </button>
@@ -88,7 +98,7 @@ class TableHeader extends React.Component {
               nodeDefUuidCols={nodeDefUuidCols}
               nodeDefUuidContext={nodeDefUuidContext}
               sort={sort}
-              onChange={updateTableSort}
+              onChange={(sort, sortMsg) => this.updateSort(sort, sortMsg)}
               onClose={this.toggleSortEditor}/>
 
           }

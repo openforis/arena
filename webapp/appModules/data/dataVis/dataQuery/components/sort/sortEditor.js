@@ -2,19 +2,21 @@ import './sortEditor.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
 import Expression from '../../../../../../../common/exprParser/expression'
 
 import Popup from '../../../../../../commonComponents/popup'
-import SortRow from './sortRow'
+import * as ExpressionVariables from '../../../../../../commonComponents/expression/expressionVariables'
 
-import * as SurveyState from '../../../../../../survey/surveyState'
+import SortRow from './sortRow'
 
 import Survey from '../../../../../../../common/survey/survey'
 
-import * as Sort from './sort'
+import * as SurveyState from '../../../../../../survey/surveyState'
 
-import * as ExpressionVariables from '../../../../../../commonComponents/expression/expressionVariables'
+import * as DataSort from './dataSort'
+
 
 class SortExpressionComponent extends React.Component {
 
@@ -23,7 +25,7 @@ class SortExpressionComponent extends React.Component {
 
     this.state = {
       edit: false,
-      sortCriteria: Sort.deserialize(props.sort),
+      sortCriteria: props.sort,
       unchosenVariables: [],
     }
   }
@@ -40,7 +42,7 @@ class SortExpressionComponent extends React.Component {
     // Only show selected variables in the dropdown menu
     if (availableVariables !== prevAvailableVariables) {
       // reset available variables and remove unavailable variables from criteria
-      const newSortCriteria = Sort.getNewCriteria(sortCriteria, availableVariables)
+      const newSortCriteria = DataSort.getNewCriteria(sortCriteria, availableVariables)
 
       this.setState({ sortCriteria: newSortCriteria },
         () => this.refreshUnchosenVariables())
@@ -50,42 +52,42 @@ class SortExpressionComponent extends React.Component {
   onSelectVariable (pos, variable) {
     const { sortCriteria } = this.state
 
-    this.setState({ sortCriteria: Sort.update(sortCriteria, pos, 'variable', variable) },
+    this.setState({ sortCriteria: DataSort.updateVariable(sortCriteria, pos, variable) },
       () => this.refreshUnchosenVariables())
   }
 
   onSelectOrder (pos, order) {
     const { sortCriteria } = this.state
 
-    this.setState({ sortCriteria: Sort.update(sortCriteria, pos, 'order', order) })
+    this.setState({ sortCriteria: DataSort.updateOrder(sortCriteria, pos, order) })
   }
 
   refreshUnchosenVariables () {
     const { availableVariables } = this.props
     const { sortCriteria } = this.state
 
-    this.setState({ unchosenVariables: Sort.getUnchosenVariables(sortCriteria, availableVariables) })
+    this.setState({ unchosenVariables: DataSort.getUnchosenVariables(sortCriteria, availableVariables) })
   }
 
-  addCriteria ({ value: variable }) {
+  addCriteria ({ value: variable, label }) {
     const { sortCriteria } = this.state
 
-    this.setState({ sortCriteria: Sort.addCriteria(sortCriteria, variable, 'asc') },
+    this.setState({ sortCriteria: DataSort.addCriteria(sortCriteria, variable, label, 'asc') },
       () => this.refreshUnchosenVariables())
   }
 
   deleteCriteria (pos) {
     const { sortCriteria } = this.state
 
-    this.setState({ sortCriteria: Sort.deleteCriteria(sortCriteria, pos) },
+    this.setState({ sortCriteria: DataSort.deleteCriteria(sortCriteria, pos) },
       () => this.refreshUnchosenVariables())
   }
 
   applyChange () {
     const { sortCriteria } = this.state
-    const { onChange, onClose } = this.props
+    const { onChange, onClose, availableVariables } = this.props
 
-    onChange && onChange(Sort.serialize(sortCriteria))
+    onChange && onChange(sortCriteria, DataSort.getViewExpr(sortCriteria, availableVariables))
     onClose()
   }
 
@@ -95,7 +97,7 @@ class SortExpressionComponent extends React.Component {
   }
 
   render () {
-    const { onClose } = this.props
+    const { onClose, availableVariables } = this.props
     const { sortCriteria, unchosenVariables } = this.state
 
     return (
@@ -110,8 +112,8 @@ class SortExpressionComponent extends React.Component {
               <SortRow
                 key={criteria.variable}
                 variables={unchosenVariables}
-                selectedVariable={criteria.variable}
-                onSelectVariable={item => this.onSelectVariable(pos, item.value)}
+                selectedVariable={DataSort.getVariable(availableVariables, criteria.variable)}
+                onSelectVariable={item => this.onSelectVariable(pos, item)}
                 selectedOrder={criteria.order}
                 onSelectOrder={order => this.onSelectOrder(pos, order)}
                 onDelete={() => this.deleteCriteria(pos)}

@@ -28,7 +28,7 @@ export const getTableOffset = getTableProp(tableKeys.offset)
 export const getTableLimit = getTableProp(tableKeys.limit)
 export const getTableCount = getTableProp(tableKeys.count)
 export const getTableFilter = getTableProp(tableKeys.filter, '')
-export const getTableSort = getTableProp(tableKeys.sort, '')
+export const getTableSort = getTableProp(tableKeys.sort, [])
 export const getTableNodeDefUuidTable = getTableProp(tableKeys.nodeDefUuidTable)
 export const getTableNodeDefUuidCols = getTableProp(tableKeys.nodeDefUuidCols, [])
 

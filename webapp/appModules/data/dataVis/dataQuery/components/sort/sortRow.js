@@ -25,7 +25,8 @@ const SortRow = (props) => {
       <Dropdown
         items={variables}
         selection={selectedVariable}
-        itemLabelProp="label" itemKeyProp="value"
+        itemLabelProp="label"
+        itemKeyProp="value"
         inputSize={25}
         onChange={item => onSelectVariable(item)} />
 

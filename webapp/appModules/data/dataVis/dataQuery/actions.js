@@ -6,7 +6,7 @@ import * as SurveyState from '../../../../survey/surveyState'
 import * as DataQueryState from './dataQueryState'
 import NodeDefTable from '../../../../../common/surveyRdb/nodeDefTable'
 
-import * as Sort from './components/sort/sort'
+import * as DataSort from './components/sort/dataSort'
 
 export const dataQueryTableNodeDefUuidUpdate = 'dataQuery/table/nodeDefUuid/update'
 export const dataQueryTableNodeDefUuidColsUpdate = 'dataQuery/table/nodeDefUuidCols/update'
@@ -35,7 +35,7 @@ const getColNames = (state, nodeDefUuidCols) => {
 
 const queryTable = (surveyId, tableName, cols, offset = 0, filter = '', sort = '') =>
   axios.get(
-    `/api/surveyRdb/${surveyId}/${tableName}/query?cols=${JSON.stringify(cols)}&offset=${offset}&limit=${defaults.limit}&filter=${filter}&sort=${sort}`,
+    `/api/surveyRdb/${surveyId}/${tableName}/query?cols=${JSON.stringify(cols)}&offset=${offset}&limit=${defaults.limit}&filter=${filter}&sort=${DataSort.serialize(sort)}`,
     // {params: {cols: JSON.stringify(cols), offset, limit}}
   )
 
@@ -70,7 +70,7 @@ export const updateTableNodeDefUuidCols = (nodeDefUuidCols, nodeDefUuidCol = nul
 
     dispatch({ type: dataQueryTableNodeDefUuidColsUpdate, nodeDefUuidCols })
 
-    const newSort = Sort.deleteVariablesByNames(DataQueryState.getTableSort(state), getColNames(state, nodeDefUuidCols))
+    const newSort = DataSort.deleteVariablesByNames(DataQueryState.getTableSort(state), getColNames(state, nodeDefUuidCols))
     dispatch({ type: dataQueryTableSortUpdate, sort: newSort })
 
     const fetch = !R.isEmpty(nodeDefUuidCols) &&
