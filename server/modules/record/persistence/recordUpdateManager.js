@@ -1,71 +1,146 @@
 const R = require('ramda')
+const Promise = require('bluebird')
 
+const db = require('../../../db/db')
+
+const { isBlank } = require('../../../../common/stringUtils')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
-const Node = require('../../../../common/record/node')
 const Record = require('../../../../common/record/record')
+const RecordStep = require('../../../../common/record/recordStep')
+const Node = require('../../../../common/record/node')
 
+const RecordUsersMap = require('../service/update/recordUsersMap')
 const RecordRepository = require('./recordRepository')
-const NodeUpdateManager = require('./nodeUpdateManager')
-const RecordUsersMap = require('./recordUsersMap')
-const DependentNodesUpdater = require('./dependentNodesUpdater')
+const RecordManager = require('./recordManager')
 const RecordValidationManager = require('../validator/recordValidationManager')
+const NodeUpdateManager = require('./nodeUpdateManager')
+const NodeDependentUpdateManager = require('./nodeDependentUpdateManager')
+
 const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
+const FileManager = require('../../../file/fileManager')
 
 const ActivityLog = require('../../../activityLog/activityLogger')
 
-// ==== UTILS
-
-const logActivity = async () => await R.apply(ActivityLog.log, arguments)
-
 /**
- * ==== RECORD
+ * =======
+ * RECORD
+ * =======
  */
 
 //==== CREATE
-const createRecord = async (user, survey, recordToCreate, preview, nodesUpdateListener, nodesValidationListener, t) => {
-  const surveyId = Survey.getId(survey)
 
-  const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
-  if (!preview)
-    await logActivity(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
+const createRecord = async (user, survey, recordToCreate) =>
+  await db.tx(async t => {
+    const surveyId = Survey.getId(survey)
 
-  const rootNodeDef = Survey.getRootNodeDef(survey)
-  const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(recordToCreate))
+    const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
+    if (!Record.isPreview(record))
+      await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
 
-  return await persistNode(user, survey, record, rootNode, preview, nodesUpdateListener, nodesValidationListener, t)
+    const rootNodeDef = Survey.getRootNodeDef(survey)
+    const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(recordToCreate))
+
+    return await persistNode(user, survey, record, rootNode, null, null, t)
+  })
+
+//==== UPDATE
+
+const updateRecordStep = async (surveyId, recordUuid, stepId) => {
+  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
+
+  // check if the step exists and that is't adjacent to the current one
+  const currentStepId = Record.getStep(record)
+  const stepCurrent = RecordStep.getStep(currentStepId)
+  const stepUpdate = RecordStep.getStep(stepId)
+
+  if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
+    await RecordRepository.updateRecordStep(surveyId, recordUuid, stepId)
+  } else {
+    throw new Error('Can\'t update step')
+  }
+
 }
 
-const persistNode = async (user, survey, record, node, preview, nodesUpdateListener, nodesValidationListener, t) => {
-  const updatedNodes = await NodeUpdateManager.persistNode(user, survey, record, node, preview, t)
-
-  return await onNodesUpdate(survey, record, updatedNodes, preview, nodesUpdateListener, nodesValidationListener, t)
+//==== DELETE
+const deleteRecord = async (user, surveyId, recordUuid) => {
+  await db.tx(async t => {
+    await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, { recordUuid }, t)
+    await RecordRepository.deleteRecord(user, surveyId, recordUuid, t)
+  })
 }
 
-const deleteNode = async (user, survey, record, nodeUuid, preview, nodesUpdateListener, nodesValidationListener, t) => {
-  const updatedNodes = await NodeUpdateManager.deleteNode(user, survey, record, nodeUuid, preview, t)
+const deleteRecordPreview = async (user, surveyId, recordUuid) =>
+  await db.tx(async t => {
+    const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, t)
 
-  return await onNodesUpdate(survey, record, updatedNodes, preview, nodesUpdateListener, nodesValidationListener, t)
-}
+    const fileUuids = R.pipe(
+      Record.getNodesArray,
+      R.map(Node.getNodeFileUuid),
+      R.reject(isBlank),
+    )(record)
+    // delete record and files
+    await Promise.all([
+        RecordRepository.deleteRecord(user, surveyId, Record.getUuid(record), t),
+        ...fileUuids.map(fileUuid => FileManager.deleteFileByUuid(surveyId, fileUuid, t)),
+      ]
+    )
+  })
 
-const onNodesUpdate = async (survey, record, updatedNodes, preview, nodesUpdateListener, nodesValidationListener, t) => {
+/**
+ * ======
+ * NODE
+ * ======
+ */
+const persistNode = async (user, survey, record, node,
+                           nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+  await t.tx(async t =>
+    await _onNodesUpdate(
+      survey,
+      record,
+      await NodeUpdateManager.persistNode(user, survey, record, node, t),
+      nodesUpdateListener,
+      nodesValidationListener,
+      t,
+    )
+  )
+
+const deleteNode = async (user, survey, record, nodeUuid,
+                          nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+  await t.tx(async t =>
+    await _onNodesUpdate(
+      survey,
+      record,
+      await NodeUpdateManager.deleteNode(user, survey, record, nodeUuid, t),
+      nodesUpdateListener,
+      nodesValidationListener,
+      t,
+    )
+  )
+
+const _onNodesUpdate = async (survey, record, updatedNodes,
+                              nodesUpdateListener, nodesValidationListener, t) => {
+  // 1. update record and notify
+  if (nodesUpdateListener)
+    nodesUpdateListener(updatedNodes)
   record = Record.assocNodes(updatedNodes)(record)
-  nodesUpdateListener(updatedNodes, t)
 
   // 2. update dependent nodes
-  const updatedDependentNodes = await DependentNodesUpdater.updateNodes(survey, record, updatedNodes, t)
+  const updatedDependentNodes = await NodeDependentUpdateManager.updateNodes(survey, record, updatedNodes, t)
+  if (nodesUpdateListener)
+    nodesUpdateListener(updatedDependentNodes)
   record = Record.assocNodes(updatedDependentNodes)(record)
-  nodesUpdateListener(updatedDependentNodes)
 
   const updatedNodesAndDependents = R.mergeDeepRight(updatedNodes, updatedDependentNodes)
 
   // 3. update node validations
   const validations = await RecordValidationManager.validateNodes(survey, record, updatedNodesAndDependents, preview, t)
+  if (nodesValidationListener)
+    nodesValidationListener(validations)
   record = Record.mergeNodeValidations(validations)(record)
-  nodesValidationListener(validations)
 
-  if (preview) {
+  if (Record.isPreview(record)) {
     // 4. touch preview record
     RecordUsersMap.touchPreviewRecord(Record.getUuid(record))
   } else {
@@ -80,7 +155,16 @@ const onNodesUpdate = async (survey, record, updatedNodes, preview, nodesUpdateL
 }
 
 module.exports = {
+  // RECORD
   createRecord,
+
+  updateRecordStep,
+
+  deleteRecord,
+  deleteRecordPreview,
+  deleteRecordsPreview: RecordRepository.deleteRecordsPreview,
+
+  // NODE
   persistNode,
   deleteNode,
 }

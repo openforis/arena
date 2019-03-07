@@ -13,7 +13,7 @@ const NodeDependencyManager = require('../../persistence/nodeDependencyManager')
 
 const TypeValidator = require('./typeValidator')
 
-const RecordExprParser = require('../../persistence/recordExprParser')
+const RecordExprParser = require('../../recordExprParser')
 
 const errorKeys = {
   required: 'required',

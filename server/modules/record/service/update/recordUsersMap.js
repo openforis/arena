@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const { isDateBefore } = require('../../../../common/dateUtils')
+const { isDateBefore } = require('../../../../../common/dateUtils')
 
 const recordUserIdsMap = new Map()
 const previewRecordsMap = new Map()

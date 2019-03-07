@@ -1,5 +1,4 @@
 const types = {
-  createRecord: 'createRecord',
   persistNode: 'persistNode',
   deleteNode: 'deleteNode',
 }

@@ -10,6 +10,7 @@ class ThreadsCache {
 
   putThread (key, worker) {
     this.threads[key] = worker
+    return worker
   }
 
   removeThread (key) {

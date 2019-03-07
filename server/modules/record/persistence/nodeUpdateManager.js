@@ -7,14 +7,9 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
 const Record = require('../../../../common/record/record')
 
-const RecordRepository = require('./recordRepository')
 const NodeRepository = require('./nodeRepository')
 
 const ActivityLog = require('../../../activityLog/activityLogger')
-
-// ==== UTILS
-
-const logActivity = async () => await R.apply(ActivityLog.log, arguments)
 
 //always assoc parentNode, used in surveyRdbManager.updateTableNodes
 const assocParentNode = (surveyId, record, node, nodes) => {
@@ -25,7 +20,7 @@ const assocParentNode = (surveyId, record, node, nodes) => {
   return R.mergeRight({ ...nodeObj, ...parentNodeObj }, nodes)
 }
 
-const persistNode = async (user, survey, record, node, preview, t) => {
+const persistNode = async (user, survey, record, node, t) => {
   const nodeUuid = Node.getUuid(node)
 
   const existingNode = Record.getNodeByUuid(nodeUuid)(record)
@@ -33,8 +28,8 @@ const persistNode = async (user, survey, record, node, preview, t) => {
   if (existingNode) {
     // update
     const surveyId = Survey.getId(survey)
-    if (!preview)
-      await logActivity(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
+    if (!Record.isPreview(record))
+      await ActivityLog.log(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
 
     const nodeValue = Node.getNodeValue(node)
     const meta = { [Node.metaKeys.defaultValue]: false }
@@ -46,12 +41,12 @@ const persistNode = async (user, survey, record, node, preview, t) => {
 
   } else {
     // create
-    return await insertNode(survey, record, node, user, preview, t)
+    return await insertNode(survey, record, node, user, t)
   }
 }
 
 // ==== CREATE
-const insertNode = async (survey, record, node, user, preview, t) => {
+const insertNode = async (survey, record, node, user, t) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
@@ -63,18 +58,18 @@ const insertNode = async (survey, record, node, user, preview, t) => {
     }
   }
 
-  const nodesToReturn = await _insertNodeRecursively(survey, nodeDef, record, node, user, preview, t)
+  const nodesToReturn = await _insertNodeRecursively(survey, nodeDef, record, node, user, t)
 
   record = Record.assocNodes(nodesToReturn)(record)
 
   return assocParentNode(Survey.getId(survey), record, node, nodesToReturn)
 }
 
-const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, user, preview, t) => {
+const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, user, t) => {
   const surveyId = Survey.getId(survey)
 
-  if (!preview)
-    await logActivity(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
+  if (!Record.isPreview(record))
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
 
   // insert node
   const node = await NodeRepository.insertNode(surveyId, nodeToInsert, t)
@@ -93,7 +88,7 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
         .filter(NodeDef.isNodeDefSingle)
         .map(async childDef => {
             const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), Node.getUuid(node))
-            return await _insertNodeRecursively(survey, childDef, record, childNode, user, preview, t)
+            return await _insertNodeRecursively(survey, childDef, record, childNode, user, t)
           }
         )
     )
@@ -129,19 +124,19 @@ const _onNodeUpdate = async (survey, record, node, t) => {
 }
 
 //==== DELETE
-const deleteNode = async (user, survey, record, nodeUuid, preview, t) => {
+
+const deleteNode = async (user, survey, record, nodeUuid, t) => {
   const surveyId = Survey.getId(survey)
 
   const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
   record = Record.assocNode(node)(record)
 
-  if (!preview)
-    await logActivity(user, surveyId, ActivityLog.type.nodeDelete, { nodeUuid }, t)
+  if (!Record.isPreview(record))
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, { nodeUuid }, t)
 
   return await _onNodeUpdate(survey, record, node, t)
 }
-
 
 module.exports = {
   persistNode,

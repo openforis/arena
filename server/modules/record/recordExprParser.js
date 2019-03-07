@@ -1,16 +1,16 @@
 const R = require('ramda')
 
-const StringUtils = require('../../../../common/stringUtils')
+const StringUtils = require('../../../common/stringUtils')
 
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
-const Record = require('../../../../common/record/record')
-const Node = require('../../../../common/record/node')
-const Expression = require('../../../../common/exprParser/expression')
+const Survey = require('../../../common/survey/survey')
+const NodeDef = require('../../../common/survey/nodeDef')
+const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
+const Record = require('../../../common/record/record')
+const Node = require('../../../common/record/node')
+const Expression = require('../../../common/exprParser/expression')
 
-const CategoryManager = require('../../../category/categoryManager')
-const TaxonomyManager = require('../../../taxonomy/taxonomyManager')
+const CategoryManager = require('../../category/categoryManager')
+const TaxonomyManager = require('../../taxonomy/taxonomyManager')
 
 const evalNodeQuery = async (survey, record, node, query, client, bindNodeFn = bindNode) => {
   const ctx = {

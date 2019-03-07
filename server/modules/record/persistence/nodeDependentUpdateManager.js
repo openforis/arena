@@ -13,7 +13,7 @@ const { dependencyTypes } = require('../../../survey/surveyDependenchyGraph')
 
 const NodeDependencyManager = require('./nodeDependencyManager')
 
-const RecordExprParser = require('./recordExprParser')
+const RecordExprParser = require('../recordExprParser')
 
 /**
  * Module responsible for updating applicable and default values
