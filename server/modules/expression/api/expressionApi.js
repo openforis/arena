@@ -1,15 +1,15 @@
 const R = require('ramda')
 
-const NodeDef = require('../../common/survey/nodeDef')
-const Category = require('../../common/survey/category')
-const Taxonomy = require('../../common/survey/taxonomy')
-const { isBlank, contains } = require('../../common/stringUtils')
+const NodeDef = require('../../../../common/survey/nodeDef')
+const Category = require('../../../../common/survey/category')
+const Taxonomy = require('../../../../common/survey/taxonomy')
+const { isBlank, contains } = require('../../../../common/stringUtils')
 
-const CategoryManager = require('../modules/category/persistence/categoryManager')
-const TaxonomyManager = require('../modules/taxonomy/persistence/taxonomyManager')
+const CategoryManager = require('../../category/persistence/categoryManager')
+const TaxonomyManager = require('../../taxonomy/persistence/taxonomyManager')
 
-const { sendErr } = require('../serverUtils/response')
-const { getRestParam } = require('../serverUtils/request')
+const { sendErr } = require('../../../serverUtils/response')
+const { getRestParam } = require('../../../serverUtils/request')
 
 const toItem = (type, lang = null) =>
   item => item

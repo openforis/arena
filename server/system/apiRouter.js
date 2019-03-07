@@ -18,7 +18,7 @@ require('../surveyRdb/surveyRdbApi').init(router)
 
 require('../job/jobApi').init(router)
 
-require('../expression/expressionApi').init(router)
+require('../modules/expression/api/expressionApi').init(router)
 
 module.exports = {
   router
