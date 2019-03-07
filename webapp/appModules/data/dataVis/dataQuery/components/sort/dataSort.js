@@ -6,7 +6,8 @@ export const serialize = sortCriteria =>
     R.join(',')
   )(sortCriteria)
 
-export const getVariable = (variables, value) => R.find(v => v.value === value)(variables)
+export const getVariable = (variables, value) =>
+  R.find(v => v.value === value)(variables)
 
 export const getViewExpr = (sortCriteria) =>
   R.pipe(
@@ -37,16 +38,13 @@ export const updateVariable = (sortCriteria, pos, variable) => {
 }
 
 export const getUnchosenVariables = (sortCriteria, availableVariables) =>
-  availableVariables.filter(v => sortCriteria.findIndex(sc => sc.variable === v.value) === -1)
+  R.filter(v => R.findIndex(sc => sc.variable === v.value)(sortCriteria) === -1)(availableVariables)
 
 export const addCriteria = (sortCriteria, variable, label, order) =>
   R.append({ variable, label, order }, sortCriteria)
 
 export const deleteCriteria = (sortCriteria, pos) =>
   R.remove(pos, 1, sortCriteria)
-
-export const deleteVariablesByName = (sortCriteria, variables) =>
-  R.filter(c => R.indexOf(c.variable, variables) !== -1)(sortCriteria)
 
 export const deleteVariablesByNames = (sortStr, variables) =>
   R.filter(c => R.indexOf(c.variable, variables) !== -1)(sortStr)
