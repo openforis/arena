@@ -27,6 +27,7 @@ class SortExpressionComponent extends React.Component {
       edit: false,
       sortCriteria: props.sort,
       unchosenVariables: [],
+      updated: false,
     }
   }
 
@@ -52,14 +53,20 @@ class SortExpressionComponent extends React.Component {
   onSelectVariable (pos, variable) {
     const { sortCriteria } = this.state
 
-    this.setState({ sortCriteria: DataSort.updateVariable(sortCriteria, pos, variable) },
-      () => this.refreshUnchosenVariables())
+    this.setState({
+      sortCriteria: DataSort.updateVariable(sortCriteria, pos, variable),
+      updated: true,
+    },
+    () => this.refreshUnchosenVariables())
   }
 
   onSelectOrder (pos, order) {
     const { sortCriteria } = this.state
 
-    this.setState({ sortCriteria: DataSort.updateOrder(sortCriteria, pos, order) })
+    this.setState({
+      sortCriteria: DataSort.updateOrder(sortCriteria, pos, order),
+      updated: true,
+    })
   }
 
   refreshUnchosenVariables () {
@@ -72,15 +79,21 @@ class SortExpressionComponent extends React.Component {
   addCriteria ({ value: variable, label }) {
     const { sortCriteria } = this.state
 
-    this.setState({ sortCriteria: DataSort.addCriteria(sortCriteria, variable, label, 'asc') },
-      () => this.refreshUnchosenVariables())
+    this.setState({
+      sortCriteria: DataSort.addCriteria(sortCriteria, variable, label, 'asc'),
+      updated: true,
+    },
+    () => this.refreshUnchosenVariables())
   }
 
   deleteCriteria (pos) {
     const { sortCriteria } = this.state
 
-    this.setState({ sortCriteria: DataSort.deleteCriteria(sortCriteria, pos) },
-      () => this.refreshUnchosenVariables())
+    this.setState({
+      sortCriteria: DataSort.deleteCriteria(sortCriteria, pos),
+      updated: true,
+    },
+    () => this.refreshUnchosenVariables())
   }
 
   applyChange () {
@@ -98,7 +111,7 @@ class SortExpressionComponent extends React.Component {
 
   render () {
     const { onClose, availableVariables } = this.props
-    const { sortCriteria, unchosenVariables } = this.state
+    const { sortCriteria, unchosenVariables, updated } = this.state
 
     return (
       <Popup
@@ -137,7 +150,7 @@ class SortExpressionComponent extends React.Component {
 
             <button className="btn btn-xs btn-of"
                     onClick={() => this.applyChange()}
-                    aria-disabled={!sortCriteria.length}>
+                    aria-disabled={!updated}>
               <span className="icon icon-checkmark icon-16px"/> Apply
             </button>
           </div>
