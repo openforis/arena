@@ -32,7 +32,7 @@ module.exports.init = app => {
         return
       }
 
-      await RecordManager.createRecord(user, surveyId, record)
+      await RecordService.createRecord(user, surveyId, record)
 
       sendOk(res)
     } catch (err) {
