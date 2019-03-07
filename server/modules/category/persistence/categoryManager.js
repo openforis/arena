@@ -1,16 +1,16 @@
 const Promise = require('bluebird')
 const R = require('ramda')
 
-const db = require('../db/db')
+const db = require('../../../db/db')
 
-const {publishSurveySchemaTableProps, markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
-const {toIndexedObj} = require('../../common/survey/surveyUtils')
+const {publishSurveySchemaTableProps, markSurveyDraft} = require('../../../survey/surveySchemaRepositoryUtils')
+const {toIndexedObj} = require('../../../../common/survey/surveyUtils')
 
 const CategoryRepository = require('./categoryRepository')
-const CategoryValidator = require('./categoryValidator')
-const Category = require('../../common/survey/category')
+const CategoryValidator = require('../categoryValidator')
+const Category = require('../../../../common/survey/category')
 
-const ActivityLog = require('../activityLog/activityLogger')
+const ActivityLog = require('../../../activityLog/activityLogger')
 
 // ====== VALIDATION
 const validateCategory = async (surveyId, categories, category, draft) => {

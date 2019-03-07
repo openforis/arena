@@ -4,7 +4,7 @@ const Category = require('../../../../common/survey/category')
 
 const Job = require('../../../job/job')
 
-const CategoryManager = require('../../../category/categoryManager')
+const CategoryManager = require('../../../modules/category/persistence/categoryManager')
 
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 

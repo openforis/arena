@@ -8,7 +8,7 @@ require('../user/userApi').init(router)
 
 require('../survey/surveyApi').init(router)
 require('../nodeDef/nodeDefApi').init(router)
-require('../category/categoryApi').init(router)
+require('../modules/category/api/categoryApi').init(router)
 require('../taxonomy/taxonomyApi').init(router)
 require('../srs/srsApi').init(router)
 

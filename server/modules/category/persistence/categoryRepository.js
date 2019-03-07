@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const db = require('../db/db')
+const db = require('../../../db/db')
 
 const {
   getSurveyDBSchema,
@@ -8,7 +8,7 @@ const {
   deleteSurveySchemaTableRecord,
   deleteSurveySchemaTableProp,
   dbTransformCallback
-} = require('../survey/surveySchemaRepositoryUtils')
+} = require('../../../survey/surveySchemaRepositoryUtils')
 
 // ============== CREATE
 

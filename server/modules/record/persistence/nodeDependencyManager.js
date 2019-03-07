@@ -8,7 +8,7 @@ const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 
 const NodeRepository = require('./nodeRepository')
-const CategoryManager = require('../../../category/categoryManager')
+const CategoryManager = require('../../category/persistence/categoryManager')
 const TaxonomyManager = require('../../../taxonomy/taxonomyManager')
 
 const { dependencyTypes } = require('../../../survey/surveyDependenchyGraph')

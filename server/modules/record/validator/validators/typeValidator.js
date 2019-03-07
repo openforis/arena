@@ -9,7 +9,7 @@ const { nodeDefType } = NodeDef
 const Category = require('../../../../../common/survey/category')
 const Node = require('../../../../../common/record/node')
 
-const CategoryManager = require('../../../../category/categoryManager')
+const CategoryManager = require('../../../category/persistence/categoryManager')
 const taxonomyRepository = require('../../../../taxonomy/taxonomyRepository')
 
 const errorKeys = {

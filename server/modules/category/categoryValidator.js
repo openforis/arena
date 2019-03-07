@@ -9,9 +9,9 @@ const {
   validateNotKeyword,
   getFieldValidation,
   isValid
-} = require('../../common/validation/validator')
+} = require('../../../common/validation/validator')
 
-const Category = require('../../common/survey/category')
+const Category = require('../../../common/survey/category')
 
 // ====== LEVELS
 
