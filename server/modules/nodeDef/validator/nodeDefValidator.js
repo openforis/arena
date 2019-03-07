@@ -9,12 +9,12 @@ const {
   validateNotKeyword,
   validateName,
   cleanup
-} = require('../../common/validation/validator')
+} = require('../../../../common/validation/validator')
 
-const Survey = require('../../common/survey/survey')
-const SurveyUtils = require('../../common/survey/surveyUtils')
-const NodeDef = require('../../common/survey/nodeDef')
-const NodeDefLayout = require('../../common/survey/nodeDefLayout')
+const Survey = require('../../../../common/survey/survey')
+const SurveyUtils = require('../../../../common/survey/surveyUtils')
+const NodeDef = require('../../../../common/survey/nodeDef')
+const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
 
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')

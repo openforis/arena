@@ -1,7 +1,7 @@
 const Job = require('../../job/job')
 
 const SurveyManager = require('../surveyManager')
-const NodeDefManager = require('../../nodeDef/nodeDefManager')
+const NodeDefManager = require('../../modules/nodeDef/persistence/nodeDefManager')
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 const RecordManager = require('../../modules/record/persistence/recordManager')

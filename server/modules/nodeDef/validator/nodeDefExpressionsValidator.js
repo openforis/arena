@@ -1,11 +1,11 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const Validator = require('../../common/validation/validator')
-const Survey = require('../../common/survey/survey')
-const NodeDef = require('../../common/survey/nodeDef')
-const NodeDefExpression = require('../../common/survey/nodeDefExpression')
-const Expression = require('../../common/exprParser/expression')
+const Validator = require('../../../../common/validation/validator')
+const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
+const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
+const Expression = require('../../../../common/exprParser/expression')
 
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,

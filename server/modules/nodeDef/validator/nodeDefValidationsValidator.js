@@ -1,8 +1,8 @@
 const R = require('ramda')
 
-const NodeDefValidations = require('../../common/survey/nodeDefValidations')
-const NodeDef = require('../../common/survey/nodeDef')
-const Validator = require('../../common/validation/validator')
+const NodeDefValidations = require('../../../../common/survey/nodeDefValidations')
+const NodeDef = require('../../../../common/survey/nodeDef')
+const Validator = require('../../../../common/validation/validator')
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 
 const validate = async (survey, nodeDef, nodeDefValidations) => {

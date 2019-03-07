@@ -1,6 +1,6 @@
 const db = require('../../../db/db')
 
-const NodeDefRepository = require('../../../nodeDef/nodeDefRepository')
+const NodeDefRepository = require('../../nodeDef/persistence/nodeDefRepository')
 const RecordRepository = require('./recordRepository')
 const NodeRepository = require('./nodeRepository')
 

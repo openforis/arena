@@ -1,14 +1,14 @@
-const { sendErr, sendOk } = require('../serverUtils/response')
-const { getRestParam, getBoolParam } = require('../serverUtils/request')
+const Request = require('../../../serverUtils/request')
+const Response = require('../../../serverUtils/response')
 
-const AuthMiddleware = require('../authGroup/authMiddleware')
+const AuthMiddleware = require('../../../authGroup/authMiddleware')
 
-const NodeDefManager = require('./nodeDefManager')
+const NodeDefService = require('../service/nodeDefService')
 
 module.exports.init = app => {
 
   const sendRespNodeDefs = async (res, surveyId, draft = true, advanced = true, validate = true) => {
-    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate)
+    const nodeDefs = await NodeDefService.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate)
     res.json({ nodeDefs })
   }
 
@@ -19,11 +19,11 @@ module.exports.init = app => {
       const { body: nodeDefRequest, user } = req
       const { surveyId, parentUuid, uuid, type, props } = nodeDefRequest
 
-      const nodeDef = await NodeDefManager.createNodeDef(user, surveyId, parentUuid, uuid, type, props)
+      const nodeDef = await NodeDefService.createNodeDef(user, surveyId, parentUuid, uuid, type, props)
 
       res.json({ nodeDef })
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -31,15 +31,15 @@ module.exports.init = app => {
 
   app.get(`/survey/:surveyId/nodeDefs`, AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
     try {
-      const surveyId = getRestParam(req, 'surveyId')
-      const draft = getBoolParam(req, 'draft')
-      const validate = getBoolParam(req, 'validate')
+      const surveyId = Request.getRestParam(req, 'surveyId')
+      const draft = Request.getBoolParam(req, 'draft')
+      const validate = Request.getBoolParam(req, 'validate')
       const advanced = true // always fetch advanced props (TODO fetch only what is needed- now in dataentry min/max count are needed)
 
       await sendRespNodeDefs(res, surveyId, draft, advanced, validate)
 
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -50,15 +50,15 @@ module.exports.init = app => {
       const { body, user } = req
       const props = body
 
-      const nodeDefUuid = getRestParam(req, 'nodeDefUuid')
-      const surveyId = getRestParam(req, 'surveyId')
+      const nodeDefUuid = Request.getRestParam(req, 'nodeDefUuid')
+      const surveyId = Request.getRestParam(req, 'surveyId')
 
-      await NodeDefManager.updateNodeDefProps(user, surveyId, nodeDefUuid, props)
+      await NodeDefService.updateNodeDefProps(user, surveyId, nodeDefUuid, props)
 
       await sendRespNodeDefs(res, surveyId)
 
     } catch (err) {
-      sendErr(res, err)
+      Response.sendErr(res, err)
     }
   })
 
@@ -67,15 +67,15 @@ module.exports.init = app => {
   app.delete('/survey/:surveyId/nodeDef/:nodeDefUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     try {
       const { user } = req
-      const nodeDefUuid = getRestParam(req, 'nodeDefUuid')
-      const surveyId = getRestParam(req, 'surveyId')
+      const nodeDefUuid = Request.getRestParam(req, 'nodeDefUuid')
+      const surveyId = Request.getRestParam(req, 'surveyId')
 
-      await NodeDefManager.markNodeDefDeleted(user, surveyId, nodeDefUuid)
+      await NodeDefService.markNodeDefDeleted(user, surveyId, nodeDefUuid)
 
       await sendRespNodeDefs(res, surveyId)
 
     } catch (e) {
-      sendErr(res, e)
+      Response.sendErr(res, e)
     }
   })
 }

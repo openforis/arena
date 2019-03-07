@@ -1,15 +1,15 @@
 const R = require('ramda')
-const db = require('../db/db')
+const db = require('../../../db/db')
 
-const SurveyUtils = require('../../common/survey/surveyUtils')
-const NodeDef = require('../../common/survey/nodeDef')
+const SurveyUtils = require('../../../../common/survey/surveyUtils')
+const NodeDef = require('../../../../common/survey/nodeDef')
 
 const NodeDefRepository = require('./nodeDefRepository')
-const NodeDefValidator = require('../nodeDef/nodeDefValidator')
+const NodeDefValidator = require('../validator/nodeDefValidator')
 
-const {markSurveyDraft} = require('../survey/surveySchemaRepositoryUtils')
+const {markSurveyDraft} = require('../../../survey/surveySchemaRepositoryUtils')
 
-const ActivityLog = require('../activityLog/activityLogger')
+const ActivityLog = require('../../../activityLog/activityLogger')
 
 // ======= CREATE
 

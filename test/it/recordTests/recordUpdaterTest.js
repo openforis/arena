@@ -10,7 +10,7 @@ const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 
-const NodeDefRepository = require('../../../server/nodeDef/nodeDefRepository')
+const NodeDefRepository = require('../../../server/modules/nodeDef/persistence/nodeDefRepository')
 const NodeRepository = require('../../../server/modules/record/persistence/nodeRepository')
 const RecordManager = require('../../../server/modules/record/persistence/recordManager')
 const RecordUpdateManager = require('../../../server/modules/record/persistence/recordUpdateManager')
