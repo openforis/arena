@@ -5,7 +5,7 @@ const Job = require('../../job/job')
 const Taxonomy = require('../../../common/survey/taxonomy')
 const {isValid, getInvalidFieldValidations} = require('../../../common/validation/validator')
 
-const TaxonomyManager = require('../../taxonomy/taxonomyManager')
+const TaxonomyManager = require('../../modules/taxonomy/persistence/taxonomyManager')
 
 class TaxonomiesValidationJob extends Job {
   constructor (params) {

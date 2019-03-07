@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const Taxonomy = require('../../common/survey/taxonomy')
+const Taxonomy = require('../../../../common/survey/taxonomy')
 
 const TaxonomyManager = require('./taxonomyManager')
 
@@ -11,7 +11,7 @@ const createPredefinedTaxa = (taxonomy) => [
   Taxonomy.newTaxon(taxonomy.uuid, Taxonomy.unlistedCode, 'Unlisted', 'Unlisted', 'Unlisted')
 ]
 
-class TaxonomyImportHelper {
+class TaxonomyImportManager {
   constructor (user, surveyId, vernacularLanguageCodes) {
     this.user = user
     this.surveyId = surveyId
@@ -60,4 +60,4 @@ class TaxonomyImportHelper {
   }
 }
 
-module.exports = TaxonomyImportHelper
+module.exports = TaxonomyImportManager

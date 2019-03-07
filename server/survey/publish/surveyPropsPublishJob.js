@@ -5,7 +5,7 @@ const Job = require('../../job/job')
 const NodeDefManager = require('../../nodeDef/nodeDefManager')
 const SurveyManager = require('../surveyManager')
 const CategoryManager = require('../../modules/category/persistence/categoryManager')
-const TaxonomyManager = require('../../taxonomy/taxonomyManager')
+const TaxonomyManager = require('../../modules/taxonomy/persistence/taxonomyManager')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 

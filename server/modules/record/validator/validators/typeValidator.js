@@ -10,7 +10,7 @@ const Category = require('../../../../../common/survey/category')
 const Node = require('../../../../../common/record/node')
 
 const CategoryManager = require('../../../category/persistence/categoryManager')
-const taxonomyRepository = require('../../../../taxonomy/taxonomyRepository')
+const TaxonomyRepository = require('../../../taxonomy/persistence/taxonomyRepository')
 
 const errorKeys = {
   invalidType: 'invalidType',
@@ -87,7 +87,7 @@ const validateTaxon = async (survey, nodeDef, node) => {
   const isSurveyDraft = Survey.isDraft(Survey.getSurveyInfo(survey))
 
   // taxon not found
-  const taxon = await taxonomyRepository.fetchTaxonByUuid(surveyId, taxonUuid, isSurveyDraft)
+  const taxon = await TaxonomyRepository.fetchTaxonByUuid(surveyId, taxonUuid, isSurveyDraft)
   if (!taxon)
     return false
 
@@ -96,7 +96,7 @@ const validateTaxon = async (survey, nodeDef, node) => {
     return true
 
   // vernacular name not found
-  const vernacularName = await taxonomyRepository.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, isSurveyDraft)
+  const vernacularName = await TaxonomyRepository.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, isSurveyDraft)
   return !!vernacularName
 }
 

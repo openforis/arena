@@ -5,8 +5,8 @@ const { languageCodesISO636_2 } = require('../../../../common/app/languages')
 
 const Job = require('../../../job/job')
 
-const TaxonomyManager = require('../../../taxonomy/taxonomyManager')
-const TaxonomyImportHelper = require('../../../taxonomy/taxonomyImportHelper')
+const TaxonomyManager = require('../../../modules/taxonomy/persistence/taxonomyManager')
+const TaxonomyImportManager = require('../../../modules/taxonomy/persistence/taxonomyImportManager')
 
 const CSVParser = require('../../../../common/file/csvParser')
 
@@ -66,7 +66,7 @@ class TaxonomiesImportJob extends Job {
 
       const vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
 
-      this.taxonomyImportHelper = new TaxonomyImportHelper(this.user, surveyId, vernacularLangCodes)
+      this.taxonomyImportHelper = new TaxonomyImportManager(this.user, surveyId, vernacularLangCodes)
 
       while (row) {
         await this.processRow(taxonomyUuid, vernacularLangCodes, row, tx)

@@ -8,8 +8,8 @@ const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 
 const NodeRepository = require('./nodeRepository')
-const CategoryManager = require('../../category/persistence/categoryManager')
-const TaxonomyManager = require('../../../taxonomy/taxonomyManager')
+const CategoryRepository = require('../../category/persistence/categoryRepository')
+const TaxonomyRepository = require('../../taxonomy/persistence/taxonomyRepository')
 
 const { dependencyTypes } = require('../../../survey/surveyDependenchyGraph')
 
@@ -106,7 +106,7 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
     // valueExpr is the code of a category item
 
     // 1. find category items
-    const itemsInLevel = await CategoryManager.fetchItemsByLevelIndex(
+    const itemsInLevel = await CategoryRepository.fetchItemsByLevelIndex(
       surveyId,
       NodeDef.getNodeDefCategoryUuid(nodeDef),
       Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey),
@@ -119,7 +119,7 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
     return item ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) } : null
   } else if (NodeDef.isNodeDefTaxon(nodeDef) && isExprPrimitive) {
     // valueExpr is the code of a taxon
-    const item = await TaxonomyManager.fetchTaxonByCode(
+    const item = await TaxonomyRepository.fetchTaxonByCode(
       surveyId,
       NodeDef.getNodeDefTaxonomyUuid(nodeDef),
       valueExpr,

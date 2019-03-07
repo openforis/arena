@@ -6,7 +6,7 @@ const Taxonomy = require('../../common/survey/taxonomy')
 const { isBlank, contains } = require('../../common/stringUtils')
 
 const CategoryManager = require('../modules/category/persistence/categoryManager')
-const TaxonomyManager = require('../taxonomy/taxonomyManager')
+const TaxonomyManager = require('../modules/taxonomy/persistence/taxonomyManager')
 
 const { sendErr } = require('../serverUtils/response')
 const { getRestParam } = require('../serverUtils/request')

@@ -1,17 +1,17 @@
 const R = require('ramda')
 
-const db = require('../db/db')
+const db = require('../../../db/db')
 
 const {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
   dbTransformCallback,
-} = require('../survey/surveySchemaRepositoryUtils')
+} = require('../../../survey/surveySchemaRepositoryUtils')
 
-const Taxonomy = require('../../common/survey/taxonomy')
+const Taxonomy = require('../../../../common/survey/taxonomy')
 
-const { isBlank } = require('../../common/stringUtils')
+const { isBlank } = require('../../../../common/stringUtils')
 
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,
@@ -130,6 +130,11 @@ const fetchTaxaByPropLike = async (surveyId,
   const filterCondition = getPropFilterCondition(filterProp, searchValue, draft)
 
   return await fetchTaxaByCondition(surveyId, taxonomyUuid, filterCondition, filterProp, draft, client)
+}
+
+const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
+  const taxa = await fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxonomy.taxonPropKeys.code, code, draft, client)
+  return R.head(taxa)
 }
 
 const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) => {
@@ -252,6 +257,7 @@ module.exports = {
   fetchTaxaByVernacularName,
   findTaxaByCodeOrScientificName,
   fetchTaxonByUuid,
+  fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid,
   fetchAllTaxa,
 

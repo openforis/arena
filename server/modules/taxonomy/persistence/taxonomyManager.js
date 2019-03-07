@@ -1,17 +1,16 @@
 const R = require('ramda')
 const Promise = require('bluebird')
-const fastcsv = require('fast-csv')
 
-const db = require('../db/db')
+const db = require('../../../db/db')
 
-const { publishSurveySchemaTableProps, markSurveyDraft } = require('../survey/surveySchemaRepositoryUtils')
+const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../../survey/surveySchemaRepositoryUtils')
 
-const Taxonomy = require('../../common/survey/taxonomy')
+const Taxonomy = require('../../../../common/survey/taxonomy')
 
 const TaxonomyRepository = require('./taxonomyRepository')
-const TaxonomyValidator = require('./taxonomyValidator')
+const TaxonomyValidator = require('../taxonomyValidator')
 
-const ActivityLog = require('../activityLog/activityLogger')
+const ActivityLog = require('../../../activityLog/activityLogger')
 
 /**
  * ====== CREATE
@@ -59,8 +58,8 @@ const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false, valida
 const includeUnknownUnlistedItems = async (surveyId, taxonomyUuid, taxa, includeUnlUnk, draft) =>
   R.isEmpty(taxa) && includeUnlUnk
     ? [
-      await fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unknownCode, draft),
-      await fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unlistedCode, draft),
+      await TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unknownCode, draft),
+      await TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unlistedCode, draft),
     ]
     : taxa
 
@@ -72,47 +71,6 @@ const fetchTaxaByPropLike = async (surveyId, taxonomyUuid, filterProp, filterVal
 const fetchTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false) => {
   const taxaDb = await TaxonomyRepository.fetchTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft)
   return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
-}
-
-const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
-  const taxa = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxonomy.taxonPropKeys.code, code, draft, client)
-  return R.head(taxa)
-}
-
-const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
-  console.log('start csv export')
-
-  const taxonomy = await TaxonomyRepository.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
-  const vernacularLanguageCodes = Taxonomy.getTaxonomyVernacularLanguageCodes(taxonomy)
-
-  const csvStream = fastcsv.createWriteStream({ headers: true })
-  csvStream.pipe(output)
-
-  const fixedHeaders = [
-    'code',
-    'family',
-    'genus',
-    'scientific_name'
-  ]
-  //write headers
-  csvStream.write(R.concat(fixedHeaders, vernacularLanguageCodes))
-
-  //write taxa
-  const taxa = await TaxonomyRepository.fetchAllTaxa(surveyId, taxonomyUuid, draft)
-
-  taxa.forEach(taxon => {
-    csvStream.write(R.concat([
-        Taxonomy.getTaxonCode(taxon),
-        Taxonomy.getTaxonFamily(taxon),
-        Taxonomy.getTaxonGenus(taxon),
-        Taxonomy.getTaxonScientificName(taxon)
-      ],
-      R.map(langCode => Taxonomy.getTaxonVernacularName(langCode)(taxon))(vernacularLanguageCodes)
-    ))
-  })
-  csvStream.end()
-
-  console.log('csv export completed')
 }
 
 // ====== UPDATE
@@ -165,13 +123,12 @@ module.exports = {
   //READ
   fetchTaxonomyByUuid,
   fetchTaxonomiesBySurveyId,
-  exportTaxa,
   countTaxaByTaxonomyUuid: TaxonomyRepository.countTaxaByTaxonomyUuid,
   fetchTaxaByPropLike,
   fetchTaxaByVernacularName,
   findTaxaByCodeOrScientificName: TaxonomyRepository.findTaxaByCodeOrScientificName,
   fetchTaxonByUuid: TaxonomyRepository.fetchTaxonByUuid,
-  fetchTaxonByCode,
+  fetchTaxonByCode: TaxonomyRepository.fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid: TaxonomyRepository.fetchTaxonVernacularNameByUuid,
   fetchAllTaxa: TaxonomyRepository.fetchAllTaxa,
 

@@ -4,7 +4,7 @@ const {
   validateRequired,
   validateItemPropUniqueness,
   validateNotKeyword
-} = require('../../common/validation/validator')
+} = require('../../../common/validation/validator')
 
 /**
  * ====== TAXONOMY

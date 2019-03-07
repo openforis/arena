@@ -1,18 +1,19 @@
 const R = require('ramda')
 
-const Job = require('../job/job')
+const Job = require('../../../job/job')
 
-const {languageCodes} = require('../../common/app/languages')
-const {isNotBlank} = require('../../common/stringUtils')
-const Validator = require('../../common/validation/validator')
-const Taxonomy = require('../../common/survey/taxonomy')
+const { languageCodes } = require('../../../../common/app/languages')
+const { isNotBlank } = require('../../../../common/stringUtils')
+const CSVParser = require('../../../../common/file/csvParser')
 
-const TaxonomyValidator = require('../taxonomy/taxonomyValidator')
-const TaxonomyManager = require('./taxonomyManager')
-const TaxonomyImportHelper = require('./taxonomyImportHelper')
-const CSVParser = require('../../common/file/csvParser')
+const Validator = require('../../../../common/validation/validator')
+const Taxonomy = require('../../../../common/survey/taxonomy')
 
-const {taxonPropKeys} = Taxonomy
+const TaxonomyValidator = require('../taxonomyValidator')
+const TaxonomyManager = require('../persistence/taxonomyManager')
+const TaxonomyImportManager = require('../persistence/taxonomyImportManager')
+
+const { taxonPropKeys } = Taxonomy
 
 const requiredColumns = [
   'code',
@@ -26,7 +27,7 @@ class TaxonomyImportJob extends Job {
   constructor (params) {
     super(TaxonomyImportJob.type, params)
 
-    const {taxonomyUuid, filePath} = params
+    const { taxonomyUuid, filePath } = params
 
     this.taxonomyUuid = taxonomyUuid
     this.filePath = filePath
@@ -38,7 +39,7 @@ class TaxonomyImportJob extends Job {
   }
 
   async execute (tx) {
-    const {surveyId, taxonomyUuid, filePath} = this
+    const { surveyId, taxonomyUuid, filePath } = this
 
     this.total = await new CSVParser(filePath).calculateSize()
 
@@ -55,7 +56,7 @@ class TaxonomyImportJob extends Job {
       throw new Error('cannot overwrite published taxa')
     }
 
-    this.taxonomyImportHelper = new TaxonomyImportHelper(this.user, this.surveyId, this.vernacularLanguageCodes)
+    this.taxonomyImportHelper = new TaxonomyImportManager(this.user, this.surveyId, this.vernacularLanguageCodes)
 
     //delete old draft taxa
     await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)
@@ -124,7 +125,7 @@ class TaxonomyImportJob extends Job {
   }
 
   async parseTaxon (data) {
-    const {family, genus, scientific_name, code, ...vernacularNames} = data
+    const { family, genus, scientific_name, code, ...vernacularNames } = data
 
     const taxon = Taxonomy.newTaxon(this.taxonomyUuid, code, family, genus, scientific_name, this.parseVernacularNames(vernacularNames))
 
@@ -140,7 +141,7 @@ class TaxonomyImportJob extends Job {
       const duplicateCodeRow = this.codesToRow[code]
 
       if (duplicateCodeRow) {
-        validation.fields[taxonPropKeys.code] = {valid: false, errors: [Validator.errorKeys.duplicate]}
+        validation.fields[taxonPropKeys.code] = { valid: false, errors: [Validator.errorKeys.duplicate] }
       } else {
         this.codesToRow[code] = this.processed + 1
       }
@@ -149,7 +150,7 @@ class TaxonomyImportJob extends Job {
       const duplicateScientificNameRow = this.scientificNamesToRow[scientificName]
 
       if (duplicateScientificNameRow) {
-        validation.fields[taxonPropKeys.scientificName] = {valid: false, errors: [Validator.errorKeys.duplicate]}
+        validation.fields[taxonPropKeys.scientificName] = { valid: false, errors: [Validator.errorKeys.duplicate] }
       } else {
         this.scientificNamesToRow[scientificName] = this.processed + 1
       }

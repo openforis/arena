@@ -7,7 +7,7 @@ const NodeDef = require('../../../common/survey/nodeDef')
 const Taxonomy = require('../../../common/survey/taxonomy')
 const Node = require('../../../common/record/node')
 const CategoryManager = require('../../modules/category/persistence/categoryManager')
-const TaxonomyManager = require('../../taxonomy/taxonomyManager')
+const TaxonomyManager = require('../../modules/taxonomy/persistence/taxonomyManager')
 
 const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
 const sqlTypes = require('../../../common/surveyRdb/sqlTypes')
