@@ -10,7 +10,7 @@ const projected = require('@esri/proj-codes/pe_list_projcs.json')
  */
 const geographic = require('@esri/proj-codes/pe_list_geogcs.json')
 
-const {contains} = require('../../common/stringUtils')
+const {contains} = require('../../../../common/stringUtils')
 
 const formatName = (name = '') => R.replace(/_/g, ' ')(name)
 
