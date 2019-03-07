@@ -3,8 +3,7 @@ const ThreadsCache = require('../../../../../threads/threadsCache')
 const threads = new ThreadsCache()
 
 module.exports = {
-  getThreadByUserId : threads.getThread,
-  removeThreadByUserId : threads.removeThread,
-  putThreadByUserId : threads.putThread,
-  getThreadByUserId : threads.getThread,
+  getThreadByUserId: userId => threads.getThread(userId),
+  removeThreadByUserId: userId => threads.removeThread(userId),
+  putThreadByUserId: (userId, thread) => threads.putThread(userId, thread),
 }

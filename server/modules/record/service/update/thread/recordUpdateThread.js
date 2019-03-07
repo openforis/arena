@@ -115,5 +115,5 @@ class RecordUpdateThread extends Thread {
 
 }
 
-new RecordUpdateThread(params)
+new RecordUpdateThread()
 

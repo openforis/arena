@@ -13,7 +13,7 @@ const CountValidator = require('./helpers/countValidator')
 const AttributeValidator = require('./helpers/attributeValidator')
 const KeysUniquenessValidator = require('./helpers/keysUniquenessValidator')
 
-const validateNodes = async (survey, record, nodes, preview, tx) => {
+const validateNodes = async (survey, record, nodes, tx) => {
 
   // 1. validate self and dependent attributes (validations/expressions)
   const attributeValidations = await AttributeValidator.validateSelfAndDependentAttributes(survey, record, nodes, tx)
@@ -23,7 +23,7 @@ const validateNodes = async (survey, record, nodes, preview, tx) => {
   const nodeCountValidations = CountValidator.validateChildrenCount(record, nodePointers)
 
   // 3. validate record keys uniqueness
-  const recordKeysValidations = !preview && isRootNodeKeysUpdated(survey, nodes)
+  const recordKeysValidations = !Record.isPreview(record) && isRootNodeKeysUpdated(survey, nodes)
     ? await KeysUniquenessValidator.validateRecordKeysUniqueness(survey, record, tx)
     : {}
 

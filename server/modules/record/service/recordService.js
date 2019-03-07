@@ -1,4 +1,5 @@
 const R = require('ramda')
+const path = require('path')
 
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
@@ -28,7 +29,7 @@ const createThread = (user, surveyId, recordUuid, preview) => {
 
   RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
 
-  const filePath = path.resolve(__dirname, 'thread', 'recordUpdateThread.js')
+  const filePath = path.resolve(__dirname, 'update', 'thread', 'recordUpdateThread.js')
   const data = { user, surveyId, recordUuid }
 
   const messageHandler = msg => {
@@ -80,7 +81,7 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
 }
 
 const checkIn = async (user, surveyId, recordUuid) => {
-  const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
+  const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid)
 
   if (canEditRecord(user, record)) {
     cancelCheckOut(user.id)

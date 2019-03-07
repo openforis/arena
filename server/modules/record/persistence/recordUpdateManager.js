@@ -13,6 +13,7 @@ const Node = require('../../../../common/record/node')
 
 const RecordUsersMap = require('../service/update/recordUsersMap')
 const RecordRepository = require('./recordRepository')
+const SurveyManager = require('../../../survey/surveyManager')
 const RecordManager = require('./recordManager')
 const RecordValidationManager = require('../validator/recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
@@ -31,12 +32,13 @@ const ActivityLog = require('../../../activityLog/activityLogger')
 
 //==== CREATE
 
-const createRecord = async (user, survey, recordToCreate) =>
+const createRecord = async (user, surveyId, recordToCreate) =>
   await db.tx(async t => {
-    const surveyId = Survey.getId(survey)
+    const preview = Record.isPreview(recordToCreate)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, preview, true, false, t)
 
     const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
-    if (!Record.isPreview(record))
+    if (!preview)
       await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
 
     const rootNodeDef = Survey.getRootNodeDef(survey)
@@ -135,7 +137,7 @@ const _onNodesUpdate = async (survey, record, updatedNodes,
   const updatedNodesAndDependents = R.mergeDeepRight(updatedNodes, updatedDependentNodes)
 
   // 3. update node validations
-  const validations = await RecordValidationManager.validateNodes(survey, record, updatedNodesAndDependents, preview, t)
+  const validations = await RecordValidationManager.validateNodes(survey, record, updatedNodesAndDependents, t)
   if (nodesValidationListener)
     nodesValidationListener(validations)
   record = Record.mergeNodeValidations(validations)(record)
