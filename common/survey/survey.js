@@ -8,6 +8,8 @@ const SurveyDefaults = require('./_internal/surveyDefaults')
 const SurveyDependencies = require('./_internal/surveyDependencies')
 
 module.exports = {
+  infoKeys: SurveyInfo.keys,
+
   // ====== DEFAULTS
   getDefaultAuthGroups: SurveyDefaults.getDefaultAuthGroups,
 
@@ -20,6 +22,7 @@ module.exports = {
   getLanguages: SurveyInfo.getLanguages,
   getDefaultLanguage: SurveyInfo.getDefaultLanguage,
   getLabels: SurveyInfo.getLabels,
+  getLabel: SurveyInfo.getLabel,
   getDefaultLabel: SurveyInfo.getDefaultLabel,
   getDescriptions: SurveyInfo.getDescriptions,
   getSRS: SurveyInfo.getSRS,

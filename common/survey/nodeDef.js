@@ -82,6 +82,7 @@ const isNodeDefType = type => R.pipe(getType, R.equals(type))
 
 const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
 const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefSingle(nodeDef)
+const isNodeDefMultipleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefMultiple(nodeDef)
 const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
 
 const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
@@ -103,7 +104,6 @@ const getNodeDefLabel = (nodeDef, lang) => {
   return isBlank(label)
     ? getNodeDefName(nodeDef)
     : label
-
 }
 
 const getValidations = SurveyUtils.getProp(propKeys.validations, {})
@@ -129,9 +129,10 @@ const canNodeDefBeMultiple = nodeDef =>
     ]
   )
 
-const canNodeDefBeKey = nodeDef =>
-  R.includes(
-    getType(nodeDef),
+const canNodeDefBeKey = nodeDef => canNodeDefTypeBeKey(getType(nodeDef))
+
+const canNodeDefTypeBeKey = type =>
+  R.includes(type,
     [
       nodeDefType.date,
       nodeDefType.decimal,
@@ -192,6 +193,7 @@ module.exports = {
   isNodeDefAttribute,
   isNodeDefEntityOrMultiple,
   isNodeDefSingleEntity,
+  isNodeDefMultipleEntity,
   isNodeDefSingleAttribute,
   isNodeDefMultipleAttribute,
   isNodeDefReadOnly: SurveyUtils.getProp(propKeys.readOnly, false),
@@ -221,5 +223,6 @@ module.exports = {
   //UTILS
   canNodeDefBeMultiple,
   canNodeDefBeKey,
+  canNodeDefTypeBeKey,
   canNodeDefHaveDefaultValue,
 }

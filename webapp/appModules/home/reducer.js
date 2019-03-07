@@ -1,18 +1,9 @@
-import { assocActionProps, dissocStateProps, exportReducer } from '../../appUtils/reduxUtils'
+import { combineReducers } from 'redux'
 
-import { appUserLogout } from '../../app/actions'
-import { surveyCreate } from '../../survey/actions'
-import { homeNewSurveyUpdate } from './actions'
-import { homeSurveysUpdate } from './actions'
+import surveys from './surveyList/reducer'
+import surveyCreate from './surveyCreate/reducer'
 
-const actionHandlers = {
-  [appUserLogout]: () => ({}),
-
-  [surveyCreate]: (state, _) => dissocStateProps(state, ['newSurvey']),
-
-  [homeNewSurveyUpdate]: assocActionProps,
-
-  [homeSurveysUpdate]: assocActionProps,
-}
-
-export default exportReducer(actionHandlers)
+export default combineReducers({
+  surveys,
+  surveyCreate,
+})

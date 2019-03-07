@@ -29,9 +29,9 @@ const unlistedCode = 'UNL'
 const unknownCode = 'UNK'
 
 // ====== CREATE
-const newTaxonomy = () => ({
+const newTaxonomy = (props = {}) => ({
   uuid: uuidv4(),
-  props: {},
+  props,
 })
 
 const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularNames = {}) => ({
@@ -57,6 +57,7 @@ const getTaxonVernacularName = lang => R.pipe(
 )
 
 module.exports = {
+  taxonomyPropKeys,
   taxonPropKeys,
   vernacularNamePropKeys,
   unlistedCode,

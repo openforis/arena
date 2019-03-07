@@ -4,14 +4,3 @@
   background-color: rgba($blue1, .05);
 
 }
-
-.designer__survey-info {
-
-  .form {
-    max-height: calc(100vh - 100px);
-  }
-
-  .form-item {
-    grid-template-columns: .2fr .7fr;
-  }
-}

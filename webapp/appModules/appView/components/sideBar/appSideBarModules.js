@@ -12,11 +12,6 @@ const modules = [
     label: 'Home',
   },
   {
-    module: appModules.dashboard,
-    icon: 'office',
-    label: 'Dashboard',
-  },
-  {
     module: appModules.designer,
     icon: 'quill',
     label: 'Designer',
