@@ -1,10 +1,8 @@
 const R = require('ramda')
 
-const Survey = require('../../common/survey/survey')
+const {errorKeys, validate, validateRequired, validateNotKeyword} = require('../../../common/validation/validator')
 
-const {errorKeys, validate, validateRequired, validateNotKeyword} = require('../../common/validation/validator')
-
-const {getSurveysByName} = require('./surveyRepository')
+const {getSurveysByName} = require('./persistence/surveyRepository')
 
 const validateSurveyNameUniqueness = async (propName, survey) => {
   const surveyName = R.path(propName.split('.'))(survey)

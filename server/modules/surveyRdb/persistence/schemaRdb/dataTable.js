@@ -6,7 +6,7 @@ const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
 const Node = require('../../../../../common/record/node')
 const DataRow = require('./dataRow')
 const DataCol = require('./dataCol')
-const SurveyRepositoryUtils = require('../../../../survey/surveySchemaRepositoryUtils')
+const SurveyRepositoryUtils = require('../../../survey/persistence/surveySchemaRepositoryUtils')
 
 const colNameUuuid = 'uuid'
 const colNameParentUuuid = 'parent_uuid'

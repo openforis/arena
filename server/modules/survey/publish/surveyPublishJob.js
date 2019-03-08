@@ -1,4 +1,4 @@
-const Job = require('../../job/job')
+const Job = require('../../../job/job')
 
 const NodeDefsValidationJob = require('./nodeDefsValidationJob')
 const CategoriesValidationJob = require('./categoriesValidationJob')

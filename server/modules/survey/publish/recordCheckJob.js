@@ -1,19 +1,19 @@
 const R = require('ramda')
 
-const { toUuidIndexedObj } = require('../../../common/survey/surveyUtils')
+const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
-const Survey = require('../../../common/survey/survey')
-const NodeDef = require('../../../common/survey/nodeDef')
-const Record = require('../../../common/record/record')
+const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
+const Record = require('../../../../common/record/record')
 
-const SurveyManager = require('../../survey/surveyManager')
-const RecordManager = require('../../modules/record/persistence/recordManager')
-const NodeDependentUpdateManager = require('../../modules/record/persistence/nodeDependentUpdateManager')
-const RecordValidationManager = require('../../modules/record/validator/recordValidationManager')
+const SurveyManager = require('../persistence/surveyManager')
+const RecordManager = require('../../record/persistence/recordManager')
+const NodeDependentUpdateManager = require('../../record/persistence/nodeDependentUpdateManager')
+const RecordValidationManager = require('../../record/validator/recordValidationManager')
 
 const RecordMissingNodesCreator = require('./helpers/recordMissingNodesCreator')
 
-const Job = require('../../job/job')
+const Job = require('../../../job/job')
 
 class RecordCheckJob extends Job {
 

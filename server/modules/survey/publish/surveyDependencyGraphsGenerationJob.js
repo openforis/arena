@@ -1,8 +1,8 @@
-const Job = require('../../job/job')
+const Job = require('../../../job/job')
 
-const SurveyManager = require('../../survey/surveyManager')
+const SurveyManager = require('../persistence/surveyManager')
 
-const SurveyDependencyGraph = require('./../surveyDependenchyGraph')
+const SurveyDependencyGraph = require('../surveyDependenchyGraph')
 
 class SurveyDependencyGraphsGenerationJob extends Job {
 

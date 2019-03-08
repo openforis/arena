@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const Job = require('../../job/job')
+const Job = require('../../../job/job')
 
-const Category = require('../../../common/survey/category')
-const Validator = require('../../../common/validation/validator')
+const Category = require('../../../../common/survey/category')
+const Validator = require('../../../../common/validation/validator')
 
-const CategoryManager = require('../../modules/category/persistence/categoryManager')
+const CategoryManager = require('../../category/persistence/categoryManager')
 
 class CategoriesValidationJob extends Job {
 

@@ -1,4 +1,4 @@
-const Job = require('../../job/job')
+const Job = require('../../../job/job')
 
 const SurveySchemaReaderJob = require('./jobs/surveySchemaReaderJob')
 const SurveyCreatorJob = require('./jobs/surveyCreatorJob')

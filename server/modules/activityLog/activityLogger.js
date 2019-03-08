@@ -1,4 +1,4 @@
-const { getSurveyDBSchema } = require('../../survey/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema } = require('../survey/persistence/surveySchemaRepositoryUtils')
 
 const type = {
   //survey

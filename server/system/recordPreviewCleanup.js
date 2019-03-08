@@ -1,7 +1,7 @@
 const schedule = require('node-schedule')
 const Promise = require('bluebird')
 
-const SurveyManager = require('../survey/surveyManager')
+const SurveyManager = require('../modules/survey/persistence/surveyManager')
 const RecordService = require('../modules/record/service/recordService')
 
 const initSchedule = () =>

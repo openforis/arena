@@ -1,13 +1,13 @@
 const R = require('ramda')
 
-const Job = require('../../job/job')
+const Job = require('../../../job/job')
 
-const NodeDefManager = require('../../modules/nodeDef/persistence/nodeDefManager')
-const SurveyManager = require('../surveyManager')
-const CategoryManager = require('../../modules/category/persistence/categoryManager')
-const TaxonomyManager = require('../../modules/taxonomy/persistence/taxonomyManager')
+const NodeDefManager = require('../../nodeDef/persistence/nodeDefManager')
+const SurveyManager = require('../persistence/surveyManager')
+const CategoryManager = require('../../category/persistence/categoryManager')
+const TaxonomyManager = require('../../taxonomy/persistence/taxonomyManager')
 
-const ActivityLog = require('../../modules/activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLogger')
 
 const determineDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, t)

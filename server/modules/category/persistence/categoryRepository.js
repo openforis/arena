@@ -8,7 +8,7 @@ const {
   deleteSurveySchemaTableRecord,
   deleteSurveySchemaTableProp,
   dbTransformCallback
-} = require('../../../survey/surveySchemaRepositoryUtils')
+} = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
 // ============== CREATE
 

@@ -9,7 +9,7 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 const Node = require('../../../../common/record/node')
 
-const { dependencyTypes } = require('../../../survey/surveyDependenchyGraph')
+const { dependencyTypes } = require('../../survey/surveyDependenchyGraph')
 
 const NodeDependencyManager = require('./nodeDependencyManager')
 

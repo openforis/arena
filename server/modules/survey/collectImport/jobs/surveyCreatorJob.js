@@ -1,10 +1,10 @@
 const R = require('ramda')
 
-const Survey = require('../../../../common/survey/survey')
+const Survey = require('../../../../../common/survey/survey')
 
-const Job = require('../../../job/job')
+const Job = require('../../../../job/job')
 
-const SurveyManager = require('../../surveyManager')
+const SurveyManager = require('../../persistence/surveyManager')
 
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 

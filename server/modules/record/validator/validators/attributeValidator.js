@@ -5,7 +5,7 @@ const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
 const NodeDefValidations = require('../../../../../common/survey/nodeDefValidations')
-const { dependencyTypes } = require('../../../../survey/surveyDependenchyGraph')
+const { dependencyTypes } = require('../../../survey/surveyDependenchyGraph')
 const Validator = require('../../../../../common/validation/validator')
 const Node = require('../../../../../common/record/node')
 

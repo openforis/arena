@@ -1,8 +1,8 @@
-const db = require('../db/db')
+const db = require('../../../db/db')
 const R = require('ramda')
 
 const {dbTransformCallback} = require('./surveySchemaRepositoryUtils')
-const {selectDate} = require('../db/dbUtils')
+const {selectDate} = require('../../../db/dbUtils')
 
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? alias + '.' : ''

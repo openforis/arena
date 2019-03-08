@@ -1,16 +1,16 @@
 const R = require('ramda')
 
-const { uuidv4 } = require('../../../../common/uuid')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
+const { uuidv4 } = require('../../../../../common/uuid')
+const NodeDef = require('../../../../../common/survey/nodeDef')
+const NodeDefLayout = require('../../../../../common/survey/nodeDefLayout')
 const { nodeDefType } = NodeDef
-const Survey = require('../../../../common/survey/survey')
-const Category = require('../../../../common/survey/category')
-const Taxonomy = require('../../../../common/survey/taxonomy')
+const Survey = require('../../../../../common/survey/survey')
+const Category = require('../../../../../common/survey/category')
+const Taxonomy = require('../../../../../common/survey/taxonomy')
 
-const Job = require('../../../job/job')
+const Job = require('../../../../job/job')
 
-const NodeDefManager = require('../../../modules/nodeDef/persistence/nodeDefManager')
+const NodeDefManager = require('../../../nodeDef/persistence/nodeDefManager')
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 
 const nodeDefTypesByCollectType = {

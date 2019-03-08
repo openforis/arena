@@ -1,7 +1,7 @@
 const parser = require('fast-xml-parser')
-const FileZip = require('../../../../common/file/fileZip')
+const FileZip = require('../../../../../common/file/fileZip')
 
-const Job = require('../../../job/job')
+const Job = require('../../../../job/job')
 
 const idmlXmlFileName = 'idml.xml'
 

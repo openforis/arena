@@ -5,7 +5,7 @@ const db = require('../../../db/db')
 const { now } = require('../../../db/dbUtils')
 
 const Node = require('../../../../common/record/node')
-const { getSurveyDBSchema } = require('../../../survey/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema } = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
 //camelize all but "meta"
 const dbTransformCallback = node =>

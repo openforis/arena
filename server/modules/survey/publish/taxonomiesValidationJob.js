@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const Job = require('../../job/job')
+const Job = require('../../../job/job')
 
-const Taxonomy = require('../../../common/survey/taxonomy')
-const {isValid, getInvalidFieldValidations} = require('../../../common/validation/validator')
+const Taxonomy = require('../../../../common/survey/taxonomy')
+const {isValid, getInvalidFieldValidations} = require('../../../../common/validation/validator')
 
-const TaxonomyManager = require('../../modules/taxonomy/persistence/taxonomyManager')
+const TaxonomyManager = require('../../taxonomy/persistence/taxonomyManager')
 
 class TaxonomiesValidationJob extends Job {
   constructor (params) {

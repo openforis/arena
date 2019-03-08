@@ -1,8 +1,8 @@
 const R = require('ramda')
 
-const Survey = require('../../common/survey/survey')
-const NodeDef = require('../../common/survey/nodeDef')
-const NodeDefExpression = require('../../common/survey/nodeDefExpression')
+const Survey = require('../../../common/survey/survey')
+const NodeDef = require('../../../common/survey/nodeDef')
+const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 
 const dependencyTypes = {
   defaultValues: 'defaultValues',

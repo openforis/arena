@@ -4,7 +4,7 @@ const camelize = require('camelize')
 const db = require('../../../db/db')
 const { selectDate } = require('../../../db/dbUtils')
 
-const { getSurveyDBSchema } = require('../../../survey/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema } = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')

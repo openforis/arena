@@ -1,26 +1,26 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const db = require('../db/db')
-const { migrateSurveySchema } = require('../db/migration/dbMigrator')
-const { uuidv4 } = require('../../common/uuid')
+const db = require('../../../db/db')
+const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
+const { uuidv4 } = require('../../../../common/uuid')
 const { getSurveyDBSchema } = require('./surveySchemaRepositoryUtils')
-const SurveyRdbManager = require('../modules/surveyRdb/persistence/surveyRdbManager')
+const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
 
-const SurveyRepository = require('../survey/surveyRepository')
-const Survey = require('../../common/survey/survey')
-const SurveyValidator = require('../survey/surveyValidator')
+const SurveyRepository = require('./surveyRepository')
+const Survey = require('../../../../common/survey/survey')
+const SurveyValidator = require('../surveyValidator')
 
-const NodeDefManager = require('../modules/nodeDef/persistence/nodeDefManager')
-const { nodeDefLayoutProps, nodeDefRenderType } = require('../../common/survey/nodeDefLayout')
+const NodeDefManager = require('../../nodeDef/persistence/nodeDefManager')
+const { nodeDefLayoutProps, nodeDefRenderType } = require('../../../../common/survey/nodeDefLayout')
 
-const UserRepository = require('../modules/user/persistence/userRepository')
-const { getUserPrefSurveyId, userPrefNames } = require('../../common/user/userPrefs')
+const UserRepository = require('../../user/persistence/userRepository')
+const { getUserPrefSurveyId, userPrefNames } = require('../../../../common/user/userPrefs')
 
-const AuthGroupRepository = require('../modules/auth/persistence/authGroupRepository')
-const AuthManager = require('../../common/auth/authManager')
+const AuthGroupRepository = require('../../auth/persistence/authGroupRepository')
+const AuthManager = require('../../../../common/auth/authManager')
 
-const ActivityLog = require('../modules/activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLogger')
 
 const assocSurveyInfo = info => ({ info })
 

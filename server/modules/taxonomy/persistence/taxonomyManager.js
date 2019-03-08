@@ -3,7 +3,7 @@ const Promise = require('bluebird')
 
 const db = require('../../../db/db')
 
-const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../../survey/surveySchemaRepositoryUtils')
+const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
 const Taxonomy = require('../../../../common/survey/taxonomy')
 

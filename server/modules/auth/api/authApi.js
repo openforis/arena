@@ -5,7 +5,7 @@ const { sendOk } = require('../../../serverUtils/response')
 const { userPrefNames, getUserPrefSurveyId } = require('../../../../common/user/userPrefs')
 
 const AuthManager = require('../../../../common/auth/authManager')
-const SurveyManager = require('../../../survey/surveyManager')
+const SurveyManager = require('../../survey/persistence/surveyManager')
 const UserService = require('../../user/service/userService')
 const RecordService = require('../../record/service/recordService')
 
