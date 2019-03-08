@@ -57,7 +57,7 @@ class TableHeader extends React.Component {
       showPaginator,
     } = this.props
 
-    const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${filter}&sort=${sort}&cols=${JSON.stringify(colNames)}`
+    const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${filter}&sort=${DataSort.serialize(sort)}&cols=${JSON.stringify(colNames)}`
     const sortMsg = DataSort.getViewExpr(sort)
 
     return (
