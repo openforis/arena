@@ -2,7 +2,7 @@ const { getRestParam } = require('../serverUtils/request')
 const { sendErr } = require('../serverUtils/response')
 
 const SurveyManager = require('../survey/surveyManager')
-const RecordManager = require('../record/recordManager')
+const RecordService = require('../modules/record/service/recordService')
 
 const {
   canViewSurvey,
@@ -34,7 +34,7 @@ const requireRecordPermission = (permissionFn) =>
     const surveyId = getRestParam(req, 'surveyId')
     const recordUuid = getRestParam(req, 'recordUuid')
 
-    const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
+    const record = await RecordService.fetchRecordByUuid(surveyId, recordUuid)
 
     if (permissionFn(user, record)) {
       next()

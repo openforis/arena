@@ -2,10 +2,10 @@ import './form.scss'
 
 import React from 'react'
 
-import { TooltipError } from '../tooltip'
+import Tooltip from '../tooltip'
 import { TextMask, InputAdapter } from 'react-text-mask-hoc'
 
-export const FormItem = ({label, children}) => (
+export const FormItem = ({ label, children }) => (
   <div className="form-item">
     <label className="form-label">{label}</label>
     {children}
@@ -24,21 +24,27 @@ export const Input = React.forwardRef((props, ref) => {
   } = props
 
   return (
-    <TooltipError messages={validation.errors}>
-      <TextMask ref={ref}
-                Component={InputAdapter}
-                mask={mask}
-                className="form-input"
-                aria-disabled={disabled}
-                isControlled={true}
-                value={value}
-                onChange={(e, {caretPosition, value: newValue}) => {
-                  if (onChange && value !== newValue) {
-                    onChange(newValue)
-                  }
-                }}
-                {...inputProps}
+    <Tooltip
+      messages={validation.errors}
+      type={`${validation.errors ? 'error' : ''}`}
+      className="form-input-container">
+
+      <TextMask
+        ref={ref}
+        Component={InputAdapter}
+        mask={mask}
+        className="form-input"
+        aria-disabled={disabled}
+        isControlled={true}
+        value={value}
+        onChange={(e, { caretPosition, value: newValue }) => {
+          if (onChange && value !== newValue) {
+            onChange(newValue)
+          }
+        }}
+        {...inputProps}
       />
-    </TooltipError>
+
+    </Tooltip>
   )
 })

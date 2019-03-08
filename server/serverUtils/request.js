@@ -1,5 +1,11 @@
 const R = require('ramda')
 
+const getParams = req => R.pipe(
+  R.mergeLeft(R.prop('query', req)),
+  R.mergeLeft(R.prop('params', req)),
+  R.mergeLeft(R.prop('body', req)),
+)({})
+
 const getRestParam = (req, param, defaultValue = null) => {
   const queryValue = R.path(['query', param], req)
   const paramsValue = R.path(['params', param], req)
@@ -39,16 +45,20 @@ const getRequiredParam = (req, param) => {
     return value
 }
 
+const getFile = R.pathOr(null, ['files', 'file'])
+
 //session
 
 const getSessionUserId = R.path(['session', 'passport', 'user'])
 
 module.exports = {
+  getParams,
   getRestParam,
   getBoolParam,
   getJsonParam,
   toQueryString,
   getRequiredParam,
+  getFile,
 
   //session
   getSessionUserId,

@@ -8,18 +8,18 @@ require('../user/userApi').init(router)
 
 require('../survey/surveyApi').init(router)
 require('../modules/survey/api').init(router)
-require('../nodeDef/nodeDefApi').init(router)
-require('../category/categoryApi').init(router)
-require('../taxonomy/taxonomyApi').init(router)
-require('../srs/srsApi').init(router)
+require('../modules/nodeDef/api/nodeDefApi').init(router)
+require('../modules/category/api/categoryApi').init(router)
+require('../modules/taxonomy/api/taxonomyApi').init(router)
+require('../modules/srs/api/srsApi').init(router)
 
-require('../record/recordApi').init(router)
+require('../modules/record/api/recordApi').init(router)
 
-require('../surveyRdb/surveyRdbApi').init(router)
+require('../modules/surveyRdb/api/surveyRdbApi').init(router)
 
 require('../job/jobApi').init(router)
 
-require('../expression/expressionApi').init(router)
+require('../modules/expression/api/expressionApi').init(router)
 
 module.exports = {
   router

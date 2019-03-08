@@ -1,0 +1,35 @@
+@import "../style/vars";
+
+.popup {
+  background-color: rgba($grey2, .95);
+  position: fixed;
+  min-width: 600px;
+  z-index: $zIndex10TopOfApp;
+  max-height: calc(80vh);
+}
+
+.popup__btn-close {
+  position: absolute;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background-color: rgba($redDark, 0.95);
+  border: 1px solid rgba($redDark, 0.5) !important;
+  width: 1.5rem;
+  height: 1.5rem;
+  top: -.7rem;
+  left: -.75rem;
+
+  .icon {
+    opacity: .5;
+    transition: opacity 250ms ease-out;
+  }
+
+  &:hover {
+    background-color: rgba($redDark, 0.8);
+    border: 1px solid rgba($redDark, 0.1) !important;
+
+    .icon {
+      opacity: .8;
+    }
+  }
+}

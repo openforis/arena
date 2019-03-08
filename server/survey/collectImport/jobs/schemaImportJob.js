@@ -10,7 +10,7 @@ const Taxonomy = require('../../../../common/survey/taxonomy')
 
 const Job = require('../../../job/job')
 
-const NodeDefManager = require('../../../nodeDef/nodeDefManager')
+const NodeDefManager = require('../../../modules/nodeDef/persistence/nodeDefManager')
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 
 const nodeDefTypesByCollectType = {

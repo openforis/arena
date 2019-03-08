@@ -1,0 +1,25 @@
+@import "../../style/vars";
+
+.expression-editor {
+  display: grid;
+  grid-row-gap: 1.5rem;
+}
+
+.expression-editor__query-container {
+  display: flex;
+  align-items: center;
+
+  .query {
+    padding: .5rem 1rem;
+    font-size: .9rem;
+
+    .placeholder {
+      opacity: .35;
+      font-style: italic;
+    }
+
+    &.invalid {
+      background-color: rgba($redLight, .8);
+    }
+  }
+}

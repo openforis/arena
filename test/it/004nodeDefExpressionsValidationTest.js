@@ -1,6 +1,6 @@
 const {expect} = require('chai')
 
-const NodeDefExpressionsValidator = require('../../server/nodeDef/nodeDefExpressionsValidator')
+const NodeDefExpressionsValidator = require('../../server/modules/nodeDef/validator/nodeDefExpressionsValidator')
 const Survey = require('../../common/survey/survey')
 const Validator = require('../../common/validation/validator')
 const NodeDefExpression = require('../../common/survey/nodeDefExpression')

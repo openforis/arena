@@ -16,6 +16,9 @@ const keys = {
   value: 'value',
   meta: 'meta',
   placeholder: 'placeholder',
+
+  created: 'created',
+  updated: 'updated',
   deleted: 'deleted',
   dirty: 'dirty'
 }
@@ -144,6 +147,8 @@ module.exports = {
   getNodeDefUuids,
 
   isPlaceholder: R.propEq(keys.placeholder, true),
+  isCreated: R.propEq(keys.created, true),
+  isUpdated: R.propEq(keys.updated, true),
   isDeleted: R.propEq(keys.deleted, true),
   isDirty: R.propEq(keys.dirty, true),
 

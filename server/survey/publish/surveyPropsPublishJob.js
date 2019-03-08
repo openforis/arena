@@ -2,10 +2,10 @@ const R = require('ramda')
 
 const Job = require('../../job/job')
 
-const NodeDefManager = require('../../nodeDef/nodeDefManager')
+const NodeDefManager = require('../../modules/nodeDef/persistence/nodeDefManager')
 const SurveyManager = require('../surveyManager')
-const CategoryManager = require('../../category/categoryManager')
-const TaxonomyManager = require('../../taxonomy/taxonomyManager')
+const CategoryManager = require('../../modules/category/persistence/categoryManager')
+const TaxonomyManager = require('../../modules/taxonomy/persistence/taxonomyManager')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 

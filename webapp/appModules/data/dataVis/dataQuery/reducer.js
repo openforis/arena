@@ -10,14 +10,15 @@ import {
   dataQueryTableInit,
   dataQueryTableDataUpdate,
   dataQueryTableFilterUpdate,
+  dataQueryTableSortUpdate,
 } from './actions'
 
 import {
   initTableData,
-  resetTableData,
   assocTableData,
   assocTableDataCol,
   assocTableFilter,
+  assocTableSort,
   assocNodeDefUuidTable,
   assocNodeDefUuidCols, dissocTableDataCols,
 } from './dataQueryState'
@@ -39,16 +40,18 @@ const actionHandlers = {
 
   [dataQueryTableInit]: (
     state,
-    { offset, limit, filter, count, data, nodeDefUuidTable, nodeDefUuidCols }
+    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols }
   ) =>
     initTableData(
-      offset, limit, filter, count, data,
+      offset, limit, filter, sort, count, data,
       nodeDefUuidTable, nodeDefUuidCols
     )(state),
 
   [dataQueryTableDataUpdate]: (state, { offset, data }) => assocTableData(offset, data)(state),
 
-  [dataQueryTableFilterUpdate]: (state, { filter }) => assocTableFilter(filter)(state)
+  [dataQueryTableFilterUpdate]: (state, { filter }) => assocTableFilter(filter)(state),
+
+  [dataQueryTableSortUpdate]: (state, { sort }) => assocTableSort(sort)(state),
 }
 
 export default exportReducer(actionHandlers)

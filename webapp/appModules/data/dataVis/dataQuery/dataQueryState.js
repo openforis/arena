@@ -12,6 +12,7 @@ const tableKeys = {
   limit: 'limit',
   count: 'count',
   filter: 'filter',
+  sort: 'sort',
   nodeDefUuidTable: 'nodeDefUuidTable',
   nodeDefUuidCols: 'nodeDefUuidCols',
 }
@@ -27,6 +28,7 @@ export const getTableOffset = getTableProp(tableKeys.offset)
 export const getTableLimit = getTableProp(tableKeys.limit)
 export const getTableCount = getTableProp(tableKeys.count)
 export const getTableFilter = getTableProp(tableKeys.filter, '')
+export const getTableSort = getTableProp(tableKeys.sort, [])
 export const getTableNodeDefUuidTable = getTableProp(tableKeys.nodeDefUuidTable)
 export const getTableNodeDefUuidCols = getTableProp(tableKeys.nodeDefUuidCols, [])
 
@@ -58,8 +60,8 @@ export const dissocTableDataCols = cols => state => R.pipe(
   )(state),
 )(state)
 
-export const initTableData = (offset, limit, filter, count, data, nodeDefUuidTable, nodeDefUuidCols) =>
-  R.assoc(keys.table, { offset, limit, filter, count, data, nodeDefUuidTable, nodeDefUuidCols })
+export const initTableData = (offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols) =>
+  R.assoc(keys.table, { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols })
 
 export const assocTableData = (offset, data) => R.pipe(
   R.assocPath([keys.table, tableKeys.offset], offset),
@@ -68,3 +70,4 @@ export const assocTableData = (offset, data) => R.pipe(
 
 export const assocTableFilter = filter => R.assocPath([keys.table, tableKeys.filter], filter)
 
+export const assocTableSort = sort => R.assocPath([keys.table, tableKeys.sort], sort)

@@ -5,16 +5,16 @@ const db = require('../../../db/db')
 const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
 const { uuidv4 } = require('../../../../common/uuid')
 const { getSurveyDBSchema } = require('./surveySchemaRepositoryUtils')
-const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager') // TODO
+const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
 
 const SurveyRepository = require('./surveyRepository')
 const Survey = require('../../../../common/survey/survey')
 const SurveyValidator = require('../surveyValidator')
 
-const NodeDefManager = require('../../../nodeDef/nodeDefManager') // TODO
+const NodeDefManager = require('../../nodeDef/persistence/nodeDefManager')
 const { nodeDefLayoutProps, nodeDefRenderType } = require('../../../../common/survey/nodeDefLayout')
 
-const UserRepository = require('../../../user/userRepository') // TODO
+const UserRepository = require('../../../user/userRepository')
 const { getUserPrefSurveyId, userPrefNames } = require('../../../../common/user/userPrefs')
 
 const AuthGroupRepository = require('../../../authGroup/authGroupRepository')
