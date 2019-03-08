@@ -1,9 +1,9 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const NodeDef = require('../../../common/survey/nodeDef')
-const Node = require('../../../common/record/node')
-const SchemaRdb = require('../../../common/surveyRdb/schemaRdb')
+const NodeDef = require('../../../../../common/survey/nodeDef')
+const Node = require('../../../../../common/record/node')
+const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
 
 const DataTable = require('../schemaRdb/dataTable')
 const DataCol = require('../schemaRdb/dataCol')

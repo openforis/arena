@@ -19,7 +19,7 @@ const RecordValidationManager = require('../validator/recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
 const NodeDependentUpdateManager = require('./nodeDependentUpdateManager')
 
-const SurveyRdbManager = require('../../../surveyRdb/surveyRdbManager')
+const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
 const FileManager = require('./fileManager')
 
 const ActivityLog = require('../../../activityLog/activityLogger')

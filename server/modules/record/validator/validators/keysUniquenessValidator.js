@@ -7,7 +7,7 @@ const RecordValidation = require('../../../../../common/record/recordValidation'
 const Node = require('../../../../../common/record/node')
 const Validator = require('../../../../../common/validation/validator')
 
-const SurveyRdbManager = require('../../../../surveyRdb/surveyRdbManager')
+const SurveyRdbManager = require('../../../surveyRdb/persistence/surveyRdbManager')
 
 const errorKeys = {
   duplicateRecordKey: 'duplicateRecordKey',

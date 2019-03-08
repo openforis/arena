@@ -1,9 +1,9 @@
 const R = require('ramda')
 const fastcsv = require('fast-csv')
 
-const TableViewQuery = require('./tableViewQuery')
+const SurveyRdbManager = require('../persistence/surveyRdbManager')
 
-const exportToCSV = async (surveyId, tableName, cols, filter, output, client) => {
+const exportTableToCSV = async (surveyId, tableName, cols, filter, output) => {
   const csvStream = fastcsv.createWriteStream({ headers: true })
   csvStream.pipe(output)
 
@@ -16,7 +16,7 @@ const exportToCSV = async (surveyId, tableName, cols, filter, output, client) =>
 
   // 2. write rows
   while (!complete) {
-    const rows = await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, filter, client)
+    const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit, filter)
 
     rows.forEach(row => {
       csvStream.write(R.values(row))
@@ -32,5 +32,10 @@ const exportToCSV = async (surveyId, tableName, cols, filter, output, client) =>
 }
 
 module.exports = {
-  exportToCSV
+
+  queryTable: SurveyRdbManager.queryTable,
+
+  countTable: SurveyRdbManager.countTable,
+
+  exportTableToCSV,
 }

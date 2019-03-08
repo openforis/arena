@@ -1,11 +1,11 @@
-const Request = require('../serverUtils/request')
-const Response = require('../serverUtils/response')
+const Request = require('../../../serverUtils/request')
+const Response = require('../../../serverUtils/response')
 
-const SurveyRdbManager = require('./surveyRdbManager')
+const SurveyRdbService = require('../service/surveyRdbService')
 
 const {
   requireRecordListViewPermission,
-} = require('../authGroup/authMiddleware')
+} = require('../../../authGroup/authMiddleware')
 
 module.exports.init = app => {
 
@@ -19,7 +19,7 @@ module.exports.init = app => {
       const limit = Request.getRestParam(req, 'limit')
       const filter = Request.getRestParam(req, 'filter', '')
 
-      const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit, filter)
+      const rows = await SurveyRdbService.queryTable(surveyId, tableName, cols, offset, limit, filter)
 
       res.json(rows)
     } catch (err) {
@@ -33,7 +33,7 @@ module.exports.init = app => {
       const tableName = Request.getRequiredParam(req, 'tableName')
       const filter = Request.getRestParam(req, 'filter', '')
 
-      const count = await SurveyRdbManager.countTable(surveyId, tableName, filter)
+      const count = await SurveyRdbService.countTable(surveyId, tableName, filter)
 
       res.json(count)
     } catch (err) {
@@ -50,7 +50,7 @@ module.exports.init = app => {
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
 
-      await SurveyRdbManager.exportTableToCSV(surveyId, tableName, cols, filter, res)
+      await SurveyRdbService.exportTableToCSV(surveyId, tableName, cols, filter, res)
 
       res.end()
     } catch (err) {

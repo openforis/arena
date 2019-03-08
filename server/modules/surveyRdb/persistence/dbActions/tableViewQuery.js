@@ -1,17 +1,17 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const Survey = require('../../../common/survey/survey')
-const NodeDef = require('../../../common/survey/nodeDef')
+const Survey = require('../../../../../common/survey/survey')
+const NodeDef = require('../../../../../common/survey/nodeDef')
 
-const Node = require('../../../common/record/node')
+const Node = require('../../../../../common/record/node')
 
-const SchemaRdb = require('../../../common/surveyRdb/schemaRdb')
-const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
+const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
+const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
 
 const DataCol = require('../schemaRdb/dataCol')
 
-const NodeRepository = require('../../modules/record/persistence/nodeRepository')
+const NodeRepository = require('../../../record/persistence/nodeRepository')
 
 const runSelect = async (surveyId, tableName, cols, offset, limit, filter = '', client) => {
   const schemaName = SchemaRdb.getName(surveyId)

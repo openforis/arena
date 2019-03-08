@@ -6,7 +6,7 @@ const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 const RecordManager = require('../../modules/record/persistence/recordManager')
 
-const SurveyRdbManager = require('../../surveyRdb/surveyRdbManager')
+const SurveyRdbManager = require('../../modules/surveyRdb/persistence/surveyRdbManager')
 
 class SurveyRdbGeneratorJob extends Job {
 

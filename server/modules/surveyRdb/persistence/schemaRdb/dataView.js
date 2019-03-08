@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const NodeDef = require('../../../common/survey/nodeDef')
-const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
-const DataTable = require('./../schemaRdb/dataTable')
-const DataCol = require('./../schemaRdb/dataCol')
+const NodeDef = require('../../../../../common/survey/nodeDef')
+const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
+const DataTable = require('./dataTable')
+const DataCol = require('./dataCol')
 
 const getName = NodeDefTable.getViewName
 

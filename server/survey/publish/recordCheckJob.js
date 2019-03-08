@@ -85,7 +85,7 @@ const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
 
   const nodesToValidate = R.mergeRight(nodes, nodeDefsParentNodes)
 
-  await RecordValidationManager.validateNodes(survey, record, nodesToValidate, false, tx)
+  await RecordValidationManager.validateNodes(survey, record, nodesToValidate, tx)
 }
 
 RecordCheckJob.type = 'RecordCheckJob'

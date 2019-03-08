@@ -1,5 +1,5 @@
-const Survey = require('../../../common/survey/survey')
-const SchemaRdb = require('../../../common/surveyRdb/schemaRdb')
+const Survey = require('../../../../../common/survey/survey')
+const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
 
 const DataTable = require('../schemaRdb/dataTable')
 const DataView = require('../schemaRdb/dataView')

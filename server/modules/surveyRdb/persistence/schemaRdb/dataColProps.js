@@ -1,20 +1,20 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
-const Survey = require('../../../common/survey/survey')
-const SurveyUtils = require('../../../common/survey/surveyUtils')
-const NodeDef = require('../../../common/survey/nodeDef')
-const Taxonomy = require('../../../common/survey/taxonomy')
-const Node = require('../../../common/record/node')
-const CategoryManager = require('../../modules/category/persistence/categoryManager')
-const TaxonomyManager = require('../../modules/taxonomy/persistence/taxonomyManager')
+const Survey = require('../../../../../common/survey/survey')
+const SurveyUtils = require('../../../../../common/survey/surveyUtils')
+const NodeDef = require('../../../../../common/survey/nodeDef')
+const Taxonomy = require('../../../../../common/survey/taxonomy')
+const Node = require('../../../../../common/record/node')
+const CategoryManager = require('../../../category/persistence/categoryManager')
+const TaxonomyManager = require('../../../taxonomy/persistence/taxonomyManager')
 
-const NodeDefTable = require('../../../common/surveyRdb/nodeDefTable')
-const sqlTypes = require('../../../common/surveyRdb/sqlTypes')
+const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
+const sqlTypes = require('../../../../../common/surveyRdb/sqlTypes')
 const { nodeDefType } = NodeDef
 
-const { isBlank } = require('../../../common/stringUtils')
-const DateTimeUtils = require('../../../common/dateUtils')
+const { isBlank } = require('../../../../../common/stringUtils')
+const DateTimeUtils = require('../../../../../common/dateUtils')
 
 const colValueProcessor = 'colValueProcessor'
 const colTypeProcessor = 'colTypeProcessor'

@@ -14,7 +14,7 @@ require('../modules/srs/api/srsApi').init(router)
 
 require('../modules/record/api/recordApi').init(router)
 
-require('../surveyRdb/surveyRdbApi').init(router)
+require('../modules/surveyRdb/api/surveyRdbApi').init(router)
 
 require('../job/jobApi').init(router)
 
