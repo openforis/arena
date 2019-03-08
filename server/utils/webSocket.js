@@ -1,6 +1,6 @@
 const io = require('socket.io')()
 const R = require('ramda')
-const Request = require('../utils/request')
+const Request = require('./request')
 
 // ==== USER SOCKETS
 

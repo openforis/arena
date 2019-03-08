@@ -6,7 +6,7 @@ const Node = require('../../../../common/record/node')
 const RecordFile = require('../../../../common/record/recordFile')
 const { canEditRecord } = require('../../../../common/auth/authManager')
 
-const WebSocketManager = require('../../../webSocket/webSocketManager')
+const WebSocket = require('../../../utils/webSocket')
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 const ThreadManager = require('../../../threads/threadManager')
 
@@ -36,7 +36,7 @@ const createUserThread = (user, surveyId, recordUuid, preview) => {
   const messageHandler = msg => {
     const userIds = RecordUsersMap.getUserIds(recordUuid)
     userIds.forEach(userId =>
-      WebSocketManager.notifyUser(userId, msg.type, R.prop('content', msg))
+      WebSocket.notifyUser(userId, msg.type, R.prop('content', msg))
     )
   }
 
@@ -77,7 +77,7 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
   //notify users that record has been deleted
   recordUsersIds.forEach(userIdRecord => {
     if (userIdRecord !== user.id) {
-      WebSocketManager.notifyUser(userIdRecord, WebSocketEvents.recordDelete, recordUuid)
+      WebSocket.notifyUser(userIdRecord, WebSocketEvents.recordDelete, recordUuid)
       terminateUserThread(userIdRecord)
     }
   })

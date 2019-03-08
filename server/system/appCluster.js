@@ -10,7 +10,7 @@ const accessControlMiddleware = require('./middleware/accessControlMiddleware')
 const authMiddleware = require('./middleware/authMiddleware')
 const authApi = require('../modules/auth/api/authApi')
 const apiRouter = require('./apiRouter')
-const WebSocketManager = require('../webSocket/webSocketManager')
+const WebSocket = require('../utils/webSocket')
 const RecordPreviewCleanup = require('./recordPreviewCleanup')
 
 module.exports = async () => {
@@ -18,14 +18,14 @@ module.exports = async () => {
   const app = express()
 
 // ====== app initializations
-  app.use(bodyParser.json({limit: '5000kb'}))
+  app.use(bodyParser.json({ limit: '5000kb' }))
   app.use(cookieParser())
   app.use(fileUpload({
     //limit upload to 10MB
-    limits: {fileSize: 10 * 1024 * 1024},
+    limits: { fileSize: 10 * 1024 * 1024 },
     abortOnLimit: true,
-    useTempFiles : true,
-    tempFileDir : '/tmp/'
+    useTempFiles: true,
+    tempFileDir: '/tmp/'
   }))
 
   headerMiddleware.init(app)
@@ -34,7 +34,7 @@ module.exports = async () => {
 //accessControlMiddleware must be initialized after authConfig
   accessControlMiddleware.init(app)
 
-  app.use(compression({threshold: 512}))
+  app.use(compression({ threshold: 512 }))
 
   app.use('/', express.static(`${__dirname}/../../dist`))
   app.use('/app*', express.static(`${__dirname}/../../dist`))
@@ -53,7 +53,7 @@ module.exports = async () => {
   })
 
 // ====== socket middleware
-  WebSocketManager.init(server, sessionMiddleware)
+  WebSocket.init(server, sessionMiddleware)
 
 // ====== scheduler
   await RecordPreviewCleanup.init()
