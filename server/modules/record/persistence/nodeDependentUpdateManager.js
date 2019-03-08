@@ -7,6 +7,7 @@ const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
+const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 
 const { dependencyTypes } = require('../../survey/surveyDependenchyGraph')
@@ -20,43 +21,44 @@ const RecordExprParser = require('../recordExprParser')
  */
 
 const updateNodes = async (survey, record, nodes, tx) => {
-  let allUpdatedNodes = R.values(nodes)
-
-  const nodesToVisit = new Queue(R.values(nodes))
-  const visitedNodeUuids = []
+  const nodesArray = R.values(nodes)
+  const nodesUpdated = nodesArray
+  const nodesToVisit = new Queue(nodesArray)
+  const nodeUuidsVisited = []
 
   while (!nodesToVisit.isEmpty()) {
     const node = nodesToVisit.dequeue()
     const nodeUuid = Node.getUuid(node)
 
     // visit only unvisited nodes
-    if (!R.includes(nodeUuid, visitedNodeUuids)) {
+    if (!R.includes(nodeUuid, nodeUuidsVisited)) {
 
       // update node
-      const lastUpdatedNodes = await updateNode(survey, record, node, tx)
+      const nodesUpdatedCurrent = await updateNode(survey, record, node, tx)
+      record = Record.assocNodes(nodesUpdatedCurrent)(record)
 
       // mark updated nodes to visit
-      const nodesUpdatedArray = R.values(lastUpdatedNodes)
-      nodesToVisit.enqueueItems(nodesUpdatedArray)
+      const nodesUpdatedCurrentArray = R.values(nodesUpdatedCurrent)
+      nodesToVisit.enqueueItems(nodesUpdatedCurrentArray)
 
       // update nodes to return
-      for (const nodeUpdated of nodesUpdatedArray) {
+      for (const nodeUpdated of nodesUpdatedCurrentArray) {
         const idx = R.findIndex(
           R.propEq(Node.keys.uuid, Node.getUuid(nodeUpdated))
-        )(allUpdatedNodes)
+        )(nodesUpdated)
 
         idx >= 0
-          ? allUpdatedNodes[idx] = R.mergeDeepRight(allUpdatedNodes[idx], nodeUpdated)
-          : allUpdatedNodes.push(nodeUpdated)
+          ? nodesUpdated[idx] = R.mergeDeepRight(nodesUpdated[idx], nodeUpdated)
+          : nodesUpdated.push(nodeUpdated)
 
       }
 
       // mark node visited
-      visitedNodeUuids.push(nodeUuid)
+      nodeUuidsVisited.push(nodeUuid)
     }
   }
 
-  return SurveyUtils.toUuidIndexedObj(allUpdatedNodes)
+  return SurveyUtils.toUuidIndexedObj(nodesUpdated)
 }
 
 const updateNode = async (survey, record, node, tx) => {
