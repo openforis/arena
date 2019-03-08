@@ -3,7 +3,7 @@ const { sendErr } = require('../../../serverUtils/response')
 const { getRestParam, getBoolParam } = require('../../../serverUtils/request')
 
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
-const AuthMiddleware = require('../../../authGroup/authMiddleware')
+const AuthMiddleware = require('../../auth/authApiMiddleware')
 
 const CategoryService = require('../service/categoryService')
 

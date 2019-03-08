@@ -7,8 +7,8 @@ const fileUpload = require('express-fileupload')
 const sessionMiddleware = require('./middleware/sessionMiddleware')
 const headerMiddleware = require('./middleware/headerMiddleware')
 const accessControlMiddleware = require('./middleware/accessControlMiddleware')
-const authConfig = require('../auth/authConfig')
-const authApi = require('../auth/authApi')
+const authMiddleware = require('./middleware/authMiddleware')
+const authApi = require('../modules/auth/api/authApi')
 const apiRouter = require('./apiRouter')
 const WebSocketManager = require('../webSocket/webSocketManager')
 const RecordPreviewCleanup = require('./recordPreviewCleanup')
@@ -30,7 +30,7 @@ module.exports = async () => {
 
   headerMiddleware.init(app)
   app.use(sessionMiddleware)
-  authConfig.init(app)
+  authMiddleware.init(app)
 //accessControlMiddleware must be initialized after authConfig
   accessControlMiddleware.init(app)
 

@@ -3,7 +3,7 @@ const Response = require('../../../serverUtils/response')
 
 const SurveyRdbService = require('../service/surveyRdbService')
 
-const { requireRecordListViewPermission } = require('../../../authGroup/authMiddleware')
+const { requireRecordListViewPermission } = require('../../auth/authApiMiddleware')
 
 module.exports.init = app => {
 

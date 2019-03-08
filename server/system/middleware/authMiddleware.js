@@ -1,7 +1,8 @@
+const passport = require('passport')
 const LocalStrategy = require('passport-local')
 
-const { validEmail } = require('../../common/user/user')
-const UserService = require('../modules/user/service/userService')
+const UserService = require('../../modules/user/service/userService')
+const { validEmail } = require('../../../common/user/user')
 
 const verifyCallback = async (req, email, password, done) => {
 
@@ -28,4 +29,21 @@ const localStrategy = new LocalStrategy({
   verifyCallback
 )
 
-module.exports = localStrategy
+module.exports.init = app => {
+
+  app.use(passport.initialize())
+
+  app.use(passport.session())
+
+  passport.use(localStrategy)
+
+  passport.serializeUser((user, done) => done(null, user.id))
+
+  passport.deserializeUser(async (userId, done) => {
+    const user = await UserService.findUserById(userId)
+    done(null, user)
+  })
+
+}
+
+

@@ -1,7 +1,7 @@
 const Request = require('../../../serverUtils/request')
 const Response = require('../../../serverUtils/response')
 
-const AuthMiddleware = require('../../../authGroup/authMiddleware')
+const AuthMiddleware = require('../../auth/authApiMiddleware')
 
 const NodeDefService = require('../service/nodeDefService')
 

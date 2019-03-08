@@ -1,4 +1,4 @@
-const UnauthorizedError = require('../authGroup/unauthorizedError')
+const UnauthorizedError = require('./unauthorizedError')
 
 const status = {
   ok: 'ok',

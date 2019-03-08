@@ -13,7 +13,7 @@ const {
   requireRecordEditPermission,
   requireRecordCreatePermission,
   requireRecordViewPermission,
-} = require('../../../authGroup/authMiddleware')
+} = require('../../auth/authApiMiddleware')
 
 module.exports.init = app => {
 

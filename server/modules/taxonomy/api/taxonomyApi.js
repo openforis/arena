@@ -5,7 +5,7 @@ const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 const { jobToJSON } = require('../../../job/jobUtils')
 const TaxonomyService = require('../service/taxonomyService')
 
-const AuthMiddleware = require('../../../authGroup/authMiddleware')
+const AuthMiddleware = require('../../auth/authApiMiddleware')
 
 const sendTaxonomies = async (res, surveyId, draft, validate) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId(surveyId, draft, validate)

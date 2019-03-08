@@ -8,7 +8,7 @@ const SurveyManager = require('./surveyManager')
 const SurveyValidator = require('./surveyValidator')
 const Validator = require('../../common/validation/validator')
 
-const AuthMiddleware = require('../authGroup/authMiddleware')
+const AuthMiddleware = require('../modules/auth/authApiMiddleware')
 
 const JobManager = require('../job/jobManager')
 const JobUtils = require('../job/jobUtils')
