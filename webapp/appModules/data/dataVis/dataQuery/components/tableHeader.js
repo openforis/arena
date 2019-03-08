@@ -8,6 +8,7 @@ import DownloadButton from '../../../../../commonComponents/form/downloadButton'
 import Tooltip from '../../../../../commonComponents/tooltip'
 
 import Expression from '../../../../../../common/exprParser/expression'
+import * as DataSort from './sort/dataSort'
 
 import { updateTableFilter, updateTableOffset, updateTableSort } from '../actions'
 
@@ -22,7 +23,6 @@ class TableHeader extends React.Component {
     this.state = {
       showExpressionEditor: false,
       showSortEditor: false,
-      sortMsg: '',
     }
   }
 
@@ -40,16 +40,15 @@ class TableHeader extends React.Component {
     }))
   }
 
-  updateSort (sort, sortMsg) {
+  updateSort (sort) {
     const { updateTableSort } = this.props
 
     updateTableSort(sort)
-    this.setState({ sortMsg })
   }
 
   render () {
 
-    const { showExpressionEditor, showSortEditor, sortMsg } = this.state
+    const { showExpressionEditor, showSortEditor } = this.state
 
     const {
       surveyId, nodeDefUuidContext, nodeDefUuidCols,
@@ -59,7 +58,7 @@ class TableHeader extends React.Component {
     } = this.props
 
     const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${filter}&sort=${sort}&cols=${JSON.stringify(colNames)}`
-    const sortMessage = sort.length ? [sortMsg] : []
+    const sortMsg = DataSort.getViewExpr(sort)
 
     return (
       <div className="table__header">
@@ -86,7 +85,7 @@ class TableHeader extends React.Component {
 
           }
 
-          <Tooltip messages={sortMessage}>
+          <Tooltip messages={sortMsg && [sortMsg]}>
             <button className={`btn btn-s btn-of-light btn-edit${sort.length ? ' highlight' : ''}`}
                     onClick={this.toggleSortEditor}>
               <span className="icon icon-sort-amount-asc icon-16px"/>
@@ -98,7 +97,7 @@ class TableHeader extends React.Component {
               nodeDefUuidCols={nodeDefUuidCols}
               nodeDefUuidContext={nodeDefUuidContext}
               sort={sort}
-              onChange={(sort, sortMsg) => this.updateSort(sort, sortMsg)}
+              onChange={(sort) => this.updateSort(sort)}
               onClose={this.toggleSortEditor}/>
 
           }

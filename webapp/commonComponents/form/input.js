@@ -27,7 +27,7 @@ export const Input = React.forwardRef((props, ref) => {
     <Tooltip
       messages={validation.errors}
       type={`${validation.errors ? 'error' : ''}`}
-      style={{ display: 'grid', width: '100%', height: '100%' }}>
+      className="full-width-input">
       <TextMask ref={ref}
                 Component={InputAdapter}
                 mask={mask}

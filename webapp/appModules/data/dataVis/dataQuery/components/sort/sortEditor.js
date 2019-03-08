@@ -2,7 +2,6 @@ import './sortEditor.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import Expression from '../../../../../../../common/exprParser/expression'
 
@@ -16,7 +15,6 @@ import Survey from '../../../../../../../common/survey/survey'
 import * as SurveyState from '../../../../../../survey/surveyState'
 
 import * as DataSort from './dataSort'
-
 
 class SortExpressionComponent extends React.Component {
 
@@ -98,9 +96,9 @@ class SortExpressionComponent extends React.Component {
 
   applyChange () {
     const { sortCriteria } = this.state
-    const { onChange, onClose, availableVariables } = this.props
+    const { onChange, onClose } = this.props
 
-    onChange && onChange(sortCriteria, DataSort.getViewExpr(sortCriteria, availableVariables))
+    onChange && onChange(sortCriteria)
     onClose()
   }
 
