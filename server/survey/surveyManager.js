@@ -14,7 +14,7 @@ const SurveyValidator = require('../survey/surveyValidator')
 const NodeDefManager = require('../modules/nodeDef/persistence/nodeDefManager')
 const { nodeDefLayoutProps, nodeDefRenderType } = require('../../common/survey/nodeDefLayout')
 
-const UserRepository = require('../user/userRepository')
+const UserRepository = require('../modules/user/persistence/userRepository')
 const { getUserPrefSurveyId, userPrefNames } = require('../../common/user/userPrefs')
 
 const AuthGroupRepository = require('../authGroup/authGroupRepository')

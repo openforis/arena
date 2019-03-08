@@ -55,7 +55,9 @@ const terminateUserThread = userId => {
     checkOutTimeoutsByUserId[userId] = setTimeout(
       () => {
         const updateWorker = RecordThreads.getThreadByUserId(userId)
-        updateWorker.terminate()
+        if (updateWorker)
+          updateWorker.terminate()
+
         delete checkOutTimeoutsByUserId[userId]
       },
       1000

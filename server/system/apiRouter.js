@@ -4,7 +4,7 @@ const router = express.Router()
 
 //init apis
 
-require('../user/userApi').init(router)
+require('../modules/user/api/userApi').init(router)
 
 require('../survey/surveyApi').init(router)
 require('../modules/nodeDef/api/nodeDefApi').init(router)

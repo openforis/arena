@@ -1,4 +1,4 @@
-const {passwordHash} = require('../server/user/userUtils')
+const {passwordHash} = require('../server/modules/user/userUtils')
 
 if (process.argv.length < 3) {
   console.log('Password is mandatory. Example usage: ')

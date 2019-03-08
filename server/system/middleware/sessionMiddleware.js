@@ -1,6 +1,6 @@
 const session = require('express-session')
 const pgSession = require('connect-pg-simple')(session)
-const db = require('../db/db')
+const db = require('../../db/db')
 
 const sessionOptions = {
   secret: process.env.FOO_COOKIE_SECRET,

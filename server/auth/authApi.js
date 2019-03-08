@@ -6,7 +6,7 @@ const { userPrefNames, getUserPrefSurveyId } = require('../../common/user/userPr
 
 const AuthManager = require('../../common/auth/authManager')
 const SurveyManager = require('../survey/surveyManager')
-const UserManager = require('../user/userManager')
+const UserService = require('../modules/user/service/userService')
 const RecordService = require('../modules/record/service/recordService')
 
 const Survey = require('../../common/survey/survey')
@@ -32,7 +32,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
     // removing user pref
     sendResponse(
       res,
-      await UserManager.deleteUserPref(user, userPrefNames.survey)
+      await UserService.deleteUserPref(user, userPrefNames.survey)
     )
   }
 }

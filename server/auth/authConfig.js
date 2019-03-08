@@ -2,7 +2,7 @@ const passport = require('passport')
 
 const localStrategy = require('./authConfigLocalStrategy')
 
-const {findUserById} = require('../user/userManager')
+const UserService = require('../modules/user/service/userService')
 
 module.exports.init = app => {
 
@@ -15,7 +15,7 @@ module.exports.init = app => {
   passport.serializeUser((user, done) => done(null, user.id))
 
   passport.deserializeUser(async (userId, done) => {
-    const user = await findUserById(userId)
+    const user = await UserService.findUserById(userId)
     done(null, user)
   })
 

@@ -1,4 +1,4 @@
-const db = require('../db/db')
+const db = require('../../../db/db')
 
 const selectFields = ['id', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.join(',')
