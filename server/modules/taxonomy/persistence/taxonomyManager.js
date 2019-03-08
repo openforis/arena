@@ -10,7 +10,7 @@ const Taxonomy = require('../../../../common/survey/taxonomy')
 const TaxonomyRepository = require('./taxonomyRepository')
 const TaxonomyValidator = require('../taxonomyValidator')
 
-const ActivityLog = require('../../../activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLogger')
 
 /**
  * ====== CREATE

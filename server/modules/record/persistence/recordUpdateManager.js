@@ -22,7 +22,7 @@ const NodeDependentUpdateManager = require('./nodeDependentUpdateManager')
 const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
 const FileManager = require('./fileManager')
 
-const ActivityLog = require('../../../activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLogger')
 
 /**
  * =======

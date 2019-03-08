@@ -20,7 +20,7 @@ const { getUserPrefSurveyId, userPrefNames } = require('../../common/user/userPr
 const AuthGroupRepository = require('../modules/auth/persistence/authGroupRepository')
 const AuthManager = require('../../common/auth/authManager')
 
-const ActivityLog = require('../activityLog/activityLogger')
+const ActivityLog = require('../modules/activityLog/activityLogger')
 
 const assocSurveyInfo = info => ({ info })
 

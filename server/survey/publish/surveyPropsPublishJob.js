@@ -7,7 +7,7 @@ const SurveyManager = require('../surveyManager')
 const CategoryManager = require('../../modules/category/persistence/categoryManager')
 const TaxonomyManager = require('../../modules/taxonomy/persistence/taxonomyManager')
 
-const ActivityLog = require('../../activityLog/activityLogger')
+const ActivityLog = require('../../modules/activityLog/activityLogger')
 
 const determineDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, t)

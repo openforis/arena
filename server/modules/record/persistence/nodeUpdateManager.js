@@ -9,7 +9,7 @@ const Record = require('../../../../common/record/record')
 
 const NodeRepository = require('./nodeRepository')
 
-const ActivityLog = require('../../../activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLogger')
 
 //always assoc parentNode, used in surveyRdbManager.updateTableNodes
 const assocParentNode = (surveyId, record, node, nodes) => {

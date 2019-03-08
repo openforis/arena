@@ -1,4 +1,4 @@
-const {getSurveyDBSchema} = require('../../server/survey/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema } = require('../../survey/surveySchemaRepositoryUtils')
 
 const type = {
   //survey
@@ -52,5 +52,5 @@ const logMany = async (user, surveyId, activities, client) =>
 module.exports = {
   log,
   logMany,
-  type: type,
+  type,
 }

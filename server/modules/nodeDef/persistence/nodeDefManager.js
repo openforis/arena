@@ -9,7 +9,7 @@ const NodeDefValidator = require('../validator/nodeDefValidator')
 
 const {markSurveyDraft} = require('../../../survey/surveySchemaRepositoryUtils')
 
-const ActivityLog = require('../../../activityLog/activityLogger')
+const ActivityLog = require('../../activityLog/activityLogger')
 
 // ======= CREATE
 
