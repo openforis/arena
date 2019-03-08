@@ -1,6 +1,6 @@
-const { sendErr } = require('../../../serverUtils/response')
+const { sendErr } = require('../../../utils/response')
 
-const { getRestParam, getBoolParam } = require('../../../serverUtils/request')
+const { getRestParam, getBoolParam } = require('../../../utils/request')
 
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 const AuthMiddleware = require('../../auth/authApiMiddleware')

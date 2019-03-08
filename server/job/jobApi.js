@@ -1,4 +1,4 @@
-const {sendOk} = require('../serverUtils/response')
+const {sendOk} = require('../utils/response')
 
 const {cancelActiveJobByUserId} = require('./jobManager')
 

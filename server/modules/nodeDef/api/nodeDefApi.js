@@ -1,5 +1,5 @@
-const Request = require('../../../serverUtils/request')
-const Response = require('../../../serverUtils/response')
+const Request = require('../../../utils/request')
+const Response = require('../../../utils/response')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 

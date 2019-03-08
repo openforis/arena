@@ -1,5 +1,5 @@
-const Request = require('../../../serverUtils/request')
-const Response = require('../../../serverUtils/response')
+const Request = require('../../../utils/request')
+const Response = require('../../../utils/response')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const { jobToJSON } = require('../../../job/jobUtils')

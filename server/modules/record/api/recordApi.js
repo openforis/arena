@@ -1,5 +1,5 @@
-const Request = require('../../../serverUtils/request')
-const { sendErr, sendOk, sendFile } = require('../../../serverUtils/response')
+const Request = require('../../../utils/request')
+const { sendErr, sendOk, sendFile } = require('../../../utils/response')
 
 const Record = require('../../../../common/record/record')
 const RecordFile = require('../../../../common/record/recordFile')

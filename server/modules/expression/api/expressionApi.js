@@ -8,8 +8,8 @@ const { isBlank, contains } = require('../../../../common/stringUtils')
 const CategoryManager = require('../../category/persistence/categoryManager')
 const TaxonomyManager = require('../../taxonomy/persistence/taxonomyManager')
 
-const { sendErr } = require('../../../serverUtils/response')
-const { getRestParam } = require('../../../serverUtils/request')
+const { sendErr } = require('../../../utils/response')
+const { getRestParam } = require('../../../utils/request')
 
 const toItem = (type, lang = null) =>
   item => item

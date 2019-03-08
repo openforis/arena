@@ -1,4 +1,4 @@
-const Request = require('../../../serverUtils/request')
+const Request = require('../../../utils/request')
 
 const { findSrsByCodeOrName } = require('../service/srsService')
 

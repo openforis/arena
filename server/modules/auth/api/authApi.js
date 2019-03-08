@@ -1,6 +1,6 @@
 const passport = require('passport')
 
-const { sendOk } = require('../../../serverUtils/response')
+const { sendOk } = require('../../../utils/response')
 
 const { userPrefNames, getUserPrefSurveyId } = require('../../../../common/user/userPrefs')
 

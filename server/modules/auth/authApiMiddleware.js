@@ -1,5 +1,5 @@
-const Request = require('../../serverUtils/request')
-const Response = require('../../serverUtils/response')
+const Request = require('../../utils/request')
+const Response = require('../../utils/response')
 
 const SurveyManager = require('../survey/persistence/surveyManager')
 const RecordService = require('../record/service/recordService')
@@ -13,7 +13,7 @@ const {
 } = require('../../../common/auth/authManager')
 const Survey = require('../../../common/survey/survey')
 
-const UnauthorizedError = require('../../serverUtils/unauthorizedError')
+const UnauthorizedError = require('../../utils/unauthorizedError')
 
 const checkPermission = (req, res, next, permissionFn, obj) => {
   const user = Request.getSessionUser(req)
