@@ -12,7 +12,7 @@ const ThreadManager = require('../../../threads/threadManager')
 
 const RecordUpdateManager = require('../persistence/recordUpdateManager')
 const RecordManager = require('../persistence/recordManager')
-const FileManager = require('../../../file/fileManager')
+const FileManager = require('../persistence/fileManager')
 
 const RecordUsersMap = require('./update/recordUsersMap')
 const RecordThreads = require('./update/thread/recordThreads')

@@ -6,7 +6,7 @@ const RecordFile = require('../../../../common/record/recordFile')
 const Node = require('../../../../common/record/node')
 
 const RecordService = require('../service/recordService')
-const FileManager = require('../../../file/fileManager')
+const FileManager = require('../persistence/fileManager')
 
 const {
   requireRecordListViewPermission,

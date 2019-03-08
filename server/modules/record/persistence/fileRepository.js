@@ -1,6 +1,6 @@
-const db = require('../db/db')
+const db = require('../../../db/db')
 
-const {getSurveyDBSchema} = require('../survey/surveySchemaRepositoryUtils')
+const {getSurveyDBSchema} = require('../../../survey/surveySchemaRepositoryUtils')
 
 // ============== CREATE
 
