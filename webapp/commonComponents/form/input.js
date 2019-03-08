@@ -27,21 +27,24 @@ export const Input = React.forwardRef((props, ref) => {
     <Tooltip
       messages={validation.errors}
       type={`${validation.errors ? 'error' : ''}`}
-      className="full-width-input">
-      <TextMask ref={ref}
-                Component={InputAdapter}
-                mask={mask}
-                className="form-input"
-                aria-disabled={disabled}
-                isControlled={true}
-                value={value}
-                onChange={(e, { caretPosition, value: newValue }) => {
-                  if (onChange && value !== newValue) {
-                    onChange(newValue)
-                  }
-                }}
-                {...inputProps}
+      className="form-input-container">
+
+      <TextMask
+        ref={ref}
+        Component={InputAdapter}
+        mask={mask}
+        className="form-input"
+        aria-disabled={disabled}
+        isControlled={true}
+        value={value}
+        onChange={(e, { caretPosition, value: newValue }) => {
+          if (onChange && value !== newValue) {
+            onChange(newValue)
+          }
+        }}
+        {...inputProps}
       />
+
     </Tooltip>
   )
 })

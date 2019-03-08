@@ -8,6 +8,7 @@
     background-color: $yellow;
     padding: 1rem;
     opacity: .97;
+    font-weight: 600;
   }
 
   &:hover {
@@ -45,7 +46,7 @@
   }
 
   .btn-checkbox .icon {
-      border: 2px solid rgba(220, 66, 66, 0.6);
+    border: 2px solid rgba(220, 66, 66, 0.6);
   }
 
   .message {
