@@ -3,7 +3,7 @@ const fastcsv = require('fast-csv')
 
 const TableViewQuery = require('./tableViewQuery')
 
-const exportToCSV = async (surveyId, tableName, cols, filter, output, client) => {
+const exportToCSV = async (surveyId, tableName, cols, filter, sort, output, client) => {
   const csvStream = fastcsv.createWriteStream({ headers: true })
   csvStream.pipe(output)
 
@@ -16,7 +16,7 @@ const exportToCSV = async (surveyId, tableName, cols, filter, output, client) =>
 
   // 2. write rows
   while (!complete) {
-    const rows = await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, filter, client)
+    const rows = await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, filter, sort, client)
 
     rows.forEach(row => {
       csvStream.write(R.values(row))

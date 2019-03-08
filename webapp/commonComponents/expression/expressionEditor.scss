@@ -1,24 +1,11 @@
 @import "../../style/vars";
 
-.expression {
+.expression-editor {
   display: grid;
   grid-row-gap: 1.5rem;
-
-  &.edit {
-    background-color: rgba($grey2, .95);
-    position: fixed;
-    min-width: 600px;
-    z-index: $zIndex10TopOfApp;
-    max-height: calc(80vh);
-    grid-template-rows: auto 1fr auto;
-
-    .query {
-      background-color: rgba($white, .15);
-    }
-  }
 }
 
-.expression__query-container {
+.expression-editor__query-container {
   display: flex;
   align-items: center;
 

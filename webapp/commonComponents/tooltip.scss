@@ -1,94 +1,67 @@
 @import "../style/vars";
 
+
 .tooltip {
-  position: relative;
-  //color: #00b4ab;
-
-  .tooltip-text {
+  .message {
+    visibility: hidden;
     position: absolute;
-    max-width: 300px;
-    background-color: $blue1;
-    color: rgba($white, .8);
-    font-size: .85rem;
-    text-transform: uppercase;
-    text-align: center;
-    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-    padding: .3rem 1rem;
-
-    z-index: 1;
-    margin-left: -60px;
-    opacity: 0;
-    transition: .3s;
-    transform: translate3d(0px, 20px, 0px);
-
-    &::after {
-      content: "";
-      position: absolute;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-    }
+    background-color: $yellow;
+    padding: 1rem;
+    opacity: .97;
+    font-weight: 600;
   }
 
+  &:hover {
+    cursor: pointer;
+    z-index: $zIndex6Tooltip;
 
-  &.top {
-    .tooltip-text {
-      bottom: 125%;
-      left: 50%;
+    .message {
+      font-size: .85rem;
+      color: black;
+      visibility: visible;
+      position: fixed;
+      margin-top: 0.5rem;
+      border-radius: 0.4rem;
+      border: 1px solid $yellow;
+      z-index: $zIndex6Tooltip;
 
-      &::after {
-        top: 100%;
-        left: 50%;
-        border-color: $blue1 transparent transparent transparent;
-      }
-    }
-  }
-
-  &.bottom {
-    .tooltip-text {
-      bottom: -100%;
-      left: 10%;
-
-      &::after {
+      &:after {
+        content: "";
+        position: absolute;
         bottom: 100%;
-        left: 50%;
-        border-color: transparent transparent $blue1 transparent;
+        left: 1rem;
+        margin-left: -.5rem;
+        border: .5rem solid;
+        border-color: transparent transparent $yellow transparent;
       }
     }
   }
-
-  &:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-    transform: translate3d(0px, 0px, 0px);
-  }
-
 }
 
 .tooltip-error {
   @extend .tooltip;
-
-  .tooltip-text {
-    background-color: $red;
-  }
-
-  &.top {
-    .tooltip-text::after {
-      border-color: $red transparent transparent transparent;
-    }
-  }
-
-  &.bottom {
-    .tooltip-text::after {
-      border-color: transparent transparent $red transparent;
-    }
-  }
 
   .form-input {
     border-bottom: 2px solid rgba($red, .6);
   }
 
   .btn-checkbox .icon {
-    border: 2px solid rgba($red, .6)
+    border: 2px solid rgba(220, 66, 66, 0.6);
+  }
+
+  .message {
+    background-color: $redDark !important;
+  }
+
+  &:hover {
+    .message {
+      color: white !important;
+      border: 1px solid $redDark !important;
+      opacity: .97;
+
+      &:after {
+        border-color: transparent transparent $redDark transparent !important;
+      }
+    }
   }
 }

@@ -29,8 +29,8 @@ const updateTableNodes = async (surveyInfo, nodeDefs, nodes, client = db) =>
   await NodesUpdate.run(surveyInfo, nodeDefs, nodes, client)
 
 const queryTable = async (surveyId, tableName, cols = [],
-                          offset, limit, filter, client = db) =>
-  await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, filter, client)
+                          offset, limit, filter, sort, client = db) =>
+  await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, filter, sort, client)
 
 const countTable = async (surveyId, tableName, filter, client = db) =>
   await TableViewQuery.runCount(surveyId, tableName, filter, client)
@@ -38,8 +38,8 @@ const countTable = async (surveyId, tableName, filter, client = db) =>
 const queryRootTableByRecordKeys = async (survey, recordUuid, client = db) =>
   await TableViewQuery.queryRootTableByRecordKeys(survey, recordUuid, client)
 
-const exportTableToCSV = async (surveyId, tableName, cols, filter, output, client = db) =>
-  await TableViewExport.exportToCSV(surveyId, tableName, cols, filter, output, client)
+const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output, client = db) =>
+  await TableViewExport.exportToCSV(surveyId, tableName, cols, filter, sort, output, client)
 
 module.exports = {
   dropSchema,

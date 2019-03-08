@@ -1,36 +1,6 @@
 @import "../style/vars";
 
 .error-badge {
-  background-color: $redDark;
-
-  .messages {
-    visibility: hidden;
-    position: absolute;
-    background-color: $redDark;
-    padding: 1rem;
-    opacity: .95;
-  }
-
-  &:hover {
-    cursor: pointer;
-    z-index: $zIndex6ErrorBadgeHover;
-
-    .messages {
-      visibility: visible;
-      position: fixed;
-      margin-top: 2.6rem;
-      border-radius: 0.4rem;
-      border: 1px solid $redDark;
-
-      :after {
-        content: "";
-        position: absolute;
-        bottom: 100%;
-        left: 1rem;
-        margin-left: -.5rem;
-        border: .5rem solid;
-        border-color: transparent transparent $redDark transparent;
-      }
-    }
-  }
+  background-color: $redDark !important;
+  display: block !important;
 }

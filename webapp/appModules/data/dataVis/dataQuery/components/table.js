@@ -2,18 +2,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
+import TableHeader from './tableHeader'
 import TableRows from './tableRows'
-import TablePaginator from '../../../../../commonComponents/table/tablePaginator'
-import ExpressionComponent from '../../../../../commonComponents/expression/expression'
-import DownloadButton from '../../../../../commonComponents/form/downloadButton'
 
 import * as SurveyState from '../../../../../survey/surveyState'
 
-import { updateTableFilter, updateTableOffset } from '../actions'
-
 import Survey from '../../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
-import Expression from '../../../../../../common/exprParser/expression'
 
 import * as DataQueryState from '../dataQueryState'
 
@@ -30,11 +25,9 @@ class Table extends React.Component {
 
   render () {
     const {
-      nodeDefUuidContext, nodeDefCols, colNames, data,
-      offset, limit, filter, count, lang,
-      updateTableOffset, updateTableFilter,
-      showTable,
-      surveyId, tableName
+      surveyId, lang, data, showTable,
+      nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames,
+      tableName, offset, limit, filter, sort, count,
     } = this.props
 
     const { width = defaultColWidth } = elementOffset(this.tableRef.current)
@@ -45,39 +38,30 @@ class Table extends React.Component {
       ? widthMax / colNames.length
       : colWidthMin
 
+    const hasData = !R.isEmpty(data)
+
     return (
       <div className="data-query__table table" ref={this.tableRef}>
         {
           showTable &&
           <React.Fragment>
-            <div className="table__header">
-              <div className="filter-container">
-                {
-                  nodeDefUuidContext &&
-                  <React.Fragment>
-                <span className="icon icon-filter icon-14px icon-left icon-reverse btn-of"
-                      style={{ opacity: R.isEmpty(filter) ? 0.5 : 1 }}/>
-                    <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
-                                         query={filter}
-                                         onChange={query => updateTableFilter(query)}
-                                         mode={Expression.modes.sql}/>
-                  </React.Fragment>
-                }
-              </div>
 
-              <DownloadButton href={`/api/surveyRdb/${surveyId}/${tableName}/export?filter=${filter}&cols=${JSON.stringify(colNames)}`}
-                              label="CSV"/>
-
-              {
-                !R.isEmpty(data) &&
-                <TablePaginator offset={offset} limit={limit} count={count}
-                                fetchFn={updateTableOffset}/>
-              }
-            </div>
-
+            <TableHeader
+              surveyId={surveyId}
+              nodeDefUuidContext={nodeDefUuidContext}
+              nodeDefUuidCols={nodeDefUuidCols}
+              tableName={tableName}
+              colNames={colNames}
+              filter={filter}
+              sort={sort}
+              limit={limit}
+              offset={offset}
+              count={count}
+              showPaginator={hasData}
+            />
 
             {
-              !R.isEmpty(data) &&
+              hasData &&
               <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
                          data={data} offset={offset}
                          lang={lang}
@@ -100,19 +84,21 @@ const mapStateToProps = state => {
   const tableName = NodeDefTable.getViewNameByUuid(nodeDefUuidContext)(survey)
 
   return {
+    surveyId: Survey.getId(survey),
+    tableName,
     nodeDefUuidContext,
+    nodeDefUuidCols,
     nodeDefCols,
     colNames,
     data: DataQueryState.getTableData(state),
     offset: DataQueryState.getTableOffset(state),
     limit: DataQueryState.getTableLimit(state),
     filter: DataQueryState.getTableFilter(state),
+    sort: DataQueryState.getTableSort(state),
     count: DataQueryState.getTableCount(state),
     lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
     showTable: DataQueryState.hasTableAndCols(state),
-    surveyId: Survey.getId(survey),
-    tableName
   }
 }
 
-export default connect(mapStateToProps, { updateTableOffset, updateTableFilter })(Table)
+export default connect(mapStateToProps)(Table)

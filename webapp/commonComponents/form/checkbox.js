@@ -1,11 +1,7 @@
 import React from 'react'
-import { TooltipError } from '../tooltip'
+import Tooltip from '../tooltip'
 
 class Checkbox extends React.Component {
-
-  constructor (props) {
-    super(props)
-  }
 
   render () {
 
@@ -16,12 +12,11 @@ class Checkbox extends React.Component {
       onChange,
       disabled,
       radio,
-      tooltipErrorPosition
     } = this.props
 
     return (
       <div style={{ justifySelf: 'start' }}>
-        <TooltipError messages={validation.errors} position={tooltipErrorPosition}>
+        <Tooltip messages={validation.errors} type={validation.errors ? 'error' : ''}>
 
           <button className="btn btn-s btn-transparent btn-checkbox"
                   onClick={() => onChange(!checked)}
@@ -30,7 +25,7 @@ class Checkbox extends React.Component {
             {label}
           </button>
 
-        </TooltipError>
+        </Tooltip>
       </div>
     )
   }
@@ -41,7 +36,6 @@ Checkbox.defaultProps = {
   disabled: false,
   radio: false,
   validation: {},
-  tooltipErrorPosition: 'top',
 }
 
 export default Checkbox

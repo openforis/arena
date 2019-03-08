@@ -13,13 +13,14 @@ const DataCol = require('../schemaRdb/dataCol')
 
 const NodeRepository = require('../../record/nodeRepository')
 
-const runSelect = async (surveyId, tableName, cols, offset, limit, filter = '', client) => {
+const runSelect = async (surveyId, tableName, cols, offset, limit, filter = '', sort = '', client) => {
   const schemaName = SchemaRdb.getName(surveyId)
 
   return await client.any(`
     SELECT ${cols.join(', ')} 
     FROM ${schemaName}.${tableName}
     ${R.isEmpty(filter) ? '' : `WHERE ${filter}`}
+    ${R.isEmpty(sort) ? '' : `ORDER BY ${sort} NULLS LAST`}
     LIMIT ${limit}
     OFFSET ${offset}
     `,
@@ -68,12 +69,12 @@ const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {
     keyNodes.map(
       async node => {
         const colValue = await getColValue(node)
-        return `${getColName(node)} ${colValue === null ? ' IS NULL' : " = '" + colValue + "'"}`
+        return `${getColName(node)} ${colValue === null ? ' IS NULL' : ' = \'' + colValue + '\''}`
       }
     )
   )
 
-  return await runSelect(surveyId, tableName, ['*'], 0, 'ALL', whereConditions.join(' AND '), client)
+  return await runSelect(surveyId, tableName, ['*'], 0, 'ALL', whereConditions.join(' AND '), '', client)
 
 }
 
