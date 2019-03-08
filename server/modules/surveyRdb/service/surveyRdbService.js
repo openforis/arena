@@ -3,7 +3,7 @@ const fastcsv = require('fast-csv')
 
 const SurveyRdbManager = require('../persistence/surveyRdbManager')
 
-const exportTableToCSV = async (surveyId, tableName, cols, filter, output) => {
+const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output) => {
   const csvStream = fastcsv.createWriteStream({ headers: true })
   csvStream.pipe(output)
 
@@ -16,7 +16,8 @@ const exportTableToCSV = async (surveyId, tableName, cols, filter, output) => {
 
   // 2. write rows
   while (!complete) {
-    const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit, filter)
+
+    const rows = await SurveyRdbManager.queryTable(surveyId, tableName, cols, offset, limit, filter, sort)
 
     rows.forEach(row => {
       csvStream.write(R.values(row))

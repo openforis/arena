@@ -4,7 +4,7 @@ $rowHeaderHeight: 45px;
 
 .data-query {
   display: grid;
-  grid-template-columns: 240px 1fr 10px;
+  grid-template-columns: 240px 1fr 5px;
   grid-column-gap: 10px;
   justify-content: center;
   height: 100%;
@@ -14,9 +14,22 @@ $rowHeaderHeight: 45px;
   position: relative;
 
   .table__header {
-    .filter-container {
-      display: flex;
-      align-items: center;
+    height: 40px;
+    align-items: top;
+
+    .data-operations {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      grid-column-gap: .25rem;
+
+      .btn {
+        padding: .5rem;
+        font-size: 0.8rem;
+
+        &.highlight {
+          background-color: rgba($yellow, .35) !important;
+        }
+      }
     }
   }
 

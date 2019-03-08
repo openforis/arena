@@ -9,7 +9,7 @@ import Literal from './literal'
 import Logical from './logical'
 import Member from './member'
 
-import Expression from '../../../../../common/exprParser/expression'
+import Expression from '../../../../common/exprParser/expression'
 
 const components = {
   [Expression.types.Identifier]: Identifier,

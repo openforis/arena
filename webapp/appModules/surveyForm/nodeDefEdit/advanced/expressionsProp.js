@@ -8,9 +8,9 @@ import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
 import Validator from '../../../../../common/validation/validator'
 
 import { FormItem } from '../../../../commonComponents/form/input'
-import ExpressionComponent from '../../../../commonComponents/expression/expression'
+import ExpressionEditor from '../../../../commonComponents/expression/expressionEditor'
 import LabelsEditor from '../../../../survey/components/labelsEditor'
-import { TooltipError } from '../../../../commonComponents/tooltip'
+import Tooltip from '../../../../commonComponents/tooltip'
 
 import { getValidationFieldMessages } from '../../../../appUtils/validationUtils'
 
@@ -26,7 +26,7 @@ const ExpressionProp = (props) => {
   const errorMessages = getValidationFieldMessages(Validator.getFieldValidations(validation))
 
   return (
-    <TooltipError messages={errorMessages} position="bottom">
+    <Tooltip messages={errorMessages} position="bottom" type={!R.isEmpty(errorMessages) ? 'error' : ''}>
       <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
 
         {
@@ -41,15 +41,15 @@ const ExpressionProp = (props) => {
         <div className="expression-item">
           <div className="label">Expression</div>
 
-          <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
-                               nodeDefUuidCurrent={nodeDefUuidCurrent}
-                               query={NodeDefExpression.getExpression(expression)}
-                               onChange={expr =>
-                                 onUpdate(NodeDefExpression.assocExpression(expr)(expression))
-                               }
-                               isContextParent={isContextParent}
-                               canBeConstant={canBeConstant}
-                               isBoolean={isBoolean}/>
+          <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
+                            nodeDefUuidCurrent={nodeDefUuidCurrent}
+                            query={NodeDefExpression.getExpression(expression)}
+                            onChange={expr =>
+                              onUpdate(NodeDefExpression.assocExpression(expr)(expression))
+                            }
+                            isContextParent={isContextParent}
+                            canBeConstant={canBeConstant}
+                            isBoolean={isBoolean}/>
         </div>
 
         {
@@ -57,14 +57,14 @@ const ExpressionProp = (props) => {
           <div className="expression-item">
             <div className="label">Apply If</div>
 
-            <ExpressionComponent nodeDefUuidContext={nodeDefUuidContext}
-                                 nodeDefUuidCurrent={nodeDefUuidCurrent}
-                                 query={NodeDefExpression.getApplyIf(expression)}
-                                 onChange={expr =>
-                                   onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
-                                 }
-                                 isContextParent={isContextParent}
-                                 canBeConstant={false}/>
+            <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
+                              nodeDefUuidCurrent={nodeDefUuidCurrent}
+                              query={NodeDefExpression.getApplyIf(expression)}
+                              onChange={expr =>
+                                onUpdate(NodeDefExpression.assocApplyIf(expr)(expression))
+                              }
+                              isContextParent={isContextParent}
+                              canBeConstant={false}/>
           </div>
         }
 
@@ -79,7 +79,7 @@ const ExpressionProp = (props) => {
         }
 
       </div>
-    </TooltipError>
+    </Tooltip>
   )
 }
 

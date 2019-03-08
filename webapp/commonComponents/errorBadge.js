@@ -1,10 +1,11 @@
 import './errorBadge.scss'
 
 import React from 'react'
-import * as R from 'ramda'
 
 import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
 import Validator from '../../common/validation/validator'
+
+import Tooltip from './tooltip'
 
 const ErrorBadge = ({ validation, showLabel, label }) => {
 
@@ -14,7 +15,10 @@ const ErrorBadge = ({ validation, showLabel, label }) => {
 
   return invalid
     ? (
-      <div className="badge error-badge">
+      <Tooltip
+        messages={validationFields}
+        type="error"
+        className="badge error-badge">
         <div className="badge__content">
           <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`}/>
           {
@@ -22,14 +26,7 @@ const ErrorBadge = ({ validation, showLabel, label }) => {
             <span>{label}</span>
           }
         </div>
-
-        {
-          !R.isEmpty(validationFields) &&
-          <div className="messages">
-            {validationFields}
-          </div>
-        }
-      </div>
+      </Tooltip>
     )
     : null
 }

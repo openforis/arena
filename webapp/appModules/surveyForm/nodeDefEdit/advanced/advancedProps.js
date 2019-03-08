@@ -23,8 +23,7 @@ const AdvancedProps = props => {
             <Checkbox checked={NodeDef.isNodeDefReadOnly(nodeDef)}
                       disabled={readOnly || NodeDef.isNodeDefKey(nodeDef) || NodeDef.isNodeDefMultiple(nodeDef)}
                       validation={Validator.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-                      onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.readOnly, checked)}
-                      tooltipErrorPosition="bottom"/>
+                      onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.readOnly, checked)}/>
           </FormItem>
 
           <NodeDefExpressionsProp nodeDef={nodeDef}

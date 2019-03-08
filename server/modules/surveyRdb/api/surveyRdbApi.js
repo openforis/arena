@@ -3,9 +3,7 @@ const Response = require('../../../serverUtils/response')
 
 const SurveyRdbService = require('../service/surveyRdbService')
 
-const {
-  requireRecordListViewPermission,
-} = require('../../../authGroup/authMiddleware')
+const { requireRecordListViewPermission } = require('../../../authGroup/authMiddleware')
 
 module.exports.init = app => {
 
@@ -18,8 +16,9 @@ module.exports.init = app => {
       const offset = Request.getRestParam(req, 'offset')
       const limit = Request.getRestParam(req, 'limit')
       const filter = Request.getRestParam(req, 'filter', '')
+      const sort = Request.getRestParam(req, 'sort', '')
 
-      const rows = await SurveyRdbService.queryTable(surveyId, tableName, cols, offset, limit, filter)
+      const rows = await SurveyRdbService.queryTable(surveyId, tableName, cols, offset, limit, filter, sort)
 
       res.json(rows)
     } catch (err) {
@@ -45,12 +44,13 @@ module.exports.init = app => {
     try {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
       const tableName = Request.getRequiredParam(req, 'tableName')
-      const filter = Request.getRestParam(req, 'filter', '')
       const cols = Request.getJsonParam(req, 'cols', [])
+      const filter = Request.getRestParam(req, 'filter', '')
+      const sort = Request.getRestParam(req, 'sort', '')
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
 
-      await SurveyRdbService.exportTableToCSV(surveyId, tableName, cols, filter, res)
+      await SurveyRdbService.exportTableToCSV(surveyId, tableName, cols, filter, sort, res)
 
       res.end()
     } catch (err) {

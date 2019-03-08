@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Expression from '../../../../../common/exprParser/expression'
+import Expression from '../../../../common/exprParser/expression'
 
 const EditButtons = (props) => {
 
