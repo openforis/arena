@@ -83,7 +83,7 @@ export default connect(
   mapStateToProps,
   {
     putNodeDefProp,
-    createTaxonomy,
+    insertTaxonomy: createTaxonomy,
     deleteTaxonomy,
   }
 )(TaxonProps)

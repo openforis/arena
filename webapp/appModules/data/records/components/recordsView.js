@@ -43,7 +43,7 @@ const RecordRow = ({ idx, offset, record, style, nodeDefKeys, canEdit }) => (
     <div>{record.step}</div>
     <div>
       <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn btn-s btn-of-light-xs">
-        <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}></span>
+        <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}/>
       </Link>
     </div>
   </div>
@@ -112,7 +112,7 @@ class RecordsView extends React.Component {
             Survey.isPublished(surveyInfo)
               ? (
                 <button onClick={() => createRecord(history)} className="btn btn-s btn-of">
-                  <span className="icon icon-plus icon-12px icon-left"></span>
+                  <span className="icon icon-plus icon-12px icon-left"/>
                   new
                 </button>
               )
@@ -158,6 +158,7 @@ export default connect(
   {
     initRecordsList,
     fetchRecords,
+    importCollectRecords,
     createRecord
   }
 )(RecordsView)

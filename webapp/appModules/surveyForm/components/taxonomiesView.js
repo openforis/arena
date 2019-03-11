@@ -87,5 +87,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  {createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
+  {insertTaxonomy: createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
 )(TaxonomiesView)

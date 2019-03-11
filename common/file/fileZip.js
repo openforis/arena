@@ -28,12 +28,17 @@ class FileZip {
   }
 
   getEntryData (entryName) {
-    return this.streamZip.entryDataSync(entryName)
+    try {
+      return this.streamZip.entryDataSync(entryName)
+    } catch(e) {
+      // entry not found
+      return null
+    }
   }
 
   getEntryAsText (entryName) {
     const data = this.getEntryData(entryName)
-    return data.toString('utf8')
+    return data ? data.toString('utf8') : null
   }
 
   async getEntryStream (entryName) {
@@ -44,6 +49,9 @@ class FileZip {
 
   getEntryNames (path = '') {
     return R.pipe(
+      R.filter(
+        R.propEq('isDirectory', false)
+      ),
       R.keys,
       R.filter(R.startsWith(path)),
       R.map(entry => entry.substring(path.length))

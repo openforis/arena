@@ -6,10 +6,10 @@ const CategoriesImportJob = require('./jobs/categoriesImportJob')
 const TaxonomiesImportJob = require('./jobs/taxonomiesImportJob')
 const SchemaImportJob = require('./jobs/schemaImportJob')
 
-class CollectSurveyImportJob extends Job {
+class CollectImportJob extends Job {
 
   constructor (params) {
-    super(CollectSurveyImportJob.type, params, [
+    super(CollectImportJob.type, params, [
       new SurveySchemaReaderJob(params),
       new SurveyCreatorJob(params),
       new CategoriesImportJob(params),
@@ -27,6 +27,6 @@ class CollectSurveyImportJob extends Job {
 
 }
 
-CollectSurveyImportJob.type = 'CollectSurveyImportJob'
+CollectImportJob.type = 'CollectImportJob'
 
-module.exports = CollectSurveyImportJob
+module.exports = CollectImportJob

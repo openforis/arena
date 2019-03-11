@@ -15,8 +15,8 @@ const ActivityLog = require('../../activityLog/activityLogger')
 /**
  * ====== CREATE
  */
-const createTaxonomy = async (user, surveyId, taxonomy) =>
-  await db.tx(async t => {
+const insertTaxonomy = async (user, surveyId, taxonomy, client = db) =>
+  await client.tx(async t => {
     await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, t)
 
     return await validateTaxonomy(surveyId, [], await TaxonomyRepository.insertTaxonomy(surveyId, taxonomy))
@@ -117,7 +117,7 @@ const insertTaxa = (surveyId, taxa, user, client = db) => {
 
 module.exports = {
   //CREATE
-  createTaxonomy,
+  insertTaxonomy,
   insertTaxa,
 
   //READ
