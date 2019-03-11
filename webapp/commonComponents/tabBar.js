@@ -32,7 +32,7 @@ class TabBar extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = { selection: TabBar.defaultProps.selection }
+    this.state = { selection: props.selection || TabBar.defaultProps.selection }
   }
 
   render () {
@@ -60,11 +60,7 @@ class TabBar extends React.Component {
         {
           renderer
             ? React.createElement(renderer, { ...this.props })
-            : (
-              typeof tab.component === 'object'
-                ? tab.component
-                : React.createElement(tab.component, { ...tab.props, ...this.props })
-            )
+            : React.createElement(tab.component, { ...tab.props, ...this.props })
         }
 
       </div>

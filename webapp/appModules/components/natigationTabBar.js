@@ -3,6 +3,7 @@ import './navigationTabBar.scss'
 import React from 'react'
 import { Route, Switch, withRouter } from 'react-router'
 import { Redirect } from 'react-router-dom'
+import * as R from 'ramda'
 
 import TabBar from '../../commonComponents/tabBar'
 
@@ -30,6 +31,8 @@ const NavigationTabBar = props => {
 
   const isRootUri = location.pathname === appModuleUri(moduleRoot)
 
+  const selection = R.findIndex(R.propEq('path', location.pathname), tabs)
+
   return isRootUri
     ? (
       <Redirect to={appModuleUri(moduleDefault)}/>
@@ -37,6 +40,7 @@ const NavigationTabBar = props => {
       <TabBar
         className={`${className} app-module__tab-navigation`}
         tabs={tabs}
+        selection={selection}
         onClick={tab => history.push(tab.path)}
         history={history}
         location={location}
