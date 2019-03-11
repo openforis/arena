@@ -3,7 +3,7 @@ import './homeView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import NavigationTabBar from '../components/natigationTabBar'
+import NavigationTabBar from '../components/moduleNavigationTabBar'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
 import SurveyCreateView from './surveyCreate/surveyCreateView'
@@ -41,10 +41,9 @@ class HomeView extends React.Component {
   }
 
   render () {
-    const { surveyInfo, location, history } = this.props
+    const { surveyInfo } = this.props
 
     return (
-
       <NavigationTabBar
         className="data"
         moduleRoot={appModules.home}

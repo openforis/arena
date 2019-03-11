@@ -1,4 +1,4 @@
-import './navigationTabBar.scss'
+import './moduleNavigationTabBar.scss'
 
 import React from 'react'
 import { Route, Switch, withRouter } from 'react-router'

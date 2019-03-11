@@ -3,7 +3,7 @@ import './dataView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import NavigationTabBar from '../components/natigationTabBar'
+import NavigationTabBar from '../components/moduleNavigationTabBar'
 import RecordsView from './records/components/recordsView'
 import RecordView from './records/components/recordView'
 import DataVisView from './dataVis/dataVisView'

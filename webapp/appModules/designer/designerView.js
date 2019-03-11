@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import AuthManager from '../../../common/auth/authManager'
 
-import NavigationTabBar from '../components/natigationTabBar'
+import NavigationTabBar from '../components/moduleNavigationTabBar'
 import SurveyFormView from '../surveyForm/surveyFormView'
 import SurveyHierarchy from './components/surveyHierarchy'
 import RecordView from '../data/records/components/recordView'

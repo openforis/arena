@@ -1,11 +1,11 @@
 import React from 'react'
 import { Route, Switch } from 'react-router'
 
-import DesignerView from '../../designer/designerView'
-import HomeView from '../../home/homeView'
-import DataView from '../../data/dataView'
+import DesignerView from '../designer/designerView'
+import HomeView from '../home/homeView'
+import DataView from '../data/dataView'
 
-import { appModules, appModuleUri } from '../../appModules'
+import { appModules, appModuleUri } from '../appModules'
 
 const AppModuleHOC = Component => props => (
   <div className="app-module">
@@ -16,7 +16,7 @@ const Home = AppModuleHOC(HomeView)
 const Designer = AppModuleHOC(DesignerView)
 const Data = AppModuleHOC(DataView)
 
-const AppModuleSwitch = (props) => (
+const ModuleSwitch = (props) => (
   <div className="app__modules">
 
     <Switch location={props.location}>
@@ -28,4 +28,4 @@ const AppModuleSwitch = (props) => (
   </div>
 )
 
-export default AppModuleSwitch
+export default ModuleSwitch

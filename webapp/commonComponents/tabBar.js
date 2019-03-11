@@ -35,6 +35,13 @@ class TabBar extends React.Component {
     this.state = { selection: props.selection || TabBar.defaultProps.selection }
   }
 
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    const { selection } = this.props
+    const { selection: selectionPrev } = prevProps
+    if (selection !== selectionPrev)
+      this.setState({ selection })
+  }
+
   render () {
     const {
       tabs, className,
