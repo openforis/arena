@@ -13,7 +13,7 @@ const sendOk = res => res.json({ status: status.ok })
 
 const sendErr = (res, err) => {
   console.log('=== ERROR ')
-  console.log(err)
+  console.error(err.stack)
 
   if (err instanceof UnauthorizedError) {
     res.status(403).json({
