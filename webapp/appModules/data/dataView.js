@@ -29,39 +29,36 @@ class DataView extends React.Component {
         <Redirect to={appModuleUri(dataModules.records)}/>
       )
       : (
-        <React.Fragment>
-          <TabBar
-            className="data"
-            location={location}
-            history={history}
-            tabs={[
+        <TabBar
+          className="data app-module__tab-navigation"
+          location={location}
+          history={history}
+          tabs={[
 
-              // records list
-              {
-                label: 'Records',
-                component: RecordsView,
-                path: appModuleUri(dataModules.records),
-              },
+            // records list
+            {
+              label: 'Records',
+              component: RecordsView,
+              path: appModuleUri(dataModules.records),
+            },
 
-              //edit record
-              {
-                label: 'Record',
-                component: RecordView,
-                path: appModuleUri(dataModules.record) + ':recordUuid/',
-                showTab: false,
-              },
+            //edit record
+            {
+              label: 'Record',
+              component: RecordView,
+              path: appModuleUri(dataModules.record) + ':recordUuid/',
+              showTab: false,
+            },
 
-              // data visualization
-              {
-                label: 'Data vis',
-                component: DataVisView,
-                path: appModuleUri(dataModules.dataVis),
-              },
+            // data visualization
+            {
+              label: 'Data vis',
+              component: DataVisView,
+              path: appModuleUri(dataModules.dataVis),
+            },
 
-            ]}
-          />
-
-        </React.Fragment>
+          ]}
+        />
       )
   }
 

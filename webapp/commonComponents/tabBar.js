@@ -4,7 +4,7 @@ import React from 'react'
 import { Switch, Route, matchPath } from 'react-router'
 
 const TabBarButtons = ({ tabs, location, selection, onClick }) => (
-  <div className="flex-center">
+  <div className="flex-center tab-bar__header">
     {
       tabs.map((tab, i) => {
         const active = location
@@ -17,6 +17,10 @@ const TabBarButtons = ({ tabs, location, selection, onClick }) => (
             <button key={i}
                     className={`btn btn-of${active ? ' active' : ''}`}
                     onClick={() => onClick(i)}>
+              {
+                tab.icon &&
+                <span className={`icon ${tab.icon} icon-12px icon-left`}/>
+              }
               {tab.label}
             </button>
           )
@@ -57,13 +61,14 @@ class TabBar extends React.Component {
     return (
       <div className={`tab-bar ${className}`}>
 
-        <TabBarButtons tabs={tabs}
-                       location={location}
-                       selection={this.state.selection}
-                       onClick={tabIndex => location
-                         ? history.push(tabs[tabIndex].path)
-                         : this.setState({ selection: tabIndex })
-                       }/>
+        <TabBarButtons
+          tabs={tabs}
+          location={location}
+          selection={this.state.selection}
+          onClick={tabIndex => location
+            ? history.push(tabs[tabIndex].path)
+            : this.setState({ selection: tabIndex })
+          }/>
 
 
         {

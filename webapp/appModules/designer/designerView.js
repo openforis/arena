@@ -36,11 +36,12 @@ class DesignerView extends React.Component {
 
     return location.pathname === appModuleUri(appModules.designer)
       ? (
-        <Redirect to={appModuleUri(designerModules.formDesigner)}/>
+        <Redirect
+          to={appModuleUri(designerModules.formDesigner)}/>
       )
       : (
         <TabBar
-          className="designer"
+          className="designer app-module__tab-navigation"
           location={location}
           history={history}
           tabs={[
