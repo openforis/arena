@@ -1,7 +1,7 @@
 const {getContextSurveyId, getContextUser} = require('./../../testContext')
 const {expect} = require('chai')
 
-const CategoryManager = require('../../../server/category/categoryManager')
+const CategoryManager = require('../../../server/modules/category/persistence/categoryManager')
 const CategoryTest = require('../../../common/survey/category')
 
 const createCategoryTest = async () => {

@@ -164,15 +164,19 @@ const assocNodes = nodes =>
 
     // exclude dirty nodes currently being edited by the user
 
-    const nodesToUpdate = R.filter(
-      n => {
-        const dirtyNode = R.prop(Node.getUuid(n), dirtyNodes)
-        return !dirtyNode ||
-          Node.isDirty(n) ||
-          R.equals(Node.getNodeValue(dirtyNode), Node.getNodeValue(n)) ||
-          Node.isNodeValueBlank(dirtyNode) && Node.isDefaultValueApplied(n)
-      },
-      nodes)
+    const nodesToUpdate = R.pipe(
+      R.filter(
+        n => {
+          const dirtyNode = R.prop(Node.getUuid(n), dirtyNodes)
+          return !dirtyNode ||
+            Node.isDirty(n) ||
+            R.equals(Node.getNodeValue(dirtyNode), Node.getNodeValue(n)) ||
+            Node.isNodeValueBlank(dirtyNode) && Node.isDefaultValueApplied(n)
+        }),
+      R.map(
+        R.omit([Node.keys.updated, Node.keys.created])
+      )
+    )(nodes)
 
     return R.pipe(
       getNodes,

@@ -2,7 +2,7 @@ const R = require('ramda')
 const {assert} = require('chai')
 
 const Node = require('../../common/record/node')
-const {evalNodeQuery} = require('../../server/record/recordExprParser')
+const {evalNodeQuery} = require('../../server/modules/record/recordExprParser')
 
 const survey = {}
 

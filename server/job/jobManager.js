@@ -4,7 +4,7 @@ const { jobThreadMessageTypes } = require('./jobUtils')
 const ThreadsCache = require('../threads/threadsCache')
 const ThreadManager = require('../threads/threadManager')
 
-const WebSocketManager = require('../webSocket/webSocketManager')
+const WebSocket = require('../utils/webSocket')
 const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
 
 // USER JOB WORKERS
@@ -14,7 +14,7 @@ const userJobThreads = new ThreadsCache()
 const notifyJobUpdate = job => {
   const userId = job.userId
 
-  WebSocketManager.notifyUser(userId, WebSocketEvents.jobUpdate, job)
+  WebSocket.notifyUser(userId, WebSocketEvents.jobUpdate, job)
 
   if (job.ended) {
     const thread = userJobThreads.getThread(userId)

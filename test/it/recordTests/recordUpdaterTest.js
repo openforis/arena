@@ -10,10 +10,10 @@ const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 
-const NodeDefRepository = require('../../../server/nodeDef/nodeDefRepository')
-const NodeRepository = require('../../../server/record/nodeRepository')
-const RecordRepository = require('../../../server/record/recordRepository')
-const RecordUpdater = require('../../../server/record/update/thread/helpers/recordUpdater')
+const NodeDefRepository = require('../../../server/modules/nodeDef/persistence/nodeDefRepository')
+const NodeRepository = require('../../../server/modules/record/persistence/nodeRepository')
+const RecordManager = require('../../../server/modules/record/persistence/recordManager')
+const RecordUpdateManager = require('../../../server/modules/record/persistence/recordUpdateManager')
 
 const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
 
@@ -26,11 +26,12 @@ const recordCreationTest = async () => {
   const survey = await fetchFullContextSurvey()
   const user = getContextUser()
 
-  const record = newRecord()
+  const recordNew = newRecord()
 
-  const nodes = await new RecordUpdater().createRecord(user, survey, record, db)
+  const record = await new RecordUpdateManager.createRecord(user, survey, recordNew, db)
+  const nodes = Record.getNodes(record)
 
-  const reloadedRecord = RecordRepository.fetchRecordByUuid(Survey.getId(survey), Record.getUuid(record))
+  const reloadedRecord = RecordManager.fetchRecordByUuid(Survey.getId(survey), Record.getUuid(recordNew))
 
   expect(reloadedRecord).to.not.be.undefined
 
@@ -57,13 +58,11 @@ const defaultValueAppliedTest = async () => {
   const record = newRecord()
 
   await db.tx(async t => {
-    await new RecordUpdater().createRecord(user, survey, record, t)
+    await new RecordUpdateManager.createRecord(user, survey, record, t)
 
     //reload record
 
-    const reloadedNodes = await NodeRepository.fetchNodesByRecordUuid(Survey.getId(survey), Record.getUuid(record), t)
-
-    const reloadedRecord = { ...record, nodes: toUuidIndexedObj(reloadedNodes) }
+    const reloadedRecord = RecordManager.fetchRecordAndNodesByUuid(Survey.getId(survey), Record.getUuid(record), t)
 
     const root = Record.getRootNode(reloadedRecord)
 

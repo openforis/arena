@@ -2,7 +2,7 @@ const {setContextSurvey, getContextUser} = require('./../../testContext')
 const {assert} = require('chai')
 const {uuidv4} = require('../../../common/uuid')
 
-const {createSurvey} = require('../../../server/survey/surveyManager')
+const {createSurvey} = require('../../../server/modules/survey/persistence/surveyManager')
 const SurveyTest = require('../../../common/survey/survey')
 
 const testSurvey = {

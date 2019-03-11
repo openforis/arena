@@ -48,7 +48,7 @@ export const importCollectSurvey = file =>
 
     const config = { headers: { 'content-type': 'multipart/form-data' } }
 
-    const { data } = await axios.post(`/api/survey/import-from-collect`, formData, config)
+    const { data } = await axios.post(`/api/survey/collect-import`, formData, config)
 
     dispatch(showAppJobMonitor(data.job, () => {
       //TODO REMOVE THIS. dispatchCurrentSurveyUpdate should be dispatched. get survey from response
