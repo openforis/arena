@@ -3,8 +3,7 @@ import './dataView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import TabBar from '../../commonComponents/tabBar'
-
+import NavigationTabBar from '../components/natigationTabBar'
 import RecordsView from './records/components/recordsView'
 import RecordView from './records/components/recordView'
 import DataVisView from './dataVis/dataVisView'
@@ -13,53 +12,48 @@ import { appModules, appModuleUri } from '../appModules'
 import { dataModules } from './dataModules'
 
 import { initSurveyDefs } from '../../survey/actions'
-import { Redirect } from 'react-router-dom'
 
 class DataView extends React.Component {
+
   componentDidMount () {
     const { initSurveyDefs } = this.props
     initSurveyDefs()
   }
 
   render () {
-    const { history, location } = this.props
 
-    return location.pathname === appModuleUri(appModules.data)
-      ? (
-        <Redirect to={appModuleUri(dataModules.records)}/>
-      )
-      : (
-        <TabBar
-          className="data app-module__tab-navigation"
-          location={location}
-          history={history}
-          tabs={[
+    return (
+      <NavigationTabBar
+        className="data app-module__tab-navigation"
+        moduleRoot={appModules.data}
+        moduleDefault={dataModules.records}
+        tabs={[
 
-            // records list
-            {
-              label: 'Records',
-              component: RecordsView,
-              path: appModuleUri(dataModules.records),
-            },
+          // records list
+          {
+            label: 'Records',
+            component: RecordsView,
+            path: appModuleUri(dataModules.records),
+          },
 
-            //edit record
-            {
-              label: 'Record',
-              component: RecordView,
-              path: appModuleUri(dataModules.record) + ':recordUuid/',
-              showTab: false,
-            },
+          //edit record
+          {
+            label: 'Record',
+            component: RecordView,
+            path: appModuleUri(dataModules.record) + ':recordUuid/',
+            showTab: false,
+          },
 
-            // data visualization
-            {
-              label: 'Data vis',
-              component: DataVisView,
-              path: appModuleUri(dataModules.dataVis),
-            },
+          // data visualization
+          {
+            label: 'Data vis',
+            component: DataVisView,
+            path: appModuleUri(dataModules.dataVis),
+          },
 
-          ]}
-        />
-      )
+        ]}
+      />
+    )
   }
 
 }

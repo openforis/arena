@@ -1,12 +1,9 @@
 import './homeView.scss'
 
 import React from 'react'
-import { compose } from 'redux'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
-import { Redirect } from 'react-router-dom'
 
-import TabBar from '../../commonComponents/tabBar'
+import NavigationTabBar from '../components/natigationTabBar'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
 import SurveyCreateView from './surveyCreate/surveyCreateView'
@@ -46,47 +43,42 @@ class HomeView extends React.Component {
   render () {
     const { surveyInfo, location, history } = this.props
 
-    const isHomeUri = location.pathname === appModuleUri(appModules.home)
+    return (
 
-    return isHomeUri
-      ? (
-        <Redirect to={appModuleUri(homeModules.dashboard)}/>
-      ) : (
-
-        <TabBar
-          className="data app-module__tab-navigation"
-          location={location}
-          history={history}
-          tabs={[
-            {
-              label: 'Dashboard',
-              component: DashboardView,
-              path: appModuleUri(homeModules.dashboard),
-              icon: 'icon-office',
-              disabled: !Survey.isValid(surveyInfo),
-            },
-            {
-              label: 'My Surveys',
-              component: SurveyListView,
-              path: appModuleUri(homeModules.surveyList),
-              icon: 'icon-paragraph-justify',
-            },
-            {
-              label: 'Add new survey',
-              component: SurveyCreateView,
-              path: appModuleUri(homeModules.surveyNew),
-              icon: 'icon-plus',
-              showTab: false,
-            },
-            {
-              label: 'Survey Info',
-              component: SurveyInfoView,
-              path: appModuleUri(homeModules.surveyInfo),
-              showTab: false,
-            },
-          ]}
-        />
-      )
+      <NavigationTabBar
+        className="data"
+        moduleRoot={appModules.home}
+        moduleDefault={homeModules.dashboard}
+        tabs={[
+          {
+            label: 'Dashboard',
+            component: DashboardView,
+            path: appModuleUri(homeModules.dashboard),
+            icon: 'icon-office',
+            disabled: !Survey.isValid(surveyInfo),
+          },
+          {
+            label: 'My Surveys',
+            component: SurveyListView,
+            path: appModuleUri(homeModules.surveyList),
+            icon: 'icon-paragraph-justify',
+          },
+          {
+            label: 'Add new survey',
+            component: SurveyCreateView,
+            path: appModuleUri(homeModules.surveyNew),
+            icon: 'icon-plus',
+            showTab: false,
+          },
+          {
+            label: 'Survey Info',
+            component: SurveyInfoView,
+            path: appModuleUri(homeModules.surveyInfo),
+            showTab: false,
+          },
+        ]}
+      />
+    )
   }
 }
 
@@ -94,9 +86,4 @@ const mapStateToProps = state => ({
   surveyInfo: SurveyState.getStateSurveyInfo(state)
 })
 
-const enhance = compose(
-  withRouter,
-  connect(mapStateToProps)
-)
-
-export default enhance(HomeView)
+export default connect(mapStateToProps)(HomeView)

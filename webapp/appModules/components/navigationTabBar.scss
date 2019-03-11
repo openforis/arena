@@ -1,0 +1,30 @@
+
+.app-module__tab-navigation {
+  grid-template-rows: 35px 1fr !important;
+
+  .tab-bar__header {
+    align-content: start;
+    align-items: start;
+
+    .btn {
+      border-top: none !important;
+      border-left: none !important;
+      border-right: none !important;
+      padding: .5rem .7rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin: 0 1px;
+      opacity: .7;
+
+      &:hover {
+        opacity: .9 !important;
+      }
+
+      &.active {
+        opacity: 1 !important;
+      }
+    }
+  }
+
+}
