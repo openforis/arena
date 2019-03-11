@@ -6,8 +6,8 @@ const SurveyManager = require('../persistence/surveyManager')
 const SurveyValidator = require('../surveyValidator')
 
 const JobManager = require('../../../job/jobManager')
-const SurveyPublishJob = require('../publish/surveyPublishJob')
-const CollectSurveyImportJob = require('../collectImport/collectSurveyImportJob')
+const SurveyPublishJob = require('./publish/surveyPublishJob')
+const CollectSurveyImportJob = require('./collectImport/collectSurveyImportJob')
 
 const updateSurveyProp = async (user, surveyId, key, value) => {
   const survey = await SurveyManager.updateSurveyProp(surveyId, key, value, user)

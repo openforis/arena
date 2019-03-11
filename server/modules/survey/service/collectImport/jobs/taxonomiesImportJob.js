@@ -1,14 +1,14 @@
 const R = require('ramda')
 
-const Taxonomy = require('../../../../../common/survey/taxonomy')
-const { languageCodesISO636_2 } = require('../../../../../common/app/languages')
+const Taxonomy = require('../../../../../../common/survey/taxonomy')
+const { languageCodesISO636_2 } = require('../../../../../../common/app/languages')
 
-const Job = require('../../../../job/job')
+const Job = require('../../../../../job/job')
 
-const TaxonomyManager = require('../../../taxonomy/persistence/taxonomyManager')
-const TaxonomyImportManager = require('../../../taxonomy/persistence/taxonomyImportManager')
+const TaxonomyManager = require('../../../../taxonomy/persistence/taxonomyManager')
+const TaxonomyImportManager = require('../../../../taxonomy/persistence/taxonomyImportManager')
 
-const CSVParser = require('../../../../../common/file/csvParser')
+const CSVParser = require('../../../../../../common/file/csvParser')
 
 const speciesFilesPath = 'species/'
 

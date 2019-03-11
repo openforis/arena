@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const Job = require('../../../job/job')
+const Job = require('../../../../../job/job')
 
-const NodeDef = require('../../../../common/survey/nodeDef')
-const Validator = require('../../../../common/validation/validator')
+const NodeDef = require('../../../../../../common/survey/nodeDef')
+const Validator = require('../../../../../../common/validation/validator')
 
-const NodeDefManager = require('../../nodeDef/persistence/nodeDefManager')
+const NodeDefManager = require('../../../../nodeDef/persistence/nodeDefManager')
 
 class NodeDefsValidationJob extends Job {
 

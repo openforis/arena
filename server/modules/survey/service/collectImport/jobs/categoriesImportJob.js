@@ -1,10 +1,10 @@
 const R = require('ramda')
 
-const Category = require('../../../../../common/survey/category')
+const Category = require('../../../../../../common/survey/category')
 
-const Job = require('../../../../job/job')
+const Job = require('../../../../../job/job')
 
-const CategoryManager = require('../../../category/persistence/categoryManager')
+const CategoryManager = require('../../../../category/persistence/categoryManager')
 
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 

@@ -1,11 +1,11 @@
 const R = require('ramda')
 
-const NodeDef = require('../../../../../common/survey/nodeDef')
+const NodeDef = require('../../../../../../common/survey/nodeDef')
 
-const Record = require('../../../../../common/record/record')
-const Node = require('../../../../../common/record/node')
+const Record = require('../../../../../../common/record/record')
+const Node = require('../../../../../../common/record/node')
 
-const RecordUpdateManager = require('../../../record/persistence/recordUpdateManager')
+const RecordUpdateManager = require('../../../../record/persistence/recordUpdateManager')
 
 /**
  * Inserts missing single nodes.

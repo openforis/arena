@@ -1,9 +1,9 @@
-const Job = require('../../../job/job')
+const Job = require('../../../../../job/job')
 
-const Validator = require('../../../../common/validation/validator')
-const Survey = require('../../../../common/survey/survey')
+const Validator = require('../../../../../../common/validation/validator')
+const Survey = require('../../../../../../common/survey/survey')
 
-const SurveyManager = require('../persistence/surveyManager')
+const SurveyManager = require('../../../persistence/surveyManager')
 
 class SurveyInfoValidationJob extends Job {
 
