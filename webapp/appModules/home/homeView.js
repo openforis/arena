@@ -13,13 +13,11 @@ import SurveyCreateView from './surveyCreate/surveyCreateView'
 import SurveyInfoView from './surveyInfo/surveyInfoView'
 
 import Survey from '../../../common/survey/survey'
-import AuthManager from '../../../common/auth/authManager'
 
 import { appModules, appModuleUri } from '../appModules'
 import { homeModules } from './homeModules'
 
 import * as SurveyState from '../../survey/surveyState'
-import * as AppState from '../../app/appState'
 
 class HomeView extends React.Component {
 
@@ -46,7 +44,7 @@ class HomeView extends React.Component {
   }
 
   render () {
-    const { location, history, canEditDef } = this.props
+    const { surveyInfo, location, history } = this.props
 
     const isHomeUri = location.pathname === appModuleUri(appModules.home)
 
@@ -65,6 +63,7 @@ class HomeView extends React.Component {
               component: DashboardView,
               path: appModuleUri(homeModules.dashboard),
               icon: 'icon-office',
+              disabled: !Survey.isValid(surveyInfo),
             },
             {
               label: 'My Surveys',
@@ -77,12 +76,13 @@ class HomeView extends React.Component {
               component: SurveyCreateView,
               path: appModuleUri(homeModules.surveyNew),
               icon: 'icon-plus',
+              showTab: false,
             },
             {
               label: 'Survey Info',
               component: SurveyInfoView,
               path: appModuleUri(homeModules.surveyInfo),
-              icon: canEditDef ? 'icon-pencil2' : 'icon-eye',
+              showTab: false,
             },
           ]}
         />
@@ -90,15 +90,9 @@ class HomeView extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
-  const user = AppState.getUser(state)
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
-
-  return {
-    surveyInfo,
-    canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
-  }
-}
+const mapStateToProps = state => ({
+  surveyInfo: SurveyState.getStateSurveyInfo(state)
+})
 
 const enhance = compose(
   withRouter,

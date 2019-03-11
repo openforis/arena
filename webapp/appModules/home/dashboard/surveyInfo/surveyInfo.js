@@ -11,11 +11,12 @@ import Survey from '../../../../../common/survey/survey'
 import AuthManager from '../../../../../common/auth/authManager'
 import Validator from '../../../../../common/validation/validator'
 
-import { appModuleUri } from '../../../appModules'
-import { designerModules } from '../../../designer/designerModules'
-
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
+
+import { appModuleUri } from '../../../appModules'
+import { designerModules } from '../../../designer/designerModules'
+import { homeModules } from '../../homeModules'
 
 import { deleteSurvey, publishSurvey } from '../../../../survey/actions'
 
@@ -69,6 +70,11 @@ class SurveyInfo extends React.Component {
                 </button>
               }
             </div>
+
+            <Link to={appModuleUri(homeModules.surveyInfo)} className="btn btn-of-light">
+              <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`}/>
+              {canEditDef ? 'Edit' : 'View'} Info
+            </Link>
 
             {
               canEditDef &&

@@ -16,7 +16,8 @@ const TabBarButtons = ({ tabs, location, selection, onClick }) => (
           : (
             <button key={i}
                     className={`btn btn-of${active ? ' active' : ''}`}
-                    onClick={() => onClick(i)}>
+                    onClick={() => onClick(i)}
+                    aria-disabled={!!tab.disabled}>
               {
                 tab.icon &&
                 <span className={`icon ${tab.icon} icon-12px icon-left`}/>

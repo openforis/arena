@@ -40,7 +40,7 @@
 }
 
 .app-module__tab-navigation {
-  grid-template-rows: 40px 1fr !important;
+  grid-template-rows: 35px 1fr !important;
 
   .tab-bar__header {
     align-content: start;
@@ -55,6 +55,15 @@
       font-weight: 600;
       letter-spacing: 1px;
       margin: 0 1px;
+      opacity: .7;
+
+      &:hover {
+        opacity: .9 !important;
+      }
+
+      &.active {
+        opacity: 1 !important;
+      }
     }
   }
 
