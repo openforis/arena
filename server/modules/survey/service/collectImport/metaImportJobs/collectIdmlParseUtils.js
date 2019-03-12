@@ -1,7 +1,7 @@
 const XmlParser = require('fast-xml-parser')
 const R = require('ramda')
 
-const NodeDef = require('../../../../../common/survey/nodeDef')
+const NodeDef = require('../../../../../../common/survey/nodeDef')
 const { nodeDefType } = NodeDef
 
 const nodeDefTypesByCollectType = {

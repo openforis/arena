@@ -16,14 +16,13 @@ class JobEvent {
 
 class Job {
 
-  constructor (type, params, innerJobs = []) {
+  constructor (type, params = {}, innerJobs = []) {
     this.params = params
 
-    const { user, surveyId } = params
-
-    this.user = user
-    this.userId = user.id
-    this.surveyId = surveyId
+    // context object (shared among nested jobs)
+    this.context = {
+      ...params
+    }
 
     this.uuid = uuidv4()
     this.type = type
@@ -34,8 +33,6 @@ class Job {
     this.processed = 0
     this.result = {}
     this.errors = {}
-    this.context = {} // object shared among nested jobs
-
     this.innerJobs = innerJobs
     this.currentInnerJobIndex = -1
 
@@ -218,6 +215,26 @@ class Job {
 
   setContext (context) {
     Object.assign(this.context, context)
+  }
+
+  /**
+   * Utils
+   */
+  getSurvey () {
+    return this.getContextProp('survey')
+  }
+
+  getSurveyId () {
+    return this.getContextProp('surveyId')
+  }
+
+  getUser () {
+    return this.getContextProp('user')
+  }
+
+  getUserId () {
+    const user = this.getUser()
+    return user ? user.id : null
   }
 }
 

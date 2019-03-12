@@ -1,10 +1,10 @@
 const R = require('ramda')
 
-const Survey = require('../../../../../common/survey/survey')
+const Survey = require('../../../../../../common/survey/survey')
 
-const Job = require('../../../../job/job')
+const Job = require('../../../../../job/job')
 
-const SurveyManager = require('../../persistence/surveyManager')
+const SurveyManager = require('../../../persistence/surveyManager')
 
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 
@@ -23,11 +23,11 @@ class SurveyCreatorJob extends Job {
     const defaultLanguage = languages[0]
     const label = CollectIdmlParseUtils.toLabels(collectSurvey.project, defaultLanguage)[defaultLanguage]
 
-    const survey = await SurveyManager.createSurvey(this.user, { name, label, lang: defaultLanguage }, false)
+    const survey = await SurveyManager.createSurvey(this.getUser(), { name, label, lang: defaultLanguage }, false, tx)
 
     const surveyId = Survey.getId(survey)
 
-    await SurveyManager.updateSurveyProp(surveyId, Survey.infoKeys.languages, languages, this.user)
+    await SurveyManager.updateSurveyProp(surveyId, Survey.infoKeys.languages, languages, this.getUser(), tx)
 
     this.setContext({ surveyId, defaultLanguage })
   }

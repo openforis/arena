@@ -158,7 +158,6 @@ export default connect(
   {
     initRecordsList,
     fetchRecords,
-    importCollectRecords,
     createRecord
   }
 )(RecordsView)

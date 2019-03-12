@@ -32,8 +32,8 @@ const ActivityLog = require('../../activityLog/activityLogger')
 
 //==== CREATE
 
-const createRecord = async (user, surveyId, recordToCreate) =>
-  await db.tx(async t => {
+const createRecord = async (user, surveyId, recordToCreate, client = db) =>
+  await client.tx(async t => {
     const preview = Record.isPreview(recordToCreate)
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, preview, true, false, t)
 
@@ -42,6 +42,7 @@ const createRecord = async (user, surveyId, recordToCreate) =>
       await ActivityLog.log(user, surveyId, ActivityLog.type.recordCreate, recordToCreate, t)
 
     const rootNodeDef = Survey.getRootNodeDef(survey)
+
     const rootNode = Node.newNode(NodeDef.getUuid(rootNodeDef), Record.getUuid(recordToCreate))
 
     return await persistNode(user, survey, record, rootNode, null, null, t)

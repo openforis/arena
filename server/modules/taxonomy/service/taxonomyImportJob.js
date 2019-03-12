@@ -39,7 +39,8 @@ class TaxonomyImportJob extends Job {
   }
 
   async execute (tx) {
-    const { surveyId, taxonomyUuid, filePath } = this
+    const { taxonomyUuid, filePath } = this
+    const surveyId = this.getSurveyId()
 
     this.total = await new CSVParser(filePath).calculateSize()
 
@@ -56,7 +57,7 @@ class TaxonomyImportJob extends Job {
       throw new Error('cannot overwrite published taxa')
     }
 
-    this.taxonomyImportHelper = new TaxonomyImportManager(this.user, this.surveyId, this.vernacularLanguageCodes)
+    this.taxonomyImportHelper = new TaxonomyImportManager(this.getUser(), surveyId, this.vernacularLanguageCodes)
 
     //delete old draft taxa
     await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)

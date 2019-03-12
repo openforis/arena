@@ -238,6 +238,11 @@ const getPropFilterCondition = (propName, searchValue, draft, columnPrefix = '')
 const toSearchValue = filterValue =>
   filterValue ?
     R.pipe(
+      R.ifElse(
+        R.is(String),
+        R.identity,
+        R.toString
+      ),
       R.trim,
       R.toLower,
       R.replace(/\*/g, '%')

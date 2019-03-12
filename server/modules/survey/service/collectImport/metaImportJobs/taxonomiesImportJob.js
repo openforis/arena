@@ -1,14 +1,14 @@
 const R = require('ramda')
 
-const Taxonomy = require('../../../../../common/survey/taxonomy')
-const { languageCodesISO636_2 } = require('../../../../../common/app/languages')
+const Taxonomy = require('../../../../../../common/survey/taxonomy')
+const { languageCodesISO636_2 } = require('../../../../../../common/app/languages')
 
-const Job = require('../../../../job/job')
+const Job = require('../../../../../job/job')
 
-const TaxonomyManager = require('../../../taxonomy/persistence/taxonomyManager')
-const TaxonomyImportManager = require('../../../taxonomy/persistence/taxonomyImportManager')
+const TaxonomyManager = require('../../../../taxonomy/persistence/taxonomyManager')
+const TaxonomyImportManager = require('../../../../taxonomy/persistence/taxonomyImportManager')
 
-const CSVParser = require('../../../../../common/file/csvParser')
+const CSVParser = require('../../../../../../common/file/csvParser')
 
 const speciesFilesPath = 'species/'
 
@@ -50,12 +50,12 @@ class TaxonomiesImportJob extends Job {
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.taxonomyPropKeys.name]: taxonomyName
     })
-    const taxonomy = await TaxonomyManager.insertTaxonomy(this.user, surveyId, taxonomyParam, tx)
+    const taxonomy = await TaxonomyManager.insertTaxonomy(this.getUser(), surveyId, taxonomyParam, tx)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
     const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
 
-    const csvParser = new CSVParser(speciesFileStream, true)
+    const csvParser = new CSVParser(speciesFileStream, false)
 
     let row = await csvParser.next()
 
@@ -66,16 +66,17 @@ class TaxonomiesImportJob extends Job {
 
       const vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
 
-      this.taxonomyImportHelper = new TaxonomyImportManager(this.user, surveyId, vernacularLangCodes)
+      this.taxonomyImportHelper = new TaxonomyImportManager(this.getUser(), surveyId, vernacularLangCodes)
+
+      row = await csvParser.next()
 
       while (row) {
         await this.processRow(taxonomyUuid, vernacularLangCodes, row, tx)
 
         row = await csvParser.next()
       }
-
-      await this.taxonomyImportHelper.finalizeImport(taxonomy, tx)
     }
+    await this.taxonomyImportHelper.finalizeImport(taxonomy, tx)
 
     return taxonomy
   }

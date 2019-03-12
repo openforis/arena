@@ -1,20 +1,32 @@
 const Job = require('../../../../job/job')
 
-const SurveySchemaReaderJob = require('./jobs/surveySchemaReaderJob')
-const SurveyCreatorJob = require('./jobs/surveyCreatorJob')
-const CategoriesImportJob = require('./jobs/categoriesImportJob')
-const TaxonomiesImportJob = require('./jobs/taxonomiesImportJob')
-const SchemaImportJob = require('./jobs/schemaImportJob')
+const CollectSurveyReaderJob = require('./metaImportJobs/collectSurveyReaderJob')
+const SurveyCreatorJob = require('./metaImportJobs/surveyCreatorJob')
+const CategoriesImportJob = require('./metaImportJobs/categoriesImportJob')
+const TaxonomiesImportJob = require('./metaImportJobs/taxonomiesImportJob')
+const NodeDefsImportJob = require('./metaImportJobs/nodeDefsImportJob')
+const RecordsImportJob = require('./dataImportJobs/recordsImportJob')
+const SurveyPropsPublishJob = require('../publish/jobs/surveyPropsPublishJob')
+const SurveyDependencyGraphsGenerationJob = require('../publish/jobs/surveyDependencyGraphsGenerationJob')
+const SurveyRdbGeneratorJob = require('../publish/jobs/surveyRdbGeneratorJob')
+const RecordCheckJob = require('../publish/jobs/recordCheckJob')
 
 class CollectImportJob extends Job {
 
   constructor (params) {
     super(CollectImportJob.type, params, [
-      new SurveySchemaReaderJob(params),
-      new SurveyCreatorJob(params),
-      new CategoriesImportJob(params),
-      new TaxonomiesImportJob(params),
-      new SchemaImportJob(params)
+      new CollectSurveyReaderJob(),
+      new SurveyCreatorJob(),
+      new CategoriesImportJob(),
+      new TaxonomiesImportJob(),
+      new NodeDefsImportJob(),
+      //publish survey
+      new SurveyPropsPublishJob(),
+      new SurveyDependencyGraphsGenerationJob(),
+      new SurveyRdbGeneratorJob(),
+      //import records
+      new RecordsImportJob(),
+      new RecordCheckJob()
     ])
   }
 

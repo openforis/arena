@@ -13,7 +13,16 @@ const {
   isValid: fnsIsValid,
 } = require('date-fns')
 
-const {isBlank} = require('../common/stringUtils')
+const { isBlank } = require('../common/stringUtils')
+
+const normalizeDateTimeValue = length => value => R.pipe(
+  R.ifElse(
+    R.is(String),
+    R.identity,
+    R.toString
+  ),
+  val => val.padStart(length, '0')
+)(value)
 
 const getRelativeDate = date => {
 
@@ -74,6 +83,12 @@ const isValidTime = (hour = '', minutes = '') =>
     ? false
     : +hour >= 0 && +hour < 24 && +minutes >= 0 && +minutes < 60
 
+const formatDate = (day, month, year) =>
+  `${normalizeDateTimeValue(2)(day)}/${normalizeDateTimeValue(2)(month)}/${normalizeDateTimeValue(4)(year)}`
+
+const formatTime = (hour, minute) =>
+  `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
+
 module.exports = {
   getRelativeDate,
   compareDatesDesc,
@@ -81,4 +96,7 @@ module.exports = {
 
   isValidDate,
   isValidTime,
+
+  formatTime,
+  formatDate,
 }

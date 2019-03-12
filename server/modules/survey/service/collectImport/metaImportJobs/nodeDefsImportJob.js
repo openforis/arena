@@ -1,21 +1,21 @@
 const R = require('ramda')
 
-const { uuidv4 } = require('../../../../../common/uuid')
-const NodeDef = require('../../../../../common/survey/nodeDef')
-const NodeDefLayout = require('../../../../../common/survey/nodeDefLayout')
+const { uuidv4 } = require('../../../../../../common/uuid')
+const NodeDef = require('../../../../../../common/survey/nodeDef')
+const NodeDefLayout = require('../../../../../../common/survey/nodeDefLayout')
 const { nodeDefType } = NodeDef
-const Category = require('../../../../../common/survey/category')
-const Taxonomy = require('../../../../../common/survey/taxonomy')
+const Category = require('../../../../../../common/survey/category')
+const Taxonomy = require('../../../../../../common/survey/taxonomy')
 
-const Job = require('../../../../job/job')
+const Job = require('../../../../../job/job')
 
-const NodeDefManager = require('../../../nodeDef/persistence/nodeDefManager')
+const NodeDefManager = require('../../../../nodeDef/persistence/nodeDefManager')
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 
 class NodeDefsImportJob extends Job {
 
   constructor (params) {
-    super('SchemaImportJob', params)
+    super('NodeDefsImportJob', params)
 
     this.nodeDefNames = []
     this.nodeDefUuidByCollectPath = {}
@@ -38,9 +38,9 @@ class NodeDefsImportJob extends Job {
   async insertNodeDef (surveyId, parentNodeDef, parentPath, collectNodeDef, type, tx) {
     const { defaultLanguage } = this.context
 
-    const multiple = collectNodeDef._attr.multiple === 'true'
-
+    // 1. determine props
     const collectNodeDefName = collectNodeDef._attr.name
+    const multiple = collectNodeDef._attr.multiple === 'true'
 
     const props = {
       [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName),
@@ -61,12 +61,13 @@ class NodeDefsImportJob extends Job {
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
     }
 
-    // page
+    // 2. determine page
     const pageUuid = determineNodeDefPageUuid(type, collectNodeDef)
     if (pageUuid)
       props[NodeDefLayout.nodeDefLayoutProps.pageUuid] = pageUuid
 
-    const nodeDef = await NodeDefManager.createNodeDef(this.user, surveyId, NodeDef.getUuid(parentNodeDef), uuidv4(), type, props, tx)
+    // 3. insert node def into db
+    const nodeDef = await NodeDefManager.createNodeDef(this.getUser(), surveyId, NodeDef.getUuid(parentNodeDef), uuidv4(), type, props, tx)
 
     const collectNodeDefPath = parentPath + '/' + collectNodeDefName
 
@@ -97,6 +98,7 @@ class NodeDefsImportJob extends Job {
 
         return {
           [NodeDef.propKeys.categoryUuid]: Category.getUuid(category),
+          [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.dropdown
         }
       case nodeDefType.taxon:
         const taxonomyName = collectNodeDef._attr.taxonomy
