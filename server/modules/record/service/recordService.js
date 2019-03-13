@@ -1,10 +1,12 @@
 const R = require('ramda')
 const path = require('path')
+const fs = require('fs')
 
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 const RecordFile = require('../../../../common/record/recordFile')
 const { canEditRecord } = require('../../../../common/auth/authManager')
+const User = require('../../../../common/user/user')
 
 const WebSocket = require('../../../utils/webSocket')
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
@@ -101,10 +103,10 @@ const checkOut = async (user, surveyId, recordUuid) => {
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
 
   if (Record.isPreview(record)) {
-    await RecordUpdateManager.deleteRecordPreview(user, surveyId, recordUuid)
+    await RecordUpdateManager.deleteRecordPreview(surveyId, recordUuid)
   }
 
-  terminateUserThread(user.id)
+  terminateUserThread(User.getId(user))
 }
 
 const cancelCheckOut = userId => {
@@ -121,26 +123,16 @@ const cancelCheckOut = userId => {
  * ======
  */
 const persistNode = async (user, surveyId, node, fileReq) => {
-  let nodeToPersist
   if (fileReq) {
     //save file to "file" table and set fileUuid and fileName into node value
-    const file = RecordFile.createFile(fileReq)
+    const file = RecordFile.createFile(Node.getNodeFileUuid(node), fileReq.name, fileReq.size, fs.readFileSync(fileReq.tempFilePath),
+      Node.getRecordUuid(node), Node.getUuid(node))
 
     await FileManager.insertFile(surveyId, file)
-
-    const nodeValue = {
-      fileUuid: file.uuid,
-      fileName: RecordFile.getName(file),
-      fileSize: RecordFile.getSize(file)
-    }
-
-    nodeToPersist = Node.assocValue(nodeValue, node)
-  } else {
-    nodeToPersist = node
   }
 
   const updateWorker = RecordThreads.getThreadByUserId(user.id)
-  updateWorker.postMessage({ type: recordThreadMessageTypes.persistNode, node: nodeToPersist })
+  updateWorker.postMessage({ type: recordThreadMessageTypes.persistNode, node })
 }
 
 const deleteNode = (user, nodeUuid) => {

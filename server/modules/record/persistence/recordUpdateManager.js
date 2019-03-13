@@ -1,9 +1,7 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const db = require('../../../db/db')
 
-const { isBlank } = require('../../../../common/stringUtils')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
@@ -14,7 +12,6 @@ const Node = require('../../../../common/record/node')
 const RecordUsersMap = require('../service/update/recordUsersMap')
 const RecordRepository = require('./recordRepository')
 const SurveyManager = require('../../survey/persistence/surveyManager')
-const RecordManager = require('./recordManager')
 const RecordValidationManager = require('../validator/recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
 const NodeDependentUpdateManager = require('./nodeDependentUpdateManager')
@@ -70,25 +67,22 @@ const updateRecordStep = async (surveyId, recordUuid, stepId) => {
 const deleteRecord = async (user, surveyId, recordUuid) => {
   await db.tx(async t => {
     await ActivityLog.log(user, surveyId, ActivityLog.type.recordDelete, { recordUuid }, t)
-    await RecordRepository.deleteRecord(user, surveyId, recordUuid, t)
+    await RecordRepository.deleteRecord(surveyId, recordUuid, t)
   })
 }
 
-const deleteRecordPreview = async (user, surveyId, recordUuid) =>
+const deleteRecordPreview = async (surveyId, recordUuid) =>
   await db.tx(async t => {
-    const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, t)
+      await RecordRepository.deleteRecord(surveyId, recordUuid, t)
+      await FileManager.deleteFilesByRecordUuids(surveyId, [recordUuid], t)
+    }
+  )
 
-    const fileUuids = R.pipe(
-      Record.getNodesArray,
-      R.map(Node.getNodeFileUuid),
-      R.reject(isBlank),
-    )(record)
-    // delete record and files
-    await Promise.all([
-        RecordRepository.deleteRecord(user, surveyId, Record.getUuid(record), t),
-        ...fileUuids.map(fileUuid => FileManager.deleteFileByUuid(surveyId, fileUuid, t)),
-      ]
-    )
+const deleteRecordsPreview = async (surveyId) =>
+  await db.tx(async t => {
+    const deletedRecordUuids = await RecordRepository.deleteRecordsPreview(surveyId, t)
+    if (!R.isEmpty(deletedRecordUuids))
+      await FileManager.deleteFilesByRecordUuids(surveyId, deletedRecordUuids, t)
   })
 
 /**
@@ -164,7 +158,7 @@ module.exports = {
 
   deleteRecord,
   deleteRecordPreview,
-  deleteRecordsPreview: RecordRepository.deleteRecordsPreview,
+  deleteRecordsPreview,
 
   // NODE
   insertNode: NodeUpdateManager.insertNode,

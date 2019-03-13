@@ -71,7 +71,6 @@ module.exports = {
 
   // update
   updateTaxonomyProp: TaxonomyManager.updateTaxonomyProp,
-  updateTaxonomyProp: TaxonomyManager.updateTaxonomyProp,
 
   // delete
   deleteTaxonomy: TaxonomyManager.deleteTaxonomy,

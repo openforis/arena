@@ -31,10 +31,16 @@ class CollectImportJob extends Job {
   }
 
   onFinish () {
-    const { collectSurveyFileZip } = this.context
+    const { collectSurveyFileZip, surveyId } = this.context
 
     if (collectSurveyFileZip)
       collectSurveyFileZip.close()
+
+    if (this.isSuccedeed()) {
+      this.setResult({
+        surveyId
+      })
+    }
   }
 
 }

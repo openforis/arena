@@ -55,7 +55,7 @@ class TaxonomiesImportJob extends Job {
 
     const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
 
-    const csvParser = new CSVParser(speciesFileStream, false)
+    const csvParser = new CSVParser(speciesFileStream, true)
 
     let row = await csvParser.next()
 
@@ -68,15 +68,14 @@ class TaxonomiesImportJob extends Job {
 
       this.taxonomyImportHelper = new TaxonomyImportManager(this.getUser(), surveyId, vernacularLangCodes)
 
-      row = await csvParser.next()
-
       while (row) {
         await this.processRow(taxonomyUuid, vernacularLangCodes, row, tx)
 
         row = await csvParser.next()
       }
+
+      await this.taxonomyImportHelper.finalizeImport(taxonomy, tx)
     }
-    await this.taxonomyImportHelper.finalizeImport(taxonomy, tx)
 
     return taxonomy
   }

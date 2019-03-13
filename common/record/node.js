@@ -40,8 +40,9 @@ const valuePropKeys = {
   srs: 'srs',
 
   // file
-  fileName: 'fileName',
   fileUuid: 'fileUuid',
+  fileName: 'fileName',
+  fileSize: 'fileSize',
 
   // taxon
   taxonUuid: 'taxonUuid',

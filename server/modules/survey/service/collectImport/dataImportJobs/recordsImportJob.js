@@ -1,4 +1,5 @@
 const R = require('ramda')
+const { uuidv4 } = require('../../../../../../common/uuid')
 
 const DateUtils = require('../../../../../../common/dateUtils')
 
@@ -9,13 +10,14 @@ const Category = require('../../../../../../common/survey/category')
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
 const Record = require('../../../../../../common/record/record')
 const Node = require('../../../../../../common/record/node')
+const RecordFile = require('../../../../../../common/record/recordFile')
 
 const SurveyManager = require('../../../../survey/persistence/surveyManager')
 const CategoryManager = require('../../../../category/persistence/categoryManager')
 const TaxonomyManager = require('../../../../taxonomy/persistence/taxonomyManager')
 const RecordManager = require('../../../../record/persistence/recordManager')
 const NodeRepository = require('../../../../record/persistence/nodeRepository')
-const RecordUpdateManager = require('../../../../record/persistence/recordUpdateManager')
+const FileManager = require('../../../../record/persistence/fileManager')
 
 const Job = require('../../../../../job/job')
 
@@ -44,8 +46,7 @@ class RecordsImportJob extends Job {
       const collectRecordJson = CollectIdmlParseUtils.parseXmlToJson(collectRecordXml)
 
       const recordToCreate = Record.newRecord(user)
-      const record = await RecordUpdateManager.createRecord(user, surveyId, recordToCreate, tx)
-      const rootEntity = Record.getRootNode(record)
+      const record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
 
       const collectRootEntityName = R.pipe(
         R.keys,
@@ -54,7 +55,7 @@ class RecordsImportJob extends Job {
 
       const collectRootEntity = collectRecordJson[collectRootEntityName]
 
-      await this.insertEntityNodes(survey, record, Node.getUuid(rootEntity), `/${collectRootEntityName}`, collectRootEntity, tx)
+      await this.insertNode(survey, record, null, `/${collectRootEntityName}`, collectRootEntity, tx)
 
       this.incrementProcessedItems()
     }
@@ -76,121 +77,164 @@ class RecordsImportJob extends Job {
     throw new Error(`Entry data not found: ${entryName}`)
   }
 
-  async insertEntityNodes (survey, record, entityUuid, collectParentNodeDefPath, collectEntity, tx) {
+  async insertNode (survey, record, parentUuid, collectNodeDefPath, collectNode, tx) {
     const { nodeDefUuidByCollectPath } = this.context
 
-    for (const collectNodeDefChildName of R.keys(collectEntity)) {
-      const collectNodeDefChildPath = collectParentNodeDefPath + '/' + collectNodeDefChildName
-      const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
+    const nodeDefUuid = nodeDefUuidByCollectPath[collectNodeDefPath]
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-      if (nodeDefChildUuid) {
-        const childDef = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
+    let nodeToInsert = Node.newNode(nodeDefUuid, Record.getUuid(record), parentUuid)
 
-        const collectChildNodes = CollectIdmlParseUtils.getList([collectNodeDefChildName])(collectEntity)
+    if (NodeDef.isNodeDefAttribute(nodeDef)) {
+      const value = await this.extractAttributeValue(survey, nodeDef, nodeToInsert, collectNodeDefPath, collectNode, tx)
+      nodeToInsert = Node.assocValue(value)(nodeToInsert)
+    }
 
-        for (const collectChildNode of collectChildNodes) {
+    const node = await NodeRepository.insertNode(Survey.getId(survey), nodeToInsert, tx)
+    record = Record.assocNode(node)(record)
 
-          let childNodeToInsert = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), entityUuid)
+    if (NodeDef.isNodeDefEntity(nodeDef)) {
+      for (const collectNodeDefChildName of R.keys(collectNode)) {
+        const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
+        const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
 
-          if (NodeDef.isNodeDefAttribute(childDef)) {
-            const value = await extractAttributeValue(survey, childDef, collectChildNode, tx)
-            childNodeToInsert = Node.assocValue(value)(childNodeToInsert)
-          }
-
-          const childNode = await NodeRepository.insertNode(Survey.getId(survey), childNodeToInsert, tx)
-
-          record = Record.assocNode(childNode)(record)
-
-          if (NodeDef.isNodeDefEntity(childDef)) {
-            await this.insertEntityNodes(survey, record, Node.getUuid(childNode), collectNodeDefChildPath, collectChildNode, tx)
+        if (nodeDefChildUuid) {
+          const collectChildNodes = CollectIdmlParseUtils.getList([collectNodeDefChildName])(collectNode)
+          for (const collectChildNode of collectChildNodes) {
+            record = await this.insertNode(survey, record, Node.getUuid(node), collectNodeDefChildPath, collectChildNode, tx)
           }
         }
       }
     }
+    return record
   }
-}
 
-const extractAttributeValue = async (survey, nodeDef, collectNode, tx) => {
-  const surveyId = Survey.getId(survey)
+  async extractAttributeValue (survey, nodeDef, node, collectNodeDefPath, collectNode, tx) {
+    const surveyId = Survey.getId(survey)
 
-  switch (NodeDef.getType(nodeDef)) {
-    case nodeDefType.boolean:
-      const { value } = collectNode
-      return value ? 'true' : 'false'
-    case nodeDefType.decimal:
-    case nodeDefType.integer:
-    case nodeDefType.text:
-      return collectNode['value']
-    case nodeDefType.code: {
-      const { code } = collectNode
+    switch (NodeDef.getType(nodeDef)) {
+      case nodeDefType.boolean:
+        const { value } = collectNode
+        return value ? 'true' : 'false'
+      case nodeDefType.decimal:
+      case nodeDefType.integer:
+      case nodeDefType.text:
+        return collectNode['value']
+      case nodeDefType.code: {
+        const { code } = collectNode
 
-      const categoryUuid = NodeDef.getNodeDefCategoryUuid(nodeDef)
-      const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-      const items = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, levelIndex, false, tx)
-      const item = R.find(item => Category.getItemCode(item) === code, items)
-      return item
-        ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) }
-        : null
-    }
-    case nodeDefType.coordinate: {
-      const { x, y, srs } = collectNode
+        const categoryUuid = NodeDef.getNodeDefCategoryUuid(nodeDef)
+        const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+        const items = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, levelIndex, false, tx)
+        const item = R.find(item => Category.getItemCode(item) === code, items)
+        return item
+          ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) }
+          : null
+      }
+      case nodeDefType.coordinate: {
+        const { x, y, srs } = collectNode
 
-      return {
-        [Node.valuePropKeys.x]: x,
-        [Node.valuePropKeys.y]: y,
-        [Node.valuePropKeys.srs]: srs
+        return {
+          [Node.valuePropKeys.x]: x,
+          [Node.valuePropKeys.y]: y,
+          [Node.valuePropKeys.srs]: srs
+        }
+      }
+      case nodeDefType.date: {
+        const { day, month, year } = collectNode
+
+        return DateUtils.formatDate(day, month, year)
+      }
+      case nodeDefType.time: {
+        const { hour, minute } = collectNode
+
+        return DateUtils.formatTime(hour, minute)
+      }
+      case nodeDefType.taxon: {
+        const { code, scientific_name, vernacularName } = collectNode
+
+        const taxonomyUuid = NodeDef.getNodeDefTaxonomyUuid(nodeDef)
+
+        const unlistedTaxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unlistedCode, false, tx)
+
+        if (vernacularName) {
+
+          const taxa = await TaxonomyManager.fetchTaxaByVernacularName(surveyId, taxonomyUuid, vernacularName, false, false, tx)
+          const taxon = R.head(taxa)
+
+          return taxon
+            ? {
+              [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(taxon),
+              [Node.valuePropKeys.vernacularNameUuid]: Taxonomy.getTaxonVernacularNameUuid(taxon),
+            }
+            : {
+              [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(unlistedTaxon),
+              [Node.valuePropKeys.vernacularName]: vernacularName
+            }
+        } else if (code) {
+          const taxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, code, false, tx)
+          return taxon
+            ? {
+              [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(taxon)
+            }
+            : {
+              [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(unlistedTaxon),
+              [Node.valuePropKeys.scientificName]: scientific_name
+            }
+
+        } else {
+          return null
+        }
+      }
+      case nodeDefType.file: {
+
+        const { file_name, file_size } = collectNode
+        const collectSurveyFileZip = this.getContextProp('collectSurveyFileZip')
+        const collectNodeDef = this.getCollectNodeDefByPath(collectNodeDefPath)
+
+        const collectNodeDefId = collectNodeDef._attr.id
+        const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${file_name}`)
+
+        if (content) {
+          const fileUuid = uuidv4()
+          const file = RecordFile.createFile(fileUuid, file_name, file_size, content, Node.getRecordUuid(node), Node.getUuid(node))
+          await FileManager.insertFile(surveyId, file, tx)
+
+          return {
+            [Node.valuePropKeys.fileUuid]: fileUuid,
+            [Node.valuePropKeys.fileName]: file_name,
+            [Node.valuePropKeys.fileSize]: file_size
+          }
+        } else {
+          return null
+        }
       }
     }
-    case nodeDefType.date: {
-      const { day, month, year } = collectNode
+  }
 
-      return DateUtils.formatDate(day, month, year)
+  getCollectNodeDefByPath (collectNodeDefPath) {
+    const collectSurvey = this.getContextProp('collectSurvey')
+
+    const collectAncestorNodeNames = R.pipe(
+      R.split('/'),
+      R.reject(R.isEmpty)
+    )(collectNodeDefPath)
+
+    let currentCollectNode = collectSurvey.schema
+
+    for (const collectAncestorNodeName of collectAncestorNodeNames) {
+      const collectChildNodeDef = R.pipe(
+        R.values,
+        R.find(n => R.path(['_attr', 'name'], n) === collectAncestorNodeName)
+      )(currentCollectNode)
+
+      if (collectChildNodeDef)
+        currentCollectNode = collectChildNodeDef
+      else
+        return null //node def not found
     }
-    case nodeDefType.time: {
-      const { hour, minute } = collectNode
 
-      return DateUtils.formatTime(hour, minute)
-    }
-    case nodeDefType.taxon: {
-      const { code, scientific_name, vernacularName } = collectNode
-
-      const taxonomyUuid = NodeDef.getNodeDefTaxonomyUuid(nodeDef)
-
-      const unlistedTaxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unlistedCode, false, tx)
-
-      if (vernacularName) {
-
-        const taxa = await TaxonomyManager.fetchTaxaByVernacularName(surveyId, taxonomyUuid, vernacularName, false, false, tx)
-        const taxon = R.head(taxa)
-
-        return taxon
-          ? {
-            [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(taxon),
-            [Node.valuePropKeys.vernacularNameUuid]: Taxonomy.getTaxonVernacularNameUuid(taxon),
-          }
-          : {
-            [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(unlistedTaxon),
-            [Node.valuePropKeys.vernacularName]: vernacularName
-          }
-      } else if (code) {
-        const taxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, code, false, tx)
-        return taxon
-          ? {
-            [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(taxon)
-          }
-          : {
-            [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(unlistedTaxon),
-            [Node.valuePropKeys.scientificName]: scientific_name
-          }
-
-      } else {
-        return null
-      }
-    }
-    case nodeDefType.file: {
-      //TODO
-      return null
-    }
+    return currentCollectNode
   }
 
 }

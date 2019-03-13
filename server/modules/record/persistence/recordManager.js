@@ -28,6 +28,10 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, client = db) => {
 }
 
 module.exports = {
+  // CREATE
+  insertRecord: RecordRepository.insertRecord,
+
+  // READ
   fetchRecordByUuid,
   fetchRecordAndNodesByUuid,
   fetchRecordsSummaryBySurveyId,

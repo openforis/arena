@@ -164,16 +164,18 @@ class Job {
   setStatus (status) {
     this.status = status
 
-    const event = this.createJobEvent(jobEvents.statusChange)
-    if (this.status === jobStatus.failed) {
-      event.errors = this.errors
-    }
-    this.notifyEvent(event)
-
     if (this.status === jobStatus.succeeded
       || this.status === jobStatus.failed) {
       this.onFinish()
     }
+
+    const event = this.createJobEvent(jobEvents.statusChange)
+    
+    if (this.status === jobStatus.failed) {
+      event.errors = this.errors
+    }
+
+    this.notifyEvent(event)
   }
 
   setStatusSucceeded () {
@@ -215,6 +217,10 @@ class Job {
 
   setContext (context) {
     Object.assign(this.context, context)
+  }
+
+  setResult (result) {
+    Object.assign(this.result, result)
   }
 
   /**
