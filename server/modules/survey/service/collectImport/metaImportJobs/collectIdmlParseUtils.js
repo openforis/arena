@@ -1,4 +1,3 @@
-const XmlJS = require('xml-js')
 const R = require('ramda')
 
 const NodeDef = require('../../../../../../common/survey/nodeDef')
@@ -30,25 +29,6 @@ const toLabels = (elName, defaultLang, typeFilter = null) =>
           : acc
       }, {})
     )(xml)
-
-const toList = R.pipe(
-  R.defaultTo([]),
-  R.ifElse(
-    R.is(Array),
-    R.identity,
-    l => [l]
-  )
-)
-
-const getList = path => R.pipe(
-  R.path(path),
-  toList
-)
-
-const parseXmlToJson = (xml, compact = true) => {
-  const options = { compact, ignoreComment: true, spaces: 2 }
-  return XmlJS.xml2js(xml, options)
-}
 
 const getElementsByName = name => R.pipe(
   R.propOr([], 'elements'),
@@ -84,24 +64,13 @@ const getText = R.pipe(
   R.prop('text')
 )
 
-const getSchema = getElementsByName('schema')
-
-const getCodeLists = getElementsByPath(['codeLists', 'list'])
-
 module.exports = {
   nodeDefTypesByCollectType,
 
   toLabels,
-  toList,
-  getList,
   getElementsByName,
   getElementByName,
   getElementsByPath,
   getText,
   getElementText: name => R.pipe(getElementByName(name), getText),
-
-  getSchema,
-  getCodeLists,
-
-  parseXmlToJson
 }

@@ -47,20 +47,22 @@ const createRecord = async (user, surveyId, recordToCreate, client = db) =>
 
 //==== UPDATE
 
-const updateRecordStep = async (surveyId, recordUuid, stepId) => {
-  const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid)
+const updateRecordStep = async (surveyId, recordUuid, stepId, client = db) => {
+  await client.tx(async t => {
+    const record = await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, t)
 
-  // check if the step exists and that is't adjacent to the current one
-  const currentStepId = Record.getStep(record)
-  const stepCurrent = RecordStep.getStep(currentStepId)
-  const stepUpdate = RecordStep.getStep(stepId)
+    // check if the step exists and that is't adjacent to the current one
+    const currentStepId = Record.getStep(record)
+    const stepCurrent = RecordStep.getStep(currentStepId)
+    const stepUpdate = RecordStep.getStep(stepId)
 
-  if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
-    await RecordRepository.updateRecordStep(surveyId, recordUuid, stepId)
-  } else {
-    throw new Error('Can\'t update step')
-  }
+    if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
+      await RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t)
+    } else {
+      throw new Error('Can\'t update step')
+    }
 
+  })
 }
 
 //==== DELETE

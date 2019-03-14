@@ -35,7 +35,7 @@ class SurveyCreatorJob extends Job {
 
     const surveyId = Survey.getId(survey)
 
-    await SurveyManager.updateSurveyProp(surveyId, Survey.infoKeys.languages, languages, this.getUser(), tx)
+    await SurveyManager.updateSurveyProp(this.getUser(), surveyId, Survey.infoKeys.languages, languages, tx)
 
     this.setContext({ surveyId, defaultLanguage })
   }

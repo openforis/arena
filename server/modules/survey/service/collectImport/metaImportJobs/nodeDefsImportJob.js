@@ -3,7 +3,9 @@ const R = require('ramda')
 const { uuidv4 } = require('../../../../../../common/uuid')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const NodeDefValidations = require('../../../../../../common/survey/nodeDefValidations')
+const NodeDefExpression = require('../../../../../../common/survey/nodeDefExpression')
 const NodeDefLayout = require('../../../../../../common/survey/nodeDefLayout')
+const SurveyUtils = require('../../../../../../common/survey/surveyUtils')
 const { nodeDefType } = NodeDef
 const Category = require('../../../../../../common/survey/category')
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
@@ -67,6 +69,7 @@ class NodeDefsImportJob extends Job {
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
     }
 
+    // 1a. validations
     props[NodeDef.propKeys.validations] = {
       ...multiple
         ? {
@@ -78,6 +81,22 @@ class NodeDefsImportJob extends Job {
         : {
           [NodeDefValidations.keys.required]: collectNodeDef.attributes.required,
         }
+    }
+
+    // 1b. default values
+    const collectDefaultValues = CollectIdmlParseUtils.getElementsByName('default')(collectNodeDef)
+
+    const defaultValues = R.pipe(
+      R.filter(R.hasPath(['attributes', 'value'])),
+      R.map(collectDefaultValue => ({
+          [SurveyUtils.keys.uuid]: uuidv4(),
+          [NodeDefExpression.keys.expression]: R.path(['attributes', 'value'])(collectDefaultValue)
+        })
+      )
+    )(collectDefaultValues)
+
+    if (!R.isEmpty(defaultValues)) {
+      props[NodeDef.propKeys.defaultValues] = defaultValues
     }
 
     // 2. determine page

@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const FileXml = require('../../../../../../common/file/fileXml')
+
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const Record = require('../../../../../../common/record/record')
@@ -7,11 +9,12 @@ const Node = require('../../../../../../common/record/node')
 
 const SurveyManager = require('../../../../survey/persistence/surveyManager')
 const RecordManager = require('../../../../record/persistence/recordManager')
+const RecordUpdateManager = require('../../../../record/persistence/recordUpdateManager')
 const NodeRepository = require('../../../../record/persistence/nodeRepository')
 
 const Job = require('../../../../../job/job')
 
-const CollectIdmlParseUtils = require('../metaImportJobs/collectIdmlParseUtils')
+const CollectRecordParseUtils = require('../dataImportJobs/collectRecordParseUtils')
 const CollectAttributeValueExtractor = require('../dataImportJobs/collectAttributeValueExtractor')
 
 class RecordsImportJob extends Job {
@@ -34,10 +37,11 @@ class RecordsImportJob extends Job {
       const collectRecordData = this.findCollectRecordData(entryName)
       const { collectRecordXml, step } = collectRecordData
 
-      const collectRecordJson = CollectIdmlParseUtils.parseXmlToJson(collectRecordXml)
+      const collectRecordJson = FileXml.parseToJson(collectRecordXml)
 
       const recordToCreate = Record.newRecord(user)
       const record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
+      await RecordUpdateManager.updateRecordStep(surveyId, Record.getUuid(record), step, tx)
 
       const collectRootEntityName = R.pipe(
         R.keys,
@@ -97,7 +101,7 @@ class RecordsImportJob extends Job {
         const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
 
         if (nodeDefChildUuid) {
-          const collectChildNodes = CollectIdmlParseUtils.getList([collectNodeDefChildName])(collectNode)
+          const collectChildNodes = CollectRecordParseUtils.getList([collectNodeDefChildName])(collectNode)
           for (const collectChildNode of collectChildNodes) {
             record = await this.insertNode(survey, record, Node.getUuid(node), collectNodeDefChildPath, collectChildNode, tx)
           }

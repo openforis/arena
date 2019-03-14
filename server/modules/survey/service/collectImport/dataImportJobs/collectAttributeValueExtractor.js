@@ -16,6 +16,7 @@ const TaxonomyManager = require('../../../../taxonomy/persistence/taxonomyManage
 const FileManager = require('../../../../record/persistence/fileManager')
 
 const CollectIdmlParseUtils = require('../metaImportJobs/collectIdmlParseUtils')
+const CollectRecordParseUtils = require('../dataImportJobs/collectRecordParseUtils')
 
 const getCollectNodeDefByPath = (collectSurvey, collectNodeDefPath) => {
   const collectAncestorNodeNames = R.pipe(
@@ -50,9 +51,9 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
     case nodeDefType.decimal:
     case nodeDefType.integer:
     case nodeDefType.text:
-      return getVal('value')(collectNode)
+      return CollectRecordParseUtils.getTextValue('value')(collectNode)
     case nodeDefType.code: {
-      const code = getVal('code')(collectNode)
+      const code = CollectRecordParseUtils.getTextValue('code')(collectNode)
 
       const categoryUuid = NodeDef.getNodeDefCategoryUuid(nodeDef)
       const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
@@ -63,7 +64,7 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
         : null
     }
     case nodeDefType.coordinate: {
-      const { x, y, srs } = collectNode
+      const { x, y, srs } = CollectRecordParseUtils.getTextValues(collectNode)
 
       return {
         [Node.valuePropKeys.x]: x,
@@ -72,17 +73,17 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
       }
     }
     case nodeDefType.date: {
-      const { day, month, year} = getValues(collectNode)
+      const { day, month, year} = CollectRecordParseUtils.getTextValues(collectNode)
 
       return DateUtils.formatDate(day, month, year)
     }
     case nodeDefType.time: {
-      const { hour, minute} = getValues(collectNode)
+      const { hour, minute} = CollectRecordParseUtils.getTextValues(collectNode)
 
       return DateUtils.formatTime(hour, minute)
     }
     case nodeDefType.taxon: {
-      const { code, scientific_name, vernacularName } = getValues(collectNode)
+      const { code, scientific_name, vernacularName } = CollectRecordParseUtils.getTextValues(collectNode)
 
       const taxonomyUuid = NodeDef.getNodeDefTaxonomyUuid(nodeDef)
 
@@ -118,41 +119,29 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
       }
     }
     case nodeDefType.file: {
-      const { file_name, file_size } = getValues(collectNode)
+      const { file_name, file_size } = CollectRecordParseUtils.getTextValues(collectNode)
 
       const collectNodeDef = getCollectNodeDefByPath(collectSurvey, collectNodeDefPath)
 
-      if (R.isNil(collectNodeDef)) {
-        console.log('node def not found', collectNodeDefPath)
-        console.log('collectSurvey', collectSurvey)
-      } else {
-        const collectNodeDefId = collectNodeDef.attributes.id
-        const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${file_name}`)
+      const collectNodeDefId = collectNodeDef.attributes.id
+      const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${file_name}`)
 
-        if (content) {
-          const fileUuid = uuidv4()
-          const file = RecordFile.createFile(fileUuid, file_name, file_size, content, Node.getRecordUuid(node), Node.getUuid(node))
-          await FileManager.insertFile(surveyId, file, tx)
+      if (content) {
+        const fileUuid = uuidv4()
+        const file = RecordFile.createFile(fileUuid, file_name, file_size, content, Node.getRecordUuid(node), Node.getUuid(node))
+        await FileManager.insertFile(surveyId, file, tx)
 
-          return {
-            [Node.valuePropKeys.fileUuid]: fileUuid,
-            [Node.valuePropKeys.fileName]: file_name,
-            [Node.valuePropKeys.fileSize]: file_size
-          }
-        } else {
-          return null
+        return {
+          [Node.valuePropKeys.fileUuid]: fileUuid,
+          [Node.valuePropKeys.fileName]: file_name,
+          [Node.valuePropKeys.fileSize]: file_size
         }
+      } else {
+        return null
       }
     }
   }
 }
-
-const getVal = prop => R.path([prop, '_text'])
-
-const getValues = valObj => R.pipe(
-  R.keys,
-  R.reduce((acc, prop) => R.assoc(prop, getVal(prop)(valObj), acc), {})
-)(valObj)
 
 module.exports = {
   extractAttributeValue
