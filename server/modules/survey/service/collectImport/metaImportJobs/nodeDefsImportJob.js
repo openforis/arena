@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const { uuidv4 } = require('../../../../../../common/uuid')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
+const NodeDefValidations = require('../../../../../../common/survey/nodeDefValidations')
 const NodeDefLayout = require('../../../../../../common/survey/nodeDefLayout')
 const { nodeDefType } = NodeDef
 const Category = require('../../../../../../common/survey/category')
@@ -25,7 +26,12 @@ class NodeDefsImportJob extends Job {
     const { collectSurvey, surveyId } = this.context
 
     // insert root entity and descendants recursively
-    await this.insertNodeDef(surveyId, null, '', collectSurvey.schema.entity, NodeDef.nodeDefType.entity, tx)
+    const collectRootDef = R.pipe(
+      CollectIdmlParseUtils.getElementsByPath(['schema', 'entity']),
+      R.head
+    )(collectSurvey)
+
+    await this.insertNodeDef(surveyId, null, '', collectRootDef, NodeDef.nodeDefType.entity, tx)
 
     this.setContext({
       nodeDefUuidByCollectPath: this.nodeDefUuidByCollectPath
@@ -39,26 +45,39 @@ class NodeDefsImportJob extends Job {
     const { defaultLanguage } = this.context
 
     // 1. determine props
-    const collectNodeDefName = collectNodeDef._attr.name
-    const multiple = collectNodeDef._attr.multiple === 'true'
+    const collectNodeDefName = collectNodeDef.attributes.name
+    const multiple = collectNodeDef.attributes.multiple === 'true'
 
     const props = {
       [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName),
       [NodeDef.propKeys.multiple]: multiple,
-      [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && collectNodeDef._attr.key === 'true',
-      [NodeDef.propKeys.labels]: CollectIdmlParseUtils.toLabels(collectNodeDef.label, defaultLanguage, 'instance'),
+      [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && collectNodeDef.attributes.key === 'true',
+      [NodeDef.propKeys.labels]: CollectIdmlParseUtils.toLabels('label', defaultLanguage, 'instance')(collectNodeDef),
       ...type === NodeDef.nodeDefType.entity
         ? {
           [NodeDefLayout.nodeDefLayoutProps.render]:
-            collectNodeDef._attr['n1:layout'] === 'table'
+            collectNodeDef.attributes['n1:layout'] === 'table'
               ? NodeDefLayout.nodeDefRenderType.table
               : NodeDefLayout.nodeDefRenderType.form
         }
         : {
-          [NodeDef.propKeys.readOnly]: collectNodeDef._attr.calculated
+          [NodeDef.propKeys.readOnly]: collectNodeDef.attributes.calculated
         }
       ,
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
+    }
+
+    props[NodeDef.propKeys.validations] = {
+      ...multiple
+        ? {
+          [NodeDefValidations.keys.count]: {
+            [NodeDefValidations.keys.min]: collectNodeDef.attributes.minCount,
+            [NodeDefValidations.keys.max]: collectNodeDef.attributes.maxCount
+          }
+        }
+        : {
+          [NodeDefValidations.keys.required]: collectNodeDef.attributes.required,
+        }
     }
 
     // 2. determine page
@@ -76,15 +95,13 @@ class NodeDefsImportJob extends Job {
     if (type === nodeDefType.entity) {
       // insert child definitions
 
-      for (const collectChildType of R.keys(collectNodeDef)) {
+      for (const collectChild of collectNodeDef.elements) {
+        const collectChildType = collectChild.name
+
         const childType = CollectIdmlParseUtils.nodeDefTypesByCollectType[collectChildType]
 
         if (childType) {
-          const collectChildDefs = CollectIdmlParseUtils.toList(collectNodeDef[collectChildType])
-
-          for (const collectChildDef of collectChildDefs) {
-            await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChildDef, childType, tx)
-          }
+          await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChild, childType, tx)
         }
       }
     }
@@ -93,7 +110,7 @@ class NodeDefsImportJob extends Job {
   extractNodeDefExtraProps (parentNodeDef, type, collectNodeDef) {
     switch (type) {
       case nodeDefType.code:
-        const listName = collectNodeDef._attr.list
+        const listName = collectNodeDef.attributes.list
         const category = R.find(c => listName === Category.getName(c), this.getContextProp('categories', []))
 
         return {
@@ -101,7 +118,7 @@ class NodeDefsImportJob extends Job {
           [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.dropdown
         }
       case nodeDefType.taxon:
-        const taxonomyName = collectNodeDef._attr.taxonomy
+        const taxonomyName = collectNodeDef.attributes.taxonomy
         const taxonomy = R.find(t => taxonomyName === Taxonomy.getTaxonomyName(t), this.getContextProp('taxonomies', []))
 
         return {
@@ -140,9 +157,9 @@ class NodeDefsImportJob extends Job {
 }
 
 const determineNodeDefPageUuid = (type, collectNodeDef) => {
-  const multiple = collectNodeDef._attr.multiple === 'true'
+  const multiple = collectNodeDef.attributes.multiple === 'true'
 
-  const hasTab = R.has('n1:tab', collectNodeDef._attr)
+  const hasTab = R.has('n1:tab', collectNodeDef.attributes)
 
   if (type === NodeDef.nodeDefType.entity) {
     if (multiple) {

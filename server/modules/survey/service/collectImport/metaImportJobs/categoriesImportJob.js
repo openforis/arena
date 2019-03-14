@@ -23,21 +23,21 @@ class CategoriesImportJob extends Job {
 
     const categories = []
 
-    const codeLists = CollectIdmlParseUtils.getList(['codeLists', 'list'])(collectSurvey)
+    const collectCodeLists = CollectIdmlParseUtils.getElementsByPath(['codeLists', 'list'])(collectSurvey)
 
-    this.total = codeLists.length
+    this.total = collectCodeLists.length
 
-    for (const codeList of codeLists) {
-      // 1. insert a category for each codeList
-      const categoryParam = Category.newCategory({
-        [Category.props.name]: codeList._attr.name
+    for (const collectCodeList of collectCodeLists) {
+      // 1. insert a category for each collectCodeList
+      const categoryToCreate = Category.newCategory({
+        [Category.props.name]: collectCodeList.attributes.name
       })
-      let category = await CategoryManager.insertCategory(this.getUser(), surveyId, categoryParam, tx)
+      let category = await CategoryManager.insertCategory(this.getUser(), surveyId, categoryToCreate, tx)
 
-      category = await insertLevels(this.getUser(), surveyId, category, codeList, tx)
+      category = await insertLevels(this.getUser(), surveyId, category, collectCodeList, tx)
 
-      const firstLevelSourceItems = CollectIdmlParseUtils.getList(['items', 'item'])(codeList)
-      await insertItems(this.getUser(), surveyId, category, 0, null, defaultLanguage, firstLevelSourceItems, tx)
+      const collectFirstLevelItems = CollectIdmlParseUtils.getElementsByPath(['items', 'item'])(collectCodeList)
+      await insertItems(this.getUser(), surveyId, category, 0, null, defaultLanguage, collectFirstLevelItems, tx)
 
       categories.push(category)
 
@@ -49,20 +49,20 @@ class CategoriesImportJob extends Job {
 }
 
 const insertLevels = async (user, surveyId, category, codeList, tx) => {
-  const hierarchyLevels = CollectIdmlParseUtils.getList(['hierarchy', 'level'])(codeList)
+  const hierarchyLevels = CollectIdmlParseUtils.getElementsByPath(['hierarchy', 'level'])(codeList)
   if (hierarchyLevels.length > 1) {
     let firstLevel = Category.getLevelByIndex(0)(category)
     const collectFirstLevel = hierarchyLevels[0]
 
     // update first level name
-    firstLevel = await CategoryManager.updateLevelProp(user, surveyId, Category.getUuid(firstLevel), Category.levelProps.name, collectFirstLevel._attr.name, tx)
+    firstLevel = await CategoryManager.updateLevelProp(user, surveyId, Category.getUuid(firstLevel), Category.levelProps.name, collectFirstLevel.attributes.name, tx)
     category = Category.assocLevel(firstLevel)(category)
 
     // insert other levels
     for (let i = 1; i < hierarchyLevels.length; i++) {
       const hierarchyLevel = hierarchyLevels[i]
-      const levelParam = Category.assocLevelName(hierarchyLevel._attr.name)(Category.newLevel(category))
-      const level = await CategoryManager.insertLevel(user, surveyId, Category.getUuid(category), levelParam, tx)
+      const levelToCreate = Category.assocLevelName(hierarchyLevel.attributes.name)(Category.newLevel(category))
+      const level = await CategoryManager.insertLevel(user, surveyId, Category.getUuid(category), levelToCreate, tx)
 
       category = Category.assocLevel(level)(category)
     }
@@ -70,23 +70,23 @@ const insertLevels = async (user, surveyId, category, codeList, tx) => {
   return category
 }
 
-const insertItems = async (user, surveyId, category, levelIndex, parentItem, defaultLanguage, sourceItems, tx) => {
+const insertItems = async (user, surveyId, category, levelIndex, parentItem, defaultLanguage, collectItems, tx) => {
   const level = Category.getLevelByIndex(levelIndex)(category)
   const levelUuid = Category.getUuid(level)
 
-  for (const collectItem of sourceItems) {
-    const labels = CollectIdmlParseUtils.toLabels(collectItem.label, defaultLanguage)
+  for (const collectItem of collectItems) {
+    const labels = CollectIdmlParseUtils.toLabels('label', defaultLanguage)(collectItem)
 
     const itemParam = Category.newItem(levelUuid, parentItem, {
-      [Category.itemProps.code]: collectItem.code,
+      [Category.itemProps.code]: CollectIdmlParseUtils.getElementText('code')(collectItem),
       [Category.itemProps.labels]: labels
     })
     const item = await CategoryManager.insertItem(user, surveyId, itemParam, tx)
 
     // insert child items recursively
-    const childItems = CollectIdmlParseUtils.getList(['item'])(collectItem)
-    if (!R.isEmpty(childItems))
-      await insertItems(user, surveyId, category, levelIndex + 1, item, defaultLanguage, childItems, tx)
+    const collectChildItems = CollectIdmlParseUtils.getElementsByName('item')(collectItem)
+    if (!R.isEmpty(collectChildItems))
+      await insertItems(user, surveyId, category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
   }
 }
 

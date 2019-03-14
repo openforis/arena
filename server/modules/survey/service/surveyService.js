@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Survey = require('../../../../common/survey/survey')
+const Validator = require('../../../../common/validation/validator')
 
 const SurveyManager = require('../persistence/surveyManager')
 const SurveyValidator = require('../surveyValidator')
@@ -10,7 +11,7 @@ const SurveyPublishJob = require('./publish/surveyPublishJob')
 const CollectImportJob = require('./collectImport/collectImportJob')
 
 const updateSurveyProp = async (user, surveyId, key, value) => {
-  const survey = await SurveyManager.updateSurveyProp(surveyId, key, value, user)
+  const survey = await SurveyManager.updateSurveyProp(user, surveyId, key, value)
 
   return R.pipe(
     Survey.getSurveyInfo,

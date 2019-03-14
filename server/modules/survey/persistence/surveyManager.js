@@ -42,7 +42,7 @@ const createSurvey = async (user, { name, label, lang }, createRootEntity = true
       const { id: surveyId } = survey
 
       //create survey data schema
-      await migrateSurveySchema(survey.id)
+      await migrateSurveySchema(surveyId)
 
       if (createRootEntity) {
         // create survey's root entity
@@ -65,7 +65,7 @@ const createSurvey = async (user, { name, label, lang }, createRootEntity = true
       survey.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
 
       if (!AuthManager.isSystemAdmin(user)) {
-        await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
+        await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, userId, t)
       }
 
       await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, { name, label, lang, uuid: survey.uuid }, t)
@@ -99,7 +99,7 @@ const fetchUserSurveysInfo = async (user) => R.map(
 )
 
 // ====== UPDATE
-const updateSurveyProp = async (surveyId, key, value, user, client = db) =>
+const updateSurveyProp = async (user, surveyId, key, value, client = db) =>
   await client.tx(async t => {
     await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t)
     await SurveyRepository.updateSurveyProp(surveyId, key, value, t)

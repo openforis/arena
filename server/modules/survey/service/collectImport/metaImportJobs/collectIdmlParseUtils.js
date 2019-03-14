@@ -1,4 +1,4 @@
-const XmlParser = require('fast-xml-parser')
+const XmlJS = require('xml-js')
 const R = require('ramda')
 
 const NodeDef = require('../../../../../../common/survey/nodeDef')
@@ -17,24 +17,19 @@ const nodeDefTypesByCollectType = {
   time: nodeDefType.time,
 }
 
-const toLabels = (labelSource, defaultLang, typeFilter = null) => {
-  const list = toList(labelSource)
+const toLabels = (elName, defaultLang, typeFilter = null) =>
+  xml =>
+    R.pipe(
+      getElementsByName(elName),
+      R.reduce((acc, l) => {
+        const lang = R.pathOr(defaultLang, ['attributes', 'xml:lang'], l)
+        const type = R.path(['attributes', 'type'], l)
 
-  return R.reduce((acc, l) => {
-    if (R.is(Object, l)) {
-      const lang = R.pathOr(defaultLang, ['_attr', 'xml:lang'], l)
-      const type = R.path(['_attr', 'type'], l)
-
-      if (typeFilter === null || type === typeFilter) {
-        return R.assoc(lang, l._text, acc)
-      } else {
-        return acc
-      }
-    } else {
-      return R.assoc(defaultLang, l, acc)
-    }
-  }, {}, list)
-}
+        return typeFilter === null || type === typeFilter
+          ? R.assoc(lang, getText(l), acc)
+          : acc
+      }, {})
+    )(xml)
 
 const toList = R.pipe(
   R.defaultTo([]),
@@ -50,18 +45,48 @@ const getList = path => R.pipe(
   toList
 )
 
-const parseXmlToJson = xml => {
-  const options = {
-    attrNodeName: '_attr',
-    attributeNamePrefix: '',
-    textNodeName: '_text',
-    ignoreAttributes: false,
-    format: false,
-    indentBy: '  ',
-  }
-  const traversalObj = XmlParser.getTraversalObj(xml, options)
-  return XmlParser.convertToJson(traversalObj, options)
+const parseXmlToJson = (xml, compact = true) => {
+  const options = { compact, ignoreComment: true, spaces: 2 }
+  return XmlJS.xml2js(xml, options)
 }
+
+const getElementsByName = name => R.pipe(
+  R.propOr([], 'elements'),
+  R.filter(R.propEq('name', name))
+)
+
+const getElementByName = name => R.pipe(
+  getElementsByName(name),
+  R.head
+)
+
+const getElementsByPath = path =>
+  xml =>
+    R.reduce((acc, pathPart) =>
+        R.ifElse(
+          R.isNil,
+          R.identity,
+          R.pipe(
+            R.ifElse(
+              R.is(Array),
+              R.head,
+              R.identity
+            ),
+            getElementsByName(pathPart)
+          )
+        )(acc)
+      , xml, path
+    )
+
+const getText = R.pipe(
+  R.prop('elements'),
+  R.find(R.propEq('type', 'text')),
+  R.prop('text')
+)
+
+const getSchema = getElementsByName('schema')
+
+const getCodeLists = getElementsByPath(['codeLists', 'list'])
 
 module.exports = {
   nodeDefTypesByCollectType,
@@ -69,6 +94,14 @@ module.exports = {
   toLabels,
   toList,
   getList,
+  getElementsByName,
+  getElementByName,
+  getElementsByPath,
+  getText,
+  getElementText: name => R.pipe(getElementByName(name), getText),
+
+  getSchema,
+  getCodeLists,
 
   parseXmlToJson
 }

@@ -28,6 +28,8 @@ const assocCountProp = key =>
   )
 
 module.exports = {
+  keys,
+
   //REQUIRED
   isRequired: R.propOr(false, keys.required),
   assocRequired: required => R.assoc(keys.required, required),

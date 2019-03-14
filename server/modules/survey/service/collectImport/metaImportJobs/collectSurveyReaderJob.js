@@ -22,9 +22,10 @@ class CollectSurveyReaderJob extends Job {
     await collectSurveyFileZip.init()
 
     const idmlXml = await collectSurveyFileZip.getEntryAsText(idmlXmlFileName)
-    const idmlJsonObj = CollectIdmlParseUtils.parseXmlToJson(idmlXml)
+    const idmlJsonObj = CollectIdmlParseUtils.parseXmlToJson(idmlXml, false)
+    const collectSurvey = CollectIdmlParseUtils.getElementByName('survey')(idmlJsonObj)
 
-    this.setContext({ collectSurveyFileZip, collectSurvey: idmlJsonObj.survey })
+    this.setContext({ collectSurveyFileZip, collectSurvey})
   }
 }
 
