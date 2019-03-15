@@ -117,32 +117,17 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
 
 // ============== UPDATE
 
-const updateNodeDefProps = async (surveyId, nodeDefUuid, propsArray, client = db) => {
-
-  const toIndexedProps = propsArray =>
-    R.reduce((acc, prop) => R.assocPath(R.split('.', prop.key), prop.value)(acc), {}, propsArray)
-
-  const props = R.pipe(
-    R.filter(R.propEq('advanced', false)),
-    toIndexedProps
-  )(propsArray)
-
-  const advancedProps = R.pipe(
-    R.filter(R.propEq('advanced', true)),
-    toIndexedProps
-  )(propsArray)
-
-  return await client.one(`
+const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced, client = db) =>
+  await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props_draft = props_draft || $1::jsonb,
         props_advanced_draft = props_advanced_draft || $2::jsonb,
         date_modified = ${now}
     WHERE uuid = $3
     RETURNING ${nodeDefSelectFields}
-  `, [props, advancedProps, nodeDefUuid],
+  `, [props, propsAdvanced, nodeDefUuid],
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
-}
 
 const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`

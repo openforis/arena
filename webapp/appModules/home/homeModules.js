@@ -9,4 +9,6 @@ export const homeModules = {
   surveyList: `${appModules.home}/surveys`,
 
   surveyNew: `${appModules.home}/surveyNew`,
+
+  collectImportReport: `${appModules.home}/collectImportReport`,
 }

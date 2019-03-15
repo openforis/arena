@@ -48,8 +48,14 @@ export const importCollectSurvey = file =>
 
     const { data } = await axios.post(`/api/survey/collect-import`, formData, config)
 
-    dispatch(showAppJobMonitor(data.job, (job) => {
+    dispatch(showAppJobMonitor(data.job, async (job) => {
       const surveyId = job.result.surveyId
       dispatch(setActiveSurvey(surveyId, false))
+
+      const { data } = await axios.get(`/api/survey/${surveyId}/collect-import-report`)
+      const { items } = data
+      if (!R.isEmpty(items)) {
+
+      }
     }))
   }

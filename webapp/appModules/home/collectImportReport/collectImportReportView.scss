@@ -1,0 +1,11 @@
+.home-collect-import-report {
+  height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.collect-import-report-header,
+.collect-import-report-item {
+  display: grid;
+  grid-template-columns: .05fr .2fr .2fr .2fr .2fr .05fr .1fr;
+  justify-content: center;
+}
