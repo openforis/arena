@@ -78,7 +78,7 @@ module.exports.init = app => {
 
       const surveyId = Request.getRestParam(req, 'surveyId')
 
-      const validation = await SurveyService.updateSurveyProp(surveyId, key, value, user)
+      const validation = await SurveyService.updateSurveyProp(user, surveyId, key, value)
 
       res.json({ validation })
     } catch (err) {

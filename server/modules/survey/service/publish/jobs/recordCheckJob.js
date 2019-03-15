@@ -22,7 +22,8 @@ class RecordCheckJob extends Job {
   }
 
   async execute (tx) {
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, true, true, false, tx)
+    const surveyId = this.getSurveyId()
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, true, true, false, tx)
 
     const nodeDefsNew = []
     const nodeDefsUpdated = []
@@ -36,12 +37,12 @@ class RecordCheckJob extends Job {
     })
 
     if (!(R.isEmpty(nodeDefsNew) && R.isEmpty(nodeDefsUpdated))) {
-      const recordUuids = await RecordManager.fetchRecordUuids(this.surveyId, tx)
+      const recordUuids = await RecordManager.fetchRecordUuids(surveyId, tx)
 
       this.total = R.length(recordUuids)
 
       for (const recordUuid of recordUuids) {
-        const record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, tx)
+        const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, tx)
         await this.checkRecord(survey, nodeDefsNew, nodeDefsUpdated, record, tx)
 
         this.incrementProcessedItems()
@@ -51,7 +52,7 @@ class RecordCheckJob extends Job {
 
   async checkRecord (survey, nodeDefsNew, nodeDefsUpdated, record, tx) {
     // 1. insert missing nodes
-    const missingNodes = await RecordMissingNodesCreator.insertMissingSingleNodes(survey, nodeDefsNew, record, this.user, tx)
+    const missingNodes = await RecordMissingNodesCreator.insertMissingSingleNodes(survey, nodeDefsNew, record, this.getUser(), tx)
     record = Record.assocNodes(missingNodes)(record)
 
     // 2. apply default values

@@ -43,6 +43,8 @@ class CSVParser {
 
   onStreamEnd () {
     this.csvStreamEnded = true
+
+    this.notifyRowReady(null)
   }
 
   async next () {

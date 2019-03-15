@@ -22,7 +22,7 @@ export const activeJobUpdate = job =>
       const stateJob = getActiveJob(getState())
       const onComplete = getActiveJobOnCompleteCallback(stateJob)
       if (stateJob && onComplete) {
-        onComplete()
+        onComplete(job)
       }
     }
     dispatch({type: appJobActiveUpdate, job})

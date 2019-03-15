@@ -25,7 +25,7 @@ const notifyJobUpdate = job => {
 
 // ====== UPDATE
 
-const cancelActiveJobByUserId = async (userId) => {
+const cancelActiveJobByUserId = async userId => {
   const jobThread = userJobThreads.getThread(userId)
   if (jobThread) {
     jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
@@ -34,7 +34,7 @@ const cancelActiveJobByUserId = async (userId) => {
 
 // ====== EXECUTE
 
-const executeJobThread = (job) => {
+const executeJobThread = job => {
 
   const thread = new ThreadManager(
     path.resolve(__dirname, 'jobThread.js'),
@@ -42,7 +42,7 @@ const executeJobThread = (job) => {
     async job => await notifyJobUpdate(job)
   )
 
-  userJobThreads.putThread(job.userId, thread)
+  userJobThreads.putThread(job.getUserId(), thread)
 }
 
 module.exports = {

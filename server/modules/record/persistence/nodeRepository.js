@@ -38,7 +38,7 @@ const insertNode = async (surveyId, node, client = db) => {
     (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
     VALUES ($1, $2, $3, $4, $5, $6::jsonb)
     RETURNING *, true as ${Node.keys.created}`,
-    [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), stringifyValue(node.value), meta],
+    [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null)), meta],
     dbTransformCallback
   )
 }

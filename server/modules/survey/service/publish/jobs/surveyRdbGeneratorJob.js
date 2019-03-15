@@ -15,8 +15,8 @@ class SurveyRdbGeneratorJob extends Job {
   }
 
   async execute (tx) {
-    const { surveyId } = this.params
     const survey = await this.getSurvey(tx)
+    const surveyId = Survey.getId(survey)
 
     //get entities or multiple attributes tables
     const { root, length } = Survey.getHierarchy(NodeDef.isNodeDefEntityOrMultiple)(survey)
@@ -48,7 +48,8 @@ class SurveyRdbGeneratorJob extends Job {
   }
 
   async getSurvey (tx) {
-    const { surveyId } = this.params
+    const surveyId = this.getSurveyId()
+
     const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, tx)
     const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, false, false, false, tx)
 

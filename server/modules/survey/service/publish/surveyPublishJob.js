@@ -13,15 +13,15 @@ class SurveyPublishJob extends Job {
 
   constructor (params) {
     super(SurveyPublishJob.type, params, [
-      new NodeDefsValidationJob(params),
-      new CategoriesValidationJob(params),
-      new TaxonomiesValidationJob(params),
-      new SurveyInfoValidationJob(params),
+      new NodeDefsValidationJob(),
+      new CategoriesValidationJob(),
+      new TaxonomiesValidationJob(),
+      new SurveyInfoValidationJob(),
       // record check must be executed before publishing survey props
-      new RecordCheckJob(params),
-      new SurveyPropsPublishJob(params),
-      new SurveyDependencyGraphsGenerationJob(params),
-      new SurveyRdbGeneratorJob(params),
+      new RecordCheckJob(),
+      new SurveyPropsPublishJob(),
+      new SurveyDependencyGraphsGenerationJob(),
+      new SurveyRdbGeneratorJob(),
     ])
   }
 }

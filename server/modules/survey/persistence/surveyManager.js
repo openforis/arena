@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const db = require('../../../db/db')
 const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
@@ -25,9 +24,9 @@ const ActivityLog = require('../../activityLog/activityLogger')
 const assocSurveyInfo = info => ({ info })
 
 // ====== CREATE
-const createSurvey = async (user, { name, label, lang }, createRootEntity = true) => {
+const createSurvey = async (user, { name, label, lang }, createRootEntity = true, client = db) => {
 
-  const survey = await db.tx(
+  const survey = await client.tx(
     async t => {
       const props = {
         name,
@@ -43,7 +42,7 @@ const createSurvey = async (user, { name, label, lang }, createRootEntity = true
       const { id: surveyId } = survey
 
       //create survey data schema
-      await migrateSurveySchema(survey.id)
+      await migrateSurveySchema(surveyId)
 
       if (createRootEntity) {
         // create survey's root entity
@@ -66,7 +65,7 @@ const createSurvey = async (user, { name, label, lang }, createRootEntity = true
       survey.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
 
       if (!AuthManager.isSystemAdmin(user)) {
-        await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, user.id, t)
+        await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, userId, t)
       }
 
       await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, { name, label, lang, uuid: survey.uuid }, t)
@@ -100,16 +99,13 @@ const fetchUserSurveysInfo = async (user) => R.map(
 )
 
 // ====== UPDATE
-const updateSurveyProp = async (surveyId, key, value, user) =>
-  await db.tx(
-    async t => {
-      await Promise.all([
-        ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t),
-        SurveyRepository.updateSurveyProp(surveyId, key, value, t)
-      ])
+const updateSurveyProp = async (user, surveyId, key, value, client = db) =>
+  await client.tx(async t => {
+    await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t)
+    await SurveyRepository.updateSurveyProp(surveyId, key, value, t)
 
-      return await fetchSurveyById(surveyId, true, true, t)
-    })
+    return await fetchSurveyById(surveyId, true, true, t)
+  })
 
 // ====== DELETE
 const deleteSurvey = async (id, user) => {

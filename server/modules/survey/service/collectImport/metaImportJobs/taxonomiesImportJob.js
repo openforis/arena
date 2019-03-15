@@ -50,7 +50,7 @@ class TaxonomiesImportJob extends Job {
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.taxonomyPropKeys.name]: taxonomyName
     })
-    const taxonomy = await TaxonomyManager.createTaxonomy(this.user, surveyId, taxonomyParam)
+    const taxonomy = await TaxonomyManager.insertTaxonomy(this.getUser(), surveyId, taxonomyParam, tx)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
     const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
@@ -66,7 +66,7 @@ class TaxonomiesImportJob extends Job {
 
       const vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
 
-      this.taxonomyImportHelper = new TaxonomyImportManager(this.user, surveyId, vernacularLangCodes)
+      this.taxonomyImportHelper = new TaxonomyImportManager(this.getUser(), surveyId, vernacularLangCodes)
 
       while (row) {
         await this.processRow(taxonomyUuid, vernacularLangCodes, row, tx)

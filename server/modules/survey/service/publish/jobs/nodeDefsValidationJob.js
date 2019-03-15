@@ -14,7 +14,7 @@ class NodeDefsValidationJob extends Job {
   }
 
   async execute (tx) {
-    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(this.surveyId, true, true, true, tx)
+    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(this.getSurveyId(), true, true, true, tx)
 
     const nodeDefsInvalid = R.pipe(
       R.values,

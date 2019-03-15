@@ -66,7 +66,6 @@
     "express-fileupload": "^1.1.1-alpha.2",
     "express-session": "^1.15.6",
     "fast-csv": "^2.4.1",
-    "fast-xml-parser": "^3.12.13",
     "gsap": "^2.0.2",
     "i18n": "^0.8.3",
     "jsep": "^0.3.4",
@@ -94,7 +93,8 @@
     "socketio": "^1.0.0",
     "text-mask-addons": "^3.8.0",
     "to-snake-case": "^1.0.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "xml-js": "^1.6.11"
   },
   "browserslist": [
     "last 2 versions"

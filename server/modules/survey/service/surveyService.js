@@ -8,10 +8,10 @@ const SurveyValidator = require('../surveyValidator')
 
 const JobManager = require('../../../job/jobManager')
 const SurveyPublishJob = require('./publish/surveyPublishJob')
-const CollectSurveyImportJob = require('./collectImport/collectSurveyImportJob')
+const CollectImportJob = require('./collectImport/collectImportJob')
 
-const updateSurveyProp = async (surveyId, key, value, user) => {
-  const survey = await SurveyManager.updateSurveyProp(surveyId, key, value, user)
+const updateSurveyProp = async (user, surveyId, key, value) => {
+  const survey = await SurveyManager.updateSurveyProp(user, surveyId, key, value)
 
   return R.pipe(
     Survey.getSurveyInfo,
@@ -20,7 +20,7 @@ const updateSurveyProp = async (surveyId, key, value, user) => {
 }
 
 const startCollectImportJob = (user, filePath) => {
-  const job = new CollectSurveyImportJob({ user, filePath })
+  const job = new CollectImportJob({ user, filePath })
 
   JobManager.executeJobThread(job)
 
