@@ -5,7 +5,7 @@ import React from 'react'
 import AppSideBar from './components/sideBar/appSideBar'
 import AppJobMonitor from './components/job/appJobMonitor'
 import AppErrors from './components/errors/appErrors'
-import AppModuleSwitch from './components/appModuleSwitch'
+import ModuleSwitch from '../components/moduleSwitch'
 
 const AppView = (props) => {
   const pathName = props.history.location.pathname
@@ -15,7 +15,7 @@ const AppView = (props) => {
 
       <AppSideBar pathname={pathName}/>
 
-      <AppModuleSwitch location={props.location}/>
+      <ModuleSwitch location={props.location}/>
 
       <AppJobMonitor/>
 
