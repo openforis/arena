@@ -2,11 +2,10 @@ import './designerView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom'
 
 import AuthManager from '../../../common/auth/authManager'
 
-import TabBar from '../../commonComponents/tabBar'
+import NavigationTabBar from '../components/moduleNavigationTabBar'
 import SurveyFormView from '../surveyForm/surveyFormView'
 import SurveyHierarchy from './components/surveyHierarchy'
 import RecordView from '../data/records/components/recordView'
@@ -32,54 +31,50 @@ class DesignerView extends React.Component {
   }
 
   render () {
-    const { history, location, canEditDef } = this.props
+    const { canEditDef } = this.props
 
-    return location.pathname === appModuleUri(appModules.designer)
-      ? (
-        <Redirect to={appModuleUri(designerModules.formDesigner)}/>
-      )
-      : (
-        <TabBar
-          className="designer"
-          location={location}
-          history={history}
-          tabs={[
-            {
-              label: 'Form Designer',
-              component: SurveyFormView,
-              path: appModuleUri(designerModules.formDesigner),
-              props: { edit: true, draft: true, canEditDef },
-            },
+    return (
+      <NavigationTabBar
+        className="designer app-module__tab-navigation"
+        moduleRoot={appModules.designer}
+        moduleDefault={designerModules.formDesigner}
+        tabs={[
+          {
+            label: 'Form Designer',
+            component: SurveyFormView,
+            path: appModuleUri(designerModules.formDesigner),
+            props: { edit: true, draft: true, canEditDef },
+          },
 
-            {
-              label: 'Hierarchy',
-              component: SurveyHierarchy,
-              path: appModuleUri(designerModules.surveyHierarchy)
-            },
+          {
+            label: 'Hierarchy',
+            component: SurveyHierarchy,
+            path: appModuleUri(designerModules.surveyHierarchy)
+          },
 
-            {
-              label: 'Form preview',
-              component: RecordView,
-              path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
-              props: { edit: true, draft: true, canEditDef, preview: true },
-              showTab: false,
-            },
+          {
+            label: 'Form preview',
+            component: RecordView,
+            path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
+            props: { edit: true, draft: true, canEditDef, preview: true },
+            showTab: false,
+          },
 
-            {
-              label: 'Categories',
-              component: CategoriesView,
-              path: appModuleUri(designerModules.categories)
-            },
+          {
+            label: 'Categories',
+            component: CategoriesView,
+            path: appModuleUri(designerModules.categories)
+          },
 
-            {
-              label: 'Taxonomies',
-              component: TaxonomiesView,
-              path: appModuleUri(designerModules.taxonomies)
-            },
+          {
+            label: 'Taxonomies',
+            component: TaxonomiesView,
+            path: appModuleUri(designerModules.taxonomies)
+          },
 
-          ]}
-        />
-      )
+        ]}
+      />
+    )
   }
 }
 
