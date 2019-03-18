@@ -1,5 +1,7 @@
 import React from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
 import SurveyFormView from '../../../surveyForm/surveyFormView'
@@ -22,7 +24,7 @@ class RecordView extends React.Component {
   }
 
   componentDidMount () {
-    const {checkInRecord, recordUuidUrlParam} = this.props
+    const { checkInRecord, recordUuidUrlParam } = this.props
 
     checkInRecord(recordUuidUrlParam)
 
@@ -35,7 +37,7 @@ class RecordView extends React.Component {
   }
 
   componentUnload () {
-    const {recordUuidUrlParam, recordLoaded, checkOutRecord, resetForm} = this.props
+    const { recordUuidUrlParam, recordLoaded, checkOutRecord, resetForm } = this.props
 
     if (recordLoaded)
       checkOutRecord(recordUuidUrlParam)
@@ -44,7 +46,7 @@ class RecordView extends React.Component {
   }
 
   render () {
-    const {recordLoaded, preview, canEditRecord} = this.props
+    const { recordLoaded, preview, canEditRecord } = this.props
 
     return recordLoaded
       ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true} canEditRecord={canEditRecord}/>
@@ -52,7 +54,7 @@ class RecordView extends React.Component {
   }
 }
 
-const mapStateToProps = (state, {match}) => {
+const mapStateToProps = (state, { match }) => {
   const surveyForm = SurveyFormState.getSurveyForm(state)
   const user = AppState.getUser(state)
   const record = RecordState.getRecord(surveyForm)
@@ -64,7 +66,12 @@ const mapStateToProps = (state, {match}) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {resetForm, checkInRecord, checkOutRecord}
-)(RecordView)
+const enhance = compose(
+  withRouter,
+  connect(
+    mapStateToProps,
+    { resetForm, checkInRecord, checkOutRecord }
+  )
+)
+
+export default enhance(RecordView)

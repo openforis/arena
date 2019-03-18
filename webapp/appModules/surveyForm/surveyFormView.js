@@ -49,7 +49,14 @@ const SurveyFormView = (props) => {
           editAllowed &&
           <NodeDefEdit/>
         }
-        <FormNavigation edit={edit} entry={entry && canEditRecord} preview={preview} history={history} canEditDef={canEditDef}/>
+
+        <FormNavigation
+          edit={edit}
+          entry={entry && canEditRecord}
+          preview={preview}
+          history={history}
+          canEditDef={canEditDef}
+        />
 
         {
           nodeDef
