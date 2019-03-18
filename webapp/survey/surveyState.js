@@ -36,8 +36,8 @@ export const surveyDefsDraftFetched = R.pathEq([survey, keys.status, statusKeys.
 export const hasCollectImportReport = R.propEq(hasCollectImportReport, true)
 
 export const setSurveyDefsFetched = draft => R.pipe(
-  R.assoc(keys.defsFetched, true),
-  R.assoc(keys.defsDraftFetched, draft),
+  R.assoc(statusKeys.defsFetched, true),
+  R.assoc(statusKeys.defsDraftFetched, draft),
 )
 
 export const setHasCollectImportReport = value => R.assoc(keys.hasCollectImportReport, value)

@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 
 import AuthManager from '../../../common/auth/authManager'
 
+import SurveyDefsLoader from '../components/surveyDefsLoader'
 import NavigationTabBar from '../components/moduleNavigationTabBar'
 import SurveyFormView from '../surveyForm/surveyFormView'
 import SurveyHierarchy from './components/surveyHierarchy'
@@ -18,62 +19,63 @@ import { designerModules } from './designerModules'
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../../survey/surveyState'
 
-import { initSurveyDefs } from '../../survey/actions'
 import { resetForm } from '../surveyForm/actions'
 
 class DesignerView extends React.Component {
 
   componentDidMount () {
-    const { resetForm, initSurveyDefs, canEditDef } = this.props
-
-    resetForm()
-    initSurveyDefs(canEditDef, canEditDef)
+    this.props.resetForm()
   }
 
   render () {
     const { canEditDef } = this.props
 
     return (
-      <NavigationTabBar
-        className="designer app-module__tab-navigation"
-        moduleRoot={appModules.designer}
-        moduleDefault={designerModules.formDesigner}
-        tabs={[
-          {
-            label: 'Form Designer',
-            component: SurveyFormView,
-            path: appModuleUri(designerModules.formDesigner),
-            props: { edit: true, draft: true, canEditDef },
-          },
+      <SurveyDefsLoader
+        draft={canEditDef}
+        validate={canEditDef}>
 
-          {
-            label: 'Hierarchy',
-            component: SurveyHierarchy,
-            path: appModuleUri(designerModules.surveyHierarchy)
-          },
+        <NavigationTabBar
+          className="designer app-module__tab-navigation"
+          moduleRoot={appModules.designer}
+          moduleDefault={designerModules.formDesigner}
+          tabs={[
+            {
+              label: 'Form Designer',
+              component: SurveyFormView,
+              path: appModuleUri(designerModules.formDesigner),
+              props: { edit: true, draft: true, canEditDef },
+            },
 
-          {
-            label: 'Form preview',
-            component: RecordView,
-            path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
-            props: { edit: true, draft: true, canEditDef, preview: true },
-            showTab: false,
-          },
+            {
+              label: 'Hierarchy',
+              component: SurveyHierarchy,
+              path: appModuleUri(designerModules.surveyHierarchy)
+            },
 
-          {
-            label: 'Categories',
-            component: CategoriesView,
-            path: appModuleUri(designerModules.categories)
-          },
+            {
+              label: 'Form preview',
+              component: RecordView,
+              path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
+              props: { edit: true, draft: true, canEditDef, preview: true },
+              showTab: false,
+            },
 
-          {
-            label: 'Taxonomies',
-            component: TaxonomiesView,
-            path: appModuleUri(designerModules.taxonomies)
-          },
+            {
+              label: 'Categories',
+              component: CategoriesView,
+              path: appModuleUri(designerModules.categories)
+            },
 
-        ]}
-      />
+            {
+              label: 'Taxonomies',
+              component: TaxonomiesView,
+              path: appModuleUri(designerModules.taxonomies)
+            },
+
+          ]}
+        />
+      </SurveyDefsLoader>
     )
   }
 }
@@ -89,5 +91,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { initSurveyDefs, resetForm }
+  { resetForm }
 )(DesignerView)

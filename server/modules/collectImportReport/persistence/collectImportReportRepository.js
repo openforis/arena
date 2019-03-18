@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const db = require('../../../db/db')
 const DbUtils = require('../../../db/dbUtils')
 
@@ -14,6 +16,15 @@ const fetchItems = async (surveyId, client = db) =>
     `,
     [],
     dbTransformCallback
+  )
+
+const countItems = async (surveyId, client = db) =>
+  await client.one(`
+      SELECT COUNT(*) as tot
+      FROM ${getSurveyDBSchema(surveyId)}.collect_import_report
+    `,
+    [],
+    R.prop('tot')
   )
 
 const insertItem = async (surveyId, nodeDefUuid, props, client = db) =>
@@ -41,9 +52,13 @@ const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
   )
 
 module.exports = {
+  // CREATE
   insertItem,
 
+  // READ
   fetchItems,
+  countItems,
 
+  // UPDATE
   updateItem
 }

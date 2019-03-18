@@ -5,6 +5,7 @@ module.exports = {
 
   // READ
   fetchItems: CollectImportReportRepository.fetchItems,
+  countItems: CollectImportReportRepository.countItems,
 
   // UPDATE
   updateItem: CollectImportReportRepository.updateItem

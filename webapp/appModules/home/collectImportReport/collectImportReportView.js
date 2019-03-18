@@ -5,19 +5,20 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import Checkbox from '../../../commonComponents/form/checkbox'
+import NodeDefEdit from '../../surveyForm/nodeDefEdit/nodeDefEdit'
+import SurveyDefsLoader from '../../../appModules/components/surveyDefsLoader'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import CollectImportReportItem from '../../../../common/survey/collectImportReportItem'
 
 import { fetchCollectImportReportItems, updateCollectImportReportItem } from './actions'
-import { initSurveyDefs } from '../../../survey/actions'
 import { setFormNodeDefEdit } from '../../surveyForm/actions'
 import * as SurveyState from '../../../survey/surveyState'
 import * as CollectImportReportState from './collectImportReportState'
-import { appModules, appModuleUri } from '../../appModules'
+import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
-const NodeDefReportItem = ({ survey, nodeDefUuid, nodeDefItems, updateCollectImportReportItem, setFormNodeDefEdit, history }) => {
+const NodeDefReportItem = ({ survey, nodeDefUuid, nodeDefItems, updateCollectImportReportItem, onNodeDefEdit }) => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const defaultLanguage = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
@@ -50,9 +51,7 @@ const NodeDefReportItem = ({ survey, nodeDefUuid, nodeDefItems, updateCollectImp
             /></div>
             <div>
               <button onClick={() => {
-                history.push(appModuleUri(appModules.designer))
-                //TODO improve it
-                setTimeout(() => setFormNodeDefEdit(nodeDef), 1000)
+                onNodeDefEdit(nodeDef)
               }}>EDIT
               </button>
             </div>
@@ -66,18 +65,20 @@ const NodeDefReportItem = ({ survey, nodeDefUuid, nodeDefItems, updateCollectImp
 class CollectImportReportView extends React.Component {
 
   async componentDidMount () {
-    const { initSurveyDefs, fetchCollectImportReportItems } = this.props
-
-    initSurveyDefs()
+    const { fetchCollectImportReportItems } = this.props
 
     fetchCollectImportReportItems()
+  }
+
+  handleNodeDefEdit (nodeDef) {
+    this.props.setFormNodeDefEdit(nodeDef)
   }
 
   render () {
     const {
       survey, reportItems,
-      updateCollectImportReportItem, setFormNodeDefEdit,
-      history
+      editedNodeDef,
+      updateCollectImportReportItem,
     } = this.props
 
     if (R.isEmpty(reportItems)) {
@@ -86,26 +87,34 @@ class CollectImportReportView extends React.Component {
 
     const nodeDefUuidGroups = R.groupBy(R.prop(CollectImportReportItem.keys.nodeDefUuid))(reportItems)
 
-    return <div className="home-collect-import-report">
+    return <SurveyDefsLoader
+      draft={true}
+      validate={true}>
       {
-        R.pipe(
-          R.keys,
-          R.map(nodeDefUuid => {
-            const nodeDefItems = nodeDefUuidGroups[nodeDefUuid]
-            return (
-              <NodeDefReportItem
-                key={nodeDefUuid}
-                survey={survey}
-                nodeDefUuid={nodeDefUuid}
-                nodeDefItems={nodeDefItems}
-                updateCollectImportReportItem={updateCollectImportReportItem}
-                setFormNodeDefEdit={setFormNodeDefEdit}
-                history={history}/>
-            )
-          })
-        )(nodeDefUuidGroups)
+        editedNodeDef &&
+        <NodeDefEdit/>
       }
-    </div>
+
+      <div className="home-collect-import-report">
+        {
+          R.pipe(
+            R.keys,
+            R.map(nodeDefUuid => {
+              const nodeDefItems = nodeDefUuidGroups[nodeDefUuid]
+              return (
+                <NodeDefReportItem
+                  key={nodeDefUuid}
+                  survey={survey}
+                  nodeDefUuid={nodeDefUuid}
+                  nodeDefItems={nodeDefItems}
+                  updateCollectImportReportItem={updateCollectImportReportItem}
+                  onNodeDefEdit={nodeDefUuid => this.handleNodeDefEdit(nodeDefUuid)}/>
+              )
+            })
+          )(nodeDefUuidGroups)
+        }
+      </div>
+    </SurveyDefsLoader>
   }
 
 }
@@ -113,17 +122,20 @@ class CollectImportReportView extends React.Component {
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const reportItems = CollectImportReportState.getState(state)
+  const surveyForm = SurveyFormState.getSurveyForm(state)
+  const editedNodeDef = SurveyFormState.getFormNodeDefEdit(survey)(surveyForm)
 
   return {
     survey,
-    reportItems
+    reportItems,
+    editedNodeDef
   }
 }
 
 export default connect(
   mapStateToProps,
   {
-    initSurveyDefs, fetchCollectImportReportItems, updateCollectImportReportItem,
+    fetchCollectImportReportItems, updateCollectImportReportItem,
     setFormNodeDefEdit
   }
 )(CollectImportReportView)

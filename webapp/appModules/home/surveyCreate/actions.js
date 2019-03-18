@@ -52,10 +52,9 @@ export const importCollectSurvey = file =>
       const surveyId = job.result.surveyId
       dispatch(setActiveSurvey(surveyId, false))
 
-      const { data } = await axios.get(`/api/survey/${surveyId}/collect-import-report`)
-      const { items } = data
-      if (!R.isEmpty(items)) {
-
+      const { data } = await axios.get(`/api/survey/${surveyId}/collect-import-report/count`)
+      if (data.count > 0) {
+        // TODO show CollectImportReportView
       }
     }))
   }

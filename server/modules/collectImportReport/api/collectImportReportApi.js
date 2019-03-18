@@ -21,6 +21,18 @@ module.exports.init = app => {
     }
   })
 
+  app.get(`/survey/:surveyId/collect-import-report/count`, AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+
+      const count = await CollectImportReportService.countItems(surveyId)
+
+      res.json({ count })
+    } catch (err) {
+      Response.sendErr(res, err)
+    }
+  })
+
   // UPDATE
 
   app.post(`/survey/:surveyId/collect-import-report/resolve-item/:itemId`, AuthMiddleware.requireSurveyEditPermission, async (req, res) => {

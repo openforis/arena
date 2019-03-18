@@ -84,7 +84,7 @@ class SurveyInfo extends React.Component {
               </button>
             }
             {
-              showCollectImportReportButton &&
+              //showCollectImportReportButton &&
               <Link to={appModuleUri(homeModules.collectImportReport)}
                 className="btn btn-of-light">
                 Collect Import Report
