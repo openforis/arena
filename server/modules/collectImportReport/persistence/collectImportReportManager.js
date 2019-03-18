@@ -1,9 +1,4 @@
-const db = require('../../../db/db')
-
 const CollectImportReportRepository = require('./collectImportReportRepository')
-
-const resolveItem = async (surveyId, itemId, client = db) =>
-  await CollectImportReportRepository.updateItem(surveyId, itemId, {}, true, client)
 
 module.exports = {
   insertItem: CollectImportReportRepository.insertItem,
@@ -12,6 +7,5 @@ module.exports = {
   fetchItems: CollectImportReportRepository.fetchItems,
 
   // UPDATE
-  updateItem: CollectImportReportRepository.updateItem,
-  resolveItem
+  updateItem: CollectImportReportRepository.updateItem
 }

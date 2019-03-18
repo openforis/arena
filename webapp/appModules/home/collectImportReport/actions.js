@@ -1,0 +1,31 @@
+import axios from 'axios'
+
+import * as SurveyState from '../../../survey/surveyState'
+
+export const homeCollectImportReportUpdate = 'home/collectImportReport/update'
+export const homeCollectImportReportItemUpdate = 'home/collectImportReport/item/update'
+
+export const fetchCollectImportReportItems = () =>
+  async (dispatch, getState) => {
+    try {
+      const surveyId = SurveyState.getStateSurveyId(getState())
+
+      const { data } = await axios.get(`/api/survey/${surveyId}/collect-import-report`)
+
+      dispatch({ type: homeCollectImportReportUpdate, items: data.items })
+    } catch (e) {
+    }
+  }
+
+export const updateCollectImportReportItem = (itemId, resolved) =>
+  async (dispatch, getState) => {
+    try {
+      const surveyId = SurveyState.getStateSurveyId(getState())
+
+      const { data } = await axios.post(`/api/survey/${surveyId}/collect-import-report/resolve-item/${itemId}`, { resolved })
+
+      dispatch({ type: homeCollectImportReportItemUpdate, item: data.item })
+    } catch (e) {
+    }
+
+  }

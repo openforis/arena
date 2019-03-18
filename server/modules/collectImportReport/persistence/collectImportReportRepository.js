@@ -30,10 +30,10 @@ const updateItem = async (surveyId, itemId, props, resolved, client = db) =>
   await client.one(`
       UPDATE ${getSurveyDBSchema(surveyId)}.collect_import_report
       SET 
-        props = props | $2
+        props = props || $2::jsonb,
         resolved = $3,
         date_modified = ${DbUtils.now}
-      WHERE id = $3
+      WHERE id = $1
       RETURNING *
     `,
     [itemId, props, resolved],

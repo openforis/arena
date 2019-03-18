@@ -2,7 +2,6 @@ const Response = require('../../../utils/response')
 const Request = require('../../../utils/request')
 
 const SurveyService = require('../service/surveyService')
-const CollectImportReportService = require('../../collectImportReport/service/collectImportReportService')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
@@ -95,18 +94,6 @@ module.exports.init = app => {
       const job = SurveyService.startPublishJob(user, surveyId)
 
       res.json({ job: JobUtils.jobToJSON(job) })
-    } catch (err) {
-      Response.sendErr(res, err)
-    }
-  })
-
-  app.get(`/survey/:surveyId/collect-import-report`, AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
-    try {
-      const { surveyId } = Request.getParams(req)
-
-      const items = await CollectImportReportService.fetchItems(surveyId)
-
-      res.json({ items })
     } catch (err) {
       Response.sendErr(res, err)
     }

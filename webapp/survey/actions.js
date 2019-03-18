@@ -70,10 +70,11 @@ export const publishSurvey = () => async (dispatch, getState) => {
 
   const { data } = await axios.put(`/api/survey/${surveyId}/publish`)
 
-  dispatch(showAppJobMonitor(data.job, () => {
-    //reload survey
-    dispatch(setActiveSurvey(surveyId, true))
-  }))
+  dispatch(
+    showAppJobMonitor(data.job, () => {
+      dispatch(setActiveSurvey(surveyId, true))
+    })
+  )
 }
 
 // == DELETE

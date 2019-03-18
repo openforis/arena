@@ -3,5 +3,5 @@ const CollectImportReportManager = require('../persistence/collectImportReportMa
 module.exports = {
   insertItem: CollectImportReportManager.insertItem,
   fetchItems: CollectImportReportManager.fetchItems,
-  resolveItem: CollectImportReportManager.resolveItem
+  updateItem: CollectImportReportManager.updateItem
 }

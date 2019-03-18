@@ -11,6 +11,7 @@ require('../modules/nodeDef/api/nodeDefApi').init(router)
 require('../modules/category/api/categoryApi').init(router)
 require('../modules/taxonomy/api/taxonomyApi').init(router)
 require('../modules/srs/api/srsApi').init(router)
+require('../modules/collectImportReport/api/collectImportReportApi').init(router)
 
 require('../modules/record/api/recordApi').init(router)
 

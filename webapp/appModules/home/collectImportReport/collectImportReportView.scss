@@ -1,6 +1,20 @@
+@import "../../../style/vars";
+
 .home-collect-import-report {
   height: calc(100vh - 40px);
   overflow-y: auto;
+}
+
+.collect-import-report-node-def-items-header {
+  text-align: center;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.collect-import-report-node-def-items {
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid rgba($white, 0.35);
 }
 
 .collect-import-report-header,
@@ -9,3 +23,4 @@
   grid-template-columns: .05fr .2fr .2fr .2fr .2fr .05fr .1fr;
   justify-content: center;
 }
+
