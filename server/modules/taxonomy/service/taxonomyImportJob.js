@@ -35,7 +35,7 @@ class TaxonomyImportJob extends Job {
     this.codesToRow = {} //maps codes to csv file rows
     this.scientificNamesToRow = {} //maps scientific names to csv file rows
 
-    this.taxonomyImportHelper = null //to be initialized before starting the import
+    this.taxonomyImportManager = null //to be initialized before starting the import
   }
 
   async execute (tx) {
@@ -57,7 +57,7 @@ class TaxonomyImportJob extends Job {
       throw new Error('cannot overwrite published taxa')
     }
 
-    this.taxonomyImportHelper = new TaxonomyImportManager(this.getUser(), surveyId, this.vernacularLanguageCodes)
+    this.taxonomyImportManager = new TaxonomyImportManager(this.getUser(), surveyId, this.vernacularLanguageCodes)
 
     //delete old draft taxa
     await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)
@@ -79,7 +79,7 @@ class TaxonomyImportJob extends Job {
 
     if (this.isRunning()) {
       if (R.isEmpty(this.errors)) {
-        await this.taxonomyImportHelper.finalizeImport(taxonomy, tx)
+        await this.taxonomyImportManager.finalizeImport(taxonomy, tx)
       } else {
         this.setStatusFailed()
       }
@@ -103,7 +103,7 @@ class TaxonomyImportJob extends Job {
     const taxon = await this.parseTaxon(data)
 
     if (Validator.isValid(taxon)) {
-      await this.taxonomyImportHelper.addTaxonToInsertBuffer(taxon, t)
+      await this.taxonomyImportManager.addTaxonToInsertBuffer(taxon, t)
     } else {
       this.addError(taxon.validation.fields)
     }

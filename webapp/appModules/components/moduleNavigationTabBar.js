@@ -14,7 +14,7 @@ const TabBarSwitch = ({ tabs, ...rest }) => (
     {
       tabs.map((tab, i) =>
         <Route key={i} exact path={tab.path} render={props =>
-          React.createElement(tab.component, { ...tab.props, match: props.match, ...rest })
+          React.createElement(tab.component, { ...tab.props, ...rest })
         }/>
       )
     }

@@ -72,7 +72,12 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
     await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
 
   // insert node
-  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, t)
+  const parentNode = Record.getParentNode(nodeToInsert)(record)
+  const hierarchy = parentNode
+    ? R.append(Node.getUuid(parentNode), Node.getHierarchy(parentNode))
+    : []
+
+  const node = await NodeRepository.insertNode(surveyId, hierarchy, nodeToInsert, t)
 
   record = Record.assocNode(node)(record)
 

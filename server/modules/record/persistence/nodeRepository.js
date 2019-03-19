@@ -19,29 +19,55 @@ const dbTransformCallback = node =>
 
 // ============== CREATE
 
-const insertNode = async (surveyId, node, client = db) => {
+const insertNode = (surveyId, hierarchy, node, client = db) => {
   const parentUuid = Node.getParentUuid(node)
 
-  const parentH = parentUuid
-    ? await client.one(
-      `SELECT meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = $1`,
-      [parentUuid]
-    ) : []
+  /*
+  const selectHierarchyQueryPart = parentUuid
+    ? `ARRAY_APPEND(TRANSLATE(COALESCE(meta->'h', '[]'::jsonb)::jsonb::text, '[]', '{}')::TEXT[], '${parentUuid}')`
+    : `'[]'::jsonb`
+
+  const createMetaObjQuery =
+    `JSON_BUILD_OBJECT(
+      '${Node.metaKeys.hierarchy}', ${selectHierarchyQueryPart},
+      '${Node.metaKeys.childApplicability}', '{}'::jsonb
+    )`
+
+  return client.one(`
+        INSERT INTO ${getSurveyDBSchema(surveyId)}.node
+          (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
+          ${parentUuid ? 'SELECT' : 'VALUES ('} $1, $2, $3, $4, $5, ${createMetaObjQuery}
+          ${parentUuid ? '' : ')'}
+          ${parentUuid ? `FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = '${parentUuid}'` : ''}
+          RETURNING *, true as ${Node.keys.created}
+    `, [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null))],
+    dbTransformCallback
+  )
+  */
 
   const meta = {
-    h: R.isEmpty(parentH) ? [] : R.append(parentUuid, parentH.h),
-    [Node.metaKeys.childApplicability]: {} //applicability of child nodes
+    [Node.metaKeys.hierarchy]: hierarchy,
+    [Node.metaKeys.childApplicability]: {}
   }
 
-  return await client.one(`
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-    (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
-    VALUES ($1, $2, $3, $4, $5, $6::jsonb)
-    RETURNING *, true as ${Node.keys.created}`,
-    [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null)), meta],
+  return client.one(`
+      INSERT INTO ${getSurveyDBSchema(surveyId)}.node
+        (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
+        VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+        RETURNING *, true as ${Node.keys.created}
+      `, [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null)), meta],
     dbTransformCallback
   )
 }
+
+const insertNodes = async (surveyId, nodesAndHierarchy, client = db) =>
+  await client.batch(
+    nodesAndHierarchy.map(nodeAndHierarchy => {
+        const { node, hierarchy } = nodeAndHierarchy
+        return insertNode(surveyId, hierarchy, node, client)
+      }
+    )
+  )
 
 // ============== READ
 
@@ -177,6 +203,7 @@ const stringifyValue = value => {
 module.exports = {
   //CREATE
   insertNode,
+  insertNodes,
 
   //READ
   fetchNodesByRecordUuid,

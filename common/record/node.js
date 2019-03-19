@@ -159,6 +159,7 @@ module.exports = {
   isChildApplicable: childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid]),
   isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
   isDescendantOf,
+  getHierarchy,
 
   // ==== UPDATE
   assocValue: R.assoc(keys.value),

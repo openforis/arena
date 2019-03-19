@@ -19,7 +19,7 @@ const SurveyCreateView = (props) => {
 
   const {
     newSurvey,
-    updateNewSurveyProp, createSurvey, importCollectSurvey,
+    updateNewSurveyProp, createSurvey, importCollectSurvey
   } = props
 
   const { name, label, lang, validation } = newSurvey
