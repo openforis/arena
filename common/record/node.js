@@ -57,16 +57,21 @@ const valuePropKeys = {
  * ======
  */
 
-const newNode = (nodeDefUuid, recordUuid, parentUuid = null, value = null) => ({
+const newNode = (nodeDefUuid, recordUuid, parentNode = null, value = null) => ({
   [keys.uuid]: uuidv4(),
   [keys.nodeDefUuid]: nodeDefUuid,
   [keys.recordUuid]: recordUuid,
-  [keys.parentUuid]: parentUuid,
+  [keys.parentUuid]: getUuid(parentNode),
   [keys.value]: value,
+  [keys.meta]: {
+    [metaKeys.hierarchy]: parentNode
+      ? R.append(getUuid(parentNode), getHierarchy(parentNode))
+      : []
+  }
 })
 
 const newNodePlaceholder = (nodeDef, parentNode, value = null) => ({
-  ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), getUuid(parentNode), value),
+  ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
   [keys.placeholder]: true
 })
 

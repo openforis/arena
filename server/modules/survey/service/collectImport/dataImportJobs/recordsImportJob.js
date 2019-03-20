@@ -96,9 +96,8 @@ class RecordsImportJob extends Job {
 
     const nodeDefUuid = nodeDefUuidByCollectPath[collectNodeDefPath]
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const parentNodeUuid = Node.getUuid(parentNode)
 
-    let nodeToInsert = Node.newNode(nodeDefUuid, Record.getUuid(record), parentNodeUuid)
+    let nodeToInsert = Node.newNode(nodeDefUuid, Record.getUuid(record), parentNode)
 
     if (NodeDef.isNodeDefAttribute(nodeDef)) {
       const value = await CollectAttributeValueExtractor.extractAttributeValue(survey, nodeDef, nodeToInsert,
@@ -106,17 +105,14 @@ class RecordsImportJob extends Job {
       nodeToInsert = Node.assocValue(value)(nodeToInsert)
     }
 
-    const hierarchy = parentNode
-      ? R.append(parentNodeUuid, Node.getHierarchy(parentNode))
-      : []
-    await this.batchPersister.addItem({hierarchy, node: nodeToInsert}, tx)
+    await this.batchPersister.addItem(nodeToInsert, tx)
 
     record = Record.assocNode(nodeToInsert)(record)
 
     if (NodeDef.isNodeDefEntity(nodeDef)) {
       const collectNodeDefChildNames = R.pipe(
         R.keys,
-        //R.reject(R.equals('_attributes'))
+        R.reject(R.equals('_attributes'))
       )(collectNode)
 
       for (const collectNodeDefChildName of collectNodeDefChildNames) {
@@ -126,7 +122,7 @@ class RecordsImportJob extends Job {
         if (nodeDefChildUuid) {
           const collectChildNodes = CollectRecordParseUtils.getList([collectNodeDefChildName])(collectNode)
           for (const collectChildNode of collectChildNodes) {
-            record = await this.insertNode(survey, record, Node.getUuid(nodeToInsert), collectNodeDefChildPath, collectChildNode, tx)
+            record = await this.insertNode(survey, record, nodeToInsert, collectNodeDefChildPath, collectChildNode, tx)
           }
         }
       }
@@ -135,10 +131,10 @@ class RecordsImportJob extends Job {
     return record
   }
 
-  async nodesBatchInsertHandler (nodesAndHierarchy, tx) {
+  async nodesBatchInsertHandler (nodes, tx) {
     const surveyId = this.getSurveyId()
 
-    await NodeRepository.insertNodes(surveyId, nodesAndHierarchy, tx)
+    await NodeRepository.insertNodes(surveyId, nodes, tx)
   }
 
 }

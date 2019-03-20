@@ -72,12 +72,7 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
     await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
 
   // insert node
-  const parentNode = Record.getParentNode(nodeToInsert)(record)
-  const hierarchy = parentNode
-    ? R.append(Node.getUuid(parentNode), Node.getHierarchy(parentNode))
-    : []
-
-  const node = await NodeRepository.insertNode(surveyId, hierarchy, nodeToInsert, t)
+  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, t)
 
   record = Record.assocNode(node)(record)
 
@@ -92,7 +87,7 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
       childDefs
         .filter(NodeDef.isNodeDefSingle)
         .map(async childDef => {
-            const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), Node.getUuid(node))
+            const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
             return await _insertNodeRecursively(survey, childDef, record, childNode, user, t)
           }
         )

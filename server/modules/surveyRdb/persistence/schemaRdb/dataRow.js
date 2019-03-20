@@ -25,14 +25,15 @@ const getNodeCol = (nodeDefCol, record, nodeRow) => {
 
 }
 
-const getValues = async (surveyInfo, nodeDefRow, record, nodeRow, nodeDefColumns) => {
+const getValues = async (surveyInfo, nodeDefRow, record, nodeRow, nodeDefColumns, client) => {
   const values = await Promise.all(nodeDefColumns.map(async nodeDefCol => {
       const nodeCol = getNodeCol(nodeDefCol, record, nodeRow)
-      return await DataCol.getValues(surveyInfo, nodeDefCol, nodeCol)
+      return await DataCol.getValues(surveyInfo, nodeDefCol, nodeCol, client)
     })
   )
   return R.flatten(values)
 }
+
 module.exports = {
   getValues,
 }

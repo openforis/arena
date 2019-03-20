@@ -23,10 +23,11 @@ class CollectImportJob extends Job {
       //publish survey
       new SurveyPropsPublishJob(),
       new SurveyDependencyGraphsGenerationJob(),
-      new SurveyRdbGeneratorJob(),
       //import records
       new RecordsImportJob(),
-      new RecordCheckJob()
+      new RecordCheckJob(),
+      //generate RDB
+      new SurveyRdbGeneratorJob(),
     ])
   }
 

@@ -19,34 +19,11 @@ const dbTransformCallback = node =>
 
 // ============== CREATE
 
-const insertNode = (surveyId, hierarchy, node, client = db) => {
+const insertNode = (surveyId, node, client = db) => {
   const parentUuid = Node.getParentUuid(node)
 
-  /*
-  const selectHierarchyQueryPart = parentUuid
-    ? `ARRAY_APPEND(TRANSLATE(COALESCE(meta->'h', '[]'::jsonb)::jsonb::text, '[]', '{}')::TEXT[], '${parentUuid}')`
-    : `'[]'::jsonb`
-
-  const createMetaObjQuery =
-    `JSON_BUILD_OBJECT(
-      '${Node.metaKeys.hierarchy}', ${selectHierarchyQueryPart},
-      '${Node.metaKeys.childApplicability}', '{}'::jsonb
-    )`
-
-  return client.one(`
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-          (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
-          ${parentUuid ? 'SELECT' : 'VALUES ('} $1, $2, $3, $4, $5, ${createMetaObjQuery}
-          ${parentUuid ? '' : ')'}
-          ${parentUuid ? `FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = '${parentUuid}'` : ''}
-          RETURNING *, true as ${Node.keys.created}
-    `, [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null))],
-    dbTransformCallback
-  )
-  */
-
   const meta = {
-    [Node.metaKeys.hierarchy]: hierarchy,
+    [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
     [Node.metaKeys.childApplicability]: {}
   }
 
@@ -55,17 +32,15 @@ const insertNode = (surveyId, hierarchy, node, client = db) => {
         (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
         VALUES ($1, $2, $3, $4, $5, $6::jsonb)
         RETURNING *, true as ${Node.keys.created}
-      `, [node.uuid, node.recordUuid, parentUuid, Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null)), meta],
+      `, [Node.getUuid(node), Node.getRecordUuid(node), parentUuid, Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null)), meta],
     dbTransformCallback
   )
 }
 
-const insertNodes = async (surveyId, nodesAndHierarchy, client = db) =>
+const insertNodes = async (surveyId, nodes, client = db) =>
   await client.batch(
-    nodesAndHierarchy.map(nodeAndHierarchy => {
-        const { node, hierarchy } = nodeAndHierarchy
-        return insertNode(surveyId, hierarchy, node, client)
-      }
+    nodes.map(node =>
+      insertNode(surveyId, node, client)
     )
   )
 

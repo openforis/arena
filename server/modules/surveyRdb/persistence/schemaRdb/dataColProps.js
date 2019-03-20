@@ -65,9 +65,9 @@ const props = {
   },
 
   [nodeDefType.code]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
-      const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid) : {}
+      const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid, false, client) : {}
 
       return (node, colName) => R.endsWith('code', colName)
         ? getValueFromItem(nodeDefCol, colName, item, true)
@@ -77,9 +77,9 @@ const props = {
   },
 
   [nodeDefType.taxon]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
       const taxonUuid = Node.getNodeTaxonUuid(nodeCol)
-      const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid) : []
+      const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : []
       return (node, colName) =>
         R.endsWith('code', colName)
           ? Taxonomy.getTaxonCode(taxon)
