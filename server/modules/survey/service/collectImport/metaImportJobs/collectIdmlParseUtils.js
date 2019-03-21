@@ -16,13 +16,22 @@ const nodeDefTypesByCollectType = {
   time: nodeDefType.time,
 }
 
+const keys = {
+  attributes: 'attributes',
+  elements: 'elements',
+  name: 'name',
+  type: 'type',
+  lang: 'xml:lang',
+  text: 'text',
+}
+
 const toLabels = (elName, defaultLang, typeFilter = null) =>
   xml =>
     R.pipe(
       getElementsByName(elName),
       R.reduce((acc, l) => {
-        const lang = R.pathOr(defaultLang, ['attributes', 'xml:lang'], l)
-        const type = R.path(['attributes', 'type'], l)
+        const lang = getAttribute(keys.lang, defaultLang)(l)
+        const type = getAttribute(keys.type)(l)
 
         return typeFilter === null || type === typeFilter
           ? R.assoc(lang, getText(l), acc)
@@ -30,9 +39,11 @@ const toLabels = (elName, defaultLang, typeFilter = null) =>
       }, {})
     )(xml)
 
+const getElements = R.propOr([], keys.elements)
+
 const getElementsByName = name => R.pipe(
-  R.propOr([], 'elements'),
-  R.filter(R.propEq('name', name))
+  getElements,
+  R.filter(el => getName(el) === name)
 )
 
 const getElementByName = name => R.pipe(
@@ -58,19 +69,32 @@ const getElementsByPath = path =>
       , xml, path
     )
 
+const getName = R.prop(keys.name)
+
 const getText = R.pipe(
-  R.prop('elements'),
-  R.find(R.propEq('type', 'text')),
-  R.prop('text')
+  getElements,
+  R.find(R.propEq(keys.type, keys.text)),
+  R.prop(keys.text)
+)
+
+const getAttributes = R.propOr({}, keys.attributes)
+
+const getAttribute = name => R.pipe(
+  getAttributes,
+  R.prop(name)
 )
 
 module.exports = {
   nodeDefTypesByCollectType,
 
   toLabels,
+  getElements,
   getElementsByName,
   getElementByName,
   getElementsByPath,
+  getName,
   getText,
-  getElementText: name => R.pipe(getElementByName(name), getText),
+  getChildElementText: name => R.pipe(getElementByName(name), getText),
+  getAttributes,
+  getAttribute
 }

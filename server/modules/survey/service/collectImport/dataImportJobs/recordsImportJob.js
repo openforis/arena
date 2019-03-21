@@ -24,7 +24,7 @@ class RecordsImportJob extends Job {
   constructor (params) {
     super('RecordsImportJob', params)
 
-    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this))
+    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 1)
   }
 
   async execute (tx) {
@@ -45,7 +45,8 @@ class RecordsImportJob extends Job {
 
       const recordToCreate = Record.newRecord(user)
       const record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
-      await RecordUpdateManager.updateRecordStep(surveyId, Record.getUuid(record), step, tx)
+      const recordUuid = Record.getUuid(record)
+      await RecordUpdateManager.updateRecordStep(surveyId, recordUuid, step, tx)
 
       const collectRootEntityName = R.pipe(
         R.keys,
@@ -55,7 +56,7 @@ class RecordsImportJob extends Job {
 
       const collectRootEntity = collectRecordJson[collectRootEntityName]
 
-      await this.insertNode(survey, record, null, `/${collectRootEntityName}`, collectRootEntity, tx)
+      await this.insertNode(survey, recordUuid, null, `/${collectRootEntityName}`, collectRootEntity, tx)
 
       this.incrementProcessedItems()
     }
@@ -91,13 +92,13 @@ class RecordsImportJob extends Job {
     throw new Error(`Entry data not found: ${entryName}`)
   }
 
-  async insertNode (survey, record, parentNode, collectNodeDefPath, collectNode, tx) {
+  async insertNode (survey, recordUuid, parentNode, collectNodeDefPath, collectNode, tx) {
     const { nodeDefUuidByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
 
     const nodeDefUuid = nodeDefUuidByCollectPath[collectNodeDefPath]
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-    let nodeToInsert = Node.newNode(nodeDefUuid, Record.getUuid(record), parentNode)
+    let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, parentNode)
 
     if (NodeDef.isNodeDefAttribute(nodeDef)) {
       const value = await CollectAttributeValueExtractor.extractAttributeValue(survey, nodeDef, nodeToInsert,
@@ -106,8 +107,6 @@ class RecordsImportJob extends Job {
     }
 
     await this.batchPersister.addItem(nodeToInsert, tx)
-
-    record = Record.assocNode(nodeToInsert)(record)
 
     if (NodeDef.isNodeDefEntity(nodeDef)) {
       const collectNodeDefChildNames = R.pipe(
@@ -122,13 +121,11 @@ class RecordsImportJob extends Job {
         if (nodeDefChildUuid) {
           const collectChildNodes = CollectRecordParseUtils.getList([collectNodeDefChildName])(collectNode)
           for (const collectChildNode of collectChildNodes) {
-            record = await this.insertNode(survey, record, nodeToInsert, collectNodeDefChildPath, collectChildNode, tx)
+            await this.insertNode(survey, recordUuid, nodeToInsert, collectNodeDefChildPath, collectChildNode, tx)
           }
         }
       }
     }
-
-    return record
   }
 
   async nodesBatchInsertHandler (nodes, tx) {

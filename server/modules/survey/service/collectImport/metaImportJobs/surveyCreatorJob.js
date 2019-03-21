@@ -17,7 +17,7 @@ class SurveyCreatorJob extends Job {
   async execute (tx) {
     const { collectSurvey } = this.context
 
-    const uri = CollectIdmlParseUtils.getElementText('uri')(collectSurvey)
+    const uri = CollectIdmlParseUtils.getChildElementText('uri')(collectSurvey)
 
     const name = R.pipe(R.split('/'), R.last)(uri)
 

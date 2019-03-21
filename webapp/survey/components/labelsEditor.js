@@ -11,7 +11,7 @@ import { getLanguageLabel } from '../../../common/app/languages'
 
 import { Input } from '../../commonComponents/form/input'
 
-const LabelBadge = ({lang}) => (
+const LabelBadge = ({ lang }) => (
   <div className="badge-of labels-editor__label-lang-badge">
     {
       getLanguageLabel(lang)
@@ -19,7 +19,7 @@ const LabelBadge = ({lang}) => (
   </div>
 )
 
-const LabelRow = ({label = '', lang, onChange, readOnly}) => (
+const LabelRow = ({ label = '', lang, onChange, readOnly }) => (
   <div className="labels-editor__label">
 
     <LabelBadge lang={lang}/>
@@ -37,17 +37,18 @@ const LabelRow = ({label = '', lang, onChange, readOnly}) => (
 class LabelsEditor extends React.Component {
 
   isPreview () {
-    const {preview} = this.state || {preview: true}
+    const { preview } = this.state || { preview: true }
     return preview
   }
 
   togglePreview () {
-    this.setState({preview: !this.isPreview()})
+    this.setState({ preview: !this.isPreview() })
   }
 
   render () {
     const {
       labels,
+      showFormLabel,
       formLabel,
       languages,
       onChange,
@@ -62,25 +63,27 @@ class LabelsEditor extends React.Component {
 
     const _canTogglePreview = canTogglePreview && languages.length > maxPreview
 
+    const className = `${showFormLabel ? 'form-item' : ''} labels-editor`
+
     return (
-      <div className="form-item labels-editor" ref="elem">
-        <label className="form-label">
-          {formLabel}
-          {
-            _canTogglePreview
-              ? <button className="btn-s btn-of-light-s btn-toggle-labels"
-                        style={{justifySelf: 'end'}}
-                        onClick={() => this.togglePreview()}>
+      <div className={className} ref="elem">
+        {
+          showFormLabel &&
+          <label className="form-label">
+            {formLabel}
+            {
+              _canTogglePreview &&
+              <button className="btn-s btn-of-light-s btn-toggle-labels"
+                      style={{ justifySelf: 'end' }}
+                      onClick={() => this.togglePreview()}>
                 <span className={`icon icon-${this.isPreview() ? 'enlarge2' : 'shrink2'} icon-12px`}/>
                 {/*{*/}
                 {/*this.isPreview() ? '...more' : '...less'*/}
                 {/*}*/}
-
               </button>
-              : null
-          }
-        </label>
-
+            }
+          </label>
+        }
         <div className="labels-editor__labels">
           {
             displayLangs.map(lang =>
@@ -102,6 +105,7 @@ class LabelsEditor extends React.Component {
 LabelsEditor.defaultProps = {
   languages: [],
   labels: [],
+  showFormLabel: true,
   formLabel: 'Label(s)',
   onChange: null,
   maxPreview: 2,

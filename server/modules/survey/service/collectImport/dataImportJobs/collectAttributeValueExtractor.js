@@ -59,6 +59,7 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
       const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
       const items = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, levelIndex, false, tx)
       const item = R.find(item => Category.getItemCode(item) === code, items)
+
       return item
         ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) }
         : null
@@ -66,21 +67,51 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
     case nodeDefType.coordinate: {
       const { x, y, srs } = CollectRecordParseUtils.getTextValues(collectNode)
 
-      return {
-        [Node.valuePropKeys.x]: x,
-        [Node.valuePropKeys.y]: y,
-        [Node.valuePropKeys.srs]: srs
+      if (x && y && srs) {
+        const srsId = R.ifElse(
+          R.isEmpty,
+          R.identity,
+          R.pipe(
+            R.split(':'),
+            R.last
+          )
+        )(srs)
+
+        return {
+          [Node.valuePropKeys.x]: x,
+          [Node.valuePropKeys.y]: y,
+          [Node.valuePropKeys.srs]: srsId
+        }
+      } else {
+        return null
       }
     }
     case nodeDefType.date: {
-      const { day, month, year} = CollectRecordParseUtils.getTextValues(collectNode)
+      const { day, month, year } = CollectRecordParseUtils.getTextValues(collectNode)
 
       return DateUtils.formatDate(day, month, year)
     }
-    case nodeDefType.time: {
-      const { hour, minute} = CollectRecordParseUtils.getTextValues(collectNode)
+    case nodeDefType.file: {
+      const { file_name, file_size } = CollectRecordParseUtils.getTextValues(collectNode)
 
-      return DateUtils.formatTime(hour, minute)
+      const collectNodeDef = getCollectNodeDefByPath(collectSurvey, collectNodeDefPath)
+
+      const collectNodeDefId = collectNodeDef.attributes.id
+      const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${file_name}`)
+
+      if (content) {
+        const fileUuid = uuidv4()
+        const file = RecordFile.createFile(fileUuid, file_name, file_size, content, Node.getRecordUuid(node), Node.getUuid(node))
+        await FileManager.insertFile(surveyId, file, tx)
+
+        return {
+          [Node.valuePropKeys.fileUuid]: fileUuid,
+          [Node.valuePropKeys.fileName]: file_name,
+          [Node.valuePropKeys.fileSize]: file_size
+        }
+      } else {
+        return null
+      }
     }
     case nodeDefType.taxon: {
       const { code, scientific_name, vernacularName } = CollectRecordParseUtils.getTextValues(collectNode)
@@ -118,27 +149,10 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
         return null
       }
     }
-    case nodeDefType.file: {
-      const { file_name, file_size } = CollectRecordParseUtils.getTextValues(collectNode)
+    case nodeDefType.time: {
+      const { hour, minute } = CollectRecordParseUtils.getTextValues(collectNode)
 
-      const collectNodeDef = getCollectNodeDefByPath(collectSurvey, collectNodeDefPath)
-
-      const collectNodeDefId = collectNodeDef.attributes.id
-      const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${file_name}`)
-
-      if (content) {
-        const fileUuid = uuidv4()
-        const file = RecordFile.createFile(fileUuid, file_name, file_size, content, Node.getRecordUuid(node), Node.getUuid(node))
-        await FileManager.insertFile(surveyId, file, tx)
-
-        return {
-          [Node.valuePropKeys.fileUuid]: fileUuid,
-          [Node.valuePropKeys.fileName]: file_name,
-          [Node.valuePropKeys.fileSize]: file_size
-        }
-      } else {
-        return null
-      }
+      return DateUtils.formatTime(hour, minute)
     }
   }
 }

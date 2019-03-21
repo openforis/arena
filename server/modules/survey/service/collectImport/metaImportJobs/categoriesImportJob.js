@@ -78,7 +78,7 @@ const insertItems = async (user, surveyId, category, levelIndex, parentItem, def
     const labels = CollectIdmlParseUtils.toLabels('label', defaultLanguage)(collectItem)
 
     const itemParam = Category.newItem(levelUuid, parentItem, {
-      [Category.itemProps.code]: CollectIdmlParseUtils.getElementText('code')(collectItem),
+      [Category.itemProps.code]: CollectIdmlParseUtils.getChildElementText('code')(collectItem),
       [Category.itemProps.labels]: labels
     })
     const item = await CategoryManager.insertItem(user, surveyId, itemParam, tx)

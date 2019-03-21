@@ -17,6 +17,42 @@ const NodeDefManager = require('../../../../nodeDef/persistence/nodeDefManager')
 const CollectImportReportManager = require('../../../../collectImportReport/persistence/collectImportReportManager')
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 
+const checkExpressionParserByType = {
+  'compare': collectCheck => {
+    const attributeToOperator = {
+      gt: '>',
+      gte: '>=',
+      lt: '<',
+      lte: '<='
+    }
+    const exprParts = []
+
+    const attributes = CollectIdmlParseUtils.getAttributes(collectCheck)
+    for (const attr of R.keys(attributes)) {
+      const operator = attributeToOperator[attr]
+      if (operator)
+        exprParts.push(`$this ${operator} ${attributes[attr]}`)
+    }
+    return R.join(' and ', exprParts)
+  },
+  'check': collectCheck => {
+    const { expr } = CollectIdmlParseUtils.getAttributes(collectCheck)
+    return expr
+  },
+  'distance': collectCheck => {
+    const { max, to } = CollectIdmlParseUtils.getAttributes(collectCheck)
+    return `distance from $this to ${to} must be <= ${max}m`
+  },
+  'pattern': collectCheck => {
+    const { regex } = CollectIdmlParseUtils.getAttributes(collectCheck)
+    return `$this must respect the pattern: ${regex}`
+  },
+  'unique': collectCheck => {
+    const { expr } = CollectIdmlParseUtils.getAttributes(collectCheck)
+    return expr
+  }
+}
+
 class NodeDefsImportJob extends Job {
 
   constructor (params) {
@@ -24,8 +60,6 @@ class NodeDefsImportJob extends Job {
 
     this.nodeDefNames = []
     this.nodeDefUuidByCollectPath = {}
-
-    this.currentNodeDefReportItem = {}
   }
 
   async execute (tx) {
@@ -50,18 +84,15 @@ class NodeDefsImportJob extends Job {
   async insertNodeDef (surveyId, parentNodeDef, parentPath, collectNodeDef, type, tx) {
     const { defaultLanguage } = this.context
 
-    this.currentNodeDefReportItem = {}
-
     const nodeDefUuid = uuidv4()
 
     // 1. determine basic props
-    const collectNodeDefName = collectNodeDef.attributes.name
-    const multiple = collectNodeDef.attributes.multiple === 'true'
+    const { name: collectNodeDefName, multiple, key, calculated } = CollectIdmlParseUtils.getAttributes(collectNodeDef)
 
     const props = {
       [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName),
-      [NodeDef.propKeys.multiple]: multiple,
-      [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && collectNodeDef.attributes.key === 'true',
+      [NodeDef.propKeys.multiple]: multiple === 'true',
+      [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key === 'true',
       [NodeDef.propKeys.labels]: CollectIdmlParseUtils.toLabels('label', defaultLanguage, 'instance')(collectNodeDef),
       ...type === NodeDef.nodeDefType.entity
         ? {
@@ -71,7 +102,7 @@ class NodeDefsImportJob extends Job {
               : NodeDefLayout.nodeDefRenderType.form
         }
         : {
-          [NodeDef.propKeys.readOnly]: collectNodeDef.attributes.calculated
+          [NodeDef.propKeys.readOnly]: calculated === 'true'
         }
       ,
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
@@ -114,7 +145,14 @@ class NodeDefsImportJob extends Job {
 
     const propsAdvanced = {}
 
-    // 1a. validations
+    // 1. default values
+    const defaultValues = await this.parseNodeDefDefaultValues(nodeDefUuid, collectNodeDef, tx)
+
+    if (!R.isEmpty(defaultValues)) {
+      propsAdvanced[NodeDef.propKeys.defaultValues] = defaultValues
+    }
+
+    // 2. validations
     propsAdvanced[NodeDef.propKeys.validations] = {
       ...multiple
         ? {
@@ -128,17 +166,14 @@ class NodeDefsImportJob extends Job {
         }
     }
 
-    // 1b. default values
-    const defaultValues = await this.extractNodeDefDefaultValues(nodeDefUuid, collectNodeDef, tx)
-
-    if (!R.isEmpty(defaultValues)) {
-      propsAdvanced[NodeDef.propKeys.defaultValues] = defaultValues
+    if (type !== nodeDefType.entity) {
+      await this.parseNodeDefValidationRules(nodeDefUuid, collectNodeDef, tx)
     }
 
-    // applicable (not supported)
+    // 3. applicable (not supported)
     const relevantExpr = collectNodeDef.attributes.relevant
     if (relevantExpr) {
-      await this.addCurrentNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.applicable, relevantExpr, null, null, tx)
+      await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.applicable, relevantExpr, null, null, tx)
     }
 
     return propsAdvanced
@@ -166,7 +201,7 @@ class NodeDefsImportJob extends Job {
     }
   }
 
-  async extractNodeDefDefaultValues (nodeDefUuid, collectNodeDef, tx) {
+  async parseNodeDefDefaultValues (nodeDefUuid, collectNodeDef, tx) {
     const { defaultLanguage } = this.context
 
     const collectDefaultValues = CollectIdmlParseUtils.getElementsByName('default')(collectNodeDef)
@@ -177,7 +212,7 @@ class NodeDefsImportJob extends Job {
       const { value, expression, applyIf } = collectDefaultValue.attributes
       if (expression || applyIf) {
         const messages = CollectIdmlParseUtils.toLabels('messages', defaultLanguage)(collectDefaultValue)
-        await this.addCurrentNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.defaultValue, expression, applyIf, messages, tx)
+        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.defaultValue, expression, applyIf, messages, tx)
       } else {
         defaultValues.push({
           [SurveyUtils.keys.uuid]: uuidv4(),
@@ -187,6 +222,22 @@ class NodeDefsImportJob extends Job {
     }
 
     return defaultValues
+  }
+
+  async parseNodeDefValidationRules (nodeDefUuid, collectNodeDef, tx) {
+    const { defaultLanguage } = this.context
+
+    const elements = CollectIdmlParseUtils.getElements(collectNodeDef)
+    for (const element of elements) {
+      const checkExpressionParser = checkExpressionParserByType[CollectIdmlParseUtils.getName(element)]
+      if (checkExpressionParser) {
+        const collectExpr = checkExpressionParser(element)
+        const messages = CollectIdmlParseUtils.toLabels('message', defaultLanguage)(element)
+        const { condition } = CollectIdmlParseUtils.getAttributes(element)
+
+        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.check, collectExpr, condition, messages, tx)
+      }
+    }
   }
 
   getUniqueNodeDefName (parentNodeDef, collectNodeDefName) {
@@ -214,7 +265,7 @@ class NodeDefsImportJob extends Job {
     return finalName
   }
 
-  async addCurrentNodeDefImportIssue (nodeDefUuid, expressionType, expression = null, applyIf = null, messages = {}, tx) {
+  async addNodeDefImportIssue (nodeDefUuid, expressionType, expression = null, applyIf = null, messages = {}, tx) {
     await CollectImportReportManager.insertItem(this.getSurveyId(), nodeDefUuid, {
       [CollectImportReportItem.propKeys.expressionType]: expressionType,
       [CollectImportReportItem.propKeys.expression]: expression,

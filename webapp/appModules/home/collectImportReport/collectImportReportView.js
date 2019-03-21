@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import Checkbox from '../../../commonComponents/form/checkbox'
+import LabelsEditor from '../../../survey/components/labelsEditor'
 import NodeDefEdit from '../../surveyForm/nodeDefEdit/nodeDefEdit'
 import SurveyDefsLoader from '../../../appModules/components/surveyDefsLoader'
 
@@ -44,11 +45,21 @@ const NodeDefReportItem = ({ survey, nodeDefUuid, nodeDefItems, updateCollectImp
             <div>{CollectImportReportItem.getExpressionType(item)}</div>
             <div>{CollectImportReportItem.getExpression(item)}</div>
             <div>{CollectImportReportItem.getApplyIf(item)}</div>
-            <div>{CollectImportReportItem.getMessages(item)}</div>
-            <div><Checkbox
-              checked={CollectImportReportItem.isResolved(item)}
-              onChange={checked => updateCollectImportReportItem(item.id, checked)}
-            /></div>
+            <div>
+              <LabelsEditor
+                labels={CollectImportReportItem.getMessages(item)}
+                languages={Survey.getLanguages(survey)}
+                readOnly={true}
+                showFormLabel={false}
+                maxPreview={1}
+              />
+            </div>
+            <div>
+              <Checkbox
+                checked={CollectImportReportItem.isResolved(item)}
+                onChange={checked => updateCollectImportReportItem(item.id, checked)}
+              />
+            </div>
             <div>
               <button onClick={() => {
                 onNodeDefEdit(nodeDef)

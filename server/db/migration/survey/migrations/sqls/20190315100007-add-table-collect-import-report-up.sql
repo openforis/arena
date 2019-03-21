@@ -12,6 +12,5 @@ CREATE TABLE
   date_modified        TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
 
   PRIMARY KEY (id),
-  CONSTRAINT collect_import_report_node_def_uuid_idx UNIQUE (node_def_uuid),
   CONSTRAINT collect_import_report_node_def_fk FOREIGN KEY (node_def_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE
 );
