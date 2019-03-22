@@ -14,6 +14,13 @@ class JobEvent {
   }
 }
 
+/**
+ * Methods that can be overwritten by subclasses:
+ * - onStart
+ * - execute
+ * - prepareResult
+ * - onEnd
+ */
 class Job {
 
   constructor (type, params = {}, innerJobs = []) {
@@ -50,22 +57,25 @@ class Job {
   async start (client = db) {
     await client.tx(async tx => {
       try {
-        await this.onStart(tx)
+        this.tx = tx
+        await this.onStart()
 
         if (this.innerJobs.length > 0) {
-          await this.executeInnerJobs(tx)
+          await this._executeInnerJobs()
         } else {
           await this.execute(tx)
         }
         if (this.isRunning()) {
-          await this.setStatusSucceeded()
+          await this.prepareResult()
+          await this._setStatusSucceeded()
         }
       } catch (e) {
         console.log('** Error in job ', e)
         this.addError({ systemError: { valid: false, errors: [e.toString()] } })
-        await this.setStatusFailed()
+        if (this.isRunning())
+          await this._setStatusFailed()
       } finally {
-        await this.onEnd(tx)
+        this.tx = null
       }
       if (!this.isSucceeded()) {
         throw new Error('Job canceled or errors found; rollback transaction')
@@ -85,52 +95,8 @@ class Job {
    */
   async execute (tx) {}
 
-  async executeInnerJobs (tx) {
-    this.total = this.innerJobs.length
-
-    //start each inner job and wait for it's completion before starting next one
-    for (const innerJob of this.innerJobs) {
-      ++this.currentInnerJobIndex
-
-      innerJob.context = this.context
-
-      innerJob.onEvent(this.handleInnerJobEvent.bind(this))
-
-      await innerJob.start(tx)
-
-      if (innerJob.isSucceeded())
-        this.incrementProcessedItems()
-      else
-        break
-    }
-  }
-
-  getCurrentInnerJob () {
-    return this.innerJobs[this.currentInnerJobIndex]
-  }
-
-  async handleInnerJobEvent (event) {
-    switch (event.status) {
-      case jobStatus.failed:
-      case jobStatus.canceled:
-        //cancel or fail even parent job
-        await this.setStatus(event.status)
-        break
-      default:
-        await this.notifyEvent(event) //propagate events to parent job
-    }
-  }
-
-  async cancel () {
-    if (this.currentInnerJobIndex >= 0) {
-      const innerJob = this.getCurrentInnerJob()
-      if (innerJob.isRunning()) {
-        await innerJob.cancel()
-        //parent job will be canceled by the inner job event listener
-      }
-    } else {
-      await this.setStatus(jobStatus.canceled)
-    }
+  async prepareResult() {
+    //to be extended by subclasses
   }
 
   onEvent (listener) {
@@ -161,55 +127,40 @@ class Job {
     }
   }
 
-  async setStatus (status) {
-    this.status = status
-
-    const event = this.createJobEvent(jobEvents.statusChange)
-
-    if (this.status === jobStatus.failed) {
-      event.errors = this.errors
+  // DO NOT OVERWRITE IT
+  async cancel () {
+    if (this.currentInnerJobIndex >= 0) {
+      const innerJob = this.getCurrentInnerJob()
+      if (innerJob.isRunning()) {
+        await innerJob.cancel()
+        //parent job will be canceled by the inner job event listener
+      }
+    } else {
+      await this._setStatus(jobStatus.canceled)
     }
-
-    await this.notifyEvent(event)
-  }
-
-  async setStatusSucceeded () {
-    await this.setStatus(jobStatus.succeeded)
-  }
-
-  async setStatusFailed () {
-    await this.setStatus(jobStatus.failed)
   }
 
   incrementProcessedItems () {
     this.processed++
 
     throttle(
-      async () => await this.notifyEvent(this.createJobEvent(jobEvents.progress)),
+      async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
       this._getProgressThrottleId,
       1000
     )()
   }
 
-  async notifyEvent (event) {
-    if (this.eventListener) {
-      this.eventListener(event)
-    }
-  }
-
-  createJobEvent (type) {
-    return new JobEvent(type, this.status, this.total, this.processed)
-  }
-
   async onStart () {
-    await this.setStatus(jobStatus.running)
     this.startTime = new Date()
+    await this._setStatus(jobStatus.running)
   }
 
   async onEnd () {
+    this.endTime = new Date()
     cancelThrottle(this._getProgressThrottleId())
   }
 
+  // UTILS
   getContextProp (prop, defaultValue = null) {
     const value = this.context[prop]
     return value ? value : defaultValue
@@ -223,9 +174,6 @@ class Job {
     Object.assign(this.result, result)
   }
 
-  /**
-   * Utils
-   */
   getSurvey () {
     return this.getContextProp('survey')
   }
@@ -243,9 +191,76 @@ class Job {
     return user ? user.id : null
   }
 
-  /**
-   * Internal
-   */
+  // INTERNAL METHODS
+  async _executeInnerJobs () {
+    this.total = this.innerJobs.length
+
+    //start each inner job and wait for it's completion before starting next one
+    for (const innerJob of this.innerJobs) {
+      ++this.currentInnerJobIndex
+
+      innerJob.context = this.context
+
+      innerJob.onEvent(this._handleInnerJobEvent.bind(this))
+
+      await innerJob.start(this.tx)
+
+      if (innerJob.isSucceeded())
+        this.incrementProcessedItems()
+      else
+        break
+    }
+  }
+
+  getCurrentInnerJob () {
+    return this.innerJobs[this.currentInnerJobIndex]
+  }
+
+  async _handleInnerJobEvent (event) {
+    switch (event.status) {
+      case jobStatus.failed:
+      case jobStatus.canceled:
+        //cancel or fail even parent job
+        await this._setStatus(event.status)
+        break
+      default:
+        await this._notifyEvent(event) //propagate events to parent job
+    }
+  }
+
+  async _setStatus (status) {
+    this.status = status
+
+    const event = this._createJobEvent(jobEvents.statusChange)
+
+    if (this.status === jobStatus.failed) {
+      event.errors = this.errors
+    }
+
+    if (this.isEnded())
+      await this.onEnd()
+
+    await this._notifyEvent(event)
+  }
+
+  async _setStatusSucceeded () {
+    await this._setStatus(jobStatus.succeeded)
+  }
+
+  async _setStatusFailed () {
+    await this._setStatus(jobStatus.failed)
+  }
+
+  async _notifyEvent (event) {
+    if (this.eventListener) {
+      this.eventListener(event)
+    }
+  }
+
+  _createJobEvent (type) {
+    return new JobEvent(type, this.status, this.total, this.processed)
+  }
+
   _getProgressThrottleId () {
     return `job-${this.uuid}-progress`
   }

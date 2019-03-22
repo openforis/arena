@@ -79,9 +79,9 @@ const getText = R.pipe(
 
 const getAttributes = R.propOr({}, keys.attributes)
 
-const getAttribute = name => R.pipe(
+const getAttribute = (name, defaultValue = null) => R.pipe(
   getAttributes,
-  R.prop(name)
+  R.propOr(defaultValue, name)
 )
 
 module.exports = {

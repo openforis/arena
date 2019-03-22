@@ -33,16 +33,17 @@ class CollectImportJob extends Job {
     ])
   }
 
-  async setStatusSucceeded() {
+  async prepareResult() {
     const { surveyId } = this.context
 
     this.setResult({
       surveyId
     })
-    await super.setStatusSucceeded()
   }
 
   async onEnd () {
+    await super.onEnd()
+
     const { collectSurveyFileZip, surveyId } = this.context
 
     if (collectSurveyFileZip)

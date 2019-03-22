@@ -26,10 +26,10 @@ class RecordsImportJob extends Job {
     this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 1000)
   }
 
-  async onStart(tx) {
+  async onStart () {
     await super.onStart()
     const surveyId = this.getSurveyId()
-    await RecordManager.disableTriggers(surveyId, tx)
+    await RecordManager.disableTriggers(surveyId, this.tx)
   }
 
   async execute (tx) {
@@ -45,6 +45,7 @@ class RecordsImportJob extends Job {
     for (const entryName of entryNames) {
       if (this.isCanceled())
         break
+
       const collectRecordData = this.findCollectRecordData(entryName)
       const { collectRecordXml, step } = collectRecordData
 
@@ -69,14 +70,14 @@ class RecordsImportJob extends Job {
     }
   }
 
-  async onEnd(tx) {
+  async onEnd () {
     await super.onEnd()
 
-    await this.batchPersister.flush(tx)
+    await this.batchPersister.flush(this.tx)
 
     const surveyId = this.getSurveyId()
 
-    await RecordManager.enableTriggers(surveyId, tx)
+    await RecordManager.enableTriggers(surveyId, this.tx)
   }
 
   getEntryNames () {

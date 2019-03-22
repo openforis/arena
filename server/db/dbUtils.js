@@ -6,7 +6,7 @@ const selectDate = (field, fieldAlias = null) =>
 const now = `timezone('UTC', now())`
 
 const insertAllQuery = (schema, table, cols, values) => {
-  const columnSet = pgp.helpers.ColumnSet(cols, {table: {schema, table}})
+  const columnSet = pgp.helpers.ColumnSet(cols, { table: { schema, table } })
   return pgp.helpers.insert(values, columnSet)
 }
 
