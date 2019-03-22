@@ -12,7 +12,6 @@ const Node = require('../../../../../../common/record/node')
 const SurveyManager = require('../../../../survey/persistence/surveyManager')
 const RecordManager = require('../../../../record/persistence/recordManager')
 const RecordUpdateManager = require('../../../../record/persistence/recordUpdateManager')
-const NodeRepository = require('../../../../record/persistence/nodeRepository')
 
 const Job = require('../../../../../job/job')
 
@@ -24,7 +23,13 @@ class RecordsImportJob extends Job {
   constructor (params) {
     super('RecordsImportJob', params)
 
-    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 1)
+    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 1000)
+  }
+
+  async onStart(tx) {
+    await super.onStart()
+    const surveyId = this.getSurveyId()
+    await RecordManager.disableTriggers(surveyId, tx)
   }
 
   async execute (tx) {
@@ -38,6 +43,8 @@ class RecordsImportJob extends Job {
     this.total = entryNames.length
 
     for (const entryName of entryNames) {
+      if (this.isCanceled())
+        break
       const collectRecordData = this.findCollectRecordData(entryName)
       const { collectRecordXml, step } = collectRecordData
 
@@ -60,8 +67,16 @@ class RecordsImportJob extends Job {
 
       this.incrementProcessedItems()
     }
+  }
+
+  async onEnd(tx) {
+    await super.onEnd()
 
     await this.batchPersister.flush(tx)
+
+    const surveyId = this.getSurveyId()
+
+    await RecordManager.enableTriggers(surveyId, tx)
   }
 
   getEntryNames () {
@@ -115,12 +130,18 @@ class RecordsImportJob extends Job {
       )(collectNode)
 
       for (const collectNodeDefChildName of collectNodeDefChildNames) {
+        if (this.isCanceled())
+          break
+
         const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
         const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
 
         if (nodeDefChildUuid) {
           const collectChildNodes = CollectRecordParseUtils.getList([collectNodeDefChildName])(collectNode)
           for (const collectChildNode of collectChildNodes) {
+            if (this.isCanceled())
+              break
+
             await this.insertNode(survey, recordUuid, nodeToInsert, collectNodeDefChildPath, collectChildNode, tx)
           }
         }
@@ -131,7 +152,7 @@ class RecordsImportJob extends Job {
   async nodesBatchInsertHandler (nodes, tx) {
     const surveyId = this.getSurveyId()
 
-    await NodeRepository.insertNodes(surveyId, nodes, tx)
+    await RecordManager.insertNodes(surveyId, nodes, tx)
   }
 
 }

@@ -2,7 +2,7 @@ const db = require('../db/db')
 const { uuidv4 } = require('../../common/uuid')
 
 const { jobEvents, jobStatus } = require('./jobUtils')
-const { throttle } = require('../../common/functionsDefer')
+const { throttle, cancelThrottle } = require('../../common/functionsDefer')
 
 class JobEvent {
 
@@ -49,27 +49,28 @@ class Job {
    */
   async start (client = db) {
     await client.tx(async tx => {
-      this.setStatus(jobStatus.running)
-      this.startTime = new Date()
+      try {
+        await this.onStart(tx)
 
-      if (this.innerJobs.length > 0) {
-        await this.executeInnerJobs(tx)
-      } else {
-        try {
+        if (this.innerJobs.length > 0) {
+          await this.executeInnerJobs(tx)
+        } else {
           await this.execute(tx)
-        } catch (e) {
-          console.log('** Error in job ', e)
-          this.addError({ systemError: { valid: false, errors: [e.toString()] } })
-          this.setStatusFailed()
         }
+        if (this.isRunning()) {
+          await this.setStatusSucceeded()
+        }
+      } catch (e) {
+        console.log('** Error in job ', e)
+        this.addError({ systemError: { valid: false, errors: [e.toString()] } })
+        await this.setStatusFailed()
+      } finally {
+        await this.onEnd(tx)
       }
-      if (!this.isRunning()) {
+      if (!this.isSucceeded()) {
         throw new Error('Job canceled or errors found; rollback transaction')
       }
     })
-    if (this.isRunning()) {
-      this.setStatusSucceeded()
-    }
   }
 
   addError (error) {
@@ -97,11 +98,10 @@ class Job {
 
       await innerJob.start(tx)
 
-      if (innerJob.isSuccedeed()) {
+      if (innerJob.isSucceeded())
         this.incrementProcessedItems()
-      } else {
+      else
         break
-      }
     }
   }
 
@@ -109,27 +109,27 @@ class Job {
     return this.innerJobs[this.currentInnerJobIndex]
   }
 
-  handleInnerJobEvent (event) {
-    this.notifyEvent(event) //propagate events to parent job
-
+  async handleInnerJobEvent (event) {
     switch (event.status) {
       case jobStatus.failed:
       case jobStatus.canceled:
         //cancel or fail even parent job
-        this.setStatus(event.status)
+        await this.setStatus(event.status)
         break
+      default:
+        await this.notifyEvent(event) //propagate events to parent job
     }
   }
 
-  cancel () {
+  async cancel () {
     if (this.currentInnerJobIndex >= 0) {
       const innerJob = this.getCurrentInnerJob()
       if (innerJob.isRunning()) {
-        innerJob.cancel()
+        await innerJob.cancel()
         //parent job will be canceled by the inner job event listener
       }
     } else {
-      this.setStatus(jobStatus.canceled)
+      await this.setStatus(jobStatus.canceled)
     }
   }
 
@@ -146,8 +146,8 @@ class Job {
     return this.status === jobStatus.running
   }
 
-  isSuccedeed () {
-    return this.status = jobStatus.succeeded
+  isSucceeded () {
+    return this.status === jobStatus.succeeded
   }
 
   isEnded () {
@@ -161,42 +161,37 @@ class Job {
     }
   }
 
-  setStatus (status) {
+  async setStatus (status) {
     this.status = status
 
-    if (this.status === jobStatus.succeeded
-      || this.status === jobStatus.failed) {
-      this.onFinish()
-    }
-
     const event = this.createJobEvent(jobEvents.statusChange)
-    
+
     if (this.status === jobStatus.failed) {
       event.errors = this.errors
     }
 
-    this.notifyEvent(event)
+    await this.notifyEvent(event)
   }
 
-  setStatusSucceeded () {
-    this.setStatus(jobStatus.succeeded)
+  async setStatusSucceeded () {
+    await this.setStatus(jobStatus.succeeded)
   }
 
-  setStatusFailed () {
-    this.setStatus(jobStatus.failed)
+  async setStatusFailed () {
+    await this.setStatus(jobStatus.failed)
   }
 
   incrementProcessedItems () {
     this.processed++
 
     throttle(
-      () => this.notifyEvent(this.createJobEvent(jobEvents.progress)),
-      `job-${this.uuid}-progress`,
+      async () => await this.notifyEvent(this.createJobEvent(jobEvents.progress)),
+      this._getProgressThrottleId,
       1000
     )()
   }
 
-  notifyEvent (event) {
+  async notifyEvent (event) {
     if (this.eventListener) {
       this.eventListener(event)
     }
@@ -206,8 +201,13 @@ class Job {
     return new JobEvent(type, this.status, this.total, this.processed)
   }
 
-  onFinish () {
-    // to be extended by subclasses
+  async onStart () {
+    await this.setStatus(jobStatus.running)
+    this.startTime = new Date()
+  }
+
+  async onEnd () {
+    cancelThrottle(this._getProgressThrottleId())
   }
 
   getContextProp (prop, defaultValue = null) {
@@ -241,6 +241,13 @@ class Job {
   getUserId () {
     const user = this.getUser()
     return user ? user.id : null
+  }
+
+  /**
+   * Internal
+   */
+  _getProgressThrottleId () {
+    return `job-${this.uuid}-progress`
   }
 }
 

@@ -32,6 +32,9 @@ class TaxonomiesImportJob extends Job {
     this.total = speciesFileNames.length
 
     for (const speciesFileName of speciesFileNames) {
+      if (this.isCanceled())
+        break
+
       const taxonomy = await this.importTaxonomyFromSpeciesFile(speciesFileName, tx)
 
       taxonomies.push(taxonomy)
@@ -39,7 +42,7 @@ class TaxonomiesImportJob extends Job {
       this.incrementProcessedItems()
     }
 
-    this.setContext({taxonomies})
+    this.setContext({ taxonomies })
   }
 
   async importTaxonomyFromSpeciesFile (speciesFileName, tx) {
@@ -69,6 +72,9 @@ class TaxonomiesImportJob extends Job {
       this.taxonomyImportHelper = new TaxonomyImportManager(this.getUser(), surveyId, vernacularLangCodes)
 
       while (row) {
+        if (this.isCanceled())
+          break
+
         await this.processRow(taxonomyUuid, vernacularLangCodes, row, tx)
 
         row = await csvParser.next()

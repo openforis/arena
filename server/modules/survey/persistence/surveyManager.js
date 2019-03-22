@@ -115,7 +115,7 @@ const deleteSurvey = async (id, user) => {
     if (userPrefSurveyId === id)
       await UserRepository.deleteUserPref(user, userPrefNames.survey, t)
 
-    await t.query(`DROP SCHEMA ${getSurveyDBSchema(id)} CASCADE`)
+    await SurveyRepository.dropSurveySchema(id, t)
     await SurveyRdbManager.dropSchema(id, t)
 
     await SurveyRepository.deleteSurvey(id, t)
@@ -142,4 +142,5 @@ module.exports = {
   deleteSurvey,
   deleteSurveyLabel: SurveyRepository.deleteSurveyLabel,
   deleteSurveyDescription: SurveyRepository.deleteSurveyDescription,
+  dropSurveySchema: SurveyRepository.dropSurveySchema,
 }

@@ -1,5 +1,7 @@
 const Job = require('../../../../job/job')
 
+const SurveyManager = require('../../persistence/surveyManager')
+
 const CollectSurveyReaderJob = require('./metaImportJobs/collectSurveyReaderJob')
 const SurveyCreatorJob = require('./metaImportJobs/surveyCreatorJob')
 const CategoriesImportJob = require('./metaImportJobs/categoriesImportJob')
@@ -31,19 +33,25 @@ class CollectImportJob extends Job {
     ])
   }
 
-  onFinish () {
+  async setStatusSucceeded() {
+    const { surveyId } = this.context
+
+    this.setResult({
+      surveyId
+    })
+    await super.setStatusSucceeded()
+  }
+
+  async onEnd () {
     const { collectSurveyFileZip, surveyId } = this.context
 
     if (collectSurveyFileZip)
       collectSurveyFileZip.close()
 
-    if (this.isSuccedeed()) {
-      this.setResult({
-        surveyId
-      })
+    if (!this.isSucceeded() && surveyId) {
+      await SurveyManager.dropSurveySchema(surveyId)
     }
   }
-
 }
 
 CollectImportJob.type = 'CollectImportJob'

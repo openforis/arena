@@ -72,6 +72,12 @@ const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, clie
   await client.none(`
     UPDATE ${getSurveyDBSchema(surveyId)}.${tableName} SET props = props #- '{${deletePath.join(',')}}'`)
 
+const disableSurveySchemaTableTriggers = async (surveyId, tableName, client = db) =>
+  await client.none(`ALTER TABLE ${getSurveyDBSchema(surveyId)}.${tableName} DISABLE TRIGGER ALL`)
+
+const enableSurveySchemaTableTriggers = async (surveyId, tableName, client = db) =>
+  await client.none(`ALTER TABLE ${getSurveyDBSchema(surveyId)}.${tableName} ENABLE TRIGGER ALL`)
+
 module.exports = {
   dbTransformCallback,
 
@@ -83,4 +89,7 @@ module.exports = {
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
   deleteSurveySchemaTableProp,
+
+  disableSurveySchemaTableTriggers,
+  enableSurveySchemaTableTriggers
 }

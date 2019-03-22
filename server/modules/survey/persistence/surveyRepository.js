@@ -1,8 +1,8 @@
 const db = require('../../../db/db')
 const R = require('ramda')
 
-const {dbTransformCallback} = require('./surveySchemaRepositoryUtils')
-const {selectDate} = require('../../../db/dbUtils')
+const { dbTransformCallback, getSurveyDBSchema } = require('./surveySchemaRepositoryUtils')
+const { selectDate } = require('../../../db/dbUtils')
 
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? alias + '.' : ''
@@ -61,14 +61,14 @@ const getSurveyById = async (surveyId, draft = false, client = db) =>
 
 const fetchDependencies = async (surveyId, client = db) =>
   await client.oneOrNone(
-    `SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1`,
+      `SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1`,
     [surveyId],
     R.prop('dependencies')
   )
 
 // ============== UPDATE
 const updateSurveyProp = async (surveyId, key, value, client = db) => {
-  const prop = {[key]: value}
+  const prop = { [key]: value }
 
   return await client.one(`
     UPDATE survey
@@ -126,6 +126,9 @@ const deleteSurveyProp = async (id, deletePath, client = db) =>
     WHERE id = $1`,
     [id])
 
+const dropSurveySchema = async (id, client = db) =>
+  await client.query(`DROP SCHEMA IF EXISTS ${getSurveyDBSchema(id)} CASCADE`)
+
 module.exports = {
   // CREATE
   insertSurvey,
@@ -146,4 +149,5 @@ module.exports = {
   deleteSurvey,
   deleteSurveyLabel,
   deleteSurveyDescription,
+  dropSurveySchema
 }

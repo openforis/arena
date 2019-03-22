@@ -1,11 +1,12 @@
-const camelize = require('camelize')
 const R = require('ramda')
+const camelize = require('camelize')
+const toSnakeCase = require('to-snake-case')
 
 const db = require('../../../db/db')
-const { now } = require('../../../db/dbUtils')
+const { now, insertAllQuery } = require('../../../db/dbUtils')
 
 const Node = require('../../../../common/record/node')
-const { getSurveyDBSchema } = require('../../survey/persistence/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
 //camelize all but "meta"
 const dbTransformCallback = node =>
@@ -20,8 +21,6 @@ const dbTransformCallback = node =>
 // ============== CREATE
 
 const insertNode = (surveyId, node, client = db) => {
-  const parentUuid = Node.getParentUuid(node)
-
   const meta = {
     [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
     [Node.metaKeys.childApplicability]: {}
@@ -32,18 +31,36 @@ const insertNode = (surveyId, node, client = db) => {
         (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
         VALUES ($1, $2, $3, $4, $5, $6::jsonb)
         RETURNING *, true as ${Node.keys.created}
-      `, [Node.getUuid(node), Node.getRecordUuid(node), parentUuid, Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null)), meta],
+      `, [Node.getUuid(node), Node.getRecordUuid(node), Node.getParentUuid(node), Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null)), meta],
     dbTransformCallback
   )
 }
 
-const insertNodes = async (surveyId, nodes, client = db) =>
-  await client.batch(
-    nodes.map(node =>
-      insertNode(surveyId, node, client)
-    )
+const insertNodes = async (surveyId, nodes, client = db) => {
+  const values = R.map(
+    R.pipe(
+      R.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.parentUuid, Node.keys.nodeDefUuid, Node.keys.value, Node.keys.meta]),
+      obj => R.pipe(
+        R.keys,
+        R.reduce((acc, key) => R.assoc(toSnakeCase(key), R.prop(key, obj), acc), {}),
+      )(obj),
+      n => ({ ...n,
+        value: stringifyValue(Node.getNodeValue(n, null)),
+        meta: {
+          ...n.meta,
+          [Node.metaKeys.childApplicability]: {}
+        }
+      })
+    ),
+    nodes
   )
-
+  client.none(insertAllQuery(
+    getSurveyDBSchema(surveyId),
+    'node',
+    ['uuid', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'],
+    values
+  ))
+}
 // ============== READ
 
 const fetchNodesByRecordUuid = async (surveyId, recordUuid, client = db) =>
@@ -60,46 +77,6 @@ const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1`,
     [uuid],
-    dbTransformCallback
-  )
-
-const fetchAncestorByNodeDefUuid = async (surveyId, nodeUuid, ancestorNodeDefUuid, client = db) => {
-  const hierarchy = await client.one(
-    `SELECT meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node WHERE uuid = $1`,
-    [nodeUuid],
-    R.prop('h')
-  )
-  if (R.isEmpty(hierarchy)) {
-    return []
-  } else {
-    return await client.one(
-      `SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
-       WHERE uuid in (${R.pipe(R.map(el => `'${el}'`), R.join(', '))(hierarchy)})
-        AND node_def_uuid = $1`,
-      [ancestorNodeDefUuid],
-      dbTransformCallback
-    )
-  }
-}
-
-const fetchDescendantNodesByCodeUuid = async (surveyId, recordUuid, parentCodeNodeUuid, client = db) =>
-  await client.map(`
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node n
-    WHERE n.record_uuid = $1
-      AND n.value @> '{"h": ["${parentCodeNodeUuid}"]}'
-    ORDER BY id`,
-    [recordUuid],
-    dbTransformCallback
-  )
-
-const fetchSelfOrDescendantNodes = async (surveyId, nodeDefUuid, recordUuid, parentNodeUuid, client = db) =>
-  await client.map(`
-    SELECT * 
-    FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $1
-      AND node_def_uuid = $2
-      AND (uuid = $3 OR meta @> '{"h": ["${parentNodeUuid}"]}')`,
-    [recordUuid, nodeDefUuid, parentNodeUuid],
     dbTransformCallback
   )
 
@@ -183,12 +160,7 @@ module.exports = {
   //READ
   fetchNodesByRecordUuid,
   fetchNodeByUuid,
-  fetchAncestorByNodeDefUuid,
-  fetchDescendantNodesByCodeUuid,
-  fetchSelfOrDescendantNodes,
   fetchChildNodeByNodeDefUuid,
-  fetchChildNodesByNodeDefUuid,
-  fetchChildNodesByNodeDefUuids,
 
   //UPDATE
   updateNode,
@@ -196,4 +168,8 @@ module.exports = {
 
   //DELETE
   deleteNode,
+
+  //UTILS
+  disableTriggers: async (surveyId, client = db) => await disableSurveySchemaTableTriggers(surveyId, 'node', client),
+  enableTriggers: async (surveyId, client = db) => await enableSurveySchemaTableTriggers(surveyId, 'node', client),
 }

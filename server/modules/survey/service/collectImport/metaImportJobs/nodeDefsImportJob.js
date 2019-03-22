@@ -129,6 +129,9 @@ class NodeDefsImportJob extends Job {
       // insert child definitions
 
       for (const collectChild of collectNodeDef.elements) {
+        if (this.isCanceled())
+          break
+
         const collectChildType = collectChild.name
 
         const childType = CollectIdmlParseUtils.nodeDefTypesByCollectType[collectChildType]
