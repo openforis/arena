@@ -28,11 +28,14 @@ const throttle = (func, id, limit = 500) => {
     const runFunction = () => {
       func.apply(context, args)
       throttleLastRan[id] = Date.now()
+
+      delete throttleTimeouts[id]
     }
 
     const lastRun = throttleLastRan[id]
     if (lastRun) {
       clearTimeout(throttleTimeouts[id])
+
       throttleTimeouts[id] = setTimeout(function () {
         if ((Date.now() - lastRun) >= limit) {
           runFunction()
@@ -44,6 +47,16 @@ const throttle = (func, id, limit = 500) => {
   }
 }
 
+const cancelThrottle = id => {
+  const timeout = throttleTimeouts[id]
+  if (timeout) {
+    clearTimeout(timeout)
+    delete throttleTimeouts[id]
+  }
+  delete throttleLastRan[id]
+}
+
 module.exports = {
   throttle,
+  cancelThrottle
 }

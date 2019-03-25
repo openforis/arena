@@ -11,15 +11,16 @@ const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 
 const NodeDefRepository = require('../../../server/modules/nodeDef/persistence/nodeDefRepository')
-const NodeRepository = require('../../../server/modules/record/persistence/nodeRepository')
 const RecordManager = require('../../../server/modules/record/persistence/recordManager')
 const RecordUpdateManager = require('../../../server/modules/record/persistence/recordUpdateManager')
 
 const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
 
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
-  await NodeDefRepository.updateNodeDefProps(Survey.getId(survey), NodeDef.getUuid(nodeDef),
-    [{ key: NodeDef.propKeys.defaultValues, value: defaultValueExpressions, advanced: true }])
+  const propsAdvanced = {
+    [NodeDef.propKeys.defaultValues]: defaultValueExpressions
+  }
+  await NodeDefRepository.updateNodeDefProps(Survey.getId(survey), NodeDef.getUuid(nodeDef), {}, propsAdvanced)
 }
 
 const recordCreationTest = async () => {

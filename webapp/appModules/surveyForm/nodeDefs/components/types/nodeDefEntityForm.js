@@ -147,7 +147,7 @@ const NodeSelect = props => {
           <button className="btn btn-s btn-of-light-xs"
                   style={{ marginLeft: '50px' }}
                   onClick={() => {
-                    const entity = Node.newNode(nodeDef.uuid, parentNode.recordUuid, parentNode.uuid)
+                    const entity = Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
                     updateNode(nodeDef, entity)
                     onChange(entity.uuid)
                   }}

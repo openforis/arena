@@ -30,6 +30,7 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, client = db) => {
 module.exports = {
   // CREATE
   insertRecord: RecordRepository.insertRecord,
+  insertNodes: NodeRepository.insertNodes,
 
   // READ
   fetchRecordByUuid,
@@ -40,4 +41,8 @@ module.exports = {
 
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
   fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,
+
+  // UTILS
+  disableTriggers: NodeRepository.disableTriggers,
+  enableTriggers: NodeRepository.enableTriggers
 }

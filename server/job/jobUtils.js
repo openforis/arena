@@ -31,6 +31,11 @@ const calculateJobProgress = job => {
   }
 }
 
+const calculatedElapsedMillis = job =>
+  job.startTime
+    ? (job.endTime ? job.endTime : new Date()).getTime() - job.startTime.getTime()
+    : 0
+
 const jobToJSON = job => ({
   type: job.type,
   userId: job.getUserId(),
@@ -50,6 +55,7 @@ const jobToJSON = job => ({
   total: job.total,
   processed: job.processed,
   progressPercent: calculateJobProgress(job),
+  elapsedMillis: calculatedElapsedMillis(job),
 
   //output
   errors: jobStatus.failed ? job.errors : null,

@@ -8,6 +8,7 @@ import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
 import SurveyCreateView from './surveyCreate/surveyCreateView'
 import SurveyInfoView from './surveyInfo/surveyInfoView'
+import CollectImportReportView from './collectImportReport/collectImportReportView'
 
 import Survey from '../../../common/survey/survey'
 
@@ -73,6 +74,12 @@ class HomeView extends React.Component {
             label: 'Survey Info',
             component: SurveyInfoView,
             path: appModuleUri(homeModules.surveyInfo),
+            showTab: false,
+          },
+          {
+            label: 'Collect Import Report',
+            component: CollectImportReportView,
+            path: appModuleUri(homeModules.collectImportReport),
             showTab: false,
           },
         ]}

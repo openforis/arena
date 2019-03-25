@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const BatchPersister = require('../../../../../db/batchPersister')
+
 const FileXml = require('../../../../../../common/file/fileXml')
 
 const Survey = require('../../../../../../common/survey/survey')
@@ -10,7 +12,6 @@ const Node = require('../../../../../../common/record/node')
 const SurveyManager = require('../../../../survey/persistence/surveyManager')
 const RecordManager = require('../../../../record/persistence/recordManager')
 const RecordUpdateManager = require('../../../../record/persistence/recordUpdateManager')
-const NodeRepository = require('../../../../record/persistence/nodeRepository')
 
 const Job = require('../../../../../job/job')
 
@@ -21,19 +22,30 @@ class RecordsImportJob extends Job {
 
   constructor (params) {
     super('RecordsImportJob', params)
+
+    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 1000)
+  }
+
+  async onStart () {
+    await super.onStart()
+    const surveyId = this.getSurveyId()
+    await RecordManager.disableTriggers(surveyId, this.tx)
   }
 
   async execute (tx) {
     const user = this.getUser()
-    const { collectSurveyFileZip, surveyId } = this.context
+    const surveyId = this.getSurveyId()
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, false, false, false, tx)
 
-    const entryNames = collectSurveyFileZip.getEntryNames('data/1/')
+    const entryNames = this.getEntryNames()
 
     this.total = entryNames.length
 
     for (const entryName of entryNames) {
+      if (this.isCanceled())
+        break
+
       const collectRecordData = this.findCollectRecordData(entryName)
       const { collectRecordXml, step } = collectRecordData
 
@@ -41,7 +53,8 @@ class RecordsImportJob extends Job {
 
       const recordToCreate = Record.newRecord(user)
       const record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
-      await RecordUpdateManager.updateRecordStep(surveyId, Record.getUuid(record), step, tx)
+      const recordUuid = Record.getUuid(record)
+      await RecordUpdateManager.updateRecordStep(surveyId, recordUuid, step, tx)
 
       const collectRootEntityName = R.pipe(
         R.keys,
@@ -51,10 +64,33 @@ class RecordsImportJob extends Job {
 
       const collectRootEntity = collectRecordJson[collectRootEntityName]
 
-      await this.insertNode(survey, record, null, `/${collectRootEntityName}`, collectRootEntity, tx)
+      await this.insertNode(survey, recordUuid, null, `/${collectRootEntityName}`, collectRootEntity, tx)
 
       this.incrementProcessedItems()
     }
+  }
+
+  async onEnd () {
+    await super.onEnd()
+
+    await this.batchPersister.flush(this.tx)
+
+    const surveyId = this.getSurveyId()
+
+    await RecordManager.enableTriggers(surveyId, this.tx)
+  }
+
+  getEntryNames () {
+    const { collectSurveyFileZip } = this.context
+
+    const steps = [1, 2, 3]
+
+    for (const step of steps) {
+      const entryNames = collectSurveyFileZip.getEntryNames(`data/${step}/`)
+      if (!R.isEmpty(entryNames))
+        return entryNames
+    }
+    return []
   }
 
   findCollectRecordData (entryName) {
@@ -63,7 +99,6 @@ class RecordsImportJob extends Job {
     const steps = [3, 2, 1]
 
     for (const step of steps) {
-
       const collectRecordXml = collectSurveyFileZip.getEntryAsText(`data/${step}/${entryName}`)
       if (collectRecordXml) {
         return { collectRecordXml, step }
@@ -73,13 +108,13 @@ class RecordsImportJob extends Job {
     throw new Error(`Entry data not found: ${entryName}`)
   }
 
-  async insertNode (survey, record, parentUuid, collectNodeDefPath, collectNode, tx) {
+  async insertNode (survey, recordUuid, parentNode, collectNodeDefPath, collectNode, tx) {
     const { nodeDefUuidByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
 
     const nodeDefUuid = nodeDefUuidByCollectPath[collectNodeDefPath]
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-    let nodeToInsert = Node.newNode(nodeDefUuid, Record.getUuid(record), parentUuid)
+    let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, parentNode)
 
     if (NodeDef.isNodeDefAttribute(nodeDef)) {
       const value = await CollectAttributeValueExtractor.extractAttributeValue(survey, nodeDef, nodeToInsert,
@@ -87,8 +122,7 @@ class RecordsImportJob extends Job {
       nodeToInsert = Node.assocValue(value)(nodeToInsert)
     }
 
-    const node = await NodeRepository.insertNode(Survey.getId(survey), nodeToInsert, tx)
-    record = Record.assocNode(node)(record)
+    await this.batchPersister.addItem(nodeToInsert, tx)
 
     if (NodeDef.isNodeDefEntity(nodeDef)) {
       const collectNodeDefChildNames = R.pipe(
@@ -97,18 +131,29 @@ class RecordsImportJob extends Job {
       )(collectNode)
 
       for (const collectNodeDefChildName of collectNodeDefChildNames) {
+        if (this.isCanceled())
+          break
+
         const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
         const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
 
         if (nodeDefChildUuid) {
           const collectChildNodes = CollectRecordParseUtils.getList([collectNodeDefChildName])(collectNode)
           for (const collectChildNode of collectChildNodes) {
-            record = await this.insertNode(survey, record, Node.getUuid(node), collectNodeDefChildPath, collectChildNode, tx)
+            if (this.isCanceled())
+              break
+
+            await this.insertNode(survey, recordUuid, nodeToInsert, collectNodeDefChildPath, collectChildNode, tx)
           }
         }
       }
     }
-    return record
+  }
+
+  async nodesBatchInsertHandler (nodes, tx) {
+    const surveyId = this.getSurveyId()
+
+    await RecordManager.insertNodes(surveyId, nodes, tx)
   }
 
 }

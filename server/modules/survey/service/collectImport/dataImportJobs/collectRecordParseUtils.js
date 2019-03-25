@@ -21,7 +21,6 @@ const getTextValues = valObj => R.pipe(
   R.reduce((acc, prop) => R.assoc(prop, getTextValue(prop)(valObj), acc), {})
 )(valObj)
 
-
 module.exports = {
   toList,
   getList,

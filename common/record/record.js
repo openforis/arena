@@ -26,10 +26,7 @@ const newRecord = (user, preview = false) => ({
 })
 
 // ====== READ
-const getNodes = R.pipe(
-  R.prop(keys.nodes),
-  R.defaultTo({}),
-)
+const getNodes = R.propOr({}, keys.nodes)
 
 const getNodesArray = R.pipe(
   getNodes,
@@ -46,6 +43,11 @@ const findNodes = predicate => R.pipe(
   //       ? -1
   //       : Number(n1.id) < Number(n2.id)
   // }),
+)
+
+const findNodesIndexed = predicate => R.pipe(
+  getNodes,
+  R.filter(predicate)
 )
 
 const getNodeChildren = node => findNodes(n => Node.getParentUuid(n) === Node.getUuid(node))
@@ -65,10 +67,8 @@ const getNodeSiblingsByDefUuid = (node, siblingDefUuid) => R.pipe(
   parentNode => getNodeChildrenByDefUuid(parentNode, siblingDefUuid)
 )
 
-const getNodesByDefUuid = (nodeDefUuid) => record => R.pipe(
-  getNodesArray,
-  R.filter(n => Node.getNodeDefUuid(n) === nodeDefUuid),
-)(record)
+const getNodesByDefUuid = nodeDefUuid =>
+  findNodes(n => Node.getNodeDefUuid(n) === nodeDefUuid)
 
 const getRootNode = R.pipe(
   getNodesArray,
@@ -157,12 +157,9 @@ const getDescendantsByNodeDefUuid = (node, descendantDefUuid) =>
 
 const assocNodes = nodes =>
   record => {
-    const dirtyNodes = R.pipe(
-      findNodes(Node.isDirty),
-      SurveyUtils.toUuidIndexedObj
-    )(record)
-
     // exclude dirty nodes currently being edited by the user
+
+    const dirtyNodes = findNodesIndexed(Node.isDirty)(record)
 
     const nodesToUpdate = R.pipe(
       R.filter(
@@ -187,13 +184,7 @@ const assocNodes = nodes =>
   }
 
 const removeDeletedNodes = record => {
-  const deletedNodes = R.pipe(
-    getNodes,
-    R.values,
-    R.filter(
-      R.propEq(Node.keys.deleted, true)
-    )
-  )(record)
+  const deletedNodes = findNodes(R.propEq(Node.keys.deleted, true))(record)
 
   return R.reduce(
     (updatedRecord, node) => deleteNode(node)(updatedRecord),

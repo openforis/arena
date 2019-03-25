@@ -6,16 +6,16 @@ const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
 
 const DataTable = require('../schemaRdb/dataTable')
 
-const getInsertValues = async (survey, nodeDef, record) => {
+const getInsertValues = async (survey, nodeDef, record, client) => {
   const nodes = Record.getNodesByDefUuid(nodeDef.uuid)(record)
   const insertValues = await Promise.all(nodes.map(async node =>
-    await DataTable.getRowValues(survey, nodeDef, record, node)
+    await DataTable.getRowValues(survey, nodeDef, record, node, client)
   ))
   return insertValues
 }
 
-const toInserts = async (survey, nodeDef, record) => {
-  const insertValues = await getInsertValues(survey, nodeDef, record)
+const toInserts = async (survey, nodeDef, record, client) => {
+  const insertValues = await getInsertValues(survey, nodeDef, record, client)
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
   return insertValues.map(values => ({
@@ -27,7 +27,7 @@ const toInserts = async (survey, nodeDef, record) => {
 }
 
 const run = async (survey, nodeDef, record, client) => {
-  const inserts = await toInserts(survey, nodeDef, record)
+  const inserts = await toInserts(survey, nodeDef, record, client)
 
   await client.tx(async t => await t.batch(
     inserts.map(insert => t.query(`
