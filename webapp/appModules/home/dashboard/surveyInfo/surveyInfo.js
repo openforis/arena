@@ -84,9 +84,9 @@ class SurveyInfo extends React.Component {
               </button>
             }
             {
-              //showCollectImportReportButton &&
+              showCollectImportReportButton &&
               <Link to={appModuleUri(homeModules.collectImportReport)}
-                className="btn btn-of-light">
+                    className="btn btn-of-light">
                 Collect Import Report
               </Link>
             }
@@ -131,7 +131,7 @@ const mapStateToProps = state => {
   const user = AppState.getUser(state)
   const surveyInfo = SurveyState.getStateSurveyInfo(state)
   const lang = Survey.getDefaultLanguage(surveyInfo)
-  const showCollectImportReportButton = SurveyState.hasCollectImportReport(state)
+  const showCollectImportReportButton = false //SurveyState.hasCollectImportReport(state)
 
   return {
     surveyInfo,
