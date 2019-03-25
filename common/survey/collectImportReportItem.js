@@ -17,6 +17,7 @@ const propKeys = {
 
 const exprTypes = {
   applicable: 'applicable',
+  codeParent: 'codeParent',
   check: 'check',
 }
 

@@ -63,7 +63,7 @@ export const setActiveSurvey = (surveyId, draft = true) =>
     await axios.post(`/api/user/${user.id}/pref/${userPrefNames.survey}/${surveyId}`)
     dispatch({ type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId })
 
-    const { data: collectImportReportSizeData } = await axios.get(`/api/survey/${surveyId}/collect-import-report/count`)
+    const { data: collectImportReportSizeData } = await axios.get(`/api/survey/${surveyId}/collect-import/report/count`)
     dispatch({ type: surveyCollectImportReportPresentUpdate, present: collectImportReportSizeData.count > 0 })
   }
 

@@ -1,6 +1,6 @@
 const Job = require('../../../../job/job')
 
-const SurveyManager = require('../../persistence/surveyManager')
+const SurveyManager = require('../../../survey/persistence/surveyManager')
 
 const CollectSurveyReaderJob = require('./metaImportJobs/collectSurveyReaderJob')
 const SurveyCreatorJob = require('./metaImportJobs/surveyCreatorJob')
@@ -8,10 +8,10 @@ const CategoriesImportJob = require('./metaImportJobs/categoriesImportJob')
 const TaxonomiesImportJob = require('./metaImportJobs/taxonomiesImportJob')
 const NodeDefsImportJob = require('./metaImportJobs/nodeDefsImportJob')
 const RecordsImportJob = require('./dataImportJobs/recordsImportJob')
-const SurveyPropsPublishJob = require('../publish/jobs/surveyPropsPublishJob')
-const SurveyDependencyGraphsGenerationJob = require('../publish/jobs/surveyDependencyGraphsGenerationJob')
-const SurveyRdbGeneratorJob = require('../publish/jobs/surveyRdbGeneratorJob')
-const RecordCheckJob = require('../publish/jobs/recordCheckJob')
+const SurveyPropsPublishJob = require('../../../survey/service/publish/jobs/surveyPropsPublishJob')
+const SurveyDependencyGraphsGenerationJob = require('../../../survey/service/publish/jobs/surveyDependencyGraphsGenerationJob')
+const SurveyRdbGeneratorJob = require('../../../survey/service/publish/jobs/surveyRdbGeneratorJob')
+const RecordCheckJob = require('../../../survey/service/publish/jobs/recordCheckJob')
 
 class CollectImportJob extends Job {
 

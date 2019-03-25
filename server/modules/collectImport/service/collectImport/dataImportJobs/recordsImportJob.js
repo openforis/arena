@@ -15,8 +15,8 @@ const RecordUpdateManager = require('../../../../record/persistence/recordUpdate
 
 const Job = require('../../../../../job/job')
 
-const CollectRecordParseUtils = require('../dataImportJobs/collectRecordParseUtils')
-const CollectAttributeValueExtractor = require('../dataImportJobs/collectAttributeValueExtractor')
+const CollectRecordParseUtils = require('./collectRecordParseUtils')
+const CollectAttributeValueExtractor = require('./collectAttributeValueExtractor')
 
 class RecordsImportJob extends Job {
 

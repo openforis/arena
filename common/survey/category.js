@@ -152,6 +152,7 @@ const isLevelDeleteAllowed = level => R.pipe(
 module.exports = {
   props,
   levelProps,
+  itemKeys,
   itemProps,
 
   // ======
@@ -188,6 +189,8 @@ module.exports = {
   newItem,
 
   //READ
+  getItemLevelUuid: R.prop(itemKeys.levelUuid),
+  getItemParentUuid: R.prop(itemKeys.parentUuid),
   getItemCode,
   getItemLabels,
   getItemLabel,

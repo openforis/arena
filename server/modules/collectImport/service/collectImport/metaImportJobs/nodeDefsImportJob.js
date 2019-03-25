@@ -14,7 +14,7 @@ const CollectImportReportItem = require('../../../../../../common/survey/collect
 const Job = require('../../../../../job/job')
 
 const NodeDefManager = require('../../../../nodeDef/persistence/nodeDefManager')
-const CollectImportReportManager = require('../../../../collectImportReport/persistence/collectImportReportManager')
+const CollectImportReportManager = require('../../../persistence/collectImportReportManager')
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 
 const checkExpressionParserByType = {
@@ -117,7 +117,7 @@ class NodeDefsImportJob extends Job {
     const nodeDef = await NodeDefManager.createNodeDef(this.getUser(), surveyId, NodeDef.getUuid(parentNodeDef), nodeDefUuid, type, props, tx)
 
     // 4. update node def with other props
-    const propsAdvanced = await this.extractNodeDefAdvanecdProps(parentNodeDef, nodeDefUuid, type, collectNodeDef, tx)
+    const propsAdvanced = await this.extractNodeDefAdvancedProps(parentNodeDef, nodeDefUuid, type, collectNodeDef, tx)
 
     await NodeDefManager.updateNodeDefProps(this.getUser(), surveyId, nodeDefUuid, {}, propsAdvanced, tx)
 
@@ -143,7 +143,7 @@ class NodeDefsImportJob extends Job {
     }
   }
 
-  async extractNodeDefAdvanecdProps (parentNodeDef, nodeDefUuid, type, collectNodeDef, tx) {
+  async extractNodeDefAdvancedProps (parentNodeDef, nodeDefUuid, type, collectNodeDef, tx) {
     const multiple = collectNodeDef.attributes.multiple === 'true'
 
     const propsAdvanced = {}
@@ -171,6 +171,12 @@ class NodeDefsImportJob extends Job {
 
     if (type !== nodeDefType.entity) {
       await this.parseNodeDefValidationRules(nodeDefUuid, collectNodeDef, tx)
+    }
+
+    if (type === nodeDefType.code) {
+      const parentExpr = CollectIdmlParseUtils.getAttribute('parent')(collectNodeDef)
+      if (parentExpr)
+        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.codeParent, parentExpr, null, null, tx)
     }
 
     // 3. applicable (not supported)

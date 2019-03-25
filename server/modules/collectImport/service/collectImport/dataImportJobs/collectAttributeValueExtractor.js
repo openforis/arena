@@ -16,7 +16,7 @@ const TaxonomyManager = require('../../../../taxonomy/persistence/taxonomyManage
 const FileManager = require('../../../../record/persistence/fileManager')
 
 const CollectIdmlParseUtils = require('../metaImportJobs/collectIdmlParseUtils')
-const CollectRecordParseUtils = require('../dataImportJobs/collectRecordParseUtils')
+const CollectRecordParseUtils = require('./collectRecordParseUtils')
 
 const getCollectNodeDefByPath = (collectSurvey, collectNodeDefPath) => {
   const collectAncestorNodeNames = R.pipe(
