@@ -21,8 +21,8 @@ module.exports = async () => {
   app.use(bodyParser.json({ limit: '5000kb' }))
   app.use(cookieParser())
   app.use(fileUpload({
-    //limit upload to 10MB
-    limits: { fileSize: 10 * 1024 * 1024 },
+    //limit upload to 1 GB
+    limits: { fileSize: 1024 * 1024 * 1024 },
     abortOnLimit: true,
     useTempFiles: true,
     tempFileDir: '/tmp/'
