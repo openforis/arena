@@ -78,7 +78,8 @@ const EntityForm = props => {
         isDraggable={edit && canEditDef && !locked}
         isResizable={edit && canEditDef && !locked}
         compactType={null}
-        useCSSTransforms={false}>
+        useCSSTransforms={false}
+        preventCollision={true}>
 
         {
           innerPageChildren
