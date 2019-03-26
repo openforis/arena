@@ -8,7 +8,6 @@ const SurveyValidator = require('../surveyValidator')
 
 const JobManager = require('../../../job/jobManager')
 const SurveyPublishJob = require('./publish/surveyPublishJob')
-const CollectImportJob = require('./collectImport/collectImportJob')
 
 const updateSurveyProp = async (user, surveyId, key, value) => {
   const survey = await SurveyManager.updateSurveyProp(user, surveyId, key, value)
@@ -17,14 +16,6 @@ const updateSurveyProp = async (user, surveyId, key, value) => {
     Survey.getSurveyInfo,
     Validator.getValidation
   )(survey)
-}
-
-const startCollectImportJob = (user, filePath) => {
-  const job = new CollectImportJob({ user, filePath })
-
-  JobManager.executeJobThread(job)
-
-  return job
 }
 
 const startPublishJob = (user, surveyId) => {
@@ -53,6 +44,5 @@ module.exports = {
   deleteSurvey: SurveyManager.deleteSurvey,
 
   // JOBS
-  startCollectImportJob,
   startPublishJob,
 }

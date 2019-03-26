@@ -179,6 +179,7 @@ module.exports = {
   insertCategory,
   insertLevel,
   insertItem,
+  insertItems: CategoryRepository.insertItems,
 
   //READ
   fetchCategoryByUuid,

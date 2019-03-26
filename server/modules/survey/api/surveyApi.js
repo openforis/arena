@@ -29,19 +29,6 @@ module.exports.init = app => {
 
   })
 
-  app.post('/survey/collect-import', async (req, res) => {
-    try {
-      const user = Request.getSessionUser(req)
-      const file = Request.getFile(req)
-
-      const job = SurveyService.startCollectImportJob(user, file.tempFilePath)
-
-      res.json({ job: JobUtils.jobToJSON(job) })
-    } catch (err) {
-      Response.sendErr(res, err)
-    }
-  })
-
   // ==== READ
   app.get('/surveys', async (req, res) => {
     try {

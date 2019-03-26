@@ -1,6 +1,9 @@
 const R = require('ramda')
 
 const db = require('../../../db/db')
+const { insertAllQuery } = require('../../../db/dbUtils')
+
+const Category = require('../../../../common/survey/category')
 
 const {
   getSurveyDBSchema,
@@ -38,6 +41,21 @@ const insertItem = async (surveyId, item, client = db) =>
     [item.uuid, item.levelUuid, item.parentUuid, item.props],
     def => dbTransformCallback(def, true, true)
   )
+
+const insertItems = async (surveyId, items, client = db) => {
+  const values = items.map(item => [
+    Category.getUuid(item),
+    Category.getItemLevelUuid(item),
+    Category.getItemParentUuid(item),
+    item.props
+  ])
+  await client.none(insertAllQuery(
+    getSurveyDBSchema(surveyId),
+    'category_item',
+    ['uuid', 'level_uuid', 'parent_uuid', 'props_draft'],
+    values
+  ))
+}
 
 // ============== READ
 
@@ -149,6 +167,7 @@ module.exports = {
   insertCategory,
   insertLevel,
   insertItem,
+  insertItems,
 
   //READ
   fetchCategoriesBySurveyId,

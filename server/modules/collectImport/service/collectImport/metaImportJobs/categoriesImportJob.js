@@ -3,6 +3,7 @@ const R = require('ramda')
 const Category = require('../../../../../../common/survey/category')
 
 const Job = require('../../../../../job/job')
+const BatchPersister = require('../../../../../db/batchPersister')
 
 const CategoryManager = require('../../../../category/persistence/categoryManager')
 
@@ -16,6 +17,8 @@ class CategoriesImportJob extends Job {
 
   constructor (params) {
     super('CategoriesImportJob', params)
+
+    this.itemBatchPersister = new BatchPersister(this.itemsInsertHandler.bind(this))
   }
 
   async execute (tx) {
@@ -46,6 +49,8 @@ class CategoriesImportJob extends Job {
 
       this.incrementProcessedItems()
     }
+
+    await this.itemBatchPersister.flush(tx)
 
     this.setContext({ categories })
   }
@@ -79,9 +84,6 @@ class CategoriesImportJob extends Job {
   }
 
   async insertItems (category, levelIndex, parentItem, defaultLanguage, collectItems, tx) {
-    const user = this.getUser()
-    const surveyId = this.getSurveyId()
-
     const level = Category.getLevelByIndex(levelIndex)(category)
     const levelUuid = Category.getUuid(level)
 
@@ -91,17 +93,23 @@ class CategoriesImportJob extends Job {
 
       const labels = CollectIdmlParseUtils.toLabels('label', defaultLanguage)(collectItem)
 
-      const itemParam = Category.newItem(levelUuid, parentItem, {
+      const item = Category.newItem(levelUuid, parentItem, {
         [Category.itemProps.code]: CollectIdmlParseUtils.getChildElementText('code')(collectItem),
         [Category.itemProps.labels]: labels
       })
-      const item = await CategoryManager.insertItem(user, surveyId, itemParam, tx)
+      await this.itemBatchPersister.addItem(item, tx)
 
       // insert child items recursively
       const collectChildItems = CollectIdmlParseUtils.getElementsByName('item')(collectItem)
       if (!R.isEmpty(collectChildItems))
         await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
     }
+  }
+
+  async itemsInsertHandler (items, tx) {
+    const surveyId = this.getSurveyId()
+
+    await CategoryManager.insertItems(surveyId, items, tx)
   }
 
 }

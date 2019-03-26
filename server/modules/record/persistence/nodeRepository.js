@@ -1,6 +1,5 @@
 const R = require('ramda')
 const camelize = require('camelize')
-const toSnakeCase = require('to-snake-case')
 
 const db = require('../../../db/db')
 const { now, insertAllQuery } = require('../../../db/dbUtils')
@@ -37,23 +36,18 @@ const insertNode = (surveyId, node, client = db) => {
 }
 
 const insertNodes = async (surveyId, nodes, client = db) => {
-  const values = R.map(
-    R.pipe(
-      R.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.parentUuid, Node.keys.nodeDefUuid, Node.keys.value, Node.keys.meta]),
-      obj => R.pipe(
-        R.keys,
-        R.reduce((acc, key) => R.assoc(toSnakeCase(key), R.prop(key, obj), acc), {}),
-      )(obj),
-      n => ({ ...n,
-        value: stringifyValue(Node.getNodeValue(n, null)),
-        meta: {
-          ...n.meta,
-          [Node.metaKeys.childApplicability]: {}
-        }
-      })
-    ),
-    nodes
-  )
+  const values = nodes.map(n => [
+    Node.getUuid(n),
+    Node.getRecordUuid(n),
+    Node.getParentUuid(n),
+    Node.getNodeDefUuid(n),
+    stringifyValue(Node.getNodeValue(n, null)),
+    {
+      ...n.meta,
+      [Node.metaKeys.childApplicability]: {}
+    }
+  ])
+
   client.none(insertAllQuery(
     getSurveyDBSchema(surveyId),
     'node',

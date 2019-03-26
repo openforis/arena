@@ -42,7 +42,7 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
   }
 
 }
-export const importCollectSurvey = file =>
+export const importCollectSurvey = (file, history) =>
   async dispatch => {
     const formData = new FormData()
     formData.append('file', file)
@@ -56,7 +56,7 @@ export const importCollectSurvey = file =>
       dispatch(setActiveSurvey(surveyId, false))
       //TODO : show Collect import report (if any)
       /*
-      const { data } = await axios.get(`/api/survey/${surveyId}/collect-import-report/count`)
+      const { data } = await axios.get(`/api/survey/${surveyId}/collect-import/report/count`)
       if (data.count > 0) {
         history.push(appModuleUri(homeModules.collectImportReport))
       }

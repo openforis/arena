@@ -10,7 +10,7 @@ export const fetchCollectImportReportItems = () =>
     try {
       const surveyId = SurveyState.getStateSurveyId(getState())
 
-      const { data } = await axios.get(`/api/survey/${surveyId}/collect-import-report`)
+      const { data } = await axios.get(`/api/survey/${surveyId}/collect-import/report`)
 
       dispatch({ type: homeCollectImportReportUpdate, items: data.items })
     } catch (e) {
@@ -22,7 +22,7 @@ export const updateCollectImportReportItem = (itemId, resolved) =>
     try {
       const surveyId = SurveyState.getStateSurveyId(getState())
 
-      const { data } = await axios.post(`/api/survey/${surveyId}/collect-import-report/resolve-item/${itemId}`, { resolved })
+      const { data } = await axios.post(`/api/survey/${surveyId}/collect-import/report/${itemId}/resolve`, { resolved })
 
       dispatch({ type: homeCollectImportReportItemUpdate, item: data.item })
     } catch (e) {
