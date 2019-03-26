@@ -54,7 +54,7 @@ const SurveyCreateView = (props) => {
         Create Survey
       </button>
 
-     {/* <UploadButton
+      {/*<UploadButton
         label="Import from Collect"
         accept={'.collect-backup'}
         maxSize={1000}
