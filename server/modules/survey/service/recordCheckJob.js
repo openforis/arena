@@ -29,7 +29,7 @@ class RecordCheckJob extends Job {
     const nodeDefsUpdated = []
 
     Survey.getNodeDefsArray(survey).forEach(def => {
-      if (!NodeDef.isNodeDefPublished(def)) {
+      if (!NodeDef.isPublished(def)) {
         nodeDefsNew.push(def)
       } else if (R.prop(NodeDef.keys.draftAdvanced, def)) {
         nodeDefsUpdated.push(def)
@@ -79,7 +79,7 @@ const applyDefaultValues = async (survey, nodeDefsUpdated, record, newNodes, tx)
 const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
   // include parent nodes of new/updated node defs (needed for min/max count validation)
   const nodeDefsParentNodes = R.pipe(
-    R.map(def => Record.getNodesByDefUuid(NodeDef.getNodeDefParentUuid(def))(record)),
+    R.map(def => Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)),
     R.flatten,
     toUuidIndexedObj
   )(nodeDefs)
@@ -95,7 +95,7 @@ const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
  * Returns an indexed object with all the inserted nodes.
  */
 const insertMissingSingleNode = async (survey, childDef, record, parentNode, user, tx) => {
-  if (NodeDef.isNodeDefSingle(childDef)) {
+  if (NodeDef.isSingle(childDef)) {
     const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
     if (R.isEmpty(children)) {
       const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
@@ -113,7 +113,7 @@ const insertMissingSingleNode = async (survey, childDef, record, parentNode, use
 const insertMissingSingleNodes = async (survey, nodeDefsNew, record, user, tx) => {
   let allInsertedNodes = {}
   for (const nodeDef of nodeDefsNew) {
-    const parentNodes = Record.getNodesByDefUuid(NodeDef.getNodeDefParentUuid(nodeDef))(record)
+    const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(record)
     for (const parentNode of parentNodes) {
       const insertedNodes = await insertMissingSingleNode(survey, nodeDef, record, parentNode, user, tx)
       allInsertedNodes = R.mergeRight(allInsertedNodes, insertedNodes)

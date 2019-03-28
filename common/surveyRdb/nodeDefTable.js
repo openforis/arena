@@ -7,12 +7,12 @@ const NodeDef = require('../survey/nodeDef')
 const composeTableName = (nodeDefName, nodeDefParentName = '') => `data_${nodeDefParentName}${nodeDefName}`
 
 const getTableName = (nodeDef, nodeDefParent) => {
-  const nodeDefName = NodeDef.getNodeDefName(nodeDef)
-  const nodeDefParentName = NodeDef.getNodeDefName(nodeDefParent)
+  const nodeDefName = NodeDef.getName(nodeDef)
+  const nodeDefParentName = NodeDef.getName(nodeDefParent)
 
-  return NodeDef.isNodeDefEntity(nodeDef)
+  return NodeDef.isEntity(nodeDef)
     ? composeTableName(nodeDefName)
-    : NodeDef.isNodeDefMultiple(nodeDef)
+    : NodeDef.isMultiple(nodeDef)
       ? composeTableName(nodeDefName, nodeDefParentName)
       : composeTableName(nodeDefParentName)
 }
@@ -21,7 +21,7 @@ const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefPar
 
 const getViewNameByUuid = nodeDefUuid => R.pipe(
   Survey.getNodeDefByUuid(nodeDefUuid),
-  nodeDef => 'data_' + NodeDef.getNodeDefName(nodeDef) + '_view'
+  nodeDef => 'data_' + NodeDef.getName(nodeDef) + '_view'
 )
 
 const {nodeDefType} = NodeDef
@@ -37,16 +37,16 @@ const getCols = nodeDef => R.propOr(
   cols
 )
 
-const getDefaultColumnName = nodeDef => NodeDef.isNodeDefEntity(nodeDef)
-  ? `${NodeDef.getNodeDefName(nodeDef)}_uuid`
-  : `${NodeDef.getNodeDefName(nodeDef)}`
+const getDefaultColumnName = nodeDef => NodeDef.isEntity(nodeDef)
+  ? `${NodeDef.getName(nodeDef)}_uuid`
+  : `${NodeDef.getName(nodeDef)}`
 
 const getColNames = nodeDef => {
   const cols = getCols(nodeDef)
   return R.isEmpty(cols)
     ? [getDefaultColumnName(nodeDef)]
     : cols.map(
-      col => NodeDef.getNodeDefName(nodeDef) + '_' + col
+      col => NodeDef.getName(nodeDef) + '_' + col
     )
 }
 
@@ -63,7 +63,7 @@ const getColNamesByUuids = nodeDefUuidCols =>
 
 const extractColName = (nodeDef, col) => R.replace(
   //TODO check if toSnakeCase is necessary : if col names are snaked when creating tables
-  toSnakeCase(NodeDef.getNodeDefName(nodeDef)) + '_',
+  toSnakeCase(NodeDef.getName(nodeDef)) + '_',
   '',
   col
 )

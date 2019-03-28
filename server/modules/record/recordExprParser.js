@@ -51,7 +51,7 @@ const bindNode = (survey, record, node) => {
     },
 
     getValue: async () => {
-      if (Node.isNodeValueBlank(node)) {
+      if (Node.isValueBlank(node)) {
         return null
       }
 
@@ -59,19 +59,19 @@ const bindNode = (survey, record, node) => {
       const surveyId = Survey.getId(survey)
       const draft = Survey.isDraft(Survey.getSurveyInfo(survey))
 
-      if (NodeDef.isNodeDefCode(nodeDef)) {
+      if (NodeDef.isCode(nodeDef)) {
         const itemUuid = Node.getCategoryItemUuid(node)
         return itemUuid ? await CategoryManager.fetchItemByUuid(surveyId, itemUuid, draft) : null
       }
 
-      if (NodeDef.isNodeDefTaxon(nodeDef)) {
-        const taxonUuid = Node.getNodeTaxonUuid(node)
+      if (NodeDef.isTaxon(nodeDef)) {
+        const taxonUuid = Node.getTaxonUuid(node)
         return taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid, draft) : null
       }
 
-      const value = Node.getNodeValue(node)
+      const value = Node.getValue(node)
 
-      return NodeDef.isNodeDefDecimal(nodeDef) || NodeDef.isNodeDefInteger(nodeDef)
+      return NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
         ? Number(value)
         : value
     }

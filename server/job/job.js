@@ -73,7 +73,7 @@ class Job {
         console.log('** Error in job ', e)
         this.addError({ systemError: { valid: false, errors: [e.toString()] } })
         if (this.isRunning())
-          await this._setStatusFailed()
+          await this.setStatusFailed()
       } finally {
         this.tx = null
       }
@@ -95,7 +95,7 @@ class Job {
    */
   async execute (tx) {}
 
-  async prepareResult() {
+  async prepareResult () {
     //to be extended by subclasses
   }
 
@@ -191,6 +191,14 @@ class Job {
     return user ? user.id : null
   }
 
+  getCurrentInnerJob () {
+    return this.innerJobs[this.currentInnerJobIndex]
+  }
+
+  async setStatusFailed () {
+    await this._setStatus(jobStatus.failed)
+  }
+
   // INTERNAL METHODS
   async _executeInnerJobs () {
     this.total = this.innerJobs.length
@@ -210,10 +218,6 @@ class Job {
       else
         break
     }
-  }
-
-  getCurrentInnerJob () {
-    return this.innerJobs[this.currentInnerJobIndex]
   }
 
   async _handleInnerJobEvent (event) {
@@ -245,10 +249,6 @@ class Job {
 
   async _setStatusSucceeded () {
     await this._setStatus(jobStatus.succeeded)
-  }
-
-  async _setStatusFailed () {
-    await this._setStatus(jobStatus.failed)
   }
 
   async _notifyEvent (event) {

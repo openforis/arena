@@ -33,7 +33,7 @@ const fetchDependentNodes = (survey, record, node, dependencyType) => {
 
         //3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
         const nodeDefUuidDependent = isDependencyApplicable
-          ? NodeDef.getNodeDefParentUuid(dependentDef)
+          ? NodeDef.getParentUuid(dependentDef)
           : NodeDef.getUuid(dependentDef)
 
         const dependentNodes = Record.getDescendantsByNodeDefUuid(commonParentNode, nodeDefUuidDependent)(record)
@@ -54,7 +54,7 @@ const fetchDependentNodes = (survey, record, node, dependencyType) => {
 const persistDependentNodeValue = async (survey, node, valueExpr, isDefaultValue, tx) => {
   const value = await toNodeValue(survey, node, valueExpr, tx)
 
-  const oldValue = Node.getNodeValue(node, null)
+  const oldValue = Node.getValue(node, null)
 
   return R.equals(oldValue, value)
     ? {}
@@ -100,13 +100,13 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
   const draft = Survey.isDraft(Survey.getSurveyInfo(survey))
   const isExprPrimitive = R.is(String, valueExpr) || R.is(Number, valueExpr)
 
-  if (NodeDef.isNodeDefCode(nodeDef) && isExprPrimitive) {
+  if (NodeDef.isCode(nodeDef) && isExprPrimitive) {
     // valueExpr is the code of a category item
 
     // 1. find category items
     const itemsInLevel = await CategoryRepository.fetchItemsByLevelIndex(
       surveyId,
-      NodeDef.getNodeDefCategoryUuid(nodeDef),
+      NodeDef.getCategoryUuid(nodeDef),
       Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey),
       draft,
       tx)
@@ -115,11 +115,11 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
     const item = R.find(item => Category.getItemCode(item) === '' + valueExpr)(itemsInLevel)
 
     return item ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) } : null
-  } else if (NodeDef.isNodeDefTaxon(nodeDef) && isExprPrimitive) {
+  } else if (NodeDef.isTaxon(nodeDef) && isExprPrimitive) {
     // valueExpr is the code of a taxon
     const item = await TaxonomyRepository.fetchTaxonByCode(
       surveyId,
-      NodeDef.getNodeDefTaxonomyUuid(nodeDef),
+      NodeDef.getTaxonomyUuid(nodeDef),
       valueExpr,
       draft,
       tx)

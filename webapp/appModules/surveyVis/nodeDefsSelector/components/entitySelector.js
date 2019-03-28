@@ -12,7 +12,7 @@ const getEntities = (hierarchy, lang) => {
   const entities = []
 
   const traverse = (nodeDef, depth) => {
-    const label = NodeDef.getNodeDefLabel(nodeDef, lang)
+    const label = NodeDef.getLabel(nodeDef, lang)
     entities.push({
       key: NodeDef.getUuid(nodeDef),
       value: nbsp + R.repeat(nbsp + nbsp, depth).join('') + label

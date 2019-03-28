@@ -30,7 +30,7 @@ const insertNode = (surveyId, node, client = db) => {
         (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
         VALUES ($1, $2, $3, $4, $5, $6::jsonb)
         RETURNING *, true as ${Node.keys.created}
-      `, [Node.getUuid(node), Node.getRecordUuid(node), Node.getParentUuid(node), Node.getNodeDefUuid(node), stringifyValue(Node.getNodeValue(node, null)), meta],
+      `, [Node.getUuid(node), Node.getRecordUuid(node), Node.getParentUuid(node), Node.getNodeDefUuid(node), stringifyValue(Node.getValue(node, null)), meta],
     dbTransformCallback
   )
 }
@@ -41,7 +41,7 @@ const insertNodes = async (surveyId, nodes, client = db) => {
     Node.getRecordUuid(n),
     Node.getParentUuid(n),
     Node.getNodeDefUuid(n),
-    stringifyValue(Node.getNodeValue(n, null)),
+    stringifyValue(Node.getValue(n, null)),
     {
       ...n.meta,
       [Node.metaKeys.childApplicability]: {}

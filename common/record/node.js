@@ -87,11 +87,11 @@ const getParentUuid = SurveyUtils.getParentUuid
 
 const getRecordUuid = R.prop(keys.recordUuid)
 
-const getNodeValue = (node = {}, defaultValue = {}) =>
+const getValue = (node = {}, defaultValue = {}) =>
   R.propOr(defaultValue, keys.value, node)
 
-const getNodeValueProp = (prop, defaultValue = null) => R.pipe(
-  getNodeValue,
+const getValueProp = (prop, defaultValue = null) => R.pipe(
+  getValue,
   R.propOr(defaultValue, prop),
 )
 
@@ -122,8 +122,8 @@ const isDescendantOf = node =>
  * UTILS
  * ======
  */
-const isNodeValueBlank = node => {
-  const value = getNodeValue(node, null)
+const isValueBlank = node => {
+  const value = getValue(node, null)
 
   if (R.isNil(value))
     return true
@@ -147,7 +147,7 @@ module.exports = {
   getUuid,
   getParentUuid,
   getRecordUuid,
-  getNodeValue,
+  getValue,
   getNodeDefUuid,
 
   getNodeDefUuids,
@@ -171,25 +171,25 @@ module.exports = {
   assocValidation: Validator.assocValidation,
 
   // ==== UTILS
-  isNodeValueBlank,
+  isValueBlank,
 
   // ====== Node Value extractor
 
   // date
   getDateYear: R.pipe(
-    R.partialRight(getNodeValue, ['//']),
+    R.partialRight(getValue, ['//']),
     R.split('/'),
     R.prop(2),
     trim,
   ),
   getDateMonth: R.pipe(
-    R.partialRight(getNodeValue, ['//']),
+    R.partialRight(getValue, ['//']),
     R.split('/'),
     R.prop(1),
     trim
   ),
   getDateDay: R.pipe(
-    R.partialRight(getNodeValue, ['//']),
+    R.partialRight(getValue, ['//']),
     R.split('/'),
     R.prop(0),
     trim
@@ -197,34 +197,34 @@ module.exports = {
 
   // time
   getTimeHour: R.pipe(
-    R.partialRight(getNodeValue, [':']),
+    R.partialRight(getValue, [':']),
     R.split(':'),
     R.prop(0),
     trim
   ),
   getTimeMinute: R.pipe(
-    R.partialRight(getNodeValue, [':']),
+    R.partialRight(getValue, [':']),
     R.split(':'),
     R.prop(1),
     trim
   ),
 
   // coordinate
-  getCoordinateX: getNodeValueProp(valuePropKeys.x),
-  getCoordinateY: getNodeValueProp(valuePropKeys.y),
-  getCoordinateSrs: (node, defaultValue = null) => getNodeValueProp(valuePropKeys.srs, defaultValue)(node),
+  getCoordinateX: getValueProp(valuePropKeys.x),
+  getCoordinateY: getValueProp(valuePropKeys.y),
+  getCoordinateSrs: (node, defaultValue = null) => getValueProp(valuePropKeys.srs, defaultValue)(node),
 
   // file
-  getNodeFileName: getNodeValueProp(valuePropKeys.fileName, ''),
-  getNodeFileUuid: getNodeValueProp(valuePropKeys.fileUuid, ''),
+  getFileName: getValueProp(valuePropKeys.fileName, ''),
+  getFileUuid: getValueProp(valuePropKeys.fileUuid, ''),
 
   // code
-  getCategoryItemUuid: getNodeValueProp(valuePropKeys.itemUuid),
-  getCategoryItemHierarchy: getNodeValueProp(valuePropKeys.hierarchy, []),
+  getCategoryItemUuid: getValueProp(valuePropKeys.itemUuid),
+  getCategoryItemHierarchy: getValueProp(valuePropKeys.hierarchy, []),
 
   // taxon
-  getNodeTaxonUuid: getNodeValueProp(valuePropKeys.taxonUuid),
-  getNodeVernacularNameUuid: getNodeValueProp(valuePropKeys.vernacularNameUuid),
-  getNodeScientificName: getNodeValueProp(valuePropKeys.scientificName),
-  getNodeVernacularName: getNodeValueProp(valuePropKeys.vernacularName),
+  getTaxonUuid: getValueProp(valuePropKeys.taxonUuid),
+  getVernacularNameUuid: getValueProp(valuePropKeys.vernacularNameUuid),
+  getScientificName: getValueProp(valuePropKeys.scientificName),
+  getVernacularName: getValueProp(valuePropKeys.vernacularName),
 }

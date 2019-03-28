@@ -49,6 +49,7 @@ const insertItems = async (surveyId, items, client = db) => {
     Category.getItemParentUuid(item),
     item.props
   ])
+
   await client.none(insertAllQuery(
     getSurveyDBSchema(surveyId),
     'category_item',

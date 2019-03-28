@@ -23,7 +23,7 @@ const integerMask = createNumberMask({
 const ValidationsProps = props => {
   const { nodeDef, nodeDefParent, readOnly, putNodeDefProp } = props
 
-  const validation = NodeDef.getNodeDefValidation(nodeDef)
+  const validation = NodeDef.getValidation(nodeDef)
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
@@ -34,7 +34,7 @@ const ValidationsProps = props => {
   return (
     <div className="form">
       {
-        NodeDef.isNodeDefMultiple(nodeDef)
+        NodeDef.isMultiple(nodeDef)
           ? (
             <React.Fragment>
               <FormItem label="Min Count">
@@ -63,7 +63,7 @@ const ValidationsProps = props => {
               </FormItem>
             </React.Fragment>
           )
-          : !NodeDef.isNodeDefKey(nodeDef)
+          : !NodeDef.isKey(nodeDef)
           ? (
             <FormItem label={'required'}>
               <Checkbox checked={NodeDefValidations.isRequired(nodeDefValidations)}
@@ -76,7 +76,7 @@ const ValidationsProps = props => {
           : null
       }
       {
-        NodeDef.isNodeDefAttribute(nodeDef) &&
+        NodeDef.isAttribute(nodeDef) &&
         <ExpressionsProp label="Expressions"
                          readOnly={readOnly}
                          applyIf={true}

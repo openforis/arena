@@ -67,7 +67,7 @@ class NodeDefCode extends React.Component {
     return (
       placeholder
         ? placeholder
-        : NodeDef.isNodeDefSingle(nodeDef) && nodes.length === 1
+        : NodeDef.isSingle(nodeDef) && nodes.length === 1
         ? nodes[0]
         : Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
     )
@@ -95,7 +95,7 @@ class NodeDefCode extends React.Component {
     // handle one selected item change each time
 
     // if multiple, remove deselected node
-    if (NodeDef.isNodeDefMultiple(nodeDef)) {
+    if (NodeDef.isMultiple(nodeDef)) {
       const deselectedItem = R.head(R.difference(selectedItems, newSelectedItems))
       if (deselectedItem) {
         const nodeToRemove = R.find(n => Node.getCategoryItemUuid(n) === deselectedItem.uuid, nodes)
@@ -107,7 +107,7 @@ class NodeDefCode extends React.Component {
 
     // single attribute => always update value
     // multiple attribute => insert new node only if there is a new selected item
-    if (newSelectedItem || NodeDef.isNodeDefSingle(nodeDef)) {
+    if (newSelectedItem || NodeDef.isSingle(nodeDef)) {
       const nodeToUpdate = this.determineNodeToUpdate()
       const value = newSelectedItem
         ? {
@@ -151,14 +151,14 @@ const mapStateToProps = (state, props) => {
   const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
 
   const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-  const category = Survey.getCategoryByUuid(NodeDef.getNodeDefCategoryUuid(nodeDef))(survey)
+  const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
 
   return {
     surveyId: Survey.getId(survey),
     draft: Survey.isDraft(surveyInfo),
     language: Survey.getDefaultLanguage(surveyInfo),
 
-    parentCodeDefUuid: NodeDef.getNodeDefParentCodeDefUuid(nodeDef),
+    parentCodeDefUuid: NodeDef.getParentCodeDefUuid(nodeDef),
     categoryUuid: category ? Category.getUuid(category) : null,
     categoryLevelIndex: categoryLevelIndex,
     parentItemUuid: Node.getCategoryItemUuid(parentCodeAttribute),

@@ -26,7 +26,7 @@ const NodeDefReportItem = ({ survey, nodeDefUuid, nodeDefItems, updateCollectImp
   return (
     <div className="collect-import-report-node-def-items">
       <div
-        className="collect-import-report-node-def-items-header">{NodeDef.getNodeDefLabel(nodeDef, defaultLanguage)}</div>
+        className="collect-import-report-node-def-items-header">{NodeDef.getLabel(nodeDef, defaultLanguage)}</div>
       <div className="table__row-header collect-import-report-header">
         <div>#</div>
         <div>Type</div>

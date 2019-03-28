@@ -34,7 +34,7 @@ const RecordRow = ({ idx, offset, record, style, nodeDefKeys, canEdit }) => (
     </div>
     {
       nodeDefKeys.map((n, i) =>
-        <div key={i}>{record[camelize(NodeDef.getNodeDefName(n))]}</div>
+        <div key={i}>{record[camelize(NodeDef.getName(n))]}</div>
       )
     }
     <div>{getRelativeDate(record.dateCreated)}</div>
@@ -59,7 +59,7 @@ const RecordsTable = ({ user, records, offset, nodeDefKeys, lang }) => {
       <div className="table__row-header" style={style}>
         <div>Row #</div>
         {
-          nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getNodeDefLabel(k, lang)}</div>)
+          nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getLabel(k, lang)}</div>)
         }
         <div>Date created</div>
         <div>Date Modified</div>

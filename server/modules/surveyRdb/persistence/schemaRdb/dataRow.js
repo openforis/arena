@@ -7,7 +7,7 @@ const Node = require('../../../../../common/record/node')
 const DataCol = require('./dataCol')
 
 const getNodeCol = (nodeDefCol, record, nodeRow) => {
-  if (NodeDef.isNodeDefRoot(nodeDefCol))
+  if (NodeDef.isRoot(nodeDefCol))
     return Record.getRootNode(record)
 
 // attribute column in multiple attribute table (value of its own table)
@@ -19,7 +19,7 @@ const getNodeCol = (nodeDefCol, record, nodeRow) => {
       R.defaultTo({})
     )(record)
 
-  return NodeDef.isNodeDefEntity(nodeDefCol) && R.isEmpty(nodeCol)
+  return NodeDef.isEntity(nodeDefCol) && R.isEmpty(nodeCol)
     ? getNodeCol(nodeDefCol, record, Record.getParentNode(nodeRow)(record))
     : nodeCol
 

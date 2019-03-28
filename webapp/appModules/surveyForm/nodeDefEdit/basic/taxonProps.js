@@ -71,10 +71,10 @@ const mapStateToProps = state => {
   const surveyForm = getSurveyForm(state)
   const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
 
-  const isTaxon = NodeDef.isNodeDefTaxon(nodeDef)
+  const isTaxon = NodeDef.isTaxon(nodeDef)
 
   return {
-    taxonomy: isTaxon ? Survey.getTaxonomyByUuid(NodeDef.getNodeDefTaxonomyUuid(nodeDef))(survey) : null,
+    taxonomy: isTaxon ? Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey) : null,
     taxonomies: isTaxon ? Survey.getTaxonomiesArray(survey) : null,
   }
 }

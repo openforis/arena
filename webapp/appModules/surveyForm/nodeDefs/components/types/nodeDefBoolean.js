@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { getNodeValue } from '../../../../../../common/record/node'
+import Node from '../../../../../../common/record/node'
 
 const Button = ({nodeDef, readOnly, parentNode, nodes, updateNode, label, disabled, value, entry, canEditRecord}) => {
   const node = entry ? nodes[0] : null
 
-  const nodeValue = getNodeValue(node, '')
+  const nodeValue = Node.getValue(node, '')
 
   return (
     <button className="btn btn-s btn-transparent"

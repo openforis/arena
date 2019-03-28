@@ -22,7 +22,7 @@ class SurveyRdbGeneratorJob extends Job {
     const surveyId = Survey.getId(survey)
 
     //get entities or multiple attributes tables
-    const { root, length } = Survey.getHierarchy(NodeDef.isNodeDefEntityOrMultiple)(survey)
+    const { root, length } = Survey.getHierarchy(NodeDef.isEntityOrMultiple)(survey)
     const recordUuids = await RecordManager.fetchRecordUuids(surveyId, tx)
 
     this.total = 1 + length + (recordUuids.length * length)

@@ -106,7 +106,7 @@ const findNodeInAncestorEntities = (parentNode, predicate) => record => {
 
 const getParentCodeAttribute = (survey, parentNode, nodeDef) =>
   record => {
-    const parentCodeDef = Survey.getNodeDefByUuid(NodeDef.getNodeDefParentCodeDefUuid(nodeDef))(survey)
+    const parentCodeDef = Survey.getNodeDefByUuid(NodeDef.getParentCodeDefUuid(nodeDef))(survey)
 
     return parentCodeDef
       ? findNodeInAncestorEntities(parentNode,
@@ -167,8 +167,8 @@ const assocNodes = nodes =>
           const dirtyNode = R.prop(Node.getUuid(n), dirtyNodes)
           return !dirtyNode ||
             Node.isDirty(n) ||
-            R.equals(Node.getNodeValue(dirtyNode), Node.getNodeValue(n)) ||
-            Node.isNodeValueBlank(dirtyNode) && Node.isDefaultValueApplied(n)
+            R.equals(Node.getValue(dirtyNode), Node.getValue(n)) ||
+            Node.isValueBlank(dirtyNode) && Node.isDefaultValueApplied(n)
         }),
       R.map(
         R.omit([Node.keys.updated, Node.keys.created])

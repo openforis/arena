@@ -84,7 +84,7 @@ module.exports.init = app => {
       const { surveyId, nodeUuid } = Request.getParams(req)
 
       const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
-      const file = await FileService.fetchFileByUuid(surveyId, Node.getNodeFileUuid(node))
+      const file = await FileService.fetchFileByUuid(surveyId, Node.getFileUuid(node))
 
       sendFile(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
     } catch (err) {

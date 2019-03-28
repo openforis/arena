@@ -87,8 +87,8 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
         const { nodeCtx: n, nodeDef } = o
 
         return isApplicableExpr || (
-          NodeDef.isNodeDefAttribute(nodeDef) && (
-            Node.isNodeValueBlank(n) ||
+          NodeDef.isAttribute(nodeDef) && (
+            Node.isValueBlank(n) ||
             Node.isDefaultValueApplied(n)
           )
         )

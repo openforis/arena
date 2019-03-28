@@ -67,7 +67,7 @@ const validateCode = async (survey, nodeDef, node) => {
   if (!item)
     return false
 
-  const categoryUuid = NodeDef.getNodeDefCategoryUuid(nodeDef)
+  const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const category = await CategoryManager.fetchCategoryByUuid(
     surveyId, categoryUuid, isSurveyDraft, false
   )
@@ -79,7 +79,7 @@ const validateCode = async (survey, nodeDef, node) => {
 }
 
 const validateTaxon = async (survey, nodeDef, node) => {
-  const taxonUuid = Node.getNodeTaxonUuid(node)
+  const taxonUuid = Node.getTaxonUuid(node)
   if (!taxonUuid)
     return true
 
@@ -91,7 +91,7 @@ const validateTaxon = async (survey, nodeDef, node) => {
   if (!taxon)
     return false
 
-  const vernacularNameUuid = Node.getNodeVernacularNameUuid(node)
+  const vernacularNameUuid = Node.getVernacularNameUuid(node)
   if (!vernacularNameUuid)
     return true
 
@@ -103,11 +103,11 @@ const validateTaxon = async (survey, nodeDef, node) => {
 const validateValueType = (survey, nodeDef) =>
   async (propName, node) => {
 
-    if (Node.isNodeValueBlank(node))
+    if (Node.isValueBlank(node))
       return null
 
     const typeValidatorFn = typeValidatorFns[NodeDef.getType(nodeDef)]
-    const valid = await typeValidatorFn(survey, nodeDef, node, Node.getNodeValue(node))
+    const valid = await typeValidatorFn(survey, nodeDef, node, Node.getValue(node))
     return valid ? null : errorKeys.invalidType
   }
 

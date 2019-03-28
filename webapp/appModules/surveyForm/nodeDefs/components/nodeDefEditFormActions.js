@@ -15,7 +15,7 @@ const NodeDefEditFormActions = (props) => {
     putNodeDefProp, setFormNodeDefEdit, setFormNodeDefAddChildTo, removeNodeDef
   } = props
 
-  const isRoot = NodeDef.isNodeDefRoot(nodeDef)
+  const isRoot = NodeDef.isRoot(nodeDef)
   const isPage = !!Layout.getPageUuid(nodeDef)
 
   return edit && canEditDef && (
@@ -39,7 +39,7 @@ const NodeDefEditFormActions = (props) => {
       </button>
 
       {
-        NodeDef.isNodeDefEntity(nodeDef) &&
+        NodeDef.isEntity(nodeDef) &&
         <button className="btn-s btn-of-light-xs"
                 onClick={() => setFormNodeDefAddChildTo(nodeDef)}>
           <span className="icon icon-plus icon-12px"/>
@@ -50,7 +50,7 @@ const NodeDefEditFormActions = (props) => {
         isRoot ?
           null
           : <button className="btn-s btn-of-light-xs"
-                    aria-disabled={NodeDef.isNodeDefPublished(nodeDef)}
+                    aria-disabled={NodeDef.isPublished(nodeDef)}
                     onClick={() => {
                       window.confirm('Are you sure you want to permanently delete this node definition? This operation cannot be undone')
                         ? removeNodeDef(nodeDef)

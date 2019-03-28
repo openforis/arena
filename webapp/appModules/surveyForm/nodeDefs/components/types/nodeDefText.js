@@ -17,7 +17,7 @@ const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord })
   <div>
     <Input aria-disabled={edit || !canEditRecord || readOnly}
            {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
-           value={Node.getNodeValue(node, '')}
+           value={Node.getValue(node, '')}
            onChange={value => updateNode(nodeDef, node, value)}
     />
   </div>
@@ -44,10 +44,10 @@ const MultipleTextInput = props => {
             <TextInput {...props}
                        node={n}/>
 
-            {!n.placeholder && NodeDef.isNodeDefMultiple(nodeDef) && canEditRecord &&
+            {!n.placeholder && NodeDef.isMultiple(nodeDef) && canEditRecord &&
             <NodeDeleteButton nodeDef={nodeDef}
                               node={n}
-                              disabled={R.isEmpty(Node.getNodeValue(n))}
+                              disabled={R.isEmpty(Node.getValue(n))}
                               showConfirm={true}
                               removeNode={removeNode}/>
             }
@@ -62,7 +62,7 @@ const MultipleTextInput = props => {
 const NodeDefText = props =>
   props.edit
     ? <TextInput {...props}/>
-    : NodeDef.isNodeDefMultiple(props.nodeDef)
+    : NodeDef.isMultiple(props.nodeDef)
     ? <MultipleTextInput {...props} />
     : <TextInput {...props} node={props.nodes[0]}/>
 

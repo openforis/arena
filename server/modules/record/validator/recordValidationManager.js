@@ -66,7 +66,7 @@ const fetchNodePointers = (survey, record, nodes) => {
       const pointers = []
       const nodeDef = getNodeDef(survey, node)
 
-      if (!NodeDef.isNodeDefRoot(nodeDef)) {
+      if (!NodeDef.isRoot(nodeDef)) {
         // add a pointer for every node
         const parent = Record.getParentNode(node)(record)
         pointers.push({
@@ -75,7 +75,7 @@ const fetchNodePointers = (survey, record, nodes) => {
         })
       }
 
-      if (NodeDef.isNodeDefEntity(nodeDef) && !Node.isDeleted(node)) {
+      if (NodeDef.isEntity(nodeDef) && !Node.isDeleted(node)) {
         // add children node pointers
         const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
 
@@ -104,7 +104,7 @@ const isRootNodeKeysUpdated = (survey, nodes) => R.pipe(
   R.any(n => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(n))(survey)
       const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
-      return NodeDef.isNodeDefKey(nodeDef) && NodeDef.isNodeDefRoot(parentDef)
+      return NodeDef.isKey(nodeDef) && NodeDef.isRoot(parentDef)
     },
   )
 )(nodes)
@@ -115,11 +115,11 @@ const getUpdatedEntitiesWithKeys = (survey, record, nodes) => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
       const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
 
-      if (NodeDef.isNodeDefEntity(nodeDef) && !R.isEmpty(Survey.getNodeDefKeys(nodeDef)(survey))) {
+      if (NodeDef.isEntity(nodeDef) && !R.isEmpty(Survey.getNodeDefKeys(nodeDef)(survey))) {
         // updated node is an entity with keys
         return node
-      } else if (NodeDef.isNodeDefKey(nodeDef) &&
-        !NodeDef.isNodeDefRoot(parentDef) &&
+      } else if (NodeDef.isKey(nodeDef) &&
+        !NodeDef.isRoot(parentDef) &&
         !R.isEmpty(Survey.getNodeDefKeys(parentDef)(survey))) {
         // updated node is the key of a non-root entity with keys
         return Record.getParentNode(node)(record)

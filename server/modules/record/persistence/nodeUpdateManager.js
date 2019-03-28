@@ -31,7 +31,7 @@ const persistNode = async (user, survey, record, node, t) => {
     if (!Record.isPreview(record))
       await ActivityLog.log(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
 
-    const nodeValue = Node.getNodeValue(node)
+    const nodeValue = Node.getValue(node)
     const meta = { [Node.metaKeys.defaultValue]: false }
     const nodeUpdate = await NodeRepository.updateNode(surveyId, nodeUuid, nodeValue, meta, t)
 
@@ -51,9 +51,9 @@ const insertNode = async (survey, record, node, user, t) => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
   // If it's a code, don't insert if it has been inserted already (by another user)
-  if (NodeDef.isNodeDefCode(nodeDef)) {
+  if (NodeDef.isCode(nodeDef)) {
     const siblings = Record.getNodeSiblingsByDefUuid(node, nodeDefUuid)(record)
-    if (R.any(sibling => R.equals(Node.getNodeValue(sibling), Node.getNodeValue(node)))(siblings)) {
+    if (R.any(sibling => R.equals(Node.getValue(sibling), Node.getValue(node)))(siblings)) {
       return {}
     }
   }
@@ -77,7 +77,7 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
   record = Record.assocNode(node)(record)
 
   // add children if entity
-  const childDefs = NodeDef.isNodeDefEntity(nodeDef)
+  const childDefs = NodeDef.isEntity(nodeDef)
     ? Survey.getNodeDefChildren(nodeDef)(survey)
     : []
 
@@ -85,7 +85,7 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
   const childNodes = R.mergeAll(
     await Promise.all(
       childDefs
-        .filter(NodeDef.isNodeDefSingle)
+        .filter(NodeDef.isSingle)
         .map(async childDef => {
             const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
             return await _insertNodeRecursively(survey, childDef, record, childNode, user, t)
@@ -108,7 +108,7 @@ const _onNodeUpdate = async (survey, record, node, t) => {
 
   // delete dependent code nodes
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-  if (NodeDef.isNodeDefCode(nodeDef)) {
+  if (NodeDef.isCode(nodeDef)) {
     const dependentCodes = Record.getDependentCodeAttributes(node)(record)
     if (!R.isEmpty(dependentCodes)) {
       const deletedNodesArray = await Promise.all(

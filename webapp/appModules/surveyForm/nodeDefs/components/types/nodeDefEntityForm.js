@@ -85,7 +85,7 @@ const EntityForm = props => {
           innerPageChildren
             .map((childDef, i) =>
               <div key={childDef.uuid} id={childDef.uuid}
-                   className={NodeDef.isNodeDefEntity(childDef) && isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
+                   className={NodeDef.isEntity(childDef) && isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
                 <NodeDefSwitch
                   key={i}
                   edit={edit}
@@ -173,7 +173,7 @@ class NodeDefEntityForm extends React.Component {
   checkNodePage () {
     const { nodeDef, setFormPageNode, nodes, entry } = this.props
 
-    if (entry && !NodeDef.isNodeDefMultiple(nodeDef)) {
+    if (entry && !NodeDef.isMultiple(nodeDef)) {
       const nodeUuid = R.pipe(
         R.head,
         R.prop('uuid')
@@ -205,7 +205,7 @@ class NodeDefEntityForm extends React.Component {
       getNodeKeyLabelValues,
     } = this.props
 
-    return entry && NodeDef.isNodeDefMultiple(nodeDef)
+    return entry && NodeDef.isMultiple(nodeDef)
       ? (
         <div className="node-def-entity-form__wrapper" ref={this.formWrapper}>
           <NodeDefErrorBadge
@@ -261,7 +261,7 @@ const mapStateToProps = (state, props) => {
 
   const recordValidation = Record.getValidation(record)
 
-  const validation = NodeDef.isNodeDefEntity(nodeDef)
+  const validation = NodeDef.isEntity(nodeDef)
     ? Validator.getFieldValidation(selectedNodeUuid)(recordValidation)
     : {}
 

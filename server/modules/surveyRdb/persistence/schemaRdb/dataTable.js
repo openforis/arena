@@ -13,11 +13,11 @@ const colNameParentUuuid = 'parent_uuid'
 const colNameRecordUuuid = 'record_uuid'
 
 const getNodeDefColumns = (survey, nodeDef) =>
-  NodeDef.isNodeDefEntity(nodeDef)
+  NodeDef.isEntity(nodeDef)
     ? (
       R.pipe(
         Survey.getNodeDefChildren(nodeDef),
-        R.filter(NodeDef.isNodeDefSingleAttribute),
+        R.filter(NodeDef.isSingleAttribute),
         R.sortBy(R.ascend(R.prop('id')))
       )(survey)
     )
@@ -28,13 +28,13 @@ const getName = NodeDefTable.getTableName
 
 const getColumnNames = (survey, nodeDef) => [
   colNameUuuid,
-  NodeDef.isNodeDefRoot(nodeDef) ? colNameRecordUuuid : colNameParentUuuid,
+  NodeDef.isRoot(nodeDef) ? colNameRecordUuuid : colNameParentUuuid,
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNames))
 ]
 
 const getColumnNamesAndType = (survey, nodeDef) => [
   colNameUuuid + ' uuid NOT NULL',
-  (NodeDef.isNodeDefRoot(nodeDef) ? colNameRecordUuuid : colNameParentUuuid) + ' uuid NOT NULL',
+  (NodeDef.isRoot(nodeDef) ? colNameRecordUuuid : colNameParentUuuid) + ' uuid NOT NULL',
   ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType))
 ]
 
@@ -45,28 +45,28 @@ const getParentForeignKey = (surveyId, schemaName, nodeDef, nodeDefParent = null
     REFERENCES ${schemaName}.${referencedTableName} (uuid) 
     ON DELETE CASCADE`
 
-  return NodeDef.isNodeDefRoot(nodeDef)
+  return NodeDef.isRoot(nodeDef)
     ? getConstraintFk(
       SurveyRepositoryUtils.getSurveyDBSchema(surveyId),
       'record',
-      NodeDef.getNodeDefName(nodeDef) + '_record',
+      NodeDef.getName(nodeDef) + '_record',
       colNameRecordUuuid
     )
     : getConstraintFk(
       schemaName,
       getName(nodeDefParent),
-      NodeDef.getNodeDefName(nodeDef) + '_' + NodeDef.getNodeDefName(nodeDefParent),
+      NodeDef.getName(nodeDef) + '_' + NodeDef.getName(nodeDefParent),
       colNameParentUuuid
     )
 }
 
-const getUuidUniqueConstraint = nodeDef => `CONSTRAINT ${NodeDef.getNodeDefName(nodeDef)}_uuid_unique_ix1 UNIQUE (${colNameUuuid})`
+const getUuidUniqueConstraint = nodeDef => `CONSTRAINT ${NodeDef.getName(nodeDef)}_uuid_unique_ix1 UNIQUE (${colNameUuuid})`
 
 const getRowValues = async (survey, nodeDef, record, node, client) => {
   const rowValues = await DataRow.getValues(Survey.getSurveyInfo(survey), nodeDef, record, node, getNodeDefColumns(survey, nodeDef), client)
   return [
     node.uuid,
-    NodeDef.isNodeDefRoot(nodeDef) ? record.uuid : Node.getParentUuid(node),
+    NodeDef.isRoot(nodeDef) ? record.uuid : Node.getParentUuid(node),
     ...R.flatten(rowValues)
   ]
 }
