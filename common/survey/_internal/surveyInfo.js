@@ -17,6 +17,7 @@ const keys = {
   labels: 'labels',
   steps: 'steps',
   authGroups: 'authGroups',
+  collectUri: 'collectUri',
 }
 
 const getInfo = R.propOr({}, keys.info)
@@ -64,6 +65,10 @@ const getStatus = surveyInfo =>
       ? 'DRAFT'
       : ''
 
+const getCollectUri = SurveyUtils.getProp(keys.collectUri)
+
+const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
+
 // ====== UTILS
 
 const isValid = surveyInfo => surveyInfo && surveyInfo.id
@@ -95,6 +100,8 @@ module.exports = {
   getDefaultLabel,
   getLabel,
   getStatus,
+  getCollectUri,
+  isFromCollect,
 
   // ====== AUTH GROUPS
   getAuthGroups,

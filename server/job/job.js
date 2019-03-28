@@ -140,8 +140,8 @@ class Job {
     }
   }
 
-  incrementProcessedItems () {
-    this.processed++
+  incrementProcessedItems (incrementBy = 1) {
+    this.processed += incrementBy
 
     throttle(
       async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),

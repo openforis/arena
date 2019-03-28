@@ -1,3 +1,6 @@
+const R = require('ramda')
+const Promise = require('axios')
+
 const Job = require('../../../../../job/job')
 
 const SurveyManager = require('../../../persistence/surveyManager')
@@ -37,13 +40,20 @@ class SurveyRdbGeneratorJob extends Job {
     await Survey.traverseHierarchyItem(root, createTable)
 
     //3 ==== insert records
-    const insertIntoTable = record => async (nodeDef) => {
-      await SurveyRdbManager.insertIntoTable(survey, nodeDef, record, tx)
-      this.incrementProcessedItems()
-    }
-    for (const recordUuid of recordUuids) {
-      const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, tx)
-      await Survey.traverseHierarchyItem(root, insertIntoTable(record))
+    const insertIntoTable = records =>
+      async nodeDef => {
+        await SurveyRdbManager.insertIntoTable(survey, nodeDef, records, tx)
+        this.incrementProcessedItems(records.length)
+      }
+
+    const recordsUuidGroups = R.splitEvery(50, recordUuids)
+    for (const recordUuids of recordsUuidGroups) {
+      const records = await Promise.all(
+        recordUuids.map(async recordUuid =>
+          await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, tx)
+        )
+      )
+      await Survey.traverseHierarchyItem(root, insertIntoTable(records))
     }
   }
 

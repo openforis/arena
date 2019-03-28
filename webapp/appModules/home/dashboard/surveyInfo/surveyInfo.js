@@ -34,8 +34,7 @@ class SurveyInfo extends React.Component {
   render () {
     const {
       surveyInfo, lang, canEditDef,
-      publishSurvey, deleteSurvey,
-      showCollectImportReportButton,
+      publishSurvey, deleteSurvey
     } = this.props
     const { showDeleteDialog } = this.state
 
@@ -84,10 +83,10 @@ class SurveyInfo extends React.Component {
               </button>
             }
             {
-              showCollectImportReportButton &&
+              Survey.isFromCollect(surveyInfo) &&
               <Link to={appModuleUri(homeModules.collectImportReport)}
                     className="btn btn-of-light">
-                Collect Import Report
+                <span className="icon icon-warning icon-12px icon-left"/> Collect Import Report
               </Link>
             }
           </div>
@@ -131,13 +130,11 @@ const mapStateToProps = state => {
   const user = AppState.getUser(state)
   const surveyInfo = SurveyState.getStateSurveyInfo(state)
   const lang = Survey.getDefaultLanguage(surveyInfo)
-  const showCollectImportReportButton = false //SurveyState.hasCollectImportReport(state)
 
   return {
     surveyInfo,
     lang,
-    canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
-    showCollectImportReportButton
+    canEditDef: AuthManager.canEditSurvey(user, surveyInfo)
   }
 }
 

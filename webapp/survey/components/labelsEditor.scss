@@ -2,21 +2,23 @@
 
 .labels-editor {
 
+  display: grid;
+  grid-template-columns: 25px 1fr;
+  grid-column-gap: 1rem;
+
+  &.with-label {
+    grid-template-columns: .2fr .7fr;
+  }
+
+  .labels-editor-label {
+    text-align: end;
+  }
+
   .btn-toggle-labels {
     padding: .4rem;
     border-color: rgba($white, 0.5) !important;
     margin-left: .5rem;
     height: 30px;
-  }
-}
-
-.labels-editor {
-  display: grid;
-  grid-template-columns: .2fr .7fr;
-  grid-column-gap: 1rem;
-
-  .labels-editor-label {
-    text-align: end;
   }
 }
 

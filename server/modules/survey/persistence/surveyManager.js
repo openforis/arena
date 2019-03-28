@@ -3,7 +3,6 @@ const R = require('ramda')
 const db = require('../../../db/db')
 const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
 const { uuidv4 } = require('../../../../common/uuid')
-const { getSurveyDBSchema } = require('./surveySchemaRepositoryUtils')
 const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
 
 const SurveyRepository = require('./surveyRepository')
@@ -24,7 +23,7 @@ const ActivityLog = require('../../activityLog/activityLogger')
 const assocSurveyInfo = info => ({ info })
 
 // ====== CREATE
-const createSurvey = async (user, { name, label, lang }, createRootEntity = true, client = db) => {
+const createSurvey = async (user, { name, label, lang, collectUri = null }, createRootEntity = true, client = db) => {
 
   const survey = await client.tx(
     async t => {
@@ -33,6 +32,9 @@ const createSurvey = async (user, { name, label, lang }, createRootEntity = true
         labels: { [lang]: label },
         languages: [lang],
         srs: [{ code: '4326', name: 'GCS WGS 1984' }], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
+        ...collectUri
+          ? { collectUri }
+          : {}
       }
 
       const userId = user.id

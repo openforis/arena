@@ -31,6 +31,8 @@ module.exports = {
   isPublished: SurveyInfo.isPublished,
   isDraft: SurveyInfo.isDraft,
   isValid: SurveyInfo.isValid,
+  isFromCollect: SurveyInfo.isFromCollect,
+  getCollectUri: SurveyInfo.getCollectUri,
 
   getAuthGroups: SurveyInfo.getAuthGroups,
   getSurveyAdminGroup: SurveyInfo.getSurveyAdminGroup,

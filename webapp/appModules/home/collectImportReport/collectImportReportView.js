@@ -52,6 +52,7 @@ const NodeDefReportItem = ({ survey, nodeDefUuid, nodeDefItems, updateCollectImp
                 readOnly={true}
                 showFormLabel={false}
                 maxPreview={1}
+                compactLanguage={true}
               />
             </div>
             <div>
