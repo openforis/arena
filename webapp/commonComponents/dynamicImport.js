@@ -5,14 +5,15 @@ export default class DynamicImport extends React.Component {
 
   constructor () {
     super()
-    this.state = {component: null}
+    this.state = { component: null }
   }
 
-  componentWillMount () {
-    const {load} = this.props
+  componentDidMount () {
+
+    const { load } = this.props
 
     load().then((module) => {
-      const {component, reducers} = module
+      const { component, reducers } = module
 
       if (reducers) {
         reducers.forEach((reducer) => {
@@ -28,6 +29,10 @@ export default class DynamicImport extends React.Component {
   }
 
   render () {
-    return this.props.children(this.state.component)
+    const { component } = this.state
+    const { module, ...rest } = this.props
+    return component
+      ? React.createElement(component, rest)
+      : null
   }
 }
