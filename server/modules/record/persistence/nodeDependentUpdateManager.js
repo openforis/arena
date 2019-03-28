@@ -10,11 +10,11 @@ const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 
-const { dependencyTypes } = require('../../survey/surveyDependenchyGraph')
-
 const NodeDependencyManager = require('./nodeDependencyManager')
 
 const RecordExprParser = require('../recordExprParser')
+
+const { dependencyTypes } = Survey
 
 /**
  * Module responsible for updating applicable and default values

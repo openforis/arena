@@ -1,8 +1,8 @@
 const Job = require('../../../../../job/job')
 
-const SurveyManager = require('../../../persistence/surveyManager')
+const Survey = require('../../../../../../common/survey/survey')
 
-const SurveyDependencyGraph = require('../../../surveyDependenchyGraph')
+const SurveyManager = require('../../../persistence/surveyManager')
 
 class SurveyDependencyGraphsGenerationJob extends Job {
 
@@ -11,10 +11,11 @@ class SurveyDependencyGraphsGenerationJob extends Job {
   }
 
   async execute (tx) {
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.getSurveyId(), false, true, false, tx)
-    const graph = SurveyDependencyGraph.buildGraph(survey)
+    const surveyId = this.getSurveyId()
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, false, true, false, tx)
+    const graph = Survey.buildDependencyGraph(survey)
 
-    await SurveyManager.updateSurveyDependencyGraphs(this.getSurveyId(), graph, tx)
+    await SurveyManager.updateSurveyDependencyGraphs(surveyId, graph, tx)
   }
 }
 

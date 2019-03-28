@@ -8,10 +8,9 @@ const CategoriesImportJob = require('./metaImportJobs/categoriesImportJob')
 const TaxonomiesImportJob = require('./metaImportJobs/taxonomiesImportJob')
 const NodeDefsImportJob = require('./metaImportJobs/nodeDefsImportJob')
 const RecordsImportJob = require('./dataImportJobs/recordsImportJob')
-const SurveyPropsPublishJob = require('../../../survey/service/publish/jobs/surveyPropsPublishJob')
-const SurveyDependencyGraphsGenerationJob = require('../../../survey/service/publish/jobs/surveyDependencyGraphsGenerationJob')
-const SurveyRdbGeneratorJob = require('../../../survey/service/publish/jobs/surveyRdbGeneratorJob')
-const RecordCheckJob = require('../../../survey/service/publish/jobs/recordCheckJob')
+const SurveyPublishPerformJob = require('../../../survey/service/publish/surveyPublishPerformJob')
+const SurveyRdbGeneratorJob = require('../../../survey/service/surveyRdbGeneratorJob')
+const RecordCheckJob = require('../../../survey/service/recordCheckJob')
 
 class CollectImportJob extends Job {
 
@@ -23,8 +22,7 @@ class CollectImportJob extends Job {
       new TaxonomiesImportJob(),
       new NodeDefsImportJob(),
       //publish survey
-      new SurveyPropsPublishJob(),
-      new SurveyDependencyGraphsGenerationJob(),
+      new SurveyPublishPerformJob(),
       //import records
       new RecordsImportJob(),
       new RecordCheckJob(),

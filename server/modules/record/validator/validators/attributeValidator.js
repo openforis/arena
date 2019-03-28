@@ -5,7 +5,6 @@ const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
 const NodeDefValidations = require('../../../../../common/survey/nodeDefValidations')
-const { dependencyTypes } = require('../../../survey/surveyDependenchyGraph')
 const Validator = require('../../../../../common/validation/validator')
 const Node = require('../../../../../common/record/node')
 
@@ -96,7 +95,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes, tx) => 
   const attributeValidationsArray = await Promise.all(
     attributes.map(
       async attribute => {
-        const dependents = NodeDependencyManager.fetchDependentNodes(survey, record, attribute, dependencyTypes.validations)
+        const dependents = NodeDependencyManager.fetchDependentNodes(survey, record, attribute, Survey.dependencyTypes.validations)
 
         // include attribute itself if it's not already included among dependents
         const attributeAndDependents =

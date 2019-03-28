@@ -11,13 +11,11 @@ const NodeRepository = require('./nodeRepository')
 const CategoryRepository = require('../../category/persistence/categoryRepository')
 const TaxonomyRepository = require('../../taxonomy/persistence/taxonomyRepository')
 
-const { dependencyTypes } = require('../../survey/surveyDependenchyGraph')
-
 const fetchDependentNodes = (survey, record, node, dependencyType) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const dependentUuids = Survey.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
-  const isDependencyApplicable = dependencyType === dependencyTypes.applicable
+  const isDependencyApplicable = dependencyType === Survey.dependencyTypes.applicable
 
   if (dependentUuids) {
     const dependentDefs = Survey.getNodeDefsByUuids(dependentUuids)(survey)
