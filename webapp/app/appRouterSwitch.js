@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { Switch, Route } from 'react-router'
+import { withRouter, Switch, Route } from 'react-router-dom'
 import { TransitionGroup, Transition } from 'react-transition-group'
 import DynamicImport from '../commonComponents/dynamicImport'
 
@@ -98,12 +97,16 @@ class AppRouterSwitch extends React.Component {
 
                       <Switch location={location}>
 
-                        <Route exact path="/" component={LoginView}/>
-                        <Route path="/app" render={(props) =>
-                          <DynamicImport load={() => import('../appModules/appView/appViewExport')}>
-                            {(Component) => Component === null ? null : <Component {...props} />}
-                          </DynamicImport>
-                        }/>
+                        <Route
+                          exact path="/"
+                          component={LoginView}
+                        />
+                        <Route
+                          path="/app"
+                          render={props => (
+                            <DynamicImport {...props} load={() => import('../appModules/appView/appViewExport')}/>
+                          )}
+                        />
 
                       </Switch>
 
