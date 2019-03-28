@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Switch, Route } from 'react-router-dom'
-import { TransitionGroup, Transition } from 'react-transition-group'
 import DynamicImport from '../commonComponents/dynamicImport'
 
 import LoginView from '../login/components/loginView'
