@@ -6,9 +6,6 @@ import { showAppJobMonitor } from '../../appView/components/job/actions'
 
 import * as SurveyCreateState from './surveyCreateState'
 
-import { appModuleUri } from '../../appModules'
-import { homeModules } from '../homeModules'
-
 export const surveyCreateNewSurveyUpdate = 'surveyCreate/newSurvey/update'
 
 export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
@@ -42,7 +39,7 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
   }
 
 }
-export const importCollectSurvey = (file, history) =>
+export const importCollectSurvey = file =>
   async dispatch => {
     const formData = new FormData()
     formData.append('file', file)
@@ -54,12 +51,5 @@ export const importCollectSurvey = (file, history) =>
     dispatch(showAppJobMonitor(data.job, async (job) => {
       const surveyId = job.result.surveyId
       dispatch(setActiveSurvey(surveyId, false))
-      //TODO : show Collect import report (if any)
-      /*
-      const { data } = await axios.get(`/api/survey/${surveyId}/collect-import/report/count`)
-      if (data.count > 0) {
-        history.push(appModuleUri(homeModules.collectImportReport))
-      }
-      */
     }))
   }

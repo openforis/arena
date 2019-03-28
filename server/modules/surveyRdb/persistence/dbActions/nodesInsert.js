@@ -46,9 +46,12 @@ const run = async (survey, nodeDef, records, client) => {
   if (insertValues.length > 0) {
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
 
+    const schema = SchemaRdb.getName(Survey.getId(survey))
+    const table = DataTable.getName(nodeDef, nodeDefParent)
+
     await client.none(insertAllQuery(
-      SchemaRdb.getName(Survey.getId(survey)),
-      DataTable.getName(nodeDef, nodeDefParent),
+      schema,
+      table,
       DataTable.getColumnNames(survey, nodeDef),
       insertValues
     ))

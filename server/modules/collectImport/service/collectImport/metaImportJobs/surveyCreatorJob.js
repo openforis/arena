@@ -17,9 +17,9 @@ class SurveyCreatorJob extends Job {
   async execute (tx) {
     const { collectSurvey } = this.context
 
-    const uri = CollectIdmlParseUtils.getChildElementText('uri')(collectSurvey)
+    const collectUri = CollectIdmlParseUtils.getChildElementText('uri')(collectSurvey)
 
-    const name = R.pipe(R.split('/'), R.last)(uri)
+    const name = R.pipe(R.split('/'), R.last)(collectUri)
 
     const languages = R.pipe(
       CollectIdmlParseUtils.getElementsByName('language'),
@@ -31,7 +31,12 @@ class SurveyCreatorJob extends Job {
     const collectProjectLabels = CollectIdmlParseUtils.getElementsByName('project')(collectSurvey)
     const label = CollectIdmlParseUtils.toLabels(collectProjectLabels, defaultLanguage)[defaultLanguage]
 
-    const survey = await SurveyManager.createSurvey(this.getUser(), { name, label, lang: defaultLanguage }, false, tx)
+    const survey = await SurveyManager.createSurvey(this.getUser(), {
+      name,
+      label,
+      lang: defaultLanguage,
+      collectUri
+    }, false, tx)
 
     const surveyId = Survey.getId(survey)
 

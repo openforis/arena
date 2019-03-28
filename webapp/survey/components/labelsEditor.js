@@ -11,20 +11,20 @@ import { getLanguageLabel } from '../../../common/app/languages'
 
 import { Input } from '../../commonComponents/form/input'
 
-const LanguageBadge = ({ lang }) => (
-  <div className="badge-of labels-editor__label-lang-badge">
+const LanguageBadge = ({ lang, compact }) => (
+  <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang): null}>
     {
-      getLanguageLabel(lang)
+      compact ? lang : getLanguageLabel(lang)
     }
   </div>
 )
 
-const LabelRow = ({ label = '', lang, onChange, readOnly, showLanguageBadge = true }) => (
+const LabelRow = ({ label = '', lang, onChange, readOnly, showLanguageBadge = true, compactLanguage }) => (
   <div className="labels-editor__label">
 
     {
       showLanguageBadge &&
-      <LanguageBadge lang={lang}/>
+      <LanguageBadge lang={lang} compact={compactLanguage}/>
     }
 
     <Input value={label}
@@ -58,6 +58,7 @@ class LabelsEditor extends React.Component {
       maxPreview,
       canTogglePreview,
       readOnly,
+      compactLanguage
     } = this.props
 
     const displayLangs = this.isPreview()
@@ -66,8 +67,10 @@ class LabelsEditor extends React.Component {
 
     const _canTogglePreview = canTogglePreview && languages.length > maxPreview
 
+    const className = `labels-editor ${showFormLabel ? 'with-label' : ''}`
+
     return (
-      <div className="labels-editor" ref="elem">
+      <div className={className} ref="elem">
         <div className="labels-editor-label">
           {
             showFormLabel &&
@@ -95,10 +98,12 @@ class LabelsEditor extends React.Component {
                         label={R.prop(lang)(labels)}
                         onChange={onChange}
                         readOnly={readOnly}
-                        showLanguageBadge={languages.length > 1}/>
+                        showLanguageBadge={languages.length > 1}
+                        compactLanguage={compactLanguage}/>
             )
           }
         </div>
+
       </div>
     )
   }
@@ -110,10 +115,11 @@ LabelsEditor.defaultProps = {
   labels: [],
   showFormLabel: true,
   formLabel: 'Label(s)',
-  onChange: null,
   maxPreview: 2,
   canTogglePreview: true,
   readOnly: false,
+  compactLanguage: false,
+  onChange: null,
 }
 
 const mapStateToProps = state => ({

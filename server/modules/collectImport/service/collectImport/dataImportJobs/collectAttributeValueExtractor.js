@@ -55,14 +55,17 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
     case nodeDefType.code: {
       const code = CollectRecordParseUtils.getTextValue('code')(collectNode)
 
-      const categoryUuid = NodeDef.getNodeDefCategoryUuid(nodeDef)
-      const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-      const items = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, levelIndex, false, tx)
-      const item = R.find(item => Category.getItemCode(item) === code, items)
+      if (code) {
+        const categoryUuid = NodeDef.getNodeDefCategoryUuid(nodeDef)
+        const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+        const item = await CategoryManager.findItemByCode(surveyId, categoryUuid, levelIndex, code, false, tx)
 
-      return item
-        ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) }
-        : null
+        return item
+          ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) }
+          : null
+      } else {
+        return null
+      }
     }
     case nodeDefType.coordinate: {
       const { x, y, srs } = CollectRecordParseUtils.getTextValues(collectNode)
