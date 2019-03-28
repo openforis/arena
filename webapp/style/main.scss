@@ -29,9 +29,40 @@ body {
   background-position: center;
 }
 
+@keyframes main__bg1-login {
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.1, 1.1);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+@keyframes main__bg2-login {
+  0% {
+    transform: scale(1.1, 1.1);
+    opacity: .9;
+  }
+  50% {
+    transform: scale(1.5, 1.5);
+    opacity: .65;
+  }
+  100% {
+    transform: scale(1.1, 1.1);
+    opacity: .9;
+  }
+}
+
 .main__bg1 {
   @extend .main__bg;
   background-image: url("/img/landing-bg.jpg");
+
+  &.login {
+    animation: main__bg1-login 16s infinite;
+  }
 }
 
 .main__bg2 {
@@ -39,6 +70,10 @@ body {
   background-image: url("/img/landing-bg2.jpg");
   transform: scale(1.1, 1.1);
   opacity: .9;
+
+  &.login {
+    animation: main__bg1-login 22s infinite;
+  }
 }
 
 .main__bg-overlay:after {
