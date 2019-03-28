@@ -28,7 +28,7 @@ class SurveyPropsPublishJob extends Job {
   async execute (tx) {
     this.total = 8
 
-    const id = this.surveyId
+    const id = this.getSurveyId()
 
     const deletedLanguages = await determineDeletedLanguages(id, tx)
     this.incrementProcessedItems()
@@ -51,12 +51,12 @@ class SurveyPropsPublishJob extends Job {
     await this.removeDeletedLanguagesLabels(deletedLanguages, tx)
     this.incrementProcessedItems()
 
-    await ActivityLog.log(this.user, id, ActivityLog.type.surveyPublish, {surveyUuid: surveyInfo.uuid}, tx)
+    await ActivityLog.log(this.getUser(), id, ActivityLog.type.surveyPublish, {surveyUuid: surveyInfo.uuid}, tx)
     this.incrementProcessedItems()
   }
 
   async removeDeletedLanguagesLabels (deletedLanguages, t) {
-    const surveyId = this.params.surveyId
+    const surveyId = this.getSurveyId()
 
     for (const langCode of deletedLanguages) {
 

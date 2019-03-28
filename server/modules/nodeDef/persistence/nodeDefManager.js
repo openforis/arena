@@ -63,13 +63,13 @@ const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, v
 
 // ======= UPDATE
 
-const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props) =>
-  await db.tx(async t => {
-    const nodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, t)
+const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
+  await client.tx(async t => {
+    const nodeDef = await NodeDefRepository.updateNodeDefProps(surveyId, nodeDefUuid, props, propsAdvanced, t)
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, {nodeDefUuid, props}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, {nodeDefUuid, props, propsAdvanced}, t)
 
     return nodeDef
   })

@@ -17,13 +17,14 @@ class UploadButton extends React.Component {
   }
 
   render () {
-    const {disabled, label, onChange, showLabel, maxSize} = this.props
+    const {disabled, label, onChange, showLabel, maxSize, accept} = this.props
 
     return <React.Fragment>
       <input
         ref={this.fileInput}
         type="file"
         style={{display: 'none'}}
+        accept={accept}
         onChange={() => {
           const files = this.fileInput.current.files
           if (checkFilesSize(files, maxSize)) {
@@ -51,7 +52,8 @@ UploadButton.defaultProps = {
   label: 'Upload',
   onChange: null,
   showLabel: true,
-  maxSize: 10 //mega bytes
+  maxSize: 10, //mega bytes
+  accept: null //e.g. .txt, .xls (null = all type of files are accepted)
 }
 
 export default UploadButton

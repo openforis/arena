@@ -125,7 +125,7 @@ const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
 
 // ============== DELETE
 
-const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
+const deleteRecord = async (surveyId, recordUuid, client = db) =>
   await client.query(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.record
     WHERE uuid = $1
@@ -134,11 +134,13 @@ const deleteRecord = async (user, surveyId, recordUuid, client = db) =>
   )
 
 const deleteRecordsPreview = async (surveyId, client = db) =>
-  await client.any(`
+  await client.map(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.record
     WHERE preview = $1
+    RETURNING uuid
     `,
-    [true]
+    [true],
+    R.prop('uuid')
   )
 
 module.exports = {

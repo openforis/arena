@@ -1,6 +1,9 @@
 const R = require('ramda')
 
 const db = require('../../../db/db')
+const { insertAllQuery } = require('../../../db/dbUtils')
+
+const Category = require('../../../../common/survey/category')
 
 const {
   getSurveyDBSchema,
@@ -38,6 +41,21 @@ const insertItem = async (surveyId, item, client = db) =>
     [item.uuid, item.levelUuid, item.parentUuid, item.props],
     def => dbTransformCallback(def, true, true)
   )
+
+const insertItems = async (surveyId, items, client = db) => {
+  const values = items.map(item => [
+    Category.getUuid(item),
+    Category.getItemLevelUuid(item),
+    Category.getItemParentUuid(item),
+    item.props
+  ])
+  await client.none(insertAllQuery(
+    getSurveyDBSchema(surveyId),
+    'category_item',
+    ['uuid', 'level_uuid', 'parent_uuid', 'props_draft'],
+    values
+  ))
+}
 
 // ============== READ
 
@@ -119,6 +137,26 @@ const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft 
     item => dbTransformCallback(item, draft, true)
   )
 
+const findItemByCode = async (surveyId, categoryUuid, levelIndex, code, draft = false, client = db) => {
+  const codeCol = draft
+    ? `COALESCE(i.props_draft->>'code', i.props->>'code')`
+    : `i.props->>'code'`
+
+  const items = await client.map(
+    `SELECT i.* 
+     FROM ${getSurveyDBSchema(surveyId)}.category_item i
+       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+         ON l.uuid = i.level_uuid
+     WHERE l.category_uuid = $1
+       AND l.index = $2
+       AND ${codeCol} = $3`,
+    [categoryUuid, levelIndex, code],
+    item => dbTransformCallback(item, draft, true)
+  )
+
+  return R.head(items)
+}
+
 // ============== UPDATE
 
 const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
@@ -149,6 +187,7 @@ module.exports = {
   insertCategory,
   insertLevel,
   insertItem,
+  insertItems,
 
   //READ
   fetchCategoriesBySurveyId,
@@ -157,6 +196,7 @@ module.exports = {
   fetchItemsByParentUuid,
   fetchItemByUuid,
   fetchItemsByLevelIndex,
+  findItemByCode,
 
   //UPDATE
   updateCategoryProp,

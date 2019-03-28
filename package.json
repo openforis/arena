@@ -94,7 +94,8 @@
     "socketio": "^1.0.0",
     "text-mask-addons": "^3.8.0",
     "to-snake-case": "^1.0.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "xml-js": "^1.6.11"
   },
   "browserslist": [
     "last 2 versions"

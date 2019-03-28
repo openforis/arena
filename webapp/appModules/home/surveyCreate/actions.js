@@ -1,12 +1,10 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { surveyCreate } from '../../../survey/actions'
+import { surveyCreate, setActiveSurvey } from '../../../survey/actions'
 import { showAppJobMonitor } from '../../appView/components/job/actions'
 
 import * as SurveyCreateState from './surveyCreateState'
-
-import { fetchSurveys } from '../surveyList/actions'
 
 export const surveyCreateNewSurveyUpdate = 'surveyCreate/newSurvey/update'
 
@@ -50,8 +48,8 @@ export const importCollectSurvey = file =>
 
     const { data } = await axios.post(`/api/survey/collect-import`, formData, config)
 
-    dispatch(showAppJobMonitor(data.job, () => {
-      //TODO REMOVE THIS. dispatchCurrentSurveyUpdate should be dispatched. get survey from response
-      dispatch(fetchSurveys())
+    dispatch(showAppJobMonitor(data.job, async (job) => {
+      const surveyId = job.result.surveyId
+      dispatch(setActiveSurvey(surveyId, false))
     }))
   }

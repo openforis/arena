@@ -56,7 +56,7 @@ const importTaxonomy = (user, surveyId, taxonomyUuid, filePath) => {
 }
 
 module.exports = {
-  createTaxonomy: TaxonomyManager.createTaxonomy,
+  insertTaxonomy: TaxonomyManager.insertTaxonomy,
 
   fetchTaxonomyByUuid: TaxonomyManager.fetchTaxonomyByUuid,
   fetchTaxonomiesBySurveyId: TaxonomyManager.fetchTaxonomiesBySurveyId,
@@ -70,7 +70,6 @@ module.exports = {
   fetchTaxonVernacularNameByUuid: TaxonomyManager.fetchTaxonVernacularNameByUuid,
 
   // update
-  updateTaxonomyProp: TaxonomyManager.updateTaxonomyProp,
   updateTaxonomyProp: TaxonomyManager.updateTaxonomyProp,
 
   // delete

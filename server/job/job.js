@@ -2,7 +2,7 @@ const db = require('../db/db')
 const { uuidv4 } = require('../../common/uuid')
 
 const { jobEvents, jobStatus } = require('./jobUtils')
-const { throttle } = require('../../common/functionsDefer')
+const { throttle, cancelThrottle } = require('../../common/functionsDefer')
 
 class JobEvent {
 
@@ -14,16 +14,22 @@ class JobEvent {
   }
 }
 
+/**
+ * Methods that can be overwritten by subclasses:
+ * - onStart
+ * - execute
+ * - prepareResult
+ * - onEnd
+ */
 class Job {
 
-  constructor (type, params, innerJobs = []) {
+  constructor (type, params = {}, innerJobs = []) {
     this.params = params
 
-    const { user, surveyId } = params
-
-    this.user = user
-    this.userId = user.id
-    this.surveyId = surveyId
+    // context object (shared among nested jobs)
+    this.context = {
+      ...params
+    }
 
     this.uuid = uuidv4()
     this.type = type
@@ -34,8 +40,6 @@ class Job {
     this.processed = 0
     this.result = {}
     this.errors = {}
-    this.context = {} // object shared among nested jobs
-
     this.innerJobs = innerJobs
     this.currentInnerJobIndex = -1
 
@@ -52,27 +56,31 @@ class Job {
    */
   async start (client = db) {
     await client.tx(async tx => {
-      this.setStatus(jobStatus.running)
-      this.startTime = new Date()
+      try {
+        this.tx = tx
+        await this.onStart()
 
-      if (this.innerJobs.length > 0) {
-        await this.executeInnerJobs(tx)
-      } else {
-        try {
+        if (this.innerJobs.length > 0) {
+          await this._executeInnerJobs()
+        } else {
           await this.execute(tx)
-        } catch (e) {
-          console.log('** Error in job ', e)
-          this.addError({ systemError: { valid: false, errors: [e.toString()] } })
-          this.setStatusFailed()
         }
+        if (this.isRunning()) {
+          await this.prepareResult()
+          await this._setStatusSucceeded()
+        }
+      } catch (e) {
+        console.log('** Error in job ', e)
+        this.addError({ systemError: { valid: false, errors: [e.toString()] } })
+        if (this.isRunning())
+          await this._setStatusFailed()
+      } finally {
+        this.tx = null
       }
-      if (!this.isRunning()) {
+      if (!this.isSucceeded()) {
         throw new Error('Job canceled or errors found; rollback transaction')
       }
     })
-    if (this.isRunning()) {
-      this.setStatusSucceeded()
-    }
   }
 
   addError (error) {
@@ -87,53 +95,8 @@ class Job {
    */
   async execute (tx) {}
 
-  async executeInnerJobs (tx) {
-    this.total = this.innerJobs.length
-
-    //start each inner job and wait for it's completion before starting next one
-    for (const innerJob of this.innerJobs) {
-      ++this.currentInnerJobIndex
-
-      innerJob.context = this.context
-
-      innerJob.onEvent(this.handleInnerJobEvent.bind(this))
-
-      await innerJob.start(tx)
-
-      if (innerJob.isSuccedeed()) {
-        this.incrementProcessedItems()
-      } else {
-        break
-      }
-    }
-  }
-
-  getCurrentInnerJob () {
-    return this.innerJobs[this.currentInnerJobIndex]
-  }
-
-  handleInnerJobEvent (event) {
-    this.notifyEvent(event) //propagate events to parent job
-
-    switch (event.status) {
-      case jobStatus.failed:
-      case jobStatus.canceled:
-        //cancel or fail even parent job
-        this.setStatus(event.status)
-        break
-    }
-  }
-
-  cancel () {
-    if (this.currentInnerJobIndex >= 0) {
-      const innerJob = this.getCurrentInnerJob()
-      if (innerJob.isRunning()) {
-        innerJob.cancel()
-        //parent job will be canceled by the inner job event listener
-      }
-    } else {
-      this.setStatus(jobStatus.canceled)
-    }
+  async prepareResult() {
+    //to be extended by subclasses
   }
 
   onEvent (listener) {
@@ -149,8 +112,8 @@ class Job {
     return this.status === jobStatus.running
   }
 
-  isSuccedeed () {
-    return this.status = jobStatus.succeeded
+  isSucceeded () {
+    return this.status === jobStatus.succeeded
   }
 
   isEnded () {
@@ -164,53 +127,40 @@ class Job {
     }
   }
 
-  setStatus (status) {
-    this.status = status
-
-    const event = this.createJobEvent(jobEvents.statusChange)
-    if (this.status === jobStatus.failed) {
-      event.errors = this.errors
-    }
-    this.notifyEvent(event)
-
-    if (this.status === jobStatus.succeeded
-      || this.status === jobStatus.failed) {
-      this.onFinish()
+  // DO NOT OVERWRITE IT
+  async cancel () {
+    if (this.currentInnerJobIndex >= 0) {
+      const innerJob = this.getCurrentInnerJob()
+      if (innerJob.isRunning()) {
+        await innerJob.cancel()
+        //parent job will be canceled by the inner job event listener
+      }
+    } else {
+      await this._setStatus(jobStatus.canceled)
     }
   }
 
-  setStatusSucceeded () {
-    this.setStatus(jobStatus.succeeded)
-  }
-
-  setStatusFailed () {
-    this.setStatus(jobStatus.failed)
-  }
-
-  incrementProcessedItems () {
-    this.processed++
+  incrementProcessedItems (incrementBy = 1) {
+    this.processed += incrementBy
 
     throttle(
-      () => this.notifyEvent(this.createJobEvent(jobEvents.progress)),
-      `job-${this.uuid}-progress`,
+      async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
+      this._getProgressThrottleId,
       1000
     )()
   }
 
-  notifyEvent (event) {
-    if (this.eventListener) {
-      this.eventListener(event)
-    }
+  async onStart () {
+    this.startTime = new Date()
+    await this._setStatus(jobStatus.running)
   }
 
-  createJobEvent (type) {
-    return new JobEvent(type, this.status, this.total, this.processed)
+  async onEnd () {
+    this.endTime = new Date()
+    cancelThrottle(this._getProgressThrottleId())
   }
 
-  onFinish () {
-    // to be extended by subclasses
-  }
-
+  // UTILS
   getContextProp (prop, defaultValue = null) {
     const value = this.context[prop]
     return value ? value : defaultValue
@@ -218,6 +168,101 @@ class Job {
 
   setContext (context) {
     Object.assign(this.context, context)
+  }
+
+  setResult (result) {
+    Object.assign(this.result, result)
+  }
+
+  getSurvey () {
+    return this.getContextProp('survey')
+  }
+
+  getSurveyId () {
+    return this.getContextProp('surveyId')
+  }
+
+  getUser () {
+    return this.getContextProp('user')
+  }
+
+  getUserId () {
+    const user = this.getUser()
+    return user ? user.id : null
+  }
+
+  // INTERNAL METHODS
+  async _executeInnerJobs () {
+    this.total = this.innerJobs.length
+
+    //start each inner job and wait for it's completion before starting next one
+    for (const innerJob of this.innerJobs) {
+      ++this.currentInnerJobIndex
+
+      innerJob.context = this.context
+
+      innerJob.onEvent(this._handleInnerJobEvent.bind(this))
+
+      await innerJob.start(this.tx)
+
+      if (innerJob.isSucceeded())
+        this.incrementProcessedItems()
+      else
+        break
+    }
+  }
+
+  getCurrentInnerJob () {
+    return this.innerJobs[this.currentInnerJobIndex]
+  }
+
+  async _handleInnerJobEvent (event) {
+    switch (event.status) {
+      case jobStatus.failed:
+      case jobStatus.canceled:
+        //cancel or fail even parent job
+        await this._setStatus(event.status)
+        break
+      default:
+        await this._notifyEvent(event) //propagate events to parent job
+    }
+  }
+
+  async _setStatus (status) {
+    this.status = status
+
+    const event = this._createJobEvent(jobEvents.statusChange)
+
+    if (this.status === jobStatus.failed) {
+      event.errors = this.errors
+    }
+
+    if (this.isEnded())
+      await this.onEnd()
+
+    await this._notifyEvent(event)
+  }
+
+  async _setStatusSucceeded () {
+    await this._setStatus(jobStatus.succeeded)
+  }
+
+  async _setStatusFailed () {
+    await this._setStatus(jobStatus.failed)
+  }
+
+  async _notifyEvent (event) {
+    if (this.eventListener) {
+      this.eventListener(event)
+    }
+  }
+
+  _createJobEvent (type) {
+    return new JobEvent(type, this.status, this.total, this.processed)
+  }
+
+  _getProgressThrottleId () {
+    return `job-${this.uuid}-progress`
   }
 }
 

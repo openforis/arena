@@ -19,7 +19,7 @@ const SurveyCreateView = (props) => {
 
   const {
     newSurvey,
-    updateNewSurveyProp, createSurvey, importCollectSurvey,
+    updateNewSurveyProp, createSurvey, importCollectSurvey
   } = props
 
   const { name, label, lang, validation } = newSurvey
@@ -55,6 +55,8 @@ const SurveyCreateView = (props) => {
 
       <UploadButton
         label="Import from Collect"
+        accept={'.collect-backup'}
+        maxSize={1000}
         onChange={files => importCollectSurvey(files[0])}/>
     </div>
   )

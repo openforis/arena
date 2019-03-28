@@ -11,12 +11,12 @@ import Survey from '../../../../../common/survey/survey'
 import AuthManager from '../../../../../common/auth/authManager'
 import Validator from '../../../../../common/validation/validator'
 
+import * as AppState from '../../../../app/appState'
+import * as SurveyState from '../../../../survey/surveyState'
+
 import { appModuleUri } from '../../../appModules'
 import { designerModules } from '../../../designer/designerModules'
 import { homeModules } from '../../homeModules'
-
-import * as AppState from '../../../../app/appState'
-import * as SurveyState from '../../../../survey/surveyState'
 
 import { deleteSurvey, publishSurvey } from '../../../../survey/actions'
 
@@ -34,7 +34,7 @@ class SurveyInfo extends React.Component {
   render () {
     const {
       surveyInfo, lang, canEditDef,
-      publishSurvey, deleteSurvey,
+      publishSurvey, deleteSurvey
     } = this.props
     const { showDeleteDialog } = this.state
 
@@ -44,43 +44,32 @@ class SurveyInfo extends React.Component {
         <ErrorBadge
           validation={Validator.getValidation(surveyInfo)}/>
 
-        <div className="home-dashboard__survey-info-status">
-          {
-            Survey.isDraft(surveyInfo) &&
-            <span className="icon icon-warning icon-12px icon-left"/>
-          }
-
-          {Survey.getStatus(surveyInfo)}
-
-          {
-            canEditDef &&
-            <button className="btn btn-of-light"
-                    aria-disabled={!Survey.isDraft(surveyInfo)}
-                    onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
-                      ? publishSurvey()
-                      : null}>
-              <span className="icon icon-checkmark2 icon-12px icon-left"/> Publish
-            </button>
-          }
-        </div>
-
-        <div className="home-dashboard__survey-info-side">
-          <Link
-            to={appModuleUri(homeModules.surveyList)} className="btn btn-of-light">
-            <span className="icon icon-paragraph-justify icon-12px icon-left"/> My Surveys
-          </Link>
-          <Link
-            to={appModuleUri(homeModules.surveyNew)} className="btn btn-of-light">
-            <span className="icon icon-plus icon-12px icon-left"/> Add a new Survey
-          </Link>
-        </div>
-
         <div className="home-dashboard__survey-info-container">
 
           <div className="row">
             <h4 className="survey-name">
               {Survey.getLabel(surveyInfo, lang)}
             </h4>
+
+            <div className="survey-status">
+              {
+                Survey.isDraft(surveyInfo) &&
+                <span className="icon icon-warning icon-12px icon-left"/>
+              }
+
+              {Survey.getStatus(surveyInfo)}
+
+              {
+                canEditDef &&
+                <button className="btn btn-of-light"
+                        aria-disabled={!Survey.isDraft(surveyInfo)}
+                        onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
+                          ? publishSurvey()
+                          : null}>
+                  <span className="icon icon-checkmark2 icon-12px icon-left"/> Publish
+                </button>
+              }
+            </div>
 
             <Link to={appModuleUri(homeModules.surveyInfo)} className="btn btn-of-light">
               <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`}/>
@@ -92,6 +81,13 @@ class SurveyInfo extends React.Component {
               <button className="btn btn-of-light" onClick={() => this.toggleDeleteConfirmDialog(true)}>
                 <span className="icon icon-bin icon-12px icon-left"/> Delete
               </button>
+            }
+            {
+              Survey.isFromCollect(surveyInfo) &&
+              <Link to={appModuleUri(homeModules.collectImportReport)}
+                    className="btn btn-of-light">
+                <span className="icon icon-warning icon-12px icon-left"/> Collect Import Report
+              </Link>
             }
           </div>
 
@@ -138,7 +134,7 @@ const mapStateToProps = state => {
   return {
     surveyInfo,
     lang,
-    canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
+    canEditDef: AuthManager.canEditSurvey(user, surveyInfo)
   }
 }
 

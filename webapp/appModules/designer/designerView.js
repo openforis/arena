@@ -2,11 +2,11 @@ import './designerView.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom'
 
 import AuthManager from '../../../common/auth/authManager'
 
-import TabBar from '../../commonComponents/tabBar'
+import SurveyDefsLoader from '../components/surveyDefsLoader'
+import NavigationTabBar from '../components/moduleNavigationTabBar'
 import SurveyFormView from '../surveyForm/surveyFormView'
 import SurveyHierarchy from './components/surveyHierarchy'
 import RecordView from '../data/records/components/recordView'
@@ -19,30 +19,26 @@ import { designerModules } from './designerModules'
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../../survey/surveyState'
 
-import { initSurveyDefs } from '../../survey/actions'
 import { resetForm } from '../surveyForm/actions'
 
 class DesignerView extends React.Component {
 
   componentDidMount () {
-    const { resetForm, initSurveyDefs, canEditDef } = this.props
-
-    resetForm()
-    initSurveyDefs(canEditDef, canEditDef)
+    this.props.resetForm()
   }
 
   render () {
-    const { history, location, canEditDef } = this.props
+    const { canEditDef } = this.props
 
-    return location.pathname === appModuleUri(appModules.designer)
-      ? (
-        <Redirect to={appModuleUri(designerModules.formDesigner)}/>
-      )
-      : (
-        <TabBar
-          className="designer"
-          location={location}
-          history={history}
+    return (
+      <SurveyDefsLoader
+        draft={canEditDef}
+        validate={canEditDef}>
+
+        <NavigationTabBar
+          className="designer app-module__tab-navigation"
+          moduleRoot={appModules.designer}
+          moduleDefault={designerModules.formDesigner}
           tabs={[
             {
               label: 'Form Designer',
@@ -79,7 +75,8 @@ class DesignerView extends React.Component {
 
           ]}
         />
-      )
+      </SurveyDefsLoader>
+    )
   }
 }
 
@@ -94,5 +91,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { initSurveyDefs, resetForm }
+  { resetForm }
 )(DesignerView)

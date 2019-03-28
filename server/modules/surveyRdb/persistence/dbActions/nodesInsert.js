@@ -1,45 +1,61 @@
+const R = require('ramda')
 const Promise = require('bluebird')
 
+const { insertAllQuery } = require('../../../../db/dbUtils')
+
 const Survey = require('../../../../../common/survey/survey')
+const NodeDef = require('../../../../../common/survey/nodeDef')
 const Record = require('../../../../../common/record/record')
 const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
 
 const DataTable = require('../schemaRdb/dataTable')
 
-const getInsertValues = async (survey, nodeDef, record) => {
-  const nodes = Record.getNodesByDefUuid(nodeDef.uuid)(record)
-  const insertValues = await Promise.all(nodes.map(async node =>
-    await DataTable.getRowValues(survey, nodeDef, record, node)
-  ))
-  return insertValues
+const flatten = array => {
+  const result = []
+  array.forEach(arr =>
+    arr.forEach(item =>
+      result.push(item)
+    )
+  )
+  return result
 }
 
-const toInserts = async (survey, nodeDef, record) => {
-  const insertValues = await getInsertValues(survey, nodeDef, record)
-  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+const getNodesRowValues = async (survey, nodeDef, record, client) => {
+  const nodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record)
 
-  return insertValues.map(values => ({
-    schemaName: SchemaRdb.getName(Survey.getSurveyInfo(survey).id),
-    tableName: DataTable.getName(nodeDef, nodeDefParent),
-    colNames: DataTable.getColumnNames(survey, nodeDef),
-    values
-  }))
+  return R.isEmpty(nodes)
+    ? []
+    : await Promise.all(
+      nodes.map(
+        async node =>
+          await DataTable.getRowValues(survey, nodeDef, record, node, client)
+      )
+    )
 }
 
-const run = async (survey, nodeDef, record, client) => {
-  const inserts = await toInserts(survey, nodeDef, record)
+const run = async (survey, nodeDef, records, client) => {
+  const insertValuesArray = await Promise.all(
+    records.map(
+      async record =>
+        await getNodesRowValues(survey, nodeDef, record, client)
+    )
+  )
 
-  await client.tx(async t => await t.batch(
-    inserts.map(insert => t.query(`
-      INSERT INTO
-        ${insert.schemaName}.${insert.tableName}
-        (${insert.colNames.join(',')})
-      VALUES
-        (${insert.colNames.map((_, i) => `$${i + 1}`).join(',')})
-      `,
-      insert.values
+  const insertValues = flatten(insertValuesArray)
+
+  if (insertValues.length > 0) {
+    const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+
+    const schema = SchemaRdb.getName(Survey.getId(survey))
+    const table = DataTable.getName(nodeDef, nodeDefParent)
+
+    await client.none(insertAllQuery(
+      schema,
+      table,
+      DataTable.getColumnNames(survey, nodeDef),
+      insertValues
     ))
-  ))
+  }
 }
 
 module.exports = {

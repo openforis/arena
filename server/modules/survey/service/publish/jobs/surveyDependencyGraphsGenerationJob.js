@@ -11,10 +11,10 @@ class SurveyDependencyGraphsGenerationJob extends Job {
   }
 
   async execute (tx) {
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.surveyId, false, true, false, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.getSurveyId(), false, true, false, tx)
     const graph = SurveyDependencyGraph.buildGraph(survey)
 
-    await SurveyManager.updateSurveyDependencyGraphs(this.surveyId, graph, tx)
+    await SurveyManager.updateSurveyDependencyGraphs(this.getSurveyId(), graph, tx)
   }
 }
 

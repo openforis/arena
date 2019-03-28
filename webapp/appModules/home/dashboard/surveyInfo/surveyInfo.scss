@@ -12,30 +12,6 @@
   }
 }
 
-.home-dashboard__survey-info-side {
-  position: absolute;
-}
-
-.home-dashboard__survey-info-status {
-  position: absolute;
-  right: 5vw;
-  top: 1rem;
-  font-size: .75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  justify-self: right;
-  display: flex;
-  align-items: center;
-
-  .icon {
-    margin-top: -4px;
-  }
-
-  .btn {
-    margin-left: 1rem;
-  }
-}
-
 .home-dashboard__survey-info-container {
   display: grid;
   align-items: center;
@@ -46,6 +22,23 @@
     font-size: 1.3rem;
     text-transform: uppercase;
     margin-right: 4rem;
+  }
+
+  .survey-status {
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    padding: 0 .5rem;
+
+    .icon {
+      margin-top: -4px;
+    }
+
+    .btn {
+      margin-left: .5rem;
+    }
   }
 
   .row {

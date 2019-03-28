@@ -6,7 +6,7 @@ const RecordFile = require('../../../../common/record/recordFile')
 const Node = require('../../../../common/record/node')
 
 const RecordService = require('../service/recordService')
-const FileManager = require('../persistence/fileManager')
+const FileService = require('../service/fileService')
 
 const {
   requireRecordListViewPermission,
@@ -81,12 +81,10 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', requireRecordViewPermission, async (req, res) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const nodeUuid = Request.getRestParam(req, 'nodeUuid')
+      const { surveyId, nodeUuid } = Request.getParams(req)
 
       const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
-      //TODO use fileService
-      const file = await FileManager.fetchFileByUuid(surveyId, Node.getNodeFileUuid(node))
+      const file = await FileService.fetchFileByUuid(surveyId, Node.getNodeFileUuid(node))
 
       sendFile(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
     } catch (err) {

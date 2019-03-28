@@ -2,9 +2,9 @@ import { exportReducer } from '../../appUtils/reduxUtils'
 
 import { appUserLogout } from '../../app/actions'
 
-import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
+import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate, surveyCollectImportReportPresentUpdate } from '../actions'
 
-import { setSurveyDefsFetched } from '../surveyState'
+import { setSurveyDefsFetched, setHasCollectImportReport } from '../surveyState'
 
 const actionHandlers = {
   // reset state
@@ -16,6 +16,7 @@ const actionHandlers = {
 
   [surveyDefsLoad]: (state, { draft }) => setSurveyDefsFetched(draft)(state),
 
+  [surveyCollectImportReportPresentUpdate]: (state, {present}) => setHasCollectImportReport(present)(state)
 }
 
 export default exportReducer(actionHandlers)

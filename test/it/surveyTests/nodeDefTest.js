@@ -47,11 +47,9 @@ const updateNodeDefTest = async () => {
   const nodeDef2 = await createNodeDef(rootDef.uuid, NodeDef.nodeDefType.boolean, 'node_def_2')
 
   const newName = 'node_def_1_new'
-  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyInfo.id, nodeDef1.uuid, [{
-    key: 'name',
-    value: newName,
-    advanced: false
-  }])
+  const updatedNodeDef = await NodeDefRepository.updateNodeDefProps(surveyInfo.id, nodeDef1.uuid, {
+    name: newName
+  })
 
   expect(NodeDef.getNodeDefName(updatedNodeDef)).to.equal(newName)
 

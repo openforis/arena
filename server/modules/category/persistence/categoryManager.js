@@ -179,6 +179,7 @@ module.exports = {
   insertCategory,
   insertLevel,
   insertItem,
+  insertItems: CategoryRepository.insertItems,
 
   //READ
   fetchCategoryByUuid,
@@ -187,6 +188,7 @@ module.exports = {
   fetchItemsByParentUuid: CategoryRepository.fetchItemsByParentUuid,
   fetchItemByUuid: CategoryRepository.fetchItemByUuid,
   fetchItemsByLevelIndex: CategoryRepository.fetchItemsByLevelIndex,
+  findItemByCode: CategoryRepository.findItemByCode,
 
   //UPDATE
   publishProps,

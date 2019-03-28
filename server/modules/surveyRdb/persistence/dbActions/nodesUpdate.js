@@ -42,16 +42,16 @@ const getColNames = (nodeDef, type) =>
     : DataCol.getNames(nodeDef)
   )
 
-const getColValues = async (surveyInfo, nodeDef, node, type) =>
+const getColValues = async (surveyInfo, nodeDef, node, type, client) =>
   R.flatten(type === types.insert
     ? [
       Node.getUuid(node),
       NodeDef.isNodeDefMultipleAttribute(nodeDef)
-        ? [Node.getParentUuid(node), ...await Promise.all(DataCol.getValues(surveyInfo, nodeDef, node))]
+        ? [Node.getParentUuid(node), ...await Promise.all(DataCol.getValues(surveyInfo, nodeDef, node, client))]
         //entity
         : NodeDef.isNodeDefRoot(nodeDef) ? Node.getRecordUuid(node) : Node.getParentUuid(node)
     ]
-    : await DataCol.getValues(surveyInfo, nodeDef, node)
+    : await DataCol.getValues(surveyInfo, nodeDef, node, client)
   )
 
 const getRowUuid = (nodeDef, node, nodeParent) =>
@@ -59,7 +59,7 @@ const getRowUuid = (nodeDef, node, nodeParent) =>
     ? Node.getUuid(node)
     : Node.getUuid(nodeParent)
 
-const toUpdates = async (surveyInfo, nodeDefs, nodes) => {
+const toUpdates = async (surveyInfo, nodeDefs, nodes, client) => {
   const updates = await Promise.all(
     R.values(nodes).map(async node => {
       const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
@@ -71,7 +71,7 @@ const toUpdates = async (surveyInfo, nodeDefs, nodes) => {
           schemaName: SchemaRdb.getName(surveyInfo.id),
           tableName: DataTable.getName(nodeDef, nodeDefParent),
           colNames: getColNames(nodeDef, type),
-          colValues: await getColValues(surveyInfo, nodeDef, node, type),
+          colValues: await getColValues(surveyInfo, nodeDef, node, type, client),
           rowUuid: getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])
         }
         : null
@@ -108,7 +108,7 @@ const runDelete = (update, client) =>
   )
 
 const run = async (surveyInfo, nodeDefs, nodes, client) => {
-  const updates = await toUpdates(surveyInfo, nodeDefs, nodes)
+  const updates = await toUpdates(surveyInfo, nodeDefs, nodes, client)
   await client.batch(
     updates.map(update =>
       isType(types.update)(update)

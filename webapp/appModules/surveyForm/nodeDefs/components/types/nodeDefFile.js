@@ -1,13 +1,33 @@
 import React from 'react'
+import { uuidv4 } from '../../../../../../common/uuid'
 
 import UploadButton from '../../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../../commonComponents/form/downloadButton'
 import NodeDeleteButton from '../nodeDeleteButton'
 
+import NodeDef from '../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../common/record/node'
 import RecordFile from '../../../../../../common/record/recordFile'
 
-const FileInput = ({ surveyInfo, nodeDef, readOnly, edit, recordUuid, node, canEditRecord, updateNode, removeNode }) => {
+const handleFileChange = (nodeDef, node, file, updateNode) => {
+  const value = {
+    [Node.valuePropKeys.fileUuid]: uuidv4(),
+    [Node.valuePropKeys.fileName]: file.name,
+    [Node.valuePropKeys.fileSize]: file.size
+  }
+  updateNode(nodeDef, node, value, file)
+}
+
+const handleNodeDelete = (nodeDef, node, removeNode, updateNode) => {
+  if (NodeDef.isNodeDefMultiple(nodeDef)) {
+    removeNode(nodeDef, node)
+  } else {
+    // do not delete single node, delete only its value
+    updateNode(nodeDef, node, null)
+  }
+}
+
+const FileInput = ({ surveyInfo, nodeDef, readOnly, edit, node, canEditRecord, updateNode, removeNode }) => {
   const fileName = Node.getNodeFileName(node)
   const truncatedFileName = RecordFile.truncateFileName(fileName)
   const fileUploaded = !edit && fileName
@@ -15,18 +35,19 @@ const FileInput = ({ surveyInfo, nodeDef, readOnly, edit, recordUuid, node, canE
   return <div className="node-def__file-input">
     <UploadButton disabled={edit || !canEditRecord || readOnly}
                   showLabel={false}
-                  onChange={files => updateNode(nodeDef, node, null, files[0])}/>
+                  onChange={files => handleFileChange(nodeDef, node, files[0], updateNode)}/>
 
-    <DownloadButton href={edit ? null : `/api/survey/${surveyInfo.id}/record/${recordUuid}/nodes/${node.uuid}/file`}
-                    disabled={!fileUploaded}
-                    label={truncatedFileName}
-                    title={fileName === truncatedFileName ? null : fileName}/>
+    <DownloadButton
+      href={edit ? null : `/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`}
+      disabled={!fileUploaded}
+      label={truncatedFileName}
+      title={fileName === truncatedFileName ? null : fileName}/>
 
     <NodeDeleteButton nodeDef={nodeDef}
                       node={node}
                       disabled={!fileUploaded}
                       showConfirm={true}
-                      removeNode={removeNode}/>
+                      removeNode={(nodeDef, node) => handleNodeDelete(nodeDef, node, removeNode, updateNode)}/>
   </div>
 }
 

@@ -11,18 +11,21 @@ import { getLanguageLabel } from '../../../common/app/languages'
 
 import { Input } from '../../commonComponents/form/input'
 
-const LabelBadge = ({lang}) => (
-  <div className="badge-of labels-editor__label-lang-badge">
+const LanguageBadge = ({ lang, compact }) => (
+  <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang): null}>
     {
-      getLanguageLabel(lang)
+      compact ? lang : getLanguageLabel(lang)
     }
   </div>
 )
 
-const LabelRow = ({label = '', lang, onChange, readOnly}) => (
+const LabelRow = ({ label = '', lang, onChange, readOnly, showLanguageBadge = true, compactLanguage }) => (
   <div className="labels-editor__label">
 
-    <LabelBadge lang={lang}/>
+    {
+      showLanguageBadge &&
+      <LanguageBadge lang={lang} compact={compactLanguage}/>
+    }
 
     <Input value={label}
            onChange={value => onChange({
@@ -37,23 +40,25 @@ const LabelRow = ({label = '', lang, onChange, readOnly}) => (
 class LabelsEditor extends React.Component {
 
   isPreview () {
-    const {preview} = this.state || {preview: true}
+    const { preview } = this.state || { preview: true }
     return preview
   }
 
   togglePreview () {
-    this.setState({preview: !this.isPreview()})
+    this.setState({ preview: !this.isPreview() })
   }
 
   render () {
     const {
       labels,
+      showFormLabel,
       formLabel,
       languages,
       onChange,
       maxPreview,
       canTogglePreview,
       readOnly,
+      compactLanguage
     } = this.props
 
     const displayLangs = this.isPreview()
@@ -62,25 +67,29 @@ class LabelsEditor extends React.Component {
 
     const _canTogglePreview = canTogglePreview && languages.length > maxPreview
 
+    const className = `labels-editor ${showFormLabel ? 'with-label' : ''}`
+
     return (
-      <div className="form-item labels-editor" ref="elem">
-        <label className="form-label">
-          {formLabel}
+      <div className={className} ref="elem">
+        <div className="labels-editor-label">
           {
-            _canTogglePreview
-              ? <button className="btn-s btn-of-light-s btn-toggle-labels"
-                        style={{justifySelf: 'end'}}
-                        onClick={() => this.togglePreview()}>
-                <span className={`icon icon-${this.isPreview() ? 'enlarge2' : 'shrink2'} icon-12px`}/>
-                {/*{*/}
-                {/*this.isPreview() ? '...more' : '...less'*/}
-                {/*}*/}
-
-              </button>
-              : null
+            showFormLabel &&
+            <label className="form-label">
+              {formLabel}
+            </label>
           }
-        </label>
-
+          {
+            _canTogglePreview &&
+            <button className="btn-s btn-of-light-s btn-toggle-labels"
+                    style={{ justifySelf: 'end' }}
+                    onClick={() => this.togglePreview()}>
+              <span className={`icon icon-${this.isPreview() ? 'enlarge2' : 'shrink2'} icon-12px`}/>
+              {/*{*/}
+              {/*this.isPreview() ? '...more' : '...less'*/}
+              {/*}*/}
+            </button>
+          }
+        </div>
         <div className="labels-editor__labels">
           {
             displayLangs.map(lang =>
@@ -88,12 +97,14 @@ class LabelsEditor extends React.Component {
                         lang={lang}
                         label={R.prop(lang)(labels)}
                         onChange={onChange}
-                        readOnly={readOnly}/>
+                        readOnly={readOnly}
+                        showLanguageBadge={languages.length > 1}
+                        compactLanguage={compactLanguage}/>
             )
           }
         </div>
-      </div>
 
+      </div>
     )
   }
 
@@ -102,11 +113,13 @@ class LabelsEditor extends React.Component {
 LabelsEditor.defaultProps = {
   languages: [],
   labels: [],
+  showFormLabel: true,
   formLabel: 'Label(s)',
-  onChange: null,
   maxPreview: 2,
   canTogglePreview: true,
   readOnly: false,
+  compactLanguage: false,
+  onChange: null,
 }
 
 const mapStateToProps = state => ({

@@ -1,10 +1,10 @@
 const R = require('ramda')
 
+const BatchPersister = require('../../../db/batchPersister')
+
 const Taxonomy = require('../../../../common/survey/taxonomy')
 
 const TaxonomyManager = require('./taxonomyManager')
-
-const taxaInsertBufferSize = 500
 
 const createPredefinedTaxa = (taxonomy) => [
   Taxonomy.newTaxon(taxonomy.uuid, Taxonomy.unknownCode, 'Unknown', 'Unknown', 'Unknown'),
@@ -17,31 +17,24 @@ class TaxonomyImportManager {
     this.surveyId = surveyId
     this.vernacularLanguageCodes = vernacularLanguageCodes
 
-    this.taxaInsertBuffer = []
+    this.batchPersister = new BatchPersister(this.taxaInsertHandler.bind(this))
     this.insertedCodes = {} //cache of inserted taxa codes
   }
 
   async addTaxonToInsertBuffer (taxon, t) {
-    this.taxaInsertBuffer.push(R.omit(['validation'], taxon))
+    this.batchPersister.addItem(R.omit(['validation'], taxon), t)
 
     this.insertedCodes[Taxonomy.getTaxonCode(taxon)] = true
-
-    if (this.taxaInsertBuffer.length === taxaInsertBufferSize) {
-      await this.flushTaxaInsertBuffer(t)
-    }
   }
 
-  async flushTaxaInsertBuffer (t) {
-    if (this.taxaInsertBuffer.length > 0) {
-      await TaxonomyManager.insertTaxa(this.surveyId, this.taxaInsertBuffer, this.user, t)
-      this.taxaInsertBuffer.length = 0
-    }
+  async taxaInsertHandler (items, t) {
+    await TaxonomyManager.insertTaxa(this.surveyId, items, this.user, t)
   }
 
   async finalizeImport (taxonomy, t) {
     const { user, surveyId } = this
 
-    await this.flushTaxaInsertBuffer(t)
+    await this.batchPersister.flush(t)
 
     //set vernacular lang codes in taxonomy
     //set log to false temporarily; set user to null as it's only needed for logging
