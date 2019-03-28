@@ -1,12 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { Switch, Route } from 'react-router'
-import { TransitionGroup, Transition } from 'react-transition-group'
+import { withRouter, Switch, Route } from 'react-router-dom'
 import DynamicImport from '../commonComponents/dynamicImport'
-
-import loginAnimation from '../login/components/loginAnimation'
-import appAnimation from './appAnimation'
 
 import LoginView from '../login/components/loginView'
 
@@ -57,23 +52,17 @@ class AppRouterSwitch extends React.Component {
   }
 
   render () {
-    const { location, isReady, systemError } = this.props
+    const { isReady, systemError } = this.props
 
     const isLogin = getLocationPathname(this.props) === loginUri
-
-    const {
-      key,
-      onEnter,
-      onExit
-    } = isLogin ? loginAnimation : appAnimation
 
     return (
       isReady
         ? (
           <React.Fragment>
 
-            <div className="main__bg1"/>
-            <div className="main__bg2"/>
+            <div className={`main__bg1${isLogin ? ' login' : ''}`}/>
+            <div className={`main__bg2${isLogin ? ' login' : ''}`}/>
             <div className="main__bg-overlay"/>
 
             {
@@ -88,27 +77,18 @@ class AppRouterSwitch extends React.Component {
                   </div>
                 )
                 : (
-                  <TransitionGroup component={null}>
-                    <Transition
-                      key={key}
-                      appear={true}
-                      timeout={2000}
-                      onEnter={onEnter}
-                      onExit={onExit}>
-
-                      <Switch location={location}>
-
-                        <Route exact path="/" component={LoginView}/>
-                        <Route path="/app" render={(props) =>
-                          <DynamicImport load={() => import('../appModules/appView/appViewExport')}>
-                            {(Component) => Component === null ? null : <Component {...props} />}
-                          </DynamicImport>
-                        }/>
-
-                      </Switch>
-
-                    </Transition>
-                  </TransitionGroup>
+                  <Switch>
+                    <Route
+                      exact path="/"
+                      component={LoginView}
+                    />
+                    <Route
+                      path="/app"
+                      render={props => (
+                        <DynamicImport {...props} load={() => import('../appModules/appView/appViewExport')}/>
+                      )}
+                    />
+                  </Switch>
                 )
             }
 
