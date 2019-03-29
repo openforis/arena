@@ -10,11 +10,11 @@ const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 
-const { dependencyTypes } = require('../../survey/surveyDependenchyGraph')
-
 const NodeDependencyManager = require('./nodeDependencyManager')
 
 const RecordExprParser = require('../recordExprParser')
+
+const { dependencyTypes } = Survey
 
 /**
  * Module responsible for updating applicable and default values
@@ -87,8 +87,8 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
         const { nodeCtx: n, nodeDef } = o
 
         return isApplicableExpr || (
-          NodeDef.isNodeDefAttribute(nodeDef) && (
-            Node.isNodeValueBlank(n) ||
+          NodeDef.isAttribute(nodeDef) && (
+            Node.isValueBlank(n) ||
             Node.isDefaultValueApplied(n)
           )
         )

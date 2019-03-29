@@ -112,7 +112,7 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
 
 const fetchKeyValues = (survey, record, entity) => {
   const keyNodes = fetchEntityKeyNodes(survey, record, entity)
-  return R.map(Node.getNodeValue)(keyNodes)
+  return R.map(Node.getValue)(keyNodes)
 }
 
 const fetchEntityKeyNodes = (survey, record, entity) => {

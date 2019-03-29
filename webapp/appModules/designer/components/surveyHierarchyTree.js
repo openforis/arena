@@ -143,10 +143,10 @@ export default class SurveyHierarchyTree {
     // Add labels for the nodes
     const fo = nodeEnter
       .append('foreignObject')
-      .attr('x', d => NodeDef.isNodeDefRoot(d.data) ? -100 : 0)
+      .attr('x', d => NodeDef.isRoot(d.data) ? -100 : 0)
       //.attr('y', d => hasChildren(d) ? -(nodeLabelDist * 3) : -nodeLabelDist)
       .attr('y', -nodeLabelDist)
-      .attr('width', d => NodeDef.isNodeDefRoot(d.data) ? 150 : 100)
+      .attr('width', d => NodeDef.isRoot(d.data) ? 150 : 100)
       .attr('height', 30)
 
     const grid = fo.append('xhtml:div')
@@ -156,7 +156,7 @@ export default class SurveyHierarchyTree {
       .on('click', d => this.onEntityClick(d.data.uuid))
       // .attr('alignment-baseline', 'middle')
       //.attr('x', d => hasChildren(d) ? -(nodeLabelDist) : (nodeLabelDist))
-      .text(d => NodeDef.getNodeDefLabel(d.data, this.lang))
+      .text(d => NodeDef.getLabel(d.data, this.lang))
 
     grid.append('xhtml:button')
       .attr('class', 'btn btn-of-light-xs')

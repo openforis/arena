@@ -23,7 +23,7 @@ class NodeDefsValidationJob extends Job {
 
     if (!R.isEmpty(nodeDefsInvalid)) {
       this.errors = R.reduce(
-        (acc, nodeDef) => R.assoc(NodeDef.getNodeDefName(nodeDef), Validator.getInvalidFieldValidations(nodeDef.validation), acc),
+        (acc, nodeDef) => R.assoc(NodeDef.getName(nodeDef), Validator.getInvalidFieldValidations(nodeDef.validation), acc),
         {},
         nodeDefsInvalid
       )

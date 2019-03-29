@@ -103,7 +103,7 @@ const CodeProps = (props) => {
                     items={candidateParentCodeNodeDefs}
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}
-                    itemLabelFunction={NodeDef.getNodeDefName}
+                    itemLabelFunction={NodeDef.getName}
                     onChange={def => putNodeDefProp(nodeDef, propKeys.parentCodeDefUuid, def ? def.uuid : null)}/>
         </div>
       </FormItem>
@@ -116,12 +116,12 @@ const mapStateToProps = state => {
   const surveyForm = getSurveyForm(state)
   const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
 
-  const isCode = NodeDef.isNodeDefCode(nodeDef)
+  const isCode = NodeDef.isCode(nodeDef)
 
   return {
     categories: isCode ? Survey.getCategoriesArray(survey) : null,
     canUpdateCategory: isCode && Survey.canUpdateCategory(nodeDef)(survey),
-    category: isCode ? Survey.getCategoryByUuid(NodeDef.getNodeDefCategoryUuid(nodeDef))(survey) : null,
+    category: isCode ? Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey) : null,
     candidateParentCodeNodeDefs: isCode ? Survey.getNodeDefCodeCandidateParents(nodeDef)(survey) : null,
     parentCodeDef: isCode ? Survey.getNodeDefParentCode(nodeDef)(survey) : null,
   }

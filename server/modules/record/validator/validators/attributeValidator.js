@@ -5,7 +5,6 @@ const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
 const NodeDefValidations = require('../../../../../common/survey/nodeDefValidations')
-const { dependencyTypes } = require('../../../survey/surveyDependenchyGraph')
 const Validator = require('../../../../../common/validation/validator')
 const Node = require('../../../../../common/record/node')
 
@@ -22,14 +21,14 @@ const errorKeys = {
 
 const validateRequired = (survey, nodeDef) =>
   (propName, node) =>
-    Node.isNodeValueBlank(node) &&
-    (NodeDef.isNodeDefKey(nodeDef) || NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef)))
+    Node.isValueBlank(node) &&
+    (NodeDef.isKey(nodeDef) || NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef)))
       ? errorKeys.required
       : null
 
 const validateNodeValidations = (survey, record, nodeDef, tx) =>
   async (propName, node) => {
-    if (Node.isNodeValueBlank(node)) {
+    if (Node.isValueBlank(node)) {
       return null
     }
     const validations = NodeDef.getValidations(nodeDef)
@@ -88,7 +87,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes, tx) => 
 
   const attributes = R.pipe(
     R.values,
-    R.filter(node => NodeDef.isNodeDefAttribute(getNodeDef(survey, node)))
+    R.filter(node => NodeDef.isAttribute(getNodeDef(survey, node)))
   )(nodes)
 
   const validatedAttributeUuids = [] //used to avoid validating 2 times the same attributes
@@ -96,7 +95,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes, tx) => 
   const attributeValidationsArray = await Promise.all(
     attributes.map(
       async attribute => {
-        const dependents = NodeDependencyManager.fetchDependentNodes(survey, record, attribute, dependencyTypes.validations)
+        const dependents = NodeDependencyManager.fetchDependentNodes(survey, record, attribute, Survey.dependencyTypes.validations)
 
         // include attribute itself if it's not already included among dependents
         const attributeAndDependents =

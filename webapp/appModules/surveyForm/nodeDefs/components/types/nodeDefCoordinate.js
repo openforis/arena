@@ -41,7 +41,7 @@ class NodeDefCoordinate extends React.Component {
     const entryDisabled = edit || !canEditRecord || readOnly
 
     const node = entry ? nodes[0] : null
-    const value = Node.getNodeValue(node, getNodeDefDefaultValue(nodeDef))
+    const value = Node.getValue(node, getNodeDefDefaultValue(nodeDef))
 
     const surveySrs = Survey.getSRS(surveyInfo)
     const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)

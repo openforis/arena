@@ -58,8 +58,8 @@ const loadTaxa = async (surveyId, taxonomyUuid, draft, field, value, strict = fa
 const loadTaxonByNode = async (surveyId, taxonomyUuid, draft, node) => {
   const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxon`, {
     params: {
-      taxonUuid: Node.getNodeTaxonUuid(node),
-      vernacularNameUuid: Node.getNodeVernacularNameUuid(node),
+      taxonUuid: Node.getTaxonUuid(node),
+      vernacularNameUuid: Node.getVernacularNameUuid(node),
       draft
     }
   })
@@ -118,8 +118,8 @@ class NodeDefTaxon extends React.Component {
 
     if (this.props.entry && !R.equals(prevNode, node) &&
       (
-        Node.getNodeTaxonUuid(prevNode) !== Node.getNodeTaxonUuid(node) ||
-        Node.getNodeVernacularNameUuid(prevNode) !== Node.getNodeVernacularNameUuid(node)
+        Node.getTaxonUuid(prevNode) !== Node.getTaxonUuid(node) ||
+        Node.getVernacularNameUuid(prevNode) !== Node.getVernacularNameUuid(node)
       )
     ) {
       await this.loadSelectedTaxonFromNode()
@@ -130,7 +130,7 @@ class NodeDefTaxon extends React.Component {
     const { surveyId, taxonomyUuid, nodes, draft } = this.props
     const node = nodes[0]
 
-    const taxon = Node.isNodeValueBlank(node)
+    const taxon = Node.isValueBlank(node)
       ? null
       : await loadTaxonByNode(surveyId, taxonomyUuid, draft, node)
 
@@ -147,11 +147,11 @@ class NodeDefTaxon extends React.Component {
       const code = Taxonomy.getTaxonCode(taxonSearchItem)
 
       const scientificName = unlisted
-        ? Node.getNodeScientificName(node)
+        ? Node.getScientificName(node)
         : Taxonomy.getTaxonScientificName(taxonSearchItem)
 
       const vernacularName = unlisted
-        ? Node.getNodeVernacularName(node)
+        ? Node.getVernacularName(node)
         : R.defaultTo('', taxonSearchItem.vernacularName)
 
       this.setState({
@@ -199,13 +199,13 @@ class NodeDefTaxon extends React.Component {
 
   handleUnlistedSpeciesFieldChange (field, value) {
     const node = this.props.nodes[0]
-    const unlistedTaxonUuid = Node.getNodeTaxonUuid(node)
+    const unlistedTaxonUuid = Node.getTaxonUuid(node)
 
     this.setState({
       [field]: value
     })
-    const scientificName = field === fields.scientificName ? value : Node.getNodeScientificName(node)
-    const vernacularName = field === fields.vernacularName ? value : Node.getNodeVernacularName(node)
+    const scientificName = field === fields.scientificName ? value : Node.getScientificName(node)
+    const vernacularName = field === fields.vernacularName ? value : Node.getVernacularName(node)
 
     this.updateNodeValue({
       [valuePropKeys.taxonUuid]: unlistedTaxonUuid,
@@ -348,7 +348,7 @@ class NodeDefTaxon extends React.Component {
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   return {
-    taxonomyUuid: NodeDef.getNodeDefTaxonomyUuid(props.nodeDef),
+    taxonomyUuid: NodeDef.getTaxonomyUuid(props.nodeDef),
     surveyId: Survey.getId(survey),
     draft: Survey.isDraft(Survey.getSurveyInfo(survey)),
   }

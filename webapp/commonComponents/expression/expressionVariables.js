@@ -8,7 +8,7 @@ import sqlTypes from '../../../common/surveyRdb/sqlTypes'
 import Expression from '../../../common/exprParser/expression'
 
 const getJsVariables = (nodeDef, nodeDefCurrent, lang, depth) => {
-  const nodeDefName = NodeDef.getNodeDefName(nodeDef)
+  const nodeDefName = NodeDef.getName(nodeDef)
 
   const getValueFnFromParent = () => {
     const parentFnCalls = depth > 0
@@ -19,7 +19,7 @@ const getJsVariables = (nodeDef, nodeDefCurrent, lang, depth) => {
 
   const getValueFnFromContextNode = () => `this.getValue()`
 
-  const valueProp = NodeDef.isNodeDefCode(nodeDef) || NodeDef.isNodeDefTaxon(nodeDef)
+  const valueProp = NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef)
     ? '.props.code'
     : ''
 
@@ -30,10 +30,10 @@ const getJsVariables = (nodeDef, nodeDefCurrent, lang, depth) => {
   return [{
     value: `${valueFn}${valueProp}`,
 
-    label: NodeDef.getNodeDefLabel(nodeDef, lang),
+    label: NodeDef.getLabel(nodeDef, lang),
 
-    type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer
-      : NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
+    type: NodeDef.isInteger(nodeDef) ? sqlTypes.integer
+      : NodeDef.isDecimal(nodeDef) ? sqlTypes.decimal
         : sqlTypes.varchar,
   }]
 }
@@ -45,13 +45,13 @@ const getSqlVariables = (nodeDef, lang) => {
 
     value: col,
 
-    label: NodeDef.getNodeDefLabel(nodeDef, lang) + (
+    label: NodeDef.getLabel(nodeDef, lang) + (
       colNames.length === 1
         ? '' : ' - ' + NodeDefTable.extractColName(nodeDef, col)
     ),
 
-    type: NodeDef.isNodeDefInteger(nodeDef) ? sqlTypes.integer :
-      NodeDef.isNodeDefDecimal(nodeDef) ? sqlTypes.decimal
+    type: NodeDef.isInteger(nodeDef) ? sqlTypes.integer :
+      NodeDef.isDecimal(nodeDef) ? sqlTypes.decimal
         : sqlTypes.varchar,
 
     uuid: NodeDef.getUuid(nodeDef)
@@ -66,7 +66,7 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, dept
   return R.pipe(
     Survey.getNodeDefChildren(nodeDefContext),
     R.map(childDef => {
-      if (NodeDef.isNodeDefEntity(childDef) || NodeDef.isNodeDefCoordinate(childDef) || NodeDef.isNodeDefFile(childDef))
+      if (NodeDef.isEntity(childDef) || NodeDef.isCoordinate(childDef) || NodeDef.isFile(childDef))
         return null
       else if (mode === Expression.modes.sql)
         return getSqlVariables(childDef, lang)
@@ -82,7 +82,7 @@ export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth
 
   const variables = getChildDefVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth)
 
-  return NodeDef.isNodeDefRoot(nodeDefContext)
+  return NodeDef.isRoot(nodeDefContext)
     ? variables
     : R.concat(
       variables,

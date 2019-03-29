@@ -39,7 +39,7 @@ class NodeDefSwitch extends React.Component {
     const { nodes, nodeDef, parentNode, createNodePlaceholder, canAddNode } = this.props
     const hasNotPlaceholder = R.none(Node.isPlaceholder, nodes)
 
-    if (canAddNode && NodeDef.isNodeDefMultipleAttribute(nodeDef) && hasNotPlaceholder) {
+    if (canAddNode && NodeDef.isMultipleAttribute(nodeDef) && hasNotPlaceholder) {
       createNodePlaceholder(nodeDef, parentNode, getNodeDefDefaultValue(nodeDef))
     }
   }
@@ -116,7 +116,7 @@ const mapStateToProps = (state, props) => {
   const record = RecordState.getRecord(surveyForm)
 
   const mapEntryProps = () => {
-    const nodes = NodeDef.isNodeDefRoot(nodeDef)
+    const nodes = NodeDef.isRoot(nodeDef)
       ? [Record.getRootNode(record)]
       : parentNode
         ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
@@ -135,18 +135,18 @@ const mapStateToProps = (state, props) => {
 
     const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
     const canAddNode = parentNode &&
-      NodeDef.isNodeDefMultiple(nodeDef) &&
+      NodeDef.isMultiple(nodeDef) &&
       (R.isEmpty(maxCount) || R.length(nodes) < Number(maxCount))
 
     return {
       nodes: nodesValidated,
       canAddNode,
-      readOnly: NodeDef.isNodeDefReadOnly(nodeDef)
+      readOnly: NodeDef.isReadOnly(nodeDef)
     }
   }
 
   return {
-    label: NodeDef.getNodeDefLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
+    label: NodeDef.getLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
     applicable: parentNode
       ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
       : true,

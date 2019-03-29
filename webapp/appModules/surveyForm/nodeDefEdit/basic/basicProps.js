@@ -60,22 +60,22 @@ const BasicProps = props => {
 
       <FormItem label={'name'}>
         <Input
-          value={NodeDef.getNodeDefName(nodeDef)}
+          value={NodeDef.getName(nodeDef)}
           validation={getFieldValidation('name')(validation)}
           onChange={value => putNodeDefProp(nodeDef, 'name', normalizeName(value))}/>
       </FormItem>
 
       <LabelsEditor
-        labels={NodeDef.getNodeDefLabels(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'labels', NodeDef.getNodeDefLabels(nodeDef))}/>
+        labels={NodeDef.getLabels(nodeDef)}
+        onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'labels', NodeDef.getLabels(nodeDef))}/>
 
       <LabelsEditor
         formLabel="Description(s)"
-        labels={NodeDef.getNodeDefDescriptions(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'descriptions', NodeDef.getNodeDefDescriptions(nodeDef))}/>
+        labels={NodeDef.getDescriptions(nodeDef)}
+        onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'descriptions', NodeDef.getDescriptions(nodeDef))}/>
 
       {
-        NodeDef.isNodeDefCode(nodeDef) &&
+        NodeDef.isCode(nodeDef) &&
         <CodeProps
           nodeDef={nodeDef}
           toggleCategoryEdit={toggleCategoryEdit}
@@ -83,7 +83,7 @@ const BasicProps = props => {
       }
 
       {
-        NodeDef.isNodeDefTaxon(nodeDef) &&
+        NodeDef.isTaxon(nodeDef) &&
         <TaxonProps
           nodeDef={nodeDef}
           toggleTaxonomyEdit={toggleTaxonomyEdit}
@@ -94,7 +94,7 @@ const BasicProps = props => {
         NodeDef.canNodeDefBeKey(nodeDef) &&
         <FormItem label={'key'}>
           <Checkbox
-            checked={NodeDef.isNodeDefKey(nodeDef)}
+            checked={NodeDef.isKey(nodeDef)}
             disabled={nodeDefKeyEditDisabled}
             onChange={(checked) => putNodeDefProp(nodeDef, 'key', checked)}/>
         </FormItem>
@@ -104,7 +104,7 @@ const BasicProps = props => {
         NodeDef.canNodeDefBeMultiple(nodeDef) &&
         <FormItem label={'multiple'}>
           <Checkbox
-            checked={NodeDef.isNodeDefMultiple(nodeDef)}
+            checked={NodeDef.isMultiple(nodeDef)}
             disabled={nodeDefMultipleEditDisabled}
             onChange={(checked) => putNodeDefProp(nodeDef, 'multiple', checked)}/>
         </FormItem>

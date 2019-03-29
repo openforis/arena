@@ -19,7 +19,7 @@ const TableColumn = (props) => {
 
       {
         isHeader &&
-        <div style={{ width: '100%' }}>{NodeDef.getNodeDefLabel(nodeDef, lang)}</div>
+        <div style={{ width: '100%' }}>{NodeDef.getLabel(nodeDef, lang)}</div>
       }
 
       {

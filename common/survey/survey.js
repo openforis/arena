@@ -9,6 +9,7 @@ const SurveyDependencies = require('./_internal/surveyDependencies')
 
 module.exports = {
   infoKeys: SurveyInfo.keys,
+  dependencyTypes: SurveyDependencies.dependencyTypes,
 
   // ====== DEFAULTS
   getDefaultAuthGroups: SurveyDefaults.getDefaultAuthGroups,
@@ -66,6 +67,7 @@ module.exports = {
   // ====== UPDATE
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,
   assocDependencyGraph: SurveyDependencies.assocDependencyGraph,
+  buildDependencyGraph: SurveyDependencies.buildGraph,
 
   // ====== NodeDef Code
   getNodeDefCategoryLevelIndex: SurveyNodeDefs.getNodeDefCategoryLevelIndex,

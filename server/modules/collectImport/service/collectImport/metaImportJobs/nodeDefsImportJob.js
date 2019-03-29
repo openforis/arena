@@ -257,7 +257,7 @@ class NodeDefsImportJob extends Job {
 
       // try to add parent node def name as prefix
       if (parentNodeDef) {
-        finalName = `${NodeDef.getNodeDefName(parentNodeDef)}_${finalName}`
+        finalName = `${NodeDef.getName(parentNodeDef)}_${finalName}`
       }
       if (R.includes(finalName, this.nodeDefNames)) {
         // try to make it unique by adding _# suffix

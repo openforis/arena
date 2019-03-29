@@ -37,7 +37,7 @@ const validateTaxonomy = async (propName, nodeDef) =>
 
 const validateChildren = survey =>
   (propName, nodeDef) => {
-    if (NodeDef.isNodeDefEntity(nodeDef)) {
+    if (NodeDef.isEntity(nodeDef)) {
       const children = Survey.getNodeDefChildren(nodeDef)(survey)
       if (R.isEmpty(children)) {
         return errorKeys.empty
@@ -48,19 +48,19 @@ const validateChildren = survey =>
 
 const countKeyAttributes = (survey, nodeDefEntity) => R.pipe(
   Survey.getNodeDefChildren(nodeDefEntity),
-  R.filter(NodeDef.isNodeDefKey),
+  R.filter(NodeDef.isKey),
   R.length
 )(survey)
 
 const validateKeyAttributes = survey =>
   (propName, nodeDef) => {
-    if (NodeDef.isNodeDefEntity(nodeDef)) {
+    if (NodeDef.isEntity(nodeDef)) {
       const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
       if (keyAttributesCount === 0 &&
         (
-          NodeDef.isNodeDefRoot(nodeDef) ||
-          (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isNodeDefMultiple(nodeDef))
+          NodeDef.isRoot(nodeDef) ||
+          (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef))
         )
       ) {
         return errorKeys.empty
@@ -73,7 +73,7 @@ const validateKeyAttributes = survey =>
 
 const validateKey = survey =>
   (propName, nodeDef) => {
-    if (!NodeDef.isNodeDefEntity(nodeDef) && NodeDef.isNodeDefKey(nodeDef)) {
+    if (!NodeDef.isEntity(nodeDef) && NodeDef.isKey(nodeDef)) {
       const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
       if (keyAttributesCount > NodeDef.maxKeyAttributes) {
@@ -84,7 +84,7 @@ const validateKey = survey =>
   }
 
 const validateReadOnly = (propName, nodeDef) =>
-  NodeDef.isNodeDefReadOnly(nodeDef) && R.isEmpty(NodeDef.getDefaultValues(nodeDef))
+  NodeDef.isReadOnly(nodeDef) && R.isEmpty(NodeDef.getDefaultValues(nodeDef))
     ? nodeDefErrorKeys.defaultValuesNotSpecified
     : null
 

@@ -56,7 +56,7 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
       const code = CollectRecordParseUtils.getTextValue('code')(collectNode)
 
       if (code) {
-        const categoryUuid = NodeDef.getNodeDefCategoryUuid(nodeDef)
+        const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
         const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
         const item = await CategoryManager.findItemByCode(surveyId, categoryUuid, levelIndex, code, false, tx)
 
@@ -119,7 +119,7 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
     case nodeDefType.taxon: {
       const { code, scientific_name, vernacularName } = CollectRecordParseUtils.getTextValues(collectNode)
 
-      const taxonomyUuid = NodeDef.getNodeDefTaxonomyUuid(nodeDef)
+      const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
 
       const unlistedTaxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unlistedCode, false, tx)
 

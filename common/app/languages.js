@@ -703,10 +703,14 @@ const languages = R.pipe(
   R.map(lang => ({key: lang, value: getLanguageLabel(lang)}))
 )(languagesMap)
 
+const languageCodes = languages.map(R.prop('key'))
+
+const languageCodesISO636_2 = R.keys(language_ISO_636_2_Map)
+
 module.exports = {
   languages,
-  languageCodes: languages.map(R.prop('key')),
-  languageCodesISO636_2: R.keys(language_ISO_636_2_Map),
+  languageCodes,
+  languageCodesISO636_2,
 
   getLanguageLabel,
 }

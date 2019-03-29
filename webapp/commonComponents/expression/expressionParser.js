@@ -40,19 +40,19 @@ export const getLiteralSearchParams = (survey, nodeDef) => {
 
   const surveyId = Survey.getId(survey)
 
-  const literalSearchParams = nodeDef && NodeDef.isNodeDefCode(nodeDef) ?
+  const literalSearchParams = nodeDef && NodeDef.isCode(nodeDef) ?
     {
       surveyId,
       type: NodeDef.nodeDefType.code,
-      categoryUuid: NodeDef.getNodeDefCategoryUuid(nodeDef),
+      categoryUuid: NodeDef.getCategoryUuid(nodeDef),
       categoryLevelIndex: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey),
       lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
     }
-    : nodeDef && NodeDef.isNodeDefTaxon(nodeDef) ?
+    : nodeDef && NodeDef.isTaxon(nodeDef) ?
       {
         surveyId,
         type: NodeDef.nodeDefType.taxon,
-        taxonomyUuid: NodeDef.getNodeDefTaxonomyUuid(nodeDef)
+        taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef)
       }
       : null
 

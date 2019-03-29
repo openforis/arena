@@ -12,13 +12,13 @@ const NodeDefFormItem = props => {
 
   const labelComponent = <div>
     {
-      NodeDef.isNodeDefKey(nodeDef) &&
+      NodeDef.isKey(nodeDef) &&
       <span className="icon icon-key2 icon-12px icon-left node-def__icon-key"/>
     }
     {label}
   </div>
 
-  return NodeDef.isNodeDefEntity(nodeDef)
+  return NodeDef.isEntity(nodeDef)
     ? nodeDefComponent
     : (
       <FormItem label={labelComponent}>

@@ -11,19 +11,19 @@ const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
   value: 1, //simulates node value
   //simulates node value
-  getValue: () => NodeDef.isNodeDefCode(nodeDef) || NodeDef.isNodeDefTaxon(nodeDef) ? { props: { code: '' } } : 1,
+  getValue: () => NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1,
   parent: () => {
     const def = Survey.getNodeDefParent(nodeDef)(survey)
-    if (!def) throw new Error('Unable to find parent of ' + NodeDef.getNodeDefName(nodeDef))
+    if (!def) throw new Error('Unable to find parent of ' + NodeDef.getName(nodeDef))
     return bindNode(survey, def)
   },
   node: name => {
-    if (NodeDef.isNodeDefEntity(nodeDef)) {
+    if (NodeDef.isEntity(nodeDef)) {
       const def = Survey.getNodeDefChildByName(nodeDef, name)(survey)
       if (!def) throw new Error('Unable to find node with name ' + name)
       return bindNode(survey, def)
     } else {
-      throw new Error(`Cannot get child '${name}' from attribute ${NodeDef.getNodeDefName(nodeDef)}`)
+      throw new Error(`Cannot get child '${name}' from attribute ${NodeDef.getName(nodeDef)}`)
     }
   },
   sibling: name => {

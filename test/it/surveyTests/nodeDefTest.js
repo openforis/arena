@@ -51,17 +51,17 @@ const updateNodeDefTest = async () => {
     name: newName
   })
 
-  expect(NodeDef.getNodeDefName(updatedNodeDef)).to.equal(newName)
+  expect(NodeDef.getName(updatedNodeDef)).to.equal(newName)
 
   const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyInfo.id, true)
 
   //only one node def with that name
-  expect(R.filter(n => NodeDef.getNodeDefName(n) === newName, nodeDefs).length).to.equal(1)
+  expect(R.filter(n => NodeDef.getName(n) === newName, nodeDefs).length).to.equal(1)
 
   //do not modify existing nodes
   const reloadedNodeDef2 = R.find(n => n.id === nodeDef2.id)(nodeDefs)
   expect(NodeDef.getType(reloadedNodeDef2)).to.equal(NodeDef.getType(nodeDef2))
-  expect(NodeDef.getNodeDefName(reloadedNodeDef2)).to.equal(NodeDef.getNodeDefName(nodeDef2))
+  expect(NodeDef.getName(reloadedNodeDef2)).to.equal(NodeDef.getName(nodeDef2))
 }
 
 module.exports = {

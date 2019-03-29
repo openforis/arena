@@ -66,8 +66,8 @@ export const getNodeKeyLabelValues = nodeEntity => (dispatch, getState) => {
           Record.getNodeChildrenByDefUuid(nodeEntity, nodeDefKeyUuid),
           R.head,
           n => {
-            const label = NodeDef.getNodeDefLabel(nodeDefKey, lang)
-            const value = Node.getNodeValue(n, '')
+            const label = NodeDef.getLabel(nodeDefKey, lang)
+            const value = Node.getValue(n, '')
             return `${label} - ${value}`
           }
         )(record)

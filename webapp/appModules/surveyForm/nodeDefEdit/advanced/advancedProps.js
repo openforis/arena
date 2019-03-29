@@ -10,7 +10,7 @@ import Checkbox from '../../../../commonComponents/form/checkbox'
 const AdvancedProps = props => {
   const { nodeDef, nodeDefParent, putNodeDefProp, readOnly } = props
 
-  const validation = NodeDef.getNodeDefValidation(nodeDef)
+  const validation = NodeDef.getValidation(nodeDef)
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   return (
@@ -20,8 +20,8 @@ const AdvancedProps = props => {
         <React.Fragment>
 
           <FormItem label={'readOnly'}>
-            <Checkbox checked={NodeDef.isNodeDefReadOnly(nodeDef)}
-                      disabled={readOnly || NodeDef.isNodeDefKey(nodeDef) || NodeDef.isNodeDefMultiple(nodeDef)}
+            <Checkbox checked={NodeDef.isReadOnly(nodeDef)}
+                      disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
                       validation={Validator.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
                       onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.readOnly, checked)}/>
           </FormItem>
@@ -34,7 +34,7 @@ const AdvancedProps = props => {
                                   validation={Validator.getFieldValidation('defaultValues')(validation)}
                                   nodeDefUuidContext={nodeDefUuidContext}
                                   canBeConstant={true}
-                                  isBoolean={NodeDef.isNodeDefBoolean(nodeDef)}/>
+                                  isBoolean={NodeDef.isBoolean(nodeDef)}/>
         </React.Fragment>
       }
 

@@ -16,7 +16,7 @@ const AttributeSelector = (props) => {
     filterTypes, canSelectAttributes
   } = props
 
-  const isVisible = NodeDef.isNodeDefAttribute(nodeDef) &&
+  const isVisible = NodeDef.isAttribute(nodeDef) &&
     (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -27,7 +27,7 @@ const AttributeSelector = (props) => {
     <button className={`btn btn-s btn-of-light btn-node-def${isActive ? ' active' : ''}`}
             onClick={() => onToggleAttribute(nodeDefUuid)}
             disabled={!canSelectAttributes}>
-      {NodeDef.getNodeDefLabel(nodeDef, lang)}
+      {NodeDef.getLabel(nodeDef, lang)}
       {NodeDefUiProps.getNodeDefIconByType(nodeDefType)}
     </button>
 
@@ -60,7 +60,7 @@ const AttributesSelector = (props) => {
       {
         showAncestors && nodeDefParent &&
         <React.Fragment>
-          <div className="node-def-label">{NodeDef.getNodeDefLabel(nodeDefParent, lang)}</div>
+          <div className="node-def-label">{NodeDef.getLabel(nodeDefParent, lang)}</div>
           <AttributesSelectorConnect
             lang={lang}
             nodeDefUuidEntity={NodeDef.getUuid(nodeDefParent)}

@@ -72,7 +72,7 @@ const defaultValueAppliedTest = async () => {
     const reloadedNode = R.head(nodes)
 
     //compare value with default value
-    expect(Node.getNodeValue(reloadedNode)).to.equal(2)
+    expect(Node.getValue(reloadedNode)).to.equal(2)
   })
 }
 

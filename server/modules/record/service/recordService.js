@@ -125,7 +125,7 @@ const cancelCheckOut = userId => {
 const persistNode = async (user, surveyId, node, fileReq) => {
   if (fileReq) {
     //save file to "file" table and set fileUuid and fileName into node value
-    const file = RecordFile.createFile(Node.getNodeFileUuid(node), fileReq.name, fileReq.size, fs.readFileSync(fileReq.tempFilePath),
+    const file = RecordFile.createFile(Node.getFileUuid(node), fileReq.name, fileReq.size, fs.readFileSync(fileReq.tempFilePath),
       Node.getRecordUuid(node), Node.getUuid(node))
 
     await FileManager.insertFile(surveyId, file)

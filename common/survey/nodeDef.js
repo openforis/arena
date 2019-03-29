@@ -70,39 +70,39 @@ const newNodeDef = (surveyId, parentUuid, type, props) => ({
 // ==== READ
 
 const getType = R.prop(propKeys.type)
-const getNodeDefName = SurveyUtils.getProp(propKeys.name, '')
-const getNodeDefParentUuid = SurveyUtils.getParentUuid
+const getName = SurveyUtils.getProp(propKeys.name, '')
+const getParentUuid = SurveyUtils.getParentUuid
 
-const isNodeDefKey = R.pipe(SurveyUtils.getProp(propKeys.key), R.equals(true))
-const isNodeDefRoot = R.pipe(getNodeDefParentUuid, R.isNil)
-const isNodeDefMultiple = R.pipe(SurveyUtils.getProp(propKeys.multiple), R.equals(true))
-const isNodeDefSingle = R.pipe(isNodeDefMultiple, R.not)
+const isKey = R.pipe(SurveyUtils.getProp(propKeys.key), R.equals(true))
+const isRoot = R.pipe(getParentUuid, R.isNil)
+const isMultiple = R.pipe(SurveyUtils.getProp(propKeys.multiple), R.equals(true))
+const isSingle = R.pipe(isMultiple, R.not)
 
-const isNodeDefType = type => R.pipe(getType, R.equals(type))
+const isType = type => R.pipe(getType, R.equals(type))
 
-const isNodeDefEntity = isNodeDefType(nodeDefType.entity)
-const isNodeDefSingleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefSingle(nodeDef)
-const isNodeDefMultipleEntity = nodeDef => isNodeDefEntity(nodeDef) && isNodeDefMultiple(nodeDef)
-const isNodeDefEntityOrMultiple = nodeDef => isNodeDefEntity(nodeDef) || isNodeDefMultiple(nodeDef)
+const isEntity = isType(nodeDefType.entity)
+const isSingleEntity = nodeDef => isEntity(nodeDef) && isSingle(nodeDef)
+const isMultipleEntity = nodeDef => isEntity(nodeDef) && isMultiple(nodeDef)
+const isEntityOrMultiple = nodeDef => isEntity(nodeDef) || isMultiple(nodeDef)
 
-const isNodeDefAttribute = R.pipe(isNodeDefEntity, R.not)
-const isNodeDefSingleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefSingle(nodeDef)
-const isNodeDefMultipleAttribute = nodeDef => isNodeDefAttribute(nodeDef) && isNodeDefMultiple(nodeDef)
+const isAttribute = R.pipe(isEntity, R.not)
+const isSingleAttribute = nodeDef => isAttribute(nodeDef) && isSingle(nodeDef)
+const isMultipleAttribute = nodeDef => isAttribute(nodeDef) && isMultiple(nodeDef)
 
-const isNodeDefBoolean = isNodeDefType(nodeDefType.boolean)
-const isNodeDefCode = isNodeDefType(nodeDefType.code)
-const isNodeDefCoordinate = isNodeDefType(nodeDefType.coordinate)
-const isNodeDefDecimal = isNodeDefType(nodeDefType.decimal)
-const isNodeDefFile = isNodeDefType(nodeDefType.file)
-const isNodeDefInteger = isNodeDefType(nodeDefType.integer)
-const isNodeDefTaxon = isNodeDefType(nodeDefType.taxon)
+const isBoolean = isType(nodeDefType.boolean)
+const isCode = isType(nodeDefType.code)
+const isCoordinate = isType(nodeDefType.coordinate)
+const isDecimal = isType(nodeDefType.decimal)
+const isFile = isType(nodeDefType.file)
+const isInteger = isType(nodeDefType.integer)
+const isTaxon = isType(nodeDefType.taxon)
 
-const isNodeDefPublished = R.propEq(propKeys.published, true)
+const isPublished = R.propEq(propKeys.published, true)
 
-const getNodeDefLabel = (nodeDef, lang) => {
+const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
   return isBlank(label)
-    ? getNodeDefName(nodeDef)
+    ? getName(nodeDef)
     : label
 }
 
@@ -111,13 +111,13 @@ const getValidations = SurveyUtils.getProp(propKeys.validations, {})
 // ==== READ meta
 const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
 
-const getNodeDefParentCodeDefUuid = SurveyUtils.getProp(propKeys.parentCodeDefUuid)
+const getParentCodeDefUuid = SurveyUtils.getProp(propKeys.parentCodeDefUuid)
 
 // ==== UPDATE
 
 // ==== UTILS
 const canNodeDefBeMultiple = nodeDef =>
-  (isNodeDefEntity(nodeDef) && !isNodeDefRoot(nodeDef)) ||
+  (isEntity(nodeDef) && !isRoot(nodeDef)) ||
   R.includes(
     getType(nodeDef),
     [
@@ -159,7 +159,7 @@ const canNodeDefHaveDefaultValue = nodeDef =>
     ]
   )
   // allow default value when parent code is null (for node def code)
-  && !getNodeDefParentCodeDefUuid(nodeDef)
+  && !getParentCodeDefUuid(nodeDef)
 
 module.exports = {
   nodeDefType,
@@ -175,38 +175,38 @@ module.exports = {
   getProp: SurveyUtils.getProp,
 
   getType,
-  getNodeDefName,
-  getNodeDefParentUuid,
-  getNodeDefLabels: SurveyUtils.getLabels,
-  getNodeDefLabel,
-  getNodeDefDescriptions: SurveyUtils.getProp(propKeys.descriptions, {}),
-  getNodeDefValidation: R.prop(keys.validation),
-  getNodeDefCategoryUuid: SurveyUtils.getProp(propKeys.categoryUuid),
-  getNodeDefParentCodeDefUuid,
-  getNodeDefTaxonomyUuid: SurveyUtils.getProp(propKeys.taxonomyUuid),
+  getName,
+  getParentUuid,
+  getLabels: SurveyUtils.getLabels,
+  getLabel,
+  getDescriptions: SurveyUtils.getProp(propKeys.descriptions, {}),
+  getValidation: R.prop(keys.validation),
+  getCategoryUuid: SurveyUtils.getProp(propKeys.categoryUuid),
+  getParentCodeDefUuid,
+  getTaxonomyUuid: SurveyUtils.getProp(propKeys.taxonomyUuid),
 
-  isNodeDefKey,
-  isNodeDefMultiple,
-  isNodeDefSingle,
-  isNodeDefRoot,
-  isNodeDefEntity,
-  isNodeDefAttribute,
-  isNodeDefEntityOrMultiple,
-  isNodeDefSingleEntity,
-  isNodeDefMultipleEntity,
-  isNodeDefSingleAttribute,
-  isNodeDefMultipleAttribute,
-  isNodeDefReadOnly: SurveyUtils.getProp(propKeys.readOnly, false),
+  isKey,
+  isMultiple,
+  isSingle,
+  isRoot,
+  isEntity,
+  isAttribute,
+  isEntityOrMultiple,
+  isSingleEntity,
+  isMultipleEntity,
+  isSingleAttribute,
+  isMultipleAttribute,
+  isReadOnly: SurveyUtils.getProp(propKeys.readOnly, false),
 
-  isNodeDefBoolean,
-  isNodeDefCode,
-  isNodeDefCoordinate,
-  isNodeDefDecimal,
-  isNodeDefFile,
-  isNodeDefInteger,
-  isNodeDefTaxon,
+  isBoolean,
+  isCode,
+  isCoordinate,
+  isDecimal,
+  isFile,
+  isInteger,
+  isTaxon,
 
-  isNodeDefPublished,
+  isPublished,
 
   //advanced props
   getDefaultValues: SurveyUtils.getProp(propKeys.defaultValues, []),

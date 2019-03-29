@@ -19,7 +19,7 @@ const NodeDefErrorBadge = props => {
   // update parent container invalid class
   const containerEl = container.current
 
-  const canToggleClass = NodeDef.isNodeDefAttribute(nodeDef) && containerEl
+  const canToggleClass = NodeDef.isAttribute(nodeDef) && containerEl
   if (canToggleClass) {
     if (Validator.isValidationValid(validation)) {
       containerEl.parentNode.classList.remove('node-def__invalid')
@@ -44,7 +44,7 @@ const mapStateToProps = (state, props) => {
   } else {
     const recordValidation = Record.getValidation(record)
 
-    if (NodeDef.isNodeDefSingle(nodeDef)) {
+    if (NodeDef.isSingle(nodeDef)) {
       //TODO : DON't the two following conditions return the same? : if !R.isEmpty(nodes) then you have node or not?
       if (!R.isEmpty(nodes))
         validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)

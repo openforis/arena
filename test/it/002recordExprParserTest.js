@@ -17,7 +17,7 @@ const bindNodeFunctions = (survey, record, node) => ({
   parent: async () => node.id === 1 ? null : bindNodeFunctions(survey, record, root),
   node: async name => bindNodeFunctions(survey, record, newNode(name)),
   sibling: async name => bindNodeFunctions(survey, record, newNode(name)),
-  getValue: () => Node.getNodeValue(node),
+  getValue: () => Node.getValue(node),
 })
 
 const node = bindNodeFunctions(survey, record, tree)

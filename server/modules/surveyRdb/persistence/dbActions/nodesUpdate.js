@@ -12,7 +12,7 @@ const types = { insert: 'insert', update: 'update', delete: 'delete' }
 
 // ==== parsing
 
-const hasTable = NodeDef.isNodeDefEntityOrMultiple
+const hasTable = NodeDef.isEntityOrMultiple
 
 const getType = (nodeDef, node) => {
   const created = Node.isCreated(node)
@@ -34,10 +34,10 @@ const getColNames = (nodeDef, type) =>
   R.flatten(type === types.insert
     ? [
       DataTable.colNameUuuid,
-      NodeDef.isNodeDefMultipleAttribute(nodeDef)
+      NodeDef.isMultipleAttribute(nodeDef)
         ? [DataTable.colNameParentUuuid, ...DataCol.getNames(nodeDef)]
         //entity
-        : NodeDef.isNodeDefRoot(nodeDef) ? DataTable.colNameRecordUuuid : DataTable.colNameParentUuuid
+        : NodeDef.isRoot(nodeDef) ? DataTable.colNameRecordUuuid : DataTable.colNameParentUuuid
     ]
     : DataCol.getNames(nodeDef)
   )
@@ -46,10 +46,10 @@ const getColValues = async (surveyInfo, nodeDef, node, type, client) =>
   R.flatten(type === types.insert
     ? [
       Node.getUuid(node),
-      NodeDef.isNodeDefMultipleAttribute(nodeDef)
+      NodeDef.isMultipleAttribute(nodeDef)
         ? [Node.getParentUuid(node), ...await Promise.all(DataCol.getValues(surveyInfo, nodeDef, node, client))]
         //entity
-        : NodeDef.isNodeDefRoot(nodeDef) ? Node.getRecordUuid(node) : Node.getParentUuid(node)
+        : NodeDef.isRoot(nodeDef) ? Node.getRecordUuid(node) : Node.getParentUuid(node)
     ]
     : await DataCol.getValues(surveyInfo, nodeDef, node, client)
   )
@@ -63,7 +63,7 @@ const toUpdates = async (surveyInfo, nodeDefs, nodes, client) => {
   const updates = await Promise.all(
     R.values(nodes).map(async node => {
       const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
-      const nodeDefParent = nodeDefs[NodeDef.getNodeDefParentUuid(nodeDef)]
+      const nodeDefParent = nodeDefs[NodeDef.getParentUuid(nodeDef)]
       const type = getType(nodeDef, node)
 
       return type ? {

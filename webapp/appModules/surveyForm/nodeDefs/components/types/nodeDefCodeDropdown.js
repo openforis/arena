@@ -14,7 +14,7 @@ const NodeDefCodeDropdown = props => {
 
   const disabled = R.isEmpty(items)
 
-  return NodeDef.isNodeDefMultiple(nodeDef)
+  return NodeDef.isMultiple(nodeDef)
     ? <InputChips readOnly={entryDisabled}
                   items={items}
                   disabled={disabled}

@@ -49,7 +49,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
 
   const rootEntityTableAlias = 'n0'
   const getNodeDefKeyColName = R.pipe(NodeDefTable.getColNames, R.head)
-  const getNodeDefKeyColAlias = NodeDef.getNodeDefName
+  const getNodeDefKeyColAlias = NodeDef.getName
   const nodeDefKeysSelect = nodeDefKeys.map(
     nodeDefKey => `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
   ).join(',')

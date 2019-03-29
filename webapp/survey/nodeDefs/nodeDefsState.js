@@ -17,7 +17,7 @@ export const assocNodeDefProp = (nodeDefUuid, key, value) => R.pipe(
 export const dissocNodeDef = nodeDef =>
   nodeDefsState => {
 
-    const state = NodeDef.isNodeDefEntity(nodeDef)
+    const state = NodeDef.isEntity(nodeDef)
       ? R.reduce(
         (s, n) => dissocNodeDef(n)(s),
         nodeDefsState,

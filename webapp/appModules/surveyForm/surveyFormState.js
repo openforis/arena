@@ -98,7 +98,7 @@ export const getFormPageParentNode = nodeDef =>
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
     if (nodeDefParent) {
 
-      if (NodeDef.isNodeDefRoot(nodeDefParent)) {
+      if (NodeDef.isRoot(nodeDefParent)) {
         return Record.getRootNode(record)
       } else {
         const parentNodeUuid = getFormPageNodeUuid(nodeDefParent)(state)
@@ -115,13 +115,13 @@ export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
   assocFormNodeDefEdit(nodeDef),
   // if is entity and renders in its own page, assoc active page
   R.ifElse(
-    () => NodeDef.isNodeDefEntity(nodeDef) && !!getPageUuid(nodeDef),
+    () => NodeDef.isEntity(nodeDef) && !!getPageUuid(nodeDef),
     assocFormActivePage(nodeDef),
     R.identity,
   ),
   // if is entity remove assocNodeDefAddChildTo
   R.ifElse(
-    () => NodeDef.isNodeDefEntity(nodeDef),
+    () => NodeDef.isEntity(nodeDef),
     assocNodeDefAddChildTo(null),
     R.identity,
   )

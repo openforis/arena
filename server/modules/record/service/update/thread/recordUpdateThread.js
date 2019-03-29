@@ -4,7 +4,6 @@ const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../../../threads/thread')
 
 const SurveyManager = require('../../../../survey/persistence/surveyManager')
-const surveyDependencyGraph = require('../../../../survey/surveyDependenchyGraph')
 const RecordManager = require('../../../persistence/recordManager')
 
 const RecordUpdateManager = require('../../../persistence/recordUpdateManager')
@@ -40,7 +39,7 @@ class RecordUpdateThread extends Thread {
 
       // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
       const dependencyGraph = preview
-        ? surveyDependencyGraph.buildGraph(surveyDb)
+        ? Survey.buildDependencyGraph(surveyDb)
         : await SurveyManager.fetchDependencies(this.surveyId)
 
       this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)

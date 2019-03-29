@@ -17,10 +17,10 @@ const errorKeys = {
 const getCount = (record, parentNode, childDef) => {
   const nodes = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
 
-  return NodeDef.isNodeDefEntity(childDef)
+  return NodeDef.isEntity(childDef)
     ? nodes.length
     : R.pipe(
-      R.reject(Node.isNodeValueBlank),
+      R.reject(Node.isValueBlank),
       R.length
     )(nodes)
 }

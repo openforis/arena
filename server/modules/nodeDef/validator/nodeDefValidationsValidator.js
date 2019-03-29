@@ -6,7 +6,7 @@ const Validator = require('../../../../common/validation/validator')
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 
 const validate = async (survey, nodeDef, nodeDefValidations) => {
-  const validation = NodeDef.isNodeDefMultiple(nodeDef)
+  const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {
       'count.min': [Validator.validatePositiveNumber],
       'count.max': [Validator.validatePositiveNumber],

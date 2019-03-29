@@ -16,20 +16,20 @@ import { getNodeDefComponent } from '../nodeDefSystemProps'
 const getNodeValues = async (surveyInfo, nodeDef, nodes) => {
   const nonEmptyNodes = R.pipe(
     R.reject(Node.isPlaceholder),
-    R.reject(Node.isNodeValueBlank),
+    R.reject(Node.isValueBlank),
   )(nodes)
 
   const stringNodeValues = await Promise.all(
     nonEmptyNodes.map(
       async node => {
-        if (NodeDef.isNodeDefCode(nodeDef)) {
+        if (NodeDef.isCode(nodeDef)) {
           const item = await loadCategoryItem(surveyInfo, Node.getCategoryItemUuid(node))
           const label = Category.getItemLabel(Survey.getDefaultLanguage(surveyInfo))(item)
           return label || Category.getItemCode(item)
-        } else if (NodeDef.isNodeDefFile(nodeDef)) {
-          return Node.getNodeFileName(node)
+        } else if (NodeDef.isFile(nodeDef)) {
+          return Node.getFileName(node)
         } else {
-          return Node.getNodeValue(node)
+          return Node.getValue(node)
         }
       }
     )
@@ -108,7 +108,7 @@ const NodeDefTableBody = props => {
   const { nodeDef } = props
 
   return (
-    NodeDef.isNodeDefMultiple(nodeDef) || NodeDef.isNodeDefCode(nodeDef)
+    NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
       ? <NodeDefMultipleTableBody {...props}/>
       : React.createElement(getNodeDefComponent(nodeDef), { ...props })
   )

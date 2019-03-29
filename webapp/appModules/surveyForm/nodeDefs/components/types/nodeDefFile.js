@@ -19,7 +19,7 @@ const handleFileChange = (nodeDef, node, file, updateNode) => {
 }
 
 const handleNodeDelete = (nodeDef, node, removeNode, updateNode) => {
-  if (NodeDef.isNodeDefMultiple(nodeDef)) {
+  if (NodeDef.isMultiple(nodeDef)) {
     removeNode(nodeDef, node)
   } else {
     // do not delete single node, delete only its value
@@ -28,7 +28,7 @@ const handleNodeDelete = (nodeDef, node, removeNode, updateNode) => {
 }
 
 const FileInput = ({ surveyInfo, nodeDef, readOnly, edit, node, canEditRecord, updateNode, removeNode }) => {
-  const fileName = Node.getNodeFileName(node)
+  const fileName = Node.getFileName(node)
   const truncatedFileName = RecordFile.truncateFileName(fileName)
   const fileUploaded = !edit && fileName
 

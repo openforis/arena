@@ -30,7 +30,7 @@ const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => 
 
 const nodeValuePropProcessor = (surveyInfo, nodeDefCol, nodeCol) =>
   (node, colName) => {
-    const nodeValue = Node.getNodeValue(node)
+    const nodeValue = Node.getValue(node)
     return getValueFromItem(nodeDefCol, colName, nodeValue)
   }
 
@@ -78,14 +78,14 @@ const props = {
 
   [nodeDefType.taxon]: {
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
-      const taxonUuid = Node.getNodeTaxonUuid(nodeCol)
+      const taxonUuid = Node.getTaxonUuid(nodeCol)
       const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : []
       return (node, colName) =>
         R.endsWith('code', colName)
           ? Taxonomy.getTaxonCode(taxon)
           // scientific_name
           : Taxonomy.isUnlistedTaxon(taxon)
-          ? Node.getNodeScientificName(node) //from node value
+          ? Node.getScientificName(node) //from node value
           : Taxonomy.getTaxonScientificName(taxon) //from taxon item
     },
   },
@@ -107,9 +107,9 @@ const props = {
 
 const getColValueProcessor = nodeDef => R.propOr(
   () => (node) => {
-    return Node.isNodeValueBlank(node)
+    return Node.isValueBlank(node)
       ? null
-      : Node.getNodeValue(node)
+      : Node.getValue(node)
   },
   colValueProcessor,
   props[NodeDef.getType(nodeDef)]
