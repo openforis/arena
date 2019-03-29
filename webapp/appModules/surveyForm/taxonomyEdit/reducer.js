@@ -1,3 +1,5 @@
+import Taxonomy from '../../../../common/survey/taxonomy'
+
 import { exportReducer } from '../../../appUtils/reduxUtils'
 
 import { appUserLogout } from '../../../app/actions'
@@ -22,7 +24,7 @@ const actionHandlers = {
   [taxonomyEditPropsUpdate]: (state, { type, ...props }) => mergeTaxonomyEditProps(props)(state),
 
   // create
-  [taxonomyCreate]: (state, { taxonomy }) => initTaxonomyEdit(taxonomy.uuid),
+  [taxonomyCreate]: (state, { taxonomy }) => initTaxonomyEdit(Taxonomy.getUuid(taxonomy)),
 }
 
 export default exportReducer(actionHandlers)

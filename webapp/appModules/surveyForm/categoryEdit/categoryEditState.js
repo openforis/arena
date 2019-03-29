@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import Survey from '../../../../common/survey/survey'
+import CategoryItem from '../../../../common/survey/categoryItem'
 
 // DOCS
 const surveyState = {
@@ -9,9 +10,9 @@ const surveyState = {
     categoryEdit: {
       uuid: '',
       levelItems: {
-        0: {'itemUuid': {}},
-        1: {'itemUuid': {}},
-        2: {'itemUuid': {}},
+        0: { 'itemUuid': {} },
+        1: { 'itemUuid': {} },
+        2: { 'itemUuid': {} },
       },
       levelActiveItems: {
         0: 'itemUuid',
@@ -31,7 +32,7 @@ const levelActiveItems = 'levelActiveItems'
 
 // ==== current editing category
 
-export const initCategoryEdit = (categoryUuid) => categoryUuid ? {categoryUuid} : null
+export const initCategoryEdit = (categoryUuid) => categoryUuid ? { categoryUuid } : null
 
 export const getCategoryForEdit = survey =>
   surveyForm => R.pipe(
@@ -58,14 +59,14 @@ export const getCategoryEditLevelItemsArray = (levelIndex) => R.pipe(
 
 // ==== level item
 export const assocLevelItem = (levelIndex, item) =>
-  R.assocPath([levelItems, levelIndex, item.uuid], item)
+  R.assocPath([levelItems, levelIndex, CategoryItem.getUuid(item)], item)
 
 export const assocLevelItemProp = (level, item, key, value) =>
-  R.assocPath([levelItems, level.index, item.uuid, 'props', key], value)
+  R.assocPath([levelItems, level.index, CategoryItem.getUuid(item), 'props', key], value)
 
 export const createLevelItem = (levelIndex, item) => R.pipe(
   assocLevelItem(levelIndex, item),
-  assocLevelActiveItem(levelIndex, item.uuid),
+  assocLevelActiveItem(levelIndex, CategoryItem.getUuid(item)),
 )
 
 export const dissocLevelItem = (levelIndex, itemUuid) => R.pipe(
@@ -86,7 +87,7 @@ export const getCategoryEditLevelActiveItem = levelIndex =>
     getLevelActiveItemUuid(levelIndex),
     activeItemUuid => {
       const levelItems = getCategoryEditLevelItemsArray(levelIndex)(surveyForm)
-      return R.find(item => item.uuid === activeItemUuid, levelItems)
+      return R.find(item => CategoryItem.getUuid(item) === activeItemUuid, levelItems)
     },
   )(surveyForm)
 

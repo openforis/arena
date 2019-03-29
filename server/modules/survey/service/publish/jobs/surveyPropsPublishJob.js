@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const Job = require('../../../../../job/job')
 
+const Survey = require('../../../../../../common/survey/survey')
 const NodeDefManager = require('../../../../nodeDef/persistence/nodeDefManager')
 const SurveyManager = require('../../../persistence/surveyManager')
 const CategoryManager = require('../../../../category/persistence/categoryManager')
@@ -11,9 +12,11 @@ const ActivityLog = require('../../../../activityLog/activityLogger')
 
 const determineDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, t)
-  if (survey.published) {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  if (Survey.isPublished(surveyInfo)) {
     const publishedSurvey = await SurveyManager.fetchSurveyById(surveyId, false, false, t)
-    return R.difference(publishedSurvey.props.languages, survey.props.languages)
+    const publishedSurveyInfo = Survey.getSurveyInfo(publishedSurvey)
+    return R.difference(Survey.getLanguages(publishedSurveyInfo), Survey.getLanguages(surveyInfo))
   } else {
     return []
   }
@@ -51,7 +54,7 @@ class SurveyPropsPublishJob extends Job {
     await this.removeDeletedLanguagesLabels(deletedLanguages, tx)
     this.incrementProcessedItems()
 
-    await ActivityLog.log(this.getUser(), id, ActivityLog.type.surveyPublish, {surveyUuid: surveyInfo.uuid}, tx)
+    await ActivityLog.log(this.getUser(), id, ActivityLog.type.surveyPublish, {surveyUuid: Survey.getUuid(surveyInfo)}, tx)
     this.incrementProcessedItems()
   }
 

@@ -4,6 +4,8 @@ const db = require('../../../db/db')
 const { insertAllQuery } = require('../../../db/dbUtils')
 
 const Category = require('../../../../common/survey/category')
+const CategoryLevel = require('../../../../common/survey/categoryLevel')
+const CategoryItem = require('../../../../common/survey/categoryItem')
 
 const {
   getSurveyDBSchema,
@@ -20,7 +22,7 @@ const insertCategory = async (surveyId, category, client = db) =>
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category (uuid, props_draft)
         VALUES ($1, $2)
         RETURNING *`,
-    [category.uuid, category.props],
+    [Category.getUuid(category), category.props],
     def => dbTransformCallback(def, true, true)
   )
 
@@ -29,7 +31,7 @@ const insertLevel = async (surveyId, categoryUuid, level, client = db) =>
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [level.uuid, categoryUuid, level.index, level.props],
+    [Category.getUuid(level), categoryUuid, CategoryLevel.getIndex(level), level.props],
     def => dbTransformCallback(def, true, true)
   )
 
@@ -38,15 +40,15 @@ const insertItem = async (surveyId, item, client = db) =>
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_item (uuid, level_uuid, parent_uuid, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [item.uuid, item.levelUuid, item.parentUuid, item.props],
+    [Category.getUuid(item), CategoryItem.getLevelUuid(item), CategoryItem.getParentUuid(item), item.props],
     def => dbTransformCallback(def, true, true)
   )
 
 const insertItems = async (surveyId, items, client = db) => {
   const values = items.map(item => [
-    Category.getUuid(item),
-    Category.getItemLevelUuid(item),
-    Category.getItemParentUuid(item),
+    CategoryItem.getUuid(item),
+    CategoryItem.getLevelUuid(item),
+    CategoryItem.getParentUuid(item),
     item.props
   ])
 

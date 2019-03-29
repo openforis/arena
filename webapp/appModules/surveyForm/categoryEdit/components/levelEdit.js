@@ -10,6 +10,8 @@ import { normalizeName } from '../../../../../common/stringUtils'
 
 import Survey from '../../../../../common/survey/survey'
 import Category from '../../../../../common/survey/category'
+import CategoryLevel from '../../../../../common/survey/categoryLevel'
+import CategoryItem from '../../../../../common/survey/categoryItem'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
 import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
@@ -32,8 +34,8 @@ class LevelEdit extends React.Component {
   handleDelete () {
     const {survey, category, level, deleteCategoryLevel} = this.props
 
-    const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(category.uuid)(survey)
-    if (R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= level.index)(nodeDefsCode)) {
+    const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
+    if (R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= CategoryLevel.getIndex(level))(nodeDefsCode)) {
       alert('This category level is used by some node definitions and cannot be removed')
     } else if (confirm('Delete the level with all items? This operation cannot be undone')) {
       deleteCategoryLevel(category, level)
@@ -48,7 +50,7 @@ class LevelEdit extends React.Component {
       setCategoryItemForEdit, deleteCategoryItem, readOnly,
     } = this.props
 
-    const validation = Category.getLevelValidation(level.index)(category)
+    const validation = Category.getLevelValidation(CategoryLevel.getIndex(level))(category)
 
     return <div className="category-edit__level">
 
@@ -68,7 +70,7 @@ class LevelEdit extends React.Component {
       </div>
 
       <FormItem label={'name'}>
-        <Input value={Category.getLevelName(level)}
+        <Input value={CategoryLevel.getName(level)}
                validation={getFieldValidation('name')(validation)}
                onChange={value => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
                readOnly={readOnly}/>
@@ -90,12 +92,12 @@ class LevelEdit extends React.Component {
       <div className="category-edit__level-items">
         {
           items.map(item =>
-            <ItemEdit key={item.uuid}
+            <ItemEdit key={CategoryItem.getUuid(item)}
                       language={language}
                       category={category}
                       level={level}
                       item={item}
-                      active={item.uuid === activeItemUuid}
+                      active={CategoryItem.getUuid(item) === activeItemUuid}
                       putCategoryItemProp={putCategoryItemProp}
                       setCategoryItemForEdit={setCategoryItemForEdit}
                       deleteCategoryItem={deleteCategoryItem}
@@ -130,7 +132,7 @@ const mapStateToProps = (state, props) => {
     language,
     category,
     items,
-    activeItemUuid: activeItem ? activeItem.uuid : null,
+    activeItemUuid: activeItem ? CategoryItem.getUuid(activeItem) : null,
     parentItem,
     canAddItem,
     canBeDeleted,

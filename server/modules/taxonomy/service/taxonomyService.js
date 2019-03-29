@@ -2,6 +2,7 @@ const R = require('ramda')
 const fastcsv = require('fast-csv')
 
 const Taxonomy = require('../../../../common/survey/taxonomy')
+const Taxon = require('../../../../common/survey/taxon')
 
 const TaxonomyManager = require('../persistence/taxonomyManager')
 const JobManager = require('../../../job/jobManager')
@@ -9,7 +10,7 @@ const TaxonomyImportJob = require('./taxonomyImportJob')
 
 const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
-  const vernacularLanguageCodes = Taxonomy.getTaxonomyVernacularLanguageCodes(taxonomy)
+  const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
   const csvStream = fastcsv.createWriteStream({ headers: true })
   csvStream.pipe(output)
@@ -29,13 +30,13 @@ const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   taxa.forEach(taxon => {
     csvStream.write(
       R.concat([
-          Taxonomy.getTaxonCode(taxon),
-          Taxonomy.getTaxonFamily(taxon),
-          Taxonomy.getTaxonGenus(taxon),
-          Taxonomy.getTaxonScientificName(taxon)
+          Taxon.getCode(taxon),
+          Taxon.getFamily(taxon),
+          Taxon.getGenus(taxon),
+          Taxon.getScientificName(taxon)
         ],
         vernacularLanguageCodes.map(
-          langCode => Taxonomy.getTaxonVernacularName(langCode)(taxon)
+          langCode => Taxon.getVernacularName(langCode)(taxon)
         )
       ))
   })

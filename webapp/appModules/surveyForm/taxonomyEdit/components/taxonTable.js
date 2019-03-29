@@ -2,6 +2,7 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'
+import Taxon from '../../../../../common/survey/taxon'
 import { languages } from '../../../../../common/app/languages'
 
 class TaxonTable extends React.Component {
@@ -19,7 +20,7 @@ class TaxonTable extends React.Component {
   render () {
     const {taxonomy, taxa, currentPage, totalPages, rowsPerPage, onPageChange} = this.props
     const vernacularLanguageCodes = R.reduce(
-      (acc, taxon) => R.concat(acc, R.difference(R.keys(Taxonomy.getTaxonVernacularNames(taxon)), acc)),
+      (acc, taxon) => R.concat(acc, R.difference(R.keys(Taxon.getVernacularNames(taxon)), acc)),
       [],
       taxa)
 
@@ -37,24 +38,24 @@ class TaxonTable extends React.Component {
         <div>SCIENTIFIC NAME</div>
         {
           vernacularLanguageCodes.map(lang =>
-            <div key={`vernacular_name_header_${taxonomy.uuid}_${lang}`}>{R.propOr(lang, lang)(languages)}</div>)
+            <div key={`vernacular_name_header_${Taxonomy.getUuid(taxonomy)}_${lang}`}>{R.propOr(lang, lang)(languages)}</div>)
         }
       </div>
       <div className="body"
            ref={this.tableBody}>
         {
           taxa.map(taxon =>
-            <div key={taxon.uuid}
+            <div key={Taxon.getUuid(taxon)}
                  className="row"
                  style={headerAndRowCustomStyle}>
               <div className="position">{(currentPage - 1) * rowsPerPage + taxa.indexOf(taxon) + 1}</div>
-              <div>{Taxonomy.getTaxonCode(taxon)}</div>
-              <div>{Taxonomy.getTaxonFamily(taxon)}</div>
-              <div>{Taxonomy.getTaxonGenus(taxon)}</div>
-              <div>{Taxonomy.getTaxonScientificName(taxon)}</div>
+              <div>{Taxon.getCode(taxon)}</div>
+              <div>{Taxon.getFamily(taxon)}</div>
+              <div>{Taxon.getGenus(taxon)}</div>
+              <div>{Taxon.getScientificName(taxon)}</div>
               {
                 vernacularLanguageCodes.map(lang =>
-                  <div key={`vernacular_name_${taxon.uuid}_${lang}`}>{Taxonomy.getTaxonVernacularName(lang)(taxon)}</div>)
+                  <div key={`vernacular_name_${Taxon.getUuid(taxon)}_${lang}`}>{Taxon.getVernacularName(lang)(taxon)}</div>)
               }
             </div>)
         }

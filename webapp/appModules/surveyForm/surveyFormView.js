@@ -12,6 +12,7 @@ import NodeDefEdit from './nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
 import Survey from '../../../common/survey/survey'
+import Record from '../../../common/record/record'
 import * as SurveyState from '../../survey/surveyState'
 import * as SurveyFormState from './surveyFormState'
 import * as RecordState from './record/recordState'
@@ -107,7 +108,7 @@ const mapStateToProps = (state, props) => {
 
   const mapEntryProps = () => ({
     parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,
-    recordUuid: record ? record.uuid : null,
+    recordUuid: Record.getUuid(record),
   })
 
   return {

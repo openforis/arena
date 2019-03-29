@@ -6,6 +6,7 @@ const db = require('../../../db/db')
 const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
 const Taxonomy = require('../../../../common/survey/taxonomy')
+const Taxon = require('../../../../common/survey/taxon')
 
 const TaxonomyRepository = require('./taxonomyRepository')
 const TaxonomyValidator = require('../taxonomyValidator')
@@ -36,7 +37,7 @@ const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, validate = fal
 }
 
 const validateTaxonomy = async (surveyId, taxonomies = [], taxonomy, client = db) => {
-  const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyUuid(surveyId, taxonomy.uuid, client)
+  const taxaCount = await TaxonomyRepository.countTaxaByTaxonomyUuid(surveyId, Taxonomy.getUuid(taxonomy), client)
 
   return {
     ...taxonomy,
@@ -58,8 +59,8 @@ const fetchTaxonomyByUuid = async (surveyId, taxonomyUuid, draft = false, valida
 const includeUnknownUnlistedItems = async (surveyId, taxonomyUuid, taxa, includeUnlUnk, draft) =>
   R.isEmpty(taxa) && includeUnlUnk
     ? [
-      await TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unknownCode, draft),
-      await TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unlistedCode, draft),
+      await TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unknownCode, draft),
+      await TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unlistedCode, draft),
     ]
     : taxa
 

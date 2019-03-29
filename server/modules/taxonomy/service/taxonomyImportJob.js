@@ -7,13 +7,11 @@ const { isNotBlank } = require('../../../../common/stringUtils')
 const CSVParser = require('../../../../common/file/csvParser')
 
 const Validator = require('../../../../common/validation/validator')
-const Taxonomy = require('../../../../common/survey/taxonomy')
+const Taxon = require('../../../../common/survey/taxon')
 
 const TaxonomyValidator = require('../taxonomyValidator')
 const TaxonomyManager = require('../persistence/taxonomyManager')
 const TaxonomyImportManager = require('../persistence/taxonomyImportManager')
-
-const { taxonPropKeys } = Taxonomy
 
 const requiredColumns = [
   'code',
@@ -128,7 +126,7 @@ class TaxonomyImportJob extends Job {
   async parseTaxon (data) {
     const { family, genus, scientific_name, code, ...vernacularNames } = data
 
-    const taxon = Taxonomy.newTaxon(this.taxonomyUuid, code, family, genus, scientific_name, this.parseVernacularNames(vernacularNames))
+    const taxon = Taxon.newTaxon(this.taxonomyUuid, code, family, genus, scientific_name, this.parseVernacularNames(vernacularNames))
 
     return await this.validateTaxon(taxon)
   }
@@ -138,20 +136,20 @@ class TaxonomyImportJob extends Job {
 
     //validate taxon uniqueness among inserted values
     if (validation.valid) {
-      const code = R.pipe(Taxonomy.getTaxonCode, R.toUpper)(taxon)
+      const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
       const duplicateCodeRow = this.codesToRow[code]
 
       if (duplicateCodeRow) {
-        validation.fields[taxonPropKeys.code] = { valid: false, errors: [Validator.errorKeys.duplicate] }
+        validation.fields[Taxon.propKeys.code] = { valid: false, errors: [Validator.errorKeys.duplicate] }
       } else {
         this.codesToRow[code] = this.processed + 1
       }
 
-      const scientificName = Taxonomy.getTaxonScientificName(taxon)
+      const scientificName = Taxon.getScientificName(taxon)
       const duplicateScientificNameRow = this.scientificNamesToRow[scientificName]
 
       if (duplicateScientificNameRow) {
-        validation.fields[taxonPropKeys.scientificName] = { valid: false, errors: [Validator.errorKeys.duplicate] }
+        validation.fields[Taxon.propKeys.scientificName] = { valid: false, errors: [Validator.errorKeys.duplicate] }
       } else {
         this.scientificNamesToRow[scientificName] = this.processed + 1
       }

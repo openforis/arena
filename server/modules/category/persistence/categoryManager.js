@@ -14,7 +14,7 @@ const ActivityLog = require('../../activityLog/activityLogger')
 
 // ====== VALIDATION
 const validateCategory = async (surveyId, categories, category, draft) => {
-  const items = await CategoryRepository.fetchItemsByCategoryUuid(surveyId, category.uuid, draft)
+  const items = await CategoryRepository.fetchItemsByCategoryUuid(surveyId, Category.getUuid(category), draft)
 
   return await assocValidation(category, categories, items)
 }
@@ -34,7 +34,7 @@ const insertCategory = async (user, surveyId, category, client = db) =>
     //insert levels
     const levelsDb = await Promise.all(
       levels.map(async level =>
-        await CategoryRepository.insertLevel(surveyId, categoryDb.uuid, level, t)
+        await CategoryRepository.insertLevel(surveyId, Category.getUuid(categoryDb), level, t)
       )
     )
     await markSurveyDraft(surveyId, t)
@@ -74,7 +74,7 @@ const fetchCategoriesAndLevels = async (surveyId, draft, client = db) => {
     categoriesDb.map(async category => ({
       ...category,
       levels: toIndexedObj(
-        await CategoryRepository.fetchLevelsByCategoryUuid(surveyId, category.uuid, draft, client),
+        await CategoryRepository.fetchLevelsByCategoryUuid(surveyId, Category.getUuid(category), draft, client),
         'index'
       ),
     }))

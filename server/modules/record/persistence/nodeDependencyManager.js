@@ -3,6 +3,7 @@ const R = require('ramda')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Category = require('../../../../common/survey/category')
+const CategoryItem = require('../../../../common/survey/categoryItem')
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
@@ -112,7 +113,7 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
       tx)
 
     // 2. get the item matching the specified code (valueExpr)
-    const item = R.find(item => Category.getItemCode(item) === '' + valueExpr)(itemsInLevel)
+    const item = R.find(item => CategoryItem.getCode(item) === '' + valueExpr)(itemsInLevel)
 
     return item ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) } : null
   } else if (NodeDef.isTaxon(nodeDef) && isExprPrimitive) {

@@ -10,6 +10,7 @@ const {
 } = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
 const Taxonomy = require('../../../../common/survey/taxonomy')
+const Taxon = require('../../../../common/survey/taxon')
 
 const { isBlank } = require('../../../../common/stringUtils')
 
@@ -26,7 +27,7 @@ const insertTaxonomy = async (surveyId, taxonomy, client = db) =>
         INSERT INTO ${getSurveyDBSchema(surveyId)}.taxonomy (uuid, props_draft)
         VALUES ($1, $2)
         RETURNING *`,
-    [taxonomy.uuid, taxonomy.props],
+    [Taxonomy.getUuid(taxonomy), taxonomy.props],
     record => dbTransformCallback(record, true, true)
   )
 
@@ -35,7 +36,7 @@ const insertTaxa = async (surveyId, taxa, client = db) =>
       const taxonInsertPromise = insertOrUpdateTaxon(surveyId, taxon, client)
 
       const vernacularNameInsertPromises = insertOrUpdateVernacularNames(
-        surveyId, taxon.uuid, Taxonomy.getTaxonVernacularNames(taxon), client)
+        surveyId, Taxon.getUuid(taxon), Taxon.getVernacularNames(taxon), client)
 
       return R.pipe(
         R.append(taxonInsertPromise),
@@ -51,7 +52,7 @@ const insertOrUpdateTaxon = (surveyId, taxon, client = db) =>
       ON CONFLICT (taxonomy_uuid, (props_draft->>'code')) DO
         UPDATE SET props_draft = ${getSurveyDBSchema(surveyId)}.taxon.props_draft || $3
       RETURNING *`,
-    [taxon.uuid, taxon.taxonomyUuid, taxon.props],
+    [Taxon.getUuid(taxon), Taxon.getTaxonomyUuid(taxon), taxon.props],
     record => dbTransformCallback(record, true, true)
   )
 
@@ -100,7 +101,7 @@ const fetchAllTaxa = async (surveyId, taxonomyUuid, draft = false, limit = null,
     `SELECT * 
      FROM ${getSurveyDBSchema(surveyId)}.taxon
      WHERE taxonomy_uuid = $1
-     ORDER BY ${getPropDraftOrNot(Taxonomy.taxonPropKeys.scientificName, draft)} ASC 
+     ORDER BY ${getPropDraftOrNot(Taxon.propKeys.scientificName, draft)} ASC 
      LIMIT ${limit ? limit : 'ALL'} 
      OFFSET $2`,
     [taxonomyUuid, offset],
@@ -133,7 +134,7 @@ const fetchTaxaByPropLike = async (surveyId,
 }
 
 const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
-  const taxa = await fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxonomy.taxonPropKeys.code, code, draft, client)
+  const taxa = await fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.code, code, draft, client)
   return R.head(taxa)
 }
 
@@ -143,12 +144,12 @@ const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValu
   const whereCondition = isBlank(searchValue)
     ? null
     : `
-    ${getPropFilterCondition(Taxonomy.taxonPropKeys.scientificName, '%' + searchValue + '%', draft)} 
+    ${getPropFilterCondition(Taxon.propKeys.scientificName, '%' + searchValue + '%', draft)} 
      OR  
-    ${getPropFilterCondition(Taxonomy.taxonPropKeys.code, '%' + searchValue + '%', draft)}
+    ${getPropFilterCondition(Taxon.propKeys.code, '%' + searchValue + '%', draft)}
     `
 
-  return await fetchTaxaByCondition(surveyId, taxonomyUuid, whereCondition, Taxonomy.taxonPropKeys.scientificName, draft, client)
+  return await fetchTaxaByCondition(surveyId, taxonomyUuid, whereCondition, Taxon.propKeys.scientificName, draft, client)
 }
 
 const fetchTaxaByVernacularName = async (surveyId,
@@ -166,7 +167,7 @@ const fetchTaxaByVernacularName = async (surveyId,
        ON vn.taxon_uuid = t.uuid
      WHERE t.taxonomy_uuid = $1 
       AND ${filterCondition}
-     ORDER BY ${getPropDraftOrNot(Taxonomy.taxonPropKeys.name, draft, 'vn.')} ASC
+     ORDER BY ${getPropDraftOrNot(Taxon.propKeys.name, draft, 'vn.')} ASC
      LIMIT 20`,
     [taxonomyUuid],
     record => dbTransformCallback(record, draft, true)

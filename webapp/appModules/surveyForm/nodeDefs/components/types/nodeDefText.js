@@ -30,8 +30,8 @@ const MultipleTextInput = props => {
     <div className="nodes">
       {
         nodes.map(n =>
-          (!n.placeholder || canEditRecord) &&
-          <div key={`nodeDefTextInput_${n.uuid}`}
+          (!Node.isPlaceholder(n) || canEditRecord) &&
+          <div key={`nodeDefTextInput_${Node.getUuid(n)}`}
                className={`node-def__text-multiple-text-input-wrapper`}
                 ref={multipleNodesWrapper}>
 

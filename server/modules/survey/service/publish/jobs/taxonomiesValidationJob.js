@@ -19,7 +19,7 @@ class TaxonomiesValidationJob extends Job {
 
     if (!R.isEmpty(invalidTaxonomies)) {
       this.errors = R.reduce(
-        (acc, taxonomy) => R.assoc(Taxonomy.getTaxonomyName(taxonomy), getInvalidFieldValidations(taxonomy.validation), acc),
+        (acc, taxonomy) => R.assoc(Taxonomy.getName(taxonomy), getInvalidFieldValidations(taxonomy.validation), acc),
         {},
         invalidTaxonomies
       )

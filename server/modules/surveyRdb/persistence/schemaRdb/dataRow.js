@@ -11,10 +11,12 @@ const getNodeCol = (nodeDefCol, record, nodeRow) => {
     return Record.getRootNode(record)
 
 // attribute column in multiple attribute table (value of its own table)
-  const nodeCol = Node.getNodeDefUuid(nodeRow) === nodeDefCol.uuid ?
+  const nodeDefUuid = NodeDef.getUuid(nodeDefCol)
+
+  const nodeCol = Node.getNodeDefUuid(nodeRow) === nodeDefUuid ?
     nodeRow :
     R.pipe(
-      Record.getNodeChildrenByDefUuid(nodeRow, nodeDefCol.uuid),
+      Record.getNodeChildrenByDefUuid(nodeRow, nodeDefUuid),
       R.head,
       R.defaultTo({})
     )(record)

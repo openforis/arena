@@ -9,6 +9,7 @@ import NodeDeleteButton from '../nodeDeleteButton'
 import { nodeDefRenderType } from '../../../../../../common/survey/nodeDefLayout'
 import { getNodeDefFormFields } from '../../nodeDefSystemProps'
 
+import NodeDef from '../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../common/record/node'
 
 const EntityTableRow = (props) => {
@@ -26,7 +27,7 @@ const EntityTableRow = (props) => {
 
   return (
     <div className={className}
-         id={`${nodeDef.uuid}_${i}`}>
+         id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
 
       {
         childDefs
@@ -34,7 +35,7 @@ const EntityTableRow = (props) => {
               const { length } = getNodeDefFormFields(childDef)
 
               return (
-                <div key={childDef.uuid} className="react-grid-item" style={{ width: 160 * length + 'px' }}>
+                <div key={NodeDef.getUuid(childDef)} className="react-grid-item" style={{ width: 160 * length + 'px' }}>
                   <NodeDefSwitch key={i}
                                  {...props}
                                  node={null}
@@ -66,7 +67,7 @@ class NodeDefEntityTable extends React.Component {
     const { nodes: prevNodes } = prevProps
 
     if (nodes && !R.isEmpty(nodes) && nodes.length !== prevNodes.length) {
-      const element = document.getElementById(`${nodeDef.uuid}_${nodes.length - 1}`)
+      const element = document.getElementById(`${NodeDef.getUuid(nodeDef)}_${nodes.length - 1}`)
       element.scrollIntoView()
     }
   }

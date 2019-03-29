@@ -8,6 +8,7 @@ import ErrorBadge from '../../../../commonComponents/errorBadge'
 import { normalizeName } from '../../../../../common/stringUtils'
 
 import Category from '../../../../../common/survey/category'
+import CategoryItem from '../../../../../common/survey/categoryItem'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
 class ItemEdit extends React.Component {
@@ -38,7 +39,7 @@ class ItemEdit extends React.Component {
       level,
       item,
       'labels',
-      R.assoc(labelItem.lang, labelItem.label, Category.getItemLabels(item))
+      R.assoc(labelItem.lang, labelItem.label, CategoryItem.getLabels(item))
     )
   }
 
@@ -67,14 +68,14 @@ class ItemEdit extends React.Component {
                 </button>
 
                 <FormItem label={'code'}>
-                  <Input value={Category.getItemCode(item)}
+                  <Input value={CategoryItem.getCode(item)}
                          disabled={disabled}
                          validation={getFieldValidation('code')(validation)}
                          onChange={value => putCategoryItemProp(category, level, item, 'code', normalizeName(value))}
                          readOnly={readOnly}/>
                 </FormItem>
 
-                <LabelsEditor labels={Category.getItemLabels(item)}
+                <LabelsEditor labels={CategoryItem.getLabels(item)}
                               onChange={(labelItem) => this.onPropLabelsChange(labelItem)}
                               readOnly={readOnly}/>
 
@@ -95,9 +96,9 @@ class ItemEdit extends React.Component {
             )
             : (
               <React.Fragment>
-                <div>{Category.getItemCode(item)}</div>
+                <div>{CategoryItem.getCode(item)}</div>
                 <div>{'\xA0'}-{'\xA0'}</div>
-                <div>{Category.getItemLabel(language)(item)}</div>
+                <div>{CategoryItem.getLabel(language)(item)}</div>
               </React.Fragment>
             )
         }

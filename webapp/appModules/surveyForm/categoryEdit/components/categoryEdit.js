@@ -9,6 +9,7 @@ import LevelEdit from './levelEdit'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 
 import Category from '../../../../../common/survey/category'
+import CategoryLevel from '../../../../../common/survey/categoryLevel'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
 import { getUser } from '../../../../app/appState'
@@ -42,7 +43,7 @@ const CategoryEdit = props => {
       <div className="category-edit__levels">
         {
           levels.map(level =>
-            <LevelEdit key={level.uuid}
+            <LevelEdit key={CategoryLevel.getUuid(level)}
                        level={level}/>
           )
         }

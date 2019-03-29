@@ -26,7 +26,7 @@ const formPagePath = [props, pageNodeDefUuid]
 export const assocFormActivePage = (nodeDef) =>
   R.assoc(
     pageNodeDefUuid,
-    nodeDef ? nodeDef.uuid : null
+    NodeDef.getUuid(nodeDef)
   )
 
 export const getFormActivePageNodeDef = state => {
@@ -50,7 +50,7 @@ const nodeDefEdit = 'nodeDefEdit'
 const nodeDefEditPath = [props, nodeDefEdit]
 
 export const assocFormNodeDefEdit = nodeDef =>
-  R.assoc(nodeDefEdit, nodeDef ? nodeDef.uuid : null)
+  R.assoc(nodeDefEdit, NodeDef.getUuid(nodeDef))
 
 export const getFormNodeDefEdit = survey =>
   surveyForm => Survey.getNodeDefByUuid(
@@ -61,7 +61,7 @@ export const getFormNodeDefEdit = survey =>
 const nodeDefAddChildTo = 'nodeDefAddChildTo'
 
 export const assocNodeDefAddChildTo = nodeDef =>
-  R.assoc(nodeDefAddChildTo, nodeDef ? nodeDef.uuid : null)
+  R.assoc(nodeDefAddChildTo, NodeDef.getUuid(nodeDef))
 
 export const getNodeDefAddChildTo = state => {
   const survey = SurveyState.getSurvey(state)
@@ -78,7 +78,7 @@ export const getNodeDefAddChildTo = state => {
 const pageNodes = 'pageNodes'
 
 export const assocFormPageNode = (nodeDef, nodeUuid) => {
-  const path = [pageNodes, nodeDef.uuid]
+  const path = [pageNodes, NodeDef.getUuid(nodeDef)]
   return nodeUuid
     ? R.assocPath(path, nodeUuid)
     : R.dissocPath(path)
@@ -86,7 +86,7 @@ export const assocFormPageNode = (nodeDef, nodeUuid) => {
 
 export const getFormPageNodeUuid = nodeDef => R.pipe(
   getSurveyForm,
-  R.path([props, pageNodes, nodeDef.uuid])
+  R.path([props, pageNodes, NodeDef.getUuid(nodeDef)])
 )
 
 export const getFormPageParentNode = nodeDef =>

@@ -2,12 +2,12 @@ import React from 'react'
 import * as R from 'ramda'
 
 import Node from '../../../../../../common/record/node'
-import Category from '../../../../../../common/survey/category'
+import CategoryItem from '../../../../../../common/survey/categoryItem'
 
 const Checkbox = props => {
   const { language, edit, item, nodes, selectedItems, onSelectedItemsChange, canEditRecord, readOnly } = props
 
-  const itemUuid = item.uuid
+  const itemUuid = CategoryItem.getUuid(item)
   const node = R.find(node => Node.getCategoryItemUuid(node) === itemUuid)(nodes)
   const selected = !!node
 
@@ -21,7 +21,7 @@ const Checkbox = props => {
           : R.append(item, selectedItems)
         onSelectedItemsChange(newSelectedItems)
       }}>
-      {Category.getItemLabel(language)(item)}
+      {CategoryItem.getItemLabel(language)(item)}
     </button>
   )
 }
@@ -43,7 +43,7 @@ const NodeDefCodeCheckbox = props => {
         : items.map(item =>
           <Checkbox {...props}
                     disabled={disabled}
-                    key={item.uuid}
+                    key={CategoryItem.getUuid(item)}
                     item={item}/>
         )
     }

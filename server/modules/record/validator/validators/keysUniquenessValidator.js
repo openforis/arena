@@ -50,11 +50,9 @@ const validateEntityKeysUniqueness = (survey, record, nodeEntity) => {
 }
 
 const isDuplicateEntity = (survey, record, siblingEntitiesAndSelf, entity) => {
-  const entityUuid = Node.getUuid(entity)
-
   // 1. skip current entity among all entities
 
-  const siblingEntities = R.reject(R.propEq(Node.keys.uuid, entityUuid), siblingEntitiesAndSelf)
+  const siblingEntities = R.reject(R.propEq(Node.keys.uuid, Node.getUuid(entity)), siblingEntitiesAndSelf)
 
   // 2. fetch key values
 

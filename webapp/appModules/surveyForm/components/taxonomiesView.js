@@ -44,12 +44,12 @@ class TaxonomiesView extends React.Component {
 
     const canDelete = taxonomy => taxonomy.usedByNodeDefs
       ? alert('This taxonomy is used by some node definitions and cannot be removed')
-      : window.confirm(`Delete the taxonomy ${Taxonomy.getTaxonomyName(taxonomy)}? This operation cannot be undone.`)
+      : window.confirm(`Delete the taxonomy ${Taxonomy.getName(taxonomy)}? This operation cannot be undone.`)
 
     return <ItemsView headerText="Taxonomies"
                       itemEditComponent={TaxonomyEdit}
                       itemEditProp="taxonomy"
-                      itemLabelFunction={taxonomy => Taxonomy.getTaxonomyName(taxonomy)}
+                      itemLabelFunction={taxonomy => Taxonomy.getName(taxonomy)}
                       editedItem={taxonomy}
                       items={taxonomies}
                       selectedItemUuid={selectedItemUuid}
@@ -74,7 +74,7 @@ const mapStateToProps = state => {
     Survey.getTaxonomiesArray,
     R.map(t => ({
       ...t,
-      usedByNodeDefs: Survey.getNodeDefsByTaxonomyUuid(t.uuid)(survey).length > 0
+      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey))
     }))
   )(survey)
 
@@ -87,5 +87,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  {insertTaxonomy: createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
+  {createTaxonomy, setTaxonomyForEdit, deleteTaxonomy}
 )(TaxonomiesView)

@@ -41,7 +41,7 @@ class TaxonomyEdit extends React.Component {
   async componentDidMount () {
     const {taxonomy, initTaxaList} = this.props
 
-    if (taxonomy.uuid) {
+    if (Taxonomy.getUuid(taxonomy)) {
       initTaxaList(taxonomy)
     }
   }
@@ -64,7 +64,7 @@ class TaxonomyEdit extends React.Component {
 
           <FormItem label="Taxonomy name">
             <div>
-              <Input value={Taxonomy.getTaxonomyName(taxonomy)}
+              <Input value={Taxonomy.getName(taxonomy)}
                      validation={getFieldValidation('name')(validation)}
                      onChange={value => putTaxonomyProp(taxonomy, 'name', normalizeName(value))}
                      readOnly={readOnly}/>
@@ -75,11 +75,11 @@ class TaxonomyEdit extends React.Component {
             {
               !readOnly &&
               <UploadButton label="CSV import"
-                            disabled={taxonomy.published}
+                            disabled={Taxonomy.isPublished(taxonomy)}
                             onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
 
             }
-            <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${taxonomy.uuid}/export?draft=true`}
+            <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export?draft=true`}
                             disabled={R.isEmpty(taxa)}
                             label="CSV Export"/>
           </div>
