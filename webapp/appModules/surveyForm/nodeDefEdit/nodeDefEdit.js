@@ -13,6 +13,8 @@ import TaxonomiesView from '../components/taxonomiesView'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
+import Category from '../../../../common/survey/category'
+import Taxonomy from '../../../../common/survey/taxonomy'
 
 import { getSurvey } from '../../../survey/surveyState'
 import { closeFormNodeDefEdit } from '../actions'
@@ -57,7 +59,7 @@ class NodeDefEdit extends React.Component {
               (
                 <CategoriesView
                   canSelect={canUpdateCategory}
-                  onSelect={category => putNodeDefProp(nodeDef, 'categoryUuid', category.uuid)}
+                  onSelect={category => putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
                   selectedItemUuid={NodeDef.getCategoryUuid(nodeDef)}
                   onClose={() => this.setState({ editingCategory: false })}/>
               )
@@ -65,7 +67,7 @@ class NodeDefEdit extends React.Component {
               (
                 <TaxonomiesView
                   canSelect={true}
-                  onSelect={taxonomy => putNodeDefProp(nodeDef, 'taxonomyUuid', taxonomy.uuid)}
+                  onSelect={taxonomy => putNodeDefProp(nodeDef, NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))}
                   selectedItemUuid={NodeDef.getTaxonomyUuid(nodeDef)}
                   onClose={() => this.setState({ editingTaxonomy: false })}/>
               )

@@ -68,7 +68,7 @@ const mapStateToProps = (state) => {
     Survey.getCategoriesArray,
     R.map(category => ({
       ...category,
-      usedByNodeDefs: Survey.getNodeDefsByCategoryUuid(category.uuid)(survey).length > 0
+      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey))
     }))
   )(survey)
 

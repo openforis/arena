@@ -7,7 +7,7 @@ const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const { nodeDefType } = NodeDef
 const Category = require('../../../../../../common/survey/category')
-const Taxonomy = require('../../../../../../common/survey/taxonomy')
+const Taxon = require('../../../../../../common/survey/taxon')
 const Node = require('../../../../../../common/record/node')
 const RecordFile = require('../../../../../../common/record/recordFile')
 
@@ -121,7 +121,7 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
 
       const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
 
-      const unlistedTaxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, Taxonomy.unlistedCode, false, tx)
+      const unlistedTaxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unlistedCode, false, tx)
 
       if (vernacularName) {
 
@@ -130,21 +130,21 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
 
         return taxon
           ? {
-            [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(taxon),
-            [Node.valuePropKeys.vernacularNameUuid]: Taxonomy.getTaxonVernacularNameUuid(taxon),
+            [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(taxon),
+            [Node.valuePropKeys.vernacularNameUuid]: Taxon.getVernacularNameUuid(taxon),
           }
           : {
-            [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(unlistedTaxon),
+            [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(unlistedTaxon),
             [Node.valuePropKeys.vernacularName]: vernacularName
           }
       } else if (code) {
         const taxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, code, false, tx)
         return taxon
           ? {
-            [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(taxon)
+            [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(taxon)
           }
           : {
-            [Node.valuePropKeys.taxonUuid]: Taxonomy.getUuid(unlistedTaxon),
+            [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(unlistedTaxon),
             [Node.valuePropKeys.scientificName]: scientific_name
           }
 

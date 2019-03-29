@@ -50,7 +50,7 @@ const CodeProps = (props) => {
 
   const putCategoryProp = category => {
     putNodeDefProp(nodeDef, propKeys.parentCodeDefUuid, null) //reset parent code
-    putNodeDefProp(nodeDef, propKeys.categoryUuid, category ? category.uuid : null)
+    putNodeDefProp(nodeDef, propKeys.categoryUuid, Category.getUuid(category))
   }
 
   return (
@@ -104,7 +104,7 @@ const CodeProps = (props) => {
                     selection={parentCodeDef}
                     itemKeyProp={'uuid'}
                     itemLabelFunction={NodeDef.getName}
-                    onChange={def => putNodeDefProp(nodeDef, propKeys.parentCodeDefUuid, def ? def.uuid : null)}/>
+                    onChange={def => putNodeDefProp(nodeDef, propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}/>
         </div>
       </FormItem>
     </React.Fragment>

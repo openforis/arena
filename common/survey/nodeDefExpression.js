@@ -3,6 +3,8 @@ const R = require('ramda')
 const {uuidv4} = require('./../uuid')
 const {isBlank} = require('../stringUtils')
 
+const SurveyUtils = require('./surveyUtils')
+
 const keys = {
   placeholder: 'placeholder',
   expression: 'expression',
@@ -80,6 +82,7 @@ module.exports = {
   createExpressionPlaceholder,
 
   //READ
+  getUuid: SurveyUtils.getUuid,
   getExpression,
   getApplyIf,
   getMessages,

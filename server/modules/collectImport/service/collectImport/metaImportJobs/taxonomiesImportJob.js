@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
+const Taxon = require('../../../../../../common/survey/taxon')
 const { languageCodesISO636_2 } = require('../../../../../../common/app/languages')
 
 const Job = require('../../../../../job/job')
@@ -99,7 +100,7 @@ class TaxonomiesImportJob extends Job {
           : acc
       }, {}, vernacularLangCodes)
 
-      const taxon = Taxonomy.newTaxon(taxonomyUuid, code, row.family, genus, scientificName, vernacularNames)
+      const taxon = Taxon.newTaxon(taxonomyUuid, code, row.family, genus, scientificName, vernacularNames)
 
       await this.taxonomyImportHelper.addTaxonToInsertBuffer(taxon, tx)
     }

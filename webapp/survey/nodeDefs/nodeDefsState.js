@@ -5,7 +5,7 @@ import NodeDef from '../../../common/survey/nodeDef'
 
 // ====== UPDATE
 
-export const assocNodeDef = nodeDef => R.assoc(nodeDef.uuid, nodeDef)
+export const assocNodeDef = nodeDef => R.assoc(NodeDef.getUuid(nodeDef), nodeDef)
 
 export const assocNodeDefProp = (nodeDefUuid, key, value) => R.pipe(
   R.assocPath(R.concat([nodeDefUuid, 'props'], R.split('.', key)), value),
@@ -25,5 +25,5 @@ export const dissocNodeDef = nodeDef =>
       )
       : nodeDefsState
 
-    return R.dissoc(nodeDef.uuid, state)
+    return R.dissoc(NodeDef.getUuid(nodeDef), state)
   }

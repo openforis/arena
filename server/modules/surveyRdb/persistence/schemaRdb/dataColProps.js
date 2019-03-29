@@ -4,7 +4,7 @@ const camelize = require('camelize')
 const Survey = require('../../../../../common/survey/survey')
 const SurveyUtils = require('../../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../../common/survey/nodeDef')
-const Taxonomy = require('../../../../../common/survey/taxonomy')
+const Taxon = require('../../../../../common/survey/taxon')
 const Node = require('../../../../../common/record/node')
 const CategoryManager = require('../../../category/persistence/categoryManager')
 const TaxonomyManager = require('../../../taxonomy/persistence/taxonomyManager')
@@ -82,11 +82,11 @@ const props = {
       const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : []
       return (node, colName) =>
         R.endsWith('code', colName)
-          ? Taxonomy.getTaxonCode(taxon)
+          ? Taxon.getCode(taxon)
           // scientific_name
-          : Taxonomy.isUnlistedTaxon(taxon)
+          : Taxon.isUnlistedTaxon(taxon)
           ? Node.getScientificName(node) //from node value
-          : Taxonomy.getTaxonScientificName(taxon) //from taxon item
+          : Taxon.getScientificName(taxon) //from taxon item
     },
   },
 

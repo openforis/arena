@@ -19,6 +19,7 @@ module.exports = {
   getSurveyInfo: SurveyInfo.getInfo,
 
   // === context is surveyInfo
+  getUuid: SurveyInfo.getUuid,
   getName: SurveyInfo.getName,
   getLanguages: SurveyInfo.getLanguages,
   getDefaultLanguage: SurveyInfo.getDefaultLanguage,

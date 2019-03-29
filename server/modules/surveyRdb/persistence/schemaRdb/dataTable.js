@@ -3,6 +3,7 @@ const R = require('ramda')
 const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
 const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
+const Record = require('../../../../../common/record/record')
 const Node = require('../../../../../common/record/node')
 const DataRow = require('./dataRow')
 const DataCol = require('./dataCol')
@@ -65,8 +66,8 @@ const getUuidUniqueConstraint = nodeDef => `CONSTRAINT ${NodeDef.getName(nodeDef
 const getRowValues = async (survey, nodeDef, record, node, client) => {
   const rowValues = await DataRow.getValues(Survey.getSurveyInfo(survey), nodeDef, record, node, getNodeDefColumns(survey, nodeDef), client)
   return [
-    node.uuid,
-    NodeDef.isRoot(nodeDef) ? record.uuid : Node.getParentUuid(node),
+    Node.getUuid(node),
+    NodeDef.isRoot(nodeDef) ? Record.getUuid(record) : Node.getParentUuid(node),
     ...R.flatten(rowValues)
   ]
 }

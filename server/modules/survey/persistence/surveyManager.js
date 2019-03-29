@@ -41,7 +41,7 @@ const createSurvey = async (user, { name, label, lang, collectUri = null }, crea
 
       // create the survey
       const survey = await SurveyRepository.insertSurvey(props, userId, t)
-      const { id: surveyId } = survey
+      const { id: surveyId, uuid } = survey
 
       //create survey data schema
       await migrateSurveySchema(surveyId)
@@ -70,7 +70,7 @@ const createSurvey = async (user, { name, label, lang, collectUri = null }, crea
         await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, userId, t)
       }
 
-      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, { name, label, lang, uuid: survey.uuid }, t)
+      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, { name, label, lang, uuid }, t)
 
       return survey
     }

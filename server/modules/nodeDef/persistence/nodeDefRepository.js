@@ -5,6 +5,8 @@ const db = require('../../../db/db')
 const { selectDate, now } = require('../../../db/dbUtils')
 const { getSurveyDBSchema, dbTransformCallback: dbTransformCallbackCommon } = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
+const NodeDef = require('../../../../common/survey/nodeDef')
+
 const dbTransformCallback = (nodeDef, draft, advanced = false) => {
 
   const def = advanced ?
@@ -110,7 +112,7 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
     AND parent_uuid = $1
     AND props->>'key' = $2
     ORDER BY id`,
-    [rootNodeDef.uuid, 'true'],
+    [NodeDef.getUuid(rootNodeDef), 'true'],
     res => dbTransformCallback(res, draft, false)
   )
 }
@@ -155,7 +157,7 @@ const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = db) => {
 
   const childNodeDefs = await fetchNodeDefsByParentUuid(surveyId, nodeDefUuid, true, client)
   await Promise.all(childNodeDefs.map(async childNodeDef =>
-    await markNodeDefDeleted(surveyId, childNodeDef.uuid, client)
+    await markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client)
   ))
 
   return nodeDef
@@ -171,10 +173,10 @@ const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
     `)
 
 const deleteNodeDefsLabels = async (surveyId, langCode, client = db) =>
-  await deleteNodeDefsProp(surveyId, ['labels', langCode], client)
+  await deleteNodeDefsProp(surveyId, [NodeDef.propKeys.labels, langCode], client)
 
 const deleteNodeDefsDescriptions = async (surveyId, langCode, client = db) =>
-  await deleteNodeDefsProp(surveyId, ['descriptions', langCode], client)
+  await deleteNodeDefsProp(surveyId, [NodeDef.propKeys.descriptions, langCode], client)
 
 const deleteNodeDefsProp = async (surveyId, deletePath, client = db) =>
   await client.none(`

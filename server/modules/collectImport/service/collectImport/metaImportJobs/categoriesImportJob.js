@@ -1,6 +1,8 @@
 const R = require('ramda')
 
 const Category = require('../../../../../../common/survey/category')
+const CategoryItem = require('../../../../../../common/survey/categoryItem')
+const CategoryLevel = require('../../../../../../common/survey/categoryLevel')
 
 const Job = require('../../../../../job/job')
 const BatchPersister = require('../../../../../db/batchPersister')
@@ -65,7 +67,7 @@ class CategoriesImportJob extends Job {
       const collectFirstLevel = hierarchyLevels[0]
 
       // update first level name
-      firstLevel = await CategoryManager.updateLevelProp(user, surveyId, Category.getUuid(firstLevel), Category.levelProps.name, collectFirstLevel.attributes.name, tx)
+      firstLevel = await CategoryManager.updateLevelProp(user, surveyId, Category.getUuid(firstLevel), CategoryLevel.props.name, collectFirstLevel.attributes.name, tx)
       category = Category.assocLevel(firstLevel)(category)
 
       // insert other levels
@@ -93,9 +95,9 @@ class CategoriesImportJob extends Job {
 
       const labels = CollectIdmlParseUtils.toLabels('label', defaultLanguage)(collectItem)
 
-      const item = Category.newItem(levelUuid, parentItem, {
-        [Category.itemProps.code]: CollectIdmlParseUtils.getChildElementText('code')(collectItem),
-        [Category.itemProps.labels]: labels
+      const item = CategoryItem.newItem(levelUuid, parentItem, {
+        [CategoryItem.props.code]: CollectIdmlParseUtils.getChildElementText('code')(collectItem),
+        [CategoryItem.props.labels]: labels
       })
       await this.itemBatchPersister.addItem(item, tx)
 

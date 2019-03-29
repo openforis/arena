@@ -111,7 +111,7 @@ export class ExpressionsProp extends React.Component {
   }
 
   getExpressionIndex (expression) {
-    return R.findIndex(R.propEq('uuid', expression.uuid), this.state.uiValues)
+    return R.findIndex(R.propEq('uuid', NodeDefExpression.getUuid(expression)), this.state.uiValues)
   }
 
   handleValuesUpdate (newValues) {

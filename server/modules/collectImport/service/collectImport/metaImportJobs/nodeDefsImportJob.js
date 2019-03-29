@@ -200,7 +200,7 @@ class NodeDefsImportJob extends Job {
         }
       case nodeDefType.taxon:
         const taxonomyName = collectNodeDef.attributes.taxonomy
-        const taxonomy = R.find(t => taxonomyName === Taxonomy.getTaxonomyName(t), this.getContextProp('taxonomies', []))
+        const taxonomy = R.find(t => taxonomyName === Taxonomy.getName(t), this.getContextProp('taxonomies', []))
 
         return {
           [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy)

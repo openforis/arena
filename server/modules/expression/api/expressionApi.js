@@ -1,8 +1,8 @@
 const R = require('ramda')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
-const Category = require('../../../../common/survey/category')
-const Taxonomy = require('../../../../common/survey/taxonomy')
+const CategoryItem = require('../../../../common/survey/categoryItem')
+const Taxon = require('../../../../common/survey/taxon')
 const { isBlank, contains } = require('../../../../common/stringUtils')
 
 const CategoryManager = require('../../category/persistence/categoryManager')
@@ -17,12 +17,12 @@ const toItem = (type, lang = null) =>
     (
       type === NodeDef.nodeDefType.code
         ? {
-          key: Category.getItemCode(item),
-          label: Category.getItemLabel(lang)(item),
+          key: CategoryItem.getCode(item),
+          label: CategoryItem.getLabel(lang)(item),
         }
         : {
-          key: Taxonomy.getTaxonCode(item),
-          label: Taxonomy.getTaxonScientificName(item),
+          key: Taxon.getCode(item),
+          label: Taxon.getScientificName(item),
         }
     )
     : null
@@ -43,7 +43,7 @@ module.exports.init = app => {
         const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, 0, true)
 
         const item = R.pipe(
-          R.find(item => Category.getItemCode(item) === value),
+          R.find(item => CategoryItem.getCode(item) === value),
           toItem(type, lang)
         )(itemsDb)
 
@@ -83,8 +83,8 @@ module.exports.init = app => {
             R.always(isBlank(value)),
             R.identity,
             R.filter(item => {
-              const code = Category.getItemCode(item)
-              const label = Category.getItemLabel(lang)(item)
+              const code = CategoryItem.getCode(item)
+              const label = CategoryItem.getLabel(lang)(item)
               return contains(value, code) || contains(value, label)
             })
           ),

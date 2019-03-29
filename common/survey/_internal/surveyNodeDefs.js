@@ -25,7 +25,7 @@ const getNodeDefsByUuids = (uuids = []) => R.pipe(
   R.filter(nodeDef => R.includes(NodeDef.getUuid(nodeDef), uuids))
 )
 
-const getNodeDefChildren = nodeDef => getNodeDefsByParentUuid(nodeDef.uuid)
+const getNodeDefChildren = nodeDef => getNodeDefsByParentUuid(NodeDef.getUuid(nodeDef))
 
 const getNodeDefChildByName = (nodeDef, childName) =>
   R.pipe(
@@ -92,7 +92,7 @@ const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
       return false
 
     const nodeDefParent = getNodeDefParent(nodeDefDescendant)(survey)
-    return nodeDefParent.uuid === nodeDefAncestor.uuid
+    return NodeDef.getUuid(nodeDefParent) === NodeDef.getUuid(nodeDefAncestor)
       ? true
       : isNodeDefAncestor(nodeDefAncestor, nodeDefParent)(survey)
   }
@@ -139,7 +139,7 @@ const getNodeDefParentCode = nodeDef => getNodeDefByUuid(NodeDef.getParentCodeDe
 
 const isNodeDefParentCode = nodeDef => R.pipe(
   getNodeDefsArray,
-  R.any(def => NodeDef.getParentCodeDefUuid(def) === nodeDef.uuid),
+  R.any(def => NodeDef.getParentCodeDefUuid(def) === NodeDef.getUuid(nodeDef)),
 )
 
 const getNodeDefCodeCandidateParents = nodeDef =>
@@ -159,10 +159,10 @@ const getNodeDefCodeCandidateParents = nodeDef =>
               NodeDef.isMultiple(n)
               ||
               // or different category nodeDef
-              NodeDef.getCategoryUuid(n) !== category.uuid
+              NodeDef.getCategoryUuid(n) !== Category.getUuid(category)
               ||
               // or itself
-              n.uuid === nodeDef.uuid
+              NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef)
               ||
               // or leaves nodeDef
               getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1

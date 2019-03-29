@@ -11,6 +11,7 @@ import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import Survey from '../../../../../../common/survey/survey'
 import Category from '../../../../../../common/survey/category'
+import CategoryItem from '../../../../../../common/survey/categoryItem'
 import Record from '../../../../../../common/record/record'
 import Node from '../../../../../../common/record/node'
 import { isRenderDropdown } from '../../../../../../common/survey/nodeDefLayout'
@@ -84,7 +85,7 @@ class NodeDefCode extends React.Component {
       R.reject(R.isNil),
     )(nodes)
 
-    return R.filter(item => R.includes(item.uuid)(selectedItemUuids))(items)
+    return R.filter(item => R.includes(CategoryItem.getUuid(item))(selectedItemUuids))(items)
   }
 
   handleSelectedItemsChange (newSelectedItems) {
@@ -98,7 +99,7 @@ class NodeDefCode extends React.Component {
     if (NodeDef.isMultiple(nodeDef)) {
       const deselectedItem = R.head(R.difference(selectedItems, newSelectedItems))
       if (deselectedItem) {
-        const nodeToRemove = R.find(n => Node.getCategoryItemUuid(n) === deselectedItem.uuid, nodes)
+        const nodeToRemove = R.find(n => Node.getCategoryItemUuid(n) === CategoryItem.getUuid(deselectedItem), nodes)
         removeNode(nodeDef, nodeToRemove)
       }
     }
@@ -111,7 +112,7 @@ class NodeDefCode extends React.Component {
       const nodeToUpdate = this.determineNodeToUpdate()
       const value = newSelectedItem
         ? {
-          itemUuid: newSelectedItem.uuid,
+          itemUuid: CategoryItem.getUuid(newSelectedItem),
           h: codeUuidsHierarchy
         }
         : null

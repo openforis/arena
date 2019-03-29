@@ -84,7 +84,7 @@ const EntityForm = props => {
         {
           innerPageChildren
             .map((childDef, i) =>
-              <div key={childDef.uuid} id={childDef.uuid}
+              <div key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}
                    className={NodeDef.isEntity(childDef) && isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
                 <NodeDefSwitch
                   key={i}
@@ -116,7 +116,7 @@ const NodeSelect = props => {
     <div className="node-def-entity-form__actions">
 
       <select className="node-select"
-              value={selectedNode ? selectedNode.uuid : 'placeholder'}
+              value={selectedNode ? Node.getUuid(selectedNode) : 'placeholder'}
               onChange={e => onChange(e.target.value)}
               aria-disabled={R.isEmpty(nodes)}>
         <option value='placeholder' disabled hidden={true}>Select</option>
@@ -150,7 +150,7 @@ const NodeSelect = props => {
                   onClick={() => {
                     const entity = Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
                     updateNode(nodeDef, entity)
-                    onChange(entity.uuid)
+                    onChange(Node.getUuid(entity))
                   }}
                   aria-disabled={!canAddNode}>
             <span className="icon icon-plus icon-16px icon-left"/>

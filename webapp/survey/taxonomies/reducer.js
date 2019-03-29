@@ -1,6 +1,8 @@
 import { exportReducer } from '../../appUtils/reduxUtils'
 import * as R from 'ramda'
 
+import Taxonomy from '../../../common/survey/taxonomy'
+
 import { appUserLogout } from '../../app/actions'
 
 import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
@@ -19,20 +21,20 @@ const actionHandlers = {
   [surveyDefsLoad]: (state, { taxonomies }) => taxonomies,
 
   // create
-  [taxonomyCreate]: (state, { taxonomy }) => R.assoc(taxonomy.uuid, taxonomy)(state),
+  [taxonomyCreate]: (state, { taxonomy }) => R.assoc(Taxonomy.getUuid(taxonomy), taxonomy)(state),
 
   // update
-  [taxonomyUpdate]: (state, { taxonomy }) => R.assoc(taxonomy.uuid, taxonomy)(state),
+  [taxonomyUpdate]: (state, { taxonomy }) => R.assoc(Taxonomy.getUuid(taxonomy), taxonomy)(state),
 
   [taxonomiesUpdate]: (state, { taxonomies }) => taxonomies,
 
   [taxonomyPropUpdate]: (state, { taxonomy, key, value }) => R.pipe(
-    R.assocPath([taxonomy.uuid, 'props', key], value),
-    R.dissocPath([taxonomy.uuid, 'validation', 'fields', key]),
+    R.assocPath([Taxonomy.getUuid(taxonomy), 'props', key], value),
+    R.dissocPath([Taxonomy.getUuid(taxonomy), 'validation', 'fields', key]),
   )(state),
 
   // delete
-  [taxonomyDelete]: (state, { taxonomy }) => R.dissoc(taxonomy.uuid)(state),
+  [taxonomyDelete]: (state, { taxonomy }) => R.dissoc(Taxonomy.getUuid(taxonomy))(state),
 }
 
 export default exportReducer(actionHandlers)

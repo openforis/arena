@@ -1,9 +1,12 @@
 const R = require('ramda')
 const { uuidv4 } = require('../uuid')
 
-const { getProp, setProp, toIndexedObj } = require('./surveyUtils')
+const { getProp, setProp, toIndexedObj, getUuid } = require('./surveyUtils')
 
 const { getValidation, getFieldValidation } = require('../validation/validator')
+
+const CategoryLevel = require('./categoryLevel')
+const CategoryItem = require('./categoryItem')
 
 const keys = {
   uuid: 'uuid',
@@ -15,24 +18,6 @@ const props = {
   name: 'name'
 }
 
-const levelKeys = {
-  categoryUuid: 'categoryUuid',
-  index: 'index'
-}
-
-const levelProps = {
-  name: 'name'
-}
-
-const itemKeys = {
-  parentUuid: 'parentUuid',
-  levelUuid: 'levelUuid'
-}
-
-const itemProps = {
-  code: 'code',
-  labels: 'labels'
-}
 
 /**
  * CATEGORY
@@ -49,8 +34,24 @@ const newCategory = (props = {}) => {
   }
 }
 
+/**
+ * LEVELS
+ */
+// ==== CREATE
+const newLevel = (category) => {
+  const index = getLevelsArray(category).length
+
+  return {
+    [CategoryLevel.keys.uuid]: uuidv4(),
+    [CategoryLevel.keys.categoryUuid]: getUuid(category),
+    [CategoryLevel.keys.index]: index,
+    [CategoryLevel.keys.props]: {
+      name: 'level_' + (index + 1),
+    }
+  }
+}
+
 // ====== READ
-const getUuid = R.prop(keys.uuid)
 const getLevels = R.propOr([], keys.levels)
 const getLevelsArray = R.pipe(
   getLevels,
@@ -75,56 +76,15 @@ const assocLevel = level =>
       levels => assocLevelsArray(levels)(category)
     )(category)
 
-/**
- * LEVEL
- */
-// ====== CREATE
-const newLevel = (category) => {
-  const index = getLevelsArray(category).length
-
-  return {
-    [keys.uuid]: uuidv4(),
-    [levelKeys.categoryUuid]: getUuid(category),
-    [levelKeys.index]: index,
-    [keys.props]: {
-      name: 'level_' + (index + 1),
-    }
-  }
-}
-// ====== READ
-const getLevelIndex = R.prop(levelKeys.index)
 
 /**
- * ITEM
+ * ITEMS
  */
-// ====== CREATE
-const newItem = (levelUuid, parentItem = null, props = {}) => {
-  return {
-    [keys.uuid]: uuidv4(),
-    [itemKeys.levelUuid]: levelUuid,
-    [itemKeys.parentUuid]: parentItem ? parentItem.uuid : null,
-    [keys.props]: props,
-  }
-}
-
-// ====== READ
-const getItemCode = getProp(itemProps.code)
-
-const getItemLabels = getProp(itemProps.labels)
-
-const getItemLabel = language =>
-  item =>
-    R.pipe(
-      getItemLabels,
-      R.prop(language),
-      R.defaultTo(getItemCode(item))
-    )(item)
-
 const getItemLevelIndex = item =>
   category => R.pipe(
-    R.prop(itemKeys.levelUuid),
+    CategoryItem.getLevelUuid,
     levelUuid => getLevelByUuid(levelUuid)(category),
-    getLevelIndex,
+    CategoryLevel.getIndex,
   )(item)
 
 const isItemLeaf = item =>
@@ -134,7 +94,7 @@ const isItemLeaf = item =>
 const getItemValidation = item => R.pipe(
   getValidation,
   getFieldValidation('items'),
-  getFieldValidation(item.uuid),
+  getFieldValidation(CategoryItem.getUuid(item)),
 )
 
 // ======= UPDATE
@@ -144,16 +104,13 @@ const isLevelDeleteAllowed = level => R.pipe(
   getLevelsArray,
   R.length,
   levelsCount => R.and(
-    level.index > 0,
-    level.index === (levelsCount - 1)
+    CategoryLevel.getIndex(level) > 0,
+    CategoryLevel.getIndex(level) === (levelsCount - 1)
   )
 )
 
 module.exports = {
   props,
-  levelProps,
-  itemKeys,
-  itemProps,
 
   // ======
   //CREATE
@@ -174,26 +131,16 @@ module.exports = {
   newLevel,
 
   //READ
-  getLevelName: getProp(levelProps.name),
-  getLevelIndex,
   getLevelValidation: levelIndex => R.pipe(
     getValidation,
     getFieldValidation(keys.levels),
     getFieldValidation(levelIndex),
   ),
   //UPDATE
-  assocLevelName: name => setProp(levelProps.name, name),
+  assocLevelName: name => setProp(CategoryLevel.props.name, name),
 
-  // ====== ITEM
-  //CREATE
-  newItem,
+  // ====== ITEMS
 
-  //READ
-  getItemLevelUuid: R.prop(itemKeys.levelUuid),
-  getItemParentUuid: R.prop(itemKeys.parentUuid),
-  getItemCode,
-  getItemLabels,
-  getItemLabel,
   getItemValidation,
   getItemLevelIndex,
   isItemLeaf,

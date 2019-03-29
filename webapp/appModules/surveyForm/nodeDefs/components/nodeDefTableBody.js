@@ -8,7 +8,7 @@ import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
-import Category from '../../../../../common/survey/category'
+import CategoryItem from '../../../../../common/survey/categoryItem'
 import Node from '../../../../../common/record/node'
 
 import { getNodeDefComponent } from '../nodeDefSystemProps'
@@ -24,8 +24,8 @@ const getNodeValues = async (surveyInfo, nodeDef, nodes) => {
       async node => {
         if (NodeDef.isCode(nodeDef)) {
           const item = await loadCategoryItem(surveyInfo, Node.getCategoryItemUuid(node))
-          const label = Category.getItemLabel(Survey.getDefaultLanguage(surveyInfo))(item)
-          return label || Category.getItemCode(item)
+          const label = CategoryItem.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+          return label || CategoryItem.getCode(item)
         } else if (NodeDef.isFile(nodeDef)) {
           return Node.getFileName(node)
         } else {

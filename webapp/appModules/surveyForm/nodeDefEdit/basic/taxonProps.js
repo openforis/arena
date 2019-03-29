@@ -29,7 +29,7 @@ const TaxonProps = (props) => {
 
   const validation = Validator.getValidation(nodeDef)
 
-  const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, propKeys.taxonomyUuid, taxonomy ? taxonomy.uuid : null)
+  const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
 
   return (
     <React.Fragment>
@@ -41,7 +41,7 @@ const TaxonProps = (props) => {
         }}>
           <Dropdown items={taxonomies}
                     itemKeyProp={'uuid'}
-                    itemLabelFunction={Taxonomy.getTaxonomyName}
+                    itemLabelFunction={Taxonomy.getName}
                     validation={Validator.getFieldValidation(propKeys.taxonomyUuid)(validation)}
                     selection={taxonomy}
                     onChange={putTaxonomyProp}/>
@@ -83,7 +83,7 @@ export default connect(
   mapStateToProps,
   {
     putNodeDefProp,
-    insertTaxonomy: createTaxonomy,
+    createTaxonomy,
     deleteTaxonomy,
   }
 )(TaxonProps)

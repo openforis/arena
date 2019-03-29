@@ -25,6 +25,8 @@ const getInfo = R.propOr({}, keys.info)
 // ====== READ surveyInfo
 const getId = R.prop(keys.id)
 
+const getUuid = SurveyUtils.getUuid
+
 const getName = SurveyUtils.getProp(keys.name, '')
 
 const getDescriptions = SurveyUtils.getProp(keys.descriptions, {})
@@ -88,6 +90,7 @@ module.exports = {
   getInfo,
 
   getId,
+  getUuid,
   isPublished,
   isDraft,
   getName,

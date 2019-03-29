@@ -3,12 +3,13 @@ const R = require('ramda')
 const BatchPersister = require('../../../db/batchPersister')
 
 const Taxonomy = require('../../../../common/survey/taxonomy')
+const Taxon = require('../../../../common/survey/taxon')
 
 const TaxonomyManager = require('./taxonomyManager')
 
 const createPredefinedTaxa = (taxonomy) => [
-  Taxonomy.newTaxon(taxonomy.uuid, Taxonomy.unknownCode, 'Unknown', 'Unknown', 'Unknown'),
-  Taxonomy.newTaxon(taxonomy.uuid, Taxonomy.unlistedCode, 'Unlisted', 'Unlisted', 'Unlisted')
+  Taxon.newTaxon(Taxonomy.getUuid(taxonomy), Taxon.unknownCode, 'Unknown', 'Unknown', 'Unknown'),
+  Taxon.newTaxon(Taxonomy.getUuid(taxonomy), Taxon.unlistedCode, 'Unlisted', 'Unlisted', 'Unlisted')
 ]
 
 class TaxonomyImportManager {
@@ -24,7 +25,7 @@ class TaxonomyImportManager {
   async addTaxonToInsertBuffer (taxon, t) {
     this.batchPersister.addItem(R.omit(['validation'], taxon), t)
 
-    this.insertedCodes[Taxonomy.getTaxonCode(taxon)] = true
+    this.insertedCodes[Taxon.getCode(taxon)] = true
   }
 
   async taxaInsertHandler (items, t) {
@@ -44,7 +45,7 @@ class TaxonomyImportManager {
     //insert predefined taxa (UNL - UNK)
     const predefinedTaxaToInsert = R.pipe(
       createPredefinedTaxa,
-      R.filter(taxon => !this.insertedCodes[Taxonomy.getTaxonCode(taxon)])
+      R.filter(taxon => !this.insertedCodes[Taxon.getCode(taxon)])
     )(taxonomy)
 
     if (!R.isEmpty(predefinedTaxaToInsert)) {

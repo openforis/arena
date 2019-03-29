@@ -5,7 +5,7 @@ import InputChips from '../../../../../commonComponents/form/inputChips'
 import Dropdown from '../../../../../commonComponents/form/dropdown'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
-import Category from '../../../../../../common/survey/category'
+import CategoryItem from '../../../../../../common/survey/categoryItem'
 
 const NodeDefCodeDropdown = props => {
   const {language, edit, nodeDef, readOnly, items = [], selectedItems = [], onSelectedItemsChange, canEditRecord} = props
@@ -19,7 +19,7 @@ const NodeDefCodeDropdown = props => {
                   items={items}
                   disabled={disabled}
                   itemKeyProp="uuid"
-                  itemLabelFunction={Category.getItemLabel(language)}
+                  itemLabelFunction={CategoryItem.getLabel(language)}
                   selection={selectedItems}
                   onChange={selectedItems => onSelectedItemsChange(selectedItems)}/>
 
@@ -27,7 +27,7 @@ const NodeDefCodeDropdown = props => {
                 items={items}
                 disabled={disabled}
                 itemKeyProp="uuid"
-                itemLabelFunction={Category.getItemLabel(language)}
+                itemLabelFunction={CategoryItem.getLabel(language)}
                 selection={R.head(selectedItems)}
                 onChange={item => onSelectedItemsChange(item ? [item] : [])}/>
 }
