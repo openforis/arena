@@ -10,7 +10,7 @@ import Tooltip from '../../../../../commonComponents/tooltip'
 import Expression from '../../../../../../common/exprParser/expression'
 import * as DataSort from './sort/dataSort'
 
-import { updateTableFilter, updateTableOffset, updateTableSort } from '../actions'
+import { updateTableFilter, updateTableOffset, updateTableSort, updateTableEditMode } from '../actions'
 
 class TableHeader extends React.Component {
 
@@ -53,8 +53,8 @@ class TableHeader extends React.Component {
     const {
       surveyId, nodeDefUuidContext, nodeDefUuidCols,
       tableName, colNames, filter, sort, limit, offset, count,
-      updateTableFilter, updateTableOffset,
-      showPaginator,
+      showPaginator, editMode, canEdit,
+      updateTableFilter, updateTableOffset, updateTableEditMode,
     } = this.props
 
     const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${filter}&sort=${DataSort.serialize(sort)}&cols=${JSON.stringify(colNames)}`
@@ -107,6 +107,14 @@ class TableHeader extends React.Component {
             label="CSV"
           />
 
+          {
+            canEdit &&
+            <button className={`btn btn-s btn-of-light btn-edit${editMode ? ' highlight' : ''}`}
+                    onClick={() => updateTableEditMode(!editMode)}>
+              <span className="icon icon-pencil2 icon-16px"/>
+            </button>
+          }
+
         </div>
 
         {
@@ -136,9 +144,10 @@ TableHeader.defaultProps = {
   updateTableOffset: null,
   updateTableSort: null,
   showPaginator: false,
+  editMode: false
 }
 
 export default connect(
   null,
-  { updateTableOffset, updateTableFilter, updateTableSort }
+  { updateTableOffset, updateTableFilter, updateTableSort, updateTableEditMode }
 )(TableHeader)

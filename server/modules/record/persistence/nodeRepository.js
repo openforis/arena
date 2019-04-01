@@ -74,14 +74,6 @@ const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
     dbTransformCallback
   )
 
-const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
-  const nodes = await fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
-  return R.head(nodes)
-}
-
-const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
-  await fetchChildNodesByNodeDefUuids(surveyId, recordUuid, nodeUuid, [childDefUUid], client)
-
 const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, childDefUUids, client = db) =>
   await client.map(`
     SELECT * 
@@ -92,6 +84,14 @@ const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUuid, chi
     [recordUuid, nodeUuid, childDefUUids],
     dbTransformCallback
   )
+
+const fetchChildNodesByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) =>
+  await fetchChildNodesByNodeDefUuids(surveyId, recordUuid, nodeUuid, [childDefUUid], client)
+
+const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, childDefUUid, client = db) => {
+  const nodes = await fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid, client)
+  return R.head(nodes)
+}
 
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
@@ -154,6 +154,7 @@ module.exports = {
   //READ
   fetchNodesByRecordUuid,
   fetchNodeByUuid,
+  fetchChildNodesByNodeDefUuid,
   fetchChildNodeByNodeDefUuid,
 
   //UPDATE

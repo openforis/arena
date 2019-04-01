@@ -19,7 +19,7 @@ $rowHeaderHeight: 45px;
 
     .data-operations {
       display: grid;
-      grid-template-columns: repeat(3, auto);
+      grid-template-columns: repeat(4, auto);
       grid-column-gap: .25rem;
 
       .btn {
@@ -31,6 +31,11 @@ $rowHeaderHeight: 45px;
         }
       }
     }
+  }
+
+  &.edit {
+    border: 3px dashed rgba($white, 0.2);
+    background-color: rgba($white, 0.02);
   }
 
   .table__rows {

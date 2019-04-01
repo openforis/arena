@@ -6,6 +6,7 @@ const getState = R.pipe(DataVisState.getState, R.prop('query'))
 const keys = {
   table: 'table',
 }
+
 const tableKeys = {
   data: 'data',
   offset: 'offset',
@@ -15,6 +16,7 @@ const tableKeys = {
   sort: 'sort',
   nodeDefUuidTable: 'nodeDefUuidTable',
   nodeDefUuidCols: 'nodeDefUuidCols',
+  editMode: 'editMode',
 }
 
 // table
@@ -31,6 +33,7 @@ export const getTableFilter = getTableProp(tableKeys.filter, '')
 export const getTableSort = getTableProp(tableKeys.sort, [])
 export const getTableNodeDefUuidTable = getTableProp(tableKeys.nodeDefUuidTable)
 export const getTableNodeDefUuidCols = getTableProp(tableKeys.nodeDefUuidCols, [])
+export const getTableEditMode = getTableProp(tableKeys.editMode, false)
 
 const hasTable = R.pipe(getTableNodeDefUuidTable, R.isNil, R.not)
 const hasCols = R.pipe(getTableNodeDefUuidCols, R.isEmpty, R.not)
@@ -60,8 +63,8 @@ export const dissocTableDataCols = cols => state => R.pipe(
   )(state),
 )(state)
 
-export const initTableData = (offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols) =>
-  R.assoc(keys.table, { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols })
+export const initTableData = (offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode) =>
+  R.assoc(keys.table, { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode })
 
 export const assocTableData = (offset, data) => R.pipe(
   R.assocPath([keys.table, tableKeys.offset], offset),
@@ -71,3 +74,5 @@ export const assocTableData = (offset, data) => R.pipe(
 export const assocTableFilter = filter => R.assocPath([keys.table, tableKeys.filter], filter)
 
 export const assocTableSort = sort => R.assocPath([keys.table, tableKeys.sort], sort)
+
+export const assocTableEditMode = editMode => R.assocPath([keys.table, tableKeys.editMode], editMode)

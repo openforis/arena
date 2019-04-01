@@ -26,6 +26,19 @@ module.exports.init = app => {
     }
   })
 
+  app.get('/surveyRdb/:surveyId/:tableName/queryForEdit', requireRecordListViewPermission, async (req, res) => {
+    try {
+      const { surveyId, tableName, offset, limit, filter = '', sort = '' } = Request.getParams(req)
+      const cols = Request.getJsonParam(req, 'cols', [])
+
+      const rows = await SurveyRdbService.queryTableForEdit(surveyId, tableName, cols, offset, limit, filter, sort)
+
+      res.json(rows)
+    } catch (err) {
+      Response.sendErr(res, err)
+    }
+  })
+
   app.get('/surveyRdb/:surveyId/:tableName/query/count', requireRecordListViewPermission, async (req, res) => {
     try {
       const surveyId = Request.getRequiredParam(req, 'surveyId')

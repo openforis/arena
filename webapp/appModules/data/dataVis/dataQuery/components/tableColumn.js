@@ -4,9 +4,10 @@ import ProgressBar from '../../../../../commonComponents/progressBar'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
+import TableColumnEdit from './tableColumnEdit'
 
 const TableColumn = (props) => {
-  const { nodeDef, row, lang, colWidth } = props
+  const { nodeDef, row, lang, colWidth, editMode } = props
 
   const colNames = NodeDefTable.getColNames(nodeDef)
   const noCols = colNames.length
@@ -27,7 +28,13 @@ const TableColumn = (props) => {
           isData ?
             <div key={i} style={{ width }}>
               {
-                row.hasOwnProperty(col)
+                editMode
+                  ? (
+                    <TableColumnEdit
+                      nodeDef={nodeDef}
+                      row={row}/>
+                  )
+                  : row.hasOwnProperty(col)
                   ? row[col]
                   : (
                     <div style={{ width: '20%', marginLeft: '40%', opacity: '.5' }}>

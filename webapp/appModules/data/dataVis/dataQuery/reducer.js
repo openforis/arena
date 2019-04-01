@@ -40,11 +40,12 @@ const actionHandlers = {
 
   [dataQueryTableInit]: (
     state,
-    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols }
+    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode }
   ) =>
     initTableData(
       offset, limit, filter, sort, count, data,
-      nodeDefUuidTable, nodeDefUuidCols
+      nodeDefUuidTable, nodeDefUuidCols,
+      editMode
     )(state),
 
   [dataQueryTableDataUpdate]: (state, { offset, data }) => assocTableData(offset, data)(state),

@@ -28,6 +28,21 @@ const runSelect = async (surveyId, tableName, cols, offset, limit, filter = '', 
   )
 }
 
+const runSelectForEdit = async (surveyId, tableName, cols, offset, limit, filter = '', sort = '', client) => {
+  const schemaName = SchemaRdb.getName(surveyId)
+
+  return await client.any(`
+    SELECT ${cols.join(', ')} 
+    FROM ${schemaName}.${tableName}
+    ${R.isEmpty(filter) ? '' : `WHERE ${filter}`}
+    ${R.isEmpty(sort) ? '' : `ORDER BY ${sort} NULLS LAST`}
+    LIMIT ${limit}
+    OFFSET ${offset}
+    `,
+    []
+  )
+}
+
 const runCount = async (surveyId, tableName, filter = '', client) => {
   const schemaName = SchemaRdb.getName(surveyId)
 
@@ -80,6 +95,7 @@ const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {
 
 module.exports = {
   runSelect,
+  runSelectForEdit,
   runCount,
   queryRootTableByRecordKeys,
 }

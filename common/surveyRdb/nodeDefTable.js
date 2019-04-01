@@ -4,7 +4,10 @@ const toSnakeCase = require('to-snake-case')
 const Survey = require('../survey/survey')
 const NodeDef = require('../survey/nodeDef')
 
-const composeTableName = (nodeDefName, nodeDefParentName = '') => `data_${nodeDefParentName}${nodeDefName}`
+const viewSuffix = '_view'
+const dataTablePrefix = 'data_'
+
+const composeTableName = (nodeDefName, nodeDefParentName = '') => `${dataTablePrefix}${nodeDefParentName}${nodeDefName}`
 
 const getTableName = (nodeDef, nodeDefParent) => {
   const nodeDefName = NodeDef.getName(nodeDef)
@@ -17,11 +20,11 @@ const getTableName = (nodeDef, nodeDefParent) => {
       : composeTableName(nodeDefParentName)
 }
 
-const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefParent) + '_view'
+const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefParent) + viewSuffix
 
 const getViewNameByUuid = nodeDefUuid => R.pipe(
   Survey.getNodeDefByUuid(nodeDefUuid),
-  nodeDef => 'data_' + NodeDef.getName(nodeDef) + '_view'
+  nodeDef => dataTablePrefix + NodeDef.getName(nodeDef) + viewSuffix
 )
 
 const {nodeDefType} = NodeDef
