@@ -1,14 +1,18 @@
 import React from 'react'
 
+import NodeDef from '../../../../../../common/survey/nodeDef'
+
 import TableColumn from './tableColumn'
 
 const defaultColWidth = 80
 
 const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) => (
   nodeDefCols.map(nodeDef =>
-    <TableColumn key={nodeDef.id}
-                 nodeDef={nodeDef} row={row}
-                 lang={lang} colWidth={colWidth}
+    <TableColumn key={NodeDef.getUuid(nodeDef)}
+                 nodeDef={nodeDef}
+                 row={row}
+                 lang={lang}
+                 colWidth={colWidth}
                  editMode={editMode}/>
   )
 )

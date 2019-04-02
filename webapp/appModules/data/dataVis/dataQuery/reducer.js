@@ -20,8 +20,12 @@ import {
   assocTableFilter,
   assocTableSort,
   assocNodeDefUuidTable,
-  assocNodeDefUuidCols, dissocTableDataCols,
+  assocNodeDefUuidCols,
+  dissocTableDataCols,
+  assocTableDataRecordNodes
 } from './dataQueryState'
+
+import { nodesUpdate } from '../../../surveyForm/record/actions'
 
 const actionHandlers = {
   [appUserLogout]: () => ({}),
@@ -53,6 +57,9 @@ const actionHandlers = {
   [dataQueryTableFilterUpdate]: (state, { filter }) => assocTableFilter(filter)(state),
 
   [dataQueryTableSortUpdate]: (state, { sort }) => assocTableSort(sort)(state),
+
+  // record nodes update
+  [nodesUpdate]: (state, { nodes }) => assocTableDataRecordNodes(nodes)(state)
 }
 
 export default exportReducer(actionHandlers)

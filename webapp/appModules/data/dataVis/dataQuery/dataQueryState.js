@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 import * as DataVisState from '../dataVisState'
 
+import Node from '../../../../../common/record/node'
+
 const getState = R.pipe(DataVisState.getState, R.prop('query'))
 
 const keys = {
@@ -68,11 +70,30 @@ export const initTableData = (offset, limit, filter, sort, count, data, nodeDefU
 
 export const assocTableData = (offset, data) => R.pipe(
   R.assocPath([keys.table, tableKeys.offset], offset),
-  R.assocPath([keys.table, tableKeys.data], data),
+  R.assocPath([keys.table, tableKeys.data], data)
 )
 
 export const assocTableFilter = filter => R.assocPath([keys.table, tableKeys.filter], filter)
 
 export const assocTableSort = sort => R.assocPath([keys.table, tableKeys.sort], sort)
 
-export const assocTableEditMode = editMode => R.assocPath([keys.table, tableKeys.editMode], editMode)
+export const assocTableDataRecordNodes = nodes =>
+  state => {
+  const editMode = R.pathOr(false, [keys.table, tableKeys.editMode], state)
+    if (editMode) {
+      // replace nodes in table rows
+      const data = R.pathOr([], [keys.table, tableKeys.data], state)
+      for(const node of R.values(nodes)) {
+        const nodeUuid = Node.getUuid(node)
+        for (const row of data) {
+          if (row.recordUuid === Node.getRecordUuid(node) && R.includes(nodeUuid, R.keys(row.nodes))) {
+            // update node in table cell
+            row.nodes[nodeUuid] = node
+          }
+        }
+      }
+      return R.assocPath([keys.table, tableKeys.data], data, state)
+    } else {
+      return state
+    }
+  }

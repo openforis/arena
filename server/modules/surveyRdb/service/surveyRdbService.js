@@ -1,5 +1,6 @@
 const R = require('ramda')
 const fastcsv = require('fast-csv')
+const Promise = require('bluebird')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
@@ -41,35 +42,62 @@ const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output)
   csvStream.end()
 }
 
-const queryTableForEdit = async (surveyId, tableName, cols = [],
+const queryTableForEdit = async (user, surveyId, tableName, cols = [],
                                  offset, limit, filter, sort) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId)
 
   const tableNodeDef = Survey.findNodeDef(nodeDef => tableName === DataView.getName(nodeDef, Survey.getNodeDefParent(nodeDef)(survey)))(survey)
 
-  const ancestorAndSelfDefsColNames = R.pipe(
-    Survey.getAncestorsHierarchy(tableNodeDef),
-    R.append(tableNodeDef),
-    defs => console.log(defs) || defs,
-    R.map(nodeDef => `${NodeDef.getName(nodeDef)}_uuid`)
-  )(survey)
+  const ancestorDefs = Survey.getAncestorsHierarchy(tableNodeDef)(survey)
 
-  const queryCols = R.concat(ancestorAndSelfDefsColNames, cols)
-  queryCols.push(DataTable.colNameRecordUuuid)
+  const ancestorAndSelfDefs = R.append(tableNodeDef, ancestorDefs)
+
+  const ancestorUuidColNames = ancestorAndSelfDefs.map(ancestor => `${NodeDef.getName(ancestor)}_uuid`)
+
+  const queryCols = R.pipe(
+    R.concat(ancestorUuidColNames),
+    R.append(DataTable.colNameRecordUuuid)
+  )(cols)
 
   const rows = await SurveyRdbManager.queryTable(surveyId, tableName, queryCols, offset, limit, filter, sort)
 
-  /*rows.map(async row => {
-    const recordId = row.recordId
-    const parentUuid =
-    const nodes = await RecordManager.fetchChildNodesByNodeDefUuid(surveyId, recordUuid, nodeUuid, childDefUUid)
+  return await Promise.all(rows.map(
+    async row => {
+      const { record_uuid: recordUuid } = row
 
-  })*/
+      // const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
+      const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
 
+      const resultRow = {
+        record,
+        cols: {}
+      }
 
-  rows.map({})
+      for (const ancestorDef of ancestorAndSelfDefs) {
+        const childDefs = Survey.getNodeDefChildren(ancestorDef)(survey)
 
-  return rows
+        for (const childDef of childDefs) {
+          const childDefColNames = NodeDefTable.getColNames(childDef)
+          if (R.pipe(
+            R.intersection(childDefColNames),
+            R.isEmpty,
+            R.not
+          )(cols)) {
+            const ancestorUuidColName = `${NodeDef.getName(ancestorDef)}_uuid`
+            const ancestorUuid = R.prop(ancestorUuidColName, row)
+            const childDefUuid = NodeDef.getUuid(childDef)
+            const nodes = await RecordManager.fetchChildNodesByNodeDefUuid(surveyId, recordUuid, ancestorUuid, childDefUuid)
+
+            resultRow.cols[childDefUuid] = {
+              nodes,
+              parentUuid: ancestorUuid
+            }
+          }
+        }
+      }
+      return resultRow
+    }
+  ))
 }
 
 module.exports = {

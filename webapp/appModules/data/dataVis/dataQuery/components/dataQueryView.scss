@@ -1,5 +1,6 @@
 @import "../../../../../style/vars";
 
+$dataTableMarginTop: 43px;
 $rowHeaderHeight: 45px;
 
 .data-query {
@@ -42,6 +43,7 @@ $rowHeaderHeight: 45px;
     overflow-y: hidden;
     overflow-x: auto;
     border: 1px solid rgba($white, 0.2);
+    height: calc(100% - #{$dataTableMarginTop})
   }
 
   .table__data-rows {

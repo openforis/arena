@@ -4,6 +4,7 @@ import ProgressBar from '../../../../../commonComponents/progressBar'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
+
 import TableColumnEdit from './tableColumnEdit'
 
 const TableColumn = (props) => {
@@ -32,7 +33,8 @@ const TableColumn = (props) => {
                   ? (
                     <TableColumnEdit
                       nodeDef={nodeDef}
-                      row={row}/>
+                      record={row.record}
+                      cell={row.cols[NodeDef.getUuid(nodeDef)]}/>
                   )
                   : row.hasOwnProperty(col)
                   ? row[col]

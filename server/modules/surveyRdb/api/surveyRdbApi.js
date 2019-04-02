@@ -28,10 +28,12 @@ module.exports.init = app => {
 
   app.get('/surveyRdb/:surveyId/:tableName/queryForEdit', requireRecordListViewPermission, async (req, res) => {
     try {
+      const user = Request.getSessionUser(req)
       const { surveyId, tableName, offset, limit, filter = '', sort = '' } = Request.getParams(req)
+
       const cols = Request.getJsonParam(req, 'cols', [])
 
-      const rows = await SurveyRdbService.queryTableForEdit(surveyId, tableName, cols, offset, limit, filter, sort)
+      const rows = await SurveyRdbService.queryTableForEdit(user, surveyId, tableName, cols, offset, limit, filter, sort)
 
       res.json(rows)
     } catch (err) {
