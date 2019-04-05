@@ -22,7 +22,7 @@ const TableRows = ({ nodeDefCols, colNames, data, offset, lang, colWidth, editMo
 
     <div className="table__row-header">
       <div style={{ width: defaultColWidth }}>Row #</div>
-      <TableColumns nodeDefCols={nodeDefCols} lang={lang} colWidth={colWidth}/>
+      <TableColumns nodeDefCols={nodeDefCols} lang={lang} colWidth={colWidth} editMode={editMode}/>
     </div>
 
 

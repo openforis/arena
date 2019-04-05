@@ -37,8 +37,10 @@ class Table extends React.Component {
     const widthMax = width - defaultColWidth
     const colWidthMin = 150
 
-    const colWidth = widthMax > colNames.length * colWidthMin
-      ? widthMax / colNames.length
+    const colsTot = editMode ? nodeDefUuidCols.length : colNames.length
+
+    const colWidth = widthMax > colsTot * colWidthMin
+      ? widthMax / colsTot
       : colWidthMin
 
     const hasData = !R.isEmpty(data)

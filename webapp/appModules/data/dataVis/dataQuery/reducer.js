@@ -22,10 +22,11 @@ import {
   assocNodeDefUuidTable,
   assocNodeDefUuidCols,
   dissocTableDataCols,
-  assocTableDataRecordNodes
+  assocTableDataRecordNodes,
+  assocTableDataRecordNodeValidations
 } from './dataQueryState'
 
-import { nodesUpdate } from '../../../surveyForm/record/actions'
+import { nodesUpdate, validationsUpdate } from '../../../surveyForm/record/actions'
 
 const actionHandlers = {
   [appUserLogout]: () => ({}),
@@ -59,7 +60,9 @@ const actionHandlers = {
   [dataQueryTableSortUpdate]: (state, { sort }) => assocTableSort(sort)(state),
 
   // record nodes update
-  [nodesUpdate]: (state, { nodes }) => assocTableDataRecordNodes(nodes)(state)
+  [nodesUpdate]: (state, { nodes }) => assocTableDataRecordNodes(nodes)(state),
+
+  [validationsUpdate]: (state, {validations}) => assocTableDataRecordNodeValidations(validations)(state),
 }
 
 export default exportReducer(actionHandlers)

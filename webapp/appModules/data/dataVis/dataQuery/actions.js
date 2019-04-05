@@ -33,12 +33,14 @@ const getColNames = (state, nodeDefUuidCols) => {
   return NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 }
 
-const queryTable = (surveyId, editMode, tableName, cols, offset = 0, filter = '', sort = '') =>
+const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = '', sort = '') =>
   editMode
     ? axios.get(
     `/api/surveyRdb/${surveyId}/${tableName}/queryForEdit`, {
       params: {
+        nodeDefUuidTable,
         cols: JSON.stringify(cols),
+        nodeDefUuidCols: JSON.stringify(nodeDefUuidCols),
         offset,
         limit: defaults.limit,
         filter,
@@ -51,18 +53,18 @@ const queryTable = (surveyId, editMode, tableName, cols, offset = 0, filter = ''
     // {params: {cols: JSON.stringify(cols), offset, limit}}
     )
 
-const fetchData = async (state, cols = null, offset = null, filter = null, sort = null) => {
+const fetchData = async (state, nodeDefUuidCols = null, offset = null, filter = null, sort = null) => {
   if (DataQueryState.hasTableAndCols(state)) {
     const surveyId = SurveyState.getStateSurveyId(state)
     const editMode = DataQueryState.getTableEditMode(state)
     const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
-    const nodeDefUuidCols = R.defaultTo(DataQueryState.getTableNodeDefUuidCols(state), cols)
+    const nodeDefUuidColsParam = R.defaultTo(DataQueryState.getTableNodeDefUuidCols(state), nodeDefUuidCols)
     const tableName = getTableName(state, nodeDefUuidTable)
-    const colsParam = getColNames(state, nodeDefUuidCols)
+    const colsParam = getColNames(state, nodeDefUuidColsParam)
     const offsetParam = R.defaultTo(DataQueryState.getTableOffset(state), offset)
     const filterParam = R.defaultTo(DataQueryState.getTableFilter(state), filter)
     const sortParam = R.defaultTo(DataQueryState.getTableSort(state), sort)
-    const { data } = await queryTable(surveyId, editMode, tableName, colsParam, offsetParam, filterParam, sortParam)
+    const { data } = await queryTable(surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidColsParam, colsParam, offsetParam, filterParam, sortParam)
     return data
   }
 }
@@ -128,7 +130,7 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
 
       const [countResp, dataResp] = await Promise.all([
         axios.get(`/api/surveyRdb/${surveyId}/${tableName}/query/count?filter=${filter}`),
-        queryTable(surveyId, editMode, tableName, cols, offset, filter, sort)
+        queryTable(surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, filter, sort)
       ])
 
       dispatch({

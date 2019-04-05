@@ -1,7 +1,9 @@
 import * as R from 'ramda'
 import * as DataVisState from '../dataVisState'
 
+import Record from '../../../../../common/record/record'
 import Node from '../../../../../common/record/node'
+import Validator from '../../../../../common/validation/validator'
 
 const getState = R.pipe(DataVisState.getState, R.prop('query'))
 
@@ -49,7 +51,7 @@ export const assocNodeDefUuidCols = (nodeDefUuidCols) =>
 
 export const assocTableDataCol = data => state => R.pipe(
   R.pathOr([{}], [keys.table, tableKeys.data]),
-  dataState => dataState.map((d, i) => R.mergeLeft(d, data[i])),
+  dataState => dataState.map((d, i) => R.mergeDeepLeft(d, data[i])),
   dataUpdate => assocTableData(
     R.pathOr(0, [keys.table, tableKeys.offset], state),
     dataUpdate
@@ -79,16 +81,27 @@ export const assocTableSort = sort => R.assocPath([keys.table, tableKeys.sort], 
 
 export const assocTableDataRecordNodes = nodes =>
   state => {
-  const editMode = R.pathOr(false, [keys.table, tableKeys.editMode], state)
+    const editMode = R.pathOr(false, [keys.table, tableKeys.editMode], state)
     if (editMode) {
       // replace nodes in table rows
       const data = R.pathOr([], [keys.table, tableKeys.data], state)
-      for(const node of R.values(nodes)) {
+
+      for (const node of R.values(nodes)) {
         const nodeUuid = Node.getUuid(node)
+        const nodeDefUuid = Node.getNodeDefUuid(node)
+        const nodeParentUuid = Node.getParentUuid(node)
+        const nodeRecordUuid = Node.getRecordUuid(node)
+
         for (const row of data) {
-          if (row.recordUuid === Node.getRecordUuid(node) && R.includes(nodeUuid, R.keys(row.nodes))) {
-            // update node in table cell
-            row.nodes[nodeUuid] = node
+          if (Record.getUuid(row.record) === nodeRecordUuid) {
+            const cell = row.cols[nodeDefUuid]
+            if (cell && cell.parentUuid === nodeParentUuid) {
+              const cellData = Node.isDeleted(node)
+                ? R.dissocPath(['nodes', nodeUuid], cell)
+                : R.assocPath(['nodes', nodeUuid], node, cell)
+
+              row.cols[nodeDefUuid] = cellData
+            }
           }
         }
       }
@@ -96,4 +109,22 @@ export const assocTableDataRecordNodes = nodes =>
     } else {
       return state
     }
+  }
+
+//TODO input field validation should be associated to record in state...
+export const assocTableDataRecordNodeValidations = validations =>
+  state => {
+    const data = R.pathOr([], [keys.table, tableKeys.data], state)
+
+    data.forEach(row => {
+      Object.values(row.cols).forEach(col => {
+        const { nodes } = col
+        Object.values(nodes).forEach(node => {
+          const validation = Validator.getFieldValidation(Node.getUuid(node))(validations)
+          if (validation)
+            node.validation = validation
+        })
+      })
+    })
+    return R.assocPath([keys.table, tableKeys.data], data, state)
   }
