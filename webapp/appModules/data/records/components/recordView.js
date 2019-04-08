@@ -24,9 +24,9 @@ class RecordView extends React.Component {
   }
 
   componentDidMount () {
-    const { checkInRecord, recordUuidUrlParam } = this.props
+    const { checkInRecord, recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam} = this.props
 
-    checkInRecord(recordUuidUrlParam)
+    checkInRecord(recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam)
 
     window.addEventListener('beforeunload', this.componentUnload)
   }
@@ -54,15 +54,18 @@ class RecordView extends React.Component {
   }
 }
 
-const mapStateToProps = (state, { match }) => {
+const mapStateToProps = (state, { match, location }) => {
   const surveyForm = SurveyFormState.getSurveyForm(state)
   const user = AppState.getUser(state)
   const record = RecordState.getRecord(surveyForm)
+  const urlSearchParams = new URLSearchParams(location.search)
 
   return {
     canEditRecord: AuthManager.canEditRecord(user, record),
     recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
+    parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
+    nodeDefUuidUrlParam: urlSearchParams.get('nodeDefUuid')
   }
 }
 

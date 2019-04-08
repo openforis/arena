@@ -4,7 +4,7 @@ const Promise = require('bluebird')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
-const {toUuidIndexedObj} = require('../../../../common/survey/surveyUtils')
+const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const DataTable = require('../persistence/schemaRdb/dataTable')
 
@@ -41,8 +41,8 @@ const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output)
   csvStream.end()
 }
 
-const queryTableForEdit = async (user, surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols = [], cols = [],
-                                 offset, limit, filter, sort) => {
+const queryTable = async (user, surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols = [], cols = [],
+                          offset, limit, filter, sort, editMode = false) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId)
 
   // 1. find ancestor defs of table def
@@ -63,11 +63,13 @@ const queryTableForEdit = async (user, surveyId, nodeDefUuidTable, tableName, no
     async row => {
       const { record_uuid: recordUuid } = row
 
-      const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
-
       const resultRow = {
-        record,
+        ...row,
         cols: {}
+      }
+
+      if (editMode) {
+        resultRow['record'] = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
       }
 
       for (const ancestorDef of ancestorAndSelfDefs) {
@@ -78,11 +80,14 @@ const queryTableForEdit = async (user, surveyId, nodeDefUuidTable, tableName, no
           const ancestorUuidColName = `${NodeDef.getName(ancestorDef)}_uuid`
           const ancestorUuid = R.prop(ancestorUuidColName, row)
           const childDefUuid = NodeDef.getUuid(childDef)
-          const nodes = await RecordManager.fetchChildNodesByNodeDefUuid(surveyId, recordUuid, ancestorUuid, childDefUuid)
 
           resultRow.cols[childDefUuid] = {
-            nodes: toUuidIndexedObj(nodes),
             parentUuid: ancestorUuid
+          }
+
+          if (editMode) {
+            const nodes = await RecordManager.fetchChildNodesByNodeDefUuid(surveyId, recordUuid, ancestorUuid, childDefUuid)
+            resultRow.cols[childDefUuid]['nodes'] = toUuidIndexedObj(nodes)
           }
         }
       }
@@ -93,9 +98,7 @@ const queryTableForEdit = async (user, surveyId, nodeDefUuidTable, tableName, no
 
 module.exports = {
 
-  queryTable: SurveyRdbManager.queryTable,
-
-  queryTableForEdit,
+  queryTable,
 
   countTable: SurveyRdbManager.countTable,
 

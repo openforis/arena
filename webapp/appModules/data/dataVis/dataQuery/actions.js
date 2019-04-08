@@ -34,9 +34,8 @@ const getColNames = (state, nodeDefUuidCols) => {
 }
 
 const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = '', sort = '') =>
-  editMode
-    ? axios.get(
-    `/api/surveyRdb/${surveyId}/${tableName}/queryForEdit`, {
+  axios.get(
+    `/api/surveyRdb/${surveyId}/${tableName}/query`, {
       params: {
         nodeDefUuidTable,
         cols: JSON.stringify(cols),
@@ -45,13 +44,10 @@ const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuid
         limit: defaults.limit,
         filter,
         sort: DataSort.serialize(sort),
+        editMode
       }
     }
-    )
-    : axios.get(
-    `/api/surveyRdb/${surveyId}/${tableName}/query?cols=${JSON.stringify(cols)}&offset=${offset}&limit=${defaults.limit}&filter=${filter}&sort=${DataSort.serialize(sort)}`,
-    // {params: {cols: JSON.stringify(cols), offset, limit}}
-    )
+  )
 
 const fetchData = async (state, nodeDefUuidCols = null, offset = null, filter = null, sort = null) => {
   if (DataQueryState.hasTableAndCols(state)) {

@@ -76,4 +76,13 @@ $rowHeaderHeight: 45px;
     }
   }
 
+  .table__cell {
+    display: grid;
+    grid-template-columns: 1fr 40px;
+  }
+
+  .table__inner-cell {
+    display: flex;
+    flex-wrap: wrap;
+  }
 }

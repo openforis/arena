@@ -1,5 +1,7 @@
 import React from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 import * as R from 'ramda'
 
 import TableHeader from './tableHeader'
@@ -30,7 +32,8 @@ class Table extends React.Component {
       surveyId, lang, data, showTable,
       nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames,
       tableName, offset, limit, filter, sort, count,
-      editMode, canEdit
+      editMode, canEdit,
+      history
     } = this.props
 
     const { width = defaultColWidth } = elementOffset(this.tableRef.current)
@@ -73,7 +76,8 @@ class Table extends React.Component {
                          data={data} offset={offset}
                          lang={lang}
                          colWidth={colWidth}
-                         editMode={editMode}/>
+                         editMode={editMode}
+                         history={history}/>
             }
           </React.Fragment>
         }
@@ -114,4 +118,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps)(Table)
+const enhance = compose(
+  withRouter,
+  connect(mapStateToProps)
+)
+export default enhance(Table)

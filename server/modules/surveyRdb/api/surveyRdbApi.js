@@ -9,32 +9,13 @@ module.exports.init = app => {
 
   app.get('/surveyRdb/:surveyId/:tableName/query', requireRecordListViewPermission, async (req, res) => {
     try {
-      const surveyId = Request.getRequiredParam(req, 'surveyId')
-      const tableName = Request.getRequiredParam(req, 'tableName')
-
-      const cols = Request.getJsonParam(req, 'cols', [])
-      const offset = Request.getRestParam(req, 'offset')
-      const limit = Request.getRestParam(req, 'limit')
-      const filter = Request.getRestParam(req, 'filter', '')
-      const sort = Request.getRestParam(req, 'sort', '')
-
-      const rows = await SurveyRdbService.queryTable(surveyId, tableName, cols, offset, limit, filter, sort)
-
-      res.json(rows)
-    } catch (err) {
-      Response.sendErr(res, err)
-    }
-  })
-
-  app.get('/surveyRdb/:surveyId/:tableName/queryForEdit', requireRecordListViewPermission, async (req, res) => {
-    try {
       const user = Request.getSessionUser(req)
-      const { surveyId, nodeDefUuidTable, tableName, offset, limit, filter = '', sort = '' } = Request.getParams(req)
+      const { surveyId, nodeDefUuidTable, tableName, offset, limit, filter = '', sort = '', editMode = false } = Request.getParams(req)
 
       const cols = Request.getJsonParam(req, 'cols', [])
       const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
 
-      const rows = await SurveyRdbService.queryTableForEdit(user, surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, limit, filter, sort)
+      const rows = await SurveyRdbService.queryTable(user, surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, limit, filter, sort, editMode)
 
       res.json(rows)
     } catch (err) {
@@ -44,9 +25,7 @@ module.exports.init = app => {
 
   app.get('/surveyRdb/:surveyId/:tableName/query/count', requireRecordListViewPermission, async (req, res) => {
     try {
-      const surveyId = Request.getRequiredParam(req, 'surveyId')
-      const tableName = Request.getRequiredParam(req, 'tableName')
-      const filter = Request.getRestParam(req, 'filter', '')
+      const { surveyId, tableName, filter = '' } = Request.getParams(req)
 
       const count = await SurveyRdbService.countTable(surveyId, tableName, filter)
 

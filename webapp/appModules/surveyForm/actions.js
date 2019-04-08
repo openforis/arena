@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../common/survey/nodeDefLayout'
 import Record from '../../../common/record/record'
 import Node from '../../../common/record/node'
 
@@ -42,9 +43,42 @@ export const setFormActivePage = (nodeDef) => dispatch =>
 
 // current node of active form page
 export const formPageNodeUpdate = 'survey/form/pageNode/update'
+export const formPageNodesUpdate = 'survey/form/pageNodes/update'
 
 export const setFormPageNode = (nodeDef, node) => dispatch =>
   dispatch({ type: formPageNodeUpdate, nodeDef, node })
+
+export const setFormActiveNode = (parentNodeUuid, nodeDefUuid) =>
+  (dispatch, getState) => {
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+    const surveyForm = SurveyFormState.getSurveyForm(state)
+
+    const record = RecordState.getRecord(surveyForm)
+
+    const parentNode = Record.getNodeByUuid(parentNodeUuid)(record)
+    const ancestors = Record.getAncestorEntitiesAndSelf(parentNode)(record)
+
+    const nodeDefActivePage = R.pipe(
+      R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
+      R.find(R.pipe(
+        NodeDefLayout.getPageUuid,
+        R.isNil,
+        R.not
+      ))
+    )(ancestors)
+
+    const nodeDefAndNodeUuids = R.reduce((acc, ancestor) => R.append(
+      [Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor)]
+      , acc), [], ancestors)
+
+    dispatch({
+      type: formActivePageNodeDefUpdate,
+      nodeDef: nodeDefActivePage
+    })
+
+    dispatch({ type: formPageNodesUpdate, nodeDefAndNodeUuids })
+  }
 
 // ==== utils
 

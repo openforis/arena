@@ -10,6 +10,8 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
 import * as RecordState from './recordState'
 
+import { setFormActiveNode } from '../actions'
+
 import { appModules, appModuleUri } from '../../appModules'
 import { dataModules } from '../../data/dataModules'
 import { designerModules } from '../../designer/designerModules'
@@ -145,10 +147,14 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
  * Check in / check out record
  * ============
  */
-export const checkInRecord = recordUuid => async (dispatch, getState) => {
+export const checkInRecord = (recordUuid, activeParentNodeUuid, activeNodeDefUuid) => async (dispatch, getState) => {
   const surveyId = SurveyState.getStateSurveyId(getState())
   const { data } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
   dispatch({ type: recordLoad, record: data.record })
+
+  if (activeParentNodeUuid) {
+    dispatch(setFormActiveNode(activeParentNodeUuid, activeNodeDefUuid))
+  }
 }
 
 export const checkOutRecord = recordUuid => async (dispatch, getState) => {

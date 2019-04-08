@@ -1,4 +1,5 @@
 import React from 'react'
+import * as R from 'ramda'
 
 import ProgressBar from '../../../../../commonComponents/progressBar'
 import NodeDefTableHeader from '../../../../surveyForm/nodeDefs/components/nodeDefTableHeader'
@@ -8,8 +9,14 @@ import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
 
 import TableColumnEdit from './tableColumnEdit'
 
+import { appModuleUri } from '../../../../appModules'
+import { dataModules } from '../../../dataModules'
+
 const TableColumn = (props) => {
-  const { nodeDef, row, lang, colWidth, editMode } = props
+  const {
+    nodeDef, row, lang, colWidth, editMode,
+    history
+  } = props
 
   const colNames = NodeDefTable.getColNames(nodeDef)
   const noCols = editMode ? 1 : colNames.length
@@ -17,8 +24,13 @@ const TableColumn = (props) => {
   const isData = !!row
   const width = (1 / noCols * 100) + '%'
 
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const { record_uuid: recordUuid } = isData ? row : {}
+  const parentNodeUuid = R.path(['cols', nodeDefUuid, 'parentUuid'], row)
+  const recordEditUrl = appModuleUri(dataModules.record) + recordUuid + `?parentNodeUuid=${parentNodeUuid}&nodeDefUuid=${nodeDefUuid}`
+
   return (
-    <div style={{ width: colWidth * noCols, display: 'flex', flexWrap: 'wrap' }}>
+    <div className="table__cell" style={{ width: colWidth * noCols }}>
 
       {
         isHeader &&
@@ -46,8 +58,8 @@ const TableColumn = (props) => {
               cell={row.cols[NodeDef.getUuid(nodeDef)]}/>
           )
           : null
-          : (
-            colNames.map((col, i) =>
+          : <div className="table__inner-cell">
+            {colNames.map((col, i) =>
               isData ?
                 <div key={i} style={{ width }}>
                   {
@@ -63,13 +75,25 @@ const TableColumn = (props) => {
                       )
                   }
                 </div>
-                : isHeader && noCols > 1 ?
-                <div key={i} style={{ width }}>
-                  {NodeDefTable.extractColName(nodeDef, col)}
-                </div>
+                : isHeader && noCols > 1
+                ? (
+                  <div key={i} style={{ width }}>
+                    {NodeDefTable.extractColName(nodeDef, col)}
+                  </div>
+                )
                 : null
             )
-          )
+            }
+          </div>
+      }
+
+      {
+        isData &&
+        <button className="btn btn-s btn-of-light btn-edit"
+                title="Edit record"
+                onClick={() => history.push(recordEditUrl)}>
+          <span className="icon icon-pencil2 icon-16px"/>
+        </button>
       }
 
     </div>
