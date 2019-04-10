@@ -20,7 +20,7 @@ const { dependencyTypes } = Survey
  * Module responsible for updating applicable and default values
  */
 
-const updateNodes = async (survey, record, nodes, tx) => {
+const updateNodes = async (survey, record, nodes, tx, persistChanges = true) => {
   const nodesArray = R.values(nodes)
   const nodesUpdated = nodesArray
   const nodesToVisit = new Queue(nodesArray)
@@ -34,7 +34,7 @@ const updateNodes = async (survey, record, nodes, tx) => {
     if (!R.includes(nodeUuid, nodeUuidsVisited)) {
 
       // update node
-      const nodesUpdatedCurrent = await updateNode(survey, record, node, tx)
+      const nodesUpdatedCurrent = await updateNode(survey, record, node, tx, persistChanges)
       record = Record.assocNodes(nodesUpdatedCurrent)(record)
 
       // mark updated nodes to visit
@@ -61,18 +61,18 @@ const updateNodes = async (survey, record, nodes, tx) => {
   return SurveyUtils.toUuidIndexedObj(nodesUpdated)
 }
 
-const updateNode = async (survey, record, node, tx) => {
+const updateNode = async (survey, record, node, tx, persistChanges = true) => {
 
-  const nodesApplicability = await updateNodeExpr(survey, record, node, NodeDef.getApplicable, dependencyTypes.applicable, tx)
-  const nodesDefaultValues = await updateNodeExpr(survey, record, node, NodeDef.getDefaultValues, dependencyTypes.defaultValues, tx)
+  const nodesApplicability = await updateNodeExpr(survey, record, node, NodeDef.getApplicable, dependencyTypes.applicable, tx, persistChanges)
+  const nodesDefaultValues = await updateNodeExpr(survey, record, node, NodeDef.getDefaultValues, dependencyTypes.defaultValues, tx, persistChanges)
 
   return R.mergeRight(nodesApplicability, nodesDefaultValues)
 }
 
-const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependencyType, tx) => {
+const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependencyType, tx, persistChanges) => {
 
   //1. fetch dependent nodes
-  const nodeDependents = NodeDependencyManager.fetchDependentNodes(survey, record, node, dependencyType)
+  const nodeDependents = NodeDependencyManager.findDependentNodes(survey, record, node, dependencyType)
   const isDefaultValuesExpr = dependencyType === dependencyTypes.defaultValues
   const isApplicableExpr = dependencyType === dependencyTypes.applicable
 
@@ -112,9 +112,17 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
         : null
 
       //5. persist updated node value, and return updated node
-      return await isApplicableExpr
-        ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, valueExpr || false, tx)
-        : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, valueExpr, isDefaultValuesExpr && !R.isNil(expr), tx)
+      const applicabilityValue = valueExpr || false
+
+      if (persistChanges) {
+        return await isApplicableExpr
+          ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, applicabilityValue, tx)
+          : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, valueExpr, isDefaultValuesExpr && !R.isNil(expr), tx)
+      } else {
+        return isApplicableExpr
+          ? R.assocPath([Node.keys.meta, Node.metaKeys.childApplicability, NodeDef.getUuid(nodeDef)], applicabilityValue)(nodeCtx)
+          : Node.assocValue(valueExpr)(nodeCtx)
+      }
     })
   )
 

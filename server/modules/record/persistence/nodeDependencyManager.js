@@ -12,7 +12,7 @@ const NodeRepository = require('./nodeRepository')
 const CategoryRepository = require('../../category/persistence/categoryRepository')
 const TaxonomyRepository = require('../../taxonomy/persistence/taxonomyRepository')
 
-const fetchDependentNodes = (survey, record, node, dependencyType) => {
+const findDependentNodes = (survey, record, node, dependencyType) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const dependentUuids = Survey.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
@@ -76,8 +76,9 @@ const persistDependentNodeApplicable = async (survey, nodeDefUuid, nodeCtx, appl
 
   const applicableOld = Node.isChildApplicable(nodeDefUuid)(nodeCtx)
 
-  if (applicable !== applicableOld) {
-    return {
+  return applicable === applicableOld
+    ? {}
+    : {
       [nodeCtxUuid]: await NodeRepository.updateChildrenApplicability(
         surveyId,
         nodeCtxUuid,
@@ -86,9 +87,6 @@ const persistDependentNodeApplicable = async (survey, nodeDefUuid, nodeCtx, appl
         tx
       )
     }
-  } else {
-    return {}
-  }
 }
 
 const toNodeValue = async (survey, node, valueExpr, tx) => {
@@ -132,7 +130,7 @@ const toNodeValue = async (survey, node, valueExpr, tx) => {
 
 module.exports = {
   //READ
-  fetchDependentNodes,
+  findDependentNodes,
 
   //UPDATE
   persistDependentNodeValue,

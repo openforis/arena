@@ -14,11 +14,11 @@ const keys = {
 
 // ====== CREATE
 
-const createExpressionPlaceholder = () => ({
+const createExpression = (expression = '', applyIf = '', placeholder = false) => ({
   uuid: uuidv4(),
-  placeholder: true,
-  expression: '',
-  applyIf: '',
+  expression,
+  applyIf,
+  placeholder
 })
 
 // ====== READ
@@ -79,7 +79,8 @@ module.exports = {
   keys,
 
   //CREATE
-  createExpressionPlaceholder,
+  createExpression,
+  createExpressionPlaceholder: createExpression('', '', true),
 
   //READ
   getUuid: SurveyUtils.getUuid,

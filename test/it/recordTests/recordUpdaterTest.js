@@ -4,7 +4,6 @@ const R = require('ramda')
 const db = require('../../../server/db/db')
 
 const Survey = require('../../../common/survey/survey')
-const { toUuidIndexedObj } = require('../../../common/survey/surveyUtils')
 const NodeDef = require('../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 const Record = require('../../../common/record/record')
@@ -15,6 +14,9 @@ const RecordManager = require('../../../server/modules/record/persistence/record
 const RecordUpdateManager = require('../../../server/modules/record/persistence/recordUpdateManager')
 
 const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
+
+const SB = require('../utils/surveyBuilder')
+const RB = require('../utils/recordBuilder')
 
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {
@@ -76,15 +78,36 @@ const defaultValueAppliedTest = async () => {
   })
 }
 
+const calculatedValueUpdateTest = async () => {
+  const survey = SB.survey(1, 'test', 'Test', 'en',
+    SB.entity('root',
+      SB.attribute('cluster_no', NodeDef.nodeDefType.integer)
+        .key(),
+      SB.attribute('num', NodeDef.nodeDefType.decimal),
+      SB.attribute('double_num', NodeDef.nodeDefType.decimal)
+        .readOnly()
+        .defaultValues(NodeDefExpression.createExpression("this.parent().sibling('num').getValue() * 2"))
+    )
+  ).build()
+
+  const record = RB.record(survey, this.getContextUser(),
+    RB.entity('root',
+      RB.attribute('cluster_no', 1),
+      RB.attribute('num', 1),
+      RB.attribute('double_num', 2),
+    )
+  ).build()
+
+  
+}
+
 //==== helper methods
-const newDefaultValue = (expression, applyIf = null) => R.pipe(
-  NodeDefExpression.assocExpression(expression),
-  NodeDefExpression.assocApplyIf(applyIf)
-)(NodeDefExpression.createExpressionPlaceholder())
+const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)
 
 const newRecord = () => Record.newRecord(getContextUser())
 
 module.exports = {
   recordCreationTest,
   defaultValueAppliedTest,
+  calculatedValueUpdateTest
 }

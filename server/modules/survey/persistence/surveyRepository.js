@@ -13,13 +13,13 @@ const surveySelectFields = (alias = '') => {
 
 // ============== CREATE
 
-const insertSurvey = async (props, userId, client = db) =>
+const insertSurvey = async (survey, client = db) =>
   await client.one(`
-      INSERT INTO survey (owner_id, props_draft)
-      VALUES ($1, $2)
+      INSERT INTO survey (uuid, props_draft, owner_id)
+      VALUES ($1, $2, $3)
       RETURNING ${surveySelectFields()}
     `,
-    [userId, props],
+    [survey.uuid, survey.props, survey.userId],
     def => dbTransformCallback(def, true)
   )
 

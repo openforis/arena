@@ -7,6 +7,7 @@ const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
 
 const SurveyRepository = require('./surveyRepository')
 const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
 const SurveyValidator = require('../surveyValidator')
 
 const NodeDefManager = require('../../nodeDef/persistence/nodeDefManager')
@@ -27,20 +28,12 @@ const createSurvey = async (user, { name, label, lang, collectUri = null }, crea
 
   const survey = await client.tx(
     async t => {
-      const props = {
-        name,
-        labels: { [lang]: label },
-        languages: [lang],
-        srs: [{ code: '4326', name: 'GCS WGS 1984' }], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
-        ...collectUri
-          ? { collectUri }
-          : {}
-      }
-
       const userId = user.id
 
       // create the survey
-      const survey = await SurveyRepository.insertSurvey(props, userId, t)
+      const surveyParam = Survey.createSurvey(userId, name, label, lang, collectUri)
+
+      const survey = await SurveyRepository.insertSurvey(surveyParam, t)
       const { id: surveyId, uuid } = survey
 
       //create survey data schema
@@ -55,6 +48,8 @@ const createSurvey = async (user, { name, label, lang, collectUri = null }, crea
           [nodeDefLayoutProps.pageUuid]: uuidv4(),
           [nodeDefLayoutProps.render]: nodeDefRenderType.form,
         }
+
+        const rootEntityDef = NodeDef.newNodeDef(surveyId, null, NodeDef.nodeDefType.entity, rootEntityDefProps)
 
         await NodeDefManager.createEntityDef(user, surveyId, null, uuidv4(), rootEntityDefProps, t)
       }

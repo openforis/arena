@@ -59,11 +59,10 @@ const maxKeyAttributes = 3
 
 // ==== CREATE
 
-const newNodeDef = (surveyId, parentUuid, type, props) => ({
-  surveyId,
+const newNodeDef = (type, parentUuid, props) => ({
   uuid: uuidv4(),
-  parentUuid,
   type,
+  parentUuid,
   props,
 })
 
