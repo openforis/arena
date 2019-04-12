@@ -84,8 +84,6 @@ class NodeDefsImportJob extends Job {
   async insertNodeDef (surveyId, parentNodeDef, parentPath, collectNodeDef, type, tx) {
     const { defaultLanguage } = this.context
 
-    const nodeDefUuid = uuidv4()
-
     // 1. determine basic props
     const { name: collectNodeDefName, multiple, key, calculated } = CollectIdmlParseUtils.getAttributes(collectNodeDef)
 
@@ -114,7 +112,9 @@ class NodeDefsImportJob extends Job {
       props[NodeDefLayout.nodeDefLayoutProps.pageUuid] = pageUuid
 
     // 3. insert node def into db
-    const nodeDef = await NodeDefManager.createNodeDef(this.getUser(), surveyId, NodeDef.getUuid(parentNodeDef), nodeDefUuid, type, props, tx)
+    const nodeDefParam = NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, props)
+    const nodeDef = await NodeDefManager.insertNodeDef(this.getUser(), surveyId, nodeDefParam, tx)
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
     // 4. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps(parentNodeDef, nodeDefUuid, type, collectNodeDef, tx)

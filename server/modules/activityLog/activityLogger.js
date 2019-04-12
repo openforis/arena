@@ -1,3 +1,5 @@
+const db = require('../../db/db')
+
 const { getSurveyDBSchema } = require('../survey/persistence/surveySchemaRepositoryUtils')
 
 const type = {
@@ -38,6 +40,11 @@ const type = {
   nodeDelete: 'nodeDelete',
 }
 
+const keys = {
+  type: 'type',
+  params: 'params'
+}
+
 const log = async (user, surveyId, type, params, client) =>
   client.none(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_email, params)
@@ -49,8 +56,17 @@ const logMany = async (user, surveyId, activities, client) =>
     activities.map(activity => log(user, surveyId, activity.type, activity.params, client))
   ])
 
+const fetchLogs = async (surveyId, client = db) =>
+  await client.any(`SELECT * FROM ${getSurveyDBSchema(surveyId)}.activity_log`)
+
 module.exports = {
+  type,
+  keys,
+
+  // CREATE
   log,
   logMany,
-  type,
+
+  // READ
+  fetchLogs
 }

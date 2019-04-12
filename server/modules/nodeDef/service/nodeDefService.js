@@ -17,7 +17,7 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, propsArray) => {
 
 module.exports = {
 
-  createNodeDef: NodeDefManager.createNodeDef,
+  insertNodeDef: NodeDefManager.insertNodeDef,
 
   fetchNodeDefsBySurveyId: NodeDefManager.fetchNodeDefsBySurveyId,
 

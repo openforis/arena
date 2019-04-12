@@ -18,7 +18,7 @@ export const nodeDefDelete = 'nodeDef/delete'
 
 export const createNodeDef = (parentUuid, type, props) => async (dispatch, getState) => {
   const surveyId = SurveyState.getStateSurveyId(getState())
-  const nodeDef = NodeDef.newNodeDef(surveyId, parentUuid, type, props)
+  const nodeDef = NodeDef.newNodeDef(parentUuid, type, props)
 
   dispatch({ type: nodeDefCreate, nodeDef })
 

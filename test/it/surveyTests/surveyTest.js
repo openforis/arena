@@ -1,9 +1,9 @@
-const {setContextSurvey, getContextUser} = require('./../../testContext')
-const {assert} = require('chai')
-const {uuidv4} = require('../../../common/uuid')
+const { setContextSurvey, getContextUser } = require('./../../testContext')
+const { assert } = require('chai')
+const { uuidv4 } = require('../../../common/uuid')
 
-const {createSurvey} = require('../../../server/modules/survey/persistence/surveyManager')
-const SurveyTest = require('../../../common/survey/survey')
+const SurveyManager = require('../../../server/modules/survey/persistence/surveyManager')
+const Survey = require('../../../common/survey/survey')
 
 const testSurvey = {
   name: 'test_survey_' + uuidv4(),
@@ -12,15 +12,15 @@ const testSurvey = {
 }
 
 const createSurveyTest = async () => {
-  const survey = await createSurvey(getContextUser(), testSurvey)
+  const survey = await SurveyManager.createSurvey(getContextUser(), testSurvey)
 
   setContextSurvey(survey)
 
-  const surveyInfo = SurveyTest.getSurveyInfo(survey)
+  const surveyInfo = Survey.getSurveyInfo(survey)
 
-  assert.equal(SurveyTest.getName(surveyInfo), testSurvey.name)
-  assert.equal(SurveyTest.getDefaultLanguage(surveyInfo), testSurvey.lang)
-  assert.equal(SurveyTest.getDefaultLabel(surveyInfo), testSurvey.label)
+  assert.equal(Survey.getName(surveyInfo), testSurvey.name)
+  assert.equal(Survey.getDefaultLanguage(surveyInfo), testSurvey.lang)
+  assert.equal(Survey.getDefaultLabel(surveyInfo), testSurvey.label)
 }
 
 // const publishSurveyTest = async () => {

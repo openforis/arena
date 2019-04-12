@@ -112,6 +112,7 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
         : null
 
       //5. persist updated node value, and return updated node
+
       const applicabilityValue = valueExpr || false
 
       if (persistChanges) {
@@ -119,9 +120,12 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
           ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, applicabilityValue, tx)
           : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, valueExpr, isDefaultValuesExpr && !R.isNil(expr), tx)
       } else {
-        return isApplicableExpr
+        const updatedNode = isApplicableExpr
           ? R.assocPath([Node.keys.meta, Node.metaKeys.childApplicability, NodeDef.getUuid(nodeDef)], applicabilityValue)(nodeCtx)
           : Node.assocValue(valueExpr)(nodeCtx)
+        return {
+          [Node.getUuid(updatedNode)]: updatedNode
+        }
       }
     })
   )

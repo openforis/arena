@@ -30,7 +30,8 @@ const nodeDefSelectFields =
 
 // ============== CREATE
 
-const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = db) => {
+const insertNodeDef = async (surveyId, nodeDef, client = db) => {
+  const parentUuid = NodeDef.getParentUuid(nodeDef)
   const parentH = parentUuid ?
     await client.one(
       `SELECT meta->'h' as h FROM ${getSurveyDBSchema(surveyId)}.node_def WHERE uuid = $1`,
@@ -47,7 +48,7 @@ const createNodeDef = async (surveyId, parentUuid, uuid, type, props, client = d
         VALUES ($1, $2, $3, $4, $5::jsonb)
         RETURNING *
     `,
-    [parentUuid, uuid, type, props, meta],
+    [parentUuid, NodeDef.getUuid(nodeDef), NodeDef.getType(nodeDef), nodeDef.props, meta],
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 }
@@ -119,7 +120,7 @@ const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
 
 // ============== UPDATE
 
-const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced, client = db) =>
+const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
   await client.one(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props_draft = props_draft || $1::jsonb,
@@ -187,7 +188,7 @@ const deleteNodeDefsProp = async (surveyId, deletePath, client = db) =>
 module.exports = {
 
   //CREATE
-  createNodeDef,
+  insertNodeDef,
 
   //READ
   fetchNodeDefsBySurveyId,

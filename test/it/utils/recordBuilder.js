@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Survey = require('../../../common/survey/survey')
+const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 
@@ -13,13 +14,16 @@ class NodeBuilder {
 
 class EntityBuilder extends NodeBuilder {
 
-  constructor (nodeDefName, childBuilders) {
+  constructor (nodeDefName, ...childBuilders) {
     super(nodeDefName)
     this.childBuilders = childBuilders
   }
 
   build (survey, parentNodeDef, recordUuid, parentNode) {
-    const nodeDef = Survey.getNodeDefChildByName(parentNodeDef, this.nodeDefName)(survey)
+    const nodeDef = parentNodeDef
+      ? Survey.getNodeDefChildByName(parentNodeDef, this.nodeDefName)(survey)
+      : Survey.getRootNodeDef(survey)
+
     const entity = Node.newNode(NodeDef.getUuid(nodeDef), recordUuid, parentNode)
 
     return R.pipe(
@@ -65,6 +69,6 @@ class RecordBuilder {
 
 module.exports = {
   record: (survey, user, rootEntityBuilder) => new RecordBuilder(survey, user, rootEntityBuilder),
-  entity: (nodeDefName, childBuilders) => new EntityBuilder(nodeDefName, childBuilders),
+  entity: (nodeDefName, ...childBuilders) => new EntityBuilder(nodeDefName, ...childBuilders),
   attribute: (nodeDefName, value = null) => new AttributeBuilder(nodeDefName, value)
 }

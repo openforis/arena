@@ -8,6 +8,8 @@ const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
 const SurveyRepository = require('./surveyRepository')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
+const User = require('../../../../common/user/user')
+
 const SurveyValidator = require('../surveyValidator')
 
 const NodeDefManager = require('../../nodeDef/persistence/nodeDefManager')
@@ -24,34 +26,38 @@ const ActivityLog = require('../../activityLog/activityLogger')
 const assocSurveyInfo = info => ({ info })
 
 // ====== CREATE
-const createSurvey = async (user, { name, label, lang, collectUri = null }, createRootEntity = true, client = db) => {
 
+const createSurvey = async (user, { name, label, lang, collectUri = null }, createRootEntityDef = true, client = db) => {
+
+  const surveyParam = Survey.newSurvey(User.getId(user), name, label, lang, collectUri)
+
+  return await insertSurvey(user, surveyParam, createRootEntityDef, client)
+}
+
+const insertSurvey = async (user, surveyParam, createRootEntityDef = true, client = db) => {
   const survey = await client.tx(
     async t => {
-      const userId = user.id
 
-      // create the survey
-      const surveyParam = Survey.createSurvey(userId, name, label, lang, collectUri)
-
-      const survey = await SurveyRepository.insertSurvey(surveyParam, t)
-      const { id: surveyId, uuid } = survey
+      const surveyDb = await SurveyRepository.insertSurvey(surveyParam, t)
+      const { id: surveyId } = surveyDb
+      const lang = R.pipe(R.path(['props', 'languages']), R.head)(surveyDb)
 
       //create survey data schema
       await migrateSurveySchema(surveyId)
 
-      if (createRootEntity) {
-        // create survey's root entity
-        const rootEntityDefProps = {
-          name: 'root_entity',
-          labels: { [lang]: 'Root entity' },
-          multiple: false,
-          [nodeDefLayoutProps.pageUuid]: uuidv4(),
-          [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-        }
-
-        const rootEntityDef = NodeDef.newNodeDef(surveyId, null, NodeDef.nodeDefType.entity, rootEntityDefProps)
-
-        await NodeDefManager.createEntityDef(user, surveyId, null, uuidv4(), rootEntityDefProps, t)
+      if (createRootEntityDef) {
+        const rootEntityDef = NodeDef.newNodeDef(
+          null,
+          NodeDef.nodeDefType.entity,
+          {
+            name: 'root_entity',
+            labels: { [lang]: 'Root entity' },
+            multiple: false,
+            [nodeDefLayoutProps.pageUuid]: uuidv4(),
+            [nodeDefLayoutProps.render]: nodeDefRenderType.form,
+          }
+        )
+        await NodeDefManager.insertNodeDef(user, surveyId, rootEntityDef, t)
       }
 
       // update user prefs
@@ -59,15 +65,15 @@ const createSurvey = async (user, { name, label, lang, collectUri = null }, crea
 
       // create default groups for this survey
 
-      survey.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
+      surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
 
       if (!AuthManager.isSystemAdmin(user)) {
-        await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(survey).id, userId, t)
+        await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(surveyDb).id, User.getId(user), t)
       }
 
-      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, { name, label, lang, uuid }, t)
+      await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, t)
 
-      return survey
+      return surveyDb
     }
   )
 
@@ -76,7 +82,7 @@ const createSurvey = async (user, { name, label, lang, collectUri = null }, crea
 
 // ====== READ
 const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
-  const surveyInfo = await SurveyRepository.getSurveyById(surveyId, draft, client)
+  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, draft, client)
   const authGroups = await AuthGroupRepository.fetchSurveyGroups(surveyInfo.id, client)
   const validation = validate ? await SurveyValidator.validateSurveyInfo(surveyInfo) : null
 
@@ -122,6 +128,7 @@ const deleteSurvey = async (id, user) => {
 module.exports = {
   // ====== CREATE
   createSurvey,
+  insertSurvey,
 
   // ====== READ
   fetchAllSurveyIds: SurveyRepository.fetchAllSurveyIds,

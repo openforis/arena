@@ -153,6 +153,55 @@ const getDescendantsByNodeDefUuid = (node, descendantDefUuid) =>
     )
   )
 
+const findNodeByPath = path => (survey, record) => {
+  const parts = R.ifElse(
+    R.is(Array),
+    R.identity,
+    R.split('/')
+  )(path)
+
+  let currentNodeDef = null
+  let currentNode = null
+  let currentParentNode = null
+  let currentParentDef = null
+
+  for (const part of parts) {
+    if (currentParentNode) {
+      currentNodeDef = Survey.getNodeDefChildByName(currentParentDef, part)(survey)
+
+      const children = getNodeChildrenByDefUuid(currentParentNode, NodeDef.getUuid(currentNodeDef))(record)
+
+      const nodePosition = 1
+
+      if (children.length >= nodePosition)
+        currentNode = children[nodePosition - 1]
+      else
+        return null
+    } else {
+      currentNodeDef = Survey.getRootNodeDef(survey)
+      currentNode = getRootNode(record)
+    }
+    currentParentDef = currentNodeDef
+    currentParentNode = currentNode
+  }
+
+  return currentNode
+}
+
+const getNodePath = node => (survey, record) => {
+  const parentNode = getParentNode(node)(record)
+  const ancestorEntities = getAncestorEntities(parentNode)(record)
+  const parentNodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(parentNode))
+
+  return R.pipe(
+    R.map(Node.getNodeDefUuid),
+    R.map(nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey)),
+    R.map(NodeDef.getName),
+    R.append(NodeDef.getName(parentNodeDef)),
+    R.join('/')
+  )(ancestorEntities)
+}
+
 // ====== UPDATE
 
 const assocNodes = nodes =>
@@ -245,6 +294,8 @@ module.exports = {
   getParentNode,
   getAncestorByNodeDefUuuid,
   getDescendantsByNodeDefUuid,
+  findNodeByPath,
+  getNodePath,
 
   // testing
   getCodeUuidsHierarchy,

@@ -2,11 +2,11 @@ const R = require('ramda')
 
 const {errorKeys, validate, validateRequired, validateNotKeyword} = require('../../../common/validation/validator')
 
-const {getSurveysByName} = require('./persistence/surveyRepository')
+const SurveyRepository = require('./persistence/surveyRepository')
 
 const validateSurveyNameUniqueness = async (propName, survey) => {
   const surveyName = R.path(propName.split('.'))(survey)
-  const surveysByName = await getSurveysByName(surveyName)
+  const surveysByName = await SurveyRepository.fetchSurveysByName(surveyName)
 
   return !R.isEmpty(surveysByName) && R.find(s => s.id !== survey.id, surveysByName)
     ? errorKeys.duplicate

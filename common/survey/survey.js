@@ -9,7 +9,7 @@ const SurveyTaxonomies = require('./_internal/surveyTaxonomies')
 const SurveyDefaults = require('./_internal/surveyDefaults')
 const SurveyDependencies = require('./_internal/surveyDependencies')
 
-const createSurvey = (userId, name, label, lang, collectUri = null) => ({
+const newSurvey = (userId, name, label, lang, collectUri = null) => ({
   uuid: uuidv4(),
   props: {
     name,
@@ -24,7 +24,7 @@ const createSurvey = (userId, name, label, lang, collectUri = null) => ({
 })
 
 module.exports = {
-  createSurvey,
+  newSurvey,
 
   infoKeys: SurveyInfo.keys,
   dependencyTypes: SurveyDependencies.dependencyTypes,

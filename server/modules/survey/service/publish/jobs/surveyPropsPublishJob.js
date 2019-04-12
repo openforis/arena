@@ -54,7 +54,7 @@ class SurveyPropsPublishJob extends Job {
     await this.removeDeletedLanguagesLabels(deletedLanguages, tx)
     this.incrementProcessedItems()
 
-    await ActivityLog.log(this.getUser(), id, ActivityLog.type.surveyPublish, {surveyUuid: Survey.getUuid(surveyInfo)}, tx)
+    await ActivityLog.log(this.getUser(), id, ActivityLog.type.surveyPublish, { surveyUuid: Survey.getUuid(surveyInfo) }, tx)
     this.incrementProcessedItems()
   }
 

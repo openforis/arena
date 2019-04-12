@@ -2,33 +2,29 @@ const R = require('ramda')
 const db = require('../../../db/db')
 
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
-const NodeDef = require('../../../../common/survey/nodeDef')
 
 const NodeDefRepository = require('./nodeDefRepository')
 const NodeDefValidator = require('../validator/nodeDefValidator')
 
-const {markSurveyDraft} = require('../../survey/persistence/surveySchemaRepositoryUtils')
+const { markSurveyDraft } = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
 // ======= CREATE
 
-const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props, client = db) =>
+const insertNodeDef = async (user, surveyId, nodeDefParam, client = db) =>
   await client.tx(async t => {
-    const nodeDef = await NodeDefRepository.createNodeDef(surveyId, parentUuid, uuid, type, props, t)
+    const nodeDef = await NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t)
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, {parentUuid, uuid, type, props}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, t)
 
     return {
       ...nodeDef,
       validation: await NodeDefValidator.validateNodeDef({}, nodeDef)
     }
   })
-
-const createEntityDef = async (user, surveyId, parentUuid, uuid, props, client = db) =>
-  await createNodeDef(user, surveyId, parentUuid, uuid, NodeDef.nodeDefType.entity, props, client)
 
 // ======= READ
 
@@ -69,7 +65,7 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, {nodeDefUuid, props, propsAdvanced}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, { nodeDefUuid, props, propsAdvanced }, t)
 
     return nodeDef
   })
@@ -82,15 +78,14 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, {nodeDefUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, { nodeDefUuid }, t)
 
     return nodeDef
   })
 
 module.exports = {
   //CREATE
-  createNodeDef,
-  createEntityDef,
+  insertNodeDef,
 
   //READ
   fetchNodeDefsBySurveyId,
