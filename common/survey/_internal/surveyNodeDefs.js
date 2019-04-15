@@ -68,6 +68,11 @@ const getNodeDefsByTaxonomyUuid = (uuid) => R.pipe(
   R.filter(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid))
 )
 
+const findNodeDef = predicate => R.pipe(
+  getNodeDefsArray,
+  R.find(predicate)
+)
+
 // ====== UPDATE
 
 const assocNodeDefs = nodeDefs => R.assoc(nodeDefsKey, nodeDefs)
@@ -107,7 +112,7 @@ const getHierarchy = (filterFn = NodeDef.isEntity) =>
         : []
 
       length += childDefs.length
-      const item = {...nodeDef, children: R.reduce(h, [], childDefs)}
+      const item = { ...nodeDef, children: R.reduce(h, [], childDefs) }
       return R.append(item, array)
     }
 
@@ -207,6 +212,8 @@ module.exports = {
 
   getNodeDefsByCategoryUuid,
   getNodeDefsByTaxonomyUuid,
+
+  findNodeDef,
 
   // ====== UPDATE
   assocNodeDefs,

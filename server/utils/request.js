@@ -4,6 +4,17 @@ const getParams = req => R.pipe(
   R.mergeLeft(R.prop('query', req)),
   R.mergeLeft(R.prop('params', req)),
   R.mergeLeft(R.prop('body', req)),
+  // convert String boolean values to Boolean type
+  R.mapObjIndexed(val =>
+    R.ifElse(
+      R.or(
+        R.equals('true'),
+        R.equals('false')
+      ),
+      R.always(val === 'true'),
+      R.identity
+    )(val)
+  )
 )({})
 
 const getRestParam = (req, param, defaultValue = null) => {

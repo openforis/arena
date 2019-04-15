@@ -1,4 +1,6 @@
-const {parentPort, workerData, isMainThread} = require('worker_threads')
+const { parentPort, workerData, isMainThread } = require('worker_threads')
+
+const threadMessageTypes = require('./threadMessageTypes')
 
 /**
  * Base class for thread execution in Worker Pool
@@ -6,7 +8,7 @@ const {parentPort, workerData, isMainThread} = require('worker_threads')
 class Thread {
 
   constructor (params) {
-    this.params = params ? params : {...workerData}
+    this.params = params ? params : { ...workerData }
 
     this.user = this.params.user
     this.surveyId = this.params.surveyId
@@ -18,9 +20,10 @@ class Thread {
   async messageHandler (msg) {
     try {
       await this.onMessage(msg)
+      this.postMessage({ type: threadMessageTypes.messageProcessComplete })
     } catch (e) {
       console.log('** Error in thread ', e)
-      this.postMessage({type: 'error', error: e.toString()})
+      this.postMessage({ type: threadMessageTypes.error, error: e.toString() })
     }
   }
 
@@ -29,7 +32,7 @@ class Thread {
    * @param msg
    */
   postMessage (msg) {
-    parentPort.postMessage({user: this.getUser(), surveyId: this.getSurveyId(), msg})
+    parentPort.postMessage({ user: this.getUser(), surveyId: this.getSurveyId(), msg })
   }
 
   /**

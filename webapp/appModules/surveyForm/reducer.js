@@ -27,6 +27,7 @@ import {
   assocFormActivePage,
   assocFormNodeDefEdit,
   assocFormPageNode,
+  assocFormPageNodes,
   assocNodeDefAddChildTo,
   assocParamsOnNodeDefCreate,
 } from './surveyFormState'
@@ -68,8 +69,14 @@ const actionHandlers = {
     }
   },
 
-  // record (preview)
-  [recordLoad]: state => assocNodeDefAddChildTo(null)(state)
+  // record
+  [recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
+    R.pipe(
+      assocNodeDefAddChildTo(null),
+      assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
+      assocFormActivePage(nodeDefActivePage)
+    )(state)
+
 }
 
 const props = exportReducer(actionHandlers)

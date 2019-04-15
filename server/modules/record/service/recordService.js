@@ -27,8 +27,16 @@ const checkOutTimeoutsByUserId = {}
  * THREAD
  * ======
  */
-const createUserThread = (user, surveyId, recordUuid, preview) => {
+const createUserThread = (user, surveyId, recordUuid, preview, singleMessageHandling) => {
   const userId = user.id
+
+  cancelCheckOut(userId)
+
+  // terminate old thread, if any
+  const oldThread = RecordThreads.getThreadByUserId(userId)
+  if (oldThread) {
+    oldThread.terminate()
+  }
 
   RecordUsersMap.assocUser(surveyId, recordUuid, user, preview)
 
@@ -47,9 +55,16 @@ const createUserThread = (user, surveyId, recordUuid, preview) => {
     RecordThreads.removeThreadByUserId(userId)
   }
 
-  const thread = new ThreadManager(filePath, data, messageHandler, exitHandler)
+  const thread = new ThreadManager(filePath, data, messageHandler, exitHandler, singleMessageHandling)
 
   return RecordThreads.putThreadByUserId(userId, thread)
+}
+
+const getOrCreatedUserThread = (user, surveyId, recordUuid, preview = false, singleMessageHandling = false) => {
+  const thread = RecordThreads.getThreadByUserId(user.id)
+  return thread
+    ? thread
+    : createUserThread(user, surveyId, recordUuid, preview, singleMessageHandling)
 }
 
 const terminateUserThread = userId => {
@@ -89,11 +104,7 @@ const checkIn = async (user, surveyId, recordUuid) => {
   const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid)
 
   if (canEditRecord(user, record)) {
-    cancelCheckOut(user.id)
-    if (!RecordThreads.getThreadByUserId(user.id)) {
-      //Start record update thread
-      createUserThread(user, surveyId, recordUuid, Record.isPreview(record))
-    }
+    createUserThread(user, surveyId, recordUuid, Record.isPreview(record), false)
   }
 
   return record
@@ -130,14 +141,13 @@ const persistNode = async (user, surveyId, node, fileReq) => {
 
     await FileManager.insertFile(surveyId, file)
   }
-
-  const updateWorker = RecordThreads.getThreadByUserId(user.id)
-  updateWorker.postMessage({ type: recordThreadMessageTypes.persistNode, node })
+  const thread = getOrCreatedUserThread(user, surveyId, Node.getRecordUuid(node), false, true)
+  thread.postMessage({ type: recordThreadMessageTypes.persistNode, node })
 }
 
-const deleteNode = (user, nodeUuid) => {
-  const updateWorker = RecordThreads.getThreadByUserId(user.id)
-  updateWorker.postMessage({ type: recordThreadMessageTypes.deleteNode, nodeUuid })
+const deleteNode = (user, surveyId, recordUuid, nodeUuid) => {
+  const thread = getOrCreatedUserThread(user, surveyId, recordUuid, false, true)
+  thread.postMessage({ type: recordThreadMessageTypes.deleteNode, nodeUuid })
 }
 
 module.exports = {
