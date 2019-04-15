@@ -10,11 +10,12 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
 import * as RecordState from './recordState'
 
-import { setFormActiveNode } from '../actions'
-
 import { appModules, appModuleUri } from '../../appModules'
 import { dataModules } from '../../data/dataModules'
 import { designerModules } from '../../designer/designerModules'
+
+import Survey from '../../../../common/survey/survey'
+import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 
 export const recordCreate = 'survey/record/create'
 export const recordLoad = 'survey/record/load'
@@ -150,10 +151,43 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
 export const checkInRecord = (recordUuid, activeParentNodeUuid, activeNodeDefUuid) => async (dispatch, getState) => {
   const surveyId = SurveyState.getStateSurveyId(getState())
   const { data } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
-  dispatch({ type: recordLoad, record: data.record })
+
+  const record = data.record
 
   if (activeParentNodeUuid) {
-    dispatch(setFormActiveNode(activeParentNodeUuid, activeNodeDefUuid))
+
+    const state = getState()
+    const survey = SurveyState.getSurvey(state)
+
+    const parentNode = Record.getNodeByUuid(activeParentNodeUuid)(record)
+    const ancestors = Record.getAncestorEntitiesAndSelf(parentNode)(record)
+
+    const nodeDefActivePage = R.pipe(
+      R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
+      R.find(R.pipe(
+        NodeDefLayout.getPageUuid,
+        R.isNil,
+        R.not
+      ))
+    )(ancestors)
+
+    const formPageNodeUuidByNodeDefUuid = R.reduce(
+      (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
+      [],
+      ancestors
+    )
+
+    dispatch({
+      type: recordLoad,
+      record,
+      nodeDefActivePage,
+      formPageNodeUuidByNodeDefUuid
+    })
+  } else {
+    dispatch({
+      type: recordLoad,
+      record
+    })
   }
 }
 

@@ -18,7 +18,6 @@ import {
   formNodeDefEditUpdate,
   formNodeDefAddChildToUpdate,
   formPageNodeUpdate,
-  formActiveNodeUpdate,
   formReset
 } from './actions'
 
@@ -57,12 +56,6 @@ const actionHandlers = {
 
   [formPageNodeUpdate]: (state, { nodeDef, node }) => assocFormPageNode(nodeDef, node)(state),
 
-  [formActiveNodeUpdate]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
-    R.pipe(
-      assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
-      assocFormActivePage(nodeDefActivePage)
-    )(state),
-
   // node def
   [nodeDefCreate]: (state, { nodeDef }) => assocParamsOnNodeDefCreate(nodeDef)(state),
 
@@ -76,8 +69,14 @@ const actionHandlers = {
     }
   },
 
-  // record (preview)
-  [recordLoad]: state => assocNodeDefAddChildTo(null)(state)
+  // record
+  [recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
+    R.pipe(
+      assocNodeDefAddChildTo(null),
+      assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
+      assocFormActivePage(nodeDefActivePage)
+    )(state)
+
 }
 
 const props = exportReducer(actionHandlers)

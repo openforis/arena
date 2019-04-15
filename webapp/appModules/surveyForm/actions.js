@@ -44,43 +44,8 @@ export const setFormActivePage = (nodeDef) => dispatch =>
 // current node of active form page
 export const formPageNodeUpdate = 'survey/form/pageNode/update'
 
-export const formActiveNodeUpdate = 'survey/form/activeNode/update'
-
 export const setFormPageNode = (nodeDef, node) => dispatch =>
   dispatch({ type: formPageNodeUpdate, nodeDef, node })
-
-export const setFormActiveNode = (parentNodeUuid, nodeDefUuid) =>
-  (dispatch, getState) => {
-    const state = getState()
-    const survey = SurveyState.getSurvey(state)
-    const surveyForm = SurveyFormState.getSurveyForm(state)
-
-    const record = RecordState.getRecord(surveyForm)
-
-    const parentNode = Record.getNodeByUuid(parentNodeUuid)(record)
-    const ancestors = Record.getAncestorEntitiesAndSelf(parentNode)(record)
-
-    const nodeDefActivePage = R.pipe(
-      R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
-      R.find(R.pipe(
-        NodeDefLayout.getPageUuid,
-        R.isNil,
-        R.not
-      ))
-    )(ancestors)
-
-    const formPageNodeUuidByNodeDefUuid = R.reduce(
-      (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
-      [],
-      ancestors
-    )
-
-    dispatch({
-      type: formActiveNodeUpdate,
-      nodeDefActivePage,
-      formPageNodeUuidByNodeDefUuid
-    })
-  }
 
 // ==== utils
 
