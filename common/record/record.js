@@ -79,7 +79,7 @@ const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
 
 const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
 
-const getAncestorEntities = entity =>
+const getAncestorEntitiesAndSelf = entity =>
   record => {
     const ancestors = []
 
@@ -92,7 +92,7 @@ const getAncestorEntities = entity =>
   }
 
 const findNodeInAncestorEntities = (parentNode, predicate) => record => {
-  const ancestors = getAncestorEntities(parentNode)(record)
+  const ancestors = getAncestorEntitiesAndSelf(parentNode)(record)
   for (const ancestor of ancestors) {
     const children = getNodeChildren(ancestor)(record)
     for (const child of children) {
@@ -140,7 +140,7 @@ const getAncestorByNodeDefUuuid = (node, ancestorDefUuid) =>
     const parentNode = getParentNode(node)(record)
 
     return R.pipe(
-      getAncestorEntities(parentNode),
+      getAncestorEntitiesAndSelf(parentNode),
       R.find(ancestor => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
     )(record)
   }
@@ -292,6 +292,7 @@ module.exports = {
   getRootNode,
   getNodeByUuid,
   getParentNode,
+  getAncestorEntitiesAndSelf,
   getAncestorByNodeDefUuuid,
   getDescendantsByNodeDefUuid,
   findNodeByPath,

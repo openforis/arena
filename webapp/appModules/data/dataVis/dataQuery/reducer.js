@@ -20,8 +20,13 @@ import {
   assocTableFilter,
   assocTableSort,
   assocNodeDefUuidTable,
-  assocNodeDefUuidCols, dissocTableDataCols,
+  assocNodeDefUuidCols,
+  dissocTableDataCols,
+  assocTableDataRecordNodes,
+  assocTableDataRecordNodeValidations
 } from './dataQueryState'
+
+import { nodesUpdate, validationsUpdate } from '../../../surveyForm/record/actions'
 
 const actionHandlers = {
   [appUserLogout]: () => ({}),
@@ -40,11 +45,12 @@ const actionHandlers = {
 
   [dataQueryTableInit]: (
     state,
-    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols }
+    { offset, limit, filter, sort, count, data, nodeDefUuidTable, nodeDefUuidCols, editMode }
   ) =>
     initTableData(
       offset, limit, filter, sort, count, data,
-      nodeDefUuidTable, nodeDefUuidCols
+      nodeDefUuidTable, nodeDefUuidCols,
+      editMode
     )(state),
 
   [dataQueryTableDataUpdate]: (state, { offset, data }) => assocTableData(offset, data)(state),
@@ -52,6 +58,11 @@ const actionHandlers = {
   [dataQueryTableFilterUpdate]: (state, { filter }) => assocTableFilter(filter)(state),
 
   [dataQueryTableSortUpdate]: (state, { sort }) => assocTableSort(sort)(state),
+
+  // record nodes update
+  [nodesUpdate]: (state, { nodes }) => assocTableDataRecordNodes(nodes)(state),
+
+  [validationsUpdate]: (state, {validations}) => assocTableDataRecordNodeValidations(validations)(state),
 }
 
 export default exportReducer(actionHandlers)

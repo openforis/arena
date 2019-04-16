@@ -143,7 +143,7 @@ const validatePositiveNumber = (propName, item) => {
 const getValidation = R.propOr(validValidation, keys.validation)
 
 //TODO rename to isValid
-const isValidationValid = R.pipe(R.defaultTo(validValidation), R.propEq(keys.valid, true))
+const isValidationValid = R.propOr(true, keys.valid)
 
 //TODO rename to isObjValid
 const isValid = R.pipe(getValidation, isValidationValid)

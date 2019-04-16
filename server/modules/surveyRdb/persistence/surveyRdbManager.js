@@ -1,5 +1,5 @@
 const db = require('../../../db/db')
-//surveyRdbManger cannot use SurveyManager - loop dependencies
+//surveyRdbManger cannot use SurveyManager - circular dependency
 
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 

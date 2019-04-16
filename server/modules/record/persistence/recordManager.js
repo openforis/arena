@@ -41,6 +41,7 @@ module.exports = {
 
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
   fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,
+  fetchChildNodesByNodeDefUuid: NodeRepository.fetchChildNodesByNodeDefUuid,
 
   // UTILS
   disableTriggers: NodeRepository.disableTriggers,

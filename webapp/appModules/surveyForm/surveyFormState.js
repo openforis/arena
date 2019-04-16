@@ -84,6 +84,21 @@ export const assocFormPageNode = (nodeDef, nodeUuid) => {
     : R.dissocPath(path)
 }
 
+export const assocFormPageNodes = formPageNodeUuidByNodeDefUuid => state =>
+  R.pipe(
+    R.keys,
+    R.reduce(
+      (acc, nodeDefUuid) => {
+        const nodeUuid = R.prop(nodeDefUuid, formPageNodeUuidByNodeDefUuid)
+        const path = [pageNodes, nodeDefUuid]
+        return nodeUuid
+          ? R.assocPath(path, nodeUuid, acc)
+          : R.dissocPath(path, acc)
+      },
+      state
+    )
+  )(formPageNodeUuidByNodeDefUuid)
+
 export const getFormPageNodeUuid = nodeDef => R.pipe(
   getSurveyForm,
   R.path([props, pageNodes, NodeDef.getUuid(nodeDef)])
