@@ -20,7 +20,7 @@ const { dependencyTypes } = Survey
  * Module responsible for updating applicable and default values
  */
 
-const updateNodes = async (survey, record, nodes, tx, persistChanges = true) => {
+const updateNodes = async (survey, record, nodes, tx) => {
   const nodesArray = R.values(nodes)
   const nodesUpdated = nodesArray
   const nodesToVisit = new Queue(nodesArray)
@@ -34,7 +34,7 @@ const updateNodes = async (survey, record, nodes, tx, persistChanges = true) => 
     if (!R.includes(nodeUuid, nodeUuidsVisited)) {
 
       // update node
-      const nodesUpdatedCurrent = await updateNode(survey, record, node, tx, persistChanges)
+      const nodesUpdatedCurrent = await updateNode(survey, record, node, tx)
       record = Record.assocNodes(nodesUpdatedCurrent)(record)
 
       // mark updated nodes to visit
@@ -61,15 +61,15 @@ const updateNodes = async (survey, record, nodes, tx, persistChanges = true) => 
   return SurveyUtils.toUuidIndexedObj(nodesUpdated)
 }
 
-const updateNode = async (survey, record, node, tx, persistChanges = true) => {
+const updateNode = async (survey, record, node, tx) => {
 
-  const nodesApplicability = await updateNodeExpr(survey, record, node, NodeDef.getApplicable, dependencyTypes.applicable, tx, persistChanges)
-  const nodesDefaultValues = await updateNodeExpr(survey, record, node, NodeDef.getDefaultValues, dependencyTypes.defaultValues, tx, persistChanges)
+  const nodesApplicability = await updateNodeExpr(survey, record, node, NodeDef.getApplicable, dependencyTypes.applicable, tx)
+  const nodesDefaultValues = await updateNodeExpr(survey, record, node, NodeDef.getDefaultValues, dependencyTypes.defaultValues, tx)
 
   return R.mergeRight(nodesApplicability, nodesDefaultValues)
 }
 
-const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependencyType, tx, persistChanges) => {
+const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependencyType, tx) => {
 
   //1. fetch dependent nodes
   const nodeDependents = NodeDependencyManager.findDependentNodes(survey, record, node, dependencyType)
@@ -115,18 +115,9 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
 
       const applicabilityValue = valueExpr || false
 
-      if (persistChanges) {
-        return await isApplicableExpr
-          ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, applicabilityValue, tx)
-          : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, valueExpr, isDefaultValuesExpr && !R.isNil(expr), tx)
-      } else {
-        const updatedNode = isApplicableExpr
-          ? R.assocPath([Node.keys.meta, Node.metaKeys.childApplicability, NodeDef.getUuid(nodeDef)], applicabilityValue)(nodeCtx)
-          : Node.assocValue(valueExpr)(nodeCtx)
-        return {
-          [Node.getUuid(updatedNode)]: updatedNode
-        }
-      }
+      return await isApplicableExpr
+        ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, applicabilityValue, tx)
+        : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, valueExpr, isDefaultValuesExpr && !R.isNil(expr), tx)
     })
   )
 

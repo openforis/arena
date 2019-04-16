@@ -1,9 +1,15 @@
 const R = require('ramda')
 
+const db = require('../../../server/db/db')
+
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
+
+const RecordRepository = require('../../../server/modules/record/persistence/recordRepository')
+const NodeRepository = require('../../../server/modules/record/persistence/nodeRepository')
+const RecordManager = require('../../../server/modules/record/persistence/recordManager')
 
 class NodeBuilder {
 
@@ -54,7 +60,7 @@ class AttributeBuilder extends NodeBuilder {
 
 class RecordBuilder {
 
-  constructor (survey, user, rootEntityBuilder) {
+  constructor (user, survey, rootEntityBuilder) {
     this.survey = survey
     this.user = user
     this.rootEntityBuilder = rootEntityBuilder
@@ -65,10 +71,26 @@ class RecordBuilder {
     const nodes = this.rootEntityBuilder.build(this.survey, null, Record.getUuid(record), null)
     return Record.assocNodes(nodes)(record)
   }
+
+  async buildAndStore (client = db) {
+    return await client.tx(async t => {
+      const record = this.build()
+      const surveyId = Survey.getId(this.survey)
+      await RecordRepository.insertRecord(surveyId, record, t)
+
+      await Record.traverse(
+        async node => {
+          await NodeRepository.insertNode(surveyId, node, t)
+        }
+      )(record)
+
+      return RecordManager.fetchRecordAndNodesByUuid(surveyId, Record.getUuid(record), t)
+    })
+  }
 }
 
 module.exports = {
-  record: (survey, user, rootEntityBuilder) => new RecordBuilder(survey, user, rootEntityBuilder),
+  record: (user, survey, rootEntityBuilder) => new RecordBuilder(user, survey, rootEntityBuilder),
   entity: (nodeDefName, ...childBuilders) => new EntityBuilder(nodeDefName, ...childBuilders),
   attribute: (nodeDefName, value = null) => new AttributeBuilder(nodeDefName, value)
 }

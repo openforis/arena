@@ -9,6 +9,8 @@ const Node = require('../record/node')
 const User = require('../user/user')
 const RecordStep = require('./recordStep')
 
+const Queue = require('../queue')
+
 const keys = {
   uuid: 'uuid',
   nodes: 'nodes',
@@ -202,6 +204,22 @@ const getNodePath = node => (survey, record) => {
   )(ancestorEntities)
 }
 
+const traverse = visitorFn => async record => {
+  const root = getRootNode(record)
+  const queue = new Queue()
+  queue.enqueue(root)
+
+  while (!queue.isEmpty()) {
+    const node = queue.dequeue()
+
+    await visitorFn(node)
+
+    const children = getNodeChildren(node)(record)
+
+    queue.enqueueItems(children)
+  }
+}
+
 // ====== UPDATE
 
 const assocNodes = nodes =>
@@ -297,6 +315,7 @@ module.exports = {
   getDescendantsByNodeDefUuid,
   findNodeByPath,
   getNodePath,
+  traverse,
 
   // testing
   getCodeUuidsHierarchy,

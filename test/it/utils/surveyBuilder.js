@@ -4,6 +4,7 @@ const db = require('../../../server/db/db')
 
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
+const User = require('../../../common/user/user')
 
 const SurveyManager = require('../../../server/modules/survey/persistence/surveyManager')
 const NodeDefRepository = require('../../../server/modules/nodeDef/persistence/nodeDefRepository')
@@ -48,7 +49,7 @@ class EntityDefBuilder extends NodeDefBuilder {
 
 class AttributeDefBuilder extends NodeDefBuilder {
 
-  constructor (name, type) {
+  constructor (name, type = NodeDef.nodeDefType.text) {
     super(name, type)
   }
 
@@ -78,8 +79,8 @@ class AttributeDefBuilder extends NodeDefBuilder {
 
 class SurveyBuilder {
 
-  constructor (userId, name, label, lang, rootDefBuilder) {
-    this.userId = userId
+  constructor (user, name, label, lang, rootDefBuilder) {
+    this.user = user
     this.name = name
     this.label = label
     this.lang = lang
@@ -87,7 +88,7 @@ class SurveyBuilder {
   }
 
   build () {
-    const survey = Survey.newSurvey(this.userId, this.name, this.label, this.lang)
+    const survey = Survey.newSurvey(User.getId(this.user), this.name, this.label, this.lang)
     const nodeDefs = this.rootDefBuilder.build(survey)
 
     return R.pipe(
@@ -96,11 +97,11 @@ class SurveyBuilder {
     )(survey)
   }
 
-  async buildAndStore (user, publish = false, client = db) {
+  async buildAndStore (publish = true, client = db) {
     const surveyParam = this.build()
 
     return await client.tx(async t => {
-      const survey = await SurveyManager.insertSurvey(user, surveyParam, false, t)
+      const survey = await SurveyManager.insertSurvey(this.user, surveyParam, false, t)
 
       const surveyId = Survey.getId(survey)
 
@@ -112,11 +113,12 @@ class SurveyBuilder {
         )
 
       if (publish) {
-        await new SurveyPublishPerformJob({ user, surveyId }).start(t)
-        await new SurveyRdbGeneratorJob({ user, surveyId }).start(t)
+        await new SurveyPublishPerformJob({ user: this.user, surveyId }).start(t)
+        await new SurveyRdbGeneratorJob({ user: this.user, surveyId }).start(t)
       }
 
-      return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, !publish, true, false, t)
+      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, !publish, true, false, t)
+      return Survey.assocDependencyGraph(Survey.buildDependencyGraph(surveyDb))(surveyDb)
     })
   }
 }
@@ -124,5 +126,5 @@ class SurveyBuilder {
 module.exports = {
   survey: (userId, name, label, lang, rootDefBuilder) => new SurveyBuilder(userId, name, label, lang, rootDefBuilder),
   entity: (name, ...childBuilders) => new EntityDefBuilder(name, ...childBuilders),
-  attribute: (name, type) => new AttributeDefBuilder(name, type)
+  attribute: (name, type = NodeDef.nodeDefType.text) => new AttributeDefBuilder(name, type)
 }

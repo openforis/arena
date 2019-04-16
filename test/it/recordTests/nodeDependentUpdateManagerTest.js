@@ -3,11 +3,13 @@ const should = require('chai').should()
 
 const R = require('ramda')
 
+const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 
+const SurveyManager = require('../../../server/modules/survey/persistence/surveyManager')
 const NodeDependentUpdateManager = require('../../../server/modules/record/persistence/nodeDependentUpdateManager')
 
 const { getContextUser } = require('../../testContext')
@@ -16,24 +18,26 @@ const SB = require('../utils/surveyBuilder')
 const RB = require('../utils/recordBuilder')
 
 const calculatedValueUpdateTest = async () => {
-  const survey = SB.survey(1, 'test', 'Test', 'en',
+  const user = getContextUser()
+
+  const survey = await SB.survey(user, 'test', 'Test', 'en',
     SB.entity('cluster',
       SB.attribute('cluster_no', NodeDef.nodeDefType.integer)
         .key(),
       SB.attribute('num', NodeDef.nodeDefType.decimal),
       SB.attribute('double_num', NodeDef.nodeDefType.decimal)
         .readOnly()
-        .defaultValues(NodeDefExpression.createExpression('this.sibling(\'num\').getValue() * 2'))
+        .defaultValues(NodeDefExpression.createExpression(`this.sibling('num').getValue() * 2`))
     )
-  ).build()
+  ).buildAndStore()
 
-  let record = RB.record(survey, getContextUser(),
+  let record = await RB.record(user, survey,
     RB.entity('root',
       RB.attribute('cluster_no', 1),
       RB.attribute('num', 1),
       RB.attribute('double_num', null),
     )
-  ).build()
+  ).buildAndStore()
 
   const sourceNode = Record.findNodeByPath('root/num')(survey, record)
 
@@ -44,38 +48,42 @@ const calculatedValueUpdateTest = async () => {
 
   const nodeDependent = Record.findNodeByPath('root/double_num')(survey, record)
 
-  const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, updatedNodes, null, false)
+  const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, updatedNodes)
 
   const nodeDependentUpdated = R.prop(Node.getUuid(nodeDependent), nodesDependentUpdated)
 
   should.exist(nodeDependentUpdated)
   expect(Node.getValue(nodeDependentUpdated)).to.equal(4)
+
+  await SurveyManager.deleteSurvey(Survey.getId(survey))
 }
 
 const calculatedValueWithApplyIfUpdateTest = async () => {
-  const survey = SB.survey(1, 'test', 'Test', 'en',
+  const user = getContextUser()
+
+  const survey = await SB.survey(user, 'test', 'Test', 'en',
     SB.entity('cluster',
       SB.attribute('cluster_no', NodeDef.nodeDefType.integer)
         .key(),
-      SB.attribute('num', NodeDef.nodeDefType.decimal),
-      SB.attribute('num_range', NodeDef.nodeDefType.decimal)
+      SB.attribute('num', NodeDef.nodeDefType.integer),
+      SB.attribute('num_range', NodeDef.nodeDefType.text)
         .readOnly()
         .defaultValues(
-          NodeDefExpression.createExpression('\'a\'', 'this.sibling(\'num\').getValue() <= 0'),
-          NodeDefExpression.createExpression('\'b\'', 'this.sibling(\'num\').getValue() <= 10'),
-          NodeDefExpression.createExpression('\'c\'', 'this.sibling(\'num\').getValue() <= 20'),
-          NodeDefExpression.createExpression('\'z\'')
+          NodeDefExpression.createExpression('a', `this.sibling('num').getValue() <= 0`),
+          NodeDefExpression.createExpression('b', `this.sibling('num').getValue() <= 10`),
+          NodeDefExpression.createExpression('c', `this.sibling('num').getValue() <= 20`),
+          NodeDefExpression.createExpression('z')
         )
     )
-  ).build()
+  ).buildAndStore()
 
-  let record = RB.record(survey, getContextUser(),
+  let record = await RB.record(user, survey,
     RB.entity('root',
       RB.attribute('cluster_no', 1),
       RB.attribute('num', 1),
       RB.attribute('num_range', null),
     )
-  ).build()
+  ).buildAndStore()
 
   // test values, couples of expected values by input
   const testValues = [
@@ -100,38 +108,42 @@ const calculatedValueWithApplyIfUpdateTest = async () => {
     record = Record.assocNodes(nodesUpdated)(record)
 
     // update dependent nodes
-    const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, nodesUpdated, null, false)
+    const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, nodesUpdated)
 
     const nodeDependentUpdated = R.prop(Node.getUuid(nodeDependent), nodesDependentUpdated)
 
     should.exist(nodeDependentUpdated)
     expect(Node.getValue(nodeDependentUpdated)).to.equal(expectedValue)
   }
+
+  await SurveyManager.deleteSurvey(Survey.getId(survey))
 }
 
 const calculatedValueCascadeUpdateTest = async () => {
-  const survey = SB.survey(1, 'test', 'Test', 'en',
+  const user = getContextUser()
+
+  const survey = await SB.survey(user, 'test', 'Test', 'en',
     SB.entity('cluster',
       SB.attribute('cluster_no', NodeDef.nodeDefType.integer)
         .key(),
       SB.attribute('num', NodeDef.nodeDefType.decimal),
       SB.attribute('num_double', NodeDef.nodeDefType.decimal)
         .readOnly()
-        .defaultValues(NodeDefExpression.createExpression('this.sibling(\'num\').getValue() * 2')),
+        .defaultValues(NodeDefExpression.createExpression(`this.sibling('num').getValue() * 2`)),
       SB.attribute('num_double_square', NodeDef.nodeDefType.decimal)
         .readOnly()
-        .defaultValues(NodeDefExpression.createExpression('this.sibling(\'num_double\').getValue() * this.sibling(\'num_double\').getValue()')),
+        .defaultValues(NodeDefExpression.createExpression(`this.sibling('num_double').getValue() * this.sibling('num_double').getValue()`)),
     )
-  ).build()
+  ).buildAndStore()
 
-  let record = RB.record(survey, getContextUser(),
+  let record = await RB.record(user, survey,
     RB.entity('root',
       RB.attribute('cluster_no', 1),
       RB.attribute('num', 1),
       RB.attribute('num_double', null),
       RB.attribute('num_double_square', null),
     )
-  ).build()
+  ).buildAndStore()
 
   const sourceNode = Record.findNodeByPath('root/num')(survey, record)
   const nodeDependent = Record.findNodeByPath('root/num_double_square')(survey, record)
@@ -144,14 +156,15 @@ const calculatedValueCascadeUpdateTest = async () => {
   }
   record = Record.assocNodes(nodesUpdated)(record)
 
-  const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, nodesUpdated, null, false)
+  const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, nodesUpdated)
 
   const nodeDependentUpdated = R.prop(Node.getUuid(nodeDependent), nodesDependentUpdated)
 
   should.exist(nodeDependentUpdated)
   expect(Node.getValue(nodeDependentUpdated)).to.equal(dependentExpectedValue)
-}
 
+  await SurveyManager.deleteSurvey(Survey.getId(survey))
+}
 
 module.exports = {
   calculatedValueUpdateTest,
