@@ -30,10 +30,12 @@ const getBoolParam = R.pipe(
   R.equals('true'),
 )
 
-const getJsonParam = R.pipe(
-  getRestParam,
-  JSON.parse,
-)
+const getJsonParam = (req, param, defaultValue = null) => {
+  const jsonStr = getRestParam(req, param, null)
+  return jsonStr
+    ? JSON.parse(jsonStr)
+    : defaultValue
+}
 
 const toQueryString = obj =>
   R.reduce((acc, key) => {

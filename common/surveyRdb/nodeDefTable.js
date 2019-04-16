@@ -5,9 +5,9 @@ const Survey = require('../survey/survey')
 const NodeDef = require('../survey/nodeDef')
 
 const viewSuffix = '_view'
-const dataTablePrefix = 'data_'
+const tablePrefix = 'data_'
 
-const composeTableName = (nodeDefName, nodeDefParentName = '') => `${dataTablePrefix}${nodeDefParentName}${nodeDefName}`
+const composeTableName = (nodeDefName, nodeDefParentName = '') => `${tablePrefix}${nodeDefParentName}${nodeDefName}`
 
 const getTableName = (nodeDef, nodeDefParent) => {
   const nodeDefName = NodeDef.getName(nodeDef)
@@ -24,7 +24,7 @@ const getViewName = (nodeDef, nodeDefParent) => getTableName(nodeDef, nodeDefPar
 
 const getViewNameByUuid = nodeDefUuid => R.pipe(
   Survey.getNodeDefByUuid(nodeDefUuid),
-  nodeDef => dataTablePrefix + NodeDef.getName(nodeDef) + viewSuffix
+  nodeDef => tablePrefix + NodeDef.getName(nodeDef) + viewSuffix
 )
 
 const {nodeDefType} = NodeDef
