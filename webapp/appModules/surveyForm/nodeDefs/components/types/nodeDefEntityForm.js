@@ -49,20 +49,23 @@ const EntityForm = props => {
     putNodeDefProp,
     entry,
     recordUuid,
-    surveyInfo
+    surveyInfo,
   } = props
 
   const columns = getNoColumns(nodeDef)
   const rdgLayout = getLayout(nodeDef)
   const innerPageChildren = filterInnerPageChildren(childDefs)
 
-  const onLayoutChange = (layout) => {
-
-    //console.log(window.innerWidth) ||
-    edit && canEditDef && !locked && window.innerWidth > 1200 && layout.length > 0
-    && layout.length === innerPageChildren.length
-      ? putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
-      : null
+  const onLayoutChange = layout => {
+    //console.log(window.innerWidth)
+    if (edit &&
+        canEditDef &&
+        !locked &&
+        window.innerWidth > 1200 &&
+        layout.length > 0 &&
+        layout.length === innerPageChildren.length) {
+      putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
+    }
   }
 
   return innerPageChildren.length > 0
@@ -167,7 +170,7 @@ class NodeDefEntityForm extends React.Component {
   constructor (props) {
     super(props)
 
-    this.formWrapper = new React.createRef()
+    this.formWrapper = React.createRef()
   }
 
   checkNodePage () {

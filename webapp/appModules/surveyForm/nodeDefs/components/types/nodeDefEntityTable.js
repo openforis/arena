@@ -1,3 +1,4 @@
+import './nodeDefEntityTable.scss'
 import '../../../style/react-grid-layout.scss'
 
 import React from 'react'
@@ -12,52 +13,148 @@ import { getNodeDefFormFields } from '../../nodeDefSystemProps'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../common/record/node'
 
-const EntityTableRow = (props) => {
+import { elementOffset } from '../../../../../appUtils/domUtils'
 
-  const {
-    nodeDef, childDefs, node,
-    renderType,
-    removeNode,
-    i = 'header',
-    canEditRecord,
-  } = props
+class EntityTableRow extends React.Component {
+  constructor (props) {
+    super(props)
 
-  const className = `node-def__table-row` +
-    (renderType === nodeDefRenderType.tableHeader ? '-header' : '')
+    this.placeholderRef = React.createRef()
 
-  return (
-    <div className={className}
-         id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
+    this.nodePlacement = null
 
-      {
-        childDefs
-          .map((childDef, i) => {
+    this.state = {
+      data: [],
+      dragged: null,
+    }
+  }
+
+  dragStart (e) {
+    this.setState({ dragged: e.currentTarget }, () => {
+      const { dragged } = this.state
+
+      this.placeholderRef.current.style.width = `${dragged.clientWidth}px`
+      this.placeholderRef.current.style.height = `${dragged.clientHeight}px`
+    })
+
+    e.dataTransfer.effectAllowed = 'move'
+    // Firefox requires dataTransfer data to be set
+    e.dataTransfer.setData('text/html', e.currentTarget)
+  }
+
+  dragEnd (e) {
+    const { dragged } = this.state
+
+    dragged.style.display = 'block'
+    // this.dragged.parentNode.removeChild(placeholder);
+
+    // Update data
+    // const data = this.state.data
+    // const from = +this.dragged.dataset.id
+    // let to = +this.over.dataset.id
+    // if (from < to) {
+    //   to--
+    // }
+    // if (this.nodePlacement === 'after') {
+    //   to++
+    // }
+    // data.splice(to, 0, data.splice(from, 1)[0])
+    // this.setState({ data: data })
+
+    this.placeholderRef.current.style.display = 'none'
+
+    this.placeholderRef.current.parentNode.insertBefore(dragged, this.placeholderRef.current)
+    this.setState({ dragged: null })
+    this.nodePlacement = null
+  }
+
+  dragOver (e) {
+    const { dragged } = this.state
+
+    e.preventDefault()
+
+    dragged.style.display = 'none'
+    this.placeholderRef.current.style.display = 'block'
+
+    if (e.target === this.placeholderRef.current) {
+      return
+    }
+
+    this.over = e.target
+
+    const { left } = elementOffset(this.over)
+    const relX = e.clientX - left
+    const width = this.over.offsetWidth / 2
+    const parent = e.target.parentNode
+
+    if (relX > width) {
+      this.nodePlacement = 'after'
+      parent.insertBefore(this.placeholderRef.current, e.target.nextElementSibling)
+    } else if (relX < width) {
+      this.nodePlacement = 'before'
+      parent.insertBefore(this.placeholderRef.current, e.target)
+    }
+  }
+
+  render () {
+
+    const {
+      nodeDef, childDefs, node,
+      renderType,
+      removeNode,
+      i = 'header',
+      canEditRecord,
+    } = this.props
+
+    const { dragged } = this.state
+
+    const className = `node-def__table-row` +
+      (renderType === nodeDefRenderType.tableHeader ? '-header' : '') +
+      (dragged ? ' drag-in-progress' : '')
+
+    return (
+      <div className={className}
+           id={`${NodeDef.getUuid(nodeDef)}_${i}`}
+           onDragOver={e => this.dragOver(e)}>
+
+        {
+          childDefs
+            .map((childDef, i) => {
               const { length } = getNodeDefFormFields(childDef)
 
               return (
-                <div key={NodeDef.getUuid(childDef)} className="react-grid-item" style={{ width: 160 * length + 'px' }}>
-                  <NodeDefSwitch key={i}
-                                 {...props}
+                <div key={NodeDef.getUuid(childDef)}
+                     className="react-grid-item draggable-item"
+                     style={{ width: 160 * length + 'px' }}
+
+                     onMouseDown={e => e.stopPropagation()}
+                     draggable="true"
+                     onDragStart={e => this.dragStart(e)}
+                     onDragEnd={e => this.dragEnd(e)}
+                     >
+                  <NodeDefSwitch {...this.props}
                                  node={null}
                                  nodeDef={childDef}
                                  parentNode={node}
                                  renderType={renderType}/>
                 </div>
               )
-            }
-          )
-      }
+            })
+        }
 
-      {
-        renderType === nodeDefRenderType.tableBody && canEditRecord &&
-        <NodeDeleteButton nodeDef={nodeDef}
-                          node={node}
-                          removeNode={removeNode}/>
-      }
+        <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={this.placeholderRef} />
 
-    </div>
-  )
+        {
+          renderType === nodeDefRenderType.tableBody && canEditRecord &&
+          <NodeDeleteButton nodeDef={nodeDef}
+                            node={node}
+                            removeNode={removeNode}/>
+        }
 
+      </div>
+    )
+
+  }
 }
 
 class NodeDefEntityTable extends React.Component {

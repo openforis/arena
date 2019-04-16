@@ -17,7 +17,7 @@ import {
   nodeDefRenderType,
 } from '../../../../common/survey/nodeDefLayout'
 
-const {nodeDefType} = NodeDef
+const { nodeDefType } = NodeDef
 
 export const nodeDefSystemProps = {
   [nodeDefType.integer]: {
@@ -62,7 +62,7 @@ export const nodeDefSystemProps = {
 
   [nodeDefType.text]: {
     icon: <span className="icon-left">{R.range(0, 3).map(i =>
-      <span key={i} className="icon icon-text-color" style={{margin: '0 -3px'}}/>
+      <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }}/>
     )}</span>,
     defaultValue: '',
   },
@@ -74,7 +74,7 @@ export const nodeDefSystemProps = {
       showMask: true,
       placeholderChar: '\u2000',
     },
-    defaultValue: ''
+    defaultValue: '',
   },
 
   [nodeDefType.time]: {
@@ -97,13 +97,13 @@ export const nodeDefSystemProps = {
     component: NodeDefCode,
     icon: <span className="icon icon-list icon-left"/>,
     defaultValue: '',
-    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.checkbox},
+    defaultLayoutProps: { [nodeDefLayoutProps.render]: nodeDefRenderType.checkbox },
   },
 
   [nodeDefType.coordinate]: {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
-    defaultValue: {x: '', y: '', srs: ''},
+    defaultValue: { x: '', y: '', srs: '' },
     formFields: ['x', 'y', 'srs'],
   },
 
@@ -125,7 +125,7 @@ export const nodeDefSystemProps = {
   [nodeDefType.entity]: {
     component: NodeDefEntitySwitch,
     icon: <span className="icon icon-table2 icon-left"/>,
-    defaultLayoutProps: {[nodeDefLayoutProps.render]: nodeDefRenderType.table, multiple: true}
+    defaultLayoutProps: { [nodeDefLayoutProps.render]: nodeDefRenderType.table, multiple: true },
   },
 
 }
@@ -140,7 +140,7 @@ export const getNodeDefInputTextProps = nodeDef =>
   getProp(
     nodeDef.type,
     'inputText',
-    {mask: false, showMask: false}
+    { mask: false, showMask: false }
   )(nodeDefSystemProps)
 
 export const getNodeDefComponent = nodeDef =>
