@@ -20,13 +20,8 @@ class EntityTableRow extends React.Component {
     super(props)
 
     this.placeholderRef = React.createRef()
-
-    this.nodePlacement = null
-
-    this.state = {
-      data: [],
-      dragged: null,
-    }
+    this.rowRef = React.createRef()
+    this.state = { dragged: null }
   }
 
   dragStart (e) {
@@ -44,55 +39,48 @@ class EntityTableRow extends React.Component {
 
   dragEnd (e) {
     const { dragged } = this.state
+    const placeholder = this.placeholderRef.current
 
     dragged.style.display = 'block'
-    // this.dragged.parentNode.removeChild(placeholder);
+    placeholder.style.display = 'none'
 
-    // Update data
-    // const data = this.state.data
-    // const from = +this.dragged.dataset.id
-    // let to = +this.over.dataset.id
-    // if (from < to) {
-    //   to--
-    // }
-    // if (this.nodePlacement === 'after') {
-    //   to++
-    // }
-    // data.splice(to, 0, data.splice(from, 1)[0])
-    // this.setState({ data: data })
-
-    this.placeholderRef.current.style.display = 'none'
-
-    this.placeholderRef.current.parentNode.insertBefore(dragged, this.placeholderRef.current)
+    placeholder.parentNode.insertBefore(dragged, placeholder)
     this.setState({ dragged: null })
-    this.nodePlacement = null
+
+    const uuids = []
+    this.rowRef.current.childNodes.forEach(childNode => {
+      const uuid = childNode.dataset.uuid
+      if (uuid) {
+        uuids.push(uuid)
+      }
+    })
+    console.log(uuids)
   }
 
   dragOver (e) {
     const { dragged } = this.state
+    const placeholder = this.placeholderRef.current
 
     e.preventDefault()
 
     dragged.style.display = 'none'
-    this.placeholderRef.current.style.display = 'block'
+    placeholder.style.display = 'block'
 
-    if (e.target === this.placeholderRef.current) {
+    if (e.target === placeholder) {
       return
     }
 
-    this.over = e.target
+    const overElement = e.target
 
-    const { left } = elementOffset(this.over)
+    const { left } = elementOffset(overElement)
     const relX = e.clientX - left
-    const width = this.over.offsetWidth / 2
+    const width = overElement.offsetWidth / 2
     const parent = e.target.parentNode
 
     if (relX > width) {
-      this.nodePlacement = 'after'
-      parent.insertBefore(this.placeholderRef.current, e.target.nextElementSibling)
+      parent.insertBefore(placeholder, e.target.nextElementSibling)
     } else if (relX < width) {
-      this.nodePlacement = 'before'
-      parent.insertBefore(this.placeholderRef.current, e.target)
+      parent.insertBefore(placeholder, e.target)
     }
   }
 
@@ -104,6 +92,7 @@ class EntityTableRow extends React.Component {
       removeNode,
       i = 'header',
       canEditRecord,
+      canEditDef,
     } = this.props
 
     const { dragged } = this.state
@@ -113,25 +102,26 @@ class EntityTableRow extends React.Component {
       (dragged ? ' drag-in-progress' : '')
 
     return (
-      <div className={className}
-           id={`${NodeDef.getUuid(nodeDef)}_${i}`}
-           onDragOver={e => this.dragOver(e)}>
+      <div ref={this.rowRef}
+           className={className}
+           id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
 
         {
           childDefs
-            .map((childDef, i) => {
+            .map(childDef => {
               const { length } = getNodeDefFormFields(childDef)
+              const childDefUuid = NodeDef.getUuid(childDef)
 
               return (
-                <div key={NodeDef.getUuid(childDef)}
+                <div key={childDefUuid}
+                     data-uuid={childDefUuid}
                      className="react-grid-item draggable-item"
                      style={{ width: 160 * length + 'px' }}
-
                      onMouseDown={e => e.stopPropagation()}
-                     draggable="true"
+                     draggable={canEditDef}
                      onDragStart={e => this.dragStart(e)}
-                     onDragEnd={e => this.dragEnd(e)}
-                     >
+                     onDragOver={e => this.dragOver(e)}
+                     onDragEnd={e => this.dragEnd(e)}>
                   <NodeDefSwitch {...this.props}
                                  node={null}
                                  nodeDef={childDef}
