@@ -2,17 +2,17 @@ import './labelsEditor.scss'
 
 import React from 'react'
 import { connect } from 'react-redux'
-
 import * as R from 'ramda'
 
-import Survey from '../../../common/survey/survey'
-import { getStateSurveyInfo } from '../surveyState'
-import { getLanguageLabel } from '../../../common/app/languages'
+import { Input } from '../../../commonComponents/form/input'
 
-import { Input } from '../../commonComponents/form/input'
+import Survey from '../../../../common/survey/survey'
+import * as SurveyState from '../../../survey/surveyState'
+
+import { getLanguageLabel } from '../../../../common/app/languages'
 
 const LanguageBadge = ({ lang, compact }) => (
-  <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang): null}>
+  <div className="badge-of labels-editor__label-lang-badge" title={compact ? getLanguageLabel(lang) : null}>
     {
       compact ? lang : getLanguageLabel(lang)
     }
@@ -123,7 +123,7 @@ LabelsEditor.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  languages: Survey.getLanguages(getStateSurveyInfo(state))
+  languages: Survey.getLanguages(SurveyState.getStateSurveyInfo(state))
 })
 
 export default connect(mapStateToProps,)(LabelsEditor)

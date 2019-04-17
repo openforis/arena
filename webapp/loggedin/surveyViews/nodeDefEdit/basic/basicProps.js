@@ -5,7 +5,7 @@ import { uuidv4 } from '../../../../../common/uuid'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
-import LabelsEditor from '../../../../survey/components/labelsEditor'
+import LabelsEditor from '../../labelsEditor/labelsEditor'
 import CodeProps from './codeProps'
 import TaxonProps from './taxonProps'
 

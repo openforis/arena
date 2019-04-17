@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import Checkbox from '../../../../commonComponents/form/checkbox'
-import LabelsEditor from '../../../../survey/components/labelsEditor'
+import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import NodeDefEdit from '../../../surveyViews/nodeDefEdit/nodeDefEdit'
 import SurveyDefsLoader from '../../components/surveyDefsLoader'
 

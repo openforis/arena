@@ -9,7 +9,7 @@ import Validator from '../../../../../common/validation/validator'
 
 import { FormItem } from '../../../../commonComponents/form/input'
 import ExpressionEditor from '../../../../commonComponents/expression/expressionEditor'
-import LabelsEditor from '../../../../survey/components/labelsEditor'
+import LabelsEditor from '../../labelsEditor/labelsEditor'
 import Tooltip from '../../../../commonComponents/tooltip'
 
 import { getValidationFieldMessages } from '../../../../utils/validationUtils'

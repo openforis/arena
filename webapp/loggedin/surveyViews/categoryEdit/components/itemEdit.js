@@ -1,7 +1,7 @@
 import React from 'react'
 import * as R from 'ramda'
 
-import LabelsEditor from '../../../../survey/components/labelsEditor'
+import LabelsEditor from '../../labelsEditor/labelsEditor'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import ErrorBadge from '../../../../commonComponents/errorBadge'
 

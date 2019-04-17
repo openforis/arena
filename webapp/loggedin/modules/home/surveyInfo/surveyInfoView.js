@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import { Input } from '../../../../commonComponents/form/input'
-import LabelsEditor from '../../../../survey/components/labelsEditor'
+import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import LanguagesEditor from './languagesEditor'
 import SrsEditor from './srsEditor'
 
