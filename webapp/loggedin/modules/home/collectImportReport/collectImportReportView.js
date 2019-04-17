@@ -7,7 +7,7 @@ import * as R from 'ramda'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import NodeDefEdit from '../../../surveyViews/nodeDefEdit/nodeDefEdit'
-import SurveyDefsLoader from '../../components/surveyDefsLoader'
+import SurveyDefsLoader from '../../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'

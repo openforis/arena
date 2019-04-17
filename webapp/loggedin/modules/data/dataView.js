@@ -3,7 +3,7 @@ import './dataView.scss'
 import React from 'react'
 
 import NavigationTabBar from '../components/moduleNavigationTabBar'
-import SurveyDefsLoader from '../components/surveyDefsLoader'
+import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import RecordsView from './records/components/recordsView'
 import RecordView from './records/components/recordView'
 import DataVisView from './dataVis/dataVisView'
