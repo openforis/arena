@@ -17,7 +17,7 @@ class SurveyDefsLoader extends React.Component {
     const { ready, children } = this.props
 
     return ready
-      ? <React.Fragment>{children}</React.Fragment>
+      ? children
       : null
   }
 
