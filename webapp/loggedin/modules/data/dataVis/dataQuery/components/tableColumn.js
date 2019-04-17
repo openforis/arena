@@ -1,5 +1,4 @@
 import React from 'react'
-import * as R from 'ramda'
 
 import ProgressBar from '../../../../../../commonComponents/progressBar'
 import NodeDefTableHeader from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableHeader'
@@ -9,13 +8,9 @@ import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
 
 import TableColumnEdit from './tableColumnEdit'
 
-import { appModuleUri } from '../../../../../appModules'
-import { dataModules } from '../../../dataModules'
-
 const TableColumn = (props) => {
   const {
-    nodeDef, row, lang, colWidth, editMode,
-    history
+    nodeDef, row, lang, colWidth, editMode
   } = props
 
   const colNames = NodeDefTable.getColNames(nodeDef)
@@ -23,11 +18,6 @@ const TableColumn = (props) => {
   const isHeader = !row
   const isData = !!row
   const width = (1 / noCols * 100) + '%'
-
-  const nodeDefUuid = NodeDef.getUuid(nodeDef)
-  const { record_uuid: recordUuid } = isData ? row : {}
-  const parentNodeUuid = R.path(['cols', nodeDefUuid, 'parentUuid'], row)
-  const recordEditUrl = appModuleUri(dataModules.record) + recordUuid + `?parentNodeUuid=${parentNodeUuid}&nodeDefUuid=${nodeDefUuid}`
 
   return (
     <div className="table__cell" style={{ width: colWidth * noCols }}>
@@ -85,15 +75,6 @@ const TableColumn = (props) => {
             )
             }
           </div>
-      }
-
-      {
-        isData &&
-        <button className="btn btn-s btn-of-light btn-edit"
-                title="Edit record"
-                onClick={() => history.push(recordEditUrl)}>
-          <span className="icon icon-pencil2 icon-16px"/>
-        </button>
       }
 
     </div>

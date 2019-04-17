@@ -1,12 +1,16 @@
 import React from 'react'
+import * as R from 'ramda'
 
 import TableColumn from './tableColumn'
 
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 
-const defaultColWidth = 80
+import { appModuleUri } from '../../../../../appModules'
+import { dataModules } from '../../../dataModules'
 
-const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false, history }) => (
+const defaultColWidth = 100
+
+const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) => (
   nodeDefCols.map(nodeDef =>
     <TableColumn
       key={NodeDef.getUuid(nodeDef)}
@@ -15,13 +19,11 @@ const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false, hist
       lang={lang}
       colWidth={colWidth}
       editMode={editMode}
-      history={history}
     />
   )
 )
 
 const TableRows = ({ nodeDefCols, colNames, data, offset, lang, colWidth, editMode, history }) => (
-
   <div className="table__rows">
 
     <div className="table__row-header">
@@ -35,17 +37,33 @@ const TableRows = ({ nodeDefCols, colNames, data, offset, lang, colWidth, editMo
 
     <div className="table__data-rows">
       {
-        data.map((row, i) =>
-          <div key={i} className="table__row">
-            <div style={{ width: defaultColWidth }}>{i + offset + 1}</div>
-            <TableColumns
-              nodeDefCols={nodeDefCols}
-              row={row}
-              colWidth={colWidth}
-              editMode={editMode}
-              history={history}/>
-          </div>
-        )
+        data.map((row, i) => {
+          const { parentNodeUuid } = row
+          const recordUuid = R.path(['record', 'uuid'], row)
+
+          const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
+
+          return (
+            <div key={i} className="table__row">
+              <div style={{ width: defaultColWidth }}>
+                {i + offset + 1}
+                {
+                  editMode &&
+                  <button className="btn btn-s btn-of-light btn-edit"
+                          title="View record"
+                          onClick={() => history.push(recordEditUrl)}>
+                    <span className="icon icon-pencil2 icon-16px"/>
+                  </button>
+                }
+              </div>
+              <TableColumns
+                nodeDefCols={nodeDefCols}
+                row={row}
+                colWidth={colWidth}
+                editMode={editMode}/>
+            </div>
+          )
+        })
       }
     </div>
   </div>
