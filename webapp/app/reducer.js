@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 
-import { exportReducer, assocActionProps } from '../appUtils/reduxUtils'
+import { exportReducer, assocActionProps } from '../utils/reduxUtils'
 
-import { startJob, updateActiveJob } from '../appModules/appView/components/job/appJobState'
+import { startJob, updateActiveJob } from '../loggedin/appJob/appJobState'
 import {
   assocAppError,
   assocSystemError,
@@ -29,7 +29,7 @@ import { loginSuccess } from '../login/actions'
  * App Jobs
  * ======
  */
-import { appJobStart, appJobActiveUpdate } from '../appModules/appView/components/job/actions'
+import { appJobStart, appJobActiveUpdate } from '../loggedin/appJob/actions'
 import { surveyCreate, surveyDelete } from '../survey/actions'
 
 const actionHandlers = {

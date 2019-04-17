@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { debounceAction } from '../../appUtils/reduxUtils'
+import { debounceAction } from '../../utils/reduxUtils'
 
 import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'

@@ -1,0 +1,88 @@
+@import "../../../../../../style/vars";
+
+$dataTableMarginTop: 43px;
+$rowHeaderHeight: 45px;
+
+.data-query {
+  display: grid;
+  grid-template-columns: 240px 1fr 5px;
+  grid-column-gap: 10px;
+  justify-content: center;
+  height: 100%;
+}
+
+.data-query__table {
+  position: relative;
+
+  .table__header {
+    height: 40px;
+    align-items: top;
+
+    .data-operations {
+      display: grid;
+      grid-template-columns: repeat(4, auto);
+      grid-column-gap: .25rem;
+
+      .btn {
+        padding: .5rem;
+        font-size: 0.8rem;
+
+        &.highlight {
+          background-color: rgba($yellow, .35) !important;
+        }
+      }
+    }
+  }
+
+  &.edit {
+    border: 3px dashed rgba($white, 0.2);
+    background-color: rgba($white, 0.02);
+  }
+
+  .table__rows {
+    overflow-y: hidden;
+    overflow-x: auto;
+    border: 1px solid rgba($white, 0.2);
+    height: calc(100% - #{$dataTableMarginTop})
+  }
+
+  .table__data-rows {
+    position: absolute;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: calc(100% - #{$rowHeaderHeight + 2px});
+    top: $rowHeaderHeight + 2px;
+  }
+
+  .table__row-header {
+    position: absolute;
+    height: $rowHeaderHeight;
+  }
+
+  .table__row {
+    border-right: none;
+    border-left: none;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .table__row, .table__row-header {
+    display: flex;
+
+    > div {
+      text-align: center;
+    }
+  }
+
+  .table__cell {
+    display: grid;
+    grid-template-columns: 1fr 40px;
+  }
+
+  .table__inner-cell {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

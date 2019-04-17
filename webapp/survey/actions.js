@@ -4,7 +4,7 @@ import { getStateSurveyId, surveyDefsFetched, surveyDefsDraftFetched } from './s
 import { getUser } from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 import { appUserPrefUpdate } from '../app/actions'
-import { showAppJobMonitor } from '../appModules/appView/components/job/actions'
+import { showAppJobMonitor } from '../loggedin/appJob/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
