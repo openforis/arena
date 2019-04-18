@@ -20,7 +20,7 @@ const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false, hist
   )
 )
 
-const TableRows = ({ nodeDefCols, colNames, data, offset, lang, colWidth, editMode, history }) => (
+const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, history }) => (
 
   <div className="table__rows">
 

@@ -1,9 +1,11 @@
 import axios from 'axios'
+import * as R from 'ramda'
 
 import { debounceAction } from '../../appUtils/reduxUtils'
 
 import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../common/survey/NodeDefLayout'
 import NodeDefValidations from '../../../common/survey/nodeDefValidations'
 
 import * as SurveyState from '../surveyState'
@@ -24,6 +26,8 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
 
   const { data } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
   dispatch({ type: nodeDefUpdate, ...data })
+
+  dispatch(_updateTableLayout(nodeDef, uuid => R.append(uuid)))
 }
 
 // ==== UPDATE
@@ -45,6 +49,8 @@ export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
   const { data } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${NodeDef.getUuid(nodeDef)}`)
 
   dispatch({ type: nodeDefsLoad, nodeDefs: data.nodeDefs })
+
+  dispatch(_updateTableLayout(nodeDef, uuid => R.without([uuid])))
 }
 
 const _putNodeDefProp = (nodeDef, key, value, advanced) => {
@@ -77,3 +83,15 @@ const _putNodeDefProp = (nodeDef, key, value, advanced) => {
   return debounceAction(action, `${nodeDefPropUpdate}_${key}`)
 }
 
+// ==== UTILS
+
+const _updateTableLayout = (nodeDef, f) => async (dispatch, getState) => {
+  const survey = SurveyState.getSurvey(getState())
+  const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
+
+  if (NodeDef.isEntity(parentNodeDef) && NodeDefLayout.isRenderTable(parentNodeDef)) {
+    const layout = NodeDefLayout.getLayout(parentNodeDef)
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    dispatch(putNodeDefProp(parentNodeDef, NodeDefLayout.nodeDefLayoutProps.layout, f(nodeDefUuid)(layout)))
+  }
+}
