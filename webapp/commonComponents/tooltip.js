@@ -3,7 +3,7 @@ import './tooltip.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import { elementOffset } from '../appUtils/domUtils'
+import { elementOffset } from '../utils/domUtils'
 
 class Tooltip extends React.Component {
 

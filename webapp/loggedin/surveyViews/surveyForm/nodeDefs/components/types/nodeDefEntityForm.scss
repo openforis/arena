@@ -1,0 +1,15 @@
+@import "../../../react-grid-layout";
+
+.node-def-entity-form__wrapper {
+  position: relative;
+}
+
+.node-def-entity-form__actions {
+  display: flex;
+  justify-content: center;
+  margin: .5rem 10rem;
+
+  .node-select {
+    min-width: 150px;
+  }
+}
