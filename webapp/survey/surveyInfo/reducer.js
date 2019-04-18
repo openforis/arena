@@ -1,4 +1,4 @@
-import { exportReducer } from '../../appUtils/reduxUtils'
+import { exportReducer } from '../../utils/reduxUtils'
 
 import Survey from '../../../common/survey/survey'
 

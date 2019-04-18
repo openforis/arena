@@ -1,4 +1,4 @@
-import { exportReducer } from '../../appUtils/reduxUtils'
+import { exportReducer } from '../../utils/reduxUtils'
 import * as R from 'ramda'
 
 import Taxonomy from '../../../common/survey/taxonomy'

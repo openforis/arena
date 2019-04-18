@@ -2,8 +2,8 @@ import './autocompleteDialog.scss'
 
 import React from 'react'
 
-import KeyboardMap from '../../appUtils/keyboardMap'
-import { clickedOutside, elementOffset } from '../../appUtils/domUtils'
+import KeyboardMap from '../../utils/keyboardMap'
+import { clickedOutside, elementOffset } from '../../utils/domUtils'
 
 class AutocompleteDialog extends React.Component {
 

@@ -1,0 +1,59 @@
+@import "../../style/vars";
+
+.app-job-monitor {
+  .modal-body {
+    padding-top: 0;
+  }
+}
+
+.app-job-monitor__job-errors {
+  justify-self: stretch;
+
+  .header, .row {
+    display: grid;
+    grid-template-columns: .2fr .8fr;
+  }
+
+  .header {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: .85rem;
+    border-bottom: 1px solid rgba($white, .8)
+  }
+
+  .body {
+    max-height: 35vh;
+    overflow-y: auto;
+  }
+
+  .row {
+    border-bottom: 1px solid rgba($white, .5);
+  }
+}
+
+.app-job-monitor__inner-jobs {
+  max-height: 45vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-top: 2rem;
+  padding: 2rem 1.5rem 0 1.5rem;
+  background-color: rgba($grey, 0.05);
+
+  .job {
+    display: grid;
+    grid-template-columns: .5fr .5fr;
+
+    .name {
+      font-size: .9rem;
+      text-transform: uppercase;
+    }
+  }
+
+  > div {
+    margin-bottom: 2rem;
+  }
+
+  .app-job-monitor__job-errors {
+    padding: 0 1rem 2rem 1rem;
+  }
+}

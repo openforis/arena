@@ -2,7 +2,7 @@ import './errorBadge.scss'
 
 import React from 'react'
 
-import { getValidationFieldMessagesHTML } from '../appUtils/validationUtils'
+import { getValidationFieldMessagesHTML } from '../utils/validationUtils'
 import Validator from '../../common/validation/validator'
 
 import Tooltip from './tooltip'

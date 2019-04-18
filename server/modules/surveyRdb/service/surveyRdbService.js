@@ -59,41 +59,41 @@ const queryTable = async (user, surveyId, nodeDefUuidTable, tableName, nodeDefUu
 
   const rows = await SurveyRdbManager.queryTable(surveyId, tableName, queryCols, offset, limit, filter, sort)
 
-  return await Promise.all(rows.map(
-    async row => {
-      const { record_uuid: recordUuid } = row
+  return editMode
+    ? await Promise.all(rows.map(
+      async row => {
+        const { record_uuid: recordUuid } = row
 
-      const resultRow = {
-        ...row,
-        cols: {}
-      }
+        const resultRow = {
+          ...row,
+          cols: {},
+          record: {
+            uuid: recordUuid
+          },
+          parentNodeUuid: R.prop(`${NodeDef.getName(tableNodeDef)}_uuid`, row)
+        }
 
-      if (editMode) {
-        resultRow['record'] = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
-      }
+        for (const ancestorDef of ancestorAndSelfDefs) {
+          const childDefs = Survey.getNodeDefChildren(ancestorDef)(survey)
+          const childDefsFiltered = R.filter(childDef => R.includes(NodeDef.getUuid(childDef), nodeDefUuidCols), childDefs)
 
-      for (const ancestorDef of ancestorAndSelfDefs) {
-        const childDefs = Survey.getNodeDefChildren(ancestorDef)(survey)
-        const childDefsFiltered = R.filter(childDef => R.includes(NodeDef.getUuid(childDef), nodeDefUuidCols), childDefs)
+          for (const childDef of childDefsFiltered) {
+            const ancestorUuidColName = `${NodeDef.getName(ancestorDef)}_uuid`
+            const ancestorUuid = R.prop(ancestorUuidColName, row)
+            const childDefUuid = NodeDef.getUuid(childDef)
 
-        for (const childDef of childDefsFiltered) {
-          const ancestorUuidColName = `${NodeDef.getName(ancestorDef)}_uuid`
-          const ancestorUuid = R.prop(ancestorUuidColName, row)
-          const childDefUuid = NodeDef.getUuid(childDef)
-
-          resultRow.cols[childDefUuid] = {
-            parentUuid: ancestorUuid
-          }
-
-          if (editMode) {
             const nodes = await RecordManager.fetchChildNodesByNodeDefUuid(surveyId, recordUuid, ancestorUuid, childDefUuid)
-            resultRow.cols[childDefUuid]['nodes'] = toUuidIndexedObj(nodes)
+
+            resultRow.cols[childDefUuid] = {
+              parentUuid: ancestorUuid,
+              nodes: toUuidIndexedObj(nodes)
+            }
           }
         }
+        return resultRow
       }
-      return resultRow
-    }
-  ))
+    ))
+    : rows
 }
 
 module.exports = {

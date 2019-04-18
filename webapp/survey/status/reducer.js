@@ -1,4 +1,4 @@
-import { exportReducer } from '../../appUtils/reduxUtils'
+import { exportReducer } from '../../utils/reduxUtils'
 
 import { appUserLogout } from '../../app/actions'
 
