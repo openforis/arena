@@ -126,11 +126,11 @@ const calculatedValueCascadeUpdateTest = async () => {
     SB.entity('cluster',
       SB.attribute('cluster_no', NodeDef.nodeDefType.integer)
         .key(),
-      SB.attribute('num', NodeDef.nodeDefType.decimal),
-      SB.attribute('num_double', NodeDef.nodeDefType.decimal)
+      SB.attribute('num', NodeDef.nodeDefType.integer),
+      SB.attribute('num_double', NodeDef.nodeDefType.integer)
         .readOnly()
         .defaultValues(NodeDefExpression.createExpression(`this.sibling('num').getValue() * 2`)),
-      SB.attribute('num_double_square', NodeDef.nodeDefType.decimal)
+      SB.attribute('num_double_square', NodeDef.nodeDefType.integer)
         .readOnly()
         .defaultValues(NodeDefExpression.createExpression(`this.sibling('num_double').getValue() * this.sibling('num_double').getValue()`)),
     )
@@ -166,8 +166,70 @@ const calculatedValueCascadeUpdateTest = async () => {
   await SurveyManager.deleteSurvey(Survey.getId(survey))
 }
 
+const applyIfUpdateTest = async () => {
+  const user = getContextUser()
+
+  const survey = await SB.survey(user, 'test', 'Test', 'en',
+    SB.entity('cluster',
+      SB.attribute('cluster_no', NodeDef.nodeDefType.integer)
+        .key(),
+      SB.attribute('num', NodeDef.nodeDefType.decimal),
+      SB.attribute('dependent_node')
+        .applyIf(`this.node('num').getValue() > 100`)
+    )
+  ).buildAndStore()
+
+  let record = await RB.record(user, survey,
+    RB.entity('root',
+      RB.attribute('cluster_no', 1),
+      RB.attribute('num', 1),
+      RB.attribute('dependent_node', null),
+    )
+  ).buildAndStore()
+
+  const nodeSource = Record.findNodeByPath('root/num')(survey, record)
+  const nodeDependent = Record.findNodeByPath('root/dependent_node')(survey, record)
+  const nodeDependentParent = Record.getParentNode(nodeDependent)(record)
+  const nodeDependentParentUuid = Node.getUuid(nodeDependentParent)
+  const nodeDependentDefUuid = Node.getNodeDefUuid(nodeDependent)
+
+  // test values, couples of expected values by input
+  const testValues = [
+    [10, false],
+    [100, false],
+    [101, true],
+    [1000, true],
+    [50, false],
+  ]
+
+  for (const testValue of testValues) {
+    const [sourceValue, expectedValue] = testValue
+
+    // update source node value
+    const nodesUpdated = {
+      [Node.getUuid(nodeSource)]: Node.assocValue(sourceValue)(nodeSource)
+    }
+    record = Record.assocNodes(nodesUpdated)(record)
+
+    // update dependent nodes
+    const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, nodesUpdated)
+
+    record = Record.assocNodes(nodesDependentUpdated)(record)
+
+    const nodeDependentParentUpdated = Record.getNodeByUuid(nodeDependentParentUuid)(record)
+
+    const applicable = Node.isChildApplicable(nodeDependentDefUuid)(nodeDependentParentUpdated)
+
+    expect(applicable).to.equal(expectedValue)
+  }
+
+  await SurveyManager.deleteSurvey(Survey.getId(survey))
+}
+
 module.exports = {
   calculatedValueUpdateTest,
   calculatedValueWithApplyIfUpdateTest,
-  calculatedValueCascadeUpdateTest
+  calculatedValueCascadeUpdateTest,
+
+  applyIfUpdateTest
 }

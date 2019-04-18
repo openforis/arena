@@ -169,14 +169,17 @@ const findNodeByPath = path => (survey, record) => {
 
   for (const part of parts) {
     if (currentParentNode) {
-      currentNodeDef = Survey.getNodeDefChildByName(currentParentDef, part)(survey)
+      //extract node name and position from path part
+      const partMatch = /(\w+)(\[(\d+)\])?/.exec(part)
+      const childName = partMatch[1]
+      const childPosition = R.defaultTo(1, partMatch[3])
+
+      currentNodeDef = Survey.getNodeDefChildByName(currentParentDef, childName)(survey)
 
       const children = getNodeChildrenByDefUuid(currentParentNode, NodeDef.getUuid(currentNodeDef))(record)
 
-      const nodePosition = 1
-
-      if (children.length >= nodePosition)
-        currentNode = children[nodePosition - 1]
+      if (children.length >= childPosition)
+        currentNode = children[childPosition - 1]
       else
         return null
     } else {

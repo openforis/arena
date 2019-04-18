@@ -4,6 +4,8 @@ const db = require('../../../server/db/db')
 
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
+const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
+const NodeDefValidations = require('../../../common/survey/nodeDefValidations')
 const User = require('../../../common/user/user')
 
 const SurveyManager = require('../../../server/modules/survey/persistence/surveyManager')
@@ -21,8 +23,20 @@ class NodeDefBuilder {
     }
   }
 
+  applyIf (expr) {
+    this.props[NodeDef.propKeys.applicable] = [NodeDefExpression.createExpression(expr)]
+    return this
+  }
+
   multiple () {
     this.props[NodeDef.propKeys.multiple] = true
+    return this
+  }
+
+  minCount (count) {
+    const validations = NodeDef.getValidations(this)
+    const validationsUpdated = NodeDefValidations.assocMinCount(count)(validations)
+    this.props[NodeDef.propKeys.validations] = validationsUpdated
     return this
   }
 }
@@ -65,6 +79,13 @@ class AttributeDefBuilder extends NodeDefBuilder {
 
   defaultValues (...defaultValues) {
     this.props[NodeDef.propKeys.defaultValues] = defaultValues
+    return this
+  }
+
+  required (required = true) {
+    const validations = NodeDef.getValidations(this)
+    const validationsUpdated = NodeDefValidations.assocRequired(required)(validations)
+    this.props[NodeDef.propKeys.validations] = validationsUpdated
     return this
   }
 

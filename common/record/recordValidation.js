@@ -3,6 +3,7 @@ const R = require('ramda')
 const Validator = require('../validation/validator')
 const Node = require('./node')
 const NodeDef = require('../survey/nodeDef')
+const NodeDefValidations = require('../survey/nodeDefValidations')
 
 const keys = {
   recordKeys: 'recordKeys',
@@ -15,6 +16,16 @@ const getChildrenCountValidation = (parentNode, childDef) => R.pipe(
   Validator.getFieldValidation(keys.childrenCount),
   Validator.getFieldValidation(NodeDef.getUuid(childDef))
 )
+
+const getMinCountValidation = (parentNode, childDef) => R.pipe(
+  getChildrenCountValidation,
+  Validator.getFieldValidation('minCount')
+)(parentNode, childDef)
+
+const getMaxCountValidation = (parentNode, childDef) => R.pipe(
+  getChildrenCountValidation,
+  Validator.getFieldValidation('maxCount')
+)(parentNode, childDef)
 
 const getNodeValidation = node =>
   R.pipe(
@@ -31,4 +42,7 @@ module.exports = {
   // READ
   getNodeValidation,
   getMultipleNodesValidation,
+
+  getMinCountValidation,
+  getMaxCountValidation
 }
