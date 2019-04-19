@@ -57,6 +57,11 @@ $rowHeaderHeight: 45px;
   .table__row-header {
     position: absolute;
     height: $rowHeaderHeight;
+
+    .table__cell {
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   .table__row {

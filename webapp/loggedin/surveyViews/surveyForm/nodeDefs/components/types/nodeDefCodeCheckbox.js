@@ -21,7 +21,7 @@ const Checkbox = props => {
           : R.append(item, selectedItems)
         onSelectedItemsChange(newSelectedItems)
       }}>
-      {CategoryItem.getItemLabel(language)(item)}
+      {CategoryItem.getLabel(language)(item)}
     </button>
   )
 }
