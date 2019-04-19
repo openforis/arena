@@ -7,12 +7,12 @@ import LoginView from '../login/components/loginView'
 
 import { throwSystemError, initApp } from './actions'
 import * as AppState from './appState'
-import { getLocationPathname } from '../appUtils/routerUtils'
+import { getLocationPathname } from '../utils/routerUtils'
 
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 import { openSocket, closeSocket } from './appWebSocket'
-import { activeJobUpdate } from '../appModules/appView/components/job/actions'
-import { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete } from '../appModules/surveyForm/record/actions'
+import { activeJobUpdate } from '../loggedin/appJob/actions'
+import { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete } from '../loggedin/surveyViews/record/actions'
 
 const loginUri = '/'
 
@@ -85,7 +85,7 @@ class AppRouterSwitch extends React.Component {
                     <Route
                       path="/app"
                       render={props => (
-                        <DynamicImport {...props} load={() => import('../appModules/appView/appViewExport')}/>
+                        <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
                       )}
                     />
                   </Switch>

@@ -1,0 +1,79 @@
+@import "../../../../style/vars";
+
+.survey-hierarchy {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+}
+
+.survey-hierarchy__attributes {
+  height: 100%;
+  width: 100%;
+}
+
+.survey-hierarchy__tree {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+
+  .node {
+    circle {
+      fill-opacity: .4;
+      fill: $white;
+
+      &:not(.leaf) {
+        cursor: pointer;
+        fill: $yellow;
+        fill-opacity: .7;
+
+        &:hover {
+          fill-opacity: .9;
+        }
+      }
+
+    }
+
+    a {
+      cursor: pointer;
+      font-size: .9rem;
+      fill: $white;
+      letter-spacing: 0;
+      padding: .2rem .5rem;
+
+      &:hover {
+        background-color: rgba($white, .35)
+      }
+    }
+  }
+
+  .node-grid {
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba($yellow, .2);
+    background-color: $yellowDark;
+    justify-content: space-around;
+    transition: background-color 1s ease;
+    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+
+    .btn {
+      transform: rotate(-90deg);
+      padding: .3rem;
+      background-color: rgba($white, .2);
+
+      &:hover {
+        background-color: rgba($white, .5);
+      }
+    }
+
+    &.highlight {
+      background-color: $yellowOpaque;
+    }
+  }
+
+  .link {
+    fill: none;
+    stroke: rgba($yellow, .6);
+    stroke-width: 1px;
+  }
+
+}

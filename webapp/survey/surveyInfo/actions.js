@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { debounceAction } from '../../appUtils/reduxUtils'
+import { debounceAction } from '../../utils/reduxUtils'
 import { getStateSurveyId } from '../surveyState'
 
 export const surveyInfoPropUpdate = 'survey/info/prop/update'

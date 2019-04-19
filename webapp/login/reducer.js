@@ -2,7 +2,7 @@ import {
   exportReducer,
   assocActionProps,
   dissocStateProps
-} from '../appUtils/reduxUtils'
+} from '../utils/reduxUtils'
 
 import {
   loginError,

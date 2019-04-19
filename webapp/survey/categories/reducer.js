@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import Category from '../../../common/survey/category'
 import CategoryLevel from '../../../common/survey/categoryLevel'
 
-import { exportReducer } from '../../appUtils/reduxUtils'
+import { exportReducer } from '../../utils/reduxUtils'
 
 import { appUserLogout } from '../../app/actions'
 import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'

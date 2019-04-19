@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Redirect } from 'react-router'
 
 import { login } from './../actions'
-import { appModuleUri } from '../../appModules/appModules'
+import { appModuleUri } from '../../loggedin/appModules'
 import { getUser } from '../../app/appState'
 
 class LoginForm extends React.Component {

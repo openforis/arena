@@ -1,0 +1,60 @@
+@import "../../../../style/vars";
+
+.node-def__code-checkbox-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+
+  .btn-checkbox {
+    pointer-events: all;
+
+    &[aria-disabled="true"]{
+      pointer-events: none;
+    }
+  }
+}
+
+.node-def__taxon-autocomplete-list .item {
+  display: grid;
+  grid-template-columns: .3fr .7fr;
+
+  div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.node-def__taxon-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.node-def__text-multiple-text-input-wrapper {
+  display: grid;
+  grid-template-columns: .9fr .1fr;
+}
+
+.node-def__text-multiple-table-cell {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: .5rem;
+
+  .values-summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.node-def__multiple-nodes-edit-modal {
+
+  .modal-body {
+    height: 40vh;
+  }
+}
+
+.node-def__icon-key {
+  opacity: .8;
+}

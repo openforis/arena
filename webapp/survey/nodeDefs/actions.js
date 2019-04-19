@@ -1,11 +1,11 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
-import { debounceAction } from '../../appUtils/reduxUtils'
+import { debounceAction } from '../../utils/reduxUtils'
 
 import Survey from '../../../common/survey/survey'
 import NodeDef from '../../../common/survey/nodeDef'
-import NodeDefLayout from '../../../common/survey/NodeDefLayout'
+import NodeDefLayout from '../../../common/survey/nodeDefLayout'
 import NodeDefValidations from '../../../common/survey/nodeDefValidations'
 
 import * as SurveyState from '../surveyState'
