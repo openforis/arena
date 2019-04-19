@@ -7,15 +7,14 @@ const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 
-const RecordRepository = require('../../../server/modules/record/persistence/recordRepository')
-const NodeRepository = require('../../../server/modules/record/persistence/nodeRepository')
-const RecordManager = require('../../../server/modules/record/persistence/recordManager')
+const RecordUpdateManager = require('../../../server/modules/record/persistence/recordUpdateManager')
 
 class NodeBuilder {
 
   constructor (nodeDefName) {
     this.nodeDefName = nodeDefName
   }
+
 }
 
 class EntityBuilder extends NodeBuilder {
@@ -39,6 +38,25 @@ class EntityBuilder extends NodeBuilder {
     )(this.childBuilders)
   }
 
+  async buildAndStore (user, survey, record, parentNode, t) {
+    const nodeDef = Survey.getNodeDefByName(this.nodeDefName)(survey)
+
+    let node
+    if (NodeDef.isRoot(nodeDef)) {
+      node = Record.getRootNode(record)
+    } else if (NodeDef.isSingle(nodeDef)) {
+      node = R.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
+    } else {
+      node = Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), parentNode)
+      record = await RecordUpdateManager.persistNode(user, survey, record, node, null, null, t)
+    }
+
+    for (const childBuilder of this.childBuilders) {
+      record = await childBuilder.buildAndStore(user, survey, record, node, t)
+    }
+
+    return record
+  }
 }
 
 class AttributeBuilder extends NodeBuilder {
@@ -49,13 +67,31 @@ class AttributeBuilder extends NodeBuilder {
   }
 
   build (survey, parentNodeDef, recordUuid, parentNode) {
-    const nodeDef = Survey.getNodeDefChildByName(parentNodeDef, this.nodeDefName)(survey)
+    const nodeDef = Survey.getNodeDefByName(this.nodeDefName)(survey)
     const attribute = Node.newNode(NodeDef.getUuid(nodeDef), recordUuid, parentNode, this.value)
 
     return {
       [Node.getUuid(attribute)]: attribute
     }
   }
+
+  async buildAndStore (user, survey, record, parentNode, t) {
+    const nodeDef = Survey.getNodeDefByName(this.nodeDefName)(survey)
+
+    if (NodeDef.isReadOnly(nodeDef))
+      return record
+
+    const nodeInRecord = NodeDef.isSingle(nodeDef)
+      ? R.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
+      : null
+
+    const nodeToPersist = nodeInRecord
+      ? Node.assocValue(this.value)(nodeInRecord)
+      : Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), parentNode, this.value)
+
+    return await RecordUpdateManager.persistNode(user, survey, record, nodeToPersist, null, null, t)
+  }
+
 }
 
 class RecordBuilder {
@@ -74,17 +110,11 @@ class RecordBuilder {
 
   async buildAndStore (client = db) {
     return await client.tx(async t => {
-      const record = this.build()
-      const surveyId = Survey.getId(this.survey)
-      await RecordRepository.insertRecord(surveyId, record, t)
+      const record = Record.newRecord(this.user)
 
-      await Record.traverse(
-        async node => {
-          await NodeRepository.insertNode(surveyId, node, t)
-        }
-      )(record)
+      const recordUpdated = await RecordUpdateManager.createRecord(this.user, Survey.getId(this.survey), record, t)
 
-      return RecordManager.fetchRecordAndNodesByUuid(surveyId, Record.getUuid(record), t)
+      return await this.rootEntityBuilder.buildAndStore(this.user, this.survey, recordUpdated, null, t)
     })
   }
 }

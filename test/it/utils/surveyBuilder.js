@@ -39,6 +39,13 @@ class NodeDefBuilder {
     this.props[NodeDef.propKeys.validations] = validationsUpdated
     return this
   }
+
+  maxCount (count) {
+    const validations = NodeDef.getValidations(this)
+    const validationsUpdated = NodeDefValidations.assocMaxCount(count)(validations)
+    this.props[NodeDef.propKeys.validations] = validationsUpdated
+    return this
+  }
 }
 
 class EntityDefBuilder extends NodeDefBuilder {

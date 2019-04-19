@@ -80,7 +80,7 @@ module.exports = {
 
   //CREATE
   createExpression,
-  createExpressionPlaceholder: createExpression('', '', true),
+  createExpressionPlaceholder: () => createExpression('', '', true),
 
   //READ
   getUuid: SurveyUtils.getUuid,

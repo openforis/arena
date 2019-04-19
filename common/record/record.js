@@ -8,6 +8,7 @@ const Validator = require('../validation/validator')
 const Node = require('../record/node')
 const User = require('../user/user')
 const RecordStep = require('./recordStep')
+const RecordValidation = require('./recordValidation')
 
 const Queue = require('../queue')
 
@@ -194,17 +195,25 @@ const findNodeByPath = path => (survey, record) => {
 }
 
 const getNodePath = node => (survey, record) => {
-  const parentNode = getParentNode(node)(record)
-  const ancestorEntities = getAncestorEntities(parentNode)(record)
-  const parentNodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(parentNode))
+  const nodeDefUuid = Node.getNodeDefUuid(node)
+  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-  return R.pipe(
-    R.map(Node.getNodeDefUuid),
-    R.map(nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey)),
-    R.map(NodeDef.getName),
-    R.append(NodeDef.getName(parentNodeDef)),
-    R.join('/')
-  )(ancestorEntities)
+  const parentNode = getParentNode(node)(record)
+  if (parentNode) {
+    const parentNodePath = getNodePath(parentNode)(survey, record)
+
+    if (NodeDef.isMultiple(nodeDef)) {
+      const siblings = getNodeChildrenByDefUuid(parentNode, nodeDefUuid)(record)
+      const index = R.findIndex(n => Node.getUuid(n) === Node.getUuid(node), siblings)
+      const position = index + 1
+      return `${parentNodePath}/${NodeDef.getName(nodeDef)}[${position}]`
+    } else {
+      return `${parentNodePath}/${NodeDef.getName(nodeDef)}`
+    }
+  } else {
+    //is root
+    return NodeDef.getName(nodeDef)
+  }
 }
 
 const traverse = visitorFn => async record => {
@@ -303,7 +312,6 @@ module.exports = {
   isPreview: R.propEq(keys.preview, true),
   getOwnerId: R.prop(keys.ownerId),
   getStep: R.prop(keys.step),
-  getValidation: Validator.getValidation,
 
   getNodes,
   getNodesArray,
@@ -333,4 +341,10 @@ module.exports = {
   // ====== DELETE
 
   deleteNode,
+
+  // ====== VALIDATION
+  getValidation: Validator.getValidation,
+  getValidationChildrenCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getChildrenCountValidation(parentNode, childDef)),
+  getValidationMinCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getValidationMinCount(parentNode, childDef)),
+  getValidationMaxCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getValidationMaxCount(parentNode, childDef)),
 }

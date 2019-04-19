@@ -81,16 +81,17 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
     ? Survey.getNodeDefChildren(nodeDef)(survey)
     : []
 
-  // insert only child single nodes
+  const childDefsToInsert = childDefs.filter(NodeDef.isSingle)
+
+  // insert only child single nodes (it allows to apply default values)
   const childNodes = R.mergeAll(
     await Promise.all(
-      childDefs
-        .filter(NodeDef.isSingle)
-        .map(async childDef => {
-            const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
-            return await _insertNodeRecursively(survey, childDef, record, childNode, user, t)
-          }
-        )
+      childDefsToInsert.map(
+        async childDef => {
+          const childNode = Node.newNode(NodeDef.getUuid(childDef), Node.getRecordUuid(node), node)
+          return await _insertNodeRecursively(survey, childDef, record, childNode, user, t)
+        }
+      )
     )
   )
   return R.mergeLeft({ [Node.getUuid(node)]: node }, childNodes)

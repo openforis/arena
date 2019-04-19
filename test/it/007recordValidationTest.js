@@ -5,7 +5,6 @@ const { getContextUser } = require('../testContext')
 const Survey = require('../../common/survey/survey')
 const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
-const RecordValidation = require('../../common/record/recordValidation')
 const Node = require('../../common/record/node')
 const Validator = require('../../common/validation/validator')
 
@@ -36,6 +35,7 @@ before(async () => {
           .key()
       ).multiple()
         .minCount(3)
+        .maxCount(4)
     )
   ).buildAndStore()
 
@@ -60,19 +60,50 @@ before(async () => {
 })
 
 after(async () => {
-  await SurveyManager.deleteSurvey(Survey.getId(survey))
+  if (survey)
+    await SurveyManager.deleteSurvey(Survey.getId(survey))
 })
 
-const updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpected) => {
-  const user = getContextUser()
+const deleteNode = async (parentNode, childNodeName, childNodePosition) => {
+  const childDef = Survey.getNodeDefByName(childNodeName)(survey)
+  const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
+  const node = children[childNodePosition - 1]
+  return await RecordUpdateManager.deleteNode(getContextUser(), survey, record, Node.getUuid(node))
+}
 
+const updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpected) => {
   const node = Record.findNodeByPath(nodePath)(survey, record)
 
-  const recordUpdated = await RecordUpdateManager.persistNode(user, survey, record, Node.assocValue(value)(node))
+  const recordUpdated = await RecordUpdateManager.persistNode(getContextUser(), survey, record, Node.assocValue(value)(node))
 
   const nodeValidation = Validator.getFieldValidation(Node.getUuid(node))(Record.getValidation(recordUpdated))
 
   expect(Validator.isValidationValid(nodeValidation)).to.equal(validationExpected)
+}
+
+const deleteNodeAndExpectMinCountToBe = async (parentNodePath, childNodeName, childNodePosition, expectedValidation) => {
+  const parentNode = Record.findNodeByPath(parentNodePath)(survey, record)
+  const childDef = Survey.getNodeDefByName(childNodeName)(survey)
+
+  const recordUpdated = await deleteNode(parentNode, childNodeName, childNodePosition)
+
+  const minCountValidation = Record.getValidationMinCount(parentNode, childDef)(recordUpdated)
+
+  expect(Validator.isValidationValid(minCountValidation)).to.equal(expectedValidation)
+}
+
+const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min, expectedValidation) => {
+  const parentNode = Record.findNodeByPath(parentNodePath)(survey, record)
+  const childDef = Survey.getNodeDefByName(childNodeName)(survey)
+
+  const node = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
+
+  const recordUpdated = await RecordUpdateManager.persistNode(getContextUser(), survey, record, node)
+
+  const countValidation = Record.getValidationChildrenCount(parentNode, childDef)(recordUpdated)
+  const validation = Validator.getFieldValidation(min ? 'minCount' : 'maxCount')(countValidation)
+
+  expect(Validator.isValidationValid(validation)).to.equal(expectedValidation)
 }
 
 describe('Record Validation Test', async () => {
@@ -127,26 +158,23 @@ describe('Record Validation Test', async () => {
   })
 
   // ========== min count
-/*
   it('Min count: missing nodes', async () => {
-    const user = getContextUser()
-    const node = Record.findNodeByPath('cluster/tree[3]')(survey, record)
-    const recordUpdated = await RecordUpdateManager.deleteNode(user, survey, record, Node.getUuid(node))
-
-    const recordValidation = Record.getValidation(recordUpdated)
-    const parentNode = Record.getParentNode(node)(recordUpdated)
-    const childDef = Survey.getNodeDefByPath('cluster/tree')(survey)
-
-    const minCountValidation = RecordValidation.getMinCountValidation(parentNode, childDef)(recordValidation)
-
-    console.log('====recordValidation', recordValidation)
-    console.log('====record multiple nodes validation', RecordValidation.getMultipleNodesValidation(parentNode, childDef)(recordValidation))
-
-    console.log('====mincountvalidation', minCountValidation)
-
-    expect(Validator.isValidationValid(minCountValidation)).to.be.false
-
+    //3 trees before => 2 trees after
+    await deleteNodeAndExpectMinCountToBe('cluster', 'tree', 3, false)
   })
-*/
-})
 
+  it('Min count: correct number of nodes', async () => {
+    //2 trees before => 3 trees after
+    await addNodeAndExpectCountToBe('cluster', 'tree', true, true)
+  })
+
+  it('Max count: correct number of nodes', async () => {
+    //3 trees before => 4 trees after
+    await addNodeAndExpectCountToBe('cluster', 'tree', false, true)
+  })
+
+  it('Max count: exceeding maximum number of nodes', async () => {
+    //4 trees before => 5 trees after
+    await addNodeAndExpectCountToBe('cluster', 'tree', false, false)
+  })
+})

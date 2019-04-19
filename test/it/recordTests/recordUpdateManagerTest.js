@@ -49,7 +49,7 @@ const defaultValueAppliedTest = async () => {
     newDefaultValue('1', 'false'), //should not be applied
     newDefaultValue('2')
   ]
-  const nodeDef = Survey.getNodeDefByPath(['node_def_text'])(survey)
+  const nodeDef = Survey.getNodeDefByName('node_def_text')(survey)
 
   await updateDefaultValues(survey, nodeDef, defaultValues)
 
