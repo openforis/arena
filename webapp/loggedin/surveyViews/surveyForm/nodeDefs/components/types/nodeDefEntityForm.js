@@ -55,6 +55,7 @@ const EntityForm = props => {
   const columns = getNoColumns(nodeDef)
   const rdgLayout = getLayout(nodeDef)
   const innerPageChildren = filterInnerPageChildren(childDefs)
+  const isFormLayout = !R.isNil(R.prop('x', rdgLayout[0]))
 
   const onLayoutChange = layout => {
     //console.log(window.innerWidth)
@@ -68,7 +69,7 @@ const EntityForm = props => {
     }
   }
 
-  return innerPageChildren.length > 0
+  return innerPageChildren.length > 0 && isFormLayout
     ? (
       <ResponsiveGridLayout
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}

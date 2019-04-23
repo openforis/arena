@@ -38,6 +38,14 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
   dispatch({ type: nodeDefPropUpdate, nodeDef, parentNodeDef, nodeDefUuid: NodeDef.getUuid(nodeDef), key, value, advanced })
 
   dispatch(_putNodeDefProp(nodeDef, key, value, advanced))
+
+  let layout = []
+  if (key === NodeDefLayout.nodeDefLayoutProps.render) {
+    if (value === NodeDefLayout.nodeDefRenderType.table) {
+      layout = Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))
+    }
+    dispatch(putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, layout))
+  }
 }
 
 // ==== DELETE

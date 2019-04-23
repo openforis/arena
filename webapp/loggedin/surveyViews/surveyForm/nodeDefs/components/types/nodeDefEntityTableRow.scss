@@ -1,3 +1,7 @@
 .drag-in-progress .draggable-item * {
-    pointer-events: none;
+  pointer-events: none;
+
+  .message {
+    display: none
+  }
 }
