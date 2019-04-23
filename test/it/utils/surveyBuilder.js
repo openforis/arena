@@ -34,16 +34,28 @@ class NodeDefBuilder {
   }
 
   minCount (count) {
-    const validations = NodeDef.getValidations(this)
-    const validationsUpdated = NodeDefValidations.assocMinCount(count)(validations)
-    this.props[NodeDef.propKeys.validations] = validationsUpdated
+    this.props[NodeDef.propKeys.validations] = R.pipe(
+      NodeDef.getValidations,
+      NodeDefValidations.assocMinCount(count)
+    )(this)
     return this
   }
 
   maxCount (count) {
-    const validations = NodeDef.getValidations(this)
-    const validationsUpdated = NodeDefValidations.assocMaxCount(count)(validations)
-    this.props[NodeDef.propKeys.validations] = validationsUpdated
+    this.props[NodeDef.propKeys.validations] = R.pipe(
+      NodeDef.getValidations,
+      NodeDefValidations.assocMaxCount(count)
+    )(this)
+    return this
+  }
+
+  expressions (...expressions) {
+    this.props[NodeDef.propKeys.validations] = R.pipe(
+      NodeDef.getValidations,
+      NodeDefValidations.assocExpressions(expressions)
+    )(this)
+
+    console.log('====newprops', this.props)
     return this
   }
 }

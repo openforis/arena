@@ -344,7 +344,7 @@ module.exports = {
 
   // ====== VALIDATION
   getValidation: Validator.getValidation,
-  getValidationChildrenCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getChildrenCountValidation(parentNode, childDef)),
+  getValidationChildrenCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getValidationChildrenCount(parentNode, childDef)),
   getValidationMinCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getValidationMinCount(parentNode, childDef)),
   getValidationMaxCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getValidationMaxCount(parentNode, childDef)),
 }

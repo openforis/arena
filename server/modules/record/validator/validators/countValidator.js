@@ -14,7 +14,7 @@ const errorKeys = {
   maxCountNodesExceeded: 'maxCountNodesExceeded'
 }
 
-const getCount = (record, parentNode, childDef) => {
+const countChildren = (record, parentNode, childDef) => {
   const nodes = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
 
   return NodeDef.isEntity(childDef)
@@ -36,7 +36,7 @@ const validateChildrenCount = (record, nodePointers) => {
       const hasMinCount = !isNaN(minCount)
       const hasMaxCount = !isNaN(maxCount)
 
-      const count = (hasMinCount || hasMaxCount) ? getCount(record, node, childDef) : 0
+      const count = (hasMinCount || hasMaxCount) ? countChildren(record, node, childDef) : 0
 
       const minCountValid = !hasMinCount || count >= minCount
       const maxCountValid = !hasMaxCount || count <= maxCount

@@ -10,19 +10,19 @@ const keys = {
   childrenCount: 'childrenCount'
 }
 
-const getChildrenCountValidation = (parentNode, childDef) => R.pipe(
+const getValidationChildrenCount = (parentNode, childDef) => R.pipe(
   Validator.getFieldValidation(Node.getUuid(parentNode)),
   Validator.getFieldValidation(keys.childrenCount),
   Validator.getFieldValidation(NodeDef.getUuid(childDef))
 )
 
 const getValidationMinCount = (parentNode, childDef) => R.pipe(
-  getChildrenCountValidation(parentNode, childDef),
+  getValidationChildrenCount(parentNode, childDef),
   Validator.getFieldValidation('minCount')
 )
 
 const getValidationMaxCount = (parentNode, childDef) => R.pipe(
-  getChildrenCountValidation(parentNode, childDef),
+  getValidationChildrenCount(parentNode, childDef),
   Validator.getFieldValidation('maxCount')
 )
 
@@ -33,7 +33,7 @@ const getNodeValidation = node =>
   )
 
 const getMultipleNodesValidation = (parentNode, childDef) =>
-  getChildrenCountValidation(parentNode, childDef)
+  getValidationChildrenCount(parentNode, childDef)
 
 module.exports = {
   keys,
@@ -42,7 +42,7 @@ module.exports = {
   getNodeValidation,
   getMultipleNodesValidation,
 
-  getChildrenCountValidation,
+  getValidationChildrenCount,
   getValidationMinCount,
   getValidationMaxCount
 }
