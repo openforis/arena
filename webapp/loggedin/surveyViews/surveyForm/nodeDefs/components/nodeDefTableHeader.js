@@ -9,12 +9,7 @@ const NodeDefTableHeader = props => {
 
   return (
     <div className="node-def__table-column-header"
-         style={{ gridTemplateColumns: `repeat(${fields.length}, auto)` }}
-         onMouseDown={e => {
-           e.preventDefault()
-           e.stopPropagation()
-         }}
-    >
+         style={{ gridTemplateColumns: `repeat(${fields.length}, auto)` }}>
 
       <label style={{ gridColumn: `1 / span ${fields.length}` }}>{label}</label>
 

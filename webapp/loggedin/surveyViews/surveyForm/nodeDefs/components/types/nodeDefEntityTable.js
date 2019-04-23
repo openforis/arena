@@ -3,62 +3,12 @@ import '../../../react-grid-layout.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import NodeDefSwitch from '../../nodeDefSwitch'
-import NodeDeleteButton from '../nodeDeleteButton'
-
 import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLayout'
-import { getNodeDefFormFields } from '../../nodeDefSystemProps'
 
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../../common/record/node'
 
-const EntityTableRow = (props) => {
-
-  const {
-    nodeDef, childDefs, node,
-    renderType,
-    removeNode,
-    i = 'header',
-    canEditRecord,
-  } = props
-
-  const className = `node-def__table-row` +
-    (renderType === nodeDefRenderType.tableHeader ? '-header' : '')
-
-  return (
-    <div className={className}
-         id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
-
-      {
-        childDefs
-          .map((childDef, i) => {
-              const { length } = getNodeDefFormFields(childDef)
-
-              return (
-                <div key={NodeDef.getUuid(childDef)} className="react-grid-item" style={{ width: 160 * length + 'px' }}>
-                  <NodeDefSwitch key={i}
-                                 {...props}
-                                 node={null}
-                                 nodeDef={childDef}
-                                 parentNode={node}
-                                 renderType={renderType}/>
-                </div>
-              )
-            }
-          )
-      }
-
-      {
-        renderType === nodeDefRenderType.tableBody && canEditRecord &&
-        <NodeDeleteButton nodeDef={nodeDef}
-                          node={node}
-                          removeNode={removeNode}/>
-      }
-
-    </div>
-  )
-
-}
+import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
 class NodeDefEntityTable extends React.Component {
 
@@ -109,27 +59,26 @@ class NodeDefEntityTable extends React.Component {
 
         <div className="node-def__table-rows">
           {
-            edit || !R.isEmpty(nodes) ?
-
-              <EntityTableRow {...this.props}
-                              node={null}
-                              renderType={nodeDefRenderType.tableHeader}/>
+            edit || !R.isEmpty(nodes)
+              ? <NodeDefEntityTableRow {...this.props}
+                                       node={null}
+                                       renderType={nodeDefRenderType.tableHeader}/>
               : null
           }
 
           {
-            entry ?
-              R.isEmpty(nodes)
+            entry
+              ? R.isEmpty(nodes)
                 ? <h5><i>No data added</i></h5>
                 : (
                   <div className="node-def__table-data-rows">
                     {nodes.map((node, i) =>
-                      <EntityTableRow key={i}
-                                      i={i}
-                                      {...this.props}
-                                      node={node}
-                                      nodes={null}
-                                      renderType={nodeDefRenderType.tableBody}/>
+                      <NodeDefEntityTableRow key={i}
+                                             i={i}
+                                             {...this.props}
+                                             node={node}
+                                             nodes={null}
+                                             renderType={nodeDefRenderType.tableBody}/>
                     )}
                   </div>
                 )

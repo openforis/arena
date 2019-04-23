@@ -1,3 +1,5 @@
+import * as R from 'ramda'
+
 import { exportReducer } from '../../utils/reduxUtils'
 
 import { appUserLogout } from '../../app/actions'
@@ -8,13 +10,13 @@ import {
   nodeDefsLoad,
   nodeDefCreate,
   nodeDefUpdate,
-  nodeDefPropUpdate,
+  nodeDefPropsUpdate,
   nodeDefDelete,
 } from './actions'
 
 import {
   assocNodeDef,
-  assocNodeDefProp,
+  assocNodeDefProps,
   dissocNodeDef,
 } from './nodeDefsState'
 
@@ -35,7 +37,8 @@ const actionHandlers = {
 
   [nodeDefUpdate]: (state, { nodeDef }) => assocNodeDef(nodeDef)(state),
 
-  [nodeDefPropUpdate]: (state, { nodeDefUuid, key, value }) => assocNodeDefProp(nodeDefUuid, key, value)(state),
+  [nodeDefPropsUpdate]: (state, { nodeDefUuid, props, propsAdvanced }) =>
+    assocNodeDefProps(nodeDefUuid, props, propsAdvanced)(state),
 
   [nodeDefDelete]: (state, { nodeDef }) => dissocNodeDef(nodeDef)(state),
 
