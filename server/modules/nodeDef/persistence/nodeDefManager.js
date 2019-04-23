@@ -7,7 +7,7 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const NodeDefRepository = require('./nodeDefRepository')
 const NodeDefValidator = require('../validator/nodeDefValidator')
 
-const {markSurveyDraft} = require('../../survey/persistence/surveySchemaRepositoryUtils')
+const { markSurveyDraft } = require('../../survey/persistence/surveySchemaRepositoryUtils')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
@@ -19,7 +19,7 @@ const createNodeDef = async (user, surveyId, parentUuid, uuid, type, props, clie
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, {parentUuid, uuid, type, props}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, { parentUuid, uuid, type, props }, t)
 
     return {
       ...nodeDef,
@@ -69,7 +69,7 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, {nodeDefUuid, props, propsAdvanced}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefUpdate, { nodeDefUuid, props, propsAdvanced }, t)
 
     return nodeDef
   })
@@ -82,7 +82,7 @@ const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, {nodeDefUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefMarkDeleted, { nodeDefUuid }, t)
 
     return nodeDef
   })

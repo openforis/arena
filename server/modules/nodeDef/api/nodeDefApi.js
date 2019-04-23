@@ -48,11 +48,11 @@ module.exports.init = app => {
   app.put('/survey/:surveyId/nodeDef/:nodeDefUuid/props', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     try {
       const { body, user } = req
-      const propsArray = body
+      const { props, propsAdvanced } = body
 
       const { surveyId, nodeDefUuid } = Request.getParams(req)
 
-      await NodeDefService.updateNodeDefProps(user, surveyId, nodeDefUuid, propsArray)
+      await NodeDefService.updateNodeDefProps(user, surveyId, nodeDefUuid, props, propsAdvanced)
 
       await sendRespNodeDefs(res, surveyId)
 

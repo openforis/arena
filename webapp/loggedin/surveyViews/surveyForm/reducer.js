@@ -21,7 +21,7 @@ import {
   formReset
 } from './actions'
 
-import { nodeDefCreate, nodeDefPropUpdate } from '../../../survey/nodeDefs/actions'
+import { nodeDefCreate, nodeDefPropsUpdate } from '../../../survey/nodeDefs/actions'
 
 import {
   assocFormActivePage,
@@ -59,10 +59,16 @@ const actionHandlers = {
   // node def
   [nodeDefCreate]: (state, { nodeDef }) => assocParamsOnNodeDefCreate(nodeDef)(state),
 
-  [nodeDefPropUpdate]: (state, { nodeDef, parentNodeDef, key, value }) => {
-    if (key === NodeDefLayout.nodeDefLayoutProps.pageUuid) {
+  [nodeDefPropsUpdate]: (state, { nodeDef, parentNodeDef, props }) => {
+    const hasPageUuid = R.pipe(
+      R.keys,
+      R.includes(NodeDefLayout.nodeDefLayoutProps.pageUuid)
+    )(props)
+
+    if (hasPageUuid) {
+      const pageUuid = props[NodeDefLayout.nodeDefLayoutProps.pageUuid]
       // when changing displayIn (pageUuid) change form active page
-      const activePageNodeDef = value ? nodeDef : parentNodeDef
+      const activePageNodeDef = pageUuid ? nodeDef : parentNodeDef
       return assocFormActivePage(activePageNodeDef)(state)
     } else {
       return state

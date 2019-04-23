@@ -2,7 +2,6 @@ import * as R from 'ramda'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
-import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
 
