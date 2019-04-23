@@ -75,12 +75,12 @@ const _putNodeDefProp = (nodeDef, key, value, advanced) => {
 
     const propsToUpdate = [{ key, value, advanced }]
 
-    if (key === 'multiple') {
+    if (key === NodeDef.propKeys.multiple) {
       const validations = value
         ? NodeDefValidations.dissocRequired(NodeDef.getValidations(nodeDef))
         : NodeDefValidations.dissocCount(NodeDef.getValidations(nodeDef))
 
-      propsToUpdate.push({ key: 'validations', value: validations, advanced: true })
+      propsToUpdate.push({ key: NodeDef.propKeys.validations, value: validations, advanced: true })
     }
 
     const nodeDefs = await putProps(nodeDef, propsToUpdate)
