@@ -27,7 +27,7 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
   const { data } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
   dispatch({ type: nodeDefUpdate, ...data })
 
-  dispatch(_updateTableLayout(nodeDef, uuid => R.append(uuid)))
+  dispatch(_updateParentLayout(nodeDef))
 }
 
 // ==== UPDATE
@@ -65,7 +65,7 @@ export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
 
   dispatch({ type: nodeDefsLoad, nodeDefs: data.nodeDefs })
 
-  dispatch(_updateTableLayout(nodeDef, uuid => R.without([uuid])))
+  dispatch(_updateParentLayout(nodeDef, true))
 }
 
 const _putNodeDefProps = (nodeDef, key, props, propsAdvanced) => {
@@ -90,7 +90,7 @@ const _putNodeDefProps = (nodeDef, key, props, propsAdvanced) => {
 
 // ==== UTILS
 
-const _updateTableLayout = (nodeDef, f) => async (dispatch, getState) => {
+const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getState) => {
   const survey = SurveyState.getSurvey(getState())
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
 
@@ -98,6 +98,7 @@ const _updateTableLayout = (nodeDef, f) => async (dispatch, getState) => {
     const layout = NodeDefLayout.getLayout(parentNodeDef)
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-    dispatch(putNodeDefProp(parentNodeDef, NodeDefLayout.nodeDefLayoutProps.layout, f(nodeDefUuid)(layout)))
+    const newLayout = deleted ? R.without([nodeDefUuid])(layout) : R.append(nodeDefUuid)(layout)
+    dispatch(putNodeDefProp(parentNodeDef, NodeDefLayout.nodeDefLayoutProps.layout, newLayout))
   }
 }
