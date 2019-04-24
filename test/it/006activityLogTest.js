@@ -41,7 +41,7 @@ describe('Activity Log Test', async () => {
   it('Activity Log on Record Creation', async () => {
     const user = getContextUser()
 
-    const survey = await SB.survey(user, 'test', 'Test', 'en',
+    survey = await SB.survey(user,
       SB.entity('cluster',
         SB.attribute('cluster_no')
           .key()

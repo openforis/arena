@@ -19,7 +19,7 @@ let record
 before(async () => {
   const user = getContextUser()
 
-  survey = await SB.survey(user, 'test', 'Test', 'en',
+  survey = await SB.survey(user,
     SB.entity('cluster',
       SB.attribute('cluster_no', NodeDef.nodeDefType.integer)
         .key(),

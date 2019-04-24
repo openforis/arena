@@ -119,11 +119,11 @@ class AttributeDefBuilder extends NodeDefBuilder {
 
 class SurveyBuilder {
 
-  constructor (user, name, label, lang, rootDefBuilder) {
+  constructor (user, rootDefBuilder) {
     this.user = user
-    this.name = name
-    this.label = label
-    this.lang = lang
+    this.name = 'test'
+    this.label = 'Test'
+    this.lang = 'en'
     this.rootDefBuilder = rootDefBuilder
   }
 
@@ -137,6 +137,10 @@ class SurveyBuilder {
     )(survey)
   }
 
+  /**
+   * Builds the survey and saves it as draft.
+   * If 'publish' is true, publishes the survey.
+   */
   async buildAndStore (publish = true, client = db) {
     const surveyParam = this.build()
 
@@ -164,7 +168,7 @@ class SurveyBuilder {
 }
 
 module.exports = {
-  survey: (userId, name, label, lang, rootDefBuilder) => new SurveyBuilder(userId, name, label, lang, rootDefBuilder),
+  survey: (user, rootDefBuilder) => new SurveyBuilder(user, rootDefBuilder),
   entity: (name, ...childBuilders) => new EntityDefBuilder(name, ...childBuilders),
   attribute: (name, type = NodeDef.nodeDefType.text) => new AttributeDefBuilder(name, type)
 }
