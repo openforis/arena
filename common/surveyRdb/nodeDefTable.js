@@ -6,6 +6,7 @@ const NodeDef = require('../survey/nodeDef')
 
 const viewSuffix = '_view'
 const tablePrefix = 'data_'
+const parentTablePrefix = '_$parent$_'
 
 const composeTableName = (nodeDefName, nodeDefParentName = '') => `${tablePrefix}${nodeDefParentName}${nodeDefName}`
 
@@ -16,7 +17,7 @@ const getTableName = (nodeDef, nodeDefParent) => {
   return NodeDef.isEntity(nodeDef)
     ? composeTableName(nodeDefName)
     : NodeDef.isMultiple(nodeDef)
-      ? composeTableName(nodeDefName, nodeDefParentName)
+      ? composeTableName(nodeDefName, nodeDefParentName + parentTablePrefix)
       : composeTableName(nodeDefParentName)
 }
 
@@ -27,7 +28,7 @@ const getViewNameByUuid = nodeDefUuid => R.pipe(
   nodeDef => tablePrefix + NodeDef.getName(nodeDef) + viewSuffix
 )
 
-const {nodeDefType} = NodeDef
+const { nodeDefType } = NodeDef
 const cols = {
   [nodeDefType.code]: ['code', 'label'],
   [nodeDefType.taxon]: ['code', 'scientific_name'], //?, 'vernacular_names?'],
@@ -71,6 +72,16 @@ const extractColName = (nodeDef, col) => R.replace(
   col
 )
 
+const extractNodeDefNameFromViewName = R.pipe(
+  R.defaultTo(''),
+  R.split(tablePrefix),
+  R.last,
+  R.split(viewSuffix),
+  R.head,
+  R.split(parentTablePrefix),
+  R.last
+)
+
 module.exports = {
   getTableName,
   getViewName,
@@ -78,5 +89,7 @@ module.exports = {
 
   getColNames,
   getColNamesByUuids,
+
   extractColName,
+  extractNodeDefNameFromViewName,
 }
