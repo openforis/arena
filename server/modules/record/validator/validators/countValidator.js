@@ -44,11 +44,11 @@ const validateChildrenCount = (record, nodePointers) => {
       const childrenCountValidation = {
         [Validator.keys.valid]: minCountValid && maxCountValid,
         [Validator.keys.fields]: {
-          'minCount': {
+          [RecordValidation.keys.minCount]: {
             [Validator.keys.valid]: minCountValid,
             [Validator.keys.errors]: minCountValid ? [] : [errorKeys.minCountNodesNotSpecified]
           },
-          'maxCount': {
+          [RecordValidation.keys.maxCount]: {
             [Validator.keys.valid]: maxCountValid,
             [Validator.keys.errors]: maxCountValid ? [] : [errorKeys.maxCountNodesExceeded]
           }

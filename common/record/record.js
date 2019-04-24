@@ -8,9 +8,6 @@ const Validator = require('../validation/validator')
 const Node = require('../record/node')
 const User = require('../user/user')
 const RecordStep = require('./recordStep')
-const RecordValidation = require('./recordValidation')
-
-const Queue = require('../queue')
 
 const keys = {
   uuid: 'uuid',
@@ -156,82 +153,6 @@ const getDescendantsByNodeDefUuid = (node, descendantDefUuid) =>
     )
   )
 
-const findNodeByPath = path => (survey, record) => {
-  const parts = R.ifElse(
-    R.is(Array),
-    R.identity,
-    R.split('/')
-  )(path)
-
-  let currentNodeDef = null
-  let currentNode = null
-  let currentParentNode = null
-  let currentParentDef = null
-
-  for (const part of parts) {
-    if (currentParentNode) {
-      //extract node name and position from path part
-      const partMatch = /(\w+)(\[(\d+)\])?/.exec(part)
-      const childName = partMatch[1]
-      const childPosition = R.defaultTo(1, partMatch[3])
-
-      currentNodeDef = Survey.getNodeDefChildByName(currentParentDef, childName)(survey)
-
-      const children = getNodeChildrenByDefUuid(currentParentNode, NodeDef.getUuid(currentNodeDef))(record)
-
-      if (children.length >= childPosition)
-        currentNode = children[childPosition - 1]
-      else
-        return null
-    } else {
-      currentNodeDef = Survey.getRootNodeDef(survey)
-      currentNode = getRootNode(record)
-    }
-    currentParentDef = currentNodeDef
-    currentParentNode = currentNode
-  }
-
-  return currentNode
-}
-
-const getNodePath = node => (survey, record) => {
-  const nodeDefUuid = Node.getNodeDefUuid(node)
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-
-  const parentNode = getParentNode(node)(record)
-  if (parentNode) {
-    const parentNodePath = getNodePath(parentNode)(survey, record)
-
-    if (NodeDef.isMultiple(nodeDef)) {
-      const siblings = getNodeChildrenByDefUuid(parentNode, nodeDefUuid)(record)
-      const index = R.findIndex(n => Node.getUuid(n) === Node.getUuid(node), siblings)
-      const position = index + 1
-      return `${parentNodePath}/${NodeDef.getName(nodeDef)}[${position}]`
-    } else {
-      return `${parentNodePath}/${NodeDef.getName(nodeDef)}`
-    }
-  } else {
-    //is root
-    return NodeDef.getName(nodeDef)
-  }
-}
-
-const traverse = visitorFn => async record => {
-  const root = getRootNode(record)
-  const queue = new Queue()
-  queue.enqueue(root)
-
-  while (!queue.isEmpty()) {
-    const node = queue.dequeue()
-
-    await visitorFn(node)
-
-    const children = getNodeChildren(node)(record)
-
-    queue.enqueueItems(children)
-  }
-}
-
 // ====== UPDATE
 
 const assocNodes = nodes =>
@@ -324,9 +245,6 @@ module.exports = {
   getAncestorEntitiesAndSelf,
   getAncestorByNodeDefUuuid,
   getDescendantsByNodeDefUuid,
-  findNodeByPath,
-  getNodePath,
-  traverse,
 
   // testing
   getCodeUuidsHierarchy,
@@ -344,7 +262,4 @@ module.exports = {
 
   // ====== VALIDATION
   getValidation: Validator.getValidation,
-  getValidationChildrenCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getValidationChildrenCount(parentNode, childDef)),
-  getValidationMinCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getValidationMinCount(parentNode, childDef)),
-  getValidationMaxCount: (parentNode, childDef) => R.pipe(Validator.getValidation, RecordValidation.getValidationMaxCount(parentNode, childDef)),
 }

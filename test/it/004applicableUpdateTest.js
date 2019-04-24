@@ -12,6 +12,7 @@ const { getContextUser } = require('../testContext')
 
 const SB = require('./utils/surveyBuilder')
 const RB = require('./utils/recordBuilder')
+const RecordUtils = require('./utils/recordUtils')
 
 let survey
 let record
@@ -43,8 +44,8 @@ after(async () => {
 })
 describe('Applicable Test', async () => {
   it('Applicable update', async () => {
-    const nodeSource = Record.findNodeByPath('root/num')(survey, record)
-    const nodeDependent = Record.findNodeByPath('root/dependent_node')(survey, record)
+    const nodeSource = RecordUtils.findNodeByPath('root/num')(survey, record)
+    const nodeDependent = RecordUtils.findNodeByPath('root/dependent_node')(survey, record)
     const nodeDependentParent = Record.getParentNode(nodeDependent)(record)
     const nodeDependentParentUuid = Node.getUuid(nodeDependentParent)
     const nodeDependentDefUuid = Node.getNodeDefUuid(nodeDependent)

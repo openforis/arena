@@ -7,23 +7,15 @@ const NodeDef = require('../survey/nodeDef')
 const keys = {
   recordKeys: 'recordKeys',
   entityKeys: 'entityKeys',
-  childrenCount: 'childrenCount'
+  childrenCount: 'childrenCount',
+  minCount: 'minCount',
+  maxCount: 'maxCount',
 }
 
 const getValidationChildrenCount = (parentNode, childDef) => R.pipe(
   Validator.getFieldValidation(Node.getUuid(parentNode)),
   Validator.getFieldValidation(keys.childrenCount),
   Validator.getFieldValidation(NodeDef.getUuid(childDef))
-)
-
-const getValidationMinCount = (parentNode, childDef) => R.pipe(
-  getValidationChildrenCount(parentNode, childDef),
-  Validator.getFieldValidation('minCount')
-)
-
-const getValidationMaxCount = (parentNode, childDef) => R.pipe(
-  getValidationChildrenCount(parentNode, childDef),
-  Validator.getFieldValidation('maxCount')
 )
 
 const getNodeValidation = node =>
@@ -43,6 +35,4 @@ module.exports = {
   getMultipleNodesValidation,
 
   getValidationChildrenCount,
-  getValidationMinCount,
-  getValidationMaxCount
 }

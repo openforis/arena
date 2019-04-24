@@ -14,6 +14,7 @@ const RecordUpdateManager = require('../../server/modules/record/persistence/rec
 
 const SB = require('./utils/surveyBuilder')
 const RB = require('./utils/recordBuilder')
+const RecordUtils = require('./utils/recordUtils')
 
 let survey = null
 let record = null
@@ -79,7 +80,7 @@ const deleteNode = async (parentNode, childNodeName, childNodePosition) => {
 }
 
 const updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpected) => {
-  const node = Record.findNodeByPath(nodePath)(survey, record)
+  const node = RecordUtils.findNodeByPath(nodePath)(survey, record)
 
   record = await RecordUpdateManager.persistNode(getContextUser(), survey, record, Node.assocValue(value)(node))
 
@@ -89,28 +90,29 @@ const updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpe
 }
 
 const deleteNodeAndExpectMinCountToBe = async (parentNodePath, childNodeName, childNodePosition, expectedValidation) => {
-  const parentNode = Record.findNodeByPath(parentNodePath)(survey, record)
+  const parentNode = RecordUtils.findNodeByPath(parentNodePath)(survey, record)
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
 
   record = await deleteNode(parentNode, childNodeName, childNodePosition)
 
-  const minCountValidation = Record.getValidationMinCount(parentNode, childDef)(record)
+  const minCountValidation = RecordUtils.getValidationMinCount(parentNode, childDef)(record)
 
   expect(Validator.isValidationValid(minCountValidation)).to.equal(expectedValidation)
 }
 
 const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = true, expectedValidation = true) => {
-  const parentNode = Record.findNodeByPath(parentNodePath)(survey, record)
+  const parentNode = RecordUtils.findNodeByPath(parentNodePath)(survey, record)
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
 
   const node = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
 
   record = await RecordUpdateManager.persistNode(getContextUser(), survey, record, node)
 
-  const countValidation = Record.getValidationChildrenCount(parentNode, childDef)(record)
-  const validation = Validator.getFieldValidation(min ? 'minCount' : 'maxCount')(countValidation)
+  const countValidation = min
+    ? RecordUtils.getValidationMinCount(parentNode, childDef)(record)
+    : RecordUtils.getValidationMaxCount(parentNode, childDef)(record)
 
-  expect(Validator.isValidationValid(validation)).to.equal(expectedValidation)
+  expect(Validator.isValidationValid(countValidation)).to.equal(expectedValidation)
 }
 
 describe('Record Validation Test', async () => {

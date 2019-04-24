@@ -13,6 +13,7 @@ const { getContextUser } = require('../testContext')
 
 const SB = require('./utils/surveyBuilder')
 const RB = require('./utils/recordBuilder')
+const RecordUtils = require('./utils/recordUtils')
 
 let survey
 let record
@@ -57,7 +58,7 @@ after(async () => {
 
 const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourcePath, sourceValue, dependentPath, dependentExpectedValue) => {
   // update source node value
-  const nodeSource = Record.findNodeByPath(sourcePath)(survey, record)
+  const nodeSource = RecordUtils.findNodeByPath(sourcePath)(survey, record)
 
   const nodesUpdated = {
     [Node.getUuid(nodeSource)]: Node.assocValue(sourceValue)(nodeSource)
@@ -68,7 +69,7 @@ const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourceP
   const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, nodesUpdated)
   record = Record.assocNodes(nodesDependentUpdated)(record)
 
-  const nodeDependent = Record.findNodeByPath(dependentPath)(survey, record)
+  const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, record)
 
   expect(Node.getValue(nodeDependent)).to.equal(dependentExpectedValue)
   return record
