@@ -45,7 +45,7 @@ class TaxonomyImportJob extends Job {
     const validHeaders = await this.processHeaders()
 
     if (!validHeaders) {
-      this.setStatusFailed()
+      await this.setStatusFailed()
       return
     }
 
@@ -69,9 +69,10 @@ class TaxonomyImportJob extends Job {
     while (row) {
       if (this.isCanceled()) {
         break
-      } else {
-        await this.processRow(row, tx)
       }
+
+      await this.processRow(row, tx)
+
       row = await csvParser.next()
     }
 
@@ -79,7 +80,7 @@ class TaxonomyImportJob extends Job {
       if (R.isEmpty(this.errors)) {
         await this.taxonomyImportManager.finalizeImport(taxonomy, tx)
       } else {
-        this.setStatusFailed()
+        await this.setStatusFailed()
       }
     }
 

@@ -157,6 +157,7 @@ module.exports = {
   isUpdated: R.propEq(keys.updated, true),
   isDeleted: R.propEq(keys.deleted, true),
   isDirty: R.propEq(keys.dirty, true),
+  isRoot: R.pipe(getParentUuid, R.isNil),
 
   getValidation: Validator.getValidation,
 

@@ -72,7 +72,7 @@ const updateNode = async (survey, record, node, tx) => {
 const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependencyType, tx) => {
 
   //1. fetch dependent nodes
-  const nodeDependents = NodeDependencyManager.fetchDependentNodes(survey, record, node, dependencyType)
+  const nodeDependents = NodeDependencyManager.findDependentNodes(survey, record, node, dependencyType)
   const isDefaultValuesExpr = dependencyType === dependencyTypes.defaultValues
   const isApplicableExpr = dependencyType === dependencyTypes.applicable
 
@@ -112,8 +112,11 @@ const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependency
         : null
 
       //5. persist updated node value, and return updated node
+
+      const applicabilityValue = valueExpr || false
+
       return await isApplicableExpr
-        ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, valueExpr || false, tx)
+        ? NodeDependencyManager.persistDependentNodeApplicable(survey, NodeDef.getUuid(nodeDef), nodeCtx, applicabilityValue, tx)
         : NodeDependencyManager.persistDependentNodeValue(survey, nodeCtx, valueExpr, isDefaultValuesExpr && !R.isNil(expr), tx)
     })
   )

@@ -13,13 +13,13 @@ const surveySelectFields = (alias = '') => {
 
 // ============== CREATE
 
-const insertSurvey = async (props, userId, client = db) =>
+const insertSurvey = async (survey, client = db) =>
   await client.one(`
-      INSERT INTO survey (owner_id, props_draft)
-      VALUES ($1, $2)
+      INSERT INTO survey (uuid, props_draft, owner_id)
+      VALUES ($1, $2, $3)
       RETURNING ${surveySelectFields()}
     `,
-    [userId, props],
+    [survey.uuid, survey.props, survey.userId],
     def => dbTransformCallback(def, true)
   )
 
@@ -45,14 +45,14 @@ const fetchSurveys = async (user, checkAccess = true, client = db) =>
     def => dbTransformCallback(def, true)
   )
 
-const getSurveysByName = async (surveyName, client = db) =>
+const fetchSurveysByName = async (surveyName, client = db) =>
   await client.map(
     `SELECT ${surveySelectFields()} FROM survey WHERE props->>'name' = $1 OR props_draft->>'name' = $1`,
     [surveyName],
     def => dbTransformCallback(def)
   )
 
-const getSurveyById = async (surveyId, draft = false, client = db) =>
+const fetchSurveyById = async (surveyId, draft = false, client = db) =>
   await client.one(
     `SELECT ${surveySelectFields()} FROM survey WHERE id = $1`,
     [surveyId],
@@ -136,8 +136,8 @@ module.exports = {
   // READ
   fetchAllSurveyIds,
   fetchSurveys,
-  getSurveysByName,
-  getSurveyById,
+  fetchSurveysByName,
+  fetchSurveyById,
   fetchDependencies,
 
   //UPDATE

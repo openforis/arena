@@ -95,7 +95,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes, tx) => 
   const attributeValidationsArray = await Promise.all(
     attributes.map(
       async attribute => {
-        const dependents = NodeDependencyManager.fetchDependentNodes(survey, record, attribute, Survey.dependencyTypes.validations)
+        const dependents = NodeDependencyManager.findDependentNodes(survey, record, attribute, Survey.dependencyTypes.validations)
 
         // include attribute itself if it's not already included among dependents
         const attributeAndDependents =

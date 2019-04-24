@@ -233,7 +233,6 @@ module.exports = {
   isPreview: R.propEq(keys.preview, true),
   getOwnerId: R.prop(keys.ownerId),
   getStep: R.prop(keys.step),
-  getValidation: Validator.getValidation,
 
   getNodes,
   getNodesArray,
@@ -260,4 +259,7 @@ module.exports = {
   // ====== DELETE
 
   deleteNode,
+
+  // ====== VALIDATION
+  getValidation: Validator.getValidation,
 }

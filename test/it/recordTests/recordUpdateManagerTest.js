@@ -1,10 +1,10 @@
 const { expect } = require('chai')
+
 const R = require('ramda')
 
 const db = require('../../../server/db/db')
 
 const Survey = require('../../../common/survey/survey')
-const { toUuidIndexedObj } = require('../../../common/survey/surveyUtils')
 const NodeDef = require('../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 const Record = require('../../../common/record/record')
@@ -14,7 +14,7 @@ const NodeDefRepository = require('../../../server/modules/nodeDef/persistence/n
 const RecordManager = require('../../../server/modules/record/persistence/recordManager')
 const RecordUpdateManager = require('../../../server/modules/record/persistence/recordUpdateManager')
 
-const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
+const { getContextUser, fetchFullContextSurvey, getContextSurveyId } = require('../../testContext')
 
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {
@@ -24,15 +24,16 @@ const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => 
 }
 
 const recordCreationTest = async () => {
-  const survey = await fetchFullContextSurvey()
+  const surveyId = getContextSurveyId()
   const user = getContextUser()
 
-  const recordNew = newRecord()
+  const recordNew = newRecordPreview()
 
-  const record = await new RecordUpdateManager.createRecord(user, survey, recordNew, db)
+  const record = await RecordUpdateManager.createRecord(user, surveyId, recordNew)
+
   const nodes = Record.getNodes(record)
 
-  const reloadedRecord = RecordManager.fetchRecordByUuid(Survey.getId(survey), Record.getUuid(recordNew))
+  const reloadedRecord = await RecordManager.fetchRecordByUuid(surveyId, Record.getUuid(recordNew))
 
   expect(reloadedRecord).to.not.be.undefined
 
@@ -48,22 +49,24 @@ const defaultValueAppliedTest = async () => {
     newDefaultValue('1', 'false'), //should not be applied
     newDefaultValue('2')
   ]
-  const nodeDef = Survey.getNodeDefByPath(['node_def_text'])(survey)
+  const nodeDef = Survey.getNodeDefByName('node_def_text')(survey)
 
   await updateDefaultValues(survey, nodeDef, defaultValues)
 
   survey = await fetchFullContextSurvey()
 
+  const surveyId = Survey.getId(survey)
+
   //create record
 
-  const record = newRecord()
+  const record = newRecordPreview()
 
   await db.tx(async t => {
-    await new RecordUpdateManager.createRecord(user, survey, record, t)
+    await RecordUpdateManager.createRecord(user, surveyId, record, t)
 
     //reload record
 
-    const reloadedRecord = RecordManager.fetchRecordAndNodesByUuid(Survey.getId(survey), Record.getUuid(record), t)
+    const reloadedRecord = await RecordManager.fetchRecordAndNodesByUuid(surveyId, Record.getUuid(record), t)
 
     const root = Record.getRootNode(reloadedRecord)
 
@@ -77,14 +80,12 @@ const defaultValueAppliedTest = async () => {
 }
 
 //==== helper methods
-const newDefaultValue = (expression, applyIf = null) => R.pipe(
-  NodeDefExpression.assocExpression(expression),
-  NodeDefExpression.assocApplyIf(applyIf)
-)(NodeDefExpression.createExpressionPlaceholder())
+const newDefaultValue = (expression, applyIf = null) => NodeDefExpression.createExpression(expression, applyIf)
 
-const newRecord = () => Record.newRecord(getContextUser())
+const newRecordPreview = () => Record.newRecord(getContextUser(), true)
 
 module.exports = {
   recordCreationTest,
-  defaultValueAppliedTest,
+  defaultValueAppliedTest
 }
+

@@ -1,7 +1,7 @@
-const {deleteSurvey} = require('../server/modules/survey/persistence/surveyManager')
+const { deleteSurvey } = require('../server/modules/survey/persistence/surveyManager')
 
-const {findUserByEmailAndPassword} = require('../server/modules/user/service/userService')
-const {setUserPref, userPrefNames} = require('../common/user/userPrefs')
+const { findUserByEmailAndPassword } = require('../server/modules/user/service/userService')
+const { setUserPref, userPrefNames } = require('../common/user/userPrefs')
 
 const Survey = require('../common/survey/survey')
 
@@ -27,7 +27,7 @@ const setContextSurvey = s => {
   user = setUserPref(userPrefNames.survey, Survey.getId(survey))(user)
 }
 
-const fetchFullContextSurvey = async(draft = true, advanced = true) =>
+const fetchFullContextSurvey = async (draft = true, advanced = true) =>
   await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(Survey.getId(survey), draft, advanced)
 
 module.exports = {

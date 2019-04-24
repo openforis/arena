@@ -2,7 +2,7 @@ const NodeDefManager = require('../persistence/nodeDefManager')
 
 module.exports = {
 
-  createNodeDef: NodeDefManager.createNodeDef,
+  insertNodeDef: NodeDefManager.insertNodeDef,
 
   fetchNodeDefsBySurveyId: NodeDefManager.fetchNodeDefsBySurveyId,
 

@@ -16,10 +16,11 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     try {
-      const { body: nodeDefRequest, user } = req
-      const { surveyId, parentUuid, uuid, type, props } = nodeDefRequest
+      const { body: nodeDefRequest } = req
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getSessionUser(req)
 
-      const nodeDef = await NodeDefService.createNodeDef(user, surveyId, parentUuid, uuid, type, props)
+      const nodeDef = await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
 
       res.json({ nodeDef })
     } catch (err) {

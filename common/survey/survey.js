@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const {uuidv4} = require('../../common/uuid')
+
 const SurveyInfo = require('./_internal/surveyInfo')
 const SurveyNodeDefs = require('./_internal/surveyNodeDefs')
 const SurveyCategories = require('./_internal/surveyCategories')
@@ -7,7 +9,23 @@ const SurveyTaxonomies = require('./_internal/surveyTaxonomies')
 const SurveyDefaults = require('./_internal/surveyDefaults')
 const SurveyDependencies = require('./_internal/surveyDependencies')
 
+const newSurvey = (userId, name, label, lang, collectUri = null) => ({
+  uuid: uuidv4(),
+  props: {
+    name,
+    labels: { [lang]: label },
+    languages: [lang],
+    srs: [{ code: '4326', name: 'GCS WGS 1984' }], //EPSG:4326 WGS84 Lat Lon Spatial Reference System,
+    ...collectUri
+      ? { collectUri }
+      : {}
+  },
+  userId
+})
+
 module.exports = {
+  newSurvey,
+
   infoKeys: SurveyInfo.keys,
   dependencyTypes: SurveyDependencies.dependencyTypes,
 
@@ -50,7 +68,6 @@ module.exports = {
   getNodeDefChildByName: SurveyNodeDefs.getNodeDefChildByName,
   getNodeDefSiblingByName: SurveyNodeDefs.getNodeDefSiblingByName,
   getNodeDefByName: SurveyNodeDefs.getNodeDefByName,
-  getNodeDefByPath: SurveyNodeDefs.getNodeDefByPath,
   getNodeDefsByCategoryUuid: SurveyNodeDefs.getNodeDefsByCategoryUuid,
   getNodeDefsByTaxonomyUuid: SurveyNodeDefs.getNodeDefsByTaxonomyUuid,
   getNodeDefParent: SurveyNodeDefs.getNodeDefParent,

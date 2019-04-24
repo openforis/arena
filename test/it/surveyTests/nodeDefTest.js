@@ -9,15 +9,13 @@ const NodeDefRepository = require('../../../server/modules/nodeDef/persistence/n
 
 const fetchRootNodeDef = async () => {
   const survey = getContextSurvey()
-  return await NodeDefRepository.fetchRootNodeDef(Survey.getSurveyInfo(survey).id, true)
+  return await NodeDefRepository.fetchRootNodeDef(Survey.getId(survey), true)
 }
 
 const createNodeDef = async (parentNodeUuid, type, name) => {
   const survey = getContextSurvey()
-  const surveyInfo = Survey.getSurveyInfo(survey)
-
-  const nodeDefReq = NodeDef.newNodeDef(surveyInfo.id, parentNodeUuid, type, {name})
-  return await NodeDefRepository.createNodeDef(surveyInfo.id, parentNodeUuid, NodeDef.getUuid(nodeDefReq), type, nodeDefReq.props)
+  const nodeDef = NodeDef.newNodeDef(parentNodeUuid, type, {name})
+  return await NodeDefRepository.insertNodeDef(Survey.getId(survey), nodeDef)
 }
 
 const createNodeDefsTest = async () => {
@@ -28,8 +26,8 @@ const createNodeDefsTest = async () => {
   const rootDefUuid = NodeDef.getUuid(rootDef)
 
   const type = NodeDef.nodeDefType.text
-  const nodeDefReq = NodeDef.newNodeDef(surveyId, rootDefUuid, type, {name: 'node_def_' + type})
-  const nodeDefDb = await NodeDefRepository.createNodeDef(surveyId, rootDefUuid, NodeDef.getUuid(nodeDefReq), type, nodeDefReq.props)
+  const nodeDefReq = NodeDef.newNodeDef(rootDefUuid, type, {name: 'node_def_' + type})
+  const nodeDefDb = await NodeDefRepository.insertNodeDef(surveyId, nodeDefReq)
 
   expect(nodeDefDb.id).to.not.be.undefined
   expect(nodeDefDb.type).to.equal(type)
