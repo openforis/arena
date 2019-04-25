@@ -13,7 +13,7 @@ const Validator = require('../../../../common/validation/validator')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
-const recordSelectFields = `id, uuid, owner_id, step, ${selectDate('date_created')}, preview, validation`
+const recordSelectFields = `uuid, owner_id, step, ${selectDate('date_created')}, preview, validation`
 
 const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
   const validation = Record.getValidation(record)

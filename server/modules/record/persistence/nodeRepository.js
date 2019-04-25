@@ -61,7 +61,7 @@ const fetchNodesByRecordUuid = async (surveyId, recordUuid, client = db) =>
   await client.map(`
     SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE record_uuid = $1
-    ORDER BY id`,
+    ORDER BY date_created`,
     [recordUuid],
     dbTransformCallback
   )

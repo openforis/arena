@@ -1,6 +1,3 @@
-const R = require('ramda')
-const Promise = require('bluebird')
-
 const { insertAllQuery } = require('../../../../db/dbUtils')
 
 const Survey = require('../../../../../common/survey/survey')
@@ -10,38 +7,24 @@ const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
 
 const DataTable = require('../schemaRdb/dataTable')
 
-const flatten = array => {
-  const result = []
-  array.forEach(arr =>
-    arr.forEach(item =>
-      result.push(item)
-    )
-  )
-  return result
-}
-
 const getNodesRowValues = async (survey, nodeDef, record, client) => {
   const nodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record)
 
-  return R.isEmpty(nodes)
-    ? []
-    : await Promise.all(
-      nodes.map(
-        async node =>
-          await DataTable.getRowValues(survey, nodeDef, record, node, client)
-      )
-    )
+  const result = []
+  for (const node of nodes) {
+    const values = await DataTable.getRowValues(survey, nodeDef, record, node, client)
+    result.push(values)
+  }
+
+  return result
 }
 
-const run = async (survey, nodeDef, records, client) => {
-  const insertValuesArray = await Promise.all(
-    records.map(
-      async record =>
-        await getNodesRowValues(survey, nodeDef, record, client)
-    )
-  )
-
-  const insertValues = flatten(insertValuesArray)
+const run = async (survey, nodeDef, record, client) => {
+  const insertValues = []
+  const valuesArr = await getNodesRowValues(survey, nodeDef, record, client)
+  for (const values of valuesArr) {
+    insertValues.push(values)
+  }
 
   if (insertValues.length > 0) {
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
