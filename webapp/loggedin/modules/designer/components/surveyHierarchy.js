@@ -71,7 +71,7 @@ class SurveyHierarchy extends React.Component {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const ready = SurveyState.surveyDefsFetched(state)
+  const ready = SurveyState.areDefsFetched(state)
   const hierarchy = Survey.getHierarchy()(survey)
   const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 

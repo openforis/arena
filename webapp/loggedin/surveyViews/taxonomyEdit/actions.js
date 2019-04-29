@@ -31,7 +31,7 @@ export const setTaxonomyForEdit = taxonomy => dispatch =>
 // ====== CREATE
 
 export const createTaxonomy = () => async (dispatch, getState) => {
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.post(`/api/survey/${surveyId}/taxonomies`, Taxonomy.newTaxonomy())
 
   const taxonomy = data.taxonomy
@@ -67,7 +67,7 @@ const fetchTaxonomy = (surveyId, taxonomyUuid) => async dispatch => {
 const ROWS_PER_PAGE = 15
 
 export const initTaxaList = taxonomy => async (dispatch, getState) => {
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
   const [count, taxa] = await Promise.all([
@@ -87,7 +87,7 @@ export const loadTaxa = (taxonomy, page = 1) => async (dispatch, getState) => {
 
   const state = getState()
   const surveyForm = getSurveyForm(state)
-  const surveyId = SurveyState.getStateSurveyId(state)
+  const surveyId = SurveyState.getSurveyId(state)
   const rowsPerPage = getTaxonomyEditTaxaPerPage(surveyForm)
   const taxa = await fetchTaxa(surveyId, Taxonomy.getUuid(taxonomy), (page - 1) * rowsPerPage, rowsPerPage)
 
@@ -99,7 +99,7 @@ export const putTaxonomyProp = (taxonomy, key, value) => async (dispatch, getSta
   dispatch({ type: taxonomyPropUpdate, taxonomy, key, value })
 
   const action = async () => {
-    const surveyId = SurveyState.getStateSurveyId(getState())
+    const surveyId = SurveyState.getSurveyId(getState())
     const { data } = await axios.put(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`, { key, value })
     dispatch({ type: taxonomiesUpdate, taxonomies: data.taxonomies })
   }
@@ -116,7 +116,7 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
     }
   }
 
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.post(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/upload`, formData, config)
 
   dispatch(showAppJobMonitor(data.job, () => {
@@ -130,7 +130,7 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
 export const deleteTaxonomy = taxonomy => async (dispatch, getState) => {
   dispatch({ type: taxonomyDelete, taxonomy })
 
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.delete(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}`)
   dispatch({ type: taxonomiesUpdate, taxonomies: data.taxonomies })
 }

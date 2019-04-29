@@ -17,7 +17,7 @@ const _updateProp = (key, value) => {
 
   const action = async (dispatch, getState) => {
 
-    const surveyId = SurveyState.getStateSurveyId(getState())
+    const surveyId = SurveyState.getSurveyId(getState())
     const res = await axios.put(`/api/survey/${surveyId}/prop`, {key, value})
 
     const {validation} = res.data

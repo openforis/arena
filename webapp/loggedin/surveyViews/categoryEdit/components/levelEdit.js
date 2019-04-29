@@ -115,7 +115,7 @@ const mapStateToProps = (state, props) => {
   const {index} = level
 
   const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
   const language = Survey.getDefaultLanguage(surveyInfo)
 

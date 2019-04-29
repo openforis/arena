@@ -82,7 +82,7 @@ class DesignerView extends React.Component {
 
 const mapStateToProps = state => {
   const user = AppState.getUser(state)
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
 
   return {
     canEditDef: AuthManager.canEditSurvey(user, surveyInfo),

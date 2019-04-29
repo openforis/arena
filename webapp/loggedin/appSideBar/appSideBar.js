@@ -56,7 +56,7 @@ class AppSideBar extends React.Component {
 
 const mapStateToProps = state => ({
   user: getUser(state),
-  surveyInfo: SurveyState.getStateSurveyInfo(state)
+  surveyInfo: SurveyState.getSurveyInfo(state)
 })
 
 export default connect(mapStateToProps, {logout})(AppSideBar)

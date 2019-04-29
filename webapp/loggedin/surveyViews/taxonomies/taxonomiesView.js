@@ -66,7 +66,7 @@ class TaxonomiesView extends React.Component {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
   const user = getUser(state)
 

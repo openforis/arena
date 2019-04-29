@@ -14,9 +14,9 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [surveyDefsLoad]: (state, { draft }) => SurveyState.setSurveyDefsFetched(draft)(state),
+  [surveyDefsLoad]: (state, { draft }) => SurveyState.assocDefsFetched(draft)(state),
 
-  [surveyCollectImportReportPresentUpdate]: (state, {present}) => SurveyState.setHasCollectImportReport(present)(state)
+  [surveyCollectImportReportPresentUpdate]: (state, {present}) => SurveyState.assocHasCollectImportReport(present)(state)
 }
 
 export default exportReducer(actionHandlers)

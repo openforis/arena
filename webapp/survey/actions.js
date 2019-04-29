@@ -28,11 +28,11 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
   const state = getState()
 
   if (
-    !SurveyState.surveyDefsFetched(state) ||
-    (SurveyState.surveyDefsDraftFetched(state) !== draft)
+    !SurveyState.areDefsFetched(state) ||
+    (SurveyState.areDefsDraftFetched(state) !== draft)
   ) {
 
-    const surveyId = SurveyState.getStateSurveyId(state)
+    const surveyId = SurveyState.getSurveyId(state)
 
     const res = await Promise.all([
       fetchNodeDefs(surveyId, draft, validate),
@@ -70,7 +70,7 @@ export const setActiveSurvey = (surveyId, draft = true) =>
 // ==== UPDATE
 
 export const publishSurvey = () => async (dispatch, getState) => {
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
 
   const { data } = await axios.put(`/api/survey/${surveyId}/publish`)
 
@@ -84,7 +84,7 @@ export const publishSurvey = () => async (dispatch, getState) => {
 // == DELETE
 
 export const deleteSurvey = () => async (dispatch, getState) => {
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   await axios.delete(`/api/survey/${surveyId}`)
 
   dispatch({ type: surveyDelete, surveyId })

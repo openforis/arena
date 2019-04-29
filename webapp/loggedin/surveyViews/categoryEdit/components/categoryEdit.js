@@ -71,7 +71,7 @@ const CategoryEdit = props => {
 }
 
 const mapStateToProps = state => ({
-  readOnly: !canEditSurvey(getUser(state), SurveyState.getStateSurveyInfo(state)),
+  readOnly: !canEditSurvey(getUser(state), SurveyState.getSurveyInfo(state)),
 })
 
 export default connect(

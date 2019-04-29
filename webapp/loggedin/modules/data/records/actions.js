@@ -14,7 +14,7 @@ const getRecords = (surveyId, offset = 0) => axios.get(
 )
 
 export const initRecordsList = () => async (dispatch, getState) => {
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const offset = 0
 
   const [countResp, recordsResp] = await Promise.all([
@@ -33,7 +33,7 @@ export const initRecordsList = () => async (dispatch, getState) => {
 }
 
 export const fetchRecords = (offset = 0) => async (dispatch, getState) => {
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await getRecords(surveyId, offset)
 
   dispatch({

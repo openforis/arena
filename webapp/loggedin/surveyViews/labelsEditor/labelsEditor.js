@@ -123,7 +123,7 @@ LabelsEditor.defaultProps = {
 }
 
 const mapStateToProps = state => ({
-  languages: Survey.getLanguages(SurveyState.getStateSurveyInfo(state))
+  languages: Survey.getLanguages(SurveyState.getSurveyInfo(state))
 })
 
 export default connect(mapStateToProps,)(LabelsEditor)

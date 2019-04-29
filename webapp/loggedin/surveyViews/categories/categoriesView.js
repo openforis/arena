@@ -61,7 +61,7 @@ class CategoriesView extends React.Component {
 
 const mapStateToProps = (state) => {
   const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = getUser(state)
 
   const categories = R.pipe(

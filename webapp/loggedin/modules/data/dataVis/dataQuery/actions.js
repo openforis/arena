@@ -51,7 +51,7 @@ const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuid
 
 const fetchData = async (state, nodeDefUuidCols = null, offset = null, filter = null, sort = null) => {
   if (DataQueryState.hasTableAndCols(state)) {
-    const surveyId = SurveyState.getStateSurveyId(state)
+    const surveyId = SurveyState.getSurveyId(state)
     const editMode = DataQueryState.getTableEditMode(state)
     const nodeDefUuidTable = DataQueryState.getTableNodeDefUuidTable(state)
     const nodeDefUuidColsParam = R.defaultTo(DataQueryState.getTableNodeDefUuidCols(state), nodeDefUuidCols)
@@ -110,7 +110,7 @@ export const updateTableNodeDefUuidCols = (nodeDefUuidCols, nodeDefUuidCol = nul
 export const initTableData = (queryFilter = null, querySort = null, editModeParam = null) =>
   async (dispatch, getState) => {
     const state = getState()
-    const surveyId = SurveyState.getStateSurveyId(state)
+    const surveyId = SurveyState.getSurveyId(state)
 
     if (DataQueryState.hasTableAndCols(state)) {
 

@@ -128,7 +128,7 @@ class SurveyInfo extends React.Component {
 
 const mapStateToProps = state => {
   const user = AppState.getUser(state)
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const lang = Survey.getDefaultLanguage(surveyInfo)
 
   return {
