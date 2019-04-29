@@ -15,7 +15,7 @@ export const getSurvey = R.prop(survey)
 
 export const getStateSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
 
-export const getStateSurveyId = R.pipe(getStateSurveyInfo, R.prop('id'))
+export const getStateSurveyId = R.pipe(getSurvey, Survey.getId)
 
 // STATUS
 const keys = {

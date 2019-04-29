@@ -14,7 +14,9 @@ import CategoryLevel from '../../../../../common/survey/categoryLevel'
 import CategoryItem from '../../../../../common/survey/categoryItem'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
-import { getStateSurveyInfo, getSurvey } from '../../../../survey/surveyState'
+import * as SurveyState from '../../../../survey/surveyState'
+import { getSurveyForm } from '../../surveyForm/surveyFormState'
+
 import {
   getCategoryEditLevelActiveItem,
   getCategoryForEdit,
@@ -24,7 +26,6 @@ import {
 import { createCategoryLevelItem } from '../actions'
 import { putCategoryItemProp, putCategoryLevelProp } from '../actions'
 import { deleteCategoryItem, deleteCategoryLevel, setCategoryItemForEdit } from '../actions'
-import { getSurveyForm } from '../../surveyForm/surveyFormState'
 
 import { getUser } from '../../../../app/appState'
 import { canEditSurvey } from '../../../../../common/auth/authManager'
@@ -113,8 +114,8 @@ const mapStateToProps = (state, props) => {
   const {level} = props
   const {index} = level
 
-  const survey = getSurvey(state)
-  const surveyInfo = getStateSurveyInfo(state)
+  const survey = SurveyState.getSurvey(state)
+  const surveyInfo = SurveyState.getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
   const language = Survey.getDefaultLanguage(surveyInfo)
 

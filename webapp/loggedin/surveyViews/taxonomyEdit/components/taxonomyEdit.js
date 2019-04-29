@@ -22,8 +22,8 @@ import {
   getTaxonomyEditTaxaPerPage
 } from '../taxonomyEditState'
 
+import * as SurveyState from '../../../../survey/surveyState'
 import { getActiveJob } from '../../../appJob/appJobState'
-import { getStateSurveyInfo, getSurvey, getStateSurveyId } from '../../../../survey/surveyState'
 import { getUser } from '../../../../app/appState'
 
 import {
@@ -110,13 +110,13 @@ class TaxonomyEdit extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const survey = getSurvey(state)
+  const survey = SurveyState.getSurvey(state)
+  const surveyInfo = SurveyState.getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
   const user = getUser(state)
-  const surveyInfo = getStateSurveyInfo(state)
 
   return {
-    surveyId: getStateSurveyId(state),
+    surveyId: SurveyState.getStateSurveyId(state),
     taxonomy: getTaxonomyEditTaxonomy(survey)(surveyForm),
     taxaCurrentPage: getTaxonomyEditTaxaCurrentPage(surveyForm),
     taxaTotalPages: getTaxonomyEditTaxaTotalPages(surveyForm),

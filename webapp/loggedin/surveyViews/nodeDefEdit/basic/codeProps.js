@@ -4,6 +4,7 @@ import * as R from 'ramda'
 
 import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
+import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -11,12 +12,11 @@ import Category from '../../../../../common/survey/category'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 import Validator from '../../../../../common/validation/validator'
 
-import { getSurvey } from '../../../../survey/surveyState'
+import * as SurveyState from '../../../../survey/surveyState'
 import { getFormNodeDefEdit, getSurveyForm } from '../../surveyForm/surveyFormState'
 
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../../categoryEdit/actions'
-import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
 
 const { propKeys } = NodeDef
 
@@ -112,7 +112,7 @@ const CodeProps = (props) => {
 }
 
 const mapStateToProps = state => {
-  const survey = getSurvey(state)
+  const survey = SurveyState.getSurvey(state)
   const surveyForm = getSurveyForm(state)
   const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
 

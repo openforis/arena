@@ -9,7 +9,7 @@ import Survey from '../../../../common/survey/survey'
 import Taxonomy from '../../../../common/survey/taxonomy'
 import { canEditSurvey } from '../../../../common/auth/authManager'
 
-import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
+import * as SurveyState from '../../../survey/surveyState'
 import { getTaxonomyEditTaxonomy } from '../taxonomyEdit/taxonomyEditState'
 import { getUser } from '../../../app/appState'
 
@@ -65,10 +65,10 @@ class TaxonomiesView extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const survey = getSurvey(state)
+  const survey = SurveyState.getSurvey(state)
+  const surveyInfo = SurveyState.getStateSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
   const user = getUser(state)
-  const surveyInfo = getStateSurveyInfo(state)
 
   const taxonomies = R.pipe(
     Survey.getTaxonomiesArray,

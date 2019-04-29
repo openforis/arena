@@ -4,7 +4,7 @@ import { appUserLogout } from '../../app/actions'
 
 import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate, surveyCollectImportReportPresentUpdate } from '../actions'
 
-import { setSurveyDefsFetched, setHasCollectImportReport } from '../surveyState'
+import * as SurveyState from '../surveyState'
 
 const actionHandlers = {
   // reset state
@@ -14,9 +14,9 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [surveyDefsLoad]: (state, { draft }) => setSurveyDefsFetched(draft)(state),
+  [surveyDefsLoad]: (state, { draft }) => SurveyState.setSurveyDefsFetched(draft)(state),
 
-  [surveyCollectImportReportPresentUpdate]: (state, {present}) => setHasCollectImportReport(present)(state)
+  [surveyCollectImportReportPresentUpdate]: (state, {present}) => SurveyState.setHasCollectImportReport(present)(state)
 }
 
 export default exportReducer(actionHandlers)
