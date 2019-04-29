@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import * as R from 'ramda'
 
 import ExpressionEditorPopup from '../../../../../../commonComponents/expression/expressionEditorPopup'
 import TablePaginator from '../../../../../../commonComponents/table/tablePaginator'
@@ -57,14 +58,14 @@ class TableHeader extends React.Component {
       updateTableFilter, updateTableOffset, updateTableEditMode,
     } = this.props
 
-    const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${filter}&sort=${DataSort.serialize(sort)}&cols=${JSON.stringify(colNames)}`
+    const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.serialize(sort)}&cols=${JSON.stringify(colNames)}`
     const sortMsg = DataSort.getViewExpr(sort)
 
     return (
       <div className="table__header">
 
         <div className="data-operations">
-          <Tooltip messages={filter && [filter]}>
+          <Tooltip messages={R.isNil(filter) ? [] : [Expression.toString(filter, Expression.modes.sql)]}>
             <button className={`btn btn-s btn-of-light btn-edit${filter ? ' highlight' : ''}`}
                     onClick={this.toggleExpressionEditor}>
               <span className="icon icon-filter icon-16px"/>
@@ -74,10 +75,10 @@ class TableHeader extends React.Component {
             showExpressionEditor &&
             <ExpressionEditorPopup
               nodeDefUuidContext={nodeDefUuidContext}
-              query={filter}
+              expr={filter}
               mode={Expression.modes.sql}
-              onChange={query => {
-                updateTableFilter(query)
+              onChange={(_, queryExpr) => {
+                updateTableFilter(queryExpr)
                 this.toggleExpressionEditor()
               }}
               onClose={this.toggleExpressionEditor}

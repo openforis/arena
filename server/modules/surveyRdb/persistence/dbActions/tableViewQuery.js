@@ -9,33 +9,39 @@ const Node = require('../../../../../common/record/node')
 const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
 const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
 
+const SqlUtils = require('../../../../../common/exprParser/helpers/sqlUtils')
+
 const DataCol = require('../schemaRdb/dataCol')
 
 const NodeRepository = require('../../../record/persistence/nodeRepository')
 
-const runSelect = async (surveyId, tableName, cols, offset, limit, filter = '', sort = '', client) => {
+const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort = '', client) => {
   const schemaName = SchemaRdb.getName(surveyId)
+  const { str: filterQuery, params: filterParams } = filterExpr ? SqlUtils.getWherePerparedStatement(filterExpr) : {}
+  const colParams = SqlUtils.toParamsObj(cols, 'col')
+  const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
 
   return await client.any(`
-    SELECT ${cols.join(', ')} 
-    FROM ${schemaName}.${tableName}
-    ${R.isEmpty(filter) ? '' : `WHERE ${filter}`}
+    SELECT ${colParamNames.join(', ')} 
+    FROM $/schemaName:name/.$/tableName:name/
+    ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
     ${R.isEmpty(sort) ? '' : `ORDER BY ${sort} NULLS LAST`}
-    LIMIT ${limit}
-    OFFSET ${offset}
+    LIMIT $/limit/
+    OFFSET $/offset/
     `,
-    []
+    { ...filterParams, ...colParams, schemaName, tableName, limit, offset }
   )
 }
 
-const runCount = async (surveyId, tableName, filter = '', client) => {
+const runCount = async (surveyId, tableName, filterExpr, client) => {
   const schemaName = SchemaRdb.getName(surveyId)
+  const { str: filterQuery, params: filterParams } = filterExpr ? SqlUtils.getWherePerparedStatement(filterExpr) : {}
 
   return await client.one(`
     SELECT count(*) 
     FROM ${schemaName}.${tableName}
-    ${R.isEmpty(filter) ? '' : `WHERE ${filter}`}
-  `)
+    ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
+  `, filterParams)
 }
 
 const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {

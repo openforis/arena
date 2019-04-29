@@ -19,8 +19,8 @@ class ExpressionEditorPopup extends React.Component {
   constructor (props) {
     super(props)
 
-    const { query, mode, canBeConstant } = props
-    const expr = ExpressionParser.parseQuery(query, mode, canBeConstant)
+    const { query, expr: exprParam, mode, canBeConstant } = props
+    const expr = exprParam || ExpressionParser.parseQuery(query, mode, canBeConstant)
 
     this.state = {
       query,
@@ -79,7 +79,7 @@ class ExpressionEditorPopup extends React.Component {
           </button>
 
           <button className="btn btn-xs btn-of"
-                  onClick={() => onChange(queryDraft)}
+                  onClick={() => onChange(queryDraft, exprDraft)}
                   aria-disabled={query === queryDraft || !exprDraftValid}>
             <span className="icon icon-checkmark icon-16px"/> Apply
           </button>
@@ -93,6 +93,7 @@ class ExpressionEditorPopup extends React.Component {
 
 ExpressionEditorPopup.defaultProps = {
   query: '',
+  expr: null,
   nodeDefUuidContext: '',
   nodeDefUuidCurrent: null,
   mode: Expression.modes.json,

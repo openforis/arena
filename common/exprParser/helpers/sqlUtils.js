@@ -1,50 +1,54 @@
-const R = require('ramda')
-
-const jsep = require('./jsep')
 const { types } = require('./types')
 
-const binaryToString = node => `${toString(node.left)} ${node.operator} ${toString(node.right)}`
-
-class LiteralGenerator {
-  constructor () {
-    this.n = 1
-    this.literals = []
-  }
-
-  generateVar (raw) {
-    const varName = `_${this.n++}`
-
-    this.literals[varName] = raw
-    return varName
-  }
-
-  getLiterals () {
-    return this.literals
+const getSqlOperator = op => {
+  switch (op) {
+  case '||':
+    return 'OR'
+  case '&&':
+    return 'AND'
+  case '===':
+    return '='
+  case '!==':
+    return '!='
+  default:
+    throw new Error(`Unknown operator: ${op}`)
   }
 }
 
-const literalGenerator = new LiteralGenerator()
+const binaryToString = (node, params) => {
+  const left = toString(node.left, params)
+  const right = toString(node.right, left.params)
+
+  return {
+    str: `${left.str} ${getSqlOperator(node.operator)} ${right.str}`,
+    params: right.params,
+  }
+}
+
+const getNextParamName = params => `_${params.length}`
 
 const converters = {
-  [types.Identifier]: R.prop('name'),
+  [types.Identifier]: (node, params) => ({ str: `$/${getNextParamName(params)}:name/`, params: params.concat(node.name) }),
   [types.BinaryExpression]: binaryToString,
-  [types.MemberExpression]: node => `${toString(node.object)}.${toString(node.property)}`,
-  [types.Literal]: node => '${' + literalGenerator.generateVar(node.raw) + '}',
-  // [types.ThisExpression]: () => 'this',
-  // [types.CallExpression]: node => `${toString(node.callee)}(${node.arguments.map(toString).join(',')})`,
-  [types.UnaryExpression]: node => `${node.operator} ${toString(node.argument)}`,
+  [types.MemberExpression]: (node, params) => ({ str: `${toString(node.object, params).str}.${toString(node.property, params).str}`, params }),
+  [types.Literal]: (node, params) => ({ str: `$/${getNextParamName(params)}/`, params: params.concat(node.raw) }),
+  [types.UnaryExpression]: (node, params) => ({ str: `${node.operator} ${toString(node.argument, params).str}`, params }),
   [types.LogicalExpression]: binaryToString,
-  [types.GroupExpression]: node => `(${toString(node.argument)})`,
+  [types.GroupExpression]: (node, params) => ({ str: `(${toString(node.argument, params).str})`, params }),
 }
 
-const toString = expr => converters[expr.type](expr)
+const toString = (expr, params) => converters[expr.type](expr, params)
 
-const expr = jsep('asdf === 1 && qwer === "qwer"')
-console.log(expr)
-console.log(toString(expr))
-console.log(literalGenerator.getLiterals())
+const toParamsObj = (paramsArray, prefix = '') => paramsArray.reduce((acc, cur, i) => ({ ...acc, [`${prefix}_${i}`]: cur }), {})
+
+const getWherePerparedStatement = expr => {
+  const prepStatement = toString(expr, [])
+  const params = toParamsObj(prepStatement.params)
+
+  return { str: prepStatement.str, params }
+}
 
 module.exports = {
-  converters,
-  toPreparedStatement: toString,
+  getWherePerparedStatement,
+  toParamsObj,
 }

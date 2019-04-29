@@ -7,15 +7,15 @@ const { requireRecordListViewPermission } = require('../../auth/authApiMiddlewar
 
 module.exports.init = app => {
 
-  app.get('/surveyRdb/:surveyId/:tableName/query', requireRecordListViewPermission, async (req, res) => {
+  app.post('/surveyRdb/:surveyId/:tableName/query', requireRecordListViewPermission, async (req, res) => {
     try {
-      const user = Request.getSessionUser(req)
-      const { surveyId, nodeDefUuidTable, tableName, offset, limit, filter = '', sort = '', editMode = false } = Request.getParams(req)
+      const { surveyId, nodeDefUuidTable, tableName, offset, limit, sort = '', editMode = false } = Request.getParams(req)
 
       const cols = Request.getJsonParam(req, 'cols', [])
       const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
+      const filter = Request.getJsonParam(req, 'filter', null)
 
-      const rows = await SurveyRdbService.queryTable(user, surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, limit, filter, sort, editMode)
+      const rows = await SurveyRdbService.queryTable(surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, limit, filter, sort, editMode)
 
       res.json(rows)
     } catch (err) {
@@ -23,9 +23,10 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/surveyRdb/:surveyId/:tableName/query/count', requireRecordListViewPermission, async (req, res) => {
+  app.post('/surveyRdb/:surveyId/:tableName/query/count', requireRecordListViewPermission, async (req, res) => {
     try {
-      const { surveyId, tableName, filter = '' } = Request.getParams(req)
+      const { surveyId, tableName } = Request.getParams(req)
+      const filter = Request.getJsonParam(req, 'filter', null)
 
       const count = await SurveyRdbService.countTable(surveyId, tableName, filter)
 
@@ -40,7 +41,7 @@ module.exports.init = app => {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
       const tableName = Request.getRequiredParam(req, 'tableName')
       const cols = Request.getJsonParam(req, 'cols', [])
-      const filter = Request.getRestParam(req, 'filter', '')
+      const filter = Request.getJsonParam(req, 'filter', null)
       const sort = Request.getRestParam(req, 'sort', '')
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
