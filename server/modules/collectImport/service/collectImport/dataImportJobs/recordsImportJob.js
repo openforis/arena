@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const log = require('../../../../log/log')
+
 const BatchPersister = require('../../../../../db/batchPersister')
 
 const FileXml = require('../../../../../../common/file/fileXml')

@@ -23,7 +23,7 @@ class TaxonomyImportManager {
   }
 
   async addTaxonToInsertBuffer (taxon, t) {
-    this.batchPersister.addItem(R.omit(['validation'], taxon), t)
+    await this.batchPersister.addItem(R.omit(['validation'], taxon), t)
 
     this.insertedCodes[Taxon.getCode(taxon)] = true
   }

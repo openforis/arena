@@ -1,3 +1,5 @@
+const Promise = require('bluebird')
+
 const { insertAllQuery } = require('../../../../db/dbUtils')
 
 const Survey = require('../../../../../common/survey/survey')
@@ -10,21 +12,15 @@ const DataTable = require('../schemaRdb/dataTable')
 const getNodesRowValues = async (survey, nodeDef, record, client) => {
   const nodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record)
 
-  const result = []
-  for (const node of nodes) {
-    const values = await DataTable.getRowValues(survey, nodeDef, record, node, client)
-    result.push(values)
-  }
-
-  return result
+  return await Promise.all(
+    nodes.map(
+      node => DataTable.getRowValues(survey, nodeDef, record, node, client)
+    )
+  )
 }
 
 const run = async (survey, nodeDef, record, client) => {
-  const insertValues = []
-  const valuesArr = await getNodesRowValues(survey, nodeDef, record, client)
-  for (const values of valuesArr) {
-    insertValues.push(values)
-  }
+  const insertValues = await getNodesRowValues(survey, nodeDef, record, client)
 
   if (insertValues.length > 0) {
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)

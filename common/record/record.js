@@ -12,10 +12,14 @@ const RecordStep = require('./recordStep')
 const keys = {
   uuid: 'uuid',
   nodes: 'nodes',
+  nodesByParent: 'nodesByParent',
+  nodesByNodeDef: 'nodesByNodeDef',
   ownerId: 'ownerId',
   step: 'step',
   preview: 'preview',
+  dateCreated: 'dateCreated'
 }
+
 // ====== CREATE
 
 const newRecord = (user, preview = false) => ({
@@ -53,22 +57,28 @@ const findNodesIndexed = predicate => R.pipe(
 const getNodeChildren = node => findNodes(n => Node.getParentUuid(n) === Node.getUuid(node))
 
 const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
-  getNodeChildren(parentNode),
-  R.filter(n => Node.getNodeDefUuid(n) === nodeDefUuid),
-  // Put placeholder at the end for multiple nodes if another user is editing the same record
+  getNodeChildrenUuidsByParent(Node.getUuid(parentNode), nodeDefUuid),
+  R.map(uuid => getNodeByUuid(uuid)(record)),
   R.sortWith([
     R.propOr(false, Node.keys.placeholder),
-    R.prop(Node.keys.id)
+    R.prop(Node.keys.dateCreated)
   ])
 )(record)
+
+const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
+  getNodeChildrenByDefUuid(parentNode, nodeDefUuid),
+  R.head
+)
 
 const getNodeSiblingsByDefUuid = (node, siblingDefUuid) => R.pipe(
   getParentNode(node),
   parentNode => getNodeChildrenByDefUuid(parentNode, siblingDefUuid)
 )
 
-const getNodesByDefUuid = nodeDefUuid =>
-  findNodes(n => Node.getNodeDefUuid(n) === nodeDefUuid)
+const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
+  getNodeUuidsByNodeDef(nodeDefUuid),
+  R.map(uuid => getNodeByUuid(uuid)(record))
+)(record)
 
 const getRootNode = R.pipe(
   getNodesArray,
@@ -175,12 +185,22 @@ const assocNodes = nodes =>
       )
     )(nodes)
 
-    return R.pipe(
+    const recordUpdated = R.pipe(
       getNodes,
       R.mergeLeft(nodesToUpdate),
       mergedNodes => R.assoc(keys.nodes, mergedNodes)(record),
       removeDeletedNodes,
+
+      record => R.pipe(
+        R.values,
+        R.reduce(
+          (acc, node) => indexNode(node)(acc),
+          record
+        )
+      )(nodesToUpdate)
     )(record)
+
+    return recordUpdated
   }
 
 const removeDeletedNodes = record => {
@@ -212,15 +232,65 @@ const deleteNode = node =>
       newValidation => Validator.assocValidation(newValidation)(recordUpdated)
     )(recordUpdated)
 
+    const recordCacheUpdated = removeNodeFromIndex(node)(recordValidationUpdated)
+
     // 3. remove entity children recursively
-    const children = getNodeChildren(node)(recordValidationUpdated)
+    const children = getNodeChildren(node)(recordCacheUpdated)
 
     return R.reduce(
       (recordCurrent, child) => deleteNode(child)(recordCurrent),
-      recordValidationUpdated,
+      recordCacheUpdated,
       children
     )
   }
+
+// ======= CACHE
+
+const getNodeUuidsByNodeDef = nodeDefUuid => R.pathOr([], [keys.nodesByNodeDef, nodeDefUuid])
+
+const getNodeChildrenUuidsByParent = (parentNodeUuid, childDefUuid) => R.pathOr([], [keys.nodesByParent, parentNodeUuid, childDefUuid])
+
+const indexNodeByNodeDef = node => record => R.pipe(
+  getNodeUuidsByNodeDef(Node.getNodeDefUuid(node)),
+  R.ifElse(
+    R.includes(Node.getUuid(node)),
+    R.identity,
+    R.append(Node.getUuid(node))
+  ),
+  arr => R.assocPath([keys.nodesByNodeDef, Node.getNodeDefUuid(node)], arr, record)
+)(record)
+
+const indexNodeByParent = node => record => R.pipe(
+  getNodeChildrenUuidsByParent(Node.getParentUuid(node), Node.getNodeDefUuid(node)),
+  R.ifElse(
+    R.includes(Node.getUuid(node)),
+    R.identity,
+    R.append(Node.getUuid(node))
+  ),
+  arr => R.assocPath([keys.nodesByParent, Node.getParentUuid(node), Node.getNodeDefUuid(node)], arr, record)
+)(record)
+
+const indexNode = node => R.pipe(
+  indexNodeByParent(node),
+  indexNodeByNodeDef(node)
+)
+
+const removeNodeFromIndexByParent = node => record => R.pipe(
+  getNodeChildrenUuidsByParent(Node.getParentUuid(node), Node.getNodeDefUuid(node)),
+  R.without([Node.getUuid(node)]),
+  arr => R.assocPath([keys.nodesByParent, Node.getParentUuid(node), Node.getNodeDefUuid(node)], arr)(record)
+)(record)
+
+const removeNodeFromIndexByNodeDef = node => record => R.pipe(
+  getNodeUuidsByNodeDef(Node.getNodeDefUuid(node)),
+  R.without([Node.getUuid(node)]),
+  arr => R.assocPath([keys.nodesByNodeDef, Node.getNodeDefUuid(node)], arr)(record)
+)(record)
+
+const removeNodeFromIndex = node => R.pipe(
+  removeNodeFromIndexByParent(node),
+  removeNodeFromIndexByNodeDef(node)
+)
 
 module.exports = {
   keys,
@@ -238,6 +308,7 @@ module.exports = {
   getNodesArray,
   getNodesByDefUuid,
   getNodeChildrenByDefUuid,
+  getNodeChildByDefUuid,
   getNodeSiblingsByDefUuid,
   getRootNode,
   getNodeByUuid,

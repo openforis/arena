@@ -16,21 +16,22 @@ const getNodeCol = (nodeDefCol, record, nodeRow) => {
   const nodeCol = Node.getNodeDefUuid(nodeRow) === nodeDefUuid ?
     nodeRow :
     R.pipe(
-      Record.getNodeChildrenByDefUuid(nodeRow, nodeDefUuid),
-      R.head,
+      Record.getNodeChildByDefUuid(nodeRow, nodeDefUuid),
       R.defaultTo({})
     )(record)
 
   return NodeDef.isEntity(nodeDefCol) && R.isEmpty(nodeCol)
     ? getNodeCol(nodeDefCol, record, Record.getParentNode(nodeRow)(record))
     : nodeCol
-
 }
 
 const getValues = async (surveyInfo, nodeDefRow, record, nodeRow, nodeDefColumns, client) => {
   const values = await Promise.all(nodeDefColumns.map(async nodeDefCol => {
       const nodeCol = getNodeCol(nodeDefCol, record, nodeRow)
-      return await DataCol.getValues(surveyInfo, nodeDefCol, nodeCol, client)
+
+      const nodeColValues = await DataCol.getValues(surveyInfo, nodeDefCol, nodeCol, client)
+
+      return nodeColValues
     })
   )
   return R.flatten(values)

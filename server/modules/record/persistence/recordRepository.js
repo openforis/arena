@@ -56,7 +56,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
 
   return await client.map(`
     SELECT 
-      r.id, r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')}, validation,
+      r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')}, validation,
       n.date_modified,
       u.name as owner_name,
       ${nodeDefKeysSelect}
@@ -77,7 +77,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
     WHERE r.preview = FALSE
-    ORDER BY r.id DESC
+    ORDER BY r.date_created DESC
     LIMIT ${limit ? limit : 'ALL'}
     OFFSET ${offset}
   `,
