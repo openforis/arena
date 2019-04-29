@@ -72,7 +72,7 @@ export const assocAppError = error => state => R.pipe(
   R.head,
   R.defaultTo({ id: -1 }),
   last => 1 + last.id,
-  id => R.assocPath([keys.errors, id + ''], error)(state)
+  id => R.assocPath([keys.errors, id + ''], { id, ...error })(state)
 )(state)
 
 export const dissocAppError = error => R.dissocPath([keys.errors, error.id + ''])
