@@ -14,8 +14,11 @@ import CategoryLevel from '../../../../../common/survey/categoryLevel'
 import CategoryItem from '../../../../../common/survey/categoryItem'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
+import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 import { getSurveyForm } from '../../surveyForm/surveyFormState'
+
+import { canEditSurvey } from '../../../../../common/auth/authManager'
 
 import {
   getCategoryEditLevelActiveItem,
@@ -27,8 +30,6 @@ import { createCategoryLevelItem } from '../actions'
 import { putCategoryItemProp, putCategoryLevelProp } from '../actions'
 import { deleteCategoryItem, deleteCategoryLevel, setCategoryItemForEdit } from '../actions'
 
-import { getUser } from '../../../../app/appState'
-import { canEditSurvey } from '../../../../../common/auth/authManager'
 
 class LevelEdit extends React.Component {
 
@@ -127,7 +128,7 @@ const mapStateToProps = (state, props) => {
   const items = canAddItem ? getCategoryEditLevelItemsArray(index)(surveyForm) : []
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
 
-  const user = getUser(state)
+  const user = AppState.getUser(state)
 
   return {
     language,

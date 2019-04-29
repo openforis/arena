@@ -6,11 +6,11 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import * as R from 'ramda'
 
-import { getAppErrors, getAppState } from '../../app/appState'
+import * as AppState from '../../app/appState'
 
 import { closeAppError } from '../../app/actions'
 
-const AppError = ({error, closeAppError}) => (
+const AppError = ({ error, closeAppError }) => (
   <div className="app-errors__error">
 
     <button className="btn-s btn-close"
@@ -27,11 +27,11 @@ const AppError = ({error, closeAppError}) => (
   </div>
 )
 
-const AppErrors = ({errors, closeAppError}) => (
-  <TransitionGroup className={`app-errors${R.isEmpty(errors)?' hidden-transition':''}`}
-                   enter={true}
-                   appear={true}
-                   >
+const AppErrors = ({ errors, closeAppError }) => (
+  <TransitionGroup
+    className={`app-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`}
+    enter={true}
+    appear={true}>
     {
       errors.map(error =>
         <CSSTransition
@@ -47,17 +47,10 @@ const AppErrors = ({errors, closeAppError}) => (
   </TransitionGroup>
 )
 
-const mapStateToProps = (state) => {
-  const errors = R.pipe(
-    getAppState,
-    getAppErrors,
-  )(state)
-
-  return {
-    errors
-  }
-}
+const mapStateToProps = (state) => ({
+  errors: AppState.getAppErrors(state)
+})
 
 export default connect(
-  mapStateToProps, {closeAppError}
+  mapStateToProps, { closeAppError }
 )(AppErrors)

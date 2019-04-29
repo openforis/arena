@@ -21,10 +21,9 @@ import {
   getTaxonomyEditTaxa,
   getTaxonomyEditTaxaPerPage
 } from '../taxonomyEditState'
-
 import * as SurveyState from '../../../../survey/surveyState'
 import { getActiveJob } from '../../../appJob/appJobState'
-import { getUser } from '../../../../app/appState'
+import * as AppState from '../../../../app/appState'
 
 import {
   setTaxonomyForEdit,
@@ -113,7 +112,7 @@ const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
-  const user = getUser(state)
+  const user = AppState.getUser(state)
 
   return {
     surveyId: SurveyState.getSurveyId(state),

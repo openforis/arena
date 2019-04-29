@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import * as SurveyState from './surveyState'
-import { getUser } from '../app/appState'
+import * as AppState from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 import { appUserPrefUpdate } from '../app/actions'
 import { showAppJobMonitor } from '../loggedin/appJob/actions'
@@ -59,7 +59,7 @@ export const setActiveSurvey = (surveyId, draft = true) =>
     dispatchCurrentSurveyUpdate(dispatch, data.survey)
 
     //update userPref
-    const user = getUser(getState())
+    const user = AppState.getUser(getState())
     await axios.post(`/api/user/${user.id}/pref/${userPrefNames.survey}/${surveyId}`)
     dispatch({ type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId })
 

@@ -1,71 +1,84 @@
 import * as R from 'ramda'
+
 import { isSystemAdmin } from '../../common/auth/authManager'
+
 import Survey from '../../common/survey/survey'
 
-const app = 'app'
+const keys = {
+  status: 'status',
+  user: 'user',
+  authGroups: 'authGroups',
+  errors: 'errors',
+  systemError: 'systemError',
+}
+
+export const getState = R.prop('app')
 
 export const appStatus = {
   ready: 'ready'
 }
 
-export const isReady = R.pathEq([app, 'status'], appStatus.ready)
+export const isReady = R.pipe(getState, R.propEq(keys.status, appStatus.ready))
 
 // ==== APP USER
-const userKey = 'user'
-const authGroupsKey = 'authGroups'
 
-export const getUser = R.path([app, userKey])
+export const getUser = R.pipe(getState, R.prop(keys.user))
 
-export const logoutUser = R.dissoc(userKey)
+export const logoutUser = R.dissoc(keys.user)
 
 // On survey create, add current user to new survey's surveyAdmin group
 
 export const assocSurveyAdminGroup = surveyInfo =>
   appState => {
-    const user = R.prop(userKey, appState)
+    const user = R.prop(keys.user, appState)
 
     if (isSystemAdmin(user)) {
       return appState
     } else {
 
       const userGroups = R.pipe(
-        R.prop(authGroupsKey),
+        R.prop(keys.authGroups),
         R.append(Survey.getSurveyAdminGroup(surveyInfo))
       )(user)
 
-      return R.assocPath([userKey, authGroupsKey], userGroups, appState)
+      return R.assocPath([keys.user, keys.authGroups], userGroups, appState)
     }
   }
 
 export const dissocSurveyGroups = surveyId =>
   appState => {
-    const user = R.prop(userKey, appState)
+    const user = R.prop(keys.user, appState)
     // removing survey auth groups from user group
     const userGroups = R.reject(
       g => g.surveyId === surveyId,
-      R.prop(authGroupsKey, user)
+      R.prop(keys.authGroups, user)
     )
 
-    return R.assocPath([userKey, authGroupsKey], userGroups, appState)
+    return R.assocPath([keys.user, keys.authGroups], userGroups, appState)
   }
 
 // ==== APP ERRORS
-const errorsKey = 'errors'
 
-export const getAppState = R.prop(app)
-
-export const assocAppError = error => R.assocPath([errorsKey, error.id + ''], error)
-
-export const dissocAppError = error => R.dissocPath([errorsKey, error.id + ''])
-
-export const getAppErrors = R.pipe(
-  R.prop(errorsKey),
+const _getAppErrors = R.pipe(
+  R.prop(keys.errors),
   R.values,
   R.sort((a, b) => +b.id - +a.id)
 )
 
-const systemErrorKey = 'systemError'
+export const getAppErrors = R.pipe(getState, _getAppErrors)
 
-export const assocSystemError = (error) => R.assoc(systemErrorKey, error)
+export const assocAppError = error => state => R.pipe(
+  _getAppErrors,
+  R.head,
+  R.defaultTo({ id: -1 }),
+  last => 1 + last.id,
+  id => R.assocPath([keys.errors, id + ''], error)(state)
+)(state)
 
-export const getSystemError = R.path([app, systemErrorKey])
+export const dissocAppError = error => R.dissocPath([keys.errors, error.id + ''])
+
+// ==== System ERRORS
+
+export const assocSystemError = (error) => R.assoc(keys.systemError, error)
+
+export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
