@@ -13,16 +13,15 @@ import * as SurveyState from '../../../survey/surveyState'
 
 export const getSurveyForm = R.prop('surveyViews')
 
-const props = 'surveyForm'
-
 const getState = R.pipe(SurveyViewsState.getState, R.prop('surveyForm'))
 
 const getStateProp = prop => R.pipe(getState, R.prop(prop))
 
 const keys = {
-  nodeDefUuidPage: 'nodeDefUuidPage', // current form page nodeDef
+  nodeDefUuidPage: 'nodeDefUuidPage', // current page nodeDef
   nodeDefUuidEdit: 'nodeDefUuidEdit', // current nodeDef edit
   nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // nodeDef (entity) selected to add children to
+  nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
 }
 
 // ====== nodeDefUuidPage
@@ -67,12 +66,10 @@ export const getNodeDefAddChildTo = state => {
   return Survey.getNodeDefByUuid(nodeDefUuidAddChildTo)(survey)
 }
 
-// ====== current list of form pages
+// ====== nodeDefUuidPageNodeUuid
 
-const pageNodes = 'pageNodes'
-
-export const assocFormPageNode = (nodeDef, nodeUuid) => {
-  const path = [pageNodes, NodeDef.getUuid(nodeDef)]
+export const assocFormPageNode = (nodeDefUuid, nodeUuid) => {
+  const path = [keys.nodeDefUuidPageNodeUuid, nodeDefUuid]
   return nodeUuid
     ? R.assocPath(path, nodeUuid)
     : R.dissocPath(path)
@@ -82,27 +79,24 @@ export const assocFormPageNodes = formPageNodeUuidByNodeDefUuid => state =>
   R.pipe(
     R.keys,
     R.reduce(
-      (acc, nodeDefUuid) => {
+      (stateAcc, nodeDefUuid) => {
         const nodeUuid = R.prop(nodeDefUuid, formPageNodeUuidByNodeDefUuid)
-        const path = [pageNodes, nodeDefUuid]
-        return nodeUuid
-          ? R.assocPath(path, nodeUuid, acc)
-          : R.dissocPath(path, acc)
+        return assocFormPageNode(nodeDefUuid, nodeUuid)(stateAcc)
       },
       state
     )
   )(formPageNodeUuidByNodeDefUuid)
 
 export const getFormPageNodeUuid = nodeDef => R.pipe(
-  getSurveyForm,
-  R.path([props, pageNodes, NodeDef.getUuid(nodeDef)])
+  getStateProp(keys.nodeDefUuidPageNodeUuid),
+  R.prop(NodeDef.getUuid(nodeDef))
 )
 
 export const getFormPageParentNode = nodeDef =>
   state => {
     const survey = SurveyState.getSurvey(state)
-    const surveyForm = getSurveyForm(state)
-    const record = RecordState.getRecord(surveyForm)
+    const surveyViewsState = SurveyViewsState.getState(state)
+    const record = RecordState.getRecord(surveyViewsState)
 
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
     if (nodeDefParent) {

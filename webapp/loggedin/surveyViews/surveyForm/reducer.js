@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import { exportReducer } from '../../../utils/reduxUtils'
 import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
+import NodeDef from '../../../../common/survey/nodeDef'
 import * as SurveyFormState from './surveyFormState'
 
 import { appUserLogout } from '../../../app/actions'
@@ -38,7 +39,7 @@ const actionHandlers = {
       SurveyFormState.assocNodeDefAddChildTo(null)
     )(state),
 
-  [formPageNodeUpdate]: (state, { nodeDef, node }) => SurveyFormState.assocFormPageNode(nodeDef, node)(state),
+  [formPageNodeUpdate]: (state, { nodeDef, node }) => SurveyFormState.assocFormPageNode(NodeDef.getUuid(nodeDef), node)(state),
 
   // node def
   [nodeDefCreate]: (state, { nodeDef }) => SurveyFormState.assocParamsOnNodeDefCreate(nodeDef)(state),
