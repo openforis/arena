@@ -5,8 +5,7 @@ import * as  SurveyViewsState from '../surveyViewsState'
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import Record from '../../../../common/record/record'
-
-import { getPageUuid } from '../../../../common/survey/nodeDefLayout'
+import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 
 import * as RecordState from '../record/recordState'
 import * as SurveyState from '../../../survey/surveyState'
@@ -113,12 +112,12 @@ export const getFormPageParentNode = nodeDef =>
     return null
   }
 
-// on nodeDef create
+// on nodeDef create init form state
 export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
   assocFormNodeDefEdit(nodeDef),
   // if is entity and renders in its own page, assoc active page
   R.ifElse(
-    () => NodeDef.isEntity(nodeDef) && !!getPageUuid(nodeDef),
+    () => NodeDef.isEntity(nodeDef) && !!NodeDefLayout.getPageUuid(nodeDef),
     assocFormActivePage(nodeDef),
     R.identity,
   ),

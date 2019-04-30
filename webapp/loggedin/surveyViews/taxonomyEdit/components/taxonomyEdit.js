@@ -24,7 +24,7 @@ import {
 import * as SurveyState from '../../../../survey/surveyState'
 import * as AppJobState from '../../../appJob/appJobState'
 import * as AppState from '../../../../app/appState'
-import { getSurveyForm } from '../../surveyForm/surveyFormState'
+import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
 import {
   setTaxonomyForEdit,
@@ -111,7 +111,7 @@ class TaxonomyEdit extends React.Component {
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const surveyForm = getSurveyForm(state)
+  const surveyForm = SurveyFormState.getSurveyForm(state)
   const user = AppState.getUser(state)
   const activeJob = AppJobState.getActiveJob(state)
 
