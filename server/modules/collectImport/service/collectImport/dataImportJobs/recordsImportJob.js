@@ -30,8 +30,7 @@ class RecordsImportJob extends Job {
 
   async onStart () {
     await super.onStart()
-    const surveyId = this.getSurveyId()
-    await RecordManager.disableTriggers(surveyId, this.tx)
+    await RecordManager.disableTriggers(this.getSurveyId(), this.tx)
   }
 
   async execute (tx) {
@@ -81,9 +80,7 @@ class RecordsImportJob extends Job {
 
     await this.batchPersister.flush(this.tx)
 
-    const surveyId = this.getSurveyId()
-
-    await RecordManager.enableTriggers(surveyId, this.tx)
+    await RecordManager.enableTriggers(this.getSurveyId(), this.tx)
   }
 
   getEntryNames () {

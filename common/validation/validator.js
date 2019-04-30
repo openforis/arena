@@ -2,8 +2,10 @@ const R = require('ramda')
 const Promise = require('bluebird')
 
 const keywords = [
+  'asc',
   'date_created',
   'date_modified',
+  'desc',
   'file',
   'id',
   'node_def_uuid',
@@ -226,6 +228,7 @@ const recalculateValidity = validation =>
 module.exports = {
   keys,
   errorKeys,
+  keywords,
 
   validValidation,
 
