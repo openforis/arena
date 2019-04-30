@@ -18,7 +18,6 @@ const props = {
   name: 'name'
 }
 
-
 /**
  * CATEGORY
  */
@@ -76,7 +75,6 @@ const assocLevel = level =>
       levels => assocLevelsArray(levels)(category)
     )(category)
 
-
 /**
  * ITEMS
  */
@@ -111,6 +109,7 @@ const isLevelDeleteAllowed = level => R.pipe(
 
 module.exports = {
   props,
+  keys,
 
   // ======
   //CREATE

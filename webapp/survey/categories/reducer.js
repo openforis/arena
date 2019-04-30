@@ -1,7 +1,4 @@
-import * as R from 'ramda'
-
-import Category from '../../../common/survey/category'
-import CategoryLevel from '../../../common/survey/categoryLevel'
+import * as CategoriesState from './categoriesState'
 
 import { exportReducer } from '../../utils/reduxUtils'
 
@@ -27,35 +24,26 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
+  // categories
   [surveyDefsLoad]: (state, { categories }) => categories,
-
-  // category
-  [categoryCreate]: (state, { category }) => R.assoc(Category.getUuid(category), category, state),
-
-  [categoryUpdate]: (state, { category }) => R.assoc(Category.getUuid(category), category, state),
-
   [categoriesUpdate]: (state, { categories }) => categories,
 
-  [categoryPropUpdate]: (state, { category, key, value }) => R.pipe(
-    R.assocPath([Category.getUuid(category), 'props', key], value),
-    R.dissocPath([Category.getUuid(category), 'validation', 'fields', key])
-  )(state),
+  // category
+  [categoryCreate]: (state, { category }) => CategoriesState.assocCategory(category)(state),
 
-  [categoryDelete]: (state, { category }) => R.dissoc(Category.getUuid(category), state),
+  [categoryUpdate]: (state, { category }) => CategoriesState.assocCategory(category)(state),
+
+  [categoryPropUpdate]: (state, { category, key, value }) => CategoriesState.assocCategoryProp(category, key, value)(state),
+
+  [categoryDelete]: (state, { category }) => CategoriesState.dissocCategory(category)(state),
 
   // category level
-  [categoryLevelPropUpdate]: (state, { category, level, key, value }) => R.pipe(
-    R.assocPath([Category.getUuid(category), 'levels', CategoryLevel.getIndex(level) + '', 'props', key], value),
-    R.dissocPath([Category.getUuid(category), 'levels', CategoryLevel.getIndex(level) + '', 'validation', 'fields', key])
-  )(state),
+  [categoryLevelPropUpdate]: (state, { category, level, key, value }) => CategoriesState.assocCategoryLevelProp(category, level, key, value)(state),
 
-  [categoryLevelDelete]: (state, { category, level }) =>
-    R.dissocPath([Category.getUuid(category), 'levels', level.index + ''])(state),
+  [categoryLevelDelete]: (state, { category, level }) => CategoriesState.dissocCategoryLevel(category, level)(state),
 
-  // category items
-  [categoryItemPropUpdate]: (state, { category, item, key }) =>
-    R.dissocPath([Category.getUuid(category), 'validation', 'fields', 'items', 'fields', Category.getUuid(category), 'fields', key])
-    (state),
+  // category level items
+  [categoryItemPropUpdate]: (state, { category, item, key }) => CategoriesState.dissocCategoryLevelItemValidation(category, item, key)(state),
 
 }
 

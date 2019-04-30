@@ -6,7 +6,8 @@ const keys = {
   uuid: 'uuid',
   categoryUuid: 'categoryUuid',
   index: 'index',
-  props: 'props'
+  props: 'props',
+  items: 'items',
 }
 
 const props = {
