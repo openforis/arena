@@ -9,33 +9,39 @@ const Node = require('../../../../../common/record/node')
 const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
 const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
 
+const Expression = require('../../../../../common/exprParser/expression.js')
+
 const DataCol = require('../schemaRdb/dataCol')
 
 const NodeRepository = require('../../../record/persistence/nodeRepository')
 
-const runSelect = async (surveyId, tableName, cols, offset, limit, filter = '', sort = '', client) => {
+const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort = '', client) => {
   const schemaName = SchemaRdb.getName(surveyId)
+  const { str: filterQuery, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
+  const colParams = Expression.toParamsObj(cols, 'col')
+  const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
 
   return await client.any(`
-    SELECT ${cols.join(', ')} 
-    FROM ${schemaName}.${tableName}
-    ${R.isEmpty(filter) ? '' : `WHERE ${filter}`}
+    SELECT ${colParamNames.join(', ')} 
+    FROM $/schemaName:name/.$/tableName:name/
+    ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
     ${R.isEmpty(sort) ? '' : `ORDER BY ${sort} NULLS LAST`}
-    LIMIT ${limit}
-    OFFSET ${offset}
+    LIMIT $/limit/
+    OFFSET $/offset/
     `,
-    []
+    { ...filterParams, ...colParams, schemaName, tableName, limit, offset }
   )
 }
 
-const runCount = async (surveyId, tableName, filter = '', client) => {
+const runCount = async (surveyId, tableName, filterExpr, client) => {
   const schemaName = SchemaRdb.getName(surveyId)
+  const { str: filterQuery, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
 
   return await client.one(`
     SELECT count(*) 
-    FROM ${schemaName}.${tableName}
-    ${R.isEmpty(filter) ? '' : `WHERE ${filter}`}
-  `)
+    FROM $/schemaName:name/.$/tableName:name/
+    ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
+  `, { ...filterParams, schemaName, tableName })
 }
 
 const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {

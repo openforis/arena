@@ -5,6 +5,7 @@ const Promise = require('bluebird')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
+const Expression = require('../../../../common/exprParser/expression')
 
 const DataTable = require('../persistence/schemaRdb/dataTable')
 
@@ -41,8 +42,8 @@ const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output)
   csvStream.end()
 }
 
-const queryTable = async (user, surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols = [], cols = [],
-                          offset, limit, filter, sort, editMode = false) => {
+const queryTable = async (surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols = [], cols = [],
+                          offset, limit, filterExpr, sort, editMode = false) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId)
 
   // 1. find ancestor defs of table def
@@ -57,7 +58,7 @@ const queryTable = async (user, surveyId, nodeDefUuidTable, tableName, nodeDefUu
     R.append(DataTable.colNameRecordUuuid)
   )(cols)
 
-  const rows = await SurveyRdbManager.queryTable(surveyId, tableName, queryCols, offset, limit, filter, sort)
+  const rows = await SurveyRdbManager.queryTable(surveyId, tableName, queryCols, offset, limit, filterExpr, sort)
 
   return editMode
     ? await Promise.all(rows.map(
@@ -68,7 +69,7 @@ const queryTable = async (user, surveyId, nodeDefUuidTable, tableName, nodeDefUu
           ...row,
           cols: {},
           record: {
-            uuid: recordUuid
+            uuid: recordUuid,
           },
           parentNodeUuid: R.prop(`${NodeDef.getName(tableNodeDef)}_uuid`, row)
         }

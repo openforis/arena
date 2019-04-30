@@ -23,7 +23,7 @@ import {
   assocNodeDefUuidCols,
   dissocTableDataCols,
   assocTableDataRecordNodes,
-  assocTableDataRecordNodeValidations
+  assocTableDataRecordNodeValidations,
 } from './dataQueryState'
 
 import { nodesUpdate, validationsUpdate } from '../../../../surveyViews/record/actions'
@@ -62,7 +62,7 @@ const actionHandlers = {
   // record nodes update
   [nodesUpdate]: (state, { nodes }) => assocTableDataRecordNodes(nodes)(state),
 
-  [validationsUpdate]: (state, {validations}) => assocTableDataRecordNodeValidations(validations)(state),
+  [validationsUpdate]: (state, { validations }) => assocTableDataRecordNodeValidations(validations)(state),
 }
 
 export default exportReducer(actionHandlers)
