@@ -1,12 +1,27 @@
 const { types } = require('./types')
-const { allOperators } = require('./operators')
+
+const js2sqlOperators = {
+  '&&': 'AND',
+  '||': 'OR',
+  '===': '=',
+  '!==': '!=',
+  '>': '>',
+  '<': '<',
+  '>=': '>=',
+  '<=': '<=',
+  '+': '+',
+  '-': '-',
+  '*': '*',
+  '/': '/',
+  '%': '%',
+}
 
 const binaryToString = (node, params) => {
   const left = toString(node.left, params)
   const right = toString(node.right, left.params)
 
   return {
-    str: `${left.str} ${allOperators(node.operator)} ${right.str}`,
+    str: `${left.str} ${js2sqlOperators[node.operator]} ${right.str}`,
     params: right.params,
   }
 }
