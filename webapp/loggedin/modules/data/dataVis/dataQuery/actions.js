@@ -125,7 +125,7 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
       const [countResp, dataResp] = await Promise.all([
         axios.post(
           `/api/surveyRdb/${surveyId}/${tableName}/query/count`, {
-            filter: filter ? JSON.stringify(filter) : null,
+            filter: filter && JSON.stringify(filter),
           }
         ),
         queryTable(surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, filter, sort)

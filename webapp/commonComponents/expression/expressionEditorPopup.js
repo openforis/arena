@@ -20,6 +20,7 @@ class ExpressionEditorPopup extends React.Component {
     super(props)
 
     const { query, expr: exprParam, mode, canBeConstant } = props
+    // Either exprParam or expr are passed by the parent.
     const expr = exprParam || ExpressionParser.parseQuery(query, mode, canBeConstant)
 
     this.state = {

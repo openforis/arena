@@ -65,7 +65,7 @@ class TableHeader extends React.Component {
       <div className="table__header">
 
         <div className="data-operations">
-          <Tooltip messages={R.isNil(filter) ? [] : [Expression.toString(filter, Expression.modes.sql)]}>
+          <Tooltip messages={filter ? [Expression.toString(filter, Expression.modes.sql)] : []}>
             <button className={`btn btn-s btn-of-light btn-edit${filter ? ' highlight' : ''}`}
                     onClick={this.toggleExpressionEditor}>
               <span className="icon icon-filter icon-16px"/>
@@ -77,8 +77,8 @@ class TableHeader extends React.Component {
               nodeDefUuidContext={nodeDefUuidContext}
               expr={filter}
               mode={Expression.modes.sql}
-              onChange={(_, queryExpr) => {
-                updateTableFilter(queryExpr)
+              onChange={(_, expr) => {
+                updateTableFilter(expr)
                 this.toggleExpressionEditor()
               }}
               onClose={this.toggleExpressionEditor}

@@ -1,18 +1,18 @@
 const { types } = require('./types')
 
 const getSqlOperator = op => {
-  switch (op) {
-  case '||':
-    return 'OR'
-  case '&&':
-    return 'AND'
-  case '===':
-    return '='
-  case '!==':
-    return '!='
-  default:
+  const sqlOperator = {
+    '||': 'OR',
+    '&&': 'AND',
+    '===': '=',
+    '!==': '!=',
+  }[op]
+
+  if (!sqlOperator) {
     throw new Error(`Unknown operator: ${op}`)
   }
+
+  return sqlOperator
 }
 
 const binaryToString = (node, params) => {

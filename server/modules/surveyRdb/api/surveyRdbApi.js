@@ -41,7 +41,7 @@ module.exports.init = app => {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
       const tableName = Request.getRequiredParam(req, 'tableName')
       const cols = Request.getJsonParam(req, 'cols', [])
-      const filter = Request.getJsonParam(req, 'filter', null)
+      const filter = Request.getJsonParam(req, 'filter')
       const sort = Request.getRestParam(req, 'sort', '')
 
       Response.setContentTypeFile(res, 'data.csv', null, Response.contentTypes.csv)
