@@ -110,7 +110,7 @@ NodeDefSwitch.defaultProps = {
 const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, entry } = props
 
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyForm = SurveyFormState.getSurveyForm(state)
   const record = RecordState.getRecord(surveyForm)
 

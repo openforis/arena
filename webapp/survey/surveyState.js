@@ -13,9 +13,9 @@ const survey = 'survey'
 // READ
 export const getSurvey = R.prop(survey)
 
-export const getStateSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
+export const getSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
 
-export const getStateSurveyId = R.pipe(getStateSurveyInfo, R.prop('id'))
+export const getSurveyId = R.pipe(getSurvey, Survey.getId)
 
 // STATUS
 const keys = {
@@ -29,15 +29,15 @@ const statusKeys = {
   defsDraftFetched: 'defsDraftFetched',
 }
 
-export const surveyDefsFetched = R.pathEq([survey, keys.status, statusKeys.defsFetched], true)
+export const areDefsFetched = R.pathEq([survey, keys.status, statusKeys.defsFetched], true)
 
-export const surveyDefsDraftFetched = R.pathEq([survey, keys.status, statusKeys.defsDraftFetched], true)
+export const areDefsDraftFetched = R.pathEq([survey, keys.status, statusKeys.defsDraftFetched], true)
 
 export const hasCollectImportReport = R.propEq(hasCollectImportReport, true)
 
-export const setSurveyDefsFetched = draft => R.pipe(
+export const assocDefsFetched = draft => R.pipe(
   R.assoc(statusKeys.defsFetched, true),
   R.assoc(statusKeys.defsDraftFetched, draft),
 )
 
-export const setHasCollectImportReport = value => R.assoc(keys.hasCollectImportReport, value)
+export const assocHasCollectImportReport = value => R.assoc(keys.hasCollectImportReport, value)

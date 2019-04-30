@@ -82,7 +82,7 @@ class SurveyInfoView extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
   const readOnly = !AuthManager.canEditSurvey(user, surveyInfo)
 

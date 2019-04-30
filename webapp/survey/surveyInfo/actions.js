@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 import { debounceAction } from '../../utils/reduxUtils'
-import { getStateSurveyId } from '../surveyState'
+
+import * as SurveyState from '../surveyState'
 
 export const surveyInfoPropUpdate = 'survey/info/prop/update'
 export const surveyInfoValidationUpdate = 'survey/info/validation/update'
@@ -16,7 +17,7 @@ const _updateProp = (key, value) => {
 
   const action = async (dispatch, getState) => {
 
-    const surveyId = getStateSurveyId(getState())
+    const surveyId = SurveyState.getSurveyId(getState())
     const res = await axios.put(`/api/survey/${surveyId}/prop`, {key, value})
 
     const {validation} = res.data

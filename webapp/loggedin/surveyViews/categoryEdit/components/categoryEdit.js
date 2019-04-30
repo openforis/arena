@@ -12,8 +12,8 @@ import Category from '../../../../../common/survey/category'
 import CategoryLevel from '../../../../../common/survey/categoryLevel'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
-import { getUser } from '../../../../app/appState'
-import { getStateSurveyInfo } from '../../../../survey/surveyState'
+import * as AppState from '../../../../app/appState'
+import * as SurveyState from '../../../../survey/surveyState'
 
 import { putCategoryProp, createCategoryLevel, setCategoryForEdit } from '../actions'
 
@@ -71,7 +71,7 @@ const CategoryEdit = props => {
 }
 
 const mapStateToProps = state => ({
-  readOnly: !canEditSurvey(getUser(state), getStateSurveyInfo(state)),
+  readOnly: !canEditSurvey(AppState.getUser(state), SurveyState.getSurveyInfo(state)),
 })
 
 export default connect(

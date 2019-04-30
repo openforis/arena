@@ -8,7 +8,7 @@ export const homeCollectImportReportItemUpdate = 'home/collectImportReport/item/
 export const fetchCollectImportReportItems = () =>
   async (dispatch, getState) => {
     try {
-      const surveyId = SurveyState.getStateSurveyId(getState())
+      const surveyId = SurveyState.getSurveyId(getState())
 
       const { data } = await axios.get(`/api/survey/${surveyId}/collect-import/report`)
 
@@ -20,7 +20,7 @@ export const fetchCollectImportReportItems = () =>
 export const updateCollectImportReportItem = (itemId, resolved) =>
   async (dispatch, getState) => {
     try {
-      const surveyId = SurveyState.getStateSurveyId(getState())
+      const surveyId = SurveyState.getSurveyId(getState())
 
       const { data } = await axios.post(`/api/survey/${surveyId}/collect-import/report/${itemId}/resolve`, { resolved })
 

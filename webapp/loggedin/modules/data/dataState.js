@@ -1,3 +1,3 @@
 import * as R from 'ramda'
 
-export const getData = R.propOr({},'data')
+export const getState = R.prop('data')

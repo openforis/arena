@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { appStatus } from './appState'
+import * as AppState from './appState'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
@@ -13,7 +13,7 @@ export const initApp = () => async (dispatch) => {
   const { data } = resp
   const { user, survey } = data
 
-  dispatch({ type: appStatusChange, status: appStatus.ready, user, survey })
+  dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user, survey })
 }
 
 export const logout = () => async dispatch => {

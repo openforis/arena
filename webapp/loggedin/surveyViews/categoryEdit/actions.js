@@ -1,13 +1,14 @@
 import axios from 'axios'
 
 import { toUuidIndexedObj } from '../../../../common/survey/surveyUtils'
-import { getStateSurveyId } from '../../../survey/surveyState'
+import { debounceAction } from '../../../utils/reduxUtils'
+
+import * as SurveyState from '../../../survey/surveyState'
 
 import Category from '../../../../common/survey/category'
 import CategoryLevel from '../../../../common/survey/categoryLevel'
 import CategoryItem from '../../../../common/survey/categoryItem'
 
-import { debounceAction } from '../../../utils/reduxUtils'
 import {
   categoryCreate,
   categoryDelete,
@@ -56,7 +57,7 @@ export const setCategoryItemForEdit = (category, level, item, edit = true) => as
 //======
 
 export const createCategory = () => async (dispatch, getState) => {
-  const surveyId = getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.post(`/api/survey/${surveyId}/categories`, Category.newCategory())
 
   const category = data.category
@@ -68,7 +69,7 @@ export const createCategory = () => async (dispatch, getState) => {
 
 export const createCategoryLevel = (category) => async (dispatch, getState) => {
   const level = Category.newLevel(category)
-  const surveyId = getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
 
   const { data } = await axios.post(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/levels`, level)
   dispatchCategoryUpdate(dispatch, data.category)
@@ -78,7 +79,7 @@ export const createCategoryLevelItem = (category, level, parentItem) => async (d
   const item = CategoryItem.newItem(CategoryLevel.getUuid(level), parentItem)
   dispatch({ type: categoryItemCreate, level, item })
 
-  const surveyId = getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.post(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items`, item)
 
   dispatchCategoryUpdate(dispatch, data.category)
@@ -95,7 +96,7 @@ const loadLevelItems = (categoryUuid, levelIndex = 0, parentUuid = null) =>
     //reset level items first
     dispatch({ type: categoryItemsUpdate, levelIndex, items: null })
 
-    const surveyId = getStateSurveyId(getState())
+    const surveyId = SurveyState.getSurveyId(getState())
     const { data } = await axios.get(
       `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
       { params: { draft: true, parentUuid } }
@@ -112,7 +113,7 @@ export const putCategoryProp = (category, key, value) => async (dispatch, getSta
   dispatch({ type: categoryPropUpdate, category, key, value })
 
   const action = async () => {
-    const surveyId = getStateSurveyId(getState())
+    const surveyId = SurveyState.getSurveyId(getState())
     const { data } = await axios.put(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}`, { key, value })
     dispatch({ type: categoriesUpdate, categories: data.categories })
   }
@@ -126,7 +127,7 @@ export const putCategoryLevelProp = (category, level, key, value) => async (disp
   const levelUuid = CategoryLevel.getUuid(level)
 
   const action = async () => {
-    const surveyId = getStateSurveyId(getState())
+    const surveyId = SurveyState.getSurveyId(getState())
     const { data } = await axios.put(
       `/api/survey/${surveyId}/categories/${Category.getUuid(category)}/levels/${levelUuid}`,
       { key, value }
@@ -143,7 +144,7 @@ export const putCategoryItemProp = (category, level, item, key, value) => async 
   const itemUuid = CategoryItem.getUuid(item)
 
   const action = async () => {
-    const surveyId = getStateSurveyId(getState())
+    const surveyId = SurveyState.getSurveyId(getState())
     const { data } = await axios.put(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${itemUuid}`, {
       key,
       value
@@ -161,7 +162,7 @@ export const putCategoryItemProp = (category, level, item, key, value) => async 
 export const deleteCategory = category => async (dispatch, getState) => {
   dispatch({ type: categoryDelete, category })
 
-  const surveyId = getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.delete(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}`)
   dispatch({ type: categoriesUpdate, categories: data.categories })
 }
@@ -170,7 +171,7 @@ export const deleteCategoryLevel = (category, level) => async (dispatch, getStat
   dispatch({ type: categoryLevelDelete, category, level })
 
   //delete level and items from db
-  const surveyId = getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.delete(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/levels/${CategoryLevel.getUuid(level)}`)
   dispatchCategoryUpdate(dispatch, data.category)
 }
@@ -178,7 +179,7 @@ export const deleteCategoryLevel = (category, level) => async (dispatch, getStat
 export const deleteCategoryItem = (category, level, item) => async (dispatch, getState) => {
   dispatch({ type: categoryItemDelete, item, level })
 
-  const surveyId = getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.delete(`/api/survey/${surveyId}/categories/${Category.getUuid(category)}/items/${CategoryItem.getUuid(item)}`)
   dispatchCategoryUpdate(dispatch, data.category)
 }

@@ -2,17 +2,10 @@ import * as R from 'ramda'
 
 import { exportReducer, assocActionProps } from '../utils/reduxUtils'
 
-import { startJob, updateActiveJob } from '../loggedin/appJob/appJobState'
-import {
-  assocAppError,
-  assocSystemError,
-  assocSurveyAdminGroup,
-  dissocAppError,
-  dissocSurveyGroups,
-  getAppErrors,
-  logoutUser
-} from './appState'
 import { setUserPref } from '../../common/user/userPrefs'
+
+import * as AppJobState from '../loggedin/appJob/appJobState'
+import * as AppState from './appState'
 
 import {
   appStatusChange,
@@ -23,12 +16,6 @@ import {
   systemErrorThrow,
 } from './actions'
 import { loginSuccess } from '../login/actions'
-
-/**
- * ======
- * App Jobs
- * ======
- */
 import { appJobStart, appJobActiveUpdate } from '../loggedin/appJob/actions'
 import { surveyCreate, surveyDelete } from '../survey/actions'
 
@@ -49,31 +36,23 @@ const actionHandlers = {
     return assocActionProps(state, { user })
   },
 
-  [appUserLogout]: (state) => logoutUser(state),
+  [appUserLogout]: (state) => AppState.logoutUser(state),
 
-  [surveyCreate]: (state, { survey: { info } }) => assocSurveyAdminGroup(info)(state),
+  [surveyCreate]: (state, { survey: { info } }) => AppState.assocSurveyAdminGroup(info)(state),
 
-  [surveyDelete]: (state, { surveyId }) => dissocSurveyGroups(surveyId)(state),
+  [surveyDelete]: (state, { surveyId }) => AppState.dissocSurveyGroups(surveyId)(state),
 
   // ====== app job
-  [appJobStart]: (state, { job, onComplete, autoHide }) =>
-    startJob(job, onComplete, autoHide)(state),
+  [appJobStart]: (state, { job, onComplete, autoHide }) => AppJobState.startJob(job, onComplete, autoHide)(state),
 
-  [appJobActiveUpdate]: (state, { job }) =>
-    updateActiveJob(job)(state),
+  [appJobActiveUpdate]: (state, { job }) => AppJobState.updateActiveJob(job)(state),
 
   // ===== app errors
-  [appErrorCreate]: (state, { error }) => R.pipe(
-    getAppErrors,
-    R.head,
-    R.defaultTo({ id: -1 }),
-    last => 1 + last.id,
-    id => assocAppError({ id, ...error })(state)
-  )(state),
+  [appErrorCreate]: (state, { error }) => AppState.assocAppError(error)(state),
 
-  [appErrorDelete]: (state, { error }) => dissocAppError(error)(state),
+  [appErrorDelete]: (state, { error }) => AppState.dissocAppError(error)(state),
 
-  [systemErrorThrow]: (state, { error }) => assocSystemError(error)(state),
+  [systemErrorThrow]: (state, { error }) => AppState.assocSystemError(error)(state),
 
 }
 

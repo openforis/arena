@@ -89,7 +89,7 @@ class HomeView extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  surveyInfo: SurveyState.getStateSurveyInfo(state)
+  surveyInfo: SurveyState.getSurveyInfo(state)
 })
 
 export default connect(mapStateToProps)(HomeView)

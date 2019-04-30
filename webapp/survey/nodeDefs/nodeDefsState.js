@@ -13,7 +13,7 @@ const assocNodeDefProp = (nodeDefUuid, key, value) => R.pipe(
 )
 
 export const assocNodeDefProps = (nodeDefUuid, props, propsAdvanced) => state => {
-  const allProps = R.merge(props, propsAdvanced)
+  const allProps = R.mergeLeft(props, propsAdvanced)
   return R.reduce(
     (acc, key) => assocNodeDefProp(nodeDefUuid, key, R.prop(key, allProps))(acc),
     state,

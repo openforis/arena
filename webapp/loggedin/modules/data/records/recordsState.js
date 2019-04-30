@@ -1,14 +1,25 @@
 import * as R from 'ramda'
-import { appModules } from '../../../appModules'
 
-const records = 'records'
+import * as DateState from '../dataState'
 
-export const getRecordsList = R.pathOr([], [appModules.data, records, 'list'])
+const keys = {
+  list: 'list',
+  nodeDefKeys: 'nodeDefKeys',
+  count: 'count',
+  limit: 'limit',
+  offset: 'offset',
+}
 
-export const getRecordsNodeDefKeys = R.pathOr([], [appModules.data, records, 'nodeDefKeys'])
+const getState = R.pipe(DateState.getState, R.prop('records'))
 
-export const getRecordsCount = R.path([appModules.data, records, 'count'])
+const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 
-export const getRecordsLimit = R.path([appModules.data, records, 'limit'])
+export const getRecordsList = getStateProp(keys.list, [])
 
-export const getRecordsOffset = R.path([appModules.data, records, 'offset'])
+export const getRecordsNodeDefKeys = getStateProp(keys.nodeDefKeys, [])
+
+export const getRecordsCount = getStateProp(keys.count)
+
+export const getRecordsLimit = getStateProp(keys.limit)
+
+export const getRecordsOffset = getStateProp(keys.offset)
