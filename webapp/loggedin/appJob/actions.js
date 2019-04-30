@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { getActiveJob, getActiveJobOnCompleteCallback } from './appJobState'
+import * as AppJobState from './appJobState'
 
 export const appJobStart = 'app/job/start'
 export const appJobActiveUpdate = 'app/job/active/update'
@@ -19,8 +19,8 @@ export const cancelActiveJob = () => async (dispatch) => {
 export const activeJobUpdate = job =>
   (dispatch, getState) => {
     if (job && job.succeeded) {
-      const stateJob = getActiveJob(getState())
-      const onComplete = getActiveJobOnCompleteCallback(stateJob)
+      const stateJob = AppJobState.getActiveJob(getState())
+      const onComplete = AppJobState.getActiveJobOnCompleteCallback(stateJob)
       if (stateJob && onComplete) {
         onComplete(job)
       }

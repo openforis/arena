@@ -22,8 +22,9 @@ import {
   getTaxonomyEditTaxaPerPage
 } from '../taxonomyEditState'
 import * as SurveyState from '../../../../survey/surveyState'
-import { getActiveJob } from '../../../appJob/appJobState'
+import * as AppJobState from '../../../appJob/appJobState'
 import * as AppState from '../../../../app/appState'
+import { getSurveyForm } from '../../surveyForm/surveyFormState'
 
 import {
   setTaxonomyForEdit,
@@ -32,7 +33,6 @@ import {
   initTaxaList,
   loadTaxa,
 } from '../actions'
-import { getSurveyForm } from '../../surveyForm/surveyFormState'
 import { canEditSurvey } from '../../../../../common/auth/authManager'
 
 class TaxonomyEdit extends React.Component {
@@ -113,6 +113,7 @@ const mapStateToProps = state => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyForm = getSurveyForm(state)
   const user = AppState.getUser(state)
+  const activeJob = AppJobState.getActiveJob(state)
 
   return {
     surveyId: SurveyState.getSurveyId(state),
@@ -121,7 +122,7 @@ const mapStateToProps = state => {
     taxaTotalPages: getTaxonomyEditTaxaTotalPages(surveyForm),
     taxaPerPage: getTaxonomyEditTaxaPerPage(surveyForm),
     taxa: getTaxonomyEditTaxa(surveyForm),
-    activeJob: getActiveJob(state),
+    activeJob,
     readOnly: !canEditSurvey(user, surveyInfo)
   }
 }
