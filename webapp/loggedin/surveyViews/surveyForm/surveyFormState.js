@@ -94,8 +94,7 @@ export const getFormPageNodeUuid = nodeDef => R.pipe(
 export const getFormPageParentNode = nodeDef =>
   state => {
     const survey = SurveyState.getSurvey(state)
-    const surveyViewsState = SurveyViewsState.getState(state)
-    const record = RecordState.getRecord(surveyViewsState)
+    const record = RecordState.getRecord(state)
 
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
     if (nodeDefParent) {

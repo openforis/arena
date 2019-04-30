@@ -102,9 +102,8 @@ SurveyFormView.defaultProps = {
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const surveyForm = SurveyFormState.getSurveyForm(state)
   const nodeDef = SurveyFormState.getFormActivePageNodeDef(state)
-  const record = RecordState.getRecord(surveyForm)
+  const record = RecordState.getRecord(state)
 
   const mapEntryProps = () => ({
     parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,
