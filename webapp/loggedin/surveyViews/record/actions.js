@@ -47,7 +47,7 @@ export const dispatchRecordDelete = (history) =>
 export const createRecord = (history, preview = false) => async (dispatch, getState) => {
   const state = getState()
   const user = AppState.getUser(state)
-  const surveyId = SurveyState.getStateSurveyId(state)
+  const surveyId = SurveyState.getSurveyId(state)
 
   const record = Record.newRecord(user, preview)
 
@@ -98,7 +98,7 @@ const _updateNodeDebounced = (node, file, delay) => {
       ? { headers: { 'content-type': 'multipart/form-data' } }
       : {}
 
-    const surveyId = SurveyState.getStateSurveyId(getState())
+    const surveyId = SurveyState.getSurveyId(getState())
     await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData, config)
   }
 
@@ -108,7 +108,7 @@ const _updateNodeDebounced = (node, file, delay) => {
 export const updateRecordStep = (step, history) => async (dispatch, getState) => {
   const state = getState()
 
-  const surveyId = SurveyState.getStateSurveyId(state)
+  const surveyId = SurveyState.getSurveyId(state)
   const recordUuid = RecordState.getRecordUuid(state)
 
   await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/step`, { step })
@@ -124,14 +124,14 @@ export const updateRecordStep = (step, history) => async (dispatch, getState) =>
 export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   dispatch({ type: nodeDelete, node })
 
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
 }
 
 export const deleteRecord = (history) => async (dispatch, getState) => {
   const state = getState()
 
-  const surveyId = SurveyState.getStateSurveyId(state)
+  const surveyId = SurveyState.getSurveyId(state)
   const recordUuid = RecordState.getRecordUuid(state)
 
   // 1. checkout (close server thread)
@@ -148,7 +148,7 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
  * ============
  */
 export const checkInRecord = (recordUuid, activeParentNodeUuid, activeNodeDefUuid) => async (dispatch, getState) => {
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
 
   const record = data.record
@@ -191,7 +191,7 @@ export const checkInRecord = (recordUuid, activeParentNodeUuid, activeNodeDefUui
 }
 
 export const checkOutRecord = recordUuid => async (dispatch, getState) => {
-  const surveyId = SurveyState.getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   // checkout can be called after logout, therefore checking if survey still exists in state
   if (surveyId)
     await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`)

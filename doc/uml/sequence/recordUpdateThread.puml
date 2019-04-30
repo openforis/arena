@@ -1,0 +1,161 @@
+@startuml
+
+' colors:
+'   level 1 : #FFCFCF
+'   level 2 : #FF6F6F
+
+' INIT
+title Node Update
+hide footbox
+
+participant WebSocket
+participant RecordService
+participant RecordUpdateThread
+participant RecordUpdateManager
+participant NodeUpdateManager
+participant NodeDependentUpdateManager
+participant RecordValidationManager
+participant AttributeValidator
+participant TypeValidator
+participant KeysUniquenessValidator
+participant CountValidator
+participant RecordExprParser
+participant NodeDependencyManager
+database RecordRepository
+database NodeRepository
+participant SurveyRdbManager
+
+RecordService --> RecordUpdateThread: postMessage
+
+RecordUpdateThread --> RecordUpdateManager ++ : persistNode
+
+    'RecordUpdateManager.persistNode
+    RecordUpdateManager -> NodeUpdateManager ++ : persistNode
+        NodeUpdateManager -> NodeRepository ++ : updateNode
+            NodeRepository -> NodeUpdateManager -- : node
+
+        NodeUpdateManager -> NodeUpdateManager ++ #FFCFCF : deleteDependentCodeNodes
+            NodeUpdateManager -> NodeRepository ++ : deleteNode
+                NodeRepository -> NodeUpdateManager -- : null
+            NodeUpdateManager -> NodeUpdateManager --: nodes
+
+        NodeUpdateManager -> RecordUpdateManager -- : nodes
+
+
+    'RecordUpdateManager._onNodesUpdate START
+    RecordUpdateManager -> RecordUpdateManager ++ #FFCFCF: _onNodesUpdate
+
+        RecordUpdateManager --> RecordUpdateThread ++ : nodes
+            RecordUpdateThread --> WebSocket -- : notify user with nodes
+
+        RecordUpdateManager -> NodeDependentUpdateManager ++ : updateNodes
+            loop N of dependent nodes (persist node)
+
+            '1. UPDATE APPLICABILITY
+            NodeDependentUpdateManager -> NodeDependentUpdateManager ++ #FFCFCF: updateApplicability
+                NodeDependentUpdateManager -> NodeDependencyManager ++ : findDependentNodes
+                    NodeDependencyManager -> NodeDependentUpdateManager -- : nodes
+                NodeDependentUpdateManager -> RecordExprParser ++ : getApplicableExpression
+                    RecordExprParser -> NodeDependentUpdateManager -- : expr
+                NodeDependentUpdateManager -> RecordExprParser ++ : evalNodeQuery
+                    RecordExprParser -> NodeDependentUpdateManager -- : value
+                NodeDependentUpdateManager -> NodeDependencyManager ++ : persistDependentNodeApplicable
+                    NodeDependencyManager -> NodeRepository ++ : updateChildrenApplicability
+                        NodeRepository -> NodeDependencyManager -- : nodes
+                    NodeDependencyManager -> NodeDependentUpdateManager -- : nodes
+                NodeDependentUpdateManager -> NodeDependentUpdateManager -- : nodes
+
+             '2. UPDATE DEFAULT VALUE
+             NodeDependentUpdateManager -> NodeDependentUpdateManager ++ #FFCFCF : updateDefaultValue
+                 NodeDependentUpdateManager -> NodeDependencyManager ++ : findDependentNodes
+                     NodeDependencyManager -> NodeDependentUpdateManager -- : nodes
+                 NodeDependentUpdateManager -> RecordExprParser ++ : getApplicableExpression
+                     RecordExprParser -> NodeDependentUpdateManager -- : expr
+                 NodeDependentUpdateManager -> RecordExprParser ++ : evalNodeQuery
+                     RecordExprParser -> NodeDependentUpdateManager -- : value
+                 NodeDependentUpdateManager -> NodeDependencyManager ++ : persistDependentNodeValue
+                     NodeDependencyManager -> NodeDependencyManager ++ #FFCFCF: toNodeValue
+                        NodeDependencyManager -> NodeDependencyManager -- : nodeValue
+                     NodeDependencyManager -> NodeRepository ++ : updateNode
+                         NodeRepository -> NodeDependencyManager -- : node
+                     NodeDependencyManager -> NodeDependentUpdateManager -- : nodes
+                 NodeDependentUpdateManager -> NodeDependentUpdateManager -- : nodes
+
+            end
+            NodeDependentUpdateManager -> RecordUpdateManager -- : nodes
+
+        RecordUpdateManager --> RecordUpdateThread ++ : nodes
+            RecordUpdateThread --> WebSocket -- : notify user with nodes
+
+        '3. UPDATE Validation
+        RecordUpdateManager -> RecordValidationManager ++ : validateNodes
+
+            '3.1 attributeValidations
+            RecordValidationManager -> AttributeValidator ++ : validateSelfAndDependentAttributes
+                loop N = attributes
+                    AttributeValidator -> NodeDependencyManager ++ : findDependentNodes
+                        NodeDependencyManager -> AttributeValidator -- : dependents
+                        loop N = attributeAndDependents
+                            AttributeValidator -> AttributeValidator ++ #FFCFCF : validateAttribute
+                                AttributeValidator -> AttributeValidator ++ #FF6F6F: validateRequired
+                                    AttributeValidator -> AttributeValidator -- : validation
+
+                                AttributeValidator -> TypeValidator ++ : validateValueType
+                                    TypeValidator -> AttributeValidator -- : validation
+
+                                AttributeValidator -> AttributeValidator ++ #FF6F6F : validateNodeValidations
+                                    AttributeValidator -> RecordExprParser ++ : getApplicableExpressions
+                                        RecordExprParser -> AttributeValidator -- : expressions
+                                        loop N = expressions
+                                            AttributeValidator -> RecordExprParser ++ : evalNodeQuery
+                                                RecordExprParser -> AttributeValidator -- : valid
+                                        end
+                                    AttributeValidator -> AttributeValidator -- : validations
+
+                                AttributeValidator -> AttributeValidator -- : attributeValidations
+                        end
+                end
+                AttributeValidator -> RecordValidationManager -- : attributeValidations
+
+            '3.2 CountValidator
+            RecordValidationManager -> CountValidator ++ : validateChildrenCount
+                CountValidator -> RecordValidationManager  -- : validation
+
+            '3.3 Record KeysUniquenessValidator
+            RecordValidationManager -> KeysUniquenessValidator ++ : validateRecordKeysUniqueness
+                KeysUniquenessValidator -> SurveyRdbManager ++ : queryRootTableByRecordKeys
+                    SurveyRdbManager -> KeysUniquenessValidator -- : records
+                    'KeysUniquenessValidator has an internal method fetchEntityKeyNodes, which does not a fetch - TODO RENAME TO get
+                KeysUniquenessValidator -> RecordValidationManager  -- : validation
+
+            '3.4 EntityKeysValidations
+            RecordValidationManager -> RecordValidationManager ++ #FFCFCF : validateEntityKeysUniqueness
+                RecordValidationManager -> RecordValidationManager ++ #FF6F6F : getUpdatedEntitiesWithKeys
+                    RecordValidationManager -> RecordValidationManager -- : entities
+                    loop N = entities
+                        RecordValidationManager -> KeysUniquenessValidator ++ : validateEntityKeysUniqueness
+                            KeysUniquenessValidator -> RecordValidationManager -- : validations
+                    end
+                RecordValidationManager -> RecordValidationManager -- : validations
+
+            '3.5 persistValidation
+            RecordValidationManager -> RecordValidationManager ++ #FFCFCF : persistValidation
+                RecordValidationManager -> RecordRepository ++ : updateValidation
+                    RecordRepository -> RecordValidationManager -- :
+                RecordValidationManager -> RecordValidationManager -- :
+
+            RecordValidationManager -> RecordUpdateManager -- : validations
+
+        RecordUpdateManager --> RecordUpdateThread ++ : validations
+            RecordUpdateThread --> WebSocket -- : notify user with validations
+
+        RecordUpdateManager -> SurveyRdbManager ++ : updateTableNodes
+            SurveyRdbManager -> RecordUpdateManager -- :
+
+        'RecordUpdateManager._onNodesUpdate END
+        RecordUpdateManager -> RecordUpdateManager -- : record
+
+RecordUpdateManager -> RecordUpdateThread -- : record
+
+
+@enduml

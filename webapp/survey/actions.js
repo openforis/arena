@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-import { getStateSurveyId, surveyDefsFetched, surveyDefsDraftFetched } from './surveyState'
-import { getUser } from '../app/appState'
+import * as SurveyState from './surveyState'
+import * as AppState from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
 import { appUserPrefUpdate } from '../app/actions'
 import { showAppJobMonitor } from '../loggedin/appJob/actions'
@@ -28,11 +28,11 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
   const state = getState()
 
   if (
-    !surveyDefsFetched(state) ||
-    (surveyDefsDraftFetched(state) !== draft)
+    !SurveyState.areDefsFetched(state) ||
+    (SurveyState.areDefsDraftFetched(state) !== draft)
   ) {
 
-    const surveyId = getStateSurveyId(state)
+    const surveyId = SurveyState.getSurveyId(state)
 
     const res = await Promise.all([
       fetchNodeDefs(surveyId, draft, validate),
@@ -59,7 +59,7 @@ export const setActiveSurvey = (surveyId, draft = true) =>
     dispatchCurrentSurveyUpdate(dispatch, data.survey)
 
     //update userPref
-    const user = getUser(getState())
+    const user = AppState.getUser(getState())
     await axios.post(`/api/user/${user.id}/pref/${userPrefNames.survey}/${surveyId}`)
     dispatch({ type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId })
 
@@ -70,7 +70,7 @@ export const setActiveSurvey = (surveyId, draft = true) =>
 // ==== UPDATE
 
 export const publishSurvey = () => async (dispatch, getState) => {
-  const surveyId = getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
 
   const { data } = await axios.put(`/api/survey/${surveyId}/publish`)
 
@@ -84,7 +84,7 @@ export const publishSurvey = () => async (dispatch, getState) => {
 // == DELETE
 
 export const deleteSurvey = () => async (dispatch, getState) => {
-  const surveyId = getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   await axios.delete(`/api/survey/${surveyId}`)
 
   dispatch({ type: surveyDelete, surveyId })

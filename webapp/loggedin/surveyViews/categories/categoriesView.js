@@ -9,8 +9,8 @@ import Survey from '../../../../common/survey/survey'
 import Category from '../../../../common/survey/category'
 import { canEditSurvey } from '../../../../common/auth/authManager'
 
-import { getUser } from '../../../app/appState'
-import { getStateSurveyInfo, getSurvey } from '../../../survey/surveyState'
+import * as AppState from '../../../app/appState'
+import * as SurveyState from '../../../survey/surveyState'
 import { getCategoryForEdit } from '../categoryEdit/categoryEditState'
 import { getSurveyForm } from '../surveyForm/surveyFormState'
 
@@ -60,9 +60,9 @@ class CategoriesView extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  const survey = getSurvey(state)
-  const surveyInfo = getStateSurveyInfo(state)
-  const user = getUser(state)
+  const survey = SurveyState.getSurvey(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const user = AppState.getUser(state)
 
   const categories = R.pipe(
     Survey.getCategoriesArray,

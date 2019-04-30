@@ -54,7 +54,7 @@ class TableColumnEdit extends React.Component {
 
 const mapStateToProps = (state, props) => {
   const { record } = props
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
 
   return {

@@ -76,7 +76,7 @@ const NavigationButton = (props) => {
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const rootNodeDef = Survey.getRootNodeDef(survey)
 
   const { edit, nodeDef = rootNodeDef } = props

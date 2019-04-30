@@ -1,5 +1,7 @@
 const log4js = require('log4js')
 
+const logger = log4js.getLogger('arena')
+
 log4js.configure({
   appenders: {
     console: { type: 'console' },
@@ -13,10 +15,12 @@ log4js.configure({
   }
 })
 
-const getLogger = () => log4js.getLogger('arena')
-
 module.exports = {
-  debug: message => getLogger().debug(message),
-  info: message => getLogger().info(message),
-  error: message => getLogger().error(message),
+  isDebugEnabled,
+  isInfoEnabled,
+  isErrorEnabled,
+
+  debug: msg => isDebugEnabled() && logger.debug(msg),
+  info: msg => isInfoEnabled() && logger.info(msg),
+  error: msg => isErrorEnabled() && logger.error(msg),
 }

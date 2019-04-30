@@ -24,7 +24,7 @@ class SurveyDefsLoader extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  ready: SurveyState.surveyDefsFetched(state)
+  ready: SurveyState.areDefsFetched(state)
 })
 
 export default connect(

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Promise from 'bluebird'
 
-import { getStateSurveyId } from '../../../../survey/surveyState'
+import * as SurveyState from '../../../../survey/surveyState'
 
 export const recordsListInit = 'data/records/list/init'
 export const recordsListUpdate = 'data/records/list/update'
@@ -10,11 +10,11 @@ const limit = 15
 
 const getRecords = (surveyId, offset = 0) => axios.get(
   `/api/survey/${surveyId}/records`,
-  {params: {offset, limit}}
+  { params: { offset, limit } }
 )
 
 export const initRecordsList = () => async (dispatch, getState) => {
-  const surveyId = getStateSurveyId(getState())
+  const surveyId = SurveyState.getSurveyId(getState())
   const offset = 0
 
   const [countResp, recordsResp] = await Promise.all([
@@ -33,8 +33,8 @@ export const initRecordsList = () => async (dispatch, getState) => {
 }
 
 export const fetchRecords = (offset = 0) => async (dispatch, getState) => {
-  const surveyId = getStateSurveyId(getState())
-  const {data} = await getRecords(surveyId, offset)
+  const surveyId = SurveyState.getSurveyId(getState())
+  const { data } = await getRecords(surveyId, offset)
 
   dispatch({
     type: recordsListUpdate,

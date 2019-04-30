@@ -139,7 +139,7 @@ class RecordsView extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const surveyInfo = SurveyState.getStateSurveyInfo(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
 
   return {
     user: UserState.getUser(state),

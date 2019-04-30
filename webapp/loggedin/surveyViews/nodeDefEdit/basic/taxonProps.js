@@ -9,7 +9,7 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 import Taxonomy from '../../../../../common/survey/taxonomy'
 import Validator from '../../../../../common/validation/validator'
 
-import { getSurvey } from '../../../../survey/surveyState'
+import * as SurveyState from '../../../../survey/surveyState'
 import { getFormNodeDefEdit, getSurveyForm } from '../../surveyForm/surveyFormState'
 
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
@@ -67,7 +67,7 @@ const TaxonProps = (props) => {
 }
 
 const mapStateToProps = state => {
-  const survey = getSurvey(state)
+  const survey = SurveyState.getSurvey(state)
   const surveyForm = getSurveyForm(state)
   const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
 

@@ -4,7 +4,7 @@ import { Redirect } from 'react-router'
 
 import { login } from './../actions'
 import { appModuleUri } from '../../loggedin/appModules'
-import { getUser } from '../../app/appState'
+import * as AppState from '../../app/appState'
 
 class LoginForm extends React.Component {
 
@@ -47,7 +47,7 @@ class LoginForm extends React.Component {
 
 const mapStateToProps = state => ({
   ...state.login,
-  user: getUser(state)
+  user: AppState.getUser(state)
 })
 
 export default connect(mapStateToProps, {login})(LoginForm)

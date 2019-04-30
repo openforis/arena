@@ -35,7 +35,7 @@ class Tooltip extends React.Component {
       {children}
 
       {
-        !R.isEmpty(messages) &&
+        !(R.isEmpty(messages) || R.isNil(messages)) &&
         <div className="message" ref={this.elementRef} style={msgStyle}>
           {
             messages.map((msg, i) =>
