@@ -56,21 +56,15 @@ export const getFormNodeDefEdit = state => {
   return Survey.getNodeDefByUuid(nodeDefUuidEdit)(survey)
 }
 
-// ====== nodeDef selected to add children to
+// ====== nodeDefUuidAddChildTo
 
-const nodeDefAddChildTo = 'nodeDefAddChildTo'
-
-export const assocNodeDefAddChildTo = nodeDef =>
-  R.assoc(nodeDefAddChildTo, NodeDef.getUuid(nodeDef))
+export const assocNodeDefAddChildTo = nodeDef => R.assoc(keys.nodeDefUuidAddChildTo, NodeDef.getUuid(nodeDef))
 
 export const getNodeDefAddChildTo = state => {
   const survey = SurveyState.getSurvey(state)
+  const nodeDefUuidAddChildTo = getStateProp(keys.nodeDefUuidAddChildTo)(state)
 
-  return R.pipe(
-    getSurveyForm,
-    R.path([props, nodeDefAddChildTo]),
-    nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  )(state)
+  return Survey.getNodeDefByUuid(nodeDefUuidAddChildTo)(survey)
 }
 
 // ====== current list of form pages
