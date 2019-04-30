@@ -19,21 +19,14 @@ const isDebugEnabled = () => logger.isDebugEnabled()
 
 const isInfoEnabled = () => logger.isInfoEnabled()
 
-const debug = message => {
-  if (isDebugEnabled())
-    logger.debug(message)
-}
-
-const info = message => {
-  if (isInfoEnabled())
-    logger.info(message)
-}
+const isErrorEnabled = () => logger.isErrorEnabled()
 
 module.exports = {
   isDebugEnabled,
   isInfoEnabled,
+  isErrorEnabled,
 
-  debug,
-  info,
-  error: message => logger.error(message),
+  debug: msg => isDebugEnabled() && logger.debug(msg),
+  info: msg => isInfoEnabled() && logger.info(msg),
+  error: msg => isErrorEnabled() && logger.error(msg),
 }
