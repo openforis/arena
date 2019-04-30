@@ -9,9 +9,9 @@ import { getPageUuid } from '../../../../common/survey/nodeDefLayout'
 import * as RecordState from '../record/recordState'
 import * as SurveyState from '../../../survey/surveyState'
 
-export const getSurveyForm = R.prop('surveyForm')
+export const getSurveyForm = R.prop('surveyViews')
 
-const props = 'props'
+const props = 'surveyForm'
 /**
  * ======================
  * Survey-Form State

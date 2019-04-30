@@ -1,13 +1,8 @@
 import * as R from 'ramda'
 
-import { combineReducers } from 'redux'
 import { exportReducer } from '../../../utils/reduxUtils'
 
 import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
-
-import categoryEdit from '../categoryEdit/reducer'
-import taxonomyEdit from '../taxonomyEdit/reducer'
-import record from '../record/reducer'
 
 import { appUserLogout } from '../../../app/actions'
 
@@ -85,12 +80,6 @@ const actionHandlers = {
 
 }
 
-const props = exportReducer(actionHandlers)
+export default  exportReducer(actionHandlers)
 
-export default combineReducers({
-  props,
-  categoryEdit,
-  taxonomyEdit,
-  record,
-})
 
