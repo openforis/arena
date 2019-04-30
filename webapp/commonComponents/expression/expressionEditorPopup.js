@@ -11,6 +11,7 @@ import Survey from '../../../common/survey/survey'
 import Expression from '../../../common/exprParser/expression'
 
 import * as SurveyState from '../../survey/surveyState'
+
 import * as ExpressionVariables from './expressionVariables'
 import * as ExpressionParser from './expressionParser'
 
@@ -20,12 +21,14 @@ class ExpressionEditorPopup extends React.Component {
     super(props)
 
     const { query, expr: exprParam, mode, canBeConstant } = props
+
     // Either exprParam or expr are passed by the parent.
     const expr = exprParam || ExpressionParser.parseQuery(query, mode, canBeConstant)
+    const exprString = Expression.toString(expr, mode)
 
     this.state = {
-      query,
-      queryDraft: Expression.toString(expr, mode),
+      query: exprString,
+      queryDraft: exprString,
       expr,
       exprDraft: expr,
       exprDraftValid: true,
@@ -42,7 +45,7 @@ class ExpressionEditorPopup extends React.Component {
   }
 
   render () {
-    const { query, expr, queryDraft, exprDraft, exprDraftValid } = this.state
+    const { query, queryDraft, exprDraft, exprDraftValid } = this.state
 
     const {
       isBoolean, onChange, onClose,
@@ -75,8 +78,8 @@ class ExpressionEditorPopup extends React.Component {
         <div className="expression-editor-popup__footer">
           <button className="btn btn-xs btn-of"
                   onClick={() => onChange('')}
-                  aria-disabled={!Expression.toString(expr)}>
-            <span className="icon icon-undo2 icon-16px" /> Reset
+                  aria-disabled={R.isEmpty(query)}>
+            <span className="icon icon-undo2 icon-16px"/> Reset
           </button>
 
           <button className="btn btn-xs btn-of"
@@ -93,14 +96,15 @@ class ExpressionEditorPopup extends React.Component {
 }
 
 ExpressionEditorPopup.defaultProps = {
-  query: '',
-  expr: null,
-  nodeDefUuidContext: '',
-  nodeDefUuidCurrent: null,
+  query: '', // string representing the expression
+  expr: null, // AST expression
+  //NOTE: One of the two above is passed on component creation
+  nodeDefUuidContext: '', // entity
+  nodeDefUuidCurrent: null, // attribute
   mode: Expression.modes.json,
   isContextParent: false,
-  canBeConstant: false,
-  isBoolean: true,
+  canBeConstant: false, // true if expression can be a constant value like a number or a string
+  isBoolean: true, // true if expression returns a boolean condition
 
   literalSearchParams: null,
   onClose: _ => {},
