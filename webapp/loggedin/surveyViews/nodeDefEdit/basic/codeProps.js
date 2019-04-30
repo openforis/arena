@@ -13,7 +13,7 @@ import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 import Validator from '../../../../../common/validation/validator'
 
 import * as SurveyState from '../../../../survey/surveyState'
-import { getFormNodeDefEdit, getSurveyForm } from '../../surveyForm/surveyFormState'
+import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 import { createCategory, deleteCategory } from '../../categoryEdit/actions'
@@ -113,8 +113,7 @@ const CodeProps = (props) => {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const surveyForm = getSurveyForm(state)
-  const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
+  const nodeDef = SurveyFormState.getFormNodeDefEdit(state)
 
   const isCode = NodeDef.isCode(nodeDef)
 

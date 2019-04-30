@@ -45,19 +45,19 @@ export const isNodeDefFormActivePage = nodeDef =>
     R.propEq(NodeDef.keys.uuid, NodeDef.getUuid(nodeDef))
   )
 
-// ====== current nodeDef edit
-const nodeDefEdit = 'nodeDefEdit'
-const nodeDefEditPath = [props, nodeDefEdit]
+// ====== nodeDefUuidEdit
 
-export const assocFormNodeDefEdit = nodeDef =>
-  R.assoc(nodeDefEdit, NodeDef.getUuid(nodeDef))
+export const assocFormNodeDefEdit = nodeDef => R.assoc(keys.nodeDefUuidEdit, NodeDef.getUuid(nodeDef))
 
-export const getFormNodeDefEdit = survey =>
-  surveyForm => Survey.getNodeDefByUuid(
-    R.path(nodeDefEditPath, surveyForm)
-  )(survey)
+export const getFormNodeDefEdit = state => {
+  const survey = SurveyState.getSurvey(state)
+  const nodeDefUuidEdit = getStateProp(keys.nodeDefUuidEdit)(state)
+
+  return Survey.getNodeDefByUuid(nodeDefUuidEdit)(survey)
+}
 
 // ====== nodeDef selected to add children to
+
 const nodeDefAddChildTo = 'nodeDefAddChildTo'
 
 export const assocNodeDefAddChildTo = nodeDef =>
