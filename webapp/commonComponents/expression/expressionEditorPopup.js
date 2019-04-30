@@ -42,7 +42,7 @@ class ExpressionEditorPopup extends React.Component {
   }
 
   render () {
-    const { query, queryDraft, exprDraft, exprDraftValid } = this.state
+    const { query, expr, queryDraft, exprDraft, exprDraftValid } = this.state
 
     const {
       isBoolean, onChange, onClose,
@@ -75,8 +75,8 @@ class ExpressionEditorPopup extends React.Component {
         <div className="expression-editor-popup__footer">
           <button className="btn btn-xs btn-of"
                   onClick={() => onChange('')}
-                  aria-disabled={R.isEmpty(query)}>
-            <span className="icon icon-undo2 icon-16px"/> Reset
+                  aria-disabled={!Expression.toString(expr)}>
+            <span className="icon icon-undo2 icon-16px" /> Reset
           </button>
 
           <button className="btn btn-xs btn-of"

@@ -11,7 +11,7 @@ import Tooltip from '../../../../../../commonComponents/tooltip'
 import Expression from '../../../../../../../common/exprParser/expression'
 import * as DataSort from './sort/dataSort'
 
-import { updateTableFilter, updateTableOffset, updateTableSort, updateTableEditMode } from '../actions'
+import { updateTableFilter, resetTableFilter, updateTableOffset, updateTableSort, updateTableEditMode } from '../actions'
 
 class TableHeader extends React.Component {
 
@@ -56,6 +56,7 @@ class TableHeader extends React.Component {
       tableName, colNames, filter, sort, limit, offset, count,
       showPaginator, editMode, canEdit,
       updateTableFilter, updateTableOffset, updateTableEditMode,
+      resetTableFilter,
     } = this.props
 
     const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.serialize(sort)}&cols=${JSON.stringify(colNames)}`
@@ -78,7 +79,11 @@ class TableHeader extends React.Component {
               expr={filter}
               mode={Expression.modes.sql}
               onChange={(_, expr) => {
-                updateTableFilter(expr)
+                if (expr) {
+                  updateTableFilter(expr)
+                } else {
+                  resetTableFilter()
+                }
                 this.toggleExpressionEditor()
               }}
               onClose={this.toggleExpressionEditor}
@@ -150,5 +155,5 @@ TableHeader.defaultProps = {
 
 export default connect(
   null,
-  { updateTableOffset, updateTableFilter, updateTableSort, updateTableEditMode }
+  { updateTableOffset, resetTableFilter, updateTableFilter, updateTableSort, updateTableEditMode }
 )(TableHeader)

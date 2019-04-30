@@ -152,6 +152,11 @@ export const updateTableOffset = (offset = 0) =>
     dispatch({ type: dataQueryTableDataUpdate, offset, data })
   }
 
+export const resetTableFilter = () => dispatch => {
+  dispatch({ type: dataQueryTableFilterUpdate, filter: null })
+  dispatch(initTableData())
+}
+
 export const updateTableFilter = (filter) => dispatch =>
   dispatch(initTableData(filter))
 
