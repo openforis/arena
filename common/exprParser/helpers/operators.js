@@ -22,6 +22,8 @@ const arithmetic = {
   mod: { key: '%', value: '%' },
 }
 
+const allOperators = R.mergeAll(logical, comparison, arithmetic)
+
 const binary = R.mergeLeft(arithmetic, comparison)
 const binaryValues = R.values(binary)
 
@@ -31,6 +33,8 @@ const findBinary = operator => R.find(
 )
 
 module.exports = {
+  allOperators,
+
   logical,
   comparison,
   arithmetic,
