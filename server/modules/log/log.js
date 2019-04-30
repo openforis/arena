@@ -15,10 +15,25 @@ log4js.configure({
   }
 })
 
-module.exports = {
-  isDebugEnabled: () => logger.isDebugEnabled(),
+const isDebugEnabled = () => logger.isDebugEnabled()
 
-  debug: message => logger.debug(message),
-  info: message => logger.info(message),
+const isInfoEnabled = () => logger.isInfoEnabled()
+
+const debug = message => {
+  if (isDebugEnabled())
+    logger.debug(message)
+}
+
+const info = message => {
+  if (isInfoEnabled())
+    logger.info(message)
+}
+
+module.exports = {
+  isDebugEnabled,
+  isInfoEnabled,
+
+  debug,
+  info,
   error: message => logger.error(message),
 }
