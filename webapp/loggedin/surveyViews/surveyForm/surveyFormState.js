@@ -1,5 +1,7 @@
 import * as R from 'ramda'
 
+import * as  SurveyViewsState from '../surveyViewsState'
+
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import Record from '../../../../common/record/record'
@@ -12,37 +14,35 @@ import * as SurveyState from '../../../survey/surveyState'
 export const getSurveyForm = R.prop('surveyViews')
 
 const props = 'surveyForm'
-/**
- * ======================
- * Survey-Form State
- * ======================
- */
 
-// ====== current form page nodeDef
+const getState = R.pipe(SurveyViewsState.getState, R.prop('surveyForm'))
 
-const pageNodeDefUuid = 'pageNodeDefUuid'
-const formPagePath = [props, pageNodeDefUuid]
+const getStateProp = prop => R.pipe(getState, R.prop(prop))
 
-export const assocFormActivePage = (nodeDef) =>
-  R.assoc(
-    pageNodeDefUuid,
-    NodeDef.getUuid(nodeDef)
-  )
+const keys = {
+  nodeDefUuidPage: 'nodeDefUuidPage', // current form page nodeDef
+  nodeDefUuidEdit: 'nodeDefUuidEdit', // current nodeDef edit
+  nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // nodeDef (entity) selected to add children to
+}
+
+// ====== nodeDefUuidPage
+
+export const assocFormActivePage = (nodeDef) => R.assoc(keys.nodeDefUuidPage, NodeDef.getUuid(nodeDef))
 
 export const getFormActivePageNodeDef = state => {
   const survey = SurveyState.getSurvey(state)
-  const surveyForm = getSurveyForm(state)
+  const nodeDefUuidPage = getStateProp(keys.nodeDefUuidPage)(state)
 
-  return R.pipe(
-    Survey.getNodeDefByUuid(R.path(formPagePath, surveyForm)),
-    R.defaultTo(Survey.getRootNodeDef(survey))
-  )(survey)
+  return nodeDefUuidPage
+    ? Survey.getNodeDefByUuid(nodeDefUuidPage)(survey)
+    : Survey.getRootNodeDef(survey)
+
 }
 
 export const isNodeDefFormActivePage = nodeDef =>
   R.pipe(
     getFormActivePageNodeDef,
-    R.propEq('uuid', NodeDef.getUuid(nodeDef))
+    R.propEq(NodeDef.keys.uuid, NodeDef.getUuid(nodeDef))
   )
 
 // ====== current nodeDef edit

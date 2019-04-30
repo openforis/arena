@@ -1,13 +1,11 @@
 import * as R from 'ramda'
 
 import { exportReducer } from '../../../utils/reduxUtils'
-
 import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
+import * as SurveyFormState from './surveyFormState'
 
 import { appUserLogout } from '../../../app/actions'
-
 import { surveyDelete, surveyUpdate } from '../../../survey/actions'
-
 import {
   formActivePageNodeDefUpdate,
   formNodeDefEditUpdate,
@@ -15,19 +13,10 @@ import {
   formPageNodeUpdate,
   formReset
 } from './actions'
-
 import { nodeDefCreate, nodeDefPropsUpdate } from '../../../survey/nodeDefs/actions'
-
-import {
-  assocFormActivePage,
-  assocFormNodeDefEdit,
-  assocFormPageNode,
-  assocFormPageNodes,
-  assocNodeDefAddChildTo,
-  assocParamsOnNodeDefCreate,
-} from './surveyFormState'
-
 import { recordLoad } from '../record/actions'
+
+
 
 const actionHandlers = {
   // reset form
@@ -39,20 +28,20 @@ const actionHandlers = {
   [formReset]: () => ({}),
 
   // form actions
-  [formNodeDefEditUpdate]: (state, { nodeDef }) => assocFormNodeDefEdit(nodeDef)(state),
+  [formNodeDefEditUpdate]: (state, { nodeDef }) => SurveyFormState.assocFormNodeDefEdit(nodeDef)(state),
 
-  [formNodeDefAddChildToUpdate]: (state, { nodeDef }) => assocNodeDefAddChildTo(nodeDef)(state),
+  [formNodeDefAddChildToUpdate]: (state, { nodeDef }) => SurveyFormState.assocNodeDefAddChildTo(nodeDef)(state),
 
   [formActivePageNodeDefUpdate]: (state, { nodeDef }) =>
     R.pipe(
-      assocFormActivePage(nodeDef),
-      assocNodeDefAddChildTo(null)
+      SurveyFormState.assocFormActivePage(nodeDef),
+      SurveyFormState.assocNodeDefAddChildTo(null)
     )(state),
 
-  [formPageNodeUpdate]: (state, { nodeDef, node }) => assocFormPageNode(nodeDef, node)(state),
+  [formPageNodeUpdate]: (state, { nodeDef, node }) => SurveyFormState.assocFormPageNode(nodeDef, node)(state),
 
   // node def
-  [nodeDefCreate]: (state, { nodeDef }) => assocParamsOnNodeDefCreate(nodeDef)(state),
+  [nodeDefCreate]: (state, { nodeDef }) => SurveyFormState.assocParamsOnNodeDefCreate(nodeDef)(state),
 
   [nodeDefPropsUpdate]: (state, { nodeDef, parentNodeDef, props }) => {
     const hasPageUuid = R.pipe(
@@ -64,7 +53,7 @@ const actionHandlers = {
       const pageUuid = props[NodeDefLayout.nodeDefLayoutProps.pageUuid]
       // when changing displayIn (pageUuid) change form active page
       const activePageNodeDef = pageUuid ? nodeDef : parentNodeDef
-      return assocFormActivePage(activePageNodeDef)(state)
+      return SurveyFormState.assocFormActivePage(activePageNodeDef)(state)
     } else {
       return state
     }
@@ -73,9 +62,9 @@ const actionHandlers = {
   // record
   [recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
     R.pipe(
-      assocNodeDefAddChildTo(null),
-      assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
-      assocFormActivePage(nodeDefActivePage)
+      SurveyFormState.assocNodeDefAddChildTo(null),
+      SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
+      SurveyFormState.assocFormActivePage(nodeDefActivePage)
     )(state)
 
 }
