@@ -59,10 +59,11 @@ const getNodeChildren = node => findNodes(n => Node.getParentUuid(n) === Node.ge
 const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
   getNodeChildrenUuidsByParent(Node.getUuid(parentNode), nodeDefUuid),
   R.map(uuid => getNodeByUuid(uuid)(record)),
-  R.sortWith([
-    R.propOr(false, Node.keys.placeholder),
-    R.prop(Node.keys.dateCreated)
-  ])
+  nodes =>
+    R.sortWith([
+      R.propOr(false, Node.keys.placeholder),
+      R.prop(Node.keys.dateCreated)
+    ])(nodes)
 )(record)
 
 const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
@@ -190,14 +191,7 @@ const assocNodes = nodes =>
       R.mergeLeft(nodesToUpdate),
       mergedNodes => R.assoc(keys.nodes, mergedNodes)(record),
       removeDeletedNodes,
-
-      record => R.pipe(
-        R.values,
-        R.reduce(
-          (acc, node) => indexNode(node)(acc),
-          record
-        )
-      )(nodesToUpdate)
+      indexNodes(nodesToUpdate)
     )(record)
 
     return recordUpdated
@@ -274,6 +268,18 @@ const indexNode = node => R.pipe(
   indexNodeByParent(node),
   indexNodeByNodeDef(node)
 )
+
+const indexNodes = nodes =>
+  record =>
+    R.pipe(
+      R.values,
+      R.reduce(
+        (acc, node) => Node.isDeleted(node)
+          ? acc
+          : indexNode(node)(acc),
+        record
+      )
+    )(nodes)
 
 const removeNodeFromIndexByParent = node => record => R.pipe(
   getNodeChildrenUuidsByParent(Node.getParentUuid(node), Node.getNodeDefUuid(node)),

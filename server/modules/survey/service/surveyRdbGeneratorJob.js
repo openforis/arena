@@ -1,11 +1,7 @@
-const R = require('ramda')
-
 const Job = require('../../../job/job')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
-const Record = require('../../../../common/record/record')
-const Node = require('../../../../common/record/node')
 const SurveyManager = require('../persistence/surveyManager')
 const NodeDefManager = require('../../nodeDef/persistence/nodeDefManager')
 const RecordManager = require('../../record/persistence/recordManager')

@@ -125,8 +125,7 @@ export const removeNode = (nodeDef, node) => async (dispatch, getState) => {
   dispatch({ type: nodeDelete, node })
 
   const surveyId = SurveyState.getStateSurveyId(getState())
-  const { data } = await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
-  recordNodesUpdate(data.nodes)(dispatch)
+  await axios.delete(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node/${Node.getUuid(node)}`)
 }
 
 export const deleteRecord = (history) => async (dispatch, getState) => {
