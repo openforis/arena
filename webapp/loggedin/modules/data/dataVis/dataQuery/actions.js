@@ -20,7 +20,7 @@ export const dataQueryTableSortUpdate = 'dataQuery/table/sort/update'
 const defaults = {
   offset: 0,
   limit: 15,
-  filter: '',
+  filter: null,
 }
 
 const getTableName = (state, nodeDefUuidTable) => {
@@ -33,19 +33,17 @@ const getColNames = (state, nodeDefUuidCols) => {
   return NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 }
 
-const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = '', sort = '') =>
-  axios.get(
+const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = null, sort = '') =>
+  axios.post(
     `/api/surveyRdb/${surveyId}/${tableName}/query`, {
-      params: {
-        nodeDefUuidTable,
-        cols: JSON.stringify(cols),
-        nodeDefUuidCols: JSON.stringify(nodeDefUuidCols),
-        offset,
-        limit: defaults.limit,
-        filter,
-        sort: DataSort.serialize(sort),
-        editMode
-      }
+      nodeDefUuidTable,
+      cols: JSON.stringify(cols),
+      nodeDefUuidCols: JSON.stringify(nodeDefUuidCols),
+      offset,
+      limit: defaults.limit,
+      filter: filter ? JSON.stringify(filter) : null,
+      sort: DataSort.serialize(sort),
+      editMode,
     }
   )
 
@@ -125,7 +123,11 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
       const { offset, limit } = defaults
 
       const [countResp, dataResp] = await Promise.all([
-        axios.get(`/api/surveyRdb/${surveyId}/${tableName}/query/count?filter=${filter}`),
+        axios.post(
+          `/api/surveyRdb/${surveyId}/${tableName}/query/count`, {
+            filter: filter && JSON.stringify(filter),
+          }
+        ),
         queryTable(surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, filter, sort)
       ])
 
@@ -139,7 +141,7 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
         data: dataResp.data,
         nodeDefUuidTable,
         nodeDefUuidCols,
-        editMode
+        editMode,
       })
     }
   }
@@ -149,6 +151,11 @@ export const updateTableOffset = (offset = 0) =>
     const data = await fetchData(getState(), null, offset)
     dispatch({ type: dataQueryTableDataUpdate, offset, data })
   }
+
+export const resetTableFilter = () => dispatch => {
+  dispatch({ type: dataQueryTableFilterUpdate, filter: null })
+  dispatch(initTableData())
+}
 
 export const updateTableFilter = (filter) => dispatch =>
   dispatch(initTableData(filter))
