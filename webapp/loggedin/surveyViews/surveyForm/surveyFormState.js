@@ -8,13 +8,14 @@ import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 import * as SurveyViewsState from '../surveyViewsState'
 import * as RecordState from '../record/recordState'
 import * as SurveyState from '../../../survey/surveyState'
+import * as NodeDefState from '../nodeDefEdit/nodeDefEditState'
 
-const getState = R.pipe(SurveyViewsState.getState, R.prop('surveyForm'))
+export const stateKey = 'surveyForm'
+const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
 const getStateProp = prop => R.pipe(getState, R.prop(prop))
 
 const keys = {
   nodeDefUuidPage: 'nodeDefUuidPage', // current page nodeDef
-  nodeDefUuidEdit: 'nodeDefUuidEdit', // current nodeDef edit
   nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // nodeDef (entity) selected to add children to
   nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
 }
@@ -38,17 +39,6 @@ export const isNodeDefFormActivePage = nodeDef =>
     getFormActivePageNodeDef,
     R.propEq(NodeDef.keys.uuid, NodeDef.getUuid(nodeDef))
   )
-
-// ====== nodeDefUuidEdit
-
-export const assocFormNodeDefEdit = nodeDef => R.assoc(keys.nodeDefUuidEdit, NodeDef.getUuid(nodeDef))
-
-export const getFormNodeDefEdit = state => {
-  const survey = SurveyState.getSurvey(state)
-  const nodeDefUuidEdit = getStateProp(keys.nodeDefUuidEdit)(state)
-
-  return Survey.getNodeDefByUuid(nodeDefUuidEdit)(survey)
-}
 
 // ====== nodeDefUuidAddChildTo
 
@@ -109,7 +99,7 @@ export const getFormPageParentNode = nodeDef =>
 
 // on nodeDef create init form state
 export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
-  assocFormNodeDefEdit(nodeDef),
+  NodeDefState.assocNodeDefEdit(nodeDef),
   // if is entity and renders in its own page, assoc active page
   R.ifElse(
     () => NodeDef.isEntity(nodeDef) && !!NodeDefLayout.getPageUuid(nodeDef),

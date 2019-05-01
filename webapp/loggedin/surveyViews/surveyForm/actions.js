@@ -17,17 +17,7 @@ export const formReset = 'survey/form/reset'
 export const resetForm = () => dispatch =>
   dispatch({ type: formReset })
 
-// ====== nodeDef edit
-export const formNodeDefEditUpdate = 'survey/form/nodeDef/edit/update'
 export const formNodeDefAddChildToUpdate = 'survey/form/nodeDef/addChildTo/update'
-
-// set current nodeDef edit
-export const setFormNodeDefEdit = nodeDef => dispatch =>
-  dispatch({ type: formNodeDefEditUpdate, nodeDef })
-
-// reset current nodeDef edit
-export const closeFormNodeDefEdit = () => async dispatch =>
-  dispatch({ type: formNodeDefEditUpdate, nodeDef: null })
 
 // set current nodeDef unlocked
 export const setFormNodeDefAddChildTo = nodeDef => dispatch =>

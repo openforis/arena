@@ -18,10 +18,10 @@ import Taxonomy from '../../../../common/survey/taxonomy'
 import { isRenderTable } from '../../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../../../survey/surveyState'
-import * as SurveyFormState from '../surveyForm/surveyFormState'
+import * as NodeDefEditState from './nodeDefEditState'
 
-import { closeFormNodeDefEdit } from '../surveyForm/actions'
 import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
+import { closeFormNodeDefEdit } from './actions'
 
 class NodeDefEdit extends React.Component {
 
@@ -156,7 +156,7 @@ const isDisplayInEnabled = (nodeDef) =>
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const nodeDef = SurveyFormState.getFormNodeDefEdit(state)
+  const nodeDef = NodeDefEditState.getNodeDefEdit(state)
   const nodeDefParent = Survey.getNodeDefByUuid(
     NodeDef.getParentUuid(nodeDef)
   )(survey)

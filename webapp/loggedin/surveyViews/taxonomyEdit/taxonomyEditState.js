@@ -24,7 +24,8 @@ const keys = {
   taxaPerPage: 'taxaPerPage',
 }
 
-const getState = R.pipe(SurveyViewsState.getState, R.prop('taxonomyEdit'))
+export const stateKey = 'taxonomyEdit'
+const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
 const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 
 // ==== taxonomy for edit

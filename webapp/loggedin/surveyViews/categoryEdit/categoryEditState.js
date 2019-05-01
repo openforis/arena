@@ -29,7 +29,7 @@ const keys = {
   levelActiveItems: 'levelActiveItems',
 }
 
-const stateKey = 'categoryEdit'
+export const stateKey = 'categoryEdit'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
 const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 

@@ -4,8 +4,9 @@ import { connect } from 'react-redux'
 import Layout from '../../../../../../common/survey/nodeDefLayout'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 
-import { setFormNodeDefEdit, setFormNodeDefAddChildTo } from '../../actions'
+import { setFormNodeDefAddChildTo } from '../../actions'
 import { putNodeDefProp, removeNodeDef } from '../../../../../survey/nodeDefs/actions'
+import { setFormNodeDefEdit } from '../../../nodeDefEdit/actions'
 
 const NodeDefEditFormActions = (props) => {
 
