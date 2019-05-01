@@ -14,7 +14,7 @@ import * as SurveyState from '../../../../survey/surveyState'
 import * as CollectImportReportState from './collectImportReportState'
 import * as NodeDefEditState from '../../../surveyViews/nodeDefEdit/nodeDefEditState'
 
-import { setFormNodeDefEdit } from '../../../surveyViews/nodeDefEdit/actions'
+import { setNodeDefForEdit } from '../../../surveyViews/nodeDefEdit/actions'
 import { fetchCollectImportReportItems, updateCollectImportReportItem } from './actions'
 
 class CollectImportReportView extends React.Component {
@@ -26,7 +26,7 @@ class CollectImportReportView extends React.Component {
   }
 
   handleNodeDefEdit (nodeDef) {
-    this.props.setFormNodeDefEdit(nodeDef)
+    this.props.setNodeDefForEdit(nodeDef)
   }
 
   render () {
@@ -90,6 +90,6 @@ export default connect(
   mapStateToProps,
   {
     fetchCollectImportReportItems, updateCollectImportReportItem,
-    setFormNodeDefEdit
+    setNodeDefForEdit
   }
 )(CollectImportReportView)

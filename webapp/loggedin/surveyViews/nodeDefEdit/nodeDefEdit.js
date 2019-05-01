@@ -21,7 +21,7 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as NodeDefEditState from './nodeDefEditState'
 
 import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
-import { closeFormNodeDefEdit } from './actions'
+import { closeNodeDefEdit } from './actions'
 
 class NodeDefEdit extends React.Component {
 
@@ -35,7 +35,7 @@ class NodeDefEdit extends React.Component {
   }
 
   close () {
-    this.props.closeFormNodeDefEdit()
+    this.props.closeNodeDefEdit()
   }
 
   render () {
@@ -156,7 +156,7 @@ const isDisplayInEnabled = (nodeDef) =>
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const nodeDef = NodeDefEditState.getNodeDefEdit(state)
+  const nodeDef = NodeDefEditState.getNodeDef(state)
   const nodeDefParent = Survey.getNodeDefByUuid(
     NodeDef.getParentUuid(nodeDef)
   )(survey)
@@ -179,5 +179,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { putNodeDefProp, closeFormNodeDefEdit }
+  { putNodeDefProp, closeNodeDefEdit }
 )(NodeDefEdit)

@@ -6,7 +6,7 @@ import { appUserLogout } from '../../../app/actions'
 import { surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../surveyForm/actions'
 
-import { formNodeDefEditUpdate } from '../nodeDefEdit/actions'
+import { nodeDefEditUpdate } from '../nodeDefEdit/actions'
 
 const actionHandlers = {
   // reset form
@@ -15,7 +15,7 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [formNodeDefEditUpdate]: (state, { nodeDef }) => NodeDefEditState.assocNodeDefEdit(nodeDef)(state),
+  [nodeDefEditUpdate]: (state, { nodeDef }) => NodeDefEditState.assocNodeDef(nodeDef)(state),
 }
 
 export default exportReducer(actionHandlers)

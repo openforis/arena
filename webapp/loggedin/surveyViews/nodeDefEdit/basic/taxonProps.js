@@ -68,7 +68,7 @@ const TaxonProps = (props) => {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const nodeDef = NodeDefEditState.getNodeDefEdit(state)
+  const nodeDef = NodeDefEditState.getNodeDef(state)
 
   const isTaxon = NodeDef.isTaxon(nodeDef)
 

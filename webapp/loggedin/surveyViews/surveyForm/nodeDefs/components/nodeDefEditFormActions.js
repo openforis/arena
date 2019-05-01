@@ -6,14 +6,14 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 
 import { setFormNodeDefAddChildTo } from '../../actions'
 import { putNodeDefProp, removeNodeDef } from '../../../../../survey/nodeDefs/actions'
-import { setFormNodeDefEdit } from '../../../nodeDefEdit/actions'
+import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
 
 const NodeDefEditFormActions = (props) => {
 
   const {
     nodeDef,
     edit, canEditDef,
-    putNodeDefProp, setFormNodeDefEdit, setFormNodeDefAddChildTo, removeNodeDef
+    putNodeDefProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
   } = props
 
   const isRoot = NodeDef.isRoot(nodeDef)
@@ -35,7 +35,7 @@ const NodeDefEditFormActions = (props) => {
       }
 
       <button className="btn-s btn-of-light-xs"
-              onClick={() => setFormNodeDefEdit(nodeDef)}>
+              onClick={() => setNodeDefForEdit(nodeDef)}>
         <span className="icon icon-pencil2 icon-12px"/>
       </button>
 
@@ -67,7 +67,7 @@ const NodeDefEditFormActions = (props) => {
 }
 
 export default connect(null, {
-  setFormNodeDefEdit,
+  setNodeDefForEdit,
   setFormNodeDefAddChildTo,
   putNodeDefProp,
   removeNodeDef

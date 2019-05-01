@@ -1,10 +1,10 @@
 
-export const formNodeDefEditUpdate = 'survey/nodeDef/edit/update'
+export const nodeDefEditUpdate = 'survey/nodeDef/edit/update'
 
 // set current nodeDef edit
-export const setFormNodeDefEdit = nodeDef => dispatch =>
-  dispatch({ type: formNodeDefEditUpdate, nodeDef })
+export const setNodeDefForEdit = nodeDef => dispatch =>
+  dispatch({ type: nodeDefEditUpdate, nodeDef })
 
 // reset current nodeDef edit
-export const closeFormNodeDefEdit = () => async dispatch =>
-  dispatch({ type: formNodeDefEditUpdate, nodeDef: null })
+export const closeNodeDefEdit = () => async dispatch =>
+  dispatch({ type: nodeDefEditUpdate, nodeDef: null })
