@@ -15,30 +15,23 @@ import { normalizeName } from '../../../../../common/stringUtils'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
 import {
-  getTaxonomyEditTaxonomy,
-  getTaxonomyEditTaxaTotalPages,
-  getTaxonomyEditTaxaCurrentPage,
   getTaxonomyEditTaxa,
-  getTaxonomyEditTaxaPerPage
+  getTaxonomyEditTaxaCurrentPage,
+  getTaxonomyEditTaxaPerPage,
+  getTaxonomyEditTaxaTotalPages,
+  getTaxonomyEditTaxonomy
 } from '../taxonomyEditState'
 import * as SurveyState from '../../../../survey/surveyState'
-import * as AppJobState from '../../../appJob/appJobState'
 import * as AppState from '../../../../app/appState'
 import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
-import {
-  setTaxonomyForEdit,
-  putTaxonomyProp,
-  uploadTaxonomyFile,
-  initTaxaList,
-  loadTaxa,
-} from '../actions'
+import { initTaxaList, loadTaxa, putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile, } from '../actions'
 import { canEditSurvey } from '../../../../../common/auth/authManager'
 
 class TaxonomyEdit extends React.Component {
 
   async componentDidMount () {
-    const {taxonomy, initTaxaList} = this.props
+    const { taxonomy, initTaxaList } = this.props
 
     if (Taxonomy.getUuid(taxonomy)) {
       initTaxaList(taxonomy)
@@ -52,7 +45,7 @@ class TaxonomyEdit extends React.Component {
       readOnly,
     } = this.props
 
-    const {validation} = taxonomy
+    const { validation } = taxonomy
 
     return (
       <div className="taxonomy-edit">
@@ -96,7 +89,7 @@ class TaxonomyEdit extends React.Component {
                           onPageChange={(page) => loadTaxa(taxonomy, page)}/>
         }
 
-        <div style={{justifySelf: 'center'}}>
+        <div style={{ justifySelf: 'center' }}>
           <button className="btn btn-of-light"
                   onClick={() => setTaxonomyForEdit(null)}>
             Done
@@ -113,7 +106,7 @@ const mapStateToProps = state => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyForm = SurveyFormState.getSurveyForm(state)
   const user = AppState.getUser(state)
-  const activeJob = AppJobState.getActiveJob(state)
+  const activeJob = AppState.getActiveJob(state)
 
   return {
     surveyId: SurveyState.getSurveyId(state),

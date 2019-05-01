@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const log = require('../../../../log/log')
+const log = require('../../../../../log/log')
 
 const BatchPersister = require('../../../../../db/batchPersister')
 

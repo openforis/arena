@@ -3,13 +3,17 @@ import * as R from 'ramda'
 import { isSystemAdmin } from '../../common/auth/authManager'
 
 import Survey from '../../common/survey/survey'
+import User from '../../common/user/user'
 
 const keys = {
   status: 'status',
   user: 'user',
-  authGroups: 'authGroups',
+  activeJob: 'activeJob',
   errors: 'errors',
   systemError: 'systemError',
+
+  // activeJob keys
+  onComplete: 'onComplete',
 }
 
 export const getState = R.prop('app')
@@ -37,25 +41,46 @@ export const assocSurveyAdminGroup = surveyInfo =>
     } else {
 
       const userGroups = R.pipe(
-        R.prop(keys.authGroups),
+        R.prop(User.keys.authGroups),
         R.append(Survey.getSurveyAdminGroup(surveyInfo))
       )(user)
 
-      return R.assocPath([keys.user, keys.authGroups], userGroups, appState)
+      return R.assocPath([keys.user, User.keys.authGroups], userGroups, appState)
     }
   }
 
+// On survey delete, diccos survey from user
 export const dissocSurveyGroups = surveyId =>
   appState => {
     const user = R.prop(keys.user, appState)
     // removing survey auth groups from user group
     const userGroups = R.reject(
       g => g.surveyId === surveyId,
-      R.prop(keys.authGroups, user)
+      R.prop(User.keys.authGroups, user)
     )
 
-    return R.assocPath([keys.user, keys.authGroups], userGroups, appState)
+    return R.assocPath([keys.user, User.keys.authGroups], userGroups, appState)
   }
+
+// ==== APP CURRENT ACTIVE JOB
+
+export const getActiveJob = R.pipe(getState, R.propOr(null, keys.activeJob))
+
+export const startJob = (job, onComplete = null, autoHide = false) =>
+  R.assoc(
+    keys.activeJob,
+    { ...job, onComplete, autoHide }
+  )
+
+export const updateActiveJob = job =>
+  state => job
+    ? R.assoc(
+      keys.activeJob,
+      R.mergeRight(R.prop(keys.activeJob)(state), job)
+    )(state)
+    : R.dissoc(keys.activeJob)(state)
+
+export const getActiveJobOnCompleteCallback = R.propOr(null, keys.onComplete)
 
 // ==== APP ERRORS
 

@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const log = require('../../log/log')
+const Log = require('../../../log/log')
 const Job = require('../../../job/job')
 
 const { languageCodes } = require('../../../../common/app/languages')
@@ -41,16 +41,16 @@ class TaxonomyImportJob extends Job {
     const { taxonomyUuid, filePath } = this
     const surveyId = this.getSurveyId()
 
-    log.debug(`starting taxonomy import on survey ${surveyId}, importing into taxonomy ${taxonomyUuid}`)
+    Log.debug(`starting taxonomy import on survey ${surveyId}, importing into taxonomy ${taxonomyUuid}`)
 
     this.total = await new CSVParser(filePath).calculateSize()
 
-    log.debug(`${this.total} rows found in the CSV file`)
+    Log.debug(`${this.total} rows found in the CSV file`)
 
     const validHeaders = await this.processHeaders()
 
     if (!validHeaders) {
-      log.debug('invalid header, setting status to "failed"')
+      Log.debug('invalid header, setting status to "failed"')
       await this.setStatusFailed()
       return
     }
@@ -66,7 +66,7 @@ class TaxonomyImportJob extends Job {
     //delete old draft taxa
     await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)
 
-    log.debug('start CSV file parsing')
+    Log.debug('start CSV file parsing')
 
     const csvParser = new CSVParser(filePath)
 
@@ -84,14 +84,14 @@ class TaxonomyImportJob extends Job {
       row = await csvParser.next()
     }
 
-    log.debug(`CSV file processed, ${this.processed} rows processed`)
+    Log.debug(`CSV file processed, ${this.processed} rows processed`)
 
     if (this.isRunning()) {
       if (R.isEmpty(this.errors)) {
-        log.debug('no errors found, finalizing import')
+        Log.debug('no errors found, finalizing import')
         await this.taxonomyImportManager.finalizeImport(taxonomy, tx)
       } else {
-        log.debug(`${this.errors.length} errors found`)
+        Log.debug(`${this.errors.length} errors found`)
         await this.setStatusFailed()
       }
     }

@@ -3,16 +3,11 @@ import './appJobMonitor.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '../../commonComponents/modal'
+import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../commonComponents/modal'
 import ProgressBar from '../../commonComponents/progressBar'
 import AppJobErrors from './appJobErrors'
 
-import * as AppJobState from './appJobState'
+import * as AppState from '../../app/appState'
 
 import { cancelActiveJob, hideAppJobMonitor } from './actions'
 
@@ -73,7 +68,7 @@ class AppJobMonitor extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  job: AppJobState.getActiveJob(state),
+  job: AppState.getActiveJob(state),
 })
 
 export default connect(
