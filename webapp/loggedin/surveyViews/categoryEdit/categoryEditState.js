@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import Survey from '../../../../common/survey/survey'
 import CategoryItem from '../../../../common/survey/categoryItem'
 
-import * as  SurveyViewsState from '../surveyViewsState'
+import * as SurveyViewsState from '../surveyViewsState'
 import * as SurveyState from '../../../survey/surveyState'
 
 // DOCS

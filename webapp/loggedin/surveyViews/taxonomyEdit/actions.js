@@ -5,8 +5,7 @@ import { debounceAction } from '../../../utils/reduxUtils'
 import Taxonomy from '../../../../common/survey/taxonomy'
 
 import * as SurveyState from '../../../survey/surveyState'
-import * as SurveyFormState from '../surveyForm/surveyFormState'
-import { getTaxonomyEditTaxaPerPage } from './taxonomyEditState'
+import * as TaxonomyEditState from './taxonomyEditState'
 
 import { showAppJobMonitor } from '../../appJob/actions'
 import {
@@ -86,9 +85,8 @@ export const loadTaxa = (taxonomy, page = 1) => async (dispatch, getState) => {
   dispatchTaxonomyEditPropsUpdate(dispatch, { taxaCurrentPage: page, taxa: [] })
 
   const state = getState()
-  const surveyForm = SurveyFormState.getSurveyForm(state)
   const surveyId = SurveyState.getSurveyId(state)
-  const rowsPerPage = getTaxonomyEditTaxaPerPage(surveyForm)
+  const rowsPerPage = TaxonomyEditState.getTaxaPerPage(state)
   const taxa = await fetchTaxa(surveyId, Taxonomy.getUuid(taxonomy), (page - 1) * rowsPerPage, rowsPerPage)
 
   dispatchTaxonomyEditPropsUpdate(dispatch, { taxa })
