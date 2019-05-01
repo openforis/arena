@@ -11,8 +11,7 @@ import { canEditSurvey } from '../../../../common/auth/authManager'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
-import { getCategoryForEdit } from '../categoryEdit/categoryEditState'
-import * as SurveyFormState from '../surveyForm/surveyFormState'
+import * as CategoryEditState from '../categoryEdit/categoryEditState'
 
 import {
   createCategory,
@@ -23,7 +22,7 @@ import {
 class CategoriesView extends React.Component {
 
   componentWillUnmount () {
-    const {category, setCategoryForEdit} = this.props
+    const { category, setCategoryForEdit } = this.props
     if (category)
       setCategoryForEdit(null)
   }
@@ -41,21 +40,24 @@ class CategoriesView extends React.Component {
       ? alert('This category is used by some node definitions and cannot be removed')
       : window.confirm(`Delete the category ${Category.getName(category)}? This operation cannot be undone.`)
 
-    return <ItemsView headerText="Categories"
-                      itemEditComponent={CategoryEdit}
-                      itemEditProp="category"
-                      itemLabelFunction={category => Category.getName(category)}
-                      editedItem={category}
-                      items={categories}
-                      selectedItemUuid={selectedItemUuid}
-                      onAdd={createCategory}
-                      onEdit={setCategoryForEdit}
-                      canDelete={canDeleteCategory}
-                      onDelete={deleteCategory}
-                      canSelect={canSelect}
-                      onSelect={onSelect}
-                      onClose={onClose}
-                      readOnly={readOnly}/>
+    return (
+      <ItemsView
+        headerText="Categories"
+        itemEditComponent={CategoryEdit}
+        itemEditProp="category"
+        itemLabelFunction={category => Category.getName(category)}
+        editedItem={category}
+        items={categories}
+        selectedItemUuid={selectedItemUuid}
+        onAdd={createCategory}
+        onEdit={setCategoryForEdit}
+        canDelete={canDeleteCategory}
+        onDelete={deleteCategory}
+        canSelect={canSelect}
+        onSelect={onSelect}
+        onClose={onClose}
+        readOnly={readOnly}/>
+    )
   }
 }
 
@@ -74,7 +76,7 @@ const mapStateToProps = (state) => {
 
   return {
     categories,
-    category: getCategoryForEdit(survey)(SurveyFormState.getSurveyForm(state)),
+    category: CategoryEditState.getCategoryForEdit(state),
     readOnly: !canEditSurvey(user, surveyInfo)
   }
 }
