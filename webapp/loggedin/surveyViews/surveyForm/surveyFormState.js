@@ -8,7 +8,6 @@ import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 import * as SurveyViewsState from '../surveyViewsState'
 import * as RecordState from '../record/recordState'
 import * as SurveyState from '../../../survey/surveyState'
-import * as NodeDefState from '../nodeDefEdit/nodeDefEditState'
 
 export const stateKey = 'surveyForm'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
@@ -99,7 +98,6 @@ export const getFormPageParentNode = nodeDef =>
 
 // on nodeDef create init form state
 export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
-  NodeDefState.assocNodeDef(nodeDef),
   // if is entity and renders in its own page, assoc active page
   R.ifElse(
     () => NodeDef.isEntity(nodeDef) && !!NodeDefLayout.getPageUuid(nodeDef),
