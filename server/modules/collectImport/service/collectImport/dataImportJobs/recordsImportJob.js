@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const log = require('../../../../../log/log')
+const Log = require('../../../../../log/log')
 
 const BatchPersister = require('../../../../../db/batchPersister')
 
@@ -30,8 +30,7 @@ class RecordsImportJob extends Job {
 
   async onStart () {
     await super.onStart()
-    const surveyId = this.getSurveyId()
-    await RecordManager.disableTriggers(surveyId, this.tx)
+    await RecordManager.disableTriggers(this.getSurveyId(), this.tx)
   }
 
   async execute (tx) {
@@ -48,7 +47,7 @@ class RecordsImportJob extends Job {
       if (this.isCanceled())
         break
 
-      log.debug(`start importing record ${entryName}`)
+      Log.debug(`start importing record ${entryName}`)
 
       const collectRecordData = this.findCollectRecordData(entryName)
       const { collectRecordXml, step } = collectRecordData
@@ -70,7 +69,7 @@ class RecordsImportJob extends Job {
 
       await this.insertNode(survey, recordUuid, null, `/${collectRootEntityName}`, collectRootEntity, tx)
 
-      log.debug('record imported')
+      Log.debug('record imported')
 
       this.incrementProcessedItems()
     }
@@ -81,9 +80,7 @@ class RecordsImportJob extends Job {
 
     await this.batchPersister.flush(this.tx)
 
-    const surveyId = this.getSurveyId()
-
-    await RecordManager.enableTriggers(surveyId, this.tx)
+    await RecordManager.enableTriggers(this.getSurveyId(), this.tx)
   }
 
   getEntryNames () {
@@ -158,7 +155,6 @@ class RecordsImportJob extends Job {
 
   async nodesBatchInsertHandler (nodes, tx) {
     const surveyId = this.getSurveyId()
-
     await RecordManager.insertNodes(surveyId, nodes, tx)
   }
 

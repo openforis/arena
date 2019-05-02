@@ -5,7 +5,8 @@ const Survey = require('../survey/survey')
 const SurveyUtils = require('../survey/surveyUtils')
 const NodeDef = require('../survey/nodeDef')
 const Validator = require('../validation/validator')
-const Node = require('../record/node')
+const Node = require('./node')
+const NodesIndex = require('./_internal/recordNodesIndex')
 const User = require('../user/user')
 const RecordStep = require('./recordStep')
 
@@ -15,7 +16,9 @@ const keys = {
   ownerId: 'ownerId',
   step: 'step',
   preview: 'preview',
+  dateCreated: 'dateCreated'
 }
+
 // ====== CREATE
 
 const newRecord = (user, preview = false) => ({
@@ -50,30 +53,40 @@ const findNodesIndexed = predicate => R.pipe(
   R.filter(predicate)
 )
 
-const getNodeChildren = node => findNodes(n => Node.getParentUuid(n) === Node.getUuid(node))
-
 const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
-  getNodeChildren(parentNode),
-  R.filter(n => Node.getNodeDefUuid(n) === nodeDefUuid),
-  // Put placeholder at the end for multiple nodes if another user is editing the same record
-  R.sortWith([
-    R.propOr(false, Node.keys.placeholder),
-    R.prop(Node.keys.id)
-  ])
+  NodesIndex.getNodeUuidsByParentAndDef(Node.getUuid(parentNode), nodeDefUuid),
+  R.map(uuid => getNodeByUuid(uuid)(record)),
+  nodes =>
+    R.sortWith([
+      R.propOr(false, Node.keys.placeholder),
+      R.prop(Node.keys.dateCreated)
+    ])(nodes)
 )(record)
+
+const getNodeChildren = node => record => R.pipe(
+  NodesIndex.getNodeUuidsByParent(Node.getUuid(node)),
+  R.map(uuid => getNodeByUuid(uuid)(record))
+)(record)
+
+const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
+  getNodeChildrenByDefUuid(parentNode, nodeDefUuid),
+  R.head
+)
 
 const getNodeSiblingsByDefUuid = (node, siblingDefUuid) => R.pipe(
   getParentNode(node),
   parentNode => getNodeChildrenByDefUuid(parentNode, siblingDefUuid)
 )
 
-const getNodesByDefUuid = nodeDefUuid =>
-  findNodes(n => Node.getNodeDefUuid(n) === nodeDefUuid)
+const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
+  NodesIndex.getNodeUuidsByDef(nodeDefUuid),
+  R.map(uuid => getNodeByUuid(uuid)(record))
+)(record)
 
-const getRootNode = R.pipe(
-  getNodesArray,
-  R.find(R.propEq(Node.keys.parentUuid, null)),
-)
+const getRootNode = record => R.pipe(
+  NodesIndex.getNodeRootUuid,
+  uuid => getNodeByUuid(uuid)(record)
+)(record)
 
 const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
 
@@ -175,51 +188,59 @@ const assocNodes = nodes =>
       )
     )(nodes)
 
+    const nodesDeletedArray = R.pipe(
+      R.filter(Node.isDeleted),
+      R.values
+    )(nodes)
+
     return R.pipe(
       getNodes,
       R.mergeLeft(nodesToUpdate),
       mergedNodes => R.assoc(keys.nodes, mergedNodes)(record),
-      removeDeletedNodes,
+      deleteNodes(nodesDeletedArray),
+      NodesIndex.addNodes(nodesToUpdate)
     )(record)
   }
 
-const removeDeletedNodes = record => {
-  const deletedNodes = findNodes(R.propEq(Node.keys.deleted, true))(record)
-
-  return R.reduce(
+const deleteNodes = nodesDeletedArray =>
+  record => R.reduce(
     (updatedRecord, node) => deleteNode(node)(updatedRecord),
     record,
-    deletedNodes
+    nodesDeletedArray
   )
-}
 
 // ====== DELETE
 const deleteNode = node =>
   record => {
     const nodeUuid = Node.getUuid(node)
 
-    // 1. remove node from record
-    const recordUpdated = R.pipe(
-      getNodes,
-      R.dissoc(nodeUuid),
-      newNodes => R.assoc(keys.nodes, newNodes, record),
-    )(record)
+    // 1. remove entity children recursively
+    const children = getNodeChildren(node)(record)
+
+    let recordUpdated = R.reduce(
+      (recordAcc, child) => deleteNode(child)(recordAcc),
+      record,
+      children
+    )
 
     // 2. update validation
-    const recordValidationUpdated = R.pipe(
+    recordUpdated = R.pipe(
       Validator.getValidation,
       Validator.dissocFieldValidation(nodeUuid),
       newValidation => Validator.assocValidation(newValidation)(recordUpdated)
     )(recordUpdated)
 
-    // 3. remove entity children recursively
-    const children = getNodeChildren(node)(recordValidationUpdated)
+    // 3. remove node from index
+    recordUpdated = NodesIndex.removeNode(node)(recordUpdated)
 
-    return R.reduce(
-      (recordCurrent, child) => deleteNode(child)(recordCurrent),
-      recordValidationUpdated,
-      children
-    )
+    // 4. remove node from record
+    recordUpdated = R.pipe(
+      getNodes,
+      R.dissoc(nodeUuid),
+      newNodes => R.assoc(keys.nodes, newNodes, recordUpdated),
+    )(recordUpdated)
+
+    return recordUpdated
   }
 
 module.exports = {
@@ -238,6 +259,7 @@ module.exports = {
   getNodesArray,
   getNodesByDefUuid,
   getNodeChildrenByDefUuid,
+  getNodeChildByDefUuid,
   getNodeSiblingsByDefUuid,
   getRootNode,
   getNodeByUuid,

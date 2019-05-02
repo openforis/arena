@@ -10,6 +10,7 @@ const { nodeDefType } = NodeDef
 const Category = require('../../../../../../common/survey/category')
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
 const CollectImportReportItem = require('../../../../../../common/survey/collectImportReportItem')
+const Validator = require('../../../../../../common/validation/validator')
 
 const Job = require('../../../../../job/job')
 
@@ -252,8 +253,9 @@ class NodeDefsImportJob extends Job {
   getUniqueNodeDefName (parentNodeDef, collectNodeDefName) {
     let finalName = collectNodeDefName
 
-    if (R.includes(finalName, this.nodeDefNames)) {
-      // name is in use
+    if (R.includes(finalName, this.nodeDefNames)
+      || R.includes(finalName, Validator.keywords)) {
+      // name is in use or is a keyword
 
       // try to add parent node def name as prefix
       if (parentNodeDef) {

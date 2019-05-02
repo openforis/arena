@@ -79,7 +79,7 @@ const props = {
   [nodeDefType.taxon]: {
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
       const taxonUuid = Node.getTaxonUuid(nodeCol)
-      const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : []
+      const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : {}
       return (node, colName) =>
         R.endsWith('code', colName)
           ? Taxon.getCode(taxon)
