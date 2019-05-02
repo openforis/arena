@@ -17,7 +17,6 @@ const NodeRepository = require('../../../record/persistence/nodeRepository')
 
 const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort = '', client) => {
   const schemaName = SchemaRdb.getName(surveyId)
-  // Either filterExpr or filterStr need to be passed, the other one must be null
   const { str: filterQuery, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
   const colParams = Expression.toParamsObj(cols, 'col')
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
