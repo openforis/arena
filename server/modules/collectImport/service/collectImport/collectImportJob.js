@@ -31,7 +31,7 @@ class CollectImportJob extends Job {
     ])
   }
 
-  async prepareResult() {
+  async beforeSuccess() {
     const { surveyId } = this.context
 
     this.setResult({
