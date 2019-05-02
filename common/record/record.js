@@ -6,7 +6,7 @@ const SurveyUtils = require('../survey/surveyUtils')
 const NodeDef = require('../survey/nodeDef')
 const Validator = require('../validation/validator')
 const Node = require('./node')
-const RecordCache = require('./recordCache')
+const NodesIndex = require('./_internal/recordNodesIndex')
 const User = require('../user/user')
 const RecordStep = require('./recordStep')
 
@@ -54,7 +54,7 @@ const findNodesIndexed = predicate => R.pipe(
 )
 
 const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
-  RecordCache.getNodeChildrenUuidsByParentAndChildDef(Node.getUuid(parentNode), nodeDefUuid),
+  NodesIndex.getNodeUuidsByParentAndDef(Node.getUuid(parentNode), nodeDefUuid),
   R.map(uuid => getNodeByUuid(uuid)(record)),
   nodes =>
     R.sortWith([
@@ -64,7 +64,7 @@ const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => record => R.pipe(
 )(record)
 
 const getNodeChildren = node => record => R.pipe(
-  RecordCache.getNodeChildrenUuidsByParent(Node.getUuid(node)),
+  NodesIndex.getNodeUuidsByParent(Node.getUuid(node)),
   R.map(uuid => getNodeByUuid(uuid)(record))
 )(record)
 
@@ -79,14 +79,14 @@ const getNodeSiblingsByDefUuid = (node, siblingDefUuid) => R.pipe(
 )
 
 const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
-  RecordCache.getNodeUuidsByNodeDef(nodeDefUuid),
+  NodesIndex.getNodeUuidsByDef(nodeDefUuid),
   R.map(uuid => getNodeByUuid(uuid)(record))
 )(record)
 
-const getRootNode = R.pipe(
-  getNodesArray,
-  R.find(R.propEq(Node.keys.parentUuid, null)),
-)
+const getRootNode = record => R.pipe(
+  NodesIndex.getNodeRootUuid,
+  uuid => getNodeByUuid(uuid)(record)
+)(record)
 
 const getNodeByUuid = uuid => R.path([keys.nodes, uuid])
 
@@ -198,7 +198,7 @@ const assocNodes = nodes =>
       R.mergeLeft(nodesToUpdate),
       mergedNodes => R.assoc(keys.nodes, mergedNodes)(record),
       deleteNodes(nodesDeletedArray),
-      RecordCache.indexNodes(nodesToUpdate)
+      NodesIndex.addNodes(nodesToUpdate)
     )(record)
   }
 
@@ -214,30 +214,33 @@ const deleteNode = node =>
   record => {
     const nodeUuid = Node.getUuid(node)
 
-    // 1. remove node from record
-    const recordUpdated = R.pipe(
-      getNodes,
-      R.dissoc(nodeUuid),
-      newNodes => R.assoc(keys.nodes, newNodes, record),
-    )(record)
+    // 1. remove entity children recursively
+    const children = getNodeChildren(node)(record)
+
+    let recordUpdated = R.reduce(
+      (recordAcc, child) => deleteNode(child)(recordAcc),
+      record,
+      children
+    )
 
     // 2. update validation
-    const recordValidationUpdated = R.pipe(
+    recordUpdated = R.pipe(
       Validator.getValidation,
       Validator.dissocFieldValidation(nodeUuid),
       newValidation => Validator.assocValidation(newValidation)(recordUpdated)
     )(recordUpdated)
 
-    const recordCacheUpdated = RecordCache.removeNodeFromIndex(node)(recordValidationUpdated)
+    // 3. remove node from index
+    recordUpdated = NodesIndex.removeNode(node)(recordUpdated)
 
-    // 3. remove entity children recursively
-    const children = getNodeChildren(node)(recordCacheUpdated)
+    // 4. remove node from record
+    recordUpdated = R.pipe(
+      getNodes,
+      R.dissoc(nodeUuid),
+      newNodes => R.assoc(keys.nodes, newNodes, recordUpdated),
+    )(recordUpdated)
 
-    return R.reduce(
-      (recordCurrent, child) => deleteNode(child)(recordCurrent),
-      recordCacheUpdated,
-      children
-    )
+    return recordUpdated
   }
 
 module.exports = {
