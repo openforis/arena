@@ -1,7 +1,7 @@
 const db = require('../../../db/db')
 
 const Record = require('../../../../common/record/record')
-const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
+const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
 const NodeDefRepository = require('../../nodeDef/persistence/nodeDefRepository')
 const RecordRepository = require('./recordRepository')
@@ -25,7 +25,7 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, client = db) => {
   const record = await fetchRecordByUuid(surveyId, recordUuid, client)
   const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
 
-  return Record.assocNodes(toUuidIndexedObj(nodes))(record)
+  return Record.assocNodes(SurveyUtils.toUuidIndexedObj(nodes))(record)
 }
 
 module.exports = {
