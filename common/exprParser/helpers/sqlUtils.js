@@ -32,7 +32,7 @@ const binaryToString = (node, parentParams) => {
   }
 }
 
-const getNextParamName = parentParams => `_${parentParams.length}`
+const getNextParamName = params => `_${params.length}`
 
 const converters = {
   [types.Identifier]: (node, parentParams) => ({
