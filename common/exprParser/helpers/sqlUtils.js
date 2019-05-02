@@ -18,8 +18,14 @@ const js2sqlOperators = {
 
 const binaryToString = (node, params) => {
   const left = toString(node.left, params)
-  const right = toString(node.right, left.params)
+  if (node.operator === '===' && node.right.type === types.Literal && node.right.value === null) {
+    return {
+      str: `${left.str} IS NULL`,
+      params: left.params,
+    }
+  }
 
+  const right = toString(node.right, left.params)
   return {
     str: `${left.str} ${js2sqlOperators[node.operator]} ${right.str}`,
     params: right.params,

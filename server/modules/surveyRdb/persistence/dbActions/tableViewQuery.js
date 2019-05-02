@@ -15,18 +15,20 @@ const DataCol = require('../schemaRdb/dataCol')
 
 const NodeRepository = require('../../../record/persistence/nodeRepository')
 
-const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort = '', client) => {
+const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, filterStr, sort = '', client) => {
   const schemaName = SchemaRdb.getName(surveyId)
+  // Either filterExpr or filterStr need to be passed, the other one must be null
   const { str: filterQuery, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
+  const whereClause = filterQuery || filterStr
   const colParams = Expression.toParamsObj(cols, 'col')
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
 
   return await client.any(`
     SELECT ${colParamNames.join(', ')} 
     FROM $/schemaName:name/.$/tableName:name/
-    ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
+    ${R.isNil(whereClause) ? '' : `WHERE ${whereClause}`}
     ${R.isEmpty(sort) ? '' : `ORDER BY ${sort} NULLS LAST`}
-    LIMIT $/limit/
+    ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
     OFFSET $/offset/
     `,
     { ...filterParams, ...colParams, schemaName, tableName, limit, offset }
@@ -80,8 +82,7 @@ const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {
     )
   )
 
-  return await runSelect(surveyId, tableName, ['*'], 0, 'ALL', whereConditions.join(' AND '), '', client)
-
+  return await runSelect(surveyId, tableName, ['*'], 0, null, null, whereConditions, '', client)
 }
 
 module.exports = {
