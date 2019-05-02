@@ -4,6 +4,7 @@ const BatchPersister = require('../../../db/batchPersister')
 
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Taxon = require('../../../../common/survey/taxon')
+const Validator = require('../../../../common/validation/validator')
 
 const TaxonomyManager = require('./taxonomyManager')
 
@@ -23,8 +24,7 @@ class TaxonomyImportManager {
   }
 
   async addTaxonToInsertBuffer (taxon, t) {
-    await this.batchPersister.addItem(R.omit(['validation'], taxon), t)
-
+    await this.batchPersister.addItem(R.omit([Validator.keys.validation], taxon), t)
     this.insertedCodes[Taxon.getCode(taxon)] = true
   }
 

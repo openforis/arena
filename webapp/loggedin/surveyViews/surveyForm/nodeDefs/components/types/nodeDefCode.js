@@ -17,8 +17,7 @@ import Node from '../../../../../../../common/record/node'
 import { isRenderDropdown } from '../../../../../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../../../../../../survey/surveyState'
-import { getRecord } from '../../../../record/recordState'
-import { getSurveyForm } from '../../../../surveyForm/surveyFormState'
+import * as RecordState from '../../../../record/recordState'
 
 class NodeDefCode extends React.Component {
 
@@ -144,9 +143,8 @@ class NodeDefCode extends React.Component {
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const surveyForm = getSurveyForm(state)
 
-  const record = getRecord(surveyForm)
+  const record = RecordState.getRecord(state)
   const { nodeDef, parentNode } = props
 
   const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)

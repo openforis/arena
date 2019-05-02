@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const log = require('../../../../log/log')
+const Log = require('../../../../../log/log')
 
 const BatchPersister = require('../../../../../db/batchPersister')
 
@@ -47,7 +47,7 @@ class RecordsImportJob extends Job {
       if (this.isCanceled())
         break
 
-      log.debug(`start importing record ${entryName}`)
+      Log.debug(`start importing record ${entryName}`)
 
       const collectRecordData = this.findCollectRecordData(entryName)
       const { collectRecordXml, step } = collectRecordData
@@ -69,7 +69,7 @@ class RecordsImportJob extends Job {
 
       await this.insertNode(survey, recordUuid, null, `/${collectRootEntityName}`, collectRootEntity, tx)
 
-      log.debug('record imported')
+      Log.debug('record imported')
 
       this.incrementProcessedItems()
     }

@@ -10,7 +10,6 @@ import Record from '../../../../../../common/record/record'
 import RecordValidation from '../../../../../../common/record/recordValidation'
 import Validator from '../../../../../../common/validation/validator'
 
-import * as SurveyFormState from '../../surveyFormState'
 import * as RecordState from '../../../record/recordState'
 
 const NodeDefErrorBadge = props => {
@@ -34,8 +33,7 @@ const NodeDefErrorBadge = props => {
 const mapStateToProps = (state, props) => {
   const {nodeDef, parentNode, nodes, node, edit} = props
 
-  const surveyForm = SurveyFormState.getSurveyForm(state)
-  const record = RecordState.getRecord(surveyForm)
+  const record = RecordState.getRecord(state)
 
   let validation = Validator.validValidation
 

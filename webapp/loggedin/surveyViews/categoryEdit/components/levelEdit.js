@@ -12,29 +12,27 @@ import Survey from '../../../../../common/survey/survey'
 import Category from '../../../../../common/survey/category'
 import CategoryLevel from '../../../../../common/survey/categoryLevel'
 import CategoryItem from '../../../../../common/survey/categoryItem'
-import { getFieldValidation } from '../../../../../common/validation/validator'
+import Validator from '../../../../../common/validation/validator'
 
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
-import { getSurveyForm } from '../../surveyForm/surveyFormState'
+import * as CategoryEditState from '../categoryEditState'
 
 import { canEditSurvey } from '../../../../../common/auth/authManager'
 
 import {
-  getCategoryEditLevelActiveItem,
-  getCategoryForEdit,
-  getCategoryEditLevelItemsArray,
-} from '../categoryEditState'
-
-import { createCategoryLevelItem } from '../actions'
-import { putCategoryItemProp, putCategoryLevelProp } from '../actions'
-import { deleteCategoryItem, deleteCategoryLevel, setCategoryItemForEdit } from '../actions'
-
+  createCategoryLevelItem,
+  putCategoryItemProp,
+  putCategoryLevelProp,
+  deleteCategoryItem,
+  deleteCategoryLevel,
+  setCategoryItemForEdit
+} from '../actions'
 
 class LevelEdit extends React.Component {
 
   handleDelete () {
-    const {survey, category, level, deleteCategoryLevel} = this.props
+    const { survey, category, level, deleteCategoryLevel } = this.props
 
     const nodeDefsCode = Survey.getNodeDefsByCategoryUuid(Category.getUuid(category))(survey)
     if (R.any(def => Survey.getNodeDefCategoryLevelIndex(def)(survey) >= CategoryLevel.getIndex(level))(nodeDefsCode)) {
@@ -73,7 +71,7 @@ class LevelEdit extends React.Component {
 
       <FormItem label={'name'}>
         <Input value={CategoryLevel.getName(level)}
-               validation={getFieldValidation('name')(validation)}
+               validation={Validator.getFieldValidation('name')(validation)}
                onChange={value => putCategoryLevelProp(category, level, 'name', normalizeName(value))}
                readOnly={readOnly}/>
       </FormItem>
@@ -112,20 +110,18 @@ class LevelEdit extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const {level} = props
-  const {index} = level
+  const { level } = props
+  const { index } = level
 
-  const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const surveyForm = getSurveyForm(state)
   const language = Survey.getDefaultLanguage(surveyInfo)
 
-  const category = getCategoryForEdit(survey)(surveyForm)
-  const activeItem = getCategoryEditLevelActiveItem(index)(surveyForm)
-  const parentItem = getCategoryEditLevelActiveItem(index - 1)(surveyForm)
+  const category = CategoryEditState.getCategoryForEdit(state)
+  const activeItem = CategoryEditState.getLevelActiveItem(index)(state)
+  const parentItem = CategoryEditState.getLevelActiveItem(index - 1)(state)
 
   const canAddItem = index === 0 || parentItem
-  const items = canAddItem ? getCategoryEditLevelItemsArray(index)(surveyForm) : []
+  const items = canAddItem ? CategoryEditState.getLevelItemsArray(index)(state) : []
   const canBeDeleted = Category.isLevelDeleteAllowed(level)(category)
 
   const user = AppState.getUser(state)

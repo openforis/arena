@@ -14,31 +14,17 @@ import Taxonomy from '../../../../../common/survey/taxonomy'
 import { normalizeName } from '../../../../../common/stringUtils'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
-import {
-  getTaxonomyEditTaxonomy,
-  getTaxonomyEditTaxaTotalPages,
-  getTaxonomyEditTaxaCurrentPage,
-  getTaxonomyEditTaxa,
-  getTaxonomyEditTaxaPerPage
-} from '../taxonomyEditState'
 import * as SurveyState from '../../../../survey/surveyState'
-import * as AppJobState from '../../../appJob/appJobState'
 import * as AppState from '../../../../app/appState'
-import { getSurveyForm } from '../../surveyForm/surveyFormState'
+import * as TaxonomyEditState from '../taxonomyEditState'
 
-import {
-  setTaxonomyForEdit,
-  putTaxonomyProp,
-  uploadTaxonomyFile,
-  initTaxaList,
-  loadTaxa,
-} from '../actions'
+import { initTaxaList, loadTaxa, putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile, } from '../actions'
 import { canEditSurvey } from '../../../../../common/auth/authManager'
 
 class TaxonomyEdit extends React.Component {
 
   async componentDidMount () {
-    const {taxonomy, initTaxaList} = this.props
+    const { taxonomy, initTaxaList } = this.props
 
     if (Taxonomy.getUuid(taxonomy)) {
       initTaxaList(taxonomy)
@@ -52,7 +38,7 @@ class TaxonomyEdit extends React.Component {
       readOnly,
     } = this.props
 
-    const {validation} = taxonomy
+    const { validation } = taxonomy
 
     return (
       <div className="taxonomy-edit">
@@ -96,7 +82,7 @@ class TaxonomyEdit extends React.Component {
                           onPageChange={(page) => loadTaxa(taxonomy, page)}/>
         }
 
-        <div style={{justifySelf: 'center'}}>
+        <div style={{ justifySelf: 'center' }}>
           <button className="btn btn-of-light"
                   onClick={() => setTaxonomyForEdit(null)}>
             Done
@@ -109,19 +95,17 @@ class TaxonomyEdit extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const surveyForm = getSurveyForm(state)
   const user = AppState.getUser(state)
-  const activeJob = AppJobState.getActiveJob(state)
+  const activeJob = AppState.getActiveJob(state)
 
   return {
     surveyId: SurveyState.getSurveyId(state),
-    taxonomy: getTaxonomyEditTaxonomy(survey)(surveyForm),
-    taxaCurrentPage: getTaxonomyEditTaxaCurrentPage(surveyForm),
-    taxaTotalPages: getTaxonomyEditTaxaTotalPages(surveyForm),
-    taxaPerPage: getTaxonomyEditTaxaPerPage(surveyForm),
-    taxa: getTaxonomyEditTaxa(surveyForm),
+    taxonomy: TaxonomyEditState.getTaxonomy(state),
+    taxaCurrentPage: TaxonomyEditState.getTaxaCurrentPage(state),
+    taxaTotalPages: TaxonomyEditState.getTaxaTotalPages(state),
+    taxaPerPage: TaxonomyEditState.getTaxaPerPage(state),
+    taxa: TaxonomyEditState.getTaxa(state),
     activeJob,
     readOnly: !canEditSurvey(user, surveyInfo)
   }

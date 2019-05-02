@@ -7,7 +7,6 @@ import Node from '../../../../common/record/node'
 
 import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from '../record/recordState'
-import * as SurveyFormState from './surveyFormState'
 
 /**
  * ==== SURVEY-FORM EDIT MODE - NODE DEFS EDIT
@@ -18,17 +17,7 @@ export const formReset = 'survey/form/reset'
 export const resetForm = () => dispatch =>
   dispatch({ type: formReset })
 
-// ====== nodeDef edit
-export const formNodeDefEditUpdate = 'survey/form/nodeDef/edit/update'
 export const formNodeDefAddChildToUpdate = 'survey/form/nodeDef/addChildTo/update'
-
-// set current nodeDef edit
-export const setFormNodeDefEdit = nodeDef => dispatch =>
-  dispatch({ type: formNodeDefEditUpdate, nodeDef })
-
-// reset current nodeDef edit
-export const closeFormNodeDefEdit = () => async dispatch =>
-  dispatch({ type: formNodeDefEditUpdate, nodeDef: null })
 
 // set current nodeDef unlocked
 export const setFormNodeDefAddChildTo = nodeDef => dispatch =>
@@ -52,8 +41,7 @@ export const getNodeKeyLabelValues = nodeEntity => (dispatch, getState) => {
   const state = getState()
 
   const survey = SurveyState.getSurvey(state)
-  const surveyForm = SurveyFormState.getSurveyForm(state)
-  const record = RecordState.getRecord(surveyForm)
+  const record = RecordState.getRecord(state)
   const lang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
 
   const nodeKeys = R.pipe(

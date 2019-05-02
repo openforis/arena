@@ -13,7 +13,6 @@ import { appModuleUri } from '../../../appModules'
 import { designerModules } from '../../../modules/designer/designerModules'
 
 import * as RecordState from '../../record/recordState'
-import * as SurveyFormState from '../surveyFormState'
 
 const RecordEntryButtons = (props) => {
 
@@ -107,8 +106,7 @@ const FormEntryActions = (props) => {
 }
 
 const mapStateToProps = (state) => {
-  const surveyForm = SurveyFormState.getSurveyForm(state)
-  const record = RecordState.getRecord(surveyForm)
+  const record = RecordState.getRecord(state)
   const stepId = Record.getStep(record)
 
   return {
