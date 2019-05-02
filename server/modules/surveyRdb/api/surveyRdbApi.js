@@ -9,11 +9,12 @@ module.exports.init = app => {
 
   app.post('/surveyRdb/:surveyId/:tableName/query', requireRecordListViewPermission, async (req, res) => {
     try {
-      const { surveyId, nodeDefUuidTable, tableName, offset, limit, sort = '', editMode = false } = Request.getParams(req)
+      const { surveyId, nodeDefUuidTable, tableName, offset, limit, editMode = false } = Request.getParams(req)
 
       const cols = Request.getJsonParam(req, 'cols', [])
       const nodeDefUuidCols = Request.getJsonParam(req, 'nodeDefUuidCols', [])
-      const filter = Request.getJsonParam(req, 'filter', null)
+      const filter = Request.getJsonParam(req, 'filter')
+      const sort = Request.getJsonParam(req, 'sort')
 
       const rows = await SurveyRdbService.queryTable(surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset, limit, filter, sort, editMode)
 

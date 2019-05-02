@@ -6,7 +6,7 @@ import * as SurveyState from '../../../../../survey/surveyState'
 import * as DataQueryState from './dataQueryState'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
 
-import * as DataSort from './components/sort/dataSort'
+import * as DataSort from '../../../../../../common/dataSort'
 
 export const dataQueryTableNodeDefUuidUpdate = 'dataQuery/table/nodeDefUuid/update'
 export const dataQueryTableNodeDefUuidColsUpdate = 'dataQuery/table/nodeDefUuidCols/update'
@@ -33,7 +33,8 @@ const getColNames = (state, nodeDefUuidCols) => {
   return NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 }
 
-const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = null, sort = '') =>
+const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = null, sort = null) =>
+  console.log(DataSort.getHttpParam(sort)) ||
   axios.post(
     `/api/surveyRdb/${surveyId}/${tableName}/query`, {
       nodeDefUuidTable,
@@ -42,7 +43,7 @@ const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuid
       offset,
       limit: defaults.limit,
       filter: filter ? JSON.stringify(filter) : null,
-      sort: DataSort.serialize(sort),
+      sort: JSON.stringify(DataSort.getHttpParam(sort)),
       editMode,
     }
   )
