@@ -1,22 +1,14 @@
 import { exportReducer } from '../../../utils/reduxUtils'
 
-import { appUserLogout } from '../../../app/actions'
+import Category from '../../../../common/survey/category'
+import CategoryLevel from '../../../../common/survey/categoryLevel'
+import CategoryItem from '../../../../common/survey/categoryItem'
+import * as CategoryEditState from './categoryEditState'
 
+import { appUserLogout } from '../../../app/actions'
 import { surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../surveyForm/actions'
 
-import {
-  initCategoryEdit,
-  dissocLevel,
-
-  createLevelItem,
-  assocLevelItems,
-  assocLevelItem,
-  assocLevelItemProp,
-  dissocLevelItem,
-
-  assocLevelActiveItem,
-} from './categoryEditState'
 
 import {
   categoryEditUpdate,
@@ -33,9 +25,6 @@ import {
   categoryLevelDelete,
 } from '../../../survey/categories/actions'
 
-import Category from '../../../../common/survey/category'
-import CategoryLevel from '../../../../common/survey/categoryLevel'
-import CategoryItem from '../../../../common/survey/categoryItem'
 
 const actionHandlers = {
   // reset form
@@ -45,29 +34,29 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
 
-  [categoryEditUpdate]: (state, { categoryUuid }) => initCategoryEdit(categoryUuid),
+  [categoryEditUpdate]: (state, { categoryUuid }) => CategoryEditState.initCategoryEdit(categoryUuid),
 
   // category
-  [categoryCreate]: (state, { category }) => initCategoryEdit(Category.getUuid(category)),
+  [categoryCreate]: (state, { category }) => CategoryEditState.initCategoryEdit(Category.getUuid(category)),
 
   // ===== category level
-  [categoryLevelDelete]: (state, { level }) => dissocLevel(CategoryLevel.getIndex(level))(state),
+  [categoryLevelDelete]: (state, { level }) => CategoryEditState.dissocLevel(CategoryLevel.getIndex(level))(state),
 
   // ===== category level items
-  [categoryItemsUpdate]: (state, { levelIndex, items }) => assocLevelItems(levelIndex, items)(state),
+  [categoryItemsUpdate]: (state, { levelIndex, items }) => CategoryEditState.assocLevelItems(levelIndex, items)(state),
 
   // ===== category level item
-  [categoryItemCreate]: (state, { level, item }) => createLevelItem(CategoryLevel.getIndex(level), item)(state),
+  [categoryItemCreate]: (state, { level, item }) => CategoryEditState.createLevelItem(CategoryLevel.getIndex(level), item)(state),
 
-  [categoryItemUpdate]: (state, { level, item }) => assocLevelItem(CategoryLevel.getIndex(level), item)(state),
+  [categoryItemUpdate]: (state, { level, item }) => CategoryEditState.assocLevelItem(CategoryLevel.getIndex(level), item)(state),
 
-  [categoryItemPropUpdate]: (state, { level, item, key, value }) => assocLevelItemProp(level, item, key, value)(state),
+  [categoryItemPropUpdate]: (state, { level, item, key, value }) => CategoryEditState.assocLevelItemProp(level, item, key, value)(state),
 
-  [categoryItemDelete]: (state, { level, item }) => dissocLevelItem(CategoryLevel.getIndex(level), CategoryItem.getUuid(item))(state),
+  [categoryItemDelete]: (state, { level, item }) => CategoryEditState.dissocLevelItem(CategoryLevel.getIndex(level), CategoryItem.getUuid(item))(state),
 
   // ===== category level active item
   [categoryEditLevelActiveItemUpdate]: (state, { levelIndex, itemUuid }) =>
-    assocLevelActiveItem(levelIndex, itemUuid)(state),
+    CategoryEditState.assocLevelActiveItem(levelIndex, itemUuid)(state),
 }
 
 export default exportReducer(actionHandlers)

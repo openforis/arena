@@ -4,75 +4,18 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import Checkbox from '../../../../commonComponents/form/checkbox'
-import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
-import NodeDefEdit from '../../../surveyViews/nodeDefEdit/nodeDefEdit'
-import SurveyDefsLoader from '../../../surveyViews/surveyDefsLoader/surveyDefsLoader'
-
-import Survey from '../../../../../common/survey/survey'
-import NodeDef from '../../../../../common/survey/nodeDef'
 import CollectImportReportItem from '../../../../../common/survey/collectImportReportItem'
 
-import { fetchCollectImportReportItems, updateCollectImportReportItem } from './actions'
-import { setFormNodeDefEdit } from '../../../surveyViews/surveyForm/actions'
+import NodeDefEdit from '../../../surveyViews/nodeDefEdit/nodeDefEdit'
+import SurveyDefsLoader from '../../../surveyViews/surveyDefsLoader/surveyDefsLoader'
+import NodeDefReportItem from './nodeDefReportItem'
+
 import * as SurveyState from '../../../../survey/surveyState'
 import * as CollectImportReportState from './collectImportReportState'
-import * as SurveyFormState from '../../../surveyViews/surveyForm/surveyFormState'
+import * as NodeDefEditState from '../../../surveyViews/nodeDefEdit/nodeDefEditState'
 
-const NodeDefReportItem = ({ survey, nodeDefUuid, nodeDefItems, updateCollectImportReportItem, onNodeDefEdit }) => {
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const defaultLanguage = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-
-  return (
-    <div className="collect-import-report-node-def-items">
-      <div
-        className="collect-import-report-node-def-items-header">{NodeDef.getLabel(nodeDef, defaultLanguage)}</div>
-      <div className="table__row-header collect-import-report-header">
-        <div>#</div>
-        <div>Type</div>
-        <div>Expression</div>
-        <div>Apply if</div>
-        <div>Messages</div>
-        <div>Resolved</div>
-        <div>Edit</div>
-      </div>
-      {
-        nodeDefItems.map((item, idx) =>
-          <div
-            key={idx}
-            className="table__row collect-import-report-item">
-            <div>{idx + 1}</div>
-            <div>{CollectImportReportItem.getExpressionType(item)}</div>
-            <div>{CollectImportReportItem.getExpression(item)}</div>
-            <div>{CollectImportReportItem.getApplyIf(item)}</div>
-            <div>
-              <LabelsEditor
-                labels={CollectImportReportItem.getMessages(item)}
-                languages={Survey.getLanguages(survey)}
-                readOnly={true}
-                showFormLabel={false}
-                maxPreview={1}
-                compactLanguage={true}
-              />
-            </div>
-            <div>
-              <Checkbox
-                checked={CollectImportReportItem.isResolved(item)}
-                onChange={checked => updateCollectImportReportItem(item.id, checked)}
-              />
-            </div>
-            <div>
-              <button onClick={() => {
-                onNodeDefEdit(nodeDef)
-              }}>EDIT
-              </button>
-            </div>
-          </div>
-        )
-      }
-    </div>
-  )
-}
+import { setNodeDefForEdit } from '../../../surveyViews/nodeDefEdit/actions'
+import { fetchCollectImportReportItems, updateCollectImportReportItem } from './actions'
 
 class CollectImportReportView extends React.Component {
 
@@ -83,7 +26,7 @@ class CollectImportReportView extends React.Component {
   }
 
   handleNodeDefEdit (nodeDef) {
-    this.props.setFormNodeDefEdit(nodeDef)
+    this.props.setNodeDefForEdit(nodeDef)
   }
 
   render () {
@@ -134,7 +77,7 @@ class CollectImportReportView extends React.Component {
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const reportItems = CollectImportReportState.getState(state)
-  const editedNodeDef = SurveyFormState.getFormNodeDefEdit(state)
+  const editedNodeDef = NodeDefEditState.hasNodeDef(state)
 
   return {
     survey,
@@ -147,6 +90,6 @@ export default connect(
   mapStateToProps,
   {
     fetchCollectImportReportItems, updateCollectImportReportItem,
-    setFormNodeDefEdit
+    setNodeDefForEdit
   }
 )(CollectImportReportView)

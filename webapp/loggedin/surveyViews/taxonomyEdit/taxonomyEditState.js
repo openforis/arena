@@ -2,42 +2,50 @@ import * as R from 'ramda'
 
 import Survey from '../../../../common/survey/survey'
 
-// DOCS
-const surveyState = {
-  survey: {
-    //....
-    // loaded taxonomy
-    taxonomyEdit: {
-      taxonomyUuid: '',
-      taxa: [],
-      currentPage: 0,
-      totalPages: 0,
-      taxaPerPage: 15,
-    },
+import * as SurveyViewsState from '../surveyViewsState'
+import * as SurveyState from '../../../survey/surveyState'
 
-  }
+// DOCS
+const stateDoc = {
+  taxonomyEdit: {
+    taxonomyUuid: '',
+    taxa: [],
+    taxaCurrentPage: 0,
+    taxaTotalPages: 0,
+    taxaPerPage: 15,
+  },
 }
 
-const taxonomyEdit = 'taxonomyEdit'
-const taxonomyUuid = 'taxonomyUuid'
+const keys = {
+  taxonomyUuid: 'taxonomyUuid',
+  taxa: 'taxa',
+  taxaCurrentPage: 'taxaCurrentPage',
+  taxaTotalPages: 'taxaTotalPages',
+  taxaPerPage: 'taxaPerPage',
+}
+
+export const stateKey = 'taxonomyEdit'
+const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
+const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 
 // ==== taxonomy for edit
-export const initTaxonomyEdit = uuid => uuid ? {[taxonomyUuid]: uuid} : null
 
-export const getTaxonomyEditTaxonomy = survey =>
-  surveyForm => R.pipe(
-    R.path([taxonomyEdit, taxonomyUuid]),
-    uuid => Survey.getTaxonomyByUuid(uuid)(survey),
-  )(surveyForm)
+export const initTaxonomyEdit = taxonomyUuid => taxonomyUuid ? { taxonomyUuid } : null
+
+export const getTaxonomy = state => {
+  const survey = SurveyState.getSurvey(state)
+  const taxonomyUuid = getStateProp(keys.taxonomyUuid)(state)
+  return Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
+}
 
 // ==== taxonomyEdit Props
+
 export const mergeTaxonomyEditProps = props => R.mergeDeepLeft(props)
 
-export const getTaxonomyEditTaxaCurrentPage = R.pathOr(1, [taxonomyEdit, 'taxaCurrentPage'])
+export const getTaxaCurrentPage = getStateProp(keys.taxaCurrentPage, 1)
 
-export const getTaxonomyEditTaxaPerPage = R.pathOr(15, [taxonomyEdit, 'taxaPerPage'])
+export const getTaxaPerPage = getStateProp(keys.taxaPerPage, 15)
 
-export const getTaxonomyEditTaxaTotalPages = R.pathOr(0, [taxonomyEdit, 'taxaTotalPages'])
+export const getTaxaTotalPages = getStateProp(keys.taxaTotalPages, 0)
 
-export const getTaxonomyEditTaxa = R.pathOr([], [taxonomyEdit, 'taxa'])
-
+export const getTaxa = getStateProp(keys.taxa, [])

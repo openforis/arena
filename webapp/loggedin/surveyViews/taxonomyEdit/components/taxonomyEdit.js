@@ -14,16 +14,9 @@ import Taxonomy from '../../../../../common/survey/taxonomy'
 import { normalizeName } from '../../../../../common/stringUtils'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
-import {
-  getTaxonomyEditTaxa,
-  getTaxonomyEditTaxaCurrentPage,
-  getTaxonomyEditTaxaPerPage,
-  getTaxonomyEditTaxaTotalPages,
-  getTaxonomyEditTaxonomy
-} from '../taxonomyEditState'
 import * as SurveyState from '../../../../survey/surveyState'
 import * as AppState from '../../../../app/appState'
-import * as SurveyFormState from '../../surveyForm/surveyFormState'
+import * as TaxonomyEditState from '../taxonomyEditState'
 
 import { initTaxaList, loadTaxa, putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile, } from '../actions'
 import { canEditSurvey } from '../../../../../common/auth/authManager'
@@ -102,19 +95,17 @@ class TaxonomyEdit extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const surveyForm = SurveyFormState.getSurveyForm(state)
   const user = AppState.getUser(state)
   const activeJob = AppState.getActiveJob(state)
 
   return {
     surveyId: SurveyState.getSurveyId(state),
-    taxonomy: getTaxonomyEditTaxonomy(survey)(surveyForm),
-    taxaCurrentPage: getTaxonomyEditTaxaCurrentPage(surveyForm),
-    taxaTotalPages: getTaxonomyEditTaxaTotalPages(surveyForm),
-    taxaPerPage: getTaxonomyEditTaxaPerPage(surveyForm),
-    taxa: getTaxonomyEditTaxa(surveyForm),
+    taxonomy: TaxonomyEditState.getTaxonomy(state),
+    taxaCurrentPage: TaxonomyEditState.getTaxaCurrentPage(state),
+    taxaTotalPages: TaxonomyEditState.getTaxaTotalPages(state),
+    taxaPerPage: TaxonomyEditState.getTaxaPerPage(state),
+    taxa: TaxonomyEditState.getTaxa(state),
     activeJob,
     readOnly: !canEditSurvey(user, surveyInfo)
   }

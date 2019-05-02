@@ -9,15 +9,12 @@ import { appUserLogout } from '../../../app/actions'
 import { surveyDelete, surveyUpdate } from '../../../survey/actions'
 import {
   formActivePageNodeDefUpdate,
-  formNodeDefEditUpdate,
   formNodeDefAddChildToUpdate,
   formPageNodeUpdate,
   formReset
 } from './actions'
 import { nodeDefCreate, nodeDefPropsUpdate } from '../../../survey/nodeDefs/actions'
 import { recordLoad } from '../record/actions'
-
-
 
 const actionHandlers = {
   // reset form
@@ -29,8 +26,6 @@ const actionHandlers = {
   [formReset]: () => ({}),
 
   // form actions
-  [formNodeDefEditUpdate]: (state, { nodeDef }) => SurveyFormState.assocFormNodeDefEdit(nodeDef)(state),
-
   [formNodeDefAddChildToUpdate]: (state, { nodeDef }) => SurveyFormState.assocNodeDefAddChildTo(nodeDef)(state),
 
   [formActivePageNodeDefUpdate]: (state, { nodeDef }) =>
@@ -71,5 +66,3 @@ const actionHandlers = {
 }
 
 export default  exportReducer(actionHandlers)
-
-
