@@ -1,4 +1,6 @@
 const db = require('../db/db')
+const Log = require('../log/log')
+
 const { uuidv4 } = require('../../common/uuid')
 
 const { jobEvents, jobStatus } = require('./jobUtils')
@@ -55,6 +57,8 @@ class Job {
    * extend the "process" method instead.
    */
   async start (client = db) {
+    Log.debug('JOB ' + this.constructor.name + ' START')
+
     await client.tx(async tx => {
       try {
         this.tx = tx
@@ -81,6 +85,8 @@ class Job {
         throw new Error('Job canceled or errors found; rollback transaction')
       }
     })
+
+    Log.debug('JOB ' + this.constructor.name + ' END')
   }
 
   addError (error) {

@@ -22,6 +22,8 @@ const getRecordPermissions = record =>
     )(user)
 
 module.exports = {
+  keys,
+
   validEmail,
   getId: R.prop(keys.id),
   getAuthGroups,

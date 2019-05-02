@@ -134,8 +134,7 @@ class CollectImportReportView extends React.Component {
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const reportItems = CollectImportReportState.getState(state)
-  const surveyForm = SurveyFormState.getSurveyForm(state)
-  const editedNodeDef = SurveyFormState.getFormNodeDefEdit(survey)(surveyForm)
+  const editedNodeDef = SurveyFormState.getFormNodeDefEdit(state)
 
   return {
     survey,

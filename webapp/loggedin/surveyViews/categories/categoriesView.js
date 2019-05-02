@@ -12,7 +12,7 @@ import { canEditSurvey } from '../../../../common/auth/authManager'
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
 import { getCategoryForEdit } from '../categoryEdit/categoryEditState'
-import { getSurveyForm } from '../surveyForm/surveyFormState'
+import * as SurveyFormState from '../surveyForm/surveyFormState'
 
 import {
   createCategory,
@@ -74,7 +74,7 @@ const mapStateToProps = (state) => {
 
   return {
     categories,
-    category: getCategoryForEdit(survey)(getSurveyForm(state)),
+    category: getCategoryForEdit(survey)(SurveyFormState.getSurveyForm(state)),
     readOnly: !canEditSurvey(user, surveyInfo)
   }
 }

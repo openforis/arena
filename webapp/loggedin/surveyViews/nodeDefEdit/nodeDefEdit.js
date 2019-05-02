@@ -18,7 +18,7 @@ import Taxonomy from '../../../../common/survey/taxonomy'
 import { isRenderTable } from '../../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../../../survey/surveyState'
-import { getFormNodeDefEdit, getSurveyForm } from '../surveyForm/surveyFormState'
+import * as SurveyFormState from '../surveyForm/surveyFormState'
 
 import { closeFormNodeDefEdit } from '../surveyForm/actions'
 import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
@@ -156,8 +156,7 @@ const isDisplayInEnabled = (nodeDef) =>
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const surveyForm = getSurveyForm(state)
-  const nodeDef = getFormNodeDefEdit(survey)(surveyForm)
+  const nodeDef = SurveyFormState.getFormNodeDefEdit(state)
   const nodeDefParent = Survey.getNodeDefByUuid(
     NodeDef.getParentUuid(nodeDef)
   )(survey)

@@ -16,7 +16,7 @@ import { getFieldValidation } from '../../../../../common/validation/validator'
 
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
-import { getSurveyForm } from '../../surveyForm/surveyFormState'
+import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
 import { canEditSurvey } from '../../../../../common/auth/authManager'
 
@@ -117,7 +117,7 @@ const mapStateToProps = (state, props) => {
 
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const surveyForm = getSurveyForm(state)
+  const surveyForm = SurveyFormState.getSurveyForm(state)
   const language = Survey.getDefaultLanguage(surveyInfo)
 
   const category = getCategoryForEdit(survey)(surveyForm)

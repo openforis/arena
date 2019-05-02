@@ -17,7 +17,6 @@ import Node from '../../../../../common/record/node'
 import Layout from '../../../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../../../../survey/surveyState'
-import * as SurveyFormState from '../surveyFormState'
 import * as RecordState from '../../record/recordState'
 
 import { getNodeDefDefaultValue } from './nodeDefSystemProps'
@@ -111,8 +110,7 @@ const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, entry } = props
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const surveyForm = SurveyFormState.getSurveyForm(state)
-  const record = RecordState.getRecord(surveyForm)
+  const record = RecordState.getRecord(state)
 
   const mapEntryProps = () => {
     const nodes = NodeDef.isRoot(nodeDef)

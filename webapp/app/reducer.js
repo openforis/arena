@@ -1,10 +1,8 @@
 import * as R from 'ramda'
 
-import { exportReducer, assocActionProps } from '../utils/reduxUtils'
-
+import { assocActionProps, exportReducer } from '../utils/reduxUtils'
 import { setUserPref } from '../../common/user/userPrefs'
 
-import * as AppJobState from '../loggedin/appJob/appJobState'
 import * as AppState from './appState'
 
 import {
@@ -43,9 +41,9 @@ const actionHandlers = {
   [surveyDelete]: (state, { surveyId }) => AppState.dissocSurveyGroups(surveyId)(state),
 
   // ====== app job
-  [appJobStart]: (state, { job, onComplete, autoHide }) => AppJobState.startJob(job, onComplete, autoHide)(state),
+  [appJobStart]: (state, { job, onComplete, autoHide }) => AppState.startJob(job, onComplete, autoHide)(state),
 
-  [appJobActiveUpdate]: (state, { job }) => AppJobState.updateActiveJob(job)(state),
+  [appJobActiveUpdate]: (state, { job }) => AppState.updateActiveJob(job)(state),
 
   // ===== app errors
   [appErrorCreate]: (state, { error }) => AppState.assocAppError(error)(state),
