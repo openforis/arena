@@ -5,7 +5,6 @@ const Promise = require('bluebird')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
-const Expression = require('../../../../common/exprParser/expression')
 
 const DataTable = require('../persistence/schemaRdb/dataTable')
 

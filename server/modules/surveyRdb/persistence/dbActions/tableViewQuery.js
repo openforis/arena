@@ -11,25 +11,32 @@ const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
 
 const Expression = require('../../../../../common/exprParser/expression.js')
 
+const DataSort = require('../../../../../common/dataSort')
+
+
 const DataCol = require('../schemaRdb/dataCol')
 
 const NodeRepository = require('../../../record/persistence/nodeRepository')
 
-const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort = '', client) => {
+const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort, client) => {
   const schemaName = SchemaRdb.getName(surveyId)
+
+  // WHERE clause
   const { str: filterQuery, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
   const colParams = Expression.toParamsObj(cols, 'col')
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
 
+  // SORT clause
+  const { clause: sortClause, params: sortParams } = DataSort.getSortPreparedStatement(sort)
+
   return await client.any(`
-    SELECT ${colParamNames.join(', ')} 
+  SELECT ${colParamNames.join(', ')} 
     FROM $/schemaName:name/.$/tableName:name/
     ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
-    ${R.isEmpty(sort) ? '' : `ORDER BY ${sort} NULLS LAST`}
+    ${R.isEmpty(sortParams) ? '' : `ORDER BY ${sortClause} NULLS LAST`}
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
-    OFFSET $/offset/
-    `,
-    { ...filterParams, ...colParams, schemaName, tableName, limit, offset }
+    OFFSET $/offset/`,
+    { ...filterParams, ...colParams, ...sortParams, schemaName, tableName, limit, offset }
   )
 }
 
@@ -38,7 +45,7 @@ const runCount = async (surveyId, tableName, filterExpr, client) => {
   const { str: filterQuery, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
 
   return await client.one(`
-    SELECT count(*) 
+    SELECT count(*)
     FROM $/schemaName:name/.$/tableName:name/
     ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
   `, { ...filterParams, schemaName, tableName })

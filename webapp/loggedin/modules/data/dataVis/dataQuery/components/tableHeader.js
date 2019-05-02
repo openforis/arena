@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
 
 import ExpressionEditorPopup from '../../../../../../commonComponents/expression/expressionEditorPopup'
 import TablePaginator from '../../../../../../commonComponents/table/tablePaginator'
@@ -9,7 +8,7 @@ import DownloadButton from '../../../../../../commonComponents/form/downloadButt
 import Tooltip from '../../../../../../commonComponents/tooltip'
 
 import Expression from '../../../../../../../common/exprParser/expression'
-import * as DataSort from './sort/dataSort'
+import * as DataSort from '../../../../../../../common/dataSort'
 
 import { updateTableFilter, resetTableFilter, updateTableOffset, updateTableSort, updateTableEditMode } from '../actions'
 
@@ -59,7 +58,7 @@ class TableHeader extends React.Component {
       resetTableFilter,
     } = this.props
 
-    const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.serialize(sort)}&cols=${JSON.stringify(colNames)}`
+    const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${JSON.stringify(DataSort.getHttpParam(sort))}&cols=${JSON.stringify(colNames)}`
     const sortMsg = DataSort.getViewExpr(sort)
 
     return (
@@ -103,7 +102,7 @@ class TableHeader extends React.Component {
               nodeDefUuidCols={nodeDefUuidCols}
               nodeDefUuidContext={nodeDefUuidContext}
               sort={sort}
-              onChange={(sort) => this.updateSort(sort)}
+              onChange={sort => this.updateSort(sort)}
               onClose={this.toggleSortEditor}/>
 
           }
@@ -150,7 +149,7 @@ TableHeader.defaultProps = {
   updateTableOffset: null,
   updateTableSort: null,
   showPaginator: false,
-  editMode: false
+  editMode: false,
 }
 
 export default connect(
