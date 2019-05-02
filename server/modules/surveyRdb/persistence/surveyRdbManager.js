@@ -29,7 +29,7 @@ const updateTableNodes = async (surveyInfo, nodeDefs, nodes, client = db) =>
 
 const queryTable = async (surveyId, tableName, cols = [],
                           offset, limit, filterExpr, sort, client = db) =>
-  await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, filterExpr, null, sort, client)
+  await TableViewQuery.runSelect(surveyId, tableName, cols, offset, limit, filterExpr, sort, client)
 
 const countTable = async (surveyId, tableName, filter, client = db) =>
   await TableViewQuery.runCount(surveyId, tableName, filter, client)

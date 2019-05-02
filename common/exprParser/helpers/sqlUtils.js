@@ -16,32 +16,58 @@ const js2sqlOperators = {
   '%': '%',
 }
 
-const binaryToString = (node, params) => {
-  const left = toString(node.left, params)
+const binaryToString = (node, parentParams) => {
+  const { str, params } = toString(node.left, parentParams)
   if (node.operator === '===' && node.right.type === types.Literal && node.right.value === null) {
     return {
-      str: `${left.str} IS NULL`,
-      params: left.params,
+      str: `${str} IS NULL`,
+      params: params,
     }
   }
 
-  const right = toString(node.right, left.params)
+  const right = toString(node.right, params)
   return {
-    str: `${left.str} ${js2sqlOperators[node.operator]} ${right.str}`,
+    str: `${str} ${js2sqlOperators[node.operator]} ${right.str}`,
     params: right.params,
   }
 }
 
-const getNextParamName = params => `_${params.length}`
+const getNextParamName = parentParams => `_${parentParams.length}`
 
 const converters = {
-  [types.Identifier]: (node, params) => ({ str: `$/${getNextParamName(params)}:name/`, params: params.concat(node.name) }),
+  [types.Identifier]: (node, parentParams) => ({
+    str: `$/${getNextParamName(parentParams)}:name/`,
+    params: parentParams.concat(node.name),
+  }),
   [types.BinaryExpression]: binaryToString,
-  [types.MemberExpression]: (node, params) => ({ str: `${toString(node.object, params).str}.${toString(node.property, params).str}`, params }),
-  [types.Literal]: (node, params) => ({ str: `$/${getNextParamName(params)}/`, params: params.concat(node.raw) }),
-  [types.UnaryExpression]: (node, params) => ({ str: `${node.operator} ${toString(node.argument, params).str}`, params }),
+  [types.MemberExpression]: (node, parentParams) => {
+    const obj = toString(node.obj, parentParams)
+    const property = toString(node.property, obj.params)
+
+    return {
+      str: `${obj.str}.${property.str}`,
+      params: property.params,
+    }
+  },
+  [types.Literal]: (node, parentParams) => ({
+    str: `$/${getNextParamName(parentParams)}/`,
+    params: parentParams.concat(node.raw)
+  }),
+  [types.UnaryExpression]: (node, parentParams) => {
+    const { str, params } = toString(node.argument, parentParams)
+    return {
+      str: `${node.operator} ${str}`,
+      params: params,
+    }
+  },
   [types.LogicalExpression]: binaryToString,
-  [types.GroupExpression]: (node, params) => ({ str: `(${toString(node.argument, params).str})`, params }),
+  [types.GroupExpression]: (node, parentParams) => {
+    const { str, params } = toString(node.argument, parentParams)
+    return {
+      str: `(${str})`,
+      params,
+    }
+  },
 }
 
 const toString = (expr, params) => converters[expr.type](expr, params)

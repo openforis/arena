@@ -50,22 +50,22 @@ const isType = type => R.propEq('type', type)
 
 // ====== Instance creators
 
-const newLiteral = () => ({
+const newLiteral = (value = null) => ({
   type: types.Literal,
-  value: null,
-  raw: '',
+  value: value,
+  raw: value || '',
 })
 
-const newIdentifier = () => ({
+const newIdentifier = (value = '') => ({
   type: types.Identifier,
-  name: ''
+  name: value,
 })
 
 const newBinary = (left, right, operator = '') => ({
   type: types.BinaryExpression,
   operator,
   left,
-  right
+  right,
 })
 
 module.exports = {
