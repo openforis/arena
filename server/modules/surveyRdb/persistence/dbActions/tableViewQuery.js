@@ -18,7 +18,7 @@ const NodeRepository = require('../../../record/persistence/nodeRepository')
 const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort = '', client) => {
   const schemaName = SchemaRdb.getName(surveyId)
   const { str: filterQuery, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
-  const colParams = Expression.toParamsObj(cols, 'col')
+  const colParams = Expression.toSqlPreparedStamentParams(cols, 'col')
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
 
   return await client.any(`
@@ -26,7 +26,7 @@ const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, s
     FROM $/schemaName:name/.$/tableName:name/
     ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
     ${R.isEmpty(sort) ? '' : `ORDER BY ${sort} NULLS LAST`}
-    LIMIT $/limit/
+    ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
     OFFSET $/offset/
     `,
     { ...filterParams, ...colParams, schemaName, tableName, limit, offset }
@@ -74,14 +74,16 @@ const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {
   const whereConditions = await Promise.all(
     keyNodes.map(
       async node => {
-        const colValue = await getColValue(node)
-        return `${getColName(node)} ${colValue === null ? ' IS NULL' : ' = \'' + colValue + '\''}`
+        const identifier = Expression.newIdentifier(getColName(node))
+        const value = Expression.newLiteral(await getColValue(node))
+
+        return Expression.newBinary(identifier, value, '===')
       }
     )
   )
+  const whereExpr = whereConditions.reduce((prev, curr) => prev ? Expression.newBinary(prev, curr, '&&') : curr)
 
-  return await runSelect(surveyId, tableName, ['*'], 0, 'ALL', whereConditions.join(' AND '), '', client)
-
+  return await runSelect(surveyId, tableName, ['*'], 0, null, whereExpr, '', client)
 }
 
 module.exports = {
