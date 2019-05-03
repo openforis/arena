@@ -18,8 +18,13 @@ const notifyJobUpdate = job => {
 
   if (job.ended) {
     const thread = userJobThreads.getThread(userId)
-    thread.terminate()
-    userJobThreads.removeThread(userId)
+    setTimeout(() => {
+        thread.terminate()
+        userJobThreads.removeThread(userId)
+      },
+      1000) //delay terminate thread by 1s (give time to print debug info to the console)
+    //thread.terminate()
+
   }
 }
 

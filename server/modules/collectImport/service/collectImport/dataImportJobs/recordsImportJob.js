@@ -75,11 +75,12 @@ class RecordsImportJob extends Job {
     }
   }
 
-  async onEnd () {
-    await super.onEnd()
-
+  async beforeSuccess () {
     await this.batchPersister.flush(this.tx)
+  }
 
+  async beforeEnd () {
+    await super.beforeEnd()
     await RecordManager.enableTriggers(this.getSurveyId(), this.tx)
   }
 
