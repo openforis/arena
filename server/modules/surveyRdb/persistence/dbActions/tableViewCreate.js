@@ -31,7 +31,7 @@ const run = async (survey, nodeDef, client) => {
     CREATE TABLE
       ${tableViewCreate.schemaName}.${tableViewCreate.tableName}
     (
-      id          bigserial NOT NULL,
+      id bigserial NOT NULL,
       date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       ${tableViewCreate.colsAndType.join(',')},
@@ -44,7 +44,7 @@ const run = async (survey, nodeDef, client) => {
   await client.query(`
     CREATE VIEW
       ${tableViewCreate.schemaName}.${tableViewCreate.viewName} AS 
-      SELECT ${tableViewCreate.viewFields.join(',')}
+      SELECT ${tableViewCreate.viewFields.join(',')}, date_created, date_modified
       FROM ${tableViewCreate.viewFrom}
       ${tableViewCreate.viewJoin}
   `)
