@@ -34,7 +34,6 @@ const getColNames = (state, nodeDefUuidCols) => {
 }
 
 const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = null, sort = null) =>
-  console.log(DataSort.getHttpParam(sort)) ||
   axios.post(
     `/api/surveyRdb/${surveyId}/${tableName}/query`, {
       nodeDefUuidTable,
