@@ -73,7 +73,6 @@ const deleteCriteria = (sortCriteria, pos) =>
 const deleteVariablesByNames = (sortStr, variables) =>
   R.filter(c => R.indexOf(c.variable, variables) !== -1)(sortStr)
 
-
 module.exports = {
   keys,
   serialize,

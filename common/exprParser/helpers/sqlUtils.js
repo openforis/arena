@@ -18,7 +18,7 @@ const js2sqlOperators = {
 
 const binaryToString = (node, paramsArr) => {
   const { operator, left, right, right: { type: rightType, value: rightValue } } = node
-  const { clause: clauseLeft, paramsArr: paramsArrLeft } = toString(left, paramsArr)
+  const { clause: clauseLeft, paramsArr: paramsArrLeft } = toPreparedStatement(left, paramsArr)
 
   if (operator === '===' && rightType === types.Literal && rightValue === null) {
     return {
@@ -27,7 +27,7 @@ const binaryToString = (node, paramsArr) => {
     }
   }
 
-  const { clause: clauseRight, paramsArr: paramsArrRight } = toString(right, paramsArrLeft)
+  const { clause: clauseRight, paramsArr: paramsArrRight } = toPreparedStatement(right, paramsArrLeft)
   return {
     clause: `${clauseLeft} ${js2sqlOperators[operator]} ${clauseRight}`,
     paramsArr: paramsArrRight,
@@ -43,8 +43,8 @@ const converters = {
   }),
   [types.BinaryExpression]: binaryToString,
   [types.MemberExpression]: (node, paramsArr) => {
-    const obj = toString(node.obj, paramsArr)
-    const property = toString(node.property, obj.paramsArr)
+    const obj = toPreparedStatement(node.obj, paramsArr)
+    const property = toPreparedStatement(node.property, obj.paramsArr)
 
     return {
       clause: `${obj.clause}.${property.clause}`,
@@ -56,7 +56,7 @@ const converters = {
     paramsArr: paramsArr.concat(node.raw),
   }),
   [types.UnaryExpression]: (node, paramsArr) => {
-    const { clause, paramsArr: newParams } = toString(node.argument, paramsArr)
+    const { clause, paramsArr: newParams } = toPreparedStatement(node.argument, paramsArr)
     return {
       clause: `${node.operator} ${clause}`,
       paramsArr: newParams,
@@ -64,7 +64,7 @@ const converters = {
   },
   [types.LogicalExpression]: binaryToString,
   [types.GroupExpression]: (node, paramsArr) => {
-    const { clause, paramsArr: newParams } = toString(node.argument, paramsArr)
+    const { clause, paramsArr: newParams } = toPreparedStatement(node.argument, paramsArr)
     return {
       clause: `(${clause})`,
       paramsArr: newParams,
@@ -72,10 +72,10 @@ const converters = {
   },
 }
 
-const toString = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
+const toPreparedStatement = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
 
 const getWherePerparedStatement = expr => {
-  const prepStatement = toString(expr, [])
+  const prepStatement = toPreparedStatement(expr, [])
   const params = prepStatement.paramsArr.reduce((acc, cur, i) => ({ ...acc, [`_${i}`]: cur }), {})
 
   return { clause: prepStatement.clause, params }
