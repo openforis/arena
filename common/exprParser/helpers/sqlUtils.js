@@ -16,73 +16,71 @@ const js2sqlOperators = {
   '%': '%',
 }
 
-const binaryToString = (node, params) => {
-  const { str, params: newParams } = toString(node.left, params)
-  if (node.operator === '===' && node.right.type === types.Literal && node.right.value === null) {
+const binaryToString = (node, paramsArr) => {
+  const { operator, left, right, right: { type: rightType, value: rightValue } } = node
+  const { clause: clauseLeft, paramsArr: paramsArrLeft } = toString(left, paramsArr)
+
+  if (operator === '===' && rightType === types.Literal && rightValue === null) {
     return {
-      str: `${str} IS NULL`,
-      params: newParams,
+      clause: `${clauseLeft} IS NULL`,
+      paramsArr: paramsArrLeft,
     }
   }
 
-  const right = toString(node.right, newParams)
+  const { clause: clauseRight, paramsArr: paramsArrRight } = toString(right, paramsArrLeft)
   return {
-    str: `${str} ${js2sqlOperators[node.operator]} ${right.str}`,
-    params: right.params,
+    clause: `${clauseLeft} ${js2sqlOperators[operator]} ${clauseRight}`,
+    paramsArr: paramsArrRight,
   }
 }
 
-const getNextParamName = params => `_${params.length}`
+const getNextParamName = paramsArr => `_${paramsArr.length}`
 
 const converters = {
-  [types.Identifier]: (node, params) => ({
-    str: `$/${getNextParamName(params)}:name/`,
-    params: params.concat(node.name),
+  [types.Identifier]: (node, paramsArr) => ({
+    clause: `$/${getNextParamName(paramsArr)}:name/`,
+    paramsArr: paramsArr.concat(node.name),
   }),
   [types.BinaryExpression]: binaryToString,
-  [types.MemberExpression]: (node, params) => {
-    const obj = toString(node.obj, params)
-    const property = toString(node.property, obj.params)
+  [types.MemberExpression]: (node, paramsArr) => {
+    const obj = toString(node.obj, paramsArr)
+    const property = toString(node.property, obj.paramsArr)
 
     return {
-      str: `${obj.str}.${property.str}`,
-      params: property.params,
+      clause: `${obj.clause}.${property.clause}`,
+      paramsArr: property.paramsArr,
     }
   },
-  [types.Literal]: (node, params) => ({
-    str: `$/${getNextParamName(params)}/`,
-    params: params.concat(node.raw),
+  [types.Literal]: (node, paramsArr) => ({
+    clause: `$/${getNextParamName(paramsArr)}/`,
+    paramsArr: paramsArr.concat(node.raw),
   }),
-  [types.UnaryExpression]: (node, params) => {
-    const { str, params: newParams } = toString(node.argument, params)
+  [types.UnaryExpression]: (node, paramsArr) => {
+    const { clause, paramsArr: newParams } = toString(node.argument, paramsArr)
     return {
-      str: `${node.operator} ${str}`,
-      params: newParams,
+      clause: `${node.operator} ${clause}`,
+      paramsArr: newParams,
     }
   },
   [types.LogicalExpression]: binaryToString,
-  [types.GroupExpression]: (node, params) => {
-    const { str, params: newParams } = toString(node.argument, params)
+  [types.GroupExpression]: (node, paramsArr) => {
+    const { clause, paramsArr: newParams } = toString(node.argument, paramsArr)
     return {
-      str: `(${str})`,
-      newParams,
+      clause: `(${clause})`,
+      paramsArr: newParams,
     }
   },
 }
 
-const toString = (expr, params) => converters[expr.type](expr, params)
-
-const toSqlPreparedStamentParams = (paramsArray, prefix = '') =>
-  paramsArray.reduce((acc, cur, i) => ({ ...acc, [`${prefix}_${i}`]: cur }), {})
+const toString = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
 
 const getWherePerparedStatement = expr => {
   const prepStatement = toString(expr, [])
-  const params = toSqlPreparedStamentParams(prepStatement.params)
+  const params = prepStatement.paramsArr.reduce((acc, cur, i) => ({ ...acc, [`_${i}`]: cur }), {})
 
-  return { str: prepStatement.str, params }
+  return { clause: prepStatement.clause, params }
 }
 
 module.exports = {
   getWherePerparedStatement,
-  toSqlPreparedStamentParams,
 }

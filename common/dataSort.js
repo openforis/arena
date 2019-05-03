@@ -1,5 +1,12 @@
 const R = require('ramda')
 
+const keys = {
+  order: {
+    asc: 'asc',
+    desc: 'desc',
+  },
+}
+
 const serialize = sortCriteria =>
   R.pipe(
     R.map(c => `${c.variable} ${c.order}`),
@@ -11,10 +18,10 @@ const getHttpParam = sortCriteria =>
     R.pick(['variable', 'order'])
   )(sortCriteria)
 
-const getSortPreparedStatement = sortCriteria => {
+const getSortPreparedStatement = (sortCriteria, prefix = 'sort') => {
   return sortCriteria.reduce((prev, curr, i) => {
-    const paramName = `sort_${i}`
-    const order = ['asc', 'desc'].indexOf(curr.order) > -1 ? curr.order : 'asc'
+    const paramName = `${prefix}_${i}`
+    const order = keys.order[curr.order] || keys.order.asc
 
     return {
       clause: `${prev.clause}${i ? ', ' : ''} $/${paramName}:name/ ${order}`,
@@ -68,6 +75,7 @@ const deleteVariablesByNames = (sortStr, variables) =>
 
 
 module.exports = {
+  keys,
   serialize,
   getHttpParam,
   getSortPreparedStatement,

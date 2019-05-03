@@ -21,18 +21,20 @@ const NodeRepository = require('../../../record/persistence/nodeRepository')
 const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort, client) => {
   const schemaName = SchemaRdb.getName(surveyId)
 
-  // WHERE clause
-  const { str: filterQuery, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
-  const colParams = Expression.toSqlPreparedStamentParams(cols, 'col')
+  // columns
+  const colParams = cols.reduce((params, col, i) => ({ ...params, [`col_${i}`]: col }), {})
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
+
+  // WHERE clause
+  const { clause: filterClause, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
 
   // SORT clause
   const { clause: sortClause, params: sortParams } = DataSort.getSortPreparedStatement(sort)
 
   return await client.any(`
-  SELECT ${colParamNames.join(', ')} 
+  SELECT ${colParamNames.join(', ')}
     FROM $/schemaName:name/.$/tableName:name/
-    ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
+    ${R.isNil(filterClause) ? '' : `WHERE ${filterClause}`}
     ${R.isEmpty(sortParams) ? '' : `ORDER BY ${sortClause} NULLS LAST`}
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
     OFFSET $/offset/`,
@@ -42,12 +44,12 @@ const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, s
 
 const runCount = async (surveyId, tableName, filterExpr, client) => {
   const schemaName = SchemaRdb.getName(surveyId)
-  const { str: filterQuery, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
+  const { str: filterClause, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
 
   return await client.one(`
     SELECT count(*)
     FROM $/schemaName:name/.$/tableName:name/
-    ${R.isNil(filterQuery) ? '' : `WHERE ${filterQuery}`}
+    ${R.isNil(filterClause) ? '' : `WHERE ${filterClause}`}
   `, { ...filterParams, schemaName, tableName })
 }
 
@@ -90,7 +92,7 @@ const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {
   )
   const whereExpr = whereConditions.reduce((prev, curr) => prev ? Expression.newBinary(prev, curr, '&&') : curr)
 
-  return await runSelect(surveyId, tableName, ['*'], 0, null, whereExpr, '', client)
+  return await runSelect(surveyId, tableName, ['*'], 0, null, whereExpr, [], client)
 }
 
 module.exports = {

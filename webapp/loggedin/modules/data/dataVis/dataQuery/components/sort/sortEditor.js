@@ -77,7 +77,7 @@ class SortExpressionComponent extends React.Component {
     const { sortCriteria } = this.state
 
     this.setState({
-      sortCriteria: DataSort.addCriteria(sortCriteria, variable, label, 'asc'),
+      sortCriteria: DataSort.addCriteria(sortCriteria, variable, label, DataSort.keys.order.asc),
       updated: true,
     },
     () => this.refreshUnchosenVariables())
