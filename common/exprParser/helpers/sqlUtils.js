@@ -72,16 +72,17 @@ const converters = {
 
 const toString = (expr, params) => converters[expr.type](expr, params)
 
-const toParamsObj = (paramsArray, prefix = '') => paramsArray.reduce((acc, cur, i) => ({ ...acc, [`${prefix}_${i}`]: cur }), {})
+const toSqlPreparedStamentParams = (paramsArray, prefix = '') =>
+  paramsArray.reduce((acc, cur, i) => ({ ...acc, [`${prefix}_${i}`]: cur }), {})
 
 const getWherePerparedStatement = expr => {
   const prepStatement = toString(expr, [])
-  const params = toParamsObj(prepStatement.params)
+  const params = toSqlPreparedStamentParams(prepStatement.params)
 
   return { str: prepStatement.str, params }
 }
 
 module.exports = {
   getWherePerparedStatement,
-  toParamsObj,
+  toSqlPreparedStamentParams,
 }
