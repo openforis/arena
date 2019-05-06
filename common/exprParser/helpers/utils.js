@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const { trim, isNotBlank } = require('../../stringUtils')
-const { types } = require('./types')
+const { types } = require('../types')
 
 // toString
 const binaryToString = node => `${toString(node.left)} ${node.operator} ${toString(node.right)}`
