@@ -1,7 +1,7 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const { types } = require('../types')
+const { types } = require('./types')
 const { isString } = require('../../stringUtils')
 
 const unaryEval = async (expr, ctx) => {

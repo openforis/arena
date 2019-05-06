@@ -1,4 +1,4 @@
-const { types } = require('../exprParser/types')
+const { types } = require('../exprParser/expression')
 
 const js2sqlOperators = {
   '&&': 'AND',

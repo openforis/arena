@@ -24,44 +24,30 @@ const getSortPreparedStatement = sortCriteria => {
   }, { clause: '', params: {} })
 }
 
-const getVariable = (variables, value) =>
-  R.find(v => v.value === value)(variables)
+const findVariableByValue = (value) =>
+  R.find(v => v.value === value)
 
 const getViewExpr = R.pipe(
   R.map(c => `${c.label} ${c.order === keys.order.asc ? 'ASCENDING' : 'DESCENDING'}`),
   R.join(', ')
 )
 
-const getNewCriteria = availableVariables => sortCriteria =>
-  R.filter(c => R.any(v => v.value === c.variable, availableVariables))(sortCriteria)
+const getNewCriteria = availableVariables =>
+  R.filter(c => R.any(v => v.value === c.variable, availableVariables))
 
-const updateOrder = (pos, order) => sortCriteria => {
-  const newVarSortCriteria = R.pipe(
-    R.nth(pos),
-    R.assoc('order', order)
-  )(sortCriteria)
+const updateOrder = (pos, order) => R.assocPath([pos, 'order'], order)
 
-  return R.update(pos, newVarSortCriteria, sortCriteria)
-}
-
-const updateVariable = (pos, variable) => sortCriteria => {
-  const newVarSortCriteria = R.pipe(
-    R.nth(pos),
-    R.assoc('variable', variable.value),
-    R.assoc('label', variable.label)
-  )(sortCriteria)
-
-  return R.update(pos, newVarSortCriteria, sortCriteria)
-}
+const updateVariable = (pos, variable) => R.update(pos, {
+  variable: R.prop('value', variable),
+  label: R.prop('label', variable),
+})
 
 const getUnchosenVariables = availableVariables => sortCriteria =>
   R.reject(v => R.any(s => s.variable === v.value)(sortCriteria))(availableVariables)
 
-const addCriteria = (variable, label, order) => sortCriteria =>
-  R.append({ variable, label, order }, sortCriteria)
+const addCriteria = (variable, label, order) => R.append({ variable, label, order })
 
-const deleteCriteria = pos => sortCriteria =>
-  R.remove(pos, 1, sortCriteria)
+const deleteCriteria = pos => R.remove(pos, 1)
 
 const retainVariables = variables =>
   R.reject(c => R.none(v => c.variable === v, variables))
@@ -70,7 +56,7 @@ module.exports = {
   keys,
   toHttpParams,
   getSortPreparedStatement,
-  getVariable,
+  findVariableByValue,
   getViewExpr,
   getNewCriteria,
   updateOrder,

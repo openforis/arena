@@ -3,7 +3,7 @@ const R = require('ramda')
 const jsep = require('./helpers/jsep')
 const { evalExpression } = require('./helpers/evaluator')
 const { toString: toStringUtils, isValid } = require('./helpers/utils')
-const { types } = require('./types')
+const { types } = require('./helpers/types')
 
 const operators = require('./helpers/operators')
 

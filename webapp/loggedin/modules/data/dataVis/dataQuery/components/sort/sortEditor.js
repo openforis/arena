@@ -122,7 +122,7 @@ class SortExpressionComponent extends React.Component {
               <SortRow
                 key={criteria.variable}
                 variables={unchosenVariables}
-                selectedVariable={DataSort.getVariable(availableVariables, criteria.variable)}
+                selectedVariable={DataSort.findVariableByValue(criteria.variable)(availableVariables)}
                 onSelectVariable={item => this.onSelectVariable(pos, item)}
                 selectedOrder={criteria.order}
                 onSelectOrder={order => this.onSelectOrder(pos, order)}
