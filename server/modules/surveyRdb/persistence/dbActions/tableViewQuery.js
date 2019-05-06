@@ -10,9 +10,8 @@ const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
 const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
 
 const Expression = require('../../../../../common/exprParser/expression.js')
-
-const DataSort = require('../../../../../common/dataSort')
-
+const DataSort = require('../../../../../common/surveyRdb/dataSort')
+const DataFilter = require('../../../../../common/surveyRdb/dataFilter')
 
 const DataCol = require('../schemaRdb/dataCol')
 
@@ -26,7 +25,7 @@ const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, s
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
 
   // WHERE clause
-  const { clause: filterClause, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
+  const { clause: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePerparedStatement(filterExpr) : {}
 
   // SORT clause
   const { clause: sortClause, params: sortParams } = DataSort.getSortPreparedStatement(sort)
@@ -44,7 +43,7 @@ const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, s
 
 const runCount = async (surveyId, tableName, filterExpr, client) => {
   const schemaName = SchemaRdb.getName(surveyId)
-  const { str: filterClause, params: filterParams } = filterExpr ? Expression.getWherePerparedStatement(filterExpr) : {}
+  const { str: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePerparedStatement(filterExpr) : {}
 
   return await client.one(`
     SELECT count(*)

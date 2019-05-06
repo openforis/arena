@@ -7,20 +7,14 @@ const keys = {
   },
 }
 
-const serialize = sortCriteria =>
-  R.pipe(
-    R.map(c => `${c.variable} ${c.order}`),
-    R.join(',')
-  )(sortCriteria)
+const toHttpParams = R.pipe(
+  R.map(R.pick(['variable', 'order'])),
+  JSON.stringify
+)
 
-const getHttpParam = sortCriteria =>
-  R.map(
-    R.pick(['variable', 'order'])
-  )(sortCriteria)
-
-const getSortPreparedStatement = (sortCriteria, prefix = 'sort') => {
+const getSortPreparedStatement = sortCriteria => {
   return sortCriteria.reduce((prev, curr, i) => {
-    const paramName = `${prefix}_${i}`
+    const paramName = `sort_${i}`
     const order = keys.order[curr.order] || keys.order.asc
 
     return {
@@ -33,16 +27,15 @@ const getSortPreparedStatement = (sortCriteria, prefix = 'sort') => {
 const getVariable = (variables, value) =>
   R.find(v => v.value === value)(variables)
 
-const getViewExpr = sortCriteria =>
-  R.pipe(
-    R.map(c => `${c.label} ${c.order === 'asc' ? 'ASCENDING' : 'DESCENDING'}`),
-    R.join(', ')
-  )(sortCriteria)
+const getViewExpr = R.pipe(
+  R.map(c => `${c.label} ${c.order === keys.order.asc ? 'ASCENDING' : 'DESCENDING'}`),
+  R.join(', ')
+)
 
-const getNewCriteria = (sortCriteria, availableVariables) =>
+const getNewCriteria = availableVariables => sortCriteria =>
   R.filter(c => R.any(v => v.value === c.variable, availableVariables))(sortCriteria)
 
-const updateOrder = (sortCriteria, pos, order) => {
+const updateOrder = (pos, order) => sortCriteria => {
   const newVarSortCriteria = R.pipe(
     R.nth(pos),
     R.assoc('order', order)
@@ -51,7 +44,7 @@ const updateOrder = (sortCriteria, pos, order) => {
   return R.update(pos, newVarSortCriteria, sortCriteria)
 }
 
-const updateVariable = (sortCriteria, pos, variable) => {
+const updateVariable = (pos, variable) => sortCriteria => {
   const newVarSortCriteria = R.pipe(
     R.nth(pos),
     R.assoc('variable', variable.value),
@@ -61,22 +54,21 @@ const updateVariable = (sortCriteria, pos, variable) => {
   return R.update(pos, newVarSortCriteria, sortCriteria)
 }
 
-const getUnchosenVariables = (sortCriteria, availableVariables) =>
-  R.filter(v => R.findIndex(sc => sc.variable === v.value)(sortCriteria) === -1)(availableVariables)
+const getUnchosenVariables = availableVariables => sortCriteria =>
+  R.reject(v => R.any(s => s.variable === v.value)(sortCriteria))(availableVariables)
 
-const addCriteria = (sortCriteria, variable, label, order) =>
+const addCriteria = (variable, label, order) => sortCriteria =>
   R.append({ variable, label, order }, sortCriteria)
 
-const deleteCriteria = (sortCriteria, pos) =>
+const deleteCriteria = pos => sortCriteria =>
   R.remove(pos, 1, sortCriteria)
 
-const deleteVariablesByNames = (sortStr, variables) =>
-  R.filter(c => R.indexOf(c.variable, variables) !== -1)(sortStr)
+const retainVariables = variables =>
+  R.reject(c => R.none(v => c.variable === v, variables))
 
 module.exports = {
   keys,
-  serialize,
-  getHttpParam,
+  toHttpParams,
   getSortPreparedStatement,
   getVariable,
   getViewExpr,
@@ -86,5 +78,5 @@ module.exports = {
   getUnchosenVariables,
   addCriteria,
   deleteCriteria,
-  deleteVariablesByNames,
+  retainVariables,
 }

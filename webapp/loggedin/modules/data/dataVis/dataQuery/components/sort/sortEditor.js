@@ -4,7 +4,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import Expression from '../../../../../../../../common/exprParser/expression'
-import * as DataSort from '../../../../../../../../common/dataSort'
+import * as DataSort from '../../../../../../../../common/surveyRdb/dataSort'
 
 import Popup from '../../../../../../../commonComponents/popup'
 import * as ExpressionVariables from '../../../../../../../commonComponents/expression/expressionVariables'
@@ -40,7 +40,7 @@ class SortExpressionComponent extends React.Component {
     // Only show selected variables in the dropdown menu
     if (availableVariables !== prevAvailableVariables) {
       // reset available variables and remove unavailable variables from criteria
-      const newSortCriteria = DataSort.getNewCriteria(sortCriteria, availableVariables)
+      const newSortCriteria = DataSort.getNewCriteria(availableVariables)(sortCriteria)
 
       this.setState({ sortCriteria: newSortCriteria },
         () => this.refreshUnchosenVariables())
@@ -51,7 +51,7 @@ class SortExpressionComponent extends React.Component {
     const { sortCriteria } = this.state
 
     this.setState({
-      sortCriteria: DataSort.updateVariable(sortCriteria, pos, variable),
+      sortCriteria: DataSort.updateVariable(pos, variable)(sortCriteria),
       updated: true,
     },
     () => this.refreshUnchosenVariables())
@@ -61,7 +61,7 @@ class SortExpressionComponent extends React.Component {
     const { sortCriteria } = this.state
 
     this.setState({
-      sortCriteria: DataSort.updateOrder(sortCriteria, pos, order),
+      sortCriteria: DataSort.updateOrder(pos, order)(sortCriteria),
       updated: true,
     })
   }
@@ -70,14 +70,14 @@ class SortExpressionComponent extends React.Component {
     const { availableVariables } = this.props
     const { sortCriteria } = this.state
 
-    this.setState({ unchosenVariables: DataSort.getUnchosenVariables(sortCriteria, availableVariables) })
+    this.setState({ unchosenVariables: DataSort.getUnchosenVariables(availableVariables)(sortCriteria) })
   }
 
   addCriteria ({ value: variable, label }) {
     const { sortCriteria } = this.state
 
     this.setState({
-      sortCriteria: DataSort.addCriteria(sortCriteria, variable, label, DataSort.keys.order.asc),
+      sortCriteria: DataSort.addCriteria(variable, label, DataSort.keys.order.asc)(sortCriteria),
       updated: true,
     },
     () => this.refreshUnchosenVariables())
@@ -87,7 +87,7 @@ class SortExpressionComponent extends React.Component {
     const { sortCriteria } = this.state
 
     this.setState({
-      sortCriteria: DataSort.deleteCriteria(sortCriteria, pos),
+      sortCriteria: DataSort.deleteCriteria(pos)(sortCriteria),
       updated: true,
     },
     () => this.refreshUnchosenVariables())

@@ -6,7 +6,6 @@ const { toString: toStringUtils, isValid } = require('./helpers/utils')
 const { types } = require('./helpers/types')
 
 const operators = require('./helpers/operators')
-const { getWherePerparedStatement } = require('./helpers/sqlUtils')
 
 const modes = {
   json: 'json',
@@ -91,7 +90,4 @@ module.exports = {
 
   // operators
   operators,
-
-  // Sql utils
-  getWherePerparedStatement,
 }
