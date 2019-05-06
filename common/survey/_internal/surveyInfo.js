@@ -18,6 +18,12 @@ const keys = {
   steps: 'steps',
   authGroups: 'authGroups',
   collectUri: 'collectUri',
+  collectReport: 'collectReport',
+}
+
+const collectReportKeys = {
+  issuesTotal: 'issuesTotal',
+  issuesResolved: 'issuesResolved'
 }
 
 const getInfo = R.propOr({}, keys.info)
@@ -69,6 +75,13 @@ const getStatus = surveyInfo =>
 
 const getCollectUri = SurveyUtils.getProp(keys.collectUri)
 
+const getCollectReport = SurveyUtils.getProp(keys.collectReport, {})
+
+const hasCollectReportIssues = R.pipe(
+  getCollectReport,
+  R.propSatisfies(total => total > 0, collectReportKeys.issuesTotal)
+)
+
 const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
 
 // ====== UTILS
@@ -86,6 +99,7 @@ const getSurveyAdminGroup = R.pipe(
 
 module.exports = {
   keys,
+  collectReportKeys,
 
   getInfo,
 
@@ -105,6 +119,8 @@ module.exports = {
   getStatus,
   getCollectUri,
   isFromCollect,
+  getCollectReport,
+  hasCollectReportIssues,
 
   // ====== AUTH GROUPS
   getAuthGroups,

@@ -83,7 +83,7 @@ class SurveyInfo extends React.Component {
               </button>
             }
             {
-              Survey.isFromCollect(surveyInfo) &&
+              Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) &&
               <Link to={appModuleUri(homeModules.collectImportReport)}
                     className="btn btn-of-light">
                 <span className="icon icon-warning icon-12px icon-left"/> Collect Import Report

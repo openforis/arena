@@ -1,6 +1,6 @@
 const R = require('ramda')
 
-const {uuidv4} = require('../../common/uuid')
+const { uuidv4 } = require('../../common/uuid')
 
 const SurveyInfo = require('./_internal/surveyInfo')
 const SurveyNodeDefs = require('./_internal/surveyNodeDefs')
@@ -28,6 +28,7 @@ module.exports = {
 
   infoKeys: SurveyInfo.keys,
   dependencyTypes: SurveyDependencies.dependencyTypes,
+  collectReportKeys: SurveyInfo.collectReportKeys,
 
   // ====== DEFAULTS
   getDefaultAuthGroups: SurveyDefaults.getDefaultAuthGroups,
@@ -53,6 +54,8 @@ module.exports = {
   isValid: SurveyInfo.isValid,
   isFromCollect: SurveyInfo.isFromCollect,
   getCollectUri: SurveyInfo.getCollectUri,
+  getCollectReport: SurveyInfo.getCollectReport,
+  hasCollectReportIssues: SurveyInfo.hasCollectReportIssues,
 
   getAuthGroups: SurveyInfo.getAuthGroups,
   getSurveyAdminGroup: SurveyInfo.getSurveyAdminGroup,
