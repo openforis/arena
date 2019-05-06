@@ -10,7 +10,6 @@ export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
 export const surveyDelete = 'survey/delete'
 export const surveyDefsLoad = 'survey/defs/load'
-export const surveyCollectImportReportPresentUpdate = 'survey/surveyCollectImportReportPresent/update'
 
 const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
   dispatch({ type: surveyUpdate, survey })
@@ -62,9 +61,6 @@ export const setActiveSurvey = (surveyId, draft = true) =>
     const user = AppState.getUser(getState())
     await axios.post(`/api/user/${user.id}/pref/${userPrefNames.survey}/${surveyId}`)
     dispatch({ type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId })
-
-    const { data: collectImportReportSizeData } = await axios.get(`/api/survey/${surveyId}/collect-import/report/count`)
-    dispatch({ type: surveyCollectImportReportPresentUpdate, present: collectImportReportSizeData.count > 0 })
   }
 
 // ==== UPDATE

@@ -55,8 +55,9 @@ module.exports.init = app => {
   app.post(`/survey/:surveyId/collect-import/report/:itemId/resolve`, AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     try {
       const { surveyId, itemId, resolved } = Request.getParams(req)
+      const user = Request.getSessionUser(req)
 
-      const item = await CollectImportService.updateReportItem(surveyId, itemId, {}, resolved)
+      const item = await CollectImportService.updateReportItem(user, surveyId, itemId, {}, resolved)
 
       return res.json({ item })
     } catch (err) {

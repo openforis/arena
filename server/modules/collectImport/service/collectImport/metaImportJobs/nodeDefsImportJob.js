@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const { uuidv4 } = require('../../../../../../common/uuid')
+const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const NodeDefValidations = require('../../../../../../common/survey/nodeDefValidations')
 const NodeDefExpression = require('../../../../../../common/survey/nodeDefExpression')
@@ -14,6 +15,7 @@ const Validator = require('../../../../../../common/validation/validator')
 
 const Job = require('../../../../../job/job')
 
+const SurveyManager = require('../../../../survey/persistence/surveyManager')
 const NodeDefManager = require('../../../../nodeDef/persistence/nodeDefManager')
 const CollectImportReportManager = require('../../../persistence/collectImportReportManager')
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
@@ -61,10 +63,11 @@ class NodeDefsImportJob extends Job {
 
     this.nodeDefNames = []
     this.nodeDefUuidByCollectPath = {}
+    this.issuesCount = 0
   }
 
   async execute (tx) {
-    const { collectSurvey, surveyId } = this.context
+    const { collectSurvey, surveyId, user } = this.context
 
     // insert root entity and descendants recursively
     const collectRootDef = R.pipe(
@@ -73,6 +76,12 @@ class NodeDefsImportJob extends Job {
     )(collectSurvey)
 
     await this.insertNodeDef(surveyId, null, '', collectRootDef, NodeDef.nodeDefType.entity, tx)
+
+    const collectReport = {
+      [Survey.collectReportKeys.issuesTotal]: this.issuesCount,
+      [Survey.collectReportKeys.issuesResolved]: 0
+    }
+    await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, tx)
 
     this.setContext({
       nodeDefUuidByCollectPath: this.nodeDefUuidByCollectPath
@@ -283,6 +292,8 @@ class NodeDefsImportJob extends Job {
       [CollectImportReportItem.propKeys.applyIf]: applyIf,
       [CollectImportReportItem.propKeys.messages]: messages
     }, tx)
+
+    this.issuesCount++
   }
 
 }

@@ -19,9 +19,7 @@ export const getSurveyId = R.pipe(getSurvey, Survey.getId)
 
 // STATUS
 const keys = {
-  status: 'status',
-
-  hasCollectImportReport: 'hasCollectImportReport'
+  status: 'status'
 }
 
 const statusKeys = {
@@ -33,11 +31,7 @@ export const areDefsFetched = R.pathEq([survey, keys.status, statusKeys.defsFetc
 
 export const areDefsDraftFetched = R.pathEq([survey, keys.status, statusKeys.defsDraftFetched], true)
 
-export const hasCollectImportReport = R.propEq(hasCollectImportReport, true)
-
 export const assocDefsFetched = draft => R.pipe(
   R.assoc(statusKeys.defsFetched, true),
   R.assoc(statusKeys.defsDraftFetched, draft),
 )
-
-export const assocHasCollectImportReport = value => R.assoc(keys.hasCollectImportReport, value)
