@@ -4,6 +4,8 @@ const Promise = require('bluebird')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
+const Record = require('../../../../common/record/record')
+const Validator = require('../../../../common/validation/validator')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 const Expression = require('../../../../common/exprParser/expression')
 
@@ -70,7 +72,12 @@ const queryTable = async (surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols
         const resultRow = {
           ...row,
           cols: {},
-          record,
+          record: {
+            [Record.keys.uuid]: recordUuid,
+            [Validator.keys.validation]: {
+              [Validator.keys.valid]: Validator.isValid(record)
+            }
+          },
           parentNodeUuid: R.prop(`${NodeDef.getName(tableNodeDef)}_uuid`, row)
         }
 

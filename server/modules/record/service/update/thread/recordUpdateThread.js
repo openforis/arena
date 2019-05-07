@@ -10,6 +10,7 @@ const RecordUpdateManager = require('../../../persistence/recordUpdateManager')
 
 const Survey = require('../../../../../../common/survey/survey')
 const Record = require('../../../../../../common/record/record')
+const Validator = require('../../../../../../common/validation/validator')
 const Queue = require('../../../../../../common/queue')
 
 const WebSocketEvents = require('../../../../../../common/webSocket/webSocketEvents')
@@ -57,13 +58,17 @@ class RecordUpdateThread extends Thread {
       this.postMessage({ type, content })
   }
 
-  async handleNodesUpdated (updatedNodes) {
+  async handleNodesUpdated (updatedNodes, t) {
     this._postMessage(WebSocketEvents.nodesUpdate, updatedNodes)
   }
 
-  async handleNodesValidationUpdated (validations) {
+  async handleNodesValidationUpdated (validations, t) {
+    const record = await this.getRecord(t)
+    const recordUpdated = Record.mergeNodeValidations(validations)(record)
+
     this._postMessage(WebSocketEvents.nodeValidationsUpdate, {
-      recordUuid: this.getRecordUuid(),
+      recordUuid: Record.getUuid(record),
+      recordValid: Validator.isValid(recordUpdated),
       validations
     })
   }

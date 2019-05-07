@@ -3,6 +3,7 @@ import * as DataVisState from '../dataVisState'
 
 import Record from '../../../../../../common/record/record'
 import Node from '../../../../../../common/record/node'
+import Validator from '../../../../../../common/validation/validator'
 
 const getState = R.pipe(DataVisState.getState, R.prop('query'))
 
@@ -114,17 +115,13 @@ export const assocTableDataRecordNodes = nodes =>
     }
   }
 
-export const assocTableDataRecordNodeValidations = (recordUuid, validations) =>
+export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) =>
   state => R.pipe(
     R.pathOr([], [keys.table, tableKeys.data]),
     R.map(row =>
       R.ifElse(
         R.pathEq([rowKeys.record, Record.keys.uuid], recordUuid),
-        R.pipe(
-          R.prop(rowKeys.record),
-          Record.mergeNodeValidations(validations),
-          record => R.assoc(rowKeys.record, record)(row)
-        ),
+        R.assocPath([rowKeys.record, Validator.keys.validation, Validator.keys.valid], recordValid),
         R.identity
       )(row)
     ),
