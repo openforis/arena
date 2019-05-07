@@ -7,9 +7,12 @@ import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../commonComponen
 import ProgressBar from '../../commonComponents/progressBar'
 import AppJobErrors from './appJobErrors'
 
+import * as AppWebSocket from '../../app/appWebSocket'
+import WebSocketEvents from '../../../common/webSocket/webSocketEvents'
+
 import * as AppState from '../../app/appState'
 
-import { cancelActiveJob, hideAppJobMonitor } from './actions'
+import { activeJobUpdate, cancelActiveJob, hideAppJobMonitor } from './actions'
 
 const JobProgress = ({ job }) =>
   <ProgressBar progress={job.progressPercent} className={job.status}/>
@@ -31,6 +34,10 @@ const InnerJobs = ({ innerJobs }) =>
   </div>
 
 class AppJobMonitor extends React.Component {
+
+  componentDidMount () {
+    AppWebSocket.on(WebSocketEvents.jobUpdate, this.props.activeJobUpdate)
+  }
 
   render () {
     const { job, cancelActiveJob, hideAppJobMonitor } = this.props
@@ -73,5 +80,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { cancelActiveJob, hideAppJobMonitor, }
+  { activeJobUpdate, cancelActiveJob, hideAppJobMonitor }
 )(AppJobMonitor)
