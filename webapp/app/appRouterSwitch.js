@@ -1,25 +1,39 @@
 import React from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Switch, Route } from 'react-router-dom'
+
 import DynamicImport from '../commonComponents/dynamicImport'
-
 import LoginView from '../login/components/loginView'
-
-import { throwSystemError, initApp } from './actions'
-import * as AppState from './appState'
-import { getLocationPathname } from '../utils/routerUtils'
 
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 import * as AppWebSocket from './appWebSocket'
-import { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete } from '../loggedin/surveyViews/record/actions'
+
+import * as AppState from './appState'
+import { throwSystemError, initApp } from './actions'
+
+import { getLocationPathname } from '../utils/routerUtils'
 
 const loginUri = '/'
 
 class AppRouterSwitch extends React.Component {
 
-  throwSystemError (error) {
+  openWebSocket () {
+    const { throwSystemError } = this.props
+
+    AppWebSocket.openSocket()
+
+    const throwError = (error) => {
+      throwSystemError(error)
+      AppWebSocket.closeSocket()
+    }
+
+    AppWebSocket.on(WebSocketEvents.connectError, error => throwError(error.stack))
+    AppWebSocket.on(WebSocketEvents.error, throwError)
+  }
+
+  closeWebSocket () {
     AppWebSocket.closeSocket()
-    this.props.throwSystemError(error)
   }
 
   componentDidMount () {
@@ -27,35 +41,20 @@ class AppRouterSwitch extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    const {
-      user, history,
-      activeJobUpdate, recordNodesUpdate, dispatchRecordDelete, nodeValidationsUpdate, throwSystemError
-    } = this.props
+    const { user, history } = this.props
     const { user: prevUser } = prevProps
 
     if (user && !prevUser) {
-      AppWebSocket.openSocket({
-        [WebSocketEvents.nodesUpdate]: recordNodesUpdate,
-        [WebSocketEvents.nodeValidationsUpdate]: nodeValidationsUpdate,
-        [WebSocketEvents.recordDelete]: () => {
-          alert('This record has just been deleted by another user')
-          dispatchRecordDelete(history)
-        },
-        [WebSocketEvents.error]: throwSystemError,
-      })
-
-      AppWebSocket.on(WebSocketEvents.connectError, error => this.throwSystemError(error.stack))
-      AppWebSocket.on(WebSocketEvents.error, this.throwSystemError.bind(this))
-
+      this.openWebSocket()
     } else if (prevUser && !user) {
-      AppWebSocket.closeSocket()
+      this.closeWebSocket()
       // logout - redirect to login page
       history.push(loginUri)
     }
   }
 
   componentWillUnmount () {
-    AppWebSocket.closeSocket()
+    this.closeWebSocket()
   }
 
   render () {
@@ -114,13 +113,12 @@ const mapStateToProps = state => ({
   systemError: AppState.getSystemError(state),
 })
 
-export default withRouter(
-  connect(mapStateToProps, {
-    initApp,
-    recordNodesUpdate,
-    dispatchRecordDelete,
-    nodeValidationsUpdate,
-    throwSystemError,
-  })
-  (AppRouterSwitch)
+const enhance = compose(
+  withRouter,
+  connect(
+    mapStateToProps,
+    { initApp, throwSystemError }
+  )
 )
+
+export default enhance(AppRouterSwitch)

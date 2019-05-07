@@ -6,13 +6,21 @@ import * as R from 'ramda'
 
 import SurveyFormView from '../../../../surveyViews/surveyForm/surveyFormView'
 
+import AuthManager from '../../../../../../common/auth/authManager'
+import WebSocketEvents from '../../../../../../common/webSocket/webSocketEvents'
+import * as AppWebSocket from '../../../../../app/appWebSocket'
+
 import * as AppState from '../../../../../app/appState'
 import * as RecordState from '../../../../surveyViews/record/recordState'
 
 import { resetForm } from '../../../../surveyViews/surveyForm/actions'
-import { checkInRecord, checkOutRecord } from '../../../../surveyViews/record/actions'
-
-import AuthManager from '../../../../../../common/auth/authManager'
+import {
+  checkInRecord,
+  checkOutRecord,
+  recordNodesUpdate,
+  nodeValidationsUpdate,
+  dispatchRecordDelete
+} from '../../../../surveyViews/record/actions'
 
 class RecordView extends React.Component {
 
@@ -22,12 +30,24 @@ class RecordView extends React.Component {
     this.componentUnload = this.componentUnload.bind(this)
   }
 
-  componentDidMount () {
-    const { checkInRecord, recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam} = this.props
+  addWebSocketListeners () {
+    const { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete, history } = this.props
 
+    AppWebSocket.on(WebSocketEvents.nodesUpdate, recordNodesUpdate)
+    AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
+    AppWebSocket.on(WebSocketEvents.recordDelete, () => {
+      alert('This record has just been deleted by another user')
+      dispatchRecordDelete(history)
+    })
+  }
+
+  componentDidMount () {
+    const { checkInRecord, recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam } = this.props
     checkInRecord(recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam)
 
     window.addEventListener('beforeunload', this.componentUnload)
+
+    this.addWebSocketListeners()
   }
 
   componentWillUnmount () {
@@ -71,7 +91,10 @@ const enhance = compose(
   withRouter,
   connect(
     mapStateToProps,
-    { resetForm, checkInRecord, checkOutRecord }
+    {
+      resetForm, checkInRecord, checkOutRecord,
+      recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete
+    }
   )
 )
 
