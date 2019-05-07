@@ -6,7 +6,7 @@ import * as SurveyState from '../../../../../survey/surveyState'
 import * as DataQueryState from './dataQueryState'
 import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
 
-import * as DataSort from './components/sort/dataSort'
+import * as DataSort from '../../../../../../common/surveyRdb/dataSort'
 
 export const dataQueryTableNodeDefUuidUpdate = 'dataQuery/table/nodeDefUuid/update'
 export const dataQueryTableNodeDefUuidColsUpdate = 'dataQuery/table/nodeDefUuidCols/update'
@@ -33,7 +33,7 @@ const getColNames = (state, nodeDefUuidCols) => {
   return NodeDefTable.getColNamesByUuids(nodeDefUuidCols)(survey)
 }
 
-const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = null, sort = '') =>
+const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuidCols, cols, offset = 0, filter = null, sort = null) =>
   axios.post(
     `/api/surveyRdb/${surveyId}/${tableName}/query`, {
       nodeDefUuidTable,
@@ -42,7 +42,7 @@ const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuid
       offset,
       limit: defaults.limit,
       filter: filter ? JSON.stringify(filter) : null,
-      sort: DataSort.serialize(sort),
+      sort: DataSort.toHttpParams(sort),
       editMode,
     }
   )
@@ -68,7 +68,7 @@ export const updateTableNodeDefUuid = nodeDefUuidTable => dispatch => {
   dispatch({
     type: dataQueryTableDataUpdate,
     offset: defaults.offset,
-    data: []
+    data: [],
   })
 }
 
@@ -78,7 +78,7 @@ export const updateTableNodeDefUuidCols = (nodeDefUuidCols, nodeDefUuidCol = nul
 
     dispatch({ type: dataQueryTableNodeDefUuidColsUpdate, nodeDefUuidCols })
 
-    const newSort = DataSort.deleteVariablesByNames(DataQueryState.getTableSort(state), getColNames(state, nodeDefUuidCols))
+    const newSort = DataSort.retainVariables(getColNames(state, nodeDefUuidCols))(DataQueryState.getTableSort(state))
     dispatch({ type: dataQueryTableSortUpdate, sort: newSort })
 
     const fetch = !R.isEmpty(nodeDefUuidCols) &&
