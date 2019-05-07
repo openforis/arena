@@ -72,7 +72,7 @@ const updateNode = async (survey, record, node, tx) => {
 const updateNodeExpr = async (survey, record, node, getExpressionsFn, dependencyType, tx) => {
 
   //1. fetch dependent nodes
-  const nodeDependents = NodeDependencyManager.findDependentNodes(survey, record, node, dependencyType)
+  const nodeDependents = Record.getDependentNodes(survey, node, dependencyType)(record)
   const isDefaultValuesExpr = dependencyType === dependencyTypes.defaultValues
   const isApplicableExpr = dependencyType === dependencyTypes.applicable
 
