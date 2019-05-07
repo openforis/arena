@@ -8,6 +8,8 @@ export const openSocket = (eventHandlers = {}) => {
   R.forEachObjIndexed((fn, eventName) => socket.on(eventName, fn), eventHandlers)
 }
 
+export const on = (eventName, eventHandler) => socket.on(eventName, eventHandler)
+
 export const closeSocket = () => {
   socket.close()
   socket = null

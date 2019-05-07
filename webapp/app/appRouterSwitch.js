@@ -10,13 +10,18 @@ import * as AppState from './appState'
 import { getLocationPathname } from '../utils/routerUtils'
 
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
-import { openSocket, closeSocket } from './appWebSocket'
+import * as AppWebSocket from './appWebSocket'
 import { activeJobUpdate } from '../loggedin/appJob/actions'
 import { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete } from '../loggedin/surveyViews/record/actions'
 
 const loginUri = '/'
 
 class AppRouterSwitch extends React.Component {
+
+  throwSystemError (error) {
+    AppWebSocket.closeSocket()
+    this.props.throwSystemError(error)
+  }
 
   componentDidMount () {
     this.props.initApp()
@@ -30,7 +35,7 @@ class AppRouterSwitch extends React.Component {
     const { user: prevUser } = prevProps
 
     if (user && !prevUser) {
-      openSocket({
+      AppWebSocket.openSocket({
         [WebSocketEvents.jobUpdate]: activeJobUpdate,
         [WebSocketEvents.nodesUpdate]: recordNodesUpdate,
         [WebSocketEvents.nodeValidationsUpdate]: nodeValidationsUpdate,
@@ -40,15 +45,19 @@ class AppRouterSwitch extends React.Component {
         },
         [WebSocketEvents.error]: throwSystemError,
       })
+
+      AppWebSocket.on(WebSocketEvents.connectError, error => this.throwSystemError(error.stack))
+      AppWebSocket.on(WebSocketEvents.error, this.throwSystemError.bind(this))
+
     } else if (prevUser && !user) {
-      closeSocket()
+      AppWebSocket.closeSocket()
       // logout - redirect to login page
       history.push(loginUri)
     }
   }
 
   componentWillUnmount () {
-    closeSocket()
+    AppWebSocket.closeSocket()
   }
 
   render () {
