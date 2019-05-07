@@ -208,9 +208,7 @@ const mergeValidation = validation =>
     getValidation,
     R.mergeDeepLeft(validation),
     cleanup,
-    v => {
-      return assocValidation(v)(obj)
-    }
+    v => assocValidation(v)(obj)
   )(obj)
 
 const recalculateValidity = validation =>

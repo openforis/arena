@@ -39,10 +39,7 @@ ErrorBadge.defaultProps = {
   validation: null,
   showLabel: true,
   label: 'INVALID',
-  /**
-   * error message to show if validation is invalid
-   * (if not specified, field validation errors will be shown)
-   */
+  //error message to show if validation is invalid (if not specified, field validation errors will be shown)
   tooltipErrorMessage: null
 }
 
