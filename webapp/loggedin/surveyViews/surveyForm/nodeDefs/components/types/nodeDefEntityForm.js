@@ -36,77 +36,115 @@ const EntityFormHeader = ({ nodeDef, label }) => (
   </div>
 )
 
-const EntityForm = props => {
-  const {
-    nodeDef,
-    childDefs,
-    edit,
-    canEditDef,
-    canEditRecord,
-    canAddNode,
-    locked,
-    node,
-    putNodeDefProp,
-    entry,
-    recordUuid,
-    surveyInfo,
-  } = props
+class EntityForm extends React.Component {
+  constructor (props) {
+    super(props)
 
-  const columns = getNoColumns(nodeDef)
-  const rdgLayout = getLayout(nodeDef)
-  const innerPageChildren = filterInnerPageChildren(childDefs)
+    this.state = { onChangeLayout: null }
+    this.onChangeLayout = this.onChangeLayout.bind(this)
+  }
 
-  const onLayoutChange = layout => {
-    //console.log(window.innerWidth)
-    if (edit &&
-        canEditDef &&
-        !locked &&
-        window.innerWidth > 1200 &&
-        layout.length > 0 &&
-        layout.length === innerPageChildren.length) {
+  setStateOnChangeLayout (onChangeLayout) {
+    const { edit, canEditDef, locked } = this.props
+    if (edit && canEditDef && !locked) {
+      this.setState({ onChangeLayout })
+    }
+  }
+
+  componentDidMount () {
+    this.setStateOnChangeLayout(this.onChangeLayout)
+  }
+
+  componentWillReceiveProps (nextProps, nextContext) {
+    const { nodeDef } = this.props
+    const { nodeDef: nodeDefNext } = nextProps
+    if (NodeDef.getUuid(nodeDef) !== NodeDef.getUuid(nodeDefNext)) {
+      // disable reactGridLayout onChangeLayout when switching nodeDef page to avoid dispatching reactGridLayout.onLayoutChange
+      this.setStateOnChangeLayout(null)
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    const { nodeDef } = this.props
+    const { nodeDef: nodeDefPrev } = prevProps
+
+    if (NodeDef.getUuid(nodeDef) !== NodeDef.getUuid(nodeDefPrev)) {
+      // enable reactGridLayout onChangeLayout when switching nodeDef page
+      this.setStateOnChangeLayout(this.onChangeLayout)
+    }
+  }
+
+  onChangeLayout (layout) {
+    const { nodeDef, putNodeDefProp } = this.props
+
+    if (window.innerWidth > 1200 && layout.length > 0) {
       putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
     }
   }
 
-  return innerPageChildren.length > 0
-    ? (
-      <ResponsiveGridLayout
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        autoSize={false}
-        rowHeight={edit && canEditDef ? 80 : 50}
-        cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
-        layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
-        containerPadding={edit && canEditDef ? [30, 50] : [30, 30]}
-        onLayoutChange={onLayoutChange}
-        isDraggable={edit && canEditDef && !locked}
-        isResizable={edit && canEditDef && !locked}
-        compactType={null}
-        useCSSTransforms={false}
-        preventCollision={true}>
+  render () {
 
-        {
-          innerPageChildren
-            .map((childDef, i) =>
-              <div key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}
-                   className={NodeDef.isEntity(childDef) && isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
-                <NodeDefSwitch
-                  key={i}
-                  edit={edit}
-                  entry={entry}
-                  recordUuid={recordUuid}
-                  surveyInfo={surveyInfo}
-                  nodeDef={childDef}
-                  parentNode={node}
-                  canEditDef={canEditDef}
-                  canEditRecord={canEditRecord}
-                  canAddNode={canAddNode}/>
-              </div>
-            )
-        }
+    const {
+      nodeDef,
+      childDefs,
+      edit,
+      canEditDef,
+      canEditRecord,
+      canAddNode,
+      locked,
+      node,
+      putNodeDefProp,
+      entry,
+      recordUuid,
+      surveyInfo,
+    } = this.props
 
-      </ResponsiveGridLayout>
-    )
-    : null
+    const { onChangeLayout } = this.state
+
+    const columns = getNoColumns(nodeDef)
+    const rdgLayout = getLayout(nodeDef)
+    const innerPageChildren = filterInnerPageChildren(childDefs)
+
+    return innerPageChildren.length > 0
+      ? (
+        <ResponsiveGridLayout
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+          autoSize={false}
+          rowHeight={edit && canEditDef ? 80 : 50}
+          cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
+          layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
+          containerPadding={edit && canEditDef ? [30, 50] : [30, 30]}
+          onLayoutChange={onChangeLayout ? onChangeLayout : () => {}}
+          isDraggable={edit && canEditDef && !locked}
+          isResizable={edit && canEditDef && !locked}
+          compactType={null}
+          useCSSTransforms={false}
+          preventCollision={true}>
+
+          {
+            innerPageChildren
+              .map((childDef, i) =>
+                <div key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}
+                     className={NodeDef.isEntity(childDef) && isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
+                  <NodeDefSwitch
+                    key={i}
+                    edit={edit}
+                    entry={entry}
+                    recordUuid={recordUuid}
+                    surveyInfo={surveyInfo}
+                    nodeDef={childDef}
+                    parentNode={node}
+                    canEditDef={canEditDef}
+                    canEditRecord={canEditRecord}
+                    canAddNode={canAddNode}/>
+                </div>
+              )
+          }
+
+        </ResponsiveGridLayout>
+      )
+      : null
+  }
 }
 
 const NodeSelect = props => {
