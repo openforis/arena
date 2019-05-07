@@ -1,9 +1,9 @@
-const { assert } = require('chai')
+const { assert, expect } = require('chai')
 
 const jsep = require('../../common/exprParser/helpers/jsep')
 const { getWherePerparedStatement } = require('../../common/surveyRdb/dataFilter')
 
-const expressions = [
+const goodExpressions = [
   { q: '1', r: { clause: '$/_0/', params: { _0: '1' } } },
   { q: '1 / 1', r: { clause: '$/_0/ / $/_1/', params: { _0: '1', _1: '1' } } },
   { q: '1 + 1 === 2', r: { clause: '$/_0/ + $/_1/ = $/_2/', params: { _0: '1', _1: '1', _2: '2' } } },
@@ -11,6 +11,7 @@ const expressions = [
   { q: '-a', r: { clause: '- $/_0:name/', params: { _0: 'a' } } },
   { q: 'a === 1', r: { clause: '$/_0:name/ = $/_1/', params: { _0: 'a', _1: '1' } } },
   { q: `a !== 'a'`, r: { clause: '$/_0:name/ != $/_1/', params: { _0: 'a', _1: `'a'` } } },
+  { q: `a !== "a"`, r: { clause: '$/_0:name/ != $/_1/', params: { _0: 'a', _1: `"a"` } } },
   {
     q: `a === 1 && b !== 'b'`,
     r: {
@@ -25,14 +26,28 @@ const expressions = [
       params: { _0: 'a', _1: '1', _2: 'b', _3: '\'b\'', _4: 'c', _5: '1' },
     },
   },
+  // & is not in the operator white list, so it's substituted with undefined by the converter
+  { q: '1 & 1', r: { clause: '$/_0/ undefined $/_1/', params: { _0: '1', _1: '1' } } },
+]
+
+const badExpressions = [
+  { q: '1 z 1' }, // compound expressions are not converted
+  { q: 'a b c d e' }, // compound expressions are not converted
 ]
 
 describe('dataFilter test', () => {
 
-  expressions.forEach(({ q, r }) =>
+  goodExpressions.forEach(({ q, r }) =>
     it (q, () => {
       const ps = getWherePerparedStatement(jsep(q))
       assert.deepEqual(ps, r)
+    })
+  )
+
+  badExpressions.forEach(({ q }) =>
+    it (q, () => {
+      const ps = () => getWherePerparedStatement(jsep(q))
+      expect(ps).to.throw()
     })
   )
 
