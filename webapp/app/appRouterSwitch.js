@@ -11,7 +11,6 @@ import { getLocationPathname } from '../utils/routerUtils'
 
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 import * as AppWebSocket from './appWebSocket'
-import { activeJobUpdate } from '../loggedin/appJob/actions'
 import { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete } from '../loggedin/surveyViews/record/actions'
 
 const loginUri = '/'
@@ -36,7 +35,6 @@ class AppRouterSwitch extends React.Component {
 
     if (user && !prevUser) {
       AppWebSocket.openSocket({
-        [WebSocketEvents.jobUpdate]: activeJobUpdate,
         [WebSocketEvents.nodesUpdate]: recordNodesUpdate,
         [WebSocketEvents.nodeValidationsUpdate]: nodeValidationsUpdate,
         [WebSocketEvents.recordDelete]: () => {
@@ -119,7 +117,6 @@ const mapStateToProps = state => ({
 export default withRouter(
   connect(mapStateToProps, {
     initApp,
-    activeJobUpdate,
     recordNodesUpdate,
     dispatchRecordDelete,
     nodeValidationsUpdate,
