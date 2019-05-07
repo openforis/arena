@@ -23,9 +23,13 @@ class RecordUpdateThread extends Thread {
     this.processing = false
   }
 
+  getRecordUuid () {
+    return R.prop('recordUuid', this.params)
+  }
+
   async getRecord (t) {
     if (!this.record) {
-      const recordUuid = R.prop('recordUuid', this.params)
+      const recordUuid = this.getRecordUuid()
       this.record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid, t)
     }
     return this.record
@@ -58,7 +62,10 @@ class RecordUpdateThread extends Thread {
   }
 
   async handleNodesValidationUpdated (validations) {
-    this._postMessage(WebSocketEvents.nodeValidationsUpdate, validations)
+    this._postMessage(WebSocketEvents.nodeValidationsUpdate, {
+      recordUuid: this.getRecordUuid(),
+      validations
+    })
   }
 
   async onMessage (msg) {

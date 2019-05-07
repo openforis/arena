@@ -3,7 +3,6 @@ import * as DataVisState from '../dataVisState'
 
 import Record from '../../../../../../common/record/record'
 import Node from '../../../../../../common/record/node'
-import Validator from '../../../../../../common/validation/validator'
 
 const getState = R.pipe(DataVisState.getState, R.prop('query'))
 
@@ -21,6 +20,10 @@ const tableKeys = {
   nodeDefUuidTable: 'nodeDefUuidTable',
   nodeDefUuidCols: 'nodeDefUuidCols',
   editMode: 'editMode',
+}
+
+const rowKeys = {
+  record: 'record'
 }
 
 // table
@@ -111,20 +114,19 @@ export const assocTableDataRecordNodes = nodes =>
     }
   }
 
-//TODO input field validation should be associated to record in state...
-export const assocTableDataRecordNodeValidations = validations =>
-  state => {
-    const data = R.pathOr([], [keys.table, tableKeys.data], state)
-
-    data.forEach(row => {
-      Object.values(row.cols).forEach(col => {
-        const { nodes } = col
-        Object.values(nodes).forEach(node => {
-          const validation = Validator.getFieldValidation(Node.getUuid(node))(validations)
-          if (validation)
-            node.validation = validation
-        })
-      })
-    })
-    return R.assocPath([keys.table, tableKeys.data], data, state)
-  }
+export const assocTableDataRecordNodeValidations = (recordUuid, validations) =>
+  state => R.pipe(
+    R.pathOr([], [keys.table, tableKeys.data]),
+    R.map(row =>
+      R.ifElse(
+        R.pathEq([rowKeys.record, Record.keys.uuid], recordUuid),
+        R.pipe(
+          R.prop(rowKeys.record),
+          Record.mergeNodeValidations(validations),
+          record => R.assoc(rowKeys.record, record)(row)
+        ),
+        R.identity
+      )(row)
+    ),
+    data => R.assocPath([keys.table, tableKeys.data], data)(state)
+  )(state)

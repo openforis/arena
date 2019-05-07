@@ -65,12 +65,12 @@ const queryTable = async (surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols
       async row => {
         const { record_uuid: recordUuid } = row
 
+        const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
+
         const resultRow = {
           ...row,
           cols: {},
-          record: {
-            uuid: recordUuid,
-          },
+          record,
           parentNodeUuid: R.prop(`${NodeDef.getName(tableNodeDef)}_uuid`, row)
         }
 

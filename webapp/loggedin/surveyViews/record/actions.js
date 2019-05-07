@@ -29,9 +29,9 @@ export const recordNodesUpdate = nodes =>
   dispatch =>
     dispatch({ type: nodesUpdate, nodes })
 
-export const nodeValidationsUpdate = validations =>
+export const nodeValidationsUpdate = ({recordUuid, validations}) =>
   dispatch =>
-    dispatch({ type: validationsUpdate, validations })
+    dispatch({ type: validationsUpdate, recordUuid, validations })
 
 export const dispatchRecordDelete = (history) =>
   dispatch => {
