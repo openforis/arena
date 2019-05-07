@@ -119,7 +119,12 @@ const getDependentNodes = (survey, node, dependencyType) => record => {
         const dependentNodes = findNodes(
           node =>
             Node.getNodeDefUuid(node) === nodeDefUuidDependent &&
-            Node.isDescendantOf(commonParentNode)(node)
+            (
+              Node.isDescendantOf(commonParentNode)(node) ||
+              (
+                isDependencyApplicable && Node.getUuid(node) === Node.getUuid(commonParentNode)
+              )
+            )
         )(record)
 
         return dependentNodes.map(nodeCtx => ({

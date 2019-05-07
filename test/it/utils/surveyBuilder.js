@@ -55,7 +55,6 @@ class NodeDefBuilder {
       NodeDefValidations.assocExpressions(expressions)
     )(this)
 
-    console.log('====newprops', this.props)
     return this
   }
 }
