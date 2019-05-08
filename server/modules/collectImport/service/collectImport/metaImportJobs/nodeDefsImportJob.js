@@ -17,7 +17,7 @@ const Job = require('../../../../../job/job')
 
 const SurveyManager = require('../../../../survey/persistence/surveyManager')
 const NodeDefManager = require('../../../../nodeDef/persistence/nodeDefManager')
-const CollectImportReportManager = require('../../../persistence/collectImportReportManager')
+const CollectImportReportManager = require('../../../manager/collectImportReportManager')
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 
 const checkExpressionParserByType = {

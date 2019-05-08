@@ -1,4 +1,4 @@
-const CollectImportReportRepository = require('./collectImportReportRepository')
+const CollectImportReportRepository = require('../repository/collectImportReportRepository')
 
 module.exports = {
   insertItem: CollectImportReportRepository.insertItem,
