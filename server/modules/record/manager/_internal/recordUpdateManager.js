@@ -13,7 +13,7 @@ const RecordUsersMap = require('../../service/update/recordUsersMap')
 const RecordRepository = require('../../repository/recordRepository')
 const SurveyManager = require('../../../survey/manager/surveyManager')
 const RecordValidationManager = require('../../validator/recordValidationManager')
-const NodeUpdateManager = require('../nodeUpdateManager')
+const NodeUpdateManager = require('./nodeUpdateManager')
 
 const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
 const FileManager = require('../fileManager')

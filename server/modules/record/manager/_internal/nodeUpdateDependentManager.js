@@ -1,21 +1,21 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
-const Category = require('../../../../common/survey/category')
-const CategoryItem = require('../../../../common/survey/categoryItem')
-const Taxonomy = require('../../../../common/survey/taxonomy')
+const Survey = require('../../../../../common/survey/survey')
+const NodeDef = require('../../../../../common/survey/nodeDef')
+const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
+const Category = require('../../../../../common/survey/category')
+const CategoryItem = require('../../../../../common/survey/categoryItem')
+const Taxonomy = require('../../../../../common/survey/taxonomy')
 
-const Record = require('../../../../common/record/record')
-const Node = require('../../../../common/record/node')
+const Record = require('../../../../../common/record/record')
+const Node = require('../../../../../common/record/node')
 
-const NodeRepository = require('../repository/nodeRepository')
-const CategoryRepository = require('../../category/repository/categoryRepository')
-const TaxonomyRepository = require('../../taxonomy/repository/taxonomyRepository')
+const NodeRepository = require('../../repository/nodeRepository')
+const CategoryRepository = require('../../../category/repository/categoryRepository')
+const TaxonomyRepository = require('../../../taxonomy/repository/taxonomyRepository')
 
-const RecordExprParser = require('../recordExprParser')
+const RecordExprParser = require('../../recordExprParser')
 
 /**
  * Module responsible for updating applicable and default values

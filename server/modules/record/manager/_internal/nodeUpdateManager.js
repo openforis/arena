@@ -1,18 +1,18 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const Queue = require('../../../../common/queue')
+const Queue = require('../../../../../common/queue')
 
-const SurveyUtils = require('../../../../common/survey/surveyUtils')
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const Node = require('../../../../common/record/node')
-const Record = require('../../../../common/record/record')
+const SurveyUtils = require('../../../../../common/survey/surveyUtils')
+const Survey = require('../../../../../common/survey/survey')
+const NodeDef = require('../../../../../common/survey/nodeDef')
+const Node = require('../../../../../common/record/node')
+const Record = require('../../../../../common/record/record')
 
 const NodeUpdateDependentManager = require('./nodeUpdateDependentManager')
-const NodeRepository = require('../repository/nodeRepository')
+const NodeRepository = require('../../repository/nodeRepository')
 
-const ActivityLog = require('../../activityLog/activityLogger')
+const ActivityLog = require('../../../activityLog/activityLogger')
 
 //==== UPDATE
 
