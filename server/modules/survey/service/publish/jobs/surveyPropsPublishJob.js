@@ -3,7 +3,7 @@ const R = require('ramda')
 const Job = require('../../../../../job/job')
 
 const Survey = require('../../../../../../common/survey/survey')
-const NodeDefManager = require('../../../../nodeDef/persistence/nodeDefManager')
+const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const SurveyManager = require('../../../persistence/surveyManager')
 const CategoryManager = require('../../../../category/manager/categoryManager')
 const TaxonomyManager = require('../../../../taxonomy/persistence/taxonomyManager')

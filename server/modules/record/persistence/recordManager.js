@@ -3,7 +3,7 @@ const db = require('../../../db/db')
 const Record = require('../../../../common/record/record')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
-const NodeDefRepository = require('../../nodeDef/persistence/nodeDefRepository')
+const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
 const RecordRepository = require('./recordRepository')
 const NodeRepository = require('./nodeRepository')
 

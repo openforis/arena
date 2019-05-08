@@ -12,7 +12,7 @@ const User = require('../../../../common/user/user')
 
 const SurveyValidator = require('../surveyValidator')
 
-const NodeDefManager = require('../../nodeDef/persistence/nodeDefManager')
+const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
 const { nodeDefLayoutProps, nodeDefRenderType } = require('../../../../common/survey/nodeDefLayout')
 
 const UserRepository = require('../../user/persistence/userRepository')

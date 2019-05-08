@@ -5,7 +5,7 @@ const R = require('ramda')
 const Survey = require('../../../common/survey/survey')
 const NodeDef = require('../../../common/survey/nodeDef')
 
-const NodeDefRepository = require('../../../server/modules/nodeDef/persistence/nodeDefRepository')
+const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
 
 const fetchRootNodeDef = async () => {
   const survey = getContextSurvey()

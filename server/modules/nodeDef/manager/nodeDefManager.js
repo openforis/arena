@@ -3,7 +3,7 @@ const db = require('../../../db/db')
 
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
-const NodeDefRepository = require('./nodeDefRepository')
+const NodeDefRepository = require('../repository/nodeDefRepository')
 const NodeDefValidator = require('../validator/nodeDefValidator')
 
 const { markSurveyDraft } = require('../../survey/persistence/surveySchemaRepositoryUtils')
