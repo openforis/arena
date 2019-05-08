@@ -20,7 +20,7 @@ const toTableViewCreate = (survey, nodeDef) => {
     viewName: DataView.getName(nodeDef, nodeDefParent),
     viewFields: DataView.getSelectFields(survey, nodeDef),
     viewFrom: `${schemaName}.${tableName} as ${DataView.alias}`,
-    viewJoin: DataView.getJoin(schemaName, nodeDef, nodeDefParent),
+    viewJoin: DataView.getJoin(schemaName, nodeDefParent),
   }
 }
 
@@ -34,7 +34,7 @@ const run = async (survey, nodeDef, client) => {
       id bigserial NOT NULL,
       date_created  TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
-      ${tableViewCreate.colsAndType.join(',')},
+      ${tableViewCreate.colsAndType.join(', ')},
       ${tableViewCreate.uuidUniqueIdx},
       ${tableViewCreate.parentForeignKey},
       PRIMARY KEY (id)
@@ -44,7 +44,7 @@ const run = async (survey, nodeDef, client) => {
   await client.query(`
     CREATE VIEW
       ${tableViewCreate.schemaName}.${tableViewCreate.viewName} AS 
-      SELECT ${tableViewCreate.viewFields.join(',')}, date_created, date_modified
+      SELECT ${tableViewCreate.viewFields.join(', ')}
       FROM ${tableViewCreate.viewFrom}
       ${tableViewCreate.viewJoin}
   `)
