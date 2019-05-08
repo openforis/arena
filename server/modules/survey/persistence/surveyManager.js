@@ -18,7 +18,7 @@ const { nodeDefLayoutProps, nodeDefRenderType } = require('../../../../common/su
 const UserRepository = require('../../user/persistence/userRepository')
 const { getUserPrefSurveyId, userPrefNames } = require('../../../../common/user/userPrefs')
 
-const AuthGroupRepository = require('../../auth/persistence/authGroupRepository')
+const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 const AuthManager = require('../../../../common/auth/authManager')
 
 const ActivityLog = require('../../activityLog/activityLogger')

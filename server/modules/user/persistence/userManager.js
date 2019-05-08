@@ -1,7 +1,7 @@
 const Promise = require('bluebird')
 
 const UserRepository = require('./userRepository')
-const AuthGroupRepository = require('../../auth/persistence/authGroupRepository')
+const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 
 const { comparePassword } = require('../userUtils')
 
