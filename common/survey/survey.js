@@ -79,7 +79,7 @@ module.exports = {
 
   // hierarchy
   isNodeDefAncestor: SurveyNodeDefs.isNodeDefAncestor,
-  getAncestorsHierarchy: SurveyNodeDefs.getAncestorsHierarchy,
+  visitAncestorsAndSelf: SurveyNodeDefs.visitAncestorsAndSelf,
   getHierarchy: SurveyNodeDefs.getHierarchy,
   traverseHierarchyItem: SurveyNodeDefs.traverseHierarchyItem,
   traverseHierarchyItemSync: SurveyNodeDefs.traverseHierarchyItemSync,
