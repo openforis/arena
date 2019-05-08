@@ -2,21 +2,25 @@ import './errorBadge.scss'
 
 import React from 'react'
 
-import { getValidationFieldMessagesHTML } from '../utils/validationUtils'
+import * as ValidationUtils from '../utils/validationUtils'
 import Validator from '../../common/validation/validator'
 
 import Tooltip from './tooltip'
 
-const ErrorBadge = ({ validation, showLabel, label }) => {
+const ErrorBadge = ({ validation, showLabel, label, tooltipErrorMessage }) => {
 
   const invalid = !Validator.isValidationValid(validation)
 
-  const validationFields = invalid ? getValidationFieldMessagesHTML(validation.fields) : []
+  const errorMessages = invalid
+    ? tooltipErrorMessage
+      ? [tooltipErrorMessage]
+      : ValidationUtils.getValidationFieldMessagesHTML(Validator.getFieldValidations(validation))
+    : []
 
   return invalid
     ? (
       <Tooltip
-        messages={validationFields}
+        messages={errorMessages}
         type="error"
         className="badge error-badge">
         <div className="badge__content">
@@ -34,7 +38,9 @@ const ErrorBadge = ({ validation, showLabel, label }) => {
 ErrorBadge.defaultProps = {
   validation: null,
   showLabel: true,
-  label: 'INVALID'
+  label: 'INVALID',
+  //error message to show if validation is invalid (if not specified, field validation errors will be shown)
+  tooltipErrorMessage: null
 }
 
 export default ErrorBadge

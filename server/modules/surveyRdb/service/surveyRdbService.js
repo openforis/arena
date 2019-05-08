@@ -4,6 +4,8 @@ const Promise = require('bluebird')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
+const Record = require('../../../../common/record/record')
+const Validator = require('../../../../common/validation/validator')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const DataTable = require('../schemaRdb/dataTable')
@@ -64,11 +66,16 @@ const queryTable = async (surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols
       async row => {
         const { record_uuid: recordUuid } = row
 
+        const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
+
         const resultRow = {
           ...row,
           cols: {},
           record: {
-            uuid: recordUuid,
+            [Record.keys.uuid]: recordUuid,
+            [Validator.keys.validation]: {
+              [Validator.keys.valid]: Validator.isValid(record)
+            }
           },
           parentNodeUuid: R.prop(`${NodeDef.getName(tableNodeDef)}_uuid`, row)
         }

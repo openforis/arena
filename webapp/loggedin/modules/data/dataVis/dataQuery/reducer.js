@@ -62,7 +62,7 @@ const actionHandlers = {
   // record nodes update
   [nodesUpdate]: (state, { nodes }) => assocTableDataRecordNodes(nodes)(state),
 
-  [validationsUpdate]: (state, { validations }) => assocTableDataRecordNodeValidations(validations)(state),
+  [validationsUpdate]: (state, { recordUuid, recordValid }) => assocTableDataRecordNodeValidations(recordUuid, recordValid)(state),
 }
 
 export default exportReducer(actionHandlers)

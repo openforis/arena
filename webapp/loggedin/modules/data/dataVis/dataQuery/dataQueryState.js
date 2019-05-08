@@ -23,6 +23,10 @@ const tableKeys = {
   editMode: 'editMode',
 }
 
+const rowKeys = {
+  record: 'record'
+}
+
 // table
 const getTableProp = (tableProp, defaultValue = null) => R.pipe(
   getState,
@@ -111,20 +115,15 @@ export const assocTableDataRecordNodes = nodes =>
     }
   }
 
-//TODO input field validation should be associated to record in state...
-export const assocTableDataRecordNodeValidations = validations =>
-  state => {
-    const data = R.pathOr([], [keys.table, tableKeys.data], state)
-
-    data.forEach(row => {
-      Object.values(row.cols).forEach(col => {
-        const { nodes } = col
-        Object.values(nodes).forEach(node => {
-          const validation = Validator.getFieldValidation(Node.getUuid(node))(validations)
-          if (validation)
-            node.validation = validation
-        })
-      })
-    })
-    return R.assocPath([keys.table, tableKeys.data], data, state)
-  }
+export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) =>
+  state => R.pipe(
+    R.pathOr([], [keys.table, tableKeys.data]),
+    R.map(row =>
+      R.ifElse(
+        R.pathEq([rowKeys.record, Record.keys.uuid], recordUuid),
+        R.assocPath([rowKeys.record, Validator.keys.validation, Validator.keys.valid], recordValid),
+        R.identity
+      )(row)
+    ),
+    data => R.assocPath([keys.table, tableKeys.data], data)(state)
+  )(state)

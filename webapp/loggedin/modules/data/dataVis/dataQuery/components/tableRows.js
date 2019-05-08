@@ -1,12 +1,13 @@
 import React from 'react'
-import * as R from 'ramda'
 
 import TableColumn from './tableColumn'
 
 import NodeDef from '../../../../../../../common/survey/nodeDef'
+import Record from '../../../../../../../common/record/record'
 
 import { appModuleUri } from '../../../../../appModules'
 import { dataModules } from '../../../dataModules'
+import ErrorBadge from '../../../../../../commonComponents/errorBadge'
 
 const defaultColWidth = 100
 
@@ -38,13 +39,18 @@ const TableRows = ({ nodeDefCols, colNames, data, offset, lang, colWidth, editMo
     <div className="table__data-rows">
       {
         data.map((row, i) => {
-          const { parentNodeUuid } = row
-          const recordUuid = R.path(['record', 'uuid'], row)
+          const { parentNodeUuid, record } = row
 
+          const recordUuid = Record.getUuid(record)
           const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
+          const validation = Record.getValidation(record)
 
           return (
             <div key={i} className="table__row">
+              <ErrorBadge
+                validation={validation}
+                showLabel={false}
+                tooltipErrorMessage="Invalid record"/>
               <div style={{ width: defaultColWidth }}>
                 {i + offset + 1}
                 {
