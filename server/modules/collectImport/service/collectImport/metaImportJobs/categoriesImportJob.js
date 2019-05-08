@@ -7,7 +7,7 @@ const CategoryLevel = require('../../../../../../common/survey/categoryLevel')
 const Job = require('../../../../../job/job')
 const BatchPersister = require('../../../../../db/batchPersister')
 
-const CategoryManager = require('../../../../category/persistence/categoryManager')
+const CategoryManager = require('../../../../category/manager/categoryManager')
 
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 

@@ -8,11 +8,10 @@ const Survey = require('../../common/survey/survey')
 const Record = require('../../common/record/record')
 
 const ActivityLogger = require('../../server/modules/activityLog/activityLogger')
-const SurveyManager = require('../../server/modules/survey/persistence/surveyManager')
-const RecordUpdateManager = require('../../server/modules/record/persistence/recordUpdateManager')
+const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
+const RecordManager = require('../../server/modules/record/manager/recordManager')
 
 const SB = require('./utils/surveyBuilder')
-const RB = require('./utils/recordBuilder')
 
 describe('Activity Log Test', async () => {
 
@@ -41,7 +40,7 @@ describe('Activity Log Test', async () => {
   it('Activity Log on Record Creation', async () => {
     const user = getContextUser()
 
-    survey = await SB.survey(user,
+    const survey = await SB.survey(user,
       SB.entity('cluster',
         SB.attribute('cluster_no')
           .key()
@@ -52,7 +51,7 @@ describe('Activity Log Test', async () => {
 
     const recordToCreate = Record.newRecord(user)
 
-    const record = await RecordUpdateManager.createRecord(user, surveyId, recordToCreate)
+    const record = await RecordManager.createRecord(user, surveyId, recordToCreate)
 
     const logs = await ActivityLogger.fetchLogs(Survey.getId(survey))
     expect(logs.length).to.be.at.least(1)

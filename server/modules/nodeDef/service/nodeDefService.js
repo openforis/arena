@@ -1,4 +1,4 @@
-const NodeDefManager = require('../persistence/nodeDefManager')
+const NodeDefManager = require('../manager/nodeDefManager')
 
 module.exports = {
 

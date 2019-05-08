@@ -1,4 +1,4 @@
-const FileManager = require('../persistence/fileManager')
+const FileManager = require('../manager/fileManager')
 
 module.exports = {
   // CREATE

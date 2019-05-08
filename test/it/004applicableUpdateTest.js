@@ -5,8 +5,8 @@ const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 
-const SurveyManager = require('../../server/modules/survey/persistence/surveyManager')
-const NodeDependentUpdateManager = require('../../server/modules/record/persistence/nodeDependentUpdateManager')
+const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
+const NodeDependentUpdateManager = require('../../server/modules/record/manager/nodeDependentUpdateManager')
 
 const { getContextUser } = require('../testContext')
 
@@ -69,7 +69,7 @@ describe('Applicable Test', async () => {
       record = Record.assocNodes(nodesUpdated)(record)
 
       // update dependent nodes
-      const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, nodesUpdated)
+      const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodesDependents(survey, record, nodesUpdated)
 
       record = Record.assocNodes(nodesDependentUpdated)(record)
 

@@ -1,4 +1,4 @@
-const UserManager = require('../persistence/userManager')
+const UserManager = require('../manager/userManager')
 
 module.exports = {
 

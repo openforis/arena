@@ -9,8 +9,8 @@ const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 const Validator = require('../../common/validation/validator')
 
-const SurveyManager = require('../../server/modules/survey/persistence/surveyManager')
-const RecordUpdateManager = require('../../server/modules/record/persistence/recordUpdateManager')
+const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
+const RecordManager = require('../../server/modules/record/manager/recordManager')
 
 const SB = require('./utils/surveyBuilder')
 const RB = require('./utils/recordBuilder')
@@ -75,14 +75,14 @@ const deleteNode = async (parentNode, childNodeName, childNodePosition) => {
   const childDef = Survey.getNodeDefByName(childNodeName)(survey)
   const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
   const node = children[childNodePosition - 1]
-  record = await RecordUpdateManager.deleteNode(getContextUser(), survey, record, Node.getUuid(node))
+  record = await RecordManager.deleteNode(getContextUser(), survey, record, Node.getUuid(node))
   return record
 }
 
 const updateNodeAndExpectValidationToBe = async (nodePath, value, validationExpected) => {
   const node = RecordUtils.findNodeByPath(nodePath)(survey, record)
 
-  record = await RecordUpdateManager.persistNode(getContextUser(), survey, record, Node.assocValue(value)(node))
+  record = await RecordManager.persistNode(getContextUser(), survey, record, Node.assocValue(value)(node))
 
   const nodeValidation = Validator.getFieldValidation(Node.getUuid(node))(Record.getValidation(record))
 
@@ -106,7 +106,7 @@ const addNodeAndExpectCountToBe = async (parentNodePath, childNodeName, min = tr
 
   const node = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
 
-  record = await RecordUpdateManager.persistNode(getContextUser(), survey, record, node)
+  record = await RecordManager.persistNode(getContextUser(), survey, record, node)
 
   const countValidation = min
     ? RecordUtils.getValidationMinCount(parentNode, childDef)(record)

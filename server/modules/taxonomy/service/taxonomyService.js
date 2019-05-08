@@ -4,7 +4,7 @@ const fastcsv = require('fast-csv')
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Taxon = require('../../../../common/survey/taxon')
 
-const TaxonomyManager = require('../persistence/taxonomyManager')
+const TaxonomyManager = require('../manager/taxonomyManager')
 const JobManager = require('../../../job/jobManager')
 const TaxonomyImportJob = require('./taxonomyImportJob')
 

@@ -12,9 +12,8 @@ const WebSocket = require('../../../utils/webSocket')
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 const ThreadManager = require('../../../threads/threadManager')
 
-const RecordUpdateManager = require('../persistence/recordUpdateManager')
-const RecordManager = require('../persistence/recordManager')
-const FileManager = require('../persistence/fileManager')
+const RecordManager = require('../manager/recordManager')
+const FileManager = require('../manager/fileManager')
 
 const RecordUsersMap = require('./update/recordUsersMap')
 const RecordThreads = require('./update/thread/recordThreads')
@@ -87,7 +86,7 @@ const terminateUserThread = userId => {
  * ======
  */
 const deleteRecord = async (user, surveyId, recordUuid) => {
-  await RecordUpdateManager.deleteRecord(user, surveyId, recordUuid)
+  await RecordManager.deleteRecord(user, surveyId, recordUuid)
 
   const recordUsersIds = RecordUsersMap.getUserIds(recordUuid)
 
@@ -114,7 +113,7 @@ const checkOut = async (user, surveyId, recordUuid) => {
   const record = await RecordManager.fetchRecordByUuid(surveyId, recordUuid)
 
   if (Record.isPreview(record)) {
-    await RecordUpdateManager.deleteRecordPreview(surveyId, recordUuid)
+    await RecordManager.deleteRecordPreview(surveyId, recordUuid)
   }
 
   terminateUserThread(User.getId(user))
@@ -151,10 +150,10 @@ const deleteNode = (user, surveyId, recordUuid, nodeUuid) => {
 }
 
 module.exports = {
-  //====== RECORD
+  // ====== RECORD
 
   //create
-  createRecord: RecordUpdateManager.createRecord,
+  createRecord: RecordManager.createRecord,
 
   //read
   fetchRecordByUuid: RecordManager.fetchRecordByUuid,
@@ -162,17 +161,17 @@ module.exports = {
   fetchRecordsSummaryBySurveyId: RecordManager.fetchRecordsSummaryBySurveyId,
 
   //update
-  updateRecordStep: RecordUpdateManager.updateRecordStep,
+  updateRecordStep: RecordManager.updateRecordStep,
 
   // delete
   deleteRecord,
-  deleteRecordsPreview: RecordUpdateManager.deleteRecordsPreview,
+  deleteRecordsPreview: RecordManager.deleteRecordsPreview,
 
   checkIn,
   checkOut,
   terminateUserThread,
 
-  //======  NODE
+  // ======  NODE
   fetchNodeByUuid: RecordManager.fetchNodeByUuid,
   persistNode,
   deleteNode,

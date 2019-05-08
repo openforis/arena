@@ -8,8 +8,8 @@ const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 const NodeDefValidations = require('../../../common/survey/nodeDefValidations')
 const User = require('../../../common/user/user')
 
-const SurveyManager = require('../../../server/modules/survey/persistence/surveyManager')
-const NodeDefRepository = require('../../../server/modules/nodeDef/persistence/nodeDefRepository')
+const SurveyManager = require('../../../server/modules/survey/manager/surveyManager')
+const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
 
 const SurveyPublishPerformJob = require('../../../server/modules/survey/service/publish/surveyPublishPerformJob')
 const SurveyRdbGeneratorJob = require('../../../server/modules/survey/service/surveyRdbGeneratorJob')
@@ -55,7 +55,6 @@ class NodeDefBuilder {
       NodeDefValidations.assocExpressions(expressions)
     )(this)
 
-    console.log('====newprops', this.props)
     return this
   }
 }

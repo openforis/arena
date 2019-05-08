@@ -7,7 +7,7 @@ const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 const Validator = require('../../../../common/validation/validator')
 
-const RecordRepository = require('../persistence/recordRepository')
+const RecordRepository = require('../repository/recordRepository')
 
 const CountValidator = require('./validators/countValidator')
 const AttributeValidator = require('./validators/attributeValidator')

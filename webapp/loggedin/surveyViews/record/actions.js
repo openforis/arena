@@ -29,9 +29,9 @@ export const recordNodesUpdate = nodes =>
   dispatch =>
     dispatch({ type: nodesUpdate, nodes })
 
-export const nodeValidationsUpdate = validations =>
+export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) =>
   dispatch =>
-    dispatch({ type: validationsUpdate, validations })
+    dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
 export const dispatchRecordDelete = (history) =>
   dispatch => {
@@ -147,19 +147,21 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
  * Check in / check out record
  * ============
  */
-export const checkInRecord = (recordUuid, activeParentNodeUuid, activeNodeDefUuid) => async (dispatch, getState) => {
+export const checkInRecord = (recordUuid, entityUuid) => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
   const { data } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
 
   const record = data.record
 
-  if (activeParentNodeUuid) {
+  // this is used by dataQuery when user is editing a specific entity
+  if (entityUuid) {
 
     const state = getState()
     const survey = SurveyState.getSurvey(state)
 
-    const parentNode = Record.getNodeByUuid(activeParentNodeUuid)(record)
-    const ancestors = Record.getAncestorEntitiesAndSelf(parentNode)(record)
+    // ancestors are needed to find the entity with a pageUuid specified
+    const entity = Record.getNodeByUuid(entityUuid)(record)
+    const ancestors = Record.getAncestorsAndSelf(entity)(record)
 
     const nodeDefActivePage = R.pipe(
       R.map(ancestor => Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestor))(survey)),
@@ -170,6 +172,7 @@ export const checkInRecord = (recordUuid, activeParentNodeUuid, activeNodeDefUui
       ))
     )(ancestors)
 
+    // getting the nodes associated to the nodeDef page
     const formPageNodeUuidByNodeDefUuid = R.reduce(
       (acc, ancestor) => R.assoc(Node.getNodeDefUuid(ancestor), Node.getUuid(ancestor), acc),
       [],

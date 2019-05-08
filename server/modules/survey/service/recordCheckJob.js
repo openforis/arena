@@ -7,10 +7,9 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 
-const SurveyManager = require('../persistence/surveyManager')
-const RecordManager = require('../../record/persistence/recordManager')
-const RecordUpdateManager = require('../../record/persistence/recordUpdateManager')
-const NodeDependentUpdateManager = require('../../record/persistence/nodeDependentUpdateManager')
+const SurveyManager = require('../manager/surveyManager')
+const RecordManager = require('../../record/manager/recordManager')
+const NodeDependentUpdateManager = require('../../record/manager/nodeDependentUpdateManager')
 const RecordValidationManager = require('../../record/validator/recordValidationManager')
 
 const Job = require('../../../job/job')
@@ -73,7 +72,7 @@ const applyDefaultValues = async (survey, nodeDefsUpdated, record, newNodes, tx)
 
   const nodesToUpdate = R.mergeRight(newNodes, updatedNodes)
 
-  return await NodeDependentUpdateManager.updateNodes(survey, record, nodesToUpdate, tx)
+  return await NodeDependentUpdateManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
 }
 
 const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
@@ -99,7 +98,7 @@ const insertMissingSingleNode = async (survey, childDef, record, parentNode, use
     const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
     if (R.isEmpty(children)) {
       const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
-      return await RecordUpdateManager.insertNode(survey, record, childNode, user, tx)
+      return await RecordManager.insertNode(survey, record, childNode, user, tx)
     }
   }
   return {}

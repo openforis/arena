@@ -1,11 +1,11 @@
-const { deleteSurvey } = require('../server/modules/survey/persistence/surveyManager')
+const { deleteSurvey } = require('../server/modules/survey/manager/surveyManager')
 
 const { findUserByEmailAndPassword } = require('../server/modules/user/service/userService')
 const { setUserPref, userPrefNames } = require('../common/user/userPrefs')
 
 const Survey = require('../common/survey/survey')
 
-const SurveyManager = require('../server/modules/survey/persistence/surveyManager')
+const SurveyManager = require('../server/modules/survey/manager/surveyManager')
 
 let user = null
 let survey = null
