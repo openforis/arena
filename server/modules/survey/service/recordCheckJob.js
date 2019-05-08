@@ -9,7 +9,6 @@ const Node = require('../../../../common/record/node')
 
 const SurveyManager = require('../manager/surveyManager')
 const RecordManager = require('../../record/manager/recordManager')
-const NodeDependentUpdateManager = require('../../record/manager/nodeDependentUpdateManager')
 const RecordValidationManager = require('../../record/validator/recordValidationManager')
 
 const Job = require('../../../job/job')
@@ -72,7 +71,7 @@ const applyDefaultValues = async (survey, nodeDefsUpdated, record, newNodes, tx)
 
   const nodesToUpdate = R.mergeRight(newNodes, updatedNodes)
 
-  return await NodeDependentUpdateManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
+  return await RecordManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
 }
 
 const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {

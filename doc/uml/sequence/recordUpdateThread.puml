@@ -14,7 +14,7 @@ participant RecordUpdateThread
 participant RecordManager
 participant RecordUpdateManager
 participant NodeUpdateManager
-participant NodeDependentUpdateManager
+participant NodeUpdateDependentManager
 participant RecordValidationManager
 participant AttributeValidator
 participant TypeValidator
@@ -22,7 +22,6 @@ participant KeysUniquenessValidator
 participant CountValidator
 participant Record
 participant RecordExprParser
-participant NodeDependencyManager
 database RecordRepository
 database NodeRepository
 participant SurveyRdbManager
@@ -51,41 +50,37 @@ RecordUpdateThread -> RecordManager ++ : persistNode
         RecordUpdateManager --> RecordUpdateThread ++ : nodes
             RecordUpdateThread --> WebSocket -- : notify user with nodes
 
-        RecordUpdateManager -> NodeDependentUpdateManager ++ : updateNodes
+        RecordUpdateManager -> NodeUpdateManager ++ : updateNodesDependents
             loop N of dependent nodes (persist node)
 
             '1. UPDATE APPLICABILITY
-            NodeDependentUpdateManager -> NodeDependentUpdateManager ++ #FFCFCF: updateApplicability
-                NodeDependentUpdateManager -> Record ++ : getDependentNodes
-                    Record -> NodeDependentUpdateManager -- : nodes
-                NodeDependentUpdateManager -> RecordExprParser ++ : getApplicableExpression
-                    RecordExprParser -> NodeDependentUpdateManager -- : expr
-                NodeDependentUpdateManager -> RecordExprParser ++ : evalNodeQuery
-                    RecordExprParser -> NodeDependentUpdateManager -- : value
-                NodeDependentUpdateManager -> NodeDependencyManager ++ : persistDependentNodeApplicable
-                    NodeDependencyManager -> NodeRepository ++ : updateChildrenApplicability
-                        NodeRepository -> NodeDependencyManager -- : nodes
-                    NodeDependencyManager -> NodeDependentUpdateManager -- : nodes
-                NodeDependentUpdateManager -> NodeDependentUpdateManager -- : nodes
+            NodeUpdateManager -> NodeUpdateDependentManager ++ #FFCFCF: updateDependentsApplicable
+                NodeUpdateDependentManager -> Record ++ : getDependentNodes
+                    Record -> NodeUpdateDependentManager -- : nodes
+                NodeUpdateDependentManager -> RecordExprParser ++ : getApplicableExpression
+                    RecordExprParser -> NodeUpdateDependentManager -- : expr
+                NodeUpdateDependentManager -> RecordExprParser ++ : evalNodeQuery
+                    RecordExprParser -> NodeUpdateDependentManager -- : value
+                NodeUpdateDependentManager -> NodeRepository ++ : updateChildrenApplicability
+                    NodeRepository -> NodeUpdateDependentManager -- : nodes
+                NodeUpdateDependentManager -> NodeUpdateManager -- : nodes
 
              '2. UPDATE DEFAULT VALUE
-             NodeDependentUpdateManager -> NodeDependentUpdateManager ++ #FFCFCF : updateDefaultValue
-                 NodeDependentUpdateManager -> Record ++ : getDependentNodes
-                     Record -> NodeDependentUpdateManager -- : nodes
-                 NodeDependentUpdateManager -> RecordExprParser ++ : getApplicableExpression
-                     RecordExprParser -> NodeDependentUpdateManager -- : expr
-                 NodeDependentUpdateManager -> RecordExprParser ++ : evalNodeQuery
-                     RecordExprParser -> NodeDependentUpdateManager -- : value
-                 NodeDependentUpdateManager -> NodeDependencyManager ++ : persistDependentNodeValue
-                     NodeDependencyManager -> NodeDependencyManager ++ #FFCFCF: toNodeValue
-                        NodeDependencyManager -> NodeDependencyManager -- : nodeValue
-                     NodeDependencyManager -> NodeRepository ++ : updateNode
-                         NodeRepository -> NodeDependencyManager -- : node
-                     NodeDependencyManager -> NodeDependentUpdateManager -- : nodes
-                 NodeDependentUpdateManager -> NodeDependentUpdateManager -- : nodes
+             NodeUpdateManager -> NodeUpdateDependentManager ++ #FFCFCF : updateDependentsDefaultValues
+                 NodeUpdateDependentManager -> Record ++ : getDependentNodes
+                     Record -> NodeUpdateDependentManager -- : nodes
+                 NodeUpdateDependentManager -> RecordExprParser ++ : getApplicableExpression
+                     RecordExprParser -> NodeUpdateDependentManager -- : expr
+                 NodeUpdateDependentManager -> RecordExprParser ++ : evalNodeQuery
+                     RecordExprParser -> NodeUpdateDependentManager -- : value
+                 NodeUpdateDependentManager -> NodeUpdateDependentManager ++ #FF6F6F: toNodeValue
+                     NodeUpdateDependentManager -> NodeUpdateDependentManager -- : nodeValue
+                 NodeUpdateDependentManager -> NodeRepository ++ : updateNode
+                     NodeRepository -> NodeUpdateDependentManager -- : node
+                 NodeUpdateDependentManager -> NodeUpdateManager -- : nodes
 
             end
-            NodeDependentUpdateManager -> RecordUpdateManager -- : nodes
+            NodeUpdateManager -> RecordUpdateManager -- : nodes
 
         RecordUpdateManager --> RecordUpdateThread ++ : nodes
             RecordUpdateThread --> WebSocket -- : notify user with nodes

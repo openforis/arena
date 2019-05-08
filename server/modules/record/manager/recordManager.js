@@ -4,7 +4,6 @@ const Record = require('../../../../common/record/record')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
 const RecordUpdateManager = require('./_internal/recordUpdateManager')
-const NodeUpdateManager = require('./nodeUpdateManager')
 
 const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
 const RecordRepository = require('../repository/recordRepository')
@@ -35,7 +34,7 @@ module.exports = {
   // ==== CREATE
   insertRecord: RecordRepository.insertRecord,
   insertNodes: NodeRepository.insertNodes,
-  insertNode: NodeUpdateManager.insertNode,
+  insertNode: RecordUpdateManager.insertNode,
 
   // ==== READ
   fetchRecordByUuid,
@@ -52,6 +51,7 @@ module.exports = {
   createRecord: RecordUpdateManager.createRecord,
   updateRecordStep: RecordUpdateManager.updateRecordStep,
   persistNode: RecordUpdateManager.persistNode,
+  updateNodesDependents: RecordUpdateManager.updateNodesDependents,
 
   // ==== DELETE
   deleteRecord: RecordUpdateManager.deleteRecord,

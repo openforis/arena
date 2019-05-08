@@ -6,7 +6,7 @@ const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 
 const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
-const NodeDependentUpdateManager = require('../../server/modules/record/manager/nodeDependentUpdateManager')
+const RecordManager = require('../../server/modules/record/manager/recordManager')
 
 const { getContextUser } = require('../testContext')
 
@@ -42,6 +42,7 @@ after(async () => {
   if (survey)
     await SurveyManager.deleteSurvey(Survey.getId(survey))
 })
+
 describe('Applicable Test', async () => {
   it('Applicable update', async () => {
     const nodeSource = RecordUtils.findNodeByPath('root/num')(survey, record)
@@ -69,7 +70,7 @@ describe('Applicable Test', async () => {
       record = Record.assocNodes(nodesUpdated)(record)
 
       // update dependent nodes
-      const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodesDependents(survey, record, nodesUpdated)
+      const nodesDependentUpdated = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
 
       record = Record.assocNodes(nodesDependentUpdated)(record)
 

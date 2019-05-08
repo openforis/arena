@@ -13,8 +13,7 @@ const RecordUsersMap = require('../../service/update/recordUsersMap')
 const RecordRepository = require('../../repository/recordRepository')
 const SurveyManager = require('../../../survey/manager/surveyManager')
 const RecordValidationManager = require('../../validator/recordValidationManager')
-const NodeUpdateManager = require('../nodeUpdateManager')
-const NodeDependentUpdateManager = require('../nodeDependentUpdateManager')
+const NodeUpdateManager = require('./nodeUpdateManager')
 
 const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
 const FileManager = require('../fileManager')
@@ -126,7 +125,7 @@ const _onNodesUpdate = async (survey, record, updatedNodes,
   record = Record.assocNodes(updatedNodes)(record)
 
   // 2. update dependent nodes
-  const updatedDependentNodes = await NodeDependentUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
+  const updatedDependentNodes = await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
   if (nodesUpdateListener)
     nodesUpdateListener(updatedDependentNodes)
   record = Record.assocNodes(updatedDependentNodes)(record)
@@ -165,5 +164,6 @@ module.exports = {
   // NODE
   insertNode: NodeUpdateManager.insertNode,
   persistNode,
+  updateNodesDependents: NodeUpdateManager.updateNodesDependents,
   deleteNode,
 }
