@@ -105,8 +105,8 @@ const getNodeDefUuids = nodes => R.pipe(
 
 const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
 
-const isDescendantOf = node =>
-  ancestor => R.includes(
+const isDescendantOf = ancestor =>
+  node => R.includes(
     getUuid(ancestor),
     getHierarchy(node),
   )

@@ -19,6 +19,7 @@ participant AttributeValidator
 participant TypeValidator
 participant KeysUniquenessValidator
 participant CountValidator
+participant Record
 participant RecordExprParser
 participant NodeDependencyManager
 database RecordRepository
@@ -53,8 +54,8 @@ RecordUpdateThread --> RecordUpdateManager ++ : persistNode
 
             '1. UPDATE APPLICABILITY
             NodeDependentUpdateManager -> NodeDependentUpdateManager ++ #FFCFCF: updateApplicability
-                NodeDependentUpdateManager -> NodeDependencyManager ++ : findDependentNodes
-                    NodeDependencyManager -> NodeDependentUpdateManager -- : nodes
+                NodeDependentUpdateManager -> Record ++ : getDependentNodes
+                    Record -> NodeDependentUpdateManager -- : nodes
                 NodeDependentUpdateManager -> RecordExprParser ++ : getApplicableExpression
                     RecordExprParser -> NodeDependentUpdateManager -- : expr
                 NodeDependentUpdateManager -> RecordExprParser ++ : evalNodeQuery
@@ -67,8 +68,8 @@ RecordUpdateThread --> RecordUpdateManager ++ : persistNode
 
              '2. UPDATE DEFAULT VALUE
              NodeDependentUpdateManager -> NodeDependentUpdateManager ++ #FFCFCF : updateDefaultValue
-                 NodeDependentUpdateManager -> NodeDependencyManager ++ : findDependentNodes
-                     NodeDependencyManager -> NodeDependentUpdateManager -- : nodes
+                 NodeDependentUpdateManager -> Record ++ : getDependentNodes
+                     Record -> NodeDependentUpdateManager -- : nodes
                  NodeDependentUpdateManager -> RecordExprParser ++ : getApplicableExpression
                      RecordExprParser -> NodeDependentUpdateManager -- : expr
                  NodeDependentUpdateManager -> RecordExprParser ++ : evalNodeQuery
@@ -93,8 +94,8 @@ RecordUpdateThread --> RecordUpdateManager ++ : persistNode
             '3.1 attributeValidations
             RecordValidationManager -> AttributeValidator ++ : validateSelfAndDependentAttributes
                 loop N = attributes
-                    AttributeValidator -> NodeDependencyManager ++ : findDependentNodes
-                        NodeDependencyManager -> AttributeValidator -- : dependents
+                    AttributeValidator -> Record ++ : getDependentNodes
+                        Record -> AttributeValidator -- : dependents
                         loop N = attributeAndDependents
                             AttributeValidator -> AttributeValidator ++ #FFCFCF : validateAttribute
                                 AttributeValidator -> AttributeValidator ++ #FF6F6F: validateRequired
