@@ -2,7 +2,7 @@ const db = require('../../../db/db')
 
 const RecordFile = require('../../../../common/record/recordFile')
 
-const { getSurveyDBSchema } = require('../../survey/persistence/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 // ============== CREATE
 

@@ -6,7 +6,7 @@ const DbUtils = require('../../../db/dbUtils')
 const {
   getSurveyDBSchema,
   dbTransformCallback
-} = require('../../survey/persistence/surveySchemaRepositoryUtils')
+} = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const fetchItems = async (surveyId, client = db) =>
   await client.map(`

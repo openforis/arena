@@ -8,7 +8,7 @@ const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const DataTable = require('../persistence/schemaRdb/dataTable')
 
-const SurveyManager = require('../../survey/persistence/surveyManager')
+const SurveyManager = require('../../survey/manager/surveyManager')
 const SurveyRdbManager = require('../persistence/surveyRdbManager')
 const RecordManager = require('../../record/manager/recordManager')
 

@@ -3,7 +3,7 @@ const R = require('ramda')
 
 const db = require('../../../db/db')
 const { selectDate, now } = require('../../../db/dbUtils')
-const { getSurveyDBSchema, dbTransformCallback: dbTransformCallbackCommon } = require('../../survey/persistence/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema, dbTransformCallback: dbTransformCallbackCommon } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
 

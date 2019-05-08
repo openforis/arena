@@ -5,7 +5,7 @@ const db = require('../../../db/db')
 const { now, insertAllQuery } = require('../../../db/dbUtils')
 
 const Node = require('../../../../common/record/node')
-const { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } = require('../../survey/persistence/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 //camelize all but "meta"
 const dbTransformCallback = node =>

@@ -7,7 +7,7 @@ const {
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
   dbTransformCallback,
-} = require('../../survey/persistence/surveySchemaRepositoryUtils')
+} = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Taxon = require('../../../../common/survey/taxon')

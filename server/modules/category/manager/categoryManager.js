@@ -3,7 +3,7 @@ const R = require('ramda')
 
 const db = require('../../../db/db')
 
-const {publishSurveySchemaTableProps, markSurveyDraft} = require('../../survey/persistence/surveySchemaRepositoryUtils')
+const {publishSurveySchemaTableProps, markSurveyDraft} = require('../../survey/repository/surveySchemaRepositoryUtils')
 const {toIndexedObj} = require('../../../../common/survey/surveyUtils')
 
 const CategoryRepository = require('../repository/categoryRepository')

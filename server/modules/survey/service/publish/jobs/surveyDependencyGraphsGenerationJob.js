@@ -2,7 +2,7 @@ const Job = require('../../../../../job/job')
 
 const Survey = require('../../../../../../common/survey/survey')
 
-const SurveyManager = require('../../../persistence/surveyManager')
+const SurveyManager = require('../../../manager/surveyManager')
 
 class SurveyDependencyGraphsGenerationJob extends Job {
 

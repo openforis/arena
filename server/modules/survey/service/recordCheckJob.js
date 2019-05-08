@@ -7,7 +7,7 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 
-const SurveyManager = require('../persistence/surveyManager')
+const SurveyManager = require('../manager/surveyManager')
 const RecordManager = require('../../record/manager/recordManager')
 const RecordUpdateManager = require('../../record/manager/recordUpdateManager')
 const NodeDependentUpdateManager = require('../../record/manager/nodeDependentUpdateManager')

@@ -8,7 +8,7 @@ const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 const NodeDefValidations = require('../../../common/survey/nodeDefValidations')
 const User = require('../../../common/user/user')
 
-const SurveyManager = require('../../../server/modules/survey/persistence/surveyManager')
+const SurveyManager = require('../../../server/modules/survey/manager/surveyManager')
 const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
 
 const SurveyPublishPerformJob = require('../../../server/modules/survey/service/publish/surveyPublishPerformJob')

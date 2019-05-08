@@ -6,7 +6,7 @@ const NodeDefExpression = require('../../common/survey/nodeDefExpression')
 const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 
-const SurveyManager = require('../../server/modules/survey/persistence/surveyManager')
+const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
 const NodeDependentUpdateManager = require('../../server/modules/record/manager/nodeDependentUpdateManager')
 
 const { getContextUser } = require('../testContext')

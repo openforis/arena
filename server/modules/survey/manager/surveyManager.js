@@ -5,7 +5,7 @@ const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
 const { uuidv4 } = require('../../../../common/uuid')
 const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
 
-const SurveyRepository = require('./surveyRepository')
+const SurveyRepository = require('../repository/surveyRepository')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const User = require('../../../../common/user/user')

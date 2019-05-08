@@ -15,7 +15,7 @@ const Validator = require('../../../../../../common/validation/validator')
 
 const Job = require('../../../../../job/job')
 
-const SurveyManager = require('../../../../survey/persistence/surveyManager')
+const SurveyManager = require('../../../../survey/manager/surveyManager')
 const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const CollectImportReportManager = require('../../../manager/collectImportReportManager')
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')

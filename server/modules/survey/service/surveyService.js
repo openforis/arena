@@ -3,7 +3,7 @@ const R = require('ramda')
 const Survey = require('../../../../common/survey/survey')
 const Validator = require('../../../../common/validation/validator')
 
-const SurveyManager = require('../persistence/surveyManager')
+const SurveyManager = require('../manager/surveyManager')
 const SurveyValidator = require('../surveyValidator')
 
 const JobManager = require('../../../job/jobManager')

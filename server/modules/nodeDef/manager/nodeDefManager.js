@@ -6,7 +6,7 @@ const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const NodeDefRepository = require('../repository/nodeDefRepository')
 const NodeDefValidator = require('../validator/nodeDefValidator')
 
-const { markSurveyDraft } = require('../../survey/persistence/surveySchemaRepositoryUtils')
+const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 

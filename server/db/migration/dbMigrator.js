@@ -6,9 +6,9 @@ const db = require('../db')
 const config = require('./migrationConfig')
 
 const { getProcessNodeEnv } = require('../../../common/processUtils')
-const { getSurveyDBSchema } = require('../../modules/survey/persistence/surveySchemaRepositoryUtils')
+const { getSurveyDBSchema } = require('../../modules/survey/repository/surveySchemaRepositoryUtils')
 
-const { fetchAllSurveyIds } = require('../../modules/survey/persistence/surveyRepository')
+const { fetchAllSurveyIds } = require('../../modules/survey/repository/surveyRepository')
 
 const env = getProcessNodeEnv()
 

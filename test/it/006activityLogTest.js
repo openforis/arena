@@ -8,7 +8,7 @@ const Survey = require('../../common/survey/survey')
 const Record = require('../../common/record/record')
 
 const ActivityLogger = require('../../server/modules/activityLog/activityLogger')
-const SurveyManager = require('../../server/modules/survey/persistence/surveyManager')
+const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
 const RecordUpdateManager = require('../../server/modules/record/manager/recordUpdateManager')
 
 const SB = require('./utils/surveyBuilder')
