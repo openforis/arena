@@ -7,7 +7,7 @@ const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 
 const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
-const NodeDependentUpdateManager = require('../../server/modules/record/manager/nodeDependentUpdateManager')
+const RecordManager = require('../../server/modules/record/manager/recordManager')
 
 const { getContextUser } = require('../testContext')
 
@@ -66,7 +66,7 @@ const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourceP
   record = Record.assocNodes(nodesUpdated)(record)
 
   // update dependent nodes
-  const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodesDependents(survey, record, nodesUpdated)
+  const nodesDependentUpdated = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
   record = Record.assocNodes(nodesDependentUpdated)(record)
 
   const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, record)

@@ -52,6 +52,7 @@ module.exports = {
   createRecord: RecordUpdateManager.createRecord,
   updateRecordStep: RecordUpdateManager.updateRecordStep,
   persistNode: RecordUpdateManager.persistNode,
+  updateNodesDependents: NodeUpdateManager.updateNodesDependents,
 
   // ==== DELETE
   deleteRecord: RecordUpdateManager.deleteRecord,

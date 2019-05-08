@@ -1,12 +1,15 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
+const Queue = require('../../../../common/queue')
+
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
 const Record = require('../../../../common/record/record')
 
+const NodeUpdateDependentManager = require('./nodeUpdateDependentManager')
 const NodeRepository = require('../repository/nodeRepository')
 
 const ActivityLog = require('../../activityLog/activityLogger')
@@ -36,6 +39,51 @@ const persistNode = async (user, survey, record, node, t) => {
     // create
     return await insertNode(survey, record, node, user, t)
   }
+}
+
+const updateNodesDependents = async (survey, record, nodes, tx) => {
+  const nodesArray = R.values(nodes)
+  const nodesUpdated = nodesArray
+  const nodesToVisit = new Queue(nodesArray)
+  const nodeUuidsVisited = []
+
+  while (!nodesToVisit.isEmpty()) {
+    const node = nodesToVisit.dequeue()
+    const nodeUuid = Node.getUuid(node)
+
+    // visit only unvisited nodes
+    if (!R.includes(nodeUuid, nodeUuidsVisited)) {
+
+      // update node dependents
+      const [nodesApplicability, nodesDefaultValues] = await Promise.all([
+        NodeUpdateDependentManager.updateDependentsApplicable(survey, record, node, tx),
+        NodeUpdateDependentManager.updateDependentsDefaultValues(survey, record, node, tx)
+      ])
+      const nodesUpdatedCurrent = R.mergeRight(nodesApplicability, nodesDefaultValues)
+      record = Record.assocNodes(nodesUpdatedCurrent)(record)
+
+      // mark updated nodes to visit
+      const nodesUpdatedCurrentArray = R.values(nodesUpdatedCurrent)
+      nodesToVisit.enqueueItems(nodesUpdatedCurrentArray)
+
+      // update nodes to return
+      for (const nodeUpdated of nodesUpdatedCurrentArray) {
+        const idx = R.findIndex(
+          R.propEq(Node.keys.uuid, Node.getUuid(nodeUpdated))
+        )(nodesUpdated)
+
+        idx >= 0
+          ? nodesUpdated[idx] = R.mergeDeepRight(nodesUpdated[idx], nodeUpdated)
+          : nodesUpdated.push(nodeUpdated)
+
+      }
+
+      // mark node visited
+      nodeUuidsVisited.push(nodeUuid)
+    }
+  }
+
+  return SurveyUtils.toUuidIndexedObj(nodesUpdated)
 }
 
 // ==== CREATE
@@ -142,5 +190,6 @@ const _assocParentNode = (surveyId, record, node, nodes) => {
 module.exports = {
   insertNode,
   persistNode,
+  updateNodesDependents,
   deleteNode,
 }
