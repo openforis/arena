@@ -4,8 +4,8 @@ const Record = require('../../../../common/record/record')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
 const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
-const RecordRepository = require('./recordRepository')
-const NodeRepository = require('./nodeRepository')
+const RecordRepository = require('../repository/recordRepository')
+const NodeRepository = require('../repository/nodeRepository')
 
 const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) => {
   const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, false, client)

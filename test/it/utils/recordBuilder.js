@@ -7,7 +7,7 @@ const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 
-const RecordUpdateManager = require('../../../server/modules/record/persistence/recordUpdateManager')
+const RecordUpdateManager = require('../../../server/modules/record/manager/recordUpdateManager')
 
 class NodeBuilder {
 

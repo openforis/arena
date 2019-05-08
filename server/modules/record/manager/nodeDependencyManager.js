@@ -7,7 +7,7 @@ const CategoryItem = require('../../../../common/survey/categoryItem')
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Node = require('../../../../common/record/node')
 
-const NodeRepository = require('./nodeRepository')
+const NodeRepository = require('../repository/nodeRepository')
 const CategoryRepository = require('../../category/repository/categoryRepository')
 const TaxonomyRepository = require('../../taxonomy/persistence/taxonomyRepository')
 

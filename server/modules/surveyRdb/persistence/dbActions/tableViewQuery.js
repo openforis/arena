@@ -15,7 +15,7 @@ const DataFilter = require('../../../../../common/surveyRdb/dataFilter')
 
 const DataCol = require('../schemaRdb/dataCol')
 
-const NodeRepository = require('../../../record/persistence/nodeRepository')
+const NodeRepository = require('../../../record/repository/nodeRepository')
 
 const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort, client) => {
   const schemaName = SchemaRdb.getName(surveyId)

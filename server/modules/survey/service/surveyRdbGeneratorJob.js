@@ -4,7 +4,7 @@ const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const SurveyManager = require('../persistence/surveyManager')
 const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
-const RecordManager = require('../../record/persistence/recordManager')
+const RecordManager = require('../../record/manager/recordManager')
 
 const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
 

@@ -1,4 +1,4 @@
-const FileRepository = require('./fileRepository')
+const FileRepository = require('../repository/fileRepository')
 
 module.exports = {
   //CREATE

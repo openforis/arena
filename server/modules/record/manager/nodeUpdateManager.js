@@ -7,7 +7,7 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
 const Record = require('../../../../common/record/record')
 
-const NodeRepository = require('./nodeRepository')
+const NodeRepository = require('../repository/nodeRepository')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 

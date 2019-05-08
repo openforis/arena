@@ -10,7 +10,7 @@ const DataTable = require('../persistence/schemaRdb/dataTable')
 
 const SurveyManager = require('../../survey/persistence/surveyManager')
 const SurveyRdbManager = require('../persistence/surveyRdbManager')
-const RecordManager = require('../../record/persistence/recordManager')
+const RecordManager = require('../../record/manager/recordManager')
 
 const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output) => {
   const csvStream = fastcsv.createWriteStream({ headers: true })
