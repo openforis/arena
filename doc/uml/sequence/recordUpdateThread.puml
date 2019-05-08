@@ -22,7 +22,6 @@ participant KeysUniquenessValidator
 participant CountValidator
 participant Record
 participant RecordExprParser
-participant NodeDependencyManager
 database RecordRepository
 database NodeRepository
 participant SurveyRdbManager
@@ -62,10 +61,8 @@ RecordUpdateThread -> RecordManager ++ : persistNode
                     RecordExprParser -> NodeUpdateDependentManager -- : expr
                 NodeUpdateDependentManager -> RecordExprParser ++ : evalNodeQuery
                     RecordExprParser -> NodeUpdateDependentManager -- : value
-                NodeUpdateDependentManager -> NodeDependencyManager ++ : persistDependentNodeApplicable
-                    NodeDependencyManager -> NodeRepository ++ : updateChildrenApplicability
-                        NodeRepository -> NodeDependencyManager -- : nodes
-                    NodeDependencyManager -> NodeUpdateDependentManager -- : nodes
+                NodeUpdateDependentManager -> NodeRepository ++ : updateChildrenApplicability
+                    NodeRepository -> NodeUpdateDependentManager -- : nodes
                 NodeUpdateDependentManager -> NodeUpdateManager -- : nodes
 
              '2. UPDATE DEFAULT VALUE
@@ -76,12 +73,10 @@ RecordUpdateThread -> RecordManager ++ : persistNode
                      RecordExprParser -> NodeUpdateDependentManager -- : expr
                  NodeUpdateDependentManager -> RecordExprParser ++ : evalNodeQuery
                      RecordExprParser -> NodeUpdateDependentManager -- : value
-                 NodeUpdateDependentManager -> NodeDependencyManager ++ : persistDependentNodeValue
-                     NodeDependencyManager -> NodeDependencyManager ++ #FFCFCF: toNodeValue
-                        NodeDependencyManager -> NodeDependencyManager -- : nodeValue
-                     NodeDependencyManager -> NodeRepository ++ : updateNode
-                         NodeRepository -> NodeDependencyManager -- : node
-                     NodeDependencyManager -> NodeUpdateDependentManager -- : nodes
+                 NodeUpdateDependentManager -> NodeUpdateDependentManager ++ #FF6F6F: toNodeValue
+                     NodeUpdateDependentManager -> NodeUpdateDependentManager -- : nodeValue
+                 NodeUpdateDependentManager -> NodeRepository ++ : updateNode
+                     NodeRepository -> NodeUpdateDependentManager -- : node
                  NodeUpdateDependentManager -> NodeUpdateManager -- : nodes
 
             end
