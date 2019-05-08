@@ -34,7 +34,7 @@ const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, s
   SELECT ${colParamNames.join(', ')}
     FROM $/schemaName:name/.$/tableName:name/
     ${R.isNil(filterClause) ? '' : `WHERE ${filterClause}`}
-    ${R.isEmpty(sortParams) ? '' : `ORDER BY ${sortClause} NULLS LAST`}
+    ORDER BY ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}date_modified DESC NULLS LAST
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
     OFFSET $/offset/`,
     { ...filterParams, ...colParams, ...sortParams, schemaName, tableName, limit, offset }

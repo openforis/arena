@@ -1,7 +1,9 @@
 const R = require('ramda')
 
+const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
+
 const DataTable = require('./dataTable')
 const DataCol = require('./dataCol')
 
@@ -13,25 +15,48 @@ const aliasParent = `p`
 const getColUuid = nodeDef => `${NodeDef.getName(nodeDef)}_${DataTable.colNameUuuid}`
 
 const getSelectFields = (survey, nodeDef) => {
-  const colUuid = `${DataTable.colNameUuuid} as ${getColUuid(nodeDef)}`
-  const isRoot = NodeDef.isRoot(nodeDef)
-  const hCols = isRoot
-    ? [DataTable.colNameRecordUuuid, colUuid]
-    : [colUuid]
+  const fields = []
+  Survey.visitAncestorsAndSelf(
+    nodeDef,
+    nodeDefCurrent => {
+      const cols = getCols(
+        survey,
+        nodeDefCurrent,
+        NodeDef.isEqual(nodeDefCurrent)(nodeDef)
+      )
+      fields.unshift(...cols)
+    }
+  )(survey)
 
-  const colNames = R.pipe(
-    R.map(DataCol.getNames),
-    R.flatten,
-    R.insertAll(0, hCols),
-    R.map(name => `${alias}.${name}`),
-  )(DataTable.getNodeDefColumns(survey, nodeDef))
+  // add record_uuid, date_created, date_modified
+  fields.unshift(
+    `${NodeDef.isRoot(nodeDef) ? alias : aliasParent}.${DataTable.colNameRecordUuuid}`,
+    `${alias}.date_created`,
+    `${alias}.date_modified`
+  )
 
-  return isRoot
-    ? colNames
-    : [`${aliasParent}.*`, ...colNames]
+  return fields
 }
 
-const getJoin = (schemaName, nodeDef, nodeDefParent) =>
+const getCols = (survey, nodeDef, isSelf) => {
+  const fields = R.pipe(
+    R.map(DataCol.getNames),
+    R.flatten,
+    R.map(name => `${isSelf ? alias : aliasParent}.${name}`),
+  )(DataTable.getNodeDefColumns(survey, nodeDef))
+
+  // if is not root, prepend parent uuid
+  if (!NodeDef.isRoot(nodeDef))
+    fields.unshift(`${aliasParent}.${getColUuid(Survey.getNodeDefParent(nodeDef)(survey))}`)
+
+  // if nodeDef isSelf (starting nodeDef) prepend col uuid
+  if (isSelf)
+    fields.unshift(`${alias}.${DataTable.colNameUuuid} as ${getColUuid(nodeDef)}`)
+
+  return fields
+}
+
+const getJoin = (schemaName, nodeDefParent) =>
   nodeDefParent
     ? `JOIN 
        ${schemaName}.${getName(nodeDefParent)} as ${aliasParent}

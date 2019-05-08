@@ -71,15 +71,13 @@ const assocNodeDefs = nodeDefs => R.assoc(nodeDefsKey, nodeDefs)
 
 const getNodeDefParent = nodeDef => getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))
 
-const getAncestorsHierarchy = nodeDef =>
-  survey => {
-    if (NodeDef.isRoot(nodeDef)) {
-      return []
-    } else {
-      const parent = getNodeDefParent(nodeDef)(survey)
-      return R.append(parent, getAncestorsHierarchy(parent)(survey))
-    }
-  }
+const visitAncestorsAndSelf = (nodeDef, visitorFn) => survey => {
+  let nodeDefCurrent = nodeDef
+  do {
+    visitorFn(nodeDefCurrent)
+    nodeDefCurrent = getNodeDefParent(nodeDefCurrent)(survey)
+  } while (!!nodeDefCurrent)
+}
 
 const isNodeDefAncestor = (nodeDefAncestor, nodeDefDescendant) =>
   survey => {
@@ -137,41 +135,41 @@ const isNodeDefParentCode = nodeDef => R.pipe(
   R.any(def => NodeDef.getParentCodeDefUuid(def) === NodeDef.getUuid(nodeDef)),
 )
 
-const getNodeDefCodeCandidateParents = nodeDef =>
-  survey => {
-    const category = SurveyCategories.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+const getNodeDefCodeCandidateParents = nodeDef => survey => {
+  const category = SurveyCategories.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
 
-    if (category) {
-      const levelsLength = Category.getLevelsArray(category).length
-      const ancestors = getAncestorsHierarchy(nodeDef)(survey)
+  if (category) {
+    const levelsLength = Category.getLevelsArray(category).length
 
-      return R.reduce(
-        (acc, ancestor) =>
-          R.pipe(
-            getNodeDefChildren(ancestor),
+    const candidates = []
+    visitAncestorsAndSelf(
+      nodeDef,
+      nodeDefAncestor => {
+        if (!NodeDef.isEqual(nodeDefAncestor)(nodeDef)) {
+
+          const candidatesAncestor = R.pipe(
+            getNodeDefChildren(nodeDefAncestor),
             R.reject(n =>
               // reject multiple attributes
-              NodeDef.isMultiple(n)
-              ||
+              NodeDef.isMultiple(n) ||
               // or different category nodeDef
-              NodeDef.getCategoryUuid(n) !== Category.getUuid(category)
-              ||
+              NodeDef.getCategoryUuid(n) !== Category.getUuid(category) ||
               // or itself
-              NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef)
-              ||
+              NodeDef.getUuid(n) === NodeDef.getUuid(nodeDef) ||
               // or leaves nodeDef
               getNodeDefCategoryLevelIndex(n)(survey) === levelsLength - 1
-            ),
-            R.concat(acc),
-          )(survey),
-        [],
-        ancestors
-      )
+            )
+          )(survey)
 
-    } else {
-      return []
-    }
+          candidates.push(...candidatesAncestor)
+        }
+      }
+    )(survey)
+    return candidates
+  } else {
+    return []
   }
+}
 
 const getNodeDefCategoryLevelIndex = nodeDef =>
   survey => {
@@ -209,7 +207,7 @@ module.exports = {
 
   // ====== HIERARCHY
   getNodeDefParent,
-  getAncestorsHierarchy,
+  visitAncestorsAndSelf,
   getHierarchy,
   isNodeDefAncestor,
   traverseHierarchyItem,

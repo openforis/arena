@@ -8,6 +8,10 @@ const keys = {
 }
 
 // READ
+const getUuid = R.propOr(null, keys.uuid)
+
+const isEqual = other => self => getUuid(other) === getUuid(self)
+
 const getProps = R.propOr({}, keys.props)
 
 const getProp = (prop, defaultTo = null) => R.pipe(
@@ -48,7 +52,8 @@ module.exports = {
   getLabel,
 
   // UTILS / uuid
-  getUuid: R.propOr(null, keys.uuid),
+  getUuid,
+  isEqual,
   getParentUuid: R.propOr(null, keys.parentUuid),
   toIndexedObj,
   toUuidIndexedObj,

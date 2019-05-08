@@ -68,7 +68,7 @@ const getRowValues = async (survey, nodeDef, record, node, client) => {
   return [
     Node.getUuid(node),
     NodeDef.isRoot(nodeDef) ? Record.getUuid(record) : Node.getParentUuid(node),
-    ...R.flatten(rowValues)
+    ...R.flatten(rowValues),
   ]
 }
 

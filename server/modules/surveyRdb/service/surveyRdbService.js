@@ -49,10 +49,17 @@ const queryTable = async (surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols
 
   // 1. find ancestor defs of table def
   const tableNodeDef = Survey.getNodeDefByUuid(nodeDefUuidTable)(survey)
-  const ancestorDefs = Survey.getAncestorsHierarchy(tableNodeDef)(survey)
-  const ancestorAndSelfDefs = R.append(tableNodeDef, ancestorDefs)
 
-  const ancestorUuidColNames = ancestorAndSelfDefs.map(ancestor => `${NodeDef.getName(ancestor)}_uuid`)
+  const ancestorAndSelfDefs = []
+  const ancestorUuidColNames = []
+
+  Survey.visitAncestorsAndSelf(
+    tableNodeDef,
+    nodeDefCurrent => {
+      ancestorUuidColNames.push(`${NodeDef.getName(nodeDefCurrent)}_uuid`)
+      ancestorAndSelfDefs.push(nodeDefCurrent)
+    }
+  )(survey)
 
   const queryCols = R.pipe(
     R.concat(ancestorUuidColNames),

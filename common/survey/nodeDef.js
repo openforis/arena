@@ -172,6 +172,7 @@ module.exports = {
   //READ
   getUuid: SurveyUtils.getUuid,
   getProp: SurveyUtils.getProp,
+  isEqual: SurveyUtils.isEqual,
 
   getType,
   getName,
