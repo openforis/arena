@@ -6,7 +6,7 @@ const db = require('../../../db/db')
 const {publishSurveySchemaTableProps, markSurveyDraft} = require('../../survey/persistence/surveySchemaRepositoryUtils')
 const {toIndexedObj} = require('../../../../common/survey/surveyUtils')
 
-const CategoryRepository = require('./categoryRepository')
+const CategoryRepository = require('../repository/categoryRepository')
 const CategoryValidator = require('../categoryValidator')
 const Category = require('../../../../common/survey/category')
 

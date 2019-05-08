@@ -5,7 +5,7 @@ const Job = require('../../../../../job/job')
 const Category = require('../../../../../../common/survey/category')
 const Validator = require('../../../../../../common/validation/validator')
 
-const CategoryManager = require('../../../../category/persistence/categoryManager')
+const CategoryManager = require('../../../../category/manager/categoryManager')
 
 class CategoriesValidationJob extends Job {
 

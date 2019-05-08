@@ -5,7 +5,7 @@ const CategoryItem = require('../../../../common/survey/categoryItem')
 const Taxon = require('../../../../common/survey/taxon')
 const { isBlank, contains } = require('../../../../common/stringUtils')
 
-const CategoryManager = require('../../category/persistence/categoryManager')
+const CategoryManager = require('../../category/manager/categoryManager')
 const TaxonomyManager = require('../../taxonomy/persistence/taxonomyManager')
 
 const { sendErr } = require('../../../utils/response')

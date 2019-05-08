@@ -9,7 +9,7 @@ const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 const Expression = require('../../../common/exprParser/expression')
 
-const CategoryManager = require('../category/persistence/categoryManager')
+const CategoryManager = require('../category/manager/categoryManager')
 const TaxonomyManager = require('../taxonomy/persistence/taxonomyManager')
 
 const evalNodeQuery = async (survey, record, node, query, client, bindNodeFn = bindNode) => {

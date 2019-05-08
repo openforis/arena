@@ -8,7 +8,7 @@ const Taxonomy = require('../../../../common/survey/taxonomy')
 const Node = require('../../../../common/record/node')
 
 const NodeRepository = require('./nodeRepository')
-const CategoryRepository = require('../../category/persistence/categoryRepository')
+const CategoryRepository = require('../../category/repository/categoryRepository')
 const TaxonomyRepository = require('../../taxonomy/persistence/taxonomyRepository')
 
 const persistDependentNodeValue = async (survey, node, valueExpr, isDefaultValue, tx) => {

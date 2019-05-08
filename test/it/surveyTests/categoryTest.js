@@ -1,7 +1,7 @@
 const {getContextSurveyId, getContextUser} = require('./../../testContext')
 const {expect} = require('chai')
 
-const CategoryManager = require('../../../server/modules/category/persistence/categoryManager')
+const CategoryManager = require('../../../server/modules/category/manager/categoryManager')
 const Category = require('../../../common/survey/category')
 const CategoryLevel = require('../../../common/survey/categoryLevel')
 const CategoryItem = require('../../../common/survey/categoryItem')
