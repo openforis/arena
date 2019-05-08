@@ -13,7 +13,6 @@ const Node = require('../../../../../../common/record/node')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../../record/manager/recordManager')
-const RecordUpdateManager = require('../../../../record/manager/recordUpdateManager')
 
 const Job = require('../../../../../job/job')
 
@@ -57,7 +56,7 @@ class RecordsImportJob extends Job {
       const recordToCreate = Record.newRecord(user)
       const record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
       const recordUuid = Record.getUuid(record)
-      await RecordUpdateManager.updateRecordStep(surveyId, recordUuid, step, tx)
+      await RecordManager.updateRecordStep(surveyId, recordUuid, step, tx)
 
       const collectRootEntityName = R.pipe(
         R.keys,

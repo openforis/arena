@@ -9,7 +9,6 @@ const Node = require('../../../../common/record/node')
 
 const SurveyManager = require('../manager/surveyManager')
 const RecordManager = require('../../record/manager/recordManager')
-const RecordUpdateManager = require('../../record/manager/recordUpdateManager')
 const NodeDependentUpdateManager = require('../../record/manager/nodeDependentUpdateManager')
 const RecordValidationManager = require('../../record/validator/recordValidationManager')
 
@@ -99,7 +98,7 @@ const insertMissingSingleNode = async (survey, childDef, record, parentNode, use
     const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
     if (R.isEmpty(children)) {
       const childNode = Node.newNode(NodeDef.getUuid(childDef), Record.getUuid(record), parentNode)
-      return await RecordUpdateManager.insertNode(survey, record, childNode, user, tx)
+      return await RecordManager.insertNode(survey, record, childNode, user, tx)
     }
   }
   return {}

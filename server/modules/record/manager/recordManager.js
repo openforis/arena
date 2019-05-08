@@ -3,6 +3,9 @@ const db = require('../../../db/db')
 const Record = require('../../../../common/record/record')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
+const RecordUpdateManager = require('./_internal/recordUpdateManager')
+const NodeUpdateManager = require('./nodeUpdateManager')
+
 const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
 const RecordRepository = require('../repository/recordRepository')
 const NodeRepository = require('../repository/nodeRepository')
@@ -29,11 +32,12 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, client = db) => {
 }
 
 module.exports = {
-  // CREATE
+  // ==== CREATE
   insertRecord: RecordRepository.insertRecord,
   insertNodes: NodeRepository.insertNodes,
+  insertNode: NodeUpdateManager.insertNode,
 
-  // READ
+  // ==== READ
   fetchRecordByUuid,
   fetchRecordAndNodesByUuid,
   fetchRecordsSummaryBySurveyId,
@@ -44,7 +48,18 @@ module.exports = {
   fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,
   fetchChildNodesByNodeDefUuid: NodeRepository.fetchChildNodesByNodeDefUuid,
 
-  // UTILS
+  // ==== UPDATE
+  createRecord: RecordUpdateManager.createRecord,
+  updateRecordStep: RecordUpdateManager.updateRecordStep,
+  persistNode: RecordUpdateManager.persistNode,
+
+  // ==== DELETE
+  deleteRecord: RecordUpdateManager.deleteRecord,
+  deleteRecordPreview: RecordUpdateManager.deleteRecordPreview,
+  deleteRecordsPreview: RecordUpdateManager.deleteRecordsPreview,
+  deleteNode: RecordUpdateManager.deleteNode,
+
+  // ====  UTILS
   disableTriggers: NodeRepository.disableTriggers,
   enableTriggers: NodeRepository.enableTriggers
 }

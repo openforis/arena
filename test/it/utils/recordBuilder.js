@@ -7,7 +7,7 @@ const NodeDef = require('../../../common/survey/nodeDef')
 const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 
-const RecordUpdateManager = require('../../../server/modules/record/manager/recordUpdateManager')
+const RecordManager = require('../../../server/modules/record/manager/recordManager')
 
 class NodeBuilder {
 
@@ -48,7 +48,7 @@ class EntityBuilder extends NodeBuilder {
       node = R.head(Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record))
     } else {
       node = Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), parentNode)
-      record = await RecordUpdateManager.persistNode(user, survey, record, node, null, null, t)
+      record = await RecordManager.persistNode(user, survey, record, node, null, null, t)
     }
 
     for (const childBuilder of this.childBuilders) {
@@ -89,7 +89,7 @@ class AttributeBuilder extends NodeBuilder {
       ? Node.assocValue(this.value)(nodeInRecord)
       : Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), parentNode, this.value)
 
-    return await RecordUpdateManager.persistNode(user, survey, record, nodeToPersist, null, null, t)
+    return await RecordManager.persistNode(user, survey, record, nodeToPersist, null, null, t)
   }
 
 }
@@ -112,7 +112,7 @@ class RecordBuilder {
     return await client.tx(async t => {
       const record = Record.newRecord(this.user)
 
-      const recordUpdated = await RecordUpdateManager.createRecord(this.user, Survey.getId(this.survey), record, t)
+      const recordUpdated = await RecordManager.createRecord(this.user, Survey.getId(this.survey), record, t)
 
       return await this.rootEntityBuilder.buildAndStore(this.user, this.survey, recordUpdated, null, t)
     })
