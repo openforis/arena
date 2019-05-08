@@ -3,7 +3,7 @@ const R = require('ramda')
 const db = require('../../../db/db')
 const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
 const { uuidv4 } = require('../../../../common/uuid')
-const SurveyRdbManager = require('../../surveyRdb/persistence/surveyRdbManager')
+const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 
 const SurveyRepository = require('../repository/surveyRepository')
 const Survey = require('../../../../common/survey/survey')

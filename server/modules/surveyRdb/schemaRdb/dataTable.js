@@ -1,13 +1,13 @@
 const R = require('ramda')
 
-const Survey = require('../../../../../common/survey/survey')
-const NodeDef = require('../../../../../common/survey/nodeDef')
-const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
-const Record = require('../../../../../common/record/record')
-const Node = require('../../../../../common/record/node')
+const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
+const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
+const Record = require('../../../../common/record/record')
+const Node = require('../../../../common/record/node')
 const DataRow = require('./dataRow')
 const DataCol = require('./dataCol')
-const SurveyRepositoryUtils = require('../../../survey/repository/surveySchemaRepositoryUtils')
+const SurveyRepositoryUtils = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const colNameUuuid = 'uuid'
 const colNameParentUuuid = 'parent_uuid'

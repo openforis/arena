@@ -1,21 +1,21 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const Survey = require('../../../../../common/survey/survey')
-const NodeDef = require('../../../../../common/survey/nodeDef')
+const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
 
-const Node = require('../../../../../common/record/node')
+const Node = require('../../../../common/record/node')
 
-const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
-const NodeDefTable = require('../../../../../common/surveyRdb/nodeDefTable')
+const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
+const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 
-const Expression = require('../../../../../common/exprParser/expression.js')
-const DataSort = require('../../../../../common/surveyRdb/dataSort')
-const DataFilter = require('../../../../../common/surveyRdb/dataFilter')
+const Expression = require('../../../../common/exprParser/expression.js')
+const DataSort = require('../../../../common/surveyRdb/dataSort')
+const DataFilter = require('../../../../common/surveyRdb/dataFilter')
 
 const DataCol = require('../schemaRdb/dataCol')
 
-const NodeRepository = require('../../../record/repository/nodeRepository')
+const NodeRepository = require('../../record/repository/nodeRepository')
 
 const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort, client) => {
   const schemaName = SchemaRdb.getName(surveyId)

@@ -3,10 +3,10 @@ const db = require('../../../db/db')
 
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
-const NodesInsert = require('./dbActions/nodesInsert')
-const NodesUpdate = require('./dbActions/nodesUpdate')
-const TableViewCreate = require('./dbActions/tableViewCreate')
-const TableViewQuery = require('./dbActions/tableViewQuery')
+const NodesInsert = require('../dbActions/nodesInsert')
+const NodesUpdate = require('../dbActions/nodesUpdate')
+const TableViewCreate = require('../dbActions/tableViewCreate')
+const TableViewQuery = require('../dbActions/tableViewQuery')
 
 // ==== DDL
 

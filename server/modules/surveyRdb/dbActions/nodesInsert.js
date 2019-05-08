@@ -1,11 +1,11 @@
 const Promise = require('bluebird')
 
-const { insertAllQuery } = require('../../../../db/dbUtils')
+const { insertAllQuery } = require('../../../db/dbUtils')
 
-const Survey = require('../../../../../common/survey/survey')
-const NodeDef = require('../../../../../common/survey/nodeDef')
-const Record = require('../../../../../common/record/record')
-const SchemaRdb = require('../../../../../common/surveyRdb/schemaRdb')
+const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
+const Record = require('../../../../common/record/record')
+const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
 const DataTable = require('../schemaRdb/dataTable')
 
