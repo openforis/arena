@@ -9,8 +9,8 @@ const Record = require('../../common/record/record')
 const Node = require('../../common/record/node')
 const Validator = require('../../common/validation/validator')
 
-const SurveyManager = require('../../server/modules/survey/persistence/surveyManager')
-const RecordUpdateManager = require('../../server/modules/record/persistence/recordUpdateManager')
+const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
+const RecordUpdateManager = require('../../server/modules/record/manager/recordUpdateManager')
 
 const SB = require('./utils/surveyBuilder')
 const RB = require('./utils/recordBuilder')

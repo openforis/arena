@@ -6,11 +6,11 @@ const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
-const DataTable = require('../persistence/schemaRdb/dataTable')
+const DataTable = require('../schemaRdb/dataTable')
 
-const SurveyManager = require('../../survey/persistence/surveyManager')
-const SurveyRdbManager = require('../persistence/surveyRdbManager')
-const RecordManager = require('../../record/persistence/recordManager')
+const SurveyManager = require('../../survey/manager/surveyManager')
+const SurveyRdbManager = require('../manager/surveyRdbManager')
+const RecordManager = require('../../record/manager/recordManager')
 
 const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output) => {
   const csvStream = fastcsv.createWriteStream({ headers: true })

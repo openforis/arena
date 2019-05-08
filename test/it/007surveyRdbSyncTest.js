@@ -10,8 +10,8 @@ const NodeDef = require('../../common/survey/nodeDef')
 const Record = require('../../common/record/record')
 const SchemaRdb = require('../../common/surveyRdb/schemaRdb')
 
-const SurveyManager = require('../../server/modules/survey/persistence/surveyManager')
-const RecordUpdateManager = require('../../server/modules/record/persistence/recordUpdateManager')
+const SurveyManager = require('../../server/modules/survey/manager/surveyManager')
+const RecordUpdateManager = require('../../server/modules/record/manager/recordUpdateManager')
 const SurveyRdbService = require('../../server/modules/surveyRdb/service/surveyRdbService')
 
 const SB = require('./utils/surveyBuilder')

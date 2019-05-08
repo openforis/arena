@@ -1,4 +1,4 @@
-const CategoryManager = require('../persistence/categoryManager')
+const CategoryManager = require('../manager/categoryManager')
 
 module.exports = {
   insertCategory: CategoryManager.insertCategory,

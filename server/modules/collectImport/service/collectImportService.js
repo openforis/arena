@@ -4,8 +4,8 @@ const db = require('../../../db/db')
 
 const Survey = require('../../../../common/survey/survey')
 
-const SurveyManager = require('../../survey/persistence/surveyManager')
-const CollectImportReportManager = require('../persistence/collectImportReportManager')
+const SurveyManager = require('../../survey/manager/surveyManager')
+const CollectImportReportManager = require('../manager/collectImportReportManager')
 const JobManager = require('../../../job/jobManager')
 const CollectImportJob = require('./collectImport/collectImportJob')
 

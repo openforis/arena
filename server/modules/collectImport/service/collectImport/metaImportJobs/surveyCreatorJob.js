@@ -4,7 +4,7 @@ const Survey = require('../../../../../../common/survey/survey')
 
 const Job = require('../../../../../job/job')
 
-const SurveyManager = require('../../../../survey/persistence/surveyManager')
+const SurveyManager = require('../../../../survey/manager/surveyManager')
 
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
 

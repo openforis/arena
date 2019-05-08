@@ -1,6 +1,6 @@
 const Job = require('../../../../job/job')
 
-const SurveyManager = require('../../../survey/persistence/surveyManager')
+const SurveyManager = require('../../../survey/manager/surveyManager')
 
 const CollectSurveyReaderJob = require('./metaImportJobs/collectSurveyReaderJob')
 const SurveyCreatorJob = require('./metaImportJobs/surveyCreatorJob')

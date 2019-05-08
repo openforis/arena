@@ -12,9 +12,9 @@ const WebSocket = require('../../../utils/webSocket')
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 const ThreadManager = require('../../../threads/threadManager')
 
-const RecordUpdateManager = require('../persistence/recordUpdateManager')
-const RecordManager = require('../persistence/recordManager')
-const FileManager = require('../persistence/fileManager')
+const RecordUpdateManager = require('../manager/recordUpdateManager')
+const RecordManager = require('../manager/recordManager')
+const FileManager = require('../manager/fileManager')
 
 const RecordUsersMap = require('./update/recordUsersMap')
 const RecordThreads = require('./update/thread/recordThreads')

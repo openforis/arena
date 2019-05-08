@@ -11,8 +11,8 @@ const Validator = require('../../../../common/validation/validator')
 const Taxon = require('../../../../common/survey/taxon')
 
 const TaxonomyValidator = require('../taxonomyValidator')
-const TaxonomyManager = require('../persistence/taxonomyManager')
-const TaxonomyImportManager = require('../persistence/taxonomyImportManager')
+const TaxonomyManager = require('../manager/taxonomyManager')
+const TaxonomyImportManager = require('../manager/taxonomyImportManager')
 
 const requiredColumns = [
   'code',

@@ -10,9 +10,9 @@ const NodeDefExpression = require('../../../common/survey/nodeDefExpression')
 const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 
-const NodeDefRepository = require('../../../server/modules/nodeDef/persistence/nodeDefRepository')
-const RecordManager = require('../../../server/modules/record/persistence/recordManager')
-const RecordUpdateManager = require('../../../server/modules/record/persistence/recordUpdateManager')
+const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
+const RecordManager = require('../../../server/modules/record/manager/recordManager')
+const RecordUpdateManager = require('../../../server/modules/record/manager/recordUpdateManager')
 
 const { getContextUser, fetchFullContextSurvey, getContextSurveyId } = require('../../testContext')
 

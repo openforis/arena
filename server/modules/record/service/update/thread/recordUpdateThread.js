@@ -3,10 +3,10 @@ const R = require('ramda')
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../../../threads/thread')
 
-const SurveyManager = require('../../../../survey/persistence/surveyManager')
-const RecordManager = require('../../../persistence/recordManager')
+const SurveyManager = require('../../../../survey/manager/surveyManager')
+const RecordManager = require('../../../manager/recordManager')
 
-const RecordUpdateManager = require('../../../persistence/recordUpdateManager')
+const RecordUpdateManager = require('../../../manager/recordUpdateManager')
 
 const Survey = require('../../../../../../common/survey/survey')
 const Record = require('../../../../../../common/record/record')

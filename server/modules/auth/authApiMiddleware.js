@@ -1,7 +1,7 @@
 const Request = require('../../utils/request')
 const Response = require('../../utils/response')
 
-const SurveyManager = require('../survey/persistence/surveyManager')
+const SurveyManager = require('../survey/manager/surveyManager')
 const RecordService = require('../record/service/recordService')
 
 const {

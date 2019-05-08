@@ -11,9 +11,9 @@ const NodeDef = require('../../../../../../common/survey/nodeDef')
 const Record = require('../../../../../../common/record/record')
 const Node = require('../../../../../../common/record/node')
 
-const SurveyManager = require('../../../../survey/persistence/surveyManager')
-const RecordManager = require('../../../../record/persistence/recordManager')
-const RecordUpdateManager = require('../../../../record/persistence/recordUpdateManager')
+const SurveyManager = require('../../../../survey/manager/surveyManager')
+const RecordManager = require('../../../../record/manager/recordManager')
+const RecordUpdateManager = require('../../../../record/manager/recordUpdateManager')
 
 const Job = require('../../../../../job/job')
 
