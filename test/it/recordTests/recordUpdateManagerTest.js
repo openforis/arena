@@ -12,7 +12,6 @@ const Node = require('../../../common/record/node')
 
 const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
 const RecordManager = require('../../../server/modules/record/manager/recordManager')
-const RecordUpdateManager = require('../../../server/modules/record/manager/recordUpdateManager')
 
 const { getContextUser, fetchFullContextSurvey, getContextSurveyId } = require('../../testContext')
 
@@ -29,7 +28,7 @@ const recordCreationTest = async () => {
 
   const recordNew = newRecordPreview()
 
-  const record = await RecordUpdateManager.createRecord(user, surveyId, recordNew)
+  const record = await RecordManager.createRecord(user, surveyId, recordNew)
 
   const nodes = Record.getNodes(record)
 
@@ -62,7 +61,7 @@ const defaultValueAppliedTest = async () => {
   const record = newRecordPreview()
 
   await db.tx(async t => {
-    await RecordUpdateManager.createRecord(user, surveyId, record, t)
+    await RecordManager.createRecord(user, surveyId, record, t)
 
     //reload record
 

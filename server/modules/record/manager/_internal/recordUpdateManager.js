@@ -1,25 +1,25 @@
 const R = require('ramda')
 
-const db = require('../../../db/db')
+const db = require('../../../../db/db')
 
-const SurveyUtils = require('../../../../common/survey/surveyUtils')
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const Record = require('../../../../common/record/record')
-const RecordStep = require('../../../../common/record/recordStep')
-const Node = require('../../../../common/record/node')
+const SurveyUtils = require('../../../../../common/survey/surveyUtils')
+const Survey = require('../../../../../common/survey/survey')
+const NodeDef = require('../../../../../common/survey/nodeDef')
+const Record = require('../../../../../common/record/record')
+const RecordStep = require('../../../../../common/record/recordStep')
+const Node = require('../../../../../common/record/node')
 
-const RecordUsersMap = require('../service/update/recordUsersMap')
-const RecordRepository = require('../repository/recordRepository')
-const SurveyManager = require('../../survey/manager/surveyManager')
-const RecordValidationManager = require('../validator/recordValidationManager')
-const NodeUpdateManager = require('./nodeUpdateManager')
-const NodeDependentUpdateManager = require('./nodeDependentUpdateManager')
+const RecordUsersMap = require('../../service/update/recordUsersMap')
+const RecordRepository = require('../../repository/recordRepository')
+const SurveyManager = require('../../../survey/manager/surveyManager')
+const RecordValidationManager = require('../../validator/recordValidationManager')
+const NodeUpdateManager = require('../nodeUpdateManager')
+const NodeDependentUpdateManager = require('../nodeDependentUpdateManager')
 
-const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
-const FileManager = require('./fileManager')
+const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
+const FileManager = require('../fileManager')
 
-const ActivityLog = require('../../activityLog/activityLogger')
+const ActivityLog = require('../../../activityLog/activityLogger')
 
 /**
  * =======
@@ -126,7 +126,7 @@ const _onNodesUpdate = async (survey, record, updatedNodes,
   record = Record.assocNodes(updatedNodes)(record)
 
   // 2. update dependent nodes
-  const updatedDependentNodes = await NodeDependentUpdateManager.updateNodes(survey, record, updatedNodes, t)
+  const updatedDependentNodes = await NodeDependentUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
   if (nodesUpdateListener)
     nodesUpdateListener(updatedDependentNodes)
   record = Record.assocNodes(updatedDependentNodes)(record)

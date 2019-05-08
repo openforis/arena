@@ -11,6 +11,7 @@ hide footbox
 participant WebSocket
 participant RecordService
 participant RecordUpdateThread
+participant RecordManager
 participant RecordUpdateManager
 participant NodeUpdateManager
 participant NodeDependentUpdateManager
@@ -26,22 +27,23 @@ database RecordRepository
 database NodeRepository
 participant SurveyRdbManager
 
-RecordService --> RecordUpdateThread: postMessage
+RecordUpdateThread ++  #yellow
 
-RecordUpdateThread --> RecordUpdateManager ++ : persistNode
+RecordService --> RecordUpdateThread : postMessage
 
-    'RecordUpdateManager.persistNode
-    RecordUpdateManager -> NodeUpdateManager ++ : persistNode
-        NodeUpdateManager -> NodeRepository ++ : updateNode
-            NodeRepository -> NodeUpdateManager -- : node
+RecordUpdateThread -> RecordManager ++ : persistNode
+    RecordManager -> RecordUpdateManager ++ : persistNode
+        'RecordUpdateManager.persistNode
+        RecordUpdateManager -> NodeUpdateManager ++ : persistNode
+            NodeUpdateManager -> NodeRepository ++ : updateNode
+                NodeRepository -> NodeUpdateManager -- : node
 
-        NodeUpdateManager -> NodeUpdateManager ++ #FFCFCF : deleteDependentCodeNodes
-            NodeUpdateManager -> NodeRepository ++ : deleteNode
-                NodeRepository -> NodeUpdateManager -- : null
-            NodeUpdateManager -> NodeUpdateManager --: nodes
+            NodeUpdateManager -> NodeUpdateManager ++ #FFCFCF : deleteDependentCodeNodes
+                NodeUpdateManager -> NodeRepository ++ : deleteNode
+                    NodeRepository -> NodeUpdateManager -- : null
+                NodeUpdateManager -> NodeUpdateManager --: nodes
 
-        NodeUpdateManager -> RecordUpdateManager -- : nodes
-
+            NodeUpdateManager -> RecordUpdateManager -- : nodes
 
     'RecordUpdateManager._onNodesUpdate START
     RecordUpdateManager -> RecordUpdateManager ++ #FFCFCF: _onNodesUpdate
@@ -156,7 +158,8 @@ RecordUpdateThread --> RecordUpdateManager ++ : persistNode
         'RecordUpdateManager._onNodesUpdate END
         RecordUpdateManager -> RecordUpdateManager -- : record
 
-RecordUpdateManager -> RecordUpdateThread -- : record
+    RecordUpdateManager -> RecordManager -- : record
+RecordManager -> RecordUpdateThread -- : record
 
 
 @enduml

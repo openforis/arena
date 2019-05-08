@@ -6,8 +6,6 @@ const Thread = require('../../../../../threads/thread')
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../manager/recordManager')
 
-const RecordUpdateManager = require('../../../manager/recordUpdateManager')
-
 const Survey = require('../../../../../../common/survey/survey')
 const Record = require('../../../../../../common/record/record')
 const Validator = require('../../../../../../common/validation/validator')
@@ -100,7 +98,7 @@ class RecordUpdateThread extends Thread {
     switch (msg.type) {
 
       case messageTypes.persistNode:
-        this.record = await RecordUpdateManager.persistNode(
+        this.record = await RecordManager.persistNode(
           user,
           survey,
           record,
@@ -111,7 +109,7 @@ class RecordUpdateThread extends Thread {
         break
 
       case messageTypes.deleteNode:
-        this.record = await RecordUpdateManager.deleteNode(
+        this.record = await RecordManager.deleteNode(
           user,
           survey,
           record,

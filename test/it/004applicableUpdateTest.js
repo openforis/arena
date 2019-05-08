@@ -69,7 +69,7 @@ describe('Applicable Test', async () => {
       record = Record.assocNodes(nodesUpdated)(record)
 
       // update dependent nodes
-      const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodes(survey, record, nodesUpdated)
+      const nodesDependentUpdated = await NodeDependentUpdateManager.updateNodesDependents(survey, record, nodesUpdated)
 
       record = Record.assocNodes(nodesDependentUpdated)(record)
 
