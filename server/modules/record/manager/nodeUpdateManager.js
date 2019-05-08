@@ -11,14 +11,7 @@ const NodeRepository = require('../repository/nodeRepository')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
-//always assoc parentNode, used in surveyRdbManager.updateTableNodes
-const assocParentNode = (surveyId, record, node, nodes) => {
-  const parentNode = Record.getParentNode(node)(record)
-  const parentNodeObj = parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}
-  const nodeObj = { [Node.getUuid(node)]: node }
-
-  return R.mergeRight({ ...nodeObj, ...parentNodeObj }, nodes)
-}
+//==== UPDATE
 
 const persistNode = async (user, survey, record, node, t) => {
   const nodeUuid = Node.getUuid(node)
@@ -62,7 +55,7 @@ const insertNode = async (survey, record, node, user, t) => {
 
   record = Record.assocNodes(nodesToReturn)(record)
 
-  return assocParentNode(Survey.getId(survey), record, node, nodesToReturn)
+  return _assocParentNode(Survey.getId(survey), record, node, nodesToReturn)
 }
 
 const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, user, t) => {
@@ -97,7 +90,20 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
   return R.mergeLeft({ [Node.getUuid(node)]: node }, childNodes)
 }
 
-//==== UPDATE
+//==== DELETE
+
+const deleteNode = async (user, survey, record, nodeUuid, t) => {
+  const surveyId = Survey.getId(survey)
+
+  const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
+
+  record = Record.assocNode(node)(record)
+
+  if (!Record.isPreview(record))
+    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, { nodeUuid }, t)
+
+  return await _onNodeUpdate(survey, record, node, t)
+}
 
 const _onNodeUpdate = async (survey, record, node, t) => {
   // TODO check if it should be removed
@@ -121,22 +127,16 @@ const _onNodeUpdate = async (survey, record, node, t) => {
 
   record = Record.assocNodes(updatedNodes)(record)
 
-  return assocParentNode(surveyId, record, node, updatedNodes)
+  return _assocParentNode(surveyId, record, node, updatedNodes)
 }
 
-//==== DELETE
+//always assoc parentNode, used in surveyRdbManager.updateTableNodes
+const _assocParentNode = (surveyId, record, node, nodes) => {
+  const parentNode = Record.getParentNode(node)(record)
+  const parentNodeObj = parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}
+  const nodeObj = { [Node.getUuid(node)]: node }
 
-const deleteNode = async (user, survey, record, nodeUuid, t) => {
-  const surveyId = Survey.getId(survey)
-
-  const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
-
-  record = Record.assocNode(node)(record)
-
-  if (!Record.isPreview(record))
-    await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDelete, { nodeUuid }, t)
-
-  return await _onNodeUpdate(survey, record, node, t)
+  return R.mergeRight({ ...nodeObj, ...parentNodeObj }, nodes)
 }
 
 module.exports = {

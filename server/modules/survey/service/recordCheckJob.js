@@ -72,7 +72,7 @@ const applyDefaultValues = async (survey, nodeDefsUpdated, record, newNodes, tx)
 
   const nodesToUpdate = R.mergeRight(newNodes, updatedNodes)
 
-  return await NodeDependentUpdateManager.updateNodes(survey, record, nodesToUpdate, tx)
+  return await NodeDependentUpdateManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
 }
 
 const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
