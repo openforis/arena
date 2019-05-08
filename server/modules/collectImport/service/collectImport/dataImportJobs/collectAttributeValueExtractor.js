@@ -12,7 +12,7 @@ const Node = require('../../../../../../common/record/node')
 const RecordFile = require('../../../../../../common/record/recordFile')
 
 const CategoryManager = require('../../../../category/manager/categoryManager')
-const TaxonomyManager = require('../../../../taxonomy/persistence/taxonomyManager')
+const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 const FileManager = require('../../../../record/manager/fileManager')
 
 const CollectIdmlParseUtils = require('../metaImportJobs/collectIdmlParseUtils')

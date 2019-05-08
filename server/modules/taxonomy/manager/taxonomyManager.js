@@ -8,7 +8,7 @@ const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Taxon = require('../../../../common/survey/taxon')
 
-const TaxonomyRepository = require('./taxonomyRepository')
+const TaxonomyRepository = require('../repository/taxonomyRepository')
 const TaxonomyValidator = require('../taxonomyValidator')
 
 const ActivityLog = require('../../activityLog/activityLogger')

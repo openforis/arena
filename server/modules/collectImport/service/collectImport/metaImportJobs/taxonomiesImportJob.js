@@ -6,8 +6,8 @@ const { languageCodesISO636_2 } = require('../../../../../../common/app/language
 
 const Job = require('../../../../../job/job')
 
-const TaxonomyManager = require('../../../../taxonomy/persistence/taxonomyManager')
-const TaxonomyImportManager = require('../../../../taxonomy/persistence/taxonomyImportManager')
+const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
+const TaxonomyImportManager = require('../../../../taxonomy/manager/taxonomyImportManager')
 
 const CSVParser = require('../../../../../../common/file/csvParser')
 

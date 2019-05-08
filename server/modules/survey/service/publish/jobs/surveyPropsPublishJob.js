@@ -6,7 +6,7 @@ const Survey = require('../../../../../../common/survey/survey')
 const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const SurveyManager = require('../../../manager/surveyManager')
 const CategoryManager = require('../../../../category/manager/categoryManager')
-const TaxonomyManager = require('../../../../taxonomy/persistence/taxonomyManager')
+const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 
 const ActivityLog = require('../../../../activityLog/activityLogger')
 
