@@ -1,3 +1,4 @@
+const util = require('util')
 const R = require('ramda')
 
 const { uuidv4 } = require('../../../../../../common/uuid')
@@ -19,6 +20,9 @@ const SurveyManager = require('../../../../survey/manager/surveyManager')
 const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const CollectImportReportManager = require('../../../manager/collectImportReportManager')
 const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
+
+const qualifiableItemApplicableExpressionFormat = `this.node('%s').getValue().props.code === '%s'`
+const specifyAttributeSuffix = 'specify'
 
 const checkExpressionParserByType = {
   'compare': collectCheck => {
@@ -61,8 +65,9 @@ class NodeDefsImportJob extends Job {
   constructor (params) {
     super('NodeDefsImportJob', params)
 
-    this.nodeDefNames = []
-    this.nodeDefUuidByCollectPath = {}
+    this.nodeDefs = {} //node definitions by uuid
+    this.nodeDefNames = [] //node def names used (to avoid naming collision)
+    this.nodeDefUuidByCollectPath = {} //used by following jobs
     this.issuesCount = 0
   }
 
@@ -131,25 +136,31 @@ class NodeDefsImportJob extends Job {
 
     await NodeDefManager.updateNodeDefProps(this.getUser(), surveyId, nodeDefUuid, {}, propsAdvanced, tx)
 
-    // 5. store nodeDefUuid in cache
+    // 5. store nodeDef in cache
     const collectNodeDefPath = parentPath + '/' + collectNodeDefName
     this.nodeDefUuidByCollectPath[collectNodeDefPath] = nodeDefUuid
+    this.nodeDefs[nodeDefUuid] = nodeDef
 
-    if (type === nodeDefType.entity) {
-      // insert child definitions
+    switch (type) {
+      case nodeDefType.entity:
+        // insert child definitions
 
-      for (const collectChild of collectNodeDef.elements) {
-        if (this.isCanceled())
-          break
+        for (const collectChild of collectNodeDef.elements) {
+          if (this.isCanceled())
+            break
 
-        const collectChildType = collectChild.name
+          const collectChildType = collectChild.name
 
-        const childType = CollectIdmlParseUtils.nodeDefTypesByCollectType[collectChildType]
+          const childType = CollectIdmlParseUtils.nodeDefTypesByCollectType[collectChildType]
 
-        if (childType) {
-          await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChild, childType, tx)
+          if (childType) {
+            await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChild, childType, tx)
+          }
         }
-      }
+        break
+      case nodeDefType.code:
+        await this.addSpecifyTextAttribute(surveyId, parentNodeDef, nodeDef, tx)
+        break
     }
   }
 
@@ -296,6 +307,37 @@ class NodeDefsImportJob extends Job {
     this.issuesCount++
   }
 
+  /**
+   * Adds a text attribute with name ${nodeDefName}_${qualifiableCode} (for each 'qualifiable' code list item in the list)
+   */
+  async addSpecifyTextAttribute (surveyId, parentNodeDef, nodeDef, tx) {
+    const categories = this.getContextProp('categories', {})
+    const category = R.find(category => Category.getUuid(category) === NodeDef.getCategoryUuid(nodeDef), categories)
+    const categoryName = Category.getName(category)
+    const survey = {
+      nodeDefs: this.nodeDefs
+    }
+    const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
+
+    const qualifiableItemCodesByCategoryAndLevel = this.getContextProp('qualifiableItemCodesByCategoryAndLevel', {})
+    const qualifiableItemCodes = R.pathOr([], [categoryName, levelIndex + ''], qualifiableItemCodesByCategoryAndLevel)
+
+    for (const itemCode of qualifiableItemCodes) {
+      const nodeDefName = NodeDef.getName(nodeDef)
+      const props = {
+        [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, `${nodeDefName}_${itemCode}`),
+        [NodeDef.propKeys.labels]: R.mapObjIndexed(label => `${label} ${specifyAttributeSuffix}`)(NodeDef.getLabels())
+      }
+      const qualifierNodeDefParam = NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), nodeDefType.text, props)
+      const qualifierNodeDef = await NodeDefManager.insertNodeDef(this.getUser(), surveyId, qualifierNodeDefParam, tx)
+      const propsAdvanced = {
+        [NodeDef.propKeys.applicable]: [NodeDefExpression.createExpression(util.format(qualifiableItemApplicableExpressionFormat, nodeDefName, itemCode))]
+      }
+      await NodeDefManager.updateNodeDefProps(this.getUser(), surveyId, NodeDef.getUuid(qualifierNodeDef), {}, propsAdvanced, tx)
+
+      this.nodeDefs[NodeDef.getUuid(qualifierNodeDef)] = qualifierNodeDef
+    }
+  }
 }
 
 const determineNodeDefPageUuid = (type, collectNodeDef) => {

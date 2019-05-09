@@ -21,6 +21,7 @@ class CategoriesImportJob extends Job {
     super('CategoriesImportJob', params)
 
     this.itemBatchPersister = new BatchPersister(this.itemsInsertHandler.bind(this))
+    this.qualifiableItemCodesByCategoryAndLevel = {}
   }
 
   async execute (tx) {
@@ -54,7 +55,10 @@ class CategoriesImportJob extends Job {
 
     await this.itemBatchPersister.flush(tx)
 
-    this.setContext({ categories })
+    this.setContext({
+      categories,
+      qualifiableItemCodesByCategoryAndLevel: this.qualifiableItemCodesByCategoryAndLevel
+    })
   }
 
   async insertLevels (category, codeList, tx) {
@@ -105,6 +109,22 @@ class CategoriesImportJob extends Job {
       const collectChildItems = CollectIdmlParseUtils.getElementsByName('item')(collectItem)
       if (!R.isEmpty(collectChildItems))
         await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
+
+      // update qualifiable item codes cache
+      collectChildItems.forEach(collectItem => {
+        if (CollectIdmlParseUtils.getAttribute('qualifiable')(collectItem) === 'true') {
+          const code = CollectIdmlParseUtils.getChildElementText('code')(collectItem)
+          this.qualifiableItemCodesByCategoryAndLevel = R.pipe(
+            R.pathOr([], [Category.getName(category), levelIndex + '']),
+            R.ifElse(
+              R.includes(code),
+              R.identity,
+              R.append(code)
+            ),
+            codes => R.assocPath([Category.getName(category), levelIndex + ''], codes, this.qualifiableItemCodesByCategoryAndLevel)
+          )(this.qualifiableItemCodesByCategoryAndLevel)
+        }
+      })
     }
   }
 
