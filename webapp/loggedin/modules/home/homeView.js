@@ -45,7 +45,7 @@ class HomeView extends React.Component {
 
   render () {
     const { surveyInfo } = this.props
-    const { i18n } = this.context
+    const { t } = this.context
 
     return (
       <NavigationTabBar
@@ -54,33 +54,33 @@ class HomeView extends React.Component {
         moduleDefault={homeModules.dashboard}
         tabs={[
           {
-            label: i18n('dashboard'),
+            label: t('dashboard'),
             component: DashboardView,
             path: appModuleUri(homeModules.dashboard),
             icon: 'icon-office',
             disabled: !Survey.isValid(surveyInfo),
           },
           {
-            label: i18n('my_surveys'),
+            label: t('my_surveys'),
             component: SurveyListView,
             path: appModuleUri(homeModules.surveyList),
             icon: 'icon-paragraph-justify',
           },
           {
-            // label: i18n('add_new_survey'),
+            // label: t('add_new_survey'),
             component: SurveyCreateView,
             path: appModuleUri(homeModules.surveyNew),
             icon: 'icon-plus',
             showTab: false,
           },
           {
-            // label: i18n('survey_info'),
+            // label: t('survey_info'),
             component: SurveyInfoView,
             path: appModuleUri(homeModules.surveyInfo),
             showTab: false,
           },
           {
-            // label: i18n('collect_import_job'),
+            // label: t('collect_import_job'),
             component: CollectImportReportView,
             path: appModuleUri(homeModules.collectImportReport),
             showTab: false,

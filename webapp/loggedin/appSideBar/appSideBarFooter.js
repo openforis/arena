@@ -4,7 +4,7 @@ import { I18nContext } from '../../i18n/i18nContext'
 
 const AppSideBarFooter = ({ logout, opened }) => (
   <I18nContext.Consumer>
-    {({ i18n }) => (
+    {({ t }) => (
       <div className="app-sidebar__footer">
         <a className="btn btn-s btn-of-light-xs"
            onClick={() => logout()}
@@ -13,10 +13,10 @@ const AppSideBarFooter = ({ logout, opened }) => (
              alignItems: 'baseline',
            }}>
           <span className={`icon icon-exit ${opened ? ' icon-left' : ''}`}
-                style={{transform: 'scaleX(-1)'}}/>
+                style={{ transform: 'scaleX(-1)' }}/>
           {
             opened
-              ? <span>{i18n('logout')}</span>
+              ? <span>{t('logout')}</span>
               : null
           }
         </a>
@@ -26,7 +26,7 @@ const AppSideBarFooter = ({ logout, opened }) => (
            target="_blank">
           {
              opened
-               ? i18n('open_foris') : i18n('open_foris_short')
+               ? t('open_foris') : t('open_foris_short')
            }
         </a>
       </div>
