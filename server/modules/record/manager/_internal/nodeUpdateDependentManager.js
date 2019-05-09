@@ -31,17 +31,14 @@ const updateDependentsApplicable = async (survey, record, node, tx) => {
     nodesToUpdate.map(async o => {
       const { nodeCtx, nodeDef } = o
 
-      const expressions = NodeDef.getApplicable(nodeDef)
+      //3. evaluate applicable expression
+      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getApplicable(nodeDef), tx)
+      const applicable = R.propOr(false, 'value', exprEval)
 
-      //3. get expression
-      const expr = await RecordExprParser.getApplicableExpression(survey, record, nodeCtx, expressions, tx)
-
-      //4. eval expr // applicable expr doesn't have applyIf, therefore always returns true or false
-      const applicable = await RecordExprParser.evalNodeQuery(survey, record, nodeCtx, NodeDefExpression.getExpression(expr), tx)
-
-      //5. persist updated node value if changed, and return updated node
+      //4. persist updated node value if changed, and return updated node
       const nodeDefUuid = NodeDef.getUuid(nodeDef)
       const nodeCtxUuid = Node.getUuid(nodeCtx)
+
       return Node.isChildApplicable(nodeDefUuid)(nodeCtx) === applicable
         ? {}
         : {
@@ -85,18 +82,12 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
     nodesToUpdate.map(async o => {
       const { nodeCtx, nodeDef } = o
 
-      const expressions = NodeDef.getDefaultValues(nodeDef)
+      //3. evaluate applicable default value expression
+      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef), tx)
+      const exprValue = R.propOr(null, 'value', exprEval)
 
-      //3. get expression
-      const expr = await RecordExprParser.getApplicableExpression(survey, record, nodeCtx, expressions, tx)
-
-      //4. eval expr
-      const valueExpr = expr
-        ? await RecordExprParser.evalNodeQuery(survey, record, nodeCtx, NodeDefExpression.getExpression(expr), tx)
-        : null
-
-      //5. persist updated node value if changed, and return updated node
-      const value = await toNodeValue(survey, nodeCtx, valueExpr, tx)
+      //4. persist updated node value if changed, and return updated node
+      const value = await toNodeValue(survey, nodeCtx, exprValue, tx)
       const oldValue = Node.getValue(nodeCtx, null)
       const nodeCtxUuid = Node.getUuid(nodeCtx)
 
@@ -107,7 +98,7 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
             Survey.getId(survey),
             nodeCtxUuid,
             value,
-            { [Node.metaKeys.defaultValue]: !R.isNil(expr) },
+            { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
             tx
           )
         }
