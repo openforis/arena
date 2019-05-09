@@ -57,10 +57,8 @@ RecordUpdateThread -> RecordManager ++ : persistNode
             NodeUpdateManager -> NodeUpdateDependentManager ++ #FFCFCF: updateDependentsApplicable
                 NodeUpdateDependentManager -> Record ++ : getDependentNodes
                     Record -> NodeUpdateDependentManager -- : nodes
-                NodeUpdateDependentManager -> RecordExprParser ++ : getApplicableExpression
-                    RecordExprParser -> NodeUpdateDependentManager -- : expr
-                NodeUpdateDependentManager -> RecordExprParser ++ : evalNodeQuery
-                    RecordExprParser -> NodeUpdateDependentManager -- : value
+                NodeUpdateDependentManager -> RecordExprParser ++ : evalApplicableExpression
+                    RecordExprParser -> NodeUpdateDependentManager -- : expressionEvaluated
                 NodeUpdateDependentManager -> NodeRepository ++ : updateChildrenApplicability
                     NodeRepository -> NodeUpdateDependentManager -- : nodes
                 NodeUpdateDependentManager -> NodeUpdateManager -- : nodes
@@ -69,10 +67,8 @@ RecordUpdateThread -> RecordManager ++ : persistNode
              NodeUpdateManager -> NodeUpdateDependentManager ++ #FFCFCF : updateDependentsDefaultValues
                  NodeUpdateDependentManager -> Record ++ : getDependentNodes
                      Record -> NodeUpdateDependentManager -- : nodes
-                 NodeUpdateDependentManager -> RecordExprParser ++ : getApplicableExpression
-                     RecordExprParser -> NodeUpdateDependentManager -- : expr
-                 NodeUpdateDependentManager -> RecordExprParser ++ : evalNodeQuery
-                     RecordExprParser -> NodeUpdateDependentManager -- : value
+                 NodeUpdateDependentManager -> RecordExprParser ++ : evalApplicableExpression
+                     RecordExprParser -> NodeUpdateDependentManager -- : expressionEvaluated
                  NodeUpdateDependentManager -> NodeUpdateDependentManager ++ #FF6F6F: toNodeValue
                      NodeUpdateDependentManager -> NodeUpdateDependentManager -- : nodeValue
                  NodeUpdateDependentManager -> NodeRepository ++ : updateNode
@@ -102,12 +98,8 @@ RecordUpdateThread -> RecordManager ++ : persistNode
                                     TypeValidator -> AttributeValidator -- : validation
 
                                 AttributeValidator -> AttributeValidator ++ #FF6F6F : validateNodeValidations
-                                    AttributeValidator -> RecordExprParser ++ : getApplicableExpressions
-                                        RecordExprParser -> AttributeValidator -- : expressions
-                                        loop N = expressions
-                                            AttributeValidator -> RecordExprParser ++ : evalNodeQuery
-                                                RecordExprParser -> AttributeValidator -- : valid
-                                        end
+                                    AttributeValidator -> RecordExprParser ++ : evalApplicableExpressions
+                                        RecordExprParser -> AttributeValidator -- : expressionsEvaluated
                                     AttributeValidator -> AttributeValidator -- : validations
 
                                 AttributeValidator -> AttributeValidator -- : attributeValidations
