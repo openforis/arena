@@ -2,7 +2,7 @@ import { exportReducer } from '../../utils/reduxUtils'
 
 import Survey from '../../../common/survey/survey'
 
-import { assocSurveyInfoProp, assocSurveyInfoValidation, markDraft, markPublished } from './surveyInfoState'
+import { assocSurveyInfoProp, assocSurveyInfoValidation, markDraft } from './surveyInfoState'
 
 // app actions
 import { loginSuccess } from '../../login/actions'

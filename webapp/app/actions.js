@@ -2,6 +2,8 @@ import axios from 'axios'
 
 import * as AppState from './appState'
 
+import i18nFactory from '../../common/i18n/i18nFactory'
+
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
@@ -13,7 +15,8 @@ export const initApp = () => async (dispatch) => {
   const { data } = resp
   const { user, survey } = data
 
-  dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user, survey })
+  const i18n = await i18nFactory.createI18nPromise('en')
+  dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user, survey, i18n })
 }
 
 export const logout = () => async dispatch => {

@@ -1,28 +1,43 @@
 import './appView.scss'
 
 import React from 'react'
+import { connect } from 'react-redux'
+
+import { I18nContext } from '../i18n/i18nContext'
+
+import * as AppState from '../app/appState'
 
 import AppSideBar from './appSideBar/appSideBar'
 import AppJobMonitor from './appJob/appJobMonitor'
 import AppErrors from './appErrors/appErrors'
 import ModuleSwitch from './modules/moduleSwitch'
 
-const AppView = (props) => {
-  const pathName = props.history.location.pathname
+class AppView extends React.Component {
+  render () {
+    const pathName = this.props.history.location.pathname
 
-  return (
-    <div className="app__container">
+    return (
+      <I18nContext.Provider value={this.props.i18n}>
+        <div className="app__container">
 
-      <AppSideBar pathname={pathName}/>
+          <AppSideBar pathname={pathName}/>
 
-      <ModuleSwitch location={props.location}/>
+          <ModuleSwitch location={this.props.location}/>
 
-      <AppJobMonitor/>
+          <AppJobMonitor/>
 
-      <AppErrors/>
+          <AppErrors/>
 
-    </div>
-  )
+        </div>
+      </I18nContext.Provider>
+    )
+  }
 }
 
-export default AppView
+const mapStateToProps = (state) => {
+  return { i18n: AppState.getState(state).i18n } // TODO - add function to appState
+}
+
+export default connect(
+  mapStateToProps
+)(AppView)

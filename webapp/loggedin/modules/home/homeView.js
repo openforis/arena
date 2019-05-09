@@ -17,6 +17,8 @@ import { homeModules } from './homeModules'
 
 import * as SurveyState from '../../../survey/surveyState'
 
+import { I18nContext } from '../../../i18n/i18nContext'
+
 class HomeView extends React.Component {
 
   componentDidUpdate (prevProps) {
@@ -43,6 +45,7 @@ class HomeView extends React.Component {
 
   render () {
     const { surveyInfo } = this.props
+    const { i18n } = this.context
 
     return (
       <NavigationTabBar
@@ -51,33 +54,33 @@ class HomeView extends React.Component {
         moduleDefault={homeModules.dashboard}
         tabs={[
           {
-            label: 'Dashboard',
+            label: i18n('dashboard'),
             component: DashboardView,
             path: appModuleUri(homeModules.dashboard),
             icon: 'icon-office',
             disabled: !Survey.isValid(surveyInfo),
           },
           {
-            label: 'My Surveys',
+            label: i18n('my_surveys'),
             component: SurveyListView,
             path: appModuleUri(homeModules.surveyList),
             icon: 'icon-paragraph-justify',
           },
           {
-            label: 'Add new survey',
+            // label: i18n('add_new_survey'),
             component: SurveyCreateView,
             path: appModuleUri(homeModules.surveyNew),
             icon: 'icon-plus',
             showTab: false,
           },
           {
-            label: 'Survey Info',
+            // label: i18n('survey_info'),
             component: SurveyInfoView,
             path: appModuleUri(homeModules.surveyInfo),
             showTab: false,
           },
           {
-            label: 'Collect Import Report',
+            // label: i18n('collect_import_job'),
             component: CollectImportReportView,
             path: appModuleUri(homeModules.collectImportReport),
             showTab: false,
@@ -88,8 +91,10 @@ class HomeView extends React.Component {
   }
 }
 
+HomeView.contextType = I18nContext
+
 const mapStateToProps = state => ({
-  surveyInfo: SurveyState.getSurveyInfo(state)
+  surveyInfo: SurveyState.getSurveyInfo(state),
 })
 
 export default connect(mapStateToProps)(HomeView)

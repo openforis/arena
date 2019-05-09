@@ -14,21 +14,21 @@ class AppSideBar extends React.Component {
 
   constructor () {
     super()
-    this.state = {opened: false}
+    this.state = { opened: false }
     this.element = React.createRef()
   }
 
   toggleOpen () {
     this.element.current.classList.toggle('opened')
-    this.setState({opened: !this.state.opened})
+    this.setState({ opened: !this.state.opened })
 
     //react-grid-layout re-render
     // window.dispatchEvent(new Event('resize'))
   }
 
   render () {
-    const {opened} = this.state
-    const {pathname, user, surveyInfo, logout} = this.props
+    const { opened } = this.state
+    const { pathname, user, surveyInfo, logout } = this.props
 
     return (
       <div className="app-sidebar" ref={this.element}>
@@ -56,7 +56,7 @@ class AppSideBar extends React.Component {
 
 const mapStateToProps = state => ({
   user: AppState.getUser(state),
-  surveyInfo: SurveyState.getSurveyInfo(state)
+  surveyInfo: SurveyState.getSurveyInfo(state),
 })
 
-export default connect(mapStateToProps, {logout})(AppSideBar)
+export default connect(mapStateToProps, { logout })(AppSideBar)
