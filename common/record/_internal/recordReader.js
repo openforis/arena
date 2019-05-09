@@ -34,11 +34,6 @@ const findNodes = predicate => R.pipe(
   R.filter(predicate)
 )
 
-const findNodesIndexed = predicate => R.pipe(
-  getNodes,
-  R.filter(predicate)
-)
-
 /**
  * ==== hierarchy
  */
@@ -116,15 +111,14 @@ const getDependentNodes = (survey, node, dependencyType) => record => {
           ? NodeDef.getParentUuid(dependentDef)
           : NodeDef.getUuid(dependentDef)
 
-        const dependentNodes = findNodes(
-          node =>
-            Node.getNodeDefUuid(node) === nodeDefUuidDependent &&
+        const dependentNodes = R.pipe(
+          getNodesByDefUuid(nodeDefUuidDependent),
+          R.filter(node =>
+            Node.isDescendantOf(commonParentNode)(node) ||
             (
-              Node.isDescendantOf(commonParentNode)(node) ||
-              (
-                isDependencyApplicable && Node.getUuid(node) === Node.getUuid(commonParentNode)
-              )
+              isDependencyApplicable && Node.getUuid(node) === Node.getUuid(commonParentNode)
             )
+          )
         )(record)
 
         return dependentNodes.map(nodeCtx => ({
@@ -186,9 +180,6 @@ module.exports = {
   getNodeByUuid,
   getRootNode,
   getNodesByDefUuid,
-
-  findNodes,
-  findNodesIndexed,
 
   // ==== hierarchy
   // ancestors

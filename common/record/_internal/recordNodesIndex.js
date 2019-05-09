@@ -32,12 +32,15 @@ const Node = require('../node')
  *     'node-def-1-uuid': ['node-1-uuid', 'node-2-uuid', 'node-5-uuid', 'node-6-uuid', ...]
  *     'node-def-2-uuid': ['node-3-uuid', 'node-4-uuid', 'node-7-uuid', 'node-8-uuid', ...]
  *   }
+ *
+ * nodesDirty: nodes (indexed by uuid) being updated, modified in the UI but not on server side
  */
 
 const keys = {
   nodeRootUuid: '_nodeRootUuid',
   nodesByParentAndDef: '_nodesByParentAndDef',
   nodesByDef: '_nodesByDef',
+  nodesDirty: '_nodesDirty',
 }
 
 // ==== GETTERS
@@ -65,6 +68,8 @@ const getNodeUuidsByParent = parentNodeUuid => R.pipe(
   R.flatten
 )
 
+const getNodesDirty = R.propOr({}, keys.nodesDirty)
+
 // ==== ADD
 /**
  * Adds the specified nodes to the cache
@@ -82,9 +87,20 @@ const addNodes = nodes =>
     )(nodes)
 
 const _addNode = node => R.pipe(
-  record => Node.isRoot(node) ? R.assoc(keys.nodeRootUuid, Node.getUuid(node))(record) : record,
+  //rootUuid
+  R.ifElse(
+    R.always(Node.isRoot(node)),
+    R.assoc(keys.nodeRootUuid, Node.getUuid(node)),
+    R.identity,
+  ),
   _addNodeToParentIndex(node),
-  _addNodeToNodeDefIndex(node)
+  _addNodeToNodeDefIndex(node),
+  //dirty nodes
+  R.ifElse(
+    R.always(Node.isDirty(node)),
+    R.assocPath([keys.nodesDirty, Node.getUuid(node)], node),
+    R.dissocPath([keys.nodesDirty, Node.getUuid(node)])
+  )
 )
 
 const _addNodeToNodeDefIndex = node => record => R.pipe(
@@ -112,8 +128,14 @@ const _addNodeToParentIndex = node => record => R.pipe(
  * Removed the specified node from the cache
  */
 const removeNode = node => R.pipe(
+  R.ifElse(
+    R.always(Node.isRoot(node)),
+    R.dissoc(keys.nodeRootUuid),
+    R.identity
+  ),
   _removeNodeFromParentIndex(node),
-  _removeNodeFromNodeDefIndex(node)
+  _removeNodeFromNodeDefIndex(node),
+  R.dissocPath([keys.nodesDirty, Node.getUuid(node)])
 )
 
 const _removeNodeFromParentIndex = node => record => R.pipe(
@@ -128,7 +150,6 @@ const _removeNodeFromNodeDefIndex = node => record => R.pipe(
   arr => R.assocPath([keys.nodesByDef, Node.getNodeDefUuid(node)], arr)(record)
 )(record)
 
-
 module.exports = {
   //ADD
   addNodes,
@@ -137,6 +158,7 @@ module.exports = {
   getNodeUuidsByParent,
   getNodeUuidsByParentAndDef,
   getNodeUuidsByDef,
+  getNodesDirty,
   //REMOVE
   removeNode
 }

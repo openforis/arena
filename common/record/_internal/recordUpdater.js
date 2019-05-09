@@ -13,7 +13,7 @@ const assocNodes = nodes =>
   record => {
     // exclude dirty nodes currently being edited by the user
 
-    const dirtyNodes = RecordReader.findNodesIndexed(Node.isDirty)(record)
+    const dirtyNodes = NodesIndex.getNodesDirty(record)
 
     const nodesToUpdate = R.pipe(
       R.filter(
