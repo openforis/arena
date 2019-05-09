@@ -78,7 +78,22 @@ const bindNode = (survey, record, node) => {
   }
 }
 
-const getApplicableExpressions = async (survey, record, nodeCtx, expressions, tx, stopAtFirstFound = false) => {
+const evalApplicableExpression = async (survey, record, nodeCtx, expressions, tx) =>
+  R.head(await evalApplicableExpressions(survey, record, nodeCtx, expressions, tx, true))
+
+const evalApplicableExpressions = async (survey, record, node, expressions, tx, stopAtFirstFound = false) => {
+  const applicableExpressions = await _getApplicableExpressions(survey, record, node, expressions, tx, stopAtFirstFound)
+
+  return await Promise.all(
+    applicableExpressions.map(async expression => ({
+        expression,
+        value: await evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression), tx)
+      })
+    )
+  )
+}
+
+const _getApplicableExpressions = async (survey, record, nodeCtx, expressions, tx, stopAtFirstFound = false) => {
   const applicableExpressions = []
   for (const expression of expressions) {
     const applyIfExpr = NodeDefExpression.getApplyIf(expression)
@@ -93,11 +108,8 @@ const getApplicableExpressions = async (survey, record, nodeCtx, expressions, tx
   return applicableExpressions
 }
 
-const getApplicableExpression = async (survey, record, nodeCtx, expressions, tx) =>
-  R.head(await getApplicableExpressions(survey, record, nodeCtx, expressions, tx, true))
-
 module.exports = {
   evalNodeQuery,
-  getApplicableExpressions,
-  getApplicableExpression
+  evalApplicableExpression,
+  evalApplicableExpressions,
 }
