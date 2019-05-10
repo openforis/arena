@@ -1,7 +1,6 @@
 const i18next = require('i18next')
 
 const enTranslation = require('./resources/en')
-const frTranslation = require('./resources/fr')
 
 const createParams = lang => ({
   fallbackLng: 'en',
@@ -17,13 +16,10 @@ const createParams = lang => ({
     en: {
       translation: enTranslation,
     },
-    fr: {
-      translation: frTranslation,
-    },
   },
 })
 
-const createI18nPromise = (language) => {
+const createI18nPromise = language => {
   return new Promise((resolve, reject) => {
     i18next.createInstance(
       createParams(language),

@@ -19,8 +19,8 @@ class AppView extends React.Component {
     const pathName = this.props.history.location.pathname
 
     return (
-      <AppContext.Provider value={{ i18n: i18n }}>
-        <div className="app__container">
+      <div className="app__container">
+        <AppContext.Provider value={{ i18n }}>
 
           <AppSideBar pathname={pathName}/>
 
@@ -30,8 +30,9 @@ class AppView extends React.Component {
 
           <AppErrors/>
 
-        </div>
-      </AppContext.Provider>
+        </AppContext.Provider>
+
+      </div>
     )
   }
 }
