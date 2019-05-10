@@ -33,6 +33,8 @@ const valuePropKeys = {
   // code
   itemUuid: 'itemUuid',
   hierarchy: 'h',
+  categoryItemHierarchy: 'itemH',
+  codeAttributeHierarchy: 'codeAttrH',
 
   // coordinate
   x: 'x',
@@ -221,7 +223,8 @@ module.exports = {
 
   // code
   getCategoryItemUuid: getValueProp(valuePropKeys.itemUuid),
-  getCategoryItemHierarchy: getValueProp(valuePropKeys.hierarchy, []),
+  getCategoryItemHierarchy: getValueProp(valuePropKeys.categoryItemHierarchy, []),
+  getCodeAttributeHierarchy: getValueProp(valuePropKeys.codeAttributeHierarchy, []),
 
   // taxon
   getTaxonUuid: getValueProp(valuePropKeys.taxonUuid),

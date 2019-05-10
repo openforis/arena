@@ -121,7 +121,7 @@ const deleteNode = async (surveyId, nodeUuid, client = db) =>
   await client.one(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1
-    RETURNING *,'{}' as value, true as ${Node.keys.deleted}
+    RETURNING *, true as ${Node.keys.deleted}
     `, [nodeUuid],
     dbTransformCallback
   )

@@ -13,17 +13,20 @@ const assocNodes = nodes =>
   record => {
     // exclude dirty nodes currently being edited by the user
 
-    const dirtyNodes = NodesIndex.getNodesDirty(record)
+    const dirtyNodeUuids = NodesIndex.getNodeUuidsDirty(record)
 
     const nodesToUpdate = R.pipe(
       R.filter(
         n => {
-          const dirtyNode = R.prop(Node.getUuid(n), dirtyNodes)
+          const nodeUuid = Node.getUuid(n)
+          const dirtyNode = R.includes(nodeUuid, dirtyNodeUuids) && RecordReader.getNodeByUuid(nodeUuid)(record)
+
           return !dirtyNode ||
             Node.isDirty(n) ||
             R.equals(Node.getValue(dirtyNode), Node.getValue(n)) ||
             Node.isValueBlank(dirtyNode) && Node.isDefaultValueApplied(n)
-        }),
+        }
+      ),
       R.map(
         R.omit([Node.keys.updated, Node.keys.created])
       )

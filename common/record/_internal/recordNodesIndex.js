@@ -33,7 +33,16 @@ const Node = require('../node')
  *     'node-def-2-uuid': ['node-3-uuid', 'node-4-uuid', 'node-7-uuid', 'node-8-uuid', ...]
  *   }
  *
- * nodesDirty: nodes (indexed by uuid) being updated, modified in the UI but not on server side
+ * nodesDirty: uuids of nodes being updated (modified in the UI but not on server side)
+ *   e.g.:
+ *   nodesDirty = ['node-1-uuid', 'node-2-uuid', ...]
+ *
+ * nodeCodeDependents : dependent code attribute uuids by node uuid
+ *   e.g.:
+ *   nodeCodeDependents = {
+ *     'code-attr-1-uuid': ['code-attr-2-uuid', 'code-attr-3-uuid', ...],
+ *     'code-attr-4-uuid': ['code-attr-5-uuid', 'code-attr-6-uuid', ...],
+ *   }
  */
 
 const keys = {
@@ -41,6 +50,7 @@ const keys = {
   nodesByParentAndDef: '_nodesByParentAndDef',
   nodesByDef: '_nodesByDef',
   nodesDirty: '_nodesDirty',
+  nodeCodeDependents: '_nodeCodeDependents'
 }
 
 // ==== GETTERS
@@ -68,7 +78,9 @@ const getNodeUuidsByParent = parentNodeUuid => R.pipe(
   R.flatten
 )
 
-const getNodesDirty = R.propOr({}, keys.nodesDirty)
+const getNodeUuidsDirty = R.propOr([], keys.nodesDirty)
+
+const getNodeCodeDependentUuids = nodeUuid => R.pathOr([], [keys.nodeCodeDependents, nodeUuid])
 
 // ==== ADD
 /**
@@ -79,9 +91,12 @@ const addNodes = nodes =>
     R.pipe(
       R.values,
       R.reduce(
-        (acc, node) => Node.isDeleted(node)
-          ? acc
-          : _addNode(node)(acc),
+        (recordAcc, node) =>
+          R.ifElse(
+            R.always(Node.isDeleted(node)),
+            R.identity,
+            _addNode(node)
+          )(recordAcc),
         record
       )
     )(nodes)
@@ -93,35 +108,23 @@ const _addNode = node => R.pipe(
     R.assoc(keys.nodeRootUuid, Node.getUuid(node)),
     R.identity,
   ),
-  _addNodeToParentIndex(node),
-  _addNodeToNodeDefIndex(node),
-  //dirty nodes
-  R.ifElse(
-    R.always(Node.isDirty(node)),
-    R.assocPath([keys.nodesDirty, Node.getUuid(node)], node),
-    R.dissocPath([keys.nodesDirty, Node.getUuid(node)])
-  )
+  //parent index
+  addOrDeleteElementInArrayInPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node)),
+  //node def index
+  addOrDeleteElementInArrayInPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
+  //code dependent index
+  _addNodeToCodeDependentsIndex(node),
+  //dirty index
+  addOrDeleteElementInArrayInPath([keys.nodesDirty], Node.getUuid(node), Node.isDirty(node))
 )
 
-const _addNodeToNodeDefIndex = node => record => R.pipe(
-  getNodeUuidsByDef(Node.getNodeDefUuid(node)),
-  R.ifElse(
-    R.includes(Node.getUuid(node)),
-    R.identity,
-    R.append(Node.getUuid(node))
-  ),
-  arr => R.assocPath([keys.nodesByDef, Node.getNodeDefUuid(node)], arr, record)
-)(record)
-
-const _addNodeToParentIndex = node => record => R.pipe(
-  getNodeUuidsByParentAndDef(Node.getParentUuid(node), Node.getNodeDefUuid(node)),
-  R.ifElse(
-    R.includes(Node.getUuid(node)),
-    R.identity,
-    R.append(Node.getUuid(node))
-  ),
-  arr => R.assocPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], arr, record)
-)(record)
+const _addNodeToCodeDependentsIndex = node => record =>
+  R.reduce(
+    (recordAcc, ancestorCodeAttributeUuid) =>
+      addOrDeleteElementInArrayInPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node))(recordAcc),
+    record,
+    Node.getCodeAttributeHierarchy(node)
+  )
 
 // ===== DELETE
 /**
@@ -133,22 +136,39 @@ const removeNode = node => R.pipe(
     R.dissoc(keys.nodeRootUuid),
     R.identity
   ),
-  _removeNodeFromParentIndex(node),
-  _removeNodeFromNodeDefIndex(node),
-  R.dissocPath([keys.nodesDirty, Node.getUuid(node)])
+  //parent index
+  addOrDeleteElementInArrayInPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node), false),
+  //node def index
+  addOrDeleteElementInArrayInPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node), false),
+  //code dependent index
+  _removeNodeFromCodeDependentsIndex(node),
+  //dirty index
+  addOrDeleteElementInArrayInPath([keys.nodesDirty], Node.getUuid(node), false)
 )
 
-const _removeNodeFromParentIndex = node => record => R.pipe(
-  getNodeUuidsByParentAndDef(Node.getParentUuid(node), Node.getNodeDefUuid(node)),
-  R.without([Node.getUuid(node)]),
-  arr => R.assocPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], arr)(record)
-)(record)
+const _removeNodeFromCodeDependentsIndex = node => record => R.pipe(
+  Node.getCodeAttributeHierarchy,
+  R.reduce(
+    (recordAcc, ancestorCodeAttributeUuid) =>
+      addOrDeleteElementInArrayInPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node), false)(recordAcc),
+    record,
+  ),
+  R.dissocPath([keys.nodeCodeDependents, Node.getUuid(node)])
+)(node)
 
-const _removeNodeFromNodeDefIndex = node => record => R.pipe(
-  getNodeUuidsByDef(Node.getNodeDefUuid(node)),
-  R.without([Node.getUuid(node)]),
-  arr => R.assocPath([keys.nodesByDef, Node.getNodeDefUuid(node)], arr)(record)
-)(record)
+const addOrDeleteElementInArrayInPath = (path, value, add = true) => obj => R.pipe(
+  R.pathOr([], path),
+  R.ifElse(
+    R.always(add),
+    R.ifElse(
+      R.includes(value),
+      R.identity,
+      R.append(value)
+    ),
+    R.without(value)
+  ),
+  arr => R.assocPath(path, arr, obj)
+)(obj)
 
 module.exports = {
   //ADD
@@ -158,7 +178,8 @@ module.exports = {
   getNodeUuidsByParent,
   getNodeUuidsByParentAndDef,
   getNodeUuidsByDef,
-  getNodesDirty,
+  getNodeUuidsDirty,
+  getNodeCodeDependentUuids,
   //REMOVE
   removeNode
 }
