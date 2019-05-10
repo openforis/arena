@@ -3,6 +3,8 @@ import './homeView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import AppContext from '../../../app/appContext'
+
 import NavigationTabBar from '../components/moduleNavigationTabBar'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
@@ -16,8 +18,6 @@ import { appModules, appModuleUri } from '../../appModules'
 import { homeModules } from './homeModules'
 
 import * as SurveyState from '../../../survey/surveyState'
-
-import { I18nContext } from '../../../i18n/i18nContext'
 
 class HomeView extends React.Component {
 
@@ -45,7 +45,7 @@ class HomeView extends React.Component {
 
   render () {
     const { surveyInfo } = this.props
-    const { t } = this.context
+    const { t } = this.context.i18n
 
     return (
       <NavigationTabBar
@@ -54,33 +54,30 @@ class HomeView extends React.Component {
         moduleDefault={homeModules.dashboard}
         tabs={[
           {
-            label: t('dashboard'),
+            label: t('homeView.dashboard'),
             component: DashboardView,
             path: appModuleUri(homeModules.dashboard),
             icon: 'icon-office',
             disabled: !Survey.isValid(surveyInfo),
           },
           {
-            label: t('my_surveys'),
+            label: t('homeView.mySurveys'),
             component: SurveyListView,
             path: appModuleUri(homeModules.surveyList),
             icon: 'icon-paragraph-justify',
           },
           {
-            // label: t('add_new_survey'),
             component: SurveyCreateView,
             path: appModuleUri(homeModules.surveyNew),
             icon: 'icon-plus',
             showTab: false,
           },
           {
-            // label: t('survey_info'),
             component: SurveyInfoView,
             path: appModuleUri(homeModules.surveyInfo),
             showTab: false,
           },
           {
-            // label: t('collect_import_job'),
             component: CollectImportReportView,
             path: appModuleUri(homeModules.collectImportReport),
             showTab: false,
@@ -91,7 +88,7 @@ class HomeView extends React.Component {
   }
 }
 
-HomeView.contextType = I18nContext
+HomeView.contextType = AppContext
 
 const mapStateToProps = state => ({
   surveyInfo: SurveyState.getSurveyInfo(state),

@@ -15,8 +15,13 @@ export const initApp = () => async (dispatch) => {
   const { data } = resp
   const { user, survey } = data
 
-  const i18n = await i18nFactory.createI18nPromise('en')
-  dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user, survey, i18n })
+  dispatch(setLanguage('en'))
+  dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user, survey })
+}
+
+export const setLanguage = languageCode => async (dispatch) => {
+  const i18n = await i18nFactory.createI18nPromise(languageCode)
+  dispatch({ type: appStatusChange, i18n })
 }
 
 export const logout = () => async dispatch => {

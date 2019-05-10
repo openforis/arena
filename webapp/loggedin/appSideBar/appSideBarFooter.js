@@ -1,10 +1,13 @@
 import React from 'react'
 
-import { I18nContext } from '../../i18n/i18nContext'
+import AppContext from '../../app/appContext'
 
-const AppSideBarFooter = ({ logout, opened }) => (
-  <I18nContext.Consumer>
-    {({ t }) => (
+class AppSideBarFooter extends React.PureComponent {
+  render () {
+    const { logout, opened } = this.props
+    const { t } = this.context.i18n
+
+    return (
       <div className="app-sidebar__footer">
         <a className="btn btn-s btn-of-light-xs"
            onClick={() => logout()}
@@ -16,7 +19,7 @@ const AppSideBarFooter = ({ logout, opened }) => (
                 style={{ transform: 'scaleX(-1)' }}/>
           {
             opened
-              ? <span>{t('logout')}</span>
+              ? <span>{t('sidebar.logout')}</span>
               : null
           }
         </a>
@@ -25,13 +28,15 @@ const AppSideBarFooter = ({ logout, opened }) => (
            href="http://www.openforis.org"
            target="_blank">
           {
-             opened
-               ? t('open_foris') : t('open_foris_short')
-           }
+            opened
+              ? t('sidebar.openForis') : t('sidebar.openForisShort')
+          }
         </a>
       </div>
-    )}
-  </I18nContext.Consumer>
-)
+    )
+  }
+}
+
+AppSideBarFooter.contextType = AppContext
 
 export default AppSideBarFooter
