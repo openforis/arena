@@ -14,6 +14,9 @@ const keys = {
 
   // activeJob keys
   onComplete: 'onComplete',
+
+  // i18n
+  i18n: 'i18n',
 }
 
 export const getState = R.prop('app')
@@ -81,6 +84,9 @@ export const updateActiveJob = job =>
     : R.dissoc(keys.activeJob)(state)
 
 export const getActiveJobOnCompleteCallback = R.propOr(null, keys.onComplete)
+
+// ==== APP I18N
+export const getI18n = R.pipe(getState, R.prop(keys.i18n))
 
 // ==== APP ERRORS
 

@@ -38,7 +38,7 @@ class AppView extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  return { i18n: AppState.getState(state).i18n }
+  return { i18n: AppState.getI18n(state) }
 }
 
 export default connect(

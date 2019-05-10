@@ -45,7 +45,7 @@ class HomeView extends React.Component {
 
   render () {
     const { surveyInfo } = this.props
-    const { t } = this.context.i18n
+    const { i18n } = this.context
 
     return (
       <NavigationTabBar
@@ -54,14 +54,14 @@ class HomeView extends React.Component {
         moduleDefault={homeModules.dashboard}
         tabs={[
           {
-            label: t('homeView.dashboard'),
+            label: i18n.t('homeView.dashboard'),
             component: DashboardView,
             path: appModuleUri(homeModules.dashboard),
             icon: 'icon-office',
             disabled: !Survey.isValid(surveyInfo),
           },
           {
-            label: t('homeView.mySurveys'),
+            label: i18n.t('homeView.mySurveys'),
             component: SurveyListView,
             path: appModuleUri(homeModules.surveyList),
             icon: 'icon-paragraph-justify',

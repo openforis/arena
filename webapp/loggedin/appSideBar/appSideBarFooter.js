@@ -5,7 +5,7 @@ import AppContext from '../../app/appContext'
 class AppSideBarFooter extends React.PureComponent {
   render () {
     const { logout, opened } = this.props
-    const { t } = this.context.i18n
+    const { i18n } = this.context
 
     return (
       <div className="app-sidebar__footer">
@@ -19,7 +19,7 @@ class AppSideBarFooter extends React.PureComponent {
                 style={{ transform: 'scaleX(-1)' }}/>
           {
             opened
-              ? <span>{t('sidebar.logout')}</span>
+              ? <span>{i18n.t('sidebar.logout')}</span>
               : null
           }
         </a>
@@ -29,7 +29,7 @@ class AppSideBarFooter extends React.PureComponent {
            target="_blank">
           {
             opened
-              ? t('sidebar.openForis') : t('sidebar.openForisShort')
+              ? i18n.t('sidebar.openForis') : i18n.t('sidebar.openForisShort')
           }
         </a>
       </div>
