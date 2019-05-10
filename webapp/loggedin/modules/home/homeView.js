@@ -3,6 +3,8 @@ import './homeView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import AppContext from '../../../app/appContext'
+
 import NavigationTabBar from '../components/moduleNavigationTabBar'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
@@ -43,6 +45,7 @@ class HomeView extends React.Component {
 
   render () {
     const { surveyInfo } = this.props
+    const { i18n } = this.context
 
     return (
       <NavigationTabBar
@@ -51,33 +54,30 @@ class HomeView extends React.Component {
         moduleDefault={homeModules.dashboard}
         tabs={[
           {
-            label: 'Dashboard',
+            label: i18n.t('homeView.dashboard'),
             component: DashboardView,
             path: appModuleUri(homeModules.dashboard),
             icon: 'icon-office',
             disabled: !Survey.isValid(surveyInfo),
           },
           {
-            label: 'My Surveys',
+            label: i18n.t('homeView.mySurveys'),
             component: SurveyListView,
             path: appModuleUri(homeModules.surveyList),
             icon: 'icon-paragraph-justify',
           },
           {
-            label: 'Add new survey',
             component: SurveyCreateView,
             path: appModuleUri(homeModules.surveyNew),
             icon: 'icon-plus',
             showTab: false,
           },
           {
-            label: 'Survey Info',
             component: SurveyInfoView,
             path: appModuleUri(homeModules.surveyInfo),
             showTab: false,
           },
           {
-            label: 'Collect Import Report',
             component: CollectImportReportView,
             path: appModuleUri(homeModules.collectImportReport),
             showTab: false,
@@ -88,8 +88,10 @@ class HomeView extends React.Component {
   }
 }
 
+HomeView.contextType = AppContext
+
 const mapStateToProps = state => ({
-  surveyInfo: SurveyState.getSurveyInfo(state)
+  surveyInfo: SurveyState.getSurveyInfo(state),
 })
 
 export default connect(mapStateToProps)(HomeView)

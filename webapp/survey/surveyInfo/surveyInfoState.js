@@ -6,11 +6,6 @@ import * as R from 'ramda'
  * ======
  */
 
-export const markPublished = R.pipe(
-  R.assoc('published', true),
-  R.assoc('draft', false),
-)
-
 export const markDraft = R.assoc('draft', true)
 
 export const assocSurveyInfoProp = (key, value) => R.pipe(
