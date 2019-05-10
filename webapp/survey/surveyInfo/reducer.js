@@ -2,7 +2,7 @@ import { exportReducer } from '../../utils/reduxUtils'
 
 import Survey from '../../../common/survey/survey'
 
-import { assocSurveyInfoProp, assocSurveyInfoValidation, markDraft } from './surveyInfoState'
+import * as SurveyInfoState from './surveyInfoState'
 
 // app actions
 import { loginSuccess } from '../../login/actions'
@@ -37,26 +37,26 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   // survey info update
-  [surveyInfoPropUpdate]: (state, { key, value }) => assocSurveyInfoProp(key, value)(state),
+  [surveyInfoPropUpdate]: (state, { key, value }) => SurveyInfoState.assocSurveyInfoProp(key, value)(state),
 
-  [surveyInfoValidationUpdate]: (state, { validation }) => assocSurveyInfoValidation(validation)(state),
+  [surveyInfoValidationUpdate]: (state, { validation }) => SurveyInfoState.assocSurveyInfoValidation(validation)(state),
 
   // NodeDef
-  [nodeDefCreate]: markDraft,
-  [nodeDefUpdate]: markDraft,
-  [nodeDefPropsUpdate]: markDraft,
-  [nodeDefDelete]: markDraft,
+  [nodeDefCreate]: SurveyInfoState.markDraft,
+  [nodeDefUpdate]: SurveyInfoState.markDraft,
+  [nodeDefPropsUpdate]: SurveyInfoState.markDraft,
+  [nodeDefDelete]: SurveyInfoState.markDraft,
 
   // Category
-  [categoryCreate]: markDraft,
-  [categoryUpdate]: markDraft,
-  [categoryDelete]: markDraft,
+  [categoryCreate]: SurveyInfoState.markDraft,
+  [categoryUpdate]: SurveyInfoState.markDraft,
+  [categoryDelete]: SurveyInfoState.markDraft,
 
   // Taxonomy
-  [taxonomyCreate]: markDraft,
-  [taxonomyUpdate]: markDraft,
-  [taxonomyPropUpdate]: markDraft,
-  [taxonomyDelete]: markDraft,
+  [taxonomyCreate]: SurveyInfoState.markDraft,
+  [taxonomyUpdate]: SurveyInfoState.markDraft,
+  [taxonomyPropUpdate]: SurveyInfoState.markDraft,
+  [taxonomyDelete]: SurveyInfoState.markDraft,
 }
 
 export default exportReducer(actionHandlers)
