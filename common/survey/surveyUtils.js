@@ -31,10 +31,12 @@ const setProp = (key, value) => R.assocPath([keys.props, key], value)
 
 // UTILS / uuid
 
-const toIndexedObj = (array, prop) => R.reduce(
-  (acc, item) => R.assoc(R.prop(prop)(item), item)(acc),
-  {},
-  array
+const toIndexedObj = (array, prop) => array.reduce(
+  (acc, item) => {
+    acc[item[prop]] = item
+    return acc
+  },
+  {}
 )
 
 const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
