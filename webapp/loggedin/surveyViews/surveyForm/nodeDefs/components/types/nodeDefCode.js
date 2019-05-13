@@ -88,7 +88,7 @@ class NodeDefCode extends React.Component {
   }
 
   handleSelectedItemsChange (newSelectedItems) {
-    const { nodeDef, nodes, codeUuidsHierarchy, categoryItemHierarchy, removeNode, updateNode } = this.props
+    const { nodeDef, nodes, codeUuidsHierarchy, removeNode, updateNode } = this.props
 
     const selectedItems = this.getSelectedItems()
 
@@ -112,11 +112,12 @@ class NodeDefCode extends React.Component {
       const value = newSelectedItem
         ? {
           [Node.valuePropKeys.itemUuid]: CategoryItem.getUuid(newSelectedItem),
-          [Node.valuePropKeys.codeAttributeHierarchy]: codeUuidsHierarchy,
-          [Node.valuePropKeys.categoryItemHierarchy]: categoryItemHierarchy
         }
         : null
-      updateNode(nodeDef, nodeToUpdate, value)
+      const meta = {
+        [Node.metaKeys.codeAttributeHierarchy]: codeUuidsHierarchy
+      }
+      updateNode(nodeDef, nodeToUpdate, value, null, meta)
     }
   }
 
@@ -157,10 +158,6 @@ const mapStateToProps = (state, props) => {
     ? R.append(Node.getUuid(parentCodeAttribute), Node.getCodeAttributeHierarchy(parentCodeAttribute))
     : []
 
-  const categoryItemHierarchy = parentCodeAttribute
-    ? R.append(Node.getCategoryItemUuid(parentCodeAttribute), Node.getCategoryItemHierarchy(parentCodeAttribute))
-    : []
-
   return {
     surveyId: Survey.getId(survey),
     draft: Survey.isDraft(surveyInfo),
@@ -170,8 +167,7 @@ const mapStateToProps = (state, props) => {
     categoryUuid: category ? Category.getUuid(category) : null,
     categoryLevelIndex: categoryLevelIndex,
     parentItemUuid: Node.getCategoryItemUuid(parentCodeAttribute),
-    codeUuidsHierarchy,
-    categoryItemHierarchy
+    codeUuidsHierarchy
   }
 }
 

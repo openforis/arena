@@ -21,6 +21,7 @@ const dbTransformCallback = node =>
 
 const insertNode = (surveyId, node, client = db) => {
   const meta = {
+    ...Node.getMeta(node),
     [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
     [Node.metaKeys.childApplicability]: {}
   }

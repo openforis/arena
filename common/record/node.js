@@ -27,14 +27,12 @@ const metaKeys = {
   hierarchy: 'h',
   childApplicability: 'childApplicability',
   defaultValue: 'defaultValue',
+  codeAttributeHierarchy: 'codeAttrH',
 }
 
 const valuePropKeys = {
   // code
   itemUuid: 'itemUuid',
-  hierarchy: 'h',
-  categoryItemHierarchy: 'itemH',
-  codeAttributeHierarchy: 'codeAttrH',
 
   // coordinate
   x: 'x',
@@ -118,6 +116,11 @@ const isDescendantOf = ancestor =>
  * UPDATE
  * ======
  */
+const mergeMeta = meta => node => R.pipe(
+  R.propOr(keys.meta),
+  R.mergeLeft(meta),
+  metaUpdated => R.assoc(keys.meta, metaUpdated)(node)
+)(node)
 
 /**
  * ======
@@ -164,14 +167,18 @@ module.exports = {
   getValidation: Validator.getValidation,
 
   // ==== READ metadata
+  getMeta: R.prop(keys.meta),
   isChildApplicable: childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid]),
   isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
   isDescendantOf,
   getHierarchy,
+  // code metadata
+  getCodeAttributeHierarchy: R.pathOr([], [keys.meta, metaKeys.codeAttributeHierarchy]),
 
   // ==== UPDATE
   assocValue: R.assoc(keys.value),
   assocValidation: Validator.assocValidation,
+  mergeMeta,
 
   // ==== UTILS
   isValueBlank,
@@ -223,8 +230,6 @@ module.exports = {
 
   // code
   getCategoryItemUuid: getValueProp(valuePropKeys.itemUuid),
-  getCategoryItemHierarchy: getValueProp(valuePropKeys.categoryItemHierarchy, []),
-  getCodeAttributeHierarchy: getValueProp(valuePropKeys.codeAttributeHierarchy, []),
 
   // taxon
   getTaxonUuid: getValueProp(valuePropKeys.taxonUuid),
