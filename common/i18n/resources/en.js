@@ -16,7 +16,6 @@ module.exports = {
     surveyInfo: {
       publish: 'publish',
       info: 'info',
-      delete: 'delete',
       collectImportReport: 'Collect Import Report',
       formDesigner: 'Form Designer',
       hierarchy: 'Hierarchy',

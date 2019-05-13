@@ -82,7 +82,7 @@ class SurveyInfo extends React.Component {
             {
               canEditDef &&
               <button className="btn btn-of-light" onClick={() => this.toggleDeleteConfirmDialog(true)}>
-                <span className="icon icon-bin icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.delete')}
+                <span className="icon icon-bin icon-12px icon-left"/> {i18n.t('common.delete')}
               </button>
             }
             {

@@ -26,8 +26,7 @@ const AppSideBarFooter = ({ logout, opened }) => {
          href="http://www.openforis.org"
          target="_blank">
         {
-          opened
-            ? i18n.t('sidebar.openForis') : i18n.t('sidebar.openForisShort')
+          i18n.t(opened ? 'sidebar.openForis' : 'sidebar.openForisShort')
         }
       </a>
     </div>
