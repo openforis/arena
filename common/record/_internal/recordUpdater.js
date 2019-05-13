@@ -37,13 +37,18 @@ const assocNodes = nodes =>
       R.values
     )(nodes)
 
+    const recordUpdated = {
+      ...record,
+      [keys.nodes]: {
+        ...RecordReader.getNodes(record),
+        ...nodesToUpdate
+      }
+    }
+
     return R.pipe(
-      RecordReader.getNodes,
-      R.mergeLeft(nodesToUpdate),
-      mergedNodes => R.assoc(keys.nodes, mergedNodes)(record),
       deleteNodes(nodesDeletedArray),
       NodesIndex.addNodes(nodesToUpdate)
-    )(record)
+    )(recordUpdated)
   }
 
 const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
@@ -81,11 +86,7 @@ const deleteNode = node =>
     recordUpdated = NodesIndex.removeNode(node)(recordUpdated)
 
     // 4. remove node from record
-    recordUpdated = R.pipe(
-      RecordReader.getNodes,
-      R.dissoc(nodeUuid),
-      newNodes => R.assoc(keys.nodes, newNodes, recordUpdated),
-    )(recordUpdated)
+    delete recordUpdated[keys.nodes][nodeUuid]
 
     return recordUpdated
   }
