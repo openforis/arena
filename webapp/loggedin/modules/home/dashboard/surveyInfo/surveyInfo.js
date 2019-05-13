@@ -4,6 +4,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import AppContext from '../../../../../app/appContext'
+
 import DeleteSurveyDialog from './deleteSurveyDialog'
 import ErrorBadge from '../../../../../commonComponents/errorBadge'
 
@@ -37,6 +39,7 @@ class SurveyInfo extends React.Component {
       publishSurvey, deleteSurvey
     } = this.props
     const { showDeleteDialog } = this.state
+    const { i18n } = this.context
 
     return (
       <div className="home-dashboard__survey-info">
@@ -66,27 +69,27 @@ class SurveyInfo extends React.Component {
                         onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
                           ? publishSurvey()
                           : null}>
-                  <span className="icon icon-checkmark2 icon-12px icon-left"/> Publish
+                  <span className="icon icon-checkmark2 icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.publish')}
                 </button>
               }
             </div>
 
             <Link to={appModuleUri(homeModules.surveyInfo)} className="btn btn-of-light">
               <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`}/>
-              {canEditDef ? 'Edit' : 'View'} Info
+              {canEditDef ? 'Edit' : 'View'} {i18n.t('homeView.surveyInfo.info')}
             </Link>
 
             {
               canEditDef &&
               <button className="btn btn-of-light" onClick={() => this.toggleDeleteConfirmDialog(true)}>
-                <span className="icon icon-bin icon-12px icon-left"/> Delete
+                <span className="icon icon-bin icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.delete')}
               </button>
             }
             {
               Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) &&
               <Link to={appModuleUri(homeModules.collectImportReport)}
                     className="btn btn-of-light">
-                <span className="icon icon-warning icon-12px icon-left"/> Collect Import Report
+                <span className="icon icon-warning icon-12px icon-left" /> {i18n.t('homeView.surveyInfo.collectImportReport')}
               </Link>
             }
           </div>
@@ -96,19 +99,19 @@ class SurveyInfo extends React.Component {
           <div className="row">
             <Link
               to={appModuleUri(designerModules.formDesigner)} className="btn btn btn-of-light">
-              <span className="icon icon-quill icon-12px icon-left"/> Form Designer
+              <span className="icon icon-quill icon-12px icon-left" /> {i18n.t('homeView.surveyInfo.formDesigner')}
             </Link>
             <Link
               to={appModuleUri(designerModules.surveyHierarchy)} className="btn btn btn-of-light">
-              <span className="icon icon-tree icon-12px icon-left"/> Hierarchy
+              <span className="icon icon-tree icon-12px icon-left" /> {i18n.t('homeView.surveyInfo.hierarchy')}
             </Link>
             <Link
               to={appModuleUri(designerModules.categories)} className="btn btn btn-of-light">
-              <span className="icon icon-list2 icon-12px icon-left"/> Categories
+              <span className="icon icon-list2 icon-12px icon-left" /> {i18n.t('homeView.surveyInfo.categories')}
             </Link>
             <Link
               to={appModuleUri(designerModules.taxonomies)} className="btn btn btn-of-light">
-              <span className="icon icon-leaf icon-12px icon-left"/> Taxonomies
+              <span className="icon icon-leaf icon-12px icon-left" /> {i18n.t('homeView.surveyInfo.taxonomies')}
             </Link>
           </div>
 
@@ -126,6 +129,8 @@ class SurveyInfo extends React.Component {
   }
 }
 
+SurveyInfo.contextType = AppContext
+
 const mapStateToProps = state => {
   const user = AppState.getUser(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
@@ -134,7 +139,7 @@ const mapStateToProps = state => {
   return {
     surveyInfo,
     lang,
-    canEditDef: AuthManager.canEditSurvey(user, surveyInfo)
+    canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
   }
 }
 

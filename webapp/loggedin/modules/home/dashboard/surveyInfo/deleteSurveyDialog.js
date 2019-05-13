@@ -1,6 +1,9 @@
 import './deleteSurveyDialog.scss'
 
 import React from 'react'
+import Markdown from 'react-remarkable'
+
+import AppContext from '../../../../../app/appContext'
 
 import {
   Modal,
@@ -9,42 +12,47 @@ import {
   ModalFooter,
 } from '../../../../../commonComponents/modal'
 
-export default class DeleteSurveyDialog extends React.Component {
+class DeleteSurveyDialog extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = {confirmName: ''}
+    this.state = { confirmName: '' }
     this.confirmNameOnChange = this.confirmNameOnChange.bind(this)
     this.confirmNameRef = React.createRef()
   }
 
   componentDidMount () {
-    this.setState({confirmName: ''})
+    this.setState({ confirmName: '' })
     this.confirmNameRef.current.focus()
   }
 
   confirmNameOnChange (event) {
-    this.setState({confirmName: event.target.value})
+    this.setState({ confirmName: event.target.value })
   }
 
   render () {
-    const {surveyName, onDelete, onCancel} = this.props
+    const { surveyName, onDelete, onCancel } = this.props
+    const { i18n } = this.context
 
     return (
       <Modal isOpen={true} onClose={() => onCancel()}>
         <ModalHeader>
-          <h5 className="survey-delete-dialog__header">Are you sure you want to delete this survey?</h5>
+          <h5 className="survey-delete-dialog__header">{i18n.t('homeView.deleteSurveyDialog.areYouSure')}</h5>
         </ModalHeader>
 
         <ModalBody>
           <div className="survey-delete-dialog__body">
             <div className="highlight">
-              <div>Deleting the <b>{surveyName}</b> survey will delete all of its data.</div>
-              <div>This operation cannot be undone!</div>
+              <div>
+                <Markdown>
+                  {i18n.t('homeView.deleteSurveyDialog.deleteWarining', { surveyName })}
+                </Markdown>
+              </div>
+              <div>{i18n.t('common.cantUndoWarning')}</div>
             </div>
 
             <div className="text-center">
-              Enter this survey’s name to confirm:
+              {i18n.t('homeView.deleteSurveyDialog.confirmName')}
             </div>
 
             <input type="text"
@@ -61,14 +69,14 @@ export default class DeleteSurveyDialog extends React.Component {
                     onClick={onCancel}
                     aria-disabled={false}>
               <span className="icon icon-cross icon-12px icon-left"/>
-              Cancel
+              {i18n.t('common.cancel')}
             </button>
 
             <button className="btn btn-of btn-danger modal-footer__item"
                     onClick={onDelete}
                     aria-disabled={!(surveyName === this.state.confirmName)}>
               <span className="icon icon-bin icon-12px icon-left"/>
-              Delete
+              {i18n.t('common.delete')}
             </button>
           </div>
         </ModalFooter>
@@ -76,3 +84,7 @@ export default class DeleteSurveyDialog extends React.Component {
     )
   }
 }
+
+DeleteSurveyDialog.contextType = AppContext
+
+export default DeleteSurveyDialog

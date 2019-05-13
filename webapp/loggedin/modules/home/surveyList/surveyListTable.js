@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
+import AppContext from '../../../../app/appContext'
+
 import Survey from '../../../../../common/survey/survey'
 import { getRelativeDate, compareDatesDesc } from '../../../../../common/dateUtils'
 
@@ -31,6 +33,8 @@ const SurveyRow = ({ surveyInfoRow, surveyInfo, setActiveSurvey }) => {
 
 const SurveyListTable = (props) => {
   const { surveys } = props
+  const { i18n } = React.useContext(AppContext)
+
   const surveyInfos = surveys.map(Survey.getSurveyInfo)
 
   return (
@@ -40,17 +44,17 @@ const SurveyListTable = (props) => {
           Surveys
           <Link
             to={appModuleUri(homeModules.surveyNew)} className="btn btn-xs btn-of-light">
-            <span className="icon icon-plus icon-12px icon-left"/> Add a new Survey
+            <span className="icon icon-plus icon-12px icon-left" /> {i18n.t('homeView.surveyListView.addNewSurvey')}
           </Link>
         </h5>
       </div>
 
       <div className="table__row-header">
-        <div>Name</div>
-        <div>Label</div>
-        <div>Date created</div>
-        <div>Date last modified</div>
-        <div>Status</div>
+        <div>{i18n.t('common.name')}</div>
+        <div>{i18n.t('homeView.surveyListView.label')}</div>
+        <div>{i18n.t('homeView.surveyListView.dateCreated')}</div>
+        <div>{i18n.t('homeView.surveyListView.dateLastModified')}</div>
+        <div>{i18n.t('homeView.surveyListView.status')}</div>
       </div>
 
 
