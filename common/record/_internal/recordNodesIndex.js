@@ -141,21 +141,21 @@ const _removeNodeFromCodeDependentsIndex = node => record => R.pipe(
   R.dissocPath([keys.nodeCodeDependents, Node.getUuid(node)])
 )(node)
 
-const _assocToIndexPath = (path, value) => obj => R.pipe(
+const _assocToIndexPath = (path, value) => record => R.pipe(
   R.pathOr([], path),
   R.ifElse(
     R.includes(value),
     R.identity,
     R.append(value)
   ),
-  arr => R.assocPath(path, arr, obj)
-)(obj)
+  arr => R.assocPath(path, arr, record)
+)(record)
 
-const _dissocFromIndexPath = (path, value) => obj => R.pipe(
+const _dissocFromIndexPath = (path, value) => record => R.pipe(
   R.pathOr([], path),
   R.without(value),
-  arr => R.assocPath(path, arr, obj)
-)(obj)
+  arr => R.assocPath(path, arr, record)
+)(record)
 
 module.exports = {
   //ADD
