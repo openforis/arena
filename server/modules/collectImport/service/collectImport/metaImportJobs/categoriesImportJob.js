@@ -25,6 +25,9 @@ class CategoriesImportJob extends Job {
   }
 
   async execute (tx) {
+    // add category items index
+    this.setContext({ _indexCategoryItemUuids: {} })
+
     const { collectSurvey, surveyId, defaultLanguage } = this.context
 
     const categories = []
@@ -42,6 +45,9 @@ class CategoriesImportJob extends Job {
         [Category.props.name]: collectCodeList.attributes.name
       })
       let category = await CategoryManager.insertCategory(this.getUser(), surveyId, categoryToCreate, tx)
+
+      // add category and first level to index
+      this.context._indexCategoryItemUuids[Category.getUuid(category)] = { ['null']: {} }
 
       category = await this.insertLevels(category, collectCodeList, tx)
 
@@ -99,16 +105,23 @@ class CategoriesImportJob extends Job {
 
       const labels = CollectIdmlParseUtils.toLabels('label', defaultLanguage)(collectItem)
 
+      const itemCode = CollectIdmlParseUtils.getChildElementText('code')(collectItem)
       const item = CategoryItem.newItem(levelUuid, parentItem, {
-        [CategoryItem.props.code]: CollectIdmlParseUtils.getChildElementText('code')(collectItem),
+        [CategoryItem.props.code]: itemCode,
         [CategoryItem.props.labels]: labels
       })
       await this.itemBatchPersister.addItem(item, tx)
 
+      // add itemUuid to index
+      this.context._indexCategoryItemUuids[Category.getUuid(category)][CategoryItem.getUuid(parentItem)][itemCode] = CategoryItem.getUuid(item)
+
       // insert child items recursively
       const collectChildItems = CollectIdmlParseUtils.getElementsByName('item')(collectItem)
-      if (!R.isEmpty(collectChildItems))
+      if (!R.isEmpty(collectChildItems)) {
+        // add parent item to index
+        this.context._indexCategoryItemUuids[Category.getUuid(category)][CategoryItem.getUuid(item)] = {}
         await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
+      }
 
       // update qualifiable item codes cache
       collectChildItems.forEach(collectItem => {

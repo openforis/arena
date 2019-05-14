@@ -8,6 +8,7 @@ const NodeDef = require('../../../../../../common/survey/nodeDef')
 const { nodeDefType } = NodeDef
 const Category = require('../../../../../../common/survey/category')
 const Taxon = require('../../../../../../common/survey/taxon')
+const Record = require('../../../../../../common/record/record')
 const Node = require('../../../../../../common/record/node')
 const RecordFile = require('../../../../../../common/record/recordFile')
 
@@ -43,7 +44,11 @@ const getCollectNodeDefByPath = (collectSurvey, collectNodeDefPath) => {
   return currentCollectNode
 }
 
-const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode, tx) => {
+const extractAttributeValue = async (
+  survey, nodeDef, record, node, // arena items
+  collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode, // collect items
+  tx, indexCategoryItemUuids
+) => {
   const surveyId = Survey.getId(survey)
 
   switch (NodeDef.getType(nodeDef)) {
@@ -58,10 +63,24 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
       if (code) {
         const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
         const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-        const item = await CategoryManager.findItemByCode(surveyId, categoryUuid, levelIndex, code, false, tx)
+        const codeUuidParentItem = levelIndex > 0 ?
+          R.pipe(
+            Record.getParentCodeAttribute(
+              survey,
+              Record.getParentNode(node)(record),
+              nodeDef
+            ),
+            Node.getCategoryItemUuid
+          )(record)
+          : 'null'
 
-        return item
-          ? { [Node.valuePropKeys.itemUuid]: Category.getUuid(item) }
+        const itemUuid = R.path(
+          [categoryUuid, codeUuidParentItem, code],
+          indexCategoryItemUuids
+        )
+
+        return itemUuid
+          ? { [Node.valuePropKeys.itemUuid]: itemUuid }
           : null
       } else {
         return null
@@ -117,40 +136,46 @@ const extractAttributeValue = async (survey, nodeDef, node, collectSurveyFileZip
       }
     }
     case nodeDefType.taxon: {
-      const { code, scientific_name, vernacularName } = CollectRecordParseUtils.getTextValues(collectNode)
-
-      const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-
-      const unlistedTaxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unlistedCode, false, tx)
-
-      if (vernacularName) {
-
-        const taxa = await TaxonomyManager.fetchTaxaByVernacularName(surveyId, taxonomyUuid, vernacularName, false, false, tx)
-        const taxon = R.head(taxa)
-
-        return taxon
-          ? {
-            [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(taxon),
-            [Node.valuePropKeys.vernacularNameUuid]: Taxon.getVernacularNameUuid(taxon),
-          }
-          : {
-            [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(unlistedTaxon),
-            [Node.valuePropKeys.vernacularName]: vernacularName
-          }
-      } else if (code) {
-        const taxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, code, false, tx)
-        return taxon
-          ? {
-            [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(taxon)
-          }
-          : {
-            [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(unlistedTaxon),
-            [Node.valuePropKeys.scientificName]: scientific_name
-          }
-
-      } else {
-        return null
-      }
+      //indexTaxaUuids = {
+      // $taxonomyUuid:{
+      //  $code:{taxonUuid:$taxonUuid, vernacularNames:{vernacularName:$vernacularNameUuid,....}}
+      // }
+      // }
+      // const { code, scientific_name, vernacularName } = CollectRecordParseUtils.getTextValues(collectNode)
+      //
+      // const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+      //
+      // const unlistedTaxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unlistedCode, false, tx)
+      //
+      // if (vernacularName) {
+      //
+      //   const taxa = await TaxonomyManager.fetchTaxaByVernacularName(surveyId, taxonomyUuid, vernacularName, false, false, tx)
+      //   const taxon = R.head(taxa)
+      //
+      //   return taxon
+      //     ? {
+      //       [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(taxon),
+      //       [Node.valuePropKeys.vernacularNameUuid]: Taxon.getVernacularNameUuid(taxon),
+      //     }
+      //     : {
+      //       [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(unlistedTaxon),
+      //       [Node.valuePropKeys.vernacularName]: vernacularName
+      //     }
+      // } else if (code) {
+      //   const taxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, code, false, tx)
+      //   return taxon
+      //     ? {
+      //       [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(taxon)
+      //     }
+      //     : {
+      //       [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(unlistedTaxon),
+      //       [Node.valuePropKeys.scientificName]: scientific_name
+      //     }
+      //
+      // } else {
+      //   return null
+      // }
+      return null
     }
     case nodeDefType.time: {
       const { hour, minute } = CollectRecordParseUtils.getTextValues(collectNode)

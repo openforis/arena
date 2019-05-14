@@ -49,7 +49,7 @@ const insertNodes = async (surveyId, nodes, client = db) => {
     }
   ])
 
-  client.none(insertAllQuery(
+  await client.none(insertAllQuery(
     getSurveyDBSchema(surveyId),
     'node',
     ['uuid', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'],
