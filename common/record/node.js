@@ -20,14 +20,14 @@ const keys = {
   created: 'created',
   updated: 'updated',
   deleted: 'deleted',
-  dirty: 'dirty'
+  dirty: 'dirty' //modified by the user but not persisted yet
 }
 
 const metaKeys = {
-  hierarchy: 'h',
-  childApplicability: 'childApplicability',
-  defaultValue: 'defaultValue',
-  codeAttributeHierarchy: 'codeAttrH',
+  hierarchy: 'h', //ancestor nodes uuids hierarchy
+  childApplicability: 'childApplicability', //applicability by child def uuid
+  defaultValue: 'defaultValue', //true if default value has been applied, false if the value is user defined
+  hierarchyCode: 'hCode', //hierarchy of code attribute ancestors (according to the parent code defs specified)
 }
 
 const valuePropKeys = {
@@ -173,7 +173,7 @@ module.exports = {
   isDescendantOf,
   getHierarchy,
   // code metadata
-  getCodeAttributeHierarchy: R.pathOr([], [keys.meta, metaKeys.codeAttributeHierarchy]),
+  getHierarchyCode: R.pathOr([], [keys.meta, metaKeys.hierarchyCode]),
 
   // ==== UPDATE
   assocValue: R.assoc(keys.value),

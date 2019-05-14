@@ -115,7 +115,7 @@ class NodeDefCode extends React.Component {
         }
         : null
       const meta = {
-        [Node.metaKeys.codeAttributeHierarchy]: codeUuidsHierarchy
+        [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy
       }
       updateNode(nodeDef, nodeToUpdate, value, null, meta)
     }
@@ -155,7 +155,7 @@ const mapStateToProps = (state, props) => {
   const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
 
   const codeUuidsHierarchy = parentCodeAttribute
-    ? R.append(Node.getUuid(parentCodeAttribute), Node.getCodeAttributeHierarchy(parentCodeAttribute))
+    ? R.append(Node.getUuid(parentCodeAttribute), Node.getHierarchyCode(parentCodeAttribute))
     : []
 
   return {

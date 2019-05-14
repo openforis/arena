@@ -13,22 +13,21 @@ const assocNodes = nodes =>
   record => {
     // exclude dirty nodes currently being edited by the user
 
-    const dirtyNodeUuids = NodesIndex.getNodeUuidsDirty(record)
-
     const nodesToUpdate = R.pipe(
       R.filter(
         n => {
           const nodeUuid = Node.getUuid(n)
-          const dirtyNode = R.includes(nodeUuid, dirtyNodeUuids) && RecordReader.getNodeByUuid(nodeUuid)(record)
+          const nodeExisting = RecordReader.getNodeByUuid(nodeUuid)(record)
 
-          return !dirtyNode ||
-            Node.isDirty(n) ||
-            R.equals(Node.getValue(dirtyNode), Node.getValue(n)) ||
-            Node.isValueBlank(dirtyNode) && Node.isDefaultValueApplied(n)
+          return !nodeExisting || //new node
+            !Node.isDirty(nodeExisting) || //existing node is not dirty
+            Node.isDirty(n) || //new node is dirty, replace the existing one
+            R.equals(Node.getValue(nodeExisting), Node.getValue(n)) || //new node is not dirty and has the same value of the existing (dirty) node
+            Node.isValueBlank(nodeExisting) && Node.isDefaultValueApplied(n) //existing node has a blank value and n has a default value applied
         }
       ),
       R.map(
-        R.omit([Node.keys.updated, Node.keys.created])
+        R.omit([Node.keys.updated, Node.keys.created]) //exclude updated and created properties (used by Survey RDB generation)
       )
     )(nodes)
 

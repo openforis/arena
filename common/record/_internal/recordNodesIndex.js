@@ -33,10 +33,6 @@ const Node = require('../node')
  *     'node-def-2-uuid': ['node-3-uuid', 'node-4-uuid', 'node-7-uuid', 'node-8-uuid', ...]
  *   }
  *
- * nodesDirty: uuids of nodes being updated (modified in the UI but not on server side)
- *   e.g.:
- *   nodesDirty = ['node-1-uuid', 'node-2-uuid', ...]
- *
  * nodeCodeDependents : dependent code attribute uuids by node uuid
  *   e.g.:
  *   nodeCodeDependents = {
@@ -49,7 +45,6 @@ const keys = {
   nodeRootUuid: '_nodeRootUuid',
   nodesByParentAndDef: '_nodesByParentAndDef',
   nodesByDef: '_nodesByDef',
-  nodesDirty: '_nodesDirty',
   nodeCodeDependents: '_nodeCodeDependents'
 }
 
@@ -78,8 +73,6 @@ const getNodeUuidsByParent = parentNodeUuid => R.pipe(
   R.flatten
 )
 
-const getNodeUuidsDirty = R.propOr([], keys.nodesDirty)
-
 const getNodeCodeDependentUuids = nodeUuid => R.pathOr([], [keys.nodeCodeDependents, nodeUuid])
 
 // ==== ADD
@@ -90,13 +83,9 @@ const addNodes = nodes =>
   record =>
     R.pipe(
       R.values,
+      R.reject(Node.isDeleted),
       R.reduce(
-        (recordAcc, node) =>
-          R.ifElse(
-            R.always(Node.isDeleted(node)),
-            R.identity,
-            _addNode(node)
-          )(recordAcc),
+        (recordAcc, node) => _addNode(node)(recordAcc),
         record
       )
     )(nodes)
@@ -109,21 +98,19 @@ const _addNode = node => R.pipe(
     R.identity,
   ),
   //parent index
-  addOrDeleteElementInArrayInPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node)),
+  _assocToIndexPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node)),
   //node def index
-  addOrDeleteElementInArrayInPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
+  _assocToIndexPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
   //code dependent index
   _addNodeToCodeDependentsIndex(node),
-  //dirty index
-  addOrDeleteElementInArrayInPath([keys.nodesDirty], Node.getUuid(node), Node.isDirty(node))
 )
 
 const _addNodeToCodeDependentsIndex = node => record =>
   R.reduce(
     (recordAcc, ancestorCodeAttributeUuid) =>
-      addOrDeleteElementInArrayInPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node))(recordAcc),
+      _assocToIndexPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node))(recordAcc),
     record,
-    Node.getCodeAttributeHierarchy(node)
+    Node.getHierarchyCode(node)
   )
 
 // ===== DELETE
@@ -137,36 +124,36 @@ const removeNode = node => R.pipe(
     R.identity
   ),
   //parent index
-  addOrDeleteElementInArrayInPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node), false),
+  _dissocFromIndexPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node)),
   //node def index
-  addOrDeleteElementInArrayInPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node), false),
+  _dissocFromIndexPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
   //code dependent index
   _removeNodeFromCodeDependentsIndex(node),
-  //dirty index
-  addOrDeleteElementInArrayInPath([keys.nodesDirty], Node.getUuid(node), false)
 )
 
 const _removeNodeFromCodeDependentsIndex = node => record => R.pipe(
-  Node.getCodeAttributeHierarchy,
+  Node.getHierarchyCode,
   R.reduce(
     (recordAcc, ancestorCodeAttributeUuid) =>
-      addOrDeleteElementInArrayInPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node), false)(recordAcc),
+      _dissocFromIndexPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node))(recordAcc),
     record,
   ),
   R.dissocPath([keys.nodeCodeDependents, Node.getUuid(node)])
 )(node)
 
-const addOrDeleteElementInArrayInPath = (path, value, add = true) => obj => R.pipe(
+const _assocToIndexPath = (path, value) => obj => R.pipe(
   R.pathOr([], path),
   R.ifElse(
-    R.always(add),
-    R.ifElse(
-      R.includes(value),
-      R.identity,
-      R.append(value)
-    ),
-    R.without(value)
+    R.includes(value),
+    R.identity,
+    R.append(value)
   ),
+  arr => R.assocPath(path, arr, obj)
+)(obj)
+
+const _dissocFromIndexPath = (path, value) => obj => R.pipe(
+  R.pathOr([], path),
+  R.without(value),
   arr => R.assocPath(path, arr, obj)
 )(obj)
 
@@ -178,7 +165,6 @@ module.exports = {
   getNodeUuidsByParent,
   getNodeUuidsByParentAndDef,
   getNodeUuidsByDef,
-  getNodeUuidsDirty,
   getNodeCodeDependentUuids,
   //REMOVE
   removeNode
