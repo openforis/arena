@@ -24,25 +24,25 @@ const validateEntityKeysUniqueness = (survey, record, nodeEntity) => {
   // 2. validate all sibling entities uniqueness
 
   const entityValidations = siblingEntities.map(
-      siblingEntity => {
-        const isDuplicate = isDuplicateEntity(survey, record, siblingEntities, siblingEntity)
+    siblingEntity => {
+      const isDuplicate = isDuplicateEntity(survey, record, siblingEntities, siblingEntity)
 
-        // 3. return entityKeys validation for each sibling entity key attribute
-        const keyNodes = fetchEntityKeyNodes(survey, record, siblingEntity)
-        return keyNodes.map(
-          keyNode => ({
-            [Node.getUuid(keyNode)]: {
-              [Validator.keys.fields]: {
-                [RecordValidation.keys.entityKeys]: {
-                  [Validator.keys.errors]: isDuplicate ? [errorKeys.duplicateEntity] : [],
-                  [Validator.keys.valid]: !isDuplicate
-                }
+      // 3. return entityKeys validation for each sibling entity key attribute
+      const keyNodes = fetchEntityKeyNodes(survey, record, siblingEntity)
+      return keyNodes.map(
+        keyNode => ({
+          [Node.getUuid(keyNode)]: {
+            [Validator.keys.fields]: {
+              [RecordValidation.keys.entityKeys]: {
+                [Validator.keys.errors]: isDuplicate ? [errorKeys.duplicateEntity] : [],
+                [Validator.keys.valid]: !isDuplicate
               }
             }
-          })
-        )
-      }
-    )
+          }
+        })
+      )
+    }
+  )
   return R.pipe(
     R.flatten,
     R.mergeAll

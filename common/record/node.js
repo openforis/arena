@@ -20,19 +20,19 @@ const keys = {
   created: 'created',
   updated: 'updated',
   deleted: 'deleted',
-  dirty: 'dirty'
+  dirty: 'dirty' //modified by the user but not persisted yet
 }
 
 const metaKeys = {
-  hierarchy: 'h',
-  childApplicability: 'childApplicability',
-  defaultValue: 'defaultValue',
+  hierarchy: 'h', //ancestor nodes uuids hierarchy
+  childApplicability: 'childApplicability', //applicability by child def uuid
+  defaultValue: 'defaultValue', //true if default value has been applied, false if the value is user defined
+  hierarchyCode: 'hCode', //hierarchy of code attribute ancestors (according to the parent code defs specified)
 }
 
 const valuePropKeys = {
   // code
   itemUuid: 'itemUuid',
-  hierarchy: 'h',
 
   // coordinate
   x: 'x',
@@ -116,6 +116,11 @@ const isDescendantOf = ancestor =>
  * UPDATE
  * ======
  */
+const mergeMeta = meta => node => R.pipe(
+  R.propOr(keys.meta),
+  R.mergeLeft(meta),
+  metaUpdated => R.assoc(keys.meta, metaUpdated)(node)
+)(node)
 
 /**
  * ======
@@ -162,14 +167,18 @@ module.exports = {
   getValidation: Validator.getValidation,
 
   // ==== READ metadata
+  getMeta: R.prop(keys.meta),
   isChildApplicable: childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid]),
   isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
   isDescendantOf,
   getHierarchy,
+  // code metadata
+  getHierarchyCode: R.pathOr([], [keys.meta, metaKeys.hierarchyCode]),
 
   // ==== UPDATE
   assocValue: R.assoc(keys.value),
   assocValidation: Validator.assocValidation,
+  mergeMeta,
 
   // ==== UTILS
   isValueBlank,
@@ -221,7 +230,6 @@ module.exports = {
 
   // code
   getCategoryItemUuid: getValueProp(valuePropKeys.itemUuid),
-  getCategoryItemHierarchy: getValueProp(valuePropKeys.hierarchy, []),
 
   // taxon
   getTaxonUuid: getValueProp(valuePropKeys.taxonUuid),

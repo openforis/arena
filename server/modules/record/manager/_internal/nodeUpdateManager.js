@@ -28,7 +28,10 @@ const persistNode = async (user, survey, record, node, t) => {
       await ActivityLog.log(user, surveyId, ActivityLog.type.nodeValueUpdate, R.pick(['uuid', 'value'], node), t)
 
     const nodeValue = Node.getValue(node)
-    const meta = { [Node.metaKeys.defaultValue]: false }
+    const meta = {
+      ...Node.getMeta(node),
+      [Node.metaKeys.defaultValue]: false
+    }
     const nodeUpdate = await NodeRepository.updateNode(surveyId, nodeUuid, nodeValue, meta, t)
 
     record = Record.assocNode(nodeUpdate)(record)
@@ -165,6 +168,7 @@ const _onNodeUpdate = async (survey, record, node, t) => {
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   if (NodeDef.isCode(nodeDef)) {
     const dependentCodes = Record.getDependentCodeAttributes(node)(record)
+
     if (!R.isEmpty(dependentCodes)) {
       const deletedNodesArray = await Promise.all(
         dependentCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t))
