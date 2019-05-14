@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 
 import AppContext from '../../../../app/appContext'
@@ -33,7 +33,7 @@ const SurveyRow = ({ surveyInfoRow, surveyInfo, setActiveSurvey }) => {
 
 const SurveyListTable = (props) => {
   const { surveys } = props
-  const { i18n } = React.useContext(AppContext)
+  const { i18n } = useContext(AppContext)
 
   const surveyInfos = surveys.map(Survey.getSurveyInfo)
 

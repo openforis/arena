@@ -21,6 +21,7 @@ module.exports = {
       hierarchy: 'Hierarchy',
       categories: 'Categories',
       taxonomies: 'Taxonomies',
+      confirmPublish: `Do you want to publish this survey ? Some operation won't be allowed afterwards.`,
     },
     deleteSurveyDialog: {
       areYouSure: 'Are you sure you want to delete this survey?',

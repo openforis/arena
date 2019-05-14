@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import AppContext from '../../app/appContext'
 
 const AppSideBarFooter = ({ logout, opened }) => {
-  const { i18n } = React.useContext(AppContext)
+  const { i18n } = useContext(AppContext)
 
   return (
     <div className="app-sidebar__footer">

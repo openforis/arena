@@ -41,6 +41,7 @@ module.exports = {
   getUuid: SurveyInfo.getUuid,
   getName: SurveyInfo.getName,
   getLanguages: SurveyInfo.getLanguages,
+  getLanguage: SurveyInfo.getLanguage,
   getDefaultLanguage: SurveyInfo.getDefaultLanguage,
   getLabels: SurveyInfo.getLabels,
   getLabel: SurveyInfo.getLabel,

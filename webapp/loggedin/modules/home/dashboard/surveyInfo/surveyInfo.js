@@ -25,13 +25,14 @@ import { deleteSurvey, publishSurvey } from '../../../../../survey/actions'
 const SurveyInfo = props => {
 
   const {
-    surveyInfo, lang, canEditDef,
+    surveyInfo, canEditDef,
     publishSurvey, deleteSurvey
   } = props
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const { i18n } = useContext(AppContext)
+  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
 
   return (
     <div className="home-dashboard__survey-info">
@@ -58,7 +59,7 @@ const SurveyInfo = props => {
               canEditDef &&
               <button className="btn btn-of-light"
                       aria-disabled={!Survey.isDraft(surveyInfo)}
-                      onClick={() => window.confirm('Do you want to publish this survey? Some operation won\'t be allowed afterwards.')
+                      onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmPublish'))
                         ? publishSurvey()
                         : null}>
                 <span className="icon icon-checkmark2 icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.publish')}
@@ -125,11 +126,9 @@ const SurveyInfo = props => {
 const mapStateToProps = state => {
   const user = AppState.getUser(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const lang = Survey.getDefaultLanguage(surveyInfo)
 
   return {
     surveyInfo,
-    lang,
     canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
   }
 }
