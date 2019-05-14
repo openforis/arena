@@ -84,6 +84,14 @@ const hasCollectReportIssues = R.pipe(
 
 const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
 
+const getLanguage = preferredLang => surveyInfo => {
+  return R.pipe(
+    getLanguages,
+    R.find(R.equals(preferredLang)),
+    R.defaultTo(getDefaultLanguage(surveyInfo))
+  )(surveyInfo)
+}
+
 // ====== UTILS
 
 const isValid = surveyInfo => surveyInfo && surveyInfo.id
@@ -109,6 +117,7 @@ module.exports = {
   isDraft,
   getName,
   getDescriptions,
+  getLanguage,
   getLanguages,
   getDefaultLanguage,
   getSRS,

@@ -21,13 +21,13 @@ const createParams = lang => ({
   },
 })
 
-const createI18nPromise = language => {
+const createI18nPromise = lang => {
   return new Promise((resolve, reject) => {
     i18next.createInstance(
-      createParams(language),
+      createParams(lang),
       (err, t) => {
         if (err) reject(err)
-        resolve({ language, t }) // TODO: wrapper
+        resolve({ lang, t })
       })
   })
 }
