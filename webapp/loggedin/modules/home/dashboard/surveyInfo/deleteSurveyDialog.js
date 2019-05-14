@@ -12,12 +12,12 @@ import {
   ModalFooter,
 } from '../../../../../commonComponents/modal'
 
-const confirmNameRef = React.createRef()
-
 const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   const { i18n } = useContext(AppContext)
 
   const [ confirmName, setConfirmName ] = useState('')
+
+  const confirmNameRef = React.createRef()
 
   useEffect(() => {
     setConfirmName('')

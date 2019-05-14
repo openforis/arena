@@ -84,10 +84,10 @@ const hasCollectReportIssues = R.pipe(
 
 const isFromCollect = R.pipe(getCollectUri, R.isNil, R.not)
 
-const getLanguage = preferred => surveyInfo => {
+const getLanguage = preferredLang => surveyInfo => {
   return R.pipe(
     getLanguages,
-    R.find(R.equals(preferred)),
+    R.find(R.equals(preferredLang)),
     R.defaultTo(getDefaultLanguage(surveyInfo))
   )(surveyInfo)
 }
