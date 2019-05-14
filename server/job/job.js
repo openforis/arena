@@ -56,7 +56,7 @@ class Job {
 
     this.eventListener = null
 
-    this._logPrefix = `Job ${this.constructor.name}`
+    this._logger = Log.getLogger(`Job ${this.constructor.name}`)
   }
 
   /**
@@ -68,13 +68,13 @@ class Job {
    * extend the "process" method instead.
    */
   async start (client = db) {
-    this._logDebug('start')
+    this.logDebug('start')
 
     // 1. crates a db transaction and run 'execute' into it
     try {
       await client.tx(tx => this._executeInTransaction(tx))
 
-      this._logDebug(`ending (status: ${this.status})`)
+      this.logDebug(`ending (status: ${this.status})`)
 
       // 7. notify job status change to 'succeed'
       if (this.isRunning()) {
@@ -82,7 +82,7 @@ class Job {
       }
     } catch (e) {
       if (!this.isCanceled()) {
-        this._logError(`${e.stack || e}`)
+        this.logError(`${e.stack || e}`)
         this.addError({ systemError: { valid: false, errors: [e.toString()] } })
         if (this.isRunning())
           await this.setStatusFailed()
@@ -106,16 +106,16 @@ class Job {
 
       // 4. execution completed, prepare result
       if (this.isRunning()) {
-        this._logDebug('beforeSuccess...')
+        this.logDebug('beforeSuccess...')
         await this.beforeSuccess()
-        this._logDebug('beforeSuccess run')
+        this.logDebug('beforeSuccess run')
       }
     } finally {
       if (!this.isCanceled()) {
         // 5. flush/clean resources
-        this._logDebug('beforeEnd...')
+        this.logDebug('beforeEnd...')
         await this.beforeEnd()
-        this._logDebug('beforeEnd run')
+        this.logDebug('beforeEnd run')
       }
       this.tx = null
     }
@@ -268,13 +268,13 @@ class Job {
   async _executeInnerJobs () {
     this.total = this.innerJobs.length
 
-    this._logDebug(`- ${this.total} inner jobs found`)
+    this.logDebug(`- ${this.total} inner jobs found`)
 
     //start each inner job and wait for it's completion before starting next one
     for (const innerJob of this.innerJobs) {
       ++this.currentInnerJobIndex
 
-      this._logDebug(`- running inner job ${this.currentInnerJobIndex + 1}`)
+      this.logDebug(`- running inner job ${this.currentInnerJobIndex + 1}`)
 
       innerJob.context = this.context
 
@@ -287,7 +287,7 @@ class Job {
       else
         break
     }
-    this._logDebug(`- ${this.processed} inner jobs processed successfully`)
+    this.logDebug(`- ${this.processed} inner jobs processed successfully`)
   }
 
   async _handleInnerJobEvent (event) {
@@ -303,7 +303,7 @@ class Job {
   }
 
   async _setStatus (status) {
-    this._logDebug(`set status: ${status}`)
+    this.logDebug(`set status: ${status}`)
 
     this.status = status
 
@@ -314,9 +314,9 @@ class Job {
     }
 
     if (this.isEnded()) {
-      this._logDebug('onEnd...')
+      this.logDebug('onEnd...')
       await this.onEnd()
-      this._logDebug('onEnd run')
+      this.logDebug('onEnd run')
     }
     await this._notifyEvent(event)
   }
@@ -339,12 +339,12 @@ class Job {
     return `job-${this.uuid}-progress`
   }
 
-  _logDebug (message) {
-    Log.debug(`${this._logPrefix} ${message}`)
+  logDebug (message) {
+    this._logger.debug(message)
   }
 
-  _logError (message) {
-    Log.error(`${this._logPrefix} ${message}`)
+  logError (message) {
+    this._logger.error(message)
   }
 
 }
