@@ -99,16 +99,18 @@ class CategoriesImportJob extends Job {
 
       const labels = CollectIdmlParseUtils.toLabels('label', defaultLanguage)(collectItem)
 
+      const itemCode = CollectIdmlParseUtils.getChildElementText('code')(collectItem)
       const item = CategoryItem.newItem(levelUuid, parentItem, {
-        [CategoryItem.props.code]: CollectIdmlParseUtils.getChildElementText('code')(collectItem),
+        [CategoryItem.props.code]: itemCode,
         [CategoryItem.props.labels]: labels
       })
       await this.itemBatchPersister.addItem(item, tx)
 
       // insert child items recursively
       const collectChildItems = CollectIdmlParseUtils.getElementsByName('item')(collectItem)
-      if (!R.isEmpty(collectChildItems))
+      if (!R.isEmpty(collectChildItems)) {
         await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
+      }
 
       // update qualifiable item codes cache
       collectChildItems.forEach(collectItem => {

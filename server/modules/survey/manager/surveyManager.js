@@ -3,7 +3,9 @@ const R = require('ramda')
 const db = require('../../../db/db')
 const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
 const { uuidv4 } = require('../../../../common/uuid')
+
 const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
+const SurveyIndexManager = require('./_internal/surveyIndexManager')
 
 const SurveyRepository = require('../repository/surveyRepository')
 const Survey = require('../../../../common/survey/survey')
@@ -147,4 +149,7 @@ module.exports = {
   deleteSurveyLabel: SurveyRepository.deleteSurveyLabel,
   deleteSurveyDescription: SurveyRepository.deleteSurveyDescription,
   dropSurveySchema: SurveyRepository.dropSurveySchema,
+
+  // ====== INDEX
+  fetchIndex: SurveyIndexManager.fetchIndex,
 }

@@ -32,12 +32,20 @@ const Node = require('../node')
  *     'node-def-1-uuid': ['node-1-uuid', 'node-2-uuid', 'node-5-uuid', 'node-6-uuid', ...]
  *     'node-def-2-uuid': ['node-3-uuid', 'node-4-uuid', 'node-7-uuid', 'node-8-uuid', ...]
  *   }
+ *
+ * nodeCodeDependents : dependent code attribute uuids by node uuid
+ *   e.g.:
+ *   nodeCodeDependents = {
+ *     'code-attr-1-uuid': ['code-attr-2-uuid', 'code-attr-3-uuid', ...],
+ *     'code-attr-4-uuid': ['code-attr-5-uuid', 'code-attr-6-uuid', ...],
+ *   }
  */
 
 const keys = {
   nodeRootUuid: '_nodeRootUuid',
   nodesByParentAndDef: '_nodesByParentAndDef',
   nodesByDef: '_nodesByDef',
+  nodeCodeDependents: '_nodeCodeDependents'
 }
 
 // ==== GETTERS
@@ -65,6 +73,8 @@ const getNodeUuidsByParent = parentNodeUuid => R.pipe(
   R.flatten
 )
 
+const getNodeCodeDependentUuids = nodeUuid => R.pathOr([], [keys.nodeCodeDependents, nodeUuid])
+
 // ==== ADD
 /**
  * Adds the specified nodes to the cache
@@ -73,61 +83,79 @@ const addNodes = nodes =>
   record =>
     R.pipe(
       R.values,
+      R.reject(Node.isDeleted),
       R.reduce(
-        (acc, node) => Node.isDeleted(node)
-          ? acc
-          : _addNode(node)(acc),
+        (recordAcc, node) => _addNode(node)(recordAcc),
         record
       )
     )(nodes)
 
 const _addNode = node => R.pipe(
-  record => Node.isRoot(node) ? R.assoc(keys.nodeRootUuid, Node.getUuid(node))(record) : record,
-  _addNodeToParentIndex(node),
-  _addNodeToNodeDefIndex(node)
+  //rootUuid
+  R.ifElse(
+    R.always(Node.isRoot(node)),
+    R.assoc(keys.nodeRootUuid, Node.getUuid(node)),
+    R.identity,
+  ),
+  //parent index
+  _assocToIndexPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node)),
+  //node def index
+  _assocToIndexPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
+  //code dependent index
+  _addNodeToCodeDependentsIndex(node),
 )
 
-const _addNodeToNodeDefIndex = node => record => R.pipe(
-  getNodeUuidsByDef(Node.getNodeDefUuid(node)),
-  R.ifElse(
-    R.includes(Node.getUuid(node)),
-    R.identity,
-    R.append(Node.getUuid(node))
-  ),
-  arr => R.assocPath([keys.nodesByDef, Node.getNodeDefUuid(node)], arr, record)
-)(record)
-
-const _addNodeToParentIndex = node => record => R.pipe(
-  getNodeUuidsByParentAndDef(Node.getParentUuid(node), Node.getNodeDefUuid(node)),
-  R.ifElse(
-    R.includes(Node.getUuid(node)),
-    R.identity,
-    R.append(Node.getUuid(node))
-  ),
-  arr => R.assocPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], arr, record)
-)(record)
+const _addNodeToCodeDependentsIndex = node => record =>
+  R.reduce(
+    (recordAcc, ancestorCodeAttributeUuid) =>
+      _assocToIndexPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node))(recordAcc),
+    record,
+    Node.getHierarchyCode(node)
+  )
 
 // ===== DELETE
 /**
  * Removed the specified node from the cache
  */
 const removeNode = node => R.pipe(
-  _removeNodeFromParentIndex(node),
-  _removeNodeFromNodeDefIndex(node)
+  R.ifElse(
+    R.always(Node.isRoot(node)),
+    R.dissoc(keys.nodeRootUuid),
+    R.identity
+  ),
+  //parent index
+  _dissocFromIndexPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], Node.getUuid(node)),
+  //node def index
+  _dissocFromIndexPath([keys.nodesByDef, Node.getNodeDefUuid(node)], Node.getUuid(node)),
+  //code dependent index
+  _removeNodeFromCodeDependentsIndex(node),
 )
 
-const _removeNodeFromParentIndex = node => record => R.pipe(
-  getNodeUuidsByParentAndDef(Node.getParentUuid(node), Node.getNodeDefUuid(node)),
-  R.without([Node.getUuid(node)]),
-  arr => R.assocPath([keys.nodesByParentAndDef, Node.getParentUuid(node), Node.getNodeDefUuid(node)], arr)(record)
+const _removeNodeFromCodeDependentsIndex = node => record => R.pipe(
+  Node.getHierarchyCode,
+  R.reduce(
+    (recordAcc, ancestorCodeAttributeUuid) =>
+      _dissocFromIndexPath([keys.nodeCodeDependents, ancestorCodeAttributeUuid], Node.getUuid(node))(recordAcc),
+    record,
+  ),
+  R.dissocPath([keys.nodeCodeDependents, Node.getUuid(node)])
+)(node)
+
+const _assocToIndexPath = (path, value) => record => R.pipe(
+  R.pathOr([], path),
+  R.ifElse(
+    R.includes(value),
+    R.identity,
+    R.append(value)
+  ),
+  arr => R.assocPath(path, arr, record)
 )(record)
 
-const _removeNodeFromNodeDefIndex = node => record => R.pipe(
-  getNodeUuidsByDef(Node.getNodeDefUuid(node)),
-  R.without([Node.getUuid(node)]),
-  arr => R.assocPath([keys.nodesByDef, Node.getNodeDefUuid(node)], arr)(record)
+const _dissocFromIndexPath = (path, value) => record => R.pipe(
+  R.pathOr([], path),
+  R.without(value),
+  arr => R.assocPath(path, arr, record)
 )(record)
-
 
 module.exports = {
   //ADD
@@ -137,6 +165,7 @@ module.exports = {
   getNodeUuidsByParent,
   getNodeUuidsByParentAndDef,
   getNodeUuidsByDef,
+  getNodeCodeDependentUuids,
   //REMOVE
   removeNode
 }

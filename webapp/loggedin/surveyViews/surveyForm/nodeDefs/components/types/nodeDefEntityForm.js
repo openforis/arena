@@ -7,6 +7,7 @@ import * as R from 'ramda'
 import AppContext from '../../../../../../app/appContext'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
+
 import NodeDefSwitch from '../../nodeDefSwitch'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 
@@ -15,14 +16,7 @@ import Record from '../../../../../../../common/record/record'
 import Node from '../../../../../../../common/record/node'
 import Validator from '../../../../../../../common/validation/validator'
 
-import {
-  nodeDefLayoutProps,
-  filterInnerPageChildren,
-  getLayout,
-  getNoColumns,
-  isRenderForm,
-  hasPage,
-} from '../../../../../../../common/survey/nodeDefLayout'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
 import { setFormPageNode, getNodeKeyLabelValues } from '../../../../surveyForm/actions'
 
@@ -32,7 +26,7 @@ import * as RecordState from '../../../../record/recordState'
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 const EntityFormHeader = ({ nodeDef, label }) => (
-  isRenderForm(nodeDef) && !hasPage(nodeDef) &&
+  NodeDefLayout.isRenderForm(nodeDef) && !NodeDefLayout.hasPage(nodeDef) &&
   <div className="node-def__inner-form-header">
     {label}
   </div>
@@ -80,7 +74,7 @@ class EntityForm extends React.Component {
     const { nodeDef, putNodeDefProp } = this.props
 
     if (window.innerWidth > 1200 && layout.length > 0) {
-      putNodeDefProp(nodeDef, nodeDefLayoutProps.layout, layout)
+      putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, layout)
     }
   }
 
@@ -102,9 +96,9 @@ class EntityForm extends React.Component {
 
     const { onChangeLayout } = this.state
 
-    const columns = getNoColumns(nodeDef)
-    const rdgLayout = getLayout(nodeDef)
-    const innerPageChildren = filterInnerPageChildren(childDefs)
+    const columns = NodeDefLayout.getNoColumns(nodeDef)
+    const rdgLayout = NodeDefLayout.getLayout(nodeDef)
+    const innerPageChildren = NodeDefLayout.filterInnerPageChildren(childDefs)
 
     return innerPageChildren.length > 0
       ? (
@@ -126,7 +120,7 @@ class EntityForm extends React.Component {
             innerPageChildren
               .map((childDef, i) =>
                 <div key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}
-                     className={NodeDef.isEntity(childDef) && isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
+                     className={NodeDef.isEntity(childDef) && NodeDefLayout.isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
                   <NodeDefSwitch
                     key={i}
                     edit={edit}

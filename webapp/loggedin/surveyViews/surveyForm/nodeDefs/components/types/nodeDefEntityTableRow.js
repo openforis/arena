@@ -69,7 +69,7 @@ class NodeDefEntityTableRow extends React.Component {
     this.setState({ dragged: null })
 
     const childNodes = this.rowRef.current.childNodes
-    const uuids = [ ...childNodes ].map(node => node.dataset.uuid).filter(uuid => uuid)
+    const uuids = [...childNodes].map(node => node.dataset.uuid).filter(uuid => uuid)
 
     putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, uuids)
   }
@@ -125,7 +125,7 @@ class NodeDefEntityTableRow extends React.Component {
             })
         }
 
-        <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={this.placeholderRef} />
+        <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={this.placeholderRef}/>
 
         {
           renderType === NodeDefLayout.nodeDefRenderType.tableBody && canEditRecord &&

@@ -1,10 +1,9 @@
 const R = require('ramda')
 
-const Log = require('../../../../../log/log')
-
 const BatchPersister = require('../../../../../db/batchPersister')
 
 const FileXml = require('../../../../../../common/file/fileXml')
+const Queue = require('../../../../../../common/queue')
 
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
@@ -46,13 +45,18 @@ class RecordsImportJob extends Job {
       if (this.isCanceled())
         break
 
-      Log.debug(`start importing record ${entryName}`)
+      this.logDebug(`-- start import record ${entryName}`)
 
+      // this.logDebug(`${entryName} findCollectRecordData start`)
       const collectRecordData = this.findCollectRecordData(entryName)
       const { collectRecordXml, step } = collectRecordData
+      // this.logDebug(`${entryName} findCollectRecordData done`)
 
+      // this.logDebug(`${entryName} parseToJson start`)
       const collectRecordJson = FileXml.parseToJson(collectRecordXml)
+      // this.logDebug(`${entryName} parseToJson done`)
 
+      // this.logDebug(`${entryName} recordToCreate start`)
       const recordToCreate = Record.newRecord(user)
       const record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
       const recordUuid = Record.getUuid(record)
@@ -65,10 +69,13 @@ class RecordsImportJob extends Job {
       )(collectRecordJson)
 
       const collectRootEntity = collectRecordJson[collectRootEntityName]
+      // this.logDebug(`${entryName} recordToCreate end`)
 
-      await this.insertNode(survey, recordUuid, null, `/${collectRootEntityName}`, collectRootEntity, tx)
+      // this.logDebug(`${entryName} insertNode start`)
+      await this.insertNodes(survey, record, collectRootEntityName, collectRootEntity)
+      // this.logDebug(`${entryName} insertNode end`)
 
-      Log.debug('record imported')
+      this.logDebug(`-- end import record ${entryName}`)
 
       this.incrementProcessedItems()
     }
@@ -111,46 +118,77 @@ class RecordsImportJob extends Job {
     throw new Error(`Entry data not found: ${entryName}`)
   }
 
-  async insertNode (survey, recordUuid, parentNode, collectNodeDefPath, collectNode, tx) {
-    const { nodeDefUuidByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
+  async insertNodes (survey, record, collectRootEntityName, collectRootEntity) {
 
-    const nodeDefUuid = nodeDefUuidByCollectPath[collectNodeDefPath]
-    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    const {
+      nodeDefUuidByCollectPath, collectSurveyFileZip, collectSurvey,
+      surveyIndex
+    } = this.context
 
-    let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, parentNode)
+    // init record nodes
+    record.nodes = {}
+    const recordUuid = Record.getUuid(record)
 
-    if (NodeDef.isAttribute(nodeDef)) {
-      const value = await CollectAttributeValueExtractor.extractAttributeValue(survey, nodeDef, nodeToInsert,
-        collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode, tx)
-      nodeToInsert = Node.assocValue(value)(nodeToInsert)
-    }
+    const queue = new Queue([{
+      parentNode: null,
+      collectNodeDefPath: `/${collectRootEntityName}`,
+      collectNode: collectRootEntity
+    }])
 
-    await this.batchPersister.addItem(nodeToInsert, tx)
+    while (!queue.isEmpty()) {
 
-    if (NodeDef.isEntity(nodeDef)) {
-      const collectNodeDefChildNames = R.pipe(
-        R.keys,
-        R.reject(R.equals('_attributes'))
-      )(collectNode)
+      const item = queue.dequeue()
+      const { parentNode, collectNodeDefPath, collectNode } = item
 
-      for (const collectNodeDefChildName of collectNodeDefChildNames) {
-        if (this.isCanceled())
-          break
+      const nodeDefUuid = nodeDefUuidByCollectPath[collectNodeDefPath]
+      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-        const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
-        const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
+      let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, parentNode)
 
-        if (nodeDefChildUuid) {
-          const collectChildNodes = CollectRecordParseUtils.getList([collectNodeDefChildName])(collectNode)
-          for (const collectChildNode of collectChildNodes) {
-            if (this.isCanceled())
-              break
+      if (NodeDef.isAttribute(nodeDef)) {
+        const value = await CollectAttributeValueExtractor.extractAttributeValue(
+          survey, nodeDef, record, nodeToInsert, surveyIndex,
+          collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode,
+          this.tx
+        )
+        nodeToInsert = Node.assocValue(value)(nodeToInsert)
+      }
 
-            await this.insertNode(survey, recordUuid, nodeToInsert, collectNodeDefChildPath, collectChildNode, tx)
+      await this.batchPersister.addItem(nodeToInsert, this.tx)
+      record.nodes[Node.getUuid(nodeToInsert)] = nodeToInsert
+
+      if (NodeDef.isEntity(nodeDef)) {
+        const collectNodeDefChildNames = R.pipe(
+          R.keys,
+          R.reject(R.equals('_attributes'))
+        )(collectNode)
+
+        for (const collectNodeDefChildName of collectNodeDefChildNames) {
+          if (this.isCanceled())
+            break
+
+          const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
+          const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
+
+          if (nodeDefChildUuid) {
+            const collectChildNodes = CollectRecordParseUtils.getList([collectNodeDefChildName])(collectNode)
+            for (const collectChildNode of collectChildNodes) {
+              if (this.isCanceled())
+                break
+
+              queue.enqueue({
+                parentNode: nodeToInsert,
+                collectNodeDefPath: collectNodeDefChildPath,
+                collectNode: collectChildNode
+              })
+
+            }
           }
         }
       }
+
     }
+
   }
 
   async nodesBatchInsertHandler (nodes, tx) {

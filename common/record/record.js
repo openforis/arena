@@ -32,7 +32,6 @@ module.exports = {
   getStep: R.prop(keys.step),
 
   getNodes: RecordReader.getNodes,
-  getNodesArray: RecordReader.getNodesArray,
   getNodeByUuid: RecordReader.getNodeByUuid,
   getRootNode: RecordReader.getRootNode,
   getNodesByDefUuid: RecordReader.getNodesByDefUuid,
@@ -48,7 +47,6 @@ module.exports = {
 
   // ==== dependency
   getDependentNodes: RecordReader.getDependentNodes,
-  getCodeUuidsHierarchy: RecordReader.getCodeUuidsHierarchy,
   getParentCodeAttribute: RecordReader.getParentCodeAttribute,
   getDependentCodeAttributes: RecordReader.getDependentCodeAttributes,
 
