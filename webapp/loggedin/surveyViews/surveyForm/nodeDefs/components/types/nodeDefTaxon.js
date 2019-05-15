@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import axios from 'axios'
 import * as R from 'ramda'
 
+import AppContext from '../../../../../../app/appContext'
+
 import { FormItem, Input } from '../../../../../../commonComponents/form/input'
 import AutocompleteDialog from '../../../../../../commonComponents/form/autocompleteDialog'
 
@@ -49,8 +51,8 @@ const loadTaxa = async (surveyId, taxonomyUuid, draft, field, value, strict = fa
       filterProp: field,
       filterValue: searchValue,
       includeUnlUnk: true,
-      draft
-    }
+      draft,
+    },
   })
   return data.taxa
 }
@@ -60,8 +62,8 @@ const loadTaxonByNode = async (surveyId, taxonomyUuid, draft, node) => {
     params: {
       taxonUuid: Node.getTaxonUuid(node),
       vernacularNameUuid: Node.getVernacularNameUuid(node),
-      draft
-    }
+      draft,
+    },
   })
   return data.taxon
 }
@@ -184,7 +186,7 @@ class NodeDefTaxon extends React.Component {
         ...fieldValues,
         autocompleteOpened: !emptyValue,
         autocompleteTaxa: [],
-        autocompleteInputField: this.getInputFields()[field]
+        autocompleteInputField: this.getInputFields()[field],
       })
 
       if (emptyValue) {
@@ -202,7 +204,7 @@ class NodeDefTaxon extends React.Component {
     const unlistedTaxonUuid = Node.getTaxonUuid(node)
 
     this.setState({
-      [field]: value
+      [field]: value,
     })
     const scientificName = field === fields.scientificName ? value : Node.getScientificName(node)
     const vernacularName = field === fields.vernacularName ? value : Node.getVernacularName(node)
@@ -224,8 +226,8 @@ class NodeDefTaxon extends React.Component {
       // preserve scientific and vernacular name written by user
       nodeValue = {
         [valuePropKeys.taxonUuid]: Taxon.getUuid(item),
-        [valuePropKeys.scientificName]: scientificName ? scientificName : Taxon.getScientificName(item),
-        [valuePropKeys.vernacularName]: vernacularName ? vernacularName : ''
+        [valuePropKeys.scientificName]: scientificName || Taxon.getScientificName(item),
+        [valuePropKeys.vernacularName]: vernacularName || '',
       }
     } else if (Taxon.isUnknownTaxon(item)) {
       // unknown item
@@ -233,12 +235,12 @@ class NodeDefTaxon extends React.Component {
       nodeValue = {
         [valuePropKeys.taxonUuid]: Taxon.getUuid(item),
         [valuePropKeys.scientificName]: Taxon.getScientificName(item),
-        [valuePropKeys.vernacularName]: ''
+        [valuePropKeys.vernacularName]: '',
       }
     } else {
       //item in list
       nodeValue = {
-        [valuePropKeys.taxonUuid]: Taxon.getUuid(item)
+        [valuePropKeys.taxonUuid]: Taxon.getUuid(item),
       }
       if (item.vernacularNameUuid) {
         nodeValue[valuePropKeys.vernacularNameUuid] = item.vernacularNameUuid
@@ -285,6 +287,8 @@ class NodeDefTaxon extends React.Component {
       autocompleteInputField,
     } = this.state
 
+    const { i18n } = this.context
+
     const codeInputField = <Input ref={this.codeField}
                                   aria-disabled={entryDisabled}
                                   readOnly={edit}
@@ -306,14 +310,14 @@ class NodeDefTaxon extends React.Component {
     const autocompleteDialog =
       autocompleteOpened
         ? ReactDOM.createPortal(
-        <AutocompleteDialog className="node-def__taxon-autocomplete-list"
-                            items={autocompleteTaxa}
-                            itemRenderer={TaxonAutocompleteItemRenderer}
-                            itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
-                            inputField={autocompleteInputField.current.component.input}
-                            onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
-                            onClose={() => this.onAutocompleteClose()}/>,
-        document.body
+          <AutocompleteDialog className="node-def__taxon-autocomplete-list"
+                              items={autocompleteTaxa}
+                              itemRenderer={TaxonAutocompleteItemRenderer}
+                              itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
+                              inputField={autocompleteInputField.current.component.input}
+                              onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
+                              onClose={() => this.onAutocompleteClose()}/>,
+          document.body
         )
         : null
 
@@ -329,13 +333,13 @@ class NodeDefTaxon extends React.Component {
 
     return (
       <div className="node-def__taxon-wrapper">
-        <FormItem label="Code">
+        <FormItem label={i18n.t('surveyForm.nodeDefTaxon.code')}>
           {codeInputField}
         </FormItem>
-        <FormItem label="Scientific Name">
+        <FormItem label={i18n.t('surveyForm.nodeDefTaxon.scientificName')}>
           {scientificNameInputField}
         </FormItem>
-        <FormItem label="Vernacular Name">
+        <FormItem label={i18n.t('surveyForm.nodeDefTaxon.vernacularName')}>
           {vernacularNameInputField}
         </FormItem>
 
@@ -344,6 +348,8 @@ class NodeDefTaxon extends React.Component {
     )
   }
 }
+
+NodeDefTaxon.contextType = AppContext
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)

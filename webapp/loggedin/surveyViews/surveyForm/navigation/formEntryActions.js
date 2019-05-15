@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+
+import AppContext from '../../../../app/appContext'
 
 import Record from '../../../../../common/record/record'
 import RecordStep from '../../../../../common/record/recordStep'
@@ -23,6 +25,8 @@ const RecordEntryButtons = (props) => {
     deleteRecord, updateRecordStep,
   } = props
 
+  const { i18n } = useContext(AppContext)
+
   return (
     <React.Fragment>
 
@@ -33,7 +37,7 @@ const RecordEntryButtons = (props) => {
           stepPrev &&
           <button className="btn-s btn-of"
                   onClick={() =>
-                    confirm(`Are sure you want to demote this record to ${RecordStep.getName(stepPrev)}?`)
+                    confirm(i18n.t('surveyForm.formEntryActions.confirmDemote', { step: RecordStep.getName(stepPrev) }))
                       ? updateRecordStep(RecordStep.getId(stepPrev), history)
                       : null
                   }>
@@ -48,7 +52,7 @@ const RecordEntryButtons = (props) => {
           <button className="btn-s btn-of"
                   aria-disabled={!valid}
                   onClick={() =>
-                    confirm(`Are sure you want to promote this record to ${RecordStep.getName(stepNext)}? You won't be able to edit it anymore`)
+                    confirm(i18n.t('surveyForm.formEntryActions.confirmPromote', { step: RecordStep.getName(stepNext) }))
                       ? updateRecordStep(RecordStep.getId(stepNext), history)
                       : null
                   }>
@@ -59,7 +63,7 @@ const RecordEntryButtons = (props) => {
 
       <button className="btn-s btn-of btn-danger"
               onClick={() =>
-                window.confirm('Are you sure you want to delete this record? This operation cannot be undone')
+                window.confirm(i18n.t('surveyForm.formEntryActions.confirmDelete'))
                   ? deleteRecord(history)
                   : null
               }
@@ -80,6 +84,8 @@ const FormEntryActions = (props) => {
     deleteRecord, updateRecordStep,
   } = props
 
+  const { i18n } = useContext(AppContext)
+
   return (
     <div className="survey-form__nav-record-actions">
       {
@@ -87,7 +93,7 @@ const FormEntryActions = (props) => {
           ? (
             <Link to={appModuleUri(designerModules.formDesigner)} className="btn btn-of">
               <span className="icon icon-eye-blocked icon-12px icon-left"/>
-              Close preview
+              {i18n.t('surveyForm.formEntryActions.closePreview')}
             </Link>
           )
           : (
@@ -113,7 +119,7 @@ const mapStateToProps = (state) => {
     step: RecordStep.getStep(stepId),
     stepNext: RecordStep.getNextStep(stepId),
     stepPrev: RecordStep.getPreviousStep(stepId),
-    valid: Validator.isValid(record)
+    valid: Validator.isValid(record),
   }
 }
 

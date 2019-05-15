@@ -1,7 +1,9 @@
 import './nodeDefNavigation.scss'
 
-import React from 'react'
+import React, { useContext } from 'react'
 import { connect } from 'react-redux'
+
+import AppContext from '../../../../app/appContext'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -30,6 +32,8 @@ const NavigationButton = (props) => {
     setFormActivePage,
     createNodeDef,
   } = props
+
+  const { i18n } = useContext(AppContext)
 
   const outerPageChildDefs = childDefs ? filterOuterPageChildren(childDefs) : []
 
@@ -67,7 +71,7 @@ const NavigationButton = (props) => {
                   }
                 )}>
           <span className="icon icon-plus icon-12px icon-left"/>
-          {label} sub page
+          {label} {i18n.t('surveyForm.nodeDefNavigation.subPage')}
         </button>
       }
     </React.Fragment>

@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { connect } from 'react-redux'
+
+import AppContext from '../../../../../app/appContext'
 
 import Layout from '../../../../../../common/survey/nodeDefLayout'
 import NodeDef from '../../../../../../common/survey/nodeDef'
@@ -16,6 +18,8 @@ const NodeDefEditFormActions = (props) => {
     putNodeDefProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
   } = props
 
+  const { i18n } = useContext(AppContext)
+
   const isRoot = NodeDef.isRoot(nodeDef)
   const isPage = !!Layout.getPageUuid(nodeDef)
 
@@ -24,7 +28,7 @@ const NodeDefEditFormActions = (props) => {
       {
         isPage &&
         <div className="btn-of-light-xs node-def__form-root-actions">
-          columns
+          {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
           <input value={Layout.getNoColumns(nodeDef)}
                  type="number" min="1" max="6"
                  onChange={e => e.target.value > 0 ?
@@ -53,7 +57,7 @@ const NodeDefEditFormActions = (props) => {
           : <button className="btn-s btn-of-light-xs"
                     aria-disabled={NodeDef.isPublished(nodeDef)}
                     onClick={() => {
-                      window.confirm('Are you sure you want to permanently delete this node definition? This operation cannot be undone')
+                      window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
                         ? removeNodeDef(nodeDef)
                         : null
                     }}>
@@ -70,5 +74,5 @@ export default connect(null, {
   setNodeDefForEdit,
   setFormNodeDefAddChildTo,
   putNodeDefProp,
-  removeNodeDef
+  removeNodeDef,
 })(NodeDefEditFormActions)

@@ -82,7 +82,7 @@ const NodeDefCoordinate = props => {
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinatee.y')}>
         {yInput}
       </FormItem>
-      <FormItem label={i18n.t('surveyForm.nodeDefCoordinatee.srs')}>
+      <FormItem label={i18n.t('common.srs')}>
         {srsDropdown}
       </FormItem>
     </div>

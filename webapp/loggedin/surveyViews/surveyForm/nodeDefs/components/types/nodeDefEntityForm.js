@@ -1,8 +1,10 @@
 import './nodeDefEntityForm.scss'
 
-import React from 'react'
+import React, { useContext } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+
+import AppContext from '../../../../../../app/appContext'
 
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import NodeDefSwitch from '../../nodeDefSwitch'
@@ -93,7 +95,6 @@ class EntityForm extends React.Component {
       canAddNode,
       locked,
       node,
-      putNodeDefProp,
       entry,
       recordUuid,
       surveyInfo,
@@ -153,6 +154,8 @@ const NodeSelect = props => {
     updateNode, removeNode, onChange, canEditRecord, canAddNode
   } = props
 
+  const { i18n } = useContext(AppContext)
+
   return (
     <div className="node-def-entity-form__actions">
 
@@ -160,7 +163,7 @@ const NodeSelect = props => {
               value={selectedNode ? Node.getUuid(selectedNode) : 'placeholder'}
               onChange={e => onChange(e.target.value)}
               aria-disabled={R.isEmpty(nodes)}>
-        <option value='placeholder' disabled hidden={true}>Select</option>
+        <option value='placeholder' disabled hidden={true}>{i18n.t('surveyForm.nodeDefEntityForm.select')}</option>
         {
           nodes.map(n =>
             <option key={Node.getUuid(n)}
@@ -178,13 +181,13 @@ const NodeSelect = props => {
                   style={{ marginLeft: '5px' }}
                   aria-disabled={!selectedNode}
                   onClick={() => {
-                    if (window.confirm('Are you sure you want to delete this entity?')) {
+                    if (window.confirm(i18n.t('surveyForm.nodeDefEntityForm.confirmDelete'))) {
                       onChange(null)
                       removeNode(nodeDef, selectedNode)
                     }
                   }}>
             <span className="icon icon-bin icon-12px icon-left"/>
-            DELETE
+            {i18n.t('common.delete')}
           </button>
           <button className="btn btn-s btn-of-light-xs"
                   style={{ marginLeft: '50px' }}
@@ -195,7 +198,7 @@ const NodeSelect = props => {
                   }}
                   aria-disabled={!canAddNode}>
             <span className="icon icon-plus icon-16px icon-left"/>
-            ADD
+            {i18n.t('common.add')}
           </button>
         </React.Fragment>
       }

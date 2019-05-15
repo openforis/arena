@@ -69,7 +69,7 @@ const SurveyInfo = props => {
 
           <Link to={appModuleUri(homeModules.surveyInfo)} className="btn btn-of-light">
             <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`}/>
-            {canEditDef ? 'Edit' : 'View'} {i18n.t('homeView.surveyInfo.info')}
+            {i18n.t(canEditDef ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
           </Link>
 
           {
