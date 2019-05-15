@@ -17,8 +17,8 @@ const nodeDefLayoutPropertyName = 'props'
 const nodeDefLayoutProps = {
   pageUuid: 'layoutPageUuid', // uuid
   render: 'layoutRender', // nodeDefRenderType
-  columns: 'layoutColumns', //int
-  layout: 'layoutReactDataGrid', // rdg
+  columns: 'layoutColumns', // number of columns
+  layout: 'layout', // React Data Grid layout (form layout) or sorted children uuids (table layout)
 }
 
 const nodeDefDisplayIn = {
