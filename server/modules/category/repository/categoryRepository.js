@@ -140,25 +140,20 @@ const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft 
     item => dbTransformCallback(item, draft, true)
   )
 
-const findItemByCode = async (surveyId, categoryUuid, levelIndex, code, draft = false, client = db) => {
-  const codeCol = draft
-    ? `COALESCE(i.props_draft->>'code', i.props->>'code')`
-    : `i.props->>'code'`
-
-  const items = await client.map(
-    `SELECT i.* 
-     FROM ${getSurveyDBSchema(surveyId)}.category_item i
-       JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
-         ON l.uuid = i.level_uuid
-     WHERE l.category_uuid = $1
-       AND l.index = $2
-       AND ${codeCol} = $3`,
-    [categoryUuid, levelIndex, code],
-    item => dbTransformCallback(item, draft, true)
-  )
-
-  return R.head(items)
-}
+const fetchIndex = async (surveyId, client = db) =>
+  await client.any(`
+    SELECT 
+      l.category_uuid,
+      i.parent_uuid,
+      i.props ->> 'code' AS code,
+      i.uuid            AS item_uuid
+    FROM
+       ${getSurveyDBSchema(surveyId)}.category_item i
+    JOIN
+       ${getSurveyDBSchema(surveyId)}.category_level l
+    ON
+      i.level_uuid = l.uuid
+  `)
 
 // ============== UPDATE
 
@@ -199,7 +194,7 @@ module.exports = {
   fetchItemsByParentUuid,
   fetchItemByUuid,
   fetchItemsByLevelIndex,
-  findItemByCode,
+  fetchIndex,
 
   //UPDATE
   updateCategoryProp,

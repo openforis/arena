@@ -9,6 +9,7 @@ const TaxonomiesImportJob = require('./metaImportJobs/taxonomiesImportJob')
 const NodeDefsImportJob = require('./metaImportJobs/nodeDefsImportJob')
 const RecordsImportJob = require('./dataImportJobs/recordsImportJob')
 const SurveyPublishPerformJob = require('../../../survey/service/publish/surveyPublishPerformJob')
+const SurveyIndexGeneratorJob = require('../../../survey/service/surveyIndexGeneratorJob')
 const SurveyRdbGeneratorJob = require('../../../survey/service/surveyRdbGeneratorJob')
 const RecordCheckJob = require('../../../survey/service/recordCheckJob')
 
@@ -23,6 +24,8 @@ class CollectImportJob extends Job {
       new NodeDefsImportJob(),
       //publish survey
       new SurveyPublishPerformJob(),
+      // create survey index
+      new SurveyIndexGeneratorJob(),
       //import records
       new RecordsImportJob(),
       new RecordCheckJob(),
@@ -31,7 +34,7 @@ class CollectImportJob extends Job {
     ])
   }
 
-  async beforeSuccess() {
+  async beforeSuccess () {
     const { surveyId } = this.context
 
     this.setResult({
