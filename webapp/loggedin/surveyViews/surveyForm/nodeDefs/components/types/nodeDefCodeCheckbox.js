@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import * as R from 'ramda'
+
+import AppContext from '../../../../../../app/appContext'
 
 import Node from '../../../../../../../common/record/node'
 import CategoryItem from '../../../../../../../common/survey/categoryItem'
@@ -29,6 +31,8 @@ const Checkbox = props => {
 const NodeDefCodeCheckbox = props => {
   const { items = [], edit, language } = props
 
+  const { i18n } = useContext(AppContext)
+
   const disabled = R.isEmpty(items)
 
   return <div className="node-def__code-checkbox-wrapper">
@@ -38,7 +42,7 @@ const NodeDefCodeCheckbox = props => {
                     disabled={true}
                     nodes={[]}
                     item={
-                      { uuid: '0', props: { labels: { [language]: 'Button code' } } }
+                      { uuid: '0', props: { labels: { [language]: i18n.t('surveyForm.nodeDefCode.buttonCode') } } }
                     }/>
         : items.map(item =>
           <Checkbox {...props}

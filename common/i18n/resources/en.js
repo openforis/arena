@@ -3,7 +3,16 @@ module.exports = {
     name: 'name',
     cancel: 'cancel',
     delete: 'delete',
+    done: 'done',
     cantUndoWarning: 'This operation cannot be undone!',
+    formDesigner: 'Form Designer',
+    categories: 'Categories',
+    taxonomies: 'Taxonomies',
+    add: 'Add',
+    label: 'Label',
+    label_plural: 'Dabels',
+    description: 'Description',
+    description_plural: 'Descriptions',
   },
   sidebar: {
     openForisShort: 'OF',
@@ -17,10 +26,7 @@ module.exports = {
       publish: 'publish',
       info: 'info',
       collectImportReport: 'Collect Import Report',
-      formDesigner: 'Form Designer',
       hierarchy: 'Hierarchy',
-      categories: 'Categories',
-      taxonomies: 'Taxonomies',
       confirmPublish: `Do you want to publish this survey ? Some operation won't be allowed afterwards.`,
     },
     deleteSurveyDialog: {
@@ -35,6 +41,30 @@ module.exports = {
       dateCreated: 'Date created',
       dateLastModified: 'Date last modified',
       status: 'Status',
+    },
+  },
+  designerView: {
+    hierarchy: 'Hierarchy',
+    formPreview: 'Form preview',
+    nodeDefEdit: {
+      basic: 'Basic',
+      advanced: 'Advanced',
+      validations: 'Validations',
+    },
+  },
+
+  designer: {
+    preview: 'preview',
+  },
+
+  surveyForm: {
+    nodeDefCode: {
+      buttonCode: 'Button code',
+    },
+    nodeDefCoordinatee: {
+      x: 'X',
+      y: 'Y',
+      srs: 'SRS',
     },
   },
 }

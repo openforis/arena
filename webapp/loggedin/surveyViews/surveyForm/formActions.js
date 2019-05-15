@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+
+import AppContext from '../../../app/appContext'
 
 import NodeDef from '../../../../common/survey/nodeDef'
 
@@ -11,32 +13,36 @@ import { setFormNodeDefAddChildTo } from './actions'
 
 import * as SurveyFormState from './surveyFormState'
 
-const AddNodeDefButtons = ({ addNodeDef }) => (
-  <React.Fragment>
-    <div/>
-    <div/>
-    <div/>
-    <div className="title-of">
-      <span className="icon icon-plus icon-left"/> Add
-    </div>
+const AddNodeDefButtons = ({ addNodeDef }) => {
+  const { i18n } = useContext(AppContext)
 
-    {
-      R.values(NodeDef.nodeDefType)
-        .map(type => {
-          const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
+  return (
+    <React.Fragment>
+      <div/>
+      <div/>
+      <div/>
+      <div className="title-of">
+        <span className="icon icon-plus icon-left"/> {i18n.t('common.add')}
+      </div>
 
-          return (
-            <button key={type}
-                    className="btn btn-s btn-of-light-s btn-add-node-def"
-                    onClick={() => addNodeDef(type, nodeDefProps)}>
-              {getNodeDefIconByType(type)}{type}
-            </button>
-          )
-        })
-    }
+      {
+        R.values(NodeDef.nodeDefType)
+          .map(type => {
+            const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
 
-  </React.Fragment>
-)
+            return (
+              <button key={type}
+                      className="btn btn-s btn-of-light-s btn-add-node-def"
+                      onClick={() => addNodeDef(type, nodeDefProps)}>
+                {getNodeDefIconByType(type)}{type}
+              </button>
+            )
+          })
+      }
+
+    </React.Fragment>
+  )
+}
 
 class FormActions extends React.Component {
 
@@ -88,7 +94,7 @@ class FormActions extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  nodeDef: SurveyFormState.getNodeDefAddChildTo(state)
+  nodeDef: SurveyFormState.getNodeDefAddChildTo(state),
 })
 
 export default connect(
