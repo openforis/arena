@@ -147,9 +147,9 @@ class RecordsImportJob extends Job {
 
       if (NodeDef.isAttribute(nodeDef)) {
         const value = await CollectAttributeValueExtractor.extractAttributeValue(
-          survey, nodeDef, record, nodeToInsert,
+          survey, nodeDef, record, nodeToInsert, surveyIndex,
           collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode,
-          this.tx, surveyIndex
+          this.tx
         )
         nodeToInsert = Node.assocValue(value)(nodeToInsert)
       }

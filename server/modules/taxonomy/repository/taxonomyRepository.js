@@ -194,6 +194,29 @@ const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
     record => dbTransformCallback(record, draft, true)
   )
 
+// ============== Index
+const fetchIndex = async (surveyId, client = db) =>
+  await client.any(`
+    SELECT
+      t.taxonomy_uuid,
+      t.uuid             AS taxon_uuid,
+      t.props ->> 'code' AS code,
+      v.name             AS vernacular_names
+    FROM
+      ${getSurveyDBSchema(surveyId)}.taxon t
+    LEFT OUTER JOIN
+      (
+        SELECT
+          v.taxon_uuid,
+          json_agg( json_build_object(v.props ->> 'name', v.uuid::text) ) AS name
+        FROM
+          ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name v
+        GROUP BY
+          v.taxon_uuid ) v
+    ON
+      v.taxon_uuid = t.uuid
+  `)
+
 // ============== UPDATE
 
 const updateTaxonomyProp = async (surveyId, taxonomyUuid, key, value, client = db) =>
@@ -266,6 +289,8 @@ module.exports = {
   fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid,
   fetchAllTaxa,
+
+  fetchIndex,
 
   //UPDATE
   updateTaxonomyProp,

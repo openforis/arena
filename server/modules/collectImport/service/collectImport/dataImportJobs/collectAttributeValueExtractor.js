@@ -1,173 +1,151 @@
 const R = require('ramda')
-const { uuidv4 } = require('../../../../../../common/uuid')
 
+const { uuidv4 } = require('../../../../../../common/uuid')
 const DateUtils = require('../../../../../../common/dateUtils')
 
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const { nodeDefType } = NodeDef
-const Category = require('../../../../../../common/survey/category')
 const Taxon = require('../../../../../../common/survey/taxon')
+
 const Record = require('../../../../../../common/record/record')
 const Node = require('../../../../../../common/record/node')
 const RecordFile = require('../../../../../../common/record/recordFile')
 
-const CategoryManager = require('../../../../category/manager/categoryManager')
-const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 const FileManager = require('../../../../record/manager/fileManager')
-
-const CollectIdmlParseUtils = require('../metaImportJobs/collectIdmlParseUtils')
+const SurveyIndex = require('../../../../survey/index/surveyIndex')
 const CollectRecordParseUtils = require('./collectRecordParseUtils')
 
-const SurveyIndex = require('../../../../survey/index/surveyIndex')
+const extractTextValue = CollectRecordParseUtils.getTextValue('value')
 
-const getCollectNodeDefByPath = (collectSurvey, collectNodeDefPath) => {
-  const collectAncestorNodeNames = R.pipe(
-    R.split('/'),
-    R.reject(R.isEmpty)
-  )(collectNodeDefPath)
+const extractCodeValue = (survey, nodeDef, surveyIndex, record, node) => collectNode => {
+  const code = CollectRecordParseUtils.getTextValue('code')(collectNode)
 
-  let currentCollectNode = CollectIdmlParseUtils.getElementByName('schema')(collectSurvey)
+  if (code) {
+    const parentNode = Record.getParentNode(node)(record)
+    const itemUuid = SurveyIndex.getCategoryItemUuid(survey, nodeDef, record, parentNode, code)(surveyIndex)
 
-  for (const collectAncestorNodeName of collectAncestorNodeNames) {
-    const collectChildNodeDef = R.pipe(
-      R.propOr([], 'elements'),
-      R.find(R.pathEq(['attributes', 'name'], collectAncestorNodeName))
-    )(currentCollectNode)
-
-    if (collectChildNodeDef)
-      currentCollectNode = collectChildNodeDef
-    else {
-      console.log(`child node def ${collectAncestorNodeName} not found in node def ${currentCollectNode}`)
-      return null //node def not found
-    }
+    return itemUuid
+      ? { [Node.valuePropKeys.itemUuid]: itemUuid }
+      : null
+  } else {
+    return null
   }
+}
 
-  return currentCollectNode
+const extractCoordinateValue = collectNode => {
+  const { x, y, srs } = CollectRecordParseUtils.getTextValues(collectNode)
+
+  if (x && y && srs) {
+    const srsId = R.ifElse(
+      R.isEmpty,
+      R.identity,
+      R.pipe(
+        R.split(':'),
+        R.last
+      )
+    )(srs)
+
+    return {
+      [Node.valuePropKeys.x]: x,
+      [Node.valuePropKeys.y]: y,
+      [Node.valuePropKeys.srs]: srsId
+    }
+  } else {
+    return null
+  }
+}
+
+const extractDateValue = collectNode => {
+  const { day, month, year } = CollectRecordParseUtils.getTextValues(collectNode)
+  return DateUtils.formatDate(day, month, year)
+}
+
+const extractFileValue = (survey, node, collectSurvey, collectSurveyFileZip, collectNodeDefPath, tx) => async collectNode => {
+  const { file_name, file_size } = CollectRecordParseUtils.getTextValues(collectNode)
+
+  const collectNodeDef = CollectRecordParseUtils.getCollectNodeDefByPath(collectSurvey, collectNodeDefPath)
+
+  const collectNodeDefId = collectNodeDef.attributes.id
+  const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${file_name}`)
+
+  if (content) {
+    const fileUuid = uuidv4()
+    const file = RecordFile.createFile(fileUuid, file_name, file_size, content, Node.getRecordUuid(node), Node.getUuid(node))
+    await FileManager.insertFile(Survey.getId(survey), file, tx)
+
+    return {
+      [Node.valuePropKeys.fileUuid]: fileUuid,
+      [Node.valuePropKeys.fileName]: file_name,
+      [Node.valuePropKeys.fileSize]: file_size
+    }
+  } else {
+    return null
+  }
+}
+
+const extractTaxonValue = (nodeDef, surveyIndex) => collectNode => {
+  const { code, scientific_name, vernacular_name } = CollectRecordParseUtils.getTextValues(collectNode)
+  const taxonUuid = SurveyIndex.getTaxonUuid(nodeDef, code)(surveyIndex)
+
+  if (taxonUuid) {
+    const taxonValue = { [Node.valuePropKeys.taxonUuid]: taxonUuid }
+
+    if (code === Taxon.unlistedCode) {
+      taxonValue[Node.valuePropKeys.scientificName] = scientific_name
+    }
+
+    if (vernacular_name) {
+      const vernacularNameUuid = SurveyIndex.getTaxonVernacularNameUuid(nodeDef, code, vernacular_name)(surveyIndex)
+      if (vernacularNameUuid) {
+        taxonValue[Node.valuePropKeys.vernacularNameUuid] = vernacularNameUuid
+      } else {
+        taxonValue[Node.valuePropKeys.vernacularName] = vernacular_name
+      }
+    }
+
+    return taxonValue
+  } else {
+    return null
+  }
+}
+
+const extractTimeValue = collectNode => {
+  const { hour, minute } = CollectRecordParseUtils.getTextValues(collectNode)
+  return DateUtils.formatTime(hour, minute)
 }
 
 const extractAttributeValue = async (
-  survey, nodeDef, record, node, // arena items
+  survey, nodeDef, record, node, surveyIndex, // arena items
   collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode, // collect items
-  tx, surveyIndex
+  tx,
 ) => {
-  const surveyId = Survey.getId(survey)
 
   switch (NodeDef.getType(nodeDef)) {
     case nodeDefType.boolean:
     case nodeDefType.decimal:
     case nodeDefType.integer:
     case nodeDefType.text:
-      return CollectRecordParseUtils.getTextValue('value')(collectNode)
-    case nodeDefType.code: {
-      const code = CollectRecordParseUtils.getTextValue('code')(collectNode)
+      return extractTextValue(collectNode)
 
-      if (code) {
-        const itemUuid = SurveyIndex.getCategoryItemUuid(survey, nodeDef, record, node, code)(surveyIndex)
+    case nodeDefType.code:
+      return extractCodeValue(survey, nodeDef, surveyIndex, record, node)(collectNode)
 
-        return itemUuid
-          ? { [Node.valuePropKeys.itemUuid]: itemUuid }
-          : null
-      } else {
-        return null
-      }
-    }
-    case nodeDefType.coordinate: {
-      const { x, y, srs } = CollectRecordParseUtils.getTextValues(collectNode)
+    case nodeDefType.coordinate:
+      return extractCoordinateValue(collectNode)
 
-      if (x && y && srs) {
-        const srsId = R.ifElse(
-          R.isEmpty,
-          R.identity,
-          R.pipe(
-            R.split(':'),
-            R.last
-          )
-        )(srs)
+    case nodeDefType.date:
+      return extractDateValue(collectNode)
 
-        return {
-          [Node.valuePropKeys.x]: x,
-          [Node.valuePropKeys.y]: y,
-          [Node.valuePropKeys.srs]: srsId
-        }
-      } else {
-        return null
-      }
-    }
-    case nodeDefType.date: {
-      const { day, month, year } = CollectRecordParseUtils.getTextValues(collectNode)
+    case nodeDefType.file:
+      return await extractFileValue(survey, node, collectSurvey, collectSurveyFileZip, collectNodeDefPath, tx)(collectNode)
 
-      return DateUtils.formatDate(day, month, year)
-    }
-    case nodeDefType.file: {
-      const { file_name, file_size } = CollectRecordParseUtils.getTextValues(collectNode)
+    case nodeDefType.taxon:
+      return extractTaxonValue(nodeDef, surveyIndex)(collectNode)
 
-      const collectNodeDef = getCollectNodeDefByPath(collectSurvey, collectNodeDefPath)
+    case nodeDefType.time:
+      return extractTimeValue(collectNode)
 
-      const collectNodeDefId = collectNodeDef.attributes.id
-      const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${file_name}`)
-
-      if (content) {
-        const fileUuid = uuidv4()
-        const file = RecordFile.createFile(fileUuid, file_name, file_size, content, Node.getRecordUuid(node), Node.getUuid(node))
-        await FileManager.insertFile(surveyId, file, tx)
-
-        return {
-          [Node.valuePropKeys.fileUuid]: fileUuid,
-          [Node.valuePropKeys.fileName]: file_name,
-          [Node.valuePropKeys.fileSize]: file_size
-        }
-      } else {
-        return null
-      }
-    }
-    case nodeDefType.taxon: {
-      //indexTaxaUuids = {
-      // $taxonomyUuid:{
-      //  $code:{taxonUuid:$taxonUuid, vernacularNames:{vernacularName:$vernacularNameUuid,....}}
-      // }
-      // }
-      // const { code, scientific_name, vernacularName } = CollectRecordParseUtils.getTextValues(collectNode)
-      //
-      // const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-      //
-      // const unlistedTaxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unlistedCode, false, tx)
-      //
-      // if (vernacularName) {
-      //
-      //   const taxa = await TaxonomyManager.fetchTaxaByVernacularName(surveyId, taxonomyUuid, vernacularName, false, false, tx)
-      //   const taxon = R.head(taxa)
-      //
-      //   return taxon
-      //     ? {
-      //       [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(taxon),
-      //       [Node.valuePropKeys.vernacularNameUuid]: Taxon.getVernacularNameUuid(taxon),
-      //     }
-      //     : {
-      //       [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(unlistedTaxon),
-      //       [Node.valuePropKeys.vernacularName]: vernacularName
-      //     }
-      // } else if (code) {
-      //   const taxon = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, code, false, tx)
-      //   return taxon
-      //     ? {
-      //       [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(taxon)
-      //     }
-      //     : {
-      //       [Node.valuePropKeys.taxonUuid]: Taxon.getUuid(unlistedTaxon),
-      //       [Node.valuePropKeys.scientificName]: scientific_name
-      //     }
-      //
-      // } else {
-      //   return null
-      // }
-      return null
-    }
-    case nodeDefType.time: {
-      const { hour, minute } = CollectRecordParseUtils.getTextValues(collectNode)
-
-      return DateUtils.formatTime(hour, minute)
-    }
   }
 }
 

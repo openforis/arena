@@ -145,7 +145,7 @@ const fetchIndex = async (surveyId, client = db) =>
     SELECT 
       l.category_uuid,
       i.parent_uuid,
-      i.props -> 'code' AS code,
+      i.props ->> 'code' AS code,
       i.uuid            AS item_uuid
     FROM
        ${getSurveyDBSchema(surveyId)}.category_item i
