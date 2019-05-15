@@ -19,6 +19,8 @@ const FileManager = require('../../../../record/manager/fileManager')
 const CollectIdmlParseUtils = require('../metaImportJobs/collectIdmlParseUtils')
 const CollectRecordParseUtils = require('./collectRecordParseUtils')
 
+const SurveyIndex = require('../../../../survey/index/surveyIndex')
+
 const getCollectNodeDefByPath = (collectSurvey, collectNodeDefPath) => {
   const collectAncestorNodeNames = R.pipe(
     R.split('/'),
@@ -47,7 +49,7 @@ const getCollectNodeDefByPath = (collectSurvey, collectNodeDefPath) => {
 const extractAttributeValue = async (
   survey, nodeDef, record, node, // arena items
   collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode, // collect items
-  tx, indexCategoryItemUuids
+  tx, surveyIndex
 ) => {
   const surveyId = Survey.getId(survey)
 
@@ -61,23 +63,7 @@ const extractAttributeValue = async (
       const code = CollectRecordParseUtils.getTextValue('code')(collectNode)
 
       if (code) {
-        const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-        const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-        const codeUuidParentItem = levelIndex > 0 ?
-          R.pipe(
-            Record.getParentCodeAttribute(
-              survey,
-              Record.getParentNode(node)(record),
-              nodeDef
-            ),
-            Node.getCategoryItemUuid
-          )(record)
-          : 'null'
-
-        const itemUuid = R.path(
-          [categoryUuid, codeUuidParentItem, code],
-          indexCategoryItemUuids
-        )
+        const itemUuid = SurveyIndex.getCategoryItemUuid(survey, nodeDef, record, node, code)(surveyIndex)
 
         return itemUuid
           ? { [Node.valuePropKeys.itemUuid]: itemUuid }

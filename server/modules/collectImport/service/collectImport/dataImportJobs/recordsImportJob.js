@@ -122,7 +122,7 @@ class RecordsImportJob extends Job {
 
     const {
       nodeDefUuidByCollectPath, collectSurveyFileZip, collectSurvey,
-      _indexCategoryItemUuids
+      surveyIndex
     } = this.context
 
     // init record nodes
@@ -149,7 +149,7 @@ class RecordsImportJob extends Job {
         const value = await CollectAttributeValueExtractor.extractAttributeValue(
           survey, nodeDef, record, nodeToInsert,
           collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode,
-          this.tx, _indexCategoryItemUuids
+          this.tx, surveyIndex
         )
         nodeToInsert = Node.assocValue(value)(nodeToInsert)
       }
