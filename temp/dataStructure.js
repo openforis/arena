@@ -26,7 +26,7 @@ const nodeDef = {
     ///layout
     pageUuid: null, // uuid - if this entity renders in its own page
     render: 'form', //|| table
-    layout: [],// rect-grid-layout layout value
+    layout: [],// rect-grid-layout layout value (form layout) or sorted children uuids (table layout)
 
     // not entity:
     defaultValues: [], //expression
