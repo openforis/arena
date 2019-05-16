@@ -66,27 +66,29 @@ const props = {
 
   [nodeDefType.code]: {
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
-      const itemUuid = Node.getCategoryItemUuid(nodeCol)
-      const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid, false, client) : {}
-
-      return (node, colName) => R.endsWith('code', colName)
-        ? getValueFromItem(nodeDefCol, colName, item, true)
-        //'label'
-        : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+      return (node,colName) => null
+      // const itemUuid = Node.getCategoryItemUuid(nodeCol)
+      // const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid, false, client) : {}
+      //
+      // return (node, colName) => R.endsWith('code', colName)
+      //   ? getValueFromItem(nodeDefCol, colName, item, true)
+      //   //'label'
+      //   : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
     },
   },
 
   [nodeDefType.taxon]: {
     [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
-      const taxonUuid = Node.getTaxonUuid(nodeCol)
-      const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : {}
-      return (node, colName) =>
-        R.endsWith('code', colName)
-          ? Taxon.getCode(taxon)
-          // scientific_name
-          : Taxon.isUnlistedTaxon(taxon)
-          ? Node.getScientificName(node) //from node value
-          : Taxon.getScientificName(taxon) //from taxon item
+      return (node,colName) => null
+      // const taxonUuid = Node.getTaxonUuid(nodeCol)
+      // const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : {}
+      // return (node, colName) =>
+      //   R.endsWith('code', colName)
+      //     ? Taxon.getCode(taxon)
+      //     // scientific_name
+      //     : Taxon.isUnlistedTaxon(taxon)
+      //     ? Node.getScientificName(node) //from node value
+      //     : Taxon.getScientificName(taxon) //from taxon item
     },
   },
 

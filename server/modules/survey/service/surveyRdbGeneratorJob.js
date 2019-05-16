@@ -3,7 +3,6 @@ const Job = require('../../../job/job')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const SurveyManager = require('../manager/surveyManager')
-const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
 const RecordManager = require('../../record/manager/recordManager')
 
 const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
@@ -24,17 +23,21 @@ class SurveyRdbGeneratorJob extends Job {
 
     this.total = 1 + length + (recordUuids.length * length)
 
+    this.logDebug('drop and create schema - start')
     //1 ==== drop and create schema
     await SurveyRdbManager.dropSchema(surveyId, tx)
     await SurveyRdbManager.createSchema(surveyId, tx)
     this.incrementProcessedItems()
+    this.logDebug('drop and create schema - end')
 
+    this.logDebug('create data tables - start')
     //2 ==== create data tables
     const createTable = async nodeDef => {
       await SurveyRdbManager.createTable(survey, nodeDef, tx)
       this.incrementProcessedItems()
     }
     await Survey.traverseHierarchyItem(root, createTable)
+    this.logDebug('create data tables - end')
 
     //3 ==== insert records
     const insertIntoTable = record =>
@@ -44,20 +47,20 @@ class SurveyRdbGeneratorJob extends Job {
       }
 
     for (const recordUuid of recordUuids) {
-      if(this.isCanceled())
+      if (this.isCanceled())
         return
+
+      this.logDebug(`insert record ${recordUuid} - start`)
       const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, tx)
       await Survey.traverseHierarchyItem(root, insertIntoTable(record))
+      this.logDebug(`insert record ${recordUuid} - end`)
     }
   }
 
   async getSurvey (tx) {
     const surveyId = this.getSurveyId()
 
-    const survey = await SurveyManager.fetchSurveyById(surveyId, false, false, tx)
-    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, false, false, false, tx)
-
-    return { ...survey, nodeDefs }
+    return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, false, false, false, tx)
   }
 
 }

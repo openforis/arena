@@ -11,10 +11,11 @@ const DataTable = require('../schemaRdb/dataTable')
 
 const getNodesRowValues = async (survey, nodeDef, record, client) => {
   const nodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record)
+  const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDef)
 
   return await Promise.all(
     nodes.map(
-      node => DataTable.getRowValues(survey, nodeDef, record, node, client)
+      node => DataTable.getRowValues(survey, nodeDef, record, node, nodeDefColumns, client)
     )
   )
 }
