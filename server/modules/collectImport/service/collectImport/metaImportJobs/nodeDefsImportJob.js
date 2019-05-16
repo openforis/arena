@@ -102,6 +102,10 @@ class NodeDefsImportJob extends Job {
     // 1. determine basic props
     const { name: collectNodeDefName, multiple, key, calculated } = CollectIdmlParseUtils.getAttributes(collectNodeDef)
 
+    const collectNodeDefPath = parentPath + '/' + collectNodeDefName
+
+    const tableLayout = CollectIdmlParseUtils.getAttribute('n1:layout')(collectNodeDef) === 'table'
+
     const props = {
       [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName),
       [NodeDef.propKeys.multiple]: multiple === 'true',
@@ -110,14 +114,14 @@ class NodeDefsImportJob extends Job {
       ...type === NodeDef.nodeDefType.entity
         ? {
           [NodeDefLayout.nodeDefLayoutProps.render]:
-            collectNodeDef.attributes['n1:layout'] === 'table'
+            tableLayout
               ? NodeDefLayout.nodeDefRenderType.table
               : NodeDefLayout.nodeDefRenderType.form
         }
         : {
           [NodeDef.propKeys.readOnly]: calculated === 'true'
-        }
-      ,
+        },
+      [NodeDefLayout.nodeDefLayoutProps.layout]: tableLayout ? [] : null,
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
     }
 
@@ -128,40 +132,49 @@ class NodeDefsImportJob extends Job {
 
     // 3. insert node def into db
     const nodeDefParam = NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, props)
-    const nodeDef = await NodeDefManager.insertNodeDef(this.getUser(), surveyId, nodeDefParam, tx)
+    let nodeDef = await NodeDefManager.insertNodeDef(this.getUser(), surveyId, nodeDefParam, tx)
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-    // 4. update node def with other props
+    // 4. insert children and updated layout props
+    const propsUpdated = {}
+
+    if (type === nodeDefType.entity) {
+      // 4a. insert child definitions
+
+      const childrenUuids = []
+
+      for (const collectChild of collectNodeDef.elements) {
+        if (this.isCanceled())
+          break
+
+        const childType = CollectIdmlParseUtils.getNodeDefTypeByCollectNodeDef(collectChild)
+
+        if (childType) {
+          const childDef = await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChild, childType, tx)
+          if (tableLayout) {
+            childrenUuids.push(NodeDef.getUuid(childDef))
+          }
+        }
+      }
+      if (tableLayout) {
+        // update layout prop
+        propsUpdated[NodeDefLayout.nodeDefLayoutProps.layout] = childrenUuids
+      }
+    } else if (type === nodeDefType.code) {
+      // 4b. add specify text attribute def
+      await this.addSpecifyTextAttribute(surveyId, parentNodeDef, nodeDef, tx)
+    }
+
+    // 5. update node def with other props
     const propsAdvanced = await this.extractNodeDefAdvancedProps(parentNodeDef, nodeDefUuid, type, collectNodeDef, tx)
 
-    await NodeDefManager.updateNodeDefProps(this.getUser(), surveyId, nodeDefUuid, {}, propsAdvanced, tx)
+    nodeDef = await NodeDefManager.updateNodeDefProps(this.getUser(), surveyId, nodeDefUuid, propsUpdated, propsAdvanced, tx)
 
-    // 5. store nodeDef in cache
-    const collectNodeDefPath = parentPath + '/' + collectNodeDefName
+    // 6. store nodeDef in cache
     this.nodeDefUuidByCollectPath[collectNodeDefPath] = nodeDefUuid
     this.nodeDefs[nodeDefUuid] = nodeDef
 
-    switch (type) {
-      case nodeDefType.entity:
-        // insert child definitions
-
-        for (const collectChild of collectNodeDef.elements) {
-          if (this.isCanceled())
-            break
-
-          const collectChildType = collectChild.name
-
-          const childType = CollectIdmlParseUtils.nodeDefTypesByCollectType[collectChildType]
-
-          if (childType) {
-            await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChild, childType, tx)
-          }
-        }
-        break
-      case nodeDefType.code:
-        await this.addSpecifyTextAttribute(surveyId, parentNodeDef, nodeDef, tx)
-        break
-    }
+    return nodeDef
   }
 
   async extractNodeDefAdvancedProps (parentNodeDef, nodeDefUuid, type, collectNodeDef, tx) {
@@ -341,12 +354,17 @@ class NodeDefsImportJob extends Job {
 }
 
 const determineNodeDefPageUuid = (type, collectNodeDef) => {
-  const multiple = collectNodeDef.attributes.multiple === 'true'
-
-  const hasTab = R.has('n1:tab', collectNodeDef.attributes)
-
   if (type === NodeDef.nodeDefType.entity) {
-    if (multiple) {
+    if (collectNodeDef.attributes.multiple === 'true') {
+      // check if a tab is specified in ui:tab or n1:tab xml attributes
+      const hasTab = R.pipe(
+        CollectIdmlParseUtils.getAttributes,
+        R.keys,
+        R.intersection(['ui:tab', 'n1:tab']), //newer versions of Collect use an alias for the ui namespace
+        R.isEmpty,
+        R.not
+      )(collectNodeDef)
+
       if (hasTab) {
         // multiple entity own tab => own page
         return uuidv4()

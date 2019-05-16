@@ -1,8 +1,10 @@
 import './nodeDefEdit.scss'
 
-import React from 'react'
+import React, { useState, useContext } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+
+import AppContext from '../../../app/appContext'
 
 import TabBar from '../../../commonComponents/tabBar'
 import BasicProps from './basic/basicProps'
@@ -23,60 +25,48 @@ import * as NodeDefEditState from './nodeDefEditState'
 import { putNodeDefProp } from './../../../survey/nodeDefs/actions'
 import { closeNodeDefEdit } from './actions'
 
-class NodeDefEdit extends React.Component {
+const NodeDefEdit = props => {
+  const {
+    nodeDef, nodeDefParent,
+    nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
+    displayAsEnabled, displayInEnabled,
+    putNodeDefProp,
+    canUpdateCategory,
+    closeNodeDefEdit,
+  } = props
 
-  constructor (props) {
-    super(props)
+  const { i18n } = useContext(AppContext)
 
-    this.state = {
-      editingCategory: false,
-      editingTaxonomy: false
-    }
-  }
+  const [ editingCategory, setEditingCategory ] = useState(false)
+  const [ editingTaxonomy, setEditingTaxonomy ] = useState(false)
 
-  close () {
-    this.props.closeNodeDefEdit()
-  }
+  const close = () => closeNodeDefEdit()
 
-  render () {
-    const {
-      nodeDef, nodeDefParent,
-      nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
-      displayAsEnabled, displayInEnabled,
-      putNodeDefProp,
-      canUpdateCategory
-    } = this.props
-
-    const {
-      editingCategory,
-      editingTaxonomy,
-    } = this.state
-
-    return nodeDef
-      ? (
-        <div className="node-def-edit">
-          {
-            editingCategory ?
-              (
-                <CategoriesView
-                  canSelect={canUpdateCategory}
-                  onSelect={category => putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
-                  selectedItemUuid={NodeDef.getCategoryUuid(nodeDef)}
-                  onClose={() => this.setState({ editingCategory: false })}/>
-              )
-              : editingTaxonomy ?
-              (
+  return nodeDef
+    ? (
+      <div className="node-def-edit">
+        {
+          editingCategory
+            ? (
+              <CategoriesView
+                canSelect={canUpdateCategory}
+                onSelect={category => putNodeDefProp(nodeDef, NodeDef.propKeys.categoryUuid, Category.getUuid(category))}
+                selectedItemUuid={NodeDef.getCategoryUuid(nodeDef)}
+                onClose={() => setEditingCategory(false)}/>
+            )
+            : editingTaxonomy
+              ? (
                 <TaxonomiesView
                   canSelect={true}
                   onSelect={taxonomy => putNodeDefProp(nodeDef, NodeDef.propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))}
                   selectedItemUuid={NodeDef.getTaxonomyUuid(nodeDef)}
-                  onClose={() => this.setState({ editingTaxonomy: false })}/>
+                  onClose={() => setEditingTaxonomy(false)}/>
               )
               : (
                 <div className="node-def-edit__container">
                   <TabBar tabs={[
                     {
-                      label: 'Basic',
+                      label: i18n.t('nodeDefEdit.basic'),
                       component: BasicProps,
                       props: {
                         nodeDef,
@@ -85,39 +75,38 @@ class NodeDefEdit extends React.Component {
                         displayAsEnabled,
                         displayInEnabled,
                         putNodeDefProp,
-                        toggleCategoryEdit: (editing) => this.setState({ editingCategory: editing }),
-                        toggleTaxonomyEdit: (editing) => this.setState({ editingTaxonomy: editing })
+                        toggleCategoryEdit: editing => setEditingCategory(editing),
+                        toggleTaxonomyEdit: editing => setEditingTaxonomy(editing),
                       },
                     },
                     ...NodeDef.isRoot(nodeDef)
                       ? []
                       : [
                         {
-                          label: 'Advanced',
+                          label: i18n.t('nodeDefEdit.advanced'),
                           component: AdvancedProps,
                           props: { nodeDef, nodeDefParent, putNodeDefProp },
                         },
                         {
-                          label: 'Validations',
+                          label: i18n.t('nodeDefEdit.validations'),
                           component: ValidationsProps,
                           props: { nodeDef, nodeDefParent, putNodeDefProp },
-                        }
-                      ]
+                        },
+                      ],
                   ]}
                   />
 
                   <button className="btn btn-of-light btn-close"
-                          onClick={() => this.close()}>Done
+                          onClick={() => close()}>{i18n.t('common.done')}
                   </button>
 
                 </div>
               )
-          }
-        </div>
-      )
-      : null
+        }
+      </div>
+    )
+    : null
 
-  }
 }
 
 NodeDefEdit.defaultProps = {

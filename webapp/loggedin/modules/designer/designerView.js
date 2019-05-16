@@ -1,7 +1,9 @@
 import './designerView.scss'
 
-import React from 'react'
+import React, { useEffect, useContext } from 'react'
 import { connect } from 'react-redux'
+
+import AppContext from '../../../app/appContext'
 
 import AuthManager from '../../../../common/auth/authManager'
 
@@ -21,63 +23,59 @@ import * as SurveyState from '../../../survey/surveyState'
 
 import { resetForm } from '../../surveyViews/surveyForm/actions'
 
-class DesignerView extends React.Component {
+const DesignerView = ({ canEditDef, resetForm }) => {
 
-  componentDidMount () {
-    this.props.resetForm()
-  }
+  const { i18n } = useContext(AppContext)
 
-  render () {
-    const { canEditDef } = this.props
+  useEffect(() => { resetForm() }, [])
 
-    return (
-      <SurveyDefsLoader
-        draft={canEditDef}
-        validate={canEditDef}>
+  return (
+    <SurveyDefsLoader
+      draft={canEditDef}
+      validate={canEditDef}>
 
-        <NavigationTabBar
-          className="designer app-module__tab-navigation"
-          moduleRoot={appModules.designer}
-          moduleDefault={designerModules.formDesigner}
-          tabs={[
-            {
-              label: 'Form Designer',
-              component: SurveyFormView,
-              path: appModuleUri(designerModules.formDesigner),
-              props: { edit: true, draft: true, canEditDef },
-            },
+      <NavigationTabBar
+        className="designer app-module__tab-navigation"
+        moduleRoot={appModules.designer}
+        moduleDefault={designerModules.formDesigner}
+        tabs={[
+          {
+            label: i18n.t('survey.formDesigner'),
+            component: SurveyFormView,
+            path: appModuleUri(designerModules.formDesigner),
+            props: { edit: true, draft: true, canEditDef },
+          },
 
-            {
-              label: 'Hierarchy',
-              component: SurveyHierarchy,
-              path: appModuleUri(designerModules.surveyHierarchy)
-            },
+          {
+            label: i18n.t('designerView.hierarchy'),
+            component: SurveyHierarchy,
+            path: appModuleUri(designerModules.surveyHierarchy),
+          },
 
-            {
-              label: 'Form preview',
-              component: RecordView,
-              path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
-              props: { edit: true, draft: true, canEditDef, preview: true },
-              showTab: false,
-            },
+          {
+            label: i18n.t('designerView.formPreview'),
+            component: RecordView,
+            path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
+            props: { edit: true, draft: true, canEditDef, preview: true },
+            showTab: false,
+          },
 
-            {
-              label: 'Categories',
-              component: CategoriesView,
-              path: appModuleUri(designerModules.categories)
-            },
+          {
+            label: i18n.t('survey.categories'),
+            component: CategoriesView,
+            path: appModuleUri(designerModules.categories),
+          },
 
-            {
-              label: 'Taxonomies',
-              component: TaxonomiesView,
-              path: appModuleUri(designerModules.taxonomies)
-            },
+          {
+            label: i18n.t('survey.taxonomies'),
+            component: TaxonomiesView,
+            path: appModuleUri(designerModules.taxonomies),
+          },
 
-          ]}
-        />
-      </SurveyDefsLoader>
-    )
-  }
+        ]}
+      />
+    </SurveyDefsLoader>
+  )
 }
 
 const mapStateToProps = state => {
