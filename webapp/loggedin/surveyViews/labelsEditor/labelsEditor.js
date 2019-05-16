@@ -47,7 +47,7 @@ const LabelsEditor = props => {
   const {
     labels,
     showFormLabel,
-    formLabelI18nKey,
+    formLabelKey,
     languages,
     onChange,
     maxPreview,
@@ -70,7 +70,7 @@ const LabelsEditor = props => {
         {
           showFormLabel &&
           <label className="form-label">
-            {i18n.t(formLabelI18nKey, { count: languages.length })}
+            {i18n.t(formLabelKey, { count: languages.length })}
           </label>
         }
         {
@@ -107,7 +107,7 @@ LabelsEditor.defaultProps = {
   languages: [],
   labels: [],
   showFormLabel: true,
-  formLabelI18nKey: 'labelsEditor.label',
+  formLabelKey: 'labelsEditor.label',
   maxPreview: 2,
   canTogglePreview: true,
   readOnly: false,

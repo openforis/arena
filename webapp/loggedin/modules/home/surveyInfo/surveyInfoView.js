@@ -70,7 +70,7 @@ const SurveyInfoView = (props) => {
         />
 
         <LabelsEditor
-          formLabelI18nKey="common.description"
+          formLabelKey="common.description"
           labels={Survey.getDescriptions(surveyInfo)}
           onChange={item => onPropLabelsChange(item, 'descriptions', Survey.getDescriptions(surveyInfo))}
           readOnly={readOnly}
