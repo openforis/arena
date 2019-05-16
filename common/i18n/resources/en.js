@@ -54,6 +54,34 @@ module.exports = {
     basic: 'Basic',
     advanced: 'Advanced',
     validations: 'Validations',
+    basicProps: {
+      type: 'type',
+      name: 'name',
+      key: 'key',
+      multiple: 'multiple',
+      displayAs: 'display as',
+      displayIn: 'display in',
+      form: 'Form',
+      table: 'Table',
+      parentPage: 'Parent page',
+      ownPage: 'Its own page',
+    },
+    advancedProps: {
+      readOnly: 'readOnly',
+      defaultValues: 'Default values',
+      applicableIf: 'Applicable if',
+    },
+    expressionsProp: {
+      expression: 'Expression',
+      applyIf: 'Apply If',
+      confirmDelete: 'Delete this expression?',
+    },
+    validationsProps: {
+      minCount: 'Min count',
+      maxCount: 'Max count',
+      required: 'Required',
+      expressions: 'Expressions',
+    },
   },
 
   designerView: {
