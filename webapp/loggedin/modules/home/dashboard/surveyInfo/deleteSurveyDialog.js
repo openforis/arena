@@ -1,6 +1,6 @@
 import './deleteSurveyDialog.scss'
 
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import Markdown from 'react-remarkable'
 
 import AppContext from '../../../../../app/appContext'
@@ -14,10 +14,8 @@ import {
 
 const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   const { i18n } = useContext(AppContext)
-
   const [ confirmName, setConfirmName ] = useState('')
-
-  const confirmNameRef = React.createRef()
+  const confirmNameRef = useRef(null)
 
   useEffect(() => {
     setConfirmName('')

@@ -23,10 +23,13 @@ const typeValidatorFns = {
   [nodeDefType.code]: (survey, nodeDef, node, value) =>
     validateCode(survey, nodeDef, node),
 
-  [nodeDefType.coordinate]: (survey, nodeDef, node, value) =>
-    NumberUtils.isFloat(Node.getCoordinateX(node)) &&
-    NumberUtils.isFloat(Node.getCoordinateY(node)) &&
-    R.includes(Node.getCoordinateSrs(node), Survey.getSRS(survey)),
+  [nodeDefType.coordinate]: (survey, nodeDef, node, value) => {
+    const srsCodes = R.map(R.prop('code'), Survey.getSRS(Survey.getSurveyInfo(survey)))
+
+    return NumberUtils.isFloat(Node.getCoordinateX(node)) &&
+           NumberUtils.isFloat(Node.getCoordinateY(node)) &&
+           R.includes(Node.getCoordinateSrs(node), srsCodes)
+  },
 
   [nodeDefType.date]: (survey, nodeDef, node, value) => {
     const [year, month, day] = [Node.getDateYear(node), Node.getDateMonth(node), Node.getDateDay(node)]
