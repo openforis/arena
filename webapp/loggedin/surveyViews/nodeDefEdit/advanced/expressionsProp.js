@@ -1,7 +1,9 @@
 import './expressionsProp.scss'
 
-import React from 'react'
+import React, { useContext } from 'react'
 import * as R from 'ramda'
+
+import AppContext from '../../../../app/appContext'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
@@ -25,6 +27,8 @@ const ExpressionProp = (props) => {
 
   const errorMessages = getValidationFieldMessages(Validator.getFieldValidations(validation))
 
+  const { i18n } = useContext(AppContext)
+
   return (
     <Tooltip messages={errorMessages} position="bottom" type={!R.isEmpty(errorMessages) ? 'error' : ''}>
       <div className={`node-def-edit__expression${expression.placeholder ? ' placeholder' : ''}`}>
@@ -39,7 +43,7 @@ const ExpressionProp = (props) => {
         }
 
         <div className="expression-item">
-          <div className="label">Expression</div>
+          <div className="label">{i18n.t('nodeDefEdit.expressionsProp.expression')}</div>
 
           <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
                             nodeDefUuidCurrent={nodeDefUuidCurrent}
@@ -55,7 +59,7 @@ const ExpressionProp = (props) => {
         {
           applyIf &&
           <div className="expression-item">
-            <div className="label">Apply If</div>
+            <div className="label">{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
 
             <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
                               nodeDefUuidCurrent={nodeDefUuidCurrent}
@@ -106,7 +110,7 @@ export class ExpressionsProp extends React.Component {
       uiValues.push(placeholder)
     }
     return {
-      uiValues
+      uiValues,
     }
   }
 
@@ -120,7 +124,9 @@ export class ExpressionsProp extends React.Component {
   }
 
   handleDelete (expression) {
-    if (window.confirm('Delete this expression?')) {
+    const { i18n } = this.context
+
+    if (window.confirm(i18n.t('nodeDefEdit.expressionsProp.confirmDelete'))) {
       const index = this.getExpressionIndex(expression)
       const newValues = R.remove(index, 1, this.state.uiValues)
       this.handleValuesUpdate(newValues)
@@ -171,6 +177,8 @@ export class ExpressionsProp extends React.Component {
     )
   }
 }
+
+ExpressionsProp.contextType = AppContext
 
 ExpressionsProp.defaultProps = {
   label: '',

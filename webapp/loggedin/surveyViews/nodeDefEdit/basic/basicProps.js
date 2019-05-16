@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import * as R from 'ramda'
+
+import AppContext from '../../../../app/appContext'
 
 import { uuidv4 } from '../../../../../common/uuid'
 
@@ -16,31 +18,28 @@ import { getFieldValidation, getValidation } from '../../../../../common/validat
 import { normalizeName } from '../../../../../common/stringUtils'
 import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
 
-const displayAsItems = [
+const getDisplayAsItems = i18n => ([
   {
     key: NodeDefLayout.nodeDefRenderType.form,
-    label: 'Form'
+    label: i18n.t('nodeDefEdit.basicProps.form'),
   },
   {
     key: NodeDefLayout.nodeDefRenderType.table,
-    label: 'Table'
-  }
-]
+    label: i18n.t('nodeDefEdit.basicProps.table'),
+  },
+])
 
-const displayInItems = [
+const getDisplayInItems = i18n => [
   {
     key: NodeDefLayout.nodeDefDisplayIn.parentPage,
-    label: 'Parent page'
+    label: i18n.t('nodeDefEdit.basicProps.parentPage'),
   },
   {
     key: NodeDefLayout.nodeDefDisplayIn.ownPage,
-    label: 'Its own page'
-  }
+    label: i18n.t('nodeDefEdit.basicProps.ownPage'),
+  },
 ]
 
-const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValue) => {
-  putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
-}
 
 const BasicProps = props => {
   const {
@@ -52,13 +51,19 @@ const BasicProps = props => {
   } = props
   const validation = getValidation(nodeDef)
 
+  const { i18n } = useContext(AppContext)
+
+  const onPropLabelsChange = (labelItem, key, currentValue) => {
+    putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
+  }
+
   return (
     <div className="form">
-      <FormItem label={'type'}>
+      <FormItem label={i18n.t('nodeDefEdit.basicProps.type')}>
         <label>{nodeDef.type}</label>
       </FormItem>
 
-      <FormItem label={'name'}>
+      <FormItem label={i18n.t('nodeDefEdit.basicProps.name')}>
         <Input
           value={NodeDef.getName(nodeDef)}
           validation={getFieldValidation('name')(validation)}
@@ -67,12 +72,12 @@ const BasicProps = props => {
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'labels', NodeDef.getLabels(nodeDef))}/>
+        onChange={(labelItem) => onPropLabelsChange(labelItem, 'labels', NodeDef.getLabels(nodeDef))}/>
 
       <LabelsEditor
         formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'descriptions', NodeDef.getDescriptions(nodeDef))}/>
+        onChange={(labelItem) => onPropLabelsChange(labelItem, 'descriptions', NodeDef.getDescriptions(nodeDef))}/>
 
       {
         NodeDef.isCode(nodeDef) &&
@@ -92,7 +97,7 @@ const BasicProps = props => {
 
       {
         NodeDef.canNodeDefBeKey(nodeDef) &&
-        <FormItem label={'key'}>
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
             disabled={nodeDefKeyEditDisabled}
@@ -102,7 +107,7 @@ const BasicProps = props => {
 
       {
         NodeDef.canNodeDefBeMultiple(nodeDef) &&
-        <FormItem label={'multiple'}>
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={nodeDefMultipleEditDisabled}
@@ -112,23 +117,23 @@ const BasicProps = props => {
 
       {
         displayAsEnabled &&
-        <FormItem label={'display as'}>
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
             onChange={renderType => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, renderType)}
-            items={displayAsItems}
+            items={getDisplayAsItems(i18n)}
           />
         </FormItem>
       }
 
       {
         displayInEnabled &&
-        <FormItem label={'display in'}>
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.displayIn')}>
           <ButtonGroup
             selectedItemKey={NodeDefLayout.getDisplayIn(nodeDef)}
             onChange={displayIn => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.pageUuid,
               displayIn === NodeDefLayout.nodeDefDisplayIn.parentPage ? null : uuidv4())}
-            items={displayInItems}
+            items={getDisplayInItems(i18n)}
           />
         </FormItem>
       }

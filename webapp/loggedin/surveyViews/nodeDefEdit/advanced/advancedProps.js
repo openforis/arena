@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useContext } from 'react'
+
+import AppContext from '../../../../app/appContext'
 
 import { NodeDefExpressionsProp } from './expressionsProp'
 
@@ -13,13 +15,15 @@ const AdvancedProps = props => {
   const validation = NodeDef.getValidation(nodeDef)
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
+  const { i18n } = useContext(AppContext)
+
   return (
     <div className="form">
       {
         NodeDef.canNodeDefHaveDefaultValue(nodeDef) &&
         <React.Fragment>
 
-          <FormItem label={'readOnly'}>
+          <FormItem label={i18n.t('nodeDefEdit.advancedProps.readOnly')}>
             <Checkbox checked={NodeDef.isReadOnly(nodeDef)}
                       disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
                       validation={Validator.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
@@ -28,7 +32,7 @@ const AdvancedProps = props => {
 
           <NodeDefExpressionsProp nodeDef={nodeDef}
                                   putNodeDefProp={putNodeDefProp}
-                                  label="Default values"
+                                  label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
                                   readOnly={readOnly}
                                   propName="defaultValues"
                                   validation={Validator.getFieldValidation('defaultValues')(validation)}
@@ -40,7 +44,7 @@ const AdvancedProps = props => {
 
       <NodeDefExpressionsProp nodeDef={nodeDef}
                               putNodeDefProp={putNodeDefProp}
-                              label="Applicable if"
+                              label={i18n.t('nodeDefEdit.advancedProps.applicableIf')}
                               readOnly={readOnly}
                               propName="applicable"
                               applyIf={false}
