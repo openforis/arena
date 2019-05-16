@@ -18,6 +18,29 @@ import { getFieldValidation, getValidation } from '../../../../../common/validat
 import { normalizeName } from '../../../../../common/stringUtils'
 import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
 
+const getDisplayAsItems = i18n => ([
+  {
+    key: NodeDefLayout.nodeDefRenderType.form,
+    label: i18n.t('nodeDefEdit.basicProps.form'),
+  },
+  {
+    key: NodeDefLayout.nodeDefRenderType.table,
+    label: i18n.t('nodeDefEdit.basicProps.table'),
+  },
+])
+
+const getDisplayInItems = i18n => [
+  {
+    key: NodeDefLayout.nodeDefDisplayIn.parentPage,
+    label: i18n.t('nodeDefEdit.basicProps.parentPage'),
+  },
+  {
+    key: NodeDefLayout.nodeDefDisplayIn.ownPage,
+    label: i18n.t('nodeDefEdit.basicProps.ownPage'),
+  },
+]
+
+
 const BasicProps = props => {
   const {
     nodeDef,
@@ -29,28 +52,6 @@ const BasicProps = props => {
   const validation = getValidation(nodeDef)
 
   const { i18n } = useContext(AppContext)
-
-  const displayAsItems = [
-    {
-      key: NodeDefLayout.nodeDefRenderType.form,
-      label: i18n.t('nodeDefEdit.basicProps.form'),
-    },
-    {
-      key: NodeDefLayout.nodeDefRenderType.table,
-      label: i18n.t('nodeDefEdit.basicProps.table'),
-    },
-  ]
-
-  const displayInItems = [
-    {
-      key: NodeDefLayout.nodeDefDisplayIn.parentPage,
-      label: i18n.t('nodeDefEdit.basicProps.parentPage'),
-    },
-    {
-      key: NodeDefLayout.nodeDefDisplayIn.ownPage,
-      label: i18n.t('nodeDefEdit.basicProps.ownPage'),
-    },
-  ]
 
   const onPropLabelsChange = (labelItem, key, currentValue) => {
     putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
@@ -120,7 +121,7 @@ const BasicProps = props => {
           <ButtonGroup
             selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
             onChange={renderType => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, renderType)}
-            items={displayAsItems}
+            items={getDisplayAsItems(i18n)}
           />
         </FormItem>
       }
@@ -132,7 +133,7 @@ const BasicProps = props => {
             selectedItemKey={NodeDefLayout.getDisplayIn(nodeDef)}
             onChange={displayIn => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.pageUuid,
               displayIn === NodeDefLayout.nodeDefDisplayIn.parentPage ? null : uuidv4())}
-            items={displayInItems}
+            items={getDisplayInItems(i18n)}
           />
         </FormItem>
       }
