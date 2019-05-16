@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import * as R from 'ramda'
+
+import AppContext from '../../../../app/appContext'
 
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
@@ -31,13 +33,15 @@ const ValidationsProps = props => {
   const handleValidationsUpdate = validations =>
     putNodeDefProp(nodeDef, 'validations', validations, true)
 
+  const { i18n } = useContext(AppContext)
+
   return (
     <div className="form">
       {
         NodeDef.isMultiple(nodeDef)
           ? (
             <React.Fragment>
-              <FormItem label="Min Count">
+              <FormItem label={i18n.t('nodeDefEdit.validationsProps.minCount')}>
                 <Input value={NodeDefValidations.getMinCount(nodeDefValidations)}
                        disabled={readOnly}
                        validation={R.pipe(
@@ -49,7 +53,7 @@ const ValidationsProps = props => {
                          NodeDefValidations.assocMinCount(value)(nodeDefValidations)
                        )}/>
               </FormItem>
-              <FormItem label="Max Count">
+              <FormItem label={i18n.t('nodeDefEdit.validationsProps.maxCount')}>
                 <Input value={NodeDefValidations.getMaxCount(nodeDefValidations)}
                        disabled={readOnly}
                        validation={R.pipe(
@@ -65,7 +69,7 @@ const ValidationsProps = props => {
           )
           : !NodeDef.isKey(nodeDef)
           ? (
-            <FormItem label={'required'}>
+            <FormItem label={i18n.t('nodeDefEdit.validationsProps.required')}>
               <Checkbox checked={NodeDefValidations.isRequired(nodeDefValidations)}
                         disabled={readOnly}
                         onChange={checked => handleValidationsUpdate(
@@ -77,7 +81,7 @@ const ValidationsProps = props => {
       }
       {
         NodeDef.isAttribute(nodeDef) &&
-        <ExpressionsProp label="Expressions"
+        <ExpressionsProp label={i18n.t('nodeDefEdit.validationsProps.expressions')}
                          readOnly={readOnly}
                          applyIf={true}
                          showLabels={true}

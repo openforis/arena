@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import * as R from 'ramda'
+
+import AppContext from '../../../../app/appContext'
 
 import { uuidv4 } from '../../../../../common/uuid'
 
@@ -19,22 +21,22 @@ import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
 const displayAsItems = [
   {
     key: NodeDefLayout.nodeDefRenderType.form,
-    label: 'Form'
+    label: 'Form',
   },
   {
     key: NodeDefLayout.nodeDefRenderType.table,
-    label: 'Table'
-  }
+    label: 'Table',
+  },
 ]
 
 const displayInItems = [
   {
     key: NodeDefLayout.nodeDefDisplayIn.parentPage,
-    label: 'Parent page'
+    label: 'Parent page',
   },
   {
     key: NodeDefLayout.nodeDefDisplayIn.ownPage,
-    label: 'Its own page'
+    label: 'Its own page',
   }
 ]
 
@@ -52,13 +54,15 @@ const BasicProps = props => {
   } = props
   const validation = getValidation(nodeDef)
 
+  const { i18n } = useContext(AppContext)
+
   return (
     <div className="form">
-      <FormItem label={'type'}>
+      <FormItem label={i18n.t('nodeDefEdit.basicProps.type')}>
         <label>{nodeDef.type}</label>
       </FormItem>
 
-      <FormItem label={'name'}>
+      <FormItem label={i18n.t('nodeDefEdit.basicProps.name')}>
         <Input
           value={NodeDef.getName(nodeDef)}
           validation={getFieldValidation('name')(validation)}
@@ -92,7 +96,7 @@ const BasicProps = props => {
 
       {
         NodeDef.canNodeDefBeKey(nodeDef) &&
-        <FormItem label={'key'}>
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.key')}>
           <Checkbox
             checked={NodeDef.isKey(nodeDef)}
             disabled={nodeDefKeyEditDisabled}
@@ -102,7 +106,7 @@ const BasicProps = props => {
 
       {
         NodeDef.canNodeDefBeMultiple(nodeDef) &&
-        <FormItem label={'multiple'}>
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.multiple')}>
           <Checkbox
             checked={NodeDef.isMultiple(nodeDef)}
             disabled={nodeDefMultipleEditDisabled}
@@ -112,7 +116,7 @@ const BasicProps = props => {
 
       {
         displayAsEnabled &&
-        <FormItem label={'display as'}>
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
             selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
             onChange={renderType => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, renderType)}
@@ -123,7 +127,7 @@ const BasicProps = props => {
 
       {
         displayInEnabled &&
-        <FormItem label={'display in'}>
+        <FormItem label={i18n.t('nodeDefEdit.basicProps.displayIn')}>
           <ButtonGroup
             selectedItemKey={NodeDefLayout.getDisplayIn(nodeDef)}
             onChange={displayIn => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.pageUuid,
