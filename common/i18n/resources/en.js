@@ -6,9 +6,9 @@ module.exports = {
     done: 'done',
     cancel: 'cancel',
     cantUndoWarning: 'This operation cannot be undone',
-    formDesigner: 'Form Designer',
-    categories: 'Categories',
-    taxonomies: 'Taxonomies',
+    // formDesigner: 'Form Designer',
+    // categories: 'Categories',
+    // taxonomies: 'Taxonomies',
     description: 'Description',
     description_plural: 'Descriptions',
     srs: 'SRS',
@@ -18,6 +18,13 @@ module.exports = {
     openForis: 'Open Foris',
     logout: 'Logout',
   },
+
+  survey: {
+    formDesigner: 'Form Designer',
+    categories: 'Categories',
+    taxonomies: 'Taxonomies',
+  },
+
   homeView: {
     mySurveys: 'My Surveys',
     dashboard: 'Dashboard',
@@ -43,14 +50,16 @@ module.exports = {
       status: 'Status',
     },
   },
+
+  nodeDefEdit: {
+    basic: 'Basic',
+    advanced: 'Advanced',
+    validations: 'Validations',
+  },
+
   designerView: {
     hierarchy: 'Hierarchy',
     formPreview: 'Form preview',
-    nodeDefEdit: {
-      basic: 'Basic',
-      advanced: 'Advanced',
-      validations: 'Validations',
-    },
   },
 
   languagesEditor: {
@@ -69,12 +78,12 @@ module.exports = {
     formEntryActions: {
       confirmDemote: 'Are sure you want to demote this record to {{step}}?',
       confirmPromote: `Are sure you want to promote this record to {{step}}?You won't be able to edit it anymore`,
-      confirmDelete: 'Are you sure you want to delete this record? $t(common.cantUndoWarning)',
+      confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
       closePreview: 'Close preview',
     },
     nodeDefEditFormActions: {
       columns: 'columns',
-      confirmDelete: 'Are you sure you want to permanently delete this node definition? $t(common.cantUndoWarning)',
+      confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
     },
     nodeDefNavigation: {
       subPage: 'sub page',

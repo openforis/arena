@@ -40,7 +40,7 @@ const DesignerView = ({ canEditDef, resetForm }) => {
         moduleDefault={designerModules.formDesigner}
         tabs={[
           {
-            label: i18n.t('common.formDesigner'),
+            label: i18n.t('survey.formDesigner'),
             component: SurveyFormView,
             path: appModuleUri(designerModules.formDesigner),
             props: { edit: true, draft: true, canEditDef },
@@ -61,13 +61,13 @@ const DesignerView = ({ canEditDef, resetForm }) => {
           },
 
           {
-            label: i18n.t('common.categories'),
+            label: i18n.t('survey.categories'),
             component: CategoriesView,
             path: appModuleUri(designerModules.categories),
           },
 
           {
-            label: i18n.t('common.taxonomies'),
+            label: i18n.t('survey.taxonomies'),
             component: TaxonomiesView,
             path: appModuleUri(designerModules.taxonomies),
           },

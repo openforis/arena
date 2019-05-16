@@ -66,7 +66,7 @@ const NodeDefEdit = props => {
                 <div className="node-def-edit__container">
                   <TabBar tabs={[
                     {
-                      label: i18n.t('designerView.nodeDefEdit.basic'),
+                      label: i18n.t('nodeDefEdit.basic'),
                       component: BasicProps,
                       props: {
                         nodeDef,
@@ -83,12 +83,12 @@ const NodeDefEdit = props => {
                       ? []
                       : [
                         {
-                          label: i18n.t('designerView.nodeDefEdit.advanced'),
+                          label: i18n.t('nodeDefEdit.advanced'),
                           component: AdvancedProps,
                           props: { nodeDef, nodeDefParent, putNodeDefProp },
                         },
                         {
-                          label: i18n.t('designerView.nodeDefEdit.validations'),
+                          label: i18n.t('nodeDefEdit.validations'),
                           component: ValidationsProps,
                           props: { nodeDef, nodeDefParent, putNodeDefProp },
                         },

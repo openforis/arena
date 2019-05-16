@@ -93,19 +93,23 @@ const SurveyInfo = props => {
         <div className="row">
           <Link
             to={appModuleUri(designerModules.formDesigner)} className="btn btn btn-of-light">
-            <span className="icon icon-quill icon-12px icon-left"/> {i18n.t('common.formDesigner')}
+            <span className="icon icon-quill icon-12px icon-left"/>
+            {i18n.t('survey.formDesigner')}
           </Link>
           <Link
             to={appModuleUri(designerModules.surveyHierarchy)} className="btn btn btn-of-light">
-            <span className="icon icon-tree icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.hierarchy')}
+            <span className="icon icon-tree icon-12px icon-left"/>
+            {i18n.t('homeView.surveyInfo.hierarchy')}
           </Link>
           <Link
             to={appModuleUri(designerModules.categories)} className="btn btn btn-of-light">
-            <span className="icon icon-list2 icon-12px icon-left"/> {i18n.t('common.categories')}
+            <span className="icon icon-list2 icon-12px icon-left"/>
+            {i18n.t('survey.categories')}
           </Link>
           <Link
             to={appModuleUri(designerModules.taxonomies)} className="btn btn btn-of-light">
-            <span className="icon icon-leaf icon-12px icon-left" /> {i18n.t('common.taxonomies')}
+            <span className="icon icon-leaf icon-12px icon-left" />
+            {i18n.t('survey.taxonomies')}
           </Link>
         </div>
 
