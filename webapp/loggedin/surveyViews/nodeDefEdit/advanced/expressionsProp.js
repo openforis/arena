@@ -74,7 +74,7 @@ const ExpressionProp = (props) => {
 
         {
           showLabels &&
-          <LabelsEditor formLabel="Error message(s)"
+          <LabelsEditor formLabelKey="common.errorMessage"
                         labels={NodeDefExpression.getMessages(expression)}
                         onChange={labelItem =>
                           onUpdate(NodeDefExpression.assocMessage(labelItem)(expression))

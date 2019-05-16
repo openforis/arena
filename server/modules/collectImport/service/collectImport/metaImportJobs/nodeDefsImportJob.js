@@ -135,7 +135,7 @@ class NodeDefsImportJob extends Job {
     let nodeDef = await NodeDefManager.insertNodeDef(this.getUser(), surveyId, nodeDefParam, tx)
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
 
-    // 4. insert children and updated layour props
+    // 4. insert children and updated layout props
     const propsUpdated = {}
 
     if (type === nodeDefType.entity) {
@@ -147,9 +147,7 @@ class NodeDefsImportJob extends Job {
         if (this.isCanceled())
           break
 
-        const collectChildType = CollectIdmlParseUtils.getName(collectChild)
-
-        const childType = CollectIdmlParseUtils.nodeDefTypesByCollectType[collectChildType]
+        const childType = CollectIdmlParseUtils.getNodeDefTypeByCollectNodeDef(collectChild)
 
         if (childType) {
           const childDef = await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChild, childType, tx)
@@ -356,12 +354,17 @@ class NodeDefsImportJob extends Job {
 }
 
 const determineNodeDefPageUuid = (type, collectNodeDef) => {
-  const multiple = collectNodeDef.attributes.multiple === 'true'
-
-  const hasTab = R.has('n1:tab', collectNodeDef.attributes)
-
   if (type === NodeDef.nodeDefType.entity) {
-    if (multiple) {
+    if (collectNodeDef.attributes.multiple === 'true') {
+      // check if a tab is specified in ui:tab or n1:tab xml attributes
+      const hasTab = R.pipe(
+        CollectIdmlParseUtils.getAttributes,
+        R.keys,
+        R.intersection(['ui:tab', 'n1:tab']), //newer versions of Collect use an alias for the ui namespace
+        R.isEmpty,
+        R.not
+      )(collectNodeDef)
+
       if (hasTab) {
         // multiple entity own tab => own page
         return uuidv4()

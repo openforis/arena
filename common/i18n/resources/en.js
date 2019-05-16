@@ -6,12 +6,11 @@ module.exports = {
     done: 'done',
     cancel: 'cancel',
     cantUndoWarning: 'This operation cannot be undone',
-    // formDesigner: 'Form Designer',
-    // categories: 'Categories',
-    // taxonomies: 'Taxonomies',
     description: 'Description',
     description_plural: 'Descriptions',
     srs: 'SRS',
+    errorMessage: 'Error message',
+    errorMessage_plural: 'Error messages',
   },
   sidebar: {
     openForisShort: 'OF',
@@ -37,7 +36,7 @@ module.exports = {
       confirmPublish: `Do you want to publish this survey? Some operation won't be allowed afterwards.`,
     },
     deleteSurveyDialog: {
-      areYouSure: 'Are you sure you want to delete this survey?',
+      confirmDelete: 'Are you sure you want to delete this survey?',
       deleteWarining: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
       confirmName: 'Enter this survey’s name to confirm:',
     },
@@ -105,7 +104,7 @@ module.exports = {
     },
     formEntryActions: {
       confirmDemote: 'Are sure you want to demote this record to {{step}}?',
-      confirmPromote: `Are sure you want to promote this record to {{step}}?You won't be able to edit it anymore`,
+      confirmPromote: `Are sure you want to promote this record to {{step}}?\n\nYou won't be able to edit it anymore`,
       confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
       closePreview: 'Close preview',
     },

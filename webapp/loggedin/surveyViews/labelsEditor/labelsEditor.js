@@ -1,8 +1,10 @@
 import './labelsEditor.scss'
 
-import React from 'react'
+import React, { useState, useContext } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
+
+import AppContext from '../../../app/appContext'
 
 import { Input } from '../../../commonComponents/form/input'
 
@@ -29,92 +31,83 @@ const LabelRow = ({ label = '', lang, onChange, readOnly, showLanguageBadge = tr
 
     <Input value={label}
            onChange={value => onChange({
-               lang,
-               label: value
-             }
-           )}
+             lang,
+             label: value,
+           })}
            readOnly={readOnly}/>
   </div>
 )
 
-class LabelsEditor extends React.Component {
+const LabelsEditor = props => {
 
-  isPreview () {
-    const { preview } = this.state || { preview: true }
-    return preview
-  }
+  const [ preview, setPreview ] = useState(true)
 
-  togglePreview () {
-    this.setState({ preview: !this.isPreview() })
-  }
+  const { i18n } = useContext(AppContext)
 
-  render () {
-    const {
-      labels,
-      showFormLabel,
-      formLabel,
-      languages,
-      onChange,
-      maxPreview,
-      canTogglePreview,
-      readOnly,
-      compactLanguage
-    } = this.props
+  const {
+    labels,
+    showFormLabel,
+    formLabelKey,
+    languages,
+    onChange,
+    maxPreview,
+    canTogglePreview,
+    readOnly,
+    compactLanguage,
+  } = props
 
-    const displayLangs = this.isPreview()
-      ? R.slice(0, maxPreview, languages)
-      : languages
+  const displayLangs = preview
+    ? R.slice(0, maxPreview, languages)
+    : languages
 
-    const _canTogglePreview = canTogglePreview && languages.length > maxPreview
+  const _canTogglePreview = canTogglePreview && languages.length > maxPreview
 
-    const className = `labels-editor ${showFormLabel ? 'with-label' : ''}`
+  const className = `labels-editor ${showFormLabel ? 'with-label' : ''}`
 
-    return (
-      <div className={className} ref="elem">
-        <div className="labels-editor-label">
-          {
-            showFormLabel &&
-            <label className="form-label">
-              {formLabel}
-            </label>
-          }
-          {
-            _canTogglePreview &&
-            <button className="btn-s btn-of-light-s btn-toggle-labels"
-                    style={{ justifySelf: 'end' }}
-                    onClick={() => this.togglePreview()}>
-              <span className={`icon icon-${this.isPreview() ? 'enlarge2' : 'shrink2'} icon-12px`}/>
-              {/*{*/}
-              {/*this.isPreview() ? '...more' : '...less'*/}
-              {/*}*/}
-            </button>
-          }
-        </div>
-        <div className="labels-editor__labels">
-          {
-            displayLangs.map(lang =>
-              <LabelRow key={lang}
-                        lang={lang}
-                        label={R.prop(lang)(labels)}
-                        onChange={onChange}
-                        readOnly={readOnly}
-                        showLanguageBadge={languages.length > 1}
-                        compactLanguage={compactLanguage}/>
-            )
-          }
-        </div>
-
+  return (
+    <div className={className}>
+      <div className="labels-editor-label">
+        {
+          showFormLabel &&
+          <label className="form-label">
+            {i18n.t(formLabelKey, { count: languages.length })}
+          </label>
+        }
+        {
+          _canTogglePreview &&
+          <button className="btn-s btn-of-light-s btn-toggle-labels"
+                  style={{ justifySelf: 'end' }}
+                  onClick={() => setPreview(!preview)}>
+            <span className={`icon icon-${preview ? 'enlarge2' : 'shrink2'} icon-12px`}/>
+            {/*{*/}
+            {/*this.preview() ? '...more' : '...less'*/}
+            {/*}*/}
+          </button>
+        }
       </div>
-    )
-  }
+      <div className="labels-editor__labels">
+        {
+          displayLangs.map(lang =>
+            <LabelRow key={lang}
+                      lang={lang}
+                      label={R.prop(lang)(labels)}
+                      onChange={onChange}
+                      readOnly={readOnly}
+                      showLanguageBadge={languages.length > 1}
+                      compactLanguage={compactLanguage}/>
+          )
+        }
+      </div>
 
+    </div>
+  )
 }
 
 LabelsEditor.defaultProps = {
   languages: [],
   labels: [],
   showFormLabel: true,
-  formLabel: 'Label(s)',
+  formLabelKey: 'labelsEditor.label',
   maxPreview: 2,
   canTogglePreview: true,
   readOnly: false,
@@ -126,4 +119,4 @@ const mapStateToProps = state => ({
   languages: Survey.getLanguages(SurveyState.getSurveyInfo(state))
 })
 
-export default connect(mapStateToProps,)(LabelsEditor)
+export default connect(mapStateToProps)(LabelsEditor)

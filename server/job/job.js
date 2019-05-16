@@ -70,22 +70,20 @@ class Job {
   async start (client = db) {
     this.logDebug('start')
 
-    // 1. crates a db transaction and run 'execute' into it
+    // 1. crates a db transaction and run '_executeInTransaction' into it
     try {
       await client.tx(tx => this._executeInTransaction(tx))
 
-      this.logDebug(`ending (status: ${this.status})`)
-
-      // 7. notify job status change to 'succeed'
+      // 2. notify job status change to 'succeed' (when transaction has been committed)
       if (this.isRunning()) {
         await this._setStatusSucceeded()
       }
     } catch (e) {
-      if (!this.isCanceled()) {
+      if (this.isRunning()) {
+        // error found, change status only if not changed already
         this.logError(`${e.stack || e}`)
         this.addError({ systemError: { valid: false, errors: [e.toString()] } })
-        if (this.isRunning())
-          await this.setStatusFailed()
+        await this.setStatusFailed()
       }
     }
   }
@@ -94,39 +92,46 @@ class Job {
     try {
       this.tx = tx
 
-      // 2. notify start
+      // 1. notify start
       await this.onStart()
 
-      // 3. execute
+      // 2. execute
       if (this.innerJobs.length > 0) {
         await this._executeInnerJobs()
       } else {
         await this.execute(tx)
       }
 
-      // 4. execution completed, prepare result
+      // 3. execution completed, prepare result
       if (this.isRunning()) {
         this.logDebug('beforeSuccess...')
         await this.beforeSuccess()
         this.logDebug('beforeSuccess run')
       }
+    // DO NOT CATCH EXCEPTIONS! Transaction will be aborted in that case
     } finally {
       if (!this.isCanceled()) {
-        // 5. flush/clean resources
+        // 4. flush/clean resources
         this.logDebug('beforeEnd...')
         await this.beforeEnd()
         this.logDebug('beforeEnd run')
       }
       this.tx = null
     }
-    // 6. commit the transaction if there are no errors (or throw an error to rollback it)
+    // 5. if errors found or job has been canceled, throw an error to rollback transaction
     if (!this.isRunning()) {
       throw new Error('Job canceled or errors found; rollback transaction')
     }
   }
 
-  addError (error) {
-    this.errors['' + (this.processed + 1)] = error
+  addError (error, errorKey = null) {
+    if (!errorKey)
+      errorKey = '' + (this.processed + 1)
+    this.errors[errorKey] = error
+  }
+
+  hasErrors () {
+    return Object.keys(this.errors).length > 0
   }
 
   /**

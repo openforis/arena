@@ -1,6 +1,5 @@
 const R = require('ramda')
 
-const Log = require('../../../log/log')
 const Job = require('../../../job/job')
 
 const { languageCodes } = require('../../../../common/app/languages')
@@ -8,6 +7,7 @@ const { isNotBlank } = require('../../../../common/stringUtils')
 const CSVParser = require('../../../../common/file/csvParser')
 
 const Validator = require('../../../../common/validation/validator')
+const Taxonomy = require('../../../../common/survey/taxonomy')
 const Taxon = require('../../../../common/survey/taxon')
 
 const TaxonomyValidator = require('../taxonomyValidator')
@@ -38,37 +38,48 @@ class TaxonomyImportJob extends Job {
   }
 
   async execute (tx) {
-    const { taxonomyUuid, filePath } = this
+    const { taxonomyUuid } = this
     const surveyId = this.getSurveyId()
 
-    Log.debug(`starting taxonomy import on survey ${surveyId}, importing into taxonomy ${taxonomyUuid}`)
+    this.logDebug(`starting taxonomy import on survey ${surveyId}, importing into taxonomy ${taxonomyUuid}`)
 
-    this.total = await new CSVParser(filePath).calculateSize()
+    // 1. load taxonomy and check it has not published
 
-    Log.debug(`${this.total} rows found in the CSV file`)
+    const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
+    if (Taxonomy.isPublished(taxonomy)) {
+      throw new Error('cannot overwrite published taxa')
+    }
+
+    // 2. calculate total number of rows
+    this.total = await new CSVParser(this.filePath).calculateSize()
+
+    this.logDebug(`${this.total} rows found in the CSV file`)
+
+    // 3. process headers
     const validHeaders = await this.processHeaders()
 
     if (!validHeaders) {
-      Log.debug('invalid header, setting status to "failed"')
+      this.logDebug('invalid header, setting status to "failed"')
       await this.setStatusFailed()
       return
     }
 
-    const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
+    // 4. delete old draft taxa
+    await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)
 
-    if (taxonomy.published) {
-      throw new Error('cannot overwrite published taxa')
-    }
+    // 5. start CSV row parsing
+    await this._parseCSVRows(taxonomy)
+  }
+
+  async _parseCSVRows(taxonomy) {
+    this.logDebug('start CSV file parsing')
+
+    const surveyId = this.getSurveyId()
 
     this.taxonomyImportManager = new TaxonomyImportManager(this.getUser(), surveyId, this.vernacularLanguageCodes)
 
-    //delete old draft taxa
-    await TaxonomyManager.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, tx)
-
-    Log.debug('start CSV file parsing')
-
-    const csvParser = new CSVParser(filePath)
+    const csvParser = new CSVParser(this.filePath)
 
     this.processed = 0
 
@@ -79,19 +90,19 @@ class TaxonomyImportJob extends Job {
         break
       }
 
-      await this.processRow(row, tx)
+      await this.processRow(row)
 
       row = await csvParser.next()
     }
 
-    Log.debug(`CSV file processed, ${this.processed} rows processed`)
+    this.logDebug(`CSV file processed, ${this.processed} rows processed`)
 
     if (this.isRunning()) {
       if (R.isEmpty(this.errors)) {
-        Log.debug('no errors found, finalizing import')
-        await this.taxonomyImportManager.finalizeImport(taxonomy, tx)
+        this.logDebug('no errors found, finalizing import')
+        await this.taxonomyImportManager.finalizeImport(taxonomy, this.tx)
       } else {
-        Log.debug(`${this.errors.length} errors found`)
+        this.logDebug(`${R.keys(this.errors).length} errors found`)
         await this.setStatusFailed()
       }
     }
@@ -110,13 +121,13 @@ class TaxonomyImportJob extends Job {
     return validHeaders
   }
 
-  async processRow (data, t) {
+  async processRow (data) {
     const taxon = await this.parseTaxon(data)
 
     if (Validator.isValid(taxon)) {
-      await this.taxonomyImportManager.addTaxonToInsertBuffer(taxon, t)
+      await this.taxonomyImportManager.addTaxonToInsertBuffer(taxon, this.tx)
     } else {
-      this.addError(taxon.validation.fields)
+      this.addError(R.pipe(Validator.getValidation, Validator.getFieldValidations)(taxon))
     }
     this.incrementProcessedItems()
   }
@@ -145,15 +156,15 @@ class TaxonomyImportJob extends Job {
   }
 
   async validateTaxon (taxon) {
-    const validation = await TaxonomyValidator.validateTaxon([], taxon) //do not validate code and scientific name uniqueness
+    let validation = await TaxonomyValidator.validateTaxon([], taxon) //do not validate code and scientific name uniqueness
 
     //validate taxon uniqueness among inserted values
-    if (validation.valid) {
+    if (Validator.isValidationValid(validation)) {
       const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
       const duplicateCodeRow = this.codesToRow[code]
 
       if (duplicateCodeRow) {
-        validation.fields[Taxon.propKeys.code] = { valid: false, errors: [Validator.errorKeys.duplicate] }
+        validation = Validator.assocFieldValidation(Taxon.propKeys.code, { valid: false, errors: [Validator.errorKeys.duplicate] })(validation)
       } else {
         this.codesToRow[code] = this.processed + 1
       }
@@ -162,12 +173,10 @@ class TaxonomyImportJob extends Job {
       const duplicateScientificNameRow = this.scientificNamesToRow[scientificName]
 
       if (duplicateScientificNameRow) {
-        validation.fields[Taxon.propKeys.scientificName] = { valid: false, errors: [Validator.errorKeys.duplicate] }
+        validation = Validator.assocFieldValidation(Taxon.propKeys.scientificName, { valid: false, errors: [Validator.errorKeys.duplicate] })(validation)
       } else {
         this.scientificNamesToRow[scientificName] = this.processed + 1
       }
-
-      validation.valid = !(duplicateCodeRow || duplicateScientificNameRow)
     }
 
     return {

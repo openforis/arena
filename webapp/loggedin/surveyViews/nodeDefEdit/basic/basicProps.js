@@ -74,7 +74,7 @@ const BasicProps = props => {
         onChange={(labelItem) => onPropLabelsChange(labelItem, 'labels', NodeDef.getLabels(nodeDef))}/>
 
       <LabelsEditor
-        formLabel="Description(s)"
+        formLabelKey="common.description"
         labels={NodeDef.getDescriptions(nodeDef)}
         onChange={(labelItem) => onPropLabelsChange(labelItem, 'descriptions', NodeDef.getDescriptions(nodeDef))}/>
 
