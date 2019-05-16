@@ -11,6 +11,7 @@ module.exports = {
     srs: 'SRS',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
+    invalid: 'INVALID',
   },
   sidebar: {
     openForisShort: 'OF',
@@ -103,10 +104,11 @@ module.exports = {
       preview: 'preview',
     },
     formEntryActions: {
-      confirmDemote: 'Are sure you want to demote this record to {{step}}?',
-      confirmPromote: `Are sure you want to promote this record to {{step}}?\n\nYou won't be able to edit it anymore`,
+      confirmDemote: 'Are sure you want to demote this record to {{name}}?',
+      confirmPromote: `Are sure you want to promote this record to {{name}}?\n\nYou won't be able to edit it anymore`,
       confirmDelete: 'Are you sure you want to delete this record?\n\n$t(common.cantUndoWarning)',
       closePreview: 'Close preview',
+      step: 'Step {{id}} ({{name}})',
     },
     nodeDefEditFormActions: {
       columns: 'columns',
@@ -134,6 +136,11 @@ module.exports = {
       code: 'Code',
       scientificName: 'Scientific Name',
       vernacularName: 'Vernacular Name',
+    },
+    step: {
+      entry: 'entry',
+      cleansing: 'cleansing',
+      analysis: 'analysis',
     },
   },
 }

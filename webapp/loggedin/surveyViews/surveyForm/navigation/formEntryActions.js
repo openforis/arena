@@ -27,6 +27,8 @@ const RecordEntryButtons = (props) => {
 
   const { i18n } = useContext(AppContext)
 
+  const getStepLabel = step => console.log(step) || i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
+
   return (
     <React.Fragment>
 
@@ -37,7 +39,7 @@ const RecordEntryButtons = (props) => {
           stepPrev &&
           <button className="btn-s btn-of"
                   onClick={() =>
-                    confirm(i18n.t('surveyForm.formEntryActions.confirmDemote', { step: RecordStep.getName(stepPrev) }))
+                    confirm(i18n.t('surveyForm.formEntryActions.confirmDemote', { name: getStepLabel(stepPrev) }))
                       ? updateRecordStep(RecordStep.getId(stepPrev), history)
                       : null
                   }>
@@ -45,14 +47,14 @@ const RecordEntryButtons = (props) => {
           </button>
         }
 
-        <span>Step {RecordStep.getId(step)} ({RecordStep.getName(step)})</span>
+        <span>{i18n.t('surveyForm.formEntryActions.step', { id: RecordStep.getId(step), name: getStepLabel(step) })}</span>
 
         {
           stepNext &&
           <button className="btn-s btn-of"
                   aria-disabled={!valid}
                   onClick={() =>
-                    confirm(i18n.t('surveyForm.formEntryActions.confirmPromote', { step: RecordStep.getName(stepNext) }))
+                    confirm(i18n.t('surveyForm.formEntryActions.confirmPromote', { name: getStepLabel(stepNext) }))
                       ? updateRecordStep(RecordStep.getId(stepNext), history)
                       : null
                   }>
@@ -69,7 +71,7 @@ const RecordEntryButtons = (props) => {
               }
               aria-disabled={false}>
         <span className="icon icon-bin icon-12px icon-left"/>
-        Delete
+        {i18n.t('common.delete')}
       </button>
     </React.Fragment>
   )
