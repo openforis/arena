@@ -104,16 +104,14 @@ const deleteTaxonomy = async (user, surveyId, taxonomyUuid) =>
     await ActivityLog.log(user, surveyId, ActivityLog.type.taxonomyDelete, { taxonomyUuid }, t)
   })
 
-const insertTaxa = (surveyId, taxa, user, client = db) => {
+const insertTaxa = async (surveyId, taxa, user, client = db) => {
+  await TaxonomyRepository.insertTaxa(surveyId, taxa, client)
+
   const activities = taxa.map(taxon => ({
     type: ActivityLog.type.taxonInsert,
     params: taxon,
   }))
-
-  return Promise.all([
-    TaxonomyRepository.insertTaxa(surveyId, taxa, client),
-    ActivityLog.logMany(user, surveyId, activities, client),
-  ])
+  await ActivityLog.logMany(user, surveyId, activities, client)
 }
 
 module.exports = {
