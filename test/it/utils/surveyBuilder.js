@@ -12,7 +12,7 @@ const SurveyManager = require('../../../server/modules/survey/manager/surveyMana
 const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
 
 const SurveyPublishPerformJob = require('../../../server/modules/survey/service/publish/surveyPublishPerformJob')
-const SurveyRdbGeneratorJob = require('../../../server/modules/survey/service/surveyRdbGeneratorJob')
+const SurveyRdbGeneratorJob = require('../../../server/modules/surveyRdb/service/surveyRdbGeneratorJob')
 
 class NodeDefBuilder {
 

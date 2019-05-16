@@ -6,7 +6,9 @@ const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Taxon = require('../../../../common/survey/taxon')
 const Node = require('../../../../common/record/node')
-const CategoryManager = require('../../category/manager/categoryManager')
+
+const SurveyIndex = require('../../survey/index/surveyIndex')
+
 const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
 
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
@@ -65,30 +67,29 @@ const props = {
   },
 
   [nodeDefType.code]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
-      return (node,colName) => null
-      // const itemUuid = Node.getCategoryItemUuid(nodeCol)
-      // const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid, false, client) : {}
-      //
-      // return (node, colName) => R.endsWith('code', colName)
-      //   ? getValueFromItem(nodeDefCol, colName, item, true)
-      //   //'label'
-      //   : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, surveyIndex) => {
+      const itemUuid = Node.getCategoryItemUuid(nodeCol)
+      const item = itemUuid ? SurveyIndex.getCategoryItemByUuid(itemUuid)(surveyIndex) : {}
+
+      return (node, colName) => R.endsWith('code', colName)
+        ? getValueFromItem(nodeDefCol, colName, item, true)
+        //'label'
+        : SurveyUtils.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
     },
   },
 
   [nodeDefType.taxon]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
-      return (node,colName) => null
-      // const taxonUuid = Node.getTaxonUuid(nodeCol)
-      // const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : {}
-      // return (node, colName) =>
-      //   R.endsWith('code', colName)
-      //     ? Taxon.getCode(taxon)
-      //     // scientific_name
-      //     : Taxon.isUnlistedTaxon(taxon)
-      //     ? Node.getScientificName(node) //from node value
-      //     : Taxon.getScientificName(taxon) //from taxon item
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, surveyIndex, client) => {
+      // return (node, colName) => null
+      const taxonUuid = Node.getTaxonUuid(nodeCol)
+      const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : {}
+      return (node, colName) =>
+        R.endsWith('code', colName)
+          ? Taxon.getCode(taxon)
+          // scientific_name
+          : Taxon.isUnlistedTaxon(taxon)
+          ? Node.getScientificName(node) //from node value
+          : Taxon.getScientificName(taxon) //from taxon item
     },
   },
 

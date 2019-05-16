@@ -9,33 +9,37 @@ const TaxonomyRepository = require('../../../taxonomy/repository/taxonomyReposit
 
 const SurveyIndex = require('../../index/surveyIndex')
 
+const CategoryItem = require('../../../../../common/survey/categoryItem')
+const CategoryLevel = require('../../../../../common/survey/categoryLevel')
+
 const fetchIndex = async (surveyId, client = db) => {
-  const [categoryIndex, taxonomyIndex] = await Promise.all([
-    _fetchCategoryIndex(surveyId, client),
-    _fetchTaxonomyIndex(surveyId, client)
+  const [categoryIndexRS, taxonomyIndexRS] = await Promise.all([
+    CategoryRepository.fetchIndex(surveyId, client),
+    TaxonomyRepository.fetchIndex(surveyId, client)
   ])
 
   return {
-    [SurveyIndex.keys.categoryIndex]: categoryIndex,
-    [SurveyIndex.keys.taxonomyIndex]: taxonomyIndex
+    // category indexes
+    [SurveyIndex.keys.categoryItemUuidIndex]: _getCategoryItemUuidIndex(categoryIndexRS),
+    [SurveyIndex.keys.categoryItemIndex]: ObjectUtils.toUuidIndexedObj(categoryIndexRS),
+    // taxonomy indexes
+    [SurveyIndex.keys.taxonomyUuidIndex]: _getTaxonomyUuidIndex(taxonomyIndexRS)
   }
 }
 
-const _fetchCategoryIndex = async (surveyId, client = db) =>
-  R.reduce(
-    (accIndex, row) => ObjectUtils.setInPath(
-      [
-        row.category_uuid,
-        JSON.stringify(row.parent_uuid),
-        row.code,
-      ],
-      row.item_uuid
-    )(accIndex),
-    {},
-    await CategoryRepository.fetchIndex(surveyId, client)
-  )
+const _getCategoryItemUuidIndex = R.reduce(
+  (accIndex, row) => ObjectUtils.setInPath(
+    [
+      CategoryLevel.getCategoryUuid(row),
+      CategoryItem.getParentUuid(row) || 'null',
+      CategoryItem.getCode(row)
+    ],
+    CategoryItem.getUuid(row)
+  )(accIndex),
+  {}
+)
 
-const _fetchTaxonomyIndex = async (surveyId, client = db) =>
+const _getTaxonomyUuidIndex = (taxonomyIndexRS) =>
   R.reduce(
     (accIndex, row) => ObjectUtils.setInPath(
       [
@@ -48,7 +52,7 @@ const _fetchTaxonomyIndex = async (surveyId, client = db) =>
       }
     )(accIndex),
     {},
-    await TaxonomyRepository.fetchIndex(surveyId, client)
+    taxonomyIndexRS
   )
 
 module.exports = {

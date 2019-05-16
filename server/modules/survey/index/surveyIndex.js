@@ -6,7 +6,7 @@ const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 
 /**
- * categoryIndex : {
+ * categoryItemUuidIndex : {
  *    [$categoryUuid] : {
  *      [$parentCategoryItemUuid] :{
  *        [$categoryItemCode] : $categoryItemUuid
@@ -14,7 +14,11 @@ const Node = require('../../../../common/record/node')
  *    }
  * }
  *
- * taxonomyIndex : {
+ * categoryItemIndex : {
+ *    [$categoryItemUuid] : { ...$categoryItem }
+ * }
+ *
+ * taxonomyUuidIndex : {
  *   [$taxonomyUuid] : {
  *     [$taxonCode] : {
  *       taxonUuid : $taxonUuid,
@@ -29,8 +33,9 @@ const Node = require('../../../../common/record/node')
  */
 
 const keys = {
-  categoryIndex: 'categoryIndex',
-  taxonomyIndex: 'taxonomyIndex'
+  categoryItemUuidIndex: 'categoryItemUuidIndex',
+  categoryItemIndex: 'categoryItemIndex',
+  taxonomyUuidIndex: 'taxonomyUuidIndex'
 }
 
 const keysTaxonomyIndex = {
@@ -38,23 +43,21 @@ const keysTaxonomyIndex = {
   vernacularNames: 'vernacularNames',
 }
 
+// ==== category index
 const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode, code) => surveyIndex => {
-
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-
-  let parentCategoryItemUuid, hierarchyCode
+  let parentCategoryItemUuid = 'null'
+  let hierarchyCode = []
 
   if (levelIndex > 0) {
     const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
     parentCategoryItemUuid = Node.getCategoryItemUuid(parentCodeAttribute)
     hierarchyCode = R.append(Node.getCategoryItemUuid(parentCodeAttribute), Node.getHierarchyCode(parentCodeAttribute))
-  } else {
-    parentCategoryItemUuid = 'null'
-    hierarchyCode = []
   }
+
   const itemUuid = R.path(
-    [keys.categoryIndex, categoryUuid, parentCategoryItemUuid, code],
+    [keys.categoryItemUuidIndex, categoryUuid, parentCategoryItemUuid, code],
     surveyIndex
   )
   return {
@@ -63,32 +66,34 @@ const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode
   }
 }
 
+const getCategoryItemByUuid = categoryItemUuid => R.pathOr(null, [keys.categoryItemIndex, categoryItemUuid])
+
+// ==== taxonomy index
+
 const getTaxonUuid = (nodeDef, taxonCode) => surveyIndex => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  return R.path([
-    keys.taxonomyIndex,
-    taxonomyUuid,
-    taxonCode,
-    keysTaxonomyIndex.taxonUuid
-  ])(surveyIndex)
+  return R.path(
+    [keys.taxonomyUuidIndex, taxonomyUuid, taxonCode, keysTaxonomyIndex.taxonUuid],
+    surveyIndex
+  )
 }
 
 const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => surveyIndex => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  return R.path([
-    keys.taxonomyIndex,
-    taxonomyUuid,
-    taxonCode,
-    keysTaxonomyIndex.vernacularNames,
-    vernacularName
-  ])(surveyIndex)
+  return R.path(
+    [keys.taxonomyUuidIndex, taxonomyUuid, taxonCode, keysTaxonomyIndex.vernacularNames, vernacularName],
+    surveyIndex
+  )
 }
 
 module.exports = {
   keys,
 
+  // ==== category index
   getCategoryItemUuidAndCodeHierarchy,
+  getCategoryItemByUuid,
 
+  // ==== taxonomy index
   getTaxonUuid,
   getTaxonVernacularNameUuid
 }

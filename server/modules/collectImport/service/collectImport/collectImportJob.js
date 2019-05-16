@@ -10,7 +10,7 @@ const NodeDefsImportJob = require('./metaImportJobs/nodeDefsImportJob')
 const RecordsImportJob = require('./dataImportJobs/recordsImportJob')
 const SurveyPublishPerformJob = require('../../../survey/service/publish/surveyPublishPerformJob')
 const SurveyIndexGeneratorJob = require('../../../survey/service/surveyIndexGeneratorJob')
-const SurveyRdbGeneratorJob = require('../../../survey/service/surveyRdbGeneratorJob')
+const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
 const RecordCheckJob = require('../../../survey/service/recordCheckJob')
 
 class CollectImportJob extends Job {

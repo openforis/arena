@@ -2,10 +2,10 @@ const Job = require('../../../job/job')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
-const SurveyManager = require('../manager/surveyManager')
+const SurveyManager = require('../../survey/manager/surveyManager')
 const RecordManager = require('../../record/manager/recordManager')
 
-const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
+const SurveyRdbManager = require('../manager/surveyRdbManager')
 
 class SurveyRdbGeneratorJob extends Job {
 
@@ -39,10 +39,12 @@ class SurveyRdbGeneratorJob extends Job {
     await Survey.traverseHierarchyItem(root, createTable)
     this.logDebug('create data tables - end')
 
+    const surveyIndex = this.getContextProp('surveyIndex')
+
     //3 ==== insert records
     const insertIntoTable = record =>
       async nodeDef => {
-        await SurveyRdbManager.insertIntoTable(survey, nodeDef, record, tx)
+        await SurveyRdbManager.insertIntoTable(survey, nodeDef, record, surveyIndex, tx)
         this.incrementProcessedItems()
       }
 

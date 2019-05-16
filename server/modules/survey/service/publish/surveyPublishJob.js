@@ -6,7 +6,7 @@ const TaxonomiesValidationJob = require('./jobs/taxonomiesValidationJob')
 const SurveyInfoValidationJob = require('./jobs/surveyInfoValidationJob')
 const RecordCheckJob = require('../recordCheckJob')
 const SurveyPublishPerformJob = require('./surveyPublishPerformJob')
-const SurveyRdbGeneratorJob = require('../surveyRdbGeneratorJob')
+const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
 
 class SurveyPublishJob extends Job {
 

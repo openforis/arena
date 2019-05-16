@@ -8,9 +8,9 @@ const getNamesAndType = nodeDefCol =>
     `${col} ${ColProps.getColTypeProcessor(nodeDefCol)(col)}`
   )
 
-const getValues = async (surveyInfo, nodeDefCol, nodeCol = {}, client) => {
+const getValues = async (surveyInfo, nodeDefCol, nodeCol = {}, surveyIndex, client) => {
   const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
-  const valueFn = await valueFnProcessor(surveyInfo, nodeDefCol, nodeCol, client)
+  const valueFn = await valueFnProcessor(surveyInfo, nodeDefCol, nodeCol, surveyIndex, client)
   const values = getNames(nodeDefCol).map(colName =>
     valueFn(nodeCol, colName)
   )
