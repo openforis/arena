@@ -38,21 +38,29 @@ const keysTaxonomyIndex = {
   vernacularNames: 'vernacularNames',
 }
 
-const getCategoryItemUuid = (survey, nodeDef, record, parentNode, code) => surveyIndex => {
+const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode, code) => surveyIndex => {
 
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
-  const parentCategoryItemUuid = levelIndex > 0 ?
-    R.pipe(
-      Record.getParentCodeAttribute(survey, parentNode, nodeDef),
-      Node.getCategoryItemUuid
-    )(record)
-    : 'null'
 
-  return R.path(
+  let parentCategoryItemUuid, hierarchyCode
+
+  if (levelIndex > 0) {
+    const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
+    parentCategoryItemUuid = Node.getCategoryItemUuid(parentCodeAttribute)
+    hierarchyCode = R.append(Node.getCategoryItemUuid(parentCodeAttribute), Node.getHierarchyCode(parentCodeAttribute))
+  } else {
+    parentCategoryItemUuid = 'null'
+    hierarchyCode = []
+  }
+  const itemUuid = R.path(
     [keys.categoryIndex, categoryUuid, parentCategoryItemUuid, code],
     surveyIndex
   )
+  return {
+    itemUuid,
+    hierarchyCode
+  }
 }
 
 const getTaxonUuid = (nodeDef, taxonCode) => surveyIndex => {
@@ -79,7 +87,7 @@ const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => surve
 module.exports = {
   keys,
 
-  getCategoryItemUuid,
+  getCategoryItemUuidAndCodeHierarchy,
 
   getTaxonUuid,
   getTaxonVernacularNameUuid
