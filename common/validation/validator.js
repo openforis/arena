@@ -193,8 +193,8 @@ const cleanup = validation => R.pipe(
 
 const assocValidation = v => R.assoc(keys.validation, v)
 
-const assocFieldValidation = field => R.pipe(
-  R.assocPath([keys.fields, field]),
+const assocFieldValidation = (field, fieldValidation) => R.pipe(
+  R.assocPath([keys.fields, field], fieldValidation),
   cleanup
 )
 
