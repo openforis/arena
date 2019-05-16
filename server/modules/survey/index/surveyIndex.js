@@ -4,6 +4,7 @@ const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
+const Taxon = require('../../../../common/survey/taxon')
 
 /**
  * categoryItemUuidIndex : {
@@ -18,10 +19,10 @@ const Node = require('../../../../common/record/node')
  *    [$categoryItemUuid] : { ...$categoryItem }
  * }
  *
- * taxonomyUuidIndex : {
+ * taxonUuidIndex : {
  *   [$taxonomyUuid] : {
  *     [$taxonCode] : {
- *       taxonUuid : $taxonUuid,
+ *       uuid : $taxonUuid,
  *       vernacularNames: {
  *        [$vernacularName] : $vernacularNameUuid,
  *       ...
@@ -30,17 +31,17 @@ const Node = require('../../../../common/record/node')
  *   }
  * }
  *
+ *  taxonIndex : {
+ *    [$taxonUuid] : { ...$taxon }
+ * }
+ *
  */
 
 const keys = {
   categoryItemUuidIndex: 'categoryItemUuidIndex',
   categoryItemIndex: 'categoryItemIndex',
-  taxonomyUuidIndex: 'taxonomyUuidIndex'
-}
-
-const keysTaxonomyIndex = {
-  taxonUuid: 'taxonUuid',
-  vernacularNames: 'vernacularNames',
+  taxonUuidIndex: 'taxonUuidIndex',
+  taxonIndex: 'taxonIndex'
 }
 
 // ==== category index
@@ -73,7 +74,7 @@ const getCategoryItemByUuid = categoryItemUuid => R.pathOr(null, [keys.categoryI
 const getTaxonUuid = (nodeDef, taxonCode) => surveyIndex => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.path(
-    [keys.taxonomyUuidIndex, taxonomyUuid, taxonCode, keysTaxonomyIndex.taxonUuid],
+    [keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.keys.uuid],
     surveyIndex
   )
 }
@@ -81,10 +82,12 @@ const getTaxonUuid = (nodeDef, taxonCode) => surveyIndex => {
 const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => surveyIndex => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.path(
-    [keys.taxonomyUuidIndex, taxonomyUuid, taxonCode, keysTaxonomyIndex.vernacularNames, vernacularName],
+    [keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.propKeys.vernacularNames, vernacularName],
     surveyIndex
   )
 }
+
+const getTaxonByUuid = taxonUuid => R.path([keys.taxonIndex, taxonUuid])
 
 module.exports = {
   keys,
@@ -95,5 +98,6 @@ module.exports = {
 
   // ==== taxonomy index
   getTaxonUuid,
-  getTaxonVernacularNameUuid
+  getTaxonVernacularNameUuid,
+  getTaxonByUuid
 }

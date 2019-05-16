@@ -22,11 +22,11 @@ const getNodeCol = (nodeDefCol, record, nodeRow) => {
   return nodeCol
 }
 
-const getValues = async (surveyInfo, nodeDefRow, record, nodeRow, nodeDefColumns, surveyIndex, client) => {
+const getValues = async (surveyInfo, nodeDefRow, record, nodeRow, nodeDefColumns, surveyIndex) => {
   const values = await Promise.all(nodeDefColumns.map(async nodeDefCol => {
       const nodeCol = getNodeCol(nodeDefCol, record, nodeRow)
 
-      const nodeColValues = await DataCol.getValues(surveyInfo, nodeDefCol, nodeCol, surveyIndex, client)
+      const nodeColValues = await DataCol.getValues(surveyInfo, nodeDefCol, nodeCol, surveyIndex)
 
       return nodeColValues
     })

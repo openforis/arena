@@ -11,6 +11,7 @@ const SurveyIndex = require('../../index/surveyIndex')
 
 const CategoryItem = require('../../../../../common/survey/categoryItem')
 const CategoryLevel = require('../../../../../common/survey/categoryLevel')
+const Taxon = require('../../../../../common/survey/taxon')
 
 const fetchIndex = async (surveyId, client = db) => {
   const [categoryIndexRS, taxonomyIndexRS] = await Promise.all([
@@ -23,7 +24,8 @@ const fetchIndex = async (surveyId, client = db) => {
     [SurveyIndex.keys.categoryItemUuidIndex]: _getCategoryItemUuidIndex(categoryIndexRS),
     [SurveyIndex.keys.categoryItemIndex]: ObjectUtils.toUuidIndexedObj(categoryIndexRS),
     // taxonomy indexes
-    [SurveyIndex.keys.taxonomyUuidIndex]: _getTaxonomyUuidIndex(taxonomyIndexRS)
+    [SurveyIndex.keys.taxonUuidIndex]: _getTaxonomyUuidIndex(taxonomyIndexRS),
+    [SurveyIndex.keys.taxonIndex]: ObjectUtils.toUuidIndexedObj(taxonomyIndexRS)
   }
 }
 
@@ -39,21 +41,22 @@ const _getCategoryItemUuidIndex = R.reduce(
   {}
 )
 
-const _getTaxonomyUuidIndex = (taxonomyIndexRS) =>
-  R.reduce(
-    (accIndex, row) => ObjectUtils.setInPath(
-      [
-        row.taxonomy_uuid,
-        row.code
-      ],
-      {
-        taxonUuid: row.taxon_uuid,
-        vernacularNames: R.mergeAll(row.vernacular_names),
-      }
-    )(accIndex),
-    {},
-    taxonomyIndexRS
-  )
+const _getTaxonomyUuidIndex = R.reduce(
+  (accIndex, row) => ObjectUtils.setInPath(
+    [
+      Taxon.getTaxonomyUuid(row),
+      Taxon.getCode(row)
+    ],
+    {
+      [Taxon.keys.uuid]: Taxon.getUuid(row),
+      [Taxon.propKeys.vernacularNames]: R.pipe(
+        R.prop(Taxon.propKeys.vernacularNames),
+        R.mergeAll
+      )(row),
+    }
+  )(accIndex),
+  {}
+)
 
 module.exports = {
   fetchIndex

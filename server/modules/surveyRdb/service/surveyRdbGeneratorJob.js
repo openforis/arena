@@ -39,7 +39,7 @@ class SurveyRdbGeneratorJob extends Job {
     await Survey.traverseHierarchyItem(root, createTable)
     this.logDebug('create data tables - end')
 
-    const surveyIndex = this.getContextProp('surveyIndex')
+    const surveyIndex = this.getContextProp(Job.keysContext.surveyIndex)
 
     //3 ==== insert records
     const insertIntoTable = record =>

@@ -249,11 +249,11 @@ class Job {
   }
 
   getSurveyId () {
-    return this.getContextProp('surveyId')
+    return this.getContextProp(Job.keysContext.surveyId)
   }
 
   getUser () {
-    return this.getContextProp('user')
+    return this.getContextProp(Job.keysContext.user)
   }
 
   getUserId () {
@@ -352,6 +352,13 @@ class Job {
     this._logger.error(message)
   }
 
+}
+
+// static context keys
+Job.keysContext = {
+  surveyId: 'surveyId',
+  user: 'user',
+  surveyIndex: 'surveyIndex'
 }
 
 module.exports = Job

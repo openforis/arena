@@ -9,8 +9,6 @@ const Node = require('../../../../common/record/node')
 
 const SurveyIndex = require('../../survey/index/surveyIndex')
 
-const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
-
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const sqlTypes = require('../../../../common/surveyRdb/sqlTypes')
 const { nodeDefType } = NodeDef
@@ -79,10 +77,11 @@ const props = {
   },
 
   [nodeDefType.taxon]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, surveyIndex, client) => {
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, surveyIndex) => {
       // return (node, colName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
-      const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : {}
+      const taxon = taxonUuid ? SurveyIndex.getTaxonByUuid(taxonUuid)(surveyIndex) : {}
+
       return (node, colName) =>
         R.endsWith('code', colName)
           ? Taxon.getCode(taxon)
