@@ -18,32 +18,6 @@ import { getFieldValidation, getValidation } from '../../../../../common/validat
 import { normalizeName } from '../../../../../common/stringUtils'
 import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
 
-const displayAsItems = [
-  {
-    key: NodeDefLayout.nodeDefRenderType.form,
-    label: 'Form',
-  },
-  {
-    key: NodeDefLayout.nodeDefRenderType.table,
-    label: 'Table',
-  },
-]
-
-const displayInItems = [
-  {
-    key: NodeDefLayout.nodeDefDisplayIn.parentPage,
-    label: 'Parent page',
-  },
-  {
-    key: NodeDefLayout.nodeDefDisplayIn.ownPage,
-    label: 'Its own page',
-  }
-]
-
-const onPropLabelsChange = (putNodeDefProp, nodeDef, labelItem, key, currentValue) => {
-  putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
-}
-
 const BasicProps = props => {
   const {
     nodeDef,
@@ -55,6 +29,32 @@ const BasicProps = props => {
   const validation = getValidation(nodeDef)
 
   const { i18n } = useContext(AppContext)
+
+  const displayAsItems = [
+    {
+      key: NodeDefLayout.nodeDefRenderType.form,
+      label: i18n.t('nodeDefEdit.basicProps.form'),
+    },
+    {
+      key: NodeDefLayout.nodeDefRenderType.table,
+      label: i18n.t('nodeDefEdit.basicProps.table'),
+    },
+  ]
+
+  const displayInItems = [
+    {
+      key: NodeDefLayout.nodeDefDisplayIn.parentPage,
+      label: i18n.t('nodeDefEdit.basicProps.parentPage'),
+    },
+    {
+      key: NodeDefLayout.nodeDefDisplayIn.ownPage,
+      label: i18n.t('nodeDefEdit.basicProps.ownPage'),
+    },
+  ]
+
+  const onPropLabelsChange = (labelItem, key, currentValue) => {
+    putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
+  }
 
   return (
     <div className="form">
@@ -71,12 +71,12 @@ const BasicProps = props => {
 
       <LabelsEditor
         labels={NodeDef.getLabels(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'labels', NodeDef.getLabels(nodeDef))}/>
+        onChange={(labelItem) => onPropLabelsChange(labelItem, 'labels', NodeDef.getLabels(nodeDef))}/>
 
       <LabelsEditor
         formLabel="Description(s)"
         labels={NodeDef.getDescriptions(nodeDef)}
-        onChange={(labelItem) => onPropLabelsChange(putNodeDefProp, nodeDef, labelItem, 'descriptions', NodeDef.getDescriptions(nodeDef))}/>
+        onChange={(labelItem) => onPropLabelsChange(labelItem, 'descriptions', NodeDef.getDescriptions(nodeDef))}/>
 
       {
         NodeDef.isCode(nodeDef) &&

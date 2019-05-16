@@ -62,6 +62,10 @@ module.exports = {
       multiple: 'multiple',
       displayAs: 'display as',
       displayIn: 'display in',
+      form: 'Form',
+      table: 'Table',
+      parentPage: 'Parent page',
+      ownPage: 'Its own page',
     },
     advancedProps: {
       readOnly: 'readOnly',
