@@ -55,6 +55,10 @@ module.exports = {
     basic: 'Basic',
     advanced: 'Advanced',
     validations: 'Validations',
+    expressionProp: {
+      errorMessage: 'Error message',
+      errorMessage_plural: 'Error messages',
+    },
   },
 
   designerView: {
