@@ -25,7 +25,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   return (
     <Modal isOpen={true} onClose={() => onCancel()}>
       <ModalHeader>
-        <h5 className="survey-delete-dialog__header">{i18n.t('homeView.deleteSurveyDialog.areYouSure')}</h5>
+        <h5 className="survey-delete-dialog__header">{i18n.t('homeView.deleteSurveyDialog.confirmDelete')}</h5>
       </ModalHeader>
 
       <ModalBody>
