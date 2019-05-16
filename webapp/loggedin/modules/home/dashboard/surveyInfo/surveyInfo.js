@@ -69,7 +69,7 @@ const SurveyInfo = props => {
 
           <Link to={appModuleUri(homeModules.surveyInfo)} className="btn btn-of-light">
             <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`}/>
-            {canEditDef ? 'Edit' : 'View'} {i18n.t('homeView.surveyInfo.info')}
+            {i18n.t(canEditDef ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
           </Link>
 
           {
@@ -93,19 +93,23 @@ const SurveyInfo = props => {
         <div className="row">
           <Link
             to={appModuleUri(designerModules.formDesigner)} className="btn btn btn-of-light">
-            <span className="icon icon-quill icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.formDesigner')}
+            <span className="icon icon-quill icon-12px icon-left"/>
+            {i18n.t('survey.formDesigner')}
           </Link>
           <Link
             to={appModuleUri(designerModules.surveyHierarchy)} className="btn btn btn-of-light">
-            <span className="icon icon-tree icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.hierarchy')}
+            <span className="icon icon-tree icon-12px icon-left"/>
+            {i18n.t('homeView.surveyInfo.hierarchy')}
           </Link>
           <Link
             to={appModuleUri(designerModules.categories)} className="btn btn btn-of-light">
-            <span className="icon icon-list2 icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.categories')}
+            <span className="icon icon-list2 icon-12px icon-left"/>
+            {i18n.t('survey.categories')}
           </Link>
           <Link
             to={appModuleUri(designerModules.taxonomies)} className="btn btn btn-of-light">
-            <span className="icon icon-leaf icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.taxonomies')}
+            <span className="icon icon-leaf icon-12px icon-left" />
+            {i18n.t('survey.taxonomies')}
           </Link>
         </div>
 

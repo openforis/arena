@@ -111,11 +111,13 @@ class NodeDefCode extends React.Component {
       const nodeToUpdate = this.determineNodeToUpdate()
       const value = newSelectedItem
         ? {
-          itemUuid: CategoryItem.getUuid(newSelectedItem),
-          h: codeUuidsHierarchy
+          [Node.valuePropKeys.itemUuid]: CategoryItem.getUuid(newSelectedItem),
         }
         : null
-      updateNode(nodeDef, nodeToUpdate, value)
+      const meta = {
+        [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy
+      }
+      updateNode(nodeDef, nodeToUpdate, value, null, meta)
     }
   }
 
@@ -147,10 +149,14 @@ const mapStateToProps = (state, props) => {
   const record = RecordState.getRecord(state)
   const { nodeDef, parentNode } = props
 
-  const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
-
   const categoryLevelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
+
+  const parentCodeAttribute = Record.getParentCodeAttribute(survey, parentNode, nodeDef)(record)
+
+  const codeUuidsHierarchy = parentCodeAttribute
+    ? R.append(Node.getUuid(parentCodeAttribute), Node.getHierarchyCode(parentCodeAttribute))
+    : []
 
   return {
     surveyId: Survey.getId(survey),
@@ -161,7 +167,7 @@ const mapStateToProps = (state, props) => {
     categoryUuid: category ? Category.getUuid(category) : null,
     categoryLevelIndex: categoryLevelIndex,
     parentItemUuid: Node.getCategoryItemUuid(parentCodeAttribute),
-    codeUuidsHierarchy: Record.getCodeUuidsHierarchy(survey, parentNode, nodeDef)(record),
+    codeUuidsHierarchy
   }
 }
 

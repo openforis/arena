@@ -21,6 +21,7 @@ const dbTransformCallback = node =>
 
 const insertNode = (surveyId, node, client = db) => {
   const meta = {
+    ...Node.getMeta(node),
     [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
     [Node.metaKeys.childApplicability]: {}
   }
@@ -48,7 +49,7 @@ const insertNodes = async (surveyId, nodes, client = db) => {
     }
   ])
 
-  client.none(insertAllQuery(
+  await client.none(insertAllQuery(
     getSurveyDBSchema(surveyId),
     'node',
     ['uuid', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'],
@@ -121,7 +122,7 @@ const deleteNode = async (surveyId, nodeUuid, client = db) =>
   await client.one(`
     DELETE FROM ${getSurveyDBSchema(surveyId)}.node
     WHERE uuid = $1
-    RETURNING *,'{}' as value, true as ${Node.keys.deleted}
+    RETURNING *, true as ${Node.keys.deleted}
     `, [nodeUuid],
     dbTransformCallback
   )

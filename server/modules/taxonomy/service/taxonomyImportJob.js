@@ -41,7 +41,7 @@ class TaxonomyImportJob extends Job {
     const { taxonomyUuid } = this
     const surveyId = this.getSurveyId()
 
-    this._logDebug(`starting taxonomy import on survey ${surveyId}, importing into taxonomy ${taxonomyUuid}`)
+    this.logDebug(`starting taxonomy import on survey ${surveyId}, importing into taxonomy ${taxonomyUuid}`)
 
     // 1. load taxonomy and check it has not published
 
@@ -54,13 +54,13 @@ class TaxonomyImportJob extends Job {
     // 2. calculate total number of rows
     this.total = await new CSVParser(this.filePath).calculateSize()
 
-    this._logDebug(`${this.total} rows found in the CSV file`)
+    this.logDebug(`${this.total} rows found in the CSV file`)
 
     // 3. process headers
     const validHeaders = await this.processHeaders()
 
     if (!validHeaders) {
-      this._logDebug('invalid header, setting status to "failed"')
+      this.logDebug('invalid header, setting status to "failed"')
       await this.setStatusFailed()
       return
     }
@@ -73,7 +73,7 @@ class TaxonomyImportJob extends Job {
   }
 
   async _parseCSVRows(taxonomy) {
-    this._logDebug('start CSV file parsing')
+    this.logDebug('start CSV file parsing')
 
     const surveyId = this.getSurveyId()
 
@@ -95,14 +95,14 @@ class TaxonomyImportJob extends Job {
       row = await csvParser.next()
     }
 
-    this._logDebug(`CSV file processed, ${this.processed} rows processed`)
+    this.logDebug(`CSV file processed, ${this.processed} rows processed`)
 
     if (this.isRunning()) {
       if (R.isEmpty(this.errors)) {
-        this._logDebug('no errors found, finalizing import')
+        this.logDebug('no errors found, finalizing import')
         await this.taxonomyImportManager.finalizeImport(taxonomy, this.tx)
       } else {
-        this._logDebug(`${R.keys(this.errors).length} errors found`)
+        this.logDebug(`${R.keys(this.errors).length} errors found`)
         await this.setStatusFailed()
       }
     }

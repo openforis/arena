@@ -44,6 +44,8 @@ class SurveyRdbGeneratorJob extends Job {
       }
 
     for (const recordUuid of recordUuids) {
+      if(this.isCanceled())
+        return
       const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, tx)
       await Survey.traverseHierarchyItem(root, insertIntoTable(record))
     }

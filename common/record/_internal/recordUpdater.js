@@ -13,19 +13,21 @@ const assocNodes = nodes =>
   record => {
     // exclude dirty nodes currently being edited by the user
 
-    const dirtyNodes = RecordReader.findNodesIndexed(Node.isDirty)(record)
-
     const nodesToUpdate = R.pipe(
       R.filter(
         n => {
-          const dirtyNode = R.prop(Node.getUuid(n), dirtyNodes)
-          return !dirtyNode ||
-            Node.isDirty(n) ||
-            R.equals(Node.getValue(dirtyNode), Node.getValue(n)) ||
-            Node.isValueBlank(dirtyNode) && Node.isDefaultValueApplied(n)
-        }),
+          const nodeUuid = Node.getUuid(n)
+          const nodeExisting = RecordReader.getNodeByUuid(nodeUuid)(record)
+
+          return !nodeExisting || //new node
+            !Node.isDirty(nodeExisting) || //existing node is not dirty
+            Node.isDirty(n) || //new node is dirty, replace the existing one
+            R.equals(Node.getValue(nodeExisting), Node.getValue(n)) || //new node is not dirty and has the same value of the existing (dirty) node
+            Node.isValueBlank(nodeExisting) && Node.isDefaultValueApplied(n) //existing node has a blank value and n has a default value applied
+        }
+      ),
       R.map(
-        R.omit([Node.keys.updated, Node.keys.created])
+        R.omit([Node.keys.updated, Node.keys.created]) //exclude updated and created properties (used by Survey RDB generation)
       )
     )(nodes)
 
@@ -34,13 +36,18 @@ const assocNodes = nodes =>
       R.values
     )(nodes)
 
+    const recordUpdated = {
+      ...record,
+      [keys.nodes]: {
+        ...RecordReader.getNodes(record),
+        ...nodesToUpdate
+      }
+    }
+
     return R.pipe(
-      RecordReader.getNodes,
-      R.mergeLeft(nodesToUpdate),
-      mergedNodes => R.assoc(keys.nodes, mergedNodes)(record),
       deleteNodes(nodesDeletedArray),
       NodesIndex.addNodes(nodesToUpdate)
-    )(record)
+    )(recordUpdated)
   }
 
 const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
@@ -78,11 +85,7 @@ const deleteNode = node =>
     recordUpdated = NodesIndex.removeNode(node)(recordUpdated)
 
     // 4. remove node from record
-    recordUpdated = R.pipe(
-      RecordReader.getNodes,
-      R.dissoc(nodeUuid),
-      newNodes => R.assoc(keys.nodes, newNodes, recordUpdated),
-    )(recordUpdated)
+    delete recordUpdated[keys.nodes][nodeUuid]
 
     return recordUpdated
   }

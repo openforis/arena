@@ -33,4 +33,32 @@ module.exports = {
   info: msg => isInfoEnabled() && logger.info(msg),
   warn: msg => isWarnEnabled() && logger.warn(msg),
   error: msg => isErrorEnabled() && logger.error(msg),
+
+  getLogger: prefix => new Logger(prefix)
+}
+
+/**
+ * Logger class with custom prefix
+ */
+class Logger {
+
+  constructor (prefix) {
+    this.prefix = prefix
+  }
+
+  debug (msg) {
+    isDebugEnabled() && logger.debug(`${this.prefix} - ${msg}`)
+  }
+
+  info (msg) {
+    isInfoEnabled() && logger.info(msg)
+  }
+
+  warn (msg) {
+    isWarnEnabled() && logger.warn(msg)
+  }
+
+  error (msg) {
+    isErrorEnabled() && logger.error(msg)
+  }
 }
