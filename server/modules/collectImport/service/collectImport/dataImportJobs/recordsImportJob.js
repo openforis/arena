@@ -146,12 +146,19 @@ class RecordsImportJob extends Job {
       let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, parentNode)
 
       if (NodeDef.isAttribute(nodeDef)) {
-        const value = await CollectAttributeValueExtractor.extractAttributeValue(
+        const valueAndMeta = await CollectAttributeValueExtractor.extractAttributeValueAndMeta(
           survey, nodeDef, record, nodeToInsert, surveyIndex,
           collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode,
           this.tx
         )
-        nodeToInsert = Node.assocValue(value)(nodeToInsert)
+        const value = R.prop('value', valueAndMeta)
+        if (value) {
+          nodeToInsert = Node.assocValue(value)(nodeToInsert)
+          const meta = R.prop('meta', valueAndMeta)
+          if (meta) {
+            nodeToInsert = Node.mergeMeta(meta)(nodeToInsert)
+          }
+        }
       }
 
       await this.batchPersister.addItem(nodeToInsert, this.tx)
