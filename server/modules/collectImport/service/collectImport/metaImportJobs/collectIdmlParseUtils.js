@@ -3,17 +3,23 @@ const R = require('ramda')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const { nodeDefType } = NodeDef
 
-const nodeDefTypesByCollectType = {
-  boolean: nodeDefType.boolean,
-  code: nodeDefType.code,
-  coordinate: nodeDefType.coordinate,
-  date: nodeDefType.date,
-  entity: nodeDefType.entity,
-  file: nodeDefType.file,
-  number: nodeDefType.decimal,
-  taxon: nodeDefType.taxon,
-  text: nodeDefType.text,
-  time: nodeDefType.time,
+const nodeDefTypesExtractorByCollectType = {
+  boolean: () => nodeDefType.boolean,
+  code: () => nodeDefType.code,
+  coordinate: () => nodeDefType.coordinate,
+  date: () => nodeDefType.date,
+  entity: () => nodeDefType.entity,
+  file: () => nodeDefType.file,
+  number: (collectNodeDef) => getAttribute('type')(collectNodeDef) === 'real' ? nodeDefType.decimal : nodeDefType.integer,
+  taxon: () => nodeDefType.taxon,
+  text: () => nodeDefType.text,
+  time: () => nodeDefType.time,
+}
+
+const getNodeDefTypeByCollectNodeDef = collectNodeDef => {
+  const collectType = getName(collectNodeDef)
+  const typeExtractor = nodeDefTypesExtractorByCollectType[collectType]
+  return typeExtractor && typeExtractor(collectNodeDef)
 }
 
 const keys = {
@@ -85,7 +91,7 @@ const getAttribute = (name, defaultValue = null) => R.pipe(
 )
 
 module.exports = {
-  nodeDefTypesByCollectType,
+  getNodeDefTypeByCollectNodeDef,
 
   toLabels,
   getElements,
