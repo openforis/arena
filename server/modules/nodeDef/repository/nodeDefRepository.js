@@ -103,20 +103,17 @@ const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = d
     res => dbTransformCallback(res, draft, false)
   )
 
-const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
-  const rootNodeDef = await fetchRootNodeDef(surveyId, draft, client)
-
-  return await client.map(`
+const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, client = db) =>
+  await client.map(`
     SELECT ${nodeDefSelectFields}
     FROM ${getSurveyDBSchema(surveyId)}.node_def 
     WHERE deleted IS NOT TRUE
     AND parent_uuid = $1
-    AND props->>'key' = $2
+    AND ${draft ? '(props_draft || props)' : 'props'}->>'key' = $2
     ORDER BY id`,
-    [NodeDef.getUuid(rootNodeDef), 'true'],
+    [nodeDefRootUuid, 'true'],
     res => dbTransformCallback(res, draft, false)
   )
-}
 
 // ============== UPDATE
 
