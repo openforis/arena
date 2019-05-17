@@ -11,7 +11,7 @@ module.exports = {
     srs: 'SRS',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
-    invalid: 'Invalid',
+    invalid: 'INVALID',
   },
   sidebar: {
     openForisShort: 'OF',
