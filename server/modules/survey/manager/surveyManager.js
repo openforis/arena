@@ -8,6 +8,7 @@ const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 const SurveyIndexManager = require('./_internal/surveyIndexManager')
 
 const SurveyRepository = require('../repository/surveyRepository')
+const SurveyRepositoryUtils = require('../repository/surveySchemaRepositoryUtils')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const User = require('../../../../common/user/user')
@@ -108,6 +109,7 @@ const updateSurveyProp = async (user, surveyId, key, value, client = db) =>
   await client.tx(async t => {
     await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t)
     await SurveyRepository.updateSurveyProp(surveyId, key, value, t)
+    await SurveyRepositoryUtils.markSurveyDraft(surveyId, t)
 
     return await fetchSurveyById(surveyId, true, true, t)
   })
