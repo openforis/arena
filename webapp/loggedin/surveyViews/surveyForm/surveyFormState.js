@@ -96,6 +96,8 @@ export const getFormPageParentNode = nodeDef =>
     return null
   }
 
+// ====== NodeDef update actions
+
 // on nodeDef create init form state
 export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
   // if is entity and renders in its own page, assoc active page
@@ -111,3 +113,20 @@ export const assocParamsOnNodeDefCreate = nodeDef => R.pipe(
     R.identity,
   )
 )
+
+// on nodeDef delete, dissoc nodeDefUuidPage and nodeDefUuidAddChildTo if they correspond to nodeDef
+export const dissocParamsOnNodeDefDelete = nodeDef => surveyFormState => {
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  return R.pipe(
+    R.ifElse(
+      R.propEq(keys.nodeDefUuidPage, nodeDefUuid),
+      R.dissoc(keys.nodeDefUuidPage),
+      R.identity
+    ),
+    R.ifElse(
+      R.propEq(keys.nodeDefUuidAddChildTo, nodeDefUuid),
+      R.dissoc(keys.nodeDefUuidAddChildTo),
+      R.identity
+    ),
+  )(surveyFormState)
+}
