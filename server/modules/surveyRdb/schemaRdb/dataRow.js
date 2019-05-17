@@ -7,29 +7,26 @@ const Node = require('../../../../common/record/node')
 const DataCol = require('./dataCol')
 
 const getNodeCol = (nodeDefCol, record, nodeRow) => {
-  if (NodeDef.isRoot(nodeDefCol))
-    return Record.getRootNode(record)
 
-// attribute column in multiple attribute table (value of its own table)
-  const nodeDefUuid = NodeDef.getUuid(nodeDefCol)
+  const nodeDefUuidCol = NodeDef.getUuid(nodeDefCol)
+  const nodeDefUuidRow = Node.getNodeDefUuid(nodeRow)
 
-  const nodeCol = Node.getNodeDefUuid(nodeRow) === nodeDefUuid ?
+  // attribute column in multiple attribute table (value of its own table)
+  const nodeCol = nodeDefUuidRow === nodeDefUuidCol ?
     nodeRow :
     R.pipe(
-      Record.getNodeChildByDefUuid(nodeRow, nodeDefUuid),
+      Record.getNodeChildByDefUuid(nodeRow, nodeDefUuidCol),
       R.defaultTo({})
     )(record)
 
-  return NodeDef.isEntity(nodeDefCol) && R.isEmpty(nodeCol)
-    ? getNodeCol(nodeDefCol, record, Record.getParentNode(nodeRow)(record))
-    : nodeCol
+  return nodeCol
 }
 
-const getValues = async (surveyInfo, nodeDefRow, record, nodeRow, nodeDefColumns, client) => {
+const getValues = async (surveyInfo, nodeDefRow, record, nodeRow, nodeDefColumns, surveyIndex) => {
   const values = await Promise.all(nodeDefColumns.map(async nodeDefCol => {
       const nodeCol = getNodeCol(nodeDefCol, record, nodeRow)
 
-      const nodeColValues = await DataCol.getValues(surveyInfo, nodeDefCol, nodeCol, client)
+      const nodeColValues = await DataCol.getValues(surveyInfo, nodeDefCol, nodeCol, surveyIndex)
 
       return nodeColValues
     })

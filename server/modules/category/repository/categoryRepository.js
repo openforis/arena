@@ -1,4 +1,5 @@
 const R = require('ramda')
+const camelize = require('camelize')
 
 const db = require('../../../db/db')
 const { insertAllQuery } = require('../../../db/dbUtils')
@@ -141,19 +142,23 @@ const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft 
   )
 
 const fetchIndex = async (surveyId, client = db) =>
-  await client.any(`
+  await client.map(`
     SELECT 
       l.category_uuid,
       i.parent_uuid,
-      i.props ->> 'code' AS code,
-      i.uuid            AS item_uuid
+      i.props,
+      i.uuid,
+      i.level_uuid
     FROM
        ${getSurveyDBSchema(surveyId)}.category_item i
     JOIN
        ${getSurveyDBSchema(surveyId)}.category_level l
     ON
       i.level_uuid = l.uuid
-  `)
+    `,
+    [],
+    camelize
+  )
 
 // ============== UPDATE
 

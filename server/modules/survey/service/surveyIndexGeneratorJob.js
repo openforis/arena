@@ -11,7 +11,7 @@ class SurveyIndexGeneratorJob extends Job {
   async execute (tx) {
     const surveyIndex = await SurveyManager.fetchIndex(this.getSurveyId(), tx)
 
-    this.setContext({ surveyIndex })
+    this.setContext({ [Job.keysContext.surveyIndex]: surveyIndex })
   }
 
 }

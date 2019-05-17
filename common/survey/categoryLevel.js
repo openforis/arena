@@ -22,4 +22,5 @@ module.exports = {
   getUuid,
   getIndex: R.prop(keys.index),
   getName: getProp(props.name),
+  getCategoryUuid: R.prop(keys.categoryUuid),
 }
