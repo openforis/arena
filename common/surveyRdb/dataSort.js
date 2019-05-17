@@ -27,8 +27,8 @@ const getSortPreparedStatement = sortCriteria => {
 const findVariableByValue = (value) =>
   R.find(v => v.value === value)
 
-const getViewExpr = R.pipe(
-  R.map(c => `${c.label} ${c.order === keys.order.asc ? 'ASCENDING' : 'DESCENDING'}`),
+const getViewExpr = (ascLabel, descLabel) => R.pipe(
+  R.map(c => `${c.label} ${c.order === keys.order.asc ? ascLabel : descLabel}`),
   R.join(', ')
 )
 

@@ -1,6 +1,8 @@
 import './dataView.scss'
 
-import React from 'react'
+import React, { useContext } from 'react'
+
+import AppContext from '../../../app/appContext'
 
 import NavigationTabBar from '../components/moduleNavigationTabBar'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
@@ -11,49 +13,45 @@ import DataVisView from './dataVis/dataVisView'
 import { appModules, appModuleUri } from '../../appModules'
 import { dataModules } from './dataModules'
 
-class DataView extends React.Component {
+const DataView = () => {
+  const { i18n } = useContext(AppContext)
 
-  render () {
+  return (
+    <SurveyDefsLoader
+      draft={false}
+      validate={false}>
 
-    return (
-      <SurveyDefsLoader
-        draft={false}
-        validate={false}>
+      <NavigationTabBar
+        className="data app-module__tab-navigation"
+        moduleRoot={appModules.data}
+        moduleDefault={dataModules.records}
+        tabs={[
 
-        <NavigationTabBar
-          className="data app-module__tab-navigation"
-          moduleRoot={appModules.data}
-          moduleDefault={dataModules.records}
-          tabs={[
+          // records list
+          {
+            label: i18n.t('data.records.records'),
+            component: RecordsView,
+            path: appModuleUri(dataModules.records),
+          },
 
-            // records list
-            {
-              label: 'Records',
-              component: RecordsView,
-              path: appModuleUri(dataModules.records),
-            },
+          //edit record
+          {
+            component: RecordView,
+            path: appModuleUri(dataModules.record) + ':recordUuid/',
+            showTab: false,
+          },
 
-            //edit record
-            {
-              label: 'Record',
-              component: RecordView,
-              path: appModuleUri(dataModules.record) + ':recordUuid/',
-              showTab: false,
-            },
+          // data visualization
+          {
+            label: i18n.t('data.dataVis.dataVis'),
+            component: DataVisView,
+            path: appModuleUri(dataModules.dataVis),
+          },
 
-            // data visualization
-            {
-              label: 'Data vis',
-              component: DataVisView,
-              path: appModuleUri(dataModules.dataVis),
-            },
-
-          ]}
-        />
-      </SurveyDefsLoader>
-    )
-  }
-
+        ]}
+      />
+    </SurveyDefsLoader>
+  )
 }
 
 export default DataView

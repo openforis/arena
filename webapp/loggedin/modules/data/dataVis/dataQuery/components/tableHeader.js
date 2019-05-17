@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useState, useContext } from 'react'
 import { connect } from 'react-redux'
+
+import AppContext from '../../../../../../app/appContext'
 
 import ExpressionEditorPopup from '../../../../../../commonComponents/expression/expressionEditorPopup'
 import TablePaginator from '../../../../../../commonComponents/table/tablePaginator'
@@ -12,129 +14,109 @@ import * as DataSort from '../../../../../../../common/surveyRdb/dataSort'
 
 import { updateTableFilter, resetTableFilter, updateTableOffset, updateTableSort, updateTableEditMode } from '../actions'
 
-class TableHeader extends React.Component {
+const TableHeader = props => {
 
-  constructor (props) {
-    super(props)
+  const [ showExpressionEditor, setShowExpressionEditor ] = useState(false)
+  const [ showSortEditor, setShowSortEditor ] = useState(false)
 
-    this.toggleExpressionEditor = this.toggleExpressionEditor.bind(this)
-    this.toggleSortEditor = this.toggleSortEditor.bind(this)
-
-    this.state = {
-      showExpressionEditor: false,
-      showSortEditor: false,
-    }
+  const toggleExpressionEditor = () => {
+    setShowExpressionEditor(!showExpressionEditor)
+    setShowSortEditor(false)
   }
 
-  toggleExpressionEditor () {
-    this.setState(state => ({
-      showExpressionEditor: !state.showExpressionEditor,
-      showSortEditor: false,
-    }))
+  const toggleSortEditor = () => {
+    setShowExpressionEditor(false)
+    setShowSortEditor(!showSortEditor)
   }
 
-  toggleSortEditor () {
-    this.setState(state => ({
-      showExpressionEditor: false,
-      showSortEditor: !state.showSortEditor,
-    }))
-  }
+  const {
+    surveyId, nodeDefUuidContext, nodeDefUuidCols,
+    tableName, colNames, filter, sort, limit, offset, count,
+    showPaginator, editMode, canEdit,
+    updateTableFilter, updateTableOffset, updateTableEditMode,
+    resetTableFilter,
+    updateTableSort,
+  } = props
 
-  updateSort (sort) {
-    const { updateTableSort } = this.props
+  const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.toHttpParams(sort)}&cols=${JSON.stringify(colNames)}`
 
-    updateTableSort(sort)
-  }
+  const { i18n } = useContext(AppContext)
+  const sortMsg = DataSort.getViewExpr(i18n.t('data.dataVis.dataSort.ascending'), i18n.t('dataVis.dataQuery.descending'))(sort)
 
-  render () {
 
-    const { showExpressionEditor, showSortEditor } = this.state
+  return (
+    <div className="table__header">
 
-    const {
-      surveyId, nodeDefUuidContext, nodeDefUuidCols,
-      tableName, colNames, filter, sort, limit, offset, count,
-      showPaginator, editMode, canEdit,
-      updateTableFilter, updateTableOffset, updateTableEditMode,
-      resetTableFilter,
-    } = this.props
-
-    const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.toHttpParams(sort)}&cols=${JSON.stringify(colNames)}`
-    const sortMsg = DataSort.getViewExpr(sort)
-
-    return (
-      <div className="table__header">
-
-        <div className="data-operations">
-          <Tooltip messages={filter && [Expression.toString(filter, Expression.modes.sql)]}>
-            <button className={`btn btn-s btn-of-light btn-edit${filter ? ' highlight' : ''}`}
-                    onClick={this.toggleExpressionEditor}>
-              <span className="icon icon-filter icon-16px"/>
-            </button>
-          </Tooltip>
-          {
-            showExpressionEditor &&
-            <ExpressionEditorPopup
-              nodeDefUuidContext={nodeDefUuidContext}
-              expr={filter}
-              mode={Expression.modes.sql}
-              onChange={(_, expr) => {
-                if (expr) {
-                  updateTableFilter(expr)
-                } else {
-                  resetTableFilter()
-                }
-                this.toggleExpressionEditor()
-              }}
-              onClose={this.toggleExpressionEditor}
-            />
-
-          }
-
-          <Tooltip messages={sortMsg && [sortMsg]}>
-            <button className={`btn btn-s btn-of-light btn-edit${sort.length ? ' highlight' : ''}`}
-                    onClick={this.toggleSortEditor}>
-              <span className="icon icon-sort-amount-asc icon-16px"/>
-            </button>
-          </Tooltip>
-          {
-            showSortEditor &&
-            <SortEditor
-              nodeDefUuidCols={nodeDefUuidCols}
-              nodeDefUuidContext={nodeDefUuidContext}
-              sort={sort}
-              onChange={sort => this.updateSort(sort)}
-              onClose={this.toggleSortEditor}/>
-
-          }
-
-          <DownloadButton
-            href={csvDownloadLink}
-            label="CSV"
+      <div className="data-operations">
+        <Tooltip messages={filter && [Expression.toString(filter, Expression.modes.sql)]}>
+          <button className={`btn btn-s btn-of-light btn-edit${filter ? ' highlight' : ''}`}
+                  onClick={toggleExpressionEditor}>
+            <span className="icon icon-filter icon-16px"/>
+          </button>
+        </Tooltip>
+        {
+          showExpressionEditor &&
+          <ExpressionEditorPopup
+            nodeDefUuidContext={nodeDefUuidContext}
+            expr={filter}
+            mode={Expression.modes.sql}
+            onChange={(_, expr) => {
+              if (expr) {
+                updateTableFilter(expr)
+              } else {
+                resetTableFilter()
+              }
+              toggleExpressionEditor()
+            }}
+            onClose={toggleExpressionEditor}
           />
 
-          {
-            canEdit &&
-            <button className={`btn btn-s btn-of-light btn-edit${editMode ? ' highlight' : ''}`}
-                    onClick={() => updateTableEditMode(!editMode)}>
-              <span className="icon icon-pencil2 icon-16px"/>
-            </button>
-          }
+        }
 
-        </div>
+        <Tooltip messages={sortMsg && [sortMsg]}>
+          <button className={`btn btn-s btn-of-light btn-edit${sort.length ? ' highlight' : ''}`}
+                  onClick={toggleSortEditor}>
+            <span className="icon icon-sort-amount-asc icon-16px"/>
+          </button>
+        </Tooltip>
+        {
+          showSortEditor &&
+          <SortEditor
+            nodeDefUuidCols={nodeDefUuidCols}
+            nodeDefUuidContext={nodeDefUuidContext}
+            sort={sort}
+            onChange={sort => updateTableSort(sort)}
+            onClose={toggleSortEditor}/>
+
+        }
+
+        <DownloadButton
+          href={csvDownloadLink}
+          label="CSV"
+        />
 
         {
-          showPaginator &&
-          <TablePaginator
-            offset={offset}
-            limit={limit}
-            count={count}
-            fetchFn={updateTableOffset}
-          />
+          canEdit &&
+          <button className={`btn btn-s btn-of-light btn-edit${editMode ? ' highlight' : ''}`}
+                  onClick={() => updateTableEditMode(!editMode)}>
+            <span className="icon icon-pencil2 icon-16px"/>
+          </button>
         }
 
       </div>
-    )
-  }
+
+      {
+        showPaginator &&
+        <TablePaginator
+          offset={offset}
+          limit={limit}
+          count={count}
+          fetchFn={updateTableOffset}
+        />
+      }
+
+    </div>
+  )
 }
 
 TableHeader.defaultProps = {
