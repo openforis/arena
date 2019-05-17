@@ -1,5 +1,4 @@
 const R = require('ramda')
-const camelize = require('camelize')
 
 const db = require('../../../db/db')
 
@@ -18,8 +17,8 @@ const { isBlank } = require('../../../../common/stringUtils')
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,
   vn.uuid AS vernacular_name_uuid,
-  ${getPropDraftOrNot('name', draft, 'vn.')} AS vernacular_name,
-  ${getPropDraftOrNot('lang', draft, 'vn.')} AS vernacular_language`
+  ${getPropColCombined('name', draft, 'vn.')} AS vernacular_name,
+  ${getPropColCombined('lang', draft, 'vn.')} AS vernacular_language`
 
 // ============== CREATE
 
@@ -102,7 +101,7 @@ const fetchAllTaxa = async (surveyId, taxonomyUuid, draft = false, limit = null,
     `SELECT * 
      FROM ${getSurveyDBSchema(surveyId)}.taxon
      WHERE taxonomy_uuid = $1
-     ORDER BY ${getPropDraftOrNot(Taxon.propKeys.scientificName, draft)} ASC 
+     ORDER BY ${getPropColCombined(Taxon.propKeys.scientificName, draft)} ASC 
      LIMIT ${limit ? limit : 'ALL'} 
      OFFSET $2`,
     [taxonomyUuid, offset],
@@ -115,7 +114,7 @@ const fetchTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, orde
        FROM ${getSurveyDBSchema(surveyId)}.taxon
        WHERE taxonomy_uuid = $1 
          ${whereCondition ? ` AND (${whereCondition})` : ''}
-       ORDER BY ${getPropDraftOrNot(orderByProp, draft)} ASC
+       ORDER BY ${getPropColCombined(orderByProp, draft)} ASC
        LIMIT 25`,
     [taxonomyUuid],
     taxon => dbTransformCallback(taxon, draft, true)
@@ -168,7 +167,7 @@ const fetchTaxaByVernacularName = async (surveyId,
        ON vn.taxon_uuid = t.uuid
      WHERE t.taxonomy_uuid = $1 
       AND ${filterCondition}
-     ORDER BY ${getPropDraftOrNot(Taxon.propKeys.name, draft, 'vn.')} ASC
+     ORDER BY ${getPropColCombined(Taxon.propKeys.name, draft, 'vn.')} ASC
      LIMIT 20`,
     [taxonomyUuid],
     record => dbTransformCallback(record, draft, true)
@@ -196,12 +195,13 @@ const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
   )
 
 // ============== Index
-const fetchIndex = async (surveyId, client = db) =>
+const fetchIndex = async (surveyId, draft = false, client = db) =>
   await client.map(`
     SELECT
       t.taxonomy_uuid,
       t.uuid,
       t.props,
+      t.props_draft,
       v.vernacular_names
     FROM
       ${getSurveyDBSchema(surveyId)}.taxon t
@@ -209,7 +209,7 @@ const fetchIndex = async (surveyId, client = db) =>
       (
         SELECT
           v.taxon_uuid,
-          json_agg( json_build_object(v.props ->> 'name', v.uuid::text) ) AS vernacular_names
+          json_agg( json_build_object(${getPropColCombined('name', draft, 'v.')}, v.uuid::text) ) AS vernacular_names
         FROM
           ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name v
         GROUP BY
@@ -218,7 +218,7 @@ const fetchIndex = async (surveyId, client = db) =>
       v.taxon_uuid = t.uuid
     `,
     [],
-    camelize
+    indexItem => dbTransformCallback(indexItem, draft, true)
   )
 
 // ============== UPDATE
@@ -241,25 +241,26 @@ const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client = db
   )
 
 /**
- * If draft, returns something like prop_draft->>'propName', otherwise prop->>'propName'
- */
-const getPropCol = (propName, draft, columnPrefix = '') =>
-  `${columnPrefix} ${draft ? 'props_draft' : 'props'}->>'${propName}'`
-
-/**
  * Combines a draft and a published column prop, if needed, using the COALESCE function
  */
-const getPropDraftOrNot = (propName, draft, columnPrefix) =>
-  draft
+const getPropColCombined = (propName, draft, columnPrefix) => {
+  /**
+   * If draft, returns something like prop_draft->>'propName', otherwise prop->>'propName'
+   */
+  const getPropCol = (propName, draft, columnPrefix = '') =>
+    `${columnPrefix}${draft ? 'props_draft' : 'props'}->>'${propName}'`
+
+  return draft
     ? `COALESCE(${getPropCol(propName, true, columnPrefix)}, ${getPropCol(propName, false, columnPrefix)})`
     : getPropCol(propName, false, columnPrefix)
+}
 
 /**
  * Generates a filter condition like "lower(col) LIKE 'searchValue' where "col" is a json prop column
  */
 const getPropFilterCondition = (propName, searchValue, draft, columnPrefix = '') => {
   return searchValue
-    ? `lower(${getPropDraftOrNot(propName, draft, columnPrefix)}) LIKE '${searchValue}'`
+    ? `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE '${searchValue}'`
     : ''
 }
 

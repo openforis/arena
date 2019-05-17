@@ -13,10 +13,10 @@ const CategoryItem = require('../../../../../common/survey/categoryItem')
 const CategoryLevel = require('../../../../../common/survey/categoryLevel')
 const Taxon = require('../../../../../common/survey/taxon')
 
-const fetchIndex = async (surveyId, client = db) => {
+const fetchIndex = async (surveyId, draft = false, client = db) => {
   const [categoryIndexRS, taxonomyIndexRS] = await Promise.all([
-    CategoryRepository.fetchIndex(surveyId, client),
-    TaxonomyRepository.fetchIndex(surveyId, client)
+    CategoryRepository.fetchIndex(surveyId, draft, client),
+    TaxonomyRepository.fetchIndex(surveyId, draft, client)
   ])
 
   return {
