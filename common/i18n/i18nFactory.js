@@ -27,7 +27,7 @@ const createI18nPromise = lang => {
       createParams(lang),
       (err, t) => {
         if (err) reject(err)
-        resolve({ lang, t })
+        resolve({ lang, t: (...args) => console.log(args) || `***${t.apply(null, args)}` })
       })
   })
 }

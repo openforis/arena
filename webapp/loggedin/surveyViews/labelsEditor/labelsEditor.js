@@ -1,10 +1,10 @@
 import './labelsEditor.scss'
 
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import AppContext from '../../../app/appContext'
+import useI18n from '../../../commonComponents/useI18n'
 
 import { Input } from '../../../commonComponents/form/input'
 
@@ -42,7 +42,7 @@ const LabelsEditor = props => {
 
   const [ preview, setPreview ] = useState(true)
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   const {
     labels,

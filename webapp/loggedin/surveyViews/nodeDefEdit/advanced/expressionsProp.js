@@ -1,9 +1,11 @@
 import './expressionsProp.scss'
 
-import React, { useContext } from 'react'
+import React from 'react'
 import * as R from 'ramda'
 
 import AppContext from '../../../../app/appContext'
+
+import useI18n from '../../../../commonComponents/useI18n'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefExpression from '../../../../../common/survey/nodeDefExpression'
@@ -27,7 +29,7 @@ const ExpressionProp = (props) => {
 
   const errorMessages = getValidationFieldMessages(Validator.getFieldValidations(validation))
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   return (
     <Tooltip messages={errorMessages} position="bottom" type={!R.isEmpty(errorMessages) ? 'error' : ''}>

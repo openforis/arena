@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import * as R from 'ramda'
 
-import AppContext from '../../../../../../app/appContext'
+import useI18n from '../../../../../../commonComponents/useI18n'
 
 import Node from '../../../../../../../common/record/node'
 import CategoryItem from '../../../../../../../common/survey/categoryItem'
@@ -31,7 +31,7 @@ const Checkbox = props => {
 const NodeDefCodeCheckbox = props => {
   const { items = [], edit, language } = props
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   const disabled = R.isEmpty(items)
 

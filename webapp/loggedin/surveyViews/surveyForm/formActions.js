@@ -1,8 +1,8 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import AppContext from '../../../app/appContext'
+import useI18n from '../../../commonComponents/useI18n'
 
 import NodeDef from '../../../../common/survey/nodeDef'
 
@@ -14,7 +14,7 @@ import { setFormNodeDefAddChildTo } from './actions'
 import * as SurveyFormState from './surveyFormState'
 
 const AddNodeDefButtons = ({ addNodeDef }) => {
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   return (
     <React.Fragment>

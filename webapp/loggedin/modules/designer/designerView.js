@@ -1,9 +1,9 @@
 import './designerView.scss'
 
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import AppContext from '../../../app/appContext'
+import useI18n from '../../../commonComponents/useI18n'
 
 import AuthManager from '../../../../common/auth/authManager'
 
@@ -25,7 +25,7 @@ import { resetForm } from '../../surveyViews/surveyForm/actions'
 
 const DesignerView = ({ canEditDef, resetForm }) => {
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   useEffect(() => { resetForm() }, [])
 

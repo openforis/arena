@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import * as R from 'ramda'
 
-import AppContext from '../../../../app/appContext'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import { uuidv4 } from '../../../../../common/uuid'
 
@@ -51,7 +51,7 @@ const BasicProps = props => {
   } = props
   const validation = getValidation(nodeDef)
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   const onPropLabelsChange = (labelItem, key, currentValue) => {
     putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))

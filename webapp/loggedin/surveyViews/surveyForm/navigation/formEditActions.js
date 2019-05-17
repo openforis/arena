@@ -1,14 +1,14 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import AppContext from '../../../../app/appContext'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import { createRecord } from '../../record/actions'
 
 const FormEditActions = ({ history, createRecord }) => {
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   return (
     <div className="survey-form__nav-record-actions">

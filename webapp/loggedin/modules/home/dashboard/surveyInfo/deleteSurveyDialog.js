@@ -1,9 +1,9 @@
 import './deleteSurveyDialog.scss'
 
-import React, { useState, useEffect, useRef, useContext } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Markdown from 'react-remarkable'
 
-import AppContext from '../../../../../app/appContext'
+import useI18n from '../../../../../commonComponents/useI18n'
 
 import {
   Modal,
@@ -13,7 +13,7 @@ import {
 } from '../../../../../commonComponents/modal'
 
 const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
   const [ confirmName, setConfirmName ] = useState('')
   const confirmNameRef = useRef(null)
 

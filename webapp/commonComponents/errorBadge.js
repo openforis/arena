@@ -1,8 +1,8 @@
 import './errorBadge.scss'
 
-import React, { useContext } from 'react'
+import React from 'react'
 
-import AppContext from '../app/appContext'
+import useI18n from '../commonComponents/useI18n'
 
 import * as ValidationUtils from '../utils/validationUtils'
 import Validator from '../../common/validation/validator'
@@ -11,8 +11,7 @@ import Tooltip from './tooltip'
 
 const ErrorBadge = ({ validation, showLabel, labelKey, tooltipErrorMessage }) => {
 
-  const { i18n } = useContext(AppContext)
-
+  const i18n = useI18n()
   const invalid = !Validator.isValidationValid(validation)
 
   const errorMessages = invalid
@@ -44,7 +43,7 @@ ErrorBadge.defaultProps = {
   showLabel: true,
   labelKey: 'common.invalid',
   //error message to show if validation is invalid (if not specified, field validation errors will be shown)
-  tooltipErrorMessage: null
+  tooltipErrorMessage: null,
 }
 
 export default ErrorBadge

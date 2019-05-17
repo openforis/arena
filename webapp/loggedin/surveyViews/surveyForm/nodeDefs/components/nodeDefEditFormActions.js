@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
-import AppContext from '../../../../../app/appContext'
+import useI18n from '../../../../../commonComponents/useI18n'
 
 import Layout from '../../../../../../common/survey/nodeDefLayout'
 import NodeDef from '../../../../../../common/survey/nodeDef'
@@ -18,7 +18,7 @@ const NodeDefEditFormActions = (props) => {
     putNodeDefProp, setNodeDefForEdit, setFormNodeDefAddChildTo, removeNodeDef
   } = props
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   const isRoot = NodeDef.isRoot(nodeDef)
   const isPage = !!Layout.getPageUuid(nodeDef)
