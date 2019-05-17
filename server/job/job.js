@@ -244,8 +244,8 @@ class Job {
     Object.assign(this.result, result)
   }
 
-  getSurvey () {
-    return this.getContextProp('survey')
+  getContextSurvey () {
+    return this.getContextProp(Job.keysContext.survey)
   }
 
   getSurveyId () {
@@ -357,6 +357,7 @@ class Job {
 // static context keys
 Job.keysContext = {
   surveyId: 'surveyId',
+  survey: 'survey',
   user: 'user',
   surveyIndex: 'surveyIndex'
 }

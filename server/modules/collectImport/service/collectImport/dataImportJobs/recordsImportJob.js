@@ -33,9 +33,8 @@ class RecordsImportJob extends Job {
 
   async execute (tx) {
     const user = this.getUser()
-    const surveyId = this.getSurveyId()
-
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, false, false, false, tx)
+    const survey = this.getContextSurvey()
+    const surveyId = Survey.getId(survey)
 
     const entryNames = this.getEntryNames()
 

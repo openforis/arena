@@ -14,7 +14,8 @@ class SurveyRdbGeneratorJob extends Job {
   }
 
   async execute (tx) {
-    const survey = await this.getSurvey(tx)
+    //TODO put survey in context in SurveyPublishJob
+    const survey = this.getContextSurvey() || await this.fetchSurvey(tx)
     const surveyId = Survey.getId(survey)
 
     //get entities or multiple attributes tables
@@ -59,7 +60,7 @@ class SurveyRdbGeneratorJob extends Job {
     }
   }
 
-  async getSurvey (tx) {
+  async fetchSurvey (tx) {
     const surveyId = this.getSurveyId()
 
     return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, false, false, false, tx)

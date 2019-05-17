@@ -1,5 +1,4 @@
 const R = require('ramda')
-const camelize = require('camelize')
 
 const db = require('../../../db/db')
 const { insertAllQuery } = require('../../../db/dbUtils')
@@ -141,12 +140,13 @@ const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft 
     item => dbTransformCallback(item, draft, true)
   )
 
-const fetchIndex = async (surveyId, client = db) =>
+const fetchIndex = async (surveyId, draft = false, client = db) =>
   await client.map(`
     SELECT 
       l.category_uuid,
       i.parent_uuid,
       i.props,
+      i.props_draft,
       i.uuid,
       i.level_uuid
     FROM
@@ -157,7 +157,7 @@ const fetchIndex = async (surveyId, client = db) =>
       i.level_uuid = l.uuid
     `,
     [],
-    camelize
+    indexItem => dbTransformCallback(indexItem, draft, true)
   )
 
 // ============== UPDATE
