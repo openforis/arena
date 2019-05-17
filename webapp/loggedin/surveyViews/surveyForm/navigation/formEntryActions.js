@@ -27,7 +27,7 @@ const RecordEntryButtons = (props) => {
 
   const { i18n } = useContext(AppContext)
 
-  const getStepLabel = step => console.log(step) || i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
+  const getStepLabel = step => i18n.t(`surveyForm.step.${RecordStep.getName(step)}`)
 
   return (
     <React.Fragment>
