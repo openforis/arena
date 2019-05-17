@@ -30,6 +30,7 @@ class DataQueryView extends React.PureComponent {
           nodeDefUuidsAttributes={nodeDefUuidsAttributes}
           onChangeEntity={updateTableNodeDefUuid}
           onChangeAttributes={updateTableNodeDefUuidCols}
+          showMultipleAttributes={false}
         />
 
         <Table/>

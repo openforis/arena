@@ -57,7 +57,7 @@ class NodeDefsSelectorView extends React.PureComponent {
   render () {
     const {
       hierarchy, lang,
-      canSelectAttributes, showAncestors,
+      canSelectAttributes, showAncestors, showMultipleAttributes,
     } = this.props
 
     const {
@@ -112,6 +112,7 @@ class NodeDefsSelectorView extends React.PureComponent {
             filterTypes={filterTypes}
             canSelectAttributes={canSelectAttributes}
             showAncestors={showAncestors}
+            showMultipleAttributes={showMultipleAttributes}
           />
 
 
@@ -129,6 +130,7 @@ NodeDefsSelectorView.defaultProps = {
 
   canSelectAttributes: true,
   showAncestors: true,
+  showMultipleAttributes: true,
 
   lang: null,
   hierarchy: null,

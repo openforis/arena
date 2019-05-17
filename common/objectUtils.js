@@ -1,3 +1,5 @@
+const SurveyUtils = require('../common/survey/surveyUtils')
+
 const setInPath = (pathArray = [], value = '') => obj => {
   let objCurrent = obj
 
@@ -18,5 +20,10 @@ const setInPath = (pathArray = [], value = '') => obj => {
 }
 
 module.exports = {
-  setInPath
+  setInPath,
+
+  // TODO move generic methods from SurveyUtils to ObjectUtils
+  toIndexedObj: SurveyUtils.toIndexedObj,
+  toUuidIndexedObj: SurveyUtils.toUuidIndexedObj
+
 }

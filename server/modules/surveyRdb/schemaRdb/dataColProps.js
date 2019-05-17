@@ -6,8 +6,8 @@ const SurveyUtils = require('../../../../common/survey/surveyUtils')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Taxon = require('../../../../common/survey/taxon')
 const Node = require('../../../../common/record/node')
-const CategoryManager = require('../../category/manager/categoryManager')
-const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
+
+const SurveyIndex = require('../../survey/index/surveyIndex')
 
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const sqlTypes = require('../../../../common/surveyRdb/sqlTypes')
@@ -65,9 +65,9 @@ const props = {
   },
 
   [nodeDefType.code]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, surveyIndex) => {
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
-      const item = itemUuid ? await CategoryManager.fetchItemByUuid(surveyInfo.id, itemUuid, false, client) : {}
+      const item = itemUuid ? SurveyIndex.getCategoryItemByUuid(itemUuid)(surveyIndex) : {}
 
       return (node, colName) => R.endsWith('code', colName)
         ? getValueFromItem(nodeDefCol, colName, item, true)
@@ -77,9 +77,11 @@ const props = {
   },
 
   [nodeDefType.taxon]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, client) => {
+    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, surveyIndex) => {
+      // return (node, colName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
-      const taxon = taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyInfo.id, taxonUuid, false, client) : {}
+      const taxon = taxonUuid ? SurveyIndex.getTaxonByUuid(taxonUuid)(surveyIndex) : {}
+
       return (node, colName) =>
         R.endsWith('code', colName)
           ? Taxon.getCode(taxon)

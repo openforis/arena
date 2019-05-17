@@ -140,20 +140,25 @@ const fetchItemsByLevelIndex = async (surveyId, categoryUuid, levelIndex, draft 
     item => dbTransformCallback(item, draft, true)
   )
 
-const fetchIndex = async (surveyId, client = db) =>
-  await client.any(`
+const fetchIndex = async (surveyId, draft = false, client = db) =>
+  await client.map(`
     SELECT 
       l.category_uuid,
       i.parent_uuid,
-      i.props ->> 'code' AS code,
-      i.uuid            AS item_uuid
+      i.props,
+      i.props_draft,
+      i.uuid,
+      i.level_uuid
     FROM
        ${getSurveyDBSchema(surveyId)}.category_item i
     JOIN
        ${getSurveyDBSchema(surveyId)}.category_level l
     ON
       i.level_uuid = l.uuid
-  `)
+    `,
+    [],
+    indexItem => dbTransformCallback(indexItem, draft, true)
+  )
 
 // ============== UPDATE
 

@@ -1,5 +1,7 @@
 const Job = require('../../../job/job')
 
+const Survey = require('../../../../common/survey/survey')
+
 const SurveyManager = require('../manager/surveyManager')
 
 class SurveyIndexGeneratorJob extends Job {
@@ -9,9 +11,11 @@ class SurveyIndexGeneratorJob extends Job {
   }
 
   async execute (tx) {
-    const surveyIndex = await SurveyManager.fetchIndex(this.getSurveyId(), tx)
+    const survey = this.getContextSurvey()
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const surveyIndex = await SurveyManager.fetchIndex(this.getSurveyId(), Survey.isDraft(surveyInfo), tx)
 
-    this.setContext({ surveyIndex })
+    this.setContext({ [Job.keysContext.surveyIndex]: surveyIndex })
   }
 
 }

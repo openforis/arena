@@ -244,16 +244,16 @@ class Job {
     Object.assign(this.result, result)
   }
 
-  getSurvey () {
-    return this.getContextProp('survey')
+  getContextSurvey () {
+    return this.getContextProp(Job.keysContext.survey)
   }
 
   getSurveyId () {
-    return this.getContextProp('surveyId')
+    return this.getContextProp(Job.keysContext.surveyId)
   }
 
   getUser () {
-    return this.getContextProp('user')
+    return this.getContextProp(Job.keysContext.user)
   }
 
   getUserId () {
@@ -352,6 +352,14 @@ class Job {
     this._logger.error(message)
   }
 
+}
+
+// static context keys
+Job.keysContext = {
+  surveyId: 'surveyId',
+  survey: 'survey',
+  user: 'user',
+  surveyIndex: 'surveyIndex'
 }
 
 module.exports = Job
