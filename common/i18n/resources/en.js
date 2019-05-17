@@ -25,6 +25,23 @@ module.exports = {
     taxonomies: 'Taxonomies',
   },
 
+  data: {
+    records: {
+      records: 'Records',
+    },
+    rowNum: 'Row #',
+    invalidRecord: 'Invalid record',
+    dataVis: {
+      dataVis: 'Data vis',
+      dataSort: {
+        orderBy: 'Order by:',
+        thenBy: 'Then by:',
+        ascending: 'ascending',
+        descending: 'descending',
+      },
+    },
+  },
+
   homeView: {
     mySurveys: 'My Surveys',
     dashboard: 'Dashboard',

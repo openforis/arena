@@ -37,7 +37,7 @@ export const Input = React.forwardRef((props, ref) => {
         aria-disabled={disabled}
         isControlled={true}
         value={value}
-        onChange={(e, { caretPosition, value: newValue }) => {
+        onChange={(e, { value: newValue }) => {
           if (onChange && value !== newValue) {
             onChange(newValue)
           }

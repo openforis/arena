@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useContext } from 'react'
+
+import AppContext from '../../../../../../app/appContext'
 
 import TableColumn from './tableColumn'
 
@@ -24,55 +26,59 @@ const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) =>
   )
 )
 
-const TableRows = ({ nodeDefCols, colNames, data, offset, lang, colWidth, editMode, history }) => (
-  <div className="table__rows">
+const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, history }) => {
+  const { i18n } = useContext(AppContext)
 
-    <div className="table__row-header">
-      <div style={{ width: defaultColWidth }}>Row #</div>
-      <TableColumns
-        nodeDefCols={nodeDefCols}
-        lang={lang}
-        colWidth={colWidth}
-        editMode={editMode}/>
-    </div>
+  return (
+    <div className="table__rows">
 
-    <div className="table__data-rows">
-      {
-        data.map((row, i) => {
-          const { parentNodeUuid, record } = row
+      <div className="table__row-header">
+        <div style={{ width: defaultColWidth }}>{i18n.t('data.rowNum')}</div>
+        <TableColumns
+          nodeDefCols={nodeDefCols}
+          lang={lang}
+          colWidth={colWidth}
+          editMode={editMode}/>
+      </div>
 
-          const recordUuid = Record.getUuid(record)
-          const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
-          const validation = Record.getValidation(record)
+      <div className="table__data-rows">
+        {
+          data.map((row, i) => {
+            const { parentNodeUuid, record } = row
 
-          return (
-            <div key={i} className="table__row">
-              <ErrorBadge
-                validation={validation}
-                showLabel={false}
-                tooltipErrorMessage="Invalid record"/>
-              <div style={{ width: defaultColWidth }}>
-                {i + offset + 1}
-                {
-                  editMode &&
-                  <button className="btn btn-s btn-of-light btn-edit"
-                          title="View record"
-                          onClick={() => history.push(recordEditUrl)}>
-                    <span className="icon icon-pencil2 icon-16px"/>
-                  </button>
-                }
+            const recordUuid = Record.getUuid(record)
+            const recordEditUrl = `${appModuleUri(dataModules.record)}${recordUuid}?parentNodeUuid=${parentNodeUuid}`
+            const validation = Record.getValidation(record)
+
+            return (
+              <div key={i} className="table__row">
+                <ErrorBadge
+                  validation={validation}
+                  showLabel={false}
+                  tooltipErrorMessage={i18n.t('data.invalidRecord')}/>
+                <div style={{ width: defaultColWidth }}>
+                  {i + offset + 1}
+                  {
+                    editMode &&
+                    <button className="btn btn-s btn-of-light btn-edit"
+                            title="View record"
+                            onClick={() => history.push(recordEditUrl)}>
+                      <span className="icon icon-pencil2 icon-16px"/>
+                    </button>
+                  }
+                </div>
+                <TableColumns
+                  nodeDefCols={nodeDefCols}
+                  row={row}
+                  colWidth={colWidth}
+                  editMode={editMode}/>
               </div>
-              <TableColumns
-                nodeDefCols={nodeDefCols}
-                row={row}
-                colWidth={colWidth}
-                editMode={editMode}/>
-            </div>
-          )
-        })
-      }
+            )
+          })
+        }
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export default TableRows

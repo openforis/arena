@@ -32,7 +32,7 @@ const RecordEntryButtons = (props) => {
   return (
     <React.Fragment>
 
-      <ErrorBadge validation={{ valid }} label="invalidRecord"/>
+      <ErrorBadge validation={{ valid }} labelKey="data.invalidRecord"/>
 
       <div className="survey-form__nav-record-actions-steps">
         {
