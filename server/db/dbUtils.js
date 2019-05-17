@@ -10,7 +10,7 @@ const insertAllQuery = (schema, table, cols, itemsValues) => {
 
   const valuesIndexedByCol = itemsValues.map(itemValues => {
     const item = {}
-    for (let i = 0; i< cols.length; i++) {
+    for (let i = 0; i < cols.length; i++) {
       item[cols[i]] = itemValues[i]
     }
     return item
@@ -18,9 +18,28 @@ const insertAllQuery = (schema, table, cols, itemsValues) => {
   return pgp.helpers.insert(valuesIndexedByCol, columnSet)
 }
 
+/**
+ * Combines a draft and a published column prop, if needed, using the COALESCE function
+ */
+const getPropColCombined = (propName, draft, columnPrefix) =>
+  draft
+    ? `(${columnPrefix}props || ${columnPrefix}props_draft)->>'${propName}'`
+    : `${columnPrefix}${draft ? 'props_draft' : 'props'}->>'${propName}'`
+
+/**
+ * Generates a filter condition like "lower(col) LIKE 'searchValue' where "col" is a json prop column
+ */
+const getPropFilterCondition = (propName, searchValue, draft, columnPrefix = '') =>
+  searchValue
+    ? `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE '${searchValue}'`
+    : ''
+
 module.exports = {
   selectDate,
   now,
-  insertAllQuery
+  insertAllQuery,
 
+  //props column
+  getPropColCombined,
+  getPropFilterCondition
 }

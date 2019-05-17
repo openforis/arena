@@ -2,6 +2,8 @@ const R = require('ramda')
 
 const db = require('../../../db/db')
 
+const DbUtils = require('../../../db/dbUtils')
+
 const {
   getSurveyDBSchema,
   updateSurveySchemaTableProp,
@@ -17,8 +19,8 @@ const { isBlank } = require('../../../../common/stringUtils')
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,
   vn.uuid AS vernacular_name_uuid,
-  ${getPropColCombined('name', draft, 'vn.')} AS vernacular_name,
-  ${getPropColCombined('lang', draft, 'vn.')} AS vernacular_language`
+  ${DbUtils.getPropColCombined('name', draft, 'vn.')} AS vernacular_name,
+  ${DbUtils.getPropColCombined('lang', draft, 'vn.')} AS vernacular_language`
 
 // ============== CREATE
 
@@ -101,7 +103,7 @@ const fetchAllTaxa = async (surveyId, taxonomyUuid, draft = false, limit = null,
     `SELECT * 
      FROM ${getSurveyDBSchema(surveyId)}.taxon
      WHERE taxonomy_uuid = $1
-     ORDER BY ${getPropColCombined(Taxon.propKeys.scientificName, draft)} ASC 
+     ORDER BY ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft)} ASC 
      LIMIT ${limit ? limit : 'ALL'} 
      OFFSET $2`,
     [taxonomyUuid, offset],
@@ -114,7 +116,7 @@ const fetchTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, orde
        FROM ${getSurveyDBSchema(surveyId)}.taxon
        WHERE taxonomy_uuid = $1 
          ${whereCondition ? ` AND (${whereCondition})` : ''}
-       ORDER BY ${getPropColCombined(orderByProp, draft)} ASC
+       ORDER BY ${DbUtils.getPropColCombined(orderByProp, draft)} ASC
        LIMIT 25`,
     [taxonomyUuid],
     taxon => dbTransformCallback(taxon, draft, true)
@@ -128,7 +130,7 @@ const fetchTaxaByPropLike = async (surveyId,
                                    client = db) => {
 
   const searchValue = toSearchValue(filterValue)
-  const filterCondition = getPropFilterCondition(filterProp, searchValue, draft)
+  const filterCondition = DbUtils.getPropFilterCondition(filterProp, searchValue, draft)
 
   return await fetchTaxaByCondition(surveyId, taxonomyUuid, filterCondition, filterProp, draft, client)
 }
@@ -144,9 +146,9 @@ const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValu
   const whereCondition = isBlank(searchValue)
     ? null
     : `
-    ${getPropFilterCondition(Taxon.propKeys.scientificName, '%' + searchValue + '%', draft)} 
+    ${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, '%' + searchValue + '%', draft)} 
      OR  
-    ${getPropFilterCondition(Taxon.propKeys.code, '%' + searchValue + '%', draft)}
+    ${DbUtils.getPropFilterCondition(Taxon.propKeys.code, '%' + searchValue + '%', draft)}
     `
 
   return await fetchTaxaByCondition(surveyId, taxonomyUuid, whereCondition, Taxon.propKeys.scientificName, draft, client)
@@ -158,7 +160,7 @@ const fetchTaxaByVernacularName = async (surveyId,
                                          draft = false,
                                          client = db) => {
   const searchValue = toSearchValue(filterValue)
-  const filterCondition = getPropFilterCondition('name', searchValue, draft, 'vn.')
+  const filterCondition = DbUtils.getPropFilterCondition('name', searchValue, draft, 'vn.')
 
   return await client.map(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
@@ -167,7 +169,7 @@ const fetchTaxaByVernacularName = async (surveyId,
        ON vn.taxon_uuid = t.uuid
      WHERE t.taxonomy_uuid = $1 
       AND ${filterCondition}
-     ORDER BY ${getPropColCombined(Taxon.propKeys.name, draft, 'vn.')} ASC
+     ORDER BY ${DbUtils.getPropColCombined(Taxon.propKeys.name, draft, 'vn.')} ASC
      LIMIT 20`,
     [taxonomyUuid],
     record => dbTransformCallback(record, draft, true)
@@ -209,7 +211,7 @@ const fetchIndex = async (surveyId, draft = false, client = db) =>
       (
         SELECT
           v.taxon_uuid,
-          json_agg( json_build_object(${getPropColCombined('name', draft, 'v.')}, v.uuid::text) ) AS vernacular_names
+          json_agg( json_build_object(${DbUtils.getPropColCombined('name', draft, 'v.')}, v.uuid::text) ) AS vernacular_names
         FROM
           ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name v
         GROUP BY
@@ -239,30 +241,6 @@ const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client = db
     ,
     [taxonomyUuid]
   )
-
-/**
- * Combines a draft and a published column prop, if needed, using the COALESCE function
- */
-const getPropColCombined = (propName, draft, columnPrefix) => {
-  /**
-   * If draft, returns something like prop_draft->>'propName', otherwise prop->>'propName'
-   */
-  const getPropCol = (propName, draft, columnPrefix = '') =>
-    `${columnPrefix}${draft ? 'props_draft' : 'props'}->>'${propName}'`
-
-  return draft
-    ? `COALESCE(${getPropCol(propName, true, columnPrefix)}, ${getPropCol(propName, false, columnPrefix)})`
-    : getPropCol(propName, false, columnPrefix)
-}
-
-/**
- * Generates a filter condition like "lower(col) LIKE 'searchValue' where "col" is a json prop column
- */
-const getPropFilterCondition = (propName, searchValue, draft, columnPrefix = '') => {
-  return searchValue
-    ? `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE '${searchValue}'`
-    : ''
-}
 
 const toSearchValue = filterValue =>
   filterValue ?
