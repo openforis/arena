@@ -19,12 +19,12 @@ const insertAllQuery = (schema, table, cols, itemsValues) => {
 }
 
 /**
- * Combines a draft and a published column prop, if needed, using the COALESCE function
+ * Combines a draft and a published column prop, if needed
  */
 const getPropColCombined = (propName, draft, columnPrefix) =>
   draft
     ? `(${columnPrefix}props || ${columnPrefix}props_draft)->>'${propName}'`
-    : `${columnPrefix}${draft ? 'props_draft' : 'props'}->>'${propName}'`
+    : `${columnPrefix}props->>'${propName}'`
 
 /**
  * Generates a filter condition like "lower(col) LIKE 'searchValue' where "col" is a json prop column
