@@ -13,10 +13,11 @@ const AttributeSelector = (props) => {
   const {
     nodeDef, lang, nodeDefUuidsAttributes,
     onToggleAttribute,
-    filterTypes, canSelectAttributes
+    filterTypes, canSelectAttributes, showMultipleAttributes
   } = props
 
-  const isVisible = NodeDef.isAttribute(nodeDef) &&
+  const isAttributeFn = showMultipleAttributes ? NodeDef.isAttribute : NodeDef.isSingleAttribute
+  const isVisible = isAttributeFn(nodeDef) &&
     (R.isEmpty(filterTypes) || R.includes(NodeDef.getType(nodeDef), filterTypes))
 
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
@@ -38,7 +39,7 @@ const AttributesSelector = (props) => {
   const {
     nodeDefParent, childDefs, lang,
     nodeDefUuidsAttributes, onToggleAttribute,
-    filterTypes, canSelectAttributes, showAncestors,
+    filterTypes, canSelectAttributes, showAncestors, showMultipleAttributes,
   } = props
 
   return childDefs &&
@@ -53,6 +54,7 @@ const AttributesSelector = (props) => {
             onToggleAttribute={onToggleAttribute}
             filterTypes={filterTypes}
             canSelectAttributes={canSelectAttributes}
+            showMultipleAttributes={showMultipleAttributes}
           />
         ))
       }
@@ -68,6 +70,7 @@ const AttributesSelector = (props) => {
             onToggleAttribute={onToggleAttribute}
             filterTypes={filterTypes}
             canSelectAttributes={canSelectAttributes}
+            showMultipleAttributes={showMultipleAttributes}
           />
         </React.Fragment>
       }
@@ -84,6 +87,7 @@ AttributesSelector.defaultProps = {
   filterTypes: [],
   canSelectAttributes: true,
   showAncestors: true,
+  showMultipleAttributes: true,
 }
 
 const mapStateToProps = (state, props) => {
