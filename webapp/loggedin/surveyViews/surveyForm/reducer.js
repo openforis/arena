@@ -13,7 +13,7 @@ import {
   formPageNodeUpdate,
   formReset
 } from './actions'
-import { nodeDefCreate, nodeDefPropsUpdate } from '../../../survey/nodeDefs/actions'
+import { nodeDefCreate, nodeDefDelete, nodeDefPropsUpdate } from '../../../survey/nodeDefs/actions'
 import { recordLoad } from '../record/actions'
 
 const actionHandlers = {
@@ -36,8 +36,10 @@ const actionHandlers = {
 
   [formPageNodeUpdate]: (state, { nodeDef, node }) => SurveyFormState.assocFormPageNode(NodeDef.getUuid(nodeDef), node)(state),
 
-  // node def
+  // node def actions
   [nodeDefCreate]: (state, { nodeDef }) => SurveyFormState.assocParamsOnNodeDefCreate(nodeDef)(state),
+
+  [nodeDefDelete]: (state, { nodeDef }) => SurveyFormState.dissocParamsOnNodeDefDelete(nodeDef)(state),
 
   [nodeDefPropsUpdate]: (state, { nodeDef, parentNodeDef, props }) => {
     const hasPageUuid = R.pipe(
@@ -65,4 +67,4 @@ const actionHandlers = {
 
 }
 
-export default  exportReducer(actionHandlers)
+export default exportReducer(actionHandlers)
