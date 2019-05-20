@@ -27,14 +27,12 @@ const HomeView = props => {
   useEffect(() => {
     const { history } = props
 
-    if (Survey.isValid(surveyInfo)) {
-      // new survey created or active survey changed
-      history.push(appModuleUri(homeModules.dashboard))
-    } else {
-      // survey deleted
-      history.push(appModuleUri(homeModules.surveyList))
-    }
-  }, [surveyInfo])
+    history.push(appModuleUri(
+      Survey.isValid(surveyInfo)
+        ? homeModules.dashboard // new survey created or active survey changed
+        : homeModules.surveyList // survey deleted
+    ))
+  }, [Survey.getUuid(surveyInfo)])
 
 
   return (
