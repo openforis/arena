@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
+import Survey from '../../../../../../common/survey/survey'
+
 import SurveyFormView from '../../../../surveyViews/surveyForm/surveyFormView'
 
 import AuthManager from '../../../../../../common/auth/authManager'
@@ -11,6 +13,7 @@ import WebSocketEvents from '../../../../../../common/webSocket/webSocketEvents'
 import * as AppWebSocket from '../../../../../app/appWebSocket'
 
 import * as AppState from '../../../../../app/appState'
+import * as SurveyState from '../../../../../survey/surveyState'
 import * as RecordState from '../../../../surveyViews/record/recordState'
 
 import { resetForm } from '../../../../surveyViews/surveyForm/actions'
@@ -75,11 +78,12 @@ class RecordView extends React.Component {
 
 const mapStateToProps = (state, { match, location }) => {
   const user = AppState.getUser(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
   const urlSearchParams = new URLSearchParams(location.search)
 
   return {
-    canEditRecord: AuthManager.canEditRecord(user, record),
+    canEditRecord: Survey.isPublished(surveyInfo) && AuthManager.canEditRecord(user, record),
     recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
