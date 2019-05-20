@@ -1,9 +1,9 @@
 import './homeView.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import AppContext from '../../../app/appContext'
+import useI18n from '../../../commonComponents/useI18n'
 
 import NavigationTabBar from '../components/moduleNavigationTabBar'
 import DashboardView from './dashboard/dashboardView'
@@ -19,76 +19,63 @@ import { homeModules } from './homeModules'
 
 import * as SurveyState from '../../../survey/surveyState'
 
-class HomeView extends React.Component {
+const HomeView = props => {
 
-  componentDidUpdate (prevProps) {
-    const { surveyInfo, history } = this.props
-    const { surveyInfo: prevSurveyInfo } = prevProps
+  const { surveyInfo } = props
+  const i18n = useI18n()
 
-    // active survey change
-    if (
-      surveyInfo && (
-        // new survey created
-        !prevSurveyInfo
-        // changed from survey list
-        || surveyInfo.id !== prevSurveyInfo.id
-      )
-    ) {
+  useEffect(() => {
+    const { history } = props
+
+    if (Survey.isValid(surveyInfo)) {
+      // new survey created or active survey changed
       history.push(appModuleUri(homeModules.dashboard))
-    }
-
-    // survey deleted
-    if (Survey.isValid(prevSurveyInfo) && !Survey.isValid(surveyInfo)) {
+    } else {
+      // survey deleted
       history.push(appModuleUri(homeModules.surveyList))
     }
-  }
+  }, [surveyInfo])
 
-  render () {
-    const { surveyInfo } = this.props
-    const { i18n } = this.context
 
-    return (
-      <NavigationTabBar
-        className="data"
-        moduleRoot={appModules.home}
-        moduleDefault={homeModules.dashboard}
-        tabs={[
-          {
-            label: i18n.t('homeView.dashboard'),
-            component: DashboardView,
-            path: appModuleUri(homeModules.dashboard),
-            icon: 'icon-office',
-            disabled: !Survey.isValid(surveyInfo),
-          },
-          {
-            label: i18n.t('homeView.mySurveys'),
-            component: SurveyListView,
-            path: appModuleUri(homeModules.surveyList),
-            icon: 'icon-paragraph-justify',
-          },
-          {
-            component: SurveyCreateView,
-            path: appModuleUri(homeModules.surveyNew),
-            icon: 'icon-plus',
-            showTab: false,
-          },
-          {
-            component: SurveyInfoView,
-            path: appModuleUri(homeModules.surveyInfo),
-            showTab: false,
-          },
-          {
-            component: CollectImportReportView,
-            path: appModuleUri(homeModules.collectImportReport),
-            showTab: false,
-          },
-        ]}
-      />
-    )
-  }
+  return (
+    <NavigationTabBar
+      className="data"
+      moduleRoot={appModules.home}
+      moduleDefault={homeModules.dashboard}
+      tabs={[
+        {
+          label: i18n.t('homeView.dashboard'),
+          component: DashboardView,
+          path: appModuleUri(homeModules.dashboard),
+          icon: 'icon-office',
+          disabled: !Survey.isValid(surveyInfo),
+        },
+        {
+          label: i18n.t('homeView.mySurveys'),
+          component: SurveyListView,
+          path: appModuleUri(homeModules.surveyList),
+          icon: 'icon-paragraph-justify',
+        },
+        {
+          component: SurveyCreateView,
+          path: appModuleUri(homeModules.surveyNew),
+          icon: 'icon-plus',
+          showTab: false,
+        },
+        {
+          component: SurveyInfoView,
+          path: appModuleUri(homeModules.surveyInfo),
+          showTab: false,
+        },
+        {
+          component: CollectImportReportView,
+          path: appModuleUri(homeModules.collectImportReport),
+          showTab: false,
+        },
+      ]}
+    />
+  )
 }
-
-HomeView.contextType = AppContext
 
 const mapStateToProps = state => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
