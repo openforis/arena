@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
-import AppContext from '../../../../app/appContext'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import { NodeDefExpressionsProp } from './expressionsProp'
 
@@ -15,7 +15,7 @@ const AdvancedProps = props => {
   const validation = NodeDef.getValidation(nodeDef)
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   return (
     <div className="form">

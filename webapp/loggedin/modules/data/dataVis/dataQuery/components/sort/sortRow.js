@@ -1,8 +1,8 @@
 import './sortEditor.scss'
 
-import React, { useContext } from 'react'
+import React from 'react'
 
-import AppContext from '../../../../../../../app/appContext'
+import useI18n from '../../../../../../../commonComponents/useI18n'
 
 import Dropdown from '../../../../../../../commonComponents/form/dropdown'
 
@@ -18,7 +18,7 @@ const SortRow = (props) => {
     isFirst,
   } = props
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   return (
     <div className="sort-row">

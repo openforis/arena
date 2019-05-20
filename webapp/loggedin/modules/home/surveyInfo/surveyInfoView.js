@@ -1,10 +1,10 @@
 import './surveyInfoView.scss'
 
-import React, { useContext } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import AppContext from '../../../../app/appContext'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import { Input } from '../../../../commonComponents/form/input'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
@@ -32,7 +32,7 @@ const SurveyInfoView = (props) => {
     )
   }
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   return (
     <div className="home-survey-info">

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
-import AppContext from '../../../../app/appContext'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import InputChips from '../../../../commonComponents/form/inputChips'
 
@@ -15,7 +15,7 @@ const LanguagesEditor = props => {
 
   const selection = surveyLanguages.map(lang => ({ key: lang, value: getLanguageLabel(lang) }))
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   return (
     <div className="form-item">

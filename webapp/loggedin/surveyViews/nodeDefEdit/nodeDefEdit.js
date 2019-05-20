@@ -1,10 +1,10 @@
 import './nodeDefEdit.scss'
 
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import AppContext from '../../../app/appContext'
+import useI18n from '../../../commonComponents/useI18n'
 
 import TabBar from '../../../commonComponents/tabBar'
 import BasicProps from './basic/basicProps'
@@ -35,7 +35,7 @@ const NodeDefEdit = props => {
     closeNodeDefEdit,
   } = props
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   const [ editingCategory, setEditingCategory ] = useState(false)
   const [ editingTaxonomy, setEditingTaxonomy ] = useState(false)

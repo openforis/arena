@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import AppContext from '../../../../../../app/appContext'
+import useI18n from '../../../../../../commonComponents/useI18n'
 
 import ExpressionEditorPopup from '../../../../../../commonComponents/expression/expressionEditorPopup'
 import TablePaginator from '../../../../../../commonComponents/table/tablePaginator'
@@ -40,7 +40,7 @@ const TableHeader = props => {
 
   const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.toHttpParams(sort)}&cols=${JSON.stringify(colNames)}`
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
   const sortMsg = DataSort.getViewExpr(i18n.t('data.dataVis.dataSort.ascending'), i18n.t('dataVis.dataQuery.descending'))(sort)
 
 

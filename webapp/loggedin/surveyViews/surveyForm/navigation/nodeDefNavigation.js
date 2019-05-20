@@ -1,9 +1,9 @@
 import './nodeDefNavigation.scss'
 
-import React, { useContext } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
-import AppContext from '../../../../app/appContext'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -33,7 +33,7 @@ const NavigationButton = (props) => {
     createNodeDef,
   } = props
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   const outerPageChildDefs = childDefs ? filterOuterPageChildren(childDefs) : []
 

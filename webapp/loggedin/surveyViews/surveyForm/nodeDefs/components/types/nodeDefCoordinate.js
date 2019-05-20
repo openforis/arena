@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import * as R from 'ramda'
 
-import AppContext from '../../../../../../app/appContext'
+import useI18n from '../../../../../../commonComponents/useI18n'
 
 import { FormItem, Input } from '../../../../../../commonComponents/form/input'
 import createNumberMask from 'text-mask-addons/dist/createNumberMask';
@@ -17,7 +17,7 @@ import { getNodeDefDefaultValue } from '../../nodeDefSystemProps'
 
 const NodeDefCoordinate = props => {
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   const numberMask = createNumberMask({
     prefix: '',
