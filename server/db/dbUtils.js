@@ -21,7 +21,7 @@ const insertAllQuery = (schema, table, cols, itemsValues) => {
 /**
  * Combines a draft and a published column prop, if needed
  */
-const getPropColCombined = (propName, draft, columnPrefix) =>
+const getPropColCombined = (propName, draft, columnPrefix = '') =>
   draft
     ? `(${columnPrefix}props || ${columnPrefix}props_draft)->>'${propName}'`
     : `${columnPrefix}props->>'${propName}'`
