@@ -90,7 +90,7 @@ class RecordsView extends React.Component {
   componentDidMount () {
     const { surveyInfo, initRecordsList } = this.props
 
-    if (Survey.isPublished(surveyInfo))
+    if (Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo))
       initRecordsList()
   }
 

@@ -1,17 +1,24 @@
 const db = require('../../../db/db')
 
+const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
 const RecordUpdateManager = require('./_internal/recordUpdateManager')
 
+const SurveyRepository = require('../../survey/repository/surveyRepository')
 const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
 const RecordRepository = require('../repository/recordRepository')
 const NodeRepository = require('../repository/nodeRepository')
 
 const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = db) => {
-  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, false, client)
-  const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, false, client)
+  const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, true, client)
+  const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+
+  const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
+  const nodeDefKeys = await NodeDefRepository.fetchRootNodeDefKeysBySurveyId(surveyId, NodeDef.getUuid(nodeDefRoot), nodeDefsDraft, client)
+
   const records = await RecordRepository.fetchRecordsSummaryBySurveyId(surveyId, nodeDefRoot, nodeDefKeys, offset, limit, client)
 
   return {

@@ -2,7 +2,7 @@ const Promise = require('bluebird')
 const R = require('ramda')
 
 const db = require('../../../db/db')
-const { selectDate, now } = require('../../../db/dbUtils')
+const DbUtils = require('../../../db/dbUtils')
 const { getSurveyDBSchema, dbTransformCallback: dbTransformCallbackCommon } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
@@ -25,7 +25,7 @@ const dbTransformCallback = (nodeDef, draft, advanced = false) => {
 }
 
 const nodeDefSelectFields =
-  `id, uuid, parent_uuid, type, deleted, ${selectDate('date_created')}, ${selectDate('date_modified')}, 
+  `id, uuid, parent_uuid, type, deleted, ${DbUtils.selectDate('date_created')}, ${DbUtils.selectDate('date_modified')}, 
   props, props_advanced, props_draft, props_advanced_draft, meta`
 
 // ============== CREATE
@@ -103,20 +103,17 @@ const fetchNodeDefsByParentUuid = async (surveyId, parentUuid, draft, client = d
     res => dbTransformCallback(res, draft, false)
   )
 
-const fetchRootNodeDefKeysBySurveyId = async (surveyId, draft, client = db) => {
-  const rootNodeDef = await fetchRootNodeDef(surveyId, draft, client)
-
-  return await client.map(`
+const fetchRootNodeDefKeysBySurveyId = async (surveyId, nodeDefRootUuid, draft, client = db) =>
+  await client.map(`
     SELECT ${nodeDefSelectFields}
     FROM ${getSurveyDBSchema(surveyId)}.node_def 
     WHERE deleted IS NOT TRUE
     AND parent_uuid = $1
-    AND props->>'key' = $2
+    AND ${DbUtils.getPropColCombined('key', draft)} = $2
     ORDER BY id`,
-    [NodeDef.getUuid(rootNodeDef), 'true'],
+    [nodeDefRootUuid, 'true'],
     res => dbTransformCallback(res, draft, false)
   )
-}
 
 // ============== UPDATE
 
@@ -125,7 +122,7 @@ const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced = 
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props_draft = props_draft || $1::jsonb,
         props_advanced_draft = props_advanced_draft || $2::jsonb,
-        date_modified = ${now}
+        date_modified = ${DbUtils.now}
     WHERE uuid = $3
     RETURNING ${nodeDefSelectFields}
   `, [props, propsAdvanced, nodeDefUuid],
