@@ -13,6 +13,7 @@ module.exports = {
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
     invalid: 'INVALID',
+    language: 'Language',
   },
   sidebar: {
     openForisShort: 'OF',
@@ -68,7 +69,9 @@ module.exports = {
     surveyCreate: {
       createSurvey: 'Create Survey',
       importFromCollect: 'Import from Collect',
-      language: 'Language',
+    },
+    collectImport: {
+
     },
   },
 

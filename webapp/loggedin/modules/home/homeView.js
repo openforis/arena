@@ -26,14 +26,11 @@ const HomeView = props => {
 
   useEffect(() => {
     const { history } = props
+    const dashboadrUri = appModuleUri(homeModules.dashboard)
+    const surveyListUri = appModuleUri(homeModules.surveyList)
 
-    history.push(appModuleUri(
-      Survey.isValid(surveyInfo)
-        ? homeModules.dashboard // new survey created or active survey changed
-        : homeModules.surveyList // survey deleted
-    ))
+    history.push(Survey.isValid(surveyInfo) ? dashboadrUri : surveyListUri)
   }, [Survey.getUuid(surveyInfo)])
-
 
   return (
     <NavigationTabBar

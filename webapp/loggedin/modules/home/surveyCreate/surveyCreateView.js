@@ -45,7 +45,6 @@ const SurveyCreateView = (props) => {
       </div>
       <div>
         <LanguageDropdown
-          placeholder={i18n.t('homeView.surveyCreate.language')}
           selection={lang}
           onChange={e => updateNewSurveyProp('lang', e)}
           validation={getFieldValidation('lang')(validation)}/>
