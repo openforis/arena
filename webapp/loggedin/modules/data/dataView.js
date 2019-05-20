@@ -1,8 +1,8 @@
 import './dataView.scss'
 
-import React, { useContext } from 'react'
+import React from 'react'
 
-import AppContext from '../../../app/appContext'
+import useI18n from '../../../commonComponents/useI18n'
 
 import NavigationTabBar from '../components/moduleNavigationTabBar'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
@@ -14,7 +14,7 @@ import { appModules, appModuleUri } from '../../appModules'
 import { dataModules } from './dataModules'
 
 const DataView = () => {
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   return (
     <SurveyDefsLoader

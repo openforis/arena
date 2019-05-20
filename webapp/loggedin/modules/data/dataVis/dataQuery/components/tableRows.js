@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
-import AppContext from '../../../../../../app/appContext'
+import useI18n from '../../../../../../commonComponents/useI18n'
 
 import TableColumn from './tableColumn'
 
@@ -27,7 +27,7 @@ const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) =>
 )
 
 const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, history }) => {
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   return (
     <div className="table__rows">

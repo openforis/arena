@@ -1,10 +1,10 @@
 import './surveyInfo.scss'
 
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import AppContext from '../../../../../app/appContext'
+import useI18n from '../../../../../commonComponents/useI18n'
 
 import DeleteSurveyDialog from './deleteSurveyDialog'
 import ErrorBadge from '../../../../../commonComponents/errorBadge'
@@ -31,7 +31,7 @@ const SurveyInfo = props => {
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
 
   return (

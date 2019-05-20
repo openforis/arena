@@ -1,9 +1,9 @@
 import '../../../react-grid-layout.scss'
 
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect } from 'react'
 import * as R from 'ramda'
 
-import AppContext from '../../../../../../app/appContext'
+import useI18n from '../../../../../../commonComponents/useI18n'
 
 import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLayout'
 
@@ -26,7 +26,7 @@ const NodeDefEntityTable = props => {
     canAddNode,
   } = props
 
-  const { i18n } = useContext(AppContext)
+  const i18n = useI18n()
 
   useEffect(() => {
     if (!R.isEmpty(nodes)) {
