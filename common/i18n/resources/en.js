@@ -1,6 +1,7 @@
 module.exports = {
   common: {
-    name: 'name',
+    name: 'Name',
+    label: 'Label',
     add: 'Add',
     delete: 'delete',
     done: 'done',
@@ -58,13 +59,16 @@ module.exports = {
       deleteWarining: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
       confirmName: 'Enter this survey’s name to confirm:',
     },
-    surveyListView: {
+    surveyListTable: {
       addNewSurvey: 'Add a new Survey',
-      name: 'Name',
-      label: 'Label',
       dateCreated: 'Date created',
       dateLastModified: 'Date last modified',
       status: 'Status',
+    },
+    surveyCreate: {
+      createSurvey: 'Create Survey',
+      importFromCollect: 'Import from Collect',
+      language: 'Language',
     },
   },
 
@@ -112,7 +116,6 @@ module.exports = {
   },
 
   labelsEditor: {
-    label: 'Label',
     label_plural: 'Labels',
   },
 

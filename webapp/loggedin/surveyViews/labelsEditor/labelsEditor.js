@@ -107,7 +107,7 @@ LabelsEditor.defaultProps = {
   languages: [],
   labels: [],
   showFormLabel: true,
-  formLabelKey: 'labelsEditor.label',
+  formLabelKey: 'common.label',
   maxPreview: 2,
   canTogglePreview: true,
   readOnly: false,
