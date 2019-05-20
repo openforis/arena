@@ -8,6 +8,7 @@ const SurveyCategories = require('./_internal/surveyCategories')
 const SurveyTaxonomies = require('./_internal/surveyTaxonomies')
 const SurveyDefaults = require('./_internal/surveyDefaults')
 const SurveyDependencies = require('./_internal/surveyDependencies')
+const SurveyRefDataIndex = require('./_internal/surveyRefDataIndex')
 
 const newSurvey = (userId, name, label, lang, collectUri = null) => ({
   uuid: uuidv4(),
@@ -103,15 +104,24 @@ module.exports = {
   isNodeDefParentCode: SurveyNodeDefs.isNodeDefParentCode,
 
   // ====== Categories
-
   getCategories: SurveyCategories.getCategories,
   getCategoriesArray: SurveyCategories.getCategoriesArray,
   getCategoryByUuid: SurveyCategories.getCategoryByUuid,
   assocCategories: SurveyCategories.assocCategories,
 
   // ====== Taxonomies
-
   getTaxonomiesArray: SurveyTaxonomies.getTaxonomiesArray,
   getTaxonomyByUuid: SurveyTaxonomies.getTaxonomyByUuid,
   assocTaxonomies: SurveyTaxonomies.assocTaxonomies,
+
+  // ====== Survey Reference data index
+  // category index
+  getCategoryItemUuidAndCodeHierarchy: SurveyRefDataIndex.getCategoryItemUuidAndCodeHierarchy,
+  getCategoryItemByUuid: SurveyRefDataIndex.getCategoryItemByUuid,
+  // taxon index
+  getTaxonUuid: SurveyRefDataIndex.getTaxonUuid,
+  getTaxonVernacularNameUuid: SurveyRefDataIndex.getTaxonVernacularNameUuid,
+  getTaxonByUuid: SurveyRefDataIndex.getTaxonByUuid,
+
+  assocRefData: SurveyRefDataIndex.assocRefData,
 }

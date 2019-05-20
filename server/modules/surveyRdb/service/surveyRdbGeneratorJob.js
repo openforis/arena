@@ -15,7 +15,7 @@ class SurveyRdbGeneratorJob extends Job {
 
   async execute (tx) {
     //TODO put survey in context in SurveyPublishJob
-    const survey = this.getContextSurvey() || await this.fetchSurvey(tx)
+    const survey = await this.fetchSurvey(tx)
     const surveyId = Survey.getId(survey)
 
     //get entities or multiple attributes tables
@@ -40,12 +40,10 @@ class SurveyRdbGeneratorJob extends Job {
     await Survey.traverseHierarchyItem(root, createTable)
     this.logDebug('create data tables - end')
 
-    const surveyIndex = this.getContextProp(Job.keysContext.surveyIndex)
-
     //3 ==== insert records
     const insertIntoTable = record =>
       async nodeDef => {
-        await SurveyRdbManager.insertIntoTable(survey, nodeDef, record, surveyIndex, tx)
+        await SurveyRdbManager.insertIntoTable(survey, nodeDef, record, tx)
         this.incrementProcessedItems()
       }
 
@@ -63,7 +61,11 @@ class SurveyRdbGeneratorJob extends Job {
   async fetchSurvey (tx) {
     const surveyId = this.getSurveyId()
 
-    return await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, false, false, false, tx)
+    const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true, false, tx)
+    const surveyInfo = Survey.getSurveyInfo(surveySummary)
+    const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+
+    return await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, fetchDraft, false, false, tx)
   }
 
 }
