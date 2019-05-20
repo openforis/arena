@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { Input } from '../../../../commonComponents/form/input'
 import LanguageDropdown from '../../../../commonComponents/form/languageDropdown'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import { getFieldValidation } from '../../../../../common/validation/validator'
 import { normalizeName } from '../../../../../common/stringUtils'
@@ -24,25 +25,26 @@ const SurveyCreateView = (props) => {
 
   const { name, label, lang, validation } = newSurvey
 
+  const i18n = useI18n()
+
   return (
     <div className="home-survey-create">
       <div>
         <Input
-          placeholder="Name"
+          placeholder={i18n.t('common.name')}
           value={name}
           validation={getFieldValidation('name')(validation)}
           onChange={value => updateNewSurveyProp('name', normalizeName(value))}/>
       </div>
       <div>
         <Input
-          placeholder="Label"
+          placeholder={i18n.t('common.label')}
           value={label}
           validation={getFieldValidation('label')(validation)}
           onChange={value => updateNewSurveyProp('label', value)}/>
       </div>
       <div>
         <LanguageDropdown
-          placeholder="Language"
           selection={lang}
           onChange={e => updateNewSurveyProp('lang', e)}
           validation={getFieldValidation('lang')(validation)}/>
@@ -50,11 +52,11 @@ const SurveyCreateView = (props) => {
       <button className="btn btn-of-light"
               onClick={() => createSurvey({ name, label, lang })}>
         <span className="icon icon-plus icon-left"/>
-        Create Survey
+        {i18n.t('homeView.surveyCreate.createSurvey')}
       </button>
 
       <UploadButton
-        label="Import from Collect"
+        label={i18n.t('homeView.surveyCreate.importFromCollect')}
         accept={'.collect-backup'}
         maxSize={1000}
         onChange={files => importCollectSurvey(files[0])}/>

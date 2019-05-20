@@ -44,17 +44,17 @@ const SurveyListTable = (props) => {
           Surveys
           <Link
             to={appModuleUri(homeModules.surveyNew)} className="btn btn-xs btn-of-light">
-            <span className="icon icon-plus icon-12px icon-left" /> {i18n.t('homeView.surveyListView.addNewSurvey')}
+            <span className="icon icon-plus icon-12px icon-left" /> {i18n.t('homeView.surveyListTable.addNewSurvey')}
           </Link>
         </h5>
       </div>
 
       <div className="table__row-header">
         <div>{i18n.t('common.name')}</div>
-        <div>{i18n.t('homeView.surveyListView.label')}</div>
-        <div>{i18n.t('homeView.surveyListView.dateCreated')}</div>
-        <div>{i18n.t('homeView.surveyListView.dateLastModified')}</div>
-        <div>{i18n.t('homeView.surveyListView.status')}</div>
+        <div>{i18n.t('common.label')}</div>
+        <div>{i18n.t('homeView.surveyListTable.dateCreated')}</div>
+        <div>{i18n.t('homeView.surveyListTable.dateLastModified')}</div>
+        <div>{i18n.t('homeView.surveyListTable.status')}</div>
       </div>
 
 
