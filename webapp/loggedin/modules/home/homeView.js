@@ -26,10 +26,8 @@ const HomeView = props => {
 
   useEffect(() => {
     const { history } = props
-    const dashboadrUri = appModuleUri(homeModules.dashboard)
-    const surveyListUri = appModuleUri(homeModules.surveyList)
-
-    history.push(Survey.isValid(surveyInfo) ? dashboadrUri : surveyListUri)
+    const module = Survey.isValid(surveyInfo) ? homeModules.dashboard : homeModules.surveyList
+    history.push(appModuleUri(module))
   }, [Survey.getUuid(surveyInfo)])
 
   return (
