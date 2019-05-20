@@ -27,6 +27,20 @@ module.exports = {
     taxonomies: 'Taxonomies',
   },
 
+  nodeDefsTypes: {
+    integer: 'integer',
+    decimal: 'decimal',
+    text: 'text',
+    date: 'date',
+    time: 'time',
+    boolean: 'boolean',
+    code: 'code',
+    coordinate: 'coordinate',
+    taxon: 'taxon',
+    file: 'file',
+    entity: 'entity',
+  },
+
   data: {
     records: {
       records: 'Records',
