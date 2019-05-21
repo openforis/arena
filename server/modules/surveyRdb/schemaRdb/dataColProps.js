@@ -63,7 +63,7 @@ const props = {
   },
 
   [nodeDefType.code]: {
-    [colValueProcessor]: async (survey, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
       const surveyInfo = Survey.getSurveyInfo(survey)
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
       const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : {}
@@ -76,7 +76,7 @@ const props = {
   },
 
   [nodeDefType.taxon]: {
-    [colValueProcessor]: async (survey, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
       // return (node, colName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
       const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
@@ -92,7 +92,7 @@ const props = {
   },
 
   [nodeDefType.coordinate]: {
-    [colValueProcessor]: async (survey, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
       const surveyInfo = Survey.getSurveyInfo(survey)
       const defaultSrsCode = Survey.getDefaultSRS(surveyInfo).code
       const [x, y, srs] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol, defaultSrsCode)]

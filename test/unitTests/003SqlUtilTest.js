@@ -1,7 +1,7 @@
 const { assert, expect } = require('chai')
 
 const jsep = require('../../common/exprParser/helpers/jsep')
-const { getWherePerparedStatement } = require('../../common/surveyRdb/dataFilter')
+const { getWherePreparedStatement } = require('../../common/surveyRdb/dataFilter')
 
 const goodExpressions = [
   { q: '1', r: { clause: '$/_0/', params: { _0: '1' } } },
@@ -39,14 +39,14 @@ describe('dataFilter test', () => {
 
   goodExpressions.forEach(({ q, r }) =>
     it (q, () => {
-      const ps = getWherePerparedStatement(jsep(q))
+      const ps = getWherePreparedStatement(jsep(q))
       assert.deepEqual(ps, r)
     })
   )
 
   badExpressions.forEach(({ q }) =>
     it (q, () => {
-      const ps = () => getWherePerparedStatement(jsep(q))
+      const ps = () => getWherePreparedStatement(jsep(q))
       expect(ps).to.throw()
     })
   )

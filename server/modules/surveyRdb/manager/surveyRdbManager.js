@@ -34,8 +34,8 @@ const queryTable = async (surveyId, tableName, cols = [],
 const countTable = async (surveyId, tableName, filter, client = db) =>
   await TableViewQuery.runCount(surveyId, tableName, filter, client)
 
-const queryRootTableByRecordKeys = async (survey, recordUuid, client = db) =>
-  await TableViewQuery.queryRootTableByRecordKeys(survey, recordUuid, client)
+const countDuplicateRecords = async (survey, record, client = db) =>
+  await TableViewQuery.countDuplicateRecords(survey, record, client)
 
 module.exports = {
   dropSchema,
@@ -47,5 +47,5 @@ module.exports = {
 
   queryTable,
   countTable,
-  queryRootTableByRecordKeys,
+  countDuplicateRecords,
 }
