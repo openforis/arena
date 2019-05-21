@@ -36,7 +36,7 @@ const validateNodeValidations = (survey, record, nodeDef, tx) =>
     }
     const validations = NodeDef.getValidations(nodeDef)
 
-    const applicableExpressionsEval = await RecordExprParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations), tx)
+    const applicableExpressionsEval = await RecordExprParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations))
 
     const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 

@@ -32,7 +32,7 @@ const updateDependentsApplicable = async (survey, record, node, tx) => {
       const { nodeCtx, nodeDef } = o
 
       //3. evaluate applicable expression
-      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getApplicable(nodeDef), tx)
+      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getApplicable(nodeDef))
       const applicable = R.propOr(false, 'value', exprEval)
 
       //4. persist updated node value if changed, and return updated node
@@ -83,7 +83,7 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
       const { nodeCtx, nodeDef } = o
 
       //3. evaluate applicable default value expression
-      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef), tx)
+      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef))
       const exprValue = R.propOr(null, 'value', exprEval)
 
       //4. persist updated node value if changed, and return updated node

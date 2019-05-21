@@ -9,12 +9,9 @@ const Record = require('../../../common/record/record')
 const Node = require('../../../common/record/node')
 const Expression = require('../../../common/exprParser/expression')
 
-const CategoryManager = require('../category/manager/categoryManager')
-const TaxonomyManager = require('../taxonomy/manager/taxonomyManager')
-
-const evalNodeQuery = async (survey, record, node, query, client, bindNodeFn = bindNode) => {
+const evalNodeQuery = async (survey, record, node, query) => {
   const ctx = {
-    node: bindNodeFn(survey, record, node),
+    node: bindNode(survey, record, node),
     functions: {
       [Expression.types.ThisExpression]: (expr, { node }) => node
     },
@@ -37,36 +34,37 @@ const bindNode = (survey, record, node) => {
   return {
     ...node,
 
-    parent: async () => bindNode(
-      survey,
-      record,
-      Record.getParentNode(node)(record)
-    ),
+    parent: () => {
+      const parentNode = Record.getParentNode(node)(record)
+      return parentNode
+        ? bindNode(survey, record, parentNode)
+        : null
+    },
 
     node: name => getChildNode(node, name),
 
-    sibling: async name => {
+    sibling: name => {
       const parentNode = Record.getParentNode(node)(record)
-      return getChildNode(parentNode, name)
+      return parentNode
+        ? getChildNode(parentNode, name)
+        : null
     },
 
-    getValue: async () => {
+    getValue: () => {
       if (Node.isValueBlank(node)) {
         return null
       }
 
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-      const surveyId = Survey.getId(survey)
-      const draft = Survey.isDraft(Survey.getSurveyInfo(survey))
 
       if (NodeDef.isCode(nodeDef)) {
         const itemUuid = Node.getCategoryItemUuid(node)
-        return itemUuid ? await CategoryManager.fetchItemByUuid(surveyId, itemUuid, draft) : null
+        return itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : null
       }
 
       if (NodeDef.isTaxon(nodeDef)) {
         const taxonUuid = Node.getTaxonUuid(node)
-        return taxonUuid ? await TaxonomyManager.fetchTaxonByUuid(surveyId, taxonUuid, draft) : null
+        return taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : null
       }
 
       const value = Node.getValue(node)
@@ -78,27 +76,27 @@ const bindNode = (survey, record, node) => {
   }
 }
 
-const evalApplicableExpression = async (survey, record, nodeCtx, expressions, tx) =>
-  R.head(await evalApplicableExpressions(survey, record, nodeCtx, expressions, tx, true))
+const evalApplicableExpression = async (survey, record, nodeCtx, expressions) =>
+  R.head(await evalApplicableExpressions(survey, record, nodeCtx, expressions, true))
 
-const evalApplicableExpressions = async (survey, record, node, expressions, tx, stopAtFirstFound = false) => {
-  const applicableExpressions = await _getApplicableExpressions(survey, record, node, expressions, tx, stopAtFirstFound)
+const evalApplicableExpressions = async (survey, record, node, expressions, stopAtFirstFound = false) => {
+  const applicableExpressions = await _getApplicableExpressions(survey, record, node, expressions, stopAtFirstFound)
 
   return await Promise.all(
     applicableExpressions.map(async expression => ({
         expression,
-        value: await evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression), tx)
+        value: await evalNodeQuery(survey, record, node, NodeDefExpression.getExpression(expression))
       })
     )
   )
 }
 
-const _getApplicableExpressions = async (survey, record, nodeCtx, expressions, tx, stopAtFirstFound = false) => {
+const _getApplicableExpressions = async (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
   const applicableExpressions = []
   for (const expression of expressions) {
     const applyIfExpr = NodeDefExpression.getApplyIf(expression)
 
-    if (StringUtils.isBlank(applyIfExpr) || await evalNodeQuery(survey, record, nodeCtx, applyIfExpr, tx)) {
+    if (StringUtils.isBlank(applyIfExpr) || await evalNodeQuery(survey, record, nodeCtx, applyIfExpr)) {
       applicableExpressions.push(expression)
 
       if (stopAtFirstFound)
