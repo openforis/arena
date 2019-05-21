@@ -3,6 +3,7 @@ import React from 'react'
 import CollectImportReportItem from '../../../../../common/survey/collectImportReportItem'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import Checkbox from '../../../../commonComponents/form/checkbox'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -13,18 +14,20 @@ const NodeDefReportItem = props => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const defaultLanguage = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
+  const i18n = useI18n()
+
   return (
     <div className="collect-import-report-node-def-items">
       <div
         className="collect-import-report-node-def-items-header">{NodeDef.getLabel(nodeDef, defaultLanguage)}</div>
       <div className="table__row-header collect-import-report-header">
         <div>#</div>
-        <div>Type</div>
-        <div>Expression</div>
-        <div>Apply if</div>
-        <div>Messages</div>
-        <div>Resolved</div>
-        <div>Edit</div>
+        <div>{i18n.t('homeView.collectImportReport.type')}</div>
+        <div>{i18n.t('homeView.collectImportReport.expression')}</div>
+        <div>{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
+        <div>{i18n.t('homeView.collectImportReport.messages')}</div>
+        <div>{i18n.t('homeView.collectImportReport.resolved')}</div>
+        <div>{i18n.t('common.edit')}</div>
       </div>
       {
         nodeDefItems.map((item, idx) =>
@@ -52,9 +55,10 @@ const NodeDefReportItem = props => {
               />
             </div>
             <div>
-              <button onClick={() => {
-                onNodeDefEdit(nodeDef)
-              }}>EDIT
+              <button
+                className="btn btn-of-light btn-edit"
+                onClick={() => { onNodeDefEdit(nodeDef) }}>
+                {i18n.t('common.edit')}
               </button>
             </div>
           </div>
