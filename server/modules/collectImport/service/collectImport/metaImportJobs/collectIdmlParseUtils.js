@@ -31,6 +31,10 @@ const keys = {
   text: 'text',
 }
 
+const layoutTypes = {
+  table: 'table',
+}
+
 const toLabels = (elName, defaultLang, typeFilter = null) =>
   xml =>
     R.pipe(
@@ -90,7 +94,18 @@ const getAttribute = (name, defaultValue = null) => R.pipe(
   R.propOr(defaultValue, name)
 )
 
+const getAttributeBoolean = name => R.pipe(
+  getAttribute(name),
+  R.equals('true')
+)
+
+const getUiAttribute = (name, defaultValue = null) => collectXmlElement =>
+  getAttribute(`n1:${name}`)(collectXmlElement) ||
+  getAttribute(`ui:${name}`, defaultValue)(collectXmlElement)
+
 module.exports = {
+  layoutTypes,
+
   getNodeDefTypeByCollectNodeDef,
 
   toLabels,
@@ -102,5 +117,7 @@ module.exports = {
   getText,
   getChildElementText: name => R.pipe(getElementByName(name), getText),
   getAttributes,
-  getAttribute
+  getAttribute,
+  getAttributeBoolean,
+  getUiAttribute
 }
