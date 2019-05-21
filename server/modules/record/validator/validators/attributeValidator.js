@@ -11,7 +11,7 @@ const Node = require('../../../../../common/record/node')
 
 const TypeValidator = require('./typeValidator')
 
-const RecordExprParser = require('../../recordExprParser')
+const RecordExprParser = require('../../../../../common/record/recordExprParser')
 
 const errorKeys = {
   required: 'required',

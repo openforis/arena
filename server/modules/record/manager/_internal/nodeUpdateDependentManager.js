@@ -6,7 +6,7 @@ const NodeDef = require('../../../../../common/survey/nodeDef')
 
 const Record = require('../../../../../common/record/record')
 const Node = require('../../../../../common/record/node')
-const RecordExprParser = require('../../recordExprParser')
+const RecordExprParser = require('../../../../../common/record/recordExprParser')
 
 const NodeRepository = require('../../repository/nodeRepository')
 

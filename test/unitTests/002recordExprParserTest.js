@@ -10,7 +10,7 @@ const RB = require('../it/utils/recordBuilder')
 const RecordUtils = require('../it/utils/recordUtils')
 const { getContextUser } = require('../testContext')
 
-const RecordExprParser = require('../../server/modules/record/recordExprParser')
+const RecordExprParser = require('../../common/record/recordExprParser')
 
 let survey = {}
 let record = {}
