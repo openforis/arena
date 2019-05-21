@@ -63,7 +63,7 @@ const checkExpressionParserByType = {
 class NodeDefsImportJob extends Job {
 
   constructor (params) {
-    super('NodeDefsImportJob', params)
+    super(NodeDefsImportJob.type, params)
 
     this.nodeDefs = {} //node definitions by uuid
     this.nodeDefNames = [] //node def names used (to avoid naming collision)
@@ -100,16 +100,20 @@ class NodeDefsImportJob extends Job {
     const { defaultLanguage } = this.context
 
     // 1. determine basic props
-    const { name: collectNodeDefName, multiple, key, calculated } = CollectIdmlParseUtils.getAttributes(collectNodeDef)
+    const collectNodeDefName = CollectIdmlParseUtils.getAttribute('name')(collectNodeDef)
+    const multiple = CollectIdmlParseUtils.getAttributeBoolean('multiple')(collectNodeDef)
+    const calculated = CollectIdmlParseUtils.getAttributeBoolean('calculated')(collectNodeDef)
+    const key = CollectIdmlParseUtils.getAttributeBoolean('key')(collectNodeDef)
 
     const collectNodeDefPath = parentPath + '/' + collectNodeDefName
 
-    const tableLayout = CollectIdmlParseUtils.getAttribute('n1:layout')(collectNodeDef) === 'table'
+    const tableLayout = multiple &&
+      CollectIdmlParseUtils.getUiAttribute('layout', CollectIdmlParseUtils.layoutTypes.table)(collectNodeDef) === CollectIdmlParseUtils.layoutTypes.table
 
     const props = {
       [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName),
-      [NodeDef.propKeys.multiple]: multiple === 'true',
-      [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key === 'true',
+      [NodeDef.propKeys.multiple]: multiple,
+      [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
       [NodeDef.propKeys.labels]: CollectIdmlParseUtils.toLabels('label', defaultLanguage, 'instance')(collectNodeDef),
       ...type === NodeDef.nodeDefType.entity
         ? {
@@ -119,7 +123,7 @@ class NodeDefsImportJob extends Job {
               : NodeDefLayout.nodeDefRenderType.form
         }
         : {
-          [NodeDef.propKeys.readOnly]: calculated === 'true'
+          [NodeDef.propKeys.readOnly]: calculated
         },
       [NodeDefLayout.nodeDefLayoutProps.layout]: tableLayout ? [] : null,
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
@@ -178,7 +182,7 @@ class NodeDefsImportJob extends Job {
   }
 
   async extractNodeDefAdvancedProps (parentNodeDef, nodeDefUuid, type, collectNodeDef, tx) {
-    const multiple = collectNodeDef.attributes.multiple === 'true'
+    const multiple = CollectIdmlParseUtils.getAttributeBoolean('multiple')(collectNodeDef)
 
     const propsAdvanced = {}
 
@@ -194,12 +198,12 @@ class NodeDefsImportJob extends Job {
       ...multiple
         ? {
           [NodeDefValidations.keys.count]: {
-            [NodeDefValidations.keys.min]: collectNodeDef.attributes.minCount,
-            [NodeDefValidations.keys.max]: collectNodeDef.attributes.maxCount
+            [NodeDefValidations.keys.min]: CollectIdmlParseUtils.getAttribute('minCount')(collectNodeDef),
+            [NodeDefValidations.keys.max]: CollectIdmlParseUtils.getAttribute('maxCount')(collectNodeDef),
           }
         }
         : {
-          [NodeDefValidations.keys.required]: collectNodeDef.attributes.required,
+          [NodeDefValidations.keys.required]: CollectIdmlParseUtils.getAttribute('required')(collectNodeDef),
         }
     }
 
@@ -214,7 +218,7 @@ class NodeDefsImportJob extends Job {
     }
 
     // 3. applicable (not supported)
-    const relevantExpr = collectNodeDef.attributes.relevant
+    const relevantExpr = CollectIdmlParseUtils.getAttribute('relevant')(collectNodeDef)
     if (relevantExpr) {
       await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.applicable, relevantExpr, null, null, tx)
     }
@@ -225,7 +229,7 @@ class NodeDefsImportJob extends Job {
   extractNodeDefExtraProps (parentNodeDef, type, collectNodeDef) {
     switch (type) {
       case nodeDefType.code:
-        const listName = collectNodeDef.attributes.list
+        const listName = CollectIdmlParseUtils.getAttribute('list')(collectNodeDef)
         const category = R.find(c => listName === Category.getName(c), this.getContextProp('categories', []))
 
         return {
@@ -233,7 +237,7 @@ class NodeDefsImportJob extends Job {
           [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.dropdown
         }
       case nodeDefType.taxon:
-        const taxonomyName = collectNodeDef.attributes.taxonomy
+        const taxonomyName = CollectIdmlParseUtils.getAttribute('taxonomy')(collectNodeDef)
         const taxonomy = R.find(t => taxonomyName === Taxonomy.getName(t), this.getContextProp('taxonomies', []))
 
         return {
@@ -252,7 +256,7 @@ class NodeDefsImportJob extends Job {
     const defaultValues = []
 
     for (const collectDefaultValue of collectDefaultValues) {
-      const { value, expression, applyIf } = collectDefaultValue.attributes
+      const { value, expression, applyIf } = CollectIdmlParseUtils.getAttributes(collectDefaultValue)
       if (expression || applyIf) {
         const messages = CollectIdmlParseUtils.toLabels('messages', defaultLanguage)(collectDefaultValue)
         await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.defaultValue, expression, applyIf, messages, tx)
@@ -355,17 +359,11 @@ class NodeDefsImportJob extends Job {
 
 const determineNodeDefPageUuid = (type, collectNodeDef) => {
   if (type === NodeDef.nodeDefType.entity) {
-    if (collectNodeDef.attributes.multiple === 'true') {
-      // check if a tab is specified in ui:tab or n1:tab xml attributes
-      const hasTab = R.pipe(
-        CollectIdmlParseUtils.getAttributes,
-        R.keys,
-        R.intersection(['ui:tab', 'n1:tab']), //newer versions of Collect use an alias for the ui namespace
-        R.isEmpty,
-        R.not
-      )(collectNodeDef)
+    const multiple = CollectIdmlParseUtils.getAttributeBoolean('multiple')(collectNodeDef)
+    if (multiple) {
+      const tab = CollectIdmlParseUtils.getUiAttribute('tab')(collectNodeDef)
 
-      if (hasTab) {
+      if (tab) {
         // multiple entity own tab => own page
         return uuidv4()
       } else {
@@ -381,5 +379,7 @@ const determineNodeDefPageUuid = (type, collectNodeDef) => {
     return null
   }
 }
+
+NodeDefsImportJob.type = 'NodeDefsImportJob'
 
 module.exports = NodeDefsImportJob
