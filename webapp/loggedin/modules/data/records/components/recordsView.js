@@ -49,7 +49,7 @@ const RecordRow = ({ idx, offset, record, style, nodeDefKeys, canEdit }) => (
   </div>
 )
 
-const RecordsTable = ({ user, records, offset, nodeDefKeys, lang }) => {
+const RecordsTable = ({ user, surveyInfo, records, offset, nodeDefKeys, lang }) => {
   const noCols = 3 + nodeDefKeys.length
 
   const style = { gridTemplateColumns: `70px repeat(${noCols}, ${1 / noCols}fr) 50px 50px` }
@@ -76,7 +76,7 @@ const RecordsTable = ({ user, records, offset, nodeDefKeys, lang }) => {
                        record={record}
                        style={style}
                        nodeDefKeys={nodeDefKeys}
-                       canEdit={AuthManager.canEditRecord(user, record)}/>
+                       canEdit={Survey.isPublished(surveyInfo) && AuthManager.canEditRecord(user, record)}/>
           )
         }
       </div>
@@ -90,7 +90,7 @@ class RecordsView extends React.Component {
   componentDidMount () {
     const { surveyInfo, initRecordsList } = this.props
 
-    if (Survey.isPublished(surveyInfo))
+    if (Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo))
       initRecordsList()
   }
 
