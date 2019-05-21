@@ -7,6 +7,7 @@ import { normalizeName } from '../../../../../common/stringUtils'
 
 import LevelEdit from './levelEdit'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import Category from '../../../../../common/survey/category'
 import CategoryLevel from '../../../../../common/survey/categoryLevel'
@@ -26,13 +27,15 @@ const CategoryEdit = props => {
     putCategoryProp, createCategoryLevel, setCategoryForEdit,
   } = props
 
-  const {validation} = category
+  const { validation } = category
   const levels = Category.getLevelsArray(category)
+
+  const i18n = useI18n()
 
   return (
     <div className="category-edit">
       <div>
-        <FormItem label="Category name">
+        <FormItem label={i18n.t('categoryEdit.categoryName')}>
           <Input value={Category.getName(category)}
                  validation={getFieldValidation('name')(validation)}
                  onChange={value => putCategoryProp(category, 'name', normalizeName(value))}
@@ -54,15 +57,15 @@ const CategoryEdit = props => {
                   onClick={() => createCategoryLevel(category)}
                   aria-disabled={levels.length === 5}>
             <span className="icon icon-plus icon-16px icon-left"/>
-            ADD LEVEL
+            {i18n.t('categoryEdit.addLevel')}
           </button>
         }
       </div>
 
-      <div style={{justifySelf: 'center'}}>
+      <div style={{ justifySelf: 'center' }}>
         <button className="btn btn-of-light"
                 onClick={() => setCategoryForEdit(null)}>
-          Done
+          {i18n.t('common.done')}
         </button>
       </div>
 

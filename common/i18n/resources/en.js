@@ -17,6 +17,7 @@ module.exports = {
     errorMessage_plural: 'Error messages',
     invalid: 'INVALID',
     language: 'Language',
+    code: 'Code',
   },
   sidebar: {
     openForisShort: 'OF',
@@ -72,9 +73,6 @@ module.exports = {
     surveyCreate: {
       createSurvey: 'Create Survey',
       importFromCollect: 'Import from Collect',
-    },
-    collectImport: {
-
     },
   },
 
@@ -165,7 +163,6 @@ module.exports = {
       noDataAdded: 'No data added',
     },
     nodeDefTaxon: {
-      code: 'Code',
       scientificName: 'Scientific Name',
       vernacularName: 'Vernacular Name',
     },
@@ -175,6 +172,15 @@ module.exports = {
       analysis: 'analysis',
     },
   },
+
+  categoryEdit: {
+    categoryName: 'Category name',
+    addLevel: 'Add level',
+    level: 'Level',
+    items: 'Items',
+    confirmDelete: 'Delete the item with all children? $t(common.cantUndoWarning)',
+    deleteItem: 'Delete item',
+ },
 
   jobs: {
     item: 'Item',
