@@ -3,6 +3,8 @@ module.exports = {
     name: 'Name',
     label: 'Label',
     add: 'Add',
+    view: 'View',
+    edit: 'Edit',
     delete: 'delete',
     done: 'done',
     close: 'close',
@@ -74,6 +76,12 @@ module.exports = {
     collectImport: {
 
     },
+  },
+
+  itemsTable: {
+    undefinedName: 'Undefined name',
+    unused: 'Unused',
+    noItemsAdded: 'No items added',
   },
 
   nodeDefEdit: {
