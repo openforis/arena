@@ -88,11 +88,8 @@ class NodeDefsImportJob extends Job {
     }
     await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, tx)
 
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, true, true, false, tx)
-
     this.setContext({
       nodeDefUuidByCollectPath: this.nodeDefUuidByCollectPath,
-      [Job.keysContext.survey]: survey
     })
   }
 

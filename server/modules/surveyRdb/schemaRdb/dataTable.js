@@ -63,8 +63,8 @@ const getParentForeignKey = (surveyId, schemaName, nodeDef, nodeDefParent = null
 
 const getUuidUniqueConstraint = nodeDef => `CONSTRAINT ${NodeDef.getName(nodeDef)}_uuid_unique_ix1 UNIQUE (${colNameUuuid})`
 
-const getRowValues = async (survey, nodeDef, record, nodeRow, nodeDefColumns, surveyIndex) => {
-  const rowValues = await DataRow.getValues(Survey.getSurveyInfo(survey), nodeDef, record, nodeRow, nodeDefColumns, surveyIndex)
+const getRowValues = async (survey, nodeDef, record, nodeRow, nodeDefColumns) => {
+  const rowValues = await DataRow.getValues(survey, nodeDef, record, nodeRow, nodeDefColumns)
   return [
     Node.getUuid(nodeRow),
     NodeDef.isRoot(nodeDef) ? Record.getUuid(record) : Node.getParentUuid(nodeRow),

@@ -45,8 +45,8 @@ const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output)
 
 const queryTable = async (surveyId, nodeDefUuidTable, tableName, nodeDefUuidCols = [], cols = [],
                           offset, limit, filterExpr, sort, editMode = false) => {
-  const surveySimple = await SurveyManager.fetchSurveyById(surveyId, true)
-  const surveyInfo = Survey.getSurveyInfo(surveySimple)
+  const surveySummary = await SurveyManager.fetchSurveyById(surveyId, true)
+  const surveyInfo = Survey.getSurveyInfo(surveySummary)
   const loadDraftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
 
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, loadDraftDefs)

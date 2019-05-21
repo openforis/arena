@@ -13,7 +13,6 @@ const Node = require('../../../../../../common/record/node')
 const RecordFile = require('../../../../../../common/record/recordFile')
 
 const FileManager = require('../../../../record/manager/fileManager')
-const SurveyIndex = require('../../../../survey/index/surveyIndex')
 const CollectRecordParseUtils = require('./collectRecordParseUtils')
 
 const extractTextValueAndMeta = collectNode => {
@@ -23,12 +22,12 @@ const extractTextValueAndMeta = collectNode => {
     : null
 }
 
-const extractCodeValueAndMeta = (survey, nodeDef, surveyIndex, record, node) => collectNode => {
+const extractCodeValueAndMeta = (survey, nodeDef, record, node) => collectNode => {
   const code = CollectRecordParseUtils.getTextValue('code')(collectNode)
 
   if (code) {
     const parentNode = Record.getParentNode(node)(record)
-    const { itemUuid, hierarchyCode } = SurveyIndex.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(surveyIndex)
+    const { itemUuid, hierarchyCode } = Survey.getCategoryItemUuidAndCodeHierarchy(survey, nodeDef, record, parentNode, code)(survey)
 
     return itemUuid
       ? {
@@ -102,9 +101,9 @@ const extractFileValueAndMeta = (survey, node, collectSurvey, collectSurveyFileZ
   }
 }
 
-const extractTaxonValueAndMeta = (nodeDef, surveyIndex) => collectNode => {
+const extractTaxonValueAndMeta = (survey, nodeDef) => collectNode => {
   const { code, scientific_name, vernacular_name } = CollectRecordParseUtils.getTextValues(collectNode)
-  const taxonUuid = SurveyIndex.getTaxonUuid(nodeDef, code)(surveyIndex)
+  const taxonUuid = Survey.getTaxonUuid(nodeDef, code)(survey)
 
   if (taxonUuid) {
     const value = {
@@ -116,7 +115,7 @@ const extractTaxonValueAndMeta = (nodeDef, surveyIndex) => collectNode => {
     }
 
     if (vernacular_name) {
-      const vernacularNameUuid = SurveyIndex.getTaxonVernacularNameUuid(nodeDef, code, vernacular_name)(surveyIndex)
+      const vernacularNameUuid = Survey.getTaxonVernacularNameUuid(nodeDef, code, vernacular_name)(survey)
       if (vernacularNameUuid) {
         value[Node.valuePropKeys.vernacularNameUuid] = vernacularNameUuid
       } else {
@@ -140,7 +139,7 @@ const extractTimeValueAndMeta = collectNode => {
 }
 
 const extractAttributeValueAndMeta = async (
-  survey, nodeDef, record, node, surveyIndex, // arena items
+  survey, nodeDef, record, node, // arena items
   collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode, // collect items
   tx,
 ) => {
@@ -153,7 +152,7 @@ const extractAttributeValueAndMeta = async (
       return extractTextValueAndMeta(collectNode)
 
     case nodeDefType.code:
-      return extractCodeValueAndMeta(survey, nodeDef, surveyIndex, record, node)(collectNode)
+      return extractCodeValueAndMeta(survey, nodeDef, record, node)(collectNode)
 
     case nodeDefType.coordinate:
       return extractCoordinateValueAndMeta(collectNode)
@@ -165,7 +164,7 @@ const extractAttributeValueAndMeta = async (
       return await extractFileValueAndMeta(survey, node, collectSurvey, collectSurveyFileZip, collectNodeDefPath, tx)(collectNode)
 
     case nodeDefType.taxon:
-      return extractTaxonValueAndMeta(nodeDef, surveyIndex)(collectNode)
+      return extractTaxonValueAndMeta(survey, nodeDef)(collectNode)
 
     case nodeDefType.time:
       return extractTimeValueAndMeta(collectNode)

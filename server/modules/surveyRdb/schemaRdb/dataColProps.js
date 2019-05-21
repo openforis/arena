@@ -7,8 +7,6 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const Taxon = require('../../../../common/survey/taxon')
 const Node = require('../../../../common/record/node')
 
-const SurveyIndex = require('../../survey/index/surveyIndex')
-
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const sqlTypes = require('../../../../common/surveyRdb/sqlTypes')
 const { nodeDefType } = NodeDef
@@ -28,7 +26,7 @@ const getValueFromItem = (nodeDefCol, colName, item = {}, isInProps = false) => 
     : R.propOr(null, prop, item)
 }
 
-const nodeValuePropProcessor = (surveyInfo, nodeDefCol, nodeCol) =>
+const nodeValuePropProcessor = (survey, nodeDefCol, nodeCol) =>
   (node, colName) => {
     const nodeValue = Node.getValue(node)
     return getValueFromItem(nodeDefCol, colName, nodeValue)
@@ -50,7 +48,7 @@ const props = {
 
   [nodeDefType.date]: {
     [colTypeProcessor]: () => () => sqlTypes.date,
-    [colValueProcessor]: (surveyInfo, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
       const [year, month, day] = [Node.getDateYear(nodeCol), Node.getDateMonth(nodeCol), Node.getDateDay(nodeCol)]
       return () => DateTimeUtils.isValidDate(year, month, day) ? `${year}-${month}-${day}` : null
     }
@@ -58,16 +56,17 @@ const props = {
 
   [nodeDefType.time]: {
     [colTypeProcessor]: () => () => sqlTypes.time,
-    [colValueProcessor]: (surveyInfo, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: (survey, nodeDefCol, nodeCol) => {
       const [hour, minute] = [Node.getTimeHour(nodeCol), Node.getTimeMinute(nodeCol)]
       return () => DateTimeUtils.isValidTime(hour, minute) ? `${hour}:${minute}:00` : null
     }
   },
 
   [nodeDefType.code]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, surveyIndex) => {
+    [colValueProcessor]: async (survey, nodeDefCol, nodeCol) => {
+      const surveyInfo = Survey.getSurveyInfo(survey)
       const itemUuid = Node.getCategoryItemUuid(nodeCol)
-      const item = itemUuid ? SurveyIndex.getCategoryItemByUuid(itemUuid)(surveyIndex) : {}
+      const item = itemUuid ? Survey.getCategoryItemByUuid(itemUuid)(survey) : {}
 
       return (node, colName) => R.endsWith('code', colName)
         ? getValueFromItem(nodeDefCol, colName, item, true)
@@ -77,10 +76,10 @@ const props = {
   },
 
   [nodeDefType.taxon]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol, surveyIndex) => {
+    [colValueProcessor]: async (survey, nodeDefCol, nodeCol) => {
       // return (node, colName) => null
       const taxonUuid = Node.getTaxonUuid(nodeCol)
-      const taxon = taxonUuid ? SurveyIndex.getTaxonByUuid(taxonUuid)(surveyIndex) : {}
+      const taxon = taxonUuid ? Survey.getTaxonByUuid(taxonUuid)(survey) : {}
 
       return (node, colName) =>
         R.endsWith('code', colName)
@@ -93,7 +92,8 @@ const props = {
   },
 
   [nodeDefType.coordinate]: {
-    [colValueProcessor]: async (surveyInfo, nodeDefCol, nodeCol) => {
+    [colValueProcessor]: async (survey, nodeDefCol, nodeCol) => {
+      const surveyInfo = Survey.getSurveyInfo(survey)
       const defaultSrsCode = Survey.getDefaultSRS(surveyInfo).code
       const [x, y, srs] = [Node.getCoordinateX(nodeCol), Node.getCoordinateY(nodeCol), Node.getCoordinateSrs(nodeCol, defaultSrsCode)]
       return () => isBlank(x) || isBlank(y) ? null : `SRID=${srs};POINT(${x} ${y})`

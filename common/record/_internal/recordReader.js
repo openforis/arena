@@ -1,6 +1,7 @@
 const R = require('ramda')
 
-const Survey = require('../../survey/survey')
+const SurveyNodeDefs = require('../../survey/_internal/surveyNodeDefs')
+const SurveyDependencies = require('../../survey/_internal/surveyDependencies')
 const NodeDef = require('../../survey/nodeDef')
 const Node = require('../node')
 
@@ -78,12 +79,12 @@ const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
  */
 const getDependentNodes = (survey, node, dependencyType) => record => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
-  const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const dependentUuids = Survey.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
-  const isDependencyApplicable = dependencyType === Survey.dependencyTypes.applicable
+  const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
+  const dependentUuids = SurveyDependencies.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
+  const isDependencyApplicable = dependencyType === SurveyDependencies.dependencyTypes.applicable
 
   if (dependentUuids) {
-    const dependentDefs = Survey.getNodeDefsByUuids(dependentUuids)(survey)
+    const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentUuids)(survey)
 
     const dependentsPerDef = dependentDefs.map(
       dependentDef => {

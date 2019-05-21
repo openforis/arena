@@ -146,7 +146,7 @@ const _onNodesUpdate = async (survey, record, updatedNodes,
     const nodeDefs = SurveyUtils.toUuidIndexedObj(
       Survey.getNodeDefsByUuids(Node.getNodeDefUuids(updatedNodesAndDependents))(survey)
     )
-    await SurveyRdbManager.updateTableNodes(Survey.getSurveyInfo(survey), nodeDefs, updatedNodesAndDependents, t)
+    await SurveyRdbManager.updateTableNodes(survey, nodeDefs, updatedNodesAndDependents, t)
   }
 
   return record

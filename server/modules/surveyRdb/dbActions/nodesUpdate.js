@@ -1,6 +1,7 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
+const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Node = require('../../../../common/record/node')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
@@ -42,16 +43,16 @@ const getColNames = (nodeDef, type) =>
     : DataCol.getNames(nodeDef)
   )
 
-const getColValues = async (surveyInfo, nodeDef, node, type, client) =>
+const getColValues = async (survey, nodeDef, node, type, client) =>
   R.flatten(type === types.insert
     ? [
       Node.getUuid(node),
       NodeDef.isMultipleAttribute(nodeDef)
-        ? [Node.getParentUuid(node), ...await Promise.all(DataCol.getValues(surveyInfo, nodeDef, node, client))]
+        ? [Node.getParentUuid(node), ...await Promise.all(DataCol.getValues(survey, nodeDef, node, client))]
         //entity
         : NodeDef.isRoot(nodeDef) ? Node.getRecordUuid(node) : Node.getParentUuid(node)
     ]
-    : await DataCol.getValues(surveyInfo, nodeDef, node, client)
+    : await DataCol.getValues(survey, nodeDef, node, client)
   )
 
 const getRowUuid = (nodeDef, node, nodeParent) =>
@@ -59,7 +60,7 @@ const getRowUuid = (nodeDef, node, nodeParent) =>
     ? Node.getUuid(node)
     : Node.getUuid(nodeParent)
 
-const toUpdates = async (surveyInfo, nodeDefs, nodes, client) => {
+const toUpdates = async (survey, nodeDefs, nodes, client) => {
   const updates = await Promise.all(
     R.values(nodes).map(async node => {
       const nodeDef = nodeDefs[Node.getNodeDefUuid(node)]
@@ -68,10 +69,10 @@ const toUpdates = async (surveyInfo, nodeDefs, nodes, client) => {
 
       return type ? {
           type,
-          schemaName: SchemaRdb.getName(surveyInfo.id),
+          schemaName: SchemaRdb.getName(Survey.getId(survey)),
           tableName: DataTable.getName(nodeDef, nodeDefParent),
           colNames: getColNames(nodeDef, type),
-          colValues: await getColValues(surveyInfo, nodeDef, node, type, client),
+          colValues: await getColValues(survey, nodeDef, node, type, client),
           rowUuid: getRowUuid(nodeDef, node, nodes[Node.getParentUuid(node)])
         }
         : null
@@ -107,8 +108,8 @@ const runDelete = (update, client) =>
     update.rowUuid
   )
 
-const run = async (surveyInfo, nodeDefs, nodes, client) => {
-  const updates = await toUpdates(surveyInfo, nodeDefs, nodes, client)
+const run = async (survey, nodeDefs, nodes, client) => {
+  const updates = await toUpdates(survey, nodeDefs, nodes, client)
   await client.batch(
     updates.map(update =>
       isType(types.update)(update)
