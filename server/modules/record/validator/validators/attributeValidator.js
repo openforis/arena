@@ -29,7 +29,7 @@ const validateRequired = (survey, nodeDef) =>
  * Evaluates the validation expressions.
  * Returns 'null' if all are valid, a concatenated error message otherwise.
  */
-const validateNodeValidations = (survey, record, nodeDef, tx) =>
+const validateNodeValidations = (survey, record, nodeDef) =>
   async (propName, node) => {
     if (Node.isValueBlank(node)) {
       return null
@@ -58,7 +58,7 @@ const validateNodeValidations = (survey, record, nodeDef, tx) =>
     )(applicableExpressionsEval)
   }
 
-const validateAttribute = async (survey, record, attribute, nodeDef, validatedNodeUuids, tx) => {
+const validateAttribute = async (survey, record, attribute, nodeDef, validatedNodeUuids) => {
   if (Node.isDeleted(attribute)) {
     return null
   }
@@ -72,7 +72,7 @@ const validateAttribute = async (survey, record, attribute, nodeDef, validatedNo
     [Node.keys.value]: [
       validateRequired(survey, nodeDef),
       TypeValidator.validateValueType(survey, nodeDef),
-      validateNodeValidations(survey, record, nodeDef, tx)
+      validateNodeValidations(survey, record, nodeDef)
     ]
   }, false)
 
@@ -81,7 +81,7 @@ const validateAttribute = async (survey, record, attribute, nodeDef, validatedNo
   }
 }
 
-const validateSelfAndDependentAttributes = async (survey, record, nodes, tx) => {
+const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
 
   const attributes = R.pipe(
     R.values,
@@ -108,7 +108,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes, tx) => 
         return await Promise.all(
           attributeAndDependents.map(
             async ({ nodeCtx, nodeDef }) =>
-              await validateAttribute(survey, record, nodeCtx, nodeDef, validatedAttributeUuids, tx)
+              await validateAttribute(survey, record, nodeCtx, nodeDef, validatedAttributeUuids)
           )
         )
       }

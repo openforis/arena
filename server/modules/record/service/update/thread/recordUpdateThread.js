@@ -19,36 +19,54 @@ class RecordUpdateThread extends Thread {
     super(paramsObj)
 
     this.queue = new Queue()
-    this.processing = false
 
-    //cache
-    this.survey = null
-    this.record = null
+    this.processing = true
+    this._survey = null
+    this._record = null
+
+    this._initRecord()
+      .then(() => {
+        this._initSurvey()
+          .then(() => {
+            this.processing = false
+            this.processNext()
+              .then(() => {})
+          })
+      })
+
   }
 
-  async getRecord () {
-    if (!this.record) {
-      const recordUuid = R.prop('recordUuid', this.params)
-      this.record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid)
-    }
-    return this.record
+  get record () {
+    return this._record
   }
 
-  async getSurvey () {
-    if (!this.survey) {
-      const record = await this.getRecord()
-      const preview = Record.isPreview(record)
-      const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, preview, true, false)
+  set record (record) {
+    this._record = record
+  }
 
-      // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
-      const dependencyGraph = preview
-        ? Survey.buildDependencyGraph(surveyDb)
-        : await SurveyManager.fetchDependencies(this.surveyId)
+  get survey () {
+    return this._survey
+  }
 
-      this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
-    }
+  set survey (survey) {
+    this._survey = survey
+  }
 
-    return this.survey
+  async _initRecord () {
+    const recordUuid = R.prop('recordUuid', this.params)
+    this.record = await RecordManager.fetchRecordAndNodesByUuid(this.surveyId, recordUuid)
+  }
+
+  async _initSurvey () {
+    const preview = Record.isPreview(this.record)
+    const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.surveyId, preview, true, false)
+
+    // if in preview mode, unpublished dependencies have not been stored in the db, so we need to build them
+    const dependencyGraph = preview
+      ? Survey.buildDependencyGraph(surveyDb)
+      : await SurveyManager.fetchDependencies(this.surveyId)
+
+    this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
   }
 
   _postMessage (type, content) {
@@ -91,17 +109,14 @@ class RecordUpdateThread extends Thread {
   }
 
   async processMessage (msg) {
-    const user = this.getUser()
-    const survey = await this.getSurvey()
-    const record = await this.getRecord()
 
     switch (msg.type) {
 
       case messageTypes.persistNode:
         this.record = await RecordManager.persistNode(
-          user,
-          survey,
-          record,
+          this.getUser(),
+          this.survey,
+          this.record,
           msg.node,
           this.handleNodesUpdated.bind(this),
           this.handleNodesValidationUpdated.bind(this)
@@ -110,9 +125,9 @@ class RecordUpdateThread extends Thread {
 
       case messageTypes.deleteNode:
         this.record = await RecordManager.deleteNode(
-          user,
-          survey,
-          record,
+          this.getUser(),
+          this.survey,
+          this.record,
           msg.nodeUuid,
           this.handleNodesUpdated.bind(this),
           this.handleNodesValidationUpdated.bind(this)
