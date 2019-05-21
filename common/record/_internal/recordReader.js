@@ -146,6 +146,23 @@ const getParentCodeAttribute = (survey, parentNode, nodeDef) => record => {
   return null
 }
 
+// ====== Keys
+
+const getEntityKeyNodes = (survey, nodeEntity) => record => {
+  const nodeDefEntity = SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(nodeEntity))(survey)
+  const nodeDefKeys = SurveyNodeDefs.getNodeDefKeys(nodeDefEntity)(survey)
+
+  return R.pipe(
+    R.map(nodeDefKey => getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)),
+    R.flatten,
+  )(nodeDefKeys)
+}
+
+const getEntityKeyValues = (survey, nodeEntity) => R.pipe(
+  getEntityKeyNodes(survey, nodeEntity),
+  R.map(Node.getValue)
+)
+
 module.exports = {
   getNodes,
   getNodeByUuid,
@@ -172,4 +189,8 @@ module.exports = {
   // code
   getParentCodeAttribute,
   getDependentCodeAttributes,
+
+  // ====== Keys
+  getEntityKeyNodes,
+  getEntityKeyValues,
 }

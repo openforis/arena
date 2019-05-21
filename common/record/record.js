@@ -50,6 +50,10 @@ module.exports = {
   getParentCodeAttribute: RecordReader.getParentCodeAttribute,
   getDependentCodeAttributes: RecordReader.getDependentCodeAttributes,
 
+  // ====== Keys
+  getEntityKeyNodes: RecordReader.getEntityKeyNodes,
+  getEntityKeyValues: RecordReader.getEntityKeyValues,
+
   // ====== UPDATE
   assocNodes: RecordUpdater.assocNodes,
   assocNode: RecordUpdater.assocNode,
