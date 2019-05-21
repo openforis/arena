@@ -6,7 +6,6 @@ const TaxonomiesValidationJob = require('./jobs/taxonomiesValidationJob')
 const SurveyInfoValidationJob = require('./jobs/surveyInfoValidationJob')
 const RecordCheckJob = require('../recordCheckJob')
 const SurveyPublishPerformJob = require('./surveyPublishPerformJob')
-const SurveyIndexGeneratorJob = require('../../../survey/service/surveyIndexGeneratorJob')
 const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
 
 class SurveyPublishJob extends Job {
@@ -20,7 +19,6 @@ class SurveyPublishJob extends Job {
       // record check must be executed before publishing survey props
       new RecordCheckJob(),
       new SurveyPublishPerformJob(),
-      new SurveyIndexGeneratorJob(),
       new SurveyRdbGeneratorJob()
     ])
   }

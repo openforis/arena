@@ -33,8 +33,8 @@ class RecordsImportJob extends Job {
 
   async execute (tx) {
     const user = this.getUser()
-    const survey = this.getContextSurvey()
-    const surveyId = Survey.getId(survey)
+    const surveyId = this.getSurveyId()
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, tx)
 
     const entryNames = this.getEntryNames()
 
@@ -120,7 +120,6 @@ class RecordsImportJob extends Job {
   async insertNodes (survey, record, collectRootEntityName, collectRootEntity) {
 
     const { nodeDefUuidByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
-    const surveyIndex = this.getContextProp(Job.keysContext.surveyIndex)
 
     // init record nodes
     record.nodes = {}
@@ -144,7 +143,7 @@ class RecordsImportJob extends Job {
 
       if (NodeDef.isAttribute(nodeDef)) {
         const valueAndMeta = await CollectAttributeValueExtractor.extractAttributeValueAndMeta(
-          survey, nodeDef, record, nodeToInsert, surveyIndex,
+          survey, nodeDef, record, nodeToInsert,
           collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode,
           this.tx
         )

@@ -4,27 +4,26 @@ const db = require('../../../db/db')
 const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
 const { uuidv4 } = require('../../../../common/uuid')
 
-const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
-const SurveyIndexManager = require('./_internal/surveyIndexManager')
-
-const SurveyRepository = require('../repository/surveyRepository')
-const SurveyRepositoryUtils = require('../repository/surveySchemaRepositoryUtils')
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const User = require('../../../../common/user/user')
-
-const SurveyValidator = require('../surveyValidator')
-
-const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
 const { nodeDefLayoutProps, nodeDefRenderType } = require('../../../../common/survey/nodeDefLayout')
-
-const UserRepository = require('../../user/repository/userRepository')
 const { getUserPrefSurveyId, userPrefNames } = require('../../../../common/user/userPrefs')
 
-const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
+const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
+const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
 const AuthManager = require('../../../../common/auth/authManager')
 
+const SurveyRepository = require('../repository/surveyRepository')
+const CategoryRepository = require('../../category/repository/categoryRepository')
+const TaxonomyRepository = require('../../taxonomy/repository/taxonomyRepository')
+const UserRepository = require('../../user/repository/userRepository')
+const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
+const SurveyRepositoryUtils = require('../repository/surveySchemaRepositoryUtils')
+
 const ActivityLog = require('../../activityLog/activityLogger')
+
+const SurveyValidator = require('../surveyValidator')
 
 const assocSurveyInfo = info => ({ info })
 
@@ -93,10 +92,20 @@ const fetchSurveyById = async (surveyId, draft = false, validate = false, client
   return assocSurveyInfo(info)
 }
 
-const fetchSurveyAndNodeDefsBySurveyId = async (id, draft = false, advanced = false, validate = false, client = db) => {
-  const survey = await fetchSurveyById(id, draft, validate, client)
-  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(id, draft, advanced, validate, client)
+const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
+  const survey = await fetchSurveyById(surveyId, draft, validate, client)
+  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate, client)
   return Survey.assocNodeDefs(nodeDefs)(survey)
+}
+
+const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
+  const survey = await fetchSurveyAndNodeDefsBySurveyId(surveyId, draft, advanced, validate, client)
+  const [categoryIndexRS, taxonomyIndexRS] = await Promise.all([
+    CategoryRepository.fetchIndex(surveyId, draft, client),
+    TaxonomyRepository.fetchIndex(surveyId, draft, client)
+  ])
+
+  return Survey.assocRefData(categoryIndexRS, taxonomyIndexRS)(survey)
 }
 
 const fetchUserSurveysInfo = async (user) => R.map(
@@ -138,6 +147,7 @@ module.exports = {
   fetchAllSurveyIds: SurveyRepository.fetchAllSurveyIds,
   fetchSurveyById,
   fetchSurveyAndNodeDefsBySurveyId,
+  fetchSurveyAndNodeDefsAndRefDataBySurveyId,
   fetchUserSurveysInfo,
   fetchDependencies: SurveyRepository.fetchDependencies,
 
@@ -151,7 +161,4 @@ module.exports = {
   deleteSurveyLabel: SurveyRepository.deleteSurveyLabel,
   deleteSurveyDescription: SurveyRepository.deleteSurveyDescription,
   dropSurveySchema: SurveyRepository.dropSurveySchema,
-
-  // ====== INDEX
-  fetchIndex: SurveyIndexManager.fetchIndex,
 }

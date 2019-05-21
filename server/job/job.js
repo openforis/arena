@@ -108,7 +108,7 @@ class Job {
         await this.beforeSuccess()
         this.logDebug('beforeSuccess run')
       }
-    // DO NOT CATCH EXCEPTIONS! Transaction will be aborted in that case
+      // DO NOT CATCH EXCEPTIONS! Transaction will be aborted in that case
     } finally {
       if (!this.isCanceled()) {
         // 4. flush/clean resources
@@ -359,7 +359,6 @@ Job.keysContext = {
   surveyId: 'surveyId',
   survey: 'survey',
   user: 'user',
-  surveyIndex: 'surveyIndex'
 }
 
 module.exports = Job

@@ -9,19 +9,19 @@ const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
 const DataTable = require('../schemaRdb/dataTable')
 
-const getNodesRowValues = async (survey, nodeDef, record, surveyIndex) => {
+const getNodesRowValues = async (survey, nodeDef, record) => {
   const nodes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record)
   const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDef)
 
   return await Promise.all(
     nodes.map(
-      node => DataTable.getRowValues(survey, nodeDef, record, node, nodeDefColumns, surveyIndex)
+      node => DataTable.getRowValues(survey, nodeDef, record, node, nodeDefColumns)
     )
   )
 }
 
-const run = async (survey, nodeDef, record, surveyIndex, client) => {
-  const insertValues = await getNodesRowValues(survey, nodeDef, record, surveyIndex)
+const run = async (survey, nodeDef, record, client) => {
+  const insertValues = await getNodesRowValues(survey, nodeDef, record)
 
   if (insertValues.length > 0) {
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)

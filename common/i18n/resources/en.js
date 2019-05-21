@@ -31,6 +31,20 @@ module.exports = {
     taxonomies: 'Taxonomies',
   },
 
+  nodeDefsTypes: {
+    integer: 'integer',
+    decimal: 'decimal',
+    text: 'text',
+    date: 'date',
+    time: 'time',
+    boolean: 'boolean',
+    code: 'code',
+    coordinate: 'coordinate',
+    taxon: 'taxon',
+    file: 'file',
+    entity: 'entity',
+  },
+
   data: {
     records: {
       records: 'Records',
@@ -73,6 +87,12 @@ module.exports = {
     surveyCreate: {
       createSurvey: 'Create Survey',
       importFromCollect: 'Import from Collect',
+    },
+    collectImportReport: {
+      type: 'Type',
+      expression: 'Expression',
+      messages: 'Messages',
+      resolved: 'Resolved',
     },
   },
 
@@ -180,7 +200,7 @@ module.exports = {
     items: 'Items',
     confirmDelete: 'Delete the item with all children? $t(common.cantUndoWarning)',
     deleteItem: 'Delete item',
- },
+  },
 
   jobs: {
     item: 'Item',

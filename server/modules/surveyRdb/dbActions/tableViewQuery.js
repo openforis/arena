@@ -75,7 +75,7 @@ const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {
   )
   const getColValue = async (node, client) => {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-    const values = await DataCol.getValues(Survey.getSurveyInfo(survey), nodeDef, node, client)
+    const values = await DataCol.getValues(survey, nodeDef, node, client)
     return R.head(values)
   }
 

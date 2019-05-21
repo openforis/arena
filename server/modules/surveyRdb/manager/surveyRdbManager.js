@@ -21,11 +21,11 @@ const createTable = async (survey, nodeDef, client = db) =>
 
 // ==== DML
 
-const insertIntoTable = async (survey, nodeDef, record, surveyIndex, client = db) =>
-  await NodesInsert.run(survey, nodeDef, record, surveyIndex, client)
+const insertIntoTable = async (survey, nodeDef, record, client = db) =>
+  await NodesInsert.run(survey, nodeDef, record, client)
 
-const updateTableNodes = async (surveyInfo, nodeDefs, nodes, client = db) =>
-  await NodesUpdate.run(surveyInfo, nodeDefs, nodes, client)
+const updateTableNodes = async (survey, nodeDefs, nodes, client = db) =>
+  await NodesUpdate.run(survey, nodeDefs, nodes, client)
 
 const queryTable = async (surveyId, tableName, cols = [],
                           offset, limit, filterExpr, sort, client = db) =>
