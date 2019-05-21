@@ -1,6 +1,6 @@
 import './surveyHierarchy.scss'
 
-import React from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { connect } from 'react-redux'
 
 import Survey from '../../../../../common/survey/survey'
@@ -10,63 +10,41 @@ import * as SurveyState from '../../../../survey/surveyState'
 import Tree from './surveyHierarchyTree'
 import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 
-class SurveyHierarchy extends React.Component {
+const SurveyHierarchy = props => {
 
-  constructor (props) {
-    super(props)
+  const { hierarchy, ready } = props
 
-    this.state = { selectedNodeDefUuid: null }
-    this.treeEl = React.createRef()
-  }
+  const [ selectedNodeDefUuid, setSelectedNodeDefUuid ] = useState(null)
+  const [ tree, setTree ] = useState(null)
+  const treeRef = useRef(null)
 
-  componentDidMount () {
-    if (this.props.ready)
-      this.initTree()
-  }
+  useEffect(() => {
+    const { lang } = props
+    const treeElement = treeRef.current
 
-  componentDidUpdate (prevProps) {
-    const { ready } = this.props
-    const { ready: readyPrev } = prevProps
+    setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid))
+  }, [ready])
 
-    if (ready && !readyPrev) {
-      this.initTree()
-    }
-  }
+  return (
+    <div className="survey-hierarchy">
 
-  initTree () {
-    const { hierarchy, lang } = this.props
-    const treeElement = this.treeEl.current
-    const onEntityClick = (selectedNodeDefUuid) => this.setState({ selectedNodeDefUuid })
+      <div className="survey-hierarchy__tree" ref={treeRef}/>
 
-    this.tree = new Tree(treeElement, hierarchy.root, lang, onEntityClick)
-  }
-
-  render () {
-    const { hierarchy } = this.props
-    const { selectedNodeDefUuid } = this.state
-
-    return (
-      <div className="survey-hierarchy">
-
-        <div className="survey-hierarchy__tree" ref={this.treeEl}/>
-
-        <div className="survey-hierarchy__attributes">
-          <NodeDefsSelectorView
-            hierarchy={hierarchy}
-            nodeDefUuidEntity={selectedNodeDefUuid}
-            onChangeEntity={
-              nodeDefUuidEntity => this.tree.expandToNode(nodeDefUuidEntity)
-            }
-            canSelectAttributes={false}
-            showAncestors={false}
-          />
-
-        </div>
+      <div className="survey-hierarchy__attributes">
+        <NodeDefsSelectorView
+          hierarchy={hierarchy}
+          nodeDefUuidEntity={selectedNodeDefUuid}
+          onChangeEntity={
+            nodeDefUuidEntity => tree.expandToNode(nodeDefUuidEntity)
+          }
+          canSelectAttributes={false}
+          showAncestors={false}
+        />
 
       </div>
-    )
-  }
 
+    </div>
+  )
 }
 
 const mapStateToProps = state => {
