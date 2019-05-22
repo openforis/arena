@@ -1,7 +1,5 @@
 const R = require('ramda')
 
-const Survey = require('../../../../../common/survey/survey')
-const NodeDef = require('../../../../../common/survey/nodeDef')
 const Record = require('../../../../../common/record/record')
 const RecordValidation = require('../../../../../common/record/recordValidation')
 const Node = require('../../../../../common/record/node')
@@ -25,10 +23,10 @@ const validateEntityKeysUniqueness = (survey, record, nodeEntity) => {
 
   const entityValidations = siblingEntities.map(
     siblingEntity => {
-      const isDuplicate = isDuplicateEntity(survey, record, siblingEntities, siblingEntity)
+      const isDuplicate = _isEntityDuplicate(survey, record, siblingEntities, siblingEntity)
 
       // 3. return entityKeys validation for each sibling entity key attribute
-      const keyNodes = fetchEntityKeyNodes(survey, record, siblingEntity)
+      const keyNodes = Record.getEntityKeyNodes(survey, siblingEntity)(record)
       return keyNodes.map(
         keyNode => ({
           [Node.getUuid(keyNode)]: {
@@ -49,19 +47,19 @@ const validateEntityKeysUniqueness = (survey, record, nodeEntity) => {
   )(entityValidations)
 }
 
-const isDuplicateEntity = (survey, record, siblingEntitiesAndSelf, entity) => {
+const _isEntityDuplicate = (survey, record, siblingEntitiesAndSelf, entity) => {
   // 1. skip current entity among all entities
 
   const siblingEntities = R.reject(R.propEq(Node.keys.uuid, Node.getUuid(entity)), siblingEntitiesAndSelf)
 
   // 2. fetch key values
 
-  const keyValues = fetchKeyValues(survey, record, entity)
+  const keyValues = Record.getEntityKeyValues(survey, entity)(record)
 
   // 3. find duplicate sibling entity with same key values
 
   for (const siblingEntity of siblingEntities) {
-    const siblingKeyValues = fetchKeyValues(survey, record, siblingEntity)
+    const siblingKeyValues = Record.getEntityKeyValues(survey, siblingEntity)(record)
     if (R.equals(keyValues, siblingKeyValues)) {
       return true
     }
@@ -71,22 +69,14 @@ const isDuplicateEntity = (survey, record, siblingEntitiesAndSelf, entity) => {
 
 const validateRecordKeysUniqueness = async (survey, record, tx) => {
 
-  const recordUuid = Record.getUuid(record)
-
-  // 1. fetch records with same keys
-  const records = await SurveyRdbManager.queryRootTableByRecordKeys(survey, recordUuid, tx)
-
-  // 2. check if record is unique
-  const isUnique = R.pipe(
-    // exclude current record
-    R.reject(R.propEq('record_uuid', recordUuid)),
-    R.isEmpty
-  )(records)
+  // 1. check if record is unique
+  const recordsCount = await SurveyRdbManager.countDuplicateRecords(survey, record, tx)
+  const isUnique = recordsCount === 0
 
   // 3. fetch key nodes
   const rootNode = Record.getRootNode(record)
 
-  const keyNodes = fetchEntityKeyNodes(survey, record, rootNode)
+  const keyNodes = Record.getEntityKeyNodes(survey, rootNode)(record)
 
   // 4. associate validation error to each key node
   return R.pipe(
@@ -104,23 +94,6 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
     R.flatten,
     R.mergeAll
   )(keyNodes)
-}
-
-// ==== UTILS
-
-const fetchKeyValues = (survey, record, entity) => {
-  const keyNodes = fetchEntityKeyNodes(survey, record, entity)
-  return R.map(Node.getValue)(keyNodes)
-}
-
-const fetchEntityKeyNodes = (survey, record, entity) => {
-  const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey)
-  const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
-
-  return R.pipe(
-    R.map(keyDef => R.head(Record.getNodeChildrenByDefUuid(entity, NodeDef.getUuid(keyDef))(record))),
-    R.flatten,
-  )(keyDefs)
 }
 
 module.exports = {

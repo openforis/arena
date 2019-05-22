@@ -122,6 +122,7 @@ module.exports = {
   getTaxonUuid: SurveyRefDataIndex.getTaxonUuid,
   getTaxonVernacularNameUuid: SurveyRefDataIndex.getTaxonVernacularNameUuid,
   getTaxonByUuid: SurveyRefDataIndex.getTaxonByUuid,
+  includesTaxonVernacularName: SurveyRefDataIndex.includesTaxonVernacularName,
 
   assocRefData: SurveyRefDataIndex.assocRefData,
 }

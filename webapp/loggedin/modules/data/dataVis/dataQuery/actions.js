@@ -137,7 +137,7 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
         limit,
         filter,
         sort,
-        count: countResp.data.count,
+        count: countResp.data,
         data: dataResp.data,
         nodeDefUuidTable,
         nodeDefUuidCols,

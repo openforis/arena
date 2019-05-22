@@ -54,6 +54,11 @@ const getColNames = nodeDef => {
     )
 }
 
+const getColName = R.pipe(
+  getColNames,
+  R.head
+)
+
 const getColNamesByUuids = nodeDefUuidCols =>
   survey => R.reduce(
     (cols, uuid) => R.pipe(
@@ -88,6 +93,7 @@ module.exports = {
   getViewNameByUuid,
 
   getColNames,
+  getColName,
   getColNamesByUuids,
 
   extractColName,

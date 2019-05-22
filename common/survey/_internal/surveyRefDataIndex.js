@@ -4,7 +4,7 @@ const ObjectUtils = require('../../../common/objectUtils')
 
 const SurveyNodeDefs = require('./surveyNodeDefs')
 const NodeDef = require('../../../common/survey/nodeDef')
-const RecordReader = require('../../../common/record/_internal/recordReader')
+const RecordReader = require('../../record/_record/recordReader')
 const Node = require('../../../common/record/node')
 
 const CategoryItem = require('../../../common/survey/categoryItem')
@@ -55,7 +55,7 @@ const keys = {
 // ====== READ
 
 // ==== category index
-const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode, code) => surveyIndex => {
+const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode, code) => survey => {
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const levelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   let parentCategoryItemUuid = 'null'
@@ -69,7 +69,7 @@ const getCategoryItemUuidAndCodeHierarchy = (survey, nodeDef, record, parentNode
 
   const itemUuid = R.path(
     [keys.indexRefData, keys.categoryItemUuidIndex, categoryUuid, parentCategoryItemUuid, code],
-    surveyIndex
+    survey
   )
   return {
     itemUuid,
@@ -81,20 +81,31 @@ const getCategoryItemByUuid = categoryItemUuid => R.pathOr(null, [keys.indexRefD
 
 // ==== taxonomy index
 
-const getTaxonUuid = (nodeDef, taxonCode) => surveyIndex => {
+const getTaxonUuid = (nodeDef, taxonCode) => survey => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.path(
     [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.keys.uuid],
-    surveyIndex
+    survey
   )
 }
 
-const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => surveyIndex => {
+const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => survey => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.path(
     [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.propKeys.vernacularNames, vernacularName],
-    surveyIndex
+    survey
   )
+}
+
+const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => survey => {
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  return R.pipe(
+    R.path(
+      [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.propKeys.vernacularNames]
+    ),
+    R.values,
+    R.includes(vernacularNameUuid)
+  )(survey)
 }
 
 const getTaxonByUuid = taxonUuid => R.path([keys.indexRefData, keys.taxonIndex, taxonUuid])
@@ -155,6 +166,7 @@ module.exports = {
   getTaxonUuid,
   getTaxonVernacularNameUuid,
   getTaxonByUuid,
+  includesTaxonVernacularName,
 
   assocRefData,
 }

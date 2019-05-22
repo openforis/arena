@@ -1,10 +1,9 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 
-const Node = require('../../../../common/record/node')
+const Record = require('../../../../common/record/record')
 
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
@@ -14,8 +13,7 @@ const DataSort = require('../../../../common/surveyRdb/dataSort')
 const DataFilter = require('../../../../common/surveyRdb/dataFilter')
 
 const DataCol = require('../schemaRdb/dataCol')
-
-const NodeRepository = require('../../record/repository/nodeRepository')
+const DataTable = require('../schemaRdb/dataTable')
 
 const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, sort, client) => {
   const schemaName = SchemaRdb.getName(surveyId)
@@ -25,16 +23,19 @@ const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, s
   const colParamNames = Object.keys(colParams).map(n => `$/${n}:name/`)
 
   // WHERE clause
-  const { clause: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePerparedStatement(filterExpr) : {}
+  const { clause: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePreparedStatement(filterExpr) : {}
 
   // SORT clause
   const { clause: sortClause, params: sortParams } = DataSort.getSortPreparedStatement(sort)
 
   return await client.any(`
-  SELECT ${colParamNames.join(', ')}
-    FROM $/schemaName:name/.$/tableName:name/
+    SELECT 
+        ${colParamNames.join(', ')}
+    FROM 
+        $/schemaName:name/.$/tableName:name/
     ${R.isNil(filterClause) ? '' : `WHERE ${filterClause}`}
-    ORDER BY ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}date_modified DESC NULLS LAST
+    ORDER BY 
+        ${R.isEmpty(sortParams) ? '' : `${sortClause}, `}date_modified DESC NULLS LAST
     ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
     OFFSET $/offset/`,
     { ...filterParams, ...colParams, ...sortParams, schemaName, tableName, limit, offset }
@@ -43,59 +44,56 @@ const runSelect = async (surveyId, tableName, cols, offset, limit, filterExpr, s
 
 const runCount = async (surveyId, tableName, filterExpr, client) => {
   const schemaName = SchemaRdb.getName(surveyId)
-  const { str: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePerparedStatement(filterExpr) : {}
+  const { clause: filterClause, params: filterParams } = filterExpr ? DataFilter.getWherePreparedStatement(filterExpr) : {}
 
-  return await client.one(`
-    SELECT count(*)
-    FROM $/schemaName:name/.$/tableName:name/
+  const countRS = await client.one(`
+    SELECT 
+        count(*)
+    FROM 
+        $/schemaName:name/.$/tableName:name/
     ${R.isNil(filterClause) ? '' : `WHERE ${filterClause}`}
-  `, { ...filterParams, schemaName, tableName })
+    `,
+    { ...filterParams, schemaName, tableName }
+  )
+
+  return Number(countRS.count)
 }
 
-const queryRootTableByRecordKeys = async (survey, recordUuid, client) => {
+const countDuplicateRecords = async (survey, record, client) => {
   const surveyId = Survey.getId(survey)
-  const rootDef = Survey.getRootNodeDef(survey)
-  const keyDefs = Survey.getNodeDefKeys(rootDef)(survey)
+  const nodeDefRoot = Survey.getRootNodeDef(survey)
+  const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
+  const nodeRoot = Record.getRootNode(record)
 
-  const rootNode = await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, recordUuid, null, NodeDef.getUuid(rootDef), client)
+  const tableName = NodeDefTable.getViewName(nodeDefRoot)
 
-  // 1. find record key nodes
-  const keyNodes = await Promise.all(
-    keyDefs.map(
-      async keyDef =>
-        await NodeRepository.fetchChildNodeByNodeDefUuid(surveyId, recordUuid, Node.getUuid(rootNode), NodeDef.getUuid(keyDef), client)
-    )
+  const recordNotEqualCondition = Expression.newBinary(
+    Expression.newIdentifier(DataTable.colNameRecordUuuid),
+    Expression.newLiteral(Record.getUuid(record)),
+    Expression.operators.comparison.notEq.key
   )
-  const tableName = NodeDefTable.getViewName(rootDef)
-  const getColName = R.pipe(
-    Node.getNodeDefUuid,
-    nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-    NodeDefTable.getColNames,
-    R.head
+
+  const whereExpr = R.reduce(
+    (whereExprAcc, nodeDefKey) => {
+      const nodeKey = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefKey))(record)
+
+      const identifier = Expression.newIdentifier(NodeDefTable.getColName(nodeDefKey))
+      const value = Expression.newLiteral(DataCol.getValue(survey, nodeDefKey, nodeKey))
+
+      const condition = Expression.newBinary(identifier, value, Expression.operators.comparison.eq.key)
+
+      return Expression.newBinary(whereExprAcc, condition, Expression.operators.logical.and.key)
+    },
+    recordNotEqualCondition,
+    nodeDefKeys
   )
-  const getColValue = async (node, client) => {
-    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
-    const values = await DataCol.getValues(survey, nodeDef, node, client)
-    return R.head(values)
-  }
 
-  const whereConditions = await Promise.all(
-    keyNodes.map(
-      async node => {
-        const identifier = Expression.newIdentifier(getColName(node))
-        const value = Expression.newLiteral(await getColValue(node))
-
-        return Expression.newBinary(identifier, value, '===')
-      }
-    )
-  )
-  const whereExpr = whereConditions.reduce((prev, curr) => prev ? Expression.newBinary(prev, curr, '&&') : curr)
-
-  return await runSelect(surveyId, tableName, ['*'], 0, null, whereExpr, [], client)
+  return await runCount(surveyId, tableName, whereExpr, client)
 }
 
 module.exports = {
   runSelect,
   runCount,
-  queryRootTableByRecordKeys,
+
+  countDuplicateRecords,
 }

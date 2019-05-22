@@ -6,9 +6,8 @@
 
 ' INIT
 title Node Update
-hide footbox
 
-participant WebSocket
+entity WebSocket
 participant RecordService
 participant RecordUpdateThread
 participant RecordManager
@@ -16,15 +15,19 @@ participant RecordUpdateManager
 participant NodeUpdateManager
 participant NodeUpdateDependentManager
 participant RecordValidationManager
-participant AttributeValidator
-participant TypeValidator
-participant KeysUniquenessValidator
-participant CountValidator
+participant RecordUniquenessValidator
+
+box "Record" #f1efe6
 participant Record
+participant RecordValidator
 participant RecordExprParser
+end box
+
+box "Persistence" #ece8d6
 database RecordRepository
 database NodeRepository
-participant SurveyRdbManager
+database SurveyRdbManager
+end box
 
 RecordUpdateThread ++  #yellow
 
@@ -82,53 +85,21 @@ RecordUpdateThread -> RecordManager ++ : persistNode
             RecordUpdateThread --> WebSocket -- : notify user with nodes
 
         '3. UPDATE Validation
-        RecordUpdateManager -> RecordValidationManager ++ : validateNodes
+        RecordUpdateManager -> RecordValidationManager ++ : validateNodesAndPersistValidation
 
-            '3.1 attributeValidations
-            RecordValidationManager -> AttributeValidator ++ : validateSelfAndDependentAttributes
-                loop N = attributes
-                    AttributeValidator -> Record ++ : getDependentNodes
-                        Record -> AttributeValidator -- : dependents
-                        loop N = attributeAndDependents
-                            AttributeValidator -> AttributeValidator ++ #FFCFCF : validateAttribute
-                                AttributeValidator -> AttributeValidator ++ #FF6F6F: validateRequired
-                                    AttributeValidator -> AttributeValidator -- : validation
+            '3.1 validate record nodes
+            RecordValidationManager -> RecordValidator ++ : validateNodes
+                RecordValidator -> RecordValidationManager -- : validations
 
-                                AttributeValidator -> TypeValidator ++ : validateValueType
-                                    TypeValidator -> AttributeValidator -- : validation
 
-                                AttributeValidator -> AttributeValidator ++ #FF6F6F : validateNodeValidations
-                                    AttributeValidator -> RecordExprParser ++ : evalApplicableExpressions
-                                        RecordExprParser -> AttributeValidator -- : expressionsEvaluated
-                                    AttributeValidator -> AttributeValidator -- : validations
+            '3.2 validate record uniqueness
+            RecordValidationManager -> RecordUniquenessValidator ++ : validateRecordKeysUniqueness
+                RecordUniquenessValidator -> SurveyRdbManager ++ : countDuplicateRecords
+                    SurveyRdbManager -> RecordUniquenessValidator -- : count
+                RecordUniquenessValidator -> RecordValidationManager  -- : validation
 
-                                AttributeValidator -> AttributeValidator -- : attributeValidations
-                        end
-                end
-                AttributeValidator -> RecordValidationManager -- : attributeValidations
 
-            '3.2 CountValidator
-            RecordValidationManager -> CountValidator ++ : validateChildrenCount
-                CountValidator -> RecordValidationManager  -- : validation
-
-            '3.3 Record KeysUniquenessValidator
-            RecordValidationManager -> KeysUniquenessValidator ++ : validateRecordKeysUniqueness
-                KeysUniquenessValidator -> SurveyRdbManager ++ : queryRootTableByRecordKeys
-                    SurveyRdbManager -> KeysUniquenessValidator -- : records
-                    'KeysUniquenessValidator has an internal method fetchEntityKeyNodes, which does not a fetch - TODO RENAME TO get
-                KeysUniquenessValidator -> RecordValidationManager  -- : validation
-
-            '3.4 EntityKeysValidations
-            RecordValidationManager -> RecordValidationManager ++ #FFCFCF : validateEntityKeysUniqueness
-                RecordValidationManager -> RecordValidationManager ++ #FF6F6F : getUpdatedEntitiesWithKeys
-                    RecordValidationManager -> RecordValidationManager -- : entities
-                    loop N = entities
-                        RecordValidationManager -> KeysUniquenessValidator ++ : validateEntityKeysUniqueness
-                            KeysUniquenessValidator -> RecordValidationManager -- : validations
-                    end
-                RecordValidationManager -> RecordValidationManager -- : validations
-
-            '3.5 persistValidation
+            '3.3 persistValidation
             RecordValidationManager -> RecordValidationManager ++ #FFCFCF : persistValidation
                 RecordValidationManager -> RecordRepository ++ : updateValidation
                     RecordRepository -> RecordValidationManager -- :

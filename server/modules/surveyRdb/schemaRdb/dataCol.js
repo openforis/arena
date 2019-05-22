@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const ColProps = require('./dataColProps')
 
@@ -8,17 +10,24 @@ const getNamesAndType = nodeDefCol =>
     `${col} ${ColProps.getColTypeProcessor(nodeDefCol)(col)}`
   )
 
-const getValues = async (survey, nodeDefCol, nodeCol = {}) => {
+const getValues = (survey, nodeDefCol, nodeCol = {}) => {
   const valueFnProcessor = ColProps.getColValueProcessor(nodeDefCol)
-  const valueFn = await valueFnProcessor(survey, nodeDefCol, nodeCol)
+  const valueFn = valueFnProcessor(survey, nodeDefCol, nodeCol)
   const values = getNames(nodeDefCol).map(colName =>
     valueFn(nodeCol, colName)
   )
   return values
 }
 
+const getValue = R.pipe(
+  getValues,
+  R.head
+)
+
 module.exports = {
   getNames,
   getNamesAndType,
+
   getValues,
+  getValue,
 }

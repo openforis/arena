@@ -74,7 +74,7 @@ const converters = {
 
 const toPreparedStatement = (expr, paramsArr) => converters[expr.type](expr, paramsArr)
 
-const getWherePerparedStatement = expr => {
+const getWherePreparedStatement = expr => {
   const prepStatement = toPreparedStatement(expr, [])
   const params = prepStatement.paramsArr.reduce((acc, cur, i) => ({ ...acc, [`_${i}`]: cur }), {})
 
@@ -82,5 +82,5 @@ const getWherePerparedStatement = expr => {
 }
 
 module.exports = {
-  getWherePerparedStatement,
+  getWherePreparedStatement,
 }

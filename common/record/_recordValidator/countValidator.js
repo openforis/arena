@@ -1,13 +1,15 @@
 const R = require('ramda')
 
-const NodeDef = require('../../../../../common/survey/nodeDef')
-const NodeDefValidations = require('../../../../../common/survey/nodeDefValidations')
+const Survey = require('../../survey/survey')
+const NodeDef = require('../../survey/nodeDef')
+const NodeDefValidations = require('../../survey/nodeDefValidations')
 
-const Record = require('../../../../../common/record/record')
-const Node = require('../../../../../common/record/node')
-const RecordValidation = require('../../../../../common/record/recordValidation')
-const Validator = require('../../../../../common/validation/validator')
-const NumberUtils = require('../../../../../common/numberUtils')
+const Record = require('../record')
+const Node = require('../node')
+const RecordValidation = require('../recordValidation')
+
+const Validator = require('../../validation/validator')
+const NumberUtils = require('../../numberUtils')
 
 const errorKeys = {
   minCountNodesNotSpecified: 'minCountNodesNotSpecified',
@@ -25,7 +27,50 @@ const countChildren = (record, parentNode, childDef) => {
     )(nodes)
 }
 
-const validateChildrenCount = (record, nodePointers) => {
+const getNodePointers = (survey, record, nodes) => {
+  const nodesArray = R.values(nodes)
+
+  const nodePointers = nodesArray.map(
+    node => {
+      const pointers = []
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+
+      if (!NodeDef.isRoot(nodeDef)) {
+        // add a pointer for every node
+        const parent = Record.getParentNode(node)(record)
+        pointers.push({
+          node: parent,
+          childDef: nodeDef
+        })
+      }
+
+      if (NodeDef.isEntity(nodeDef) && !Node.isDeleted(node)) {
+        // add children node pointers
+        const childDefs = Survey.getNodeDefChildren(nodeDef)(survey)
+
+        pointers.push(
+          childDefs.map(
+            childDef => ({
+              node,
+              childDef
+            })
+          )
+        )
+      }
+
+      return pointers
+    }
+  )
+
+  return R.pipe(
+    R.flatten,
+    R.uniq
+  )(nodePointers)
+}
+
+const validateChildrenCount = (survey, record, nodes) => {
+  const nodePointers = getNodePointers(survey, record, nodes)
+
   const nodePointersValidated = nodePointers.map(
     nodePointer => {
       const { node, childDef } = nodePointer

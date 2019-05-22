@@ -1,17 +1,17 @@
 const R = require('ramda')
 const Promise = require('bluebird')
 
-const Survey = require('../../../../../common/survey/survey')
-const NodeDef = require('../../../../../common/survey/nodeDef')
-const NodeDefExpression = require('../../../../../common/survey/nodeDefExpression')
-const NodeDefValidations = require('../../../../../common/survey/nodeDefValidations')
-const Validator = require('../../../../../common/validation/validator')
-const Record = require('../../../../../common/record/record')
-const Node = require('../../../../../common/record/node')
+const Survey = require('../../survey/survey')
+const NodeDef = require('../../survey/nodeDef')
+const NodeDefExpression = require('../../survey/nodeDefExpression')
+const NodeDefValidations = require('../../survey/nodeDefValidations')
+const Validator = require('../../validation/validator')
 
-const TypeValidator = require('./typeValidator')
+const Record = require('../record')
+const Node = require('../node')
+const RecordExprParser = require('../recordExprParser')
 
-const RecordExprParser = require('../../../../../common/record/recordExprParser')
+const AttributeTypeValidator = require('./attributeTypeValidator')
 
 const errorKeys = {
   required: 'required',
@@ -71,7 +71,7 @@ const validateAttribute = async (survey, record, attribute, nodeDef, validatedNo
   const validation = await Validator.validate(attribute, {
     [Node.keys.value]: [
       validateRequired(survey, nodeDef),
-      TypeValidator.validateValueType(survey, nodeDef),
+      AttributeTypeValidator.validateValueType(survey, nodeDef),
       validateNodeValidations(survey, record, nodeDef)
     ]
   }, false)

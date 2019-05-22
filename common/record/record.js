@@ -6,9 +6,9 @@ const Validator = require('../validation/validator')
 const User = require('../user/user')
 const RecordStep = require('./recordStep')
 
-const keys = require('./_internal/recordKeys')
-const RecordReader = require('./_internal/recordReader')
-const RecordUpdater = require('./_internal/recordUpdater')
+const keys = require('./_record/recordKeys')
+const RecordReader = require('./_record/recordReader')
+const RecordUpdater = require('./_record/recordUpdater')
 
 // ====== CREATE
 
@@ -49,6 +49,10 @@ module.exports = {
   getDependentNodes: RecordReader.getDependentNodes,
   getParentCodeAttribute: RecordReader.getParentCodeAttribute,
   getDependentCodeAttributes: RecordReader.getDependentCodeAttributes,
+
+  // ====== Keys
+  getEntityKeyNodes: RecordReader.getEntityKeyNodes,
+  getEntityKeyValues: RecordReader.getEntityKeyValues,
 
   // ====== UPDATE
   assocNodes: RecordUpdater.assocNodes,
