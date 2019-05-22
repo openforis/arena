@@ -2,8 +2,8 @@
   "license": "MIT",
   "name": "open-foris-arena",
   "engines": {
-    "node": "10.15.3",
-    "yarn": ">=1.12.3"
+    "node": ">=10.15.3",
+    "yarn": ">=1.16.0"
   },
   "scripts": {
     "build": "webpack -p --config webpack.config.js",
