@@ -71,7 +71,9 @@ const bindNode = (survey, record, node) => {
 
       return NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
         ? Number(value)
-        : value
+        : NodeDef.isBoolean(nodeDef)
+          ? value === 'true'
+          : value
     }
   }
 }
