@@ -41,15 +41,16 @@ const TaxonomiesView = (props) => {
       if (taxonomy) {
         setTaxonomyForEdit(null)
       }
-    }, [taxonomy])
+    }, [Taxonomy.getUuid(taxonomy)]
+  )
 
   const i18n = useI18n()
 
   const canDelete = taxonomy => taxonomy.usedByNodeDefs
     ? alert(i18n.t('taxonomy.cantBeDeleted'))
     : window.confirm(i18n.t('taxonomy.confirmDelete', {
-        taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
-      }))
+      taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
+    }))
 
   return (
     <ItemsView
