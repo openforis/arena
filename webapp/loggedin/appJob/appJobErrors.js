@@ -5,7 +5,7 @@ import useI18n from '../../commonComponents/useI18n'
 
 import { getValidationFieldMessagesHTML } from '../../utils/validationUtils'
 
-const AppJobErrors = ({job}) => {
+const AppJobErrors = ({ job }) => {
 
   const errors = R.propOr([], 'errors', job)
 
@@ -16,7 +16,7 @@ const AppJobErrors = ({job}) => {
       <div className="app-job-monitor__job-errors">
         <div className="header">
           <div>{i18n.t('jobs.item')}</div>
-          <div>{i18n.t('jobs.errors')}</div>
+          <div>{i18n.t('common.error', { count: errors.length })}</div>
         </div>
         <div className="body">
           {

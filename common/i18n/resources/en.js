@@ -13,6 +13,9 @@ module.exports = {
     description: 'Description',
     description_plural: 'Descriptions',
     srs: 'SRS',
+    error: 'error',
+    error_plural: 'Errors',
+
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
     invalid: 'INVALID',
@@ -204,7 +207,6 @@ module.exports = {
 
   jobs: {
     item: 'Item',
-    errors: 'Errors',
 
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories validation',

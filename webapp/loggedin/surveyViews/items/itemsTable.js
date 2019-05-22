@@ -24,7 +24,7 @@ const TableRow = props => {
       <div className="name">
         {name}
         <ErrorBadge validation={item.validation}/>
-        <WarningBadge show={!item.usedByNodeDefs} label={i18n.t('unused')}/>
+        <WarningBadge show={!item.usedByNodeDefs} label={i18n.t('itemsTable.unused')}/>
       </div>
 
       <div className="buttons">
