@@ -5,7 +5,8 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
-const RecordUpdateManager = require('./_internal/recordUpdateManager')
+const RecordUpdateManager = require('./_recordManager/recordUpdateManager')
+const RecordValidationManager = require('./_recordManager/recordValidationManager')
 
 const SurveyRepository = require('../../survey/repository/surveyRepository')
 const NodeDefRepository = require('../../nodeDef/repository/nodeDefRepository')
@@ -65,6 +66,9 @@ module.exports = {
   deleteRecordPreview: RecordUpdateManager.deleteRecordPreview,
   deleteRecordsPreview: RecordUpdateManager.deleteRecordsPreview,
   deleteNode: RecordUpdateManager.deleteNode,
+
+  // ==== VALIDATION
+  validateNodesAndPersistValidation: RecordValidationManager.validateNodesAndPersistValidation,
 
   // ====  UTILS
   disableTriggers: NodeRepository.disableTriggers,

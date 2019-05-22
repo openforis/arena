@@ -4,7 +4,7 @@ const ObjectUtils = require('../../../common/objectUtils')
 
 const SurveyNodeDefs = require('./surveyNodeDefs')
 const NodeDef = require('../../../common/survey/nodeDef')
-const RecordReader = require('../../../common/record/_internal/recordReader')
+const RecordReader = require('../../record/_record/recordReader')
 const Node = require('../../../common/record/node')
 
 const CategoryItem = require('../../../common/survey/categoryItem')

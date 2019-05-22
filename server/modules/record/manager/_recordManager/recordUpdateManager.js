@@ -12,7 +12,7 @@ const Node = require('../../../../../common/record/node')
 const RecordUsersMap = require('../../service/update/recordUsersMap')
 const RecordRepository = require('../../repository/recordRepository')
 const SurveyManager = require('../../../survey/manager/surveyManager')
-const RecordValidationManager = require('../../validator/recordValidationManager')
+const RecordValidationManager = require('./recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
 
 const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
@@ -133,7 +133,7 @@ const _onNodesUpdate = async (survey, record, updatedNodes,
   const updatedNodesAndDependents = R.mergeDeepRight(updatedNodes, updatedDependentNodes)
 
   // 3. update node validations
-  const validations = await RecordValidationManager.validateNodes(survey, record, updatedNodesAndDependents, t)
+  const validations = await RecordValidationManager.validateNodesAndPersistValidation(survey, record, updatedNodesAndDependents, t)
   if (nodesValidationListener)
     nodesValidationListener(validations)
   record = Record.mergeNodeValidations(validations)(record)

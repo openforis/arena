@@ -1,18 +1,18 @@
 const R = require('ramda')
 
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
+const Survey = require('../../../../../common/survey/survey')
+const NodeDef = require('../../../../../common/survey/nodeDef')
 
-const Record = require('../../../../common/record/record')
-const RecordValidator = require('../../../../common/record/recordValidator')
-const Node = require('../../../../common/record/node')
-const Validator = require('../../../../common/validation/validator')
+const Record = require('../../../../../common/record/record')
+const RecordValidator = require('../../../../../common/record/recordValidator')
+const Node = require('../../../../../common/record/node')
+const Validator = require('../../../../../common/validation/validator')
 
-const RecordRepository = require('../repository/recordRepository')
+const RecordRepository = require('../../repository/recordRepository')
 
-const RecordUniquenessValidator = require('./validators/recordUniquenessValidator')
+const RecordUniquenessValidator = require('./recordUniquenessValidator')
 
-const validateNodes = async (survey, record, nodes, tx) => {
+const validateNodesAndPersistValidation = async (survey, record, nodes, tx) => {
 
   // 1. validate nodes
   const nodesValidation = await RecordValidator.validateNodes(survey, record, nodes)
@@ -60,5 +60,5 @@ const persistValidation = async (survey, record, nodesValidation, tx) => {
 }
 
 module.exports = {
-  validateNodes
+  validateNodesAndPersistValidation
 }
