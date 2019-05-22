@@ -22,6 +22,9 @@ module.exports = {
     invalid: 'INVALID',
     language: 'Language',
     code: 'Code',
+    csvImport: 'CSV Import',
+    csvExport: 'CSV Export',
+    undefinedName: 'Undefined name',
   },
   sidebar: {
     openForisShort: 'OF',
@@ -101,7 +104,6 @@ module.exports = {
   },
 
   itemsTable: {
-    undefinedName: 'Undefined name',
     unused: 'Unused',
     noItemsAdded: 'No items added',
   },
@@ -194,6 +196,18 @@ module.exports = {
       entry: 'entry',
       cleansing: 'cleansing',
       analysis: 'analysis',
+    },
+  },
+
+  taxonomy: {
+    cantBeDeleted: 'This taxonomy is used by some node definitions and cannot be deleted',
+    confirmDelete: 'Delete the taxonomy {{taxonomyName}}? This operation cannot be undone.',
+    edit: {
+      taxonomyName: 'Taxonomy name',
+      taxaNotImported: 'Taxa not imported',
+      family: 'Family',
+      genus: 'Genus',
+      scientificName: 'Scientific name',
     },
   },
 

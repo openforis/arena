@@ -1,6 +1,6 @@
 import './taxonomyEdit.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
@@ -8,6 +8,7 @@ import { FormItem, Input } from '../../../../commonComponents/form/input'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import DownloadButton from '../../../../commonComponents/form/downloadButton'
 import ErrorBadge from '../../../../commonComponents/errorBadge'
+import useI18n from '../../../../commonComponents/useI18n'
 import TaxonTable from './taxonTable'
 
 import Taxonomy from '../../../../../common/survey/taxonomy'
@@ -18,80 +19,79 @@ import * as SurveyState from '../../../../survey/surveyState'
 import * as AppState from '../../../../app/appState'
 import * as TaxonomyEditState from '../taxonomyEditState'
 
-import { initTaxaList, loadTaxa, putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile, } from '../actions'
+import { initTaxaList, loadTaxa, putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from '../actions'
 import { canEditSurvey } from '../../../../../common/auth/authManager'
 
-class TaxonomyEdit extends React.Component {
+const TaxonomyEdit = props => {
 
-  async componentDidMount () {
-    const { taxonomy, initTaxaList } = this.props
+  const {
+    surveyId, taxonomy, taxaCurrentPage, taxaTotalPages, taxaPerPage, taxa,
+    loadTaxa, putTaxonomyProp, uploadTaxonomyFile, setTaxonomyForEdit,
+    readOnly,
+  } = props
 
+  useEffect(() => {
+    const { initTaxaList } = props
     if (Taxonomy.getUuid(taxonomy)) {
       initTaxaList(taxonomy)
     }
-  }
+  }, [Taxonomy.getUuid(taxonomy)])
 
-  render () {
-    const {
-      surveyId, taxonomy, taxaCurrentPage, taxaTotalPages, taxaPerPage, taxa,
-      loadTaxa, putTaxonomyProp, uploadTaxonomyFile, setTaxonomyForEdit,
-      readOnly,
-    } = this.props
+  const { validation } = taxonomy
 
-    const { validation } = taxonomy
+  const i18n = useI18n()
 
-    return (
-      <div className="taxonomy-edit">
+  return (
+    <div className="taxonomy-edit">
 
-        <div className="taxonomy-edit__header">
+      <div className="taxonomy-edit__header">
 
-          <ErrorBadge validation={validation}/>
+        <ErrorBadge validation={validation}/>
 
-          <FormItem label="Taxonomy name">
-            <div>
-              <Input value={Taxonomy.getName(taxonomy)}
-                     validation={getFieldValidation('name')(validation)}
-                     onChange={value => putTaxonomyProp(taxonomy, 'name', normalizeName(value))}
-                     readOnly={readOnly}/>
-            </div>
-          </FormItem>
-
-          <div className="button-bar">
-            {
-              !readOnly &&
-              <UploadButton label="CSV import"
-                            disabled={Taxonomy.isPublished(taxonomy)}
-                            onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
-
-            }
-            <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export?draft=true`}
-                            disabled={R.isEmpty(taxa)}
-                            label="CSV Export"/>
+        <FormItem label={i18n.t('taxonomy.edit.taxonomyName')}>
+          <div>
+            <Input value={Taxonomy.getName(taxonomy)}
+                   validation={getFieldValidation('name')(validation)}
+                   onChange={value => putTaxonomyProp(taxonomy, 'name', normalizeName(value))}
+                   readOnly={readOnly}/>
           </div>
+        </FormItem>
+
+        <div className="button-bar">
+          {
+            !readOnly &&
+            <UploadButton label={i18n.t('common.csvImport')}
+                          disabled={Taxonomy.isPublished(taxonomy)}
+                          onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
+
+          }
+          <DownloadButton href={`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/export?draft=true`}
+                          disabled={R.isEmpty(taxa)}
+                          label={i18n.t('common.csvExport')}/>
         </div>
-
-
-        {
-          R.isEmpty(taxa)
-            ? <div className="taxonomy-edit__empty-taxa">Taxa not imported</div>
-            : <TaxonTable taxonomy={taxonomy}
-                          taxa={taxa}
-                          currentPage={taxaCurrentPage}
-                          totalPages={taxaTotalPages}
-                          rowsPerPage={taxaPerPage}
-                          onPageChange={(page) => loadTaxa(taxonomy, page)}/>
-        }
-
-        <div style={{ justifySelf: 'center' }}>
-          <button className="btn btn-of-light"
-                  onClick={() => setTaxonomyForEdit(null)}>
-            Done
-          </button>
-        </div>
-
       </div>
-    )
-  }
+
+
+      {
+        R.isEmpty(taxa)
+          ? <div className="taxonomy-edit__empty-taxa">{i18n.t('taxonomy.edit.taxaNotImported')}</div>
+          : <TaxonTable taxonomy={taxonomy}
+                        taxa={taxa}
+                        currentPage={taxaCurrentPage}
+                        totalPages={taxaTotalPages}
+                        rowsPerPage={taxaPerPage}
+                        onPageChange={(page) => loadTaxa(taxonomy, page)}/>
+      }
+
+      <div style={{ justifySelf: 'center' }}>
+        <button className="btn btn-of-light"
+                onClick={() => setTaxonomyForEdit(null)}>
+          {i18n.t('common.done')}
+        </button>
+      </div>
+
+    </div>
+  )
 }
 
 const mapStateToProps = state => {
@@ -107,7 +107,7 @@ const mapStateToProps = state => {
     taxaPerPage: TaxonomyEditState.getTaxaPerPage(state),
     taxa: TaxonomyEditState.getTaxa(state),
     activeJob,
-    readOnly: !canEditSurvey(user, surveyInfo)
+    readOnly: !canEditSurvey(user, surveyInfo),
   }
 }
 

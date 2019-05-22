@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -19,51 +19,56 @@ import {
   deleteTaxonomy,
 } from '../taxonomyEdit/actions'
 
-class TaxonomiesView extends React.Component {
+import useI18n from '../../../commonComponents/useI18n'
 
-  componentWillUnmount () {
-    const { taxonomy, setTaxonomyForEdit } = this.props
-    if (taxonomy)
-      setTaxonomyForEdit(null)
-  }
+const TaxonomiesView = (props) => {
 
-  render () {
-    const {
-      taxonomy,
-      taxonomies,
-      selectedItemUuid,
-      createTaxonomy,
-      setTaxonomyForEdit,
-      deleteTaxonomy,
-      canSelect,
-      onSelect,
-      onClose,
-      readOnly,
-    } = this.props
+  const {
+    taxonomy,
+    taxonomies,
+    selectedItemUuid,
+    createTaxonomy,
+    setTaxonomyForEdit,
+    deleteTaxonomy,
+    canSelect,
+    onSelect,
+    onClose,
+    readOnly,
+  } = props
 
-    const canDelete = taxonomy => taxonomy.usedByNodeDefs
-      ? alert('This taxonomy is used by some node definitions and cannot be removed')
-      : window.confirm(`Delete the taxonomy ${Taxonomy.getName(taxonomy)}? This operation cannot be undone.`)
+  useEffect(() =>
+    () => {
+      if (taxonomy) {
+        setTaxonomyForEdit(null)
+      }
+    }, [taxonomy])
 
-    return (
-      <ItemsView
-        headerText="Taxonomies"
-        itemEditComponent={TaxonomyEdit}
-        itemEditProp="taxonomy"
-        itemLabelFunction={taxonomy => Taxonomy.getName(taxonomy)}
-        editedItem={taxonomy}
-        items={taxonomies}
-        selectedItemUuid={selectedItemUuid}
-        onAdd={createTaxonomy}
-        onEdit={setTaxonomyForEdit}
-        canDelete={canDelete}
-        onDelete={deleteTaxonomy}
-        canSelect={canSelect}
-        onSelect={onSelect}
-        onClose={onClose}
-        readOnly={readOnly}/>
-    )
-  }
+  const i18n = useI18n()
+
+  const canDelete = taxonomy => taxonomy.usedByNodeDefs
+    ? alert(i18n.t('taxonomy.cantBeDeleted'))
+    : window.confirm(i18n.t('taxonomy.confirmDelete', {
+        taxonomyName: Taxonomy.getName(taxonomy) || i18n.t('common.undefinedName'),
+      }))
+
+  return (
+    <ItemsView
+      headerText="Taxonomies"
+      itemEditComponent={TaxonomyEdit}
+      itemEditProp="taxonomy"
+      itemLabelFunction={taxonomy => Taxonomy.getName(taxonomy)}
+      editedItem={taxonomy}
+      items={taxonomies}
+      selectedItemUuid={selectedItemUuid}
+      onAdd={createTaxonomy}
+      onEdit={setTaxonomyForEdit}
+      canDelete={canDelete}
+      onDelete={deleteTaxonomy}
+      canSelect={canSelect}
+      onSelect={onSelect}
+      onClose={onClose}
+      readOnly={readOnly}/>
+  )
 }
 
 const mapStateToProps = state => {
@@ -75,7 +80,7 @@ const mapStateToProps = state => {
     Survey.getTaxonomiesArray,
     R.map(t => ({
       ...t,
-      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey))
+      usedByNodeDefs: !R.isEmpty(Survey.getNodeDefsByTaxonomyUuid(Taxonomy.getUuid(t))(survey)),
     }))
   )(survey)
 
