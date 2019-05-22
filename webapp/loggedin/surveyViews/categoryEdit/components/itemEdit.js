@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import * as R from 'ramda'
 
 import LabelsEditor from '../../labelsEditor/labelsEditor'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import ErrorBadge from '../../../../commonComponents/errorBadge'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import { normalizeName } from '../../../../../common/stringUtils'
 
@@ -11,29 +12,19 @@ import Category from '../../../../../common/survey/category'
 import CategoryItem from '../../../../../common/survey/categoryItem'
 import { getFieldValidation } from '../../../../../common/validation/validator'
 
-class ItemEdit extends React.Component {
+const ItemEdit = (props) => {
 
-  constructor (props) {
-    super(props)
-    this.elemRef = React.createRef()
-  }
+  const elemRef = useRef(null)
 
-  componentDidMount () {
-    if (this.props.active)
-      this.scrollIntoView()
-  }
+  useEffect(() => {
+    if (props.active) {
+      elemRef.current.scrollIntoView()
+    }
+  }, [props.active])
 
-  componentDidUpdate (prevProps) {
-    if (this.props.active && !prevProps.active)
-      this.scrollIntoView()
-  }
+  const onPropLabelsChange = (labelItem) => {
+    const { category, level, item, putCategoryItemProp } = props
 
-  scrollIntoView () {
-    this.elemRef.current.scrollIntoView()
-  }
-
-  onPropLabelsChange (labelItem) {
-    const {category, level, item, putCategoryItemProp} = this.props
     putCategoryItemProp(
       category,
       level,
@@ -43,68 +34,69 @@ class ItemEdit extends React.Component {
     )
   }
 
-  render () {
-    const {
-      category, level, item, active,
-      putCategoryItemProp, setCategoryItemForEdit, deleteCategoryItem,
-      language, readOnly
-    } = this.props
+  const {
+    category, level, item, active,
+    putCategoryItemProp, setCategoryItemForEdit, deleteCategoryItem,
+    language, readOnly
+  } = props
 
-    const validation = Category.getItemValidation(item)(category)
-    const disabled = item.published
-    return (
-      <div className={`category-edit__item ${active ? 'active' : ''}`}
-           onClick={() => active ? null : setCategoryItemForEdit(category, level, item, true)}
-           ref={this.elemRef}>
-        <ErrorBadge validation={validation} showLabel={false}/>
-        {
-          active
-            ? (
-              <React.Fragment>
+  const validation = Category.getItemValidation(item)(category)
+  const disabled = item.published
 
-                <button className="btn-s btn-of-light-xs btn-close"
-                        onClick={() => setCategoryItemForEdit(category, level, item, false)}>
-                  <span className="icon icon-arrow-up icon-12px"/>
+  const i18n = useI18n()
+
+  return (
+    <div className={`category-edit__item ${active ? 'active' : ''}`}
+         onClick={() => active ? null : setCategoryItemForEdit(category, level, item, true)}
+         ref={elemRef}>
+      <ErrorBadge validation={validation} showLabel={false}/>
+      {
+        active
+          ? (
+            <React.Fragment>
+
+              <button className="btn-s btn-of-light-xs btn-close"
+                      onClick={() => setCategoryItemForEdit(category, level, item, false)}>
+                <span className="icon icon-arrow-up icon-12px"/>
+              </button>
+
+              <FormItem label={i18n.t('common.code')}>
+                <Input value={CategoryItem.getCode(item)}
+                       disabled={disabled}
+                       validation={getFieldValidation('code')(validation)}
+                       onChange={value => putCategoryItemProp(category, level, item, 'code', normalizeName(value))}
+                       readOnly={readOnly}/>
+              </FormItem>
+
+              <LabelsEditor labels={CategoryItem.getLabels(item)}
+                            onChange={(labelItem) => onPropLabelsChange(labelItem)}
+                            readOnly={readOnly}/>
+
+              {
+                !readOnly &&
+                <button className="btn btn-of-light btn-delete"
+                        aria-disabled={disabled}
+                        onClick={() => {
+                          if (confirm(i18n.t('categoryEdit.confirmDelete'))) {
+                            deleteCategoryItem(category, level, item)
+                          }
+                        }}>
+                  <span className="icon icon-bin2 icon-12px icon-left"/>
+                  {i18n.t('categoryEdit.deleteItem')}
                 </button>
-
-                <FormItem label={'code'}>
-                  <Input value={CategoryItem.getCode(item)}
-                         disabled={disabled}
-                         validation={getFieldValidation('code')(validation)}
-                         onChange={value => putCategoryItemProp(category, level, item, 'code', normalizeName(value))}
-                         readOnly={readOnly}/>
-                </FormItem>
-
-                <LabelsEditor labels={CategoryItem.getLabels(item)}
-                              onChange={(labelItem) => this.onPropLabelsChange(labelItem)}
-                              readOnly={readOnly}/>
-
-                {
-                  !readOnly &&
-                  <button className="btn btn-of-light btn-delete"
-                          aria-disabled={disabled}
-                          onClick={() => {
-                            if (confirm('Delete the item with all children? This operation cannot be undone')) {
-                              deleteCategoryItem(category, level, item)
-                            }
-                          }}>
-                    <span className="icon icon-bin2 icon-12px icon-left"/>
-                    Delete Item
-                  </button>
-                }
-              </React.Fragment>
-            )
-            : (
-              <React.Fragment>
-                <div>{CategoryItem.getCode(item)}</div>
-                <div>{'\xA0'}-{'\xA0'}</div>
-                <div>{CategoryItem.getLabel(language)(item)}</div>
-              </React.Fragment>
-            )
-        }
-      </div>
-    )
-  }
+              }
+            </React.Fragment>
+          )
+          : (
+            <React.Fragment>
+              <div>{CategoryItem.getCode(item)}</div>
+              <div>{'\xA0'}-{'\xA0'}</div>
+              <div>{CategoryItem.getLabel(language)(item)}</div>
+            </React.Fragment>
+          )
+      }
+    </div>
+  )
 }
 
 export default ItemEdit

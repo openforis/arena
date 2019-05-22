@@ -1,18 +1,22 @@
 import React from 'react'
 import * as R from 'ramda'
 
+import useI18n from '../../commonComponents/useI18n'
+
 import { getValidationFieldMessagesHTML } from '../../utils/validationUtils'
 
-const AppJobErrors = ({job}) => {
+const AppJobErrors = ({ job }) => {
 
   const errors = R.propOr([], 'errors', job)
+
+  const i18n = useI18n()
 
   return job.failed && !R.isEmpty(errors)
     ? (
       <div className="app-job-monitor__job-errors">
         <div className="header">
-          <div>Item</div>
-          <div>Errors</div>
+          <div>{i18n.t('jobs.item')}</div>
+          <div>{i18n.t('common.error', { count: errors.length })}</div>
         </div>
         <div className="body">
           {

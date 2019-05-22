@@ -333,7 +333,7 @@ class NodeDefTaxon extends React.Component {
 
     return (
       <div className="node-def__taxon-wrapper">
-        <FormItem label={i18n.t('surveyForm.nodeDefTaxon.code')}>
+        <FormItem label={i18n.t('common.code')}>
           {codeInputField}
         </FormItem>
         <FormItem label={i18n.t('surveyForm.nodeDefTaxon.scientificName')}>

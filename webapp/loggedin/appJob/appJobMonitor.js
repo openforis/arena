@@ -1,6 +1,6 @@
 import './appJobMonitor.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../commonComponents/modal'
@@ -14,64 +14,69 @@ import * as AppState from '../../app/appState'
 
 import { activeJobUpdate, cancelActiveJob, hideAppJobMonitor } from './actions'
 
+import useI18n from '../../commonComponents/useI18n'
+
 const JobProgress = ({ job }) =>
   <ProgressBar progress={job.progressPercent} className={job.status}/>
 
-const InnerJobs = ({ innerJobs }) =>
-  innerJobs.length > 0 &&
-  <div className="app-job-monitor__inner-jobs">
-    {
-      innerJobs.map((innerJob, i) => (
-        <React.Fragment key={i}>
-          <div className="job">
-            <div className="name">{i + 1}. {innerJob.type}</div>
-            <JobProgress job={innerJob}/>
-          </div>
-          <AppJobErrors job={innerJob}/>
-        </React.Fragment>
-      ))
-    }
-  </div>
+const InnerJobs = ({ innerJobs }) => {
+  const i18n = useI18n()
 
-class AppJobMonitor extends React.Component {
+  return innerJobs.length > 0 && (
+    <div className="app-job-monitor__inner-jobs">
+      {
+        innerJobs.map((innerJob, i) => (
+          <React.Fragment key={i}>
+            <div className="job">
+              <div className="name">{i + 1}. {i18n.t(`jobs.${innerJob.type}`)}</div>
+              <JobProgress job={innerJob}/>
+            </div>
+            <AppJobErrors job={innerJob}/>
+          </React.Fragment>
+        ))
+      }
+    </div>
+  )
+}
 
-  componentDidMount () {
-    AppWebSocket.on(WebSocketEvents.jobUpdate, this.props.activeJobUpdate)
-  }
+const AppJobMonitor = props => {
 
-  render () {
-    const { job, cancelActiveJob, hideAppJobMonitor } = this.props
-    const innerJobs = job ? job.innerJobs : null
-    return job && !job.canceled
-      ? (
-        <Modal className="app-job-monitor" closeOnEsc={false}>
+  const { job, cancelActiveJob, hideAppJobMonitor } = props
+  const innerJobs = job ? job.innerJobs : null
 
-          <ModalHeader>{job.type}</ModalHeader>
+  useEffect(() => {
+    AppWebSocket.on(WebSocketEvents.jobUpdate, props.activeJobUpdate)
+  }, [])
 
-          <ModalBody>
-            <JobProgress job={job}/>
-            <AppJobErrors job={job}/>
+  const i18n = useI18n()
 
-            <InnerJobs innerJobs={innerJobs}/>
-          </ModalBody>
+  return job && !job.canceled && (
+    <Modal className="app-job-monitor" closeOnEsc={false}>
 
-          <ModalFooter>
-            <button className="btn btn-of modal-footer__item"
-                    onClick={() => cancelActiveJob()}
-                    aria-disabled={!job.running}>
-              Cancel
-            </button>
+      <ModalHeader>{i18n.t(`jobs.${job.type}`)}</ModalHeader>
 
-            <button className="btn btn-of modal-footer__item"
-                    onClick={() => hideAppJobMonitor()}
-                    aria-disabled={!job.ended}>
-              Close
-            </button>
-          </ModalFooter>
-        </Modal>
-      )
-      : null
-  }
+      <ModalBody>
+        <JobProgress job={job}/>
+        <AppJobErrors job={job}/>
+
+        <InnerJobs innerJobs={innerJobs}/>
+      </ModalBody>
+
+      <ModalFooter>
+        <button className="btn btn-of modal-footer__item"
+                onClick={() => cancelActiveJob()}
+                aria-disabled={!job.running}>
+          {i18n.t('common.cancel')}
+        </button>
+
+        <button className="btn btn-of modal-footer__item"
+                onClick={() => hideAppJobMonitor()}
+                aria-disabled={!job.ended}>
+          {i18n.t('common.close')}
+        </button>
+      </ModalFooter>
+    </Modal>
+  )
 }
 
 const mapStateToProps = state => ({
