@@ -14,7 +14,7 @@ const TableRow = props => {
 
   const i18n = useI18n()
 
-  const name = R.defaultTo(`--- ${i18n.t('itemsTable.undefinedName')} ---`, itemLabelFunction(item))
+  const name = R.defaultTo(`--- ${i18n.t('common.undefinedName')} ---`, itemLabelFunction(item))
 
   const selected = item.uuid === selectedItemUuid
 
@@ -90,7 +90,7 @@ const ItemsTable = (props) => {
           : (
             <div className="table">
               <div className="table__row-header">
-                <div className="name">Name</div>
+                <div className="name">{i18n.t('common.name')}</div>
                 <div/>
               </div>
               <div className="table__rows">

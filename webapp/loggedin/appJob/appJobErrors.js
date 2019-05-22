@@ -15,7 +15,7 @@ const AppJobErrors = ({ job }) => {
     ? (
       <div className="app-job-monitor__job-errors">
         <div className="header">
-          <div>{i18n.t('jobs.item')}</div>
+          <div>{i18n.t('common.item')}</div>
           <div>{i18n.t('common.error', { count: errors.length })}</div>
         </div>
         <div className="body">
