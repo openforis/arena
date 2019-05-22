@@ -23,7 +23,7 @@ const validateEntityKeysUniqueness = (survey, record, nodeEntity) => {
 
   const entityValidations = siblingEntities.map(
     siblingEntity => {
-      const isDuplicate = _isEntityDuplicated(survey, record, siblingEntities, siblingEntity)
+      const isDuplicate = _isEntityDuplicate(survey, record, siblingEntities, siblingEntity)
 
       // 3. return entityKeys validation for each sibling entity key attribute
       const keyNodes = Record.getEntityKeyNodes(survey, siblingEntity)(record)
@@ -47,7 +47,7 @@ const validateEntityKeysUniqueness = (survey, record, nodeEntity) => {
   )(entityValidations)
 }
 
-const _isEntityDuplicated = (survey, record, siblingEntitiesAndSelf, entity) => {
+const _isEntityDuplicate = (survey, record, siblingEntitiesAndSelf, entity) => {
   // 1. skip current entity among all entities
 
   const siblingEntities = R.reject(R.propEq(Node.keys.uuid, Node.getUuid(entity)), siblingEntitiesAndSelf)
