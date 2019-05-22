@@ -79,7 +79,7 @@ const LevelEdit = props => {
     </FormItem>
 
     <div className="category-edit__level-items-header">
-      <h5 className="label">{i18n.t('categoryEdit.items')}</h5>
+      <h5 className="label">{i18n.t('common.item_plural')}</h5>
       {
         !readOnly &&
         <button className="btn btn-s btn-of-light-xs btn-add-item"
