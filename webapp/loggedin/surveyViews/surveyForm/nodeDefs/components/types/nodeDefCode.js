@@ -161,7 +161,6 @@ const mapStateToProps = (state, props) => {
   return {
     surveyId: Survey.getId(survey),
     draft: Survey.isDraft(surveyInfo),
-    language: Survey.getDefaultLanguage(surveyInfo),
 
     parentCodeDefUuid: NodeDef.getParentCodeDefUuid(nodeDef),
     categoryUuid: category ? Category.getUuid(category) : null,

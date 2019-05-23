@@ -10,20 +10,24 @@ import * as SurveyState from '../../../../survey/surveyState'
 import Tree from './surveyHierarchyTree'
 import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 
+import useI18n from '../../../../commonComponents/useI18n'
+
 const SurveyHierarchy = props => {
 
-  const { hierarchy, ready } = props
+  const { surveyInfo, hierarchy, ready } = props
 
   const [ selectedNodeDefUuid, setSelectedNodeDefUuid ] = useState(null)
   const [ tree, setTree ] = useState(null)
   const treeRef = useRef(null)
 
+  const i18n = useI18n()
+
   useEffect(() => {
-    const { lang } = props
+    const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
     const treeElement = treeRef.current
 
     setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid))
-  }, [ready])
+  }, [ready, i18n.lang])
 
   return (
     <div className="survey-hierarchy">
@@ -49,13 +53,13 @@ const SurveyHierarchy = props => {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
+  const surveyInfo = Survey.getSurveyInfo(survey)
   const ready = SurveyState.areDefsFetched(state)
   const hierarchy = Survey.getHierarchy()(survey)
-  const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
   return {
+    surveyInfo,
     hierarchy,
-    lang,
     ready,
   }
 }

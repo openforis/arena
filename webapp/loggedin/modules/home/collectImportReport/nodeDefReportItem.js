@@ -12,14 +12,15 @@ const NodeDefReportItem = props => {
   const { survey, nodeDefUuid, nodeDefItems, updateCollectImportReportItem, onNodeDefEdit } = props
 
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-  const defaultLanguage = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
   const i18n = useI18n()
+  const lang = Survey.getLanguage(i18n.lang)(Survey.getSurveyInfo(survey))
+
 
   return (
     <div className="collect-import-report-node-def-items">
       <div
-        className="collect-import-report-node-def-items-header">{NodeDef.getLabel(nodeDef, defaultLanguage)}</div>
+        className="collect-import-report-node-def-items-header">{NodeDef.getLabel(nodeDef, lang)}</div>
       <div className="table__row-header collect-import-report-header">
         <div>#</div>
         <div>{i18n.t('homeView.collectImportReport.type')}</div>
