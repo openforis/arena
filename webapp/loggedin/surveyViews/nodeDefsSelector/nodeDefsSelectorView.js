@@ -22,21 +22,12 @@ const NodeDefsSelectorView = props => {
   const [filterTypes, setFilterTypes] = useState([])
   const [showSettings, setShowSettings] = useState(false)
 
-  const onChangeEntity = nodeDefUuidEntity => {
-    setNodeDefUuidEntity(nodeDefUuidEntity)
-
-    const newNodeDefUuidsAttributes = []
-    setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
-    props.onChangeEntity(nodeDefUuidEntity)
-    props.onChangeAttributes(newNodeDefUuidsAttributes)
-  }
-
   const onToggleAttribute = nodeDefUuid => {
     const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefUuidsAttributes)
     const isDeleted = idx >= 0
     const fn = isDeleted ? R.remove(idx, 1) : R.append(nodeDefUuid)
-    const newNodeDefUuidsAttributes = fn(nodeDefUuidsAttributes)
 
+    const newNodeDefUuidsAttributes = fn(nodeDefUuidsAttributes)
     setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
     props.onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
   }
@@ -44,9 +35,17 @@ const NodeDefsSelectorView = props => {
   useEffect(() => {
     const newNodeDefUuidEntity = props.nodeDefUuidEntity
     if (newNodeDefUuidEntity) {
-      onChangeEntity(newNodeDefUuidEntity)
+      setNodeDefUuidEntity(newNodeDefUuidEntity)
     }
   }, [props.nodeDefUuidEntity])
+
+  useEffect(() => {
+    props.onChangeEntity(nodeDefUuidEntity)
+
+    const newNodeDefUuidsAttributes = []
+    setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
+    props.onChangeAttributes(newNodeDefUuidsAttributes)
+  }, [nodeDefUuidEntity])
 
   const {
     hierarchy, lang,
@@ -69,7 +68,7 @@ const NodeDefsSelectorView = props => {
           hierarchy={hierarchy}
           lang={lang}
           nodeDefUuidEntity={nodeDefUuidEntity}
-          onChange={onChangeEntity}
+          onChange={setNodeDefUuidEntity}
         />
 
         {
