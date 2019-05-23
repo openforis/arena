@@ -5,6 +5,7 @@ import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
 import Survey from '../../../../../../common/survey/survey'
+import Record from '../../../../../../common/record/record'
 
 import SurveyFormView from '../../../../surveyViews/surveyForm/surveyFormView'
 
@@ -83,7 +84,7 @@ const mapStateToProps = (state, { match, location }) => {
   const urlSearchParams = new URLSearchParams(location.search)
 
   return {
-    canEditRecord: Survey.isPublished(surveyInfo) && AuthManager.canEditRecord(user, record),
+    canEditRecord: AuthManager.canEditRecord(user, record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
     recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
