@@ -57,8 +57,6 @@ const RecordsTable = ({ user, surveyInfo, records, offset, nodeDefKeys }) => {
 
   const i18n = useI18n()
   const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
-  console.log('i18n.lang', i18n.lang)
-  console.log('lang', lang)
 
   return (
     <React.Fragment>
@@ -104,7 +102,7 @@ const RecordsView = props => {
 
     if (Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo))
       initRecordsList()
-  }, [surveyInfo])
+  }, [Survey.getUuid(surveyInfo)])
 
   const hasRecords = !R.isEmpty(records)
 
