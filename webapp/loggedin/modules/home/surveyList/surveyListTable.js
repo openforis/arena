@@ -52,8 +52,8 @@ const SurveyListTable = (props) => {
       <div className="table__row-header">
         <div>{i18n.t('common.name')}</div>
         <div>{i18n.t('common.label')}</div>
-        <div>{i18n.t('homeView.surveyListTable.dateCreated')}</div>
-        <div>{i18n.t('homeView.surveyListTable.dateLastModified')}</div>
+        <div>{i18n.t('common.dateCreated')}</div>
+        <div>{i18n.t('common.dateLastModified')}</div>
         <div>{i18n.t('homeView.surveyListTable.status')}</div>
       </div>
 

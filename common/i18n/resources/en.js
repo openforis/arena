@@ -3,12 +3,15 @@ module.exports = {
     name: 'Name',
     label: 'Label',
     add: 'Add',
+    new: 'New',
     view: 'View',
     edit: 'Edit',
     delete: 'Delete',
     done: 'Done',
     close: 'Close',
     cancel: 'Cancel',
+    dateCreated: 'Date created',
+    dateLastModified: 'Date last modified',
     cantUndoWarning: 'This operation cannot be undone',
     description: 'Description',
     description_plural: 'Descriptions',
@@ -55,6 +58,9 @@ module.exports = {
   data: {
     records: {
       records: 'Records',
+      owner: 'Owner',
+      step: 'Step',
+      noRecordsAdded: 'No records added',
     },
     rowNum: 'Row #',
     invalidRecord: 'Invalid record',
@@ -87,8 +93,6 @@ module.exports = {
     },
     surveyListTable: {
       addNewSurvey: 'Add a new Survey',
-      dateCreated: 'Date created',
-      dateLastModified: 'Date last modified',
       status: 'Status',
     },
     surveyCreate: {
