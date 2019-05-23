@@ -1,6 +1,6 @@
 import './recordsView.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import * as R from 'ramda'
@@ -8,6 +8,7 @@ import camelize from 'camelize'
 
 import TablePaginator from '../../../../../commonComponents/table/tablePaginator'
 import ErrorBadge from '../../../../../commonComponents/errorBadge'
+import useI18n from '../../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
@@ -49,22 +50,27 @@ const RecordRow = ({ idx, offset, record, style, nodeDefKeys, canEdit }) => (
   </div>
 )
 
-const RecordsTable = ({ user, surveyInfo, records, offset, nodeDefKeys, lang }) => {
+const RecordsTable = ({ user, surveyInfo, records, offset, nodeDefKeys }) => {
   const noCols = 3 + nodeDefKeys.length
 
   const style = { gridTemplateColumns: `70px repeat(${noCols}, ${1 / noCols}fr) 50px 50px` }
 
+  const i18n = useI18n()
+  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
+  console.log('i18n.lang', i18n.lang)
+  console.log('lang', lang)
+
   return (
     <React.Fragment>
       <div className="table__row-header" style={style}>
-        <div>Row #</div>
+        <div>#</div>
         {
           nodeDefKeys.map((k, i) => <div key={i}>{NodeDef.getLabel(k, lang)}</div>)
         }
-        <div>Date created</div>
-        <div>Date Modified</div>
-        <div>Owner</div>
-        <div>Step</div>
+        <div>{i18n.t('common.dateCreated')}</div>
+        <div>{i18n.t('common.dateLastModified')}</div>
+        <div>{i18n.t('data.records.owner')}</div>
+        <div>{i18n.t('data.records.step')}</div>
       </div>
 
       <div className="table__rows">
@@ -85,57 +91,55 @@ const RecordsTable = ({ user, surveyInfo, records, offset, nodeDefKeys, lang }) 
   )
 }
 
-class RecordsView extends React.Component {
+const RecordsView = props => {
 
-  componentDidMount () {
-    const { surveyInfo, initRecordsList } = this.props
+  const {
+    surveyInfo, records,
+    offset, limit, count,
+    fetchRecords, createRecord, history,
+  } = props
+
+  useEffect(() => {
+    const { initRecordsList } = props
 
     if (Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo))
       initRecordsList()
-  }
+  }, [surveyInfo])
 
-  render () {
+  const hasRecords = !R.isEmpty(records)
 
-    const {
-      surveyInfo, records,
-      offset, limit, count,
-      fetchRecords, createRecord, history
-    } = this.props
+  const i18n = useI18n()
 
-    const hasRecords = !R.isEmpty(records)
+  return (
+    <div className="records table">
 
-    return (
-      <div className="records table">
-
-        <div className="table__header">
-          {
-            Survey.isPublished(surveyInfo)
-              ? (
-                <button onClick={() => createRecord(history)} className="btn btn-s btn-of">
-                  <span className="icon icon-plus icon-12px icon-left"/>
-                  new
-                </button>
-              )
-              : <div/>
-          }
-
-          {
-            hasRecords &&
-            <TablePaginator offset={offset} limit={limit} count={count}
-                            fetchFn={fetchRecords}/>
-          }
-        </div>
-
+      <div className="table__header">
         {
-          hasRecords
-            ? <RecordsTable {...this.props}/>
-            : <div className="table__empty-rows">No records added</div>
+          Survey.isPublished(surveyInfo)
+            ? (
+              <button onClick={() => createRecord(history)} className="btn btn-s btn-of">
+                <span className="icon icon-plus icon-12px icon-left"/>
+                {i18n.t('common.new')}
+              </button>
+            )
+            : <div/>
         }
 
+        {
+          hasRecords &&
+          <TablePaginator offset={offset} limit={limit} count={count}
+                          fetchFn={fetchRecords}/>
+        }
       </div>
-    )
-  }
 
+      {
+        hasRecords
+          ? <RecordsTable {...props}/>
+          : <div className="table__empty-rows">{i18n.t('data.records.noRecordsAdded')}</div>
+      }
+
+    </div>
+  )
 }
 
 const mapStateToProps = state => {
@@ -149,7 +153,6 @@ const mapStateToProps = state => {
     offset: RecordsState.getRecordsOffset(state),
     limit: RecordsState.getRecordsLimit(state),
     count: RecordsState.getRecordsCount(state),
-    lang: Survey.getDefaultLanguage(surveyInfo)
   }
 }
 
@@ -158,6 +161,6 @@ export default connect(
   {
     initRecordsList,
     fetchRecords,
-    createRecord
+    createRecord,
   }
 )(RecordsView)
