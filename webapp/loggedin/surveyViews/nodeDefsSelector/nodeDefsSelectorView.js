@@ -24,18 +24,21 @@ const NodeDefsSelectorView = props => {
 
   const onChangeEntity = nodeDefUuidEntity => {
     setNodeDefUuidEntity(nodeDefUuidEntity)
-    setNodeDefUuidsAttributes([])
+
+    const newNodeDefUuidsAttributes = []
+    setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
     props.onChangeEntity(nodeDefUuidEntity)
-    props.onChangeAttributes(nodeDefUuidsAttributes)
+    props.onChangeAttributes(newNodeDefUuidsAttributes)
   }
 
   const onToggleAttribute = nodeDefUuid => {
     const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefUuidsAttributes)
     const isDeleted = idx >= 0
     const fn = isDeleted ? R.remove(idx, 1) : R.append(nodeDefUuid)
+    const newNodeDefUuidsAttributes = fn(nodeDefUuidsAttributes)
 
-    setNodeDefUuidsAttributes(fn(nodeDefUuidsAttributes))
-    props.onChangeAttributes(nodeDefUuidsAttributes, nodeDefUuid, isDeleted)
+    setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
+    props.onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
   }
 
   useEffect(() => {
