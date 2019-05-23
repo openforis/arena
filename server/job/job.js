@@ -108,7 +108,7 @@ class Job {
         await this.beforeSuccess()
         this.logDebug('beforeSuccess run')
       }
-    // DO NOT CATCH EXCEPTIONS! Transaction will be aborted in that case
+      // DO NOT CATCH EXCEPTIONS! Transaction will be aborted in that case
     } finally {
       if (!this.isCanceled()) {
         // 4. flush/clean resources
@@ -189,7 +189,7 @@ class Job {
 
     throttle(
       async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
-      this._getProgressThrottleId,
+      this._getProgressThrottleId(),
       1000
     )()
   }
@@ -302,8 +302,10 @@ class Job {
         //cancel or fail even parent job
         await this._setStatus(event.status)
         break
-      default:
-        await this._notifyEvent(event) //propagate events to parent job
+      case jobStatus.running:
+        //propagate progress event to parent job
+        await this._notifyEvent(this._createJobEvent(jobEvents.progress))
+        break
     }
   }
 
