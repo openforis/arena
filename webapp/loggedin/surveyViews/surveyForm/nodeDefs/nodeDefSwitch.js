@@ -74,8 +74,7 @@ class NodeDefSwitch extends React.Component {
 
     const { i18n } = this.context
     const label = NodeDef.getLabel(nodeDef, Survey.getLanguage(i18n.lang)(surveyInfo))
-    console.log(label)
-    
+
     return (
       <div className={className} ref={this.element}>
 
