@@ -244,7 +244,7 @@ class Job {
     Object.assign(this.result, result)
   }
 
-  getContextSurvey () {
+  get contextSurvey () {
     return this.getContextProp(Job.keysContext.survey)
   }
 

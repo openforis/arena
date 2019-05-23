@@ -1,9 +1,13 @@
-const Job = require('../../../../../job/job')
+const Job = require('../../../job/job')
 
-const Survey = require('../../../../../../common/survey/survey')
+const Survey = require('../../../../common/survey/survey')
 
-const SurveyManager = require('../../../manager/surveyManager')
+const SurveyManager = require('../manager/surveyManager')
 
+/**
+ * Generates the survey dependency graph and stores it in the metadata of the survey.
+ * (It requires the survey to be set in the context or it loads it with "published" props)
+ */
 class SurveyDependencyGraphsGenerationJob extends Job {
 
   constructor (params) {
@@ -12,7 +16,8 @@ class SurveyDependencyGraphsGenerationJob extends Job {
 
   async execute (tx) {
     const surveyId = this.getSurveyId()
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, false, true, false, tx)
+    const survey = this.contextSurvey || await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, false, true, false, tx)
+
     const graph = Survey.buildDependencyGraph(survey)
 
     await SurveyManager.updateSurveyDependencyGraphs(surveyId, graph, tx)
