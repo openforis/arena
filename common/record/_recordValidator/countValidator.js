@@ -27,7 +27,37 @@ const countChildren = (record, parentNode, childDef) => {
     )(nodes)
 }
 
-const getNodePointers = (survey, record, nodes) => {
+const validateChildrenCountRecord = (survey, record) => {
+  const nodePointers = _getNodePointersRecord(survey, record)
+  return _validateChildrenCount(survey, record, nodePointers)
+}
+
+const validateChildrenCountNodes = (survey, record, nodes) => {
+  const nodePointers = _getNodePointers(survey, record, nodes)
+  return _validateChildrenCount(survey, record, nodePointers)
+}
+
+const _getNodePointersRecord = (survey, record) => {
+  const nodePointers = []
+  const { root } = Survey.getHierarchy()(survey)
+  Survey.traverseHierarchyItemSync(root, nodeDefEntity => {
+    const nodeDefChildren = Survey.getNodeDefChildren(nodeDefEntity)(survey)
+    const nodeEntities = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDefEntity))(record)
+    for (const nodeEntity of nodeEntities) {
+      for (const childDef of nodeDefChildren) {
+        if (_hasMinOrMaxCount(childDef)) {
+          nodePointers.push({
+            node: nodeEntity,
+            childDef
+          })
+        }
+      }
+    }
+  })
+  return nodePointers
+}
+
+const _getNodePointers = (survey, record, nodes) => {
   const nodesArray = R.values(nodes)
 
   const nodePointers = nodesArray.map(
@@ -68,9 +98,7 @@ const getNodePointers = (survey, record, nodes) => {
   )(nodePointers)
 }
 
-const validateChildrenCount = (survey, record, nodes) => {
-  const nodePointers = getNodePointers(survey, record, nodes)
-
+const _validateChildrenCount = (survey, record, nodePointers) => {
   const nodePointersValidated = nodePointers.map(
     nodePointer => {
       const { node, childDef } = nodePointer
@@ -121,6 +149,17 @@ const validateChildrenCount = (survey, record, nodes) => {
   )(nodePointersValidated)
 }
 
+const _hasMinOrMaxCount = nodeDef => {
+  const validations = NodeDef.getValidations(nodeDef)
+  const minCount = NumberUtils.toNumber(NodeDefValidations.getMinCount(validations))
+  const maxCount = NumberUtils.toNumber(NodeDefValidations.getMaxCount(validations))
+  const hasMinCount = !isNaN(minCount)
+  const hasMaxCount = !isNaN(maxCount)
+
+  return hasMinCount || hasMaxCount
+}
+
 module.exports = {
-  validateChildrenCount
+  validateChildrenCountNodes,
+  validateChildrenCountRecord
 }

@@ -48,7 +48,7 @@ const countRecordsBySurveyId = async (surveyId, client = db) =>
 const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys, offset = 0, limit = null, client = db) => {
 
   const rootEntityTableAlias = 'n0'
-  const getNodeDefKeyColName = R.pipe(NodeDefTable.getColNames, R.head)
+  const getNodeDefKeyColName = NodeDefTable.getColName
   const getNodeDefKeyColAlias = NodeDef.getName
   const nodeDefKeysSelect = nodeDefKeys.map(
     nodeDefKey => `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`

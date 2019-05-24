@@ -69,6 +69,7 @@ module.exports = {
 
   // ==== VALIDATION
   validateNodesAndPersistValidation: RecordValidationManager.validateNodesAndPersistValidation,
+  validateRecordAndPersistValidation: RecordValidationManager.validateRecordAndPersistValidation,
 
   // ====  UTILS
   disableTriggers: NodeRepository.disableTriggers,

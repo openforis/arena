@@ -12,6 +12,29 @@ const RecordRepository = require('../../repository/recordRepository')
 
 const RecordUniquenessValidator = require('./recordUniquenessValidator')
 
+const validateRecordAndPersistValidation = async (survey, record, tx) => {
+  // 1. validate nodes
+  const nodesValidation = await RecordValidator.validateRecord(survey, record)
+
+  // 2. validate record keys uniqueness
+  const recordKeysValidation = await RecordUniquenessValidator.validateRecordKeysUniqueness(survey, record, tx)
+
+  // 3. merge validations
+  const validation = Validator.recalculateValidity(
+    R.mergeDeepLeft(
+      {
+        [Validator.keys.fields]: recordKeysValidation
+      },
+      nodesValidation
+    )
+  )
+
+  // 4. persist validation
+  await persistValidation(survey, record, validation, tx)
+
+  return validation
+}
+
 const validateNodesAndPersistValidation = async (survey, record, nodes, tx) => {
 
   // 1. validate nodes
@@ -60,5 +83,6 @@ const persistValidation = async (survey, record, nodesValidation, tx) => {
 }
 
 module.exports = {
-  validateNodesAndPersistValidation
+  validateNodesAndPersistValidation,
+  validateRecordAndPersistValidation
 }

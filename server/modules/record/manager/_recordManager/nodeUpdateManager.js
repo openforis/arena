@@ -62,7 +62,10 @@ const updateNodesDependents = async (survey, record, nodes, tx) => {
         NodeUpdateDependentManager.updateDependentsApplicable(survey, record, node, tx),
         NodeUpdateDependentManager.updateDependentsDefaultValues(survey, record, node, tx)
       ])
-      const nodesUpdatedCurrent = R.mergeRight(nodesApplicability, nodesDefaultValues)
+      const nodesUpdatedCurrent = {
+        ...nodesApplicability,
+        ...nodesDefaultValues
+      }
       record = Record.assocNodes(nodesUpdatedCurrent)(record)
 
       // mark updated nodes to visit
@@ -138,7 +141,10 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
       )
     )
   )
-  return R.mergeLeft({ [Node.getUuid(node)]: node }, childNodes)
+  return {
+    ...childNodes,
+    [Node.getUuid(node)]: node
+  }
 }
 
 //==== DELETE
@@ -173,7 +179,10 @@ const _onNodeUpdate = async (survey, record, node, t) => {
       const deletedNodesArray = await Promise.all(
         dependentCodes.map(async nodeCode => await NodeRepository.deleteNode(surveyId, Node.getUuid(nodeCode), t))
       )
-      updatedNodes = R.mergeRight(updatedNodes, SurveyUtils.toUuidIndexedObj(deletedNodesArray))
+      updatedNodes = {
+        ...updatedNodes,
+        ...SurveyUtils.toUuidIndexedObj(deletedNodesArray)
+      }
     }
   }
 
@@ -188,7 +197,11 @@ const _assocParentNode = (surveyId, record, node, nodes) => {
   const parentNodeObj = parentNode ? { [Node.getUuid(parentNode)]: parentNode } : {}
   const nodeObj = { [Node.getUuid(node)]: node }
 
-  return R.mergeRight({ ...nodeObj, ...parentNodeObj }, nodes)
+  return {
+    ...nodeObj,
+    ...parentNodeObj,
+    ...nodes
+  }
 }
 
 module.exports = {

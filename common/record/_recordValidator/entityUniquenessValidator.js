@@ -13,9 +13,23 @@ const keysError = {
   duplicateEntity: 'duplicateEntity'
 }
 
-const validateEntitiesUniqueness = (survey, record, nodes) => {
-  const updatedEntities = _getUpdatedEntitiesWithKeys(survey, record, nodes)
+const validateEntitiesUniquenessInRecord = (survey, record) => {
+  const entities = []
+  const { root } = Survey.getHierarchy()(survey)
+  Survey.traverseHierarchyItemSync(root, nodeDefEntity => {
+    if (Survey.hasNodeDefKeys(nodeDefEntity)) {
+      entities.push(...Record.getNodesByDefUuid(nodeDefEntity)(record))
+    }
+  })
+  return _validateEntitiesUniqueness(survey, record, entities)
+}
 
+const validateEntitiesUniquenessInNodes = (survey, record, nodes) => {
+  const updatedEntities = _getUpdatedEntitiesWithKeys(survey, record, nodes)
+  return _validateEntitiesUniqueness(survey, record, updatedEntities)
+}
+
+const _validateEntitiesUniqueness = (survey, record, updatedEntities) => {
   const entityKeysValidationsArray = updatedEntities.map(
     entity => _validateEntity(survey, record, entity)
   )
@@ -27,25 +41,27 @@ const validateEntitiesUniqueness = (survey, record, nodes) => {
 }
 
 const _getUpdatedEntitiesWithKeys = (survey, record, nodes) => {
-  const entities = R.values(nodes).map(
-    node => {
-      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  const entitiesUpdated = []
+  nodes.values().forEach(node => {
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+
+    if (NodeDef.isEntity(nodeDef) && Survey.hasNodeDefKeys(nodeDef)(survey)) {
+      // updated node is an entity with keys
+      entitiesUpdated.push(node)
+    } else {
       const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
 
-      if (NodeDef.isEntity(nodeDef) && !R.isEmpty(Survey.getNodeDefKeys(nodeDef)(survey))) {
-        // updated node is an entity with keys
-        return node
-      } else if (NodeDef.isKey(nodeDef) &&
+      if (NodeDef.isKey(nodeDef) &&
         !NodeDef.isRoot(parentDef) &&
-        !R.isEmpty(Survey.getNodeDefKeys(parentDef)(survey))) {
+        Survey.hasNodeDefKeys(parentDef)(survey)) {
         // updated node is the key of a non-root entity with keys
-        return Record.getParentNode(node)(record)
-      } else {
-        return null
+        const nodeParent = Record.getParentNode(node)(record)
+        entitiesUpdated.push(nodeParent)
       }
     }
-  )
-  return R.reject(R.isNil, entities)
+  })
+
+  return entitiesUpdated
 }
 
 const _validateEntity = (survey, record, nodeEntity) => {
@@ -53,13 +69,13 @@ const _validateEntity = (survey, record, nodeEntity) => {
   // 1. find all sibling entities
 
   const parentNode = Record.getParentNode(nodeEntity)(record)
-  const siblingEntities = Record.getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(nodeEntity))(record)
+  const siblingEntitiesAndSelf = Record.getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(nodeEntity))(record)
 
   // 2. validate all sibling entities uniqueness
 
-  const entityValidations = siblingEntities.map(
+  const entityValidations = siblingEntitiesAndSelf.map(
     siblingEntity => {
-      const isDuplicate = _isEntityDuplicated(survey, record, siblingEntities, siblingEntity)
+      const isDuplicate = _isEntityDuplicated(survey, record, siblingEntitiesAndSelf, siblingEntity)
 
       // 3. return entityKeys validation for each sibling entity key attribute
       const keyNodes = Record.getEntityKeyNodes(survey, siblingEntity)(record)
@@ -99,5 +115,6 @@ const _isEntityDuplicated = (survey, record, siblingEntitiesAndSelf, entity) => 
 }
 
 module.exports = {
-  validateEntitiesUniqueness
+  validateEntitiesUniquenessInNodes,
+  validateEntitiesUniquenessInRecord,
 }

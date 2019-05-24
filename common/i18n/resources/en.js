@@ -232,6 +232,7 @@ module.exports = {
     NodeDefsValidationJob: 'Node Defs Validation',
     RecordCheckJob: 'Record Check',
     RecordsImportJob: 'Records Import',
+    RecordsValidationJob: 'Records Validation',
     SurveyCreatorJob: 'Survey Create',
     SurveyDependencyGraphsGenerationJob: 'Survey Dependency Graph Generation',
     SurveyIndexGeneratorJob: 'Survey Index Generator',

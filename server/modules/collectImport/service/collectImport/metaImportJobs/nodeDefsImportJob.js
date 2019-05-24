@@ -2,6 +2,8 @@ const util = require('util')
 const R = require('ramda')
 
 const { uuidv4 } = require('../../../../../../common/uuid')
+const StringUtils = require('../../../../../../common/stringUtils')
+
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const NodeDefValidations = require('../../../../../../common/survey/nodeDefValidations')
@@ -88,7 +90,8 @@ class NodeDefsImportJob extends Job {
     }
     await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, tx)
 
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, true, true, false, tx)
+    //fetch survey and store it in context
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, tx)
 
     this.setContext({
       nodeDefUuidByCollectPath: this.nodeDefUuidByCollectPath,
@@ -259,15 +262,17 @@ class NodeDefsImportJob extends Job {
     const defaultValues = []
 
     for (const collectDefaultValue of collectDefaultValues) {
-      const { value, expression, applyIf } = CollectIdmlParseUtils.getAttributes(collectDefaultValue)
-      if (expression || applyIf) {
+      const { value, expr, applyIf } = CollectIdmlParseUtils.getAttributes(collectDefaultValue)
+      if (StringUtils.isNotBlank(expr) || StringUtils.isNotBlank(applyIf)) {
         const messages = CollectIdmlParseUtils.toLabels('messages', defaultLanguage)(collectDefaultValue)
-        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.defaultValue, expression, applyIf, messages, tx)
-      } else {
+        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.defaultValue, expr, applyIf, messages, tx)
+      } else if (StringUtils.isNotBlank(value)) {
         defaultValues.push({
           [SurveyUtils.keys.uuid]: uuidv4(),
           [NodeDefExpression.keys.expression]: value
         })
+      } else {
+        this.logDebug('empty value found in default attribute constant value')
       }
     }
 
