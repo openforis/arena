@@ -23,7 +23,7 @@ class RecordsImportJob extends Job {
   constructor (params) {
     super('RecordsImportJob', params)
 
-    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 1000)
+    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
   }
 
   async onStart () {
@@ -140,6 +140,7 @@ class RecordsImportJob extends Job {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
       let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, parentNode)
+      nodeToInsert.dateCreated = new Date()
 
       if (NodeDef.isAttribute(nodeDef)) {
         const valueAndMeta = await CollectAttributeValueExtractor.extractAttributeValueAndMeta(
@@ -157,9 +158,28 @@ class RecordsImportJob extends Job {
         }
       }
 
-      await this.batchPersister.addItem(nodeToInsert, this.tx)
+      // create node value to insert
+      const nodeValue = Node.getValue(nodeToInsert, null)
+      const nodeValueInsert = [
+        Node.getUuid(nodeToInsert),
+        nodeToInsert.dateCreated,
+        nodeToInsert.dateCreated,
+        recordUuid,
+        Node.getParentUuid(nodeToInsert),
+        nodeDefUuid,
+        // nodeValue !== null && (NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)) ? JSON.stringify(nodeValue) : nodeValue,
+        nodeValue === null || (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isCoordinate(nodeDef) || NodeDef.isFile(nodeDef)) ? nodeValue : JSON.stringify(nodeValue),
+        {
+          ...nodeToInsert.meta,
+          [Node.metaKeys.childApplicability]: {}
+        }
+      ]
+      await this.batchPersister.addItem(nodeValueInsert, this.tx)
+
+      // assoc node to record
       record.nodes[Node.getUuid(nodeToInsert)] = nodeToInsert
 
+      // insert child nodes
       if (NodeDef.isEntity(nodeDef)) {
         const collectNodeDefChildNames = R.pipe(
           R.keys,
@@ -194,9 +214,9 @@ class RecordsImportJob extends Job {
 
   }
 
-  async nodesBatchInsertHandler (nodes, tx) {
+  async nodesBatchInsertHandler (nodeValues, tx) {
     const surveyId = this.getSurveyId()
-    await RecordManager.insertNodes(surveyId, nodes, tx)
+    await RecordManager.insertNodesFromValues(surveyId, nodeValues, tx)
   }
 
 }
