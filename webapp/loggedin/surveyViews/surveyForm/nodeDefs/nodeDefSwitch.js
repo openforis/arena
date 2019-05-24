@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -25,6 +25,8 @@ import { getNodeDefDefaultValue } from './nodeDefSystemProps'
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 // entry actions
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
+
+import AppContext from '../../../../app/appContext'
 
 class NodeDefSwitch extends React.Component {
 
@@ -57,10 +59,11 @@ class NodeDefSwitch extends React.Component {
 
   render () {
     const {
+      surveyInfo,
       nodeDef,
       edit, canEditDef,
-      renderType, label, applicable,
-      parentNode, nodes
+      renderType, applicable,
+      parentNode, nodes,
     } = this.props
 
     const isPage = !!Layout.getPageUuid(nodeDef)
@@ -68,6 +71,9 @@ class NodeDefSwitch extends React.Component {
     const className = 'node-def__form'
       + (isPage ? '_page' : '')
       + (applicable ? '' : ' node-def__not-applicable')
+
+    const { i18n } = this.context
+    const label = NodeDef.getLabel(nodeDef, Survey.getLanguage(i18n.lang)(surveyInfo))
 
     return (
       <div className={className} ref={this.element}>
@@ -86,8 +92,8 @@ class NodeDefSwitch extends React.Component {
           renderType === Layout.nodeDefRenderType.tableHeader
             ? <NodeDefTableHeader nodeDef={nodeDef} label={label}/>
             : renderType === Layout.nodeDefRenderType.tableBody
-            ? <NodeDefTableBody {...this.props}/>
-            : <NodeDefFormItem {...this.props} />
+              ? <NodeDefTableBody {...this.props} label={label}/>
+              : <NodeDefFormItem {...this.props} label={label}/>
         }
 
       </div>
@@ -95,6 +101,8 @@ class NodeDefSwitch extends React.Component {
 
   }
 }
+
+NodeDefSwitch.contextType = AppContext
 
 NodeDefSwitch.defaultProps = {
   // specified when can edit node definition
@@ -143,7 +151,7 @@ const mapStateToProps = (state, props) => {
   }
 
   return {
-    label: NodeDef.getLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
+    surveyInfo,
     applicable: parentNode
       ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
       : true,

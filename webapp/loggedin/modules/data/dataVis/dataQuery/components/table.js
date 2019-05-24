@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
@@ -18,73 +18,70 @@ import { elementOffset } from '../../../../../../utils/domUtils'
 import AuthManager from '../../../../../../../common/auth/authManager'
 import * as AppState from '../../../../../../app/appState'
 
+import useI18n from '../../../../../../commonComponents/useI18n'
+
 const defaultColWidth = 80
 
-class Table extends React.Component {
+const Table = props => {
 
-  constructor (props) {
-    super(props)
-    this.tableRef = React.createRef()
-  }
+  const {
+    surveyId, surveyInfo, data, showTable,
+    nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames,
+    tableName, offset, limit, filter, sort, count,
+    editMode, canEdit,
+    history
+  } = props
 
-  render () {
-    const {
-      surveyId, lang, data, showTable,
-      nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames,
-      tableName, offset, limit, filter, sort, count,
-      editMode, canEdit,
-      history
-    } = this.props
+  const tableRef = useRef()
+  const { width = defaultColWidth } = elementOffset(tableRef.current)
+  const widthMax = width - defaultColWidth
+  const colWidthMin = 150
 
-    const { width = defaultColWidth } = elementOffset(this.tableRef.current)
-    const widthMax = width - defaultColWidth
-    const colWidthMin = 150
+  const colsTot = editMode ? nodeDefUuidCols.length : colNames.length
 
-    const colsTot = editMode ? nodeDefUuidCols.length : colNames.length
+  const colWidth = widthMax > colsTot * colWidthMin
+    ? widthMax / colsTot
+    : colWidthMin
 
-    const colWidth = widthMax > colsTot * colWidthMin
-      ? widthMax / colsTot
-      : colWidthMin
+  const hasData = !R.isEmpty(data)
 
-    const hasData = !R.isEmpty(data)
+  const lang = Survey.getLanguage(useI18n().lang)(surveyInfo)
 
-    return (
-      <div className={`data-query__table table${editMode ? ' edit' : ''}`} ref={this.tableRef}>
-        {
-          showTable &&
-          <React.Fragment>
+  return (
+    <div className={`data-query__table table${editMode ? ' edit' : ''}`} ref={tableRef}>
+      {
+        showTable &&
+        <React.Fragment>
 
-            <TableHeader
-              surveyId={surveyId}
-              nodeDefUuidContext={nodeDefUuidContext}
-              nodeDefUuidCols={nodeDefUuidCols}
-              tableName={tableName}
-              colNames={colNames}
-              filter={filter}
-              sort={sort}
-              limit={limit}
-              offset={offset}
-              count={count}
-              showPaginator={hasData}
-              editMode={editMode}
-              canEdit={canEdit}
-            />
+          <TableHeader
+            surveyId={surveyId}
+            nodeDefUuidContext={nodeDefUuidContext}
+            nodeDefUuidCols={nodeDefUuidCols}
+            tableName={tableName}
+            colNames={colNames}
+            filter={filter}
+            sort={sort}
+            limit={limit}
+            offset={offset}
+            count={count}
+            showPaginator={hasData}
+            editMode={editMode}
+            canEdit={canEdit}
+          />
 
-            {
-              hasData &&
-              <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
-                         data={data} offset={offset}
-                         lang={lang}
-                         colWidth={colWidth}
-                         editMode={editMode}
-                         history={history}/>
-            }
-          </React.Fragment>
-        }
-      </div>
-    )
-  }
-
+          {
+            hasData &&
+            <TableRows nodeDefCols={nodeDefCols} colNames={colNames}
+                       data={data} offset={offset}
+                       lang={lang}
+                       colWidth={colWidth}
+                       editMode={editMode}
+                       history={history}/>
+          }
+        </React.Fragment>
+      }
+    </div>
+  )
 }
 
 const mapStateToProps = state => {
@@ -100,7 +97,7 @@ const mapStateToProps = state => {
 
   return {
     surveyId: Survey.getId(survey),
-    lang: Survey.getDefaultLanguage(surveyInfo),
+    surveyInfo,
     tableName,
     nodeDefUuidContext,
     nodeDefUuidCols,

@@ -19,12 +19,12 @@ import { createNodeDef } from '../../../../survey/nodeDefs/actions'
 
 const NavigationButton = (props) => {
   const {
+    surveyInfo,
     nodeDef,
     childDefs,
     edit,
     canEditDef,
 
-    label,
     level,
     active,
     enabled,
@@ -36,6 +36,8 @@ const NavigationButton = (props) => {
   const i18n = useI18n()
 
   const outerPageChildDefs = childDefs ? filterOuterPageChildren(childDefs) : []
+
+  const label = NodeDef.getLabel(nodeDef, Survey.getLanguage(i18n.lang)(surveyInfo))
 
   return (
     <React.Fragment>
@@ -88,9 +90,9 @@ const mapStateToProps = (state, props) => {
   const parentNode = SurveyFormState.getFormPageParentNode(nodeDef)(state)
 
   return {
+    surveyInfo,
     nodeDef,
     childDefs: Survey.getNodeDefChildren(nodeDef)(survey),
-    label: NodeDef.getLabel(nodeDef, Survey.getDefaultLanguage(surveyInfo)),
 
     active: SurveyFormState.isNodeDefFormActivePage(nodeDef)(state),
     enabled: edit || NodeDef.isRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,

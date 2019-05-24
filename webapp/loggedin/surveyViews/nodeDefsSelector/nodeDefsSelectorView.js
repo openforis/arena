@@ -50,11 +50,13 @@ const NodeDefsSelectorView = props => {
   }, [nodeDefUuidEntity])
 
   const {
-    hierarchy, lang,
+    surveyInfo,
+    hierarchy,
     canSelectAttributes, showAncestors, showMultipleAttributes,
   } = props
 
   const i18n = useI18n()
+  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
 
   return (
     <div className="node-defs-selector">
@@ -126,9 +128,10 @@ NodeDefsSelectorView.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
+  const surveyInfo = Survey.getSurveyInfo(survey)
 
   return {
-    lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
+    surveyInfo,
     hierarchy: props.hierarchy || Survey.getHierarchy()(survey),
   }
 }

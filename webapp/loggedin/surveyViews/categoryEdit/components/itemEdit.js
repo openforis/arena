@@ -37,7 +37,7 @@ const ItemEdit = (props) => {
   const {
     category, level, item, active,
     putCategoryItemProp, setCategoryItemForEdit, deleteCategoryItem,
-    language, readOnly
+    lang, readOnly
   } = props
 
   const validation = Category.getItemValidation(item)(category)
@@ -91,7 +91,7 @@ const ItemEdit = (props) => {
             <React.Fragment>
               <div>{CategoryItem.getCode(item)}</div>
               <div>{'\xA0'}-{'\xA0'}</div>
-              <div>{CategoryItem.getLabel(language)(item)}</div>
+              <div>{CategoryItem.getLabel(lang)(item)}</div>
             </React.Fragment>
           )
       }
