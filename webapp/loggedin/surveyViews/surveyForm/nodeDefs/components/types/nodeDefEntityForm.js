@@ -36,7 +36,7 @@ class EntityForm extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = { onChangeLayout: null }
+    this.state = { onChangeLayout: null, mounted: false }
     this.onChangeLayout = this.onChangeLayout.bind(this)
   }
 
@@ -49,6 +49,11 @@ class EntityForm extends React.Component {
 
   componentDidMount () {
     this.setStateOnChangeLayout(this.onChangeLayout)
+    // mark component mounted to enable react-grid-item css-transition after initial rendering
+    setTimeout(
+      () => this.setState({ mounted: true }),
+      200
+    )
   }
 
   componentWillReceiveProps (nextProps, nextContext) {
@@ -94,7 +99,7 @@ class EntityForm extends React.Component {
       surveyInfo,
     } = this.props
 
-    const { onChangeLayout } = this.state
+    const { onChangeLayout, mounted } = this.state
 
     const columns = NodeDefLayout.getNoColumns(nodeDef)
     const rdgLayout = NodeDefLayout.getLayout(nodeDef)
@@ -113,8 +118,9 @@ class EntityForm extends React.Component {
           isDraggable={edit && canEditDef && !locked}
           isResizable={edit && canEditDef && !locked}
           compactType={null}
-          useCSSTransforms={false}
-          preventCollision={true}>
+          useCSSTransforms={true}
+          preventCollision={true}
+          className={mounted ? 'mounted' : ''}>
 
           {
             innerPageChildren
