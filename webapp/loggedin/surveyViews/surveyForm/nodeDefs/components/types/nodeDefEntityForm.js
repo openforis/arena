@@ -168,7 +168,7 @@ const NodeSelect = props => {
           nodes.map(n =>
             <option key={Node.getUuid(n)}
                     value={Node.getUuid(n)}>
-              {getNodeKeyLabelValues(n)}
+              {getNodeKeyLabelValues(nodeDef, n)}
             </option>
           )
         }
