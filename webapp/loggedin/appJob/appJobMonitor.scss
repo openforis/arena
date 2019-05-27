@@ -11,24 +11,43 @@
 
   .header, .row {
     display: grid;
-    grid-template-columns: .2fr .8fr;
+    grid-template-columns: .35fr .65fr;
+    font-size: .85rem;
   }
 
   .header {
     font-weight: 600;
     text-transform: uppercase;
-    font-size: .85rem;
-    border-bottom: 1px solid rgba($white, .8)
+    border-bottom: 1px solid rgba($white, .8);
+
+    > * {
+      padding: .3rem .5rem;
+    }
   }
 
   .body {
-    max-height: 35vh;
+    max-height: calc(35vh - 2px);
     overflow-y: auto;
   }
 
   .row {
-    border-bottom: 1px solid rgba($white, .5);
+    border-bottom: 1px solid rgba($white, .3);
+
+    > * {
+      padding: .3rem .5rem;
+      word-break: break-all;
+    }
+
+    .item {
+      border-left: 1px solid rgba($white, .3);
+    }
+
+    .item-error {
+      border-left: 1px solid rgba($white, .3);
+      border-right: 1px solid rgba($white, .3);
+    }
   }
+
 }
 
 .app-job-monitor__inner-jobs {
