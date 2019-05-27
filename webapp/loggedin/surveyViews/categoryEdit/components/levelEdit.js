@@ -43,16 +43,18 @@ const LevelEdit = props => {
     }
   }
 
-  const i18n = useI18n()
-
   const {
+    surveyInfo,
     category, level, parentItem, items, activeItemUuid, canAddItem,
-    canBeDeleted, language,
+    canBeDeleted,
     createCategoryLevelItem, putCategoryLevelProp, putCategoryItemProp,
     setCategoryItemForEdit, deleteCategoryItem, readOnly,
   } = props
 
   const validation = Category.getLevelValidation(CategoryLevel.getIndex(level))(category)
+
+  const i18n = useI18n()
+  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
 
   return <div className="category-edit__level">
 
@@ -95,7 +97,7 @@ const LevelEdit = props => {
       {
         items.map(item =>
           <ItemEdit key={CategoryItem.getUuid(item)}
-                    language={language}
+                    lang={lang}
                     category={category}
                     level={level}
                     item={item}
@@ -115,7 +117,6 @@ const mapStateToProps = (state, props) => {
   const { index } = level
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
-  const language = Survey.getDefaultLanguage(surveyInfo)
 
   const category = CategoryEditState.getCategoryForEdit(state)
   const activeItem = CategoryEditState.getLevelActiveItem(index)(state)
@@ -128,7 +129,7 @@ const mapStateToProps = (state, props) => {
   const user = AppState.getUser(state)
 
   return {
-    language,
+    surveyInfo,
     category,
     items,
     activeItemUuid: activeItem ? CategoryItem.getUuid(activeItem) : null,

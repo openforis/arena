@@ -22,35 +22,41 @@ const NodeDefsSelectorView = props => {
   const [filterTypes, setFilterTypes] = useState([])
   const [showSettings, setShowSettings] = useState(false)
 
-  const onChangeEntity = nodeDefUuidEntity => {
-    setNodeDefUuidEntity(nodeDefUuidEntity)
-    setNodeDefUuidsAttributes([])
-    props.onChangeEntity(nodeDefUuidEntity)
-    props.onChangeAttributes(nodeDefUuidsAttributes)
-  }
-
   const onToggleAttribute = nodeDefUuid => {
     const idx = R.findIndex(R.equals(nodeDefUuid), nodeDefUuidsAttributes)
     const isDeleted = idx >= 0
     const fn = isDeleted ? R.remove(idx, 1) : R.append(nodeDefUuid)
 
-    setNodeDefUuidsAttributes(fn(nodeDefUuidsAttributes))
-    props.onChangeAttributes(nodeDefUuidsAttributes, nodeDefUuid, isDeleted)
+    const newNodeDefUuidsAttributes = fn(nodeDefUuidsAttributes)
+    setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
+    props.onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
   }
 
   useEffect(() => {
     const newNodeDefUuidEntity = props.nodeDefUuidEntity
     if (newNodeDefUuidEntity) {
-      onChangeEntity(newNodeDefUuidEntity)
+      setNodeDefUuidEntity(newNodeDefUuidEntity)
     }
   }, [props.nodeDefUuidEntity])
 
+  useEffect(() => {
+    if (nodeDefUuidEntity) {
+      props.onChangeEntity(nodeDefUuidEntity)
+
+      const newNodeDefUuidsAttributes = []
+      setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
+      props.onChangeAttributes(newNodeDefUuidsAttributes)
+    }
+  }, [nodeDefUuidEntity])
+
   const {
-    hierarchy, lang,
+    surveyInfo,
+    hierarchy,
     canSelectAttributes, showAncestors, showMultipleAttributes,
   } = props
 
   const i18n = useI18n()
+  const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
 
   return (
     <div className="node-defs-selector">
@@ -66,7 +72,7 @@ const NodeDefsSelectorView = props => {
           hierarchy={hierarchy}
           lang={lang}
           nodeDefUuidEntity={nodeDefUuidEntity}
-          onChange={onChangeEntity}
+          onChange={setNodeDefUuidEntity}
         />
 
         {
@@ -122,9 +128,10 @@ NodeDefsSelectorView.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
+  const surveyInfo = Survey.getSurveyInfo(survey)
 
   return {
-    lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
+    surveyInfo,
     hierarchy: props.hierarchy || Survey.getHierarchy()(survey),
   }
 }

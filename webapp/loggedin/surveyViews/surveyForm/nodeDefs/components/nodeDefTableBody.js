@@ -13,7 +13,9 @@ import Node from '../../../../../../common/record/node'
 
 import { getNodeDefComponent } from '../nodeDefSystemProps'
 
-const getNodeValues = async (surveyInfo, nodeDef, nodes) => {
+import useI18n from '../../../../../commonComponents/useI18n'
+
+const getNodeValues = async (surveyInfo, nodeDef, nodes, lang) => {
   const nonEmptyNodes = R.pipe(
     R.reject(Node.isPlaceholder),
     R.reject(Node.isValueBlank),
@@ -24,7 +26,7 @@ const getNodeValues = async (surveyInfo, nodeDef, nodes) => {
       async node => {
         if (NodeDef.isCode(nodeDef)) {
           const item = await loadCategoryItem(surveyInfo, Node.getCategoryItemUuid(node))
-          const label = CategoryItem.getLabel(Survey.getDefaultLanguage(surveyInfo))(item)
+          const label = CategoryItem.getLabel(lang)(item)
           return label || CategoryItem.getCode(item)
         } else if (NodeDef.isFile(nodeDef)) {
           return Node.getFileName(node)
@@ -71,8 +73,8 @@ class NodeDefMultipleTableBody extends React.Component {
   }
 
   async loadNodeValues () {
-    const { surveyInfo, nodeDef, nodes } = this.props
-    const nodeValues = await getNodeValues(surveyInfo, nodeDef, nodes)
+    const { surveyInfo, nodeDef, nodes, lang } = this.props
+    const nodeValues = await getNodeValues(surveyInfo, nodeDef, nodes, lang)
 
     this.setState({ nodeValues })
   }
@@ -105,11 +107,12 @@ class NodeDefMultipleTableBody extends React.Component {
 }
 
 const NodeDefTableBody = props => {
-  const { nodeDef } = props
+  const { nodeDef, surveyInfo } = props
+  const surveyLanguage = Survey.getLanguage(useI18n().lang)(surveyInfo)
 
   return (
     NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
-      ? <NodeDefMultipleTableBody {...props}/>
+      ? <NodeDefMultipleTableBody {...props} lang={surveyLanguage}/>
       : React.createElement(getNodeDefComponent(nodeDef), { ...props })
   )
 }

@@ -45,6 +45,7 @@ CREATE INDEX record_preview_idx ON record(preview);
 CREATE TABLE
   node
 (
+  id            bigserial NOT NULL,
   uuid          uuid      NOT NULL DEFAULT uuid_generate_v4(),
   record_uuid   uuid      NOT NULL,
   parent_uuid   uuid,
@@ -55,9 +56,12 @@ CREATE TABLE
   date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
 
   PRIMARY KEY (uuid),
+  CONSTRAINT node_id_unique_idx UNIQUE (id),
   CONSTRAINT node_record_fk FOREIGN KEY (record_uuid) REFERENCES "record" ("uuid") ON DELETE CASCADE,
   CONSTRAINT node_node_def_fk FOREIGN KEY (node_def_uuid) REFERENCES "node_def" ("uuid") ON DELETE CASCADE,
   CONSTRAINT node_parent_fk FOREIGN KEY (parent_uuid) REFERENCES "node" ("uuid") ON DELETE CASCADE
 );
 
 CREATE INDEX node_record_idx ON node(record_uuid);
+CREATE INDEX node_parent_uuid_idx ON node(parent_uuid);
+CREATE INDEX node_node_def_uuid_idx ON node(node_def_uuid);

@@ -1,5 +1,7 @@
 const path = require('path')
 
+const logger = require('../log/log').getLogger('JobManager')
+
 const { jobThreadMessageTypes } = require('./jobUtils')
 const ThreadsCache = require('../threads/threadsCache')
 const ThreadManager = require('../threads/threadManager')
@@ -18,13 +20,13 @@ const notifyJobUpdate = job => {
 
   if (job.ended) {
     const thread = userJobThreads.getThread(userId)
+    //delay thread termination by 1 second (give time to print debug info to the console)
     setTimeout(() => {
         thread.terminate()
         userJobThreads.removeThread(userId)
       },
-      1000) //delay terminate thread by 1s (give time to print debug info to the console)
-    //thread.terminate()
-
+      1000
+    )
   }
 }
 
