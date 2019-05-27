@@ -17,6 +17,7 @@ const keys = {
 
   // i18n
   i18n: 'i18n',
+  lang: 'lang'
 }
 
 export const getState = R.prop('app')
@@ -87,6 +88,8 @@ export const getActiveJobOnCompleteCallback = R.propOr(null, keys.onComplete)
 
 // ==== APP I18N
 export const getI18n = R.pipe(getState, R.prop(keys.i18n))
+
+export const getLang = R.pipe(getI18n, R.prop(keys.lang))
 
 // ==== APP ERRORS
 
