@@ -54,12 +54,27 @@ $tableRowHeaderHeight: 40px;
     }
   }
 
-  .react-grid-item {
-    &.node-def__inner-form {
-      border: 2px solid rgba($white, .2);
-      border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  .react-grid-layout {
+    .react-grid-item {
+      &.node-def__inner-form {
+        border: 2px solid rgba($white, .2);
+        border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+      }
+
+      &.cssTransforms {
+        //react-grid-item css animation are disabled on first render
+        transition-property: none;
+      }
+    }
+
+    &.mounted {
+      //react-grid-item css animation are enabled after component didMount
+      .react-grid-item.cssTransforms {
+        transition-property: transform;
+      }
     }
   }
+
 }
 
 .survey-form__nav {
