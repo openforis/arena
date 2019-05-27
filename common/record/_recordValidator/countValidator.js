@@ -16,25 +16,50 @@ const errorKeys = {
   maxCountNodesExceeded: 'maxCountNodesExceeded'
 }
 
-const countChildren = (record, parentNode, childDef) => {
-  const nodes = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
+const validateChildrenCount = (survey, nodeParent, nodeDefChild, count) => {
+  const validations = NodeDef.getValidations(nodeDefChild)
 
-  return NodeDef.isEntity(childDef)
-    ? nodes.length
-    : R.pipe(
-      R.reject(Node.isValueBlank),
-      R.length
-    )(nodes)
+  const minCount = NumberUtils.toNumber(NodeDefValidations.getMinCount(validations))
+  const maxCount = NumberUtils.toNumber(NodeDefValidations.getMaxCount(validations))
+  const hasMinCount = !isNaN(minCount)
+  const hasMaxCount = !isNaN(maxCount)
+
+  const minCountValid = !hasMinCount || count >= minCount
+  const maxCountValid = !hasMaxCount || count <= maxCount
+
+  const childrenCountValidation = {
+    [Validator.keys.valid]: minCountValid && maxCountValid,
+    [Validator.keys.fields]: {
+      [RecordValidation.keys.minCount]: {
+        [Validator.keys.valid]: minCountValid,
+        [Validator.keys.errors]: minCountValid ? [] : [errorKeys.minCountNodesNotSpecified]
+      },
+      [RecordValidation.keys.maxCount]: {
+        [Validator.keys.valid]: maxCountValid,
+        [Validator.keys.errors]: maxCountValid ? [] : [errorKeys.maxCountNodesExceeded]
+      }
+    }
+  }
+
+  return {
+    [Validator.keys.fields]: {
+      [RecordValidation.keys.childrenCount]: {
+        [Validator.keys.fields]: {
+          [NodeDef.getUuid(nodeDefChild)]: childrenCountValidation
+        },
+      }
+    }
+  }
 }
 
 const validateChildrenCountRecord = (survey, record) => {
   const nodePointers = _getNodePointersRecord(survey, record)
-  return _validateChildrenCount(survey, record, nodePointers)
+  return _validateChildrenCountNodePointers(survey, record, nodePointers)
 }
 
 const validateChildrenCountNodes = (survey, record, nodes) => {
   const nodePointers = _getNodePointers(survey, record, nodes)
-  return _validateChildrenCount(survey, record, nodePointers)
+  return _validateChildrenCountNodePointers(survey, record, nodePointers)
 }
 
 const _getNodePointersRecord = (survey, record) => {
@@ -98,68 +123,40 @@ const _getNodePointers = (survey, record, nodes) => {
   )(nodePointers)
 }
 
-const _validateChildrenCount = (survey, record, nodePointers) => {
-  const nodePointersValidated = nodePointers.map(
-    nodePointer => {
-      const { node, childDef } = nodePointer
+const _validateChildrenCountNodePointers = (survey, record, nodePointers) => {
+  let validation = {}
+  for (const nodePointer of nodePointers) {
+    const { node, childDef } = nodePointer
 
-      const validations = NodeDef.getValidations(childDef)
-      const minCount = NumberUtils.toNumber(NodeDefValidations.getMinCount(validations))
-      const maxCount = NumberUtils.toNumber(NodeDefValidations.getMaxCount(validations))
-      const hasMinCount = !isNaN(minCount)
-      const hasMaxCount = !isNaN(maxCount)
+    const count = _hasMinOrMaxCount(childDef) ? _countChildren(record, node, childDef) : 0
 
-      const count = (hasMinCount || hasMaxCount) ? countChildren(record, node, childDef) : 0
+    const nodeValidation = validateChildrenCount(survey, node, childDef, count)
 
-      const minCountValid = !hasMinCount || count >= minCount
-      const maxCountValid = !hasMaxCount || count <= maxCount
-
-      const childrenCountValidation = {
-        [Validator.keys.valid]: minCountValid && maxCountValid,
-        [Validator.keys.fields]: {
-          [RecordValidation.keys.minCount]: {
-            [Validator.keys.valid]: minCountValid,
-            [Validator.keys.errors]: minCountValid ? [] : [errorKeys.minCountNodesNotSpecified]
-          },
-          [RecordValidation.keys.maxCount]: {
-            [Validator.keys.valid]: maxCountValid,
-            [Validator.keys.errors]: maxCountValid ? [] : [errorKeys.maxCountNodesExceeded]
-          }
-        }
-      }
-
-      return {
-        [Node.getUuid(node)]: {
-          [Validator.keys.fields]: {
-            [RecordValidation.keys.childrenCount]: {
-              [Validator.keys.fields]: {
-                [NodeDef.getUuid(childDef)]: childrenCountValidation
-              },
-            }
-          }
-        }
-      }
-
-    }
-  )
-
-  return R.pipe(
-    R.flatten,
-    R.reduce(R.mergeDeepRight, {}),
-  )(nodePointersValidated)
+    validation = R.mergeDeepLeft({
+      [Node.getUuid(node)]: nodeValidation
+    }, validation)
+  }
+  return validation
 }
 
 const _hasMinOrMaxCount = nodeDef => {
   const validations = NodeDef.getValidations(nodeDef)
-  const minCount = NumberUtils.toNumber(NodeDefValidations.getMinCount(validations))
-  const maxCount = NumberUtils.toNumber(NodeDefValidations.getMaxCount(validations))
-  const hasMinCount = !isNaN(minCount)
-  const hasMaxCount = !isNaN(maxCount)
+  return NodeDefValidations.hasMinOrMaxCount(validations)
+}
 
-  return hasMinCount || hasMaxCount
+const _countChildren = (record, parentNode, childDef) => {
+  const nodes = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
+
+  return NodeDef.isEntity(childDef)
+    ? nodes.length
+    : R.pipe(
+      R.reject(Node.isValueBlank),
+      R.length
+    )(nodes)
 }
 
 module.exports = {
   validateChildrenCountNodes,
-  validateChildrenCountRecord
+  validateChildrenCountRecord,
+  validateChildrenCount
 }

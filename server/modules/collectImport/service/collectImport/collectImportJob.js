@@ -10,7 +10,6 @@ const NodeDefsImportJob = require('./metaImportJobs/nodeDefsImportJob')
 const SurveyDependencyGraphsGenerationJob = require('../../../survey/service/surveyDependencyGraphsGenerationJob')
 
 const RecordsImportJob = require('./dataImportJobs/recordsImportJob')
-const RecordsValidationJob = require('./dataImportJobs/recordsValidationJob')
 const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
 
 class CollectImportJob extends Job {
@@ -25,7 +24,6 @@ class CollectImportJob extends Job {
       new SurveyDependencyGraphsGenerationJob(),
       new RecordsImportJob(),
       new SurveyRdbGeneratorJob(),
-      new RecordsValidationJob(),
     ])
   }
 

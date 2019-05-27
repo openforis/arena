@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const NumberUtils = require('../../common/numberUtils')
+
 const keys = {
   required: 'required',
   count: 'count',
@@ -11,6 +13,16 @@ const keys = {
 const dissocCount = R.dissoc(keys.count)
 
 const getCountProp = key => R.pathOr('', [keys.count, key])
+
+const getMinCount = getCountProp(keys.min)
+
+const getMaxCount = getCountProp(keys.max)
+
+const hasMinOrMaxCount = validations => {
+  const minCount = NumberUtils.toNumber(getMinCount(validations))
+  const maxCount = NumberUtils.toNumber(getMaxCount(validations))
+  return !isNaN(minCount) || !isNaN(maxCount)
+}
 
 const assocCountProp = key =>
   value => R.pipe(
@@ -36,8 +48,9 @@ module.exports = {
   dissocRequired: R.dissoc(keys.required),
 
   //COUNT
-  getMinCount: getCountProp(keys.min),
-  getMaxCount: getCountProp(keys.max),
+  getMinCount,
+  getMaxCount,
+  hasMinOrMaxCount,
 
   assocMinCount: assocCountProp(keys.min),
   assocMaxCount: assocCountProp(keys.max),

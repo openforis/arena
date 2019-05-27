@@ -1,6 +1,9 @@
 const R = require('ramda')
 
+const Survey = require('../survey/survey')
+const NodeDef = require('../survey/nodeDef')
 const Record = require('./record')
+const Node = require('./node')
 const Validator = require('../validation/validator')
 
 const CountValidator = require('./_recordValidator/countValidator')
@@ -8,7 +11,6 @@ const AttributeValidator = require('./_recordValidator/attributeValidator')
 const EntityUniquenessValidator = require('./_recordValidator/entityUniquenessValidator')
 
 const validateNodes = async (survey, record, nodes) => {
-
 
   // 1. validate self and dependent attributes (validations/expressions)
   const attributeValidations = await AttributeValidator.validateSelfAndDependentAttributes(survey, record, nodes)
@@ -31,37 +33,52 @@ const validateNodes = async (survey, record, nodes) => {
 }
 
 const validateRecord = async (survey, record) => {
-  const nodes = Record.getNodes(record)
 
-  // 1. validate self and dependent attributes (validations/expressions)
-  console.log(`${new Date().getTime()} - validate attributes start`)
-  const attributeValidations = await AttributeValidator.validateSelfAndDependentAttributes(survey, record, nodes)
-  console.log(`${new Date().getTime()} - validate attributes end`)
+  // 1. validate attributes (validations/expressions)
+  // _log('validate attributes start')
+  const attributeValidations = {}
+  const { root } = Survey.getHierarchy()(survey)
+  Survey.traverseHierarchyItem(root, async nodeDefEntity => {
+    const nodeDefChildren = Survey.getNodeDefChildren(nodeDefEntity)(survey)
+    const nodeDefAttributes = nodeDefChildren.filter(NodeDef.isAttribute)
+    for (const nodeDefAttribute of nodeDefAttributes) {
+      const attributes = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDefAttribute))(record)
+      for (const attribute of attributes) {
+        const validation = await AttributeValidator.validateAttribute(survey, record, attribute, nodeDefAttribute)
+        if (validation)
+          attributeValidations[Node.getUuid(attribute)] = validation
+      }
+    }
+  })
+  // _log('validate attributes end')
 
   // 2. validate min/max count
-  console.log(`${new Date().getTime()} - validate children count start`)
+  // _log('validate children count start')
   const nodeCountValidations = CountValidator.validateChildrenCountRecord(survey, record)
-  console.log(`${new Date().getTime()} - validate children count end`)
+  // _log('validate children count end')
 
   // 3. validate entity keys uniqueness
-  console.log(`${new Date().getTime()} - validate entities uniqueness start`)
+  // _log('validate entities uniqueness start')
   const entityKeysValidations = EntityUniquenessValidator.validateEntitiesUniquenessInRecord(survey, record)
-  console.log(`${new Date().getTime()} - validate entities uniqueness end`)
+  // _log('validate entities uniqueness end')
 
   // 4. merge validations
-  console.log(`${new Date().getTime()} - merge validation start`)
+  // _log('merge validation start')
   const validation = {
     [Validator.keys.fields]: R.pipe(
       R.mergeDeepLeft(nodeCountValidations),
       R.mergeDeepLeft(entityKeysValidations)
     )(attributeValidations)
   }
-  console.log(`${new Date().getTime()} - merge validation end`)
+  // _log('merge validation end')
 
   return Validator.recalculateValidity(validation)
 }
 
+//const _log = message => console.log(`${new Date().getTime()} - ${message}`)
+
 module.exports = {
   validateNodes,
-  validateRecord
+  validateRecord,
+  validateChildrenCount: CountValidator.validateChildrenCount
 }

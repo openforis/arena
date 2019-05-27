@@ -68,8 +68,10 @@ module.exports = {
   deleteNode: RecordUpdateManager.deleteNode,
 
   // ==== VALIDATION
+  persistValidation: RecordValidationManager.persistValidation,
   validateNodesAndPersistValidation: RecordValidationManager.validateNodesAndPersistValidation,
   validateRecordAndPersistValidation: RecordValidationManager.validateRecordAndPersistValidation,
+  validateRecordKeysUniqueness: RecordValidationManager.validateRecordKeysUniqueness,
 
   // ====  UTILS
   disableTriggers: NodeRepository.disableTriggers,

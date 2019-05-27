@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const Survey = require('../../survey/survey')
 const NodeDef = require('../../survey/nodeDef')
@@ -58,16 +57,7 @@ const validateNodeValidations = (survey, record, nodeDef) =>
     )(applicableExpressionsEval)
   }
 
-const validateAttribute = async (survey, record, attribute, nodeDef, validatedNodeUuids) => {
-  if (Node.isDeleted(attribute)) {
-    return null
-  }
-
-  const nodeUuid = Node.getUuid(attribute)
-
-  // mark attribute validated
-  validatedNodeUuids.push(nodeUuid)
-
+const validateAttribute = async (survey, record, attribute, nodeDef) => {
   const validation = await Validator.validate(attribute, {
     [Node.keys.value]: [
       validateRequired(survey, nodeDef),
@@ -77,7 +67,7 @@ const validateAttribute = async (survey, record, attribute, nodeDef, validatedNo
   }, false)
 
   return {
-    [nodeUuid]: validation
+    [Node.getUuid(attribute)]: validation
   }
 }
 
@@ -90,39 +80,44 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
 
   const validatedAttributeUuids = [] //used to avoid validating 2 times the same attributes
 
-  const attributeValidationsArray = await Promise.all(
-    attributes.map(
-      async attribute => {
-        const dependents = Record.getDependentNodes(survey, attribute, Survey.dependencyTypes.validations)(record)
+  const attributeValidations = {}
 
-        // include attribute itself if it's not already included among dependents
-        const attributeAndDependents =
-          R.includes(dep => R.equals(attribute, dep.nodeCtx))(dependents)
-            ? dependents
-            : R.append({
-              nodeDef: getNodeDef(survey, attribute),
-              nodeCtx: attribute
-            })(dependents)
+  for (const attribute of attributes) {
+    const dependents = Record.getDependentNodes(survey, attribute, Survey.dependencyTypes.validations)(record)
 
-        // call validateAttribute for each attribute
-        return await Promise.all(
-          attributeAndDependents.map(
-            async ({ nodeCtx, nodeDef }) =>
-              await validateAttribute(survey, record, nodeCtx, nodeDef, validatedAttributeUuids)
-          )
-        )
+    // include attribute itself if it's not already included among dependents
+    const attributeAndDependents =
+      R.includes(dep => R.equals(attribute, dep.nodeCtx))(dependents)
+        ? dependents
+        : R.append({
+          nodeDef: getNodeDef(survey, attribute),
+          nodeCtx: attribute
+        })(dependents)
+
+    // call validateAttribute for each attribute
+
+    for (const { nodeCtx, nodeDef } of attributeAndDependents) {
+
+      if (Node.isDeleted(attribute)) {
+        return null
       }
-    )
-  )
-  return R.pipe(
-    R.flatten,
-    R.mergeAll
-  )(attributeValidationsArray)
+      const attributeValidation = await validateAttribute(survey, record, nodeCtx, nodeDef)
+
+      const nodeCtxUuid = Node.getUuid(nodeCtx)
+
+      // mark attribute validated
+      validatedAttributeUuids.push(nodeCtxUuid)
+
+      attributeValidations[nodeCtxUuid] = attributeValidation
+    }
+  }
+  return attributeValidations
 }
 
 const getNodeDef = (survey, node) =>
   Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
 module.exports = {
+  validateAttribute,
   validateSelfAndDependentAttributes
 }
