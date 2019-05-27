@@ -61,29 +61,21 @@ class RecordsImportJob extends Job {
 
       // this.logDebug(`${entryName} recordToCreate start`)
       const recordToCreate = Record.newRecord(user)
-      let record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
+      const record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
       const recordUuid = Record.getUuid(record)
       await RecordManager.updateRecordStep(surveyId, recordUuid, step, tx)
-
-      const collectRootEntityName = R.pipe(
-        R.keys,
-        R.reject(R.equals('_declaration')),
-        R.head,
-      )(collectRecordJson)
-
-      const collectRootEntity = collectRecordJson[collectRootEntityName]
       // this.logDebug(`${entryName} recordToCreate end`)
 
-      // this.logDebug(`${entryName} insertNode start`)
-      record = await this.insertNodes(survey, record, collectRootEntityName, collectRootEntity)
-      // this.logDebug(`${entryName} insertNode end`)
+      // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)
+      const recordValidation = await this.traverseCollectRecordAndInsertNodes(survey, record, collectRecordJson)
+      // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
 
       /*
       const validationRecordKeys = RecordManager.validateRecordKeysUniqueness(survey, record, this.tx)
       const validation = Record.mergeNodeValidations(validationRecordKeys)(record)
       */
       //persist validation
-      await RecordManager.persistValidation(survey, record, Record.getValidation(record), this.tx)
+      await RecordManager.persistValidation(survey, record, recordValidation, this.tx)
 
       this.logDebug(`-- end import record ${entryName}`)
 
@@ -128,15 +120,19 @@ class RecordsImportJob extends Job {
     throw new Error(`Entry data not found: ${entryName}`)
   }
 
-  async insertNodes (survey, record, collectRootEntityName, collectRootEntity) {
-
+  async traverseCollectRecordAndInsertNodes (survey, record, collectRecordJson) {
     const { nodeDefUuidByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
 
-    let recordValidation = {}
+    const collectRootEntityName = R.pipe(
+      R.keys,
+      R.reject(R.equals('_declaration')),
+      R.head,
+    )(collectRecordJson)
 
-    // init record nodes
-    record.nodes = {}
+    const collectRootEntity = collectRecordJson[collectRootEntityName]
+
     const recordUuid = Record.getUuid(record)
+    let recordValidation = Record.getValidation(record)
 
     const queue = new Queue([{
       nodeParent: null,
@@ -165,12 +161,7 @@ class RecordsImportJob extends Job {
       const value = R.prop('value', valueAndMeta)
       const meta = R.prop('meta', valueAndMeta)
 
-      // create insert values and add them to batch persister
-      const nodeValueInsert = _createNodeValueInsert(nodeDef, nodeToInsert, value, meta)
-      await this.batchPersister.addItem(nodeValueInsert, this.tx)
-
-      // assoc node to record
-      record.nodes[Node.getUuid(nodeToInsert)] = nodeToInsert
+      await this._insertNode(nodeDef, nodeToInsert, value, meta)
 
       if (NodeDef.isEntity(nodeDef)) {
 
@@ -179,16 +170,16 @@ class RecordsImportJob extends Job {
 
         queue.enqueueItems(nodesToInsert)
 
-        record = await this._insertMissingNodesRecursivelyAndValidate(survey, nodeDef, childrenCountByNodeDefUuid, record, nodeToInsert)
+        recordValidation = await this._insertMissingNodesRecursivelyAndValidate(survey, nodeDef, childrenCountByNodeDefUuid, recordValidation, nodeToInsert)
       }
     }
 
-    return record
+    return recordValidation
 
   }
 
-  async _insertMissingNodesRecursivelyAndValidate (survey, nodeDefParent, childrenCountByNodeDefUuid, record, nodeParent) {
-    let nodeParentValidation = {}
+  async _insertMissingNodesRecursivelyAndValidate (survey, nodeDefParent, childrenCountByNodeDefUuid, recordValidation, nodeParent) {
+    let nodeParentValidation = Validator.getFieldValidation(Node.getUuid(nodeParent))(recordValidation)
 
     const nodeDefChildren = Survey.getNodeDefChildren(nodeDefParent)(survey)
     for (const nodeDefChild of nodeDefChildren) {
@@ -200,27 +191,22 @@ class RecordsImportJob extends Job {
         const validationCount = RecordValidator.validateChildrenCount(survey, nodeParent, nodeDefChild, childrenCount)
 
         nodeParentValidation = R.mergeDeepLeft(validationCount)(nodeParentValidation)
+        recordValidation = Validator.assocFieldValidation(Node.getUuid(nodeParent), nodeParentValidation)(recordValidation)
       }
 
       // consider only single node defs not inserted yet
       if (NodeDef.isSingle(nodeDefChild) && childrenCount === 0) {
-        const nodeMissing = Node.newNode(nodeDefChildUuid, Record.getUuid(record), nodeParent)
+        const nodeMissing = Node.newNode(nodeDefChildUuid, Node.getRecordUuid(nodeParent), nodeParent)
 
-        record.nodes[Node.getUuid(nodeMissing)] = nodeMissing
-        // create insert values and add them to batch persister
-        await this.batchPersister.addItem(_createNodeValueInsert(nodeDefChild, nodeMissing), this.tx)
+        await this._insertNode(nodeDefChild, nodeMissing)
 
         if (NodeDef.isEntity(nodeDefChild)) {
-          record = await this._insertMissingNodesRecursivelyAndValidate(survey, nodeDefChild, {}, record, nodeMissing)
+          recordValidation = await this._insertMissingNodesRecursivelyAndValidate(survey, nodeDefChild, {}, recordValidation, nodeMissing)
         }
       }
     }
 
-    record = Record.mergeNodeValidations({
-      [Node.getUuid(nodeParent)]: nodeParentValidation
-    })(record)
-
-    return record
+    return recordValidation
   }
 
   _createNodeChildrenToInsert (collectNodeParent, collectNodeDefPathParent, nodeParent) {
@@ -266,31 +252,33 @@ class RecordsImportJob extends Job {
     }
   }
 
+  async _insertNode (nodeDef, node, value = null, meta = null) {
+    node.dateCreated = new Date()
+
+    const nodeValueInsert =  [
+      Node.getUuid(node),
+      node.dateCreated,
+      node.dateCreated,
+      Node.getRecordUuid(node),
+      Node.getParentUuid(node),
+      NodeDef.getUuid(nodeDef),
+      value === null || (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isCoordinate(nodeDef) || NodeDef.isFile(nodeDef))
+        ? value
+        : JSON.stringify(value),
+      {
+        ...meta,
+        [Node.metaKeys.childApplicability]: {}
+      }
+    ]
+
+    await this.batchPersister.addItem(nodeValueInsert, this.tx)
+  }
+
   async nodesBatchInsertHandler (nodeValues, tx) {
     const surveyId = this.getSurveyId()
     await RecordManager.insertNodesFromValues(surveyId, nodeValues, tx)
   }
 
-}
-
-const _createNodeValueInsert = (nodeDef, node, value = null, meta = null) => {
-  node.dateCreated = new Date()
-
-  return [
-    Node.getUuid(node),
-    node.dateCreated,
-    node.dateCreated,
-    Node.getRecordUuid(node),
-    Node.getParentUuid(node),
-    NodeDef.getUuid(nodeDef),
-    value === null || (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isCoordinate(nodeDef) || NodeDef.isFile(nodeDef))
-      ? value
-      : JSON.stringify(value),
-    {
-      ...meta,
-      [Node.metaKeys.childApplicability]: {}
-    }
-  ]
 }
 
 module.exports = RecordsImportJob
