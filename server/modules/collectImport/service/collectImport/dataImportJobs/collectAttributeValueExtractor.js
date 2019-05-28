@@ -13,17 +13,18 @@ const Node = require('../../../../../../common/record/node')
 const RecordFile = require('../../../../../../common/record/recordFile')
 
 const FileManager = require('../../../../record/manager/fileManager')
-const CollectRecordParseUtils = require('./collectRecordParseUtils')
+const CollectSurvey = require('../model/collectSurvey')
+const CollectRecord = require('../model/collectRecord')
 
 const extractTextValueAndMeta = collectNode => {
-  const value = CollectRecordParseUtils.getTextValue('value')(collectNode)
+  const value = CollectRecord.getTextValue('value')(collectNode)
   return value
     ? { value }
     : null
 }
 
 const extractCodeValueAndMeta = (survey, nodeDef, record, node) => collectNode => {
-  const code = CollectRecordParseUtils.getTextValue('code')(collectNode)
+  const code = CollectRecord.getTextValue('code')(collectNode)
 
   if (code) {
     const parentNode = Record.getParentNode(node)(record)
@@ -45,7 +46,7 @@ const extractCodeValueAndMeta = (survey, nodeDef, record, node) => collectNode =
 }
 
 const extractCoordinateValueAndMeta = collectNode => {
-  const { x, y, srs } = CollectRecordParseUtils.getTextValues(collectNode)
+  const { x, y, srs } = CollectRecord.getTextValues(collectNode)
 
   if (x && y && srs) {
     const srsId = R.ifElse(
@@ -70,18 +71,16 @@ const extractCoordinateValueAndMeta = collectNode => {
 }
 
 const extractDateValueAndMeta = collectNode => {
-  const { day, month, year } = CollectRecordParseUtils.getTextValues(collectNode)
+  const { day, month, year } = CollectRecord.getTextValues(collectNode)
   return {
     value: DateUtils.formatDate(day, month, year)
   }
 }
 
-const extractFileValueAndMeta = (survey, node, collectSurvey, collectSurveyFileZip, collectNodeDefPath, tx) => async collectNode => {
-  const { file_name, file_size } = CollectRecordParseUtils.getTextValues(collectNode)
+const extractFileValueAndMeta = (survey, node, collectSurvey, collectSurveyFileZip, collectNodeDef, tx) => async collectNode => {
+  const { file_name, file_size } = CollectRecord.getTextValues(collectNode)
 
-  const collectNodeDef = CollectRecordParseUtils.getCollectNodeDefByPath(collectSurvey, collectNodeDefPath)
-
-  const collectNodeDefId = collectNodeDef.attributes.id
+  const collectNodeDefId = CollectSurvey.getAttribute('id')(collectNodeDef)
   const content = collectSurveyFileZip.getEntryData(`upload/${collectNodeDefId}/${file_name}`)
 
   if (content) {
@@ -102,7 +101,7 @@ const extractFileValueAndMeta = (survey, node, collectSurvey, collectSurveyFileZ
 }
 
 const extractTaxonValueAndMeta = (survey, nodeDef) => collectNode => {
-  const { code, scientific_name, vernacular_name } = CollectRecordParseUtils.getTextValues(collectNode)
+  const { code, scientific_name, vernacular_name } = CollectRecord.getTextValues(collectNode)
   const taxonUuid = Survey.getTaxonUuid(nodeDef, code)(survey)
 
   if (taxonUuid) {
@@ -132,7 +131,7 @@ const extractTaxonValueAndMeta = (survey, nodeDef) => collectNode => {
 }
 
 const extractTimeValueAndMeta = collectNode => {
-  const { hour, minute } = CollectRecordParseUtils.getTextValues(collectNode)
+  const { hour, minute } = CollectRecord.getTextValues(collectNode)
   return {
     value: DateUtils.formatTime(hour, minute)
   }
@@ -140,7 +139,7 @@ const extractTimeValueAndMeta = collectNode => {
 
 const extractAttributeValueAndMeta = async (
   survey, nodeDef, record, node, // arena items
-  collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode, // collect items
+  collectSurveyFileZip, collectSurvey, collectNodeDef, collectNode, // collect items
   tx,
 ) => {
 
@@ -161,7 +160,7 @@ const extractAttributeValueAndMeta = async (
       return extractDateValueAndMeta(collectNode)
 
     case nodeDefType.file:
-      return await extractFileValueAndMeta(survey, node, collectSurvey, collectSurveyFileZip, collectNodeDefPath, tx)(collectNode)
+      return await extractFileValueAndMeta(survey, node, collectSurvey, collectSurveyFileZip, collectNodeDef, tx)(collectNode)
 
     case nodeDefType.taxon:
       return extractTaxonValueAndMeta(survey, nodeDef)(collectNode)

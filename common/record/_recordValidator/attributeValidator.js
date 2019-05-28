@@ -57,19 +57,14 @@ const validateNodeValidations = (survey, record, nodeDef) =>
     )(applicableExpressionsEval)
   }
 
-const validateAttribute = async (survey, record, attribute, nodeDef) => {
-  const validation = await Validator.validate(attribute, {
+const validateAttribute = async (survey, record, attribute, nodeDef) =>
+  await Validator.validate(attribute, {
     [Node.keys.value]: [
       validateRequired(survey, nodeDef),
       AttributeTypeValidator.validateValueType(survey, nodeDef),
       validateNodeValidations(survey, record, nodeDef)
     ]
   }, false)
-
-  return {
-    [Node.getUuid(attribute)]: validation
-  }
-}
 
 const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
 

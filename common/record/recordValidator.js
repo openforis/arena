@@ -80,5 +80,6 @@ const validateRecord = async (survey, record) => {
 module.exports = {
   validateNodes,
   validateRecord,
+  validateAttribute: AttributeValidator.validateAttribute,
   validateChildrenCount: CountValidator.validateChildrenCount
 }

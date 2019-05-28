@@ -3,7 +3,7 @@ const FileXml = require('../../../../../../common/file/fileXml')
 
 const Job = require('../../../../../job/job')
 
-const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
+const CollectSurvey = require('../model/collectSurvey')
 
 const idmlXmlFileName = 'idml.xml'
 
@@ -24,7 +24,7 @@ class CollectSurveyReaderJob extends Job {
 
     const idmlXml = await collectSurveyFileZip.getEntryAsText(idmlXmlFileName)
     const idmlJsonObj = FileXml.parseToJson(idmlXml, false)
-    const collectSurvey = CollectIdmlParseUtils.getElementByName('survey')(idmlJsonObj)
+    const collectSurvey = CollectSurvey.getElementByName('survey')(idmlJsonObj)
 
     this.setContext({ collectSurveyFileZip, collectSurvey })
   }
