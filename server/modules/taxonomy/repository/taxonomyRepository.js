@@ -84,7 +84,9 @@ const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client = db) =
 
 const fetchTaxonomiesBySurveyId = async (surveyId, draft = false, client = db) =>
   await client.map(
-    `SELECT * FROM ${getSurveyDBSchema(surveyId)}.taxonomy`,
+    `SELECT * 
+     FROM ${getSurveyDBSchema(surveyId)}.taxonomy 
+     ORDER BY ${DbUtils.getPropColCombined(Taxonomy.taxonomyPropKeys.name, draft)}, id`,
     [],
     record => dbTransformCallback(record, draft, true)
   )
