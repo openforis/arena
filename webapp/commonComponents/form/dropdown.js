@@ -43,10 +43,12 @@ class Dropdown extends React.Component {
       })
     }
 
-    if (selection && !R.equals(selection, prevSelection)) {
-      this.setState({
-        displayValue: this.getItemLabel(selection),
-      })
+    if (!R.equals(selection, prevSelection)) {
+      const displayValue = selection
+        ? this.getItemLabel(selection)
+        : null
+
+      this.setState({ displayValue })
     }
   }
 
