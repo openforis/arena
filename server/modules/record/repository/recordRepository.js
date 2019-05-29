@@ -54,13 +54,28 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
     nodeDefKey => `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
   ).join(',')
 
-  return await client.map(`
+  const recordsSelect = `
     SELECT 
-      r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')}, validation,
+        r.uuid, 
+        r.owner_id, 
+        r.step, 
+        ${selectDate('r.date_created', 'date_created')}, 
+        r.validation
+    FROM ${getSurveyDBSchema(surveyId)}.record r
+    WHERE r.preview = FALSE
+    ORDER BY r.date_created DESC
+    LIMIT ${limit ? limit : 'ALL'}
+    OFFSET ${offset}
+  `
+
+  return await client.map(`
+    WITH r AS (${recordsSelect})
+    SELECT 
+      r.*,
       n.date_modified,
       u.name as owner_name,
       ${nodeDefKeysSelect}
-    FROM ${getSurveyDBSchema(surveyId)}.record r
+    FROM  r
     -- GET OWNER NAME
     JOIN "user" u
       ON r.owner_id = u.id
@@ -69,6 +84,8 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
          SELECT 
            record_uuid, ${selectDate('MAX(date_modified)', 'date_modified')}
          FROM ${getSurveyDBSchema(surveyId)}.node
+         WHERE
+           record_uuid IN (select uuid from r)
          GROUP BY record_uuid
     ) as n
       ON r.uuid = n.record_uuid
@@ -76,10 +93,6 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
     LEFT OUTER JOIN
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
-    WHERE r.preview = FALSE
-    ORDER BY r.date_created DESC
-    LIMIT ${limit ? limit : 'ALL'}
-    OFFSET ${offset}
   `,
     [],
     dbTransformCallback(surveyId, false)
