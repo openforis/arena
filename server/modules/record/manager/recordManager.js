@@ -54,6 +54,7 @@ module.exports = {
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
   fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,
   fetchChildNodesByNodeDefUuid: NodeRepository.fetchChildNodesByNodeDefUuid,
+  fetchDuplicateEntityKeyNodeUuids: NodeRepository.fetchDuplicateEntityKeyNodeUuids,
 
   // ==== UPDATE
   createRecord: RecordUpdateManager.createRecord,

@@ -82,6 +82,79 @@ const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, child
   return R.head(nodes)
 }
 
+const fetchDuplicateEntityKeyNodeUuids = async (surveyId, nodeDefUuid, nodeDefKeyUuids, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+
+  return await client.any(`
+    WITH node_key AS (
+      SELECT k.parent_uuid, json_agg(k.value)::text as key
+      FROM (
+         SELECT k.parent_uuid, k.value
+         FROM ${schema}.node k 
+         WHERE k.node_def_uuid in ($2:list)
+         --order by node def uuid to ensure getting always key nodes in the same order
+         ORDER by k.parent_uuid, k.node_def_uuid
+      ) k
+      GROUP by k.parent_uuid
+    )
+
+    SELECT e.record_uuid, json_agg(n.uuid) as node_uuids
+    FROM ${schema}.node e
+      JOIN ${schema}.node n
+        ON n.record_uuid = e.record_uuid 
+          AND n.parent_uuid = e.uuid AND n.node_def_uuid in ($2:list)
+    WHERE e.node_def_uuid = $1
+    AND EXISTS (
+        SELECT n1.*
+        FROM ${schema}.node n1
+        WHERE n1.parent_uuid = e.parent_uuid
+          AND n1.uuid != e.uuid
+          AND (SELECT k1.key FROM node_key k1 WHERE k1.parent_uuid = e.uuid)::text = (SELECT k.key FROM node_key k WHERE k.parent_uuid = e.uuid)::text
+    )
+    GROUP BY e.record_uuid`,
+    [nodeDefUuid, nodeDefKeyUuids]
+  )
+}
+
+/*
+const fetchDuplicateEntityKeyNodeUuids = async (surveyId, recordUuid, nodeDefUuid, nodeDefKeyUuids, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+
+  return await client.any(`
+    WITH node_key AS (
+      SELECT k.parent_uuid, json_agg(k.value)::text as key
+      FROM (
+         SELECT k.parent_uuid, k.value
+         FROM ${schema}.node k 
+         WHERE k.record_uuid = $1 AND 
+               k.node_def_uuid in ($3:list)
+         --order by node def uuid to ensure getting always key nodes in the same order
+         ORDER by k.parent_uuid, k.node_def_uuid
+      ) k
+      GROUP by k.parent_uuid
+    )
+
+    SELECT json_agg(n.uuid) as node_uuids
+    FROM ${schema}.node e
+      JOIN ${schema}.node n
+        ON n.record_uuid = e.record_uuid AND 
+           n.parent_uuid = e.uuid AND n.node_def_uuid in ($3:list)
+    WHERE e.record_uuid = $1 AND 
+          e.node_def_uuid = $2
+    AND EXISTS (
+        SELECT ed.*
+        FROM ${schema}.node ed
+        WHERE ed.record_uuid = $1 AND 
+          ed.parent_uuid = e.parent_uuid AND 
+          ed.uuid != e.uuid AND 
+          (SELECT k1.key FROM node_key k1 WHERE k1.parent_uuid = e.uuid)::text = (SELECT k.key FROM node_key k WHERE k.parent_uuid = ed.uuid)::text
+    )
+    GROUP BY e.record_uuid`,
+    [recordUuid, nodeDefUuid, nodeDefKeyUuids]
+  )
+}
+*/
+
 // ============== UPDATE
 const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
   await client.one(`
@@ -145,6 +218,7 @@ module.exports = {
   fetchNodeByUuid,
   fetchChildNodesByNodeDefUuid,
   fetchChildNodeByNodeDefUuid,
+  fetchDuplicateEntityKeyNodeUuids,
 
   //UPDATE
   updateNode,

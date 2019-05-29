@@ -30,7 +30,7 @@ const run = async (survey, nodeDef, client) => {
     [nodeDefUuid]
   )
 
-  const limit = 10000
+  const limit = 5000
   const noIter = Math.ceil(count / limit)
   for (let i = 0; i < noIter; i++) {
     const offset = i * limit
