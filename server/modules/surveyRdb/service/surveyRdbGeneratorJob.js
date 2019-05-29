@@ -32,6 +32,9 @@ class SurveyRdbGeneratorJob extends Job {
 
     //2 ==== traverse entities to create and populate tables
     const traverseNodeDef = async nodeDef => {
+      if(this.isCanceled())
+        return
+
       const nodeDefName = NodeDef.getName(nodeDef)
 
       // ===== create table

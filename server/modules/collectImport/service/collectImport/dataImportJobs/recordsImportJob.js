@@ -41,19 +41,6 @@ class RecordsImportJob extends Job {
     const surveyId = this.getSurveyId()
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, tx)
 
-    /*
-    //Survey node def children by parent cache
-
-    this.nodeDefChildrenUuidByParentUuid = {}
-    Survey.getNodeDefsArray(survey).forEach(nodeDef => {
-      let childrenUuids = this.nodeDefChildrenUuidByParentUuid[NodeDef.getParentUuid(nodeDef)]
-      if (!childrenUuids) {
-        childrenUuids = []
-        this.nodeDefChildrenUuidByParentUuid[NodeDef.getParentUuid(nodeDef)] = childrenUuids
-      }
-      childrenUuids.push(NodeDef.getUuid(nodeDef))
-    })
-    */
     const entryNames = this.getEntryNames()
 
     this.total = entryNames.length
@@ -185,107 +172,89 @@ class RecordsImportJob extends Job {
       if (NodeDef.isEntity(nodeDef)) {
 
         // create child nodes to insert
-        const { nodesToInsert, childrenCountByNodeDefUuid } = this._createNodeChildrenToInsert(collectNode, collectNodeDef, collectNodeDefPath, nodeToInsert)
-
+        const { nodesToInsert, validation } = this._createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, nodeToInsert, recordValidation)
+        recordValidation = validation
         queue.enqueueItems(nodesToInsert)
 
-        recordValidation = await this._insertMissingNodesRecursivelyAndValidate(survey, nodeDef, nodeToInsert, childrenCountByNodeDefUuid, recordValidation, collectNodeDef, collectNodeDefPath)
       } else {
         const validationAttribute = RecordValidator.validateAttribute(nodeToInsert)
-        recordValidation = Validator.assocFieldValidation(Node.getUuid(validationAttribute), validationAttribute)(recordValidation)
-      }
-    }
-
-    return recordValidation
-
-  }
-
-  async _insertMissingNodesRecursivelyAndValidate (survey, nodeDefParent, nodeParent, childrenCountByNodeDefUuid, recordValidation, collectNodeDefParent, collectNodeDefParentPath) {
-    const { nodeDefUuidByCollectPath } = this.context
-
-    let nodeParentValidation = Validator.getFieldValidation(Node.getUuid(nodeParent))(recordValidation)
-
-    /*
-    const nodeDefChildren = this.nodeDefChildrenUuidByParentUuid[NodeDef.getUuid(nodeDefParent)].map(uuid => Survey.getNodeDefByUuid(uuid)(survey))
-    //const nodeDefChildren = Survey.getNodeDefChildren(nodeDefParent)(survey)
-    for (const nodeDefChild of nodeDefChildren) {
-      const nodeDefChildUuid = NodeDef.getUuid(nodeDefChild)
-    */
-    const collectNodeDefChildren = CollectSurvey.getNodeDefChildren(collectNodeDefParent)
-
-    for (const collectNodeDefChild of collectNodeDefChildren) {
-      const collectNodeDefChildPath = collectNodeDefParentPath + '/' + CollectSurvey.getAttributeName(collectNodeDefChild)
-      const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
-      const nodeDefChild = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
-
-      const childrenCount = R.propOr(0, nodeDefChildUuid, childrenCountByNodeDefUuid)
-
-      //validate min/max count
-      if (NodeDefValidations.hasMinOrMaxCount(NodeDef.getValidations(nodeDefChild))) {
-        const validationCount = RecordValidator.validateChildrenCount(survey, nodeParent, nodeDefChild, childrenCount)
-
-        nodeParentValidation = R.mergeDeepLeft(validationCount)(nodeParentValidation)
-        recordValidation = Validator.assocFieldValidation(Node.getUuid(nodeParent), nodeParentValidation)(recordValidation)
-      }
-
-      // consider only single node defs not inserted yet
-      if (NodeDef.isSingle(nodeDefChild) && childrenCount === 0) {
-        const nodeMissing = Node.newNode(nodeDefChildUuid, Node.getRecordUuid(nodeParent), nodeParent)
-
-        await this._insertNode(nodeDefChild, nodeMissing)
-
-        if (NodeDef.isEntity(nodeDefChild)) {
-          recordValidation = await this._insertMissingNodesRecursivelyAndValidate(survey, nodeDefChild, nodeMissing, {}, recordValidation, collectNodeDefChild, collectNodeDefChildPath)
+        if (!Validator.isValidationValid(validationAttribute)) {
+          recordValidation[Validator.keys.valid] = false
+          recordValidation[Validator.keys.fields][Node.getUuid(nodeToInsert)] = validationAttribute
         }
       }
     }
 
     return recordValidation
+
   }
 
-  _createNodeChildrenToInsert (collectNodeParent, collectNodeDef, collectNodeDefPathParent, nodeParent) {
+  _createNodeChildrenToInsert (survey, collectNodeDef, collectNodeDefPath, collectNode, node, recordValidation) {
     const { nodeDefUuidByCollectPath } = this.context
 
     //output
     const nodesToInsert = []
-    const childrenCountByNodeDefUuid = {}
 
-    const collectNodeDefChildNames = R.pipe(
-      R.keys,
-      R.reject(R.equals('_attributes'))
-    )(collectNodeParent)
+    const nodeUuid = Node.getUuid(node)
+    let nodeValidation = Validator.getFieldValidation(nodeUuid)(recordValidation)
 
-    for (const collectNodeDefChildName of collectNodeDefChildNames) {
+    const collectNodeDefChildren = CollectSurvey.getNodeDefChildren(collectNodeDef)
+    for (const collectNodeDefChild of collectNodeDefChildren) {
       if (this.isCanceled())
         break
 
-      const collectNodeDefChildPath = collectNodeDefPathParent + '/' + collectNodeDefChildName
+      const collectNodeDefChildName = CollectSurvey.getAttributeName(collectNodeDefChild)
+      const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
       const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
 
       if (nodeDefChildUuid) {
-        const collectChildNodes = CollectRecord.getNodeChildren([collectNodeDefChildName])(collectNodeParent)
+        const nodeDefChild = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
+        const collectChildNodes = CollectRecord.getNodeChildren([collectNodeDefChildName])(collectNode)
 
-        childrenCountByNodeDefUuid[nodeDefChildUuid] = collectChildNodes.length
+        const childrenCount = collectChildNodes.length
 
-        const collectNodeDefChild = CollectSurvey.getNodeDefChildByName(collectNodeDefChildName)(collectNodeDef)
-
+        // if children count > 0
         for (const collectChildNode of collectChildNodes) {
           if (this.isCanceled())
             break
 
           nodesToInsert.push({
-            nodeParent,
+            nodeParent: node,
             collectNodeDef: collectNodeDefChild,
             collectNodeDefPath: collectNodeDefChildPath,
             collectNode: collectChildNode
           })
         }
+
+        //validate min/max count
+        if (NodeDefValidations.hasMinOrMaxCount(NodeDef.getValidations(nodeDefChild))) {
+          const validationCount = RecordValidator.validateChildrenCount(survey, node, nodeDefChild, childrenCount)
+
+          if (!Validator.isValidationValid(validationCount)) {
+            recordValidation[Validator.keys.valid] = false
+            nodeValidation = R.mergeDeepRight(nodeValidation, validationCount)
+            recordValidation[Validator.keys.fields][nodeUuid] = nodeValidation
+          }
+
+        }
+
+        if (NodeDef.isSingle(nodeDefChild) && childrenCount === 0) {
+          nodesToInsert.push({
+            nodeParent: node,
+            collectNodeDef: collectNodeDefChild,
+            collectNodeDefPath: collectNodeDefChildPath,
+            collectNode: {}
+          })
+        }
+
+      } else {
+        this.logDebug(`==== NodeDef not found for ${collectNodeDefChildPath}`)
       }
     }
 
     return {
       nodesToInsert,
-      childrenCountByNodeDefUuid
+      recordValidation
     }
   }
 

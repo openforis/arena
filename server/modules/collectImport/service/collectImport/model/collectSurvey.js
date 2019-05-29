@@ -7,7 +7,7 @@ const collectNodeDefTypes = {
   boolean: 'boolean',
   code: 'code',
   coordinate: 'coordinate',
-  data: 'data',
+  date: 'date',
   entity: 'entity',
   file: 'file',
   number: 'number',

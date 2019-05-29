@@ -30,14 +30,14 @@ const run = async (survey, nodeDef, client) => {
     [nodeDefUuid]
   )
 
-  const limit = 5000
+  const limit = 10000
   const noIter = Math.ceil(count / limit)
   for (let i = 0; i < noIter; i++) {
     const offset = i * limit
 
     const selectNodeRows = `
       SELECT
-        n.uuid, n.node_def_uuid, n.record_uuid, n.parent_uuid, n.value
+        n.uuid, n.record_uuid, n.parent_uuid, n.value
       FROM
         ${surveySchema}.node n
         WHERE n.node_def_uuid = $1

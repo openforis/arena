@@ -17,45 +17,46 @@ const errorKeys = {
   invalidValue: 'invalidValue',
 }
 
-const validateRequired = (survey, nodeDef) =>
-  (propName, node) =>
-    Node.isValueBlank(node) &&
-    (NodeDef.isKey(nodeDef) || NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef)))
-      ? errorKeys.required
-      : null
+const validateRequired = (survey, nodeDef) => (propName, node) =>
+  (
+    NodeDef.isKey(nodeDef) ||
+    NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
+  ) &&
+  Node.isValueBlank(node)
+    ? errorKeys.required
+    : null
 
 /**
  * Evaluates the validation expressions.
  * Returns 'null' if all are valid, a concatenated error message otherwise.
  */
-const validateNodeValidations = (survey, record, nodeDef) =>
-  async (propName, node) => {
-    if (Node.isValueBlank(node)) {
-      return null
-    }
-    const validations = NodeDef.getValidations(nodeDef)
-
-    const applicableExpressionsEval = await RecordExprParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations))
-
-    const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-
-    return R.pipe(
-      R.reduce(
-        (acc, exprEval) => {
-          const { expression, value: valid } = exprEval
-          return valid
-            ? acc
-            : R.append(NodeDefExpression.getMessage(lang, errorKeys.invalidValue)(expression), acc)
-        },
-        []
-      ),
-      R.ifElse(
-        R.isEmpty,
-        R.always(null), //all validations are 'valid'
-        R.join('; ') //join the error messages with a ';' separator
-      )
-    )(applicableExpressionsEval)
+const validateNodeValidations = (survey, record, nodeDef) => async (propName, node) => {
+  if (Node.isValueBlank(node)) {
+    return null
   }
+  const validations = NodeDef.getValidations(nodeDef)
+
+  const applicableExpressionsEval = await RecordExprParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations))
+
+  const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+
+  return R.pipe(
+    R.reduce(
+      (acc, exprEval) => {
+        const { expression, value: valid } = exprEval
+        return valid
+          ? acc
+          : R.append(NodeDefExpression.getMessage(lang, errorKeys.invalidValue)(expression), acc)
+      },
+      []
+    ),
+    R.ifElse(
+      R.isEmpty,
+      R.always(null), //all validations are 'valid'
+      R.join('; ') //join the error messages with a ';' separator
+    )
+  )(applicableExpressionsEval)
+}
 
 const validateAttribute = async (survey, record, attribute, nodeDef) =>
   await Validator.validate(attribute, {
