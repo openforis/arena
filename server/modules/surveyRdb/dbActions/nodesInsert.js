@@ -9,14 +9,6 @@ const SurveySchemaRepository = require('../../survey/repository/surveySchemaRepo
 
 const DataTable = require('../schemaRdb/dataTable')
 
-const getNodesRowValues = (survey, nodeDefRow, nodeRows) => {
-  const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDefRow)
-
-  return nodeRows.map(
-    nodeRow => DataTable.getRowValues(survey, nodeDefRow, nodeRow, nodeDefColumns)
-  )
-}
-
 const run = async (survey, nodeDef, client) => {
 
   const surveyId = Survey.getId(survey)
@@ -24,28 +16,19 @@ const run = async (survey, nodeDef, client) => {
 
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDef)
 
-  const { count } = await client.one(
-    `SELECT count(*) FROM ${surveySchema}.node WHERE node_def_uuid = $1`,
-    [nodeDefUuid]
-  )
-
-  const limit = 5000
-  const noIter = Math.ceil(count / limit)
-  for (let i = 0; i < noIter; i++) {
-    const offset = i * limit
-
-    const selectNodeRows = `
+  const selectNodeRows = `
       SELECT
-        n.uuid, n.node_def_uuid, n.record_uuid, n.parent_uuid, n.value
+        n.id, n.uuid, n.node_def_uuid, n.record_uuid, n.parent_uuid, n.value
       FROM
         ${surveySchema}.node n
         WHERE n.node_def_uuid = $1
         ORDER BY n.id
-        OFFSET ${offset} LIMIT ${limit}
+        
     `
-    const selectQuery = NodeDef.isEntity(nodeDef)
-      ? `
+  const selectQuery = NodeDef.isEntity(nodeDef)
+    ? `
         WITH
           n AS
           (${selectNodeRows})
@@ -69,12 +52,30 @@ const run = async (survey, nodeDef, client) => {
         ON
           n.uuid = c.parent_uuid
         `
-      : selectNodeRows
+    : selectNodeRows
 
-    const nodes = await client.any(selectQuery, [nodeDefUuid])
+  // 1. create materialized view
+  const vName = `${surveySchema}.m_view_data`
+  await client.none(`CREATE MATERIALIZED VIEW ${vName} AS ${selectQuery}`, [nodeDefUuid])
 
-    const nodesRowValues = getNodesRowValues(survey, nodeDef, nodes)
+  const { count } = await client.one(
+    `SELECT count(*) FROM ${vName}`,
+  )
 
+  const limit = 5000
+  const noIter = Math.ceil(count / limit)
+  for (let i = 0; i < noIter; i++) {
+    const offset = i * limit
+
+    // 2. fetch nodes
+    const nodes = await client.any(`select * from ${vName} ORDER BY id OFFSET ${offset} LIMIT ${limit}  `)
+
+    // 3. convert nodes into values
+    const nodesRowValues = nodes.map(
+      nodeRow => DataTable.getRowValues(survey, nodeDef, nodeRow, nodeDefColumns)
+    )
+
+    // 4. insert node values
     await client.none(insertAllQuery(
       SchemaRdb.getName(surveyId),
       NodeDefTable.getTableName(nodeDef, nodeDefParent),
@@ -84,6 +85,8 @@ const run = async (survey, nodeDef, client) => {
 
   }
 
+  // 5. drop materialized view
+  await client.none(`DROP MATERIALIZED VIEW ${vName}`)
 }
 
 module.exports = {
