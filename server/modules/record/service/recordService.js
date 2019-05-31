@@ -2,6 +2,7 @@ const R = require('ramda')
 const path = require('path')
 const fs = require('fs')
 
+const Survey = require('../../../../common/survey/survey')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 const RecordFile = require('../../../../common/record/recordFile')
@@ -12,6 +13,7 @@ const WebSocket = require('../../../utils/webSocket')
 const WebSocketEvents = require('../../../../common/webSocket/webSocketEvents')
 const ThreadManager = require('../../../threads/threadManager')
 
+const SurveyManager = require('../../survey/manager/surveyManager')
 const RecordManager = require('../manager/recordManager')
 const FileManager = require('../manager/fileManager')
 
@@ -100,9 +102,11 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
 }
 
 const checkIn = async (user, surveyId, recordUuid) => {
+  const survey = await SurveyManager.fetchSurveyById(surveyId, true, false)
+  const surveyInfo = Survey.getSurveyInfo(survey)
   const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid)
 
-  if (canEditRecord(user, record)) {
+  if ((Survey.isPublished(surveyInfo) || Record.isPreview(record)) && canEditRecord(user, record)) {
     createUserThread(user, surveyId, recordUuid, Record.isPreview(record), false)
   }
 
