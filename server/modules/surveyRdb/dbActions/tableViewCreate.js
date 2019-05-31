@@ -1,4 +1,5 @@
 const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
 const DataTable = require('../schemaRdb/dataTable')
@@ -14,6 +15,7 @@ const toTableViewCreate = (survey, nodeDef) => {
     schemaName,
     tableName,
     colsAndType: DataTable.getColumnNamesAndType(survey, nodeDef),
+    recordForeignKey: DataTable.getRecordForeignKey(surveyId, nodeDef),
     parentForeignKey: DataTable.getParentForeignKey(surveyId, schemaName, nodeDef, nodeDefParent),
     uuidUniqueIdx: DataTable.getUuidUniqueConstraint(nodeDef),
 
@@ -36,7 +38,8 @@ const run = async (survey, nodeDef, client) => {
       date_modified TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC'),
       ${tableViewCreate.colsAndType.join(', ')},
       ${tableViewCreate.uuidUniqueIdx},
-      ${tableViewCreate.parentForeignKey},
+      ${tableViewCreate.recordForeignKey}
+      ${NodeDef.isRoot(nodeDef) ? '' : ', ' + tableViewCreate.parentForeignKey},
       PRIMARY KEY (id)
     )
   `)

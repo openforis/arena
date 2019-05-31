@@ -2,7 +2,7 @@ const R = require('ramda')
 const camelize = require('camelize')
 
 const db = require('../../../db/db')
-const { selectDate } = require('../../../db/dbUtils')
+const DbUtils = require('../../../db/dbUtils')
 
 const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
@@ -13,7 +13,7 @@ const Validator = require('../../../../common/validation/validator')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
-const recordSelectFields = `uuid, owner_id, step, ${selectDate('date_created')}, preview, validation`
+const recordSelectFields = `uuid, owner_id, step, ${DbUtils.selectDate('date_created')}, preview, validation`
 
 const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
   const validation = Record.getValidation(record)
@@ -56,7 +56,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
 
   return await client.map(`
     SELECT 
-      r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')}, validation,
+      r.uuid, r.owner_id, r.step, ${DbUtils.selectDate('r.date_created', 'date_created')}, validation,
       n.date_modified,
       u.name as owner_name,
       ${nodeDefKeysSelect}
@@ -67,7 +67,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
     -- GET LAST MODIFIED NODE DATE
     LEFT OUTER JOIN (
          SELECT 
-           record_uuid, ${selectDate('MAX(date_modified)', 'date_modified')}
+           record_uuid, ${DbUtils.selectDate('MAX(date_modified)', 'date_modified')}
          FROM ${getSurveyDBSchema(surveyId)}.node
          GROUP BY record_uuid
     ) as n
@@ -123,6 +123,19 @@ const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
     [step, recordUuid]
   )
 
+const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) => {
+  const query  =DbUtils.updateAllQuery(
+    getSurveyDBSchema(surveyId),
+    'record',
+    'uuid',
+    ['validation'],
+    recordUuidAndValidationValues, //recordUuidAndValidationValues.map(recordUuidAndValidtionValue => [recordUuidAndValidtionValue[0], JSON.stringify(recordUuidAndValidtionValue[1])])
+  )
+  console.log('====query', query)
+
+  return await client.none(query)
+}
+
 // ============== DELETE
 
 const deleteRecord = async (surveyId, recordUuid, client = db) =>
@@ -156,6 +169,7 @@ module.exports = {
   // UPDATE
   updateValidation,
   updateRecordStep,
+  updateRecordValidationsFromValues,
 
   // DELETE
   deleteRecord,

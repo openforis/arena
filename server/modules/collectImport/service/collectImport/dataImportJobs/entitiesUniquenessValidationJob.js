@@ -1,76 +1,111 @@
 const R = require('ramda')
 
+const ObjectUtils = require('../../../../../../common/objectUtils')
 const BatchPersister = require('../../../../../db/batchPersister')
-
-const FileXml = require('../../../../../../common/file/fileXml')
-const Queue = require('../../../../../../common/queue')
 
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
-const NodeDefValidations = require('../../../../../../common/survey/nodeDefValidations')
 const Record = require('../../../../../../common/record/record')
-const Node = require('../../../../../../common/record/node')
 const RecordValidation = require('../../../../../../common/record/recordValidation')
-const RecordValidator = require('../../../../../../common/record/recordValidator')
 const Validator = require('../../../../../../common/validation/validator')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../../record/manager/recordManager')
+const SurveyRdbManager = require('../../../../surveyRdb/manager/surveyRdbManager')
 
 const Job = require('../../../../../job/job')
-
-const CollectRecord = require('../model/collectRecord')
-const CollectAttributeValueExtractor = require('./collectAttributeValueExtractor')
-
-const CollectSurvey = require('../model/collectSurvey')
 
 class EntitiesUniquenessValidationJob extends Job {
 
   constructor (params) {
     super(EntitiesUniquenessValidationJob.type, params)
+
+    this.recordValidationBatchPersister = new BatchPersister(this.persistRecordsValidation.bind(this))
   }
 
   async onStart () {
     await super.onStart()
     await RecordManager.disableTriggers(this.getSurveyId(), this.tx)
+
+    this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.getSurveyId(), true, true, false, this.tx)
   }
 
   async execute (tx) {
-    const surveyId = this.getSurveyId()
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, this.tx)
-    const { root } = Survey.getHierarchy()(survey)
+    const { root, length } = Survey.getHierarchy()(this.survey)
+
+    this.total = length - 1 //do not consider root entity
+
     await Survey.traverseHierarchyItem(root, async nodeDefEntity => {
-      const nodeDefKeys = Survey.getNodeDefKeys(nodeDefEntity)(survey)
-      if (!R.isEmpty(nodeDefKeys)) {
-        const nodeDefKeyUuids = nodeDefKeys.map(NodeDef.getUuid)
-        const recordNodeUuidsDuplicates = await RecordManager.fetchDuplicateEntityKeyNodeUuids(surveyId, NodeDef.getUuid(nodeDefEntity), nodeDefKeyUuids, this.tx)
+      //ignore root entity uniqueness check (it will be performed by record key uniqueness check job)
+      if (this.isCanceled() || NodeDef.isRoot(nodeDefEntity))
+        return
 
-        for (const recordNodeUuidsDuplicate  of recordNodeUuidsDuplicates) {
-          const { record_uuid, node_uuids } = recordNodeUuidsDuplicate
+      await this.validateEntityUniqueness(nodeDefEntity)
+      this.incrementProcessedItems()
+    })
+  }
 
-          const record = await RecordManager.fetchRecordByUuid(surveyId, record_uuid, this.tx)
-          const recordValidation = Record.getValidation(record)
+  async validateEntityUniqueness (nodeDefEntity) {
+    const nodeDefKeys = Survey.getNodeDefKeys(nodeDefEntity)(this.survey)
+    if (!R.isEmpty(nodeDefKeys)) {
+      const duplicateEntitiesRows = await SurveyRdbManager.fetchDuplicateNodeEntities(this.survey, nodeDefEntity, nodeDefKeys, this.tx)
 
-          for (const nodeUuid of node_uuids) {
-            let nodeValidation = Validator.getFieldValidation(nodeUuid)(recordValidation)
+      if (!R.isEmpty(duplicateEntitiesRows)) {
+        let record = null
+        let recordValidation = null
 
-            //assoc new validation to node validation
-            nodeValidation = R.mergeDeepRight(nodeValidation, {
-              [Validator.keys.fields]: {
-                [RecordValidation.keys.entityKeys]: {
-                  [Validator.keys.valid]: false
-                }
-              },
-              [Validator.keys.valid]: false
-            })
+        for (const duplicateEntityRow of duplicateEntitiesRows) {
+          const { record_uuid: recordUuid, meta } = duplicateEntityRow
+          const { nodeRowKeyUuidByNodeDefUuid } = meta
 
-            recordValidation[Validator.keys.fields][nodeUuid] = nodeValidation
+          if (record === null || Record.getUuid(record) !== recordUuid) {
+            //record changed
+            if (record !== null) {
+              //add record and validation to batch persister
+              await this.recordValidationBatchPersister.addItem([
+                recordUuid,
+                recordValidation
+              ], this.tx)
+            }
+
+            record = await RecordManager.fetchRecordByUuid(this.getSurveyId(), recordUuid, this.tx)
+            recordValidation = Record.getValidation(record)
+            recordValidation[Validator.keys.valid] = false
           }
 
-          await RecordManager.persistValidation(survey, record, recordValidation, this.tx)
+          for (const nodeDefKey of nodeDefKeys) {
+            const nodeKeyUuid = nodeRowKeyUuidByNodeDefUuid[NodeDef.getUuid(nodeDefKey)]
+
+            if (nodeKeyUuid) {
+              let nodeValidation = Validator.getFieldValidation(nodeKeyUuid)(recordValidation)
+
+              //assoc new validation to node validation
+              nodeValidation = R.mergeDeepRight(nodeValidation, {
+                [Validator.keys.fields]: {
+                  [RecordValidation.keys.entityKeys]: {
+                    [Validator.keys.valid]: false
+                  }
+                },
+                [Validator.keys.valid]: false
+              })
+
+              recordValidation = ObjectUtils.setInPath([Validator.keys.fields, nodeKeyUuid], nodeValidation)(recordValidation)
+            }
+          }
+
         }
       }
-    })
+    }
+  }
+
+  async onEnd () {
+    await super.onEnd()
+
+    await this.recordValidationBatchPersister.flush(this.tx)
+  }
+
+  async persistRecordsValidation (recordAndValidationValues, tx) {
+    await RecordManager.updateRecordValidationsFromValues(this.getSurveyId(), recordAndValidationValues, this.tx)
   }
 }
 

@@ -24,8 +24,8 @@ class CollectImportJob extends Job {
       new NodeDefsImportJob(),
       new SurveyDependencyGraphsGenerationJob(),
       new RecordsImportJob(),
-      new EntitiesUniquenessValidationJob(),
       new SurveyRdbGeneratorJob(),
+      new EntitiesUniquenessValidationJob(),
     ])
   }
 

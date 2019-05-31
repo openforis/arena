@@ -55,6 +55,7 @@ module.exports = {
   fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,
   fetchChildNodesByNodeDefUuid: NodeRepository.fetchChildNodesByNodeDefUuid,
   fetchDuplicateEntityKeyNodeUuids: NodeRepository.fetchDuplicateEntityKeyNodeUuids,
+  fetchDuplicateEntityKeyNodeUuidsByRecord: NodeRepository.fetchDuplicateEntityKeyNodeUuidsByRecord,
 
   // ==== UPDATE
   createRecord: RecordUpdateManager.createRecord,
@@ -70,6 +71,7 @@ module.exports = {
 
   // ==== VALIDATION
   persistValidation: RecordValidationManager.persistValidation,
+  updateRecordValidationsFromValues: RecordValidationManager.updateRecordValidationsFromValues,
   validateNodesAndPersistValidation: RecordValidationManager.validateNodesAndPersistValidation,
   validateRecordAndPersistValidation: RecordValidationManager.validateRecordAndPersistValidation,
   validateRecordKeysUniqueness: RecordValidationManager.validateRecordKeysUniqueness,

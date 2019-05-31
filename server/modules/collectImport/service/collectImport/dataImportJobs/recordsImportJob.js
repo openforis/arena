@@ -71,23 +71,6 @@ class RecordsImportJob extends Job {
       const recordValidation = await this.traverseCollectRecordAndInsertNodes(survey, record, collectRecordJson)
       // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
 
-      //flush batch persister, nodes could be still being inserted
-      await this.batchPersister.flush(this.tx)
-
-      /*
-      const { root } = Survey.getHierarchy()(survey)
-      await Survey.traverseHierarchyItem(root, async nodeDefEntity => {
-        const nodeDefKeys = Survey.getNodeDefKeys(nodeDefEntity)(survey)
-        if (!R.isEmpty(nodeDefKeys)) {
-          const nodeDefKeyUuids = nodeDefKeys.map(NodeDef.getUuid)
-          const nodeKeyDuplicateUuids = await RecordManager.fetchDuplicateEntityKeyNodeUuids(surveyId, recordUuid, NodeDef.getUuid(nodeDefEntity), nodeDefKeyUuids, this.tx)
-          if (!R.isEmpty) {
-            this.logDebug('=====DUPLICATES', nodeKeyDuplicateUuids)
-          }
-        }
-      })
-      */
-
       //persist validation
       // this.logDebug(`${entryName} persistValidation start`)
       await RecordManager.persistValidation(survey, record, recordValidation, this.tx)
@@ -176,10 +159,8 @@ class RecordsImportJob extends Job {
           collectSurveyFileZip, collectSurvey, collectNodeDef, collectNode,
           this.tx
         )
-        : null
-
-      const value = R.propOr(null, 'value', valueAndMeta)
-      const meta = R.propOr({}, 'meta', valueAndMeta)
+        : {}
+      const { value = null, meta = {} } = valueAndMeta
 
       nodeToInsert = Node.assocValue(value)(nodeToInsert)
       nodeToInsert = Node.assocMeta(meta)(nodeToInsert)

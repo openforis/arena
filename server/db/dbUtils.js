@@ -19,6 +19,33 @@ const insertAllQuery = (schema, table, cols, itemsValues) => {
 }
 
 /**
+ * Creates a multi-items update query.
+ *
+ * @param schema
+ * @param table
+ * @param idCol Name of the identifier column (used to build the WHERE condition)
+ * @param updateCols Array of column names to be updated
+ * @param itemsValues List of array of values to use in the update.
+ *        The first value in every array of values must be the value of the identifier column
+ * @returns Generated query string
+ */
+const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
+  const cols = [`?${idCol}`, ...(updateCols.map(updateCol => `${updateCol}`))]
+  const columnSet = pgp.helpers.ColumnSet(cols, { table: { schema, table } })
+
+  const valuesIndexedByCol = itemsValues.map(itemValues => {
+    const item = {}
+    //id column is always the first among item values
+    item[idCol] = itemValues[0]
+    for (let i = 0; i < updateCols.length; i++) {
+      item[updateCols[i]] = itemValues[i + 1]
+    }
+    return item
+  })
+  return pgp.helpers.update(valuesIndexedByCol, columnSet) + ` WHERE v.${idCol}::text = t.${idCol}::text`
+}
+
+/**
  * Combines a draft and a published column prop, if needed
  */
 const getPropColCombined = (propName, draft, columnPrefix = '') =>
@@ -38,6 +65,7 @@ module.exports = {
   selectDate,
   now,
   insertAllQuery,
+  updateAllQuery,
 
   //props column
   getPropColCombined,
