@@ -9,12 +9,39 @@ const SurveySchemaRepository = require('../../survey/repository/surveySchemaRepo
 
 const DataTable = require('../schemaRdb/dataTable')
 
-const getNodesRowValues = (survey, nodeDefRow, nodeRows) => {
-  const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDefRow)
+const getSelectQuery = (surveySchema, nodeDef) => {
+  const selectNodeRows = `
+    SELECT
+      n.id, n.uuid, n.node_def_uuid, n.record_uuid, n.parent_uuid, n.value
+    FROM
+      ${surveySchema}.node n
+      WHERE n.node_def_uuid = $1
+      ORDER BY n.id`
 
-  return nodeRows.map(
-    nodeRow => DataTable.getRowValues(survey, nodeDefRow, nodeRow, nodeDefColumns)
-  )
+  return NodeDef.isEntity(nodeDef)
+    ? `
+      WITH n AS (${selectNodeRows})
+      SELECT
+        n.* ,
+        c.children
+      FROM
+        n
+      LEFT OUTER JOIN
+        (
+          SELECT
+            c.parent_uuid,
+            json_object_agg(c.node_def_uuid::text, json_build_object('uuid',c.uuid, 'nodeDefUuid', c.node_def_uuid,'value',c.value)) children
+          FROM
+            ${surveySchema}.node c
+          WHERE
+            c.parent_uuid in (select uuid from n)
+          AND c.value IS NOT NULL
+          GROUP BY
+            c.parent_uuid ) c
+      ON
+        n.uuid = c.parent_uuid
+      `
+    : selectNodeRows
 }
 
 const run = async (survey, nodeDef, client) => {
@@ -24,57 +51,29 @@ const run = async (survey, nodeDef, client) => {
 
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
+  const nodeDefColumns = DataTable.getNodeDefColumns(survey, nodeDef)
 
-  const { count } = await client.one(
-    `SELECT count(*) FROM ${surveySchema}.node WHERE node_def_uuid = $1`,
-    [nodeDefUuid]
-  )
+  // 1. create materialized view
+  const viewName = `${surveySchema}.m_view_data`
+  const selectQuery = getSelectQuery(surveySchema, nodeDef)
+  await client.none(`CREATE MATERIALIZED VIEW ${viewName} AS ${selectQuery}`, [nodeDefUuid])
+
+  const { count } = await client.one(`SELECT count(id) FROM ${viewName}`)
 
   const limit = 5000
   const noIter = Math.ceil(count / limit)
   for (let i = 0; i < noIter; i++) {
     const offset = i * limit
 
-    const selectNodeRows = `
-      SELECT
-        n.uuid, n.node_def_uuid, n.record_uuid, n.parent_uuid, n.value
-      FROM
-        ${surveySchema}.node n
-        WHERE n.node_def_uuid = $1
-        ORDER BY n.id
-        OFFSET ${offset} LIMIT ${limit}
-    `
-    const selectQuery = NodeDef.isEntity(nodeDef)
-      ? `
-        WITH
-          n AS
-          (${selectNodeRows})
-        SELECT
-          n.* ,
-          c.children
-        FROM
-          n
-        LEFT OUTER JOIN
-          (
-            SELECT
-              c.parent_uuid,
-              json_object_agg(c.node_def_uuid::text, json_build_object('uuid',c.uuid, 'nodeDefUuid', c.node_def_uuid,'value',c.value)) children
-            FROM
-              ${surveySchema}.node c
-            WHERE
-              c.parent_uuid in (select uuid from n)
-            AND c.value IS NOT NULL
-            GROUP BY
-              c.parent_uuid ) c
-        ON
-          n.uuid = c.parent_uuid
-        `
-      : selectNodeRows
+    // 2. fetch nodes
+    const nodes = await client.any(`select * from ${viewName} ORDER BY id OFFSET ${offset} LIMIT ${limit}  `)
 
-    const nodes = await client.any(selectQuery, [nodeDefUuid])
+    // 3. convert nodes into values
+    const nodesRowValues = nodes.map(
+      nodeRow => DataTable.getRowValues(survey, nodeDef, nodeRow, nodeDefColumns)
+    )
 
-    const nodesRowValues = getNodesRowValues(survey, nodeDef, nodes)
-
+    // 4. insert node values
     await client.none(insertAllQuery(
       SchemaRdb.getName(surveyId),
       NodeDefTable.getTableName(nodeDef, nodeDefParent),
@@ -84,6 +83,8 @@ const run = async (survey, nodeDef, client) => {
 
   }
 
+  // 5. drop materialized view
+  await client.none(`DROP MATERIALIZED VIEW ${viewName}`)
 }
 
 module.exports = {
