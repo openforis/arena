@@ -11,11 +11,6 @@ const SurveyRepositoryUtils = require('../../survey/repository/surveySchemaRepos
 const colNameUuuid = 'uuid'
 const colNameParentUuuid = 'parent_uuid'
 const colNameRecordUuuid = 'record_uuid'
-const colNameMeta = 'meta'
-
-const keysMeta = {
-  nodeUuidByDef: 'nodeUuidByDef'
-}
 
 const getNodeDefColumns = (survey, nodeDef) =>
   NodeDef.isEntity(nodeDef)
@@ -35,16 +30,14 @@ const getColumnNames = (survey, nodeDef) => [
   colNameUuuid,
   colNameRecordUuuid,
   colNameParentUuuid,
-  ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNames)),
-  colNameMeta
+  ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNames))
 ]
 
 const getColumnNamesAndType = (survey, nodeDef) => [
   colNameUuuid + ' uuid NOT NULL',
   colNameRecordUuuid + ' uuid NOT NULL',
   colNameParentUuuid + ' uuid',
-  ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType)),
-  colNameMeta + ' jsonb NOT NULL'
+  ...R.flatten(getNodeDefColumns(survey, nodeDef).map(DataCol.getNamesAndType))
 ]
 
 const getRecordForeignKey = (surveyId, nodeDef) =>
@@ -68,27 +61,11 @@ const getUuidUniqueConstraint = nodeDef => `CONSTRAINT ${NodeDef.getName(nodeDef
 const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
   const rowValues = DataRow.getValues(survey, nodeDefRow, nodeRow, nodeDefColumns)
 
-  const nodeUuidByDef = R.pipe(
-    Survey.getNodeDefChildren(nodeDefRow),
-    R.reduce(
-      (nodeUuidByNodeDefAcc, nodeDef) => {
-        const nodeDefUuid = NodeDef.getUuid(nodeDef)
-        nodeUuidByNodeDefAcc[nodeDefUuid] = R.path(['children', nodeDefUuid, 'uuid'], nodeRow)
-        return nodeUuidByNodeDefAcc
-      },
-      {})
-  )(survey)
-
-  const meta = {
-    [keysMeta.nodeUuidByDef]: nodeUuidByDef
-  }
-
   return [
     Node.getUuid(nodeRow),
     nodeRow[colNameRecordUuuid],
     nodeRow[colNameParentUuuid],
-    ...rowValues,
-    meta
+    ...rowValues
   ]
 }
 
@@ -102,9 +79,6 @@ module.exports = {
   colNameUuuid,
   colNameParentUuuid,
   colNameRecordUuuid,
-  colNameMeta,
-
-  keysMeta,
 
   getNodeDefColumns,
 

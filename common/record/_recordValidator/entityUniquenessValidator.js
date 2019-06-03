@@ -9,10 +9,6 @@ const RecordValidation = require('../recordValidation')
 
 const Validator = require('../../validation/validator')
 
-const keysError = {
-  duplicateEntity: 'duplicateEntity'
-}
-
 const validateEntitiesUniquenessInRecord = (survey, record) => {
   const entities = []
   const { root } = Survey.getHierarchy()(survey)
@@ -42,24 +38,27 @@ const _validateEntitiesUniqueness = (survey, record, updatedEntities) => {
 
 const _getUpdatedEntitiesWithKeys = (survey, record, nodes) => {
   const entitiesUpdated = []
-  nodes.values().forEach(node => {
-    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
-    if (NodeDef.isEntity(nodeDef) && Survey.hasNodeDefKeys(nodeDef)(survey)) {
-      // updated node is an entity with keys
-      entitiesUpdated.push(node)
-    } else {
-      const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+  R.forEachObjIndexed(node => {
+      const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
-      if (NodeDef.isKey(nodeDef) &&
-        !NodeDef.isRoot(parentDef) &&
-        Survey.hasNodeDefKeys(parentDef)(survey)) {
-        // updated node is the key of a non-root entity with keys
-        const nodeParent = Record.getParentNode(node)(record)
-        entitiesUpdated.push(nodeParent)
+      if (NodeDef.isEntity(nodeDef) && Survey.hasNodeDefKeys(nodeDef)(survey)) {
+        // updated node is an entity with keys
+        entitiesUpdated.push(node)
+      } else {
+        const parentDef = Survey.getNodeDefParent(nodeDef)(survey)
+
+        if (NodeDef.isKey(nodeDef) &&
+          !NodeDef.isRoot(parentDef) &&
+          Survey.hasNodeDefKeys(parentDef)(survey)) {
+          // updated node is the key of a non-root entity with keys
+          const nodeParent = Record.getParentNode(node)(record)
+          entitiesUpdated.push(nodeParent)
+        }
       }
-    }
-  })
+    },
+    nodes
+  )
 
   return entitiesUpdated
 }
@@ -77,26 +76,20 @@ const _validateEntity = (survey, record, nodeEntity) => {
     siblingEntity => {
       const isDuplicate = _isEntityDuplicated(survey, record, siblingEntitiesAndSelf, siblingEntity)
 
-      // 3. return entityKeys validation for each sibling entity key attribute
-      const keyNodes = Record.getEntityKeyNodes(survey, siblingEntity)(record)
-      return keyNodes.map(
-        keyNode => ({
-          [Node.getUuid(keyNode)]: {
-            [Validator.keys.fields]: {
-              [RecordValidation.keys.entityKeys]: {
-                [Validator.keys.errors]: isDuplicate ? [keysError.duplicateEntity] : [],
-                [Validator.keys.valid]: !isDuplicate
-              }
+      // 3. return entity validation
+      return {
+        [Node.getUuid(siblingEntity)]: {
+          [Validator.keys.fields]: {
+            [RecordValidation.keys.entityKeys]: {
+              [Validator.keys.errors]: isDuplicate ? [RecordValidation.keysError.duplicateEntity] : [],
+              [Validator.keys.valid]: !isDuplicate
             }
           }
-        })
-      )
+        }
+      }
     }
   )
-  return R.pipe(
-    R.flatten,
-    R.mergeAll
-  )(entityValidations)
+  return R.mergeAll(entityValidations)
 }
 
 const _isEntityDuplicated = (survey, record, siblingEntitiesAndSelf, entity) => {

@@ -15,6 +15,16 @@ const SurveyRdbManager = require('../../../../surveyRdb/manager/surveyRdbManager
 
 const Job = require('../../../../../job/job')
 
+const entityDuplicateValidation = {
+  [Validator.keys.valid]: false,
+  [Validator.keys.fields]: {
+    [RecordValidation.keys.entityKeys]: {
+      [Validator.keys.valid]: false,
+      [Validator.keys.errors]: [RecordValidation.keysError.duplicateEntity]
+    }
+  }
+}
+
 class EntitiesUniquenessValidationJob extends Job {
 
   constructor (params) {
@@ -25,12 +35,13 @@ class EntitiesUniquenessValidationJob extends Job {
 
   async onStart () {
     await super.onStart()
-    await RecordManager.disableTriggers(this.getSurveyId(), this.tx)
 
     this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.getSurveyId(), true, true, false, this.tx)
   }
 
   async execute (tx) {
+    //1. traverse survey hierarchy and find duplicate entities
+
     const { root, length } = Survey.getHierarchy()(this.survey)
 
     this.total = length - 1 //do not consider root entity
@@ -40,55 +51,52 @@ class EntitiesUniquenessValidationJob extends Job {
       if (this.isCanceled() || NodeDef.isRoot(nodeDefEntity))
         return
 
-      await this.validateEntityUniqueness(nodeDefEntity)
+      //2. for each entity def, validate entities uniqueness
+      await this.validateEntitiesUniqueness(nodeDefEntity)
+
       this.incrementProcessedItems()
     })
   }
 
-  async validateEntityUniqueness (nodeDefEntity) {
+  async validateEntitiesUniqueness (nodeDefEntity) {
     const nodeDefKeys = Survey.getNodeDefKeys(nodeDefEntity)(this.survey)
-    if (!R.isEmpty(nodeDefKeys)) {
-      const rowsRecordsWithDuplicateEntities = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(this.survey, nodeDefEntity, nodeDefKeys, this.tx)
+    if (R.isEmpty(nodeDefKeys)) {
+      return
+    }
 
-      if (!R.isEmpty(rowsRecordsWithDuplicateEntities)) {
-        for (const rowRecordWithDuplicateEntities of rowsRecordsWithDuplicateEntities) {
-          const { uuid, validation, node_key_uuid_by_node_def_uuid } = rowRecordWithDuplicateEntities
+    //1. find records with duplicate entities
+    const rowsRecordsWithDuplicateEntities = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(this.survey, nodeDefEntity, nodeDefKeys, this.tx)
 
-          const nodeKeyUuids = R.pipe(
-            R.values,
-            R.flatten
-          )(node_key_uuid_by_node_def_uuid)
+    if (!R.isEmpty(rowsRecordsWithDuplicateEntities)) {
+      for (const rowRecordWithDuplicateEntities of rowsRecordsWithDuplicateEntities) {
+        if (this.isCanceled())
+          return
 
-          let validationUpdated = nodeKeyUuids.reduce((validationRecord, nodeKeyUuid) => {
-              const nodeValidation = Validator.getFieldValidation(nodeKeyUuid)(validationRecord)
+        //2. for each duplicate node entity, update record validation
+        const { uuid, validation, node_duplicate_uuids } = rowRecordWithDuplicateEntities
 
-              //assoc new validation to node validation
-              const nodeValidationUpdated = R.mergeDeepRight(nodeValidation, {
-                [Validator.keys.fields]: {
-                  [RecordValidation.keys.entityKeys]: {
-                    [Validator.keys.valid]: false
-                  }
-                },
-                [Validator.keys.valid]: false
-              })
+        let validationUpdated = node_duplicate_uuids.reduce((validationRecord, nodeEntityDuplicateUuid) => {
+            const nodeValidation = Validator.getFieldValidation(nodeEntityDuplicateUuid)(validationRecord)
 
-              return ObjectUtils.setInPath([Validator.keys.fields, nodeKeyUuid], nodeValidationUpdated)(validationRecord)
-            },
-            validation
-          )
+            //assoc new validation to node validation
+            const nodeValidationUpdated = R.mergeDeepRight(nodeValidation, entityDuplicateValidation)
 
-          //add record and validation to batch persister
-          await this.recordValidationBatchPersister.addItem([
-            uuid,
-            validationUpdated
-          ], this.tx)
-        }
+            return ObjectUtils.setInPath([Validator.keys.fields, nodeEntityDuplicateUuid], nodeValidationUpdated)(validationRecord)
+          },
+          validation
+        )
+
+        //3. store updated record validation (using batch persister)
+        await this.recordValidationBatchPersister.addItem([
+          uuid,
+          validationUpdated
+        ])
       }
     }
   }
 
-  async onEnd () {
-    await super.onEnd()
+  async beforeEnd () {
+    await super.beforeEnd()
 
     await this.recordValidationBatchPersister.flush(this.tx)
   }

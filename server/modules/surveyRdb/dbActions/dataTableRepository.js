@@ -16,16 +16,11 @@ const SurveySchemaRepositoryUtils = require('../../survey/repository/surveySchem
  * {
  *   uuid, //record uuid,
  *   validation: {}, //record validation object,
-     node_key_uuid_by_node_def_uuid: {
-       nodeKeyDefUuid1: [nodeKeyUuid1, nodeKeyUuid2, ...],
-       nodeKeyDefUuid2: [nodeKeyUuid3, nodeKeyUuid4, ...]
-     } //indexed object of node uuids (array) by key node def uuid
+     node_duplicate_uuids: [nodeUuid1, nodeUuid2, ...] //array of duplicate entity uuids
  * }
  */
 const fetchRecordsWithDuplicateEntities = async (survey, nodeDefEntity, nodeDefKeys, client) => {
   const surveyId = Survey.getId(survey)
-
-  const nodeKeyUuidByNodeDefUuidAlias = 'node_key_uuid_by_node_def_uuid'
 
   const tableName = `${SchemaRdb.getName(surveyId)}.${NodeDefTable.getTableName(nodeDefEntity)}`
 
@@ -37,17 +32,8 @@ const fetchRecordsWithDuplicateEntities = async (survey, nodeDefEntity, nodeDefK
     R.join(' AND '),
   )(nodeDefKeys)
 
-  const nodeKeyUuidByNodeDefUuidCol = R.pipe(
-    R.map(nodeDefKey => {
-      const nodeDefUuid = NodeDef.getUuid(nodeDefKey)
-      return `'${nodeDefUuid}', json_agg(${aliasA}.${DataTable.colNameMeta}#>>'{"${DataTable.keysMeta.nodeUuidByDef}","${nodeDefUuid}"}')`
-    }),
-    R.join(', '),
-    str => `json_build_object(${str}) AS ${nodeKeyUuidByNodeDefUuidAlias}`
-  )(nodeDefKeys)
-
   return await client.any(`
-    SELECT r.uuid, r.validation, ${nodeKeyUuidByNodeDefUuidCol}
+    SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
     FROM ${tableName} ${aliasA}
       JOIN ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r ON r.uuid = ${aliasA}.${DataTable.colNameRecordUuuid} 
     WHERE EXISTS (

@@ -5,9 +5,8 @@ import * as R from 'ramda'
 
 import useI18n from '../../../../../../commonComponents/useI18n'
 
-import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLayout'
-
 import NodeDef from '../../../../../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 import Node from '../../../../../../../common/record/node'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
@@ -15,15 +14,10 @@ import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 const NodeDefEntityTable = props => {
 
   const {
-    entry,
-    edit,
-    nodeDef,
-    nodes,
-    parentNode,
-    label,
+    entry, edit,
+    nodeDef, nodes, parentNode, label,
     updateNode,
-    canEditRecord,
-    canAddNode,
+    canEditRecord, canAddNode,
   } = props
 
   const i18n = useI18n()
@@ -33,7 +27,6 @@ const NodeDefEntityTable = props => {
       const element = document.getElementById(`${NodeDef.getUuid(nodeDef)}_${nodes.length - 1}`)
       element.scrollIntoView()
     }
-
   }, [nodes && nodes.length])
 
   return (
@@ -60,30 +53,36 @@ const NodeDefEntityTable = props => {
 
       <div className="node-def__table-rows">
         {
-          edit || !R.isEmpty(nodes)
-            ? <NodeDefEntityTableRow {...props}
-                                     node={null}
-                                     renderType={nodeDefRenderType.tableHeader}/>
-            : null
+          (edit || !R.isEmpty(nodes)) &&
+          <NodeDefEntityTableRow
+            {...props}
+            node={null}
+            renderType={NodeDefLayout.nodeDefRenderType.tableHeader}/>
         }
 
         {
-          entry
-            ? R.isEmpty(nodes)
-              ? <h5><i>{i18n.t('surveyForm.nodeDefEntityTable.noDataAdded')}</i></h5>
-              : (
-                <div className="node-def__table-data-rows">
-                  {nodes.map((node, i) =>
-                    <NodeDefEntityTableRow key={i}
-                                           i={i}
-                                           {...props}
-                                           node={node}
-                                           nodes={null}
-                                           renderType={nodeDefRenderType.tableBody}/>
-                  )}
-                </div>
-              )
-            : null
+          entry &&
+          R.isEmpty(nodes)
+            ? (
+              <h5>
+                <i>{i18n.t('surveyForm.nodeDefEntityTable.noDataAdded')}</i>
+              </h5>
+            )
+            : (
+              <div className="node-def__table-data-rows">
+                {
+                  nodes.map((node, i) =>
+                    <NodeDefEntityTableRow
+                      key={i}
+                      i={i}
+                      {...props}
+                      node={node}
+                      nodes={null}
+                      renderType={NodeDefLayout.nodeDefRenderType.tableBody}/>
+                  )
+                }
+              </div>
+            )
         }
       </div>
     </div>
