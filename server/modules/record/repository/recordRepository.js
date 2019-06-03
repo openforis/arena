@@ -123,18 +123,14 @@ const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
     [step, recordUuid]
   )
 
-const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) => {
-  const query  =DbUtils.updateAllQuery(
+const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) =>
+  await client.none(DbUtils.updateAllQuery(
     getSurveyDBSchema(surveyId),
     'record',
-    'uuid',
-    ['validation'],
-    recordUuidAndValidationValues, //recordUuidAndValidationValues.map(recordUuidAndValidtionValue => [recordUuidAndValidtionValue[0], JSON.stringify(recordUuidAndValidtionValue[1])])
-  )
-  console.log('====query', query)
-
-  return await client.none(query)
-}
+    { name: 'uuid', cast: 'uuid' },
+    [{ name: 'validation', cast: 'jsonb' }],
+    recordUuidAndValidationValues,
+  ))
 
 // ============== DELETE
 

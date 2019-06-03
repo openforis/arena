@@ -104,33 +104,7 @@ const fetchRecordsCountByKeys = async (survey, client) => {
 
 }
 
-const fetchDuplicateNodeEntities = async (survey, nodeDefEntity, nodeDefKeys, client) => {
 
-  const tableName = `${SchemaRdb.getName(Survey.getId(survey))}.${NodeDefTable.getTableName(nodeDefEntity)}`
-
-  const aliasA = 'e1'
-  const aliasB = 'e2'
-
-  const equalKeysCondition = R.pipe(
-    R.map(nodeDefKey => `${aliasA}.${NodeDefTable.getColName(nodeDefKey)} = ${aliasB}.${NodeDefTable.getColName(nodeDefKey)}`),
-    R.join(' AND '),
-  )(nodeDefKeys)
-
-  const rows = client.any(`
-    SELECT ${aliasA}.${DataTable.colNameRecordUuuid}, ${aliasA}.${DataTable.colNameMeta}
-    FROM ${tableName} ${aliasA}
-    WHERE EXISTS (
-      SELECT ${aliasB}.${DataTable.colNameUuuid}
-      FROM ${tableName} ${aliasB}
-        WHERE ${aliasA}.${DataTable.colNameUuuid} != ${aliasB}.${DataTable.colNameUuuid}
-        AND ${aliasA}.${DataTable.colNameRecordUuuid} = ${aliasB}.${DataTable.colNameRecordUuuid}
-        AND ${aliasA}.${DataTable.colNameParentUuuid} = ${aliasB}.${DataTable.colNameParentUuuid}
-        AND (${equalKeysCondition})
-      )
-  `)
-
-  return rows
-}
 
 module.exports = {
   runSelect,
@@ -138,5 +112,4 @@ module.exports = {
 
   countDuplicateRecords,
   fetchRecordsCountByKeys,
-  fetchDuplicateNodeEntities
 }

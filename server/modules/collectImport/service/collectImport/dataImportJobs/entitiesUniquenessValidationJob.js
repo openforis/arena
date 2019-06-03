@@ -5,7 +5,7 @@ const BatchPersister = require('../../../../../db/batchPersister')
 
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
-const Record = require('../../../../../../common/record/record')
+
 const RecordValidation = require('../../../../../../common/record/recordValidation')
 const Validator = require('../../../../../../common/validation/validator')
 
@@ -48,39 +48,22 @@ class EntitiesUniquenessValidationJob extends Job {
   async validateEntityUniqueness (nodeDefEntity) {
     const nodeDefKeys = Survey.getNodeDefKeys(nodeDefEntity)(this.survey)
     if (!R.isEmpty(nodeDefKeys)) {
-      const duplicateEntitiesRows = await SurveyRdbManager.fetchDuplicateNodeEntities(this.survey, nodeDefEntity, nodeDefKeys, this.tx)
+      const rowsRecordsWithDuplicateEntities = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(this.survey, nodeDefEntity, nodeDefKeys, this.tx)
 
-      if (!R.isEmpty(duplicateEntitiesRows)) {
-        let record = null
-        let recordValidation = null
+      if (!R.isEmpty(rowsRecordsWithDuplicateEntities)) {
+        for (const rowRecordWithDuplicateEntities of rowsRecordsWithDuplicateEntities) {
+          const { uuid, validation, node_key_uuid_by_node_def_uuid } = rowRecordWithDuplicateEntities
 
-        for (const duplicateEntityRow of duplicateEntitiesRows) {
-          const { record_uuid: recordUuid, meta } = duplicateEntityRow
-          const { nodeRowKeyUuidByNodeDefUuid } = meta
+          const nodeKeyUuids = R.pipe(
+            R.values,
+            R.flatten
+          )(node_key_uuid_by_node_def_uuid)
 
-          if (record === null || Record.getUuid(record) !== recordUuid) {
-            //record changed
-            if (record !== null) {
-              //add record and validation to batch persister
-              await this.recordValidationBatchPersister.addItem([
-                recordUuid,
-                recordValidation
-              ], this.tx)
-            }
-
-            record = await RecordManager.fetchRecordByUuid(this.getSurveyId(), recordUuid, this.tx)
-            recordValidation = Record.getValidation(record)
-            recordValidation[Validator.keys.valid] = false
-          }
-
-          for (const nodeDefKey of nodeDefKeys) {
-            const nodeKeyUuid = nodeRowKeyUuidByNodeDefUuid[NodeDef.getUuid(nodeDefKey)]
-
-            if (nodeKeyUuid) {
-              let nodeValidation = Validator.getFieldValidation(nodeKeyUuid)(recordValidation)
+          let validationUpdated = nodeKeyUuids.reduce((validationRecord, nodeKeyUuid) => {
+              const nodeValidation = Validator.getFieldValidation(nodeKeyUuid)(validationRecord)
 
               //assoc new validation to node validation
-              nodeValidation = R.mergeDeepRight(nodeValidation, {
+              const nodeValidationUpdated = R.mergeDeepRight(nodeValidation, {
                 [Validator.keys.fields]: {
                   [RecordValidation.keys.entityKeys]: {
                     [Validator.keys.valid]: false
@@ -89,10 +72,16 @@ class EntitiesUniquenessValidationJob extends Job {
                 [Validator.keys.valid]: false
               })
 
-              recordValidation = ObjectUtils.setInPath([Validator.keys.fields, nodeKeyUuid], nodeValidation)(recordValidation)
-            }
-          }
+              return ObjectUtils.setInPath([Validator.keys.fields, nodeKeyUuid], nodeValidationUpdated)(validationRecord)
+            },
+            validation
+          )
 
+          //add record and validation to batch persister
+          await this.recordValidationBatchPersister.addItem([
+            uuid,
+            validationUpdated
+          ], this.tx)
         }
       }
     }
@@ -104,7 +93,7 @@ class EntitiesUniquenessValidationJob extends Job {
     await this.recordValidationBatchPersister.flush(this.tx)
   }
 
-  async persistRecordsValidation (recordAndValidationValues, tx) {
+  async persistRecordsValidation (recordAndValidationValues) {
     await RecordManager.updateRecordValidationsFromValues(this.getSurveyId(), recordAndValidationValues, this.tx)
   }
 }

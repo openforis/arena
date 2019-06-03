@@ -160,7 +160,7 @@ class RecordsImportJob extends Job {
           this.tx
         )
         : {}
-      const { value = null, meta = {} } = valueAndMeta
+      const { value = null, meta = {} } = valueAndMeta || {}
 
       nodeToInsert = Node.assocValue(value)(nodeToInsert)
       nodeToInsert = Node.assocMeta(meta)(nodeToInsert)

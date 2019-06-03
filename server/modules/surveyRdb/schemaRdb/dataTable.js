@@ -13,6 +13,10 @@ const colNameParentUuuid = 'parent_uuid'
 const colNameRecordUuuid = 'record_uuid'
 const colNameMeta = 'meta'
 
+const keysMeta = {
+  nodeUuidByDef: 'nodeUuidByDef'
+}
+
 const getNodeDefColumns = (survey, nodeDef) =>
   NodeDef.isEntity(nodeDef)
     ? (
@@ -64,17 +68,19 @@ const getUuidUniqueConstraint = nodeDef => `CONSTRAINT ${NodeDef.getName(nodeDef
 const getRowValues = (survey, nodeDefRow, nodeRow, nodeDefColumns) => {
   const rowValues = DataRow.getValues(survey, nodeDefRow, nodeRow, nodeDefColumns)
 
-  const nodeDefRowKeys = Survey.getNodeDefKeys(nodeDefRow)(survey)
-  const nodeRowKeyUuidByNodeDefUuid = nodeDefRowKeys.reduce(
-    (acc, nodeDefRowKey) => {
-      const nodeDefRowKeyUuid = NodeDef.getUuid(nodeDefRowKey)
-      acc[nodeDefRowKeyUuid] = R.path(['children', nodeDefRowKeyUuid, 'uuid'], nodeRow)
-      return acc
-    }, {}
-  )
+  const nodeUuidByDef = R.pipe(
+    Survey.getNodeDefChildren(nodeDefRow),
+    R.reduce(
+      (nodeUuidByNodeDefAcc, nodeDef) => {
+        const nodeDefUuid = NodeDef.getUuid(nodeDef)
+        nodeUuidByNodeDefAcc[nodeDefUuid] = R.path(['children', nodeDefUuid, 'uuid'], nodeRow)
+        return nodeUuidByNodeDefAcc
+      },
+      {})
+  )(survey)
 
   const meta = {
-    nodeRowKeyUuidByNodeDefUuid
+    [keysMeta.nodeUuidByDef]: nodeUuidByDef
   }
 
   return [
@@ -97,6 +103,8 @@ module.exports = {
   colNameParentUuuid,
   colNameRecordUuuid,
   colNameMeta,
+
+  keysMeta,
 
   getNodeDefColumns,
 

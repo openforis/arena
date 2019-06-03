@@ -228,6 +228,7 @@ module.exports = {
     CategoriesValidationJob: 'Categories validation',
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',
+    EntitiesUniquenessValidationJob: 'Entities Uniqueness Validation',
     NodeDefsImportJob: 'Node Defs Import',
     NodeDefsValidationJob: 'Node Defs Validation',
     RecordCheckJob: 'Record Check',
