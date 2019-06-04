@@ -225,7 +225,7 @@ module.exports = {
 
   jobs: {
     CategoriesImportJob: 'Categories Import',
-    CategoriesValidationJob: 'Categories validation',
+    CategoriesValidationJob: 'Categories Validation',
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',
     EntitiesUniquenessValidationJob: 'Entities Uniqueness Validation',
@@ -233,7 +233,6 @@ module.exports = {
     NodeDefsValidationJob: 'Node Defs Validation',
     RecordCheckJob: 'Record Check',
     RecordsImportJob: 'Records Import',
-    RecordsValidationJob: 'Records Validation',
     SurveyCreatorJob: 'Survey Create',
     SurveyDependencyGraphsGenerationJob: 'Survey Dependency Graph Generation',
     SurveyIndexGeneratorJob: 'Survey Index Generator',
