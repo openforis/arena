@@ -1,3 +1,4 @@
+const R = require('ramda')
 const pgp = require('pg-promise')()
 
 const selectDate = (field, fieldAlias = null) =>
@@ -16,6 +17,41 @@ const insertAllQuery = (schema, table, cols, itemsValues) => {
     return item
   })
   return pgp.helpers.insert(valuesIndexedByCol, columnSet)
+}
+
+/**
+ * Creates a multi-items update query.
+ *
+ * @param schema
+ * @param table
+ * @param idCol Name of the identifier column (used to build the WHERE condition) or pgromise helpers.ColumnConfig object
+ * @param updateCols Array of column names or pgromise helpers.ColumnConfig objects that describe the columns to update
+ * @param itemsValues List of array of values to use in the update.
+ *        The first value in every array of values must be the value of the identifier column
+ * @returns Generated query string
+ */
+const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
+  const getColName = col => R.propOr(col, 'name', col)
+
+  const idColName = getColName(idCol)
+  const idColCast = R.propOr('text', 'cast', idCol)
+
+  const cols = [`?${idColName}`, ...updateCols]
+
+  const columnSet = pgp.helpers.ColumnSet(cols, { table: { schema, table } })
+
+  const valuesIndexedByCol = itemsValues.map(itemValues => {
+    const item = {}
+    //id column is always the first among item values
+    item[idColName] = itemValues[0]
+    for (let i = 0; i < updateCols.length; i++) {
+      const updateCol = updateCols[i]
+      item[getColName(updateCol)] = itemValues[i + 1]
+    }
+    return item
+  })
+
+  return pgp.helpers.update(valuesIndexedByCol, columnSet) + ` WHERE v.${idColName}::${idColCast} = t.${idColName}::${idColCast}`
 }
 
 /**
@@ -38,6 +74,7 @@ module.exports = {
   selectDate,
   now,
   insertAllQuery,
+  updateAllQuery,
 
   //props column
   getPropColCombined,

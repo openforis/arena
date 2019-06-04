@@ -7,6 +7,7 @@ const NodesInsert = require('../dbActions/nodesInsert')
 const NodesUpdate = require('../dbActions/nodesUpdate')
 const TableViewCreate = require('../dbActions/tableViewCreate')
 const TableViewQuery = require('../dbActions/tableViewQuery')
+const DataTableRepository = require('../dbActions/dataTableRepository')
 
 // ==== DDL
 
@@ -48,4 +49,5 @@ module.exports = {
   queryTable,
   countTable,
   countDuplicateRecords,
+  fetchRecordsWithDuplicateEntities: DataTableRepository.fetchRecordsWithDuplicateEntities,
 }

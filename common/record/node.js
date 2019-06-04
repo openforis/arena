@@ -177,6 +177,7 @@ module.exports = {
 
   // ==== UPDATE
   assocValue: R.assoc(keys.value),
+  assocMeta: R.assoc(keys.meta),
   assocValidation: Validator.assocValidation,
   mergeMeta,
 

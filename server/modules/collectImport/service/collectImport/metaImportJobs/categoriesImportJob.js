@@ -9,7 +9,7 @@ const BatchPersister = require('../../../../../db/batchPersister')
 
 const CategoryManager = require('../../../../category/manager/categoryManager')
 
-const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
+const CollectSurvey = require('../model/collectSurvey')
 
 /**
  * Inserts a category for each code list in the Collect survey.
@@ -29,7 +29,7 @@ class CategoriesImportJob extends Job {
 
     const categories = []
 
-    const collectCodeLists = CollectIdmlParseUtils.getElementsByPath(['codeLists', 'list'])(collectSurvey)
+    const collectCodeLists = CollectSurvey.getElementsByPath(['codeLists', 'list'])(collectSurvey)
 
     this.total = collectCodeLists.length
 
@@ -45,7 +45,7 @@ class CategoriesImportJob extends Job {
 
       category = await this.insertLevels(category, collectCodeList, tx)
 
-      const collectFirstLevelItems = CollectIdmlParseUtils.getElementsByPath(['items', 'item'])(collectCodeList)
+      const collectFirstLevelItems = CollectSurvey.getElementsByPath(['items', 'item'])(collectCodeList)
       await this.insertItems(category, 0, null, defaultLanguage, collectFirstLevelItems, tx)
 
       categories.push(category)
@@ -65,7 +65,7 @@ class CategoriesImportJob extends Job {
     const user = this.getUser()
     const surveyId = this.getSurveyId()
 
-    const hierarchyLevels = CollectIdmlParseUtils.getElementsByPath(['hierarchy', 'level'])(codeList)
+    const hierarchyLevels = CollectSurvey.getElementsByPath(['hierarchy', 'level'])(codeList)
     if (hierarchyLevels.length > 1) {
       let firstLevel = Category.getLevelByIndex(0)(category)
       const collectFirstLevel = hierarchyLevels[0]
@@ -97,9 +97,9 @@ class CategoriesImportJob extends Job {
       if (this.isCanceled())
         break
 
-      const labels = CollectIdmlParseUtils.toLabels('label', defaultLanguage)(collectItem)
+      const labels = CollectSurvey.toLabels('label', defaultLanguage)(collectItem)
 
-      const itemCode = CollectIdmlParseUtils.getChildElementText('code')(collectItem)
+      const itemCode = CollectSurvey.getChildElementText('code')(collectItem)
       const item = CategoryItem.newItem(levelUuid, parentItem, {
         [CategoryItem.props.code]: itemCode,
         [CategoryItem.props.labels]: labels
@@ -107,15 +107,15 @@ class CategoriesImportJob extends Job {
       await this.itemBatchPersister.addItem(item, tx)
 
       // insert child items recursively
-      const collectChildItems = CollectIdmlParseUtils.getElementsByName('item')(collectItem)
+      const collectChildItems = CollectSurvey.getElementsByName('item')(collectItem)
       if (!R.isEmpty(collectChildItems)) {
         await this.insertItems(category, levelIndex + 1, item, defaultLanguage, collectChildItems, tx)
       }
 
       // update qualifiable item codes cache
       collectChildItems.forEach(collectItem => {
-        if (CollectIdmlParseUtils.getAttribute('qualifiable')(collectItem) === 'true') {
-          const code = CollectIdmlParseUtils.getChildElementText('code')(collectItem)
+        if (CollectSurvey.getAttribute('qualifiable')(collectItem) === 'true') {
+          const code = CollectSurvey.getChildElementText('code')(collectItem)
           this.qualifiableItemCodesByCategoryAndLevel = R.pipe(
             R.pathOr([], [Category.getName(category), levelIndex + '']),
             R.ifElse(
