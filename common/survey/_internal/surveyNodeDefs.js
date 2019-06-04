@@ -43,12 +43,6 @@ const getNodeDefKeys = nodeDef => R.pipe(
   R.filter(n => NodeDef.isKey(n))
 )
 
-const hasNodeDefKeys = nodeDef => R.pipe(
-  getNodeDefKeys(nodeDef),
-  R.isEmpty,
-  R.not
-)
-
 const getNodeDefByName = (name) => R.pipe(
   getNodeDefsArray,
   R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name))
@@ -201,7 +195,6 @@ module.exports = {
   getNodeDefChildByName,
   getNodeDefSiblingByName,
   getNodeDefKeys,
-  hasNodeDefKeys,
   getNodeDefByName,
 
   getNodeDefsByCategoryUuid,

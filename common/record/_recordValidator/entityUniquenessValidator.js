@@ -9,23 +9,9 @@ const RecordValidation = require('../recordValidation')
 
 const Validator = require('../../validation/validator')
 
-const validateEntitiesUniquenessInRecord = (survey, record) => {
-  const entities = []
-  const { root } = Survey.getHierarchy()(survey)
-  Survey.traverseHierarchyItemSync(root, nodeDefEntity => {
-    if (Survey.hasNodeDefKeys(nodeDefEntity)) {
-      entities.push(...Record.getNodesByDefUuid(nodeDefEntity)(record))
-    }
-  })
-  return _validateEntitiesUniqueness(survey, record, entities)
-}
-
 const validateEntitiesUniquenessInNodes = (survey, record, nodes) => {
   const updatedEntities = _getUpdatedEntitiesWithKeys(survey, record, nodes)
-  return _validateEntitiesUniqueness(survey, record, updatedEntities)
-}
 
-const _validateEntitiesUniqueness = (survey, record, updatedEntities) => {
   const entityKeysValidationsArray = updatedEntities.map(
     entity => _validateEntity(survey, record, entity)
   )
@@ -42,7 +28,7 @@ const _getUpdatedEntitiesWithKeys = (survey, record, nodes) => {
   R.forEachObjIndexed(node => {
       const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
-      if (NodeDef.isEntity(nodeDef) && Survey.hasNodeDefKeys(nodeDef)(survey)) {
+      if (NodeDef.isEntity(nodeDef) && _hasNodeDefKeys(nodeDef)(survey)) {
         // updated node is an entity with keys
         entitiesUpdated.push(node)
       } else {
@@ -50,7 +36,7 @@ const _getUpdatedEntitiesWithKeys = (survey, record, nodes) => {
 
         if (NodeDef.isKey(nodeDef) &&
           !NodeDef.isRoot(parentDef) &&
-          Survey.hasNodeDefKeys(parentDef)(survey)) {
+          _hasNodeDefKeys(parentDef)(survey)) {
           // updated node is the key of a non-root entity with keys
           const nodeParent = Record.getParentNode(node)(record)
           entitiesUpdated.push(nodeParent)
@@ -107,7 +93,12 @@ const _isEntityDuplicated = (survey, record, siblingEntitiesAndSelf, entity) => 
   return false
 }
 
+const _hasNodeDefKeys = nodeDef => R.pipe(
+  Survey.getNodeDefKeys(nodeDef),
+  R.isEmpty,
+  R.not
+)
+
 module.exports = {
-  validateEntitiesUniquenessInNodes,
-  validateEntitiesUniquenessInRecord,
+  validateEntitiesUniquenessInNodes
 }
