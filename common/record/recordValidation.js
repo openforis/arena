@@ -13,7 +13,8 @@ const keys = {
 }
 
 const keysError = {
-  duplicateEntity: 'duplicateEntity'
+  duplicateEntity: 'duplicateEntity',
+  duplicateRecord: 'duplicateRecord'
 }
 
 const getValidationChildrenCount = (parentNode, childDef) => R.pipe(
