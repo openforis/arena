@@ -52,34 +52,9 @@ const validateChildrenCount = (survey, nodeParent, nodeDefChild, count) => {
   }
 }
 
-const validateChildrenCountRecord = (survey, record) => {
-  const nodePointers = _getNodePointersRecord(survey, record)
-  return _validateChildrenCountNodePointers(survey, record, nodePointers)
-}
-
 const validateChildrenCountNodes = (survey, record, nodes) => {
   const nodePointers = _getNodePointers(survey, record, nodes)
   return _validateChildrenCountNodePointers(survey, record, nodePointers)
-}
-
-const _getNodePointersRecord = (survey, record) => {
-  const nodePointers = []
-  const { root } = Survey.getHierarchy()(survey)
-  Survey.traverseHierarchyItemSync(root, nodeDefEntity => {
-    const nodeDefChildren = Survey.getNodeDefChildren(nodeDefEntity)(survey)
-    const nodeEntities = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDefEntity))(record)
-    for (const nodeEntity of nodeEntities) {
-      for (const childDef of nodeDefChildren) {
-        if (_hasMinOrMaxCount(childDef)) {
-          nodePointers.push({
-            node: nodeEntity,
-            childDef
-          })
-        }
-      }
-    }
-  })
-  return nodePointers
 }
 
 const _getNodePointers = (survey, record, nodes) => {
@@ -157,6 +132,5 @@ const _countChildren = (record, parentNode, childDef) => {
 
 module.exports = {
   validateChildrenCountNodes,
-  validateChildrenCountRecord,
   validateChildrenCount
 }

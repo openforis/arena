@@ -73,7 +73,6 @@ module.exports = {
   persistValidation: RecordValidationManager.persistValidation,
   updateRecordValidationsFromValues: RecordValidationManager.updateRecordValidationsFromValues,
   validateNodesAndPersistValidation: RecordValidationManager.validateNodesAndPersistValidation,
-  validateRecordAndPersistValidation: RecordValidationManager.validateRecordAndPersistValidation,
   validateRecordKeysUniqueness: RecordValidationManager.validateRecordKeysUniqueness,
 
   // ====  UTILS
