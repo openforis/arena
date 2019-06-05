@@ -8,10 +8,10 @@ import Tooltip from './tooltip'
 
 import useI18n from '../commonComponents/useI18n'
 
-export default ({ messages, children, className, type = '' }) => {
+export default ({ validation, children, className, type = '' }) => {
   const i18n = useI18n()
 
-  const messagesHtml = ValidationUtils.getValidationFieldMessagesHTML(i18n)(messages)
+  const messagesHtml = ValidationUtils.getValidationFieldMessagesHTML(i18n)(validation)
 
   return (
     <Tooltip
