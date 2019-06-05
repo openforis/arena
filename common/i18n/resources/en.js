@@ -247,8 +247,9 @@ module.exports = {
   },
 
   formErrors: {
-    duplicateName: 'duplicate scientific name {{scientificName}}; row: {{row}} duplicate row: {{duplicateRow}}',
-    duplicateCode: 'duplicate code {{code}}; row: {{row}} duplicate row: {{duplicateRow}}',
+    duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
+    duplicateName: 'duplicate scientific name {{scientificName}}; $t(formErrors.duplicateRows, {row, duplicateRow})',
+    duplicateCode: 'duplicate code {{code}}; $t(formErrors.duplicateRows, {row, duplicateRow})',
     empty: 'Empty',
     duplicate: 'Duplicate',
     exceedingMax: 'Exceeding max',

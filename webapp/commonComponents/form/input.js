@@ -26,7 +26,6 @@ export const Input = React.forwardRef((props, ref) => {
   return (
     <ValidationTooltip
       validation={validation}
-      type={`${validation.errors ? 'error' : ''}`}
       className="form-input-container">
 
       <TextMask

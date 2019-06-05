@@ -22,7 +22,7 @@ class Tooltip extends React.Component {
 
   mouseEnter () {
     const style = this.getStyle()
-    if (!R.isEmpty(style)) this.setState({ style: this.getStyle() })
+    if (!R.isEmpty(style)) this.setState({ style })
   }
 
   render () {

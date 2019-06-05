@@ -16,6 +16,8 @@ const speciesFilesPath = 'species/'
 const keysError = {
   code: 'code',
   scientificName: 'scientificName',
+  duplicateCode: 'duplicateCode',
+  duplicateName: 'duplicateName',
 }
 
 /**
@@ -148,7 +150,10 @@ class TaxonomiesImportJob extends Job {
       this.addError({
         [keysError.code]: {
           valid: false,
-          errors: [{ key: 'duplicateCode', params: { code, row: this.currentRow, duplicateRow: rowDuplicateCode } }],
+          errors: [{
+            key: keysError.duplicateCode,
+            params: { code, row: this.currentRow, duplicateRow: rowDuplicateCode },
+          }],
         },
       }, speciesFileName)
     } else {
@@ -161,7 +166,10 @@ class TaxonomiesImportJob extends Job {
       this.addError({
         [keysError.scientificName]: {
           valid: false,
-          errors: [{ key: 'duplicateName', params: { scientificName, row: this.currentRow, duplicateRow: rowDuplicateScientificName } }],
+          errors: [{
+            key: keysError.duplicateName,
+            params: { scientificName, row: this.currentRow, duplicateRow: rowDuplicateScientificName },
+          }],
         },
       }, speciesFileName)
     } else {
