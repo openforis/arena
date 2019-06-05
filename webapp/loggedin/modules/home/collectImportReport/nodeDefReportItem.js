@@ -16,11 +16,12 @@ const NodeDefReportItem = props => {
   const i18n = useI18n()
   const lang = Survey.getLanguage(i18n.lang)(Survey.getSurveyInfo(survey))
 
+  const nodeDefPath = _getNodeDefPath(survey, nodeDef, lang)
 
   return (
     <div className="collect-import-report-node-def-items">
       <div
-        className="collect-import-report-node-def-items-header">{NodeDef.getLabel(nodeDef, lang)}</div>
+        className="collect-import-report-node-def-items-header">{nodeDefPath}</div>
       <div className="table__row-header collect-import-report-header">
         <div>#</div>
         <div>{i18n.t('homeView.collectImportReport.type')}</div>
@@ -67,6 +68,16 @@ const NodeDefReportItem = props => {
       }
     </div>
   )
+}
+
+const _getNodeDefPath = (survey, nodeDef, lang) => {
+  const nodeDefPathParts = []
+  Survey.visitAncestorsAndSelf(
+    nodeDef,
+    def => nodeDefPathParts.unshift(NodeDef.getLabel(def, lang) || NodeDef.getName(def))
+  )(survey)
+
+  return nodeDefPathParts.join(' > ')
 }
 
 export default NodeDefReportItem

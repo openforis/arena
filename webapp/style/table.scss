@@ -50,6 +50,7 @@ $tableRowsHeight: calc(100% - 77px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 100%;
   }
 
   .btn {
