@@ -16,10 +16,10 @@ const Job = require('../../../../../job/job')
 
 const recordValidationUpdateBatchSize = 1000
 
-class RecordsAndEntitiesUniquenessValidationJob extends Job {
+class EntitiesUniquenessValidationJob extends Job {
 
   constructor (params) {
-    super(RecordsAndEntitiesUniquenessValidationJob.type, params)
+    super(EntitiesUniquenessValidationJob.type, params)
 
     //cache of record validations
     this.validationByRecordUuid = {}
@@ -68,16 +68,15 @@ class RecordsAndEntitiesUniquenessValidationJob extends Job {
         //2. for each duplicate node entity, update record validation
         const { uuid, validation, node_duplicate_uuids } = rowRecordWithDuplicateEntities
 
-        let validationRecord = this.validationByRecordUuid[uuid] || validation
+        const validationRecord = this.validationByRecordUuid[uuid] || validation
 
-        let validationUpdated = node_duplicate_uuids.reduce(
+        const validationUpdated = node_duplicate_uuids.reduce(
           (validationRecord, nodeEntityDuplicateUuid) =>
             _updateNodeValidation(validationRecord, nodeEntityDuplicateUuid, validationDuplicate)
           , validationRecord
         )
 
         //3. add record validation to batch update
-
         await this.addRecordValidationToBatchUpdate(uuid, validationUpdated)
       }
     }
@@ -107,7 +106,7 @@ class RecordsAndEntitiesUniquenessValidationJob extends Job {
 
 }
 
-RecordsAndEntitiesUniquenessValidationJob.type = 'RecordsAndEntitiesUniquenessValidationJob'
+EntitiesUniquenessValidationJob.type = 'EntitiesUniquenessValidationJob'
 
 const _createValidationRecordOrEntityDuplicate = nodeDefEntity => {
   const isRoot = NodeDef.isRoot(nodeDefEntity)
@@ -144,4 +143,4 @@ const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
   }
 }
 
-module.exports = RecordsAndEntitiesUniquenessValidationJob
+module.exports = EntitiesUniquenessValidationJob
