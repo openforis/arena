@@ -120,7 +120,7 @@ class RecordsImportJob extends Job {
   }
 
   async traverseCollectRecordAndInsertNodes (survey, record, collectRecordJson) {
-    const { nodeDefUuidByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
+    const { nodeDefsInfoByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
 
     const collectRootEntityName = R.pipe(
       R.keys,
@@ -148,37 +148,42 @@ class RecordsImportJob extends Job {
       const item = queue.dequeue()
       const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
 
-      const nodeDefUuid = nodeDefUuidByCollectPath[collectNodeDefPath]
-      const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+      const nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
 
-      let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
+      for (const { uuid: nodeDefUuid, field } of nodeDefsInfo) {
+        const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-      const valueAndMeta = NodeDef.isAttribute(nodeDef)
-        ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta(
-          survey, nodeDef, record, nodeToInsert,
-          collectSurveyFileZip, collectSurvey, collectNodeDef, collectNode,
-          this.tx
-        )
-        : {}
-      const { value = null, meta = {} } = valueAndMeta || {}
+        let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
 
-      nodeToInsert = Node.assocValue(value)(nodeToInsert)
-      nodeToInsert = Node.assocMeta(meta)(nodeToInsert)
+        const valueAndMeta = NodeDef.isAttribute(nodeDef)
+          ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta(
+            survey, nodeDef, record, nodeToInsert,
+            collectSurveyFileZip, collectSurvey, collectNodeDef, collectNode, field,
+            this.tx
+          )
+          : {}
+        const { value = null, meta = {} } = valueAndMeta || {}
 
-      await this._insertNode(nodeDef, nodeToInsert)
+        nodeToInsert = R.pipe(
+          Node.assocValue(value),
+          Node.assocMeta(meta),
+        )(nodeToInsert)
 
-      if (NodeDef.isEntity(nodeDef)) {
+        await this._insertNode(nodeDef, nodeToInsert)
 
-        // create child nodes to insert
-        const { nodesToInsert, validation } = this._createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, nodeToInsert, recordValidation)
-        recordValidation = validation
-        queue.enqueueItems(nodesToInsert)
+        if (NodeDef.isEntity(nodeDef)) {
 
-      } else {
-        const validationAttribute = RecordValidator.validateAttribute(nodeToInsert)
-        if (!Validator.isValidationValid(validationAttribute)) {
-          recordValidation[Validator.keys.valid] = false
-          recordValidation[Validator.keys.fields][Node.getUuid(nodeToInsert)] = validationAttribute
+          // create child nodes to insert
+          const { nodesToInsert, validation } = this._createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, nodeToInsert, recordValidation)
+          recordValidation = validation
+          queue.enqueueItems(nodesToInsert)
+
+        } else {
+          const validationAttribute = RecordValidator.validateAttribute(nodeToInsert)
+          if (!Validator.isValidationValid(validationAttribute)) {
+            recordValidation[Validator.keys.valid] = false
+            recordValidation[Validator.keys.fields][Node.getUuid(nodeToInsert)] = validationAttribute
+          }
         }
       }
     }
@@ -188,7 +193,7 @@ class RecordsImportJob extends Job {
   }
 
   _createNodeChildrenToInsert (survey, collectNodeDef, collectNodeDefPath, collectNode, node, recordValidation) {
-    const { nodeDefUuidByCollectPath } = this.context
+    const { nodeDefsInfoByCollectPath } = this.context
 
     //output
     const nodesToInsert = []
@@ -203,10 +208,9 @@ class RecordsImportJob extends Job {
 
       const collectNodeDefChildName = CollectSurvey.getAttributeName(collectNodeDefChild)
       const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
-      const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
+      const nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefChildPath]
 
-      if (nodeDefChildUuid) {
-        const nodeDefChild = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
+      if (nodeDefsInfo) {
         const collectChildNodes = CollectRecord.getNodeChildren([collectNodeDefChildName])(collectNode)
 
         const childrenCount = collectChildNodes.length
@@ -223,6 +227,10 @@ class RecordsImportJob extends Job {
             collectNode: collectChildNode
           })
         }
+
+        //get nodeDefUuid from first nodeDef field
+        const { uuid: nodeDefChildUuid } = nodeDefsInfo[0]
+        const nodeDefChild = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
 
         //validate min/max count
         if (NodeDefValidations.hasMinOrMaxCount(NodeDef.getValidations(nodeDefChild))) {
@@ -244,9 +252,8 @@ class RecordsImportJob extends Job {
             collectNode: {}
           })
         }
-
       } else {
-        this.logDebug(`==== NodeDef not found for ${collectNodeDefChildPath}`)
+        this.logError(`==== NodeDef not found for ${collectNodeDefChildPath}`)
       }
     }
 

@@ -11,31 +11,43 @@ const collectNodeDefTypes = {
   entity: 'entity',
   file: 'file',
   number: 'number',
+  range: 'range',
   taxon: 'taxon',
   text: 'text',
   time: 'time'
 }
 
-const nodeDefTypesExtractorByCollectType = {
-  [collectNodeDefTypes.boolean]: () => nodeDefType.boolean,
-  [collectNodeDefTypes.code]: () => nodeDefType.code,
-  [collectNodeDefTypes.coordinate]: () => nodeDefType.coordinate,
-  [collectNodeDefTypes.date]: () => nodeDefType.date,
-  [collectNodeDefTypes.entity]: () => nodeDefType.entity,
-  [collectNodeDefTypes.file]: () => nodeDefType.file,
-  [collectNodeDefTypes.number]: collectNodeDef =>
-    getAttribute('type')(collectNodeDef) === 'real'
+const nodeDefFieldsExtractorByCollectType = {
+  [collectNodeDefTypes.boolean]: () => [{ type: nodeDefType.boolean }],
+  [collectNodeDefTypes.code]: () => [{ type: nodeDefType.code }],
+  [collectNodeDefTypes.coordinate]: () => [{ type: nodeDefType.coordinate }],
+  [collectNodeDefTypes.date]: () => [{ type: nodeDefType.date }],
+  [collectNodeDefTypes.entity]: () => [{ type: nodeDefType.entity }],
+  [collectNodeDefTypes.file]: () => [{ type: nodeDefType.file }],
+  [collectNodeDefTypes.number]: collectNodeDef => {
+    const type = getAttribute('type')(collectNodeDef) === 'real'
       ? nodeDefType.decimal
-      : nodeDefType.integer,
-  [collectNodeDefTypes.taxon]: () => nodeDefType.taxon,
-  [collectNodeDefTypes.text]: () => nodeDefType.text,
-  [collectNodeDefTypes.time]: () => nodeDefType.time,
+      : nodeDefType.integer
+    return [{ type }]
+  },
+  [collectNodeDefTypes.range]: collectNodeDef => {
+    const type = getAttribute('type')(collectNodeDef) === 'real'
+      ? nodeDefType.decimal
+      : nodeDefType.integer
+    return [
+      { type, field: 'from' },
+      { type, field: 'to' }
+    ]
+  },
+  [collectNodeDefTypes.taxon]: () => [{ type: nodeDefType.taxon }],
+  [collectNodeDefTypes.text]: () => [{ type: nodeDefType.text }],
+  [collectNodeDefTypes.time]: () => [{ type: nodeDefType.time }],
 }
 
-const getNodeDefTypeByCollectNodeDef = collectNodeDef => {
+const getNodeDefFieldsByCollectNodeDef = collectNodeDef => {
   const collectType = getElementName(collectNodeDef)
-  const typeExtractor = nodeDefTypesExtractorByCollectType[collectType]
-  return typeExtractor && typeExtractor(collectNodeDef)
+  const fieldsExtractor = nodeDefFieldsExtractorByCollectType[collectType]
+  return fieldsExtractor && fieldsExtractor(collectNodeDef)
 }
 
 const keys = {
@@ -51,17 +63,20 @@ const layoutTypes = {
   table: 'table',
 }
 
-const toLabels = (elName, defaultLang, typeFilter = null) =>
+const toLabels = (elName, defaultLang, typeFilter = null, suffix = '') =>
   xml =>
     R.pipe(
       getElementsByName(elName),
-      R.reduce((acc, l) => {
-        const lang = getAttribute(keys.lang, defaultLang)(l)
-        const type = getAttribute(keys.type)(l)
+      R.reduce((labelsAcc, labelEl) => {
+        const lang = getAttribute(keys.lang, defaultLang)(labelEl)
+        const type = getAttribute(keys.type)(labelEl)
 
-        return typeFilter === null || type === typeFilter
-          ? R.assoc(lang, getText(l), acc)
-          : acc
+        if (typeFilter === null || type === typeFilter) {
+          const text = getText(labelEl) + suffix
+          return R.assoc(lang, text, labelsAcc)
+        } else {
+          return labelsAcc
+        }
       }, {})
     )(xml)
 
@@ -167,7 +182,7 @@ const _isNodeDefElement = R.pipe(
 module.exports = {
   layoutTypes,
 
-  getNodeDefTypeByCollectNodeDef,
+  getNodeDefFieldsByCollectNodeDef,
 
   toLabels,
   getElements,
