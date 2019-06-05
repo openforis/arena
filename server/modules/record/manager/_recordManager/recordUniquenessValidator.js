@@ -32,7 +32,7 @@ const validateEntityKeysUniqueness = (survey, record, nodeEntity) => {
           [Node.getUuid(keyNode)]: {
             [Validator.keys.fields]: {
               [RecordValidation.keys.entityKeys]: {
-                [Validator.keys.errors]: isDuplicate ? [errorKeys.duplicateEntity] : [],
+                [Validator.keys.errors]: isDuplicate ? [{ key: errorKeys.duplicateEntity }] : [],
                 [Validator.keys.valid]: !isDuplicate
               }
             }
@@ -84,7 +84,7 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
         [Node.getUuid(keyNode)]: {
           [Validator.keys.fields]: {
             [RecordValidation.keys.recordKeys]: {
-              [Validator.keys.errors]: isUnique ? [] : [errorKeys.duplicateRecordKey],
+              [Validator.keys.errors]: isUnique ? [] : [{ key: errorKeys.duplicateRecordKey }],
               [Validator.keys.valid]: isUnique
             }
           }

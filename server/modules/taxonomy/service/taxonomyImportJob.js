@@ -164,7 +164,7 @@ class TaxonomyImportJob extends Job {
       const duplicateCodeRow = this.codesToRow[code]
 
       if (duplicateCodeRow) {
-        validation = Validator.assocFieldValidation(Taxon.propKeys.code, { valid: false, errors: [Validator.errorKeys.duplicate] })(validation)
+        validation = Validator.assocFieldValidation(Taxon.propKeys.code, { valid: false, errors: [{ key: Validator.errorKeys.duplicate }] })(validation)
       } else {
         this.codesToRow[code] = this.processed + 1
       }
@@ -173,7 +173,7 @@ class TaxonomyImportJob extends Job {
       const duplicateScientificNameRow = this.scientificNamesToRow[scientificName]
 
       if (duplicateScientificNameRow) {
-        validation = Validator.assocFieldValidation(Taxon.propKeys.scientificName, { valid: false, errors: [Validator.errorKeys.duplicate] })(validation)
+        validation = Validator.assocFieldValidation(Taxon.propKeys.scientificName, { valid: false, errors: [{ key: Validator.errorKeys.duplicate }] })(validation)
       } else {
         this.scientificNamesToRow[scientificName] = this.processed + 1
       }

@@ -2,7 +2,7 @@ import './form.scss'
 
 import React from 'react'
 
-import Tooltip from '../tooltip'
+import ValidationTooltip from '../validationTooltip'
 import { TextMask, InputAdapter } from 'react-text-mask-hoc'
 
 export const FormItem = ({ label, children }) => (
@@ -24,8 +24,8 @@ export const Input = React.forwardRef((props, ref) => {
   } = props
 
   return (
-    <Tooltip
-      messages={validation.errors}
+    <ValidationTooltip
+      messages={validation}
       type={`${validation.errors ? 'error' : ''}`}
       className="form-input-container">
 
@@ -45,6 +45,6 @@ export const Input = React.forwardRef((props, ref) => {
         {...inputProps}
       />
 
-    </Tooltip>
+    </ValidationTooltip>
   )
 })

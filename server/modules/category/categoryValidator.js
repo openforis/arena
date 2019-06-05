@@ -56,12 +56,12 @@ const getChildrenItems = (itemsByParentUuid, parentItemUuid) =>
 const validateNotEmptyChildrenItems = (isLeaf, itemsByParentUuid) =>
   (propName, item) =>
     !isLeaf && R.isEmpty(getChildrenItems(itemsByParentUuid, CategoryItem.getUuid(item)))
-      ? errorKeys.empty
+      ? { key: errorKeys.empty }
       : null
 
 const validateNotEmptyFirstLevelItems = itemsByParentUuid => (propName, level) =>
   CategoryLevel.getIndex(level) === 0 && R.isEmpty(getChildrenItems(itemsByParentUuid, null))
-    ? errorKeys.empty
+    ? { key: errorKeys.empty }
     : null
 
 const validateItem = async (category, itemsByParentUuid, parentItemUuid, itemUuid) => {

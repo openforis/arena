@@ -27,7 +27,7 @@ const AppJobErrors = ({ job }) => {
                     {errorKey}
                   </div>
                   <div>
-                    {getValidationFieldMessagesHTML(errors[errorKey])}
+                    {getValidationFieldMessagesHTML(i18n)(errors[errorKey])}
                   </div>
                 </div>
               )

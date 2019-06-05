@@ -1,5 +1,5 @@
 import React from 'react'
-import Tooltip from '../tooltip'
+import ValidationTooltip from '../validationTooltip'
 
 class Checkbox extends React.Component {
 
@@ -16,7 +16,7 @@ class Checkbox extends React.Component {
 
     return (
       <div style={{ justifySelf: 'start' }}>
-        <Tooltip messages={validation.errors} type={validation.errors ? 'error' : ''}>
+        <ValidationTooltip messages={validation} type={validation.errors ? 'error' : ''}>
 
           <button className="btn btn-s btn-transparent btn-checkbox"
                   onClick={() => onChange(!checked)}
@@ -25,7 +25,7 @@ class Checkbox extends React.Component {
             {label}
           </button>
 
-        </Tooltip>
+        </ValidationTooltip>
       </div>
     )
   }

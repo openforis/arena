@@ -4,26 +4,19 @@ import React from 'react'
 
 import useI18n from '../commonComponents/useI18n'
 
-import * as ValidationUtils from '../utils/validationUtils'
 import Validator from '../../common/validation/validator'
 
-import Tooltip from './tooltip'
+import ValidationTooltip from './validationTooltip'
 
 const ErrorBadge = ({ validation, showLabel, labelKey, tooltipErrorMessage }) => {
 
   const i18n = useI18n()
   const invalid = !Validator.isValidationValid(validation)
 
-  const errorMessages = invalid
-    ? tooltipErrorMessage
-      ? [tooltipErrorMessage]
-      : ValidationUtils.getValidationFieldMessagesHTML(Validator.getFieldValidations(validation))
-    : []
-
   return invalid
     ? (
-      <Tooltip
-        messages={errorMessages}
+      <ValidationTooltip
+        messages={Validator.getFieldValidations(validation)}
         type="error"
         className="badge error-badge">
         <div className="badge__content">
@@ -33,7 +26,7 @@ const ErrorBadge = ({ validation, showLabel, labelKey, tooltipErrorMessage }) =>
             <span>{i18n.t(labelKey)}</span>
           }
         </div>
-      </Tooltip>
+      </ValidationTooltip>
     )
     : null
 }
