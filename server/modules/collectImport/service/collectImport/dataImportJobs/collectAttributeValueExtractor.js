@@ -16,8 +16,8 @@ const FileManager = require('../../../../record/manager/fileManager')
 const CollectSurvey = require('../model/collectSurvey')
 const CollectRecord = require('../model/collectRecord')
 
-const extractTextValueAndMeta = collectNode => {
-  const value = CollectRecord.getTextValue('value')(collectNode)
+const extractTextValueAndMeta = (collectNode, collectNodeField = 'value') => {
+  const value = CollectRecord.getTextValue(collectNodeField)(collectNode)
   return value
     ? { value }
     : null
@@ -139,7 +139,7 @@ const extractTimeValueAndMeta = collectNode => {
 
 const extractAttributeValueAndMeta = async (
   survey, nodeDef, record, node, // arena items
-  collectSurveyFileZip, collectSurvey, collectNodeDef, collectNode, // collect items
+  collectSurveyFileZip, collectSurvey, collectNodeDef, collectNode, collectNodeField, // collect items
   tx,
 ) => {
 
@@ -148,7 +148,7 @@ const extractAttributeValueAndMeta = async (
     case nodeDefType.decimal:
     case nodeDefType.integer:
     case nodeDefType.text:
-      return extractTextValueAndMeta(collectNode)
+      return extractTextValueAndMeta(collectNode, collectNodeField)
 
     case nodeDefType.code:
       return extractCodeValueAndMeta(survey, nodeDef, record, node)(collectNode)

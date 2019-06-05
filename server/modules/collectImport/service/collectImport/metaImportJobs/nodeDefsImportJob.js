@@ -69,7 +69,7 @@ class NodeDefsImportJob extends Job {
 
     this.nodeDefs = {} //node definitions by uuid
     this.nodeDefNames = [] //node def names used (to avoid naming collision)
-    this.nodeDefUuidByCollectPath = {} //used by following jobs
+    this.nodeDefsInfoByCollectPath = {} //used by following jobs
     this.issuesCount = 0
   }
 
@@ -94,15 +94,18 @@ class NodeDefsImportJob extends Job {
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, tx)
 
     this.setContext({
-      nodeDefUuidByCollectPath: this.nodeDefUuidByCollectPath,
+      nodeDefsInfoByCollectPath: this.nodeDefsInfoByCollectPath,
       [Job.keysContext.survey]: survey
     })
   }
 
   /**
    * Inserts a node definition and all its descendants (if any)
+   *
+   * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
+   * (used to import Collect composite attribute definitions like Range)
    */
-  async insertNodeDef (surveyId, parentNodeDef, parentPath, collectNodeDef, type, tx) {
+  async insertNodeDef (surveyId, parentNodeDef, parentPath, collectNodeDef, type, tx, field = null) {
     const { defaultLanguage } = this.context
 
     // 1. determine basic props
@@ -116,11 +119,14 @@ class NodeDefsImportJob extends Job {
     const tableLayout = multiple &&
       CollectSurvey.getUiAttribute('layout', CollectSurvey.layoutTypes.table)(collectNodeDef) === CollectSurvey.layoutTypes.table
 
+    const nodeDefNameSuffix = field ? `_${field}` : ''
+    const nodeDefLabelSuffix = field ? ` (${field})` : ''
+
     const props = {
-      [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName),
+      [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName + nodeDefNameSuffix),
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
-      [NodeDef.propKeys.labels]: CollectSurvey.toLabels('label', defaultLanguage, 'instance')(collectNodeDef),
+      [NodeDef.propKeys.labels]: CollectSurvey.toLabels('label', defaultLanguage, 'instance', nodeDefLabelSuffix)(collectNodeDef),
       ...type === NodeDef.nodeDefType.entity
         ? {
           [NodeDefLayout.nodeDefLayoutProps.render]:
@@ -157,12 +163,15 @@ class NodeDefsImportJob extends Job {
         if (this.isCanceled())
           break
 
-        const childType = CollectSurvey.getNodeDefTypeByCollectNodeDef(collectChild)
+        const childDefFields = CollectSurvey.getNodeDefFieldsByCollectNodeDef(collectChild)
 
-        if (childType) {
-          const childDef = await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChild, childType, tx)
-          if (tableLayout) {
-            childrenUuids.push(NodeDef.getUuid(childDef))
+        if (childDefFields) {
+          for (const childDefField of childDefFields) {
+            const { type: childType, field = null } = childDefField
+            const childDef = await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChild, childType, tx, field)
+            if (tableLayout) {
+              childrenUuids.push(NodeDef.getUuid(childDef))
+            }
           }
         }
       }
@@ -181,7 +190,16 @@ class NodeDefsImportJob extends Job {
     nodeDef = await NodeDefManager.updateNodeDefProps(this.getUser(), surveyId, nodeDefUuid, propsUpdated, propsAdvanced, tx)
 
     // 6. store nodeDef in cache
-    this.nodeDefUuidByCollectPath[collectNodeDefPath] = nodeDefUuid
+    let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
+    if (!nodeDefsInfo) {
+      nodeDefsInfo = []
+      this.nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
+    }
+    nodeDefsInfo.push({
+      uuid: nodeDefUuid,
+      ...field ? { field } : {}
+    })
+
     this.nodeDefs[nodeDefUuid] = nodeDef
 
     return nodeDef
