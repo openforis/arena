@@ -36,26 +36,14 @@ const insertNode = (surveyId, node, client = db) => {
   )
 }
 
-const insertNodes = async (surveyId, nodes, client = db) => {
-  const values = nodes.map(n => [
-    Node.getUuid(n),
-    Node.getRecordUuid(n),
-    Node.getParentUuid(n),
-    Node.getNodeDefUuid(n),
-    stringifyValue(Node.getValue(n, null)),
-    {
-      ...n.meta,
-      [Node.metaKeys.childApplicability]: {}
-    }
-  ])
-
+const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
   await client.none(insertAllQuery(
     getSurveyDBSchema(surveyId),
     'node',
-    ['uuid', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'],
-    values
+    ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'],
+    nodeValues
   ))
-}
+
 // ============== READ
 
 const fetchNodesByRecordUuid = async (surveyId, recordUuid, client = db) =>
@@ -150,7 +138,7 @@ const stringifyValue = value => {
 module.exports = {
   //CREATE
   insertNode,
-  insertNodes,
+  insertNodesFromValues,
 
   //READ
   fetchNodesByRecordUuid,

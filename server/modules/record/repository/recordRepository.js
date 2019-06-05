@@ -2,7 +2,7 @@ const R = require('ramda')
 const camelize = require('camelize')
 
 const db = require('../../../db/db')
-const { selectDate } = require('../../../db/dbUtils')
+const DbUtils = require('../../../db/dbUtils')
 
 const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
@@ -13,7 +13,7 @@ const Validator = require('../../../../common/validation/validator')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
-const recordSelectFields = `uuid, owner_id, step, ${selectDate('date_created')}, preview, validation`
+const recordSelectFields = `uuid, owner_id, step, ${DbUtils.selectDate('date_created')}, preview, validation`
 
 const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
   const validation = Record.getValidation(record)
@@ -48,27 +48,44 @@ const countRecordsBySurveyId = async (surveyId, client = db) =>
 const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys, offset = 0, limit = null, client = db) => {
 
   const rootEntityTableAlias = 'n0'
-  const getNodeDefKeyColName = R.pipe(NodeDefTable.getColNames, R.head)
+  const getNodeDefKeyColName = NodeDefTable.getColName
   const getNodeDefKeyColAlias = NodeDef.getName
   const nodeDefKeysSelect = nodeDefKeys.map(
     nodeDefKey => `${rootEntityTableAlias}.${getNodeDefKeyColName(nodeDefKey)} as "${getNodeDefKeyColAlias(nodeDefKey)}"`
   ).join(',')
 
-  return await client.map(`
+  const recordsSelect = `
     SELECT 
-      r.uuid, r.owner_id, r.step, ${selectDate('r.date_created', 'date_created')}, validation,
+        r.uuid, 
+        r.owner_id, 
+        r.step, 
+        ${DbUtils.selectDate('r.date_created', 'date_created')}, 
+        r.validation
+    FROM ${getSurveyDBSchema(surveyId)}.record r
+    WHERE r.preview = FALSE
+    ORDER BY r.date_created DESC
+    LIMIT ${limit ? limit : 'ALL'}
+    OFFSET ${offset}
+  `
+
+  return await client.map(`
+    WITH r AS (${recordsSelect})
+    SELECT 
+      r.*,
       n.date_modified,
       u.name as owner_name,
       ${nodeDefKeysSelect}
-    FROM ${getSurveyDBSchema(surveyId)}.record r
+    FROM  r
     -- GET OWNER NAME
     JOIN "user" u
       ON r.owner_id = u.id
     -- GET LAST MODIFIED NODE DATE
     LEFT OUTER JOIN (
          SELECT 
-           record_uuid, ${selectDate('MAX(date_modified)', 'date_modified')}
+           record_uuid, ${DbUtils.selectDate('MAX(date_modified)', 'date_modified')}
          FROM ${getSurveyDBSchema(surveyId)}.node
+         WHERE
+           record_uuid IN (select uuid from r)
          GROUP BY record_uuid
     ) as n
       ON r.uuid = n.record_uuid
@@ -76,10 +93,6 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
     LEFT OUTER JOIN
       ${SchemaRdb.getName(surveyId)}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
-    WHERE r.preview = FALSE
-    ORDER BY r.date_created DESC
-    LIMIT ${limit ? limit : 'ALL'}
-    OFFSET ${offset}
   `,
     [],
     dbTransformCallback(surveyId, false)
@@ -123,6 +136,15 @@ const updateRecordStep = async (surveyId, recordUuid, step, client = db) =>
     [step, recordUuid]
   )
 
+const updateRecordValidationsFromValues = async (surveyId, recordUuidAndValidationValues, client = db) =>
+  await client.none(DbUtils.updateAllQuery(
+    getSurveyDBSchema(surveyId),
+    'record',
+    { name: 'uuid', cast: 'uuid' },
+    [{ name: 'validation', cast: 'jsonb' }],
+    recordUuidAndValidationValues,
+  ))
+
 // ============== DELETE
 
 const deleteRecord = async (surveyId, recordUuid, client = db) =>
@@ -156,6 +178,7 @@ module.exports = {
   // UPDATE
   updateValidation,
   updateRecordStep,
+  updateRecordValidationsFromValues,
 
   // DELETE
   deleteRecord,

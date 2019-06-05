@@ -23,10 +23,10 @@ const AppJobErrors = ({ job }) => {
             R.keys(errors)
               .map(errorKey =>
                 <div key={errorKey} className="row">
-                  <div>
+                  <div className="item">
                     {errorKey}
                   </div>
-                  <div>
+                  <div className="item-error">
                     {getValidationFieldMessagesHTML(i18n)(errors[errorKey])}
                   </div>
                 </div>

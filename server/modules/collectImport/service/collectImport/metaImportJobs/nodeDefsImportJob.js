@@ -2,6 +2,8 @@ const util = require('util')
 const R = require('ramda')
 
 const { uuidv4 } = require('../../../../../../common/uuid')
+const StringUtils = require('../../../../../../common/stringUtils')
+
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const NodeDefValidations = require('../../../../../../common/survey/nodeDefValidations')
@@ -19,7 +21,7 @@ const Job = require('../../../../../job/job')
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const CollectImportReportManager = require('../../../manager/collectImportReportManager')
-const CollectIdmlParseUtils = require('./collectIdmlParseUtils')
+const CollectSurvey = require('../model/collectSurvey')
 
 const qualifiableItemApplicableExpressionFormat = `this.node('%s').getValue().props.code === '%s'`
 const specifyAttributeSuffix = 'specify'
@@ -34,7 +36,7 @@ const checkExpressionParserByType = {
     }
     const exprParts = []
 
-    const attributes = CollectIdmlParseUtils.getAttributes(collectCheck)
+    const attributes = CollectSurvey.getAttributes(collectCheck)
     for (const attr of R.keys(attributes)) {
       const operator = attributeToOperator[attr]
       if (operator)
@@ -43,19 +45,19 @@ const checkExpressionParserByType = {
     return R.join(' and ', exprParts)
   },
   'check': collectCheck => {
-    const { expr } = CollectIdmlParseUtils.getAttributes(collectCheck)
+    const { expr } = CollectSurvey.getAttributes(collectCheck)
     return expr
   },
   'distance': collectCheck => {
-    const { max, to } = CollectIdmlParseUtils.getAttributes(collectCheck)
+    const { max, to } = CollectSurvey.getAttributes(collectCheck)
     return `distance from $this to ${to} must be <= ${max}m`
   },
   'pattern': collectCheck => {
-    const { regex } = CollectIdmlParseUtils.getAttributes(collectCheck)
+    const { regex } = CollectSurvey.getAttributes(collectCheck)
     return `$this must respect the pattern: ${regex}`
   },
   'unique': collectCheck => {
-    const { expr } = CollectIdmlParseUtils.getAttributes(collectCheck)
+    const { expr } = CollectSurvey.getAttributes(collectCheck)
     return expr
   }
 }
@@ -76,7 +78,7 @@ class NodeDefsImportJob extends Job {
 
     // insert root entity and descendants recursively
     const collectRootDef = R.pipe(
-      CollectIdmlParseUtils.getElementsByPath(['schema', 'entity']),
+      CollectSurvey.getElementsByPath(['schema', 'entity']),
       R.head
     )(collectSurvey)
 
@@ -88,8 +90,12 @@ class NodeDefsImportJob extends Job {
     }
     await SurveyManager.updateSurveyProp(user, surveyId, Survey.infoKeys.collectReport, collectReport, tx)
 
+    //fetch survey and store it in context
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, tx)
+
     this.setContext({
       nodeDefUuidByCollectPath: this.nodeDefUuidByCollectPath,
+      [Job.keysContext.survey]: survey
     })
   }
 
@@ -100,21 +106,21 @@ class NodeDefsImportJob extends Job {
     const { defaultLanguage } = this.context
 
     // 1. determine basic props
-    const collectNodeDefName = CollectIdmlParseUtils.getAttribute('name')(collectNodeDef)
-    const multiple = CollectIdmlParseUtils.getAttributeBoolean('multiple')(collectNodeDef)
-    const calculated = CollectIdmlParseUtils.getAttributeBoolean('calculated')(collectNodeDef)
-    const key = CollectIdmlParseUtils.getAttributeBoolean('key')(collectNodeDef)
+    const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
+    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
+    const calculated = CollectSurvey.getAttributeBoolean('calculated')(collectNodeDef)
+    const key = CollectSurvey.getAttributeBoolean('key')(collectNodeDef)
 
     const collectNodeDefPath = parentPath + '/' + collectNodeDefName
 
     const tableLayout = multiple &&
-      CollectIdmlParseUtils.getUiAttribute('layout', CollectIdmlParseUtils.layoutTypes.table)(collectNodeDef) === CollectIdmlParseUtils.layoutTypes.table
+      CollectSurvey.getUiAttribute('layout', CollectSurvey.layoutTypes.table)(collectNodeDef) === CollectSurvey.layoutTypes.table
 
     const props = {
       [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName),
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
-      [NodeDef.propKeys.labels]: CollectIdmlParseUtils.toLabels('label', defaultLanguage, 'instance')(collectNodeDef),
+      [NodeDef.propKeys.labels]: CollectSurvey.toLabels('label', defaultLanguage, 'instance')(collectNodeDef),
       ...type === NodeDef.nodeDefType.entity
         ? {
           [NodeDefLayout.nodeDefLayoutProps.render]:
@@ -151,7 +157,7 @@ class NodeDefsImportJob extends Job {
         if (this.isCanceled())
           break
 
-        const childType = CollectIdmlParseUtils.getNodeDefTypeByCollectNodeDef(collectChild)
+        const childType = CollectSurvey.getNodeDefTypeByCollectNodeDef(collectChild)
 
         if (childType) {
           const childDef = await this.insertNodeDef(surveyId, nodeDef, collectNodeDefPath, collectChild, childType, tx)
@@ -182,7 +188,7 @@ class NodeDefsImportJob extends Job {
   }
 
   async extractNodeDefAdvancedProps (parentNodeDef, nodeDefUuid, type, collectNodeDef, tx) {
-    const multiple = CollectIdmlParseUtils.getAttributeBoolean('multiple')(collectNodeDef)
+    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
 
     const propsAdvanced = {}
 
@@ -198,12 +204,12 @@ class NodeDefsImportJob extends Job {
       ...multiple
         ? {
           [NodeDefValidations.keys.count]: {
-            [NodeDefValidations.keys.min]: CollectIdmlParseUtils.getAttribute('minCount')(collectNodeDef),
-            [NodeDefValidations.keys.max]: CollectIdmlParseUtils.getAttribute('maxCount')(collectNodeDef),
+            [NodeDefValidations.keys.min]: CollectSurvey.getAttribute('minCount')(collectNodeDef),
+            [NodeDefValidations.keys.max]: CollectSurvey.getAttribute('maxCount')(collectNodeDef),
           }
         }
         : {
-          [NodeDefValidations.keys.required]: CollectIdmlParseUtils.getAttribute('required')(collectNodeDef),
+          [NodeDefValidations.keys.required]: CollectSurvey.getAttribute('required')(collectNodeDef),
         }
     }
 
@@ -212,13 +218,13 @@ class NodeDefsImportJob extends Job {
     }
 
     if (type === nodeDefType.code) {
-      const parentExpr = CollectIdmlParseUtils.getAttribute('parent')(collectNodeDef)
+      const parentExpr = CollectSurvey.getAttribute('parent')(collectNodeDef)
       if (parentExpr)
         await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.codeParent, parentExpr, null, null, tx)
     }
 
     // 3. applicable (not supported)
-    const relevantExpr = CollectIdmlParseUtils.getAttribute('relevant')(collectNodeDef)
+    const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
     if (relevantExpr) {
       await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.applicable, relevantExpr, null, null, tx)
     }
@@ -229,7 +235,7 @@ class NodeDefsImportJob extends Job {
   extractNodeDefExtraProps (parentNodeDef, type, collectNodeDef) {
     switch (type) {
       case nodeDefType.code:
-        const listName = CollectIdmlParseUtils.getAttribute('list')(collectNodeDef)
+        const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
         const category = R.find(c => listName === Category.getName(c), this.getContextProp('categories', []))
 
         return {
@@ -237,7 +243,7 @@ class NodeDefsImportJob extends Job {
           [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.dropdown
         }
       case nodeDefType.taxon:
-        const taxonomyName = CollectIdmlParseUtils.getAttribute('taxonomy')(collectNodeDef)
+        const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)
         const taxonomy = R.find(t => taxonomyName === Taxonomy.getName(t), this.getContextProp('taxonomies', []))
 
         return {
@@ -251,20 +257,22 @@ class NodeDefsImportJob extends Job {
   async parseNodeDefDefaultValues (nodeDefUuid, collectNodeDef, tx) {
     const { defaultLanguage } = this.context
 
-    const collectDefaultValues = CollectIdmlParseUtils.getElementsByName('default')(collectNodeDef)
+    const collectDefaultValues = CollectSurvey.getElementsByName('default')(collectNodeDef)
 
     const defaultValues = []
 
     for (const collectDefaultValue of collectDefaultValues) {
-      const { value, expression, applyIf } = CollectIdmlParseUtils.getAttributes(collectDefaultValue)
-      if (expression || applyIf) {
-        const messages = CollectIdmlParseUtils.toLabels('messages', defaultLanguage)(collectDefaultValue)
-        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.defaultValue, expression, applyIf, messages, tx)
-      } else {
+      const { value, expr, applyIf } = CollectSurvey.getAttributes(collectDefaultValue)
+      if (StringUtils.isNotBlank(expr) || StringUtils.isNotBlank(applyIf)) {
+        const messages = CollectSurvey.toLabels('messages', defaultLanguage)(collectDefaultValue)
+        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.defaultValue, expr, applyIf, messages, tx)
+      } else if (StringUtils.isNotBlank(value)) {
         defaultValues.push({
           [SurveyUtils.keys.uuid]: uuidv4(),
           [NodeDefExpression.keys.expression]: value
         })
+      } else {
+        this.logDebug('empty value found in default attribute constant value')
       }
     }
 
@@ -274,13 +282,13 @@ class NodeDefsImportJob extends Job {
   async parseNodeDefValidationRules (nodeDefUuid, collectNodeDef, tx) {
     const { defaultLanguage } = this.context
 
-    const elements = CollectIdmlParseUtils.getElements(collectNodeDef)
+    const elements = CollectSurvey.getElements(collectNodeDef)
     for (const element of elements) {
-      const checkExpressionParser = checkExpressionParserByType[CollectIdmlParseUtils.getName(element)]
+      const checkExpressionParser = checkExpressionParserByType[CollectSurvey.getElementName(element)]
       if (checkExpressionParser) {
         const collectExpr = checkExpressionParser(element)
-        const messages = CollectIdmlParseUtils.toLabels('message', defaultLanguage)(element)
-        const { condition } = CollectIdmlParseUtils.getAttributes(element)
+        const messages = CollectSurvey.toLabels('message', defaultLanguage)(element)
+        const { condition } = CollectSurvey.getAttributes(element)
 
         await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.check, collectExpr, condition, messages, tx)
       }
@@ -359,9 +367,9 @@ class NodeDefsImportJob extends Job {
 
 const determineNodeDefPageUuid = (type, collectNodeDef) => {
   if (type === NodeDef.nodeDefType.entity) {
-    const multiple = CollectIdmlParseUtils.getAttributeBoolean('multiple')(collectNodeDef)
+    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
     if (multiple) {
-      const tab = CollectIdmlParseUtils.getUiAttribute('tab')(collectNodeDef)
+      const tab = CollectSurvey.getUiAttribute('tab')(collectNodeDef)
 
       if (tab) {
         // multiple entity own tab => own page

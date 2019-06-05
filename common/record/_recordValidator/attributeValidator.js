@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const Survey = require('../../survey/survey')
 const NodeDef = require('../../survey/nodeDef')
@@ -18,68 +17,55 @@ const errorKeys = {
   invalidValue: 'invalidValue',
 }
 
-const validateRequired = (survey, nodeDef) =>
-  (propName, node) =>
-    Node.isValueBlank(node) &&
-    (NodeDef.isKey(nodeDef) || NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef)))
-      ? { key: errorKeys.required }
-      : null
+const validateRequired = (survey, nodeDef) => (propName, node) =>
+  (
+    NodeDef.isKey(nodeDef) ||
+    NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
+  ) &&
+  Node.isValueBlank(node)
+    ? { key: errorKeys.required }
+    : null
 
 /**
  * Evaluates the validation expressions.
  * Returns 'null' if all are valid, a concatenated error message otherwise.
  */
-const validateNodeValidations = (survey, record, nodeDef) =>
-  async (propName, node) => {
-    if (Node.isValueBlank(node)) {
-      return null
-    }
-    const validations = NodeDef.getValidations(nodeDef)
-
-    const applicableExpressionsEval = await RecordExprParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations))
-
-    const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-
-    return R.pipe(
-      R.reduce(
-        (acc, exprEval) => {
-          const { expression, value: valid } = exprEval
-          return valid
-            ? acc
-            : R.append(NodeDefExpression.getMessage(lang, errorKeys.invalidValue)(expression), acc)
-        },
-        []
-      ),
-      R.ifElse(
-        R.isEmpty,
-        R.always(null), //all validations are 'valid'
-        R.join('; ') //join the error messages with a ';' separator
-      )
-    )(applicableExpressionsEval)
-  }
-
-const validateAttribute = async (survey, record, attribute, nodeDef, validatedNodeUuids) => {
-  if (Node.isDeleted(attribute)) {
+const validateNodeValidations = (survey, record, nodeDef) => async (propName, node) => {
+  if (Node.isValueBlank(node)) {
     return null
   }
+  const validations = NodeDef.getValidations(nodeDef)
 
-  const nodeUuid = Node.getUuid(attribute)
+  const applicableExpressionsEval = await RecordExprParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations))
 
-  // mark attribute validated
-  validatedNodeUuids.push(nodeUuid)
+  const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
-  const validation = await Validator.validate(attribute, {
+  return R.pipe(
+    R.reduce(
+      (acc, exprEval) => {
+        const { expression, value: valid } = exprEval
+        return valid
+          ? acc
+          : R.append(NodeDefExpression.getMessage(lang, errorKeys.invalidValue)(expression), acc)
+      },
+      []
+    ),
+    R.ifElse(
+      R.isEmpty,
+      R.always(null), //all validations are 'valid'
+      R.join('; ') //join the error messages with a ';' separator
+    )
+  )(applicableExpressionsEval)
+}
+
+const validateAttribute = async (survey, record, attribute, nodeDef) =>
+  await Validator.validate(attribute, {
     [Node.keys.value]: [
       validateRequired(survey, nodeDef),
       AttributeTypeValidator.validateValueType(survey, nodeDef),
       validateNodeValidations(survey, record, nodeDef)
     ]
   }, false)
-
-  return {
-    [nodeUuid]: validation
-  }
-}
 
 const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
 
@@ -90,39 +76,44 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
 
   const validatedAttributeUuids = [] //used to avoid validating 2 times the same attributes
 
-  const attributeValidationsArray = await Promise.all(
-    attributes.map(
-      async attribute => {
-        const dependents = Record.getDependentNodes(survey, attribute, Survey.dependencyTypes.validations)(record)
+  const attributeValidations = {}
 
-        // include attribute itself if it's not already included among dependents
-        const attributeAndDependents =
-          R.includes(dep => R.equals(attribute, dep.nodeCtx))(dependents)
-            ? dependents
-            : R.append({
-              nodeDef: getNodeDef(survey, attribute),
-              nodeCtx: attribute
-            })(dependents)
+  for (const attribute of attributes) {
+    const dependents = Record.getDependentNodes(survey, attribute, Survey.dependencyTypes.validations)(record)
 
-        // call validateAttribute for each attribute
-        return await Promise.all(
-          attributeAndDependents.map(
-            async ({ nodeCtx, nodeDef }) =>
-              await validateAttribute(survey, record, nodeCtx, nodeDef, validatedAttributeUuids)
-          )
-        )
+    // include attribute itself if it's not already included among dependents
+    const attributeAndDependents =
+      R.includes(dep => R.equals(attribute, dep.nodeCtx))(dependents)
+        ? dependents
+        : R.append({
+          nodeDef: getNodeDef(survey, attribute),
+          nodeCtx: attribute
+        })(dependents)
+
+    // call validateAttribute for each attribute
+
+    for (const { nodeCtx, nodeDef } of attributeAndDependents) {
+
+      if (Node.isDeleted(attribute)) {
+        return null
       }
-    )
-  )
-  return R.pipe(
-    R.flatten,
-    R.mergeAll
-  )(attributeValidationsArray)
+      const attributeValidation = await validateAttribute(survey, record, nodeCtx, nodeDef)
+
+      const nodeCtxUuid = Node.getUuid(nodeCtx)
+
+      // mark attribute validated
+      validatedAttributeUuids.push(nodeCtxUuid)
+
+      attributeValidations[nodeCtxUuid] = attributeValidation
+    }
+  }
+  return attributeValidations
 }
 
 const getNodeDef = (survey, node) =>
   Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
 module.exports = {
+  validateAttribute,
   validateSelfAndDependentAttributes
 }

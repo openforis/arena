@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const db = require('../../../db/db')
-const { insertAllQuery } = require('../../../db/dbUtils')
+const DbUtils = require('../../../db/dbUtils')
 
 const Category = require('../../../../common/survey/category')
 const CategoryLevel = require('../../../../common/survey/categoryLevel')
@@ -52,7 +52,7 @@ const insertItems = async (surveyId, items, client = db) => {
     item.props
   ])
 
-  await client.none(insertAllQuery(
+  await client.none(DbUtils.insertAllQuery(
     getSurveyDBSchema(surveyId),
     'category_item',
     ['uuid', 'level_uuid', 'parent_uuid', 'props_draft'],
@@ -64,8 +64,9 @@ const insertItems = async (surveyId, items, client = db) => {
 
 const fetchCategoriesBySurveyId = async (surveyId, draft = false, client = db) =>
   await client.map(`
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.category
-    ORDER BY id`,
+    SELECT * 
+    FROM ${getSurveyDBSchema(surveyId)}.category
+    ORDER BY ${DbUtils.getPropColCombined(Category.props.name, draft)}, id`,
     [],
     def => dbTransformCallback(def, draft, true)
   )

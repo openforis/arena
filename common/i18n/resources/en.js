@@ -225,9 +225,10 @@ module.exports = {
 
   jobs: {
     CategoriesImportJob: 'Categories Import',
-    CategoriesValidationJob: 'Categories validation',
+    CategoriesValidationJob: 'Categories Validation',
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',
+    EntitiesUniquenessValidationJob: 'Entities Uniqueness Validation',
     NodeDefsImportJob: 'Node Defs Import',
     NodeDefsValidationJob: 'Node Defs Validation',
     RecordCheckJob: 'Record Check',
@@ -261,7 +262,7 @@ module.exports = {
     minCountNodesNotSpecified: 'Min count nodes not specified',
     maxCountNodesExceeded: 'Max count nodes exceeded',
 
-    duplicateRecordKey: 'Duplicate record key',
+    duplicateRecord: 'Duplicate record key',
     duplicateEntity: 'Duplicate entity',
 
     defaultValuesNotSpecified: 'Default value not specified',

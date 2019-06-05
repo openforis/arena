@@ -60,5 +60,8 @@ const persistValidation = async (survey, record, nodesValidation, tx) => {
 }
 
 module.exports = {
-  validateNodesAndPersistValidation
+  persistValidation,
+  updateRecordValidationsFromValues: RecordRepository.updateRecordValidationsFromValues,
+  validateNodesAndPersistValidation,
+  validateRecordKeysUniqueness: RecordUniquenessValidator.validateRecordKeysUniqueness
 }

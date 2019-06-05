@@ -91,9 +91,25 @@ const countDuplicateRecords = async (survey, record, client) => {
   return await runCount(surveyId, tableName, whereExpr, client)
 }
 
+const fetchRecordsCountByKeys = async (survey, client) => {
+  const rootEntityTableAlias = 'n0'
+  const nodeDefRoot = Survey.getRootNodeDef(survey)
+  const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
+  const keysCol = `CONCAT(${nodeDefKeys.map(nodeDefKey => `${rootEntityTableAlias}.${NodeDefTable.getColName(nodeDefKey)}`).join('____')})`
+
+  return await client.any(`
+    SELECT ${keysCol}, COUNT(*)
+    FROM ${SchemaRdb.getName(Survey.getId(survey))}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
+  `)
+
+}
+
+
+
 module.exports = {
   runSelect,
   runCount,
 
   countDuplicateRecords,
+  fetchRecordsCountByKeys,
 }

@@ -7,23 +7,28 @@ const Queue = require('../../../../../../common/queue')
 
 const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
+const NodeDefValidations = require('../../../../../../common/survey/nodeDefValidations')
 const Record = require('../../../../../../common/record/record')
 const Node = require('../../../../../../common/record/node')
+const RecordValidator = require('../../../../../../common/record/recordValidator')
+const Validator = require('../../../../../../common/validation/validator')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../../record/manager/recordManager')
 
 const Job = require('../../../../../job/job')
 
-const CollectRecordParseUtils = require('./collectRecordParseUtils')
+const CollectRecord = require('../model/collectRecord')
 const CollectAttributeValueExtractor = require('./collectAttributeValueExtractor')
+
+const CollectSurvey = require('../model/collectSurvey')
 
 class RecordsImportJob extends Job {
 
   constructor (params) {
-    super('RecordsImportJob', params)
+    super(RecordsImportJob.type, params)
 
-    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 1000)
+    this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
   }
 
   async onStart () {
@@ -44,7 +49,7 @@ class RecordsImportJob extends Job {
       if (this.isCanceled())
         break
 
-      this.logDebug(`-- start import record ${entryName}`)
+      // this.logDebug(`-- start import record ${entryName}`)
 
       // this.logDebug(`${entryName} findCollectRecordData start`)
       const collectRecordData = this.findCollectRecordData(entryName)
@@ -60,21 +65,18 @@ class RecordsImportJob extends Job {
       const record = await RecordManager.insertRecord(surveyId, recordToCreate, tx)
       const recordUuid = Record.getUuid(record)
       await RecordManager.updateRecordStep(surveyId, recordUuid, step, tx)
-
-      const collectRootEntityName = R.pipe(
-        R.keys,
-        R.reject(R.equals('_declaration')),
-        R.head,
-      )(collectRecordJson)
-
-      const collectRootEntity = collectRecordJson[collectRootEntityName]
       // this.logDebug(`${entryName} recordToCreate end`)
 
-      // this.logDebug(`${entryName} insertNode start`)
-      await this.insertNodes(survey, record, collectRootEntityName, collectRootEntity)
-      // this.logDebug(`${entryName} insertNode end`)
+      // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes start`)
+      const recordValidation = await this.traverseCollectRecordAndInsertNodes(survey, record, collectRecordJson)
+      // this.logDebug(`${entryName} traverseCollectRecordAndInsertNodes end`)
 
-      this.logDebug(`-- end import record ${entryName}`)
+      //persist validation
+      // this.logDebug(`${entryName} persistValidation start`)
+      await RecordManager.persistValidation(survey, record, recordValidation, this.tx)
+      // this.logDebug(`${entryName} persistValidation end`)
+
+      // this.logDebug(`-- end import record ${entryName}`)
 
       this.incrementProcessedItems()
     }
@@ -117,88 +119,173 @@ class RecordsImportJob extends Job {
     throw new Error(`Entry data not found: ${entryName}`)
   }
 
-  async insertNodes (survey, record, collectRootEntityName, collectRootEntity) {
-
+  async traverseCollectRecordAndInsertNodes (survey, record, collectRecordJson) {
     const { nodeDefUuidByCollectPath, collectSurveyFileZip, collectSurvey } = this.context
 
-    // init record nodes
-    record.nodes = {}
+    const collectRootEntityName = R.pipe(
+      R.keys,
+      R.reject(R.equals('_declaration')),
+      R.head,
+    )(collectRecordJson)
+
+    const collectRootEntity = collectRecordJson[collectRootEntityName]
+
     const recordUuid = Record.getUuid(record)
+    let recordValidation = Record.getValidation(record)
+
+    const collectRootEntityDefPath = `/${collectRootEntityName}`
+    const collectRootEntityDef = CollectSurvey.getNodeDefByPath(collectRootEntityDefPath)(collectSurvey)
 
     const queue = new Queue([{
-      parentNode: null,
-      collectNodeDefPath: `/${collectRootEntityName}`,
+      nodeParent: null,
+      collectNodeDef: collectRootEntityDef,
+      collectNodeDefPath: collectRootEntityDefPath,
       collectNode: collectRootEntity
     }])
 
     while (!queue.isEmpty()) {
 
       const item = queue.dequeue()
-      const { parentNode, collectNodeDefPath, collectNode } = item
+      const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
 
       const nodeDefUuid = nodeDefUuidByCollectPath[collectNodeDefPath]
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-      let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, parentNode)
+      let nodeToInsert = Node.newNode(nodeDefUuid, recordUuid, nodeParent)
 
-      if (NodeDef.isAttribute(nodeDef)) {
-        const valueAndMeta = await CollectAttributeValueExtractor.extractAttributeValueAndMeta(
+      const valueAndMeta = NodeDef.isAttribute(nodeDef)
+        ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta(
           survey, nodeDef, record, nodeToInsert,
-          collectSurveyFileZip, collectSurvey, collectNodeDefPath, collectNode,
+          collectSurveyFileZip, collectSurvey, collectNodeDef, collectNode,
           this.tx
         )
-        const value = R.prop('value', valueAndMeta)
-        if (value) {
-          nodeToInsert = Node.assocValue(value)(nodeToInsert)
-          const meta = R.prop('meta', valueAndMeta)
-          if (meta) {
-            nodeToInsert = Node.mergeMeta(meta)(nodeToInsert)
-          }
-        }
-      }
+        : {}
+      const { value = null, meta = {} } = valueAndMeta || {}
 
-      await this.batchPersister.addItem(nodeToInsert, this.tx)
-      record.nodes[Node.getUuid(nodeToInsert)] = nodeToInsert
+      nodeToInsert = Node.assocValue(value)(nodeToInsert)
+      nodeToInsert = Node.assocMeta(meta)(nodeToInsert)
+
+      await this._insertNode(nodeDef, nodeToInsert)
 
       if (NodeDef.isEntity(nodeDef)) {
-        const collectNodeDefChildNames = R.pipe(
-          R.keys,
-          R.reject(R.equals('_attributes'))
-        )(collectNode)
 
-        for (const collectNodeDefChildName of collectNodeDefChildNames) {
+        // create child nodes to insert
+        const { nodesToInsert, validation } = this._createNodeChildrenToInsert(survey, collectNodeDef, collectNodeDefPath, collectNode, nodeToInsert, recordValidation)
+        recordValidation = validation
+        queue.enqueueItems(nodesToInsert)
+
+      } else {
+        const validationAttribute = RecordValidator.validateAttribute(nodeToInsert)
+        if (!Validator.isValidationValid(validationAttribute)) {
+          recordValidation[Validator.keys.valid] = false
+          recordValidation[Validator.keys.fields][Node.getUuid(nodeToInsert)] = validationAttribute
+        }
+      }
+    }
+
+    return recordValidation
+
+  }
+
+  _createNodeChildrenToInsert (survey, collectNodeDef, collectNodeDefPath, collectNode, node, recordValidation) {
+    const { nodeDefUuidByCollectPath } = this.context
+
+    //output
+    const nodesToInsert = []
+
+    const nodeUuid = Node.getUuid(node)
+    let nodeValidation = Validator.getFieldValidation(nodeUuid)(recordValidation)
+
+    const collectNodeDefChildren = CollectSurvey.getNodeDefChildren(collectNodeDef)
+    for (const collectNodeDefChild of collectNodeDefChildren) {
+      if (this.isCanceled())
+        break
+
+      const collectNodeDefChildName = CollectSurvey.getAttributeName(collectNodeDefChild)
+      const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
+      const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
+
+      if (nodeDefChildUuid) {
+        const nodeDefChild = Survey.getNodeDefByUuid(nodeDefChildUuid)(survey)
+        const collectChildNodes = CollectRecord.getNodeChildren([collectNodeDefChildName])(collectNode)
+
+        const childrenCount = collectChildNodes.length
+
+        // if children count > 0
+        for (const collectChildNode of collectChildNodes) {
           if (this.isCanceled())
             break
 
-          const collectNodeDefChildPath = collectNodeDefPath + '/' + collectNodeDefChildName
-          const nodeDefChildUuid = nodeDefUuidByCollectPath[collectNodeDefChildPath]
-
-          if (nodeDefChildUuid) {
-            const collectChildNodes = CollectRecordParseUtils.getList([collectNodeDefChildName])(collectNode)
-            for (const collectChildNode of collectChildNodes) {
-              if (this.isCanceled())
-                break
-
-              queue.enqueue({
-                parentNode: nodeToInsert,
-                collectNodeDefPath: collectNodeDefChildPath,
-                collectNode: collectChildNode
-              })
-
-            }
-          }
+          nodesToInsert.push({
+            nodeParent: node,
+            collectNodeDef: collectNodeDefChild,
+            collectNodeDefPath: collectNodeDefChildPath,
+            collectNode: collectChildNode
+          })
         }
-      }
 
+        //validate min/max count
+        if (NodeDefValidations.hasMinOrMaxCount(NodeDef.getValidations(nodeDefChild))) {
+          const validationCount = RecordValidator.validateChildrenCount(survey, node, nodeDefChild, childrenCount)
+
+          if (!Validator.isValidationValid(validationCount)) {
+            recordValidation[Validator.keys.valid] = false
+            nodeValidation = R.mergeDeepRight(nodeValidation, validationCount)
+            recordValidation[Validator.keys.fields][nodeUuid] = nodeValidation
+          }
+
+        }
+
+        if (NodeDef.isSingle(nodeDefChild) && childrenCount === 0) {
+          nodesToInsert.push({
+            nodeParent: node,
+            collectNodeDef: collectNodeDefChild,
+            collectNodeDefPath: collectNodeDefChildPath,
+            collectNode: {}
+          })
+        }
+
+      } else {
+        this.logDebug(`==== NodeDef not found for ${collectNodeDefChildPath}`)
+      }
     }
 
+    return {
+      nodesToInsert,
+      recordValidation
+    }
   }
 
-  async nodesBatchInsertHandler (nodes, tx) {
+  async _insertNode (nodeDef, node) {
+    node.dateCreated = new Date()
+    const value = Node.getValue(node, null)
+
+    const nodeValueInsert = [
+      Node.getUuid(node),
+      node.dateCreated,
+      node.dateCreated,
+      Node.getRecordUuid(node),
+      Node.getParentUuid(node),
+      NodeDef.getUuid(nodeDef),
+      value === null || (NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) || NodeDef.isCoordinate(nodeDef) || NodeDef.isFile(nodeDef))
+        ? value
+        : JSON.stringify(value),
+      {
+        ...Node.getMeta(node),
+        [Node.metaKeys.childApplicability]: {}
+      }
+    ]
+
+    await this.batchPersister.addItem(nodeValueInsert, this.tx)
+  }
+
+  async nodesBatchInsertHandler (nodeValues, tx) {
     const surveyId = this.getSurveyId()
-    await RecordManager.insertNodes(surveyId, nodes, tx)
+    await RecordManager.insertNodesFromValues(surveyId, nodeValues, tx)
   }
 
 }
+
+RecordsImportJob.type = 'RecordsImportJob'
 
 module.exports = RecordsImportJob

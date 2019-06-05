@@ -41,7 +41,7 @@ const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, client = db) => {
 module.exports = {
   // ==== CREATE
   insertRecord: RecordRepository.insertRecord,
-  insertNodes: NodeRepository.insertNodes,
+  insertNodesFromValues: NodeRepository.insertNodesFromValues,
   insertNode: RecordUpdateManager.insertNode,
 
   // ==== READ
@@ -68,6 +68,8 @@ module.exports = {
   deleteNode: RecordUpdateManager.deleteNode,
 
   // ==== VALIDATION
+  persistValidation: RecordValidationManager.persistValidation,
+  updateRecordValidationsFromValues: RecordValidationManager.updateRecordValidationsFromValues,
   validateNodesAndPersistValidation: RecordValidationManager.validateNodesAndPersistValidation,
 
   // ====  UTILS

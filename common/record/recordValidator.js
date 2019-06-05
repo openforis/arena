@@ -12,10 +12,10 @@ const validateNodes = async (survey, record, nodes) => {
   const attributeValidations = await AttributeValidator.validateSelfAndDependentAttributes(survey, record, nodes)
 
   // 2. validate min/max count
-  const nodeCountValidations = CountValidator.validateChildrenCount(survey, record, nodes)
+  const nodeCountValidations = CountValidator.validateChildrenCountNodes(survey, record, nodes)
 
   // 3. validate entity keys uniqueness
-  const entityKeysValidations = EntityUniquenessValidator.validateEntitiesUniqueness(survey, record, nodes)
+  const entityKeysValidations = EntityUniquenessValidator.validateEntitiesUniquenessInNodes(survey, record, nodes)
 
   // 4. merge validations
   const validation = {
@@ -29,5 +29,7 @@ const validateNodes = async (survey, record, nodes) => {
 }
 
 module.exports = {
-  validateNodes
+  validateNodes,
+  validateAttribute: AttributeValidator.validateAttribute,
+  validateChildrenCount: CountValidator.validateChildrenCount
 }

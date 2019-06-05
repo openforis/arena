@@ -7,9 +7,11 @@ const SurveyCreatorJob = require('./metaImportJobs/surveyCreatorJob')
 const CategoriesImportJob = require('./metaImportJobs/categoriesImportJob')
 const TaxonomiesImportJob = require('./metaImportJobs/taxonomiesImportJob')
 const NodeDefsImportJob = require('./metaImportJobs/nodeDefsImportJob')
+const SurveyDependencyGraphsGenerationJob = require('../../../survey/service/surveyDependencyGraphsGenerationJob')
+
 const RecordsImportJob = require('./dataImportJobs/recordsImportJob')
+const EntitiesUniquenessValidationJob = require('./dataImportJobs/entitiesUniquenessValidationJob')
 const SurveyRdbGeneratorJob = require('../../../surveyRdb/service/surveyRdbGeneratorJob')
-const RecordCheckJob = require('../../../survey/service/recordCheckJob')
 
 class CollectImportJob extends Job {
 
@@ -20,12 +22,10 @@ class CollectImportJob extends Job {
       new CategoriesImportJob(),
       new TaxonomiesImportJob(),
       new NodeDefsImportJob(),
-      //import records
+      new SurveyDependencyGraphsGenerationJob(),
       new RecordsImportJob(),
-      //TODO restore it after performance improvement
-      // new RecordCheckJob(),
-      //generate RDB
       new SurveyRdbGeneratorJob(),
+      new EntitiesUniquenessValidationJob(),
     ])
   }
 

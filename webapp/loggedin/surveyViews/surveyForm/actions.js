@@ -5,6 +5,7 @@ import NodeDef from '../../../../common/survey/nodeDef'
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
 
+import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from '../record/recordState'
 
@@ -37,32 +38,20 @@ export const setFormPageNode = (nodeDef, node) => dispatch =>
 
 // ==== utils
 
-export const getNodeKeyLabelValues = nodeEntity => (dispatch, getState) => {
+export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (dispatch, getState) => {
   const state = getState()
 
   const survey = SurveyState.getSurvey(state)
   const record = RecordState.getRecord(state)
-  const lang = R.pipe(Survey.getSurveyInfo, Survey.getDefaultLanguage)(survey)
+  const lang = Survey.getLanguage(AppState.getLang(state))(survey)
+  const nodeDefKeys = Survey.getNodeDefKeys(nodeDef)(survey)
 
-  const nodeKeys = R.pipe(
-    Node.getNodeDefUuid,
-    nodeDefUuid => Survey.getNodeDefByUuid(nodeDefUuid)(survey),
-    nodeDef => Survey.getNodeDefKeys(nodeDef)(survey),
-    R.map(nodeDefKey => {
-        const nodeDefKeyUuid = NodeDef.getUuid(nodeDefKey)
-        return R.pipe(
-          Record.getNodeChildrenByDefUuid(nodeEntity, nodeDefKeyUuid),
-          R.head,
-          n => {
-            const label = NodeDef.getLabel(nodeDefKey, lang)
-            const value = Node.getValue(n, '')
-            return `${label} - ${value}`
-          }
-        )(record)
-      }
-    ),
-    R.join(', ')
-  )(nodeEntity)
+  const getNodeDefKeyLabelValue = nodeDefKey => {
+    const nodeKey = Record.getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)
+    const label = NodeDef.getLabel(nodeDefKey, lang)
+    const value = Node.getValue(nodeKey, '')
+    return `${label} - ${value}`
+  }
 
-  return nodeKeys
+  return nodeDefKeys.map(getNodeDefKeyLabelValue).join(', ')
 }

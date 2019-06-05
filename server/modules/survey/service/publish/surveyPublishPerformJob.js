@@ -1,7 +1,7 @@
 const Job = require('../../../../job/job')
 
 const SurveyPropsPublishJob = require('./jobs/surveyPropsPublishJob')
-const SurveyDependencyGraphsGenerationJob = require('./jobs/surveyDependencyGraphsGenerationJob')
+const SurveyDependencyGraphsGenerationJob = require('../surveyDependencyGraphsGenerationJob')
 
 class SurveyPublishPerformJob extends Job {
 

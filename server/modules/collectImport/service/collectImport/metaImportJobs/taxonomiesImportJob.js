@@ -62,7 +62,11 @@ class TaxonomiesImportJob extends Job {
   async importTaxonomyFromSpeciesFile (speciesFileName, tx) {
     const { collectSurveyFileZip, surveyId } = this.context
 
-    // 1. insert taxonomy
+    // 1. reset duplicate values indexes
+    this.rowsByCode = {}
+    this.rowsByScientificName = {}
+
+    // 2. insert taxonomy
     const taxonomyName = speciesFileName.substring(0, speciesFileName.length - 4)
 
     const taxonomyParam = Taxonomy.newTaxonomy({
@@ -71,7 +75,7 @@ class TaxonomiesImportJob extends Job {
     const taxonomy = await TaxonomyManager.insertTaxonomy(this.getUser(), surveyId, taxonomyParam, tx)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
 
-    // 2. parse CSV file
+    // 3. parse CSV file
     const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
 
     const csvParser = new CSVParser(speciesFileStream, true)

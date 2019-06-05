@@ -189,7 +189,7 @@ class Job {
 
     throttle(
       async () => await this._notifyEvent(this._createJobEvent(jobEvents.progress)),
-      this._getProgressThrottleId,
+      this._getProgressThrottleId(),
       1000
     )()
   }
@@ -244,7 +244,7 @@ class Job {
     Object.assign(this.result, result)
   }
 
-  getContextSurvey () {
+  get contextSurvey () {
     return this.getContextProp(Job.keysContext.survey)
   }
 
@@ -302,8 +302,10 @@ class Job {
         //cancel or fail even parent job
         await this._setStatus(event.status)
         break
-      default:
-        await this._notifyEvent(event) //propagate events to parent job
+      case jobStatus.running:
+        //propagate progress event to parent job
+        await this._notifyEvent(this._createJobEvent(jobEvents.progress))
+        break
     }
   }
 

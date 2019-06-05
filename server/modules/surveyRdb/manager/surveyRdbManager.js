@@ -7,6 +7,7 @@ const NodesInsert = require('../dbActions/nodesInsert')
 const NodesUpdate = require('../dbActions/nodesUpdate')
 const TableViewCreate = require('../dbActions/tableViewCreate')
 const TableViewQuery = require('../dbActions/tableViewQuery')
+const DataTableRepository = require('../dbActions/dataTableRepository')
 
 // ==== DDL
 
@@ -21,8 +22,8 @@ const createTable = async (survey, nodeDef, client = db) =>
 
 // ==== DML
 
-const insertIntoTable = async (survey, nodeDef, record, client = db) =>
-  await NodesInsert.run(survey, nodeDef, record, client)
+const insertIntoTable = async (survey, nodeDef, client = db) =>
+  await NodesInsert.run(survey, nodeDef, client)
 
 const updateTableNodes = async (survey, nodeDefs, nodes, client = db) =>
   await NodesUpdate.run(survey, nodeDefs, nodes, client)
@@ -48,4 +49,5 @@ module.exports = {
   queryTable,
   countTable,
   countDuplicateRecords,
+  fetchRecordsWithDuplicateEntities: DataTableRepository.fetchRecordsWithDuplicateEntities,
 }

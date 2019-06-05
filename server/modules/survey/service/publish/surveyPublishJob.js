@@ -19,7 +19,7 @@ class SurveyPublishJob extends Job {
       // record check must be executed before publishing survey props
       new RecordCheckJob(),
       new SurveyPublishPerformJob(),
-      new SurveyRdbGeneratorJob()
+      new SurveyRdbGeneratorJob(),
     ])
   }
 }
