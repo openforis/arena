@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Survey = require('../../../../common/survey/survey')
+const NodeDef = require('../../../../common/survey/nodeDef')
 
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
@@ -26,21 +27,36 @@ const fetchRecordsWithDuplicateEntities = async (survey, nodeDefEntity, nodeDefK
   const aliasA = 'e1'
   const aliasB = 'e2'
 
+  const getColEqualCondition = colName => `${aliasA}.${colName} = ${aliasB}.${colName}`
+
+  const getNullableColEqualCondition = colName =>
+    `(${aliasA}.${colName} IS NULL AND ${aliasB}.${colName} IS NULL OR ${getColEqualCondition(colName)})`
+
   const equalKeysCondition = R.pipe(
-    R.map(nodeDefKey => `${aliasA}.${NodeDefTable.getColName(nodeDefKey)} = ${aliasB}.${NodeDefTable.getColName(nodeDefKey)}`),
+    R.map(nodeDefKey => getNullableColEqualCondition(NodeDefTable.getColName(nodeDefKey))),
     R.join(' AND '),
   )(nodeDefKeys)
+
+  const recordAndParentEqualCondition =
+    NodeDef.isRoot(nodeDefEntity)
+      ? ''
+      : `AND ${getColEqualCondition(DataTable.colNameRecordUuuid)}
+         AND ${getColEqualCondition(DataTable.colNameParentUuuid)}`
 
   return await client.any(`
     SELECT r.uuid, r.validation, json_agg(${aliasA}.uuid) as node_duplicate_uuids
     FROM ${tableName} ${aliasA}
-      JOIN ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r ON r.uuid = ${aliasA}.${DataTable.colNameRecordUuuid} 
+      JOIN ${SurveySchemaRepositoryUtils.getSurveyDBSchema(surveyId)}.record r 
+        ON r.uuid = ${aliasA}.${DataTable.colNameRecordUuuid} 
     WHERE EXISTS (
+      --exists a node entity with the same key node values in the same record (if not root entity) and in the same parent node entity
       SELECT ${aliasB}.${DataTable.colNameUuuid}
       FROM ${tableName} ${aliasB}
-        WHERE ${aliasA}.${DataTable.colNameUuuid} != ${aliasB}.${DataTable.colNameUuuid}
-        AND ${aliasA}.${DataTable.colNameRecordUuuid} = ${aliasB}.${DataTable.colNameRecordUuuid}
-        AND ${aliasA}.${DataTable.colNameParentUuuid} = ${aliasB}.${DataTable.colNameParentUuuid}
+        WHERE
+        --different node uuid 
+        ${aliasA}.${DataTable.colNameUuuid} != ${aliasB}.${DataTable.colNameUuuid}
+        ${recordAndParentEqualCondition}
+        --same key node(s) values
         AND (${equalKeysCondition})
       )
     GROUP BY r.uuid, r.validation
