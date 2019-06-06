@@ -11,8 +11,7 @@ const User = require('../../../common/user/user')
 const SurveyManager = require('../../../server/modules/survey/manager/surveyManager')
 const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
 
-const SurveyPublishPerformJob = require('../../../server/modules/survey/service/publish/surveyPublishPerformJob')
-const SurveyRdbGeneratorJob = require('../../../server/modules/surveyRdb/service/surveyRdbGeneratorJob')
+const SurveyPublishJob = require('../../../server/modules/survey/service/publish/surveyPublishJob')
 
 class NodeDefBuilder {
 
@@ -120,7 +119,7 @@ class SurveyBuilder {
 
   constructor (user, rootDefBuilder) {
     this.user = user
-    this.name = 'test'
+    this.name = `test_${new Date().getTime()}`
     this.label = 'Test'
     this.lang = 'en'
     this.rootDefBuilder = rootDefBuilder
@@ -156,8 +155,7 @@ class SurveyBuilder {
         )
 
       if (publish) {
-        await new SurveyPublishPerformJob({ user: this.user, surveyId }).start(t)
-        await new SurveyRdbGeneratorJob({ user: this.user, surveyId }).start(t)
+        await new SurveyPublishJob({ user: this.user, surveyId }).start(t)
       }
 
       const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, !publish, true, false, t)
