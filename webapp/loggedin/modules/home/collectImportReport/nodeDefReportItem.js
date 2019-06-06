@@ -1,12 +1,12 @@
 import React from 'react'
 
+import Survey from '../../../../../common/survey/survey'
+import NodeDef from '../../../../../common/survey/nodeDef'
 import CollectImportReportItem from '../../../../../common/survey/collectImportReportItem'
+
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import useI18n from '../../../../commonComponents/useI18n'
-
-import Survey from '../../../../../common/survey/survey'
-import NodeDef from '../../../../../common/survey/nodeDef'
 
 const NodeDefReportItem = props => {
   const { survey, nodeDefUuid, nodeDefItems, updateCollectImportReportItem, onNodeDefEdit } = props
@@ -16,11 +16,12 @@ const NodeDefReportItem = props => {
   const i18n = useI18n()
   const lang = Survey.getLanguage(i18n.lang)(Survey.getSurveyInfo(survey))
 
+  const nodeDefPath = _getNodeDefPath(survey, nodeDef, lang)
 
   return (
     <div className="collect-import-report-node-def-items">
       <div
-        className="collect-import-report-node-def-items-header">{NodeDef.getLabel(nodeDef, lang)}</div>
+        className="collect-import-report-node-def-items-header">{nodeDefPath}</div>
       <div className="table__row-header collect-import-report-header">
         <div>#</div>
         <div>{i18n.t('homeView.collectImportReport.type')}</div>
@@ -67,6 +68,16 @@ const NodeDefReportItem = props => {
       }
     </div>
   )
+}
+
+const _getNodeDefPath = (survey, nodeDef, lang) => {
+  const nodeDefPathParts = []
+  Survey.visitAncestorsAndSelf(
+    nodeDef,
+    def => nodeDefPathParts.unshift(NodeDef.getLabel(def, lang))
+  )(survey)
+
+  return nodeDefPathParts.join(' > ')
 }
 
 export default NodeDefReportItem

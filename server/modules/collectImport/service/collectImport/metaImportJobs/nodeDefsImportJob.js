@@ -126,7 +126,7 @@ class NodeDefsImportJob extends Job {
       [NodeDef.propKeys.name]: this.getUniqueNodeDefName(parentNodeDef, collectNodeDefName + nodeDefNameSuffix),
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
-      [NodeDef.propKeys.labels]: CollectSurvey.toLabels('label', defaultLanguage, 'instance', nodeDefLabelSuffix)(collectNodeDef),
+      [NodeDef.propKeys.labels]: CollectSurvey.toLabels('label', defaultLanguage, ['instance', 'heading'], nodeDefLabelSuffix)(collectNodeDef),
       ...type === NodeDef.nodeDefType.entity
         ? {
           [NodeDefLayout.nodeDefLayoutProps.render]:

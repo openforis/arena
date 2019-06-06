@@ -63,7 +63,7 @@ const layoutTypes = {
   table: 'table',
 }
 
-const toLabels = (elName, defaultLang, typeFilter = null, suffix = '') =>
+const toLabels = (elName, defaultLang, typesFilter = [], suffix = '') =>
   xml =>
     R.pipe(
       getElementsByName(elName),
@@ -71,7 +71,7 @@ const toLabels = (elName, defaultLang, typeFilter = null, suffix = '') =>
         const lang = getAttribute(keys.lang, defaultLang)(labelEl)
         const type = getAttribute(keys.type)(labelEl)
 
-        if (typeFilter === null || type === typeFilter) {
+        if (!R.has(lang, labelsAcc) && (R.isEmpty(typesFilter) || R.includes(type, typesFilter))) {
           const text = getText(labelEl) + suffix
           return R.assoc(lang, text, labelsAcc)
         } else {
