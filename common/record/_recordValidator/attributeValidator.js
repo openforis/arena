@@ -79,32 +79,24 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
   const attributeValidations = {}
 
   for (const attribute of attributes) {
-    const dependents = Record.getDependentNodes(survey, attribute, Survey.dependencyTypes.validations)(record)
-
-    // include attribute itself if it's not already included among dependents
-    const attributeAndDependents =
-      R.includes(dep => R.equals(attribute, dep.nodeCtx))(dependents)
-        ? dependents
-        : R.append({
-          nodeDef: getNodeDef(survey, attribute),
-          nodeCtx: attribute
-        })(dependents)
+    // get dependents and attribute itself
+    const attributeAndDependents = Record.getDependentNodePointers(survey, attribute, Survey.dependencyTypes.validations, true)(record)
 
     // call validateAttribute for each attribute
 
     for (const { nodeCtx, nodeDef } of attributeAndDependents) {
-
-      if (Node.isDeleted(attribute)) {
-        return null
-      }
-      const attributeValidation = await validateAttribute(survey, record, nodeCtx, nodeDef)
-
       const nodeCtxUuid = Node.getUuid(nodeCtx)
 
-      // mark attribute validated
-      validatedAttributeUuids.push(nodeCtxUuid)
+      // validate only attributes not deleted and not validated already
+      if (!(Node.isDeleted(nodeCtx) || R.includes(nodeCtxUuid, validatedAttributeUuids))) {
 
-      attributeValidations[nodeCtxUuid] = attributeValidation
+        const attributeValidation = await validateAttribute(survey, record, nodeCtx, nodeDef)
+
+        // mark attribute validated
+        validatedAttributeUuids.push(nodeCtxUuid)
+
+        attributeValidations[nodeCtxUuid] = attributeValidation
+      }
     }
   }
   return attributeValidations
