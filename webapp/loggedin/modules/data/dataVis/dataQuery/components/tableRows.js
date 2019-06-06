@@ -54,8 +54,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, histor
               <div key={i} className="table__row">
                 <ErrorBadge
                   validation={validation}
-                  showLabel={false}
-                  tooltipErrorMessage={i18n.t('data.invalidRecord')}/>
+                  showLabel={false}/>
                 <div style={{ width: defaultColWidth }}>
                   {i + offset + 1}
                   {

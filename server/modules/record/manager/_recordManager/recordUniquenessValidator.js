@@ -24,7 +24,7 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
         [Node.getUuid(keyNode)]: {
           [Validator.keys.fields]: {
             [RecordValidation.keys.recordKeys]: {
-              [Validator.keys.errors]: isUnique ? [] : [RecordValidation.keysError.duplicateRecord],
+              [Validator.keys.errors]: isUnique ? [] : [{ key: RecordValidation.keysError.duplicateRecord }],
               [Validator.keys.valid]: isUnique
             }
           }

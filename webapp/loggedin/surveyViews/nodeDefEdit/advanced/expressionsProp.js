@@ -24,12 +24,12 @@ const ExpressionProp = (props) => {
     nodeDefUuidContext, nodeDefUuidCurrent, validation,
     expression, applyIf, showLabels, readOnly,
     isContextParent, canBeConstant, isBoolean,
-    onUpdate, onDelete
+    onUpdate, onDelete,
   } = props
 
-  const errorMessages = getValidationFieldMessages(Validator.getFieldValidations(validation))
-
   const i18n = useI18n()
+
+  const errorMessages = getValidationFieldMessages(i18n)(Validator.getFieldValidations(validation))
 
   return (
     <Tooltip messages={errorMessages} position="bottom" type={!R.isEmpty(errorMessages) ? 'error' : ''}>
