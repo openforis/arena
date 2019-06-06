@@ -1,12 +1,12 @@
 import React from 'react'
 
+import Survey from '../../../../../common/survey/survey'
+import NodeDef from '../../../../../common/survey/nodeDef'
 import CollectImportReportItem from '../../../../../common/survey/collectImportReportItem'
+
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 import useI18n from '../../../../commonComponents/useI18n'
-
-import Survey from '../../../../../common/survey/survey'
-import NodeDef from '../../../../../common/survey/nodeDef'
 
 const NodeDefReportItem = props => {
   const { survey, nodeDefUuid, nodeDefItems, updateCollectImportReportItem, onNodeDefEdit } = props
@@ -74,7 +74,7 @@ const _getNodeDefPath = (survey, nodeDef, lang) => {
   const nodeDefPathParts = []
   Survey.visitAncestorsAndSelf(
     nodeDef,
-    def => nodeDefPathParts.unshift(NodeDef.getLabel(def, lang) || NodeDef.getName(def))
+    def => nodeDefPathParts.unshift(NodeDef.getLabel(def, lang))
   )(survey)
 
   return nodeDefPathParts.join(' > ')
