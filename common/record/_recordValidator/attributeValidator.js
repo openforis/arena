@@ -40,22 +40,17 @@ const validateNodeValidations = (survey, record, nodeDef) => async (propName, no
 
   const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
 
-  return R.pipe(
-    R.reduce(
-      (acc, exprEval) => {
-        const { expression, value: valid } = exprEval
-        return valid
-          ? acc
-          : R.append(NodeDefExpression.getMessage(lang, errorKeys.invalidValue)(expression), acc)
-      },
-      []
-    ),
-    R.ifElse(
-      R.isEmpty,
-      R.always(null), //all validations are 'valid'
-      R.join('; ') //join the error messages with a ';' separator
-    )
-  )(applicableExpressionsEval)
+  const errorMessages = []
+
+  for (const { expression, value: valid } of applicableExpressionsEval) {
+    if (!valid) {
+      errorMessages.push(NodeDefExpression.getMessage(lang, errorKeys.invalidValue)(expression))
+    }
+  }
+
+  return R.isEmpty(errorMessages)
+    ? null //all validations are 'valid'
+    : R.join('; ', errorMessages) //join the error messages with a ';' separator
 }
 
 const validateAttribute = async (survey, record, attribute, nodeDef) =>
@@ -68,42 +63,31 @@ const validateAttribute = async (survey, record, attribute, nodeDef) =>
   }, false)
 
 const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
-
-  const attributes = R.pipe(
-    R.values,
-    R.filter(node => NodeDef.isAttribute(getNodeDef(survey, node)))
-  )(nodes)
-
-  const validatedAttributeUuids = [] //used to avoid validating 2 times the same attributes
-
+  // output
   const attributeValidations = {}
 
-  for (const attribute of attributes) {
-    // get dependents and attribute itself
-    const attributeAndDependents = Record.getDependentNodePointers(survey, attribute, Survey.dependencyTypes.validations, true)(record)
+  for (const node of Object.values(nodes)) {
+    const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
-    // call validateAttribute for each attribute
+    if (NodeDef.isAttribute(nodeDef)) {
 
-    for (const { nodeCtx, nodeDef } of attributeAndDependents) {
-      const nodeCtxUuid = Node.getUuid(nodeCtx)
+      // get dependents and attribute itself
+      const nodePointersAttributeAndDependents = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.validations, true)(record)
 
-      // validate only attributes not deleted and not validated already
-      if (!(Node.isDeleted(nodeCtx) || R.includes(nodeCtxUuid, validatedAttributeUuids))) {
+      // call validateAttribute for each attribute
 
-        const attributeValidation = await validateAttribute(survey, record, nodeCtx, nodeDef)
+      for (const { nodeCtx, nodeDef } of nodePointersAttributeAndDependents) {
+        const nodeCtxUuid = Node.getUuid(nodeCtx)
 
-        // mark attribute validated
-        validatedAttributeUuids.push(nodeCtxUuid)
-
-        attributeValidations[nodeCtxUuid] = attributeValidation
+        // validate only attributes not deleted and not validated already
+        if (!(Node.isDeleted(nodeCtx) || !!attributeValidations[nodeCtxUuid])) {
+          attributeValidations[nodeCtxUuid] = await validateAttribute(survey, record, nodeCtx, nodeDef)
+        }
       }
     }
   }
   return attributeValidations
 }
-
-const getNodeDef = (survey, node) =>
-  Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
 
 module.exports = {
   validateAttribute,
