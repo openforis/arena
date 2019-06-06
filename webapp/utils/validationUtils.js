@@ -3,7 +3,7 @@ import React from 'react'
 
 const getFieldError = i18n => field => R.pipe(
   R.pathOr([], [field, 'errors']),
-  R.map(error => `${i18n.t(`formErrors.${error.key}`, error.params)}`),
+  R.map(error => i18n.t(`formErrors.${error.key}`, error.params)),
   R.ifElse(
     R.isEmpty,
     () => 'invalid', //default error message

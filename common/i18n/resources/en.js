@@ -248,8 +248,8 @@ module.exports = {
 
   formErrors: {
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
-    duplicateName: 'duplicate scientific name {{scientificName}}; $t(formErrors.duplicateRows, {row, duplicateRow})',
-    duplicateCode: 'duplicate code {{code}}; $t(formErrors.duplicateRows, {row, duplicateRow})',
+    duplicateName: 'duplicate scientific name {{scientificName}}; $t(formErrors.duplicateRows)',
+    duplicateCode: 'duplicate code {{code}}; $t(formErrors.duplicateRows)',
     empty: 'Empty',
     duplicate: 'Duplicate',
     exceedingMax: 'Exceeding max',

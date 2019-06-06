@@ -16,7 +16,7 @@ const ErrorBadge = ({ validation, showLabel, labelKey }) => {
   return invalid
     ? (
       <ValidationTooltip
-        validation={Validator.getFieldValidations(validation)}
+        validation={validation}
         className="badge error-badge">
         <div className="badge__content">
           <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`}/>
