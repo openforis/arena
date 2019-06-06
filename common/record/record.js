@@ -63,6 +63,6 @@ module.exports = {
   deleteNode: RecordUpdater.deleteNode,
 
   // ====== VALIDATION
-  mergeNodeValidations: Validator.mergeValidation,
+  mergeNodeValidations: RecordUpdater.mergeNodeValidations,
   getValidation: Validator.getValidation,
 }
