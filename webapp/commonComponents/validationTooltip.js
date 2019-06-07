@@ -3,8 +3,6 @@ import React from 'react'
 import * as ValidationUtils from '../utils/validationUtils'
 import Validator from '../../common/validation/validator'
 
-import * as R from 'ramda'
-
 import Tooltip from './tooltip'
 
 import useI18n from '../commonComponents/useI18n'
@@ -16,7 +14,7 @@ export default ({ validation, children, className }) => {
   const type = isValid ? '' : 'error'
   const messagesHtml = isValid
     ? null
-    : ValidationUtils.getValidationFieldMessagesHTML(i18n)(Validator.getFieldValidations(validation))
+    : ValidationUtils.getValidationFieldMessagesHTML(i18n)(validation)
 
   return (
     <Tooltip

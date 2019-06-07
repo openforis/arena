@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 import React from 'react'
 
+import Validator from '../../common/validation/validator'
+
 const getErrorText = (error, i18n, errorKeyPrefix) => i18n.t(`${errorKeyPrefix}.${error.key}`, error.params)
 
 const getFieldError = (i18n, errorKeyPrefix) => field => R.pipe(
@@ -14,21 +16,23 @@ const getFieldError = (i18n, errorKeyPrefix) => field => R.pipe(
 )
 
 export const getValidationFieldMessages = (i18n, errorKeyPrefix = 'formErrors') =>
-  validationFields => R.pipe(
-    R.keys,
-    R.filter(key => R.pathEq([key, 'valid'], false, validationFields)),
-    R.map(field => `${field}: ${getFieldError(i18n, errorKeyPrefix)(field)(validationFields)}`)
-  )(validationFields)
+  validation => {
+    const validationFields = Validator.getInvalidFieldValidations(validation)
 
+    return R.pipe(
+      R.keys,
+      R.map(field => `${field}: ${getFieldError(i18n, errorKeyPrefix)(field)(validationFields)}`)
+    )(validationFields)
+  }
 export const getValidationFieldMessagesHTML = (i18n, errorKeyPrefix = 'formErrors') =>
-  validationFields =>
+  validation =>
     R.pipe(
       getValidationFieldMessages(i18n, errorKeyPrefix),
-      messages => validationFields.errors
+      messages => validation.errors
         ? R.pipe(
           R.map(error => getErrorText(error, i18n, errorKeyPrefix)),
           R.concat(messages)
-        )(validationFields.errors)
+        )(validation.errors)
         : messages,
       R.addIndex(R.map)(
         (msg, i) =>
@@ -36,4 +40,4 @@ export const getValidationFieldMessagesHTML = (i18n, errorKeyPrefix = 'formError
             {msg}
           </div>
       )
-    )(validationFields)
+    )(validation)

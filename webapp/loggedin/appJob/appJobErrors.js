@@ -5,6 +5,11 @@ import useI18n from '../../commonComponents/useI18n'
 
 import { getValidationFieldMessagesHTML } from '../../utils/validationUtils'
 
+const validationWrapper = fields => ({
+  valid: false,
+  fields,
+})
+
 const AppJobErrors = ({ job }) => {
 
   const errors = R.propOr([], 'errors', job)
@@ -27,7 +32,7 @@ const AppJobErrors = ({ job }) => {
                     {errorKey}
                   </div>
                   <div className="item-error">
-                    {getValidationFieldMessagesHTML(i18n, 'systemErrors')(errors[errorKey])}
+                    {getValidationFieldMessagesHTML(i18n, 'jobErrors')(validationWrapper(errors[errorKey]))}
                   </div>
                 </div>
               )

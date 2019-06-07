@@ -263,10 +263,10 @@ module.exports = {
     required: 'Required',
     zeroOrNegative: 'Zero or negative',
   },
-  systemErrors: {
+  jobErrors: {
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
     duplicateName: 'duplicate scientific name {{scientificName}}; $t(errors.duplicateRows)',
     duplicateCode: 'duplicate code {{code}}; $t(errors.duplicateRows)',
-    systemError: '{{text}}',
+    generic: '{{text}}',
   },
 }
