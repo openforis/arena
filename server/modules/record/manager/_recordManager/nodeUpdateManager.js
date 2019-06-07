@@ -45,23 +45,28 @@ const persistNode = async (user, survey, record, node, t) => {
 }
 
 const updateNodesDependents = async (survey, record, nodes, tx) => {
+  // output
+  let nodesUpdated = { ...nodes }
+
   const nodesArray = R.values(nodes)
-  const nodesUpdated = nodesArray
   const nodesToVisit = new Queue(nodesArray)
-  const nodeUuidsVisited = []
+
+  const nodesVisitedByUuid = {} //used to avoid visiting the same node 2 times
 
   while (!nodesToVisit.isEmpty()) {
     const node = nodesToVisit.dequeue()
     const nodeUuid = Node.getUuid(node)
 
     // visit only unvisited nodes
-    if (!R.includes(nodeUuid, nodeUuidsVisited)) {
+    if (!nodesVisitedByUuid[nodeUuid]) {
 
       // update node dependents
       const [nodesApplicability, nodesDefaultValues] = await Promise.all([
         NodeUpdateDependentManager.updateDependentsApplicable(survey, record, node, tx),
         NodeUpdateDependentManager.updateDependentsDefaultValues(survey, record, node, tx)
       ])
+
+      // update record nodes
       const nodesUpdatedCurrent = {
         ...nodesApplicability,
         ...nodesDefaultValues
@@ -69,27 +74,20 @@ const updateNodesDependents = async (survey, record, nodes, tx) => {
       record = Record.assocNodes(nodesUpdatedCurrent)(record)
 
       // mark updated nodes to visit
-      const nodesUpdatedCurrentArray = R.values(nodesUpdatedCurrent)
-      nodesToVisit.enqueueItems(nodesUpdatedCurrentArray)
+      nodesToVisit.enqueueItems(R.values(nodesUpdatedCurrent))
 
       // update nodes to return
-      for (const nodeUpdated of nodesUpdatedCurrentArray) {
-        const idx = R.findIndex(
-          R.propEq(Node.keys.uuid, Node.getUuid(nodeUpdated))
-        )(nodesUpdated)
-
-        idx >= 0
-          ? nodesUpdated[idx] = R.mergeDeepRight(nodesUpdated[idx], nodeUpdated)
-          : nodesUpdated.push(nodeUpdated)
-
+      nodesUpdated = {
+        ...nodesUpdated,
+        ...nodesUpdatedCurrent
       }
 
       // mark node visited
-      nodeUuidsVisited.push(nodeUuid)
+      nodesVisitedByUuid[nodeUuid] = true
     }
   }
 
-  return SurveyUtils.toUuidIndexedObj(nodesUpdated)
+  return nodesUpdated
 }
 
 // ==== CREATE

@@ -52,6 +52,12 @@ const assocNodes = nodes =>
 
 const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
 
+const mergeNodeValidations = nodeValidations => record => R.pipe(
+  Validator.getValidation,
+  Validator.mergeValidation(nodeValidations),
+  validationMerged => Validator.assocValidation(validationMerged)(record)
+)(record)
+
 // ====== DELETE
 
 const deleteNodes = nodesDeletedArray =>
@@ -93,6 +99,7 @@ const deleteNode = node =>
 module.exports = {
   assocNodes,
   assocNode,
+  mergeNodeValidations,
 
   deleteNode,
 }

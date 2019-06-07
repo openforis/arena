@@ -53,14 +53,21 @@ const validateNodeValidations = (survey, record, nodeDef) => async (propName, no
     : R.join('; ', errorMessages) //join the error messages with a ';' separator
 }
 
-const validateAttribute = async (survey, record, attribute, nodeDef) =>
-  await Validator.validate(attribute, {
-    [Node.keys.value]: [
-      validateRequired(survey, nodeDef),
-      AttributeTypeValidator.validateValueType(survey, nodeDef),
-      validateNodeValidations(survey, record, nodeDef)
-    ]
-  }, false)
+const validateAttribute = async (survey, record, attribute, nodeDef) => {
+  const parentNode = Record.getParentNode(attribute)(record)
+
+  if (Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)) {
+    return await Validator.validate(attribute, {
+      [Node.keys.value]: [
+        validateRequired(survey, nodeDef),
+        AttributeTypeValidator.validateValueType(survey, nodeDef),
+        validateNodeValidations(survey, record, nodeDef)
+      ]
+    }, false)
+  } else {
+    return Validator.validValidation
+  }
+}
 
 const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
   // output
@@ -80,7 +87,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
         const nodeCtxUuid = Node.getUuid(nodeCtx)
 
         // validate only attributes not deleted and not validated already
-        if (!(Node.isDeleted(nodeCtx) || !!attributeValidations[nodeCtxUuid])) {
+        if (!Node.isDeleted(nodeCtx) && !attributeValidations[nodeCtxUuid]) {
           attributeValidations[nodeCtxUuid] = await validateAttribute(survey, record, nodeCtx, nodeDef)
         }
       }
