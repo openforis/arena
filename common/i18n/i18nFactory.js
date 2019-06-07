@@ -1,4 +1,4 @@
-const i18next = require('i18next')
+const i18next = require('i18next').default
 
 const { isEnvDevelopment } = require('../../common/processUtils')
 
