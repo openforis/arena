@@ -113,11 +113,11 @@ const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid) => 
           [Validator.keys.fields]: {
             [RecordValidation.keys.minCount]: {
               [Validator.keys.valid]: minCountValid,
-              [Validator.keys.errors]: minCountValid ? [] : [errorKeys.minCountNodesNotSpecified]
+              [Validator.keys.errors]: minCountValid ? [] : [{ key: errorKeys.minCountNodesNotSpecified }]
             },
             [RecordValidation.keys.maxCount]: {
               [Validator.keys.valid]: maxCountValid,
-              [Validator.keys.errors]: maxCountValid ? [] : [errorKeys.maxCountNodesExceeded]
+              [Validator.keys.errors]: maxCountValid ? [] : [{ key: errorKeys.maxCountNodesExceeded }]
             }
           }
         }

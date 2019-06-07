@@ -23,7 +23,7 @@ const validateRequired = (survey, nodeDef) => (propName, node) =>
     NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
   ) &&
   Node.isValueBlank(node)
-    ? errorKeys.required
+    ? { key: errorKeys.required }
     : null
 
 /**

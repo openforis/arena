@@ -245,4 +245,27 @@ module.exports = {
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
   },
+
+  formErrors: {
+    duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
+    duplicateName: 'duplicate scientific name {{scientificName}}; $t(formErrors.duplicateRows)',
+    duplicateCode: 'duplicate code {{code}}; $t(formErrors.duplicateRows)',
+    empty: 'Empty',
+    duplicate: 'Duplicate',
+    exceedingMax: 'Exceeding max',
+    keyword: 'Keyword',
+    invalidNumber: 'Invalid number',
+    zeroOrNegative: 'Zero or negative',
+    invalidName: 'Invalid name',
+    required: 'Required',
+    invalidValue: 'Invalid value',
+
+    minCountNodesNotSpecified: 'Min count nodes not specified',
+    maxCountNodesExceeded: 'Max count nodes exceeded',
+
+    duplicateRecord: 'Duplicate record key',
+    duplicateEntity: 'Duplicate entity',
+
+    defaultValuesNotSpecified: 'Default value not specified',
+  },
 }

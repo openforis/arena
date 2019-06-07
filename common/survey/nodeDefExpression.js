@@ -87,7 +87,7 @@ module.exports = {
   getExpression,
   getApplyIf,
   getMessages,
-  getMessage: (lang, defaultValue = "") => R.pipe(
+  getMessage: (lang, defaultValue = '') => R.pipe(
     getMessages,
     R.propOr(defaultValue, lang)
   ),

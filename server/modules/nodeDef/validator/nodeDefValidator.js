@@ -40,7 +40,7 @@ const validateChildren = survey =>
     if (NodeDef.isEntity(nodeDef)) {
       const children = Survey.getNodeDefChildren(nodeDef)(survey)
       if (R.isEmpty(children)) {
-        return errorKeys.empty
+        return { key: errorKeys.empty }
       }
     }
     return null
@@ -63,9 +63,9 @@ const validateKeyAttributes = survey =>
           (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef))
         )
       ) {
-        return errorKeys.empty
+        return { key: errorKeys.empty }
       } else if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return errorKeys.exceedingMax
+        return { key: errorKeys.exceedingMax }
       }
     }
     return null
@@ -77,7 +77,7 @@ const validateKey = survey =>
       const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
       if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return errorKeys.exceedingMax
+        return { key: errorKeys.exceedingMax }
       }
     }
     return null
@@ -85,7 +85,7 @@ const validateKey = survey =>
 
 const validateReadOnly = (propName, nodeDef) =>
   NodeDef.isReadOnly(nodeDef) && R.isEmpty(NodeDef.getDefaultValues(nodeDef))
-    ? nodeDefErrorKeys.defaultValuesNotSpecified
+    ? { key: nodeDefErrorKeys.defaultValuesNotSpecified }
     : null
 
 const propsValidations = survey => ({

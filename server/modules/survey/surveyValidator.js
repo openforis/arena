@@ -9,7 +9,7 @@ const validateSurveyNameUniqueness = async (propName, survey) => {
   const surveysByName = await SurveyRepository.fetchSurveysByName(surveyName)
 
   return !R.isEmpty(surveysByName) && R.find(s => s.id !== survey.id, surveysByName)
-    ? errorKeys.duplicate
+    ? { key: errorKeys.duplicate }
     : null
 }
 

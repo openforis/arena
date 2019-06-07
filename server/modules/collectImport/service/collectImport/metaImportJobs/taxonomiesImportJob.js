@@ -2,7 +2,6 @@ const R = require('ramda')
 
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
 const Taxon = require('../../../../../../common/survey/taxon')
-const Validator = require('../../../../../../common/validation/validator')
 const { languageCodesISO636_2 } = require('../../../../../../common/app/languages')
 
 const Job = require('../../../../../job/job')
@@ -16,7 +15,9 @@ const speciesFilesPath = 'species/'
 
 const keysError = {
   code: 'code',
-  scientificName: 'scientificName'
+  scientificName: 'scientificName',
+  duplicateCode: 'duplicateCode',
+  duplicateName: 'duplicateName',
 }
 
 /**
@@ -71,7 +72,7 @@ class TaxonomiesImportJob extends Job {
     const taxonomyName = speciesFileName.substring(0, speciesFileName.length - 4)
 
     const taxonomyParam = Taxonomy.newTaxonomy({
-      [Taxonomy.taxonomyPropKeys.name]: taxonomyName
+      [Taxonomy.taxonomyPropKeys.name]: taxonomyName,
     })
     const taxonomy = await TaxonomyManager.insertTaxonomy(this.getUser(), surveyId, taxonomyParam, tx)
     const taxonomyUuid = Taxonomy.getUuid(taxonomy)
@@ -149,8 +150,11 @@ class TaxonomiesImportJob extends Job {
       this.addError({
         [keysError.code]: {
           valid: false,
-          errors: [`duplicate code ${code}; row: ${this.currentRow} duplicate row: ${rowDuplicateCode}`]
-        }
+          errors: [{
+            key: keysError.duplicateCode,
+            params: { code, row: this.currentRow, duplicateRow: rowDuplicateCode },
+          }],
+        },
       }, speciesFileName)
     } else {
       this.rowsByCode[code] = this.currentRow
@@ -162,8 +166,11 @@ class TaxonomiesImportJob extends Job {
       this.addError({
         [keysError.scientificName]: {
           valid: false,
-          errors: [`duplicate scientific name ${scientificName}; row: ${this.currentRow} duplicate row: ${rowDuplicateScientificName}`]
-        }
+          errors: [{
+            key: keysError.duplicateName,
+            params: { scientificName, row: this.currentRow, duplicateRow: rowDuplicateScientificName },
+          }],
+        },
       }, speciesFileName)
     } else {
       this.rowsByScientificName[scientificName] = this.currentRow

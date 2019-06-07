@@ -94,7 +94,7 @@ const validateRequired = (propName, obj) => {
   )(obj)
 
   return R.isEmpty(value)
-    ? errorKeys.empty
+    ? { key: errorKeys.empty }
     : null
 }
 
@@ -110,25 +110,25 @@ const validateItemPropUniqueness = items =>
       , items)
 
     return hasDuplicates
-      ? errorKeys.duplicate
+      ? { key: errorKeys.duplicate }
       : null
   }
 
 const validateNotKeyword = (propName, item) =>
   R.contains(getProp(propName)(item), keywords)
-    ? errorKeys.keyword
+    ? { key: errorKeys.keyword }
     : null
 
 const validateName = (propName, item) => {
   const prop = getProp(propName)(item)
   return !prop || validNameRegex.test(prop)
     ? null
-    : errorKeys.invalidName
+    : { key: errorKeys.invalidName }
 }
 
 const validateNumber = (propName, item) => {
   const value = getProp(propName)(item)
-  return value && isNaN(value) ? errorKeys.invalidNumber : null
+  return value && isNaN(value) ? { key: errorKeys.invalidNumber } : null
 }
 
 const validatePositiveNumber = (propName, item) => {
@@ -137,7 +137,7 @@ const validatePositiveNumber = (propName, item) => {
     return invalidNumberError
   } else {
     const value = getProp(propName)(item)
-    return !value || value > 0 ? null : errorKeys.zeroOrNegative
+    return !value || value > 0 ? null : { key: errorKeys.zeroOrNegative }
   }
 }
 
