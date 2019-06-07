@@ -201,6 +201,7 @@ module.exports = {
       cleansing: 'cleansing',
       analysis: 'analysis',
     },
+    confirmNodeDelete: 'Are you sure you want to delete this item?',
   },
 
   taxonomy: {
@@ -246,10 +247,10 @@ module.exports = {
     TaxonomyImportJob: 'Taxonomy Import',
   },
 
-  formErrors: {
+  errors: {
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
-    duplicateName: 'duplicate scientific name {{scientificName}}; $t(formErrors.duplicateRows)',
-    duplicateCode: 'duplicate code {{code}}; $t(formErrors.duplicateRows)',
+    duplicateName: 'duplicate scientific name {{scientificName}}; $t(errors.duplicateRows)',
+    duplicateCode: 'duplicate code {{code}}; $t(errors.duplicateRows)',
     empty: 'Empty',
     duplicate: 'Duplicate',
     exceedingMax: 'Exceeding max',
@@ -267,5 +268,8 @@ module.exports = {
     duplicateEntity: 'Duplicate entity',
 
     defaultValuesNotSpecified: 'Default value not specified',
+
+    systemError: '{{text}}',
   },
+
 }

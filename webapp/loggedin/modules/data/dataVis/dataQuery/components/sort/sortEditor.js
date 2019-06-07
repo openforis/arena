@@ -1,6 +1,6 @@
 import './sortEditor.scss'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import Expression from '../../../../../../../../common/exprParser/expression'
@@ -15,147 +15,129 @@ import Survey from '../../../../../../../../common/survey/survey'
 
 import * as SurveyState from '../../../../../../../survey/surveyState'
 
-class SortExpressionComponent extends React.Component {
+import useI18n from '../../../../../../../commonComponents/useI18n'
 
-  constructor (props) {
-    super(props)
+const SortExpressionComponent = props => {
 
-    this.state = {
-      edit: false,
-      sortCriteria: props.sort,
-      unchosenVariables: [],
-      updated: false,
-    }
-  }
+  const { lang } = useI18n()
 
-  componentDidMount () {
-    this.refreshUnchosenVariables()
-  }
+  const { nodeDefUuidCols, onClose } = props
 
-  componentDidUpdate (prevProps) {
-    const { availableVariables } = this.props
-    const { availableVariables: prevAvailableVariables } = prevProps
-    const { sortCriteria } = this.state
+  const [sortCriteria, setSortCriteria] = useState(props.sort)
+  const [unchosenVariables, setUnchosenVariables] = useState([])
+  const [updated, setUpdated] = useState(false)
 
+  useEffect(() => { refreshUnchosenVariables() }, [sortCriteria])
+
+  useEffect(() => {
     // Only show selected variables in the dropdown menu
-    if (availableVariables !== prevAvailableVariables) {
-      // reset available variables and remove unavailable variables from criteria
-      const newSortCriteria = DataSort.getNewCriteria(availableVariables)(sortCriteria)
+    // Reset available variables and remove unavailable variables from criteria
+    const availableVariables = getAvailableVariables(props, lang)
+    const newSortCriteria = DataSort.getNewCriteria(availableVariables)(sortCriteria)
 
-      this.setState({ sortCriteria: newSortCriteria },
-        () => this.refreshUnchosenVariables())
-    }
+    setSortCriteria(newSortCriteria)
+  }, [nodeDefUuidCols])
+
+  const onSelectVariable = (pos, variable) => {
+    setSortCriteria(DataSort.updateVariable(pos, variable)(sortCriteria))
   }
 
-  onSelectVariable (pos, variable) {
-    const { sortCriteria } = this.state
-
-    this.setState({
-      sortCriteria: DataSort.updateVariable(pos, variable)(sortCriteria),
-      updated: true,
-    },
-    () => this.refreshUnchosenVariables())
+  const onSelectOrder = (pos, order) => {
+    setSortCriteria(DataSort.updateOrder(pos, order)(sortCriteria))
+    setUpdated(true)
   }
 
-  onSelectOrder (pos, order) {
-    const { sortCriteria } = this.state
-
-    this.setState({
-      sortCriteria: DataSort.updateOrder(pos, order)(sortCriteria),
-      updated: true,
-    })
+  const refreshUnchosenVariables = () => {
+    const availableVariables = getAvailableVariables(props, lang)
+    setUnchosenVariables(DataSort.getUnchosenVariables(availableVariables)(sortCriteria))
   }
 
-  refreshUnchosenVariables () {
-    const { availableVariables } = this.props
-    const { sortCriteria } = this.state
-
-    this.setState({ unchosenVariables: DataSort.getUnchosenVariables(availableVariables)(sortCriteria) })
+  const addCriteria = ({ value: variable, label }) => {
+    setSortCriteria(DataSort.addCriteria(variable, label, DataSort.keys.order.asc)(sortCriteria))
+    setUpdated(true)
   }
 
-  addCriteria ({ value: variable, label }) {
-    const { sortCriteria } = this.state
-
-    this.setState({
-      sortCriteria: DataSort.addCriteria(variable, label, DataSort.keys.order.asc)(sortCriteria),
-      updated: true,
-    },
-    () => this.refreshUnchosenVariables())
+  const deleteCriteria = (pos) => {
+    setSortCriteria(DataSort.deleteCriteria(pos)(sortCriteria))
+    setUpdated(true)
   }
 
-  deleteCriteria (pos) {
-    const { sortCriteria } = this.state
-
-    this.setState({
-      sortCriteria: DataSort.deleteCriteria(pos)(sortCriteria),
-      updated: true,
-    },
-    () => this.refreshUnchosenVariables())
-  }
-
-  applyChange () {
-    const { sortCriteria } = this.state
-    const { onChange, onClose } = this.props
+  const applyAndClose = (sortCriteria) => {
+    const { onChange, onClose } = props
 
     onChange && onChange(sortCriteria)
     onClose()
   }
 
-  reset () {
-    this.setState({ sortCriteria: [] },
-      () => this.applyChange())
+  const applyChange = () => {
+    applyAndClose(sortCriteria)
   }
 
-  render () {
-    const { onClose, availableVariables } = this.props
-    const { sortCriteria, unchosenVariables, updated } = this.state
-
-    return (
-      <Popup
-        className="sort-editor-popup"
-        onClose={onClose}
-        padding={20}>
-
-        <React.Fragment>
-          <div className="sort-editor__criteria">
-            {sortCriteria.map((criteria, pos) =>
-              <SortRow
-                key={criteria.variable}
-                variables={unchosenVariables}
-                selectedVariable={DataSort.findVariableByValue(criteria.variable)(availableVariables)}
-                onSelectVariable={item => this.onSelectVariable(pos, item)}
-                selectedOrder={criteria.order}
-                onSelectOrder={order => this.onSelectOrder(pos, order)}
-                onDelete={() => this.deleteCriteria(pos)}
-                isFirst={!pos}/>)}
-
-            {
-              !!unchosenVariables.length &&
-              <SortRow
-                variables={unchosenVariables}
-                onSelectVariable={item => this.addCriteria(item)}
-                isPlaceholder={true}
-                isFirst={!sortCriteria.length}/>
-            }
-          </div>
-          <div className="sort-editor__footer">
-            <button className="btn btn-xs btn-of"
-                    onClick={() => this.reset()}
-                    aria-disabled={!sortCriteria.length}>
-              <span className="icon icon-undo2 icon-16px"/> Reset
-            </button>
-
-            <button className="btn btn-xs btn-of"
-                    onClick={() => this.applyChange()}
-                    aria-disabled={!updated}>
-              <span className="icon icon-checkmark icon-16px"/> Apply
-            </button>
-          </div>
-        </React.Fragment>
-
-      </Popup>
-    )
+  const reset = () => {
+    applyAndClose([])
   }
+
+  const getAvailableVariables = () => {
+    const {
+      survey,
+      nodeDefUuidCols,
+      nodeDefContext,
+      nodeDefCurrent,
+      mode,
+      depth,
+    } = props
+
+    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
+    return variables.filter(v => nodeDefUuidCols.indexOf(v.uuid) !== -1)
+  }
+
+  const availableVariables = getAvailableVariables()
+
+  return (
+    <Popup
+      className="sort-editor-popup"
+      onClose={onClose}
+      padding={20}>
+
+      <React.Fragment>
+        <div className="sort-editor__criteria">
+          {sortCriteria.map((criteria, pos) =>
+            <SortRow
+              key={criteria.variable}
+              variables={unchosenVariables}
+              selectedVariable={DataSort.findVariableByValue(criteria.variable)(availableVariables)}
+              onSelectVariable={item => onSelectVariable(pos, item)}
+              selectedOrder={criteria.order}
+              onSelectOrder={order => onSelectOrder(pos, order)}
+              onDelete={() => deleteCriteria(pos)}
+              isFirst={!pos}/>)}
+
+          {
+            !!unchosenVariables.length &&
+            <SortRow
+              variables={unchosenVariables}
+              onSelectVariable={item => addCriteria(item)}
+              isPlaceholder={true}
+              isFirst={!sortCriteria.length}/>
+          }
+        </div>
+        <div className="sort-editor__footer">
+          <button className="btn btn-xs btn-of"
+                  onClick={() => reset()}
+                  aria-disabled={!sortCriteria.length}>
+            <span className="icon icon-undo2 icon-16px"/> Reset
+          </button>
+
+          <button className="btn btn-xs btn-of"
+                  onClick={() => applyChange()}
+                  aria-disabled={!updated}>
+            <span className="icon icon-checkmark icon-16px"/> Apply
+          </button>
+        </div>
+      </React.Fragment>
+
+    </Popup>
+  )
 }
 
 const mapStateToProps = (state, props) => {
@@ -171,10 +153,14 @@ const mapStateToProps = (state, props) => {
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
   const mode = Expression.modes.sql
   const depth = 0
-  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth)
 
   return {
-    availableVariables: variables.filter(v => nodeDefUuidCols.indexOf(v.uuid) !== -1),
+    survey,
+    nodeDefUuidCols,
+    nodeDefContext,
+    nodeDefCurrent,
+    mode,
+    depth,
   }
 }
 

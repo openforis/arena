@@ -1,9 +1,11 @@
 import * as R from 'ramda'
 import React from 'react'
 
+const getErrorText = (error, i18n) => i18n.t(`errors.${error.key}`, error.params)
+
 const getFieldError = i18n => field => R.pipe(
   R.pathOr([], [field, 'errors']),
-  R.map(error => i18n.t(`formErrors.${error.key}`, error.params)),
+  R.map(error => getErrorText(error, i18n)),
   R.ifElse(
     R.isEmpty,
     () => 'invalid', //default error message
@@ -22,7 +24,7 @@ export const getValidationFieldMessagesHTML = i18n => validationFields =>
     getValidationFieldMessages(i18n),
     messages => validationFields.errors
       ? R.pipe(
-        R.map(error => `${i18n.t(`formErrors.${error.key}`, error.params)}`),
+        R.map(error => getErrorText(error, i18n)),
         R.concat(messages)
       )(validationFields.errors)
       : messages,
