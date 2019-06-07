@@ -21,7 +21,7 @@ const checkPermission = (req, res, next, permissionFn, obj) => {
   if (permissionFn(user, obj)) {
     next()
   } else {
-    const error = new UnauthorizedError(`User ${user.name} is not authorized`)
+    const error = new UnauthorizedError(user.name)
     Response.sendErr(res, error)
   }
 
