@@ -247,29 +247,26 @@ module.exports = {
     TaxonomyImportJob: 'Taxonomy Import',
   },
 
-  errors: {
+  formErrors: {
+    defaultValuesNotSpecified: 'Default value not specified',
+    duplicate: 'Duplicate',
+    duplicateEntity: 'Duplicate entity',
+    duplicateRecord: 'Duplicate record key',
+    empty: 'Empty',
+    exceedingMax: 'Exceeding max',
+    invalidName: 'Invalid name',
+    invalidNumber: 'Invalid number',
+    invalidValue: 'Invalid value',
+    keyword: 'Keyword',
+    maxCountNodesExceeded: 'Max count nodes exceeded',
+    minCountNodesNotSpecified: 'Min count nodes not specified',
+    required: 'Required',
+    zeroOrNegative: 'Zero or negative',
+  },
+  systemErrors: {
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
     duplicateName: 'duplicate scientific name {{scientificName}}; $t(errors.duplicateRows)',
     duplicateCode: 'duplicate code {{code}}; $t(errors.duplicateRows)',
-    empty: 'Empty',
-    duplicate: 'Duplicate',
-    exceedingMax: 'Exceeding max',
-    keyword: 'Keyword',
-    invalidNumber: 'Invalid number',
-    zeroOrNegative: 'Zero or negative',
-    invalidName: 'Invalid name',
-    required: 'Required',
-    invalidValue: 'Invalid value',
-
-    minCountNodesNotSpecified: 'Min count nodes not specified',
-    maxCountNodesExceeded: 'Max count nodes exceeded',
-
-    duplicateRecord: 'Duplicate record key',
-    duplicateEntity: 'Duplicate entity',
-
-    defaultValuesNotSpecified: 'Default value not specified',
-
     systemError: '{{text}}',
   },
-
 }

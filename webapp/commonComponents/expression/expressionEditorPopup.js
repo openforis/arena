@@ -15,7 +15,7 @@ import * as SurveyState from '../../survey/surveyState'
 import * as ExpressionVariables from './expressionVariables'
 import * as ExpressionParser from './expressionParser'
 
-import appContext from '../../app/appContext'
+import AppContext from '../../app/appContext'
 
 class ExpressionEditorPopup extends React.Component {
 
@@ -106,7 +106,7 @@ class ExpressionEditorPopup extends React.Component {
 
 }
 
-ExpressionEditorPopup.contextType = appContext
+ExpressionEditorPopup.contextType = AppContext
 
 ExpressionEditorPopup.defaultProps = {
   query: '', // string representing the expression
