@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const Queue = require('../../../common/queue')
+
 const SurveyNodeDefs = require('../../survey/_internal/surveyNodeDefs')
 const SurveyDependencies = require('../../survey/_internal/surveyDependencies')
 const NodeDef = require('../../survey/nodeDef')
@@ -31,12 +33,24 @@ const getNodesByDefUuid = nodeDefUuid => record => R.pipe(
 // ancestors
 const getParentNode = node => getNodeByUuid(Node.getParentUuid(node))
 
+const visitAncestors = (node, visitor, visitSelf = false) => record => {
+  let nodeCurrent = visitSelf
+    ? node
+    : getParentNode(node)(record)
+
+  while (nodeCurrent) {
+    visitor(nodeCurrent)
+    nodeCurrent = getParentNode(nodeCurrent)(record)
+  }
+}
+
 const getAncestorsAndSelf = entity => record => {
   const ancestors = []
-  while (entity) {
-    ancestors.push(entity)
-    entity = getParentNode(entity)(record)
-  }
+  visitAncestors(
+    entity,
+    ancestor => ancestors.push(ancestor),
+    true
+  )(record)
   return ancestors
 }
 
@@ -73,6 +87,40 @@ const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
   getNodeChildrenByDefUuid(parentNode, nodeDefUuid),
   R.head
 )
+
+const visitDescendantsAndSelf = (node, visitor) => record => {
+  const queue = new Queue()
+
+  queue.enqueue(node)
+
+  while (!queue.isEmpty()) {
+    const node = queue.dequeue()
+
+    visitor(node)
+
+    const children = getNodeChildren(node)(record)
+    queue.enqueueItems(children)
+  }
+}
+
+/**
+ * Returns true if a node and all its ancestors are applicable
+ */
+const isNodeApplicable = node => record => {
+  //output
+  let applicable = true
+
+  let nodeCurrent = node
+
+  visitAncestors(node, ancestor => {
+    if (applicable) {
+      applicable = Node.isChildApplicable(Node.getNodeDefUuid(nodeCurrent))(ancestor)
+    }
+    nodeCurrent = ancestor
+  })(record)
+
+  return applicable
+}
 
 /**
  * ==== dependency
@@ -200,6 +248,8 @@ module.exports = {
   getNodeChildren,
   getNodeChildrenByDefUuid,
   getNodeChildByDefUuid,
+  visitDescendantsAndSelf,
+  isNodeApplicable,
 
   // ==== dependency
   getDependentNodePointers,
