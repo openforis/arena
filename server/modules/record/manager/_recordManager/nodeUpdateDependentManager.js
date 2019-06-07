@@ -17,7 +17,7 @@ const NodeRepository = require('../../repository/nodeRepository')
 const updateDependentsApplicable = async (survey, record, node, tx) => {
 
   //1. fetch dependent nodes
-  const nodesToUpdate = Record.getDependentNodes(survey, node, Survey.dependencyTypes.applicable)(record)
+  const nodesToUpdate = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.applicable)(record)
 
   //2. update expr to node and dependent nodes
   const nodesUpdated = await Promise.all(
@@ -52,28 +52,25 @@ const updateDependentsApplicable = async (survey, record, node, tx) => {
 const updateDependentsDefaultValues = async (survey, record, node, tx) => {
 
   //1. fetch dependent nodes
-  const nodeDependents = Record.getDependentNodes(survey, node, Survey.dependencyTypes.defaultValues)(record)
 
   // filter nodes to update including itself and (attributes with empty values or with default values applied)
   // therefore attributes with user defined values are excluded
-  const nodesToUpdate = R.pipe(
-    R.append({ nodeCtx: node, nodeDef: Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey) }),
-    R.filter(o => {
-        const { nodeCtx: n, nodeDef } = o
-        return (
-          NodeDef.isAttribute(nodeDef) && (
-            Node.isValueBlank(n) ||
-            Node.isDefaultValueApplied(n)
-          )
-        )
-      }
-    )
-  )(nodeDependents)
+  const nodeDependentPointersFilterFn = nodePointer => {
+    const { nodeCtx, nodeDef } = nodePointer
+
+    return NodeDef.isAttribute(nodeDef) &&
+      (
+        Node.isValueBlank(nodeCtx) ||
+        Node.isDefaultValueApplied(nodeCtx)
+      )
+  }
+
+  const nodePointersToUpdate = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.defaultValues, true, nodeDependentPointersFilterFn)(record)
 
   //2. update expr to node and dependent nodes
   const nodesUpdated = await Promise.all(
-    nodesToUpdate.map(async o => {
-      const { nodeCtx, nodeDef } = o
+    nodePointersToUpdate.map(async nodePointer => {
+      const { nodeCtx, nodeDef } = nodePointer
 
       //3. evaluate applicable default value expression
       const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getDefaultValues(nodeDef))

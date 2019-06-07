@@ -77,52 +77,70 @@ const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
 /**
  * ==== dependency
  */
-const getDependentNodes = (survey, node, dependencyType) => record => {
+/**
+ * Returns a list of dependent node pointers.
+ * Every item in the list is in the format:
+ * {
+ *   nodeCtx, //context node
+ *   nodeDef, //node definition
+ * }
+ */
+const getDependentNodePointers = (survey, node, dependencyType, includeSelf = false, filterFn = null) => record => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = SurveyNodeDefs.getNodeDefByUuid(nodeDefUuid)(survey)
   const dependentUuids = SurveyDependencies.getNodeDefDependencies(nodeDefUuid, dependencyType)(survey)
-  const isDependencyApplicable = dependencyType === SurveyDependencies.dependencyTypes.applicable
+
+  const nodePointers = []
 
   if (dependentUuids) {
     const dependentDefs = SurveyNodeDefs.getNodeDefsByUuids(dependentUuids)(survey)
 
-    const dependentsPerDef = dependentDefs.map(
-      dependentDef => {
-        //1 find common parent def
-        const commonParentDefUuid = R.pipe(
-          R.intersection(NodeDef.getMetaHierarchy(nodeDef)),
-          R.last
-        )(NodeDef.getMetaHierarchy(dependentDef))
+    for (const dependentDef of dependentDefs) {
+      //1 find common parent def
+      const commonParentDefUuid = R.pipe(
+        R.intersection(NodeDef.getMetaHierarchy(nodeDef)),
+        R.last
+      )(NodeDef.getMetaHierarchy(dependentDef))
 
-        //2 find common parent node
-        const commonParentNode = getAncestorByNodeDefUuid(node, commonParentDefUuid)(record)
+      //2 find common parent node
+      const commonParentNode = getAncestorByNodeDefUuid(node, commonParentDefUuid)(record)
 
-        //3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
-        const nodeDefUuidDependent = isDependencyApplicable
-          ? NodeDef.getParentUuid(dependentDef)
-          : NodeDef.getUuid(dependentDef)
+      //3 find descendant nodes of common parent node with nodeDefUuid = dependentDef uuid
+      const isDependencyApplicable = dependencyType === SurveyDependencies.dependencyTypes.applicable
 
-        const dependentNodes = R.pipe(
-          getNodesByDefUuid(nodeDefUuidDependent),
-          R.filter(node =>
-            Node.isDescendantOf(commonParentNode)(node) ||
-            (
-              isDependencyApplicable && Node.getUuid(node) === Node.getUuid(commonParentNode)
-            )
+      const nodeDefUuidDependent = isDependencyApplicable
+        ? NodeDef.getParentUuid(dependentDef)
+        : NodeDef.getUuid(dependentDef)
+
+      const nodeDependents = getNodesByDefUuid(nodeDefUuidDependent)(record)
+      for (const nodeDependent of nodeDependents) {
+        if (Node.isDescendantOf(commonParentNode)(nodeDependent) ||
+          (
+            isDependencyApplicable && Node.getUuid(nodeDependent) === Node.getUuid(commonParentNode)
           )
-        )(record)
-
-        return dependentNodes.map(nodeCtx => ({
-          nodeDef: dependentDef,
-          nodeCtx
-        }))
+        ) {
+          const nodePointer = {
+            nodeDef: dependentDef,
+            nodeCtx: nodeDependent
+          }
+          if (filterFn === null || filterFn(nodePointer)) {
+            nodePointers.push(nodePointer)
+          }
+        }
       }
-    )
-
-    return R.flatten(dependentsPerDef)
-  } else {
-    return []
+    }
   }
+  if (includeSelf) {
+    const nodePointerSelf = {
+      nodeDef,
+      nodeCtx: node
+    }
+    if (filterFn === null || filterFn(nodePointerSelf)) {
+      nodePointers.push(nodePointerSelf)
+    }
+  }
+
+  return nodePointers
 }
 
 // code attributes
@@ -184,7 +202,7 @@ module.exports = {
   getNodeChildByDefUuid,
 
   // ==== dependency
-  getDependentNodes,
+  getDependentNodePointers,
 
   // code
   getParentCodeAttribute,

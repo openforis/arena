@@ -52,8 +52,8 @@ const persistValidation = async (survey, record, nodesValidation, tx) => {
   const surveyId = Survey.getId(survey)
 
   const recordValidationUpdated = R.pipe(
-    Validator.mergeValidation(nodesValidation),
-    Validator.getValidation
+    Record.getValidation,
+    Validator.mergeValidation(nodesValidation)
   )(record)
 
   await RecordRepository.updateValidation(surveyId, Record.getUuid(record), recordValidationUpdated, tx)

@@ -130,7 +130,10 @@ const _onNodesUpdate = async (survey, record, updatedNodes,
     nodesUpdateListener(updatedDependentNodes)
   record = Record.assocNodes(updatedDependentNodes)(record)
 
-  const updatedNodesAndDependents = R.mergeDeepRight(updatedNodes, updatedDependentNodes)
+  const updatedNodesAndDependents = {
+    ...updatedNodes,
+    ...updatedDependentNodes
+  }
 
   // 3. update node validations
   const validations = await RecordValidationManager.validateNodesAndPersistValidation(survey, record, updatedNodesAndDependents, t)

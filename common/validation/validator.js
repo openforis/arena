@@ -203,13 +203,16 @@ const dissocFieldValidation = field => R.pipe(
   cleanup
 )
 
-const mergeValidation = validation =>
-  obj => R.pipe(
-    getValidation,
-    R.mergeDeepLeft(validation),
+const mergeValidation = validationNew =>
+  validationOld => R.pipe(
+    validation => ({
+      [keys.fields]: {
+        ...getFieldValidations(validation),
+        ...getFieldValidations(validationNew),
+      }
+    }),
     cleanup,
-    v => assocValidation(v)(obj)
-  )(obj)
+  )(validationOld)
 
 const recalculateValidity = validation =>
   R.pipe(
@@ -233,7 +236,6 @@ module.exports = {
   validValidation,
 
   validate,
-  validateProp,
   validateRequired,
   validateItemPropUniqueness,
   validateNotKeyword,
