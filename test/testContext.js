@@ -19,7 +19,8 @@ const initTestContext = async () => {
 }
 
 const destroyTestContext = async () => {
-  await deleteSurvey(Survey.getId(survey), user)
+  if (survey)
+    await deleteSurvey(Survey.getId(survey), user)
 }
 
 const setContextSurvey = s => {

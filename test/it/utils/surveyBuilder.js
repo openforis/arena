@@ -53,7 +53,6 @@ class NodeDefBuilder {
       NodeDef.getValidations,
       NodeDefValidations.assocExpressions(expressions)
     )(this)
-
     return this
   }
 }
@@ -149,13 +148,15 @@ class SurveyBuilder {
 
       const { root } = Survey.getHierarchy(R.always)(surveyParam)
 
-      await
-        Survey.traverseHierarchyItem(root, async nodeDef =>
-          await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
-        )
+      await Survey.traverseHierarchyItem(root, async nodeDef =>
+        await NodeDefRepository.insertNodeDef(surveyId, nodeDef, t)
+       )
 
       if (publish) {
-        await new SurveyPublishJob({ user: this.user, surveyId }).start(t)
+        const publishJob = new SurveyPublishJob({ user: this.user, surveyId })
+        await publishJob.start(t)
+        if (publishJob.isFailed())
+          throw new Error(`Test survey buildAndStore failed: ${JSON.stringify(publishJob)}`)
       }
 
       const surveyDb = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, !publish, true, false, t)

@@ -159,6 +159,10 @@ class Job {
     return this.status === jobStatus.succeeded
   }
 
+  isFailed () {
+    return this.status === jobStatus.failed
+  }
+
   isEnded () {
     switch (this.status) {
       case jobStatus.succeeded:

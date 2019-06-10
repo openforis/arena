@@ -11,7 +11,6 @@ const Node = require('../../../../../common/record/node')
 
 const RecordUsersMap = require('../../service/update/recordUsersMap')
 const RecordRepository = require('../../repository/recordRepository')
-const SurveyManager = require('../../../survey/manager/surveyManager')
 const RecordValidationManager = require('./recordValidationManager')
 const NodeUpdateManager = require('./nodeUpdateManager')
 
@@ -28,10 +27,10 @@ const ActivityLog = require('../../../activityLog/activityLogger')
 
 //==== CREATE
 
-const createRecord = async (user, surveyId, recordToCreate, client = db) =>
+const createRecord = async (user, survey, recordToCreate, client = db) =>
   await client.tx(async t => {
     const preview = Record.isPreview(recordToCreate)
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, preview, true, false, t)
+    const surveyId = Survey.getId(survey)
 
     const record = await RecordRepository.insertRecord(surveyId, recordToCreate, t)
     if (!preview)
