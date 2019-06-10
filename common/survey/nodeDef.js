@@ -216,6 +216,7 @@ module.exports = {
     getValidations,
     NodeDefValidations.getExpressions,
   ),
+  hasAdvancedPropsDraft: R.pipe(R.prop(keys.draftAdvanced), R.isEmpty, R.not),
 
   // meta
   getMetaHierarchy,

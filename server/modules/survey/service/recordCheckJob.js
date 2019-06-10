@@ -1,7 +1,5 @@
 const R = require('ramda')
 
-const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
-
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const Record = require('../../../../common/record/record')
@@ -19,6 +17,8 @@ class RecordCheckJob extends Job {
   }
 
   async execute (tx) {
+    //1. determine new or updated node defs
+
     const surveyId = this.getSurveyId()
     const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, true, true, false, tx)
 
@@ -27,61 +27,78 @@ class RecordCheckJob extends Job {
 
     Survey.getNodeDefsArray(survey).forEach(def => {
       if (!NodeDef.isPublished(def)) {
+        // new node def
         nodeDefsNew.push(def)
-      } else if (R.prop(NodeDef.keys.draftAdvanced, def)) {
+      } else if (NodeDef.hasAdvancedPropsDraft(def)) {
+        // already existing node def but validations have been updated
         nodeDefsUpdated.push(def)
       }
     })
 
-    if (!(R.isEmpty(nodeDefsNew) && R.isEmpty(nodeDefsUpdated))) {
+    if (!R.isEmpty(nodeDefsNew) || !R.isEmpty(nodeDefsUpdated)) {
+      // 2. for each record, perform record check
+
       const recordUuids = await RecordManager.fetchRecordUuids(surveyId, tx)
 
       this.total = R.length(recordUuids)
 
       for (const recordUuid of recordUuids) {
         const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, tx)
-        await this.checkRecord(survey, nodeDefsNew, nodeDefsUpdated, record, tx)
+        await this._checkRecord(survey, nodeDefsNew, nodeDefsUpdated, record, tx)
 
         this.incrementProcessedItems()
       }
     }
   }
 
-  async checkRecord (survey, nodeDefsNew, nodeDefsUpdated, record, tx) {
+  async _checkRecord (survey, nodeDefsNew, nodeDefsUpdated, record, tx) {
     // 1. insert missing nodes
-    const missingNodes = await insertMissingSingleNodes(survey, nodeDefsNew, record, this.getUser(), tx)
+    const missingNodes = await _insertMissingSingleNodes(survey, nodeDefsNew, record, this.getUser(), tx)
     record = Record.assocNodes(missingNodes)(record)
 
-    // 2. apply default values
-    const defaultValuesUpdated = await applyDefaultValues(survey, nodeDefsUpdated, record, missingNodes, tx)
-    record = Record.assocNodes(defaultValuesUpdated)(record)
+    // 2. apply default values and recalculate applicability
+    const nodesUpdatedDefaultValues = await _applyDefaultValuesAndApplicability(survey, nodeDefsUpdated, record, missingNodes, tx)
+    record = Record.assocNodes(nodesUpdatedDefaultValues)(record)
 
     // 3. validate nodes
-    await validateNodes(survey, R.concat(nodeDefsNew, nodeDefsUpdated), record, R.mergeRight(missingNodes, defaultValuesUpdated), tx)
+    const nodesToValidate = {
+      ...missingNodes,
+      ...nodesUpdatedDefaultValues
+    }
+    const nodeDefsToValidate = R.concat(nodeDefsNew, nodeDefsUpdated)
+
+    await _validateNodes(survey, nodeDefsToValidate, record, nodesToValidate, tx)
   }
 }
 
-const applyDefaultValues = async (survey, nodeDefsUpdated, record, newNodes, tx) => {
-  const updatedNodes = R.pipe(
-    R.map(def => Record.getNodesByDefUuid(NodeDef.getUuid(def))(record)),
-    R.flatten,
-    toUuidIndexedObj
-  )(nodeDefsUpdated)
+const _applyDefaultValuesAndApplicability = async (survey, nodeDefsUpdated, record, newNodes, tx) => {
+  const nodesToUpdate = {
+    ...newNodes
+  }
 
-  const nodesToUpdate = R.mergeRight(newNodes, updatedNodes)
+  // include nodes associated to updated node defs
+  for (const nodeDefUpdated of nodeDefsUpdated) {
+    const nodesToUpdatePartial = Record.getNodesByDefUuid(NodeDef.getUuid(nodeDefUpdated))(record)
+    for (const nodeUpdated of nodesToUpdatePartial) {
+      nodesToUpdate[Node.getUuid(nodeUpdated)] = nodeUpdated
+    }
+  }
 
   return await RecordManager.updateNodesDependents(survey, record, nodesToUpdate, tx)
 }
 
-const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
-  // include parent nodes of new/updated node defs (needed for min/max count validation)
-  const nodeDefsParentNodes = R.pipe(
-    R.map(def => Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)),
-    R.flatten,
-    toUuidIndexedObj
-  )(nodeDefs)
+const _validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
+  const nodesToValidate = {
+    ...nodes
+  }
 
-  const nodesToValidate = R.mergeRight(nodes, nodeDefsParentNodes)
+  // include parent nodes of new/updated node defs (needed for min/max count validation)
+  for (const def of nodeDefs) {
+    const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
+    for (const parentNode of parentNodes) {
+      nodesToValidate[Node.getUuid(parentNode)] = parentNode
+    }
+  }
 
   await RecordManager.validateNodesAndPersistValidation(survey, record, nodesToValidate, tx)
 }
@@ -91,7 +108,7 @@ const validateNodes = async (survey, nodeDefs, record, nodes, tx) => {
  *
  * Returns an indexed object with all the inserted nodes.
  */
-const insertMissingSingleNode = async (survey, childDef, record, parentNode, user, tx) => {
+const _insertMissingSingleNode = async (survey, childDef, record, parentNode, user, tx) => {
   if (NodeDef.isSingle(childDef)) {
     const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
     if (R.isEmpty(children)) {
@@ -107,13 +124,13 @@ const insertMissingSingleNode = async (survey, childDef, record, parentNode, use
  *
  * Returns an indexed object with all the inserted nodes.
  */
-const insertMissingSingleNodes = async (survey, nodeDefsNew, record, user, tx) => {
+const _insertMissingSingleNodes = async (survey, nodeDefsNew, record, user, tx) => {
   let allInsertedNodes = {}
   for (const nodeDef of nodeDefsNew) {
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(nodeDef))(record)
     for (const parentNode of parentNodes) {
-      const insertedNodes = await insertMissingSingleNode(survey, nodeDef, record, parentNode, user, tx)
-      allInsertedNodes = R.mergeRight(allInsertedNodes, insertedNodes)
+      const insertedNodes = await _insertMissingSingleNode(survey, nodeDef, record, parentNode, user, tx)
+      Object.assign(allInsertedNodes, insertedNodes)
     }
   }
   return allInsertedNodes
