@@ -90,7 +90,7 @@ const terminateUserThread = userId => {
 const createRecord = async (user, surveyId, recordToCreate) => {
   const preview = Record.isPreview(recordToCreate)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, preview, true, false)
-  return RecordManager.createRecord(user, survey, recordToCreate)
+  return await RecordManager.createRecord(user, survey, recordToCreate)
 }
 
 const deleteRecord = async (user, surveyId, recordUuid) => {
