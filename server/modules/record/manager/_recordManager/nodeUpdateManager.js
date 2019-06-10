@@ -48,7 +48,7 @@ const updateNodesDependents = async (survey, record, nodes, tx) => {
   // output
   let nodesUpdated = { ...nodes }
 
-  const nodesArray = R.values(nodes)
+  const nodesArray = Object.values(nodes)
   const nodesToVisit = new Queue(nodesArray)
 
   const nodesVisitedByUuid = {} //used to avoid visiting the same node 2 times
@@ -74,13 +74,10 @@ const updateNodesDependents = async (survey, record, nodes, tx) => {
       record = Record.assocNodes(nodesUpdatedCurrent)(record)
 
       // mark updated nodes to visit
-      nodesToVisit.enqueueItems(R.values(nodesUpdatedCurrent))
+      nodesToVisit.enqueueItems(Object.values(nodesUpdatedCurrent))
 
       // update nodes to return
-      nodesUpdated = {
-        ...nodesUpdated,
-        ...nodesUpdatedCurrent
-      }
+      Object.assign(nodesUpdated, nodesUpdatedCurrent)
 
       // mark node visited
       nodesVisitedByUuid[nodeUuid] = true

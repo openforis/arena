@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const Queue = require('../../../common/queue')
+
 const SurveyNodeDefs = require('../../survey/_internal/surveyNodeDefs')
 const SurveyDependencies = require('../../survey/_internal/surveyDependencies')
 const NodeDef = require('../../survey/nodeDef')
@@ -73,6 +75,37 @@ const getNodeChildByDefUuid = (parentNode, nodeDefUuid) => R.pipe(
   getNodeChildrenByDefUuid(parentNode, nodeDefUuid),
   R.head
 )
+
+const visitDescendantsAndSelf = (node, visitor) => record => {
+  const queue = new Queue()
+
+  queue.enqueue(node)
+
+  while (!queue.isEmpty()) {
+    const node = queue.dequeue()
+
+    visitor(node)
+
+    const children = getNodeChildren(node)(record)
+    queue.enqueueItems(children)
+  }
+}
+
+/**
+ * Returns true if a node and all its ancestors are applicable
+ */
+const isNodeApplicable = node => record => {
+  if (Node.isRoot(node))
+    return true
+
+  const nodeParent = getParentNode(node)(record)
+  const isApplicable = Node.isChildApplicable(Node.getNodeDefUuid(node))(nodeParent)
+  if (isApplicable) {
+    return isNodeApplicable(nodeParent)(record)
+  } else {
+    return false
+  }
+}
 
 /**
  * ==== dependency
@@ -200,6 +233,8 @@ module.exports = {
   getNodeChildren,
   getNodeChildrenByDefUuid,
   getNodeChildByDefUuid,
+  visitDescendantsAndSelf,
+  isNodeApplicable,
 
   // ==== dependency
   getDependentNodePointers,

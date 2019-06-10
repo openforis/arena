@@ -15,38 +15,48 @@ const NodeRepository = require('../../repository/nodeRepository')
  */
 
 const updateDependentsApplicable = async (survey, record, node, tx) => {
+  //output
+  const nodesUpdated = {} //updated nodes indexed by uuid
 
   //1. fetch dependent nodes
-  const nodesToUpdate = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.applicable)(record)
+  const nodePointersToUpdate = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.applicable)(record)
 
   //2. update expr to node and dependent nodes
-  const nodesUpdated = await Promise.all(
-    nodesToUpdate.map(async o => {
-      const { nodeCtx, nodeDef } = o
+  //NOTE: don't do it in parallel, same nodeCtx metadata could be overwritten
+  for (const { nodeCtx, nodeDef } of nodePointersToUpdate) {
+    //3. evaluate applicable expression
+    const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getApplicable(nodeDef))
+    const applicable = R.propOr(false, 'value', exprEval)
 
-      //3. evaluate applicable expression
-      const exprEval = await RecordExprParser.evalApplicableExpression(survey, record, nodeCtx, NodeDef.getApplicable(nodeDef))
-      const applicable = R.propOr(false, 'value', exprEval)
+    //4. persist updated node value if changed, and return updated node
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+    const nodeCtxUuid = Node.getUuid(nodeCtx)
 
-      //4. persist updated node value if changed, and return updated node
-      const nodeDefUuid = NodeDef.getUuid(nodeDef)
-      const nodeCtxUuid = Node.getUuid(nodeCtx)
+    if (Node.isChildApplicable(nodeDefUuid)(nodeCtx) !== applicable) {
+      //applicability changed
 
-      return Node.isChildApplicable(nodeDefUuid)(nodeCtx) === applicable
-        ? {}
-        : {
-          [nodeCtxUuid]: await NodeRepository.updateChildrenApplicability(
-            Survey.getId(survey),
-            nodeCtxUuid,
-            nodeDefUuid,
-            applicable,
-            tx
-          )
-        }
-    })
-  )
+      //update node and add it to nodesUpdated
+      nodesUpdated[nodeCtxUuid] = await NodeRepository.updateChildrenApplicability(
+        Survey.getId(survey),
+        nodeCtxUuid,
+        nodeDefUuid,
+        applicable,
+        tx
+      )
 
-  return R.mergeAll(nodesUpdated)
+      const nodeCtxChildren = Record.getNodeChildrenByDefUuid(nodeCtx, nodeDefUuid)(record)
+
+      for (const nodeCtxChild of nodeCtxChildren) {
+        //5. add nodeCtxChild and its descendants to nodesUpdated
+        Record.visitDescendantsAndSelf(
+          nodeCtxChild,
+          node => nodesUpdated[Node.getUuid(node)] = node
+        )(record)
+      }
+    }
+  }
+
+  return nodesUpdated
 }
 
 const updateDependentsDefaultValues = async (survey, record, node, tx) => {

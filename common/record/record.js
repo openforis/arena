@@ -44,6 +44,8 @@ module.exports = {
   getNodeSiblingsByDefUuid: RecordReader.getNodeSiblingsByDefUuid,
   getNodeChildrenByDefUuid: RecordReader.getNodeChildrenByDefUuid,
   getNodeChildByDefUuid: RecordReader.getNodeChildByDefUuid,
+  visitDescendantsAndSelf: RecordReader.visitDescendantsAndSelf,
+  isNodeApplicable: RecordReader.isNodeApplicable,
 
   // ==== dependency
   getDependentNodePointers: RecordReader.getDependentNodePointers,

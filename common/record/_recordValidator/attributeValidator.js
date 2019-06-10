@@ -54,9 +54,7 @@ const validateNodeValidations = (survey, record, nodeDef) => async (propName, no
 }
 
 const validateAttribute = async (survey, record, attribute, nodeDef) => {
-  const parentNode = Record.getParentNode(attribute)(record)
-
-  if (Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)) {
+  if (Record.isNodeApplicable(attribute)(record)) {
     return await Validator.validate(attribute, {
       [Node.keys.value]: [
         validateRequired(survey, nodeDef),
