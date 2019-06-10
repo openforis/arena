@@ -8,6 +8,7 @@ const { isBlank, contains } = require('../../../../common/stringUtils')
 const CategoryManager = require('../../category/manager/categoryManager')
 const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
 
+const SystemError = require('../../../utils/systemError')
 const { sendErr } = require('../../../utils/response')
 const { getRestParam } = require('../../../utils/request')
 
@@ -57,7 +58,10 @@ module.exports.init = app => {
         res.json({ item: toItem(type)(itemDb) })
 
       } else {
-        throw new Error('invalid type ' + type)
+        throw new SystemError({
+          key: 'invalidType',
+          params: { type },
+        }, `Invalid type ${type}`)
       }
     } catch (err) {
       sendErr(res, err)
@@ -104,7 +108,10 @@ module.exports.init = app => {
         res.json({ items })
 
       } else {
-        throw new Error('invalid type ' + type)
+        throw new SystemError({
+          key: 'invalidType',
+          params: { type },
+        }, `Invalid type ${type}`)
       }
     } catch (err) {
       sendErr(res, err)

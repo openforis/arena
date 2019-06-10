@@ -7,6 +7,8 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 const Expression = require('../../../../common/exprParser/expression')
 
+const SystemError = require('../../../../server/utils/systemError')
+
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
   value: 1, //simulates node value
@@ -14,23 +16,43 @@ const bindNode = (survey, nodeDef) => ({
   getValue: () => NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1,
   parent: () => {
     const def = Survey.getNodeDefParent(nodeDef)(survey)
-    if (!def) throw new Error('Unable to find parent of ' + NodeDef.getName(nodeDef))
+    if (!def) {
+      const name = NodeDef.getName(nodeDef)
+      throw new SystemError({
+        key: 'unableToFindParent',
+        params: { name },
+      }, `Unable to find parent of ${name}`)
+    }
     return bindNode(survey, def)
   },
   node: name => {
     if (NodeDef.isEntity(nodeDef)) {
       const def = Survey.getNodeDefChildByName(nodeDef, name)(survey)
-      if (!def) throw new Error('Unable to find node with name ' + name)
+      if (!def) {
+        throw new SystemError({
+          key: 'unableToFindNode',
+          params: { name },
+        }, `Unable to find node with name ${name}`)
+      }
       return bindNode(survey, def)
     } else {
-      throw new Error(`Cannot get child '${name}' from attribute ${NodeDef.getName(nodeDef)}`)
+      const attributeName = NodeDef.getName(nodeDef)
+      throw new SystemError({
+        key: 'cannotGetChild',
+        params: { childName: name, name: attributeName },
+      }, `Cannot get child '${name}' from attribute ${attributeName}`)
     }
   },
   sibling: name => {
     const def = Survey.getNodeDefSiblingByName(nodeDef, name)(survey)
-    if (!def) throw new Error('Unable to find sibling with name ' + name)
+    if (!def) {
+      throw new SystemError({
+        key: 'unableToFindSibiling',
+        params: { name },
+      }, `Unable to find sibling with name ${name}`)
+    }
     return bindNode(survey, def)
-  }
+  },
 })
 
 const validateNodeDefExpr = async (survey, nodeDef, expr) => {
@@ -40,7 +62,7 @@ const validateNodeDefExpr = async (survey, nodeDef, expr) => {
       {
         node: bindNode(survey, nodeDef),
         functions: {
-          [Expression.types.ThisExpression]: (expr, { node }) => node
+          [Expression.types.ThisExpression]: (expr, { node }) => node,
         },
       }
     )
@@ -73,8 +95,8 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i) => {
       [NodeDefExpression.keys.applyIf]: [
         validateExpressionProp(survey, nodeDef),
         Validator.validateItemPropUniqueness(nodeDefExpressions),
-        validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
-      ]
+        validateOnlyLastApplyIfEmpty(nodeDefExpressions, i),
+      ],
     }
   )
   return validation
@@ -98,5 +120,5 @@ const validate = async (survey, nodeDef, nodeDefExpressions) => {
 }
 
 module.exports = {
-  validate
+  validate,
 }

@@ -4,6 +4,8 @@ const Promise = require('bluebird')
 const { types } = require('./types')
 const { isString } = require('../../stringUtils')
 
+const SystemError = require('../../../server/utils/systemError')
+
 const unaryEval = async (expr, ctx) => {
   const { argument, operator } = expr
   const res = await evalExpression(argument, ctx)
@@ -64,7 +66,10 @@ const callEval = async (expr, ctx) => {
     return res
   } else {
     const fnName = R.pathOr('', ['property', 'name'])(callee)
-    throw new Error(`Undefined function '${fnName}' or wrong parameter types`)
+    throw new SystemError({
+      key: 'undefinedFunction',
+      params: { fnName: fnName },
+    }, `Undefined function '${fnName}' or wrong parameter types`)
   }
 }
 
@@ -114,7 +119,10 @@ const evalExpression = async (expr, ctx) => {
   if (fn)
     return await fn(expr, ctx)
   else
-    throw new Error(`Unsupported function type: ${expr.type}`)
+    throw new SystemError({
+      key: 'unsupportedFunctionType',
+      params: { exprType: expr.type },
+    }, `Unsupported function type: ${expr.type}`)
 }
 
 module.exports = {

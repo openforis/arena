@@ -10,23 +10,30 @@ import * as AppState from '../../app/appState'
 
 import { closeAppError } from '../../app/actions'
 
-const AppError = ({ error, closeAppError }) => (
-  <div className="app-errors__error">
+import useI18n from '../../commonComponents/useI18n'
 
-    <button className="btn-s btn-close"
-            onClick={() => closeAppError(error)}>
-      <span className="icon icon-cross icon-12px"/>
-    </button>
+const AppError = ({ error, closeAppError }) => {
 
-    <div className="status">
-      ERROR {R.path(['response', 'status'], error)}
+  const i18n = useI18n()
+  const { key, params } = R.path(['response', 'data'], error)
+
+  return (
+    <div className="app-errors__error">
+
+      <button className="btn-s btn-close"
+              onClick={() => closeAppError(error)}>
+        <span className="icon icon-cross icon-12px"/>
+      </button>
+
+      <div className="status">
+        ERROR {R.path(['response', 'status'], error)}
+      </div>
+      <div className="message">
+        {i18n.t(`appErrors.${key}`, params)}
+      </div>
     </div>
-    <div className="message">
-      {R.prop('message', error)}
-    </div>
-  </div>
-)
-
+  )
+}
 const AppErrors = ({ errors, closeAppError }) => (
   <TransitionGroup
     className={`app-errors${R.isEmpty(errors) ? ' hidden-transition' : ''}`}

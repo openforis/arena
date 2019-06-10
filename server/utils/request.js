@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const SystemError = require('../../server/utils/systemError')
+
 const getParams = req => R.pipe(
   R.mergeLeft(R.prop('query', req)),
   R.mergeLeft(R.prop('params', req)),
@@ -53,7 +55,7 @@ const toQueryString = obj =>
 const getRequiredParam = (req, param) => {
   const value = getRestParam(req, param, '')
   if (R.isEmpty(value))
-    throw new Error(`${param} is required`)
+    throw new SystemError({ key: 'paramIsRequired', params: { param } }, `${param} is required`)
   else
     return value
 }

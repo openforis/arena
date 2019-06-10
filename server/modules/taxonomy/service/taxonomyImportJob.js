@@ -14,6 +14,8 @@ const TaxonomyValidator = require('../taxonomyValidator')
 const TaxonomyManager = require('../manager/taxonomyManager')
 const TaxonomyImportManager = require('../manager/taxonomyImportManager')
 
+const SystemError = require('../../../../server/utils/systemError')
+
 const requiredColumns = [
   'code',
   'family',
@@ -48,7 +50,7 @@ class TaxonomyImportJob extends Job {
     const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
     if (Taxonomy.isPublished(taxonomy)) {
-      throw new Error('cannot overwrite published taxa')
+      throw new SystemError({ key: 'cannotOverridePublishedTaxa' }, 'Cannot overwrite published taxa')
     }
 
     // 2. calculate total number of rows

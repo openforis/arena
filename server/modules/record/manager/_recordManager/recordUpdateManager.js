@@ -18,6 +18,8 @@ const NodeUpdateManager = require('./nodeUpdateManager')
 const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
 const FileManager = require('../fileManager')
 
+const SystemError = require('../../../../../server/utils/systemError')
+
 const ActivityLog = require('../../../activityLog/activityLogger')
 
 /**
@@ -58,9 +60,8 @@ const updateRecordStep = async (surveyId, recordUuid, stepId, client = db) => {
     if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
       await RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t)
     } else {
-      throw new Error('Can\'t update step')
+      throw new SystemError({ key: 'cantUpdateStep' }, `Can't update step`)
     }
-
   })
 }
 

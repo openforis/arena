@@ -6,6 +6,8 @@ const { uuidv4 } = require('../../common/uuid')
 const { jobEvents, jobStatus } = require('./jobUtils')
 const { throttle, cancelThrottle } = require('../../common/functionsDefer')
 
+const SystemError = require('../utils/systemError')
+
 class JobEvent {
 
   constructor (type, status, total, processed) {
@@ -125,7 +127,9 @@ class Job {
     }
     // 5. if errors found or job has been canceled, throw an error to rollback transaction
     if (!this.isRunning()) {
-      throw new Error('Job canceled or errors found; rollback transaction')
+      throw new SystemError({
+        key: 'jobCanceledOrErrorsFound',
+      }, 'Job canceled or errors found; rollback transaction')
     }
   }
 

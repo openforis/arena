@@ -17,13 +17,13 @@ const keys = {
 
   // i18n
   i18n: 'i18n',
-  lang: 'lang'
+  lang: 'lang',
 }
 
 export const getState = R.prop('app')
 
 export const appStatus = {
-  ready: 'ready'
+  ready: 'ready',
 }
 
 export const isReady = R.pipe(getState, R.propEq(keys.status, appStatus.ready))

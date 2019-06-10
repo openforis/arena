@@ -3,6 +3,8 @@ const Response = require('../../../utils/response')
 
 const UserService = require('../service/userService')
 
+const SystemError = require('../../../../server/utils/systemError')
+
 module.exports.init = app => {
 
   // ==== UPDATE
@@ -14,7 +16,7 @@ module.exports.init = app => {
       const { userId, name, value } = Request.getParams(req)
 
       if (user.id !== userId) {
-        throw new Error('User not allowed to change pref')
+        throw new SystemError({ key: 'userNotAllowedToChangePref' }, 'User not allowed to change pref')
       }
 
       await UserService.updateUserPref(user, name, value)
