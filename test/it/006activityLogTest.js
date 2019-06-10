@@ -51,9 +51,9 @@ describe('Activity Log Test', async () => {
 
     const recordToCreate = Record.newRecord(user)
 
-    const record = await RecordManager.createRecord(user, surveyId, recordToCreate)
+    const record = await RecordManager.createRecord(user, survey, recordToCreate)
 
-    const logs = await ActivityLogger.fetchLogs(Survey.getId(survey))
+    const logs = await ActivityLogger.fetchLogs(surveyId)
     expect(logs.length).to.be.at.least(1)
 
     const recordCreateLogs = R.filter(log =>

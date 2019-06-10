@@ -14,7 +14,10 @@ const validate = async (survey, nodeDef, nodeDefValidations) => {
     : {}
 
   return R.pipe(
-    R.assocPath(['fields', 'expressions'], await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations))),
+    R.assocPath(
+      ['fields', 'expressions'],
+      await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations), false)
+    ),
     Validator.cleanup
   )(validation)
 }

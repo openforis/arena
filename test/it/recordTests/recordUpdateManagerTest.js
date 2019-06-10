@@ -13,7 +13,7 @@ const Node = require('../../../common/record/node')
 const NodeDefRepository = require('../../../server/modules/nodeDef/repository/nodeDefRepository')
 const RecordManager = require('../../../server/modules/record/manager/recordManager')
 
-const { getContextUser, fetchFullContextSurvey, getContextSurveyId } = require('../../testContext')
+const { getContextUser, fetchFullContextSurvey } = require('../../testContext')
 
 const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => {
   const propsAdvanced = {
@@ -23,12 +23,13 @@ const updateDefaultValues = async (survey, nodeDef, defaultValueExpressions) => 
 }
 
 const recordCreationTest = async () => {
-  const surveyId = getContextSurveyId()
+  const survey = await fetchFullContextSurvey()
   const user = getContextUser()
+  const surveyId = Survey.getId(survey)
 
   const recordNew = newRecordPreview()
 
-  const record = await RecordManager.createRecord(user, surveyId, recordNew)
+  const record = await RecordManager.createRecord(user, survey, recordNew)
 
   const nodes = Record.getNodes(record)
 
@@ -58,18 +59,14 @@ const defaultValueAppliedTest = async () => {
 
   //create record
 
-  const record = newRecordPreview()
+  const recordToCreate = newRecordPreview()
 
   await db.tx(async t => {
-    await RecordManager.createRecord(user, surveyId, record, t)
+    const record = await RecordManager.createRecord(user, survey, recordToCreate, t)
 
-    //reload record
+    const root = Record.getRootNode(record)
 
-    const reloadedRecord = await RecordManager.fetchRecordAndNodesByUuid(surveyId, Record.getUuid(record), t)
-
-    const root = Record.getRootNode(reloadedRecord)
-
-    const nodes = Record.getNodeChildrenByDefUuid(root, NodeDef.getUuid(nodeDef))(reloadedRecord)
+    const nodes = Record.getNodeChildrenByDefUuid(root, NodeDef.getUuid(nodeDef))(record)
 
     const reloadedNode = R.head(nodes)
 

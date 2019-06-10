@@ -32,28 +32,30 @@ const getType = (nodeDef, node) => {
 }
 
 const getColNames = (nodeDef, type) =>
-  R.flatten(type === types.insert
+  type === types.insert
     ? [
       DataTable.colNameUuuid,
-      NodeDef.isMultipleAttribute(nodeDef)
-        ? [DataTable.colNameParentUuuid, ...DataCol.getNames(nodeDef)]
+      DataTable.colNameRecordUuuid,
+      DataTable.colNameParentUuuid,
+      ...NodeDef.isMultipleAttribute(nodeDef)
+        ? DataCol.getNames(nodeDef)
         //entity
-        : NodeDef.isRoot(nodeDef) ? DataTable.colNameRecordUuuid : DataTable.colNameParentUuuid
+        : []
     ]
     : DataCol.getNames(nodeDef)
-  )
 
 const getColValues = async (survey, nodeDef, node, type, client) =>
-  R.flatten(type === types.insert
+  type === types.insert
     ? [
       Node.getUuid(node),
-      NodeDef.isMultipleAttribute(nodeDef)
-        ? [Node.getParentUuid(node), ...await Promise.all(DataCol.getValues(survey, nodeDef, node, client))]
+      Node.getRecordUuid(node),
+      Node.getParentUuid(node),
+      ...NodeDef.isMultipleAttribute(nodeDef)
+        ? await Promise.all(DataCol.getValues(survey, nodeDef, node, client))
         //entity
-        : NodeDef.isRoot(nodeDef) ? Node.getRecordUuid(node) : Node.getParentUuid(node)
+        : []
     ]
     : await DataCol.getValues(survey, nodeDef, node, client)
-  )
 
 const getRowUuid = (nodeDef, node, nodeParent) =>
   hasTable(nodeDef)
