@@ -87,6 +87,12 @@ const terminateUserThread = userId => {
  * RECORD
  * ======
  */
+const createRecord = async (user, surveyId, recordToCreate) => {
+  const preview = Record.isPreview(recordToCreate)
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, preview, true, false)
+  return RecordManager.createRecord(user, survey, recordToCreate)
+}
+
 const deleteRecord = async (user, surveyId, recordUuid) => {
   await RecordManager.deleteRecord(user, surveyId, recordUuid)
 
@@ -157,7 +163,7 @@ module.exports = {
   // ====== RECORD
 
   //create
-  createRecord: RecordManager.createRecord,
+  createRecord,
 
   //read
   fetchRecordByUuid: RecordManager.fetchRecordByUuid,

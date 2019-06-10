@@ -64,7 +64,7 @@ const validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
       : null
   }
 
-const validateExpression = async (survey, nodeDef, nodeDefExpressions, i) => {
+const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness) => {
   const nodeDefExpression = nodeDefExpressions[i]
   const validation = await Validator.validate(
     nodeDefExpression,
@@ -72,20 +72,24 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i) => {
       [NodeDefExpression.keys.expression]: [Validator.validateRequired, validateExpressionProp(survey, nodeDef)],
       [NodeDefExpression.keys.applyIf]: [
         validateExpressionProp(survey, nodeDef),
-        Validator.validateItemPropUniqueness(nodeDefExpressions),
-        validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
+        ...validateApplyIfUniqueness
+          ? [
+            Validator.validateItemPropUniqueness(nodeDefExpressions),
+            validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
+          ]
+          : []
       ]
     }
   )
   return validation
 }
 
-const validate = async (survey, nodeDef, nodeDefExpressions) => {
+const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniqueness = true) => {
   const result = { valid: true, fields: {} }
 
   const validations = await Promise.all(
     nodeDefExpressions.map(async (nodeDefExpression, i) =>
-      await validateExpression(survey, nodeDef, nodeDefExpressions, i)
+      await validateExpression(survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness)
     )
   )
 
