@@ -82,7 +82,12 @@ class Job {
       if (this.isRunning()) {
         // error found, change status only if not changed already
         this.logError(`${e.stack || e}`)
-        this.addError({ systemError: { valid: false, errors: [e.toString()] } })
+        this.addError({
+          error: {
+            valid: false,
+            errors: [{ key: 'generic', params: { text: e.toString() } }],
+          },
+        })
         await this.setStatusFailed()
       }
     }

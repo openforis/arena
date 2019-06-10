@@ -58,10 +58,7 @@ const getSqlVariables = (nodeDef, lang) => {
   }))
 }
 
-const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth) => {
-  const lang = Survey.getDefaultLanguage(
-    Survey.getSurveyInfo(survey)
-  )
+const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth, lang) => {
 
   return R.pipe(
     Survey.getNodeDefChildren(nodeDefContext),
@@ -78,9 +75,10 @@ const getChildDefVariables = (survey, nodeDefContext, nodeDefCurrent, mode, dept
   )(survey)
 }
 
-export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth = 1) => {
+export const getVariables = (survey, nodeDefContext, nodeDefCurrent, mode, depth = 1, preferredLang) => {
 
-  const variables = getChildDefVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth)
+  const lang = Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey))
+  const variables = getChildDefVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
 
   return NodeDef.isRoot(nodeDefContext)
     ? variables

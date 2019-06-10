@@ -1,10 +1,9 @@
-module.exports = class UnauthorizedError extends Error {
-  constructor(...params) {
-    super(...params);
+const SystemError = require('./systemError')
 
-    // Maintains proper stack trace for where our error was thrown (only available on V8)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, UnauthorizedError);
-    }
+class UnauthorizedError extends SystemError {
+  constructor (userName) {
+    super('userNotAuthorized', userName)
   }
 }
+
+module.exports = UnauthorizedError
