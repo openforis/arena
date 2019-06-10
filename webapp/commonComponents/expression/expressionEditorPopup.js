@@ -15,6 +15,8 @@ import * as SurveyState from '../../survey/surveyState'
 import * as ExpressionVariables from './expressionVariables'
 import * as ExpressionParser from './expressionParser'
 
+import AppContext from '../../app/appContext'
+
 class ExpressionEditorPopup extends React.Component {
 
   constructor (props) {
@@ -48,9 +50,18 @@ class ExpressionEditorPopup extends React.Component {
     const { query, queryDraft, exprDraft, exprDraftValid } = this.state
 
     const {
+      survey,
+      nodeDefContext,
+      nodeDefCurrent,
+      mode,
+      depth,
       isBoolean, onChange, onClose,
-      variables, literalSearchParams,
     } = this.props
+
+    const { i18n: { lang } } = this.context
+
+    const literalSearchParams = ExpressionParser.getLiteralSearchParams(survey, nodeDefCurrent, lang)
+    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
 
     return (
       <Popup
@@ -95,6 +106,8 @@ class ExpressionEditorPopup extends React.Component {
 
 }
 
+ExpressionEditorPopup.contextType = AppContext
+
 ExpressionEditorPopup.defaultProps = {
   query: '', // string representing the expression
   expr: null, // AST expression
@@ -124,13 +137,13 @@ const mapStateToProps = (state, props) => {
   const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
   const depth = isContextParent ? 0 : 1
-  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth)
-
-  const literalSearchParams = ExpressionParser.getLiteralSearchParams(survey, nodeDefCurrent)
 
   return {
-    variables,
-    literalSearchParams,
+    survey,
+    nodeDefContext,
+    nodeDefCurrent,
+    mode,
+    depth,
   }
 }
 

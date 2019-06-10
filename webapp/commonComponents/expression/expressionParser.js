@@ -36,7 +36,7 @@ export const isExprValid = (expr, canBeConstant) => {
   }
 }
 
-export const getLiteralSearchParams = (survey, nodeDef) => {
+export const getLiteralSearchParams = (survey, nodeDef, preferredLang) => {
 
   const surveyId = Survey.getId(survey)
 
@@ -46,13 +46,13 @@ export const getLiteralSearchParams = (survey, nodeDef) => {
       type: NodeDef.nodeDefType.code,
       categoryUuid: NodeDef.getCategoryUuid(nodeDef),
       categoryLevelIndex: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey),
-      lang: Survey.getDefaultLanguage(Survey.getSurveyInfo(survey)),
+      lang: Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey)),
     }
     : nodeDef && NodeDef.isTaxon(nodeDef) ?
       {
         surveyId,
         type: NodeDef.nodeDefType.taxon,
-        taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef)
+        taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
       }
       : null
 
