@@ -13,6 +13,8 @@ const Node = require('../../../../../../common/record/node')
 const RecordValidator = require('../../../../../../common/record/recordValidator')
 const Validator = require('../../../../../../common/validation/validator')
 
+const SystemError = require('../../../../../utils/systemError')
+
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const RecordManager = require('../../../../record/manager/recordManager')
 
@@ -116,7 +118,7 @@ class RecordsImportJob extends Job {
       }
     }
 
-    throw new Error(`Entry data not found: ${entryName}`)
+    throw new SystemError('entryDataNotFound', { entryName })
   }
 
   async traverseCollectRecordAndInsertNodes (survey, record, collectRecordJson) {

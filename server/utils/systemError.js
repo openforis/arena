@@ -1,10 +1,12 @@
 class SystemError extends Error {
 
-  constructor (messageKey, ...messageParams) {
-    super(messageKey)
+  constructor (key, params) {
+    super(key)
 
-    this._messageKey = messageKey
-    this._messageParams = messageParams
+    this.name = 'SystemError'
+
+    this._key = key
+    this._params = params
 
     // Maintains proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {
@@ -12,12 +14,12 @@ class SystemError extends Error {
     }
   }
 
-  get messageKey () {
-    return this._messageKey
+  get key () {
+    return this._key
   }
 
-  get messageParams () {
-    return this._messageParams
+  get params () {
+    return this._params
   }
 
 }

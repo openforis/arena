@@ -3,25 +3,27 @@ const Response = require('../../../utils/response')
 
 const UserService = require('../service/userService')
 
+const SystemError = require('../../../../server/utils/systemError')
+
 module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.post('/user/:userId/pref/:name/:value', async (req, res) => {
+  app.post('/user/:userId/pref/:name/:value', async (req, res, next) => {
     try {
       const { user } = req
 
       const { userId, name, value } = Request.getParams(req)
 
       if (user.id !== userId) {
-        throw new Error('User not allowed to change pref')
+        throw new SystemError('userNotAllowedToChangePref')
       }
 
       await UserService.updateUserPref(user, name, value)
 
       Response.sendOk(res)
-    } catch (e) {
-      Response.sendErr(res, e)
+    } catch (err) {
+      next(err)
     }
 
   })

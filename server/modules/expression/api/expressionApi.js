@@ -8,7 +8,7 @@ const { isBlank, contains } = require('../../../../common/stringUtils')
 const CategoryManager = require('../../category/manager/categoryManager')
 const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
 
-const { sendErr } = require('../../../utils/response')
+const SystemError = require('../../../utils/systemError')
 const { getRestParam } = require('../../../utils/request')
 
 const toItem = (type, lang = null) =>
@@ -30,7 +30,7 @@ const toItem = (type, lang = null) =>
 module.exports.init = app => {
 
   // ==== READ
-  app.get('/expression/literal/item', async (req, res) => {
+  app.get('/expression/literal/item', async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const type = getRestParam(req, 'type')
@@ -57,14 +57,14 @@ module.exports.init = app => {
         res.json({ item: toItem(type)(itemDb) })
 
       } else {
-        throw new Error('invalid type ' + type)
+        throw new SystemError('invalidType', { type })
       }
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.get('/expression/literal/items', async (req, res) => {
+  app.get('/expression/literal/items', async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const type = getRestParam(req, 'type')
@@ -104,10 +104,10 @@ module.exports.init = app => {
         res.json({ items })
 
       } else {
-        throw new Error('invalid type ' + type)
+        throw new SystemError('invalidType', { type })
       }
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 

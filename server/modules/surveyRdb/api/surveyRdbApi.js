@@ -7,7 +7,7 @@ const { requireRecordListViewPermission } = require('../../auth/authApiMiddlewar
 
 module.exports.init = app => {
 
-  app.post('/surveyRdb/:surveyId/:tableName/query', requireRecordListViewPermission, async (req, res) => {
+  app.post('/surveyRdb/:surveyId/:tableName/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, nodeDefUuidTable, tableName, offset, limit, editMode = false } = Request.getParams(req)
 
@@ -20,11 +20,11 @@ module.exports.init = app => {
 
       res.json(rows)
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
-  app.post('/surveyRdb/:surveyId/:tableName/query/count', requireRecordListViewPermission, async (req, res) => {
+  app.post('/surveyRdb/:surveyId/:tableName/query/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, tableName } = Request.getParams(req)
       const filter = Request.getJsonParam(req, 'filter', null)
@@ -33,11 +33,11 @@ module.exports.init = app => {
 
       res.json(count)
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
-  app.get('/surveyRdb/:surveyId/:tableName/export', requireRecordListViewPermission, async (req, res) => {
+  app.get('/surveyRdb/:surveyId/:tableName/export', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRequiredParam(req, 'surveyId')
       const tableName = Request.getRequiredParam(req, 'tableName')
@@ -51,7 +51,7 @@ module.exports.init = app => {
 
       res.end()
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 

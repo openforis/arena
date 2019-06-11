@@ -1,5 +1,4 @@
 const Request = require('../../../utils/request')
-const Response = require('../../../utils/response')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
@@ -14,7 +13,7 @@ module.exports.init = app => {
 
   // ==== CREATE
 
-  app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { body: nodeDefRequest } = req
       const { surveyId } = Request.getParams(req)
@@ -24,13 +23,13 @@ module.exports.init = app => {
 
       res.json({ nodeDef })
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== READ
 
-  app.get(`/survey/:surveyId/nodeDefs`, AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+  app.get(`/survey/:surveyId/nodeDefs`, AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const draft = Request.getBoolParam(req, 'draft')
@@ -40,13 +39,13 @@ module.exports.init = app => {
       await sendRespNodeDefs(res, surveyId, draft, advanced, validate)
 
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/nodeDef/:nodeDefUuid/props', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/nodeDef/:nodeDefUuid/props', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { body, user } = req
       const { props, propsAdvanced } = body
@@ -58,13 +57,13 @@ module.exports.init = app => {
       await sendRespNodeDefs(res, surveyId)
 
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId/nodeDef/:nodeDefUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/nodeDef/:nodeDefUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { user } = req
       const nodeDefUuid = Request.getRestParam(req, 'nodeDefUuid')
@@ -74,8 +73,8 @@ module.exports.init = app => {
 
       await sendRespNodeDefs(res, surveyId)
 
-    } catch (e) {
-      Response.sendErr(res, e)
+    } catch (err) {
+      next(err)
     }
   })
 }

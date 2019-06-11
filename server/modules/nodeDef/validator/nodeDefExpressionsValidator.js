@@ -7,6 +7,8 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 const Expression = require('../../../../common/exprParser/expression')
 
+const SystemError = require('../../../../server/utils/systemError')
+
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
   value: 1, //simulates node value
@@ -14,23 +16,31 @@ const bindNode = (survey, nodeDef) => ({
   getValue: () => NodeDef.isCode(nodeDef) || NodeDef.isTaxon(nodeDef) ? { props: { code: '' } } : 1,
   parent: () => {
     const def = Survey.getNodeDefParent(nodeDef)(survey)
-    if (!def) throw new Error('Unable to find parent of ' + NodeDef.getName(nodeDef))
+    if (!def) {
+      const name = NodeDef.getName(nodeDef)
+      throw new SystemError('unableToFindParent', { name })
+    }
     return bindNode(survey, def)
   },
   node: name => {
     if (NodeDef.isEntity(nodeDef)) {
       const def = Survey.getNodeDefChildByName(nodeDef, name)(survey)
-      if (!def) throw new Error('Unable to find node with name ' + name)
+      if (!def) {
+        throw new SystemError('unableToFindNode', { name })
+      }
       return bindNode(survey, def)
     } else {
-      throw new Error(`Cannot get child '${name}' from attribute ${NodeDef.getName(nodeDef)}`)
+      const attributeName = NodeDef.getName(nodeDef)
+      throw new SystemError('cannotGetChild', { childName: name, name: attributeName })
     }
   },
   sibling: name => {
     const def = Survey.getNodeDefSiblingByName(nodeDef, name)(survey)
-    if (!def) throw new Error('Unable to find sibling with name ' + name)
+    if (!def) {
+      throw new SystemError('unableToFindSibiling', { name })
+    }
     return bindNode(survey, def)
-  }
+  },
 })
 
 const validateNodeDefExpr = async (survey, nodeDef, expr) => {
@@ -40,7 +50,7 @@ const validateNodeDefExpr = async (survey, nodeDef, expr) => {
       {
         node: bindNode(survey, nodeDef),
         functions: {
-          [Expression.types.ThisExpression]: (expr, { node }) => node
+          [Expression.types.ThisExpression]: (expr, { node }) => node,
         },
       }
     )
@@ -102,5 +112,5 @@ const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniq
 }
 
 module.exports = {
-  validate
+  validate,
 }

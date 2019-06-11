@@ -8,10 +8,13 @@ const sessionMiddleware = require('./middleware/sessionMiddleware')
 const headerMiddleware = require('./middleware/headerMiddleware')
 const accessControlMiddleware = require('./middleware/accessControlMiddleware')
 const authMiddleware = require('./middleware/authMiddleware')
+const errorMiddleware = require('./middleware/errorMiddleware')
 const authApi = require('../modules/auth/api/authApi')
 const apiRouter = require('./apiRouter')
 const WebSocket = require('../utils/webSocket')
 const RecordPreviewCleanup = require('./recordPreviewCleanup')
+
+const response = require('../utils/response')
 
 module.exports = async () => {
 
@@ -25,13 +28,13 @@ module.exports = async () => {
     limits: { fileSize: 1024 * 1024 * 1024 },
     abortOnLimit: true,
     useTempFiles: true,
-    tempFileDir: '/tmp/'
+    tempFileDir: '/tmp/',
   }))
 
   headerMiddleware.init(app)
   app.use(sessionMiddleware)
   authMiddleware.init(app)
-//accessControlMiddleware must be initialized after authConfig
+// accessControlMiddleware must be initialized after authConfig
   accessControlMiddleware.init(app)
 
   app.use(compression({ threshold: 512 }))
@@ -44,6 +47,9 @@ module.exports = async () => {
 // ====== apis
   authApi.init(app)
   app.use('/api', apiRouter.router)
+
+// ====== error handling
+  app.use(await errorMiddleware('en'))
 
 // ====== server
   const httpServerPort = process.env.PORT || '9090'

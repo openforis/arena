@@ -1,3 +1,4 @@
+const SystemError = require('./systemError')
 const UnauthorizedError = require('./unauthorizedError')
 
 const status = {
@@ -11,22 +12,22 @@ const contentTypes = {
 
 const sendOk = res => res.json({ status: status.ok })
 
-const sendErr = (res, err) => {
-  console.log('=== ERROR ')
-  console.error(err.stack)
+const _getErr = ({ key, params }) => ({
+  status: status.error,
+  key,
+  params,
+})
 
+const sendErr = (res, err) => {
   if (err instanceof UnauthorizedError) {
-    res.status(403).json({
-      status: status.error,
-      error: err.message,
-      err
-    })
+    res.status(403).json(_getErr(err))
+  } else if (err instanceof SystemError) {
+    res.status(500).json(_getErr(err))
   } else {
-    res.status(500).json({
-      status: status.error,
-      error: 'Could not serve: ' + err.toString(),
-      err,
-    })
+    res.status(500).json(_getErr({
+      key: 'generic',
+      params: { text: `Could not serve: ${err.toString()}` },
+    }))
   }
 }
 
