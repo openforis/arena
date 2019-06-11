@@ -28,6 +28,7 @@ module.exports = {
     csvImport: 'CSV Import',
     csvExport: 'CSV Export',
     undefinedName: 'Undefined name',
+    empty: 'empty',
   },
   sidebar: {
     openForisShort: 'OF',
@@ -252,7 +253,7 @@ module.exports = {
     duplicate: 'Duplicate',
     duplicateEntity: 'Duplicate entity',
     duplicateRecord: 'Duplicate record key',
-    empty: 'Empty',
+    empty: '$t(common.empty)',
     exceedingMax: 'Exceeding max',
     invalidName: 'Invalid name',
     invalidNumber: 'Invalid number',
@@ -265,6 +266,7 @@ module.exports = {
   },
   jobErrors: {
     generic: '{{text}}',
+    empty: '$t(common.empty)',
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
     duplicateName: 'duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
     duplicateCode: 'duplicate code {{code}}; $t(jobErrors.duplicateRows)',

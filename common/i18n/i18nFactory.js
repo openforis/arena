@@ -1,4 +1,4 @@
-const i18next = require('i18next').default
+const i18next = require('i18next')
 
 const { isEnvDevelopment } = require('../../common/processUtils')
 
@@ -22,8 +22,11 @@ const createParams = lang => ({
 })
 
 const createI18nPromise = lang => {
+  // import and require return different objects
+  const createInstance = i18next.createInstance || i18next.default.createInstance
+
   return new Promise((resolve, reject) => {
-    i18next.createInstance(
+    createInstance(
       createParams(lang),
       (err, t) => {
         if (err) reject(err)
