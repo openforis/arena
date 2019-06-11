@@ -73,17 +73,13 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const user = Request.getSessionUser(req)
+  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+    const surveyId = Request.getRestParam(req, 'surveyId')
+    const user = Request.getSessionUser(req)
 
-      const job = SurveyService.startPublishJob(user, surveyId)
+    const job = SurveyService.startPublishJob(user, surveyId)
 
-      res.json({ job: JobUtils.jobToJSON(job) })
-    } catch (err) {
-      next(err)
-    }
+    res.json({ job: JobUtils.jobToJSON(job) })
   })
 
   // ==== DELETE

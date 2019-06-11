@@ -150,20 +150,16 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/survey/:surveyId/taxonomies/:taxonomyUuid/upload', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
-    try {
-      const user = req.user
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const taxonomyUuid = Request.getRestParam(req, 'taxonomyUuid')
+  app.post('/survey/:surveyId/taxonomies/:taxonomyUuid/upload', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
+    const user = req.user
+    const surveyId = Request.getRestParam(req, 'surveyId')
+    const taxonomyUuid = Request.getRestParam(req, 'taxonomyUuid')
 
-      const file = Request.getFile(req)
+    const file = Request.getFile(req)
 
-      const job = TaxonomyService.importTaxonomy(user, surveyId, taxonomyUuid, file.tempFilePath)
+    const job = TaxonomyService.importTaxonomy(user, surveyId, taxonomyUuid, file.tempFilePath)
 
-      res.json({ job: jobToJSON(job) })
-    } catch (err) {
-      next(err)
-    }
+    res.json({ job: jobToJSON(job) })
   })
 
   // ====== DELETE

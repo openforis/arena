@@ -152,16 +152,12 @@ module.exports.init = app => {
     }
   })
 
-  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, async (req, res, next) => {
-    try {
-      const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
-      const user = req.user
+  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, (req, res) => {
+    const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
+    const user = req.user
 
-      RecordService.deleteNode(user, surveyId, recordUuid, nodeUuid)
-      sendOk(res)
-    } catch (err) {
-      next(err)
-    }
+    RecordService.deleteNode(user, surveyId, recordUuid, nodeUuid)
+    sendOk(res)
   })
 
 }
