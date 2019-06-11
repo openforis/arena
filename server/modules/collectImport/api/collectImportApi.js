@@ -1,4 +1,3 @@
-const Response = require('../../../utils/response')
 const Request = require('../../../utils/request')
 
 const CollectImportService = require('../service/collectImportService')
@@ -11,7 +10,7 @@ module.exports.init = app => {
 
   // CREATE
 
-  app.post('/survey/collect-import', async (req, res) => {
+  app.post('/survey/collect-import', async (req, res, next) => {
     try {
       const user = Request.getSessionUser(req)
       const file = Request.getFile(req)
@@ -20,13 +19,13 @@ module.exports.init = app => {
 
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
   // READ
 
-  app.get(`/survey/:surveyId/collect-import/report`, AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.get(`/survey/:surveyId/collect-import/report`, AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
 
@@ -34,11 +33,11 @@ module.exports.init = app => {
 
       res.json({ items })
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
-  app.get(`/survey/:surveyId/collect-import/report/count`, AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.get(`/survey/:surveyId/collect-import/report/count`, AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
 
@@ -46,13 +45,13 @@ module.exports.init = app => {
 
       res.json({ count })
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
   // UPDATE
 
-  app.post(`/survey/:surveyId/collect-import/report/:itemId/resolve`, AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.post(`/survey/:surveyId/collect-import/report/:itemId/resolve`, AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { surveyId, itemId, resolved } = Request.getParams(req)
       const user = Request.getSessionUser(req)
@@ -61,7 +60,7 @@ module.exports.init = app => {
 
       return res.json({ item })
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 

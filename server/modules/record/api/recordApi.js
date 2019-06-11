@@ -1,5 +1,5 @@
 const Request = require('../../../utils/request')
-const { sendErr, sendOk, sendFile } = require('../../../utils/response')
+const { sendOk, sendFile } = require('../../../utils/response')
 
 const Record = require('../../../../common/record/record')
 const RecordFile = require('../../../../common/record/recordFile')
@@ -18,7 +18,7 @@ const {
 module.exports.init = app => {
 
   // ==== CREATE
-  app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res) => {
+  app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res, next) => {
     try {
       const { user } = req
       const surveyId = Request.getRestParam(req, 'surveyId')
@@ -26,19 +26,18 @@ module.exports.init = app => {
       const record = req.body
 
       if (Record.getOwnerId(record) !== user.id) {
-        sendErr(res, 'Error record create. User is different')
-        return
+        throw new Error('Error record create. User is different')
       }
 
       await RecordService.createRecord(user, surveyId, record)
 
       sendOk(res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res, next) => {
     try {
       const user = req.user
       const node = JSON.parse(req.body.node)
@@ -50,13 +49,13 @@ module.exports.init = app => {
 
       sendOk(res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== READ
 
-  app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res) => {
+  app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
 
@@ -64,22 +63,22 @@ module.exports.init = app => {
       res.json(count)
 
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res) => {
+  app.get('/survey/:surveyId/records', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, limit, offset } = Request.getParams(req)
 
       const recordsSummary = await RecordService.fetchRecordsSummaryBySurveyId(surveyId, offset, limit)
       res.json(recordsSummary)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', requireRecordViewPermission, async (req, res) => {
+  app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', requireRecordViewPermission, async (req, res, next) => {
     try {
       const { surveyId, nodeUuid } = Request.getParams(req)
 
@@ -88,14 +87,14 @@ module.exports.init = app => {
 
       sendFile(res, RecordFile.getName(file), RecordFile.getContent(file), RecordFile.getSize(file))
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== UPDATE
 
   // RECORD promote / demote
-  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordEditPermission, async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/step', requireRecordEditPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const recordUuid = Request.getRestParam(req, 'recordUuid')
@@ -105,12 +104,12 @@ module.exports.init = app => {
 
       sendOk(res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
   // RECORD Check in / out
-  app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordViewPermission, async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordViewPermission, async (req, res, next) => {
     try {
       const user = req.user
       const surveyId = Request.getRestParam(req, 'surveyId')
@@ -120,11 +119,11 @@ module.exports.init = app => {
 
       res.json({ record })
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.post('/survey/:surveyId/record/:recordUuid/checkout', async (req, res) => {
+  app.post('/survey/:surveyId/record/:recordUuid/checkout', async (req, res, next) => {
     try {
       const user = req.user
       const surveyId = Request.getRestParam(req, 'surveyId')
@@ -134,12 +133,12 @@ module.exports.init = app => {
 
       sendOk(res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== DELETE
-  app.delete('/survey/:surveyId/record/:recordUuid', requireRecordEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/record/:recordUuid', requireRecordEditPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const recordUuid = Request.getRestParam(req, 'recordUuid')
@@ -149,11 +148,11 @@ module.exports.init = app => {
 
       sendOk(res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, async (req, res, next) => {
     try {
       const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
       const user = req.user
@@ -161,7 +160,7 @@ module.exports.init = app => {
       RecordService.deleteNode(user, surveyId, recordUuid, nodeUuid)
       sendOk(res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 

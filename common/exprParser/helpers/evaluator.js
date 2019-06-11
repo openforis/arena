@@ -69,7 +69,7 @@ const callEval = async (expr, ctx) => {
     throw new SystemError({
       key: 'undefinedFunction',
       params: { fnName: fnName },
-    }, `Undefined function '${fnName}' or wrong parameter types`)
+    })
   }
 }
 
@@ -122,7 +122,7 @@ const evalExpression = async (expr, ctx) => {
     throw new SystemError({
       key: 'unsupportedFunctionType',
       params: { exprType: expr.type },
-    }, `Unsupported function type: ${expr.type}`)
+    })
 }
 
 module.exports = {

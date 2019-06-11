@@ -10,7 +10,7 @@ const JobUtils = require('../../../job/jobUtils')
 module.exports.init = app => {
 
   // ==== CREATE
-  app.post('/survey', async (req, res) => {
+  app.post('/survey', async (req, res, next) => {
     try {
       const user = Request.getSessionUser(req)
       const { body } = req
@@ -24,13 +24,13 @@ module.exports.init = app => {
         res.json({ validation })
       }
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
 
   })
 
   // ==== READ
-  app.get('/surveys', async (req, res) => {
+  app.get('/surveys', async (req, res, next) => {
     try {
       const user = Request.getSessionUser(req)
 
@@ -38,11 +38,11 @@ module.exports.init = app => {
 
       res.json({ surveys })
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
-  app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+  app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const draft = Request.getBoolParam(req, 'draft')
@@ -51,13 +51,13 @@ module.exports.init = app => {
 
       res.json({ survey })
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/prop', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/prop', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const user = Request.getSessionUser(req)
       const { body } = req
@@ -69,11 +69,11 @@ module.exports.init = app => {
 
       res.json({ validation })
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
-  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const user = Request.getSessionUser(req)
@@ -82,13 +82,13 @@ module.exports.init = app => {
 
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const user = Request.getSessionUser(req)
@@ -97,7 +97,7 @@ module.exports.init = app => {
 
       Response.sendOk(res)
     } catch (err) {
-      Response.sendErr(res, err)
+      next(err)
     }
   })
 

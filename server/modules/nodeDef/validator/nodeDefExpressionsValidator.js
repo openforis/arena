@@ -21,7 +21,7 @@ const bindNode = (survey, nodeDef) => ({
       throw new SystemError({
         key: 'unableToFindParent',
         params: { name },
-      }, `Unable to find parent of ${name}`)
+      })
     }
     return bindNode(survey, def)
   },
@@ -32,7 +32,7 @@ const bindNode = (survey, nodeDef) => ({
         throw new SystemError({
           key: 'unableToFindNode',
           params: { name },
-        }, `Unable to find node with name ${name}`)
+        })
       }
       return bindNode(survey, def)
     } else {
@@ -40,7 +40,7 @@ const bindNode = (survey, nodeDef) => ({
       throw new SystemError({
         key: 'cannotGetChild',
         params: { childName: name, name: attributeName },
-      }, `Cannot get child '${name}' from attribute ${attributeName}`)
+      })
     }
   },
   sibling: name => {
@@ -49,7 +49,7 @@ const bindNode = (survey, nodeDef) => ({
       throw new SystemError({
         key: 'unableToFindSibiling',
         params: { name },
-      }, `Unable to find sibling with name ${name}`)
+      })
     }
     return bindNode(survey, def)
   },

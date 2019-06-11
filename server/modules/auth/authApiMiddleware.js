@@ -1,5 +1,4 @@
 const Request = require('../../utils/request')
-const Response = require('../../utils/response')
 
 const SurveyManager = require('../survey/manager/surveyManager')
 const RecordService = require('../record/service/recordService')
@@ -21,8 +20,7 @@ const checkPermission = (req, res, next, permissionFn, obj) => {
   if (permissionFn(user, obj)) {
     next()
   } else {
-    const error = new UnauthorizedError(user.name)
-    Response.sendErr(res, error)
+    next(new UnauthorizedError(user.name))
   }
 
 }

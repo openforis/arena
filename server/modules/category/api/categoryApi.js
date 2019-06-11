@@ -1,5 +1,3 @@
-const { sendErr } = require('../../../utils/response')
-
 const { getRestParam, getBoolParam } = require('../../../utils/request')
 
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
@@ -20,7 +18,7 @@ const sendCategories = async (res, surveyId, draft, validate) => {
 module.exports.init = app => {
 
   // ==== CREATE
-  app.post('/survey/:surveyId/categories', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.post('/survey/:surveyId/categories', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
 
@@ -30,11 +28,11 @@ module.exports.init = app => {
 
       res.json({ category })
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.post('/survey/:surveyId/categories/:categoryUuid/levels', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.post('/survey/:surveyId/categories/:categoryUuid/levels', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryUuid = getRestParam(req, 'categoryUuid')
@@ -44,11 +42,11 @@ module.exports.init = app => {
 
       await sendValidatedCategory(surveyId, categoryUuid, res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.post('/survey/:surveyId/categories/:categoryUuid/items', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.post('/survey/:surveyId/categories/:categoryUuid/items', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryUuid = getRestParam(req, 'categoryUuid')
@@ -59,13 +57,13 @@ module.exports.init = app => {
 
       await sendValidatedCategory(surveyId, categoryUuid, res, { item })
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== READ
 
-  app.get(`/survey/:surveyId/categories`, AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+  app.get(`/survey/:surveyId/categories`, AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const draft = getBoolParam(req, 'draft')
@@ -73,12 +71,12 @@ module.exports.init = app => {
 
       await sendCategories(res, surveyId, draft, validate)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
   // fetch items by parent item Uuid
-  app.get('/survey/:surveyId/categories/:categoryUuid/items', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+  app.get('/survey/:surveyId/categories/:categoryUuid/items', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const draft = getBoolParam(req, 'draft')
       const surveyId = getRestParam(req, 'surveyId')
@@ -89,11 +87,11 @@ module.exports.init = app => {
 
       res.json({ items })
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.get('/survey/:surveyId/categories/items/:itemUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+  app.get('/survey/:surveyId/categories/items/:itemUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const draft = getBoolParam(req, 'draft')
       const surveyId = getRestParam(req, 'surveyId')
@@ -103,13 +101,13 @@ module.exports.init = app => {
 
       res.json({ item })
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/categories/:categoryUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/categories/:categoryUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryUuid = getRestParam(req, 'categoryUuid')
@@ -120,11 +118,11 @@ module.exports.init = app => {
 
       await sendCategories(res, surveyId, true, true)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.put('/survey/:surveyId/categories/:categoryUuid/levels/:levelUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/categories/:categoryUuid/levels/:levelUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryUuid = getRestParam(req, 'categoryUuid')
@@ -136,11 +134,11 @@ module.exports.init = app => {
 
       await sendValidatedCategory(surveyId, categoryUuid, res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.put('/survey/:surveyId/categories/:categoryUuid/items/:itemUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.put('/survey/:surveyId/categories/:categoryUuid/items/:itemUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryUuid = getRestParam(req, 'categoryUuid')
@@ -152,13 +150,13 @@ module.exports.init = app => {
 
       await sendValidatedCategory(surveyId, categoryUuid, res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
   // ==== DELETE
 
-  app.delete('/survey/:surveyId/categories/:categoryUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/categories/:categoryUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryUuid = getRestParam(req, 'categoryUuid')
@@ -168,11 +166,11 @@ module.exports.init = app => {
 
       await sendCategories(res, surveyId, true, true)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.delete('/survey/:surveyId/categories/:categoryUuid/levels/:levelUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/categories/:categoryUuid/levels/:levelUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryUuid = getRestParam(req, 'categoryUuid')
@@ -183,11 +181,11 @@ module.exports.init = app => {
 
       await sendValidatedCategory(surveyId, categoryUuid, res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.delete('/survey/:surveyId/categories/:categoryUuid/items/:itemUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+  app.delete('/survey/:surveyId/categories/:categoryUuid/items/:itemUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const categoryUuid = getRestParam(req, 'categoryUuid')
@@ -198,7 +196,7 @@ module.exports.init = app => {
 
       await sendValidatedCategory(surveyId, categoryUuid, res)
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 

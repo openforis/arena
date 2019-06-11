@@ -9,7 +9,6 @@ const CategoryManager = require('../../category/manager/categoryManager')
 const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
 
 const SystemError = require('../../../utils/systemError')
-const { sendErr } = require('../../../utils/response')
 const { getRestParam } = require('../../../utils/request')
 
 const toItem = (type, lang = null) =>
@@ -31,7 +30,7 @@ const toItem = (type, lang = null) =>
 module.exports.init = app => {
 
   // ==== READ
-  app.get('/expression/literal/item', async (req, res) => {
+  app.get('/expression/literal/item', async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const type = getRestParam(req, 'type')
@@ -61,14 +60,14 @@ module.exports.init = app => {
         throw new SystemError({
           key: 'invalidType',
           params: { type },
-        }, `Invalid type ${type}`)
+        })
       }
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
-  app.get('/expression/literal/items', async (req, res) => {
+  app.get('/expression/literal/items', async (req, res, next) => {
     try {
       const surveyId = getRestParam(req, 'surveyId')
       const type = getRestParam(req, 'type')
@@ -111,10 +110,10 @@ module.exports.init = app => {
         throw new SystemError({
           key: 'invalidType',
           params: { type },
-        }, `Invalid type ${type}`)
+        })
       }
     } catch (err) {
-      sendErr(res, err)
+      next(err)
     }
   })
 
