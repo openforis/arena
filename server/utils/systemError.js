@@ -1,6 +1,6 @@
 class SystemError extends Error {
 
-  constructor ({ key, params }) {
+  constructor (key, params) {
     super(key)
 
     this.name = 'SystemError'

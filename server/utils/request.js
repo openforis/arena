@@ -55,7 +55,7 @@ const toQueryString = obj =>
 const getRequiredParam = (req, param) => {
   const value = getRestParam(req, param, '')
   if (R.isEmpty(value))
-    throw new SystemError({ key: 'paramIsRequired', params: { param } })
+    throw new SystemError('paramIsRequired', { param })
   else
     return value
 }

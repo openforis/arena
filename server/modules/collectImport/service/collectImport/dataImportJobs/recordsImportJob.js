@@ -118,10 +118,7 @@ class RecordsImportJob extends Job {
       }
     }
 
-    throw new SystemError({
-      key: 'entryDataNotFound',
-      params: { entryName },
-    })
+    throw new SystemError('entryDataNotFound', { entryName })
   }
 
   async traverseCollectRecordAndInsertNodes (survey, record, collectRecordJson) {

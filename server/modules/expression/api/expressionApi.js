@@ -57,10 +57,7 @@ module.exports.init = app => {
         res.json({ item: toItem(type)(itemDb) })
 
       } else {
-        throw new SystemError({
-          key: 'invalidType',
-          params: { type },
-        })
+        throw new SystemError('invalidType', { type })
       }
     } catch (err) {
       next(err)
@@ -107,10 +104,7 @@ module.exports.init = app => {
         res.json({ items })
 
       } else {
-        throw new SystemError({
-          key: 'invalidType',
-          params: { type },
-        })
+        throw new SystemError('invalidType', { type })
       }
     } catch (err) {
       next(err)

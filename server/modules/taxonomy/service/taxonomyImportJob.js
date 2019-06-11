@@ -50,7 +50,7 @@ class TaxonomyImportJob extends Job {
     const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, true, false, tx)
 
     if (Taxonomy.isPublished(taxonomy)) {
-      throw new SystemError({ key: 'cannotOverridePublishedTaxa' })
+      throw new SystemError('cannotOverridePublishedTaxa')
     }
 
     // 2. calculate total number of rows

@@ -66,10 +66,7 @@ const callEval = async (expr, ctx) => {
     return res
   } else {
     const fnName = R.pathOr('', ['property', 'name'])(callee)
-    throw new SystemError({
-      key: 'undefinedFunction',
-      params: { fnName: fnName },
-    })
+    throw new SystemError('undefinedFunction', { fnName: fnName })
   }
 }
 
@@ -119,10 +116,7 @@ const evalExpression = async (expr, ctx) => {
   if (fn)
     return await fn(expr, ctx)
   else
-    throw new SystemError({
-      key: 'unsupportedFunctionType',
-      params: { exprType: expr.type },
-    })
+    throw new SystemError('unsupportedFunctionType', { exprType: expr.type })
 }
 
 module.exports = {

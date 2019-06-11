@@ -2,7 +2,7 @@ const SystemError = require('./systemError')
 
 class UnauthorizedError extends SystemError {
   constructor (userName) {
-    super({ key: 'userNotAuthorized', params: { userName } })
+    super('userNotAuthorized', { userName })
 
     this.name = 'UnauthorizedError'
   }

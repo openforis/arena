@@ -59,7 +59,7 @@ const updateRecordStep = async (surveyId, recordUuid, stepId, client = db) => {
     if (RecordStep.areAdjacent(stepCurrent, stepUpdate)) {
       await RecordRepository.updateRecordStep(surveyId, recordUuid, stepId, t)
     } else {
-      throw new SystemError({ key: 'cantUpdateStep' })
+      throw new SystemError('cantUpdateStep')
     }
   })
 }

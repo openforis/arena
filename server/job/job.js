@@ -127,7 +127,7 @@ class Job {
     }
     // 5. if errors found or job has been canceled, throw an error to rollback transaction
     if (!this.isRunning()) {
-      throw new SystemError({ key: 'jobCanceledOrErrorsFound' })
+      throw new SystemError('jobCanceledOrErrorsFound')
     }
   }
 

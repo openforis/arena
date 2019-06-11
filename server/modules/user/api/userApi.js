@@ -16,7 +16,7 @@ module.exports.init = app => {
       const { userId, name, value } = Request.getParams(req)
 
       if (user.id !== userId) {
-        throw new SystemError({ key: 'userNotAllowedToChangePref' })
+        throw new SystemError('userNotAllowedToChangePref')
       }
 
       await UserService.updateUserPref(user, name, value)

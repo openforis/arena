@@ -18,10 +18,7 @@ const bindNode = (survey, nodeDef) => ({
     const def = Survey.getNodeDefParent(nodeDef)(survey)
     if (!def) {
       const name = NodeDef.getName(nodeDef)
-      throw new SystemError({
-        key: 'unableToFindParent',
-        params: { name },
-      })
+      throw new SystemError('unableToFindParent', { name })
     }
     return bindNode(survey, def)
   },
@@ -29,27 +26,18 @@ const bindNode = (survey, nodeDef) => ({
     if (NodeDef.isEntity(nodeDef)) {
       const def = Survey.getNodeDefChildByName(nodeDef, name)(survey)
       if (!def) {
-        throw new SystemError({
-          key: 'unableToFindNode',
-          params: { name },
-        })
+        throw new SystemError('unableToFindNode', { name })
       }
       return bindNode(survey, def)
     } else {
       const attributeName = NodeDef.getName(nodeDef)
-      throw new SystemError({
-        key: 'cannotGetChild',
-        params: { childName: name, name: attributeName },
-      })
+      throw new SystemError('cannotGetChild', { childName: name, name: attributeName })
     }
   },
   sibling: name => {
     const def = Survey.getNodeDefSiblingByName(nodeDef, name)(survey)
     if (!def) {
-      throw new SystemError({
-        key: 'unableToFindSibiling',
-        params: { name },
-      })
+      throw new SystemError('unableToFindSibiling', { name })
     }
     return bindNode(survey, def)
   },
