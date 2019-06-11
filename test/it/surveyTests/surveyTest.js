@@ -19,7 +19,7 @@ const createSurveyTest = async () => {
   const surveyInfo = Survey.getSurveyInfo(survey)
 
   assert.equal(Survey.getName(surveyInfo), testSurvey.name)
-  assert.equal(Survey.getDefaultLanguage(surveyInfo), testSurvey.lang)
+  assert.equal(Survey.getLanguage(testSurvey.lang)(surveyInfo), testSurvey.lang)
   assert.equal(Survey.getDefaultLabel(surveyInfo), testSurvey.label)
 }
 
