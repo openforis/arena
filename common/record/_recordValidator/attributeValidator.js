@@ -1,5 +1,3 @@
-const R = require('ramda')
-
 const Survey = require('../../survey/survey')
 const NodeDef = require('../../survey/nodeDef')
 const NodeDefExpression = require('../../survey/nodeDefExpression')
@@ -38,19 +36,19 @@ const validateNodeValidations = (survey, record, nodeDef) => async (propName, no
 
   const applicableExpressionsEval = await RecordExprParser.evalApplicableExpressions(survey, record, node, NodeDefValidations.getExpressions(validations))
 
-  const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
-
-  const errorMessages = []
+  let errorMessage = null
 
   for (const { expression, value: valid } of applicableExpressionsEval) {
     if (!valid) {
-      errorMessages.push(NodeDefExpression.getMessage(lang, errorKeys.invalidValue)(expression))
+      errorMessage = {
+        key: 'custom',
+        messages: NodeDefExpression.getMessages(expression)
+      }
+      break
     }
   }
 
-  return R.isEmpty(errorMessages)
-    ? null //all validations are 'valid'
-    : R.join('; ', errorMessages) //join the error messages with a ';' separator
+  return errorMessage
 }
 
 const validateAttribute = async (survey, record, attribute, nodeDef) => {

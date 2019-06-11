@@ -3,7 +3,9 @@ import React from 'react'
 
 import Validator from '../../common/validation/validator'
 
-const getErrorText = (error, i18n, errorKeyPrefix) => i18n.t(`${errorKeyPrefix}.${error.key}`, error.params)
+const getErrorText = (error, i18n, errorKeyPrefix) => error.key === 'custom'
+  ? error.messages[i18n.lang]
+  : i18n.t(`${errorKeyPrefix}.${error.key}`, error.params)
 
 const getFieldError = (i18n, errorKeyPrefix) => field => R.pipe(
   R.pathOr([], [field, 'errors']),
@@ -28,12 +30,14 @@ export const getValidationFieldMessagesHTML = (i18n, errorKeyPrefix = 'formError
   validation =>
     R.pipe(
       getValidationFieldMessages(i18n, errorKeyPrefix),
+
       messages => validation.errors
         ? R.pipe(
           R.map(error => getErrorText(error, i18n, errorKeyPrefix)),
           R.concat(messages)
         )(validation.errors)
         : messages,
+
       R.addIndex(R.map)(
         (msg, i) =>
           <div key={i}>
