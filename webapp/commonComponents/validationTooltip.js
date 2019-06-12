@@ -7,14 +7,14 @@ import Tooltip from './tooltip'
 
 import useI18n from '../commonComponents/useI18n'
 
-export default ({ validation, children, className }) => {
+export default ({ validation, className, showKeys, children }) => {
   const i18n = useI18n()
 
   const isValid = Validator.isValidationValid(validation)
   const type = isValid ? '' : 'error'
   const messagesHtml = isValid
     ? null
-    : ValidationUtils.getValidationFieldMessagesHTML(i18n)(validation)
+    : ValidationUtils.getValidationFieldMessagesHTML(i18n, undefined, showKeys)(validation)
 
   return (
     <Tooltip

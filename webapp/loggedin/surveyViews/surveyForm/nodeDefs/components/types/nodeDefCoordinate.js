@@ -76,10 +76,10 @@ const NodeDefCoordinate = props => {
       gridTemplateColumns: '1fr',
       rowGap: '.3rem',
     }}>
-      <FormItem label={i18n.t('surveyForm.nodeDefCoordinatee.x')}>
+      <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>
         {xInput}
       </FormItem>
-      <FormItem label={i18n.t('surveyForm.nodeDefCoordinatee.y')}>
+      <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.y')}>
         {yInput}
       </FormItem>
       <FormItem label={i18n.t('common.srs')}>

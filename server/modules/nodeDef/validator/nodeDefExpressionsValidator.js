@@ -37,7 +37,7 @@ const bindNode = (survey, nodeDef) => ({
   sibling: name => {
     const def = Survey.getNodeDefSiblingByName(nodeDef, name)(survey)
     if (!def) {
-      throw new SystemError('unableToFindSibiling', { name })
+      throw new SystemError('unableToFindSibling', { name })
     }
     return bindNode(survey, def)
   },
