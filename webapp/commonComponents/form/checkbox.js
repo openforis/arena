@@ -16,7 +16,7 @@ class Checkbox extends React.Component {
 
     return (
       <div style={{ justifySelf: 'start' }}>
-        <ValidationTooltip validation={validation} showKeys={false}>
+        <ValidationTooltip validation={validation}>
 
           <button className="btn btn-s btn-transparent btn-checkbox"
                   onClick={() => onChange(!checked)}
