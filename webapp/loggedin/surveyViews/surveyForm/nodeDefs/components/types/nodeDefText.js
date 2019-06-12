@@ -33,13 +33,14 @@ const MultipleTextInput = props => {
           (!Node.isPlaceholder(n) || canEditRecord) &&
           <div key={`nodeDefTextInput_${Node.getUuid(n)}`}
                className={`node-def__text-multiple-text-input-wrapper`}
-                ref={multipleNodesWrapper}>
+               ref={multipleNodesWrapper}>
 
-            <NodeDefErrorBadge  nodeDef={nodeDef}
-                                edit={false}
-                                parentNode={parentNode}
-                                node={n}
-                                container={multipleNodesWrapper}/>
+            <NodeDefErrorBadge nodeDef={nodeDef}
+                               edit={false}
+                               parentNode={parentNode}
+                               node={n}
+                               container={multipleNodesWrapper}
+                               showKeys={false}/>
 
             <TextInput {...props}
                        node={n}/>
