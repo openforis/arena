@@ -23,6 +23,8 @@ const keywords = [
 
 const errorKeys = {
   duplicate: 'duplicate',
+  duplicateCode: 'duplicateCode',
+  duplicateName: 'duplicateName',
   empty: 'empty',
   exceedingMax: 'exceedingMax',
   keyword: 'keyword',
