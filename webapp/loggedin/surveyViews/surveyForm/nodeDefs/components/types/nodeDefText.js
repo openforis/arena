@@ -39,8 +39,7 @@ const MultipleTextInput = props => {
                                edit={false}
                                parentNode={parentNode}
                                node={n}
-                               container={multipleNodesWrapper}
-                               showKeys={false}/>
+                               container={multipleNodesWrapper}/>
 
             <TextInput {...props}
                        node={n}/>

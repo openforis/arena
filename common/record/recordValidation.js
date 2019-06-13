@@ -29,16 +29,12 @@ const getNodeValidation = node =>
     Validator.dissocFieldValidation(keys.childrenCount)
   )
 
-const getMultipleNodesValidation = (parentNode, childDef) =>
-  getValidationChildrenCount(parentNode, childDef)
-
 module.exports = {
   keys,
   keysError,
 
   // READ
   getNodeValidation,
-  getMultipleNodesValidation,
 
   getValidationChildrenCount,
 }

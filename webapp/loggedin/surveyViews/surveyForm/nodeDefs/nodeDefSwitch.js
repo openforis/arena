@@ -82,8 +82,7 @@ class NodeDefSwitch extends React.Component {
                            edit={edit}
                            parentNode={parentNode}
                            nodes={nodes}
-                           container={this.element}
-                           showKeys={false}/>
+                           container={this.element}/>
 
         <NodeDefEditFormActions nodeDef={nodeDef}
                                 edit={edit}

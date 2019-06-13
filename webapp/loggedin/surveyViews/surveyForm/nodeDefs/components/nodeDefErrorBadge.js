@@ -13,7 +13,7 @@ import Validator from '../../../../../../common/validation/validator'
 import * as RecordState from '../../../record/recordState'
 
 const NodeDefErrorBadge = props => {
-  const { edit, nodeDef, validation, container, showKeys } = props
+  const { edit, nodeDef, validation, container } = props
 
   // update parent container invalid class
   const containerEl = container.current
@@ -27,30 +27,36 @@ const NodeDefErrorBadge = props => {
     }
   }
 
-  return <ErrorBadge validation={validation} showLabel={edit} showKeys={showKeys} />
+  return (
+    <ErrorBadge
+      validation={validation}
+      showLabel={edit}
+      showKeys={false}/>
+  )
 }
 
 const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, nodes, node, edit } = props
-
-  const record = RecordState.getRecord(state)
 
   let validation = Validator.validValidation
 
   if (edit) {
     validation = Validator.getValidation(nodeDef)
   } else {
-    const recordValidation = Record.getValidation(record)
+    const recordValidation = R.pipe(
+      RecordState.getRecord,
+      Record.getValidation
+    )(state)
 
-    if (NodeDef.isSingle(nodeDef)) {
-      //TODO : DON't the two following conditions return the same? : if !R.isEmpty(nodes) then you have node or not?
-      if (!R.isEmpty(nodes))
-        validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)
-    } else if (node) {
-      // "node" will be available only for multiple attributes
-      validation = RecordValidation.getNodeValidation(node)(recordValidation)
-    } else {
-      validation = RecordValidation.getMultipleNodesValidation(parentNode, nodeDef)(recordValidation)
+    if (NodeDef.isMultiple(nodeDef)) {
+      // showing validation for a single node instance of multiple nodeDef
+      if (node) {
+        validation = RecordValidation.getNodeValidation(node)(recordValidation)
+      } else {
+        validation = RecordValidation.getValidationChildrenCount(parentNode, nodeDef)(recordValidation)
+      }
+    } else if (!R.isEmpty(nodes)) {
+      validation = RecordValidation.getNodeValidation(nodes[0])(recordValidation)
     }
   }
 
@@ -61,8 +67,8 @@ const mapStateToProps = (state, props) => {
 
 NodeDefErrorBadge.defaultProps = {
   nodes: null,
+  // singe node is passed in nodeDefText Multiple
   node: null,
-  showKeys: true,
 }
 
 export default connect(
