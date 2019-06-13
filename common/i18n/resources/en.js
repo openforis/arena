@@ -28,7 +28,7 @@ module.exports = {
     csvImport: 'CSV Import',
     csvExport: 'CSV Export',
     undefinedName: 'Undefined name',
-    empty: 'empty',
+    empty: 'Empty',
   },
   sidebar: {
     openForisShort: 'OF',
@@ -43,17 +43,17 @@ module.exports = {
   },
 
   nodeDefsTypes: {
-    integer: 'integer',
-    decimal: 'decimal',
-    text: 'text',
-    date: 'date',
-    time: 'time',
-    boolean: 'boolean',
-    code: 'code',
-    coordinate: 'coordinate',
-    taxon: 'taxon',
-    file: 'file',
-    entity: 'entity',
+    integer: 'Integer',
+    decimal: 'Decimal',
+    text: 'Text',
+    date: 'Date',
+    time: 'Time',
+    boolean: 'Boolean',
+    code: 'Code',
+    coordinate: 'Coordinate',
+    taxon: 'Taxon',
+    file: 'File',
+    entity: 'Entity',
   },
 
   data: {
@@ -80,7 +80,7 @@ module.exports = {
     mySurveys: 'My Surveys',
     dashboard: 'Dashboard',
     surveyInfo: {
-      publish: 'publish',
+      publish: 'Publish',
       viewInfo: 'View info',
       editInfo: 'Edit info',
       collectImportReport: 'Collect Import Report',
@@ -89,7 +89,7 @@ module.exports = {
     },
     deleteSurveyDialog: {
       confirmDelete: 'Are you sure you want to delete this survey?',
-      deleteWarining: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
+      deleteWarning: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
       confirmName: 'Enter this survey’s name to confirm:',
     },
     surveyListTable: {
@@ -118,12 +118,12 @@ module.exports = {
     advanced: 'Advanced',
     validations: 'Validations',
     basicProps: {
-      type: 'type',
-      name: 'name',
-      key: 'key',
-      multiple: 'multiple',
-      displayAs: 'display as',
-      displayIn: 'display in',
+      type: 'Type',
+      name: 'Name',
+      key: 'Key',
+      multiple: 'Multiple',
+      displayAs: 'Display as',
+      displayIn: 'Display in',
       form: 'Form',
       table: 'Table',
       parentPage: 'Parent page',
@@ -162,7 +162,7 @@ module.exports = {
 
   surveyForm: {
     formEditActions: {
-      preview: 'preview',
+      preview: 'Preview',
     },
     formEntryActions: {
       confirmDemote: 'Are sure you want to demote this record to {{name}}?',
@@ -172,7 +172,7 @@ module.exports = {
       step: 'Step {{id}} ({{name}})',
     },
     nodeDefEditFormActions: {
-      columns: 'columns',
+      columns: 'Columns',
       confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
     },
     nodeDefNavigation: {
@@ -181,7 +181,7 @@ module.exports = {
     nodeDefCode: {
       buttonCode: 'Button code',
     },
-    nodeDefCoordinatee: {
+    nodeDefCoordinate: {
       x: 'X',
       y: 'Y',
       srs: 'SRS',
@@ -198,9 +198,9 @@ module.exports = {
       vernacularName: 'Vernacular Name',
     },
     step: {
-      entry: 'entry',
-      cleansing: 'cleansing',
-      analysis: 'analysis',
+      entry: 'Entry',
+      cleansing: 'Cleansing',
+      analysis: 'Analysis',
     },
     confirmNodeDelete: 'Are you sure you want to delete this item?',
   },
@@ -259,8 +259,8 @@ module.exports = {
     invalidNumber: 'Invalid number',
     invalidValue: 'Invalid value',
     keyword: 'Keyword',
-    maxCountNodesExceeded: 'Max count nodes exceeded',
-    minCountNodesNotSpecified: 'Min count nodes not specified',
+    maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
+    minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
     required: 'Required',
     zeroOrNegative: 'Zero or negative',
   },
@@ -268,8 +268,8 @@ module.exports = {
     generic: '{{text}}',
     empty: '$t(common.empty)',
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
-    duplicateName: 'duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
-    duplicateCode: 'duplicate code {{code}}; $t(jobErrors.duplicateRows)',
+    duplicateName: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
+    duplicateCode: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
   },
   appErrors: {
     generic: '{{text}}',
@@ -282,7 +282,7 @@ module.exports = {
     unableToFindParent: 'Unable to find parent of {{name}}',
     unableToFindNode: 'Unable to find node with name {{name}}',
     cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
-    unableToFindSibiling: 'Unable to find sibling with name {{name}}',
+    unableToFindSibling: 'Unable to find sibling with name {{name}}',
     cantUpdateStep: `Can't update step`,
     cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
     userNotAllowedToChangePref: 'User not allowed to change pref',

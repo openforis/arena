@@ -3,7 +3,7 @@ import React from 'react'
 
 import Validator from '../../common/validation/validator'
 
-const getErrorText = (error, i18n, errorKeyPrefix) => error.key === 'custom'
+const getErrorText = (error, i18n, errorKeyPrefix = 'formErrors') => error.key === 'custom'
   ? error.messages[i18n.lang]
   : i18n.t(`${errorKeyPrefix}.${error.key}`, error.params)
 
@@ -17,19 +17,20 @@ const getFieldError = (i18n, errorKeyPrefix) => field => R.pipe(
   )
 )
 
-export const getValidationFieldMessages = (i18n, errorKeyPrefix = 'formErrors') =>
+export const getValidationFieldMessages = (i18n, errorKeyPrefix, showKeys = true) =>
   validation => {
     const validationFields = Validator.getInvalidFieldValidations(validation)
 
     return R.pipe(
       R.keys,
-      R.map(field => `${field}: ${getFieldError(i18n, errorKeyPrefix)(field)(validationFields)}`)
+      R.map(field => `${showKeys ? field + ': ' : ''}${getFieldError(i18n, errorKeyPrefix)(field)(validationFields)}`)
     )(validationFields)
   }
-export const getValidationFieldMessagesHTML = (i18n, errorKeyPrefix = 'formErrors') =>
+
+export const getValidationFieldMessagesHTML = (i18n, errorKeyPrefix, showKeys) =>
   validation =>
     R.pipe(
-      getValidationFieldMessages(i18n, errorKeyPrefix),
+      getValidationFieldMessages(i18n, errorKeyPrefix, showKeys),
 
       messages => validation.errors
         ? R.pipe(

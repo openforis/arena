@@ -11,7 +11,6 @@ import RecordValidation from '../../../../../../common/record/recordValidation'
 import Validator from '../../../../../../common/validation/validator'
 
 import * as RecordState from '../../../record/recordState'
-import Node from 'webpack-bundle-analyzer/src/tree/Node'
 
 const NodeDefErrorBadge = props => {
   const { edit, nodeDef, validation, container } = props
@@ -31,7 +30,8 @@ const NodeDefErrorBadge = props => {
   return (
     <ErrorBadge
       validation={validation}
-      showLabel={edit}/>
+      showLabel={edit}
+      showKeys={false}/>
   )
 }
 
@@ -61,7 +61,7 @@ const mapStateToProps = (state, props) => {
   }
 
   return {
-    validation
+    validation,
   }
 }
 

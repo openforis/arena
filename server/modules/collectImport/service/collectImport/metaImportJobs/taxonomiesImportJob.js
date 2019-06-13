@@ -6,6 +6,8 @@ const { languageCodesISO636_2 } = require('../../../../../../common/app/language
 
 const Job = require('../../../../../job/job')
 
+const Validator = require('../../../../../../common/validation/validator')
+
 const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 const TaxonomyImportManager = require('../../../../taxonomy/manager/taxonomyImportManager')
 
@@ -16,8 +18,6 @@ const speciesFilesPath = 'species/'
 const keysError = {
   code: 'code',
   scientificName: 'scientificName',
-  duplicateCode: 'duplicateCode',
-  duplicateName: 'duplicateName',
 }
 
 /**
@@ -151,7 +151,7 @@ class TaxonomiesImportJob extends Job {
         [keysError.code]: {
           valid: false,
           errors: [{
-            key: keysError.duplicateCode,
+            key: Validator.errorKeys.duplicateCode,
             params: { code, row: this.currentRow, duplicateRow: rowDuplicateCode },
           }],
         },
@@ -167,7 +167,7 @@ class TaxonomiesImportJob extends Job {
         [keysError.scientificName]: {
           valid: false,
           errors: [{
-            key: keysError.duplicateName,
+            key: Validator.errorKeys.duplicateName,
             params: { scientificName, row: this.currentRow, duplicateRow: rowDuplicateScientificName },
           }],
         },

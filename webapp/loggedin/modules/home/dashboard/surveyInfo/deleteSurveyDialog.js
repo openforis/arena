@@ -33,7 +33,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
           <div className="highlight">
             <div>
               <Markdown>
-                {i18n.t('homeView.deleteSurveyDialog.deleteWarining', { surveyName })}
+                {i18n.t('homeView.deleteSurveyDialog.deleteWarning', { surveyName })}
               </Markdown>
             </div>
             <div>{i18n.t('common.cantUndoWarning')}</div>

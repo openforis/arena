@@ -12,7 +12,7 @@ const Validator = require('../../validation/validator')
 const NumberUtils = require('../../numberUtils')
 
 const errorKeys = {
-  minCountNodesNotSpecified: 'minCountNodesNotSpecified',
+  minCountNodesNotReached: 'minCountNodesNotReached',
   maxCountNodesExceeded: 'maxCountNodesExceeded'
 }
 
@@ -25,7 +25,7 @@ const validateChildrenCount = (survey, nodeParent, nodeDefChild, count) => {
   const minCountValid = isNaN(minCount) || count >= minCount
   const maxCountValid = isNaN(maxCount) || count <= maxCount
 
-  return _createValidationResult(nodeDefChild, minCountValid, maxCountValid)
+  return _createValidationResult(nodeDefChild, minCountValid, maxCountValid, minCount, maxCount)
 }
 
 const validateChildrenCountNodes = (survey, record, nodes) => {
@@ -104,7 +104,7 @@ const _countChildren = (record, parentNode, childDef) => {
     )(nodes)
 }
 
-const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid) => ({
+const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid, minCount, maxCount) => ({
   [Validator.keys.fields]: {
     [RecordValidation.keys.childrenCount]: {
       [Validator.keys.fields]: {
@@ -113,11 +113,11 @@ const _createValidationResult = (nodeDefChild, minCountValid, maxCountValid) => 
           [Validator.keys.fields]: {
             [RecordValidation.keys.minCount]: {
               [Validator.keys.valid]: minCountValid,
-              [Validator.keys.errors]: minCountValid ? [] : [{ key: errorKeys.minCountNodesNotSpecified }]
+              [Validator.keys.errors]: minCountValid ? [] : [{ key: errorKeys.minCountNodesNotReached, params: { minCount } }],
             },
             [RecordValidation.keys.maxCount]: {
               [Validator.keys.valid]: maxCountValid,
-              [Validator.keys.errors]: maxCountValid ? [] : [{ key: errorKeys.maxCountNodesExceeded }]
+              [Validator.keys.errors]: maxCountValid ? [] : [{ key: errorKeys.maxCountNodesExceeded, params: { maxCount } }],
             }
           }
         }
