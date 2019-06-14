@@ -72,6 +72,10 @@ const webPackConfig = {
           'css-loader',
           'sass-loader',
         ]
+      },
+      {
+        test: /\.json$/,
+        loader: 'json'
       }
     ]
   },
@@ -88,7 +92,7 @@ webpack.optimization = {
       parallel: true,
       uglifyOptions: {
         compress: true,
-        output: {comments: false},
+        output: { comments: false },
       },
       sourceMap: true
     }),
