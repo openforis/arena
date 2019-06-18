@@ -5,6 +5,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
+const dotenv = require('dotenv')
+
 const uuidv4 = require('uuid/v4')
 
 const mode = {
@@ -17,6 +19,12 @@ const buildReport = process.env.BUILD_REPORT === 'true'
 
 const lastCommit = process.env.SOURCE_VERSION || 'N/A'
 const versionString = lastCommit + '_' + new Date().toISOString()
+
+const env = dotenv.config().parsed
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next])
+  return prev
+}, {})
 
 // ==== init plugins
 const plugins = [
@@ -35,6 +43,7 @@ const plugins = [
       }
     }
   ),
+  new webpack.DefinePlugin(envKeys)
 ]
 
 if (buildReport) {
@@ -76,7 +85,11 @@ const webPackConfig = {
       {
         test: /\.json$/,
         loader: 'json'
-      }
+      },
+      // {
+      //   test: /\.json$/,
+      //   loader: 'json-loader'
+      // }
     ]
   },
   plugins: plugins

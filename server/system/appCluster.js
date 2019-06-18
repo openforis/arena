@@ -14,8 +14,6 @@ const apiRouter = require('./apiRouter')
 const WebSocket = require('../utils/webSocket')
 const RecordPreviewCleanup = require('./recordPreviewCleanup')
 
-const response = require('../utils/response')
-
 module.exports = async () => {
 
   const app = express()
@@ -32,6 +30,7 @@ module.exports = async () => {
   }))
 
   headerMiddleware.init(app)
+
   app.use(sessionMiddleware)
   authMiddleware.init(app)
 // accessControlMiddleware must be initialized after authConfig

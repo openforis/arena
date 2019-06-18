@@ -51,7 +51,6 @@ const actionHandlers = {
   [appErrorDelete]: (state, { error }) => AppState.dissocAppError(error)(state),
 
   [systemErrorThrow]: (state, { error }) => AppState.assocSystemError(error)(state),
-
 }
 
 export default exportReducer(actionHandlers)

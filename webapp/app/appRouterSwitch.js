@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Switch, Route } from 'react-router-dom'
@@ -16,10 +16,10 @@ import { getLocationPathname } from '../utils/routerUtils'
 
 const loginUri = '/'
 
-class AppRouterSwitch extends React.Component {
+const AppRouterSwitch = props => {
 
-  openWebSocket () {
-    const { throwSystemError } = this.props
+  const openWebSocket = () => {
+    const { throwSystemError } = props
 
     AppWebSocket.openSocket()
 
@@ -32,79 +32,66 @@ class AppRouterSwitch extends React.Component {
     AppWebSocket.on(WebSocketEvents.error, throwError)
   }
 
-  closeWebSocket () {
+  const closeWebSocket = () => {
     AppWebSocket.closeSocket()
   }
 
-  componentDidMount () {
-    this.props.initApp()
-  }
+  const { isReady, systemError, initApp, user } = props
 
-  componentDidUpdate (prevProps) {
-    const { user, history } = this.props
-    const { user: prevUser } = prevProps
+  useEffect(() => {
+    initApp()
+    return () => closeWebSocket()
+  }, [])
 
-    if (user && !prevUser) {
-      this.openWebSocket()
-    } else if (prevUser && !user) {
-      this.closeWebSocket()
-      // logout - redirect to login page
-      history.push(loginUri)
+  useEffect(() => {
+    if (user) {
+      openWebSocket()
+    } else {
+      closeWebSocket()
+      props.history.push(loginUri)
     }
-  }
+  }, [user])
 
-  componentWillUnmount () {
-    this.closeWebSocket()
-  }
+  const isLogin = getLocationPathname(props) === loginUri
 
-  render () {
-    const { isReady, systemError } = this.props
+  return (
+    isReady && (
+      <React.Fragment>
 
-    const isLogin = getLocationPathname(this.props) === loginUri
+        <div className={`main__bg1${isLogin ? ' login' : ''}`}/>
+        <div className={`main__bg2${isLogin ? ' login' : ''}`}/>
+        <div className="main__bg-overlay"/>
 
-    return (
-      isReady
-        ? (
-          <React.Fragment>
+        {
+          systemError
+            ? (
+              <div className="main__system-error">
+                <div className="main__system-error-container">
+                  <span className="icon icon-warning icon-24px icon-left"/>
+                  Oooops! Something went wrong. Try to refresh the page.
+                  <div className="error">{systemError}</div>
+                </div>
+              </div>
+            )
+            : (
+              <Switch>
+                <Route
+                  exact path="/"
+                  component={LoginView}
+                />
+                <Route
+                  path="/app"
+                  render={props => (
+                    <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
+                  )}
+                />
+              </Switch>
+            )
+        }
 
-            <div className={`main__bg1${isLogin ? ' login' : ''}`}/>
-            <div className={`main__bg2${isLogin ? ' login' : ''}`}/>
-            <div className="main__bg-overlay"/>
-
-            {
-              systemError
-                ? (
-                  <div className="main__system-error">
-                    <div className="main__system-error-container">
-                      <span className="icon icon-warning icon-24px icon-left"/>
-                      Oooops! Something went wrong. Try to refresh the page.
-                      <div className="error">{systemError}</div>
-                    </div>
-                  </div>
-                )
-                : (
-                  <Switch>
-                    <Route
-                      exact path="/"
-                      component={LoginView}
-                    />
-                    <Route
-                      path="/app"
-                      render={props => (
-                        <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
-                      )}
-                    />
-                  </Switch>
-                )
-            }
-
-          </React.Fragment>
-        )
-        : (
-          null
-        )
+      </React.Fragment>
     )
-  }
+  )
 }
 
 const mapStateToProps = state => ({

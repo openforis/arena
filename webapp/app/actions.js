@@ -8,8 +8,10 @@ export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
 
-export const initApp = () => async (dispatch) => {
-  // fetching user
+export const initApp = () => async (dispatch, getState) => {
+  const jwt = window.localStorage.getItem('jwt')
+  console.log(jwt)
+
   const resp = await axios.get('/auth/user')
 
   const { data } = resp
