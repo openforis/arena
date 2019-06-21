@@ -12,7 +12,6 @@ export const initApp = () => async (dispatch, getState) => {
   const i18n = await i18nFactory.createI18nPromise('en')
 
   const jwt = window.localStorage.getItem('jwt')
-  console.log(jwt)
 
   // To refresh token: https://stackoverflow.com/a/46627024
 

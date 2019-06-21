@@ -7,7 +7,8 @@ const requestHandler = request => {
     const jwtToken = window.localStorage.getItem('jwt')
 
     if (jwtToken) {
-      request.headers['Authorization'] = `Bearer ${jwtToken}` // TODO implement refresh token
+      // TODO implement refresh token
+      request.headers['Authorization'] = `Bearer ${jwtToken}`
     }
   }
 

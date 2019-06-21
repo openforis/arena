@@ -1,4 +1,4 @@
-// import axios from 'axios'
+import axios from 'axios'
 
 import { AuthenticationDetails, CognitoUserPool, CognitoUser } from 'amazon-cognito-identity-js'
 
@@ -27,11 +27,10 @@ export const login = (username, password) => async dispatch => {
   cognitoUser.authenticateUser(authenticationDetails, {
     onSuccess: async result => {
       const accessToken = result.getAccessToken().getJwtToken()
-
-      dispatch({ type: 'jwt', jwt: accessToken })
       window.localStorage.setItem('jwt', accessToken)
 
-      // const user = await axios.get('/auth/user')
+      const { data: { user, survey } } = await axios.get('/auth/user')
+      dispatch({ type: loginSuccess, user, survey })
     },
     onFailure: err => {
       alert(`Error with Cognito authentication: ${err}`) // TODO

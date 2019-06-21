@@ -57,22 +57,6 @@ const validate = async (token, cb) => {
   }
 }
 
-// const doSomething = console.info
-
-// const validate_ = (token, doSomething) => {
-//   getKeys(region, poolId)
-//     .then(indexKeys)
-//     .then(findVerificationKey(token))
-//     .then(verifyToken(token))
-//     // .then(checkTokenUse)
-//     // .then(doSomething)
-//     // .catch(handleError)
-// }
-
-// const token = 'xxx.zzz.ttt'
-
-// validate(token)
-
 module.exports = {
   decode,
   validate

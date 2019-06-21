@@ -85,18 +85,18 @@ module.exports.init = app => {
     sendOk(res)
   })
 
-  app.post('/auth/login', (req, res, next) => {
+  // app.post('/auth/login', (req, res, next) => {
 
-    passport.authenticate('local', (err, user, info) => {
+  //   passport.authenticate('local', (err, user, info) => {
 
-      if (err)
-        return next(err)
-      else if (!user)
-        res.json(info)
-      else
-        authenticationSuccessful(req, res, next, user)
+  //     if (err)
+  //       return next(err)
+  //     else if (!user)
+  //       res.json(info)
+  //     else
+  //       authenticationSuccessful(req, res, next, user)
 
-    })(req, res, next)
+  //   })(req, res, next)
 
-  })
+  // })
 }
