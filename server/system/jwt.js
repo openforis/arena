@@ -41,7 +41,7 @@ const findVerificationKey = token => pemList => {
 const verifyToken = token => pem =>
   jwt.verify(token, pem, verificationOptions)
 
-const validate = async (token) => {
+const validate = async (token, cb) => {
   const keys = await getKeys(region, poolId)
 
   try {
@@ -50,6 +50,7 @@ const validate = async (token) => {
       findVerificationKey(token),
       verifyToken(token),
       // checkTokenToUse,
+      cb
     )(keys)
   } catch (err) {
     handleError(err)
@@ -68,9 +69,9 @@ const validate = async (token) => {
 //     // .catch(handleError)
 // }
 
-const token = 'xxx.zzz.ttt'
+// const token = 'xxx.zzz.ttt'
 
-validate(token)
+// validate(token)
 
 module.exports = {
   decode,

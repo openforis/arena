@@ -9,16 +9,23 @@ export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
 
 export const initApp = () => async (dispatch, getState) => {
+  const i18n = await i18nFactory.createI18nPromise('en')
+
   const jwt = window.localStorage.getItem('jwt')
   console.log(jwt)
 
-  const resp = await axios.get('/auth/user')
+  // To refresh token: https://stackoverflow.com/a/46627024
 
-  const { data } = resp
-  const { user, survey } = data
+  if (jwt) {
+    const resp = await axios.get('/auth/user')
+    const { data } = resp
+    const { user, survey } = data
 
-  const i18n = await i18nFactory.createI18nPromise('en')
-  dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user, survey, i18n })
+    dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user, survey, i18n })
+  } else {
+    dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user: null, survey: null, i18n })
+  }
+
 }
 
 export const setLanguage = languageCode => async (dispatch) => {

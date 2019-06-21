@@ -11,6 +11,10 @@ const RecordService = require('../../record/service/recordService')
 
 const Survey = require('../../../../common/survey/survey')
 
+const jwt = require('../../../system/jwt')
+
+const { findUserByUsername } = require('../../../modules/user/manager/userManager')
+
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
 const sendUserSurvey = async (res, user, surveyId) => {
@@ -56,8 +60,20 @@ const authenticationSuccessful = (req, res, next, user) =>
 
 module.exports.init = app => {
 
-  app.get('/auth/user', (req, res) => {
-    sendUser(res, req.user)
+  app.get('/auth/user', async (req, res) => {
+    // sendUser(res, req.user)
+    // TODO middleware
+    const authHeader = req.headers['authorization']
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.slice('Bearer '.length)
+
+      const decoded = jwt.decode(token)
+
+      const username = decoded.payload.username
+      const user = await findUserByUsername(username)
+
+      sendUser(res, user)
+    }
   })
 
   app.post('/auth/logout', (req, res) => {

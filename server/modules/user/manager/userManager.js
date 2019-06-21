@@ -26,6 +26,17 @@ const findUserByEmailAndPassword = async (email, password) => {
   return null
 }
 
+const findUserByUsername = async username => {
+  const user = await UserRepository.findUserByUsername(username)
+
+  if (user) {
+    const authGroups = await AuthGroupRepository.fetchUserGroups(user.id)
+    return { ...user, authGroups }
+  }
+
+  return null
+}
+
 // ==== UPDATE
 
 const updateUserPref = async (user, name, value) =>
@@ -42,6 +53,7 @@ module.exports = {
   // READ
   findUserById,
   findUserByEmailAndPassword,
+  findUserByUsername,
 
   // UPDATE
   updateUserPref,

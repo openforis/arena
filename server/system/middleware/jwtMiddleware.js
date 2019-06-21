@@ -1,13 +1,30 @@
-const { validate } = require('../jwt')
+const jwt = require('../jwt')
 
-module.exports = (req, res, next) => {
-  if (!req.headers || !req.headers.authorization) {
+const UserService = require('../../modules/user/service/userService')
+
+module.exports = async (req, res, next) => {
+  const bearerPrefix = 'Bearer '
+
+  const authorizationHeader = req.headers && req.headers.authorization
+
+  if (!authorizationHeader) {
     throw new Error('Missing authorization header')
-  } else if (req.headers.authorization.substr(0, 7).toLowerCase() !== 'bearer ') {
+  } else if (req.headers.authorization.substr(0, bearerPrefix.length) !== bearerPrefix) {
     throw new Error('Authorization header is not a bearer header')
   } else {
-    validate(req.headers.authorization.substr(7),
-      success => { next() },
+    const jwtToken = authorizationHeader && authorizationHeader.substr(bearerPrefix.length)
+
+    await jwt.validate(jwtToken,
+      async success => {
+        const decoded = jwt.decode(jwtToken)
+
+        const username = decoded.payload.username
+        const user = await UserService.findUserByUsername(username)
+
+        req.user = user
+
+        next()
+      },
       fail => { console.log('do something here') })
   }
 }

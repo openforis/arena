@@ -21,7 +21,15 @@ const findUserByEmail = async (email, client = db) =>
     [email]
   )
 
-// ==== UPDATE
+const findUserByUsername = async (username, client = db) =>
+  await client.oneOrNone(`
+    SELECT ${selectFieldsCommaSep}
+    FROM "user" 
+    WHERE name = $1`,
+    [username]
+  )
+
+  // ==== UPDATE
 
 const updateUserPref = async (user, name, value, client = db) => {
   const userPref = JSON.stringify(
@@ -54,6 +62,7 @@ module.exports = {
   // READ
   findUserById,
   findUserByEmail,
+  findUserByUsername,
 
   // UPDATE
   updateUserPref,
