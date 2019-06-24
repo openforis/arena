@@ -26,8 +26,8 @@ export const login = (username, password) => async dispatch => {
   const cognitoUser = new CognitoUser(userData)
   cognitoUser.authenticateUser(authenticationDetails, {
     onSuccess: async result => {
-      const accessToken = result.getAccessToken().getJwtToken()
-      window.localStorage.setItem('jwt', accessToken)
+      // const accessToken = result.getAccessToken().getJwtToken()
+      // window.localStorage.setItem('jwt', accessToken)
 
       const { data: { user, survey } } = await axios.get('/auth/user')
       dispatch({ type: loginSuccess, user, survey })

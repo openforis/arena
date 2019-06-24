@@ -12,7 +12,7 @@ const checkAuth = (req, res, next) => {
 
     const acceptHeader = req.header('Accept')
     if (acceptHeader && acceptHeader.indexOf('application/json') !== -1) {
-      res.status(401).json({error: 'Not logged in'})
+      res.status(401).json({ error: 'Not logged in' })
     } else {
       // redirect to login page
       res.redirect('/')

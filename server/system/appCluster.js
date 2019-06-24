@@ -4,7 +4,7 @@ const compression = require('compression')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 
-const sessionMiddleware = require('./middleware/sessionMiddleware')
+// const sessionMiddleware = require('./middleware/sessionMiddleware')
 const headerMiddleware = require('./middleware/headerMiddleware')
 const accessControlMiddleware = require('./middleware/accessControlMiddleware')
 // const authMiddleware = require('./middleware/authMiddleware')
@@ -60,7 +60,7 @@ module.exports = async () => {
   })
 
 // ====== socket middleware
-  WebSocket.init(server, sessionMiddleware) // TODO delete sessionMiddleware
+  WebSocket.init(server, jwtMiddleware) // TODO delete sessionMiddleware
 
 // ====== scheduler
   await RecordPreviewCleanup.init()

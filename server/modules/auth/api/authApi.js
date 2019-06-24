@@ -1,4 +1,4 @@
-const passport = require('passport')
+// const passport = require('passport')
 
 const { sendOk } = require('../../../utils/response')
 
@@ -49,14 +49,14 @@ const sendUser = async (res, user) => {
     : sendResponse(res, user)
 }
 
-const authenticationSuccessful = (req, res, next, user) =>
-  req.logIn(user, err => {
-    if (err)
-      next(err)
-    else {
-      req.session.save(() => sendUser(res, user))
-    }
-  })
+// const authenticationSuccessful = (req, res, next, user) =>
+//   req.logIn(user, err => {
+//     if (err)
+//       next(err)
+//     else {
+//       req.session.save(() => sendUser(res, user))
+//     }
+//   })
 
 module.exports.init = app => {
 

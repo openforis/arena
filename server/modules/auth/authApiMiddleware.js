@@ -34,7 +34,7 @@ const requireSurveyPermission = permissionFn =>
     checkPermission(req, res, next, permissionFn, surveyInfo)
   }
 
-const requireRecordPermission = (permissionFn) =>
+const requireRecordPermission = permissionFn =>
   async (req, res, next) => {
     const { surveyId, recordUuid } = Request.getParams(req)
 

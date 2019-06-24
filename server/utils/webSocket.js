@@ -12,20 +12,20 @@ const addUserSocket = (userId, socket) => userSockets = R.assocPath([userId, soc
 
 const deleteUserSocket = (userId, socketId) => userSockets = R.dissocPath([userId, socketId], userSockets)
 
-const notifyUser = (userId, eventType, message) => R.pipe(
+const notifyUser = (userId, eventType, message) => console.log(getUserSockets(userId)) || R.pipe(
   getUserSockets,
   R.forEachObjIndexed(
     socket => socket.emit(eventType, message),
   )
 )(userId)
 
-const init = (server, sessionMiddleware) => {
+const init = (server, jwtMiddleware) => {
 
   io.attach(server)
 
   io.use((socket, next) => {
-    // Wrap the sessionMiddleware to get the user id
-    sessionMiddleware(socket.request, {}, next)
+    // Wrap the jwtMiddleware to get the user id
+    jwtMiddleware(socket.request, {}, next)
   })
 
   io.on('connection', async socket => {
