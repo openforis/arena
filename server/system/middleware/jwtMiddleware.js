@@ -6,11 +6,13 @@ module.exports = async (req, res, next) => {
   const bearerPrefix = 'Bearer '
 
   const authorizationHeader = req.headers && req.headers.authorization
+  console.log('authorizationHeader', authorizationHeader)
 
   if (!authorizationHeader) {
     // throw new Error('Missing authorization header')
-    // TODO throw exception
+    // TODO (jwt) throw exception
     req.user = null
+    next()
   } else if (req.headers.authorization.substr(0, bearerPrefix.length) !== bearerPrefix) {
     throw new Error('Authorization header is not a bearer header')
   } else {

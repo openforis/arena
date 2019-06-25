@@ -12,7 +12,7 @@ const addUserSocket = (userId, socket) => userSockets = R.assocPath([userId, soc
 
 const deleteUserSocket = (userId, socketId) => userSockets = R.dissocPath([userId, socketId], userSockets)
 
-const notifyUser = (userId, eventType, message) => console.log(getUserSockets(userId)) || R.pipe(
+const notifyUser = (userId, eventType, message) => R.pipe(
   getUserSockets,
   R.forEachObjIndexed(
     socket => socket.emit(eventType, message),

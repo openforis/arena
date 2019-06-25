@@ -3,6 +3,8 @@ import { CognitoUserPool } from 'amazon-cognito-identity-js'
 
 const isHandlerEnabled = ({ addJwtHeader = true }) => addJwtHeader
 
+// TODO (jwt) move to jwtUtils.js
+
 const poolData = {
   UserPoolId: process.env.COGNITO_USER_POOL_ID,
   ClientId: process.env.COGNITO_CLIENT_ID,
@@ -27,7 +29,6 @@ const requestHandler = request => {
     // const jwtToken = window.localStorage.getItem('jwt')
 
     // if (jwtToken) {
-    //   // TODO implement refresh token
     //   request.headers['Authorization'] = `Bearer ${jwtToken}`
     // }
   }

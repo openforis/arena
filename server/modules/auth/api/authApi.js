@@ -1,5 +1,3 @@
-// const passport = require('passport')
-
 const { sendOk } = require('../../../utils/response')
 
 const { userPrefNames, getUserPrefSurveyId } = require('../../../../common/user/userPrefs')
@@ -10,8 +8,6 @@ const UserService = require('../../user/service/userService')
 const RecordService = require('../../record/service/recordService')
 
 const Survey = require('../../../../common/survey/survey')
-
-const jwt = require('../../../system/jwt')
 
 const { findUserByUsername } = require('../../../modules/user/manager/userManager')
 
@@ -49,31 +45,11 @@ const sendUser = async (res, user) => {
     : sendResponse(res, user)
 }
 
-// const authenticationSuccessful = (req, res, next, user) =>
-//   req.logIn(user, err => {
-//     if (err)
-//       next(err)
-//     else {
-//       req.session.save(() => sendUser(res, user))
-//     }
-//   })
-
 module.exports.init = app => {
 
   app.get('/auth/user', async (req, res) => {
-    // sendUser(res, req.user)
-    // TODO middleware
-    const authHeader = req.headers['authorization']
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.slice('Bearer '.length)
-
-      const decoded = jwt.decode(token)
-
-      const username = decoded.payload.username
-      const user = await findUserByUsername(username)
-
-      sendUser(res, user)
-    }
+    const user = req.user ? await findUserByUsername(req.user.name) : null
+    sendUser(res, user)
   })
 
   app.post('/auth/logout', (req, res) => {
@@ -84,19 +60,4 @@ module.exports.init = app => {
     req.logout()
     sendOk(res)
   })
-
-  // app.post('/auth/login', (req, res, next) => {
-
-  //   passport.authenticate('local', (err, user, info) => {
-
-  //     if (err)
-  //       return next(err)
-  //     else if (!user)
-  //       res.json(info)
-  //     else
-  //       authenticationSuccessful(req, res, next, user)
-
-  //   })(req, res, next)
-
-  // })
 }
