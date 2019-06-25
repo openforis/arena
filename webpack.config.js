@@ -3,10 +3,9 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-
-const dotenv = require('dotenv')
-
+require('dotenv').config()
 const uuidv4 = require('uuid/v4')
 
 const mode = {
@@ -20,12 +19,6 @@ const buildReport = process.env.BUILD_REPORT === 'true'
 const lastCommit = process.env.SOURCE_VERSION || 'N/A'
 const versionString = lastCommit + '_' + new Date().toISOString()
 
-const env = dotenv.config().parsed
-const envKeys = Object.keys(env).reduce((prev, next) => {
-  prev[`process.env.${next}`] = JSON.stringify(env[next])
-  return prev
-}, {})
-
 // ==== init plugins
 const plugins = [
   new MiniCssExtractPlugin({
@@ -38,12 +31,13 @@ const plugins = [
     {
       __SYSTEM_VERSION__: `"${versionString}"`,
       __BUST__: `"${uuidv4()}"`,
+      __COGNITO_USER_POOL_ID__: JSON.stringify(process.env.COGNITO_USER_POOL_ID),
+      __COGNITO_CLIENT_ID__: JSON.stringify(process.env.COGNITO_CLIENT_ID),
       'process.env': {
-        'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       }
     }
-  ),
-  new webpack.DefinePlugin(envKeys)
+  )
 ]
 
 if (buildReport) {
@@ -81,15 +75,7 @@ const webPackConfig = {
           'css-loader',
           'sass-loader',
         ]
-      },
-      {
-        test: /\.json$/,
-        loader: 'json'
-      },
-      // {
-      //   test: /\.json$/,
-      //   loader: 'json-loader'
-      // }
+      }
     ]
   },
   plugins: plugins

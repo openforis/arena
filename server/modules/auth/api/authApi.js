@@ -9,8 +9,6 @@ const RecordService = require('../../record/service/recordService')
 
 const Survey = require('../../../../common/survey/survey')
 
-const { findUserByUsername } = require('../../../modules/user/manager/userManager')
-
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
 const sendUserSurvey = async (res, user, surveyId) => {
@@ -48,8 +46,8 @@ const sendUser = async (res, user) => {
 module.exports.init = app => {
 
   app.get('/auth/user', async (req, res) => {
-    const user = req.user ? await findUserByUsername(req.user.name) : null
-    sendUser(res, user)
+    const user = req.user ? await UserService.findUserByUsername(req.user.name) : null
+    await sendUser(res, user)
   })
 
   app.post('/auth/logout', (req, res) => {

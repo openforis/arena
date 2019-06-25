@@ -11,11 +11,11 @@ import store from './app/store'
 
 import AppRouterSwitch from './app/appRouterSwitch'
 
-import AxiosJwtMiddleware from './app/axiosJwtMiddleware'
-
-// AxiosJwtMiddleware.init()
+import * as AxiosJwtMiddleware from './app/axiosJwtMiddleware'
 
 function renderApp () {
+
+  AxiosJwtMiddleware.init()
 
   ReactDOM.render(
     <Provider store={store}>
