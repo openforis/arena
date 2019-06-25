@@ -1,21 +1,17 @@
 import axios from 'axios'
 
-import { getUserPool } from '../utils/jwtUtils'
+import { Auth } from 'aws-amplify'
 
-const requestHandler = request => {
-
-  const userPool = getUserPool()
-  const cognitoUser = userPool.getCurrentUser()
-
-  if (cognitoUser !== null) {
-    cognitoUser.getSession((err, session) => {
-      if (err) {
-        alert(err) // TODO (jwt) re-authenticate
-      } else {
-        const accessToken = session.getAccessToken().jwtToken
-        request.headers['Authorization'] = `Bearer ${accessToken}`
-      }
-    })
+const requestHandler = async request => {
+  try {
+    const session = await Auth.currentSession()
+    const jwtToken = session.getAccessToken().jwtToken
+ 
+    request.headers['Authorization'] = `Bearer ${jwtToken}`
+    return request
+  } catch (err) {
+    // TODO throws 'no currentUser' when not logged in
+    alert(err)
   }
 
   return request
