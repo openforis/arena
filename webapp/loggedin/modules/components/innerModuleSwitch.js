@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom'
 
 import { appModuleUri } from '../../appModules'
 
-const NavigationTabBar = props => {
+const InnerModuleSwitch = props => {
 
   const {
     modules, moduleRoot, moduleDefault,
@@ -32,11 +32,11 @@ const NavigationTabBar = props => {
     )
 }
 
-NavigationTabBar.defaultProps = {
+InnerModuleSwitch.defaultProps = {
   tabs: [],
   className: '',
   moduleRoot: '',
   moduleDefault: '',
 }
 
-export default withRouter(NavigationTabBar)
+export default withRouter(InnerModuleSwitch)

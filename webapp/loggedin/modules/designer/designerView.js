@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import AuthManager from '../../../../common/auth/authManager'
 
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
-import NavigationTabBar from '../components/moduleNavigationTabBar'
+import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyFormView from '../../surveyViews/surveyForm/surveyFormView'
 import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
 import RecordView from '../data/records/components/recordView'
@@ -27,7 +27,7 @@ const DesignerView = ({ canEditDef, resetForm }) => {
       draft={canEditDef}
       validate={canEditDef}>
 
-      <NavigationTabBar
+      <InnerModuleSwitch
         moduleRoot={appModules.designer}
         moduleDefault={designerModules.formDesigner}
         modules={[

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import NavigationTabBar from '../components/moduleNavigationTabBar'
+import InnerModuleSwitch from '../components/innerModuleSwitch'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
 import SurveyCreateView from './surveyCreate/surveyCreateView'
@@ -25,7 +25,7 @@ const HomeView = props => {
   }, [Survey.getUuid(surveyInfo)])
 
   return (
-    <NavigationTabBar
+    <InnerModuleSwitch
       moduleRoot={appModules.home}
       moduleDefault={homeModules.dashboard}
       modules={[

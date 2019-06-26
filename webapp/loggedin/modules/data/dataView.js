@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import Survey from '../../../../common/survey/survey'
 
-import NavigationTabBar from '../components/moduleNavigationTabBar'
+import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import RecordsView from './records/components/recordsView'
 import RecordView from './records/components/recordView'
@@ -19,7 +19,7 @@ const DataView = ({ surveyInfo }) => {
       draft={!Survey.isPublished(surveyInfo)}
       validate={false}>
 
-      <NavigationTabBar
+      <InnerModuleSwitch
         moduleRoot={appModules.data}
         moduleDefault={dataModules.records}
         modules={[
