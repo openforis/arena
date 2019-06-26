@@ -9,7 +9,7 @@ import * as AppState from '../../app/appState'
 class LoginForm extends React.Component {
 
   render () {
-    const {login, errorMessage, user} = this.props
+    const { login, errorMessage, user } = this.props
 
     return (
       user

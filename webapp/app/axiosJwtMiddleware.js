@@ -11,7 +11,7 @@ const requestHandler = async request => {
     return request
   } catch (err) {
     // TODO throws 'no currentUser' when not logged in
-    alert(err)
+    // alert(err)
   }
 
   return request

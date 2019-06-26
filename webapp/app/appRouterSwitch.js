@@ -14,6 +14,9 @@ import { throwSystemError, initApp } from './actions'
 
 import { getLocationPathname } from '../utils/routerUtils'
 
+import { Authenticator } from 'aws-amplify-react/dist/auth'
+import { CustomSignIn } from '../login/components/customSignIn'
+
 const loginUri = '/'
 
 const AppRouterSwitch = props => {
@@ -74,18 +77,21 @@ const AppRouterSwitch = props => {
               </div>
             )
             : (
-              <Switch>
-                <Route
-                  exact path="/"
-                  component={LoginView}
-                />
-                <Route
-                  path="/app"
-                  render={props => (
-                    <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
-                  )}
-                />
-              </Switch>
+              <Authenticator hideDefault={true}>
+                <CustomSignIn override={'SignIn'}/>
+                <Switch>
+                  <Route
+                    exact path="/"
+                    component={LoginView}
+                  />
+                  <Route
+                    path="/app"
+                    render={props => (
+                      <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
+                    )}
+                  />
+                </Switch>
+              </Authenticator>
             )
         }
 
