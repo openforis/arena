@@ -3,12 +3,9 @@ import './appSideBar.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
-import AppSideBarFooter from './appSideBarFooter'
 import AppSideBarModules from './appSideBarModules'
 
 import * as SurveyState from '../../survey/surveyState'
-import * as AppState from '../../app/appState'
-import { logout } from '../../app/actions'
 
 class AppSideBar extends React.Component {
 
@@ -28,25 +25,27 @@ class AppSideBar extends React.Component {
 
   render () {
     const { opened } = this.state
-    const { pathname, user, surveyInfo, logout } = this.props
+    const { pathname, surveyInfo } = this.props
 
     return (
       <div className="app-sidebar" ref={this.element}>
 
-        {/*toggle sidebar */}
-        <a className="btn btn-s btn-of-light-xs no-border app-sidebar__btn-toggle"
-           onClick={() => this.toggleOpen()}>
-          <span className={`icon icon-${opened ? 'shrink2' : 'enlarge2'} icon-16px`}/>
-        </a>
+        {/*logo placeholder*/}
+        <div></div>
 
-        <AppSideBarModules pathname={pathname}
-                           surveyInfo={surveyInfo}
-                           sideBarOpened={opened}/>
 
-        <AppSideBarFooter surveyInfo={surveyInfo}
-                          user={user}
-                          opened={opened}
-                          logout={logout}/>
+        <AppSideBarModules
+          pathname={pathname}
+          surveyInfo={surveyInfo}
+          sideBarOpened={opened}/>
+
+        <div>
+          {/*toggle sidebar */}
+          <a className="app-sidebar__btn-toggle"
+             onClick={() => this.toggleOpen()}>
+            <span className="icon icon-16px icon-menu"/>
+          </a>
+        </div>
 
       </div>
     )
@@ -55,8 +54,7 @@ class AppSideBar extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
 })
 
-export default connect(mapStateToProps, { logout })(AppSideBar)
+export default connect(mapStateToProps)(AppSideBar)

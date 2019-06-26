@@ -1,8 +1,9 @@
 @import "../../style/vars";
 
-$sidebarWidthClosed: 60px;
+$sidebarWidthClosed: 46px;
 $sidebarWidthOpened: 200px;
 $sidebarTransition: width 100ms ease-in;
+$sidebarBtnMargin: 4px;
 
 .app-sidebar {
   position: relative;
@@ -11,54 +12,62 @@ $sidebarTransition: width 100ms ease-in;
   border-right: 1px solid rgba($white, 0.1);
 
   display: grid;
-  grid-template-rows: .85fr .15fr;
-  align-items: center;
-  justify-content: center;
-  justify-items: center;
+  grid-template-rows: $headerHeight .95fr .05fr;
+  align-items: start;
 
-  transition: $sidebarTransition;
-
+  //transition: $sidebarTransition;
   &.opened {
     width: $sidebarWidthOpened;
   }
 }
 
-.app-sidebar__btn-of {
-  color: rgba($white, 0.5);
-  border-bottom: 1px solid rgba($white, 0.5) !important;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: -0.10rem;
-  font-size: .8rem;
-  padding: .3rem .5rem .15rem;
-
-  &:hover {
-    background-color: rgba($white, .1);
-    color: rgba($white, .75);
-    border-bottom: 1px solid rgba($white, 0.75) !important;
-  }
-}
-
-.app-sidebar__btn-toggle {
-  position: absolute;
-  top: $sidebarWidthClosed / 4;
-  right: $sidebarWidthClosed / 4;
-  opacity: .75;
-}
-
 .app-sidebar__modules {
   display: grid;
-  grid-row-gap: 1.5rem;
+  grid-row-gap: 1rem;
 }
 
 .app-sidebar__module {
-  display: flex;
-  align-items: baseline;
+  display: grid;
+  grid-row-gap: 20px;
+  border-left: $sidebarBtnMargin solid transparent;
+  border-right: $sidebarBtnMargin solid transparent;
+  padding: 6px 0;
+
+  &.active {
+    border-right-color: rgba($yellow, .8);
+  }
 }
 
-.app-sidebar__footer {
-  display: grid;
-  justify-items: center;
-  align-content: space-around;
-  height: 100%;
+.app-sidebar__module-btn {
+  display: flex;
+  align-items: center;
+  //margin: 0 $sidebarBtnMargin;
+  padding: 0 10px;
+  font-size: .85rem;
 }
+
+.app-sidebar__module-child-btn {
+  margin-left: 30px;
+  font-size: .8rem;
+}
+
+.app-sidebar__btn-toggle {
+  margin: 0 $sidebarBtnMargin;
+  padding: 0 10px;
+}
+
+//.app-sidebar__btn-of {
+//  color: rgba($white, 0.5);
+//  border-bottom: 1px solid rgba($white, 0.5) !important;
+//  text-transform: uppercase;
+//  font-weight: 600;
+//  letter-spacing: -0.10rem;
+//  font-size: .8rem;
+//  padding: .3rem .5rem .15rem;
+//
+//  &:hover {
+//    background-color: rgba($white, .1);
+//    color: rgba($white, .75);
+//    border-bottom: 1px solid rgba($white, 0.75) !important;
+//  }
+//}

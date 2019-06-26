@@ -9,13 +9,12 @@ import NavigationTabBar from '../components/moduleNavigationTabBar'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
 import SurveyCreateView from './surveyCreate/surveyCreateView'
-import SurveyInfoView from './surveyInfo/surveyInfoView'
+import SurveyInfoView from '../designer/surveyInfo/surveyInfoView'
 import CollectImportReportView from './collectImportReport/collectImportReportView'
 
 import Survey from '../../../../common/survey/survey'
 
-import { appModules, appModuleUri } from '../../appModules'
-import { homeModules } from './homeModules'
+import { appModules, appModuleUri, homeModules } from '../../appModules'
 
 import * as SurveyState from '../../../survey/surveyState'
 
@@ -37,14 +36,14 @@ const HomeView = props => {
       moduleDefault={homeModules.dashboard}
       tabs={[
         {
-          label: i18n.t('homeView.dashboard'),
+          label: i18n.t('appModules.dashboard'),
           component: DashboardView,
           path: appModuleUri(homeModules.dashboard),
           icon: 'icon-office',
           disabled: !Survey.isValid(surveyInfo),
         },
         {
-          label: i18n.t('homeView.mySurveys'),
+          label: i18n.t('appModules.surveyList'),
           component: SurveyListView,
           path: appModuleUri(homeModules.surveyList),
           icon: 'icon-paragraph-justify',

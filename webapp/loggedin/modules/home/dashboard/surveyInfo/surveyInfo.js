@@ -16,9 +16,7 @@ import Validator from '../../../../../../common/validation/validator'
 import * as AppState from '../../../../../app/appState'
 import * as SurveyState from '../../../../../survey/surveyState'
 
-import { appModuleUri } from '../../../../appModules'
-import { designerModules } from '../../../designer/designerModules'
-import { homeModules } from '../../homeModules'
+import { appModuleUri, designerModules, homeModules } from '../../../../appModules'
 
 import { deleteSurvey, publishSurvey } from '../../../../../survey/actions'
 
@@ -83,7 +81,7 @@ const SurveyInfo = props => {
             <Link to={appModuleUri(homeModules.collectImportReport)}
                   className="btn btn-of-light">
               <span className="icon icon-warning icon-12px icon-left"/>
-              {i18n.t('homeView.surveyInfo.collectImportReport')}
+              {i18n.t('appModules.collectImportReport')}
             </Link>
           }
         </div>
@@ -94,22 +92,22 @@ const SurveyInfo = props => {
           <Link
             to={appModuleUri(designerModules.formDesigner)} className="btn btn btn-of-light">
             <span className="icon icon-quill icon-12px icon-left"/>
-            {i18n.t('survey.formDesigner')}
+            {i18n.t('appModules.formDesigner')}
           </Link>
           <Link
             to={appModuleUri(designerModules.surveyHierarchy)} className="btn btn btn-of-light">
             <span className="icon icon-tree icon-12px icon-left"/>
-            {i18n.t('homeView.surveyInfo.hierarchy')}
+            {i18n.t('appModules.surveyHierarchy')}
           </Link>
           <Link
             to={appModuleUri(designerModules.categories)} className="btn btn btn-of-light">
             <span className="icon icon-list2 icon-12px icon-left"/>
-            {i18n.t('survey.categories')}
+            {i18n.t('appModules.categories')}
           </Link>
           <Link
             to={appModuleUri(designerModules.taxonomies)} className="btn btn btn-of-light">
-            <span className="icon icon-leaf icon-12px icon-left" />
-            {i18n.t('survey.taxonomies')}
+            <span className="icon icon-leaf icon-12px icon-left"/>
+            {i18n.t('appModules.taxonomies')}
           </Link>
         </div>
 

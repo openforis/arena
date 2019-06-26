@@ -10,13 +10,12 @@ import AuthManager from '../../../../common/auth/authManager'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import NavigationTabBar from '../components/moduleNavigationTabBar'
 import SurveyFormView from '../../surveyViews/surveyForm/surveyFormView'
-import SurveyHierarchy from './components/surveyHierarchy'
+import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
 import RecordView from '../data/records/components/recordView'
 import CategoriesView from '../../surveyViews/categories/categoriesView'
 import TaxonomiesView from '../../surveyViews/taxonomies/taxonomiesView'
 
-import { appModules, appModuleUri } from '../../appModules'
-import { designerModules } from './designerModules'
+import { appModules, appModuleUri, designerModules } from '../../appModules'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
@@ -40,14 +39,14 @@ const DesignerView = ({ canEditDef, resetForm }) => {
         moduleDefault={designerModules.formDesigner}
         tabs={[
           {
-            label: i18n.t('survey.formDesigner'),
+            label: i18n.t('appModules.formDesigner'),
             component: SurveyFormView,
             path: appModuleUri(designerModules.formDesigner),
             props: { edit: true, draft: true, canEditDef },
           },
 
           {
-            label: i18n.t('designerView.hierarchy'),
+            label: i18n.t('appModules.surveyHierarchy'),
             component: SurveyHierarchy,
             path: appModuleUri(designerModules.surveyHierarchy),
           },
@@ -61,13 +60,13 @@ const DesignerView = ({ canEditDef, resetForm }) => {
           },
 
           {
-            label: i18n.t('survey.categories'),
+            label: i18n.t('appModules.categories'),
             component: CategoriesView,
             path: appModuleUri(designerModules.categories),
           },
 
           {
-            label: i18n.t('survey.taxonomies'),
+            label: i18n.t('appModules.taxonomies'),
             component: TaxonomiesView,
             path: appModuleUri(designerModules.taxonomies),
           },

@@ -13,8 +13,7 @@ import RecordsView from './records/components/recordsView'
 import RecordView from './records/components/recordView'
 import DataVisView from './dataVis/dataVisView'
 
-import { appModules, appModuleUri } from '../../appModules'
-import { dataModules } from './dataModules'
+import { appModules, appModuleUri, dataModules } from '../../appModules'
 import * as SurveyState from '../../../survey/surveyState'
 
 const DataView = ({ surveyInfo }) => {
@@ -35,7 +34,7 @@ const DataView = ({ surveyInfo }) => {
 
           // records list
           {
-            label: i18n.t('data.records.records'),
+            label: i18n.t('appModules.records'),
             component: RecordsView,
             path: appModuleUri(dataModules.records),
           },
@@ -49,7 +48,7 @@ const DataView = ({ surveyInfo }) => {
 
           // data visualization
           {
-            label: i18n.t('data.dataVis.dataVis'),
+            label: i18n.t('appModules.dataVis'),
             component: DataVisView,
             path: appModuleUri(dataModules.dataVis),
             showTab: showDataVis
