@@ -81,9 +81,9 @@ const AppSideBarModules = ({ pathname, surveyInfo, sideBarOpened }) => (
   <div className="app-sidebar__modules">
     {
       modulesHierarchy.map((module, i) => (
-        <React.Fragment>
+        <React.Fragment key={module.key}>
+
           <AppSideBarModule
-            key={module.key}
             module={module}
             pathname={pathname}
             surveyInfo={surveyInfo}
@@ -92,7 +92,7 @@ const AppSideBarModules = ({ pathname, surveyInfo, sideBarOpened }) => (
 
           {
             i !== modulesHierarchy.length - 1 &&
-            <div className="separator-of"></div>
+            <div className="separator-of"/>
           }
 
         </React.Fragment>
