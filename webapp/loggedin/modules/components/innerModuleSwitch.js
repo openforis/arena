@@ -33,8 +33,7 @@ const InnerModuleSwitch = props => {
 }
 
 InnerModuleSwitch.defaultProps = {
-  tabs: [],
-  className: '',
+  modules: [],
   moduleRoot: '',
   moduleDefault: '',
 }
