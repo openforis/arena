@@ -1,9 +1,9 @@
 @import "../../style/vars";
 
-$sidebarWidthClosed: 55px;
+$sidebarWidthClosed: 46px;
 $sidebarWidthOpened: 200px;
 $sidebarTransition: width 100ms ease-in;
-$sidebarBtnBorder: 8px solid transparent;
+$sidebarBtnMargin: 4px;
 
 .app-sidebar {
   position: relative;
@@ -27,18 +27,26 @@ $sidebarBtnBorder: 8px solid transparent;
   grid-row-gap: 1.5rem;
 }
 
+.app-sidebar__module {
+  border-left: $sidebarBtnMargin solid transparent;
+  border-right: $sidebarBtnMargin solid transparent;
+  padding: 6px 0;
+
+  &.active {
+    border-right-color: rgba($yellow, .8);
+  }
+}
+
 .app-sidebar__module-btn {
   display: flex;
   align-items: center;
-  border-left: $sidebarBtnBorder;
-  border-right: $sidebarBtnBorder;
+  //margin: 0 $sidebarBtnMargin;
   padding: 0 10px;
   font-size: .8rem;
 }
 
 .app-sidebar__btn-toggle {
-  border-left: $sidebarBtnBorder;
-  border-right: $sidebarBtnBorder;
+  margin: 0 $sidebarBtnMargin;
   padding: 0 10px;
 }
 

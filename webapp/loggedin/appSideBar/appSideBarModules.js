@@ -39,7 +39,7 @@ const AppSideBarModule = (props) => {
   const {
     pathname, module, surveyInfo,
     //module props
-    icon, label, sideBarOpened = false, disabled = false,
+    icon, label, sideBarOpened = false
   } = props
 
   const active = R.startsWith(appModuleUri(module), pathname)
@@ -48,17 +48,20 @@ const AppSideBarModule = (props) => {
   return (
     <React.Fragment>
 
-      <Link
-        className="app-sidebar__module-btn text-uppercase"
-        to={appModuleUri(module)}
-        aria-disabled={disabled || (requireSurvey && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo)))}>
-        <span className={`icon icon-${icon} icon-16px${sideBarOpened ? ' icon-left-2x' : ''}`}></span>
-        {
-          sideBarOpened &&
-          <span>{label}</span>
-        }
+      <div className={`app-sidebar__module${active ? ' active' : ''}`}>
 
-      </Link>
+        <Link
+          className="app-sidebar__module-btn text-uppercase"
+          to={appModuleUri(module)}
+          aria-disabled={requireSurvey && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))}>
+          <span className={`icon icon-${icon} icon-16px${sideBarOpened ? ' icon-left-2x' : ''}`}></span>
+          {
+            sideBarOpened &&
+            <span>{label}</span>
+          }
+
+        </Link>
+      </div>
 
       {
         module === appModules.home &&
