@@ -16,9 +16,8 @@ import Validator from '../../../../../../common/validation/validator'
 import * as AppState from '../../../../../app/appState'
 import * as SurveyState from '../../../../../survey/surveyState'
 
-import { appModuleUri } from '../../../../appModules'
+import { appModuleUri, homeModules } from '../../../../appModules'
 import { designerModules } from '../../../designer/designerModules'
-import { homeModules } from '../../homeModules'
 
 import { deleteSurvey, publishSurvey } from '../../../../../survey/actions'
 

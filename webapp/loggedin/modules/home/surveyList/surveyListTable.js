@@ -6,8 +6,7 @@ import useI18n from '../../../../commonComponents/useI18n'
 import Survey from '../../../../../common/survey/survey'
 import { getRelativeDate, compareDatesDesc } from '../../../../../common/dateUtils'
 
-import { appModuleUri } from '../../../appModules'
-import { homeModules } from '../homeModules'
+import { appModuleUri, homeModules } from '../../../appModules'
 
 const SurveyRow = ({ surveyInfoRow, surveyInfo, setActiveSurvey }) => {
   const surveyId = surveyInfoRow.id

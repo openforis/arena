@@ -14,8 +14,7 @@ import CollectImportReportView from './collectImportReport/collectImportReportVi
 
 import Survey from '../../../../common/survey/survey'
 
-import { appModules, appModuleUri } from '../../appModules'
-import { homeModules } from './homeModules'
+import { appModules, appModuleUri, homeModules } from '../../appModules'
 
 import * as SurveyState from '../../../survey/surveyState'
 
