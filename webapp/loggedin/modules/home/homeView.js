@@ -36,14 +36,14 @@ const HomeView = props => {
       moduleDefault={homeModules.dashboard}
       tabs={[
         {
-          label: i18n.t('homeView.dashboard'),
+          label: i18n.t('appModules.dashboard'),
           component: DashboardView,
           path: appModuleUri(homeModules.dashboard),
           icon: 'icon-office',
           disabled: !Survey.isValid(surveyInfo),
         },
         {
-          label: i18n.t('homeView.mySurveys'),
+          label: i18n.t('appModules.surveyList'),
           component: SurveyListView,
           path: appModuleUri(homeModules.surveyList),
           icon: 'icon-paragraph-justify',

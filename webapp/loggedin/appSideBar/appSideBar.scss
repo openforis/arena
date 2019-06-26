@@ -15,8 +15,7 @@ $sidebarBtnMargin: 4px;
   grid-template-rows: $headerHeight .95fr .05fr;
   align-items: start;
 
-  transition: $sidebarTransition;
-
+  //transition: $sidebarTransition;
   &.opened {
     width: $sidebarWidthOpened;
   }

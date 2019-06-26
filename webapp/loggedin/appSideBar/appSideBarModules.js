@@ -2,9 +2,11 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import * as R from 'ramda'
 
+import useI18n from '../../commonComponents/useI18n'
+
 import { appModuleUri, appModules, designerModules, dataModules } from '../appModules'
 
-//==== Modules hierarchy for appSidebar
+//==== Modules hierarchy
 const getModule = (module, children = null) => ({
   key: module.key,
   uri: appModuleUri(module),
@@ -20,22 +22,26 @@ export const modulesHierarchy = [
   getModule(appModules.data, [dataModules.records, dataModules.dataVis]),
 ]
 
-const ModuleLink = ({ module, showLabel, disabled, className = '' }) => (
-  <Link
-    className={`app-sidebar__module-btn text-uppercase ${className}`}
-    to={module.uri}
-    aria-disabled={disabled}>
-    {
-      module.icon &&
-      <span className={`icon icon-${module.icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`}></span>
-    }
-    {
-      showLabel &&
-      <span>{module.key}</span>
-    }
+const ModuleLink = ({ module, showLabel, disabled, className = '' }) => {
+  const i18n = useI18n()
 
-  </Link>
-)
+  return (
+    <Link
+      className={`app-sidebar__module-btn text-uppercase ${className}`}
+      to={module.uri}
+      aria-disabled={disabled}>
+      {
+        module.icon &&
+        <span className={`icon icon-${module.icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`}></span>
+      }
+      {
+        showLabel &&
+        <span>{i18n.t(`appModules.${module.key}`)}</span>
+      }
+
+    </Link>
+  )
+}
 
 const AppSideBarModule = (props) => {
   const { pathname, module, surveyInfo, sideBarOpened = false } = props

@@ -34,7 +34,7 @@ const DataView = ({ surveyInfo }) => {
 
           // records list
           {
-            label: i18n.t('data.records.records'),
+            label: i18n.t('appModules.records'),
             component: RecordsView,
             path: appModuleUri(dataModules.records),
           },
@@ -48,7 +48,7 @@ const DataView = ({ surveyInfo }) => {
 
           // data visualization
           {
-            label: i18n.t('data.dataVis.dataVis'),
+            label: i18n.t('appModules.dataVis'),
             component: DataVisView,
             path: appModuleUri(dataModules.dataVis),
             showTab: showDataVis
