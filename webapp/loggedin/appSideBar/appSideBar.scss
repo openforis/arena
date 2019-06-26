@@ -1,6 +1,6 @@
 @import "../../style/vars";
 
-$sidebarWidthClosed: 60px;
+$sidebarWidthClosed: 55px;
 $sidebarWidthOpened: 200px;
 $sidebarTransition: width 100ms ease-in;
 
@@ -11,31 +11,15 @@ $sidebarTransition: width 100ms ease-in;
   border-right: 1px solid rgba($white, 0.1);
 
   display: grid;
-  grid-template-rows: .85fr .15fr;
-  align-items: center;
-  justify-content: center;
-  justify-items: center;
+  grid-template-rows: $headerHeight .85fr .15fr;
+  align-items: start;
+  //justify-content: center;
+  //justify-items: center;
 
   transition: $sidebarTransition;
 
   &.opened {
     width: $sidebarWidthOpened;
-  }
-}
-
-.app-sidebar__btn-of {
-  color: rgba($white, 0.5);
-  border-bottom: 1px solid rgba($white, 0.5) !important;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: -0.10rem;
-  font-size: .8rem;
-  padding: .3rem .5rem .15rem;
-
-  &:hover {
-    background-color: rgba($white, .1);
-    color: rgba($white, .75);
-    border-bottom: 1px solid rgba($white, 0.75) !important;
   }
 }
 
@@ -51,9 +35,13 @@ $sidebarTransition: width 100ms ease-in;
   grid-row-gap: 1.5rem;
 }
 
-.app-sidebar__module {
+.app-sidebar__module-btn {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  padding: 0 10px;
+  font-size: .8rem;
 }
 
 .app-sidebar__footer {
@@ -61,4 +49,21 @@ $sidebarTransition: width 100ms ease-in;
   justify-items: center;
   align-content: space-around;
   height: 100%;
+}
+
+
+.app-sidebar__btn-of {
+  color: rgba($white, 0.5);
+  border-bottom: 1px solid rgba($white, 0.5) !important;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: -0.10rem;
+  font-size: .8rem;
+  padding: .3rem .5rem .15rem;
+
+  &:hover {
+    background-color: rgba($white, .1);
+    color: rgba($white, .75);
+    border-bottom: 1px solid rgba($white, 0.75) !important;
+  }
 }

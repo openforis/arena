@@ -19,19 +19,20 @@ const modules = [
     module: appModules.data,
     icon: 'table2',
     label: 'Data',
-  },
-  {
-    module: appModules.analysis,
-    icon: 'calculator',
-    label: 'Analysis',
-    disabled: true,
-  },
-  {
-    module: appModules.users,
-    icon: 'users',
-    label: 'Users',
-    disabled: true,
-  },
+  }
+  // ,
+  // {
+  //   module: appModules.analysis,
+  //   icon: 'calculator',
+  //   label: 'Analysis',
+  //   disabled: true,
+  // },
+  // {
+  //   module: appModules.users,
+  //   icon: 'users',
+  //   label: 'Users',
+  //   disabled: true,
+  // },
 ]
 
 const AppSideBarModule = (props) => {
@@ -46,21 +47,24 @@ const AppSideBarModule = (props) => {
 
   return (
     <React.Fragment>
-      <Link className={`btn btn-s btn-of-light-s app-sidebar__module${active ? ' active' : ''}`}
-            to={appModuleUri(module)}
-            aria-disabled={disabled || (requireSurvey && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo)))}>
-        <span className={`icon icon-${icon} icon-20px${sideBarOpened ? ' icon-left' : ''}`}></span>
+
+      <Link
+        className="app-sidebar__module-btn text-uppercase"
+        to={appModuleUri(module)}
+        aria-disabled={disabled || (requireSurvey && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo)))}>
+        <span className={`icon icon-${icon} icon-16px${sideBarOpened ? ' icon-left-2x' : ''}`}></span>
         {
           sideBarOpened &&
           <span>{label}</span>
         }
 
       </Link>
+
       {
-        module === appModules.home
-          ? <div className="separator-of"></div>
-          : null
+        module === appModules.home &&
+        <div className="separator-of"></div>
       }
+
     </React.Fragment>
   )
 }

@@ -33,6 +33,9 @@ class AppSideBar extends React.Component {
     return (
       <div className="app-sidebar" ref={this.element}>
 
+        {/*logo placeholder*/}
+        <div></div>
+
         {/*toggle sidebar */}
         <a className="btn btn-s btn-of-light-xs no-border app-sidebar__btn-toggle"
            onClick={() => this.toggleOpen()}>
