@@ -81,7 +81,7 @@ const AppSideBarModules = ({ pathname, surveyInfo, sideBarOpened }) => (
   <div className="app-sidebar__modules">
     {
       modulesHierarchy.map((module, i) => (
-        <React.Fragment key={i}>
+        <React.Fragment key={module.key}>
 
           <AppSideBarModule
             module={module}
