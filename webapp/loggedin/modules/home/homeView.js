@@ -9,7 +9,7 @@ import NavigationTabBar from '../components/moduleNavigationTabBar'
 import DashboardView from './dashboard/dashboardView'
 import SurveyListView from './surveyList/surveyListView'
 import SurveyCreateView from './surveyCreate/surveyCreateView'
-import SurveyInfoView from './surveyInfo/surveyInfoView'
+import SurveyInfoView from '../designer/surveyInfo/surveyInfoView'
 import CollectImportReportView from './collectImportReport/collectImportReportView'
 
 import Survey from '../../../../common/survey/survey'
