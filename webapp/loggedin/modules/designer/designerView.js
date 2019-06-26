@@ -1,9 +1,5 @@
-import './designerView.scss'
-
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-
-import useI18n from '../../../commonComponents/useI18n'
 
 import AuthManager from '../../../../common/auth/authManager'
 
@@ -24,8 +20,6 @@ import { resetForm } from '../../surveyViews/surveyForm/actions'
 
 const DesignerView = ({ canEditDef, resetForm }) => {
 
-  const i18n = useI18n()
-
   useEffect(() => { resetForm() }, [])
 
   return (
@@ -34,39 +28,32 @@ const DesignerView = ({ canEditDef, resetForm }) => {
       validate={canEditDef}>
 
       <NavigationTabBar
-        className="designer app-module__tab-navigation"
         moduleRoot={appModules.designer}
         moduleDefault={designerModules.formDesigner}
-        tabs={[
+        modules={[
           {
-            label: i18n.t('appModules.formDesigner'),
             component: SurveyFormView,
             path: appModuleUri(designerModules.formDesigner),
             props: { edit: true, draft: true, canEditDef },
           },
 
           {
-            label: i18n.t('appModules.surveyHierarchy'),
             component: SurveyHierarchy,
             path: appModuleUri(designerModules.surveyHierarchy),
           },
 
           {
-            label: i18n.t('designerView.formPreview'),
             component: RecordView,
             path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
             props: { edit: true, draft: true, canEditDef, preview: true },
-            showTab: false,
           },
 
           {
-            label: i18n.t('appModules.categories'),
             component: CategoriesView,
             path: appModuleUri(designerModules.categories),
           },
 
           {
-            label: i18n.t('appModules.taxonomies'),
             component: TaxonomiesView,
             path: appModuleUri(designerModules.taxonomies),
           },
@@ -86,7 +73,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { resetForm }
-)(DesignerView)
+export default connect(mapStateToProps, { resetForm })(DesignerView)
