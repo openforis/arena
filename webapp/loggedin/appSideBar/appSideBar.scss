@@ -24,10 +24,12 @@ $sidebarBtnMargin: 4px;
 
 .app-sidebar__modules {
   display: grid;
-  grid-row-gap: 1.5rem;
+  grid-row-gap: 1rem;
 }
 
 .app-sidebar__module {
+  display: grid;
+  grid-row-gap: 20px;
   border-left: $sidebarBtnMargin solid transparent;
   border-right: $sidebarBtnMargin solid transparent;
   padding: 6px 0;
@@ -42,6 +44,11 @@ $sidebarBtnMargin: 4px;
   align-items: center;
   //margin: 0 $sidebarBtnMargin;
   padding: 0 10px;
+  font-size: .85rem;
+}
+
+.app-sidebar__module-child-btn {
+  margin-left: 30px;
   font-size: .8rem;
 }
 
