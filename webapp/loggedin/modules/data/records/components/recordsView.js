@@ -15,8 +15,7 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 import AuthManager from '../../../../../../common/auth/authManager'
 import Validator from '../../../../../../common/validation/validator'
 
-import { appModuleUri } from '../../../../appModules'
-import { dataModules } from '../../dataModules'
+import { appModuleUri, dataModules } from '../../../../appModules'
 
 import { getRelativeDate } from '../../../../../../common/dateUtils'
 

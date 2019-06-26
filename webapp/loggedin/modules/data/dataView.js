@@ -13,8 +13,7 @@ import RecordsView from './records/components/recordsView'
 import RecordView from './records/components/recordView'
 import DataVisView from './dataVis/dataVisView'
 
-import { appModules, appModuleUri } from '../../appModules'
-import { dataModules } from './dataModules'
+import { appModules, appModuleUri, dataModules } from '../../appModules'
 import * as SurveyState from '../../../survey/surveyState'
 
 const DataView = ({ surveyInfo }) => {

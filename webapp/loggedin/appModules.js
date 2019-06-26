@@ -1,5 +1,7 @@
 const app = 'app'
 
+export const appModuleUri = (module = appModules.home) => `/${[app, module].join('/')}/`
+
 export const appModules = {
   home: 'home',
   designer: 'designer',
@@ -34,4 +36,14 @@ export const designerModules = {
 
 }
 
-export const appModuleUri = (module = appModules.home) => `/${[app, module].join('/')}/`
+export const dataModules = {
+  // edit record form
+  record: `${appModules.data}/record`,
+
+  // records list
+  records: `${appModules.data}/records`,
+
+  dataVis: `${appModules.data}/dataVis`,
+
+}
+

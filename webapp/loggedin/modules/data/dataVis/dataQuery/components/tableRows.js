@@ -7,8 +7,7 @@ import TableColumn from './tableColumn'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../../common/record/record'
 
-import { appModuleUri } from '../../../../../appModules'
-import { dataModules } from '../../../dataModules'
+import { appModuleUri, dataModules } from '../../../../../appModules'
 import ErrorBadge from '../../../../../../commonComponents/errorBadge'
 
 const defaultColWidth = 100
