@@ -11,8 +11,7 @@ import Validator from '../../../../../common/validation/validator'
 import ErrorBadge from '../../../../commonComponents/errorBadge'
 
 import { deleteRecord, updateRecordStep } from '../../record/actions'
-import { appModuleUri } from '../../../appModules'
-import { designerModules } from '../../../modules/designer/designerModules'
+import { appModuleUri, designerModules } from '../../../appModules'
 
 import * as RecordState from '../../record/recordState'
 

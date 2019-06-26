@@ -15,8 +15,7 @@ import RecordView from '../data/records/components/recordView'
 import CategoriesView from '../../surveyViews/categories/categoriesView'
 import TaxonomiesView from '../../surveyViews/taxonomies/taxonomiesView'
 
-import { appModules, appModuleUri } from '../../appModules'
-import { designerModules } from './designerModules'
+import { appModules, appModuleUri, designerModules } from '../../appModules'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'

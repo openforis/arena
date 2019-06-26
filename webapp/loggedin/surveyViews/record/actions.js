@@ -10,9 +10,8 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
 import * as RecordState from './recordState'
 
-import { appModules, appModuleUri } from '../../appModules'
+import { appModules, appModuleUri, designerModules } from '../../appModules'
 import { dataModules } from '../../modules/data/dataModules'
-import { designerModules } from '../../modules/designer/designerModules'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
