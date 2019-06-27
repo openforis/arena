@@ -12,8 +12,8 @@ class CSVParser {
     const options = { headers: readHeaders }
 
     this.csvStream = R.is(String, filePathOrStream)
-      ? fastcsv.fromPath(filePathOrStream, options)
-      : fastcsv.fromStream(filePathOrStream, options)
+      ? fastcsv.parseFile(filePathOrStream, options)
+      : fastcsv.parseStream(filePathOrStream, options)
 
     this.csvStream
       .on('data', data => this.onData(data))
@@ -24,7 +24,7 @@ class CSVParser {
   calculateSize () {
     return new Promise(resolve => {
       let count = 0
-      fastcsv.fromPath(this.filePathOrStream, { headers: true })
+      fastcsv.parseFile(this.filePathOrStream, { headers: true })
         .on('data', () => count++)
         .on('end', () => resolve(count))
     })
