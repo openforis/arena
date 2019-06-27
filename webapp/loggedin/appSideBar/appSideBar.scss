@@ -8,8 +8,8 @@ $sidebarBtnMargin: 4px;
 .app-sidebar {
   position: relative;
   width: $sidebarWidthClosed;
-  //background-color: rgba($brown, 0.4);
-  border-right: 1px solid rgba($white, 0.1);
+  background-color: rgba($grey, 0.6);
+  border-right: 1px solid rgba($blueLight, 0.6);
 
   display: grid;
   grid-template-rows: $headerHeight .95fr .05fr;
@@ -23,7 +23,7 @@ $sidebarBtnMargin: 4px;
 
 .app-sidebar__modules {
   display: grid;
-  grid-row-gap: 1rem;
+  grid-row-gap: .5rem;
 }
 
 .app-sidebar__module {
@@ -31,10 +31,11 @@ $sidebarBtnMargin: 4px;
   grid-row-gap: 20px;
   border-left: $sidebarBtnMargin solid transparent;
   border-right: $sidebarBtnMargin solid transparent;
-  padding: 6px 0;
+  padding: 15px 0;
 
   &.active {
-    border-right-color: rgba($yellow, .8);
+    border-right-color: $blueLight;
+    background-color: rgba($blueLight, .1);
   }
 }
 
@@ -49,6 +50,11 @@ $sidebarBtnMargin: 4px;
 .app-sidebar__module-child-btn {
   margin-left: 30px;
   font-size: .8rem;
+
+  &.active {
+    //color: $blueLight;
+    font-weight: bold;
+  }
 }
 
 .app-sidebar__btn-toggle {

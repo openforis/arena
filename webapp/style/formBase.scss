@@ -3,9 +3,9 @@
 input,
 label,
 select,
-button,
 textarea,
 a,
+button,
 .btn {
   margin: 0;
   border: 0;
@@ -23,9 +23,9 @@ a,
   letter-spacing: 1px;
   font-weight: inherit;
   word-wrap: break-word;
-  color: $white;
+  color: $black;
 
-  transition: all .5s ease;
+  //transition: all .1s ease;
 }
 
 input {
@@ -44,10 +44,11 @@ input {
 
 a {
   text-decoration: none;
+  cursor: pointer;
 }
 
 a:hover {
-  cursor: pointer;
+  font-weight: 600;
 }
 
 a:focus,
@@ -61,7 +62,7 @@ a:visited {
 button, .btn {
   padding: .7rem .8rem;
   font-weight: 400;
-  border: 1px solid $whiteLight;
+  border: 1px solid $greyBorder;
   text-decoration: none;
 
   &:hover {
@@ -75,8 +76,7 @@ button, .btn {
   display: inline-block; /* For IE11/ MS Edge bug */
   pointer-events: none;
   text-decoration: none;
-  opacity: .4;
-  background-color: rgba(222, 220, 203, 0.1);
+  opacity: .8;
 }
 
 .btn-s {

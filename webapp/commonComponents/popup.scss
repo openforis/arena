@@ -1,7 +1,7 @@
 @import "../style/vars";
 
 .popup {
-  background-color: rgba($grey2, .95);
+  background-color: rgba($greyBorder, .95);
   position: fixed;
   min-width: 600px;
   z-index: $zIndex10TopOfApp;

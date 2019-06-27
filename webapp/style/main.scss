@@ -20,7 +20,7 @@ body {
   margin: 0;
   font-weight: 400;
   letter-spacing: 1px;
-  color: $white;
+  color: $black;
 }
 
 .main__system-error {
@@ -65,7 +65,7 @@ body {
 }
 
 .separator-of {
-  border-bottom: 1px double rgba($white, .2);
+  border-bottom: 1px double $greyBorder;
   border-bottom-right-radius: 10% 2%;
   border-bottom-left-radius: 80% 10%;
   width: 70%;
