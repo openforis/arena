@@ -34,7 +34,7 @@ const Chip = props => {
 
   return <div className="form-input">
 
-    <div className="btn btn-s form-input-chip-item">
+    <div className="form-input-chip-item">
       {getItemLabel(item, itemLabelFunction, itemLabelProp)}
 
       {
