@@ -97,7 +97,7 @@ class NodeDefMultipleTableBody extends React.Component {
       : (
         <div className="node-def__text-multiple-table-cell">
           <span className="values-summary">{this.state.nodeValues}</span>
-          <button className="btn-s btn-of-light-xs"
+          <button className="btn-s"
                   onClick={() => this.setShowEditDialog(true)}>
             <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`}/>
           </button>

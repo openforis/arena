@@ -36,7 +36,7 @@ const NodeDefEntityTable = props => {
         <div>{label}</div>
         {
           entry && canEditRecord
-            ? <button className="btn btn-s btn-of-light-xs"
+            ? <button className="btn btn-s"
                       style={{ marginLeft: '10px' }}
                       onClick={() => {
                         const entity = Node.newNodePlaceholder(nodeDef, parentNode)

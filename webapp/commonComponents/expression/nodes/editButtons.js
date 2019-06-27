@@ -27,17 +27,17 @@ const EditButtons = (props) => {
   return (
     <div className="btns">
       <div className="btns__add">
-        <button className="btn btn-s btn-of-light"
+        <button className="btn btn-s"
                 onClick={() => addLogicalExpr(logical.or.value)}>
           <span className="icon icon-plus icon-8px"/> OR
         </button>
-        <button className="btn btn-s btn-of-light"
+        <button className="btn btn-s"
                 onClick={() => addLogicalExpr(logical.and.value)}>
           <span className="icon icon-plus icon-8px"/> AND
         </button>
       </div>
 
-      <button className="btn btn-s btn-of-light btn-delete btns__last"
+      <button className="btn btn-s btn-delete btns__last"
               onClick={onDelete}
               aria-disabled={!canDelete}>
         <span className="icon icon-bin icon-10px"/>

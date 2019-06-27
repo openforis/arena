@@ -12,7 +12,7 @@ const TabBarButtons = ({ tabs, selection, onClick }) => (
           ? null
           : (
             <button key={i}
-                    className={`btn btn-of${active ? ' active' : ''}`}
+                    className={`btn${active ? ' active' : ''}`}
                     onClick={() => onClick(i)}
                     aria-disabled={!!tab.disabled}>
               {

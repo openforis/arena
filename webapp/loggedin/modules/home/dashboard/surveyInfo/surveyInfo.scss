@@ -26,8 +26,10 @@
     align-items: center;
     padding: 0 .5rem;
 
-    .icon {
+    .icon-warning {
       margin-top: -4px;
+      color: $orange;
+      font-weight: bold;
     }
 
     .btn {

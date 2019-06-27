@@ -63,13 +63,13 @@ const AppJobMonitor = props => {
       </ModalBody>
 
       <ModalFooter>
-        <button className="btn btn-of modal-footer__item"
+        <button className="btn modal-footer__item"
                 onClick={() => cancelActiveJob()}
                 aria-disabled={!job.running}>
           {i18n.t('common.cancel')}
         </button>
 
-        <button className="btn btn-of modal-footer__item"
+        <button className="btn modal-footer__item"
                 onClick={() => hideAppJobMonitor()}
                 aria-disabled={!job.ended}>
           {i18n.t('common.close')}

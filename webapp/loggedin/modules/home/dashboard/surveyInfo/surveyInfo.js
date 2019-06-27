@@ -48,7 +48,7 @@ const SurveyInfo = props => {
           <div className="survey-status">
             {
               Survey.isDraft(surveyInfo) &&
-              <span className="icon icon-warning icon-12px icon-left"/>
+              <span className="icon icon-warning icon-14px icon-left"/>
             }
 
             {Survey.getStatus(surveyInfo)}

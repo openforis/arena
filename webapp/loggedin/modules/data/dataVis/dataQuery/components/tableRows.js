@@ -58,7 +58,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, histor
                   {i + offset + 1}
                   {
                     editMode &&
-                    <button className="btn btn-s btn-of-light btn-edit"
+                    <button className="btn btn-s btn-edit"
                             title="View record"
                             onClick={() => history.push(recordEditUrl)}>
                       <span className="icon icon-pencil2 icon-16px"/>

@@ -30,14 +30,14 @@ const TableRow = props => {
       <div className="buttons">
         {
           onSelect && (canSelect || selected) &&
-          <button className={`btn btn-s btn-of-light-xs${selected ? ' active' : ''}`}
+          <button className={`btn btn-s${selected ? ' active' : ''}`}
                   onClick={() => onSelect(item)}>
             <span className={`icon icon-checkbox-${selected ? '' : 'un'}checked icon-12px icon-left`}/>
             {selected ? 'Selected' : 'Select'}
           </button>
         }
 
-        <button className="btn btn-s btn-of-light-xs"
+        <button className="btn btn-s"
                 onClick={() => onEdit(item)}>
           <span className={`icon icon-${readOnly ? 'eye' : 'pencil2'} icon-12px icon-left`}/>
           {readOnly ? i18n.t('common.view') : i18n.t('common.edit')}
@@ -45,7 +45,7 @@ const TableRow = props => {
 
         {
           !readOnly &&
-          <button className="btn btn-s btn-of-light-xs"
+          <button className="btn btn-s"
                   onClick={() => {
                     if (canDelete(item)) {
                       onDelete(item)
@@ -66,7 +66,7 @@ const Header = ({ onAdd, readOnly }) => {
   return !readOnly && (
     <div className="table__header">
 
-      <button className="btn btn-s btn-of-light"
+      <button className="btn btn-s"
               onClick={onAdd}>
         <span className="icon icon-plus icon-12px icon-left"/>
         {i18n.t('common.add')}

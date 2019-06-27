@@ -21,17 +21,17 @@ const Logical = (props) => {
       <div className="btns">
 
         <div className="btns__add">
-          <button className={`btn btn-s btn-of-light${operator === logical.or.key ? ' active' : ''}`}
+          <button className={`btn btn-s${operator === logical.or.key ? ' active' : ''}`}
                   onClick={() => onChange(R.assoc('operator', logical.or.key, node))}>
             OR
           </button>
-          <button className={`btn btn-s btn-of-light${operator === logical.and.key ? ' active' : ''}`}
+          <button className={`btn btn-s${operator === logical.and.key ? ' active' : ''}`}
                   onClick={() => onChange(R.assoc('operator', logical.and.key, node))}>
             AND
           </button>
         </div>
 
-        <button className="btn btn-s btn-of-light btns__last"
+        <button className="btn btn-s btns__last"
                 onClick={() => onChange({
                   type: Expression.types.GroupExpression,
                   argument: node,

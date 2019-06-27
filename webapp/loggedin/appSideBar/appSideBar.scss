@@ -19,6 +19,10 @@ $sidebarBtnMargin: 4px;
   &.opened {
     width: $sidebarWidthOpened;
   }
+
+  *[aria-disabled="true"] {
+    opacity: 1;
+  }
 }
 
 .app-sidebar__modules {

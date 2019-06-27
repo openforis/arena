@@ -65,7 +65,7 @@ const LevelEdit = props => {
       </h4>
       {
         !readOnly &&
-        <button className="btn btn-s btn-of-light-xs"
+        <button className="btn btn-s"
                 onClick={() => handleDelete()}
                 aria-disabled={!canBeDeleted}>
           <span className="icon icon-bin2 icon-12px"/>
@@ -84,7 +84,7 @@ const LevelEdit = props => {
       <h5 className="label">{i18n.t('common.item_plural')}</h5>
       {
         !readOnly &&
-        <button className="btn btn-s btn-of-light-xs btn-add-item"
+        <button className="btn btn-s btn-add-item"
                 aria-disabled={!canAddItem}
                 onClick={() => createCategoryLevelItem(category, level, parentItem)}>
           <span className="icon icon-plus icon-12px icon-left"/>

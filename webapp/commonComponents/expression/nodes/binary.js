@@ -16,14 +16,14 @@ const BinaryOperand = ({ type, node, ...props }) => {
   return (
     <React.Fragment>
       <button
-        className={`btn btn-s btn-of-light btn-switch-operand${!Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
+        className={`btn btn-s btn-switch-operand${!Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
         onClick={() => onChange(
           R.assoc(type, Expression.newIdentifier(), node)
         )}>
         Var
       </button>
       <button
-        className={`btn btn-s btn-of-light btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
+        className={`btn btn-s btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
         aria-disabled={isLeft && isBoolean}
         onClick={() => {
           const nodeUpdate = isLeft && !isBoolean ?

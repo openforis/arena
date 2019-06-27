@@ -177,7 +177,7 @@ const NodeSelect = props => {
       {
         canEditRecord &&
         <React.Fragment>
-          <button className="btn btn-s btn-of-light-xs"
+          <button className="btn btn-s"
                   style={{ marginLeft: '5px' }}
                   aria-disabled={!selectedNode}
                   onClick={() => {
@@ -189,7 +189,7 @@ const NodeSelect = props => {
             <span className="icon icon-bin icon-12px icon-left"/>
             {i18n.t('common.delete')}
           </button>
-          <button className="btn btn-s btn-of-light-xs"
+          <button className="btn btn-s"
                   style={{ marginLeft: '50px' }}
                   onClick={() => {
                     const entity = Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)

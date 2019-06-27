@@ -20,7 +20,7 @@ $borderRadius: 2px;
   width: auto;
   flex-direction: column;
   pointer-events: auto;
-  background-color: rgba($brown, 0.9);
+  background-color: $grey;
   background-clip: padding-box;
   border: none;
   border-radius: $borderRadius;

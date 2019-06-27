@@ -25,7 +25,7 @@ const AttributeSelector = (props) => {
   const isActive = R.includes(nodeDefUuid, nodeDefUuidsAttributes)
 
   return isVisible &&
-    <button className={`btn btn-s btn-of-light btn-node-def${isActive ? ' active' : ''}`}
+    <button className={`btn btn-s btn-node-def${isActive ? ' active' : ''}`}
             onClick={() => onToggleAttribute(nodeDefUuid)}
             disabled={!canSelectAttributes}>
       {NodeDef.getLabel(nodeDef, lang)}

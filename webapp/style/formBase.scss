@@ -63,6 +63,7 @@ button, .btn {
   font-weight: 400;
   border: 1px solid $greyBorder;
   text-decoration: none;
+  background-color: white;
 
   &:hover {
     cursor: pointer;
@@ -81,7 +82,7 @@ button, .btn {
   display: inline-block; /* For IE11/ MS Edge bug */
   pointer-events: none;
   text-decoration: none;
-  opacity: .8;
+  opacity: .5;
 }
 
 .btn-s {
@@ -94,48 +95,16 @@ button, .btn {
   font-size: 0.8rem;
 }
 
-.btn-of {
-  @include of;
-  text-transform: uppercase;
-  border-color: $ofBorderColor;
-}
-
-.btn-of-link {
-  border: none !important;
-  border-bottom: 1px solid transparent !important;
-  border-bottom-right-radius: 10% 2%;
-  border-bottom-left-radius: 80% 10%;
-
-  &:hover {
-    background-color: transparent;
-    border-bottom: 1px solid rgba(222, 220, 203, 0.6) !important;
-  }
-}
-
-.btn-of-light {
-  @extend .btn-of;
-  border-color: $ofBorderColorLight;
-}
-
-.btn-of-light-s {
-  @extend .btn-of;
-  border-color: $ofBorderColorLightS;
-}
-
-.btn-of-light-xs {
-  @extend .btn-of;
-  border-color: $ofBorderColorLightXs;
-}
-
 .btn-transparent {
   border: none !important;
 }
 
 .btn-danger {
-  background-color: rgba($red, 0.5);
-  border-color: rgba($red, 0.3) !important;
+  color: white;
+  background-color: $red;
+  border-color: rgba($red, 0.5) !important;
 
   &:hover {
-    background-color: rgba($red, 0.8) !important;
+    background-color: rgba($red, 0.9) !important;
   }
 }

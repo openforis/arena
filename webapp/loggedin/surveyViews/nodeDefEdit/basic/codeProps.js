@@ -68,7 +68,7 @@ const CodeProps = (props) => {
                     validation={Validator.getFieldValidation(propKeys.categoryUuid)(validation)}
                     selection={category}
                     onChange={putCategoryProp}/>
-          <button className="btn btn-s btn-of-light-xs"
+          <button className="btn btn-s"
                   style={{ justifySelf: 'center' }}
                   onClick={async () => {
                     putCategoryProp(await createCategory())
@@ -78,7 +78,7 @@ const CodeProps = (props) => {
             <span className="icon icon-plus icon-12px icon-left"/>
             ADD
           </button>
-          <button className="btn btn-s btn-of-light-xs"
+          <button className="btn btn-s"
                   style={{ justifySelf: 'center' }}
                   onClick={() => toggleCategoryEdit(true)}>
             <span className="icon icon-list icon-12px icon-left"/>

@@ -18,7 +18,7 @@ $purple: #231133;
 $green: #84ac67;
 $greenLight: #f0f2e7;
 //$yellow: #debf32;
-$yellow: #d6c990;
+$yellow: #fee997;
 $yellowDark: #2c2c2b;
 $yellowOpaque: #7d785f;
 $grey: #edecea;
@@ -49,8 +49,3 @@ $ofBorderColorLightXs: rgba($white, .1) !important;
 $shadow1: 0 0 4px rgba($black, .2);
 $shadow2: 0 0 8px rgba($black, .2);
 $shadow3: 0 0 8px 1px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.1);
-
-@mixin of() {
-  border-radius: $ofBorderRadius;
-  border: $ofBorder;
-}

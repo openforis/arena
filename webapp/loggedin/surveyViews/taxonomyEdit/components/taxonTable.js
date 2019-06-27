@@ -54,24 +54,24 @@ const TaxonTable = props => {
     </div>
 
     <div className="paginator">
-      <button className="btn btn-of-light"
+      <button className="btn"
               aria-disabled={currentPage === 1}
               onClick={() => onPageChange(1)}>
         <span className="icon icon-backward2 icon-16px"/>
       </button>
-      <button className="btn btn-of-light"
+      <button className="btn"
               aria-disabled={currentPage === 1}
               onClick={() => onPageChange(currentPage - 1)}
               style={{transform: 'scaleX(-1)'}}>
         <span className="icon icon-play3 icon-16px"/>
       </button>
       <span className="page-count">{currentPage} / {totalPages}</span>
-      <button className="btn btn-of-light"
+      <button className="btn"
               aria-disabled={currentPage === totalPages}
               onClick={() => onPageChange(currentPage + 1)}>
         <span className="icon icon-play3 icon-16px"/>
       </button>
-      <button className="btn btn-of-light"
+      <button className="btn"
               aria-disabled={currentPage === totalPages}
               onClick={() => onPageChange(totalPages)}>
         <span className="icon icon-forward3 icon-16px"/>

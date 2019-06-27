@@ -84,7 +84,7 @@ const TaxonomyEdit = props => {
       }
 
       <div style={{ justifySelf: 'center' }}>
-        <button className="btn btn-of-light"
+        <button className="btn"
                 onClick={() => setTaxonomyForEdit(null)}>
           {i18n.t('common.done')}
         </button>

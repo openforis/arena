@@ -53,7 +53,7 @@ const CategoryEdit = props => {
 
         {
           !readOnly &&
-          <button className="btn btn-s btn-of-light-xs btn-add-level"
+          <button className="btn btn-s btn-add-level"
                   onClick={() => createCategoryLevel(category)}
                   aria-disabled={levels.length === 5}>
             <span className="icon icon-plus icon-16px icon-left"/>
@@ -63,7 +63,7 @@ const CategoryEdit = props => {
       </div>
 
       <div style={{ justifySelf: 'center' }}>
-        <button className="btn btn-of-light"
+        <button className="btn"
                 onClick={() => setCategoryForEdit(null)}>
           {i18n.t('common.done')}
         </button>

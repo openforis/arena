@@ -58,7 +58,7 @@ const NodeDefReportItem = props => {
             </div>
             <div>
               <button
-                className="btn btn-of-light btn-edit"
+                className="btn btn-edit"
                 onClick={() => { onNodeDefEdit(nodeDef) }}>
                 {i18n.t('common.edit')}
               </button>
