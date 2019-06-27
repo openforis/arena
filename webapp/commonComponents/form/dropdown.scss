@@ -21,7 +21,7 @@
   z-index: $zIndex20Dropdown;
   display: grid;
   grid-template-columns: 1rem 1fr 1rem;
-  background-color: rgba($blueLightFocus, .3);
+  background-color: $blueLightFocus;
   padding: 1rem 0;
   justify-content: center;
 
@@ -37,7 +37,7 @@
 
   &:hover, &:focus {
     cursor: pointer;
-    background-color: rgba($blueLightFocus, .5);
+    background-color: rgba($blueLight, .5);
     outline: none
   }
 }

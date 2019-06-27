@@ -33,7 +33,7 @@ input {
   background-color: transparent;
 
   &:not([readonly]):focus {
-    background-color: rgba($blueLightFocus, 0.3);
+    background-color: $blueLightFocus;
   }
 
   &[readonly] {
