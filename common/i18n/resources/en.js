@@ -100,8 +100,10 @@ module.exports = {
       deleteWarning: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
       confirmName: 'Enter this survey’s name to confirm:',
     },
-    surveyListTable: {
+    surveyList: {
       status: 'Status',
+      active: 'Active',
+      activate: 'Activate'
     },
     surveyCreate: {
       createSurvey: 'Create Survey',

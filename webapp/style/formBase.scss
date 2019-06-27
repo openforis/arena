@@ -70,6 +70,11 @@ button, .btn {
     background-color: $greenLight;
     font-weight: 400;
   }
+
+  &.active {
+    background-color: rgba($orange, .35);
+    pointer-events: none;
+  }
 }
 
 *[aria-disabled="true"] {
@@ -94,12 +99,6 @@ button, .btn {
   @include of;
   text-transform: uppercase;
   border-color: $ofBorderColor;
-
-  &.active {
-    //border-color: transparent !important;
-    background-color: rgba($yellow, .35) !important;
-    pointer-events: none;
-  }
 }
 
 .btn-of-link {
