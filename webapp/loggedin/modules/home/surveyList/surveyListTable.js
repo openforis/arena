@@ -1,12 +1,9 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 
 import useI18n from '../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../common/survey/survey'
 import { getRelativeDate, compareDatesDesc } from '../../../../../common/dateUtils'
-
-import { appModuleUri, homeModules } from '../../../appModules'
 
 const SurveyRow = ({ surveyInfoRow, surveyInfo, setActiveSurvey }) => {
   const surveyId = surveyInfoRow.id
@@ -41,10 +38,6 @@ const SurveyListTable = (props) => {
       <div className="table__header">
         <h5>
           Surveys
-          <Link
-            to={appModuleUri(homeModules.surveyNew)} className="btn btn-xs btn-of-light">
-            <span className="icon icon-plus icon-12px icon-left" /> {i18n.t('homeView.surveyListTable.addNewSurvey')}
-          </Link>
         </h5>
       </div>
 

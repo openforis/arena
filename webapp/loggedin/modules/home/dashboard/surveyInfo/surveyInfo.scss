@@ -1,15 +1,9 @@
 @import "../../../../../style/vars";
 
 .home-dashboard__survey-info {
-  grid-column: 1 / span 2;
   display: grid;
   align-content: end;
   padding-bottom: 1rem;
-
-  .btn {
-    padding: .5rem;
-    font-size: .8rem;
-  }
 }
 
 .home-dashboard__survey-info-container {

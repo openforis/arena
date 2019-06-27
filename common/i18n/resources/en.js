@@ -88,6 +88,7 @@ module.exports = {
   },
 
   homeView: {
+    createSurvey: 'Create Survey',
     surveyInfo: {
       publish: 'Publish',
       viewInfo: 'View info',
@@ -100,7 +101,6 @@ module.exports = {
       confirmName: 'Enter this survey’s name to confirm:',
     },
     surveyListTable: {
-      addNewSurvey: 'Add a new Survey',
       status: 'Status',
     },
     surveyCreate: {

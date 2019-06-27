@@ -58,7 +58,7 @@ const AppSideBarModule = (props) => {
 
       <ModuleLink
         module={module}
-        disabled={!isModuleHome}
+        disabled={active || !isModuleHome}
         showLabel={sideBarOpened}
         pathname={pathname}
       />

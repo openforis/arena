@@ -67,7 +67,8 @@ button, .btn {
 
   &:hover {
     cursor: pointer;
-    background-color: rgba($white, 0.25);
+    background-color: $greenLight;
+    font-weight: 400;
   }
 }
 
