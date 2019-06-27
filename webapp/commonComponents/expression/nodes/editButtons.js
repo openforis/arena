@@ -37,7 +37,7 @@ const EditButtons = (props) => {
         </button>
       </div>
 
-      <button className="btn btn-s btn-delete btns__last"
+      <button className="btn btn-s btn-danger btns__last"
               onClick={onDelete}
               aria-disabled={!canDelete}>
         <span className="icon icon-bin icon-10px"/>

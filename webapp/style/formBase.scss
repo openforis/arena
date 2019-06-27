@@ -66,9 +66,12 @@ button, .btn {
   background-color: white;
 
   &:hover {
-    cursor: pointer;
     background-color: $greenLight;
     font-weight: 400;
+
+    &:not([aria-disabled="true"]) {
+      cursor: pointer;
+    }
   }
 
   &.active {
