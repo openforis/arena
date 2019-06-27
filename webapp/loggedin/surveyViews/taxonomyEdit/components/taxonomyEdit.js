@@ -25,7 +25,7 @@ import { canEditSurvey } from '../../../../../common/auth/authManager'
 const TaxonomyEdit = props => {
 
   const {
-    surveyId, taxonomy, taxaCurrentPage, taxaTotalPages, taxaPerPage, taxa,
+    surveyId, taxonomy, taxaCurrentPage, taxaTotalPages, taxaTotal, taxaPerPage, taxa,
     loadTaxa, putTaxonomyProp, uploadTaxonomyFile, setTaxonomyForEdit,
     readOnly,
   } = props
@@ -79,8 +79,9 @@ const TaxonomyEdit = props => {
                         taxa={taxa}
                         currentPage={taxaCurrentPage}
                         totalPages={taxaTotalPages}
+                        taxaTotal={taxaTotal}
                         rowsPerPage={taxaPerPage}
-                        onPageChange={(page) => loadTaxa(taxonomy, page)}/>
+                        onPageChange={(offset) => loadTaxa(taxonomy, offset)}/>
       }
 
       <div style={{ justifySelf: 'center' }}>
@@ -104,6 +105,7 @@ const mapStateToProps = state => {
     taxonomy: TaxonomyEditState.getTaxonomy(state),
     taxaCurrentPage: TaxonomyEditState.getTaxaCurrentPage(state),
     taxaTotalPages: TaxonomyEditState.getTaxaTotalPages(state),
+    taxaTotal: TaxonomyEditState.getTaxaTotal(state),
     taxaPerPage: TaxonomyEditState.getTaxaPerPage(state),
     taxa: TaxonomyEditState.getTaxa(state),
     activeJob,

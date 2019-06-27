@@ -75,19 +75,21 @@ export const initTaxaList = taxonomy => async (dispatch, getState) => {
   ])
 
   dispatchTaxonomyEditPropsUpdate(dispatch, {
-    taxaCurrentPage: 1,
     taxaTotalPages: Math.ceil(count / ROWS_PER_PAGE),
+    taxaTotal: count,
     taxa,
   })
 }
 
-export const loadTaxa = (taxonomy, page = 1) => async (dispatch, getState) => {
-  dispatchTaxonomyEditPropsUpdate(dispatch, { taxaCurrentPage: page, taxa: [] })
+export const loadTaxa = (taxonomy, offset) => async (dispatch, getState) => {
 
   const state = getState()
   const surveyId = SurveyState.getSurveyId(state)
   const rowsPerPage = TaxonomyEditState.getTaxaPerPage(state)
-  const taxa = await fetchTaxa(surveyId, Taxonomy.getUuid(taxonomy), (page - 1) * rowsPerPage, rowsPerPage)
+
+  dispatchTaxonomyEditPropsUpdate(dispatch, { taxaCurrentPage: Math.floor(offset / rowsPerPage), taxa: [] })
+
+  const taxa = await fetchTaxa(surveyId, Taxonomy.getUuid(taxonomy), offset, rowsPerPage)
 
   dispatchTaxonomyEditPropsUpdate(dispatch, { taxa })
 }
