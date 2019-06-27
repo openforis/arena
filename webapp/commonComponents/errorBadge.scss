@@ -1,6 +1,7 @@
 @import "../style/vars";
 
 .error-badge {
-  background-color: $redDark !important;
+  background-color: $red !important;
   display: block !important;
+  color: white;
 }

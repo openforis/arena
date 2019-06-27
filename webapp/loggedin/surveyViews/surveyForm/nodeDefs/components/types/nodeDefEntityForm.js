@@ -197,7 +197,7 @@ const NodeSelect = props => {
                     onChange(Node.getUuid(entity))
                   }}
                   aria-disabled={!canAddNode}>
-            <span className="icon icon-plus icon-16px icon-left"/>
+            <span className="icon icon-plus icon-12px icon-left"/>
             {i18n.t('common.add')}
           </button>
         </React.Fragment>
