@@ -1,5 +1,7 @@
 @import "../../../../style/vars";
 
+$borderColor: $greyBorder;
+
 .category-edit {
   display: grid;
   grid-template-rows: 5rem 1fr 5rem;
@@ -23,12 +25,12 @@
   display: grid;
   align-content: start;
   padding: .5rem 1rem;
-  border-right: 1px dashed rgba($white, 0.35);
-  border-top: 1px dashed rgba($white, 0.35);
-  border-bottom: 1px dashed rgba($white, 0.35);
+  border-right: 1px dashed $borderColor;
+  border-top: 1px dashed $borderColor;
+  border-bottom: 1px dashed $borderColor;
 
   &:first-child {
-    border-left: 1px dashed rgba($white, 0.35);
+    border-left: 1px dashed $borderColor;
   }
 }
 
@@ -50,6 +52,7 @@
   .label {
     text-transform: uppercase;
   }
+
   .btn-add-item {
     margin-left: 1rem;
   }
@@ -62,7 +65,7 @@
 
 .category-edit__item {
   position: relative;
-  border-bottom: 1px dotted rgba($white, 0.35);
+  border-bottom: 1px dotted $borderColor;
   display: grid;
   align-content: center;
   grid-template-columns: 35px 80px 1fr;
@@ -71,13 +74,13 @@
 
   &.active {
     grid-template-columns: 1fr;
-    border: 2px dashed rgba($white, 0.35);
-    background-color: rgba($white, 0.1);
+    border: 2px dashed $borderColor;
+    background-color: rgba($grey, 0.4);
     padding: 1.5rem 0;
   }
 
   &:not(.active):hover {
-    background-color: rgba($white, .15);
+    background-color: rgba($greenLight, .6);
     cursor: pointer;
   }
 
