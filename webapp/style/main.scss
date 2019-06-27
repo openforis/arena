@@ -73,10 +73,11 @@ body {
 }
 
 .badge-of {
-  background-color: rgba($white, .2);
   padding: .15rem .3rem;
-  border-radius: $ofBorderRadius;
-  font-size: .7rem;
+  font-size: .6rem;
+  background-color: $blueLight;
+  color: white;
+  font-weight: 600;
 }
 
 .no-border {
