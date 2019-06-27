@@ -67,10 +67,6 @@ class AppRouterSwitch extends React.Component {
         ? (
           <React.Fragment>
 
-            <div className={`main__bg1${isLogin ? ' login' : ''}`}/>
-            <div className={`main__bg2${isLogin ? ' login' : ''}`}/>
-            <div className="main__bg-overlay"/>
-
             {
               systemError
                 ? (
