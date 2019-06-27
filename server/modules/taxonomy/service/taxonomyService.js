@@ -12,7 +12,7 @@ const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   const taxonomy = await TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft)
   const vernacularLanguageCodes = Taxonomy.getVernacularLanguageCodes(taxonomy)
 
-  const csvStream = fastcsv.createWriteStream({ headers: true })
+  const csvStream = fastcsv.format({ headers: true })
   csvStream.pipe(output)
 
   const fixedHeaders = [
