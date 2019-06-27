@@ -32,9 +32,8 @@ input {
   padding: 20px 5px;
   background-color: transparent;
 
-  &:not([readonly]):focus,
-  &:not([readonly]):hover {
-    background-color: rgba($white, 0.15);
+  &:not([readonly]):focus {
+    background-color: rgba($blueLightFocus, 0.3);
   }
 
   &[readonly] {

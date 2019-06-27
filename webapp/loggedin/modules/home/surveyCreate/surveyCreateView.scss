@@ -1,7 +1,6 @@
 .home-survey-create {
   display: grid;
-  grid-template-columns: repeat(4, .25fr);
+  grid-template-columns: repeat(5, .2fr);
   align-items: center;
-  grid-column-gap: 2rem;
-  padding: 0 10rem;
+  grid-column-gap: .5rem;
 }

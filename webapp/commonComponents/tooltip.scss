@@ -46,21 +46,21 @@
   }
 
   .btn-checkbox .icon {
-    border: 2px solid rgba(220, 66, 66, 0.6);
+    border: 2px solid rgba($red, 0.6);
   }
 
   .message {
-    background-color: $redDark !important;
+    background-color: $red !important;
   }
 
   &:hover {
     .message {
       color: white !important;
-      border: 1px solid $redDark !important;
+      border: 1px solid $red !important;
       opacity: .97;
 
       &:after {
-        border-color: transparent transparent $redDark transparent !important;
+        border-color: transparent transparent $red transparent !important;
       }
     }
   }

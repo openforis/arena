@@ -6,7 +6,7 @@
   //align-self: stretch;
 
   span.icon {
-    color: $whiteLight;
+    color: $black;
     justify-self: end;
     align-self: center;
 
@@ -16,17 +16,12 @@
   }
 }
 
-.dropdown-of {
-  @include of;
-  border-color: $ofBorderColorLight;
-}
-
 .dropdown__list {
   position: fixed;
   z-index: $zIndex20Dropdown;
   display: grid;
   grid-template-columns: 1rem 1fr 1rem;
-  background-color: rgba($brown, .95);
+  background-color: rgba($blueLightFocus, .3);
   padding: 1rem 0;
   justify-content: center;
 
@@ -39,11 +34,10 @@
   padding: .4rem 0;
   grid-column: 2;
   text-align: center;
-  color: rgba($white, 0.95);
 
   &:hover, &:focus {
     cursor: pointer;
-    background-color: rgba($white, .15);
+    background-color: rgba($blueLightFocus, .5);
     outline: none
   }
 }
