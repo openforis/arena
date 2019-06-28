@@ -115,7 +115,7 @@
   //border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
 
   input {
-    border-bottom: 5px dotted $greyBorder;
+    border-bottom: 2px solid rgba($greyBorder, .7);
     text-align: center;
   }
 
@@ -125,12 +125,20 @@
     justify-self: center;
     grid-row-gap: .5rem;
 
+    .btn-login {
+      border: none;
+      text-transform: uppercase;
+      font-size: .8rem;
+    }
+
     .btn-forgot-pwd {
       border: none !important;
       border-bottom: 1px solid transparent !important;
       border-bottom-right-radius: 10% 2%;
       border-bottom-left-radius: 80% 10%;
       justify-self: end;
+      background-color: transparent;
+      color: white;
 
       &:hover {
         background-color: transparent;

@@ -28,7 +28,7 @@ class LoginForm extends React.Component {
             }
             <div className="buttons">
               <button type="button"
-                      className="btn"
+                      className="btn btn-login"
                       onClick={() => login(this.refs.username.value, this.refs.password.value)}>
                 Login
               </button>

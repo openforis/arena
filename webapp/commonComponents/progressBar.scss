@@ -22,8 +22,8 @@
 
   &.running {
     .filler {
-      border: 1px solid rgba($blue3, .4);
-      background: rgba($blue3, .8);
+      border: 1px solid $blueLightActive;
+      background: $blueLightActive;
     }
   }
 
