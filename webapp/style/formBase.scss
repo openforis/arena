@@ -75,7 +75,7 @@ button, .btn {
   }
 
   &.active {
-    background-color: rgba($orange, .35);
+    background-color: $blueLightActive;
     pointer-events: none;
   }
 }
