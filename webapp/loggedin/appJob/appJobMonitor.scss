@@ -18,7 +18,7 @@
   .header {
     font-weight: 600;
     text-transform: uppercase;
-    border-bottom: 1px solid rgba($white, .8);
+    border-bottom: 1px solid $greyBorder;
 
     > * {
       padding: .3rem .5rem;
@@ -31,7 +31,7 @@
   }
 
   .row {
-    border-bottom: 1px solid rgba($white, .3);
+    border-bottom: 1px solid rgba($greyBorder, .8);
 
     > * {
       padding: .3rem .5rem;
@@ -39,12 +39,12 @@
     }
 
     .item {
-      border-left: 1px solid rgba($white, .3);
+      border-left: 1px solid rgba($greyBorder, .8);
     }
 
     .item-error {
-      border-left: 1px solid rgba($white, .3);
-      border-right: 1px solid rgba($white, .3);
+      border-left: 1px solid rgba($greyBorder, .8);
+      border-right: 1px solid rgba($greyBorder, .8);
     }
   }
 

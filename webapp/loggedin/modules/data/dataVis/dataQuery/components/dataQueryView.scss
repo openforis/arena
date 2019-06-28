@@ -35,14 +35,13 @@ $rowHeaderHeight: 45px;
   }
 
   &.edit {
-    border: 3px dashed rgba($white, 0.2);
-    background-color: rgba($white, 0.02);
+    border: 3px dashed $greyBorder;
+    background-color: rgba($grey, 0.2);
   }
 
   .table__rows {
     overflow-y: hidden;
     overflow-x: auto;
-    border: 1px solid rgba($white, 0.2);
     height: calc(100% - #{$dataTableMarginTop})
   }
 
