@@ -12,7 +12,7 @@ $sidebarBtnMargin: 4px;
   border-right: 1px solid $blueLight;
 
   display: grid;
-  grid-template-rows: $headerHeight .95fr .05fr;
+  grid-template-rows: $headerHeight 1fr 80px 40px;
   align-items: start;
 
   //transition: $sidebarTransition;
