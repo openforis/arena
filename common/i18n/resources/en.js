@@ -110,6 +110,7 @@ module.exports = {
       importFromCollect: 'Import from Collect',
     },
     collectImportReport: {
+      path: 'Path',
       type: 'Type',
       expression: 'Expression',
       messages: 'Messages',
