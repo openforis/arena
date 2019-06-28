@@ -42,11 +42,6 @@
     .btn {
       transform: rotate(-90deg);
       padding: .3rem;
-      background-color: rgba($white, .2);
-
-      &:hover {
-        background-color: rgba($white, .5);
-      }
     }
 
     &.highlight {

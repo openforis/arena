@@ -21,7 +21,7 @@ const AddNodeDefButtons = ({ addNodeDef }) => {
       <div/>
       <div/>
       <div/>
-      <div className="title-of">
+      <div>
         <span className="icon icon-plus icon-left"/> {i18n.t('common.add')}
       </div>
 

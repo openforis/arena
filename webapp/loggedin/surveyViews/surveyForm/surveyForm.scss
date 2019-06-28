@@ -1,7 +1,6 @@
 @import "../../../style/vars";
 
-$tableBorderColor: rgba($white, .4);
-$tableBorder: 1px solid $tableBorderColor;
+$tableBorder: 1px solid $greyBorder;
 $tableRowHeaderHeight: 40px;
 
 .survey-form {
@@ -114,12 +113,6 @@ $tableRowHeaderHeight: 40px;
     left: 1.3rem;
   }
 
-  .title-of {
-    text-align: right;
-    padding-bottom: .1rem;
-    opacity: .8;
-  }
-
   .btn-add-node-def {
     background-color: rgba($green, 0.3);
 
@@ -158,7 +151,7 @@ $tableRowHeaderHeight: 40px;
 }
 
 .node-def__not-applicable {
-  background-color: rgba($white, 0.15);
+  background-color: rgba($greyBorder, 0.7);
   opacity: .6;
 }
 
@@ -240,21 +233,15 @@ $tableRowHeaderHeight: 40px;
   height: calc(100% - 40px);
   overflow-x: auto;
   overflow-y: hidden;
-  //justify-self: center;
-  //display: grid;
-  //justify-items: center;
 }
 
 .node-def__table-row-header {
   position: absolute;
   display: flex;
   height: $tableRowHeaderHeight;
-  //width: 100%;
   background-color: rgba($blueLight, 0.3);
-  //border: 1px solid $tableBorderColor;
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
-  //top: 4px;
 
   .react-grid-item {
     display: grid;
@@ -265,7 +252,6 @@ $tableRowHeaderHeight: 40px;
 
 .node-def__table-column-header {
   display: grid;
-  //height: $tableRowHeaderHeight;
 
   label {
     justify-self: center;

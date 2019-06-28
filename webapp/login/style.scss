@@ -83,7 +83,7 @@
 }
 
 .of-letter {
-  color: $whiteLight;
+  color: $grey;
   font-size: 70px;
   font-weight: 200;
   text-align: center;
@@ -115,7 +115,7 @@
   //border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
 
   input {
-    border-bottom: 5px dotted $whiteLight;
+    border-bottom: 5px dotted $greyBorder;
     text-align: center;
   }
 
