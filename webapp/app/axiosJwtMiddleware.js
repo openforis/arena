@@ -6,7 +6,7 @@ const requestHandler = async request => {
   try {
     const session = await Auth.currentSession()
     const jwtToken = session.getAccessToken().jwtToken
- 
+
     request.headers['Authorization'] = `Bearer ${jwtToken}`
     return request
   } catch (err) {

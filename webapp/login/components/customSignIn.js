@@ -1,10 +1,37 @@
 import React from 'react'
 import { SignIn } from 'aws-amplify-react'
+import { Hub } from 'aws-amplify'
 
-export class CustomSignIn extends SignIn {
+import { withRouter } from 'react-router-dom'
+
+// import axios from 'axios'
+
+import { appModuleUri } from '../../loggedin/appModules'
+
+class CustomSignIn extends SignIn {
+
   constructor (props) {
-    super(props);
-    this._validAuthStates = ['signIn', 'signedOut', 'signedUp'];
+    super(props)
+    this._validAuthStates = ['signIn', 'signedOut', 'signedUp']
+  }
+
+  // onAuthEvent (payload) {
+  //   // ... your implementation
+  // }
+
+  componentDidMount () {
+    Hub.listen('auth', async data => {
+      // const { payload } = data
+      // const { data: { user: serverUser, survey } } = await axios.get('/auth/user')
+
+      // return { user: serverUser, survey }
+      // this.onAuthEvent(payload)
+      // console.log(payload)
+      // console.log('A new auth event has happened: ', data.payload.data.username + ' has ' + data.payload.event)
+
+      // console.log(appModuleUri())
+      this.props.history.push(appModuleUri())
+    })
   }
 
   showComponent (theme) {
@@ -65,3 +92,5 @@ export class CustomSignIn extends SignIn {
     )
   }
 }
+
+export default withRouter(CustomSignIn)

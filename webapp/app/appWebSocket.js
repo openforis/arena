@@ -6,7 +6,7 @@ export const openSocket = () => {
   socket = io(window.location.origin)
 }
 
-export const on = (eventName, eventHandler) => socket.on(eventName, eventHandler)
+export const on = (eventName, eventHandler) => socket && socket.on(eventName, eventHandler)
 
 export const closeSocket = () => {
   if (socket) {

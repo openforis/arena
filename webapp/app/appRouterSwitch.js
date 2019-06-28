@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router'
 import { withRouter, Switch, Route } from 'react-router-dom'
 
 import DynamicImport from '../commonComponents/dynamicImport'
@@ -14,8 +15,10 @@ import { throwSystemError, initApp } from './actions'
 
 import { getLocationPathname } from '../utils/routerUtils'
 
-import { Authenticator } from 'aws-amplify-react/dist/auth'
-import { CustomSignIn } from '../login/components/customSignIn'
+import { Authenticator } from 'aws-amplify-react/dist/Auth'
+import CustomSignIn from '../login/components/customSignIn'
+
+// import { appModuleUri } from '../loggedin/appModules'
 
 const loginUri = '/'
 
@@ -79,11 +82,13 @@ const AppRouterSwitch = props => {
             : (
               <Authenticator hideDefault={true}>
                 <CustomSignIn override={'SignIn'}/>
+                {/* <AppView location="props.history.location" history={props.history} /> */}
+                {/* <Redirect to={appModuleUri()} /> */}
                 <Switch>
-                  <Route
+                  {/* <Route
                     exact path="/"
                     component={LoginView}
-                  />
+                  /> */}
                   <Route
                     path="/app"
                     render={props => (
