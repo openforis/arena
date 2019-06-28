@@ -42,7 +42,7 @@ const RecordRow = ({ idx, offset, record, style, nodeDefKeys, canEdit }) => (
     <div>{record.ownerName}</div>
     <div>{record.step}</div>
     <div>
-      <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn btn-s">
+      <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn-edit">
         <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}/>
       </Link>
     </div>

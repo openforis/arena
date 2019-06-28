@@ -36,10 +36,6 @@ $borderColor: $greyBorder;
 .category-edit__level-header {
   display: flex;
   justify-content: space-between;
-
-  .label {
-    text-transform: uppercase;
-  }
 }
 
 .category-edit__level-items-header {
@@ -47,10 +43,6 @@ $borderColor: $greyBorder;
   justify-content: center;
   margin-top: 3rem;
   align-items: center;
-
-  .label {
-    text-transform: uppercase;
-  }
 
   .btn-add-item {
     margin-left: 1rem;
