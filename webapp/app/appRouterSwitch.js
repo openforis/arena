@@ -28,7 +28,7 @@ const AppRouterSwitch = props => {
 
     const throwError = (error) => {
       throwSystemError(error)
-      AppWebSocket.closeSocket()
+      closeWebSocket()
     }
 
     AppWebSocket.on(WebSocketEvents.connectError, error => throwError(error.stack))
@@ -51,9 +51,9 @@ const AppRouterSwitch = props => {
       // Before sending  get request in app/actions/initApp has been sent, user is
       // undefined, after the request is null if not logged in
       props.history.push(loginUri)
-      openWebSocket()
-    } else {
       closeWebSocket()
+    } else {
+      openWebSocket()
     }
   }, [user])
 
