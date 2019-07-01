@@ -1,7 +1,6 @@
 const jwt = require('../jwt')
 
 const UserService = require('../../modules/user/service/userService')
-const UnauthorizedError = require('../../utils/unauthorizedError')
 
 module.exports = async (req, res, next) => {
   const bearerPrefix = 'Bearer '
@@ -16,18 +15,12 @@ module.exports = async (req, res, next) => {
   } else {
     const jwtToken = authorizationHeader && authorizationHeader.substr(bearerPrefix.length)
 
-    await jwt.validate(jwtToken, async success => {
-      const decoded = jwt.decode(jwtToken)
+    const decoded = await jwt.validate(jwtToken)
+    const username = decoded.username
+    const user = await UserService.findUserByUsername(username)
 
-      const username = decoded.payload.username
-      const user = await UserService.findUserByUsername(username)
+    req.user = user
 
-      req.user = user
-
-      next()
-    },
-    fail => {
-      throw new UnauthorizedError('unknown')
-    })
+    next()
   }
 }
