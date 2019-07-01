@@ -3,7 +3,7 @@
 .survey-form__node-def-nav {
   &.level0 {
     height: calc(100vh - 70px);
-    overflow-y: scroll;
+    overflow-y: auto;
     background-color: rgba($grey, .6);
     border-left: 1px solid $greyBorder;
     border-top: 1px solid $greyBorder;
@@ -28,10 +28,12 @@
 
   .btn-toggle {
     align-self: flex-start;
+    margin-top: 3px;
   }
 
   .btn-node-def {
     width: 100%;
+    font-size: .85rem;
   }
 }
 

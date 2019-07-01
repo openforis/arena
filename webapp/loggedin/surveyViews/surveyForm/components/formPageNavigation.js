@@ -1,6 +1,6 @@
 import './formPageNavigation.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
 import useI18n from '../../../../commonComponents/useI18n'
@@ -22,6 +22,7 @@ const NavigationButton = (props) => {
     setFormActivePage,
   } = props
 
+  const [showChildren, setShowChildren] = useState(level === 0)
   const i18n = useI18n()
 
   const outerPageChildDefs = childDefs ? filterOuterPageChildren(childDefs) : []
@@ -36,7 +37,8 @@ const NavigationButton = (props) => {
           outerPageChildDefs.length > 0 ?
             (
               <button className="btn-xs btn-toggle"
-                      style={{ transform: `rotate(90deg)` }}>
+                      style={{ transform: `rotate(${showChildren ? '90' : '0'}deg)` }}
+                      onClick={() => setShowChildren(!showChildren)}>
                 <span className="icon icon-play3 icon-12px"/>
               </button>
             )
@@ -53,7 +55,7 @@ const NavigationButton = (props) => {
       </div>
 
       {
-        outerPageChildDefs.map(child =>
+        showChildren && outerPageChildDefs.map(child =>
           <FormPageNavigation
             key={NodeDef.getUuid(child)}
             level={level + 1}
