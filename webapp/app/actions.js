@@ -4,6 +4,8 @@ import * as AppState from './appState'
 
 import i18nFactory from '../../common/i18n/i18nFactory'
 
+import * as cognitoAuth from '../utils/cognitoAuth'
+
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
@@ -22,7 +24,8 @@ export const setLanguage = languageCode => async (dispatch) => {
 }
 
 export const logout = () => async dispatch => {
-  await axios.post('/auth/logout')
+  await cognitoAuth.logout()
+  // await axios.post('/auth/logout')
   dispatch({ type: appUserLogout })
 }
 

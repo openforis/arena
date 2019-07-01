@@ -91,6 +91,10 @@ export const authenticate = async (username, password) => {
   }
 }
 
+export const logout = () => {
+  Auth.signOut({ global: true })
+}
+
 export const getJwtToken = async () => {
   const session = await Auth.currentSession()
   return session.getAccessToken().jwtToken
