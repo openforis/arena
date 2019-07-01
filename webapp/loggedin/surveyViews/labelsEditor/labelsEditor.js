@@ -75,7 +75,7 @@ const LabelsEditor = props => {
         }
         {
           _canTogglePreview &&
-          <button className="btn-s btn-of-light-s btn-toggle-labels"
+          <button className="btn-s btn-toggle-labels"
                   style={{ justifySelf: 'end' }}
                   onClick={() => setPreview(!preview)}>
             <span className={`icon icon-${preview ? 'enlarge2' : 'shrink2'} icon-12px`}/>

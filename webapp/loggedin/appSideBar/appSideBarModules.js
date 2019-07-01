@@ -22,14 +22,15 @@ export const modulesHierarchy = [
   getModule(appModules.data, [dataModules.records, dataModules.dataVis]),
 ]
 
-const ModuleLink = ({ module, showLabel, disabled, className = '' }) => {
+const ModuleLink = ({ module, showLabel, disabled, pathname, className = '' }) => {
   const i18n = useI18n()
+  const active = module.uri === pathname
 
   return (
     <Link
-      className={`app-sidebar__module-btn text-uppercase ${className}`}
+      className={`app-sidebar__module-btn text-uppercase ${className}${active ? ' active' : ''}`}
       to={module.uri}
-      aria-disabled={disabled}>
+      aria-disabled={disabled || active}>
       {
         module.icon &&
         <span className={`icon icon-${module.icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`}></span>
@@ -57,8 +58,9 @@ const AppSideBarModule = (props) => {
 
       <ModuleLink
         module={module}
-        disabled={disabled}
+        disabled={active || !isModuleHome}
         showLabel={sideBarOpened}
+        pathname={pathname}
       />
 
       {
@@ -68,6 +70,7 @@ const AppSideBarModule = (props) => {
             module={childModule}
             disabled={disabled}
             showLabel={sideBarOpened}
+            pathname={pathname}
             className="app-sidebar__module-child-btn"
           />
         ))
@@ -81,21 +84,13 @@ const AppSideBarModules = ({ pathname, surveyInfo, sideBarOpened }) => (
   <div className="app-sidebar__modules">
     {
       modulesHierarchy.map((module, i) => (
-        <React.Fragment key={module.key}>
-
-          <AppSideBarModule
-            module={module}
-            pathname={pathname}
-            surveyInfo={surveyInfo}
-            sideBarOpened={sideBarOpened}
-          />
-
-          {
-            i !== modulesHierarchy.length - 1 &&
-            <div className="separator-of"/>
-          }
-
-        </React.Fragment>
+        <AppSideBarModule
+          key={module.key}
+          module={module}
+          pathname={pathname}
+          surveyInfo={surveyInfo}
+          sideBarOpened={sideBarOpened}
+        />
       ))
     }
 

@@ -21,7 +21,7 @@ const AddNodeDefButtons = ({ addNodeDef }) => {
       <div/>
       <div/>
       <div/>
-      <div className="title-of">
+      <div>
         <span className="icon icon-plus icon-left"/> {i18n.t('common.add')}
       </div>
 
@@ -32,7 +32,7 @@ const AddNodeDefButtons = ({ addNodeDef }) => {
 
             return (
               <button key={type}
-                      className="btn btn-s btn-of-light-s btn-add-node-def"
+                      className="btn btn-s btn-add-node-def"
                       onClick={() => addNodeDef(type, nodeDefProps)}>
                 {getNodeDefIconByType(type)}{type}
               </button>
@@ -78,7 +78,7 @@ class FormActions extends React.Component {
         {
           nodeDef &&
           <React.Fragment>
-            <button className="btn btn-s btn-of-light-xs no-border btn-toggle"
+            <button className="btn btn-s no-border btn-toggle"
                     onClick={() => setFormNodeDefAddChildTo(null)}>
               <span className="icon icon-cross icon-16px"/>
             </button>

@@ -23,7 +23,7 @@
     margin-top: 1rem;
     font-weight: 600;
     font-size: .8rem;
-    background-color: rgba($white, 0.15);
+    background-color: rgba($pink, .9);
     width: 100%;
     text-align: center;
     padding: .3rem 0;
@@ -49,15 +49,11 @@
     padding: 0;
     height: 30px;
     width: 30px;
-
-    .icon {
-      color: rgba($white, .7);
-    }
   }
 }
 
 .node-defs-selector__settings {
-  background-color: rgba($grey, .1);
+  background-color: rgba($grey, .5);
   display: flex;
   flex-wrap: wrap;
   padding: 1rem;
@@ -84,7 +80,7 @@
 }
 
 .node-defs-selector__entity-selector {
-  background-color: rgba($white, 0.15);
+  background-color: $pink;
   height: 30px;
 
   input {

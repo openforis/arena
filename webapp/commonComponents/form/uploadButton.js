@@ -32,14 +32,14 @@ class UploadButton extends React.Component {
           }
         }}/>
 
-      <button className="btn btn-of btn-upload"
+      <button className="btn"
               aria-disabled={disabled}
               onClick={() => {
                 // first reset current value, then trigger click event
                 this.fileInput.current.value = ''
                 this.fileInput.current.dispatchEvent(new MouseEvent('click'))
               }}>
-        <span className={`icon icon-upload2 icon-16px${showLabel ? ' icon-left' : ''}`}/>
+        <span className={`icon icon-upload2 icon-14px${showLabel ? ' icon-left' : ''}`}/>
         {showLabel && label}
       </button>
     </React.Fragment>

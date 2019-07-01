@@ -88,6 +88,7 @@ module.exports = {
   },
 
   homeView: {
+    createSurvey: 'Create Survey',
     surveyInfo: {
       publish: 'Publish',
       viewInfo: 'View info',
@@ -99,15 +100,17 @@ module.exports = {
       deleteWarning: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
       confirmName: 'Enter this survey’s name to confirm:',
     },
-    surveyListTable: {
-      addNewSurvey: 'Add a new Survey',
+    surveyList: {
       status: 'Status',
+      active: 'Active',
+      activate: 'Activate'
     },
     surveyCreate: {
       createSurvey: 'Create Survey',
       importFromCollect: 'Import from Collect',
     },
     collectImportReport: {
+      path: 'Path',
       type: 'Type',
       expression: 'Expression',
       messages: 'Messages',

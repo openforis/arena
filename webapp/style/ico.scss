@@ -53,6 +53,10 @@
   font-size: 16px !important;
 }
 
+.icon-18px {
+  font-size: 18px !important;
+}
+
 .icon-20px {
   font-size: 20px !important;
 }
@@ -82,8 +86,8 @@
 }
 
 .icon-reverse {
-  color: $grey2;
-  background-color: $white;
+  color: white;
+  background-color: $black;
   padding: 4px;
 }
 

@@ -1,7 +1,7 @@
 import React from 'react'
 
 const DownloadButton = ({href, label = 'Download', showLabel = true, disabled = false, title = null}) => (
-  <a className="btn btn-of btn-download"
+  <a className="btn btn-download"
      aria-disabled={disabled}
      target="_blank"
      href={href}

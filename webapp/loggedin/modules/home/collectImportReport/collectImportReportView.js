@@ -1,95 +1,56 @@
 import './collectImportReportView.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import CollectImportReportItem from '../../../../../common/survey/collectImportReportItem'
-
 import NodeDefEdit from '../../../surveyViews/nodeDefEdit/nodeDefEdit'
 import SurveyDefsLoader from '../../../surveyViews/surveyDefsLoader/surveyDefsLoader'
-import NodeDefReportItem from './nodeDefReportItem'
+import TableHeader from './components/tableHeader'
+import TableRows from './components/tableRows'
 
-import * as SurveyState from '../../../../survey/surveyState'
 import * as CollectImportReportState from './collectImportReportState'
 import * as NodeDefEditState from '../../../surveyViews/nodeDefEdit/nodeDefEditState'
 
-import { setNodeDefForEdit } from '../../../surveyViews/nodeDefEdit/actions'
-import { fetchCollectImportReportItems, updateCollectImportReportItem } from './actions'
+import { fetchCollectImportReportItems } from './actions'
 
-class CollectImportReportView extends React.Component {
+const CollectImportReportView = (props) => {
 
-  async componentDidMount () {
-    const { fetchCollectImportReportItems } = this.props
+  const {
+    reportItems, isNodeDefEditOpened,
+    fetchCollectImportReportItems
+  } = props
 
+  useEffect(() => {
     fetchCollectImportReportItems()
-  }
+  }, [])
 
-  handleNodeDefEdit (nodeDef) {
-    this.props.setNodeDefForEdit(nodeDef)
-  }
+  return R.isEmpty(reportItems)
+    ? null
+    : (
+      <SurveyDefsLoader
+        draft={true}
+        validate={true}>
 
-  render () {
-    const {
-      survey, reportItems,
-      editedNodeDef,
-      updateCollectImportReportItem,
-    } = this.props
-
-    if (R.isEmpty(reportItems)) {
-      return null
-    }
-
-    const nodeDefUuidGroups = R.groupBy(R.prop(CollectImportReportItem.keys.nodeDefUuid))(reportItems)
-
-    return <SurveyDefsLoader
-      draft={true}
-      validate={true}>
-      {
-        editedNodeDef &&
-        <NodeDefEdit/>
-      }
-
-      <div className="home-collect-import-report">
         {
-          R.pipe(
-            R.keys,
-            R.map(nodeDefUuid => {
-              const nodeDefItems = nodeDefUuidGroups[nodeDefUuid]
-              return (
-                <NodeDefReportItem
-                  key={nodeDefUuid}
-                  survey={survey}
-                  nodeDefUuid={nodeDefUuid}
-                  nodeDefItems={nodeDefItems}
-                  updateCollectImportReportItem={updateCollectImportReportItem}
-                  onNodeDefEdit={nodeDefUuid => this.handleNodeDefEdit(nodeDefUuid)}/>
-              )
-            })
-          )(nodeDefUuidGroups)
+          isNodeDefEditOpened &&
+          <NodeDefEdit/>
         }
-      </div>
-    </SurveyDefsLoader>
-  }
+
+        <div className="collect-import-report">
+
+          <TableHeader/>
+
+          <TableRows reportItems={reportItems}/>
+
+        </div>
+      </SurveyDefsLoader>
+    )
 
 }
 
-const mapStateToProps = state => {
-  const survey = SurveyState.getSurvey(state)
-  const reportItems = CollectImportReportState.getState(state)
-  const editedNodeDef = NodeDefEditState.hasNodeDef(state)
-
-  return {
-    survey,
-    reportItems,
-    editedNodeDef
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  {
-    fetchCollectImportReportItems, updateCollectImportReportItem,
-    setNodeDefForEdit
-  }
-)(CollectImportReportView)
+const mapStateToProps = state => ({
+  reportItems: CollectImportReportState.getState(state),
+  isNodeDefEditOpened: NodeDefEditState.hasNodeDef(state),
+})
+export default connect(mapStateToProps, { fetchCollectImportReportItems })(CollectImportReportView)

@@ -62,7 +62,7 @@ const NodeDefsSelectorView = props => {
     <div className="node-defs-selector">
       <div className="node-defs-selector__container">
 
-        <button className="btn btn-s btn-of-light-xs btn-toggle-settings"
+        <button className="btn btn-s btn-toggle-settings"
                 aria-disabled={R.isNil(nodeDefUuidEntity)}
                 onClick={() => setShowSettings(!showSettings)}>
           <span className="icon icon-cog icon-12px"/>
@@ -82,7 +82,7 @@ const NodeDefsSelectorView = props => {
               R.keys(NodeDef.nodeDefType).map(type =>
                 NodeDef.nodeDefType.entity !== type
                   ? <button key={type}
-                            className={`btn btn-s btn-of-light-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
+                            className={`btn btn-s btn-node-def-type${R.includes(type, filterTypes) ? ' active' : ''}`}
                             onClick={() => {
                               const idx = R.findIndex(R.equals(type), filterTypes)
                               const fn = idx >= 0 ? R.remove(idx, 1) : R.append(type)

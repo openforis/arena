@@ -28,11 +28,11 @@ class LoginForm extends React.Component {
             }
             <div className="buttons">
               <button type="button"
-                      className="btn btn-of"
+                      className="btn btn-login"
                       onClick={() => login(this.refs.username.value, this.refs.password.value)}>
                 Login
               </button>
-              <button type="button" className="btn btn-s btn-of-link">
+              <button type="button" className="btn btn-s btn-forgot-pwd">
                 <span className="icon icon-question icon-left icon-12px"/>
                 Forgot Password
               </button>

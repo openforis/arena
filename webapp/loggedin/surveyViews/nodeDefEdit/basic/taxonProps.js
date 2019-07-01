@@ -45,7 +45,7 @@ const TaxonProps = (props) => {
                     validation={Validator.getFieldValidation(propKeys.taxonomyUuid)(validation)}
                     selection={taxonomy}
                     onChange={putTaxonomyProp}/>
-          <button className="btn btn-s btn-of-light-xs"
+          <button className="btn btn-s"
                   style={{justifySelf: 'center'}}
                   onClick={async () => {
                     putTaxonomyProp(await createTaxonomy())
@@ -54,7 +54,7 @@ const TaxonProps = (props) => {
             <span className="icon icon-plus icon-12px icon-left"/>
             ADD
           </button>
-          <button className="btn btn-s btn-of-light-xs"
+          <button className="btn btn-s"
                   style={{justifySelf: 'center'}}
                   onClick={() => toggleTaxonomyEdit(true)}>
             <span className="icon icon-list icon-12px icon-left"/>

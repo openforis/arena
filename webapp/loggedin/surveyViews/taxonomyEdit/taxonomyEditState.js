@@ -21,6 +21,7 @@ const keys = {
   taxa: 'taxa',
   taxaCurrentPage: 'taxaCurrentPage',
   taxaTotalPages: 'taxaTotalPages',
+  taxaTotal: 'taxaTotal',
   taxaPerPage: 'taxaPerPage',
 }
 
@@ -42,10 +43,12 @@ export const getTaxonomy = state => {
 
 export const mergeTaxonomyEditProps = props => R.mergeDeepLeft(props)
 
-export const getTaxaCurrentPage = getStateProp(keys.taxaCurrentPage, 1)
+export const getTaxaCurrentPage = getStateProp(keys.taxaCurrentPage, 0)
 
 export const getTaxaPerPage = getStateProp(keys.taxaPerPage, 15)
 
 export const getTaxaTotalPages = getStateProp(keys.taxaTotalPages, 0)
+
+export const getTaxaTotal = getStateProp(keys.taxaTotal, 0)
 
 export const getTaxa = getStateProp(keys.taxa, [])

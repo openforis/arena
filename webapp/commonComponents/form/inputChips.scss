@@ -1,3 +1,5 @@
+@import "../../style/vars";
+
 .form-input-chip {
   display: flex;
   flex-wrap: wrap;
@@ -26,9 +28,11 @@
   margin: 0.25rem 0.3rem;
   font-size: 0.7rem;
   padding: 0.25rem 0.5rem;
+  border: 1px solid $greyBorder;
 
   .btn-remove {
     padding: .2rem .5rem;
     margin-left: 0.3rem;
+    border: none;
   }
 }

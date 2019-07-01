@@ -96,7 +96,7 @@ const NodeDefEdit = props => {
                   ]}
                   />
 
-                  <button className="btn btn-of-light btn-close"
+                  <button className="btn btn-close"
                           onClick={() => close()}>{i18n.t('common.done')}
                   </button>
 

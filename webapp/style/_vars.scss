@@ -1,31 +1,20 @@
-// header
-$headerHeight: 60px;
-
 // colors
-$white: #dedccb;
-$whiteLight: rgba($white, 0.6);
-$red: #dc4242;
-$redLight: #b55c60;
-$redDark: #713534;
-$blue1: #c6d6e1;
-$blue2: #defbff;
-$blue3: #17a2b8;
-$pink: #f9e1e2;
-$purple: #231133;
-$greenLight: #33ad6f;
-//$yellow: #debf32;
-$yellow: #d6c990;
-$yellowDark: #2c2c2b;
-$yellowOpaque: #7d785f;
-$green: #3b4e3e;
-$grey: #d7d7d7;
-$grey2: #333735;
-$greyDark: #2b2a28;
-$brown: #17150f;
-//$black: #202324;
-$black: #343736;
+
+$red: #ed5b46;
+$blueLight: #c6dfd6;
+$blueLightActive: #acccc4;
+$blueLightFocus: #eef5f3;
+$pink: #f7dfe3;
+$green: #84ac67;
+$greenLight: #f0f2e7;
+$yellow: #fee997;
+$grey: #edecea;
+$greyBorder: #c4bcb8;
+$orange: #feac97;
+$black: #464545;
 
 //z-indexes
+
 $zIndex1App: 1;
 $zIndex5Badge: 5;
 $zIndex6Tooltip: 6;
@@ -34,19 +23,6 @@ $zIndex19AppModal: 19;
 $zIndex20Dropdown: 20;
 $zIndex90AppError: 90;
 
-//OF style
-$ofBorderColor: rgba($white, .6) !important;
-$ofBorder: 1px solid !important;
-$ofBorderRadius: 255px 15px 225px 15px/15px 225px 15px 255px;
-$ofBorderColorLight: rgba($white, .4) !important;
-$ofBorderColorLightS: rgba($white, .2) !important;
-$ofBorderColorLightXs: rgba($white, .1) !important;
-
 $shadow1: 0 0 4px rgba($black, .2);
 $shadow2: 0 0 8px rgba($black, .2);
 $shadow3: 0 0 8px 1px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.1);
-
-@mixin of() {
-  border-radius: $ofBorderRadius;
-  border: $ofBorder;
-}

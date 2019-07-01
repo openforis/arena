@@ -23,32 +23,37 @@ const ofLetters = {
   10: 'S'
 }
 
-const LoginView = () =>
-  <div className="login__container full-screen-fixed">
-    {/*<div className="login__bg1"/>*/}
-    {/*<div className="login__bg2"/>*/}
-    {/*<div className="login__bg-overlay"/>*/}
+const LoginView = () => (
+  <React.Fragment>
 
-    <div className="login__grid">
-      {
-        cells.map(i => {
-          const isLoginContainer = i === 15
-          const ofLetter = ofLetters[i]
-          return (
-            <div key={i}
-                 className={`${isLoginContainer ? 'login__form-container' : 'login__grid-cell'}`}>
-              {
-                isLoginContainer
-                  ? <LoginForm/>
-                  : <div className={ofLetter ? 'of-letter' : ''}>{ofLetter}</div>
-              }
-            </div>
-          )
-        })
+    <div className="login__bg1 login"/>
+    <div className="login__bg2 login"/>
+    <div className="login__bg-overlay"/>
 
-      }
+    <div className="login__container full-screen-fixed">
+
+      <div className="login__grid">
+        {
+          cells.map(i => {
+            const isLoginContainer = i === 15
+            const ofLetter = ofLetters[i]
+            return (
+              <div key={i}
+                   className={`${isLoginContainer ? 'login__form-container' : 'login__grid-cell'}`}>
+                {
+                  isLoginContainer
+                    ? <LoginForm/>
+                    : <div className={ofLetter ? 'of-letter' : ''}>{ofLetter}</div>
+                }
+              </div>
+            )
+          })
+
+        }
+      </div>
+
     </div>
+  </React.Fragment>
 
-  </div>
-
+)
 export default LoginView

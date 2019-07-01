@@ -6,11 +6,13 @@
   width: 100%;
 
   .progress {
-    font-size: .75rem;
+    font-size: .7rem;
     text-transform: uppercase;
     position: absolute;
     left: .2rem;
     top: 0;
+    font-weight: 600;
+    color: white;
   }
 
   .filler {
@@ -20,8 +22,8 @@
 
   &.running {
     .filler {
-      border: 1px solid rgba($blue3, .4);
-      background: rgba($blue3, .8);
+      border: 1px solid $blueLightActive;
+      background: $blueLightActive;
     }
   }
 
@@ -35,14 +37,14 @@
 
   &.succeeded {
     .filler {
-      border: 1px solid rgba($greenLight, .4);
-      background: rgba($greenLight, .8);
+      border: 1px solid rgba($green, .4);
+      background: rgba($green, .8);
     }
   }
 }
 
 .progress-bar-striped {
-  background-image: linear-gradient(45deg, rgba($white, .15) 25%, transparent 25%, transparent 50%, rgba($white, .15) 50%, rgba($white, .15) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(45deg, rgba($blueLightFocus, .15) 25%, transparent 25%, transparent 50%, rgba($blueLightFocus, .15) 50%, rgba($blueLightFocus, .15) 75%, transparent 75%, transparent);
   background-size: 1rem 1rem;
   animation: progress-bar-stripes 1s linear infinite;
 }

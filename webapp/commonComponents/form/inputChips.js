@@ -34,12 +34,12 @@ const Chip = props => {
 
   return <div className="form-input">
 
-    <div className="btn-of btn-s form-input-chip-item">
+    <div className="form-input-chip-item">
       {getItemLabel(item, itemLabelFunction, itemLabelProp)}
 
       {
         !readOnly &&
-        <button className="btn-of-light-xs btn-s btn-remove"
+        <button className="btn btn-s btn-remove"
                 onClick={() => onDelete(item)}
                 aria-disabled={!canBeRemoved}>
           <span className="icon icon-cross icon-8px"/>

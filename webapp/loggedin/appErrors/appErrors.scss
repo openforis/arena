@@ -11,14 +11,14 @@
   align-content: start;
   grid-row-gap: 1rem;
   overflow-y: auto;
+  color: white;
 }
 
 .app-errors__error {
-  background-color: rgba($red, .98);
+  background-color: $red;
   margin: 0 .5rem;
   min-height: 100px;
-  padding: .5rem;
-  border-radius: .5rem;
+  padding: 1rem;
   position: relative;
 
   .btn-close {
@@ -26,7 +26,11 @@
     left: 0;
     top: 0;
     border: none !important;
-    border-radius: 100%;
+    background-color: $red;
+
+    .icon {
+      color: white;
+    }
   }
 
   .status {

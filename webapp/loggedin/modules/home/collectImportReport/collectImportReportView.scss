@@ -1,31 +1,31 @@
 @import "../../../../style/vars";
 
-.home-collect-import-report {
-  height: calc(100vh - 40px);
+.collect-import-report {
+  height: 100%;
   overflow-y: auto;
-}
+  position: relative;
 
-.collect-import-report-node-def-items-header {
-  text-align: center;
-  font-weight: 600;
-  text-transform: uppercase;
-}
 
-.collect-import-report-node-def-items {
-  padding: 1rem;
-  margin: 1rem 0;
-  border: 1px solid rgba($white, 0.35);
-}
+  .table__row-header,
+  .table__row {
+    grid-template-columns: 60px repeat(5, .2fr) .1fr 30px;
+    height: auto;
+    font-size: .8rem;
+  }
 
-.collect-import-report-header,
-.collect-import-report-item {
-  display: grid;
-  grid-template-columns: .05fr .2fr .2fr .2fr .2fr .05fr .1fr;
-  justify-content: center;
-  height: auto;
+  .table__row-header {
+    min-height: 40px;
+  }
 
-  div {
-    white-space: pre-line;
+  .table__row {
+    padding: .5rem 0;
+
+    input {
+      font-size: .8rem;
+    }
+
+    div {
+      white-space: pre-line;
+    }
   }
 }
-

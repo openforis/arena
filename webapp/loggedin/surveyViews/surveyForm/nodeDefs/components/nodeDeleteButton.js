@@ -6,7 +6,7 @@ export default ({ nodeDef, node, disabled = false, showConfirm = true, removeNod
   const i18n = useI18n()
 
   return (
-    <button className="btn btn-s btn-of-light-xs btn-delete"
+    <button className="btn btn-s btn-delete"
             style={{
               alignSelf: 'center',
               justifySelf: 'center',

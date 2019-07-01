@@ -5,7 +5,7 @@ const ButtonGroup = ({ items, selectedItemKey, onChange }) => (
     {
       items.map(item =>
         <button key={item.key}
-                className={`btn btn-of-light ${selectedItemKey === item.key ? 'active' : ''}`}
+                className={`btn${selectedItemKey === item.key ? ' active' : ''}`}
                 onClick={() => onChange(item.key)}>
           {item.label}
         </button>

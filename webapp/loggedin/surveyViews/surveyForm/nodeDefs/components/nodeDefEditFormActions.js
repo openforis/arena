@@ -27,7 +27,7 @@ const NodeDefEditFormActions = (props) => {
     <div className="node-def__form-actions">
       {
         isPage &&
-        <div className="btn-of-light-xs node-def__form-root-actions">
+        <div className="node-def__form-root-actions">
           {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
           <input value={Layout.getNoColumns(nodeDef)}
                  type="number" min="1" max="6"
@@ -38,14 +38,14 @@ const NodeDefEditFormActions = (props) => {
         </div>
       }
 
-      <button className="btn-s btn-of-light-xs"
+      <button className="btn-s"
               onClick={() => setNodeDefForEdit(nodeDef)}>
         <span className="icon icon-pencil2 icon-12px"/>
       </button>
 
       {
         NodeDef.isEntity(nodeDef) &&
-        <button className="btn-s btn-of-light-xs"
+        <button className="btn btn-s"
                 onClick={() => setFormNodeDefAddChildTo(nodeDef)}>
           <span className="icon icon-plus icon-12px"/>
         </button>
@@ -54,7 +54,7 @@ const NodeDefEditFormActions = (props) => {
       {
         isRoot ?
           null
-          : <button className="btn-s btn-of-light-xs"
+          : <button className="btn btn-s"
                     aria-disabled={NodeDef.isPublished(nodeDef)}
                     onClick={() => {
                       window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))

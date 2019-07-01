@@ -1,7 +1,7 @@
 @import "../style/vars";
 
 $rowHeight: 35px;
-$rowBorder: 1px solid rgba($white, 0.4);
+$rowBorder: 1px solid $greyBorder;
 $tableRowsHeight: calc(100% - 77px);
 
 .table {
@@ -17,7 +17,6 @@ $tableRowsHeight: calc(100% - 77px);
 }
 
 .table__empty-rows {
-  text-transform: uppercase;
   font-style: italic;
   text-align: center;
   margin-top: 2rem;
@@ -36,13 +35,11 @@ $tableRowsHeight: calc(100% - 77px);
   align-items: center;
   justify-items: center;
   border-bottom: $rowBorder;
-  border-right: $rowBorder;
-  border-left: $rowBorder;
   height: $rowHeight;
   position: relative;
 
   &.active {
-    background-color: rgba($white, .2);
+    background-color: rgba($blueLightActive, .6);
   }
 
   > div {
@@ -64,8 +61,7 @@ $tableRowsHeight: calc(100% - 77px);
   border-left: none;
   border-bottom-width: 2px;
   font-weight: 600;
-  background-color: rgba($white, 0.1);
-  text-transform: uppercase;
+  background-color: rgba($blueLight, 0.35);
   font-size: .8rem;
 }
 
