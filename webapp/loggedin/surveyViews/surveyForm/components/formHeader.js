@@ -29,16 +29,20 @@ const FormHeader = props => {
 
   return (
     <div className="survey-form-header">
-      <div className="survey-form__nav-node-def-navigation">
+      <div className="survey-form-header__label-container">
 
         <button className="btn btn-s">
           <span className="icon icon-stack icon-12px icon-left"/>
           {i18n.t('surveyForm.showPageNav')}
         </button>
 
+        <div className="survey-form-header__node-def-label">
+          {nodeDefPageLabel}
+        </div>
+
         {
           edit && canEditDef &&
-          <button className="btn btn-s icon-right"
+          <button className="btn btn-s btn-add-sub-page icon-right"
                   onClick={() => createNodeDef(
                     NodeDef.getUuid(nodeDefPage),
                     NodeDef.nodeDefType.entity,
@@ -48,7 +52,7 @@ const FormHeader = props => {
                     }
                   )}>
             <span className="icon icon-plus icon-12px icon-left"/>
-            {nodeDefPageLabel} {i18n.t('surveyForm.nodeDefNavigation.subPage')}
+            {i18n.t('surveyForm.subPage')}
           </button>
         }
 

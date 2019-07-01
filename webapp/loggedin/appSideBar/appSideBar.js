@@ -24,7 +24,7 @@ const AppSideBar = (props) => {
     setOpened(!opened)
 
     //react-grid-layout re-render
-    // window.dispatchEvent(new Event('resize'))
+    window.dispatchEvent(new Event('resize'))
   }
 
   return (

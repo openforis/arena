@@ -1,0 +1,44 @@
+@import "../../../../style/vars";
+
+.survey-form__node-def-nav {
+  &.level0 {
+    height: calc(100vh - 70px);
+    overflow-y: scroll;
+    background-color: rgba($grey, .6);
+    border-left: 1px solid $greyBorder;
+    border-top: 1px solid $greyBorder;
+    border-bottom: 1px solid $greyBorder;
+  }
+
+  button {
+    border: none;
+    background-color: transparent;
+    text-align: left;
+
+    &:hover {
+      color: $orange;
+      background-color: transparent;
+    }
+
+    &.active {
+      font-weight: bold;
+      background-color: transparent;
+    }
+  }
+
+  .btn-toggle {
+    align-self: flex-start;
+  }
+
+  .btn-node-def {
+    width: 100%;
+  }
+}
+
+.node-def-nav__btn-add-page {
+  border: 2px dashed rgba($greyBorder, 0.6);
+  margin: 0 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  opacity: .7;
+}

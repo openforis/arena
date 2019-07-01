@@ -6,13 +6,15 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import FormHeader from './header/formHeader'
-import FormActions from './formActions'
+import Survey from '../../../../common/survey/survey'
+import Record from '../../../../common/record/record'
+
+import FormHeader from './components/formHeader'
+import FormActions from './components/formActions'
+import FormPageNavigation from './components/formPageNavigation'
 import NodeDefEdit from '../nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
-import Survey from '../../../../common/survey/survey'
-import Record from '../../../../common/record/record'
 import * as SurveyState from '../../../survey/surveyState'
 import * as SurveyFormState from './surveyFormState'
 import * as RecordState from '../record/recordState'
@@ -59,24 +61,36 @@ const SurveyFormView = (props) => {
           canEditDef={canEditDef}
         />
 
-        {
-          nodeDef
-            ? <NodeDefSwitch surveyInfo={surveyInfo}
-                             nodeDef={nodeDef}
-                             edit={edit}
-                             entry={entry}
-                             recordUuid={recordUuid}
-                             parentNode={parentNode}
-                             canEditDef={canEditDef}
-                             canEditRecord={canEditRecord}/>
-            : <div/>
-        }
+        <div className="survey-form-container">
 
-        {
-          editAllowed
-            ? <FormActions/>
-            : null
-        }
+          <FormPageNavigation
+            surveyInfo={surveyInfo}
+            edit={edit}
+            entry={entry}
+            canEditDef={canEditDef}
+            level={0}
+          />
+
+
+          {
+            nodeDef &&
+            <NodeDefSwitch
+              surveyInfo={surveyInfo}
+              nodeDef={nodeDef}
+              edit={edit}
+              entry={entry}
+              recordUuid={recordUuid}
+              parentNode={parentNode}
+              canEditDef={canEditDef}
+              canEditRecord={canEditRecord}/>
+          }
+
+          {
+            editAllowed &&
+            <FormActions/>
+          }
+
+        </div>
 
       </div>
     )
@@ -85,6 +99,7 @@ const SurveyFormView = (props) => {
 }
 
 SurveyFormView.defaultProps = {
+  surveyInfo:null,
   // current nodeDef page
   nodeDef: null,
   // form in edit mode

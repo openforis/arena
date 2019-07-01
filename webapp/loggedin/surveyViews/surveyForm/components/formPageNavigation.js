@@ -1,0 +1,95 @@
+import './formPageNavigation.scss'
+
+import React from 'react'
+import { connect } from 'react-redux'
+
+import useI18n from '../../../../commonComponents/useI18n'
+
+import Survey from '../../../../../common/survey/survey'
+import NodeDef from '../../../../../common/survey/nodeDef'
+import { filterOuterPageChildren } from '../../../../../common/survey/nodeDefLayout'
+
+import * as SurveyState from '../../../../survey/surveyState'
+import * as SurveyFormState from '../../surveyForm/surveyFormState'
+
+import { setFormActivePage } from '../../surveyForm/actions'
+
+const NavigationButton = (props) => {
+  const {
+    surveyInfo, nodeDef, childDefs,
+    edit, canEditDef,
+    level, active, enabled,
+    setFormActivePage,
+  } = props
+
+  const i18n = useI18n()
+
+  const outerPageChildDefs = childDefs ? filterOuterPageChildren(childDefs) : []
+
+  const label = NodeDef.getLabel(nodeDef, Survey.getLanguage(i18n.lang)(surveyInfo))
+
+  return (
+    <div className={`survey-form__node-def-nav level${level}`}
+         style={{ marginLeft: `${level === 0 ? 0 : 1}rem` }}>
+      <div className="display-flex">
+        {
+          outerPageChildDefs.length > 0 ?
+            (
+              <button className="btn-xs btn-toggle"
+                      style={{ transform: `rotate(90deg)` }}>
+                <span className="icon icon-play3 icon-12px"/>
+              </button>
+            )
+            : (
+              <span style={{ marginLeft: '21px' }}/>
+            )
+        }
+
+        <button className={`btn btn-s btn-node-def${active ? ' active' : ''}`}
+                onClick={() => setFormActivePage(nodeDef)}
+                aria-disabled={!enabled}>
+          {label}
+        </button>
+      </div>
+
+      {
+        outerPageChildDefs.map(child =>
+          <FormPageNavigation
+            key={NodeDef.getUuid(child)}
+            level={level + 1}
+            nodeDef={child}
+            edit={edit}
+            canEditDef={canEditDef}
+          />
+        )
+      }
+
+    </div>
+  )
+}
+
+const mapStateToProps = (state, props) => {
+  const survey = SurveyState.getSurvey(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const rootNodeDef = Survey.getRootNodeDef(survey)
+
+  const { edit, nodeDef = rootNodeDef } = props
+
+  const parentNode = SurveyFormState.getFormPageParentNode(nodeDef)(state)
+
+  return {
+    surveyInfo,
+    nodeDef,
+    childDefs: Survey.getNodeDefChildren(nodeDef)(survey),
+
+    active: SurveyFormState.isNodeDefFormActivePage(nodeDef)(state),
+    enabled: edit || NodeDef.isRoot(nodeDef) || rootNodeDef.id === nodeDef.parentId || parentNode,
+  }
+}
+
+const FormPageNavigation = connect(
+  mapStateToProps,
+  { setFormActivePage }
+)(NavigationButton)
+
+export default FormPageNavigation

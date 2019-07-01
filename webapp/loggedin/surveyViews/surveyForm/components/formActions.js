@@ -2,14 +2,14 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import NodeDef from '../../../../common/survey/nodeDef'
+import NodeDef from '../../../../../common/survey/nodeDef'
 
-import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from './nodeDefs/nodeDefSystemProps'
+import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
-import { createNodeDef } from '../../../survey/nodeDefs/actions'
-import { setFormNodeDefAddChildTo } from './actions'
+import { createNodeDef } from '../../../../survey/nodeDefs/actions'
+import { setFormNodeDefAddChildTo } from '../actions'
 
-import * as SurveyFormState from './surveyFormState'
+import * as SurveyFormState from '../surveyFormState'
 
 const AddNodeDefButtons = ({ addNodeDef, setFormNodeDefAddChildTo }) => {
 
@@ -72,7 +72,7 @@ class FormActions extends React.Component {
 
         <button className="btn btn-s no-border btn-toggle"
                 onClick={() => setFormNodeDefAddChildTo(null)}>
-          <span className="icon icon-cross icon-14px"/>
+          <span className="icon icon-cross icon-12px"/>
         </button>
 
         <AddNodeDefButtons
