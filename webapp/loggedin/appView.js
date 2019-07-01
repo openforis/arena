@@ -16,7 +16,7 @@ class AppView extends React.Component {
   render () {
     const { location, i18n, authState } = this.props
 
-    if (authState === 'signedIn') {
+    // if (authState === 'signedIn') {
       const pathName = this.props.history.location.pathname
 
       return (
@@ -35,9 +35,9 @@ class AppView extends React.Component {
 
         </div>
       )
-    } else {
-      return null
-    }
+    // } else {
+    //   return null
+    // }
   }
 }
 

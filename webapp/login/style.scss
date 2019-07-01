@@ -2,7 +2,7 @@
 @import "../style/layoutMixins";
 
 .login__grid {
-  @include full-screen-fixed();
+  // @include full-screen-fixed();
   display: grid;
   grid-template-columns: repeat(12, 8.33333333333333vw);
   grid-template-rows: repeat(6, 16.66666666666667vh);

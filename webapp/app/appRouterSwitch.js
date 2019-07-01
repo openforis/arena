@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router'
 import { withRouter, Switch, Route } from 'react-router-dom'
 
 import DynamicImport from '../commonComponents/dynamicImport'
-import LoginView from '../login/components/loginView'
 
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 import * as AppWebSocket from './appWebSocket'
@@ -16,9 +14,8 @@ import { throwSystemError, initApp } from './actions'
 import { getLocationPathname } from '../utils/routerUtils'
 
 import { Authenticator } from 'aws-amplify-react/dist/Auth'
+import LoginView from '../login/components/LoginView'
 import CustomSignIn from '../login/components/customSignIn'
-
-// import { appModuleUri } from '../loggedin/appModules'
 
 const loginUri = '/'
 
@@ -50,11 +47,13 @@ const AppRouterSwitch = props => {
   }, [])
 
   useEffect(() => {
-    if (user) {
+    if (user === null) {
+      // Before sending  get request in app/actions/initApp has been sent, user is
+      // undefined, after the request is null if not logged in
+      props.history.push(loginUri)
       openWebSocket()
     } else {
       closeWebSocket()
-      props.history.push(loginUri)
     }
   }, [user])
 
@@ -82,13 +81,11 @@ const AppRouterSwitch = props => {
             : (
               <Authenticator hideDefault={true}>
                 <CustomSignIn override={'SignIn'}/>
-                {/* <AppView location="props.history.location" history={props.history} /> */}
-                {/* <Redirect to={appModuleUri()} /> */}
                 <Switch>
-                  {/* <Route
+                  <Route
                     exact path="/"
                     component={LoginView}
-                  /> */}
+                  />
                   <Route
                     path="/app"
                     render={props => (

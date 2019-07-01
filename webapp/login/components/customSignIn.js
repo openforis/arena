@@ -2,41 +2,36 @@ import React from 'react'
 import { SignIn } from 'aws-amplify-react'
 import { Hub } from 'aws-amplify'
 
+import { compose } from 'redux'
+import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-// import axios from 'axios'
-
 import { appModuleUri } from '../../loggedin/appModules'
+
+import { initApp } from '../../app/actions'
 
 class CustomSignIn extends SignIn {
 
   constructor (props) {
     super(props)
+
     this._validAuthStates = ['signIn', 'signedOut', 'signedUp']
   }
-
-  // onAuthEvent (payload) {
-  //   // ... your implementation
-  // }
 
   componentDidMount () {
     Hub.listen('auth', async data => {
       // const { payload } = data
+      // console.log('A new auth event has happened: ', data.payload.data.username + ' has ' + data.payload.event)
       // const { data: { user: serverUser, survey } } = await axios.get('/auth/user')
 
-      // return { user: serverUser, survey }
-      // this.onAuthEvent(payload)
-      // console.log(payload)
-      // console.log('A new auth event has happened: ', data.payload.data.username + ' has ' + data.payload.event)
-
-      // console.log(appModuleUri())
+      this.props.initApp()
       this.props.history.push(appModuleUri())
     })
   }
 
   showComponent (theme) {
     return (
-      <div className="login__form">
+      <div className="login__form" style={{ position: 'fixed' }}>
         <form>
           <div>
             <label
@@ -93,4 +88,13 @@ class CustomSignIn extends SignIn {
   }
 }
 
-export default withRouter(CustomSignIn)
+const enhance = compose(
+  withRouter,
+  connect(
+    null,
+    { initApp }
+  )
+)
+export default enhance(CustomSignIn)
+
+// export default withRouter(CustomSignIn)

@@ -24,7 +24,7 @@ const ofLetters = {
 }
 
 const LoginView = () =>
-  <div className="login__container full-screen-fixed">
+  <div className="login__container">
     {/*<div className="login__bg1"/>*/}
     {/*<div className="login__bg2"/>*/}
     {/*<div className="login__bg-overlay"/>*/}
@@ -38,9 +38,8 @@ const LoginView = () =>
             <div key={i}
                  className={`${isLoginContainer ? 'login__form-container' : 'login__grid-cell'}`}>
               {
-                isLoginContainer
-                  ? <LoginForm/>
-                  : <div className={ofLetter ? 'of-letter' : ''}>{ofLetter}</div>
+                isLoginContainer ||
+                  <div className={ofLetter ? 'of-letter' : ''}>{ofLetter}</div>
               }
             </div>
           )

@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 
 const headerMiddleware = require('./middleware/headerMiddleware')
-const accessControlMiddleware = require('./middleware/accessControlMiddleware')
+// const accessControlMiddleware = require('./middleware/accessControlMiddleware')
 const jwtMiddleware = require('./middleware/jwtMiddleware')
 const errorMiddleware = require('./middleware/errorMiddleware')
 const authApi = require('../modules/auth/api/authApi')
@@ -32,7 +32,7 @@ module.exports = async () => {
 
   app.use(/^\/api.*|\/auth\/user/, jwtMiddleware)
   // accessControlMiddleware must be initialized after jwtMiddleware
-  accessControlMiddleware.init(app)
+  // accessControlMiddleware.init(app)
 
   app.use(compression({ threshold: 512 }))
 
