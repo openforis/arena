@@ -16,13 +16,16 @@ import * as SurveyState from '../../../../survey/surveyState'
 import * as SurveyFormState from '../surveyFormState'
 
 import { createNodeDef } from '../../../../survey/nodeDefs/actions'
+import { toggleFormPageNavigation } from '../actions'
 
 const FormHeader = props => {
 
   const {
     edit, entry, preview,
     history, canEditDef,
-    nodeDefPage, nodeDefPageLabel, createNodeDef
+    nodeDefPage, nodeDefPageLabel,
+    showPageNavigation,
+    createNodeDef, toggleFormPageNavigation,
   } = props
 
   const i18n = useI18n()
@@ -31,9 +34,10 @@ const FormHeader = props => {
     <div className="survey-form-header">
       <div className="survey-form-header__label-container">
 
-        <button className="btn btn-s">
+        <button className="btn btn-s"
+                onClick={toggleFormPageNavigation}>
           <span className="icon icon-stack icon-12px icon-left"/>
-          {i18n.t('surveyForm.showPageNav')}
+          {i18n.t(`surveyForm.${showPageNavigation ? 'hidePageNav' : 'showPageNav'}`)}
         </button>
 
         <div className="survey-form-header__node-def-label">
@@ -72,11 +76,16 @@ const mapStateToProps = state => {
   const lang = AppState.getLang(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const nodeDefPageLabel = NodeDef.getLabel(nodeDefPage, Survey.getLanguage(lang)(surveyInfo))
+  const showPageNavigation = SurveyFormState.showPageNavigation(state)
 
   return {
     nodeDefPage,
-    nodeDefPageLabel
+    nodeDefPageLabel,
+    showPageNavigation
   }
 }
 
-export default connect(mapStateToProps, { createNodeDef })(FormHeader)
+export default connect(
+  mapStateToProps,
+  { createNodeDef, toggleFormPageNavigation }
+)(FormHeader)

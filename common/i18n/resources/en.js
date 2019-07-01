@@ -170,7 +170,8 @@ module.exports = {
   },
 
   surveyForm: {
-    showPageNav:'Show page navigation',
+    showPageNav: 'Show pages',
+    hidePageNav: 'Hide pages',
     subPage: 'Sub page',
     formEditActions: {
       preview: 'Preview',

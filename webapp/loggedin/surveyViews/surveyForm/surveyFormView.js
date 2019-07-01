@@ -22,27 +22,24 @@ import * as RecordState from '../record/recordState'
 const SurveyFormView = (props) => {
 
   const {
-    surveyInfo,
-    nodeDef,
-    edit,
-    entry,
-    preview,
-    canEditDef,
-    canEditRecord,
+    surveyInfo, nodeDef,
+    edit, entry, preview,
+    showPageNavigation,
+    canEditDef, canEditRecord,
 
-    recordUuid,
-    parentNode,
+    recordUuid, parentNode,
 
     history,
   } = props
 
   const editAllowed = edit && canEditDef && !preview
 
-  const className = editAllowed
+  let className = editAllowed
     ? ' form-designer edit form-actions-off'
     : edit && !preview
       ? ' form-designer'
       : ''
+  className += showPageNavigation ? '' : ' page-navigation-off'
 
   return nodeDef
     ? (
@@ -63,13 +60,16 @@ const SurveyFormView = (props) => {
 
         <div className="survey-form-container">
 
-          <FormPageNavigation
-            surveyInfo={surveyInfo}
-            edit={edit}
-            entry={entry}
-            canEditDef={canEditDef}
-            level={0}
-          />
+          {
+            showPageNavigation &&
+            <FormPageNavigation
+              surveyInfo={surveyInfo}
+              edit={edit}
+              entry={entry}
+              canEditDef={canEditDef}
+              level={0}
+            />
+          }
 
 
           {
@@ -99,7 +99,7 @@ const SurveyFormView = (props) => {
 }
 
 SurveyFormView.defaultProps = {
-  surveyInfo:null,
+  surveyInfo: null,
   // current nodeDef page
   nodeDef: null,
   // form in edit mode
@@ -119,6 +119,7 @@ const mapStateToProps = (state, props) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeDef = SurveyFormState.getFormActivePageNodeDef(state)
   const record = RecordState.getRecord(state)
+  const showPageNavigation = SurveyFormState.showPageNavigation(state)
 
   const mapEntryProps = () => ({
     parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,
@@ -128,6 +129,7 @@ const mapStateToProps = (state, props) => {
   return {
     surveyInfo,
     nodeDef,
+    showPageNavigation,
     ...props.entry
       ? mapEntryProps()
       : {},
