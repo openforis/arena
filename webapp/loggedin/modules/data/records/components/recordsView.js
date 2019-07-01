@@ -15,8 +15,7 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 import AuthManager from '../../../../../../common/auth/authManager'
 import Validator from '../../../../../../common/validation/validator'
 
-import { appModuleUri } from '../../../../appModules'
-import { dataModules } from '../../dataModules'
+import { appModuleUri, dataModules } from '../../../../appModules'
 
 import { getRelativeDate } from '../../../../../../common/dateUtils'
 
@@ -43,7 +42,7 @@ const RecordRow = ({ idx, offset, record, style, nodeDefKeys, canEdit }) => (
     <div>{record.ownerName}</div>
     <div>{record.step}</div>
     <div>
-      <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn btn-s btn-of-light-xs">
+      <Link to={appModuleUri(dataModules.record) + record.uuid} className="btn-edit">
         <span className={`icon icon-12px ${canEdit ? 'icon-pencil2' : 'icon-eye'}`}/>
       </Link>
     </div>
@@ -115,7 +114,7 @@ const RecordsView = props => {
         {
           Survey.isPublished(surveyInfo)
             ? (
-              <button onClick={() => createRecord(history)} className="btn btn-s btn-of">
+              <button onClick={() => createRecord(history)} className="btn btn-s">
                 <span className="icon icon-plus icon-12px icon-left"/>
                 {i18n.t('common.new')}
               </button>

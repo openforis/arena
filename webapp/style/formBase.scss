@@ -3,8 +3,9 @@
 input,
 label,
 select,
-button,
 textarea,
+a,
+button,
 .btn {
   margin: 0;
   border: 0;
@@ -22,18 +23,17 @@ textarea,
   letter-spacing: 1px;
   font-weight: inherit;
   word-wrap: break-word;
-  color: $white;
+  color: $black;
 
-  transition: all .5s ease;
+  //transition: all .1s ease;
 }
 
 input {
   padding: 20px 5px;
   background-color: transparent;
 
-  &:not([readonly]):focus,
-  &:not([readonly]):hover {
-    background-color: rgba($white, 0.15);
+  &:not([readonly]):focus {
+    background-color: $blueLightFocus;
   }
 
   &[readonly] {
@@ -41,16 +41,42 @@ input {
   }
 }
 
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a:hover {
+  font-weight: 600;
+}
+
+a:focus,
+a:active,
+a:hover,
+a:visited {
+  outline: 0;
+}
+
 // buttons
 button, .btn {
   padding: .7rem .8rem;
   font-weight: 400;
-  border: 1px solid $whiteLight;
+  border: 1px solid $greyBorder;
   text-decoration: none;
+  background-color: white;
 
   &:hover {
-    cursor: pointer;
-    background-color: rgba($white, 0.25);
+    background-color: $greenLight;
+    font-weight: 400;
+
+    &:not([aria-disabled="true"]) {
+      cursor: pointer;
+    }
+  }
+
+  &.active {
+    background-color: $blueLightActive;
+    pointer-events: none;
   }
 }
 
@@ -59,8 +85,7 @@ button, .btn {
   display: inline-block; /* For IE11/ MS Edge bug */
   pointer-events: none;
   text-decoration: none;
-  opacity: .4;
-  background-color: rgba(222, 220, 203, 0.1);
+  opacity: .5;
 }
 
 .btn-s {
@@ -73,54 +98,16 @@ button, .btn {
   font-size: 0.8rem;
 }
 
-.btn-of {
-  @include of;
-  text-transform: uppercase;
-  border-color: $ofBorderColor;
-
-  &.active {
-    //border-color: transparent !important;
-    background-color: rgba($yellow, .35) !important;
-    pointer-events: none;
-  }
-}
-
-.btn-of-link {
-  border: none !important;
-  border-bottom: 1px solid transparent !important;
-  border-bottom-right-radius: 10% 2%;
-  border-bottom-left-radius: 80% 10%;
-
-  &:hover {
-    background-color: transparent;
-    border-bottom: 1px solid rgba(222, 220, 203, 0.6) !important;
-  }
-}
-
-.btn-of-light {
-  @extend .btn-of;
-  border-color: $ofBorderColorLight;
-}
-
-.btn-of-light-s {
-  @extend .btn-of;
-  border-color: $ofBorderColorLightS;
-}
-
-.btn-of-light-xs {
-  @extend .btn-of;
-  border-color: $ofBorderColorLightXs;
-}
-
 .btn-transparent {
   border: none !important;
 }
 
 .btn-danger {
-  background-color: rgba($red, 0.5);
-  border-color: rgba($red, 0.3) !important;
+  color: white;
+  background-color: $red;
+  border-color: rgba($red, 0.5) !important;
 
   &:hover {
-    background-color: rgba($red, 0.8) !important;
+    background-color: rgba($red, 0.9) !important;
   }
 }

@@ -1,4 +1,5 @@
 module.exports = {
+
   common: {
     name: 'Name',
     label: 'Label',
@@ -30,16 +31,28 @@ module.exports = {
     undefinedName: 'Undefined name',
     empty: 'Empty',
   },
+
+  appModules: {
+    home: 'Home',
+    dashboard: 'Dashboard',
+    surveyList: 'My Surveys',
+    collectImportReport: 'Collect Import Report',
+
+    designer: 'Survey',
+    formDesigner: 'Form Designer',
+    surveyHierarchy: 'Hierarchy',
+    categories: 'Categories',
+    taxonomies: 'Taxonomies',
+
+    data: 'Data',
+    records: 'Records',
+    dataVis: 'Data vis',
+  },
+
   sidebar: {
     openForisShort: 'OF',
     openForis: 'Open Foris',
     logout: 'Logout',
-  },
-
-  survey: {
-    formDesigner: 'Form Designer',
-    categories: 'Categories',
-    taxonomies: 'Taxonomies',
   },
 
   nodeDefsTypes: {
@@ -58,7 +71,6 @@ module.exports = {
 
   data: {
     records: {
-      records: 'Records',
       owner: 'Owner',
       step: 'Step',
       noRecordsAdded: 'No records added',
@@ -66,7 +78,6 @@ module.exports = {
     rowNum: 'Row #',
     invalidRecord: 'Invalid record',
     dataVis: {
-      dataVis: 'Data vis',
       dataSort: {
         orderBy: 'Order by:',
         thenBy: 'Then by:',
@@ -77,14 +88,11 @@ module.exports = {
   },
 
   homeView: {
-    mySurveys: 'My Surveys',
-    dashboard: 'Dashboard',
+    createSurvey: 'Create Survey',
     surveyInfo: {
       publish: 'Publish',
       viewInfo: 'View info',
       editInfo: 'Edit info',
-      collectImportReport: 'Collect Import Report',
-      hierarchy: 'Hierarchy',
       confirmPublish: `Do you want to publish this survey? Some operation won't be allowed afterwards.`,
     },
     deleteSurveyDialog: {
@@ -92,15 +100,17 @@ module.exports = {
       deleteWarning: 'Deleting the **{{surveyName}}** survey will delete all of its data.',
       confirmName: 'Enter this survey’s name to confirm:',
     },
-    surveyListTable: {
-      addNewSurvey: 'Add a new Survey',
+    surveyList: {
       status: 'Status',
+      active: 'Active',
+      activate: 'Activate'
     },
     surveyCreate: {
       createSurvey: 'Create Survey',
       importFromCollect: 'Import from Collect',
     },
     collectImportReport: {
+      path: 'Path',
       type: 'Type',
       expression: 'Expression',
       messages: 'Messages',
@@ -148,7 +158,6 @@ module.exports = {
   },
 
   designerView: {
-    hierarchy: 'Hierarchy',
     formPreview: 'Form preview',
   },
 

@@ -189,7 +189,7 @@ class Dropdown extends React.Component {
              onFocus={e => this.onInputFocus(e)}
              size={inputSize}/>
 
-      <span className="icon icon-menu2 icon-24px"
+      <span className="icon icon-menu2 icon-18px"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()

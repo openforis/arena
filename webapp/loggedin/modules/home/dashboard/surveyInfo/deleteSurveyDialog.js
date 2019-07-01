@@ -32,7 +32,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
         <div className="survey-delete-dialog__body">
           <div className="highlight">
             <div>
-              <Markdown>
+              <Markdown options={{html:false}}>
                 {i18n.t('homeView.deleteSurveyDialog.deleteWarning', { surveyName })}
               </Markdown>
             </div>
@@ -53,14 +53,14 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
 
       <ModalFooter>
         <div>
-          <button className="btn btn-of modal-footer__item"
+          <button className="btn modal-footer__item"
                   onClick={onCancel}
                   aria-disabled={false}>
             <span className="icon icon-cross icon-12px icon-left"/>
             {i18n.t('common.cancel')}
           </button>
 
-          <button className="btn btn-of btn-danger modal-footer__item"
+          <button className="btn btn-danger modal-footer__item"
                   onClick={onDelete}
                   aria-disabled={!(surveyName === confirmName)}>
             <span className="icon icon-bin icon-12px icon-left"/>

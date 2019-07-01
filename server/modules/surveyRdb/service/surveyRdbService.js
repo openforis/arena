@@ -15,7 +15,7 @@ const SurveyRdbManager = require('../manager/surveyRdbManager')
 const RecordManager = require('../../record/manager/recordManager')
 
 const exportTableToCSV = async (surveyId, tableName, cols, filter, sort, output) => {
-  const csvStream = fastcsv.createWriteStream({ headers: true })
+  const csvStream = fastcsv.format({ headers: true })
   csvStream.pipe(output)
 
   // 1. write headers

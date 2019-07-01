@@ -42,7 +42,7 @@ const NavigationButton = (props) => {
   return (
     <React.Fragment>
 
-      <button className={`btn btn-of-light${active ? ' active' : ''}`}
+      <button className={`btn${active ? ' active' : ''}`}
               onClick={() => setFormActivePage(nodeDef)}
               style={{ height: `${100 - level * 7}%` }}
               aria-disabled={!enabled}>
@@ -62,7 +62,7 @@ const NavigationButton = (props) => {
 
       {
         edit && active && canEditDef && level < 6 &&
-        <button className="btn btn-of-light node-def-nav__btn-add-page"
+        <button className="btn node-def-nav__btn-add-page"
                 style={{ height: `${100 - (level + 1) * 7}%` }}
                 onClick={() => createNodeDef(
                   NodeDef.getUuid(nodeDef),

@@ -60,7 +60,7 @@ class ExpressionEditor extends React.PureComponent {
                   !R.isEmpty(query) &&
                   <div className="query">{query}</div>
                 }
-                <button className="btn btn-s btn-of-light btn-edit"
+                <button className="btn btn-s btn-edit"
                         onClick={this.toggleEdit}>
                   <span className="icon icon-pencil2 icon-14px"/>
                 </button>

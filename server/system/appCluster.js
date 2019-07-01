@@ -46,7 +46,7 @@ module.exports = async () => {
   app.use('/api', apiRouter.router)
 
   // ====== error handling
-  app.use(await errorMiddleware('en'))
+  errorMiddleware.init(app)
 
   // ====== server
   const httpServerPort = process.env.PORT || '9090'

@@ -49,9 +49,9 @@ const SurveyCreateView = (props) => {
           onChange={e => updateNewSurveyProp('lang', e)}
           validation={getFieldValidation('lang')(validation)}/>
       </div>
-      <button className="btn btn-of-light"
+      <button className="btn"
               onClick={() => createSurvey({ name, label, lang })}>
-        <span className="icon icon-plus icon-left"/>
+        <span className="icon icon-plus icon-left icon-12px"/>
         {i18n.t('homeView.surveyCreate.createSurvey')}
       </button>
 
@@ -60,6 +60,7 @@ const SurveyCreateView = (props) => {
         accept={'.collect-backup'}
         maxSize={1000}
         onChange={files => importCollectSurvey(files[0])}/>
+
     </div>
   )
 }

@@ -1,9 +1,22 @@
+@import "../../../../../style/vars";
+
 .records {
-  margin: 0 4rem;
 
   .table__row {
+
     .error-badge {
       left: 4rem;
+      background-color: white;
+      pointer-events: none;
+
+      .icon {
+        color: $red;
+        font-weight: bold;
+      }
+    }
+
+    .btn-edit:hover {
+      color: $orange;
     }
   }
 }

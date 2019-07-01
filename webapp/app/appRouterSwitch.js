@@ -3,6 +3,9 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Switch, Route } from 'react-router-dom'
 
+import { Authenticator, SignIn } from 'aws-amplify-react/dist/Auth'
+
+import LoginView from '../login/loginView'
 import DynamicImport from '../commonComponents/dynamicImport'
 
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
@@ -10,12 +13,6 @@ import * as AppWebSocket from './appWebSocket'
 
 import * as AppState from './appState'
 import { throwSystemError, initApp } from './actions'
-
-import { getLocationPathname } from '../utils/routerUtils'
-
-import { Authenticator } from 'aws-amplify-react/dist/Auth'
-import LoginView from '../login/components/LoginView'
-import CustomSignIn from '../login/components/customSignIn'
 
 const loginUri = '/'
 
@@ -57,47 +54,35 @@ const AppRouterSwitch = props => {
     }
   }, [user])
 
-  const isLogin = getLocationPathname(props) === loginUri
-
   return (
     isReady && (
-      <React.Fragment>
-
-        <div className={`main__bg1${isLogin ? ' login' : ''}`}/>
-        <div className={`main__bg2${isLogin ? ' login' : ''}`}/>
-        <div className="main__bg-overlay"/>
-
-        {
-          systemError
-            ? (
-              <div className="main__system-error">
-                <div className="main__system-error-container">
-                  <span className="icon icon-warning icon-24px icon-left"/>
-                  Oooops! Something went wrong. Try to refresh the page.
-                  <div className="error">{systemError}</div>
-                </div>
-              </div>
-            )
-            : (
-              <Authenticator hideDefault={true}>
-                <CustomSignIn override={'SignIn'}/>
-                <Switch>
-                  <Route
-                    exact path="/"
-                    component={LoginView}
-                  />
-                  <Route
-                    path="/app"
-                    render={props => (
-                      <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
-                    )}
-                  />
-                </Switch>
-              </Authenticator>
-            )
-        }
-
-      </React.Fragment>
+      systemError
+        ? (
+          <div className="main__system-error">
+            <div className="main__system-error-container">
+              <span className="icon icon-warning icon-24px icon-left"/>
+              Oooops! Something went wrong. Try to refresh the page.
+              <div className="error">{systemError}</div>
+            </div>
+          </div>
+        )
+        : (
+          <Authenticator hide={[SignIn]} hideDefault={true}>
+            <LoginView override={'SignIn'}/>
+            <Switch>
+              {/*<Route*/}
+              {/*  exact path="/"*/}
+              {/*  component={LoginView}*/}
+              {/*/>*/}
+              <Route
+                path="/app"
+                render={props => (
+                  <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
+                )}
+              />
+            </Switch>
+          </Authenticator>
+        )
     )
   )
 }

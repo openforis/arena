@@ -21,7 +21,7 @@ class Checkbox extends React.Component {
           <button className="btn btn-s btn-transparent btn-checkbox"
                   onClick={() => onChange(!checked)}
                   aria-disabled={disabled}>
-            <span className={`icon icon-${radio ? 'radio' : 'checkbox'}-${!checked ? 'un' : ''}checked icon-24px`}/>
+            <span className={`icon icon-${radio ? 'radio' : 'checkbox'}-${!checked ? 'un' : ''}checked icon-18px`}/>
             {label}
           </button>
 

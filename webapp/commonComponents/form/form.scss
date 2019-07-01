@@ -19,7 +19,6 @@
 
 .form-label {
   justify-self: right;
-  text-transform: uppercase;
   font-size: .9rem;
   text-align: end;
 }
@@ -37,12 +36,12 @@
 
 .form-input {
   padding: .5rem 1rem;
-  border-bottom: 1px solid rgba($white, .7);
+  border-bottom: 1px solid $greyBorder;
   //&.error {
   //  border-bottom: 5px dotted rgba($red, .6);
   //}
 
   &[readonly] {
-    border-bottom: 1px solid rgba($white, .5);
+    border-bottom: 1px solid rgba($greyBorder, .5);
   }
 }

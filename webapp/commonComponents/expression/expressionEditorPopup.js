@@ -87,13 +87,13 @@ class ExpressionEditorPopup extends React.Component {
         </div>
 
         <div className="expression-editor-popup__footer">
-          <button className="btn btn-xs btn-of"
+          <button className="btn btn-xs"
                   onClick={() => onChange('')}
                   aria-disabled={R.isEmpty(query)}>
             <span className="icon icon-undo2 icon-16px"/> Reset
           </button>
 
-          <button className="btn btn-xs btn-of"
+          <button className="btn btn-xs"
                   onClick={() => onChange(queryDraft, exprDraft)}
                   aria-disabled={query === queryDraft || !exprDraftValid}>
             <span className="icon icon-checkmark icon-16px"/> Apply

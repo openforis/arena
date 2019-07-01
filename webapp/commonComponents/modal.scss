@@ -11,7 +11,7 @@ $borderRadius: 2px;
   width: 100vw;
   height: 100vh;
   overflow: auto;
-  background-color: rgba($brown, 0.7);
+  background-color: rgba($black, 0.7);
 }
 
 .modal-content {
@@ -20,7 +20,7 @@ $borderRadius: 2px;
   width: auto;
   flex-direction: column;
   pointer-events: auto;
-  background-color: rgba($brown, 0.9);
+  background-color: $grey;
   background-clip: padding-box;
   border: none;
   border-radius: $borderRadius;
@@ -37,7 +37,6 @@ $borderRadius: 2px;
   border-top-right-radius: $borderRadius;
 
   text-align: center;
-  text-transform: uppercase;
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 1rem;

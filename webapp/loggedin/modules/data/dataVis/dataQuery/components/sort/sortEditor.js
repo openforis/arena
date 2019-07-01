@@ -122,13 +122,13 @@ const SortExpressionComponent = props => {
           }
         </div>
         <div className="sort-editor__footer">
-          <button className="btn btn-xs btn-of"
+          <button className="btn btn-xs"
                   onClick={() => reset()}
                   aria-disabled={!sortCriteria.length}>
             <span className="icon icon-undo2 icon-16px"/> Reset
           </button>
 
-          <button className="btn btn-xs btn-of"
+          <button className="btn btn-xs"
                   onClick={() => applyChange()}
                   aria-disabled={!updated}>
             <span className="icon icon-checkmark icon-16px"/> Apply

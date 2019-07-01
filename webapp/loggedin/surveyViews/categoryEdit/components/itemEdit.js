@@ -55,7 +55,7 @@ const ItemEdit = (props) => {
           ? (
             <React.Fragment>
 
-              <button className="btn-s btn-of-light-xs btn-close"
+              <button className="btn btn-s btn-close"
                       onClick={() => setCategoryItemForEdit(category, level, item, false)}>
                 <span className="icon icon-arrow-up icon-12px"/>
               </button>
@@ -74,7 +74,7 @@ const ItemEdit = (props) => {
 
               {
                 !readOnly &&
-                <button className="btn btn-of-light btn-delete"
+                <button className="btn btn-delete"
                         aria-disabled={disabled}
                         onClick={() => {
                           if (confirm(i18n.t('categoryEdit.confirmDelete'))) {

@@ -20,81 +20,11 @@ body {
   margin: 0;
   font-weight: 400;
   letter-spacing: 1px;
-  color: $white;
-}
-
-.main__bg {
-  @include full-screen-fixed();
-  background-size: cover;
-  background-position: center;
-}
-
-@keyframes main__bg1-login {
-  0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(1.1, 1.1);
-  }
-  100% {
-    transform: scale(1, 1);
-  }
-}
-
-@keyframes main__bg2-login {
-  0% {
-    transform: scale(1.1, 1.1);
-    opacity: .9;
-  }
-  50% {
-    transform: scale(1.5, 1.5);
-    opacity: .65;
-  }
-  100% {
-    transform: scale(1.1, 1.1);
-    opacity: .9;
-  }
-}
-
-.main__bg1 {
-  @extend .main__bg;
-  background-image: url("/img/landing-bg.jpg");
-
-  &.login {
-    animation: main__bg1-login 16s infinite;
-  }
-}
-
-.main__bg2 {
-  @extend .main__bg;
-  background-image: url("/img/landing-bg2.jpg");
-  transform: scale(1.1, 1.1);
-  opacity: .9;
-
-  &.login {
-    animation: main__bg2-login 22s infinite;
-  }
-}
-
-.main__bg-overlay:after {
-  opacity: 0.8;
-  background: transparent;
-  background-image: linear-gradient(to bottom, black 0%, rgba($pink, 0.2) 100%);
-  background-repeat: repeat-x;
-  content: '';
-  display: block !important;
-
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-  width: 100%;
+  color: $black;
 }
 
 .main__system-error {
-  @extend .main__bg;
+  @include full-screen-fixed();
   display: grid;
   justify-content: center;
   align-items: center;
@@ -126,16 +56,8 @@ body {
   font-weight: 600;
 }
 
-.title-of {
-  border-bottom: 3px double $whiteLight;
-  padding-bottom: .5rem;
-  text-transform: uppercase;
-  border-bottom-right-radius: 10% 2%;
-  border-bottom-left-radius: 80% 10%;
-}
-
 .separator-of {
-  border-bottom: 1px double rgba($white, .2);
+  border-bottom: 1px double $greyBorder;
   border-bottom-right-radius: 10% 2%;
   border-bottom-left-radius: 80% 10%;
   width: 70%;
@@ -143,10 +65,10 @@ body {
 }
 
 .badge-of {
-  background-color: rgba($white, .2);
   padding: .15rem .3rem;
-  border-radius: $ofBorderRadius;
-  font-size: .7rem;
+  font-size: .6rem;
+  background-color: $blueLight;
+  font-weight: 600;
 }
 
 .no-border {

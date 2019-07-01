@@ -36,7 +36,7 @@ class Popup extends React.PureComponent {
       <div className={`popup ${className}`}
            ref={this.elementRef}
            style={style}>
-        <button className="btn btn-of popup__btn-close"
+        <button className="btn popup__btn-close"
                 onClick={onClose}>
           <span className="icon icon-cross icon-8px"/>
         </button>

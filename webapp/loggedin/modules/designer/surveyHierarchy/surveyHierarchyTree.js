@@ -159,7 +159,7 @@ export default class SurveyHierarchyTree {
       .text(d => NodeDef.getLabel(d.data, this.lang))
 
     grid.append('xhtml:button')
-      .attr('class', 'btn btn-of-light-xs')
+      .attr('class', 'btn')
       .style('display', d => hasChildren(d) ? 'block' : 'none')
       .on('click', d => this.toggleNode(d))
       .append('xhtml:span')

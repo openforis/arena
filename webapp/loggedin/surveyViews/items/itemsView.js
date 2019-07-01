@@ -25,7 +25,7 @@ const ItemsView = (props) => {
         {
           onClose &&
           <div className="items__footer">
-            <button className="btn btn-of-light"
+            <button className="btn"
                     onClick={() => {
                       onClose ? onClose() : null
                     }}>

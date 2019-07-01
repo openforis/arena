@@ -21,7 +21,7 @@ const NodeDefMultipleEditDialog = props => {
 
       <ModalFooter>
         <div>
-          <button className="btn btn-of modal-footer__item"
+          <button className="btn modal-footer__item"
                   onClick={onClose}>
             Close
           </button>

@@ -7,8 +7,7 @@ import TableColumn from './tableColumn'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../../common/record/record'
 
-import { appModuleUri } from '../../../../../appModules'
-import { dataModules } from '../../../dataModules'
+import { appModuleUri, dataModules } from '../../../../../appModules'
 import ErrorBadge from '../../../../../../commonComponents/errorBadge'
 
 const defaultColWidth = 100
@@ -59,7 +58,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, histor
                   {i + offset + 1}
                   {
                     editMode &&
-                    <button className="btn btn-s btn-of-light btn-edit"
+                    <button className="btn btn-s btn-edit"
                             title="View record"
                             onClick={() => history.push(recordEditUrl)}>
                       <span className="icon icon-pencil2 icon-16px"/>
