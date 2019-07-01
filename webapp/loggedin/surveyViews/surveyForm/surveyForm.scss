@@ -5,7 +5,7 @@ $tableRowHeaderHeight: 40px;
 
 .survey-form {
   display: grid;
-  grid-template-rows: 50px 1fr;
+  grid-template-rows: 40px 1fr;
 
   .node-def__form_page {
     border: 2px solid $greyBorder;
@@ -24,7 +24,7 @@ $tableRowHeaderHeight: 40px;
       }
     }
 
-    .survey-form__nav {
+    .survey-form-header {
       grid-column: 1/3;
     }
   }
@@ -73,21 +73,21 @@ $tableRowHeaderHeight: 40px;
 
 }
 
-.survey-form__nav {
+/**
+* ==== survey form header
+*/
+
+.survey-form-header {
   display: flex;
   justify-content: space-between;
+  align-items: start;
 }
 
-.survey-form__nav-node-def-navigation {
-  display: flex;
-  align-items: flex-end;
-}
 
-.survey-form__nav-record-actions {
+.survey-form-header__actions {
   display: flex;
-  align-self: center;
 
-  > * {
+  > *:not(:last-child) {
     margin: 0 1rem;
   }
 
@@ -95,9 +95,11 @@ $tableRowHeaderHeight: 40px;
     position: relative;
   }
 
-  .survey-form__nav-record-actions-steps > * {
-    margin: 0 .5rem;
-  }
+}
+
+.survey-form-header__record-actions-steps > * {
+  margin: 0 .5rem;
+  font-size: .8rem;
 }
 
 .survey-form__actions {

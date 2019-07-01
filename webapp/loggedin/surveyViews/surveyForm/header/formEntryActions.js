@@ -33,7 +33,7 @@ const RecordEntryButtons = (props) => {
 
       <ErrorBadge validation={{ valid }} labelKey="data.invalidRecord"/>
 
-      <div className="survey-form__nav-record-actions-steps">
+      <div className="survey-form-header__record-actions-steps">
         {
           stepPrev &&
           <button className="btn-s"
@@ -88,11 +88,11 @@ const FormEntryActions = (props) => {
   const i18n = useI18n()
 
   return (
-    <div className="survey-form__nav-record-actions">
+    <div className="survey-form-header__actions">
       {
         preview
           ? (
-            <Link to={appModuleUri(designerModules.formDesigner)} className="btn">
+            <Link to={appModuleUri(designerModules.formDesigner)} className="btn btn-s">
               <span className="icon icon-eye-blocked icon-12px icon-left"/>
               {i18n.t('surveyForm.formEntryActions.closePreview')}
             </Link>

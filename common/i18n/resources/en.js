@@ -170,6 +170,7 @@ module.exports = {
   },
 
   surveyForm: {
+    showPageNav:'Show page navigation',
     formEditActions: {
       preview: 'Preview',
     },

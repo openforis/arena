@@ -11,8 +11,8 @@ const FormEditActions = ({ history, createRecord }) => {
   const i18n = useI18n()
 
   return (
-    <div className="survey-form__nav-record-actions">
-      <button className="btn" onClick={() => createRecord(history, true)}>
+    <div className="survey-form-header__actions">
+      <button className="btn btn-s" onClick={() => createRecord(history, true)}>
         <span className="icon icon-eye icon-12px icon-left"/>
         {i18n.t('surveyForm.formEditActions.preview')}
       </button>

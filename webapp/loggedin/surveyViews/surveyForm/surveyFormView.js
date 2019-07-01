@@ -6,7 +6,7 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import FormNavigation from './navigation/formNavigation'
+import FormHeader from './header/formHeader'
 import FormActions from './formActions'
 import NodeDefEdit from '../nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
@@ -51,7 +51,7 @@ const SurveyFormView = (props) => {
           <NodeDefEdit/>
         }
 
-        <FormNavigation
+        <FormHeader
           edit={edit}
           entry={entry && canEditRecord}
           preview={preview}
