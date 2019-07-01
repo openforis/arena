@@ -3,7 +3,7 @@ const jwkToPem = require('jwk-to-pem')
 const jwt = require('jsonwebtoken')
 const R = require('ramda')
 
-const region = 'eu-west-1'
+const region = process.env.COGNITO_REGION
 const poolId = process.env.COGNITO_USER_POOL_ID
 const issuer = `https://cognito-idp.${region}.amazonaws.com/${poolId}`
 

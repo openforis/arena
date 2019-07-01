@@ -31,6 +31,7 @@ const plugins = [
     {
       __SYSTEM_VERSION__: `"${versionString}"`,
       __BUST__: `"${uuidv4()}"`,
+      __COGNITO_REGION__: JSON.stringify(process.env.COGNITO_REGION),
       __COGNITO_USER_POOL_ID__: JSON.stringify(process.env.COGNITO_USER_POOL_ID),
       __COGNITO_CLIENT_ID__: JSON.stringify(process.env.COGNITO_CLIENT_ID),
       'process.env': {

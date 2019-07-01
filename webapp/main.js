@@ -13,14 +13,11 @@ import AppRouterSwitch from './app/appRouterSwitch'
 
 import * as AxiosJwtMiddleware from './app/axiosJwtMiddleware'
 
-
-
-
 import Amplify from 'aws-amplify'
 
 Amplify.configure({
   Auth: {
-    region: 'eu-west-1',
+    region: __COGNITO_REGION__,
     userPoolId: __COGNITO_USER_POOL_ID__,
     userPoolWebClientId: __COGNITO_CLIENT_ID__,
 
