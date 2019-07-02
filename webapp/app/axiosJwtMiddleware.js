@@ -1,11 +1,10 @@
 import axios from 'axios'
 
-import { Auth } from 'aws-amplify'
+import * as CognitoAuth from '../utils/cognitoAuth'
 
 const requestHandler = async request => {
   try {
-    const session = await Auth.currentSession()
-    const jwtToken = session.getAccessToken().jwtToken
+    const jwtToken = await CognitoAuth.getJwtToken()
 
     request.headers['Authorization'] = `Bearer ${jwtToken}`
     return request

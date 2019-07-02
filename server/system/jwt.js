@@ -1,6 +1,6 @@
 const axios = require('axios')
 const jwkToPem = require('jwk-to-pem')
-const jwt = require('jsonwebtoken')
+const jsonwebtoken = require('jsonwebtoken')
 const R = require('ramda')
 
 const region = process.env.COGNITO_REGION
@@ -25,7 +25,7 @@ const indexKeys = keyList => keyList.reduce((keys, jwk) => {
   return keys
 }, {})
 
-const decode = token => jwt.decode(token, { complete: true })
+const decode = token => jsonwebtoken.decode(token, { complete: true })
 
 // Now we need to decode our token, to find the verification key
 const findVerificationKey = token => pemList => {
@@ -35,7 +35,7 @@ const findVerificationKey = token => pemList => {
 
 // Verify our token
 const verifyToken = token => pem =>
-  jwt.verify(token, pem, verificationOptions)
+  jsonwebtoken.verify(token, pem, verificationOptions)
 
 let keys
 

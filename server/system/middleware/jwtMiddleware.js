@@ -1,4 +1,4 @@
-const jwt = require('../jwt')
+const Jwt = require('../jwt')
 
 const UserService = require('../../modules/user/service/userService')
 
@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
   } else {
     const jwtToken = authorizationHeader && authorizationHeader.substr(bearerPrefix.length)
 
-    const decoded = await jwt.validate(jwtToken)
+    const decoded = await Jwt.validate(jwtToken)
     const username = decoded.username
     const user = await UserService.findUserByUsername(username)
 

@@ -48,9 +48,14 @@ const AppRouterSwitch = props => {
       // Before sending  get request in app/actions/initApp has been sent, user is
       // undefined, after the request is null if not logged in
       props.history.push(loginUri)
-      closeWebSocket()
-    } else {
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
       openWebSocket()
+    } else {
+      closeWebSocket()
     }
   }, [user])
 
