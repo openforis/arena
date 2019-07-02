@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import Record from '../../../../common/record/record'
@@ -8,6 +6,7 @@ import Node from '../../../../common/record/node'
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from '../record/recordState'
+import * as SurveyFormState from './surveyFormState'
 
 /**
  * ==== SURVEY-FORM EDIT MODE - NODE DEFS EDIT
@@ -35,6 +34,14 @@ export const formPageNodeUpdate = 'survey/form/pageNode/update'
 
 export const setFormPageNode = (nodeDef, node) => dispatch =>
   dispatch({ type: formPageNodeUpdate, nodeDef, node })
+
+// toggle form page navigation
+export const formShowPageNavigationUpdate = 'survey/form/showPageNavigation/update'
+
+export const toggleFormPageNavigation = () => (dispatch, getState) => {
+  const showPageNavigation = !SurveyFormState.showPageNavigation(getState())
+  dispatch({ type: formShowPageNavigationUpdate, showPageNavigation })
+}
 
 // ==== utils
 

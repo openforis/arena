@@ -170,6 +170,9 @@ module.exports = {
   },
 
   surveyForm: {
+    showPageNav: 'Show pages',
+    hidePageNav: 'Hide pages',
+    subPage: 'Sub page',
     formEditActions: {
       preview: 'Preview',
     },
@@ -183,9 +186,6 @@ module.exports = {
     nodeDefEditFormActions: {
       columns: 'Columns',
       confirmDelete: 'Are you sure you want to permanently delete this node definition?\n\n$t(common.cantUndoWarning)',
-    },
-    nodeDefNavigation: {
-      subPage: 'sub page',
     },
     nodeDefCode: {
       buttonCode: 'Button code',

@@ -2,60 +2,42 @@
 
 $tableBorder: 1px solid $greyBorder;
 $tableRowHeaderHeight: 40px;
+$formHeaderHeight: 40px;
 
 .survey-form {
-  display: grid;
-  grid-template-rows: 50px 1fr;
 
   .node-def__form_page {
-    border: 2px solid $greyBorder;
+    border: 1px solid $greyBorder;
   }
 
-  &.edit {
-    grid-template-columns: 1fr 200px;
-
-    &.form-actions-off {
-      grid-template-columns: 1fr 0;
-
-      .survey-form__actions {
-        .btn-toggle {
-          left: 0;
-        }
-      }
-    }
-
-    .survey-form__nav {
-      grid-column: 1/3;
-    }
+  .react-grid-item {
+    border: 1px solid rgba($greyBorder, .3);
   }
 
   //edit mode
   &.form-designer {
     .react-grid-item {
-      border: 1px dashed rgba($blueLight, .7);
+      border: 1px dashed rgba($greyBorder, .9);
 
       // inner page
       &.node-def__inner-form {
-        border: 2px dashed $greyBorder;
+        border: 1px dashed $greyBorder;
       }
 
       > .react-resizable-handle::after {
-        border-right: 2px solid rgba($blueLight, 0.7);
-        border-bottom: 2px solid rgba($blueLight, 0.7);
+        border-right: 2px solid rgba($greyBorder, 0.9);
+        border-bottom: 2px solid rgba($greyBorder, 0.9);
       }
 
     }
 
     .node-def__form_page {
-      border: 2px dashed $greyBorder;
+      border: 1px dashed $greyBorder;
     }
   }
 
   .react-grid-layout {
     .react-grid-item {
-      &.node-def__inner-form {
-        border: 2px solid $greyBorder;
-      }
 
       &.cssTransforms {
         //react-grid-item css animation are disabled on first render
@@ -73,21 +55,74 @@ $tableRowHeaderHeight: 40px;
 
 }
 
-.survey-form__nav {
+.survey-form-container {
+  display: grid;
+  height: calc(100% - #{$formHeaderHeight});
+  grid-template-columns: 250px 1fr;
+}
+
+.survey-form.page-navigation-off {
+  .survey-form-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.survey-form.edit {
+  .survey-form-container {
+    grid-template-columns: 250px 1fr 200px;
+  }
+}
+
+.survey-form.edit.page-navigation-off {
+  .survey-form-container {
+    grid-template-columns: 1fr 200px;
+  }
+}
+
+.survey-form.edit.form-actions-off {
+  .survey-form-container {
+    grid-template-columns: 250px 1fr 0;
+  }
+}
+
+.survey-form.edit.form-actions-off.page-navigation-off {
+  .survey-form-container {
+    grid-template-columns: 1fr 0;
+  }
+}
+
+/**
+* ==== survey form header
+*/
+
+.survey-form-header {
   display: flex;
   justify-content: space-between;
+  align-items: start;
+  height: $formHeaderHeight;
 }
 
-.survey-form__nav-node-def-navigation {
+.survey-form-header__label-container {
   display: flex;
-  align-items: flex-end;
+
+  .btn-add-sub-page {
+    border: none;
+    align-self: flex-end;
+    border-bottom: 1px dashed $greyBorder;
+  }
 }
 
-.survey-form__nav-record-actions {
-  display: flex;
-  align-self: center;
+.survey-form-header__node-def-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  align-self: flex-end;
+  margin-left: 2rem;
+}
 
-  > * {
+.survey-form-header__actions {
+  display: flex;
+
+  > *:not(:last-child) {
     margin: 0 1rem;
   }
 
@@ -95,9 +130,11 @@ $tableRowHeaderHeight: 40px;
     position: relative;
   }
 
-  .survey-form__nav-record-actions-steps > * {
-    margin: 0 .5rem;
-  }
+}
+
+.survey-form-header__record-actions-steps > * {
+  margin: 0 .5rem;
+  font-size: .8rem;
 }
 
 .survey-form__actions {
@@ -107,6 +144,10 @@ $tableRowHeaderHeight: 40px;
   align-content: start;
   justify-content: center;
   grid-template-columns: .65fr;
+  padding-top: 3rem;
+  border-top: 1px dashed $greyBorder;
+  border-right: 1px dashed $greyBorder;
+  border-bottom: 1px dashed $greyBorder;
 
   .btn-toggle {
     position: absolute;
