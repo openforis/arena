@@ -61,6 +61,10 @@ class FormActions extends React.Component {
     }
   }
 
+  componentWillUnmount () {
+    this.props.setFormNodeDefAddChildTo(null)
+  }
+
   addNodeDef (type, props) {
     const { nodeDef, createNodeDef } = this.props
     createNodeDef(NodeDef.getUuid(nodeDef), type, props)
