@@ -2,14 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
+import { dispatchWindowResize } from '../../../../utils/domUtils'
+
 import NodeDef from '../../../../../common/survey/nodeDef'
 
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
+import * as SurveyFormState from '../surveyFormState'
+
 import { createNodeDef } from '../../../../survey/nodeDefs/actions'
 import { setFormNodeDefAddChildTo } from '../actions'
-
-import * as SurveyFormState from '../surveyFormState'
 
 const AddNodeDefButtons = ({ addNodeDef, setFormNodeDefAddChildTo }) => {
 
@@ -55,7 +57,7 @@ class FormActions extends React.Component {
       surveyFormElement.classList.toggle('form-actions-off')
 
       //react-grid-layout re-render
-      window.dispatchEvent(new Event('resize'))
+      dispatchWindowResize()
     }
   }
 
