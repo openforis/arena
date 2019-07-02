@@ -4,7 +4,7 @@ import * as R from 'ramda'
 import useI18n from '../../../../../../commonComponents/useI18n'
 
 import { FormItem, Input } from '../../../../../../commonComponents/form/input'
-import createNumberMask from 'text-mask-addons/dist/createNumberMask';
+import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import Dropdown from '../../../../../../commonComponents/form/dropdown'
 
@@ -71,11 +71,7 @@ const NodeDefCoordinate = props => {
   }
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr',
-      rowGap: '.3rem',
-    }}>
+    <div className="node-def__coordinate">
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>
         {xInput}
       </FormItem>

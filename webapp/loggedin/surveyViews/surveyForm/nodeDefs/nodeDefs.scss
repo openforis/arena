@@ -1,5 +1,15 @@
 @import "../../../../style/vars";
 
+.node-def__coordinate {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 0.3rem;
+
+  .form-item {
+    grid-template-columns: 40px 1fr;
+  }
+}
+
 .node-def__code-checkbox-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -58,7 +68,6 @@
 }
 
 .node-def__multiple-nodes-edit-modal {
-
   .modal-body {
     height: 40vh;
   }
