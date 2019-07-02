@@ -16,7 +16,6 @@ $rowHeaderHeight: 45px;
 
   .table__header {
     height: 40px;
-    align-items: top;
 
     .data-operations {
       display: grid;
@@ -35,8 +34,7 @@ $rowHeaderHeight: 45px;
   }
 
   &.edit {
-    border: 3px dashed $greyBorder;
-    background-color: rgba($grey, 0.2);
+    border: 1px dashed $greyBorder;
   }
 
   .table__rows {
@@ -64,11 +62,21 @@ $rowHeaderHeight: 45px;
   }
 
   .table__row {
-    border-right: none;
-    border-left: none;
 
     &:last-child {
       border-bottom: none;
+    }
+
+    .btn-edit {
+      border: none;
+
+      &:hover {
+        color: $orange;
+      }
+    }
+
+    .error-badge {
+      pointer-events: none;
     }
   }
 
@@ -89,4 +97,5 @@ $rowHeaderHeight: 45px;
     display: flex;
     flex-wrap: wrap;
   }
+
 }

@@ -51,9 +51,13 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, histor
 
             return (
               <div key={i} className="table__row">
+
                 <ErrorBadge
                   validation={validation}
-                  showLabel={false}/>
+                  showLabel={false}
+                  className="error-badge-inverse"
+                />
+
                 <div style={{ width: defaultColWidth }}>
                   {i + offset + 1}
                   {
@@ -61,7 +65,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, histor
                     <button className="btn btn-s btn-edit"
                             title="View record"
                             onClick={() => history.push(recordEditUrl)}>
-                      <span className="icon icon-pencil2 icon-16px"/>
+                      <span className="icon icon-pencil2 icon-12px"/>
                     </button>
                   }
                 </div>

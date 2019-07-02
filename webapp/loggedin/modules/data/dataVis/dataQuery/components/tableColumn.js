@@ -25,16 +25,7 @@ const TableColumn = (props) => {
       {
         isHeader &&
         <div style={{ width: '100%' }}>
-          {
-            editMode &&
-            <NodeDefTableHeader nodeDef={nodeDef} label={NodeDef.getLabel(nodeDef, lang)}/>
-          }
-          {
-            !editMode &&
-            <div>
-              {NodeDef.getLabel(nodeDef, lang)}
-            </div>
-          }
+            {NodeDef.getLabel(nodeDef, lang)}
         </div>
       }
 
