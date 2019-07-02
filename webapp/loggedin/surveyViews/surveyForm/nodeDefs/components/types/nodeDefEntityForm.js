@@ -113,7 +113,7 @@ class EntityForm extends React.Component {
           rowHeight={edit && canEditDef ? 80 : 50}
           cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
           layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
-          containerPadding={edit && canEditDef ? [30, 50] : [30, 30]}
+          containerPadding={edit && canEditDef ? [15, 40] : [15, 15]}
           onLayoutChange={onChangeLayout ? onChangeLayout : () => {}}
           isDraggable={edit && canEditDef && !locked}
           isResizable={edit && canEditDef && !locked}
