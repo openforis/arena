@@ -6,13 +6,8 @@
 
     .error-badge {
       left: 4rem;
-      background-color: white;
       pointer-events: none;
-
-      .icon {
-        color: $red;
-        font-weight: bold;
-      }
+      top: .5rem;
     }
 
     .btn-edit:hover {

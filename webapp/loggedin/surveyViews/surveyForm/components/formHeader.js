@@ -1,5 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+
+import { dispatchWindowResize } from '../../../../utils/domUtils'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -29,6 +31,20 @@ const FormHeader = props => {
   } = props
 
   const i18n = useI18n()
+
+  //if showPageNavigation changes, trigger window resize to rerender form
+  useEffect(() => {
+    const reactGridLayoutElems = document.getElementsByClassName('react-grid-layout')
+    for (const el of reactGridLayoutElems) {
+      el.classList.remove('mounted')
+    }
+    dispatchWindowResize()
+    setTimeout(() => {
+      for (const el of reactGridLayoutElems) {
+        el.classList.add('mounted')
+      }
+    }, 100)
+  }, [showPageNavigation])
 
   return (
     <div className="survey-form-header">

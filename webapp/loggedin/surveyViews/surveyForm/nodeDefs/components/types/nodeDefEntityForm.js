@@ -110,10 +110,11 @@ class EntityForm extends React.Component {
         <ResponsiveGridLayout
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
           autoSize={false}
-          rowHeight={edit && canEditDef ? 80 : 50}
+          rowHeight={edit && canEditDef ? 80 : 70}
           cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
           layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
-          containerPadding={edit && canEditDef ? [30, 50] : [30, 30]}
+          containerPadding={edit && canEditDef ? [15, 40] : [15, 15]}
+          margin={[5, 5]}
           onLayoutChange={onChangeLayout ? onChangeLayout : () => {}}
           isDraggable={edit && canEditDef && !locked}
           isResizable={edit && canEditDef && !locked}

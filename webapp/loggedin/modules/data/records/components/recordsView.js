@@ -29,7 +29,11 @@ import * as SurveyState from '../../../../../survey/surveyState'
 const RecordRow = ({ idx, offset, record, style, nodeDefKeys, canEdit }) => (
   <div className="table__row" style={style}>
     <div>
-      <ErrorBadge validation={Validator.getValidation(record)} showLabel={false}/>
+      <ErrorBadge
+        validation={Validator.getValidation(record)}
+        showLabel={false}
+        className="error-badge-inverse"
+      />
       {idx + offset + 1}
     </div>
     {

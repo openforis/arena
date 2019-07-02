@@ -30,8 +30,10 @@ const NodeDefErrorBadge = props => {
   return (
     <ErrorBadge
       validation={validation}
-      showLabel={edit}
-      showKeys={false}/>
+      showLabel={false}
+      showKeys={false}
+      className="error-badge-inverse"
+    />
   )
 }
 
