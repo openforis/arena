@@ -30,7 +30,7 @@ const NodeDefEditFormActions = (props) => {
         <div className="node-def__form-root-actions">
           {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
           <input value={Layout.getNoColumns(nodeDef)}
-                 type="number" min="1" max="6"
+                 type="number" min="1" max="12"
                  onChange={e => e.target.value > 0 ?
                    putNodeDefProp(nodeDef, Layout.nodeDefLayoutProps.columns, e.target.value)
                    : null
