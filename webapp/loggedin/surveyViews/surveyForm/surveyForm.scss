@@ -179,10 +179,16 @@ $formHeaderHeight: 40px;
   .form-input {
     text-overflow: ellipsis;
     text-align: right;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .form-item {
     grid-template-columns: 135px 1fr;
+
+    :nth-child(2) {
+      padding-right: .5rem;
+    }
   }
 
   //.badge {
@@ -316,7 +322,7 @@ $formHeaderHeight: 40px;
 
   .form-input {
     border: none;
-    padding: 0 .5rem;
+    padding: 0;
     overflow: hidden;
   }
 

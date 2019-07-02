@@ -37,6 +37,7 @@ $tableRowsHeight: calc(100% - 77px);
   border-bottom: $rowBorder;
   height: $rowHeight;
   position: relative;
+  font-size: .9rem;
 
   &.active {
     background-color: rgba($blueLightActive, .6);
