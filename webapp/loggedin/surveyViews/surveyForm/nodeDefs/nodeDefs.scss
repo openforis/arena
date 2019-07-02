@@ -7,7 +7,7 @@
   .btn-checkbox {
     pointer-events: all;
 
-    &[aria-disabled="true"]{
+    &[aria-disabled="true"] {
       pointer-events: none;
     }
   }
@@ -45,6 +45,15 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: .9rem;
+  }
+
+  button {
+    border: none;
+
+    &:hover {
+      color: $orange;
+    }
   }
 }
 
