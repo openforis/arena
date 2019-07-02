@@ -5,3 +5,12 @@
   display: block;
   color: white;
 }
+
+.error-badge-inverse {
+  background-color: transparent;
+
+  .icon {
+    color: $red;
+    font-weight: bold;
+  }
+}

@@ -21,7 +21,7 @@ const NodeDefFormItem = props => {
   return NodeDef.isEntity(nodeDef)
     ? nodeDefComponent
     : (
-      <FormItem label={labelComponent}>
+      <FormItem label={labelComponent} className="node-def__form-item">
         {nodeDefComponent}
       </FormItem>
     )

@@ -8,7 +8,7 @@ import Validator from '../../common/validation/validator'
 
 import ValidationTooltip from './validationTooltip'
 
-const ErrorBadge = ({ validation, showLabel, labelKey, showKeys }) => {
+const ErrorBadge = ({ validation, showLabel, labelKey, showKeys, className = '' }) => {
 
   const i18n = useI18n()
   const invalid = !Validator.isValidationValid(validation)
@@ -18,7 +18,7 @@ const ErrorBadge = ({ validation, showLabel, labelKey, showKeys }) => {
       <ValidationTooltip
         validation={validation}
         showKeys={showKeys}
-        className="badge error-badge">
+        className={`badge error-badge ${className}`}>
         <div className="badge__content">
           <span className={`icon icon-warning icon-12px${showLabel ? ' icon-left' : ''}`}/>
           {

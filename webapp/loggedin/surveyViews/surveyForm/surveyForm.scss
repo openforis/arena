@@ -18,7 +18,7 @@ $formHeaderHeight: 40px;
   //edit mode
   &.form-designer {
     .react-grid-item {
-      border: 1px dashed rgba($greyBorder, .9);
+      border: 1px dashed $greyBorder;
 
       // inner page
       &.node-def__inner-form {
@@ -26,8 +26,8 @@ $formHeaderHeight: 40px;
       }
 
       > .react-resizable-handle::after {
-        border-right: 2px solid rgba($greyBorder, 0.9);
-        border-bottom: 2px solid rgba($greyBorder, 0.9);
+        border-right: 2px solid $greyBorder;
+        border-bottom: 2px solid $greyBorder;
       }
 
     }
@@ -181,19 +181,26 @@ $formHeaderHeight: 40px;
   .form-input {
     text-overflow: ellipsis;
     text-align: right;
+    padding: .25rem 1rem;
   }
 
-  .form-item {
-    grid-template-columns: 135px 1fr;
+  .node-def__form-item {
+    //grid-template-columns: 135px 1fr;
+    grid-template-columns: 1fr;
+
+    > :nth-child(1).form-label {
+      padding: 0 .5rem;
+      justify-self: start;
+      font-weight: 600;
+      padding: .5rem 2rem;
+      align-self: start;
+    }
 
     > :nth-child(2) {
-      padding-right: .5rem;
+      padding: 0 .5rem;
+      align-self: start;
     }
   }
-
-  //.badge {
-  //  position: fixed;
-  //}
 
 }
 

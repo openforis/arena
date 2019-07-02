@@ -5,8 +5,8 @@ import React from 'react'
 import ValidationTooltip from '../validationTooltip'
 import { TextMask, InputAdapter } from 'react-text-mask-hoc'
 
-export const FormItem = ({ label, children }) => (
-  <div className="form-item">
+export const FormItem = ({ label, children, className = '' }) => (
+  <div className={`form-item ${className}`}>
     <label className="form-label">{label}</label>
     {children}
   </div>
