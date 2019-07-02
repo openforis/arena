@@ -34,7 +34,16 @@ const FormHeader = props => {
 
   //if showPageNavigation changes, trigger window resize to rerender form
   useEffect(() => {
+    const reactGridLayoutElems = document.getElementsByClassName('react-grid-layout')
+    for (const el of reactGridLayoutElems) {
+      el.classList.remove('mounted')
+    }
     dispatchWindowResize()
+    setTimeout(() => {
+      for (const el of reactGridLayoutElems) {
+        el.classList.add('mounted')
+      }
+    }, 100)
   }, [showPageNavigation])
 
   return (
