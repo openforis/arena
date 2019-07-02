@@ -37,6 +37,7 @@ const init = (server, jwtMiddleware) => {
       R.prop('request'),
       Request.getSessionUserId,
     )(socket)
+
     if (userId) {
       addUserSocket(userId, socket)
 

@@ -48,9 +48,9 @@ class LoginView extends SignIn {
           this.props.initApp()
           this.props.history.push(appModuleUri())
           break
-        case 'signUp':
-          // logger.error('user signed up');
-          break
+        // case 'signUp':
+        //   // logger.error('user signed up');
+        //   break
         case 'signOut':
           this.props.history.push('/')
           break
@@ -58,9 +58,9 @@ class LoginView extends SignIn {
           this.setState({ errorMessage: payload.data.message })
           // logger.error('user sign in failed');
           break
-        case 'configured':
-          // logger.error('the Auth module is configured');
-          break
+        // case 'configured':
+        //   // logger.error('the Auth module is configured');
+        //   break
         }
 
     })

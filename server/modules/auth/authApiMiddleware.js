@@ -20,7 +20,7 @@ const checkPermission = (req, res, next, permissionFn, obj) => {
   if (permissionFn(user, obj)) {
     next()
   } else {
-    next(new UnauthorizedError(user.name))
+    next(new UnauthorizedError(user && user.name))
   }
 
 }
