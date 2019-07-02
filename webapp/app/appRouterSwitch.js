@@ -3,7 +3,7 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Switch, Route } from 'react-router-dom'
 
-import { Authenticator, SignIn } from 'aws-amplify-react/dist/Auth'
+import { Authenticator, SignIn, RequireNewPassword } from 'aws-amplify-react/dist/Auth'
 
 import LoginView from '../login/loginView'
 import DynamicImport from '../commonComponents/dynamicImport'
@@ -69,11 +69,8 @@ const AppRouterSwitch = props => {
         : (
           <Authenticator hide={[SignIn]} hideDefault={true}>
             <LoginView override={'SignIn'}/>
+            <RequireNewPassword />
             <Switch>
-              {/*<Route*/}
-              {/*  exact path="/"*/}
-              {/*  component={LoginView}*/}
-              {/*/>*/}
               <Route
                 path="/app"
                 render={props => (

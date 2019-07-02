@@ -9,8 +9,8 @@ import * as R from 'ramda'
 import { SignIn } from 'aws-amplify-react'
 import { Hub } from 'aws-amplify'
 
-import { initApp } from '../../app/actions'
-import { appModuleUri } from '../../loggedin/appModules'
+import { initApp } from '../app/actions'
+import { appModuleUri } from '../loggedin/appModules'
 
 const noCols = 12
 const noRows = 6
@@ -42,23 +42,17 @@ class LoginView extends SignIn {
   componentDidMount () {
     Hub.listen('auth', async data => {
       const { payload } = data
-      console.log('===========')
-      console.log(data)
-      // const { payload } = data
-      // console.log('A new auth event has happened: ', data.payload.data.username + ' has ' + data.payload.event)
-      // const { data: { user: serverUser, survey } } = await axios.get('/auth/user')
       switch (data.payload.event) {
 
         case 'signIn':
           this.props.initApp()
           this.props.history.push(appModuleUri())
-          // logger.error('user signed in'); //[ERROR] My-Logger - user signed in
           break
         case 'signUp':
           // logger.error('user signed up');
           break
         case 'signOut':
-          // logger.error('user signed out');
+          this.props.history.push('/')
           break
         case 'signIn_failure':
           this.setState({ errorMessage: payload.data.message })
@@ -67,7 +61,7 @@ class LoginView extends SignIn {
         case 'configured':
           // logger.error('the Auth module is configured');
           break
-      }
+        }
 
     })
   }
