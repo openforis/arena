@@ -12,7 +12,7 @@
 .form-item {
   display: grid;
   grid-template-columns: .3fr .65fr;
-  grid-column-gap: 1rem;
+  grid-column-gap: .5rem;
   height: 100%;
   align-items: center;
 }
@@ -21,6 +21,8 @@
   justify-self: right;
   font-size: .9rem;
   text-align: end;
+  padding-left: 2px;
+  letter-spacing: .5px;
 }
 
 //.form-input {
