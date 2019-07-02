@@ -16,6 +16,7 @@ import Record from '../../../../../../../common/record/record'
 import Node from '../../../../../../../common/record/node'
 import { isRenderDropdown } from '../../../../../../../common/survey/nodeDefLayout'
 
+import * as AppState from '../../../../../../app/appState'
 import * as SurveyState from '../../../../../../survey/surveyState'
 import * as RecordState from '../../../../record/recordState'
 
@@ -143,6 +144,8 @@ class NodeDefCode extends React.Component {
 }
 
 const mapStateToProps = (state, props) => {
+  const language = AppState.getLang(state)
+
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = SurveyState.getSurveyInfo(state)
 
@@ -159,6 +162,8 @@ const mapStateToProps = (state, props) => {
     : []
 
   return {
+    language,
+
     surveyId: Survey.getId(survey),
     draft: Survey.isDraft(surveyInfo),
 
