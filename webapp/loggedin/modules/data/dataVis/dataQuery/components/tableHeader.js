@@ -51,7 +51,7 @@ const TableHeader = props => {
         <Tooltip messages={filter && [Expression.toString(filter, Expression.modes.sql)]}>
           <button className={`btn btn-s btn-edit${filter ? ' highlight' : ''}`}
                   onClick={toggleExpressionEditor}>
-            <span className="icon icon-filter icon-16px"/>
+            <span className="icon icon-filter icon-14px"/>
           </button>
         </Tooltip>
         {
@@ -76,7 +76,7 @@ const TableHeader = props => {
         <Tooltip messages={sortMsg && [sortMsg]}>
           <button className={`btn btn-s btn-edit${sort.length ? ' highlight' : ''}`}
                   onClick={toggleSortEditor}>
-            <span className="icon icon-sort-amount-asc icon-16px"/>
+            <span className="icon icon-sort-amount-asc icon-14px"/>
           </button>
         </Tooltip>
         {
@@ -99,7 +99,7 @@ const TableHeader = props => {
           canEdit &&
           <button className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
                   onClick={() => updateTableEditMode(!editMode)}>
-            <span className="icon icon-pencil2 icon-16px"/>
+            <span className="icon icon-pencil2 icon-14px"/>
           </button>
         }
 

@@ -23,11 +23,9 @@ $rowHeaderHeight: 45px;
       grid-column-gap: .25rem;
 
       .btn {
-        padding: .5rem;
-        font-size: 0.8rem;
 
         &.highlight {
-          background-color: rgba($yellow, .35) !important;
+          background-color: $yellow;
         }
       }
     }
@@ -62,11 +60,6 @@ $rowHeaderHeight: 45px;
   }
 
   .table__row {
-
-    &:last-child {
-      border-bottom: none;
-    }
-
     .btn-edit {
       border: none;
 

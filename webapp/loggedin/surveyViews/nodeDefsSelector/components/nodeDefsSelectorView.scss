@@ -32,6 +32,7 @@
   .btn-node-def {
     display: flex;
     justify-content: space-between;
+    margin: 0 .5rem;
 
     &.active {
       pointer-events: auto;
@@ -40,6 +41,14 @@
     &[disabled] {
       opacity: 1;
       pointer-events: none;
+    }
+
+    .icon {
+      font-size: 11px !important;
+    }
+
+    .node_def__icon {
+      font-size: 9px;
     }
   }
 
