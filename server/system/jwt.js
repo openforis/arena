@@ -15,6 +15,7 @@ const verificationOptions = {
 const getKeys = async (region, poolId) => {
   const jwksUrl = issuer + '/.well-known/jwks.json'
   const response = await axios.get(jwksUrl)
+
   return response.data.keys
 }
 
@@ -36,8 +37,10 @@ const findVerificationKey = token => pemList => {
 const verifyToken = token => pem =>
   jwt.verify(token, pem, verificationOptions)
 
+let keys
+
 const validate = async token => {
-  const keys = await getKeys(region, poolId)
+  keys = keys || await getKeys(region, poolId)
 
   return R.pipe(
     indexKeys,
