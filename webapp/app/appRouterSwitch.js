@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
-import { withRouter, Switch, Route } from 'react-router-dom'
+import { withRouter, Switch, Route, Redirect } from 'react-router-dom'
 
 import { Authenticator, SignIn, RequireNewPassword } from 'aws-amplify-react/dist/Auth'
 
@@ -14,7 +14,34 @@ import * as AppWebSocket from './appWebSocket'
 import * as AppState from './appState'
 import { throwSystemError, initApp } from './actions'
 
+import { appModuleUri } from '../loggedin/appModules'
+
 const loginUri = '/'
+
+class Authenticated extends React.Component {
+  render () {
+    const { authState } = this.props
+
+    return (
+      authState === 'signedIn' &&
+      <Switch>
+        <Route
+          exact
+          path="/"
+          render={props => (
+            <Redirect to={appModuleUri()}/>
+          )}
+        />
+        <Route
+          path="/app"
+          render={props => (
+            <DynamicImport {...props} load={() => import('../loggedin/appViewExport')} />
+          )}
+        />
+      </Switch>
+    )
+  }
+}
 
 const AppRouterSwitch = props => {
 
@@ -45,7 +72,7 @@ const AppRouterSwitch = props => {
 
   useEffect(() => {
     if (user === null) {
-      // Before sending  get request in app/actions/initApp has been sent, user is
+      // Before the get request in app/actions/initApp has been sent, user is
       // undefined, after the request is null if not logged in
       props.history.push(loginUri)
     }
@@ -75,14 +102,8 @@ const AppRouterSwitch = props => {
           <Authenticator hide={[SignIn]} hideDefault={true}>
             <LoginView override={'SignIn'}/>
             <RequireNewPassword />
-            <Switch>
-              <Route
-                path="/app"
-                render={props => (
-                  <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
-                )}
-              />
-            </Switch>
+
+            <Authenticated />
           </Authenticator>
         )
     )

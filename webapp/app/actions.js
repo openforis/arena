@@ -4,7 +4,7 @@ import * as AppState from './appState'
 
 import i18nFactory from '../../common/i18n/i18nFactory'
 
-import * as cognitoAuth from '../utils/cognitoAuth'
+import * as CognitoAuth from '../utils/cognitoAuth'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'
@@ -13,9 +13,13 @@ export const appUserPrefUpdate = 'app/user/pref/update'
 export const initApp = () => async (dispatch, getState) => {
   const i18n = await i18nFactory.createI18nPromise('en')
 
-  const { data: { user, survey } } = await axios.get('/auth/user')
+  dispatch(initUser())
+  dispatch({ type: appStatusChange, status: AppState.appStatus.ready, i18n })
+}
 
-  dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user, survey, i18n })
+export const initUser = () => async (dispatch, getState) => {
+  const { data: { user, survey } } = await axios.get('/auth/user')
+  dispatch({ type: appStatusChange, user, survey })
 }
 
 export const setLanguage = languageCode => async (dispatch) => {
@@ -24,7 +28,7 @@ export const setLanguage = languageCode => async (dispatch) => {
 }
 
 export const logout = () => async dispatch => {
-  await cognitoAuth.logout()
+  await CognitoAuth.logout()
   // await axios.post('/auth/logout')
   dispatch({ type: appUserLogout })
 }
