@@ -10,8 +10,6 @@ import Record from '../../../../../../../common/record/record'
 import { appModuleUri, dataModules } from '../../../../../appModules'
 import ErrorBadge from '../../../../../../commonComponents/errorBadge'
 
-const defaultColWidth = 100
-
 const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) => (
   nodeDefCols.map(nodeDef =>
     <TableColumn
@@ -25,7 +23,7 @@ const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) =>
   )
 )
 
-const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, history }) => {
+const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth, editMode, history }) => {
   const i18n = useI18n()
 
   return (

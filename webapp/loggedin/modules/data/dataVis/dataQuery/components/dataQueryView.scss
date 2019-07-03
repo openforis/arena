@@ -5,18 +5,19 @@ $rowHeaderHeight: 45px;
 
 .data-query {
   display: grid;
-  grid-template-columns: 240px 1fr 5px;
+  grid-template-columns: 240px 1fr;
   grid-column-gap: 10px;
   justify-content: center;
   height: 100%;
 }
 
 .data-query__table {
-  position: relative;
+
+  &.edit {
+    border: 1px dashed $greyBorder;
+  }
 
   .table__header {
-    height: 40px;
-
     .data-operations {
       display: grid;
       grid-template-columns: repeat(4, auto);
@@ -29,10 +30,6 @@ $rowHeaderHeight: 45px;
         }
       }
     }
-  }
-
-  &.edit {
-    border: 1px dashed $greyBorder;
   }
 
   .table__rows {
