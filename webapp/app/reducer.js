@@ -13,7 +13,6 @@ import {
   appErrorDelete,
   systemErrorThrow,
 } from './actions'
-import { loginSuccess } from '../login/actions'
 import { appJobStart, appJobActiveUpdate } from '../loggedin/appJob/actions'
 import { surveyCreate, surveyDelete } from '../survey/actions'
 
@@ -22,8 +21,6 @@ const actionHandlers = {
   [appStatusChange]: (state, { survey, ...props }) => assocActionProps(state, props),
 
   // ====== user
-  // user and current survey are properties of app state
-  [loginSuccess]: (state, { survey, ...props }) => assocActionProps(state, props),
 
   [appUserPrefUpdate]: (state, { name, value }) => {
     const user = R.pipe(

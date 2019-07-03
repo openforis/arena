@@ -4,7 +4,7 @@ import * as AppState from './appState'
 
 import i18nFactory from '../../common/i18n/i18nFactory'
 
-import * as CognitoAuth from '../utils/cognitoAuth'
+import * as CognitoAuth from './cognitoAuth'
 
 export const appStatusChange = 'app/status/change'
 export const appUserLogout = 'app/user/logout'

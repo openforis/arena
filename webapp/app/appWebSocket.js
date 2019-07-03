@@ -1,6 +1,6 @@
 import io from 'socket.io-client'
 
-import * as CognitoAuth from '../utils/cognitoAuth'
+import * as CognitoAuth from './cognitoAuth'
 
 let socket = null
 

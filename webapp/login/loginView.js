@@ -91,11 +91,11 @@ class LoginView extends SignIn {
                   const ofLetter = ofLetters[i]
                   return (
                     <div key={i}
-                         className={`${isLoginContainer ? 'login__form-container' : 'login__grid-cell'}`}>
+                         className={`${isLoginContainer ? 'login-form__container' : 'login__grid-cell'}`}>
                       {
                         isLoginContainer
                           ? (
-                            <div className="login__form">
+                            <div className="login-form">
 
                               <input ref="username" type='text' name='username' placeholder='Your email'
                                      onChange={this.handleInputChange}/>
@@ -103,7 +103,7 @@ class LoginView extends SignIn {
                                      onChange={this.handleInputChange}/>
                               {
                                 errorMessage
-                                  ? <div className="error-msg text-center">{errorMessage}</div>
+                                  ? <div className="login-form__error-msg text-center">{errorMessage}</div>
                                   : null
                               }
                               <div className="buttons">

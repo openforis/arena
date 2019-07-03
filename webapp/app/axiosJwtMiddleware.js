@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import * as CognitoAuth from '../utils/cognitoAuth'
+import * as CognitoAuth from './cognitoAuth'
 
 const requestHandler = async request => {
   try {
