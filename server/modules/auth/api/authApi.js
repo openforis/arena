@@ -46,8 +46,7 @@ const sendUser = async (res, user) => {
 module.exports.init = app => {
 
   app.get('/auth/user', async (req, res) => {
-    const user = req.user ? await UserService.findUserByUsername(req.user.name) : null
-    await sendUser(res, user)
+    await sendUser(res, req.user)
   })
 
   app.post('/auth/logout', (req, res) => {
