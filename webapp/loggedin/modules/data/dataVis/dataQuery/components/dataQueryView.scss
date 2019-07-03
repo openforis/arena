@@ -15,6 +15,15 @@ $rowHeaderHeight: 45px;
 
   &.edit {
     border: 1px dashed $greyBorder;
+
+    input {
+      border-bottom: none;
+    }
+
+    .node-def__table-column-header {
+      background-color: transparent;
+      grid-row-gap: .5rem;
+    }
   }
 
   .table__header {
