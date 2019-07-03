@@ -10,7 +10,6 @@ import { SignIn } from 'aws-amplify-react'
 import { Hub } from 'aws-amplify'
 
 import { initUser } from '../app/actions'
-import { appModuleUri } from '../loggedin/appModules'
 
 const noCols = 12
 const noRows = 6
@@ -35,7 +34,6 @@ class LoginView extends SignIn {
   constructor (props) {
     super(props)
 
-    // this._validAuthStates = ['signIn', 'signedOut', 'signedUp']
     this.state = { errorMessage: null }
   }
 
@@ -51,7 +49,6 @@ class LoginView extends SignIn {
         case 'signIn':
           this.props.initUser()
           this.resetState()
-          this.props.history.push(appModuleUri())
           break
         // case 'signUp':
         //   // logger.error('user signed up');
@@ -66,7 +63,7 @@ class LoginView extends SignIn {
         // case 'configured':
         //   // logger.error('the Auth module is configured');
         //   break
-        }
+      }
 
     })
   }
@@ -76,61 +73,61 @@ class LoginView extends SignIn {
 
     return (
       this.props.authState === 'signIn' &&
-        <React.Fragment>
+      <React.Fragment>
 
-          <div className="login__bg1 login"/>
-          <div className="login__bg2 login"/>
-          <div className="login__bg-overlay"/>
+        <div className="login__bg1 login"/>
+        <div className="login__bg2 login"/>
+        <div className="login__bg-overlay"/>
 
-          <div className="login__container">
+        <div className="login__container">
 
-            <div className="login__grid">
-              {
-                cells.map(i => {
-                  const isLoginContainer = i === 15
-                  const ofLetter = ofLetters[i]
-                  return (
-                    <div key={i}
-                         className={`${isLoginContainer ? 'login-form__container' : 'login__grid-cell'}`}>
-                      {
-                        isLoginContainer
-                          ? (
-                            <div className="login-form">
+          <div className="login__grid">
+            {
+              cells.map(i => {
+                const isLoginContainer = i === 15
+                const ofLetter = ofLetters[i]
+                return (
+                  <div key={i}
+                       className={`${isLoginContainer ? 'login-form__container' : 'login__grid-cell'}`}>
+                    {
+                      isLoginContainer
+                        ? (
+                          <div className="login-form">
 
-                              <input ref="username" type='text' name='username' placeholder='Your email'
-                                     onChange={this.handleInputChange}/>
-                              <input ref="password" type='password' name='password' placeholder='Your password'
-                                     onChange={this.handleInputChange}/>
-                              {
-                                errorMessage
-                                  ? <div className="login-form__error-msg text-center">{errorMessage}</div>
-                                  : null
-                              }
-                              <div className="buttons">
-                                <button type="button"
-                                        className="btn btn-login"
-                                        onClick={() => super.signIn()}>
-                                  Login
-                                </button>
-                                <button type="button" className="btn btn-s btn-forgot-pwd">
-                                  <span className="icon icon-question icon-left icon-12px"/>
-                                  Forgot Password
-                                </button>
-                              </div>
-
+                            <input ref="username" type='text' name='username' placeholder='Your email'
+                                   onChange={this.handleInputChange}/>
+                            <input ref="password" type='password' name='password' placeholder='Your password'
+                                   onChange={this.handleInputChange}/>
+                            {
+                              errorMessage
+                                ? <div className="login-form__error-msg text-center">{errorMessage}</div>
+                                : null
+                            }
+                            <div className="buttons">
+                              <button type="button"
+                                      className="btn btn-login"
+                                      onClick={() => super.signIn()}>
+                                Login
+                              </button>
+                              <button type="button" className="btn btn-s btn-forgot-pwd">
+                                <span className="icon icon-question icon-left icon-12px"/>
+                                Forgot Password
+                              </button>
                             </div>
-                          )
-                          : <div className={ofLetter ? 'of-letter' : ''}>{ofLetter}</div>
-                      }
-                    </div>
-                  )
-                })
 
-              }
-            </div>
+                          </div>
+                        )
+                        : <div className={ofLetter ? 'of-letter' : ''}>{ofLetter}</div>
+                    }
+                  </div>
+                )
+              })
 
+            }
           </div>
-        </React.Fragment>
+
+        </div>
+      </React.Fragment>
     )
   }
 }

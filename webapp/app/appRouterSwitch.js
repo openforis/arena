@@ -3,12 +3,11 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Switch, Route, Redirect } from 'react-router-dom'
 
-import { Authenticator, SignIn, RequireNewPassword } from 'aws-amplify-react/dist/Auth'
+import { Authenticator, SignIn } from 'aws-amplify-react/dist/Auth'
 
 import LoginView from '../login/loginView'
 import DynamicImport from '../commonComponents/dynamicImport'
 
-import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 import * as AppWebSocket from './appWebSocket'
 
 import * as AppState from './appState'
@@ -16,73 +15,44 @@ import { throwSystemError, initApp } from './actions'
 
 import { appModuleUri } from '../loggedin/appModules'
 
-const loginUri = '/'
-
-class Authenticated extends React.Component {
-  render () {
-    const { authState } = this.props
-
-    return (
-      authState === 'signedIn' &&
-      <Switch>
-        <Route
-          exact
-          path="/"
-          render={props => (
-            <Redirect to={appModuleUri()}/>
-          )}
-        />
-        <Route
-          path="/app"
-          render={props => (
-            <DynamicImport {...props} load={() => import('../loggedin/appViewExport')} />
-          )}
-        />
-      </Switch>
-    )
-  }
-}
+const AppSwitch = ({ authState }) => (
+  authState === 'signedIn' &&
+  <Switch>
+    <Route
+      exact
+      path="/"
+      render={() => (
+        <Redirect to={appModuleUri()}/>
+      )}
+    />
+    <Route
+      path="/app"
+      render={props => (
+        <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
+      )}
+    />
+  </Switch>
+)
 
 const AppRouterSwitch = props => {
 
-  const openWebSocket = () => {
-    const { throwSystemError } = props
-
-    AppWebSocket.openSocket()
-
-    const throwError = (error) => {
-      throwSystemError(error)
-      closeWebSocket()
-    }
-
-    AppWebSocket.on(WebSocketEvents.connectError, error => throwError(error.stack))
-    AppWebSocket.on(WebSocketEvents.error, throwError)
-  }
-
-  const closeWebSocket = () => {
-    AppWebSocket.closeSocket()
-  }
-
-  const { isReady, systemError, initApp, user } = props
+  const {
+    isReady, systemError, user,
+    initApp, throwSystemError,
+  } = props
 
   useEffect(() => {
     initApp()
-    return () => closeWebSocket()
+    return () => AppWebSocket.closeSocket()
   }, [])
 
   useEffect(() => {
-    if (user === null) {
-      // Before the get request in app/actions/initApp has been sent, user is
-      // undefined, after the request is null if not logged in
-      props.history.push(loginUri)
-    }
-  }, [user])
-
-  useEffect(() => {
     if (user) {
-      openWebSocket()
+      (async () => {
+        await AppWebSocket.openSocket(throwSystemError)
+      })()
     } else {
-      closeWebSocket()
+      AppWebSocket.closeSocket()
     }
   }, [user])
 
@@ -101,9 +71,7 @@ const AppRouterSwitch = props => {
         : (
           <Authenticator hide={[SignIn]} hideDefault={true}>
             <LoginView override={'SignIn'}/>
-            <RequireNewPassword />
-
-            <Authenticated />
+            <AppSwitch/>
           </Authenticator>
         )
     )

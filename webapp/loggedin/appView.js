@@ -14,30 +14,26 @@ import ModuleSwitch from './modules/moduleSwitch'
 
 class AppView extends React.Component {
   render () {
-    const { location, i18n, authState } = this.props
+    const { location, i18n } = this.props
 
-    // if (authState === 'signedIn') {
-      const pathName = this.props.history.location.pathname
+    const pathName = this.props.history.location.pathname
 
-      return (
-        <div className="app__container">
-          <AppContext.Provider value={{ i18n }}>
+    return (
+      <div className="app__container">
+        <AppContext.Provider value={{ i18n }}>
 
-            <AppSideBar pathname={pathName}/>
+          <AppSideBar pathname={pathName}/>
 
-            <ModuleSwitch location={location}/>
+          <ModuleSwitch location={location}/>
 
-            <AppJobMonitor/>
+          <AppJobMonitor/>
 
-            <AppErrors/>
+          <AppErrors/>
 
-          </AppContext.Provider>
+        </AppContext.Provider>
 
-        </div>
-      )
-    // } else {
-    //   return null
-    // }
+      </div>
+    )
   }
 }
 

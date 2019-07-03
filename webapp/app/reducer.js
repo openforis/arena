@@ -6,7 +6,7 @@ import { setUserPref } from '../../common/user/userPrefs'
 import * as AppState from './appState'
 
 import {
-  appStatusChange,
+  appPropsChange,
   appUserLogout,
   appUserPrefUpdate,
   appErrorCreate,
@@ -18,7 +18,7 @@ import { surveyCreate, surveyDelete } from '../survey/actions'
 
 const actionHandlers = {
 
-  [appStatusChange]: (state, { survey, ...props }) => assocActionProps(state, props),
+  [appPropsChange]: (state, { survey, ...props }) => assocActionProps(state, props),
 
   // ====== user
 

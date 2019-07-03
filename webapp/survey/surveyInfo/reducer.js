@@ -5,7 +5,7 @@ import Survey from '../../../common/survey/survey'
 import * as SurveyInfoState from './surveyInfoState'
 
 // app actions
-import { appStatusChange, appUserLogout } from '../../app/actions'
+import { appPropsChange, appUserLogout } from '../../app/actions'
 
 // survey actions
 import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
@@ -26,7 +26,7 @@ import { taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomie
 
 const actionHandlers = {
   // app initialization
-  [appStatusChange]: (state, { survey }) => Survey.getSurveyInfo(survey),
+  [appPropsChange]: (state, { survey }) => Survey.getSurveyInfo(survey),
   [appUserLogout]: () => ({}),
 
   // Survey Update
