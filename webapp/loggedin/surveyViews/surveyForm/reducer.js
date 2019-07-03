@@ -11,7 +11,8 @@ import {
   formActivePageNodeDefUpdate,
   formNodeDefAddChildToUpdate,
   formPageNodeUpdate,
-  formReset
+  formReset,
+  formShowPageNavigationUpdate,
 } from './actions'
 import { nodeDefCreate, nodeDefDelete, nodeDefPropsUpdate } from '../../../survey/nodeDefs/actions'
 import { recordLoad } from '../record/actions'
@@ -35,6 +36,8 @@ const actionHandlers = {
     )(state),
 
   [formPageNodeUpdate]: (state, { nodeDef, node }) => SurveyFormState.assocFormPageNode(NodeDef.getUuid(nodeDef), node)(state),
+
+  [formShowPageNavigationUpdate]: (state, { showPageNavigation }) => SurveyFormState.setShowPageNavigation(showPageNavigation)(state),
 
   // node def actions
   [nodeDefCreate]: (state, { nodeDef }) => SurveyFormState.assocParamsOnNodeDefCreate(nodeDef)(state),

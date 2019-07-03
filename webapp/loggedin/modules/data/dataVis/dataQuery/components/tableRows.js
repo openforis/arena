@@ -10,8 +10,6 @@ import Record from '../../../../../../../common/record/record'
 import { appModuleUri, dataModules } from '../../../../../appModules'
 import ErrorBadge from '../../../../../../commonComponents/errorBadge'
 
-const defaultColWidth = 100
-
 const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) => (
   nodeDefCols.map(nodeDef =>
     <TableColumn
@@ -25,7 +23,7 @@ const TableColumns = ({ nodeDefCols, row, lang, colWidth, editMode = false }) =>
   )
 )
 
-const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, history }) => {
+const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth, editMode, history }) => {
   const i18n = useI18n()
 
   return (
@@ -51,9 +49,13 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, histor
 
             return (
               <div key={i} className="table__row">
+
                 <ErrorBadge
                   validation={validation}
-                  showLabel={false}/>
+                  showLabel={false}
+                  className="error-badge-inverse"
+                />
+
                 <div style={{ width: defaultColWidth }}>
                   {i + offset + 1}
                   {
@@ -61,7 +63,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, editMode, histor
                     <button className="btn btn-s btn-edit"
                             title="View record"
                             onClick={() => history.push(recordEditUrl)}>
-                      <span className="icon icon-pencil2 icon-16px"/>
+                      <span className="icon icon-pencil2 icon-12px"/>
                     </button>
                   }
                 </div>

@@ -2,26 +2,32 @@ import React from 'react'
 
 import Node from '../../../../../../../common/record/node'
 
-const Button = ({nodeDef, readOnly, parentNode, nodes, updateNode, label, disabled, value, entry, canEditRecord}) => {
+const Button = (props) => {
+
+  const {
+    nodeDef, nodes, value,
+    label, readOnly, disabled,
+    updateNode,
+    entry, canEditRecord
+  } = props
+
   const node = entry ? nodes[0] : null
 
   const nodeValue = Node.getValue(node, '')
 
   return (
-    <button className="btn btn-s btn-transparent"
-            style={{borderRadius: '.75rem'}}
+    <button className="btn btn-s btn-transparent flex-center"
             aria-disabled={disabled || !canEditRecord || readOnly}
             onClick={() => updateNode(nodeDef, node, value)}>
-      <span className={`icon icon-radio-${nodeValue === value ? 'checked2' : 'unchecked'} icon-left`}/>
+      <span className={`icon icon-12px icon-radio-${nodeValue === value ? 'checked2' : 'unchecked'} icon-left`}/>
       {label}
     </button>
   )
 
 }
 
-const NodeDefBoolean = props =>
-
-  <div style={{borderBottom: 'none', textAlign: 'center'}}>
+const NodeDefBoolean = props => (
+  <div className="survey-form__node-def-boolean">
 
     <Button {...props}
             disabled={props.edit}
@@ -34,5 +40,6 @@ const NodeDefBoolean = props =>
             value="false"/>
 
   </div>
+)
 
 export default NodeDefBoolean

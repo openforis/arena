@@ -3,6 +3,8 @@ import './appSideBar.scss'
 import React, { useState, useRef } from 'react'
 import { connect } from 'react-redux'
 
+import { dispatchWindowResize } from '../../utils/domUtils'
+
 import AppSideBarModules from './appSideBarModules'
 
 import { logout } from '../../app/actions'
@@ -24,7 +26,7 @@ const AppSideBar = (props) => {
     setOpened(!opened)
 
     //react-grid-layout re-render
-    // window.dispatchEvent(new Event('resize'))
+    dispatchWindowResize()
   }
 
   return (

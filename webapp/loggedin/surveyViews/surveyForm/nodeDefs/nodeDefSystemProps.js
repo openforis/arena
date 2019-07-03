@@ -61,7 +61,7 @@ export const nodeDefSystemProps = {
   },
 
   [nodeDefType.text]: {
-    icon: <span className="icon-left">{R.range(0, 3).map(i =>
+    icon: <span className="icon-left display-flex">{R.range(0, 3).map(i =>
       <span key={i} className="icon icon-text-color" style={{ margin: '0 -3px' }}/>
     )}</span>,
     defaultValue: '',

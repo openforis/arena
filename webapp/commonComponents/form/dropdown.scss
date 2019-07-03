@@ -2,7 +2,7 @@
 
 .dropdown {
   display: grid;
-  grid-template-columns: 1fr 35px;
+  grid-template-columns: 1fr auto;
   //align-self: stretch;
 
   span.icon {

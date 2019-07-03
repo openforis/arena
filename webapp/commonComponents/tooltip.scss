@@ -2,39 +2,33 @@
 
 
 .tooltip {
-  .message {
-    visibility: hidden;
-    position: absolute;
-    background-color: $yellow;
-    padding: 1rem;
-    opacity: .97;
-    font-weight: 600;
-  }
-
   &:hover {
     cursor: pointer;
-    z-index: $zIndex6Tooltip;
+  }
+}
 
-    .message {
-      font-size: .85rem;
-      color: black;
-      visibility: visible;
-      position: fixed;
-      margin-top: 0.5rem;
-      border-radius: 0.4rem;
-      border: 1px solid $yellow;
-      z-index: $zIndex6Tooltip;
+.tooltip__message {
+  background-color: $yellow;
+  padding: 1rem;
+  opacity: .97;
+  font-weight: 600;
+  font-size: .85rem;
+  color: black;
+  visibility: visible;
+  position: fixed;
+  margin-top: 0.5rem;
+  border-radius: 0.4rem;
+  border: 1px solid $yellow;
+  z-index: $zIndex6Tooltip;
 
-      &:after {
-        content: "";
-        position: absolute;
-        bottom: 100%;
-        left: 1rem;
-        margin-left: -.5rem;
-        border: .5rem solid;
-        border-color: transparent transparent $yellow transparent;
-      }
-    }
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 1rem;
+    margin-left: -.5rem;
+    border: .5rem solid;
+    border-color: transparent transparent $yellow transparent;
   }
 }
 
@@ -49,19 +43,17 @@
     border: 2px solid rgba($red, 0.6);
   }
 
-  .message {
-    background-color: $red !important;
-  }
+}
 
-  &:hover {
-    .message {
-      color: white !important;
-      border: 1px solid $red !important;
-      opacity: .97;
+.tooltip__message-error {
+  @extend .tooltip__message;
+  background-color: $red;
 
-      &:after {
-        border-color: transparent transparent $red transparent !important;
-      }
-    }
+  color: white;
+  border: 1px solid $red;
+  opacity: .97;
+
+  &:after {
+    border-color: transparent transparent $red transparent;
   }
 }

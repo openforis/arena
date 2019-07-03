@@ -2,28 +2,21 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import useI18n from '../../../commonComponents/useI18n'
+import { dispatchWindowResize } from '../../../../utils/domUtils'
 
-import NodeDef from '../../../../common/survey/nodeDef'
+import NodeDef from '../../../../../common/survey/nodeDef'
 
-import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from './nodeDefs/nodeDefSystemProps'
+import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
-import { createNodeDef } from '../../../survey/nodeDefs/actions'
-import { setFormNodeDefAddChildTo } from './actions'
+import * as SurveyFormState from '../surveyFormState'
 
-import * as SurveyFormState from './surveyFormState'
+import { createNodeDef } from '../../../../survey/nodeDefs/actions'
+import { setFormNodeDefAddChildTo } from '../actions'
 
-const AddNodeDefButtons = ({ addNodeDef }) => {
-  const i18n = useI18n()
+const AddNodeDefButtons = ({ addNodeDef, setFormNodeDefAddChildTo }) => {
 
   return (
     <React.Fragment>
-      <div/>
-      <div/>
-      <div/>
-      <div>
-        <span className="icon icon-plus icon-left"/> {i18n.t('common.add')}
-      </div>
 
       {
         R.values(NodeDef.nodeDefType)
@@ -33,7 +26,10 @@ const AddNodeDefButtons = ({ addNodeDef }) => {
             return (
               <button key={type}
                       className="btn btn-s btn-add-node-def"
-                      onClick={() => addNodeDef(type, nodeDefProps)}>
+                      onClick={() => {
+                        addNodeDef(type, nodeDefProps)
+                        setFormNodeDefAddChildTo(null)
+                      }}>
                 {getNodeDefIconByType(type)}{type}
               </button>
             )
@@ -61,8 +57,12 @@ class FormActions extends React.Component {
       surveyFormElement.classList.toggle('form-actions-off')
 
       //react-grid-layout re-render
-      window.dispatchEvent(new Event('resize'))
+      dispatchWindowResize()
     }
+  }
+
+  componentWillUnmount () {
+    this.props.setFormNodeDefAddChildTo(null)
   }
 
   addNodeDef (type, props) {
@@ -73,19 +73,20 @@ class FormActions extends React.Component {
   render () {
     const { nodeDef, setFormNodeDefAddChildTo } = this.props
 
-    return (
+    return nodeDef && (
       <div className="survey-form__actions">
-        {
-          nodeDef &&
-          <React.Fragment>
-            <button className="btn btn-s no-border btn-toggle"
-                    onClick={() => setFormNodeDefAddChildTo(null)}>
-              <span className="icon icon-cross icon-16px"/>
-            </button>
 
-            <AddNodeDefButtons nodeDef={nodeDef} addNodeDef={this.addNodeDef}/>
-          </React.Fragment>
-        }
+        <button className="btn btn-s no-border btn-toggle"
+                onClick={() => setFormNodeDefAddChildTo(null)}>
+          <span className="icon icon-cross icon-12px"/>
+        </button>
+
+        <AddNodeDefButtons
+          nodeDef={nodeDef}
+          addNodeDef={this.addNodeDef}
+          setFormNodeDefAddChildTo={setFormNodeDefAddChildTo}
+        />
+
       </div>
 
     )

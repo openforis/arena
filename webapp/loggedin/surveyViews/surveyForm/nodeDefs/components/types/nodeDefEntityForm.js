@@ -78,7 +78,7 @@ class EntityForm extends React.Component {
   onChangeLayout (layout) {
     const { nodeDef, putNodeDefProp } = this.props
 
-    if (window.innerWidth > 1200 && layout.length > 0) {
+    if (window.innerWidth >= 480 && layout.length > 0) {
       putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.layout, layout)
     }
   }
@@ -110,10 +110,11 @@ class EntityForm extends React.Component {
         <ResponsiveGridLayout
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
           autoSize={false}
-          rowHeight={edit && canEditDef ? 80 : 50}
-          cols={{ lg: columns, md: columns, sm: columns, xs: 1, xxs: 1 }}
-          layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout }}
-          containerPadding={edit && canEditDef ? [30, 50] : [30, 30]}
+          rowHeight={edit && canEditDef ? 80 : 70}
+          cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
+          layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
+          containerPadding={edit && canEditDef ? [15, 40] : [15, 15]}
+          margin={[0, 0]}
           onLayoutChange={onChangeLayout ? onChangeLayout : () => {}}
           isDraggable={edit && canEditDef && !locked}
           isResizable={edit && canEditDef && !locked}

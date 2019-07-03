@@ -1,13 +1,24 @@
 @import "../../../../style/vars";
 
+.node-def__coordinate {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 0.3rem;
+
+  .form-item {
+    grid-template-columns: 40px 1fr;
+  }
+}
+
 .node-def__code-checkbox-wrapper {
   display: flex;
   flex-wrap: wrap;
 
   .btn-checkbox {
     pointer-events: all;
+    border-color: $blueDark;
 
-    &[aria-disabled="true"]{
+    &[aria-disabled="true"] {
       pointer-events: none;
     }
   }
@@ -31,7 +42,30 @@
 
 .node-def__text-multiple-text-input-wrapper {
   display: grid;
-  grid-template-columns: .9fr .1fr;
+  grid-template-columns: 1fr auto;
+  border-top: 1px solid $blueDark;
+  border-left: 1px solid $blueDark;
+  border-right: 1px solid $blueDark;
+
+  .form-input {
+    border: none !important;
+  }
+
+  .btn-delete {
+    border: none;
+
+    &:hover {
+      color: $orange;
+    }
+  }
+
+  &:last-child {
+    border-bottom: 1px solid rgba($blueDark, .9);
+
+    .form-input {
+      padding-right: 40px;
+    }
+  }
 }
 
 .node-def__text-multiple-table-cell {
@@ -45,11 +79,19 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: .9rem;
+  }
+
+  button {
+    border: none;
+
+    &:hover {
+      color: $orange;
+    }
   }
 }
 
 .node-def__multiple-nodes-edit-modal {
-
   .modal-body {
     height: 40vh;
   }

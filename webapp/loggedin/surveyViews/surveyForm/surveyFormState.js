@@ -11,12 +11,13 @@ import * as SurveyState from '../../../survey/surveyState'
 
 export const stateKey = 'surveyForm'
 const getState = R.pipe(SurveyViewsState.getState, R.prop(stateKey))
-const getStateProp = prop => R.pipe(getState, R.prop(prop))
+const getStateProp = (prop, defaultTo = null) => R.pipe(getState, R.propOr(defaultTo, prop))
 
 const keys = {
   nodeDefUuidPage: 'nodeDefUuidPage', // current page nodeDef
   nodeDefUuidAddChildTo: 'nodeDefUuidAddChildTo', // nodeDef (entity) selected to add children to
   nodeDefUuidPageNodeUuid: 'nodeDefUuidPageNodeUuid', // map of nodeDefUuid -> nodeUuid representing the node loaded in page nodeDefUuid
+  showPageNavigation: 'showPageNavigation',
 }
 
 // ====== nodeDefUuidPage
@@ -95,6 +96,12 @@ export const getFormPageParentNode = nodeDef =>
 
     return null
   }
+
+// ====== Page navigation
+
+export const showPageNavigation = getStateProp(keys.showPageNavigation, true)
+
+export const setShowPageNavigation = showPageNavigation => R.assoc(keys.showPageNavigation, showPageNavigation)
 
 // ====== NodeDef update actions
 
