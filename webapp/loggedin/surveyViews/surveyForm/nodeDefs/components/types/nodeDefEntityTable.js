@@ -34,20 +34,20 @@ const NodeDefEntityTable = props => {
 
       <div className="node-def__table-header">
         <div>{label}</div>
+
         {
-          entry && canEditRecord
-            ? <button className="btn btn-s"
-                      style={{ marginLeft: '10px' }}
-                      onClick={() => {
-                        const entity = Node.newNodePlaceholder(nodeDef, parentNode)
-                        updateNode(nodeDef, entity)
-                      }}
-                      aria-disabled={!canAddNode}>
-              <span className="icon icon-plus icon-12px icon-left"/>
-              {i18n.t('common.add')}
-            </button>
-            : null
+          entry && canEditRecord &&
+          <button className="btn btn-xs btn-add"
+                  onClick={() => {
+                    const entity = Node.newNodePlaceholder(nodeDef, parentNode)
+                    updateNode(nodeDef, entity)
+                  }}
+                  aria-disabled={!canAddNode}>
+            <span className="icon icon-plus icon-12px icon-left"/>
+
+          </button>
         }
+
       </div>
 
 

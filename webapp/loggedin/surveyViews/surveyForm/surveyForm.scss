@@ -1,18 +1,13 @@
 @import "../../../style/vars";
 
 $tableBorder: 1px solid $greyBorder;
-$tableRowHeaderHeight: 40px;
+$tableRowHeaderHeight: 25px;
 $formHeaderHeight: 40px;
 
 .survey-form {
 
-  .node-def__form_page {
-    border: 1px solid $greyBorder;
-    background-color: rgba($blueLight, .2);
-  }
-
   .react-grid-item {
-    border: 1px solid rgba($greyBorder, .3);
+    //border: 1px solid rgba($greyBorder, .3);
   }
 
   //edit mode
@@ -33,13 +28,15 @@ $formHeaderHeight: 40px;
     }
 
     .node-def__form_page {
-      border: 1px dashed $greyBorder;
+      border-top: 1px dashed $greyBorder;
+      border-right: 1px dashed $greyBorder;
+      border-bottom: 1px dashed $greyBorder;
     }
   }
 
   .react-grid-layout {
     .react-grid-item {
-      background-color: white;
+      //background-color: white;
 
       &.cssTransforms {
         //react-grid-item css animation are disabled on first render
@@ -67,6 +64,10 @@ $formHeaderHeight: 40px;
   .survey-form-container {
     grid-template-columns: 1fr;
   }
+
+  .node-def__form_page {
+    border-left: 1px solid $greyBorder;
+  }
 }
 
 .survey-form.edit {
@@ -79,6 +80,10 @@ $formHeaderHeight: 40px;
   .survey-form-container {
     grid-template-columns: 1fr 200px;
   }
+
+  .node-def__form_page {
+    border-left: 1px solid $greyBorder;
+  }
 }
 
 .survey-form.edit.form-actions-off {
@@ -90,6 +95,10 @@ $formHeaderHeight: 40px;
 .survey-form.edit.form-actions-off.page-navigation-off {
   .survey-form-container {
     grid-template-columns: 1fr 0;
+  }
+
+  .node-def__form_page {
+    border-left: 1px solid $greyBorder;
   }
 }
 
@@ -171,6 +180,10 @@ $formHeaderHeight: 40px;
 .node-def__form_page {
   position: relative;
   overflow-y: auto;
+
+  border-top: 1px solid $greyBorder;
+  border-right: 1px solid $greyBorder;
+  border-bottom: 1px solid $greyBorder;
 }
 
 .node-def__form {
@@ -178,28 +191,32 @@ $formHeaderHeight: 40px;
   position: relative;
   height: 100%;
 
-  .form-input {
-    text-overflow: ellipsis;
-    text-align: right;
-    padding: .25rem 1rem;
-  }
 
   .node-def__form-item {
     //grid-template-columns: 135px 1fr;
     grid-template-columns: 1fr;
-    grid-template-rows: 30px 1fr;
+    grid-template-rows: $tableRowHeaderHeight 1fr;
 
     > :nth-child(1).form-label {
-      padding: 0 .5rem;
-      justify-self: start;
-      font-weight: 600;
+      align-self: normal;
+      justify-self: auto;
+      background-color: rgba($blueLight, .3);
       padding: .5rem 2rem;
-      align-self: start;
+      font-weight: 600;
+      text-align: left;
+      text-transform: uppercase;
+      font-size: .8rem;
     }
 
     > :nth-child(2) {
       padding: 0 .5rem;
       align-self: start;
+    }
+
+    .form-input {
+      text-overflow: ellipsis;
+      text-align: right;
+      padding: .25rem 1rem;
     }
   }
 
@@ -273,19 +290,34 @@ $formHeaderHeight: 40px;
 }
 
 .node-def__table-header {
-  justify-self: center;
+  justify-self: auto;
   align-self: center;
-  font-weight: 600;
   display: flex;
   align-items: center;
-  height: $tableRowHeaderHeight;
+  background-color: rgba($blueLight, 0.3);
+  border-bottom: 1px solid $greyBorder;
+  padding: .5rem 2rem;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+  font-size: .8rem;
+
+  .btn-add {
+    background-color: transparent;
+    margin-left: 10px;
+    border: none;
+
+    &:hover {
+      color: $orange;
+    }
+  }
 }
 
 .node-def__table-rows {
   position: absolute;
-  top: 40px;
+  top: calc(#{$tableRowHeaderHeight} + 4px);
   width: 100%;
-  height: calc(100% - 40px);
+  height: calc(100% - #{$tableRowHeaderHeight});
   overflow-x: auto;
   overflow-y: hidden;
 }
@@ -319,8 +351,8 @@ $formHeaderHeight: 40px;
 
 .node-def__table-data-rows {
   position: absolute;
-  top: 40px;
-  height: calc(100% - 40px);
+  top: $tableRowHeaderHeight;
+  height: calc(100% - #{$tableRowHeaderHeight});
   overflow-y: auto;
   overflow-x: hidden;
 }
