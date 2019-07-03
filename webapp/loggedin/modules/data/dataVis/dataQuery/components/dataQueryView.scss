@@ -5,38 +5,40 @@ $rowHeaderHeight: 45px;
 
 .data-query {
   display: grid;
-  grid-template-columns: 240px 1fr 5px;
+  grid-template-columns: 240px 1fr;
   grid-column-gap: 10px;
   justify-content: center;
   height: 100%;
 }
 
 .data-query__table {
-  position: relative;
+
+  &.edit {
+    border: 1px dashed $greyBorder;
+
+    input {
+      border-bottom: none;
+    }
+
+    .node-def__table-column-header {
+      background-color: transparent;
+      grid-row-gap: .5rem;
+    }
+  }
 
   .table__header {
-    height: 40px;
-    align-items: top;
-
     .data-operations {
       display: grid;
       grid-template-columns: repeat(4, auto);
       grid-column-gap: .25rem;
 
       .btn {
-        padding: .5rem;
-        font-size: 0.8rem;
 
         &.highlight {
-          background-color: rgba($yellow, .35) !important;
+          background-color: $yellow;
         }
       }
     }
-  }
-
-  &.edit {
-    border: 3px dashed $greyBorder;
-    background-color: rgba($grey, 0.2);
   }
 
   .table__rows {
@@ -64,11 +66,16 @@ $rowHeaderHeight: 45px;
   }
 
   .table__row {
-    border-right: none;
-    border-left: none;
+    .btn-edit {
+      border: none;
 
-    &:last-child {
-      border-bottom: none;
+      &:hover {
+        color: $orange;
+      }
+    }
+
+    .error-badge {
+      pointer-events: none;
     }
   }
 
@@ -89,4 +96,5 @@ $rowHeaderHeight: 45px;
     display: flex;
     flex-wrap: wrap;
   }
+
 }

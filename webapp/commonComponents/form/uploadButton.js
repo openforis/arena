@@ -32,7 +32,7 @@ class UploadButton extends React.Component {
           }
         }}/>
 
-      <button className="btn"
+      <button className="btn btn-s"
               aria-disabled={disabled}
               onClick={() => {
                 // first reset current value, then trigger click event
