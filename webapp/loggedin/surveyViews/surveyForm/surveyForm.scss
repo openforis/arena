@@ -187,6 +187,7 @@ $formHeaderHeight: 40px;
   .node-def__form-item {
     //grid-template-columns: 135px 1fr;
     grid-template-columns: 1fr;
+    grid-template-rows: 30px 1fr;
 
     > :nth-child(1).form-label {
       padding: 0 .5rem;
@@ -374,12 +375,11 @@ $formHeaderHeight: 40px;
   position: relative;
   height: 100%;
   display: flex;
-  align-items: center;
 
   .nodes {
     position: absolute;
     max-height: 100%;
-    left: 0;
+    left: 10px;
     right: 0;
     overflow-y: auto;
   }
