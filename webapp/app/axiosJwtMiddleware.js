@@ -8,7 +8,7 @@ const requestHandler = async request => {
   if (jwtToken) {
     request.headers['Authorization'] = `Bearer ${jwtToken}`
   }
-  
+
   return request
 }
 
