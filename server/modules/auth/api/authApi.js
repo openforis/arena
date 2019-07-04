@@ -2,6 +2,8 @@ const { sendOk } = require('../../../utils/response')
 
 const { userPrefNames, getUserPrefSurveyId } = require('../../../../common/user/userPrefs')
 
+const Jwt = require('../../../system/jwt')
+
 const AuthManager = require('../../../../common/auth/authManager')
 const SurveyManager = require('../../survey/manager/surveyManager')
 const UserService = require('../../user/service/userService')
@@ -54,7 +56,9 @@ module.exports.init = app => {
     const { user } = req
     RecordService.terminateUserThread(user.id)
 
-    req.logout()
+    const token = req.headers.authorization.substring(7) // TODO - 7
+    UserService.blacklistTokenByJti(Jwt.getJti(token), Jwt.getExpiration(token))
+
     sendOk(res)
   })
 }

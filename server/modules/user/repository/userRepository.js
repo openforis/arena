@@ -58,6 +58,29 @@ const deleteUserPref = async (user, name, client = db) => {
   return userRes
 }
 
+// JWT tokens
+
+const blacklistTokenByJti = async (jti, expiration, client = db) => {
+  client.none(`
+    INSERT INTO jwt_token_blacklist (jti, expiration)
+    VALUES ($1, $2)
+  `, [jti, expiration])
+}
+
+const findBlacklistedTokenByJti = async (jti, client = db) =>
+  client.oneOrNone(`
+    SELECT * FROM jwt_token_blacklist
+    WHERE jti = $1
+  `, [jti])
+
+const deleteExpiredJwtTokens = async (timeSeconds, client = db) => {
+  client.query(`
+    DELETE FROM jwt_token_blacklist
+    WHERE expiration < $1
+  `, [timeSeconds]
+  )
+}
+
 module.exports = {
   // READ
   findUserById,
@@ -69,4 +92,9 @@ module.exports = {
 
   // DELETE
   deleteUserPref,
+
+  // JWT TOKENS
+  blacklistTokenByJti,
+  findBlacklistedTokenByJti,
+  deleteExpiredJwtTokens,
 }

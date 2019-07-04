@@ -60,4 +60,9 @@ module.exports = {
 
   // DELETE
   deleteUserPref,
+
+  // JWT TOKENS
+  blacklistTokenByJti: UserRepository.blacklistTokenByJti,
+  findBlacklistedTokenByJti: UserRepository.findBlacklistedTokenByJti,
+  deleteExpiredJwtTokens: UserRepository.deleteExpiredJwtTokens,
 }

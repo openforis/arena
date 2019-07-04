@@ -48,6 +48,12 @@ const validate = async token => {
   return verifyToken(token, verificationKey)
 }
 
+const getJti = token => decode(token).payload.jti
+
+const getExpiration = token => decode(token).payload.exp
+
 module.exports = {
   validate,
+  getJti,
+  getExpiration,
 }

@@ -12,4 +12,9 @@ module.exports = {
 
   deleteUserPref: UserManager.deleteUserPref,
 
+  blacklistTokenByJti: UserManager.blacklistTokenByJti,
+
+  findBlacklistedTokenByJti: UserManager.findBlacklistedTokenByJti,
+
+  deleteExpiredJwtTokens: UserManager.deleteExpiredJwtTokens,
 }

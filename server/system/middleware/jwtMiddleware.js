@@ -15,6 +15,12 @@ module.exports = async (req, res, next) => {
   } else {
     try {
       const jwtToken = authorizationHeader && authorizationHeader.substr(bearerPrefix.length)
+
+      // Check if token is blacklisted
+      if (await UserService.findBlacklistedTokenByJti(Jwt.getJti(jwtToken))) {
+        throw new Error()
+      }
+
       const decoded = await Jwt.validate(jwtToken)
       const username = decoded.username
       const user = await UserService.findUserByUsername(username)
@@ -27,4 +33,3 @@ module.exports = async (req, res, next) => {
     }
   }
 }
-
