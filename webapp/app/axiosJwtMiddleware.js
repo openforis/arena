@@ -3,16 +3,12 @@ import axios from 'axios'
 import * as CognitoAuth from './cognitoAuth'
 
 const requestHandler = async request => {
-  try {
-    const jwtToken = await CognitoAuth.getJwtToken()
+  const jwtToken = await CognitoAuth.getJwtToken()
 
+  if (jwtToken) {
     request.headers['Authorization'] = `Bearer ${jwtToken}`
-    return request
-  } catch (err) {
-    // TODO throws 'no currentUser' when not logged in
-    // alert(err)
   }
-
+  
   return request
 }
 

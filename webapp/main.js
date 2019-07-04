@@ -37,6 +37,9 @@ Amplify.configure({
 
     // OPTIONAL - Manually set the authentication flow type. Default is 'USER_SRP_AUTH'
     // authenticationFlowType: 'USER_PASSWORD_AUTH'
+  },
+  Analytics: {
+    disabled: true
   }
 })
 
