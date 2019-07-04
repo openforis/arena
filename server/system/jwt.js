@@ -1,7 +1,8 @@
 const axios = require('axios')
 const jwkToPem = require('jwk-to-pem')
 const jsonwebtoken = require('jsonwebtoken')
-const R = require('ramda')
+
+const UserService = require('../modules/user/service/userService')
 
 const region = process.env.COGNITO_REGION
 const poolId = process.env.COGNITO_USER_POOL_ID
@@ -28,26 +29,23 @@ const indexKeys = keyList => keyList.reduce((keys, jwk) => {
 const decode = token => jsonwebtoken.decode(token, { complete: true })
 
 // Now we need to decode our token, to find the verification key
-const findVerificationKey = token => pemList => {
+const findVerificationKey = (token, pemList) => {
   const decoded = decode(token)
   return pemList[decoded.header.kid]
 }
 
 // Verify our token
-const verifyToken = token => pem =>
+const verifyToken = (token, pem) =>
   jsonwebtoken.verify(token, pem, verificationOptions)
 
-let keys
+let indexedKeys
 
 const validate = async token => {
-  keys = keys || await getKeys(region, poolId)
+  // Verify token
+  indexedKeys = indexedKeys || indexKeys(await getKeys(region, poolId))
+  const verificationKey = findVerificationKey(token, indexedKeys)
 
-  return R.pipe(
-    indexKeys,
-    findVerificationKey(token),
-    verifyToken(token),
-    // checkTokenToUse,
-  )(keys)
+  return verifyToken(token, verificationKey)
 }
 
 module.exports = {
