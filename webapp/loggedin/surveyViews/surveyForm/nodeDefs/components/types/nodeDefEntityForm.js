@@ -110,24 +110,26 @@ class EntityForm extends React.Component {
         <ResponsiveGridLayout
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
           autoSize={false}
-          rowHeight={edit && canEditDef ? 80 : 70}
+          rowHeight={70}
           cols={{ lg: columns, md: columns, sm: columns, xs: columns, xxs: 1 }}
           layouts={{ lg: rdgLayout, md: rdgLayout, sm: rdgLayout, xs: rdgLayout }}
           containerPadding={edit && canEditDef ? [15, 40] : [15, 15]}
-          margin={[0, 0]}
+          margin={[5, 5]}
           onLayoutChange={onChangeLayout ? onChangeLayout : () => {}}
           isDraggable={edit && canEditDef && !locked}
           isResizable={edit && canEditDef && !locked}
           compactType={null}
           useCSSTransforms={true}
           preventCollision={true}
-          className={mounted ? 'mounted' : ''}>
+          className={mounted ? 'mounted' : ''}
+        >
 
           {
             innerPageChildren
               .map((childDef, i) =>
-                <div key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}
-                     className={NodeDef.isEntity(childDef) && NodeDefLayout.isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
+                <div
+                  key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}
+                  className={NodeDef.isEntity(childDef) && NodeDefLayout.isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
                   <NodeDefSwitch
                     key={i}
                     edit={edit}

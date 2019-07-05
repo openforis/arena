@@ -39,30 +39,37 @@ const NodeDefEditFormActions = (props) => {
       }
 
       <button className="btn-s"
-              onClick={() => setNodeDefForEdit(nodeDef)}>
+              onClick={() => setNodeDefForEdit(nodeDef)}
+              onMouseDown={e => {
+                e.stopPropagation()
+              }}>
         <span className="icon icon-pencil2 icon-12px"/>
       </button>
 
       {
         NodeDef.isEntity(nodeDef) &&
         <button className="btn btn-s"
-                onClick={() => setFormNodeDefAddChildTo(nodeDef)}>
+                onClick={() => setFormNodeDefAddChildTo(nodeDef)}
+                onMouseDown={e => {
+                  e.stopPropagation()
+                }}>
           <span className="icon icon-plus icon-12px"/>
         </button>
       }
 
       {
-        isRoot ?
-          null
-          : <button className="btn btn-s"
-                    aria-disabled={NodeDef.isPublished(nodeDef)}
-                    onClick={() => {
-                      window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
-                        ? removeNodeDef(nodeDef)
-                        : null
-                    }}>
-            <span className="icon icon-bin2 icon-12px"/>
-          </button>
+        !(isRoot || NodeDef.isPublished(nodeDef)) &&
+        <button className="btn btn-s"
+                onClick={() => {
+                  window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
+                    ? removeNodeDef(nodeDef)
+                    : null
+                }}
+                onMouseDown={e => {
+                  e.stopPropagation()
+                }}>
+          <span className="icon icon-bin2 icon-12px"/>
+        </button>
       }
 
     </div>
