@@ -57,7 +57,7 @@ module.exports.init = app => {
     const { user } = req
     RecordService.terminateUserThread(user.id)
 
-    const token = req.headers.authorization.substring(7) // TODO - 7
+    const token = req.headers.authorization.substring(7)
     AuthService.blacklistToken(token, Jwt.getExpiration(token))
 
     sendOk(res)
