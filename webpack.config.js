@@ -3,8 +3,9 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+require('dotenv').config()
 const uuidv4 = require('uuid/v4')
 
 const mode = {
@@ -30,11 +31,14 @@ const plugins = [
     {
       __SYSTEM_VERSION__: `"${versionString}"`,
       __BUST__: `"${uuidv4()}"`,
+      __COGNITO_REGION__: JSON.stringify(process.env.COGNITO_REGION),
+      __COGNITO_USER_POOL_ID__: JSON.stringify(process.env.COGNITO_USER_POOL_ID),
+      __COGNITO_CLIENT_ID__: JSON.stringify(process.env.COGNITO_CLIENT_ID),
       'process.env': {
-        'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+        'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       }
     }
-  ),
+  )
 ]
 
 if (buildReport) {
@@ -88,7 +92,7 @@ webpack.optimization = {
       parallel: true,
       uglifyOptions: {
         compress: true,
-        output: {comments: false},
+        output: { comments: false },
       },
       sourceMap: true
     }),

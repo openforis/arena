@@ -62,10 +62,10 @@ const getRequiredParam = (req, param) => {
 
 const getFile = R.pathOr(null, ['files', 'file'])
 
-// passport session
+// User
 
-const getSessionUserId = R.path(['session', 'passport', 'user'])
 const getSessionUser = R.prop('user')
+const getSessionUserId = R.pipe(getSessionUser, R.prop('id'))
 
 module.exports = {
   getParams,
@@ -76,7 +76,7 @@ module.exports = {
   getRequiredParam,
   getFile,
 
-  //session
+  // User
   getSessionUserId,
   getSessionUser,
 }

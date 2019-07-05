@@ -6,24 +6,21 @@ import { setUserPref } from '../../common/user/userPrefs'
 import * as AppState from './appState'
 
 import {
-  appStatusChange,
+  appPropsChange,
   appUserLogout,
   appUserPrefUpdate,
   appErrorCreate,
   appErrorDelete,
   systemErrorThrow,
 } from './actions'
-import { loginSuccess } from '../login/actions'
 import { appJobStart, appJobActiveUpdate } from '../loggedin/appJob/actions'
 import { surveyCreate, surveyDelete } from '../survey/actions'
 
 const actionHandlers = {
 
-  [appStatusChange]: (state, { survey, ...props }) => assocActionProps(state, props),
+  [appPropsChange]: (state, { survey, ...props }) => assocActionProps(state, props),
 
   // ====== user
-  // user and current survey are properties of app state
-  [loginSuccess]: (state, { survey, ...props }) => assocActionProps(state, props),
 
   [appUserPrefUpdate]: (state, { name, value }) => {
     const user = R.pipe(
@@ -51,7 +48,6 @@ const actionHandlers = {
   [appErrorDelete]: (state, { error }) => AppState.dissocAppError(error)(state),
 
   [systemErrorThrow]: (state, { error }) => AppState.assocSystemError(error)(state),
-
 }
 
 export default exportReducer(actionHandlers)

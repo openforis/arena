@@ -20,28 +20,34 @@ const checkPermission = (req, res, next, permissionFn, obj) => {
   if (permissionFn(user, obj)) {
     next()
   } else {
-    next(new UnauthorizedError(user.name))
+    next(new UnauthorizedError(user && user.name))
   }
 
 }
 
-const requireSurveyPermission = permissionFn =>
-  async (req, res, next) => {
+const requireSurveyPermission = permissionFn => async (req, res, next) => {
+  try {
     const { surveyId } = Request.getParams(req)
     const survey = await SurveyManager.fetchSurveyById(surveyId)
     const surveyInfo = Survey.getSurveyInfo(survey)
 
     checkPermission(req, res, next, permissionFn, surveyInfo)
+  } catch (e) {
+    next(e)
   }
+}
 
-const requireRecordPermission = (permissionFn) =>
-  async (req, res, next) => {
+const requireRecordPermission = permissionFn => async (req, res, next) => {
+  try {
     const { surveyId, recordUuid } = Request.getParams(req)
 
     const record = await RecordService.fetchRecordByUuid(surveyId, recordUuid)
 
     checkPermission(req, res, next, permissionFn, record)
+  } catch (e) {
+    next(e)
   }
+}
 
 module.exports = {
   // Survey

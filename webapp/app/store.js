@@ -2,7 +2,6 @@ import { applyMiddleware, combineReducers, createStore } from 'redux'
 
 // == app reducer
 import app from './reducer'
-import login from '../login/reducer'
 import survey from '../survey/reducer'
 
 import createDebounce from 'redux-debounced'
@@ -12,7 +11,6 @@ import { isEnvDevelopment } from '../../common/processUtils'
 
 const appReducer = {
   app,
-  login,
   survey,
 }
 

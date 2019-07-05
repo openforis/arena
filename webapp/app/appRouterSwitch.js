@@ -1,106 +1,81 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
-import { withRouter, Switch, Route } from 'react-router-dom'
+import { withRouter, Switch, Route, Redirect } from 'react-router-dom'
 
+import { Authenticator, SignIn } from 'aws-amplify-react/dist/Auth'
+
+import LoginView from '../login/loginView'
 import DynamicImport from '../commonComponents/dynamicImport'
-import LoginView from '../login/components/loginView'
 
-import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 import * as AppWebSocket from './appWebSocket'
 
 import * as AppState from './appState'
 import { throwSystemError, initApp } from './actions'
 
-import { getLocationPathname } from '../utils/routerUtils'
+import { appModuleUri } from '../loggedin/appModules'
 
-const loginUri = '/'
+const AppSwitch = ({ authState }) => (
+  authState === 'signedIn' &&
+  <Switch>
+    <Route
+      exact
+      path="/"
+      render={() => (
+        <Redirect to={appModuleUri()}/>
+      )}
+    />
+    <Route
+      path="/app"
+      render={props => (
+        <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
+      )}
+    />
+  </Switch>
+)
 
-class AppRouterSwitch extends React.Component {
+const AppRouterSwitch = props => {
 
-  openWebSocket () {
-    const { throwSystemError } = this.props
+  const {
+    isReady, systemError, user,
+    initApp, throwSystemError,
+  } = props
 
-    AppWebSocket.openSocket()
+  useEffect(() => {
+    initApp()
+    return () => AppWebSocket.closeSocket()
+  }, [])
 
-    const throwError = (error) => {
-      throwSystemError(error)
+  useEffect(() => {
+    if (user) {
+      (async () => {
+        await AppWebSocket.openSocket(throwSystemError)
+      })()
+    } else {
       AppWebSocket.closeSocket()
     }
+  }, [user])
 
-    AppWebSocket.on(WebSocketEvents.connectError, error => throwError(error.stack))
-    AppWebSocket.on(WebSocketEvents.error, throwError)
-  }
-
-  closeWebSocket () {
-    AppWebSocket.closeSocket()
-  }
-
-  componentDidMount () {
-    this.props.initApp()
-  }
-
-  componentDidUpdate (prevProps) {
-    const { user, history } = this.props
-    const { user: prevUser } = prevProps
-
-    if (user && !prevUser) {
-      this.openWebSocket()
-    } else if (prevUser && !user) {
-      this.closeWebSocket()
-      // logout - redirect to login page
-      history.push(loginUri)
-    }
-  }
-
-  componentWillUnmount () {
-    this.closeWebSocket()
-  }
-
-  render () {
-    const { isReady, systemError } = this.props
-
-    const isLogin = getLocationPathname(this.props) === loginUri
-
-    return (
-      isReady
+  return (
+    isReady && (
+      systemError
         ? (
-          <React.Fragment>
-
-            {
-              systemError
-                ? (
-                  <div className="main__system-error">
-                    <div className="main__system-error-container">
-                      <span className="icon icon-warning icon-24px icon-left"/>
-                      Oooops! Something went wrong. Try to refresh the page.
-                      <div className="error">{systemError}</div>
-                    </div>
-                  </div>
-                )
-                : (
-                  <Switch>
-                    <Route
-                      exact path="/"
-                      component={LoginView}
-                    />
-                    <Route
-                      path="/app"
-                      render={props => (
-                        <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
-                      )}
-                    />
-                  </Switch>
-                )
-            }
-
-          </React.Fragment>
+          <div className="main__system-error">
+            <div className="main__system-error-container">
+              <span className="icon icon-warning icon-24px icon-left"/>
+              Oooops! Something went wrong. Try to refresh the page.
+              <div className="error">{systemError}</div>
+            </div>
+          </div>
         )
         : (
-          null
+          <Authenticator hide={[SignIn]} hideDefault={true}>
+            <LoginView override={'SignIn'}/>
+            <AppSwitch/>
+          </Authenticator>
         )
     )
-  }
+  )
 }
 
 const mapStateToProps = state => ({

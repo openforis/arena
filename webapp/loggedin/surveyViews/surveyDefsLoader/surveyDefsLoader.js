@@ -1,33 +1,37 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import { initSurveyDefs } from '../../../survey/actions'
+import Survey from '../../../../common/survey/survey'
 
 import * as SurveyState from '../../../survey/surveyState'
 
-class SurveyDefsLoader extends React.Component {
+import { initSurveyDefs } from '../../../survey/actions'
 
-  componentDidMount () {
-    const { draft, validate, initSurveyDefs } = this.props
+const SurveyDefsLoader = (props) => {
 
-    initSurveyDefs(draft, validate)
-  }
+  const {
+    surveyInfo, draft, validate,
+    ready, children,
+    initSurveyDefs
+  } = props
 
-  render () {
-    const { ready, children } = this.props
+  const surveyUuid = Survey.getUuid(surveyInfo)
 
-    return ready
-      ? children
-      : null
-  }
+  useEffect(() => {
+    if (surveyUuid) {
+      initSurveyDefs(draft, validate)
+    }
+  }, [surveyUuid])
+
+  return ready
+    ? children
+    : null
 
 }
 
 const mapStateToProps = state => ({
-  ready: SurveyState.areDefsFetched(state)
+  ready: SurveyState.areDefsFetched(state),
+  surveyInfo: SurveyState.getSurveyInfo(state),
 })
 
-export default connect(
-  mapStateToProps,
-  { initSurveyDefs }
-)(SurveyDefsLoader)
+export default connect(mapStateToProps, { initSurveyDefs })(SurveyDefsLoader)
