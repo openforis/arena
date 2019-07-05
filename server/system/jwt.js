@@ -2,8 +2,6 @@ const axios = require('axios')
 const jwkToPem = require('jwk-to-pem')
 const jsonwebtoken = require('jsonwebtoken')
 
-const UserService = require('../modules/user/service/userService')
-
 const region = process.env.COGNITO_REGION
 const poolId = process.env.COGNITO_USER_POOL_ID
 const issuer = `https://cognito-idp.${region}.amazonaws.com/${poolId}`

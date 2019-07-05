@@ -4,9 +4,7 @@ module.exports = {
 
   findUserById: UserManager.findUserById,
 
-  findUserByEmailAndPassword: UserManager.findUserByEmailAndPassword,
-
-  findUserByUsername: UserManager.findUserByUsername,
+  findUserByEmail: UserManager.findUserByEmail,
 
   updateUserPref: UserManager.updateUserPref,
 

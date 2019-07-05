@@ -51,7 +51,6 @@
     "aws-amplify": "^1.1.29",
     "aws-amplify-react": "^2.3.9",
     "axios": "^0.19.0",
-    "bcrypt": "^3.0.6",
     "bluebird": "^3.5.5",
     "body-parser": "^1.19.0",
     "camelize": "^1.0.0",
