@@ -34,13 +34,13 @@ const SurveyFormView = (props) => {
 
   const editAllowed = edit && canEditDef
 
-  let className = editAllowed && hasNodeDefAddChildTo
+  let className = editAllowed
     ? ' form-designer edit'
-    : editAllowed
-      ? ' form-designer edit form-actions-off'
-      : edit
-        ? ' form-designer'
-        : ''
+    : edit
+      ? ' form-designer'
+      : ''
+
+  className += hasNodeDefAddChildTo ? '' : ' form-actions-off'
   className += showPageNavigation ? '' : ' page-navigation-off'
 
   return nodeDef
