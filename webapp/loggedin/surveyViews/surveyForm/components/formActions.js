@@ -5,6 +5,7 @@ import * as R from 'ramda'
 import { dispatchWindowResize } from '../../../../utils/domUtils'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
@@ -13,7 +14,7 @@ import * as SurveyFormState from '../surveyFormState'
 import { createNodeDef } from '../../../../survey/nodeDefs/actions'
 import { setFormNodeDefAddChildTo } from '../actions'
 
-const AddNodeDefButtons = ({ addNodeDef, setFormNodeDefAddChildTo }) => {
+const AddNodeDefButtons = ({ nodeDef, addNodeDef, setFormNodeDefAddChildTo }) => {
 
   return (
     <React.Fragment>
@@ -23,13 +24,17 @@ const AddNodeDefButtons = ({ addNodeDef, setFormNodeDefAddChildTo }) => {
           .map(type => {
             const nodeDefProps = getNodeDefDefaultLayoutPropsByType(type)
 
+            // cannot add entities when entity is rendered as table
+            const disabled = type === NodeDef.nodeDefType.entity && NodeDefLayout.isRenderTable(nodeDef)
+
             return (
               <button key={type}
                       className="btn btn-s btn-add-node-def"
                       onClick={() => {
                         addNodeDef(type, nodeDefProps)
                         setFormNodeDefAddChildTo(null)
-                      }}>
+                      }}
+                      aria-disabled={disabled}>
                 {getNodeDefIconByType(type)}{type}
               </button>
             )
