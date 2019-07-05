@@ -7,7 +7,7 @@ CREATE TABLE
   labels       jsonb DEFAULT '{}'::jsonb,
   descriptions jsonb DEFAULT '{}'::jsonb,
   permissions  jsonb DEFAULT '{}'::jsonb,
-  record_steps   jsonb DEFAULT '{}'::jsonb,
+  record_steps jsonb DEFAULT '{}'::jsonb,
   PRIMARY KEY (id)
 );
 
@@ -28,9 +28,9 @@ CREATE TABLE jwt_token_blacklist
 
 -- INSERT ADMIN USER
 INSERT INTO
-  "user" (email)
+  "user" (name, email)
 VALUES
-('openforis.arena@gmail.com');
+('Admin', 'openforis.arena@gmail.com');
 
 INSERT INTO auth_group (name, labels, descriptions, permissions, record_steps)
 VALUES ('systemAdmin',

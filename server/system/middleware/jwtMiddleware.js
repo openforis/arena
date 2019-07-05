@@ -24,11 +24,7 @@ module.exports = async (req, res, next) => {
 
       const decoded = await Jwt.validate(jwtToken)
       const email = decoded.email
-
-      const user = {
-        ...await UserService.findUserByEmail(email),
-        name: decoded.name,
-      }
+      const user = await UserService.findUserByEmail(email)
 
       req.user = user
 
