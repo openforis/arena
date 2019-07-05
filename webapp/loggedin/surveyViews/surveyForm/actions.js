@@ -49,8 +49,9 @@ export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (dispatch, getStat
   const state = getState()
 
   const survey = SurveyState.getSurvey(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
-  const lang = Survey.getLanguage(AppState.getLang(state))(survey)
+  const lang = Survey.getLanguage(AppState.getLang(state))(surveyInfo)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDef)(survey)
 
   const getNodeDefKeyLabelValue = nodeDefKey => {
