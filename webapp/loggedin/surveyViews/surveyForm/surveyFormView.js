@@ -45,7 +45,7 @@ const SurveyFormView = (props) => {
 
   return nodeDef
     ? (
-      <div className={`survey-form${className}`}>
+      <div>
 
         {
           editAllowed &&
@@ -60,7 +60,7 @@ const SurveyFormView = (props) => {
           canEditDef={canEditDef}
         />
 
-        <div className="survey-form-container">
+        <div className={`survey-form${className}`}>
 
           {
             showPageNavigation &&
@@ -73,19 +73,15 @@ const SurveyFormView = (props) => {
             />
           }
 
-
-          {
-            nodeDef &&
-            <NodeDefSwitch
-              surveyInfo={surveyInfo}
-              nodeDef={nodeDef}
-              edit={edit}
-              entry={entry}
-              recordUuid={recordUuid}
-              parentNode={parentNode}
-              canEditDef={canEditDef}
-              canEditRecord={canEditRecord}/>
-          }
+          <NodeDefSwitch
+            surveyInfo={surveyInfo}
+            nodeDef={nodeDef}
+            edit={edit}
+            entry={entry}
+            recordUuid={recordUuid}
+            parentNode={parentNode}
+            canEditDef={canEditDef}
+            canEditRecord={canEditRecord}/>
 
           {
             editAllowed &&
