@@ -72,11 +72,13 @@ const Binary = (props) => {
         <React.Fragment>
 
 
-          <Dropdown items={Expression.operators.binaryValues} inputSize={10}
-                    selection={Expression.operators.findBinary(node.operator)}
-                    onChange={item => onChange(
-                      R.assoc('operator', R.propOr('', 'key', item), node)
-                    )}/>
+          <Dropdown
+            items={Expression.operators.binaryValues}
+            selection={Expression.operators.findBinary(node.operator)}
+            onChange={item => onChange(
+              R.assoc('operator', R.propOr('', 'key', item), node)
+            )}
+          />
 
           <BinaryOperand {...R.dissoc('literalSearchParams', props)} type="right"/>
 

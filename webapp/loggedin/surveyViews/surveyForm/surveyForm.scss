@@ -241,6 +241,7 @@ $formHeaderHeight: 40px;
       text-align: right;
       //padding: .25rem 1rem;
       border: 1px solid $blueDark;
+      width: calc(100% - 2rem - 2px);
     }
 
     .dropdown {
@@ -325,7 +326,10 @@ $formHeaderHeight: 40px;
 //===
 .survey-form__node-def-boolean {
   justify-self: start;
-  border: 1px solid $blueDark;
+
+  > *:first-child {
+    border: 1px solid $blueDark;
+  }
 }
 
 //===

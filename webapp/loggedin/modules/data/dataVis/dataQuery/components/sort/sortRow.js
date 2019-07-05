@@ -31,7 +31,6 @@ const SortRow = (props) => {
         selection={selectedVariable}
         itemLabelProp="label"
         itemKeyProp="value"
-        inputSize={25}
         onChange={item => onSelectVariable(item)} />
 
       {

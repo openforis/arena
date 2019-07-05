@@ -157,7 +157,6 @@ class Dropdown extends React.Component {
       validation = {},
       readOnly,
       disabled,
-      inputSize,
       autocompleteDialogClassName,
     } = this.props
 
@@ -187,7 +186,7 @@ class Dropdown extends React.Component {
              disabled={disabled}
              onChange={value => this.onInputChange(value)}
              onFocus={e => this.onInputFocus(e)}
-             size={inputSize}/>
+             />
 
       <span className="icon icon-menu2 icon-18px"
             onClick={(e) => {
@@ -229,7 +228,6 @@ Dropdown.defaultProps = {
   itemKeyFunction: null,
   itemLabelProp: null,
   itemLabelFunction: null,
-  inputSize: 20,
   autocompleteDialogClassName: null,
 }
 
