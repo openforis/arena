@@ -52,10 +52,6 @@ class FormActions extends React.Component {
     const { nodeDef: nodeDefPrev } = prevProps
 
     if ((nodeDef && !nodeDefPrev) || (!nodeDef && nodeDefPrev)) {
-
-      const surveyFormElement = document.getElementsByClassName('survey-form')[0]
-      surveyFormElement.classList.toggle('form-actions-off')
-
       //react-grid-layout re-render
       dispatchWindowResize()
     }

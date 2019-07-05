@@ -24,7 +24,7 @@ const SurveyFormView = (props) => {
   const {
     surveyInfo, nodeDef,
     edit, entry, preview,
-    showPageNavigation,
+    hasNodeDefAddChildTo, showPageNavigation,
     canEditDef, canEditRecord,
 
     recordUuid, parentNode,
@@ -32,13 +32,15 @@ const SurveyFormView = (props) => {
     history,
   } = props
 
-  const editAllowed = edit && canEditDef && !preview
+  const editAllowed = edit && canEditDef
 
-  let className = editAllowed
-    ? ' form-designer edit form-actions-off'
-    : edit && !preview
-      ? ' form-designer'
-      : ''
+  let className = editAllowed && hasNodeDefAddChildTo
+    ? ' form-designer edit'
+    : editAllowed
+      ? ' form-designer edit form-actions-off'
+      : edit
+        ? ' form-designer'
+        : ''
   className += showPageNavigation ? '' : ' page-navigation-off'
 
   return nodeDef
@@ -118,6 +120,7 @@ const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeDef = SurveyFormState.getFormActivePageNodeDef(state)
+  const hasNodeDefAddChildTo = !!SurveyFormState.getNodeDefAddChildTo(state)
   const record = RecordState.getRecord(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
 
@@ -129,6 +132,7 @@ const mapStateToProps = (state, props) => {
   return {
     surveyInfo,
     nodeDef,
+    hasNodeDefAddChildTo,
     showPageNavigation,
     ...props.entry
       ? mapEntryProps()
