@@ -4,28 +4,47 @@ import * as AppState from './appState'
 
 import i18nFactory from '../../common/i18n/i18nFactory'
 
-export const appStatusChange = 'app/status/change'
+import * as CognitoAuth from './cognitoAuth'
+
+export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
 
-export const initApp = () => async (dispatch) => {
-  // fetching user
-  const resp = await axios.get('/auth/user')
+const getUserSurvey = async () => {
+  const { data: { user, survey } } = await axios.get('/auth/user')
+  return { user, survey }
+}
 
-  const { data } = resp
-  const { user, survey } = data
-
+export const initApp = () => async dispatch => {
   const i18n = await i18nFactory.createI18nPromise('en')
-  dispatch({ type: appStatusChange, status: AppState.appStatus.ready, user, survey, i18n })
+
+  let user = null
+  let survey = null
+
+  //get jwt token to check if user is already logged in
+  const token = await CognitoAuth.getJwtToken()
+  if (token) {
+    const userSurvey = await getUserSurvey()
+    user = userSurvey.user
+    survey = userSurvey.survey
+  }
+
+  dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey })
+}
+
+export const initUser = () => async dispatch => {
+  const { user, survey } = await getUserSurvey()
+  dispatch({ type: appPropsChange, user, survey })
 }
 
 export const setLanguage = languageCode => async (dispatch) => {
   const i18n = await i18nFactory.createI18nPromise(languageCode)
-  dispatch({ type: appStatusChange, i18n })
+  dispatch({ type: appPropsChange, i18n })
 }
 
 export const logout = () => async dispatch => {
-  await axios.post('/auth/logout')
+  await CognitoAuth.logout()
+  // await axios.post('/auth/logout')
   dispatch({ type: appUserLogout })
 }
 

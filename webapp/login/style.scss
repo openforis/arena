@@ -71,7 +71,7 @@
 }
 
 .login__grid {
-  @include full-screen-fixed();
+  // @include full-screen-fixed();
   display: grid;
   grid-template-columns: repeat(12, 8.33333333333333vw);
   grid-template-rows: repeat(6, 16.66666666666667vh);
@@ -83,7 +83,7 @@
 }
 
 .of-letter {
-  color: $grey;
+  color: rgba($grey, .8);
   font-size: 70px;
   font-weight: 200;
   text-align: center;
@@ -92,7 +92,7 @@
   filter: blur(.1px);
 }
 
-.login__form-container {
+.login-form__container {
   //@extend .login__grid-cell;
   grid-column: span 6;
   grid-row: span 4;
@@ -103,7 +103,7 @@
   background-color: rgba($green, 0.1);
 }
 
-.login__form {
+.login-form {
   display: grid;
   grid-template-columns: .7fr;
   height: 100%;
@@ -111,12 +111,22 @@
   justify-content: center;
   align-content: space-evenly;
   //box-shadow: 0px -8px 260px -50px rgba($color, 0.1);
-  //border: 3px double rgba(249, 225, 226, 0.08);
-  //border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  border: 3px double rgba(249, 225, 226, 0.08);
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
 
   input {
     border-bottom: 2px solid rgba($greyBorder, .7);
     text-align: center;
+    color: white;
+
+    &:focus, &:active,
+    &:-webkit-autofill, &:-webkit-autofill:hover, &:-webkit-autofill:focus {
+      background-color: rgba($blueLightActive, .3);
+      color: white;
+      -webkit-text-fill-color: white;
+      box-shadow: 0 0 0px 1000px rgba($blueLightActive, .3) inset;
+      -webkit-box-shadow: 0 0 0px 1000px rgba($blueLightActive, .3) inset;
+    }
   }
 
   .buttons {
@@ -146,4 +156,17 @@
       }
     }
   }
+}
+
+.login-form__error-msg {
+  background-color: $red;
+  font-size: .9rem;
+  font-weight: 600;
+  color: white;
+  padding: .5rem 0;
+}
+
+
+.Toast__toast___XXr3v {
+  display: none;
 }

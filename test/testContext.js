@@ -1,6 +1,6 @@
 const { deleteSurvey } = require('../server/modules/survey/manager/surveyManager')
 
-const { findUserByEmailAndPassword } = require('../server/modules/user/service/userService')
+const { findUserByEmail } = require('../server/modules/user/service/userService')
 const { setUserPref, userPrefNames } = require('../common/user/userPrefs')
 
 const Survey = require('../common/survey/survey')
@@ -15,7 +15,7 @@ let survey = null
  * before executing all tests
  */
 const initTestContext = async () => {
-  user = await findUserByEmailAndPassword('admin@openforis.org', 'admin')
+  user = await findUserByEmail('openforis.arena@gmail.com')
 }
 
 const destroyTestContext = async () => {

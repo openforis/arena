@@ -8,9 +8,9 @@ let userSockets = {}
 
 const getUserSockets = userId => R.propOr({}, userId, userSockets)
 
-const addUserSocket = (userId, socket) => userSockets = R.assocPath([userId, socket.id], socket, userSockets)
+const addUserSocket = (userId, socket) => { userSockets = R.assocPath([userId, socket.id], socket, userSockets) }
 
-const deleteUserSocket = (userId, socketId) => userSockets = R.dissocPath([userId, socketId], userSockets)
+const deleteUserSocket = (userId, socketId) => { userSockets = R.dissocPath([userId, socketId], userSockets) }
 
 const notifyUser = (userId, eventType, message) => R.pipe(
   getUserSockets,
@@ -19,17 +19,20 @@ const notifyUser = (userId, eventType, message) => R.pipe(
   )
 )(userId)
 
-const init = (server, sessionMiddleware) => {
+const init = (server, jwtMiddleware) => {
 
   io.attach(server)
 
   io.use((socket, next) => {
-    // Wrap the sessionMiddleware to get the user id
-    sessionMiddleware(socket.request, {}, next)
+    // Set the request authorization header from socket handshake
+    const token = socket.handshake.query.token
+    socket.request.headers.authorization = 'Bearer ' + token
+
+    // Wrap the jwtMiddleware to get the user id
+    jwtMiddleware(socket.request, {}, next)
   })
 
   io.on('connection', async socket => {
-
     const userId = R.pipe(
       R.prop('request'),
       Request.getSessionUserId,
