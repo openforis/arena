@@ -19,12 +19,13 @@ export const logout = () => {
 
 /**
  *
- * @returns current jwtToken or null if user is not logged in
+ * @returns current idToken.jwtToken if current session has a user or null if it doesn't
  */
 export const getJwtToken = async () => {
   try {
     const session = await Auth.currentSession()
-    return session.getAccessToken().jwtToken
+    const idToken = session.getIdToken()
+    return idToken.jwtToken
   } catch (e) {
     // No current user
     return null

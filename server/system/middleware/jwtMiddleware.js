@@ -16,8 +16,12 @@ module.exports = async (req, res, next) => {
     try {
       const jwtToken = authorizationHeader && authorizationHeader.substr(bearerPrefix.length)
       const decoded = await Jwt.validate(jwtToken)
-      const username = decoded.username
-      const user = await UserService.findUserByUsername(username)
+      const email = decoded.email
+
+      const user = {
+        ...await UserService.findUserByEmail(email),
+        name: decoded.name,
+      }
 
       req.user = user
 
