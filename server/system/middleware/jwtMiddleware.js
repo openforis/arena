@@ -1,6 +1,7 @@
 const Jwt = require('../jwt')
 
 const UserService = require('../../modules/user/service/userService')
+const AuthService = require('../../modules/auth/service/authService')
 
 const UnauthorizedError = require('../../utils/unauthorizedError')
 
@@ -17,7 +18,7 @@ module.exports = async (req, res, next) => {
       const jwtToken = authorizationHeader && authorizationHeader.substr(bearerPrefix.length)
 
       // Check if token is blacklisted
-      if (await UserService.findBlacklistedTokenByJti(Jwt.getJti(jwtToken))) {
+      if (await AuthService.findBlacklistedToken(jwtToken)) {
         throw new Error()
       }
 

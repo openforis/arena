@@ -19,11 +19,18 @@ CREATE TABLE
   PRIMARY KEY (user_id, group_id)
 );
 
+CREATE TABLE jwt_token_blacklist
+(
+  token text,
+  expiration bigint,
+  PRIMARY KEY (token)
+);
+
 -- INSERT ADMIN USER
 INSERT INTO
-  "user" (name, email, password)
+  "user" (email)
 VALUES
-('Admin', 'admin@openforis.org', '$2b$10$PGiD7cS.ESkAI4NIbuJ.9OYDEsfnMl8wNoETWoi03JWhXXJIwLDte');
+('openforis.arena@gmail.com');
 
 INSERT INTO auth_group (name, labels, descriptions, permissions, record_steps)
 VALUES ('systemAdmin',
@@ -35,4 +42,4 @@ VALUES ('systemAdmin',
 INSERT INTO auth_group_user (user_id, group_id)
 SELECT id, currval(pg_get_serial_sequence('auth_group', 'id'))
 FROM "user"
-WHERE email = 'admin@openforis.org';
+WHERE email = 'openforis.arena@gmail.com';

@@ -8,6 +8,7 @@ const AuthManager = require('../../../../common/auth/authManager')
 const SurveyManager = require('../../survey/manager/surveyManager')
 const UserService = require('../../user/service/userService')
 const RecordService = require('../../record/service/recordService')
+const AuthService = require('../../auth/service/authService')
 
 const Survey = require('../../../../common/survey/survey')
 
@@ -57,7 +58,7 @@ module.exports.init = app => {
     RecordService.terminateUserThread(user.id)
 
     const token = req.headers.authorization.substring(7) // TODO - 7
-    UserService.blacklistTokenByJti(Jwt.getJti(token), Jwt.getExpiration(token))
+    AuthService.blacklistToken(token, Jwt.getExpiration(token))
 
     sendOk(res)
   })
