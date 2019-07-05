@@ -62,6 +62,11 @@ const getDisplayIn = R.ifElse(
   R.always(nodeDefDisplayIn.parentPage)
 )
 
+const isDisplayInParentPage = R.pipe(
+  getDisplayIn,
+  R.propEq(nodeDefDisplayIn.parentPage)
+)
+
 module.exports = {
   nodeDefRenderType,
   nodeDefLayoutProps,
@@ -77,6 +82,7 @@ module.exports = {
   getPageUuid,
   hasPage,
   getDisplayIn,
+  isDisplayInParentPage,
   filterInnerPageChildren,
   filterOuterPageChildren,
 }

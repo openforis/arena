@@ -1,6 +1,8 @@
 import axios from 'axios'
 import * as R from 'ramda'
 
+import { uuidv4 } from '../../../common/uuid'
+
 import { debounceAction } from '../../utils/reduxUtils'
 
 import Survey from '../../../common/survey/survey'
@@ -40,9 +42,18 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
 
   if (key === NodeDefLayout.nodeDefLayoutProps.render) {
     // If setting layout render mode (table | form), set the the proper layout
-    props[NodeDefLayout.nodeDefLayoutProps.layout] = (value === NodeDefLayout.nodeDefRenderType.table)
+    const isRenderTable = value === NodeDefLayout.nodeDefRenderType.table
+    const isRenderForm = value === NodeDefLayout.nodeDefRenderType.form
+
+    props[NodeDefLayout.nodeDefLayoutProps.layout] = isRenderTable
       ? Survey.getNodeDefChildren(nodeDef)(survey).map(n => NodeDef.getUuid(n))
       : null
+
+    // entity rendered as form can only exists in its own page
+    if (isRenderForm && NodeDefLayout.isDisplayInParentPage(nodeDef)) {
+      props[NodeDefLayout.nodeDefLayoutProps.pageUuid] = uuidv4()
+    }
+
   } else if (key === NodeDef.propKeys.multiple) {
     // If setting "multiple", reset validations required or count
     propsAdvanced[NodeDef.propKeys.validations] = value
@@ -50,7 +61,14 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
       : NodeDefValidations.dissocCount(NodeDef.getValidations(nodeDef))
   }
 
-  dispatch({ type: nodeDefPropsUpdate, nodeDef, parentNodeDef, nodeDefUuid: NodeDef.getUuid(nodeDef), props, propsAdvanced })
+  dispatch({
+    type: nodeDefPropsUpdate,
+    nodeDef,
+    parentNodeDef,
+    nodeDefUuid: NodeDef.getUuid(nodeDef),
+    props,
+    propsAdvanced
+  })
 
   dispatch(_putNodeDefProps(nodeDef, key, props, propsAdvanced))
 }

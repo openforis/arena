@@ -27,6 +27,17 @@ const getNodeDefsByUuids = (uuids = []) => R.pipe(
 
 const getNodeDefChildren = nodeDef => getNodeDefsByParentUuid(NodeDef.getUuid(nodeDef))
 
+const hasNodeDefChildrenEntities = nodeDef => survey => {
+  if (NodeDef.isAttribute(nodeDef))
+    return false
+
+  return R.pipe(
+    getNodeDefChildren(nodeDef),
+    R.any(NodeDef.isEntity),
+  )(survey)
+
+}
+
 const getNodeDefChildByName = (nodeDef, childName) =>
   R.pipe(
     getNodeDefChildren(nodeDef),
@@ -192,6 +203,7 @@ module.exports = {
   getNodeDefByUuid,
   getNodeDefsByUuids,
   getNodeDefChildren,
+  hasNodeDefChildrenEntities,
   getNodeDefChildByName,
   getNodeDefSiblingByName,
   getNodeDefKeys,

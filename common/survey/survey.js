@@ -70,6 +70,7 @@ module.exports = {
   // getNodeDefById: SurveyNodeDefs.getNodeDefById,
   getRootNodeDef: SurveyNodeDefs.getRootNodeDef,
   getNodeDefChildren: SurveyNodeDefs.getNodeDefChildren,
+  hasNodeDefChildrenEntities: SurveyNodeDefs.hasNodeDefChildrenEntities,
   getNodeDefChildByName: SurveyNodeDefs.getNodeDefChildByName,
   getNodeDefSiblingByName: SurveyNodeDefs.getNodeDefSiblingByName,
   getNodeDefByName: SurveyNodeDefs.getNodeDefByName,

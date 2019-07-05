@@ -1,51 +1,35 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import useI18n from '../../../../commonComponents/useI18n'
-
-import { uuidv4 } from '../../../../../common/uuid'
-
-import { FormItem, Input } from '../../../../commonComponents/form/input'
-import Checkbox from '../../../../commonComponents/form/checkbox'
-import LabelsEditor from '../../labelsEditor/labelsEditor'
-import CodeProps from './codeProps'
-import TaxonProps from './taxonProps'
-
+import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
 
+import { uuidv4 } from '../../../../../common/uuid'
 import { normalizeName } from '../../../../../common/stringUtils'
+
+import { FormItem, Input } from '../../../../commonComponents/form/input'
+import Checkbox from '../../../../commonComponents/form/checkbox'
+import LabelsEditor from '../../labelsEditor/labelsEditor'
 import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
+import CodeProps from './codeProps'
+import TaxonProps from './taxonProps'
+import useI18n from '../../../../commonComponents/useI18n'
 
-const getDisplayAsItems = i18n => ([
-  {
-    key: NodeDefLayout.nodeDefRenderType.form,
-    label: i18n.t('nodeDefEdit.basicProps.form'),
-  },
-  {
-    key: NodeDefLayout.nodeDefRenderType.table,
-    label: i18n.t('nodeDefEdit.basicProps.table'),
-  },
-])
-
-const getDisplayInItems = i18n => [
-  {
-    key: NodeDefLayout.nodeDefDisplayIn.parentPage,
-    label: i18n.t('nodeDefEdit.basicProps.parentPage'),
-  },
-  {
-    key: NodeDefLayout.nodeDefDisplayIn.ownPage,
-    label: i18n.t('nodeDefEdit.basicProps.ownPage'),
-  },
-]
-
+import * as SurveyState from '../../../../survey/surveyState'
+import * as NodeDefEditState from '../nodeDefEditState'
 
 const BasicProps = props => {
   const {
     nodeDef,
     nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
+
     displayAsEnabled, displayInEnabled,
+    displayAsFormDisabled, displayAsTableDisabled,
+    displayInParentPageDisabled, displayInOwnPageDisabled,
+
     putNodeDefProp,
     toggleTaxonomyEdit, toggleCategoryEdit
   } = props
@@ -56,6 +40,9 @@ const BasicProps = props => {
   const onPropLabelsChange = (labelItem, key, currentValue) => {
     putNodeDefProp(nodeDef, key, R.assoc(labelItem.lang, labelItem.label, currentValue))
   }
+
+  const renderType = NodeDefLayout.getRenderType(nodeDef)
+  const displayIn = NodeDefLayout.getDisplayIn(nodeDef)
 
   return (
     <div className="form">
@@ -119,9 +106,20 @@ const BasicProps = props => {
         displayAsEnabled &&
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayAs')}>
           <ButtonGroup
-            selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
+            selectedItemKey={renderType}
             onChange={renderType => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, renderType)}
-            items={getDisplayAsItems(i18n)}
+            items={[
+              {
+                key: NodeDefLayout.nodeDefRenderType.form,
+                label: i18n.t('nodeDefEdit.basicProps.form'),
+                disabled: displayAsFormDisabled,
+              },
+              {
+                key: NodeDefLayout.nodeDefRenderType.table,
+                label: i18n.t('nodeDefEdit.basicProps.table'),
+                disabled: displayAsTableDisabled,
+              },
+            ]}
           />
         </FormItem>
       }
@@ -130,10 +128,24 @@ const BasicProps = props => {
         displayInEnabled &&
         <FormItem label={i18n.t('nodeDefEdit.basicProps.displayIn')}>
           <ButtonGroup
-            selectedItemKey={NodeDefLayout.getDisplayIn(nodeDef)}
-            onChange={displayIn => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.pageUuid,
-              displayIn === NodeDefLayout.nodeDefDisplayIn.parentPage ? null : uuidv4())}
-            items={getDisplayInItems(i18n)}
+            selectedItemKey={displayIn}
+            onChange={displayIn => putNodeDefProp(
+              nodeDef,
+              NodeDefLayout.nodeDefLayoutProps.pageUuid,
+              displayIn === NodeDefLayout.nodeDefDisplayIn.parentPage ? null : uuidv4()
+            )}
+            items={[
+              {
+                key: NodeDefLayout.nodeDefDisplayIn.parentPage,
+                label: i18n.t('nodeDefEdit.basicProps.parentPage'),
+                disabled: displayInParentPageDisabled,
+              },
+              {
+                key: NodeDefLayout.nodeDefDisplayIn.ownPage,
+                label: i18n.t('nodeDefEdit.basicProps.ownPage'),
+                disabled: displayInOwnPageDisabled,
+              },
+            ]}
           />
         </FormItem>
       }
@@ -142,4 +154,26 @@ const BasicProps = props => {
   )
 }
 
-export default BasicProps
+const mapStateToProps = state => {
+  const survey = SurveyState.getSurvey(state)
+  const nodeDef = NodeDefEditState.getNodeDef(state)
+  const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
+
+  const displayAsFormDisabled = false
+  const displayAsTableDisabled = isEntityAndNotRoot && Survey.hasNodeDefChildrenEntities(nodeDef)(survey)
+
+  const displayInParentPageDisabled = NodeDefLayout.isRenderForm(nodeDef)
+  const displayInOwnPageDisabled = false
+
+  return {
+    displayAsEnabled: isEntityAndNotRoot,
+    displayInEnabled: isEntityAndNotRoot,
+
+    displayAsFormDisabled,
+    displayAsTableDisabled,
+    displayInParentPageDisabled,
+    displayInOwnPageDisabled,
+  }
+}
+
+export default connect(mapStateToProps)(BasicProps)
