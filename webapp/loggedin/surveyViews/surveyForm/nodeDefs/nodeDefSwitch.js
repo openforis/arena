@@ -8,7 +8,6 @@ import NodeDefTableBody from './components/nodeDefTableBody'
 import NodeDefEditFormActions from './components/nodeDefEditFormActions'
 import NodeDefErrorBadge from './components/nodeDefErrorBadge'
 
-import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'
 import Validator from '../../../../../common/validation/validator'
@@ -25,8 +24,6 @@ import { getNodeDefDefaultValue } from './nodeDefSystemProps'
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 // entry actions
 import { createNodePlaceholder, updateNode, removeNode } from '../../record/actions'
-
-import AppContext from '../../../../app/appContext'
 
 class NodeDefSwitch extends React.Component {
 
@@ -60,7 +57,7 @@ class NodeDefSwitch extends React.Component {
   render () {
     const {
       surveyInfo,
-      nodeDef,
+      nodeDef, label,
       edit, canEditDef,
       renderType, applicable,
       parentNode, nodes,
@@ -71,9 +68,6 @@ class NodeDefSwitch extends React.Component {
     const className = 'node-def__form'
       + (isPage ? '_page' : '')
       + (applicable ? '' : ' node-def__not-applicable')
-
-    const { i18n } = this.context
-    const label = NodeDef.getLabel(nodeDef, Survey.getLanguage(i18n.lang)(surveyInfo))
 
     return (
       <div className={className} ref={this.element}>
@@ -92,8 +86,8 @@ class NodeDefSwitch extends React.Component {
           renderType === Layout.nodeDefRenderType.tableHeader
             ? <NodeDefTableHeader nodeDef={nodeDef} label={label}/>
             : renderType === Layout.nodeDefRenderType.tableBody
-              ? <NodeDefTableBody {...this.props} label={label}/>
-              : <NodeDefFormItem {...this.props} label={label}/>
+            ? <NodeDefTableBody {...this.props} label={label}/>
+            : <NodeDefFormItem {...this.props} label={label}/>
         }
 
       </div>
@@ -101,8 +95,6 @@ class NodeDefSwitch extends React.Component {
 
   }
 }
-
-NodeDefSwitch.contextType = AppContext
 
 NodeDefSwitch.defaultProps = {
   // specified when can edit node definition
@@ -119,6 +111,8 @@ const mapStateToProps = (state, props) => {
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
+
+  const label = SurveyState.getNodeDefLabel(nodeDef)(state)
 
   const mapEntryProps = () => {
     const nodes = NodeDef.isRoot(nodeDef)
@@ -152,6 +146,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     surveyInfo,
+    label,
     applicable: parentNode
       ? Node.isChildApplicable(NodeDef.getUuid(nodeDef))(parentNode)
       : true,

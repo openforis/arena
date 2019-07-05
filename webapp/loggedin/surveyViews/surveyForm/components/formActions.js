@@ -2,14 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
+import AppContext from '../../../../app/appContext'
+
 import { dispatchWindowResize } from '../../../../utils/domUtils'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
-
 import { getNodeDefIconByType, getNodeDefDefaultLayoutPropsByType } from '../nodeDefs/nodeDefSystemProps'
 
 import * as SurveyFormState from '../surveyFormState'
+import * as SurveyState from '../../../../survey/surveyState'
 
 import { createNodeDef } from '../../../../survey/nodeDefs/actions'
 import { setFormNodeDefAddChildTo } from '../actions'
@@ -35,7 +37,8 @@ const AddNodeDefButtons = ({ nodeDef, addNodeDef, setFormNodeDefAddChildTo }) =>
                         setFormNodeDefAddChildTo(null)
                       }}
                       aria-disabled={disabled}>
-                {getNodeDefIconByType(type)}{type}
+                {type}
+                {getNodeDefIconByType(type)}
               </button>
             )
           })
@@ -72,7 +75,9 @@ class FormActions extends React.Component {
   }
 
   render () {
-    const { nodeDef, setFormNodeDefAddChildTo } = this.props
+    const { nodeDef, nodeDefLabel, setFormNodeDefAddChildTo } = this.props
+
+    const { i18n } = this.context
 
     return nodeDef && (
       <div className="survey-form__actions">
@@ -81,6 +86,11 @@ class FormActions extends React.Component {
                 onClick={() => setFormNodeDefAddChildTo(null)}>
           <span className="icon icon-cross icon-12px"/>
         </button>
+
+        <div className="flex-center add-to-label">
+          <span className="icon icon-plus icon-10px icon-left"/>
+          {i18n.t('surveyForm.addChildTo', { nodeDef: nodeDefLabel })}
+        </div>
 
         <AddNodeDefButtons
           nodeDef={nodeDef}
@@ -95,9 +105,15 @@ class FormActions extends React.Component {
 
 }
 
-const mapStateToProps = state => ({
-  nodeDef: SurveyFormState.getNodeDefAddChildTo(state),
-})
+FormActions.contextType = AppContext
+
+const mapStateToProps = state => {
+  const nodeDef = SurveyFormState.getNodeDefAddChildTo(state)
+  return {
+    nodeDef,
+    nodeDefLabel: SurveyState.getNodeDefLabel(nodeDef)(state)
+  }
+}
 
 export default connect(
   mapStateToProps,

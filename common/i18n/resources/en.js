@@ -173,6 +173,7 @@ module.exports = {
     showPageNav: 'Show pages',
     hidePageNav: 'Hide pages',
     subPage: 'Sub page',
+    addChildTo: 'Add to {{nodeDef}}',
     formEditActions: {
       preview: 'Preview',
     },
