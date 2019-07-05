@@ -56,7 +56,6 @@ class NodeDefSwitch extends React.Component {
 
   render () {
     const {
-      surveyInfo,
       nodeDef, label,
       edit, canEditDef,
       renderType, applicable,
@@ -72,15 +71,19 @@ class NodeDefSwitch extends React.Component {
     return (
       <div className={className} ref={this.element}>
 
-        <NodeDefErrorBadge nodeDef={nodeDef}
-                           edit={edit}
-                           parentNode={parentNode}
-                           nodes={nodes}
-                           container={this.element}/>
+        <NodeDefErrorBadge
+          nodeDef={nodeDef}
+          edit={edit}
+          parentNode={parentNode}
+          nodes={nodes}
+          container={this.element}
+        />
 
-        <NodeDefEditFormActions nodeDef={nodeDef}
-                                edit={edit}
-                                canEditDef={canEditDef}/>
+        <NodeDefEditFormActions
+          nodeDef={nodeDef}
+          edit={edit}
+          canEditDef={canEditDef}
+        />
 
         {
           renderType === Layout.nodeDefRenderType.tableHeader

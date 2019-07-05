@@ -26,7 +26,7 @@ const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord })
 const MultipleTextInput = props => {
   const { nodeDef, parentNode, nodes, removeNode, canEditRecord } = props
 
-  return <div className="node-def__entry-multiple">
+  return (
     <div className="nodes">
       {
         nodes.map(n =>
@@ -56,7 +56,7 @@ const MultipleTextInput = props => {
         )
       }
     </div>
-  </div>
+  )
 }
 
 const NodeDefText = props =>

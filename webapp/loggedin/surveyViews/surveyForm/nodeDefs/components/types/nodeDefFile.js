@@ -54,7 +54,7 @@ const FileInput = ({ surveyInfo, nodeDef, readOnly, edit, node, canEditRecord, u
 const MultipleFileInput = props => {
   const { nodes } = props
 
-  return <div className="node-def__entry-multiple">
+  return (
     <div className="nodes">
       {
         nodes.map((n, i) =>
@@ -64,7 +64,7 @@ const MultipleFileInput = props => {
         )
       }
     </div>
-  </div>
+  )
 }
 
 const NodeDefFile = props =>

@@ -63,7 +63,7 @@
     border-bottom: 1px solid rgba($blueDark, .9);
 
     .form-input {
-      padding-right: 40px;
+      width: calc(100% - 2rem - 27px);
     }
   }
 }
