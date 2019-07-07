@@ -30,6 +30,8 @@ module.exports = {
     csvExport: 'CSV Export',
     undefinedName: 'Undefined name',
     empty: 'Empty',
+    download: 'Download',
+    upload: 'Upload',
   },
 
   appModules: {

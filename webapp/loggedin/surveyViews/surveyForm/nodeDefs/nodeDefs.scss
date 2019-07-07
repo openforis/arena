@@ -35,6 +35,12 @@
   }
 }
 
+.survey-form__node-def-file-container {
+  display: grid;
+  grid-template-columns: 30px 1fr 30px;
+  grid-column-gap: .5rem;
+}
+
 .node-def__taxon-autocomplete-list .item {
   display: grid;
   grid-template-columns: .3fr .7fr;

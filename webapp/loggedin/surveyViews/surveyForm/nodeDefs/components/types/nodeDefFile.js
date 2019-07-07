@@ -27,28 +27,43 @@ const handleNodeDelete = (nodeDef, node, removeNode, updateNode) => {
   }
 }
 
-const FileInput = ({ surveyInfo, nodeDef, readOnly, edit, node, canEditRecord, updateNode, removeNode }) => {
+const FileInput = props => {
+  const {
+    surveyInfo, nodeDef, node,
+    readOnly, edit, canEditRecord,
+    updateNode, removeNode
+  } = props
+
   const fileName = Node.getFileName(node)
   const truncatedFileName = RecordFile.truncateFileName(fileName)
   const fileUploaded = !edit && fileName
 
-  return <div className="node-def__file-input">
-    <UploadButton disabled={edit || !canEditRecord || readOnly}
-                  showLabel={false}
-                  onChange={files => handleFileChange(nodeDef, node, files[0], updateNode)}/>
+  return (
+    <div className="survey-form__node-def-file-container">
+      <UploadButton
+        disabled={edit || !canEditRecord || readOnly}
+        showLabel={false}
+        onChange={files => handleFileChange(nodeDef, node, files[0], updateNode)}/>
 
-    <DownloadButton
-      href={edit ? null : `/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`}
-      disabled={!fileUploaded}
-      label={truncatedFileName}
-      title={fileName === truncatedFileName ? null : fileName}/>
+      {
+        fileUploaded &&
+        <React.Fragment>
+          <DownloadButton
+            href={`/api/survey/${surveyInfo.id}/record/${Node.getRecordUuid(node)}/nodes/${Node.getUuid(node)}/file`}
+            label={fileName}
+            title={fileName}
+            className="ellipsis"
+          />
 
-    <NodeDeleteButton nodeDef={nodeDef}
-                      node={node}
-                      disabled={!fileUploaded}
-                      showConfirm={true}
-                      removeNode={(nodeDef, node) => handleNodeDelete(nodeDef, node, removeNode, updateNode)}/>
-  </div>
+          <NodeDeleteButton
+            nodeDef={nodeDef}
+            node={node}
+            removeNode={(nodeDef, node) => handleNodeDelete(nodeDef, node, removeNode, updateNode)}
+          />
+        </React.Fragment>
+      }
+    </div>
+  )
 }
 
 const MultipleFileInput = props => {
@@ -58,9 +73,10 @@ const MultipleFileInput = props => {
     <div className="nodes">
       {
         nodes.map((n, i) =>
-          <FileInput key={i}
-                     {...props}
-                     node={n}/>
+          <FileInput
+            key={i}
+            {...props}
+            node={n}/>
         )
       }
     </div>
