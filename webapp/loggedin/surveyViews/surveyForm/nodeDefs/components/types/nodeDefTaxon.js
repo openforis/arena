@@ -310,7 +310,7 @@ class NodeDefTaxon extends React.Component {
     const autocompleteDialog =
       autocompleteOpened
         ? ReactDOM.createPortal(
-          <AutocompleteDialog className="node-def__taxon-autocomplete-list"
+          <AutocompleteDialog className="survey-form__node-def-taxon-autocomplete-list"
                               items={autocompleteTaxa}
                               itemRenderer={TaxonAutocompleteItemRenderer}
                               itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
@@ -332,7 +332,7 @@ class NodeDefTaxon extends React.Component {
     }
 
     return (
-      <div className="node-def__taxon-wrapper">
+      <div className="survey-form__node-def-taxon-container">
         <FormItem label={i18n.t('common.code')}>
           {codeInputField}
         </FormItem>

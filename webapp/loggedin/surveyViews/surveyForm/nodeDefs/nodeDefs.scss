@@ -2,7 +2,6 @@
 
 .survey-form__node-def-coordinate-container {
   display: grid;
-  grid-template-columns: 1fr;
   row-gap: 0.3rem;
 
   .form-item {
@@ -41,7 +40,16 @@
   grid-column-gap: .5rem;
 }
 
-.node-def__taxon-autocomplete-list .item {
+.survey-form__node-def-taxon-container {
+  display: grid;
+  row-gap: 0.3rem;
+
+  .form-item {
+    grid-template-columns: 125px 1fr;
+  }
+}
+
+.survey-form__node-def-taxon-autocomplete-list .item {
   display: grid;
   grid-template-columns: .3fr .7fr;
 
@@ -49,13 +57,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &:first-child {
+      justify-self: center;
+    }
   }
 }
 
-.node-def__taxon-wrapper {
-  display: flex;
-  flex-direction: column;
-}
 
 .node-def__text-multiple-text-input-wrapper {
   display: grid;
