@@ -35,23 +35,25 @@ const NodeDefCodeCheckbox = props => {
 
   const disabled = R.isEmpty(items)
 
-  return <div className="node-def__code-checkbox-wrapper">
-    {
-      edit
-        ? <Checkbox {...props}
-                    disabled={true}
-                    nodes={[]}
-                    item={
-                      { uuid: '0', props: { labels: { [language]: i18n.t('surveyForm.nodeDefCode.buttonCode') } } }
-                    }/>
-        : items.map(item =>
-          <Checkbox {...props}
-                    disabled={disabled}
-                    key={CategoryItem.getUuid(item)}
-                    item={item}/>
-        )
-    }
-  </div>
+  return (
+    <div className="survey-form__node-def-code-container nodes">
+      {
+        edit
+          ? <Checkbox {...props}
+                      disabled={true}
+                      nodes={[]}
+                      item={
+                        { uuid: '0', props: { labels: { [language]: i18n.t('surveyForm.nodeDefCode.buttonCode') } } }
+                      }/>
+          : items.map(item =>
+            <Checkbox {...props}
+                      disabled={disabled}
+                      key={CategoryItem.getUuid(item)}
+                      item={item}/>
+          )
+      }
+    </div>
+  )
 }
 
 export default NodeDefCodeCheckbox

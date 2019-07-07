@@ -1,6 +1,6 @@
 @import "../../../../style/vars";
 
-.node-def__coordinate {
+.survey-form__node-def-coordinate-container {
   display: grid;
   grid-template-columns: 1fr;
   row-gap: 0.3rem;
@@ -10,9 +10,10 @@
   }
 }
 
-.node-def__code-checkbox-wrapper {
+.survey-form__node-def-code-container {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
 
   .btn-checkbox {
     pointer-events: all;
@@ -21,6 +22,16 @@
     &[aria-disabled="true"] {
       pointer-events: none;
     }
+  }
+
+  .form-input {
+    width: auto !important;
+    border: none !important;
+  }
+
+  .dropdown {
+    margin: 0.25rem 0.3rem;
+    min-height: 24px;
   }
 }
 

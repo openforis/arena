@@ -71,7 +71,7 @@ const NodeDefCoordinate = props => {
   }
 
   return (
-    <div className="node-def__coordinate">
+    <div className="survey-form__node-def-coordinate-container">
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>
         {xInput}
       </FormItem>
