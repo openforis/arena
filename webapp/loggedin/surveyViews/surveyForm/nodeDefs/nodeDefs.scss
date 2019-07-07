@@ -76,15 +76,6 @@
     border: none !important;
   }
 
-  .btn-delete {
-    border: none;
-    background-color: transparent;
-
-    &:hover {
-      color: $orange;
-    }
-  }
-
   &:last-child {
     border-bottom: 1px solid rgba($blueDark, .9);
 

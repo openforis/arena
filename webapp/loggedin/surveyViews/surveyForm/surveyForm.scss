@@ -370,9 +370,7 @@ $formHeaderHeight: 40px;
   font-size: .8rem;
 
   .btn-add {
-    background-color: transparent;
     margin-left: 10px;
-    border: none;
 
     &:hover {
       color: $orange;
@@ -394,12 +392,16 @@ $formHeaderHeight: 40px;
   display: flex;
   height: $tableRowHeaderHeight;
   background-color: rgba($blueLight, 0.3);
-  border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
   .react-grid-item {
     display: grid;
-    border-right: 1px solid transparent;
+    border-right: 1px solid $greyBorder;
+    border-top: 1px solid $greyBorder;
+
+    &:first-child {
+      border-left: 1px solid $greyBorder;
+    }
   }
 
 }
@@ -430,8 +432,9 @@ $formHeaderHeight: 40px;
 
   .form-input {
     border: none;
-    padding: 0;
     overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .react-grid-item {
@@ -447,6 +450,10 @@ $formHeaderHeight: 40px;
     .react-grid-item {
       border-top: $tableBorder;
     }
+  }
+
+  .error-badge {
+    left: -.5rem;
   }
 
 }

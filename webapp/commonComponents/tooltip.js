@@ -57,7 +57,8 @@ class Tooltip extends React.Component {
       <div className={tooltipClass}
            onMouseEnter={() => this.mouseEnter()}
            onMouseLeave={() => this.mouseLeave()}
-           ref={this.tooltipRef}>
+           ref={this.tooltipRef}
+           onBlur={() => this.setState({ messageElement: null })}>
 
         {children}
 
