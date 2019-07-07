@@ -39,17 +39,25 @@ const NodeDefCodeCheckbox = props => {
     <div className="survey-form__node-def-code-container nodes">
       {
         edit
-          ? <Checkbox {...props}
-                      disabled={true}
-                      nodes={[]}
-                      item={
-                        { uuid: '0', props: { labels: { [language]: i18n.t('surveyForm.nodeDefCode.buttonCode') } } }
-                      }/>
+          ? (
+            <Checkbox
+              {...props}
+              disabled={true}
+              nodes={[]}
+              item={
+                { uuid: '0', props: { labels: { [language]: i18n.t('surveyForm.nodeDefCode.buttonCode') } } }
+              }
+            />
+          )
           : items.map(item =>
-            <Checkbox {...props}
-                      disabled={disabled}
-                      key={CategoryItem.getUuid(item)}
-                      item={item}/>
+            (
+              <Checkbox
+                {...props}
+                disabled={disabled}
+                key={CategoryItem.getUuid(item)}
+                item={item}
+              />
+            )
           )
       }
     </div>

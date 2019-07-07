@@ -27,7 +27,7 @@ const Button = (props) => {
 }
 
 const NodeDefBoolean = props => (
-  <div>
+  <div className="flex-center">
 
     <Button {...props}
             disabled={props.edit}

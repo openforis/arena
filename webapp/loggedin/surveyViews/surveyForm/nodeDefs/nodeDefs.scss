@@ -64,6 +64,7 @@
 
   .btn-delete {
     border: none;
+    background-color: transparent;
 
     &:hover {
       color: $orange;
@@ -76,6 +77,10 @@
     .form-input {
       width: calc(100% - 2rem - 27px);
     }
+  }
+
+  &:focus-within {
+    background-color: $blueLightFocus;
   }
 }
 
