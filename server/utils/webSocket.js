@@ -2,7 +2,7 @@ const io = require('socket.io')()
 const R = require('ramda')
 
 const Request = require('./request')
-const Jwt = require('../auth/jwt')
+const Jwt = require('../modules/auth/jwt')
 
 // ==== USER SOCKETS
 

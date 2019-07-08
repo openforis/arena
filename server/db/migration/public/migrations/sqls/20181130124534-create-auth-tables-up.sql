@@ -21,9 +21,9 @@ CREATE TABLE
 
 CREATE TABLE jwt_token_blacklist
 (
-  token text,
+  token_jti VARCHAR,
   expiration bigint,
-  PRIMARY KEY (token)
+  PRIMARY KEY (token_jti)
 );
 
 -- INSERT ADMIN USER

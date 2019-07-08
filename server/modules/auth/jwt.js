@@ -2,6 +2,8 @@ const axios = require('axios')
 const jwkToPem = require('jwk-to-pem')
 const jsonwebtoken = require('jsonwebtoken')
 
+const JwtConstants = require('../../../common/auth/jwtConstants')
+
 const region = process.env.COGNITO_REGION
 const poolId = process.env.COGNITO_USER_POOL_ID
 const issuer = `https://cognito-idp.${region}.amazonaws.com/${poolId}`
@@ -10,8 +12,6 @@ const verificationOptions = {
   algorithms: ['RS256'],
   issuer,
 }
-
-const bearerPrefix = 'Bearer '
 
 let indexedKeys = {}
 
@@ -54,8 +54,12 @@ const validate = async token => {
 
 const getExpiration = token => _decode(token).payload.exp
 
+const getJti = token => _decode(token).payload.jti
+
 module.exports = {
+  bearerPrefix: JwtConstants.bearer,
+
   validate,
   getExpiration,
-  bearerPrefix,
+  getJti,
 }

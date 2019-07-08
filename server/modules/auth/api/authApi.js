@@ -1,17 +1,16 @@
 const Request = require('../../../utils/request')
 const { sendOk } = require('../../../utils/response')
 
+const Survey = require('../../../../common/survey/survey')
 const { userPrefNames, getUserPrefSurveyId } = require('../../../../common/user/userPrefs')
-
-const Jwt = require('../../../auth/jwt')
-
 const AuthManager = require('../../../../common/auth/authManager')
+
 const SurveyManager = require('../../survey/manager/surveyManager')
 const UserService = require('../../user/service/userService')
 const RecordService = require('../../record/service/recordService')
-const AuthService = require('../../auth/service/authService')
 
-const Survey = require('../../../../common/survey/survey')
+const AuthService = require('../service/authService')
+const Jwt = require('../jwt')
 
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
@@ -53,14 +52,14 @@ module.exports.init = app => {
     sendUser(res, req.user)
   })
 
-  app.post('/auth/logout', (req, res) => {
+  app.post('/auth/logout', async (req, res) => {
     // before logout checkOut record if there's an opened thread
     const user = Request.getSessionUser(req)
     RecordService.terminateUserThread(user.id)
 
     const token = req.headers.authorization.substring(Jwt.bearerPrefix.length)
-    const expiration = Jwt.getExpiration(token)
-    AuthService.blacklistToken(token, expiration)
+
+    await AuthService.blacklistToken(token)
 
     sendOk(res)
   })
