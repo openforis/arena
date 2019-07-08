@@ -1,9 +1,9 @@
 @import "../../../../style/vars";
 
 .survey-list {
-  margin: 0 4rem;
 
   .table__row, .table__row-header {
     grid-template-columns: repeat(5, 1.5fr) 1fr;
   }
+
 }

@@ -3,8 +3,6 @@ import './formPageNavigation.scss'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import useI18n from '../../../../commonComponents/useI18n'
-
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import { filterOuterPageChildren } from '../../../../../common/survey/nodeDefLayout'
@@ -16,18 +14,15 @@ import { setFormActivePage } from '../../surveyForm/actions'
 
 const NavigationButton = (props) => {
   const {
-    surveyInfo, nodeDef, childDefs,
+    nodeDef, label, childDefs,
     edit, canEditDef,
     level, active, enabled,
     setFormActivePage,
   } = props
 
   const [showChildren, setShowChildren] = useState(level === 0)
-  const i18n = useI18n()
 
   const outerPageChildDefs = childDefs ? filterOuterPageChildren(childDefs) : []
-
-  const label = NodeDef.getLabel(nodeDef, Survey.getLanguage(i18n.lang)(surveyInfo))
 
   return (
     <div className={`survey-form__node-def-nav level${level}`}
@@ -72,7 +67,6 @@ const NavigationButton = (props) => {
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
   const rootNodeDef = Survey.getRootNodeDef(survey)
 
   const { edit, nodeDef = rootNodeDef } = props
@@ -80,8 +74,8 @@ const mapStateToProps = (state, props) => {
   const parentNode = SurveyFormState.getFormPageParentNode(nodeDef)(state)
 
   return {
-    surveyInfo,
     nodeDef,
+    label: SurveyState.getNodeDefLabel(nodeDef)(state),
     childDefs: Survey.getNodeDefChildren(nodeDef)(survey),
 
     active: SurveyFormState.isNodeDefFormActivePage(nodeDef)(state),

@@ -43,3 +43,13 @@
   font-weight: 600;
   opacity: .7;
 }
+
+.survey-form.edit {
+  .survey-form__node-def-nav {
+    &.level0 {
+      border-left: 1px dashed $greyBorder;
+      border-top: 1px dashed $greyBorder;
+      border-bottom: 1px dashed $greyBorder;
+    }
+  }
+}

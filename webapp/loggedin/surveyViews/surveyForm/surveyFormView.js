@@ -24,7 +24,7 @@ const SurveyFormView = (props) => {
   const {
     surveyInfo, nodeDef,
     edit, entry, preview,
-    showPageNavigation,
+    hasNodeDefAddChildTo, showPageNavigation,
     canEditDef, canEditRecord,
 
     recordUuid, parentNode,
@@ -32,18 +32,20 @@ const SurveyFormView = (props) => {
     history,
   } = props
 
-  const editAllowed = edit && canEditDef && !preview
+  const editAllowed = edit && canEditDef
 
   let className = editAllowed
-    ? ' form-designer edit form-actions-off'
-    : edit && !preview
+    ? ' form-designer edit'
+    : edit
       ? ' form-designer'
       : ''
+
+  className += hasNodeDefAddChildTo ? '' : ' form-actions-off'
   className += showPageNavigation ? '' : ' page-navigation-off'
 
   return nodeDef
     ? (
-      <div className={`survey-form${className}`}>
+      <div>
 
         {
           editAllowed &&
@@ -58,7 +60,7 @@ const SurveyFormView = (props) => {
           canEditDef={canEditDef}
         />
 
-        <div className="survey-form-container">
+        <div className={`survey-form${className}`}>
 
           {
             showPageNavigation &&
@@ -71,19 +73,15 @@ const SurveyFormView = (props) => {
             />
           }
 
-
-          {
-            nodeDef &&
-            <NodeDefSwitch
-              surveyInfo={surveyInfo}
-              nodeDef={nodeDef}
-              edit={edit}
-              entry={entry}
-              recordUuid={recordUuid}
-              parentNode={parentNode}
-              canEditDef={canEditDef}
-              canEditRecord={canEditRecord}/>
-          }
+          <NodeDefSwitch
+            surveyInfo={surveyInfo}
+            nodeDef={nodeDef}
+            edit={edit}
+            entry={entry}
+            recordUuid={recordUuid}
+            parentNode={parentNode}
+            canEditDef={canEditDef}
+            canEditRecord={canEditRecord}/>
 
           {
             editAllowed &&
@@ -118,6 +116,7 @@ const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const nodeDef = SurveyFormState.getFormActivePageNodeDef(state)
+  const hasNodeDefAddChildTo = !!SurveyFormState.getNodeDefAddChildTo(state)
   const record = RecordState.getRecord(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
 
@@ -129,6 +128,7 @@ const mapStateToProps = (state, props) => {
   return {
     surveyInfo,
     nodeDef,
+    hasNodeDefAddChildTo,
     showPageNavigation,
     ...props.entry
       ? mapEntryProps()

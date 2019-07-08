@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:200,400,600,800');
 @import "./vars";
-@import "./layout";
 @import "./layoutMixins";
 @import "./formBase";
 @import "./ico";
 @import "./table";
+@import "./layout";
 @import "./reactTransitions";
 
 html {
@@ -69,12 +69,6 @@ body {
   border: none !important;
 }
 
-.grid100 {
-  height: 100%;
-  display: grid;
-  grid-template-rows: 1fr;
-}
-
 // badge
 .badge {
   position: absolute;
@@ -88,6 +82,12 @@ body {
 
 .badge__content {
   justify-self: start;
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 

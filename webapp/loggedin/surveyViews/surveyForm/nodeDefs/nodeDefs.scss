@@ -1,8 +1,7 @@
 @import "../../../../style/vars";
 
-.node-def__coordinate {
+.survey-form__node-def-coordinate-container {
   display: grid;
-  grid-template-columns: 1fr;
   row-gap: 0.3rem;
 
   .form-item {
@@ -10,9 +9,10 @@
   }
 }
 
-.node-def__code-checkbox-wrapper {
+.survey-form__node-def-code-container {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
 
   .btn-checkbox {
     pointer-events: all;
@@ -22,9 +22,34 @@
       pointer-events: none;
     }
   }
+
+  .form-input {
+    width: auto !important;
+    border: none !important;
+  }
+
+  .dropdown {
+    margin: 0.25rem 0.3rem;
+    min-height: 24px;
+  }
 }
 
-.node-def__taxon-autocomplete-list .item {
+.survey-form__node-def-file-container {
+  display: grid;
+  grid-template-columns: 30px 1fr 30px;
+  grid-column-gap: .5rem;
+}
+
+.survey-form__node-def-taxon-container {
+  display: grid;
+  row-gap: 0.3rem;
+
+  .form-item {
+    grid-template-columns: 125px 1fr;
+  }
+}
+
+.survey-form__node-def-taxon-autocomplete-list .item {
   display: grid;
   grid-template-columns: .3fr .7fr;
 
@@ -32,13 +57,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &:first-child {
+      justify-self: center;
+    }
   }
 }
 
-.node-def__taxon-wrapper {
-  display: flex;
-  flex-direction: column;
-}
 
 .node-def__text-multiple-text-input-wrapper {
   display: grid;
@@ -46,25 +71,22 @@
   border-top: 1px solid $blueDark;
   border-left: 1px solid $blueDark;
   border-right: 1px solid $blueDark;
+  background-color: white;
 
   .form-input {
     border: none !important;
-  }
-
-  .btn-delete {
-    border: none;
-
-    &:hover {
-      color: $orange;
-    }
   }
 
   &:last-child {
     border-bottom: 1px solid rgba($blueDark, .9);
 
     .form-input {
-      padding-right: 40px;
+      width: calc(100% - 2rem - 27px);
     }
+  }
+
+  &:focus-within {
+    background-color: $blueLightFocus;
   }
 }
 
@@ -94,6 +116,18 @@
 .node-def__multiple-nodes-edit-modal {
   .modal-body {
     height: 40vh;
+  }
+
+  .survey-form__node-def-code-container {
+    justify-content: center;
+  }
+
+  .dropdown {
+    background-color: white;
+
+    &:focus-within {
+      background-color: $blueLightFocus;
+    }
   }
 }
 

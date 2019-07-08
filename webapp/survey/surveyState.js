@@ -1,6 +1,9 @@
 import * as R from 'ramda'
 
 import Survey from '../../common/survey/survey'
+import NodeDef from '../../common/survey/nodeDef'
+
+import * as AppState from '../app/appState'
 
 const survey = 'survey'
 
@@ -16,6 +19,14 @@ export const getSurvey = R.prop(survey)
 export const getSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
 
 export const getSurveyId = R.pipe(getSurvey, Survey.getId)
+
+export const getNodeDefLabel = nodeDef => state => {
+  const surveyInfo = getSurveyInfo(state)
+  const langApp = AppState.getLang(state)
+  const langSurvey = Survey.getLanguage(langApp)(surveyInfo)
+  const label = NodeDef.getLabel(nodeDef, langSurvey)
+  return label
+}
 
 // STATUS
 const keys = {

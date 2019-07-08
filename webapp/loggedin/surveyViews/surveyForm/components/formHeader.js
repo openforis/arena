@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 
 import { dispatchWindowResize } from '../../../../utils/domUtils'
 
-import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import { nodeDefLayoutProps, nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
 import { uuidv4 } from '../../../../../common/uuid'
@@ -13,7 +12,6 @@ import FormEditActions from './formEditActions'
 
 import useI18n from '../../../../commonComponents/useI18n'
 
-import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 import * as SurveyFormState from '../surveyFormState'
 
@@ -89,9 +87,7 @@ const FormHeader = props => {
 
 const mapStateToProps = state => {
   const nodeDefPage = SurveyFormState.getFormActivePageNodeDef(state)
-  const lang = AppState.getLang(state)
-  const surveyInfo = SurveyState.getSurveyInfo(state)
-  const nodeDefPageLabel = NodeDef.getLabel(nodeDefPage, Survey.getLanguage(lang)(surveyInfo))
+  const nodeDefPageLabel = SurveyState.getNodeDefLabel(nodeDefPage)(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
 
   return {

@@ -3,7 +3,6 @@ import NodeDef from '../../../../common/survey/nodeDef'
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
 
-import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from '../record/recordState'
 import * as SurveyFormState from './surveyFormState'
@@ -50,12 +49,11 @@ export const getNodeKeyLabelValues = (nodeDef, nodeEntity) => (dispatch, getStat
 
   const survey = SurveyState.getSurvey(state)
   const record = RecordState.getRecord(state)
-  const lang = Survey.getLanguage(AppState.getLang(state))(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDef)(survey)
 
   const getNodeDefKeyLabelValue = nodeDefKey => {
     const nodeKey = Record.getNodeChildByDefUuid(nodeEntity, NodeDef.getUuid(nodeDefKey))(record)
-    const label = NodeDef.getLabel(nodeDefKey, lang)
+    const label = SurveyState.getNodeDefLabel(nodeDefKey)(state)
     const value = Node.getValue(nodeKey, '')
     return `${label} - ${value}`
   }

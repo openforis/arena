@@ -4,7 +4,13 @@ $tableBorder: 1px solid $greyBorder;
 $tableRowHeaderHeight: 40px;
 $formHeaderHeight: 40px;
 
+// ======
+// Survey form style
+// ======
 .survey-form {
+  display: grid;
+  height: calc(100% - #{$formHeaderHeight});
+  grid-template-columns: 250px 1fr;
 
   //edit mode
   &.form-designer {
@@ -50,16 +56,11 @@ $formHeaderHeight: 40px;
 
 }
 
-.survey-form-container {
-  display: grid;
-  height: calc(100% - #{$formHeaderHeight});
-  grid-template-columns: 250px 1fr;
-}
-
+// ======
+// Survey form grid style
+// ======
 .survey-form.page-navigation-off {
-  .survey-form-container {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: 1fr;
 
   .node-def__form_page {
     border-left: 1px solid $greyBorder;
@@ -67,15 +68,11 @@ $formHeaderHeight: 40px;
 }
 
 .survey-form.edit {
-  .survey-form-container {
-    grid-template-columns: 250px 1fr 200px;
-  }
+  grid-template-columns: 250px 1fr 200px;
 }
 
 .survey-form.edit.page-navigation-off {
-  .survey-form-container {
-    grid-template-columns: 1fr 200px;
-  }
+  grid-template-columns: 1fr 200px;
 
   .node-def__form_page {
     border-left: 1px solid $greyBorder;
@@ -83,15 +80,11 @@ $formHeaderHeight: 40px;
 }
 
 .survey-form.edit.form-actions-off {
-  .survey-form-container {
-    grid-template-columns: 250px 1fr 0;
-  }
+  grid-template-columns: 250px 1fr 0;
 }
 
 .survey-form.edit.form-actions-off.page-navigation-off {
-  .survey-form-container {
-    grid-template-columns: 1fr 0;
-  }
+  grid-template-columns: 1fr 0;
 
   .node-def__form_page {
     border-left: 1px solid $greyBorder;
@@ -156,18 +149,52 @@ $formHeaderHeight: 40px;
   border-right: 1px dashed $greyBorder;
   border-bottom: 1px dashed $greyBorder;
 
-  .btn-toggle {
-    position: absolute;
-    left: 1.3rem;
-  }
-
   .btn-add-node-def {
     background-color: rgba($green, 0.3);
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
 
     &:hover {
       background-color: rgba($green, 0.85);
     }
   }
+
+  .icon {
+    font-size: .8rem !important;
+    opacity: .6;
+  }
+
+  .node_def__icon {
+    font-size: .6rem !important;
+    font-weight: 600;
+    opacity: .6;
+    letter-spacing: 0;
+  }
+
+  .icon-text-color {
+    font-size: .8rem !important;
+  }
+
+  .add-to-label {
+    font-weight: 600;
+    font-size: .7rem;
+    opacity: .8;
+
+    .icon {
+      opacity: .5;
+    }
+  }
+
+  .btn-toggle {
+    position: absolute;
+    left: 1.3rem;
+
+    .icon {
+      opacity: 1;
+    }
+  }
+
 }
 
 // ======
@@ -207,6 +234,21 @@ $formHeaderHeight: 40px;
     > :nth-child(2) {
       padding: 0 .5rem;
       align-self: start;
+
+      //multiple node def
+      &.multiple {
+        position: relative;
+        height: 100%;
+        display: flex;
+
+        .nodes {
+          position: absolute;
+          max-height: 100%;
+          left: 10px;
+          right: 10px;
+          overflow-y: auto;
+        }
+      }
     }
 
     .form-input {
@@ -214,6 +256,7 @@ $formHeaderHeight: 40px;
       text-align: right;
       //padding: .25rem 1rem;
       border: 1px solid $blueDark;
+      width: calc(100% - 2rem - 2px);
     }
 
     .dropdown {
@@ -298,7 +341,10 @@ $formHeaderHeight: 40px;
 //===
 .survey-form__node-def-boolean {
   justify-self: start;
-  border: 1px solid $blueDark;
+
+  > *:first-child {
+    border: 1px solid $blueDark;
+  }
 }
 
 //===
@@ -324,9 +370,7 @@ $formHeaderHeight: 40px;
   font-size: .8rem;
 
   .btn-add {
-    background-color: transparent;
     margin-left: 10px;
-    border: none;
 
     &:hover {
       color: $orange;
@@ -348,12 +392,16 @@ $formHeaderHeight: 40px;
   display: flex;
   height: $tableRowHeaderHeight;
   background-color: rgba($blueLight, 0.3);
-  border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
   .react-grid-item {
     display: grid;
-    border-right: 1px solid transparent;
+    border-right: 1px solid $greyBorder;
+    border-top: 1px solid $greyBorder;
+
+    &:first-child {
+      border-left: 1px solid $greyBorder;
+    }
   }
 
 }
@@ -384,8 +432,9 @@ $formHeaderHeight: 40px;
 
   .form-input {
     border: none;
-    padding: 0;
     overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
   .react-grid-item {
@@ -401,6 +450,10 @@ $formHeaderHeight: 40px;
     .react-grid-item {
       border-top: $tableBorder;
     }
+  }
+
+  .error-badge {
+    left: -.5rem;
   }
 
 }
@@ -421,19 +474,4 @@ $formHeaderHeight: 40px;
 .node-def__table-row-taxon {
   display: grid;
   grid-template-columns: .2fr .5fr .3fr;
-}
-
-// == data entry
-.node-def__entry-multiple {
-  position: relative;
-  height: 100%;
-  display: flex;
-
-  .nodes {
-    position: absolute;
-    max-height: 100%;
-    left: 10px;
-    right: 10px;
-    overflow-y: auto;
-  }
 }

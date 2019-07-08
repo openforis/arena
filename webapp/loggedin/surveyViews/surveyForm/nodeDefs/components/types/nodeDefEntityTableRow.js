@@ -115,23 +115,31 @@ class NodeDefEntityTableRow extends React.Component {
                      onDragStart={e => this.dragStart(e)}
                      onDragOver={e => this.dragOver(e)}
                      onDragEnd={e => this.dragEnd(e)}>
-                  <NodeDefSwitch {...this.props}
-                                 node={null}
-                                 nodeDef={childDef}
-                                 parentNode={node}
-                                 renderType={renderType}/>
+                  <NodeDefSwitch
+                    {...this.props}
+                    node={null}
+                    nodeDef={childDef}
+                    parentNode={node}
+                    renderType={renderType}
+                  />
                 </div>
               )
             })
         }
 
-        <div className="react-grid-item" style={{ width: 100 + 'px', display: 'none' }} ref={this.placeholderRef}/>
+        <div
+          className="react-grid-item"
+          style={{ width: 100 + 'px', display: 'none' }}
+          ref={this.placeholderRef}
+        />
 
         {
           renderType === NodeDefLayout.nodeDefRenderType.tableBody && canEditRecord &&
-          <NodeDeleteButton nodeDef={nodeDef}
-                            node={node}
-                            removeNode={removeNode}/>
+          <NodeDeleteButton
+            nodeDef={nodeDef}
+            node={node}
+            removeNode={removeNode}
+          />
         }
 
       </div>

@@ -6,9 +6,9 @@ import { getNodeDefComponent } from '../nodeDefSystemProps'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 
 const NodeDefFormItem = props => {
-  const {nodeDef, label} = props
+  const { nodeDef, label, entry } = props
 
-  const nodeDefComponent = React.createElement(getNodeDefComponent(nodeDef), {...props})
+  const nodeDefComponent = React.createElement(getNodeDefComponent(nodeDef), { ...props })
 
   const labelComponent = <div>
     {
@@ -22,7 +22,10 @@ const NodeDefFormItem = props => {
     ? nodeDefComponent
     : (
       <FormItem label={labelComponent} className="node-def__form-item">
-        {nodeDefComponent}
+        <div
+          className={`survey-form__node-def-${NodeDef.getType(nodeDef)} ${entry && NodeDef.isMultiple(nodeDef) ? 'multiple' : ''}`}>
+          {nodeDefComponent}
+        </div>
       </FormItem>
     )
 

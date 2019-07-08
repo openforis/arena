@@ -5,8 +5,9 @@ const ButtonGroup = ({ items, selectedItemKey, onChange }) => (
     {
       items.map(item =>
         <button key={item.key}
-                className={`btn${selectedItemKey === item.key ? ' active' : ''}`}
-                onClick={() => onChange(item.key)}>
+                className={`btn btn-s${selectedItemKey === item.key ? ' active' : ''}`}
+                onClick={() => onChange(item.key)}
+                aria-disabled={!!item.disabled}>
           {item.label}
         </button>
       )

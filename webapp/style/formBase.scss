@@ -99,7 +99,12 @@ button, .btn {
 }
 
 .btn-transparent {
-  border: none !important;
+  border: none;
+  background-color: transparent;
+
+  &:hover {
+    color: $orange;
+  }
 }
 
 .btn-danger {

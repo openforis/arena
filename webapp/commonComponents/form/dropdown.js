@@ -157,7 +157,6 @@ class Dropdown extends React.Component {
       validation = {},
       readOnly,
       disabled,
-      inputSize,
       autocompleteDialogClassName,
     } = this.props
 
@@ -175,44 +174,48 @@ class Dropdown extends React.Component {
       </div>
     }
 
-    return <div ref={this.dropdown}
-                className={`dropdown ${className}`}
-                style={style}
-                onBlur={e => this.onBlur(e)}>
-      <Input ref={this.input}
-             placeholder={placeholder}
-             value={trim(displayValue)}
-             validation={validation}
-             readOnly={readOnly}
-             disabled={disabled}
-             onChange={value => this.onInputChange(value)}
-             onFocus={e => this.onInputFocus(e)}
-             size={inputSize}/>
+    return (
+      <div ref={this.dropdown}
+           className={`dropdown ${className}`}
+           style={style}
+           onBlur={e => this.onBlur(e)}>
 
-      <span className="icon icon-menu2 icon-18px"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              this.toggleOpened()
-            }}
-            aria-disabled={disabled}/>
-      {
-        this.isOpened() ?
-          ReactDOM.createPortal(
-            <AutocompleteDialog ref={this.dropdownList}
-                                items={items}
-                                itemRenderer={DropdownItemRenderer}
-                                itemKeyFunction={item => this.getItemKey(item)}
-                                inputField={this.getInputField()}
-                                onItemSelect={item => this.onSelectionChange(item)}
-                                onClose={() => this.toggleOpened()}
-                                className={autocompleteDialogClassName}/>,
-            document.body
-          )
-          : null
+        <Input
+          ref={this.input}
+          placeholder={placeholder}
+          value={trim(displayValue)}
+          validation={validation}
+          readOnly={readOnly}
+          disabled={disabled}
+          onChange={value => this.onInputChange(value)}
+          onFocus={e => this.onInputFocus(e)}
+        />
 
-      }
-    </div>
+        <span className="icon icon-menu2 icon-16px"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                this.toggleOpened()
+              }}
+              aria-disabled={disabled}/>
+        {
+          this.isOpened() ?
+            ReactDOM.createPortal(
+              <AutocompleteDialog ref={this.dropdownList}
+                                  items={items}
+                                  itemRenderer={DropdownItemRenderer}
+                                  itemKeyFunction={item => this.getItemKey(item)}
+                                  inputField={this.getInputField()}
+                                  onItemSelect={item => this.onSelectionChange(item)}
+                                  onClose={() => this.toggleOpened()}
+                                  className={autocompleteDialogClassName}/>,
+              document.body
+            )
+            : null
+
+        }
+      </div>
+    )
   }
 }
 
@@ -229,7 +232,6 @@ Dropdown.defaultProps = {
   itemKeyFunction: null,
   itemLabelProp: null,
   itemLabelFunction: null,
-  inputSize: 20,
   autocompleteDialogClassName: null,
 }
 

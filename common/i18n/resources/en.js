@@ -30,6 +30,8 @@ module.exports = {
     csvExport: 'CSV Export',
     undefinedName: 'Undefined name',
     empty: 'Empty',
+    download: 'Download',
+    upload: 'Upload',
   },
 
   appModules: {
@@ -173,6 +175,7 @@ module.exports = {
     showPageNav: 'Show pages',
     hidePageNav: 'Hide pages',
     subPage: 'Sub page',
+    addChildTo: 'Add to {{nodeDef}}',
     formEditActions: {
       preview: 'Preview',
     },

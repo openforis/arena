@@ -43,8 +43,7 @@ const NodeDefEntityTable = props => {
                     updateNode(nodeDef, entity)
                   }}
                   aria-disabled={!canAddNode}>
-            <span className="icon icon-plus icon-12px icon-left"/>
-
+            <span className="icon icon-plus icon-10px"/>
           </button>
         }
 
@@ -61,29 +60,24 @@ const NodeDefEntityTable = props => {
         }
 
         {
-          entry &&
-          R.isEmpty(nodes)
-            ? (
-              <h5>
-                <i>{i18n.t('surveyForm.nodeDefEntityTable.noDataAdded')}</i>
-              </h5>
-            )
-            : (
-              <div className="node-def__table-data-rows">
-                {
-                  nodes.map((node, i) =>
-                    <NodeDefEntityTableRow
-                      key={i}
-                      i={i}
-                      {...props}
-                      node={node}
-                      nodes={null}
-                      renderType={NodeDefLayout.nodeDefRenderType.tableBody}/>
-                  )
-                }
-              </div>
-            )
+          entry && !R.isEmpty(nodes) &&
+          <div className="node-def__table-data-rows">
+            {
+              nodes.map((node, i) =>
+                <NodeDefEntityTableRow
+                  key={i}
+                  i={i}
+                  {...props}
+                  node={node}
+                  nodes={null}
+                  renderType={NodeDefLayout.nodeDefRenderType.tableBody}
+                />
+              )
+            }
+          </div>
+
         }
+
       </div>
     </div>
   )

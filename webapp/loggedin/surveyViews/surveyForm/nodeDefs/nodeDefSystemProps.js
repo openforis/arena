@@ -104,7 +104,11 @@ export const nodeDefSystemProps = {
     component: NodeDefCoordinate,
     icon: <span className="icon icon-location2 icon-left"/>,
     defaultValue: { x: '', y: '', srs: '' },
-    formFields: ['x', 'y', 'srs'],
+    formFields: [
+      { field: 'x', labelKey: 'surveyForm.nodeDefCoordinate.x' },
+      { field: 'y', labelKey: 'surveyForm.nodeDefCoordinate.y' },
+      { field: 'srs', labelKey: 'surveyForm.nodeDefCoordinate.srs' },
+    ],
   },
 
   [nodeDefType.taxon]: {
@@ -114,7 +118,11 @@ export const nodeDefSystemProps = {
       taxonUuid: null,
       vernacularNameUuid: null,
     },
-    formFields: ['code', 'scientific_name', 'vernacular_name'],
+    formFields: [
+      { field: 'code', labelKey: 'common.code' },
+      { field: 'scientific_name', labelKey: 'surveyForm.nodeDefTaxon.scientificName' },
+      { field: 'vernacular_name', labelKey: 'surveyForm.nodeDefTaxon.vernacularName' },
+    ],
   },
 
   [nodeDefType.file]: {
