@@ -11,6 +11,8 @@ const verificationOptions = {
   issuer,
 }
 
+const bearerPrefix = 'Bearer '
+
 let indexedKeys = {}
 
 const _getKeys = async (region, poolId) => {
@@ -38,7 +40,6 @@ const _findVerificationKey = (token, pemList) => {
 const _verifyToken = (token, pem) =>
   jsonwebtoken.verify(token, pem, verificationOptions)
 
-
 const validate = async token => {
   let verificationKey = _findVerificationKey(token, indexedKeys)
 
@@ -56,4 +57,5 @@ const getExpiration = token => _decode(token).payload.exp
 module.exports = {
   validate,
   getExpiration,
+  bearerPrefix,
 }

@@ -1,6 +1,8 @@
 const io = require('socket.io')()
 const R = require('ramda')
+
 const Request = require('./request')
+const Jwt = require('../auth/jwt')
 
 // ==== USER SOCKETS
 
@@ -26,7 +28,7 @@ const init = (server, jwtMiddleware) => {
   io.use((socket, next) => {
     // Set the request authorization header from socket handshake
     const token = socket.handshake.query.token
-    socket.request.headers.authorization = 'Bearer ' + token
+    socket.request.headers.authorization = Jwt.bearerPrefix + token
 
     // Wrap the jwtMiddleware to get the user id
     jwtMiddleware(socket.request, {}, next)
