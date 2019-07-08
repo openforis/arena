@@ -28,9 +28,9 @@ CREATE TABLE jwt_token_blacklist
 
 -- INSERT ADMIN USER
 INSERT INTO
-  "user" (name, email)
+  "user" (name, email, cognito_username)
 VALUES
-('Admin', 'openforis.arena@gmail.com');
+('Admin', 'admin@openforis.org', 'demo_user');
 
 INSERT INTO auth_group (name, labels, descriptions, permissions, record_steps)
 VALUES ('systemAdmin',
@@ -42,4 +42,4 @@ VALUES ('systemAdmin',
 INSERT INTO auth_group_user (user_id, group_id)
 SELECT id, currval(pg_get_serial_sequence('auth_group', 'id'))
 FROM "user"
-WHERE email = 'openforis.arena@gmail.com';
+WHERE email = 'admin@openforis.org';

@@ -2,8 +2,9 @@ const UserRepository = require('../repository/userRepository')
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 
 // ==== READ
-const findUserByEmail = async email => {
-  const user = await UserRepository.findUserByEmail(email)
+
+const findUserByCognitoUsername = async email => {
+  const user = await UserRepository.findUserByCognitoUsername(email)
 
   if (user) {
     const authGroups = await AuthGroupRepository.fetchUserGroups(user.id)
@@ -22,7 +23,7 @@ const deleteUserPref = async (user, name) => ({
 
 module.exports = {
   // READ
-  findUserByEmail,
+  findUserByCognitoUsername,
 
   // UPDATE
   updateUserPref: UserRepository.updateUserPref,

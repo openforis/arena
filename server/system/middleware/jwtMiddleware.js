@@ -21,10 +21,10 @@ module.exports = async (req, res, next) => {
         throw new Error()
       }
 
-      const decoded = await Jwt.validate(jwtToken)
-      const email = decoded.email
+      const tokenDecoded = await Jwt.validate(jwtToken)
 
-      req.user = await UserService.findUserByEmail(email)
+      req.user = await UserService.findUserByCognitoUsername(tokenDecoded.username)
+
       next()
     } catch (e) {
       next(new UnauthorizedError())
