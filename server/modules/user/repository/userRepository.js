@@ -1,16 +1,16 @@
 const db = require('../../../db/db')
 
-const selectFields = ['id', 'email', 'prefs']
+const selectFields = ['id', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.join(',')
 
 // in sql queries, user table must be surrounded by "" e.g. "user"
 
-const findUserByEmail = async (email, client = db) =>
+const findUserByCognitoUsername = async (cognitoUsername, client = db) =>
   await client.oneOrNone(`
     SELECT ${selectFieldsCommaSep}
     FROM "user" 
-    WHERE LOWER(email) = LOWER($1)`,
-    [email]
+    WHERE cognito_username = $1`,
+    [cognitoUsername]
   )
 
 // ==== UPDATE
@@ -44,7 +44,7 @@ const deleteUserPref = async (user, name, client = db) => {
 
 module.exports = {
   // READ
-  findUserByEmail,
+  findUserByCognitoUsername,
 
   // UPDATE
   updateUserPref,

@@ -6,7 +6,7 @@ const Survey = require('../../../../common/survey/survey')
 const Record = require('../../../../common/record/record')
 const Node = require('../../../../common/record/node')
 const RecordFile = require('../../../../common/record/recordFile')
-const { canEditRecord } = require('../../../../common/auth/authManager')
+const Authorizer = require('../../../../common/auth/authorizer')
 const User = require('../../../../common/user/user')
 
 const WebSocket = require('../../../utils/webSocket')
@@ -63,9 +63,7 @@ const createUserThread = (user, surveyId, recordUuid, preview, singleMessageHand
 
 const getOrCreatedUserThread = (user, surveyId, recordUuid, preview = false, singleMessageHandling = false) => {
   const thread = RecordThreads.getThreadByUserId(user.id)
-  return thread
-    ? thread
-    : createUserThread(user, surveyId, recordUuid, preview, singleMessageHandling)
+  return thread || createUserThread(user, surveyId, recordUuid, preview, singleMessageHandling)
 }
 
 const terminateUserThread = userId => {
@@ -112,7 +110,7 @@ const checkIn = async (user, surveyId, recordUuid) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid)
 
-  if ((Survey.isPublished(surveyInfo) || Record.isPreview(record)) && canEditRecord(user, record)) {
+  if ((Survey.isPublished(surveyInfo) || Record.isPreview(record)) && Authorizer.canEditRecord(user, record)) {
     createUserThread(user, surveyId, recordUuid, Record.isPreview(record), false)
   }
 

@@ -24,8 +24,8 @@ export const logout = () => {
 export const getJwtToken = async () => {
   try {
     const session = await Auth.currentSession()
-    const idToken = session.getIdToken()
-    return idToken.jwtToken
+    const accessToken = session.getAccessToken()
+    return accessToken.jwtToken
   } catch (e) {
     // No current user
     return null

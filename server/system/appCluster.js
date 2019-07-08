@@ -11,6 +11,7 @@ const authApi = require('../modules/auth/api/authApi')
 const apiRouter = require('./apiRouter')
 const WebSocket = require('../utils/webSocket')
 const RecordPreviewCleanup = require('./recordPreviewCleanup')
+const ExpiredJwtTokensCleanup = require('./expiredJwtTokensCleanup')
 
 module.exports = async () => {
 
@@ -29,7 +30,7 @@ module.exports = async () => {
 
   headerMiddleware.init(app)
 
-  app.use(/^\/api.*|\/auth\/user/, jwtMiddleware)
+  app.use(/^\/api.*|^\/auth.*/, jwtMiddleware)
 
   app.use(compression({ threshold: 512 }))
 
@@ -55,6 +56,7 @@ module.exports = async () => {
   // ====== socket middleware
   WebSocket.init(server, jwtMiddleware)
 
-  // ====== scheduler
+  // ====== schedulers
   await RecordPreviewCleanup.init()
+  await ExpiredJwtTokensCleanup.init()
 }

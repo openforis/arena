@@ -64,8 +64,8 @@ const getFile = R.pathOr(null, ['files', 'file'])
 
 // User
 
-const getSessionUser = R.prop('user')
-const getSessionUserId = R.pipe(getSessionUser, R.prop('id'))
+const getUser = R.prop('user')
+const getUserId = R.pipe(getUser, R.prop('id'))
 
 module.exports = {
   getParams,
@@ -77,6 +77,6 @@ module.exports = {
   getFile,
 
   // User
-  getSessionUserId,
-  getSessionUser,
+  getUserId,
+  getUser,
 }

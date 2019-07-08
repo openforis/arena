@@ -8,7 +8,7 @@ import { elementOffset } from '../../../../../../utils/domUtils'
 
 import Survey from '../../../../../../../common/survey/survey'
 import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
-import AuthManager from '../../../../../../../common/auth/authManager'
+import Authorizer from '../../../../../../../common/auth/authorizer'
 
 import TableHeader from './tableHeader'
 import TableRows from './tableRows'
@@ -111,7 +111,7 @@ const mapStateToProps = state => {
     count: DataQueryState.getTableCount(state),
     showTable: DataQueryState.hasTableAndCols(state),
     editMode,
-    canEdit: AuthManager.canEditSurvey(user, surveyInfo),
+    canEdit: Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
 

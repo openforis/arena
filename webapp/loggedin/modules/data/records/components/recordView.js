@@ -9,7 +9,7 @@ import Record from '../../../../../../common/record/record'
 
 import SurveyFormView from '../../../../surveyViews/surveyForm/surveyFormView'
 
-import AuthManager from '../../../../../../common/auth/authManager'
+import Authorizer from '../../../../../../common/auth/authorizer'
 import WebSocketEvents from '../../../../../../common/webSocket/webSocketEvents'
 import * as AppWebSocket from '../../../../../app/appWebSocket'
 
@@ -84,7 +84,7 @@ const mapStateToProps = (state, { match, location }) => {
   const urlSearchParams = new URLSearchParams(location.search)
 
   return {
-    canEditRecord: AuthManager.canEditRecord(user, record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
+    canEditRecord: Authorizer.canEditRecord(user, record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
     recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),

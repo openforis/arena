@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLayout'
 import Record from '../../../../../../../common/record/record'
 import Node from '../../../../../../../common/record/node'
-import AuthManager from '../../../../../../../common/auth/authManager'
+import Authorizer from '../../../../../../../common/auth/authorizer'
 
 import NodeDefTableBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableBody'
 
@@ -59,7 +59,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     surveyInfo,
-    canEditRecord: AuthManager.canEditRecord(user, record),
+    canEditRecord: Authorizer.canEditRecord(user, record),
   }
 }
 

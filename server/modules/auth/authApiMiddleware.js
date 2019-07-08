@@ -3,19 +3,13 @@ const Request = require('../../utils/request')
 const SurveyManager = require('../survey/manager/surveyManager')
 const RecordService = require('../record/service/recordService')
 
-const {
-  canViewSurvey,
-  canEditSurvey,
-  canCreateRecord,
-  canEditRecord,
-  canViewRecord,
-} = require('../../../common/auth/authManager')
+const Authorizer = require('../../../common/auth/authorizer')
 const Survey = require('../../../common/survey/survey')
 
 const UnauthorizedError = require('../../utils/unauthorizedError')
 
 const checkPermission = (req, res, next, permissionFn, obj) => {
-  const user = Request.getSessionUser(req)
+  const user = Request.getUser(req)
 
   if (permissionFn(user, obj)) {
     next()
@@ -51,12 +45,12 @@ const requireRecordPermission = permissionFn => async (req, res, next) => {
 
 module.exports = {
   // Survey
-  requireSurveyViewPermission: requireSurveyPermission(canViewSurvey),
-  requireSurveyEditPermission: requireSurveyPermission(canEditSurvey),
+  requireSurveyViewPermission: requireSurveyPermission(Authorizer.canViewSurvey),
+  requireSurveyEditPermission: requireSurveyPermission(Authorizer.canEditSurvey),
 
   // Record
-  requireRecordListViewPermission: requireSurveyPermission(canViewSurvey),
-  requireRecordCreatePermission: requireSurveyPermission(canCreateRecord),
-  requireRecordEditPermission: requireRecordPermission(canEditRecord),
-  requireRecordViewPermission: requireSurveyPermission(canViewRecord),
+  requireRecordListViewPermission: requireSurveyPermission(Authorizer.canViewSurvey),
+  requireRecordCreatePermission: requireSurveyPermission(Authorizer.canCreateRecord),
+  requireRecordEditPermission: requireRecordPermission(Authorizer.canEditRecord),
+  requireRecordViewPermission: requireSurveyPermission(Authorizer.canViewRecord),
 }

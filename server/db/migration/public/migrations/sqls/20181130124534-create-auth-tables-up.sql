@@ -7,7 +7,7 @@ CREATE TABLE
   labels       jsonb DEFAULT '{}'::jsonb,
   descriptions jsonb DEFAULT '{}'::jsonb,
   permissions  jsonb DEFAULT '{}'::jsonb,
-  record_steps   jsonb DEFAULT '{}'::jsonb,
+  record_steps jsonb DEFAULT '{}'::jsonb,
   PRIMARY KEY (id)
 );
 
@@ -19,11 +19,18 @@ CREATE TABLE
   PRIMARY KEY (user_id, group_id)
 );
 
+CREATE TABLE jwt_token_blacklist
+(
+  token_jti VARCHAR,
+  expiration bigint,
+  PRIMARY KEY (token_jti)
+);
+
 -- INSERT ADMIN USER
 INSERT INTO
-  "user" (name, email, password)
+  "user" (name, email, cognito_username)
 VALUES
-('Admin', 'admin@openforis.org', '$2b$10$PGiD7cS.ESkAI4NIbuJ.9OYDEsfnMl8wNoETWoi03JWhXXJIwLDte');
+('Admin', 'admin@openforis.org', 'demo_user');
 
 INSERT INTO auth_group (name, labels, descriptions, permissions, record_steps)
 VALUES ('systemAdmin',

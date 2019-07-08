@@ -12,7 +12,7 @@ import useI18n from '../../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
-import AuthManager from '../../../../../../common/auth/authManager'
+import Authorizer from '../../../../../../common/auth/authorizer'
 import Validator from '../../../../../../common/validation/validator'
 
 import { appModuleUri, dataModules } from '../../../../appModules'
@@ -83,7 +83,7 @@ const RecordsTable = ({ user, surveyInfo, records, offset, nodeDefKeys }) => {
                        record={record}
                        style={style}
                        nodeDefKeys={nodeDefKeys}
-                       canEdit={Survey.isPublished(surveyInfo) && AuthManager.canEditRecord(user, record)}/>
+                       canEdit={Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record)}/>
           )
         }
       </div>

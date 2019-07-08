@@ -1,29 +1,29 @@
-const Jwt = require('../jwt')
+const Jwt = require('../../modules/auth/jwt')
 
 const UserService = require('../../modules/user/service/userService')
+const AuthService = require('../../modules/auth/service/authService')
 
 const UnauthorizedError = require('../../utils/unauthorizedError')
 
 module.exports = async (req, res, next) => {
-  const bearerPrefix = 'Bearer '
   const authorizationHeader = req.headers && req.headers.authorization
 
   if (!authorizationHeader) {
     next(new UnauthorizedError())
-  } else if (authorizationHeader.substr(0, bearerPrefix.length) !== bearerPrefix) {
+  } else if (!authorizationHeader.startsWith(Jwt.bearerPrefix)) {
     next(new Error('Authorization header is not a bearer header'))
   } else {
     try {
-      const jwtToken = authorizationHeader && authorizationHeader.substr(bearerPrefix.length)
-      const decoded = await Jwt.validate(jwtToken)
-      const email = decoded.email
+      const jwtToken = authorizationHeader.substr(Jwt.bearerPrefix.length)
 
-      const user = {
-        ...await UserService.findUserByEmail(email),
-        name: decoded.name,
+      // Check if token is blacklisted
+      if (await AuthService.findBlacklistedToken(Jwt.getJti(jwtToken))) {
+        throw new Error()
       }
 
-      req.user = user
+      const tokenDecoded = await Jwt.validate(jwtToken)
+
+      req.user = await UserService.findUserByCognitoUsername(tokenDecoded.username)
 
       next()
     } catch (e) {
@@ -31,4 +31,3 @@ module.exports = async (req, res, next) => {
     }
   }
 }
-

@@ -10,7 +10,7 @@ import DeleteSurveyDialog from './deleteSurveyDialog'
 import ErrorBadge from '../../../../../commonComponents/errorBadge'
 
 import Survey from '../../../../../../common/survey/survey'
-import AuthManager from '../../../../../../common/auth/authManager'
+import Authorizer from '../../../../../../common/auth/authorizer'
 import Validator from '../../../../../../common/validation/validator'
 
 import * as AppState from '../../../../../app/appState'
@@ -131,7 +131,7 @@ const mapStateToProps = state => {
 
   return {
     surveyInfo,
-    canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
+    canEditDef: Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
 

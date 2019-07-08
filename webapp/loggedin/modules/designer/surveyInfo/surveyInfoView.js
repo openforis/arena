@@ -12,7 +12,7 @@ import LanguagesEditor from './languagesEditor'
 import SrsEditor from './srsEditor'
 
 import Survey from '../../../../../common/survey/survey'
-import AuthManager from '../../../../../common/auth/authManager'
+import Authorizer from '../../../../../common/auth/authorizer'
 import Validator from '../../../../../common/validation/validator'
 import { normalizeName } from '../../../../../common/stringUtils'
 
@@ -85,7 +85,7 @@ const SurveyInfoView = (props) => {
 const mapStateToProps = state => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
-  const readOnly = !AuthManager.canEditSurvey(user, surveyInfo)
+  const readOnly = !Authorizer.canEditSurvey(user, surveyInfo)
 
   return {
     surveyInfo,

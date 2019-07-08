@@ -7,7 +7,7 @@ import CategoryEdit from '../categoryEdit/components/categoryEdit'
 
 import Survey from '../../../../common/survey/survey'
 import Category from '../../../../common/survey/category'
-import { canEditSurvey } from '../../../../common/auth/authManager'
+import Authorizer from '../../../../common/auth/authorizer'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
@@ -77,7 +77,7 @@ const mapStateToProps = (state) => {
   return {
     categories,
     category: CategoryEditState.getCategoryForEdit(state),
-    readOnly: !canEditSurvey(user, surveyInfo)
+    readOnly: !Authorizer.canEditSurvey(user, surveyInfo)
   }
 }
 

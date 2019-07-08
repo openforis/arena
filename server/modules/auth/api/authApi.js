@@ -1,13 +1,16 @@
+const Request = require('../../../utils/request')
 const { sendOk } = require('../../../utils/response')
 
+const Survey = require('../../../../common/survey/survey')
 const { userPrefNames, getUserPrefSurveyId } = require('../../../../common/user/userPrefs')
+const Authorizer = require('../../../../common/auth/authorizer')
 
-const AuthManager = require('../../../../common/auth/authManager')
 const SurveyManager = require('../../survey/manager/surveyManager')
 const UserService = require('../../user/service/userService')
 const RecordService = require('../../record/service/recordService')
 
-const Survey = require('../../../../common/survey/survey')
+const AuthService = require('../service/authService')
+const Jwt = require('../jwt')
 
 const sendResponse = (res, user, survey = null) => res.json({ user, survey })
 
@@ -15,7 +18,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
   try {
     let survey = await SurveyManager.fetchSurveyById(surveyId, false, false)
 
-    if (AuthManager.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
+    if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
       survey = await SurveyManager.fetchSurveyById(surveyId, true, true)
     }
 
@@ -45,16 +48,27 @@ const sendUser = async (res, user) => {
 
 module.exports.init = app => {
 
-  app.get('/auth/user', (req, res) => {
-    sendUser(res, req.user)
+  app.get('/auth/user', async (req, res, next) => {
+    try {
+      await sendUser(res, req.user)
+    } catch (err) {
+      next(err)
+    }
   })
 
-  app.post('/auth/logout', (req, res) => {
-    // before logout checkOut record if there's an opened thread
-    const { user } = req
-    RecordService.terminateUserThread(user.id)
+  app.post('/auth/logout', async (req, res, next) => {
+    try {
+      // before logout checkOut record if there's an opened thread
+      const user = Request.getUser(req)
+      RecordService.terminateUserThread(user.id)
 
-    req.logout()
-    sendOk(res)
+      const token = req.headers.authorization.substring(Jwt.bearerPrefix.length)
+
+      await AuthService.blacklistToken(token)
+
+      sendOk(res)
+    } catch (err) {
+      next(err)
+    }
   })
 }

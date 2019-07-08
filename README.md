@@ -47,7 +47,7 @@ When you need execute a DDL (e.g. add new table to the database, say "dbtable"),
 
 ```yarn run create-migration add-table-dbtable```
 
-Now you'll see new sql files in `db/migration/migrations/sql/<timestamp>-kuikka-<up/down>.sql`
+Now you'll see new sql files in `db/migration/migrations/sql/<timestamp>- add-table-dbtable-<up/down>.sql`
 
 You should edit the `<timestamp>-add-table-dbtable-up.sql to contain your `create table` -statement. 
 You could also add the corresponding `drop table` to `<timestamp>-add-table-dbtable-down.sql` if you ever want to run migrations downwards.
@@ -67,13 +67,8 @@ PGDATABASE=of-arena-dev
 PGUSER=arena
 PGPASSWORD=arena
 
-# Session
-FOO_COOKIE_SECRET=my-cookie-secret-key
+# AWS Cognito
+COGNITO_REGION=cognito_region
+COGNITO_USER_POOL_ID=cognito_user_pool_id
+COGNITO_CLIENT_ID=cognito_client_id
 ```
-
-## Predefined users
-
-##### ***ADMIN USER***: 
-email:admin@openforis.org 
-
-pwd:admin 
