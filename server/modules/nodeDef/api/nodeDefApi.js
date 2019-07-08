@@ -17,7 +17,7 @@ module.exports.init = app => {
     try {
       const { body: nodeDefRequest } = req
       const { surveyId } = Request.getParams(req)
-      const user = Request.getSessionUser(req)
+      const user = Request.getUser(req)
 
       const nodeDef = await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
 

@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 
-import { isSystemAdmin } from '../../common/auth/authManager'
+import Authorizer from '../../common/auth/authorizer'
 
 import Survey from '../../common/survey/survey'
 import User from '../../common/user/user'
@@ -40,7 +40,7 @@ export const assocSurveyAdminGroup = surveyInfo =>
   appState => {
     const user = R.prop(keys.user, appState)
 
-    if (isSystemAdmin(user)) {
+    if (Authorizer.isSystemAdmin(user)) {
       return appState
     } else {
 

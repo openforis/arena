@@ -18,7 +18,7 @@ import * as SurveyState from '../../../../survey/surveyState'
 
 import { putCategoryProp, createCategoryLevel, setCategoryForEdit } from '../actions'
 
-import { canEditSurvey } from '../../../../../common/auth/authManager'
+import Authorizer from '../../../../../common/auth/authorizer'
 
 const CategoryEdit = props => {
 
@@ -74,7 +74,7 @@ const CategoryEdit = props => {
 }
 
 const mapStateToProps = state => ({
-  readOnly: !canEditSurvey(AppState.getUser(state), SurveyState.getSurveyInfo(state)),
+  readOnly: !Authorizer.anEditSurvey(AppState.getUser(state), SurveyState.getSurveyInfo(state)),
 })
 
 export default connect(

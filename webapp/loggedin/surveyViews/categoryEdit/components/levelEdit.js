@@ -19,7 +19,7 @@ import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 import * as CategoryEditState from '../categoryEditState'
 
-import { canEditSurvey } from '../../../../../common/auth/authManager'
+import Authorizer from '../../../../../common/auth/authorizer'
 
 import {
   createCategoryLevelItem,
@@ -136,7 +136,7 @@ const mapStateToProps = (state, props) => {
     parentItem,
     canAddItem,
     canBeDeleted,
-    readOnly: !canEditSurvey(user, surveyInfo),
+    readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
 

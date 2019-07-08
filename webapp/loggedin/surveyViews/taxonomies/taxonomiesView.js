@@ -7,7 +7,7 @@ import TaxonomyEdit from '../taxonomyEdit/components/taxonomyEdit'
 
 import Survey from '../../../../common/survey/survey'
 import Taxonomy from '../../../../common/survey/taxonomy'
-import { canEditSurvey } from '../../../../common/auth/authManager'
+import Authorizer from '../../../../common/auth/authorizer'
 
 import * as SurveyState from '../../../survey/surveyState'
 import * as TaxonomyEditState from '../taxonomyEdit/taxonomyEditState'
@@ -88,7 +88,7 @@ const mapStateToProps = state => {
   return {
     taxonomies,
     taxonomy: TaxonomyEditState.getTaxonomy(state),
-    readOnly: !canEditSurvey(user, surveyInfo),
+    readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
 

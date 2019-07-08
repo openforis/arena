@@ -37,7 +37,7 @@ const init = (server, jwtMiddleware) => {
   io.on('connection', async socket => {
     const userId = R.pipe(
       R.prop('request'),
-      Request.getSessionUserId,
+      Request.getUserId,
     )(socket)
 
     if (userId) {

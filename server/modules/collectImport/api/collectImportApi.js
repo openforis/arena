@@ -12,7 +12,7 @@ module.exports.init = app => {
 
   app.post('/survey/collect-import', async (req, res, next) => {
     try {
-      const user = Request.getSessionUser(req)
+      const user = Request.getUser(req)
       const file = Request.getFile(req)
 
       const job = CollectImportService.startCollectImportJob(user, file.tempFilePath)
@@ -54,7 +54,7 @@ module.exports.init = app => {
   app.post(`/survey/:surveyId/collect-import/report/:itemId/resolve`, AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { surveyId, itemId, resolved } = Request.getParams(req)
-      const user = Request.getSessionUser(req)
+      const user = Request.getUser(req)
 
       const item = await CollectImportService.updateReportItem(user, surveyId, itemId, {}, resolved)
 

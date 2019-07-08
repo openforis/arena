@@ -20,7 +20,7 @@ import * as AppState from '../../../../app/appState'
 import * as TaxonomyEditState from '../taxonomyEditState'
 
 import { initTaxaList, loadTaxa, putTaxonomyProp, setTaxonomyForEdit, uploadTaxonomyFile } from '../actions'
-import { canEditSurvey } from '../../../../../common/auth/authManager'
+import Authorizer from '../../../../../common/auth/authorizer'
 
 const TaxonomyEdit = props => {
 
@@ -109,7 +109,7 @@ const mapStateToProps = state => {
     taxaPerPage: TaxonomyEditState.getTaxaPerPage(state),
     taxa: TaxonomyEditState.getTaxa(state),
     activeJob,
-    readOnly: !canEditSurvey(user, surveyInfo),
+    readOnly: !Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
 

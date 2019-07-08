@@ -12,7 +12,7 @@ module.exports.init = app => {
   // ==== CREATE
   app.post('/survey', async (req, res, next) => {
     try {
-      const user = Request.getSessionUser(req)
+      const user = Request.getUser(req)
       const { body } = req
       const validation = await SurveyService.validateNewSurvey(body)
 
@@ -32,7 +32,7 @@ module.exports.init = app => {
   // ==== READ
   app.get('/surveys', async (req, res, next) => {
     try {
-      const user = Request.getSessionUser(req)
+      const user = Request.getUser(req)
 
       const surveys = await SurveyService.fetchUserSurveysInfo(user)
 
@@ -59,7 +59,7 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/prop', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const user = Request.getSessionUser(req)
+      const user = Request.getUser(req)
       const { body } = req
       const { key, value } = body
 
@@ -75,7 +75,7 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
     const surveyId = Request.getRestParam(req, 'surveyId')
-    const user = Request.getSessionUser(req)
+    const user = Request.getUser(req)
 
     const job = SurveyService.startPublishJob(user, surveyId)
 
@@ -87,7 +87,7 @@ module.exports.init = app => {
   app.delete('/survey/:surveyId', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
-      const user = Request.getSessionUser(req)
+      const user = Request.getUser(req)
 
       await SurveyService.deleteSurvey(surveyId, user)
 

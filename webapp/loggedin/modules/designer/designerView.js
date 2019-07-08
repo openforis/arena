@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import AuthManager from '../../../../common/auth/authManager'
+import Authorizer from '../../../../common/auth/authorizer'
 
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
 import InnerModuleSwitch from '../components/innerModuleSwitch'
@@ -69,7 +69,7 @@ const mapStateToProps = state => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
 
   return {
-    canEditDef: AuthManager.canEditSurvey(user, surveyInfo),
+    canEditDef: Authorizer.canEditSurvey(user, surveyInfo),
   }
 }
 
