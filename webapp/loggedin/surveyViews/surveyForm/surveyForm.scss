@@ -12,30 +12,6 @@ $formHeaderHeight: 40px;
   height: calc(100% - #{$formHeaderHeight});
   grid-template-columns: 250px 1fr;
 
-  //edit mode
-  &.form-designer {
-    .react-grid-item {
-      border: 1px dashed $greyBorder;
-
-      // inner page
-      &.node-def__inner-form {
-        border: 1px dashed $greyBorder;
-      }
-
-      > .react-resizable-handle::after {
-        border-right: 2px solid $greyBorder;
-        border-bottom: 2px solid $greyBorder;
-      }
-
-    }
-
-    .node-def__form_page {
-      border-top: 1px dashed $greyBorder;
-      border-right: 1px dashed $greyBorder;
-      border-bottom: 1px dashed $greyBorder;
-    }
-  }
-
   .react-grid-layout {
     .react-grid-item {
       //background-color: white;
@@ -67,8 +43,28 @@ $formHeaderHeight: 40px;
   }
 }
 
+// ======
+// Survey form edit mode grid style
+// ======
 .survey-form.edit {
   grid-template-columns: 250px 1fr 200px;
+
+  .react-grid-item {
+    border: 1px dashed $greyBorder;
+
+    > .react-resizable-handle::after {
+      border-right: 2px solid $greyBorder;
+      border-bottom: 2px solid $greyBorder;
+    }
+
+  }
+
+  .node-def__form_page {
+    border-top: 1px dashed $greyBorder;
+    border-right: 1px dashed $greyBorder;
+    border-bottom: 1px dashed $greyBorder;
+  }
+
 }
 
 .survey-form.edit.page-navigation-off {
