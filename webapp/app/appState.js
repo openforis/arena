@@ -5,12 +5,13 @@ import Authorizer from '../../common/auth/authorizer'
 import Survey from '../../common/survey/survey'
 import User from '../../common/user/user'
 
-const keys = {
+export const keys = {
   status: 'status',
   user: 'user',
   activeJob: 'activeJob',
   errors: 'errors',
   systemError: 'systemError',
+  sideBarOpened: 'sideBarOpened',
 
   // activeJob keys
   onComplete: 'onComplete',
@@ -65,6 +66,11 @@ export const dissocSurveyGroups = surveyId =>
 
     return R.assocPath([keys.user, User.keys.authGroups], userGroups, appState)
   }
+
+// ==== APP SIDE BAR
+export const isSideBarOpened = R.pipe(getState, R.propEq(keys.sideBarOpened, true))
+
+export const assocSideBarOpened = sideBarOpened => R.assoc(keys.sideBarOpened, sideBarOpened)
 
 // ==== APP CURRENT ACTIVE JOB
 

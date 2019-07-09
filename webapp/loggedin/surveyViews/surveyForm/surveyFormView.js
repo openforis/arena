@@ -15,11 +15,14 @@ import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefEdit from '../nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
+import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
 import * as SurveyFormState from './surveyFormState'
 import * as RecordState from '../record/recordState'
 
 import { setFormNodeDefAddChildTo } from './actions'
+
+import { dispatchWindowResize } from '../../../utils/domUtils'
 
 const SurveyFormView = (props) => {
 
@@ -28,9 +31,8 @@ const SurveyFormView = (props) => {
     edit, entry, preview,
     hasNodeDefAddChildTo, showPageNavigation,
     canEditDef, canEditRecord,
-
     recordUuid, parentNode,
-
+    isSideBarOpened,
     history,
     setFormNodeDefAddChildTo,
   } = props
@@ -40,6 +42,20 @@ const SurveyFormView = (props) => {
   let className = editAllowed ? ' edit' : ''
   className += hasNodeDefAddChildTo ? '' : ' form-actions-off'
   className += showPageNavigation ? '' : ' page-navigation-off'
+
+  //if showPageNavigation, addNodeDefAddChildTo or sideBar change, trigger window resize to re-render react-grid-layout form
+  useEffect(() => {
+    const reactGridLayoutElems = document.getElementsByClassName('react-grid-layout')
+    for (const el of reactGridLayoutElems) {
+      el.classList.remove('mounted')
+    }
+    dispatchWindowResize()
+    setTimeout(() => {
+      for (const el of reactGridLayoutElems) {
+        el.classList.add('mounted')
+      }
+    }, 100)
+  }, [showPageNavigation, hasNodeDefAddChildTo, isSideBarOpened])
 
   useEffect(() => {
     // onUnmount if it's in editAllowed mode, set nodeDefAddChildTo to null
@@ -126,6 +142,7 @@ const mapStateToProps = (state, props) => {
   const hasNodeDefAddChildTo = !!SurveyFormState.getNodeDefAddChildTo(state)
   const record = RecordState.getRecord(state)
   const showPageNavigation = SurveyFormState.showPageNavigation(state)
+  const isSideBarOpened = AppState.isSideBarOpened(state)
 
   const mapEntryProps = () => ({
     parentNode: nodeDef ? SurveyFormState.getFormPageParentNode(nodeDef)(state) : null,
@@ -137,6 +154,7 @@ const mapStateToProps = (state, props) => {
     nodeDef,
     hasNodeDefAddChildTo,
     showPageNavigation,
+    isSideBarOpened,
     ...props.entry
       ? mapEntryProps()
       : {},
