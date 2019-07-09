@@ -97,7 +97,7 @@ class NodeDefMultipleTableCell extends React.Component {
         )
       )
       : (
-        <div className="survey-form__node-def-multiple-table-cell-body">
+        <div className="survey-form__node-def-table-cell-body-multiple">
           <span className="values-summary">{this.state.nodeValues}</span>
           <button className="btn-s"
                   onClick={() => this.setShowEditDialog(true)}>

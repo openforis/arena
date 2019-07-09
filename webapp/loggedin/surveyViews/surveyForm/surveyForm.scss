@@ -57,14 +57,3 @@
 .survey-form.edit.form-actions-off.page-navigation-off {
   grid-template-columns: 1fr 0;
 }
-
-
-.node-def__table-row-coordinate {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-}
-
-.node-def__table-row-taxon {
-  display: grid;
-  grid-template-columns: .2fr .5fr .3fr;
-}

@@ -21,3 +21,9 @@
     }
   }
 }
+
+
+.survey-form__node-def-table-cell-taxon {
+  display: grid;
+  grid-template-columns: .2fr .5fr .3fr;
+}

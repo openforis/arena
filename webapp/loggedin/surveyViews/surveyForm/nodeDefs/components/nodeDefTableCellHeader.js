@@ -16,7 +16,7 @@ const NodeDefTableCellHeader = props => {
   const i18n = useI18n()
 
   return (
-    <div className={`survey-form__node-def-table-cell-header node-def__table-row-${NodeDef.getType(nodeDef)}`}>
+    <div className={`survey-form__node-def-table-cell-header survey-form__node-def-table-cell-${NodeDef.getType(nodeDef)}`}>
 
       <label style={{ gridColumn: `1 / span ${fields.length}` }}>{label}</label>
 

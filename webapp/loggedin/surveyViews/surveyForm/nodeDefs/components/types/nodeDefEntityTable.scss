@@ -1,8 +1,6 @@
 @import "../../../../../../style/vars";
 @import "../../../surveyFormVars";
 
-//node-def__table
-
 .survey-form__node-def-entity-table {
   display: grid;
   align-self: start;
@@ -33,7 +31,7 @@
 
 .survey-form__node-def-entity-table-rows {
   position: absolute;
-  top: calc(#{$formTableRowHeaderHeight} + 4px);
+  top: $formTableRowHeaderHeight;
   width: 100%;
   height: calc(100% - #{$formTableRowHeaderHeight});
   overflow-x: auto;
@@ -48,7 +46,7 @@
   overflow-x: hidden;
 }
 
-.node-def__table-row-header {
+.survey-form__node-def-entity-table-row-header {
   position: absolute;
   display: flex;
   height: $formTableRowHeaderHeight;
@@ -65,11 +63,17 @@
     }
   }
 
+  &.drag-in-progress .draggable-item * {
+    pointer-events: none;
+
+    .message {
+      display: none
+    }
+  }
 }
 
 
-
-.node-def__table-row {
+.survey-form__node-def-entity-table-row {
   position: relative;
   display: flex;
 
@@ -99,12 +103,4 @@
     left: -.5rem;
   }
 
-}
-
-.node-def__table-data-composite-attr {
-  height: 100%;
-
-  > div:not(:last-child) {
-    border-right: $formBorder;
-  }
 }

@@ -324,7 +324,7 @@ class NodeDefTaxon extends React.Component {
         : null
 
     if (renderType === nodeDefRenderType.tableBody) {
-      return <div className="node-def__table-row-taxon node-def__table-data-composite-attr">
+      return <div className="survey-form__node-def-table-cell-taxon survey-form__node-def-table-cell-composite">
         {codeInputField}
         {scientificNameInputField}
         {vernacularNameInputField}

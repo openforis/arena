@@ -1,6 +1,7 @@
 @import "../../../../../style/vars";
+@import "../../surveyFormVars";
 
-.survey-form__node-def-multiple-table-cell-body {
+.survey-form__node-def-table-cell-body-multiple {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
@@ -20,5 +21,13 @@
     &:hover {
       color: $orange;
     }
+  }
+}
+
+.survey-form__node-def-table-cell-composite {
+  height: 100%;
+
+  > div:not(:last-child) {
+    border-right: $formBorder;
   }
 }

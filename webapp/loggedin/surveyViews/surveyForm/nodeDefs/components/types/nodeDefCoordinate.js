@@ -65,7 +65,7 @@ const NodeDefCoordinate = props => {
                                 onChange={(selection) => handleInputChange(node, 'srs', R.prop('code')(selection))}/>
 
   if (renderType === nodeDefRenderType.tableBody) {
-    return <div className="node-def__table-row-coordinate node-def__table-data-composite-attr">
+    return <div className="survey-form__node-def-table-cell-coordinate survey-form__node-def-table-cell-composite">
       {xInput}
       {yInput}
       {srsDropdown}
