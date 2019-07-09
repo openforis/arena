@@ -47,7 +47,7 @@ if (buildReport) {
 
 // ====== webpack config
 const webPackConfig = {
-  entry: ['@babel/polyfill', './webapp/main.js'],
+  entry: ['core-js/stable', 'regenerator-runtime/runtime', './webapp/main.js'],
   mode: prodBuild ? mode.production : mode.development,
   output: {
     filename: 'bundle-[hash].js',
