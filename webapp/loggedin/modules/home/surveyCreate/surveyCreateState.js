@@ -2,9 +2,11 @@ import * as R from 'ramda'
 
 import * as HomeState from '../homeState'
 
+export const stateKey = 'surveyCreate'
+
 export const getState = R.pipe(
   HomeState.getState,
-  R.prop('surveyCreate')
+  R.prop(stateKey)
 )
 
 export const getNewSurvey = R.pipe(

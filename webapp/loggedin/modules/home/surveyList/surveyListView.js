@@ -1,6 +1,6 @@
 import './surveyListView.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -14,24 +14,25 @@ import * as SurveyState from '../../../../survey/surveyState'
 import { fetchSurveys } from './actions'
 import { setActiveSurvey } from '../../../../survey/actions'
 
-class SurveyListView extends React.Component {
+const SurveyListView = props => {
 
-  componentDidMount () {
-    this.props.fetchSurveys()
-  }
+  const {
+    surveyInfo, surveys,
+    setActiveSurvey, fetchSurveys
+  } = props
 
-  render () {
-    const { surveyInfo, surveys, setActiveSurvey } = this.props
+  const surveysLength = R.length(surveys)
 
-    return R.isEmpty(surveys)
-      ? null : (
-        <SurveyListTable
-          surveys={surveys}
-          surveyInfo={surveyInfo}
-          setActiveSurvey={setActiveSurvey}
-        />
-      )
-  }
+  useEffect(() => {
+    fetchSurveys()
+  }, [])
+
+  return !R.isEmpty(surveys) &&
+    <SurveyListTable
+      surveys={surveys}
+      surveyInfo={surveyInfo}
+      setActiveSurvey={setActiveSurvey}
+    />
 }
 
 const mapStateToProps = state => ({
