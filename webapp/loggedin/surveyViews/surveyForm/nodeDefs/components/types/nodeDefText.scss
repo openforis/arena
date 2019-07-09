@@ -1,5 +1,19 @@
 @import "../../../../../../style/vars";
 
+.survey-form__node-def-integer,
+.survey-form__node-def-decimal {
+  .form-input {
+    text-align: right;
+  }
+}
+
+.survey-form__node-def-date,
+.survey-form__node-def-time {
+  .form-input {
+    text-align: center;
+  }
+}
+
 .survey-form__node-def-text-multiple-container {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -24,4 +38,3 @@
     background-color: $blueLightFocus;
   }
 }
-

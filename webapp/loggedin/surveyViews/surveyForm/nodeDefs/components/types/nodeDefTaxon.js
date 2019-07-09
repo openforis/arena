@@ -334,7 +334,7 @@ class NodeDefTaxon extends React.Component {
     }
 
     return (
-      <div className="survey-form__node-def-taxon-container">
+      <div className="survey-form__node-def-taxon">
         <FormItem label={i18n.t('common.code')}>
           {codeInputField}
         </FormItem>

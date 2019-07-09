@@ -112,11 +112,17 @@ const NodeDefTableCellBody = props => {
   const { nodeDef, surveyInfo } = props
   const surveyLanguage = Survey.getLanguage(useI18n().lang)(surveyInfo)
 
-  return (
-    NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
-      ? <NodeDefMultipleTableCell {...props} lang={surveyLanguage}/>
-      : React.createElement(getNodeDefComponent(nodeDef), { ...props })
-  )
+  return NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
+    ? (
+      <NodeDefMultipleTableCell
+        {...props}
+        lang={surveyLanguage}
+      />
+    )
+    : (
+      React.createElement(getNodeDefComponent(nodeDef), { ...props })
+    )
+
 }
 
 export default NodeDefTableCellBody

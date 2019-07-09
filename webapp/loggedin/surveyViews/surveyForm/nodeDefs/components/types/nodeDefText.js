@@ -13,28 +13,28 @@ import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../../common/record/node'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 
-const multipleNodesWrapper = React.createRef()
-
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
-  <div>
-    <Input aria-disabled={edit || !canEditRecord || readOnly}
-           {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
-           value={Node.getValue(node, '')}
-           onChange={value => updateNode(nodeDef, node, value)}
+  <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
+    <Input
+      aria-disabled={edit || !canEditRecord || readOnly}
+      {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
+      value={Node.getValue(node, '')}
+      onChange={value => updateNode(nodeDef, node, value)}
     />
   </div>
 )
 
 const MultipleTextInput = props => {
   const { nodeDef, parentNode, nodes, removeNode, canEditRecord } = props
+  const multipleNodesWrapper = React.createRef()
 
   return (
-    <div className="nodes">
+    <div>
       {
         nodes.map(n =>
           (!Node.isPlaceholder(n) || canEditRecord) &&
           <div key={`nodeDefTextInput_${Node.getUuid(n)}`}
-               className="survey-form__node-def-text-multiple-container"
+               className={`survey-form__node-def-${NodeDef.getType(nodeDef)} survey-form__node-def-text-multiple-container`}
                ref={multipleNodesWrapper}>
 
             <NodeDefErrorBadge nodeDef={nodeDef}
