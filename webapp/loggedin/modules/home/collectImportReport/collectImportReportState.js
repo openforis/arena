@@ -1,7 +1,9 @@
 import * as R from 'ramda'
 import * as HomeState from '../homeState'
 
-export const getState = R.pipe(HomeState.getState, R.prop('collectImportReport'))
+export const stateKey = 'collectImportReport'
+
+export const getState = R.pipe(HomeState.getState, R.prop(stateKey))
 
 export const updateItem = item =>
   items => {

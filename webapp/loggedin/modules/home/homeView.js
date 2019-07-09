@@ -18,12 +18,11 @@ import * as SurveyState from '../../../survey/surveyState'
 
 const HomeView = props => {
 
-  const { surveyInfo, user } = props
+  const { surveyInfo, user,history } = props
 
   useEffect(() => {
     // making sure user is logged in - it's possible he just logged out
     if (User.getId(user)) {
-      const { history } = props
       const module = Survey.isValid(surveyInfo) ? homeModules.dashboard : homeModules.surveyList
       history.push(appModuleUri(module))
     }

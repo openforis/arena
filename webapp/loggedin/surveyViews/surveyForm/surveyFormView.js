@@ -1,7 +1,7 @@
 import './surveyForm.scss'
 import './react-grid-layout.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -19,6 +19,8 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as SurveyFormState from './surveyFormState'
 import * as RecordState from '../record/recordState'
 
+import { setFormNodeDefAddChildTo } from './actions'
+
 const SurveyFormView = (props) => {
 
   const {
@@ -30,6 +32,7 @@ const SurveyFormView = (props) => {
     recordUuid, parentNode,
 
     history,
+    setFormNodeDefAddChildTo,
   } = props
 
   const editAllowed = edit && canEditDef
@@ -42,6 +45,15 @@ const SurveyFormView = (props) => {
 
   className += hasNodeDefAddChildTo ? '' : ' form-actions-off'
   className += showPageNavigation ? '' : ' page-navigation-off'
+
+  useEffect(() => {
+    // onUnmount if it's in editAllowed mode, set nodeDefAddChildTo to null
+    return () => {
+      if (editAllowed) {
+        setFormNodeDefAddChildTo(null)
+      }
+    }
+  }, [])
 
   return nodeDef
     ? (
@@ -84,7 +96,7 @@ const SurveyFormView = (props) => {
             canEditRecord={canEditRecord}/>
 
           {
-            editAllowed &&
+            editAllowed && hasNodeDefAddChildTo &&
             <FormActions/>
           }
 
@@ -139,6 +151,6 @@ const mapStateToProps = (state, props) => {
 
 const enhance = compose(
   withRouter,
-  connect(mapStateToProps)
+  connect(mapStateToProps, { setFormNodeDefAddChildTo })
 )
 export default enhance(SurveyFormView)

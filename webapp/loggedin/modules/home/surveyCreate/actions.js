@@ -16,9 +16,10 @@ export const updateNewSurveyProp = (name, value) => (dispatch, getState) => {
     R.assoc(name, value),
   )(getState())
 
-  dispatch({ type: surveyCreateNewSurveyUpdate, newSurvey })
+  dispatch({ type: surveyCreateNewSurveyUpdate, [SurveyCreateState.keys.newSurvey]: newSurvey })
 
 }
+
 export const createSurvey = surveyProps => async (dispatch, getState) => {
 
   const { data } = await axios.post('/api/survey', surveyProps)
@@ -31,7 +32,7 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
   } else {
     dispatch({
       type: surveyCreateNewSurveyUpdate,
-      newSurvey: {
+      [SurveyCreateState.keys.newSurvey]: {
         ...SurveyCreateState.getNewSurvey(getState()),
         ...data,
       }
@@ -39,17 +40,24 @@ export const createSurvey = surveyProps => async (dispatch, getState) => {
   }
 
 }
-export const importCollectSurvey = file =>
-  async dispatch => {
-    const formData = new FormData()
-    formData.append('file', file)
 
-    const config = { headers: { 'content-type': 'multipart/form-data' } }
+export const resetNewSurvey = () => dispatch => {
+  dispatch({
+    type: surveyCreateNewSurveyUpdate,
+    [SurveyCreateState.keys.newSurvey]: SurveyCreateState.newSurveyDefault
+  })
+}
 
-    const { data } = await axios.post(`/api/survey/collect-import`, formData, config)
+export const importCollectSurvey = file => async dispatch => {
+  const formData = new FormData()
+  formData.append('file', file)
 
-    dispatch(showAppJobMonitor(data.job, async (job) => {
-      const surveyId = job.result.surveyId
-      dispatch(setActiveSurvey(surveyId, true))
-    }))
-  }
+  const config = { headers: { 'content-type': 'multipart/form-data' } }
+
+  const { data } = await axios.post(`/api/survey/collect-import`, formData, config)
+
+  dispatch(showAppJobMonitor(data.job, async (job) => {
+    const surveyId = job.result.surveyId
+    dispatch(setActiveSurvey(surveyId, true))
+  }))
+}
