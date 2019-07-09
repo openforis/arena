@@ -120,9 +120,8 @@ class EntityForm extends React.Component {
           {
             innerPageChildren
               .map((childDef, i) =>
-                <div
-                  key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}
-                  className={NodeDef.isEntity(childDef) && NodeDefLayout.isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
+                <div key={NodeDef.getUuid(childDef)}
+                     id={NodeDef.getUuid(childDef)}>
                   <NodeDefSwitch
                     key={i}
                     edit={edit}

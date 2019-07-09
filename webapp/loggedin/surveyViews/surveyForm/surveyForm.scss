@@ -37,7 +37,7 @@
   grid-template-columns: 250px 1fr 200px;
 
   .react-grid-item {
-    border: 1px dashed $greyBorder;
+    border: $formBorderEdit;
 
     > .react-resizable-handle::after {
       border-right: 2px solid $greyBorder;
@@ -58,122 +58,6 @@
   grid-template-columns: 1fr 0;
 }
 
-// ======
-// NODE DEF
-// ======
-
-
-//===
-//nodeDefEntity table
-//===
-
-
-//===
-//nodeDefEntity table
-//===
-.node-def__table {
-  display: grid;
-  align-self: start;
-  grid-template-rows: $tableRowHeaderHeight 1fr;
-  position: relative;
-  height: 100%;
-}
-
-.node-def__table-header {
-  justify-self: auto;
-  align-self: center;
-  display: flex;
-  align-items: center;
-  padding: .5rem 2rem;
-  font-weight: 600;
-  text-align: left;
-  text-transform: uppercase;
-  font-size: .8rem;
-
-  .btn-add {
-    margin-left: 10px;
-
-    &:hover {
-      color: $orange;
-    }
-  }
-}
-
-.node-def__table-rows {
-  position: absolute;
-  top: calc(#{$tableRowHeaderHeight} + 4px);
-  width: 100%;
-  height: calc(100% - #{$tableRowHeaderHeight});
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.node-def__table-row-header {
-  position: absolute;
-  display: flex;
-  height: $tableRowHeaderHeight;
-  background-color: rgba($blueLight, 0.3);
-  border-right: 1px solid transparent;
-
-  .react-grid-item {
-    display: grid;
-    border-right: 1px solid $greyBorder;
-    border-top: 1px solid $greyBorder;
-
-    &:first-child {
-      border-left: 1px solid $greyBorder;
-    }
-  }
-
-}
-
-.node-def__table-data-rows {
-  position: absolute;
-  top: $tableRowHeaderHeight;
-  height: calc(100% - #{$tableRowHeaderHeight});
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.node-def__table-row {
-  position: relative;
-  display: flex;
-
-  .form-input {
-    border: none;
-    overflow: hidden;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .react-grid-item {
-    border-right: $tableBorder;
-    border-bottom: $tableBorder;
-
-    &:first-child {
-      border-left: $tableBorder;
-    }
-  }
-
-  &:first-child {
-    .react-grid-item {
-      border-top: $tableBorder;
-    }
-  }
-
-  .error-badge {
-    left: -.5rem;
-  }
-
-}
-
-.node-def__table-data-composite-attr {
-  height: 100%;
-
-  > div:not(:last-child) {
-    border-right: $tableBorder;
-  }
-}
 
 .node-def__table-row-coordinate {
   display: grid;

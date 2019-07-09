@@ -1,0 +1,110 @@
+@import "../../../../../../style/vars";
+@import "../../../surveyFormVars";
+
+//node-def__table
+
+.survey-form__node-def-entity-table {
+  display: grid;
+  align-self: start;
+  grid-template-rows: $formTableRowHeaderHeight 1fr;
+  position: relative;
+  height: 100%;
+}
+
+.survey-form__node-def-entity-table-header {
+  justify-self: auto;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  padding: .5rem 2rem;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+  font-size: .8rem;
+
+  .btn-add {
+    margin-left: 10px;
+
+    &:hover {
+      color: $orange;
+    }
+  }
+}
+
+.survey-form__node-def-entity-table-rows {
+  position: absolute;
+  top: calc(#{$formTableRowHeaderHeight} + 4px);
+  width: 100%;
+  height: calc(100% - #{$formTableRowHeaderHeight});
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.survey-form__node-def-entity-table-data-rows {
+  position: absolute;
+  top: $formTableRowHeaderHeight;
+  height: calc(100% - #{$formTableRowHeaderHeight});
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.node-def__table-row-header {
+  position: absolute;
+  display: flex;
+  height: $formTableRowHeaderHeight;
+  background-color: rgba($blueLight, 0.3);
+  border-right: 1px solid transparent;
+
+  .react-grid-item {
+    display: grid;
+    border-right: $formBorder;
+    border-top: $formBorder;
+
+    &:first-child {
+      border-left: $formBorder;
+    }
+  }
+
+}
+
+
+
+.node-def__table-row {
+  position: relative;
+  display: flex;
+
+  .form-input {
+    border: none;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .react-grid-item {
+    border-right: $formBorder;
+    border-bottom: $formBorder;
+
+    &:first-child {
+      border-left: $formBorder;
+    }
+  }
+
+  &:first-child {
+    .react-grid-item {
+      border-top: $formBorder;
+    }
+  }
+
+  .error-badge {
+    left: -.5rem;
+  }
+
+}
+
+.node-def__table-data-composite-attr {
+  height: 100%;
+
+  > div:not(:last-child) {
+    border-right: $formBorder;
+  }
+}

@@ -1,32 +1,33 @@
 @import "../../../../style/vars";
+@import "../surveyFormVars";
 
 .survey-form__node-def-page {
   position: relative;
   overflow-y: auto;
 
-  border-top: 1px solid $greyBorder;
-  border-right: 1px solid $greyBorder;
-  border-bottom: 1px solid $greyBorder;
+  border-top: $formBorder;
+  border-right: $formBorder;
+  border-bottom: $formBorder;
 }
 
 // page style when form navigation is off
 .survey-form.page-navigation-off {
   .survey-form__node-def-page {
-    border-left: 1px solid $greyBorder;
+    border-left: $formBorder;
   }
 }
 
 // page style in edit mode
 .survey-form.edit {
   .survey-form__node-def-page {
-    border-top: 1px dashed $greyBorder;
-    border-right: 1px dashed $greyBorder;
-    border-bottom: 1px dashed $greyBorder;
+    border-top: $formBorderEdit;
+    border-right: $formBorderEdit;
+    border-bottom: $formBorderEdit;
   }
 
   &.page-navigation-off {
     .survey-form__node-def-page {
-      border-left: 1px dashed $greyBorder;
+      border-left: $formBorderEdit;
     }
   }
 }

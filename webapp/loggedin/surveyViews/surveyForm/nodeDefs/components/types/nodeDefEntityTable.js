@@ -1,4 +1,4 @@
-import '../../../react-grid-layout.scss'
+import './nodeDefEntityTable.scss'
 
 import React, { useEffect } from 'react'
 import * as R from 'ramda'
@@ -30,9 +30,9 @@ const NodeDefEntityTable = props => {
   }, [nodes && nodes.length])
 
   return (
-    <div className="node-def__table">
+    <div className="survey-form__node-def-entity-table">
 
-      <div className="node-def__table-header">
+      <div className="survey-form__node-def-entity-table-header">
         <div>{label}</div>
 
         {
@@ -50,7 +50,7 @@ const NodeDefEntityTable = props => {
       </div>
 
 
-      <div className="node-def__table-rows">
+      <div className="survey-form__node-def-entity-table-rows">
         {
           (edit || !R.isEmpty(nodes)) &&
           <NodeDefEntityTableRow
@@ -61,7 +61,7 @@ const NodeDefEntityTable = props => {
 
         {
           entry && !R.isEmpty(nodes) &&
-          <div className="node-def__table-data-rows">
+          <div className="survey-form__node-def-entity-table-data-rows">
             {
               nodes.map((node, i) =>
                 <NodeDefEntityTableRow
