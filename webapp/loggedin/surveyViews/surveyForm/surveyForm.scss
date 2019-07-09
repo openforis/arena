@@ -1,5 +1,6 @@
 @import "../../../style/vars";
 @import "./surveyFormVars";
+@import "./react-grid-layout";
 
 .survey-form {
   display: grid;
@@ -62,23 +63,10 @@
 // ======
 
 
-
-
-.node-def__inner-form-header {
-  font-weight: 600;
-  text-align: center;
-}
-
 //===
 //nodeDefEntity table
 //===
-.survey-form__node-def-boolean {
-  justify-self: start;
 
-  > *:first-child {
-    border: 1px solid $blueDark;
-  }
-}
 
 //===
 //nodeDefEntity table

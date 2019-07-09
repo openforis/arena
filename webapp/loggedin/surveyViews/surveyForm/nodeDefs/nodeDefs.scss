@@ -11,7 +11,9 @@
 
 // page style when form navigation is off
 .survey-form.page-navigation-off {
-  border-left: 1px solid $greyBorder;
+  .survey-form__node-def-page {
+    border-left: 1px solid $greyBorder;
+  }
 }
 
 // page style in edit mode

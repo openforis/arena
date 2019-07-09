@@ -1,0 +1,9 @@
+@import "../../../../../../style/vars";
+
+.survey-form__node-def-boolean {
+  justify-self: start;
+
+  > *:first-child {
+    border: 1px solid $blueDark;
+  }
+}
