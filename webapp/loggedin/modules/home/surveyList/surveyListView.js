@@ -1,15 +1,16 @@
 import './surveyListView.scss'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
-import SurveyListTable from './surveyListTable'
-
 import Survey from '../../../../../common/survey/survey'
+
+import SurveyListTable from './surveyListTable'
 
 import * as SurveyListState from './surveyListState'
 import * as SurveyState from '../../../../survey/surveyState'
+import { appModuleUri, homeModules } from '../../../appModules'
 
 import { fetchSurveys } from './actions'
 import { setActiveSurvey } from '../../../../survey/actions'
@@ -17,15 +18,25 @@ import { setActiveSurvey } from '../../../../survey/actions'
 const SurveyListView = props => {
 
   const {
-    surveyInfo, surveys,
+    surveyInfo, surveys, history,
     setActiveSurvey, fetchSurveys
   } = props
 
-  const surveysLength = R.length(surveys)
+  const [fetched, setFeched] = useState(false)
 
+  //onMount fetch surveys
   useEffect(() => {
     fetchSurveys()
+    setFeched(true)
   }, [])
+
+  const surveysLength = R.length(surveys)
+  useEffect(() => {
+    // redirect to create survey when (after fetching surveys) there are no surveys
+    if (fetched === true && surveysLength === 0) {
+      history.push(appModuleUri(homeModules.surveyNew))
+    }
+  }, [surveysLength])
 
   return !R.isEmpty(surveys) &&
     <SurveyListTable
@@ -37,7 +48,7 @@ const SurveyListView = props => {
 
 const mapStateToProps = state => ({
   surveyInfo: Survey.getSurveyInfo(SurveyState.getSurvey(state)),
-  surveys: SurveyListState.getState(state)
+  surveys: SurveyListState.getSurveys(state),
 })
 
 export default connect(

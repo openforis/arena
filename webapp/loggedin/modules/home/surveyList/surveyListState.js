@@ -3,12 +3,16 @@ import * as HomeState from '../homeState'
 
 export const stateKey = 'surveyList'
 
-const keys = {
-  surveys: 'surveys',
-}
-
 export const getState = R.pipe(HomeState.getState, R.prop(stateKey))
 
-export const assocSurveys = R.assoc(keys.surveys)
+const keys = {
+  surveys: 'surveys'
+}
 
-export const getSurveys = R.pipe(getState, R.propOr([], keys.surveys))
+// ==== surveys
+export const assocSurveys = surveys => R.assoc(keys.surveys, surveys)
+
+export const getSurveys = R.pipe(getState, R.propOr({}, keys.surveys))
+
+// ==== reset state
+export const resetState = assocSurveys({})
