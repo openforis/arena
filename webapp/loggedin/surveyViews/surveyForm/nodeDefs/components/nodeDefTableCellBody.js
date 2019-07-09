@@ -1,3 +1,5 @@
+import './nodeDefTableCellBody.scss'
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as R from 'ramda'
@@ -49,7 +51,7 @@ const loadCategoryItem = async (surveyInfo, itemUuid) => {
   return data.item
 }
 
-class NodeDefMultipleTableBody extends React.Component {
+class NodeDefMultipleTableCell extends React.Component {
 
   constructor (props) {
     super(props)
@@ -95,7 +97,7 @@ class NodeDefMultipleTableBody extends React.Component {
         )
       )
       : (
-        <div className="node-def__text-multiple-table-cell">
+        <div className="survey-form__node-def-multiple-table-cell-body">
           <span className="values-summary">{this.state.nodeValues}</span>
           <button className="btn-s"
                   onClick={() => this.setShowEditDialog(true)}>
@@ -106,15 +108,15 @@ class NodeDefMultipleTableBody extends React.Component {
   }
 }
 
-const NodeDefTableBody = props => {
+const NodeDefTableCellBody = props => {
   const { nodeDef, surveyInfo } = props
   const surveyLanguage = Survey.getLanguage(useI18n().lang)(surveyInfo)
 
   return (
     NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
-      ? <NodeDefMultipleTableBody {...props} lang={surveyLanguage}/>
+      ? <NodeDefMultipleTableCell {...props} lang={surveyLanguage}/>
       : React.createElement(getNodeDefComponent(nodeDef), { ...props })
   )
 }
 
-export default NodeDefTableBody
+export default NodeDefTableCellBody

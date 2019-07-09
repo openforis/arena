@@ -1,4 +1,4 @@
-import '../../nodeDefs.scss'
+import './nodeDefCode.scss'
 
 import React from 'react'
 import * as R from 'ramda'

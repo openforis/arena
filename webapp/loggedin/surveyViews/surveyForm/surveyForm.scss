@@ -293,18 +293,6 @@
 
 }
 
-.node-def__table-column-header {
-  display: grid;
-  background-color: rgba($blueLight, 0.3);
-
-  label {
-    justify-self: center;
-    align-self: center;
-    font-weight: 600;
-    font-size: .8rem;
-  }
-}
-
 .node-def__table-data-rows {
   position: absolute;
   top: $tableRowHeaderHeight;

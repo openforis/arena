@@ -1,3 +1,5 @@
+import './nodeDefFile.scss'
+
 import React from 'react'
 import { uuidv4 } from '../../../../../../../common/uuid'
 

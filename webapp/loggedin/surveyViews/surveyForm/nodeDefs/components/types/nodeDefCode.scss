@@ -1,0 +1,26 @@
+@import "../../../../../../style/vars";
+
+.survey-form__node-def-code-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+
+  .btn-checkbox {
+    pointer-events: all;
+    border-color: $blueDark;
+
+    &[aria-disabled="true"] {
+      pointer-events: none;
+    }
+  }
+
+  .form-input {
+    width: auto !important;
+    border: none !important;
+  }
+
+  .dropdown {
+    margin: 0.25rem 0.3rem;
+    min-height: 24px;
+  }
+}

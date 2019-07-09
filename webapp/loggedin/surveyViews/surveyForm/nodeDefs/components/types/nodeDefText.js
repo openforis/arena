@@ -1,3 +1,5 @@
+import './nodeDefText.scss'
+
 import React from 'react'
 import * as R from 'ramda'
 
@@ -32,7 +34,7 @@ const MultipleTextInput = props => {
         nodes.map(n =>
           (!Node.isPlaceholder(n) || canEditRecord) &&
           <div key={`nodeDefTextInput_${Node.getUuid(n)}`}
-               className="node-def__text-multiple-text-input-wrapper"
+               className="survey-form__node-def-text-multiple-container"
                ref={multipleNodesWrapper}>
 
             <NodeDefErrorBadge nodeDef={nodeDef}

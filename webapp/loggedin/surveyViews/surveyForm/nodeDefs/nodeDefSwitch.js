@@ -1,10 +1,12 @@
+import './nodeDefs.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import NodeDefFormItem from './components/nodeDefFormItem'
-import NodeDefTableHeader from './components/nodeDefTableHeader'
-import NodeDefTableBody from './components/nodeDefTableBody'
+import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
+import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefEditFormActions from './components/nodeDefEditFormActions'
 import NodeDefErrorBadge from './components/nodeDefErrorBadge'
 
@@ -87,9 +89,9 @@ class NodeDefSwitch extends React.Component {
 
         {
           renderType === Layout.nodeDefRenderType.tableHeader
-            ? <NodeDefTableHeader nodeDef={nodeDef} label={label}/>
+            ? <NodeDefTableCellHeader nodeDef={nodeDef} label={label}/>
             : renderType === Layout.nodeDefRenderType.tableBody
-            ? <NodeDefTableBody {...this.props} label={label}/>
+            ? <NodeDefTableCellBody {...this.props} label={label}/>
             : <NodeDefFormItem {...this.props} label={label}/>
         }
 

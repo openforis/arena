@@ -1,3 +1,5 @@
+import './nodeDefTaxon.scss'
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
@@ -310,14 +312,14 @@ class NodeDefTaxon extends React.Component {
     const autocompleteDialog =
       autocompleteOpened
         ? ReactDOM.createPortal(
-          <AutocompleteDialog className="survey-form__node-def-taxon-autocomplete-list"
-                              items={autocompleteTaxa}
-                              itemRenderer={TaxonAutocompleteItemRenderer}
-                              itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
-                              inputField={autocompleteInputField.current.component.input}
-                              onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
-                              onClose={() => this.onAutocompleteClose()}/>,
-          document.body
+        <AutocompleteDialog className="survey-form__node-def-taxon-autocomplete-list"
+                            items={autocompleteTaxa}
+                            itemRenderer={TaxonAutocompleteItemRenderer}
+                            itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
+                            inputField={autocompleteInputField.current.component.input}
+                            onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
+                            onClose={() => this.onAutocompleteClose()}/>,
+        document.body
         )
         : null
 

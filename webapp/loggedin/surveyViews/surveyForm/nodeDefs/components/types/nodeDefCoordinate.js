@@ -1,3 +1,5 @@
+import './nodeDefCoordinate.scss'
+
 import React from 'react'
 import * as R from 'ramda'
 

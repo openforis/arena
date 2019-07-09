@@ -1,0 +1,23 @@
+@import "../../../../../style/vars";
+
+.survey-form__node-def-multiple-edit-dialog {
+  .modal-body {
+    height: 40vh;
+  }
+
+  .survey-form__node-def-code-container {
+    justify-content: center;
+  }
+
+  .dropdown {
+    background-color: white;
+
+    &:focus-within {
+      background-color: $blueLightFocus;
+    }
+  }
+}
+
+.node-def__icon-key {
+  opacity: .8;
+}

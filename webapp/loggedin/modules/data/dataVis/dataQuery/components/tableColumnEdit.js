@@ -7,7 +7,7 @@ import Record from '../../../../../../../common/record/record'
 import Node from '../../../../../../../common/record/node'
 import Authorizer from '../../../../../../../common/auth/authorizer'
 
-import NodeDefTableBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableBody'
+import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 
 import { createNodePlaceholder, removeNode, updateNode } from '../../../../../surveyViews/record/actions'
 import * as SurveyState from '../../../../../../survey/surveyState'
@@ -32,7 +32,7 @@ class TableColumnEdit extends React.Component {
       }
 
       return (
-        <NodeDefTableBody
+        <NodeDefTableCellBody
           surveyInfo={surveyInfo}
           nodeDef={nodeDef}
           parentNode={parentNode}

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import ProgressBar from '../../../../../../commonComponents/progressBar'
-import NodeDefTableHeader from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableHeader'
+import NodeDefTableCellHeader from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellHeader'
 
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
@@ -28,7 +28,7 @@ const TableColumn = (props) => {
           {
             editMode
               ? (
-                <NodeDefTableHeader
+                <NodeDefTableCellHeader
                   nodeDef={nodeDef}
                   label={NodeDef.getLabel(nodeDef, lang)}
                 />
