@@ -23,7 +23,7 @@ const AppSideBar = (props) => {
   const i18n = useI18n()
 
   return (
-    <div className="app-sidebar" ref={element}>
+    <div className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
 
       {/*logo placeholder*/}
       <div></div>
