@@ -1,6 +1,6 @@
 import './surveyCreateView.scss'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { Input } from '../../../../commonComponents/form/input'
@@ -13,19 +13,24 @@ import StringUtils from '../../../../../common/stringUtils'
 
 import * as SurveyCreateState from './surveyCreateState'
 
-import { updateNewSurveyProp } from './actions'
+import { updateNewSurveyProp, resetNewSurvey } from './actions'
 import { createSurvey, importCollectSurvey } from './actions'
 
 const SurveyCreateView = (props) => {
 
   const {
     newSurvey,
-    updateNewSurveyProp, createSurvey, importCollectSurvey
+    resetNewSurvey, updateNewSurveyProp, createSurvey, importCollectSurvey
   } = props
 
   const { name, label, lang, validation } = newSurvey
 
   const i18n = useI18n()
+
+  // onMount reset new survey
+  useEffect(() => {
+    resetNewSurvey()
+  }, [])
 
   return (
     <div className="home-survey-create">
@@ -76,6 +81,7 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   {
+    resetNewSurvey,
     createSurvey,
     updateNewSurveyProp,
     importCollectSurvey,
