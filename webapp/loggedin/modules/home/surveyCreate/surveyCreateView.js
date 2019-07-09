@@ -55,11 +55,15 @@ const SurveyCreateView = (props) => {
         {i18n.t('homeView.surveyCreate.createSurvey')}
       </button>
 
-      <UploadButton
-        label={i18n.t('homeView.surveyCreate.importFromCollect')}
-        accept={'.collect-backup'}
-        maxSize={1000}
-        onChange={files => importCollectSurvey(files[0])}/>
+
+      <div className="home-survey-create__collect-import">
+
+        <UploadButton
+          label={i18n.t('homeView.surveyCreate.importFromCollect')}
+          accept={'.collect-backup'}
+          maxSize={1000}
+          onChange={files => importCollectSurvey(files[0])}/>
+      </div>
 
     </div>
   )
