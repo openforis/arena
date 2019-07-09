@@ -1,7 +1,7 @@
 import './surveyForm.scss'
 import './react-grid-layout.scss'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -43,19 +43,28 @@ const SurveyFormView = (props) => {
   className += hasNodeDefAddChildTo ? '' : ' form-actions-off'
   className += showPageNavigation ? '' : ' page-navigation-off'
 
+  const isInitialMount = useRef(true)
+
   //if showPageNavigation, addNodeDefAddChildTo or sideBar change, trigger window resize to re-render react-grid-layout form
-  useEffect(() => {
-    const reactGridLayoutElems = document.getElementsByClassName('react-grid-layout')
-    for (const el of reactGridLayoutElems) {
-      el.classList.remove('mounted')
-    }
-    dispatchWindowResize()
-    setTimeout(() => {
-      for (const el of reactGridLayoutElems) {
-        el.classList.add('mounted')
+  useEffect(
+    () => {
+      if (isInitialMount.current) {
+        isInitialMount.current = false
+      } else {
+        const reactGridLayoutElems = document.getElementsByClassName('react-grid-layout')
+        for (const el of reactGridLayoutElems) {
+          el.classList.remove('mounted')
+        }
+        dispatchWindowResize()
+        setTimeout(() => {
+          for (const el of reactGridLayoutElems) {
+            el.classList.add('mounted')
+          }
+        }, 100)
       }
-    }, 100)
-  }, [showPageNavigation, hasNodeDefAddChildTo, isSideBarOpened])
+    },
+    [showPageNavigation, hasNodeDefAddChildTo, isSideBarOpened]
+  )
 
   useEffect(() => {
     // onUnmount if it's in editAllowed mode, set nodeDefAddChildTo to null
