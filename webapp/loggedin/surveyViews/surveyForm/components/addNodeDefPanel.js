@@ -1,3 +1,5 @@
+import './addNodeDefPanel.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
@@ -48,7 +50,7 @@ const AddNodeDefButtons = ({ nodeDef, addNodeDef, setFormNodeDefAddChildTo }) =>
   )
 }
 
-class FormActions extends React.Component {
+class AddNodeDefPanel extends React.Component {
 
   constructor (props) {
     super(props)
@@ -76,7 +78,7 @@ class FormActions extends React.Component {
     const { i18n } = this.context
 
     return nodeDef && (
-      <div className="survey-form__actions">
+      <div className="survey-form__add-node-def-panel">
 
         <button className="btn btn-s no-border btn-toggle"
                 onClick={() => setFormNodeDefAddChildTo(null)}>
@@ -101,7 +103,7 @@ class FormActions extends React.Component {
 
 }
 
-FormActions.contextType = AppContext
+AddNodeDefPanel.contextType = AppContext
 
 const mapStateToProps = state => {
   const nodeDef = SurveyFormState.getNodeDefAddChildTo(state)
@@ -114,4 +116,4 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   { createNodeDef, setFormNodeDefAddChildTo }
-)(FormActions)
+)(AddNodeDefPanel)

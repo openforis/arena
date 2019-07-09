@@ -10,8 +10,8 @@ import Survey from '../../../../common/survey/survey'
 import Record from '../../../../common/record/record'
 
 import FormHeader from './components/formHeader'
-import FormActions from './components/formActions'
 import FormPageNavigation from './components/formPageNavigation'
+import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefEdit from '../nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
 
@@ -92,7 +92,7 @@ const SurveyFormView = (props) => {
 
           {
             editAllowed && hasNodeDefAddChildTo &&
-            <FormActions/>
+            <AddNodeDefPanel/>
           }
 
         </div>
