@@ -21,9 +21,9 @@ const NodeDefErrorBadge = props => {
   const canToggleClass = NodeDef.isAttribute(nodeDef) && containerEl
   if (canToggleClass) {
     if (Validator.isValidationValid(validation)) {
-      containerEl.parentNode.classList.remove('node-def__invalid')
+      containerEl.parentNode.classList.remove('survey-form__node-def-invalid')
     } else {
-      containerEl.parentNode.classList.add('node-def__invalid')
+      containerEl.parentNode.classList.add('survey-form__node-def-invalid')
     }
   }
 

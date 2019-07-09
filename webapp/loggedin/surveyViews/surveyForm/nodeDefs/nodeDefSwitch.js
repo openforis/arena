@@ -66,9 +66,9 @@ class NodeDefSwitch extends React.Component {
 
     const isPage = !!Layout.getPageUuid(nodeDef)
 
-    const className = 'node-def__form'
-      + (isPage ? '_page' : '')
-      + (applicable ? '' : ' node-def__not-applicable')
+    const className = 'survey-form__node-def-page'
+      + (isPage ? '' : '-item')
+      + (applicable ? '' : ' not-applicable')
 
     return (
       <div className={className} ref={this.element}>
