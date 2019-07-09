@@ -7,7 +7,7 @@ import * as R from 'ramda'
 import NodeDefFormItem from './components/nodeDefFormItem'
 import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
-import NodeDefEditFormActions from './components/nodeDefEditFormActions'
+import NodeDefEditButtons from './components/nodeDefEditButtons'
 import NodeDefErrorBadge from './components/nodeDefErrorBadge'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -81,7 +81,7 @@ class NodeDefSwitch extends React.Component {
           container={this.element}
         />
 
-        <NodeDefEditFormActions
+        <NodeDefEditButtons
           nodeDef={nodeDef}
           edit={edit}
           canEditDef={canEditDef}

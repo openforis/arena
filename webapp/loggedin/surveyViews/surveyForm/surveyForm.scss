@@ -1,9 +1,6 @@
 @import "../../../style/vars";
 @import "./surveyFormVars";
 
-// ======
-// Survey form style
-// ======
 .survey-form {
   display: grid;
   height: calc(100% - #{$formHeaderHeight});
@@ -65,41 +62,7 @@
 // ======
 
 
-.node-def__form-actions {
-  position: absolute;
-  right: 0;
-  background-color: rgba($grey, .9);
-  padding: .2rem .3rem;
-  z-index: $zIndex1App;
 
-  display: flex;
-  font-size: .8rem;
-  align-items: center;
-
-  button {
-    border: none;
-    background-color: transparent;
-
-    &:hover {
-      .icon {
-        color: $orange;
-      }
-    }
-  }
-}
-
-.node-def__form-root-actions {
-  margin: 0 .5rem;
-  padding: .2rem;
-
-  input {
-    padding: .2rem .2rem;
-    width: 30px;
-    border-bottom: 1px dashed $greyBorder;
-    font-size: 1em;
-    text-align: center;
-  }
-}
 
 .node-def__inner-form-header {
   font-weight: 600;
