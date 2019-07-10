@@ -45,6 +45,23 @@ class RecordView extends React.Component {
     })
   }
 
+  removeWebSocketListeners () {
+    AppWebSocket.off(WebSocketEvents.nodesUpdate)
+    AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
+    AppWebSocket.off(WebSocketEvents.recordDelete)
+  }
+
+  componentUnload () {
+    this.removeWebSocketListeners()
+
+    const { recordUuidUrlParam, recordLoaded, checkOutRecord, resetForm } = this.props
+
+    if (recordLoaded)
+      checkOutRecord(recordUuidUrlParam)
+
+    resetForm()
+  }
+
   componentDidMount () {
     const { checkInRecord, recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam } = this.props
     checkInRecord(recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam)
@@ -57,15 +74,6 @@ class RecordView extends React.Component {
   componentWillUnmount () {
     this.componentUnload()
     window.removeEventListener('beforeunload', this.componentUnload)
-  }
-
-  componentUnload () {
-    const { recordUuidUrlParam, recordLoaded, checkOutRecord, resetForm } = this.props
-
-    if (recordLoaded)
-      checkOutRecord(recordUuidUrlParam)
-
-    resetForm()
   }
 
   render () {

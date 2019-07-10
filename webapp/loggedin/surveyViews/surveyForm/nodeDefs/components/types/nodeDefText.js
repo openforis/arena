@@ -48,7 +48,6 @@ const MultipleTextInput = props => {
               <NodeDeleteButton
                 nodeDef={nodeDef}
                 node={n}
-                disabled={R.isEmpty(Node.getValue(n))}
                 showConfirm={true}
                 removeNode={removeNode}/>
             }
