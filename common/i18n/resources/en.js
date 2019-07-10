@@ -170,10 +170,6 @@ module.exports = {
     languages: 'Language(s)',
   },
 
-  labelsEditor: {
-    label_plural: 'Labels',
-  },
-
   surveyForm: {
     showPageNav: 'Show pages',
     hidePageNav: 'Hide pages',
