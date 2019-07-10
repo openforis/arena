@@ -14,14 +14,22 @@
     }
   }
 
-  .form-input {
-    width: auto !important;
-    border: none !important;
+  .form-input-chip {
+    .form-input {
+      width: auto;
+      border: none;
+
+      .form-input-chip-item {
+        border: 1px solid $blueDark;
+        height: 22px;
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+    }
   }
 
   .dropdown {
-    margin: 0.25rem 0.3rem;
-    min-height: 24px;
+    height: 29px;
   }
 }
 

@@ -3,9 +3,10 @@ import axios from 'axios'
 import * as R from 'ramda'
 import Promise from 'bluebird'
 
-import Dropdown from '../../form/dropdown'
+import NodeDef from '../../../../common/survey/nodeDef'
+import StringUtils from '../../../../common/stringUtils'
 
-const getNodeRawValue = node => node.raw ? JSON.parse(node.raw) : ''
+import Dropdown from '../../form/dropdown'
 
 class Literal extends React.Component {
 
@@ -26,13 +27,17 @@ class Literal extends React.Component {
     return !!this.getSearchParams()
   }
 
+  isValueText (value) {
+    const { nodeDefCurrent } = this.props
+    return !(NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent) || StringUtils.isBlank(value))
+  }
+
   getNodeValue () {
     const rawValue = R.pathOr(null, ['node', 'raw'], this.props)
 
-    return rawValue
-      ? this.hasSearchParams()
-        ? JSON.parse(rawValue) : rawValue
-      : ''
+    return this.isValueText(rawValue)
+      ? JSON.parse(rawValue)
+      : rawValue
   }
 
   async componentDidMount () {
@@ -75,7 +80,9 @@ class Literal extends React.Component {
   onChange (val) {
     const { node, onChange } = this.props
 
-    const value = this.hasSearchParams() ? JSON.stringify(val) : val
+    const value = this.isValueText(val)
+      ? JSON.stringify(val)
+      : val
 
     onChange(R.pipe(
       R.assoc('raw', value),
@@ -97,15 +104,17 @@ class Literal extends React.Component {
                 itemsLookupFunction={this.loadItems.bind(this)}
                 itemKeyProp="key"
                 itemLabelProp="label"
-                onChange={item => this.onChange(item.key)}
-                selection={selection}/>
+                onChange={item => item && this.onChange(item.key)}
+                selection={selection}
+              />
             )
             : (
               <input
                 className="form-input"
                 value={this.getNodeValue()}
                 size={25}
-                onChange={e => this.onChange(e.target.value)}/>
+                onChange={e => this.onChange(e.target.value)}
+              />
             )
 
         }

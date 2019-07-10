@@ -50,12 +50,9 @@ class ExpressionEditorPopup extends React.Component {
     const { query, queryDraft, exprDraft, exprDraftValid } = this.state
 
     const {
-      survey,
-      nodeDefContext,
-      nodeDefCurrent,
-      mode,
-      depth,
-      isBoolean, onChange, onClose,
+      survey, nodeDefContext, nodeDefCurrent,
+      mode, depth, isBoolean,
+      onChange, onClose,
     } = this.props
 
     const { i18n } = this.context
@@ -81,23 +78,27 @@ class ExpressionEditorPopup extends React.Component {
         </div>
 
         <div className="expression-editor-popup__expr-container">
-          <ExpressionNode variables={variables} node={exprDraft}
-                          onChange={this.updateDraft.bind(this)}
-                          isBoolean={isBoolean}
-                          literalSearchParams={literalSearchParams}/>
+          <ExpressionNode
+            variables={variables}
+            node={exprDraft}
+            onChange={this.updateDraft.bind(this)}
+            isBoolean={isBoolean}
+            literalSearchParams={literalSearchParams}
+            nodeDefCurrent={nodeDefCurrent}
+          />
         </div>
 
         <div className="expression-editor-popup__footer">
           <button className="btn btn-xs"
                   onClick={() => onChange('')}
                   aria-disabled={R.isEmpty(query)}>
-            <span className="icon icon-undo2 icon-16px" /> {i18n.t('common.reset')}
+            <span className="icon icon-undo2 icon-16px"/> {i18n.t('common.reset')}
           </button>
 
           <button className="btn btn-xs"
                   onClick={() => onChange(queryDraft, exprDraft)}
                   aria-disabled={query === queryDraft || !exprDraftValid}>
-            <span className="icon icon-checkmark icon-16px" /> {i18n.t('common.apply')}
+            <span className="icon icon-checkmark icon-16px"/> {i18n.t('common.apply')}
           </button>
         </div>
 
