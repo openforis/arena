@@ -46,11 +46,11 @@ const BasicProps = props => {
 
   return (
     <div className="form">
-      <FormItem label={i18n.t('nodeDefEdit.basicProps.type')}>
+      <FormItem label={i18n.t('common.type')}>
         <label>{nodeDef.type}</label>
       </FormItem>
 
-      <FormItem label={i18n.t('nodeDefEdit.basicProps.name')}>
+      <FormItem label={i18n.t('common.name')}>
         <Input
           value={NodeDef.getName(nodeDef)}
           validation={getFieldValidation('name')(validation)}

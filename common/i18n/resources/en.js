@@ -1,39 +1,44 @@
 module.exports = {
 
   common: {
-    name: 'Name',
-    label: 'Label',
     add: 'Add',
-    new: 'New',
-    view: 'View',
-    edit: 'Edit',
-    delete: 'Delete',
-    done: 'Done',
-    close: 'Close',
+    apply: 'Apply',
     cancel: 'Cancel',
+    cantUndoWarning: 'This operation cannot be undone',
+    close: 'Close',
+    code: 'Code',
+    csvExport: 'CSV Export',
+    csvImport: 'CSV Import',
     dateCreated: 'Date created',
     dateLastModified: 'Date last modified',
-    cantUndoWarning: 'This operation cannot be undone',
+    delete: 'Delete',
     description: 'Description',
     description_plural: 'Descriptions',
-    srs: 'SRS',
+    done: 'Done',
+    download: 'Download',
+    edit: 'Edit',
+    empty: 'Empty',
     error: 'error',
     error_plural: 'Errors',
-    item: 'Item',
-    item_plural: 'Items',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
     invalid: 'INVALID',
+    item: 'Item',
+    item_plural: 'Items',
+    label: 'Label',
+    label_plural: 'Labels',
     language: 'Language',
-    code: 'Code',
-    csvImport: 'CSV Import',
-    csvExport: 'CSV Export',
-    undefinedName: 'Undefined name',
-    empty: 'Empty',
-    download: 'Download',
-    upload: 'Upload',
+    manage: 'Manage',
+    name: 'Name',
+    new: 'New',
+    of: 'of',
+    required: 'Required',
     reset: 'Reset',
-    apply: 'Apply',
+    srs: 'SRS',
+    type: 'Type',
+    undefinedName: 'Undefined name',
+    upload: 'Upload',
+    view: 'View',
   },
 
   appModules: {
@@ -115,7 +120,6 @@ module.exports = {
     },
     collectImportReport: {
       path: 'Path',
-      type: 'Type',
       expression: 'Expression',
       messages: 'Messages',
       resolved: 'Resolved',
@@ -132,8 +136,6 @@ module.exports = {
     advanced: 'Advanced',
     validations: 'Validations',
     basicProps: {
-      type: 'Type',
-      name: 'Name',
       key: 'Key',
       multiple: 'Multiple',
       displayAs: 'Display as',
@@ -144,7 +146,7 @@ module.exports = {
       ownPage: 'Its own page',
     },
     advancedProps: {
-      readOnly: 'readOnly',
+      readOnly: 'Read only',
       defaultValues: 'Default values',
       applicableIf: 'Applicable if',
     },
@@ -156,7 +158,6 @@ module.exports = {
     validationsProps: {
       minCount: 'Min count',
       maxCount: 'Max count',
-      required: 'Required',
       expressions: 'Expressions',
     },
   },
@@ -167,10 +168,6 @@ module.exports = {
 
   languagesEditor: {
     languages: 'Language(s)',
-  },
-
-  labelsEditor: {
-    label_plural: 'Labels',
   },
 
   surveyForm: {
@@ -198,7 +195,6 @@ module.exports = {
     nodeDefCoordinate: {
       x: 'X',
       y: 'Y',
-      srs: 'SRS',
     },
     nodeDefEntityForm: {
       confirmDelete: 'Are you sure you want to delete this entity?',
@@ -275,7 +271,7 @@ module.exports = {
     keyword: 'Keyword',
     maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
     minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
-    required: 'Required',
+    required: '$t(common.required)',
     zeroOrNegative: 'Zero or negative',
   },
   jobErrors: {
