@@ -13,7 +13,7 @@ import Validator from '../../../../../../common/validation/validator'
 import * as RecordState from '../../../record/recordState'
 
 const NodeDefErrorBadge = props => {
-  const { edit, nodeDef, validation, container } = props
+  const { nodeDef, validation, container, children } = props
 
   // update parent container invalid class
   const containerEl = container.current
@@ -27,14 +27,23 @@ const NodeDefErrorBadge = props => {
     }
   }
 
-  return (
-    <ErrorBadge
-      validation={validation}
-      showLabel={false}
-      showKeys={false}
-      className="error-badge-inverse"
-    />
-  )
+  const valid = Validator.isValidationValid(validation)
+
+  return valid && children
+    ? (
+      children
+    )
+    : !valid
+      ? (
+        <ErrorBadge
+          validation={validation}
+          showLabel={false}
+          showKeys={false}
+          className="error-badge-inverse survey-form__node-def-error-badge">
+          {children}
+        </ErrorBadge>
+      )
+      : null
 }
 
 const mapStateToProps = (state, props) => {

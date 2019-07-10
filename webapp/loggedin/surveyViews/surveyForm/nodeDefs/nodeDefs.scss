@@ -109,3 +109,17 @@
     }
   }
 }
+
+// error badge
+.survey-form__node-def-error-badge {
+  padding-left: 0;
+
+  .badge__content {
+    display: flex;
+    align-items: center;
+
+    > *:not(:first-child) {
+      margin-left: .5rem;
+    }
+  }
+}
