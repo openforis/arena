@@ -18,7 +18,7 @@ module.exports = {
     download: 'Download',
     edit: 'Edit',
     empty: 'Empty',
-    error: 'error',
+    error: 'Error',
     error_plural: 'Errors',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
@@ -170,6 +170,14 @@ module.exports = {
     languages: 'Language(s)',
   },
 
+  expressionEditor: {
+    and: 'AND',
+    or: 'OR',
+    group: 'Group',
+    var: 'Var',
+    const: 'Const',
+  },
+
   surveyForm: {
     showPageNav: 'Show pages',
     hidePageNav: 'Hide pages',
@@ -199,9 +207,6 @@ module.exports = {
     nodeDefEntityForm: {
       confirmDelete: 'Are you sure you want to delete this entity?',
       select: 'Select',
-    },
-    nodeDefEntityTable: {
-      noDataAdded: 'No data added',
     },
     nodeDefTaxon: {
       scientificName: 'Scientific Name',
@@ -267,6 +272,7 @@ module.exports = {
     exceedingMax: 'Exceeding max',
     invalidName: 'Invalid name',
     invalidNumber: 'Invalid number',
+    invalidType: 'Invalid type',
     invalidValue: 'Invalid value',
     keyword: 'Keyword',
     maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
@@ -274,6 +280,7 @@ module.exports = {
     required: '$t(common.required)',
     zeroOrNegative: 'Zero or negative',
   },
+
   jobErrors: {
     generic: '{{text}}',
     empty: '$t(common.empty)',
@@ -281,6 +288,7 @@ module.exports = {
     duplicateName: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
     duplicateCode: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
   },
+
   appErrors: {
     generic: '{{text}}',
     userNotAuthorized: 'User {{userName}} is not authorized',
@@ -288,7 +296,7 @@ module.exports = {
     unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
     jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
     entryDataNotFound: 'Entry data not found: {{entryName}}',
-    invalidType: 'invalid type {{type}}',
+    invalidType: 'Invalid type {{type}}',
     unableToFindParent: 'Unable to find parent of {{name}}',
     unableToFindNode: 'Unable to find node with name {{name}}',
     cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
@@ -299,11 +307,7 @@ module.exports = {
     paramIsRequired: 'Param {{param}} is required',
   },
 
-  expressionEditor: {
-    and: 'AND',
-    or: 'OR',
-    group: 'Group',
-    var: 'Var',
-    const: 'Const',
+  systemErrors: {
+    somethingWentWrong: 'Oooops! Something went wrong. Try to refresh the page.'
   }
 }

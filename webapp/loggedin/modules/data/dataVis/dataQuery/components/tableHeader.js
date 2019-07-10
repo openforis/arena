@@ -41,7 +41,7 @@ const TableHeader = props => {
   const csvDownloadLink = `/api/surveyRdb/${surveyId}/${tableName}/export?filter=${JSON.stringify(filter)}&sort=${DataSort.toHttpParams(sort)}&cols=${JSON.stringify(colNames)}`
 
   const i18n = useI18n()
-  const sortMsg = DataSort.getViewExpr(i18n.t('data.dataVis.dataSort.ascending'), i18n.t('dataVis.dataQuery.descending'))(sort)
+  const sortMsg = DataSort.getViewExpr(i18n.t('data.dataVis.dataSort.ascending'), i18n.t('data.dataVis.dataSort.descending'))(sort)
 
 
   return (
