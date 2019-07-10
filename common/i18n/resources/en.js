@@ -26,6 +26,7 @@ module.exports = {
     item: 'Item',
     item_plural: 'Items',
     label: 'Label',
+    label_plural: 'Labels',
     language: 'Language',
     manage: 'Manage',
     name: 'Name',
