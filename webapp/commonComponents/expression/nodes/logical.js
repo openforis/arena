@@ -40,7 +40,7 @@ const Logical = (props) => {
                   type: Expression.types.GroupExpression,
                   argument: node,
                 })}>
-          group ()
+          {i18n.t('expressionEditor.group')} ()
         </button>
       </div>
 

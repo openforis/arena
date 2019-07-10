@@ -2,6 +2,7 @@ module.exports = {
 
   common: {
     add: 'Add',
+    apply: 'Apply',
     cancel: 'Cancel',
     cantUndoWarning: 'This operation cannot be undone',
     close: 'Close',
@@ -31,6 +32,7 @@ module.exports = {
     new: 'New',
     of: 'of',
     required: 'Required',
+    reset: 'Reset',
     srs: 'SRS',
     type: 'Type',
     undefinedName: 'Undefined name',
@@ -303,6 +305,7 @@ module.exports = {
   expressionEditor: {
     and: 'AND',
     or: 'OR',
+    group: 'Group',
     var: 'Var',
     const: 'Const',
   }
