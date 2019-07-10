@@ -32,6 +32,8 @@ module.exports = {
     empty: 'Empty',
     download: 'Download',
     upload: 'Upload',
+    reset: 'Reset',
+    apply: 'Apply',
   },
 
   appModules: {
@@ -304,6 +306,7 @@ module.exports = {
   expressionEditor: {
     and: 'AND',
     or: 'OR',
+    group: 'Group',
     var: 'Var',
     const: 'Const',
   }
