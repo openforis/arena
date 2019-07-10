@@ -58,7 +58,8 @@ class ExpressionEditorPopup extends React.Component {
       isBoolean, onChange, onClose,
     } = this.props
 
-    const { i18n: { lang } } = this.context
+    const { i18n } = this.context
+    const { lang } = i18n
 
     const literalSearchParams = ExpressionParser.getLiteralSearchParams(survey, nodeDefCurrent, lang)
     const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
@@ -73,7 +74,7 @@ class ExpressionEditorPopup extends React.Component {
           <div className={`query${exprDraftValid ? '' : ' invalid'}`}>
             {
               R.isEmpty(queryDraft)
-                ? <span className="placeholder">- empty -</span>
+                ? <span className="placeholder">- {i18n.t('common.empty')} -</span>
                 : queryDraft
             }
           </div>

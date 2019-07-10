@@ -3,12 +3,16 @@ import * as R from 'ramda'
 
 import Expression from '../../../../common/exprParser/expression'
 
+import useI18n from '../../useI18n'
+
 import ExpressionNode from './expressionNode'
 
 const Logical = (props) => {
   const { node, onChange, canDelete = false } = props
   const { left, right, operator } = node
   const { logical } = Expression.operators
+
+  const i18n = useI18n()
 
   return (
     <div className="logical">
@@ -23,11 +27,11 @@ const Logical = (props) => {
         <div className="btns__add">
           <button className={`btn btn-s${operator === logical.or.key ? ' active' : ''}`}
                   onClick={() => onChange(R.assoc('operator', logical.or.key, node))}>
-            OR
+            {i18n.t('expressionEditor.or')}
           </button>
           <button className={`btn btn-s${operator === logical.and.key ? ' active' : ''}`}
                   onClick={() => onChange(R.assoc('operator', logical.and.key, node))}>
-            AND
+            {i18n.t('expressionEditor.and')}
           </button>
         </div>
 

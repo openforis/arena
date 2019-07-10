@@ -300,4 +300,11 @@ module.exports = {
     userNotAllowedToChangePref: 'User not allowed to change pref',
     paramIsRequired: 'Param {{param}} is required',
   },
+
+  expressionEditor: {
+    and: 'AND',
+    or: 'OR',
+    var: 'Var',
+    const: 'Const',
+  }
 }
