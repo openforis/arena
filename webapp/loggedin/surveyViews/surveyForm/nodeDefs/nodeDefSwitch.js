@@ -8,7 +8,6 @@ import NodeDefFormItem from './components/nodeDefFormItem'
 import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
 import NodeDefTableCellBody from './components/nodeDefTableCellBody'
 import NodeDefEditButtons from './components/nodeDefEditButtons'
-import NodeDefErrorBadge from './components/nodeDefErrorBadge'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'
@@ -61,7 +60,6 @@ class NodeDefSwitch extends React.Component {
       nodeDef, label,
       edit, canEditDef,
       renderType, applicable,
-      parentNode, nodes,
     } = this.props
 
     const isPage = !!NodeDefLayout.getPageUuid(nodeDef)
@@ -72,14 +70,6 @@ class NodeDefSwitch extends React.Component {
 
     return (
       <div className={className} ref={this.element}>
-
-        <NodeDefErrorBadge
-          nodeDef={nodeDef}
-          edit={edit}
-          parentNode={parentNode}
-          nodes={nodes}
-          container={this.element}
-        />
 
         <NodeDefEditButtons
           nodeDef={nodeDef}
@@ -116,7 +106,6 @@ const mapStateToProps = (state, props) => {
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
-
   const label = SurveyState.getNodeDefLabel(nodeDef)(state)
 
   const mapEntryProps = () => {

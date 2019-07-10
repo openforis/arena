@@ -53,7 +53,7 @@
   > :nth-child(1).form-label {
     align-self: end;
     justify-self: auto;
-    padding: .5rem 2rem;
+    padding: .5rem 1rem;
     font-weight: 600;
     text-align: left;
     text-transform: uppercase;
@@ -102,10 +102,52 @@
   }
 }
 
-.survey-form__node-def-invalid {
-  .survey-form__node-def-form-item {
-    > :nth-child(1).form-label {
-      color: $red;
+// error badge
+.survey-form__node-def-error-badge {
+  padding-left: 0;
+
+  .badge__content {
+    display: flex;
+    align-items: center;
+
+    > *:not(:first-child) {
+      margin-left: 10px;
+    }
+  }
+}
+
+.survey-form__node-def-form-item {
+  .survey-form__node-def-error-badge {
+    padding-bottom: 0;
+    position: relative;
+  }
+}
+
+.survey-form__node-def-text-multiple-container {
+  .survey-form__node-def-error-badge {
+    position: absolute;
+  }
+}
+
+.survey-form__node-def-entity-table-row {
+  .survey-form__node-def-error-badge {
+    padding: 0;
+    height: 100%;
+    width: 100%;
+
+    .badge__content {
+      height: 100%;
+      font-weight: 400;
+
+      > *:first-child {
+        width: 100%;
+        height: 100%;
+      }
+
+      .icon-warning {
+        position: absolute;
+        left: -.5rem;
+      }
     }
   }
 }

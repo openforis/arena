@@ -3,13 +3,12 @@ import './nodeDefEntityTable.scss'
 import React, { useEffect } from 'react'
 import * as R from 'ramda'
 
-import useI18n from '../../../../../../commonComponents/useI18n'
-
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 import Node from '../../../../../../../common/record/node'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
+import NodeDefErrorBadge from '../nodeDefErrorBadge'
 
 const NodeDefEntityTable = props => {
 
@@ -19,8 +18,6 @@ const NodeDefEntityTable = props => {
     updateNode,
     canEditRecord, canAddNode,
   } = props
-
-  const i18n = useI18n()
 
   useEffect(() => {
     if (!R.isEmpty(nodes)) {
@@ -33,20 +30,26 @@ const NodeDefEntityTable = props => {
     <div className="survey-form__node-def-entity-table">
 
       <div className="survey-form__node-def-entity-table-header">
-        <div>{label}</div>
+        <NodeDefErrorBadge
+          nodeDef={nodeDef}
+          edit={edit}
+          parentNode={parentNode}
+          nodes={nodes}>
 
-        {
-          entry && canEditRecord &&
-          <button className="btn btn-xs btn-add"
-                  onClick={() => {
-                    const entity = Node.newNodePlaceholder(nodeDef, parentNode)
-                    updateNode(nodeDef, entity)
-                  }}
-                  aria-disabled={!canAddNode}>
-            <span className="icon icon-plus icon-10px"/>
-          </button>
-        }
+          <div>{label}</div>
 
+          {
+            entry && canEditRecord &&
+            <button className="btn btn-xs btn-add"
+                    onClick={() => {
+                      const entity = Node.newNodePlaceholder(nodeDef, parentNode)
+                      updateNode(nodeDef, entity)
+                    }}
+                    aria-disabled={!canAddNode}>
+              <span className="icon icon-plus icon-10px"/>
+            </button>
+          }
+        </NodeDefErrorBadge>
       </div>
 
 

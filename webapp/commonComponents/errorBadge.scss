@@ -8,9 +8,10 @@
 
 .error-badge-inverse {
   background-color: transparent;
+  color: $red;
 
-  .icon {
-    color: $red;
+  .icon-warning {
     font-weight: bold;
+    color: $red;
   }
 }

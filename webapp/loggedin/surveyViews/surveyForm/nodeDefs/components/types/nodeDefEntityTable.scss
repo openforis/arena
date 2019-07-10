@@ -14,7 +14,7 @@
   align-self: center;
   display: flex;
   align-items: center;
-  padding: .5rem 2rem;
+  padding: .5rem 1rem;
   font-weight: 600;
   text-align: left;
   text-transform: uppercase;
@@ -76,6 +76,7 @@
 .survey-form__node-def-entity-table-row {
   position: relative;
   display: flex;
+  min-height: calc(#{$formTableRowHeaderHeight - 10px});
 
   .form-input {
     border: none;
@@ -97,10 +98,6 @@
     .react-grid-item {
       border-top: $formBorder;
     }
-  }
-
-  .error-badge {
-    left: -.5rem;
   }
 
 }

@@ -29,6 +29,8 @@ export const openSocket = async (throwErrorFn) => {
 
 export const on = (eventName, eventHandler) => socket && socket.on(eventName, eventHandler)
 
+export const off = (eventName) => socket && socket.off(eventName)
+
 export const closeSocket = () => {
   if (socket) {
     socket.close()

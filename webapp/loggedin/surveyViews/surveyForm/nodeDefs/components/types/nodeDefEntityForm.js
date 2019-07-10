@@ -14,8 +14,6 @@ import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../../common/record/record'
 import Node from '../../../../../../../common/record/node'
-import Validator from '../../../../../../../common/validation/validator'
-
 import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
 import { setFormPageNode, getNodeKeyLabelValues } from '../../../../surveyForm/actions'
@@ -203,12 +201,6 @@ const NodeSelect = props => {
 
 class NodeDefEntityForm extends React.Component {
 
-  constructor (props) {
-    super(props)
-
-    this.formWrapper = React.createRef()
-  }
-
   checkNodePage () {
     const { nodeDef, setFormPageNode, nodes, entry } = this.props
 
@@ -235,68 +227,81 @@ class NodeDefEntityForm extends React.Component {
 
   render () {
     const {
-      nodeDef, label,
-      edit, entry,
-      parentNode, nodes,
-
-      setFormPageNode,
-      selectedNode,
-      getNodeKeyLabelValues,
+      nodeDef,
+      edit, entry, entryMultiple,
+      parentNode, nodes, selectedNode,
+      setFormPageNode, getNodeKeyLabelValues,
     } = this.props
 
-    return entry && NodeDef.isMultiple(nodeDef)
-      ? (
-        <div ref={this.formWrapper}>
-          <NodeDefErrorBadge
-            nodeDef={nodeDef}
-            edit={edit}
-            parentNode={parentNode}
-            nodes={nodes}
-            container={this.formWrapper}/>
+    return (
+      <div>
 
+        <NodeDefErrorBadge
+          nodeDef={nodeDef}
+          edit={edit}
+          parentNode={parentNode}
+          nodes={nodes}
+        />
+
+        {
+          entryMultiple &&
           <NodeSelect
             {...this.props}
             selectedNode={selectedNode}
             getNodeKeyLabelValues={getNodeKeyLabelValues}
-            onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}/>
+            onChange={selectedNodeUuid => setFormPageNode(nodeDef, selectedNodeUuid)}
+          />
+        }
 
-          {
-            selectedNode
-              ? <EntityForm {...this.props} node={selectedNode}/>
-              : null
-          }
-        </div>
-      )
-      : (
-        <EntityForm
-          {...this.props}
-          node={entry ? nodes[0] : null}
-        />
-      )
+        {
+          entry && selectedNode &&
+          <EntityForm {...this.props} node={selectedNode}/>
+        }
+
+        {
+          edit &&
+          <EntityForm {...this.props} node={null}/>
+        }
+
+      </div>
+    )
 
   }
 }
 
+NodeDefEntityForm.defaultProps = {
+  nodeDef: null,
+  // entry props
+  entry: false,
+  entryMultiple: false,
+  nodes: null,
+  selectedNode: null,
+}
+
 const mapStateToProps = (state, props) => {
-  const { nodeDef, nodes } = props
+  const { nodeDef, nodes, entry } = props
 
-  const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
-  const record = RecordState.getRecord(state)
+  const getEntryProps = () => {
+    const entryMultiple = NodeDef.isMultiple(nodeDef)
+    const record = RecordState.getRecord(state)
 
-  const selectedNode = selectedNodeUuid && nodes
-    ? R.find(R.propEq('uuid', selectedNodeUuid), nodes)
-    : null
+    const selectedNodeUuid = entryMultiple
+      ? SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
+      : Node.getUuid(nodes[0])
 
-  const recordValidation = Record.getValidation(record)
+    const selectedNode = selectedNodeUuid
+      ? Record.getNodeByUuid(selectedNodeUuid)(record)
+      : null
 
-  const validation = NodeDef.isEntity(nodeDef)
-    ? Validator.getFieldValidation(selectedNodeUuid)(recordValidation)
-    : {}
-
-  return {
-    selectedNode,
-    validation,
+    return {
+      entryMultiple,
+      selectedNode,
+    }
   }
+
+  return entry
+    ? getEntryProps()
+    : {}
 }
 
 export default connect(

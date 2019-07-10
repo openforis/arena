@@ -160,7 +160,7 @@ const mapStateToProps = state => {
   const isEntityAndNotRoot = NodeDef.isEntity(nodeDef) && !NodeDef.isRoot(nodeDef)
 
   const displayAsFormDisabled = false
-  const displayAsTableDisabled = isEntityAndNotRoot && Survey.hasNodeDefChildrenEntities(nodeDef)(survey)
+  const displayAsTableDisabled = Survey.hasNodeDefChildrenEntities(nodeDef)(survey) || NodeDef.isSingle(nodeDef)
 
   const displayInParentPageDisabled = NodeDefLayout.isRenderForm(nodeDef)
   const displayInOwnPageDisabled = false
