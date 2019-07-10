@@ -103,7 +103,7 @@ export const nodeDefUIProps = {
     formFields: [
       { field: 'x', labelKey: 'surveyForm.nodeDefCoordinate.x' },
       { field: 'y', labelKey: 'surveyForm.nodeDefCoordinate.y' },
-      { field: 'srs', labelKey: 'surveyForm.nodeDefCoordinate.srs' },
+      { field: 'srs', labelKey: 'common.srs' },
     ],
   },
 

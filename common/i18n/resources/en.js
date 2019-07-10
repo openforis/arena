@@ -30,7 +30,9 @@ module.exports = {
     name: 'Name',
     new: 'New',
     of: 'of',
+    required: 'Required',
     srs: 'SRS',
+    type: 'Type',
     undefinedName: 'Undefined name',
     upload: 'Upload',
     view: 'View',
@@ -115,7 +117,6 @@ module.exports = {
     },
     collectImportReport: {
       path: 'Path',
-      type: 'Type',
       expression: 'Expression',
       messages: 'Messages',
       resolved: 'Resolved',
@@ -132,8 +133,6 @@ module.exports = {
     advanced: 'Advanced',
     validations: 'Validations',
     basicProps: {
-      type: 'Type',
-      name: 'Name',
       key: 'Key',
       multiple: 'Multiple',
       displayAs: 'Display as',
@@ -144,7 +143,7 @@ module.exports = {
       ownPage: 'Its own page',
     },
     advancedProps: {
-      readOnly: 'readOnly',
+      readOnly: 'Read only',
       defaultValues: 'Default values',
       applicableIf: 'Applicable if',
     },
@@ -156,7 +155,6 @@ module.exports = {
     validationsProps: {
       minCount: 'Min count',
       maxCount: 'Max count',
-      required: 'Required',
       expressions: 'Expressions',
     },
   },
@@ -198,7 +196,6 @@ module.exports = {
     nodeDefCoordinate: {
       x: 'X',
       y: 'Y',
-      srs: 'SRS',
     },
     nodeDefEntityForm: {
       confirmDelete: 'Are you sure you want to delete this entity?',
@@ -275,7 +272,7 @@ module.exports = {
     keyword: 'Keyword',
     maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
     minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
-    required: 'Required',
+    required: '$t(common.required)',
     zeroOrNegative: 'Zero or negative',
   },
   jobErrors: {

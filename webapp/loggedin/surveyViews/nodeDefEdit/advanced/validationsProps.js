@@ -69,7 +69,7 @@ const ValidationsProps = props => {
           )
           : !NodeDef.isKey(nodeDef)
           ? (
-            <FormItem label={i18n.t('nodeDefEdit.validationsProps.required')}>
+            <FormItem label={i18n.t('common.required')}>
               <Checkbox checked={NodeDefValidations.isRequired(nodeDefValidations)}
                         disabled={readOnly}
                         onChange={checked => handleValidationsUpdate(
