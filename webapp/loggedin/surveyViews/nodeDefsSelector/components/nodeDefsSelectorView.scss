@@ -33,6 +33,10 @@
     display: flex;
     justify-content: space-between;
     margin: 0 .5rem;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px dotted $greyBorder;
 
     &.active {
       pointer-events: auto;
