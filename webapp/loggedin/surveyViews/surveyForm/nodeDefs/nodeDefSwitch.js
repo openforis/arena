@@ -73,13 +73,13 @@ class NodeDefSwitch extends React.Component {
     return (
       <div className={className} ref={this.element}>
 
-        <NodeDefErrorBadge
-          nodeDef={nodeDef}
-          edit={edit}
-          parentNode={parentNode}
-          nodes={nodes}
-          container={this.element}
-        />
+        {/*<NodeDefErrorBadge*/}
+        {/*  nodeDef={nodeDef}*/}
+        {/*  edit={edit}*/}
+        {/*  parentNode={parentNode}*/}
+        {/*  nodes={nodes}*/}
+        {/*  container={this.element}*/}
+        {/*/>*/}
 
         <NodeDefEditButtons
           nodeDef={nodeDef}
@@ -116,7 +116,6 @@ const mapStateToProps = (state, props) => {
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
-
   const label = SurveyState.getNodeDefLabel(nodeDef)(state)
 
   const mapEntryProps = () => {
