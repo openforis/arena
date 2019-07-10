@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React from 'react'
 
 import { FormItem } from '../../../../../commonComponents/form/input'
 
@@ -13,25 +13,22 @@ const NodeDefFormItemLabel = props => {
     parentNode, nodes,
   } = props
 
-  const elementRef = useRef(null)
-
   return (
-    <div ref={elementRef}>
-      <NodeDefErrorBadge
-        nodeDef={nodeDef}
-        edit={edit}
-        parentNode={parentNode}
-        nodes={nodes}
-        container={elementRef}>
-        <div>
-          {
-            NodeDef.isKey(nodeDef) &&
-            <span className="icon icon-key2 icon-10px icon-left node-def__icon-key"/>
-          }
-          {label}
-        </div>
-      </NodeDefErrorBadge>
-    </div>
+    <NodeDefErrorBadge
+      nodeDef={nodeDef}
+      edit={edit}
+      parentNode={parentNode}
+      nodes={nodes}>
+
+      <div>
+        {
+          NodeDef.isKey(nodeDef) &&
+          <span className="icon icon-key2 icon-10px icon-left node-def__icon-key"/>
+        }
+        {label}
+      </div>
+
+    </NodeDefErrorBadge>
   )
 }
 

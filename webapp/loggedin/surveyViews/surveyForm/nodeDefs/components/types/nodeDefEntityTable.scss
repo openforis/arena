@@ -76,6 +76,7 @@
 .survey-form__node-def-entity-table-row {
   position: relative;
   display: flex;
+  min-height: calc(#{$formTableRowHeaderHeight - 10px});
 
   .form-input {
     border: none;
@@ -97,10 +98,6 @@
     .react-grid-item {
       border-top: $formBorder;
     }
-  }
-
-  .error-badge {
-    left: -.5rem;
   }
 
 }

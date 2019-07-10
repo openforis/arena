@@ -1,6 +1,6 @@
 import './nodeDefEntityTable.scss'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import * as R from 'ramda'
 
 import NodeDef from '../../../../../../../common/survey/nodeDef'
@@ -26,19 +26,15 @@ const NodeDefEntityTable = props => {
     }
   }, [nodes && nodes.length])
 
-  const elementRef = useRef(null)
-
   return (
-    <div className="survey-form__node-def-entity-table"
-         ref={elementRef}>
+    <div className="survey-form__node-def-entity-table">
 
       <div className="survey-form__node-def-entity-table-header">
         <NodeDefErrorBadge
           nodeDef={nodeDef}
           edit={edit}
           parentNode={parentNode}
-          nodes={nodes}
-          container={elementRef}>
+          nodes={nodes}>
 
           <div>{label}</div>
 

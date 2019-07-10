@@ -201,12 +201,6 @@ const NodeSelect = props => {
 
 class NodeDefEntityForm extends React.Component {
 
-  constructor (props) {
-    super(props)
-
-    this.formWrapper = React.createRef()
-  }
-
   checkNodePage () {
     const { nodeDef, setFormPageNode, nodes, entry } = this.props
 
@@ -240,14 +234,13 @@ class NodeDefEntityForm extends React.Component {
     } = this.props
 
     return (
-      <div ref={this.formWrapper}>
+      <div>
 
         <NodeDefErrorBadge
           nodeDef={nodeDef}
           edit={edit}
           parentNode={parentNode}
           nodes={nodes}
-          container={this.formWrapper}
         />
 
         {

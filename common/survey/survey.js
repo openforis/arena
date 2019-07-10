@@ -36,6 +36,7 @@ module.exports = {
 
   // READ
   getId: R.pipe(SurveyInfo.getInfo, SurveyInfo.getId),
+  getIdSurveyInfo: SurveyInfo.getId,
   getSurveyInfo: SurveyInfo.getInfo,
 
   // === context is surveyInfo

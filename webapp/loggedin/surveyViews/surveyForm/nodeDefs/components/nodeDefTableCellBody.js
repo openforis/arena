@@ -15,39 +15,40 @@ import CategoryItem from '../../../../../../common/survey/categoryItem'
 import Node from '../../../../../../common/record/node'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
+import NodeDefErrorBadge from './nodeDefErrorBadge'
 
 const getNodeValues = async (surveyInfo, nodeDef, nodes, lang) => {
-  const nonEmptyNodes = R.pipe(
-    R.reject(Node.isPlaceholder),
-    R.reject(Node.isValueBlank),
-  )(nodes)
 
-  const stringNodeValues = await Promise.all(
-    nonEmptyNodes.map(
-      async node => {
-        if (NodeDef.isCode(nodeDef)) {
-          const item = await loadCategoryItem(surveyInfo, Node.getCategoryItemUuid(node))
-          const label = CategoryItem.getLabel(lang)(item)
-          return label || CategoryItem.getCode(item)
-        } else if (NodeDef.isFile(nodeDef)) {
-          return Node.getFileName(node)
-        } else {
-          return Node.getValue(node)
-        }
-      }
-    )
+  const getNodeValue = async node => {
+    if (NodeDef.isCode(nodeDef)) {
+      const item = await loadCategoryItem(surveyInfo, Node.getCategoryItemUuid(node))
+      const label = CategoryItem.getLabel(lang)(item)
+      return label || CategoryItem.getCode(item)
+    } else if (NodeDef.isFile(nodeDef)) {
+      return Node.getFileName(node)
+    } else {
+      return Node.getValue(node)
+    }
+  }
+
+  const nodeValues = await Promise.all(
+    R.pipe(
+      R.reject(n => Node.isPlaceholder(n) || Node.isValueBlank(n)),
+      R.map(getNodeValue)
+    )(nodes)
   )
 
-  return R.join(', ', stringNodeValues)
+  return R.join(', ', nodeValues)
 }
 
 const loadCategoryItem = async (surveyInfo, itemUuid) => {
-  const { data } = await axios.get(`/api/survey/${surveyInfo.id}/categories/items/${itemUuid}`, {
+  const config = {
     params: {
       draft: Survey.isDraft(surveyInfo)
     }
-  })
-  return data.item
+  }
+  const { data: { item } } = await axios.get(`/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/categories/items/${itemUuid}`, config)
+  return item
 }
 
 class NodeDefMultipleTableCell extends React.Component {
@@ -86,18 +87,23 @@ class NodeDefMultipleTableCell extends React.Component {
 
   render () {
     const { canEditRecord } = this.props
+    const { showEditDialog, nodeValues } = this.state
 
-    return this.state.showEditDialog
+    return showEditDialog
       ? (
         ReactDOM.createPortal(
-          <NodeDefMultipleEditDialog {...this.props}
-                                     onClose={() => this.setShowEditDialog(false)}/>,
+          <NodeDefMultipleEditDialog
+            {...this.props}
+            onClose={() => this.setShowEditDialog(false)}
+          />,
           document.body
         )
       )
       : (
         <div className="survey-form__node-def-table-cell-body-multiple">
-          <span className="values-summary">{this.state.nodeValues}</span>
+          <span className="values-summary">
+            {nodeValues}
+          </span>
           <button className="btn-s"
                   onClick={() => this.setShowEditDialog(true)}>
             <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`}/>
@@ -108,19 +114,34 @@ class NodeDefMultipleTableCell extends React.Component {
 }
 
 const NodeDefTableCellBody = props => {
-  const { nodeDef, surveyInfo } = props
+  const {
+    surveyInfo, nodeDef,
+    parentNode, nodes, edit,
+  } = props
   const surveyLanguage = Survey.getLanguage(useI18n().lang)(surveyInfo)
 
-  return NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
-    ? (
-      <NodeDefMultipleTableCell
-        {...props}
-        lang={surveyLanguage}
-      />
-    )
-    : (
-      React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
-    )
+  return (
+    <NodeDefErrorBadge
+      nodeDef={nodeDef}
+      parentNode={parentNode}
+      nodes={nodes}
+      edit={edit}>
+
+      {
+        NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
+          ? (
+            <NodeDefMultipleTableCell
+              {...props}
+              lang={surveyLanguage}
+            />
+          )
+          : (
+            React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
+          )
+      }
+
+    </NodeDefErrorBadge>
+  )
 
 }
 

@@ -24,32 +24,33 @@ const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord })
 
 const MultipleTextInput = props => {
   const { nodeDef, parentNode, nodes, removeNode, canEditRecord } = props
-  const multipleNodesWrapper = React.createRef()
 
   return (
     <div>
       {
         nodes.map(n =>
           (!Node.isPlaceholder(n) || canEditRecord) &&
-          <div key={`nodeDefTextInput_${Node.getUuid(n)}`}
-               className={`survey-form__node-def-${NodeDef.getType(nodeDef)} survey-form__node-def-text-multiple-container`}
-               ref={multipleNodesWrapper}>
+          <div key={Node.getUuid(n)}
+               className={`survey-form__node-def-${NodeDef.getType(nodeDef)} survey-form__node-def-text-multiple-container`}>
 
-            <NodeDefErrorBadge nodeDef={nodeDef}
-                               edit={false}
-                               parentNode={parentNode}
-                               node={n}
-                               container={multipleNodesWrapper}/>
+            <NodeDefErrorBadge
+              nodeDef={nodeDef}
+              edit={false}
+              parentNode={parentNode}
+              node={n}
+            />
 
             <TextInput {...props}
                        node={n}/>
 
-            {!n.placeholder && NodeDef.isMultiple(nodeDef) && canEditRecord &&
-            <NodeDeleteButton nodeDef={nodeDef}
-                              node={n}
-                              disabled={R.isEmpty(Node.getValue(n))}
-                              showConfirm={true}
-                              removeNode={removeNode}/>
+            {
+              !n.placeholder && NodeDef.isMultiple(nodeDef) && canEditRecord &&
+              <NodeDeleteButton
+                nodeDef={nodeDef}
+                node={n}
+                disabled={R.isEmpty(Node.getValue(n))}
+                showConfirm={true}
+                removeNode={removeNode}/>
             }
 
           </div>

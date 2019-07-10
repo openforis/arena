@@ -102,14 +102,6 @@
   }
 }
 
-.survey-form__node-def-invalid {
-  .survey-form__node-def-form-item {
-    > :nth-child(1).form-label {
-      color: $red;
-    }
-  }
-}
-
 // error badge
 .survey-form__node-def-error-badge {
   padding-left: 0;
@@ -134,5 +126,28 @@
 .survey-form__node-def-text-multiple-container {
   .survey-form__node-def-error-badge {
     position: absolute;
+  }
+}
+
+.survey-form__node-def-entity-table-row {
+  .survey-form__node-def-error-badge {
+    padding: 0;
+    height: 100%;
+    width: 100%;
+
+    .badge__content {
+      height: 100%;
+      font-weight: 400;
+
+      > *:first-child {
+        width: 100%;
+        height: 100%;
+      }
+
+      .icon-warning {
+        position: absolute;
+        left: -.5rem;
+      }
+    }
   }
 }

@@ -13,19 +13,7 @@ import Validator from '../../../../../../common/validation/validator'
 import * as RecordState from '../../../record/recordState'
 
 const NodeDefErrorBadge = props => {
-  const { nodeDef, validation, container, children } = props
-
-  // update parent container invalid class
-  const containerEl = container.current
-
-  const canToggleClass = NodeDef.isAttribute(nodeDef) && containerEl
-  if (canToggleClass) {
-    if (Validator.isValidationValid(validation)) {
-      containerEl.parentNode.classList.remove('survey-form__node-def-invalid')
-    } else {
-      containerEl.parentNode.classList.add('survey-form__node-def-invalid')
-    }
-  }
+  const { validation, children } = props
 
   const valid = Validator.isValidationValid(validation)
 
@@ -44,6 +32,14 @@ const NodeDefErrorBadge = props => {
         </ErrorBadge>
       )
       : null
+}
+
+NodeDefErrorBadge.defaultProps = {
+  nodeDef: null,
+  parentNode: null,
+  nodes: null,
+  node: null, // passed when validating a single node of a nodeDef multiple
+  edit: false,
 }
 
 const mapStateToProps = (state, props) => {
@@ -76,12 +72,4 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-NodeDefErrorBadge.defaultProps = {
-  nodes: null,
-  // singe node is passed in nodeDefText Multiple
-  node: null,
-}
-
-export default connect(
-  mapStateToProps,
-)(NodeDefErrorBadge)
+export default connect(mapStateToProps)(NodeDefErrorBadge)
