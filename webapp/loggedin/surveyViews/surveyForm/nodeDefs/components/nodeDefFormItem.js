@@ -1,14 +1,15 @@
 import React from 'react'
 
 import { FormItem } from '../../../../../commonComponents/form/input'
-import { getNodeDefComponent } from '../nodeDefSystemProps'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
+
+import * as NodeDefUiProps from '../nodeDefUIProps'
 
 const NodeDefFormItem = props => {
   const { nodeDef, label, entry } = props
 
-  const nodeDefComponent = React.createElement(getNodeDefComponent(nodeDef), { ...props })
+  const nodeDefComponent = React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
 
   const labelComponent = <div>
     {

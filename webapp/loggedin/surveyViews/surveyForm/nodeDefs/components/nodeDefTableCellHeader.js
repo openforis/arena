@@ -4,7 +4,7 @@ import React from 'react'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
 
-import * as NodeDefUiProps from '../nodeDefSystemProps'
+import * as NodeDefUiProps from '../nodeDefUIProps'
 
 import useI18n from '../../../../../commonComponents/useI18n'
 

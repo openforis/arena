@@ -8,7 +8,7 @@ import useI18n from '../../../../commonComponents/useI18n'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
-import * as NodeDefUIProps from '../nodeDefs/nodeDefSystemProps'
+import * as NodeDefUIProps from '../nodeDefs/nodeDefUIProps'
 
 import * as SurveyFormState from '../surveyFormState'
 import * as SurveyState from '../../../../survey/surveyState'

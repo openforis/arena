@@ -3,10 +3,9 @@ import React from 'react'
 import NodeDefSwitch from '../../nodeDefSwitch'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
-import * as NodeDefUiProps from '../../nodeDefSystemProps'
-
 import NodeDef from '../../../../../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
+import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 import { elementOffset } from '../../../../../../../webapp/utils/domUtils'
 

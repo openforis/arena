@@ -7,15 +7,14 @@ import axios from 'axios'
 import Promise from 'bluebird'
 
 import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
+import useI18n from '../../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import CategoryItem from '../../../../../../common/survey/categoryItem'
 import Node from '../../../../../../common/record/node'
 
-import { getNodeDefComponent } from '../nodeDefSystemProps'
-
-import useI18n from '../../../../../commonComponents/useI18n'
+import * as NodeDefUiProps from '../nodeDefUIProps'
 
 const getNodeValues = async (surveyInfo, nodeDef, nodes, lang) => {
   const nonEmptyNodes = R.pipe(
@@ -120,7 +119,7 @@ const NodeDefTableCellBody = props => {
       />
     )
     : (
-      React.createElement(getNodeDefComponent(nodeDef), { ...props })
+      React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
     )
 
 }

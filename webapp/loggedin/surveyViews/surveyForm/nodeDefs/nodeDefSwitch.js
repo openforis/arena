@@ -20,7 +20,7 @@ import Layout from '../../../../../common/survey/nodeDefLayout'
 import * as SurveyState from '../../../../survey/surveyState'
 import * as RecordState from '../../record/recordState'
 
-import { getNodeDefDefaultValue } from './nodeDefSystemProps'
+import * as NodeDefUiProps from './nodeDefUIProps'
 
 // edit actions
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
@@ -39,7 +39,7 @@ class NodeDefSwitch extends React.Component {
     const { nodes, nodeDef, parentNode, createNodePlaceholder, canAddNode } = this.props
 
     if (parentNode && canAddNode && NodeDef.isAttribute(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
-      createNodePlaceholder(nodeDef, parentNode, getNodeDefDefaultValue(nodeDef))
+      createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getNodeDefDefaultValue(nodeDef))
     }
   }
 

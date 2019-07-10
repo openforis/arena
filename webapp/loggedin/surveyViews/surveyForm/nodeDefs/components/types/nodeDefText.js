@@ -4,20 +4,18 @@ import React from 'react'
 import * as R from 'ramda'
 
 import { Input } from '../../../../../../commonComponents/form/input'
-
+import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
-import * as NodeDefUI from '../../nodeDefSystemProps'
 
 import NodeDef from '../../../../../../../common/survey/nodeDef'
-
 import Node from '../../../../../../../common/record/node'
-import NodeDefErrorBadge from '../nodeDefErrorBadge'
+import * as NodeDefUIProps from '../../nodeDefUIProps'
 
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
   <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
     <Input
       aria-disabled={edit || !canEditRecord || readOnly}
-      {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
+      {...NodeDefUIProps.getNodeDefInputTextProps(nodeDef)}
       value={Node.getValue(node, '')}
       onChange={value => updateNode(nodeDef, node, value)}
     />

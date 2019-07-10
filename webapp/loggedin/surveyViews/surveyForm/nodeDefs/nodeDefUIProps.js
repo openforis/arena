@@ -19,7 +19,7 @@ import {
 
 const { nodeDefType } = NodeDef
 
-export const nodeDefSystemProps = {
+export const nodeDefUIProps = {
   [nodeDefType.integer]: {
     icon: <span className="icon-left node_def__icon">923</span>,
     inputText: {
@@ -142,38 +142,38 @@ const getProp = (nodeDefType, prop, defaultValue = null) => R.pathOr(defaultValu
 
 export const getNodeDefIconByType = nodeDefType => R.pipe(
   getProp(nodeDefType, 'icon'),
-)(nodeDefSystemProps)
+)(nodeDefUIProps)
 
 export const getNodeDefInputTextProps = nodeDef =>
   getProp(
     nodeDef.type,
     'inputText',
     { mask: false, showMask: false }
-  )(nodeDefSystemProps)
+  )(nodeDefUIProps)
 
 export const getNodeDefComponent = nodeDef =>
   getProp(
     nodeDef.type,
     'component',
     NodeDefText
-  )(nodeDefSystemProps)
+  )(nodeDefUIProps)
 
 export const getNodeDefFormFields = nodeDef =>
   getProp(
     nodeDef.type,
     'formFields',
     ['field']
-  )(nodeDefSystemProps)
+  )(nodeDefUIProps)
 
 export const getNodeDefDefaultValue = nodeDef =>
   getProp(
     nodeDef.type,
     'defaultValue',
-  )(nodeDefSystemProps)
+  )(nodeDefUIProps)
 
 export const getNodeDefDefaultLayoutPropsByType = type =>
   getProp(
     type,
     'defaultLayoutProps',
     {}
-  )(nodeDefSystemProps)
+  )(nodeDefUIProps)

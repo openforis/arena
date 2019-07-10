@@ -15,7 +15,7 @@ import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLay
 import Survey from '../../../../../../../common/survey/survey'
 import Node from '../../../../../../../common/record/node'
 
-import { getNodeDefDefaultValue } from '../../nodeDefSystemProps'
+import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefCoordinate = props => {
 
@@ -42,7 +42,7 @@ const NodeDefCoordinate = props => {
   const entryDisabled = edit || !canEditRecord || readOnly
 
   const node = entry ? nodes[0] : null
-  const value = Node.getValue(node, getNodeDefDefaultValue(nodeDef))
+  const value = Node.getValue(node, NodeDefUiProps.getNodeDefDefaultValue(nodeDef))
 
   const surveySrs = Survey.getSRS(surveyInfo)
   const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)

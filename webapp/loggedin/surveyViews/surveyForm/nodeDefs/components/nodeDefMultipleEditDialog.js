@@ -3,7 +3,8 @@ import './nodeDefMultipleEditDialog.scss'
 import React from 'react'
 
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../../../../commonComponents/modal'
-import { getNodeDefComponent } from '../nodeDefSystemProps'
+
+import * as NodeDefUiProps from '../nodeDefUIProps'
 
 const NodeDefMultipleEditDialog = props => {
   const { nodeDef, label, onClose } = props
@@ -17,7 +18,7 @@ const NodeDefMultipleEditDialog = props => {
 
       <ModalBody>
         {
-          React.createElement(getNodeDefComponent(nodeDef), { ...props })
+          React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
         }
       </ModalBody>
 
