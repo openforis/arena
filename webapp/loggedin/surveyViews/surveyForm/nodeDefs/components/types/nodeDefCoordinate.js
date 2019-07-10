@@ -10,10 +10,9 @@ import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import Dropdown from '../../../../../../commonComponents/form/dropdown'
 
-import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLayout'
-
 import Survey from '../../../../../../../common/survey/survey'
 import Node from '../../../../../../../common/record/node'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
 import * as NodeDefUiProps from '../../nodeDefUIProps'
 
@@ -64,7 +63,7 @@ const NodeDefCoordinate = props => {
                                 selection={selectedSrs}
                                 onChange={(selection) => handleInputChange(node, 'srs', R.prop('code')(selection))}/>
 
-  if (renderType === nodeDefRenderType.tableBody) {
+  if (renderType === NodeDefLayout.nodeDefRenderType.tableBody) {
     return <div className="survey-form__node-def-table-cell-coordinate survey-form__node-def-table-cell-composite">
       {xInput}
       {yInput}

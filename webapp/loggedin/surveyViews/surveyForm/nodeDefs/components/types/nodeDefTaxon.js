@@ -15,8 +15,8 @@ import Survey from '../../../../../../../common/survey/survey'
 import Taxon from '../../../../../../../common/survey/taxon'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../../common/record/node'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
-import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLayout'
 import * as SurveyState from '../../../../../../survey/surveyState'
 
 const { valuePropKeys } = Node
@@ -323,7 +323,7 @@ class NodeDefTaxon extends React.Component {
         )
         : null
 
-    if (renderType === nodeDefRenderType.tableBody) {
+    if (renderType === NodeDefLayout.nodeDefRenderType.tableBody) {
       return <div className="survey-form__node-def-table-cell-taxon survey-form__node-def-table-cell-composite">
         {codeInputField}
         {scientificNameInputField}

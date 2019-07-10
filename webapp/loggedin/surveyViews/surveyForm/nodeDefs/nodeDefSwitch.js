@@ -15,7 +15,7 @@ import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'
 import Validator from '../../../../../common/validation/validator'
 import Record from '../../../../../common/record/record'
 import Node from '../../../../../common/record/node'
-import Layout from '../../../../../common/survey/nodeDefLayout'
+import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as RecordState from '../../record/recordState'
@@ -64,7 +64,7 @@ class NodeDefSwitch extends React.Component {
       parentNode, nodes,
     } = this.props
 
-    const isPage = !!Layout.getPageUuid(nodeDef)
+    const isPage = !!NodeDefLayout.getPageUuid(nodeDef)
 
     const className = 'survey-form__node-def-page'
       + (isPage ? '' : '-item')
@@ -88,9 +88,9 @@ class NodeDefSwitch extends React.Component {
         />
 
         {
-          renderType === Layout.nodeDefRenderType.tableHeader
+          renderType === NodeDefLayout.nodeDefRenderType.tableHeader
             ? <NodeDefTableCellHeader nodeDef={nodeDef} label={label}/>
-            : renderType === Layout.nodeDefRenderType.tableBody
+            : renderType === NodeDefLayout.nodeDefRenderType.tableBody
             ? <NodeDefTableCellBody {...this.props} label={label}/>
             : <NodeDefFormItem {...this.props} label={label}/>
         }
