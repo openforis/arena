@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
+import useI18n from '../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -15,7 +16,7 @@ import * as NodeDefEditState from '../nodeDefEditState'
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
 import { createTaxonomy, deleteTaxonomy } from '../../taxonomyEdit/actions'
 
-const {propKeys} = NodeDef
+const { propKeys } = NodeDef
 
 const TaxonProps = (props) => {
   const {
@@ -30,6 +31,8 @@ const TaxonProps = (props) => {
   const validation = Validator.getValidation(nodeDef)
 
   const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
+
+  const i18n = useI18n()
 
   return (
     <React.Fragment>
@@ -52,13 +55,13 @@ const TaxonProps = (props) => {
                     toggleTaxonomyEdit(true)
                   }}>
             <span className="icon icon-plus icon-12px icon-left"/>
-            ADD
+            {i18n.t('common.add')}
           </button>
           <button className="btn btn-s"
                   style={{justifySelf: 'center'}}
                   onClick={() => toggleTaxonomyEdit(true)}>
             <span className="icon icon-list icon-12px icon-left"/>
-            MANAGE
+            {i18n.t('common.manage')}
           </button>
         </div>
       </FormItem>

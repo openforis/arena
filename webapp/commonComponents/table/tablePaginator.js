@@ -1,8 +1,12 @@
 import React from 'react'
 
+import useI18n from '../useI18n'
+
 const TablePaginator = ({offset, limit, count, fetchFn}) => {
   const currentPage = (offset / limit) + 1
   const totalPage = Math.ceil(count / limit)
+
+  const i18n = useI18n()
 
   return (
     <div className="table__paginator">
@@ -20,7 +24,7 @@ const TablePaginator = ({offset, limit, count, fetchFn}) => {
       </button>
 
       <span className="counts">
-      {offset + 1}-{Math.min(offset + limit, count)} of {count}
+        {offset + 1}-{Math.min(offset + limit, count)} {i18n.t('common.of')} {count}
       </span>
 
       <button className="btn"

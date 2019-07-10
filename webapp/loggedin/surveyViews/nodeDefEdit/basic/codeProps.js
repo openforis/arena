@@ -5,6 +5,8 @@ import * as R from 'ramda'
 import { FormItem } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
+import useI18n from '../../../../commonComponents/useI18n'
+
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -53,6 +55,8 @@ const CodeProps = (props) => {
     putNodeDefProp(nodeDef, propKeys.categoryUuid, Category.getUuid(category))
   }
 
+  const i18n = useI18n()
+
   return (
     <React.Fragment>
 
@@ -76,13 +80,13 @@ const CodeProps = (props) => {
                   }}>
 
             <span className="icon icon-plus icon-12px icon-left"/>
-            ADD
+            {i18n.t('common.add')}
           </button>
           <button className="btn btn-s"
                   style={{ justifySelf: 'center' }}
                   onClick={() => toggleCategoryEdit(true)}>
             <span className="icon icon-list icon-12px icon-left"/>
-            MANAGE
+            {i18n.t('common.manage')}
           </button>
         </div>
       </FormItem>
