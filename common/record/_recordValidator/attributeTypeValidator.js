@@ -69,9 +69,6 @@ const validateTaxon = (survey, nodeDef, node) => {
   if (!taxonUuid)
     return true
 
-  const surveyId = Survey.getId(survey)
-  const isSurveyDraft = Survey.isDraft(Survey.getSurveyInfo(survey))
-
   // taxon not found
   const taxon = Survey.getTaxonByUuid(taxonUuid)(survey)
   if (!taxon)
