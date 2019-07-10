@@ -39,6 +39,7 @@ const AppRouterSwitch = props => {
   const {
     isReady, systemError, user,
     initApp, throwSystemError,
+    i18n,
   } = props
 
   useEffect(() => {
@@ -63,7 +64,7 @@ const AppRouterSwitch = props => {
           <div className="main__system-error">
             <div className="main__system-error-container">
               <span className="icon icon-warning icon-24px icon-left"/>
-              Oooops! Something went wrong. Try to refresh the page.
+              {i18n.t('systemErrors.somethingWentWrong')}
               <div className="error">{systemError}</div>
             </div>
           </div>
@@ -82,6 +83,7 @@ const mapStateToProps = state => ({
   isReady: AppState.isReady(state),
   user: AppState.getUser(state),
   systemError: AppState.getSystemError(state),
+  i18n: AppState.getI18n(state),
 })
 
 const enhance = compose(

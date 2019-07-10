@@ -69,9 +69,6 @@ const validateTaxon = (survey, nodeDef, node) => {
   if (!taxonUuid)
     return true
 
-  const surveyId = Survey.getId(survey)
-  const isSurveyDraft = Survey.isDraft(Survey.getSurveyInfo(survey))
-
   // taxon not found
   const taxon = Survey.getTaxonByUuid(taxonUuid)(survey)
   if (!taxon)
@@ -91,7 +88,7 @@ const validateValueType = (survey, nodeDef) => (propName, node) => {
 
   const typeValidatorFn = typeValidatorFns[NodeDef.getType(nodeDef)]
   const valid = typeValidatorFn(survey, nodeDef, node, Node.getValue(node))
-  return valid ? null : keysError.invalidType
+  return valid ? null : { key: keysError.invalidType }
 }
 
 module.exports = {
