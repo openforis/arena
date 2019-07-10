@@ -1,3 +1,5 @@
+import './nodeDefTaxon.scss'
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
@@ -13,8 +15,8 @@ import Survey from '../../../../../../../common/survey/survey'
 import Taxon from '../../../../../../../common/survey/taxon'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../../common/record/node'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
-import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLayout'
 import * as SurveyState from '../../../../../../survey/surveyState'
 
 const { valuePropKeys } = Node
@@ -310,19 +312,19 @@ class NodeDefTaxon extends React.Component {
     const autocompleteDialog =
       autocompleteOpened
         ? ReactDOM.createPortal(
-          <AutocompleteDialog className="survey-form__node-def-taxon-autocomplete-list"
-                              items={autocompleteTaxa}
-                              itemRenderer={TaxonAutocompleteItemRenderer}
-                              itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
-                              inputField={autocompleteInputField.current.component.input}
-                              onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
-                              onClose={() => this.onAutocompleteClose()}/>,
-          document.body
+        <AutocompleteDialog className="survey-form__node-def-taxon-autocomplete-list"
+                            items={autocompleteTaxa}
+                            itemRenderer={TaxonAutocompleteItemRenderer}
+                            itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
+                            inputField={autocompleteInputField.current.component.input}
+                            onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
+                            onClose={() => this.onAutocompleteClose()}/>,
+        document.body
         )
         : null
 
-    if (renderType === nodeDefRenderType.tableBody) {
-      return <div className="node-def__table-row-taxon node-def__table-data-composite-attr">
+    if (renderType === NodeDefLayout.nodeDefRenderType.tableBody) {
+      return <div className="survey-form__node-def-table-cell-taxon survey-form__node-def-table-cell-composite">
         {codeInputField}
         {scientificNameInputField}
         {vernacularNameInputField}
@@ -332,7 +334,7 @@ class NodeDefTaxon extends React.Component {
     }
 
     return (
-      <div className="survey-form__node-def-taxon-container">
+      <div className="survey-form__node-def-taxon">
         <FormItem label={i18n.t('common.code')}>
           {codeInputField}
         </FormItem>

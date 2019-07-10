@@ -1,36 +1,29 @@
 import './appSideBar.scss'
 
-import React, { useState, useRef } from 'react'
+import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
-import { dispatchWindowResize } from '../../utils/domUtils'
-
 import AppSideBarModules from './appSideBarModules'
-
-import { logout } from '../../app/actions'
-
-import * as SurveyState from '../../survey/surveyState'
 import useI18n from '../../commonComponents/useI18n'
+
+import * as AppState from '../../app/appState'
+import * as SurveyState from '../../survey/surveyState'
+
+import { logout, toggleSideBar } from '../../app/actions'
 
 const AppSideBar = (props) => {
 
-  const { pathname, surveyInfo, logout } = props
+  const {
+    pathname, surveyInfo, isSideBarOpened,
+    logout, toggleSideBar
+  } = props
 
-  const [opened, setOpened] = useState(false)
   const element = useRef(null)
 
   const i18n = useI18n()
 
-  const toggleOpen = () => {
-    element.current.classList.toggle('opened')
-    setOpened(!opened)
-
-    //react-grid-layout re-render
-    dispatchWindowResize()
-  }
-
   return (
-    <div className="app-sidebar" ref={element}>
+    <div className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
 
       {/*logo placeholder*/}
       <div></div>
@@ -39,17 +32,17 @@ const AppSideBar = (props) => {
       <AppSideBarModules
         pathname={pathname}
         surveyInfo={surveyInfo}
-        sideBarOpened={opened}/>
+        sideBarOpened={isSideBarOpened}/>
 
       {/*logout */}
       <div>
         <a className="app-sidebar__module-btn text-uppercase"
            onClick={() => logout()}>
             <span
-              className={`icon icon-exit ${opened ? ' icon-left' : ''}`}
+              className={`icon icon-exit ${isSideBarOpened ? ' icon-left' : ''}`}
               style={{ transform: 'scaleX(-1)' }}/>
           {
-            opened
+            isSideBarOpened
               ? <span>{i18n.t('sidebar.logout')}</span>
               : null
           }
@@ -60,7 +53,10 @@ const AppSideBar = (props) => {
       {/*toggle sidebar */}
       <div>
         <a className="app-sidebar__btn-toggle"
-           onClick={() => toggleOpen()}>
+           onClick={() => {
+             element.current.classList.toggle('opened')
+             toggleSideBar()
+           }}>
           <span className="icon icon-16px icon-menu"/>
         </a>
       </div>
@@ -72,6 +68,7 @@ const AppSideBar = (props) => {
 
 const mapStateToProps = state => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
+  isSideBarOpened: AppState.isSideBarOpened(state),
 })
 
-export default connect(mapStateToProps, { logout })(AppSideBar)
+export default connect(mapStateToProps, { logout, toggleSideBar })(AppSideBar)

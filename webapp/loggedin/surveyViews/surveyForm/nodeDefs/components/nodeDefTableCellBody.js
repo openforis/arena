@@ -1,3 +1,5 @@
+import './nodeDefTableCellBody.scss'
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as R from 'ramda'
@@ -5,15 +7,14 @@ import axios from 'axios'
 import Promise from 'bluebird'
 
 import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
+import useI18n from '../../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import CategoryItem from '../../../../../../common/survey/categoryItem'
 import Node from '../../../../../../common/record/node'
 
-import { getNodeDefComponent } from '../nodeDefSystemProps'
-
-import useI18n from '../../../../../commonComponents/useI18n'
+import * as NodeDefUiProps from '../nodeDefUIProps'
 
 const getNodeValues = async (surveyInfo, nodeDef, nodes, lang) => {
   const nonEmptyNodes = R.pipe(
@@ -49,7 +50,7 @@ const loadCategoryItem = async (surveyInfo, itemUuid) => {
   return data.item
 }
 
-class NodeDefMultipleTableBody extends React.Component {
+class NodeDefMultipleTableCell extends React.Component {
 
   constructor (props) {
     super(props)
@@ -95,7 +96,7 @@ class NodeDefMultipleTableBody extends React.Component {
         )
       )
       : (
-        <div className="node-def__text-multiple-table-cell">
+        <div className="survey-form__node-def-table-cell-body-multiple">
           <span className="values-summary">{this.state.nodeValues}</span>
           <button className="btn-s"
                   onClick={() => this.setShowEditDialog(true)}>
@@ -106,15 +107,21 @@ class NodeDefMultipleTableBody extends React.Component {
   }
 }
 
-const NodeDefTableBody = props => {
+const NodeDefTableCellBody = props => {
   const { nodeDef, surveyInfo } = props
   const surveyLanguage = Survey.getLanguage(useI18n().lang)(surveyInfo)
 
-  return (
-    NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
-      ? <NodeDefMultipleTableBody {...props} lang={surveyLanguage}/>
-      : React.createElement(getNodeDefComponent(nodeDef), { ...props })
-  )
+  return NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
+    ? (
+      <NodeDefMultipleTableCell
+        {...props}
+        lang={surveyLanguage}
+      />
+    )
+    : (
+      React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
+    )
+
 }
 
-export default NodeDefTableBody
+export default NodeDefTableCellBody

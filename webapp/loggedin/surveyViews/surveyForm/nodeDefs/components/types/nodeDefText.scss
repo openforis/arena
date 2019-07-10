@@ -1,0 +1,40 @@
+@import "../../../../../../style/vars";
+
+.survey-form__node-def-integer,
+.survey-form__node-def-decimal {
+  .form-input {
+    text-align: right;
+  }
+}
+
+.survey-form__node-def-date,
+.survey-form__node-def-time {
+  .form-input {
+    text-align: center;
+  }
+}
+
+.survey-form__node-def-text-multiple-container {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  border-top: 1px solid $blueDark;
+  border-left: 1px solid $blueDark;
+  border-right: 1px solid $blueDark;
+  background-color: white;
+
+  .form-input {
+    border: none !important;
+  }
+
+  &:last-child {
+    border-bottom: 1px solid rgba($blueDark, .9);
+
+    .form-input {
+      width: calc(100% - 2rem - 27px);
+    }
+  }
+
+  &:focus-within {
+    background-color: $blueLightFocus;
+  }
+}

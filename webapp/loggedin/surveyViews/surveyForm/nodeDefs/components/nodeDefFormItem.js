@@ -1,14 +1,15 @@
 import React from 'react'
 
 import { FormItem } from '../../../../../commonComponents/form/input'
-import { getNodeDefComponent } from '../nodeDefSystemProps'
 
 import NodeDef from '../../../../../../common/survey/nodeDef'
+
+import * as NodeDefUiProps from '../nodeDefUIProps'
 
 const NodeDefFormItem = props => {
   const { nodeDef, label, entry } = props
 
-  const nodeDefComponent = React.createElement(getNodeDefComponent(nodeDef), { ...props })
+  const nodeDefComponent = React.createElement(NodeDefUiProps.getNodeDefComponent(nodeDef), { ...props })
 
   const labelComponent = <div>
     {
@@ -21,9 +22,8 @@ const NodeDefFormItem = props => {
   return NodeDef.isEntity(nodeDef)
     ? nodeDefComponent
     : (
-      <FormItem label={labelComponent} className="node-def__form-item">
-        <div
-          className={`survey-form__node-def-${NodeDef.getType(nodeDef)} ${entry && NodeDef.isMultiple(nodeDef) ? 'multiple' : ''}`}>
+      <FormItem label={labelComponent} className="survey-form__node-def-form-item">
+        <div className={`${entry && NodeDef.isMultiple(nodeDef) ? 'survey-form__node-def-multiple-container' : ''}`}>
           {nodeDefComponent}
         </div>
       </FormItem>

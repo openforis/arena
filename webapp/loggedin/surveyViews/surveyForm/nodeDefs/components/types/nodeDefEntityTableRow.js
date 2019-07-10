@@ -1,14 +1,11 @@
-import './nodeDefEntityTableRow.scss'
-
 import React from 'react'
 
 import NodeDefSwitch from '../../nodeDefSwitch'
 import NodeDeleteButton from '../nodeDeleteButton'
 
-import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
-import * as NodeDefUiProps from '../../nodeDefSystemProps'
-
 import NodeDef from '../../../../../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
+import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 import { elementOffset } from '../../../../../../../webapp/utils/domUtils'
 
@@ -90,7 +87,7 @@ class NodeDefEntityTableRow extends React.Component {
     const orderedUuids = NodeDefLayout.getLayout(nodeDef)
     const orderedChildDefs = orderedUuids.map(uuid => childDefs.find(def => def.uuid === uuid)).filter(d => d)
 
-    const className = `node-def__table-row` +
+    const className = `survey-form__node-def-entity-table-row` +
       (renderType === NodeDefLayout.nodeDefRenderType.tableHeader ? '-header' : '') +
       (dragged ? ' drag-in-progress' : '')
 

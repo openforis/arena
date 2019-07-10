@@ -17,7 +17,7 @@ import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
 import Category from '../../../../common/survey/category'
 import Taxonomy from '../../../../common/survey/taxonomy'
-import { isRenderTable } from '../../../../common/survey/nodeDefLayout'
+import NodeDefLayout from '../../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../../../survey/surveyState'
 import * as NodeDefEditState from './nodeDefEditState'
@@ -127,7 +127,7 @@ const isNodeDefMultipleEditDisabled = (survey, nodeDef) =>
   !nodeDef ||
   NodeDef.isPublished(nodeDef) ||
   NodeDef.isKey(nodeDef) ||
-  isRenderTable(nodeDef) ||
+  NodeDefLayout.isRenderTable(nodeDef) ||
   Survey.isNodeDefParentCode(nodeDef)(survey) ||
   NodeDef.isReadOnly(nodeDef)
 

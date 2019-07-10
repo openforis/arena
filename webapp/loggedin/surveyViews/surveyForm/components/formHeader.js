@@ -1,15 +1,14 @@
-import React, { useEffect } from 'react'
+import './formHeader.scss'
+
+import React from 'react'
 import { connect } from 'react-redux'
 
-import { dispatchWindowResize } from '../../../../utils/domUtils'
-
 import NodeDef from '../../../../../common/survey/nodeDef'
-import { nodeDefLayoutProps, nodeDefRenderType } from '../../../../../common/survey/nodeDefLayout'
+import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 import { uuidv4 } from '../../../../../common/uuid'
 
 import FormEntryActions from './formEntryActions'
 import FormEditActions from './formEditActions'
-
 import useI18n from '../../../../commonComponents/useI18n'
 
 import * as SurveyState from '../../../../survey/surveyState'
@@ -29,20 +28,6 @@ const FormHeader = props => {
   } = props
 
   const i18n = useI18n()
-
-  //if showPageNavigation changes, trigger window resize to rerender form
-  useEffect(() => {
-    const reactGridLayoutElems = document.getElementsByClassName('react-grid-layout')
-    for (const el of reactGridLayoutElems) {
-      el.classList.remove('mounted')
-    }
-    dispatchWindowResize()
-    setTimeout(() => {
-      for (const el of reactGridLayoutElems) {
-        el.classList.add('mounted')
-      }
-    }, 100)
-  }, [showPageNavigation])
 
   return (
     <div className="survey-form-header">
@@ -65,8 +50,8 @@ const FormHeader = props => {
                     NodeDef.getUuid(nodeDefPage),
                     NodeDef.nodeDefType.entity,
                     {
-                      [nodeDefLayoutProps.render]: nodeDefRenderType.form,
-                      [nodeDefLayoutProps.pageUuid]: uuidv4(),
+                      [NodeDefLayout.nodeDefLayoutProps.render]: nodeDefRenderType.form,
+                      [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
                     }
                   )}>
             <span className="icon icon-plus icon-12px icon-left"/>

@@ -1,136 +1,111 @@
 @import "../../../../style/vars";
+@import "../surveyFormVars";
 
-.survey-form__node-def-coordinate-container {
-  display: grid;
-  row-gap: 0.3rem;
+// === page
+.survey-form__node-def-page {
+  position: relative;
+  overflow-y: auto;
 
-  .form-item {
-    grid-template-columns: 40px 1fr;
+  border-top: $formBorder;
+  border-right: $formBorder;
+  border-bottom: $formBorder;
+}
+
+// page style when form navigation is off
+.survey-form.page-navigation-off {
+  .survey-form__node-def-page {
+    border-left: $formBorder;
   }
 }
 
-.survey-form__node-def-code-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
+// page style in edit mode
+.survey-form.edit {
+  .survey-form__node-def-page {
+    border-top: $formBorderEdit;
+    border-right: $formBorderEdit;
+    border-bottom: $formBorderEdit;
+  }
 
-  .btn-checkbox {
-    pointer-events: all;
-    border-color: $blueDark;
-
-    &[aria-disabled="true"] {
-      pointer-events: none;
+  &.page-navigation-off {
+    .survey-form__node-def-page {
+      border-left: $formBorderEdit;
     }
+  }
+}
+
+// === page item
+.survey-form__node-def-page-item {
+  display: grid;
+  position: relative;
+  height: 100%;
+
+  &.not-applicable {
+    background-color: rgba($greyBorder, 0.7);
+    opacity: .6;
+  }
+}
+
+// === form item
+.survey-form__node-def-form-item {
+  grid-template-columns: 1fr !important;
+  grid-template-rows: 30px 1fr;
+
+  > :nth-child(1).form-label {
+    align-self: end;
+    justify-self: auto;
+    padding: .5rem 2rem;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    font-size: .8rem;
+  }
+
+  > :nth-child(2) {
+    padding: 0 .5rem;
+    align-self: start;
   }
 
   .form-input {
-    width: auto !important;
-    border: none !important;
+    text-overflow: ellipsis;
+    text-align: left;
+    //padding: .25rem 1rem;
+    border: 1px solid $blueDark;
+    width: calc(100% - 2rem - 2px);
   }
 
   .dropdown {
-    margin: 0.25rem 0.3rem;
-    min-height: 24px;
-  }
-}
+    grid-template-columns: 1fr 35px;
+    border: 1px solid $blueDark;
 
-.survey-form__node-def-file-container {
-  display: grid;
-  grid-template-columns: 30px 1fr 30px;
-  grid-column-gap: .5rem;
-}
+    .form-input {
+      border: none;
+    }
 
-.survey-form__node-def-taxon-container {
-  display: grid;
-  row-gap: 0.3rem;
-
-  .form-item {
-    grid-template-columns: 125px 1fr;
-  }
-}
-
-.survey-form__node-def-taxon-autocomplete-list .item {
-  display: grid;
-  grid-template-columns: .3fr .7fr;
-
-  div {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    &:first-child {
+    > :nth-child(2) {
       justify-self: center;
     }
   }
 }
 
+//multiple node def
+.survey-form__node-def-multiple-container {
+  position: relative;
+  height: 100%;
+  display: flex;
 
-.node-def__text-multiple-text-input-wrapper {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  border-top: 1px solid $blueDark;
-  border-left: 1px solid $blueDark;
-  border-right: 1px solid $blueDark;
-  background-color: white;
-
-  .form-input {
-    border: none !important;
-  }
-
-  &:last-child {
-    border-bottom: 1px solid rgba($blueDark, .9);
-
-    .form-input {
-      width: calc(100% - 2rem - 27px);
-    }
-  }
-
-  &:focus-within {
-    background-color: $blueLightFocus;
+  > *:first-child {
+    position: absolute;
+    max-height: 100%;
+    left: 10px;
+    right: 10px;
+    overflow-y: auto;
   }
 }
 
-.node-def__text-multiple-table-cell {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  padding-left: 1rem;
-  padding-right: .5rem;
-
-  .values-summary {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: .9rem;
-  }
-
-  button {
-    border: none;
-
-    &:hover {
-      color: $orange;
+.survey-form__node-def-invalid {
+  .survey-form__node-def-form-item {
+    > :nth-child(1).form-label {
+      color: $red;
     }
   }
-}
-
-.node-def__multiple-nodes-edit-modal {
-  .modal-body {
-    height: 40vh;
-  }
-
-  .survey-form__node-def-code-container {
-    justify-content: center;
-  }
-
-  .dropdown {
-    background-color: white;
-
-    &:focus-within {
-      background-color: $blueLightFocus;
-    }
-  }
-}
-
-.node-def__icon-key {
-  opacity: .8;
 }

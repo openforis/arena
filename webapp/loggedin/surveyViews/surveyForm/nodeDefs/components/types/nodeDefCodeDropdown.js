@@ -15,7 +15,7 @@ const NodeDefCodeDropdown = props => {
   const disabled = R.isEmpty(items)
 
   return (
-    <div className="survey-form__node-def-code-container nodes">
+    <div className="survey-form__node-def-code">
       {
         NodeDef.isMultiple(nodeDef)
           ? (

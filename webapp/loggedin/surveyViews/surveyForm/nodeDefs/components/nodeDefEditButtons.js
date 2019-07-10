@@ -1,3 +1,5 @@
+import './nodeDefEditButtons.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 
@@ -10,7 +12,7 @@ import { setFormNodeDefAddChildTo } from '../../actions'
 import { putNodeDefProp, removeNodeDef } from '../../../../../survey/nodeDefs/actions'
 import { setNodeDefForEdit } from '../../../nodeDefEdit/actions'
 
-const NodeDefEditFormActions = (props) => {
+const NodeDefEditButtons = (props) => {
 
   const {
     nodeDef,
@@ -24,10 +26,10 @@ const NodeDefEditFormActions = (props) => {
   const isPage = !!Layout.getPageUuid(nodeDef)
 
   return edit && canEditDef && (
-    <div className="node-def__form-actions">
+    <div className="survey-form__node-def-edit-buttons">
       {
         isPage &&
-        <div className="node-def__form-root-actions">
+        <div className="survey-form__node-def-edit-page-props">
           {i18n.t('surveyForm.nodeDefEditFormActions.columns')}
           <input value={Layout.getNoColumns(nodeDef)}
                  type="number" min="1" max="12"
@@ -38,7 +40,7 @@ const NodeDefEditFormActions = (props) => {
         </div>
       }
 
-      <button className="btn-s"
+      <button className="btn btn-s btn-transparent"
               onClick={() => setNodeDefForEdit(nodeDef)}
               onMouseDown={e => {
                 e.stopPropagation()
@@ -48,7 +50,7 @@ const NodeDefEditFormActions = (props) => {
 
       {
         NodeDef.isEntity(nodeDef) &&
-        <button className="btn btn-s"
+        <button className="btn btn-s btn-transparent"
                 onClick={() => setFormNodeDefAddChildTo(nodeDef)}
                 onMouseDown={e => {
                   e.stopPropagation()
@@ -59,7 +61,7 @@ const NodeDefEditFormActions = (props) => {
 
       {
         !(isRoot || NodeDef.isPublished(nodeDef)) &&
-        <button className="btn btn-s"
+        <button className="btn btn-s btn-transparent"
                 onClick={() => {
                   window.confirm(i18n.t('surveyForm.nodeDefEditFormActions.confirmDelete'))
                     ? removeNodeDef(nodeDef)
@@ -82,4 +84,4 @@ export default connect(null, {
   setFormNodeDefAddChildTo,
   putNodeDefProp,
   removeNodeDef,
-})(NodeDefEditFormActions)
+})(NodeDefEditButtons)

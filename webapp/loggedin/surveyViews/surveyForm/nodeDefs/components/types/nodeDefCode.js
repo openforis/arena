@@ -1,4 +1,4 @@
-import '../../nodeDefs.scss'
+import './nodeDefCode.scss'
 
 import React from 'react'
 import * as R from 'ramda'
@@ -14,7 +14,7 @@ import Category from '../../../../../../../common/survey/category'
 import CategoryItem from '../../../../../../../common/survey/categoryItem'
 import Record from '../../../../../../../common/record/record'
 import Node from '../../../../../../../common/record/node'
-import { isRenderDropdown } from '../../../../../../../common/survey/nodeDefLayout'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
 import * as AppState from '../../../../../../app/appState'
 import * as SurveyState from '../../../../../../survey/surveyState'
@@ -129,7 +129,7 @@ class NodeDefCode extends React.Component {
     const selectedItems = this.getSelectedItems()
 
     return (
-      isRenderDropdown(nodeDef)
+      NodeDefLayout.isRenderDropdown(nodeDef)
         ? <NodeDefCodeDropdown {...this.props}
                                items={items}
                                selectedItems={selectedItems}

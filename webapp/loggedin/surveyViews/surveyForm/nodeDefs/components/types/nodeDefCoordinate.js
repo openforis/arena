@@ -1,3 +1,5 @@
+import './nodeDefCoordinate.scss'
+
 import React from 'react'
 import * as R from 'ramda'
 
@@ -8,12 +10,11 @@ import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 import Dropdown from '../../../../../../commonComponents/form/dropdown'
 
-import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLayout'
-
 import Survey from '../../../../../../../common/survey/survey'
 import Node from '../../../../../../../common/record/node'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
-import { getNodeDefDefaultValue } from '../../nodeDefSystemProps'
+import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 const NodeDefCoordinate = props => {
 
@@ -40,7 +41,7 @@ const NodeDefCoordinate = props => {
   const entryDisabled = edit || !canEditRecord || readOnly
 
   const node = entry ? nodes[0] : null
-  const value = Node.getValue(node, getNodeDefDefaultValue(nodeDef))
+  const value = Node.getValue(node, NodeDefUiProps.getNodeDefDefaultValue(nodeDef))
 
   const surveySrs = Survey.getSRS(surveyInfo)
   const selectedSrs = R.find(R.propEq('code', value.srs), surveySrs)
@@ -62,8 +63,8 @@ const NodeDefCoordinate = props => {
                                 selection={selectedSrs}
                                 onChange={(selection) => handleInputChange(node, 'srs', R.prop('code')(selection))}/>
 
-  if (renderType === nodeDefRenderType.tableBody) {
-    return <div className="node-def__table-row-coordinate node-def__table-data-composite-attr">
+  if (renderType === NodeDefLayout.nodeDefRenderType.tableBody) {
+    return <div className="survey-form__node-def-table-cell-coordinate survey-form__node-def-table-cell-composite">
       {xInput}
       {yInput}
       {srsDropdown}
@@ -71,7 +72,7 @@ const NodeDefCoordinate = props => {
   }
 
   return (
-    <div className="survey-form__node-def-coordinate-container">
+    <div className="survey-form__node-def-coordinate">
       <FormItem label={i18n.t('surveyForm.nodeDefCoordinate.x')}>
         {xInput}
       </FormItem>

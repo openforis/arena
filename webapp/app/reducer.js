@@ -11,6 +11,7 @@ import {
   appUserPrefUpdate,
   appErrorCreate,
   appErrorDelete,
+  appSideBarOpenedUpdate,
   systemErrorThrow,
 } from './actions'
 import { appJobStart, appJobActiveUpdate } from '../loggedin/appJob/actions'
@@ -36,6 +37,9 @@ const actionHandlers = {
   [surveyCreate]: (state, { survey: { info } }) => AppState.assocSurveyAdminGroup(info)(state),
 
   [surveyDelete]: (state, { surveyId }) => AppState.dissocSurveyGroups(surveyId)(state),
+
+  // ====== sideBar
+  [appSideBarOpenedUpdate]: (state, { sideBarOpened }) => AppState.assocSideBarOpened(sideBarOpened)(state),
 
   // ====== app job
   [appJobStart]: (state, { job, onComplete, autoHide }) => AppState.startJob(job, onComplete, autoHide)(state),

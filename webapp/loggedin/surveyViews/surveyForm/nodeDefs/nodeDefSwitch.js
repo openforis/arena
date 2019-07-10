@@ -1,11 +1,13 @@
+import './nodeDefs.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import NodeDefFormItem from './components/nodeDefFormItem'
-import NodeDefTableHeader from './components/nodeDefTableHeader'
-import NodeDefTableBody from './components/nodeDefTableBody'
-import NodeDefEditFormActions from './components/nodeDefEditFormActions'
+import NodeDefTableCellHeader from './components/nodeDefTableCellHeader'
+import NodeDefTableCellBody from './components/nodeDefTableCellBody'
+import NodeDefEditButtons from './components/nodeDefEditButtons'
 import NodeDefErrorBadge from './components/nodeDefErrorBadge'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
@@ -13,12 +15,12 @@ import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'
 import Validator from '../../../../../common/validation/validator'
 import Record from '../../../../../common/record/record'
 import Node from '../../../../../common/record/node'
-import Layout from '../../../../../common/survey/nodeDefLayout'
+import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as RecordState from '../../record/recordState'
 
-import { getNodeDefDefaultValue } from './nodeDefSystemProps'
+import * as NodeDefUiProps from './nodeDefUIProps'
 
 // edit actions
 import { putNodeDefProp } from '../../../../survey/nodeDefs/actions'
@@ -37,7 +39,7 @@ class NodeDefSwitch extends React.Component {
     const { nodes, nodeDef, parentNode, createNodePlaceholder, canAddNode } = this.props
 
     if (parentNode && canAddNode && NodeDef.isAttribute(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
-      createNodePlaceholder(nodeDef, parentNode, getNodeDefDefaultValue(nodeDef))
+      createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getNodeDefDefaultValue(nodeDef))
     }
   }
 
@@ -62,11 +64,11 @@ class NodeDefSwitch extends React.Component {
       parentNode, nodes,
     } = this.props
 
-    const isPage = !!Layout.getPageUuid(nodeDef)
+    const isPage = !!NodeDefLayout.getPageUuid(nodeDef)
 
-    const className = 'node-def__form'
-      + (isPage ? '_page' : '')
-      + (applicable ? '' : ' node-def__not-applicable')
+    const className = 'survey-form__node-def-page'
+      + (isPage ? '' : '-item')
+      + (applicable ? '' : ' not-applicable')
 
     return (
       <div className={className} ref={this.element}>
@@ -79,17 +81,17 @@ class NodeDefSwitch extends React.Component {
           container={this.element}
         />
 
-        <NodeDefEditFormActions
+        <NodeDefEditButtons
           nodeDef={nodeDef}
           edit={edit}
           canEditDef={canEditDef}
         />
 
         {
-          renderType === Layout.nodeDefRenderType.tableHeader
-            ? <NodeDefTableHeader nodeDef={nodeDef} label={label}/>
-            : renderType === Layout.nodeDefRenderType.tableBody
-            ? <NodeDefTableBody {...this.props} label={label}/>
+          renderType === NodeDefLayout.nodeDefRenderType.tableHeader
+            ? <NodeDefTableCellHeader nodeDef={nodeDef} label={label}/>
+            : renderType === NodeDefLayout.nodeDefRenderType.tableBody
+            ? <NodeDefTableCellBody {...this.props} label={label}/>
             : <NodeDefFormItem {...this.props} label={label}/>
         }
 

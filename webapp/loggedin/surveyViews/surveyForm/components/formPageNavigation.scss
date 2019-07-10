@@ -1,13 +1,14 @@
 @import "../../../../style/vars";
+@import "../surveyFormVars";
 
 .survey-form__node-def-nav {
   &.level0 {
     height: calc(100vh - 70px);
     overflow-y: auto;
-    background-color: rgba($grey, .5);
-    border-left: 1px solid $greyBorder;
-    border-top: 1px solid $greyBorder;
-    border-bottom: 1px solid $greyBorder;
+    background-color: $formBgColorGrey;
+    border-left: $formBorder;
+    border-top: $formBorder;
+    border-bottom: $formBorder;
   }
 
   button {
@@ -36,20 +37,12 @@
   }
 }
 
-.node-def-nav__btn-add-page {
-  border: 2px dashed rgba($greyBorder, 0.6);
-  margin: 0 1rem;
-  font-size: .8rem;
-  font-weight: 600;
-  opacity: .7;
-}
-
 .survey-form.edit {
   .survey-form__node-def-nav {
     &.level0 {
-      border-left: 1px dashed $greyBorder;
-      border-top: 1px dashed $greyBorder;
-      border-bottom: 1px dashed $greyBorder;
+      border-left: $formBorderEdit;
+      border-top: $formBorderEdit;
+      border-bottom: $formBorderEdit;
     }
   }
 }

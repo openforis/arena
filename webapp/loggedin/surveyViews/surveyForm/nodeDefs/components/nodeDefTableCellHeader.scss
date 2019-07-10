@@ -1,0 +1,13 @@
+@import "../../../../../style/vars";
+
+.survey-form__node-def-table-cell-header {
+  display: grid;
+  background-color: rgba($blueLight, 0.3);
+
+  label {
+    justify-self: center;
+    align-self: center;
+    font-weight: 600;
+    font-size: .8rem;
+  }
+}

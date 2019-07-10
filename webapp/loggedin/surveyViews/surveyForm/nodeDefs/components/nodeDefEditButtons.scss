@@ -1,0 +1,27 @@
+@import "../../../../../style/vars";
+
+.survey-form__node-def-edit-buttons {
+  position: absolute;
+  right: 0;
+  background-color: rgba($grey, .9);
+  padding: 0 .3rem;
+  z-index: $zIndex1App;
+
+  display: flex;
+  font-size: .8rem;
+  align-items: center;
+}
+
+.survey-form__node-def-edit-page-props {
+  margin: 0 .5rem;
+  padding: .2rem;
+
+  input {
+    padding: .2rem .2rem;
+    width: 30px;
+    border-bottom: 1px dashed $greyBorder;
+    font-size: 1em;
+    text-align: center;
+  }
+}
+

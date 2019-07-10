@@ -11,7 +11,7 @@ import AttributesSelector from './components/attributesSelector'
 
 import Survey from '../../../../common/survey/survey'
 import NodeDef from '../../../../common/survey/nodeDef'
-import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefSystemProps'
+import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
 
 import * as SurveyState from '../../../survey/surveyState'
 

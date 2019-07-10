@@ -1,38 +1,38 @@
+import './nodeDefText.scss'
+
 import React from 'react'
 import * as R from 'ramda'
 
 import { Input } from '../../../../../../commonComponents/form/input'
-
+import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDeleteButton from '../nodeDeleteButton'
-import * as NodeDefUI from '../../nodeDefSystemProps'
 
 import NodeDef from '../../../../../../../common/survey/nodeDef'
-
 import Node from '../../../../../../../common/record/node'
-import NodeDefErrorBadge from '../nodeDefErrorBadge'
-
-const multipleNodesWrapper = React.createRef()
+import * as NodeDefUIProps from '../../nodeDefUIProps'
 
 const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => (
-  <div>
-    <Input aria-disabled={edit || !canEditRecord || readOnly}
-           {...NodeDefUI.getNodeDefInputTextProps(nodeDef)}
-           value={Node.getValue(node, '')}
-           onChange={value => updateNode(nodeDef, node, value)}
+  <div className={`survey-form__node-def-${NodeDef.getType(nodeDef)}`}>
+    <Input
+      aria-disabled={edit || !canEditRecord || readOnly}
+      {...NodeDefUIProps.getNodeDefInputTextProps(nodeDef)}
+      value={Node.getValue(node, '')}
+      onChange={value => updateNode(nodeDef, node, value)}
     />
   </div>
 )
 
 const MultipleTextInput = props => {
   const { nodeDef, parentNode, nodes, removeNode, canEditRecord } = props
+  const multipleNodesWrapper = React.createRef()
 
   return (
-    <div className="nodes">
+    <div>
       {
         nodes.map(n =>
           (!Node.isPlaceholder(n) || canEditRecord) &&
           <div key={`nodeDefTextInput_${Node.getUuid(n)}`}
-               className="node-def__text-multiple-text-input-wrapper"
+               className={`survey-form__node-def-${NodeDef.getType(nodeDef)} survey-form__node-def-text-multiple-container`}
                ref={multipleNodesWrapper}>
 
             <NodeDefErrorBadge nodeDef={nodeDef}

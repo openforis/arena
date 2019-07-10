@@ -1,0 +1,13 @@
+.survey-form__node-def-coordinate {
+  display: grid;
+  row-gap: 0.3rem;
+
+  .form-item {
+    grid-template-columns: 40px 1fr;
+  }
+}
+
+.survey-form__node-def-table-cell-coordinate {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+}

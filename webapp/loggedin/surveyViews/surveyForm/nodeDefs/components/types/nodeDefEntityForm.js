@@ -25,13 +25,6 @@ import * as RecordState from '../../../../record/recordState'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-const EntityFormHeader = ({ nodeDef, label }) => (
-  NodeDefLayout.isRenderForm(nodeDef) && !NodeDefLayout.hasPage(nodeDef) &&
-  <div className="node-def__inner-form-header">
-    {label}
-  </div>
-)
-
 class EntityForm extends React.Component {
   constructor (props) {
     super(props)
@@ -127,9 +120,8 @@ class EntityForm extends React.Component {
           {
             innerPageChildren
               .map((childDef, i) =>
-                <div
-                  key={NodeDef.getUuid(childDef)} id={NodeDef.getUuid(childDef)}
-                  className={NodeDef.isEntity(childDef) && NodeDefLayout.isRenderForm(childDef) ? 'node-def__inner-form' : ''}>
+                <div key={NodeDef.getUuid(childDef)}
+                     id={NodeDef.getUuid(childDef)}>
                   <NodeDefSwitch
                     key={i}
                     edit={edit}
@@ -160,7 +152,7 @@ const NodeSelect = props => {
   const i18n = useI18n()
 
   return (
-    <div className="node-def-entity-form__actions">
+    <div className="survey-form__node-def-entity-form-header">
 
       <select className="node-select"
               value={selectedNode ? Node.getUuid(selectedNode) : 'placeholder'}
@@ -189,7 +181,7 @@ const NodeSelect = props => {
                       removeNode(nodeDef, selectedNode)
                     }
                   }}>
-            <span className="icon icon-bin icon-12px icon-left"/>
+            <span className="icon icon-bin icon-10px icon-left"/>
             {i18n.t('common.delete')}
           </button>
           <button className="btn btn-s"
@@ -200,7 +192,7 @@ const NodeSelect = props => {
                     onChange(Node.getUuid(entity))
                   }}
                   aria-disabled={!canAddNode}>
-            <span className="icon icon-plus icon-12px icon-left"/>
+            <span className="icon icon-plus icon-10px icon-left"/>
             {i18n.t('common.add')}
           </button>
         </React.Fragment>
@@ -254,17 +246,13 @@ class NodeDefEntityForm extends React.Component {
 
     return entry && NodeDef.isMultiple(nodeDef)
       ? (
-        <div className="node-def-entity-form__wrapper" ref={this.formWrapper}>
+        <div ref={this.formWrapper}>
           <NodeDefErrorBadge
             nodeDef={nodeDef}
             edit={edit}
             parentNode={parentNode}
             nodes={nodes}
             container={this.formWrapper}/>
-
-          <EntityFormHeader
-            nodeDef={nodeDef}
-            label={label}/>
 
           <NodeSelect
             {...this.props}
@@ -280,16 +268,10 @@ class NodeDefEntityForm extends React.Component {
         </div>
       )
       : (
-        <React.Fragment>
-          <EntityFormHeader
-            nodeDef={nodeDef}
-            label={label}/>
-
-          <EntityForm
-            {...this.props}
-            node={entry ? nodes[0] : null}
-          />
-        </React.Fragment>
+        <EntityForm
+          {...this.props}
+          node={entry ? nodes[0] : null}
+        />
       )
 
   }

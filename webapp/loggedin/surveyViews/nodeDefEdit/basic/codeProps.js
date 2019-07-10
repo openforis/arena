@@ -87,13 +87,6 @@ const CodeProps = (props) => {
         </div>
       </FormItem>
 
-      <FormItem label={'Display As'}>
-        <ButtonGroup selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
-                     onChange={render => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, render)}
-                     items={displayAsItems}
-        />
-      </FormItem>
-
       <FormItem label={'Parent Code'}>
         <div style={{
           display: 'grid',
@@ -107,6 +100,14 @@ const CodeProps = (props) => {
                     onChange={def => putNodeDefProp(nodeDef, propKeys.parentCodeDefUuid, NodeDef.getUuid(def))}/>
         </div>
       </FormItem>
+
+      <FormItem label={'Display As'}>
+        <ButtonGroup selectedItemKey={NodeDefLayout.getRenderType(nodeDef)}
+                     onChange={render => putNodeDefProp(nodeDef, NodeDefLayout.nodeDefLayoutProps.render, render)}
+                     items={displayAsItems}
+        />
+      </FormItem>
+
     </React.Fragment>
   )
 }

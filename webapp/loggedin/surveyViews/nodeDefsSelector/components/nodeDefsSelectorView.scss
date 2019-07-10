@@ -33,6 +33,10 @@
     display: flex;
     justify-content: space-between;
     margin: 0 .5rem;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px dotted $greyBorder;
 
     &.active {
       pointer-events: auto;
@@ -49,6 +53,8 @@
 
     .node_def__icon {
       font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0;
     }
   }
 

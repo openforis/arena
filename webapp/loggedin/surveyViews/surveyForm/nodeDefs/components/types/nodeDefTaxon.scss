@@ -1,0 +1,29 @@
+.survey-form__node-def-taxon {
+  display: grid;
+  row-gap: 0.3rem;
+
+  .form-item {
+    grid-template-columns: 125px 1fr;
+  }
+}
+
+.survey-form__node-def-taxon-autocomplete-list .item {
+  display: grid;
+  grid-template-columns: .3fr .7fr;
+
+  div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &:first-child {
+      justify-self: center;
+    }
+  }
+}
+
+
+.survey-form__node-def-table-cell-taxon {
+  display: grid;
+  grid-template-columns: .2fr .5fr .3fr;
+}

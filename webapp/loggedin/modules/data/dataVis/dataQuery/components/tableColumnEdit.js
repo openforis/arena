@@ -2,12 +2,12 @@ import React from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
-import { nodeDefRenderType } from '../../../../../../../common/survey/nodeDefLayout'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 import Record from '../../../../../../../common/record/record'
 import Node from '../../../../../../../common/record/node'
 import Authorizer from '../../../../../../../common/auth/authorizer'
 
-import NodeDefTableBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableBody'
+import NodeDefTableCellBody from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellBody'
 
 import { createNodePlaceholder, removeNode, updateNode } from '../../../../../surveyViews/record/actions'
 import * as SurveyState from '../../../../../../survey/surveyState'
@@ -32,14 +32,14 @@ class TableColumnEdit extends React.Component {
       }
 
       return (
-        <NodeDefTableBody
+        <NodeDefTableCellBody
           surveyInfo={surveyInfo}
           nodeDef={nodeDef}
           parentNode={parentNode}
           nodes={nodesArray}
           entry={true}
           edit={false}
-          renderType={nodeDefRenderType.tableBody}
+          renderType={NodeDefLayout.nodeDefRenderType.tableBody}
           canEditRecord={canEditRecord}
           updateNode={updateNode}
           removeNode={removeNode}

@@ -1,15 +1,15 @@
-@import "../../../react-grid-layout";
+@import "../../../../../../style/vars";
+@import "../../../surveyFormVars";
 
-.node-def-entity-form__wrapper {
-  position: relative;
-}
-
-.node-def-entity-form__actions {
+.survey-form__node-def-entity-form-header {
   display: flex;
   justify-content: center;
-  margin: .5rem 10rem;
+  padding: .5rem 10rem;
+  background-color: $formBgColorGrey;
 
   .node-select {
     min-width: 150px;
+    font-weight: 600;
+    font-size: .85rem;
   }
 }

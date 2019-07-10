@@ -1,3 +1,5 @@
+import './nodeDefBoolean.scss'
+
 import React from 'react'
 
 import Node from '../../../../../../../common/record/node'

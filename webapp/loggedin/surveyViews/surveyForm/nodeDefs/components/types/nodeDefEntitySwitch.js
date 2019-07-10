@@ -5,14 +5,11 @@ import NodeDefEntityTable from './nodeDefEntityTable'
 import NodeDefEntityForm from './nodeDefEntityForm'
 
 import Survey from '../../../../../../../common/survey/survey'
+import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
-import {
-  isRenderForm,
-  isRenderTable,
-} from '../../../../../../../common/survey/nodeDefLayout'
+import * as SurveyState from '../../../../../../survey/surveyState'
 
 import { putNodeDefProp } from '../../../../../../survey/nodeDefs/actions'
-import * as SurveyState from '../../../../../../survey/surveyState'
 
 class NodeDefEntitySwitch extends React.Component {
 
@@ -37,7 +34,7 @@ class NodeDefEntitySwitch extends React.Component {
       canAddNode,
     } = this.props
 
-    if (isRenderForm(nodeDef))
+    if (NodeDefLayout.isRenderForm(nodeDef))
       return <NodeDefEntityForm label={label}
                                 surveyInfo={surveyInfo}
                                 nodeDef={nodeDef}
@@ -53,7 +50,7 @@ class NodeDefEntitySwitch extends React.Component {
                                 canEditRecord={canEditRecord}
                                 canAddNode={canAddNode}
                                 removeNode={removeNode}/>
-    else if (isRenderTable(nodeDef))
+    else if (NodeDefLayout.isRenderTable(nodeDef))
       return <NodeDefEntityTable label={label}
                                  surveyInfo={surveyInfo}
                                  nodeDef={nodeDef}

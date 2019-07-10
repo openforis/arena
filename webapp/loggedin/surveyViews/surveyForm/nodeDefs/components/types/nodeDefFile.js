@@ -1,3 +1,5 @@
+import './nodeDefFile.scss'
+
 import React from 'react'
 import { uuidv4 } from '../../../../../../../common/uuid'
 
@@ -39,7 +41,7 @@ const FileInput = props => {
   const fileUploaded = !edit && fileName
 
   return (
-    <div className="survey-form__node-def-file-container">
+    <div className="survey-form__node-def-file">
       <UploadButton
         disabled={edit || !canEditRecord || readOnly}
         showLabel={false}
@@ -70,7 +72,7 @@ const MultipleFileInput = props => {
   const { nodes } = props
 
   return (
-    <div className="nodes">
+    <div>
       {
         nodes.map((n, i) =>
           <FileInput

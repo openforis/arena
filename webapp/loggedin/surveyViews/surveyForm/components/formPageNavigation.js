@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
-import { filterOuterPageChildren } from '../../../../../common/survey/nodeDefLayout'
+import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as SurveyFormState from '../../surveyForm/surveyFormState'
@@ -22,7 +22,7 @@ const NavigationButton = (props) => {
 
   const [showChildren, setShowChildren] = useState(level === 0)
 
-  const outerPageChildDefs = childDefs ? filterOuterPageChildren(childDefs) : []
+  const outerPageChildDefs = childDefs ? NodeDefLayout.filterOuterPageChildren(childDefs) : []
 
   return (
     <div className={`survey-form__node-def-nav level${level}`}

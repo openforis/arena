@@ -1,0 +1,44 @@
+@import "../../../../style/vars";
+@import "../surveyFormVars";
+
+.survey-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  height: $formHeaderHeight;
+}
+
+.survey-form-header__label-container {
+  display: flex;
+
+  .btn-add-sub-page {
+    border: none;
+    align-self: flex-end;
+    border-bottom: 1px dashed $greyBorder;
+  }
+}
+
+.survey-form-header__node-def-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  align-self: flex-end;
+  margin-left: 2rem;
+}
+
+.survey-form-header__actions {
+  display: flex;
+
+  > *:not(:last-child) {
+    margin: 0 1rem;
+  }
+
+  .error-badge {
+    position: relative;
+  }
+
+}
+
+.survey-form-header__record-actions-steps > * {
+  margin: 0 .5rem;
+  font-size: .8rem;
+}

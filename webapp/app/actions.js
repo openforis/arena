@@ -1,14 +1,14 @@
 import axios from 'axios'
 
-import * as AppState from './appState'
-
 import i18nFactory from '../../common/i18n/i18nFactory'
-
 import * as CognitoAuth from './cognitoAuth'
+
+import * as AppState from './appState'
 
 export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
+export const appSideBarOpenedUpdate = 'app/sideBar/opened/update'
 
 const getUserSurvey = async () => {
   const { data: { user, survey } } = await axios.get('/auth/user')
@@ -46,6 +46,12 @@ export const logout = () => async dispatch => {
   await axios.post('/auth/logout')
   await CognitoAuth.logout()
   dispatch({ type: appUserLogout })
+}
+
+// ====== Toggle sidebar
+export const toggleSideBar = () => (dispatch, getState) => {
+  const sideBarOpened = !AppState.isSideBarOpened(getState())
+  dispatch({ type: appSideBarOpenedUpdate, [AppState.keys.sideBarOpened]: sideBarOpened })
 }
 
 // ====== ERRORS HANDLING
