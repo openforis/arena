@@ -2,12 +2,16 @@ import React from 'react'
 
 import Expression from '../../../../common/exprParser/expression'
 
+import useI18n from '../../useI18n'
+
 const EditButtons = (props) => {
 
   const {
     node, onChange,
     canDelete = false, onDelete,
   } = props
+
+  const i18n = useI18n()
 
   const addLogicalExpr = (operator) => onChange(
     {
@@ -29,11 +33,11 @@ const EditButtons = (props) => {
       <div className="btns__add">
         <button className="btn btn-s"
                 onClick={() => addLogicalExpr(logical.or.value)}>
-          <span className="icon icon-plus icon-8px"/> OR
+          <span className="icon icon-plus icon-8px"/> {i18n.t('expressionEditor.or')}
         </button>
         <button className="btn btn-s"
                 onClick={() => addLogicalExpr(logical.and.value)}>
-          <span className="icon icon-plus icon-8px"/> AND
+          <span className="icon icon-plus icon-8px"/> {i18n.t('expressionEditor.and')}
         </button>
       </div>
 

@@ -8,10 +8,14 @@ import Dropdown from '../../form/dropdown'
 import EditButtons from './editButtons'
 import ExpressionNode from './expressionNode'
 
+import useI18n from '../../useI18n'
+
 const BinaryOperand = ({ type, node, ...props }) => {
   const { isBoolean, onChange } = props
   const nodeOperand = R.prop(type, node)
   const isLeft = type === 'left'
+
+  const i18n = useI18n()
 
   return (
     <React.Fragment>
@@ -20,7 +24,7 @@ const BinaryOperand = ({ type, node, ...props }) => {
         onClick={() => onChange(
           R.assoc(type, Expression.newIdentifier(), node)
         )}>
-        Var
+        {i18n.t('expressionEditor.var')}
       </button>
       <button
         className={`btn btn-s btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
@@ -36,7 +40,7 @@ const BinaryOperand = ({ type, node, ...props }) => {
 
           onChange(nodeUpdate)
         }}>
-        Const
+        {i18n.t('expressionEditor.const')}
       </button>
 
       <ExpressionNode
