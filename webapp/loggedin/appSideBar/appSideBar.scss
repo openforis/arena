@@ -62,6 +62,10 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
   &[aria-disabled="true"] {
     opacity: 1;
   }
+
+  &:only-child.active {
+    font-weight: bold;
+  }
 }
 
 .app-sidebar__module-child-btn {
