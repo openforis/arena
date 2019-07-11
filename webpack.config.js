@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const GoogleFontsPlugin = require('google-fonts-plugin')
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 require('dotenv').config()
@@ -38,7 +39,16 @@ const plugins = [
         'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       }
     }
-  )
+  ),
+  new GoogleFontsPlugin({
+    fonts: [{
+      family: 'Montserrat',
+      variants: ['200', '400', '600', '800']
+    }],
+    formats: [
+      'woff2'
+    ]
+  })
 ]
 
 if (buildReport) {
