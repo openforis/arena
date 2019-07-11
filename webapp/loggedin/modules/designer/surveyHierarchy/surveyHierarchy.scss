@@ -20,13 +20,15 @@
 
     a {
       cursor: pointer;
-      font-size: .9rem;
+      font-size: .8rem;
       letter-spacing: 0;
       padding: .2rem .5rem;
-
-      &:hover {
-        //background-color: rgba($white, .35)
-      }
+      text-overflow: ellipsis;
+      overflow: hidden;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
     }
   }
 
@@ -34,14 +36,15 @@
     display: flex;
     align-items: center;
     border: 1px solid $greyBorder;
-    justify-content: space-around;
+    justify-content: space-between;
     transition: background-color 1s ease;
     background-color: white;
-    min-height: 27px;
-
+    height: 38px;
+    
     .btn {
       transform: rotate(-90deg);
       padding: .3rem;
+      margin-right: .2rem;
     }
 
     &.highlight {

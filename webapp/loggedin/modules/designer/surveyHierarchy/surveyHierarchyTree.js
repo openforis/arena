@@ -6,7 +6,7 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 100 }
 
 const nodeRadiusInit = 1e-6
-const nodeRadius = 10
+const nodeRadius = 16
 const nodeLabelDist = nodeRadius + 3
 const nodeLinkLength = 200
 
@@ -114,7 +114,6 @@ export default class SurveyHierarchyTree {
   }
 
   updateNodes (treeData, source) {
-
     // Compute the new tree layout
     const nodes = treeData.descendants()
 
@@ -131,9 +130,9 @@ export default class SurveyHierarchyTree {
       nodes.forEach(d => { d.y = d.depth * nodeLinkLength })
 
     const node = this.svg.selectAll('g.node')
-      .data(nodes)
+      .data(nodes, function (d) { return d.data.uuid })
 
-    // Enter any new modes at the parent's previous position
+    // Enter any new nodes at the parent's previous position
     const nodeEnter = node.enter().append('g')
       .attr('class', 'node')
       .attr('transform', d => `translate(${source.y0}, ${source.x0})`)
@@ -146,16 +145,14 @@ export default class SurveyHierarchyTree {
       .attr('x', d => NodeDef.isRoot(d.data) ? -100 : 0)
       //.attr('y', d => hasChildren(d) ? -(nodeLabelDist * 3) : -nodeLabelDist)
       .attr('y', -nodeLabelDist)
-      .attr('width', d => NodeDef.isRoot(d.data) ? 150 : 100)
-      .attr('height', 30)
+      .attr('width', 150)
+      .attr('height', 40)
 
     const grid = fo.append('xhtml:div')
       .attr('class', 'node-grid')
 
     grid.append('xhtml:a')
       .on('click', d => this.onEntityClick(d.data.uuid))
-      // .attr('alignment-baseline', 'middle')
-      //.attr('x', d => hasChildren(d) ? -(nodeLabelDist) : (nodeLabelDist))
       .text(d => NodeDef.getLabel(d.data, this.lang))
 
     grid.append('xhtml:button')
@@ -164,12 +161,6 @@ export default class SurveyHierarchyTree {
       .on('click', d => this.toggleNode(d))
       .append('xhtml:span')
       .attr('class', 'icon icon-tree icon-12px')
-
-    // Add Circle for the nodes
-    // nodeEnter.append('circle')
-    //   .attr('class', d => 'node' + (hasChildren(d) ? '' : ' leaf'))
-    //   .attr('r', nodeRadiusInit)
-    //   .on('click', this.toggleNode.bind(this))
 
     // UPDATE
     const nodeUpdate = nodeEnter.merge(node)
