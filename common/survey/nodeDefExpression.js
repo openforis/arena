@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const {uuidv4} = require('./../uuid')
-const {isBlank} = require('../stringUtils')
+const { uuidv4 } = require('./../uuid')
+const { isBlank } = require('../stringUtils')
 
 const SurveyUtils = require('./surveyUtils')
 
@@ -27,7 +27,7 @@ const getExpression = R.prop(keys.expression)
 
 const getApplyIf = R.prop(keys.applyIf)
 
-const getMessages = R.prop(keys.messages)
+const getMessages = R.propOr({}, keys.messages)
 
 const isPlaceholder = R.propEq(keys.placeholder, true)
 
