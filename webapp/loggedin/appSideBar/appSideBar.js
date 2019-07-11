@@ -3,7 +3,7 @@ import './appSideBar.scss'
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
-import AppSideBarModules from './appSideBarModules'
+import AppSideBarModules from './components/appSideBarModules'
 import useI18n from '../../commonComponents/useI18n'
 
 import * as AppState from '../../app/appState'
@@ -30,8 +30,8 @@ const AppSideBar = (props) => {
 
 
       <AppSideBarModules
-        pathname={pathname}
         surveyInfo={surveyInfo}
+        pathname={pathname}
         sideBarOpened={isSideBarOpened}/>
 
       {/*logout */}

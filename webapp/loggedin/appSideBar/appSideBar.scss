@@ -2,8 +2,13 @@
 
 $sidebarWidthClosed: 46px;
 $sidebarWidthOpened: 200px;
-$sidebarTransition: width 100ms ease-in;
+//== buttons
 $sidebarBtnMargin: 4px;
+$sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
+//== popup-menu
+$sidebarPopupMenuBgColor: lighten($blueLight, 7%);
+
+//$sidebarTransition: width 100ms ease-in;
 
 .app-sidebar {
   position: relative;
@@ -14,15 +19,7 @@ $sidebarBtnMargin: 4px;
   display: grid;
   grid-template-rows: 60px 1fr 80px 40px;
   align-items: start;
-
   //transition: $sidebarTransition;
-  &.opened {
-    width: $sidebarWidthOpened;
-  }
-
-  *[aria-disabled="true"] {
-    opacity: 1;
-  }
 }
 
 .app-sidebar__modules {
@@ -33,22 +30,38 @@ $sidebarBtnMargin: 4px;
 .app-sidebar__module {
   display: grid;
   grid-row-gap: 20px;
-  border-left: $sidebarBtnMargin solid transparent;
-  border-right: $sidebarBtnMargin solid transparent;
-  padding: 15px 0;
+  border-left: $sidebarBtnTransparent;
+  border-right: $sidebarBtnTransparent;
+  height: 56px;
+  cursor: pointer;
+
+  &[aria-disabled="true"] {
+    opacity: .4;
+  }
 
   &.active {
     border-right-color: $blueLight;
-    background-color: rgba($blueLight, .1);
+    background-color: rgba($blueLight, .2);
+
+    &[aria-disabled="true"] {
+      opacity: 1;
+    }
+
+    .icon {
+      color: darken($blueLight, 45%);
+    }
   }
 }
 
 .app-sidebar__module-btn {
   display: flex;
   align-items: center;
-  //margin: 0 $sidebarBtnMargin;
   padding: 0 10px;
   font-size: .85rem;
+
+  &[aria-disabled="true"] {
+    opacity: 1;
+  }
 }
 
 .app-sidebar__module-child-btn {
@@ -56,14 +69,53 @@ $sidebarBtnMargin: 4px;
   font-size: .8rem;
 
   &.active {
-    //color: $blueLight;
     font-weight: bold;
   }
 }
 
 .app-sidebar__btn-toggle {
   margin: 0 $sidebarBtnMargin;
-  padding: 0 10px;
+  padding: 10px;
+}
+
+//=== sidebar opened
+.app-sidebar.opened {
+  width: $sidebarWidthOpened;
+
+  .app-sidebar__module {
+    height: auto;
+    padding: 15px 0;
+    cursor: auto;
+  }
+}
+
+//=== popup menu opened
+.app-sidebar__popup-menu {
+  position: fixed;
+  z-index: $zIndex10TopOfApp;
+  left: $sidebarWidthClosed;
+  background-color: $sidebarPopupMenuBgColor;
+  border-top: 1px solid $blueLight;
+  border-right: 1px solid $blueLight;
+  border-bottom: 1px solid $blueLight;
+  display: grid;
+  grid-row-gap: 1.5rem;
+  padding: 25px 10px;
+
+  .app-sidebar__module-child-btn {
+    margin: 0;
+  }
+
+}
+
+.app-sidebar__modules.menu-opened {
+  .app-sidebar__module.over {
+    background-color: $sidebarPopupMenuBgColor;
+
+    &.active {
+      border-right: $sidebarBtnTransparent;
+    }
+  }
 }
 
 //.app-sidebar__btn-of {
