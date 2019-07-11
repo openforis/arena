@@ -3,28 +3,35 @@ import { Link } from 'react-router-dom'
 
 import useI18n from '../../../commonComponents/useI18n'
 
+import * as SideBarModule from '../sidebarModule'
+
 const AppSideBarModuleLink = props => {
   const { module, pathname, showLabel, disabled } = props
 
+  const active = SideBarModule.isActive(pathname)(module)
+  const root = SideBarModule.isRoot(module)
+  const icon = SideBarModule.getIcon(module)
+  const uri = SideBarModule.getUri(module)
+  const key = SideBarModule.getKey(module)
+
   const i18n = useI18n()
-  const active = module.uri === pathname
 
   let className = 'app-sidebar__module-btn text-uppercase'
-  className += module.root ? '' : ' app-sidebar__module-child-btn'
+  className += root ? '' : ' app-sidebar__module-child-btn'
   className += active ? ' active' : ''
 
   return (
     <Link
-      to={module.uri}
+      to={uri}
       className={className}
       aria-disabled={disabled || active}>
       {
-        module.icon &&
-        <span className={`icon icon-${module.icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`}></span>
+        icon &&
+        <span className={`icon icon-${icon} icon-16px${showLabel ? ' icon-left-2x' : ''}`}></span>
       }
       {
         showLabel &&
-        <span>{i18n.t(`appModules.${module.key}`)}</span>
+        <span>{i18n.t(`appModules.${key}`)}</span>
       }
     </Link>
   )

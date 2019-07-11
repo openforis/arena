@@ -1,0 +1,54 @@
+import React, { useRef } from 'react'
+import * as R from 'ramda'
+
+import { appModules, appModuleUri, dataModules, designerModules, homeModules } from '../appModules'
+
+const keys = {
+  key: 'key',
+  uri: 'uri',
+  icon: 'icon',
+  root: 'root',
+  elementRef: 'elementRef',
+  children: 'children',
+}
+
+//==== Modules hierarchy
+const getModule = (module, children = null, root = true) => ({
+  [keys.key]: module.key,
+  [keys.uri]: appModuleUri(module),
+  [keys.icon]: module.icon,
+  [keys.root]: root,
+  [keys.elementRef]: useRef(null),
+  [keys.children]: children
+    ? children.map(childModule => getModule(childModule, null, false))
+    : []
+})
+
+export const getModulesHierarchy = () => [
+  getModule(appModules.home),
+  getModule(
+    appModules.designer,
+    [designerModules.formDesigner, designerModules.surveyHierarchy, designerModules.categories, designerModules.taxonomies]
+  ),
+  getModule(
+    appModules.data,
+    [dataModules.records, dataModules.dataVis]
+  ),
+]
+
+export const getKey = R.prop(keys.key)
+export const getUri = R.prop(keys.uri)
+export const getIcon = R.prop(keys.icon)
+export const getChildren = R.prop(keys.children)
+
+export const isRoot = R.propEq(keys.root, true)
+export const isHome = module => getKey(module) === appModules.home.key
+export const isActive = pathname => module => {
+  // module home is active when page is on dashboard
+  return isHome(module)
+    ? pathname === appModuleUri(homeModules.dashboard)
+    : R.startsWith(module.uri, pathname)
+}
+
+export const getElementRef = R.prop(keys.elementRef)
+export const getDomElement = R.pipe(getElementRef, R.prop('current'))

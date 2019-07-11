@@ -2,20 +2,18 @@ import React from 'react'
 import * as R from 'ramda'
 
 import AppSideBarModuleLink from './appSideBarModuleLink'
-
-import { appModules, appModuleUri, homeModules } from '../../appModules'
 import AppSideBarSubModules from './appSideBarSubModules'
+
+import * as SideBarModule from '../sidebarModule'
 
 const AppSideBarModule = props => {
   const { surveyInfo, module, pathname, sideBarOpened, isOver, onMouseEnter } = props
 
-  const isModuleHome = module.key === appModules.home.key
+  const elementRef = SideBarModule.getElementRef(module)
+  const isModuleHome = SideBarModule.isHome(module)
 
-  // module home is active when page is on dashboard
-  const active = isModuleHome
-    ? pathname === appModuleUri(homeModules.dashboard)
-    : R.startsWith(module.uri, pathname)
-
+  const active = SideBarModule.isActive(pathname)(module)
+  // all modules except home require the survey
   const disabledRequiredSurvey = !isModuleHome && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))
   // module home is disabled when page is on dashboard, other modules are disabled when there's no active survey
   const disabledModule = isModuleHome ? active : disabledRequiredSurvey
@@ -24,7 +22,7 @@ const AppSideBarModule = props => {
 
   return (
     <div className={`app-sidebar__module${active ? ' active' : ''}${isOver ? ' over' : ''}`}
-         ref={module.elementRef}
+         ref={elementRef}
          onMouseEnter={
            isModuleHome || sideBarOpened
              ? null

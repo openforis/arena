@@ -3,11 +3,14 @@ import ReactDOM from 'react-dom'
 
 import AppSideBarSubModules from './appSideBarSubModules'
 
+import * as SideBarModule from '../sidebarModule'
+
 import { elementOffset } from '../../../utils/domUtils'
 
 const AppSideBarPopupMenu = props => {
   const { module, pathname, onClose } = props
-  const moduleElement = module.elementRef.current
+  const moduleElement = SideBarModule.getDomElement(module)
+  const key = SideBarModule.getKey(module)
 
   // used to check if mouse is within popup-menu or module link
   const inPopupMenu = useRef(false)
@@ -43,7 +46,7 @@ const AppSideBarPopupMenu = props => {
       moduleElement.removeEventListener('mouseenter', onmouseenter, true)
       moduleElement.removeEventListener('mouseleave', onmouseleave, true)
     }
-  }, [module.key])
+  }, [key])
 
   return (
     ReactDOM.createPortal(

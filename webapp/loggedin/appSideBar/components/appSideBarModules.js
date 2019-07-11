@@ -1,27 +1,9 @@
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 
 import AppSideBarModule from './appSideBarModule'
 import AppSideBarPopupMenu from './appSideBarPopupMenu'
 
-import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
-
-//==== Modules hierarchy
-const getModule = (module, children = null, root = true) => ({
-  key: module.key,
-  uri: appModuleUri(module),
-  icon: module.icon,
-  root: root,
-  elementRef: useRef(null),
-  children: children
-    ? children.map(childModule => getModule(childModule, null, false))
-    : null
-})
-
-const getModulesHierarchy = () => [
-  getModule(appModules.home),
-  getModule(appModules.designer, [designerModules.formDesigner, designerModules.surveyHierarchy, designerModules.categories, designerModules.taxonomies]),
-  getModule(appModules.data, [dataModules.records, dataModules.dataVis]),
-]
+import * as SideBarModule from '../sidebarModule'
 
 const AppSideBarModules = props => {
 
@@ -33,14 +15,14 @@ const AppSideBarModules = props => {
   return (
     <div className={`app-sidebar__modules${modulePopupMenu ? ' popup-menu-opened' : ''}`}>
       {
-        getModulesHierarchy().map(module => (
+        SideBarModule.getModulesHierarchy().map(module => (
           <AppSideBarModule
-            key={module.key}
+            key={SideBarModule.getKey(module)}
             surveyInfo={surveyInfo}
             module={module}
             pathname={pathname}
             sideBarOpened={sideBarOpened}
-            isOver={modulePopupMenu && module.key === modulePopupMenu.key}
+            isOver={modulePopupMenu && SideBarModule.getKey(module) === SideBarModule.getKey(modulePopupMenu)}
             onMouseEnter={() => {
               setModulePopupMenu(module)
             }}
