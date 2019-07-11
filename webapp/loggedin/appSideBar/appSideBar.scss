@@ -32,7 +32,7 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
   grid-row-gap: 20px;
   border-left: $sidebarBtnTransparent;
   border-right: $sidebarBtnTransparent;
-  height: 56px;
+  height: 46px;
   cursor: pointer;
 
   &[aria-disabled="true"] {
@@ -108,7 +108,7 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
 
 }
 
-.app-sidebar__modules.menu-opened {
+.app-sidebar__modules.popup-menu-opened {
   .app-sidebar__module.over {
     background-color: $sidebarPopupMenuBgColor;
 
