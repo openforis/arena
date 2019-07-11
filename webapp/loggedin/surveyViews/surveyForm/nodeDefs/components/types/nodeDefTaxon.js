@@ -316,7 +316,7 @@ class NodeDefTaxon extends React.Component {
                             items={autocompleteTaxa}
                             itemRenderer={TaxonAutocompleteItemRenderer}
                             itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
-                            inputField={autocompleteInputField.current.component.input}
+                            inputField={autocompleteInputField.current}
                             onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
                             onClose={() => this.onAutocompleteClose()}/>,
         document.body

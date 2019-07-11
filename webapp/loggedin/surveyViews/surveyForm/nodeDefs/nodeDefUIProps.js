@@ -147,7 +147,7 @@ export const getNodeDefInputTextProps = nodeDef =>
   getProp(
     nodeDef.type,
     'inputText',
-    { mask: false, showMask: false }
+    { mask: false }
   )(nodeDefUIProps)
 
 export const getNodeDefComponent = nodeDef =>

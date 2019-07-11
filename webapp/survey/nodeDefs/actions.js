@@ -18,6 +18,33 @@ export const nodeDefUpdate = 'nodeDef/update'
 export const nodeDefPropsUpdate = 'nodeDef/props/update'
 export const nodeDefDelete = 'nodeDef/delete'
 
+// ==== Internal update nodeDefs actions
+
+const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, getState) => {
+  const url = `/api/survey/${SurveyState.getSurveyId(getState())}/nodeDef/${NodeDef.getUuid(nodeDef)}/props`
+  const data = { props, propsAdvanced }
+  const { data: { nodeDefs } } = await axios.put(url, data)
+  dispatch({ type: nodeDefsLoad, nodeDefs })
+}
+
+const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) => debounceAction(
+  _putNodeDefProps(nodeDef, props, propsAdvanced),
+  `${nodeDefPropsUpdate}_${NodeDef.getUuid(nodeDef)}_${key}`
+)
+
+const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getState) => {
+  const survey = SurveyState.getSurvey(getState())
+  const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
+
+  if (NodeDef.isEntity(nodeDefParent) && NodeDefLayout.isRenderTable(nodeDefParent)) {
+    const nodeDefParentLayout = NodeDefLayout.getLayout(nodeDefParent)
+    const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+    const newLayout = deleted ? R.without([nodeDefUuid])(nodeDefParentLayout) : R.append(nodeDefUuid)(nodeDefParentLayout)
+    dispatch(putNodeDefProp(nodeDefParent, NodeDefLayout.nodeDefLayoutProps.layout, newLayout))
+  }
+}
+
 // ==== CREATE
 
 export const createNodeDef = (parentUuid, type, props) => async (dispatch, getState) => {
@@ -33,6 +60,7 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
 }
 
 // ==== UPDATE
+
 export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => async (dispatch, getState) => {
   const survey = SurveyState.getSurvey(getState())
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
@@ -70,7 +98,7 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
     propsAdvanced
   })
 
-  dispatch(_putNodeDefProps(nodeDef, key, props, propsAdvanced))
+  dispatch(_putNodeDefPropsDebounced(nodeDef, key, props, propsAdvanced))
 }
 
 // ==== DELETE
@@ -84,39 +112,4 @@ export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
   dispatch({ type: nodeDefsLoad, nodeDefs: data.nodeDefs })
 
   dispatch(_updateParentLayout(nodeDef, true))
-}
-
-const _putNodeDefProps = (nodeDef, key, props, propsAdvanced) => {
-  const action = async (dispatch, getState) => {
-    const surveyId = SurveyState.getSurveyId(getState())
-
-    const putProps = async (nodeDef, props, propsAdvanced) => {
-      const { data } = await axios.put(
-        `/api/survey/${surveyId}/nodeDef/${NodeDef.getUuid(nodeDef)}/props`,
-        { props, propsAdvanced }
-      )
-      return data.nodeDefs
-    }
-
-    const nodeDefs = await putProps(nodeDef, props, propsAdvanced)
-
-    dispatch({ type: nodeDefsLoad, nodeDefs })
-  }
-
-  return debounceAction(action, `${nodeDefPropsUpdate}_${NodeDef.getUuid(nodeDef)}_${key}`)
-}
-
-// ==== UTILS
-
-const _updateParentLayout = (nodeDef, deleted = false) => async (dispatch, getState) => {
-  const survey = SurveyState.getSurvey(getState())
-  const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
-
-  if (NodeDef.isEntity(parentNodeDef) && NodeDefLayout.isRenderTable(parentNodeDef)) {
-    const layout = NodeDefLayout.getLayout(parentNodeDef)
-    const nodeDefUuid = NodeDef.getUuid(nodeDef)
-
-    const newLayout = deleted ? R.without([nodeDefUuid])(layout) : R.append(nodeDefUuid)(layout)
-    dispatch(putNodeDefProp(parentNodeDef, NodeDefLayout.nodeDefLayoutProps.layout, newLayout))
-  }
 }

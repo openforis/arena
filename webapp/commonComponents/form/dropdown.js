@@ -134,7 +134,7 @@ class Dropdown extends React.Component {
   }
 
   getInputField () {
-    return this.input.current.component.input
+    return this.input.current
   }
 
   extractValueFromFunctionOrProp (item, func, prop, defaultProp) {
