@@ -31,6 +31,18 @@ export default class SurveyHierarchyTree {
     this.svgWidth = null
 
     this.initSvg()
+
+    window.onresize = event => {
+      // this.svg
+      //   .attr('width', domElement.offsetWidth)
+      //   .attr('height', domElement.offsetHeight)
+
+      // document.getElementsByTagName('svg')[0]
+      //   .setAttribute('width', domElement.offsetWidth)
+      //   // .attr('height', domElement.offsetHeight)
+      // this.update(this.root)
+    }
+
   }
 
   collapseNode (node) {
@@ -69,7 +81,6 @@ export default class SurveyHierarchyTree {
 
   initSvg () {
     // Set the dimensions and margins of the diagram
-
     const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
     const height = this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
 
@@ -84,6 +95,11 @@ export default class SurveyHierarchyTree {
       .attr('height', height + svgMargin.top + svgMargin.bottom)
       .append('g')
       .attr('transform', `translate(${svgMargin.left}, ${svgMargin.top})`)
+
+    // this.svg.append('rect')
+    //   .attr('width', '100%')
+    //   .attr('height', '100%')
+    // .attr('fill', 'pink')
 
     // declares a tree layout and assigns the size
     this.tree = d3.tree().size([height, width])
@@ -126,8 +142,14 @@ export default class SurveyHierarchyTree {
       R.inc
     )(this.nodesByUuidMap)
 
-    if (nodeLinkLength * maxDepth + svgMargin.left < this.svgWidth)
-      nodes.forEach(d => { d.y = d.depth * nodeLinkLength })
+    document.getElementsByTagName('svg')[0]
+      .setAttribute('width', nodeLinkLength * maxDepth + svgMargin.left + 150)
+      // TODO height
+
+    // if (nodeLinkLength * maxDepth + svgMargin.left < this.svgWidth)
+    //   nodes.forEach(d => { d.y = d.depth * nodeLinkLength })
+
+    nodes.forEach(d => { d.y = d.depth * nodeLinkLength })
 
     const node = this.svg.selectAll('g.node')
       .data(nodes, function (d) { return d.data.uuid })
@@ -143,6 +165,7 @@ export default class SurveyHierarchyTree {
     const fo = nodeEnter
       .append('foreignObject')
       .attr('x', d => NodeDef.isRoot(d.data) ? -100 : 0)
+      // .attr('x', 0)
       //.attr('y', d => hasChildren(d) ? -(nodeLabelDist * 3) : -nodeLabelDist)
       .attr('y', -nodeLabelDist)
       .attr('width', 150)

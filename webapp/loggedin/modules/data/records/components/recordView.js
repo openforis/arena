@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -26,16 +26,10 @@ import {
   dispatchRecordDelete
 } from '../../../../surveyViews/record/actions'
 
-class RecordView extends React.Component {
+const RecordView = props => {
 
-  constructor (props) {
-    super(props)
-
-    this.componentUnload = this.componentUnload.bind(this)
-  }
-
-  addWebSocketListeners () {
-    const { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete, history } = this.props
+  const addWebSocketListeners = () => {
+    const { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete, history } = props
 
     AppWebSocket.on(WebSocketEvents.nodesUpdate, recordNodesUpdate)
     AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
@@ -45,45 +39,50 @@ class RecordView extends React.Component {
     })
   }
 
-  removeWebSocketListeners () {
+  const removeWebSocketListeners = () => {
     AppWebSocket.off(WebSocketEvents.nodesUpdate)
     AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
     AppWebSocket.off(WebSocketEvents.recordDelete)
   }
 
-  componentUnload () {
-    this.removeWebSocketListeners()
+  const componentUnload = () => {
+    removeWebSocketListeners()
 
-    const { recordUuidUrlParam, recordLoaded, checkOutRecord, resetForm } = this.props
+    const { recordUuidUrlParam, recordLoaded, checkOutRecord, resetForm } = props
 
-    if (recordLoaded)
+    if (recordLoaded) {
       checkOutRecord(recordUuidUrlParam)
+    }
 
     resetForm()
   }
 
-  componentDidMount () {
-    const { checkInRecord, recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam } = this.props
+  useEffect(() => {
+    const { checkInRecord, recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam } = props
+
     checkInRecord(recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam)
 
-    window.addEventListener('beforeunload', this.componentUnload)
+    window.addEventListener('beforeunload', componentUnload)
+    addWebSocketListeners()
 
-    this.addWebSocketListeners()
-  }
+    return () => {
+      componentUnload()
+      window.removeEventListener('beforeunload', componentUnload)
+    }
+  }, [])
 
-  componentWillUnmount () {
-    this.componentUnload()
-    window.removeEventListener('beforeunload', this.componentUnload)
-  }
+  const { recordLoaded, preview, canEditRecord } = props
 
-  render () {
-    const { recordLoaded, preview, canEditRecord } = this.props
-
-    return recordLoaded
-      ? <SurveyFormView draft={preview} preview={preview} edit={false} entry={true} canEditRecord={canEditRecord}/>
-      : null
-  }
+  return recordLoaded
+    ? <SurveyFormView
+        draft={preview}
+        preview={preview}
+        edit={false}
+        entry={true}
+        canEditRecord={canEditRecord}/>
+    : null
 }
+
 
 const mapStateToProps = (state, { match, location }) => {
   const user = AppState.getUser(state)
