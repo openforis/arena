@@ -1,7 +1,7 @@
 import './surveyForm.scss'
 import './react-grid-layout.scss'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -14,6 +14,7 @@ import FormPageNavigation from './components/formPageNavigation'
 import AddNodeDefPanel from './components/addNodeDefPanel'
 import NodeDefEdit from '../nodeDefEdit/nodeDefEdit'
 import NodeDefSwitch from './nodeDefs/nodeDefSwitch'
+import { useOnUpdate } from '../../../commonComponents/hooks'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
@@ -43,25 +44,18 @@ const SurveyFormView = (props) => {
   className += hasNodeDefAddChildTo ? '' : ' form-actions-off'
   className += showPageNavigation ? '' : ' page-navigation-off'
 
-  const isInitialMount = useRef(true)
-
   //if showPageNavigation, addNodeDefAddChildTo or sideBar change, trigger window resize to re-render react-grid-layout form
-  useEffect(
-    () => {
-      if (isInitialMount.current) {
-        isInitialMount.current = false
-      } else {
-        const reactGridLayoutElems = document.getElementsByClassName('react-grid-layout')
-        for (const el of reactGridLayoutElems) {
-          el.classList.remove('mounted')
-        }
-        dispatchWindowResize()
-        setTimeout(() => {
-          for (const el of reactGridLayoutElems) {
-            el.classList.add('mounted')
-          }
-        }, 100)
+  useOnUpdate(() => {
+      const reactGridLayoutElems = document.getElementsByClassName('react-grid-layout')
+      for (const el of reactGridLayoutElems) {
+        el.classList.remove('mounted')
       }
+      dispatchWindowResize()
+      setTimeout(() => {
+        for (const el of reactGridLayoutElems) {
+          el.classList.add('mounted')
+        }
+      }, 100)
     },
     [showPageNavigation, hasNodeDefAddChildTo, isSideBarOpened]
   )

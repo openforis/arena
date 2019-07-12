@@ -32,6 +32,11 @@ const getViewExpr = (ascLabel, descLabel) => R.pipe(
   R.join(', ')
 )
 
+const toString = R.pipe(
+  R.defaultTo([]),
+  getViewExpr('asc', 'desc')
+)
+
 const getNewCriteria = availableVariables =>
   R.filter(c => R.any(v => v.value === c.variable, availableVariables))
 
@@ -58,6 +63,7 @@ module.exports = {
   getSortPreparedStatement,
   findVariableByValue,
   getViewExpr,
+  toString,
   getNewCriteria,
   updateOrder,
   updateVariable,
