@@ -42,10 +42,6 @@ const NodeDefsSelectorView = props => {
   useEffect(() => {
     if (nodeDefUuidEntity) {
       props.onChangeEntity(nodeDefUuidEntity)
-
-      const newNodeDefUuidsAttributes = []
-      setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
-      props.onChangeAttributes(newNodeDefUuidsAttributes)
     }
   }, [nodeDefUuidEntity])
 

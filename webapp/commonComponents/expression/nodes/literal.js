@@ -29,7 +29,9 @@ class Literal extends React.Component {
 
   isValueText (value) {
     const { nodeDefCurrent } = this.props
-    return !(NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent) || StringUtils.isBlank(value))
+    return nodeDefCurrent
+      ? !(NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent) || StringUtils.isBlank(value))
+      : false
   }
 
   getNodeValue () {
