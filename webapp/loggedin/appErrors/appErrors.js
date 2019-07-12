@@ -11,6 +11,7 @@ import * as AppState from '../../app/appState'
 import { closeAppError } from '../../app/actions'
 
 import useI18n from '../../commonComponents/useI18n'
+import Markdown from 'react-remarkable'
 
 const AppError = ({ error, closeAppError }) => {
 
@@ -29,7 +30,9 @@ const AppError = ({ error, closeAppError }) => {
         ERROR {R.path(['response', 'status'], error)}
       </div>
       <div className="message">
-        {i18n.t(`appErrors.${key}`, params)}
+        <Markdown options={{ html: false }}>
+          {i18n.t(`appErrors.${key}`, params)}
+        </Markdown>
       </div>
     </div>
   )
