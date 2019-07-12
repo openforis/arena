@@ -32,7 +32,7 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
   grid-row-gap: 20px;
   border-left: $sidebarBtnTransparent;
   border-right: $sidebarBtnTransparent;
-  height: 46px;
+  padding: 15px 0;
   cursor: pointer;
 
   &[aria-disabled="true"] {
@@ -87,8 +87,6 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
   width: $sidebarWidthOpened;
 
   .app-sidebar__module {
-    height: auto;
-    padding: 15px 0;
     cursor: auto;
   }
 }
