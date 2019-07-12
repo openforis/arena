@@ -16,7 +16,7 @@ const DataView = ({ surveyInfo }) => {
 
   return (
     <SurveyDefsLoader
-      draft={!Survey.isPublished(surveyInfo)}
+      draft={Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)}
       validate={false}>
 
       <InnerModuleSwitch
