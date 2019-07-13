@@ -9,46 +9,36 @@ const RecordReader = require('./recordReader')
 
 // ====== UPDATE
 
-const assocNodes = nodes =>
-  record => {
-    // exclude dirty nodes currently being edited by the user
+const assocNodes = nodes => record => {
+  let recordUpdated = { ...record }
+  if (!recordUpdated[keys.nodes])
+    recordUpdated[keys.nodes] = {}
 
-    const nodesToUpdate = R.pipe(
-      R.filter(
-        n => {
-          const nodeUuid = Node.getUuid(n)
-          const nodeExisting = RecordReader.getNodeByUuid(nodeUuid)(record)
+  R.forEachObjIndexed((n, nodeUuid) => {
 
-          return !nodeExisting || //new node
-            !Node.isDirty(nodeExisting) || //existing node is not dirty
-            Node.isDirty(n) || //new node is dirty, replace the existing one
-            R.equals(Node.getValue(nodeExisting), Node.getValue(n)) || //new node is not dirty and has the same value of the existing (dirty) node
-            Node.isValueBlank(nodeExisting) && Node.isDefaultValueApplied(n) //existing node has a blank value and n has a default value applied
-        }
-      ),
-      R.map(
-        R.omit([Node.keys.updated, Node.keys.created]) //exclude updated and created properties (used by Survey RDB generation)
-      )
-    )(nodes)
+    // remove deleted node
+    if (Node.isDeleted(n)) {
+      recordUpdated = deleteNode(n)(recordUpdated)
+    } else {
+      const nodeExisting = RecordReader.getNodeByUuid(nodeUuid)(recordUpdated)
+      // exclude dirty nodes currently being edited by the user
+      const includes = !nodeExisting || // nodeExisting does not exist, n is new node
+        !Node.isDirty(nodeExisting) || //existing node is not dirty //TODO check with S.R. why
+        Node.isDirty(n) || //new node is dirty, replace the existing one
+        R.equals(Node.getValue(nodeExisting), Node.getValue(n)) || //new node is not dirty and has the same value of the existing (dirty) node
+        Node.isValueBlank(nodeExisting) && Node.isDefaultValueApplied(n) //existing node has a blank value and n has a default value applied
 
-    const nodesDeletedArray = R.pipe(
-      R.filter(Node.isDeleted),
-      R.values
-    )(nodes)
-
-    const recordUpdated = {
-      ...record,
-      [keys.nodes]: {
-        ...RecordReader.getNodes(record),
-        ...nodesToUpdate
+      if (includes) {
+        const nodeUpdated = R.omit([Node.keys.updated, Node.keys.created], n) //exclude updated and created properties (used by Survey RDB generation)
+        recordUpdated[keys.nodes][nodeUuid] = nodeUpdated
+        recordUpdated = NodesIndex.addNode(nodeUpdated)(recordUpdated)
       }
-    }
 
-    return R.pipe(
-      deleteNodes(nodesDeletedArray),
-      NodesIndex.addNodes(nodesToUpdate)
-    )(recordUpdated)
-  }
+    }
+  }, nodes)
+
+  return recordUpdated
+}
 
 const assocNode = node => assocNodes({ [Node.getUuid(node)]: node })
 
@@ -60,41 +50,39 @@ const mergeNodeValidations = nodeValidations => record => R.pipe(
 
 // ====== DELETE
 
-const deleteNodes = nodesDeletedArray =>
-  record => R.reduce(
-    (updatedRecord, node) => deleteNode(node)(updatedRecord),
+const deleteNodes = nodesDeletedArray => record => R.reduce(
+  (updatedRecord, node) => deleteNode(node)(updatedRecord),
+  record,
+  nodesDeletedArray
+)
+
+const deleteNode = node => record => {
+  const nodeUuid = Node.getUuid(node)
+
+  // 1. remove entity children recursively
+  const children = RecordReader.getNodeChildren(node)(record)
+
+  let recordUpdated = R.reduce(
+    (recordAcc, child) => deleteNode(child)(recordAcc),
     record,
-    nodesDeletedArray
+    children
   )
 
-const deleteNode = node =>
-  record => {
-    const nodeUuid = Node.getUuid(node)
+  // 2. update validation
+  recordUpdated = R.pipe(
+    Validator.getValidation,
+    Validator.dissocFieldValidation(nodeUuid),
+    newValidation => Validator.assocValidation(newValidation)(recordUpdated)
+  )(recordUpdated)
 
-    // 1. remove entity children recursively
-    const children = RecordReader.getNodeChildren(node)(record)
+  // 3. remove node from index
+  recordUpdated = NodesIndex.removeNode(node)(recordUpdated)
 
-    let recordUpdated = R.reduce(
-      (recordAcc, child) => deleteNode(child)(recordAcc),
-      record,
-      children
-    )
+  // 4. remove node from record
+  delete recordUpdated[keys.nodes][nodeUuid]
 
-    // 2. update validation
-    recordUpdated = R.pipe(
-      Validator.getValidation,
-      Validator.dissocFieldValidation(nodeUuid),
-      newValidation => Validator.assocValidation(newValidation)(recordUpdated)
-    )(recordUpdated)
-
-    // 3. remove node from index
-    recordUpdated = NodesIndex.removeNode(node)(recordUpdated)
-
-    // 4. remove node from record
-    delete recordUpdated[keys.nodes][nodeUuid]
-
-    return recordUpdated
-  }
+  return recordUpdated
+}
 
 module.exports = {
   assocNodes,
