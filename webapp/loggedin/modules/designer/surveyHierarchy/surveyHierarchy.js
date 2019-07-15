@@ -29,6 +29,10 @@ const SurveyHierarchy = props => {
     setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid))
   }, [ready, i18n.lang])
 
+  useEffect(() => {
+    return () => tree && tree.terminate()
+  }, [tree])
+
   return (
     <div className="survey-hierarchy">
 
