@@ -35,17 +35,13 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [dataQueryTableNodeDefUuidUpdate]: (state, { nodeDefUuidTable }) =>
-    assocNodeDefUuidTable(nodeDefUuidTable)(state),
+  [dataQueryTableNodeDefUuidUpdate]: (state, { nodeDefUuidTable }) => assocNodeDefUuidTable(nodeDefUuidTable)(state),
 
-  [dataQueryTableNodeDefUuidColsUpdate]: (state, { nodeDefUuidCols }) =>
-    assocNodeDefUuidCols(nodeDefUuidCols)(state),
+  [dataQueryTableNodeDefUuidColsUpdate]: (state, { nodeDefUuidCols }) => assocNodeDefUuidCols(nodeDefUuidCols)(state),
 
-  [dataQueryTableDataColUpdate]: (state, { data }) =>
-    assocTableDataCol(data)(state),
+  [dataQueryTableDataColUpdate]: (state, { data }) => assocTableDataCol(data)(state),
 
-  [dataQueryTableDataColDelete]: (state, { cols }) =>
-    dissocTableDataCols(cols)(state),
+  [dataQueryTableDataColDelete]: (state, { cols }) => dissocTableDataCols(cols)(state),
 
   [dataQueryTableInit]: (
     state,
