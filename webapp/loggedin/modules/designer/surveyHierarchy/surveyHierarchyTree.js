@@ -2,69 +2,6 @@ import * as d3 from 'd3'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 
-// ResizeObserver polyfill
-if (typeof ResizeObserver === 'undefined') {
-  window.ResizeObserver = class ResizeObserver {
-    constructor (callback) {
-      this.observables = []
-      // Array of observed elements that looks like this:
-      // [{
-      //   el: domNode,
-      //   size: {height: x, width: y}
-      // }]
-      this.boundCheck = this.check.bind(this)
-      this.callback = callback
-
-      this.boundCheck()
-    }
-
-    observe (el) {
-      if (this.observables.some(observable => observable.el === el)) {
-        return
-      }
-      const newObservable = {
-        el: el,
-        size: {
-          height: el.clientHeight,
-          width: el.clientWidth
-        }
-      }
-      this.observables.push(newObservable)
-    }
-
-    unobserve (el) {
-      this.observables = this.observables.filter(obj => obj.el !== el)
-    }
-
-    disconnect () {
-      this.observables = []
-    }
-
-    check () {
-      const changedEntries = this.observables.filter((obj) => {
-        const currentHeight = obj.el.getBBox().height
-        const currentWidth = obj.el.getBBox().width
-
-        if (obj.size.height !== currentHeight || obj.size.width !== currentWidth) {
-          obj.size.height = currentHeight
-          obj.size.width = currentWidth
-
-          return true
-        }
-      }).map(obj => obj.el)
-
-      if (changedEntries.length) {
-        this.callback(changedEntries)
-      }
-      this.af = window.requestAnimationFrame(this.boundCheck)
-    }
-
-    terminate () {
-      window.cancelAnimationFrame(this.af)
-    }
-  }
-}
-
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 100 }
 
 const nodeRadiusInit = 1e-6
@@ -89,8 +26,6 @@ export default class SurveyHierarchyTree {
     this.svg = null
     this.tree = null
     this.root = null
-
-    this.svgWidth = null
 
     this.rootG = null
     this.resizeObserver = null
@@ -158,8 +93,6 @@ export default class SurveyHierarchyTree {
     // Set the dimensions and margins of the diagram
     const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
     const height = this.domElement.clientHeight - svgMargin.top - svgMargin.bottom
-
-    this.svgWidth = width
 
     // append the svg object to the body of the page
     // appends a 'group' element to 'svg'
@@ -256,8 +189,8 @@ export default class SurveyHierarchyTree {
     nodeUpdate.transition()
       .duration(transitionDuration)
       .attr('transform', d => `translate(${d.y}, ${d.x})`)
-      // .on('start', () => { this.resizeSvg(true) })
-      // .on('end', () => { this.resizeSvg(false) })
+    // .on('start', () => { this.resizeSvg(true) })
+    // .on('end', () => { this.resizeSvg(false) })
 
     // Update the node attributes and style
     nodeUpdate.select('circle.node')
