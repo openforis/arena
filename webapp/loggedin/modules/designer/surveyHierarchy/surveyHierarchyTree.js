@@ -10,7 +10,9 @@ const nodeHeight = 40
 const nodeLabelDist = 19
 const nodeLinkLength = 230
 
-const transitionDuration = 500
+const transitionDuration = 750
+const easeEnter = d3.easeExpOut
+const easeExit = d3.easeExpOut
 
 export default class SurveyHierarchyTree {
 
@@ -69,28 +71,25 @@ export default class SurveyHierarchyTree {
     }
   }
 
-  initObserver () {
-    const svgEl = document.getElementsByTagName('svg')[0]
+  resizeObserverCallback () {
+    const svgEl = document.getElementsByClassName('survey-hierarchy__svg')[0]
     const treeEl = document.getElementsByClassName('survey-hierarchy__tree')[0]
     const treeElSize = elementOffset(treeEl)
 
-    this.resizeObserver = new ResizeObserver(() => {
-      const bBox = this.rootG.getBBox()
-      console.log('bBox', bBox)
-      const oldWidth = Number(svgEl.getAttribute('width'))
-      const newWidth = bBox.width
-      const newHeight = bBox.height
+    const bBox = this.rootG.getBBox()
+    const oldWidth = Number(svgEl.getAttribute('width'))
+    const newWidth = bBox.width
+    const newHeight = bBox.height
 
-      svgEl.setAttribute('width', `${newWidth}`)
-      svgEl.setAttribute('height', `${Math.max(newHeight, treeElSize.height)}`)
+    svgEl.setAttribute('width', `${newWidth}`)
+    svgEl.setAttribute('height', `${Math.max(newHeight, treeElSize.height)}`)
 
-      d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${-bBox.y})`)
+    d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${-bBox.y})`)
 
-      if (newWidth > oldWidth) {
-        treeEl.scrollLeft = newWidth
-      }
-    })
-    this.resizeObserver.observe(this.rootG)
+    if (newWidth > oldWidth) {
+      treeEl.scrollLeft = newWidth
+    }
+
   }
 
   initSvg () {
@@ -103,14 +102,17 @@ export default class SurveyHierarchyTree {
     // moves the 'group' element to the top left margin
     this.svg = d3.select(this.domElement)
       .append('svg')
+      .classed('survey-hierarchy__svg', true)
       .attr('width', width + svgMargin.right + svgMargin.left)
       .attr('height', height + svgMargin.top + svgMargin.bottom)
       .append('g')
-      .attr('id', 'root_g')
+      .attr('id', 'survey-hierarchy__root-g')
 
-    this.rootG = document.getElementById('root_g')
+    this.rootG = document.getElementById('survey-hierarchy__root-g')
 
-    this.initObserver()
+    // initObserver
+    this.resizeObserver = new ResizeObserver(this.resizeObserverCallback.bind(this))
+    this.resizeObserver.observe(this.rootG)
 
     // declares a tree layout and assigns the size
     this.tree = d3.tree().size([height, width])
@@ -142,9 +144,8 @@ export default class SurveyHierarchyTree {
 
   }
 
-  terminate () {
-    this.resizeObserver.unobserve(this.rootG)
-    this.resizeObserver.terminate && this.resizeObserver.terminate()
+  disconnect () {
+    this.resizeObserver.disconnect()
   }
 
   updateNodes (treeData, source) {
@@ -188,14 +189,18 @@ export default class SurveyHierarchyTree {
     const nodeUpdate = nodeEnter.merge(node)
 
     // Transition to the proper position for the node
-    nodeUpdate.transition()
+    nodeUpdate
+      .transition()
       .duration(transitionDuration)
+      .ease(easeEnter)
       .attr('transform', d => `translate(${d.y}, ${d.x})`)
 
     // Remove any exiting nodes
     node.exit().transition()
       .duration(transitionDuration)
-      .attr('transform', d => `translate(${source.y}, ${source.x})`)
+      .ease(easeExit)
+      .attr('transform', `translate(${source.y}, ${source.x})`)
+      .style('opacity', 0)
       .remove()
 
     return nodes
@@ -227,17 +232,21 @@ export default class SurveyHierarchyTree {
     const linkUpdate = linkEnter.merge(link)
 
     // Transition back to the parent element position
-    linkUpdate.transition()
+    linkUpdate
+      .transition()
       .duration(transitionDuration)
+      .ease(easeEnter)
       .attr('d', d => diagonal(d, d.parent))
 
     // Remove any exiting links
     link.exit().transition()
       .duration(transitionDuration)
+      .ease(easeExit)
       .attr('d', d => {
         const o = { x: node.x, y: node.y }
         return diagonal(o, o)
       })
+      .style('opacity', 0)
       .remove()
   }
 
