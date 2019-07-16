@@ -26,13 +26,14 @@ export const getViewportDimensions = () => ({
 })
 
 export const isElementInViewport = el => {
-  const rect = el.getBoundingClientRect()
+  const rect = elementOffset(el)
+  const viewportDim = getViewportDimensions()
 
   return (
     rect.top >= 0 &&
     rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    rect.bottom <= viewportDim.height &&
+    rect.right <= viewportDim.width
   )
 }
 

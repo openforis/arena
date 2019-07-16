@@ -1,14 +1,14 @@
 import * as d3 from 'd3'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
-import { elementOffset, isElementInViewport } from '../../../../utils/domUtils'
+import { elementOffset } from '../../../../utils/domUtils'
 
-const svgMargin = { top: 40, right: 100, bottom: 40, left: 100 }
+const svgMargin = { top: 40, right: 100, bottom: 40, left: 0 }
 
-const nodeRadiusInit = 1e-6
-const nodeRadius = 16
-const nodeLabelDist = nodeRadius + 3
-const nodeLinkLength = 200
+const nodeWidth = 150
+const nodeHeight = 40
+const nodeLabelDist = 19
+const nodeLinkLength = 230
 
 const transitionDuration = 500
 
@@ -31,9 +31,6 @@ export default class SurveyHierarchyTree {
     this.rootG = null
     this.resizeObserver = null
 
-    // used to keep track of last toggle node event
-    this.lastToggleEvent = {}
-
     this.initSvg()
   }
 
@@ -52,11 +49,6 @@ export default class SurveyHierarchyTree {
     } else {
       node.children = node._children
       node._children = null
-    }
-
-    this.lastToggleEvent = {
-      node,
-      target: d3.event.target,
     }
 
     this.update(node)
@@ -84,28 +76,18 @@ export default class SurveyHierarchyTree {
 
     this.resizeObserver = new ResizeObserver(() => {
       const bBox = this.rootG.getBBox()
+      console.log('bBox', bBox)
+      const oldWidth = Number(svgEl.getAttribute('width'))
       const newWidth = bBox.width
       const newHeight = bBox.height
-      const oldWidth = Number(svgEl.getAttribute('width'))
-      const oldHeight = Number(svgEl.getAttribute('height'))
 
       svgEl.setAttribute('width', `${newWidth}`)
       svgEl.setAttribute('height', `${Math.max(newHeight, treeElSize.height)}`)
 
       d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${-bBox.y})`)
 
-      if (newWidth > oldWidth || newHeight !== oldHeight) {
-        const { target, node } = this.lastToggleEvent
-        // node has children if it has been expanded
-        const top = node && node.children && !isElementInViewport(target) ?
-          elementOffset(target).top + 20
-          : null
-
-        treeEl.scrollTo({
-          top,
-          left: newWidth,
-          behavior: 'smooth'
-        })
+      if (newWidth > oldWidth) {
+        treeEl.scrollLeft = newWidth
       }
     })
     this.resizeObserver.observe(this.rootG)
@@ -183,12 +165,10 @@ export default class SurveyHierarchyTree {
     // Add labels for the nodes
     const fo = nodeEnter
       .append('foreignObject')
-      .attr('x', d => NodeDef.isRoot(d.data) ? -100 : -50)
-      // .attr('x', 0)
-      //.attr('y', d => hasChildren(d) ? -(nodeLabelDist * 3) : -nodeLabelDist)
+      .attr('x', 0)
       .attr('y', -nodeLabelDist)
-      .attr('width', 150)
-      .attr('height', 40)
+      .attr('width', nodeWidth)
+      .attr('height', nodeHeight)
 
     const grid = fo.append('xhtml:div')
       .attr('class', 'node-grid')
@@ -211,27 +191,12 @@ export default class SurveyHierarchyTree {
     nodeUpdate.transition()
       .duration(transitionDuration)
       .attr('transform', d => `translate(${d.y}, ${d.x})`)
-    // .on('start', () => { this.resizeSvg(true) })
-    // .on('end', () => { this.resizeSvg(false) })
-
-    // Update the node attributes and style
-    nodeUpdate.select('circle.node')
-      .attr('r', d => hasChildren(d) ? nodeRadius : nodeRadiusInit)
-      .attr('class', d => 'node' + (hasChildren(d) ? '' : ' leaf'))
 
     // Remove any exiting nodes
-    const nodeExit = node.exit().transition()
+    node.exit().transition()
       .duration(transitionDuration)
       .attr('transform', d => `translate(${source.y}, ${source.x})`)
       .remove()
-
-    // On exit reduce the node circles size to 0
-    nodeExit.select('circle')
-      .attr('r', nodeRadiusInit)
-
-    // On exit reduce the opacity of text labels
-    nodeExit.select('text')
-      .style('fill-opacity', nodeRadiusInit)
 
     return nodes
   }
@@ -246,9 +211,9 @@ export default class SurveyHierarchyTree {
     // Creates a curved (diagonal) path from parent to the child nodes
     const diagonal = (s, d) =>
       `M ${s.y} ${s.x}
-        C ${(s.y + d.y) / 2} ${s.x},
-          ${(s.y + d.y) / 2} ${d.x},
-          ${d.y} ${d.x}`
+        C ${(s.y + d.y) / 2 + nodeWidth / 2} ${s.x},
+          ${(s.y + d.y) / 2 + nodeWidth / 2} ${d.x},
+          ${d.y + nodeWidth} ${d.x}`
 
     // Enter any new links at the parent's previous position
     const linkEnter = link.enter().insert('path', 'g')
