@@ -23,7 +23,7 @@ const assocNodes = nodes => record => {
       const nodeExisting = RecordReader.getNodeByUuid(nodeUuid)(recordUpdated)
       // exclude dirty nodes currently being edited by the user
       const includes = !nodeExisting || // nodeExisting does not exist, n is new node
-        !Node.isDirty(nodeExisting) || //existing node is not dirty //TODO check with S.R. why
+        !Node.isDirty(nodeExisting) || //existing node is not dirty
         Node.isDirty(n) || //new node is dirty, replace the existing one
         R.equals(Node.getValue(nodeExisting), Node.getValue(n)) || //new node is not dirty and has the same value of the existing (dirty) node
         Node.isValueBlank(nodeExisting) && Node.isDefaultValueApplied(n) //existing node has a blank value and n has a default value applied
@@ -49,12 +49,6 @@ const mergeNodeValidations = nodeValidations => record => R.pipe(
 )(record)
 
 // ====== DELETE
-
-const deleteNodes = nodesDeletedArray => record => R.reduce(
-  (updatedRecord, node) => deleteNode(node)(updatedRecord),
-  record,
-  nodesDeletedArray
-)
 
 const deleteNode = node => record => {
   const nodeUuid = Node.getUuid(node)
