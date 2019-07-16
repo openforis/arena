@@ -16,6 +16,10 @@
   width: 100%;
   overflow: auto;
 
+  svg {
+    position: absolute;
+  }
+
   .node {
 
     a {

@@ -25,6 +25,18 @@ export const getViewportDimensions = () => ({
   height: Math.max(document.documentElement.clientHeight, window.innerHeight || 0),
 })
 
+export const isElementInViewport = el => {
+  const rect = elementOffset(el)
+  const viewportDim = getViewportDimensions()
+
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= viewportDim.height &&
+    rect.right <= viewportDim.width
+  )
+}
+
 export const dispatchWindowResize = () => {
   window.dispatchEvent(new Event('resize'))
 }

@@ -5,29 +5,28 @@ import { connect } from 'react-redux'
 
 import Survey from '../../../../../common/survey/survey'
 
-import * as SurveyState from '../../../../survey/surveyState'
-
 import Tree from './surveyHierarchyTree'
 import NodeDefsSelectorView from '../../../surveyViews/nodeDefsSelector/nodeDefsSelectorView'
 
-import useI18n from '../../../../commonComponents/useI18n'
+import * as AppState from '../../../../app/appState'
+import * as SurveyState from '../../../../survey/surveyState'
 
 const SurveyHierarchy = props => {
 
-  const { surveyInfo, hierarchy, ready } = props
+  const { lang, hierarchy } = props
 
-  const [ selectedNodeDefUuid, setSelectedNodeDefUuid ] = useState(null)
-  const [ tree, setTree ] = useState(null)
+  const [selectedNodeDefUuid, setSelectedNodeDefUuid] = useState(null)
+  const [tree, setTree] = useState(null)
   const treeRef = useRef(null)
 
-  const i18n = useI18n()
+  useEffect(() => {
+    const treeElement = treeRef.current
+    setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid))
+  }, [lang])
 
   useEffect(() => {
-    const lang = Survey.getLanguage(i18n.lang)(surveyInfo)
-    const treeElement = treeRef.current
-
-    setTree(new Tree(treeElement, hierarchy.root, lang, setSelectedNodeDefUuid))
-  }, [ready, i18n.lang])
+    return () => tree && tree.disconnect()
+  }, [tree])
 
   return (
     <div className="survey-hierarchy">
@@ -52,15 +51,13 @@ const SurveyHierarchy = props => {
 }
 
 const mapStateToProps = state => {
+  const lang = AppState.getLang(state)
   const survey = SurveyState.getSurvey(state)
-  const surveyInfo = Survey.getSurveyInfo(survey)
-  const ready = SurveyState.areDefsFetched(state)
   const hierarchy = Survey.getHierarchy()(survey)
 
   return {
-    surveyInfo,
+    lang,
     hierarchy,
-    ready,
   }
 }
 
