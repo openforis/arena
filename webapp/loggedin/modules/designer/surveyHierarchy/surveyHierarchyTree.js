@@ -4,7 +4,7 @@ import NodeDef from '../../../../../common/survey/nodeDef'
 
 // ResizeObserver polyfill
 if (typeof ResizeObserver === 'undefined') {
-  global.ResizeObserver = class ResizeObserver {
+  window.ResizeObserver = class ResizeObserver {
     constructor (callback) {
       this.observables = []
       // Array of observed elements that looks like this:
@@ -13,12 +13,13 @@ if (typeof ResizeObserver === 'undefined') {
       //   size: {height: x, width: y}
       // }]
       this.boundCheck = this.check.bind(this)
-      this.boundCheck()
       this.callback = callback
+
+      this.boundCheck()
     }
 
     observe (el) {
-      if (this.observables.some((observable) => observable.el === el)) {
+      if (this.observables.some(observable => observable.el === el)) {
         return
       }
       const newObservable = {
@@ -50,9 +51,9 @@ if (typeof ResizeObserver === 'undefined') {
 
           return true
         }
-      }).map((obj) => obj.el)
+      }).map(obj => obj.el)
 
-      if (changedEntries.length > 0) {
+      if (changedEntries.length) {
         this.callback(changedEntries)
       }
       this.af = window.requestAnimationFrame(this.boundCheck)
@@ -131,6 +132,28 @@ export default class SurveyHierarchyTree {
     }
   }
 
+  initObserver () {
+    const svgEl = document.getElementsByTagName('svg')[0]
+    const treeEl = document.getElementsByClassName('survey-hierarchy__tree')[0]
+
+    this.resizeObserver = new ResizeObserver(entries => {
+      const bBox = this.rootG.getBBox()
+      const newWidth = bBox.width
+      const newHeight = bBox.height
+      const oldWidth = svgEl.getAttribute('width')
+
+      if (newWidth > oldWidth) {
+        treeEl.scrollTo(newWidth, treeEl.scrollTop)
+      }
+
+      svgEl.setAttribute('width', newWidth)
+      svgEl.setAttribute('height', newHeight)
+
+      d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${-bBox.y})`)
+    })
+    this.resizeObserver.observe(this.rootG)
+  }
+
   initSvg () {
     // Set the dimensions and margins of the diagram
     const width = this.domElement.clientWidth - svgMargin.left - svgMargin.right
@@ -150,25 +173,7 @@ export default class SurveyHierarchyTree {
 
     this.rootG = document.getElementById('root_g')
 
-    const svgEl = document.getElementsByTagName('svg')[0]
-    const treeEl = document.getElementsByClassName('survey-hierarchy__tree')[0]
-
-    this.resizeObserver = new ResizeObserver(entries => {
-      const bBox = this.rootG.getBBox()
-      const newWidth = bBox.width
-      const newHeight = bBox.height
-
-      if (newWidth > svgEl.getAttribute('width')) {
-        treeEl.scrollTo(newWidth, treeEl.scrollTop)
-      }
-
-      svgEl.setAttribute('width', newWidth)
-      svgEl.setAttribute('height', newHeight)
-
-      // svg.setAttribute('viewBox', `-${svgMargin.left} ${bBox.y} ${newWidth} ${newHeight}`)
-      d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${-bBox.y})`)
-    })
-    this.resizeObserver.observe(this.rootG)
+    this.initObserver()
 
     // declares a tree layout and assigns the size
     this.tree = d3.tree().size([height, width])
@@ -205,53 +210,7 @@ export default class SurveyHierarchyTree {
     this.resizeObserver.terminate && this.resizeObserver.terminate()
   }
 
-  // resizeSvg (enlarge) {
-  //   // const maxDepth = R.pipe(
-  //   //   R.values,
-  //   //   R.filter(R.prop('children')),
-  //   //   R.map(R.prop('depth')),
-  //   //   R.reduce(R.max, -1),
-  //   //   R.inc
-  //   // )(this.nodesByUuidMap)
-
-  //   // // Get current size
-  //   // const svg = document.getElementsByTagName('svg')[0]
-  //   // const oldWidth = svg.getAttribute('width')
-  //   // const newWidth = nodeLinkLength * maxDepth + svgMargin.left + 150
-
-  //   const svg = document.getElementsByTagName('svg')[0]
-  //   // const oldWidth = svg.getAttribute('width')
-  //   const newWidth = document.getElementById('root_g').getBBox().width
-  //   svg.setAttribute('width', newWidth)
-  //   // if (enlarge && newWidth > oldWidth) {
-  //   //   svg.setAttribute('width', newWidth)
-  //   //   // svg.setAttribute('viewBox', `0 0 ${newWidth} 1000`)
-  //   // } else if (!enlarge && newWidth < oldWidth) {
-  //   //   svg.setAttribute('width', newWidth)
-  //   //   // svg.setAttribute('viewBox', `0 0 ${newWidth} 1000`)
-  //   // }
-  //   // mySVG.setAttribute("viewBox", "0 0 100 100");
-  // }
-
   updateNodes (treeData, source) {
-    // // Compute the new tree layout
-    // this.resizeSvg()
-
-    // // Normalize for fixed-depth
-    // const maxDepth = R.pipe(
-    //   R.values,
-    //   R.filter(R.prop('children')),
-    //   R.map(R.prop('depth')),
-    //   R.reduce(R.max, -1),
-    //   R.inc
-    // )(this.nodesByUuidMap)
-
-    // document.getElementsByTagName('svg')[0]
-    //   .setAttribute('width', nodeLinkLength * maxDepth + svgMargin.left + 150)
-
-    // if (nodeLinkLength * maxDepth + svgMargin.left < this.svgWidth)
-    //   nodes.forEach(d => { d.y = d.depth * nodeLinkLength })
-
     const nodes = treeData.descendants()
 
     nodes.forEach(d => { d.y = d.depth * nodeLinkLength })
