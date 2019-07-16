@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
+import { elementOffset, isElementInViewport } from '../../../../utils/domUtils'
 
 const svgMargin = { top: 40, right: 100, bottom: 40, left: 100 }
 
@@ -30,6 +31,9 @@ export default class SurveyHierarchyTree {
     this.rootG = null
     this.resizeObserver = null
 
+    // used to keep track of last toggle node event
+    this.lastToggleEvent = {}
+
     this.initSvg()
   }
 
@@ -42,11 +46,17 @@ export default class SurveyHierarchyTree {
   }
 
   toggleNode (node) {
+
     if (node.children) {
       this.collapseNode(node)
     } else {
       node.children = node._children
       node._children = null
+    }
+
+    this.lastToggleEvent = {
+      node,
+      target: d3.event.target,
     }
 
     this.update(node)
@@ -70,21 +80,33 @@ export default class SurveyHierarchyTree {
   initObserver () {
     const svgEl = document.getElementsByTagName('svg')[0]
     const treeEl = document.getElementsByClassName('survey-hierarchy__tree')[0]
+    const treeElSize = elementOffset(treeEl)
 
-    this.resizeObserver = new ResizeObserver(entries => {
+    this.resizeObserver = new ResizeObserver(() => {
       const bBox = this.rootG.getBBox()
       const newWidth = bBox.width
       const newHeight = bBox.height
-      const oldWidth = svgEl.getAttribute('width')
+      const oldWidth = Number(svgEl.getAttribute('width'))
+      const oldHeight = Number(svgEl.getAttribute('height'))
 
-      if (newWidth > oldWidth) {
-        treeEl.scrollTo(newWidth, treeEl.scrollTop)
-      }
-
-      svgEl.setAttribute('width', newWidth)
-      svgEl.setAttribute('height', newHeight)
+      svgEl.setAttribute('width', `${newWidth}`)
+      svgEl.setAttribute('height', `${Math.max(newHeight, treeElSize.height)}`)
 
       d3.select(this.rootG).attr('transform', `translate(${svgMargin.left}, ${-bBox.y})`)
+
+      if (newWidth > oldWidth || newHeight !== oldHeight) {
+        const { target, node } = this.lastToggleEvent
+        // node has children if it has been expanded
+        const top = node && node.children && !isElementInViewport(target) ?
+          elementOffset(target).top + 20
+          : null
+
+        treeEl.scrollTo({
+          top,
+          left: newWidth,
+          behavior: 'smooth'
+        })
+      }
     })
     this.resizeObserver.observe(this.rootG)
   }
@@ -110,7 +132,7 @@ export default class SurveyHierarchyTree {
 
     // declares a tree layout and assigns the size
     this.tree = d3.tree().size([height, width])
-      .nodeSize([50, 10]).separation((a, b) => 1)
+      .nodeSize([50, 10]).separation((a, b) => a.parent !== b.parent ? 2 : 1)
 
     // Assigns parent, children, height, depth
     this.root = d3.hierarchy(this.data, d => d.children)
@@ -161,7 +183,7 @@ export default class SurveyHierarchyTree {
     // Add labels for the nodes
     const fo = nodeEnter
       .append('foreignObject')
-      .attr('x', d => NodeDef.isRoot(d.data) ? -100 : 0)
+      .attr('x', d => NodeDef.isRoot(d.data) ? -100 : -50)
       // .attr('x', 0)
       //.attr('y', d => hasChildren(d) ? -(nodeLabelDist * 3) : -nodeLabelDist)
       .attr('y', -nodeLabelDist)
