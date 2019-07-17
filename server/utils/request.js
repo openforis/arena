@@ -29,7 +29,7 @@ const getRestParam = (req, param, defaultValue = null) => {
 
 const getBoolParam = R.pipe(
   getRestParam,
-  R.equals('true'),
+  value => R.equals('true', value) || R.equals(true, value),
 )
 
 const getJsonParam = (req, param, defaultValue = null) => {
