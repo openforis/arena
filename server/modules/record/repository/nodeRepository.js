@@ -2,7 +2,7 @@ const R = require('ramda')
 const camelize = require('camelize')
 
 const db = require('../../../db/db')
-const { now, insertAllQuery } = require('../../../db/dbUtils')
+const DbUtils = require('../../../db/dbUtils')
 
 const Node = require('../../../../common/record/node')
 const { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } = require('../../survey/repository/surveySchemaRepositoryUtils')
@@ -37,7 +37,7 @@ const insertNode = (surveyId, node, client = db) => {
 }
 
 const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
-  await client.none(insertAllQuery(
+  await client.none(DbUtils.insertAllQuery(
     getSurveyDBSchema(surveyId),
     'node',
     ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'],
@@ -46,14 +46,38 @@ const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
 
 // ============== READ
 
-const fetchNodesByRecordUuid = async (surveyId, recordUuid, client = db) =>
-  await client.map(`
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $1
-    ORDER BY date_created`,
+const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+
+  return await client.map(`
+    SELECT 
+        n.*,
+        ${DbUtils.getPropsCombined(draft, 'c.', 'category_item')},
+        ${DbUtils.getPropsCombined(draft, 't.', 'taxon')},
+        ${DbUtils.getPropsCombined(draft, 'v.', 'taxon_vernacular_name')}
+    FROM 
+        ${schema}.node n
+    LEFT OUTER JOIN
+        ${schema}.category_item c
+    ON
+        (n.value->>'itemUuid')::uuid = c.uuid
+    LEFT OUTER JOIN
+        ${schema}.taxon t
+    ON
+        (n.value->>'taxonUuid')::uuid = t.uuid
+    LEFT OUTER JOIN
+        ${schema}.taxon_vernacular_name v
+    ON
+        (n.value->>'vernacularNameUuid')::uuid = v.uuid    
+    WHERE 
+        record_uuid = $1
+    ORDER 
+        BY date_created
+    `,
     [recordUuid],
     dbTransformCallback
   )
+}
 
 const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
   await client.one(`
@@ -88,7 +112,7 @@ const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1,
     meta = meta || $2::jsonb, 
-    date_modified = ${now}
+    date_modified = ${DbUtils.now}
     WHERE uuid = $3
     RETURNING *, true as ${Node.keys.updated}
     `, [stringifyValue(value), meta, nodeUuid],

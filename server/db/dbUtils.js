@@ -53,6 +53,13 @@ const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
 
   return pgp.helpers.update(valuesIndexedByCol, columnSet) + ` WHERE v.${idColName}::${idColCast} = t.${idColName}::${idColCast}`
 }
+/**
+ * Combines a draft and published props
+ */
+const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
+  draft
+    ? `${columnPrefix}props || ${columnPrefix}props_draft AS ${alias}`
+    : `${columnPrefix}props AS ${alias}`
 
 /**
  * Combines a draft and a published column prop, if needed
@@ -76,6 +83,7 @@ module.exports = {
   insertAllQuery,
   updateAllQuery,
 
+  getPropsCombined,
   //props column
   getPropColCombined,
   getPropFilterCondition

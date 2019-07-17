@@ -28,61 +28,66 @@ import {
 
 const RecordView = props => {
 
-  const addWebSocketListeners = () => {
-    const { recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete, history } = props
+  const componentLoad = () => {
+    const {
+      recordUuidUrlParam, parentNodeUuidUrlParam, draftDefs,
+      checkInRecord,
+      recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete, history
+    } = props
 
+    // check in record
+    checkInRecord(recordUuidUrlParam, draftDefs, parentNodeUuidUrlParam)
+
+    // add websocket event listeners
     AppWebSocket.on(WebSocketEvents.nodesUpdate, recordNodesUpdate)
     AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
     AppWebSocket.on(WebSocketEvents.recordDelete, () => {
       alert('This record has just been deleted by another user')
       dispatchRecordDelete(history)
     })
-  }
 
-  const removeWebSocketListeners = () => {
-    AppWebSocket.off(WebSocketEvents.nodesUpdate)
-    AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
-    AppWebSocket.off(WebSocketEvents.recordDelete)
+    // add beforeunload event listener
+    window.addEventListener('beforeunload', componentUnload)
   }
 
   const componentUnload = () => {
-    removeWebSocketListeners()
+    // remove web socket listeners
+    AppWebSocket.off(WebSocketEvents.nodesUpdate)
+    AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
+    AppWebSocket.off(WebSocketEvents.recordDelete)
 
     const { recordUuidUrlParam, recordLoaded, checkOutRecord, resetForm } = props
-
+    // checkout record
     if (recordLoaded) {
       checkOutRecord(recordUuidUrlParam)
     }
 
+    // reset form
     resetForm()
+
+    // remove beforeunload event listener
+    window.removeEventListener('beforeunload', componentUnload)
   }
 
   useEffect(() => {
-    const { checkInRecord, recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam } = props
-
-    checkInRecord(recordUuidUrlParam, parentNodeUuidUrlParam, nodeDefUuidUrlParam)
-
-    window.addEventListener('beforeunload', componentUnload)
-    addWebSocketListeners()
-
-    return () => {
-      componentUnload()
-      window.removeEventListener('beforeunload', componentUnload)
-    }
+    componentLoad()
+    return componentUnload
   }, [])
 
   const { recordLoaded, preview, canEditRecord } = props
 
   return recordLoaded
-    ? <SurveyFormView
+    ? (
+      <SurveyFormView
         draft={preview}
         preview={preview}
         edit={false}
         entry={true}
-        canEditRecord={canEditRecord}/>
+        canEditRecord={canEditRecord}
+      />
+    )
     : null
 }
-
 
 const mapStateToProps = (state, { match, location }) => {
   const user = AppState.getUser(state)
@@ -95,7 +100,6 @@ const mapStateToProps = (state, { match, location }) => {
     recordLoaded: !R.isEmpty(record),
     recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
-    nodeDefUuidUrlParam: urlSearchParams.get('nodeDefUuid')
   }
 }
 
