@@ -1,61 +1,41 @@
 import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
-import { withRouter, Switch, Route, Redirect } from 'react-router-dom'
-
-import { Authenticator, SignIn } from 'aws-amplify-react/dist/Auth'
+import { withRouter, Route } from 'react-router-dom'
 
 import LoginView from '../login/loginView'
 import DynamicImport from '../commonComponents/dynamicImport'
+import { useOnUpdate } from '../commonComponents/hooks'
 
 import * as AppWebSocket from './appWebSocket'
 
 import * as AppState from './appState'
 import { throwSystemError, initApp } from './actions'
 
-import { appModuleUri } from '../loggedin/appModules'
-
-const AppSwitch = ({ authState }) => (
-  authState === 'signedIn' &&
-  <Switch>
-    <Route
-      exact
-      path="/"
-      render={() => (
-        <Redirect to={appModuleUri()}/>
-      )}
-    />
-    <Route
-      path="/app"
-      render={props => (
-        <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
-      )}
-    />
-  </Switch>
-)
-
 const AppRouterSwitch = props => {
 
   const {
     isReady, systemError, user,
     initApp, throwSystemError,
-    i18n,
+    i18n
   } = props
 
   useEffect(() => {
     initApp()
-    return () => AppWebSocket.closeSocket()
+    return AppWebSocket.closeSocket
   }, [])
 
-  useEffect(() => {
-    if (user) {
-      (async () => {
-        await AppWebSocket.openSocket(throwSystemError)
-      })()
-    } else {
-      AppWebSocket.closeSocket()
+  useOnUpdate(() => {
+    if (isReady) {
+      if (user) {
+        (async () => {
+          await AppWebSocket.openSocket(throwSystemError)
+        })()
+      } else {
+        AppWebSocket.closeSocket()
+      }
     }
-  }, [user])
+  }, [isReady, user])
 
   return (
     isReady && (
@@ -69,12 +49,19 @@ const AppRouterSwitch = props => {
             </div>
           </div>
         )
-        : (
-          <Authenticator hide={[SignIn]} hideDefault={true}>
-            <LoginView override={'SignIn'}/>
-            <AppSwitch/>
-          </Authenticator>
+        : user
+        ? (
+          <Route
+            path="/app"
+            render={props => (
+              <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
+            )}
+          />
         )
+        : (
+          <LoginView/>
+        )
+
     )
   )
 }

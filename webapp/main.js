@@ -11,14 +11,12 @@ import { Provider } from 'react-redux'
 
 import AppRouterSwitch from './app/appRouterSwitch'
 
-import * as CognitoAuth from './app/cognitoAuth'
 import * as AxiosJwtMiddleware from './app/axiosJwtMiddleware'
 
 import store from './app/store'
 
 function renderApp () {
 
-  CognitoAuth.init()
   AxiosJwtMiddleware.init()
 
   ReactDOM.render(
