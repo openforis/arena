@@ -1,7 +1,6 @@
 import React from 'react'
 import axios from 'axios'
 import * as R from 'ramda'
-import Promise from 'bluebird'
 
 import NodeDef from '../../../../common/survey/nodeDef'
 import StringUtils from '../../../../common/stringUtils'

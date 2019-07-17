@@ -55,7 +55,7 @@ if (buildReport) {
 
 // ====== webpack config
 const webPackConfig = {
-  entry: ['core-js/stable', 'regenerator-runtime/runtime', './webapp/main.js'],
+  entry: ['./webapp/main.js'],
   mode: prodBuild ? mode.production : mode.development,
   output: {
     filename: 'bundle-[hash].js',

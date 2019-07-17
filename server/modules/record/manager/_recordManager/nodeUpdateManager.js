@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const Queue = require('../../../../../common/queue')
 

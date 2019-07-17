@@ -4,7 +4,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import * as R from 'ramda'
 import axios from 'axios'
-import Promise from 'bluebird'
 
 import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 import useI18n from '../../../../../commonComponents/useI18n'

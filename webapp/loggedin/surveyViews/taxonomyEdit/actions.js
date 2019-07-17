@@ -1,5 +1,4 @@
 import axios from 'axios'
-import Promise from 'bluebird'
 
 import { debounceAction } from '../../../utils/reduxUtils'
 import Taxonomy from '../../../../common/survey/taxonomy'

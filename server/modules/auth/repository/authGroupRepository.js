@@ -1,4 +1,3 @@
-const Promise = require('bluebird')
 const camelize = require('camelize')
 const db = require('../../../db/db')
 

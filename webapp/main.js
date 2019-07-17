@@ -1,6 +1,8 @@
-import './style/main.scss'
-
 import './utils/polyfill/polyfill'
+// import 'core-js/stable'
+import 'regenerator-runtime/runtime'
+
+import './style/main.scss'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
