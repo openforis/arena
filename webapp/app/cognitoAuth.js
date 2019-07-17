@@ -1,33 +1,62 @@
-import Amplify, { Auth } from 'aws-amplify'
+import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js'
 
-export const init = () => {
-  Amplify.configure({
-    Auth: {
-      region: __COGNITO_REGION__,
-      userPoolId: __COGNITO_USER_POOL_ID__,
-      userPoolWebClientId: __COGNITO_CLIENT_ID__,
-    },
-    Analytics: {
-      disabled: true
-    }
-  })
+const UserPoolId = __COGNITO_USER_POOL_ID__
+const ClientId = __COGNITO_CLIENT_ID__
+
+const getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
+
+const getUser = () => {
+  const pool = getUserPool()
+  return pool.getCurrentUser()
 }
 
+export const login = (Username, Password) => new Promise((resolve, reject) => {
+
+  const authenticationData = { Username, Password }
+  const authenticationDetails = new AuthenticationDetails(authenticationData)
+
+  const Pool = getUserPool()
+  const userData = { Username, Pool }
+  const cognitoUser = new CognitoUser(userData)
+
+  cognitoUser.authenticateUser(
+    authenticationDetails,
+    {
+      onSuccess: result => {
+        const jwtToken = result.getAccessToken().getJwtToken()
+        resolve(jwtToken)
+      },
+      onFailure: error => {
+        reject(error)
+      }
+    }
+  )
+})
+
 export const logout = () => {
-  Auth.signOut({ global: true })
+  const user = getUser()
+  if (user) {
+    user.signOut()
+  }
 }
 
 /**
  *
- * @returns current idToken.jwtToken if current session has a user or null if it doesn't
+ * @returns current accessToken.jwtToken if current session has a user or null if it doesn't
  */
-export const getJwtToken = async () => {
-  try {
-    const session = await Auth.currentSession()
-    const accessToken = session.getAccessToken()
-    return accessToken.jwtToken
-  } catch (e) {
-    // No current user
-    return null
+export const getJwtToken = () => new Promise((resolve, reject) => {
+  const user = getUser()
+
+  if (user) {
+    user.getSession((err, session) => {
+      if (err) {
+        reject(err)
+      }
+      const accessToken = session.getAccessToken()
+      const jwtToken = accessToken.jwtToken
+      resolve(jwtToken)
+    })
+  } else {
+    resolve(null)
   }
-}
+})

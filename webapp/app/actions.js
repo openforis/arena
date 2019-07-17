@@ -44,7 +44,7 @@ export const setLanguage = languageCode => async (dispatch) => {
 
 export const logout = () => async dispatch => {
   await axios.post('/auth/logout')
-  await CognitoAuth.logout()
+  CognitoAuth.logout()
   dispatch({ type: appUserLogout })
 }
 
