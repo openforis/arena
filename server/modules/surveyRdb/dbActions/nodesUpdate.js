@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')

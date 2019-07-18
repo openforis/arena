@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const Validator = require('../../../../common/validation/validator')
 const Survey = require('../../../../common/survey/survey')
