@@ -53,8 +53,9 @@ const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
 
   return pgp.helpers.update(valuesIndexedByCol, columnSet) + ` WHERE v.${idColName}::${idColCast} = t.${idColName}::${idColCast}`
 }
+
 /**
- * Combines a draft and published props
+ * Combines draft and published props
  */
 const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
   draft

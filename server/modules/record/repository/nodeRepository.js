@@ -49,34 +49,43 @@ const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
 const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  return await client.map(`
-    SELECT 
-        n.*,
-        ${DbUtils.getPropsCombined(draft, 'c.', 'category_item')},
-        ${DbUtils.getPropsCombined(draft, 't.', 'taxon')},
-        ${DbUtils.getPropsCombined(draft, 'v.', 'taxon_vernacular_name')}
+  // TODO: This query can be used to prefetch taxa and category items associated with the nodes
+  // const select = `
+  //   SELECT
+  //       n.*,
+  //       ${DbUtils.getPropsCombined(draft, 'c.', 'category_item')},
+  //       ${DbUtils.getPropsCombined(draft, 't.', 'taxon')},
+  //       ${DbUtils.getPropsCombined(draft, 'v.', 'taxon_vernacular_name')}
+  //   FROM
+  //       ${schema}.node n
+  //   LEFT OUTER JOIN
+  //       ${schema}.category_item c
+  //   ON
+  //       (n.value->>'${Node.valuePropKeys.itemUuid}')::uuid = c.uuid
+  //   LEFT OUTER JOIN
+  //       ${schema}.taxon t
+  //   ON
+  //       (n.value->>'${Node.valuePropKeys.taxonUuid}')::uuid = t.uuid
+  //   LEFT OUTER JOIN
+  //       ${schema}.taxon_vernacular_name v
+  //   ON
+  //       (n.value->>'${Node.valuePropKeys.vernacularNameUuid}')::uuid = v.uuid
+  //   WHERE
+  //       record_uuid = $1
+  //   ORDER
+  //       BY date_created
+  //   `
+
+  const select = `
+    SELECT * 
     FROM 
-        ${schema}.node n
-    LEFT OUTER JOIN
-        ${schema}.category_item c
-    ON
-        (n.value->>'itemUuid')::uuid = c.uuid
-    LEFT OUTER JOIN
-        ${schema}.taxon t
-    ON
-        (n.value->>'taxonUuid')::uuid = t.uuid
-    LEFT OUTER JOIN
-        ${schema}.taxon_vernacular_name v
-    ON
-        (n.value->>'vernacularNameUuid')::uuid = v.uuid    
+        ${schema}.node
     WHERE 
         record_uuid = $1
-    ORDER 
-        BY date_created
-    `,
-    [recordUuid],
-    dbTransformCallback
-  )
+    ORDER BY 
+        date_created
+  `
+  return await client.map(select, [recordUuid], dbTransformCallback)
 }
 
 const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
