@@ -4,6 +4,7 @@ import { Route, Switch } from 'react-router'
 import DesignerView from './designer/designerView'
 import HomeView from './home/homeView'
 import DataView from './data/dataView'
+import Users from './users/usersView'
 
 import { appModules, appModuleUri } from '../appModules'
 
@@ -23,6 +24,7 @@ const ModuleSwitch = (props) => (
       <Route path={appModuleUri(appModules.home)} component={Home}/>
       <Route path={appModuleUri(appModules.designer)} component={Designer}/>
       <Route path={appModuleUri(appModules.data)} component={Data}/>
+      <Route path={appModuleUri(appModules.users)} component={Users}/>
     </Switch>
 
   </div>

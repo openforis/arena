@@ -22,12 +22,12 @@ const SurveyListView = props => {
     setActiveSurvey, fetchSurveys
   } = props
 
-  const [fetched, setFeched] = useState(false)
+  const [fetched, setFetched] = useState(false)
 
   //onMount fetch surveys
   useEffect(() => {
     fetchSurveys()
-    setFeched(true)
+    setFetched(true)
   }, [])
 
   const surveysLength = R.length(surveys)

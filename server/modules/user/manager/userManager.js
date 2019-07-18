@@ -14,6 +14,7 @@ const findUserByCognitoUsername = async email => {
   return null
 }
 
+
 // ==== DELETE
 
 const deleteUserPref = async (user, name) => ({
@@ -23,6 +24,8 @@ const deleteUserPref = async (user, name) => ({
 
 module.exports = {
   // READ
+  fetchUsersBySurveyId: UserRepository.fetchUsersBySurveyId,
+
   findUserByCognitoUsername,
 
   // UPDATE

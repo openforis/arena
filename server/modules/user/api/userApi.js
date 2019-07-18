@@ -7,6 +7,14 @@ const SystemError = require('../../../../server/utils/systemError')
 
 module.exports.init = app => {
 
+  // ==== READ
+
+  app.get('/survey/:surveyId/users', async (req, res, next) => {
+    const { surveyId } = Request.getParams(req)
+
+    res.json(await UserService.fetchUsersBySurveyId(surveyId))
+  })
+
   // ==== UPDATE
 
   app.post('/user/:userId/pref/:name/:value', async (req, res, next) => {

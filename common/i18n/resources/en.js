@@ -17,11 +17,13 @@ module.exports = {
     done: 'Done',
     download: 'Download',
     edit: 'Edit',
+    email: 'Email',
     empty: 'Empty',
     error: 'Error',
     error_plural: 'Errors',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
+    id: 'id',
     invalid: 'INVALID',
     item: 'Item',
     item_plural: 'Items',
@@ -56,6 +58,8 @@ module.exports = {
     data: 'Data',
     records: 'Records',
     dataVis: 'Data vis',
+
+    users: 'Users',
   },
 
   sidebar: {

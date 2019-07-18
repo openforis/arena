@@ -22,7 +22,7 @@ const SortExpressionComponent = props => {
 
   const { lang } = useI18n()
 
-  const { nodeDefUuidCols, onClose } = props
+  const { onClose } = props
 
   const [sortCriteria, setSortCriteria] = useState(props.sort)
 

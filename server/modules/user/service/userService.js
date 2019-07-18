@@ -1,6 +1,7 @@
 const UserManager = require('../manager/userManager')
 
 module.exports = {
+  fetchUsersBySurveyId: UserManager.fetchUsersBySurveyId,
 
   findUserById: UserManager.findUserById,
 
