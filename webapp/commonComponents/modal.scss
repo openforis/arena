@@ -26,7 +26,7 @@ $borderRadius: 2px;
   border-radius: $borderRadius;
   outline: 0;
   animation-name: animatetop;
-  animation-duration: 0.5s;
+  animation-duration: 0.4s;
   margin: 10vh 20vw auto;
   padding: 5vh 5vw;
   box-shadow: $shadow3;
@@ -49,6 +49,7 @@ $borderRadius: 2px;
 
 .modal-close {
   padding: 3px;
+
   &:hover {
     cursor: pointer;
   }
@@ -75,11 +76,11 @@ $borderRadius: 2px;
 
 @keyframes animatetop {
   from {
-    top: -300px;
-    opacity: 0
+    transform: translateY(-100px);
+    opacity: 0;
   }
   to {
-    top: 0;
-    opacity: 1
+    transform: none;
+    opacity: 1;
   }
 }

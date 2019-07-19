@@ -40,23 +40,10 @@ const NodeDefEntityTableCell = props => {
         const gridLeft = gridSize.left
         const gridRight = gridSize.width + gridLeft
 
-        const elemVisible = edit || (
-          // vertical visibility
-          (
-            (elemtTop >= gridTop && elemBottom <= gridBottom) // fully contained
-            ||
-            (elemtTop < gridTop && elemBottom > gridTop) // top intersection
-            ||
-            (elemBottom > gridBottom && elemtTop < gridBottom) // bottom intersection
-          ) &&
-          // horizontal visibility
-          (
-            (elemLeft >= gridLeft && elemRight <= gridRight) // fully contained
-            ||
-            (elemLeft < gridLeft && elemRight > gridLeft) // left intersection
-            ||
-            (elemRight > gridRight && elemLeft < gridRight) // right intersection
-          )
+        const elemVisible = (
+          elemtTop <= gridBottom && elemBottom >= gridTop // vertical visibility
+          &&
+          elemLeft <= gridRight && elemRight >= gridLeft // horizontal visibility
         )
         setVisible(elemVisible)
       }
