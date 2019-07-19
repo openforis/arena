@@ -1,6 +1,6 @@
 import './nodeDefTableCellBody.scss'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import * as R from 'ramda'
 import axios from 'axios'
@@ -15,6 +15,7 @@ import Node from '../../../../../../common/record/node'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
+import { useIsMounted } from '../../../../../commonComponents/hooks'
 
 const getNodeValues = async (surveyInfo, nodeDef, nodes, lang) => {
 
@@ -47,68 +48,48 @@ const loadCategoryItem = async (surveyInfo, itemUuid) => {
   return item
 }
 
-class NodeDefMultipleTableCell extends React.Component {
+const NodeDefMultipleTableCell = props => {
+  const isMounted = useIsMounted()
 
-  constructor (props) {
-    super(props)
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [nodeValues, setNodeValues] = useState([])
 
-    this.state = {
-      showEditDialog: false,
-      nodeValues: '',
-    }
-  }
+  const { surveyInfo, nodeDef, nodes, lang, canEditRecord } = props
 
-  loadNodeValues () {
+  const loadNodeValues = () => {
     (async () => {
-      const { surveyInfo, nodeDef, nodes, lang } = this.props
-      const nodeValues = await getNodeValues(surveyInfo, nodeDef, nodes, lang)
-
-      this.setState({ nodeValues })
+      const nodeValuesUpdate = await getNodeValues(surveyInfo, nodeDef, nodes, lang)
+      if (isMounted.current) {
+        setNodeValues(nodeValuesUpdate)
+      }
     })()
   }
 
-  componentDidMount () {
-    this.loadNodeValues()
-  }
+  useEffect(() => {
+    loadNodeValues()
+  }, [nodes])
 
-  componentDidUpdate (prevProps) {
-    const { nodes: prevNodes } = prevProps
-
-    if (!R.equals(prevNodes, this.props.nodes)) {
-      this.loadNodeValues()
-    }
-  }
-
-  setShowEditDialog (showEditDialog) {
-    this.setState({ showEditDialog })
-  }
-
-  render () {
-    const { canEditRecord } = this.props
-    const { showEditDialog, nodeValues } = this.state
-
-    return showEditDialog
-      ? (
-        ReactDOM.createPortal(
-          <NodeDefMultipleEditDialog
-            {...this.props}
-            onClose={() => this.setShowEditDialog(false)}
-          />,
-          document.body
-        )
+  return showEditDialog
+    ? (
+      ReactDOM.createPortal(
+        <NodeDefMultipleEditDialog
+          {...this.props}
+          onClose={() => this.setShowEditDialog(false)}
+        />,
+        document.body
       )
-      : (
-        <div className="survey-form__node-def-table-cell-body-multiple">
+    )
+    : (
+      <div className="survey-form__node-def-table-cell-body-multiple">
           <span className="values-summary">
             {nodeValues}
           </span>
-          <button className="btn-s"
-                  onClick={() => this.setShowEditDialog(true)}>
-            <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`}/>
-          </button>
-        </div>
-      )
-  }
+        <button className="btn-s"
+                onClick={() => this.setShowEditDialog(true)}>
+          <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`}/>
+        </button>
+      </div>
+    )
 }
 
 const NodeDefTableCellBody = props => {
