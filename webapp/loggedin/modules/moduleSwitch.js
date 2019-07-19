@@ -4,7 +4,7 @@ import { Route, Switch } from 'react-router'
 import DesignerView from './designer/designerView'
 import HomeView from './home/homeView'
 import DataView from './data/dataView'
-import Users from './users/usersView'
+import UsersView from './users/usersView'
 
 import { appModules, appModuleUri } from '../appModules'
 
@@ -16,6 +16,7 @@ const AppModuleHOC = Component => props => (
 const Home = AppModuleHOC(HomeView)
 const Designer = AppModuleHOC(DesignerView)
 const Data = AppModuleHOC(DataView)
+const Users = AppModuleHOC(UsersView)
 
 const ModuleSwitch = (props) => (
   <div className="app__modules">

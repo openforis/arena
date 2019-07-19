@@ -41,6 +41,7 @@ module.exports = {
     undefinedName: 'Undefined name',
     upload: 'Upload',
     view: 'View',
+    group: 'Group',
   },
 
   appModules: {
@@ -60,6 +61,7 @@ module.exports = {
     dataVis: 'Data vis',
 
     users: 'Users',
+    userList: 'User list',
   },
 
   sidebar: {
@@ -128,6 +130,10 @@ module.exports = {
       messages: 'Messages',
       resolved: 'Resolved',
     },
+  },
+
+  usersView: {
+    inviteUser: 'Invite',
   },
 
   itemsTable: {
