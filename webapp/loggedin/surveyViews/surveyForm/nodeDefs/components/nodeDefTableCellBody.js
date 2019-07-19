@@ -41,12 +41,9 @@ const getNodeValues = async (surveyInfo, nodeDef, nodes, lang) => {
 }
 
 const loadCategoryItem = async (surveyInfo, itemUuid) => {
-  const config = {
-    params: {
-      draft: Survey.isDraft(surveyInfo)
-    }
-  }
-  const { data: { item } } = await axios.get(`/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/categories/items/${itemUuid}`, config)
+  const url = `/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/categories/items/${itemUuid}`
+  const params = { draft: Survey.isDraft(surveyInfo) }
+  const { data: { item } } = await axios.get(url, { params })
   return item
 }
 
@@ -61,23 +58,25 @@ class NodeDefMultipleTableCell extends React.Component {
     }
   }
 
-  async componentDidMount () {
-    await this.loadNodeValues()
+  loadNodeValues () {
+    (async () => {
+      const { surveyInfo, nodeDef, nodes, lang } = this.props
+      const nodeValues = await getNodeValues(surveyInfo, nodeDef, nodes, lang)
+
+      this.setState({ nodeValues })
+    })()
   }
 
-  async componentDidUpdate (prevProps) {
+  componentDidMount () {
+    this.loadNodeValues()
+  }
+
+  componentDidUpdate (prevProps) {
     const { nodes: prevNodes } = prevProps
 
     if (!R.equals(prevNodes, this.props.nodes)) {
-      await this.loadNodeValues()
+      this.loadNodeValues()
     }
-  }
-
-  async loadNodeValues () {
-    const { surveyInfo, nodeDef, nodes, lang } = this.props
-    const nodeValues = await getNodeValues(surveyInfo, nodeDef, nodes, lang)
-
-    this.setState({ nodeValues })
   }
 
   setShowEditDialog (showEditDialog) {

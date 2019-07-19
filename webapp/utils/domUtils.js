@@ -26,7 +26,7 @@ export const getViewportDimensions = () => ({
 })
 
 export const isElementInViewport = el => {
-  const rect = elementOffset(el)
+  const rect = el.getBoundingClientRect()
   const viewportDim = getViewportDimensions()
 
   return (
