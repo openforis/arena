@@ -149,11 +149,11 @@ const mapStateToProps = state => {
   return {
     user: UserState.getUser(state),
     surveyInfo,
-    records: RecordsState.getRecordsList(state),
-    nodeDefKeys: RecordsState.getRecordsNodeDefKeys(state),
-    offset: RecordsState.getRecordsOffset(state),
-    limit: RecordsState.getRecordsLimit(state),
-    count: RecordsState.getRecordsCount(state),
+    records: RecordsState.getList(state),
+    nodeDefKeys: RecordsState.getNodeDefKeys(state),
+    offset: RecordsState.getOffset(state),
+    limit: RecordsState.getLimit(state),
+    count: RecordsState.getCount(state),
   }
 }
 
