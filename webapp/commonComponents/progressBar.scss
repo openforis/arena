@@ -22,8 +22,8 @@
 
   &.running {
     .filler {
-      border: 1px solid $blueLightActive;
-      background: $blueLightActive;
+      //border: 1px solid $blueLightActive;
+      background: rgba($blueLightActive, .3);
     }
   }
 
@@ -44,7 +44,7 @@
 }
 
 .progress-bar-striped {
-  background-image: linear-gradient(45deg, rgba($blueLightFocus, .15) 25%, transparent 25%, transparent 50%, rgba($blueLightFocus, .15) 50%, rgba($blueLightFocus, .15) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(45deg, rgba($black, .15) 25%, transparent 25%, transparent 50%, rgba($black, .15) 50%, rgba($black, .15) 75%, transparent 75%, transparent);
   background-size: 1rem 1rem;
   animation: progress-bar-stripes 1s linear infinite;
 }

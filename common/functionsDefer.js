@@ -58,5 +58,6 @@ const cancelThrottle = id => {
 
 module.exports = {
   throttle,
-  cancelThrottle
+  cancelThrottle,
+  debounce,
 }

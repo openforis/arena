@@ -26,38 +26,41 @@ class NodeDefCode extends React.Component {
     super(props)
 
     this.state = { items: [] }
+
+    this.loadCategoryItems = this.loadCategoryItems.bind(this)
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     const { edit } = this.props
 
     if (!edit) {
-      await this.loadCategoryItems()
+      this.loadCategoryItems()
     }
   }
 
-  async componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps) {
     const { parentCodeDefUuid, parentItemUuid } = this.props
     const { parentItemUuid: prevParentItemUuid } = prevProps
 
     if (parentCodeDefUuid && parentItemUuid !== prevParentItemUuid) {
-      await this.loadCategoryItems()
+      this.loadCategoryItems()
     }
   }
 
-  async loadCategoryItems () {
-    const { surveyId, categoryUuid, categoryLevelIndex, parentItemUuid, draft } = this.props
+  loadCategoryItems () {
+    (async () => {
 
-    let items = []
+      const { surveyId, categoryUuid, categoryLevelIndex, parentItemUuid, draft } = this.props
+      if (categoryUuid && (parentItemUuid || categoryLevelIndex === 0)) {
+        const url = `/api/survey/${surveyId}/categories/${categoryUuid}/items`
+        const params = { draft, parentUuid: parentItemUuid }
+        const { data: { items } } = await axios.get(url, { params })
+        this.setState({ items })
+      } else {
+        this.setState({ items: [] })
+      }
 
-    if (categoryUuid && (parentItemUuid || categoryLevelIndex === 0)) {
-      const { data } = await axios.get(
-        `/api/survey/${surveyId}/categories/${categoryUuid}/items`,
-        { params: { draft, parentUuid: parentItemUuid } }
-      )
-      items = data.items
-    }
-    this.setState({ items })
+    })()
   }
 
   determineNodeToUpdate () {

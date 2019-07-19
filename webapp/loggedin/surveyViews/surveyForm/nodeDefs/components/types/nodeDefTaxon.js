@@ -110,13 +110,13 @@ class NodeDefTaxon extends React.Component {
     }
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     if (this.props.entry) {
-      await this.loadSelectedTaxonFromNode()
+      this.loadSelectedTaxonFromNode()
     }
   }
 
-  async componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps) {
     const node = R.head(this.props.nodes)
     const prevNode = R.head(prevProps.nodes)
 
@@ -126,19 +126,22 @@ class NodeDefTaxon extends React.Component {
         Node.getVernacularNameUuid(prevNode) !== Node.getVernacularNameUuid(node)
       )
     ) {
-      await this.loadSelectedTaxonFromNode()
+      this.loadSelectedTaxonFromNode()
     }
   }
 
-  async loadSelectedTaxonFromNode () {
-    const { surveyId, taxonomyUuid, nodes, draft } = this.props
-    const node = nodes[0]
+  loadSelectedTaxonFromNode () {
+    (async () => {
 
-    const taxon = Node.isValueBlank(node)
-      ? null
-      : await loadTaxonByNode(surveyId, taxonomyUuid, draft, node)
+      const { surveyId, taxonomyUuid, nodes, draft } = this.props
+      const node = nodes[0]
+      const taxon = Node.isValueBlank(node)
+        ? null
+        : await loadTaxonByNode(surveyId, taxonomyUuid, draft, node)
 
-    this.updateStateFromTaxonSearchItem(taxon)
+      this.updateStateFromTaxonSearchItem(taxon)
+
+    })()
   }
 
   updateStateFromTaxonSearchItem (taxonSearchItem) {

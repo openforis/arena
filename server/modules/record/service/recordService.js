@@ -105,12 +105,15 @@ const deleteRecord = async (user, surveyId, recordUuid) => {
   })
 }
 
-const checkIn = async (user, surveyId, recordUuid) => {
-  const survey = await SurveyManager.fetchSurveyById(surveyId, true, false)
+const checkIn = async (user, surveyId, recordUuid, draft) => {
+  const survey = await SurveyManager.fetchSurveyById(surveyId, draft, false)
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid)
+  const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, draft)
 
-  if ((Survey.isPublished(surveyInfo) || Record.isPreview(record)) && Authorizer.canEditRecord(user, record)) {
+  if (
+    (Survey.isPublished(surveyInfo) || Record.isPreview(record)) &&
+    Authorizer.canEditRecord(user, record)
+  ) {
     createUserThread(user, surveyId, recordUuid, Record.isPreview(record), false)
   }
 
