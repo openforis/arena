@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -27,6 +27,9 @@ import {
 } from '../../../../surveyViews/record/actions'
 
 const RecordView = props => {
+  const { recordLoaded, preview, canEditRecord } = props
+
+  const recordLoadedRef = useRef(false)
 
   const componentLoad = () => {
     const {
@@ -56,9 +59,9 @@ const RecordView = props => {
     AppWebSocket.off(WebSocketEvents.nodeValidationsUpdate)
     AppWebSocket.off(WebSocketEvents.recordDelete)
 
-    const { recordUuidUrlParam, recordLoaded, checkOutRecord, resetForm } = props
-    // checkout record
-    if (recordLoaded) {
+    const { recordUuidUrlParam, checkOutRecord, resetForm } = props
+
+    if (recordLoadedRef.current) {
       checkOutRecord(recordUuidUrlParam)
     }
 
@@ -69,12 +72,12 @@ const RecordView = props => {
     window.removeEventListener('beforeunload', componentUnload)
   }
 
+  useEffect(() => { recordLoadedRef.current = recordLoaded }, [recordLoaded])
+
   useEffect(() => {
     componentLoad()
     return componentUnload
   }, [])
-
-  const { recordLoaded, preview, canEditRecord } = props
 
   return recordLoaded
     ? (
