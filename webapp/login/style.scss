@@ -20,145 +20,132 @@
   }
 }
 
-@keyframes login__bg2-animation {
-  0% {
-    transform: scale(1.1, 1.1);
-    opacity: .9;
-  }
-  50% {
-    transform: scale(1.5, 1.5);
-    opacity: .65;
-  }
-  100% {
-    transform: scale(1.1, 1.1);
-    opacity: .9;
-  }
-}
+//@keyframes login__bg2-animation {
+//  0% {
+//    transform: scale(1.1, 1.1);
+//    opacity: .002;
+//  }
+//  50% {
+//    transform: scale(1.5, 1.5);
+//    opacity: .1;
+//  }
+//  100% {
+//    transform: scale(1.1, 1.1);
+//    opacity: .002;
+//  }
+//}
 
 .login__bg1 {
   @extend .login__bg;
-  background-image: url("/img/landing-bg.jpg");
-
-  &.login {
-    animation: login__bg1-animation 16s infinite;
-  }
+  //background-image: url("/img/landing-bg.jpg");
+  background-image: url("https://cdn.stocksnap.io/img-thumbs/960w/NA2S5F8U5A.jpg");
+  /*background-image: url("https://cdn.stocksnap.io/img-thumbs/960w/QYDRWBCRJJ.jpg");*/
+  /*background-image: url(https://cdn.stocksnap.io/img-thumbs/960w/MCN1KN1JET.jpg); */
+  /*background-image: url(https://cdn.stocksnap.io/img-thumbs/960w/5QXN6L2OZH.jpg); */
+  /*background-image: url(https://cdn.stocksnap.io/img-thumbs/960w/VLV2PGR0QQ.jpg); */
+  opacity: .25;
+  animation: login__bg1-animation 15s infinite;
 }
 
-.login__bg2 {
-  @extend .login__bg;
-  background-image: url("/img/landing-bg2.jpg");
-  transform: scale(1.1, 1.1);
-  opacity: .9;
+//.login__bg2 {
+//  @extend .login__bg;
+//  //background-image: url("/img/landing-bg2.jpg");
+//  background-image: url("https://cdn.stocksnap.io/img-thumbs/960w/QYDRWBCRJJ.jpg");
+//  transform: scale(1.1, 1.1);
+//  opacity: .002;
+//  animation: login__bg2-animation 25s infinite;
+//}
 
-  animation: login__bg2-animation 22s infinite;
-}
-
-.login__bg-overlay:after {
-  opacity: 0.8;
-  background: transparent;
-  background-image: linear-gradient(to bottom, black 0%, rgba($pink, 0.2) 100%);
-  background-repeat: repeat-x;
-  content: '';
-  display: block !important;
-
-  position: absolute;
+.login__openforis {
+  position: fixed;
+  width: 60px;
+  right: 5vw;
   top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-  width: 100%;
-}
-
-.login__grid {
-  // @include full-screen-fixed();
+  border-left: 2px solid $green;
+  border-bottom: 2px solid $green;
+  border-right: 2px solid $green;
+  padding: 10px;
   display: grid;
-  grid-template-columns: repeat(12, 8.33333333333333vw);
-  grid-template-rows: repeat(6, 16.66666666666667vh);
-  //background-color: rgba($pink, 0.1);
+  grid-row-gap: 10px;
+  z-index: $zIndex10TopOfApp;
+
+  > div {
+    padding: 10px 0;
+    text-align: center;
+    font-size: 1.5rem;
+    color: white;
+    text-transform: uppercase;
+  }
+
+  .openforis {
+    background-color: rgba($green, .9);
+  }
+
+  .arena {
+    background-color: rgba($red, 0.8);
+  }
+
 }
 
-.login__grid-cell {
-  //background-color: rgba($pink, 0.1);
-}
-
-.of-letter {
-  color: rgba($grey, .8);
-  font-size: 70px;
-  font-weight: 200;
-  text-align: center;
-  padding-top: 1rem;
-  position: relative;
-  filter: blur(.1px);
-}
-
-.login-form__container {
-  //@extend .login__grid-cell;
-  grid-column: span 6;
-  grid-row: span 4;
-  padding: 50px;
-  border: 3px double rgba($pink, 0.1);
-  //border: 3px double rgba($pink, 0.08);
-  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-  background-color: rgba($green, 0.1);
-}
 
 .login-form {
+  position: fixed;
+  width: 50vw;
+  height: 60vh;
+  top: 20vh;
+  left: 25vw;
   display: grid;
   grid-template-columns: .7fr;
-  height: 100%;
-  position: relative;
   justify-content: center;
-  align-content: space-evenly;
-  //box-shadow: 0px -8px 260px -50px rgba($color, 0.1);
-  border: 3px double rgba(249, 225, 226, 0.08);
-  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+  align-content: start;
+  grid-row-gap: 3rem;
+}
 
-  input {
-    border-bottom: 2px solid rgba($greyBorder, .7);
-    text-align: center;
-    color: white;
+.login-form__input {
+  text-align: center;
+  color: $black;
+  background-color: white;
 
-    &:focus, &:active,
-    &:-webkit-autofill, &:-webkit-autofill:hover, &:-webkit-autofill:focus {
-      background-color: rgba($blueLightActive, .3);
-      color: white;
-      -webkit-text-fill-color: white;
-      box-shadow: 0 0 0px 1000px rgba($blueLightActive, .3) inset;
-      -webkit-box-shadow: 0 0 0px 1000px rgba($blueLightActive, .3) inset;
+  &:focus, &:active,
+  &:-webkit-autofill, &:-webkit-autofill:hover, &:-webkit-autofill:focus, &:-internal-autofill-selected {
+    background-color: $greenLight;
+    color: $black;
+    -webkit-text-fill-color: $black;
+    box-shadow: 0 0 0px 1000px $greenLight inset;
+    -webkit-box-shadow: 0 0 0px 1000px $greenLight inset;
+    font-family: $fontFamily;
+    font-size: .9rem;
+  }
+}
+
+.login-form__buttons {
+  width: 70%;
+  display: grid;
+  justify-self: center;
+  grid-row-gap: .5rem;
+
+  .btn-login {
+    border: none;
+    background-color: rgba($green, .15);
+    padding: 1rem;
+    text-transform: uppercase;
+    font-weight: 600;
+
+    &:hover {
+      background-color: rgba($green, .3);
     }
   }
 
-  .buttons {
-    width: 70%;
-    display: grid;
-    justify-self: center;
-    grid-row-gap: .5rem;
+  .btn-forgot-pwd {
+    justify-self: end;
 
-    .btn-login {
-      border: none;
-      text-transform: uppercase;
-      font-size: .8rem;
-    }
-
-    .btn-forgot-pwd {
-      border: none !important;
-      border-bottom: 1px solid transparent !important;
-      border-bottom-right-radius: 10% 2%;
-      border-bottom-left-radius: 80% 10%;
-      justify-self: end;
+    &:hover {
       background-color: transparent;
-      color: white;
-
-      &:hover {
-        background-color: transparent;
-        border-bottom: 1px solid rgba(222, 220, 203, 0.6) !important;
-      }
     }
   }
 }
 
-.login-form__error-msg {
+.login-form__error {
   background-color: $red;
   font-size: .9rem;
   font-weight: 600;
@@ -166,7 +153,3 @@
   padding: .5rem 0;
 }
 
-
-.Toast__toast___XXr3v {
-  display: none;
-}
