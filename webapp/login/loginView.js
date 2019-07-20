@@ -19,8 +19,7 @@ const LoginView = (props) => {
   return (
     <React.Fragment>
 
-      <div className="login__bg1"/>
-      {/*<div className="login__bg2"/>*/}
+      <div className="login__bg"/>
 
       <div className="login__openforis">
         <div className="openforis">

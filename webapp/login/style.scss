@@ -1,13 +1,6 @@
 @import "../style/vars";
 @import "../style/layoutMixins";
 
-
-.login__bg {
-  @include full-screen-fixed();
-  background-size: cover;
-  background-position: center;
-}
-
 @keyframes login__bg1-animation {
   0% {
     transform: scale(1, 1);
@@ -20,41 +13,14 @@
   }
 }
 
-//@keyframes login__bg2-animation {
-//  0% {
-//    transform: scale(1.1, 1.1);
-//    opacity: .002;
-//  }
-//  50% {
-//    transform: scale(1.5, 1.5);
-//    opacity: .1;
-//  }
-//  100% {
-//    transform: scale(1.1, 1.1);
-//    opacity: .002;
-//  }
-//}
-
-.login__bg1 {
-  @extend .login__bg;
-  //background-image: url("/img/landing-bg.jpg");
-  background-image: url("https://cdn.stocksnap.io/img-thumbs/960w/NA2S5F8U5A.jpg");
-  /*background-image: url("https://cdn.stocksnap.io/img-thumbs/960w/QYDRWBCRJJ.jpg");*/
-  /*background-image: url(https://cdn.stocksnap.io/img-thumbs/960w/MCN1KN1JET.jpg); */
-  /*background-image: url(https://cdn.stocksnap.io/img-thumbs/960w/5QXN6L2OZH.jpg); */
-  /*background-image: url(https://cdn.stocksnap.io/img-thumbs/960w/VLV2PGR0QQ.jpg); */
+.login__bg {
+  @include full-screen-fixed();
+  background-size: cover;
+  background-position: center;
+  background-image: url("/img/login-bg.jpg");
   opacity: .25;
   animation: login__bg1-animation 15s infinite;
 }
-
-//.login__bg2 {
-//  @extend .login__bg;
-//  //background-image: url("/img/landing-bg2.jpg");
-//  background-image: url("https://cdn.stocksnap.io/img-thumbs/960w/QYDRWBCRJJ.jpg");
-//  transform: scale(1.1, 1.1);
-//  opacity: .002;
-//  animation: login__bg2-animation 25s infinite;
-//}
 
 .login__openforis {
   position: fixed;
@@ -152,4 +118,3 @@
   color: white;
   padding: .5rem 0;
 }
-
