@@ -38,7 +38,7 @@
   > div {
     padding: 10px 0;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: white;
     text-transform: uppercase;
   }
@@ -56,10 +56,10 @@
 
 .login-form {
   position: fixed;
-  width: 50vw;
+  width: 40vw;
   height: 60vh;
   top: 20vh;
-  left: 25vw;
+  left: 30vw;
   display: grid;
   grid-template-columns: .7fr;
   justify-content: center;

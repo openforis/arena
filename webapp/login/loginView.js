@@ -1,4 +1,4 @@
-import './style.scss'
+import './loginView.scss'
 
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
