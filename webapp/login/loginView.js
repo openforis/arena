@@ -24,7 +24,13 @@ const LoginView = (props) => {
       <div className="login__openforis">
         <div className="openforis">
           {
-            'openforis'.split('').map((letter, i) =>
+            'open'.split('').map((letter, i) =>
+              <div key={i}>{letter}</div>
+            )
+          }
+          <div className="separator">∞</div>
+          {
+            'foris'.split('').map((letter, i) =>
               <div key={i}>{letter}</div>
             )
           }

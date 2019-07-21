@@ -5,6 +5,7 @@ import { withRouter, Route } from 'react-router-dom'
 
 import LoginView from '../login/loginView'
 import DynamicImport from '../commonComponents/dynamicImport'
+import AppLoaderView from './appLoader/appLoaderView'
 import { useOnUpdate } from '../commonComponents/hooks'
 
 import * as AppWebSocket from './appWebSocket'
@@ -39,6 +40,7 @@ const AppRouterSwitch = props => {
 
   return (
     isReady && (
+
       systemError
         ? (
           <div className="main__system-error">
@@ -49,17 +51,24 @@ const AppRouterSwitch = props => {
             </div>
           </div>
         )
-        : user
-        ? (
-          <Route
-            path="/app"
-            render={props => (
-              <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
-            )}
-          />
-        )
         : (
-          <LoginView/>
+          <React.Fragment>
+            {
+              user
+                ? (
+                  <Route
+                    path="/app"
+                    render={props => (
+                      <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
+                    )}
+                  />
+                )
+                : (
+                  <LoginView/>
+                )
+            }
+            <AppLoaderView/>
+          </React.Fragment>
         )
 
     )

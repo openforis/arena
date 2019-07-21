@@ -43,9 +43,13 @@ export const setLanguage = languageCode => async (dispatch) => {
 }
 
 export const logout = () => async dispatch => {
+  dispatch(showAppLoader())
+
   await axios.post('/auth/logout')
   CognitoAuth.logout()
+
   dispatch({ type: appUserLogout })
+  dispatch(hideAppLoader())
 }
 
 // ====== Toggle sidebar
@@ -58,11 +62,15 @@ export const toggleSideBar = () => (dispatch, getState) => {
 
 export const appErrorCreate = 'app/error/create'
 export const appErrorDelete = 'app/error/delete'
-
-export const closeAppError = error => dispatch =>
-  dispatch({ type: appErrorDelete, error })
-
 export const systemErrorThrow = 'system/error'
 
-export const throwSystemError = error => dispatch =>
-  dispatch({ type: systemErrorThrow, error })
+export const closeAppError = error => dispatch => dispatch({ type: appErrorDelete, error })
+
+export const throwSystemError = error => dispatch => dispatch({ type: systemErrorThrow, error })
+
+// ====== App Loader
+export const showAppLoader = () => dispatch =>
+  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
+
+export const hideAppLoader = () => dispatch =>
+  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })

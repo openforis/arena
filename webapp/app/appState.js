@@ -12,6 +12,7 @@ export const keys = {
   errors: 'errors',
   systemError: 'systemError',
   sideBarOpened: 'sideBarOpened',
+  loaderVisible: 'loaderVisible',
 
   // activeJob keys
   onComplete: 'onComplete',
@@ -122,3 +123,7 @@ export const dissocAppError = error => R.dissocPath([keys.errors, error.id + '']
 export const assocSystemError = (error) => R.assoc(keys.systemError, error)
 
 export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
+
+// ==== App Loader
+
+export const isLoaderVisible = R.pipe(getState, R.propEq(keys.loaderVisible, true))
