@@ -44,9 +44,13 @@ const LoginView = (props) => {
         </div>
       </div>
 
+      {
+        error &&
+        <div className="login-form__error text-center">{error}</div>
+      }
+
       <div className="login-form">
 
-        <div/>
         <input ref={usernameRef}
                type='text'
                name='username'
@@ -70,11 +74,6 @@ const LoginView = (props) => {
             Forgot Password
           </button>
         </div>
-
-        {
-          error &&
-          <div className="login-form__error text-center">{error}</div>
-        }
 
       </div>
 

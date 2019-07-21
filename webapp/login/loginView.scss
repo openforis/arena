@@ -59,14 +59,14 @@
 
 .login-form {
   position: fixed;
-  width: 40vw;
+  width: 30vw;
   height: 60vh;
   top: 20vh;
-  left: 30vw;
+  left: 35vw;
   display: grid;
-  grid-template-columns: .7fr;
+  grid-template-columns: 1fr;
   justify-content: center;
-  align-content: start;
+  align-content: center;
   grid-row-gap: 3rem;
 }
 
@@ -129,4 +129,8 @@
   font-weight: 600;
   color: white;
   padding: .5rem 0;
+  position: fixed;
+  width: 30vw;
+  left: 35vw;
+  top: 15vh;
 }
