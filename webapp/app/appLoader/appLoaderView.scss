@@ -15,6 +15,10 @@
   opacity: 0;
 }
 
+.app-loader.enter-done {
+  opacity: 1;
+}
+
 .app-loader.enter-active {
   animation: animate-in 750ms ease-out;
 }

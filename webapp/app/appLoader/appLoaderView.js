@@ -13,7 +13,7 @@ const AppLoaderView = props => {
   return (
     <CSSTransition
       in={visible}
-      timeout={1000}
+      timeout={750}
       unmountOnExit
       className="app-loader">
       <div>
