@@ -46,6 +46,10 @@ const AppJobMonitor = props => {
 
   useEffect(() => {
     AppWebSocket.on(WebSocketEvents.jobUpdate, props.activeJobUpdate)
+
+    return () => {
+      AppWebSocket.off(WebSocketEvents.jobUpdate)
+    }
   }, [])
 
   const i18n = useI18n()
