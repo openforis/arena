@@ -8,12 +8,8 @@ import * as AppState from './appState'
 export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
 export const appUserPrefUpdate = 'app/user/pref/update'
-export const appSideBarOpenedUpdate = 'app/sideBar/opened/update'
 
-const getUserSurvey = async () => {
-  const { data: { user, survey } } = await axios.get('/auth/user')
-  return { user, survey }
-}
+// ====== INIT
 
 export const initApp = () => async dispatch => {
   const i18n = await i18nFactory.createI18nPromise('en')
@@ -30,6 +26,13 @@ export const initApp = () => async dispatch => {
   }
 
   dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey })
+}
+
+// ====== USER
+
+const getUserSurvey = async () => {
+  const { data: { user, survey } } = await axios.get('/auth/user')
+  return { user, survey }
 }
 
 export const initUser = () => async dispatch => {
@@ -52,7 +55,10 @@ export const logout = () => async dispatch => {
   dispatch(hideAppLoader())
 }
 
-// ====== Toggle sidebar
+// ====== SIDEBAR
+
+export const appSideBarOpenedUpdate = 'app/sideBar/opened/update'
+
 export const toggleSideBar = () => (dispatch, getState) => {
   const sideBarOpened = !AppState.isSideBarOpened(getState())
   dispatch({ type: appSideBarOpenedUpdate, [AppState.keys.sideBarOpened]: sideBarOpened })
@@ -68,9 +74,33 @@ export const closeAppError = error => dispatch => dispatch({ type: appErrorDelet
 
 export const throwSystemError = error => dispatch => dispatch({ type: systemErrorThrow, error })
 
-// ====== App Loader
-export const showAppLoader = () => dispatch =>
-  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
+// ====== APP LOADER
 
-export const hideAppLoader = () => dispatch =>
-  dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })
+export const showAppLoader = () => dispatch => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: true })
+
+export const hideAppLoader = () => dispatch => dispatch({ type: appPropsChange, [AppState.keys.loaderVisible]: false })
+
+// ====== APP JOB
+
+export const appJobStart = 'app/job/start'
+export const appJobActiveUpdate = 'app/job/active/update'
+
+export const showAppJobMonitor = (job, onComplete = null, autoHide = false) => dispatch =>
+  dispatch({ type: appJobStart, job, onComplete, autoHide })
+
+export const hideAppJobMonitor = () => dispatch => dispatch(activeJobUpdate(null))
+
+export const cancelActiveJob = () => async dispatch => {
+  await axios.delete(`/api/jobs/active`)
+  dispatch(hideAppJobMonitor())
+}
+
+export const activeJobUpdate = job => (dispatch, getState) => {
+  if (job && job.succeeded) {
+    const onComplete = AppState.getActiveJobOnCompleteCallback(getState())
+    if (onComplete) {
+      onComplete(job)
+    }
+  }
+  dispatch({ type: appJobActiveUpdate, job })
+}

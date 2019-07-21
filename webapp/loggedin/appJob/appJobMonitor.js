@@ -1,20 +1,16 @@
 import './appJobMonitor.scss'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../commonComponents/modal'
 import ProgressBar from '../../commonComponents/progressBar'
 import AppJobErrors from './appJobErrors'
-
-import * as AppWebSocket from '../../app/appWebSocket'
-import WebSocketEvents from '../../../common/webSocket/webSocketEvents'
+import useI18n from '../../commonComponents/useI18n'
 
 import * as AppState from '../../app/appState'
 
-import { activeJobUpdate, cancelActiveJob, hideAppJobMonitor } from './actions'
-
-import useI18n from '../../commonComponents/useI18n'
+import { cancelActiveJob, hideAppJobMonitor } from '../../app/actions'
 
 const JobProgress = ({ job }) =>
   <ProgressBar progress={job.progressPercent} className={job.status}/>
@@ -43,14 +39,6 @@ const AppJobMonitor = props => {
 
   const { job, cancelActiveJob, hideAppJobMonitor } = props
   const innerJobs = job ? job.innerJobs : null
-
-  useEffect(() => {
-    AppWebSocket.on(WebSocketEvents.jobUpdate, props.activeJobUpdate)
-
-    return () => {
-      AppWebSocket.off(WebSocketEvents.jobUpdate)
-    }
-  }, [])
 
   const i18n = useI18n()
 
@@ -89,5 +77,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { activeJobUpdate, cancelActiveJob, hideAppJobMonitor }
+  { cancelActiveJob, hideAppJobMonitor }
 )(AppJobMonitor)

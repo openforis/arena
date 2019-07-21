@@ -91,7 +91,7 @@ export const updateActiveJob = job =>
     )(state)
     : R.dissoc(keys.activeJob)(state)
 
-export const getActiveJobOnCompleteCallback = R.propOr(null, keys.onComplete)
+export const getActiveJobOnCompleteCallback = R.pipe(getActiveJob, R.defaultTo({}), R.propOr(null, keys.onComplete))
 
 // ==== APP I18N
 export const getI18n = R.pipe(getState, R.prop(keys.i18n))
