@@ -31,9 +31,9 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, offset, limit, client = d
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   await RecordRepository.fetchRecordByUuid(surveyId, recordUuid, client)
 
-const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, client = db) => {
+const fetchRecordAndNodesByUuid = async (surveyId, recordUuid, draft = true, client = db) => {
   const record = await fetchRecordByUuid(surveyId, recordUuid, client)
-  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, client)
+  const nodes = await NodeRepository.fetchNodesByRecordUuid(surveyId, recordUuid, draft, client)
 
   return Record.assocNodes(SurveyUtils.toUuidIndexedObj(nodes))(record)
 }

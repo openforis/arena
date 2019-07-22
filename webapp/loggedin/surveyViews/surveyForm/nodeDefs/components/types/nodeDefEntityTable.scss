@@ -36,6 +36,7 @@
   height: calc(100% - #{$formTableRowHeaderHeight});
   overflow-x: auto;
   overflow-y: hidden;
+  //overflow: hidden;
 }
 
 .survey-form__node-def-entity-table-data-rows {
@@ -55,12 +56,6 @@
 
   .react-grid-item {
     display: grid;
-    border-right: $formBorder;
-    border-top: $formBorder;
-
-    &:first-child {
-      border-left: $formBorder;
-    }
   }
 
   &.drag-in-progress .draggable-item * {
@@ -72,6 +67,20 @@
   }
 }
 
+.survey-form:not(.edit) {
+  .survey-form__node-def-entity-table-row-header {
+    .react-grid-item {
+      display: grid;
+      border-right: $formBorder;
+      border-top: $formBorder;
+      border-bottom: $formBorder;
+
+      &:first-child {
+        border-left: $formBorder;
+      }
+    }
+  }
+}
 
 .survey-form__node-def-entity-table-row {
   position: relative;
@@ -100,4 +109,17 @@
     }
   }
 
+}
+
+.survey-form__node-def-entity-table-cell-placeholder {
+  display: grid;
+  align-content: center;
+  width: 45px;
+  height: 100%;
+  opacity: .7;
+  margin: auto;
+
+  .progress-bar {
+    height: .5rem;
+  }
 }

@@ -297,6 +297,7 @@ module.exports = {
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
     duplicateName: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
     duplicateCode: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
+    defaultValuesNotSpecified: '$t(formErrors.defaultValuesNotSpecified)',
   },
 
   appErrors: {

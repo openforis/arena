@@ -1,8 +1,4 @@
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
-
-import Survey from '../../../../common/survey/survey'
-import User from '../../../../common/user/user'
+import React from 'react'
 
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import DashboardView from './dashboard/dashboardView'
@@ -13,20 +9,7 @@ import CollectImportReportView from './collectImportReport/collectImportReportVi
 
 import { appModules, appModuleUri, homeModules } from '../../appModules'
 
-import * as AppState from '../../../app/appState'
-import * as SurveyState from '../../../survey/surveyState'
-
-const HomeView = props => {
-
-  const { surveyInfo, user,history } = props
-
-  useEffect(() => {
-    // making sure user is logged in - it's possible he just logged out
-    if (User.getId(user)) {
-      const module = Survey.isValid(surveyInfo) ? homeModules.dashboard : homeModules.surveyList
-      history.push(appModuleUri(module))
-    }
-  }, [Survey.getUuid(surveyInfo), User.getId(user)])
+const HomeView = () => {
 
   return (
     <InnerModuleSwitch
@@ -58,9 +41,4 @@ const HomeView = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  surveyInfo: SurveyState.getSurveyInfo(state),
-  user: AppState.getUser(state),
-})
-
-export default connect(mapStateToProps)(HomeView)
+export default HomeView

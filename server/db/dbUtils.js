@@ -55,6 +55,14 @@ const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
 }
 
 /**
+ * Combines draft and published props
+ */
+const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
+  draft
+    ? `${columnPrefix}props || ${columnPrefix}props_draft AS ${alias}`
+    : `${columnPrefix}props AS ${alias}`
+
+/**
  * Combines a draft and a published column prop, if needed
  */
 const getPropColCombined = (propName, draft, columnPrefix = '') =>
@@ -76,6 +84,7 @@ module.exports = {
   insertAllQuery,
   updateAllQuery,
 
+  getPropsCombined,
   //props column
   getPropColCombined,
   getPropFilterCondition
