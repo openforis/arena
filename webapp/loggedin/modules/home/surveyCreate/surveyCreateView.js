@@ -3,15 +3,20 @@ import './surveyCreateView.scss'
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
+import Survey from '../../../../../common/survey/survey'
+
 import { Input } from '../../../../commonComponents/form/input'
 import LanguageDropdown from '../../../../commonComponents/form/languageDropdown'
 import UploadButton from '../../../../commonComponents/form/uploadButton'
 import useI18n from '../../../../commonComponents/useI18n'
+import { useOnUpdate } from '../../../../commonComponents/hooks'
 
 import Validator from '../../../../../common/validation/validator'
 import StringUtils from '../../../../../common/stringUtils'
 
+import * as SurveyState from '../../../../survey/surveyState'
 import * as SurveyCreateState from './surveyCreateState'
+import { appModuleUri, homeModules } from '../../../appModules'
 
 import { updateNewSurveyProp, resetNewSurvey } from './actions'
 import { createSurvey, importCollectSurvey } from './actions'
@@ -19,7 +24,7 @@ import { createSurvey, importCollectSurvey } from './actions'
 const SurveyCreateView = (props) => {
 
   const {
-    newSurvey,
+    surveyInfo, newSurvey, history,
     resetNewSurvey, updateNewSurveyProp, createSurvey, importCollectSurvey
   } = props
 
@@ -31,6 +36,11 @@ const SurveyCreateView = (props) => {
   useEffect(() => {
     resetNewSurvey()
   }, [])
+
+  // redirect to dashboard on survey change
+  useOnUpdate(() => {
+    history.push(appModuleUri(homeModules.dashboard))
+  }, [Survey.getUuid(surveyInfo)])
 
   return (
     <div className="home-survey-create">
@@ -75,6 +85,7 @@ const SurveyCreateView = (props) => {
 }
 
 const mapStateToProps = state => ({
+  surveyInfo: SurveyState.getSurveyInfo(state),
   newSurvey: SurveyCreateState.getNewSurvey(state),
 })
 
