@@ -6,7 +6,7 @@ import Taxonomy from '../../../../common/survey/taxonomy'
 import * as SurveyState from '../../../survey/surveyState'
 import * as TaxonomyEditState from './taxonomyEditState'
 
-import { showAppJobMonitor } from '../../appJob/actions'
+import { showAppJobMonitor } from '../../../app/actions'
 import {
   taxonomyCreate,
   taxonomyDelete,

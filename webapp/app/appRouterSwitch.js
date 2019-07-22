@@ -5,40 +5,54 @@ import { withRouter, Route } from 'react-router-dom'
 
 import LoginView from '../login/loginView'
 import DynamicImport from '../commonComponents/dynamicImport'
+import AppLoaderView from './appLoader/appLoaderView'
 import { useOnUpdate } from '../commonComponents/hooks'
 
 import * as AppWebSocket from './appWebSocket'
+import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 
 import * as AppState from './appState'
-import { throwSystemError, initApp } from './actions'
+
+import { throwSystemError, initApp, activeJobUpdate } from './actions'
 
 const AppRouterSwitch = props => {
 
   const {
     isReady, systemError, user,
-    initApp, throwSystemError,
+    initApp, throwSystemError, activeJobUpdate,
     i18n
   } = props
 
+  const openSocket = () => {
+    (async () => {
+      await AppWebSocket.openSocket(throwSystemError)
+      AppWebSocket.on(WebSocketEvents.jobUpdate, activeJobUpdate)
+    })()
+  }
+
+  const closeSocket = () => {
+    AppWebSocket.closeSocket()
+    AppWebSocket.off(WebSocketEvents.jobUpdate)
+  }
+
   useEffect(() => {
     initApp()
-    return AppWebSocket.closeSocket
+    return closeSocket
   }, [])
 
   useOnUpdate(() => {
     if (isReady) {
       if (user) {
-        (async () => {
-          await AppWebSocket.openSocket(throwSystemError)
-        })()
+        openSocket()
       } else {
-        AppWebSocket.closeSocket()
+        closeSocket()
       }
     }
   }, [isReady, user])
 
   return (
     isReady && (
+
       systemError
         ? (
           <div className="main__system-error">
@@ -49,17 +63,24 @@ const AppRouterSwitch = props => {
             </div>
           </div>
         )
-        : user
-        ? (
-          <Route
-            path="/app"
-            render={props => (
-              <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
-            )}
-          />
-        )
         : (
-          <LoginView/>
+          <React.Fragment>
+            {
+              user
+                ? (
+                  <Route
+                    path="/app"
+                    render={props => (
+                      <DynamicImport {...props} load={() => import('../loggedin/appViewExport')}/>
+                    )}
+                  />
+                )
+                : (
+                  <LoginView/>
+                )
+            }
+            <AppLoaderView/>
+          </React.Fragment>
         )
 
     )
@@ -77,7 +98,7 @@ const enhance = compose(
   withRouter,
   connect(
     mapStateToProps,
-    { initApp, throwSystemError }
+    { initApp, throwSystemError, activeJobUpdate }
   )
 )
 
