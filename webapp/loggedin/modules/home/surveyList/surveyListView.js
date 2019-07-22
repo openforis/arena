@@ -7,6 +7,7 @@ import * as R from 'ramda'
 import Survey from '../../../../../common/survey/survey'
 
 import SurveyListTable from './surveyListTable'
+import { useOnUpdate } from '../../../../commonComponents/hooks'
 
 import * as SurveyListState from './surveyListState'
 import * as SurveyState from '../../../../survey/surveyState'
@@ -22,21 +23,15 @@ const SurveyListView = props => {
     setActiveSurvey, fetchSurveys
   } = props
 
-  const [fetched, setFeched] = useState(false)
-
   //onMount fetch surveys
   useEffect(() => {
     fetchSurveys()
-    setFeched(true)
   }, [])
 
-  const surveysLength = R.length(surveys)
-  useEffect(() => {
-    // redirect to create survey when (after fetching surveys) there are no surveys
-    if (fetched === true && surveysLength === 0) {
-      history.push(appModuleUri(homeModules.surveyNew))
-    }
-  }, [surveysLength])
+  // redirect to dashboard on survey change
+  useOnUpdate(() => {
+    history.push(appModuleUri(homeModules.dashboard))
+  }, [Survey.getUuid(surveyInfo)])
 
   return !R.isEmpty(surveys) &&
     <SurveyListTable
@@ -47,7 +42,7 @@ const SurveyListView = props => {
 }
 
 const mapStateToProps = state => ({
-  surveyInfo: Survey.getSurveyInfo(SurveyState.getSurvey(state)),
+  surveyInfo: SurveyState.getSurveyInfo(state),
   surveys: SurveyListState.getSurveys(state),
 })
 
