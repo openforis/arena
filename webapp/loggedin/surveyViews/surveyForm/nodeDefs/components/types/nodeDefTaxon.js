@@ -1,367 +1,181 @@
 import './nodeDefTaxon.scss'
 
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import * as R from 'ramda'
 
-import AppContext from '../../../../../../app/appContext'
-
-import { FormItem, Input } from '../../../../../../commonComponents/form/input'
-import AutocompleteDialog from '../../../../../../commonComponents/form/autocompleteDialog'
+import { FormItem } from '../../../../../../commonComponents/form/input'
+import useI18n from '../../../../../../commonComponents/useI18n'
+import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
 import Survey from '../../../../../../../common/survey/survey'
 import Taxon from '../../../../../../../common/survey/taxon'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../../common/record/node'
 import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
+import StringUtils from '../../../../../../../common/stringUtils'
 
 import * as SurveyState from '../../../../../../survey/surveyState'
 
-const { valuePropKeys } = Node
+const code = Node.valuePropKeys.code
+const scientificName = Node.valuePropKeys.scientificName
+const vernacularName = Node.valuePropKeys.vernacularName
+const vernacularNameUuid = Node.valuePropKeys.vernacularNameUuid
+const taxonUuid = Node.valuePropKeys.taxonUuid
 
-const fields = {
-  code: 'code',
-  scientificName: 'scientificName',
-  vernacularName: 'vernacularName',
-}
-
-const defaultFieldValues = {
-  code: '',
-  scientificName: '',
-  vernacularName: ''
-}
-
-const defaultState = {
-  ...defaultFieldValues,
-  selectedTaxon: null,
-  autocompleteOpened: false,
-  autocompleteTaxa: [],
-  autocompleteInputField: null,
-}
-
-const loadTaxa = async (surveyId, taxonomyUuid, draft, field, value, strict = false) => {
-  const searchValue =
-    strict ? value
-      : field === fields.code
-      ? `${value}*` //starts with value
-      : `*${value}*` //contains value
-
-  const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`, {
-    params: {
-      filterProp: field,
-      filterValue: searchValue,
-      includeUnlUnk: true,
-      draft,
-    },
-  })
-  return data.taxa
+const selectionDefault = {
+  [code]: '',
+  [scientificName]: '',
+  [vernacularName]: '',
 }
 
 const loadTaxonByNode = async (surveyId, taxonomyUuid, draft, node) => {
-  const { data } = await axios.get(`/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxon`, {
-    params: {
-      taxonUuid: Node.getTaxonUuid(node),
-      vernacularNameUuid: Node.getVernacularNameUuid(node),
-      draft,
-    },
-  })
-  return data.taxon
+  const params = {
+    [taxonUuid]: Node.getTaxonUuid(node),
+    [vernacularNameUuid]: Node.getVernacularNameUuid(node),
+    draft,
+  }
+  const { data: { taxon } } = await axios.get(
+    `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxon`,
+    { params }
+  )
+  return taxon
 }
 
-const TaxonAutocompleteItemRenderer = props => {
-  const { item: taxon, ...otherProps } = props
+const NodeDefTaxon = props => {
+  const {
+    surveyId, nodeDef, taxonomyUuid, node,
+    edit, draft, renderType,
+    canEditRecord, readOnly,
+    updateNode,
+  } = props
 
-  const vernacularNames = Taxon.getVernacularNames(taxon)
-  const vernacularNamesString = R.pipe(
-    R.keys, //vernacular language codes
-    R.map(langCode => `${R.prop(langCode, vernacularNames)} (${langCode})`),
-    R.join(' / ')
-  )(vernacularNames)
+  const [selection, setSelection] = useState(selectionDefault)
 
-  return <div {...otherProps}
-              key={Taxon.getUuid(taxon)}
-              className="item"
-              tabIndex="1">
-    <div>{Taxon.getCode(taxon)}</div>
-    <div>{Taxon.getScientificName(taxon)}</div>
-    <div style={{ gridColumn: 2 }}>{vernacularNamesString}</div>
-  </div>
-}
+  const i18n = useI18n()
 
-class NodeDefTaxon extends React.Component {
+  const isTableBody = renderType === NodeDefLayout.nodeDefRenderType.tableBody
+  const className = isTableBody
+    ? 'survey-form__node-def-table-cell-taxon survey-form__node-def-table-cell-composite'
+    : 'survey-form__node-def-taxon'
 
-  constructor (props) {
-    super(props)
-
-    this.codeField = React.createRef()
-    this.scientificNameField = React.createRef()
-    this.vernacularNameField = React.createRef()
-
-    this.state = defaultState
-  }
-
-  getInputFields () {
-    return {
-      code: this.codeField,
-      scientificName: this.scientificNameField,
-      vernacularName: this.vernacularNameField,
-    }
-  }
-
-  componentDidMount () {
-    if (this.props.entry) {
-      this.loadSelectedTaxonFromNode()
-    }
-  }
-
-  componentDidUpdate (prevProps) {
-    const node = R.head(this.props.nodes)
-    const prevNode = R.head(prevProps.nodes)
-
-    if (this.props.entry && !R.equals(prevNode, node) &&
-      (
-        Node.getTaxonUuid(prevNode) !== Node.getTaxonUuid(node) ||
-        Node.getVernacularNameUuid(prevNode) !== Node.getVernacularNameUuid(node)
-      )
-    ) {
-      this.loadSelectedTaxonFromNode()
-    }
-  }
-
-  loadSelectedTaxonFromNode () {
+  const updateSelectionFromNode = () => {
+    //TODO remove async call when using pre-fetched taxon
     (async () => {
-
-      const { surveyId, taxonomyUuid, nodes, draft } = this.props
-      const node = nodes[0]
       const taxon = Node.isValueBlank(node)
         ? null
         : await loadTaxonByNode(surveyId, taxonomyUuid, draft, node)
 
-      this.updateStateFromTaxonSearchItem(taxon)
+      const unlisted = taxon && Taxon.isUnlistedTaxon(taxon)
 
+      const selectionUpdate = taxon ?
+        {
+          [code]: Taxon.getCode(taxon),
+          [scientificName]: unlisted
+            ? Node.getScientificName(node)
+            : Taxon.getScientificName(taxon),
+          [vernacularName]: unlisted
+            ? Node.getVernacularName(node)
+            : R.defaultTo('', taxon[vernacularName]),
+        }
+        : selectionDefault
+
+      setSelection(selectionUpdate)
     })()
   }
 
-  updateStateFromTaxonSearchItem (taxonSearchItem) {
-    const { nodes } = this.props
-    const node = nodes[0]
+  const updateNodeValue = nodeValue => updateNode(nodeDef, node, nodeValue)
 
-    if (taxonSearchItem) {
-      const unlisted = Taxon.isUnlistedTaxon(taxonSearchItem)
+  const onChangeTaxon = taxon => {
+    if (taxon) {
+      const nodeValue = {
+        [taxonUuid]: Taxon.getUuid(taxon),
+        [scientificName]: Taxon.isUnlistedTaxon(taxon) && selection[scientificName]
+          ? selection[scientificName]
+          : Taxon.getScientificName(taxon),
+        [vernacularName]: Taxon.isUnlistedTaxon(taxon) && selection[vernacularName]
+          ? selection[vernacularName]
+          : '',
+        [vernacularNameUuid]: taxon[vernacularNameUuid]
+      }
 
-      const code = Taxon.getCode(taxonSearchItem)
-
-      const scientificName = unlisted
-        ? Node.getScientificName(node)
-        : Taxon.getScientificName(taxonSearchItem)
-
-      const vernacularName = unlisted
-        ? Node.getVernacularName(node)
-        : R.defaultTo('', taxonSearchItem.vernacularName)
-
-      this.setState({
-        selectedTaxon: taxonSearchItem,
-        code,
-        scientificName,
-        vernacularName,
-        autocompleteOpened: false,
-        autocompleteTaxa: [],
-        autocompleteInputField: null,
-      })
+      updateNodeValue(nodeValue)
     } else {
-      this.setState(defaultState)
+      // reset to last node value
+      updateSelectionFromNode()
     }
   }
 
-  async onInputFieldChange (field, value) {
-    const { draft } = this.props
-    const { code } = this.state
-
-    if (code === Taxon.unlistedCode && field !== fields.code) {
-      this.handleUnlistedSpeciesFieldChange(field, value)
+  const onChangeSelectionField = (field, value) => {
+    if (StringUtils.isBlank(value)) {
+      updateNodeValue({})
+    } else if (field !== Node.valuePropKeys.code && selection[Node.valuePropKeys.code] === Taxon.unlistedCode) {
+      // if input field is not code and current code is UNL, update node value field
+      updateNodeValue({ ...Node.getValue(node), [field]: value })
     } else {
-      //reset other field values
-      const fieldValues = R.assoc(field, value)(defaultFieldValues)
-
-      const emptyValue = R.isEmpty(value)
-
-      this.setState({
-        ...fieldValues,
-        autocompleteOpened: !emptyValue,
-        autocompleteTaxa: [],
-        autocompleteInputField: this.getInputFields()[field],
-      })
-
-      if (emptyValue) {
-        //reset node value
-        this.updateNodeValue(null)
-      } else {
-        //show autocomplete
-        await this.loadAutocompleteTaxa(field, value, draft)
-      }
+      setSelection({ ...selectionDefault, [field]: value })
     }
   }
 
-  handleUnlistedSpeciesFieldChange (field, value) {
-    const node = this.props.nodes[0]
-    const unlistedTaxonUuid = Node.getTaxonUuid(node)
-
-    this.setState({
-      [field]: value,
-    })
-    const scientificName = field === fields.scientificName ? value : Node.getScientificName(node)
-    const vernacularName = field === fields.vernacularName ? value : Node.getVernacularName(node)
-
-    this.updateNodeValue({
-      [valuePropKeys.taxonUuid]: unlistedTaxonUuid,
-      [valuePropKeys.scientificName]: scientificName,
-      [valuePropKeys.vernacularName]: vernacularName,
-    })
+  if (!edit) {
+    useEffect(() => {
+      updateSelectionFromNode()
+    }, [Node.getValue(node, '')])
   }
 
-  onTaxonSelect (item) {
-    const { scientificName, vernacularName } = this.state
+  return (
+    <div className={className}>
 
-    let nodeValue = null
+      {
+        R.keys(selection).map(field => {
+            const inputField = (
+              <NodeDefTaxonInputField
+                key={field}
+                surveyId={surveyId}
+                taxonomyUuid={taxonomyUuid}
+                edit={edit}
+                draft={draft}
+                canEditRecord={canEditRecord}
+                readOnly={readOnly}
 
-    if (Taxon.isUnlistedTaxon(item)) {
-      // unlisted item
-      // preserve scientific and vernacular name written by user
-      nodeValue = {
-        [valuePropKeys.taxonUuid]: Taxon.getUuid(item),
-        [valuePropKeys.scientificName]: scientificName || Taxon.getScientificName(item),
-        [valuePropKeys.vernacularName]: vernacularName || '',
-      }
-    } else if (Taxon.isUnknownTaxon(item)) {
-      // unknown item
-      // do not allow writing custom scientific and vernacular name
-      nodeValue = {
-        [valuePropKeys.taxonUuid]: Taxon.getUuid(item),
-        [valuePropKeys.scientificName]: Taxon.getScientificName(item),
-        [valuePropKeys.vernacularName]: '',
-      }
-    } else {
-      //item in list
-      nodeValue = {
-        [valuePropKeys.taxonUuid]: Taxon.getUuid(item),
-      }
-      if (item.vernacularNameUuid) {
-        nodeValue[valuePropKeys.vernacularNameUuid] = item.vernacularNameUuid
-      }
-    }
+                field={field}
+                selection={selection}
+                onChangeTaxon={onChangeTaxon}
+                onChangeSelectionField={onChangeSelectionField}
+              />
+            )
 
-    this.updateStateFromTaxonSearchItem(item)
-
-    this.updateNodeValue(nodeValue)
-  }
-
-  updateNodeValue (value) {
-    const { nodeDef, nodes, updateNode } = this.props
-
-    updateNode(nodeDef, nodes[0], value)
-  }
-
-  onAutocompleteClose () {
-    //reset state using previously selected taxon
-    this.updateStateFromTaxonSearchItem(this.state.selectedTaxon)
-  }
-
-  async loadAutocompleteTaxa (field, value, draft) {
-    const { surveyId, taxonomyUuid } = this.props
-
-    const taxa = await loadTaxa(surveyId, taxonomyUuid, draft, field, value)
-    this.setState({ autocompleteTaxa: taxa })
-  }
-
-  render () {
-    const {
-      edit, renderType, canEditRecord, readOnly
-    } = this.props
-
-    const entryDisabled = edit || !canEditRecord || readOnly
-
-    const {
-      code,
-      scientificName,
-      vernacularName,
-
-      autocompleteOpened,
-      autocompleteTaxa,
-      autocompleteInputField,
-    } = this.state
-
-    const { i18n } = this.context
-
-    const codeInputField = <Input ref={this.codeField}
-                                  aria-disabled={entryDisabled}
-                                  readOnly={edit}
-                                  value={code}
-                                  onChange={value => this.onInputFieldChange(fields.code, value)}/>
-
-    const scientificNameInputField = <Input ref={this.scientificNameField}
-                                            aria-disabled={entryDisabled}
-                                            readOnly={edit}
-                                            value={scientificName}
-                                            onChange={value => this.onInputFieldChange(fields.scientificName, value)}/>
-
-    const vernacularNameInputField = <Input ref={this.vernacularNameField}
-                                            aria-disabled={entryDisabled}
-                                            readOnly={edit}
-                                            value={vernacularName}
-                                            onChange={value => this.onInputFieldChange(fields.vernacularName, value)}/>
-
-    const autocompleteDialog =
-      autocompleteOpened
-        ? ReactDOM.createPortal(
-        <AutocompleteDialog className="survey-form__node-def-taxon-autocomplete-list"
-                            items={autocompleteTaxa}
-                            itemRenderer={TaxonAutocompleteItemRenderer}
-                            itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
-                            inputField={autocompleteInputField.current}
-                            onItemSelect={taxonSearchResult => this.onTaxonSelect(taxonSearchResult)}
-                            onClose={() => this.onAutocompleteClose()}/>,
-        document.body
+            return isTableBody
+              ? (
+                inputField
+              )
+              : (
+                <FormItem
+                  key={field}
+                  label={i18n.t(`surveyForm.nodeDefTaxon.${field}`)}>
+                  {inputField}
+                </FormItem>
+              )
+          }
         )
-        : null
+      }
 
-    if (renderType === NodeDefLayout.nodeDefRenderType.tableBody) {
-      return <div className="survey-form__node-def-table-cell-taxon survey-form__node-def-table-cell-composite">
-        {codeInputField}
-        {scientificNameInputField}
-        {vernacularNameInputField}
-
-        {autocompleteDialog}
-      </div>
-    }
-
-    return (
-      <div className="survey-form__node-def-taxon">
-        <FormItem label={i18n.t('common.code')}>
-          {codeInputField}
-        </FormItem>
-        <FormItem label={i18n.t('surveyForm.nodeDefTaxon.scientificName')}>
-          {scientificNameInputField}
-        </FormItem>
-        <FormItem label={i18n.t('surveyForm.nodeDefTaxon.vernacularName')}>
-          {vernacularNameInputField}
-        </FormItem>
-
-        {autocompleteDialog}
-      </div>
-    )
-  }
+    </div>
+  )
 }
 
-NodeDefTaxon.contextType = AppContext
-
 const mapStateToProps = (state, props) => {
-  const survey = SurveyState.getSurvey(state)
+
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+  const surveyId = SurveyState.getSurveyId(state)
+  const { nodeDef, edit, nodes } = props
+
   return {
-    taxonomyUuid: NodeDef.getTaxonomyUuid(props.nodeDef),
-    surveyId: Survey.getId(survey),
-    draft: Survey.isDraft(Survey.getSurveyInfo(survey)),
+    taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
+    surveyId,
+    draft: Survey.isDraft(surveyInfo),
+    node: edit ? null : nodes[0]
   }
 }
 
