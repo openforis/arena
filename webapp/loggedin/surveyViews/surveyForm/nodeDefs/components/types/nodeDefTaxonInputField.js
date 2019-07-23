@@ -66,7 +66,7 @@ NodeDefTaxonInputField.defaultProps = {
   edit: false,
   draft: false,
   canEditRecord: false,
-  readOnly: true,
+  readOnly: false,
 
   field: Node.valuePropKeys.code,
   selection: {
