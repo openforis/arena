@@ -1,31 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import * as R from 'ramda'
-import axios from 'axios'
 
 import AutocompleteDialog from '../../../../../../commonComponents/form/autocompleteDialog'
-import { useIsMounted } from '../../../../../../commonComponents/hooks'
+import { useAsyncGetRequest } from '../../../../../../commonComponents/hooks'
 
 import Taxon from '../../../../../../../common/survey/taxon'
 import Node from '../../../../../../../common/record/node'
 import ReactDOM from 'react-dom'
-
-const loadTaxa = async (surveyId, taxonomyUuid, draft, field, value) => {
-  const searchValue = field === Node.valuePropKeys.code
-    ? `${value}*` //starts with value
-    : `*${value}*` //contains value
-
-  const params = {
-    filterProp: field,
-    filterValue: searchValue,
-    includeUnlUnk: true,
-    draft,
-  }
-  const { data: { taxa } } = await axios.get(
-    `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`,
-    { params }
-  )
-  return taxa
-}
 
 const NodeDefTaxonAutocompleteItemRenderer = props => {
   const { item: taxon, ...otherProps } = props
@@ -62,22 +43,24 @@ const NodeDefTaxonAutocompleteDialog = props => {
     onItemSelect, onClose,
   } = props
 
-  const isMounted = useIsMounted()
-  const [items, setItems] = useState([])
+  const params = {
+    filterProp: field,
+    filterValue: field === Node.valuePropKeys.code ? `${fieldValue}*` : `*${fieldValue}*`,
+    includeUnlUnk: true,
+    draft,
+  }
 
-  useEffect(() => {
-    (async () => {
-      const itemsUpdate = await loadTaxa(surveyId, taxonomyUuid, draft, field, fieldValue)
+  const { data: { taxa = [] } = { taxa: [] }, dispatch } = useAsyncGetRequest(
+    `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxa`,
+    { params }
+  )
 
-      if (isMounted.current)
-        setItems(itemsUpdate)
-    })()
-  }, [fieldValue])
+  useEffect(dispatch, [fieldValue])
 
   return ReactDOM.createPortal(
     <AutocompleteDialog
       className="survey-form__node-def-taxon-autocomplete-list"
-      items={items}
+      items={taxa}
       itemRenderer={NodeDefTaxonAutocompleteItemRenderer}
       itemKeyFunction={taxon => `${Taxon.getUuid(taxon)}_${taxon.vernacularName}`}
       inputField={inputRef.current}
