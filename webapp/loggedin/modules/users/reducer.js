@@ -1,7 +1,12 @@
-import { combineReducers } from 'redux'
+import { assocActionProps, exportReducer } from '../../../utils/reduxUtils'
 
-import userList from './userList/reducer'
+import { userListInit, userListUpdate } from './actions'
 
-export default combineReducers({
-  userList,
-})
+const actionHandlers = {
+  [userListInit]: (state, { offset, limit, count, list }) =>
+    ({ ...state, offset, limit, count, list }),
+
+  [userListUpdate]: assocActionProps,
+}
+
+export default exportReducer(actionHandlers)

@@ -1,24 +1,21 @@
 import './userListView.scss'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import TablePaginator from '../../../../commonComponents/table/tablePaginator'
 import useI18n from '../../../../commonComponents/useI18n'
 
-import { fetchUsers } from './actions'
+import { initUserList, fetchUsers } from '../actions'
+
+import * as UsersState from '../usersState'
 
 const SurveyListView = props => {
-  const { users, fetchUsers } = props
+  const { users, offset, limit, count, initUserList, fetchUsers } = props
 
-  const [offset, setOffset] = useState(0)
-  const [limit, setLimit] = useState(0)
-  const [count, setCount] = useState(0)
   const i18n = useI18n()
 
-  useEffect(() => {
-    fetchUsers()
-  }, [])
+  useEffect(() => { initUserList() }, [])
 
   return (
     <div className="user-list table">
@@ -42,6 +39,7 @@ const SurveyListView = props => {
         <div>{i18n.t('common.name')}</div>
         <div>{i18n.t('common.email')}</div>
         <div>{i18n.t('common.group')}</div>
+        <div>Accepted</div>
       </div>
 
 
@@ -49,10 +47,11 @@ const SurveyListView = props => {
         {
           users
             .map(user => (
-              <div className={`table__row`}>
+              <div key={user.id} className={`table__row`}>
                 <div>{user.name}</div>
                 <div>{user.email}</div>
-                <div>{user.groupName}</div>
+                <div>{i18n.t(`authGroups.${user.groupName}.label`)}</div>
+                <div>{user.accepted ? i18n.t('common.yes') : i18n.t('common.no')}</div>
               </div>
             ))
         }
@@ -62,10 +61,13 @@ const SurveyListView = props => {
 }
 
 const mapStateToProps = state => ({
-  users: state.users.userList.users || [],
+  users: UsersState.getList(state),
+  offset: UsersState.getOffset(state),
+  limit: UsersState.getLimit(state),
+  count: UsersState.getCount(state),
 })
 
 export default connect(
   mapStateToProps,
-  { fetchUsers }
+  { initUserList, fetchUsers }
 )(SurveyListView)

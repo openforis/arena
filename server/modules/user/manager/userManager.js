@@ -1,7 +1,20 @@
+const R = require('ramda')
+
 const UserRepository = require('../repository/userRepository')
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 
 // ==== READ
+
+const fetchUsersBySurveyId = async (surveyId, offset, limit) => {
+  const users = await (UserRepository.fetchUsersBySurveyId(surveyId, offset, limit))
+
+  return R.map(
+    R.pipe(
+      u => R.assoc('accepted', !!u.cognitoUsername)(u),
+      R.dissoc('cognitoUsername')
+    )
+  )(users)
+}
 
 const findUserByCognitoUsername = async email => {
   const user = await UserRepository.findUserByCognitoUsername(email)
@@ -24,7 +37,9 @@ const deleteUserPref = async (user, name) => ({
 
 module.exports = {
   // READ
-  fetchUsersBySurveyId: UserRepository.fetchUsersBySurveyId,
+  fetchUsersBySurveyId,
+
+  countUsersBySurveyId: UserRepository.countUsersBySurveyId,
 
   findUserByCognitoUsername,
 

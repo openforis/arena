@@ -4,8 +4,6 @@ CREATE TABLE
   id           bigserial    NOT NULL,
   name         VARCHAR(255) NOT NULL,
   survey_id    bigint REFERENCES survey (id) ON DELETE CASCADE,
-  labels       jsonb DEFAULT '{}'::jsonb,
-  descriptions jsonb DEFAULT '{}'::jsonb,
   permissions  jsonb DEFAULT '{}'::jsonb,
   record_steps jsonb DEFAULT '{}'::jsonb,
   PRIMARY KEY (id)
@@ -32,10 +30,8 @@ INSERT INTO
 VALUES
 ('Admin', 'admin@openforis.org', 'demo_user');
 
-INSERT INTO auth_group (name, labels, descriptions, permissions, record_steps)
+INSERT INTO auth_group (name, permissions, record_steps)
 VALUES ('systemAdmin',
-        '{"en": "System Administrators"}'::jsonb,
-        '{"en": "OF Arena system administrators"}'::jsonb,
         NULL,
         NULL);
 

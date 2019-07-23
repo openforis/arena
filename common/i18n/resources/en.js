@@ -23,6 +23,7 @@ module.exports = {
     error_plural: 'Errors',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
+    group: 'Group',
     id: 'id',
     invalid: 'INVALID',
     item: 'Item',
@@ -33,6 +34,7 @@ module.exports = {
     manage: 'Manage',
     name: 'Name',
     new: 'New',
+    no: 'No',
     of: 'of',
     required: 'Required',
     reset: 'Reset',
@@ -41,7 +43,7 @@ module.exports = {
     undefinedName: 'Undefined name',
     upload: 'Upload',
     view: 'View',
-    group: 'Group',
+    yes: 'Yes',
   },
 
   appModules: {
@@ -320,5 +322,36 @@ module.exports = {
 
   systemErrors: {
     somethingWentWrong: 'Oooops! Something went wrong. Try to refresh the page.'
+  },
+
+  authGroups: {
+    systemAdmin: {
+      label: 'System Administrators',
+      description: 'OF Arena system administrators',
+    },
+    surveyAdmin: {
+      label: 'Survey administrators',
+      description: 'Full rights',
+    },
+    surveyEditor: {
+      label: 'Survey editors',
+      description: 'Can edit survey, records, invite users',
+    },
+    dataEditor: {
+      label: 'Data editors',
+      description: 'Can edit records in data entry step',
+    },
+    dataCleanser: {
+      label: 'Data cleansers',
+      description: 'Can edit records in data cleansing step',
+    },
+    dataAnalyst: {
+      label: 'Data analysts',
+      description: 'Can edit records in data analysis step',
+    },
+    surveyGuest: {
+      label: 'System guest',
+      description: 'Can view records',
+    },
   }
 }

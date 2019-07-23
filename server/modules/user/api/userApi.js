@@ -9,10 +9,26 @@ module.exports.init = app => {
 
   // ==== READ
 
-  app.get('/survey/:surveyId/users', async (req, res, next) => {
-    const { surveyId } = Request.getParams(req)
+  app.get('/survey/:surveyId/users/count', async (req, res, next) => {
+    try {
+      const surveyId = Request.getRestParam(req, 'surveyId')
 
-    res.json(await UserService.fetchUsersBySurveyId(surveyId))
+      const count = await UserService.countUsersBySurveyId(surveyId)
+      res.json(count)
+
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.get('/survey/:surveyId/users', async (req, res, next) => {
+    try {
+      const { surveyId, offset, limit } = Request.getParams(req)
+
+      res.json(await UserService.fetchUsersBySurveyId(surveyId, offset, limit))
+    } catch (err) {
+      next(err)
+    }
   })
 
   // ==== UPDATE

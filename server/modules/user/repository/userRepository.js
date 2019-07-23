@@ -7,14 +7,25 @@ const selectFieldsCommaSep = (prefix = '') => selectFields.map(f => prefix + f).
 
 // in sql queries, user table must be surrounded by "" e.g. "user"
 
-const fetchUsersBySurveyId = async (surveyId, client = db) =>
+const countUsersBySurveyId = async (surveyId, client = db) =>
+  await client.one(`
+    SELECT count(*)
+    FROM "user" u
+    JOIN auth_group_user gu ON gu.user_id = u.id
+    JOIN auth_group g on g.id = gu.group_id AND g.survey_id = $1`,
+    [surveyId]
+  )
+
+const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client = db) =>
   await client.map(`
-    SELECT ${selectFieldsCommaSep('u.')}, g.name AS group_name
+    SELECT ${selectFieldsCommaSep('u.')}, u.cognito_username, g.name AS group_name
     FROM "user" u
     JOIN auth_group_user gu ON gu.user_id = u.id
     JOIN auth_group g on g.id = gu.group_id AND g.survey_id = $1
     GROUP BY u.id, g.name
-    ORDER BY u.id`,
+    ORDER BY u.id
+    LIMIT ${limit || 'ALL'}
+    OFFSET ${offset}`,
     [surveyId],
     camelize
   )
@@ -58,6 +69,7 @@ const deleteUserPref = async (user, name, client = db) => {
 
 module.exports = {
   // READ
+  countUsersBySurveyId,
   fetchUsersBySurveyId,
   findUserByCognitoUsername,
 
