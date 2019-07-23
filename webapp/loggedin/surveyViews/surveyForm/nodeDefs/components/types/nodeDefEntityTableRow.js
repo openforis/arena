@@ -74,7 +74,7 @@ class NodeDefEntityTableRow extends React.Component {
   render () {
 
     const {
-      nodeDef, nodeDefColumns, node,
+      nodeDef, nodeDefColumnUuids, node,
       canEditRecord, canEditDef,
       renderType, i = 'header',
       removeNode,
@@ -92,12 +92,12 @@ class NodeDefEntityTableRow extends React.Component {
            id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
 
         {
-          nodeDefColumns
-            .map(childDef => (
+          nodeDefColumnUuids
+            .map(nodeDefUuid => (
               <NodeDefEntityTableCell
-                key={NodeDef.getUuid(childDef)}
+                key={nodeDefUuid}
                 {...this.props}
-                nodeDef={childDef}
+                nodeDefUuid={nodeDefUuid}
                 parentNode={node}
                 canEditDef={canEditDef}
                 renderType={renderType}
