@@ -18,11 +18,11 @@ const TableColumn = (props) => {
   const isHeader = !row
   const isData = !!row
   const noCols = editMode ? 1 : colNames.length
-  const widthOuter = colWidth * (editMode ? colNames.length : NodeDefUIProps.getNodeDefFormFields(nodeDef).length)
+  const widthOuter = colWidth * noCols// (editMode ? NodeDefUIProps.getNodeDefFormFields(nodeDef).length : colNames.length)
   const widthInner = (1 / noCols * 100) + '%'
 
   return (
-    <div className="table__cell" style={{ width:widthOuter }}>
+    <div className="table__cell" style={{ width: widthOuter }}>
 
       {
         isHeader &&

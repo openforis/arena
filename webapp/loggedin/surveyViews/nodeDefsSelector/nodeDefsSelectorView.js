@@ -1,6 +1,6 @@
 import './components/nodeDefsSelectorView.scss'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -14,12 +14,14 @@ import NodeDef from '../../../../common/survey/nodeDef'
 import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
 
 import * as SurveyState from '../../../survey/surveyState'
-import { usePrevious } from '../../../commonComponents/hooks'
 
 const NodeDefsSelectorView = props => {
 
-  const [nodeDefUuidEntity, setNodeDefUuidEntity] = useState(props.nodeDefUuidEntity)
-  const [nodeDefUuidsAttributes, setNodeDefUuidsAttributes] = useState(props.nodeDefUuidsAttributes)
+  const {
+    nodeDefUuidsAttributes, nodeDefUuidEntity,
+    onChangeAttributes, onChangeEntity
+  } = props
+
   const [filterTypes, setFilterTypes] = useState([])
   const [showSettings, setShowSettings] = useState(false)
 
@@ -29,23 +31,8 @@ const NodeDefsSelectorView = props => {
     const fn = isDeleted ? R.remove(idx, 1) : R.append(nodeDefUuid)
 
     const newNodeDefUuidsAttributes = fn(nodeDefUuidsAttributes)
-    setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
-    props.onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
+    onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
   }
-
-  useEffect(() => {
-    const newNodeDefUuidEntity = props.nodeDefUuidEntity
-    if (newNodeDefUuidEntity) {
-      setNodeDefUuidEntity(newNodeDefUuidEntity)
-    }
-  }, [props.nodeDefUuidEntity])
-
-  const nodeDefUuidEntityPrev = usePrevious(nodeDefUuidEntity, nodeDefUuidEntity)
-  useEffect(() => {
-    if (nodeDefUuidEntity && nodeDefUuidEntity !== nodeDefUuidEntityPrev) {
-      props.onChangeEntity(nodeDefUuidEntity)
-    }
-  }, [nodeDefUuidEntity])
 
   const {
     surveyInfo,
@@ -70,7 +57,7 @@ const NodeDefsSelectorView = props => {
           hierarchy={hierarchy}
           lang={lang}
           nodeDefUuidEntity={nodeDefUuidEntity}
-          onChange={setNodeDefUuidEntity}
+          onChange={onChangeEntity}
         />
 
         {
