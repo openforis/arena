@@ -29,8 +29,8 @@ const SurveyDefsLoader = (props) => {
 
 }
 
-const mapStateToProps = state => ({
-  ready: SurveyState.areDefsFetched(state),
+const mapStateToProps = (state, props) => ({
+  ready: SurveyState.areDefsFetched(state) && SurveyState.areDefsDraftFetched(state) === props.draft,
   surveyInfo: SurveyState.getSurveyInfo(state),
 })
 

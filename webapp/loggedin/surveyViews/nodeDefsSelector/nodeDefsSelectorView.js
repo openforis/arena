@@ -14,6 +14,7 @@ import NodeDef from '../../../../common/survey/nodeDef'
 import * as NodeDefUiProps from '../surveyForm/nodeDefs/nodeDefUIProps'
 
 import * as SurveyState from '../../../survey/surveyState'
+import { usePrevious } from '../../../commonComponents/hooks'
 
 const NodeDefsSelectorView = props => {
 
@@ -39,8 +40,9 @@ const NodeDefsSelectorView = props => {
     }
   }, [props.nodeDefUuidEntity])
 
+  const nodeDefUuidEntityPrev = usePrevious(nodeDefUuidEntity, nodeDefUuidEntity)
   useEffect(() => {
-    if (nodeDefUuidEntity) {
+    if (nodeDefUuidEntity && nodeDefUuidEntity !== nodeDefUuidEntityPrev) {
       props.onChangeEntity(nodeDefUuidEntity)
     }
   }, [nodeDefUuidEntity])

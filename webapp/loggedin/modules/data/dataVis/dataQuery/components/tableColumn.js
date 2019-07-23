@@ -5,6 +5,7 @@ import NodeDefTableCellHeader from '../../../../../surveyViews/surveyForm/nodeDe
 
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import NodeDefTable from '../../../../../../../common/surveyRdb/nodeDefTable'
+import * as NodeDefUIProps from '../../../../../surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 import TableColumnEdit from './tableColumnEdit'
 
@@ -14,13 +15,14 @@ const TableColumn = (props) => {
   } = props
 
   const colNames = NodeDefTable.getColNames(nodeDef)
-  const noCols = editMode ? 1 : colNames.length
   const isHeader = !row
   const isData = !!row
-  const width = (1 / noCols * 100) + '%'
+  const noCols = editMode ? 1 : colNames.length
+  const widthOuter = colWidth * (editMode ? colNames.length : NodeDefUIProps.getNodeDefFormFields(nodeDef).length)
+  const widthInner = (1 / noCols * 100) + '%'
 
   return (
-    <div className="table__cell" style={{ width: colWidth * noCols }}>
+    <div className="table__cell" style={{ width:widthOuter }}>
 
       {
         isHeader &&
@@ -56,7 +58,7 @@ const TableColumn = (props) => {
             {
               colNames.map((col, i) =>
                 isData ?
-                  <div key={i} style={{ width }}>
+                  <div key={i} style={{ width: widthInner }} className="ellipsis">
                     {
                       row.hasOwnProperty(col)
                         ? row[col]
@@ -72,7 +74,7 @@ const TableColumn = (props) => {
                   </div>
                   : isHeader && noCols > 1
                   ? (
-                    <div key={i} style={{ width }}>
+                    <div key={i} style={{ width: widthInner }}>
                       {NodeDefTable.extractColName(nodeDef, col)}
                     </div>
                   )
