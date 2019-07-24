@@ -29,11 +29,14 @@ const getNodeValues = (surveyInfo, nodeDef, nodes, lang) => {
     }
   }
 
-  return R.pipe(
-    R.reject(n => Node.isPlaceholder(n) || Node.isValueBlank(n)),
-    R.map(getNodeValue),
-    R.join(', ')
-  )(nodes)
+  return R.reduce(
+    (accString, node) => Node.isPlaceholder(node) || Node.isValueBlank(node)
+      ? accString
+      : `${accString === '' ? '' : ', '}${getNodeValue(node)}`
+    ,
+    '',
+    nodes
+  )
 
 }
 
