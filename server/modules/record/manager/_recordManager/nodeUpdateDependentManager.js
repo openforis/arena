@@ -98,6 +98,7 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
             nodeCtxUuid,
             value,
             { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
+            Record.isPreview(record),
             tx
           )
         }

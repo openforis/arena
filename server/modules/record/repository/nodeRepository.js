@@ -116,7 +116,7 @@ const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, child
 }
 
 // ============== UPDATE
-const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) => {
+const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = db) => {
   await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1,
@@ -126,7 +126,7 @@ const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) => 
     `, [stringifyValue(value), meta, nodeUuid]
   )
   const node = await client.one(`
-    ${getNodeSelectQuery(surveyId, false)}
+    ${getNodeSelectQuery(surveyId, draft)}
     WHERE n.uuid = $1
   `,
     nodeUuid,

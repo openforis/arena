@@ -31,7 +31,7 @@ const persistNode = async (user, survey, record, node, t) => {
       ...Node.getMeta(node),
       [Node.metaKeys.defaultValue]: false
     }
-    const nodeUpdate = await NodeRepository.updateNode(surveyId, nodeUuid, nodeValue, meta, t)
+    const nodeUpdate = await NodeRepository.updateNode(surveyId, nodeUuid, nodeValue, meta, Record.isPreview(record), t)
 
     record = Record.assocNode(nodeUpdate)(record)
 

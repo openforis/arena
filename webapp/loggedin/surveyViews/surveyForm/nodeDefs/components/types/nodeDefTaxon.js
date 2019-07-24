@@ -65,7 +65,7 @@ const NodeDefTaxon = props => {
     updateNode(nodeDef, node, nodeValue, null, {}, { [NodeRefData.keys.taxon]: taxon })
 
   const onChangeTaxon = taxon => {
-    if (taxon) {
+    if (taxon && !Taxon.isEqual(taxon)(taxonRefData)) {
       const nodeValue = {
         [taxonUuid]: Taxon.getUuid(taxon),
         [scientificName]: Taxon.isUnlistedTaxon(taxon) && selection[scientificName]
