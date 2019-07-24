@@ -8,7 +8,12 @@ import NodeDef from '../../../../../../../common/survey/nodeDef'
 import CategoryItem from '../../../../../../../common/survey/categoryItem'
 
 const NodeDefCodeDropdown = props => {
-  const { language, edit, nodeDef, readOnly, items = [], selectedItems = [], onSelectedItemsChange, canEditRecord } = props
+  const {
+    lang, nodeDef,
+    items, selectedItems,
+    edit, canEditRecord, readOnly,
+    onItemAdd, onItemRemove
+  } = props
 
   const entryDisabled = edit || !canEditRecord || readOnly
 
@@ -24,9 +29,10 @@ const NodeDefCodeDropdown = props => {
               items={items}
               disabled={disabled}
               itemKeyProp="uuid"
-              itemLabelFunction={CategoryItem.getLabel(language)}
+              itemLabelFunction={CategoryItem.getLabel(lang)}
               selection={selectedItems}
-              onChange={selectedItems => onSelectedItemsChange(selectedItems)}
+              onItemAdd={onItemAdd}
+              onItemRemove={onItemRemove}
             />
           )
           : (
@@ -35,9 +41,13 @@ const NodeDefCodeDropdown = props => {
               items={items}
               disabled={disabled}
               itemKeyProp="uuid"
-              itemLabelFunction={CategoryItem.getLabel(language)}
+              itemLabelFunction={CategoryItem.getLabel(lang)}
               selection={R.head(selectedItems)}
-              onChange={item => onSelectedItemsChange(item ? [item] : [])}
+              onChange={item => {
+                item
+                  ? onItemAdd(item)
+                  : onItemRemove(item)
+              }}
             />
           )
       }
