@@ -7,6 +7,8 @@ const DbUtils = require('../../../db/dbUtils')
 const Node = require('../../../../common/record/node')
 const { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
+// ============== UTILS
+
 //camelize all but "meta"
 const dbTransformCallback = node =>
   node
@@ -16,35 +18,6 @@ const dbTransformCallback = node =>
     R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node))
     )(node)
     : null
-
-// ============== CREATE
-
-const insertNode = (surveyId, node, client = db) => {
-  const meta = {
-    ...Node.getMeta(node),
-    [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
-    [Node.metaKeys.childApplicability]: {}
-  }
-
-  return client.one(`
-      INSERT INTO ${getSurveyDBSchema(surveyId)}.node
-        (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
-        VALUES ($1, $2, $3, $4, $5, $6::jsonb)
-        RETURNING *, true as ${Node.keys.created}
-      `, [Node.getUuid(node), Node.getRecordUuid(node), Node.getParentUuid(node), Node.getNodeDefUuid(node), stringifyValue(Node.getValue(node, null)), meta],
-    dbTransformCallback
-  )
-}
-
-const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
-  await client.none(DbUtils.insertAllQuery(
-    getSurveyDBSchema(surveyId),
-    'node',
-    ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'],
-    nodeValues
-  ))
-
-// ============== READ
 
 const getNodeSelectQuery = (surveyId, draft) => {
   const schema = getSurveyDBSchema(surveyId)
@@ -78,6 +51,43 @@ const getNodeSelectQuery = (surveyId, draft) => {
     ON
         (n.value->>'${Node.valuePropKeys.vernacularNameUuid}')::uuid = v.uuid`
 }
+
+// ============== CREATE
+
+const insertNode = async (surveyId, node, draft, client = db) => {
+  const meta = {
+    ...Node.getMeta(node),
+    [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
+    [Node.metaKeys.childApplicability]: {}
+  }
+
+  await client.query(`
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.node
+        (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+    `,
+    [Node.getUuid(node), Node.getRecordUuid(node), Node.getParentUuid(node), Node.getNodeDefUuid(node), stringifyValue(Node.getValue(node, null)), meta],
+  )
+
+  const nodeAdded = await client.one(`
+    ${getNodeSelectQuery(surveyId, draft)}
+    WHERE n.uuid = $1
+  `,
+    Node.getUuid(node),
+    dbTransformCallback
+  )
+  return { ...nodeAdded, [Node.keys.created]: true }
+}
+
+const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
+  await client.none(DbUtils.insertAllQuery(
+    getSurveyDBSchema(surveyId),
+    'node',
+    ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'],
+    nodeValues
+  ))
+
+// ============== READ
 
 const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) =>
   await client.map(`

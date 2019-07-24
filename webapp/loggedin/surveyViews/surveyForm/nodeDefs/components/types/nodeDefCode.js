@@ -14,6 +14,7 @@ import Category from '../../../../../../../common/survey/category'
 import CategoryItem from '../../../../../../../common/survey/categoryItem'
 import Record from '../../../../../../../common/record/record'
 import Node from '../../../../../../../common/record/node'
+import NodeRefData from '../../../../../../../common/record/nodeRefData'
 import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 
 import * as AppState from '../../../../../../app/appState'
@@ -62,13 +63,14 @@ const NodeDefCode = props => {
 
     const value = { [Node.valuePropKeys.itemUuid]: CategoryItem.getUuid(item) }
     const meta = { [Node.metaKeys.hierarchyCode]: codeUuidsHierarchy }
+    const refData = { [NodeRefData.keys.categoryItem]: item }
 
-    updateNode(nodeDef, node, value, null, meta)
+    updateNode(nodeDef, node, value, null, meta, refData)
   }
 
   const onItemRemove = item => {
     if (NodeDef.isSingle(nodeDef)) {
-      updateNode(nodeDef, nodes[0], {}, null, {})
+      updateNode(nodeDef, nodes[0], {}, null, {}, {})
     } else {
       const nodeToRemove = nodes.find(node => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
       removeNode(nodeDef, nodeToRemove)
