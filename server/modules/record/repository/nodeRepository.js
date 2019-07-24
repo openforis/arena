@@ -49,42 +49,38 @@ const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
 const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  // TODO: This query can be used to prefetch taxa and category items associated with the nodes
-  // const select = `
-  //   SELECT
-  //       n.*,
-  //       ${DbUtils.getPropsCombined(draft, 'c.', 'category_item')},
-  //       ${DbUtils.getPropsCombined(draft, 't.', 'taxon')},
-  //       ${DbUtils.getPropsCombined(draft, 'v.', 'taxon_vernacular_name')}
-  //   FROM
-  //       ${schema}.node n
-  //   LEFT OUTER JOIN
-  //       ${schema}.category_item c
-  //   ON
-  //       (n.value->>'${Node.valuePropKeys.itemUuid}')::uuid = c.uuid
-  //   LEFT OUTER JOIN
-  //       ${schema}.taxon t
-  //   ON
-  //       (n.value->>'${Node.valuePropKeys.taxonUuid}')::uuid = t.uuid
-  //   LEFT OUTER JOIN
-  //       ${schema}.taxon_vernacular_name v
-  //   ON
-  //       (n.value->>'${Node.valuePropKeys.vernacularNameUuid}')::uuid = v.uuid
-  //   WHERE
-  //       record_uuid = $1
-  //   ORDER
-  //       BY date_created
-  //   `
+  const propsTaxon = DbUtils.getPropsCombined(draft, 't.', false)
+  const propsVernacularName = DbUtils.getPropsCombined(draft, 'v.', false)
+  const propsCategoryItem = DbUtils.getPropsCombined(draft, 'c.', false)
 
   const select = `
-    SELECT * 
-    FROM 
-        ${schema}.node
-    WHERE 
+    SELECT
+        n.*,
+        CASE
+            WHEN n.value->>'taxonUuid' IS NOT NULL
+            THEN json_build_object( 'taxon',json_build_object('id',t.id, 'uuid',t.uuid, 'taxonomy_uuid',t.taxonomy_uuid,' props',${propsTaxon}, 'vernacular_name_uuid',v.uuid, 'vernacular_language',(${propsVernacularName})->>'lang', 'vernacular_name',(${propsVernacularName})->>'name') )
+            WHEN n.value->>'itemUuid' IS NOT NULL
+            THEN json_build_object( 'category_item',json_build_object('id',c.id, 'uuid',c.uuid, 'level_uuid',c.level_uuid, 'parent_uuid',c.parent_uuid, 'props',${propsCategoryItem}) )
+            ELSE NULL
+        END                      AS ref_data
+    FROM
+        ${schema}.node n
+    LEFT OUTER JOIN
+        ${schema}.category_item c
+    ON
+        (n.value->>'${Node.valuePropKeys.itemUuid}')::uuid = c.uuid
+    LEFT OUTER JOIN
+        ${schema}.taxon t
+    ON
+        (n.value->>'${Node.valuePropKeys.taxonUuid}')::uuid = t.uuid
+    LEFT OUTER JOIN
+        ${schema}.taxon_vernacular_name v
+    ON
+        (n.value->>'${Node.valuePropKeys.vernacularNameUuid}')::uuid = v.uuid
+    WHERE
         record_uuid = $1
-    ORDER BY 
-        date_created
-  `
+    `
+
   return await client.map(select, [recordUuid], dbTransformCallback)
 }
 
