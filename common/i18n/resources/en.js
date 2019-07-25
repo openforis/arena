@@ -137,6 +137,7 @@ module.exports = {
   usersView: {
     inviteUser: 'Invite',
     accepted: 'Accepted',
+    group: 'Group',
   },
 
   itemsTable: {
@@ -326,6 +327,7 @@ module.exports = {
   },
 
   authGroups: {
+    group: 'Group',
     systemAdmin: {
       label: 'System Administrators',
       description: 'OF Arena system administrators',

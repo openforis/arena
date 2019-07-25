@@ -2,16 +2,24 @@ import './userListView.scss'
 
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
+import { Link } from 'react-router-dom'
+
+import Authorizer from '../../../../../common/auth/authorizer'
 
 import TablePaginator from '../../../../commonComponents/table/tablePaginator'
 import useI18n from '../../../../commonComponents/useI18n'
 
+import { appModuleUri, userModules } from '../../../appModules'
+
 import { initUserList, fetchUsers } from '../actions'
 
+import * as AppState from '../../../../app/appState'
 import * as UsersState from '../usersState'
+import * as SurveyState from '../../../../survey/surveyState'
+
 
 const SurveyListView = props => {
-  const { users, offset, limit, count, initUserList, fetchUsers } = props
+  const { users, offset, limit, count, initUserList, fetchUsers, canInvite } = props
 
   const i18n = useI18n()
 
@@ -22,10 +30,12 @@ const SurveyListView = props => {
       <div className="table__header">
 
         <div>
-          <button className="btn btn-s">
-            <span className="icon icon-user-plus icon-14px icon-left"/>
-            {i18n.t('usersView.inviteUser')}
-          </button>
+          {canInvite && (
+            <Link to={appModuleUri(userModules.userInvite)} className="btn btn-s">
+              <span className="icon icon-plus icon-12px icon-left" />
+              {i18n.t('usersView.inviteUser')}
+            </Link>
+          )}
         </div>
 
         <TablePaginator
@@ -60,12 +70,19 @@ const SurveyListView = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  users: UsersState.getList(state),
-  offset: UsersState.getOffset(state),
-  limit: UsersState.getLimit(state),
-  count: UsersState.getCount(state),
-})
+const mapStateToProps = state => {
+  const user = AppState.getUser(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+
+  return {
+    canInvite: Authorizer.canInviteUsers(user, surveyInfo),
+
+    users: UsersState.getList(state),
+    offset: UsersState.getOffset(state),
+    limit: UsersState.getLimit(state),
+    count: UsersState.getCount(state),
+  }
+}
 
 export default connect(
   mapStateToProps,

@@ -1,0 +1,8 @@
+.user-invite {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: .5fr .5fr;
+  align-items: center;
+  grid-column-gap: .5rem;
+  grid-row-gap: 2rem;
+}
