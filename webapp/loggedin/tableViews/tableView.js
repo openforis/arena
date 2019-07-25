@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import TablePaginator from './components/tablePaginator'
+import useI18n from '../../commonComponents/useI18n'
 
 import * as TableViewsState from './tableViewsState'
 
@@ -12,7 +13,7 @@ const TableView = props => {
   const {
     module, className,
     headerLeftComponent, gridTemplateColumns,
-    rowHeaderComponent, rowComponent,
+    rowHeaderComponent, rowComponent, noItemsLabelKey,
     list, offset, limit, count,
     initList, fetchListItems,
   } = props
@@ -22,6 +23,7 @@ const TableView = props => {
   }, [])
 
   const hasItems = !R.isEmpty(list)
+  const i18n = useI18n()
 
   return (
     <div className={`table ${className}`}>
@@ -69,7 +71,9 @@ const TableView = props => {
             </div>
           )
           : (
-            <div className="table__empty-rows">No Items</div>
+            <div className="table__empty-rows">
+              {i18n.t(noItemsLabelKey)}
+            </div>
           )
       }
 
@@ -84,6 +88,7 @@ TableView.defaultProps = {
   headerLeftComponent: () => <div></div>,
   rowHeaderComponent: () => <div></div>,
   rowComponent: () => <div></div>,
+  noItemsLabelKey: 'common.noItems'
 
 }
 

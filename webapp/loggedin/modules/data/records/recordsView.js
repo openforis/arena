@@ -8,6 +8,8 @@ import RecordsHeaderLeft from './components/recordsHeaderLeft'
 import RecordsRowHeader from './components/recordsRowHeader'
 import RecordsRow from './components/recordsRow'
 
+import Survey from '../../../../../common/survey/survey'
+
 import * as AppState from '../../../../app/appState'
 import * as RecordsState from './recordsState'
 import * as SurveyState from '../../../../survey/surveyState'
@@ -24,23 +26,25 @@ const RecordsView = props => {
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 50px`
 
-  return (
-    <TableView
-      module={RecordsState.keys.records}
-      className="records"
-      gridTemplateColumns={gridTemplateColumns}
-      headerLeftComponent={RecordsHeaderLeft}
-      rowHeaderComponent={RecordsRowHeader}
-      rowComponent={RecordsRow}
+  return Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo) &&
+    (
+      <TableView
+        module={RecordsState.keys.records}
+        className="records"
+        gridTemplateColumns={gridTemplateColumns}
+        headerLeftComponent={RecordsHeaderLeft}
+        rowHeaderComponent={RecordsRowHeader}
+        rowComponent={RecordsRow}
+        noItemsLabelKey={'data.records.noRecordsAdded'}
 
-      surveyInfo={surveyInfo}
-      createRecord={createRecord}
-      history={history}
-      nodeDefKeys={nodeDefKeys}
-      lang={lang}
-    />
+        surveyInfo={surveyInfo}
+        createRecord={createRecord}
+        history={history}
+        nodeDefKeys={nodeDefKeys}
+        lang={lang}
+      />
 
-  )
+    )
 }
 
 const mapStateToProps = state => ({
