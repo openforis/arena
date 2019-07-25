@@ -1,7 +1,16 @@
 const R = require('ramda')
 
+const db = require('../../../db/db')
+
 const UserRepository = require('../repository/userRepository')
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
+
+// ==== CREATE
+
+const inviteUser = async (surveyId, email, groupId, client = db) => {
+  const user = await UserRepository.insertUser(surveyId, email, groupId, client)
+  await AuthGroupRepository.insertUserGroup(groupId, user.id, client)
+}
 
 // ==== READ
 
@@ -37,6 +46,9 @@ const deleteUserPref = async (user, name) => ({
 })
 
 module.exports = {
+  // CREATE
+  inviteUser,
+
   // READ
   fetchUsersBySurveyId,
 

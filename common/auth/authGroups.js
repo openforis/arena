@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const keys = {
+  id: 'id',
   authGroups: 'authGroups',
   permissions: 'permissions',
   recordSteps: 'recordSteps',
@@ -41,10 +42,13 @@ const groupNames = {
 
 const getAuthGroups = R.propOr([], keys.authGroups)
 
+const getId = R.prop(keys.id)
+
 module.exports = {
   keys,
   permissions,
   groupNames,
 
+  getId,
   getAuthGroups,
 }

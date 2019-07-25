@@ -7,6 +7,17 @@ const selectFieldsCommaSep = (prefix = '') => selectFields.map(f => prefix + f).
 
 // in sql queries, user table must be surrounded by "" e.g. "user"
 
+// CREATE
+
+const insertUser = async (surveyId, email, group, client = db) =>
+  await client.one(`
+    INSERT INTO "user" (name, email, prefs)
+    VALUES ($1, $2, $3::jsonb)
+    RETURNING ${selectFieldsCommaSep()}`,
+    ['name!', email, { surveyId }])
+
+// READ
+
 const countUsersBySurveyId = async (surveyId, client = db) =>
   await client.one(`
     SELECT count(*)
@@ -68,6 +79,9 @@ const deleteUserPref = async (user, name, client = db) => {
 }
 
 module.exports = {
+  // CREATE
+  insertUser,
+
   // READ
   countUsersBySurveyId,
   fetchUsersBySurveyId,

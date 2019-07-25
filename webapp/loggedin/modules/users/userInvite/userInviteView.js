@@ -1,23 +1,36 @@
 import './userInviteView.scss'
 
-import * as R from 'ramda'
+import React, { useState } from 'react'
+import { connect } from 'react-redux'
 
-import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
-import { groupNames } from '../../../../../common/auth/authGroups'
+import Survey from '../../../../../common/survey/survey'
+import AuthGroups from '../../../../../common/auth/authGroups'
+
+import * as SurveyState from '../../../../survey/surveyState'
 
 import useI18n from '../../../../commonComponents/useI18n'
-
 import { Input } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 
-const UserInviteView = () => {
+const UserInviteView = props => {
   const i18n = useI18n()
 
-  const groups = R.keys(groupNames)
+  const { groups: groups_, surveyId } = props
+
+  const groups = groups_.map(g => ({
+    id: g.id,
+    label: i18n.t(`authGroups.${g.name}.label`)
+  }))
 
   const [email, setEmail] = useState('')
   const [group, setGroup] = useState()
+
+  const inviteUser = () => {
+    const groupId = AuthGroups.getId(group)
+    axios.post('/api/user/invite', { surveyId, email, groupId })
+  }
 
   return (
     <div className="user-invite">
@@ -31,11 +44,13 @@ const UserInviteView = () => {
         <Dropdown
           placeholder={i18n.t('usersView.group')}
           items={groups}
+          itemKeyProp={'id'}
+          itemLabelProp={'label'}
           selection={group}
           onChange={setGroup}/>
       </div>
       <button className="btn"
-              onClick={() => alert('ecchice')}>
+              onClick={() => inviteUser()}>
         <span className="icon icon-plus icon-left icon-12px" />
         {i18n.t('usersView.inviteUser')}
       </button>
@@ -43,4 +58,16 @@ const UserInviteView = () => {
   )
 }
 
-export default UserInviteView
+const mapStateToProps = state => {
+  const survey = SurveyState.getSurvey(state)
+  const authGroups = Survey.getAuthGroups(Survey.getSurveyInfo(survey))
+
+  return {
+    survey,
+    groups: authGroups.map(g => ({ id: g.id, name: g.name }))
+  }
+}
+
+export default connect(
+  mapStateToProps,
+)(UserInviteView)
