@@ -31,6 +31,9 @@ const metaKeys = {
 }
 
 const valuePropKeys = {
+  // generic code (can be used by taxon or categoryItem)
+  code: 'code',
+
   // code
   itemUuid: 'itemUuid',
 
@@ -235,6 +238,6 @@ module.exports = {
   // taxon
   getTaxonUuid: getValueProp(valuePropKeys.taxonUuid),
   getVernacularNameUuid: getValueProp(valuePropKeys.vernacularNameUuid),
-  getScientificName: getValueProp(valuePropKeys.scientificName),
-  getVernacularName: getValueProp(valuePropKeys.vernacularName),
+  getScientificName: getValueProp(valuePropKeys.scientificName, ''),
+  getVernacularName: getValueProp(valuePropKeys.vernacularName, ''),
 }
