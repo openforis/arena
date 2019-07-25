@@ -7,7 +7,8 @@ const keys = {
   offset: 'offset',
 }
 
-const getState = R.prop('users')
+export const stateKey = 'users'
+const getState = R.prop(stateKey)
 
 const getStateProp = (prop, defaultValue = null) => R.pipe(getState, R.propOr(defaultValue, prop))
 

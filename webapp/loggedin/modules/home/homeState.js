@@ -1,3 +1,4 @@
 import * as R from 'ramda'
 
-export const getState = R.prop('home')
+export const stateKey = 'home'
+export const getState = R.prop(stateKey)

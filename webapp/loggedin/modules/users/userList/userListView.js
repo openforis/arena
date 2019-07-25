@@ -3,14 +3,14 @@ import './userListView.scss'
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import TablePaginator from '../../../../commonComponents/table/tablePaginator'
+import TablePaginator from '../../../tableViews/components/tablePaginator'
 import useI18n from '../../../../commonComponents/useI18n'
 
 import { initUserList, fetchUsers } from '../actions'
 
 import * as UsersState from '../usersState'
 
-const SurveyListView = props => {
+const UsersListView = props => {
   const { users, offset, limit, count, initUserList, fetchUsers } = props
 
   const i18n = useI18n()
@@ -32,7 +32,8 @@ const SurveyListView = props => {
           offset={offset}
           limit={limit}
           count={count}
-          fetchFn={fetchUsers}/>
+          fetchFn={fetchUsers}
+        />
       </div>
 
       <div className="table__row-header">
@@ -70,4 +71,4 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   { initUserList, fetchUsers }
-)(SurveyListView)
+)(UsersListView)
