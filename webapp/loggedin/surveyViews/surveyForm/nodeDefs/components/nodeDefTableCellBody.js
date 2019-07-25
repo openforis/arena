@@ -73,8 +73,8 @@ const NodeDefMultipleTableCell = props => {
     ? (
       ReactDOM.createPortal(
         <NodeDefMultipleEditDialog
-          {...this.props}
-          onClose={() => this.setShowEditDialog(false)}
+          {...props}
+          onClose={() => setShowEditDialog(false)}
         />,
         document.body
       )
@@ -85,7 +85,7 @@ const NodeDefMultipleTableCell = props => {
             {nodeValues}
           </span>
         <button className="btn-s"
-                onClick={() => this.setShowEditDialog(true)}>
+                onClick={() => setShowEditDialog(true)}>
           <span className={`icon icon-12px ${canEditRecord ? 'icon-pencil2' : 'icon-eye'}`}/>
         </button>
       </div>

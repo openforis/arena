@@ -88,8 +88,14 @@ $rowHeaderHeight: 45px;
   }
 
   .table__cell {
-    display: grid;
-    grid-template-columns: 1fr 40px;
+    //display: grid;
+    //grid-template-columns: 1fr 40px; WHY?
+    overflow: hidden;
+    width: 100%;
+
+    .form-input {
+      overflow: hidden;
+    }
   }
 
   .table__inner-cell {

@@ -223,8 +223,9 @@ module.exports = {
       select: 'Select',
     },
     nodeDefTaxon: {
-      scientificName: 'Scientific Name',
-      vernacularName: 'Vernacular Name',
+      code: '$t(common.code)',
+      scientificName: 'Scientific name',
+      vernacularName: 'Vernacular name',
     },
     step: {
       entry: 'Entry',
@@ -242,7 +243,7 @@ module.exports = {
       taxaNotImported: 'Taxa not imported',
       family: 'Family',
       genus: 'Genus',
-      scientificName: 'Scientific name',
+      scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
     },
   },
 

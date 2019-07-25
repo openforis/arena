@@ -17,7 +17,7 @@ const NodeDefEntityTableCell = props => {
     nodeDef, parentNode,
     canEditDef, renderType,
     onDragStart, onDragOver, onDragEnd,
-    gridSize
+    gridSize, windowed,
   } = props
 
   if (nodeDef) {
@@ -29,9 +29,9 @@ const NodeDefEntityTableCell = props => {
 
     // table cell header is always visible
     const isHeader = renderType === NodeDefLayout.nodeDefRenderType.tableHeader
-    const [visible, setVisible] = useState(isHeader)
+    const [visible, setVisible] = useState(isHeader || !windowed)
 
-    if (!isHeader) {
+    if (!isHeader && windowed) {
       useEffect(() => {
         if (gridSize) {
           const el = elementRef.current
@@ -92,6 +92,11 @@ const NodeDefEntityTableCell = props => {
   }
 
   return null
+}
+
+NodeDefEntityTableCell.defaultProps = {
+  gridSize: {}, // coordinates of the grid size where it's contained
+  windowed: true, // used to load component only when visible in parent grid
 }
 
 const mapStateToProps = (state, props) => {
