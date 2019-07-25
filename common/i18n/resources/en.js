@@ -136,6 +136,7 @@ module.exports = {
 
   usersView: {
     inviteUser: 'Invite',
+    accepted: 'Accepted',
   },
 
   itemsTable: {

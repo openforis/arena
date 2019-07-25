@@ -1,6 +1,8 @@
 const Request = require('../../../utils/request')
 const Response = require('../../../utils/response')
 
+const AuthMiddleware = require('../../auth/authApiMiddleware')
+
 const UserService = require('../service/userService')
 
 const SystemError = require('../../../../server/utils/systemError')
@@ -9,7 +11,7 @@ module.exports.init = app => {
 
   // ==== READ
 
-  app.get('/survey/:surveyId/users/count', async (req, res, next) => {
+  app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
 
@@ -21,7 +23,7 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/users', async (req, res, next) => {
+  app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, offset, limit } = Request.getParams(req)
 

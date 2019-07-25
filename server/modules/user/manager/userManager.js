@@ -8,6 +8,7 @@ const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 const fetchUsersBySurveyId = async (surveyId, offset, limit) => {
   const users = await (UserRepository.fetchUsersBySurveyId(surveyId, offset, limit))
 
+  // User is accepted if cognitoUsername is set
   return R.map(
     R.pipe(
       u => R.assoc('accepted', !!u.cognitoUsername)(u),

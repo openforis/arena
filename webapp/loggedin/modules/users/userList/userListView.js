@@ -39,7 +39,7 @@ const SurveyListView = props => {
         <div>{i18n.t('common.name')}</div>
         <div>{i18n.t('common.email')}</div>
         <div>{i18n.t('common.group')}</div>
-        <div>Accepted</div>
+        <div>{i18n.t('usersView.accepted')}</div>
       </div>
 
 
