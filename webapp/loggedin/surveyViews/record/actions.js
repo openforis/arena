@@ -5,6 +5,7 @@ import { debounceAction } from '../../../utils/reduxUtils'
 
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
+import NodeRefData from '../../../../common/record/nodeRefData'
 
 import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
@@ -72,12 +73,13 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
  * ============
  */
 
-export const updateNode = (nodeDef, node, value, file = null, meta = {}) => dispatch => {
+export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData = null) => dispatch => {
 
   const nodeToUpdate = R.pipe(
     R.dissoc(Node.keys.placeholder),
     Node.assocValue(value),
     Node.mergeMeta(meta),
+    NodeRefData.assocRefData(refData),
     R.assoc(Node.keys.dirty, true),
   )(node)
 

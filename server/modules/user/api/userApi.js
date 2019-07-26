@@ -42,7 +42,9 @@ module.exports.init = app => {
     try {
       const { surveyId, offset, limit } = Request.getParams(req)
 
-      res.json(await UserService.fetchUsersBySurveyId(surveyId, offset, limit))
+      const list = await UserService.fetchUsersBySurveyId(surveyId, offset, limit)
+
+      res.json({ list })
     } catch (err) {
       next(err)
     }

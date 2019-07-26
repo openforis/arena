@@ -4,27 +4,27 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
-import Survey from '../../../../../../common/survey/survey'
-import Record from '../../../../../../common/record/record'
+import Survey from '../../../../common/survey/survey'
+import Record from '../../../../common/record/record'
 
-import SurveyFormView from '../../../../surveyViews/surveyForm/surveyFormView'
+import SurveyFormView from '../surveyForm/surveyFormView'
 
-import Authorizer from '../../../../../../common/auth/authorizer'
-import WebSocketEvents from '../../../../../../common/webSocket/webSocketEvents'
-import * as AppWebSocket from '../../../../../app/appWebSocket'
+import Authorizer from '../../../../common/auth/authorizer'
+import WebSocketEvents from '../../../../common/webSocket/webSocketEvents'
+import * as AppWebSocket from '../../../app/appWebSocket'
 
-import * as AppState from '../../../../../app/appState'
-import * as SurveyState from '../../../../../survey/surveyState'
-import * as RecordState from '../../../../surveyViews/record/recordState'
+import * as AppState from '../../../app/appState'
+import * as SurveyState from '../../../survey/surveyState'
+import * as RecordState from './recordState'
 
-import { resetForm } from '../../../../surveyViews/surveyForm/actions'
+import { resetForm } from '../surveyForm/actions'
 import {
   checkInRecord,
   checkOutRecord,
   recordNodesUpdate,
   nodeValidationsUpdate,
   dispatchRecordDelete
-} from '../../../../surveyViews/record/actions'
+} from './actions'
 
 const RecordView = props => {
   const { recordLoaded, preview, canEditRecord } = props

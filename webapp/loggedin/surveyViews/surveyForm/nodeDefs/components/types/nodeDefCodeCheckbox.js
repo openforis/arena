@@ -3,33 +3,34 @@ import * as R from 'ramda'
 
 import useI18n from '../../../../../../commonComponents/useI18n'
 
-import Node from '../../../../../../../common/record/node'
 import CategoryItem from '../../../../../../../common/survey/categoryItem'
 
 const Checkbox = props => {
-  const { language, edit, item, nodes, selectedItems, onSelectedItemsChange, canEditRecord, readOnly } = props
+  const {
+    lang,
+    item, selectedItems,
+    edit, canEditRecord, readOnly,
+    onItemAdd, onItemRemove
+  } = props
 
-  const itemUuid = CategoryItem.getUuid(item)
-  const node = R.find(node => Node.getCategoryItemUuid(node) === itemUuid)(nodes)
-  const selected = !!node
+  const selected = !!selectedItems.find(CategoryItem.isEqual(item))
 
   return (
     <button
       className={`btn btn-s btn-checkbox ${selected ? 'active' : ''}`}
       aria-disabled={edit || !canEditRecord || readOnly}
       onClick={() => {
-        const newSelectedItems = selected
-          ? R.remove(R.indexOf(item, selectedItems), 1, selectedItems)
-          : R.append(item, selectedItems)
-        onSelectedItemsChange(newSelectedItems)
+        selected
+          ? onItemRemove(item)
+          : onItemAdd(item)
       }}>
-      {CategoryItem.getLabel(language)(item)}
+      {CategoryItem.getLabel(lang)(item)}
     </button>
   )
 }
 
 const NodeDefCodeCheckbox = props => {
-  const { items = [], edit, language } = props
+  const { items = [], edit, lang } = props
 
   const i18n = useI18n()
 
@@ -45,7 +46,7 @@ const NodeDefCodeCheckbox = props => {
               disabled={true}
               nodes={[]}
               item={
-                { uuid: '0', props: { labels: { [language]: i18n.t('surveyForm.nodeDefCode.buttonCode') } } }
+                { uuid: '0', props: { labels: { [lang]: i18n.t('surveyForm.nodeDefCode.buttonCode') } } }
               }
             />
           )

@@ -44,6 +44,7 @@ module.exports = {
     upload: 'Upload',
     view: 'View',
     yes: 'Yes',
+    noItems: `$t(common.no) $t(common.item,{'count':2})`,
   },
 
   appModules: {

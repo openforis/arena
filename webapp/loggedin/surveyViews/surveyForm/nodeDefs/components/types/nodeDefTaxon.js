@@ -2,7 +2,6 @@ import './nodeDefTaxon.scss'
 
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import axios from 'axios'
 import * as R from 'ramda'
 
 import { FormItem } from '../../../../../../commonComponents/form/input'
@@ -13,6 +12,7 @@ import Survey from '../../../../../../../common/survey/survey'
 import Taxon from '../../../../../../../common/survey/taxon'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../../common/record/node'
+import NodeRefData from '../../../../../../../common/record/nodeRefData'
 import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
 import StringUtils from '../../../../../../../common/stringUtils'
 
@@ -30,19 +30,6 @@ const selectionDefault = {
   [vernacularName]: '',
 }
 
-const loadTaxonByNode = async (surveyId, taxonomyUuid, draft, node) => {
-  const params = {
-    [taxonUuid]: Node.getTaxonUuid(node),
-    [vernacularNameUuid]: Node.getVernacularNameUuid(node),
-    draft,
-  }
-  const { data: { taxon } } = await axios.get(
-    `/api/survey/${surveyId}/taxonomies/${taxonomyUuid}/taxon`,
-    { params }
-  )
-  return taxon
-}
-
 const NodeDefTaxon = props => {
   const {
     surveyId, nodeDef, taxonomyUuid, node,
@@ -54,41 +41,30 @@ const NodeDefTaxon = props => {
   const [selection, setSelection] = useState(selectionDefault)
 
   const i18n = useI18n()
-
-  const isTableBody = renderType === NodeDefLayout.nodeDefRenderType.tableBody
-  const className = isTableBody
-    ? 'survey-form__node-def-table-cell-taxon survey-form__node-def-table-cell-composite'
-    : 'survey-form__node-def-taxon'
+  const taxonRefData = edit ? null : NodeRefData.getTaxon(node)
 
   const updateSelectionFromNode = () => {
-    //TODO remove async call when using pre-fetched taxon
-    (async () => {
-      const taxon = Node.isValueBlank(node)
-        ? null
-        : await loadTaxonByNode(surveyId, taxonomyUuid, draft, node)
+    const unlisted = taxonRefData && Taxon.isUnlistedTaxon(taxonRefData)
+    const selectionUpdate = taxonRefData ?
+      {
+        [code]: Taxon.getCode(taxonRefData),
+        [scientificName]: unlisted
+          ? Node.getScientificName(node)
+          : Taxon.getScientificName(taxonRefData),
+        [vernacularName]: unlisted
+          ? Node.getVernacularName(node)
+          : R.defaultTo('', taxonRefData[vernacularName]),
+      }
+      : selectionDefault
 
-      const unlisted = taxon && Taxon.isUnlistedTaxon(taxon)
-
-      const selectionUpdate = taxon ?
-        {
-          [code]: Taxon.getCode(taxon),
-          [scientificName]: unlisted
-            ? Node.getScientificName(node)
-            : Taxon.getScientificName(taxon),
-          [vernacularName]: unlisted
-            ? Node.getVernacularName(node)
-            : R.defaultTo('', taxon[vernacularName]),
-        }
-        : selectionDefault
-
-      setSelection(selectionUpdate)
-    })()
+    setSelection(selectionUpdate)
   }
 
-  const updateNodeValue = nodeValue => updateNode(nodeDef, node, nodeValue)
+  const updateNodeValue = (nodeValue, taxon = null) =>
+    updateNode(nodeDef, node, nodeValue, null, {}, { [NodeRefData.keys.taxon]: taxon })
 
   const onChangeTaxon = taxon => {
-    if (taxon) {
+    if (taxon && !Taxon.isEqual(taxon)(taxonRefData)) {
       const nodeValue = {
         [taxonUuid]: Taxon.getUuid(taxon),
         [scientificName]: Taxon.isUnlistedTaxon(taxon) && selection[scientificName]
@@ -100,7 +76,7 @@ const NodeDefTaxon = props => {
         [vernacularNameUuid]: taxon[vernacularNameUuid]
       }
 
-      updateNodeValue(nodeValue)
+      updateNodeValue(nodeValue, taxon)
     } else {
       // reset to last node value
       updateSelectionFromNode()
@@ -114,28 +90,28 @@ const NodeDefTaxon = props => {
         : updateNodeValue({})
     } else if (field !== code && selection[code] === Taxon.unlistedCode) {
       // if input field is not code and current code is UNL, update node value field
-      updateNodeValue({ ...Node.getValue(node), [field]: value })
+      updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
     } else {
       setSelection({ ...selectionDefault, [field]: value })
     }
   }
 
   if (!edit) {
-    const valueTaxonUuid = Node.getTaxonUuid(node)
-    const valueScientificName = Node.getScientificName(node)
-    const valueVernacularName = Node.getVernacularName(node)
-    const valueVernacularNameUuid = Node.getVernacularNameUuid(node)
     useEffect(
       updateSelectionFromNode,
-      [valueTaxonUuid, valueScientificName, valueVernacularName, valueVernacularNameUuid]
+      [Taxon.getUuid(taxonRefData), Node.getScientificName(node), Node.getVernacularName(node)]
     )
   }
 
+  const isTableBody = renderType === NodeDefLayout.nodeDefRenderType.tableBody
+  const className = isTableBody
+    ? 'survey-form__node-def-table-cell-taxon survey-form__node-def-table-cell-composite'
+    : 'survey-form__node-def-taxon'
+
   return (
     <div className={className}>
-
       {
-        R.keys(selection).map(field => {
+        R.keys(selectionDefault).map(field => {
             const inputField = (
               <NodeDefTaxonInputField
                 key={field}
@@ -154,9 +130,7 @@ const NodeDefTaxon = props => {
             )
 
             return isTableBody
-              ? (
-                inputField
-              )
+              ? inputField
               : (
                 <FormItem
                   key={field}
@@ -167,13 +141,11 @@ const NodeDefTaxon = props => {
           }
         )
       }
-
     </div>
   )
 }
 
 const mapStateToProps = (state, props) => {
-
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const surveyId = SurveyState.getSurveyId(state)
   const { nodeDef, edit, nodes } = props

@@ -59,8 +59,8 @@ const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
  */
 const getPropsCombined = (draft, columnPrefix = '', alias = 'props') =>
   draft
-    ? `${columnPrefix}props || ${columnPrefix}props_draft AS ${alias}`
-    : `${columnPrefix}props AS ${alias}`
+    ? `${columnPrefix}props || ${columnPrefix}props_draft${alias ? ` AS ${alias}` :''}`
+    : `${columnPrefix}props${alias ? ` AS ${alias}` :''}`
 
 /**
  * Combines a draft and a published column prop, if needed
