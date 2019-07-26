@@ -8,7 +8,7 @@
   max-height: calc(80vh);
   border: 1px solid $greyBorder;
 
-  input{
+  input {
     background-color: white;
   }
 }
@@ -16,12 +16,11 @@
 .popup__btn-close {
   position: absolute;
   padding: 0 !important;
-  border-radius: 50% !important;
-  background-color: $red;
+  background-color: rgba($red, .6);
   width: 1.5rem;
   height: 1.5rem;
-  top: -.7rem;
-  left: -.75rem;
+  top: 0;
+  left: 0;
   border: 1px solid rgba($red, 0.1);
 
   .icon {

@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-
-import axios from 'axios'
 import * as R from 'ramda'
+import axios from 'axios'
 
 import Dropdown from '../../form/dropdown'
 import { BinaryOperandType } from './binaryOperand'
 import * as ExpressionParser from '../expressionParser'
+import { useAsyncGetRequest } from '../../hooks'
 
 import NodeDef from '../../../../common/survey/nodeDef'
 import StringUtils from '../../../../common/stringUtils'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
-import { useAsyncGetRequest } from '../../hooks'
 
-const isValueText = (nodeDef, value) => {
-  return nodeDef
-    ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value))
-    : false
-}
+const isValueText = (nodeDef, value) => nodeDef
+  ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value))
+  : false
 
 const parseValue = (nodeDef, value) => isValueText(nodeDef, value) ? JSON.parse(value) : value
 

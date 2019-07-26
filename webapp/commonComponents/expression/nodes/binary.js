@@ -32,6 +32,7 @@ const Binary = (props) => {
 
 
           <Dropdown
+            className="operator"
             items={Expression.operators.binaryValues}
             selection={Expression.operators.findBinary(node.operator)}
             onChange={item => onChange(
