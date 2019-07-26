@@ -1,8 +1,8 @@
 import React from 'react'
 
-import useI18n from '../useI18n'
+import useI18n from '../../../commonComponents/useI18n'
 
-const TablePaginator = ({offset, limit, count, fetchFn}) => {
+const TablePaginator = ({ offset, limit, count, fetchFn }) => {
   const currentPage = (offset / limit) + 1
   const totalPage = Math.ceil(count / limit)
 

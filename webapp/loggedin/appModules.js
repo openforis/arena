@@ -19,8 +19,12 @@ export const appModules = {
     path: 'data',
     icon: 'table2',
   },
+  users: {
+    key: 'users',
+    path: 'users',
+    icon: 'users'
+  },
   // analysis: 'analysis',
-  // users: 'users',
 }
 
 //==== Inner modules
@@ -83,5 +87,12 @@ export const dataModules = {
   dataVis: {
     key: 'dataVis',
     path: `${appModules.data.path}/dataVis`,
+  },
+}
+
+export const userModules = {
+  users: {
+    key: 'userList',
+    path: `${appModules.users.path}/list`,
   },
 }

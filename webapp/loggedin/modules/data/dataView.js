@@ -5,8 +5,8 @@ import Survey from '../../../../common/survey/survey'
 
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoader'
-import RecordsView from './records/components/recordsView'
-import RecordView from './records/components/recordView'
+import RecordsView from './records/recordsView'
+import RecordView from '../../surveyViews/record/recordView'
 import DataVisView from './dataVis/dataVisView'
 
 import * as SurveyState from '../../../survey/surveyState'

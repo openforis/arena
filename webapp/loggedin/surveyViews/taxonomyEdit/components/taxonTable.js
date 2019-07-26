@@ -6,7 +6,7 @@ import Taxon from '../../../../../common/survey/taxon'
 import { languages } from '../../../../../common/app/languages'
 
 import useI18n from '../../../../commonComponents/useI18n'
-import TablePaginator from '../../../../commonComponents/table/tablePaginator'
+import TablePaginator from '../../../tableViews/components/tablePaginator'
 
 const TaxonTable = props => {
 

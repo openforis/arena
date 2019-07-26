@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const UserRepository = require('../repository/userRepository')
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 
@@ -23,6 +25,10 @@ const deleteUserPref = async (user, name) => ({
 
 module.exports = {
   // READ
+  fetchUsersBySurveyId: UserRepository.fetchUsersBySurveyId,
+
+  countUsersBySurveyId: UserRepository.countUsersBySurveyId,
+
   findUserByCognitoUsername,
 
   // UPDATE

@@ -1,11 +1,39 @@
 const Request = require('../../../utils/request')
 const Response = require('../../../utils/response')
 
+const AuthMiddleware = require('../../auth/authApiMiddleware')
+
 const UserService = require('../service/userService')
 
 const SystemError = require('../../../../server/utils/systemError')
 
 module.exports.init = app => {
+
+  // ==== READ
+
+  app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const surveyId = Request.getRestParam(req, 'surveyId')
+
+      const count = await UserService.countUsersBySurveyId(surveyId)
+      res.json(count)
+
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, offset, limit } = Request.getParams(req)
+
+      const list = await UserService.fetchUsersBySurveyId(surveyId, offset, limit)
+
+      res.json({ list })
+    } catch (err) {
+      next(err)
+    }
+  })
 
   // ==== UPDATE
 

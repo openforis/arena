@@ -55,7 +55,7 @@ export const assocSurveyAdminGroup = surveyInfo =>
     }
   }
 
-// On survey delete, diccos survey from user
+// On survey delete, dissoc survey from user
 export const dissocSurveyGroups = surveyId =>
   appState => {
     const user = R.prop(keys.user, appState)

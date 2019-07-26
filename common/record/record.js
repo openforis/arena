@@ -29,7 +29,10 @@ module.exports = {
   getUuid: SurveyUtils.getUuid,
   isPreview: R.propEq(keys.preview, true),
   getOwnerId: R.prop(keys.ownerId),
+  getOwnerName: R.prop(keys.ownerName),
   getStep: R.prop(keys.step),
+  getDateCreated: R.prop(keys.dateCreated),
+  getDateModified: R.prop(keys.dateModified),
 
   getNodes: RecordReader.getNodes,
   getNodeByUuid: RecordReader.getNodeByUuid,
