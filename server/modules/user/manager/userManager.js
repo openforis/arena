@@ -1,4 +1,4 @@
-const R = require('ramda')
+const aws = require('../../../system/aws')
 
 const db = require('../../../db/db')
 
@@ -7,15 +7,19 @@ const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 
 // ==== CREATE
 
-const inviteUser = async (surveyId, email, groupId, client = db) => {
-  const user = await UserRepository.insertUser(surveyId, email, groupId, client)
-  await AuthGroupRepository.insertUserGroup(groupId, user.id, client)
-}
+const inviteUser = (surveyId, email, groupId, client = db) =>
+  client.tx(async t => {
+    const user = await UserRepository.insertUser(surveyId, email, groupId, t)
+    await AuthGroupRepository.insertUserGroup(groupId, user.id, t)
+
+    // Rolls back the transaction if reject
+    return aws.inviteUser('this is the name', email)
+  })
 
 // ==== READ
 
-const findUserByCognitoUsername = async email => {
-  const user = await UserRepository.findUserByCognitoUsername(email)
+const _userFetcher = fetchFn => async (...args) => {
+  const user = await fetchFn(...args)
 
   if (user) {
     const authGroups = await AuthGroupRepository.fetchUserGroups(user.id)
@@ -24,6 +28,10 @@ const findUserByCognitoUsername = async email => {
 
   return null
 }
+
+const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
+
+const fetchUserByCognitoUsername = _userFetcher(UserRepository.fetchUserByCognitoUsername)
 
 // ==== DELETE
 
@@ -41,7 +49,9 @@ module.exports = {
 
   countUsersBySurveyId: UserRepository.countUsersBySurveyId,
 
-  findUserByCognitoUsername,
+  fetchUserByCognitoUsername,
+
+  fetchUserByEmail,
 
   // UPDATE
   updateUserPref: UserRepository.updateUserPref,

@@ -11,9 +11,9 @@ const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 const insertUser = async (surveyId, email, group, client = db) =>
   await client.one(`
-    INSERT INTO "user" (name, email, prefs)
+    INSERT INTO "user" AS u (name, email, prefs)
     VALUES ($1, $2, $3::jsonb)
-    RETURNING ${selectFieldsCommaSep()}`,
+    RETURNING ${selectFieldsCommaSep}`,
     ['name!', email, { surveyId }])
 
 // READ
@@ -41,13 +41,20 @@ const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client =
     camelize
   )
 
-const findUserByCognitoUsername = async (cognitoUsername, client = db) =>
+const fetchUserByCognitoUsername = async (cognitoUsername, client = db) =>
   await client.oneOrNone(`
     SELECT ${selectFieldsCommaSep}
     FROM "user" u
     WHERE u.cognito_username = $1`,
     [cognitoUsername]
   )
+
+const fetchUserByEmail = async (email, client = db) =>
+  await client.oneOrNone(`
+    SELECT ${selectFieldsCommaSep}
+    FROM "user" u
+    WHERE u.email = $1`,
+    [email])
 
 // ==== UPDATE
 
@@ -85,7 +92,8 @@ module.exports = {
   // READ
   countUsersBySurveyId,
   fetchUsersBySurveyId,
-  findUserByCognitoUsername,
+  fetchUserByCognitoUsername,
+  fetchUserByEmail,
 
   // UPDATE
   updateUserPref,

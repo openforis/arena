@@ -17,8 +17,9 @@ module.exports.init = app => {
       const email = Request.getRestParam(req, 'email')
       const groupId = Request.getRestParam(req, 'groupId')
 
-      // TODO make sure that group is not systemAdmin
       await UserService.inviteUser(surveyId, email, groupId)
+
+      Response.sendOk(res)
     } catch (err) {
       next(err)
     }

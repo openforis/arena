@@ -7,7 +7,7 @@ module.exports = {
 
   findUserById: UserManager.findUserById,
 
-  findUserByCognitoUsername: UserManager.findUserByCognitoUsername,
+  fetchUserByCognitoUsername: UserManager.fetchUserByCognitoUsername,
 
   updateUserPref: UserManager.updateUserPref,
 
