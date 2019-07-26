@@ -36,10 +36,21 @@ const UsersRow = props => {
 
   return (
     <>
-      <div>{User.getName(user)}</div>
-      <div>{User.getEmail(user)}</div>
-      <div>{i18n.t(`authGroups.${User.getGroupName(user)}.label`)}</div>
-      <div>{User.getAccepted(user) ? i18n.t('common.yes') : i18n.t('common.no')}</div>
+      <div>
+        {User.getName(user)}
+      </div>
+      <div>
+        {User.getEmail(user)}
+      </div>
+      <div>
+        {i18n.t(`authGroups.${User.getGroupName(user)}.label`)}
+      </div>
+      <div>
+        {
+          User.hasAccepted(user) &&
+          <span className="icon icon-user-check icon-16px"/>
+        }
+      </div>
     </>
   )
 }

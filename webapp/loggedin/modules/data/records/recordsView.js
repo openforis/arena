@@ -26,7 +26,7 @@ const RecordsView = props => {
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `70px repeat(${noCols}, ${1 / noCols}fr) 50px 50px`
 
-  return Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo) &&
+  return (Survey.isPublished(surveyInfo) || Survey.isFromCollect(surveyInfo)) &&
     (
       <TableView
         module={RecordsState.keys.records}
