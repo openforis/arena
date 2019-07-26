@@ -3,7 +3,6 @@ import './nodeDefTableCellBody.scss'
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import * as R from 'ramda'
-import axios from 'axios'
 
 import NodeDefMultipleEditDialog from './nodeDefMultipleEditDialog'
 import useI18n from '../../../../../commonComponents/useI18n'
@@ -12,16 +11,15 @@ import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import CategoryItem from '../../../../../../common/survey/categoryItem'
 import Node from '../../../../../../common/record/node'
+import NodeRefData from '../../../../../../common/record/nodeRefData'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefErrorBadge from './nodeDefErrorBadge'
-import { useIsMounted } from '../../../../../commonComponents/hooks'
 
-const getNodeValues = async (surveyInfo, nodeDef, nodes, lang) => {
-
-  const getNodeValue = async node => {
+const getNodeValues = (surveyInfo, nodeDef, nodes, lang) => {
+  const getNodeValue = node => {
     if (NodeDef.isCode(nodeDef)) {
-      const item = await loadCategoryItem(surveyInfo, Node.getCategoryItemUuid(node))
+      const item = NodeRefData.getCategoryItem(node)
       const label = CategoryItem.getLabel(lang)(item)
       return label || CategoryItem.getCode(item)
     } else if (NodeDef.isFile(nodeDef)) {
@@ -31,42 +29,27 @@ const getNodeValues = async (surveyInfo, nodeDef, nodes, lang) => {
     }
   }
 
-  const nodeValues = await Promise.all(
-    R.pipe(
-      R.reject(n => Node.isPlaceholder(n) || Node.isValueBlank(n)),
-      R.map(getNodeValue)
-    )(nodes)
+  return R.reduce(
+    (accString, node) => Node.isPlaceholder(node) || Node.isValueBlank(node)
+      ? accString
+      : `${accString === '' ? '' : ', '}${getNodeValue(node)}`
+    ,
+    '',
+    nodes
   )
 
-  return R.join(', ', nodeValues)
-}
-
-const loadCategoryItem = async (surveyInfo, itemUuid) => {
-  const url = `/api/survey/${Survey.getIdSurveyInfo(surveyInfo)}/categories/items/${itemUuid}`
-  const params = { draft: Survey.isDraft(surveyInfo) }
-  const { data: { item } } = await axios.get(url, { params })
-  return item
 }
 
 const NodeDefMultipleTableCell = props => {
-  const isMounted = useIsMounted()
 
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [nodeValues, setNodeValues] = useState([])
 
   const { surveyInfo, nodeDef, nodes, lang, canEditRecord } = props
 
-  const loadNodeValues = () => {
-    (async () => {
-      const nodeValuesUpdate = await getNodeValues(surveyInfo, nodeDef, nodes, lang)
-      if (isMounted.current) {
-        setNodeValues(nodeValuesUpdate)
-      }
-    })()
-  }
-
   useEffect(() => {
-    loadNodeValues()
+    const nodeValuesUpdate = getNodeValues(surveyInfo, nodeDef, nodes, lang)
+    setNodeValues(nodeValuesUpdate)
   }, [nodes])
 
   return showEditDialog

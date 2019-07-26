@@ -71,9 +71,14 @@ export const useAsync = (promiseFn, promiseArgs) => {
     })()
   }
 
+  const setState = stateUpdate => {
+    _dispatch({ type: 0, payload: stateUpdate })
+  }
+
   return {
-    dispatch,
     ...state,
+    dispatch,
+    setState,
   }
 }
 

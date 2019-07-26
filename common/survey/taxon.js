@@ -65,4 +65,6 @@ module.exports = {
   getVernacularNameUuid: SurveyUtils.getProp(propKeys.vernacularNameUuid),
   isUnlistedTaxon: R.pipe(getCode, R.equals(unlistedCode)),
   isUnknownTaxon: R.pipe(getCode, R.equals(unknownCode)),
+
+  isEqual: SurveyUtils.isEqual,
 }

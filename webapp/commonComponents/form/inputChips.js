@@ -59,26 +59,36 @@ const InputChips = (props) => {
     itemKeyFunction,
     itemLabelFunction,
     itemLabelProp,
-    onChange,
     selection,
     requiredItems,
     dropdownAutocompleteMinChars,
     readOnly,
     disabled,
     validation,
+    onChange, onItemAdd, onItemRemove,
   } = props
 
   const onDropdownChange = (item) => {
     if (item) {
-      const newItems = R.append(item)(selection)
-      onChange(newItems)
+      if (onChange) {
+        const newItems = R.append(item)(selection)
+        onChange(newItems)
+      }
+      if (onItemAdd) {
+        onItemAdd(item)
+      }
     }
   }
 
   const removeItem = (item) => {
-    const idx = R.indexOf(item)(selection)
-    const newItems = R.remove(idx, 1, selection)
-    onChange(newItems)
+    if (onChange) {
+      const idx = R.indexOf(item)(selection)
+      const newItems = R.remove(idx, 1, selection)
+      onChange(newItems)
+    }
+    if (onItemRemove) {
+      onItemRemove(item)
+    }
   }
 
   const rejectSelectedItems = R.reject(item => R.contains(item, selection))
@@ -106,7 +116,7 @@ const InputChips = (props) => {
       }
 
       {
-        !readOnly &&
+        !(readOnly || R.isEmpty(dropdownItems)) &&
         <Dropdown items={dropdownItems}
                   itemsLookupFunction={dropdownItemsLookupFunction}
                   itemKeyProp={itemKeyProp}
@@ -132,13 +142,15 @@ InputChips.defaultProps = {
   itemKeyFunction: null,
   itemLabelFunction: null,
   itemLabelProp: null,
-  onChange: null,
   selection: [],
   requiredItems: 0,
   dropdownAutocompleteMinChars: 0,
   readOnly: false,
   disabled: false,
-  validation: {}
+  validation: {},
+  onChange: null,  // callback to receive all selection change
+  onItemAdd: null, // callback to receive added item
+  onItemRemove: null, // callback to receive removed item
 }
 
 export default InputChips
