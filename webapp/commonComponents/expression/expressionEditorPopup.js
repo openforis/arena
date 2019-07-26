@@ -59,13 +59,15 @@ const ExpressionEditorPopup = props => {
         <button className="btn btn-xs"
                 onClick={() => onChange('')}
                 aria-disabled={R.isEmpty(query)}>
-          <span className="icon icon-undo2 icon-12px"/> {i18n.t('common.reset')}
+          <span className="icon icon-undo2 icon-12px"/>
+          {i18n.t('common.reset')}
         </button>
 
         <button className="btn btn-xs"
                 onClick={() => onChange(queryDraft, exprDraft)}
                 aria-disabled={query === queryDraft || !exprDraftValid}>
-          <span className="icon icon-checkmark icon-12px"/> {i18n.t('common.apply')}
+          <span className="icon icon-checkmark icon-12px"/>
+          {i18n.t('common.apply')}
         </button>
       </div>
 

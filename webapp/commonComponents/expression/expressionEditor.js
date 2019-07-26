@@ -1,76 +1,59 @@
 import './expressionEditor.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import * as R from 'ramda'
 
 import ExpressionEditorPopup from './expressionEditorPopup'
 
 import Expression from '../../../common/exprParser/expression'
 
-class ExpressionEditor extends React.PureComponent {
+const ExpressionEditor = props => {
 
-  constructor (props) {
-    super(props)
+  const {
+    query, nodeDefUuidContext, nodeDefUuidCurrent, mode,
+    isContextParent, canBeConstant, isBoolean,
+    onChange,
+  } = props
 
-    this.state = { edit: false }
-    this.toggleEdit = this.toggleEdit.bind(this)
-  }
+  const [edit, setEdit] = useState(false)
 
-  applyChange (query) {
-    const { onChange } = this.props
+  const applyChange = query => {
     onChange && onChange(query)
-
-    this.toggleEdit()
+    setEdit(false)
   }
 
-  toggleEdit () {
-    this.setState(state => ({ edit: !state.edit }))
-  }
-
-  render () {
-
-    const {
-      query, nodeDefUuidContext, nodeDefUuidCurrent, mode,
-      isContextParent, canBeConstant, isBoolean,
-    } = this.props
-
-    const { edit } = this.state
-
-    return (
-      <div className="expression-editor">
-
-        {
-          edit
-            ? (
-              <ExpressionEditorPopup
-                query={query}
-                nodeDefUuidContext={nodeDefUuidContext}
-                nodeDefUuidCurrent={nodeDefUuidCurrent}
-                mode={mode}
-                isContextParent={isContextParent}
-                canBeConstant={canBeConstant}
-                isBoolean={isBoolean}
-                onClose={this.toggleEdit}
-                onChange={query => this.applyChange(query)}
-              />
-            )
-            : (
-              <div className="expression-editor__query-container">
-                {
-                  !R.isEmpty(query) &&
-                  <div className="query">{query}</div>
-                }
-                <button className="btn btn-s btn-edit"
-                        onClick={this.toggleEdit}>
-                  <span className="icon icon-pencil2 icon-14px"/>
-                </button>
-              </div>
-            )
-        }
-
-      </div>
-    )
-  }
+  return (
+    <div className="expression-editor">
+      {
+        edit
+          ? (
+            <ExpressionEditorPopup
+              query={query}
+              nodeDefUuidContext={nodeDefUuidContext}
+              nodeDefUuidCurrent={nodeDefUuidCurrent}
+              mode={mode}
+              isContextParent={isContextParent}
+              canBeConstant={canBeConstant}
+              isBoolean={isBoolean}
+              onClose={() => setEdit(false)}
+              onChange={query => applyChange(query)}
+            />
+          )
+          : (
+            <div className="expression-editor__query-container">
+              {
+                !R.isEmpty(query) &&
+                <div className="query">{query}</div>
+              }
+              <button className="btn btn-s btn-edit"
+                      onClick={() => setEdit(true)}>
+                <span className="icon icon-pencil2 icon-14px"/>
+              </button>
+            </div>
+          )
+      }
+    </div>
+  )
 }
 
 ExpressionEditor.defaultProps = {
