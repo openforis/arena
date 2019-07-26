@@ -1,131 +1,102 @@
-import React from 'react'
-import axios from 'axios'
+import React, { useState, useEffect } from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
+import axios from 'axios'
+
+import Dropdown from '../../form/dropdown'
+import { BinaryOperandType } from './binaryOperand'
+import * as ExpressionParser from '../expressionParser'
+import { useAsyncGetRequest } from '../../hooks'
 
 import NodeDef from '../../../../common/survey/nodeDef'
 import StringUtils from '../../../../common/stringUtils'
 
-import Dropdown from '../../form/dropdown'
+import * as AppState from '../../../app/appState'
+import * as SurveyState from '../../../survey/surveyState'
 
-class Literal extends React.Component {
+const isValueText = (nodeDef, value) => nodeDef
+  ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value))
+  : false
 
-  constructor (props) {
-    super(props)
+const parseValue = (nodeDef, value) => isValueText(nodeDef, value) ? JSON.parse(value) : value
 
-    this.state = {
-      selection: null,
-      items: null
-    }
-  }
+const getValue = (nodeDef, value) => isValueText(nodeDef, value) ? JSON.stringify(value) : value
 
-  getSearchParams () {
-    return this.props.literalSearchParams
-  }
+const loadItems = async params => {
+  const { data: { items } } = await axios.get('/api/expression/literal/items', { params })
+  return items
+}
 
-  hasSearchParams () {
-    return !!this.getSearchParams()
-  }
+const Literal = props => {
 
-  isValueText (value) {
-    const { nodeDefCurrent } = this.props
-    return nodeDefCurrent
-      ? !(NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent) || StringUtils.isBlank(value))
-      : false
-  }
+  const { node, nodeDefCurrent, literalSearchParams, onChange } = props
+  const nodeValue = parseValue(nodeDefCurrent, R.propOr(null, 'raw', node))
 
-  getNodeValue () {
-    const rawValue = R.pathOr(null, ['node', 'raw'], this.props)
+  const { data: { item = {} } = { item: {} }, dispatch: fetchItem } = useAsyncGetRequest(
+    '/api/expression/literal/item',
+    { params: { ...literalSearchParams, value: nodeValue } }
+  )
+  const [items, setItems] = useState([])
 
-    return this.isValueText(rawValue)
-      ? JSON.parse(rawValue)
-      : rawValue
-  }
-
-  async componentDidMount () {
-    if (this.hasSearchParams()) {
-
-      const [selection, items] = await Promise.all([
-        this.loadItem(),
-        this.loadItems()
-      ])
-
-      this.setState({ selection, items })
-    }
-  }
-
-  async loadItem () {
-    const value = this.getNodeValue()
-
-    if (value) {
-      const params = {
-        ...this.getSearchParams(),
-        value
-      }
-      const { data } = await axios.get('/api/expression/literal/item', { params })
-
-      return data.item
-    } else {
-      return null
-    }
-  }
-
-  async loadItems (value = '') {
-    const params = {
-      ...this.getSearchParams(),
-      value
-    }
-    const { data } = await axios.get('/api/expression/literal/items', { params })
-    return data.items
-  }
-
-  onChange (val) {
-    const { node, onChange } = this.props
-
-    const value = this.isValueText(val)
-      ? JSON.stringify(val)
-      : val
-
+  const onChangeValue = val => {
+    const value = getValue(nodeDefCurrent, val)
     onChange(R.pipe(
       R.assoc('raw', value),
       R.assoc('value', value),
     )(node))
   }
 
-  render () {
-    const { items, selection } = this.state
+  if (literalSearchParams) {
+    useEffect(() => {
+      (async () => {
+        fetchItem()
+        const itemsUpdate = await loadItems({ ...literalSearchParams, value: '' })
+        setItems(itemsUpdate)
+      })()
+    }, [])
+  }
 
-    return (
-      <div className="literal">
-        {
+  return (
+    <div className="literal">
+      {
+        literalSearchParams
+          ? (
+            <Dropdown
+              items={items}
+              itemsLookupFunction={value => loadItems({ ...literalSearchParams, value })}
+              itemKeyProp="key"
+              itemLabelProp="label"
+              onChange={item => item && onChangeValue(item.key)}
+              selection={item}
+            />
+          )
+          : (
+            <input
+              className="form-input"
+              value={nodeValue}
+              size={25}
+              onChange={e => onChangeValue(e.target.value)}
+            />
+          )
 
-          this.hasSearchParams()
-            ? (
-              <Dropdown
-                items={items}
-                itemsLookupFunction={this.loadItems.bind(this)}
-                itemKeyProp="key"
-                itemLabelProp="label"
-                onChange={item => item && this.onChange(item.key)}
-                selection={selection}
-              />
-            )
-            : (
-              <input
-                className="form-input"
-                value={this.getNodeValue()}
-                size={25}
-                onChange={e => this.onChange(e.target.value)}
-              />
-            )
+      }
+    </div>
+  )
 
-        }
-      </div>
-    )
+}
+
+const mapStateToProps = (state, props) => {
+  const survey = SurveyState.getSurvey(state)
+  const lang = AppState.getLang(state)
+  const { nodeDefCurrent, type } = props
+
+  const literalSearchParams = nodeDefCurrent && BinaryOperandType.isLeft(type)
+    ? ExpressionParser.getLiteralSearchParams(survey, nodeDefCurrent, lang)
+    : null
+
+  return {
+    literalSearchParams
   }
 }
 
-Literal.defaultProps = {
-  literalSearchParams: null
-}
-
-export default Literal
+export default connect(mapStateToProps)(Literal)
