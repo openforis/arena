@@ -3,6 +3,8 @@ import React from 'react'
 import TableView from '../../../tableViews/tableView'
 import useI18n from '../../../../commonComponents/useI18n'
 
+import User from '../../../../../common/user/user'
+
 const UsersHeaderLeft = () => {
   const i18n = useI18n()
 
@@ -34,10 +36,10 @@ const UsersRow = props => {
 
   return (
     <>
-      <div>{user.name}</div>
-      <div>{user.email}</div>
-      <div>{i18n.t(`authGroups.${user.groupName}.label`)}</div>
-      <div>{user.accepted ? i18n.t('common.yes') : i18n.t('common.no')}</div>
+      <div>{User.getName(user)}</div>
+      <div>{User.getEmail(user)}</div>
+      <div>{i18n.t(`authGroups.${User.getGroupName(user)}.label`)}</div>
+      <div>{User.getAccepted(user) ? i18n.t('common.yes') : i18n.t('common.no')}</div>
     </>
   )
 }

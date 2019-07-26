@@ -29,7 +29,7 @@ module.exports.init = app => {
 
       const list = await UserService.fetchUsersBySurveyId(surveyId, offset, limit)
 
-      res.json({list})
+      res.json({ list })
     } catch (err) {
       next(err)
     }

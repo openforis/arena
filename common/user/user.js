@@ -6,6 +6,11 @@ const keys = {
   id: 'id',
   authGroups: 'authGroups',
   surveyId: 'surveyId',
+  name: 'name',
+  email: 'email',
+
+  groupName: 'groupName',
+  accepted: 'accepted',
 }
 
 const validEmail = email => validEmailRe.test(email)
@@ -21,11 +26,27 @@ const getRecordPermissions = record =>
       )
     )(user)
 
+const getId = R.prop(keys.id)
+
+const getName = R.prop(keys.name)
+
+const getEmail = R.prop(keys.email)
+
+// The following methods are used in UserListView. They are meant to work on the
+// object returned by the '/api/survey/:surveyId/users' entry point.
+const getGroupName = R.prop(keys.groupName)
+const getAccepted = R.prop(keys.accepted)
+
 module.exports = {
   keys,
 
   validEmail,
-  getId: R.prop(keys.id),
+  getId,
+  getName,
+  getEmail,
   getAuthGroups,
   getRecordPermissions,
+
+  getGroupName,
+  getAccepted,
 }
