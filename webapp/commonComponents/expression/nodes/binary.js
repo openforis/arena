@@ -3,56 +3,9 @@ import * as R from 'ramda'
 
 import Expression from '../../../../common/exprParser/expression'
 
-import Dropdown from '../../form/dropdown'
-
+import BinaryOperand, { BinaryOperandType } from './binaryOperand'
 import EditButtons from './editButtons'
-import ExpressionNode from './expressionNode'
-
-import useI18n from '../../useI18n'
-
-const BinaryOperand = ({ type, node, ...props }) => {
-  const { isBoolean, onChange } = props
-  const nodeOperand = R.prop(type, node)
-  const isLeft = type === 'left'
-
-  const i18n = useI18n()
-
-  return (
-    <React.Fragment>
-      <button
-        className={`btn btn-s btn-switch-operand${!Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
-        onClick={() => onChange(
-          R.assoc(type, Expression.newIdentifier(), node)
-        )}>
-        {i18n.t('expressionEditor.var')}
-      </button>
-      <button
-        className={`btn btn-s btn-switch-operand${Expression.isLiteral(nodeOperand) ? ' active' : ''}`}
-        aria-disabled={isLeft && isBoolean}
-        onClick={() => {
-          const nodeUpdate = isLeft && !isBoolean ?
-            R.pipe(
-              R.assoc(type, Expression.newLiteral()),
-              R.assoc('operator', ''),
-              R.assoc('right', Expression.newIdentifier()),
-            )(node)
-            : R.assoc(type, Expression.newLiteral(), node)
-
-          onChange(nodeUpdate)
-        }}>
-        {i18n.t('expressionEditor.const')}
-      </button>
-
-      <ExpressionNode
-        {...props}
-        node={nodeOperand}
-        onChange={item => onChange(
-          R.assoc(type, item, node)
-        )}/>
-
-    </React.Fragment>
-  )
-}
+import Dropdown from '../../form/dropdown'
 
 const Binary = (props) => {
   const {
@@ -62,14 +15,16 @@ const Binary = (props) => {
   } = props
 
   const isLeftLiteral = R.pipe(
-    R.prop('left'),
+    R.prop(BinaryOperandType.left),
     Expression.isLiteral
   )(node)
 
   return (
     <div className="binary">
-
-      <BinaryOperand {...props} type="left"/>
+      <BinaryOperand
+        {...props}
+        type={BinaryOperandType.left}
+      />
 
       {
         (isBoolean || !isLeftLiteral) &&
@@ -84,12 +39,19 @@ const Binary = (props) => {
             )}
           />
 
-          <BinaryOperand {...R.dissoc('literalSearchParams', props)} type="right"/>
+          <BinaryOperand
+            {...props}
+            type={BinaryOperandType.right}
+          />
 
           {
             isBoolean &&
-            <EditButtons node={node} onChange={onChange}
-                         onDelete={onDelete} canDelete={canDelete}/>
+            <EditButtons
+              node={node}
+              onChange={onChange}
+              onDelete={onDelete}
+              canDelete={canDelete}
+            />
           }
         </React.Fragment>
       }

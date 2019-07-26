@@ -16,6 +16,7 @@ import * as ExpressionVariables from './expressionVariables'
 import * as ExpressionParser from './expressionParser'
 
 import AppContext from '../../app/appContext'
+import * as AppState from '../../app/appState'
 
 class ExpressionEditorPopup extends React.Component {
 
@@ -50,16 +51,11 @@ class ExpressionEditorPopup extends React.Component {
     const { query, queryDraft, exprDraft, exprDraftValid } = this.state
 
     const {
-      survey, nodeDefContext, nodeDefCurrent,
-      mode, depth, isBoolean,
+      nodeDefCurrent, isBoolean, variables,
       onChange, onClose,
     } = this.props
 
     const { i18n } = this.context
-    const { lang } = i18n
-
-    const literalSearchParams = ExpressionParser.getLiteralSearchParams(survey, nodeDefCurrent, lang)
-    const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
 
     return (
       <Popup
@@ -83,7 +79,6 @@ class ExpressionEditorPopup extends React.Component {
             node={exprDraft}
             onChange={this.updateDraft.bind(this)}
             isBoolean={isBoolean}
-            literalSearchParams={literalSearchParams}
             nodeDefCurrent={nodeDefCurrent}
           />
         </div>
@@ -92,13 +87,13 @@ class ExpressionEditorPopup extends React.Component {
           <button className="btn btn-xs"
                   onClick={() => onChange('')}
                   aria-disabled={R.isEmpty(query)}>
-            <span className="icon icon-undo2 icon-16px"/> {i18n.t('common.reset')}
+            <span className="icon icon-undo2 icon-12px"/> {i18n.t('common.reset')}
           </button>
 
           <button className="btn btn-xs"
                   onClick={() => onChange(queryDraft, exprDraft)}
                   aria-disabled={query === queryDraft || !exprDraftValid}>
-            <span className="icon icon-checkmark icon-16px"/> {i18n.t('common.apply')}
+            <span className="icon icon-checkmark icon-12px"/> {i18n.t('common.apply')}
           </button>
         </div>
 
@@ -128,10 +123,10 @@ ExpressionEditorPopup.defaultProps = {
 
 const mapStateToProps = (state, props) => {
   const survey = SurveyState.getSurvey(state)
+  const lang = AppState.getLang(state)
 
   const {
-    nodeDefUuidContext,
-    nodeDefUuidCurrent,
+    nodeDefUuidContext, nodeDefUuidCurrent,
     mode = ExpressionEditorPopup.defaultProps.mode,
     isContextParent = ExpressionEditorPopup.defaultProps.isContextParent,
   } = props
@@ -140,12 +135,12 @@ const mapStateToProps = (state, props) => {
   const nodeDefCurrent = nodeDefUuidCurrent ? Survey.getNodeDefByUuid(nodeDefUuidCurrent)(survey) : null
   const depth = isContextParent ? 0 : 1
 
+  const variables = ExpressionVariables.getVariables(survey, nodeDefContext, nodeDefCurrent, mode, depth, lang)
+
   return {
-    survey,
     nodeDefContext,
     nodeDefCurrent,
-    mode,
-    depth,
+    variables,
   }
 }
 
