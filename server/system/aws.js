@@ -1,6 +1,6 @@
 const aws = require('aws-sdk')
 
-const inviteUser = (name, email) =>
+const inviteUser = email =>
   new Promise((resolve, reject) => {
     aws.config.update({
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -21,9 +21,6 @@ const inviteUser = (name, email) =>
       UserAttributes: [{
         Name: 'email',
         Value: email
-      }, {
-        Name: 'name',
-        Value: name
       }]
     }
 

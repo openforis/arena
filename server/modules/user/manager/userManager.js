@@ -13,7 +13,7 @@ const inviteUser = (surveyId, email, groupId, client = db) =>
     await AuthGroupRepository.insertUserGroup(groupId, user.id, t)
 
     // Rolls back the transaction if reject
-    return aws.inviteUser('this is the name', email)
+    return aws.inviteUser(email)
   })
 
 // ==== READ

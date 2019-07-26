@@ -11,7 +11,7 @@ module.exports.init = app => {
 
   // ==== CREATE
 
-  app.post('/user/invite', async (req, res, next) => {
+  app.post('/survey/:surveyId/users/invite', async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const email = Request.getRestParam(req, 'email')

@@ -29,7 +29,8 @@ const UserInviteView = props => {
 
   const inviteUser = () => {
     const groupId = AuthGroups.getId(group)
-    axios.post('/api/user/invite', { surveyId, email, groupId })
+
+    axios.post(`/api/survey/${surveyId}/users/invite`, { email, groupId })
   }
 
   return (
