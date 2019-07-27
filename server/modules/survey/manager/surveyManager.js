@@ -42,7 +42,6 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
 
       const surveyDb = await SurveyRepository.insertSurvey(surveyParam, t)
       const { id: surveyId } = surveyDb
-      const lang = R.pipe(R.path(['props', 'languages']), R.head)(surveyDb)
 
       //create survey data schema
       await migrateSurveySchema(surveyId)
@@ -53,7 +52,6 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
           NodeDef.nodeDefType.entity,
           {
             name: 'root_entity',
-            labels: { [lang]: 'Root entity' },
             multiple: false,
             [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
             [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.form,
@@ -67,7 +65,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
 
       // create default groups for this survey
 
-      surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
+      surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.defaultAuthGroups, t)
 
       if (!Authorizer.isSystemAdmin(user)) {
         await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(surveyDb).id, User.getId(user), t)
