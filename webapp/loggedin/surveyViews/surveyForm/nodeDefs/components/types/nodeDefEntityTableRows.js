@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
 import * as R from 'ramda'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
@@ -19,7 +19,17 @@ const NodeDefEntityTableRows = props => {
   const tableRowsRef = useRef(null)
   const tableDataRowsRef = useRef(null)
 
-  const [nodeDefColumns, setNodeDefColumns] = useState([])
+  const nodeDefColumnUuids = NodeDefLayout.getLayout(nodeDef)
+  const nodeDefColumns = useMemo(() => R.reduce(
+    (nodeDefColumnsAgg, nodeDefColumnUuid) => {
+      const nodeDefChild = childDefs.find(def => NodeDef.getUuid(def) === nodeDefColumnUuid)
+      nodeDefChild && nodeDefColumnsAgg.push(nodeDefChild)
+      return nodeDefColumnsAgg
+    },
+    [],
+    nodeDefColumnUuids
+  ), [nodeDefColumnUuids])
+
   const [gridSize, setGridSize] = useState({ width: 0, height: 0, top: 0, left: 0 })
   const debounceDelayOnScroll = 100
 
@@ -49,22 +59,10 @@ const NodeDefEntityTableRows = props => {
     debounce(onScroll, 'scroll-table-data-rows', debounceDelayOnScroll)()
   }
 
-  // nodeDef update effect
-  useEffect(() => {
+  // nodeDef update effect entry mode
+  if (!edit) {
+    useEffect(() => {
 
-    // set nodeDefColumns
-    const nodeDefColumnUuids = NodeDefLayout.getLayout(nodeDef)
-    const nodeDefColumnsUpdate = []
-    nodeDefColumnUuids.forEach(uuid => {
-      const nodeDefChild = childDefs.find(def => def.uuid === uuid)
-      if (nodeDefChild) {
-        nodeDefColumnsUpdate.push(nodeDefChild)
-      }
-    })
-    setNodeDefColumns(nodeDefColumnsUpdate)
-
-    // entry mode
-    if (!edit) {
       // reset scrolls and set grid size
       tableRowsRef.current.scrollLeft = 0
       tableDataRowsRef.current.scrollTop = 0
@@ -89,8 +87,8 @@ const NodeDefEntityTableRows = props => {
       return () => {
         window.removeEventListener('resize', onWindowResize)
       }
-    }
-  }, [NodeDef.getUuid(nodeDef)])
+    }, [NodeDef.getUuid(nodeDef)])
+  }
 
   return (
     <div className="survey-form__node-def-entity-table-rows"
