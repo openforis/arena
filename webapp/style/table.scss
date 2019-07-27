@@ -65,14 +65,26 @@ $tableRowsHeight: calc(100% - 77px);
 }
 
 .table__paginator {
+  align-self: normal;
+  display: flex;
+
   button {
     padding: .3rem;
     margin: 0 .2rem;
+    border: none;
+    background-color: inherit;
+
+    &:hover {
+      background-color: inherit;
+    }
   }
 
   .counts {
-    font-size: 0.9rem;
-    margin: 0 .8rem;
+    font-size: 0.8rem;
     align-self: center;
+    min-width: 100px;
+    text-align: center;
+    font-weight: 600;
+    color: rgba($black, 0.8);
   }
 }
