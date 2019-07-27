@@ -25,10 +25,7 @@ const fetchTaxonomies = (surveyId, draft = false, validate = false) =>
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
   const state = getState()
 
-  if (
-    !SurveyState.areDefsFetched(state) ||
-    (SurveyState.areDefsDraftFetched(state) !== draft)
-  ) {
+  if (!SurveyState.areDefsFetched(draft)(state)) {
 
     const surveyId = SurveyState.getSurveyId(state)
 
