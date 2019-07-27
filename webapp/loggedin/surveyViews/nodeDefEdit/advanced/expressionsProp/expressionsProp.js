@@ -3,106 +3,76 @@ import './expressionsProp.scss'
 import React from 'react'
 import * as R from 'ramda'
 
-import AppContext from '../../../../../app/appContext'
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
 import Validator from '../../../../../../common/validation/validator'
 
 import { FormItem } from '../../../../../commonComponents/form/input'
 import ExpressionProp from './expressionProp'
+import useI18n from '../../../../../commonComponents/useI18n'
 
-class ExpressionsProp extends React.Component {
+const ExpressionsProp = props => {
 
-  constructor (props) {
-    super(props)
+  const {
+    values, label, validation,
+    multiple,
+    onChange,
+  } = props
 
-    this.state = { uiValues: [] }
-  }
+  const i18n = useI18n()
 
-  static getDerivedStateFromProps (props, state) {
-    const { values, multiple } = props
-    const { uiValues: oldUiValues } = state
+  const getExpressionIndex = (expression) => R.findIndex(
+    R.propEq('uuid', NodeDefExpression.getUuid(expression))
+    , values
+  )
 
-    const uiValues = R.clone(values)
-
-    if (R.isEmpty(values) || multiple) {
-      const placeholder = R.pipe(
-        R.find(NodeDefExpression.isPlaceholder),
-        R.defaultTo(NodeDefExpression.createExpressionPlaceholder())
-      )(oldUiValues)
-
-      uiValues.push(placeholder)
-    }
-    return {
-      uiValues,
-    }
-  }
-
-  getExpressionIndex (expression) {
-    return R.findIndex(R.propEq('uuid', NodeDefExpression.getUuid(expression)), this.state.uiValues)
-  }
-
-  handleValuesUpdate (newValues) {
-    this.setState({ uiValues: newValues })
-    this.props.onChange(R.reject(NodeDefExpression.isPlaceholder, newValues))
-  }
-
-  handleDelete (expression) {
-    const { i18n } = this.context
-
+  const onDelete = (expression) => {
     if (window.confirm(i18n.t('nodeDefEdit.expressionsProp.confirmDelete'))) {
-      const index = this.getExpressionIndex(expression)
-      const newValues = R.remove(index, 1, this.state.uiValues)
-      this.handleValuesUpdate(newValues)
+      const index = getExpressionIndex(expression)
+      const newValues = R.remove(index, 1, values)
+      onChange(newValues)
     }
   }
 
-  handleUpdate (expression) {
+  const onUpdate = expression => {
     if (NodeDefExpression.isEmpty(expression)) {
-      this.handleDelete(expression)
+      onDelete(expression)
     } else {
-      const index = this.getExpressionIndex(expression)
-      const newValues = R.update(index, expression, this.state.uiValues)
-      this.handleValuesUpdate(newValues)
+      const index = getExpressionIndex(expression)
+      const newValues = index >= 0 ? R.update(index, expression, values) : R.append(expression, values)
+      onChange(newValues)
     }
   }
 
-  render () {
-    const {
-      nodeDefUuidContext, nodeDefUuidCurrent,
-      label, readOnly, applyIf, showLabels, validation,
-      isContextParent, canBeConstant, isBoolean,
-    } = this.props
-    const { uiValues } = this.state
+  return (
+    <FormItem label={label}>
+      <div className="node-def-edit__expressions">
+        {
+          values.map((value, i) =>
+            <ExpressionProp
+              key={i}
+              {...props}
+              expression={value}
+              validation={Validator.getFieldValidation(i)(validation)}
+              onDelete={onDelete}
+              onUpdate={onUpdate}
+            />
+          )
+        }
 
-    return (
-      <FormItem label={label}>
-        <div className="node-def-edit__expressions">
-          {
-            uiValues.map((value, i) =>
-              <ExpressionProp
-                key={i}
-                expression={value}
-                applyIf={applyIf}
-                showLabels={showLabels}
-                validation={Validator.getFieldValidation(i)(validation)}
-                onDelete={this.handleDelete.bind(this)}
-                onUpdate={this.handleUpdate.bind(this)}
-                readOnly={readOnly}
-                nodeDefUuidContext={nodeDefUuidContext}
-                nodeDefUuidCurrent={nodeDefUuidCurrent}
-                isContextParent={isContextParent}
-                canBeConstant={canBeConstant}
-                isBoolean={isBoolean}/>
-            )
-
-          }
-        </div>
-      </FormItem>
-    )
-  }
+        {
+          (multiple || R.isEmpty(values)) &&
+          <ExpressionProp
+            {...props}
+            expression={NodeDefExpression.createExpressionPlaceholder()}
+            validation={{}}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+          />
+        }
+      </div>
+    </FormItem>
+  )
 }
-
-ExpressionsProp.contextType = AppContext
 
 ExpressionsProp.defaultProps = {
   label: '',

@@ -45,15 +45,16 @@ const ExpressionProp = (props) => {
         <div className="expression-item">
           <div className="label">{i18n.t('nodeDefEdit.expressionsProp.expression')}</div>
 
-          <ExpressionEditor nodeDefUuidContext={nodeDefUuidContext}
-                            nodeDefUuidCurrent={nodeDefUuidCurrent}
-                            query={NodeDefExpression.getExpression(expression)}
-                            onChange={expr =>
-                              onUpdate(NodeDefExpression.assocExpression(expr)(expression))
-                            }
-                            isContextParent={isContextParent}
-                            canBeConstant={canBeConstant}
-                            isBoolean={isBoolean}/>
+          <ExpressionEditor
+            nodeDefUuidContext={nodeDefUuidContext}
+            nodeDefUuidCurrent={nodeDefUuidCurrent}
+            query={NodeDefExpression.getExpression(expression)}
+            onChange={expr =>
+              onUpdate(NodeDefExpression.assocExpression(expr)(expression))
+            }
+            isContextParent={isContextParent}
+            canBeConstant={canBeConstant}
+            isBoolean={isBoolean}/>
         </div>
 
         {
