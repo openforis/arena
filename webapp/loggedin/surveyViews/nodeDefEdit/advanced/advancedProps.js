@@ -2,12 +2,11 @@ import React from 'react'
 
 import useI18n from '../../../../commonComponents/useI18n'
 
-import { NodeDefExpressionsProp } from './expressionsProp'
-
 import Validator from '../../../../../common/validation/validator'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import { FormItem } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
+import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'
 
 const AdvancedProps = props => {
   const { nodeDef, nodeDefParent, putNodeDefProp, readOnly } = props
@@ -20,38 +19,43 @@ const AdvancedProps = props => {
   return (
     <div className="form">
       {
-        NodeDef.canNodeDefHaveDefaultValue(nodeDef) &&
-        <React.Fragment>
-
+        NodeDef.canHaveDefaultValue(nodeDef) &&
+        <>
           <FormItem label={i18n.t('nodeDefEdit.advancedProps.readOnly')}>
-            <Checkbox checked={NodeDef.isReadOnly(nodeDef)}
-                      disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
-                      validation={Validator.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
-                      onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.readOnly, checked)}/>
+            <Checkbox
+              checked={NodeDef.isReadOnly(nodeDef)}
+              disabled={readOnly || NodeDef.isKey(nodeDef) || NodeDef.isMultiple(nodeDef)}
+              validation={Validator.getFieldValidation(NodeDef.propKeys.readOnly)(validation)}
+              onChange={checked => putNodeDefProp(nodeDef, NodeDef.propKeys.readOnly, checked)}
+            />
           </FormItem>
 
-          <NodeDefExpressionsProp nodeDef={nodeDef}
-                                  putNodeDefProp={putNodeDefProp}
-                                  label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
-                                  readOnly={readOnly}
-                                  propName="defaultValues"
-                                  validation={Validator.getFieldValidation('defaultValues')(validation)}
-                                  nodeDefUuidContext={nodeDefUuidContext}
-                                  canBeConstant={true}
-                                  isBoolean={NodeDef.isBoolean(nodeDef)}/>
-        </React.Fragment>
+          <NodeDefExpressionsProp
+            nodeDef={nodeDef}
+            nodeDefValidation={validation}
+            putNodeDefProp={putNodeDefProp}
+            label={i18n.t('nodeDefEdit.advancedProps.defaultValues')}
+            readOnly={readOnly}
+            propName={NodeDef.propKeys.defaultValues}
+            nodeDefUuidContext={nodeDefUuidContext}
+            canBeConstant={true}
+            isBoolean={NodeDef.isBoolean(nodeDef)}
+          />
+        </>
       }
 
-      <NodeDefExpressionsProp nodeDef={nodeDef}
-                              putNodeDefProp={putNodeDefProp}
-                              label={i18n.t('nodeDefEdit.advancedProps.applicableIf')}
-                              readOnly={readOnly}
-                              propName="applicable"
-                              applyIf={false}
-                              multiple={false}
-                              validation={Validator.getFieldValidation('applicable')(validation)}
-                              nodeDefUuidContext={nodeDefUuidContext}
-                              isContextParent={true}/>
+      <NodeDefExpressionsProp
+        nodeDef={nodeDef}
+        nodeDefValidation={validation}
+        putNodeDefProp={putNodeDefProp}
+        label={i18n.t('nodeDefEdit.advancedProps.applicableIf')}
+        readOnly={readOnly}
+        propName={NodeDef.propKeys.applicable}
+        applyIf={false}
+        multiple={false}
+        nodeDefUuidContext={nodeDefUuidContext}
+        isContextParent={true}
+      />
 
 
     </div>
