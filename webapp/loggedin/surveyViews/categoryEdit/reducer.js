@@ -6,9 +6,8 @@ import CategoryItem from '../../../../common/survey/categoryItem'
 import * as CategoryEditState from './categoryEditState'
 
 import { appUserLogout } from '../../../app/actions'
-import { surveyDelete, surveyUpdate } from '../../../survey/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../surveyForm/actions'
-
 
 import {
   categoryEditUpdate,
@@ -25,11 +24,11 @@ import {
   categoryLevelDelete,
 } from '../../../survey/categories/actions'
 
-
 const actionHandlers = {
   // reset form
   [appUserLogout]: () => ({}),
 
+  [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
@@ -55,8 +54,7 @@ const actionHandlers = {
   [categoryItemDelete]: (state, { level, item }) => CategoryEditState.dissocLevelItem(CategoryLevel.getIndex(level), CategoryItem.getUuid(item))(state),
 
   // ===== category level active item
-  [categoryEditLevelActiveItemUpdate]: (state, { levelIndex, itemUuid }) =>
-    CategoryEditState.assocLevelActiveItem(levelIndex, itemUuid)(state),
+  [categoryEditLevelActiveItemUpdate]: (state, { levelIndex, itemUuid }) => CategoryEditState.assocLevelActiveItem(levelIndex, itemUuid)(state),
 }
 
 export default exportReducer(actionHandlers)
