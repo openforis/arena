@@ -7,7 +7,7 @@ const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 
 // ==== CREATE
 
-const inviteUser = (surveyId, email, groupId, client = db) =>
+const inviteUser = async (surveyId, email, groupId, client = db) =>
   client.tx(async t => {
     const user = await UserRepository.insertUser(surveyId, email, groupId, t)
     await AuthGroupRepository.insertUserGroup(groupId, user.id, t)

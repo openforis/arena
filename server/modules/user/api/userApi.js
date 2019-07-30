@@ -17,12 +17,30 @@ module.exports.init = app => {
       const email = Request.getRestParam(req, 'email')
       const groupId = Request.getRestParam(req, 'groupId')
 
-      await UserService.inviteUser(surveyId, email, groupId)
+      const validation = await UserService.validateNewUser(req.body)
 
-      Response.sendOk(res)
+      if (validation.valid) {
+        await UserService.inviteUser(surveyId, email, groupId)
+
+        Response.sendOk(res)
+      } else {
+        res.json({ validation })
+      }
     } catch (err) {
       next(err)
     }
+
+    // try {
+    //   const surveyId = Request.getRestParam(req, 'surveyId')
+    //   const email = Request.getRestParam(req, 'email')
+    //   const groupId = Request.getRestParam(req, 'groupId')
+    //
+    //   await UserService.inviteUser(surveyId, email, groupId)
+    //
+    //   Response.sendOk(res)
+    // } catch (err) {
+    //   next(err)
+    // }
   })
 
   // ==== READ
