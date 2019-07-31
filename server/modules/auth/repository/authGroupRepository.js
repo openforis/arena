@@ -38,10 +38,11 @@ const fetchSurveyGroups = async (surveyId, client = db) =>
 
 const fetchUserGroups = async (userId, client = db) =>
   await client.map(`
-    SELECT auth_group.* 
-    FROM auth_group_user, auth_group 
-    WHERE auth_group_user.user_id = $1 
-    AND auth_group.id = auth_group_user.group_id`,
+    SELECT auth_group.*
+    FROM auth_group_user, auth_group
+    WHERE
+      auth_group_user.user_id = $1
+      AND auth_group.id = auth_group_user.group_id`,
     userId,
     dbTransformCallback
   )

@@ -7,6 +7,8 @@ const keys = {
   recordSteps: 'recordSteps',
   all: 'all',
   own: 'own',
+  surveyId: 'surveyId',
+  name: 'name',
 }
 
 const permissions = {
@@ -42,7 +44,11 @@ const groupNames = {
 
 const getAuthGroups = R.propOr([], keys.authGroups)
 
+const getSurveyId = R.prop(keys.surveyId)
+
 const getId = R.prop(keys.id)
+
+const getName = R.prop(keys.name)
 
 module.exports = {
   keys,
@@ -50,5 +56,7 @@ module.exports = {
   groupNames,
 
   getId,
+  getName,
+  getSurveyId,
   getAuthGroups,
 }

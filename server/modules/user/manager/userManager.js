@@ -1,20 +1,5 @@
-const aws = require('../../../system/aws')
-
-const db = require('../../../db/db')
-
 const UserRepository = require('../repository/userRepository')
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
-
-// ==== CREATE
-
-const inviteUser = async (surveyId, email, groupId, client = db) =>
-  client.tx(async t => {
-    const user = await UserRepository.insertUser(surveyId, email, groupId, t)
-    await AuthGroupRepository.insertUserGroup(groupId, user.id, t)
-
-    // Rolls back the transaction if reject
-    return aws.inviteUser(email)
-  })
 
 // ==== READ
 
@@ -42,7 +27,7 @@ const deleteUserPref = async (user, name) => ({
 
 module.exports = {
   // CREATE
-  inviteUser,
+  insertUser: UserRepository.insertUser,
 
   // READ
   fetchUsersBySurveyId: UserRepository.fetchUsersBySurveyId,

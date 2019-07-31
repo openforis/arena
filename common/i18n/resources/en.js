@@ -286,6 +286,7 @@ module.exports = {
     duplicateRecord: 'Duplicate record key',
     empty: '$t(common.empty)',
     exceedingMax: 'Exceeding max',
+    invalidEmail: 'Invalid email',
     invalidName: 'Invalid name',
     invalidNumber: 'Invalid number',
     invalidType: 'Invalid type',
@@ -322,6 +323,8 @@ module.exports = {
     cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
     userNotAllowedToChangePref: 'User not allowed to change pref',
     paramIsRequired: 'Param {{param}} is required',
+    userHasRole: 'The given user has already a role in this survey',
+    invalidUser: 'Invalid user',
   },
 
   systemErrors: {

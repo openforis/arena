@@ -20,11 +20,12 @@ module.exports.init = app => {
       const validation = await UserService.validateNewUser(req.body)
 
       if (validation.valid) {
-        await UserService.inviteUser(surveyId, email, groupId)
+        const user = await UserService.inviteUser(surveyId, email, groupId)
 
-        Response.sendOk(res)
+        res.json(user)
       } else {
-        res.json({ validation })
+        // res.json({ validation })
+        throw new SystemError('invalidUser')
       }
     } catch (err) {
       next(err)

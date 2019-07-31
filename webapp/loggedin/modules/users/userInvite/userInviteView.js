@@ -1,70 +1,72 @@
-import * as R from 'ramda'
-
 import './userInviteView.scss'
 
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
-import axios from 'axios'
+import { appModuleUri, userModules } from '../../../appModules'
 
 import Survey from '../../../../../common/survey/survey'
 import AuthGroups from '../../../../../common/auth/authGroups'
-
-import * as SurveyState from '../../../../survey/surveyState'
+import UserValidator from '../../../../../common/user/userValidator'
+import Validator from '../../../../../common/validation/validator'
 
 import useI18n from '../../../../commonComponents/useI18n'
 import { Input } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
+import { useAsyncPostRequest } from '../../../../commonComponents/hooks'
 
-import UserValidator from '../../../../../common/user/userValidator'
-import Validator from '../../../../../common/validation/validator'
+import * as SurveyState from '../../../../survey/surveyState'
 
-// import { useOnUpdate } from '../../../../commonComponents/hooks'
+import { showAppLoader, hideAppLoader } from '../../../../app/actions'
 
 const UserInviteView = props => {
   const i18n = useI18n()
 
-  const { surveyGroups, surveyId } = props
+  const { surveyGroups, surveyId, history, showAppLoader, hideAppLoader } = props
 
   const [email, setEmail] = useState('')
   const [group, setGroup] = useState('')
-  const [newUser, setNewUser] = useState({})
-  const [validation, setValidation] = useState({ valid: true })
-  const [clientValidationEnabled, enableClientValidation] = useState(false)
+  const [validation, setValidation] = useState({})
+  const [validationEnabled, setValidationEnabled] = useState(false)
 
   const groups = surveyGroups.map(g => ({
-    id: g.id,
-    label: i18n.t(`authGroups.${g.name}.label`)
+    id: AuthGroups.getId(g),
+    label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label`)
   }))
 
-  const inviteUser = async () => {
-    const validation = await UserValidator.validateNewUser(newUser)
-
-    if (Validator.isValid(validation)) {
-      const groupId = AuthGroups.getId(group)
-      const { data } = await axios.post(`/api/survey/${surveyId}/users/invite`, { email, groupId })
-
-      if (R.pathOr(true, ['validation', 'valid'])(data)) {
-        setNewUser(data)
-      } else {
-        setValidation(data.validation)
-      }
+  const { data, error, dispatch } = useAsyncPostRequest(
+    `/api/survey/${surveyId}/users/invite`, {
+      email,
+      groupId: AuthGroups.getId(group)
     }
+  )
 
-    enableClientValidation(true)
+  const inviteUser = async () => {
+    if (Validator.isValidationValid(validation)) {
+      showAppLoader()
+      dispatch()
+    } else {
+      setValidationEnabled(true)
+    }
   }
 
   useEffect(() => {
-    if (clientValidationEnabled) {
-      (async () => {
-        setValidation(await UserValidator.validateNewUser(newUser))
-      })()
+    hideAppLoader()
+
+    if (data) {
+      history.push(appModuleUri(userModules.users))
     }
-  }, [newUser, clientValidationEnabled])
+  }, [data, error])
 
   useEffect(() => {
-    setNewUser({ email, groupId: group.id })
+    (async () => {
+      const groupId = AuthGroups.getId(group)
+      setValidation(await UserValidator.validateNewUser({ email, groupId }))
+    })()
   }, [email, group])
+
+  const getFieldValidation = field =>
+    Validator.getFieldValidation(field)(validationEnabled ? validation : null)
 
   return (
     <div className="user-invite">
@@ -72,12 +74,12 @@ const UserInviteView = props => {
         <Input
           placeholder={i18n.t('common.email')}
           value={email}
-          validation={Validator.getFieldValidation('email')(validation)}
+          validation={getFieldValidation('email')}
           onChange={setEmail}/>
       </div>
       <div>
         <Dropdown
-          validation={Validator.getFieldValidation('groupId')(validation)}
+          validation={getFieldValidation('groupId')}
           placeholder={i18n.t('usersView.group')}
           items={groups}
           itemKeyProp={'id'}
@@ -99,11 +101,9 @@ const mapStateToProps = state => {
   const authGroups = Survey.getAuthGroups(Survey.getSurveyInfo(survey))
 
   return {
-    survey,
+    surveyId: Survey.getId(survey),
     surveyGroups: authGroups.map(g => ({ id: g.id, name: g.name }))
   }
 }
 
-export default connect(
-  mapStateToProps,
-)(UserInviteView)
+export default connect(mapStateToProps, { showAppLoader, hideAppLoader })(UserInviteView)
