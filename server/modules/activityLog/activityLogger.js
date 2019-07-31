@@ -38,6 +38,10 @@ const type = {
   nodeCreate: 'nodeCreate',
   nodeValueUpdate: 'nodeValueUpdate',
   nodeDelete: 'nodeDelete',
+
+  // user
+  userInvite: 'userInvite',
+  userGroupInsert: 'userGroupInsert',
 }
 
 const keys = {

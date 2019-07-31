@@ -11,10 +11,10 @@ const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 const insertUser = async (surveyId, email, group, client = db) =>
   await client.one(`
-    INSERT INTO "user" AS u (name, email, prefs)
-    VALUES ($1, $2, $3::jsonb)
+    INSERT INTO "user" AS u (email, prefs)
+    VALUES ($1, $2::jsonb)
     RETURNING ${selectFieldsCommaSep}`,
-    ['name!', email, { surveyId }])
+    [email, { survey: surveyId }])
 
 // READ
 

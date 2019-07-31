@@ -11,7 +11,7 @@ module.exports.init = app => {
 
   // ==== CREATE
 
-  app.post('/survey/:surveyId/users/invite', async (req, res, next) => {
+  app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const email = Request.getRestParam(req, 'email')
@@ -20,9 +20,10 @@ module.exports.init = app => {
       const validation = await UserService.validateNewUser(req.body)
 
       if (validation.valid) {
-        const user = await UserService.inviteUser(surveyId, email, groupId)
+        const { user } = req
+        const newUser = await UserService.inviteUser(user, surveyId, email, groupId)
 
-        res.json(user)
+        res.json(newUser)
       } else {
         // res.json({ validation })
         throw new SystemError('invalidUser')
@@ -30,18 +31,6 @@ module.exports.init = app => {
     } catch (err) {
       next(err)
     }
-
-    // try {
-    //   const surveyId = Request.getRestParam(req, 'surveyId')
-    //   const email = Request.getRestParam(req, 'email')
-    //   const groupId = Request.getRestParam(req, 'groupId')
-    //
-    //   await UserService.inviteUser(surveyId, email, groupId)
-    //
-    //   Response.sendOk(res)
-    // } catch (err) {
-    //   next(err)
-    // }
   })
 
   // ==== READ
