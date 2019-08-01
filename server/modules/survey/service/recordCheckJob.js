@@ -20,7 +20,7 @@ class RecordCheckJob extends Job {
     //1. determine new or updated node defs
 
     const surveyId = this.getSurveyId()
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, true, true, false, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, tx)
 
     const nodeDefsNew = []
     const nodeDefsUpdated = []
