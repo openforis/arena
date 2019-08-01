@@ -45,7 +45,7 @@ const DesignerView = ({ canEditDef, resetForm }) => {
           {
             component: RecordView,
             path: `${appModuleUri(designerModules.recordPreview)}:recordUuid`,
-            props: { edit: true, draft: true, canEditDef, preview: true },
+            props: { edit: true, draftDefs: true, canEditDef, preview: true },
           },
 
           {
