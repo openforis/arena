@@ -6,7 +6,7 @@ import NodeDef from '../../../../common/survey/nodeDef'
 import * as SurveyFormState from './surveyFormState'
 
 import { appUserLogout } from '../../../app/actions'
-import { surveyDelete, surveyUpdate } from '../../../survey/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '../../../survey/actions'
 import {
   formActivePageNodeDefUpdate,
   formNodeDefAddChildToUpdate,
@@ -21,6 +21,7 @@ const actionHandlers = {
   // reset form
   [appUserLogout]: () => ({}),
 
+  [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 

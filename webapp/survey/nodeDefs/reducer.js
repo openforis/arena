@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { exportReducer } from '../../utils/reduxUtils'
 
 import { appUserLogout } from '../../app/actions'
@@ -14,11 +12,7 @@ import {
   nodeDefDelete,
 } from './actions'
 
-import {
-  assocNodeDef,
-  assocNodeDefProps,
-  dissocNodeDef,
-} from './nodeDefsState'
+import * as NodeDefsState from './nodeDefsState'
 
 const actionHandlers = {
   [appUserLogout]: () => ({}),
@@ -33,14 +27,13 @@ const actionHandlers = {
   [surveyDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
 
   // single nodeDef actions
-  [nodeDefCreate]: (state, { nodeDef }) => assocNodeDef(nodeDef)(state),
+  [nodeDefCreate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefUpdate]: (state, { nodeDef }) => assocNodeDef(nodeDef)(state),
+  [nodeDefUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
-  [nodeDefPropsUpdate]: (state, { nodeDefUuid, props, propsAdvanced }) =>
-    assocNodeDefProps(nodeDefUuid, props, propsAdvanced)(state),
+  [nodeDefPropsUpdate]: (state, { nodeDefUuid, props, propsAdvanced }) => NodeDefsState.assocNodeDefProps(nodeDefUuid, props, propsAdvanced)(state),
 
-  [nodeDefDelete]: (state, { nodeDef }) => dissocNodeDef(nodeDef)(state),
+  [nodeDefDelete]: (state, { nodeDef }) => NodeDefsState.dissocNodeDef(nodeDef)(state),
 
 }
 

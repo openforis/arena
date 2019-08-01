@@ -20,7 +20,8 @@ const DataView = ({ surveyInfo }) => {
   return (
     <SurveyDefsLoader
       draft={draftDefs}
-      validate={false}>
+      validate={false}
+      requirePublish={true}>
 
       <InnerModuleSwitch
         moduleRoot={appModules.data}
