@@ -13,10 +13,7 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const email = Request.getRestParam(req, 'email')
-      const groupId = Request.getRestParam(req, 'groupId')
-
+      const { surveyId, email, groupId } = Request.getParams(req)
       const validation = await UserService.validateNewUser(req.body)
 
       if (validation.valid) {
