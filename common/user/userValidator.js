@@ -8,26 +8,6 @@ const errorKeys = {
   invalidEmail: 'invalidEmail'
 }
 
-// const UserRepository = require('../../server/modules/user/repository/userRepository')
-
-// const validateUserEmailUniqueness = async (propName, user) => {
-//   const email = R.path(propName.split('.'))(user)
-//   const userByEmail = await UserRepository.fetchUserByEmail(email)
-//
-//   return !R.isEmpty(userByEmail) && R.find(s => s.id !== survey.id, userByName)
-//     ? { key: errorKeys.duplicate }
-//     : null
-// }
-
-// const surveyInfoPropsValidations = {
-//   'props.name': [validateRequired, validateNotKeyword, validateSurveyNameUniqueness],
-//   'props.languages': [validateRequired],
-//   'props.srs': [validateRequired],
-// }
-
-// const validateSurveyInfo = async surveyInfo =>
-//   await validate(surveyInfo, surveyInfoPropsValidations)
-
 const getProp = (propName, defaultValue) => R.pathOr(defaultValue, propName.split('.'))
 
 const validateEmail = (propName, item) => {
