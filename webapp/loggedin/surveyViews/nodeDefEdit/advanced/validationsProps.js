@@ -6,7 +6,7 @@ import useI18n from '../../../../commonComponents/useI18n'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 import Checkbox from '../../../../commonComponents/form/checkbox'
 
-import { ExpressionsProp } from './expressionsProp'
+import ExpressionsProp from './expressionsProp/expressionsProp'
 
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefValidations from '../../../../../common/survey/nodeDefValidations'

@@ -35,6 +35,7 @@ module.exports = {
     name: 'Name',
     new: 'New',
     no: 'No',
+    noItems: `$t(common.no) $t(common.item,{'count':2})`,
     of: 'of',
     required: 'Required',
     reset: 'Reset',
@@ -44,8 +45,29 @@ module.exports = {
     upload: 'Upload',
     view: 'View',
     yes: 'Yes',
-    noItems: `$t(common.no) $t(common.item,{'count':2})`,
   },
+
+  sidebar: {
+    openForisShort: 'OF',
+    openForis: 'Open Foris',
+    logout: 'Logout',
+  },
+
+  nodeDefsTypes: {
+    integer: 'Integer',
+    decimal: 'Decimal',
+    text: 'Text',
+    date: 'Date',
+    time: 'Time',
+    boolean: 'Boolean',
+    code: 'Code',
+    coordinate: 'Coordinate',
+    taxon: 'Taxon',
+    file: 'File',
+    entity: 'Entity',
+  },
+
+  // ====== App modules and views
 
   appModules: {
     home: 'Home',
@@ -67,24 +89,8 @@ module.exports = {
     userList: 'User list',
   },
 
-  sidebar: {
-    openForisShort: 'OF',
-    openForis: 'Open Foris',
-    logout: 'Logout',
-  },
-
-  nodeDefsTypes: {
-    integer: 'Integer',
-    decimal: 'Decimal',
-    text: 'Text',
-    date: 'Date',
-    time: 'Time',
-    boolean: 'Boolean',
-    code: 'Code',
-    coordinate: 'Coordinate',
-    taxon: 'Taxon',
-    file: 'File',
-    entity: 'Entity',
+  surveyDefsLoader: {
+    requireSurveyPublish: 'This section is available when survey is published',
   },
 
   data: {
@@ -135,6 +141,10 @@ module.exports = {
     },
   },
 
+  designerView: {
+    formPreview: 'Form preview',
+  },
+
   usersView: {
     inviteUser: 'Invite',
     accepted: 'Accepted',
@@ -145,6 +155,8 @@ module.exports = {
     unused: 'Unused',
     noItemsAdded: 'No items added',
   },
+
+  // ====== Survey views
 
   nodeDefEdit: {
     basic: 'Basic',
@@ -177,20 +189,8 @@ module.exports = {
     },
   },
 
-  designerView: {
-    formPreview: 'Form preview',
-  },
-
   languagesEditor: {
     languages: 'Language(s)',
-  },
-
-  expressionEditor: {
-    and: 'AND',
-    or: 'OR',
-    group: 'Group',
-    var: 'Var',
-    const: 'Const',
   },
 
   surveyForm: {
@@ -256,6 +256,25 @@ module.exports = {
     deleteItem: 'Delete item',
   },
 
+  formErrors: {
+    defaultValuesNotSpecified: 'Default value not specified',
+    duplicate: 'Duplicate',
+    duplicateEntity: 'Duplicate entity',
+    duplicateRecord: 'Duplicate record key',
+    empty: '$t(common.empty)',
+    exceedingMax: 'Exceeding max',
+    invalidName: 'Invalid name',
+    invalidNumber: 'Invalid number',
+    invalidType: 'Invalid type',
+    invalidValue: 'Invalid value',
+    keyword: 'Keyword',
+    maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
+    minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
+    required: '$t(common.required)',
+    zeroOrNegative: 'Zero or negative',
+  },
+
+  // ====== Jobs
   jobs: {
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
@@ -279,25 +298,6 @@ module.exports = {
     TaxonomyImportJob: 'Taxonomy Import',
   },
 
-  formErrors: {
-    defaultValuesNotSpecified: 'Default value not specified',
-    duplicate: 'Duplicate',
-    duplicateEntity: 'Duplicate entity',
-    duplicateRecord: 'Duplicate record key',
-    empty: '$t(common.empty)',
-    exceedingMax: 'Exceeding max',
-    invalidEmail: 'Invalid email',
-    invalidName: 'Invalid name',
-    invalidNumber: 'Invalid number',
-    invalidType: 'Invalid type',
-    invalidValue: 'Invalid value',
-    keyword: 'Keyword',
-    maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
-    minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
-    required: '$t(common.required)',
-    zeroOrNegative: 'Zero or negative',
-  },
-
   jobErrors: {
     generic: '{{text}}',
     empty: '$t(common.empty)',
@@ -306,6 +306,8 @@ module.exports = {
     duplicateCode: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
     defaultValuesNotSpecified: '$t(formErrors.defaultValuesNotSpecified)',
   },
+
+  // ====== App Errors
 
   appErrors: {
     generic: '{{text}}',
@@ -330,6 +332,18 @@ module.exports = {
   systemErrors: {
     somethingWentWrong: 'Oooops! Something went wrong. Try to refresh the page.'
   },
+
+  // ====== Common components
+
+  expressionEditor: {
+    and: 'AND',
+    or: 'OR',
+    group: 'Group',
+    var: 'Var',
+    const: 'Const',
+  },
+
+  // ====== Auth
 
   authGroups: {
     group: 'Group',
@@ -361,5 +375,5 @@ module.exports = {
       label: 'System guest',
       description: 'Can view records',
     },
-  }
+  },
 }

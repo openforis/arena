@@ -4,7 +4,7 @@ import Taxonomy from '../../../../common/survey/taxonomy'
 import * as TaxonomyEditState from './taxonomyEditState'
 
 import { appUserLogout } from '../../../app/actions'
-import { surveyDelete, surveyUpdate } from '../../../survey/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../surveyForm/actions'
 
 import { taxonomyEditPropsUpdate, taxonomyEditUpdate } from './actions'
@@ -14,6 +14,7 @@ const actionHandlers = {
   // reset form
   [appUserLogout]: () => ({}),
 
+  [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),

@@ -143,7 +143,7 @@ const canNodeDefTypeBeKey = type =>
     ]
   )
 
-const canNodeDefHaveDefaultValue = nodeDef =>
+const canHaveDefaultValue = nodeDef =>
   R.includes(
     getType(nodeDef),
     [
@@ -225,5 +225,5 @@ module.exports = {
   canNodeDefBeMultiple,
   canNodeDefBeKey,
   canNodeDefTypeBeKey,
-  canNodeDefHaveDefaultValue,
+  canHaveDefaultValue,
 }
