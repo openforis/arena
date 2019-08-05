@@ -2,11 +2,6 @@ const aws = require('aws-sdk')
 
 const inviteUser = email =>
   new Promise((resolve, reject) => {
-    aws.config.update({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    })
-
     const awsClient = new aws.CognitoIdentityServiceProvider({
       apiVersion: '2016-04-19',
       region: process.env.COGNITO_REGION,

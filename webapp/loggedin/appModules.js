@@ -96,7 +96,7 @@ export const userModules = {
     path: `${appModules.users.path}/list`,
   },
   userInvite: {
-    key: 'inviteUser',
+    key: 'userInvite',
     path: `${appModules.users.path}/invite`,
   }
 }

@@ -5,7 +5,10 @@ const AuthMiddleware = require('../../auth/authApiMiddleware')
 
 const UserService = require('../service/userService')
 
+const Validator = require('../../../../common/validation/validator')
+
 const SystemError = require('../../../../server/utils/systemError')
+
 
 module.exports.init = app => {
 
@@ -16,13 +19,12 @@ module.exports.init = app => {
       const { surveyId, email, groupId } = Request.getParams(req)
       const validation = await UserService.validateNewUser(req.body)
 
-      if (validation.valid) {
+      if (Validator.isValidationValid(validation)) {
         const { user } = req
         const newUser = await UserService.inviteUser(user, surveyId, email, groupId)
 
         res.json(newUser)
       } else {
-        // res.json({ validation })
         throw new SystemError('invalidUser')
       }
     } catch (err) {

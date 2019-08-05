@@ -41,7 +41,7 @@ const UserInviteView = props => {
     }
   )
 
-  const inviteUser = async () => {
+  const inviteUser = () => {
     if (Validator.isValidationValid(validation)) {
       showAppLoader()
       dispatch()
@@ -80,7 +80,7 @@ const UserInviteView = props => {
       <div>
         <Dropdown
           validation={getFieldValidation('groupId')}
-          placeholder={i18n.t('usersView.group')}
+          placeholder={i18n.t('common.group')}
           items={groups}
           itemKeyProp={'id'}
           itemLabelProp={'label'}

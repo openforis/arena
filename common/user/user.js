@@ -1,9 +1,6 @@
 const R = require('ramda')
 const StringUtils = require('../stringUtils')
 
-const validEmailRe = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-const validEmail = email => validEmailRe.test(email)
-
 const keys = {
   id: 'id',
   surveyId: 'surveyId',
@@ -45,7 +42,6 @@ const getRecordPermissions = record => user =>
 module.exports = {
   keys,
 
-  validEmail,
   getId,
   getName,
   getEmail,
