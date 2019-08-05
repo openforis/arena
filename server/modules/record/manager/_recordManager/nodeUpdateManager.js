@@ -96,7 +96,7 @@ const insertNode = async (survey, record, node, user, t) => {
 
   // If it's a code, don't insert if it has been inserted already (by another user)
   if (NodeDef.isCode(nodeDef)) {
-    const siblings = Record.getNodeSiblingsByDefUuid(node, nodeDefUuid)(record)
+    const siblings = Record.getNodeSiblingsAndSelf(node)(record)
     if (R.any(sibling => R.equals(Node.getValue(sibling), Node.getValue(node)))(siblings)) {
       return {}
     }

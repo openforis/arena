@@ -57,7 +57,7 @@ const NodeDefCode = props => {
   }
 
   const onItemAdd = item => {
-    const node = NodeDef.isSingle(nodeDef) && nodes.length === 1 //TODO check why after survey publish node is not being inserted
+    const node = NodeDef.isSingle(nodeDef)
       ? nodes[0]
       : Node.newNode(NodeDef.getUuid(nodeDef), Node.getRecordUuid(parentNode), parentNode)
 
