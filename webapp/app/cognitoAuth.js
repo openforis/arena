@@ -43,7 +43,7 @@ export const login = (Username, Password) =>
     )
   })
 
-export const setNewPassword = (password, user) =>
+export const setNewUserPassword = (password, user) =>
   new Promise((resolve, reject) => {
     cognitoUser.completeNewPasswordChallenge(
       password,

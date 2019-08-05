@@ -35,14 +35,14 @@ export const login = (username, password) => async dispatch => {
   }
 }
 
-export const resetPassword = (password, name) =>
+export const acceptInvitation = (password, name) =>
   async (dispatch, getState) => {
     try {
       dispatch({ type: loginErrorReset })
       dispatch(showAppLoader())
 
       const newUser = LoginState.getPasswordResetUser(getState())
-      const response = await CognitoAuth.setNewPassword(password, { ...newUser, name })
+      const response = await CognitoAuth.setNewUserPassword(password, { ...newUser, name })
 
       if (response.type === 'success') {
         await axios.put('/api/user/username', { name })

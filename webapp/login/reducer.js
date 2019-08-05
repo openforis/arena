@@ -19,12 +19,6 @@ const actionHandlers = {
 
   [passwordResetUserReset]: state => LoginState.assocPasswordResetUser(null)(state),
 
-
-  // [loginReset]: (state) => {
-  //   LoginState.assocError(null)(state)
-  //   return LoginState.assocPasswordResetUser(null)(state)
-  // }
-
 }
 
 export default exportReducer(actionHandlers)

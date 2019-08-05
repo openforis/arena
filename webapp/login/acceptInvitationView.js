@@ -1,11 +1,11 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
-import { resetPassword, setLoginError } from './actions'
+import { acceptInvitation, setLoginError } from './actions'
 
 const LoginView = props => {
 
-  const { resetPassword, setLoginError } = props
+  const { acceptInvitation, setLoginError } = props
 
   const usernameRef = useRef()
   const newPasswordRef = useRef()
@@ -19,7 +19,7 @@ const LoginView = props => {
       setLoginError(`Passwords don't match.`)
     } else {
       const username = usernameRef.current.value
-      resetPassword(newPassword, username)
+      acceptInvitation(newPassword, username)
     }
   }
 
@@ -54,4 +54,4 @@ const LoginView = props => {
   )
 }
 
-export default connect(null, { resetPassword, setLoginError })(LoginView)
+export default connect(null, { acceptInvitation, setLoginError })(LoginView)
