@@ -26,6 +26,15 @@ const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
 
 // ==== READ
 
+const fetchGroupById = async (groupId, client = db) =>
+  await client.one(`
+    SELECT auth_group.*
+    FROM auth_group
+    WHERE auth_group.id = $1`,
+    [groupId]
+  )
+
+
 const fetchSurveyGroups = async (surveyId, client = db) =>
   await client.map(`
     SELECT auth_group.*
@@ -63,6 +72,7 @@ module.exports = {
   createSurveyGroups,
 
   // READ
+  fetchGroupById,
   fetchSurveyGroups,
   fetchUserGroups,
 

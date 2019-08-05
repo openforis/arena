@@ -1,20 +1,25 @@
 import './userInviteView.scss'
 
+import * as R from 'ramda'
+
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import { appModuleUri, userModules } from '../../../appModules'
 
-import Survey from '../../../../../common/survey/survey'
+import User from '../../../../../common/user/user'
 import AuthGroups from '../../../../../common/auth/authGroups'
+import Survey from '../../../../../common/survey/survey'
 import UserValidator from '../../../../../common/user/userValidator'
 import Validator from '../../../../../common/validation/validator'
+import Authorizer from '../../../../../common/auth/authorizer'
 
 import useI18n from '../../../../commonComponents/useI18n'
 import { Input } from '../../../../commonComponents/form/input'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import { useAsyncPostRequest } from '../../../../commonComponents/hooks'
 
+import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 
 import { showAppLoader, hideAppLoader } from '../../../../app/actions'
@@ -22,14 +27,14 @@ import { showAppLoader, hideAppLoader } from '../../../../app/actions'
 const UserInviteView = props => {
   const i18n = useI18n()
 
-  const { surveyGroups, surveyId, history, showAppLoader, hideAppLoader } = props
+  const { surveyId, groups, history, showAppLoader, hideAppLoader } = props
 
   const [email, setEmail] = useState('')
   const [group, setGroup] = useState('')
   const [validation, setValidation] = useState({})
   const [validationEnabled, setValidationEnabled] = useState(false)
 
-  const groups = surveyGroups.map(g => ({
+  const groupItems = groups.map(g => ({
     id: AuthGroups.getId(g),
     label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label`)
   }))
@@ -81,7 +86,7 @@ const UserInviteView = props => {
         <Dropdown
           validation={getFieldValidation('groupId')}
           placeholder={i18n.t('common.group')}
-          items={groups}
+          items={groupItems}
           itemKeyProp={'id'}
           itemLabelProp={'label'}
           selection={group}
@@ -98,11 +103,18 @@ const UserInviteView = props => {
 
 const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
-  const authGroups = Survey.getAuthGroups(Survey.getSurveyInfo(survey))
+  const surveyGroups = Survey.getAuthGroups(Survey.getSurveyInfo(survey))
+  const user = AppState.getUser(state)
+
+  const groups = R.clone(surveyGroups)
+  if (Authorizer.isSystemAdmin(user)) {
+    const adminGroup = User.getAuthGroups(user).find(AuthGroups.isAdminGroup)
+    groups.unshift(adminGroup)
+  }
 
   return {
     surveyId: Survey.getId(survey),
-    surveyGroups: authGroups.map(g => ({ id: g.id, name: g.name }))
+    groups
   }
 }
 

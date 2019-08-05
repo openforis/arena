@@ -2,7 +2,7 @@ const aws = require('../../../system/aws')
 
 const UserManager = require('../manager/userManager')
 
-const AuthGroupManager = require('../../auth/manager/authManager')
+const AuthManager = require('../../auth/manager/authManager')
 
 const UserValidator = require('../../../../common/user/userValidator')
 const User = require('../../../../common/user/user')
@@ -21,7 +21,7 @@ const inviteUser = async (user, surveyId, email, groupId) => {
     if (hasRoleInSurvey) {
       throw new SystemError('userHasRole')
     } else {
-      await AuthGroupManager.insertUserGroup(user, surveyId, groupId, newUserId)
+      await AuthManager.addUserToGroup(user, surveyId, groupId, newUserId)
       return dbUser
     }
   } else {

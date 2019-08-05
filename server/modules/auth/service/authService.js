@@ -9,6 +9,8 @@ const blacklistToken = async token =>{
 }
 
 module.exports = {
+  fetchGroupById: AuthManager.fetchGroupById,
+
   blacklistToken,
 
   findBlacklistedToken: AuthManager.findBlacklistedToken,

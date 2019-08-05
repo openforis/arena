@@ -12,10 +12,9 @@ const ActivityLog = require('../../activityLog/activityLogger')
 const insertUser = async (user, surveyId, email, groupId, client = db) =>
   client.tx(async t => {
     const newUser = await UserRepository.insertUser(surveyId, email, groupId, t)
-    const newUserId = User.getId(newUser)
-    await ActivityLog.log(user, surveyId, ActivityLog.type.userInvite, { email, id: newUserId }, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.userJoined, { email, id: User.getId(newUser) }, t)
 
-    await AuthManager.insertUserGroup(user, surveyId, groupId, newUserId, t)
+    await AuthManager.addUserToGroup(user, surveyId, groupId, User.getId(newUser), t)
 
     return newUser
   })

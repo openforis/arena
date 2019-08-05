@@ -40,8 +40,8 @@ const type = {
   nodeDelete: 'nodeDelete',
 
   // user
+  userJoined: 'userJoined',
   userInvite: 'userInvite',
-  userGroupInsert: 'userGroupInsert',
 }
 
 const keys = {
