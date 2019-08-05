@@ -1,14 +1,10 @@
 import './nodeDefEntityTable.scss'
 
-import React, { useEffect } from 'react'
-import * as R from 'ramda'
-
-import NodeDef from '../../../../../../../common/survey/nodeDef'
-import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
+import React from 'react'
 import Node from '../../../../../../../common/record/node'
 
-import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
+import NodeDefEntityTableRows from './nodeDefEntityTableRows'
 
 const NodeDefEntityTable = props => {
 
@@ -18,13 +14,6 @@ const NodeDefEntityTable = props => {
     updateNode,
     canEditRecord, canAddNode,
   } = props
-
-  useEffect(() => {
-    if (!R.isEmpty(nodes)) {
-      const element = document.getElementById(`${NodeDef.getUuid(nodeDef)}_${nodes.length - 1}`)
-      element.scrollIntoView()
-    }
-  }, [nodes && nodes.length])
 
   return (
     <div className="survey-form__node-def-entity-table">
@@ -52,36 +41,8 @@ const NodeDefEntityTable = props => {
         </NodeDefErrorBadge>
       </div>
 
+      <NodeDefEntityTableRows {...props}/>
 
-      <div className="survey-form__node-def-entity-table-rows">
-        {
-          (edit || !R.isEmpty(nodes)) &&
-          <NodeDefEntityTableRow
-            {...props}
-            node={null}
-            renderType={NodeDefLayout.nodeDefRenderType.tableHeader}/>
-        }
-
-        {
-          entry && !R.isEmpty(nodes) &&
-          <div className="survey-form__node-def-entity-table-data-rows">
-            {
-              nodes.map((node, i) =>
-                <NodeDefEntityTableRow
-                  key={i}
-                  i={i}
-                  {...props}
-                  node={node}
-                  nodes={null}
-                  renderType={NodeDefLayout.nodeDefRenderType.tableBody}
-                />
-              )
-            }
-          </div>
-
-        }
-
-      </div>
     </div>
   )
 }

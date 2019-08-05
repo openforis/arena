@@ -1,6 +1,6 @@
 import './components/nodeDefsSelectorView.scss'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -17,8 +17,11 @@ import * as SurveyState from '../../../survey/surveyState'
 
 const NodeDefsSelectorView = props => {
 
-  const [nodeDefUuidEntity, setNodeDefUuidEntity] = useState(props.nodeDefUuidEntity)
-  const [nodeDefUuidsAttributes, setNodeDefUuidsAttributes] = useState(props.nodeDefUuidsAttributes)
+  const {
+    nodeDefUuidsAttributes, nodeDefUuidEntity,
+    onChangeAttributes, onChangeEntity
+  } = props
+
   const [filterTypes, setFilterTypes] = useState([])
   const [showSettings, setShowSettings] = useState(false)
 
@@ -28,26 +31,8 @@ const NodeDefsSelectorView = props => {
     const fn = isDeleted ? R.remove(idx, 1) : R.append(nodeDefUuid)
 
     const newNodeDefUuidsAttributes = fn(nodeDefUuidsAttributes)
-    setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
-    props.onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
+    onChangeAttributes(newNodeDefUuidsAttributes, nodeDefUuid, isDeleted)
   }
-
-  useEffect(() => {
-    const newNodeDefUuidEntity = props.nodeDefUuidEntity
-    if (newNodeDefUuidEntity) {
-      setNodeDefUuidEntity(newNodeDefUuidEntity)
-    }
-  }, [props.nodeDefUuidEntity])
-
-  useEffect(() => {
-    if (nodeDefUuidEntity) {
-      props.onChangeEntity(nodeDefUuidEntity)
-
-      const newNodeDefUuidsAttributes = []
-      setNodeDefUuidsAttributes(newNodeDefUuidsAttributes)
-      props.onChangeAttributes(newNodeDefUuidsAttributes)
-    }
-  }, [nodeDefUuidEntity])
 
   const {
     surveyInfo,
@@ -72,7 +57,7 @@ const NodeDefsSelectorView = props => {
           hierarchy={hierarchy}
           lang={lang}
           nodeDefUuidEntity={nodeDefUuidEntity}
-          onChange={setNodeDefUuidEntity}
+          onChange={onChangeEntity}
         />
 
         {

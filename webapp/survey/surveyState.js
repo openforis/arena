@@ -38,9 +38,11 @@ const statusKeys = {
   defsDraftFetched: 'defsDraftFetched',
 }
 
-export const areDefsFetched = R.pathEq([survey, keys.status, statusKeys.defsFetched], true)
+const _areDefsFetched = R.pathEq([survey, keys.status, statusKeys.defsFetched], true)
 
-export const areDefsDraftFetched = R.pathEq([survey, keys.status, statusKeys.defsDraftFetched], true)
+const _areDefsDraftFetched = R.pathEq([survey, keys.status, statusKeys.defsDraftFetched], true)
+
+export const areDefsFetched = draft => state => _areDefsFetched(state) && _areDefsDraftFetched(state) === draft
 
 export const assocDefsFetched = draft => R.pipe(
   R.assoc(statusKeys.defsFetched, true),

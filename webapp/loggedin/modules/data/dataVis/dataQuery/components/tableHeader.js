@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import useI18n from '../../../../../../commonComponents/useI18n'
 
 import ExpressionEditorPopup from '../../../../../../commonComponents/expression/expressionEditorPopup'
-import TablePaginator from '../../../../../../commonComponents/table/tablePaginator'
+import TablePaginator from '../../../../../tableViews/components/tablePaginator'
 import SortEditor from './sort/sortEditor'
 import DownloadButton from '../../../../../../commonComponents/form/downloadButton'
 import Tooltip from '../../../../../../commonComponents/tooltip'

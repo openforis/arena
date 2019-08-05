@@ -19,7 +19,7 @@ button,
 
   /* Browsers have different default form fonts */
   font-size: .9rem;
-  font-family: inherit;
+  font-family: $fontFamily;
   letter-spacing: 1px;
   font-weight: inherit;
   word-wrap: break-word;
@@ -44,6 +44,7 @@ input {
 a {
   text-decoration: none;
   cursor: pointer;
+  transition: .2s all;
 }
 
 a:hover {
@@ -64,6 +65,7 @@ button, .btn {
   border: 1px solid $greyBorder;
   text-decoration: none;
   background-color: white;
+  transition: .2s all;
 
   &:hover {
     background-color: $greenLight;

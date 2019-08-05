@@ -1,5 +1,4 @@
 import axios from 'axios'
-import Promise from 'bluebird'
 import * as R from 'ramda'
 
 import * as SurveyState from '../../../../../survey/surveyState'
@@ -16,12 +15,6 @@ export const dataQueryTableDataColUpdate = 'dataQuery/table/data/col/update'
 export const dataQueryTableDataColDelete = 'dataQuery/table/data/col/delete'
 export const dataQueryTableFilterUpdate = 'dataQuery/table/filter/update'
 export const dataQueryTableSortUpdate = 'dataQuery/table/sort/update'
-
-const defaults = {
-  offset: 0,
-  limit: 15,
-  filter: null,
-}
 
 const getTableName = (state, nodeDefUuidTable) => {
   const survey = SurveyState.getSurvey(state)
@@ -40,7 +33,7 @@ const queryTable = (surveyId, editMode, nodeDefUuidTable, tableName, nodeDefUuid
       cols: JSON.stringify(cols),
       nodeDefUuidCols: JSON.stringify(nodeDefUuidCols),
       offset,
-      limit: defaults.limit,
+      limit: DataQueryState.defaults.limit,
       filter: filter ? JSON.stringify(filter) : null,
       sort: DataSort.toHttpParams(sort),
       editMode,
@@ -63,14 +56,8 @@ const fetchData = async (state, nodeDefUuidCols = null, offset = null, filter = 
   }
 }
 
-export const updateTableNodeDefUuid = nodeDefUuidTable => dispatch => {
+export const updateTableNodeDefUuid = nodeDefUuidTable => dispatch =>
   dispatch({ type: dataQueryTableNodeDefUuidUpdate, nodeDefUuidTable })
-  dispatch({
-    type: dataQueryTableDataUpdate,
-    offset: defaults.offset,
-    data: [],
-  })
-}
 
 export const updateTableNodeDefUuidCols = (nodeDefUuidCols, nodeDefUuidCol = null, nodeDefUuidColDeleted = false) =>
   async (dispatch, getState) => {
@@ -78,8 +65,11 @@ export const updateTableNodeDefUuidCols = (nodeDefUuidCols, nodeDefUuidCol = nul
 
     dispatch({ type: dataQueryTableNodeDefUuidColsUpdate, nodeDefUuidCols })
 
-    const newSort = DataSort.retainVariables(getColNames(state, nodeDefUuidCols))(DataQueryState.getTableSort(state))
-    dispatch({ type: dataQueryTableSortUpdate, sort: newSort })
+    const sort = DataQueryState.getTableSort(state)
+    const newSort = DataSort.retainVariables(getColNames(state, nodeDefUuidCols))(sort)
+    if (DataSort.toString(sort) !== DataSort.toString(newSort)) {
+      dispatch({ type: dataQueryTableSortUpdate, sort: newSort })
+    }
 
     const fetch = !R.isEmpty(nodeDefUuidCols) &&
       !!nodeDefUuidCol &&
@@ -120,7 +110,7 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
       const tableName = getTableName(state, nodeDefUuidTable)
       const cols = getColNames(state, nodeDefUuidCols)
 
-      const { offset, limit } = defaults
+      const { offset, limit } = DataQueryState.defaults
 
       const [countResp, dataResp] = await Promise.all([
         axios.post(

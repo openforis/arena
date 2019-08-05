@@ -107,9 +107,6 @@ class AutocompleteDialog extends React.Component {
 
   focusItem (index) {
     const itemEl = this.list.current.children[index]
-    if (!itemEl) {
-      console.log(index)
-    }
     itemEl.focus()
 
     this.focusedItemIndex = index

@@ -7,7 +7,7 @@ import SurveyDefsLoader from '../../surveyViews/surveyDefsLoader/surveyDefsLoade
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import SurveyFormView from '../../surveyViews/surveyForm/surveyFormView'
 import SurveyHierarchy from './surveyHierarchy/surveyHierarchy'
-import RecordView from '../data/records/components/recordView'
+import RecordView from '../../surveyViews/record/recordView'
 import CategoriesView from '../../surveyViews/categories/categoriesView'
 import TaxonomiesView from '../../surveyViews/taxonomies/taxonomiesView'
 

@@ -1,4 +1,3 @@
-const Promise = require('bluebird')
 const camelize = require('camelize')
 const db = require('../../../db/db')
 
@@ -8,15 +7,13 @@ const dbTransformCallback = camelize
 
 const insertGroup = async (authGroup, surveyId, client = db) =>
   await client.one(`
-    INSERT INTO auth_group (name, survey_id, permissions, labels, descriptions, record_steps)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO auth_group (name, survey_id, permissions, record_steps)
+    VALUES ($1, $2, $3, $4)
     RETURNING *`,
     [
       authGroup.name,
       surveyId,
       JSON.stringify(authGroup.permissions),
-      JSON.stringify(authGroup.labels),
-      JSON.stringify(authGroup.descriptions),
       JSON.stringify(authGroup.recordSteps),
     ],
     dbTransformCallback

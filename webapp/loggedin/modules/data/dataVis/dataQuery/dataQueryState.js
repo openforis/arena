@@ -5,6 +5,15 @@ import Record from '../../../../../../common/record/record'
 import Node from '../../../../../../common/record/node'
 import Validator from '../../../../../../common/validation/validator'
 
+export const defaults = {
+  offset: 0,
+  limit: 15,
+  data: [],
+  filter: null,
+  nodeDefUuidCols: [],
+  sort: [],
+}
+
 const getState = R.pipe(DataVisState.getState, R.prop('query'))
 
 const keys = {
@@ -47,8 +56,14 @@ const hasTable = R.pipe(getTableNodeDefUuidTable, R.isNil, R.not)
 const hasCols = R.pipe(getTableNodeDefUuidCols, R.isEmpty, R.not)
 export const hasTableAndCols = state => hasTable(state) && hasCols(state)
 
-export const assocNodeDefUuidTable = nodeDefUuidTable =>
-  R.assocPath([keys.table, tableKeys.nodeDefUuidTable], nodeDefUuidTable)
+// on nodeDefUuid table change, reset table data, sort and filter
+export const assocNodeDefUuidTable = nodeDefUuidTable => R.pipe(
+  R.assocPath([keys.table, tableKeys.nodeDefUuidTable], nodeDefUuidTable),
+  assocTableData(defaults.offset, defaults.data),
+  assocNodeDefUuidCols(defaults.nodeDefUuidCols),
+  assocTableSort(defaults.sort),
+  assocTableFilter(defaults.filter),
+)
 
 export const assocNodeDefUuidCols = (nodeDefUuidCols) =>
   R.assocPath([keys.table, tableKeys.nodeDefUuidCols], nodeDefUuidCols)

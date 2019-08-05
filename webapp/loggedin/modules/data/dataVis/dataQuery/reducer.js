@@ -1,7 +1,7 @@
 import { exportReducer } from '../../../../../utils/reduxUtils'
 
 import { appUserLogout } from '../../../../../app/actions'
-import { surveyDelete, surveyUpdate } from '../../../../../survey/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '../../../../../survey/actions'
 
 import {
   dataQueryTableNodeDefUuidUpdate,
@@ -32,20 +32,17 @@ import { nodesUpdate, validationsUpdate } from '../../../../surveyViews/record/a
 const actionHandlers = {
   [appUserLogout]: () => ({}),
 
+  [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [dataQueryTableNodeDefUuidUpdate]: (state, { nodeDefUuidTable }) =>
-    assocNodeDefUuidTable(nodeDefUuidTable)(state),
+  [dataQueryTableNodeDefUuidUpdate]: (state, { nodeDefUuidTable }) => assocNodeDefUuidTable(nodeDefUuidTable)(state),
 
-  [dataQueryTableNodeDefUuidColsUpdate]: (state, { nodeDefUuidCols }) =>
-    assocNodeDefUuidCols(nodeDefUuidCols)(state),
+  [dataQueryTableNodeDefUuidColsUpdate]: (state, { nodeDefUuidCols }) => assocNodeDefUuidCols(nodeDefUuidCols)(state),
 
-  [dataQueryTableDataColUpdate]: (state, { data }) =>
-    assocTableDataCol(data)(state),
+  [dataQueryTableDataColUpdate]: (state, { data }) => assocTableDataCol(data)(state),
 
-  [dataQueryTableDataColDelete]: (state, { cols }) =>
-    dissocTableDataCols(cols)(state),
+  [dataQueryTableDataColDelete]: (state, { cols }) => dissocTableDataCols(cols)(state),
 
   [dataQueryTableInit]: (
     state,

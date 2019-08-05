@@ -3,8 +3,7 @@ import axios from 'axios'
 import * as SurveyState from './surveyState'
 import * as AppState from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
-import { appUserPrefUpdate } from '../app/actions'
-import { showAppJobMonitor } from '../loggedin/appJob/actions'
+import { appUserPrefUpdate, showAppJobMonitor } from '../app/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
@@ -26,10 +25,7 @@ const fetchTaxonomies = (surveyId, draft = false, validate = false) =>
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
   const state = getState()
 
-  if (
-    !SurveyState.areDefsFetched(state) ||
-    (SurveyState.areDefsDraftFetched(state) !== draft)
-  ) {
+  if (!SurveyState.areDefsFetched(draft)(state)) {
 
     const surveyId = SurveyState.getSurveyId(state)
 

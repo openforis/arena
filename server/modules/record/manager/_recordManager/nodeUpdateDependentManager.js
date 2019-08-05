@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const Survey = require('../../../../../common/survey/survey')
 const NodeDef = require('../../../../../common/survey/nodeDef')
@@ -99,6 +98,7 @@ const updateDependentsDefaultValues = async (survey, record, node, tx) => {
             nodeCtxUuid,
             value,
             { [Node.metaKeys.defaultValue]: !R.isNil(exprEval) },
+            Record.isPreview(record),
             tx
           )
         }

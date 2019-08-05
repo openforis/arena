@@ -43,7 +43,7 @@ class RecordCheckJob extends Job {
       this.total = R.length(recordUuids)
 
       for (const recordUuid of recordUuids) {
-        const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, tx)
+        const record = await RecordManager.fetchRecordAndNodesByUuid(surveyId, recordUuid, true, tx)
         await this._checkRecord(survey, nodeDefsNew, nodeDefsUpdated, record, tx)
 
         this.incrementProcessedItems()

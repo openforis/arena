@@ -1,140 +1,93 @@
-import './style.scss'
+import './loginView.scss'
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import { withRouter } from 'react-router'
-import * as R from 'ramda'
 
-import { SignIn } from 'aws-amplify-react'
-import { Hub } from 'aws-amplify'
+import * as LoginState from './loginState'
 
-import { initUser } from '../app/actions'
+import { login } from './actions'
 
-const noCols = 12
-const noRows = 6
+const LoginView = (props) => {
 
-const noCells = noCols * noRows - 6 * 4 + 1
-const cells = R.range(0, noCells)
+  const { login, error } = props
 
-const ofLetters = {
-  1: 'O',
-  2: 'P',
-  3: 'E',
-  4: 'N',
-  6: 'F',
-  7: 'O',
-  8: 'R',
-  9: 'I',
-  10: 'S'
-}
+  const usernameRef = useRef(null)
+  const passwordRef = useRef(null)
 
-class LoginView extends SignIn {
+  return (
+    <React.Fragment>
 
-  constructor (props) {
-    super(props)
+      <div className="login__bg"/>
 
-    this.state = { errorMessage: null }
-  }
+      <div className="login__openforis">
+        <div className="openforis">
+          {
+            'open'.split('').map((letter, i) =>
+              <div key={i}>{letter}</div>
+            )
+          }
+          <div className="separator">∞</div>
+          {
+            'foris'.split('').map((letter, i) =>
+              <div key={i}>{letter}</div>
+            )
+          }
+        </div>
+        <div className="arena">
+          {
+            'arena'.split('').map((letter, i) =>
+              <div key={i}>{letter}</div>
+            )
+          }
+        </div>
+      </div>
 
-  resetState () {
-    this.setState({ errorMessage: null })
-  }
-
-  componentDidMount () {
-    Hub.listen('auth', async data => {
-      const { payload } = data
-      switch (data.payload.event) {
-
-        case 'signIn':
-          this.props.initUser()
-          this.resetState()
-          break
-        // case 'signUp':
-        //   // logger.error('user signed up');
-        //   break
-        case 'signOut':
-          this.props.history.push('/')
-          break
-        case 'signIn_failure':
-          this.setState({ errorMessage: payload.data.message })
-          // logger.error('user sign in failed');
-          break
-        // case 'configured':
-        //   // logger.error('the Auth module is configured');
-        //   break
+      {
+        error &&
+        <div className="login-form__error text-center">{error}</div>
       }
 
-    })
-  }
+      <div className="login-form">
 
-  render () {
-    const { errorMessage } = this.state
+        <input ref={usernameRef}
+               type='text'
+               name='username'
+               className="login-form__input"
+               placeholder='Your email'/>
 
-    return (
-      this.props.authState === 'signIn' &&
-      <React.Fragment>
+        <input ref={passwordRef}
+               type='password'
+               name='password'
+               className="login-form__input"
+               placeholder='Your password'/>
 
-        <div className="login__bg1 login"/>
-        <div className="login__bg2 login"/>
-        <div className="login__bg-overlay"/>
-
-        <div className="login__container">
-
-          <div className="login__grid">
-            {
-              cells.map(i => {
-                const isLoginContainer = i === 15
-                const ofLetter = ofLetters[i]
-                return (
-                  <div key={i}
-                       className={`${isLoginContainer ? 'login-form__container' : 'login__grid-cell'}`}>
-                    {
-                      isLoginContainer
-                        ? (
-                          <div className="login-form">
-
-                            <input ref="username" type='text' name='username' placeholder='Your email'
-                                   onChange={this.handleInputChange}/>
-                            <input ref="password" type='password' name='password' placeholder='Your password'
-                                   onChange={this.handleInputChange}/>
-                            {
-                              errorMessage
-                                ? <div className="login-form__error-msg text-center">{errorMessage}</div>
-                                : null
-                            }
-                            <div className="buttons">
-                              <button type="button"
-                                      className="btn btn-login"
-                                      onClick={() => super.signIn()}>
-                                Login
-                              </button>
-                              <button type="button" className="btn btn-s btn-forgot-pwd">
-                                <span className="icon icon-question icon-left icon-12px"/>
-                                Forgot Password
-                              </button>
-                            </div>
-
-                          </div>
-                        )
-                        : <div className={ofLetter ? 'of-letter' : ''}>{ofLetter}</div>
-                    }
-                  </div>
-                )
-              })
-
-            }
-          </div>
-
+        <div className="login-form__buttons">
+          <button type="button"
+                  className="btn btn-login"
+                  onClick={() => login(usernameRef.current.value, passwordRef.current.value)}>
+            Login
+          </button>
+          <button type="button" className="btn btn-s btn-transparent btn-forgot-pwd">
+            <span className="icon icon-question icon-left icon-12px"/>
+            Forgot Password
+          </button>
         </div>
-      </React.Fragment>
-    )
-  }
+
+      </div>
+
+    </React.Fragment>
+  )
 }
+
+const mapStateToProps = state => ({
+  error: LoginState.getError(state)
+})
 
 const enhance = compose(
   withRouter,
-  connect(null, { initUser })
+  connect(mapStateToProps, { login })
 )
 
 export default enhance(LoginView)

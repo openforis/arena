@@ -34,6 +34,8 @@ module.exports = async () => {
 
   app.use(compression({ threshold: 512 }))
 
+  app.use(/^\/$/, (req, res) => res.redirect('/app/home'))
+
   app.use('/', express.static(`${__dirname}/../../dist`))
   app.use('/app*', express.static(`${__dirname}/../../dist`))
   app.use('/img/', express.static(`${__dirname}/../../web-resources/img`))

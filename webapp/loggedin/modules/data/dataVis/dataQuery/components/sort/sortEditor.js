@@ -8,6 +8,7 @@ import * as DataSort from '../../../../../../../../common/surveyRdb/dataSort'
 
 import Popup from '../../../../../../../commonComponents/popup'
 import * as ExpressionVariables from '../../../../../../../commonComponents/expression/expressionVariables'
+import { usePrevious } from '../../../../../../../commonComponents/hooks'
 
 import SortRow from './sortRow'
 
@@ -21,22 +22,17 @@ const SortExpressionComponent = props => {
 
   const { lang } = useI18n()
 
-  const { nodeDefUuidCols, onClose } = props
+  const { onClose } = props
 
   const [sortCriteria, setSortCriteria] = useState(props.sort)
+
+  // keep reference of old sortCriteria
+  const sortCriteriaStrPrev = usePrevious(DataSort.toString(props.sort), '')
+
   const [unchosenVariables, setUnchosenVariables] = useState([])
   const [updated, setUpdated] = useState(false)
 
   useEffect(() => { refreshUnchosenVariables() }, [sortCriteria])
-
-  useEffect(() => {
-    // Only show selected variables in the dropdown menu
-    // Reset available variables and remove unavailable variables from criteria
-    const availableVariables = getAvailableVariables(props, lang)
-    const newSortCriteria = DataSort.getNewCriteria(availableVariables)(sortCriteria)
-
-    setSortCriteria(newSortCriteria)
-  }, [nodeDefUuidCols])
 
   const onSelectVariable = (pos, variable) => {
     setSortCriteria(DataSort.updateVariable(pos, variable)(sortCriteria))
@@ -65,7 +61,9 @@ const SortExpressionComponent = props => {
   const applyAndClose = (sortCriteria) => {
     const { onChange, onClose } = props
 
-    onChange && onChange(sortCriteria)
+    if (DataSort.toString(sortCriteria) !== sortCriteriaStrPrev) {
+      onChange && onChange(sortCriteria)
+    }
     onClose()
   }
 

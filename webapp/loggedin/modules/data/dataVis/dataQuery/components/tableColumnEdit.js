@@ -44,6 +44,7 @@ class TableColumnEdit extends React.Component {
           updateNode={updateNode}
           removeNode={removeNode}
           createNodePlaceholder={createNodePlaceholder}
+          windowed={false}
         />
       )
     } else {

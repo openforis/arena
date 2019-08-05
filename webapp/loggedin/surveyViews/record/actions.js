@@ -5,6 +5,7 @@ import { debounceAction } from '../../../utils/reduxUtils'
 
 import Record from '../../../../common/record/record'
 import Node from '../../../../common/record/node'
+import NodeRefData from '../../../../common/record/nodeRefData'
 
 import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
@@ -72,12 +73,13 @@ export const createNodePlaceholder = (nodeDef, parentNode, defaultValue) =>
  * ============
  */
 
-export const updateNode = (nodeDef, node, value, file = null, meta = {}) => dispatch => {
+export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData = null) => dispatch => {
 
   const nodeToUpdate = R.pipe(
     R.dissoc(Node.keys.placeholder),
     Node.assocValue(value),
     Node.mergeMeta(meta),
+    NodeRefData.assocRefData(refData),
     R.assoc(Node.keys.dirty, true),
   )(node)
 
@@ -146,11 +148,12 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
  * Check in / check out record
  * ============
  */
-export const checkInRecord = (recordUuid, entityUuid) => async (dispatch, getState) => {
+export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data } = await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkin`)
-
-  const record = data.record
+  const { data: { record } } = await axios.post(
+    `/api/survey/${surveyId}/record/${recordUuid}/checkin`,
+    { draft }
+  )
 
   // this is used by dataQuery when user is editing a specific entity
   if (entityUuid) {

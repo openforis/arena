@@ -28,18 +28,16 @@ const plugins = [
   new HtmlWebpackPlugin({
     template: './web-resources/index.html'
   }),
-  new webpack.DefinePlugin(
-    {
-      __SYSTEM_VERSION__: `"${versionString}"`,
-      __BUST__: `"${uuidv4()}"`,
-      __COGNITO_REGION__: JSON.stringify(process.env.COGNITO_REGION),
-      __COGNITO_USER_POOL_ID__: JSON.stringify(process.env.COGNITO_USER_POOL_ID),
-      __COGNITO_CLIENT_ID__: JSON.stringify(process.env.COGNITO_CLIENT_ID),
-      'process.env': {
-        'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-      }
+  new webpack.DefinePlugin({
+    __SYSTEM_VERSION__: `"${versionString}"`,
+    __BUST__: `"${uuidv4()}"`,
+    __COGNITO_REGION__: JSON.stringify(process.env.COGNITO_REGION),
+    __COGNITO_USER_POOL_ID__: JSON.stringify(process.env.COGNITO_USER_POOL_ID),
+    __COGNITO_CLIENT_ID__: JSON.stringify(process.env.COGNITO_CLIENT_ID),
+    'process.env': {
+      'NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }
-  ),
+  }),
   new GoogleFontsPlugin({
     fonts: [{
       family: 'Montserrat',
@@ -57,7 +55,7 @@ if (buildReport) {
 
 // ====== webpack config
 const webPackConfig = {
-  entry: ['core-js/stable', 'regenerator-runtime/runtime', './webapp/main.js'],
+  entry: ['./webapp/main.js'],
   mode: prodBuild ? mode.production : mode.development,
   output: {
     filename: 'bundle-[hash].js',

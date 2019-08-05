@@ -1,5 +1,4 @@
 const R = require('ramda')
-const Promise = require('bluebird')
 
 const Queue = require('../../../../../common/queue')
 
@@ -32,7 +31,7 @@ const persistNode = async (user, survey, record, node, t) => {
       ...Node.getMeta(node),
       [Node.metaKeys.defaultValue]: false
     }
-    const nodeUpdate = await NodeRepository.updateNode(surveyId, nodeUuid, nodeValue, meta, t)
+    const nodeUpdate = await NodeRepository.updateNode(surveyId, nodeUuid, nodeValue, meta, Record.isPreview(record), t)
 
     record = Record.assocNode(nodeUpdate)(record)
 
@@ -117,7 +116,7 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
     await ActivityLog.log(user, surveyId, ActivityLog.type.nodeCreate, nodeToInsert, t)
 
   // insert node
-  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, t)
+  const node = await NodeRepository.insertNode(surveyId, nodeToInsert, Record.isPreview(record), t)
 
   record = Record.assocNode(node)(record)
 

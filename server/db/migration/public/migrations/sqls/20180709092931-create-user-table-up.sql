@@ -2,7 +2,7 @@ CREATE TABLE
   "user"
 (
   id                    BIGSERIAL     NOT NULL,
-  cognito_username      VARCHAR       NOT NULL,
+  cognito_username      VARCHAR,
   name                  VARCHAR(1024) NOT NULL,
   email                 VARCHAR(1024) NOT NULL,
   prefs                 jsonb DEFAULT '{}'::jsonb,

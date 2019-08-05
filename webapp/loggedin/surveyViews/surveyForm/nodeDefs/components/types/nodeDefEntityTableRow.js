@@ -1,15 +1,15 @@
 import React from 'react'
 
-import NodeDefSwitch from '../../nodeDefSwitch'
+import NodeDefEntityTableCell from './nodeDefEntityTableCell'
 import NodeDeleteButton from '../nodeDeleteButton'
 
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
-import * as NodeDefUiProps from '../../nodeDefUIProps'
 
 import { elementOffset } from '../../../../../../../webapp/utils/domUtils'
 
 class NodeDefEntityTableRow extends React.Component {
+
   constructor (props) {
     super(props)
 
@@ -74,18 +74,13 @@ class NodeDefEntityTableRow extends React.Component {
   render () {
 
     const {
-      nodeDef, childDefs, node,
-      renderType,
+      nodeDef, nodeDefColumns, node,
+      canEditRecord, canEditDef,
+      renderType, i = 'header',
       removeNode,
-      i = 'header',
-      canEditRecord,
-      canEditDef,
     } = this.props
 
     const { dragged } = this.state
-
-    const orderedUuids = NodeDefLayout.getLayout(nodeDef)
-    const orderedChildDefs = orderedUuids.map(uuid => childDefs.find(def => def.uuid === uuid)).filter(d => d)
 
     const className = `survey-form__node-def-entity-table-row` +
       (renderType === NodeDefLayout.nodeDefRenderType.tableHeader ? '-header' : '') +
@@ -97,31 +92,20 @@ class NodeDefEntityTableRow extends React.Component {
            id={`${NodeDef.getUuid(nodeDef)}_${i}`}>
 
         {
-          orderedChildDefs
-            .map(childDef => {
-              const { length } = NodeDefUiProps.getNodeDefFormFields(childDef)
-              const childDefUuid = NodeDef.getUuid(childDef)
-
-              return (
-                <div key={childDefUuid}
-                     data-uuid={childDefUuid}
-                     className="react-grid-item draggable-item"
-                     style={{ width: 160 * length + 'px' }}
-                     onMouseDown={e => e.stopPropagation()}
-                     draggable={canEditDef}
-                     onDragStart={e => this.dragStart(e)}
-                     onDragOver={e => this.dragOver(e)}
-                     onDragEnd={e => this.dragEnd(e)}>
-                  <NodeDefSwitch
-                    {...this.props}
-                    node={null}
-                    nodeDef={childDef}
-                    parentNode={node}
-                    renderType={renderType}
-                  />
-                </div>
-              )
-            })
+          nodeDefColumns
+            .map(nodeDefChild => (
+              <NodeDefEntityTableCell
+                key={NodeDef.getUuid(nodeDefChild)}
+                {...this.props}
+                nodeDef={nodeDefChild}
+                parentNode={node}
+                canEditDef={canEditDef}
+                renderType={renderType}
+                onDragStart={e => this.dragStart(e)}
+                onDragOver={e => this.dragOver(e)}
+                onDragEnd={e => this.dragEnd(e)}
+              />
+            ))
         }
 
         <div

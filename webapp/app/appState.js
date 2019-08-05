@@ -12,6 +12,7 @@ export const keys = {
   errors: 'errors',
   systemError: 'systemError',
   sideBarOpened: 'sideBarOpened',
+  loaderVisible: 'loaderVisible',
 
   // activeJob keys
   onComplete: 'onComplete',
@@ -54,7 +55,7 @@ export const assocSurveyAdminGroup = surveyInfo =>
     }
   }
 
-// On survey delete, diccos survey from user
+// On survey delete, dissoc survey from user
 export const dissocSurveyGroups = surveyId =>
   appState => {
     const user = R.prop(keys.user, appState)
@@ -90,7 +91,7 @@ export const updateActiveJob = job =>
     )(state)
     : R.dissoc(keys.activeJob)(state)
 
-export const getActiveJobOnCompleteCallback = R.propOr(null, keys.onComplete)
+export const getActiveJobOnCompleteCallback = R.pipe(getActiveJob, R.defaultTo({}), R.propOr(null, keys.onComplete))
 
 // ==== APP I18N
 export const getI18n = R.pipe(getState, R.prop(keys.i18n))
@@ -122,3 +123,7 @@ export const dissocAppError = error => R.dissocPath([keys.errors, error.id + '']
 export const assocSystemError = (error) => R.assoc(keys.systemError, error)
 
 export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
+
+// ==== App Loader
+
+export const isLoaderVisible = R.pipe(getState, R.propEq(keys.loaderVisible, true))

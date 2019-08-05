@@ -2,10 +2,12 @@ const R = require('ramda')
 const camelize = require('camelize')
 
 const db = require('../../../db/db')
-const { now, insertAllQuery } = require('../../../db/dbUtils')
+const DbUtils = require('../../../db/dbUtils')
 
 const Node = require('../../../../common/record/node')
 const { getSurveyDBSchema, disableSurveySchemaTableTriggers, enableSurveySchemaTableTriggers } = require('../../survey/repository/surveySchemaRepositoryUtils')
+
+// ============== UTILS
 
 //camelize all but "meta"
 const dbTransformCallback = node =>
@@ -17,27 +19,68 @@ const dbTransformCallback = node =>
     )(node)
     : null
 
+const getNodeSelectQuery = (surveyId, draft) => {
+  const schema = getSurveyDBSchema(surveyId)
+
+  const propsTaxon = DbUtils.getPropsCombined(draft, 't.', false)
+  const propsVernacularName = DbUtils.getPropsCombined(draft, 'v.', false)
+  const propsCategoryItem = DbUtils.getPropsCombined(draft, 'c.', false)
+
+  return `
+    SELECT
+        n.*,
+        CASE
+            WHEN n.value->>'taxonUuid' IS NOT NULL
+            THEN json_build_object( 'taxon',json_build_object('id',t.id, 'uuid',t.uuid, 'taxonomy_uuid',t.taxonomy_uuid, 'props',${propsTaxon}, 'vernacular_name_uuid',v.uuid, 'vernacular_language',(${propsVernacularName})->>'lang', 'vernacular_name',(${propsVernacularName})->>'name') )
+            WHEN n.value->>'itemUuid' IS NOT NULL
+            THEN json_build_object( 'category_item',json_build_object('id',c.id, 'uuid',c.uuid, 'level_uuid',c.level_uuid, 'parent_uuid',c.parent_uuid, 'props',${propsCategoryItem}) )
+            ELSE NULL
+        END AS ref_data
+    FROM
+        ${schema}.node n
+    LEFT OUTER JOIN
+        ${schema}.category_item c
+    ON
+        (n.value->>'${Node.valuePropKeys.itemUuid}')::uuid = c.uuid
+    LEFT OUTER JOIN
+        ${schema}.taxon t
+    ON
+        (n.value->>'${Node.valuePropKeys.taxonUuid}')::uuid = t.uuid
+    LEFT OUTER JOIN
+        ${schema}.taxon_vernacular_name v
+    ON
+        (n.value->>'${Node.valuePropKeys.vernacularNameUuid}')::uuid = v.uuid`
+}
+
 // ============== CREATE
 
-const insertNode = (surveyId, node, client = db) => {
+const insertNode = async (surveyId, node, draft, client = db) => {
   const meta = {
     ...Node.getMeta(node),
     [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
     [Node.metaKeys.childApplicability]: {}
   }
 
-  return client.one(`
-      INSERT INTO ${getSurveyDBSchema(surveyId)}.node
+  await client.query(`
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.node
         (uuid, record_uuid, parent_uuid, node_def_uuid, value, meta)
-        VALUES ($1, $2, $3, $4, $5, $6::jsonb)
-        RETURNING *, true as ${Node.keys.created}
-      `, [Node.getUuid(node), Node.getRecordUuid(node), Node.getParentUuid(node), Node.getNodeDefUuid(node), stringifyValue(Node.getValue(node, null)), meta],
+    VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+    `,
+    [Node.getUuid(node), Node.getRecordUuid(node), Node.getParentUuid(node), Node.getNodeDefUuid(node), stringifyValue(Node.getValue(node, null)), meta],
+  )
+
+  const nodeAdded = await client.one(`
+    ${getNodeSelectQuery(surveyId, draft)}
+    WHERE n.uuid = $1
+  `,
+    Node.getUuid(node),
     dbTransformCallback
   )
+  return { ...nodeAdded, [Node.keys.created]: true }
 }
 
 const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
-  await client.none(insertAllQuery(
+  await client.none(DbUtils.insertAllQuery(
     getSurveyDBSchema(surveyId),
     'node',
     ['uuid', 'date_created', 'date_modified', 'record_uuid', 'parent_uuid', 'node_def_uuid', 'value', 'meta'],
@@ -46,11 +89,11 @@ const insertNodesFromValues = async (surveyId, nodeValues, client = db) =>
 
 // ============== READ
 
-const fetchNodesByRecordUuid = async (surveyId, recordUuid, client = db) =>
+const fetchNodesByRecordUuid = async (surveyId, recordUuid, draft, client = db) =>
   await client.map(`
-    SELECT * FROM ${getSurveyDBSchema(surveyId)}.node
-    WHERE record_uuid = $1
-    ORDER BY date_created`,
+    ${getNodeSelectQuery(surveyId, draft)}
+    WHERE n.record_uuid = $1
+    `,
     [recordUuid],
     dbTransformCallback
   )
@@ -83,17 +126,24 @@ const fetchChildNodeByNodeDefUuid = async (surveyId, recordUuid, nodeUuid, child
 }
 
 // ============== UPDATE
-const updateNode = async (surveyId, nodeUuid, value, meta = {}, client = db) =>
-  await client.one(`
+const updateNode = async (surveyId, nodeUuid, value, meta = {}, draft, client = db) => {
+  await client.query(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1,
     meta = meta || $2::jsonb, 
-    date_modified = ${now}
+    date_modified = ${DbUtils.now}
     WHERE uuid = $3
-    RETURNING *, true as ${Node.keys.updated}
-    `, [stringifyValue(value), meta, nodeUuid],
+    `, [stringifyValue(value), meta, nodeUuid]
+  )
+  const node = await client.one(`
+    ${getNodeSelectQuery(surveyId, draft)}
+    WHERE n.uuid = $1
+  `,
+    nodeUuid,
     dbTransformCallback
   )
+  return { ...node, [Node.keys.updated]: true }
+}
 
 const updateChildrenApplicability = async (surveyId, parentNodeUuid, childDefUuid, applicable, client = db) =>
   await client.one(`

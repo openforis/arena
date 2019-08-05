@@ -17,11 +17,14 @@ module.exports = {
     done: 'Done',
     download: 'Download',
     edit: 'Edit',
+    email: 'Email',
     empty: 'Empty',
     error: 'Error',
     error_plural: 'Errors',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
+    group: 'Group',
+    id: 'id',
     invalid: 'INVALID',
     item: 'Item',
     item_plural: 'Items',
@@ -31,6 +34,8 @@ module.exports = {
     manage: 'Manage',
     name: 'Name',
     new: 'New',
+    no: 'No',
+    noItems: `$t(common.no) $t(common.item,{'count':2})`,
     of: 'of',
     required: 'Required',
     reset: 'Reset',
@@ -39,23 +44,7 @@ module.exports = {
     undefinedName: 'Undefined name',
     upload: 'Upload',
     view: 'View',
-  },
-
-  appModules: {
-    home: 'Home',
-    dashboard: 'Dashboard',
-    surveyList: 'My Surveys',
-    collectImportReport: 'Collect Import Report',
-
-    designer: 'Survey',
-    formDesigner: 'Form Designer',
-    surveyHierarchy: 'Hierarchy',
-    categories: 'Categories',
-    taxonomies: 'Taxonomies',
-
-    data: 'Data',
-    records: 'Records',
-    dataVis: 'Data vis',
+    yes: 'Yes',
   },
 
   sidebar: {
@@ -76,6 +65,32 @@ module.exports = {
     taxon: 'Taxon',
     file: 'File',
     entity: 'Entity',
+  },
+
+  // ====== App modules and views
+
+  appModules: {
+    home: 'Home',
+    dashboard: 'Dashboard',
+    surveyList: 'My Surveys',
+    collectImportReport: 'Collect Import Report',
+
+    designer: 'Survey',
+    formDesigner: 'Form Designer',
+    surveyHierarchy: 'Hierarchy',
+    categories: 'Categories',
+    taxonomies: 'Taxonomies',
+
+    data: 'Data',
+    records: 'Records',
+    dataVis: 'Data vis',
+
+    users: 'Users',
+    userList: 'User list',
+  },
+
+  surveyDefsLoader: {
+    requireSurveyPublish: 'This section is available when survey is published',
   },
 
   data: {
@@ -126,10 +141,21 @@ module.exports = {
     },
   },
 
+  designerView: {
+    formPreview: 'Form preview',
+  },
+
+  usersView: {
+    inviteUser: 'Invite',
+    accepted: 'Accepted',
+  },
+
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',
   },
+
+  // ====== Survey views
 
   nodeDefEdit: {
     basic: 'Basic',
@@ -162,20 +188,8 @@ module.exports = {
     },
   },
 
-  designerView: {
-    formPreview: 'Form preview',
-  },
-
   languagesEditor: {
     languages: 'Language(s)',
-  },
-
-  expressionEditor: {
-    and: 'AND',
-    or: 'OR',
-    group: 'Group',
-    var: 'Var',
-    const: 'Const',
   },
 
   surveyForm: {
@@ -209,8 +223,9 @@ module.exports = {
       select: 'Select',
     },
     nodeDefTaxon: {
-      scientificName: 'Scientific Name',
-      vernacularName: 'Vernacular Name',
+      code: '$t(common.code)',
+      scientificName: 'Scientific name',
+      vernacularName: 'Vernacular name',
     },
     step: {
       entry: 'Entry',
@@ -228,7 +243,7 @@ module.exports = {
       taxaNotImported: 'Taxa not imported',
       family: 'Family',
       genus: 'Genus',
-      scientificName: 'Scientific name',
+      scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
     },
   },
 
@@ -240,6 +255,25 @@ module.exports = {
     deleteItem: 'Delete item',
   },
 
+  formErrors: {
+    defaultValuesNotSpecified: 'Default value not specified',
+    duplicate: 'Duplicate',
+    duplicateEntity: 'Duplicate entity',
+    duplicateRecord: 'Duplicate record key',
+    empty: '$t(common.empty)',
+    exceedingMax: 'Exceeding max',
+    invalidName: 'Invalid name',
+    invalidNumber: 'Invalid number',
+    invalidType: 'Invalid type',
+    invalidValue: 'Invalid value',
+    keyword: 'Keyword',
+    maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
+    minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
+    required: '$t(common.required)',
+    zeroOrNegative: 'Zero or negative',
+  },
+
+  // ====== Jobs
   jobs: {
     CategoriesImportJob: 'Categories Import',
     CategoriesValidationJob: 'Categories Validation',
@@ -263,31 +297,16 @@ module.exports = {
     TaxonomyImportJob: 'Taxonomy Import',
   },
 
-  formErrors: {
-    defaultValuesNotSpecified: 'Default value not specified',
-    duplicate: 'Duplicate',
-    duplicateEntity: 'Duplicate entity',
-    duplicateRecord: 'Duplicate record key',
-    empty: '$t(common.empty)',
-    exceedingMax: 'Exceeding max',
-    invalidName: 'Invalid name',
-    invalidNumber: 'Invalid number',
-    invalidType: 'Invalid type',
-    invalidValue: 'Invalid value',
-    keyword: 'Keyword',
-    maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
-    minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
-    required: '$t(common.required)',
-    zeroOrNegative: 'Zero or negative',
-  },
-
   jobErrors: {
     generic: '{{text}}',
     empty: '$t(common.empty)',
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
     duplicateName: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
     duplicateCode: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
+    defaultValuesNotSpecified: '$t(formErrors.defaultValuesNotSpecified)',
   },
+
+  // ====== App Errors
 
   appErrors: {
     generic: '{{text}}',
@@ -309,5 +328,48 @@ module.exports = {
 
   systemErrors: {
     somethingWentWrong: 'Oooops! Something went wrong. Try to refresh the page.'
-  }
+  },
+
+  // ====== Common components
+
+  expressionEditor: {
+    and: 'AND',
+    or: 'OR',
+    group: 'Group',
+    var: 'Var',
+    const: 'Const',
+  },
+
+  // ====== Auth
+
+  authGroups: {
+    systemAdmin: {
+      label: 'System Administrators',
+      description: 'OF Arena system administrators',
+    },
+    surveyAdmin: {
+      label: 'Survey administrators',
+      description: 'Full rights',
+    },
+    surveyEditor: {
+      label: 'Survey editors',
+      description: 'Can edit survey, records, invite users',
+    },
+    dataEditor: {
+      label: 'Data editors',
+      description: 'Can edit records in data entry step',
+    },
+    dataCleanser: {
+      label: 'Data cleansers',
+      description: 'Can edit records in data cleansing step',
+    },
+    dataAnalyst: {
+      label: 'Data analysts',
+      description: 'Can edit records in data analysis step',
+    },
+    surveyGuest: {
+      label: 'System guest',
+      description: 'Can view records',
+    },
+  },
 }

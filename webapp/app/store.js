@@ -2,7 +2,10 @@ import { applyMiddleware, combineReducers, createStore } from 'redux'
 
 // == app reducer
 import app from './reducer'
+import login from '../login/reducer'
 import survey from '../survey/reducer'
+
+import * as LoginState from '../login/loginState'
 
 import createDebounce from 'redux-debounced'
 import thunkMiddleware from 'redux-thunk'
@@ -11,6 +14,7 @@ import { isEnvDevelopment } from '../../common/processUtils'
 
 const appReducer = {
   app,
+  [LoginState.stateKey]: login,
   survey,
 }
 
@@ -24,7 +28,7 @@ const createReducer = asyncReducers => (
 const middlewares = [createDebounce(), thunkMiddleware, appErrorsMiddleware]
 
 if (isEnvDevelopment()) {
-  const {logger} = require('redux-logger')
+  const { logger } = require('redux-logger')
 
   middlewares.push(logger)
 }
