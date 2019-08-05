@@ -30,7 +30,7 @@ const Button = (props) => {
 }
 
 const NodeDefBoolean = props => (
-  <div className="flex-center">
+  <div className="survey-form__node-def-boolean">
 
     <Button {...props}
             disabled={props.edit}
