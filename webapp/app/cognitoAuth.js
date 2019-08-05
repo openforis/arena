@@ -10,28 +10,47 @@ const getUser = () => {
   return pool.getCurrentUser()
 }
 
-export const login = (Username, Password) => new Promise((resolve, reject) => {
+// Global variables to handle completeNewPasswordChallenge flow
+let cognitoUser
 
-  const authenticationData = { Username, Password }
-  const authenticationDetails = new AuthenticationDetails(authenticationData)
+const cognitoCallbacks = (resolve, reject) => ({
+  onSuccess: result => {
+    resolve({ type: 'success' })
+  },
+  onFailure: error => {
+    reject(error)
+  },
+  newPasswordRequired: (userAttributes) => {
+    // the api doesn't accept this field back
+    delete userAttributes.email_verified
 
-  const Pool = getUserPool()
-  const userData = { Username, Pool }
-  const cognitoUser = new CognitoUser(userData)
-
-  cognitoUser.authenticateUser(
-    authenticationDetails,
-    {
-      onSuccess: result => {
-        const jwtToken = result.getAccessToken().getJwtToken()
-        resolve(jwtToken)
-      },
-      onFailure: error => {
-        reject(error)
-      }
-    }
-  )
+    resolve({ type: 'newPasswordRequired', user: userAttributes })
+  }
 })
+
+export const login = (Username, Password) =>
+  new Promise((resolve, reject) => {
+    const authenticationData = { Username, Password }
+    const authenticationDetails = new AuthenticationDetails(authenticationData)
+
+    const Pool = getUserPool()
+    const userData = { Username, Pool }
+
+    cognitoUser = new CognitoUser(userData)
+    cognitoUser.authenticateUser(
+      authenticationDetails,
+      cognitoCallbacks(resolve, reject)
+    )
+  })
+
+export const setNewPassword = (password, user) =>
+  new Promise((resolve, reject) => {
+    cognitoUser.completeNewPasswordChallenge(
+      password,
+      user,
+      cognitoCallbacks(resolve, reject)
+    )
+  })
 
 export const logout = () => {
   const user = getUser()

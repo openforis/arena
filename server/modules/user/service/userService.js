@@ -25,8 +25,8 @@ const inviteUser = async (user, surveyId, email, groupId) => {
       return dbUser
     }
   } else {
-    const newUser = await UserManager.insertUser(user, surveyId, email, groupId)
-    await aws.inviteUser(email)
+    const { User: { Username: cognitoUsername } } = await aws.inviteUser(email)
+    const newUser = await UserManager.insertUser(user, surveyId, cognitoUsername, email, groupId)
 
     return newUser
   }
@@ -42,6 +42,8 @@ module.exports = {
   findUserById: UserManager.findUserById,
 
   fetchUserByCognitoUsername: UserManager.fetchUserByCognitoUsername,
+
+  updateUsername: UserManager.updateUsername,
 
   updateUserPref: UserManager.updateUserPref,
 

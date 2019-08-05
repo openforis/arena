@@ -25,7 +25,7 @@ const getEmail = R.prop(keys.email)
 const getAuthGroups = R.prop(keys.authGroups)
 
 const hasAccepted = R.pipe(
-  R.propOr('', keys.cognitoUsername),
+  R.propOr('', keys.name),
   StringUtils.isNotBlank
 )
 

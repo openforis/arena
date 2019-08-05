@@ -9,11 +9,11 @@ const ActivityLog = require('../../activityLog/activityLogger')
 
 // ==== CREATE
 
-const insertUser = async (user, surveyId, email, groupId, client = db) =>
+const insertUser = async (user, surveyId, cognitoUsername, email, groupId, client = db) =>
   client.tx(async t => {
-    const newUser = await UserRepository.insertUser(surveyId, email, groupId, t)
+    const newUser = await UserRepository.insertUser(surveyId, cognitoUsername, email, t)
     const newUserId = User.getId(newUser)
-    await ActivityLog.log(user, surveyId, ActivityLog.type.userInvite, { email, id: newUserId }, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.userInvite, { email, id: newUserId, cognitoUsername }, t)
 
     await AuthManager.insertUserGroup(user, surveyId, groupId, newUserId, t)
 
@@ -58,6 +58,8 @@ module.exports = {
   fetchUserByEmail,
 
   // UPDATE
+  updateUsername: UserRepository.updateUsername,
+
   updateUserPref: UserRepository.updateUserPref,
 
   // DELETE

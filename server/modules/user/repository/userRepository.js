@@ -2,6 +2,8 @@ const db = require('../../../db/db')
 
 const camelize = require('camelize')
 
+const User = require('../../../../common/user/user')
+
 const selectFields = ['id', 'name', 'email', 'prefs']
 const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
@@ -9,12 +11,12 @@ const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 // CREATE
 
-const insertUser = async (surveyId, email, group, client = db) =>
+const insertUser = async (surveyId, cognitoUsername, email, client = db) =>
   await client.one(`
-    INSERT INTO "user" AS u (email, prefs)
-    VALUES ($1, $2::jsonb)
+    INSERT INTO "user" AS u (cognito_username, email, prefs)
+    VALUES ($1, $2, $3::jsonb)
     RETURNING ${selectFieldsCommaSep}`,
-    [email, { survey: surveyId }])
+    [cognitoUsername, email, { survey: surveyId }])
 
 // READ
 
@@ -58,6 +60,14 @@ const fetchUserByEmail = async (email, client = db) =>
 
 // ==== UPDATE
 
+const updateUsername = async (user, name, client = db) =>
+  client.one(`
+    UPDATE "user"  u
+    SET name = $1
+    WHERE u.id = $2
+    RETURNING ${selectFieldsCommaSep}`,
+    [name, User.getId(user)])
+
 const updateUserPref = async (user, name, value, client = db) => {
   const userPref = JSON.stringify(
     { [name]: value }
@@ -68,19 +78,20 @@ const updateUserPref = async (user, name, value, client = db) => {
     SET prefs = prefs || $1
     WHERE id = $2
     RETURNING ${selectFieldsCommaSep}
-  `, [userPref, user.id])
+  `, [userPref, User.getId(user)])
 
   return userRes
 }
 
 // ==== DELETE
+
 const deleteUserPref = async (user, name, client = db) => {
   const userRes = await client.one(`
     UPDATE "user" u
     SET prefs = prefs - $1
     WHERE id = $2
     RETURNING ${selectFieldsCommaSep}
-  `, [name, user.id])
+  `, [name, User.getId(user)])
 
   return userRes
 }
@@ -96,6 +107,7 @@ module.exports = {
   fetchUserByEmail,
 
   // UPDATE
+  updateUsername,
   updateUserPref,
 
   // DELETE
