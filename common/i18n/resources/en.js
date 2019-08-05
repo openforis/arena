@@ -279,6 +279,7 @@ module.exports = {
   },
 
   formErrors: {
+    atLeastOneInvalidValue: 'At least one invalid value',
     defaultValuesNotSpecified: 'Default value not specified',
     duplicate: 'Duplicate',
     duplicateEntity: 'Duplicate entity',

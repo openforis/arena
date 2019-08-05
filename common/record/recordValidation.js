@@ -13,6 +13,7 @@ const keys = {
 }
 
 const keysError = {
+  atLeastOneInvalidValue: 'atLeastOneInvalidValue',
   duplicateEntity: 'duplicateEntity',
   duplicateRecord: 'duplicateRecord'
 }
