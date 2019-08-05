@@ -29,11 +29,14 @@ const getNodeValues = (surveyInfo, nodeDef, nodes, lang) => {
     }
   }
 
-  return R.pipe(
-    R.reject(node => Node.isPlaceholder(node) || Node.isValueBlank(node)),
-    R.map(getNodeValue),
-    R.join(', ')
-  )(nodes)
+  return R.reduce(
+    (accString, node) => Node.isPlaceholder(node) || Node.isValueBlank(node)
+      ? accString
+      : `${accString === '' ? '' : `${accString}, `}${getNodeValue(node)}`
+    ,
+    '',
+    nodes
+  )
 }
 
 const NodeDefMultipleTableCell = props => {
