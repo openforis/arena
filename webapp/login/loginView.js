@@ -6,11 +6,20 @@ import { connect } from 'react-redux'
 import * as LoginState from './loginState'
 
 import LoginForm from './loginForm'
-import AcceptInvitationView from './acceptInvitationView'
+import AcceptInvitationForm from './acceptInvitationForm'
 
 const LoginView = props => {
 
-  const { error, newPasswordRequired } = props
+  const { requiredUserAction, error } = props
+
+  let form
+  switch (requiredUserAction) {
+    case LoginState.userActions.setNewPassword:
+      form = <AcceptInvitationForm />
+      break
+    default:
+      form = <LoginForm />
+  }
 
   return (
     <>
@@ -44,17 +53,13 @@ const LoginView = props => {
         <div className="login-form__error text-center">{error}</div>
       }
 
-      {
-        newPasswordRequired
-          ? <AcceptInvitationView />
-          : <LoginForm />
-      }
+      {form}
     </>
   )
 }
 
 const mapStateToProps = state => ({
-  newPasswordRequired: LoginState.getPasswordResetUser(state),
+  requiredUserAction: LoginState.getRequiredUserAction(state),
   error: LoginState.getError(state),
 })
 

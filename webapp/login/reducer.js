@@ -3,22 +3,15 @@ import { exportReducer } from '../utils/reduxUtils'
 import * as LoginState from './loginState'
 
 import {
-  passwordResetUser,
+  setRequiredUserAction,
   loginError,
-  loginErrorReset,
-  passwordResetUserReset
 } from './actions'
 
 const actionHandlers = {
 
-  [passwordResetUser]: (state, { user }) => LoginState.assocPasswordResetUser(user)(state),
+  [setRequiredUserAction]: (state, { action }) => LoginState.setRequiredUserAction(action)(state),
 
   [loginError]: (state, { message }) => LoginState.assocError(message)(state),
-
-  [loginErrorReset]: state => LoginState.assocError(null)(state),
-
-  [passwordResetUserReset]: state => LoginState.assocPasswordResetUser(null)(state),
-
 }
 
 export default exportReducer(actionHandlers)

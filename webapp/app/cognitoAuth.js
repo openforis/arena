@@ -12,6 +12,7 @@ const getUser = () => {
 
 // Global variables to handle completeNewPasswordChallenge flow
 let cognitoUser
+let sessionUserAttributes
 
 const cognitoCallbacks = (resolve, reject) => ({
   onSuccess: result => {
@@ -24,7 +25,8 @@ const cognitoCallbacks = (resolve, reject) => ({
     // the api doesn't accept this field back
     delete userAttributes.email_verified
 
-    resolve({ type: 'newPasswordRequired', user: userAttributes })
+    sessionUserAttributes = userAttributes
+    resolve({ type: 'newPasswordRequired' })
   }
 })
 
@@ -43,11 +45,11 @@ export const login = (Username, Password) =>
     )
   })
 
-export const setNewUserPassword = (password, user) =>
+export const acceptInvitation = (name, password) =>
   new Promise((resolve, reject) => {
     cognitoUser.completeNewPasswordChallenge(
       password,
-      user,
+      { ...sessionUserAttributes, name },
       cognitoCallbacks(resolve, reject)
     )
   })

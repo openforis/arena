@@ -2,60 +2,46 @@ import axios from 'axios'
 
 import * as CognitoAuth from '../app/cognitoAuth'
 
-import * as LoginState from './loginState'
+import { userActions } from './loginState'
 import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
 
-export const passwordResetUser = 'login/passwordResetUser'
+export const setRequiredUserAction = 'login/setRequiredUserAction'
 export const loginError = 'login/error'
-export const loginErrorReset = 'login/reset'
-export const passwordResetUserReset = 'login/passwordResetUserReset'
 
-export const login = (username, password) => async dispatch => {
-  try {
-    dispatch(showAppLoader())
-
-    const cognitoLoginResult = await CognitoAuth.login(username, password)
-    const { type } = cognitoLoginResult
-
-    switch (type) {
-    case 'success':
-      dispatch({ type: loginErrorReset })
-      dispatch(initUser())
-      break
-    case 'newPasswordRequired':
-      dispatch({ type: loginErrorReset })
-      const { user } = cognitoLoginResult
-      dispatch({ type: passwordResetUser, user })
-      break
-    }
-  } catch (error) {
-    dispatch(setLoginError(error.message))
-  } finally {
-    dispatch(hideAppLoader())
-  }
-}
-
-export const acceptInvitation = (password, name) =>
-  async (dispatch, getState) => {
+const getAction = (cognitoFn, cognitoResponseHandler) => (username, password) =>
+  async dispatch => {
     try {
-      dispatch({ type: loginErrorReset })
       dispatch(showAppLoader())
+      dispatch(setLoginError(null))
 
-      const newUser = LoginState.getPasswordResetUser(getState())
-      const response = await CognitoAuth.setNewUserPassword(password, { ...newUser, name })
+      const { type } = await cognitoFn(username, password)
+      const action = await cognitoResponseHandler(type, { username })
 
-      if (response.type === 'success') {
-        await axios.put('/api/user/username', { name })
-
-        dispatch({ type: passwordResetUserReset })
-        dispatch(initUser())
-      }
+      if (action) dispatch(action)
+      if (type === 'success') dispatch(initUser())
     } catch (error) {
       dispatch(setLoginError(error.message))
     } finally {
       dispatch(hideAppLoader())
     }
   }
+
+export const login = getAction(
+  CognitoAuth.login,
+  cognitoResponseType => {
+    if (cognitoResponseType === 'newPasswordRequired') {
+      return { type: setRequiredUserAction, action: userActions.setNewPassword }
+    }
+  })
+
+export const acceptInvitation = getAction(
+  CognitoAuth.acceptInvitation,
+  async (cognitoResponseType, { username }) => {
+    if (cognitoResponseType === 'success') {
+      await axios.put('/api/user/username', { name: username })
+      return { type: setRequiredUserAction, action: userActions.login }
+    }
+  })
 
 export const setLoginError = message => dispatch =>
   dispatch({ type: loginError, message })

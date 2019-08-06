@@ -1,11 +1,9 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
-import * as LoginState from './loginState'
-
 import { login } from './actions'
 
-const LoginView = props => {
+const LoginForm = props => {
 
   const { login } = props
 
@@ -41,8 +39,4 @@ const LoginView = props => {
   )
 }
 
-const mapStateToProps = state => ({
-  passwordResetUser: !!LoginState.getPasswordResetUser(state),
-})
-
-export default connect(mapStateToProps, { login })(LoginView)
+export default connect(null, { login })(LoginForm)

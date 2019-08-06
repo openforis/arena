@@ -3,23 +3,23 @@ import { connect } from 'react-redux'
 
 import { acceptInvitation, setLoginError } from './actions'
 
-const LoginView = props => {
+const AcceptInvitationForm = props => {
 
   const { acceptInvitation, setLoginError } = props
 
-  const usernameRef = useRef()
-  const newPasswordRef = useRef()
-  const newPasswordConfirmRef = useRef()
+  const usernameRef = useRef(null)
+  const newPasswordRef = useRef(null)
+  const newPasswordConfirmRef = useRef(null)
 
-  const reset = () => {
+  const accept = () => {
     const newPassword = newPasswordRef.current.value
     const newPasswordConfirm = newPasswordConfirmRef.current.value
 
     if (newPassword !== newPasswordConfirm) {
-      setLoginError(`Passwords don't match.`)
+      setLoginError(`Passwords don't match`)
     } else {
       const username = usernameRef.current.value
-      acceptInvitation(newPassword, username)
+      acceptInvitation(username, newPassword)
     }
   }
 
@@ -29,7 +29,7 @@ const LoginView = props => {
              type='text'
              name='username'
              className="login-form__input"
-             placeholder='Choose your username' />
+             placeholder='Choose your new username' />
 
       <input ref={newPasswordRef}
              type='password'
@@ -46,7 +46,7 @@ const LoginView = props => {
       <div className="login-form__buttons">
         <button type="button"
                 className="btn btn-login"
-                onClick={reset}>
+                onClick={accept}>
           Reset password
         </button>
       </div>
@@ -54,4 +54,4 @@ const LoginView = props => {
   )
 }
 
-export default connect(null, { acceptInvitation, setLoginError })(LoginView)
+export default connect(null, { acceptInvitation, setLoginError })(AcceptInvitationForm)
