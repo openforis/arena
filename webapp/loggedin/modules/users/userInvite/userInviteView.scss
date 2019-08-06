@@ -1,8 +1,14 @@
 .user-invite {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: .5fr .5fr;
+  grid-template-columns: 400px;
+  justify-content: center;
+  align-content: center;
   align-items: center;
-  grid-column-gap: .5rem;
-  grid-row-gap: 2rem;
+  grid-row-gap: 7rem;
+
+  .btn {
+    justify-self: center;
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
 }
