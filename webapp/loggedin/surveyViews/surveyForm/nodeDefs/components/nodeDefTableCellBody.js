@@ -32,12 +32,11 @@ const getNodeValues = (surveyInfo, nodeDef, nodes, lang) => {
   return R.reduce(
     (accString, node) => Node.isPlaceholder(node) || Node.isValueBlank(node)
       ? accString
-      : `${accString === '' ? '' : ', '}${getNodeValue(node)}`
+      : `${accString === '' ? '' : `${accString}, `}${getNodeValue(node)}`
     ,
     '',
     nodes
   )
-
 }
 
 const NodeDefMultipleTableCell = props => {

@@ -66,8 +66,8 @@ const updateNodeAndExpectDependentNodeValueToBe = async (survey, record, sourceP
   record = Record.assocNodes(nodesUpdated)(record)
 
   // update dependent nodes
-  const nodesDependentUpdated = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
-  record = Record.assocNodes(nodesDependentUpdated)(record)
+  const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
+  record = recordUpdate
 
   const nodeDependent = RecordUtils.findNodeByPath(dependentPath)(survey, record)
 

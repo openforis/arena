@@ -1,4 +1,5 @@
-require('@babel/polyfill')
+require('core-js/stable')
+require('regenerator-runtime/runtime')
 const webpack = require('webpack')
 const path = require('path')
 const nodeExternals = require('webpack-node-externals')
@@ -10,7 +11,7 @@ const nodeExternals = require('webpack-node-externals')
 // module.exports = config
 module.exports = {
   // plugins: [new ExtractTextPlugin({filename: 'test-style.css'})],
-  entry: ['@babel/polyfill'],
+  entry: ['core-js/stable', 'regenerator-runtime/runtime'],
   target: 'node', // in order to ignore built-in modules like path, fs, etc.
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
   mode: 'development',

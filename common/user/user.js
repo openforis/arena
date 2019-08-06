@@ -1,8 +1,6 @@
 const R = require('ramda')
 const StringUtils = require('../stringUtils')
-
-const validEmailRe = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-const validEmail = email => validEmailRe.test(email)
+const AuthGroups = require('../auth/authGroups')
 
 const keys = {
   id: 'id',
@@ -20,9 +18,16 @@ const getId = R.prop(keys.id)
 
 const getName = R.prop(keys.name)
 
+const getCognitoUsername = R.prop(keys.cognitoUsername)
+
 const getEmail = R.prop(keys.email)
 
 const getAuthGroups = R.prop(keys.authGroups)
+
+const getAuthGroupAdmin = R.pipe(
+  getAuthGroups,
+  R.find(AuthGroups.isAdminGroup)
+)
 
 const hasAccepted = R.pipe(
   R.propOr('', keys.cognitoUsername),
@@ -45,11 +50,12 @@ const getRecordPermissions = record => user =>
 module.exports = {
   keys,
 
-  validEmail,
   getId,
   getName,
+  getCognitoUsername,
   getEmail,
   getAuthGroups,
+  getAuthGroupAdmin,
   hasAccepted,
 
   getGroupName,

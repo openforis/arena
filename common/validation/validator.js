@@ -207,10 +207,10 @@ const dissocFieldValidation = field => R.pipe(
 const mergeValidation = validationNew =>
   validationOld => R.pipe(
     validation => ({
-      [keys.fields]: {
-        ...getFieldValidations(validation),
-        ...getFieldValidations(validationNew),
-      }
+      [keys.fields]: R.mergeDeepRight(
+        getFieldValidations(validation),
+        getFieldValidations(validationNew)
+      )
     }),
     cleanup,
   )(validationOld)

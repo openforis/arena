@@ -112,15 +112,15 @@ const fetchAllTaxa = async (surveyId, taxonomyUuid, draft = false, limit = null,
     record => dbTransformCallback(record, draft, true)
   )
 
-const fetchTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, orderByProp, draft, client) =>
+const fetchTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searchValue, orderByProp, draft, client) =>
   await client.map(
     `SELECT * 
        FROM ${getSurveyDBSchema(surveyId)}.taxon
-       WHERE taxonomy_uuid = $1 
+       WHERE taxonomy_uuid = $/taxonomyUuid/ 
          ${whereCondition ? ` AND (${whereCondition})` : ''}
        ORDER BY ${DbUtils.getPropColCombined(orderByProp, draft)} ASC
        LIMIT 25`,
-    [taxonomyUuid],
+    { taxonomyUuid, searchValue },
     taxon => dbTransformCallback(taxon, draft, true)
   )
 
@@ -132,9 +132,9 @@ const fetchTaxaByPropLike = async (surveyId,
                                    client = db) => {
 
   const searchValue = toSearchValue(filterValue)
-  const filterCondition = DbUtils.getPropFilterCondition(filterProp, searchValue, draft)
+  const filterCondition = searchValue ? DbUtils.getPropFilterCondition(filterProp, draft) : ''
 
-  return await fetchTaxaByCondition(surveyId, taxonomyUuid, filterCondition, filterProp, draft, client)
+  return await fetchTaxaByCondition(surveyId, taxonomyUuid, filterCondition, searchValue, filterProp, draft, client)
 }
 
 const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
@@ -148,12 +148,12 @@ const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValu
   const whereCondition = isBlank(searchValue)
     ? null
     : `
-    ${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, '%' + searchValue + '%', draft)} 
+    ${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, draft)} 
      OR  
-    ${DbUtils.getPropFilterCondition(Taxon.propKeys.code, '%' + searchValue + '%', draft)}
+    ${DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft)}
     `
 
-  return await fetchTaxaByCondition(surveyId, taxonomyUuid, whereCondition, Taxon.propKeys.scientificName, draft, client)
+  return await fetchTaxaByCondition(surveyId, taxonomyUuid, whereCondition, searchValue, Taxon.propKeys.scientificName, draft, client)
 }
 
 const fetchTaxaByVernacularName = async (surveyId,
@@ -162,18 +162,18 @@ const fetchTaxaByVernacularName = async (surveyId,
                                          draft = false,
                                          client = db) => {
   const searchValue = toSearchValue(filterValue)
-  const filterCondition = DbUtils.getPropFilterCondition('name', searchValue, draft, 'vn.')
+  const filterCondition = searchValue ? DbUtils.getPropFilterCondition('name', draft, 'vn.') : ''
 
   return await client.map(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
      FROM ${getSurveyDBSchema(surveyId)}.taxon t
        LEFT OUTER JOIN ${getSurveyDBSchema(surveyId)}.taxon_vernacular_name vn 
        ON vn.taxon_uuid = t.uuid
-     WHERE t.taxonomy_uuid = $1 
+     WHERE t.taxonomy_uuid = $/taxonomyUuid/ 
       AND ${filterCondition}
-     ORDER BY ${DbUtils.getPropColCombined(Taxon.propKeys.name, draft, 'vn.')} ASC
+     ORDER BY ${DbUtils.getPropColCombined('name', draft, 'vn.')} ASC
      LIMIT 20`,
-    [taxonomyUuid],
+    { taxonomyUuid, searchValue },
     record => dbTransformCallback(record, draft, true)
   )
 }
