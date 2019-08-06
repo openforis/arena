@@ -45,7 +45,7 @@ NodeDefErrorBadge.defaultProps = {
 const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, nodes, node, edit } = props
 
-  let validation = Validator.validValidation
+  let validation = Validator.newValidationValid()
 
   if (edit) {
     validation = Validator.getValidation(nodeDef)

@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const Validator = require('../../validation/validator')
+
 const {
   errorKeys,
   validate,
@@ -8,12 +10,12 @@ const {
   validateNotKeyword,
   validateName,
   cleanup
-} = require('../../../../common/validation/validator')
+} = Validator
 
-const Survey = require('../../../../common/survey/survey')
-const SurveyUtils = require('../../../../common/survey/surveyUtils')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
+const Survey = require('../survey')
+const SurveyUtils = require('../surveyUtils')
+const NodeDef = require('../nodeDef')
+const NodeDefLayout = require('../nodeDefLayout')
 
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
@@ -128,7 +130,7 @@ const validateNodeDef = async (survey, nodeDef) => {
   return validation.valid ? null : validation
 }
 
-const validateNodeDefs = async (nodeDefs) => {
+const validateNodeDefsOld = async (nodeDefs) => {
   const survey = Survey.assocNodeDefs(nodeDefs)({})
 
   const nodeDefsValidated = await Promise.all(
@@ -143,8 +145,25 @@ const validateNodeDefs = async (nodeDefs) => {
   return SurveyUtils.toUuidIndexedObj(nodeDefsValidated)
 }
 
+const validateNodeDefs = async survey => {
+  const nodeDefs = Survey.getNodeDefs(survey)
+  const validation = Validator.getValidation(survey)
+
+  for (const nodeDefUuid of Object.keys(nodeDefs)) {
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    const nodeDefValidation = await validateNodeDef(survey, nodeDef)
+
+    if (!Validator.isValidationValid(nodeDefValidation)) {
+      validation[Validator.keys.fields][nodeDefUuid] = nodeDefValidation
+      validation[Validator.keys.valid] = false
+    }
+  }
+
+  return validation
+}
+
 module.exports = {
+  validateNodeDefsOld,
   validateNodeDefs,
-  validateNodeDef,
 }
 

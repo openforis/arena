@@ -2,13 +2,20 @@ const Request = require('../../../utils/request')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
+const SurveyService = require('../../survey/manager/surveyManager')
 const NodeDefService = require('../service/nodeDefService')
+
+const SurveyValidator = require('../../../../common/survey/surveyValidator')
 
 module.exports.init = app => {
 
   const sendRespNodeDefs = async (res, surveyId, draft = true, advanced = true, validate = true) => {
     const nodeDefs = await NodeDefService.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate)
-    res.json({ nodeDefs })
+
+    const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(surveyId, draft, advanced, false)
+    const nodeDefsValidation = await SurveyValidator.validateNodeDefs(survey)
+
+    res.json({ nodeDefs, nodeDefsValidation })
   }
 
   // ==== CREATE
