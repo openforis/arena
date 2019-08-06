@@ -5,6 +5,7 @@ const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
 const { uuidv4 } = require('../../../../common/uuid')
 
 const Survey = require('../../../../common/survey/survey')
+const SurveyValidator = require('../../../../common/survey/surveyValidator')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const User = require('../../../../common/user/user')
 const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
@@ -22,8 +23,6 @@ const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 const SurveyRepositoryUtils = require('../repository/surveySchemaRepositoryUtils')
 
 const ActivityLog = require('../../activityLog/activityLogger')
-
-const SurveyValidator = require('../surveyValidator')
 
 const assocSurveyInfo = info => ({ info })
 
@@ -80,11 +79,22 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
   return assocSurveyInfo(survey)
 }
 
+const validateNewSurvey = async newSurvey => {
+  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)//TODO add object model for newSurvey
+  return await SurveyValidator.validateNewSurvey(newSurvey, surveyInfos)
+}
+
 // ====== READ
 const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, draft, client)
   const authGroups = await AuthGroupRepository.fetchSurveyGroups(surveyInfo.id, client)
-  const validation = validate ? await SurveyValidator.validateSurveyInfo(surveyInfo) : null
+
+  let validation = null
+  if (validate) {
+    const surveyName = Survey.getName(surveyInfo)
+    const surveyInfos = await SurveyRepository.fetchSurveysByName(surveyName)
+    validation = await SurveyValidator.validateSurveyInfo(surveyInfo, surveyInfos)
+  }
 
   const info = { ...surveyInfo, authGroups, validation }
   return assocSurveyInfo(info)
@@ -92,7 +102,7 @@ const fetchSurveyById = async (surveyId, draft = false, validate = false, client
 
 const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
   const survey = await fetchSurveyById(surveyId, draft, validate, client)
-  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate, client)
+  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, client)
   return Survey.assocNodeDefs(nodeDefs)(survey)
 }
 
@@ -140,6 +150,7 @@ module.exports = {
   // ====== CREATE
   createSurvey,
   insertSurvey,
+  validateNewSurvey,
 
   // ====== READ
   fetchAllSurveyIds: SurveyRepository.fetchAllSurveyIds,

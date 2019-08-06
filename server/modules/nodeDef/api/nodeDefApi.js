@@ -10,7 +10,7 @@ const SurveyValidator = require('../../../../common/survey/surveyValidator')
 module.exports.init = app => {
 
   const sendRespNodeDefs = async (res, surveyId, draft = true, advanced = true, validate = true) => {
-    const nodeDefs = await NodeDefService.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate)
+    const nodeDefs = await NodeDefService.fetchNodeDefsBySurveyId(surveyId, draft, advanced)
 
     const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(surveyId, draft, advanced, false)
     const nodeDefsValidation = await SurveyValidator.validateNodeDefs(survey)

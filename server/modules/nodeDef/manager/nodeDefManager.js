@@ -2,10 +2,8 @@ const R = require('ramda')
 const db = require('../../../db/db')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
-const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
 const NodeDefRepository = require('../repository/nodeDefRepository')
-
 const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const ActivityLog = require('../../activityLog/activityLogger')
@@ -25,7 +23,7 @@ const insertNodeDef = async (user, surveyId, nodeDefParam, client = db) =>
 
 // ======= READ
 
-const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
+const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, client = db) => {
   const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced, client)
 
   return R.reduce(
