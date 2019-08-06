@@ -96,7 +96,6 @@ const persistNode = async (user, survey, record, node,
   await t.tx(async t =>
     await _onNodesUpdate(
       survey,
-      record,
       await NodeUpdateManager.persistNode(user, survey, record, node, t),
       nodesUpdateListener,
       nodesValidationListener,
@@ -109,7 +108,6 @@ const deleteNode = async (user, survey, record, nodeUuid,
   await t.tx(async t =>
     await _onNodesUpdate(
       survey,
-      record,
       await NodeUpdateManager.deleteNode(user, survey, record, nodeUuid, t),
       nodesUpdateListener,
       nodesValidationListener,
@@ -117,18 +115,17 @@ const deleteNode = async (user, survey, record, nodeUuid,
     )
   )
 
-const _onNodesUpdate = async (survey, record, updatedNodes,
+const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
                               nodesUpdateListener, nodesValidationListener, t) => {
   // 1. update record and notify
   if (nodesUpdateListener)
     nodesUpdateListener(updatedNodes)
-  record = Record.assocNodes(updatedNodes)(record)
 
   // 2. update dependent nodes
-  const updatedDependentNodes = await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
+  const { record: recordUpdatedDependentNodes, nodes: updatedDependentNodes } = await NodeUpdateManager.updateNodesDependents(survey, record, updatedNodes, t)
   if (nodesUpdateListener)
     nodesUpdateListener(updatedDependentNodes)
-  record = Record.assocNodes(updatedDependentNodes)(record)
+  record = recordUpdatedDependentNodes
 
   const updatedNodesAndDependents = {
     ...updatedNodes,

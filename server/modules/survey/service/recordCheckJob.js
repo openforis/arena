@@ -20,7 +20,7 @@ class RecordCheckJob extends Job {
     //1. determine new or updated node defs
 
     const surveyId = this.getSurveyId()
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(surveyId, true, true, false, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(surveyId, true, true, false, tx)
 
     const nodeDefsNew = []
     const nodeDefsUpdated = []
@@ -53,12 +53,12 @@ class RecordCheckJob extends Job {
 
   async _checkRecord (survey, nodeDefsNew, nodeDefsUpdated, record, tx) {
     // 1. insert missing nodes
-    const missingNodes = await _insertMissingSingleNodes(survey, nodeDefsNew, record, this.getUser(), tx)
-    record = Record.assocNodes(missingNodes)(record)
+    const { record: recordUpdateInsert, nodes: missingNodes = {} } = await _insertMissingSingleNodes(survey, nodeDefsNew, record, this.getUser(), tx)
+    record = recordUpdateInsert || record
 
     // 2. apply default values and recalculate applicability
-    const nodesUpdatedDefaultValues = await _applyDefaultValuesAndApplicability(survey, nodeDefsUpdated, record, missingNodes, tx)
-    record = Record.assocNodes(nodesUpdatedDefaultValues)(record)
+    const { record: recordUpdate, nodes: nodesUpdatedDefaultValues = {} } = await _applyDefaultValuesAndApplicability(survey, nodeDefsUpdated, record, missingNodes, tx)
+    record = recordUpdate || record
 
     // 3. validate nodes
     const nodesToValidate = {

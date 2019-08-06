@@ -50,6 +50,12 @@ const getId = R.prop(keys.id)
 
 const getName = R.prop(keys.name)
 
+const isAdminGroup = group =>
+  R.pipe(
+    getName,
+    R.propEq(groupNames.systemAdmin)
+  )
+
 module.exports = {
   keys,
   permissions,
@@ -57,6 +63,7 @@ module.exports = {
 
   getId,
   getName,
+  isAdminGroup,
   getSurveyId,
   getAuthGroups,
 }

@@ -14,8 +14,9 @@ import { appModuleUri, userModules } from '../../../appModules'
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 
-const UsersHeaderLeft = canInvite => () => {
+const UsersHeaderLeft = props => {
   const i18n = useI18n()
+  const { canInvite } = props
 
   return (
     <div>
@@ -71,9 +72,11 @@ const UsersListView = ({ canInvite }) => (
     module={'users'}
     className="records"
     gridTemplateColumns={'repeat(4, 1fr)'}
-    headerLeftComponent={UsersHeaderLeft(canInvite)}
+    headerLeftComponent={UsersHeaderLeft}
     rowHeaderComponent={UsersRowHeader}
     rowComponent={UsersRow}
+
+    canInvite={canInvite}
   />
 )
 

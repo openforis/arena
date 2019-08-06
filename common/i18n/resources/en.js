@@ -148,7 +148,6 @@ module.exports = {
   usersView: {
     inviteUser: 'Invite',
     accepted: 'Accepted',
-    group: 'Group',
   },
 
   itemsTable: {
@@ -267,9 +266,11 @@ module.exports = {
     invalidNumber: 'Invalid number',
     invalidType: 'Invalid type',
     invalidValue: 'Invalid value',
+    invalidEmail: 'Invalid email',
     keyword: 'Keyword',
     maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
     minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
+    oneOrMoreInvalidValues: 'One or more values are invalid',
     required: '$t(common.required)',
     zeroOrNegative: 'Zero or negative',
   },
@@ -346,7 +347,6 @@ module.exports = {
   // ====== Auth
 
   authGroups: {
-    group: 'Group',
     systemAdmin: {
       label: 'System Administrators',
       description: 'OF Arena system administrators',

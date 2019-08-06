@@ -1,23 +1,30 @@
 const db = require('../../../db/db')
 
-const UserRepository = require('../repository/userRepository')
-const AuthManager = require('../../auth/manager/authManager')
-
 const User = require('../../../../common/user/user')
+
+const UserRepository = require('../repository/userRepository')
+const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
 // ==== CREATE
 
 const insertUser = async (user, surveyId, cognitoUsername, email, groupId, client = db) =>
-  client.tx(async t => {
+  await client.tx(async t => {
     const newUser = await UserRepository.insertUser(surveyId, cognitoUsername, email, t)
-    const newUserId = User.getId(newUser)
-    await ActivityLog.log(user, surveyId, ActivityLog.type.userInvite, { email, id: newUserId, cognitoUsername }, t)
+    await addUserToGroup(user, surveyId, groupId, newUser, t)
+  })
 
-    await AuthManager.insertUserGroup(user, surveyId, groupId, newUserId, t)
-
-    return newUser
+const addUserToGroup = async (user, surveyId, groupId, userToAdd, client = db) =>
+  await client.tx(async t => {
+    await AuthGroupRepository.insertUserGroup(groupId, User.getId(userToAdd), t)
+    await ActivityLog.log(
+      user,
+      surveyId,
+      ActivityLog.type.userInvite,
+      { groupId, cognitoUsername: User.getCognitoUsername(userToAdd) },
+      t
+    )
   })
 
 // ==== READ
@@ -26,7 +33,7 @@ const _userFetcher = fetchFn => async (...args) => {
   const user = await fetchFn(...args)
 
   if (user) {
-    const authGroups = await AuthManager.fetchUserGroups(user.id)
+    const authGroups = await AuthGroupRepository.fetchUserGroups(User.getId(user))
     return { ...user, authGroups }
   }
 
@@ -41,12 +48,13 @@ const fetchUserByCognitoUsername = _userFetcher(UserRepository.fetchUserByCognit
 
 const deleteUserPref = async (user, name) => ({
   ...(await UserRepository.deleteUserPref(user, name)),
-  authGroups: await AuthManager.fetchUserGroups(user.id)
+  authGroups: await AuthGroupRepository.fetchUserGroups(User.getId(user))
 })
 
 module.exports = {
   // CREATE
   insertUser,
+  addUserToGroup,
 
   // READ
   fetchUsersBySurveyId: UserRepository.fetchUsersBySurveyId,

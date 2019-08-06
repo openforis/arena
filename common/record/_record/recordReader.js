@@ -50,10 +50,10 @@ const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => record =>
   )(record)
 
 // siblings
-const getNodeSiblingsByDefUuid = (node, siblingDefUuid) => R.pipe(
+const getNodeSiblingsAndSelf = node => record => R.pipe(
   getParentNode(node),
-  parentNode => getNodeChildrenByDefUuid(parentNode, siblingDefUuid)
-)
+  parentNode => getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(node))(record)
+)(record)
 
 // descendants
 const getNodeChildren = node => record => R.pipe(
@@ -227,7 +227,7 @@ module.exports = {
   getAncestorByNodeDefUuid,
 
   // siblings
-  getNodeSiblingsByDefUuid,
+  getNodeSiblingsAndSelf,
 
   // descendants
   getNodeChildren,

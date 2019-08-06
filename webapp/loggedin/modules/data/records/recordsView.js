@@ -17,7 +17,7 @@ import { createRecord } from '../../../surveyViews/record/actions'
 const RecordsView = props => {
 
   const {
-    surveyInfo, nodeDefKeys, lang,
+    surveyInfo, user, nodeDefKeys, lang,
     createRecord, history,
   } = props
 
@@ -35,6 +35,7 @@ const RecordsView = props => {
       noItemsLabelKey={'data.records.noRecordsAdded'}
 
       surveyInfo={surveyInfo}
+      user={user}
       createRecord={createRecord}
       history={history}
       nodeDefKeys={nodeDefKeys}
