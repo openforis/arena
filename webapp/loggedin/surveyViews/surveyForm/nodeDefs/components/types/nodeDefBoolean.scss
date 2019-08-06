@@ -1,9 +1,12 @@
 @import "../../../../../../style/vars";
 
 .survey-form__node-def-boolean {
-  justify-self: start;
+  display: flex;
+  border: 1px solid $blueDark;
+}
 
-  > *:first-child {
-    border: 1px solid $blueDark;
+.survey-form__node-def-entity-table-row {
+  .survey-form__node-def-boolean {
+    border: none;
   }
 }

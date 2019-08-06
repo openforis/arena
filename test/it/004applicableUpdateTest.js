@@ -70,9 +70,8 @@ describe('Applicable Test', async () => {
       record = Record.assocNodes(nodesUpdated)(record)
 
       // update dependent nodes
-      const nodesDependentUpdated = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
-
-      record = Record.assocNodes(nodesDependentUpdated)(record)
+      const { record: recordUpdate } = await RecordManager.updateNodesDependents(survey, record, nodesUpdated)
+      record = recordUpdate
 
       const nodeDependentParentUpdated = Record.getNodeByUuid(nodeDependentParentUuid)(record)
 
