@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useReducer, useState } from 'react'
+import React, { useRef, useEffect, useReducer } from 'react'
 import axios from 'axios'
 
 export const usePrevious = (value, initialValue = null) => {
@@ -83,3 +83,5 @@ export const useAsync = (promiseFn, promiseArgs) => {
 }
 
 export const useAsyncGetRequest = (url, config = {}) => useAsync(axios.get, [url, config])
+
+export const useAsyncPostRequest = (url, config = {}) => useAsync(axios.post, [url, config])

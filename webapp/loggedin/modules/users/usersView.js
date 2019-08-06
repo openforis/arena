@@ -4,6 +4,7 @@ import { appModules, appModuleUri, userModules } from '../../appModules'
 
 import InnerModuleSwitch from '../components/innerModuleSwitch'
 import UsersListView from './userList/userListView'
+import UserInviteView from './userInvite/userInviteView'
 
 const UsersView = () => (
   <InnerModuleSwitch
@@ -13,6 +14,10 @@ const UsersView = () => (
       {
         component: UsersListView,
         path: appModuleUri(userModules.users),
+      },
+      {
+        component: UserInviteView,
+        path: appModuleUri(userModules.userInvite),
       },
     ]}
   />

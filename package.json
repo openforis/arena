@@ -51,6 +51,7 @@
   "dependencies": {
     "@esri/proj-codes": "^2.2.0",
     "amazon-cognito-identity-js": "^3.0.14",
+    "aws-sdk": "^2.500.0",
     "axios": "^0.19.0",
     "body-parser": "^1.19.0",
     "camelize": "^1.0.0",
