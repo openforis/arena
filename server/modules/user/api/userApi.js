@@ -3,16 +3,11 @@ const Response = require('../../../utils/response')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
-const AuthManager = require('../../auth/manager/authManager')
 const UserService = require('../service/userService')
 
 const Validator = require('../../../../common/validation/validator')
-const AuthGroups = require('../../../../common/auth/authGroups')
-const Authorizer = require('../../../../common/auth/authorizer')
 
 const SystemError = require('../../../../server/utils/systemError')
-const UnauthorizedError = require('../../../../server/utils/unauthorizedError')
-
 
 module.exports.init = app => {
 
@@ -25,15 +20,10 @@ module.exports.init = app => {
       const { surveyId, email, groupId } = Request.getParams(req)
       const validation = await UserService.validateNewUser(req.body)
 
-      const group = await AuthManager.fetchGroupById(groupId)
-      if (AuthGroups.isAdminGroup(group) && !Authorizer.isSystemAdmin(user)) {
-        throw new UnauthorizedError()
-      }
-
       if (Validator.isValidationValid(validation)) {
-        const newUser = await UserService.inviteUser(user, surveyId, email, groupId)
+        await UserService.inviteUser(user, surveyId, email, groupId)
 
-        res.json(newUser)
+        Response.sendOk(res)
       } else {
         throw new SystemError('invalidUser')
       }

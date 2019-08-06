@@ -94,7 +94,7 @@ const UserInviteView = props => {
       </div>
       <button className="btn"
               onClick={() => inviteUser()}>
-        <span className="icon icon-plus icon-left icon-12px" />
+        <span className="icon icon-plus icon-left icon-12px"/>
         {i18n.t('usersView.inviteUser')}
       </button>
     </div>
@@ -108,7 +108,7 @@ const mapStateToProps = state => {
 
   const groups = R.clone(surveyGroups)
   if (Authorizer.isSystemAdmin(user)) {
-    const adminGroup = User.getAuthGroups(user).find(AuthGroups.isAdminGroup)
+    const adminGroup = User.getAuthGroupAdmin(user)
     groups.unshift(adminGroup)
   }
 
