@@ -266,6 +266,7 @@ module.exports = {
     invalidNumber: 'Invalid number',
     invalidType: 'Invalid type',
     invalidValue: 'Invalid value',
+    invalidEmail: 'Invalid email',
     keyword: 'Keyword',
     maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
     minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
@@ -324,6 +325,8 @@ module.exports = {
     cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
     userNotAllowedToChangePref: 'User not allowed to change pref',
     paramIsRequired: 'Param {{param}} is required',
+    userHasRole: 'The given user has already a role in this survey',
+    invalidUser: 'Invalid user',
   },
 
   systemErrors: {

@@ -83,6 +83,13 @@ const canEditRecord = (user, record) => {
   return level === keys.all || (level === keys.own && Record.getOwnerId(record) === user.id)
 }
 
+// ======
+// ====== Users
+// ======
+
+// INVITE
+const canInviteUsers = hasSurveyPermission(permissions.userInvite)
+
 module.exports = {
   isSystemAdmin,
 
@@ -94,4 +101,7 @@ module.exports = {
   canCreateRecord,
   canEditRecord,
   canViewRecord,
+
+  // User permissions
+  canInviteUsers,
 }

@@ -26,7 +26,7 @@ import { taxonomyDelete, taxonomyPropUpdate, taxonomyUpdate } from '../taxonomie
 
 const actionHandlers = {
   // app initialization
-  [appPropsChange]: (state, { survey }) => Survey.getSurveyInfo(survey),
+  [appPropsChange]: (state, { survey }) => survey ? Survey.getSurveyInfo(survey) : state,
   [appUserLogout]: () => ({}),
 
   // Survey Update
