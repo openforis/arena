@@ -270,6 +270,7 @@ module.exports = {
     keyword: 'Keyword',
     maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
     minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
+    oneOrMoreInvalidValues: 'One or more values are invalid',
     required: '$t(common.required)',
     zeroOrNegative: 'Zero or negative',
   },
