@@ -85,9 +85,15 @@ const NodeDefTaxon = props => {
 
   const onChangeSelectionField = (field, value) => {
     if (StringUtils.isBlank(value)) {
-      Node.isValueBlank(node)
-        ? setSelection(selectionDefault)
-        : updateNodeValue({})
+      if (Node.isValueBlank(node)) {
+        setSelection(selectionDefault)
+      } else if (field === vernacularName && selection[code] === Taxon.unlistedCode) {
+        // if current code is UNL and vernacular name is reset, do not clear node value
+        updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
+      } else {
+        // clear node value
+        updateNodeValue({})
+      }
     } else if (field !== code && selection[code] === Taxon.unlistedCode) {
       // if input field is not code and current code is UNL, update node value field
       updateNodeValue({ ...Node.getValue(node), [field]: value }, taxonRefData)
