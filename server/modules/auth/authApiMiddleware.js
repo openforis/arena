@@ -8,7 +8,7 @@ const Survey = require('../../../common/survey/survey')
 
 const UnauthorizedError = require('../../utils/unauthorizedError')
 
-const checkPermission = (req, res, next, permissionFn, obj) => {
+const checkPermission = (req, next, permissionFn, obj) => {
   const user = Request.getUser(req)
 
   if (permissionFn(user, obj)) {
@@ -25,7 +25,7 @@ const requireSurveyPermission = permissionFn => async (req, res, next) => {
     const survey = await SurveyManager.fetchSurveyById(surveyId)
     const surveyInfo = Survey.getSurveyInfo(survey)
 
-    checkPermission(req, res, next, permissionFn, surveyInfo)
+    checkPermission(req, next, permissionFn, surveyInfo)
   } catch (e) {
     next(e)
   }
@@ -37,7 +37,7 @@ const requireRecordPermission = permissionFn => async (req, res, next) => {
 
     const record = await RecordService.fetchRecordByUuid(surveyId, recordUuid)
 
-    checkPermission(req, res, next, permissionFn, record)
+    checkPermission(req, next, permissionFn, record)
   } catch (e) {
     next(e)
   }
@@ -53,4 +53,7 @@ module.exports = {
   requireRecordCreatePermission: requireSurveyPermission(Authorizer.canCreateRecord),
   requireRecordEditPermission: requireRecordPermission(Authorizer.canEditRecord),
   requireRecordViewPermission: requireSurveyPermission(Authorizer.canViewRecord),
+
+  // User
+  requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers)
 }

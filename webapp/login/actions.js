@@ -1,9 +1,9 @@
 import * as CognitoAuth from '../app/cognitoAuth'
 
+import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
+
 export const loginError = 'login/error'
 export const loginReset = 'login/reset'
-
-import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
 
 export const login = (username, password) => async dispatch => {
   try {
