@@ -10,38 +10,38 @@ export const loginErrorUpdate = 'login/error'
 
 export const setLoginError = message => dispatch => dispatch({ type: loginErrorUpdate, message })
 
-const _createAction = (cognitoFn, cognitoResponseHandler) =>
-  (username, password) => async dispatch => {
-    try {
-      dispatch(showAppLoader())
-      dispatch(setLoginError(null))
+const _createAction = cognitoResponseHandler => async dispatch => {
+  try {
+    dispatch(showAppLoader())
+    dispatch(setLoginError(null))
 
-      const responseType = await cognitoFn(username, password)
-      await cognitoResponseHandler(dispatch, responseType, { username })
-
-    } catch (error) {
-      dispatch(setLoginError(error.message))
-    } finally {
-      dispatch(hideAppLoader())
-    }
+    await cognitoResponseHandler(dispatch)
+  } catch (error) {
+    dispatch(setLoginError(error.message))
+  } finally {
+    dispatch(hideAppLoader())
   }
+}
 
-export const login = _createAction(
-  CognitoAuth.login,
-  (dispatch, responseType) => {
-    if (responseType === CognitoAuth.keysAction.newPasswordRequired) {
-      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.setNewPassword })
-    } else if (responseType === CognitoAuth.keysAction.success) {
+export const login = (email, password) => _createAction(
+  async dispatch => {
+    const responseType = await CognitoAuth.login(email, password)
+
+    if (responseType === CognitoAuth.keysAction.success) {
       dispatch(initUser())
+    } else if (responseType === CognitoAuth.keysAction.newPasswordRequired) {
+      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.setNewPassword })
     }
   }
 )
 
-export const acceptInvitation = _createAction(
-  CognitoAuth.acceptInvitation,
-  async (dispatch, responseType, { username }) => {
+export const acceptInvitation = (name, password) => _createAction(
+  async dispatch => {
+    const responseType = await CognitoAuth.acceptInvitation(name, password)
+
     if (responseType === CognitoAuth.keysAction.success) {
-      await axios.put('/api/user/username', { name: username })
+      const cognitoUser = CognitoAuth.getUser()
+      await axios.put(`/api/user/${cognitoUser.username}/name`, { name })
       dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
       dispatch(initUser())
     }

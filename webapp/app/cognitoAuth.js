@@ -10,9 +10,9 @@ const ClientId = __COGNITO_CLIENT_ID__
 
 const getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
 
-const getUser = () => getUserPool().getCurrentUser()
+export const getUser = () => getUserPool().getCurrentUser()
 
-const newCognitoUser = (Username) => new CognitoUser({ Username, Pool: getUserPool() })
+const newCognitoUser = Username => new CognitoUser({ Username, Pool: getUserPool() })
 
 // Global variables to handle completeNewPasswordChallenge flow
 let cognitoUser

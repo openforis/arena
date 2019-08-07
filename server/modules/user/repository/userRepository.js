@@ -58,12 +58,12 @@ const fetchUserByEmail = async (email, client = db) =>
 // ==== UPDATE
 
 const updateUsername = async (user, name, client = db) =>
-  client.one(`
+  await client.one(`
     UPDATE "user" 
     SET name = $1
-    WHERE id = $2
+    WHERE cognito_username = $2
     RETURNING *`,
-    [name, User.getId(user)],
+    [name, User.getCognitoUsername(user)],
     camelize)
 
 const updateUserPref = async (user, name, value, client = db) => {
@@ -76,7 +76,7 @@ const updateUserPref = async (user, name, value, client = db) => {
     SET prefs = prefs || $1
     WHERE id = $2
     RETURNING *`,
-    [userPref, User.getId(user)],
+    [userPref, User.getUuid(user)],
     camelize)
 
   return userRes

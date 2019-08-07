@@ -16,7 +16,7 @@ const inviteUser = async (user, surveyId, email, groupId) => {
   if (!Authorizer.isSystemAdmin(user)) {
     const group = await AuthManager.fetchGroupById(groupId)
     if (AuthGroups.isAdminGroup(group))
-      throw new UnauthorizedError()
+      throw new UnauthorizedError(User.getName(user))
   }
 
   const dbUser = await UserManager.fetchUserByEmail(email)
@@ -35,6 +35,15 @@ const inviteUser = async (user, surveyId, email, groupId) => {
   }
 }
 
+const updateUsername = (user, userUuid, name) => {
+  // For now a user can change only his own name
+  if (User.getCognitoUsername(user) !== userUuid) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+
+  UserManager.updateUsername(user, name)
+}
+
 module.exports = {
   validateNewUser: UserValidator.validateNewUser,
 
@@ -46,7 +55,7 @@ module.exports = {
 
   fetchUserByCognitoUsername: UserManager.fetchUserByCognitoUsername,
 
-  updateUsername: UserManager.updateUsername,
+  updateUsername,
 
   updateUserPref: UserManager.updateUserPref,
 
