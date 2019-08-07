@@ -62,6 +62,7 @@ const TaxonomyEdit = props => {
             !readOnly &&
             <UploadButton label={i18n.t('common.csvImport')}
                           disabled={Taxonomy.isPublished(taxonomy)}
+                          accept=".csv"
                           onChange={(files) => uploadTaxonomyFile(taxonomy, files[0])}/>
 
           }

@@ -1,5 +1,6 @@
-import * as R from 'ramda'
 import React from 'react'
+import * as R from 'ramda'
+import Markdown from 'react-remarkable'
 
 import Validator from '../../common/validation/validator'
 
@@ -42,7 +43,9 @@ export const getValidationFieldMessagesHTML = (i18n, errorKeyPrefix, showKeys) =
       R.addIndex(R.map)(
         (msg, i) =>
           <div key={i}>
-            {msg}
+            <Markdown>
+              {msg}
+            </Markdown>
           </div>
       )
     )(validation)

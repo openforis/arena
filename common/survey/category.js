@@ -117,7 +117,7 @@ module.exports = {
 
   //READ
   getUuid,
-  getName: getProp(props.name),
+  getName: getProp(props.name, ''),
   getLevelsArray,
   getLevelByIndex,
 
