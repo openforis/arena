@@ -5,7 +5,6 @@ const SurveyInfoValidator = require('./_surveyValidator/surveyInfoValidator')
 const NodeDefValidator = require('./_surveyValidator/nodeDefValidator')
 const NodeDefExpressionsValidator = require('./_surveyValidator/nodeDefExpressionsValidator')
 
-//nodeDefValidationJob
 module.exports = {
   validateNewSurvey: SurveyInfoValidator.validateNewSurvey,
 
@@ -13,6 +12,4 @@ module.exports = {
 
   validateNodeDefs: NodeDefValidator.validateNodeDefs,
   validateNodeDefExpressions: NodeDefExpressionsValidator.validate,
-
-  validateNodeDefsOld: NodeDefValidator.validateNodeDefsOld,
 }

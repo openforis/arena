@@ -130,21 +130,6 @@ const validateNodeDef = async (survey, nodeDef) => {
   return validation.valid ? null : validation
 }
 
-const validateNodeDefsOld = async (nodeDefs) => {
-  const survey = Survey.assocNodeDefs(nodeDefs)({})
-
-  const nodeDefsValidated = await Promise.all(
-    Survey.getNodeDefsArray(survey).map(
-      async n => ({
-        ...n,
-        validation: await validateNodeDef(survey, n)
-      })
-    )
-  )
-
-  return SurveyUtils.toUuidIndexedObj(nodeDefsValidated)
-}
-
 const validateNodeDefs = async survey => {
   const nodeDefs = Survey.getNodeDefs(survey)
   const validation = Validator.newValidationValid()
@@ -163,7 +148,6 @@ const validateNodeDefs = async survey => {
 }
 
 module.exports = {
-  validateNodeDefsOld,
   validateNodeDefs,
 }
 
