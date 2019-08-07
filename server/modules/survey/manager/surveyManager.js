@@ -89,21 +89,22 @@ const fetchSurveyById = async (surveyId, draft = false, validate = false, client
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, draft, client)
   const authGroups = await AuthGroupRepository.fetchSurveyGroups(surveyInfo.id, client)
 
-  let validation = null
-  if (validate) {
-    const surveyName = Survey.getName(surveyInfo)
-    const surveyInfos = await SurveyRepository.fetchSurveysByName(surveyName)
-    validation = await SurveyValidator.validateSurveyInfo(surveyInfo, surveyInfos)
-  }
+  const validation = validate ?
+    await SurveyValidator.validateSurveyInfo(
+      surveyInfo,
+      await SurveyRepository.fetchSurveysByName(Survey.getName(surveyInfo))
+    ) : null
 
-  const info = { ...surveyInfo, authGroups, validation }
-  return assocSurveyInfo(info)
+  return assocSurveyInfo({ ...surveyInfo, authGroups, validation })
 }
 
 const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
-  const survey = await fetchSurveyById(surveyId, draft, validate, client)
   const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, client)
-  return Survey.assocNodeDefs(nodeDefs)(survey)
+  const survey = Survey.assocNodeDefs(nodeDefs)(await fetchSurveyById(surveyId, draft, validate, client))
+
+  return validate
+    ? Survey.assocNodeDefsValidation(await SurveyValidator.validateNodeDefs(survey))(survey)
+    : survey
 }
 
 const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {

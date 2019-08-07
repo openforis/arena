@@ -4,6 +4,7 @@ const { uuidv4 } = require('../../common/uuid')
 
 const SurveyInfo = require('./_survey/surveyInfo')
 const SurveyNodeDefs = require('./_survey/surveyNodeDefs')
+const SurveyNodeDefsValidation = require('./_survey/surveyNodeDefsValidation')
 const SurveyCategories = require('./_survey/surveyCategories')
 const SurveyTaxonomies = require('./_survey/surveyTaxonomies')
 const SurveyDefaults = require('./_survey/surveyDefaults')
@@ -95,6 +96,10 @@ module.exports = {
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,
   assocDependencyGraph: SurveyDependencies.assocDependencyGraph,
   buildDependencyGraph: SurveyDependencies.buildGraph,
+
+  // ====== NodeDefsValidation
+  getNodeDefsValidation: SurveyNodeDefsValidation.getNodeDefsValidation,
+  assocNodeDefsValidation: SurveyNodeDefsValidation.assocNodeDefsValidation,
 
   // ====== NodeDef Code
   getNodeDefCategoryLevelIndex: SurveyNodeDefs.getNodeDefCategoryLevelIndex,
