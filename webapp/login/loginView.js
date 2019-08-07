@@ -8,18 +8,14 @@ import * as LoginState from './loginState'
 import LoginForm from './loginForm'
 import AcceptInvitationForm from './acceptInvitationForm'
 
+const forms = {
+  [LoginState.userActions.setNewPassword]: AcceptInvitationForm,
+  [LoginState.userActions.login]: LoginForm,
+}
+
 const LoginView = props => {
 
-  const { requiredUserAction, error } = props
-
-  let form
-  switch (requiredUserAction) {
-    case LoginState.userActions.setNewPassword:
-      form = <AcceptInvitationForm />
-      break
-    default:
-      form = <LoginForm />
-  }
+  const { userAction, error } = props
 
   return (
     <>
@@ -53,13 +49,15 @@ const LoginView = props => {
         <div className="login-form__error text-center">{error}</div>
       }
 
-      {form}
+      {
+        React.createElement(forms[userAction], props)
+      }
     </>
   )
 }
 
 const mapStateToProps = state => ({
-  requiredUserAction: LoginState.getRequiredUserAction(state),
+  userAction: LoginState.getUserAction(state),
   error: LoginState.getError(state),
 })
 

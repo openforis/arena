@@ -147,6 +147,7 @@ module.exports = {
 
   usersView: {
     inviteUser: 'Invite',
+    sendInvitation: 'Send invitation',
     accepted: 'Accepted',
   },
 

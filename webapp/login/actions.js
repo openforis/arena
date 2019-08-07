@@ -2,23 +2,23 @@ import axios from 'axios'
 
 import * as CognitoAuth from '../app/cognitoAuth'
 
-import { userActions } from './loginState'
+import * as LoginState from './loginState'
 import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
 
-export const setRequiredUserAction = 'login/setRequiredUserAction'
-export const loginError = 'login/error'
+export const loginUserActionUpdate = 'login/userAction/update'
+export const loginErrorUpdate = 'login/error'
 
-const getAction = (cognitoFn, cognitoResponseHandler) => (username, password) =>
-  async dispatch => {
+export const setLoginError = message => dispatch => dispatch({ type: loginErrorUpdate, message })
+
+const _createAction = (cognitoFn, cognitoResponseHandler) =>
+  (username, password) => async dispatch => {
     try {
       dispatch(showAppLoader())
       dispatch(setLoginError(null))
 
-      const { type } = await cognitoFn(username, password)
-      const action = await cognitoResponseHandler(type, { username })
+      const responseType = await cognitoFn(username, password)
+      await cognitoResponseHandler(dispatch, responseType, { username })
 
-      if (action) dispatch(action)
-      if (type === 'success') dispatch(initUser())
     } catch (error) {
       dispatch(setLoginError(error.message))
     } finally {
@@ -26,22 +26,24 @@ const getAction = (cognitoFn, cognitoResponseHandler) => (username, password) =>
     }
   }
 
-export const login = getAction(
+export const login = _createAction(
   CognitoAuth.login,
-  cognitoResponseType => {
-    if (cognitoResponseType === 'newPasswordRequired') {
-      return { type: setRequiredUserAction, action: userActions.setNewPassword }
+  (dispatch, responseType) => {
+    if (responseType === CognitoAuth.keysAction.newPasswordRequired) {
+      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.setNewPassword })
+    } else if (responseType === CognitoAuth.keysAction.success) {
+      dispatch(initUser())
     }
-  })
+  }
+)
 
-export const acceptInvitation = getAction(
+export const acceptInvitation = _createAction(
   CognitoAuth.acceptInvitation,
-  async (cognitoResponseType, { username }) => {
-    if (cognitoResponseType === 'success') {
+  async (dispatch, responseType, { username }) => {
+    if (responseType === CognitoAuth.keysAction.success) {
       await axios.put('/api/user/username', { name: username })
-      return { type: setRequiredUserAction, action: userActions.login }
+      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
+      dispatch(initUser())
     }
-  })
-
-export const setLoginError = message => dispatch =>
-  dispatch({ type: loginError, message })
+  }
+)

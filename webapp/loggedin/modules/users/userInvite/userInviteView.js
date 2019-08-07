@@ -94,8 +94,8 @@ const UserInviteView = props => {
       </div>
       <button className="btn"
               onClick={() => inviteUser()}>
-        <span className="icon icon-plus icon-left icon-12px"/>
-        {i18n.t('usersView.inviteUser')}
+        <span className="icon icon-envelop icon-left icon-12px"/>
+        {i18n.t('usersView.sendInvitation')}
       </button>
     </div>
   )

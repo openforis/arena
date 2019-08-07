@@ -1,46 +1,46 @@
 import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js'
 
+export const keysAction = {
+  success: 'success',
+  newPasswordRequired: 'newPasswordRequired'
+}
+
 const UserPoolId = __COGNITO_USER_POOL_ID__
 const ClientId = __COGNITO_CLIENT_ID__
 
 const getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
 
-const getUser = () => {
-  const pool = getUserPool()
-  return pool.getCurrentUser()
-}
+const getUser = () => getUserPool().getCurrentUser()
+
+const newCognitoUser = (Username) => new CognitoUser({ Username, Pool: getUserPool() })
 
 // Global variables to handle completeNewPasswordChallenge flow
 let cognitoUser
 let sessionUserAttributes
 
-const cognitoCallbacks = (resolve, reject) => ({
-  onSuccess: result => {
-    resolve({ type: 'success' })
+const cognitoCallbacks = (onSuccess, onFailure) => ({
+  onSuccess: () => {
+    cognitoUser = null
+    sessionUserAttributes = null
+    onSuccess(keysAction.success)
   },
-  onFailure: error => {
-    reject(error)
-  },
+
+  onFailure,
+
   newPasswordRequired: (userAttributes) => {
     // the api doesn't accept this field back
     delete userAttributes.email_verified
 
     sessionUserAttributes = userAttributes
-    resolve({ type: 'newPasswordRequired' })
+    onSuccess(keysAction.newPasswordRequired)
   }
 })
 
 export const login = (Username, Password) =>
   new Promise((resolve, reject) => {
-    const authenticationData = { Username, Password }
-    const authenticationDetails = new AuthenticationDetails(authenticationData)
-
-    const Pool = getUserPool()
-    const userData = { Username, Pool }
-
-    cognitoUser = new CognitoUser(userData)
+    cognitoUser = newCognitoUser(Username)
     cognitoUser.authenticateUser(
-      authenticationDetails,
+      new AuthenticationDetails({ Username, Password }),
       cognitoCallbacks(resolve, reject)
     )
   })

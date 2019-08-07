@@ -7,46 +7,46 @@ const AcceptInvitationForm = props => {
 
   const { acceptInvitation, setLoginError } = props
 
-  const usernameRef = useRef(null)
+  const nameRef = useRef(null)
   const newPasswordRef = useRef(null)
   const newPasswordConfirmRef = useRef(null)
 
-  const accept = () => {
+  const onClickReset = () => {
     const newPassword = newPasswordRef.current.value
     const newPasswordConfirm = newPasswordConfirmRef.current.value
 
     if (newPassword !== newPasswordConfirm) {
       setLoginError(`Passwords don't match`)
     } else {
-      const username = usernameRef.current.value
-      acceptInvitation(username, newPassword)
+      const name = nameRef.current.value
+      acceptInvitation(name, newPassword)
     }
   }
 
   return (
     <div className="login-form">
-      <input ref={usernameRef}
+      <input ref={nameRef}
              type='text'
              name='username'
              className="login-form__input"
-             placeholder='Choose your new username' />
+             placeholder='Your Name'/>
 
       <input ref={newPasswordRef}
              type='password'
              name='newPassword'
              className="login-form__input"
-             placeholder='Your new password' />
+             placeholder='Your new Password'/>
 
       <input ref={newPasswordConfirmRef}
              type='password'
              name='newPasswordRepeat'
              className="login-form__input"
-             placeholder='New password confirm' />
+             placeholder='Repeat your new Password'/>
 
       <div className="login-form__buttons">
         <button type="button"
                 className="btn btn-login"
-                onClick={accept}>
+                onClick={onClickReset}>
           Reset password
         </button>
       </div>
