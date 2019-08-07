@@ -147,7 +147,7 @@ const validateNodeDefsOld = async (nodeDefs) => {
 
 const validateNodeDefs = async survey => {
   const nodeDefs = Survey.getNodeDefs(survey)
-  const validation = Validator.getValidation(survey)
+  const validation = Validator.newValidationValid()
 
   for (const nodeDefUuid of Object.keys(nodeDefs)) {
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)

@@ -13,7 +13,6 @@ import NodeDefValidations from '../../../common/survey/nodeDefValidations'
 import * as SurveyState from '../surveyState'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
-export const nodeDefUpdate = 'survey/nodeDef/update'
 export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
 export const nodeDefDelete = 'survey/nodeDef/delete'
 
@@ -59,8 +58,8 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
 
   dispatch({ type: nodeDefCreate, nodeDef })
 
-  const { data } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
-  dispatch({ type: nodeDefUpdate, ...data })
+  const { data: { nodeDefsValidation } } = await axios.post(`/api/survey/${surveyId}/nodeDef`, nodeDef)
+  dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
   dispatch(_updateParentLayout(nodeDef))
 }
@@ -112,9 +111,7 @@ export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
   dispatch({ type: nodeDefDelete, nodeDef })
 
   const surveyId = SurveyState.getSurveyId(getState())
-
   const { data: { nodeDefsValidation } } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${NodeDef.getUuid(nodeDef)}`)
-
   dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
   dispatch(_updateParentLayout(nodeDef, true))

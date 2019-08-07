@@ -10,8 +10,6 @@ export const surveyUpdate = 'survey/update'
 export const surveyDelete = 'survey/delete'
 export const surveyDefsLoad = 'survey/defs/load'
 
-const dispatchCurrentSurveyUpdate = (dispatch, survey) => dispatch({ type: surveyUpdate, survey })
-
 const fetchDefs = (surveyId, defs, draft = false, validate = false) =>
   axios.get(
     `/api/survey/${surveyId}/${defs}`,
@@ -44,8 +42,8 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
 export const setActiveSurvey = (surveyId, draft = true) =>
   async (dispatch, getState) => {
     //load survey
-    const { data } = await axios.get(`/api/survey/${surveyId}?draft=${draft}`)
-    dispatchCurrentSurveyUpdate(dispatch, data.survey)
+    const { data: { survey } } = await axios.get(`/api/survey/${surveyId}`, { params: { draft } })
+    dispatch({ type: surveyUpdate, survey })
 
     //update userPref
     const user = AppState.getUser(getState())
@@ -53,7 +51,7 @@ export const setActiveSurvey = (surveyId, draft = true) =>
     dispatch({ type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId })
   }
 
-// ==== UPDATE
+// ====== UPDATE
 
 export const publishSurvey = () => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
@@ -67,7 +65,7 @@ export const publishSurvey = () => async (dispatch, getState) => {
   )
 }
 
-// == DELETE
+// ====== DELETE
 
 export const deleteSurvey = () => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())

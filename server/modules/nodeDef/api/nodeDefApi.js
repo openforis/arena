@@ -25,9 +25,10 @@ module.exports.init = app => {
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const nodeDef = await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
+      await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
 
-      res.json({ nodeDef })
+      await sendRespNodeDefs(res, surveyId)
+
     } catch (err) {
       next(err)
     }
