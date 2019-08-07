@@ -9,9 +9,8 @@ import Checkbox from '../../../../commonComponents/form/checkbox'
 import NodeDefExpressionsProp from './expressionsProp/nodeDefExpressionsProp'
 
 const AdvancedProps = props => {
-  const { nodeDef, nodeDefParent, putNodeDefProp, readOnly } = props
+  const { nodeDef, validation, nodeDefParent, putNodeDefProp, readOnly } = props
 
-  const validation = NodeDef.getValidation(nodeDef)
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   const i18n = useI18n()
