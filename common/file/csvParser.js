@@ -8,61 +8,49 @@ class CSVParser {
     this.csvStreamEnded = false
     this.filePathOrStream = filePathOrStream
     this.rowReadyListener = null
+    this.error = null
 
-    const options = { headers: readHeaders }
-
-    this.csvStream = R.is(String, filePathOrStream)
-      ? fastcsv.parseFile(filePathOrStream, options)
-      : fastcsv.parseStream(filePathOrStream, options)
+    this.csvStream = this._createCsvStream({ headers: readHeaders })
 
     this.csvStream
-      .on('data', data => this.onData(data))
-      .on('end', () => this.onStreamEnd())
+      .on('data', data => this._onData(data))
+      .on('end', () => this._onStreamEnd())
+      .on('error', error => this.error = error)
       .pause()
   }
 
   calculateSize () {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      if (this.error)
+        reject(this.error)
+
       let count = 0
-      fastcsv.parseFile(this.filePathOrStream, { headers: true })
+      // do not consume instance csv stream, create a new one
+      this._createCsvStream({ headers: true })
         .on('data', () => count++)
         .on('end', () => resolve(count))
+        .on('error', reject)
     })
   }
 
-  onData (data) {
-    this.csvStream.pause()
-
-    this.notifyRowReady(data)
-  }
-
-  notifyRowReady (row) {
-    if (this.rowReadyListener)
-      this.rowReadyListener(row)
-  }
-
-  onStreamEnd () {
-    this.csvStreamEnded = true
-
-    this.notifyRowReady(null)
-  }
-
   async next () {
-    return new Promise(resolve => {
-      if (this.csvStreamEnded) {
+    return new Promise((resolve, reject) => {
+      if (this.error)
+        reject(this.error)
+
+      if (this.csvStreamEnded)
         resolve(null)
-      } else {
-        this.rowReadyListener = row => {
-          this.rowReadyListener = null
-          resolve(row)
-        }
-        this.csvStream.resume()
+
+      this.rowReadyListener = row => {
+        this.rowReadyListener = null
+        resolve(row)
       }
+      this.csvStream.resume()
     })
   }
 
   destroy () {
-    if (!this.destroyed) {
+    if (!this.destroyed && this.csvStream) {
       this.csvStream.destroy()
       this.csvStream = null
       this.filePath = null
@@ -70,6 +58,30 @@ class CSVParser {
       this.destroyed = true
     }
   }
+
+  _createCsvStream (options) {
+    return R.is(String, this.filePathOrStream)
+      ? fastcsv.parseFile(this.filePathOrStream, options)
+      : fastcsv.parseStream(this.filePathOrStream, options)
+  }
+
+  _onData (data) {
+    this.csvStream.pause()
+
+    this._notifyRowReady(data)
+  }
+
+  _notifyRowReady (row) {
+    if (this.rowReadyListener)
+      this.rowReadyListener(row)
+  }
+
+  _onStreamEnd () {
+    this.csvStreamEnded = true
+
+    this._notifyRowReady(null)
+  }
+
 }
 
 module.exports = CSVParser
