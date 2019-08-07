@@ -29,7 +29,8 @@ const errorKeys = {
   keyword: 'keyword',
   invalidNumber: 'invalidNumber',
   zeroOrNegative: 'zeroOrNegative',
-  invalidName: 'invalidName'
+  invalidName: 'invalidName',
+  requiredField: 'requiredField',
 }
 
 const keys = {
@@ -95,7 +96,7 @@ const validateRequired = (propName, obj) => {
   )(obj)
 
   return R.isEmpty(value)
-    ? { key: errorKeys.empty }
+    ? { key: errorKeys.requiredField }
     : null
 }
 
