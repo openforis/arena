@@ -20,20 +20,15 @@ class RecordUpdateThread extends Thread {
 
     this.queue = new Queue()
 
-    this.processing = true
     this._survey = null
     this._record = null
+  }
 
-    this._initRecord()
-      .then(() => {
-        this._initSurvey()
-          .then(() => {
-            this.processing = false
-            this.processNext()
-              .then(() => {})
-          })
-      })
-
+  async initRecordAndSurveyCache () {
+    if (!this.record) {
+      await this._initRecord()
+      await this._initSurvey()
+    }
   }
 
   get record () {
@@ -109,6 +104,8 @@ class RecordUpdateThread extends Thread {
   }
 
   async processMessage (msg) {
+
+    await this.initRecordAndSurveyCache()
 
     switch (msg.type) {
 
