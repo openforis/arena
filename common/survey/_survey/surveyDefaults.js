@@ -1,7 +1,7 @@
 const { groupNames, permissions } = require('../../auth/authGroups')
 const { keys: authGroupKeys } = require('../../auth/authGroups')
 
-const defaultAuthGroups = [
+const getDefaultAuthGroups = () => [
   {
     name: groupNames.surveyAdmin,
     permissions: [
@@ -77,5 +77,5 @@ const defaultAuthGroups = [
 ]
 
 module.exports = {
-  defaultAuthGroups,
+  getDefaultAuthGroups,
 }

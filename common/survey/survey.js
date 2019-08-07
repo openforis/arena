@@ -33,7 +33,7 @@ module.exports = {
   collectReportKeys: SurveyInfo.collectReportKeys,
 
   // ====== DEFAULTS
-  defaultAuthGroups: SurveyDefaults.defaultAuthGroups,
+  getDefaultAuthGroups: SurveyDefaults.getDefaultAuthGroups,
 
   // READ
   getId: R.pipe(SurveyInfo.getInfo, SurveyInfo.getId),
