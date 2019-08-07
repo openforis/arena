@@ -22,8 +22,11 @@ const countUsersBySurveyId = async (surveyId, client = db) =>
   await client.one(`
     SELECT count(*)
     FROM "user" u
-    JOIN auth_group_user gu ON gu.user_id = u.id
-    JOIN auth_group g on g.id = gu.group_id AND g.survey_id = $1`,
+    JOIN auth_group_user gu 
+    ON gu.user_id = u.id
+    JOIN auth_group g 
+    ON g.id = gu.group_id 
+    AND g.survey_id = $1`,
     [surveyId])
 
 const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client = db) =>
@@ -76,7 +79,7 @@ const updateUserPref = async (user, name, value, client = db) => {
     SET prefs = prefs || $1
     WHERE id = $2
     RETURNING *`,
-    [userPref, User.getUuid(user)],
+    [userPref, User.getId(user)],
     camelize)
 
   return userRes
