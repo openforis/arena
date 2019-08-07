@@ -12,19 +12,25 @@ import NodeDefValidations from '../../../common/survey/nodeDefValidations'
 
 import * as SurveyState from '../surveyState'
 
-export const nodeDefsLoad = 'nodeDefs/load'
-export const nodeDefCreate = 'nodeDef/create'
-export const nodeDefUpdate = 'nodeDef/update'
-export const nodeDefPropsUpdate = 'nodeDef/props/update'
-export const nodeDefDelete = 'nodeDef/delete'
+export const nodeDefCreate = 'survey/nodeDef/create'
+export const nodeDefUpdate = 'survey/nodeDef/update'
+export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
+export const nodeDefDelete = 'survey/nodeDef/delete'
+
+export const nodeDefsValidationUpdate = 'survey/nodeDefsValidation/update'
 
 // ==== Internal update nodeDefs actions
 
 const _putNodeDefProps = (nodeDef, props, propsAdvanced) => async (dispatch, getState) => {
-  const url = `/api/survey/${SurveyState.getSurveyId(getState())}/nodeDef/${NodeDef.getUuid(nodeDef)}/props`
-  const data = { props, propsAdvanced }
-  const { data: { nodeDefs } } = await axios.put(url, data)
-  dispatch({ type: nodeDefsLoad, nodeDefs })
+  const surveyId = SurveyState.getSurveyId(getState())
+  const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+  const { data: { nodeDefsValidation } } = await axios.put(
+    `/api/survey/${surveyId}/nodeDef/${nodeDefUuid}/props`,
+    { props, propsAdvanced }
+  )
+
+  dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 }
 
 const _putNodeDefPropsDebounced = (nodeDef, key, props, propsAdvanced) => debounceAction(
@@ -107,9 +113,9 @@ export const removeNodeDef = (nodeDef) => async (dispatch, getState) => {
 
   const surveyId = SurveyState.getSurveyId(getState())
 
-  const { data } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${NodeDef.getUuid(nodeDef)}`)
+  const { data: { nodeDefsValidation } } = await axios.delete(`/api/survey/${surveyId}/nodeDef/${NodeDef.getUuid(nodeDef)}`)
 
-  dispatch({ type: nodeDefsLoad, nodeDefs: data.nodeDefs })
+  dispatch({ type: nodeDefsValidationUpdate, nodeDefsValidation })
 
   dispatch(_updateParentLayout(nodeDef, true))
 }

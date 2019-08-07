@@ -100,6 +100,7 @@ module.exports = {
   // ====== NodeDefsValidation
   getNodeDefsValidation: SurveyNodeDefsValidation.getNodeDefsValidation,
   assocNodeDefsValidation: SurveyNodeDefsValidation.assocNodeDefsValidation,
+  getNodeDefValidation: SurveyNodeDefsValidation.getNodeDefValidation,
 
   // ====== NodeDef Code
   getNodeDefCategoryLevelIndex: SurveyNodeDefs.getNodeDefCategoryLevelIndex,

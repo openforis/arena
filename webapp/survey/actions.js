@@ -10,17 +10,13 @@ export const surveyUpdate = 'survey/update'
 export const surveyDelete = 'survey/delete'
 export const surveyDefsLoad = 'survey/defs/load'
 
-const dispatchCurrentSurveyUpdate = (dispatch, survey) =>
-  dispatch({ type: surveyUpdate, survey })
+const dispatchCurrentSurveyUpdate = (dispatch, survey) => dispatch({ type: surveyUpdate, survey })
 
-const fetchNodeDefs = (surveyId, draft = false, validate = false) =>
-  axios.get(`/api/survey/${surveyId}/nodeDefs?draft=${draft}&validate=${validate}`)
-
-const fetchCategories = (surveyId, draft = false, validate = false) =>
-  axios.get(`/api/survey/${surveyId}/categories?draft=${draft}&validate=${validate}`)
-
-const fetchTaxonomies = (surveyId, draft = false, validate = false) =>
-  axios.get(`/api/survey/${surveyId}/taxonomies?draft=${draft}&validate=${validate}`)
+const fetchDefs = (surveyId, defs, draft = false, validate = false) =>
+  axios.get(
+    `/api/survey/${surveyId}/${defs}`,
+    { params: { draft, validate } }
+  )
 
 export const initSurveyDefs = (draft = false, validate = false) => async (dispatch, getState) => {
   const state = getState()
@@ -29,19 +25,17 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
 
     const surveyId = SurveyState.getSurveyId(state)
 
-    const res = await Promise.all([
-      fetchNodeDefs(surveyId, draft, validate),
-      fetchCategories(surveyId, draft, validate),
-      fetchTaxonomies(surveyId, draft, validate),
+    const [
+      { data: { nodeDefs, nodeDefsValidation } },
+      { data: { categories } },
+      { data: { taxonomies } }
+    ] = await Promise.all([
+      fetchDefs(surveyId, 'nodeDefs', draft, validate),
+      fetchDefs(surveyId, 'categories', draft, validate),
+      fetchDefs(surveyId, 'taxonomies', draft, validate),
     ])
 
-    dispatch({
-      type: surveyDefsLoad,
-      nodeDefs: res[0].data.nodeDefs,
-      categories: res[1].data.categories,
-      taxonomies: res[2].data.taxonomies,
-      draft
-    })
+    dispatch({ type: surveyDefsLoad, nodeDefs, nodeDefsValidation, categories, taxonomies, draft })
   }
 
 }

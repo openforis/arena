@@ -33,6 +33,7 @@ module.exports = {
   // READ
   fetchUserSurveysInfo: SurveyManager.fetchUserSurveysInfo,
   fetchSurveyById: SurveyManager.fetchSurveyById,
+  fetchSurveyAndNodeDefsBySurveyId: SurveyManager.fetchSurveyAndNodeDefsBySurveyId,
 
   // UPDATE
   updateSurveyProp,
