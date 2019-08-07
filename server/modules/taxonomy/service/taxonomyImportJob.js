@@ -74,7 +74,7 @@ class TaxonomyImportJob extends Job {
     await this._parseCSVRows(taxonomy)
   }
 
-  async _parseCSVRows(taxonomy) {
+  async _parseCSVRows (taxonomy) {
     this.logDebug('start CSV file parsing')
 
     const surveyId = this.getSurveyId()
@@ -168,7 +168,10 @@ class TaxonomyImportJob extends Job {
       if (duplicateCodeRow) {
         validation = Validator.assocFieldValidation(Taxon.propKeys.code, {
           valid: false,
-          errors: [{ key: Validator.errorKeys.duplicateCode, params: { row: duplicateCodeRow, duplicateRow: this.processed + 1 } }],
+          errors: [{
+            key: Validator.errorKeys.duplicateCode,
+            params: { row: duplicateCodeRow, duplicateRow: this.processed + 1 }
+          }],
         })(validation)
       } else {
         this.codesToRow[code] = this.processed + 1
@@ -180,7 +183,10 @@ class TaxonomyImportJob extends Job {
       if (duplicateScientificNameRow) {
         validation = Validator.assocFieldValidation(Taxon.propKeys.scientificName, {
           valid: false,
-          errors: [{ key: Validator.errorKeys.duplicateName, params: { row: duplicateCodeRow, duplicateRow: this.processed + 1 } }],
+          errors: [{
+            key: Validator.errorKeys.duplicateName,
+            params: { row: duplicateCodeRow, duplicateRow: this.processed + 1 }
+          }],
         })(validation)
       } else {
         this.scientificNamesToRow[scientificName] = this.processed + 1

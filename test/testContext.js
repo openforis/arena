@@ -15,7 +15,7 @@ let survey = null
  * before executing all tests
  */
 const initTestContext = async () => {
-  user = await UserService.findUserByCognitoUsername('demo_user')
+  user = await UserService.fetchUserByCognitoUsername('demo_user')
 }
 
 const destroyTestContext = async () => {

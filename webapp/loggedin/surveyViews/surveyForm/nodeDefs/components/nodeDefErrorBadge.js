@@ -60,11 +60,12 @@ const mapStateToProps = (state, props) => {
       if (node) {
         validation = RecordValidation.getNodeValidation(node)(recordValidation)
       } else if (NodeDef.isEntity(nodeDef)) {
+        //only entities can have children with min/max count validation
         validation = RecordValidation.getValidationChildrenCount(parentNode, nodeDef)(recordValidation)
       } else if (!R.all(Validator.isValid)(nodes)) {
         validation = {
           [Validator.keys.valid]: false,
-          [Validator.keys.errors]: [{ key: RecordValidation.keysError.atLeastOneInvalidValue }]
+          [Validator.keys.errors]: [{ key: RecordValidation.keysError.oneOrMoreInvalidValues }]
         }
       }
     } else if (!R.isEmpty(nodes)) {

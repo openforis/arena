@@ -7,6 +7,17 @@ const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 // in sql queries, user table must be surrounded by "" e.g. "user"
 
+// CREATE
+
+const insertUser = async (surveyId, email, group, client = db) =>
+  await client.one(`
+    INSERT INTO "user" AS u (email, prefs)
+    VALUES ($1, $2::jsonb)
+    RETURNING ${selectFieldsCommaSep}`,
+    [email, { survey: surveyId }])
+
+// READ
+
 const countUsersBySurveyId = async (surveyId, client = db) =>
   await client.one(`
     SELECT count(*)
@@ -30,13 +41,20 @@ const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client =
     camelize
   )
 
-const findUserByCognitoUsername = async (cognitoUsername, client = db) =>
+const fetchUserByCognitoUsername = async (cognitoUsername, client = db) =>
   await client.oneOrNone(`
     SELECT ${selectFieldsCommaSep}
     FROM "user" u
     WHERE u.cognito_username = $1`,
     [cognitoUsername]
   )
+
+const fetchUserByEmail = async (email, client = db) =>
+  await client.oneOrNone(`
+    SELECT ${selectFieldsCommaSep}
+    FROM "user" u
+    WHERE u.email = $1`,
+    [email])
 
 // ==== UPDATE
 
@@ -68,10 +86,14 @@ const deleteUserPref = async (user, name, client = db) => {
 }
 
 module.exports = {
+  // CREATE
+  insertUser,
+
   // READ
   countUsersBySurveyId,
   fetchUsersBySurveyId,
-  findUserByCognitoUsername,
+  fetchUserByCognitoUsername,
+  fetchUserByEmail,
 
   // UPDATE
   updateUserPref,

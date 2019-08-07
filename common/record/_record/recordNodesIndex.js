@@ -79,18 +79,17 @@ const getNodeCodeDependentUuids = nodeUuid => R.pathOr([], [keys.nodeCodeDepende
 /**
  * Adds the specified nodes to the cache
  */
-const addNodes = nodes =>
-  record =>
-    R.pipe(
-      R.values,
-      R.reject(Node.isDeleted),
-      R.reduce(
-        (recordAcc, node) => _addNode(node)(recordAcc),
-        record
-      )
-    )(nodes)
+const addNodes = nodes => record =>
+  R.pipe(
+    R.values,
+    R.reject(Node.isDeleted),
+    R.reduce(
+      (recordAcc, node) => addNode(node)(recordAcc),
+      record
+    )
+  )(nodes)
 
-const _addNode = node => R.pipe(
+const addNode = node => R.pipe(
   //rootUuid
   R.ifElse(
     R.always(Node.isRoot(node)),
@@ -160,6 +159,7 @@ const _dissocFromIndexPath = (path, value) => record => R.pipe(
 module.exports = {
   //ADD
   addNodes,
+  addNode,
   //GETTERS
   getNodeRootUuid,
   getNodeUuidsByParent,

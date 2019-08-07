@@ -3,7 +3,7 @@ import { exportReducer } from '../../../utils/reduxUtils'
 import * as NodeDefEditState from '../nodeDefEdit/nodeDefEditState'
 
 import { appUserLogout } from '../../../app/actions'
-import { surveyDelete, surveyUpdate } from '../../../survey/actions'
+import { surveyCreate, surveyDelete, surveyUpdate } from '../../../survey/actions'
 import { formReset } from '../surveyForm/actions'
 
 import { nodeDefEditUpdate } from '../nodeDefEdit/actions'
@@ -12,6 +12,7 @@ import { nodeDefCreate } from '../../../survey/nodeDefs/actions'
 const actionHandlers = {
   // reset form
   [appUserLogout]: () => ({}),
+  [surveyCreate]: () => ({}),
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
   [formReset]: () => ({}),
