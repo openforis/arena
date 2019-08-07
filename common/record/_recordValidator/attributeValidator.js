@@ -2,11 +2,11 @@ const Survey = require('../../survey/survey')
 const NodeDef = require('../../survey/nodeDef')
 const NodeDefExpression = require('../../survey/nodeDefExpression')
 const NodeDefValidations = require('../../survey/nodeDefValidations')
-const Validator = require('../../validation/validator')
-
 const Record = require('../record')
 const Node = require('../node')
 const RecordExprParser = require('../recordExprParser')
+const Validator = require('../../validation/validator')
+const StringUtils = require('../../stringUtils')
 
 const AttributeTypeValidator = require('./attributeTypeValidator')
 
@@ -40,9 +40,11 @@ const validateNodeValidations = (survey, record, nodeDef) => async (propName, no
 
   for (const { expression, value: valid } of applicableExpressionsEval) {
     if (!valid) {
+      const messages = _getCustomValidationMessages(survey, expression)
+
       errorMessage = {
         key: 'custom',
-        messages: NodeDefExpression.getMessages(expression)
+        messages
       }
       break
     }
@@ -90,6 +92,21 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
     }
   }
   return attributeValidations
+}
+
+const _getCustomValidationMessages = (survey, expression) => {
+  const messages = NodeDefExpression.getMessages(expression)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const languages = Survey.getLanguages(surveyInfo)
+
+  for (const lang of languages) {
+    const customMessage = messages[lang]
+    if (StringUtils.isBlank(customMessage)) {
+      // when custom message is blank, use the expression itself
+      messages[lang] = NodeDefExpression.getExpression(expression)
+    }
+  }
+  return messages
 }
 
 module.exports = {
