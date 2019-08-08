@@ -13,12 +13,12 @@ const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
 
 const userJobThreads = new ThreadsCache()
 
-const notifyJobUpdate = job => {
-  const userUuid = job.userUuid
+const notifyJobUpdate = jobSerialized => {
+  const userUuid = jobSerialized.userUuid
 
-  WebSocket.notifyUser(userUuid, WebSocketEvents.jobUpdate, job)
+  WebSocket.notifyUser(userUuid, WebSocketEvents.jobUpdate, jobSerialized)
 
-  if (job.ended) {
+  if (jobSerialized.ended) {
     const thread = userJobThreads.getThread(userUuid)
     //delay thread termination by 1 second (give time to print debug info to the console)
     setTimeout(() => {
