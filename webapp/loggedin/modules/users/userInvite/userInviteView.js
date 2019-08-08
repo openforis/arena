@@ -16,7 +16,7 @@ import Dropdown from '../../../../commonComponents/form/dropdown'
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 
-import { showAppLoader, hideAppLoader } from '../../../../app/actions'
+import { showAppLoader, hideAppLoader, showNotificationMessage } from '../../../../app/actions'
 import { useUserInviteState } from './userInviteState'
 
 const UserInviteView = props => {
@@ -72,4 +72,7 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { showAppLoader, hideAppLoader })(UserInviteView)
+export default connect(
+  mapStateToProps,
+  { showAppLoader, hideAppLoader, showNotificationMessage }
+)(UserInviteView)

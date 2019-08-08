@@ -1,0 +1,61 @@
+@import "../../style/vars";
+
+$appNotificationWidth: 500px;
+
+.app-notification {
+  position: fixed;
+  z-index: $zIndex80AppNotification;
+  width: $appNotificationWidth;
+  padding: 10px;
+  background-color: lighten($blueLightActive, 18%);
+  border: 1px solid lighten($blueLightActive, 5%);
+  border-radius: 3px;
+
+  font-size: .9rem;
+  font-weight: 600;
+  text-align: center;
+
+  transform: translate(calc(50vw - #{$appNotificationWidth / 2}), 15px);
+}
+
+.app-notification.enter-active {
+  animation: app-notification-in 250ms ease-out;
+}
+
+.app-notification.exit, .app-notification.exit-done {
+  opacity: 0;
+}
+
+.app-notification.exit-active {
+  animation: app-notification-out 250ms ease-out;
+}
+
+.app-notification__btn-close {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  &:hover {
+    background-color: transparent;
+  }
+}
+
+@keyframes app-notification-in {
+  from {
+    opacity: 0;
+    transform: translate(calc(50vw - #{$appNotificationWidth / 2}), -15px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(calc(50vw - #{$appNotificationWidth / 2}), 15px);
+  }
+}
+
+@keyframes app-notification-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
