@@ -111,7 +111,7 @@ module.exports = {
 
   getInfo,
 
-  getId,
+  getUuid: getId,
   getUuid,
   isPublished,
   isDraft,
