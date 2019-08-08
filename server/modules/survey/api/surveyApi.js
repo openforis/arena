@@ -1,6 +1,8 @@
 const Response = require('../../../utils/response')
 const Request = require('../../../utils/request')
 
+const Validator = require('../../../../common/validation/validator')
+
 const SurveyService = require('../service/surveyService')
 
 const AuthMiddleware = require('../../auth/authApiMiddleware')
@@ -16,7 +18,7 @@ module.exports.init = app => {
       const { body } = req
       const validation = await SurveyService.validateNewSurvey(body)
 
-      if (validation.valid) {
+      if (Validator.isValidationValid(validation)) {
         const survey = await SurveyService.createSurvey(user, body)
 
         res.json({ survey })

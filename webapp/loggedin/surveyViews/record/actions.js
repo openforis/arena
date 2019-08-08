@@ -83,7 +83,7 @@ export const updateNode = (nodeDef, node, value, file = null, meta = {}, refData
     R.assoc(Node.keys.dirty, true),
   )(node)
 
-  recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate })(dispatch)
+  dispatch(recordNodesUpdate({ [Node.getUuid(node)]: nodeToUpdate }))
   dispatch(_updateNodeDebounced(nodeToUpdate, file, Node.isPlaceholder(node) ? 0 : 500))
 }
 

@@ -61,7 +61,7 @@ const validateAttribute = async (survey, record, attribute, nodeDef) => {
       ]
     }, false)
   } else {
-    return Validator.validValidation
+    return Validator.newValidationValid()
   }
 }
 
