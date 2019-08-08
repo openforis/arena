@@ -7,7 +7,6 @@ import Dropdown from '../../../../commonComponents/form/dropdown'
 import ButtonGroup from '../../../../commonComponents/form/buttonGroup'
 import useI18n from '../../../../commonComponents/useI18n'
 
-
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import Category from '../../../../../common/survey/category'
@@ -35,7 +34,7 @@ const displayAsItems = [
 
 const CodeProps = (props) => {
   const {
-    nodeDef,
+    nodeDef, validation,
     putNodeDefProp,
     categories,
     canUpdateCategory,
@@ -45,8 +44,6 @@ const CodeProps = (props) => {
     createCategory,
     toggleCategoryEdit,
   } = props
-
-  const validation = Validator.getValidation(nodeDef)
 
   const disabled = !canUpdateCategory
 
