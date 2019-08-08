@@ -3,6 +3,7 @@ const R = require('ramda')
 const Job = require('../../../../../job/job')
 
 const Survey = require('../../../../../../common/survey/survey')
+
 const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const SurveyManager = require('../../../manager/surveyManager')
 const CategoryManager = require('../../../../category/manager/categoryManager')
@@ -51,7 +52,9 @@ class SurveyPropsPublishJob extends Job {
     const surveyInfo = await SurveyManager.publishSurveyProps(id, tx)
     this.incrementProcessedItems()
 
-    await this.removeDeletedLanguagesLabels(deletedLanguages, tx)
+    if (!R.isEmpty(deletedLanguages)) {
+      await this.removeDeletedLanguagesLabels(deletedLanguages, tx)
+    }
     this.incrementProcessedItems()
 
     await ActivityLog.log(this.getUser(), id, ActivityLog.type.surveyPublish, { surveyUuid: Survey.getUuid(surveyInfo) }, tx)
@@ -74,6 +77,9 @@ class SurveyPropsPublishJob extends Job {
       //CATEGORY ITEMS
       await CategoryManager.deleteItemLabels(surveyId, langCode, t)
     }
+
+    // NODE DEF VALIDATIONS MESSAGES
+    await NodeDefManager.deleteNodeDefValidationMessagesLabels(surveyId, deletedLanguages, t)
   }
 }
 

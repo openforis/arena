@@ -1,6 +1,9 @@
 const R = require('ramda')
 const db = require('../../../db/db')
 
+const NodeDef = require('../../../../common/survey/nodeDef')
+const NodeDefValidations = require('../../../../common/survey/nodeDefValidations')
+const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 const SurveyUtils = require('../../../../common/survey/surveyUtils')
 
 const NodeDefRepository = require('../repository/nodeDefRepository')
@@ -70,6 +73,49 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
     return nodeDef
   })
 
+const deleteNodeDefValidationMessagesLabels = async (surveyId, deletedLanguages, client = db) => {
+  await client.tx(async tx => {
+    // 1. fetch all node defs (already published)
+    const nodeDefs = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, false, true, tx)
+
+    for (const nodeDef of nodeDefs) {
+      // 2. for each node def, remove messages in deleted languages and update its expressions in validations
+      const validations = NodeDef.getValidations(nodeDef)
+      const expressions = NodeDefValidations.getExpressions(validations)
+
+      let nodeDefUpdateRequired = false
+      const expressionsUpdated = []
+
+      for (const expression of expressions) {
+        // 3. for each expression find messages in deleted languages (if any)
+        const messages = NodeDefExpression.getMessages(expression)
+
+        const deletedMessageLanguages = R.pipe(
+          R.keys,
+          R.intersection(deletedLanguages)
+        )(messages)
+
+        if (R.isEmpty(deletedMessageLanguages)) {
+          expressionsUpdated.push(expression)
+        } else {
+          // 4. remove messages in deleted languages
+          const messagesUpdated = R.omit(deletedMessageLanguages, messages)
+          expressionsUpdated.push(NodeDefExpression.assocMessages(messagesUpdated)(expression))
+          nodeDefUpdateRequired = true
+        }
+
+        if (nodeDefUpdateRequired) {
+          // 5. update node def in db (props already published)
+          const validationsUpdated = NodeDefValidations.assocExpressions(expressionsUpdated)(validations)
+          await NodeDefRepository.updateNodeDefPropsPublished(surveyId, NodeDef.getUuid(nodeDef), {}, {
+            [NodeDef.propKeys.validations]: validationsUpdated
+          }, tx)
+        }
+      }
+    }
+  })
+}
+
 // ======= DELETE
 
 const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
@@ -101,4 +147,5 @@ module.exports = {
   permanentlyDeleteNodeDefs: NodeDefRepository.permanentlyDeleteNodeDefs,
   deleteNodeDefsLabels: NodeDefRepository.deleteNodeDefsLabels,
   deleteNodeDefsDescriptions: NodeDefRepository.deleteNodeDefsDescriptions,
+  deleteNodeDefValidationMessagesLabels
 }

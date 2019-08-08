@@ -128,6 +128,17 @@ const updateNodeDefProps = async (surveyId, nodeDefUuid, props, propsAdvanced = 
     def => dbTransformCallback(def, true, true) //always loading draft when creating or updating a nodeDef
   )
 
+const updateNodeDefPropsPublished = async (surveyId, nodeDefUuid, props, propsAdvanced = {}, client = db) =>
+  await client.one(`
+    UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
+    SET props = props || $1::jsonb,
+        props_advanced = props_advanced || $2::jsonb
+    WHERE uuid = $3
+    RETURNING ${nodeDefSelectFields}
+  `, [props, propsAdvanced, nodeDefUuid],
+    def => dbTransformCallback(def, false, true) //always loading draft when creating or updating a nodeDef
+  )
+
 const publishNodeDefsProps = async (surveyId, client = db) =>
   await client.query(`
         UPDATE
@@ -196,6 +207,7 @@ module.exports = {
 
   //UPDATE
   updateNodeDefProps,
+  updateNodeDefPropsPublished,
   publishNodeDefsProps,
 
   //DELETE

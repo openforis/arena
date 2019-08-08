@@ -40,11 +40,13 @@ const assocProp = (propName, value) => R.pipe(
   R.dissoc(keys.placeholder),
 )
 
+const assocMessages = messages => assocProp(keys.messages, messages)
+
 const assocMessage = message =>
   nodeDefExpression => {
     const messagesOld = getMessages(nodeDefExpression)
     const messagesNew = R.assoc(message.lang, message.label, messagesOld)
-    return assocProp(keys.messages, messagesNew)(nodeDefExpression)
+    return assocMessages(messagesNew)(nodeDefExpression)
   }
 
 // ====== UTILS
@@ -98,6 +100,7 @@ module.exports = {
   assocExpression: expression => assocProp(keys.expression, expression),
   assocApplyIf: applyIf => assocProp(keys.applyIf, applyIf),
   assocMessage,
+  assocMessages,
 
   //UTILS
   findReferencedNodeDefs
