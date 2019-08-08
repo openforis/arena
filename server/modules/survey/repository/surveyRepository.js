@@ -4,9 +4,12 @@ const R = require('ramda')
 const { dbTransformCallback, getSurveyDBSchema } = require('./surveySchemaRepositoryUtils')
 const { selectDate } = require('../../../db/dbUtils')
 
+const User = require('../../../../common/user/user')
+const Survey = require('../../../../common/survey/survey')
+
 const surveySelectFields = (alias = '') => {
   const prefix = alias ? alias + '.' : ''
-  return `${prefix}id, ${prefix}uuid, ${prefix}published, ${prefix}draft, ${prefix}props, ${prefix}props_draft, ${prefix}owner_id,
+  return `${prefix}id, ${prefix}uuid, ${prefix}published, ${prefix}draft, ${prefix}props, ${prefix}props_draft, ${prefix}owner_uuid,
   ${selectDate(`${prefix}date_created`, 'date_created')}, 
   ${selectDate(`${prefix}date_modified`, 'date_modified')}`
 }
@@ -15,11 +18,11 @@ const surveySelectFields = (alias = '') => {
 
 const insertSurvey = async (survey, client = db) =>
   await client.one(`
-      INSERT INTO survey (uuid, props_draft, owner_id)
+      INSERT INTO survey (uuid, props_draft, owner_uuid)
       VALUES ($1, $2, $3)
       RETURNING ${surveySelectFields()}
     `,
-    [survey.uuid, survey.props, survey.userId],
+    [Survey.getUuid(survey), survey.props, survey.ownerUuid],
     def => dbTransformCallback(def, true)
   )
 
@@ -36,12 +39,12 @@ const fetchSurveys = async (user, checkAccess = true, client = db) =>
     JOIN auth_group g
       ON s.id = g.survey_id
     JOIN auth_group_user gu
-      ON gu.group_id = g.id AND gu.user_id = $1`
+      ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
     :
     ''}
     ORDER BY s.id
     `,
-    [user.id],
+    [User.getUuid(user)],
     def => dbTransformCallback(def, true)
   )
 

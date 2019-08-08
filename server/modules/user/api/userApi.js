@@ -5,6 +5,7 @@ const AuthMiddleware = require('../../auth/authApiMiddleware')
 
 const UserService = require('../service/userService')
 
+const User = require('../../../../common/user/user')
 const Validator = require('../../../../common/validation/validator')
 
 const SystemError = require('../../../../server/utils/systemError')
@@ -17,11 +18,11 @@ module.exports.init = app => {
     try {
       const { user } = req
 
-      const { surveyId, email, groupId } = Request.getParams(req)
+      const { surveyId, email, groupUuid } = Request.getParams(req)
       const validation = await UserService.validateNewUser(req.body)
 
       if (Validator.isValidationValid(validation)) {
-        await UserService.inviteUser(user, surveyId, email, groupId)
+        await UserService.inviteUser(user, surveyId, email, groupUuid)
 
         Response.sendOk(res)
       } else {
@@ -73,13 +74,13 @@ module.exports.init = app => {
     }
   })
 
-  app.post('/user/:userId/pref/:name/:value', async (req, res, next) => {
+  app.post('/user/:userUuid/pref/:name/:value', async (req, res, next) => {
     try {
       const { user } = req
 
-      const { userId, name, value } = Request.getParams(req)
+      const { userUuid, name, value } = Request.getParams(req)
 
-      if (user.id !== userId) {
+      if (User.getUuid(user) !== userUuid) {
         throw new SystemError('userNotAllowedToChangePref')
       }
 

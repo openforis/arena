@@ -23,7 +23,7 @@ export const useUserInviteState = props => {
   const {
     object, objectValid,
     setObjectField, enableValidation, getFieldValidation
-  } = useFormObject({ email: '', groupId: null }, UserValidator.validateNewUser)
+  } = useFormObject({ email: '', groupUuid: null }, UserValidator.validateNewUser)
 
   const { data, error, dispatch } = useAsyncPostRequest(
     `/api/survey/${surveyId}/users/invite`,
@@ -33,7 +33,7 @@ export const useUserInviteState = props => {
   // init groups
   useEffect(() => {
     const groups = groupsProps.map(g => ({
-      id: AuthGroups.getId(g),
+      uuid: AuthGroups.getUuid(g),
       label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label`)
     }))
 
@@ -55,8 +55,8 @@ export const useUserInviteState = props => {
   }
 
   const setGroup = group => {
-    const groupId = AuthGroups.getId(group)
-    setObjectField('groupId', groupId)
+    const groupUuid = AuthGroups.getUuid(group)
+    setObjectField('groupUuid', groupUuid)
   }
 
   const inviteUser = () => {
@@ -70,7 +70,7 @@ export const useUserInviteState = props => {
 
   return {
     email: object.email,
-    group: groups.find(R.propEq('id', object.groupId)),
+    group: groups.find(R.propEq('uuid', object.groupUuid)),
     groups,
 
     setEmail,

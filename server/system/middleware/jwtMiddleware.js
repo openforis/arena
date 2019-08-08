@@ -23,7 +23,7 @@ module.exports = async (req, res, next) => {
 
       const tokenDecoded = await Jwt.validate(jwtToken)
 
-      req.user = await UserService.fetchUserByCognitoUsername(tokenDecoded.username)
+      req.user = await UserService.fetchUserByUuid(tokenDecoded.username)
 
       next()
     } catch (e) {

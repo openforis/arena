@@ -2,6 +2,8 @@ const db = require('../../db/db')
 
 const { getSurveyDBSchema } = require('../survey/repository/surveySchemaRepositoryUtils')
 
+const User = require('../../../common/user/user')
+
 const type = {
   //survey
   surveyCreate: 'surveyCreate',
@@ -51,9 +53,9 @@ const keys = {
 
 const log = async (user, surveyId, type, params, client) =>
   client.none(`
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_email, params)
+    INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, params)
     VALUES ($1, $2, $3::jsonb)`,
-    [type, user.email, params])
+    [type, User.getUuid(user), params])
 
 const logMany = async (user, surveyId, activities, client) =>
   await client.batch([

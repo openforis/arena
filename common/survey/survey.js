@@ -11,7 +11,7 @@ const SurveyDefaults = require('./_survey/surveyDefaults')
 const SurveyDependencies = require('./_survey/surveyDependencies')
 const SurveyRefDataIndex = require('./_survey/surveyRefDataIndex')
 
-const newSurvey = (userId, name, label, lang, collectUri = null) => ({
+const newSurvey = (ownerUuid, name, label, lang, collectUri = null) => ({
   uuid: uuidv4(),
   props: {
     name,
@@ -22,7 +22,7 @@ const newSurvey = (userId, name, label, lang, collectUri = null) => ({
       ? { collectUri }
       : {}
   },
-  userId
+  ownerUuid
 })
 
 module.exports = {
