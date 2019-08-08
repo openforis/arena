@@ -13,7 +13,7 @@ const Validator = require('../../../../common/validation/validator')
 const NodeDefTable = require('../../../../common/surveyRdb/nodeDefTable')
 const SchemaRdb = require('../../../../common/surveyRdb/schemaRdb')
 
-const recordSelectFields = `uuid, owner_id, step, ${DbUtils.selectDate('date_created')}, preview, validation`
+const recordSelectFields = `uuid, owner_uuid, step, ${DbUtils.selectDate('date_created')}, preview, validation`
 
 const dbTransformCallback = (surveyId, includeValidationFields = true) => record => {
   const validation = Record.getValidation(record)
@@ -33,10 +33,10 @@ const dbTransformCallback = (surveyId, includeValidationFields = true) => record
 const insertRecord = async (surveyId, record, client = db) =>
   await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.record 
-    (owner_id, uuid, step, preview)
+    (owner_uuid, uuid, step, preview)
     VALUES ($1, $2, $3, $4)
     RETURNING ${recordSelectFields}`,
-    [Record.getOwnerId(record), Record.getUuid(record), Record.getStep(record), Record.isPreview(record)],
+    [Record.getOwnerUuid(record), Record.getUuid(record), Record.getStep(record), Record.isPreview(record)],
     dbTransformCallback(surveyId)
   )
 
@@ -57,7 +57,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
   const recordsSelect = `
     SELECT 
         r.uuid, 
-        r.owner_id, 
+        r.owner_uuid, 
         r.step, 
         ${DbUtils.selectDate('r.date_created', 'date_created')}, 
         r.validation
@@ -78,7 +78,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
     FROM  r
     -- GET OWNER NAME
     JOIN "user" u
-      ON r.owner_id = u.id
+      ON r.owner_uuid = u.uuid
     -- GET LAST MODIFIED NODE DATE
     LEFT OUTER JOIN (
          SELECT 

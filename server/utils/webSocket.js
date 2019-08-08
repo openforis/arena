@@ -8,18 +8,18 @@ const Jwt = require('../modules/auth/jwt')
 
 let userSockets = {}
 
-const getUserSockets = userId => R.propOr({}, userId, userSockets)
+const getUserSockets = userUuid => R.propOr({}, userUuid, userSockets)
 
-const addUserSocket = (userId, socket) => { userSockets = R.assocPath([userId, socket.id], socket, userSockets) }
+const addUserSocket = (userUuid, socket) => { userSockets = R.assocPath([userUuid, socket.id], socket, userSockets) }
 
-const deleteUserSocket = (userId, socketId) => { userSockets = R.dissocPath([userId, socketId], userSockets) }
+const deleteUserSocket = (userUuid, socketId) => { userSockets = R.dissocPath([userUuid, socketId], userSockets) }
 
-const notifyUser = (userId, eventType, message) => R.pipe(
+const notifyUser = (userUuid, eventType, message) => R.pipe(
   getUserSockets,
   R.forEachObjIndexed(
     socket => socket.emit(eventType, message),
   )
-)(userId)
+)(userUuid)
 
 const init = (server, jwtMiddleware) => {
 
@@ -35,16 +35,16 @@ const init = (server, jwtMiddleware) => {
   })
 
   io.on('connection', async socket => {
-    const userId = R.pipe(
+    const userUuid = R.pipe(
       R.prop('request'),
-      Request.getUserId,
+      Request.getUserUuid,
     )(socket)
 
-    if (userId) {
-      addUserSocket(userId, socket)
+    if (userUuid) {
+      addUserSocket(userUuid, socket)
 
       socket.on('disconnect', () => {
-        deleteUserSocket(userId, socket.id)
+        deleteUserSocket(userUuid, socket.id)
       })
     }
   })

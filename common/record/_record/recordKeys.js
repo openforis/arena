@@ -1,7 +1,7 @@
 const keys = {
   uuid: 'uuid',
   nodes: 'nodes',
-  ownerId: 'ownerId',
+  ownerUuid: 'ownerUuid',
   ownerName: 'ownerName',
   step: 'step',
   preview: 'preview',

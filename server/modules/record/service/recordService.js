@@ -21,7 +21,7 @@ const RecordUsersMap = require('./update/recordUsersMap')
 const RecordThreads = require('./update/thread/recordThreads')
 const recordThreadMessageTypes = require('./update/thread/recordThreadMessageTypes')
 
-const checkOutTimeoutsByUserId = {}
+const checkOutTimeoutsByUserUuid = {}
 
 /**
  * ======
@@ -29,12 +29,12 @@ const checkOutTimeoutsByUserId = {}
  * ======
  */
 const createUserThread = (user, surveyId, recordUuid, preview, singleMessageHandling) => {
-  const userId = user.id
+  const userUuid = User.getUuid(user)
 
-  cancelCheckOut(userId)
+  cancelCheckOut(userUuid)
 
   // terminate old thread, if any
-  const oldThread = RecordThreads.getThreadByUserId(userId)
+  const oldThread = RecordThreads.getThreadByUserUuid(userUuid)
   if (oldThread) {
     oldThread.terminate()
   }
@@ -45,36 +45,36 @@ const createUserThread = (user, surveyId, recordUuid, preview, singleMessageHand
   const data = { user, surveyId, recordUuid }
 
   const messageHandler = msg => {
-    const userIds = RecordUsersMap.getUserIds(recordUuid)
-    userIds.forEach(userId =>
-      WebSocket.notifyUser(userId, msg.type, R.prop('content', msg))
+    const userUuids = RecordUsersMap.getUserUuids(recordUuid)
+    userUuids.forEach(userUuid =>
+      WebSocket.notifyUser(userUuid, msg.type, R.prop('content', msg))
     )
   }
 
   const exitHandler = () => {
-    RecordUsersMap.dissocUserId(recordUuid, userId)
-    RecordThreads.removeThreadByUserId(userId)
+    RecordUsersMap.dissocUserUuid(recordUuid, userUuid)
+    RecordThreads.removeThreadByUserUuid(userUuid)
   }
 
   const thread = new ThreadManager(filePath, data, messageHandler, exitHandler, singleMessageHandling)
 
-  return RecordThreads.putThreadByUserId(userId, thread)
+  return RecordThreads.putThreadByUserUuid(userUuid, thread)
 }
 
 const getOrCreatedUserThread = (user, surveyId, recordUuid, preview = false, singleMessageHandling = false) => {
-  const thread = RecordThreads.getThreadByUserId(user.id)
+  const thread = RecordThreads.getThreadByUserUuid(User.getUuid(user))
   return thread || createUserThread(user, surveyId, recordUuid, preview, singleMessageHandling)
 }
 
-const terminateUserThread = userId => {
-  if (!checkOutTimeoutsByUserId[userId])
-    checkOutTimeoutsByUserId[userId] = setTimeout(
+const terminateUserThread = userUuid => {
+  if (!checkOutTimeoutsByUserUuid[userUuid])
+    checkOutTimeoutsByUserUuid[userUuid] = setTimeout(
       () => {
-        const updateWorker = RecordThreads.getThreadByUserId(userId)
+        const updateWorker = RecordThreads.getThreadByUserUuid(userUuid)
         if (updateWorker)
           updateWorker.terminate()
 
-        delete checkOutTimeoutsByUserId[userId]
+        delete checkOutTimeoutsByUserUuid[userUuid]
       },
       1000
     )
@@ -94,13 +94,13 @@ const createRecord = async (user, surveyId, recordToCreate) => {
 const deleteRecord = async (user, surveyId, recordUuid) => {
   await RecordManager.deleteRecord(user, surveyId, recordUuid)
 
-  const recordUsersIds = RecordUsersMap.getUserIds(recordUuid)
+  const recordUsersIds = RecordUsersMap.getUserUuids(recordUuid)
 
   //notify users that record has been deleted
-  recordUsersIds.forEach(userIdRecord => {
-    if (userIdRecord !== user.id) {
-      WebSocket.notifyUser(userIdRecord, WebSocketEvents.recordDelete, recordUuid)
-      terminateUserThread(userIdRecord)
+  recordUsersIds.forEach(userUuidRecord => {
+    if (userUuidRecord !== User.getUuid(user)) {
+      WebSocket.notifyUser(userUuidRecord, WebSocketEvents.recordDelete, recordUuid)
+      terminateUserThread(userUuidRecord)
     }
   })
 }
@@ -127,14 +127,14 @@ const checkOut = async (user, surveyId, recordUuid) => {
     await RecordManager.deleteRecordPreview(surveyId, recordUuid)
   }
 
-  terminateUserThread(User.getId(user))
+  terminateUserThread(User.getUuid(user))
 }
 
-const cancelCheckOut = userId => {
-  const timeout = checkOutTimeoutsByUserId[userId]
+const cancelCheckOut = userUuid => {
+  const timeout = checkOutTimeoutsByUserUuid[userUuid]
   if (timeout) {
     clearTimeout(timeout)
-    delete checkOutTimeoutsByUserId[userId]
+    delete checkOutTimeoutsByUserUuid[userUuid]
   }
 }
 

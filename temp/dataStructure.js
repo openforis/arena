@@ -46,7 +46,7 @@ const nodeDef = {
 const survey = {
   id,
   uuid: null,
-  ownerId: id,
+  ownerUuid: uuid,
 
   published: false,
   draft: true,
@@ -69,7 +69,7 @@ const record = {
   id,
   uuid: null,
   surveyId: id,
-  ownerId: id,
+  ownerUuid: uuid,
   step: id, // current step id
   dateCreated: null,
 }
@@ -97,7 +97,7 @@ const node = {
 
 const recordCommand = {
   action: null, //recordActions
-  userId: id,
+  userUuid: id,
   surveyId: id,
   recordUuid: id,
   parentId: id, //only for addNode action
@@ -109,7 +109,7 @@ const recordCommand = {
 const recordUpdateLog = {
   id: id,
   action: null, //recordActions
-  userId: id,
+  userUuid: id,
   dateCreated: null,
   node: null,
 }

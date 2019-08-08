@@ -3,7 +3,7 @@ const JwtRepository = require('../repository/jwtRepository')
 
 module.exports = {
 
-  fetchGroupById: AuthGroupRepository.fetchGroupById,
+  fetchGroupByUuid: AuthGroupRepository.fetchGroupByUuid,
 
   blacklistToken: JwtRepository.blacklistToken,
 

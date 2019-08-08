@@ -1,13 +1,13 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE
   "user"
 (
-  id                    BIGSERIAL     NOT NULL,
-  cognito_username      VARCHAR,
-  name                  VARCHAR(1024),
-  email                 VARCHAR(1024) NOT NULL,
-  prefs                 jsonb DEFAULT '{}'::jsonb,
+  uuid  uuid NOT NULL DEFAULT uuid_generate_v4(),
+  name  VARCHAR,
+  email VARCHAR NOT NULL,
+  prefs jsonb DEFAULT '{}'::jsonb,
 
-  PRIMARY KEY ("id"),
-  CONSTRAINT user_cognito_username_idx UNIQUE ("cognito_username"),
+  PRIMARY KEY ("uuid"),
   CONSTRAINT user_email_idx UNIQUE ("email")
 );

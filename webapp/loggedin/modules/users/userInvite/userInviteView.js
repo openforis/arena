@@ -38,10 +38,10 @@ const UserInviteView = props => {
       </div>
       <div>
         <Dropdown
-          validation={getFieldValidation('groupId')}
+          validation={getFieldValidation('groupUuid')}
           placeholder={i18n.t('common.group')}
           items={groups}
-          itemKeyProp={'id'}
+          itemKeyProp={'uuid'}
           itemLabelProp={'label'}
           selection={group}
           onChange={setGroup}/>

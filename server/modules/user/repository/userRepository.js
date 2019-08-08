@@ -8,12 +8,12 @@ const User = require('../../../../common/user/user')
 
 // CREATE
 
-const insertUser = async (surveyId, cognitoUsername, email, client = db) =>
+const insertUser = async (surveyId, uuid, email, client = db) =>
   await client.one(`
-    INSERT INTO "user" (cognito_username, email, prefs)
+    INSERT INTO "user" (uuid, email, prefs)
     VALUES ($1, $2, $3::jsonb)
     RETURNING *`,
-    [cognitoUsername, email, { survey: surveyId }],
+    [uuid, email, { survey: surveyId }],
     camelize)
 
 // READ
@@ -23,31 +23,30 @@ const countUsersBySurveyId = async (surveyId, client = db) =>
     SELECT count(*)
     FROM "user" u
     JOIN auth_group_user gu 
-    ON gu.user_id = u.id
+    ON gu.user_uuid = u.uuid
     JOIN auth_group g 
-    ON g.id = gu.group_id 
+    ON g.uuid = gu.group_uuid 
     AND g.survey_id = $1`,
     [surveyId])
 
 const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client = db) =>
   await client.map(`
-    SELECT u.*, u.cognito_username, g.name AS group_name
+    SELECT u.*, g.name AS group_name
     FROM "user" u
-    JOIN auth_group_user gu ON gu.user_id = u.id
-    JOIN auth_group g on g.id = gu.group_id AND g.survey_id = $1
-    GROUP BY u.id, g.name
-    ORDER BY u.id
+    JOIN auth_group_user gu ON gu.user_uuid = u.uuid
+    JOIN auth_group g on g.uuid = gu.group_uuid AND g.survey_id = $1
+    GROUP BY u.uuid, g.name
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
     [surveyId],
     camelize)
 
-const fetchUserByCognitoUsername = async (cognitoUsername, client = db) =>
+const fetchUserByUuid = async (uuid, client = db) =>
   await client.oneOrNone(`
     SELECT *
     FROM "user"
-    WHERE cognito_username = $1`,
-    [cognitoUsername],
+    WHERE uuid = $1`,
+    [uuid],
     camelize)
 
 const fetchUserByEmail = async (email, client = db) =>
@@ -64,9 +63,9 @@ const updateUsername = async (user, name, client = db) =>
   await client.one(`
     UPDATE "user" 
     SET name = $1
-    WHERE cognito_username = $2
+    WHERE uuid = $2
     RETURNING *`,
-    [name, User.getCognitoUsername(user)],
+    [name, User.getUuid(user)],
     camelize)
 
 const updateUserPref = async (user, name, value, client = db) => {
@@ -77,9 +76,9 @@ const updateUserPref = async (user, name, value, client = db) => {
   const userRes = await client.one(`
     UPDATE "user"
     SET prefs = prefs || $1
-    WHERE id = $2
+    WHERE uuid = $2
     RETURNING *`,
-    [userPref, User.getId(user)],
+    [userPref, User.getUuid(user)],
     camelize)
 
   return userRes
@@ -91,9 +90,9 @@ const deleteUserPref = async (user, name, client = db) => {
   const userRes = await client.one(`
     UPDATE "user"
     SET prefs = prefs - $1
-    WHERE id = $2
+    WHERE uuid = $2
     RETURNING *`,
-    [name, User.getId(user)],
+    [name, User.getUuid(user)],
     camelize)
 
   return userRes
@@ -106,7 +105,7 @@ module.exports = {
   // READ
   countUsersBySurveyId,
   fetchUsersBySurveyId,
-  fetchUserByCognitoUsername,
+  fetchUserByUuid,
   fetchUserByEmail,
 
   // UPDATE

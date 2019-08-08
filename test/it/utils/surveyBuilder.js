@@ -125,7 +125,7 @@ class SurveyBuilder {
   }
 
   build () {
-    const survey = Survey.newSurvey(User.getId(this.user), this.name, this.label, this.lang)
+    const survey = Survey.newSurvey(User.getUuid(this.user), this.name, this.label, this.lang)
     const nodeDefs = this.rootDefBuilder.build(survey)
 
     return R.pipe(
