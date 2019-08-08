@@ -114,9 +114,12 @@ export const showNotificationMessage = message => dispatch => dispatch({
   notification: { [AppState.keysNotification.message]: message }
 })
 
-export const showNotificationMessageKey = messageKey => dispatch => dispatch({
+export const showNotificationMessageKey = (messageKey, messageParams) => dispatch => dispatch({
   type: appNotificationShow,
-  notification: { [AppState.keysNotification.messageKey]: messageKey }
+  notification: {
+    [AppState.keysNotification.messageKey]: messageKey,
+    [AppState.keysNotification.messageParams]: messageParams,
+  }
 })
 
 export const hideNotification = () => dispatch => dispatch({ type: appNotificationHide })

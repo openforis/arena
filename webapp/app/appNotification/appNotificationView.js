@@ -4,14 +4,15 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { CSSTransition } from 'react-transition-group'
-import useI18n from '../../commonComponents/useI18n'
 
 import * as AppState from '../appState'
+
 import { hideNotification } from '../actions'
 
 const AppNotificationView = props => {
   const {
-    visible, message, messageKey,
+    visible, message, messageKey, messageParams,
+    i18n,
     hideNotification,
   } = props
 
@@ -30,7 +31,7 @@ const AppNotificationView = props => {
         <div>
           {
             messageKey
-              ? useI18n().t(messageKey)
+              ? i18n.t(messageKey, messageParams)
               : message
           }
         </div>
@@ -45,7 +46,9 @@ const AppNotificationView = props => {
 const mapStateToProps = state => ({
   message: AppState.getNotificationMessage(state),
   messageKey: AppState.getNotificationMessageKey(state),
+  messageParams: AppState.getNotificationMessageParams(state),
   visible: AppState.isNotificationVisible(state),
+  i18n: AppState.getI18n(state),
 })
 
 export default connect(mapStateToProps, { hideNotification })(AppNotificationView)

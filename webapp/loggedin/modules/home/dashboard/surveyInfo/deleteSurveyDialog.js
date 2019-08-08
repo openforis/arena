@@ -1,6 +1,6 @@
 import './deleteSurveyDialog.scss'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState } from 'react'
 import Markdown from 'react-remarkable'
 
 import useI18n from '../../../../../commonComponents/useI18n'
@@ -14,13 +14,7 @@ import {
 
 const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
   const i18n = useI18n()
-  const [ confirmName, setConfirmName ] = useState('')
-  const confirmNameRef = useRef(null)
-
-  useEffect(() => {
-    setConfirmName('')
-    confirmNameRef.current.focus()
-  }, [])
+  const [confirmName, setConfirmName] = useState('')
 
   return (
     <Modal isOpen={true} onClose={() => onCancel()}>
@@ -32,7 +26,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
         <div className="survey-delete-dialog__body">
           <div className="highlight">
             <div>
-              <Markdown options={{html:false}}>
+              <Markdown options={{ html: false }}>
                 {i18n.t('homeView.deleteSurveyDialog.deleteWarning', { surveyName })}
               </Markdown>
             </div>
@@ -46,8 +40,7 @@ const DeleteSurveyDialog = ({ surveyName, onDelete, onCancel }) => {
           <input type="text"
                  className="confirm-name"
                  value={confirmName}
-                 onChange={evt => setConfirmName(evt.target.value)}
-                 ref={confirmNameRef}/>
+                 onChange={evt => setConfirmName(evt.target.value)}/>
         </div>
       </ModalBody>
 
