@@ -5,11 +5,13 @@ import * as R from 'ramda'
 
 import ErrorBadge from '../../../../../commonComponents/errorBadge'
 
+import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../common/record/record'
 import RecordValidation from '../../../../../../common/record/recordValidation'
 import Validator from '../../../../../../common/validation/validator'
 
+import * as SurveyState from '../../../../../survey/surveyState'
 import * as RecordState from '../../../record/recordState'
 
 const NodeDefErrorBadge = props => {
@@ -45,10 +47,11 @@ NodeDefErrorBadge.defaultProps = {
 const mapStateToProps = (state, props) => {
   const { nodeDef, parentNode, nodes, node, edit } = props
 
-  let validation = Validator.validValidation
+  let validation = Validator.newValidationValid()
 
   if (edit) {
-    validation = Validator.getValidation(nodeDef)
+    const survey = SurveyState.getSurvey(state)
+    validation = Survey.getNodeDefValidation(nodeDef)(survey)
   } else {
     const recordValidation = R.pipe(
       RecordState.getRecord,

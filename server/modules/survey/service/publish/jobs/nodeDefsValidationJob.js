@@ -2,10 +2,11 @@ const R = require('ramda')
 
 const Job = require('../../../../../job/job')
 
+const Survey = require('../../../../../../common/survey/survey')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const Validator = require('../../../../../../common/validation/validator')
 
-const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
+const SurveyManager = require('../../../../survey/manager/surveyManager')
 
 class NodeDefsValidationJob extends Job {
 
@@ -14,19 +15,18 @@ class NodeDefsValidationJob extends Job {
   }
 
   async execute (tx) {
-    const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(this.getSurveyId(), true, true, true, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(this.getSurveyId(), true, true, true, tx)
 
-    const nodeDefsInvalid = R.pipe(
-      R.values,
-      R.reject(nodeDef => Validator.isValid(nodeDef))
-    )(nodeDefs)
+    R.pipe(
+      Survey.getNodeDefsValidation,
+      Validator.getInvalidFieldValidations,
+      R.forEachObjIndexed((nodeDefValidation, nodeDefUuid) => {
+        const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+        this.errors[NodeDef.getName(nodeDef)] = Validator.getInvalidFieldValidations(nodeDefValidation)
+      })
+    )(survey)
 
-    if (!R.isEmpty(nodeDefsInvalid)) {
-      this.errors = R.reduce(
-        (acc, nodeDef) => R.assoc(NodeDef.getName(nodeDef), Validator.getInvalidFieldValidations(nodeDef.validation), acc),
-        {},
-        nodeDefsInvalid
-      )
+    if (!R.isEmpty(this.errors)) {
       this.setStatusFailed()
     }
   }

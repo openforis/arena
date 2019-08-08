@@ -1,6 +1,6 @@
 const {expect} = require('chai')
 
-const NodeDefExpressionsValidator = require('../../server/modules/nodeDef/validator/nodeDefExpressionsValidator')
+const SurveyValidator = require('../../common/survey/surveyValidator')
 const Survey = require('../../common/survey/survey')
 const Validator = require('../../common/validation/validator')
 const NodeDefExpression = require('../../common/survey/nodeDefExpression')
@@ -12,7 +12,7 @@ const validateExpression = async (survey, nodeDefName, expression) => {
 
   const expressions = [{[NodeDefExpression.keys.expression]: expression}]
 
-  return await NodeDefExpressionsValidator.validate(survey, nodeDef, expressions)
+  return await SurveyValidator.validateNodeDefExpressions(survey, nodeDef, expressions)
 }
 
 /**

@@ -1,4 +1,4 @@
-export const nodeDefEditUpdate = 'survey/nodeDef/edit/update'
+export const nodeDefEditUpdate = 'surveyViews/nodeDefEdit/update'
 
 // set current nodeDef edit
 export const setNodeDefForEdit = nodeDef => dispatch =>

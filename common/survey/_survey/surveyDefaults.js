@@ -1,7 +1,7 @@
 const { groupNames, permissions } = require('../../auth/authGroups')
 const { keys: authGroupKeys } = require('../../auth/authGroups')
 
-const getDefaultAuthGroups = lang => [
+const getDefaultAuthGroups = () => [
   {
     name: groupNames.surveyAdmin,
     permissions: [

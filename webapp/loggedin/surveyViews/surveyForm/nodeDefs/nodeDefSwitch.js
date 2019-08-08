@@ -37,7 +37,7 @@ class NodeDefSwitch extends React.Component {
   checkNodePlaceholder () {
     const { nodes, nodeDef, parentNode, createNodePlaceholder, canAddNode } = this.props
 
-    if (parentNode && canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
+    if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
       createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getNodeDefDefaultValue(nodeDef))
     }
   }
@@ -102,7 +102,7 @@ NodeDefSwitch.defaultProps = {
 }
 
 const mapStateToProps = (state, props) => {
-  const { nodeDef, parentNode, entry } = props
+  const { nodeDef, parentNode, entry, canEditRecord } = props
 
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const record = RecordState.getRecord(state)
@@ -127,9 +127,12 @@ const mapStateToProps = (state, props) => {
     )(nodes)
 
     const maxCount = R.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount)(nodeDef)
-    const canAddNode = parentNode &&
-      NodeDef.isMultiple(nodeDef) &&
-      (R.isEmpty(maxCount) || R.length(nodes) < Number(maxCount))
+
+    const canAddNode =
+      canEditRecord
+      && parentNode
+      && NodeDef.isMultiple(nodeDef)
+      && (R.isEmpty(maxCount) || R.length(nodes) < Number(maxCount))
 
     return {
       nodes: nodesValidated,

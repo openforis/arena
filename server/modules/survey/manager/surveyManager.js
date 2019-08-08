@@ -5,6 +5,7 @@ const { migrateSurveySchema } = require('../../../db/migration/dbMigrator')
 const { uuidv4 } = require('../../../../common/uuid')
 
 const Survey = require('../../../../common/survey/survey')
+const SurveyValidator = require('../../../../common/survey/surveyValidator')
 const NodeDef = require('../../../../common/survey/nodeDef')
 const User = require('../../../../common/user/user')
 const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
@@ -23,8 +24,6 @@ const SurveyRepositoryUtils = require('../repository/surveySchemaRepositoryUtils
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
-const SurveyValidator = require('../surveyValidator')
-
 const assocSurveyInfo = info => ({ info })
 
 // ====== CREATE
@@ -42,7 +41,6 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
 
       const surveyDb = await SurveyRepository.insertSurvey(surveyParam, t)
       const { id: surveyId } = surveyDb
-      const lang = R.pipe(R.path(['props', 'languages']), R.head)(surveyDb)
 
       //create survey data schema
       await migrateSurveySchema(surveyId)
@@ -53,7 +51,6 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
           NodeDef.nodeDefType.entity,
           {
             name: 'root_entity',
-            labels: { [lang]: 'Root entity' },
             multiple: false,
             [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
             [NodeDefLayout.nodeDefLayoutProps.render]: NodeDefLayout.nodeDefRenderType.form,
@@ -67,7 +64,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
 
       // create default groups for this survey
 
-      surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(lang), t)
+      surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
 
       if (!Authorizer.isSystemAdmin(user)) {
         await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(surveyDb).id, User.getId(user), t)
@@ -82,20 +79,32 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
   return assocSurveyInfo(survey)
 }
 
+const validateNewSurvey = async newSurvey => {
+  const surveyInfos = await SurveyRepository.fetchSurveysByName(newSurvey.name)//TODO add object model for newSurvey
+  return await SurveyValidator.validateNewSurvey(newSurvey, surveyInfos)
+}
+
 // ====== READ
 const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, draft, client)
   const authGroups = await AuthGroupRepository.fetchSurveyGroups(surveyInfo.id, client)
-  const validation = validate ? await SurveyValidator.validateSurveyInfo(surveyInfo) : null
 
-  const info = { ...surveyInfo, authGroups, validation }
-  return assocSurveyInfo(info)
+  const validation = validate ?
+    await SurveyValidator.validateSurveyInfo(
+      surveyInfo,
+      await SurveyRepository.fetchSurveysByName(Survey.getName(surveyInfo))
+    ) : null
+
+  return assocSurveyInfo({ ...surveyInfo, authGroups, validation })
 }
 
 const fetchSurveyAndNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
-  const survey = await fetchSurveyById(surveyId, draft, validate, client)
-  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate, client)
-  return Survey.assocNodeDefs(nodeDefs)(survey)
+  const nodeDefs = await NodeDefManager.fetchNodeDefsBySurveyId(surveyId, draft, advanced, client)
+  const survey = Survey.assocNodeDefs(nodeDefs)(await fetchSurveyById(surveyId, draft, validate, client))
+
+  return validate
+    ? Survey.assocNodeDefsValidation(await SurveyValidator.validateNodeDefs(survey))(survey)
+    : survey
 }
 
 const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
@@ -142,6 +151,7 @@ module.exports = {
   // ====== CREATE
   createSurvey,
   insertSurvey,
+  validateNewSurvey,
 
   // ====== READ
   fetchAllSurveyIds: SurveyRepository.fetchAllSurveyIds,

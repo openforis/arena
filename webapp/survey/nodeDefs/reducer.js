@@ -5,7 +5,6 @@ import { appUserLogout } from '../../app/actions'
 import { surveyCreate, surveyDefsLoad, surveyDelete, surveyUpdate } from '../actions'
 
 import {
-  nodeDefsLoad,
   nodeDefCreate,
   nodeDefUpdate,
   nodeDefPropsUpdate,
@@ -22,14 +21,10 @@ const actionHandlers = {
   [surveyUpdate]: () => ({}),
   [surveyDelete]: () => ({}),
 
-  [nodeDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
-
   [surveyDefsLoad]: (state = {}, { nodeDefs }) => nodeDefs,
 
   // single nodeDef actions
   [nodeDefCreate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
-
-  [nodeDefUpdate]: (state, { nodeDef }) => NodeDefsState.assocNodeDef(nodeDef)(state),
 
   [nodeDefPropsUpdate]: (state, { nodeDefUuid, props, propsAdvanced }) => NodeDefsState.assocNodeDefProps(nodeDefUuid, props, propsAdvanced)(state),
 
