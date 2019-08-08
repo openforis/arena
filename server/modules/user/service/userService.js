@@ -12,7 +12,6 @@ const SystemError = require('../../../utils/systemError')
 const UnauthorizedError = require('../../../utils/unauthorizedError')
 
 const inviteUser = async (user, surveyId, email, groupId) => {
-
   if (!Authorizer.isSystemAdmin(user)) {
     const group = await AuthManager.fetchGroupById(groupId)
     if (AuthGroups.isAdminGroup(group))
@@ -26,6 +25,8 @@ const inviteUser = async (user, surveyId, email, groupId) => {
 
     if (hasRoleInSurvey) {
       throw new SystemError('userHasRole')
+    } else if (Authorizer.isSystemAdmin(dbUser)) {
+      throw new SystemError('userIsAdmin')
     } else {
       await UserManager.addUserToGroup(user, surveyId, groupId, dbUser)
     }

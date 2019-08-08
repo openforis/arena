@@ -328,6 +328,7 @@ module.exports = {
     userNotAllowedToChangePref: 'User not allowed to change pref',
     paramIsRequired: 'Param {{param}} is required',
     userHasRole: 'The given user has already a role in this survey',
+    userIsAdmin: 'The given user is already a system administrator',
     invalidUser: 'Invalid user',
   },
 
