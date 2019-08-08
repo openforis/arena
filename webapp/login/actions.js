@@ -3,7 +3,7 @@ import axios from 'axios'
 import * as CognitoAuth from '../app/cognitoAuth'
 
 import * as LoginState from './loginState'
-import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
+import { hideAppLoader, initUser, showAppLoader, showNotificationMessage } from '../app/actions'
 
 export const loginUserActionUpdate = 'login/userAction/update'
 export const loginErrorUpdate = 'login/error'
@@ -47,3 +47,8 @@ export const acceptInvitation = (name, password) => _createAction(
     }
   }
 )
+
+export const forgotPassword = () => dispatch => {
+  dispatch(setLoginError(null))
+  dispatch(showNotificationMessage('An email with the verification code has been sent'))
+}
