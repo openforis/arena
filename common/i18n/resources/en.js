@@ -113,6 +113,7 @@ module.exports = {
 
   homeView: {
     createSurvey: 'Create Survey',
+    surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
       publish: 'Publish',
       viewInfo: 'View info',
@@ -149,6 +150,7 @@ module.exports = {
     inviteUser: 'Invite',
     sendInvitation: 'Send invitation',
     accepted: 'Accepted',
+    inviteUserConfirmation: 'An email to {{email}} has been sent'
   },
 
   itemsTable: {
