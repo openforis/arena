@@ -13,7 +13,7 @@ export const useUserInviteState = props => {
 
   const {
     surveyId, groups: groupsProps, history,
-    showAppLoader, hideAppLoader, showNotificationMessageKey,
+    showAppLoader, hideAppLoader, showNotificationMessage,
   } = props
 
   const i18n = useI18n()
@@ -45,7 +45,7 @@ export const useUserInviteState = props => {
     hideAppLoader()
     if (data) {
       history.push(appModuleUri(userModules.users))
-      showNotificationMessageKey('usersView.inviteUserConfirmation', { email: object.email })
+      showNotificationMessage('usersView.inviteUserConfirmation', { email: object.email })
     }
   }, [data, error])
 

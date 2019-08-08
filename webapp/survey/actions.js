@@ -5,7 +5,7 @@ import Survey from '../../common/survey/survey'
 import * as SurveyState from './surveyState'
 import * as AppState from '../app/appState'
 import { userPrefNames } from '../../common/user/userPrefs'
-import { appUserPrefUpdate, showAppJobMonitor, showNotificationMessageKey } from '../app/actions'
+import { appUserPrefUpdate, showAppJobMonitor, showNotificationMessage } from '../app/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
@@ -77,6 +77,6 @@ export const deleteSurvey = () => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${surveyId}`)
 
   dispatch({ type: surveyDelete, surveyId })
-  dispatch(showNotificationMessageKey('homeView.surveyDeleted', { surveyName: Survey.getName(surveyInfo) }))
+  dispatch(showNotificationMessage('homeView.surveyDeleted', { surveyName: Survey.getName(surveyInfo) }))
 }
 
