@@ -52,8 +52,6 @@ module.exports = {
 
   fetchUsersBySurveyId: UserManager.fetchUsersBySurveyId,
 
-  findUserById: UserManager.findUserById,
-
   fetchUserByUuid: UserManager.fetchUserByUuid,
 
   updateUsername,
