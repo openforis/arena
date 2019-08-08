@@ -1,21 +1,49 @@
+import axios from 'axios'
+
 import * as CognitoAuth from '../app/cognitoAuth'
 
+import * as LoginState from './loginState'
 import { hideAppLoader, initUser, showAppLoader } from '../app/actions'
 
-export const loginError = 'login/error'
-export const loginReset = 'login/reset'
+export const loginUserActionUpdate = 'login/userAction/update'
+export const loginErrorUpdate = 'login/error'
 
-export const login = (username, password) => async dispatch => {
+export const setLoginError = message => dispatch => dispatch({ type: loginErrorUpdate, message })
+
+const _createAction = cognitoResponseHandler => async dispatch => {
   try {
-    dispatch({ type: loginReset })
     dispatch(showAppLoader())
+    dispatch(setLoginError(null))
 
-    await CognitoAuth.login(username, password)
-
-    dispatch(initUser())
+    await cognitoResponseHandler(dispatch)
   } catch (error) {
-    dispatch({ type: loginError, message: error.message })
+    dispatch(setLoginError(error.message))
   } finally {
     dispatch(hideAppLoader())
   }
 }
+
+export const login = (email, password) => _createAction(
+  async dispatch => {
+    const responseType = await CognitoAuth.login(email, password)
+
+    if (responseType === CognitoAuth.keysAction.success) {
+      dispatch(initUser())
+    } else if (responseType === CognitoAuth.keysAction.newPasswordRequired) {
+      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.setNewPassword })
+    }
+  }
+)
+
+export const acceptInvitation = (name, password) => _createAction(
+  async dispatch => {
+    const responseType = await CognitoAuth.acceptInvitation(name, password)
+
+    if (responseType === CognitoAuth.keysAction.success) {
+      const cognitoUser = CognitoAuth.getUser()
+      await axios.put(`/api/user/${cognitoUser.username}/name`, { name })
+      dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.login })
+      dispatch(initUser())
+    }
+  }
+)

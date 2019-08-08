@@ -12,11 +12,10 @@ const SystemError = require('../../../utils/systemError')
 const UnauthorizedError = require('../../../utils/unauthorizedError')
 
 const inviteUser = async (user, surveyId, email, groupId) => {
-
   if (!Authorizer.isSystemAdmin(user)) {
     const group = await AuthManager.fetchGroupById(groupId)
     if (AuthGroups.isAdminGroup(group))
-      throw new UnauthorizedError()
+      throw new UnauthorizedError(User.getName(user))
   }
 
   const dbUser = await UserManager.fetchUserByEmail(email)
@@ -26,13 +25,24 @@ const inviteUser = async (user, surveyId, email, groupId) => {
 
     if (hasRoleInSurvey) {
       throw new SystemError('userHasRole')
+    } else if (Authorizer.isSystemAdmin(dbUser)) {
+      throw new SystemError('userIsAdmin')
     } else {
       await UserManager.addUserToGroup(user, surveyId, groupId, dbUser)
     }
   } else {
-    await UserManager.insertUser(user, surveyId, email, groupId)
-    await aws.inviteUser(email)
+    const { User: { Username: cognitoUsername } } = await aws.inviteUser(email)
+    await UserManager.insertUser(user, surveyId, cognitoUsername, email, groupId)
   }
+}
+
+const updateUsername = (user, userUuid, name) => {
+  // For now a user can change only his own name
+  if (User.getCognitoUsername(user) !== userUuid) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+
+  UserManager.updateUsername(user, name)
 }
 
 module.exports = {
@@ -45,6 +55,8 @@ module.exports = {
   findUserById: UserManager.findUserById,
 
   fetchUserByCognitoUsername: UserManager.fetchUserByCognitoUsername,
+
+  updateUsername,
 
   updateUserPref: UserManager.updateUserPref,
 

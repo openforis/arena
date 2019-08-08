@@ -50,11 +50,11 @@ const getId = R.prop(keys.id)
 
 const getName = R.prop(keys.name)
 
-const isAdminGroup = group =>
-  R.pipe(
-    getName,
-    R.propEq(groupNames.systemAdmin)
-  )
+const isAdminGroup =
+R.pipe(
+  getName,
+  R.equals(groupNames.systemAdmin)
+)
 
 module.exports = {
   keys,
