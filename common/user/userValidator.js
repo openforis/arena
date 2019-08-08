@@ -20,8 +20,7 @@ const newUserPropsValidations = {
   'groupId': [validateRequired],
 }
 
-const validateNewUser = async user =>
-  validate(user, newUserPropsValidations)
+const validateNewUser = async user => await validate(user, newUserPropsValidations)
 
 module.exports = {
   validateNewUser,

@@ -2,14 +2,16 @@ import { exportReducer } from '../utils/reduxUtils'
 
 import * as LoginState from './loginState'
 
-import { loginError, loginReset } from './actions'
+import {
+  loginUserActionUpdate,
+  loginErrorUpdate,
+} from './actions'
 
 const actionHandlers = {
 
-  [loginError]: (state, { message }) => LoginState.assocError(message)(state),
+  [loginUserActionUpdate]: (state, { action }) => LoginState.assocUserAction(action)(state),
 
-  [loginReset]: (state) => LoginState.assocError(null)(state)
-
+  [loginErrorUpdate]: (state, { message }) => LoginState.assocError(message)(state),
 }
 
 export default exportReducer(actionHandlers)

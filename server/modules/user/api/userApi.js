@@ -60,6 +60,19 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
+  app.put('/user/:userUuid/name', async (req, res, next) => {
+    try {
+      const { user } = req
+      const { userUuid, name } = Request.getParams(req)
+
+      await UserService.updateUsername(user, userUuid, name)
+
+      Response.sendOk(res)
+    } catch (err) {
+      next(err)
+    }
+  })
+
   app.post('/user/:userId/pref/:name/:value', async (req, res, next) => {
     try {
       const { user } = req

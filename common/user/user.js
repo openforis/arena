@@ -30,7 +30,7 @@ const getAuthGroupAdmin = R.pipe(
 )
 
 const hasAccepted = R.pipe(
-  R.propOr('', keys.cognitoUsername),
+  R.propOr('', keys.name),
   StringUtils.isNotBlank
 )
 
