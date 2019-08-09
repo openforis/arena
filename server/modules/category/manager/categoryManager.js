@@ -2,8 +2,8 @@ const R = require('ramda')
 
 const db = require('../../../db/db')
 
-const {publishSurveySchemaTableProps, markSurveyDraft} = require('../../survey/repository/surveySchemaRepositoryUtils')
-const {toIndexedObj} = require('../../../../common/survey/surveyUtils')
+const { publishSurveySchemaTableProps, markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
+const { toIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const CategoryRepository = require('../repository/categoryRepository')
 const CategoryValidator = require('../categoryValidator')
@@ -49,7 +49,7 @@ const insertLevel = async (user, surveyId, categoryUuid, level, client = db) =>
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, {categoryUuid, level}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, { categoryUuid, level }, t)
 
     return levelDb
   })
@@ -103,12 +103,16 @@ const fetchCategoriesBySurveyId = async (surveyId, draft = false, validate = tru
 
 // ====== UPDATE
 
-const publishProps = async (surveyId, client = db) => {
+const publishProps = async (surveyId, langsDeleted, client = db) => {
   await publishSurveySchemaTableProps(surveyId, 'category', client)
 
   await publishSurveySchemaTableProps(surveyId, 'category_level', client)
 
   await publishSurveySchemaTableProps(surveyId, 'category_item', client)
+
+  for (const langDeleted of langsDeleted) {
+    await CategoryRepository.deleteItemLabels(surveyId, langDeleted, client)
+  }
 }
 
 const updateCategoryProp = async (user, surveyId, categoryUuid, key, value, client = db) =>
@@ -117,7 +121,7 @@ const updateCategoryProp = async (user, surveyId, categoryUuid, key, value, clie
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryPropUpdate, {categoryUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryPropUpdate, { categoryUuid, key, value }, t)
 
     return category
   })
@@ -128,7 +132,7 @@ const updateLevelProp = async (user, surveyId, levelUuid, key, value, client = d
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelPropUpdate, {levelUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelPropUpdate, { levelUuid, key, value }, t)
 
     return level
   })
@@ -139,7 +143,7 @@ const updateItemProp = async (user, surveyId, itemUuid, key, value, client = db)
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemPropUpdate, {itemUuid, key, value}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemPropUpdate, { itemUuid, key, value }, t)
 
     return item
   })
@@ -150,7 +154,7 @@ const deleteCategory = async (user, surveyId, categoryUuid) =>
     await CategoryRepository.deleteCategory(surveyId, categoryUuid, t)
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryDelete, {categoryUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryDelete, { categoryUuid }, t)
   })
 
 const deleteLevel = async (user, surveyId, levelUuid) =>
@@ -158,7 +162,7 @@ const deleteLevel = async (user, surveyId, levelUuid) =>
     await CategoryRepository.deleteLevel(surveyId, levelUuid, t)
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, {levelUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, { levelUuid }, t)
   })
 
 const deleteItem = async (user, surveyId, itemUuid) =>
@@ -166,7 +170,7 @@ const deleteItem = async (user, surveyId, itemUuid) =>
     await CategoryRepository.deleteItem(surveyId, itemUuid, t)
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemDelete, {itemUuid}, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemDelete, { itemUuid }, t)
   })
 
 module.exports = {
@@ -198,5 +202,4 @@ module.exports = {
   deleteCategory,
   deleteLevel,
   deleteItem,
-  deleteItemLabels: CategoryRepository.deleteItemLabels
 }
