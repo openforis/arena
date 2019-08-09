@@ -20,15 +20,13 @@ const { propKeys } = NodeDef
 
 const TaxonProps = (props) => {
   const {
-    nodeDef,
+    nodeDef, validation,
     putNodeDefProp,
     taxonomies,
     taxonomy,
     createTaxonomy,
     toggleTaxonomyEdit,
   } = props
-
-  const validation = Validator.getValidation(nodeDef)
 
   const putTaxonomyProp = taxonomy => putNodeDefProp(nodeDef, propKeys.taxonomyUuid, Taxonomy.getUuid(taxonomy))
 
@@ -49,7 +47,7 @@ const TaxonProps = (props) => {
                     selection={taxonomy}
                     onChange={putTaxonomyProp}/>
           <button className="btn btn-s"
-                  style={{justifySelf: 'center'}}
+                  style={{ justifySelf: 'center' }}
                   onClick={async () => {
                     putTaxonomyProp(await createTaxonomy())
                     toggleTaxonomyEdit(true)
@@ -58,7 +56,7 @@ const TaxonProps = (props) => {
             {i18n.t('common.add')}
           </button>
           <button className="btn btn-s"
-                  style={{justifySelf: 'center'}}
+                  style={{ justifySelf: 'center' }}
                   onClick={() => toggleTaxonomyEdit(true)}>
             <span className="icon icon-list icon-12px icon-left"/>
             {i18n.t('common.manage')}

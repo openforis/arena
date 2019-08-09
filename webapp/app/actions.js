@@ -104,3 +104,17 @@ export const activeJobUpdate = job => (dispatch, getState) => {
   }
   dispatch({ type: appJobActiveUpdate, job })
 }
+
+// ====== APP Notification
+export const appNotificationShow = 'app/notification/show'
+export const appNotificationHide = 'app/notification/hide'
+
+export const showNotificationMessage = (messageKey, messageParams) => dispatch => dispatch({
+  type: appNotificationShow,
+  notification: {
+    [AppState.keysNotification.messageKey]: messageKey,
+    [AppState.keysNotification.messageParams]: messageParams,
+  }
+})
+
+export const hideNotification = () => dispatch => dispatch({ type: appNotificationHide })

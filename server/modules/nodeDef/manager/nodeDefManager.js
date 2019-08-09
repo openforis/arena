@@ -1,11 +1,11 @@
 const R = require('ramda')
 const db = require('../../../db/db')
 
-const SurveyUtils = require('../../../../common/survey/surveyUtils')
+const NodeDef = require('../../../../common/survey/nodeDef')
+const NodeDefValidations = require('../../../../common/survey/nodeDefValidations')
+const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 
 const NodeDefRepository = require('../repository/nodeDefRepository')
-const NodeDefValidator = require('../validator/nodeDefValidator')
-
 const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const ActivityLog = require('../../activityLog/activityLogger')
@@ -20,41 +20,26 @@ const insertNodeDef = async (user, surveyId, nodeDefParam, client = db) =>
 
     await ActivityLog.log(user, surveyId, ActivityLog.type.nodeDefCreate, nodeDefParam, t)
 
-    return {
-      ...nodeDef,
-      validation: await NodeDefValidator.validateNodeDef({}, nodeDef)
-    }
+    return nodeDef
   })
 
 // ======= READ
 
-const processNodeDefs = async (nodeDefsDb, draft, validate) => {
-  const nodeDefsResult = R.pipe(
-    R.reduce(
-      (acc, nodeDef) => draft
-        ? R.append(nodeDef, acc)
-        // remove draft and unpublished nodeDef
-        : nodeDef.draft && !nodeDef.published
-          ? acc
-          : R.append(nodeDef, acc),
-      [],
-    ),
-    SurveyUtils.toUuidIndexedObj
-  )(nodeDefsDb)
-
-  return validate
-    ? await NodeDefValidator.validateNodeDefs(nodeDefsResult)
-    : nodeDefsResult
-}
-
-const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, validate = false, client = db) => {
+const fetchNodeDefsBySurveyId = async (surveyId, draft = false, advanced = false, client = db) => {
   const nodeDefsDB = await NodeDefRepository.fetchNodeDefsBySurveyId(surveyId, draft, advanced, client)
-  return await processNodeDefs(nodeDefsDB, draft, validate)
-}
 
-const fetchNodeDefsByUuid = async (surveyId, nodeDefUuids = [], draft = false, validate = false) => {
-  const nodeDefsDB = await NodeDefRepository.fetchNodeDefsByUuid(surveyId, nodeDefUuids, draft, validate)
-  return await processNodeDefs(nodeDefsDB, draft, validate)
+  return R.reduce(
+    (acc, nodeDef) => {
+      // remove draft and unpublished nodeDef
+      if (draft || NodeDef.isPublished(nodeDef)) {
+        acc[NodeDef.getUuid(nodeDef)] = nodeDef
+      }
+
+      return acc
+    },
+    {},
+    nodeDefsDB
+  )
 }
 
 // ======= UPDATE
@@ -69,6 +54,17 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
 
     return nodeDef
   })
+
+const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
+  await NodeDefRepository.publishNodeDefsProps(surveyId, client)
+
+  for (const langDeleted of langsDeleted) {
+    await NodeDefRepository.deleteNodeDefsLabels(surveyId, langDeleted, client)
+    await NodeDefRepository.deleteNodeDefsDescriptions(surveyId, langDeleted, client)
+  }
+
+  await NodeDefRepository.deleteNodeDefsValidationMessageLabels(surveyId, langsDeleted, client)
+}
 
 // ======= DELETE
 
@@ -89,16 +85,13 @@ module.exports = {
 
   //READ
   fetchNodeDefsBySurveyId,
-  fetchNodeDefsByUuid,
   fetchNodeDefByUuid: NodeDefRepository.fetchNodeDefByUuid,
 
   //UPDATE
   updateNodeDefProps,
-  publishNodeDefsProps: NodeDefRepository.publishNodeDefsProps,
+  publishNodeDefsProps,
 
   //DELETE
   markNodeDefDeleted,
   permanentlyDeleteNodeDefs: NodeDefRepository.permanentlyDeleteNodeDefs,
-  deleteNodeDefsLabels: NodeDefRepository.deleteNodeDefsLabels,
-  deleteNodeDefsDescriptions: NodeDefRepository.deleteNodeDefsDescriptions,
 }

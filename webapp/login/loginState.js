@@ -3,13 +3,21 @@ import * as R from 'ramda'
 export const stateKey = 'login'
 
 const keys = {
-  error: 'error'
+  userAction: 'userAction',
+  error: 'error',
 }
-const getState = R.prop(stateKey)
 
-export const assocError = message => R.assoc(keys.error, message)
+export const userActions = {
+  login: 'login',
+  setNewPassword: 'setNewPassword',
+}
 
-export const getError = R.pipe(
-  getState,
-  R.prop(keys.error)
-)
+const getStateProp = (key, defaultValue = null) => R.pathOr(defaultValue, [stateKey, key])
+
+export const getUserAction = getStateProp(keys.userAction, userActions.login)
+
+export const assocUserAction = R.assoc(keys.userAction)
+
+export const getError = getStateProp(keys.error)
+
+export const assocError = R.assoc(keys.error)

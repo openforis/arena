@@ -1,12 +1,12 @@
 const R = require('ramda')
 
-const Validator = require('../../../../common/validation/validator')
-const Survey = require('../../../../common/survey/survey')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
-const Expression = require('../../../../common/exprParser/expression')
+const Validator = require('../../validation/validator')
+const Survey = require('../survey')
+const NodeDef = require('../nodeDef')
+const NodeDefExpression = require('../nodeDefExpression')
+const Expression = require('../../exprParser/expression')
 
-const SystemError = require('../../../../server/utils/systemError')
+const SystemError = require('../../../server/utils/systemError')
 
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,

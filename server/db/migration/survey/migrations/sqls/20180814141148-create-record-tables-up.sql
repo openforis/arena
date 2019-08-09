@@ -30,14 +30,14 @@ CREATE TABLE
   record
 (
   uuid         uuid        NOT NULL DEFAULT uuid_generate_v4(),
-  owner_id     bigint      NOT NULL,
+  owner_uuid   uuid        NOT NULL,
   step         varchar(63) NOT NULL,
-  date_created TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
+  date_created TIMESTAMP   WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'UTC') NOT NULL,
   preview      boolean     DEFAULT FALSE,
   validation   jsonb       NOT NULL DEFAULT '{}'::jsonb,
 
   PRIMARY KEY (uuid),
-  CONSTRAINT record_user_fk FOREIGN KEY (owner_id) REFERENCES "user" ("id")
+  CONSTRAINT record_user_fk FOREIGN KEY (owner_uuid) REFERENCES "user" ("uuid")
 );
 
 CREATE INDEX record_preview_idx ON record(preview);

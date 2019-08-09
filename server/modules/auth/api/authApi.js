@@ -2,6 +2,7 @@ const Request = require('../../../utils/request')
 const { sendOk } = require('../../../utils/response')
 
 const Survey = require('../../../../common/survey/survey')
+const User = require('../../../../common/user/user')
 const { userPrefNames, getUserPrefSurveyId } = require('../../../../common/user/userPrefs')
 const Authorizer = require('../../../../common/auth/authorizer')
 
@@ -60,7 +61,7 @@ module.exports.init = app => {
     try {
       // before logout checkOut record if there's an opened thread
       const user = Request.getUser(req)
-      RecordService.terminateUserThread(user.id)
+      RecordService.terminateUserThread(User.getUuid(user))
 
       const token = req.headers.authorization.substring(Jwt.bearerPrefix.length)
 

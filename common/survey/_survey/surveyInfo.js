@@ -8,6 +8,7 @@ const { isBlank } = require('../../stringUtils')
 const keys = {
   info: 'info',
   id: 'id',
+  ownerUuid: 'ownerUuid',
   name: 'name',
   descriptions: 'descriptions',
   published: 'published',

@@ -114,6 +114,7 @@ module.exports = {
 
   homeView: {
     createSurvey: 'Create Survey',
+    surveyDeleted: 'Survey {{surveyName}} has been deleted',
     surveyInfo: {
       publish: 'Publish',
       viewInfo: 'View info',
@@ -148,7 +149,9 @@ module.exports = {
 
   usersView: {
     inviteUser: 'Invite',
+    sendInvitation: 'Send invitation',
     accepted: 'Accepted',
+    inviteUserConfirmation: 'An email to {{email}} has been sent'
   },
 
   itemsTable: {
@@ -343,6 +346,7 @@ module.exports = {
     userNotAllowedToChangePref: 'User not allowed to change pref',
     paramIsRequired: 'Param {{param}} is required',
     userHasRole: 'The given user has already a role in this survey',
+    userIsAdmin: 'The given user is already a system administrator',
     invalidUser: 'Invalid user',
   },
 

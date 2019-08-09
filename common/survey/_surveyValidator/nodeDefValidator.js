@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const Validator = require('../../validation/validator')
+
 const {
   errorKeys,
   validate,
@@ -8,12 +10,12 @@ const {
   validateNotKeyword,
   validateName,
   cleanup
-} = require('../../../../common/validation/validator')
+} = Validator
 
-const Survey = require('../../../../common/survey/survey')
-const SurveyUtils = require('../../../../common/survey/surveyUtils')
-const NodeDef = require('../../../../common/survey/nodeDef')
-const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
+const Survey = require('../survey')
+const SurveyUtils = require('../surveyUtils')
+const NodeDef = require('../nodeDef')
+const NodeDefLayout = require('../nodeDefLayout')
 
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
@@ -136,23 +138,24 @@ const validateNodeDef = async (survey, nodeDef) => {
   return validation.valid ? null : validation
 }
 
-const validateNodeDefs = async (nodeDefs) => {
-  const survey = Survey.assocNodeDefs(nodeDefs)({})
+const validateNodeDefs = async survey => {
+  const nodeDefs = Survey.getNodeDefs(survey)
+  const validation = Validator.newValidationValid()
 
-  const nodeDefsValidated = await Promise.all(
-    Survey.getNodeDefsArray(survey).map(
-      async n => ({
-        ...n,
-        validation: await validateNodeDef(survey, n)
-      })
-    )
-  )
+  for (const nodeDefUuid of Object.keys(nodeDefs)) {
+    const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+    const nodeDefValidation = await validateNodeDef(survey, nodeDef)
 
-  return SurveyUtils.toUuidIndexedObj(nodeDefsValidated)
+    if (!Validator.isValidationValid(nodeDefValidation)) {
+      validation[Validator.keys.fields][nodeDefUuid] = nodeDefValidation
+      validation[Validator.keys.valid] = false
+    }
+  }
+
+  return validation
 }
 
 module.exports = {
   validateNodeDefs,
-  validateNodeDef,
 }
 

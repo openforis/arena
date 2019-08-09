@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const keys = {
-  id: 'id',
+  uuid: 'uuid',
   authGroups: 'authGroups',
   permissions: 'permissions',
   recordSteps: 'recordSteps',
@@ -46,22 +46,22 @@ const getAuthGroups = R.propOr([], keys.authGroups)
 
 const getSurveyId = R.prop(keys.surveyId)
 
-const getId = R.prop(keys.id)
+const getUuid = R.prop(keys.uuid)
 
 const getName = R.prop(keys.name)
 
-const isAdminGroup = group =>
-  R.pipe(
-    getName,
-    R.propEq(groupNames.systemAdmin)
-  )
+const isAdminGroup =
+R.pipe(
+  getName,
+  R.equals(groupNames.systemAdmin)
+)
 
 module.exports = {
   keys,
   permissions,
   groupNames,
 
-  getId,
+  getUuid,
   getName,
   isAdminGroup,
   getSurveyId,

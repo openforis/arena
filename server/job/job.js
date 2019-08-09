@@ -4,6 +4,8 @@ const Log = require('../log/log')
 const { uuidv4 } = require('../../common/uuid')
 
 const { jobEvents, jobStatus } = require('./jobUtils')
+
+const User = require('../../common/user/user.js')
 const { throttle, cancelThrottle } = require('../../common/functionsDefer')
 
 const SystemError = require('../utils/systemError')
@@ -267,9 +269,8 @@ class Job {
     return this.getContextProp(Job.keysContext.user)
   }
 
-  getUserId () {
-    const user = this.getUser()
-    return user ? user.id : null
+  get userUuid () {
+    return User.getUuid(this.getUser())
   }
 
   getCurrentInnerJob () {

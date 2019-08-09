@@ -77,7 +77,7 @@ const systemAdminGroup = {
   dataCondition: null,
 
   // table group_user
-  userIds: [1, 2, 3, 4],
+  userUuids: [1, 2, 3, 4],
 }
 
 const group = {
@@ -89,7 +89,7 @@ const group = {
   // table group_survey
   // surveyIds: [1, 2, 3, 4],
   // table group_user
-  // userIds: [1, 2, 3, 4],
+  // userUuids: [1, 2, 3, 4],
 }
 
 const defaultSurveyGroups = [

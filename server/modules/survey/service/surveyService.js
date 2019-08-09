@@ -4,7 +4,6 @@ const Survey = require('../../../../common/survey/survey')
 const Validator = require('../../../../common/validation/validator')
 
 const SurveyManager = require('../manager/surveyManager')
-const SurveyValidator = require('../surveyValidator')
 
 const JobManager = require('../../../job/jobManager')
 const SurveyPublishJob = require('./publish/surveyPublishJob')
@@ -27,15 +26,14 @@ const startPublishJob = (user, surveyId) => {
 }
 
 module.exports = {
-
-  validateNewSurvey: SurveyValidator.validateNewSurvey,
-
   // CREATE
   createSurvey: SurveyManager.createSurvey,
+  validateNewSurvey: SurveyManager.validateNewSurvey,
 
   // READ
   fetchUserSurveysInfo: SurveyManager.fetchUserSurveysInfo,
   fetchSurveyById: SurveyManager.fetchSurveyById,
+  fetchSurveyAndNodeDefsBySurveyId: SurveyManager.fetchSurveyAndNodeDefsBySurveyId,
 
   // UPDATE
   updateSurveyProp,

@@ -15,6 +15,8 @@ import {
   appJobActiveUpdate,
   appJobStart,
   systemErrorThrow,
+  appNotificationShow,
+  appNotificationHide,
 } from './actions'
 import { surveyCreate, surveyDelete } from '../survey/actions'
 
@@ -53,6 +55,11 @@ const actionHandlers = {
   [appErrorDelete]: (state, { error }) => AppState.dissocAppError(error)(state),
 
   [systemErrorThrow]: (state, { error }) => AppState.assocSystemError(error)(state),
+
+  // ===== app notification
+  [appNotificationShow]: (state, { notification }) => AppState.showNotification(notification)(state),
+
+  [appNotificationHide]: AppState.hideNotification,
 }
 
 export default exportReducer(actionHandlers)

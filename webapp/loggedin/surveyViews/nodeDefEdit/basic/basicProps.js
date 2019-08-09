@@ -5,7 +5,7 @@ import * as R from 'ramda'
 import Survey from '../../../../../common/survey/survey'
 import NodeDef from '../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
-import { getFieldValidation, getValidation } from '../../../../../common/validation/validator'
+import Validator from '../../../../../common/validation/validator'
 
 import { uuidv4 } from '../../../../../common/uuid'
 import { normalizeName } from '../../../../../common/stringUtils'
@@ -23,7 +23,7 @@ import * as NodeDefEditState from '../nodeDefEditState'
 
 const BasicProps = props => {
   const {
-    nodeDef,
+    nodeDef, validation,
     nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
 
     displayAsEnabled, displayInEnabled,
@@ -33,7 +33,6 @@ const BasicProps = props => {
     putNodeDefProp,
     toggleTaxonomyEdit, toggleCategoryEdit
   } = props
-  const validation = getValidation(nodeDef)
 
   const i18n = useI18n()
 
@@ -53,7 +52,7 @@ const BasicProps = props => {
       <FormItem label={i18n.t('common.name')}>
         <Input
           value={NodeDef.getName(nodeDef)}
-          validation={getFieldValidation('name')(validation)}
+          validation={Validator.getFieldValidation('name')(validation)}
           onChange={value => putNodeDefProp(nodeDef, 'name', normalizeName(value))}/>
       </FormItem>
 
@@ -70,6 +69,7 @@ const BasicProps = props => {
         NodeDef.isCode(nodeDef) &&
         <CodeProps
           nodeDef={nodeDef}
+          validation={validation}
           toggleCategoryEdit={toggleCategoryEdit}
           putNodeDefProp={putNodeDefProp}/>
       }
@@ -78,6 +78,7 @@ const BasicProps = props => {
         NodeDef.isTaxon(nodeDef) &&
         <TaxonProps
           nodeDef={nodeDef}
+          validation={validation}
           toggleTaxonomyEdit={toggleTaxonomyEdit}
           putNodeDefProp={putNodeDefProp}/>
       }

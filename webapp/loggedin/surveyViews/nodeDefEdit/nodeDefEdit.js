@@ -27,7 +27,7 @@ import { closeNodeDefEdit } from './actions'
 
 const NodeDefEdit = props => {
   const {
-    nodeDef, nodeDefParent,
+    nodeDef, nodeDefParent, validation,
     nodeDefKeyEditDisabled, nodeDefMultipleEditDisabled,
     putNodeDefProp,
     canUpdateCategory,
@@ -69,6 +69,7 @@ const NodeDefEdit = props => {
                     component: BasicProps,
                     props: {
                       nodeDef,
+                      validation,
                       nodeDefKeyEditDisabled,
                       nodeDefMultipleEditDisabled,
                       putNodeDefProp,
@@ -82,12 +83,12 @@ const NodeDefEdit = props => {
                       {
                         label: i18n.t('nodeDefEdit.advanced'),
                         component: AdvancedProps,
-                        props: { nodeDef, nodeDefParent, putNodeDefProp },
+                        props: { nodeDef, validation, nodeDefParent, putNodeDefProp },
                       },
                       {
                         label: i18n.t('nodeDefEdit.validations'),
                         component: ValidationsProps,
-                        props: { nodeDef, nodeDefParent, putNodeDefProp },
+                        props: { nodeDef, validation, nodeDefParent, putNodeDefProp },
                       },
                     ],
                 ]}
@@ -137,6 +138,7 @@ const mapStateToProps = state => {
   const nodeDefParent = Survey.getNodeDefByUuid(
     NodeDef.getParentUuid(nodeDef)
   )(survey)
+  const validation = Survey.getNodeDefValidation(nodeDef)(survey)
 
   const nodeDefKeyEditDisabled = isNodeDefKeyEditDisabled(survey, nodeDef)
   const nodeDefMultipleEditDisabled = isNodeDefMultipleEditDisabled(survey, nodeDef)
@@ -144,6 +146,7 @@ const mapStateToProps = state => {
   return {
     nodeDef,
     nodeDefParent,
+    validation,
     nodeDefKeyEditDisabled,
     nodeDefMultipleEditDisabled,
     canUpdateCategory: NodeDef.isCode(nodeDef) && Survey.canUpdateCategory(nodeDef)(survey)

@@ -2,15 +2,16 @@ const R = require('ramda')
 
 const { uuidv4 } = require('../../common/uuid')
 
-const SurveyInfo = require('./_internal/surveyInfo')
-const SurveyNodeDefs = require('./_internal/surveyNodeDefs')
-const SurveyCategories = require('./_internal/surveyCategories')
-const SurveyTaxonomies = require('./_internal/surveyTaxonomies')
-const SurveyDefaults = require('./_internal/surveyDefaults')
-const SurveyDependencies = require('./_internal/surveyDependencies')
-const SurveyRefDataIndex = require('./_internal/surveyRefDataIndex')
+const SurveyInfo = require('./_survey/surveyInfo')
+const SurveyNodeDefs = require('./_survey/surveyNodeDefs')
+const SurveyNodeDefsValidation = require('./_survey/surveyNodeDefsValidation')
+const SurveyCategories = require('./_survey/surveyCategories')
+const SurveyTaxonomies = require('./_survey/surveyTaxonomies')
+const SurveyDefaults = require('./_survey/surveyDefaults')
+const SurveyDependencies = require('./_survey/surveyDependencies')
+const SurveyRefDataIndex = require('./_survey/surveyRefDataIndex')
 
-const newSurvey = (userId, name, label, lang, collectUri = null) => ({
+const newSurvey = (ownerUuid, name, label, lang, collectUri = null) => ({
   uuid: uuidv4(),
   props: {
     name,
@@ -21,7 +22,7 @@ const newSurvey = (userId, name, label, lang, collectUri = null) => ({
       ? { collectUri }
       : {}
   },
-  userId
+  ownerUuid
 })
 
 module.exports = {
@@ -95,6 +96,11 @@ module.exports = {
   assocNodeDefs: SurveyNodeDefs.assocNodeDefs,
   assocDependencyGraph: SurveyDependencies.assocDependencyGraph,
   buildDependencyGraph: SurveyDependencies.buildGraph,
+
+  // ====== NodeDefsValidation
+  getNodeDefsValidation: SurveyNodeDefsValidation.getNodeDefsValidation,
+  assocNodeDefsValidation: SurveyNodeDefsValidation.assocNodeDefsValidation,
+  getNodeDefValidation: SurveyNodeDefsValidation.getNodeDefValidation,
 
   // ====== NodeDef Code
   getNodeDefCategoryLevelIndex: SurveyNodeDefs.getNodeDefCategoryLevelIndex,

@@ -1,15 +1,21 @@
 const Request = require('../../../utils/request')
-
 const AuthMiddleware = require('../../auth/authApiMiddleware')
 
+const Survey = require('../../../../common/survey/survey')
+
+const SurveyService = require('../../survey/service/surveyService')
 const NodeDefService = require('../service/nodeDefService')
 
-module.exports.init = app => {
+const sendRespNodeDefs = async (res, surveyId, sendNodeDefs = false, draft = true, advanced = true, validate = true) => {
+  const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId(surveyId, draft, advanced, validate)
 
-  const sendRespNodeDefs = async (res, surveyId, draft = true, advanced = true, validate = true) => {
-    const nodeDefs = await NodeDefService.fetchNodeDefsBySurveyId(surveyId, draft, advanced, validate)
-    res.json({ nodeDefs })
-  }
+  res.json({
+    nodeDefs: sendNodeDefs ? Survey.getNodeDefs(survey) : null,
+    nodeDefsValidation: Survey.getNodeDefsValidation(survey)
+  })
+}
+
+module.exports.init = app => {
 
   // ==== CREATE
 
@@ -19,9 +25,10 @@ module.exports.init = app => {
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const nodeDef = await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
+      await NodeDefService.insertNodeDef(user, surveyId, nodeDefRequest)
 
-      res.json({ nodeDef })
+      await sendRespNodeDefs(res, surveyId)
+
     } catch (err) {
       next(err)
     }
@@ -35,8 +42,9 @@ module.exports.init = app => {
       const draft = Request.getBoolParam(req, 'draft')
       const validate = Request.getBoolParam(req, 'validate')
       const advanced = true // always fetch advanced props (TODO fetch only what is needed- now in dataentry min/max count are needed)
+      const sendNodeDefs = true
 
-      await sendRespNodeDefs(res, surveyId, draft, advanced, validate)
+      await sendRespNodeDefs(res, surveyId, sendNodeDefs, draft, advanced, validate)
 
     } catch (err) {
       next(err)

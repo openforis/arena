@@ -13,6 +13,7 @@ export const keys = {
   systemError: 'systemError',
   sideBarOpened: 'sideBarOpened',
   loaderVisible: 'loaderVisible',
+  notification: 'notification',
 
   // activeJob keys
   onComplete: 'onComplete',
@@ -20,6 +21,12 @@ export const keys = {
   // i18n
   i18n: 'i18n',
   lang: 'lang',
+}
+
+export const keysNotification = {
+  messageKey: 'messageKey',
+  messageParams: 'messageParams',
+  visible: 'visible',
 }
 
 export const getState = R.prop('app')
@@ -37,7 +44,6 @@ export const getUser = R.pipe(getState, R.prop(keys.user))
 export const logoutUser = R.dissoc(keys.user)
 
 // On survey create, add current user to new survey's surveyAdmin group
-
 export const assocSurveyAdminGroup = surveyInfo =>
   appState => {
     const user = R.prop(keys.user, appState)
@@ -127,3 +133,16 @@ export const getSystemError = R.pipe(getState, R.prop(keys.systemError))
 // ==== App Loader
 
 export const isLoaderVisible = R.pipe(getState, R.propEq(keys.loaderVisible, true))
+
+// ==== App Notification
+
+export const getNotificationMessageKey = R.pipe(getState, R.pathOr(null, [keys.notification, keysNotification.messageKey]))
+export const getNotificationMessageParams = R.pipe(getState, R.pathOr({}, [keys.notification, keysNotification.messageParams]))
+export const isNotificationVisible = R.pipe(getState, R.pathEq([keys.notification, keysNotification.visible], true))
+
+export const showNotification = notification => R.pipe(
+  R.assoc(keys.notification, notification),
+  R.assocPath([keys.notification, keysNotification.visible], true)
+)
+
+export const hideNotification = R.assocPath([keys.notification, keysNotification.visible], false)
