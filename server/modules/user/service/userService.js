@@ -36,13 +36,13 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   }
 }
 
-const updateUsername = (user, userUuid, name) => {
+const updateUsername = async (user, userUuid, name) => {
   // For now a user can change only his own name
   if (User.getUuid(user) !== userUuid) {
     throw new UnauthorizedError(User.getName(user))
   }
 
-  UserManager.updateUsername(user, name)
+  await UserManager.updateUsername(user, name)
 }
 
 module.exports = {
