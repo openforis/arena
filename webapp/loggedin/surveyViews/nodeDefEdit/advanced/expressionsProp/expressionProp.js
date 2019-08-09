@@ -9,7 +9,6 @@ import useI18n from '../../../../../commonComponents/useI18n'
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
 import Validator from '../../../../../../common/validation/validator'
 import { getValidationFieldMessages } from '../../../../../utils/validationUtils'
-import { ExpressionsProp } from './expressionsProp'
 
 const ExpressionProp = (props) => {
 

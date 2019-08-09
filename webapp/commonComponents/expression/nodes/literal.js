@@ -4,6 +4,7 @@ import * as R from 'ramda'
 import axios from 'axios'
 
 import Dropdown from '../../form/dropdown'
+import { Input } from '../../form/input'
 import { BinaryOperandType } from './binaryOperand'
 import * as ExpressionParser from '../expressionParser'
 import { useAsyncGetRequest } from '../../hooks'
@@ -13,6 +14,7 @@ import StringUtils from '../../../../common/stringUtils'
 
 import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
+import * as NodeDefUIProps from '../../../loggedin/surveyViews/surveyForm/nodeDefs/nodeDefUIProps'
 
 const isValueText = (nodeDef, value) => nodeDef
   ? !(NodeDef.isInteger(nodeDef) || NodeDef.isDecimal(nodeDef) || StringUtils.isBlank(value))
@@ -29,7 +31,7 @@ const loadItems = async params => {
 
 const Literal = props => {
 
-  const { node, nodeDefCurrent, literalSearchParams, onChange } = props
+  const { node, nodeDefCurrent, literalSearchParams, onChange, type } = props
   const nodeValue = parseValue(nodeDefCurrent, R.propOr(null, 'raw', node))
 
   const { data: { item = {} } = { item: {} }, dispatch: fetchItem } = useAsyncGetRequest(
@@ -71,12 +73,20 @@ const Literal = props => {
             />
           )
           : (
-            <input
-              className="form-input"
-              value={nodeValue}
-              size={25}
-              onChange={e => onChangeValue(e.target.value)}
-            />
+            BinaryOperandType.isLeft(type) && (NodeDef.isInteger(nodeDefCurrent) || NodeDef.isDecimal(nodeDefCurrent))
+              ?
+              <Input
+                {...NodeDefUIProps.getNodeDefInputTextProps(nodeDefCurrent)}
+                value={nodeValue}
+                onChange={value => onChangeValue(value)}
+              />
+              :
+              <input
+                className="form-input"
+                value={nodeValue}
+                size={25}
+                onChange={e => onChangeValue(e.target.value)}
+              />
           )
 
       }

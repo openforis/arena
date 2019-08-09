@@ -1,16 +1,19 @@
 const {
-  errorKeys,
   validate,
   validateRequired,
   validateItemPropUniqueness,
   validateNotKeyword
 } = require('../../../common/validation/validator')
 
+const keysErrors = {
+  taxaEmpty: 'taxonomy.validationErrors.taxaEmpty'
+}
+
 /**
  * ====== TAXONOMY
  */
 const validateNotEmptyTaxa = taxaCount => () =>
-  taxaCount === 0 ? { key: errorKeys.empty } : null
+  taxaCount === 0 ? { key: keysErrors.taxaEmpty } : null
 
 const taxonomyValidators = (taxonomies, taxaCount) => ({
   'props.name': [validateRequired, validateNotKeyword, validateItemPropUniqueness(taxonomies)],
