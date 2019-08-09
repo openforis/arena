@@ -132,6 +132,15 @@ const updateSurveyProp = async (user, surveyId, key, value, client = db) =>
     return await fetchSurveyById(surveyId, true, true, t)
   })
 
+const publishSurveyProps = async (surveyId, langsDeleted, client = db) => {
+  await SurveyRepository.publishSurveyProps(surveyId, client)
+
+  for (const langDeleted of langsDeleted) {
+    await SurveyRepository.deleteSurveyLabel(surveyId, langDeleted, client)
+    await SurveyRepository.deleteSurveyDescription(surveyId, langDeleted, client)
+  }
+}
+
 // ====== DELETE
 const deleteSurvey = async (id, user) => {
   await db.tx(async t => {
@@ -163,12 +172,10 @@ module.exports = {
 
   // ====== UPDATE
   updateSurveyProp,
-  publishSurveyProps: SurveyRepository.publishSurveyProps,
+  publishSurveyProps,
   updateSurveyDependencyGraphs: SurveyRepository.updateSurveyDependencyGraphs,
 
   // ====== DELETE
   deleteSurvey,
-  deleteSurveyLabel: SurveyRepository.deleteSurveyLabel,
-  deleteSurveyDescription: SurveyRepository.deleteSurveyDescription,
   dropSurveySchema: SurveyRepository.dropSurveySchema,
 }

@@ -181,16 +181,54 @@ const permanentlyDeleteNodeDefs = async (surveyId, client = db) =>
     `)
 
 const deleteNodeDefsLabels = async (surveyId, langCode, client = db) =>
-  await deleteNodeDefsProp(surveyId, [NodeDef.propKeys.labels, langCode], client)
+  await _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.labels, langCode], client)
 
 const deleteNodeDefsDescriptions = async (surveyId, langCode, client = db) =>
-  await deleteNodeDefsProp(surveyId, [NodeDef.propKeys.descriptions, langCode], client)
+  await _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.descriptions, langCode], client)
 
-const deleteNodeDefsProp = async (surveyId, deletePath, client = db) =>
+const _deleteNodeDefsProp = async (surveyId, deletePath, client = db) =>
   await client.none(`
     UPDATE ${getSurveyDBSchema(surveyId)}.node_def 
     SET props = props #- '{${deletePath.join(',')}}'
     `)
+
+const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+
+  await client.query(`
+    WITH
+      expressions AS
+      (
+        SELECT
+          n.uuid,
+          jsonb_array_elements(n.props_advanced #> '{validations, expressions}') ${langs.map(l => `#- '{messages, ${l}'`).join(' ')} AS expr
+        FROM
+          ${schema}.node_def n
+      ),
+      expressions_agg AS
+      (
+        SELECT
+          n.uuid,
+          json_agg( e.expr )::jsonb AS expressions
+        FROM
+          ${schema}.node_def n
+        JOIN
+          expressions e
+        ON
+          e.uuid = n.uuid
+        GROUP BY
+          n.uuid
+      )
+    UPDATE
+      ${schema}.node_def n
+    SET
+      props_advanced = jsonb_set(n.props_advanced, '{validations, expressions}', e.expressions, false)
+    FROM
+      expressions_agg e
+    WHERE
+      e.uuid = n.uuid
+  `)
+}
 
 module.exports = {
 
@@ -215,4 +253,5 @@ module.exports = {
   permanentlyDeleteNodeDefs,
   deleteNodeDefsLabels,
   deleteNodeDefsDescriptions,
+  deleteNodeDefsValidationMessageLabels,
 }
