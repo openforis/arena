@@ -13,17 +13,17 @@ const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
 
 const userJobThreads = new ThreadsCache()
 
-const notifyJobUpdate = job => {
-  const userId = job.userId
+const notifyJobUpdate = jobSerialized => {
+  const userUuid = jobSerialized.userUuid
 
-  WebSocket.notifyUser(userId, WebSocketEvents.jobUpdate, job)
+  WebSocket.notifyUser(userUuid, WebSocketEvents.jobUpdate, jobSerialized)
 
-  if (job.ended) {
-    const thread = userJobThreads.getThread(userId)
+  if (jobSerialized.ended) {
+    const thread = userJobThreads.getThread(userUuid)
     //delay thread termination by 1 second (give time to print debug info to the console)
     setTimeout(() => {
         thread.terminate()
-        userJobThreads.removeThread(userId)
+        userJobThreads.removeThread(userUuid)
       },
       1000
     )
@@ -32,8 +32,8 @@ const notifyJobUpdate = job => {
 
 // ====== UPDATE
 
-const cancelActiveJobByUserId = async userId => {
-  const jobThread = userJobThreads.getThread(userId)
+const cancelActiveJobByUserUuid = async userUuid => {
+  const jobThread = userJobThreads.getThread(userUuid)
   if (jobThread) {
     jobThread.postMessage({ type: jobThreadMessageTypes.cancelJob })
   }
@@ -49,11 +49,11 @@ const executeJobThread = job => {
     async job => await notifyJobUpdate(job)
   )
 
-  userJobThreads.putThread(job.getUserId(), thread)
+  userJobThreads.putThread(job.userUuid, thread)
 }
 
 module.exports = {
   executeJobThread,
 
-  cancelActiveJobByUserId,
+  cancelActiveJobByUserUuid,
 }

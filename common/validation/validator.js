@@ -8,7 +8,7 @@ const keywords = [
   'file',
   'id',
   'node_def_uuid',
-  'owner_id',
+  'owner_uuid',
   'parent_id',
   'parent_uuid',
   'props',

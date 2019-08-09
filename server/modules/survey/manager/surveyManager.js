@@ -13,6 +13,7 @@ const { getUserPrefSurveyId, userPrefNames } = require('../../../../common/user/
 
 const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
+const AuthGroups = require('../../../../common/auth/authGroups')
 const Authorizer = require('../../../../common/auth/authorizer')
 
 const SurveyRepository = require('../repository/surveyRepository')
@@ -30,7 +31,7 @@ const assocSurveyInfo = info => ({ info })
 
 const createSurvey = async (user, { name, label, lang, collectUri = null }, createRootEntityDef = true, client = db) => {
 
-  const surveyParam = Survey.newSurvey(User.getId(user), name, label, lang, collectUri)
+  const surveyParam = Survey.newSurvey(User.getUuid(user), name, label, lang, collectUri)
 
   return await insertSurvey(user, surveyParam, createRootEntityDef, client)
 }
@@ -67,7 +68,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
       surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
 
       if (!Authorizer.isSystemAdmin(user)) {
-        await AuthGroupRepository.insertUserGroup(Survey.getSurveyAdminGroup(surveyDb).id, User.getId(user), t)
+        await AuthGroupRepository.insertUserGroup(AuthGroups.getUuid(Survey.getSurveyAdminGroup(surveyDb)), User.getUuid(user), t)
       }
 
       await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, t)

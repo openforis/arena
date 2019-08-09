@@ -1,6 +1,6 @@
 const { deleteSurvey } = require('../server/modules/survey/manager/surveyManager')
 
-const UserService = require('../server/modules/user/service/userService')
+const UserManager = require('../server/modules/user/manager/userManager')
 const { setUserPref, userPrefNames } = require('../common/user/userPrefs')
 
 const Survey = require('../common/survey/survey')
@@ -15,7 +15,7 @@ let survey = null
  * before executing all tests
  */
 const initTestContext = async () => {
-  user = await UserService.fetchUserByCognitoUsername('demo_user')
+  user = await UserManager.fetchUserByEmail('admin@openforis.org')
 }
 
 const destroyTestContext = async () => {
@@ -42,4 +42,3 @@ module.exports = {
   getContextSurveyId: () => Survey.getId(survey),
   setContextSurvey
 }
-

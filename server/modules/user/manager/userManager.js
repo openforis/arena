@@ -9,20 +9,20 @@ const ActivityLog = require('../../activityLog/activityLogger')
 
 // ==== CREATE
 
-const insertUser = async (user, surveyId, email, groupId, client = db) =>
+const insertUser = async (user, surveyId, uuid, email, groupUuid, client = db) =>
   await client.tx(async t => {
-    const newUser = await UserRepository.insertUser(surveyId, email, groupId, t)
-    await addUserToGroup(user, surveyId, groupId, newUser, t)
+    const newUser = await UserRepository.insertUser(surveyId, uuid, email, t)
+    await addUserToGroup(user, surveyId, groupUuid, newUser, t)
   })
 
-const addUserToGroup = async (user, surveyId, groupId, userToAdd, client = db) =>
+const addUserToGroup = async (user, surveyId, groupUuid, userToAdd, client = db) =>
   await client.tx(async t => {
-    await AuthGroupRepository.insertUserGroup(groupId, User.getId(userToAdd), t)
+    await AuthGroupRepository.insertUserGroup(groupUuid, User.getUuid(userToAdd), t)
     await ActivityLog.log(
       user,
       surveyId,
       ActivityLog.type.userInvite,
-      { groupId, cognitoUsername: User.getCognitoUsername(userToAdd) },
+      { groupUuid, uuid: User.getUuid(userToAdd) },
       t
     )
   })
@@ -33,7 +33,7 @@ const _userFetcher = fetchFn => async (...args) => {
   const user = await fetchFn(...args)
 
   if (user) {
-    const authGroups = await AuthGroupRepository.fetchUserGroups(User.getId(user))
+    const authGroups = await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
     return { ...user, authGroups }
   }
 
@@ -42,13 +42,13 @@ const _userFetcher = fetchFn => async (...args) => {
 
 const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
-const fetchUserByCognitoUsername = _userFetcher(UserRepository.fetchUserByCognitoUsername)
+const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
 // ==== DELETE
 
 const deleteUserPref = async (user, name) => ({
   ...(await UserRepository.deleteUserPref(user, name)),
-  authGroups: await AuthGroupRepository.fetchUserGroups(User.getId(user))
+  authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
 })
 
 module.exports = {
@@ -61,11 +61,13 @@ module.exports = {
 
   countUsersBySurveyId: UserRepository.countUsersBySurveyId,
 
-  fetchUserByCognitoUsername,
+  fetchUserByUuid,
 
   fetchUserByEmail,
 
   // UPDATE
+  updateUsername: UserRepository.updateUsername,
+
   updateUserPref: UserRepository.updateUserPref,
 
   // DELETE

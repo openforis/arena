@@ -1,6 +1,8 @@
 const { Worker } = require('worker_threads')
 
 const WebSocket = require('../utils/webSocket')
+
+const User = require('../../common/user/user')
 const WebSocketEvents = require('../../common/webSocket/webSocketEvents')
 
 const threadMessageTypes = require('./threadMessageTypes')
@@ -30,7 +32,7 @@ class ThreadManager {
     return ({ user, msg }) => {
       switch (msg.type) {
         case threadMessageTypes.error:
-          WebSocket.notifyUser(user.id, WebSocketEvents.error, msg.error)
+          WebSocket.notifyUser(User.getUuid(user), WebSocketEvents.error, msg.error)
           break
         case threadMessageTypes.messageProcessComplete:
           if (this.singleMessageHandling)

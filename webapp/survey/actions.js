@@ -1,9 +1,14 @@
 import axios from 'axios'
 
+import Survey from '../../common/survey/survey'
+
 import * as SurveyState from './surveyState'
 import * as AppState from '../app/appState'
+
+import User from '../../common/user/user'
 import { userPrefNames } from '../../common/user/userPrefs'
-import { appUserPrefUpdate, showAppJobMonitor } from '../app/actions'
+
+import { appUserPrefUpdate, showAppJobMonitor, showNotificationMessage } from '../app/actions'
 
 export const surveyCreate = 'survey/create'
 export const surveyUpdate = 'survey/update'
@@ -47,7 +52,7 @@ export const setActiveSurvey = (surveyId, draft = true) =>
 
     //update userPref
     const user = AppState.getUser(getState())
-    await axios.post(`/api/user/${user.id}/pref/${userPrefNames.survey}/${surveyId}`)
+    await axios.post(`/api/user/${User.getUuid(user)}/pref/${userPrefNames.survey}/${surveyId}`)
     dispatch({ type: appUserPrefUpdate, name: userPrefNames.survey, value: surveyId })
   }
 
@@ -68,9 +73,13 @@ export const publishSurvey = () => async (dispatch, getState) => {
 // ====== DELETE
 
 export const deleteSurvey = () => async (dispatch, getState) => {
-  const surveyId = SurveyState.getSurveyId(getState())
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
+
   await axios.delete(`/api/survey/${surveyId}`)
 
   dispatch({ type: surveyDelete, surveyId })
+  dispatch(showNotificationMessage('homeView.surveyDeleted', { surveyName: Survey.getName(surveyInfo) }))
 }
 

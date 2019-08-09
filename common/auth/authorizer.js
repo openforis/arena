@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const Record = require('../record/record')
 const User = require('../user/user')
+const AuthGroups = require('./authGroups')
 
 const {
   groupNames,
@@ -24,7 +25,7 @@ const getSurveyUserGroups = (user, surveyInfo) => {
   const userGroups = getAuthGroups(user)
   const surveyGroups = getAuthGroups(surveyInfo)
   return R.innerJoin(
-    (userGroup, surveyGroup) => userGroup.id === surveyGroup.id,
+    (userGroup, surveyGroup) => AuthGroups.getUuid(userGroup) === AuthGroups.getUuid(surveyGroup),
     userGroups,
     surveyGroups
   )
@@ -80,7 +81,7 @@ const canEditRecord = (user, record) => {
   // If 'all', he can edit all survey's records
   const level = R.path([keys.recordSteps, recordDataStep], recordUserPermissions)
 
-  return level === keys.all || (level === keys.own && Record.getOwnerId(record) === user.id)
+  return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
 // ======

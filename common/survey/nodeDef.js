@@ -25,7 +25,6 @@ const nodeDefType = {
 const keys = {
   uuid: 'uuid',
   props: 'props',
-  validation: 'validation',
   meta: 'meta',
   draftAdvanced: 'draftAdvanced'
 }
@@ -180,7 +179,6 @@ module.exports = {
   getLabels: SurveyUtils.getLabels,
   getLabel,
   getDescriptions: SurveyUtils.getProp(propKeys.descriptions, {}),
-  getValidation: R.prop(keys.validation),
   getCategoryUuid: SurveyUtils.getProp(propKeys.categoryUuid),
   getParentCodeDefUuid,
   getTaxonomyUuid: SurveyUtils.getProp(propKeys.taxonomyUuid),

@@ -17,8 +17,8 @@ CREATE TABLE
 
   meta          jsonb              DEFAULT '{}'::jsonb,
 
-  owner_id      bigint    NOT NULL,
+  owner_uuid    uuid      NOT NULL,
 
   PRIMARY KEY (id),
-  CONSTRAINT survey_user_fk FOREIGN KEY (owner_id) REFERENCES "user" ("id")
+  CONSTRAINT survey_user_fk FOREIGN KEY (owner_uuid) REFERENCES "user" ("uuid")
 );

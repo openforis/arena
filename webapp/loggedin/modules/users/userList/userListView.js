@@ -22,7 +22,7 @@ const UsersHeaderLeft = props => {
     <div>
       {canInvite && (
         <Link to={appModuleUri(userModules.userInvite)} className="btn btn-s">
-          <span className="icon icon-plus icon-12px icon-left" />
+          <span className="icon icon-user-plus icon-12px icon-left" />
           {i18n.t('usersView.inviteUser')}
         </Link>
       )}

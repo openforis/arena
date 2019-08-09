@@ -1,6 +1,7 @@
 const Request = require('../../../utils/request')
 const { sendOk, sendFile } = require('../../../utils/response')
 
+const User = require('../../../../common/user/user')
 const Record = require('../../../../common/record/record')
 const RecordFile = require('../../../../common/record/recordFile')
 const Node = require('../../../../common/record/node')
@@ -25,7 +26,7 @@ module.exports.init = app => {
 
       const record = req.body
 
-      if (Record.getOwnerId(record) !== user.id) {
+      if (Record.getOwnerUuid(record) !== User.getUuid(user)) {
         throw new Error('Error record create. User is different')
       }
 

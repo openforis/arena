@@ -3,22 +3,19 @@ const StringUtils = require('../stringUtils')
 const AuthGroups = require('../auth/authGroups')
 
 const keys = {
-  id: 'id',
+  uuid: 'uuid',
   surveyId: 'surveyId',
   name: 'name',
   email: 'email',
-  cognitoUsername: 'cognitoUsername',
   authGroups: 'authGroups',
 
   groupName: 'groupName',
 }
 
 // ==== User properties
-const getId = R.prop(keys.id)
+const getUuid = R.prop(keys.uuid)
 
 const getName = R.prop(keys.name)
-
-const getCognitoUsername = R.prop(keys.cognitoUsername)
 
 const getEmail = R.prop(keys.email)
 
@@ -30,7 +27,7 @@ const getAuthGroupAdmin = R.pipe(
 )
 
 const hasAccepted = R.pipe(
-  R.propOr('', keys.cognitoUsername),
+  R.propOr('', keys.name),
   StringUtils.isNotBlank
 )
 
@@ -50,9 +47,8 @@ const getRecordPermissions = record => user =>
 module.exports = {
   keys,
 
-  getId,
+  getUuid,
   getName,
-  getCognitoUsername,
   getEmail,
   getAuthGroups,
   getAuthGroupAdmin,

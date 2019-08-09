@@ -1,37 +1,58 @@
 import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js'
 
+export const keysAction = {
+  success: 'success',
+  newPasswordRequired: 'newPasswordRequired'
+}
+
 const UserPoolId = __COGNITO_USER_POOL_ID__
 const ClientId = __COGNITO_CLIENT_ID__
 
 const getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
 
-const getUser = () => {
-  const pool = getUserPool()
-  return pool.getCurrentUser()
-}
+export const getUser = () => getUserPool().getCurrentUser()
 
-export const login = (Username, Password) => new Promise((resolve, reject) => {
+const newCognitoUser = Username => new CognitoUser({ Username, Pool: getUserPool() })
 
-  const authenticationData = { Username, Password }
-  const authenticationDetails = new AuthenticationDetails(authenticationData)
+// Global variables to handle completeNewPasswordChallenge flow
+let cognitoUser
+let sessionUserAttributes
 
-  const Pool = getUserPool()
-  const userData = { Username, Pool }
-  const cognitoUser = new CognitoUser(userData)
+const cognitoCallbacks = (onSuccess, onFailure) => ({
+  onSuccess: () => {
+    cognitoUser = null
+    sessionUserAttributes = null
+    onSuccess(keysAction.success)
+  },
 
-  cognitoUser.authenticateUser(
-    authenticationDetails,
-    {
-      onSuccess: result => {
-        const jwtToken = result.getAccessToken().getJwtToken()
-        resolve(jwtToken)
-      },
-      onFailure: error => {
-        reject(error)
-      }
-    }
-  )
+  onFailure,
+
+  newPasswordRequired: (userAttributes) => {
+    // the api doesn't accept this field back
+    delete userAttributes.email_verified
+
+    sessionUserAttributes = userAttributes
+    onSuccess(keysAction.newPasswordRequired)
+  }
 })
+
+export const login = (Username, Password) =>
+  new Promise((resolve, reject) => {
+    cognitoUser = newCognitoUser(Username)
+    cognitoUser.authenticateUser(
+      new AuthenticationDetails({ Username, Password }),
+      cognitoCallbacks(resolve, reject)
+    )
+  })
+
+export const acceptInvitation = (name, password) =>
+  new Promise((resolve, reject) => {
+    cognitoUser.completeNewPasswordChallenge(
+      password,
+      { ...sessionUserAttributes, name },
+      cognitoCallbacks(resolve, reject)
+    )
+  })
 
 export const logout = () => {
   const user = getUser()

@@ -3,9 +3,11 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter, Route } from 'react-router-dom'
 
-import LoginView from '../login/loginView'
 import DynamicImport from '../commonComponents/dynamicImport'
+import LoginView from '../login/loginView'
 import AppLoaderView from './appLoader/appLoaderView'
+import AppNotificationView from './appNotification/appNotificationView'
+
 import { useOnUpdate } from '../commonComponents/hooks'
 
 import * as AppWebSocket from './appWebSocket'
@@ -64,7 +66,8 @@ const AppRouterSwitch = props => {
           </div>
         )
         : (
-          <React.Fragment>
+          <>
+
             {
               user
                 ? (
@@ -79,8 +82,11 @@ const AppRouterSwitch = props => {
                   <LoginView/>
                 )
             }
+
             <AppLoaderView/>
-          </React.Fragment>
+            <AppNotificationView/>
+
+          </>
         )
 
     )

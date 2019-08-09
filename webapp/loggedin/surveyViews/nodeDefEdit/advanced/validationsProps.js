@@ -23,9 +23,8 @@ const integerMask = createNumberMask({
 })
 
 const ValidationsProps = props => {
-  const { nodeDef, nodeDefParent, readOnly, putNodeDefProp } = props
+  const { nodeDef, validation, nodeDefParent, readOnly, putNodeDefProp } = props
 
-  const validation = NodeDef.getValidation(nodeDef)
   const nodeDefUuidContext = NodeDef.getUuid(nodeDefParent)
 
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
