@@ -201,7 +201,7 @@ const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, client = d
       (
         SELECT
           n.uuid,
-          jsonb_array_elements(n.props_advanced #> '{validations, expressions}') ${langs.map(l => `#- '{messages, ${l}'`).join(' ')} AS expr
+          jsonb_array_elements(n.props_advanced #> '{validations, expressions}') ${langs.map(l => `#- '{messages, ${l}}'`).join(' ')} AS expr
         FROM
           ${schema}.node_def n
       ),

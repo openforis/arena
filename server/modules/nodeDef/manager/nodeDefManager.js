@@ -89,7 +89,7 @@ module.exports = {
 
   //UPDATE
   updateNodeDefProps,
-  publishNodeDefsProps: NodeDefRepository.publishNodeDefsProps,
+  publishNodeDefsProps,
 
   //DELETE
   markNodeDefDeleted,
