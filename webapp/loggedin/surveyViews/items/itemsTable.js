@@ -80,7 +80,7 @@ const ItemsTable = (props) => {
   const i18n = useI18n()
 
   return (
-    <React.Fragment>
+    <div className="table">
 
       <Header {...props}/>
 
@@ -88,7 +88,7 @@ const ItemsTable = (props) => {
         R.isEmpty(items)
           ? <div className="table__empty-rows">{i18n.t('itemsTable.noItemsAdded')}</div>
           : (
-            <div className="table">
+            <div className="table__content">
               <div className="table__row-header">
                 <div className="name">{i18n.t('common.name')}</div>
                 <div/>
@@ -105,7 +105,7 @@ const ItemsTable = (props) => {
             </div>
           )
       }
-    </React.Fragment>
+    </div>
   )
 }
 
