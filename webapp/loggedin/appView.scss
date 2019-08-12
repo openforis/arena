@@ -7,15 +7,9 @@
   height: calc(100vh - #{$headerHeight});
 }
 
-.app__modules {
-  position: relative;
-  display: grid;
-  flex-grow: 1;
-}
-
 .app-module {
+  position: relative;
   flex-grow: 1;
-  display: grid;
   padding: 15px 25px;
 }
 

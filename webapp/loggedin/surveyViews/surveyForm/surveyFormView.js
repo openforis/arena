@@ -71,7 +71,7 @@ const SurveyFormView = (props) => {
 
   return nodeDef
     ? (
-      <div>
+      <div className="height100">
 
         {
           editAllowed &&

@@ -68,7 +68,7 @@ button, .btn {
   transition: .2s all;
 
   &:hover {
-    background-color: $greenLight;
+    background-color: $blueLightFocus;
     font-weight: 400;
 
     &:not([aria-disabled="true"]) {
@@ -106,6 +106,7 @@ button, .btn {
 
   &:hover {
     color: $orange;
+    background-color: transparent;
   }
 }
 

@@ -1,4 +1,5 @@
 @import "../../../../../../style/vars";
+@import "../../../surveyFormVars";
 
 .survey-form__node-def-integer,
 .survey-form__node-def-decimal {
@@ -17,20 +18,20 @@
 .survey-form__node-def-text-multiple-container {
   display: grid;
   grid-template-columns: 1fr auto;
-  border-top: 1px solid $blueDark;
-  border-left: 1px solid $blueDark;
-  border-right: 1px solid $blueDark;
+  border-top: $formBorder;
+  border-left: $formBorder;
+  border-right: $formBorder;
   background-color: white;
 
   .form-input {
-    border: none !important;
+    border: 1px solid transparent;
   }
 
   &:last-child {
-    border-bottom: 1px solid rgba($blueDark, .9);
+    border-bottom: $formBorder;
 
     .form-input {
-      width: calc(100% - 2rem - 27px);
+      width: calc(100% - 27px);
     }
   }
 
