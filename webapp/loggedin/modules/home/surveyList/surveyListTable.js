@@ -45,28 +45,31 @@ const SurveyListTable = (props) => {
         </Header>
       </div>
 
-      <div className="table__row-header">
-        <div>{i18n.t('common.name')}</div>
-        <div>{i18n.t('common.label')}</div>
-        <div>{i18n.t('common.dateCreated')}</div>
-        <div>{i18n.t('common.dateLastModified')}</div>
-        <div>{i18n.t('homeView.surveyList.status')}</div>
-      </div>
+      <div className="table__content">
+        <div className="table__row-header">
+          <div>{i18n.t('common.name')}</div>
+          <div>{i18n.t('common.label')}</div>
+          <div>{i18n.t('common.dateCreated')}</div>
+          <div>{i18n.t('common.dateLastModified')}</div>
+          <div>{i18n.t('homeView.surveyList.status')}</div>
+        </div>
 
 
-      <div className="table__rows">
-        {
-          surveyInfos
-            .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
-            .map((surveyInfo, i) => (
-              <SurveyRow
-                key={i}
-                {...props}
-                surveyInfoRow={surveyInfo}
-                i18n={i18n}/>
-            ))
-        }
+        <div className="table__rows">
+          {
+            surveyInfos
+              .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
+              .map((surveyInfo, i) => (
+                <SurveyRow
+                  key={i}
+                  {...props}
+                  surveyInfoRow={surveyInfo}
+                  i18n={i18n}/>
+              ))
+          }
+        </div>
       </div>
+
     </div>
   )
 }
