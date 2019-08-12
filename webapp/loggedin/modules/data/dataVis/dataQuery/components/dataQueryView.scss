@@ -30,14 +30,20 @@ $rowHeaderHeight: 45px;
     .data-operations {
       display: grid;
       grid-template-columns: repeat(4, auto);
-      grid-column-gap: .25rem;
+      align-self: flex-end;
+      border-top: 1px solid $greyBorder;
+      border-left: 1px solid $greyBorder;
+      border-right: 1px solid $greyBorder;
 
       .btn {
+        border: none;
+        padding: .6rem 1rem;
 
         &.highlight {
-          background-color: $yellow;
+          background-color: $yellowHighlight;
         }
       }
+
     }
   }
 
