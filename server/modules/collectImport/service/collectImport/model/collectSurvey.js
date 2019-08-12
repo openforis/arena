@@ -197,6 +197,11 @@ module.exports = {
   getAttributeName: getNodeDefName,
   getAttributeBoolean,
   getUiAttribute,
+
+  getNodeDefRoot: R.pipe(
+    getElementsByPath(['schema', 'entity']),
+    R.head
+  ),
   getNodeDefByPath,
   getNodeDefChildByName,
   getNodeDefChildren
