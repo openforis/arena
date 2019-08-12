@@ -34,7 +34,9 @@ const UserPopupMenu = props => {
   }, [])
 
   return (
-    <div className="user-popup-menu" ref={elementRef}>
+    <div className="user-popup-menu"
+         ref={elementRef}
+         onMouseLeave={onClose}>
 
       <div className="user-popup-menu__user">
         <img src="https://cdn0.iconfinder.com/data/icons/user-pictures/100/unknown2-512.png"/>
@@ -44,7 +46,7 @@ const UserPopupMenu = props => {
           </div>
           <div>
             <Link
-              className="btn-s"
+              className="btn-s btn-transparent"
               to={appModuleUri(userModules.userInvite)} //TODO link to user page
               onClick={onClose}>
               <span className="icon icon-user icon-12px icon-left"/>
@@ -73,10 +75,10 @@ const UserPopupMenu = props => {
       <div className="user-popup-menu__sep"/>
 
       <a className="btn-s btn-transparent"
-              onClick={() => {
-                onClose()
-                logout()
-              }}>
+         onClick={() => {
+           onClose()
+           logout()
+         }}>
         <span className="icon icon-exit icon-12px icon-left"/>
         {i18n.t('sidebar.logout')}
       </a>
