@@ -3,7 +3,7 @@
 $sidebarWidthClosed: 46px;
 $sidebarWidthOpened: 200px;
 //== buttons
-$sidebarBtnMargin: 4px;
+$sidebarBtnMargin: 1px;
 $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
 //== popup-menu
 $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
@@ -13,8 +13,6 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
 .app-sidebar {
   position: relative;
   width: $sidebarWidthClosed;
-  background-color: rgba($grey, 0.6);
-  border-right: 1px solid $blueLight;
 
   display: grid;
   grid-template-rows: 60px 1fr 80px 40px;

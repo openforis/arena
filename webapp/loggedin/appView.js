@@ -4,43 +4,37 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import AppContext from '../app/appContext'
-
-import * as AppState from '../app/appState'
-
+import AppHeader from './appHeader/appHeader'
 import AppSideBar from './appSideBar/appSideBar'
 import AppJobMonitor from './appJob/appJobMonitor'
 import AppErrors from './appErrors/appErrors'
 import ModuleSwitch from './modules/moduleSwitch'
 
-class AppView extends React.Component {
-  render () {
-    const { location, i18n } = this.props
+import * as AppState from '../app/appState'
 
-    const pathName = this.props.history.location.pathname
+const AppView = props => {
+  const { location, i18n } = props
+  const pathName = location.pathname
 
-    return (
-      <div className="app__container">
-        <AppContext.Provider value={{ i18n }}>
+  return (
+    <AppContext.Provider value={{ i18n }}>
 
-          <AppSideBar pathname={pathName}/>
+      <AppHeader/>
 
-          <ModuleSwitch location={location}/>
-
-          <AppJobMonitor/>
-
-          <AppErrors/>
-
-        </AppContext.Provider>
-
+      <div className="app__container height100">
+        <AppSideBar pathname={pathName}/>
+        <ModuleSwitch location={location}/>
       </div>
-    )
-  }
+
+      <AppJobMonitor/>
+      <AppErrors/>
+
+    </AppContext.Provider>
+  )
 }
 
-const mapStateToProps = (state) => {
-  return { i18n: AppState.getI18n(state) }
-}
+const mapStateToProps = (state) => ({
+  i18n: AppState.getI18n(state)
+})
 
-export default connect(
-  mapStateToProps
-)(AppView)
+export default connect(mapStateToProps)(AppView)

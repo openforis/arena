@@ -2,9 +2,7 @@
 @import "../style/layoutMixins";
 
 .app__container {
-  @include full-screen-fixed();
-
-  z-index: $zIndex1App;
+  background-color: lighten($grey, 5%);
   display: flex;
 }
 
@@ -15,11 +13,10 @@
 }
 
 .app-module {
-  position: absolute;
-  width: calc(100% - 30px);
-  height: calc(100% - 30px);
+  flex-grow: 1;
+  height: calc(100vh - 45px);
   display: grid;
-  padding: 15px;
+  padding: 15px 25px;
 }
 
 .app-module__fade-enter {
