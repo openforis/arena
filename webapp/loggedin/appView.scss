@@ -4,6 +4,7 @@
 .app__container {
   background-color: lighten($grey, 5%);
   display: flex;
+  height: calc(100vh - #{$headerHeight});
 }
 
 .app__modules {
@@ -14,7 +15,6 @@
 
 .app-module {
   flex-grow: 1;
-  height: calc(100vh - 45px);
   display: grid;
   padding: 15px 25px;
 }

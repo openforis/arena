@@ -4,30 +4,31 @@ import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
 import AppSideBarModules from './components/appSideBarModules'
-import useI18n from '../../commonComponents/useI18n'
 
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../../survey/surveyState'
 
-import { logout, toggleSideBar } from '../../app/actions'
+import { toggleSideBar } from '../../app/actions'
 
 const AppSideBar = (props) => {
 
   const {
     pathname, surveyInfo, isSideBarOpened,
-    logout, toggleSideBar
+    toggleSideBar
   } = props
 
   const element = useRef(null)
 
-  const i18n = useI18n()
-
   return (
     <div className={`app-sidebar ${isSideBarOpened ? 'opened' : ''}`} ref={element}>
-
-      {/*logo placeholder*/}
-      <div></div>
-
+      {/*toggle sidebar */}
+      <a className="app-sidebar__btn-toggle"
+         onClick={() => {
+           element.current.classList.toggle('opened')
+           toggleSideBar()
+         }}>
+        <span className="icon icon-16px icon-menu"/>
+      </a>
 
       <AppSideBarModules
         surveyInfo={surveyInfo}
@@ -35,31 +36,20 @@ const AppSideBar = (props) => {
         sideBarOpened={isSideBarOpened}/>
 
       {/*logout */}
-      <div>
-        <a className="app-sidebar__module-btn text-uppercase"
-           onClick={() => logout()}>
-            <span
-              className={`icon icon-exit ${isSideBarOpened ? ' icon-left' : ''}`}
-              style={{ transform: 'scaleX(-1)' }}/>
-          {
-            isSideBarOpened
-              ? <span>{i18n.t('sidebar.logout')}</span>
-              : null
-          }
-        </a>
+      {/*<div>*/}
+      {/*  <a className="app-sidebar__module-btn text-uppercase"*/}
+      {/*     onClick={() => logout()}>*/}
+      {/*      <span*/}
+      {/*        className={`icon icon-exit ${isSideBarOpened ? ' icon-left' : ''}`}*/}
+      {/*        style={{ transform: 'scaleX(-1)' }}/>*/}
+      {/*    {*/}
+      {/*      isSideBarOpened*/}
+      {/*        ? <span>{i18n.t('sidebar.logout')}</span>*/}
+      {/*        : null*/}
+      {/*    }*/}
+      {/*  </a>*/}
 
-      </div>
-
-      {/*toggle sidebar */}
-      <div>
-        <a className="app-sidebar__btn-toggle"
-           onClick={() => {
-             element.current.classList.toggle('opened')
-             toggleSideBar()
-           }}>
-          <span className="icon icon-16px icon-menu"/>
-        </a>
-      </div>
+      {/*</div>*/}
 
     </div>
   )
@@ -71,4 +61,4 @@ const mapStateToProps = state => ({
   isSideBarOpened: AppState.isSideBarOpened(state),
 })
 
-export default connect(mapStateToProps, { logout, toggleSideBar })(AppSideBar)
+export default connect(mapStateToProps, { toggleSideBar })(AppSideBar)
