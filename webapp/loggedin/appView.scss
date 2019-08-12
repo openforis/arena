@@ -11,6 +11,10 @@
   position: relative;
   flex-grow: 1;
   padding: 15px 25px;
+
+  > :first-child {
+    height: 100%;
+  }
 }
 
 .app-module__fade-enter {
