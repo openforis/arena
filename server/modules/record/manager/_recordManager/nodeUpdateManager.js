@@ -125,7 +125,7 @@ const _insertNodeRecursively = async (survey, nodeDef, record, nodeToInsert, use
     ? Survey.getNodeDefChildren(nodeDef)(survey)
     : []
 
-  const childDefsToInsert = childDefs.filter(NodeDef.isSingle)
+  const childDefsToInsert = childDefs.filter(nodeDef => NodeDef.isSingle(nodeDef) || NodeDef.hasDefaultValueSimple(nodeDef))
 
   // insert only child single nodes (it allows to apply default values)
   const childNodes = R.mergeAll(

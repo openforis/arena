@@ -8,8 +8,8 @@ import NodeDefCodeDropdown from './nodeDefCodeDropdown'
 import NodeDefCodeCheckbox from './nodeDefCodeCheckbox'
 import { useAsyncGetRequest } from '../../../../../../commonComponents/hooks'
 
-import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Survey from '../../../../../../../common/survey/survey'
+import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Category from '../../../../../../../common/survey/category'
 import CategoryItem from '../../../../../../../common/survey/categoryItem'
 import Record from '../../../../../../../common/record/record'
@@ -70,8 +70,11 @@ const NodeDefCode = props => {
 
   const onItemRemove = item => {
     if (NodeDef.isSingle(nodeDef)) {
-      updateNode(nodeDef, nodes[0], {}, null, {}, {})
-    } else {
+      // do not update node if it has a "simple" default value
+      if (!NodeDef.hasDefaultValueSimple(nodeDef)) {
+        updateNode(nodeDef, nodes[0], {}, null, {}, {})
+      }
+    } else if (nodes.length > 1 || !NodeDef.hasDefaultValueSimple(nodeDef)) {
       const nodeToRemove = nodes.find(node => Node.getCategoryItemUuid(node) === CategoryItem.getUuid(item))
       removeNode(nodeDef, nodeToRemove)
     }

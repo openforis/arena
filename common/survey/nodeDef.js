@@ -1,10 +1,12 @@
 const R = require('ramda')
+
 const { uuidv4 } = require('../uuid')
 
-const SurveyUtils = require('./surveyUtils')
+const NodeDefExpression = require('./nodeDefExpression')
 const NodeDefValidations = require('./nodeDefValidations')
 
-const { isBlank } = require('../stringUtils')
+const SurveyUtils = require('./surveyUtils')
+const StringUtils = require('../stringUtils')
 
 // ======== NODE DEF PROPERTIES
 
@@ -99,12 +101,19 @@ const isPublished = R.propEq(propKeys.published, true)
 
 const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
-  return isBlank(label)
+  return StringUtils.isBlank(label)
     ? getName(nodeDef)
     : label
 }
 
 const getValidations = SurveyUtils.getProp(propKeys.validations, {})
+
+const getDefaultValues = SurveyUtils.getProp(propKeys.defaultValues, [])
+
+const hasDefaultValueSimple = nodeDef => {
+  const defValues = getDefaultValues(nodeDef)
+  return R.length(defValues) === 1 && NodeDefExpression.hasEmptyApplyIf(defValues[0])
+}
 
 // ==== READ meta
 const getMetaHierarchy = R.pathOr([], [keys.meta, metaKeys.h])
@@ -207,7 +216,8 @@ module.exports = {
   isPublished,
 
   //advanced props
-  getDefaultValues: SurveyUtils.getProp(propKeys.defaultValues, []),
+  getDefaultValues,
+  hasDefaultValueSimple,
   getApplicable: SurveyUtils.getProp(propKeys.applicable, []),
   getValidations,
   getValidationExpressions: R.pipe(

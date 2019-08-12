@@ -1,7 +1,5 @@
 const R = require('ramda')
 
-const StringUtils = require('../stringUtils')
-
 const Survey = require('../survey/survey')
 const NodeDef = require('../survey/nodeDef')
 const NodeDefExpression = require('../survey/nodeDefExpression')
@@ -96,9 +94,8 @@ const evalApplicableExpressions = async (survey, record, node, expressions, stop
 const _getApplicableExpressions = async (survey, record, nodeCtx, expressions, stopAtFirstFound = false) => {
   const applicableExpressions = []
   for (const expression of expressions) {
-    const applyIfExpr = NodeDefExpression.getApplyIf(expression)
-
-    if (StringUtils.isBlank(applyIfExpr) || await evalNodeQuery(survey, record, nodeCtx, applyIfExpr)) {
+    if (NodeDefExpression.hasEmptyApplyIf(expression)
+      || await evalNodeQuery(survey, record, nodeCtx, NodeDefExpression.getApplyIf(expression))) {
       applicableExpressions.push(expression)
 
       if (stopAtFirstFound)

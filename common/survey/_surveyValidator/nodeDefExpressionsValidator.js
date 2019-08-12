@@ -67,8 +67,7 @@ const validateExpressionProp = (survey, nodeDef) =>
 
 const validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
   async (propName, nodeDefExpression) => {
-    const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
-    return R.isEmpty(expr) && i < nodeDefExpressions.length - 1
+    return i < nodeDefExpressions.length - 1 && NodeDefExpression.hasEmptyApplyIf(nodeDefExpression)
       ? 'only_last_can_have_empty_apply_if'
       : null
   }

@@ -1,9 +1,9 @@
 const R = require('ramda')
 
-const { uuidv4 } = require('./../uuid')
-const { isBlank } = require('../stringUtils')
+const { uuidv4 } = require('../uuid')
 
 const SurveyUtils = require('./surveyUtils')
+const StringUtils = require('../stringUtils')
 
 const keys = {
   placeholder: 'placeholder',
@@ -23,15 +23,17 @@ const createExpression = (expression = '', applyIf = '', placeholder = false) =>
 
 // ====== READ
 
-const getExpression = R.prop(keys.expression)
+const getExpression = R.propOr('', keys.expression)
 
-const getApplyIf = R.prop(keys.applyIf)
+const getApplyIf = R.propOr('', keys.applyIf)
+
+const hasEmptyApplyIf = R.pipe(getApplyIf, StringUtils.isBlank)
 
 const getMessages = R.propOr({}, keys.messages)
 
 const isPlaceholder = R.propEq(keys.placeholder, true)
 
-const isEmpty = (expression = {}) => isBlank(getExpression(expression)) && isBlank(getApplyIf(expression))
+const isEmpty = (expression = {}) => StringUtils.isBlank(getExpression(expression)) && hasEmptyApplyIf(expression)
 
 // ====== UPDATE
 
@@ -52,7 +54,7 @@ const assocMessage = message =>
 // ====== UTILS
 
 const extractNodeDefNames = (jsExpr = '') => {
-  if (isBlank(jsExpr))
+  if (StringUtils.isBlank(jsExpr))
     return []
 
   const names = []
@@ -88,6 +90,7 @@ module.exports = {
   getUuid: SurveyUtils.getUuid,
   getExpression,
   getApplyIf,
+  hasEmptyApplyIf,
   getMessages,
   getMessage: (lang, defaultValue = '') => R.pipe(
     getMessages,
