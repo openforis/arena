@@ -14,7 +14,9 @@ $rowHeaderHeight: 45px;
 .data-query__table {
 
   &.edit {
-    border: 1px dashed $greyBorder;
+    .table__content {
+      border: 1px dashed $greyBorder;
+    }
 
     input {
       border-bottom: none;
