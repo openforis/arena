@@ -1,7 +1,9 @@
 import './appHeader.scss'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
+
+import UserPopupMenu from './components/userPopupMenu'
 
 import Survey from '../../../common/survey/survey'
 
@@ -10,6 +12,7 @@ import * as SurveyState from '../../survey/surveyState'
 
 const AppHeader = props => {
   const { surveyInfo, lang } = props
+  const [showUserPopup, setShowUserPopup] = useState(false)
 
   return (
     <div className="app-header">
@@ -22,12 +25,21 @@ const AppHeader = props => {
         {Survey.getLabel(surveyInfo, lang)}
       </div>
 
-      <div className="app-header__user">
+      <div className="app-header__user"
+           onClick={() => {
+             setShowUserPopup(showUserPopupPrev => !showUserPopupPrev)
+           }}>
         <img src="https://cdn0.iconfinder.com/data/icons/user-pictures/100/unknown2-512.png"/>
         <button className="btn btn-transparent">
           <span className="icon icon-ctrl"/>
         </button>
       </div>
+
+      {
+        showUserPopup &&
+        <UserPopupMenu
+          onClose={() => setShowUserPopup(false)}/>
+      }
 
     </div>
   )

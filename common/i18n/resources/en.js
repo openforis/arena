@@ -54,6 +54,10 @@ module.exports = {
     logout: 'Logout',
   },
 
+  header: {
+    myProfile: 'My profile',
+  },
+
   nodeDefsTypes: {
     integer: 'Integer',
     decimal: 'Decimal',

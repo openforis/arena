@@ -35,22 +35,6 @@ const AppSideBar = (props) => {
         pathname={pathname}
         sideBarOpened={isSideBarOpened}/>
 
-      {/*logout */}
-      {/*<div>*/}
-      {/*  <a className="app-sidebar__module-btn text-uppercase"*/}
-      {/*     onClick={() => logout()}>*/}
-      {/*      <span*/}
-      {/*        className={`icon icon-exit ${isSideBarOpened ? ' icon-left' : ''}`}*/}
-      {/*        style={{ transform: 'scaleX(-1)' }}/>*/}
-      {/*    {*/}
-      {/*      isSideBarOpened*/}
-      {/*        ? <span>{i18n.t('sidebar.logout')}</span>*/}
-      {/*        : null*/}
-      {/*    }*/}
-      {/*  </a>*/}
-
-      {/*</div>*/}
-
     </div>
   )
 
