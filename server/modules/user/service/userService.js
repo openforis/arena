@@ -3,7 +3,6 @@ const aws = require('../../../system/aws')
 const UserManager = require('../manager/userManager')
 const AuthManager = require('../../auth/manager/authManager')
 
-const UserValidator = require('../../../../common/user/userValidator')
 const User = require('../../../../common/user/user')
 const AuthGroups = require('../../../../common/auth/authGroups')
 const Authorizer = require('../../../../common/auth/authorizer')
@@ -36,6 +35,10 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   }
 }
 
+const updateUser = async (user, userUuid, name, newGroupUuid) => {
+  await UserManager.updateUser(userUuid, name, newGroupUuid)
+}
+
 const updateUsername = async (user, userUuid, name) => {
   // For now a user can change only his own name
   if (User.getUuid(user) !== userUuid) {
@@ -46,13 +49,13 @@ const updateUsername = async (user, userUuid, name) => {
 }
 
 module.exports = {
-  validateNewUser: UserValidator.validateNewUser,
-
   countUsersBySurveyId: UserManager.countUsersBySurveyId,
 
   fetchUsersBySurveyId: UserManager.fetchUsersBySurveyId,
 
   fetchUserByUuid: UserManager.fetchUserByUuid,
+
+  updateUser,
 
   updateUsername,
 

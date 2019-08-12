@@ -23,7 +23,7 @@ const UserInviteView = props => {
   const i18n = useI18n()
 
   const {
-    email, group, groups,
+    email, group, surveyGroups,
     getFieldValidation, setEmail, setGroup, inviteUser
   } = useUserInviteState(props)
 
@@ -40,7 +40,7 @@ const UserInviteView = props => {
         <Dropdown
           validation={getFieldValidation('groupUuid')}
           placeholder={i18n.t('common.group')}
-          items={groups}
+          items={surveyGroups}
           itemKeyProp={'uuid'}
           itemLabelProp={'label'}
           selection={group}

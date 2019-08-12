@@ -31,7 +31,7 @@ const countUsersBySurveyId = async (surveyId, client = db) =>
 
 const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client = db) =>
   await client.map(`
-    SELECT u.*, g.name AS group_name
+    SELECT u.*
     FROM "user" u
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
     JOIN auth_group g on g.uuid = gu.group_uuid AND g.survey_id = $1
@@ -42,7 +42,7 @@ const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client =
     camelize)
 
 const fetchUserByUuid = async (uuid, client = db) =>
-  await client.oneOrNone(`
+  await client.one(`
     SELECT *
     FROM "user"
     WHERE uuid = $1`,
@@ -58,6 +58,16 @@ const fetchUserByEmail = async (email, client = db) =>
     camelize)
 
 // ==== UPDATE
+
+const updateUser = async (uuid, name, client = db) =>
+  await client.one(`
+    UPDATE "user"
+    SET
+    name = $1
+    WHERE uuid = $2
+    RETURNING *`,
+    [name, uuid],
+    camelize)
 
 const updateUsername = async (user, name, client = db) =>
   await client.one(`
@@ -109,6 +119,7 @@ module.exports = {
   fetchUserByEmail,
 
   // UPDATE
+  updateUser,
   updateUsername,
   updateUserPref,
 

@@ -31,10 +31,6 @@ const hasAccepted = R.pipe(
   StringUtils.isNotBlank
 )
 
-// The following methods are used in UserListView. They are meant to work on the
-// object returned by the '/api/survey/:surveyId/users' entry point.
-const getGroupName = R.prop(keys.groupName)
-
 // ==== User record permissions
 const getRecordPermissions = record => user =>
   R.pipe(
@@ -53,8 +49,6 @@ module.exports = {
   getAuthGroups,
   getAuthGroupAdmin,
   hasAccepted,
-
-  getGroupName,
 
   getRecordPermissions,
 }

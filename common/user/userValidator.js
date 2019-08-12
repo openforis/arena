@@ -15,14 +15,15 @@ const validateEmail = (propName, item) => {
   return email && !validEmailRe.test(email) ? { key: errorKeys.invalidEmail } : null
 }
 
-const newUserPropsValidations = {
-  'email': [validateRequired, validateEmail],
+const userPropsValidations = {
+  'name': [validateRequired],
+  // 'email': [validateRequired, validateEmail],
   'groupUuid': [validateRequired],
 }
 
-const validateNewUser = async user => await validate(user, newUserPropsValidations)
+const validateUser = async user => await validate(user, userPropsValidations)
 
 module.exports = {
-  validateNewUser,
   validateEmail,
+  validateUser,
 }

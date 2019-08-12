@@ -6,6 +6,7 @@ const AuthMiddleware = require('../../auth/authApiMiddleware')
 const UserService = require('../service/userService')
 
 const User = require('../../../../common/user/user')
+const UserInviteValidator = require('../../../../common/user/userInviteValidator')
 const Validator = require('../../../../common/validation/validator')
 
 const SystemError = require('../../../../server/utils/systemError')
@@ -19,7 +20,7 @@ module.exports.init = app => {
       const { user } = req
 
       const { surveyId, email, groupUuid } = Request.getParams(req)
-      const validation = await UserService.validateNewUser(req.body)
+      const validation = await UserInviteValidator.validateNewUser(req.body)
 
       if (Validator.isValidationValid(validation)) {
         await UserService.inviteUser(user, surveyId, email, groupUuid)
@@ -34,6 +35,17 @@ module.exports.init = app => {
   })
 
   // ==== READ
+
+  app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
+    try {
+      const { userUuid } = Request.getParams(req)
+      const user = await UserService.fetchUserByUuid(userUuid)
+
+      res.json(user)
+    } catch (err) {
+      next(err)
+    }
+  })
 
   app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
@@ -67,6 +79,19 @@ module.exports.init = app => {
       const { userUuid, name } = Request.getParams(req)
 
       await UserService.updateUsername(user, userUuid, name)
+
+      Response.sendOk(res)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.put('/user/:userUuid', async (req, res, next) => {
+    try {
+      const { user } = req
+      const { userUuid, name, groupUuid } = Request.getParams(req)
+
+      await UserService.updateUser(user, userUuid, name, groupUuid)
 
       Response.sendOk(res)
     } catch (err) {

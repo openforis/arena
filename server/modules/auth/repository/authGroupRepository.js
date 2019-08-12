@@ -24,6 +24,15 @@ const createSurveyGroups = async (surveyId, surveyGroups, client = db) =>
     authGroup => insertGroup(authGroup, surveyId, client)
   ))
 
+const insertUserGroup = async (groupUuid, userUuid, client = db) =>
+  await client.one(`
+    INSERT INTO auth_group_user (group_uuid, user_uuid)
+    VALUES ($1, $2)
+    RETURNING *`,
+    [groupUuid, userUuid],
+    dbTransformCallback
+  )
+
 // ==== READ
 
 const fetchGroupByUuid = async (groupUuid, client = db) =>
@@ -31,7 +40,8 @@ const fetchGroupByUuid = async (groupUuid, client = db) =>
     SELECT auth_group.*
     FROM auth_group
     WHERE auth_group.uuid = $1`,
-    [groupUuid]
+    [groupUuid],
+    dbTransformCallback
   )
 
 
@@ -58,18 +68,22 @@ const fetchUserGroups = async (userUuid, client = db) =>
 
 // ==== UPDATE
 
-const insertUserGroup = async (groupUuid, userUuid, client = db) =>
+const updateUserGroup = async (oldGroupUuid, newGroupUuid, userUuid, client = db) => {
   await client.one(`
-    INSERT INTO auth_group_user (group_uuid, user_uuid)
-    VALUES ($1, $2)
+    UPDATE auth_group_user
+    SET group_uuid = $1
+    WHERE group_uuid = $2
+    AND user_uuid = $3
     RETURNING *`,
-    [groupUuid, userUuid],
+    [newGroupUuid, oldGroupUuid, userUuid],
     dbTransformCallback
   )
+}
 
 module.exports = {
   // CREATE
   createSurveyGroups,
+  insertUserGroup,
 
   // READ
   fetchGroupByUuid,
@@ -77,5 +91,5 @@ module.exports = {
   fetchUserGroups,
 
   // UPDATE
-  insertUserGroup,
+  updateUserGroup,
 }

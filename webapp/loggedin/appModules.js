@@ -98,5 +98,9 @@ export const userModules = {
   userInvite: {
     key: 'userInvite',
     path: `${appModules.users.path}/invite`,
+  },
+  user: {
+    user: 'view',
+    path: `${appModules.users.path}/user`,
   }
 }

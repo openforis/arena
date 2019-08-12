@@ -1,10 +1,15 @@
+const R = require('ramda')
+
 const Request = require('../../utils/request')
 
 const SurveyManager = require('../survey/manager/surveyManager')
 const RecordService = require('../record/service/recordService')
+const UserService = require('../user/service/userService')
 
 const Authorizer = require('../../../common/auth/authorizer')
 const Survey = require('../../../common/survey/survey')
+const User = require('../../../common/user/user')
+const AuthGroups = require('../../../common/auth/authGroups')
 
 const UnauthorizedError = require('../../utils/unauthorizedError')
 
@@ -43,6 +48,48 @@ const requireRecordPermission = permissionFn => async (req, res, next) => {
   }
 }
 
+// const requireUserEditPermissions = async (req, res, next) => {
+//   const { user } = req
+//   const { user: userToEdit } = Request.getParams(req)
+//
+//   const userGroups = User.getAuthGroups(user)
+//   const userToEditGroups = User.getAuthGroups(userToEdit)
+//
+//   // find groups in common
+//   const commonGroups = R.innerJoin(
+//     (userGroup, userToEditGroup) => AuthGroups.getUuid(userGroup) === AuthGroups.getUuid(surveyGroup),
+//     userGroups,
+//     userToEditGroups
+//   )
+//
+//   console.log(commonGroups)
+// }
+
+const requireUserViewPermission = async (req, res, next) => {
+  try {
+    const { user } = req
+    const { userUuid } = Request.getParams(req)
+    const userToEdit = await UserService.fetchUserByUuid(userUuid)
+
+    const userGroups = User.getAuthGroups(user)
+    const userToEditGroups = User.getAuthGroups(userToEdit)
+
+    const commonGroups = R.innerJoin(
+      (userGroup, userToEditGroup) => AuthGroups.getUuid(userGroup) === AuthGroups.getUuid(userToEditGroup),
+      userGroups,
+      userToEditGroups
+    )
+
+    if (R.isEmpty(commonGroups)) {
+      next(new UnauthorizedError(user && user.name))
+    }
+
+    next()
+  } catch (e) {
+    next(e)
+  }
+}
+
 module.exports = {
   // Survey
   requireSurveyViewPermission: requireSurveyPermission(Authorizer.canViewSurvey),
@@ -55,5 +102,7 @@ module.exports = {
   requireRecordViewPermission: requireSurveyPermission(Authorizer.canViewRecord),
 
   // User
-  requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers)
+  // requireUserEditPermission: requireUserEditPermissions,
+  requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers),
+  requireUserViewPermission,
 }

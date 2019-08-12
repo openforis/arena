@@ -1,0 +1,30 @@
+.user-invite {
+    display: grid;
+    grid-template-columns: 400px;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    grid-row-gap: 7rem;
+
+    .btn {
+        justify-self: center;
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}
+
+.form.user {
+    width: 50%;
+    align-content: center;
+    margin: auto;
+
+    .form-item {
+        grid-template-columns: .1fr .9fr
+    }
+
+    .btn {
+        justify-self: center;
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}

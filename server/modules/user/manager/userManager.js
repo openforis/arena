@@ -1,6 +1,7 @@
 const db = require('../../../db/db')
 
 const User = require('../../../../common/user/user')
+const AuthGroups = require('../../../../common/auth/authGroups')
 
 const UserRepository = require('../repository/userRepository')
 const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
@@ -44,6 +45,33 @@ const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
 const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
+const fetchUsersBySurveyId = async (surveyId, offset, limit, client = db) =>
+  await client.tx(async t => {
+    const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, t)
+
+    return await Promise.all(
+      users.map(async u => ({
+        ...u,
+        authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(u)) }))
+    )
+  })
+
+// ==== UPDATE
+
+const updateUser = async (userUuid, name, newGroupUuid, client = db) => {
+  await client.tx(async t => {
+    const newGroup = await AuthGroupRepository.fetchGroupByUuid(newGroupUuid)
+    const surveyId = AuthGroups.getSurveyId(newGroup)
+    const userGroups = await AuthGroupRepository.fetchUserGroups(userUuid)
+    const oldGroup = userGroups.find(g => AuthGroups.getSurveyId(g) === surveyId)
+
+    if (oldGroup) {
+      await UserRepository.updateUser(userUuid, name)
+      await AuthGroupRepository.updateUserGroup(AuthGroups.getUuid(oldGroup), newGroupUuid, userUuid)
+    }
+  })
+}
+
 // ==== DELETE
 
 const deleteUserPref = async (user, name) => ({
@@ -57,7 +85,7 @@ module.exports = {
   addUserToGroup,
 
   // READ
-  fetchUsersBySurveyId: UserRepository.fetchUsersBySurveyId,
+  fetchUsersBySurveyId,
 
   countUsersBySurveyId: UserRepository.countUsersBySurveyId,
 
@@ -66,6 +94,8 @@ module.exports = {
   fetchUserByEmail,
 
   // UPDATE
+  updateUser,
+
   updateUsername: UserRepository.updateUsername,
 
   updateUserPref: UserRepository.updateUserPref,
