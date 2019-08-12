@@ -1,5 +1,6 @@
 import React from 'react'
 
+import Header from '../../../../commonComponents/header'
 import useI18n from '../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../common/survey/survey'
@@ -37,9 +38,11 @@ const SurveyListTable = (props) => {
   return (
     <div className="survey-list table">
       <div className="table__header">
-        <h5>
-          {i18n.t('appModules.surveyList')}
-        </h5>
+        <Header>
+          <h6>
+            {i18n.t('appModules.surveyList')}
+          </h6>
+        </Header>
       </div>
 
       <div className="table__row-header">
