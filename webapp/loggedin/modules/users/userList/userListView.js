@@ -47,7 +47,11 @@ const UsersRow = props => {
   const { row: userListItem, user, surveyInfo } = props
   const i18n = useI18n()
 
-  const authGroup = Authorizer.getSurveyUserGroup(userListItem, surveyInfo)
+  const authGroup = Authorizer.isSystemAdmin(userListItem)
+    ? User.getAuthGroups(userListItem)[0]
+    : Authorizer.getSurveyUserGroup(userListItem, surveyInfo)
+
+  const canEditUser = Authorizer.canEditUser(user, userListItem, surveyInfo)
 
   return (
     <>
@@ -68,11 +72,9 @@ const UsersRow = props => {
       </div>
       <div>
         {
-          Authorizer.canEditUser(user, userListItem, surveyInfo) && (
-            <Link to={appModuleUri(userModules.user) + User.getUuid(userListItem)} className="btn-edit">
-              <span className={`icon icon-12px ${true ? 'icon-pencil2' : 'icon-eye'}`}/>
-            </Link>
-          )
+          <Link to={appModuleUri(userModules.user) + User.getUuid(userListItem)} className="btn-edit">
+            <span className={`icon icon-12px ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`}/>
+          </Link>
         }
       </div>
     </>

@@ -17,7 +17,7 @@ const validateEmail = (propName, item) => {
 
 const userPropsValidations = {
   'name': [validateRequired],
-  // 'email': [validateRequired, validateEmail],
+  'email': [validateRequired, validateEmail],
   'groupUuid': [validateRequired],
 }
 

@@ -3,10 +3,10 @@ import * as R from 'ramda'
 
 import Validator from '../../../common/validation/validator'
 
-export default (obj, validatorFn) => {
+export default (obj, validatorFn, validationEnabled = false) => {
   const [state, setState] = useState({
     validation: {},
-    validationEnabled: false,
+    validationEnabled,
     obj,
   })
 

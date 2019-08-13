@@ -61,9 +61,10 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
+      const { user } = req
       const { surveyId, offset, limit } = Request.getParams(req)
 
-      const list = await UserService.fetchUsersBySurveyId(surveyId, offset, limit)
+      const list = await UserService.fetchUsersBySurveyId(user, surveyId, offset, limit)
 
       res.json({ list })
     } catch (err) {

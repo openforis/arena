@@ -10,9 +10,16 @@ const Authorizer = require('../../../../common/auth/authorizer')
 const SystemError = require('../../../utils/systemError')
 const UnauthorizedError = require('../../../utils/unauthorizedError')
 
+const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
+  const fetchSystemAdmins = Authorizer.isSystemAdmin(user)
+
+  return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
+}
+
 const inviteUser = async (user, surveyId, email, groupUuid) => {
   if (!Authorizer.isSystemAdmin(user)) {
     const group = await AuthManager.fetchGroupByUuid(groupUuid)
+    
     if (AuthGroups.isAdminGroup(group))
       throw new UnauthorizedError(User.getName(user))
   }
@@ -51,7 +58,7 @@ const updateUsername = async (user, userUuid, name) => {
 module.exports = {
   countUsersBySurveyId: UserManager.countUsersBySurveyId,
 
-  fetchUsersBySurveyId: UserManager.fetchUsersBySurveyId,
+  fetchUsersBySurveyId,
 
   fetchUserByUuid: UserManager.fetchUserByUuid,
 

@@ -3,6 +3,7 @@ const db = require('../../../db/db')
 const camelize = require('camelize')
 
 const User = require('../../../../common/user/user')
+const AuthGroups = require('../../../../common/auth/authGroups')
 
 // in sql queries, user table must be surrounded by "" e.g. "user"
 
@@ -29,16 +30,19 @@ const countUsersBySurveyId = async (surveyId, client = db) =>
     AND g.survey_id = $1`,
     [surveyId])
 
-const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, client = db) =>
+const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSystemAdmins = false, client = db) =>
   await client.map(`
     SELECT u.*
     FROM "user" u
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
-    JOIN auth_group g on g.uuid = gu.group_uuid AND g.survey_id = $1
+    JOIN auth_group g
+    ON g.uuid = gu.group_uuid
+    AND (g.survey_id = $1 OR ($2 AND g.name = '${AuthGroups.groupNames.systemAdmin}'))
     GROUP BY u.uuid, g.name
+    ORDER BY u.name
     LIMIT ${limit || 'ALL'}
     OFFSET ${offset}`,
-    [surveyId],
+    [surveyId, fetchSystemAdmins],
     camelize)
 
 const fetchUserByUuid = async (uuid, client = db) =>

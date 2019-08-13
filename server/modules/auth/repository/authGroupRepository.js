@@ -3,6 +3,8 @@ const db = require('../../../db/db')
 
 const dbTransformCallback = camelize
 
+const AuthGroups = require('../../../../common/auth/authGroups')
+
 // ==== CREATE
 
 const insertGroup = async (authGroup, surveyId, client = db) =>
@@ -68,14 +70,22 @@ const fetchUserGroups = async (userUuid, client = db) =>
 
 // ==== UPDATE
 
-const updateUserGroup = async (oldGroupUuid, newGroupUuid, userUuid, client = db) => {
+const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
   await client.one(`
-    UPDATE auth_group_user
+    UPDATE auth_group_user gu
     SET group_uuid = $1
-    WHERE group_uuid = $2
-    AND user_uuid = $3
+    FROM auth_group g
+    WHERE gu.user_uuid = $2
+    AND (
+      g.survey_id = $3
+      AND g.uuid = gu.group_uuid
+    )
+    OR (
+      g.uuid = $1
+      AND g.name = '${AuthGroups.groupNames.systemAdmin}'
+    ) 
     RETURNING *`,
-    [newGroupUuid, oldGroupUuid, userUuid],
+    [groupUuid, userUuid, surveyId],
     dbTransformCallback
   )
 }

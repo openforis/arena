@@ -65,26 +65,12 @@ const requireRecordPermission = permissionFn => async (req, res, next) => {
 //   console.log(commonGroups)
 // }
 
-const requireUserViewPermission = async (req, res, next) => {
+const requireUserPermission = permissionFn => async (req, res, next) => {
   try {
-    const { user } = req
     const { userUuid } = Request.getParams(req)
     const userToEdit = await UserService.fetchUserByUuid(userUuid)
 
-    const userGroups = User.getAuthGroups(user)
-    const userToEditGroups = User.getAuthGroups(userToEdit)
-
-    const commonGroups = R.innerJoin(
-      (userGroup, userToEditGroup) => AuthGroups.getUuid(userGroup) === AuthGroups.getUuid(userToEditGroup),
-      userGroups,
-      userToEditGroups
-    )
-
-    if (R.isEmpty(commonGroups)) {
-      next(new UnauthorizedError(user && user.name))
-    }
-
-    next()
+    checkPermission(req, next, permissionFn, userToEdit)
   } catch (e) {
     next(e)
   }
@@ -104,5 +90,6 @@ module.exports = {
   // User
   // requireUserEditPermission: requireUserEditPermissions,
   requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers),
-  requireUserViewPermission,
+  requireUserViewPermission: requireUserPermission(Authorizer.canViewUser),
+  requireUserEditPermission: requireUserPermission(() => true),
 }

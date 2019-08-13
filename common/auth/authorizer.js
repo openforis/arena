@@ -86,19 +86,38 @@ const canEditRecord = (user, record) => {
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }
 
-const canEditUser = (user, userToEdit, surveyInfo) =>
-    (isSystemAdmin(user) && !isSystemAdmin(userToEdit))
-    || (isSurveyAdmin(user, surveyInfo) &&
-        !isSurveyAdmin(userToEdit, surveyInfo) &&
-        !isSystemAdmin(userToEdit))
-    || User.getUuid(user) === User.getUuid(userToEdit)
-
 // ======
 // ====== Users
 // ======
 
-// INVITE
+// CREATE
 const canInviteUsers = hasSurveyPermission(permissions.userInvite)
+
+// READ
+const canViewUser = (user, userToEdit) => {
+  if (isSystemAdmin(user)) {
+    return true
+  }
+
+  const userGroups = User.getAuthGroups(user)
+  const userToEditGroups = User.getAuthGroups(userToEdit)
+
+  const commonGroups = R.innerJoin(
+    (userGroup, userToEditGroup) => AuthGroups.getSurveyId(userGroup) === AuthGroups.getSurveyId(userToEditGroup),
+    userGroups,
+    userToEditGroups
+  )
+
+  return !R.isEmpty(commonGroups)
+}
+
+// EDIT
+const canEditUser = (user, userToEdit, surveyInfo) =>
+  (isSystemAdmin(user) && !isSystemAdmin(userToEdit))
+  || (isSurveyAdmin(user, surveyInfo) &&
+  !isSurveyAdmin(userToEdit, surveyInfo) &&
+  !isSystemAdmin(userToEdit))
+  || User.getUuid(user) === User.getUuid(userToEdit)
 
 module.exports = {
   isSystemAdmin,
@@ -116,5 +135,6 @@ module.exports = {
 
   // User permissions
   canInviteUsers,
+  canViewUser,
   canEditUser,
 }

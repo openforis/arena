@@ -45,9 +45,9 @@ const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
 const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
-const fetchUsersBySurveyId = async (surveyId, offset, limit, client = db) =>
+const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
   await client.tx(async t => {
-    const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, t)
+    const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
 
     return await Promise.all(
       users.map(async u => ({
@@ -62,13 +62,15 @@ const updateUser = async (userUuid, name, newGroupUuid, client = db) => {
   await client.tx(async t => {
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(newGroupUuid)
     const surveyId = AuthGroups.getSurveyId(newGroup)
-    const userGroups = await AuthGroupRepository.fetchUserGroups(userUuid)
-    const oldGroup = userGroups.find(g => AuthGroups.getSurveyId(g) === surveyId)
 
-    if (oldGroup) {
-      await UserRepository.updateUser(userUuid, name)
-      await AuthGroupRepository.updateUserGroup(AuthGroups.getUuid(oldGroup), newGroupUuid, userUuid)
-    }
+    // const userGroups = await AuthGroupRepository.fetchUserGroups(userUuid)
+    // const oldGroup = userGroups.find(g => AuthGroups.getSurveyId(g) === surveyId)
+
+    // if (oldGroup) {
+    await UserRepository.updateUser(userUuid, name)
+    // await AuthGroupRepository.updateUserGroup(AuthGroups.getUuid(oldGroup), newGroupUuid, userUuid)
+    await AuthGroupRepository.updateUserGroup(surveyId, userUuid, newGroupUuid)
+    // }
   })
 }
 
