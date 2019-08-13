@@ -8,24 +8,14 @@ import UsersView from './users/usersView'
 
 import { appModules, appModuleUri } from '../appModules'
 
-const AppModuleHOC = Component => props => (
-  <div className="app-module">
-    <Component {...props}/>
-  </div>
-)
-const Home = AppModuleHOC(HomeView)
-const Designer = AppModuleHOC(DesignerView)
-const Data = AppModuleHOC(DataView)
-const Users = AppModuleHOC(UsersView)
-
 const ModuleSwitch = (props) => (
-  <div className="app__modules">
+  <div className="app-module">
 
     <Switch location={props.location}>
-      <Route path={appModuleUri(appModules.home)} component={Home}/>
-      <Route path={appModuleUri(appModules.designer)} component={Designer}/>
-      <Route path={appModuleUri(appModules.data)} component={Data}/>
-      <Route path={appModuleUri(appModules.users)} component={Users}/>
+      <Route path={appModuleUri(appModules.home)} component={HomeView}/>
+      <Route path={appModuleUri(appModules.designer)} component={DesignerView}/>
+      <Route path={appModuleUri(appModules.data)} component={DataView}/>
+      <Route path={appModuleUri(appModules.users)} component={UsersView}/>
     </Switch>
 
   </div>

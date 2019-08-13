@@ -12,12 +12,18 @@ import Tooltip from '../../../../../../commonComponents/tooltip'
 import Expression from '../../../../../../../common/exprParser/expression'
 import * as DataSort from '../../../../../../../common/surveyRdb/dataSort'
 
-import { updateTableFilter, resetTableFilter, updateTableOffset, updateTableSort, updateTableEditMode } from '../actions'
+import {
+  updateTableFilter,
+  resetTableFilter,
+  updateTableOffset,
+  updateTableSort,
+  updateTableEditMode
+} from '../actions'
 
 const TableHeader = props => {
 
-  const [ showExpressionEditor, setShowExpressionEditor ] = useState(false)
-  const [ showSortEditor, setShowSortEditor ] = useState(false)
+  const [showExpressionEditor, setShowExpressionEditor] = useState(false)
+  const [showSortEditor, setShowSortEditor] = useState(false)
 
   const toggleExpressionEditor = () => {
     setShowExpressionEditor(!showExpressionEditor)
@@ -42,7 +48,6 @@ const TableHeader = props => {
 
   const i18n = useI18n()
   const sortMsg = DataSort.getViewExpr(i18n.t('data.dataVis.dataSort.ascending'), i18n.t('data.dataVis.dataSort.descending'))(sort)
-
 
   return (
     <div className="table__header">
@@ -90,17 +95,21 @@ const TableHeader = props => {
 
         }
 
-        <DownloadButton
-          href={csvDownloadLink}
-          label="CSV"
-        />
+        <div>
+          <DownloadButton
+            href={csvDownloadLink}
+            label="CSV"
+          />
+        </div>
 
         {
           canEdit &&
-          <button className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
-                  onClick={() => updateTableEditMode(!editMode)}>
-            <span className="icon icon-pencil2 icon-14px"/>
-          </button>
+          <div>
+            <button className={`btn btn-s btn-edit${editMode ? ' highlight' : ''}`}
+                    onClick={() => updateTableEditMode(!editMode)}>
+              <span className="icon icon-pencil2 icon-14px"/>
+            </button>
+          </div>
         }
 
       </div>

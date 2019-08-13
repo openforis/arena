@@ -1,0 +1,16 @@
+@import "../style/vars";
+
+header {
+  position: relative;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: .5rem 0;
+
+  .separator {
+    position: absolute;
+    top: 0;
+    width: 50px;
+    height: 2px;
+    background-color: $blue;
+  }
+}

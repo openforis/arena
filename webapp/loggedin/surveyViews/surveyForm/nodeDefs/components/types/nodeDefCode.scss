@@ -1,4 +1,5 @@
 @import "../../../../../../style/vars";
+@import "../../../surveyFormVars";
 
 .survey-form__node-def-code {
   display: flex;
@@ -7,7 +8,7 @@
 
   .btn-checkbox {
     pointer-events: all;
-    border-color: $blueDark;
+    border: $formBorder;
 
     &[aria-disabled="true"] {
       pointer-events: none;
@@ -20,7 +21,7 @@
       border: none;
 
       .form-input-chip-item {
-        border: 1px solid $blueDark;
+        border: $formBorder;
         height: 22px;
         margin-top: 0;
         margin-bottom: 0;

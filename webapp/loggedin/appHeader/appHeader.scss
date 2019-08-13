@@ -1,0 +1,46 @@
+@import '../../style/vars';
+
+.app-header {
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid $greyBorder;
+}
+
+.app-header__logo {
+  display: flex;
+  margin-left: 20px;
+
+  img {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.app-header__survey {
+  text-transform: uppercase;
+  font-size: .9rem;
+  font-weight: 600;
+  color: lighten($black, 20%);
+}
+
+.app-header__user {
+  margin-right: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  img {
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    padding: 3px;
+    border: 1px solid $greyBorder;
+  }
+
+  .btn {
+    padding: 1.2rem .5rem .7rem;
+    transform: scaleY(-0.6);
+  }
+}
