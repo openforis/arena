@@ -11,6 +11,7 @@ import ErrorBadge from '../../../../../commonComponents/errorBadge'
 
 import Survey from '../../../../../../common/survey/survey'
 import Authorizer from '../../../../../../common/auth/authorizer'
+import Validator from '../../../../../../common/validation/validator'
 
 import * as AppState from '../../../../../app/appState'
 import * as SurveyState from '../../../../../survey/surveyState'
