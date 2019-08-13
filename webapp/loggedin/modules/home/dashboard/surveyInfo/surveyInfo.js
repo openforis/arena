@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 import useI18n from '../../../../../commonComponents/useI18n'
 
 import DeleteSurveyDialog from './deleteSurveyDialog'
+import ErrorBadge from '../../../../../commonComponents/errorBadge'
 
 import Survey from '../../../../../../common/survey/survey'
 import Authorizer from '../../../../../../common/auth/authorizer'
@@ -33,6 +34,9 @@ const SurveyInfo = props => {
   return Survey.isValid(surveyInfo)
     ? (
       <div className="home-dashboard__survey-info">
+
+        <ErrorBadge
+          validation={Validator.getValidation(surveyInfo)}/>
 
         <div className="home-dashboard__survey-info-container">
 
