@@ -44,10 +44,11 @@ export const initSurveyDefs = (draft = false, validate = false) => async (dispat
 }
 
 // ====== SET ACTIVE SURVEY
-export const setActiveSurvey = (surveyId, draft = true) =>
+export const setActiveSurvey = (surveyId, canEdit = true) =>
   async (dispatch, getState) => {
     //load survey
-    const { data: { survey } } = await axios.get(`/api/survey/${surveyId}`, { params: { draft } })
+    const params = { draft: canEdit, validate: canEdit }
+    const { data: { survey } } = await axios.get(`/api/survey/${surveyId}`, { params })
     dispatch({ type: surveyUpdate, survey })
 
     //update userPref
