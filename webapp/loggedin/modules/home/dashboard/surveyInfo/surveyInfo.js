@@ -4,21 +4,19 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import useI18n from '../../../../../commonComponents/useI18n'
-
+import Header from '../../../../../commonComponents/header'
 import DeleteSurveyDialog from './deleteSurveyDialog'
-import ErrorBadge from '../../../../../commonComponents/errorBadge'
+import useI18n from '../../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../../common/survey/survey'
 import Authorizer from '../../../../../../common/auth/authorizer'
-import Validator from '../../../../../../common/validation/validator'
 
 import * as AppState from '../../../../../app/appState'
 import * as SurveyState from '../../../../../survey/surveyState'
 
-import { appModuleUri, designerModules, homeModules } from '../../../../appModules'
-
 import { deleteSurvey, publishSurvey } from '../../../../../survey/actions'
+
+import { appModuleUri, designerModules, homeModules } from '../../../../appModules'
 
 const SurveyInfo = props => {
 
@@ -34,85 +32,63 @@ const SurveyInfo = props => {
 
   return Survey.isValid(surveyInfo)
     ? (
-      <div className="home-dashboard__survey-info">
+      <>
+        <div className="home-dashboard__survey-info">
 
-        <ErrorBadge
-          validation={Validator.getValidation(surveyInfo)}/>
-
-        <div className="home-dashboard__survey-info-container">
-
-          <div className="row">
-            <h4 className="survey-name">
+          <Header>
+            <h3>
               {Survey.getLabel(surveyInfo, lang)}
-            </h4>
+            </h3>
 
             <div className="survey-status">
-              {
-                Survey.isDraft(surveyInfo) &&
-                <span className="icon icon-warning icon-14px icon-left"/>
-              }
-
-              {Survey.getStatus(surveyInfo)}
-
-              {
-                canEditDef &&
-                <button className="btn"
-                        aria-disabled={!Survey.isDraft(surveyInfo)}
-                        onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmPublish'))
-                          ? publishSurvey()
-                          : null}>
-                  <span className="icon icon-checkmark2 icon-12px icon-left"/> {i18n.t('homeView.surveyInfo.publish')}
-                </button>
-              }
+              ({Survey.getStatus(surveyInfo)})
             </div>
+          </Header>
 
-            <Link to={appModuleUri(homeModules.surveyInfo)} className="btn">
+          <div>
+
+            <Link to={appModuleUri(homeModules.surveyInfo)} className="btn-s btn-transparent">
+              <div className="triangle-left"/>
               <span className={`icon icon-${canEditDef ? 'pencil2' : 'eye'} icon-12px icon-left`}/>
               {i18n.t(canEditDef ? 'homeView.surveyInfo.editInfo' : 'homeView.surveyInfo.viewInfo')}
             </Link>
 
             {
               canEditDef &&
-              <button className="btn" onClick={() => setShowDeleteDialog(true)}>
-                <span className="icon icon-bin icon-12px icon-left"/> {i18n.t('common.delete')}
-              </button>
+              <a className="btn-s btn-transparent"
+                 aria-disabled={!Survey.isDraft(surveyInfo)}
+                 onClick={() => window.confirm(i18n.t('homeView.surveyInfo.confirmPublish'))
+                   ? publishSurvey()
+                   : null}>
+                <div className="triangle-left"/>
+                <span className="icon icon-checkmark2 icon-12px icon-left"/>
+                {i18n.t('homeView.surveyInfo.publish')}
+              </a>
             }
+
+
+            {
+              canEditDef &&
+              <a className="btn-s btn-transparent" onClick={() => setShowDeleteDialog(true)}>
+                <div className="triangle-left"/>
+                <span className="icon icon-bin icon-12px icon-left"/>
+                {i18n.t('common.delete')}
+              </a>
+            }
+
             {
               Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) &&
               <Link to={appModuleUri(homeModules.collectImportReport)}
-                    className="btn">
-                <span className="icon icon-warning icon-12px icon-left"/>
+                    className="btn-s btn-transparent">
+                <div className="triangle-left"/>
+                <span className="icon icon-clipboard icon-12px icon-left"/>
                 {i18n.t('appModules.collectImportReport')}
               </Link>
             }
           </div>
 
-          <div className="hr"/>
-
-          <div className="row">
-            <Link
-              to={appModuleUri(designerModules.formDesigner)} className="btn">
-              <span className="icon icon-quill icon-12px icon-left"/>
-              {i18n.t('appModules.formDesigner')}
-            </Link>
-            <Link
-              to={appModuleUri(designerModules.surveyHierarchy)} className="btn">
-              <span className="icon icon-tree icon-12px icon-left"/>
-              {i18n.t('appModules.surveyHierarchy')}
-            </Link>
-            <Link
-              to={appModuleUri(designerModules.categories)} className="btn">
-              <span className="icon icon-list2 icon-12px icon-left"/>
-              {i18n.t('appModules.categories')}
-            </Link>
-            <Link
-              to={appModuleUri(designerModules.taxonomies)} className="btn">
-              <span className="icon icon-leaf icon-12px icon-left"/>
-              {i18n.t('appModules.taxonomies')}
-            </Link>
-          </div>
-
         </div>
+
 
         {
           showDeleteDialog &&
@@ -121,7 +97,7 @@ const SurveyInfo = props => {
             onDelete={() => deleteSurvey()}
             surveyName={Survey.getName(surveyInfo)}/>
         }
-      </div>
+      </>
     )
     : null
 }
