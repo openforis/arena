@@ -7,16 +7,22 @@ class CSVParser {
     this.destroyed = false
     this.csvStreamEnded = false
     this.filePathOrStream = filePathOrStream
+    this.readHeaders = readHeaders
     this.rowReadyListener = null
     this.error = null
+    this.initialized = false
+  }
 
-    this.csvStream = this._createCsvStream({ headers: readHeaders })
+  init () {
+    this.csvStream = this._createCsvStream({ headers: this.readHeaders })
 
     this.csvStream
       .on('data', data => this._onData(data))
       .on('end', () => this._onStreamEnd())
       .on('error', error => this.error = error)
       .pause()
+
+    this.initialized = true
   }
 
   calculateSize () {
@@ -34,6 +40,9 @@ class CSVParser {
   }
 
   async next () {
+    if (!this.initialized)
+      throw new Error(`${this.constructor.name} not initialized yet`)
+
     return new Promise((resolve, reject) => {
       if (this.error)
         reject(this.error)

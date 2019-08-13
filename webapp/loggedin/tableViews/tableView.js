@@ -48,26 +48,28 @@ const TableView = props => {
       {
         hasItems
           ? (
-            <div className="table__rows">
+            <div className="table__content">
+              <div className="table__rows">
 
-              <div className="table__row-header" style={{ gridTemplateColumns }}>
+                <div className="table__row-header" style={{ gridTemplateColumns }}>
+                  {
+                    React.createElement(rowHeaderComponent, props)
+                  }
+                </div>
+
                 {
-                  React.createElement(rowHeaderComponent, props)
+                  list.map((row, i) => (
+                    <div className="table__row" key={i} style={{ gridTemplateColumns }}>
+                      {
+                        React.createElement(
+                          rowComponent,
+                          { ...props, idx: i, row }
+                        )
+                      }
+                    </div>
+                  ))
                 }
               </div>
-
-              {
-                list.map((row, i) => (
-                  <div className="table__row" key={i} style={{ gridTemplateColumns }}>
-                    {
-                      React.createElement(
-                        rowComponent,
-                        { ...props, idx: i, row }
-                      )
-                    }
-                  </div>
-                ))
-              }
             </div>
           )
           : (

@@ -72,11 +72,14 @@
     .react-grid-item {
       display: grid;
       border-right: $formBorder;
-      border-top: $formBorder;
-      border-bottom: $formBorder;
+      border-top: 1px solid $black;
 
       &:first-child {
-        border-left: $formBorder;
+        border-left: 1px solid $black;
+      }
+
+      &:last-child {
+        border-right: 1px solid $black;
       }
     }
   }

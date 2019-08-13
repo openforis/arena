@@ -1,5 +1,6 @@
 import React from 'react'
 
+import Header from '../../../../commonComponents/header'
 import useI18n from '../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../common/survey/survey'
@@ -37,33 +38,38 @@ const SurveyListTable = (props) => {
   return (
     <div className="survey-list table">
       <div className="table__header">
-        <h5>
-          {i18n.t('appModules.surveyList')}
-        </h5>
+        <Header>
+          <h6>
+            {i18n.t('appModules.surveyList')}
+          </h6>
+        </Header>
       </div>
 
-      <div className="table__row-header">
-        <div>{i18n.t('common.name')}</div>
-        <div>{i18n.t('common.label')}</div>
-        <div>{i18n.t('common.dateCreated')}</div>
-        <div>{i18n.t('common.dateLastModified')}</div>
-        <div>{i18n.t('homeView.surveyList.status')}</div>
-      </div>
+      <div className="table__content">
+        <div className="table__row-header">
+          <div>{i18n.t('common.name')}</div>
+          <div>{i18n.t('common.label')}</div>
+          <div>{i18n.t('common.dateCreated')}</div>
+          <div>{i18n.t('common.dateLastModified')}</div>
+          <div>{i18n.t('homeView.surveyList.status')}</div>
+        </div>
 
 
-      <div className="table__rows">
-        {
-          surveyInfos
-            .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
-            .map((surveyInfo, i) => (
-              <SurveyRow
-                key={i}
-                {...props}
-                surveyInfoRow={surveyInfo}
-                i18n={i18n}/>
-            ))
-        }
+        <div className="table__rows">
+          {
+            surveyInfos
+              .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
+              .map((surveyInfo, i) => (
+                <SurveyRow
+                  key={i}
+                  {...props}
+                  surveyInfoRow={surveyInfo}
+                  i18n={i18n}/>
+              ))
+          }
+        </div>
       </div>
+
     </div>
   )
 }

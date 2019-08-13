@@ -68,14 +68,12 @@
   .form-input {
     text-overflow: ellipsis;
     text-align: left;
-    //padding: .25rem 1rem;
-    border: 1px solid $blueDark;
-    width: calc(100% - 2rem - 2px);
+    border: $formBorder;
   }
 
   .dropdown {
     grid-template-columns: 1fr 35px;
-    border: 1px solid $blueDark;
+    border: $formBorder;
 
     .form-input {
       border: none;

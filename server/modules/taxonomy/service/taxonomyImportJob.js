@@ -82,6 +82,7 @@ class TaxonomyImportJob extends Job {
     this.taxonomyImportManager = new TaxonomyImportManager(this.getUser(), surveyId, this.vernacularLanguageCodes)
 
     const csvParser = new CSVParser(this.filePath)
+    csvParser.init()
 
     this.processed = 0
 

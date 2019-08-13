@@ -76,11 +76,10 @@ class NodeDefsImportJob extends Job {
   async execute (tx) {
     const { collectSurvey, surveyId, user } = this.context
 
+    this._calculateTotal()
+
     // insert root entity and descendants recursively
-    const collectRootDef = R.pipe(
-      CollectSurvey.getElementsByPath(['schema', 'entity']),
-      R.head
-    )(collectSurvey)
+    const collectRootDef = CollectSurvey.getNodeDefRoot(collectSurvey)
 
     await this.insertNodeDef(surveyId, null, '', collectRootDef, NodeDef.nodeDefType.entity, tx)
 
@@ -150,6 +149,9 @@ class NodeDefsImportJob extends Job {
     const nodeDefParam = NodeDef.newNodeDef(NodeDef.getUuid(parentNodeDef), type, props)
     let nodeDef = await NodeDefManager.insertNodeDef(this.getUser(), surveyId, nodeDefParam, tx)
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
+
+    // 3a. increment processed items before recursive call to insertNodeDef
+    this.incrementProcessedItems()
 
     // 4. insert children and updated layout props
     const propsUpdated = {}
@@ -380,6 +382,36 @@ class NodeDefsImportJob extends Job {
 
       this.nodeDefs[NodeDef.getUuid(qualifierNodeDef)] = qualifierNodeDef
     }
+  }
+
+  _calculateTotal () {
+    const { collectSurvey } = this.context
+    let count = 0
+
+    const collectNodeDefRoot = CollectSurvey.getNodeDefRoot(collectSurvey)
+
+    const stack = []
+    stack.push(collectNodeDefRoot)
+
+    while (stack.length > 0) {
+      const collectNodeDef = stack.pop()
+
+      count++
+
+      if (CollectSurvey.getElementName(collectNodeDef) === nodeDefType.entity) {
+        for (const collectNodeDefChild of CollectSurvey.getElements(collectNodeDef)) {
+          if (this.isCanceled())
+            break
+
+          const childDefFields = CollectSurvey.getNodeDefFieldsByCollectNodeDef(collectNodeDefChild)
+
+          if (childDefFields) {
+            stack.push(collectNodeDefChild)
+          }
+        }
+      }
+    }
+    this.total = count
   }
 }
 

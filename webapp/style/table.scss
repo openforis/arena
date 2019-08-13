@@ -2,7 +2,6 @@
 
 $rowHeight: 35px;
 $rowBorder: 1px solid $greyBorder;
-$tableRowsHeight: calc(100% - 77px);
 
 .table {
   overflow: hidden;
@@ -16,6 +15,14 @@ $tableRowsHeight: calc(100% - 77px);
   justify-content: space-between;
 }
 
+.table__content {
+  position: relative;
+  padding: 15px;
+  background-color: $white;
+  height: calc(100% - 40px);
+  border: $rowBorder;
+}
+
 .table__empty-rows {
   font-style: italic;
   text-align: center;
@@ -25,9 +32,9 @@ $tableRowsHeight: calc(100% - 77px);
 .table__rows {
   position: absolute;
   overflow-y: auto;
-  height: $tableRowsHeight;
-  right: 0;
-  left: 0;
+  height: calc(100% - 50px);
+  right: 15px;
+  left: 15px;
 }
 
 .table__row {
@@ -40,7 +47,11 @@ $tableRowsHeight: calc(100% - 77px);
   font-size: .9rem;
 
   &.active {
-    background-color: rgba($blueLightActive, .6);
+    background-color: $yellowHighlight;
+  }
+
+  &:last-child {
+    border-bottom: none;
   }
 
   > div {
@@ -53,14 +64,20 @@ $tableRowsHeight: calc(100% - 77px);
 
   .btn {
     font-size: 0.7rem;
+
+    &.active {
+      background-color: $orangeLight;
+    }
   }
 }
 
 .table__row-header {
   @extend .table__row;
-  border-bottom-width: 2px;
+  border-bottom: none;
+  background-color: $black;
+  color: white;
+  text-transform: uppercase;
   font-weight: 600;
-  background-color: rgba($blueLight, 0.35);
   font-size: .8rem;
 }
 
