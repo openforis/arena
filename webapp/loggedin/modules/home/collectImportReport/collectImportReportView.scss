@@ -1,24 +1,22 @@
 @import "../../../../style/vars";
 
 .collect-import-report {
-  height: 100%;
-  overflow-y: auto;
-  position: relative;
-
 
   .table__row-header,
   .table__row {
     grid-template-columns: 60px repeat(5, .2fr) .1fr 30px;
-    height: auto;
-    font-size: .8rem;
+
   }
 
-  .table__row-header {
-    min-height: 40px;
+  .table__rows {
+    height: calc(100% - 15px);
   }
 
   .table__row {
     padding: .5rem 0;
+    min-height: 40px;
+    height: auto;
+    font-size: .8rem;
 
     input {
       font-size: .8rem;
