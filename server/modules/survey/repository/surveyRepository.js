@@ -33,7 +33,8 @@ const fetchAllSurveyIds = async (client = db) =>
 
 const fetchSurveys = async (user, checkAccess = true, client = db) =>
   await client.map(`
-    SELECT ${surveySelectFields('s')}
+    SELECT ${surveySelectFields('s')} 
+      ${checkAccess ? `, json_build_array(row_to_json(g.*)) AS auth_groups` : ''}
     FROM survey s
     ${checkAccess ? `
     JOIN auth_group g

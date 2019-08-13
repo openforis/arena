@@ -48,8 +48,9 @@ module.exports.init = app => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const draft = Request.getBoolParam(req, 'draft')
+      const validate = Request.getBoolParam(req, 'validate')
 
-      const survey = await SurveyService.fetchSurveyById(surveyId, draft)
+      const survey = await SurveyService.fetchSurveyById(surveyId, draft, validate)
 
       res.json({ survey })
     } catch (err) {

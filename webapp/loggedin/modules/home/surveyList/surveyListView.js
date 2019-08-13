@@ -9,6 +9,7 @@ import Survey from '../../../../../common/survey/survey'
 import SurveyListTable from './surveyListTable'
 import { useOnUpdate } from '../../../../commonComponents/hooks'
 
+import * as AppState from '../../../../app/appState'
 import * as SurveyListState from './surveyListState'
 import * as SurveyState from '../../../../survey/surveyState'
 import { appModuleUri, homeModules } from '../../../appModules'
@@ -19,7 +20,7 @@ import { setActiveSurvey } from '../../../../survey/actions'
 const SurveyListView = props => {
 
   const {
-    surveyInfo, surveys, history,
+    user, surveyInfo, surveys, history,
     setActiveSurvey, fetchSurveys
   } = props
 
@@ -35,6 +36,7 @@ const SurveyListView = props => {
 
   return !R.isEmpty(surveys) &&
     <SurveyListTable
+      user={user}
       surveys={surveys}
       surveyInfo={surveyInfo}
       setActiveSurvey={setActiveSurvey}
@@ -42,6 +44,7 @@ const SurveyListView = props => {
 }
 
 const mapStateToProps = state => ({
+  user: AppState.getUser(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
   surveys: SurveyListState.getSurveys(state),
 })
