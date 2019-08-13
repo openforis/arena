@@ -9,13 +9,13 @@ const {
   permissions,
   keys,
   getAuthGroups,
-} = require('./authGroups')
+} = AuthGroups
 
 const isSystemAdmin = user =>
   user &&
   R.any(
-    group => group.name === groupNames.systemAdmin
-  )(user.authGroups)
+    group => AuthGroups.getName(group) === groupNames.systemAdmin
+  )(User.getAuthGroups(user))
 
 // ======
 // ====== Survey
