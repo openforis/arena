@@ -2,6 +2,8 @@ const R = require('ramda')
 const db = require('../../../db/db')
 
 const NodeDef = require('../../../../common/survey/nodeDef')
+const NodeDefValidations = require('../../../../common/survey/nodeDefValidations')
+const NodeDefExpression = require('../../../../common/survey/nodeDefExpression')
 
 const NodeDefRepository = require('../repository/nodeDefRepository')
 const { markSurveyDraft } = require('../../survey/repository/surveySchemaRepositoryUtils')
@@ -53,6 +55,17 @@ const updateNodeDefProps = async (user, surveyId, nodeDefUuid, props, propsAdvan
     return nodeDef
   })
 
+const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
+  await NodeDefRepository.publishNodeDefsProps(surveyId, client)
+
+  for (const langDeleted of langsDeleted) {
+    await NodeDefRepository.deleteNodeDefsLabels(surveyId, langDeleted, client)
+    await NodeDefRepository.deleteNodeDefsDescriptions(surveyId, langDeleted, client)
+  }
+
+  await NodeDefRepository.deleteNodeDefsValidationMessageLabels(surveyId, langsDeleted, client)
+}
+
 // ======= DELETE
 
 const markNodeDefDeleted = async (user, surveyId, nodeDefUuid) =>
@@ -76,11 +89,9 @@ module.exports = {
 
   //UPDATE
   updateNodeDefProps,
-  publishNodeDefsProps: NodeDefRepository.publishNodeDefsProps,
+  publishNodeDefsProps,
 
   //DELETE
   markNodeDefDeleted,
   permanentlyDeleteNodeDefs: NodeDefRepository.permanentlyDeleteNodeDefs,
-  deleteNodeDefsLabels: NodeDefRepository.deleteNodeDefsLabels,
-  deleteNodeDefsDescriptions: NodeDefRepository.deleteNodeDefsDescriptions,
 }

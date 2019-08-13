@@ -74,7 +74,7 @@ class NodeDefEntityTableRow extends React.Component {
   render () {
 
     const {
-      nodeDef, nodeDefColumns, node,
+      edit, nodeDef, nodeDefColumns, node,
       canEditRecord, canEditDef,
       renderType, i = 'header',
       removeNode,
@@ -108,11 +108,14 @@ class NodeDefEntityTableRow extends React.Component {
             ))
         }
 
-        <div
-          className="react-grid-item"
-          style={{ width: 100 + 'px', display: 'none' }}
-          ref={this.placeholderRef}
-        />
+        {
+          edit &&
+          <div
+            className="react-grid-item"
+            style={{ width: 100 + 'px', display: 'none' }}
+            ref={this.placeholderRef}
+          />
+        }
 
         {
           renderType === NodeDefLayout.nodeDefRenderType.tableBody && canEditRecord &&

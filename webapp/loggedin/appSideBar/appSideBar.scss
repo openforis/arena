@@ -1,38 +1,36 @@
 @import "../../style/vars";
 
-$sidebarWidthClosed: 46px;
+$sidebarWidthClosed: 70px;
 $sidebarWidthOpened: 200px;
 //== buttons
-$sidebarBtnMargin: 4px;
+$sidebarBtnMargin: 1px;
 $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
 //== popup-menu
-$sidebarPopupMenuBgColor: lighten($blueLight, 7%);
-
-//$sidebarTransition: width 100ms ease-in;
+$sidebarPopupMenuBgColor: lighten($blue, 40%);
 
 .app-sidebar {
+  display: grid;
+  align-content: center;
   position: relative;
   width: $sidebarWidthClosed;
-  background-color: rgba($grey, 0.6);
-  border-right: 1px solid $blueLight;
+}
 
-  display: grid;
-  grid-template-rows: 60px 1fr 80px 40px;
-  align-items: start;
-  //transition: $sidebarTransition;
+.app-sidebar__btn-toggle {
+  padding: 10px;
+  position: absolute;
+  top: 0px;
+  left: 12px;
 }
 
 .app-sidebar__modules {
   display: grid;
-  grid-row-gap: .5rem;
 }
 
-.app-sidebar__module {
+.app-sidebar__module, .app-sidebar__module-placeholder {
   display: grid;
-  grid-row-gap: 20px;
-  border-left: $sidebarBtnTransparent;
-  border-right: $sidebarBtnTransparent;
-  padding: 15px 0;
+  grid-row-gap: 15px;
+  border-right: 1px solid $greyBorder;
+  padding: 25px 15px;
   cursor: pointer;
 
   &[aria-disabled="true"] {
@@ -40,15 +38,14 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
   }
 
   &.active {
-    border-right-color: $blueLight;
-    background-color: rgba($blueLight, .2);
+    border-right-color: $blue;
 
     &[aria-disabled="true"] {
       opacity: 1;
     }
 
     .icon {
-      color: darken($blueLight, 45%);
+      color: $blue;
     }
   }
 }
@@ -65,6 +62,7 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
 
   &:only-child.active {
     font-weight: bold;
+    color: $blue;
   }
 }
 
@@ -74,13 +72,10 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
 
   &.active {
     font-weight: bold;
+    color: $blue;
   }
 }
 
-.app-sidebar__btn-toggle {
-  margin: 0 $sidebarBtnMargin;
-  padding: 10px;
-}
 
 //=== sidebar opened
 .app-sidebar.opened {
@@ -88,6 +83,12 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
 
   .app-sidebar__module {
     cursor: auto;
+    padding: 12px 15px;
+  }
+
+  .app-sidebar__module-placeholder {
+    height: 30px;
+    padding: 0px;
   }
 }
 
@@ -95,14 +96,14 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
 .app-sidebar__popup-menu {
   position: fixed;
   z-index: $zIndex10TopOfApp;
-  left: $sidebarWidthClosed;
+  left: $sidebarWidthClosed - 1px;
   background-color: $sidebarPopupMenuBgColor;
-  border-top: 1px solid $blueLight;
-  border-right: 1px solid $blueLight;
-  border-bottom: 1px solid $blueLight;
+  border-top: 1px solid $greyBorder;
+  border-right: 1px solid $greyBorder;
+  border-bottom: 1px solid $greyBorder;
   display: grid;
   grid-row-gap: 1.5rem;
-  padding: 25px 10px;
+  padding: 30px 10px;
 
   .app-sidebar__module-child-btn {
     margin: 0;
@@ -113,10 +114,6 @@ $sidebarPopupMenuBgColor: lighten($blueLight, 7%);
 .app-sidebar__modules.popup-menu-opened {
   .app-sidebar__module.over {
     background-color: $sidebarPopupMenuBgColor;
-
-    &.active {
-      border-right: $sidebarBtnTransparent;
-    }
   }
 }
 

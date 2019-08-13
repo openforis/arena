@@ -3,6 +3,7 @@ const R = require('ramda')
 const Job = require('../../../../../job/job')
 
 const Survey = require('../../../../../../common/survey/survey')
+
 const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
 const SurveyManager = require('../../../manager/surveyManager')
 const CategoryManager = require('../../../../category/manager/categoryManager')
@@ -10,7 +11,7 @@ const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 
 const ActivityLog = require('../../../../activityLog/activityLogger')
 
-const determineDeletedLanguages = async (surveyId, t) => {
+const findDeletedLanguages = async (surveyId, t) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, t)
   const surveyInfo = Survey.getSurveyInfo(survey)
   if (Survey.isPublished(surveyInfo)) {
@@ -29,52 +30,32 @@ class SurveyPropsPublishJob extends Job {
   }
 
   async execute (tx) {
-    this.total = 8
+    this.total = 7
 
     const id = this.getSurveyId()
 
-    const deletedLanguages = await determineDeletedLanguages(id, tx)
-    this.incrementProcessedItems()
-
-    await NodeDefManager.publishNodeDefsProps(id, tx)
+    const langsDeleted = await findDeletedLanguages(id, tx)
     this.incrementProcessedItems()
 
     await NodeDefManager.permanentlyDeleteNodeDefs(id, tx)
     this.incrementProcessedItems()
 
-    await CategoryManager.publishProps(id, tx)
+    await NodeDefManager.publishNodeDefsProps(id, langsDeleted, tx)
+    this.incrementProcessedItems()
+
+    await CategoryManager.publishProps(id, langsDeleted, tx)
     this.incrementProcessedItems()
 
     await TaxonomyManager.publishTaxonomiesProps(id, tx)
     this.incrementProcessedItems()
 
-    const surveyInfo = await SurveyManager.publishSurveyProps(id, tx)
-    this.incrementProcessedItems()
-
-    await this.removeDeletedLanguagesLabels(deletedLanguages, tx)
+    const surveyInfo = await SurveyManager.publishSurveyProps(id, langsDeleted, tx)
     this.incrementProcessedItems()
 
     await ActivityLog.log(this.getUser(), id, ActivityLog.type.surveyPublish, { surveyUuid: Survey.getUuid(surveyInfo) }, tx)
     this.incrementProcessedItems()
   }
 
-  async removeDeletedLanguagesLabels (deletedLanguages, t) {
-    const surveyId = this.getSurveyId()
-
-    for (const langCode of deletedLanguages) {
-
-      //SURVEY
-      await SurveyManager.deleteSurveyLabel(surveyId, langCode, t)
-      await SurveyManager.deleteSurveyDescription(surveyId, langCode, t)
-
-      //NODE DEFS
-      await NodeDefManager.deleteNodeDefsLabels(surveyId, langCode, t)
-      await NodeDefManager.deleteNodeDefsDescriptions(surveyId, langCode, t)
-
-      //CATEGORY ITEMS
-      await CategoryManager.deleteItemLabels(surveyId, langCode, t)
-    }
-  }
 }
 
 SurveyPropsPublishJob.type = 'SurveyPropsPublishJob'

@@ -23,7 +23,15 @@ const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
 const { keys, propKeys } = NodeDef
 
 const nodeDefErrorKeys = {
-  defaultValuesNotSpecified: 'defaultValuesNotSpecified'
+  defaultValuesNotSpecified: 'nodeDefEdit.validationErrors.defaultValuesNotSpecified',
+  childrenEmpty: 'nodeDefEdit.validationErrors.childrenEmpty',
+  keysEmpty: 'nodeDefEdit.validationErrors.keysEmpty',
+  keysExceedingMax: 'nodeDefEdit.validationErrors.keysExceedingMax',
+}
+
+const keysValidationFields = {
+  children: 'children',
+  keyAttributes: 'keyAttributes',
 }
 
 const validateCategory = async (propName, nodeDef) =>
@@ -41,7 +49,7 @@ const validateChildren = survey =>
     if (NodeDef.isEntity(nodeDef)) {
       const children = Survey.getNodeDefChildren(nodeDef)(survey)
       if (R.isEmpty(children)) {
-        return { key: errorKeys.empty }
+        return { key: nodeDefErrorKeys.childrenEmpty }
       }
     }
     return null
@@ -64,9 +72,9 @@ const validateKeyAttributes = survey =>
           (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef))
         )
       ) {
-        return { key: errorKeys.empty }
+        return { key: nodeDefErrorKeys.keysEmpty }
       } else if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return { key: errorKeys.exceedingMax }
+        return { key: nodeDefErrorKeys.keysExceedingMax }
       }
     }
     return null
@@ -100,8 +108,8 @@ const propsValidations = survey => ({
   [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
   [`${keys.props}.${propKeys.key}`]: [validateKey(survey)],
   [`${keys.props}.${propKeys.readOnly}`]: [validateReadOnly],
-  'keyAttributes': [validateKeyAttributes(survey)],
-  'children': [validateChildren(survey)],
+  [keysValidationFields.keyAttributes]: [validateKeyAttributes(survey)],
+  [keysValidationFields.children]: [validateChildren(survey)],
 })
 
 const validateAdvancedProps = async (survey, nodeDef) => {

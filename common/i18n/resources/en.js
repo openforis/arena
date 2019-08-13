@@ -9,6 +9,7 @@ module.exports = {
     code: 'Code',
     csvExport: 'CSV Export',
     csvImport: 'CSV Import',
+    childrenEmpty: 'Define at least one child item',
     dateCreated: 'Date created',
     dateLastModified: 'Date last modified',
     delete: 'Delete',
@@ -51,6 +52,10 @@ module.exports = {
     openForisShort: 'OF',
     openForis: 'Open Foris',
     logout: 'Logout',
+  },
+
+  header: {
+    myProfile: 'My profile',
   },
 
   nodeDefsTypes: {
@@ -190,6 +195,12 @@ module.exports = {
       maxCount: 'Max count',
       expressions: 'Expressions',
     },
+    validationErrors: {
+      childrenEmpty: '$t(common.childrenEmpty)',
+      defaultValuesNotSpecified: 'Default value not specified',
+      keysEmpty: 'Define at least one key',
+      keysExceedingMax: 'Exceeding maximum number of keys',
+    }
   },
 
   languagesEditor: {
@@ -249,6 +260,9 @@ module.exports = {
       genus: 'Genus',
       scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
     },
+    validationErrors: {
+      taxaEmpty: 'Empty taxa'
+    }
   },
 
   categoryEdit: {
@@ -257,10 +271,15 @@ module.exports = {
     level: 'Level',
     confirmDelete: 'Delete the item with all children? $t(common.cantUndoWarning)',
     deleteItem: 'Delete item',
+    validationErrors: {
+      childrenEmpty: '$t(common.childrenEmpty)',
+      childrenInvalid: 'At least one invalid child',
+      itemsInvalid: 'At least one invalid item',
+      itemsEmpty: 'Define at least one item',
+    }
   },
 
   formErrors: {
-    defaultValuesNotSpecified: 'Default value not specified',
     duplicate: 'Duplicate',
     duplicateEntity: 'Duplicate entity',
     duplicateRecord: 'Duplicate record key',
@@ -276,6 +295,7 @@ module.exports = {
     minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
     oneOrMoreInvalidValues: 'One or more values are invalid',
     required: '$t(common.required)',
+    requiredField: 'Required field',
     zeroOrNegative: 'Zero or negative',
   },
 

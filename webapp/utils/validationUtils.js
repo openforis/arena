@@ -6,7 +6,7 @@ import Validator from '../../common/validation/validator'
 
 const getErrorText = (error, i18n, errorKeyPrefix = 'formErrors') => error.key === 'custom'
   ? error.messages[i18n.lang]
-  : i18n.t(`${errorKeyPrefix}.${error.key}`, error.params)
+  : i18n.t([`${errorKeyPrefix}.${error.key}`, error.key], error.params)
 
 const getFieldError = (i18n, errorKeyPrefix) => field => R.pipe(
   R.pathOr([], [field, 'errors']),

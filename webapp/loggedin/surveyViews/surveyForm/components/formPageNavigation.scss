@@ -3,12 +3,8 @@
 
 .survey-form__node-def-nav {
   &.level0 {
-    height: calc(100vh - 70px);
     overflow-y: auto;
-    background-color: $formBgColorGrey;
-    border-left: $formBorder;
-    border-top: $formBorder;
-    border-bottom: $formBorder;
+    border: $formBorder;
   }
 
   button {
@@ -40,9 +36,7 @@
 .survey-form.edit {
   .survey-form__node-def-nav {
     &.level0 {
-      border-left: $formBorderEdit;
-      border-top: $formBorderEdit;
-      border-bottom: $formBorderEdit;
+      border: $formBorderEdit;
     }
   }
 }

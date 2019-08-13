@@ -9,7 +9,7 @@ const {
   permissions,
   keys,
   getAuthGroups,
-} = require('./authGroups')
+} = AuthGroups
 
 const isSystemAdmin = user =>
   user &&
@@ -113,11 +113,13 @@ const canViewUser = (user, userToEdit) => {
 
 // EDIT
 const canEditUser = (user, userToEdit, surveyInfo) =>
-  (isSystemAdmin(user) && !isSystemAdmin(userToEdit))
-  || (isSurveyAdmin(user, surveyInfo) &&
-  !isSurveyAdmin(userToEdit, surveyInfo) &&
-  !isSystemAdmin(userToEdit))
-  || User.getUuid(user) === User.getUuid(userToEdit)
+  (isSystemAdmin(user) && !isSystemAdmin(userToEdit)) ||
+  (
+    isSurveyAdmin(user, surveyInfo) &&
+    !isSurveyAdmin(userToEdit, surveyInfo) &&
+    !isSystemAdmin(userToEdit)
+  ) ||
+  User.getUuid(user) === User.getUuid(userToEdit)
 
 module.exports = {
   isSystemAdmin,

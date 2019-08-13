@@ -14,6 +14,8 @@ const AppSideBarModules = props => {
 
   return (
     <div className={`app-sidebar__modules${modulePopupMenu ? ' popup-menu-opened' : ''}`}>
+
+      <div className="app-sidebar__module-placeholder"/>
       {
         SideBarModule.getModulesHierarchy().map(module => (
           <AppSideBarModule
@@ -29,6 +31,7 @@ const AppSideBarModules = props => {
           />
         ))
       }
+      <div className="app-sidebar__module-placeholder"/>
 
       {
         modulePopupMenu &&

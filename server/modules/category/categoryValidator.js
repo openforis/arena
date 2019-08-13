@@ -1,7 +1,6 @@
 const R = require('ramda')
 
 const {
-  errorKeys,
   validate,
   validateRequired,
   validateItemPropUniqueness,
@@ -14,6 +13,13 @@ const {
 const Category = require('../../../common/survey/category')
 const CategoryLevel = require('../../../common/survey/categoryLevel')
 const CategoryItem = require('../../../common/survey/categoryItem')
+
+const keysErrors = {
+  childrenEmpty: 'categoryEdit.validationErrors.childrenEmpty',
+  childrenInvalid: 'categoryEdit.validationErrors.childrenInvalid',
+  itemsInvalid: 'categoryEdit.validationErrors.itemsInvalid',
+  itemsEmpty: 'categoryEdit.validationErrors.itemsEmpty',
+}
 
 // ====== LEVELS
 
@@ -34,9 +40,8 @@ const validateLevels = async (category, itemsByParentUuid) => {
     )
   )
 
-  const invalid = R.any(R.propEq('valid', false))(validations)
   return {
-    valid: !invalid,
+    valid: R.all(isValidationValid, validations),
     fields: Object.assign({}, validations)
   }
 
@@ -55,12 +60,12 @@ const getChildrenItems = (itemsByParentUuid, parentItemUuid) =>
 const validateNotEmptyChildrenItems = (isLeaf, itemsByParentUuid) =>
   (propName, item) =>
     !isLeaf && R.isEmpty(getChildrenItems(itemsByParentUuid, CategoryItem.getUuid(item)))
-      ? { key: errorKeys.empty }
+      ? { key: keysErrors.childrenEmpty }
       : null
 
 const validateNotEmptyFirstLevelItems = itemsByParentUuid => (propName, level) =>
   CategoryLevel.getIndex(level) === 0 && R.isEmpty(getChildrenItems(itemsByParentUuid, null))
-    ? { key: errorKeys.empty }
+    ? { key: keysErrors.itemsEmpty }
     : null
 
 const validateItem = async (category, itemsByParentUuid, parentItemUuid, itemUuid) => {
@@ -85,7 +90,7 @@ const validateItem = async (category, itemsByParentUuid, parentItemUuid, itemUui
           R.pipe(
             R.assocPath(['fields', 'children'], {
               valid: false,
-              errors: ['invalid']
+              errors: [{ key: keysErrors.itemsInvalid }]
             }),
             R.assoc('valid', false)
           )(validation)
@@ -103,20 +108,21 @@ const validateItem = async (category, itemsByParentUuid, parentItemUuid, itemUui
 const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItemUuid) => {
   const children = getChildrenItems(itemsByParentUuid, parentItemUuid)
 
-  const childValidations = await Promise.all(children.map(
+  const childValidationsArr = await Promise.all(children.map(
     async child => await validateItem(category, itemsByParentUuid, parentItemUuid, CategoryItem.getUuid(child))
   ))
 
-  const childrenValid =
-    R.none(
-      childValidation => R.propEq('valid', false, R.values(childValidation)[0])
-      , childValidations
-    )
+  const childValidations = R.mergeAll(childValidationsArr)
+
+  const childrenValid = R.pipe(
+    R.values,
+    R.all(isValidationValid)
+  )(childValidations)
 
   return {
-    fields: R.mergeAll(childValidations),
+    fields: childValidations,
     valid: childrenValid,
-    errors: !childrenValid ? ['invalidChildren'] : []
+    errors: childrenValid ? [] : [{ key: keysErrors.childrenInvalid }]
   }
 }
 
