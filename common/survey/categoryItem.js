@@ -26,7 +26,7 @@ const newItem = (levelUuid, parentItem = null, props = {}) => {
 }
 
 // ====== READ
-const getCode = SurveyUtils.getProp(props.code)
+const getCode = SurveyUtils.getProp(props.code, '')
 
 const getLabels = SurveyUtils.getProp(props.labels)
 
