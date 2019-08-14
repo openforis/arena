@@ -24,7 +24,7 @@ const TableRow = props => {
   return (
     <div
       key={idx}
-      className="table__row collect-import-report-item">
+      className="table__row">
       <div>{idx + 1}</div>
       <div>{nodeDefPath}</div>
       <div>{CollectImportReportItem.getExpressionType(item)}</div>

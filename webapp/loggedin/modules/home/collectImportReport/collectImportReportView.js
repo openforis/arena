@@ -37,7 +37,7 @@ const CollectImportReportView = (props) => {
           <NodeDefEdit/>
         }
 
-        <div className="collect-import-report">
+        <div className="collect-import-report table">
 
           <TableHeader/>
 
