@@ -7,8 +7,8 @@ const debugOptions = {
   }
 }
 
-const pgp = require('pg-promise')(debugOptions)
-// const pgp = require('pg-promise')({})
+// const pgp = require('pg-promise')(debugOptions)
+const pgp = require('pg-promise')({})
 
 const configCommon = {
   // how long a client is allowed to remain idle before being closed

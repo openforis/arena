@@ -6,7 +6,7 @@ const AuthMiddleware = require('../../auth/authApiMiddleware')
 const UserService = require('../service/userService')
 
 const User = require('../../../../common/user/user')
-const UserInviteValidator = require('../../../../common/user/userInviteValidator')
+const UserValidator = require('../../../../common/user/userValidator')
 const Validator = require('../../../../common/validation/validator')
 
 const SystemError = require('../../../../server/utils/systemError')
@@ -20,7 +20,7 @@ module.exports.init = app => {
       const { user } = req
 
       const { surveyId, email, groupUuid } = Request.getParams(req)
-      const validation = await UserInviteValidator.validateNewUser(req.body)
+      const validation = await UserValidator.validateNewUser(req.body)
 
       if (Validator.isValidationValid(validation)) {
         await UserService.inviteUser(user, surveyId, email, groupUuid)
@@ -74,7 +74,7 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/user/:userUuid/name', async (req, res, next) => {
+  app.put('/user/:userUuid/name', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
       const { user } = req
       const { userUuid, name } = Request.getParams(req)

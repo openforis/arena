@@ -149,7 +149,7 @@ const canEditUserGroup = (user, { userToUpdate, survey }) => {
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const sameUser = User.getUuid(user) === User.getUuid(userToUpdate)
-  
+
   return (!sameUser && isSurveyAdmin(user, surveyInfo) && hasRole) ||
     (sameUser && isSurveyAdmin(userToUpdate, surveyInfo))
 }
