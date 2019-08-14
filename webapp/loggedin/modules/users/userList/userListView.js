@@ -22,7 +22,7 @@ const UsersHeaderLeft = props => {
   return (
     <div>
       {canInvite && (
-        <Link to={appModuleUri(userModules.userInvite)} className="btn btn-s">
+        <Link to={appModuleUri(userModules.user)} className="btn btn-s">
           <span className="icon icon-user-plus icon-12px icon-left" />
           {i18n.t('usersView.inviteUser')}
         </Link>
@@ -72,7 +72,7 @@ const UsersRow = props => {
       </div>
       <div>
         {
-          <Link to={appModuleUri(userModules.user) + User.getUuid(userListItem)} className="btn-edit">
+          <Link to={`${appModuleUri(userModules.user)}${User.getUuid(userListItem)}`} className="btn-edit">
             <span className={`icon icon-12px ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`}/>
           </Link>
         }

@@ -87,7 +87,7 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/user/:userUuid', async (req, res, next) => {
+  app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
       const { user } = req
       const { userUuid, name, groupUuid } = Request.getParams(req)

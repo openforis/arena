@@ -77,12 +77,8 @@ const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
     FROM auth_group g
     WHERE gu.user_uuid = $2
     AND (
-      g.survey_id = $3
-      AND g.uuid = gu.group_uuid
-    )
-    OR (
-      g.uuid = $1
-      AND g.name = '${AuthGroups.groupNames.systemAdmin}'
+      (g.survey_id = $3 AND g.uuid = gu.group_uuid)
+      OR (g.uuid = $1 AND g.name = '${AuthGroups.groupNames.systemAdmin}')
     ) 
     RETURNING *`,
     [groupUuid, userUuid, surveyId],

@@ -91,5 +91,5 @@ module.exports = {
   // requireUserEditPermission: requireUserEditPermissions,
   requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers),
   requireUserViewPermission: requireUserPermission(Authorizer.canViewUser),
-  requireUserEditPermission: requireUserPermission(() => true),
+  requireUserEditPermission: requireUserPermission(Authorizer.canEditUser),
 }

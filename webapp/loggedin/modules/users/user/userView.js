@@ -24,11 +24,11 @@ const UserView = props => {
   const i18n = useI18n()
 
   const {
-    name, email, group, surveyGroups, objectValid,
-    getFieldValidation, setName, setEmail, setGroup, updateUser
+    newUser, loaded, name, email, group, surveyGroups, objectValid,
+    getFieldValidation, setName, setEmail, setGroup, sendRequest
   } = useUserViewState(props)
 
-  return (
+  return loaded && (
     <div className="form user">
       <FormItem label={i18n.t('common.email')}>
         <Input
@@ -37,13 +37,17 @@ const UserView = props => {
           validation={getFieldValidation('email')}
           onChange={setEmail}/>
       </FormItem>
-      <FormItem label={i18n.t('common.name')}>
-        <Input
-          placeholder={i18n.t('common.name')}
-          value={name}
-          validation={getFieldValidation('name')}
-          onChange={setName}/>
-      </FormItem>
+      {
+        !newUser && (
+          <FormItem label={i18n.t('common.name')}>
+            <Input
+              placeholder={i18n.t('common.name')}
+              value={name}
+              validation={getFieldValidation('name')}
+              onChange={setName}/>
+          </FormItem>
+        )
+      }
       <FormItem label={i18n.t('common.group')}>
         <Dropdown
           validation={getFieldValidation('groupUuid')}
@@ -56,9 +60,9 @@ const UserView = props => {
       </FormItem>
       <button className="btn"
               aria-disabled={!objectValid}
-              onClick={updateUser}>
+              onClick={sendRequest}>
         <span className="icon icon-floppy-disk icon-left icon-12px"/>
-        Save
+        {newUser ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
       </button>
     </div>
   )

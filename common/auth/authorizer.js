@@ -112,14 +112,42 @@ const canViewUser = (user, userToEdit) => {
 }
 
 // EDIT
-const canEditUser = (user, userToEdit, surveyInfo) =>
-  (isSystemAdmin(user) && !isSystemAdmin(userToEdit)) ||
-  (
-    isSurveyAdmin(user, surveyInfo) &&
-    !isSurveyAdmin(userToEdit, surveyInfo) &&
-    !isSystemAdmin(userToEdit)
-  ) ||
-  User.getUuid(user) === User.getUuid(userToEdit)
+const canEditUser = (user, userToEdit, surveyInfo) => {
+  // user is userToEdit
+  if (User.getUuid(user) === User.getUuid(userToEdit)) {
+    return true
+  }
+
+  // user is systemAdmin and userToUpdate is not systemAdmin
+  if (isSystemAdmin(user)) {
+    return true
+  }
+
+  // user is surveyAdmin of userToEdit survey
+  const commonSurveys = R.innerJoin(
+    (g1, g2) => (
+      AuthGroups.getName(g1) === AuthGroups.groupNames.surveyAdmin &&
+      AuthGroups.getSurveyId(g1) === AuthGroups.getSurveyId(g2)
+    ),
+    User.getAuthGroups(user),
+    User.getAuthGroups(userToEdit)
+  )
+
+  return !!commonSurveys.length
+}
+
+// const canEditUser__ = (user, userToEdit) => {
+//   const newGroup = await AuthGroupRepository.fetchGroupByUuid(newGroupUuid)
+//   const surveyId = AuthGroups.getSurveyId(newGroup)
+//
+//   // const userGroups = await AuthGroupRepository.fetchUserGroups(userUuid)
+//   // const oldGroup = userGroups.find(g => AuthGroups.getSurveyId(g) === surveyId)
+//
+//   // if (oldGroup) {
+//   await UserRepository.updateUser(userUuid, name)
+//   // await AuthGroupRepository.updateUserGroup(AuthGroups.getUuid(oldGroup), newGroupUuid, userUuid)
+//   await AuthGroupRepository.updateUserGroup(surveyId, userUuid, newGroupUuid)
+// }
 
 module.exports = {
   isSystemAdmin,
