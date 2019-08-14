@@ -143,6 +143,7 @@ const canNodeDefTypeBeKey = type =>
   )
 
 const canHaveDefaultValue = nodeDef =>
+  isSingleAttribute(nodeDef) &&
   R.includes(
     getType(nodeDef),
     [
