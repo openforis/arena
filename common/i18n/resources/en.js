@@ -199,7 +199,8 @@ module.exports = {
       defaultValuesNotSpecified: 'Default value not specified',
       keysEmpty: 'Define at least one key',
       keysExceedingMax: 'Exceeding maximum number of keys',
-    }
+    },
+    cannotChangeIntoMultipleWithDefaultValues: 'This node cannot be converted to multiple because it has default values.'
   },
 
   languagesEditor: {

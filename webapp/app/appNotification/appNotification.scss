@@ -4,12 +4,12 @@ $appNotificationWidth: 500px;
 
 .app-notification {
   position: fixed;
-  top:10px;
+  top: 10px;
   z-index: $zIndex80AppNotification;
   width: $appNotificationWidth;
   padding: 10px;
-  background-color: lighten($blueLightActive, 18%);
-  border: 1px solid lighten($blueLightActive, 5%);
+
+  border: 1px solid transparent;
   border-radius: 3px;
 
   font-size: .9rem;
@@ -17,6 +17,22 @@ $appNotificationWidth: 500px;
   text-align: center;
 
   transform: translate(calc(50vw - #{$appNotificationWidth / 2}), 15px);
+}
+
+.app-notification.info {
+  background-color: lighten($blueLightActive, 18%);
+  border-color: lighten($blueLightActive, 5%);
+}
+
+.app-notification.warning {
+  background-color: lighten($orangeLight, 8%);
+  border-color: $orange;
+}
+
+.app-notification.error {
+  color: $white;
+  background-color: lighten($red, 10%);
+  border-color: $red;
 }
 
 .app-notification.enter-active {
