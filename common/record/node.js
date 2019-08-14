@@ -106,6 +106,8 @@ const getNodeDefUuids = nodes => R.pipe(
   R.uniq
 )(nodes)
 
+const getMeta = R.propOr({}, keys.meta)
+
 const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
 
 const isDescendantOf = ancestor =>
@@ -120,7 +122,7 @@ const isDescendantOf = ancestor =>
  * ======
  */
 const mergeMeta = meta => node => R.pipe(
-  R.propOr(keys.meta),
+  getMeta,
   R.mergeLeft(meta),
   metaUpdated => R.assoc(keys.meta, metaUpdated)(node)
 )(node)
@@ -170,7 +172,7 @@ module.exports = {
   getValidation: Validator.getValidation,
 
   // ==== READ metadata
-  getMeta: R.prop(keys.meta),
+  getMeta,
   isChildApplicable: childDefUuid => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid]),
   isDefaultValueApplied: R.pathOr(false, [keys.meta, metaKeys.defaultValue]),
   isDescendantOf,
