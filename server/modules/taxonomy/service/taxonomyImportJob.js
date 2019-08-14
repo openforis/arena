@@ -115,6 +115,7 @@ class TaxonomyImportJob extends Job {
 
   async processHeaders () {
     const csvParser = new CSVParser(this.filePath, false)
+    csvParser.init()
     const headers = await csvParser.next()
     csvParser.destroy()
     const validHeaders = this.validateHeaders(headers)
