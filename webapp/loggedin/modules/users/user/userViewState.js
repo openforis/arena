@@ -4,6 +4,7 @@ import * as R from 'ramda'
 import useI18n from '../../../../commonComponents/useI18n'
 
 import User from '../../../../../common/user/user'
+import Survey from '../../../../../common/survey/survey'
 import AuthGroups from '../../../../../common/auth/authGroups'
 
 import UserValidator from '../../../../../common/user/userValidator'
@@ -21,29 +22,42 @@ import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    surveyId, userUuidUrlParam, groups: groupsProps,
+    user, survey, userUuidUrlParam, groups: groupsProps,
     showAppLoader, hideAppLoader, showNotificationMessage,
     history,
   } = props
 
   const i18n = useI18n()
 
-  const newUser = !userUuidUrlParam
+  const isNewUser = !userUuidUrlParam
 
-  // init groups
-  const surveyGroups = groupsProps.map(g => ({
-    uuid: AuthGroups.getUuid(g),
-    label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label`)
-  }))
+  const surveyId = Survey.getId(survey)
 
-  const validationFn = newUser ? UserValidator.validateNewUser : UserValidator.validateUser
+  const { data: userToUpdate = {}, dispatch: fetchUser } = useAsyncGetRequest(
+    `/api/survey/${surveyId}/user/${userUuidUrlParam}`,
+    {}
+  )
+
+  const [canEdit, setCanEdit] = useState(false)
+  const [loaded, setLoaded] = useState(isNewUser)
+
+  const canEditName = canEdit && !!User.getName(userToUpdate)
+  const validationFn = isNewUser ? UserValidator.validateNewUser : UserValidator.validateUser(canEditName)
 
   const {
     object: formObject, objectValid,
-    setObjectField, enableValidation, getFieldValidation,
-  } = useFormObject({ name: '', email: '', groupUuid: null }, validationFn, true)
+    setObjectField, setValidationEnabled, getFieldValidation,
+  } = useFormObject({ name: '', email: '', groupUuid: null }, validationFn, false)
 
-  const [loaded, setLoaded] = useState(newUser)
+  const [surveyGroups, setSurveyGroups] = useState([])
+
+  // init groups
+  useEffect(() => {
+    setSurveyGroups(groupsProps.map(g => ({
+      uuid: AuthGroups.getUuid(g),
+      label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label`)
+    })))
+  }, [])
 
   const setName = name => setObjectField('name', name)
 
@@ -54,14 +68,8 @@ export const useUserViewState = props => {
     setObjectField('groupUuid', groupUuid)
   }
 
-  // ====== User fetching - user in user edit mode
-
-  const { data: userToUpdate = {}, dispatch: fetchUser } = useAsyncGetRequest(
-    `/api/survey/${surveyId}/user/${userUuidUrlParam}`,
-    {}
-  )
   useEffect(() => {
-    if (!newUser) {
+    if (!isNewUser) {
       fetchUser()
     }
   }, [])
@@ -75,43 +83,46 @@ export const useUserViewState = props => {
         ? User.getAuthGroups(userToUpdate)[0]
         : authGroups.find(g => AuthGroups.getSurveyId(g) === surveyId)
 
-      setName(name)
+      setName(name || '') // Name can be null if user has not accepted the invitation
       setEmail(email)
       setGroup(userGroup)
+
+      const canEdit = Authorizer.canEditUser(user, userToUpdate)
+      setCanEdit(canEdit)
+      setValidationEnabled(canEdit)
 
       setLoaded(true)
     }
   }, [userToUpdate])
 
-  const { data: saveResponse, error: saveError, dispatch: saveUser } = newUser
+  const { data: userSaveResponse, error: userSaveError, dispatch: saveUser } = isNewUser
     ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, formObject)
     : useAsyncPutRequest(`/api/user/${User.getUuid(userToUpdate)}`, R.omit(['email'], formObject))
 
   // server responses update
   useOnUpdate(() => {
     hideAppLoader()
-    if (saveResponse) {
+    if (userSaveResponse) {
       history.push(appModuleUri(userModules.users))
-      if (newUser) {
+      if (isNewUser) {
         showNotificationMessage('usersView.inviteUserConfirmation', { email: formObject.email })
       } else {
         showNotificationMessage('usersView.updateUserConfirmation', { name: formObject.name })
       }
     }
-  }, [saveResponse, saveError])
+  }, [userSaveResponse, userSaveError])
 
   const sendRequest = () => {
-    if (objectValid) {
-      showAppLoader()
-      saveUser()
-    } else {
-      enableValidation()
-    }
+    showAppLoader()
+    saveUser()
   }
 
   return {
-    newUser,
-
+    isNewUser,
+    canEdit,
+    canEditGroup: Authorizer.canEditUserGroup(user, { userToUpdate, survey }),
+    // If user hasn't accepted yet (name is null) don't allow to set the name
+    canEditName,
     loaded,
     name: formObject.name,
     email: formObject.email,

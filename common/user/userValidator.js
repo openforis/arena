@@ -15,10 +15,10 @@ const validateEmail = (propName, item) => {
   return email && !validEmailRe.test(email) ? { key: errorKeys.invalidEmail } : null
 }
 
-const validateUser = async user => await validate(
+const validateUser = validateName => async user => await validate(
   user,
   {
-    'name': [validateRequired],
+    'name': validateName ? [validateRequired] : [],
     'email': [validateRequired, validateEmail],
     'groupUuid': [validateRequired],
   })

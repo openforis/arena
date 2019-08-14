@@ -29,9 +29,9 @@ export default (obj, validatorFn, validationEnabled = false) => {
     ? Validator.getFieldValidation(field)(state.validation)
     : null
 
-  const enableValidation = () => {
+  const setValidationEnabled = enabled => {
     setState(statePrev => ({
-      ...statePrev, validationEnabled: true
+      ...statePrev, validationEnabled: enabled
     }))
   }
 
@@ -39,7 +39,7 @@ export default (obj, validatorFn, validationEnabled = false) => {
     object: state.obj,
     objectValid: Validator.isValidationValid(state.validation),
     setObjectField,
-    enableValidation,
+    setValidationEnabled,
     getFieldValidation,
   }
 

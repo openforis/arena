@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Record = require('../record/record')
+const Survey = require('../survey/survey')
 const User = require('../user/user')
 const AuthGroups = require('./authGroups')
 
@@ -103,7 +104,7 @@ const canViewUser = (user, userToEdit) => {
   const userToEditGroups = User.getAuthGroups(userToEdit)
 
   const commonGroups = R.innerJoin(
-    (userGroup, userToEditGroup) => AuthGroups.getSurveyId(userGroup) === AuthGroups.getSurveyId(userToEditGroup),
+    (g1, g2) => AuthGroups.getSurveyId(g1) === AuthGroups.getSurveyId(g2),
     userGroups,
     userToEditGroups
   )
@@ -112,18 +113,18 @@ const canViewUser = (user, userToEdit) => {
 }
 
 // EDIT
-const canEditUser = (user, userToEdit, surveyInfo) => {
+const canEditUser = (user, userToEdit) => {
+  // user is systemAdmin
+  if (isSystemAdmin(user)) {
+    return true
+  }
+
   // user is userToEdit
   if (User.getUuid(user) === User.getUuid(userToEdit)) {
     return true
   }
 
-  // user is systemAdmin and userToUpdate is not systemAdmin
-  if (isSystemAdmin(user)) {
-    return true
-  }
-
-  // user is surveyAdmin of userToEdit survey
+  // user is surveyAdmin of one of userToEdit's surveys
   const commonSurveys = R.innerJoin(
     (g1, g2) => (
       AuthGroups.getName(g1) === AuthGroups.groupNames.surveyAdmin &&
@@ -134,6 +135,23 @@ const canEditUser = (user, userToEdit, surveyInfo) => {
   )
 
   return !!commonSurveys.length
+}
+
+const canEditUserGroup = (user, { userToUpdate, survey }) => {
+  if (isSystemAdmin(user)) {
+    return true
+  }
+
+  // Check if user has a group in survey
+  const hasRole = !!AuthGroups.getAuthGroups(userToUpdate).find(
+    g => AuthGroups.getSurveyId(g) === Survey.getId(survey)
+  )
+
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const sameUser = User.getUuid(user) === User.getUuid(userToUpdate)
+  
+  return (!sameUser && isSurveyAdmin(user, surveyInfo) && hasRole) ||
+    (sameUser && isSurveyAdmin(userToUpdate, surveyInfo))
 }
 
 // const canEditUser__ = (user, userToEdit) => {
@@ -167,4 +185,5 @@ module.exports = {
   canInviteUsers,
   canViewUser,
   canEditUser,
+  canEditUserGroup,
 }

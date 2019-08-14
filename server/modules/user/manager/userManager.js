@@ -63,14 +63,8 @@ const updateUser = async (userUuid, name, newGroupUuid, client = db) => {
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(newGroupUuid)
     const surveyId = AuthGroups.getSurveyId(newGroup)
 
-    // const userGroups = await AuthGroupRepository.fetchUserGroups(userUuid)
-    // const oldGroup = userGroups.find(g => AuthGroups.getSurveyId(g) === surveyId)
-
-    // if (oldGroup) {
-    await UserRepository.updateUser(userUuid, name)
-    // await AuthGroupRepository.updateUserGroup(AuthGroups.getUuid(oldGroup), newGroupUuid, userUuid)
-    await AuthGroupRepository.updateUserGroup(surveyId, userUuid, newGroupUuid)
-    // }
+    await UserRepository.updateUser(userUuid, name, t)
+    await AuthGroupRepository.updateUserGroup(surveyId, userUuid, newGroupUuid, t)
   })
 }
 

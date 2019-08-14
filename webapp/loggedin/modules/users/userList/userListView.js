@@ -51,7 +51,7 @@ const UsersRow = props => {
     ? User.getAuthGroups(userListItem)[0]
     : Authorizer.getSurveyUserGroup(userListItem, surveyInfo)
 
-  const canEditUser = Authorizer.canEditUser(user, userListItem, surveyInfo)
+  const canEditUser = Authorizer.canEditUser(user, userListItem)
 
   return (
     <>

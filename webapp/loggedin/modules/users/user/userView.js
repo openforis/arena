@@ -24,7 +24,7 @@ const UserView = props => {
   const i18n = useI18n()
 
   const {
-    newUser, loaded, name, email, group, surveyGroups, objectValid,
+    isNewUser, loaded, name, email, group, surveyGroups, objectValid, canEdit, canEditName, canEditGroup,
     getFieldValidation, setName, setEmail, setGroup, sendRequest
   } = useUserViewState(props)
 
@@ -32,24 +32,27 @@ const UserView = props => {
     <div className="form user">
       <FormItem label={i18n.t('common.email')}>
         <Input
+          disabled={!canEdit}
           placeholder={i18n.t('common.email')}
           value={email}
           validation={getFieldValidation('email')}
           onChange={setEmail}/>
       </FormItem>
       {
-        !newUser && (
+        !isNewUser && (
           <FormItem label={i18n.t('common.name')}>
             <Input
-              placeholder={i18n.t('common.name')}
+              disabled={!canEditName}
+              placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
               value={name}
-              validation={getFieldValidation('name')}
+              validation={canEditName ? getFieldValidation('name') : {}}
               onChange={setName}/>
           </FormItem>
         )
       }
       <FormItem label={i18n.t('common.group')}>
         <Dropdown
+          disabled={!canEditGroup}
           validation={getFieldValidation('groupUuid')}
           placeholder={i18n.t('common.group')}
           items={surveyGroups}
@@ -58,12 +61,17 @@ const UserView = props => {
           selection={group}
           onChange={setGroup}/>
       </FormItem>
-      <button className="btn"
-              aria-disabled={!objectValid}
-              onClick={sendRequest}>
-        <span className="icon icon-floppy-disk icon-left icon-12px"/>
-        {newUser ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
-      </button>
+
+      {
+        canEdit && (
+          <button className="btn"
+                  aria-disabled={!objectValid}
+                  onClick={sendRequest}>
+            <span className="icon icon-floppy-disk icon-left icon-12px"/>
+            {isNewUser ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
+          </button>
+        )
+      }
     </div>
   )
 }
@@ -79,7 +87,8 @@ const mapStateToProps = (state, { match }) => {
   }
 
   return {
-    surveyId: Survey.getId(survey),
+    user,
+    survey,
     groups,
     userUuidUrlParam: R.path(['params', 'userUuid'], match),
   }
