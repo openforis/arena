@@ -4,7 +4,7 @@ $appNotificationWidth: 500px;
 
 .app-notification {
   position: fixed;
-  top: 15px;
+  top:10px;
   z-index: $zIndex80AppNotification;
   width: $appNotificationWidth;
   padding: 10px;

@@ -3,14 +3,16 @@ import React from 'react'
 import Header from '../../../../commonComponents/header'
 import useI18n from '../../../../commonComponents/useI18n'
 
+import Authorizer from '../../../../../common/auth/authorizer'
 import Survey from '../../../../../common/survey/survey'
 import { getRelativeDate, compareDatesDesc } from '../../../../../common/dateUtils'
 
-const SurveyRow = ({ surveyInfoRow, surveyInfo, setActiveSurvey, i18n }) => {
+const SurveyRow = ({ user, surveyInfoRow, surveyInfo, setActiveSurvey, i18n }) => {
   const surveyId = surveyInfoRow.id
   const active = surveyInfo && surveyId === surveyInfo.id
   const activeClass = active ? ' active' : ''
   const btnLabelKey = active ? 'active' : 'activate'
+  const canEdit = Authorizer.canEditSurvey(user, surveyInfo)
 
   return (
     <div className={`table__row${activeClass}`}>
@@ -21,7 +23,7 @@ const SurveyRow = ({ surveyInfoRow, surveyInfo, setActiveSurvey, i18n }) => {
       <div>{Survey.getStatus(surveyInfoRow)}</div>
       <div>
         <button className={`btn btn-s${activeClass}`}
-                onClick={() => setActiveSurvey(surveyId)}>
+                onClick={() => setActiveSurvey(surveyId, canEdit)}>
           {i18n.t(`homeView.surveyList.${btnLabelKey}`)}
         </button>
       </div>

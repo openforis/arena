@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react'
+import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import NodeDefEntityTableRow from './nodeDefEntityTableRow'
 
+import Survey from '../../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../../../../../common/survey/nodeDefLayout'
+import * as SurveyState from '../../../../../../survey/surveyState'
 
 import { elementOffset } from '../../../../../../utils/domUtils'
 import { debounce } from '../../../../../../../common/functionsDefer'
@@ -13,22 +16,11 @@ const NodeDefEntityTableRows = props => {
 
   const {
     entry, edit,
-    nodeDef, childDefs, nodes,
+    nodeDef, nodeDefColumns, nodes,
   } = props
 
   const tableRowsRef = useRef(null)
   const tableDataRowsRef = useRef(null)
-
-  const nodeDefColumnUuids = NodeDefLayout.getLayout(nodeDef)
-  const nodeDefColumns = useMemo(() => R.reduce(
-    (nodeDefColumnsAgg, nodeDefColumnUuid) => {
-      const nodeDefChild = childDefs.find(def => NodeDef.getUuid(def) === nodeDefColumnUuid)
-      nodeDefChild && nodeDefColumnsAgg.push(nodeDefChild)
-      return nodeDefColumnsAgg
-    },
-    [],
-    nodeDefColumnUuids
-  ), [nodeDefColumnUuids])
 
   const [gridSize, setGridSize] = useState({ width: 0, height: 0, top: 0, left: 0 })
   const debounceDelayOnScroll = 100
@@ -133,4 +125,25 @@ const NodeDefEntityTableRows = props => {
   )
 }
 
-export default NodeDefEntityTableRows
+const mapStateToProps = (state, props) => {
+  const { nodeDef } = props
+
+  const survey = SurveyState.getSurvey(state)
+  const nodeDefColumnUuids = NodeDefLayout.getLayout(nodeDef)
+
+  const nodeDefColumns = R.reduce(
+    (nodeDefColumnsAgg, nodeDefColumnUuid) => {
+      const nodeDefChild = Survey.getNodeDefByUuid(nodeDefColumnUuid)(survey)
+      nodeDefChild && nodeDefColumnsAgg.push(nodeDefChild)
+      return nodeDefColumnsAgg
+    },
+    [],
+    nodeDefColumnUuids
+  )
+
+  return {
+    nodeDefColumns
+  }
+}
+
+export default connect(mapStateToProps)(NodeDefEntityTableRows)

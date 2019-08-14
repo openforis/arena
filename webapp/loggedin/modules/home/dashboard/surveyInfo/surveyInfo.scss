@@ -1,53 +1,18 @@
 @import "../../../../../style/vars";
 
 .home-dashboard__survey-info {
-  display: grid;
-  align-content: end;
-  padding-bottom: 1rem;
-}
-
-.home-dashboard__survey-info-container {
-  display: grid;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-
-  .survey-name {
-    font-size: 1.3rem;
-    margin-right: 4rem;
-  }
+  padding: 2rem;
 
   .survey-status {
-    font-size: .75rem;
-    font-weight: 600;
+    font-size: .7rem;
     text-transform: uppercase;
-    display: flex;
-    align-items: center;
     padding: 0 .5rem;
-
-    .icon-warning {
-      margin-top: -4px;
-      color: $orange;
-      font-weight: bold;
-    }
-
-    .btn {
-      margin-left: .5rem;
-    }
+    color: lighten($black, 20%);
+    margin-left: 1rem;
   }
 
-  .row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .hr {
-    width: 90%;
-    height: 10px;
-    margin: .5rem 0;
-    background-color: rgba($pink, .15);
-    justify-self: center;
+  a {
+    margin-right: 1rem;
   }
 
 }

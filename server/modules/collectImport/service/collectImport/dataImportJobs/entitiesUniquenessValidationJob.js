@@ -120,8 +120,8 @@ const _createValidationRecordOrEntityDuplicate = nodeDefEntity => {
         [Validator.keys.valid]: false,
         [Validator.keys.errors]: [
           isRoot
-            ? RecordValidation.keysError.duplicateRecord
-            : RecordValidation.keysError.duplicateEntity
+            ? { key: RecordValidation.keysError.duplicateRecord }
+            : { key: RecordValidation.keysError.duplicateEntity }
         ]
       }
     }
