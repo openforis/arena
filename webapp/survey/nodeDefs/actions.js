@@ -10,6 +10,7 @@ import NodeDef from '../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../common/survey/nodeDefLayout'
 import NodeDefValidations from '../../../common/survey/nodeDefValidations'
 
+import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'
 
 import { showNotificationMessage } from '../../app/actions'
@@ -111,15 +112,9 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
 }
 
 const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
-  const hasDefaultValues = R.pipe(
-    NodeDef.getDefaultValues,
-    R.isEmpty,
-    R.not
-  )(nodeDef)
-
-  if (value && hasDefaultValues) {
+  if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
     // nodeDef has default values, cannot change into multiple
-    dispatch(showNotificationMessage('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues'))
+    dispatch(showNotificationMessage('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, AppState.notificationSeverity.warning))
     return false
   }
   return true

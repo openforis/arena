@@ -11,7 +11,7 @@ import { hideNotification } from '../actions'
 
 const AppNotificationView = props => {
   const {
-    visible, messageKey, messageParams,
+    visible, messageKey, messageParams, severity,
     i18n,
     hideNotification,
   } = props
@@ -22,7 +22,7 @@ const AppNotificationView = props => {
       timeout={250}
       unmountOnExit>
 
-      <div className="app-notification">
+      <div className={`app-notification ${severity}`}>
         <button className="btn-s btn-transparent app-notification__btn-close"
                 onClick={hideNotification}>
           <span className="icon icon-cross icon-8px"/>
@@ -42,6 +42,7 @@ const AppNotificationView = props => {
 const mapStateToProps = state => ({
   messageKey: AppState.getNotificationMessageKey(state),
   messageParams: AppState.getNotificationMessageParams(state),
+  severity: AppState.getNotificationSeverity(state),
   visible: AppState.isNotificationVisible(state),
   i18n: AppState.getI18n(state),
 })
