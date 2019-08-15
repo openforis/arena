@@ -11,7 +11,7 @@ import { appPropsChange, appUserLogout } from '../../app/actions'
 import { surveyCreate, surveyDelete, surveyUpdate } from '../actions'
 
 // surveyInfo actions
-import { surveyInfoPropUpdate, surveyInfoValidationUpdate } from './actions'
+import { surveyInfoUpdate, surveyInfoValidationUpdate } from './actions'
 
 // nodeDefs actions
 import { nodeDefCreate, nodeDefDelete, nodeDefPropsUpdate } from '../nodeDefs/actions'
@@ -35,9 +35,9 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   // survey info update
-  [surveyInfoPropUpdate]: (state, { key, value }) => SurveyInfoState.assocSurveyInfoProp(key, value)(state),
+  [surveyInfoUpdate]: (state, { surveyInfo }) => surveyInfo,
 
-  [surveyInfoValidationUpdate]: (state, { validation }) => SurveyInfoState.assocSurveyInfoValidation(validation)(state),
+  [surveyInfoValidationUpdate]: (state, { validation }) => SurveyInfoState.assocValidation(validation)(state),
 
   // NodeDef
   [nodeDefCreate]: SurveyInfoState.markDraft,

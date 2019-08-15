@@ -23,6 +23,7 @@ module.exports = {
   setInPath,
 
   // TODO move generic methods from SurveyUtils to ObjectUtils
+  getProps: SurveyUtils.getProps,
   toIndexedObj: SurveyUtils.toIndexedObj,
   toUuidIndexedObj: SurveyUtils.toUuidIndexedObj
 

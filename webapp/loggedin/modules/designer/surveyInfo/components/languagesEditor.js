@@ -4,11 +4,15 @@ import useI18n from '../../../../../commonComponents/useI18n'
 
 import InputChips from '../../../../../commonComponents/form/inputChips'
 
-import { languages as appLanguages } from '../../../../../../common/app/languages'
+import { getLanguageLabel, languages as appLanguages } from '../../../../../../common/app/languages'
 
 const LanguagesEditor = props => {
 
-  const { languages, setLanguageCodes, readOnly } = props
+  const { languages, setLanguages, readOnly } = props
+
+  const selection = languages.map(lang => ({
+    key: lang, value: getLanguageLabel(lang)
+  }))
 
   const i18n = useI18n()
 
@@ -20,9 +24,9 @@ const LanguagesEditor = props => {
       <InputChips
         items={appLanguages}
         itemKeyProp="key"
-        selection={languages}
+        selection={selection}
         onChange={items => {
-          setLanguageCodes(R.pluck('key', items))
+          setLanguages(R.pluck('key', items))
         }}
         requiredItems={1}
         readOnly={readOnly}

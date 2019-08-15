@@ -64,6 +64,9 @@ module.exports = {
   getAuthGroups: SurveyInfo.getAuthGroups,
   getSurveyAdminGroup: SurveyInfo.getSurveyAdminGroup,
 
+  // UPDATE
+  markDraft: SurveyInfo.markDraft,
+
   // ====== READ nodeDefs
   getNodeDefs: SurveyNodeDefs.getNodeDefs,
   getNodeDefsArray: SurveyNodeDefs.getNodeDefsArray,

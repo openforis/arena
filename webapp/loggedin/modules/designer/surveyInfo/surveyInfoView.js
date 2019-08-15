@@ -9,14 +9,14 @@ import { Input } from '../../../../commonComponents/form/input'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
 import LanguagesEditor from './components/languagesEditor'
 import SrsEditor from './components/srsEditor'
-import { useSurveyInfoState } from './components/surveyInfoState'
+import { useSurveyInfoViewState } from './components/surveyInfoViewState'
 
 import Authorizer from '../../../../../common/auth/authorizer'
 
 import * as SurveyState from '../../../../survey/surveyState'
 import * as AppState from '../../../../app/appState'
 
-import { updateSurveyInfoProp } from '../../../../survey/surveyInfo/actions'
+import { updateSurveyInfoProps } from '../../../../survey/surveyInfo/actions'
 
 const SurveyInfoView = (props) => {
   const { readOnly } = props
@@ -25,9 +25,9 @@ const SurveyInfoView = (props) => {
 
   const {
     name, languages, srs, labels, descriptions,
-    setName, setLanguageCodes, setSrs, setLabel, setDescription,
-    getFieldValidation,
-  } = useSurveyInfoState(props)
+    setName, setLanguages, setSrs, setLabel, setDescription,
+    getFieldValidation, saveProps,
+  } = useSurveyInfoViewState(props)
 
   return (
     <div className="home-survey-info">
@@ -45,7 +45,7 @@ const SurveyInfoView = (props) => {
         <LanguagesEditor
           readOnly={readOnly}
           languages={languages}
-          setLanguageCodes={setLanguageCodes}
+          setLanguages={setLanguages}
         />
 
         <div className="form-item">
@@ -60,6 +60,7 @@ const SurveyInfoView = (props) => {
 
         <LabelsEditor
           readOnly={readOnly}
+          languages={languages}
           labels={labels}
           onChange={setLabel}
         />
@@ -67,11 +68,13 @@ const SurveyInfoView = (props) => {
         <LabelsEditor
           readOnly={readOnly}
           formLabelKey="common.description"
+          languages={languages}
           labels={descriptions}
           onChange={setDescription}
         />
 
-        <button className="btn btn-save">
+        <button className="btn btn-save"
+                onClick={saveProps}>
           <span className="icon icon-floppy-disk icon-12px icon-left"/>
           {i18n.t('common.save')}
         </button>
@@ -93,5 +96,5 @@ const mapStateToProps = state => {
 }
 
 export default connect(
-  mapStateToProps, { updateSurveyInfoProp }
+  mapStateToProps, { updateSurveyInfoProps }
 )(SurveyInfoView)

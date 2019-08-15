@@ -1,28 +1,30 @@
 import axios from 'axios'
 
-import { debounceAction } from '../../utils/reduxUtils'
+import Survey from '../../../common/survey/survey'
+import Validator from '../../../common/validation/validator'
 
+import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'
 
-export const surveyInfoPropUpdate = 'survey/info/prop/update'
+import { hideAppLoader, showAppLoader, showNotificationMessage } from '../../app/actions'
+
+export const surveyInfoUpdate = 'survey/info/update'
 export const surveyInfoValidationUpdate = 'survey/info/validation/update'
 
-export const updateSurveyInfoProp = (key, value) => async (dispatch) => {
-  dispatch({type: surveyInfoPropUpdate, key, value})
+export const updateSurveyInfoProps = props => async (dispatch, getState) => {
+  dispatch(showAppLoader())
 
-  dispatch(_updateProp(key, value))
-}
+  const surveyId = SurveyState.getSurveyId(getState())
+  const { data } = await axios.put(`/api/survey/${surveyId}/info`, props)
 
-const _updateProp = (key, value) => {
-
-  const action = async (dispatch, getState) => {
-
-    const surveyId = SurveyState.getSurveyId(getState())
-    const res = await axios.put(`/api/survey/${surveyId}/prop`, {key, value})
-
-    const {validation} = res.data
-    dispatch({type: surveyInfoValidationUpdate, validation})
+  const surveyInfo = Survey.getSurveyInfo(data)
+  if (Validator.isValid(surveyInfo)) {
+    dispatch(showNotificationMessage('common.saved'))
+    dispatch({ type: surveyInfoUpdate, surveyInfo })
+  } else {
+    dispatch(showNotificationMessage('common.formContainsErrors', null, AppState.notificationSeverity.error))
+    dispatch({ type: surveyInfoValidationUpdate, validation: Validator.getValidation(surveyInfo) })
   }
 
-  return debounceAction(action, `${surveyInfoPropUpdate}_${key}`)
+  dispatch(hideAppLoader())
 }
