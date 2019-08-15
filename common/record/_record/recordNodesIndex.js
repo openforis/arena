@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Node = require('../node')
+const ObjectUtils = require('../../objectUtils')
 
 /**
  * Record nodes index.
@@ -147,13 +148,13 @@ const _assocToIndexPath = (path, value) => record => R.pipe(
     R.identity,
     R.append(value)
   ),
-  arr => R.assocPath(path, arr, record)
+  valuesArray => ObjectUtils.setInPath(path, valuesArray)(record)
 )(record)
 
 const _dissocFromIndexPath = (path, value) => record => R.pipe(
   R.pathOr([], path),
   R.without(value),
-  arr => R.assocPath(path, arr, record)
+  valuesArray => ObjectUtils.setInPath(path, valuesArray)(record)
 )(record)
 
 module.exports = {
