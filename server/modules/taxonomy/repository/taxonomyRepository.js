@@ -100,21 +100,44 @@ const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, cl
     r => parseInt(r.count)
   )
 
-const fetchAllTaxa = async (surveyId, taxonomyUuid, draft = false, limit = null, offset = 0, client = db) =>
-  await client.map(
-    `SELECT * 
-     FROM ${getSurveyDBSchema(surveyId)}.taxon
-     WHERE taxonomy_uuid = $1
-     ORDER BY ${DbUtils.getPropColCombined(Taxon.propKeys.scientificName, draft)} ASC 
-     LIMIT ${limit ? limit : 'ALL'} 
-     OFFSET $2`,
+const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = false, limit = null, offset = 0, client = db) => {
+  const schema = getSurveyDBSchema(surveyId)
+
+  return await client.map(`
+      WITH vernacular_names AS
+      (
+      SELECT
+          vn.taxon_uuid,
+          json_build_object(${DbUtils.getPropColCombined('lang', draft, 'vn.')}, ${DbUtils.getPropColCombined('name', draft, 'vn.')})
+          AS names
+      FROM
+          ${schema}.taxon_vernacular_name vn
+      )
+      
+      SELECT
+          t.*,
+          vn.names as vernacular_names
+      FROM
+          ${schema}.taxon t
+      LEFT OUTER JOIN
+          vernacular_names vn
+      ON
+          vn.taxon_uuid = t.uuid
+      WHERE
+          t.taxonomy_uuid = $1
+      ORDER BY
+          (t.props || t.props_draft)->>'scientificName' ASC 
+      LIMIT ${limit ? limit : 'ALL'} 
+      OFFSET $2
+    `,
     [taxonomyUuid, offset],
     record => dbTransformCallback(record, draft, true)
   )
+}
 
 const fetchTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searchValue, orderByProp, draft, client) =>
   await client.map(
-    `SELECT * 
+    `SELECT *
        FROM ${getSurveyDBSchema(surveyId)}.taxon
        WHERE taxonomy_uuid = $/taxonomyUuid/ 
          ${whereCondition ? ` AND (${whereCondition})` : ''}
@@ -273,7 +296,7 @@ module.exports = {
   fetchTaxonByUuid,
   fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid,
-  fetchAllTaxa,
+  fetchTaxaWithVernacularNames,
 
   fetchIndex,
 

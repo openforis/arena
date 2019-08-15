@@ -25,7 +25,7 @@ const exportTaxa = async (surveyId, taxonomyUuid, output, draft = false) => {
   csvStream.write(R.concat(fixedHeaders, vernacularLanguageCodes))
 
   //write taxa
-  const taxa = await TaxonomyManager.fetchAllTaxa(surveyId, taxonomyUuid, draft)
+  const taxa = await TaxonomyManager.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft)
 
   taxa.forEach(taxon => {
     csvStream.write(
@@ -65,7 +65,7 @@ module.exports = {
   fetchTaxonByUuid: TaxonomyManager.fetchTaxonByUuid,
   fetchTaxaByVernacularName: TaxonomyManager.fetchTaxaByVernacularName,
   fetchTaxaByPropLike: TaxonomyManager.fetchTaxaByPropLike,
-  fetchAllTaxa: TaxonomyManager.fetchAllTaxa,
+  fetchTaxaWithVernacularNames: TaxonomyManager.fetchTaxaWithVernacularNames,
   countTaxaByTaxonomyUuid: TaxonomyManager.countTaxaByTaxonomyUuid,
 
   fetchTaxonVernacularNameByUuid: TaxonomyManager.fetchTaxonVernacularNameByUuid,
