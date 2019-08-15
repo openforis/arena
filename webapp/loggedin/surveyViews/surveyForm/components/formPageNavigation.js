@@ -10,7 +10,7 @@ import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 import * as SurveyState from '../../../../survey/surveyState'
 import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
-import { setFormActivePage } from '../../surveyForm/actions'
+import { setFormActivePage, toggleFormPageNavigation } from '../../surveyForm/actions'
 
 const NavigationButton = (props) => {
   const {
@@ -85,7 +85,7 @@ const mapStateToProps = (state, props) => {
 
 const FormPageNavigation = connect(
   mapStateToProps,
-  { setFormActivePage }
+  { setFormActivePage, toggleFormPageNavigation }
 )(NavigationButton)
 
 export default FormPageNavigation

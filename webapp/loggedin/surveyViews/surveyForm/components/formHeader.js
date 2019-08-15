@@ -15,7 +15,6 @@ import * as SurveyState from '../../../../survey/surveyState'
 import * as SurveyFormState from '../surveyFormState'
 
 import { createNodeDef } from '../../../../survey/nodeDefs/actions'
-import { toggleFormPageNavigation } from '../actions'
 
 const FormHeader = props => {
 
@@ -24,7 +23,7 @@ const FormHeader = props => {
     history, canEditDef,
     nodeDefPage, nodeDefPageLabel,
     showPageNavigation,
-    createNodeDef, toggleFormPageNavigation,
+    createNodeDef,
   } = props
 
   const i18n = useI18n()
@@ -33,19 +32,11 @@ const FormHeader = props => {
     <div className="survey-form-header">
       <div className="survey-form-header__label-container">
 
-        <button className="btn btn-s"
-                onClick={toggleFormPageNavigation}>
-          <span className="icon icon-stack icon-12px icon-left"/>
-          {i18n.t(`surveyForm.${showPageNavigation ? 'hidePageNav' : 'showPageNav'}`)}
-        </button>
-
-        <div className="survey-form-header__node-def-label">
-          {nodeDefPageLabel}
-        </div>
+        <h5>{nodeDefPageLabel}</h5>
 
         {
           edit && canEditDef &&
-          <button className="btn btn-s btn-add-sub-page icon-right"
+          <button className="btn-s btn-transparent btn-add-sub-page"
                   onClick={() => createNodeDef(
                     NodeDef.getUuid(nodeDefPage),
                     NodeDef.nodeDefType.entity,
@@ -54,7 +45,7 @@ const FormHeader = props => {
                       [NodeDefLayout.nodeDefLayoutProps.pageUuid]: uuidv4(),
                     }
                   )}>
-            <span className="icon icon-plus icon-12px icon-left"/>
+            <span className="icon icon-plus icon-10px icon-left"/>
             {i18n.t('surveyForm.subPage')}
           </button>
         }
@@ -84,5 +75,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { createNodeDef, toggleFormPageNavigation }
+  { createNodeDef }
 )(FormHeader)

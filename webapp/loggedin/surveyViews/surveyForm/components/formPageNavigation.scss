@@ -3,6 +3,7 @@
 
 .survey-form__node-def-nav {
   &.level0 {
+    position: relative;
     overflow-y: auto;
     border: $formBorder;
   }
