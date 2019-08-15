@@ -10,14 +10,15 @@ import NodeDefLayout from '../../../../../common/survey/nodeDefLayout'
 import * as SurveyState from '../../../../survey/surveyState'
 import * as SurveyFormState from '../../surveyForm/surveyFormState'
 
-import { setFormActivePage } from '../../surveyForm/actions'
+import { setFormActivePage, toggleFormPageNavigation } from '../../surveyForm/actions'
 
 const NavigationButton = (props) => {
   const {
     nodeDef, label, childDefs,
     edit, canEditDef,
     level, active, enabled,
-    setFormActivePage,
+    showPageNavigation,
+    setFormActivePage, toggleFormPageNavigation,
   } = props
 
   const [showChildren, setShowChildren] = useState(level === 0)
@@ -25,43 +26,62 @@ const NavigationButton = (props) => {
   const outerPageChildDefs = childDefs ? NodeDefLayout.filterOuterPageChildren(childDefs) : []
 
   return (
-    <div className={`survey-form__node-def-nav level${level}`}
-         style={{ marginLeft: `${level === 0 ? 0 : 1}rem` }}>
-      <div className="display-flex">
-        {
-          outerPageChildDefs.length > 0 ?
-            (
-              <button className="btn-xs btn-toggle"
-                      style={{ transform: `rotate(${showChildren ? '90' : '0'}deg)` }}
-                      onClick={() => setShowChildren(!showChildren)}>
-                <span className="icon icon-play3 icon-12px"/>
-              </button>
-            )
-            : (
-              <span style={{ marginLeft: '21px' }}/>
-            )
-        }
+    showPageNavigation
+      ? (
+        <div className={`survey-form__node-def-nav level${level}`}
+             style={{ marginLeft: `${level === 0 ? 0 : 1}rem` }}>
 
-        <button className={`btn btn-s btn-node-def${active ? ' active' : ''}`}
-                onClick={() => setFormActivePage(nodeDef)}
-                aria-disabled={!enabled}>
-          {label}
+          {
+            level === 0 &&
+            <button className="btn-s btn-transparent survey-form__node-def-nav__btn-toggle"
+                    onClick={toggleFormPageNavigation}>
+              <span className="icon icon-shrink2 icon-12px icon-left"/>
+            </button>
+          }
+
+          <div className="display-flex">
+            {
+              outerPageChildDefs.length > 0 ?
+                (
+                  <button className="btn-xs btn-toggle"
+                          style={{ transform: `rotate(${showChildren ? '90' : '0'}deg)` }}
+                          onClick={() => setShowChildren(!showChildren)}>
+                    <span className="icon icon-play3 icon-12px"/>
+                  </button>
+                )
+                : (
+                  <span style={{ marginLeft: '21px' }}/>
+                )
+            }
+
+            <button className={`btn btn-s btn-node-def${active ? ' active' : ''}`}
+                    onClick={() => setFormActivePage(nodeDef)}
+                    aria-disabled={!enabled}>
+              {label}
+            </button>
+          </div>
+
+          {
+            showChildren && outerPageChildDefs.map(child =>
+              <FormPageNavigation
+                key={NodeDef.getUuid(child)}
+                level={level + 1}
+                nodeDef={child}
+                edit={edit}
+                canEditDef={canEditDef}
+                showPageNavigation={showPageNavigation}
+              />
+            )
+          }
+
+        </div>
+      )
+      : (
+        <button className="btn-s btn-transparent survey-form__node-def-nav__btn-toggle"
+                onClick={toggleFormPageNavigation}>
+          <span className="icon icon-enlarge2 icon-12px icon-left"/>
         </button>
-      </div>
-
-      {
-        showChildren && outerPageChildDefs.map(child =>
-          <FormPageNavigation
-            key={NodeDef.getUuid(child)}
-            level={level + 1}
-            nodeDef={child}
-            edit={edit}
-            canEditDef={canEditDef}
-          />
-        )
-      }
-
-    </div>
+      )
   )
 }
 
@@ -85,7 +105,7 @@ const mapStateToProps = (state, props) => {
 
 const FormPageNavigation = connect(
   mapStateToProps,
-  { setFormActivePage }
+  { setFormActivePage, toggleFormPageNavigation }
 )(NavigationButton)
 
 export default FormPageNavigation

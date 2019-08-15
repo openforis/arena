@@ -10,19 +10,12 @@
 
 .survey-form-header__label-container {
   display: flex;
+  align-items: flex-end;
 
   .btn-add-sub-page {
-    border: none;
-    align-self: flex-end;
-    border-bottom: 1px dashed $greyBorder;
+    margin-left: 2rem;
+    border: 1px dashed $greyBorder;
   }
-}
-
-.survey-form-header__node-def-label {
-  font-size: 1.1rem;
-  font-weight: 600;
-  align-self: flex-end;
-  margin-left: 2rem;
 }
 
 .survey-form-header__actions {
@@ -38,7 +31,11 @@
 
 }
 
-.survey-form-header__record-actions-steps > * {
-  margin: 0 .5rem;
-  font-size: .8rem;
+.survey-form-header__record-actions-steps {
+  border: 1px solid $greyBorder;
+
+  > * {
+    margin: 0 .5rem;
+    font-size: .8rem;
+  }
 }
