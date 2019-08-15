@@ -7,6 +7,10 @@ const keys = {
   uuid: SurveyUtils.keys.uuid,
   taxonomyUuid: 'taxonomyUuid',
   props: SurveyUtils.keys.props,
+  vernacularNames: 'vernacularNames',
+  vernacularNameUuid: 'vernacularNameUuid',
+  vernacularName: 'vernacularName',
+  vernacularLanguage: 'vernacularLanguage',
 }
 
 const propKeys = {
@@ -14,8 +18,6 @@ const propKeys = {
   family: 'family',
   genus: 'genus',
   scientificName: 'scientificName',
-  vernacularNames: 'vernacularNames',
-  vernacularNameUuid: 'vernacularNameUuid',
 }
 
 const unlistedCode = 'UNL'
@@ -30,19 +32,24 @@ const newTaxon = (taxonomyUuid, code, family, genus, scientificName, vernacularN
     [propKeys.family]: family,
     [propKeys.genus]: genus,
     [propKeys.scientificName]: scientificName,
-    [propKeys.vernacularNames]: vernacularNames
   },
+  [keys.vernacularNames]: vernacularNames
 })
 
 // ====== READ
 const getCode = SurveyUtils.getProp(propKeys.code, '')
 
-const getVernacularNames = SurveyUtils.getProp(propKeys.vernacularNames, {})
+const getVernacularNames = R.propOr({}, keys.vernacularNames)
 
-const getVernacularName = lang => R.pipe(
+const getVernacularName = lang => taxon => R.pipe(
   getVernacularNames,
   R.prop(lang),
-)
+  R.defaultTo(
+    R.propOr('', keys.vernacularName, taxon)
+  )
+)(taxon)
+
+const getVernacularLanguage = R.propOr('', keys.vernacularLanguage)
 
 module.exports = {
   keys,
@@ -62,7 +69,8 @@ module.exports = {
   getScientificName: SurveyUtils.getProp(propKeys.scientificName, ''),
   getVernacularNames,
   getVernacularName,
-  getVernacularNameUuid: SurveyUtils.getProp(propKeys.vernacularNameUuid),
+  getVernacularLanguage,
+  getVernacularNameUuid: R.prop(keys.vernacularNameUuid),
   isUnlistedTaxon: R.pipe(getCode, R.equals(unlistedCode)),
   isUnknownTaxon: R.pipe(getCode, R.equals(unknownCode)),
 

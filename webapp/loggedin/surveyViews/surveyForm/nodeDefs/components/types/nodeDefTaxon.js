@@ -73,7 +73,7 @@ const NodeDefTaxon = props => {
         [vernacularName]: Taxon.isUnlistedTaxon(taxon) && selection[vernacularName]
           ? selection[vernacularName]
           : '',
-        [vernacularNameUuid]: taxon[vernacularNameUuid]
+        [vernacularNameUuid]: Taxon.getVernacularNameUuid(taxon)
       }
 
       updateNodeValue(nodeValue, taxon)

@@ -91,7 +91,7 @@ module.exports.init = app => {
           taxa = await TaxonomyService.fetchTaxaByPropLike(surveyId, taxonomyUuid, filterProp, filterValue, draft, includeUnlUnk)
         }
       } else {
-        taxa = await TaxonomyService.fetchAllTaxa(surveyId, taxonomyUuid, draft, limit, offset)
+        taxa = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)
       }
 
       res.json({ taxa })

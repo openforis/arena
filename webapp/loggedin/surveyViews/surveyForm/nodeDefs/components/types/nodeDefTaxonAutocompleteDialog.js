@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import * as R from 'ramda'
 
 import AutocompleteDialog from '../../../../../../commonComponents/form/autocompleteDialog'
 import { useAsyncGetRequest } from '../../../../../../commonComponents/hooks'
@@ -10,13 +9,6 @@ import ReactDOM from 'react-dom'
 
 const NodeDefTaxonAutocompleteItemRenderer = props => {
   const { item: taxon, ...otherProps } = props
-
-  const vernacularNames = Taxon.getVernacularNames(taxon)
-  const vernacularNamesString = R.pipe(
-    R.keys, //vernacular language codes
-    R.map(langCode => `${R.prop(langCode, vernacularNames)} (${langCode})`),
-    R.join(', ')
-  )(vernacularNames)
 
   return (
     <div {...otherProps}
@@ -30,7 +22,7 @@ const NodeDefTaxonAutocompleteItemRenderer = props => {
         {Taxon.getScientificName(taxon)}
       </div>
       <div style={{ gridColumn: 2 }}>
-        {vernacularNamesString}
+        {`${Taxon.getVernacularName()(taxon)} (${Taxon.getVernacularLanguage(taxon)})`}
       </div>
     </div>
   )

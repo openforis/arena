@@ -92,7 +92,7 @@ const getTaxonUuid = (nodeDef, taxonCode) => survey => {
 const getTaxonVernacularNameUuid = (nodeDef, taxonCode, vernacularName) => survey => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.path(
-    [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.propKeys.vernacularNames, vernacularName],
+    [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.keys.vernacularNames, vernacularName],
     survey
   )
 }
@@ -101,7 +101,7 @@ const includesTaxonVernacularName = (nodeDef, taxonCode, vernacularNameUuid) => 
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   return R.pipe(
     R.path(
-      [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.propKeys.vernacularNames]
+      [keys.indexRefData, keys.taxonUuidIndex, taxonomyUuid, taxonCode, Taxon.keys.vernacularNames]
     ),
     R.values,
     R.includes(vernacularNameUuid)
@@ -148,8 +148,8 @@ const _getTaxonomyUuidIndex = R.reduce(
     ],
     {
       [Taxon.keys.uuid]: Taxon.getUuid(row),
-      [Taxon.propKeys.vernacularNames]: R.pipe(
-        R.prop(Taxon.propKeys.vernacularNames),
+      [Taxon.keys.vernacularNames]: R.pipe(
+        R.prop(Taxon.keys.vernacularNames),
         R.mergeAll
       )(row),
     }

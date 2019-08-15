@@ -128,7 +128,7 @@ module.exports = {
   fetchTaxonByUuid: TaxonomyRepository.fetchTaxonByUuid,
   fetchTaxonByCode: TaxonomyRepository.fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid: TaxonomyRepository.fetchTaxonVernacularNameByUuid,
-  fetchAllTaxa: TaxonomyRepository.fetchAllTaxa,
+  fetchTaxaWithVernacularNames: TaxonomyRepository.fetchTaxaWithVernacularNames,
 
   //UPDATE
   publishTaxonomiesProps,
