@@ -48,9 +48,10 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
+      const { user } = req
       const surveyId = Request.getRestParam(req, 'surveyId')
 
-      const count = await UserService.countUsersBySurveyId(surveyId)
+      const count = await UserService.countUsersBySurveyId(user, surveyId)
       res.json(count)
 
     } catch (err) {

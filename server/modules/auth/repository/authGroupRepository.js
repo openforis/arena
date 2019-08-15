@@ -9,8 +9,10 @@ const AuthGroups = require('../../../../common/auth/authGroups')
 
 const insertGroup = async (authGroup, surveyId, client = db) =>
   await client.one(`
-    INSERT INTO auth_group (name, survey_id, permissions, record_steps)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO auth_group (name, survey_uuid, permissions, record_steps)
+    SELECT $1, s.uuid, $3, $4
+    FROM survey s
+    WHERE s.id = $2 
     RETURNING *`,
     [
       authGroup.name,
@@ -51,8 +53,9 @@ const fetchSurveyGroups = async (surveyId, client = db) =>
   await client.map(`
     SELECT auth_group.*
     FROM auth_group
-    WHERE auth_group.survey_id = $1`
-    ,
+    JOIN survey s
+    ON s.id = $1
+    WHERE auth_group.survey_uuid = s.uuid`,
     [surveyId],
     dbTransformCallback
   )
@@ -75,11 +78,13 @@ const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
     UPDATE auth_group_user gu
     SET group_uuid = $1
     FROM auth_group g
+    JOIN survey s
+    ON s.id = $3
     WHERE gu.user_uuid = $2
     AND (
-      (g.survey_id = $3 AND g.uuid = gu.group_uuid)
-      -- OR (g.uuid = $1 AND g.name = '${AuthGroups.groupNames.systemAdmin}')
-      OR (gu.group_uuid = g.uuid AND g.name = '${AuthGroups.groupNames.systemAdmin}')
+      (g.survey_uuid = s.uuid AND g.uuid = gu.group_uuid)
+      OR
+      (gu.group_uuid = g.uuid AND g.name = '${AuthGroups.groupNames.systemAdmin}')
     ) 
     RETURNING *`,
     [groupUuid, userUuid, surveyId],

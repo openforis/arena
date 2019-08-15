@@ -16,6 +16,12 @@ const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
   return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
 }
 
+const countUsersBySurveyId = async (user, surveyId) => {
+  const countSystemAdmins = Authorizer.isSystemAdmin(user)
+
+  return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
+}
+
 const inviteUser = async (user, surveyId, email, groupUuid) => {
   if (!Authorizer.isSystemAdmin(user)) {
     const group = await AuthManager.fetchGroupByUuid(groupUuid)
@@ -62,7 +68,7 @@ const updateUsername = async (user, userUuid, name) => {
 }
 
 module.exports = {
-  countUsersBySurveyId: UserManager.countUsersBySurveyId,
+  countUsersBySurveyId,
 
   fetchUsersBySurveyId,
 

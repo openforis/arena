@@ -45,7 +45,7 @@ export const useUserViewState = props => {
     userGroup: false,
   })
 
-  const validationFn = isNewUser ? UserValidator.validateNewUser : UserValidator.validateUser(editPermissions.name)
+  const validationFn = isNewUser ? UserValidator.validateNewUser : UserValidator.validateUser(editPermissions.userName)
   const {
     object: formObject, objectValid,
     setObjectField, setValidationEnabled, getFieldValidation,
@@ -86,7 +86,7 @@ export const useUserViewState = props => {
         : Authorizer.getSurveyUserGroup(userToUpdate, Survey.getSurveyInfo(survey))
 
       // Name can be null if user has not accepted the invitation
-      setName(name || '')
+      setName(name)
       setEmail(email)
       setGroup(userGroup)
 
@@ -95,16 +95,18 @@ export const useUserViewState = props => {
   }, [userToUpdate])
 
   useEffect(() => {
-    const canEdit = Authorizer.canEditUser(user, Survey.getSurveyInfo(survey), userToUpdate)
-    const canEditName = canEdit && User.getName(userToUpdate) !== null
+    if (loaded) {
+      const canEdit = Authorizer.canEditUser(user, Survey.getSurveyInfo(survey), userToUpdate)
+      const canEditName = canEdit && User.getName(userToUpdate) !== null
 
-    setEditPermissions({
-      user: canEdit,
-      userName: canEditName,
-      userGroup: isNewUser || Authorizer.canEditUserGroup(user, Survey.getSurveyInfo(survey), userToUpdate),
-    })
-    setValidationEnabled(canEdit)
-  }, [userToUpdate])
+      setValidationEnabled(canEdit)
+      setEditPermissions({
+        user: canEdit,
+        userName: canEditName,
+        userGroup: isNewUser || Authorizer.canEditUserGroup(user, Survey.getSurveyInfo(survey), userToUpdate),
+      })
+    }
+  }, [loaded])
 
   const { data: userSaveResponse, error: userSaveError, dispatch: saveUser } = isNewUser
     ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, formObject)

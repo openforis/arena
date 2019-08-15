@@ -19,25 +19,30 @@ const insertUser = async (surveyId, uuid, email, client = db) =>
 
 // READ
 
-const countUsersBySurveyId = async (surveyId, client = db) =>
+const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client = db) =>
   await client.one(`
     SELECT count(*)
     FROM "user" u
-    JOIN auth_group_user gu 
+    JOIN survey s
+    ON s.id = $1
+    JOIN auth_group_user gu
     ON gu.user_uuid = u.uuid
-    JOIN auth_group g 
-    ON g.uuid = gu.group_uuid 
-    AND g.survey_id = $1`,
-    [surveyId])
+    JOIN auth_group g
+    ON g.uuid = gu.group_uuid
+    AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroups.groupNames.systemAdmin}'))`,
+    [surveyId, countSystemAdmins])
 
 const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSystemAdmins = false, client = db) =>
   await client.map(`
     SELECT u.*
     FROM "user" u
-    JOIN auth_group_user gu ON gu.user_uuid = u.uuid
+    JOIN survey s
+    ON s.id = $1
+    JOIN auth_group_user gu
+    ON gu.user_uuid = u.uuid
     JOIN auth_group g
     ON g.uuid = gu.group_uuid
-    AND (g.survey_id = $1 OR ($2 AND g.name = '${AuthGroups.groupNames.systemAdmin}'))
+    AND (g.survey_uuid = s.uuid OR ($2 AND g.name = '${AuthGroups.groupNames.systemAdmin}'))
     GROUP BY u.uuid, g.name
     ORDER BY u.name
     LIMIT ${limit || 'ALL'}

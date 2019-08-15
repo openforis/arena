@@ -3,7 +3,7 @@ CREATE TABLE
 (
   uuid         uuid NOT NULL DEFAULT uuid_generate_v4(),
   name         VARCHAR(255) NOT NULL,
-  survey_id    bigint REFERENCES survey (id) ON DELETE CASCADE,
+  survey_uuid  uuid REFERENCES survey (uuid) ON DELETE CASCADE,
   permissions  jsonb DEFAULT '{}'::jsonb,
   record_steps jsonb DEFAULT '{}'::jsonb,
   PRIMARY KEY (uuid)

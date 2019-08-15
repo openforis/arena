@@ -4,7 +4,7 @@ CREATE TABLE
   survey
 (
   id            bigserial NOT NULL,
-  uuid          uuid      NOT NULL DEFAULT uuid_generate_v4(),
+  uuid          uuid      UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
 
   published     boolean   NOT NULL DEFAULT false,
   draft         boolean   NOT NULL DEFAULT true,
