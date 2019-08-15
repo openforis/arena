@@ -2,10 +2,9 @@ const db = require('../../../db/db')
 
 const User = require('../../../../common/user/user')
 const AuthGroups = require('../../../../common/auth/authGroups')
-
 const UserRepository = require('../repository/userRepository')
-const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 
+const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 const ActivityLog = require('../../activityLog/activityLogger')
 
 // ==== CREATE
@@ -58,13 +57,26 @@ const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, 
 
 // ==== UPDATE
 
-const updateUser = async (userUuid, name, newGroupUuid, client = db) => {
+const updateUser = async (user, surveyId, userUuid, name, newGroup, client = db) => {
   await client.tx(async t => {
-    const newGroup = await AuthGroupRepository.fetchGroupByUuid(newGroupUuid)
-    const surveyId = AuthGroups.getSurveyId(newGroup)
-
     await UserRepository.updateUser(userUuid, name, t)
-    await AuthGroupRepository.updateUserGroup(surveyId, userUuid, newGroupUuid, t)
+
+    const newGroupUuid = AuthGroups.getUuid(newGroup)
+    if (AuthGroups.isSystemAdminGroup(newGroup)) {
+      // if new group is SystemAdmin, delete all user groups and set his new group to SystemAdmin
+      await AuthGroupRepository.deleteAllUserGroups(userUuid, t)
+      await AuthGroupRepository.insertUserGroup(newGroupUuid, userUuid, t)
+    } else {
+      await AuthGroupRepository.updateUserGroup(surveyId, userUuid, newGroupUuid, t)
+    }
+
+    await ActivityLog.log(
+      user,
+      surveyId,
+      ActivityLog.type.userUpdate,
+      { userUuid, groupUuid: newGroupUuid },
+      t
+    )
   })
 }
 

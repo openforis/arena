@@ -19,8 +19,8 @@ const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
 const inviteUser = async (user, surveyId, email, groupUuid) => {
   if (!Authorizer.isSystemAdmin(user)) {
     const group = await AuthManager.fetchGroupByUuid(groupUuid)
-    
-    if (AuthGroups.isAdminGroup(group))
+
+    if (AuthGroups.isSystemAdminGroup(group))
       throw new UnauthorizedError(User.getName(user))
   }
 
@@ -42,8 +42,14 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   }
 }
 
-const updateUser = async (user, userUuid, name, newGroupUuid) => {
-  await UserManager.updateUser(userUuid, name, newGroupUuid)
+const updateUser = async (user, surveyId, userUuid, name, newGroupUuid) => {
+  const newGroup = await AuthManager.fetchGroupByUuid(newGroupUuid)
+
+  if (AuthGroups.isSystemAdminGroup(newGroup) && !Authorizer.isSystemAdmin(user)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+
+  await UserManager.updateUser(user, surveyId, userUuid, name, newGroup)
 }
 
 const updateUsername = async (user, userUuid, name) => {

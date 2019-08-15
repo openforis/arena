@@ -13,10 +13,10 @@ const AuthGroups = require('../../../common/auth/authGroups')
 
 const UnauthorizedError = require('../../utils/unauthorizedError')
 
-const checkPermission = (req, next, permissionFn, obj) => {
+const checkPermission = (req, next, permissionFn, ...args) => {
   const user = Request.getUser(req)
 
-  if (permissionFn(user, obj)) {
+  if (permissionFn(user, ...args)) {
     next()
   } else {
     next(new UnauthorizedError(user && user.name))
@@ -48,29 +48,14 @@ const requireRecordPermission = permissionFn => async (req, res, next) => {
   }
 }
 
-// const requireUserEditPermissions = async (req, res, next) => {
-//   const { user } = req
-//   const { user: userToEdit } = Request.getParams(req)
-//
-//   const userGroups = User.getAuthGroups(user)
-//   const userToEditGroups = User.getAuthGroups(userToEdit)
-//
-//   // find groups in common
-//   const commonGroups = R.innerJoin(
-//     (userGroup, userToEditGroup) => AuthGroups.getUuid(userGroup) === AuthGroups.getUuid(surveyGroup),
-//     userGroups,
-//     userToEditGroups
-//   )
-//
-//   console.log(commonGroups)
-// }
-
 const requireUserPermission = permissionFn => async (req, res, next) => {
   try {
-    const { userUuid } = Request.getParams(req)
-    const userToEdit = await UserService.fetchUserByUuid(userUuid)
+    const { surveyId, userUuid } = Request.getParams(req)
+    const survey = await SurveyManager.fetchSurveyById(surveyId)
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const user = await UserService.fetchUserByUuid(userUuid)
 
-    checkPermission(req, next, permissionFn, userToEdit)
+    checkPermission(req, next, permissionFn, surveyInfo, user)
   } catch (e) {
     next(e)
   }

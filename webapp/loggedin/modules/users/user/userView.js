@@ -78,13 +78,12 @@ const UserView = props => {
 
 const mapStateToProps = (state, { match }) => {
   const survey = SurveyState.getSurvey(state)
-  const groups = Survey.getAuthGroups(Survey.getSurveyInfo(survey))
   const user = AppState.getUser(state)
 
-  if (Authorizer.isSystemAdmin(user)) {
-    const adminGroup = User.getAuthGroupAdmin(user)
-    groups.unshift(adminGroup)
-  }
+  const groups = R.concat(
+    Authorizer.isSystemAdmin(user) ? User.getAuthGroups(user) : [],
+    Survey.getAuthGroups(Survey.getSurveyInfo(survey))
+  )
 
   return {
     user,

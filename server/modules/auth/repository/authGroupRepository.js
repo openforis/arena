@@ -78,13 +78,22 @@ const updateUserGroup = async (surveyId, userUuid, groupUuid, client = db) => {
     WHERE gu.user_uuid = $2
     AND (
       (g.survey_id = $3 AND g.uuid = gu.group_uuid)
-      OR (g.uuid = $1 AND g.name = '${AuthGroups.groupNames.systemAdmin}')
+      -- OR (g.uuid = $1 AND g.name = '${AuthGroups.groupNames.systemAdmin}')
+      OR (gu.group_uuid = g.uuid AND g.name = '${AuthGroups.groupNames.systemAdmin}')
     ) 
     RETURNING *`,
     [groupUuid, userUuid, surveyId],
     dbTransformCallback
   )
 }
+
+// ==== UPDATE
+
+const deleteAllUserGroups = async (userUuid, client = db) =>
+  await client.query(`
+    DELETE FROM auth_group_user
+    WHERE user_uuid = $1`,
+    userUuid)
 
 module.exports = {
   // CREATE
@@ -98,4 +107,7 @@ module.exports = {
 
   // UPDATE
   updateUserGroup,
+
+  // DELETE
+  deleteAllUserGroups,
 }

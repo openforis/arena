@@ -50,7 +50,7 @@ const getUuid = R.prop(keys.uuid)
 
 const getName = R.prop(keys.name)
 
-const isAdminGroup =
+const isSystemAdminGroup =
 R.pipe(
   getName,
   R.equals(groupNames.systemAdmin)
@@ -63,7 +63,7 @@ module.exports = {
 
   getUuid,
   getName,
-  isAdminGroup,
+  isSystemAdminGroup,
   getSurveyId,
   getAuthGroups,
 }

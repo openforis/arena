@@ -38,10 +38,10 @@ export const useUserViewState = props => {
     {}
   )
 
-  const [canEdit, setCanEdit] = useState(false)
+  const [canEdit, setCanEdit] = useState(isNewUser)
   const [loaded, setLoaded] = useState(isNewUser)
-
-  const canEditName = canEdit && !!User.getName(userToUpdate)
+  // If user hasn't accepted yet (name is null), can't edit his name
+  const canEditName = canEdit && User.getName(userToUpdate) !== null
   const validationFn = isNewUser ? UserValidator.validateNewUser : UserValidator.validateUser(canEditName)
 
   const {
@@ -87,7 +87,7 @@ export const useUserViewState = props => {
       setEmail(email)
       setGroup(userGroup)
 
-      const canEdit = Authorizer.canEditUser(user, userToUpdate)
+      const canEdit = Authorizer.canEditUser(user, Survey.getSurveyInfo(survey), userToUpdate)
       setCanEdit(canEdit)
       setValidationEnabled(canEdit)
 
@@ -97,7 +97,7 @@ export const useUserViewState = props => {
 
   const { data: userSaveResponse, error: userSaveError, dispatch: saveUser } = isNewUser
     ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, formObject)
-    : useAsyncPutRequest(`/api/user/${User.getUuid(userToUpdate)}`, R.omit(['email'], formObject))
+    : useAsyncPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, R.omit(['email'], formObject))
 
   // server responses update
   useOnUpdate(() => {
@@ -120,8 +120,7 @@ export const useUserViewState = props => {
   return {
     isNewUser,
     canEdit,
-    canEditGroup: Authorizer.canEditUserGroup(user, { userToUpdate, survey }),
-    // If user hasn't accepted yet (name is null) don't allow to set the name
+    canEditGroup: isNewUser || Authorizer.canEditUserGroup(user, Survey.getSurveyInfo(survey), userToUpdate),
     canEditName,
     loaded,
     name: formObject.name,

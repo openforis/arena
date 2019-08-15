@@ -74,7 +74,7 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/user/:userUuid/name', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
+  app.put('/user/:userUuid/name', async (req, res, next) => {
     try {
       const { user } = req
       const { userUuid, name } = Request.getParams(req)
@@ -87,12 +87,12 @@ module.exports.init = app => {
     }
   })
 
-  app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
+  app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
       const { user } = req
-      const { userUuid, name, groupUuid } = Request.getParams(req)
+      const { surveyId, userUuid, name, groupUuid } = Request.getParams(req)
 
-      await UserService.updateUser(user, userUuid, name, groupUuid)
+      await UserService.updateUser(user, surveyId, userUuid, name, groupUuid)
 
       Response.sendOk(res)
     } catch (err) {

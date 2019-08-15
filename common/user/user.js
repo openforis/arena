@@ -21,11 +21,6 @@ const getEmail = R.prop(keys.email)
 
 const getAuthGroups = R.prop(keys.authGroups)
 
-const getAuthGroupAdmin = R.pipe(
-  getAuthGroups,
-  R.find(AuthGroups.isAdminGroup)
-)
-
 const hasAccepted = R.pipe(
   R.propOr('', keys.name),
   StringUtils.isNotBlank
@@ -47,7 +42,6 @@ module.exports = {
   getName,
   getEmail,
   getAuthGroups,
-  getAuthGroupAdmin,
   hasAccepted,
 
   getRecordPermissions,

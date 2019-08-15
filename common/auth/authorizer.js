@@ -39,11 +39,7 @@ const getSurveyUserGroup = (user, surveyInfo) => {
 }
 
 const getSurveyUserPermissions = (user, surveyInfo) =>
-  R.pipe(
-    getSurveyUserGroup,
-    R.head, // there's only one group per user per survey
-    R.propOr([], keys.permissions)
-  )(user, surveyInfo)
+  R.propOr([], keys.permissions, getSurveyUserGroup(user, surveyInfo))
 
 const hasSurveyPermission = permission => (user, surveyInfo) =>
   user && surveyInfo && (
@@ -95,77 +91,44 @@ const canEditRecord = (user, record) => {
 const canInviteUsers = hasSurveyPermission(permissions.userInvite)
 
 // READ
-const canViewUser = (user, userToEdit) => {
+const canViewUser = (user, surveyInfo, userToView) => {
   if (isSystemAdmin(user)) {
     return true
   }
 
-  const userGroups = User.getAuthGroups(user)
-  const userToEditGroups = User.getAuthGroups(userToEdit)
-
-  const commonGroups = R.innerJoin(
-    (g1, g2) => AuthGroups.getSurveyId(g1) === AuthGroups.getSurveyId(g2),
-    userGroups,
-    userToEditGroups
-  )
-
-  return !R.isEmpty(commonGroups)
+  return !!getSurveyUserGroup(user, surveyInfo) && !!getSurveyUserGroup(userToView, surveyInfo)
 }
 
 // EDIT
-const canEditUser = (user, userToEdit) => {
+const canEditUser = (user, surveyInfo, userToUpdate) => {
   // user is systemAdmin
   if (isSystemAdmin(user)) {
     return true
   }
 
-  // user is userToEdit
-  if (User.getUuid(user) === User.getUuid(userToEdit)) {
+  // user is userToUpdate
+  if (User.getUuid(user) === User.getUuid(userToUpdate)) {
     return true
   }
 
-  // user is surveyAdmin of one of userToEdit's surveys
-  const commonSurveys = R.innerJoin(
-    (g1, g2) => (
-      AuthGroups.getName(g1) === AuthGroups.groupNames.surveyAdmin &&
-      AuthGroups.getSurveyId(g1) === AuthGroups.getSurveyId(g2)
-    ),
-    User.getAuthGroups(user),
-    User.getAuthGroups(userToEdit)
-  )
-
-  return !!commonSurveys.length
+  return isSurveyAdmin(user, surveyInfo) && !!getSurveyUserGroup(user, surveyInfo)
 }
 
-const canEditUserGroup = (user, { userToUpdate, survey }) => {
+const canEditUserGroup = (user, surveyInfo, userToUpdate) => {
   if (isSystemAdmin(user)) {
     return true
   }
 
-  // Check if user has a group in survey
+  // Check if userToUpdate has a group in survey
   const hasRole = !!AuthGroups.getAuthGroups(userToUpdate).find(
-    g => AuthGroups.getSurveyId(g) === Survey.getId(survey)
+    g => AuthGroups.getSurveyId(g) === surveyInfo.id
   )
 
-  const surveyInfo = Survey.getSurveyInfo(survey)
   const sameUser = User.getUuid(user) === User.getUuid(userToUpdate)
 
   return (!sameUser && isSurveyAdmin(user, surveyInfo) && hasRole) ||
     (sameUser && isSurveyAdmin(userToUpdate, surveyInfo))
 }
-
-// const canEditUser__ = (user, userToEdit) => {
-//   const newGroup = await AuthGroupRepository.fetchGroupByUuid(newGroupUuid)
-//   const surveyId = AuthGroups.getSurveyId(newGroup)
-//
-//   // const userGroups = await AuthGroupRepository.fetchUserGroups(userUuid)
-//   // const oldGroup = userGroups.find(g => AuthGroups.getSurveyId(g) === surveyId)
-//
-//   // if (oldGroup) {
-//   await UserRepository.updateUser(userUuid, name)
-//   // await AuthGroupRepository.updateUserGroup(AuthGroups.getUuid(oldGroup), newGroupUuid, userUuid)
-//   await AuthGroupRepository.updateUserGroup(surveyId, userUuid, newGroupUuid)
-// }
 
 module.exports = {
   isSystemAdmin,
