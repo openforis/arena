@@ -7,8 +7,7 @@ import InputChips from '../../../../../commonComponents/form/inputChips'
 
 const SrsEditor = props => {
 
-  const { surveyInfo, validation, readOnly, updateSurveyInfoProp } = props
-  const surveySrs = Survey.getSRS(surveyInfo)
+  const { srs, validation, readOnly, setSrs } = props
 
   const srsLookupFunction = async value => {
     const { data } = await axios.get(
@@ -23,11 +22,11 @@ const SrsEditor = props => {
       itemsLookupFunction={srsLookupFunction}
       itemKeyProp="code"
       itemLabelProp="name"
-      selection={surveySrs}
+      selection={srs}
       dropdownAutocompleteMinChars={3}
       requiredItems={1}
       validation={validation}
-      onChange={srs => updateSurveyInfoProp('srs', srs)}
+      onChange={setSrs}
       readOnly={readOnly}
     />
   )

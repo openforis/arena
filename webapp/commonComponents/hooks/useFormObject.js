@@ -3,20 +3,27 @@ import * as R from 'ramda'
 
 import Validator from '../../../common/validation/validator'
 
-export default (obj, validatorFn) => {
+export default (obj, validatorFn = null, validationObj = {}) => {
   const [state, setState] = useState({
     validation: {},
     validationEnabled: false,
     obj,
   })
 
+  // validation effect
   useEffect(() => {
-    (async () => {
-      const validation = await validatorFn(state.obj)
+    if (validatorFn) {
+      (async () => {
+        const validation = await validatorFn(state.obj)
+        setState(statePrev => ({
+          ...statePrev, validation
+        }))
+      })()
+    } else if (validationObj) {
       setState(statePrev => ({
-        ...statePrev, validation
+        ...statePrev, validation: validationObj
       }))
-    })()
+    }
   }, [state.obj])
 
   const setObjectField = (field, value) => {

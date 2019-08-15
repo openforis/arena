@@ -40,6 +40,7 @@ module.exports = {
     of: 'of',
     required: 'Required',
     reset: 'Reset',
+    save: 'Save',
     srs: 'SRS',
     type: 'Type',
     undefinedName: 'Undefined name',
