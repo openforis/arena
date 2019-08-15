@@ -22,7 +22,6 @@ const FormHeader = props => {
     edit, entry, preview,
     history, canEditDef,
     nodeDefPage, nodeDefPageLabel,
-    showPageNavigation,
     createNodeDef,
   } = props
 

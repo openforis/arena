@@ -2,11 +2,6 @@
 @import "../surveyFormVars";
 
 .survey-form__node-def-nav {
-  &.level0 {
-    position: relative;
-    overflow-y: auto;
-    border: $formBorder;
-  }
 
   button {
     border: none;
@@ -39,5 +34,22 @@
     &.level0 {
       border: $formBorderEdit;
     }
+  }
+}
+
+.survey-form__node-def-nav__btn-toggle {
+  width: 30px;
+  height: 30px;
+}
+
+.survey-form__node-def-nav.level0 {
+  position: relative;
+  overflow-y: auto;
+  border: $formBorder;
+  background-color: $white;
+
+  .survey-form__node-def-nav__btn-toggle {
+    position: absolute;
+    right: 0;
   }
 }
