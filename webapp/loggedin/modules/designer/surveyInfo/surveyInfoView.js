@@ -8,8 +8,8 @@ import useI18n from '../../../../commonComponents/useI18n'
 
 import { Input } from '../../../../commonComponents/form/input'
 import LabelsEditor from '../../../surveyViews/labelsEditor/labelsEditor'
-import LanguagesEditor from './languagesEditor'
-import SrsEditor from './srsEditor'
+import LanguagesEditor from './components/languagesEditor'
+import SrsEditor from './components/srsEditor'
 
 import Survey from '../../../../../common/survey/survey'
 import Authorizer from '../../../../../common/auth/authorizer'

@@ -1,9 +1,9 @@
 import React from 'react'
 import axios from 'axios'
 
-import Survey from '../../../../../common/survey/survey'
+import Survey from '../../../../../../common/survey/survey'
 
-import InputChips from '../../../../commonComponents/form/inputChips'
+import InputChips from '../../../../../commonComponents/form/inputChips'
 
 const SrsEditor = props => {
 

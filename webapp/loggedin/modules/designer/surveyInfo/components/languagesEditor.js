@@ -1,11 +1,11 @@
 import React from 'react'
 
-import useI18n from '../../../../commonComponents/useI18n'
+import useI18n from '../../../../../commonComponents/useI18n'
 
-import InputChips from '../../../../commonComponents/form/inputChips'
+import InputChips from '../../../../../commonComponents/form/inputChips'
 
-import Survey from '../../../../../common/survey/survey'
-import { getLanguageLabel, languages } from '../../../../../common/app/languages'
+import Survey from '../../../../../../common/survey/survey'
+import { getLanguageLabel, languages } from '../../../../../../common/app/languages'
 
 const LanguagesEditor = props => {
 
