@@ -30,7 +30,6 @@ export const useUserViewState = props => {
   const i18n = useI18n()
 
   const isNewUser = !userUuidUrlParam
-
   const surveyId = Survey.getId(survey)
 
   const { data: userToUpdate = {}, dispatch: fetchUser } = useAsyncGetRequest(
@@ -38,12 +37,15 @@ export const useUserViewState = props => {
     {}
   )
 
-  const [canEdit, setCanEdit] = useState(isNewUser)
   const [loaded, setLoaded] = useState(isNewUser)
-  // If user hasn't accepted yet (name is null), can't edit his name
-  const canEditName = canEdit && User.getName(userToUpdate) !== null
-  const validationFn = isNewUser ? UserValidator.validateNewUser : UserValidator.validateUser(canEditName)
 
+  const [editPermissions, setEditPermissions] = useState({
+    user: isNewUser,
+    userName: false,
+    userGroup: false,
+  })
+
+  const validationFn = isNewUser ? UserValidator.validateNewUser : UserValidator.validateUser(editPermissions.name)
   const {
     object: formObject, objectValid,
     setObjectField, setValidationEnabled, getFieldValidation,
@@ -76,30 +78,38 @@ export const useUserViewState = props => {
 
   useEffect(() => {
     if (!R.isEmpty(userToUpdate)) {
-      const { name, email, authGroups } = userToUpdate
+      const { name, email } = userToUpdate
 
       // look for current survey's group in returned user object
       const userGroup = Authorizer.isSystemAdmin(userToUpdate)
         ? User.getAuthGroups(userToUpdate)[0]
-        : authGroups.find(g => AuthGroups.getSurveyId(g) === surveyId)
+        : Authorizer.getSurveyUserGroup(userToUpdate, Survey.getSurveyInfo(survey))
 
-      setName(name || '') // Name can be null if user has not accepted the invitation
+      // Name can be null if user has not accepted the invitation
+      setName(name || '')
       setEmail(email)
       setGroup(userGroup)
 
-      const canEdit = Authorizer.canEditUser(user, Survey.getSurveyInfo(survey), userToUpdate)
-      setCanEdit(canEdit)
-      setValidationEnabled(canEdit)
-
       setLoaded(true)
     }
+  }, [userToUpdate])
+
+  useEffect(() => {
+    const canEdit = Authorizer.canEditUser(user, Survey.getSurveyInfo(survey), userToUpdate)
+    const canEditName = canEdit && User.getName(userToUpdate) !== null
+
+    setEditPermissions({
+      user: canEdit,
+      userName: canEditName,
+      userGroup: isNewUser || Authorizer.canEditUserGroup(user, Survey.getSurveyInfo(survey), userToUpdate),
+    })
+    setValidationEnabled(canEdit)
   }, [userToUpdate])
 
   const { data: userSaveResponse, error: userSaveError, dispatch: saveUser } = isNewUser
     ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, formObject)
     : useAsyncPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, R.omit(['email'], formObject))
 
-  // server responses update
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveResponse) {
@@ -118,11 +128,14 @@ export const useUserViewState = props => {
   }
 
   return {
-    isNewUser,
-    canEdit,
-    canEditGroup: isNewUser || Authorizer.canEditUserGroup(user, Survey.getSurveyInfo(survey), userToUpdate),
-    canEditName,
     loaded,
+
+    isNewUser,
+
+    canEdit: editPermissions.user,
+    canEditName: editPermissions.userName,
+    canEditGroup: editPermissions.userGroup,
+
     name: formObject.name,
     email: formObject.email,
     group: surveyGroups.find(R.propEq('uuid', formObject.groupUuid)),

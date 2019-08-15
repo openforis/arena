@@ -22,13 +22,12 @@ module.exports.init = app => {
       const { surveyId, email, groupUuid } = Request.getParams(req)
       const validation = await UserValidator.validateNewUser(req.body)
 
-      if (Validator.isValidationValid(validation)) {
-        await UserService.inviteUser(user, surveyId, email, groupUuid)
-
-        Response.sendOk(res)
-      } else {
+      if (!Validator.isValidationValid(validation)) {
         throw new SystemError('invalidUser')
       }
+
+      await UserService.inviteUser(user, surveyId, email, groupUuid)
+      Response.sendOk(res)
     } catch (err) {
       next(err)
     }
@@ -89,9 +88,14 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
+      const validation = await UserValidator.validateUser(req.body)
+
+      if (!Validator.isValidationValid(validation)) {
+        throw new SystemError('invalidUser')
+      }
+
       const { user } = req
       const { surveyId, userUuid, name, groupUuid } = Request.getParams(req)
-
       await UserService.updateUser(user, surveyId, userUuid, name, groupUuid)
 
       Response.sendOk(res)

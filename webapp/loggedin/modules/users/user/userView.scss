@@ -19,7 +19,13 @@
     margin: auto;
 
     .form-item {
-        grid-template-columns: .1fr .9fr
+        grid-template-columns: .1fr .9fr;
+
+        .tooltip {
+            &:hover {
+                cursor: default;
+            }
+        }
     }
 
     .btn {
