@@ -92,7 +92,7 @@ const FormEntryActions = (props) => {
       {
         preview
           ? (
-            <Link to={appModuleUri(designerModules.formDesigner)} className="btn btn-s">
+            <Link to={appModuleUri(designerModules.formDesigner)} className="btn-s btn-transparent">
               <span className="icon icon-eye-blocked icon-12px icon-left"/>
               {i18n.t('surveyForm.formEntryActions.closePreview')}
             </Link>
