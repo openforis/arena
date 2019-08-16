@@ -3,15 +3,18 @@ import './dashboardView.scss'
 import React from 'react'
 
 import SurveyInfo from './surveyInfo/surveyInfo'
+import RecordsSummary from './recordsSummary/recordsSummary'
 
-const DashboardView = () => {
-  return (
-    <div className="home-dashboard">
+const DashboardView = () => (
+  <div className="home-dashboard">
 
-      <SurveyInfo/>
+    <SurveyInfo/>
 
-    </div>
-  )
-}
+    <div/>
+
+    <RecordsSummary/>
+
+  </div>
+)
 
 export default DashboardView
