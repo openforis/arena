@@ -2,6 +2,6 @@
 
 .home-dashboard {
   display: grid;
-  grid-template-rows: 120px .8fr auto;
-  grid-template-columns: .6fr .5fr;
+  grid-template-rows: 120px 500px 1fr;
+  grid-template-columns: .6fr .4fr;
 }

@@ -3,5 +3,8 @@
 .home-dashboard__records-summary {
   padding: 10px;
   background-color: $white;
+  display: grid;
+  grid-template-rows: 25px 1fr;
+  position: relative;
   //border: 1px solid $greyBorder;
 }
