@@ -103,34 +103,39 @@ const canViewUser = (user, surveyInfo, userToView) => {
 }
 
 // EDIT
-const canEditUser = (user, surveyInfo, userToUpdate) => {
-  // user is systemAdmin
-  if (isSystemAdmin(user)) {
-    return true
-  }
+const isSurveyUser = (surveyInfo, user) => AuthGroups.getAuthGroups(user).some(
+  g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo)
+)
 
-  // user is userToUpdate
-  if (User.getUuid(user) === User.getUuid(userToUpdate)) {
-    return true
-  }
-
-  // user is surveyAdmin of userToUpdate
-  return isSurveyAdmin(user, surveyInfo) && !!getSurveyUserGroup(userToUpdate, surveyInfo)
-}
-
-const canEditUserGroupAndEmail = (user, surveyInfo, userToUpdate) => {
-  if (isSystemAdmin(user)) {
-    return true
-  }
-
-  // Check if userToUpdate has a group in survey
-  const hasGroup = AuthGroups.getAuthGroups(userToUpdate).some(
-    g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo)
+const canEditUser = (user, surveyInfo, userToUpdate) => (
+  isSystemAdmin(user) ||
+  (User.getUuid(user) === User.getUuid(userToUpdate)) ||
+  (
+    isSurveyAdmin(user, surveyInfo) &&
+    isSurveyUser(surveyInfo, userToUpdate)
   )
+)
+
+const canEditUserEmail = (user, surveyInfo, userToUpdate) => (
+  isSystemAdmin(user) ||
+  (
+    isSurveyAdmin(userToUpdate, surveyInfo) &&
+    isSurveyUser(surveyInfo, userToUpdate)
+  )
+)
+
+const canEditUserGroup = (user, surveyInfo, userToUpdate) => {
   const sameUser = User.getUuid(user) === User.getUuid(userToUpdate)
 
-  return (sameUser && isSurveyAdmin(userToUpdate, surveyInfo)) ||
-    (!sameUser && isSurveyAdmin(user, surveyInfo) && hasGroup)
+  return (
+    !sameUser && (
+      isSystemAdmin(user) ||
+      (
+        isSurveyAdmin(userToUpdate, surveyInfo) &&
+        isSurveyUser(surveyInfo, userToUpdate)
+      )
+    )
+  )
 }
 
 module.exports = {
@@ -151,5 +156,6 @@ module.exports = {
   canInviteUsers,
   canViewUser,
   canEditUser,
-  canEditUserGroupAndEmail,
+  canEditUserEmail,
+  canEditUserGroup,
 }

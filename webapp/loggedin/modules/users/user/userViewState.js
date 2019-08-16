@@ -38,8 +38,9 @@ export const useUserViewState = props => {
 
   // form fields edit permissions
   const [editPermissions, setEditPermissions] = useState({
-    userName: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
-    userGroupAndEmail: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
+    name: false,
+    group: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
+    email: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
   })
 
   // local form object
@@ -88,8 +89,9 @@ export const useUserViewState = props => {
       // set edit form permissions
       const canEdit = Authorizer.canEditUser(user, surveyInfo, userToUpdate)
       setEditPermissions({
-        userName: canEdit && !isUserAcceptPending,
-        userGroupAndEmail: isInvitation || Authorizer.canEditUserGroupAndEmail(user, surveyInfo, userToUpdate),
+        name: canEdit && !isUserAcceptPending,
+        email: isInvitation || Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate),
+        group: isInvitation || Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
       })
 
       enableValidation(canEdit)
@@ -128,9 +130,10 @@ export const useUserViewState = props => {
     isUserAcceptPending,
     isInvitation,
 
-    canEdit: editPermissions.userName || editPermissions.userGroupAndEmail,
-    canEditName: editPermissions.userName,
-    canEditGroupAndEmail: editPermissions.userGroupAndEmail,
+    canEdit: editPermissions.name || editPermissions.group || editPermissions.email,
+    canEditName: editPermissions.name,
+    canEditGroup: editPermissions.group,
+    canEditEmail: editPermissions.email,
 
     name: formObject.name,
     email: formObject.email,

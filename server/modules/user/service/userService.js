@@ -50,22 +50,25 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   }
 }
 
-const updateUser = async (user, surveyId, userUuid, name, email, newGroupUuid) => {
-  // Only system admins can assign systemAdmin group to users
-  const newGroup = await AuthManager.fetchGroupByUuid(newGroupUuid)
-  if (AuthGroups.isSystemAdminGroup(newGroup) && !Authorizer.isSystemAdmin(user)) {
-    throw new UnauthorizedError(User.getName(user))
+const updateUser = async (user, surveyId, userUuid, name, email, groupUuid) => {
+  const survey = await SurveyManager.fetchSurveyById(surveyId)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
+  const groupUserToUpdate = Authorizer.getSurveyUserGroup(userToUpdate, surveyInfo)
+
+  if (AuthGroups.getUuid(groupUserToUpdate) !== groupUuid) {
+    if (!Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)) {
+      throw new UnauthorizedError(User.getName(user))
+    }
   }
 
   // Check if email has changed
-  const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
-  const { email: oldEmail } = userToUpdate
+  const oldEmail = User.getEmail(userToUpdate)
   if (oldEmail !== email) {
-    const survey = await SurveyManager.fetchSurveyById(surveyId)
-    const canEditGroupAndEmail = Authorizer.canEditUserGroupAndEmail(user, Survey.getSurveyInfo(survey), userToUpdate)
+    const canEditEmail = Authorizer.canEditUserEmail(user, Survey.getSurveyInfo(survey), userToUpdate)
 
     // Throw exception if user is not allowed
-    if (!canEditGroupAndEmail) {
+    if (!canEditEmail) {
       throw new UnauthorizedError(User.getName(user))
     }
 
@@ -73,7 +76,7 @@ const updateUser = async (user, surveyId, userUuid, name, email, newGroupUuid) =
     await aws.updateEmail(oldEmail, email)
   }
 
-  await UserManager.updateUser(user, surveyId, userUuid, name, email, newGroup)
+  await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid)
 }
 
 const updateUsername = async (user, userUuid, name) => {

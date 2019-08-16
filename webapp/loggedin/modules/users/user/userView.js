@@ -28,7 +28,7 @@ const UserView = props => {
   const {
     isInvitation, loaded,
     name, email, group, surveyGroups, objectValid,
-    canEdit, canEditName, canEditGroupAndEmail,
+    canEdit, canEditName, canEditGroup, canEditEmail,
     getFieldValidation, setName, setEmail, setGroup,
     sendRequest,
   } = useUserViewState(props)
@@ -49,7 +49,7 @@ const UserView = props => {
       }
       <FormItem label={i18n.t('common.email')}>
         <Input
-          disabled={!canEditGroupAndEmail}
+          disabled={!canEditEmail}
           placeholder={i18n.t('common.email')}
           value={email}
           validation={getFieldValidation('email')}
@@ -57,7 +57,7 @@ const UserView = props => {
       </FormItem>
       <FormItem label={i18n.t('common.group')}>
         <Dropdown
-          disabled={!canEditGroupAndEmail}
+          disabled={!canEditGroup}
           validation={getFieldValidation('groupUuid')}
           placeholder={i18n.t('common.group')}
           items={surveyGroups}

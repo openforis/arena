@@ -51,30 +51,32 @@ const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, 
     return await Promise.all(
       users.map(async u => ({
         ...u,
-        authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(u)) }))
+        authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(u))
+      }))
     )
   })
 
 // ==== UPDATE
 
-const updateUser = async (user, surveyId, userUuid, name, email, newGroup, client = db) => {
+const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, client = db) => {
   await client.tx(async t => {
+    const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
+
     await UserRepository.updateUser(userUuid, name, email, t)
 
-    const newGroupUuid = AuthGroups.getUuid(newGroup)
     if (AuthGroups.isSystemAdminGroup(newGroup)) {
       // if new group is SystemAdmin, delete all user groups and set his new group to SystemAdmin
       await AuthGroupRepository.deleteAllUserGroups(userUuid, t)
-      await AuthGroupRepository.insertUserGroup(newGroupUuid, userUuid, t)
+      await AuthGroupRepository.insertUserGroup(groupUuid, userUuid, t)
     } else {
-      await AuthGroupRepository.updateUserGroup(surveyId, userUuid, newGroupUuid, t)
+      await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
     }
 
     await ActivityLog.log(
       user,
       surveyId,
       ActivityLog.type.userUpdate,
-      { userUuid, name, email, groupUuid: newGroupUuid },
+      { userUuid, name, email, groupUuid },
       t
     )
   })
