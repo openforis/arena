@@ -170,6 +170,7 @@ module.exports = {
   fetchRecordByUuid: RecordManager.fetchRecordByUuid,
   countRecordsBySurveyId: RecordManager.countRecordsBySurveyId,
   fetchRecordsSummaryBySurveyId: RecordManager.fetchRecordsSummaryBySurveyId,
+  fetchRecordCreatedCountsByDates: RecordManager.fetchRecordCreatedCountsByDates,
 
   //update
   updateRecordStep: RecordManager.updateRecordStep,

@@ -11,6 +11,9 @@ const {
 
   compareDesc,
   isValid: fnsIsValid,
+
+  subDays,
+  addDays,
 } = require('date-fns')
 
 const { isBlank } = require('../common/stringUtils')
@@ -97,6 +100,10 @@ module.exports = {
   isValidDate,
   isValidTime,
 
+  format,
   formatTime,
   formatDate,
+
+  subDays,
+  addDays,
 }

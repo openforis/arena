@@ -79,6 +79,18 @@ module.exports.init = app => {
     }
   })
 
+  app.get('/survey/:surveyId/records/created/count', requireRecordListViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, from, to } = Request.getParams(req)
+
+      const counts = await RecordService.fetchRecordCreatedCountsByDates(surveyId, from, to)
+
+      res.json(counts)
+    } catch (err) {
+      next(err)
+    }
+  })
+
   app.get('/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file', requireRecordViewPermission, async (req, res, next) => {
     try {
       const { surveyId, nodeUuid } = Request.getParams(req)
