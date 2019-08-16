@@ -119,7 +119,7 @@ const canEditUser = (user, surveyInfo, userToUpdate) => (
 const canEditUserEmail = (user, surveyInfo, userToUpdate) => (
   isSystemAdmin(user) ||
   (
-    isSurveyAdmin(userToUpdate, surveyInfo) &&
+    isSurveyAdmin(user, surveyInfo) &&
     isSurveyUser(surveyInfo, userToUpdate)
   )
 )
@@ -131,7 +131,7 @@ const canEditUserGroup = (user, surveyInfo, userToUpdate) => {
     !sameUser && (
       isSystemAdmin(user) ||
       (
-        isSurveyAdmin(userToUpdate, surveyInfo) &&
+        isSurveyAdmin(user, surveyInfo) &&
         isSurveyUser(surveyInfo, userToUpdate)
       )
     )

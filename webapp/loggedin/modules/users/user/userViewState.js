@@ -78,20 +78,17 @@ export const useUserViewState = props => {
 
   useEffect(() => {
     if (loaded) {
-      const { name, email } = userToUpdate
-
       // set form object field from server side response
-      // Name can be null if user has not accepted the invitation
-      setName(isUserAcceptPending ? undefined : name)
-      setEmail(email)
+      setName(isUserAcceptPending ? undefined : User.getName(userToUpdate)) // Name can be null if user has not accepted the invitation
+      setEmail(User.getEmail(userToUpdate))
       setGroup(Authorizer.getSurveyUserGroup(userToUpdate, surveyInfo))
 
       // set edit form permissions
       const canEdit = Authorizer.canEditUser(user, surveyInfo, userToUpdate)
       setEditPermissions({
-        name: canEdit && !isUserAcceptPending,
-        email: isInvitation || Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate),
-        group: isInvitation || Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
+        name: !isUserAcceptPending && canEdit,
+        email: !isUserAcceptPending && Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate),
+        group: !isUserAcceptPending && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
       })
 
       enableValidation(canEdit)
