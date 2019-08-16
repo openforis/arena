@@ -26,6 +26,9 @@ const isSurveyAdmin = (user, surveyInfo) =>
 // ======
 
 const getSurveyUserGroup = (user, surveyInfo) => {
+  if (isSystemAdmin(user))
+    return R.pipe(User.getAuthGroups, R.head)(user)
+
   const userGroups = getAuthGroups(user)
   const surveyGroups = getAuthGroups(surveyInfo)
 

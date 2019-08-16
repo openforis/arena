@@ -47,10 +47,7 @@ const UsersRow = props => {
   const { row: userListItem, user, surveyInfo } = props
   const i18n = useI18n()
 
-  const authGroup = Authorizer.isSystemAdmin(userListItem)
-    ? User.getAuthGroups(userListItem)[0]
-    : Authorizer.getSurveyUserGroup(userListItem, surveyInfo)
-
+  const authGroup = Authorizer.getSurveyUserGroup(userListItem, surveyInfo)
   const canEditUser = Authorizer.canEditUser(user, surveyInfo, userListItem)
 
   return (

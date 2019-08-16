@@ -2,20 +2,22 @@ import './userView.scss'
 
 import React from 'react'
 import * as R from 'ramda'
-
 import { connect } from 'react-redux'
+
+import { getUrlParam } from '../../../../utils/routerUtils'
 
 import useI18n from '../../../../commonComponents/useI18n.js'
 
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
-import * as SurveyState from '../../../../survey/surveyState'
 
 import Survey from '../../../../../common/survey/survey'
 import User from '../../../../../common/user/user'
 import Authorizer from '../../../../../common/auth/authorizer'
 
 import * as AppState from '../../../../app/appState'
+import * as SurveyState from '../../../../survey/surveyState'
+
 import { showAppLoader, hideAppLoader, showNotificationMessage } from '../../../../app/actions'
 
 import { useUserViewState } from './userViewState'
@@ -24,20 +26,15 @@ const UserView = props => {
   const i18n = useI18n()
 
   const {
-    isInvitation, loaded, name, email, group, surveyGroups, objectValid, canEdit, canEditName, canEditGroupAndEmail,
-    getFieldValidation, setName, setEmail, setGroup, sendRequest
+    isInvitation, loaded,
+    name, email, group, surveyGroups, objectValid,
+    canEdit, canEditName, canEditGroupAndEmail,
+    getFieldValidation, setName, setEmail, setGroup,
+    sendRequest,
   } = useUserViewState(props)
 
   return loaded && (
     <div className="form user">
-      <FormItem label={i18n.t('common.email')}>
-        <Input
-          disabled={!canEditGroupAndEmail}
-          placeholder={i18n.t('common.email')}
-          value={email}
-          validation={getFieldValidation('email')}
-          onChange={setEmail}/>
-      </FormItem>
       {
         !isInvitation && (
           <FormItem label={i18n.t('common.name')}>
@@ -50,6 +47,14 @@ const UserView = props => {
           </FormItem>
         )
       }
+      <FormItem label={i18n.t('common.email')}>
+        <Input
+          disabled={!canEditGroupAndEmail}
+          placeholder={i18n.t('common.email')}
+          value={email}
+          validation={getFieldValidation('email')}
+          onChange={setEmail}/>
+      </FormItem>
       <FormItem label={i18n.t('common.group')}>
         <Dropdown
           disabled={!canEditGroupAndEmail}
@@ -77,19 +82,19 @@ const UserView = props => {
 }
 
 const mapStateToProps = (state, { match }) => {
-  const survey = SurveyState.getSurvey(state)
+  const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
 
-  const groups = R.concat(
-    Authorizer.isSystemAdmin(user) ? User.getAuthGroups(user) : [],
-    Survey.getAuthGroups(Survey.getSurveyInfo(survey))
-  )
+  const groups = R.when(
+    R.always(Authorizer.isSystemAdmin(user)),
+    R.concat(User.getAuthGroups(user))
+  )(Survey.getAuthGroups(surveyInfo))
 
   return {
     user,
-    survey,
+    surveyInfo,
     groups,
-    userUuidUrlParam: R.path(['params', 'userUuid'], match),
+    userUuidUrlParam: getUrlParam('userUuid')(match),
   }
 }
 

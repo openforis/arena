@@ -19,14 +19,21 @@ export const initApp = () => async dispatch => {
   let survey = null
 
   //get jwt token to check if user is already logged in
-  const token = await CognitoAuth.getJwtToken()
-  if (token) {
-    const userSurvey = await getUserSurvey()
-    user = userSurvey.user
-    survey = userSurvey.survey
+  try {
+
+    const token = await CognitoAuth.getJwtToken()
+    if (token) {
+      const userSurvey = await getUserSurvey()
+      user = userSurvey.user
+      survey = userSurvey.survey
+    }
+
+    dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey })
+  } catch (e) {
+    dispatch({ type: appPropsChange, i18n, })
+    dispatch(throwSystemError(e.message))
   }
 
-  dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey })
 }
 
 // ====== USER

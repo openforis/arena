@@ -20,7 +20,7 @@ module.exports.init = app => {
       const { user } = req
 
       const { surveyId, email, groupUuid } = Request.getParams(req)
-      const validation = await UserValidator.validateNewUser(req.body)
+      const validation = await UserValidator.validateInvitation(req.body)
 
       if (!Validator.isValidationValid(validation)) {
         throw new SystemError('invalidUser')
