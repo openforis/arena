@@ -114,7 +114,7 @@ const canEditUser = (user, surveyInfo, userToUpdate) => {
   return isSurveyAdmin(user, surveyInfo) && !!getSurveyUserGroup(user, surveyInfo)
 }
 
-const canEditUserGroup = (user, surveyInfo, userToUpdate) => {
+const canEditUserGroupAndEmail = (user, surveyInfo, userToUpdate) => {
   if (isSystemAdmin(user)) {
     return true
   }
@@ -148,5 +148,5 @@ module.exports = {
   canInviteUsers,
   canViewUser,
   canEditUser,
-  canEditUserGroup,
+  canEditUserGroupAndEmail,
 }

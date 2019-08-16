@@ -29,7 +29,7 @@ export const useUserViewState = props => {
 
   const i18n = useI18n()
 
-  const isNewUser = !userUuidUrlParam
+  const isInvitation = !userUuidUrlParam
   const surveyId = Survey.getId(survey)
 
   const { data: userToUpdate = {}, dispatch: fetchUser } = useAsyncGetRequest(
@@ -37,12 +37,13 @@ export const useUserViewState = props => {
     {}
   )
 
-  const [loaded, setLoaded] = useState(isNewUser)
+  const isNewUser = !userToUpdate.name
+  const [loaded, setLoaded] = useState(isInvitation)
 
   const [editPermissions, setEditPermissions] = useState({
     user: isNewUser,
     userName: false,
-    userGroup: false,
+    userGroupAndEmail: false,
   })
 
   const validationFn = isNewUser ? UserValidator.validateNewUser : UserValidator.validateUser(editPermissions.userName)
@@ -71,7 +72,7 @@ export const useUserViewState = props => {
   }
 
   useEffect(() => {
-    if (!isNewUser) {
+    if (!isInvitation) {
       fetchUser()
     }
   }, [])
@@ -86,7 +87,7 @@ export const useUserViewState = props => {
         : Authorizer.getSurveyUserGroup(userToUpdate, Survey.getSurveyInfo(survey))
 
       // Name can be null if user has not accepted the invitation
-      setName(name)
+      setName(isNewUser ? undefined : name)
       setEmail(email)
       setGroup(userGroup)
 
@@ -103,20 +104,24 @@ export const useUserViewState = props => {
       setEditPermissions({
         user: canEdit,
         userName: canEditName,
-        userGroup: isNewUser || Authorizer.canEditUserGroup(user, Survey.getSurveyInfo(survey), userToUpdate),
+        userGroupAndEmail: isInvitation || Authorizer.canEditUserGroupAndEmail(user, Survey.getSurveyInfo(survey), userToUpdate),
       })
     }
   }, [loaded])
 
-  const { data: userSaveResponse, error: userSaveError, dispatch: saveUser } = isNewUser
-    ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, formObject)
-    : useAsyncPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, R.omit(['email'], formObject))
+  const {
+    dispatch: saveUser,
+    data: userSaveResponse,
+    error: userSaveError,
+  } = isInvitation
+    ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, R.omit(['name'], formObject))
+    : useAsyncPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, formObject)
 
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveResponse) {
       history.push(appModuleUri(userModules.users))
-      if (isNewUser) {
+      if (isInvitation) {
         showNotificationMessage('usersView.inviteUserConfirmation', { email: formObject.email })
       } else {
         showNotificationMessage('usersView.updateUserConfirmation', { name: formObject.name })
@@ -133,10 +138,11 @@ export const useUserViewState = props => {
     loaded,
 
     isNewUser,
+    isInvitation,
 
     canEdit: editPermissions.user,
     canEditName: editPermissions.userName,
-    canEditGroup: editPermissions.userGroup,
+    canEditGroupAndEmail: editPermissions.userGroupAndEmail,
 
     name: formObject.name,
     email: formObject.email,

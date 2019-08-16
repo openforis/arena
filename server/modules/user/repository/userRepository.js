@@ -68,14 +68,13 @@ const fetchUserByEmail = async (email, client = db) =>
 
 // ==== UPDATE
 
-const updateUser = async (uuid, name, client = db) =>
+const updateUser = async (uuid, name, email, client = db) =>
   await client.one(`
     UPDATE "user"
-    SET
-    name = $1
-    WHERE uuid = $2
+    SET name = $1, email = $2
+    WHERE uuid = $3
     RETURNING *`,
-    [name, uuid],
+    [name, email, uuid],
     camelize)
 
 const updateUsername = async (user, name, client = db) =>

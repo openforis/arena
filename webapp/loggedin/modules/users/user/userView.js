@@ -24,7 +24,7 @@ const UserView = props => {
   const i18n = useI18n()
 
   const {
-    isNewUser, loaded, name, email, group, surveyGroups, objectValid, canEdit, canEditName, canEditGroup,
+    isInvitation, loaded, name, email, group, surveyGroups, objectValid, canEdit, canEditName, canEditGroupAndEmail,
     getFieldValidation, setName, setEmail, setGroup, sendRequest
   } = useUserViewState(props)
 
@@ -32,14 +32,14 @@ const UserView = props => {
     <div className="form user">
       <FormItem label={i18n.t('common.email')}>
         <Input
-          disabled={!canEdit}
+          disabled={!canEditGroupAndEmail}
           placeholder={i18n.t('common.email')}
           value={email}
           validation={getFieldValidation('email')}
           onChange={setEmail}/>
       </FormItem>
       {
-        !isNewUser && (
+        !isInvitation && (
           <FormItem label={i18n.t('common.name')}>
             <Input
               disabled={!canEditName}
@@ -52,7 +52,7 @@ const UserView = props => {
       }
       <FormItem label={i18n.t('common.group')}>
         <Dropdown
-          disabled={!canEditGroup}
+          disabled={!canEditGroupAndEmail}
           validation={getFieldValidation('groupUuid')}
           placeholder={i18n.t('common.group')}
           items={surveyGroups}
@@ -68,7 +68,7 @@ const UserView = props => {
                   aria-disabled={!objectValid}
                   onClick={sendRequest}>
             <span className="icon icon-floppy-disk icon-left icon-12px"/>
-            {isNewUser ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
+            {isInvitation ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
           </button>
         )
       }

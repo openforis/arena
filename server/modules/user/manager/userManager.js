@@ -57,9 +57,9 @@ const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, 
 
 // ==== UPDATE
 
-const updateUser = async (user, surveyId, userUuid, name, newGroup, client = db) => {
+const updateUser = async (user, surveyId, userUuid, name, email, newGroup, client = db) => {
   await client.tx(async t => {
-    await UserRepository.updateUser(userUuid, name, t)
+    await UserRepository.updateUser(userUuid, name, email, t)
 
     const newGroupUuid = AuthGroups.getUuid(newGroup)
     if (AuthGroups.isSystemAdminGroup(newGroup)) {

@@ -2,7 +2,9 @@ const aws = require('../../../system/aws')
 
 const UserManager = require('../manager/userManager')
 const AuthManager = require('../../auth/manager/authManager')
+const SurveyManager = require('../../survey/manager/surveyManager')
 
+const Survey = require('../../../../common/survey/survey')
 const User = require('../../../../common/user/user')
 const AuthGroups = require('../../../../common/auth/authGroups')
 const Authorizer = require('../../../../common/auth/authorizer')
@@ -48,14 +50,30 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   }
 }
 
-const updateUser = async (user, surveyId, userUuid, name, newGroupUuid) => {
+const updateUser = async (user, surveyId, userUuid, name, email, newGroupUuid) => {
+  // Only system admins can assign systemAdmin group to users
   const newGroup = await AuthManager.fetchGroupByUuid(newGroupUuid)
-
   if (AuthGroups.isSystemAdminGroup(newGroup) && !Authorizer.isSystemAdmin(user)) {
     throw new UnauthorizedError(User.getName(user))
   }
 
-  await UserManager.updateUser(user, surveyId, userUuid, name, newGroup)
+  // Check if email has changed
+  const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
+  const { email: oldEmail } = userToUpdate
+  if (oldEmail !== email) {
+    const survey = await SurveyManager.fetchSurveyById(surveyId)
+    const canEditGroupAndEmail = Authorizer.canEditUserGroupAndEmail(user, Survey.getSurveyInfo(survey), userToUpdate)
+
+    // Throw exception if user is not allowed
+    if (!canEditGroupAndEmail) {
+      throw new UnauthorizedError(User.getName(user))
+    }
+
+    // Send aws a email update request if changed
+    await aws.updateEmail(oldEmail, email)
+  }
+
+  await UserManager.updateUser(user, surveyId, userUuid, name, email, newGroup)
 }
 
 const updateUsername = async (user, userUuid, name) => {

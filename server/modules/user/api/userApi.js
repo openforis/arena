@@ -96,8 +96,8 @@ module.exports.init = app => {
       }
 
       const { user } = req
-      const { surveyId, userUuid, name, groupUuid } = Request.getParams(req)
-      await UserService.updateUser(user, surveyId, userUuid, name, groupUuid)
+      const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(req)
+      await UserService.updateUser(user, surveyId, userUuid, name, email, groupUuid)
 
       Response.sendOk(res)
     } catch (err) {
