@@ -108,11 +108,13 @@ const isSurveyUser = (surveyInfo, user) => AuthGroups.getAuthGroups(user).some(
 )
 
 const canEditUser = (user, surveyInfo, userToUpdate) => (
-  isSystemAdmin(user) ||
-  (User.getUuid(user) === User.getUuid(userToUpdate)) ||
-  (
-    isSurveyAdmin(user, surveyInfo) &&
-    isSurveyUser(surveyInfo, userToUpdate)
+  User.hasAccepted(userToUpdate) && (
+    isSystemAdmin(user) ||
+    User.getUuid(user) === User.getUuid(userToUpdate) ||
+    (
+      isSurveyAdmin(user, surveyInfo) &&
+      isSurveyUser(surveyInfo, userToUpdate)
+    )
   )
 )
 
