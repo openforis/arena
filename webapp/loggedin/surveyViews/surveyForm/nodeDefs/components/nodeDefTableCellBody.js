@@ -9,6 +9,7 @@ import useI18n from '../../../../../commonComponents/useI18n'
 
 import Survey from '../../../../../../common/survey/survey'
 import NodeDef from '../../../../../../common/survey/nodeDef'
+import NodeDefLayout from '../../../../../../common/survey/nodeDefLayout'
 import CategoryItem from '../../../../../../common/survey/categoryItem'
 import Node from '../../../../../../common/record/node'
 import NodeRefData from '../../../../../../common/record/nodeRefData'
@@ -89,7 +90,7 @@ const NodeDefTableCellBody = props => {
       edit={edit}>
 
       {
-        NodeDef.isMultiple(nodeDef) || NodeDef.isCode(nodeDef)
+        NodeDef.isMultiple(nodeDef) || (NodeDef.isCode(nodeDef) && NodeDefLayout.isRenderCheckbox(nodeDef))
           ? (
             <NodeDefMultipleTableCell
               {...props}
