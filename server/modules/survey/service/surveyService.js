@@ -8,15 +8,6 @@ const SurveyManager = require('../manager/surveyManager')
 const JobManager = require('../../../job/jobManager')
 const SurveyPublishJob = require('./publish/surveyPublishJob')
 
-const updateSurveyProp = async (user, surveyId, key, value) => {
-  const survey = await SurveyManager.updateSurveyProp(user, surveyId, key, value)
-
-  return R.pipe(
-    Survey.getSurveyInfo,
-    Validator.getValidation
-  )(survey)
-}
-
 const startPublishJob = (user, surveyId) => {
   const job = new SurveyPublishJob({ user, surveyId })
 
@@ -36,7 +27,7 @@ module.exports = {
   fetchSurveyAndNodeDefsBySurveyId: SurveyManager.fetchSurveyAndNodeDefsBySurveyId,
 
   // UPDATE
-  updateSurveyProp,
+  updateSurveyProps: SurveyManager.updateSurveyProps,
 
   // DELETE
   deleteSurvey: SurveyManager.deleteSurvey,

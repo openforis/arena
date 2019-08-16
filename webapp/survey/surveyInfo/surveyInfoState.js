@@ -1,19 +1,14 @@
 import * as R from 'ramda'
 
+import Survey from '../../../common/survey/survey'
+import Validator from '../../../common/validation/validator'
+
 /**
  * ======
  * UPDATE
  * ======
  */
 
-export const markDraft = R.assoc('draft', true)
+export const markDraft = Survey.markDraft
 
-export const assocSurveyInfoProp = (key, value) => R.pipe(
-  R.assocPath(['props', key], value),
-  // reset validation
-  R.dissocPath(['validation', 'fields', key]),
-  //set as draft
-  markDraft,
-)
-
-export const assocSurveyInfoValidation = (validation) => R.assoc('validation', validation)
+export const assocValidation = Validator.assocValidation

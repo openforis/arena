@@ -60,17 +60,16 @@ module.exports.init = app => {
 
   // ==== UPDATE
 
-  app.put('/survey/:surveyId/prop', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+  app.put('/survey/:surveyId/info', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { body } = req
-      const { key, value } = body
 
       const surveyId = Request.getRestParam(req, 'surveyId')
 
-      const validation = await SurveyService.updateSurveyProp(user, surveyId, key, value)
+      const survey = await SurveyService.updateSurveyProps(user, surveyId, body)
 
-      res.json({ validation })
+      res.json(survey)
     } catch (err) {
       next(err)
     }
