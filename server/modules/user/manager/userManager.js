@@ -74,7 +74,7 @@ const updateUser = async (user, surveyId, userUuid, name, email, newGroup, clien
       user,
       surveyId,
       ActivityLog.type.userUpdate,
-      { userUuid, groupUuid: newGroupUuid },
+      { userUuid, name, email, groupUuid: newGroupUuid },
       t
     )
   })

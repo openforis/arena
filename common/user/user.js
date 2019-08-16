@@ -1,6 +1,5 @@
 const R = require('ramda')
 const StringUtils = require('../stringUtils')
-const AuthGroups = require('../auth/authGroups')
 
 const keys = {
   uuid: 'uuid',

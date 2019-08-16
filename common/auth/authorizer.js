@@ -1,7 +1,7 @@
 const R = require('ramda')
 
-const Record = require('../record/record')
 const Survey = require('../survey/survey')
+const Record = require('../record/record')
 const User = require('../user/user')
 const AuthGroups = require('./authGroups')
 
@@ -111,7 +111,8 @@ const canEditUser = (user, surveyInfo, userToUpdate) => {
     return true
   }
 
-  return isSurveyAdmin(user, surveyInfo) && !!getSurveyUserGroup(user, surveyInfo)
+  // user is surveyAdmin of userToUpdate
+  return isSurveyAdmin(user, surveyInfo) && !!getSurveyUserGroup(userToUpdate, surveyInfo)
 }
 
 const canEditUserGroupAndEmail = (user, surveyInfo, userToUpdate) => {
@@ -120,14 +121,13 @@ const canEditUserGroupAndEmail = (user, surveyInfo, userToUpdate) => {
   }
 
   // Check if userToUpdate has a group in survey
-  const hasRole = !!AuthGroups.getAuthGroups(userToUpdate).find(
-    g => AuthGroups.getSurveyId(g) === surveyInfo.id
+  const hasGroup = AuthGroups.getAuthGroups(userToUpdate).some(
+    g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo)
   )
-
   const sameUser = User.getUuid(user) === User.getUuid(userToUpdate)
 
-  return (!sameUser && isSurveyAdmin(user, surveyInfo) && hasRole) ||
-    (sameUser && isSurveyAdmin(userToUpdate, surveyInfo))
+  return (sameUser && isSurveyAdmin(userToUpdate, surveyInfo)) ||
+    (!sameUser && isSurveyAdmin(user, surveyInfo) && hasGroup)
 }
 
 module.exports = {
