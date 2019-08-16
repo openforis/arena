@@ -11,7 +11,7 @@ const Validator = require('../../../../../../common/validation/validator')
 const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 const TaxonomyImportManager = require('../../../../taxonomy/manager/taxonomyImportManager')
 
-const CSVParser = require('../../../../../../common/file/csvParser')
+const CSVParser = require('../../../../../utils/file/csvParser')
 
 const speciesFilesPath = 'species/'
 

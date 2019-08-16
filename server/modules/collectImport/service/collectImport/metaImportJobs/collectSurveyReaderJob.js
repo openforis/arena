@@ -1,5 +1,5 @@
-const FileZip = require('../../../../../../common/file/fileZip')
-const FileXml = require('../../../../../../common/file/fileXml')
+const FileZip = require('../../../../../utils/file/fileZip')
+const FileXml = require('../../../../../utils/file/fileXml')
 
 const Job = require('../../../../../job/job')
 

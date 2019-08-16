@@ -2,6 +2,9 @@ const DBMigrate = require('db-migrate')
 const path = require('path')
 const R = require('ramda')
 
+const Log = require('../../log/log')
+const logger = Log.getLogger('DBMigrator')
+
 const db = require('../db')
 const config = require('./migrationConfig')
 
@@ -44,7 +47,7 @@ const migrateSchema = async (schema = publicSchema) => {
 }
 
 const migrateSurveySchema = async (surveyId) => {
-  console.log(`starting db migrations for survey ${surveyId}`)
+  logger.info(`starting db migrations for survey ${surveyId}`)
 
   const schema = getSurveyDBSchema(surveyId)
 
@@ -54,25 +57,25 @@ const migrateSurveySchema = async (surveyId) => {
 const migrateSurveySchemas = async () => {
   const surveyIds = await fetchAllSurveyIds()
 
-  console.log(`starting data schemas migrations for ${surveyIds.length} surveys`)
+  logger.info(`starting data schemas migrations for ${surveyIds.length} surveys`)
 
   for (let i = 0; i < surveyIds.length; i++) {
     await migrateSurveySchema(surveyIds[i])
   }
-  console.log(`data schemas migrations completed`)
+  logger.info(`data schemas migrations completed`)
 }
 
 const migrateAll = async () => {
   try {
-    console.log('running database migrations')
+    logger.info('running database migrations')
 
     await migrateSchema()
 
     await migrateSurveySchemas()
 
-    console.log('database migrations completed')
+    logger.info('database migrations completed')
   } catch (err) {
-    console.log('error running database migrations', err)
+    logger.error(`error running database migrations: ${err.toString()}`)
   }
 }
 

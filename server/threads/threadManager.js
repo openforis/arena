@@ -1,5 +1,7 @@
 const { Worker } = require('worker_threads')
 
+const Log = require('../log/log')
+
 const WebSocket = require('../utils/webSocket')
 
 const User = require('../../common/user/user')
@@ -20,12 +22,14 @@ class ThreadManager {
     this.worker.on('message', this.messageHandlerWrapper.bind(this)(messageHandler))
 
     this.worker.on('exit', () => {
-      console.log(`thread ${this.threadId} ended`)
+      this.logger.debug('thread ended')
       if (exitHandler)
         exitHandler()
     })
 
-    console.log(`thread ${this.threadId} created`)
+    this.logger = Log.getLogger(`ThreadManager - thread ID: ${this.threadId}`)
+
+    this.logger.debug('thread created')
   }
 
   messageHandlerWrapper (messageHandler) {

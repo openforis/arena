@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const BatchPersister = require('../../../../../db/batchPersister')
 
-const FileXml = require('../../../../../../common/file/fileXml')
+const FileXml = require('../../../../../utils/file/fileXml')
 const Queue = require('../../../../../../common/queue')
 
 const Survey = require('../../../../../../common/survey/survey')

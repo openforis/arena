@@ -1,12 +1,14 @@
 const R = require('ramda')
-
 const StreamZip = require('node-stream-zip')
+
+const Log = require('../../log/log')
 
 class FileZip {
 
   constructor (file) {
     this.file = file
     this.streamZip = null // to be initialized in init method
+    this.logger = Log.getLogger('FileZip')
   }
 
   async init () {
@@ -21,7 +23,10 @@ class FileZip {
       })
 
       // Handle errors
-      streamZip.on('error', err => console.log(err) || reject(err))
+      streamZip.on('error', err => {
+        this.logger.error(`Error initializing stream: ${err}`)
+        reject(err)
+      })
 
       this.streamZip = streamZip
     })

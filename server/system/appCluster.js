@@ -4,6 +4,8 @@ const compression = require('compression')
 const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 
+const Log = require('../log/log')
+
 const headerMiddleware = require('./middleware/headerMiddleware')
 const jwtMiddleware = require('./middleware/jwtMiddleware')
 const errorMiddleware = require('./middleware/errorMiddleware')
@@ -14,6 +16,9 @@ const RecordPreviewCleanup = require('./recordPreviewCleanup')
 const ExpiredJwtTokensCleanup = require('./expiredJwtTokensCleanup')
 
 module.exports = async () => {
+  const logger = Log.getLogger('AppCluster')
+
+  logger.info(`server initialization start`)
 
   const app = express()
 
@@ -52,7 +57,7 @@ module.exports = async () => {
   const httpServerPort = process.env.PORT || '9090'
 
   const server = app.listen(httpServerPort, () => {
-    console.log('server listening on port', httpServerPort)
+    logger.info(`server initialization end - listening on port ${httpServerPort}`)
   })
 
   // ====== socket middleware
