@@ -34,8 +34,9 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
 
   const dbUser = await UserManager.fetchUserByEmail(email)
   if (dbUser) {
+    const survey = await SurveyManager.fetchSurveyById(surveyId)
     const newUserGroups = User.getAuthGroups(dbUser)
-    const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyId(g) === surveyId)
+    const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(Survey.getSurveyInfo(survey)))
 
     if (hasRoleInSurvey) {
       throw new SystemError('userHasRole')
