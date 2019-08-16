@@ -40,7 +40,7 @@ const LabelRow = ({ label = '', lang, onChange, readOnly, showLanguageBadge = tr
 
 const LabelsEditor = props => {
 
-  const [ preview, setPreview ] = useState(true)
+  const [preview, setPreview] = useState(true)
 
   const i18n = useI18n()
 
@@ -115,8 +115,8 @@ LabelsEditor.defaultProps = {
   onChange: null,
 }
 
-const mapStateToProps = state => ({
-  languages: Survey.getLanguages(SurveyState.getSurveyInfo(state))
+const mapStateToProps = (state, props) => ({
+  languages: props.languages || Survey.getLanguages(SurveyState.getSurveyInfo(state))
 })
 
 export default connect(mapStateToProps)(LabelsEditor)

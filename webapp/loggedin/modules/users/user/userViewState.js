@@ -49,7 +49,7 @@ export const useUserViewState = props => {
   const validationFn = isNewUser ? UserValidator.validateNewUser : UserValidator.validateUser(editPermissions.userName)
   const {
     object: formObject, objectValid,
-    setObjectField, setValidationEnabled, getFieldValidation,
+    setObjectField, enableValidation, getFieldValidation,
   } = useFormObject({ name: '', email: '', groupUuid: null }, validationFn, false)
 
   const [surveyGroups, setSurveyGroups] = useState([])
@@ -100,7 +100,7 @@ export const useUserViewState = props => {
       const canEdit = Authorizer.canEditUser(user, Survey.getSurveyInfo(survey), userToUpdate)
       const canEditName = canEdit && User.getName(userToUpdate) !== null
 
-      setValidationEnabled(canEdit)
+      enableValidation(canEdit)
       setEditPermissions({
         user: canEdit,
         userName: canEditName,

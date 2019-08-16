@@ -27,6 +27,13 @@ export const keysNotification = {
   messageKey: 'messageKey',
   messageParams: 'messageParams',
   visible: 'visible',
+  severity: 'severity',
+}
+
+export const notificationSeverity = {
+  info: 'info',
+  warning: 'warning',
+  error: 'error',
 }
 
 export const getState = R.prop('app')
@@ -138,6 +145,7 @@ export const isLoaderVisible = R.pipe(getState, R.propEq(keys.loaderVisible, tru
 
 export const getNotificationMessageKey = R.pipe(getState, R.pathOr(null, [keys.notification, keysNotification.messageKey]))
 export const getNotificationMessageParams = R.pipe(getState, R.pathOr({}, [keys.notification, keysNotification.messageParams]))
+export const getNotificationSeverity = R.pipe(getState, R.pathOr(notificationSeverity.info, [keys.notification, keysNotification.severity]))
 export const isNotificationVisible = R.pipe(getState, R.pathEq([keys.notification, keysNotification.visible], true))
 
 export const showNotification = notification => R.pipe(

@@ -10,7 +10,10 @@ import NodeDef from '../../../common/survey/nodeDef'
 import NodeDefLayout from '../../../common/survey/nodeDefLayout'
 import NodeDefValidations from '../../../common/survey/nodeDefValidations'
 
+import * as AppState from '../../app/appState'
 import * as SurveyState from '../surveyState'
+
+import { showNotificationMessage } from '../../app/actions'
 
 export const nodeDefCreate = 'survey/nodeDef/create'
 export const nodeDefPropsUpdate = 'survey/nodeDef/props/update'
@@ -67,6 +70,9 @@ export const createNodeDef = (parentUuid, type, props) => async (dispatch, getSt
 // ==== UPDATE
 
 export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => async (dispatch, getState) => {
+  if (!_checkCanChangeProp(dispatch, nodeDef, key, value))
+    return
+
   const survey = SurveyState.getSurvey(getState())
   const parentNodeDef = Survey.getNodeDefParent(nodeDef)(survey)
 
@@ -86,7 +92,6 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
     if (isRenderForm && NodeDefLayout.isDisplayInParentPage(nodeDef)) {
       props[NodeDefLayout.nodeDefLayoutProps.pageUuid] = uuidv4()
     }
-
   } else if (key === NodeDef.propKeys.multiple) {
     // If setting "multiple", reset validations required or count
     propsAdvanced[NodeDef.propKeys.validations] = value
@@ -104,6 +109,15 @@ export const putNodeDefProp = (nodeDef, key, value = null, advanced = false) => 
   })
 
   dispatch(_putNodeDefPropsDebounced(nodeDef, key, props, propsAdvanced))
+}
+
+const _checkCanChangeProp = (dispatch, nodeDef, key, value) => {
+  if (key === NodeDef.propKeys.multiple && value && NodeDef.hasDefaultValues(nodeDef)) {
+    // nodeDef has default values, cannot change into multiple
+    dispatch(showNotificationMessage('nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues', null, AppState.notificationSeverity.warning))
+    return false
+  }
+  return true
 }
 
 // ==== DELETE

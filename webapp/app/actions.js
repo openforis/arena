@@ -4,6 +4,7 @@ import i18nFactory from '../../common/i18n/i18nFactory'
 import * as CognitoAuth from './cognitoAuth'
 
 import * as AppState from './appState'
+import { cancelDebouncedAction, debounceAction } from '../utils/reduxUtils'
 
 export const appPropsChange = 'app/props/change'
 export const appUserLogout = 'app/user/logout'
@@ -109,12 +110,20 @@ export const activeJobUpdate = job => (dispatch, getState) => {
 export const appNotificationShow = 'app/notification/show'
 export const appNotificationHide = 'app/notification/hide'
 
-export const showNotificationMessage = (messageKey, messageParams) => dispatch => dispatch({
-  type: appNotificationShow,
-  notification: {
-    [AppState.keysNotification.messageKey]: messageKey,
-    [AppState.keysNotification.messageParams]: messageParams,
-  }
-})
+export const showNotificationMessage = (messageKey, messageParams, severity) => dispatch => {
+  dispatch({
+    type: appNotificationShow,
+    notification: {
+      [AppState.keysNotification.messageKey]: messageKey,
+      [AppState.keysNotification.messageParams]: messageParams,
+      [AppState.keysNotification.severity]: severity,
+    }
+  })
 
-export const hideNotification = () => dispatch => dispatch({ type: appNotificationHide })
+  dispatch(debounceAction({ type: appNotificationHide }, appNotificationHide, 10000))
+}
+
+export const hideNotification = () => dispatch => {
+  dispatch(cancelDebouncedAction(appNotificationHide))
+  dispatch({ type: appNotificationHide })
+}

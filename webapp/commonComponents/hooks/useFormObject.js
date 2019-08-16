@@ -3,19 +3,21 @@ import * as R from 'ramda'
 
 import Validator from '../../../common/validation/validator'
 
-export default (obj, validatorFn, validationEnabled = false) => {
+export default (obj, validatorFn = null, validationEnabled = false) => {
   const [state, setState] = useState({
     validation: {},
     validationEnabled,
     obj,
   })
 
+  // validation effect
   useEffect(() => {
     (async () => {
-      const validation = await validatorFn(state.obj)
-      setState(statePrev => ({
-        ...statePrev, validation
-      }))
+      if (validatorFn) {
+        setValidation(await validatorFn(state.obj))
+      } else if (Validator.getValidation(obj)) {
+        setValidation(Validator.getValidation(obj))
+      }
     })()
   }, [state.obj])
 
@@ -25,11 +27,16 @@ export default (obj, validatorFn, validationEnabled = false) => {
     }))
   }
 
+  const setValidation = validation => setState(statePrev => ({
+    ...statePrev,
+    validation
+  }))
+
   const getFieldValidation = field => state.validationEnabled
     ? Validator.getFieldValidation(field)(state.validation)
     : null
 
-  const setValidationEnabled = enabled => {
+  const enableValidation = enabled => {
     setState(statePrev => ({
       ...statePrev, validationEnabled: enabled
     }))
@@ -39,7 +46,8 @@ export default (obj, validatorFn, validationEnabled = false) => {
     object: state.obj,
     objectValid: Validator.isValidationValid(state.validation),
     setObjectField,
-    setValidationEnabled,
+    setValidation,
+    enableValidation,
     getFieldValidation,
   }
 

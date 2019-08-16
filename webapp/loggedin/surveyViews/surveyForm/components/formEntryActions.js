@@ -36,7 +36,7 @@ const RecordEntryButtons = (props) => {
       <div className="survey-form-header__record-actions-steps">
         {
           stepPrev &&
-          <button className="btn-s"
+          <button className="btn-s btn-transparent"
                   onClick={() =>
                     confirm(i18n.t('surveyForm.formEntryActions.confirmDemote', { name: getStepLabel(stepPrev) }))
                       ? updateRecordStep(RecordStep.getId(stepPrev), history)
@@ -50,7 +50,7 @@ const RecordEntryButtons = (props) => {
 
         {
           stepNext &&
-          <button className="btn-s"
+          <button className="btn-s btn-transparent"
                   aria-disabled={!valid}
                   onClick={() =>
                     confirm(i18n.t('surveyForm.formEntryActions.confirmPromote', { name: getStepLabel(stepNext) }))
@@ -92,7 +92,7 @@ const FormEntryActions = (props) => {
       {
         preview
           ? (
-            <Link to={appModuleUri(designerModules.formDesigner)} className="btn btn-s">
+            <Link to={appModuleUri(designerModules.formDesigner)} className="btn-s btn-transparent">
               <span className="icon icon-eye-blocked icon-12px icon-left"/>
               {i18n.t('surveyForm.formEntryActions.closePreview')}
             </Link>

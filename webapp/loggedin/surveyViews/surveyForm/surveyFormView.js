@@ -89,13 +89,13 @@ const SurveyFormView = (props) => {
         <div className={`survey-form${className}`}>
 
           {
-            showPageNavigation &&
             <FormPageNavigation
               surveyInfo={surveyInfo}
               edit={edit}
               entry={entry}
               canEditDef={canEditDef}
               level={0}
+              showPageNavigation={showPageNavigation}
             />
           }
 

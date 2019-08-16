@@ -12,12 +12,22 @@ export const exportReducer = actionHandlers =>
 
 export const assocActionProps = (state, { type, ...props }) => ({ ...state, ...props })
 
-export const debounceAction = (action, key, delay = 500) => {
+export const debounceAction = (action, key, time = 500) => {
   action.meta = {
     debounce: {
-      time: delay,
-      key
+      time,
+      key,
     }
   }
   return action
 }
+
+export const cancelDebouncedAction = key => ({
+  type: `${key}/cancel`,
+  meta: {
+    debounce: {
+      cancel: true,
+      key,
+    }
+  }
+})

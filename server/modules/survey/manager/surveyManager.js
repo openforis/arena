@@ -10,6 +10,8 @@ const NodeDef = require('../../../../common/survey/nodeDef')
 const User = require('../../../../common/user/user')
 const NodeDefLayout = require('../../../../common/survey/nodeDefLayout')
 const { getUserPrefSurveyId, userPrefNames } = require('../../../../common/user/userPrefs')
+const ObjectUtils = require('../../../../common/objectUtils')
+const Validator = require('../../../../common/validation/validator')
 
 const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
@@ -85,16 +87,17 @@ const validateNewSurvey = async newSurvey => {
   return await SurveyValidator.validateNewSurvey(newSurvey, surveyInfos)
 }
 
+const validateSurveyInfo = async surveyInfo => await SurveyValidator.validateSurveyInfo(
+  surveyInfo,
+  await SurveyRepository.fetchSurveysByName(Survey.getName(surveyInfo))
+)
+
 // ====== READ
 const fetchSurveyById = async (surveyId, draft = false, validate = false, client = db) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById(surveyId, draft, client)
   const authGroups = await AuthGroupRepository.fetchSurveyGroups(surveyInfo.id, client)
 
-  const validation = validate ?
-    await SurveyValidator.validateSurveyInfo(
-      surveyInfo,
-      await SurveyRepository.fetchSurveysByName(Survey.getName(surveyInfo))
-    ) : null
+  const validation = validate ? await validateSurveyInfo(surveyInfo) : null
 
   return assocSurveyInfo({ ...surveyInfo, authGroups, validation })
 }
@@ -131,6 +134,35 @@ const updateSurveyProp = async (user, surveyId, key, value, client = db) =>
     await SurveyRepositoryUtils.markSurveyDraft(surveyId, t)
 
     return await fetchSurveyById(surveyId, true, true, t)
+  })
+
+const updateSurveyProps = async (user, surveyId, props, client = db) =>
+  await client.tx(async t => {
+    const validation = await validateSurveyInfo({ id: surveyId, props })
+    if (Validator.isValidationValid(validation)) {
+
+      const surveyInfoPrev = await fetchSurveyById(surveyId, true, false, t)
+      const propsPrev = ObjectUtils.getProps(surveyInfoPrev)
+
+      let updated = false
+      for (const key of Object.keys(props)) {
+        const value = props[key]
+        const valuePrev = propsPrev[key]
+        if (!R.equals(value, valuePrev)) {
+          await ActivityLog.log(user, surveyId, ActivityLog.type.surveyPropUpdate, { key, value }, t)
+          await SurveyRepository.updateSurveyProp(surveyId, key, value, t)
+          updated = true
+        }
+      }
+
+      if (updated) {
+        await SurveyRepositoryUtils.markSurveyDraft(surveyId, t)
+      }
+
+      return await fetchSurveyById(surveyId, true, true, t)
+    } else {
+      return assocSurveyInfo({ validation })
+    }
   })
 
 const publishSurveyProps = async (surveyId, langsDeleted, client = db) => {
@@ -173,6 +205,7 @@ module.exports = {
 
   // ====== UPDATE
   updateSurveyProp,
+  updateSurveyProps,
   publishSurveyProps,
   updateSurveyDependencyGraphs: SurveyRepository.updateSurveyDependencyGraphs,
 

@@ -93,6 +93,9 @@ const getLanguage = preferredLang => surveyInfo => {
   )(surveyInfo)
 }
 
+// ====== UPDATE
+const markDraft = R.assoc(keys.draft, true)
+
 // ====== UTILS
 
 const isValid = surveyInfo => surveyInfo && surveyInfo.id
@@ -110,6 +113,7 @@ module.exports = {
   keys,
   collectReportKeys,
 
+  // ====== READ
   getInfo,
 
   getId,
@@ -131,6 +135,9 @@ module.exports = {
   isFromCollect,
   getCollectReport,
   hasCollectReportIssues,
+
+  // ====== UPDATE
+  markDraft,
 
   // ====== AUTH GROUPS
   getAuthGroups,

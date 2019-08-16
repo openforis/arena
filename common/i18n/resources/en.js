@@ -24,6 +24,7 @@ module.exports = {
     error_plural: 'Errors',
     errorMessage: 'Error message',
     errorMessage_plural: 'Error messages',
+    formContainsErrors: 'Form contains errors',
     group: 'Group',
     id: 'id',
     invalid: 'INVALID',
@@ -41,6 +42,7 @@ module.exports = {
     required: 'Required',
     reset: 'Reset',
     save: 'Save',
+    saved: 'Saved!',
     srs: 'SRS',
     type: 'Type',
     undefinedName: 'Undefined name',
@@ -202,7 +204,8 @@ module.exports = {
       defaultValuesNotSpecified: 'Default value not specified',
       keysEmpty: 'Define at least one key',
       keysExceedingMax: 'Exceeding maximum number of keys',
-    }
+    },
+    cannotChangeIntoMultipleWithDefaultValues: 'This node cannot be converted to multiple because it has default values.'
   },
 
   languagesEditor: {
@@ -210,8 +213,6 @@ module.exports = {
   },
 
   surveyForm: {
-    showPageNav: 'Show pages',
-    hidePageNav: 'Hide pages',
     subPage: 'Sub page',
     addChildTo: 'Add to {{nodeDef}}',
     formEditActions: {

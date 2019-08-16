@@ -104,6 +104,9 @@ const getLabel = (nodeDef, lang) => {
     : label
 }
 
+const getDefaultValues = SurveyUtils.getProp(propKeys.defaultValues, [])
+const hasDefaultValues = R.pipe(getDefaultValues, R.isEmpty, R.not)
+
 const getValidations = SurveyUtils.getProp(propKeys.validations, {})
 
 // ==== READ meta
@@ -143,6 +146,7 @@ const canNodeDefTypeBeKey = type =>
   )
 
 const canHaveDefaultValue = nodeDef =>
+  isSingleAttribute(nodeDef) &&
   R.includes(
     getType(nodeDef),
     [
@@ -207,7 +211,8 @@ module.exports = {
   isPublished,
 
   //advanced props
-  getDefaultValues: SurveyUtils.getProp(propKeys.defaultValues, []),
+  getDefaultValues,
+  hasDefaultValues,
   getApplicable: SurveyUtils.getProp(propKeys.applicable, []),
   getValidations,
   getValidationExpressions: R.pipe(

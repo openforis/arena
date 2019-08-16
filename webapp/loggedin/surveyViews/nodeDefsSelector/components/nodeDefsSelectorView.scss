@@ -23,7 +23,7 @@
     margin-top: 1rem;
     font-weight: 600;
     font-size: .8rem;
-    background-color: rgba($pink, .9);
+    background-color: $greyBorder;
     width: 100%;
     text-align: center;
     padding: .3rem 0;
@@ -95,7 +95,7 @@
 }
 
 .node-defs-selector__entity-selector {
-  background-color: $pink;
+  background-color: $greyBorder;
   height: 30px;
 
   input {
