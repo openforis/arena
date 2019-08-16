@@ -9,13 +9,15 @@ const Validator = require('../../validation/validator')
 const StringUtils = require('../../stringUtils')
 
 const AttributeTypeValidator = require('./attributeTypeValidator')
+const AttributeKeyValidator = require('./attributeKeyValidator')
 
 const errorKeys = {
   required: 'required',
   invalidValue: 'invalidValue',
+  duplicateEntityKey: 'duplicateEntityKey',
 }
 
-const validateRequired = (survey, nodeDef) => (propName, node) =>
+const _validateRequired = (survey, nodeDef) => (propName, node) =>
   (
     NodeDef.isKey(nodeDef) ||
     NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
@@ -28,7 +30,7 @@ const validateRequired = (survey, nodeDef) => (propName, node) =>
  * Evaluates the validation expressions.
  * Returns 'null' if all are valid, a concatenated error message otherwise.
  */
-const validateNodeValidations = (survey, record, nodeDef) => async (propName, node) => {
+const _validateNodeValidations = (survey, record, nodeDef) => async (propName, node) => {
   if (Node.isValueBlank(node)) {
     return null
   }
@@ -57,9 +59,10 @@ const validateAttribute = async (survey, record, attribute, nodeDef) => {
   if (Record.isNodeApplicable(attribute)(record)) {
     return await Validator.validate(attribute, {
       [Node.keys.value]: [
-        validateRequired(survey, nodeDef),
+        _validateRequired(survey, nodeDef),
         AttributeTypeValidator.validateValueType(survey, nodeDef),
-        validateNodeValidations(survey, record, nodeDef)
+        _validateNodeValidations(survey, record, nodeDef),
+        AttributeKeyValidator.validateAttributeKey(survey, record, nodeDef)
       ]
     }, false)
   } else {
@@ -77,7 +80,12 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
     if (NodeDef.isAttribute(nodeDef)) {
 
       // get dependents and attribute itself
-      const nodePointersAttributeAndDependents = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.validations, true)(record)
+      const nodePointersAttributeAndDependents = [
+        ...Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.validations, true)(record),
+        ...NodeDef.isKey(nodeDef)
+          ? Record.getDependentNodePointersKeys(survey, nodeDef, record, node)
+          : []
+      ]
 
       // call validateAttribute for each attribute
 

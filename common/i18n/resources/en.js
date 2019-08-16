@@ -282,8 +282,8 @@ module.exports = {
 
   formErrors: {
     duplicate: 'Duplicate',
-    duplicateEntity: 'Duplicate entity',
-    duplicateRecord: 'Duplicate record key',
+    duplicateEntityKey: 'Duplicate entity key',
+    duplicateRecordKey: 'Duplicate record key',
     empty: '$t(common.empty)',
     exceedingMax: 'Exceeding max',
     invalidName: 'Invalid name',

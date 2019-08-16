@@ -3,7 +3,6 @@ const R = require('ramda')
 const ObjectUtils = require('../../../../../../common/objectUtils')
 
 const Survey = require('../../../../../../common/survey/survey')
-const NodeDef = require('../../../../../../common/survey/nodeDef')
 
 const RecordValidation = require('../../../../../../common/record/recordValidation')
 const Validator = require('../../../../../../common/validation/validator')
@@ -25,28 +24,14 @@ class EntitiesUniquenessValidationJob extends Job {
     this.validationByRecordUuid = {}
   }
 
-  async onStart () {
-    await super.onStart()
+  async execute (tx) {
+    this.total = 2
 
     this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.getSurveyId(), true, true, false, this.tx)
-  }
+    this.incrementProcessedItems()
 
-  async execute (tx) {
-    //1. traverse survey hierarchy and find duplicate entities
-
-    const { root, length } = Survey.getHierarchy()(this.survey)
-
-    this.total = length - 1 //do not consider root entity
-
-    await Survey.traverseHierarchyItem(root, async nodeDefEntity => {
-      if (this.isCanceled())
-        return
-
-      //2. for each entity def, validate entities uniqueness
-      await this.validateEntitiesUniqueness(nodeDefEntity)
-
-      this.incrementProcessedItems()
-    })
+    await this.validateEntitiesUniqueness(Survey.getRootNodeDef(this.survey))
+    this.incrementProcessedItems()
   }
 
   async validateEntitiesUniqueness (nodeDefEntity) {
@@ -59,7 +44,7 @@ class EntitiesUniquenessValidationJob extends Job {
     const rowsRecordsWithDuplicateEntities = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(this.survey, nodeDefEntity, nodeDefKeys, this.tx)
 
     if (!R.isEmpty(rowsRecordsWithDuplicateEntities)) {
-      const validationDuplicate = _createValidationRecordOrEntityDuplicate(nodeDefEntity)
+      const validationDuplicate = _createValidationRecordDuplicate(nodeDefEntity)
 
       for (const rowRecordWithDuplicateEntities of rowsRecordsWithDuplicateEntities) {
         if (this.isCanceled())
@@ -108,25 +93,15 @@ class EntitiesUniquenessValidationJob extends Job {
 
 EntitiesUniquenessValidationJob.type = 'EntitiesUniquenessValidationJob'
 
-const _createValidationRecordOrEntityDuplicate = nodeDefEntity => {
-  const isRoot = NodeDef.isRoot(nodeDefEntity)
-  return {
-    [Validator.keys.valid]: false,
-    [Validator.keys.fields]: {
-      [isRoot
-        ? RecordValidation.keys.recordKeys
-        : RecordValidation.keys.entityKeys
-        ]: {
-        [Validator.keys.valid]: false,
-        [Validator.keys.errors]: [
-          isRoot
-            ? { key: RecordValidation.keysError.duplicateRecord }
-            : { key: RecordValidation.keysError.duplicateEntity }
-        ]
-      }
+const _createValidationRecordDuplicate = () => ({
+  [Validator.keys.valid]: false,
+  [Validator.keys.fields]: {
+    [RecordValidation.keys.recordKeys]: {
+      [Validator.keys.valid]: false,
+      [Validator.keys.errors]: [{ key: RecordValidation.keysError.duplicateRecordKey }]
     }
   }
-}
+})
 
 const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
   const nodeValidation = Validator.getFieldValidation(nodeUuid)(validationRecord)

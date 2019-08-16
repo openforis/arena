@@ -176,6 +176,22 @@ const getDependentNodePointers = (survey, node, dependencyType, includeSelf = fa
   return nodePointers
 }
 
+const getDependentNodePointersKeys = (survey, nodeDefAttribute, record, nodeKey) => {
+  const nodePointers = []
+  const nodeParent = getParentNode(nodeKey)(record)
+  const siblingEntities = getNodeSiblingsAndSelf(nodeParent)(record)
+  for (const siblingEntity of siblingEntities) {
+    const nodesKey = getEntityKeyNodes(survey, siblingEntity)(record)
+
+    nodePointers.push.apply(nodePointers, nodesKey.map(nodeKey => ({
+      nodeDef: SurveyNodeDefs.getNodeDefByUuid(Node.getNodeDefUuid(nodeKey))(survey),
+      nodeCtx: nodeKey
+    })))
+  }
+
+  return nodePointers
+}
+
 // code attributes
 const getDependentCodeAttributes = node => record => R.pipe(
   NodesIndex.getNodeCodeDependentUuids(Node.getUuid(node)),
@@ -238,6 +254,7 @@ module.exports = {
 
   // ==== dependency
   getDependentNodePointers,
+  getDependentNodePointersKeys,
 
   // code
   getParentCodeAttribute,
