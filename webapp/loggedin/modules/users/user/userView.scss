@@ -1,0 +1,21 @@
+.form.user {
+    width: 50%;
+    align-content: center;
+    margin: auto;
+
+    .form-item {
+        grid-template-columns: .1fr .9fr;
+
+        .tooltip {
+            &:hover {
+                cursor: default;
+            }
+        }
+    }
+
+    .btn {
+        justify-self: center;
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+}

@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import * as R from 'ramda'
 
+import { getUrlParam } from '../../../utils/routerUtils'
+
 import Survey from '../../../../common/survey/survey'
 import Record from '../../../../common/record/record'
 
@@ -111,7 +113,7 @@ const mapStateToProps = (state, { match, location }) => {
   return {
     canEditRecord: Authorizer.canEditRecord(user, record) && (Survey.isPublished(surveyInfo) || Record.isPreview(record)),
     recordLoaded: !R.isEmpty(record),
-    recordUuidUrlParam: R.path(['params', 'recordUuid'], match),
+    recordUuidUrlParam: getUrlParam('recordUuid')(match),
     parentNodeUuidUrlParam: urlSearchParams.get('parentNodeUuid'),
   }
 }

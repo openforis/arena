@@ -158,7 +158,9 @@ module.exports = {
     inviteUser: 'Invite',
     sendInvitation: 'Send invitation',
     accepted: 'Accepted',
-    inviteUserConfirmation: 'An email to {{email}} has been sent'
+    inviteUserConfirmation: 'An email to {{email}} has been sent',
+    updateUserConfirmation: 'User {{name}} has been updated',
+    notAcceptedYet: 'Invitation not accepted yet'
   },
 
   itemsTable: {

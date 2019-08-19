@@ -6,6 +6,7 @@ const AuthMiddleware = require('../../auth/authApiMiddleware')
 const UserService = require('../service/userService')
 
 const User = require('../../../../common/user/user')
+const UserValidator = require('../../../../common/user/userValidator')
 const Validator = require('../../../../common/validation/validator')
 
 const SystemError = require('../../../../server/utils/systemError')
@@ -19,15 +20,14 @@ module.exports.init = app => {
       const { user } = req
 
       const { surveyId, email, groupUuid } = Request.getParams(req)
-      const validation = await UserService.validateNewUser(req.body)
+      const validation = await UserValidator.validateInvitation(req.body)
 
-      if (Validator.isValidationValid(validation)) {
-        await UserService.inviteUser(user, surveyId, email, groupUuid)
-
-        Response.sendOk(res)
-      } else {
+      if (!Validator.isValidationValid(validation)) {
         throw new SystemError('invalidUser')
       }
+
+      await UserService.inviteUser(user, surveyId, email, groupUuid)
+      Response.sendOk(res)
     } catch (err) {
       next(err)
     }
@@ -35,11 +35,23 @@ module.exports.init = app => {
 
   // ==== READ
 
+  app.get('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserViewPermission, async (req, res, next) => {
+    try {
+      const { userUuid } = Request.getParams(req)
+      const user = await UserService.fetchUserByUuid(userUuid)
+
+      res.json(user)
+    } catch (err) {
+      next(err)
+    }
+  })
+
   app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
+      const { user } = req
       const surveyId = Request.getRestParam(req, 'surveyId')
 
-      const count = await UserService.countUsersBySurveyId(surveyId)
+      const count = await UserService.countUsersBySurveyId(user, surveyId)
       res.json(count)
 
     } catch (err) {
@@ -49,9 +61,10 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
+      const { user } = req
       const { surveyId, offset, limit } = Request.getParams(req)
 
-      const list = await UserService.fetchUsersBySurveyId(surveyId, offset, limit)
+      const list = await UserService.fetchUsersBySurveyId(user, surveyId, offset, limit)
 
       res.json({ list })
     } catch (err) {
@@ -69,6 +82,24 @@ module.exports.init = app => {
       await UserService.updateUsername(user, userUuid, name)
 
       Response.sendOk(res)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
+    try {
+      const validation = await UserValidator.validateUser(req.body)
+
+      if (!Validator.isValidationValid(validation)) {
+        throw new SystemError('invalidUser')
+      }
+
+      const { user } = req
+      const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(req)
+      const updatedUser = await UserService.updateUser(user, surveyId, userUuid, name, email, groupUuid)
+
+      res.json(updatedUser)
     } catch (err) {
       next(err)
     }

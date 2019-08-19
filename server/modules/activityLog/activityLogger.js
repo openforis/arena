@@ -44,6 +44,7 @@ const type = {
   // user
   userJoined: 'userJoined',
   userInvite: 'userInvite',
+  userUpdate: 'userUpdate',
 }
 
 const keys = {

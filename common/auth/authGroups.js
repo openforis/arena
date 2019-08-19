@@ -7,7 +7,7 @@ const keys = {
   recordSteps: 'recordSteps',
   all: 'all',
   own: 'own',
-  surveyId: 'surveyId',
+  surveyUuid: 'surveyUuid',
   name: 'name',
 }
 
@@ -44,13 +44,13 @@ const groupNames = {
 
 const getAuthGroups = R.propOr([], keys.authGroups)
 
-const getSurveyId = R.prop(keys.surveyId)
+const getSurveyUuid = R.prop(keys.surveyUuid)
 
 const getUuid = R.prop(keys.uuid)
 
 const getName = R.prop(keys.name)
 
-const isAdminGroup =
+const isSystemAdminGroup =
 R.pipe(
   getName,
   R.equals(groupNames.systemAdmin)
@@ -63,7 +63,7 @@ module.exports = {
 
   getUuid,
   getName,
-  isAdminGroup,
-  getSurveyId,
+  isSystemAdminGroup,
+  getSurveyUuid,
   getAuthGroups,
 }
