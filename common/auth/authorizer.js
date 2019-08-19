@@ -127,10 +127,8 @@ const canEditUserEmail = (user, surveyInfo, userToUpdate) => (
 )
 
 const canEditUserGroup = (user, surveyInfo, userToUpdate) => {
-  const sameUser = User.getUuid(user) === User.getUuid(userToUpdate)
-
   return (
-    !sameUser && (
+    !User.isEqual(user)(userToUpdate) && (
       isSystemAdmin(user) ||
       (
         isSurveyAdmin(user, surveyInfo) &&

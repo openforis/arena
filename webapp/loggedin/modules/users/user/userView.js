@@ -18,9 +18,10 @@ import Authorizer from '../../../../../common/auth/authorizer'
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 
-import { showAppLoader, hideAppLoader, showNotificationMessage } from '../../../../app/actions'
+import { showAppLoader, hideAppLoader, showNotificationMessage, setUser } from '../../../../app/actions'
 
 import { useUserViewState } from './userViewState'
+import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 const UserView = props => {
   const i18n = useI18n()
@@ -43,6 +44,7 @@ const UserView = props => {
               placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
               value={name}
               validation={canEditName ? getFieldValidation('name') : {}}
+              maxLength="128"
               onChange={setName}/>
           </FormItem>
         )
@@ -100,5 +102,5 @@ const mapStateToProps = (state, { match }) => {
 
 export default connect(
   mapStateToProps,
-  { showAppLoader, hideAppLoader, showNotificationMessage },
+  { showAppLoader, hideAppLoader, showNotificationMessage, setUser },
 )(UserView)

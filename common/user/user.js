@@ -12,6 +12,8 @@ const keys = {
 }
 
 // ==== User properties
+const isEqual = user1 => user2 => getUuid(user1) === getUuid(user2)
+
 const getUuid = R.prop(keys.uuid)
 
 const getName = R.prop(keys.name)
@@ -37,6 +39,7 @@ const getRecordPermissions = record => user =>
 module.exports = {
   keys,
 
+  isEqual,
   getUuid,
   getName,
   getEmail,

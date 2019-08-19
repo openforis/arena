@@ -22,7 +22,7 @@ import { appModuleUri, userModules } from '../../../appModules'
 export const useUserViewState = props => {
   const {
     user, surveyInfo, userUuidUrlParam, groups: groupsProps,
-    showAppLoader, hideAppLoader, showNotificationMessage,
+    showAppLoader, hideAppLoader, showNotificationMessage, setUser,
     history,
   } = props
 
@@ -79,7 +79,7 @@ export const useUserViewState = props => {
   useEffect(() => {
     if (loaded) {
       // set form object field from server side response
-      setName(isUserAcceptPending ? undefined : User.getName(userToUpdate)) // Name can be null if user has not accepted the invitation
+      setName(isUserAcceptPending ? '' : User.getName(userToUpdate)) // Name can be null if user has not accepted the invitation
       setEmail(User.getEmail(userToUpdate))
       setGroup(Authorizer.getSurveyUserGroup(userToUpdate, surveyInfo))
 
@@ -91,13 +91,14 @@ export const useUserViewState = props => {
         group: !isUserAcceptPending && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
       })
 
-      enableValidation(canEdit)
+      enableValidation()
     }
   }, [loaded])
 
   // persist user/invitation actions
   const {
     dispatch: saveUser,
+    loaded: userSaved,
     data: userSaveResponse,
     error: userSaveError,
   } = isInvitation
@@ -106,15 +107,23 @@ export const useUserViewState = props => {
 
   useOnUpdate(() => {
     hideAppLoader()
-    if (userSaveResponse) {
-      history.push(appModuleUri(userModules.users))
+    if (userSaveError) {
+      showNotificationMessage('userView.errorSavingUser', { error: userSaveError })
+    } else if (userSaved) {
+      // update user in redux state if self
+      if (User.isEqual(user)(userSaveResponse)) {
+        setUser(userSaveResponse)
+      }
+
       if (isInvitation) {
         showNotificationMessage('usersView.inviteUserConfirmation', { email: formObject.email })
       } else {
         showNotificationMessage('usersView.updateUserConfirmation', { name: formObject.name })
       }
+
+      history.push(appModuleUri(userModules.users))
     }
-  }, [userSaveResponse, userSaveError])
+  }, [userSaved, userSaveError])
 
   const sendRequest = () => {
     showAppLoader()

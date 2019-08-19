@@ -58,11 +58,9 @@ const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, 
 
 // ==== UPDATE
 
-const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, client = db) => {
+const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, client = db) =>
   await client.tx(async t => {
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
-
-    await UserRepository.updateUser(userUuid, name, email, t)
 
     if (AuthGroups.isSystemAdminGroup(newGroup)) {
       // if new group is SystemAdmin, delete all user groups and set his new group to SystemAdmin
@@ -79,8 +77,11 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, clie
       { userUuid, name, email, groupUuid },
       t
     )
+
+    return await UserRepository.updateUser(userUuid, name, email, t)
   })
-}
+
+const updateUser = _userFetcher(_updateUser)
 
 // ==== DELETE
 

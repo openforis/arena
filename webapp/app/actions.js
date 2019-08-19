@@ -30,7 +30,7 @@ export const initApp = () => async dispatch => {
 
     dispatch({ type: appPropsChange, status: AppState.appStatus.ready, i18n, user, survey })
   } catch (e) {
-    dispatch({ type: appPropsChange, i18n, })
+    dispatch({ type: appPropsChange, i18n })
     dispatch(throwSystemError(e.message))
   }
 
@@ -46,6 +46,10 @@ const getUserSurvey = async () => {
 export const initUser = () => async dispatch => {
   const { user, survey } = await getUserSurvey()
   dispatch({ type: appPropsChange, user, survey })
+}
+
+export const setUser = user => async dispatch => {
+  dispatch({ type: appPropsChange, user })
 }
 
 export const setLanguage = languageCode => async (dispatch) => {

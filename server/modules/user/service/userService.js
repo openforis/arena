@@ -77,7 +77,7 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid) => {
     await aws.updateEmail(oldEmail, email)
   }
 
-  await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid)
+  return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid)
 }
 
 const updateUsername = async (user, userUuid, name) => {
