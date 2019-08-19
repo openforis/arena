@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const Survey = require('../../survey/survey')
 const NodeDef = require('../../survey/nodeDef')
 const NodeDefExpression = require('../../survey/nodeDefExpression')
@@ -80,21 +82,24 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
     if (NodeDef.isAttribute(nodeDef)) {
 
       // get dependents and attribute itself
-      const nodePointersAttributeAndDependents = [
-        ...Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.validations, true)(record),
+      const nodePointersAttributeAndDependents = Record.getDependentNodePointers(survey, node, Survey.dependencyTypes.validations, true)(record)
+
+      const nodesToValidate = [
+        ..._nodePointersToNodes(nodePointersAttributeAndDependents),
         ...NodeDef.isKey(nodeDef)
-          ? Record.getDependentNodePointersKeys(survey, nodeDef, record, node)
+          ? _getParentEntitySiblingsKeys(survey, nodeDef, record, node)
           : []
       ]
 
       // call validateAttribute for each attribute
 
-      for (const { nodeCtx, nodeDef } of nodePointersAttributeAndDependents) {
-        const nodeCtxUuid = Node.getUuid(nodeCtx)
+      for (const node of nodesToValidate) {
+        const nodeUuid = Node.getUuid(node)
 
         // validate only attributes not deleted and not validated already
-        if (!Node.isDeleted(nodeCtx) && !attributeValidations[nodeCtxUuid]) {
-          attributeValidations[nodeCtxUuid] = await validateAttribute(survey, record, nodeCtx, nodeDef)
+        if (!Node.isDeleted(node) && !attributeValidations[nodeUuid]) {
+          const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+          attributeValidations[nodeUuid] = await validateAttribute(survey, record, node, nodeDef)
         }
       }
     }
@@ -116,6 +121,19 @@ const _getCustomValidationMessages = (survey, expression) => {
   }
   return messages
 }
+
+const _getParentEntitySiblingsKeys = (survey, nodeDefAttribute, record, nodeKey) => {
+  const dependentKeys = []
+  const nodeParent = Record.getParentNode(nodeKey)(record)
+  const siblingEntities = Record.getNodeSiblingsAndSelf(nodeParent)(record)
+  for (const siblingEntity of siblingEntities) {
+    const nodesKey = Record.getEntityKeyNodes(survey, siblingEntity)(record)
+    dependentKeys.push.apply(dependentKeys, nodesKey)
+  }
+  return dependentKeys
+}
+
+const _nodePointersToNodes = R.pluck('nodeCtx')
 
 module.exports = {
   validateAttribute,

@@ -52,7 +52,6 @@ module.exports = {
 
   // ==== dependency
   getDependentNodePointers: RecordReader.getDependentNodePointers,
-  getDependentNodePointersKeys: RecordReader.getDependentNodePointersKeys,
   getParentCodeAttribute: RecordReader.getParentCodeAttribute,
   getDependentCodeAttributes: RecordReader.getDependentCodeAttributes,
 
