@@ -87,7 +87,7 @@ const validateSelfAndDependentAttributes = async (survey, record, nodes) => {
       const nodesToValidate = [
         ..._nodePointersToNodes(nodePointersAttributeAndDependents),
         ...NodeDef.isKey(nodeDef)
-          ? _getParentEntitySiblingsKeys(survey, nodeDef, record, node)
+          ? _getSiblingNodeKeys(survey, nodeDef, record, Record.getParentNode(node)(record))
           : []
       ]
 
@@ -122,15 +122,14 @@ const _getCustomValidationMessages = (survey, expression) => {
   return messages
 }
 
-const _getParentEntitySiblingsKeys = (survey, nodeDefAttribute, record, nodeKey) => {
-  const dependentKeys = []
-  const nodeParent = Record.getParentNode(nodeKey)(record)
-  const siblingEntities = Record.getNodeSiblingsAndSelf(nodeParent)(record)
-  for (const siblingEntity of siblingEntities) {
-    const nodesKey = Record.getEntityKeyNodes(survey, siblingEntity)(record)
-    dependentKeys.push.apply(dependentKeys, nodesKey)
+const _getSiblingNodeKeys = (survey, nodeDefKey, record, node) => {
+  const siblingKeys = []
+  const siblings = Record.getNodeSiblingsAndSelf(node)(record)
+  for (const sibling of siblings) {
+    const nodesKey = Record.getEntityKeyNodes(survey, sibling)(record)
+    siblingKeys.push.apply(siblingKeys, nodesKey)
   }
-  return dependentKeys
+  return siblingKeys
 }
 
 const _nodePointersToNodes = R.pluck('nodeCtx')
