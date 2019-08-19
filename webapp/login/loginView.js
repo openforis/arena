@@ -7,15 +7,26 @@ import * as LoginState from './loginState'
 
 import LoginForm from './loginForm'
 import AcceptInvitationForm from './acceptInvitationForm'
+import ForgotPasswordForm from './forgotPasswordForm'
+import ResetPasswordForm from './resetPasswordForm'
+
+import { showResetPasswordForm } from './actions'
 
 const forms = {
   [LoginState.userActions.setNewPassword]: AcceptInvitationForm,
   [LoginState.userActions.login]: LoginForm,
+  [LoginState.userActions.resetPasswordRequest]: ForgotPasswordForm,
+  [LoginState.userActions.resetPassword]: ResetPasswordForm,
 }
 
 const LoginView = props => {
 
-  const { userAction, error } = props
+  const { userAction, error, resetPassword, showResetPasswordForm } = props
+
+  console.log(resetPassword)
+  if (resetPassword) {
+    showResetPasswordForm()
+  }
 
   return (
     <>
@@ -61,4 +72,4 @@ const mapStateToProps = state => ({
   error: LoginState.getError(state),
 })
 
-export default connect(mapStateToProps)(LoginView)
+export default connect(mapStateToProps, { showResetPasswordForm })(LoginView)

@@ -10,6 +10,8 @@ const keys = {
 export const userActions = {
   login: 'login',
   setNewPassword: 'setNewPassword',
+  resetPasswordRequest: 'resetPasswordRequest',
+  resetPassword: 'resetPassword',
 }
 
 const getStateProp = (key, defaultValue = null) => R.pathOr(defaultValue, [stateKey, key])

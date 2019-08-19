@@ -48,7 +48,28 @@ export const acceptInvitation = (name, password) => _createAction(
   }
 )
 
-export const forgotPassword = () => dispatch => {
+export const showForgotPasswordForm = () => dispatch => {
   dispatch(setLoginError(null))
-  dispatch(showNotificationMessage('An email with the verification code has been sent'))
+  dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.resetPasswordRequest })
 }
+
+export const sendResetPasswordRequest = email => _createAction(
+  async dispatch => {
+    const responseType = await CognitoAuth.forgotPassword(email)
+    if (responseType === CognitoAuth.keysAction.success) {
+      dispatch(showNotificationMessage('An email with the verification code has been sent'))
+    }
+  }
+)
+
+export const showResetPasswordForm = () => dispatch => {
+  dispatch(setLoginError(null))
+  dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.resetPassword })
+}
+
+export const resetPassword = (username, verificationCode, newPassword) => _createAction(
+  async dispatch => {
+    const responseType = await CognitoAuth.resetPassword(username, verificationCode, newPassword)
+    console.log(responseType)
+  }
+)

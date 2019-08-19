@@ -21,7 +21,6 @@ import * as SurveyState from '../../../../survey/surveyState'
 import { showAppLoader, hideAppLoader, showNotificationMessage, setUser } from '../../../../app/actions'
 
 import { useUserViewState } from './userViewState'
-import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 const UserView = props => {
   const i18n = useI18n()

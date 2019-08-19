@@ -1,11 +1,11 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 
-import { login, forgotPassword } from './actions'
+import { login, showForgotPasswordForm } from './actions'
 
 const LoginForm = props => {
 
-  const { login, forgotPassword, } = props
+  const { login, showForgotPasswordForm, } = props
 
   const email = useRef(null)
   const password = useRef(null)
@@ -34,7 +34,7 @@ const LoginForm = props => {
 
         <button type="button"
                 className="btn btn-s btn-transparent btn-forgot-pwd"
-                onClick={forgotPassword}>
+                onClick={showForgotPasswordForm}>
           <span className="icon icon-question icon-left icon-12px"/>
           Forgot Password
         </button>
@@ -44,4 +44,4 @@ const LoginForm = props => {
   )
 }
 
-export default connect(null, { login, forgotPassword })(LoginForm)
+export default connect(null, { login, showForgotPasswordForm })(LoginForm)

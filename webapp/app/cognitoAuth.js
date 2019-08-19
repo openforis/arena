@@ -61,6 +61,22 @@ export const logout = () => {
   }
 }
 
+export const forgotPassword = username =>
+  new Promise((resolve, reject) => {
+    newCognitoUser(username).forgotPassword(cognitoCallbacks(resolve, reject))
+  })
+
+export const resetPassword = (username, verificationCode, newPassword) => {
+  cognitoUser = newCognitoUser(username)
+
+  return new Promise((resolve, reject) => {
+    cognitoUser.confirmPassword(verificationCode, newPassword, {
+      onFailure: reject,
+      onSuccess: () => resolve(),
+    })
+  })
+}
+
 /**
  *
  * @returns current accessToken.jwtToken if current session has a user or null if it doesn't
