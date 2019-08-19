@@ -15,10 +15,10 @@ const Job = require('../../../../../job/job')
 
 const recordValidationUpdateBatchSize = 1000
 
-class EntitiesUniquenessValidationJob extends Job {
+class RecordsUniquenessValidationJob extends Job {
 
   constructor (params) {
-    super(EntitiesUniquenessValidationJob.type, params)
+    super(RecordsUniquenessValidationJob.type, params)
 
     //cache of record validations
     this.validationByRecordUuid = {}
@@ -27,31 +27,29 @@ class EntitiesUniquenessValidationJob extends Job {
   async execute (tx) {
     this.total = 2
 
+    // 1. fetch survey and node defs
     this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.getSurveyId(), true, true, false, this.tx)
     this.incrementProcessedItems()
 
-    await this.validateEntitiesUniqueness(Survey.getRootNodeDef(this.survey))
-    this.incrementProcessedItems()
-  }
-
-  async validateEntitiesUniqueness (nodeDefEntity) {
-    const nodeDefKeys = Survey.getNodeDefKeys(nodeDefEntity)(this.survey)
+    const nodeDefRoot = Survey.getRootNodeDef(this.survey)
+    const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(this.survey)
     if (R.isEmpty(nodeDefKeys)) {
       return
     }
 
-    //1. find records with duplicate entities
-    const rowsRecordsWithDuplicateEntities = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(this.survey, nodeDefEntity, nodeDefKeys, this.tx)
+    // 2. find duplicate records
+    const rowsRecordsDuplicate = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(this.survey, nodeDefRoot, nodeDefKeys, this.tx)
 
-    if (!R.isEmpty(rowsRecordsWithDuplicateEntities)) {
-      const validationDuplicate = _createValidationRecordDuplicate(nodeDefEntity)
+    if (!R.isEmpty(rowsRecordsDuplicate)) {
+      // 3. update records validation
+      const validationDuplicate = _createValidationRecordDuplicate(nodeDefRoot)
 
-      for (const rowRecordWithDuplicateEntities of rowsRecordsWithDuplicateEntities) {
+      for (const rowRecordDuplicate of rowsRecordsDuplicate) {
         if (this.isCanceled())
           return
 
         //2. for each duplicate node entity, update record validation
-        const { uuid, validation, node_duplicate_uuids } = rowRecordWithDuplicateEntities
+        const { uuid, validation, node_duplicate_uuids } = rowRecordDuplicate
 
         const validationRecord = this.validationByRecordUuid[uuid] || validation
 
@@ -65,6 +63,8 @@ class EntitiesUniquenessValidationJob extends Job {
         await this.addRecordValidationToBatchUpdate(uuid, validationUpdated)
       }
     }
+
+    this.incrementProcessedItems()
   }
 
   async addRecordValidationToBatchUpdate (recordUuid, validation) {
@@ -91,7 +91,7 @@ class EntitiesUniquenessValidationJob extends Job {
 
 }
 
-EntitiesUniquenessValidationJob.type = 'EntitiesUniquenessValidationJob'
+RecordsUniquenessValidationJob.type = 'RecordsUniquenessValidationJob'
 
 const _createValidationRecordDuplicate = () => ({
   [Validator.keys.valid]: false,
@@ -118,4 +118,4 @@ const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
   }
 }
 
-module.exports = EntitiesUniquenessValidationJob
+module.exports = RecordsUniquenessValidationJob
