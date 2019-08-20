@@ -12,15 +12,12 @@ const getUserUuids = recordUuid =>
     userUuidsByRecordUuid.get(recordUuid)
   )
 
-const getRecordUuid = userUuid => {
-  for (const recordUuid of userUuidsByRecordUuid.keys()) {
-    const userUuids = userUuidsByRecordUuid.get(recordUuid)
-    if (userUuids && userUuids.has(userUuid)) {
-      return recordUuid
-    }
-  }
-  return null
-}
+const getRecordUuid = userUuid =>
+  Array.from(userUuidsByRecordUuid.keys()).find(
+    recordUuid => {
+      const userUuids = userUuidsByRecordUuid.get(recordUuid)
+      return userUuids && userUuids.has(userUuid)
+    })
 
 const assocUser = (surveyId, recordUuid, user, preview) => {
   if (!userUuidsByRecordUuid.has(recordUuid))
