@@ -5,4 +5,16 @@
 
   svg {
   }
+
+  .y-axis, .x-axis {
+    path, line {
+      stroke: $greyBorder;
+    }
+
+    text {
+      fill: lighten($black, 20%);
+      font-weight: 600;
+      font-size: .65rem;
+    }
+  }
 }
