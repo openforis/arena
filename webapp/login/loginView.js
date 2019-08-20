@@ -15,7 +15,7 @@ import { showResetPasswordForm } from './actions'
 const forms = {
   [LoginState.userActions.setNewPassword]: AcceptInvitationForm,
   [LoginState.userActions.login]: LoginForm,
-  [LoginState.userActions.resetPasswordRequest]: ForgotPasswordForm,
+  [LoginState.userActions.forgotPassword]: ForgotPasswordForm,
   [LoginState.userActions.resetPassword]: ResetPasswordForm,
 }
 

@@ -29,7 +29,8 @@ const ForgotPasswordForm = props => {
                 className="btn btn-login"
                 aria-disabled={false}
                 onClick={onClickReset}>
-          Reset password
+          <span className="icon icon-envelop icon-12px icon-left"/>
+          Send verification code
         </button>
       </div>
     </div>

@@ -50,7 +50,7 @@ export const acceptInvitation = (name, password) => _createAction(
 
 export const showForgotPasswordForm = () => dispatch => {
   dispatch(setLoginError(null))
-  dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.resetPasswordRequest })
+  dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.forgotPassword })
 }
 
 export const sendResetPasswordRequest = email => _createAction(

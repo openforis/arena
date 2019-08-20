@@ -73,7 +73,7 @@ const UserView = props => {
           <button className="btn"
                   aria-disabled={!objectValid}
                   onClick={sendRequest}>
-            <span className="icon icon-floppy-disk icon-left icon-12px"/>
+            <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`}/>
             {isInvitation ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
           </button>
         )

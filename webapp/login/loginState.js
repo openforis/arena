@@ -10,7 +10,7 @@ const keys = {
 export const userActions = {
   login: 'login',
   setNewPassword: 'setNewPassword',
-  resetPasswordRequest: 'resetPasswordRequest',
+  forgotPassword: 'forgotPassword',
   resetPassword: 'resetPassword',
 }
 
