@@ -48,14 +48,16 @@ const touchPreviewRecord = recordUuid => {
   previewRecordsByRecordUuid.set(recordUuid, { ...previewData, date: new Date() })
 }
 
-const getStalePreviewRecordUuids = olderThan => {
-  const array = []
-  for (const [recordUuid, { date, surveyId, user }] of previewRecordsByRecordUuid.entries()) {
-    if (isDateBefore(date, olderThan))
-      array.push({ recordUuid, surveyId, user })
-  }
-  return array
-}
+const getStalePreviewRecordUuids = olderThan =>
+  Array.from(previewRecordsByRecordUuid.entries()).reduce(
+    (acc, [recordUuid, { date, surveyId, user }]) => {
+      if (isDateBefore(date, olderThan)) {
+        acc.push({ recordUuid, surveyId, user })
+      }
+      return acc
+    },
+    []
+  )
 
 module.exports = {
   getUserUuids,
