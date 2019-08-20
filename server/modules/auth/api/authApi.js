@@ -1,6 +1,9 @@
 const Request = require('../../../utils/request')
 const { sendOk } = require('../../../utils/response')
 
+const Log = require('../../../log/log')
+const logger = Log.getLogger('AuthAPI')
+
 const Survey = require('../../../../common/survey/survey')
 const User = require('../../../../common/user/user')
 const { userPrefNames, getUserPrefSurveyId } = require('../../../../common/user/userPrefs')
@@ -29,7 +32,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
       survey,
     )
   } catch (e) {
-    console.log(`error loading survey with id ${surveyId}`, e)
+    logger.error(`error loading survey with id ${surveyId}: ${e.toString()}`)
     // survey not found with user pref
     // removing user pref
     sendResponse(

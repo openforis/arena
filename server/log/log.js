@@ -15,25 +15,14 @@ log4js.configure({
   }
 })
 
-const isDebugEnabled = () => logger.isDebugEnabled()
-
-const isInfoEnabled = () => logger.isInfoEnabled()
-
-const isWarnEnabled = () => logger.isWarnEnabled()
-
-const isErrorEnabled = () => logger.isErrorEnabled()
+const levels = {
+  debug: 'debug',
+  info: 'info',
+  warn: 'warn',
+  error: 'error'
+}
 
 module.exports = {
-  isDebugEnabled,
-  isInfoEnabled,
-  isWarnEnabled,
-  isErrorEnabled,
-
-  debug: msg => isDebugEnabled() && logger.debug(msg),
-  info: msg => isInfoEnabled() && logger.info(msg),
-  warn: msg => isWarnEnabled() && logger.warn(msg),
-  error: msg => isErrorEnabled() && logger.error(msg),
-
   getLogger: prefix => new Logger(prefix)
 }
 
@@ -46,19 +35,43 @@ class Logger {
     this.prefix = prefix
   }
 
+  isDebugEnabled () {
+    return this._isLevelEnabled(levels.debug)
+  }
+
+  isInfoEnabled () {
+    return this._isLevelEnabled(levels.info)
+  }
+
+  isWarnEnabled () {
+    return this._isLevelEnabled(levels.warn)
+  }
+
+  isErrorEnabled () {
+    return this._isLevelEnabled(levels.error)
+  }
+
   debug (msg) {
-    isDebugEnabled() && logger.debug(`${this.prefix} - ${msg}`)
+    this._log(levels.debug, msg)
   }
 
   info (msg) {
-    isInfoEnabled() && logger.info(msg)
+    this._log(levels.info, msg)
   }
 
   warn (msg) {
-    isWarnEnabled() && logger.warn(msg)
+    this._log(levels.warn, msg)
   }
 
   error (msg) {
-    isErrorEnabled() && logger.error(msg)
+    this._log(levels.error, msg)
+  }
+
+  _isLevelEnabled (level) {
+    return logger.isLevelEnabled(level)
+  }
+
+  _log (level, msg) {
+    this._isLevelEnabled(level) && logger.log(level, `${this.prefix} - ${msg}`)
   }
 }

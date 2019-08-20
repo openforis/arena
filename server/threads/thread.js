@@ -1,5 +1,7 @@
 const { parentPort, workerData, isMainThread } = require('worker_threads')
 
+const Log = require('../log/log')
+
 const threadMessageTypes = require('./threadMessageTypes')
 
 /**
@@ -10,8 +12,7 @@ class Thread {
   constructor (params) {
     this.params = params ? params : { ...workerData }
 
-    this.user = this.params.user
-    this.surveyId = this.params.surveyId
+    this.logger = Log.getLogger('Thread')
 
     if (!isMainThread)
       parentPort.on('message', this.messageHandler.bind(this))
@@ -22,8 +23,9 @@ class Thread {
       await this.onMessage(msg)
       this.postMessage({ type: threadMessageTypes.messageProcessComplete })
     } catch (e) {
-      console.log('** Error in thread ', e)
-      this.postMessage({ type: threadMessageTypes.error, error: e.toString() })
+      const error = e.toString()
+      this.logger.error(`Error in thread:  ${error}`)
+      this.postMessage({ type: threadMessageTypes.error, error })
     }
   }
 
@@ -32,7 +34,7 @@ class Thread {
    * @param msg
    */
   postMessage (msg) {
-    parentPort.postMessage({ user: this.getUser(), surveyId: this.getSurveyId(), msg })
+    parentPort.postMessage({ user: this.user, surveyId: this.surveyId, msg })
   }
 
   /**
@@ -43,12 +45,16 @@ class Thread {
     //TO OVERRIDE
   }
 
-  getUser () {
-    return this.params.user
+  _getParam(name) {
+    return this.params[name]
   }
 
-  getSurveyId () {
-    return this.params.surveyId
+  get user () {
+    return this._getParam('user')
+  }
+
+  get surveyId () {
+    return this._getParam('surveyId')
   }
 
 }

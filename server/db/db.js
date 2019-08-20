@@ -1,8 +1,12 @@
+const Log = require('../log/log')
+
+const logger = Log.getLogger('DB')
+
 const debugOptions = {
   query: (e) => {
-    console.log('QUERY: ', e.query)
+    logger.debug(`QUERY: ${e.query}`)
     if (e.params) {
-      console.log('PARAMS:', e.params)
+      logger.debug(`PARAMS: ${JSON.stringify(e.params)}`)
     }
   }
 }
