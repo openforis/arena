@@ -47,7 +47,7 @@ const UserPopupMenu = props => {
           <div>
             <Link
               className="btn-s btn-transparent"
-              to={appModuleUri(userModules.userInvite)} //TODO link to user page
+              to={`${appModuleUri(userModules.user)}${User.getUuid(user)}/`}
               onClick={onClose}>
               <span className="icon icon-user icon-12px icon-left"/>
               {i18n.t('header.myProfile')}

@@ -73,9 +73,15 @@ export const getJwtToken = () => new Promise((resolve, reject) => {
       if (err) {
         reject(err)
       }
-      const accessToken = session.getAccessToken()
-      const jwtToken = accessToken.jwtToken
-      resolve(jwtToken)
+
+      try {
+        const accessToken = session.getAccessToken()
+        const jwtToken = accessToken.jwtToken
+        resolve(jwtToken)
+      } catch (e) {
+        reject(e)
+      }
+
     })
   } else {
     resolve(null)

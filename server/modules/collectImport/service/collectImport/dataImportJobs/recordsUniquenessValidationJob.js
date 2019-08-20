@@ -3,7 +3,6 @@ const R = require('ramda')
 const ObjectUtils = require('../../../../../../common/objectUtils')
 
 const Survey = require('../../../../../../common/survey/survey')
-const NodeDef = require('../../../../../../common/survey/nodeDef')
 
 const RecordValidation = require('../../../../../../common/record/recordValidation')
 const Validator = require('../../../../../../common/validation/validator')
@@ -16,57 +15,41 @@ const Job = require('../../../../../job/job')
 
 const recordValidationUpdateBatchSize = 1000
 
-class EntitiesUniquenessValidationJob extends Job {
+class RecordsUniquenessValidationJob extends Job {
 
   constructor (params) {
-    super(EntitiesUniquenessValidationJob.type, params)
+    super(RecordsUniquenessValidationJob.type, params)
 
     //cache of record validations
     this.validationByRecordUuid = {}
   }
 
-  async onStart () {
-    await super.onStart()
-
-    this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.getSurveyId(), true, true, false, this.tx)
-  }
-
   async execute (tx) {
-    //1. traverse survey hierarchy and find duplicate entities
+    this.total = 2
 
-    const { root, length } = Survey.getHierarchy()(this.survey)
+    // 1. fetch survey and node defs
+    this.survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(this.getSurveyId(), true, true, false, this.tx)
+    this.incrementProcessedItems()
 
-    this.total = length - 1 //do not consider root entity
-
-    await Survey.traverseHierarchyItem(root, async nodeDefEntity => {
-      if (this.isCanceled())
-        return
-
-      //2. for each entity def, validate entities uniqueness
-      await this.validateEntitiesUniqueness(nodeDefEntity)
-
-      this.incrementProcessedItems()
-    })
-  }
-
-  async validateEntitiesUniqueness (nodeDefEntity) {
-    const nodeDefKeys = Survey.getNodeDefKeys(nodeDefEntity)(this.survey)
+    const nodeDefRoot = Survey.getRootNodeDef(this.survey)
+    const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(this.survey)
     if (R.isEmpty(nodeDefKeys)) {
       return
     }
 
-    //1. find records with duplicate entities
-    const rowsRecordsWithDuplicateEntities = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(this.survey, nodeDefEntity, nodeDefKeys, this.tx)
+    // 2. find duplicate records
+    const rowsRecordsDuplicate = await SurveyRdbManager.fetchRecordsWithDuplicateEntities(this.survey, nodeDefRoot, nodeDefKeys, this.tx)
 
-    if (!R.isEmpty(rowsRecordsWithDuplicateEntities)) {
-      const validationDuplicate = _createValidationRecordOrEntityDuplicate(nodeDefEntity)
+    if (!R.isEmpty(rowsRecordsDuplicate)) {
+      // 3. update records validation
+      const validationDuplicate = _createValidationRecordDuplicate(nodeDefRoot)
 
-      for (const rowRecordWithDuplicateEntities of rowsRecordsWithDuplicateEntities) {
+      for (const rowRecordDuplicate of rowsRecordsDuplicate) {
         if (this.isCanceled())
           return
 
         //2. for each duplicate node entity, update record validation
-        const { uuid, validation, node_duplicate_uuids } = rowRecordWithDuplicateEntities
+        const { uuid, validation, node_duplicate_uuids } = rowRecordDuplicate
 
         const validationRecord = this.validationByRecordUuid[uuid] || validation
 
@@ -80,6 +63,8 @@ class EntitiesUniquenessValidationJob extends Job {
         await this.addRecordValidationToBatchUpdate(uuid, validationUpdated)
       }
     }
+
+    this.incrementProcessedItems()
   }
 
   async addRecordValidationToBatchUpdate (recordUuid, validation) {
@@ -106,27 +91,17 @@ class EntitiesUniquenessValidationJob extends Job {
 
 }
 
-EntitiesUniquenessValidationJob.type = 'EntitiesUniquenessValidationJob'
+RecordsUniquenessValidationJob.type = 'RecordsUniquenessValidationJob'
 
-const _createValidationRecordOrEntityDuplicate = nodeDefEntity => {
-  const isRoot = NodeDef.isRoot(nodeDefEntity)
-  return {
-    [Validator.keys.valid]: false,
-    [Validator.keys.fields]: {
-      [isRoot
-        ? RecordValidation.keys.recordKeys
-        : RecordValidation.keys.entityKeys
-        ]: {
-        [Validator.keys.valid]: false,
-        [Validator.keys.errors]: [
-          isRoot
-            ? { key: RecordValidation.keysError.duplicateRecord }
-            : { key: RecordValidation.keysError.duplicateEntity }
-        ]
-      }
+const _createValidationRecordDuplicate = () => ({
+  [Validator.keys.valid]: false,
+  [Validator.keys.fields]: {
+    [RecordValidation.keys.recordKeys]: {
+      [Validator.keys.valid]: false,
+      [Validator.keys.errors]: [{ key: RecordValidation.keysError.duplicateRecordKey }]
     }
   }
-}
+})
 
 const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
   const nodeValidation = Validator.getFieldValidation(nodeUuid)(validationRecord)
@@ -143,4 +118,4 @@ const _updateNodeValidation = (validationRecord, nodeUuid, validationNode) => {
   }
 }
 
-module.exports = EntitiesUniquenessValidationJob
+module.exports = RecordsUniquenessValidationJob

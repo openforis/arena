@@ -1,10 +1,7 @@
-const R = require('ramda')
-
 const Validator = require('../validation/validator')
 
 const CountValidator = require('./_recordValidator/countValidator')
 const AttributeValidator = require('./_recordValidator/attributeValidator')
-const EntityUniquenessValidator = require('./_recordValidator/entityUniquenessValidator')
 
 const validateNodes = async (survey, record, nodes) => {
 
@@ -14,15 +11,12 @@ const validateNodes = async (survey, record, nodes) => {
   // 2. validate min/max count
   const nodeCountValidations = CountValidator.validateChildrenCountNodes(survey, record, nodes)
 
-  // 3. validate entity keys uniqueness
-  const entityKeysValidations = EntityUniquenessValidator.validateEntitiesUniquenessInNodes(survey, record, nodes)
-
-  // 4. merge validations
+  // 3. merge validations
   const validation = {
-    [Validator.keys.fields]: R.pipe(
-      R.mergeDeepLeft(nodeCountValidations),
-      R.mergeDeepLeft(entityKeysValidations)
-    )(attributeValidations)
+    [Validator.keys.fields]: {
+      ...attributeValidations,
+      ...nodeCountValidations
+    }
   }
 
   return Validator.recalculateValidity(validation)
