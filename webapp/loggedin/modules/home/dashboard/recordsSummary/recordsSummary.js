@@ -8,18 +8,22 @@ import RecordsSummaryChart from './chart/recordsSummaryChart'
 
 import Survey from '../../../../../../common/survey/survey'
 import * as SurveyState from '../../../../../survey/surveyState'
+import * as RecordsSummaryState from './recordsSummaryState'
 
-import { fetchRecordsAddedSummary } from './actions'
+import { fetchRecordsSummary } from './actions'
 
 const RecordsSummary = props => {
-  const { surveyInfo, fetchRecordsAddedSummary } = props
+  const {
+    surveyInfo, counts, from, to,
+    fetchRecordsSummary
+  } = props
   const surveyInfoValid = Survey.isValid(surveyInfo)
 
   const i18n = useI18n()
 
   useEffect(() => {
     if (surveyInfoValid) {
-      fetchRecordsAddedSummary()
+      fetchRecordsSummary()
     }
   }, [])
 
@@ -33,8 +37,13 @@ const RecordsSummary = props => {
           </h6>
         </div>
 
-
-        <RecordsSummaryChart/>
+        {
+          from && to &&
+          <RecordsSummaryChart
+            counts={counts}
+            from={from}
+            to={to}/>
+        }
 
       </div>
     )
@@ -43,6 +52,9 @@ const RecordsSummary = props => {
 
 const mapStateToProps = state => ({
   surveyInfo: SurveyState.getSurveyInfo(state),
+  counts: RecordsSummaryState.getCounts(state),
+  from: RecordsSummaryState.getFrom(state),
+  to: RecordsSummaryState.getTo(state),
 })
 
-export default connect(mapStateToProps, { fetchRecordsAddedSummary })(RecordsSummary)
+export default connect(mapStateToProps, { fetchRecordsSummary })(RecordsSummary)

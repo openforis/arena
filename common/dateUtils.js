@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const {
   parse,
+  parseISO,
   differenceInMonths,
   differenceInWeeks,
   differenceInDays,
@@ -104,6 +105,8 @@ module.exports = {
   formatTime,
   formatDate,
 
+  parseISO,
   subDays,
   addDays,
+  differenceInDays,
 }

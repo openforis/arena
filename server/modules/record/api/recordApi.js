@@ -79,7 +79,7 @@ module.exports.init = app => {
     }
   })
 
-  app.get('/survey/:surveyId/records/created/count', requireRecordListViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, from, to } = Request.getParams(req)
 

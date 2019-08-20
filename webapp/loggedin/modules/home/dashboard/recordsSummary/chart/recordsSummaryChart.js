@@ -8,7 +8,6 @@ import XAxis from './components/xAxis'
 import { elementOffset } from '../../../../../../utils/domUtils'
 
 const RecordsSummaryChart = props => {
-
   const chartRef = useRef(null)
 
   const [chartProps, setChartProps] = useState(null)
@@ -20,7 +19,7 @@ const RecordsSummaryChart = props => {
       width,
       height,
       top: 20,
-      bottom: 20,
+      bottom: 40,
       left: 50,
       transitionDuration: 300,
     })
@@ -34,10 +33,10 @@ const RecordsSummaryChart = props => {
         chartProps &&
         <svg width={chartProps.width} height={chartProps.height}>
           <YAxis
-            data={[]}
+            {...props}
             chartProps={chartProps}/>
           <XAxis
-            data={[]}
+            {...props}
             chartProps={chartProps}/>
         </svg>
       }

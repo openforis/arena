@@ -5,19 +5,19 @@ import * as d3 from 'd3'
 
 const yMaxValue = 98765
 
-const getScale = (data, { height, bottom, top }) => {
+const getScale = (counts, { height, bottom, top }) => {
   const max = R.pipe(
     R.map(o => d3.max(o, d => d.count)),
     R.defaultTo(yMaxValue),
     v => v > 0 ? v : yMaxValue
-  )(data)
+  )(counts)
 
   return d3.scaleLinear()
     .domain([0, max])
     .range([height - bottom, top])
 }
 
-const getAxis = (data, chartProps) => d3.axisLeft(getScale(data, chartProps))
+const getAxis = (counts, chartProps) => d3.axisLeft(getScale(counts, chartProps))
   .ticks(6)
   .tickSizeInner(-chartProps.width)
   .tickSizeOuter(0)
@@ -25,7 +25,7 @@ const getAxis = (data, chartProps) => d3.axisLeft(getScale(data, chartProps))
   .tickPadding(8)
 
 const YAxis = props => {
-  const { data, chartProps } = props
+  const { counts, chartProps } = props
   const { left, transitionDuration } = chartProps
 
   const elementRef = useRef(null)
@@ -34,7 +34,7 @@ const YAxis = props => {
 
   // on data update
   useEffect(() => {
-    const axis = getAxis(data, chartProps)
+    const axis = getAxis(counts, chartProps)
     axisRef.current = d3.select(elementRef.current).call(axis)
 
     // update left offset
@@ -42,8 +42,8 @@ const YAxis = props => {
       .transition()
       .ease(d3.easePolyOut)
       .duration(transitionDuration)
-      .attr('transform', () => `translate(${R.isEmpty(data) ? 0 : left}, 0)`)
-  }, [data])
+      .attr('transform', () => `translate(${R.isEmpty(counts) ? 0 : left}, 0)`)
+  }, [counts])
 
   return (
     <g className="y-axis" ref={elementRef}/>

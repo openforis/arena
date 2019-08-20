@@ -4,21 +4,20 @@ import DateUtils from '../../../../../../common/dateUtils'
 
 import * as SurveyState from '../../../../../survey/surveyState'
 
-const recordsAddedSummaryUpdate = 'home/dashboard/recordsAdded/summary/update'
+export const recordsSummaryUpdate = 'home/recordsSummary/update'
 
-export const fetchRecordsAddedSummary = () => async (dispatch, getState) => {
+export const fetchRecordsSummary = () => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(getState())
 
   const now = Date.now()
-  const format = date => DateUtils.format(date, 'YYYY-MM-DD')
+  const format = date => DateUtils.format(date, 'yyyy-MM-dd')
   const from = format(DateUtils.subDays(now, 14))
   const to = format(now)
 
-  const { data } = await axios.get(
-    `/api/survey/${surveyId}/records/created/count`,
+  const { data: counts } = await axios.get(
+    `/api/survey/${surveyId}/records/summary/count`,
     { params: { from, to } }
   )
 
-  dispatch({ type: recordsAddedSummaryUpdate, data })
-
+  dispatch({ type: recordsSummaryUpdate, from, to, counts })
 }
