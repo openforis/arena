@@ -49,5 +49,6 @@ module.exports = {
   queryTable,
   countTable,
   countDuplicateRecords,
+  fetchRecordsCountByKeys: TableViewQuery.fetchRecordsCountByKeys,
   fetchRecordsWithDuplicateEntities: DataTableRepository.fetchRecordsWithDuplicateEntities,
 }

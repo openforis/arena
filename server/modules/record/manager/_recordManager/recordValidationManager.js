@@ -18,9 +18,14 @@ const validateNodesAndPersistValidation = async (survey, record, nodes, tx) => {
   const nodesValidation = await RecordValidator.validateNodes(survey, record, nodes)
 
   // 2. validate record keys uniqueness
-  const recordKeysValidation = !Record.isPreview(record) && isRootNodeKeysUpdated(survey, nodes)
+  const nodesKeyUpdated = !Record.isPreview(record) && isRootNodeKeysUpdated(survey, nodes)
+  const recordKeysValidation = nodesKeyUpdated
     ? await RecordUniquenessValidator.validateRecordKeysUniqueness(survey, record, tx)
     : {}
+
+  if (nodesKeyUpdated) {
+
+  }
 
   // 3. merge validations
   const validation = Validator.recalculateValidity(
@@ -63,5 +68,6 @@ module.exports = {
   persistValidation,
   updateRecordValidationsFromValues: RecordRepository.updateRecordValidationsFromValues,
   validateNodesAndPersistValidation,
-  validateRecordKeysUniqueness: RecordUniquenessValidator.validateRecordKeysUniqueness
+  validateRecordKeysUniqueness: RecordUniquenessValidator.validateRecordKeysUniqueness,
+  validateRecordsKeysUniqueness: RecordUniquenessValidator.validateRecordsKeysUniqueness,
 }

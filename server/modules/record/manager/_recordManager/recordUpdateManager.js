@@ -93,14 +93,18 @@ const deleteRecordsPreview = async (surveyId) =>
  */
 const persistNode = async (user, survey, record, node,
                            nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
-  await t.tx(async t =>
-    await _onNodesUpdate(
-      survey,
-      await NodeUpdateManager.persistNode(user, survey, record, node, t),
-      nodesUpdateListener,
-      nodesValidationListener,
-      t,
-    )
+  await t.tx(async t => {
+      await _beforeNodeUpdate(user, survey, record, node, t)
+      const nodesUpdated = await _onNodesUpdate(
+        survey,
+        await NodeUpdateManager.persistNode(user, survey, record, node, t),
+        nodesUpdateListener,
+        nodesValidationListener,
+        t,
+      )
+      await _afterNodeUpdate(user, survey, record, node, t)
+      return nodesUpdated
+    }
   )
 
 const deleteNode = async (user, survey, record, nodeUuid,
@@ -114,6 +118,15 @@ const deleteNode = async (user, survey, record, nodeUuid,
       t,
     )
   )
+
+const _beforeNodeUpdate = async (user, survey, record, node, t) => {
+  // validate record uniqueness of records with same record keys
+  const recordKeyNodes = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
+
+  if (R.includes(Node.getUuid(node), R.pluck(Node.keys.uuid, recordKeyNodes))) {
+    await RecordValidationManager.validateRecordsKeysUniqueness(survey, Record.getUuid(record), recordKeyNodes, t)
+  }
+}
 
 const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
                               nodesUpdateListener, nodesValidationListener, t) => {
@@ -150,6 +163,15 @@ const _onNodesUpdate = async (survey, { record, nodes: updatedNodes },
   }
 
   return record
+}
+
+const _afterNodeUpdate = async (user, survey, record, node, t) => {
+  // validate record uniqueness of records with same record keys
+  const recordKeyNodes = Record.getEntityKeyNodes(survey, Record.getRootNode(record))(record)
+
+  if (R.includes(Node.getUuid(node), R.pluck(Node.keys.uuid, recordKeyNodes))) {
+    await RecordValidationManager.validateRecordsKeysUniqueness(survey, null, recordKeyNodes, t)
+  }
 }
 
 module.exports = {
