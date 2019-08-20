@@ -54,6 +54,10 @@ const getNodeDefKeys = nodeDef => R.pipe(
   R.filter(n => NodeDef.isKey(n))
 )
 
+const isNodeDefRootKey = nodeDef => survey =>
+  NodeDef.isKey(nodeDef) &&
+  NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
+
 const getNodeDefByName = (name) => R.pipe(
   getNodeDefsArray,
   R.find(R.pathEq([NodeDef.keys.props, NodeDef.propKeys.name], name))
@@ -207,6 +211,7 @@ module.exports = {
   getNodeDefChildByName,
   getNodeDefSiblingByName,
   getNodeDefKeys,
+  isNodeDefRootKey,
   getNodeDefByName,
 
   getNodeDefsByCategoryUuid,

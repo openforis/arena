@@ -1,6 +1,8 @@
 const R = require('ramda')
 const camelize = require('camelize')
 
+const db = require('../../../db/db')
+
 const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const Survey = require('../../../../common/survey/survey')
@@ -94,7 +96,7 @@ const countDuplicateRecords = async (survey, record, client) => {
   return await runCount(surveyId, tableName, whereExpr, client)
 }
 
-const fetchRecordsCountByKeys = async (survey, recordUuidToExclude, keyNodes, client) => {
+const fetchRecordsCountByKeys = async (survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, client = db) => {
   const nodeDefRoot = Survey.getRootNodeDef(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
   const surveyId = Survey.getId(survey)
@@ -111,10 +113,10 @@ const fetchRecordsCountByKeys = async (survey, recordUuidToExclude, keyNodes, cl
     WITH count_records AS (
           SELECT
               ${keyColumnsString},
-              COUNT(*) AS COUNT
+              COUNT(*) AS count
           FROM
               ${rootTable}
-          ${recordUuidToExclude ? `WHERE ${DataTable.colNameRecordUuuid} != '${recordUuidToExclude}'` : ''} 
+          ${excludeRecordFromCount ? `WHERE ${DataTable.colNameRecordUuuid} != '${recordUuidExcluded}'` : ''} 
           GROUP BY 
               ${keyColumnsString}
       )
@@ -136,11 +138,11 @@ const fetchRecordsCountByKeys = async (survey, recordUuidToExclude, keyNodes, cl
     
     WHERE
       ${keysCondition}
-      ${recordUuidToExclude ? ` AND ${rootTableAlias}.${DataTable.colNameRecordUuuid} != '${recordUuidToExclude}'` : ''}
-    
+      AND ${rootTableAlias}.${DataTable.colNameRecordUuuid} != $1
+          
     GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count
     `,
-    [],
+    [recordUuidExcluded],
     camelize
   )
 }

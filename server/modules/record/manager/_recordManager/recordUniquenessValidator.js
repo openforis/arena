@@ -1,13 +1,11 @@
 const R = require('ramda')
 
-const Survey = require('../../../../../common/survey/survey')
 const Record = require('../../../../../common/record/record')
 const RecordValidation = require('../../../../../common/record/recordValidation')
 const Node = require('../../../../../common/record/node')
 const Validator = require('../../../../../common/validation/validator')
 
 const SurveyRdbManager = require('../../../surveyRdb/manager/surveyRdbManager')
-const recordRepository = require('../../repository/recordRepository')
 
 const validateRecordKeysUniqueness = async (survey, record, tx) => {
 
@@ -21,46 +19,45 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
   const keyNodes = Record.getEntityKeyNodes(survey, rootNode)(record)
 
   // 4. associate validation error to each key node
-  return R.pipe(
-    R.map(keyNode => newValidationRecordDuplicate(isUnique)(Node.getUuid(keyNode))),
-    R.flatten,
-    R.mergeAll
-  )(keyNodes)
+  const validationNodesKey = {}
+  for (const keyNode of keyNodes) {
+    validationNodesKey[Node.getUuid(keyNode)] = newValidationRecordDuplicate(isUnique)
+  }
+  return validationNodesKey
 }
 
-const validateRecordsKeysUniqueness = async (survey, recordUuidExcluded, keyNodes, tx) => {
-  const recordsCountRows = await SurveyRdbManager.fetchRecordsCountByKeys(survey, recordUuidExcluded, keyNodes, tx)
+/**
+ * Returns an indexed object with recordUuid as key and validation as value
+ */
+const validateRecordsUniqueness = async (survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx) => {
+  const result = {}
+  const recordsCountRows = await SurveyRdbManager.fetchRecordsCountByKeys(survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx)
 
   if (!R.isEmpty(recordsCountRows)) {
-    const surveyId = Survey.getId(survey)
-    const recordUuidAndValidationValues = []
-
     for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
-      const record = await recordRepository.fetchRecordByUuid(surveyId, recordUuid, tx)
-      const unique = count === 1
-      const validationNodesKey = {
-        [Validator.keys.fields]: R.map(newValidationRecordDuplicate(unique))(nodesKeyUuids)
+      const isUnique = count === '1'
+      const validationNodesKeyFields = {}
+      for (const nodeKeyUuid of nodesKeyUuids) {
+        validationNodesKeyFields[nodeKeyUuid] = newValidationRecordDuplicate(isUnique)
       }
-      const validationUpdated = Validator.mergeValidation(validationNodesKey)(Validator.getValidation(record))
-      recordUuidAndValidationValues.push([recordUuid, validationUpdated])
+      result[recordUuid] = {
+        [Validator.keys.fields]: validationNodesKeyFields
+      }
     }
-
-    await recordRepository.updateRecordValidationsFromValues(surveyId, recordUuidAndValidationValues, tx)
   }
+  return result
 }
 
-const newValidationRecordDuplicate = isUnique => nodeKeyUuid => ({
-  [nodeKeyUuid]: {
-    [Validator.keys.fields]: {
-      [RecordValidation.keys.recordKeys]: {
-        [Validator.keys.errors]: isUnique ? [] : [{ key: RecordValidation.keysError.duplicateRecord }],
-        [Validator.keys.valid]: isUnique
-      }
+const newValidationRecordDuplicate = isUnique => ({
+  [Validator.keys.fields]: {
+    [RecordValidation.keys.recordKeys]: {
+      [Validator.keys.errors]: isUnique ? [] : [{ key: RecordValidation.keysError.duplicateRecord }],
+      [Validator.keys.valid]: isUnique
     }
   }
 })
 
 module.exports = {
   validateRecordKeysUniqueness,
-  validateRecordsKeysUniqueness
+  validateRecordsUniqueness
 }
