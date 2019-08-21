@@ -1,33 +1,28 @@
-import React, { useRef } from 'react'
+import React from 'react'
+import * as R from 'ramda'
+
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
+import { Input } from '../commonComponents/form/input'
+
 import * as LoginState from './loginState'
 import { setEmail, resetPassword, setLoginError } from './actions'
+
+import { useResetPasswordFormState } from './useResetPasswordFormState'
 
 const ResetPasswordForm = props => {
 
   const {
+    password, passwordConfirm, verificationCode,
+    setPassword, setPasswordConfirm, setVerificationCode,
+    onClickReset
+  } = useResetPasswordFormState(props)
+
+  const {
     email,
-    resetPassword, setLoginError,
   } = props
-
-  const newPasswordRef = useRef(null)
-  const newPasswordConfirmRef = useRef(null)
-  const verificationCodeRef = useRef(null)
-
-  const onClickReset = () => {
-    const newPassword = newPasswordRef.current.value
-    const newPasswordConfirm = newPasswordConfirmRef.current.value
-    const verificationCode = verificationCodeRef.current.value
-
-    if (newPassword !== newPasswordConfirm) {
-      setLoginError(`Passwords don't match`)
-    } else {
-      resetPassword(verificationCode, newPassword)
-    }
-  }
 
   return (
     <div className='login-form'>
@@ -37,19 +32,22 @@ const ResetPasswordForm = props => {
              name='email'
              className="login-form__input"/>
 
-      <input ref={newPasswordRef}
+      <Input value={password}
+             onChange={setPassword}
              type='password'
              name='newPassword'
              className="login-form__input"
              placeholder='Your new Password'/>
 
-      <input ref={newPasswordConfirmRef}
+      <Input value={passwordConfirm}
+             onChange={setPasswordConfirm}
              type='password'
              name='newPasswordRepeat'
              className="login-form__input"
              placeholder='Repeat your new Password'/>
 
-      <input ref={verificationCodeRef}
+      <Input value={verificationCode}
+             onChange={setVerificationCode}
              type='text'
              name='verificationCode'
              className="login-form__input"

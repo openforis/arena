@@ -1,5 +1,11 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
+
+import { Input } from '../commonComponents/form/input'
+import useFormObject from '../commonComponents/hooks/useFormObject'
+import { validate, validateRequired, isValidationValid } from '../../common/validation/validator'
+
+import { validatePassword, validatePasswordStrength, validatePasswordConfirm, errors } from './passwordValidator'
 
 import { acceptInvitation, setLoginError } from './actions'
 
@@ -7,37 +13,70 @@ const AcceptInvitationForm = props => {
 
   const { acceptInvitation, setLoginError } = props
 
-  const nameRef = useRef(null)
-  const newPasswordRef = useRef(null)
-  const newPasswordConfirmRef = useRef(null)
-
-  const onClickReset = () => {
-    const newPassword = newPasswordRef.current.value
-    const newPasswordConfirm = newPasswordConfirmRef.current.value
-
-    if (newPassword !== newPasswordConfirm) {
-      setLoginError(`Passwords don't match`)
-    } else {
-      const name = nameRef.current.value
-      acceptInvitation(name, newPassword)
+  const formErrors = {
+    ...errors,
+    userName: {
+      requiredField: 'Please enter a new name',
     }
   }
 
+  const validateObj = async obj => await validate(
+    obj,
+    {
+      'userName': [validateRequired],
+      'passwordConfirm': [validatePasswordConfirm],
+      'password': [validateRequired, validatePassword, validatePasswordStrength],
+    })
+
+  const {
+    object: formObject,
+    setObjectField,
+    objectValid,
+    getFieldValidation,
+  } = useFormObject({
+    userName: '',
+    password: '',
+    passwordConfirm: '',
+  }, validateObj, true)
+
+  const userName = formObject.userName
+  const password = formObject.password
+  const passwordConfirm = formObject.passwordConfirm
+
+  const onClickReset = () => {
+    if (objectValid) {
+      acceptInvitation(userName, password)
+    } else {
+      const firstMatch = ['userName', 'passwordConfirm', 'password']
+        .map(field => ({ field, validation: getFieldValidation(field) }))
+        .find(v => !isValidationValid(v.validation))
+      const key = firstMatch.validation.errors[0].key
+      setLoginError(formErrors[firstMatch.field][key])
+    }
+  }
+
+  const setUserName = userName => setObjectField('userName', userName)
+  const setPassword = password => setObjectField('password', password)
+  const setPasswordConfirm = passwordConfirm => setObjectField('passwordConfirm', passwordConfirm)
+
   return (
     <div className="login-form">
-      <input ref={nameRef}
+      <Input value={userName}
+             onChange={setUserName}
              type='text'
-             name='username'
+             name='name'
              className="login-form__input"
              placeholder='Your Name'/>
 
-      <input ref={newPasswordRef}
+      <Input value={password}
+             onChange={setPassword}
              type='password'
              name='newPassword'
              className="login-form__input"
              placeholder='Your new Password'/>
 
-      <input ref={newPasswordConfirmRef}
+      <Input value={passwordConfirm}
+             onChange={setPasswordConfirm}
              type='password'
              name='newPasswordRepeat'
              className="login-form__input"
