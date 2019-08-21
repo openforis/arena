@@ -1,17 +1,11 @@
 import React, { useEffect, useRef } from 'react'
 
 import * as d3 from 'd3'
-import DateUtils from '../../../../../../../../common/dateUtils'
-
-import { getScale as getXScale } from './xAxis'
-import { getScale as getYScale } from './yAxis'
 
 const DataPoints = props => {
-  const { counts, from, to, chartProps } = props
+  const { counts, chartProps } = props
 
-  const { transitionDuration } = chartProps
-  const xScale = date => getXScale(counts, from, to, chartProps)(DateUtils.parseISO(date))
-  const yScale = getYScale(counts, chartProps)
+  const { xScale, yScale, transitionDuration } = chartProps
   const radius = 3
   const elementRef = useRef(null)
 

@@ -14,7 +14,7 @@ import * as RecordsSummaryState from './recordsSummaryState'
 
 import { fetchRecordsSummary } from './actions'
 
-const formatDate = dateStr => dateStr && DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy')
+const formatDate = dateStr => dateStr ? DateUtils.format(DateUtils.parseISO(dateStr), 'dd MMMM yyyy') : ''
 
 const RecordsSummary = props => {
   const {

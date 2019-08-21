@@ -2,13 +2,18 @@ import './recordsSummaryChart.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 
-import YAxis from './components/yAxis'
-import XAxis from './components/xAxis'
+import DateUtils from '../../../../../../../common/dateUtils'
+
+import YAxis, { getScale as getYScale } from './components/yAxis'
+import XAxis, { getScale as getXScale } from './components/xAxis'
 import DataPoints from './components/dataPoints'
+import DataPath from './components/dataPath'
 
 import { elementOffset } from '../../../../../../utils/domUtils'
 
 const RecordsSummaryChart = props => {
+  const { counts, from, to } = props
+
   const chartRef = useRef(null)
 
   const [chartProps, setChartProps] = useState(null)
@@ -16,7 +21,7 @@ const RecordsSummaryChart = props => {
   useEffect(() => {
     const { width, height } = elementOffset(chartRef.current)
 
-    setChartProps({
+    const chartPropsUpdate = {
       width,
       height,
       top: 20,
@@ -24,8 +29,13 @@ const RecordsSummaryChart = props => {
       left: 35,
       right: 35,
       transitionDuration: 300,
+    }
+    setChartProps({
+      ...chartPropsUpdate,
+      xScale: date => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
+      yScale: getYScale(counts, chartPropsUpdate)
     })
-  }, [])
+  }, [counts, from, to])
 
   return (
     <div className="home-dashboard__records-summary__chart"
@@ -41,6 +51,9 @@ const RecordsSummaryChart = props => {
             {...props}
             chartProps={chartProps}/>
           <DataPoints
+            {...props}
+            chartProps={chartProps}/>
+          <DataPath
             {...props}
             chartProps={chartProps}/>
         </svg>
