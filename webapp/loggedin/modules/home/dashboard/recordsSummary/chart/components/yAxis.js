@@ -3,26 +3,20 @@ import React, { useEffect, useRef } from 'react'
 import * as R from 'ramda'
 import * as d3 from 'd3'
 
-const yMaxValue = 98765
+const getMax = (counts) => counts.reduce((maxAcc, item) => Math.max(maxAcc, item.count), 0)
 
-const getScale = (counts, { height, bottom, top }) => {
-  const max = R.pipe(
-    R.map(o => d3.max(o, d => d.count)),
-    R.defaultTo(yMaxValue),
-    v => v > 0 ? v : yMaxValue
-  )(counts)
-
-  return d3.scaleLinear()
-    .domain([0, max])
+export const getScale = (counts, { height, bottom, top }) =>
+  d3.scaleLinear()
+    .domain([0, getMax(counts) || 98765])
     .range([height - bottom, top])
-}
 
-const getAxis = (counts, chartProps) => d3.axisLeft(getScale(counts, chartProps))
-  .ticks(6)
-  .tickSizeInner(-chartProps.width)
-  .tickSizeOuter(0)
-  .tickFormat(d3.format(',.0f'))
-  .tickPadding(8)
+const getAxis = (counts, chartProps) =>
+  d3.axisLeft(getScale(counts, chartProps))
+    .ticks(Math.min(getMax(counts), 5))
+    .tickSizeInner(-(chartProps.width - chartProps.right - chartProps.left))
+    .tickSizeOuter(0)
+    .tickFormat(d3.format(',.0f'))
+    .tickPadding(8)
 
 const YAxis = props => {
   const { counts, chartProps } = props
@@ -30,7 +24,6 @@ const YAxis = props => {
 
   const elementRef = useRef(null)
   const axisRef = useRef(null)
-
 
   // on data update
   useEffect(() => {

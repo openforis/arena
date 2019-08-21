@@ -6,5 +6,9 @@
   display: grid;
   grid-template-rows: 25px 1fr;
   position: relative;
-  //border: 1px solid $greyBorder;
+  border: 1px solid $greyBorder;
+}
+
+.home-dashboard__records-summary-header {
+  justify-self: center;
 }

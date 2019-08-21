@@ -3,9 +3,6 @@
 .home-dashboard__records-summary__chart {
   height: 100%;
 
-  svg {
-  }
-
   .y-axis, .x-axis {
     path, line {
       stroke: $greyBorder;
@@ -16,5 +13,9 @@
       font-weight: 600;
       font-size: .65rem;
     }
+  }
+
+  .data-points {
+    fill: $blue;
   }
 }

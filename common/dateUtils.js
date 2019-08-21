@@ -1,7 +1,6 @@
 const R = require('ramda')
 
 const {
-  parse,
   parseISO,
   differenceInMonths,
   differenceInWeeks,
@@ -33,7 +32,7 @@ const getRelativeDate = date => {
   if (R.isNil(date))
     return null
 
-  const timestamp = parse(date)
+  const timestamp = parseISO(date)
   const now = new Date()
 
   const formatDiff = (fn, unit) => {
@@ -42,7 +41,7 @@ const getRelativeDate = date => {
   }
 
   if (differenceInMonths(now, timestamp) > 0)
-    return format(timestamp, 'DD MMM YYYY')
+    return format(timestamp, 'dd MMM yyyy')
 
   if (differenceInWeeks(now, timestamp) > 0)
     return formatDiff(differenceInWeeks, 'week')

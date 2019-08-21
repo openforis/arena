@@ -149,7 +149,7 @@ module.exports = {
       resolved: 'Resolved',
     },
     recordsSummary: {
-      newRecords: 'New records',
+      recordsAdded: 'Records added from {{from}} to {{to}}',
     },
   },
 

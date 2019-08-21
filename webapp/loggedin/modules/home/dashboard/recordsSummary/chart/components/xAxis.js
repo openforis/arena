@@ -8,36 +8,31 @@ const getAxisValues = (from, to) => {
   const fromDate = DateUtils.parseISO(from)
   const toDate = DateUtils.parseISO(to)
   const diff = DateUtils.differenceInDays(toDate, fromDate)
-  const noTicks = 4
+  const noTicks = 5
   const daysSpan = diff / noTicks
 
   const axisValues = [fromDate]
   for (let i = 1; i <= noTicks; i++) {
     axisValues.push(DateUtils.addDays(fromDate, daysSpan * i))
   }
-
   return axisValues
 }
 
-const getScale = (axisValues, counts, { width, left }) =>
+export const getScale = (counts, from, to, { width, left, right }) =>
   d3.scaleTime()
-    .range([R.isEmpty(counts) ? 0 : left, width])
-    .domain([R.head(axisValues), R.last(axisValues)])
+    .range([R.isEmpty(counts) ? 0 : left, width - right])
+    .domain([DateUtils.parseISO(from), DateUtils.parseISO(to)])
 
-const getAxis = (from, to, counts, chartProps) => {
-
-  const axisValues = getAxisValues(from, to)
-
-  return d3.axisBottom(getScale(axisValues, counts, chartProps))
-    .tickValues(axisValues)
-    .tickFormat(d => DateUtils.format(d, 'dd-MMM-yyyy'))
+const getAxis = (from, to, counts, chartProps) =>
+  d3.axisBottom(getScale(counts, from, to, chartProps))
+    .tickValues(getAxisValues(from, to))
+    .tickFormat(d => DateUtils.format(d, 'dd-MMM-yyyy')) //TODO put year on a new line https://bl.ocks.org/mbostock/7555321
     .tickSize(5)
-    .tickPadding(16)
-}
+    .tickPadding(15)
 
 const XAxis = props => {
   const { counts, from, to, chartProps } = props
-  const { height, bottom, left, transitionDuration } = chartProps
+  const { height, bottom } = chartProps
 
   const elementRef = useRef(null)
   const axisRef = useRef(null)

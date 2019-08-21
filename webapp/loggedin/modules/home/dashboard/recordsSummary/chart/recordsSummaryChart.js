@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import YAxis from './components/yAxis'
 import XAxis from './components/xAxis'
+import DataPoints from './components/dataPoints'
 
 import { elementOffset } from '../../../../../../utils/domUtils'
 
@@ -20,7 +21,8 @@ const RecordsSummaryChart = props => {
       height,
       top: 20,
       bottom: 40,
-      left: 50,
+      left: 35,
+      right: 35,
       transitionDuration: 300,
     })
   }, [])
@@ -36,6 +38,9 @@ const RecordsSummaryChart = props => {
             {...props}
             chartProps={chartProps}/>
           <XAxis
+            {...props}
+            chartProps={chartProps}/>
+          <DataPoints
             {...props}
             chartProps={chartProps}/>
         </svg>
