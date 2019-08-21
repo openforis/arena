@@ -93,44 +93,48 @@ const deleteRecordsPreview = async (surveyId) =>
  */
 const persistNode = async (user, survey, record, node,
                            nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
-  await t.tx(async t => {
-      await _beforeNodeUpdate(user, survey, record, node, t)
-
-      const nodesUpdated = await NodeUpdateManager.persistNode(user, survey, record, node, t)
-
-      const { record: updatedRecord, updatedNodesAndDependents } = await _onNodesUpdate(
-        survey,
-        nodesUpdated,
-        nodesUpdateListener,
-        nodesValidationListener,
-        t,
-      )
-
-      await _afterNodesUpdate(user, survey, updatedRecord, updatedNodesAndDependents, t)
-
-      return updatedRecord
-    }
+  await _performNodesUpdate(
+    user,
+    survey,
+    record,
+    node,
+    (user, survey, record, node, t) => NodeUpdateManager.persistNode(user, survey, record, node, t),
+    nodesUpdateListener,
+    nodesValidationListener,
+    t
   )
 
 const deleteNode = async (user, survey, record, nodeUuid,
                           nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
-  await t.tx(async t => {
-      await _beforeNodeUpdate(user, survey, record, node, t)
-
-      const nodesUpdated = await NodeUpdateManager.deleteNode(user, survey, record, nodeUuid, t)
-
-      const { record: updatedRecord, updatedNodesAndDependents } = await _onNodesUpdate(
-        survey,
-        nodesUpdated,
-        nodesUpdateListener,
-        nodesValidationListener,
-        t,
-      )
-      await _afterNodesUpdate(user, survey, updatedRecord, updatedNodesAndDependents, t)
-
-      return updatedRecord
-    }
+  await _performNodesUpdate(
+    user,
+    survey,
+    record,
+    Record.getNodeByUuid(nodeUuid)(record),
+    (user, survey, record, node, t) => NodeUpdateManager.deleteNode(user, survey, record, Node.getUuid(node), t),
+    nodesUpdateListener,
+    nodesValidationListener,
+    t
   )
+
+const _performNodesUpdate = async (user, survey, record, node, nodesUpdateFn,
+                                   nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
+  await t.tx(async t => {
+    await _beforeNodeUpdate(user, survey, record, node, t)
+
+    const nodesUpdated = await nodesUpdateFn(user, survey, record, node, t)
+
+    const { record: updatedRecord, updatedNodesAndDependents } = await _onNodesUpdate(
+      survey,
+      nodesUpdated,
+      nodesUpdateListener,
+      nodesValidationListener,
+      t,
+    )
+    await _afterNodesUpdate(user, survey, updatedRecord, updatedNodesAndDependents, t)
+
+    return updatedRecord
+  })
 
 const _beforeNodeUpdate = async (user, survey, record, node, t) => {
   if (!Record.isPreview(record)) {
@@ -139,7 +143,7 @@ const _beforeNodeUpdate = async (user, survey, record, node, t) => {
 
     if (Survey.isNodeDefRootKey(nodeDef)(survey)) {
       // validate record uniqueness of records with same record keys
-      await RecordValidationManager.validateOtherRecordsUniquenessAndPersistValidation(survey, record, true, t)
+      await RecordValidationManager.validateRecordsUniquenessAndPersistValidation(survey, record, true, t)
     }
   }
 }
@@ -194,7 +198,7 @@ const _afterNodesUpdate = async (user, survey, record, nodes, t) => {
 
     if (rootKeyModified) {
       // validate record uniqueness of records with same record keys
-      await RecordValidationManager.validateOtherRecordsUniquenessAndPersistValidation(survey, record, false, t)
+      await RecordValidationManager.validateRecordsUniquenessAndPersistValidation(survey, record, false, t)
     }
   }
 }
