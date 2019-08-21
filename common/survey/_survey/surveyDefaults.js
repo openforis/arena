@@ -32,15 +32,18 @@ const getDefaultAuthGroups = () => [
       '3': authGroupKeys.all,
     },
   },
+  ,
   {
-    name: groupNames.dataEditor,
+    name: groupNames.dataAnalyst,
     permissions: [
       permissions.recordView,
       permissions.recordCreate,
       permissions.recordEdit,
     ],
     recordSteps: {
-      '1': authGroupKeys.own,
+      '1': authGroupKeys.all,
+      '2': authGroupKeys.all,
+      '3': authGroupKeys.all,
     },
   },
   {
@@ -56,18 +59,16 @@ const getDefaultAuthGroups = () => [
     },
   },
   {
-    name: groupNames.dataAnalyst,
+    name: groupNames.dataEditor,
     permissions: [
       permissions.recordView,
       permissions.recordCreate,
       permissions.recordEdit,
     ],
     recordSteps: {
-      '1': authGroupKeys.all,
-      '2': authGroupKeys.all,
-      '3': authGroupKeys.all,
+      '1': authGroupKeys.own,
     },
-  }
+  },
   // ,
   // {
   //   name: groupNames.surveyGuest,

@@ -4,7 +4,7 @@ CREATE TABLE
   "user"
 (
   uuid  uuid NOT NULL DEFAULT uuid_generate_v4(),
-  name  VARCHAR,
+  name  VARCHAR(128),
   email VARCHAR NOT NULL,
   prefs jsonb DEFAULT '{}'::jsonb,
 

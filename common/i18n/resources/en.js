@@ -158,7 +158,9 @@ module.exports = {
     inviteUser: 'Invite',
     sendInvitation: 'Send invitation',
     accepted: 'Accepted',
-    inviteUserConfirmation: 'An email to {{email}} has been sent'
+    inviteUserConfirmation: 'An email to {{email}} has been sent',
+    updateUserConfirmation: 'User {{name}} has been updated',
+    notAcceptedYet: 'Invitation not accepted yet'
   },
 
   itemsTable: {
@@ -282,8 +284,8 @@ module.exports = {
 
   formErrors: {
     duplicate: 'Duplicate',
-    duplicateEntity: 'Duplicate entity',
-    duplicateRecord: 'Duplicate record key',
+    duplicateEntityKey: 'Duplicate entity key',
+    duplicateRecordKey: 'Duplicate record key',
     empty: '$t(common.empty)',
     exceedingMax: 'Exceeding max',
     invalidName: 'Invalid name',
@@ -306,11 +308,11 @@ module.exports = {
     CategoriesValidationJob: 'Categories Validation',
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',
-    EntitiesUniquenessValidationJob: 'Entities Uniqueness Validation',
     NodeDefsImportJob: 'Node Defs Import',
     NodeDefsValidationJob: 'Node Defs Validation',
     RecordCheckJob: 'Record Check',
     RecordsImportJob: 'Records Import',
+    RecordsUniquenessValidationJob: 'Records Uniqueness Validation',
     SurveyCreatorJob: 'Survey Create',
     SurveyDependencyGraphsGenerationJob: 'Survey Dependency Graph Generation',
     SurveyIndexGeneratorJob: 'Survey Index Generator',

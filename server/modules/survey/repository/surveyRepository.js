@@ -38,7 +38,7 @@ const fetchSurveys = async (user, checkAccess = true, client = db) =>
     FROM survey s
     ${checkAccess ? `
     JOIN auth_group g
-      ON s.id = g.survey_id
+      ON s.uuid = g.survey_uuid
     JOIN auth_group_user gu
       ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
     :

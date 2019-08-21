@@ -12,15 +12,12 @@ const getUserUuids = recordUuid =>
     userUuidsByRecordUuid.get(recordUuid)
   )
 
-const getRecordUuid = userUuid => {
-  for (const recordUuid of userUuidsByRecordUuid.keys()) {
-    const userUuids = userUuidsByRecordUuid.get(recordUuid)
-    if (userUuids && userUuids.has(userUuid)) {
-      return recordUuid
-    }
-  }
-  return null
-}
+const getRecordUuid = userUuid =>
+  Array.from(userUuidsByRecordUuid.keys()).find(
+    recordUuid => {
+      const userUuids = userUuidsByRecordUuid.get(recordUuid)
+      return userUuids && userUuids.has(userUuid)
+    })
 
 const assocUser = (surveyId, recordUuid, user, preview) => {
   if (!userUuidsByRecordUuid.has(recordUuid))
@@ -51,14 +48,16 @@ const touchPreviewRecord = recordUuid => {
   previewRecordsByRecordUuid.set(recordUuid, { ...previewData, date: new Date() })
 }
 
-const getStalePreviewRecordUuids = olderThan => {
-  const array = []
-  for (const [recordUuid, { date, surveyId, user }] of previewRecordsByRecordUuid.entries()) {
-    if (isDateBefore(date, olderThan))
-      array.push({ recordUuid, surveyId, user })
-  }
-  return array
-}
+const getStalePreviewRecordUuids = olderThan =>
+  Array.from(previewRecordsByRecordUuid.entries()).reduce(
+    (acc, [recordUuid, { date, surveyId, user }]) => {
+      if (isDateBefore(date, olderThan)) {
+        acc.push({ recordUuid, surveyId, user })
+      }
+      return acc
+    },
+    []
+  )
 
 module.exports = {
   getUserUuids,

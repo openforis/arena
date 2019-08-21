@@ -1,17 +1,22 @@
+const R = require('ramda')
+
 const Request = require('../../utils/request')
 
 const SurveyManager = require('../survey/manager/surveyManager')
 const RecordService = require('../record/service/recordService')
+const UserService = require('../user/service/userService')
 
 const Authorizer = require('../../../common/auth/authorizer')
 const Survey = require('../../../common/survey/survey')
+const User = require('../../../common/user/user')
+const AuthGroups = require('../../../common/auth/authGroups')
 
 const UnauthorizedError = require('../../utils/unauthorizedError')
 
-const checkPermission = (req, next, permissionFn, obj) => {
+const checkPermission = (req, next, permissionFn, ...args) => {
   const user = Request.getUser(req)
 
-  if (permissionFn(user, obj)) {
+  if (permissionFn(user, ...args)) {
     next()
   } else {
     next(new UnauthorizedError(user && user.name))
@@ -43,6 +48,19 @@ const requireRecordPermission = permissionFn => async (req, res, next) => {
   }
 }
 
+const requireUserPermission = permissionFn => async (req, res, next) => {
+  try {
+    const { surveyId, userUuid } = Request.getParams(req)
+    const survey = await SurveyManager.fetchSurveyById(surveyId)
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    const user = await UserService.fetchUserByUuid(userUuid)
+
+    checkPermission(req, next, permissionFn, surveyInfo, user)
+  } catch (e) {
+    next(e)
+  }
+}
+
 module.exports = {
   // Survey
   requireSurveyViewPermission: requireSurveyPermission(Authorizer.canViewSurvey),
@@ -55,5 +73,8 @@ module.exports = {
   requireRecordViewPermission: requireSurveyPermission(Authorizer.canViewRecord),
 
   // User
-  requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers)
+  // requireUserEditPermission: requireUserEditPermissions,
+  requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers),
+  requireUserViewPermission: requireUserPermission(Authorizer.canViewUser),
+  requireUserEditPermission: requireUserPermission(Authorizer.canEditUser),
 }

@@ -1,10 +1,10 @@
 const db = require('../../../db/db')
 
 const User = require('../../../../common/user/user')
-
+const AuthGroups = require('../../../../common/auth/authGroups')
 const UserRepository = require('../repository/userRepository')
-const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 
+const AuthGroupRepository = require('../../auth/repository/authGroupRepository')
 const ActivityLog = require('../../activityLog/activityLogger')
 
 // ==== CREATE
@@ -44,6 +44,45 @@ const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
 
 const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
+const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, client = db) =>
+  await client.tx(async t => {
+    const users = await UserRepository.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins, t)
+
+    return await Promise.all(
+      users.map(async u => ({
+        ...u,
+        authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(u))
+      }))
+    )
+  })
+
+// ==== UPDATE
+
+const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, client = db) =>
+  await client.tx(async t => {
+    const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
+
+    if (AuthGroups.isSystemAdminGroup(newGroup)) {
+      // if new group is SystemAdmin, delete all user groups and set his new group to SystemAdmin
+      await AuthGroupRepository.deleteAllUserGroups(userUuid, t)
+      await AuthGroupRepository.insertUserGroup(groupUuid, userUuid, t)
+    } else {
+      await AuthGroupRepository.updateUserGroup(surveyId, userUuid, groupUuid, t)
+    }
+
+    await ActivityLog.log(
+      user,
+      surveyId,
+      ActivityLog.type.userUpdate,
+      { userUuid, name, email, groupUuid },
+      t
+    )
+
+    return await UserRepository.updateUser(userUuid, name, email, t)
+  })
+
+const updateUser = _userFetcher(_updateUser)
+
 // ==== DELETE
 
 const deleteUserPref = async (user, name) => ({
@@ -57,7 +96,7 @@ module.exports = {
   addUserToGroup,
 
   // READ
-  fetchUsersBySurveyId: UserRepository.fetchUsersBySurveyId,
+  fetchUsersBySurveyId,
 
   countUsersBySurveyId: UserRepository.countUsersBySurveyId,
 
@@ -66,6 +105,8 @@ module.exports = {
   fetchUserByEmail,
 
   // UPDATE
+  updateUser,
+
   updateUsername: UserRepository.updateUsername,
 
   updateUserPref: UserRepository.updateUserPref,

@@ -4,7 +4,7 @@ const Job = require('../../../job/job')
 
 const { languageCodes } = require('../../../../common/app/languages')
 const { isNotBlank } = require('../../../../common/stringUtils')
-const CSVParser = require('../../../../common/file/csvParser')
+const CSVParser = require('../../../utils/file/csvParser')
 
 const Validator = require('../../../../common/validation/validator')
 const Taxonomy = require('../../../../common/survey/taxonomy')

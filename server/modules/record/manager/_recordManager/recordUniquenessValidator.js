@@ -15,13 +15,12 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
 
   // 3. fetch key nodes
   const rootNode = Record.getRootNode(record)
-
   const keyNodes = Record.getEntityKeyNodes(survey, rootNode)(record)
 
   // 4. associate validation error to each key node
   const validationNodesKey = {}
   for (const keyNode of keyNodes) {
-    validationNodesKey[Node.getUuid(keyNode)] = newValidationRecordDuplicate(isUnique)
+    validationNodesKey[Node.getUuid(keyNode)] = _newValidationRecordDuplicate(isUnique)
   }
   return validationNodesKey
 }
@@ -38,7 +37,7 @@ const validateRecordsUniqueness = async (survey, keyNodes, recordUuidExcluded, e
       const isUnique = count === '1'
       const validationNodesKeyFields = {}
       for (const nodeKeyUuid of nodesKeyUuids) {
-        validationNodesKeyFields[nodeKeyUuid] = newValidationRecordDuplicate(isUnique)
+        validationNodesKeyFields[nodeKeyUuid] = _newValidationRecordDuplicate(isUnique)
       }
       result[recordUuid] = {
         [Validator.keys.fields]: validationNodesKeyFields
@@ -48,7 +47,7 @@ const validateRecordsUniqueness = async (survey, keyNodes, recordUuidExcluded, e
   return result
 }
 
-const newValidationRecordDuplicate = isUnique => ({
+const _newValidationRecordDuplicate = isUnique => ({
   [Validator.keys.fields]: {
     [RecordValidation.keys.recordKeys]: {
       [Validator.keys.errors]: isUnique ? [] : [{ key: RecordValidation.keysError.duplicateRecord }],

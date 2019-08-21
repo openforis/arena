@@ -1,6 +1,5 @@
 const R = require('ramda')
 const StringUtils = require('../stringUtils')
-const AuthGroups = require('../auth/authGroups')
 
 const keys = {
   uuid: 'uuid',
@@ -13,6 +12,8 @@ const keys = {
 }
 
 // ==== User properties
+const isEqual = user1 => user2 => getUuid(user1) === getUuid(user2)
+
 const getUuid = R.prop(keys.uuid)
 
 const getName = R.prop(keys.name)
@@ -21,19 +22,10 @@ const getEmail = R.prop(keys.email)
 
 const getAuthGroups = R.prop(keys.authGroups)
 
-const getAuthGroupAdmin = R.pipe(
-  getAuthGroups,
-  R.find(AuthGroups.isAdminGroup)
-)
-
 const hasAccepted = R.pipe(
   R.propOr('', keys.name),
   StringUtils.isNotBlank
 )
-
-// The following methods are used in UserListView. They are meant to work on the
-// object returned by the '/api/survey/:surveyId/users' entry point.
-const getGroupName = R.prop(keys.groupName)
 
 // ==== User record permissions
 const getRecordPermissions = record => user =>
@@ -47,14 +39,12 @@ const getRecordPermissions = record => user =>
 module.exports = {
   keys,
 
+  isEqual,
   getUuid,
   getName,
   getEmail,
   getAuthGroups,
-  getAuthGroupAdmin,
   hasAccepted,
-
-  getGroupName,
 
   getRecordPermissions,
 }
