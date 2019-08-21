@@ -5,11 +5,11 @@ import * as CognitoAuth from '../app/cognitoAuth'
 import * as LoginState from './loginState'
 import { hideAppLoader, initUser, showAppLoader, showNotificationMessage } from '../app/actions'
 
-export const emailUpdate = 'login/email/update'
+export const loginEmailUpdate = 'login/email/update'
 export const loginUserActionUpdate = 'login/userAction/update'
 export const loginErrorUpdate = 'login/error'
 
-export const setEmail = email => dispatch => dispatch({ type: emailUpdate, email })
+export const setEmail = email => dispatch => dispatch({ type: loginEmailUpdate, email })
 
 export const setLoginError = message => dispatch => dispatch({ type: loginErrorUpdate, message })
 
@@ -58,7 +58,7 @@ export const showForgotPasswordForm = () => dispatch => {
   dispatch({ type: loginUserActionUpdate, action: LoginState.userActions.forgotPassword })
 }
 
-export const sendResetPasswordRequest = email => _createAction(
+export const sendVerificationCode = email => _createAction(
   async dispatch => {
     const responseType = await CognitoAuth.forgotPassword(email)
     if (responseType === CognitoAuth.keysAction.success) {

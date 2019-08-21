@@ -8,21 +8,32 @@ export const keysAction = {
 const UserPoolId = __COGNITO_USER_POOL_ID__
 const ClientId = __COGNITO_CLIENT_ID__
 
-const getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
+const _getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
 
-export const getUser = () => getUserPool().getCurrentUser()
+const _newCognitoUser = Username => new CognitoUser({ Username, Pool: _getUserPool() })
 
-const newCognitoUser = Username => new CognitoUser({ Username, Pool: getUserPool() })
+const _checkPassword = password => {
+  if (!password) {
+    throw new Error('Please specify a new password')
+  }
+  if (!(new RegExp(/^[\S]+.*[\S]+$/)).test(password)) {
+    throw new Error('Password should not start nor end with white spaces')
+  }
+  const passwordRegExp = new RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/)
+  if (!passwordRegExp.test(password)) {
+    throw new Error('Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers')
+  }
+}
 
 // Global variables to handle completeNewPasswordChallenge flow
-let cognitoUser
-let sessionUserAttributes
+let _cognitoUser
+let _sessionUserAttributes
 
-const cognitoCallbacks = (onSuccess, onFailure, reset = true) => ({
+const _cognitoCallbacks = (onSuccess, onFailure, reset = true) => ({
   onSuccess: () => {
     if (reset) {
-      cognitoUser = null
-      sessionUserAttributes = null
+      _cognitoUser = null
+      _sessionUserAttributes = null
     }
     onSuccess(keysAction.success)
   },
@@ -33,26 +44,30 @@ const cognitoCallbacks = (onSuccess, onFailure, reset = true) => ({
     // the api doesn't accept this field back
     delete userAttributes.email_verified
 
-    sessionUserAttributes = userAttributes
+    _sessionUserAttributes = userAttributes
     onSuccess(keysAction.newPasswordRequired)
   }
 })
 
+export const getUser = () => _getUserPool().getCurrentUser()
+
 export const login = (Username, Password) =>
   new Promise((resolve, reject) => {
-    cognitoUser = newCognitoUser(Username)
-    cognitoUser.authenticateUser(
+    _cognitoUser = _newCognitoUser(Username)
+    _cognitoUser.authenticateUser(
       new AuthenticationDetails({ Username, Password }),
-      cognitoCallbacks(resolve, reject)
+      _cognitoCallbacks(resolve, reject)
     )
   })
 
 export const acceptInvitation = (name, password) =>
   new Promise((resolve, reject) => {
-    cognitoUser.completeNewPasswordChallenge(
+    _checkPassword(password)
+
+    _cognitoUser.completeNewPasswordChallenge(
       password,
-      { ...sessionUserAttributes, name },
-      cognitoCallbacks(resolve, reject)
+      { ..._sessionUserAttributes, name },
+      _cognitoCallbacks(resolve, reject)
     )
   })
 
@@ -70,8 +85,8 @@ export const forgotPassword = username =>
       throw new Error('Please enter your email')
     }
 
-    cognitoUser = newCognitoUser(username)
-    cognitoUser.forgotPassword(cognitoCallbacks(resolve, reject, false))
+    _cognitoUser = _newCognitoUser(username)
+    _cognitoUser.forgotPassword(_cognitoCallbacks(resolve, reject, false))
   })
 
 export const resetPassword = (verificationCode, password) =>
@@ -79,15 +94,10 @@ export const resetPassword = (verificationCode, password) =>
     // Override Cognito error messages with more readable ones
     if (!(new RegExp(/^[\S]+$/)).test(verificationCode)) {
       throw new Error('Please enter a valid verification code')
-    } else if (!password) {
-      throw new Error('Please specify a new password')
-    } else if (!(new RegExp(/^[\S]+.*[\S]+$/)).test(password)) {
-      throw new Error('Password should not start nor end with white spaces')
-    } else if (password.length < 6) {
-      throw new Error('Password does not conform to policy: Password not long enough')
     }
+    _checkPassword(password)
 
-    cognitoUser.confirmPassword(verificationCode, password, cognitoCallbacks(resolve, reject))
+    _cognitoUser.confirmPassword(verificationCode, password, _cognitoCallbacks(resolve, reject))
   })
 
 /**
@@ -100,12 +110,16 @@ export const getJwtToken = () => new Promise((resolve, reject) => {
   if (user) {
     user.getSession((err, session) => {
       if (err) {
-        reject(err)
+        return reject(err)
       }
 
-      const accessToken = session.getAccessToken()
-      const jwtToken = accessToken.jwtToken
-      resolve(jwtToken)
+      try {
+        const accessToken = session.getAccessToken()
+        const jwtToken = accessToken.jwtToken
+        resolve(jwtToken)
+      } catch (e) {
+        reject(e)
+      }
     })
   } else {
     resolve(null)

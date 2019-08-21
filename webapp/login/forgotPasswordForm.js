@@ -2,18 +2,18 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import * as LoginState from './loginState'
-import { setEmail, sendResetPasswordRequest } from './actions'
+import { setEmail, sendVerificationCode } from './actions'
 
 const ForgotPasswordForm = props => {
 
   const {
     email,
-    setEmail, sendResetPasswordRequest
+    setEmail, sendVerificationCode
   } = props
 
   const onClickReset = () => {
     if (email) {
-      sendResetPasswordRequest(email)
+      sendVerificationCode(email)
     }
   }
 
@@ -44,5 +44,5 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
   setEmail,
-  sendResetPasswordRequest,
+  sendVerificationCode,
 })(ForgotPasswordForm)
