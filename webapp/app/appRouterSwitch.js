@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
-import { withRouter, Switch, Route } from 'react-router-dom'
+import { withRouter, Route } from 'react-router-dom'
 
 import DynamicImport from '../commonComponents/dynamicImport'
 import LoginView from '../login/loginView'

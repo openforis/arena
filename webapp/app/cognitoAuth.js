@@ -67,7 +67,7 @@ export const forgotPassword = username =>
   new Promise((resolve, reject) => {
     // Override Cognito error messages with a more readable one
     if (!username) {
-      reject(new Error('Please enter your email'))
+      throw new Error('Please enter your email')
     }
 
     cognitoUser = newCognitoUser(username)
@@ -78,13 +78,13 @@ export const resetPassword = (verificationCode, password) =>
   new Promise((resolve, reject) => {
     // Override Cognito error messages with more readable ones
     if (!(new RegExp(/^[\S]+$/)).test(verificationCode)) {
-      reject(new Error('Please enter a valid verification code'))
+      throw new Error('Please enter a valid verification code')
     } else if (!password) {
-      reject(new Error('Please specify a new password'))
+      throw new Error('Please specify a new password')
     } else if (!(new RegExp(/^[\S]+.*[\S]+$/)).test(password)) {
-      reject(new Error('Password should not start nor end with white spaces'))
+      throw new Error('Password should not start nor end with white spaces')
     } else if (password.length < 6) {
-      reject(new Error('Password does not conform to policy: Password not long enough'))
+      throw new Error('Password does not conform to policy: Password not long enough')
     }
 
     cognitoUser.confirmPassword(verificationCode, password, cognitoCallbacks(resolve, reject))
@@ -103,14 +103,9 @@ export const getJwtToken = () => new Promise((resolve, reject) => {
         reject(err)
       }
 
-      try {
-        const accessToken = session.getAccessToken()
-        const jwtToken = accessToken.jwtToken
-        resolve(jwtToken)
-      } catch (e) {
-        reject(e)
-      }
-
+      const accessToken = session.getAccessToken()
+      const jwtToken = accessToken.jwtToken
+      resolve(jwtToken)
     })
   } else {
     resolve(null)
