@@ -5,6 +5,9 @@ const camelize = require('camelize')
 const User = require('../../../../common/user/user')
 const AuthGroups = require('../../../../common/auth/authGroups')
 
+const selectFields = ['uuid', 'name', 'email', 'prefs']
+const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
+
 // in sql queries, user table must be surrounded by "" e.g. "user"
 
 // CREATE
@@ -13,7 +16,7 @@ const insertUser = async (surveyId, uuid, email, client = db) =>
   await client.one(`
     INSERT INTO "user" (uuid, email, prefs)
     VALUES ($1, $2, $3::jsonb)
-    RETURNING *`,
+    RETURNING ${selectFieldsCommaSep}`,
     [uuid, email, { survey: surveyId }],
     camelize)
 
@@ -34,7 +37,7 @@ const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client 
 
 const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSystemAdmins = false, client = db) =>
   await client.map(`
-    SELECT u.*
+    SELECT ${selectFieldsCommaSep}
     FROM "user" u
     JOIN survey s ON s.id = $1
     JOIN auth_group_user gu ON gu.user_uuid = u.uuid
@@ -50,37 +53,45 @@ const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSys
 
 const fetchUserByUuid = async (uuid, client = db) =>
   await client.one(`
-    SELECT *
-    FROM "user"
-    WHERE uuid = $1`,
+    SELECT ${selectFieldsCommaSep}
+    FROM "user" u
+    WHERE u.uuid = $1`,
     [uuid],
     camelize)
 
 const fetchUserByEmail = async (email, client = db) =>
   await client.oneOrNone(`
-    SELECT *
-    FROM "user"
-    WHERE email = $1`,
+    SELECT ${selectFieldsCommaSep}
+    FROM "user" u
+    WHERE u.email = $1`,
     [email],
     camelize)
+
+const fetchUserProfilePicture = async (uuid, client = db) => {
+  await client.one(`
+    SELECT profile_picture
+    FROM "user" u
+    WHERE u.uuid = $1`,
+    uuid)
+}
 
 // ==== UPDATE
 
 const updateUser = async (uuid, name, email, client = db) =>
   await client.one(`
-    UPDATE "user"
-    SET name = $1, email = $2
-    WHERE uuid = $3
-    RETURNING *`,
+    UPDATE "user" u
+    SET u.name = $1, u.email = $2
+    WHERE u.uuid = $3
+    RETURNING ${selectFieldsCommaSep}`,
     [name, email, uuid],
     camelize)
 
 const updateUsername = async (user, name, client = db) =>
   await client.one(`
-    UPDATE "user" 
-    SET name = $1
-    WHERE uuid = $2
-    RETURNING *`,
+    UPDATE "user"  u
+    SET u.name = $1
+    WHERE u.uuid = $2
+    RETURNING ${selectFieldsCommaSep}`,
     [name, User.getUuid(user)],
     camelize)
 
@@ -90,10 +101,10 @@ const updateUserPref = async (user, name, value, client = db) => {
   )
 
   const userRes = await client.one(`
-    UPDATE "user"
-    SET prefs = prefs || $1
-    WHERE uuid = $2
-    RETURNING *`,
+    UPDATE "user" u
+    SET u.prefs = u.prefs || $1
+    WHERE u.uuid = $2
+    RETURNING ${selectFieldsCommaSep}`,
     [userPref, User.getUuid(user)],
     camelize)
 
@@ -104,10 +115,10 @@ const updateUserPref = async (user, name, value, client = db) => {
 
 const deleteUserPref = async (user, name, client = db) => {
   const userRes = await client.one(`
-    UPDATE "user"
-    SET prefs = prefs - $1
-    WHERE uuid = $2
-    RETURNING *`,
+    UPDATE "user" u
+    SET u.prefs = u.prefs - $1
+    WHERE u.uuid = $2
+    RETURNING ${selectFieldsCommaSep}`,
     [name, User.getUuid(user)],
     camelize)
 
@@ -123,6 +134,7 @@ module.exports = {
   fetchUsersBySurveyId,
   fetchUserByUuid,
   fetchUserByEmail,
+  fetchUserProfilePicture,
 
   // UPDATE
   updateUser,

@@ -102,6 +102,8 @@ module.exports = {
 
   fetchUserByUuid,
 
+  fetchUserProfilePicture: UserRepository.fetchUserProfilePicture,
+
   fetchUserByEmail,
 
   // UPDATE

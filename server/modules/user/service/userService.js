@@ -96,6 +96,8 @@ module.exports = {
 
   fetchUserByUuid: UserManager.fetchUserByUuid,
 
+  fetchUserProfilePicture: UserManager.fetchUserProfilePicture,
+
   updateUser,
 
   updateUsername,

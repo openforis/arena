@@ -72,6 +72,23 @@ module.exports.init = app => {
     }
   })
 
+  app.get('user/:userUuid/profilePicture', async (req, res, next) => {
+    try {
+      const { userUuid } = Request.getParams(req)
+
+      const profilePicture = await UserService.fetchUserProfilePicture(userUuid)
+
+      console.log('__dirname', __dirname)
+      if (profilePicture) {
+        res.end(profilePicture, 'binary')
+      } else {
+        res.sendFile(`${__dirname}/avatar.png`)
+      }
+    } catch (err) {
+      next(err)
+    }
+  })
+
   // ==== UPDATE
 
   app.put('/user/:userUuid/name', async (req, res, next) => {
