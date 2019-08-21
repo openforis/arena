@@ -93,7 +93,7 @@ const deleteRecordsPreview = async (surveyId) =>
  */
 const persistNode = async (user, survey, record, node,
                            nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
-  await _performNodesUpdate(
+  await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
@@ -106,7 +106,7 @@ const persistNode = async (user, survey, record, node,
 
 const deleteNode = async (user, survey, record, nodeUuid,
                           nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
-  await _performNodesUpdate(
+  await _updateNodeAndValidateRecordUniqueness(
     user,
     survey,
     record,
@@ -117,7 +117,7 @@ const deleteNode = async (user, survey, record, nodeUuid,
     t
   )
 
-const _performNodesUpdate = async (user, survey, record, node, nodesUpdateFn,
+const _updateNodeAndValidateRecordUniqueness = async (user, survey, record, node, nodesUpdateFn,
                                    nodesUpdateListener = null, nodesValidationListener = null, t = db) =>
   await t.tx(async t => {
     await _beforeNodeUpdate(user, survey, record, node, t)
