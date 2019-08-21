@@ -1,36 +1,42 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { resetPassword, setLoginError } from './actions'
+import * as LoginState from './loginState'
+import { setEmail, resetPassword, setLoginError } from './actions'
 
 const ResetPasswordForm = props => {
 
   const {
-    username, verificationCode,
+    email,
     resetPassword, setLoginError,
   } = props
 
   const newPasswordRef = useRef(null)
   const newPasswordConfirmRef = useRef(null)
+  const verificationCodeRef = useRef(null)
 
   const onClickReset = () => {
     const newPassword = newPasswordRef.current.value
     const newPasswordConfirm = newPasswordConfirmRef.current.value
+    const verificationCode = verificationCodeRef.current.value
 
     if (newPassword !== newPasswordConfirm) {
       setLoginError(`Passwords don't match`)
     } else {
-      resetPassword(username, verificationCode, newPassword)
+      resetPassword(verificationCode, newPassword)
     }
   }
 
-  useEffect(() => {
-  }, [username, verificationCode])
-
   return (
     <div className='login-form'>
+      <input value={email}
+             readOnly={true}
+             type='text'
+             name='email'
+             className="login-form__input"/>
+
       <input ref={newPasswordRef}
              type='password'
              name='newPassword'
@@ -43,6 +49,12 @@ const ResetPasswordForm = props => {
              className="login-form__input"
              placeholder='Repeat your new Password'/>
 
+      <input ref={verificationCodeRef}
+             type='text'
+             name='verificationCode'
+             className="login-form__input"
+             placeholder='Verification code'/>
+
       <div className="login-form__buttons">
         <button type="button"
                 className="btn btn-login"
@@ -53,20 +65,16 @@ const ResetPasswordForm = props => {
     </div>
   )
 }
-const mapStateToProps = (_, { location }) => {
-  const urlSearchParams = new URLSearchParams(location.search)
 
-  return {
-    username: urlSearchParams.get('username'),
-    verificationCode: urlSearchParams.get('verificationCode'),
-  }
-}
+const mapStateToProps = state => ({
+  email: LoginState.getEmail(state),
+})
 
 const enhance = compose(
   withRouter,
   connect(
     mapStateToProps,
-    { resetPassword, setLoginError }
+    { setEmail, resetPassword, setLoginError }
   )
 )
 

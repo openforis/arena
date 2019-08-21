@@ -1,16 +1,17 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
-import { sendResetPasswordRequest } from './actions'
+import * as LoginState from './loginState'
+import { setEmail, sendResetPasswordRequest } from './actions'
 
 const ForgotPasswordForm = props => {
 
-  const { sendResetPasswordRequest } = props
-
-  const emailRef = useRef(null)
+  const {
+    email,
+    setEmail, sendResetPasswordRequest
+  } = props
 
   const onClickReset = () => {
-    const email = emailRef.current.value
     if (email) {
       sendResetPasswordRequest(email)
     }
@@ -18,7 +19,8 @@ const ForgotPasswordForm = props => {
 
   return (
     <div className="login-form">
-      <input ref={emailRef}
+      <input value={email}
+             onChange={e => setEmail(e.target.value)}
              type='text'
              name='username'
              className="login-form__input"
@@ -27,7 +29,6 @@ const ForgotPasswordForm = props => {
       <div className="login-form__buttons">
         <button type="button"
                 className="btn btn-login"
-                aria-disabled={false}
                 onClick={onClickReset}>
           <span className="icon icon-envelop icon-12px icon-left"/>
           Send verification code
@@ -37,4 +38,11 @@ const ForgotPasswordForm = props => {
   )
 }
 
-export default connect(null, { sendResetPasswordRequest })(ForgotPasswordForm)
+const mapStateToProps = state => ({
+  email: LoginState.getEmail(state),
+})
+
+export default connect(mapStateToProps, {
+  setEmail,
+  sendResetPasswordRequest,
+})(ForgotPasswordForm)

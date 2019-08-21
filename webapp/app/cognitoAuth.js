@@ -18,16 +18,18 @@ const newCognitoUser = Username => new CognitoUser({ Username, Pool: getUserPool
 let cognitoUser
 let sessionUserAttributes
 
-const cognitoCallbacks = (onSuccess, onFailure) => ({
+const cognitoCallbacks = (onSuccess, onFailure, reset = true) => ({
   onSuccess: () => {
-    cognitoUser = null
-    sessionUserAttributes = null
+    if (reset) {
+      cognitoUser = null
+      sessionUserAttributes = null
+    }
     onSuccess(keysAction.success)
   },
 
   onFailure,
 
-  newPasswordRequired: (userAttributes) => {
+  newPasswordRequired: userAttributes => {
     // the api doesn't accept this field back
     delete userAttributes.email_verified
 
@@ -63,19 +65,30 @@ export const logout = () => {
 
 export const forgotPassword = username =>
   new Promise((resolve, reject) => {
-    newCognitoUser(username).forgotPassword(cognitoCallbacks(resolve, reject))
+    // Override Cognito error messages with a more readable one
+    if (!username) {
+      reject(new Error('Please enter your email'))
+    }
+
+    cognitoUser = newCognitoUser(username)
+    cognitoUser.forgotPassword(cognitoCallbacks(resolve, reject, false))
   })
 
-export const resetPassword = (username, verificationCode, newPassword) => {
-  cognitoUser = newCognitoUser(username)
+export const resetPassword = (verificationCode, password) =>
+  new Promise((resolve, reject) => {
+    // Override Cognito error messages with more readable ones
+    if (!(new RegExp(/^[\S]+$/)).test(verificationCode)) {
+      reject(new Error('Please enter a valid verification code'))
+    } else if (!password) {
+      reject(new Error('Please specify a new password'))
+    } else if (!(new RegExp(/^[\S]+.*[\S]+$/)).test(password)) {
+      reject(new Error('Password should not start nor end with white spaces'))
+    } else if (password.length < 6) {
+      reject(new Error('Password does not conform to policy: Password not long enough'))
+    }
 
-  return new Promise((resolve, reject) => {
-    cognitoUser.confirmPassword(verificationCode, newPassword, {
-      onFailure: reject,
-      onSuccess: () => resolve(),
-    })
+    cognitoUser.confirmPassword(verificationCode, password, cognitoCallbacks(resolve, reject))
   })
-}
 
 /**
  *

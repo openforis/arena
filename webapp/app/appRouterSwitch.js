@@ -77,13 +77,7 @@ const AppRouterSwitch = props => {
               />
             )
             : (
-              <Switch>
-                <Route
-                  path={'/app/resetPassword'}
-                  render={props => <LoginView {...props} resetPassword={true} />}
-                />
-                <Route component={LoginView} />
-              </Switch>
+              <LoginView/>
             )
         }
 

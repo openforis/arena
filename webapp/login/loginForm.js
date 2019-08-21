@@ -1,24 +1,29 @@
-import React, { useRef } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import { login, showForgotPasswordForm } from './actions'
+import * as LoginState from './loginState'
+import { setEmail, login, showForgotPasswordForm } from './actions'
 
 const LoginForm = props => {
 
-  const { login, showForgotPasswordForm, } = props
+  const {
+    email,
+    setEmail, login, showForgotPasswordForm
+  } = props
 
-  const email = useRef(null)
-  const password = useRef(null)
+  const [password, setPassword] = useState('')
 
   return (
     <div className="login-form">
-      <input ref={email}
+      <input value={email}
+             onChange={e => setEmail(e.target.value)}
              type='text'
              name='email'
              className="login-form__input"
              placeholder='Your email'/>
 
-      <input ref={password}
+      <input value={password}
+             onChange={e => setPassword(e.target.value)}
              type='password'
              name='password'
              className="login-form__input"
@@ -28,7 +33,7 @@ const LoginForm = props => {
 
         <button type="button"
                 className="btn btn-login"
-                onClick={() => login(email.current.value, password.current.value)}>
+                onClick={() => login(email, password)}>
           Login
         </button>
 
@@ -44,4 +49,8 @@ const LoginForm = props => {
   )
 }
 
-export default connect(null, { login, showForgotPasswordForm })(LoginForm)
+const mapStateToProps = state => ({
+  email: LoginState.getEmail(state),
+})
+
+export default connect(mapStateToProps, { setEmail, login, showForgotPasswordForm })(LoginForm)
