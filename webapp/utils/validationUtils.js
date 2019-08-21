@@ -4,11 +4,20 @@ import Markdown from 'react-remarkable'
 
 import Validator from '../../common/validation/validator'
 
-const getErrorText = (error, i18n, errorKeyPrefix = 'formErrors') => error.key === 'custom'
-  ? error.messages[i18n.lang]
-  : i18n.t([`${errorKeyPrefix}.${error.key}`, error.key], error.params)
+const getErrorText = (error, i18n, errorKeyPrefix = null) => {
+  const errorKey = error.key
 
-const getFieldError = (i18n, errorKeyPrefix) => field => R.pipe(
+  if (errorKey === Validator.keys.customErrorMessageKey) {
+    return error.messages[i18n.lang]
+  } else {
+    const messageKeys = errorKeyPrefix
+      ? [`${errorKeyPrefix}.${errorKey}`, errorKey]
+      : [errorKey]
+    return i18n.t(messageKeys, error.params)
+  }
+}
+
+const getFieldError = (i18n, errorKeyPrefix = null) => field => R.pipe(
   R.pathOr([], [field, 'errors']),
   R.map(error => getErrorText(error, i18n, errorKeyPrefix)),
   R.ifElse(
@@ -18,27 +27,25 @@ const getFieldError = (i18n, errorKeyPrefix) => field => R.pipe(
   )
 )
 
-export const getValidationFieldMessages = (i18n, errorKeyPrefix, showKeys = true) =>
+export const getValidationFieldMessages = (i18n, errorKeyPrefix = null, showKeys = true) =>
   validation => {
     const validationFields = Validator.getInvalidFieldValidations(validation)
 
     return R.pipe(
       R.keys,
-      R.map(field => `${showKeys ? field + ': ' : ''}${getFieldError(i18n, errorKeyPrefix)(field)(validationFields)}`)
+      R.map(field => `${showKeys ? `${i18n.t(field)}: ` : ''}${getFieldError(i18n, errorKeyPrefix)(field)(validationFields)}`)
     )(validationFields)
   }
 
-export const getValidationFieldMessagesHTML = (i18n, errorKeyPrefix, showKeys) =>
+export const getValidationFieldMessagesHTML = (i18n, errorKeyPrefix = null, showKeys = true) =>
   validation =>
     R.pipe(
       getValidationFieldMessages(i18n, errorKeyPrefix, showKeys),
 
-      messages => validation.errors
-        ? R.pipe(
-          R.map(error => getErrorText(error, i18n, errorKeyPrefix)),
-          R.concat(messages)
-        )(validation.errors)
-        : messages,
+      messages => R.pipe(
+        R.map(error => getErrorText(error, i18n, errorKeyPrefix)),
+        R.concat(messages)
+      )(Validator.getErrors(validation)),
 
       R.addIndex(R.map)(
         (msg, i) =>

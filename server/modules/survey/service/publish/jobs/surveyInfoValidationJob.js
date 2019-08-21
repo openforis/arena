@@ -1,9 +1,16 @@
+const R = require('ramda')
+
 const Job = require('../../../../../job/job')
 
 const Validator = require('../../../../../../common/validation/validator')
 const Survey = require('../../../../../../common/survey/survey')
 
 const SurveyManager = require('../../../manager/surveyManager')
+
+const keys = {
+  surveyInfoPrefix: 'survey.info',
+  surveyInfoLabel: 'survey.info.label'
+}
 
 class SurveyInfoValidationJob extends Job {
 
@@ -14,10 +21,13 @@ class SurveyInfoValidationJob extends Job {
   async execute (tx) {
     const survey = await SurveyManager.fetchSurveyById(this.getSurveyId(), true, true, tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
+    const validation = Validator.getValidation(surveyInfo)
 
-    if (!Validator.isValid(surveyInfo)) {
-      this.errors = { surveyInfo: Validator.getInvalidFieldValidations(Validator.getValidation(surveyInfo)) }
-      this.setStatusFailed()
+    if (!Validator.isValidationValid(validation)) {
+      this.errors = {
+        [keys.surveyInfoLabel]: Validator.getInvalidFieldValidations(validation, keys.surveyInfoPrefix)
+      }
+      await this.setStatusFailed()
     }
   }
 }

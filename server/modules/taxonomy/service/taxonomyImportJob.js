@@ -23,6 +23,10 @@ const requiredColumns = [
   'scientific_name',
 ]
 
+const keysErrors = {
+  missingRequiredColumns: 'taxonomy.taxonomyImportJob.errors.missingRequiredColumns'
+}
+
 class TaxonomyImportJob extends Job {
 
   constructor (params) {
@@ -144,7 +148,7 @@ class TaxonomyImportJob extends Job {
       this.addError({
         all: {
           valid: false,
-          errors: [`Missing required columns: ${R.join(', ', missingColumns)}`]
+          errors: [{key: keysErrors.missingRequiredColumns, params: {columns: R.join(', ', missingColumns)}}]
         }
       })
       return false
@@ -171,7 +175,7 @@ class TaxonomyImportJob extends Job {
         validation = Validator.assocFieldValidation(Taxon.propKeys.code, {
           valid: false,
           errors: [{
-            key: Validator.errorKeys.duplicateCode,
+            key: TaxonomyValidator.keysErrors.duplicateCode,
             params: { row: duplicateCodeRow, duplicateRow: this.processed + 1 }
           }],
         })(validation)
@@ -186,8 +190,8 @@ class TaxonomyImportJob extends Job {
         validation = Validator.assocFieldValidation(Taxon.propKeys.scientificName, {
           valid: false,
           errors: [{
-            key: Validator.errorKeys.duplicateName,
-            params: { row: duplicateCodeRow, duplicateRow: this.processed + 1 }
+            key: TaxonomyValidator.keysErrors.duplicateScientificName,
+            params: { row: duplicateScientificNameRow, duplicateRow: this.processed + 1 }
           }],
         })(validation)
       } else {

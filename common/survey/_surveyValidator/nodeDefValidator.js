@@ -13,7 +13,6 @@ const {
 } = Validator
 
 const Survey = require('../survey')
-const SurveyUtils = require('../surveyUtils')
 const NodeDef = require('../nodeDef')
 const NodeDefLayout = require('../nodeDefLayout')
 
@@ -132,7 +131,7 @@ const validateNodeDef = async (survey, nodeDef) => {
 
   const validation = R.pipe(
     R.mergeDeepLeft(advancedPropsValidation),
-    R.assoc('valid', nodeDefValidation.valid && advancedPropsValidation.valid)
+    R.assoc(Validator.keys.valid, Validator.isValidationValid(nodeDefValidation) && Validator.isValidationValid(advancedPropsValidation))
   )(nodeDefValidation)
 
   return validation.valid ? null : validation

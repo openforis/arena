@@ -6,7 +6,9 @@ const {
 } = require('../../../common/validation/validator')
 
 const keysErrors = {
-  taxaEmpty: 'taxonomy.validationErrors.taxaEmpty'
+  taxaEmpty: 'taxonomy.validationErrors.taxaEmpty',
+  duplicateCode: 'taxonomy.validationErrors.duplicateCode',
+  duplicateScientificName: 'taxonomy.validationErrors.duplicateScientificName'
 }
 
 /**
@@ -37,6 +39,8 @@ const validateTaxon = async (taxa, taxon) =>
   await validate(taxon, taxonValidators(taxa))
 
 module.exports = {
+  keysErrors,
+
   validateTaxonomy,
   validateTaxon,
 }

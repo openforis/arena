@@ -47,7 +47,7 @@ const _validateNodeValidations = (survey, record, nodeDef) => async (propName, n
       const messages = _getCustomValidationMessages(survey, expression)
 
       errorMessage = {
-        key: 'custom',
+        key: Validator.keys.customErrorMessageKey,
         messages
       }
       break

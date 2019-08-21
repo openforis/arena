@@ -264,7 +264,14 @@ module.exports = {
       scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
     },
     validationErrors: {
-      taxaEmpty: 'Empty taxa'
+      taxaEmpty: 'Empty taxa',
+      duplicateCode: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
+      duplicateScientificName: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
+    },
+    taxonomyImportJob: {
+      errors: {
+        missingRequiredColumns: 'Missing required column(s): {{columns}}'
+      }
     }
   },
 
@@ -302,6 +309,17 @@ module.exports = {
     zeroOrNegative: 'Zero or negative',
   },
 
+  // ===== Survey properties
+  survey: {
+    info: {
+      label: 'Info',
+      name: '$t(common.name)',
+      languages: 'Languages',
+      srs: '$t(common.srs)'
+    },
+
+  },
+
   // ====== Jobs
   jobs: {
     CategoriesImportJob: 'Categories Import',
@@ -330,8 +348,6 @@ module.exports = {
     generic: '{{text}}',
     empty: '$t(common.empty)',
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
-    duplicateName: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
-    duplicateCode: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
     defaultValuesNotSpecified: '$t(formErrors.defaultValuesNotSpecified)',
   },
 

@@ -13,8 +13,8 @@ const keys = {
 }
 
 const keysError = {
-  duplicateRecordKey: 'duplicateRecordKey',
-  oneOrMoreInvalidValues: 'oneOrMoreInvalidValues'
+  duplicateRecordKey: 'formErrors.duplicateRecordKey',
+  oneOrMoreInvalidValues: 'formErrors.oneOrMoreInvalidValues'
 }
 
 const getValidationChildrenCount = (parentNode, childDef) => R.pipe(

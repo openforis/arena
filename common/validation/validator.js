@@ -21,23 +21,22 @@ const keywords = [
 ]
 
 const errorKeys = {
-  duplicate: 'duplicate',
-  duplicateCode: 'duplicateCode',
-  duplicateName: 'duplicateName',
-  empty: 'empty',
-  exceedingMax: 'exceedingMax',
-  keyword: 'keyword',
-  invalidNumber: 'invalidNumber',
-  zeroOrNegative: 'zeroOrNegative',
-  invalidName: 'invalidName',
-  requiredField: 'requiredField',
+  duplicate: 'formErrors.duplicate',
+  empty: 'formErrors.empty',
+  exceedingMax: 'formErrors.exceedingMax',
+  invalidName: 'formErrors.invalidName',
+  invalidNumber: 'formErrors.invalidNumber',
+  keyword: 'formErrors.keyword',
+  requiredField: 'formErrors.requiredField',
+  zeroOrNegative: 'formErrors.zeroOrNegative',
 }
 
 const keys = {
   fields: 'fields',
   valid: 'valid',
   errors: 'errors',
-  validation: 'validation'
+  validation: 'validation',
+  customErrorMessageKey: 'custom',
 }
 
 const newValidationValid = () => ({
@@ -151,10 +150,19 @@ const getFieldValidations = R.propOr({}, keys.fields)
 
 const getFieldValidation = field => R.pathOr(newValidationValid(), [keys.fields, field])
 
-const getInvalidFieldValidations = R.pipe(
+const getInvalidFieldValidations = (validation, fieldPrefix = null) => R.pipe(
   getFieldValidations,
-  R.reject(R.propEq(keys.valid, true))
-)
+  R.reject(R.propEq(keys.valid, true)),
+  R.unless(
+    R.always(fieldPrefix === null),
+    validations => console.log('validations', validations) || R.reduce((accValidations, field) => {
+        accValidations[`${fieldPrefix}.${field}`] = validations[field]
+        return accValidations
+      },
+      {}
+    )(R.keys(validations))
+  )
+)(validation)
 
 const getErrors = R.propOr([], keys.errors)
 
