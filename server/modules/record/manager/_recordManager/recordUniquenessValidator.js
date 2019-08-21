@@ -50,7 +50,7 @@ const validateRecordsUniqueness = async (survey, keyNodes, recordUuidExcluded, e
 const _newValidationRecordDuplicate = isUnique => ({
   [Validator.keys.fields]: {
     [RecordValidation.keys.recordKeys]: {
-      [Validator.keys.errors]: isUnique ? [] : [{ key: RecordValidation.keysError.duplicateRecord }],
+      [Validator.keys.errors]: isUnique ? [] : [{ key: RecordValidation.keysError.duplicateRecordKey }],
       [Validator.keys.valid]: isUnique
     }
   }

@@ -107,7 +107,11 @@ const fetchRecordsCountByKeys = async (survey, keyNodes, recordUuidExcluded, exc
 
   const keyColumns = nodeDefKeys.map(NodeDefTable.getColName)
   const keyColumnsString = keyColumns.join(', ')
-  const keysCondition = nodeDefKeys.map((nodeDefKey, idx) => `${rootTableAlias}.${NodeDefTable.getColName(nodeDefKey)} = '${DataCol.getValue(survey, nodeDefKey, keyNodes[idx])}'`)
+  const keysCondition = nodeDefKeys.map((nodeDefKey, idx) => {
+    const value = DataCol.getValue(survey, nodeDefKey, keyNodes[idx])
+    return `${rootTableAlias}.${NodeDefTable.getColName(nodeDefKey)} ${value === null ? ' IS NULL' : `= '${value}'`}`
+  })
+
 
   return await client.map(`
     WITH count_records AS (
