@@ -79,7 +79,7 @@ const UserPopupMenu = props => {
            onClose()
            logout()
          }}>
-        <span className="icon icon-exit icon-12px icon-left"/>
+        <span className="icon icon-switch icon-12px icon-left"/>
         {i18n.t('sidebar.logout')}
       </a>
 

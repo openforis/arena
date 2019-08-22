@@ -118,6 +118,24 @@ const fetchRecordUuids = async (surveyId, client = db) => await client.map(
   R.prop('uuid')
 )
 
+const fetchRecordCreatedCountsByDates = async (surveyId, from, to, client = db) => await client.any(`
+    SELECT
+      COUNT(r.uuid),
+      to_char(date_trunc('day', r.date_created), 'YYYY-MM-DD') AS date
+    FROM
+      ${getSurveyDBSchema(surveyId)}.record r
+    WHERE
+      r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
+    AND 
+      r.preview = FALSE
+    GROUP BY
+      date_trunc('day', r.date_created)
+    ORDER BY
+      date_trunc('day', r.date_created)
+  `,
+  [from, to]
+)
+
 // ============== UPDATE
 
 const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
@@ -175,6 +193,7 @@ module.exports = {
   fetchRecordsSummaryBySurveyId,
   fetchRecordByUuid,
   fetchRecordUuids,
+  fetchRecordCreatedCountsByDates,
 
   // UPDATE
   updateValidation,

@@ -21,7 +21,7 @@ const AppView = props => {
 
       <AppHeader/>
 
-      <div className="app__container height100">
+      <div className="app__container">
         <AppSideBar pathname={pathName}/>
         <ModuleSwitch location={location}/>
       </div>

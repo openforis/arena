@@ -50,6 +50,7 @@ module.exports = {
   fetchRecordsSummaryBySurveyId,
   fetchRecordUuids: RecordRepository.fetchRecordUuids,
   countRecordsBySurveyId: RecordRepository.countRecordsBySurveyId,
+  fetchRecordCreatedCountsByDates: RecordRepository.fetchRecordCreatedCountsByDates,
 
   fetchNodeByUuid: NodeRepository.fetchNodeByUuid,
   fetchChildNodeByNodeDefUuid: NodeRepository.fetchChildNodeByNodeDefUuid,

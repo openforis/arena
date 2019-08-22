@@ -1,0 +1,30 @@
+@import "../../../../../../style/vars";
+
+.home-dashboard__records-summary__chart {
+  height: 100%;
+
+  .y-axis, .x-axis {
+    path, line {
+      stroke: $greyBorder;
+    }
+
+    text {
+      fill: lighten($black, 25%);
+      font-weight: 600;
+      font-size: .65rem;
+    }
+  }
+
+  .data-points {
+    fill: $blue;
+  }
+
+  .data-path {
+    fill: none;
+    stroke: rgba($blue, 0.6);
+    stroke-width: 3;
+    shape-rendering: geometricprecision;
+    stroke-dasharray: 0;
+    opacity: 1;
+  }
+}
