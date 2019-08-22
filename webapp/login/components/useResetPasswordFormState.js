@@ -27,8 +27,8 @@ export const useResetPasswordFormState = props => {
   const validateObj = async obj => await validate(
     obj,
     {
-      'passwordConfirm': [validatePasswordConfirm],
       'password': [validateRequired, validatePassword, validatePasswordStrength],
+      'passwordConfirm': [validatePasswordConfirm],
       'verificationCode': [validateVerificationCode],
     })
 
@@ -43,9 +43,13 @@ export const useResetPasswordFormState = props => {
     verificationCode: '',
   }, validateObj, true)
 
+  const password = formObject.password
+  const passwordConfirm = formObject.passwordConfirm
+  const verificationCode = formObject.verificationCode
+
   const onClickReset = () => {
     if (objectValid) {
-      resetPassword(formObject.verificationCode, formObject.password)
+      resetPassword(verificationCode, password)
     } else {
       const firstMatch = ['passwordConfirm', 'password', 'verificationCode']
         .map(field => ({ field, validation: getFieldValidation(field) }))
@@ -56,11 +60,11 @@ export const useResetPasswordFormState = props => {
   }
 
   return {
-    password: formObject.password,
+    password: password,
     setPassword: password => setObjectField('password', password),
-    passwordConfirm: formObject.passwordConfirm,
+    passwordConfirm: passwordConfirm,
     setPasswordConfirm: password => setObjectField('passwordConfirm', password),
-    verificationCode: formObject.verificationCode,
+    verificationCode: verificationCode,
     setVerificationCode: verificationCode => setObjectField('verificationCode', verificationCode),
     onClickReset,
   }

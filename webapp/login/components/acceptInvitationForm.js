@@ -2,62 +2,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { Input } from '../../commonComponents/form/input'
-import useFormObject from '../../commonComponents/hooks/useFormObject'
-import Validator from '../../../common/validation/validator'
-
-import { validatePassword, validatePasswordStrength, validatePasswordConfirm, errors } from './passwordValidator'
 
 import { acceptInvitation, setLoginError } from '../actions'
+import { useAcceptInvitationFormState } from './useAcceptInvitationFormState';
 
 const AcceptInvitationForm = props => {
 
-  const { acceptInvitation, setLoginError } = props
-
-  const formErrors = {
-    ...errors,
-    userName: {
-      requiredField: 'Please enter a new name',
-    }
-  }
-
-  const validateObj = async obj => await Validator.validate(
-    obj,
-    {
-      'userName': [Validator.validateRequired],
-      'passwordConfirm': [validatePasswordConfirm],
-      'password': [Validator.validateRequired, validatePassword, validatePasswordStrength],
-    })
-
   const {
-    object: formObject,
-    setObjectField,
-    objectValid,
-    getFieldValidation,
-  } = useFormObject({
-    userName: '',
-    password: '',
-    passwordConfirm: '',
-  }, validateObj, true)
-
-  const userName = formObject.userName
-  const password = formObject.password
-  const passwordConfirm = formObject.passwordConfirm
-
-  const onClickReset = () => {
-    if (objectValid) {
-      acceptInvitation(userName, password)
-    } else {
-      const firstMatch = ['userName', 'passwordConfirm', 'password']
-        .map(field => ({ field, validation: getFieldValidation(field) }))
-        .find(v => !Validator.isValidationValid(v.validation))
-      const key = firstMatch.validation.errors[0].key
-      setLoginError(formErrors[firstMatch.field][key])
-    }
-  }
-
-  const setUserName = userName => setObjectField('userName', userName)
-  const setPassword = password => setObjectField('password', password)
-  const setPasswordConfirm = passwordConfirm => setObjectField('passwordConfirm', passwordConfirm)
+    userName, password, passwordConfirm,
+    setUserName, setPassword, setPasswordConfirm,
+    onClickReset,
+  } = useAcceptInvitationFormState(props)
 
   return (
     <div className="login-form">
@@ -93,4 +48,7 @@ const AcceptInvitationForm = props => {
   )
 }
 
-export default connect(null, { acceptInvitation, setLoginError })(AcceptInvitationForm)
+export default connect(null, {
+  acceptInvitation,
+  setLoginError
+})(AcceptInvitationForm)
