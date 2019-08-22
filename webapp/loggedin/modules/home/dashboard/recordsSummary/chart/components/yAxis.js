@@ -36,7 +36,7 @@ const YAxis = props => {
       .ease(d3.easePolyOut)
       .duration(transitionDuration)
       .attr('transform', () => `translate(${R.isEmpty(counts) ? 0 : left}, 0)`)
-  }, [counts])
+  }, [chartProps])
 
   return (
     <g className="y-axis" ref={elementRef}/>

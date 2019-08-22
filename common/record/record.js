@@ -26,6 +26,8 @@ module.exports = {
   newRecord,
 
   // ====== READ
+  getSurveyUuid : R.prop(keys.surveyUuid),
+
   getUuid: SurveyUtils.getUuid,
   isPreview: R.propEq(keys.preview, true),
   getOwnerUuid: R.prop(keys.ownerUuid),

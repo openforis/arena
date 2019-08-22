@@ -35,8 +35,9 @@ const insertRecord = async (surveyId, record, client = db) =>
     INSERT INTO ${getSurveyDBSchema(surveyId)}.record 
     (owner_uuid, uuid, step, preview)
     VALUES ($1, $2, $3, $4)
-    RETURNING ${recordSelectFields}`,
-    [Record.getOwnerUuid(record), Record.getUuid(record), Record.getStep(record), Record.isPreview(record)],
+    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $5)
+    `,
+    [Record.getOwnerUuid(record), Record.getUuid(record), Record.getStep(record), Record.isPreview(record), surveyId],
     dbTransformCallback(surveyId)
   )
 
@@ -72,10 +73,14 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
     WITH r AS (${recordsSelect})
     SELECT 
       r.*,
+      s.uuid AS survey_uuid,
       n.date_modified,
       u.name as owner_name,
       ${nodeDefKeysSelect}
     FROM  r
+    -- GET SURVEY UUID
+    JOIN survey s
+      ON s.id = $1 
     -- GET OWNER NAME
     JOIN "user" u
       ON r.owner_uuid = u.uuid
@@ -95,7 +100,7 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
     ON r.uuid = ${rootEntityTableAlias}.record_uuid
     ORDER BY r.date_created DESC
   `,
-    [],
+    [surveyId],
     dbTransformCallback(surveyId, false)
   )
 }
@@ -103,9 +108,9 @@ const fetchRecordsSummaryBySurveyId = async (surveyId, nodeDefRoot, nodeDefKeys,
 const fetchRecordByUuid = async (surveyId, recordUuid, client = db) =>
   await client.one(
     `SELECT 
-     ${recordSelectFields}
+     ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $2)
      FROM ${getSurveyDBSchema(surveyId)}.record WHERE uuid = $1`,
-    [recordUuid],
+    [recordUuid, surveyId],
     dbTransformCallback(surveyId)
   )
 

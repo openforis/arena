@@ -9,6 +9,8 @@ import XAxis, { getScale as getXScale } from './components/xAxis'
 import DataPoints from './components/dataPoints'
 import DataPath from './components/dataPath'
 
+import { useOnResize } from '../../../../../../commonComponents/hooks'
+
 import { elementOffset } from '../../../../../../utils/domUtils'
 
 const RecordsSummaryChart = props => {
@@ -18,7 +20,7 @@ const RecordsSummaryChart = props => {
 
   const [chartProps, setChartProps] = useState(null)
 
-  useEffect(() => {
+  const updateChartProps = () => {
     const { width, height } = elementOffset(chartRef.current)
 
     const chartPropsUpdate = {
@@ -30,12 +32,17 @@ const RecordsSummaryChart = props => {
       right: 35,
       transitionDuration: 300,
     }
+
     setChartProps({
       ...chartPropsUpdate,
       xScale: date => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
       yScale: getYScale(counts, chartPropsUpdate)
     })
-  }, [counts, from, to])
+  }
+
+  useOnResize(updateChartProps, chartRef)
+
+  useEffect(updateChartProps, [counts, from, to])
 
   return (
     <div className="home-dashboard__records-summary__chart"

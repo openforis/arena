@@ -43,7 +43,7 @@ const XAxis = props => {
     axisRef.current = d3.select(elementRef.current).call(axis)
     // update bottom offset
       .attr('transform', () => `translate(0, ${height - bottom})`)
-  }, [from, to])
+  }, [chartProps])
 
   return (
     <g className="x-axis" ref={elementRef}/>

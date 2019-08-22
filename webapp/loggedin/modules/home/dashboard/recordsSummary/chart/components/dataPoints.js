@@ -45,7 +45,7 @@ const DataPoints = props => {
       .attr('cy', d => yScale(d.count))
       .attr('r', radius)
       .style('opacity', '1')
-  }, [counts])
+  }, [chartProps])
 
   return (
     <g className="data-points" ref={elementRef}/>
