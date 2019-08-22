@@ -8,49 +8,51 @@ export const keysAction = {
 const UserPoolId = __COGNITO_USER_POOL_ID__
 const ClientId = __COGNITO_CLIENT_ID__
 
-const getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
+const _getUserPool = () => new CognitoUserPool({ UserPoolId, ClientId })
 
-export const getUser = () => getUserPool().getCurrentUser()
-
-const newCognitoUser = Username => new CognitoUser({ Username, Pool: getUserPool() })
+const _newCognitoUser = Username => new CognitoUser({ Username, Pool: _getUserPool() })
 
 // Global variables to handle completeNewPasswordChallenge flow
-let cognitoUser
-let sessionUserAttributes
+let _cognitoUser
+let _sessionUserAttributes
 
-const cognitoCallbacks = (onSuccess, onFailure) => ({
+const _cognitoCallbacks = (onSuccess, onFailure, reset = true) => ({
   onSuccess: () => {
-    cognitoUser = null
-    sessionUserAttributes = null
+    if (reset) {
+      _cognitoUser = null
+      _sessionUserAttributes = null
+    }
     onSuccess(keysAction.success)
   },
 
   onFailure,
 
-  newPasswordRequired: (userAttributes) => {
+  newPasswordRequired: userAttributes => {
     // the api doesn't accept this field back
     delete userAttributes.email_verified
 
-    sessionUserAttributes = userAttributes
+    _sessionUserAttributes = userAttributes
     onSuccess(keysAction.newPasswordRequired)
   }
 })
 
+export const getUser = () => _getUserPool().getCurrentUser()
+
 export const login = (Username, Password) =>
   new Promise((resolve, reject) => {
-    cognitoUser = newCognitoUser(Username)
-    cognitoUser.authenticateUser(
+    _cognitoUser = _newCognitoUser(Username)
+    _cognitoUser.authenticateUser(
       new AuthenticationDetails({ Username, Password }),
-      cognitoCallbacks(resolve, reject)
+      _cognitoCallbacks(resolve, reject)
     )
   })
 
 export const acceptInvitation = (name, password) =>
   new Promise((resolve, reject) => {
-    cognitoUser.completeNewPasswordChallenge(
+    _cognitoUser.completeNewPasswordChallenge(
       password,
-      { ...sessionUserAttributes, name },
-      cognitoCallbacks(resolve, reject)
+      { ..._sessionUserAttributes, name },
+      _cognitoCallbacks(resolve, reject)
     )
   })
 
@@ -60,6 +62,22 @@ export const logout = () => {
     user.signOut()
   }
 }
+
+export const forgotPassword = username =>
+  new Promise((resolve, reject) => {
+    // Override Cognito error messages with a more readable one
+    if (!username) {
+      throw new Error('Please enter your email')
+    }
+
+    _cognitoUser = _newCognitoUser(username)
+    _cognitoUser.forgotPassword(_cognitoCallbacks(resolve, reject, false))
+  })
+
+export const resetPassword = (verificationCode, password) =>
+  new Promise((resolve, reject) => {
+    _cognitoUser.confirmPassword(verificationCode, password, _cognitoCallbacks(resolve, reject))
+  })
 
 /**
  *
@@ -71,7 +89,7 @@ export const getJwtToken = () => new Promise((resolve, reject) => {
   if (user) {
     user.getSession((err, session) => {
       if (err) {
-        reject(err)
+        return reject(err)
       }
 
       try {
@@ -81,7 +99,6 @@ export const getJwtToken = () => new Promise((resolve, reject) => {
       } catch (e) {
         reject(e)
       }
-
     })
   } else {
     resolve(null)
