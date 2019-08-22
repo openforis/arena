@@ -77,11 +77,12 @@ const canEditRecord = (user, record) => {
     return true
 
   const recordDataStep = Record.getStep(record)
-  const recordUserPermissions = User.getRecordPermissions(record)(user)
+
+  const userAuthGroup = User.getAuthGroups(user).find(authGroup => AuthGroups.getSurveyUuid(authGroup) === Record.getSurveyUuid(record))
 
   // level = 'all' or 'own'. If 'own', user can only edit the records that he created
   // If 'all', he can edit all survey's records
-  const level = R.path([keys.recordSteps, recordDataStep], recordUserPermissions)
+  const level = R.path([keys.recordSteps, recordDataStep], userAuthGroup)
 
   return level === keys.all || (level === keys.own && Record.getOwnerUuid(record) === User.getUuid(user))
 }

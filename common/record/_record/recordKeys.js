@@ -1,4 +1,5 @@
 const keys = {
+  surveyUuid: 'surveyUuid',
   uuid: 'uuid',
   nodes: 'nodes',
   ownerUuid: 'ownerUuid',
