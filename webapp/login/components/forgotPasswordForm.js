@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import * as LoginState from './loginState'
-import { setEmail, sendVerificationCode } from './actions'
+import * as LoginState from '../loginState'
+import { setEmail, sendVerificationCode } from '../actions'
 
 const ForgotPasswordForm = props => {
 

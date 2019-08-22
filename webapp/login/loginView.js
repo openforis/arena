@@ -5,10 +5,10 @@ import { connect } from 'react-redux'
 
 import * as LoginState from './loginState'
 
-import LoginForm from './loginForm'
-import AcceptInvitationForm from './acceptInvitationForm'
-import ForgotPasswordForm from './forgotPasswordForm'
-import ResetPasswordForm from './resetPasswordForm'
+import LoginForm from './components/loginForm'
+import AcceptInvitationForm from './components/acceptInvitationForm'
+import ForgotPasswordForm from './components/forgotPasswordForm'
+import ResetPasswordForm from './components/resetPasswordForm'
 
 const forms = {
   [LoginState.userActions.setNewPassword]: AcceptInvitationForm,

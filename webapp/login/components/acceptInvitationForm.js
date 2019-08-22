@@ -1,13 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Input } from '../commonComponents/form/input'
-import useFormObject from '../commonComponents/hooks/useFormObject'
-import { validate, validateRequired, isValidationValid } from '../../common/validation/validator'
+import { Input } from '../../commonComponents/form/input'
+import useFormObject from '../../commonComponents/hooks/useFormObject'
+import Validator from '../../../common/validation/validator'
 
 import { validatePassword, validatePasswordStrength, validatePasswordConfirm, errors } from './passwordValidator'
 
-import { acceptInvitation, setLoginError } from './actions'
+import { acceptInvitation, setLoginError } from '../actions'
 
 const AcceptInvitationForm = props => {
 
@@ -20,12 +20,12 @@ const AcceptInvitationForm = props => {
     }
   }
 
-  const validateObj = async obj => await validate(
+  const validateObj = async obj => await Validator.validate(
     obj,
     {
-      'userName': [validateRequired],
+      'userName': [Validator.validateRequired],
       'passwordConfirm': [validatePasswordConfirm],
-      'password': [validateRequired, validatePassword, validatePasswordStrength],
+      'password': [Validator.validateRequired, validatePassword, validatePasswordStrength],
     })
 
   const {
@@ -49,7 +49,7 @@ const AcceptInvitationForm = props => {
     } else {
       const firstMatch = ['userName', 'passwordConfirm', 'password']
         .map(field => ({ field, validation: getFieldValidation(field) }))
-        .find(v => !isValidationValid(v.validation))
+        .find(v => !Validator.isValidationValid(v.validation))
       const key = firstMatch.validation.errors[0].key
       setLoginError(formErrors[firstMatch.field][key])
     }

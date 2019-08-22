@@ -1,7 +1,7 @@
 import React from 'react'
 
-import useFormObject from '../commonComponents/hooks/useFormObject'
-import { validate, validateRequired, isValidationValid } from '../../common/validation/validator'
+import useFormObject from '../../commonComponents/hooks/useFormObject'
+import { validate, validateRequired, isValidationValid } from '../../../common/validation/validator'
 
 import { validatePassword, validatePasswordStrength, validatePasswordConfirm, errors } from './passwordValidator'
 

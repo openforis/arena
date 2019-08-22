@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
-import * as LoginState from './loginState'
-import { setEmail, login, showForgotPasswordForm } from './actions'
+import * as LoginState from '../loginState'
+import { setEmail, login, showForgotPasswordForm } from '../actions'
 
 const LoginForm = props => {
 
