@@ -14,14 +14,22 @@ const keys = {
 const keysErrors = {
   childrenEmpty: 'categoryEdit.validationErrors.childrenEmpty',
   childrenInvalid: 'categoryEdit.validationErrors.childrenInvalid',
+  codeDuplicate: 'categoryEdit.validationErrors.codeDuplicate',
+  codeNotKeyword: 'categoryEdit.validationErrors.codeNotKeyword',
+  codeRequired: 'categoryEdit.validationErrors.codeRequired',
   itemsInvalid: 'categoryEdit.validationErrors.itemsInvalid',
   itemsEmpty: 'categoryEdit.validationErrors.itemsEmpty',
+  levelDuplicate: 'categoryEdit.validationErrors.levelDuplicate',
+  nameDuplicate: 'categoryEdit.validationErrors.nameDuplicate',
+  nameNotKeyword: 'categoryEdit.validationErrors.nameNotKeyword',
+  nameRequired: 'categoryEdit.validationErrors.nameRequired',
 }
 
 // ====== LEVELS
 
 const levelValidators = (levels, itemsByParentUuid) => ({
-  'props.name': [Validator.validateRequired, Validator.validateNotKeyword, Validator.validateItemPropUniqueness(levels)],
+  'props.name': [Validator.validateRequired(keysErrors.nameRequired), Validator.validateNotKeyword(keysErrors.nameNotKeyword),
+    Validator.validateItemPropUniqueness(keysErrors.levelDuplicate)(levels)],
   [keys.items]: [validateNotEmptyFirstLevelItems(itemsByParentUuid)]
 })
 
@@ -47,7 +55,8 @@ const validateLevels = async (category, itemsByParentUuid) => {
 // ====== ITEMS
 
 const itemValidators = (isLeaf, itemsByParentUuid, siblings) => ({
-  'props.code': [Validator.validateRequired, Validator.validateNotKeyword, Validator.validateItemPropUniqueness(siblings)],
+  'props.code': [Validator.validateRequired(keysErrors.codeRequired), Validator.validateNotKeyword(keysErrors.codeNotKeyword),
+    Validator.validateItemPropUniqueness(keysErrors.codeDuplicate)(siblings)],
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemsByParentUuid)],
 })
 
@@ -121,7 +130,8 @@ const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItem
 // ====== CATEGORY
 
 const categoryValidators = (categories) => ({
-  'props.name': [Validator.validateRequired, Validator.validateNotKeyword, Validator.validateItemPropUniqueness(categories)],
+  'props.name': [Validator.validateRequired(keysErrors.nameRequired), Validator.validateNotKeyword(keysErrors.nameNotKeyword),
+    Validator.validateItemPropUniqueness(keysErrors.nameDuplicate)(categories)],
 })
 
 const validateCategoryProps = async (categories, category) =>

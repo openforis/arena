@@ -14,9 +14,7 @@ const AttributeTypeValidator = require('./attributeTypeValidator')
 const AttributeKeyValidator = require('./attributeKeyValidator')
 
 const errorKeys = {
-  required: 'required',
-  invalidValue: 'invalidValue',
-  duplicateEntityKey: 'duplicateEntityKey',
+  valueRequired: 'record.validationErrors.valueRequired',
 }
 
 const _validateRequired = (survey, nodeDef) => (propName, node) =>
@@ -25,7 +23,7 @@ const _validateRequired = (survey, nodeDef) => (propName, node) =>
     NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
   ) &&
   Node.isValueBlank(node)
-    ? { key: errorKeys.required }
+    ? { key: errorKeys.valueRequired }
     : null
 
 /**

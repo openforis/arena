@@ -39,7 +39,7 @@ module.exports = {
     no: 'No',
     noItems: `$t(common.no) $t(common.item,{'count':2})`,
     of: 'of',
-    required: 'Required',
+    valueRequired: 'Required',
     reset: 'Reset',
     save: 'Save',
     saved: 'Saved!',
@@ -160,7 +160,16 @@ module.exports = {
     accepted: 'Accepted',
     inviteUserConfirmation: 'An email to {{email}} has been sent',
     updateUserConfirmation: 'User {{name}} has been updated',
-    notAcceptedYet: 'Invitation not accepted yet'
+    notAcceptedYet: 'Invitation not accepted yet',
+  },
+
+  user: {
+    validationErrors: {
+      emailRequired: 'Email is required',
+      emailInvalid: 'Email is invalid',
+      groupRequired: 'Group is required',
+      nameRequired: 'Name is required',
+    }
   },
 
   itemsTable: {
@@ -200,10 +209,20 @@ module.exports = {
       expressions: 'Expressions',
     },
     validationErrors: {
+      applyIfDuplicate: '"Apply if" condition is duplicate',
+      countMaxPositiveNumber: 'Min Count must be a positive integer',
+      countMinPositiveNumber: 'Max Count must be a positive integer',
+      categoryRequired: 'Category is required',
       childrenEmpty: '$t(common.childrenEmpty)',
       defaultValuesNotSpecified: 'Default value not specified',
-      keysEmpty: 'Define at least one key',
-      keysExceedingMax: 'Exceeding maximum number of keys',
+      expressionRequired: 'Expression required',
+      keysEmpty: 'Define at least one key attribute',
+      keysExceedingMax: 'Exceeding maximum number of key attributes',
+      nameDuplicate: '$t(formErrors.nameDuplicate)',
+      nameInvalid: 'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
+      nameNotKeyword: '$t(formErrors.nameNotKeyword)',
+      nameRequired: '$t(formErrors.nameRequired)',
+      taxonomyRequired: 'Taxonomy is required',
     },
     cannotChangeIntoMultipleWithDefaultValues: 'This node cannot be converted to multiple because it has default values.'
   },
@@ -264,9 +283,16 @@ module.exports = {
       scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
     },
     validationErrors: {
+      codeDuplicate: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
+      codeRequired: 'Code is required',
+      familyRequired: 'Family is required',
+      genusRequired: 'Genus is required',
+      nameDuplicate: '$t(formErrors.nameDuplicate)',
+      nameNotKeyword: '$t(formErrors.nameNotKeyword)',
+      nameRequired: '$t(formErrors.nameRequired)',
+      scientificNameDuplicate: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
+      scientificNameRequired: 'Scientific name is required',
       taxaEmpty: 'Empty taxa',
-      duplicateCode: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
-      duplicateScientificName: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
     },
     taxonomyImportJob: {
       errors: {
@@ -284,29 +310,43 @@ module.exports = {
     validationErrors: {
       childrenEmpty: '$t(common.childrenEmpty)',
       childrenInvalid: 'At least one invalid child',
+      codeDuplicate: 'Code is duplicate',
+      codeNotKeyword: 'Code "{{value}}" cannot be used: it\'s a reserved word',
+      codeRequired: 'Code is required',
       itemsInvalid: 'At least one invalid item',
       itemsEmpty: 'Define at least one item',
+      levelDuplicate: 'Level name is duplicate',
+      nameDuplicate: '$t(formErrors.nameDuplicate)',
+      nameNotKeyword: '$t(formErrors.nameNotKeyword)',
+      nameRequired: '$t(formErrors.nameRequired)',
     }
   },
 
   formErrors: {
     duplicate: 'Duplicate',
-    duplicateEntityKey: 'Duplicate entity key',
     duplicateRecordKey: 'Duplicate record key',
     empty: '$t(common.empty)',
     exceedingMax: 'Exceeding max',
-    invalidName: 'Invalid name',
     invalidNumber: 'Invalid number',
-    invalidType: 'Invalid type',
-    invalidValue: 'Invalid value',
+    invalidField: '"{{field}}" is invalid',
     invalidEmail: 'Invalid email',
-    keyword: 'Keyword',
-    maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
-    minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
+    nameDuplicate: 'Name is duplicate',
+    nameNotKeyword: 'Name "{{value}}" cannot be used: it\'s a reserved word',
+    nameRequired: 'Name is required',
     oneOrMoreInvalidValues: 'One or more values are invalid',
-    required: '$t(common.required)',
+    valueRequired: '$t(common.required)',
     requiredField: 'Required field',
     zeroOrNegative: 'Zero or negative',
+  },
+
+  record: {
+    validationErrors: {
+      entityKeyDuplicate: 'Duplicate entity key',
+      nodesMaxCountExceeded: 'Nodes must be less than or equal to {{maxCount}}',
+      nodesMinCountNotReached: 'Nodes must be more than or equal to {{minCount}}',
+      valueInvalid: 'Invalid value',
+      valueRequired: 'Required value',
+    }
   },
 
   // ===== Survey properties
@@ -315,7 +355,14 @@ module.exports = {
       label: 'Info',
       name: '$t(common.name)',
       languages: 'Languages',
-      srs: '$t(common.srs)'
+      srs: '$t(common.srs)',
+      validationErrors: {
+        langRequired: 'Language is required',
+        nameDuplicate: '$t(formErrors.nameDuplicate)',
+        nameNotKeyword: '$t(formErrors.nameNotKeyword)',
+        nameRequired: '$t(formErrors.nameRequired)',
+        srsRequired: 'Spatial Reference System is required',
+      }
     },
 
   },
@@ -348,7 +395,6 @@ module.exports = {
     generic: '{{text}}',
     empty: '$t(common.empty)',
     duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
-    defaultValuesNotSpecified: '$t(formErrors.defaultValuesNotSpecified)',
   },
 
   // ====== App Errors

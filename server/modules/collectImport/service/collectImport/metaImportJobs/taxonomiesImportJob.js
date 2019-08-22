@@ -14,11 +14,6 @@ const CSVParser = require('../../../../../utils/file/csvParser')
 
 const speciesFilesPath = 'species/'
 
-const keysError = {
-  code: 'code',
-  scientificName: 'scientificName',
-}
-
 /**
  * Inserts a taxonomy for each taxonomy in the Collect survey.
  * Saves the list of inserted taxonomies in the "taxonomies" context property
@@ -164,10 +159,10 @@ class TaxonomiesImportJob extends Job {
     const rowDuplicateCode = this.rowsByCode[code]
     if (rowDuplicateCode) {
       this.addError({
-        [keysError.code]: {
+        [Taxon.propKeys.code]: {
           valid: false,
           errors: [{
-            key: TaxonomyValidator.keysErrors.duplicateCode,
+            key: TaxonomyValidator.keysErrors.codeDuplicate,
             params: { code, row: this.currentRow, duplicateRow: rowDuplicateCode },
           }],
         },
@@ -180,10 +175,10 @@ class TaxonomiesImportJob extends Job {
     const rowDuplicateScientificName = this.rowsByScientificName[scientificName]
     if (rowDuplicateScientificName) {
       this.addError({
-        [keysError.scientificName]: {
+        [Taxon.propKeys.scientificName]: {
           valid: false,
           errors: [{
-            key: TaxonomyValidator.keysErrors.duplicateScientificName,
+            key: TaxonomyValidator.keysErrors.scientificNameDuplicate,
             params: { scientificName, row: this.currentRow, duplicateRow: rowDuplicateScientificName },
           }],
         },

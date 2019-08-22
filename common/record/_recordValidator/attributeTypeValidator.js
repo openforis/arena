@@ -11,7 +11,7 @@ const Taxon = require('../../survey/taxon')
 const Node = require('../node')
 
 const keysError = {
-  invalidType: 'invalidType',
+  valueInvalid: 'record.validationErrors.valueInvalid',
 }
 
 const typeValidatorFns = {
@@ -88,7 +88,7 @@ const validateValueType = (survey, nodeDef) => (propName, node) => {
 
   const typeValidatorFn = typeValidatorFns[NodeDef.getType(nodeDef)]
   const valid = typeValidatorFn(survey, nodeDef, node, Node.getValue(node))
-  return valid ? null : { key: keysError.invalidType }
+  return valid ? null : { key: keysError.valueInvalid }
 }
 
 module.exports = {

@@ -21,11 +21,6 @@ const exprTypes = {
   check: 'check',
 }
 
-const errorKeys = {
-  couldNotParseExpression: 'couldNotParseExpression',
-  couldNotImportAllDefaultValues: 'couldNotImportAllDefaultValues',
-}
-
 const createItem = (expressionType, expression, applyIf = null, messages = null) => ({
   [propKeys.expressionType]: expressionType,
   [propKeys.expression]: expression,
@@ -37,7 +32,6 @@ module.exports = {
   keys,
   propKeys,
   exprTypes,
-  errorKeys,
 
   createItem,
 

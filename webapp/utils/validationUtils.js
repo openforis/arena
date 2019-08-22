@@ -18,11 +18,14 @@ const getErrorText = (error, i18n, errorKeyPrefix = null) => {
 }
 
 const getFieldError = (i18n, errorKeyPrefix = null) => field => R.pipe(
-  R.pathOr([], [field, 'errors']),
+  R.pathOr([], [field, Validator.keys.errors]),
   R.map(error => getErrorText(error, i18n, errorKeyPrefix)),
   R.ifElse(
     R.isEmpty,
-    () => 'invalid', //default error message
+    () => getErrorText({
+      key: Validator.errorKeys.invalidField,  //default error message
+      params: { field }
+    }, i18n),
     R.join(', ')
   )
 )

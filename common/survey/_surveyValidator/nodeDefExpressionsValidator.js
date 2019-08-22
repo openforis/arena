@@ -8,6 +8,11 @@ const Expression = require('../../exprParser/expression')
 
 const SystemError = require('../../../server/utils/systemError')
 
+const keysErrors = {
+  expressionRequired: 'nodeDefEdit.validationErrors.expressionRequired',
+  applyIfDuplicate: 'nodeDefEdit.validationErrors.applyIfDuplicate',
+}
+
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
   value: 1, //simulates node value
@@ -78,12 +83,12 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
   const validation = await Validator.validate(
     nodeDefExpression,
     {
-      [NodeDefExpression.keys.expression]: [Validator.validateRequired, validateExpressionProp(survey, nodeDef)],
+      [NodeDefExpression.keys.expression]: [Validator.validateRequired(keysErrors.expressionRequired), validateExpressionProp(survey, nodeDef)],
       [NodeDefExpression.keys.applyIf]: [
         validateExpressionProp(survey, nodeDef),
         ...validateApplyIfUniqueness
           ? [
-            Validator.validateItemPropUniqueness(nodeDefExpressions),
+            Validator.validateItemPropUniqueness(keysErrors.applyIfDuplicate)(nodeDefExpressions),
             validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
           ]
           : []
@@ -94,7 +99,7 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
 }
 
 const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniqueness = true) => {
-  const result = { valid: true, fields: {} }
+  const result = Validator.newValidationValid()
 
   const validations = await Promise.all(
     nodeDefExpressions.map(async (nodeDefExpression, i) =>
