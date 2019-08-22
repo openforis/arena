@@ -55,8 +55,6 @@ const getRelativeDate = date => {
   return 'A moment ago'
 }
 
-const compareDatesDesc = compareDesc
-
 const isDateBefore = isBefore
 /**
  * Checks if the date is valid. Takes into account leap years
@@ -94,7 +92,6 @@ const formatTime = (hour, minute) =>
 
 module.exports = {
   getRelativeDate,
-  compareDatesDesc,
   isDateBefore,
 
   isValidDate,

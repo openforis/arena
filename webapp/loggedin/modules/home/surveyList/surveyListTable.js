@@ -5,7 +5,7 @@ import useI18n from '../../../../commonComponents/useI18n'
 
 import Authorizer from '../../../../../common/auth/authorizer'
 import Survey from '../../../../../common/survey/survey'
-import { getRelativeDate, compareDatesDesc } from '../../../../../common/dateUtils'
+import DateUtils from '../../../../../common/dateUtils'
 
 const SurveyRow = ({ user, surveyInfoRow, surveyInfo, setActiveSurvey, i18n }) => {
   const surveyId = surveyInfoRow.id
@@ -18,8 +18,8 @@ const SurveyRow = ({ user, surveyInfoRow, surveyInfo, setActiveSurvey, i18n }) =
     <div className={`table__row${activeClass}`}>
       <div>{Survey.getName(surveyInfoRow)}</div>
       <div>{Survey.getDefaultLabel(surveyInfoRow)}</div>
-      <div>{getRelativeDate(surveyInfoRow.dateCreated)}</div>
-      <div>{getRelativeDate(surveyInfoRow.dateModified)}</div>
+      <div>{DateUtils.getRelativeDate(surveyInfoRow.dateCreated)}</div>
+      <div>{DateUtils.getRelativeDate(surveyInfoRow.dateModified)}</div>
       <div>{Survey.getStatus(surveyInfoRow)}</div>
       <div>
         <button className={`btn btn-s${activeClass}`}
@@ -60,7 +60,6 @@ const SurveyListTable = (props) => {
         <div className="table__rows">
           {
             surveyInfos
-              .sort((a, b) => compareDatesDesc(a.dateModified, b.dateModified))
               .map((surveyInfo, i) => (
                 <SurveyRow
                   key={i}

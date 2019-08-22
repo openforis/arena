@@ -126,6 +126,8 @@ const fetchRecordCreatedCountsByDates = async (surveyId, from, to, client = db) 
       ${getSurveyDBSchema(surveyId)}.record r
     WHERE
       r.date_created BETWEEN $1::DATE AND $2::DATE + INTERVAL '1 day'
+    AND 
+      r.preview = FALSE
     GROUP BY
       date_trunc('day', r.date_created)
     ORDER BY
