@@ -1224,9 +1224,9 @@ autolinker@~0.28.0:
     gulp-header "^1.7.1"
 
 aws-sdk@^2.513.0:
-  version "2.514.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.514.0.tgz#fe1cc76eb93982b3d6062866a1bc0fd501a02ee5"
-  integrity sha512-QKfmUJhn8iapnmx1pc86zLuJIKj5ereMz/ujjaFxMl6zKyypzdMJbNcZQHSqyQyVoU/EDsHt838L4sWbwVLCNQ==
+  version "2.515.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.515.0.tgz#5c433a722fbe5865301bd9c8ff7f1be0c8ba9997"
+  integrity sha512-ek/mSJIjJEQpUJTyl9uFw+mENcpTb/InThEKiDKBYoCSvJVPbkxcke9GYvb+1nyL0B+WJbPmboFpFm6r06pjrg==
   dependencies:
     buffer "4.9.1"
     events "1.1.1"
@@ -1780,9 +1780,9 @@ check-types@^8.0.3:
   integrity sha512-YpeKZngUmG65rLudJ4taU7VLkOCTMhNl/u4ctNC56LQS/zJTyNH0Lrtwm1tfTsbLlwvlfsA2d1c8vCf/Kh2KwQ==
 
 chokidar@^2.0.2, chokidar@^2.0.4, chokidar@^2.1.5, chokidar@^2.1.6:
-  version "2.1.6"
-  resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-2.1.6.tgz#b6cad653a929e244ce8a834244164d241fa954c5"
-  integrity sha512-V2jUo67OKkc6ySiRpJrjlpJKl9kDuG+Xb8VgsGzb+aEouhgS1D0weyPU4lEzdAcsCAvrih2J2BqyXqHWvVLw5g==
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-2.1.8.tgz#804b3a7b6a99358c3c5c61e71d8728f041cff917"
+  integrity sha512-ZmZUazfOzf0Nve7duiCKD23PFSCs4JPoYyccjUFF3aQkQadqBhfzhjkwBH2mNOG9cTBwhamM37EIsIkZw3nRgg==
   dependencies:
     anymatch "^2.0.0"
     async-each "^1.0.1"
@@ -4397,9 +4397,9 @@ https-browserify@^1.0.0:
   integrity sha1-7AbBDgo0wPL68Zn3/X/Hj//QPHM=
 
 i18next@^17.0.11:
-  version "17.0.11"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-17.0.11.tgz#36424dc01f6de391fae87878d24f5ff713565c27"
-  integrity sha512-O+yzoNi0usYcd4oi85EFY4WuwZ8NNsYJLauZ629YSjwgIi2D7eYDSQxy6aAR67V++b//GNuZEk7hx/i3L9Rxag==
+  version "17.0.12"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-17.0.12.tgz#d732a6c1131fc3b02305a8241eac25ec0d1cf663"
+  integrity sha512-FoYYnORcAMNznVXSpwJ1zVGL8kXcv1JUmvTqoQyuPPRncBq9rd7Mi0I/oVXkGR3YIek5dDiunvA/NGG2o+mMuw==
   dependencies:
     "@babel/runtime" "^7.3.1"
 
@@ -5950,9 +5950,9 @@ node-pre-gyp@^0.12.0:
     tar "^4"
 
 node-releases@^1.1.25:
-  version "1.1.27"
-  resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.27.tgz#b19ec8add2afe9a826a99dceccc516104c1edaf4"
-  integrity sha512-9iXUqHKSGo6ph/tdXVbHFbhRVQln4ZDTIBJCzsa90HimnBYc5jw8RWYt4wBYFHehGyC3koIz5O4mb2fHrbPOuA==
+  version "1.1.28"
+  resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.28.tgz#503c3c70d0e4732b84e7aaa2925fbdde10482d4a"
+  integrity sha512-AQw4emh6iSXnCpDiFe0phYcThiccmkNWMZnFZ+lDJjAP8J0m2fVd59duvUUyuTirQOhIAajTFkzG6FHCLBO59g==
   dependencies:
     semver "^5.3.0"
 
@@ -6614,9 +6614,9 @@ pg-pool@^2.0.4:
   integrity sha512-UiJyO5B9zZpu32GSlP0tXy8J2NsJ9EFGFfz5v6PSbdz/1hBLX1rNiiy5+mAm5iJJYwfCv4A0EBcQLGWwjbpzZw==
 
 pg-promise@^9.0.3:
-  version "9.0.3"
-  resolved "https://registry.yarnpkg.com/pg-promise/-/pg-promise-9.0.3.tgz#99597f4dea6ffe92dd8f458c3cbcdcb1df343a4a"
-  integrity sha512-UqsFnWHmCDQ8HaHE4x55ooqXd6IVY+vxlBZ95+WsLPQzm+4IyDjEYgqa4HWRRNMW6PTl6TnUU/bM0Y8EQO+2PA==
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/pg-promise/-/pg-promise-9.1.0.tgz#86126ed05591aaf41346b1c2f2a5155974734746"
+  integrity sha512-6oZp9MMUKQz8PtloY886bCU4SXaxEa8gYrcimXl6FGkc1P7QzZkFS8IKv+zducAtZpUI2K+0UFx0Xl9jTSMEEQ==
   dependencies:
     assert-options "0.4.0"
     manakin "0.5.2"

@@ -18,7 +18,7 @@ const RecordsSummaryChart = props => {
 
   const [chartProps, setChartProps] = useState(null)
 
-  useEffect(() => {
+  const updateChartProps = () => {
     const { width, height } = elementOffset(chartRef.current)
 
     const chartPropsUpdate = {
@@ -30,12 +30,24 @@ const RecordsSummaryChart = props => {
       right: 35,
       transitionDuration: 300,
     }
+
     setChartProps({
       ...chartPropsUpdate,
       xScale: date => getXScale(counts, from, to, chartPropsUpdate)(DateUtils.parseISO(date)),
       yScale: getYScale(counts, chartPropsUpdate)
     })
-  }, [counts, from, to])
+  }
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(updateChartProps)
+    resizeObserver.observe(chartRef.current)
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [])
+
+  useEffect(updateChartProps, [counts, from, to])
 
   return (
     <div className="home-dashboard__records-summary__chart"

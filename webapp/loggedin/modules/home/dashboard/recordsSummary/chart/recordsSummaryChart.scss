@@ -2,6 +2,11 @@
 
 .home-dashboard__records-summary__chart {
   height: 100%;
+  position: relative;
+
+  svg {
+    position: absolute;
+  }
 
   .y-axis, .x-axis {
     path, line {

@@ -33,7 +33,7 @@ const DataPath = props => {
     const current = dataEmpty ? getEmptyPath() : getPath(counts)
     interpolatePath(previous, current)
       .style('opacity', dataEmpty ? 0 : 1)
-  }, [counts, from, to])
+  }, [chartProps])
 
   return (
     <path className="data-path"
