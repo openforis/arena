@@ -148,6 +148,9 @@ module.exports = {
       messages: 'Messages',
       resolved: 'Resolved',
     },
+    recordsSummary: {
+      recordsAdded: 'Records added from {{from}} to {{to}}',
+    },
   },
 
   designerView: {

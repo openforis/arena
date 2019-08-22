@@ -1,4 +1,9 @@
 const R = require('ramda')
+const camelize = require('camelize')
+
+const db = require('../../../db/db')
+
+const { getSurveyDBSchema } = require('../../survey/repository/surveySchemaRepositoryUtils')
 
 const Survey = require('../../../../common/survey/survey')
 const NodeDef = require('../../../../common/survey/nodeDef')
@@ -91,20 +96,60 @@ const countDuplicateRecords = async (survey, record, client) => {
   return await runCount(surveyId, tableName, whereExpr, client)
 }
 
-const fetchRecordsCountByKeys = async (survey, client) => {
-  const rootEntityTableAlias = 'n0'
+const fetchRecordsCountByKeys = async (survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, client = db) => {
   const nodeDefRoot = Survey.getRootNodeDef(survey)
   const nodeDefKeys = Survey.getNodeDefKeys(nodeDefRoot)(survey)
-  const keysCol = `CONCAT(${nodeDefKeys.map(nodeDefKey => `${rootEntityTableAlias}.${NodeDefTable.getColName(nodeDefKey)}`).join('____')})`
+  const surveyId = Survey.getId(survey)
+  const schemaRdb = SchemaRdb.getName(surveyId)
+  const schema = getSurveyDBSchema(surveyId)
+  const rootTable = `${schemaRdb}.${NodeDefTable.getViewName(nodeDefRoot)}`
+  const rootTableAlias = 'r'
 
-  return await client.any(`
-    SELECT ${keysCol}, COUNT(*)
-    FROM ${SchemaRdb.getName(Survey.getId(survey))}.${NodeDefTable.getViewName(nodeDefRoot)} as ${rootEntityTableAlias}
-  `)
+  const keyColumns = nodeDefKeys.map(NodeDefTable.getColName)
+  const keyColumnsString = keyColumns.join(', ')
+  const keysCondition = nodeDefKeys.map((nodeDefKey, idx) => {
+    const value = DataCol.getValue(survey, nodeDefKey, keyNodes[idx])
+    return `${rootTableAlias}.${NodeDefTable.getColName(nodeDefKey)} ${value === null ? ' IS NULL' : `= '${value}'`}`
+  })
 
+
+  return await client.map(`
+    WITH count_records AS (
+          SELECT
+              ${keyColumnsString},
+              COUNT(*) AS count
+          FROM
+              ${rootTable}
+          ${excludeRecordFromCount ? `WHERE ${DataTable.colNameRecordUuuid} != '${recordUuidExcluded}'` : ''} 
+          GROUP BY 
+              ${keyColumnsString}
+      )
+    SELECT
+        ${rootTableAlias}.${DataTable.colNameRecordUuuid},
+        jsonb_agg(n.uuid) as nodes_key_uuids,
+        cr.count
+    FROM
+        ${rootTable} ${rootTableAlias}
+
+    JOIN
+        count_records cr
+        ON
+            ${keyColumns.map(keyCol => `cr."${keyCol}" = ${rootTableAlias}."${keyCol}"`).join(' AND ')}
+
+    JOIN ${schema}.node n
+        ON n.record_uuid = r.record_uuid
+        AND n.node_def_uuid IN (${nodeDefKeys.map(nodeDefKey => `'${NodeDef.getUuid(nodeDefKey)}'`).join(', ')})
+    
+    WHERE
+      ${keysCondition}
+      AND ${rootTableAlias}.${DataTable.colNameRecordUuuid} != $1
+          
+    GROUP BY ${rootTableAlias}.${DataTable.colNameRecordUuuid}, cr.count
+    `,
+    [recordUuidExcluded],
+    camelize
+  )
 }
-
-
 
 module.exports = {
   runSelect,

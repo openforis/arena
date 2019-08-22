@@ -43,7 +43,7 @@ const fetchSurveys = async (user, checkAccess = true, client = db) =>
       ON gu.group_uuid = g.uuid AND gu.user_uuid = $1`
     :
     ''}
-    ORDER BY s.id
+    ORDER BY s.date_modified DESC
     `,
     [User.getUuid(user)],
     def => dbTransformCallback(def, true)

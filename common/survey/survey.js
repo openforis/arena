@@ -83,6 +83,7 @@ module.exports = {
   getNodeDefsByTaxonomyUuid: SurveyNodeDefs.getNodeDefsByTaxonomyUuid,
   getNodeDefParent: SurveyNodeDefs.getNodeDefParent,
   getNodeDefKeys: SurveyNodeDefs.getNodeDefKeys,
+  isNodeDefRootKey: SurveyNodeDefs.isNodeDefRootKey,
   findNodeDef: SurveyNodeDefs.findNodeDef,
 
   // hierarchy

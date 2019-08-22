@@ -3,7 +3,6 @@ const StringUtils = require('../stringUtils')
 
 const keys = {
   uuid: 'uuid',
-  surveyId: 'surveyId',
   name: 'name',
   email: 'email',
   authGroups: 'authGroups',
@@ -27,15 +26,6 @@ const hasAccepted = R.pipe(
   StringUtils.isNotBlank
 )
 
-// ==== User record permissions
-const getRecordPermissions = record => user =>
-  R.pipe(
-    getAuthGroups,
-    R.find(
-      R.propEq(keys.surveyId, R.prop(keys.surveyId, record))
-    )
-  )(user)
-
 module.exports = {
   keys,
 
@@ -45,6 +35,4 @@ module.exports = {
   getEmail,
   getAuthGroups,
   hasAccepted,
-
-  getRecordPermissions,
 }

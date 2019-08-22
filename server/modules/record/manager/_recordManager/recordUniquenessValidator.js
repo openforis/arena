@@ -15,29 +15,48 @@ const validateRecordKeysUniqueness = async (survey, record, tx) => {
 
   // 3. fetch key nodes
   const rootNode = Record.getRootNode(record)
-
   const keyNodes = Record.getEntityKeyNodes(survey, rootNode)(record)
 
   // 4. associate validation error to each key node
-  return R.pipe(
-    R.map(keyNode => ({
-        [Node.getUuid(keyNode)]: {
-          [Validator.keys.fields]: {
-            [RecordValidation.keys.recordKeys]: {
-              [Validator.keys.errors]: isUnique
-                ? []
-                : [{ key: RecordValidation.keysError.duplicateRecordKey }],
-              [Validator.keys.valid]: isUnique
-            }
-          }
-        }
-      })
-    ),
-    R.flatten,
-    R.mergeAll
-  )(keyNodes)
+  const validationNodesKey = {}
+  for (const keyNode of keyNodes) {
+    validationNodesKey[Node.getUuid(keyNode)] = _newValidationRecordDuplicate(isUnique)
+  }
+  return validationNodesKey
 }
 
+/**
+ * Returns an indexed object with recordUuid as key and validation as value
+ */
+const validateRecordsUniqueness = async (survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx) => {
+  const result = {}
+  const recordsCountRows = await SurveyRdbManager.fetchRecordsCountByKeys(survey, keyNodes, recordUuidExcluded, excludeRecordFromCount, tx)
+
+  if (!R.isEmpty(recordsCountRows)) {
+    for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {
+      const isUnique = count === '1'
+      const validationNodesKeyFields = {}
+      for (const nodeKeyUuid of nodesKeyUuids) {
+        validationNodesKeyFields[nodeKeyUuid] = _newValidationRecordDuplicate(isUnique)
+      }
+      result[recordUuid] = {
+        [Validator.keys.fields]: validationNodesKeyFields
+      }
+    }
+  }
+  return result
+}
+
+const _newValidationRecordDuplicate = isUnique => ({
+  [Validator.keys.fields]: {
+    [RecordValidation.keys.recordKeys]: {
+      [Validator.keys.errors]: isUnique ? [] : [{ key: RecordValidation.keysError.duplicateRecordKey }],
+      [Validator.keys.valid]: isUnique
+    }
+  }
+})
+
 module.exports = {
-  validateRecordKeysUniqueness
+  validateRecordKeysUniqueness,
+  validateRecordsUniqueness
 }

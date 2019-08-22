@@ -1,7 +1,7 @@
 const R = require('ramda')
 
 const {
-  parse,
+  parseISO,
   differenceInMonths,
   differenceInWeeks,
   differenceInDays,
@@ -11,6 +11,9 @@ const {
 
   compareDesc,
   isValid: fnsIsValid,
+
+  subDays,
+  addDays,
 } = require('date-fns')
 
 const { isBlank } = require('../common/stringUtils')
@@ -29,7 +32,7 @@ const getRelativeDate = date => {
   if (R.isNil(date))
     return null
 
-  const timestamp = parse(date)
+  const timestamp = parseISO(date)
   const now = new Date()
 
   const formatDiff = (fn, unit) => {
@@ -38,7 +41,7 @@ const getRelativeDate = date => {
   }
 
   if (differenceInMonths(now, timestamp) > 0)
-    return format(timestamp, 'DD MMM YYYY')
+    return format(timestamp, 'dd MMM yyyy')
 
   if (differenceInWeeks(now, timestamp) > 0)
     return formatDiff(differenceInWeeks, 'week')
@@ -51,8 +54,6 @@ const getRelativeDate = date => {
 
   return 'A moment ago'
 }
-
-const compareDatesDesc = compareDesc
 
 const isDateBefore = isBefore
 /**
@@ -91,12 +92,17 @@ const formatTime = (hour, minute) =>
 
 module.exports = {
   getRelativeDate,
-  compareDatesDesc,
   isDateBefore,
 
   isValidDate,
   isValidTime,
 
+  format,
   formatTime,
   formatDate,
+
+  parseISO,
+  subDays,
+  addDays,
+  differenceInDays,
 }
