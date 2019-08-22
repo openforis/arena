@@ -150,6 +150,8 @@ module.exports = {
     },
     recordsSummary: {
       recordsAdded: 'Records added from {{from}} to {{to}}',
+      record: '{{count}} Record',
+      record_plural: '{{count}} Records',
     },
   },
 
