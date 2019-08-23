@@ -169,7 +169,7 @@ AutocompleteDialog.defaultProps = {
   itemRenderer: null,
   itemKeyFunction: null,
   inputField: null,
-  sourceElement: null, // used to calculate the size of the dialog if available, otherwise the input filed is used
+  sourceElement: null, // used to calculate the size of the dialog if available, otherwise the input field is used
   className: '',
 }
 

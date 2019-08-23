@@ -157,6 +157,7 @@ class Dropdown extends React.Component {
       readOnly,
       disabled,
       autocompleteDialogClassName,
+      sourceElement,
     } = this.props
 
     const {
@@ -205,7 +206,7 @@ class Dropdown extends React.Component {
                 itemRenderer={DropdownItemRenderer}
                 itemKeyFunction={item => this.getItemKey(item)}
                 inputField={this.getInputField()}
-                sourceElement={this.dropdown.current}
+                sourceElement={sourceElement || this.dropdown.current}
                 onItemSelect={item => this.onSelectionChange(item)}
                 onClose={() => this.toggleOpened()}
                 className={autocompleteDialogClassName}/>,
@@ -233,6 +234,7 @@ Dropdown.defaultProps = {
   itemLabelProp: null,
   itemLabelFunction: null,
   autocompleteDialogClassName: null,
+  sourceElement: null, // used to calculate the size of the autocomplete-dialog if available, otherwise the this.dropdown.current is used
 }
 
 export default Dropdown
