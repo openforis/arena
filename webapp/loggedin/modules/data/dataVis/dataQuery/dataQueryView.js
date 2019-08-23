@@ -18,20 +18,23 @@ class DataQueryView extends React.PureComponent {
 
   render () {
     const {
-      nodeDefUuidEntity, nodeDefUuidsAttributes,
+      nodeDefUuidEntity, nodeDefUuidsAttributes, nodeDefSelectorsVisible,
       updateTableNodeDefUuid, updateTableNodeDefUuidCols
     } = this.props
 
     return (
-      <div className="data-query">
+      <div className={`data-query${nodeDefSelectorsVisible ? '' : ' node-def-selectors-off'}`}>
 
-        <NodeDefsSelectorView
-          nodeDefUuidEntity={nodeDefUuidEntity}
-          nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-          onChangeEntity={updateTableNodeDefUuid}
-          onChangeAttributes={updateTableNodeDefUuidCols}
-          showMultipleAttributes={false}
-        />
+        {
+          nodeDefSelectorsVisible &&
+          <NodeDefsSelectorView
+            nodeDefUuidEntity={nodeDefUuidEntity}
+            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+            onChangeEntity={updateTableNodeDefUuid}
+            onChangeAttributes={updateTableNodeDefUuidCols}
+            showMultipleAttributes={false}
+          />
+        }
 
         <Table/>
 
@@ -48,7 +51,8 @@ DataQueryView.defaultProps = {
 
 const mapStateToProps = state => ({
   nodeDefUuidEntity: DataQueryState.getTableNodeDefUuidTable(state),
-  nodeDefUuidsAttributes: DataQueryState.getTableNodeDefUuidCols(state)
+  nodeDefUuidsAttributes: DataQueryState.getTableNodeDefUuidCols(state),
+  nodeDefSelectorsVisible: DataQueryState.isNodeDefSelectorsVisible(state),
 })
 
 export default connect(
