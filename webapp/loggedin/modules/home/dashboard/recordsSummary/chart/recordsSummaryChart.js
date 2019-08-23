@@ -57,10 +57,10 @@ const RecordsSummaryChart = props => {
           <XAxis
             {...props}
             chartProps={chartProps}/>
-          <DataPoints
+          <DataPath
             {...props}
             chartProps={chartProps}/>
-          <DataPath
+          <DataPoints
             {...props}
             chartProps={chartProps}/>
         </svg>
