@@ -97,6 +97,10 @@
     padding-bottom: 0;
   }
 
+  .dropdown {
+    border-bottom: none;
+  }
+
   .react-grid-item {
     border-right: $formBorder;
     border-bottom: $formBorder;

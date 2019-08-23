@@ -29,7 +29,6 @@ class Dropdown extends React.Component {
 
     this.dropdown = React.createRef()
     this.input = React.createRef()
-    this.dropdownList = React.createRef()
   }
 
   componentDidUpdate (prevProps) {
@@ -191,7 +190,7 @@ class Dropdown extends React.Component {
           onFocus={e => this.onInputFocus(e)}
         />
 
-        <span className="icon icon-menu2 icon-16px"
+        <span className="icon icon-play3 icon-12px"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -201,14 +200,15 @@ class Dropdown extends React.Component {
         {
           this.isOpened() ?
             ReactDOM.createPortal(
-              <AutocompleteDialog ref={this.dropdownList}
-                                  items={items}
-                                  itemRenderer={DropdownItemRenderer}
-                                  itemKeyFunction={item => this.getItemKey(item)}
-                                  inputField={this.getInputField()}
-                                  onItemSelect={item => this.onSelectionChange(item)}
-                                  onClose={() => this.toggleOpened()}
-                                  className={autocompleteDialogClassName}/>,
+              <AutocompleteDialog
+                items={items}
+                itemRenderer={DropdownItemRenderer}
+                itemKeyFunction={item => this.getItemKey(item)}
+                inputField={this.getInputField()}
+                sourceElement={this.dropdown.current}
+                onItemSelect={item => this.onSelectionChange(item)}
+                onClose={() => this.toggleOpened()}
+                className={autocompleteDialogClassName}/>,
               document.body
             )
             : null
