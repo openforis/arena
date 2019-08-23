@@ -40,3 +40,8 @@ export const isElementInViewport = el => {
 export const dispatchWindowResize = () => {
   window.dispatchEvent(new Event('resize'))
 }
+
+export const toDataUrlBase64 = data => {
+  const raw = String.fromCharCode(...new Uint8Array(data))
+  return 'data:image;base64,' + btoa(raw)
+}

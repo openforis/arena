@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import * as R from 'ramda'
 
+import { toDataUrlBase64 } from '../../../../utils/domUtils'
+
 import useI18n from '../../../../commonComponents/useI18n'
 
 import User from '../../../../../common/user/user'
@@ -14,14 +16,15 @@ import {
   useAsyncPostRequest,
   useAsyncPutRequest,
   useFormObject,
-  useOnUpdate
+  useOnUpdate,
 } from '../../../../commonComponents/hooks'
 
 import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    user, surveyInfo, userUuidUrlParam, groups: groupsProps,
+    profilePictureRef,
+    user, surveyInfo, userUuid, groups: groupsProps,
     showAppLoader, hideAppLoader, showNotificationMessage, setUser,
     history,
   } = props
@@ -30,10 +33,10 @@ export const useUserViewState = props => {
   const i18n = useI18n()
 
   const { data: userToUpdate = {}, dispatch: fetchUser, loaded } = useAsyncGetRequest(
-    `/api/survey/${surveyId}/user/${userUuidUrlParam}`
+    `/api/survey/${surveyId}/user/${userUuid}`
   )
 
-  const isInvitation = !userUuidUrlParam
+  const isInvitation = !userUuid
   const isUserAcceptPending = !(isInvitation || User.hasAccepted(userToUpdate))
 
   // form fields edit permissions
@@ -74,6 +77,9 @@ export const useUserViewState = props => {
     if (!isInvitation) {
       fetchUser()
     }
+
+    // get user's profile picture
+    getProfilePicture()
   }, [])
 
   useEffect(() => {
@@ -130,6 +136,24 @@ export const useUserViewState = props => {
     saveUser()
   }
 
+  const {
+    data: downloadedPicture,
+    dispatch: getProfilePicture,
+    loaded: profilePictureLoaded,
+    // error: userSaveError,
+  } = useAsyncGetRequest(`/api/user/${userUuid}/profilePicture`, {
+    responseType: 'arraybuffer',
+  })
+
+  const [profilePicture, setProfilePicture] = useState(null)
+
+  useEffect(() => {
+    if (profilePictureLoaded) {
+      const dataUri = toDataUrlBase64(downloadedPicture)
+      setProfilePicture(dataUri)
+    }
+  }, [profilePictureLoaded])
+
   return {
     loaded: isInvitation || loaded,
 
@@ -146,6 +170,8 @@ export const useUserViewState = props => {
     group: surveyGroups.find(R.propEq('uuid', formObject.groupUuid)),
     surveyGroups,
     objectValid,
+
+    profilePicture,
 
     getFieldValidation,
     setName,

@@ -1,6 +1,6 @@
 import './userView.scss'
 
-import React from 'react'
+import React, { useRef } from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
@@ -22,62 +22,71 @@ import { showAppLoader, hideAppLoader, showNotificationMessage, setUser } from '
 
 import { useUserViewState } from './userViewState'
 
+import ProfilePictureEditor from './components/profilePictureEditor'
+
 const UserView = props => {
   const i18n = useI18n()
+
+  const profilePictureRef = useRef(null)
 
   const {
     isInvitation, loaded,
     name, email, group, surveyGroups, objectValid,
     canEdit, canEditName, canEditGroup, canEditEmail,
     getFieldValidation, setName, setEmail, setGroup,
+    profilePicture,
     sendRequest,
-  } = useUserViewState(props)
+  } = useUserViewState({ ...props, profilePictureRef })
 
   return loaded && (
-    <div className="form user">
-      {
-        !isInvitation && (
-          <FormItem label={i18n.t('common.name')}>
-            <Input
-              disabled={!canEditName}
-              placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
-              value={name}
-              validation={canEditName ? getFieldValidation('name') : {}}
-              maxLength="128"
-              onChange={setName}/>
-          </FormItem>
-        )
-      }
-      <FormItem label={i18n.t('common.email')}>
-        <Input
-          disabled={!canEditEmail}
-          placeholder={i18n.t('common.email')}
-          value={email}
-          validation={getFieldValidation('email')}
-          onChange={setEmail}/>
-      </FormItem>
-      <FormItem label={i18n.t('common.group')}>
-        <Dropdown
-          disabled={!canEditGroup}
-          validation={getFieldValidation('groupUuid')}
-          placeholder={i18n.t('common.group')}
-          items={surveyGroups}
-          itemKeyProp={'uuid'}
-          itemLabelProp={'label'}
-          selection={group}
-          onChange={setGroup}/>
-      </FormItem>
+    <div>
+      { profilePicture ? <ProfilePictureEditor profilePicture={profilePicture} /> : null }
 
-      {
-        canEdit && (
-          <button className="btn"
-                  aria-disabled={!objectValid}
-                  onClick={sendRequest}>
-            <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`}/>
-            {isInvitation ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
-          </button>
-        )
-      }
+      <div className="form user">
+        {
+          !isInvitation && (
+            <FormItem label={i18n.t('common.name')}>
+              <Input
+                disabled={!canEditName}
+                placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
+                value={name}
+                validation={canEditName ? getFieldValidation('name') : {}}
+                maxLength="128"
+                onChange={setName}/>
+            </FormItem>
+          )
+        }
+        <FormItem label={i18n.t('common.email')}>
+          <Input
+            disabled={!canEditEmail}
+            placeholder={i18n.t('common.email')}
+            value={email}
+            validation={getFieldValidation('email')}
+            onChange={setEmail}/>
+        </FormItem>
+        <FormItem label={i18n.t('common.group')}>
+          <Dropdown
+            disabled={!canEditGroup}
+            validation={getFieldValidation('groupUuid')}
+            placeholder={i18n.t('common.group')}
+            items={surveyGroups}
+            itemKeyProp={'uuid'}
+            itemLabelProp={'label'}
+            selection={group}
+            onChange={setGroup}/>
+        </FormItem>
+
+        {
+          canEdit && (
+            <button className="btn"
+                    aria-disabled={!objectValid}
+                    onClick={sendRequest}>
+              <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`}/>
+              {isInvitation ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
+            </button>
+          )
+        }
+      </div>
     </div>
   )
 }
@@ -95,7 +104,7 @@ const mapStateToProps = (state, { match }) => {
     user,
     surveyInfo,
     groups,
-    userUuidUrlParam: getUrlParam('userUuid')(match),
+    userUuid: getUrlParam('userUuid')(match),
   }
 }
 
