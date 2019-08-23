@@ -11,6 +11,10 @@ $rowHeaderHeight: 45px;
   height: 100%;
 }
 
+.data-query.node-def-selectors-off {
+  grid-template-columns: 1fr;
+}
+
 .data-query__table {
 
   &.edit {
@@ -31,7 +35,7 @@ $rowHeaderHeight: 45px;
   .table__header {
     .data-operations {
       display: grid;
-      grid-template-columns: repeat(4, auto);
+      grid-template-columns: repeat(5, auto);
       align-self: flex-end;
       border-top: 1px solid $greyBorder;
       border-left: 1px solid $greyBorder;

@@ -152,6 +152,12 @@ module.exports = {
       recordsAdded: 'Records added from {{from}} to {{to}}',
       record: '{{count}} Record',
       record_plural: '{{count}} Records',
+      week: '{{count}} Week',
+      week_plural: '{{count}} Weeks',
+      month: '{{count}} Month',
+      month_plural: '{{count}} Months',
+      year: '{{count}} Year',
+      year_plural: '{{count}} Years',
     },
   },
 

@@ -14,6 +14,8 @@ const {
 
   subDays,
   addDays,
+  subMonths,
+  subYears,
 } = require('date-fns')
 
 const { isBlank } = require('../common/stringUtils')
@@ -105,4 +107,6 @@ module.exports = {
   subDays,
   addDays,
   differenceInDays,
+  subMonths,
+  subYears,
 }

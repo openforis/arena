@@ -17,7 +17,8 @@ import {
   resetTableFilter,
   updateTableOffset,
   updateTableSort,
-  updateTableEditMode
+  updateTableEditMode,
+  toggleNodeDefsSelector,
 } from '../actions'
 
 const TableHeader = props => {
@@ -38,6 +39,7 @@ const TableHeader = props => {
   const {
     surveyId, nodeDefUuidContext, nodeDefUuidCols,
     tableName, colNames, filter, sort, limit, offset, count,
+    nodeDefSelectorsVisible, toggleNodeDefsSelector,
     showPaginator, editMode, canEdit,
     updateTableFilter, updateTableOffset, updateTableEditMode,
     resetTableFilter,
@@ -53,12 +55,19 @@ const TableHeader = props => {
     <div className="table__header">
 
       <div className="data-operations">
+
+        <button className={`btn btn-s${nodeDefSelectorsVisible ? ' highlight' : ''}`}
+                onClick={toggleNodeDefsSelector}>
+          <span className="icon icon-list icon-14px"/>
+        </button>
+
         <Tooltip messages={filter && [Expression.toString(filter, Expression.modes.sql)]}>
           <button className={`btn btn-s btn-edit${filter ? ' highlight' : ''}`}
                   onClick={toggleExpressionEditor}>
             <span className="icon icon-filter icon-14px"/>
           </button>
         </Tooltip>
+
         {
           showExpressionEditor &&
           <ExpressionEditorPopup
@@ -84,6 +93,7 @@ const TableHeader = props => {
             <span className="icon icon-sort-amount-asc icon-14px"/>
           </button>
         </Tooltip>
+
         {
           showSortEditor &&
           <SortEditor
@@ -141,9 +151,17 @@ TableHeader.defaultProps = {
   updateTableSort: null,
   showPaginator: false,
   editMode: false,
+  nodeDefSelectorsVisible: true,
 }
 
 export default connect(
   null,
-  { updateTableOffset, resetTableFilter, updateTableFilter, updateTableSort, updateTableEditMode }
+  {
+    updateTableOffset,
+    resetTableFilter,
+    updateTableFilter,
+    updateTableSort,
+    updateTableEditMode,
+    toggleNodeDefsSelector
+  }
 )(TableHeader)

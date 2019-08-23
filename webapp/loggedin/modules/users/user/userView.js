@@ -65,7 +65,8 @@ const UserView = props => {
           itemKeyProp={'uuid'}
           itemLabelProp={'label'}
           selection={group}
-          onChange={setGroup}/>
+          onChange={setGroup}
+          readOnlyInput={true}/>
       </FormItem>
 
       {

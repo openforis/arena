@@ -25,6 +25,7 @@ const Table = props => {
     lang, surveyId, data, showTable,
     nodeDefUuidContext, nodeDefCols, nodeDefUuidCols, colNames,
     tableName, offset, limit, filter, sort, count,
+    nodeDefSelectorsVisible,
     editMode, canEdit,
     history
   } = props
@@ -62,6 +63,7 @@ const Table = props => {
             showPaginator={hasData}
             editMode={editMode}
             canEdit={canEdit}
+            nodeDefSelectorsVisible={nodeDefSelectorsVisible}
           />
 
           {
@@ -110,6 +112,7 @@ const mapStateToProps = state => {
     sort: DataQueryState.getTableSort(state),
     count: DataQueryState.getTableCount(state),
     showTable: DataQueryState.hasTableAndCols(state),
+    nodeDefSelectorsVisible: DataQueryState.isNodeDefSelectorsVisible(state),
     editMode,
     canEdit: Authorizer.canEditSurvey(user, surveyInfo),
   }
