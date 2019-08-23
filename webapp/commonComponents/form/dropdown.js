@@ -154,8 +154,7 @@ class Dropdown extends React.Component {
       className = '',
       style = {},
       validation = {},
-      readOnly,
-      disabled,
+      readOnly, readOnlyInput, disabled,
       autocompleteDialogClassName,
       sourceElement,
     } = this.props
@@ -185,7 +184,7 @@ class Dropdown extends React.Component {
           placeholder={placeholder}
           value={trim(displayValue)}
           validation={validation}
-          readOnly={readOnly}
+          readOnly={readOnly || readOnlyInput}
           disabled={disabled}
           onChange={value => this.onInputChange(value)}
           onFocus={e => this.onInputFocus(e)}
@@ -224,6 +223,7 @@ Dropdown.defaultProps = {
   clearOnSelection: false,
   autocompleteMinChars: 0,
   readOnly: false,
+  readOnlyInput: false,
   disabled: false,
   items: [],
   itemsLookupFunction: null,

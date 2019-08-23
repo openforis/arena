@@ -61,6 +61,7 @@ const RecordsSummary = props => {
               selection={timeRangeSelection}
               onChange={item => fetchRecordsSummary(item.key)}
               sourceElement={timeRangeElementRef.current}
+              readOnlyInput={true}
             />
           </div>
         </div>
