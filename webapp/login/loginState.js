@@ -3,6 +3,7 @@ import * as R from 'ramda'
 export const stateKey = 'login'
 
 const keys = {
+  email: 'email',
   userAction: 'userAction',
   error: 'error',
 }
@@ -10,9 +11,15 @@ const keys = {
 export const userActions = {
   login: 'login',
   setNewPassword: 'setNewPassword',
+  forgotPassword: 'forgotPassword',
+  resetPassword: 'resetPassword',
 }
 
 const getStateProp = (key, defaultValue = null) => R.pathOr(defaultValue, [stateKey, key])
+
+export const getEmail = getStateProp(keys.email, '')
+
+export const assocEmail = R.assoc(keys.email)
 
 export const getUserAction = getStateProp(keys.userAction, userActions.login)
 

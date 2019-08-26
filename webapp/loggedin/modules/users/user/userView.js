@@ -21,7 +21,6 @@ import * as SurveyState from '../../../../survey/surveyState'
 import { showAppLoader, hideAppLoader, showNotificationMessage, setUser } from '../../../../app/actions'
 
 import { useUserViewState } from './userViewState'
-import createNumberMask from 'text-mask-addons/dist/createNumberMask'
 
 const UserView = props => {
   const i18n = useI18n()
@@ -66,7 +65,8 @@ const UserView = props => {
           itemKeyProp={'uuid'}
           itemLabelProp={'label'}
           selection={group}
-          onChange={setGroup}/>
+          onChange={setGroup}
+          readOnlyInput={true}/>
       </FormItem>
 
       {
@@ -74,7 +74,7 @@ const UserView = props => {
           <button className="btn"
                   aria-disabled={!objectValid}
                   onClick={sendRequest}>
-            <span className="icon icon-floppy-disk icon-left icon-12px"/>
+            <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`}/>
             {isInvitation ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
           </button>
         )

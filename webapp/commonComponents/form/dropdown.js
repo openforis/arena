@@ -29,7 +29,6 @@ class Dropdown extends React.Component {
 
     this.dropdown = React.createRef()
     this.input = React.createRef()
-    this.dropdownList = React.createRef()
   }
 
   componentDidUpdate (prevProps) {
@@ -155,9 +154,9 @@ class Dropdown extends React.Component {
       className = '',
       style = {},
       validation = {},
-      readOnly,
-      disabled,
+      readOnly, readOnlyInput, disabled,
       autocompleteDialogClassName,
+      sourceElement,
     } = this.props
 
     const {
@@ -185,13 +184,13 @@ class Dropdown extends React.Component {
           placeholder={placeholder}
           value={trim(displayValue)}
           validation={validation}
-          readOnly={readOnly}
+          readOnly={readOnly || readOnlyInput}
           disabled={disabled}
           onChange={value => this.onInputChange(value)}
           onFocus={e => this.onInputFocus(e)}
         />
 
-        <span className="icon icon-menu2 icon-16px"
+        <span className="icon icon-play3 icon-12px"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -201,14 +200,15 @@ class Dropdown extends React.Component {
         {
           this.isOpened() ?
             ReactDOM.createPortal(
-              <AutocompleteDialog ref={this.dropdownList}
-                                  items={items}
-                                  itemRenderer={DropdownItemRenderer}
-                                  itemKeyFunction={item => this.getItemKey(item)}
-                                  inputField={this.getInputField()}
-                                  onItemSelect={item => this.onSelectionChange(item)}
-                                  onClose={() => this.toggleOpened()}
-                                  className={autocompleteDialogClassName}/>,
+              <AutocompleteDialog
+                items={items}
+                itemRenderer={DropdownItemRenderer}
+                itemKeyFunction={item => this.getItemKey(item)}
+                inputField={this.getInputField()}
+                sourceElement={sourceElement || this.dropdown.current}
+                onItemSelect={item => this.onSelectionChange(item)}
+                onClose={() => this.toggleOpened()}
+                className={autocompleteDialogClassName}/>,
               document.body
             )
             : null
@@ -223,6 +223,7 @@ Dropdown.defaultProps = {
   clearOnSelection: false,
   autocompleteMinChars: 0,
   readOnly: false,
+  readOnlyInput: false,
   disabled: false,
   items: [],
   itemsLookupFunction: null,
@@ -233,6 +234,7 @@ Dropdown.defaultProps = {
   itemLabelProp: null,
   itemLabelFunction: null,
   autocompleteDialogClassName: null,
+  sourceElement: null, // used to calculate the size of the autocomplete-dialog if available, otherwise the this.dropdown.current is used
 }
 
 export default Dropdown

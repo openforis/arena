@@ -2,17 +2,23 @@
 
 .dropdown {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 20px;
+  border-bottom: 1px solid $greyBorder;
   //align-self: stretch;
 
   span.icon {
     color: $black;
-    justify-self: end;
+    justify-self: center;
     align-self: center;
+    transform: rotate(90deg) scale(0.8, 1.1);
 
     &:hover {
       cursor: pointer;
     }
+  }
+
+  .form-input {
+    border-bottom: none;
   }
 
   &:focus-within {
