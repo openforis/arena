@@ -1,7 +1,22 @@
 const CategoryManager = require('../manager/categoryManager')
+const JobManager = require('../../../job/jobManager')
+const CategoryImportJob = require('./categoryImportJob')
+
+const importCategory = (user, surveyId, filePath) => {
+  const job = new CategoryImportJob({
+    user,
+    surveyId,
+    filePath
+  })
+
+  JobManager.executeJobThread(job)
+
+  return job
+}
 
 module.exports = {
   insertCategory: CategoryManager.insertCategory,
+  importCategory,
   insertLevel: CategoryManager.insertLevel,
   insertItem: CategoryManager.insertItem,
 

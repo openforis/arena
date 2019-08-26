@@ -12,31 +12,36 @@ const keys = {
 
 const props = {
   code: 'code',
-  labels: 'labels'
+  descriptions: 'descriptions',
+  labels: 'labels',
 }
 
 // ====== CREATE
-const newItem = (levelUuid, parentItem = null, props = {}) => {
-  return {
-    [keys.uuid]: uuidv4(),
-    [keys.levelUuid]: levelUuid,
-    [keys.parentUuid]: SurveyUtils.getUuid(parentItem),
-    [keys.props]: props,
-  }
-}
+const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
+  [keys.uuid]: uuidv4(),
+  [keys.levelUuid]: levelUuid,
+  [keys.parentUuid]: parentItemUuid,
+  [keys.props]: props,
+})
 
 // ====== READ
 const getCode = SurveyUtils.getProp(props.code, '')
 
 const getLabels = SurveyUtils.getProp(props.labels)
 
-const getLabel = language =>
-  item =>
-    R.pipe(
-      getLabels,
-      R.prop(language),
-      R.defaultTo(getCode(item))
-    )(item)
+const getLabel = language => item =>
+  R.pipe(
+    getLabels,
+    R.propOr(getCode(item), language),
+  )(item)
+
+const getDescriptions = SurveyUtils.getProp(props.descriptions)
+
+const getDescription = language => item =>
+  R.pipe(
+    getDescriptions,
+    R.propOr('', language),
+  )(item)
 
 module.exports = {
   keys,
@@ -52,6 +57,8 @@ module.exports = {
   getCode,
   getLabels,
   getLabel,
+  getDescriptions,
+  getDescription,
 
   isEqual: SurveyUtils.isEqual
 }

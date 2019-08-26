@@ -100,7 +100,7 @@ class CategoriesImportJob extends Job {
       const labels = CollectSurvey.toLabels('label', defaultLanguage)(collectItem)
 
       const itemCode = CollectSurvey.getChildElementText('code')(collectItem)
-      const item = CategoryItem.newItem(levelUuid, parentItem, {
+      const item = CategoryItem.newItem(levelUuid, CategoryItem.getUuid(parentItem), {
         [CategoryItem.props.code]: itemCode,
         [CategoryItem.props.labels]: labels
       })

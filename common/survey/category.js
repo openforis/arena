@@ -15,7 +15,8 @@ const keys = {
 }
 
 const props = {
-  name: 'name'
+  name: 'name',
+  itemExtraDef: 'itemExtraDef'
 }
 
 /**
@@ -120,10 +121,12 @@ module.exports = {
   getName: getProp(props.name, ''),
   getLevelsArray,
   getLevelByIndex,
+  getItemExtraDef: getProp(props.itemExtraDef, {}),
 
   // UPDATE
   assocLevelsArray,
   assocLevel,
+  assocItemExtraDef: extraDef => setProp(props.itemExtraDef, extraDef),
 
   // ====== LEVEL
   //CREATE

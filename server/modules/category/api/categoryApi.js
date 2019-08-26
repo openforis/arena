@@ -24,7 +24,11 @@ module.exports.init = app => {
 
       const { body, user } = req
 
-      const category = await CategoryService.insertCategory(user, surveyId, body)
+      const file = Request.getFile(req)
+
+      const category = file
+        ? await CategoryService.importCategory(user, surveyId, file.tempFilePath)
+        : await CategoryService.insertCategory(user, surveyId, body)
 
       res.json({ category })
     } catch (err) {

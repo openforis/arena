@@ -316,6 +316,7 @@ module.exports = {
   // ====== Jobs
   jobs: {
     CategoriesImportJob: 'Categories Import',
+    CategoryImportJob: 'Category Import',
     CategoriesValidationJob: 'Categories Validation',
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',

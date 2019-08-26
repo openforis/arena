@@ -76,7 +76,7 @@ export const createCategoryLevel = (category) => async (dispatch, getState) => {
 }
 
 export const createCategoryLevelItem = (category, level, parentItem) => async (dispatch, getState) => {
-  const item = CategoryItem.newItem(CategoryLevel.getUuid(level), parentItem)
+  const item = CategoryItem.newItem(CategoryLevel.getUuid(level), CategoryItem.getUuid(parentItem))
   dispatch({ type: categoryItemCreate, level, item })
 
   const surveyId = SurveyState.getSurveyId(getState())
