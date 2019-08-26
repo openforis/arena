@@ -1,17 +1,13 @@
 const R = require('ramda')
 
 const Validator = require('../../validation/validator')
+const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
 const NodeDefExpression = require('../nodeDefExpression')
 const Expression = require('../../exprParser/expression')
 
 const SystemError = require('../../../server/utils/systemError')
-
-const keysErrors = {
-  expressionRequired: 'nodeDefEdit.validationErrors.expressionRequired',
-  applyIfDuplicate: 'nodeDefEdit.validationErrors.applyIfDuplicate',
-}
 
 const bindNode = (survey, nodeDef) => ({
   ...nodeDef,
@@ -83,12 +79,15 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
   const validation = await Validator.validate(
     nodeDefExpression,
     {
-      [NodeDefExpression.keys.expression]: [Validator.validateRequired(keysErrors.expressionRequired), validateExpressionProp(survey, nodeDef)],
+      [NodeDefExpression.keys.expression]: [
+        Validator.validateRequired(ValidatorErrorKeys.nodeDefEdit.expressionRequired),
+        validateExpressionProp(survey, nodeDef)
+      ],
       [NodeDefExpression.keys.applyIf]: [
         validateExpressionProp(survey, nodeDef),
         ...validateApplyIfUniqueness
           ? [
-            Validator.validateItemPropUniqueness(keysErrors.applyIfDuplicate)(nodeDefExpressions),
+            Validator.validateItemPropUniqueness(ValidatorErrorKeys.nodeDefEdit.applyIfDuplicate)(nodeDefExpressions),
             validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
           ]
           : []

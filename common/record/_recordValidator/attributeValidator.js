@@ -8,14 +8,11 @@ const Record = require('../record')
 const Node = require('../node')
 const RecordExprParser = require('../recordExprParser')
 const Validator = require('../../validation/validator')
+const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 const StringUtils = require('../../stringUtils')
 
 const AttributeTypeValidator = require('./attributeTypeValidator')
 const AttributeKeyValidator = require('./attributeKeyValidator')
-
-const errorKeys = {
-  valueRequired: 'record.validationErrors.valueRequired',
-}
 
 const _validateRequired = (survey, nodeDef) => (propName, node) =>
   (
@@ -23,7 +20,7 @@ const _validateRequired = (survey, nodeDef) => (propName, node) =>
     NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
   ) &&
   Node.isValueBlank(node)
-    ? { key: errorKeys.valueRequired }
+    ? { key: ValidatorErrorKeys.record.valueRequired }
     : null
 
 /**

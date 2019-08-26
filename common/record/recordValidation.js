@@ -12,11 +12,6 @@ const keys = {
   maxCount: 'maxCount',
 }
 
-const keysError = {
-  duplicateRecordKey: 'formErrors.duplicateRecordKey',
-  oneOrMoreInvalidValues: 'formErrors.oneOrMoreInvalidValues'
-}
-
 const getValidationChildrenCount = (parentNode, childDef) => R.pipe(
   Validator.getFieldValidation(Node.getUuid(parentNode)),
   Validator.getFieldValidation(keys.childrenCount),
@@ -31,7 +26,6 @@ const getNodeValidation = node =>
 
 module.exports = {
   keys,
-  keysError,
 
   // READ
   getNodeValidation,

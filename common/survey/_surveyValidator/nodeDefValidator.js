@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Validator = require('../../validation/validator')
+const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 
 const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
@@ -11,19 +12,6 @@ const NodeDefValidationsValidator = require('./nodeDefValidationsValidator')
 
 const { keys, propKeys } = NodeDef
 
-const nodeDefErrorKeys = {
-  defaultValuesNotSpecified: 'nodeDefEdit.validationErrors.defaultValuesNotSpecified',
-  categoryRequired: 'nodeDefEdit.validationErrors.categoryRequired',
-  childrenEmpty: 'nodeDefEdit.validationErrors.childrenEmpty',
-  keysEmpty: 'nodeDefEdit.validationErrors.keysEmpty',
-  keysExceedingMax: 'nodeDefEdit.validationErrors.keysExceedingMax',
-  nameDuplicate: 'nodeDefEdit.validationErrors.nameDuplicate',
-  nameInvalid: 'nodeDefEdit.validationErrors.nameInvalid',
-  nameNotKeyword: 'nodeDefEdit.validationErrors.nameNotKeyword',
-  nameRequired: 'nodeDefEdit.validationErrors.nameRequired',
-  taxonomyRequired: 'nodeDefEdit.validationErrors.taxonomyRequired',
-}
-
 const keysValidationFields = {
   children: 'children',
   keyAttributes: 'keyAttributes',
@@ -31,12 +19,12 @@ const keysValidationFields = {
 
 const validateCategory = async (propName, nodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.code
-    ? Validator.validateRequired(nodeDefErrorKeys.categoryRequired)(propName, nodeDef)
+    ? Validator.validateRequired(ValidatorErrorKeys.nodeDefEdit.categoryRequired)(propName, nodeDef)
     : null
 
 const validateTaxonomy = async (propName, nodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.taxon
-    ? Validator.validateRequired(nodeDefErrorKeys.taxonomyRequired)(propName, nodeDef)
+    ? Validator.validateRequired(ValidatorErrorKeys.nodeDefEdit.taxonomyRequired)(propName, nodeDef)
     : null
 
 const validateChildren = survey =>
@@ -44,7 +32,7 @@ const validateChildren = survey =>
     if (NodeDef.isEntity(nodeDef)) {
       const children = Survey.getNodeDefChildren(nodeDef)(survey)
       if (R.isEmpty(children)) {
-        return { key: nodeDefErrorKeys.childrenEmpty }
+        return { key: ValidatorErrorKeys.nodeDefEdit.childrenEmpty }
       }
     }
     return null
@@ -67,9 +55,9 @@ const validateKeyAttributes = survey =>
           (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef))
         )
       ) {
-        return { key: nodeDefErrorKeys.keysEmpty }
+        return { key: ValidatorErrorKeys.nodeDefEdit.keysEmpty }
       } else if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return { key: nodeDefErrorKeys.keysExceedingMax }
+        return { key: ValidatorErrorKeys.nodeDefEdit.keysExceedingMax }
       }
     }
     return null
@@ -81,7 +69,7 @@ const validateKey = survey =>
       const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
       if (keyAttributesCount > NodeDef.maxKeyAttributes) {
-        return { key: nodeDefErrorKeys.keysExceedingMax }
+        return { key: ValidatorErrorKeys.nodeDefEdit.keysExceedingMax }
       }
     }
     return null
@@ -89,15 +77,15 @@ const validateKey = survey =>
 
 const validateReadOnly = (propName, nodeDef) =>
   NodeDef.isReadOnly(nodeDef) && R.isEmpty(NodeDef.getDefaultValues(nodeDef))
-    ? { key: nodeDefErrorKeys.defaultValuesNotSpecified }
+    ? { key: ValidatorErrorKeys.nodeDefEdit.defaultValuesNotSpecified }
     : null
 
 const propsValidations = survey => ({
   [`${keys.props}.${propKeys.name}`]: [
-    Validator.validateRequired(nodeDefErrorKeys.nameRequired),
-    Validator.validateNotKeyword(nodeDefErrorKeys.nameNotKeyword),
-    Validator.validateName(nodeDefErrorKeys.nameInvalid),
-    Validator.validateItemPropUniqueness(nodeDefErrorKeys.nameDuplicate)(Survey.getNodeDefsArray(survey))
+    Validator.validateRequired(ValidatorErrorKeys.nameRequired),
+    Validator.validateNotKeyword(ValidatorErrorKeys.nameCannotBeKeyword),
+    Validator.validateName(ValidatorErrorKeys.nodeDefEdit.nameInvalid),
+    Validator.validateItemPropUniqueness(ValidatorErrorKeys.nameDuplicate)(Survey.getNodeDefsArray(survey))
   ],
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
   [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
@@ -115,8 +103,8 @@ const validateAdvancedProps = async (survey, nodeDef) => {
   }
 
   return Validator.cleanup({
-    fields: validations,
-    valid: true,
+    [Validator.keys.fields]: validations,
+    [Validator.keys.valid]: true,
   })
 }
 

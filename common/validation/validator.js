@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const ValidatorErrorKeys = require('./validatorErrorKeys')
+
 const keywords = [
   'asc',
   'date_created',
@@ -19,15 +21,6 @@ const keywords = [
   'uuid',
   'value',
 ]
-
-const errorKeys = {
-  duplicate: 'formErrors.duplicate',
-  empty: 'formErrors.empty',
-  exceedingMax: 'formErrors.exceedingMax',
-  invalidNumber: 'formErrors.invalidNumber',
-  invalidField: 'formErrors.invalidField',
-  zeroOrNegative: 'formErrors.zeroOrNegative',
-}
 
 const keys = {
   fields: 'fields',
@@ -124,7 +117,7 @@ const validateName = errorKey => (propName, item) => {
 
 const validateNumber = (propName, item) => {
   const value = getProp(propName)(item)
-  return value && isNaN(value) ? { key: errorKeys.invalidNumber } : null
+  return value && isNaN(value) ? { key: ValidatorErrorKeys.invalidNumber } : null
 }
 
 const validatePositiveNumber = errorKey => (propName, item) => {
@@ -150,19 +143,10 @@ const getFieldValidations = R.propOr({}, keys.fields)
 
 const getFieldValidation = field => R.pathOr(newValidationValid(), [keys.fields, field])
 
-const getInvalidFieldValidations = (validation, fieldPrefix = null) => R.pipe(
+const getInvalidFieldValidations = R.pipe(
   getFieldValidations,
-  R.reject(R.propEq(keys.valid, true)),
-  R.unless(
-    R.always(fieldPrefix === null),
-    validations => console.log('validations', validations) || R.reduce((accValidations, field) => {
-        accValidations[`${fieldPrefix}.${field}`] = validations[field]
-        return accValidations
-      },
-      {}
-    )(R.keys(validations))
-  )
-)(validation)
+  R.reject(isValidationValid)
+)
 
 const getErrors = R.propOr([], keys.errors)
 
@@ -234,7 +218,6 @@ const recalculateValidity = validation =>
 
 module.exports = {
   keys,
-  errorKeys,
   keywords,
 
   newValidationValid,
