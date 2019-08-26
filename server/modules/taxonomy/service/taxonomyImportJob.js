@@ -4,9 +4,11 @@ const Job = require('../../../job/job')
 
 const { languageCodes } = require('../../../../common/app/languages')
 const { isNotBlank } = require('../../../../common/stringUtils')
+const ObjectUtils = require('../../../../common/objectUtils')
 const CSVParser = require('../../../utils/file/csvParser')
 
 const Validator = require('../../../../common/validation/validator')
+const ValidatorErrorKeys = require('../../../../common/validation/validatorErrorKeys')
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Taxon = require('../../../../common/survey/taxon')
 
@@ -33,8 +35,10 @@ class TaxonomyImportJob extends Job {
     this.taxonomyUuid = taxonomyUuid
     this.filePath = filePath
 
-    this.codesToRow = {} //maps codes to csv file rows
-    this.scientificNamesToRow = {} //maps scientific names to csv file rows
+    this.rowsByField = {
+      code: {}, //maps codes to csv file rows
+      scientificName: {} //maps scientific names to csv file rows
+    }
 
     this.taxonomyImportManager = null //to be initialized before starting the import
   }
@@ -144,7 +148,7 @@ class TaxonomyImportJob extends Job {
       this.addError({
         all: {
           valid: false,
-          errors: [`Missing required columns: ${R.join(', ', missingColumns)}`]
+          errors: [{ key: ValidatorErrorKeys.taxonomyImportJob.missingRequiredColumns, params: { columns: R.join(', ', missingColumns) } }]
         }
       })
       return false
@@ -160,44 +164,36 @@ class TaxonomyImportJob extends Job {
   }
 
   async validateTaxon (taxon) {
-    let validation = await TaxonomyValidator.validateTaxon([], taxon) //do not validate code and scientific name uniqueness
+    const validation = await TaxonomyValidator.validateTaxon([], taxon) //do not validate code and scientific name uniqueness
 
     //validate taxon uniqueness among inserted values
     if (Validator.isValidationValid(validation)) {
       const code = R.pipe(Taxon.getCode, R.toUpper)(taxon)
-      const duplicateCodeRow = this.codesToRow[code]
-
-      if (duplicateCodeRow) {
-        validation = Validator.assocFieldValidation(Taxon.propKeys.code, {
-          valid: false,
-          errors: [{
-            key: Validator.errorKeys.duplicateCode,
-            params: { row: duplicateCodeRow, duplicateRow: this.processed + 1 }
-          }],
-        })(validation)
-      } else {
-        this.codesToRow[code] = this.processed + 1
-      }
+      this._addValueToIndex(Taxon.propKeys.code, code, ValidatorErrorKeys.taxonomyEdit.codeDuplicate, validation)
 
       const scientificName = Taxon.getScientificName(taxon)
-      const duplicateScientificNameRow = this.scientificNamesToRow[scientificName]
-
-      if (duplicateScientificNameRow) {
-        validation = Validator.assocFieldValidation(Taxon.propKeys.scientificName, {
-          valid: false,
-          errors: [{
-            key: Validator.errorKeys.duplicateName,
-            params: { row: duplicateCodeRow, duplicateRow: this.processed + 1 }
-          }],
-        })(validation)
-      } else {
-        this.scientificNamesToRow[scientificName] = this.processed + 1
-      }
+      this._addValueToIndex(Taxon.propKeys.scientificName, scientificName, ValidatorErrorKeys.taxonomyEdit.scientificNameDuplicate, validation)
     }
 
     return {
       ...taxon,
       validation,
+    }
+  }
+
+  _addValueToIndex (field, value, errorKeyDuplicate, validation) {
+    const duplicateRow = this.rowsByField[field][value]
+    if (duplicateRow) {
+      ObjectUtils.setInPath([Validator.keys.fields, field], {
+        [Validator.keys.valid]: false,
+        [Validator.keys.errors]: [{
+          key: errorKeyDuplicate,
+          params: { row: this.processed + 1, duplicateRow }
+        }],
+      })(validation)
+      validation[Validator.keys.valid] = false
+    } else {
+      this.rowsByField[field][value] = this.processed + 1
     }
   }
 

@@ -1,6 +1,7 @@
 const R = require('ramda')
 
 const Validator = require('../../validation/validator')
+const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
 const NodeDefExpression = require('../nodeDefExpression')
@@ -78,12 +79,15 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
   const validation = await Validator.validate(
     nodeDefExpression,
     {
-      [NodeDefExpression.keys.expression]: [Validator.validateRequired, validateExpressionProp(survey, nodeDef)],
+      [NodeDefExpression.keys.expression]: [
+        Validator.validateRequired(ValidatorErrorKeys.nodeDefEdit.expressionRequired),
+        validateExpressionProp(survey, nodeDef)
+      ],
       [NodeDefExpression.keys.applyIf]: [
         validateExpressionProp(survey, nodeDef),
         ...validateApplyIfUniqueness
           ? [
-            Validator.validateItemPropUniqueness(nodeDefExpressions),
+            Validator.validateItemPropUniqueness(ValidatorErrorKeys.nodeDefEdit.applyIfDuplicate)(nodeDefExpressions),
             validateOnlyLastApplyIfEmpty(nodeDefExpressions, i)
           ]
           : []
@@ -94,7 +98,7 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
 }
 
 const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniqueness = true) => {
-  const result = { valid: true, fields: {} }
+  const result = Validator.newValidationValid()
 
   const validations = await Promise.all(
     nodeDefExpressions.map(async (nodeDefExpression, i) =>

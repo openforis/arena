@@ -171,7 +171,7 @@ module.exports = {
     accepted: 'Accepted',
     inviteUserConfirmation: 'An email to {{email}} has been sent',
     updateUserConfirmation: 'User {{name}} has been updated',
-    notAcceptedYet: 'Invitation not accepted yet'
+    notAcceptedYet: 'Invitation not accepted yet',
   },
 
   itemsTable: {
@@ -209,12 +209,6 @@ module.exports = {
       minCount: 'Min count',
       maxCount: 'Max count',
       expressions: 'Expressions',
-    },
-    validationErrors: {
-      childrenEmpty: '$t(common.childrenEmpty)',
-      defaultValuesNotSpecified: 'Default value not specified',
-      keysEmpty: 'Define at least one key',
-      keysExceedingMax: 'Exceeding maximum number of keys',
     },
     cannotChangeIntoMultipleWithDefaultValues: 'This node cannot be converted to multiple because it has default values.'
   },
@@ -274,9 +268,6 @@ module.exports = {
       genus: 'Genus',
       scientificName: '$t(surveyForm.nodeDefTaxon.scientificName)',
     },
-    validationErrors: {
-      taxaEmpty: 'Empty taxa'
-    }
   },
 
   categoryEdit: {
@@ -285,32 +276,78 @@ module.exports = {
     level: 'Level',
     confirmDelete: 'Delete the item with all children? $t(common.cantUndoWarning)',
     deleteItem: 'Delete item',
-    validationErrors: {
-      childrenEmpty: '$t(common.childrenEmpty)',
-      childrenInvalid: 'At least one invalid child',
-      itemsInvalid: 'At least one invalid item',
-      itemsEmpty: 'Define at least one item',
-    }
   },
 
-  formErrors: {
-    duplicate: 'Duplicate',
-    duplicateEntityKey: 'Duplicate entity key',
-    duplicateRecordKey: 'Duplicate record key',
-    empty: '$t(common.empty)',
-    exceedingMax: 'Exceeding max',
-    invalidName: 'Invalid name',
+  // ===== All validation errors
+  validationErrors: {
+    // common
+    invalidField: '"{{field}}" is invalid',
     invalidNumber: 'Invalid number',
-    invalidType: 'Invalid type',
-    invalidValue: 'Invalid value',
-    invalidEmail: 'Invalid email',
-    keyword: 'Keyword',
-    maxCountNodesExceeded: 'Nodes must be less than or equal to {{maxCount}}',
-    minCountNodesNotReached: 'Nodes must be more than or equal to {{minCount}}',
-    oneOrMoreInvalidValues: 'One or more values are invalid',
-    required: '$t(common.required)',
-    requiredField: 'Required field',
-    zeroOrNegative: 'Zero or negative',
+    nameDuplicate: 'Name is duplicate',
+    nameCannotBeKeyword: 'Name "{{value}}" cannot be used: it\'s a reserved word',
+    nameRequired: 'Name is required',
+    rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
+
+    categoryEdit: {
+      childrenEmpty: '$t(common.childrenEmpty)',
+      childrenInvalid: 'At least one invalid child',
+      codeCannotBeKeyword: 'Code "{{value}}" cannot be used: it\'s a reserved word',
+      codeDuplicate: 'Code is duplicate',
+      codeRequired: 'Code is required',
+      itemsInvalid: 'At least one invalid item',
+      itemsEmpty: 'Define at least one item',
+      levelDuplicate: 'Level name is duplicate',
+    },
+
+    nodeDefEdit: {
+      applyIfDuplicate: '"Apply if" condition is duplicate',
+      countMaxMustBePositiveNumber: 'Max Count must be a positive integer',
+      countMinMustBePositiveNumber: 'Min Count must be a positive integer',
+      categoryRequired: 'Category is required',
+      childrenEmpty: '$t(common.childrenEmpty)',
+      defaultValuesNotSpecified: 'Default value not specified',
+      expressionRequired: 'Expression required',
+      keysEmpty: 'Define at least one key attribute',
+      keysExceedingMax: 'Exceeding maximum number of key attributes',
+      nameInvalid: 'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
+      taxonomyRequired: 'Taxonomy is required',
+    },
+
+    record: {
+      keyDuplicate: 'Duplicate record key',
+      oneOrMoreInvalidValues: 'One or more values are invalid',
+
+      entityKeyDuplicate: 'Duplicate entity key',
+      nodesMaxCountExceeded: 'Nodes must be less than or equal to {{maxCount}}',
+      nodesMinCountNotReached: 'Nodes must be more than or equal to {{minCount}}',
+      valueInvalid: 'Invalid value',
+      valueRequired: 'Required value',
+    },
+
+    surveyInfoEdit: {
+      langRequired: 'Language is required',
+      srsRequired: 'Spatial Reference System is required',
+    },
+
+    taxonomyEdit: {
+      codeDuplicate: 'Duplicate code {{code}}; $t(validationErrors.rowsDuplicate)',
+      codeRequired: 'Code is required',
+      familyRequired: 'Family is required',
+      genusRequired: 'Genus is required',
+      scientificNameDuplicate: 'Duplicate scientific name {{scientificName}}; $t(validationErrors.rowsDuplicate)',
+      scientificNameRequired: 'Scientific name is required',
+      taxaEmpty: 'Empty taxa',
+    },
+
+    taxonomyImportJob: {
+      missingRequiredColumns: 'Missing required column(s): {{columns}}'
+    },
+
+    user: {
+      emailRequired: 'Email is required',
+      emailInvalid: 'Email is invalid',
+      groupRequired: 'Group is required',
+    }
   },
 
   // ====== Jobs
@@ -335,15 +372,6 @@ module.exports = {
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
-  },
-
-  jobErrors: {
-    generic: '{{text}}',
-    empty: '$t(common.empty)',
-    duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
-    duplicateName: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
-    duplicateCode: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
-    defaultValuesNotSpecified: '$t(formErrors.defaultValuesNotSpecified)',
   },
 
   // ====== App Errors

@@ -2,11 +2,10 @@ const R = require('ramda')
 
 const Taxonomy = require('../../../../../../common/survey/taxonomy')
 const Taxon = require('../../../../../../common/survey/taxon')
+const ValidatorErrorKeys = require('../../../../../../common/validation/validatorErrorKeys')
 const { languageCodesISO636_2 } = require('../../../../../../common/app/languages')
 
 const Job = require('../../../../../job/job')
-
-const Validator = require('../../../../../../common/validation/validator')
 
 const TaxonomyManager = require('../../../../taxonomy/manager/taxonomyManager')
 const TaxonomyImportManager = require('../../../../taxonomy/manager/taxonomyImportManager')
@@ -14,11 +13,6 @@ const TaxonomyImportManager = require('../../../../taxonomy/manager/taxonomyImpo
 const CSVParser = require('../../../../../utils/file/csvParser')
 
 const speciesFilesPath = 'species/'
-
-const keysError = {
-  code: 'code',
-  scientificName: 'scientificName',
-}
 
 /**
  * Inserts a taxonomy for each taxonomy in the Collect survey.
@@ -165,10 +159,10 @@ class TaxonomiesImportJob extends Job {
     const rowDuplicateCode = this.rowsByCode[code]
     if (rowDuplicateCode) {
       this.addError({
-        [keysError.code]: {
+        [Taxon.propKeys.code]: {
           valid: false,
           errors: [{
-            key: Validator.errorKeys.duplicateCode,
+            key: ValidatorErrorKeys.taxonomyEdit.codeDuplicate,
             params: { code, row: this.currentRow, duplicateRow: rowDuplicateCode },
           }],
         },
@@ -181,10 +175,10 @@ class TaxonomiesImportJob extends Job {
     const rowDuplicateScientificName = this.rowsByScientificName[scientificName]
     if (rowDuplicateScientificName) {
       this.addError({
-        [keysError.scientificName]: {
+        [Taxon.propKeys.scientificName]: {
           valid: false,
           errors: [{
-            key: Validator.errorKeys.duplicateName,
+            key: ValidatorErrorKeys.taxonomyEdit.scientificNameDuplicate,
             params: { scientificName, row: this.currentRow, duplicateRow: rowDuplicateScientificName },
           }],
         },
