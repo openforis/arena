@@ -39,7 +39,7 @@ module.exports = {
     no: 'No',
     noItems: `$t(common.no) $t(common.item,{'count':2})`,
     of: 'of',
-    valueRequired: 'Required',
+    required: 'Required',
     reset: 'Reset',
     save: 'Save',
     saved: 'Saved!',
@@ -286,6 +286,7 @@ module.exports = {
     nameDuplicate: 'Name is duplicate',
     nameCannotBeKeyword: 'Name "{{value}}" cannot be used: it\'s a reserved word',
     nameRequired: 'Name is required',
+    rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
     categoryEdit: {
       childrenEmpty: '$t(common.childrenEmpty)',
@@ -329,11 +330,11 @@ module.exports = {
     },
 
     taxonomyEdit: {
-      codeDuplicate: 'Duplicate code {{code}}; $t(jobErrors.duplicateRows)',
+      codeDuplicate: 'Duplicate code {{code}}; $t(validationErrors.rowsDuplicate)',
       codeRequired: 'Code is required',
       familyRequired: 'Family is required',
       genusRequired: 'Genus is required',
-      scientificNameDuplicate: 'Duplicate scientific name {{scientificName}}; $t(jobErrors.duplicateRows)',
+      scientificNameDuplicate: 'Duplicate scientific name {{scientificName}}; $t(validationErrors.rowsDuplicate)',
       scientificNameRequired: 'Scientific name is required',
       taxaEmpty: 'Empty taxa',
     },
@@ -371,12 +372,6 @@ module.exports = {
     TaxonomiesImportJob: 'Taxonomies Import',
     TaxonomiesValidationJob: 'Taxonomies Validation',
     TaxonomyImportJob: 'Taxonomy Import',
-  },
-
-  jobErrors: {
-    generic: '{{text}}',
-    empty: '$t(common.empty)',
-    duplicateRows: 'row: {{row}} duplicate row: {{duplicateRow}}',
   },
 
   // ====== App Errors

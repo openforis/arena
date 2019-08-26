@@ -32,7 +32,7 @@ const AppJobErrors = ({ job }) => {
                     {i18n.t(errorKey)}
                   </div>
                   <div className="item-error">
-                    {getValidationFieldMessagesHTML(i18n, null, false)(validationWrapper(errors[errorKey]))}
+                    {getValidationFieldMessagesHTML(i18n, false)(validationWrapper(errors[errorKey]))}
                   </div>
                 </div>
               )

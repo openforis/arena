@@ -14,7 +14,7 @@ export default ({ validation, className, showKeys, children }) => {
   const type = isValid ? '' : 'error'
   const messagesHtml = isValid
     ? null
-    : ValidationUtils.getValidationFieldMessagesHTML(i18n, undefined, showKeys)(validation)
+    : ValidationUtils.getValidationFieldMessagesHTML(i18n, showKeys)(validation)
 
   return (
     <Tooltip
