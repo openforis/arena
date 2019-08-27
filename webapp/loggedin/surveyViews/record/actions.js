@@ -11,6 +11,8 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
 import * as RecordState from './recordState'
 
+import { showAppLoader, hideAppLoader } from '../../../app/actions'
+
 import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
 
 import Survey from '../../../../common/survey/survey'
@@ -41,6 +43,8 @@ export const recordDeleted = (history) => dispatch => {
  * ============
  */
 export const createRecord = (history, preview = false) => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+
   const state = getState()
   const user = AppState.getUser(state)
   const surveyId = SurveyState.getSurveyId(state)
@@ -143,6 +147,8 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
  * ============
  */
 export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+
   const surveyId = SurveyState.getSurveyId(getState())
   const { data: { record } } = await axios.post(
     `/api/survey/${surveyId}/record/${recordUuid}/checkin`,
@@ -175,18 +181,12 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
       ancestors
     )
 
-    dispatch({
-      type: recordLoad,
-      record,
-      nodeDefActivePage,
-      formPageNodeUuidByNodeDefUuid
-    })
+    dispatch({ type: recordLoad, record, nodeDefActivePage, formPageNodeUuidByNodeDefUuid })
   } else {
-    dispatch({
-      type: recordLoad,
-      record
-    })
+    dispatch({ type: recordLoad, record })
   }
+
+  dispatch(hideAppLoader())
 }
 
 export const checkOutRecord = recordUuid => async (dispatch, getState) => {

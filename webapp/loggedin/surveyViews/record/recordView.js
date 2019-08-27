@@ -19,7 +19,6 @@ import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from './recordState'
 
-import { hideAppLoader, showAppLoader } from '../../../app/actions'
 import { resetForm } from '../surveyForm/actions'
 import {
   checkInRecord,
@@ -30,10 +29,7 @@ import {
 } from './actions'
 
 const RecordView = props => {
-  const {
-    recordLoaded, preview, canEditRecord,
-    hideAppLoader, showAppLoader,
-  } = props
+  const { recordLoaded, preview, canEditRecord, } = props
 
   const recordLoadedRef = useRef(false)
 
@@ -44,7 +40,6 @@ const RecordView = props => {
       recordNodesUpdate, nodeValidationsUpdate, recordDeleted, history
     } = props
 
-    showAppLoader()
     // check in record
     checkInRecord(recordUuidUrlParam, draftDefs, parentNodeUuidUrlParam)
 
@@ -81,9 +76,6 @@ const RecordView = props => {
 
   useEffect(() => {
     recordLoadedRef.current = recordLoaded
-    if (recordLoaded) {
-      hideAppLoader()
-    }
   }, [recordLoaded])
 
   useEffect(() => {
@@ -123,7 +115,6 @@ const enhance = compose(
   connect(
     mapStateToProps,
     {
-      hideAppLoader, showAppLoader,
       resetForm, checkInRecord, checkOutRecord,
       recordNodesUpdate, nodeValidationsUpdate, recordDeleted
     }
