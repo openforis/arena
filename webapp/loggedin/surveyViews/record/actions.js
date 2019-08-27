@@ -24,19 +24,16 @@ export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
 export const validationsUpdate = 'survey/record/validation/update'
 
-export const recordNodesUpdate = nodes =>
-  dispatch =>
-    dispatch({ type: nodesUpdate, nodes })
+export const recordNodesUpdate = nodes => dispatch =>
+  dispatch({ type: nodesUpdate, nodes })
 
-export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) =>
-  dispatch =>
-    dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
+export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
+  dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
-export const dispatchRecordDelete = (history) =>
-  dispatch => {
-    dispatch({ type: recordDelete })
-    history.push(appModuleUri(appModules.data))
-  }
+export const recordDeleted = (history) => dispatch => {
+  dispatch({ type: recordDelete })
+  history.push(appModuleUri(appModules.data))
+}
 
 /**
  * ============
@@ -135,12 +132,9 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(state)
   const recordUuid = RecordState.getRecordUuid(state)
 
-  // 1. checkout (close server thread)
-  await checkOutRecord(recordUuid)(dispatch, getState)
-  // 2. perform server side delete
   await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
-  // 3. remove record from redux state and redirect to records view
-  dispatchRecordDelete(history)(dispatch)
+
+  dispatch(recordDeleted(history))
 }
 
 /**

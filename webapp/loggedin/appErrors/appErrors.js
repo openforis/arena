@@ -31,7 +31,7 @@ const AppError = ({ error, closeAppError }) => {
       </div>
       <div className="message">
         <Markdown options={{ html: false }}>
-          {i18n.t(`appErrors.${key}`, params)}
+          {i18n.t(key, params)}
         </Markdown>
       </div>
     </div>

@@ -26,7 +26,7 @@ import {
   checkOutRecord,
   recordNodesUpdate,
   nodeValidationsUpdate,
-  dispatchRecordDelete
+  recordDeleted
 } from './actions'
 
 const RecordView = props => {
@@ -41,7 +41,7 @@ const RecordView = props => {
     const {
       recordUuidUrlParam, parentNodeUuidUrlParam, draftDefs,
       checkInRecord,
-      recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete, history
+      recordNodesUpdate, nodeValidationsUpdate, recordDeleted, history
     } = props
 
     showAppLoader()
@@ -53,7 +53,7 @@ const RecordView = props => {
     AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
     AppWebSocket.on(WebSocketEvents.recordDelete, () => {
       alert('This record has just been deleted by another user')
-      dispatchRecordDelete(history)
+      recordDeleted(history)
     })
 
     // add beforeunload event listener
@@ -125,7 +125,7 @@ const enhance = compose(
     {
       hideAppLoader, showAppLoader,
       resetForm, checkInRecord, checkOutRecord,
-      recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete
+      recordNodesUpdate, nodeValidationsUpdate, recordDeleted
     }
   )
 )
