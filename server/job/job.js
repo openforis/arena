@@ -89,7 +89,7 @@ class Job {
         this.addError({
           error: {
             valid: false,
-            errors: [{ key: 'generic', params: { text: e.toString() } }],
+            errors: [{ key: 'appErrors.generic', params: { text: e.toString() } }],
           },
         })
         await this.setStatusFailed()
