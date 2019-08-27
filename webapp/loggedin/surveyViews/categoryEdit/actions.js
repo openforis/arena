@@ -24,6 +24,8 @@ import {
   categoriesUpdate,
 } from '../../../survey/categories/actions'
 
+import { showAppJobMonitor } from '../../../app/actions'
+
 export const categoryEditUpdate = 'surveyForm/categoryEdit/update'
 export const categoryEditLevelActiveItemUpdate = 'surveyForm/categoryEdit/levelActiveItem/update'
 
@@ -65,6 +67,24 @@ export const createCategory = () => async (dispatch, getState) => {
   dispatch({ type: categoryCreate, category })
 
   return category
+}
+
+export const uploadCategory = (categoryUuid, file) => async (dispatch, getState) => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const config = {
+    headers: {
+      'content-type': 'multipart/form-data'
+    }
+  }
+
+  const surveyId = SurveyState.getSurveyId(getState())
+  const { data } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData, config)
+
+  dispatch(showAppJobMonitor(data.job, () => {
+
+  }))
 }
 
 export const createCategoryLevel = (category) => async (dispatch, getState) => {

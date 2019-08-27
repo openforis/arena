@@ -1,12 +1,14 @@
 const R = require('ramda')
 
-const SurveyPublishJob = require('../modules/survey/service/publish/surveyPublishJob')
+const CategoryImportJob = require('../modules/category/service/categoryImportJob')
 const CollectImportJob = require('../modules/collectImport/service/collectImport/collectImportJob')
+const SurveyPublishJob = require('../modules/survey/service/publish/surveyPublishJob')
 const TaxonomyImportJob = require('../modules/taxonomy/service/taxonomyImportJob')
 
 const jobClasses = [
-  SurveyPublishJob,
+  CategoryImportJob,
   CollectImportJob,
+  SurveyPublishJob,
   TaxonomyImportJob,
 ]
 
@@ -17,7 +19,6 @@ const createJob = (jobType, params) => {
 
   return new jobClass(params)
 }
-
 
 module.exports = {
   createJob,

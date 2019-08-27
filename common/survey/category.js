@@ -38,7 +38,7 @@ const newCategory = (props = {}) => {
  * LEVELS
  */
 // ==== CREATE
-const newLevel = (category) => {
+const newLevel = (category, props = {}) => {
   const index = getLevelsArray(category).length
 
   return {
@@ -47,6 +47,7 @@ const newLevel = (category) => {
     [CategoryLevel.keys.index]: index,
     [CategoryLevel.keys.props]: {
       name: 'level_' + (index + 1),
+      ...props
     }
   }
 }

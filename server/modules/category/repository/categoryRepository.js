@@ -180,6 +180,14 @@ const deleteCategory = async (surveyId, categoryUuid, client = db) =>
 const deleteLevel = async (surveyId, levelUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category_level', levelUuid, client)
 
+const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db) =>
+  await client.none(`
+      DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level 
+      WHERE category_uuid = $1
+    `,
+    [categoryUuid]
+  )
+
 const deleteItem = async (surveyId, itemUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category_item', itemUuid, client)
 
@@ -210,6 +218,7 @@ module.exports = {
   //DELETE
   deleteCategory,
   deleteLevel,
+  deleteLevelsByCategory,
   deleteItem,
 
   deleteItemLabels,

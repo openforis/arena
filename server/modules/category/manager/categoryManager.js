@@ -80,8 +80,8 @@ const fetchCategoriesAndLevels = async (surveyId, draft, client = db) => {
   )
 }
 
-const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, validate = true) => {
-  const categories = await fetchCategoriesAndLevels(surveyId, draft)
+const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, validate = true, client = db) => {
+  const categories = await fetchCategoriesAndLevels(surveyId, draft, client)
   const category = R.find(R.propEq('uuid', categoryUuid))(categories)
 
   return validate
@@ -165,6 +165,14 @@ const deleteLevel = async (user, surveyId, levelUuid) =>
     await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, { levelUuid }, t)
   })
 
+const deleteLevelsByCategory = async (user, surveyId, categoryUuid, client = db) =>
+  await client.tx(async t => {
+    await CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t)
+    await markSurveyDraft(surveyId, t)
+
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelsDelete, { categoryUuid }, t)
+  })
+
 const deleteItem = async (user, surveyId, itemUuid) =>
   await db.tx(async t => {
     await CategoryRepository.deleteItem(surveyId, itemUuid, t)
@@ -201,5 +209,6 @@ module.exports = {
   //DELETE
   deleteCategory,
   deleteLevel,
+  deleteLevelsByCategory,
   deleteItem,
 }

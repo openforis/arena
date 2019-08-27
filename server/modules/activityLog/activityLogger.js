@@ -22,6 +22,7 @@ const type = {
   categoryLevelInsert: 'categoryLevelInsert',
   categoryLevelPropUpdate: 'categoryLevelPropUpdate',
   categoryLevelDelete: 'categoryLevelDelete',
+  categoryLevelsDelete: 'categoryLevelsDelete',
   categoryItemInsert: 'categoryItemInsert',
   categoryItemPropUpdate: 'categoryItemPropUpdate',
   categoryItemDelete: 'categoryItemDelete',

@@ -2,10 +2,11 @@ const CategoryManager = require('../manager/categoryManager')
 const JobManager = require('../../../job/jobManager')
 const CategoryImportJob = require('./categoryImportJob')
 
-const importCategory = (user, surveyId, filePath) => {
+const importCategory = (user, surveyId, categoryUuid, filePath) => {
   const job = new CategoryImportJob({
     user,
     surveyId,
+    categoryUuid,
     filePath
   })
 

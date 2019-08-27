@@ -59,6 +59,10 @@ module.exports = {
   getLabel,
   getDescriptions,
   getDescription,
+  getExtraProp: prop => R.pipe(
+    SurveyUtils.getProp(keys.extra),
+    R.propOr('', prop)
+  ),
 
   isEqual: SurveyUtils.isEqual
 }

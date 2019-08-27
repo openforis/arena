@@ -1,5 +1,4 @@
 const R = require('ramda')
-const path = require('path')
 
 const Job = require('../../../job/job')
 const CSVParser = require('../../../utils/file/csvParser')
@@ -25,7 +24,7 @@ const columnRegExpDescription = new RegExp(`^.*${columnSuffixes.description}(_[a
 class CategoryImportJob extends Job {
 
   constructor (params) {
-    super('CategoryImportJob', params)
+    super(CategoryImportJob.type, params)
 
     const { filePath } = params
 
@@ -36,19 +35,18 @@ class CategoryImportJob extends Job {
   }
 
   async execute () {
-    const { filePath } = this.params
+    const { categoryUuid } = this.params
+
+    await this.csvParser.init()
 
     this.total = await this.csvParser.calculateSize()
+    this.logDebug(`total size: ${this.total}`)
 
     const surveyId = this.getSurveyId()
 
-    const categoryName = path.basename(filePath, path.extname(filePath))
+    await CategoryManager.deleteLevelsByCategory(this.getUser(), surveyId, categoryUuid, this.tx)
 
-    const categoryToCreate = Category.newCategory({
-      [Category.props.name]: categoryName
-    })
-
-    this.category = await CategoryManager.insertCategory(this.getUser(), surveyId, categoryToCreate, this.tx)
+    this.category = await CategoryManager.fetchCategoryByUuid(surveyId, categoryUuid, true, false, this.tx)
 
     await this._insertLevelsAndExtraPropsDef()
 
@@ -56,31 +54,26 @@ class CategoryImportJob extends Job {
   }
 
   async _insertLevelsAndExtraPropsDef () {
-    const headers = await this.csvParser.next()
+    const headers = this.csvParser.headers
 
     const itemExtraDef = {}
 
-    for (let i = 0; i < headers.length; i++) {
-      const header = headers[i]
-
+    for (const header of headers) {
+      this.logDebug(`reading header '${header}'`)
       if (header.endsWith(columnSuffixes.code)) {
-        // identify level names
+        // identify level name
         const levelName = header.substr(0, header.length - 5)
-        if (i === 0) {
-          // update first level
-          const firstLevel = Category.getLevelByIndex(0)(this.category)
-          await CategoryManager.updateLevelProp(this.getUser(), this.getSurveyId(), Category.getUuid(firstLevel), CategoryLevel.props.name, levelName, this.tx)
-        } else {
-          // insert new level
-          const level = Category.newLevel(this.category)
-          const levelUpdated = Category.assocLevelName(levelName)(level)
-          await CategoryManager.insertLevel(this.getUser(), this.getSurveyId(), Category.getUuid(this.category), levelUpdated, this.tx)
-        }
-      } else if (
-        !columnRegExpLabel.test(header) ||
-        !columnRegExpDescription.test(header)
-      ) {
-        //do not ends with _label_LANGCODE
+        // insert new level
+        const level = Category.newLevel(this.category, { [CategoryLevel.props.name]: levelName })
+        const levelInserted = await CategoryManager.insertLevel(this.getUser(), this.getSurveyId(), Category.getUuid(this.category), level, this.tx)
+        this.category = Category.assocLevel(levelInserted)(this.category)
+        this.logDebug(`inserted level ${levelName}`)
+      } else if (!(
+        columnRegExpLabel.test(header) || // label
+        columnRegExpDescription.test(header) // description
+      )) {
+        this.logDebug(`extra prop: ${header}`)
+        // column header is not related to a label or description, it will be considered as an "extra" prop
         itemExtraDef[header] = { type: 'text' }
       }
     }
@@ -88,6 +81,7 @@ class CategoryImportJob extends Job {
     this.itemExtraDef = itemExtraDef
 
     if (!R.isEmpty(itemExtraDef)) {
+      this.logDebug(`updating item extra def: ${JSON.stringify(itemExtraDef)}`)
       await CategoryManager.updateCategoryProp(this.getUser(), this.getSurveyId(), Category.getUuid(this.category),
         Category.props.itemExtraDef, itemExtraDef, this.tx)
     }
@@ -98,11 +92,13 @@ class CategoryImportJob extends Job {
     const surveyInfo = Survey.getSurveyInfo(survey)
     const languages = Survey.getLanguages(surveyInfo)
 
-    const levels = Category.getLevelsArray(category)
+    const levels = Category.getLevelsArray(this.category)
 
-    let row = this.csvParser.next()
+    let row = await this.csvParser.next()
     while (row !== null) {
       await this._insertItem(levels, languages, row)
+      this.incrementProcessedItems()
+      row = await this.csvParser.next()
     }
   }
 
@@ -118,9 +114,9 @@ class CategoryImportJob extends Job {
 
       if (StringUtils.isNotBlank(codeValue)) {
         ancestorCodes.push(codeValue)
-      } else {
         lastLevelCodeValue = codeValue
         lastLevel = level
+      } else {
         break
       }
     }
@@ -169,11 +165,14 @@ class CategoryImportJob extends Job {
       ...extraProps
     })
 
+    //TODO do it in batch
     await CategoryManager.insertItem(this.getUser(), this.getSurveyId(), item, this.tx)
 
     this.itemUuidByAncestorCodes[ancestorCodes] = CategoryItem.getUuid(item)
   }
 }
+
+CategoryImportJob.type = 'CategoryImportJob'
 
 module.exports = CategoryImportJob
 
