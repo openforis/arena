@@ -24,13 +24,6 @@ class RecordUpdateThread extends Thread {
     this._record = null
   }
 
-  async initRecordAndSurveyCache () {
-    if (!this.record) {
-      await this._initRecord()
-      await this._initSurvey()
-    }
-  }
-
   get record () {
     return this._record
   }
@@ -45,6 +38,13 @@ class RecordUpdateThread extends Thread {
 
   set survey (survey) {
     this._survey = survey
+  }
+
+  async initRecordAndSurveyCache () {
+    if (!this.record) {
+      await this._initRecord()
+      await this._initSurvey()
+    }
   }
 
   async _initRecord () {
@@ -64,22 +64,25 @@ class RecordUpdateThread extends Thread {
     this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
   }
 
-  _postMessage (type, content) {
-    if (!R.isEmpty(content))
-      this.postMessage({ type, content })
-  }
-
   async handleNodesUpdated (updatedNodes) {
-    this._postMessage(WebSocketEvents.nodesUpdate, updatedNodes)
+    if (!R.isEmpty(updatedNodes)) {
+      this.postMessage({
+        type: WebSocketEvents.nodesUpdate,
+        content: updatedNodes
+      })
+    }
   }
 
   async handleNodesValidationUpdated (validations) {
     const recordUpdated = Record.mergeNodeValidations(validations)(this.record)
 
-    this._postMessage(WebSocketEvents.nodeValidationsUpdate, {
-      recordUuid: Record.getUuid(this.record),
-      recordValid: Validator.isValid(recordUpdated),
-      validations
+    this.postMessage({
+      type: WebSocketEvents.nodeValidationsUpdate,
+      content: {
+        recordUuid: Record.getUuid(this.record),
+        recordValid: Validator.isValid(recordUpdated),
+        validations
+      }
     })
   }
 
@@ -129,6 +132,10 @@ class RecordUpdateThread extends Thread {
           this.handleNodesUpdated.bind(this),
           this.handleNodesValidationUpdated.bind(this)
         )
+        break
+
+      case messageTypes.threadKill:
+        this.postMessage(msg)
         break
     }
   }
