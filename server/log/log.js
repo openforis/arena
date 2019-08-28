@@ -22,9 +22,13 @@ const levels = {
   error: 'error'
 }
 
-module.exports = {
-  getLogger: prefix => new Logger(prefix)
-}
+const _stringifyMsgs = msgs => msgs
+  .map(
+    msg => typeof msg === 'object'
+      ? JSON.stringify(msg)
+      : msg
+  )
+  .join(' ')
 
 /**
  * Logger class with custom prefix
@@ -51,27 +55,32 @@ class Logger {
     return this._isLevelEnabled(levels.error)
   }
 
-  debug (msg) {
-    this._log(levels.debug, msg)
+  debug (...msgs) {
+    this._log(levels.debug, msgs)
   }
 
-  info (msg) {
-    this._log(levels.info, msg)
+  info (...msgs) {
+    this._log(levels.info, msgs)
   }
 
-  warn (msg) {
-    this._log(levels.warn, msg)
+  warn (...msgs) {
+    this._log(levels.warn, msgs)
   }
 
-  error (msg) {
-    this._log(levels.error, msg)
+  error (...msgs) {
+    this._log(levels.error, msgs)
   }
 
   _isLevelEnabled (level) {
     return logger.isLevelEnabled(level)
   }
 
-  _log (level, msg) {
-    this._isLevelEnabled(level) && logger.log(level, `${this.prefix} - ${msg}`)
+  _log (level, msgs) {
+    this._isLevelEnabled(level) && logger.log(level, `${this.prefix} - ${_stringifyMsgs(msgs)}`)
   }
 }
+
+module.exports = {
+  getLogger: prefix => new Logger(prefix)
+}
+
