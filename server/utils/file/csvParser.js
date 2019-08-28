@@ -4,14 +4,8 @@ const R = require('ramda')
 class CSVParser {
 
   constructor (filePathOrStream) {
-    this._csvStream = null
-    this._csvStreamEnded = false
+    this._reset()
     this._filePathOrStream = filePathOrStream
-    this._rowReadyListener = null
-    this._error = null
-    this._initialized = false
-    this._destroyed = false
-    this._headers = null
   }
 
   async init () {
@@ -27,15 +21,16 @@ class CSVParser {
 
   calculateSize () {
     return new Promise((resolve, reject) => {
-      if (this._error)
+      if (this._error) {
         reject(this._error)
-
-      let count = -1 //do not include headers
-      // do not consume instance csv stream, create a new one
-      this._createCsvStream({ headers: false })
-        .on('data', () => count++)
-        .on('end', () => resolve(count))
-        .on('error', reject)
+      } else {
+        let count = -1 //do not include headers
+        // do not consume instance csv stream, create a new one
+        this._createCsvStream({ headers: false })
+          .on('data', () => count++)
+          .on('end', () => resolve(count))
+          .on('error', reject)
+      }
     })
   }
 
@@ -44,29 +39,28 @@ class CSVParser {
       throw new Error(`${this.constructor.name} not initialized yet`)
 
     return new Promise((resolve, reject) => {
-      if (this._error)
-        reject(this._error)
-
-      if (this._csvStreamEnded)
-        resolve(null)
-
-      this._rowReadyListener = row => {
-        this._rowReadyListener = null
-        resolve(row)
+        if (this._error) {
+          reject(this._error)
+        } else if (this._csvStreamEnded) {
+          // stream ended; no new rows to read
+          resolve(null)
+        } else {
+          // resume the stream and wait for a new row
+          this._rowReadyListener = row => {
+            this._rowReadyListener = null
+            resolve(row)
+          }
+          this._csvStream.resume()
+        }
       }
-      this._csvStream.resume()
-    })
+    )
   }
 
   destroy () {
     if (!this._destroyed && this._csvStream) {
       this._csvStream.destroy()
-      this._csvStream = null
-      this._filePathOrStream = null
-      this._rowReadyListener = null
-      this._headers = null
+      this._reset()
       this._destroyed = true
-      this._initialized = false
     }
   }
 
@@ -110,6 +104,17 @@ class CSVParser {
   _onStreamEnd () {
     this._csvStreamEnded = true
     this._notifyRowReady(null)
+  }
+
+  _reset () {
+    this._csvStream = null
+    this._csvStreamEnded = false
+    this._destroyed = false
+    this._error = null
+    this._filePathOrStream = null
+    this._headers = null
+    this._initialized = false
+    this._rowReadyListener = null
   }
 
 }
