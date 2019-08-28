@@ -59,6 +59,7 @@
     "cluster": "^0.7.7",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.3",
+    "csv": "^5.1.2",
     "d3": "^5.10.0",
     "d3-interpolate-path": "^2.1.1",
     "d3-tip": "^0.9.1",
