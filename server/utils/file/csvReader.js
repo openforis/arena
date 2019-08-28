@@ -20,7 +20,7 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
         if (queue.isEmpty()) {
           resolve()
         } else if (!canceled) {
-          await onRow(queue.dequeue())
+          onRow && await onRow(queue.dequeue())
           processNext()
         }
       })()
@@ -29,7 +29,7 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
     const onData = data => {
       if (headers) {
         queue.enqueue(data)
-        onTotalChange(++total)
+        onTotalChange && onTotalChange(++total)
 
         if (!started) {
           started = true
@@ -37,7 +37,7 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
         }
       } else {
         headers = data
-        onHeaders(headers)
+        onHeaders && onHeaders(headers)
       }
     }
 

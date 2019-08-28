@@ -1,7 +1,6 @@
 const R = require('ramda')
 
 const Job = require('../../../job/job')
-const CSVParser = require('../../../utils/file/csvParser')
 const CSVReader = require('../../../utils/file/csvReader')
 
 const Survey = require('../../../../common/survey/survey')
@@ -12,6 +11,7 @@ const StringUtils = require('../../../../common/stringUtils')
 
 const CategoryManager = require('../manager/categoryManager')
 const SurveyManager = require('../../survey/manager/surveyManager')
+const CategoryImportCSVParser = require('./categoryImportCSVParser')
 
 const columnSuffixes = {
   code: '_code',
@@ -27,36 +27,16 @@ class CategoryImportJob extends Job {
   constructor (params) {
     super(CategoryImportJob.type, params)
 
-    const { filePath } = params
-
-    this.csvParser = new CSVParser(filePath)
-
-    this.itemExtraDef = {} // category item extra props def
     this.itemUuidByAncestorCodes = [] // cache of category items by ancestor codes
   }
 
   async execute () {
-    const reader = CSVReader.createReader(
-      this.params.filePath,
-      (headers) => {},
-      (data) => {
-        return new Promise(resolve => {
-          if (this.isCanceled()) {
-            reader.cancel()
-            return
-          }
-          setTimeout(() => {
-            this.incrementProcessedItems()
-            return resolve()
-          }, 100)
-        })
-      },
-      (total) => {
-        this.total = total
-      })
+    const { summary } = this.params
+    const { category, filePath } = summary
 
-    await reader.start()
-
+    // const categoryImport = await CategoryImportCSVParser.generateImportSummary(filePath)
+    console.log('this.params', this.params)
+    console.log('summary', summary)
     /*    const { categoryUuid } = this.params
 
         await this.csvParser.init()

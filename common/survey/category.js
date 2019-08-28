@@ -19,6 +19,10 @@ const props = {
   itemExtraDef: 'itemExtraDef'
 }
 
+const propsItemExtraDef = {
+  type: 'type'
+}
+
 /**
  * CATEGORY
  */
@@ -150,7 +154,7 @@ module.exports = {
   getItemExtraDef: getProp(props.itemExtraDef, {}),
   assocItemExtraDef: extraDef => setProp(props.itemExtraDef, extraDef),
 
-  assocItemExtraDefType: (name, type) => R.assocPath([props.itemExtraDef, name, type]),
+  assocItemExtraDefType: (name, type) => R.assocPath([props.itemExtraDef, name, propsItemExtraDef.type], type),
 
   //UTILS
   isLevelDeleteAllowed,

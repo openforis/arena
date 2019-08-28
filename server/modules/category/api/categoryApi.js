@@ -33,10 +33,25 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/categories/:categoryUuid/upload', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
       const { surveyId, categoryUuid } = Request.getParams(req)
-      const user = Request.getUser(req)
       const file = Request.getFile(req)
 
-      const job = await CategoryService.importCategory(user, surveyId, categoryUuid, file.tempFilePath)
+      const summary = await CategoryService.createImportSummary(surveyId, categoryUuid, file.tempFilePath)
+
+      res.json(summary)
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  app.post('/survey/:surveyId/categories/:categoryUuid/import', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const { body: summary } = req
+
+      console.log('summary param', summary)
+
+      const job = await CategoryService.importCategory(user, surveyId, summary)
       res.json({ job })
     } catch (err) {
       next(err)

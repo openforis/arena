@@ -80,9 +80,11 @@ export const uploadCategory = (categoryUuid, file) => async (dispatch, getState)
   }
 
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData, config)
+  const { data: summary } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData, config)
 
-  dispatch(showAppJobMonitor(data.job, () => {
+  const { data: { job } } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, summary)
+
+  dispatch(showAppJobMonitor(job, () => {
 
   }))
 }
