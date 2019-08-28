@@ -21,7 +21,7 @@ module.exports.init = app => {
   // ==== CREATE
   app.post('/survey/:surveyId/record', requireRecordCreatePermission, async (req, res, next) => {
     try {
-      const { user } = req
+      const user = Request.getUser(req)
       const surveyId = Request.getRestParam(req, 'surveyId')
 
       const record = req.body
@@ -40,7 +40,7 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/record/:recordUuid/node', requireRecordEditPermission, async (req, res, next) => {
     try {
-      const user = req.user
+      const user = Request.getUser(req)
       const node = JSON.parse(req.body.node)
       const file = Request.getFile(req)
 
@@ -124,10 +124,8 @@ module.exports.init = app => {
   // RECORD Check in / out
   app.post('/survey/:surveyId/record/:recordUuid/checkin', requireRecordViewPermission, async (req, res, next) => {
     try {
-      const user = req.user
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const recordUuid = Request.getRestParam(req, 'recordUuid')
-      const draft = Request.getBoolParam(req, 'draft')
+      const { surveyId, recordUuid, draft } = Request.getParams(req)
+      const user = Request.getUser(req)
 
       const record = await RecordService.checkIn(user, surveyId, recordUuid, draft)
 
@@ -139,7 +137,7 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/record/:recordUuid/checkout', async (req, res, next) => {
     try {
-      const user = req.user
+      const user = Request.getUser(req)
       const surveyId = Request.getRestParam(req, 'surveyId')
       const recordUuid = Request.getRestParam(req, 'recordUuid')
 
@@ -156,7 +154,7 @@ module.exports.init = app => {
     try {
       const surveyId = Request.getRestParam(req, 'surveyId')
       const recordUuid = Request.getRestParam(req, 'recordUuid')
-      const user = req.user
+      const user = Request.getUser(req)
 
       await RecordService.deleteRecord(user, surveyId, recordUuid)
 
@@ -168,7 +166,7 @@ module.exports.init = app => {
 
   app.delete('/survey/:surveyId/record/:recordUuid/node/:nodeUuid', requireRecordEditPermission, (req, res) => {
     const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
-    const user = req.user
+    const user = Request.getUser(req)
 
     RecordService.deleteNode(user, surveyId, recordUuid, nodeUuid)
     sendOk(res)

@@ -122,12 +122,10 @@ module.exports = {
   getName: getProp(props.name, ''),
   getLevelsArray,
   getLevelByIndex,
-  getItemExtraDef: getProp(props.itemExtraDef, {}),
 
   // UPDATE
   assocLevelsArray,
   assocLevel,
-  assocItemExtraDef: extraDef => setProp(props.itemExtraDef, extraDef),
 
   // ====== LEVEL
   //CREATE
@@ -147,6 +145,12 @@ module.exports = {
   getItemValidation,
   getItemLevelIndex,
   isItemLeaf,
+
+  // ====== ITEMS extra def
+  getItemExtraDef: getProp(props.itemExtraDef, {}),
+  assocItemExtraDef: extraDef => setProp(props.itemExtraDef, extraDef),
+
+  assocItemExtraDefType: (name, type) => R.assocPath([props.itemExtraDef, name, type]),
 
   //UTILS
   isLevelDeleteAllowed,

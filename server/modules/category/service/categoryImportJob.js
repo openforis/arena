@@ -2,6 +2,7 @@ const R = require('ramda')
 
 const Job = require('../../../job/job')
 const CSVParser = require('../../../utils/file/csvParser')
+const CSVReader = require('../../../utils/file/csvReader')
 
 const Survey = require('../../../../common/survey/survey')
 const Category = require('../../../../common/survey/category')
@@ -35,22 +36,43 @@ class CategoryImportJob extends Job {
   }
 
   async execute () {
-    const { categoryUuid } = this.params
+    const reader = CSVReader.createReader(
+      this.params.filePath,
+      (headers) => {},
+      (data) => {
+        return new Promise(resolve => {
+          if (this.isCanceled()) {
+            reader.cancel()
+            return
+          }
+          setTimeout(() => {
+            this.incrementProcessedItems()
+            return resolve()
+          }, 100)
+        })
+      },
+      (total) => {
+        this.total = total
+      })
 
-    await this.csvParser.init()
+    await reader.start()
 
-    this.total = await this.csvParser.calculateSize()
-    this.logDebug(`total size: ${this.total}`)
+    /*    const { categoryUuid } = this.params
 
-    const surveyId = this.getSurveyId()
+        await this.csvParser.init()
 
-    await CategoryManager.deleteLevelsByCategory(this.getUser(), surveyId, categoryUuid, this.tx)
+        this.total = await this.csvParser.calculateSize()
+        this.logDebug(`total size: ${this.total}`)
 
-    this.category = await CategoryManager.fetchCategoryByUuid(surveyId, categoryUuid, true, false, this.tx)
+        const surveyId = this.getSurveyId()
 
-    await this._insertLevelsAndExtraPropsDef()
+        await CategoryManager.deleteLevelsByCategory(this.getUser(), surveyId, categoryUuid, this.tx)
 
-    await this._insertItems()
+        this.category = await CategoryManager.fetchCategoryByUuid(surveyId, categoryUuid, true, false, this.tx)
+
+        await this._insertLevelsAndExtraPropsDef()
+
+        await this._insertItems()*/
   }
 
   async _insertLevelsAndExtraPropsDef () {

@@ -30,7 +30,7 @@ module.exports = async () => {
     limits: { fileSize: 1024 * 1024 * 1024 },
     abortOnLimit: true,
     useTempFiles: true,
-    tempFileDir: '/tmp/',
+    tempFileDir: '/tmp/arena-upload',
   }))
 
   headerMiddleware.init(app)
