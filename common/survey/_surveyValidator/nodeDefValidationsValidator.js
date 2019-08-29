@@ -3,19 +3,22 @@ const R = require('ramda')
 const NodeDefValidations = require('../nodeDefValidations')
 const NodeDef = require('../nodeDef')
 const Validator = require('../../validation/validator')
+const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 
 const validate = async (survey, nodeDef, nodeDefValidations) => {
   const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {
-      'count.min': [Validator.validatePositiveNumber],
-      'count.max': [Validator.validatePositiveNumber],
+      [`${NodeDefValidations.keys.count}.${NodeDefValidations.keys.min}`]:
+        [Validator.validatePositiveNumber(ValidatorErrorKeys.nodeDefEdit.countMinMustBePositiveNumber)],
+      [`${NodeDefValidations.keys.count}.${NodeDefValidations.keys.max}`]:
+        [Validator.validatePositiveNumber(ValidatorErrorKeys.nodeDefEdit.countMaxMustBePositiveNumber)],
     })
     : {}
 
   return R.pipe(
     R.assocPath(
-      ['fields', 'expressions'],
+      [Validator.keys.fields, NodeDefValidations.keys.expressions],
       await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations), false)
     ),
     Validator.cleanup

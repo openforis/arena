@@ -25,7 +25,7 @@ const sendErr = (res, err) => {
     res.status(500).json(_getErr(err))
   } else {
     res.status(500).json(_getErr({
-      key: 'generic',
+      key: 'appErrors.generic',
       params: { text: `Could not serve: ${err.toString()}` },
     }))
   }

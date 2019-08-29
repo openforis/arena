@@ -11,6 +11,8 @@ import * as SurveyState from '../../../survey/surveyState'
 import * as AppState from '../../../app/appState'
 import * as RecordState from './recordState'
 
+import { showAppLoader, hideAppLoader } from '../../../app/actions'
+
 import { appModules, appModuleUri, dataModules, designerModules } from '../../appModules'
 
 import Survey from '../../../../common/survey/survey'
@@ -24,19 +26,16 @@ export const nodesUpdate = 'survey/record/node/update'
 export const nodeDelete = 'survey/record/node/delete'
 export const validationsUpdate = 'survey/record/validation/update'
 
-export const recordNodesUpdate = nodes =>
-  dispatch =>
-    dispatch({ type: nodesUpdate, nodes })
+export const recordNodesUpdate = nodes => dispatch =>
+  dispatch({ type: nodesUpdate, nodes })
 
-export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) =>
-  dispatch =>
-    dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
+export const nodeValidationsUpdate = ({ recordUuid, recordValid, validations }) => dispatch =>
+  dispatch({ type: validationsUpdate, recordUuid, recordValid, validations })
 
-export const dispatchRecordDelete = (history) =>
-  dispatch => {
-    dispatch({ type: recordDelete })
-    history.push(appModuleUri(appModules.data))
-  }
+export const recordDeleted = (history) => dispatch => {
+  dispatch({ type: recordDelete })
+  history.push(appModuleUri(appModules.data))
+}
 
 /**
  * ============
@@ -44,6 +43,8 @@ export const dispatchRecordDelete = (history) =>
  * ============
  */
 export const createRecord = (history, preview = false) => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+
   const state = getState()
   const user = AppState.getUser(state)
   const surveyId = SurveyState.getSurveyId(state)
@@ -135,12 +136,9 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
   const surveyId = SurveyState.getSurveyId(state)
   const recordUuid = RecordState.getRecordUuid(state)
 
-  // 1. checkout (close server thread)
-  await checkOutRecord(recordUuid)(dispatch, getState)
-  // 2. perform server side delete
   await axios.delete(`/api/survey/${surveyId}/record/${recordUuid}`)
-  // 3. remove record from redux state and redirect to records view
-  dispatchRecordDelete(history)(dispatch)
+
+  dispatch(recordDeleted(history))
 }
 
 /**
@@ -149,6 +147,8 @@ export const deleteRecord = (history) => async (dispatch, getState) => {
  * ============
  */
 export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch, getState) => {
+  dispatch(showAppLoader())
+
   const surveyId = SurveyState.getSurveyId(getState())
   const { data: { record } } = await axios.post(
     `/api/survey/${surveyId}/record/${recordUuid}/checkin`,
@@ -181,18 +181,12 @@ export const checkInRecord = (recordUuid, draft, entityUuid) => async (dispatch,
       ancestors
     )
 
-    dispatch({
-      type: recordLoad,
-      record,
-      nodeDefActivePage,
-      formPageNodeUuidByNodeDefUuid
-    })
+    dispatch({ type: recordLoad, record, nodeDefActivePage, formPageNodeUuidByNodeDefUuid })
   } else {
-    dispatch({
-      type: recordLoad,
-      record
-    })
+    dispatch({ type: recordLoad, record })
   }
+
+  dispatch(hideAppLoader())
 }
 
 export const checkOutRecord = recordUuid => async (dispatch, getState) => {

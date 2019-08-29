@@ -114,12 +114,8 @@ const getTaxonByUuid = taxonUuid => R.path([keys.indexRefData, keys.taxonIndex, 
 
 const assocRefData = (categoryItemsRefData, taxaIndexRefData) => survey => {
   const refDataIndex = {
-    // category indexes
-    [keys.categoryItemUuidIndex]: _getCategoryItemUuidIndex(categoryItemsRefData),
-    [keys.categoryItemIndex]: ObjectUtils.toUuidIndexedObj(categoryItemsRefData),
-    // taxonomy indexes
-    [keys.taxonUuidIndex]: _getTaxonomyUuidIndex(taxaIndexRefData),
-    [keys.taxonIndex]: ObjectUtils.toUuidIndexedObj(taxaIndexRefData)
+    ..._getCategoryIndex(categoryItemsRefData),
+    ..._getTaxonomyIndex(taxaIndexRefData),
   }
 
   return {
@@ -128,32 +124,46 @@ const assocRefData = (categoryItemsRefData, taxaIndexRefData) => survey => {
   }
 }
 
-const _getCategoryItemUuidIndex = R.reduce(
-  (accIndex, row) => ObjectUtils.setInPath(
-    [
-      CategoryLevel.getCategoryUuid(row),
-      CategoryItem.getParentUuid(row) || 'null',
-      CategoryItem.getCode(row)
-    ],
-    CategoryItem.getUuid(row)
-  )(accIndex),
+const _getCategoryIndex = R.reduce(
+  (accIndex, row) => {
+    ObjectUtils.setInPath(
+      [
+        keys.categoryItemUuidIndex,
+        CategoryLevel.getCategoryUuid(row),
+        CategoryItem.getParentUuid(row) || 'null',
+        CategoryItem.getCode(row)
+      ],
+      CategoryItem.getUuid(row)
+    )(accIndex)
+
+    ObjectUtils.setInPath([keys.categoryItemIndex, CategoryItem.getUuid(row)], row)(accIndex)
+
+    return accIndex
+  },
   {}
 )
 
-const _getTaxonomyUuidIndex = R.reduce(
-  (accIndex, row) => ObjectUtils.setInPath(
-    [
-      Taxon.getTaxonomyUuid(row),
-      Taxon.getCode(row)
-    ],
-    {
-      [Taxon.keys.uuid]: Taxon.getUuid(row),
-      [Taxon.keys.vernacularNames]: R.pipe(
-        R.prop(Taxon.keys.vernacularNames),
-        R.mergeAll
-      )(row),
-    }
-  )(accIndex),
+const _getTaxonomyIndex = R.reduce(
+  (accIndex, row) => {
+    ObjectUtils.setInPath(
+      [
+        keys.taxonUuidIndex,
+        Taxon.getTaxonomyUuid(row),
+        Taxon.getCode(row)
+      ],
+      {
+        [Taxon.keys.uuid]: Taxon.getUuid(row),
+        [Taxon.keys.vernacularNames]: R.pipe(
+          R.prop(Taxon.keys.vernacularNames),
+          R.mergeAll
+        )(row),
+      }
+    )(accIndex)
+
+    ObjectUtils.setInPath([keys.taxonIndex, Taxon.getUuid(row)], row)(accIndex)
+
+    return accIndex
+  },
   {}
 )
 
