@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import * as R from 'ramda'
-
-import { toDataUrlBase64 } from '../../../../utils/domUtils'
 
 import useI18n from '../../../../commonComponents/useI18n'
 
@@ -17,13 +15,13 @@ import {
   useAsyncPutRequest,
   useFormObject,
   useOnUpdate,
+  usePrevious,
 } from '../../../../commonComponents/hooks'
 
 import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    profilePictureRef,
     user, surveyInfo, userUuid, groups: groupsProps,
     showAppLoader, hideAppLoader, showNotificationMessage, setUser,
     history,
@@ -38,6 +36,9 @@ export const useUserViewState = props => {
 
   const isInvitation = !userUuid
   const isUserAcceptPending = !(isInvitation || User.hasAccepted(userToUpdate))
+
+  // FormData object to be used for the multipart/form-data put request
+  const [formData, setFormData] = useState(null)
 
   // form fields edit permissions
   const [editPermissions, setEditPermissions] = useState({
@@ -55,6 +56,9 @@ export const useUserViewState = props => {
     isInvitation || isUserAcceptPending ? UserValidator.validateInvitation : UserValidator.validateUser,
     !isInvitation
   )
+
+
+  // USER ATTRIBUTES
 
   // form object setters
   const setName = name => setObjectField('name', name)
@@ -77,10 +81,9 @@ export const useUserViewState = props => {
     if (!isInvitation) {
       fetchUser()
     }
-
-    // get user's profile picture
-    getProfilePicture()
   }, [])
+
+  const ready = useRef(false)
 
   useEffect(() => {
     if (loaded) {
@@ -97,9 +100,39 @@ export const useUserViewState = props => {
         group: !isUserAcceptPending && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
       })
 
+      ready.current = true
       enableValidation()
     }
   }, [loaded])
+
+
+  // PROFILE PICTURE
+
+  const [profilePicture, setProfilePicture] = useState(null)
+  const prevProfilePicture = usePrevious(profilePicture)
+  const pictureChanged = useRef(false)
+
+  useEffect(() => {
+    const fd = new FormData()
+    for (var key in formObject) {
+      fd.append(key, formObject[key])
+    }
+
+    if (prevProfilePicture && prevProfilePicture !== profilePicture) {
+      pictureChanged.current = true
+      // Only send the picture file if it has been edited by the user
+      fd.append('picture', profilePicture)
+    }
+
+    setFormData(fd)
+  }, [profilePicture, formObject])
+
+  const putRequest = useAsyncPutRequest(
+    `/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`,
+    formData,
+    { headers: { 'content-type': 'multipart/form-data' } })
+
+  // SAVE
 
   // persist user/invitation actions
   const {
@@ -109,7 +142,7 @@ export const useUserViewState = props => {
     error: userSaveError,
   } = isInvitation
     ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, R.omit(['name'], formObject))
-    : useAsyncPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, formObject)
+    : putRequest
 
   useOnUpdate(() => {
     hideAppLoader()
@@ -136,25 +169,8 @@ export const useUserViewState = props => {
     saveUser()
   }
 
-  const {
-    data: downloadedPicture,
-    dispatch: getProfilePicture,
-    loaded: profilePictureLoaded,
-    // error: userSaveError,
-  } = useAsyncGetRequest(`/api/user/${userUuid}/profilePicture`, {
-    responseType: 'arraybuffer',
-  })
-
-  const [profilePicture, setProfilePicture] = useState(null)
-
-  useEffect(() => {
-    if (profilePictureLoaded) {
-      const dataUri = toDataUrlBase64(downloadedPicture)
-      setProfilePicture(dataUri)
-    }
-  }, [profilePictureLoaded])
-
   return {
+    ready: ready.current,
     loaded: isInvitation || loaded,
 
     isUserAcceptPending,
@@ -164,6 +180,7 @@ export const useUserViewState = props => {
     canEditName: editPermissions.name,
     canEditGroup: editPermissions.group,
     canEditEmail: editPermissions.email,
+    pictureEditorEnabled: userToUpdate.hasProfilePicture || pictureChanged.current,
 
     name: formObject.name,
     email: formObject.email,
@@ -171,12 +188,12 @@ export const useUserViewState = props => {
     surveyGroups,
     objectValid,
 
-    profilePicture,
-
     getFieldValidation,
     setName,
     setEmail,
     setGroup,
+    setProfilePicture,
+
     sendRequest,
   }
 }

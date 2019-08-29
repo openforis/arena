@@ -1,6 +1,6 @@
 import './userView.scss'
 
-import React, { useRef } from 'react'
+import React from 'react'
 import * as R from 'ramda'
 import { connect } from 'react-redux'
 
@@ -10,6 +10,7 @@ import useI18n from '../../../../commonComponents/useI18n.js'
 
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
+import { useProfilePicture } from '../../../../commonComponents/hooks'
 
 import Survey from '../../../../../common/survey/survey'
 import User from '../../../../../common/user/user'
@@ -25,23 +26,37 @@ import { useUserViewState } from './userViewState'
 import ProfilePictureEditor from './components/profilePictureEditor'
 
 const UserView = props => {
+
+  const { userUuid } = props
+
   const i18n = useI18n()
 
-  const profilePictureRef = useRef(null)
-
   const {
-    isInvitation, loaded,
+    ready, isInvitation,
     name, email, group, surveyGroups, objectValid,
     canEdit, canEditName, canEditGroup, canEditEmail,
     getFieldValidation, setName, setEmail, setGroup,
-    profilePicture,
+    setProfilePicture,
+    pictureEditorEnabled,
     sendRequest,
-  } = useUserViewState({ ...props, profilePictureRef })
+  } = useUserViewState(props)
 
-  return loaded && (
+  const initialProfilePicture = useProfilePicture(userUuid)
+
+  return ready && (
     <div>
-      { profilePicture ? <ProfilePictureEditor profilePicture={profilePicture} /> : null }
-
+      {
+        canEdit
+          ? <ProfilePictureEditor
+              image={initialProfilePicture}
+              onPictureUpdate={setProfilePicture}
+              enabled={pictureEditorEnabled}/>
+          : (
+            <div className="profile-picture">
+              <img src={initialProfilePicture}/>
+            </div>
+          )
+      }
       <div className="form user">
         {
           !isInvitation && (

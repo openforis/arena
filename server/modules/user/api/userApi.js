@@ -76,7 +76,7 @@ module.exports.init = app => {
     try {
       const { userUuid } = Request.getParams(req)
 
-      const profilePicture = await UserService.fetchUserProfilePicture(userUuid)
+      const { profile_picture: profilePicture } = await UserService.fetchUserProfilePicture(userUuid)
       if (profilePicture) {
         res.end(profilePicture, 'binary')
       } else {
@@ -112,7 +112,10 @@ module.exports.init = app => {
 
       const { user } = req
       const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(req)
-      const updatedUser = await UserService.updateUser(user, surveyId, userUuid, name, email, groupUuid)
+
+      const fileReq = (req.files && req.files.picture) || null
+
+      const updatedUser = await UserService.updateUser(user, surveyId, userUuid, name, email, groupUuid, fileReq)
 
       res.json(updatedUser)
     } catch (err) {

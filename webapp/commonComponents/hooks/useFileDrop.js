@@ -30,6 +30,7 @@ export default (elemRef, handler) => {
       ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         document.body.removeEventListener(eventName, _preventDefaults)
       })
+      elem.removeEventListener('drop', handleDrop)
     }
   }, [elemRef.current])
 }

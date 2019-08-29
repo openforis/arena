@@ -1,5 +1,25 @@
-.user-list {
-  .table__row, .table__row-header {
-    grid-template-columns: repeat(4, 1fr);
+@import "../../../../style/vars";
+
+.users-list {
+  .table__rows {
+    cursor: pointer;
   }
+
+  .table__row-header {
+    grid-template-columns: repeat(4, 1fr);
+    cursor: default;
+
+    &:hover {
+      background-color: $black;
+    }
+  }
+
+  .table__row {
+    grid-template-columns: repeat(4, 1fr);
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba($blueLight, 0.3);
+    }
+  }   
 }

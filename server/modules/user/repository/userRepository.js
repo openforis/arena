@@ -53,7 +53,7 @@ const fetchUsersBySurveyId = async (surveyId, offset = 0, limit = null, fetchSys
 
 const fetchUserByUuid = async (uuid, client = db) =>
   await client.one(`
-    SELECT ${selectFieldsCommaSep}
+    SELECT ${selectFieldsCommaSep}, u.profile_picture IS NOT NULL as has_profile_picture
     FROM "user" u
     WHERE u.uuid = $1`,
     [uuid],
@@ -67,29 +67,31 @@ const fetchUserByEmail = async (email, client = db) =>
     [email],
     camelize)
 
-const fetchUserProfilePicture = async (uuid, client = db) => {
+const fetchUserProfilePicture = async (uuid, client = db) =>
   await client.one(`
     SELECT profile_picture
-    FROM "user" u
-    WHERE u.uuid = $1`,
-    uuid)
-}
+    FROM "user"
+    WHERE uuid = $1`,
+    [uuid])
 
 // ==== UPDATE
 
-const updateUser = async (uuid, name, email, client = db) =>
+const updateUser = async (uuid, name, email, profilePicture, client = db) =>
   await client.one(`
     UPDATE "user" u
-    SET u.name = $1, u.email = $2
-    WHERE u.uuid = $3
+    SET
+    name = $1,
+    email = $2,
+    profile_picture = COALESCE($3, profile_picture)
+    WHERE u.uuid = $4
     RETURNING ${selectFieldsCommaSep}`,
-    [name, email, uuid],
+    [name, email, profilePicture, uuid],
     camelize)
 
 const updateUsername = async (user, name, client = db) =>
   await client.one(`
     UPDATE "user"  u
-    SET u.name = $1
+    SET name = $1
     WHERE u.uuid = $2
     RETURNING ${selectFieldsCommaSep}`,
     [name, User.getUuid(user)],
@@ -102,7 +104,7 @@ const updateUserPref = async (user, name, value, client = db) => {
 
   const userRes = await client.one(`
     UPDATE "user" u
-    SET u.prefs = u.prefs || $1
+    SET prefs = prefs || $1
     WHERE u.uuid = $2
     RETURNING ${selectFieldsCommaSep}`,
     [userPref, User.getUuid(user)],
@@ -116,7 +118,7 @@ const updateUserPref = async (user, name, value, client = db) => {
 const deleteUserPref = async (user, name, client = db) => {
   const userRes = await client.one(`
     UPDATE "user" u
-    SET u.prefs = u.prefs - $1
+    SET prefs = prefs - $1
     WHERE u.uuid = $2
     RETURNING ${selectFieldsCommaSep}`,
     [name, User.getUuid(user)],

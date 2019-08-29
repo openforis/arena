@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import useI18n from '../../../commonComponents/useI18n'
+import ProfilePicture from '../../../commonComponents/profilePicture'
 
 import User from '../../../../common/user/user'
 import * as AppState from '../../../app/appState'
@@ -39,7 +40,7 @@ const UserPopupMenu = props => {
          onMouseLeave={onClose}>
 
       <div className="user-popup-menu__user">
-        <img src="https://cdn0.iconfinder.com/data/icons/user-pictures/100/unknown2-512.png"/>
+        <ProfilePicture/>
         <div className="user-details">
           <div>
             {User.getName(user)}

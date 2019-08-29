@@ -1,3 +1,5 @@
+import './userListView.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -68,20 +70,18 @@ const UsersRow = props => {
         }
       </div>
       <div>
-        {
-          <Link to={`${appModuleUri(userModules.user)}${User.getUuid(userListItem)}`} className="btn-edit">
-            <span className={`icon icon-12px ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`}/>
-          </Link>
-        }
+        <span className={`icon icon-12px ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`}/>
       </div>
     </>
   )
 }
 
-const UsersListView = ({ canInvite, user, surveyInfo }) => (
-  <TableView
+const UsersListView = ({ canInvite, user, surveyInfo, history }) => {
+  const onRowClick = user => history.push(`${appModuleUri(userModules.user)}${User.getUuid(user)}`)
+
+  return <TableView
     module={'users'}
-    className="records"
+    className="users-list"
     gridTemplateColumns={'repeat(3, 1fr) 10rem 50px'}
     headerLeftComponent={UsersHeaderLeft}
     rowHeaderComponent={UsersRowHeader}
@@ -90,8 +90,10 @@ const UsersListView = ({ canInvite, user, surveyInfo }) => (
     canInvite={canInvite}
     user={user}
     surveyInfo={surveyInfo}
+
+    onRowClick={onRowClick}
   />
-)
+}
 
 const mapStateToProps = state => {
   const user = AppState.getUser(state)

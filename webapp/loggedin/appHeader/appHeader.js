@@ -3,6 +3,8 @@ import './appHeader.scss'
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 
+import ProfilePicture from '../../commonComponents/profilePicture'
+
 import UserPopupMenu from './components/userPopupMenu'
 
 import Survey from '../../../common/survey/survey'
@@ -29,7 +31,9 @@ const AppHeader = props => {
            onClick={() => {
              setShowUserPopup(showUserPopupPrev => !showUserPopupPrev)
            }}>
-        <img src="https://cdn0.iconfinder.com/data/icons/user-pictures/100/unknown2-512.png"/>
+
+        <ProfilePicture/>
+
         <button className="btn btn-transparent">
           <span className="icon icon-ctrl"/>
         </button>
@@ -47,7 +51,6 @@ const AppHeader = props => {
 }
 
 const mapStateToProps = state => ({
-  user: AppState.getUser(state),
   lang: AppState.getLang(state),
   surveyInfo: SurveyState.getSurveyInfo(state),
 })
