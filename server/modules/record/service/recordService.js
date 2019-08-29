@@ -124,10 +124,13 @@ const dissocUserFromRecordThread = userUuid => {
     RecordUsersMap.dissocUser(recordUuid, userUuid)
 
     // terminate thread if there are no more users editing the record
-    const userUuids = RecordUsersMap.getUserUuids(recordUuid)
-    if (R.isEmpty(userUuids)) {
-      RecordThreads.markZombie(recordUuid)
-      RecordThreads.get(recordUuid).postMessage({ type: recordThreadMessageTypes.threadKill })
+    const thread = RecordThreads.get(recordUuid)
+    if (thread) {
+      const userUuids = RecordUsersMap.getUserUuids(recordUuid)
+      if (R.isEmpty(userUuids)) {
+        RecordThreads.markZombie(recordUuid)
+        thread.postMessage({ type: recordThreadMessageTypes.threadKill })
+      }
     }
   }
 }
