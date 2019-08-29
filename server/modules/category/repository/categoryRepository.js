@@ -26,12 +26,12 @@ const insertCategory = async (surveyId, category, client = db) =>
     def => dbTransformCallback(def, true, true)
   )
 
-const insertLevel = async (surveyId, categoryUuid, level, client = db) =>
+const insertLevel = async (surveyId, level, client = db) =>
   await client.one(`
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [Category.getUuid(level), categoryUuid, CategoryLevel.getIndex(level), level.props],
+    [Category.getUuid(level), CategoryLevel.getCategoryUuid(level), CategoryLevel.getIndex(level), level.props],
     def => dbTransformCallback(def, true, true)
   )
 

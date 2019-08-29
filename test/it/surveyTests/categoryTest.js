@@ -27,7 +27,7 @@ const createCategoryLevelTest = async () => {
   const category = (await CategoryManager.fetchCategoriesBySurveyId(surveyId, true, false))[0]
 
   const levelReq = Category.newLevel(category)
-  const level = await CategoryManager.insertLevel(user, surveyId, Category.getUuid(category), levelReq)
+  const level = await CategoryManager.insertLevel(user, surveyId, levelReq)
 
   expect(CategoryLevel.getName(level)).to.be.equal(CategoryLevel.getName(levelReq))
 

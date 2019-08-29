@@ -8,6 +8,11 @@ $borderColor: $greyBorder;
   align-items: center;
 }
 
+.category-edit__header {
+  display: grid;
+  grid-template-columns: .8fr .1fr;
+}
+
 .category-edit__levels {
   display: flex;
   //justify-content: center;

@@ -33,7 +33,7 @@ const insertCategory = async (user, surveyId, category, client = db) =>
     //insert levels
     const levelsDb = await Promise.all(
       levels.map(async level =>
-        await CategoryRepository.insertLevel(surveyId, Category.getUuid(categoryDb), level, t)
+        await CategoryRepository.insertLevel(surveyId, level, t)
       )
     )
     await markSurveyDraft(surveyId, t)
@@ -43,13 +43,13 @@ const insertCategory = async (user, surveyId, category, client = db) =>
     return await assocValidation(Category.assocLevelsArray(levelsDb)(categoryDb))
   })
 
-const insertLevel = async (user, surveyId, categoryUuid, level, client = db) =>
+const insertLevel = async (user, surveyId, level, client = db) =>
   await client.tx(async t => {
-    const levelDb = await CategoryRepository.insertLevel(surveyId, categoryUuid, level, t)
+    const levelDb = await CategoryRepository.insertLevel(surveyId, level, t)
 
     await markSurveyDraft(surveyId, t)
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, { categoryUuid, level }, t)
+    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, { level }, t)
 
     return levelDb
   })

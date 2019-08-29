@@ -7,10 +7,11 @@ const createImportSummary = async (surveyId, categoryUuid, filePath) => {
   return await CategoryImportCSVParser.createImportSummary(filePath)
 }
 
-const importCategory = (user, surveyId, summary) => {
+const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
     user,
     surveyId,
+    categoryUuid,
     summary
   })
 

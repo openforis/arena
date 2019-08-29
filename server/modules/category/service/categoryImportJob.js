@@ -1,176 +1,85 @@
-const R = require('ramda')
-
 const Job = require('../../../job/job')
-const CSVReader = require('../../../utils/file/csvReader')
 
 const Survey = require('../../../../common/survey/survey')
 const Category = require('../../../../common/survey/category')
+const CategoryImportSummary = require('../../../../common/survey/categoryImportSummary')
 const CategoryLevel = require('../../../../common/survey/categoryLevel')
 const CategoryItem = require('../../../../common/survey/categoryItem')
-const StringUtils = require('../../../../common/stringUtils')
 
-const CategoryManager = require('../manager/categoryManager')
 const SurveyManager = require('../../survey/manager/surveyManager')
+const CategoryManager = require('../manager/categoryManager')
 const CategoryImportCSVParser = require('./categoryImportCSVParser')
-
-const columnSuffixes = {
-  code: '_code',
-  label: '_label',
-  description: '_description',
-}
-
-const columnRegExpLabel = new RegExp(`^.*${columnSuffixes.label}(_[a-z]{2})?$`)
-const columnRegExpDescription = new RegExp(`^.*${columnSuffixes.description}(_[a-z]{2})?$`)
 
 class CategoryImportJob extends Job {
 
   constructor (params) {
     super(CategoryImportJob.type, params)
 
-    this.itemUuidByAncestorCodes = [] // cache of category items by ancestor codes
+    this.itemsByAncestorCodes = [] // cache of category items by ancestor codes
   }
 
   async execute () {
-    const { summary } = this.params
-    const { category, filePath } = summary
+    const { categoryUuid, summary } = this.params
 
-    // const categoryImport = await CategoryImportCSVParser.generateImportSummary(filePath)
-    console.log('this.params', this.params)
-    console.log('summary', summary)
-    /*    const { categoryUuid } = this.params
+    const surveyId = this.getSurveyId()
+    const user = this.getUser()
 
-        await this.csvParser.init()
+    // insert levels
+    this.logDebug('inserting levels')
+    const levels = []
 
-        this.total = await this.csvParser.calculateSize()
-        this.logDebug(`total size: ${this.total}`)
+    await CategoryManager.deleteLevelsByCategory(user, surveyId, categoryUuid, this.tx)
+    const category = await CategoryManager.fetchCategoryByUuid(surveyId, categoryUuid, true, false, this.tx)
 
-        const surveyId = this.getSurveyId()
+    const levelNames = CategoryImportSummary.getLevelNames(summary)
 
-        await CategoryManager.deleteLevelsByCategory(this.getUser(), surveyId, categoryUuid, this.tx)
-
-        this.category = await CategoryManager.fetchCategoryByUuid(surveyId, categoryUuid, true, false, this.tx)
-
-        await this._insertLevelsAndExtraPropsDef()
-
-        await this._insertItems()*/
-  }
-
-  async _insertLevelsAndExtraPropsDef () {
-    const headers = this.csvParser.headers
-
-    const itemExtraDef = {}
-
-    for (const header of headers) {
-      this.logDebug(`reading header '${header}'`)
-      if (header.endsWith(columnSuffixes.code)) {
-        // identify level name
-        const levelName = header.substr(0, header.length - 5)
-        // insert new level
-        const level = Category.newLevel(this.category, { [CategoryLevel.props.name]: levelName })
-        const levelInserted = await CategoryManager.insertLevel(this.getUser(), this.getSurveyId(), Category.getUuid(this.category), level, this.tx)
-        this.category = Category.assocLevel(levelInserted)(this.category)
-        this.logDebug(`inserted level ${levelName}`)
-      } else if (!(
-        columnRegExpLabel.test(header) || // label
-        columnRegExpDescription.test(header) // description
-      )) {
-        this.logDebug(`extra prop: ${header}`)
-        // column header is not related to a label or description, it will be considered as an "extra" prop
-        itemExtraDef[header] = { type: 'text' }
-      }
+    for (const levelName of levelNames) {
+      const levelToInsert = Category.newLevel(category, {
+        [CategoryLevel.props.name]: levelName
+      })
+      const level = await CategoryManager.insertLevel(user, surveyId, levelToInsert, this.tx)
+      levels.push(level)
     }
+    this.logDebug(`levels inserted: ${levelNames}`)
 
-    this.itemExtraDef = itemExtraDef
-
-    if (!R.isEmpty(itemExtraDef)) {
-      this.logDebug(`updating item extra def: ${JSON.stringify(itemExtraDef)}`)
-      await CategoryManager.updateCategoryProp(this.getUser(), this.getSurveyId(), Category.getUuid(this.category),
-        Category.props.itemExtraDef, itemExtraDef, this.tx)
-    }
-  }
-
-  async _insertItems () {
-    const survey = await SurveyManager.fetchSurveyById(this.getSurveyId(), true, false, this.tx)
+    // insert items
+    const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, this.tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
     const languages = Survey.getLanguages(surveyInfo)
 
-    const levels = Category.getLevelsArray(this.category)
+    const reader = await CategoryImportCSVParser.createRowsReader(summary, levels, languages,
+      async itemRow => {
+        if (this.isCanceled()) {
+          reader.cancel()
+          return
+        }
+        const { levelIndex, codes, labels, descriptions, extra } = itemRow
 
-    let row = await this.csvParser.next()
-    while (row !== null) {
-      await this._insertItem(levels, languages, row)
-      this.incrementProcessedItems()
-      row = await this.csvParser.next()
-    }
-  }
+        const level = levels[levelIndex]
 
-  async _insertItem (levels, languages, row) {
-    // determine ancestor codes and last level
-    const ancestorCodes = []
-    let lastLevel,
-      lastLevelCodeValue
+        let itemParentUuid = null
+        if (levelIndex > 0) {
+          const itemParent = this.itemsByAncestorCodes[codes.slice(0, codes.length - 1)]
+          itemParentUuid = CategoryItem.getUuid(itemParent)
+        }
 
-    for (const level of levels) {
-      const levelName = CategoryLevel.getName(level)
-      const codeValue = row[`${levelName}${columnSuffixes.code}`]
+        const itemToInsert = CategoryItem.newItem(CategoryLevel.getUuid(level), itemParentUuid, {
+          [CategoryItem.props.code]: codes[codes.length - 1],
+          [CategoryItem.props.labels]: labels,
+          [CategoryItem.props.descriptions]: descriptions,
+          [CategoryItem.props.extra]: extra,
 
-      if (StringUtils.isNotBlank(codeValue)) {
-        ancestorCodes.push(codeValue)
-        lastLevelCodeValue = codeValue
-        lastLevel = level
-      } else {
-        break
-      }
-    }
+        })
 
-    // check if duplicate
-    if (this.itemUuidByAncestorCodes[ancestorCodes]) {
-      // TODO duplicate code, add error
-    }
+        const item = await CategoryManager.insertItem(user, surveyId, itemToInsert, this.tx)
 
-    // get parent item uuid
-    const parentItemUuid = CategoryLevel.getIndex(lastLevel) === 0
-      ? null
-      : this.itemUuidByAncestorCodes[ancestorCodes.slice(0, ancestorCodes.length - 1)]
+        this.itemsByAncestorCodes[codes] = item
+        this.incrementProcessedItems()
+      },
+      total => this.total = total
+    )
 
-    const extractLabels = columnSuffix => {
-      const labelsReducer = (acc, lang) => {
-        const value = row[`${CategoryLevel.getName(lastLevel)}${columnSuffix}_${lang}`]
-        if (StringUtils.isNotBlank(value))
-          acc[lang] = value
-        return acc
-      }
-      return languages.reduce(labelsReducer, {})
-    }
-
-    // extracts labels and descriptions
-    const labels = extractLabels(columnSuffixes.label)
-    const descriptions = extractLabels(columnSuffixes.description)
-
-    // extract extra props
-    const extraProps = R.pipe(
-      R.keys,
-      R.reduce((acc, extraPropName) => {
-        const value = row[extraPropName]
-        if (StringUtils.isNotBlank(value))
-          acc[extraPropName] = value
-
-        return acc
-      })
-    )(this.itemExtraDef)
-
-    // insert item
-    const item = CategoryItem.newItem(CategoryLevel.getUuid(lastLevel), parentItemUuid, {
-      [CategoryItem.props.code]: lastLevelCodeValue,
-      [CategoryItem.props.labels]: labels,
-      [CategoryItem.props.descriptions]: descriptions,
-      ...extraProps
-    })
-
-    //TODO do it in batch
-    await CategoryManager.insertItem(this.getUser(), this.getSurveyId(), item, this.tx)
-
-    this.itemUuidByAncestorCodes[ancestorCodes] = CategoryItem.getUuid(item)
+    await reader.start()
   }
 }
 

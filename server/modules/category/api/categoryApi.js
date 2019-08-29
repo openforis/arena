@@ -45,13 +45,11 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/categories/:categoryUuid/import', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId } = Request.getParams(req)
+      const { surveyId, categoryUuid } = Request.getParams(req)
       const user = Request.getUser(req)
       const { body: summary } = req
 
-      console.log('summary param', summary)
-
-      const job = await CategoryService.importCategory(user, surveyId, summary)
+      const job = await CategoryService.importCategory(user, surveyId, categoryUuid, summary)
       res.json({ job })
     } catch (err) {
       next(err)
@@ -64,7 +62,7 @@ module.exports.init = app => {
       const user = Request.getUser(req)
       const { body } = req
 
-      await CategoryService.insertLevel(user, surveyId, categoryUuid, body)
+      await CategoryService.insertLevel(user, surveyId, body)
 
       await sendValidatedCategory(surveyId, categoryUuid, res)
     } catch (err) {

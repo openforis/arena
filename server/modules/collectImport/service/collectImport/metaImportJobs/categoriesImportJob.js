@@ -81,7 +81,7 @@ class CategoriesImportJob extends Job {
 
         const hierarchyLevel = hierarchyLevels[i]
         const levelToCreate = Category.assocLevelName(hierarchyLevel.attributes.name)(Category.newLevel(category))
-        const level = await CategoryManager.insertLevel(user, surveyId, Category.getUuid(category), levelToCreate, tx)
+        const level = await CategoryManager.insertLevel(user, surveyId, levelToCreate, tx)
 
         category = Category.assocLevel(level)(category)
       }

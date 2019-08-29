@@ -85,7 +85,8 @@ export const uploadCategory = (categoryUuid, file) => async (dispatch, getState)
   const { data: { job } } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, summary)
 
   dispatch(showAppJobMonitor(job, () => {
-
+    // reload category
+    dispatch(setCategoryForEdit({[Category.keys.uuid]: categoryUuid}))
   }))
 }
 
