@@ -4,17 +4,14 @@ const Survey = require('../../survey/survey')
 const NodeDef = require('../../survey/nodeDef')
 const Record = require('../record')
 const Node = require('../node')
-
-const errorKeys = {
-  duplicateEntityKey: 'duplicateEntityKey'
-}
+const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 
 const validateAttributeKey = (survey, record, attributeDef) => async (propName, node) => {
   const nodeDefParent = Survey.getNodeDefParent(attributeDef)(survey)
   if (!NodeDef.isRoot(nodeDefParent) && NodeDef.isKey(attributeDef)) {
     const entity = Record.getParentNode(node)(record)
     if (_isEntityDuplicate(survey, record, entity)) {
-      return { key: errorKeys.duplicateEntityKey }
+      return { key: ValidatorErrorKeys.record.entityKeyDuplicate }
     }
   }
   return null

@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const Log = require('../../../../../log/log').getLogger('RecordUpdateThread')
+
 const messageTypes = require('./recordThreadMessageTypes')
 const Thread = require('../../../../../threads/thread')
 
@@ -20,31 +22,20 @@ class RecordUpdateThread extends Thread {
 
     this.queue = new Queue()
 
-    this._survey = null
-    this._record = null
+    this.survey = null
+    this.record = null
+    this.processing = true
+
+    this._init()
+      .then(() => {
+        this.processing = false
+      })
+
   }
 
-  async initRecordAndSurveyCache () {
-    if (!this.record) {
-      await this._initRecord()
-      await this._initSurvey()
-    }
-  }
-
-  get record () {
-    return this._record
-  }
-
-  set record (record) {
-    this._record = record
-  }
-
-  get survey () {
-    return this._survey
-  }
-
-  set survey (survey) {
-    this._survey = survey
+  async _init () {
+    await this._initRecord()
+    await this._initSurvey()
   }
 
   async _initRecord () {
@@ -64,52 +55,51 @@ class RecordUpdateThread extends Thread {
     this.survey = Survey.assocDependencyGraph(dependencyGraph)(surveyDb)
   }
 
-  _postMessage (type, content) {
-    if (!R.isEmpty(content))
-      this.postMessage({ type, content })
-  }
-
   async handleNodesUpdated (updatedNodes) {
-    this._postMessage(WebSocketEvents.nodesUpdate, updatedNodes)
+    if (!R.isEmpty(updatedNodes)) {
+      this.postMessage({
+        type: WebSocketEvents.nodesUpdate,
+        content: updatedNodes
+      })
+    }
   }
 
   async handleNodesValidationUpdated (validations) {
     const recordUpdated = Record.mergeNodeValidations(validations)(this.record)
 
-    this._postMessage(WebSocketEvents.nodeValidationsUpdate, {
-      recordUuid: Record.getUuid(this.record),
-      recordValid: Validator.isValid(recordUpdated),
-      validations
+    this.postMessage({
+      type: WebSocketEvents.nodeValidationsUpdate,
+      content: {
+        recordUuid: Record.getUuid(this.record),
+        recordValid: Validator.isValid(recordUpdated),
+        validations
+      }
     })
   }
 
   async onMessage (msg) {
     this.queue.enqueue(msg)
-
     await this.processNext()
   }
 
   async processNext () {
-    if (!(this.processing || this.queue.isEmpty())) {
-
+    if (!this.processing && !this.queue.isEmpty()) {
       this.processing = true
 
       const msg = this.queue.dequeue()
       await this.processMessage(msg)
 
       this.processing = false
-
       await this.processNext()
     }
   }
 
   async processMessage (msg) {
-
-    await this.initRecordAndSurveyCache()
+    Log.debug('process message', msg)
 
     switch (msg.type) {
 
-      case messageTypes.persistNode:
+      case messageTypes.nodePersist:
         this.record = await RecordManager.persistNode(
           this.user,
           this.survey,
@@ -120,7 +110,7 @@ class RecordUpdateThread extends Thread {
         )
         break
 
-      case messageTypes.deleteNode:
+      case messageTypes.nodeDelete:
         this.record = await RecordManager.deleteNode(
           this.user,
           this.survey,
@@ -129,6 +119,10 @@ class RecordUpdateThread extends Thread {
           this.handleNodesUpdated.bind(this),
           this.handleNodesValidationUpdated.bind(this)
         )
+        break
+
+      case messageTypes.threadKill:
+        this.postMessage(msg)
         break
     }
   }

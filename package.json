@@ -61,6 +61,7 @@
     "cookie-parser": "^1.4.3",
     "d3": "^5.10.0",
     "d3-interpolate-path": "^2.1.1",
+    "d3-tip": "^0.9.1",
     "date-fns": "^2.0.0",
     "db-migrate": "^0.11.6",
     "db-migrate-pg": "^1.0.0",

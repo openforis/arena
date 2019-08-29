@@ -7,6 +7,7 @@ import NodeDefTable from '../../../../../../common/surveyRdb/nodeDefTable'
 
 import * as DataSort from '../../../../../../common/surveyRdb/dataSort'
 
+// ====== table
 export const dataQueryTableNodeDefUuidUpdate = 'dataQuery/table/nodeDefUuid/update'
 export const dataQueryTableNodeDefUuidColsUpdate = 'dataQuery/table/nodeDefUuidCols/update'
 export const dataQueryTableInit = 'dataQuery/table/init'
@@ -136,22 +137,24 @@ export const initTableData = (queryFilter = null, querySort = null, editModePara
     }
   }
 
-export const updateTableOffset = (offset = 0) =>
-  async (dispatch, getState) => {
-    const data = await fetchData(getState(), null, offset)
-    dispatch({ type: dataQueryTableDataUpdate, offset, data })
-  }
+export const updateTableOffset = (offset = 0) => async (dispatch, getState) => {
+  const data = await fetchData(getState(), null, offset)
+  dispatch({ type: dataQueryTableDataUpdate, offset, data })
+}
 
 export const resetTableFilter = () => dispatch => {
   dispatch({ type: dataQueryTableFilterUpdate, filter: null })
   dispatch(initTableData())
 }
 
-export const updateTableFilter = (filter) => dispatch =>
-  dispatch(initTableData(filter))
+export const updateTableFilter = (filter) => dispatch => dispatch(initTableData(filter))
 
-export const updateTableSort = (sort) => dispatch =>
-  dispatch(initTableData(null, sort))
+export const updateTableSort = (sort) => dispatch => dispatch(initTableData(null, sort))
 
-export const updateTableEditMode = editMode => dispatch =>
-  dispatch(initTableData(null, null, editMode))
+export const updateTableEditMode = editMode => dispatch => dispatch(initTableData(null, null, editMode))
+
+// ====== nodeDefSelectors
+export const dataQueryNodeDefSelectorsShowUpdate = 'dataQuery/nodeDefSelectors/show/update'
+
+export const toggleNodeDefsSelector = () => (dispatch, getState) =>
+  dispatch({ type: dataQueryNodeDefSelectorsShowUpdate, show: !DataQueryState.isNodeDefSelectorsVisible(getState()) })

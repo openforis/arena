@@ -45,7 +45,7 @@ ErrorBadge.defaultProps = {
   validation: null,
   showLabel: true,
   labelKey: 'common.invalid',
-  showKeys: true,
+  showKeys: false,
   className: '',
 }
 

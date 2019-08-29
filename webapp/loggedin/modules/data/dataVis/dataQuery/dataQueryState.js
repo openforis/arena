@@ -18,6 +18,7 @@ const getState = R.pipe(DataVisState.getState, R.prop('query'))
 
 const keys = {
   table: 'table',
+  showNodeDefSelectors: 'showNodeDefSelectors',
 }
 
 const tableKeys = {
@@ -36,7 +37,7 @@ const rowKeys = {
   record: 'record'
 }
 
-// table
+// ====== table
 const getTableProp = (tableProp, defaultValue = null) => R.pipe(
   getState,
   R.pathOr(defaultValue, [keys.table, tableProp])
@@ -142,3 +143,7 @@ export const assocTableDataRecordNodeValidations = (recordUuid, recordValid) =>
     ),
     data => R.assocPath([keys.table, tableKeys.data], data)(state)
   )(state)
+
+// ====== nodeDefSelectors
+export const isNodeDefSelectorsVisible = R.pipe(getState, R.propOr(true, keys.showNodeDefSelectors))
+export const assocShowNodeDefSelectors = R.assoc(keys.showNodeDefSelectors)

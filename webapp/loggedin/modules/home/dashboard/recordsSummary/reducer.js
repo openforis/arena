@@ -14,7 +14,7 @@ const actionHandlers = {
   [surveyDelete]: () => ({}),
 
   // records summary
-  [recordsSummaryUpdate]: (state, { from, to, counts }) => RecordsSummaryState.assocSummary(from, to, counts)(state)
+  [recordsSummaryUpdate]: (state, { timeRange, from, to, counts }) => RecordsSummaryState.assocSummary(timeRange, from, to, counts)(state)
 
 }
 

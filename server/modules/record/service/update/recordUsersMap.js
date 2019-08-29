@@ -37,10 +37,14 @@ const dissocUser = (recordUuid, userUuid) => {
     userUuids.delete(userUuid)
 
     if (userUuids.size === 0) {
-      userUuidsByRecordUuid.delete(recordUuid)
-      previewRecordsByRecordUuid.delete(recordUuid)
+      dissocUsers(recordUuid)
     }
   }
+}
+
+const dissocUsers = recordUuid => {
+  userUuidsByRecordUuid.delete(recordUuid)
+  previewRecordsByRecordUuid.delete(recordUuid)
 }
 
 const touchPreviewRecord = recordUuid => {
@@ -65,6 +69,7 @@ module.exports = {
 
   assocUser,
   dissocUser,
+  dissocUsers,
 
   touchPreviewRecord,
   getStalePreviewRecordUuids,

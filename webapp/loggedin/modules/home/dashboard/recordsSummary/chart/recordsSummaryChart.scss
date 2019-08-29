@@ -22,6 +22,11 @@
 
   .data-points {
     fill: $blue;
+
+    circle {
+      cursor: pointer;
+    }
+
   }
 
   .data-path {
@@ -32,4 +37,39 @@
     stroke-dasharray: 0;
     opacity: 1;
   }
+}
+
+.home-dashboard__records-summary__chart-data-point-tip {
+  line-height: 16px;
+  font-weight: 400;
+  padding: .8rem 1rem;
+  background: rgba($black, .9);
+  border-radius: 2px;
+  pointer-events: none;
+  color: $white;
+  opacity: 0;
+  text-align: center;
+  transition: opacity .2s ease-out .1s;
+
+  .date {
+    color: darken($white, 15%);
+    font-size: .7rem;
+    font-weight: 600;
+  }
+
+  .count {
+    font-size: .8rem;
+    color: $white;
+  }
+}
+
+.home-dashboard__records-summary__chart-data-point-tip:after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba($black, .9) transparent transparent transparent;
 }

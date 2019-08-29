@@ -14,10 +14,13 @@ class SurveyInfoValidationJob extends Job {
   async execute (tx) {
     const survey = await SurveyManager.fetchSurveyById(this.getSurveyId(), true, true, tx)
     const surveyInfo = Survey.getSurveyInfo(survey)
+    const validation = Validator.getValidation(surveyInfo)
 
-    if (!Validator.isValid(surveyInfo)) {
-      this.errors = { surveyInfo: Validator.getInvalidFieldValidations(Validator.getValidation(surveyInfo)) }
-      this.setStatusFailed()
+    if (!Validator.isValidationValid(validation)) {
+      this.errors = {
+        'info': Validator.getInvalidFieldValidations(validation)
+      }
+      await this.setStatusFailed()
     }
   }
 }

@@ -1,6 +1,8 @@
 const types = {
-  persistNode: 'persistNode',
-  deleteNode: 'deleteNode',
+  threadKill: 'threadKill',
+
+  nodePersist: 'nodePersist',
+  nodeDelete: 'nodeDelete',
 }
 
 module.exports = types

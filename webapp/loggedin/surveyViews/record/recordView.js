@@ -19,21 +19,17 @@ import * as AppState from '../../../app/appState'
 import * as SurveyState from '../../../survey/surveyState'
 import * as RecordState from './recordState'
 
-import { hideAppLoader, showAppLoader } from '../../../app/actions'
 import { resetForm } from '../surveyForm/actions'
 import {
   checkInRecord,
   checkOutRecord,
   recordNodesUpdate,
   nodeValidationsUpdate,
-  dispatchRecordDelete
+  recordDeleted
 } from './actions'
 
 const RecordView = props => {
-  const {
-    recordLoaded, preview, canEditRecord,
-    hideAppLoader, showAppLoader,
-  } = props
+  const { recordLoaded, preview, canEditRecord, } = props
 
   const recordLoadedRef = useRef(false)
 
@@ -41,10 +37,9 @@ const RecordView = props => {
     const {
       recordUuidUrlParam, parentNodeUuidUrlParam, draftDefs,
       checkInRecord,
-      recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete, history
+      recordNodesUpdate, nodeValidationsUpdate, recordDeleted, history
     } = props
 
-    showAppLoader()
     // check in record
     checkInRecord(recordUuidUrlParam, draftDefs, parentNodeUuidUrlParam)
 
@@ -53,7 +48,7 @@ const RecordView = props => {
     AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
     AppWebSocket.on(WebSocketEvents.recordDelete, () => {
       alert('This record has just been deleted by another user')
-      dispatchRecordDelete(history)
+      recordDeleted(history)
     })
 
     // add beforeunload event listener
@@ -81,9 +76,6 @@ const RecordView = props => {
 
   useEffect(() => {
     recordLoadedRef.current = recordLoaded
-    if (recordLoaded) {
-      hideAppLoader()
-    }
   }, [recordLoaded])
 
   useEffect(() => {
@@ -123,9 +115,8 @@ const enhance = compose(
   connect(
     mapStateToProps,
     {
-      hideAppLoader, showAppLoader,
       resetForm, checkInRecord, checkOutRecord,
-      recordNodesUpdate, nodeValidationsUpdate, dispatchRecordDelete
+      recordNodesUpdate, nodeValidationsUpdate, recordDeleted
     }
   )
 )

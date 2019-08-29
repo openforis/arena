@@ -10,5 +10,31 @@
 }
 
 .home-dashboard__records-summary-header {
-  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  .time-range {
+    display: flex;
+    align-items: center;
+    padding: .5rem 1rem;
+    background-color: $blueLightFocus;
+
+    .dropdown {
+      border-bottom: none;
+      grid-template-columns: 100px 20px;
+
+      * {
+        font-size: .8rem;
+        font-weight: 600;
+        color: lighten($black, 20%);
+      }
+
+      .form-input {
+        padding: 0;
+        text-align: center;
+        width: 100%;
+      }
+    }
+  }
 }

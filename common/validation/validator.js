@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const ValidatorErrorKeys = require('./validatorErrorKeys')
+
 const keywords = [
   'asc',
   'date_created',
@@ -20,24 +22,12 @@ const keywords = [
   'value',
 ]
 
-const errorKeys = {
-  duplicate: 'duplicate',
-  duplicateCode: 'duplicateCode',
-  duplicateName: 'duplicateName',
-  empty: 'empty',
-  exceedingMax: 'exceedingMax',
-  keyword: 'keyword',
-  invalidNumber: 'invalidNumber',
-  zeroOrNegative: 'zeroOrNegative',
-  invalidName: 'invalidName',
-  requiredField: 'requiredField',
-}
-
 const keys = {
   fields: 'fields',
   valid: 'valid',
   errors: 'errors',
-  validation: 'validation'
+  validation: 'validation',
+  customErrorMessageKey: 'custom',
 }
 
 const newValidationValid = () => ({
@@ -84,18 +74,18 @@ const validate = async (obj, propsValidations, performCleanup = true) => {
     : validation
 }
 
-const validateRequired = (propName, obj) => {
+const validateRequired = errorKey => (propName, obj) => {
   const value = R.pipe(
     getProp(propName),
     R.defaultTo(''),
   )(obj)
 
   return R.isEmpty(value)
-    ? { key: errorKeys.requiredField }
+    ? { key: errorKey }
     : null
 }
 
-const validateItemPropUniqueness = items =>
+const validateItemPropUniqueness = errorKey => items =>
   (propName, item) => {
 
     const hasDuplicates = R.any(
@@ -107,34 +97,36 @@ const validateItemPropUniqueness = items =>
       , items)
 
     return hasDuplicates
-      ? { key: errorKeys.duplicate }
+      ? { key: errorKey }
       : null
   }
 
-const validateNotKeyword = (propName, item) =>
-  R.includes(getProp(propName)(item), keywords)
-    ? { key: errorKeys.keyword }
+const validateNotKeyword = errorKey => (propName, item) => {
+  const value = getProp(propName)(item)
+  return R.includes(value, keywords)
+    ? { key: errorKey, params: { value } }
     : null
+}
 
-const validateName = (propName, item) => {
+const validateName = errorKey => (propName, item) => {
   const prop = getProp(propName)(item)
   return !prop || validNameRegex.test(prop)
     ? null
-    : { key: errorKeys.invalidName }
+    : { key: errorKey }
 }
 
 const validateNumber = (propName, item) => {
   const value = getProp(propName)(item)
-  return value && isNaN(value) ? { key: errorKeys.invalidNumber } : null
+  return value && isNaN(value) ? { key: ValidatorErrorKeys.invalidNumber } : null
 }
 
-const validatePositiveNumber = (propName, item) => {
+const validatePositiveNumber = errorKey => (propName, item) => {
   const invalidNumberError = validateNumber(propName, item)
   if (invalidNumberError) {
     return invalidNumberError
   } else {
     const value = getProp(propName)(item)
-    return !value || value > 0 ? null : { key: errorKeys.zeroOrNegative }
+    return !value || value > 0 ? null : { key: errorKey }
   }
 }
 
@@ -153,7 +145,7 @@ const getFieldValidation = field => R.pathOr(newValidationValid(), [keys.fields,
 
 const getInvalidFieldValidations = R.pipe(
   getFieldValidations,
-  R.reject(R.propEq(keys.valid, true))
+  R.reject(isValidationValid)
 )
 
 const getErrors = R.propOr([], keys.errors)
@@ -226,7 +218,6 @@ const recalculateValidity = validation =>
 
 module.exports = {
   keys,
-  errorKeys,
   keywords,
 
   newValidationValid,
