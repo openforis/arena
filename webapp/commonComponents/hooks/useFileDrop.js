@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 
-export default (elemRef, handler) => {
+export default (handler, elemRef, acceptedTypes) => {
+  const eventTypes = ['dragenter', 'dragover', 'dragleave', 'drop']
+
   const _preventDefaults = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -8,8 +10,18 @@ export default (elemRef, handler) => {
 
   const handleDrop = evt => {
     // Prevent default behavior (Prevent file from being opened)
-    evt.preventDefault()
-    handler([...evt.dataTransfer.items])
+    _preventDefaults(evt)
+
+    const fileItems = [...evt.dataTransfer.items]
+
+    const fileItem = fileItems.find(item =>
+      !acceptedTypes ||
+      acceptedTypes.find(acceptedType =>
+        acceptedType.test(item.type)))
+
+    if (fileItem) {
+      handler(fileItem.getAsFile())
+    }
   }
 
   useEffect(() => {
@@ -17,7 +29,7 @@ export default (elemRef, handler) => {
 
     if (elem) {
       // Prevent default drag behaviors
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      eventTypes.forEach(eventName => {
         elem.addEventListener(eventName, _preventDefaults)
         document.body.addEventListener(eventName, _preventDefaults)
       })
@@ -27,7 +39,7 @@ export default (elemRef, handler) => {
 
     // Remove document.body event listeners on unmount
     return () => {
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      eventTypes.forEach(eventName => {
         document.body.removeEventListener(eventName, _preventDefaults)
       })
       elem.removeEventListener('drop', handleDrop)

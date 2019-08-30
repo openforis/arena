@@ -1,9 +1,17 @@
 @import "../../../../../style/vars";
 
 .profile-picture-editor {    
+  position: relative;
   height: 260px;
   display: flex;
   justify-content: center;
+
+  .drop-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .profile-picture-editor__sliders {
@@ -25,9 +33,11 @@
 
     &:disabled {
       background: rgba($blueLight, .5);
+
       &::-webkit-slider-thumb {
         background: rgba($blue, .3);
       }
+      
       &::-moz-range-thumb {
         background: rgba($blue, .3);
       }

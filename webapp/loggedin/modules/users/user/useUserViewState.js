@@ -12,7 +12,7 @@ import Authorizer from '../../../../../common/auth/authorizer'
 import {
   useAsyncGetRequest,
   useAsyncPostRequest,
-  useAsyncPutRequest,
+  useAsyncMultipartPutRequest,
   useFormObject,
   useOnUpdate,
   usePrevious,
@@ -113,24 +113,16 @@ export const useUserViewState = props => {
   const pictureChanged = useRef(false)
 
   useEffect(() => {
-    const fd = new FormData()
-    for (var key in formObject) {
-      fd.append(key, formObject[key])
-    }
+    setFormData({ ...formObject })
+  }, [formObject])
 
-    if (prevProfilePicture && prevProfilePicture !== profilePicture) {
+  useEffect(() => {
+    if (prevProfilePicture) {
       pictureChanged.current = true
       // Only send the picture file if it has been edited by the user
-      fd.append('picture', profilePicture)
+      setFormData(formDataPrev => ({ ...formDataPrev, file: profilePicture }))
     }
-
-    setFormData(fd)
-  }, [profilePicture, formObject])
-
-  const putRequest = useAsyncPutRequest(
-    `/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`,
-    formData,
-    { headers: { 'content-type': 'multipart/form-data' } })
+  }, [profilePicture])
 
   // SAVE
 
@@ -142,7 +134,7 @@ export const useUserViewState = props => {
     error: userSaveError,
   } = isInvitation
     ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, R.omit(['name'], formObject))
-    : putRequest
+    : useAsyncMultipartPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, formData)
 
   useOnUpdate(() => {
     hideAppLoader()

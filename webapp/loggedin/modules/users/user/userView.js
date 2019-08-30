@@ -9,8 +9,9 @@ import { getUrlParam } from '../../../../utils/routerUtils'
 import useI18n from '../../../../commonComponents/useI18n.js'
 
 import Dropdown from '../../../../commonComponents/form/dropdown'
-import { FormItem, Input } from '../../../../commonComponents/form/input'
+import ProfilePicture from '../../../../commonComponents/profilePicture'
 import { useProfilePicture } from '../../../../commonComponents/hooks'
+import { FormItem, Input } from '../../../../commonComponents/form/input'
 
 import Survey from '../../../../../common/survey/survey'
 import User from '../../../../../common/user/user'
@@ -21,7 +22,7 @@ import * as SurveyState from '../../../../survey/surveyState'
 
 import { showAppLoader, hideAppLoader, showNotificationMessage, setUser } from '../../../../app/actions'
 
-import { useUserViewState } from './userViewState'
+import { useUserViewState } from './useUserViewState'
 
 import ProfilePictureEditor from './components/profilePictureEditor'
 
@@ -41,7 +42,7 @@ const UserView = props => {
     sendRequest,
   } = useUserViewState(props)
 
-  const initialProfilePicture = useProfilePicture(userUuid)
+  const initialProfilePicture = useProfilePicture(canEdit && userUuid)
 
   return ready && (
     <div>
@@ -53,7 +54,7 @@ const UserView = props => {
               enabled={pictureEditorEnabled}/>
           : (
             <div className="profile-picture">
-              <img src={initialProfilePicture}/>
+              <ProfilePicture userUuid={userUuid}/>
             </div>
           )
       }

@@ -113,7 +113,7 @@ module.exports.init = app => {
       const { user } = req
       const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(req)
 
-      const fileReq = (req.files && req.files.picture) || null
+      const fileReq = Request.getFile(req)
 
       const updatedUser = await UserService.updateUser(user, surveyId, userUuid, name, email, groupUuid, fileReq)
 

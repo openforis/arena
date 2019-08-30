@@ -53,7 +53,7 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   }
 }
 
-const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, fileReq) => {
+const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
@@ -80,7 +80,7 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file
   }
 
   // Get profile picture
-  const profilePicture = fileReq ? fs.readFileSync(fileReq.tempFilePath) : null
+  const profilePicture = file ? fs.readFileSync(file.tempFilePath) : null
   return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid, profilePicture)
 }
 

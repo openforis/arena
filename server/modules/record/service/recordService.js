@@ -140,13 +140,13 @@ const dissocUserFromRecordThread = userUuid => {
  * NODE
  * ======
  */
-const persistNode = async (user, surveyId, node, fileReq) => {
-  if (fileReq) {
+const persistNode = async (user, surveyId, node, file) => {
+  if (file) {
     //save file to "file" table and set fileUuid and fileName into node value
-    const file = RecordFile.createFile(Node.getFileUuid(node), fileReq.name, fileReq.size, fs.readFileSync(fileReq.tempFilePath),
+    const fileObj = RecordFile.createFile(Node.getFileUuid(node), file.name, file.size, fs.readFileSync(file.tempFilePath),
       Node.getRecordUuid(node), Node.getUuid(node))
 
-    await FileManager.insertFile(surveyId, file)
+    await FileManager.insertFile(surveyId, fileObj)
   }
   const thread = _getOrCreatedRecordThread(user, surveyId, Node.getRecordUuid(node), false, true)
   thread.postMessage({ type: recordThreadMessageTypes.nodePersist, node })

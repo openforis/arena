@@ -60,8 +60,9 @@ const TableView = props => {
 
                 {
                   list.map((row, i) => (
-                    <div onClick={() => onRowClick(row)}
-                         className="table__row" key={i}
+                    <div onClick={() => onRowClick && onRowClick(row)}
+                         className={`table__row${onRowClick ? ' hoverable' : ''}`}
+                         key={i}
                          style={{ gridTemplateColumns }}>
                       {
                         React.createElement(
@@ -94,7 +95,7 @@ TableView.defaultProps = {
   rowHeaderComponent: () => <div></div>,
   rowComponent: () => <div></div>,
   noItemsLabelKey: 'common.noItems',
-  onRowClick: () => {},
+  onRowClick: null,
 }
 
 const mapStateToProps = (state, props) => {

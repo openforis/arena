@@ -40,7 +40,9 @@ const UserPopupMenu = props => {
          onMouseLeave={onClose}>
 
       <div className="user-popup-menu__user">
-        <ProfilePicture/>
+
+        <ProfilePicture userUuid={User.getUuid(user)}/>
+
         <div className="user-details">
           <div>
             {User.getName(user)}

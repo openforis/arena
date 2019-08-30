@@ -1,35 +1,60 @@
 import './profilePictureEditor.scss'
 
+import { image as fileTimeImage } from '../../../../../utils/fileTypes'
+
 import React, { useEffect, useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 
 import { useFileDrop } from '../../../../../commonComponents/hooks'
+import useI18n from '../../../../../commonComponents/useI18n'
 
 const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled }) => {
+
+  const i18n = useI18n()
 
   const dropRef = useRef(null)
   const avatarRef = useRef(null)
 
-  const [image, setImage] = useState(null)
-  const [scale, setScale] = useState(1)
-  const [rotate, setRotate] = useState(0)
+  const [state, setState] = useState({
+    image: null,
+    scale: 1,
+    rotate: 0,
+  })
+
+  const setScale = scale => setState(statePrev => ({
+    ...statePrev,
+    scale,
+  }))
+
+  const setRotate = rotate => setState(statePrev => ({
+    ...statePrev,
+    rotate,
+  }))
 
   useEffect(() => {
     if (initialImage) {
-      setImage(initialImage)
+      setState(statePrev => ({
+        ...statePrev,
+        image: initialImage,
+      }))
     }
   }, [initialImage])
 
-  useFileDrop(dropRef, files => {
-    const imgFile = files.find(f => f.kind === 'file' && f.type.startsWith('image'))
-    if (imgFile) {
-      setImage(imgFile.getAsFile())
-    }
-  })
+  useFileDrop(
+    image => {
+      setState(statePrev => ({
+        ...statePrev,
+        image,
+      }))
+    },
+    dropRef, [fileTimeImage])
 
   const resetSliders = () => {
-    setScale(1)
-    setRotate(0)
+    setState(statePrev => ({
+      ...statePrev,
+      scale: 1,
+      rotate: 0,
+    }))
   }
 
   const onImageChange = () => {
@@ -42,26 +67,27 @@ const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled })
   return (
     <>
       <div ref={dropRef} className="profile-picture-editor">
+        { !enabled && <div className="drop-text">{i18n.t('profilePictureEditor.imageDrop')}</div> }
         {
-          image && <AvatarEditor
+          state.image && <AvatarEditor
             ref={avatarRef}
-            image={image}
-            onImageChange={onImageChange}
+            image={state.image}
+            onImageChange={e => enabled && onImageChange(e)}
             onImageReady={onImageChange}
             onLoadSuccess={resetSliders}
             width={200}
             height={200}
             border={20}
             color={[255, 255, 255, 0.6]}
-            scale={scale}
-            rotate={rotate} />
+            scale={state.scale}
+            rotate={state.rotate} />
         }
       </div>
       <div className="form profile-picture-editor__sliders">
         <div className="form-item">
-          <label className="form-label">Scale</label>
+          <label className="form-label">{i18n.t('profilePictureEditor.scale')}</label>
           <div>
-            <input value={scale}
+            <input value={state.scale}
                    disabled={!enabled}
                    onChange={e => setScale(+e.target.value)}
                    className="slider"
@@ -74,9 +100,9 @@ const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled })
         </div>
 
         <div className="form-item">
-          <label className="form-label">Rotate</label>
+          <label className="form-label">{i18n.t('profilePictureEditor.rotate')}</label>
           <div>
-            <input value={rotate}
+            <input value={state.rotate}
                    disabled={!enabled}
                    onChange={e => setRotate(+e.target.value)}
                    className="slider"

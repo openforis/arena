@@ -174,6 +174,12 @@ module.exports = {
     notAcceptedYet: 'Invitation not accepted yet',
   },
 
+  profilePictureEditor: {
+    scale: 'Scale',
+    rotate: 'Rotate',
+    imageDrop: 'Drop your image here'
+  },
+
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',
