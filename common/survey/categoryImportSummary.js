@@ -1,88 +1,90 @@
 const R = require('ramda')
 
 const keys = {
-  headers: 'headers',
+  columns: 'columns',
   filePath: 'filePath',
 }
 
-const keysHeader = {
+const keysColumn = {
   name: 'name',
   type: 'type',
   levelIndex: 'levelIndex',
   levelName: 'levelName',
 }
 
-const headerTypes = {
+const columnTypes = {
   itemCode: 'itemCode',
   itemLabel: 'itemLabel',
   itemDescription: 'itemDescription',
   extra: 'extra'
 }
 
-const headerDataTypes = {
+const columnDataTypes = {
   text: 'text',
   number: 'number',
 }
 
-const headerInfoTypeDefault = headerDataTypes.text
+const columnDataTypeDefault = columnDataTypes.text
 
 // ===== SUMMARY
 
-const newSummary = (headers, filePath) => ({
-  [keys.headers]: headers,
+const newSummary = (columns, filePath) => ({
+  [keys.columns]: columns,
   [keys.filePath]: filePath
 })
 
-const getHeaders = R.propOr({}, keys.headers)
+const getColumns = R.propOr({}, keys.columns)
 
-// ===== HEADER
-const newHeader = (type, levelName, levelIndex = 0) => ({
-  [keysHeader.type]: type,
-  [keysHeader.levelName]: levelName,
-  [keysHeader.levelIndex]: levelIndex
+// ===== COLUMN
+
+const newColumn = (type, levelName, levelIndex = 0) => ({
+  [keysColumn.type]: type,
+  [keysColumn.levelName]: levelName,
+  [keysColumn.levelIndex]: levelIndex
 })
 
-const getHeaderType = R.propOr(headerInfoTypeDefault, keysHeader.type)
+const getColumnType = R.propOr(columnDataTypeDefault, keysColumn.type)
 
-const getHeaderLevelName = R.propOr(headerInfoTypeDefault, keysHeader.levelName)
+const getColumnLevelName = R.propOr(columnDataTypeDefault, keysColumn.levelName)
 
-const getHeaderLevelIndex = R.propOr(headerInfoTypeDefault, keysHeader.levelIndex)
+const getColumnLevelIndex = R.propOr(columnDataTypeDefault, keysColumn.levelIndex)
 
 // ===== UTILS
-const getLevelNames = R.pipe(
-  getHeaders,
+
+const getColumnNames = R.pipe(
+  getColumns,
   R.values,
-  R.filter(header => getHeaderType(header) === headerTypes.itemCode),
-  R.map(getHeaderLevelName)
+  R.filter(column => getColumnType(column) === columnTypes.itemCode),
+  R.map(getColumnLevelName)
 )
 
-const getHeaderName = (type, levelIndex) => summary => {
-  const headers = getHeaders(summary)
+const getColumnName = (type, levelIndex) => summary => {
+  const columns = getColumns(summary)
   return R.pipe(
     R.keys,
-    R.find(headerName => {
-      const header = headers[headerName]
-      return getHeaderType(header) === type && getHeaderLevelIndex(header) === levelIndex
+    R.find(name => {
+      const column = columns[name]
+      return getColumnType(column) === type && getColumnLevelIndex(column) === levelIndex
     })
-  )(headers)
+  )(columns)
 }
 
 module.exports = {
-  headerTypes,
-  headerDataTypes,
+  columnTypes,
+  columnDataTypes,
 
   newSummary,
-  getHeaders,
+  getColumns,
   getFilePath: R.prop(keys.filePath),
 
-  // ==== header
-  newHeader,
+  // ==== column
+  newColumn,
 
-  getHeaderType,
-  getHeaderLevelName,
-  getHeaderLevelIndex: R.prop(keysHeader.levelIndex),
+  getColumnType,
+  getColumnLevelName,
+  getColumnLevelIndex,
 
   // ==== utils
-  getLevelNames,
-  getHeaderName,
+  getColumnNames,
+  getColumnName,
 }

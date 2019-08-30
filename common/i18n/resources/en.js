@@ -300,8 +300,9 @@ module.exports = {
     },
 
     categoryImport: {
-      codeRequired: '{{headerName}}: a code is required',
-      codeDuplicate: '{{headerName}}: duplicate code "{{code}}"'
+      codeRequired: '{{columnName}}: a code is required',
+      codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
+      emptyHeaderFound: 'The file contains an empty header'
     },
 
     nodeDefEdit: {

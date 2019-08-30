@@ -19,6 +19,7 @@ module.exports = {
   categoryImport: {
     codeDuplicate: 'validationErrors.categoryImport.codeDuplicate',
     codeRequired: 'validationErrors.categoryImport.codeRequired',
+    emptyHeaderFound: 'validationErrors.categoryImport.emptyHeaderFound',
   },
 
   nodeDefEdit: {

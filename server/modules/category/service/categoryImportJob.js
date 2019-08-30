@@ -57,7 +57,7 @@ class CategoryImportJob extends Job {
     await CategoryManager.deleteLevelsByCategory(user, surveyId, categoryUuid, this.tx)
     let category = await CategoryManager.fetchCategoryByUuid(surveyId, categoryUuid, true, false, this.tx)
 
-    const levelNames = CategoryImportSummary.getLevelNames(summary)
+    const levelNames = CategoryImportSummary.getColumnNames(summary)
 
     for (const levelName of levelNames) {
       const levelToInsert = Category.newLevel(category, {
@@ -164,7 +164,7 @@ class CategoryImportJob extends Job {
     const levelIndex = codes.length - 1
     const code = codes[levelIndex]
     const summary = CategoryImportJobParams.getSummary(this.params)
-    const headerName = CategoryImportSummary.getHeaderName(CategoryImportSummary.headerTypes.itemCode, levelIndex)(summary)
+    const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.itemCode, levelIndex)(summary)
 
     this.addError({
       error: {
@@ -172,7 +172,7 @@ class CategoryImportJob extends Job {
         [Validator.keys.errors]: [{
           key: ValidatorErrorKeys.categoryImport.codeDuplicate,
           params: {
-            headerName,
+            columnName,
             code
           }
         }]
@@ -183,7 +183,7 @@ class CategoryImportJob extends Job {
   addErrorCodeRequired (levelIndex) {
     const summary = CategoryImportJobParams.getSummary(this.params)
 
-    const headerName = CategoryImportSummary.getHeaderName(CategoryImportSummary.headerTypes.itemCode, levelIndex)(summary)
+    const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.itemCode, levelIndex)(summary)
 
     this.addError({
       error: {
@@ -191,7 +191,7 @@ class CategoryImportJob extends Job {
         [Validator.keys.errors]: [{
           key: ValidatorErrorKeys.categoryImport.codeRequired,
           params: {
-            headerName
+            columnName
           }
         }]
       }
