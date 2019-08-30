@@ -26,22 +26,46 @@ const headerDataTypes = {
 
 const headerInfoTypeDefault = headerDataTypes.text
 
+// ===== SUMMARY
+
 const newSummary = (headers, filePath) => ({
   [keys.headers]: headers,
   [keys.filePath]: filePath
 })
 
+const getHeaders = R.propOr({}, keys.headers)
+
+// ===== HEADER
 const newHeader = (type, levelName, levelIndex = 0) => ({
   [keysHeader.type]: type,
   [keysHeader.levelName]: levelName,
   [keysHeader.levelIndex]: levelIndex
 })
 
-const getHeaders = R.propOr({}, keys.headers)
-
 const getHeaderType = R.propOr(headerInfoTypeDefault, keysHeader.type)
 
 const getHeaderLevelName = R.propOr(headerInfoTypeDefault, keysHeader.levelName)
+
+const getHeaderLevelIndex = R.propOr(headerInfoTypeDefault, keysHeader.levelIndex)
+
+// ===== UTILS
+const getLevelNames = R.pipe(
+  getHeaders,
+  R.values,
+  R.filter(header => getHeaderType(header) === headerTypes.itemCode),
+  R.map(getHeaderLevelName)
+)
+
+const getHeaderName = (type, levelIndex) => summary => {
+  const headers = getHeaders(summary)
+  return R.pipe(
+    R.keys,
+    R.find(headerName => {
+      const header = headers[headerName]
+      return getHeaderType(header) === type && getHeaderLevelIndex(header) === levelIndex
+    })
+  )(headers)
+}
 
 module.exports = {
   headerTypes,
@@ -49,15 +73,7 @@ module.exports = {
 
   newSummary,
   getHeaders,
-  getLevelNames: R.pipe(
-    getHeaders,
-    R.values,
-    R.filter(header => getHeaderType(header) === headerTypes.itemCode),
-    R.map(getHeaderLevelName)
-  ),
   getFilePath: R.prop(keys.filePath),
-  getHeader: headerName => R.pathOr({}, [keys.headers, headerName]),
-  assocHeader: (headerName, header) => R.assocPath([keys.headers, headerName], header),
 
   // ==== header
   newHeader,
@@ -66,4 +82,7 @@ module.exports = {
   getHeaderLevelName,
   getHeaderLevelIndex: R.prop(keysHeader.levelIndex),
 
+  // ==== utils
+  getLevelNames,
+  getHeaderName,
 }

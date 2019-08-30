@@ -299,6 +299,11 @@ module.exports = {
       levelDuplicate: 'Level name is duplicate',
     },
 
+    categoryImport: {
+      codeRequired: '{{headerName}}: a code is required',
+      codeDuplicate: '{{headerName}}: duplicate code "{{code}}"'
+    },
+
     nodeDefEdit: {
       applyIfDuplicate: '"Apply if" condition is duplicate',
       countMaxMustBePositiveNumber: 'Max Count must be a positive integer',

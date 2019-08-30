@@ -65,6 +65,20 @@ const insertItem = async (user, surveyId, item, client = db) =>
     return itemDb
   })
 
+const insertItems = async (user, surveyId, items, client = db) =>
+  await client.tx(async t => {
+    await CategoryRepository.insertItems(surveyId, items, client)
+
+    await markSurveyDraft(surveyId, t)
+
+    const activities = items.map(item => ({
+        type: ActivityLog.type.categoryItemInsert,
+        params: item
+      })
+    )
+    await ActivityLog.logMany(user, surveyId, activities, client)
+  })
+
 // ====== READ
 const fetchCategoriesAndLevels = async (surveyId, draft, client = db) => {
   const categoriesDb = await CategoryRepository.fetchCategoriesBySurveyId(surveyId, draft, client)
@@ -190,7 +204,7 @@ module.exports = {
   insertCategory,
   insertLevel,
   insertItem,
-  insertItems: CategoryRepository.insertItems,
+  insertItems,
 
   //READ
   fetchCategoryByUuid,

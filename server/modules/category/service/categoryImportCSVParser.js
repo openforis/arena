@@ -81,12 +81,10 @@ const createImportSummary = async (filePath) => {
 const createRowsReader = async (summary, levels, languages, onRowItem, onTotalChange) => {
   const headers = CategoryImportSummary.getHeaders(summary)
 
-  const filePath = CategoryImportSummary.getFilePath(summary)
-
-  const reader = CSVReader.createReader(
-    filePath,
+  return CSVReader.createReader(
+    CategoryImportSummary.getFilePath(summary),
     null,
-    data => {
+    async data => {
       // extract codes and extra props
       const codes = []
       const extra = {}
@@ -105,31 +103,17 @@ const createRowsReader = async (summary, levels, languages, onRowItem, onTotalCh
       )
 
       // determine level
-      const levelIndex = R.findLastIndex(StringUtils.isNotBlank)(codes)
-      const levelName = CategoryLevel.getName(levels[levelIndex])
+      const levelIndexDeeper = R.findLastIndex(StringUtils.isNotBlank)(codes)
 
       // extract labels and descriptions
-      const extractLabels = columnSuffix => {
-        const labelsReducer = (acc, lang) => {
-          const headerName = `${levelName}${columnSuffix}_${lang}`
-          const headerIndex = Object.keys(headers).indexOf(headerName)
-          if (headerIndex >= 0) {
-            const value = data[headerIndex]
-            if (StringUtils.isNotBlank(value))
-              acc[lang] = value
-          }
-          return acc
-        }
-        return languages.reduce(labelsReducer, {})
-      }
 
       // extracts labels and descriptions
-      const labels = extractLabels(columnSuffixes.label)
-      const descriptions = extractLabels(columnSuffixes.description)
+      const labels = _extractLabels(levels, languages, headers, columnSuffixes.label, data)
+      const descriptions = _extractLabels(levels, languages, headers, columnSuffixes.description, data)
 
-      onRowItem({
-        levelIndex,
-        codes: codes.slice(0, levelIndex + 1),
+      await onRowItem({
+        levelIndexDeeper,
+        codes: codes.slice(0, levelIndexDeeper + 1),
         labels,
         descriptions,
         extra
@@ -137,9 +121,29 @@ const createRowsReader = async (summary, levels, languages, onRowItem, onTotalCh
     },
     onTotalChange
   )
-
-  return reader
 }
+
+const _extractLabels = (levels, languages, headers, columnSuffix, data) =>
+  levels.reduce(
+    (accLabelsByLevel, level, levelIndex) => {
+      const levelName = CategoryLevel.getName(levels[levelIndex])
+      const labels = languages.reduce((accLabelsByLang, lang) => {
+          const headerName = `${levelName}${columnSuffix}_${lang}`
+          const headerIndex = Object.keys(headers).indexOf(headerName)
+          if (headerIndex >= 0) {
+            const value = data[headerIndex]
+            if (StringUtils.isNotBlank(value))
+              accLabelsByLang[lang] = value
+          }
+          return accLabelsByLang
+        },
+        {}
+      )
+      accLabelsByLevel.push(labels)
+      return accLabelsByLevel
+    },
+    []
+  )
 
 module.exports = {
   createImportSummary,

@@ -14,11 +14,13 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
   const start = () => new Promise((resolve, reject) => {
     stream = fs.createReadStream(filePath)
     let started = false
+    let ended = false
 
     const processNext = () => {
       (async () => {
         if (queue.isEmpty()) {
-          resolve()
+          if (ended)
+            resolve()
         } else if (!canceled) {
           onRow && await onRow(queue.dequeue())
           processNext()
@@ -28,10 +30,11 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
 
     const onData = data => {
       if (headers) {
+        const wasEmpty = queue.isEmpty()
         queue.enqueue(data)
         onTotalChange && onTotalChange(++total)
 
-        if (!started) {
+        if (!started || wasEmpty) {
           started = true
           processNext()
         }
@@ -44,6 +47,7 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
     stream
       .pipe(csvParser())
       .on('data', onData)
+      .on('end', () => ended = true)
       .on('error', reject)
   })
 

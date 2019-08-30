@@ -2,6 +2,7 @@ const CategoryManager = require('../manager/categoryManager')
 const JobManager = require('../../../job/jobManager')
 const CategoryImportJob = require('./categoryImportJob')
 const CategoryImportCSVParser = require('./categoryImportCSVParser')
+const CategoryImportJobParams = require('./categoryImportJobParams')
 
 const createImportSummary = async (surveyId, categoryUuid, filePath) => {
   return await CategoryImportCSVParser.createImportSummary(filePath)
@@ -11,8 +12,8 @@ const importCategory = (user, surveyId, categoryUuid, summary) => {
   const job = new CategoryImportJob({
     user,
     surveyId,
-    categoryUuid,
-    summary
+    [CategoryImportJobParams.keys.categoryUuid]: categoryUuid,
+    [CategoryImportJobParams.keys.summary]: summary,
   })
 
   JobManager.executeJobThread(job)
