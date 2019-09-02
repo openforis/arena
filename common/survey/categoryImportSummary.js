@@ -60,23 +60,27 @@ const isColumnDescription = isColumnType(columnTypes.description)
 
 // ===== UTILS
 
-const getColumnNames = R.pipe(
+const getLevelNames = R.pipe(
   getColumns,
   R.values,
   R.filter(column => getColumnType(column) === columnTypes.code),
   R.map(getColumnLevelName)
 )
 
-const getColumnName = (type, levelIndex) => summary => {
-  const columns = getColumns(summary)
-  return R.pipe(
-    R.keys,
-    R.find(name => {
-      const column = columns[name]
-      return getColumnType(column) === type && getColumnLevelIndex(column) === levelIndex
-    })
-  )(columns)
-}
+const getColumnName = (type, levelIndex) => R.pipe(
+  getColumns,
+  Object.entries,
+  R.find(([columnName, column]) =>
+    getColumnType(column) === type &&
+    getColumnLevelIndex(column) === levelIndex),
+  entry => entry ? entry[0] : null
+)
+
+const hasColumn = (type, levelIndex) => R.pipe(
+  getColumnName(type, levelIndex),
+  R.isNil,
+  R.not
+)
 
 module.exports = {
   columnTypes,
@@ -98,6 +102,7 @@ module.exports = {
   isColumnDescription,
 
   // ==== utils
-  getColumnNames,
+  getLevelNames,
   getColumnName,
+  hasColumn,
 }

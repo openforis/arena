@@ -302,6 +302,7 @@ module.exports = {
     categoryImport: {
       codeRequired: '{{columnName}}: a code is required',
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
+      columnMissing: 'Missing column: {{columnNameMissing}}',
       emptyHeaderFound: 'The file contains an empty header'
     },
 

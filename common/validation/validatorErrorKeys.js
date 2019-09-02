@@ -19,6 +19,7 @@ module.exports = {
   categoryImport: {
     codeDuplicate: 'validationErrors.categoryImport.codeDuplicate',
     codeRequired: 'validationErrors.categoryImport.codeRequired',
+    columnMissing: 'validationErrors.categoryImport.columnMissing',
     emptyHeaderFound: 'validationErrors.categoryImport.emptyHeaderFound',
   },
 

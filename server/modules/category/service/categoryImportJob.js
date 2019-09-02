@@ -57,7 +57,7 @@ class CategoryImportJob extends Job {
     await CategoryManager.deleteLevelsByCategory(user, surveyId, categoryUuid, this.tx)
     let category = await CategoryManager.fetchCategoryByUuid(surveyId, categoryUuid, true, false, this.tx)
 
-    const levelNames = CategoryImportSummary.getColumnNames(summary)
+    const levelNames = CategoryImportSummary.getLevelNames(summary)
 
     for (const levelName of levelNames) {
       const levelToInsert = Category.newLevel(category, {
@@ -100,6 +100,7 @@ class CategoryImportJob extends Job {
     if (this._checkCodesNotEmpty(codes)) {
       for (let levelIndex = 0; levelIndex <= levelIndexDeeper; levelIndex++) {
         const level = levels[levelIndex]
+        const levelName = CategoryLevel.getName(level)
 
         const codesLevel = codes.slice(0, levelIndex + 1)
 
@@ -127,8 +128,8 @@ class CategoryImportJob extends Job {
             itemParentUuid,
             {
               [CategoryItem.props.code]: codeLevel,
-              [CategoryItem.props.labels]: labels[levelIndex],
-              [CategoryItem.props.descriptions]: descriptions[levelIndex],
+              [CategoryItem.props.labels]: labels[levelName],
+              [CategoryItem.props.descriptions]: descriptions[levelName],
               [CategoryItem.props.extra]: extra,
             }
           )
