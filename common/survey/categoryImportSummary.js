@@ -13,9 +13,9 @@ const keysColumn = {
 }
 
 const columnTypes = {
-  itemCode: 'itemCode',
-  itemLabel: 'itemLabel',
-  itemDescription: 'itemDescription',
+  code: 'code',
+  label: 'label',
+  description: 'description',
   extra: 'extra'
 }
 
@@ -23,8 +23,6 @@ const columnDataTypes = {
   text: 'text',
   number: 'number',
 }
-
-const columnDataTypeDefault = columnDataTypes.text
 
 // ===== SUMMARY
 
@@ -37,24 +35,35 @@ const getColumns = R.propOr({}, keys.columns)
 
 // ===== COLUMN
 
-const newColumn = (type, levelName, levelIndex = 0) => ({
+const newColumn = (type, levelName = null, levelIndex = -1) => ({
   [keysColumn.type]: type,
   [keysColumn.levelName]: levelName,
   [keysColumn.levelIndex]: levelIndex
 })
 
-const getColumnType = R.propOr(columnDataTypeDefault, keysColumn.type)
+const getColumnType = R.prop(keysColumn.type)
 
-const getColumnLevelName = R.propOr(columnDataTypeDefault, keysColumn.levelName)
+const getColumnLevelName = R.prop(keysColumn.levelName)
 
-const getColumnLevelIndex = R.propOr(columnDataTypeDefault, keysColumn.levelIndex)
+const getColumnLevelIndex = R.prop(keysColumn.levelIndex)
+
+const isColumnType = type => R.pipe(
+  getColumnType,
+  R.equals(type)
+)
+
+const isColumnCode = isColumnType(columnTypes.code)
+
+const isColumnExtra = isColumnType(columnTypes.extra)
+const isColumnLabel = isColumnType(columnTypes.label)
+const isColumnDescription = isColumnType(columnTypes.description)
 
 // ===== UTILS
 
 const getColumnNames = R.pipe(
   getColumns,
   R.values,
-  R.filter(column => getColumnType(column) === columnTypes.itemCode),
+  R.filter(column => getColumnType(column) === columnTypes.code),
   R.map(getColumnLevelName)
 )
 
@@ -83,6 +92,10 @@ module.exports = {
   getColumnType,
   getColumnLevelName,
   getColumnLevelIndex,
+  isColumnCode,
+  isColumnExtra,
+  isColumnLabel,
+  isColumnDescription,
 
   // ==== utils
   getColumnNames,

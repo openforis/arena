@@ -1,20 +1,23 @@
 const R = require('ramda')
 
-const CategoryLevel = require('../../../../common/survey/categoryLevel')
 const CategoryImportSummary = require('../../../../common/survey/categoryImportSummary')
 const ValidatorErrorKeys = require('../../../../common/validation/validatorErrorKeys')
 const StringUtils = require('../../../../common/stringUtils')
 
 const CSVReader = require('../../../utils/file/csvReader')
 
-const columnSuffixes = {
-  code: '_code',
-  label: '_label',
-  description: '_description',
+const columnProps = {
+  [CategoryImportSummary.columnTypes.code]: { suffix: '_code', lang: false },
+  [CategoryImportSummary.columnTypes.label]: { suffix: '_label', lang: true },
+  [CategoryImportSummary.columnTypes.description]: { suffix: '_description', lang: true },
 }
 
-const columnRegExpLabel = new RegExp(`^.*${columnSuffixes.label}(_[a-z]{2})?$`)
-const columnRegExpDescription = new RegExp(`^.*${columnSuffixes.description}(_[a-z]{2})?$`)
+const columnCodeSuffix = columnProps[CategoryImportSummary.columnTypes.code].suffix
+const columnLabelSuffix = columnProps[CategoryImportSummary.columnTypes.label].suffix
+const columnDescriptionSuffix = columnProps[CategoryImportSummary.columnTypes.description].suffix
+
+const columnRegExpLabel = new RegExp(`^.*${columnLabelSuffix}(_[a-z]{2})?$`)
+const columnRegExpDescription = new RegExp(`^.*${columnDescriptionSuffix}(_[a-z]{2})?$`)
 
 const _readHeaders = filePath => new Promise((resolve, reject) => {
   try {
@@ -34,47 +37,45 @@ const _readHeaders = filePath => new Promise((resolve, reject) => {
 
 const createImportSummary = async (filePath) => {
   //clean category levels
-  const headers = await _readHeaders(filePath)
+  const columnNames = await _readHeaders(filePath)
 
-  if (R.find(StringUtils.isBlank)(headers)) {
+  if (R.find(StringUtils.isBlank)(columnNames)) {
     throw new Error(ValidatorErrorKeys.categoryImport.emptyHeaderFound)
   }
 
-  const levelNames = headers.reduce(
-    (accLevelNames, header) => {
-      if (header.endsWith(columnSuffixes.code)) {
-        accLevelNames.push(header.substr(0, header.length - columnSuffixes.code.length))
+  const levelByNames = {}
+
+  const getOrCreateLevel = (columnName, columnType) => {
+    const columnProp = columnProps[columnType]
+    if (columnProp) {
+      const name = columnName.substr(0, columnName.length - columnProp.suffix.length - columnProp.lang ? 3 : 0)
+
+      let level = levelByNames[name]
+      if (!level) {
+        level = { name, index: Object.keys(levelByNames).length }
+        levelByNames[name] = level
       }
-      return accLevelNames
-    },
-    []
-  )
+      return level
+    } else {
+      return { name: null, index: -1 }
+    }
+  }
 
-  const columns = headers.reduce(
-    (acc, header) => {
-      if (header.endsWith(columnSuffixes.code)) {
-        const levelIndex = R.pipe(
-          R.filter(R.endsWith(columnSuffixes.code)),
-          R.indexOf(header)
-        )(headers)
+  const columns = columnNames.reduce(
+    (acc, columnName) => {
 
-        const levelName = header.substr(0, header.length - columnSuffixes.code.length)
+      const columnType = columnName.endsWith(columnCodeSuffix)
+        ? CategoryImportSummary.columnTypes.code
+        : columnRegExpLabel.test(columnName)
+          ? CategoryImportSummary.columnTypes.label
+          : columnRegExpDescription.test(columnName)
+            ? CategoryImportSummary.columnTypes.description
+            : CategoryImportSummary.columnTypes.extra
 
-        acc[header] = CategoryImportSummary.newColumn(CategoryImportSummary.columnTypes.itemCode, levelName, levelIndex)
-      } else if (columnRegExpLabel.test(header)) {
-        const levelName = header.substr(0, header.length - (columnSuffixes.label.length + 3))
-        const levelIndex = levelNames.indexOf(levelName)
+      const level = getOrCreateLevel(columnName, columnType)
 
-        acc[header] = CategoryImportSummary.newColumn(CategoryImportSummary.columnTypes.itemLabel, levelName, levelIndex)
-      } else if (columnRegExpDescription.test(header)) {
-        const levelName = header.substr(0, header.length - (columnSuffixes.description.length + 3))
-        const levelIndex = levelNames.indexOf(levelName)
+      acc[columnName] = CategoryImportSummary.newColumn(columnType, level.name, level.index)
 
-        acc[header] = CategoryImportSummary.newColumn(CategoryImportSummary.columnTypes.itemDescription, levelName, levelIndex)
-      } else {
-        const levelName = levelNames[0]
-        acc[header] = CategoryImportSummary.newColumn(CategoryImportSummary.columnTypes.extra, levelName)
-      }
       return acc
     },
     {}
@@ -83,38 +84,41 @@ const createImportSummary = async (filePath) => {
   return CategoryImportSummary.newSummary(columns, filePath)
 }
 
-const createRowsReader = async (summary, levels, languages, onRowItem, onTotalChange) => {
+const createRowsReader = async (summary, onRowItem, onTotalChange) => {
   const columns = CategoryImportSummary.getColumns(summary)
 
   return CSVReader.createReader(
     CategoryImportSummary.getFilePath(summary),
     null,
-    async data => {
-      // extract codes and extra props
+    async row => {
+
       const codes = []
       const extra = {}
+      const labels = {}
+      const descriptions = {}
 
-      Object.keys(columns).forEach(
-        (columnName, index) => {
-          const column = columns[columnName]
-          if (CategoryImportSummary.getColumnType(column) === CategoryImportSummary.columnTypes.itemCode) {
-            codes.push(data[index])
-          } else if (CategoryImportSummary.getColumnType(column) === CategoryImportSummary.columnTypes.extra) {
-            const value = data[index]
-            if (StringUtils.isNotBlank(value))
-              extra[columnName] = value
+      Object.entries(columns).forEach(
+        ([columnName, column], index) => {
+          const columnValue = row[index]
+
+          if (CategoryImportSummary.isColumnCode(column)) {
+            codes.push(columnValue)
+          } else if (CategoryImportSummary.isColumnExtra(column)) {
+            if (StringUtils.isNotBlank(columnValue))
+              extra[columnName] = columnValue
+          } else {
+            // label or description
+            const lang = columnName.substring(columnName.lastIndexOf('_') + 1)
+            if (CategoryImportSummary.isColumnLabel(column))
+              labels[lang] = columnValue
+            else if (CategoryImportSummary.isColumnDescription(column))
+              descriptions[lang] = columnValue
           }
         }
       )
 
       // determine level
       const levelIndexDeeper = R.findLastIndex(StringUtils.isNotBlank)(codes)
-
-      // extract labels and descriptions
-
-      // extracts labels and descriptions
-      const labels = _extractLabels(levels, languages, columns, columnSuffixes.label, data)
-      const descriptions = _extractLabels(levels, languages, columns, columnSuffixes.description, data)
 
       await onRowItem({
         levelIndexDeeper,
@@ -127,28 +131,6 @@ const createRowsReader = async (summary, levels, languages, onRowItem, onTotalCh
     onTotalChange
   )
 }
-
-const _extractLabels = (levels, languages, columns, columnSuffix, data) =>
-  levels.reduce(
-    (accLabelsByLevel, level, levelIndex) => {
-      const levelName = CategoryLevel.getName(levels[levelIndex])
-      const labels = languages.reduce((accLabelsByLang, lang) => {
-          const columnName = `${levelName}${columnSuffix}_${lang}`
-          const columnIndex = Object.keys(columns).indexOf(columnName)
-          if (columnIndex >= 0) {
-            const value = data[columnIndex]
-            if (StringUtils.isNotBlank(value))
-              accLabelsByLang[lang] = value
-          }
-          return accLabelsByLang
-        },
-        {}
-      )
-      accLabelsByLevel.push(labels)
-      return accLabelsByLevel
-    },
-    []
-  )
 
 module.exports = {
   createImportSummary,

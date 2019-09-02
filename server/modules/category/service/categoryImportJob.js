@@ -75,16 +75,12 @@ class CategoryImportJob extends Job {
   async _importItems (category) {
     this.logDebug('importing items')
 
-    const surveyId = this.getSurveyId()
     const summary = CategoryImportJobParams.getSummary(this.params)
-
-    const survey = await SurveyManager.fetchSurveyById(surveyId, true, false, this.tx)
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    const languages = Survey.getLanguages(surveyInfo)
 
     const levels = Category.getLevelsArray(category)
 
-    const reader = await CategoryImportCSVParser.createRowsReader(summary, levels, languages,
+    const reader = await CategoryImportCSVParser.createRowsReader(
+      summary,
       async itemRow => {
         if (this.isCanceled()) {
           reader.cancel()
@@ -164,7 +160,7 @@ class CategoryImportJob extends Job {
     const levelIndex = codes.length - 1
     const code = codes[levelIndex]
     const summary = CategoryImportJobParams.getSummary(this.params)
-    const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.itemCode, levelIndex)(summary)
+    const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.code, levelIndex)(summary)
 
     this.addError({
       error: {
@@ -183,7 +179,7 @@ class CategoryImportJob extends Job {
   addErrorCodeRequired (levelIndex) {
     const summary = CategoryImportJobParams.getSummary(this.params)
 
-    const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.itemCode, levelIndex)(summary)
+    const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.code, levelIndex)(summary)
 
     this.addError({
       error: {
