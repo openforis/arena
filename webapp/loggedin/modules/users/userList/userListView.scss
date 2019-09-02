@@ -1,0 +1,7 @@
+@import "../../../../style/vars";
+
+.users-list__cell-profile-picture {
+  height: $tableRowHeight;
+  display: flex;
+  align-items: center;
+}

@@ -1,8 +1,5 @@
 @import "../style/vars";
 
-$rowHeight: 35px;
-$rowBorder: 1px solid $greyBorder;
-
 .table {
   overflow: hidden;
   position: relative;
@@ -20,7 +17,7 @@ $rowBorder: 1px solid $greyBorder;
   padding: 15px;
   background-color: $white;
   height: calc(100% - 40px);
-  border: $rowBorder;
+  border: $tableRowBorder;
 }
 
 .table__empty-rows {
@@ -41,8 +38,8 @@ $rowBorder: 1px solid $greyBorder;
   display: grid;
   align-items: center;
   justify-items: center;
-  border-bottom: $rowBorder;
-  height: $rowHeight;
+  border-bottom: $tableRowBorder;
+  height: $tableRowHeight;
   position: relative;
   font-size: .9rem;
 
@@ -56,12 +53,13 @@ $rowBorder: 1px solid $greyBorder;
 
   &.hoverable {
     cursor: pointer;
+    transition: .2s all;
 
     &:hover {
       background-color: rgba($blueLight, 0.3);
     }
   }
-  
+
   > div {
     //width: calc(100% / 6);
     white-space: nowrap;

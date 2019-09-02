@@ -38,7 +38,11 @@ const AppHeader = props => {
              setShowUserPopup(showUserPopupPrev => !showUserPopupPrev)
            }}>
 
-        <ProfilePicture userUuid={User.getUuid(user)} forceUpdateKey={pictureUpdateKeyRef.current}/>
+        <ProfilePicture
+          userUuid={User.getUuid(user)}
+          forceUpdateKey={pictureUpdateKeyRef.current}
+          thumbnail={true}
+        />
 
         <button className="btn btn-transparent">
           <span className="icon icon-ctrl"/>

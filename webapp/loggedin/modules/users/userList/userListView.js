@@ -1,8 +1,11 @@
+import './userListView.scss'
+
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
 import TableView from '../../../tableViews/tableView'
+import ProfilePicture from '../../../../commonComponents/profilePicture'
 import useI18n from '../../../../commonComponents/useI18n'
 
 import Authorizer from '../../../../../common/auth/authorizer'
@@ -23,7 +26,7 @@ const UsersHeaderLeft = props => {
     <div>
       {canInvite && (
         <Link to={appModuleUri(userModules.user)} className="btn btn-s">
-          <span className="icon icon-user-plus icon-12px icon-left" />
+          <span className="icon icon-user-plus icon-12px icon-left"/>
           {i18n.t('usersView.inviteUser')}
         </Link>
       )}
@@ -35,6 +38,7 @@ const UsersRowHeader = () => {
   const i18n = useI18n()
   return (
     <>
+      <div/>
       <div>{i18n.t('common.name')}</div>
       <div>{i18n.t('common.email')}</div>
       <div>{i18n.t('common.group')}</div>
@@ -52,6 +56,9 @@ const UsersRow = props => {
 
   return (
     <>
+      <div className="users-list__cell-profile-picture">
+        <ProfilePicture userUuid={User.getUuid(userListItem)} thumbnail={true}/>
+      </div>
       <div>
         {User.getName(userListItem)}
       </div>
@@ -80,7 +87,7 @@ const UsersListView = ({ canInvite, user, surveyInfo, history }) => {
   return <TableView
     module={'users'}
     className="users-list"
-    gridTemplateColumns={'repeat(3, 1fr) 10rem 50px'}
+    gridTemplateColumns={'35px repeat(3, 1fr) 10rem 50px'}
     headerLeftComponent={UsersHeaderLeft}
     rowHeaderComponent={UsersRowHeader}
     rowComponent={UsersRow}

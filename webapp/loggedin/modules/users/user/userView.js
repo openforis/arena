@@ -45,64 +45,64 @@ const UserView = props => {
   const initialProfilePicture = useProfilePicture(canEdit && userUuid)
 
   return ready && (
-    <div>
+
+    <div className="user-view form">
       {
         canEdit
-          ? <ProfilePictureEditor
+          ? (
+            <ProfilePictureEditor
               image={initialProfilePicture}
               onPictureUpdate={setProfilePicture}
               enabled={pictureEditorEnabled}/>
+          )
           : (
-            <div className="profile-picture">
-              <ProfilePicture userUuid={userUuid}/>
-            </div>
+            <ProfilePicture userUuid={userUuid}/>
           )
       }
-      <div className="form user">
-        {
-          !isInvitation && (
-            <FormItem label={i18n.t('common.name')}>
-              <Input
-                disabled={!canEditName}
-                placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
-                value={name}
-                validation={canEditName ? getFieldValidation('name') : {}}
-                maxLength="128"
-                onChange={setName}/>
-            </FormItem>
-          )
-        }
-        <FormItem label={i18n.t('common.email')}>
-          <Input
-            disabled={!canEditEmail}
-            placeholder={i18n.t('common.email')}
-            value={email}
-            validation={getFieldValidation('email')}
-            onChange={setEmail}/>
-        </FormItem>
-        <FormItem label={i18n.t('common.group')}>
-          <Dropdown
-            disabled={!canEditGroup}
-            validation={getFieldValidation('groupUuid')}
-            placeholder={i18n.t('common.group')}
-            items={surveyGroups}
-            itemKeyProp={'uuid'}
-            itemLabelProp={'label'}
-            selection={group}
-            onChange={setGroup}/>
-        </FormItem>
 
-        {
-          canEdit && (
-            <button className="btn"
-                    aria-disabled={!objectValid}
-                    onClick={sendRequest}>
-              <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`}/>
-              {isInvitation ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
-            </button>
-          )
-        }
-      </div>
+      {
+        !isInvitation && (
+          <FormItem label={i18n.t('common.name')}>
+            <Input
+              disabled={!canEditName}
+              placeholder={canEditName ? i18n.t('common.name') : i18n.t('usersView.notAcceptedYet')}
+              value={name}
+              validation={canEditName ? getFieldValidation('name') : {}}
+              maxLength="128"
+              onChange={setName}/>
+          </FormItem>
+        )
+      }
+      <FormItem label={i18n.t('common.email')}>
+        <Input
+          disabled={!canEditEmail}
+          placeholder={i18n.t('common.email')}
+          value={email}
+          validation={getFieldValidation('email')}
+          onChange={setEmail}/>
+      </FormItem>
+      <FormItem label={i18n.t('common.group')}>
+        <Dropdown
+          disabled={!canEditGroup}
+          validation={getFieldValidation('groupUuid')}
+          placeholder={i18n.t('common.group')}
+          items={surveyGroups}
+          itemKeyProp={'uuid'}
+          itemLabelProp={'label'}
+          selection={group}
+          onChange={setGroup}/>
+      </FormItem>
+
+      {
+        canEdit && (
+          <button className="btn"
+                  aria-disabled={!objectValid}
+                  onClick={sendRequest}>
+            <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`}/>
+            {isInvitation ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
+          </button>
+        )
+      }
     </div>
   )
 }
