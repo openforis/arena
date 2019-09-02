@@ -5,6 +5,7 @@
   //height: 260px;
   display: grid;
   justify-content: center;
+  grid-row-gap: 0.75rem;
 
   .drop-text {
     position: absolute;
@@ -15,13 +16,17 @@
 
   canvas {
     border: $profilePictureBorder;
+    margin: auto;
+  }
+
+  .btn-upload {
+    padding: 0;
   }
 }
 
 .profile-picture-editor__sliders {
   justify-content: center;
   grid-row-gap: 0.5rem;
-  margin-top: 20px;
 
   .form-item {
     grid-template-columns: 70px auto;

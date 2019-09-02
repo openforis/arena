@@ -70,7 +70,7 @@ const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled })
 
         {
           !enabled &&
-          <div className="drop-text">{i18n.t('profilePictureEditor.imageDrop')}</div>
+          <div className="drop-text">{i18n.t('profilePictureEditor.imageDrop')}</div> //TODO remove
         }
 
         {
@@ -86,8 +86,11 @@ const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled })
             border={10}
             color={[255, 255, 255]}
             scale={state.scale}
-            rotate={state.rotate}/>
+            rotate={state.rotate}
+          />
         }
+
+        <div>Drop an image above or <button className="btn btn-transparent btn-upload">click here to upload</button></div>
 
         <div className="form profile-picture-editor__sliders">
           <div className="form-item">
