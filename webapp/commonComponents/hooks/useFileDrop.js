@@ -16,8 +16,7 @@ export default (handler, elemRef, acceptedTypes) => {
 
     const fileItem = fileItems.find(item =>
       !acceptedTypes ||
-      acceptedTypes.find(acceptedType =>
-        acceptedType.test(item.type)))
+      acceptedTypes.find(acceptedType => acceptedType.test(item.type)))
 
     if (fileItem) {
       handler(fileItem.getAsFile())
@@ -42,6 +41,7 @@ export default (handler, elemRef, acceptedTypes) => {
       eventTypes.forEach(eventName => {
         document.body.removeEventListener(eventName, _preventDefaults)
       })
+
       elem.removeEventListener('drop', handleDrop)
     }
   }, [elemRef.current])

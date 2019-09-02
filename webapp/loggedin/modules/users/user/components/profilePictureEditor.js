@@ -5,12 +5,16 @@ import * as FileTypes from '../../../../../utils/fileTypes'
 import React, { useEffect, useRef, useState } from 'react'
 import AvatarEditor from 'react-avatar-editor'
 
-import { useFileDrop } from '../../../../../commonComponents/hooks'
+import { useProfilePicture, useFileDrop } from '../../../../../commonComponents/hooks'
 import useI18n from '../../../../../commonComponents/useI18n'
 
-const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled }) => {
+import UploadButton from '../../../../../commonComponents/form/uploadButton'
+
+const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
 
   const i18n = useI18n()
+
+  const initialProfilePicture = useProfilePicture(userUuid)
 
   const dropRef = useRef(null)
   const avatarRef = useRef(null)
@@ -21,32 +25,23 @@ const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled })
     rotate: 0,
   })
 
-  const setScale = scale => setState(statePrev => ({
-    ...statePrev,
-    scale,
-  }))
+  const setImage = image => setState(statePrev => ({ ...statePrev, image }))
 
-  const setRotate = rotate => setState(statePrev => ({
-    ...statePrev,
-    rotate,
-  }))
+  const setScale = scale => setState(statePrev => ({ ...statePrev, scale }))
+
+  const setRotate = rotate => setState(statePrev => ({ ...statePrev, rotate }))
 
   useEffect(() => {
-    if (initialImage) {
+    if (initialProfilePicture) {
       setState(statePrev => ({
         ...statePrev,
-        image: initialImage,
+        image: initialProfilePicture,
       }))
     }
-  }, [initialImage])
+  }, [initialProfilePicture])
 
   useFileDrop(
-    image => {
-      setState(statePrev => ({
-        ...statePrev,
-        image,
-      }))
-    },
+    setImage,
     dropRef, [FileTypes.image])
 
   const resetSliders = () => {
@@ -69,11 +64,6 @@ const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled })
       <div ref={dropRef} className="profile-picture-editor">
 
         {
-          !enabled &&
-          <div className="drop-text">{i18n.t('profilePictureEditor.imageDrop')}</div> //TODO remove
-        }
-
-        {
           state.image &&
           <AvatarEditor
             ref={avatarRef}
@@ -90,11 +80,19 @@ const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled })
           />
         }
 
-        <div>Drop an image above or <button className="btn btn-transparent btn-upload">click here to upload</button></div>
+        <div>
+          {i18n.t('userView.dragAndDrop')} <UploadButton
+            label={i18n.t('userView.upload')}
+            showLabel={true}
+            showIcon={false}
+            className="btn btn-transparent btn-upload"
+            accept="image/*"
+            onChange={([file]) => setImage(file)}/>
+        </div>
 
         <div className="form profile-picture-editor__sliders">
           <div className="form-item">
-            <label className="form-label">{i18n.t('profilePictureEditor.scale')}</label>
+            <label className="form-label">{i18n.t('userView.scale')}</label>
             <div>
               <input value={state.scale}
                      disabled={!enabled}
@@ -109,7 +107,7 @@ const ProfilePictureEditor = ({ image: initialImage, onPictureUpdate, enabled })
           </div>
 
           <div className="form-item">
-            <label className="form-label">{i18n.t('profilePictureEditor.rotate')}</label>
+            <label className="form-label">{i18n.t('userView.rotate')}</label>
             <div>
               <input value={state.rotate}
                      disabled={!enabled}

@@ -1,18 +1,9 @@
 @import "../../../../../style/vars";
 
 .profile-picture-editor {
-  position: relative;
-  //height: 260px;
   display: grid;
   justify-content: center;
   grid-row-gap: 0.75rem;
-
-  .drop-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
 
   canvas {
     border: $profilePictureBorder;

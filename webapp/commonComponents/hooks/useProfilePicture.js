@@ -11,11 +11,7 @@ export default (userUuid, forceUpdateKey) => {
     responseType: 'blob',
   })
 
-  useEffect(() => {
-    if (userUuid) {
-      dispatch()
-    }
-  }, [userUuid, forceUpdateKey])
+  useEffect(dispatch, [userUuid, forceUpdateKey])
 
   useEffect(() => {
     if (data) {

@@ -10,7 +10,6 @@ import useI18n from '../../../../commonComponents/useI18n.js'
 
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import ProfilePicture from '../../../../commonComponents/profilePicture'
-import { useProfilePicture } from '../../../../commonComponents/hooks'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 
 import Survey from '../../../../../common/survey/survey'
@@ -42,8 +41,6 @@ const UserView = props => {
     sendRequest,
   } = useUserViewState(props)
 
-  const initialProfilePicture = useProfilePicture(canEdit && userUuid)
-
   return ready && (
 
     <div className="user-view form">
@@ -51,7 +48,7 @@ const UserView = props => {
         canEdit
           ? (
             <ProfilePictureEditor
-              image={initialProfilePicture}
+              userUuid={userUuid}
               onPictureUpdate={setProfilePicture}
               enabled={pictureEditorEnabled}/>
           )

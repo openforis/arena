@@ -72,7 +72,8 @@ const fetchUserProfilePicture = async (uuid, client = db) =>
     SELECT profile_picture
     FROM "user"
     WHERE uuid = $1`,
-    [uuid])
+    [uuid],
+    row => row.profile_picture)
 
 // ==== UPDATE
 

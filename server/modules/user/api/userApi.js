@@ -76,7 +76,7 @@ module.exports.init = app => {
     try {
       const { userUuid } = Request.getParams(req)
 
-      const { profile_picture: profilePicture } = await UserService.fetchUserProfilePicture(userUuid)
+      const profilePicture = await UserService.fetchUserProfilePicture(userUuid)
       if (profilePicture) {
         res.end(profilePicture, 'binary')
       } else {
