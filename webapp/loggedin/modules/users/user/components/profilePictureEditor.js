@@ -32,12 +32,7 @@ const ProfilePictureEditor = ({ userUuid, onPictureUpdate, enabled }) => {
   const setRotate = rotate => setState(statePrev => ({ ...statePrev, rotate }))
 
   useEffect(() => {
-    if (initialProfilePicture) {
-      setState(statePrev => ({
-        ...statePrev,
-        image: initialProfilePicture,
-      }))
-    }
+    setImage(initialProfilePicture)
   }, [initialProfilePicture])
 
   useFileDrop(
