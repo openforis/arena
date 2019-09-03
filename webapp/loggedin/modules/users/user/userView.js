@@ -45,16 +45,18 @@ const UserView = props => {
 
     <div className="user-view form">
       {
-        canEdit
-          ? (
-            <ProfilePictureEditor
-              userUuid={userUuid}
-              onPictureUpdate={setProfilePicture}
-              enabled={pictureEditorEnabled}/>
-          )
-          : (
-            <ProfilePicture userUuid={userUuid}/>
-          )
+        !isInvitation && (
+          canEdit
+            ? (
+              <ProfilePictureEditor
+                userUuid={userUuid}
+                onPictureUpdate={setProfilePicture}
+                enabled={pictureEditorEnabled}/>
+            )
+            : (
+              <ProfilePicture userUuid={userUuid}/>
+            )
+        )
       }
 
       {

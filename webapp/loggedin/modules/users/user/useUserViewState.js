@@ -83,7 +83,7 @@ export const useUserViewState = props => {
     }
   }, [])
 
-  const ready = useRef(false)
+  const ready = useRef(isInvitation)
 
   useEffect(() => {
     if (loaded) {
