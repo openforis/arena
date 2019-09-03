@@ -52,9 +52,7 @@ export const importCollectSurvey = file => async dispatch => {
   const formData = new FormData()
   formData.append('file', file)
 
-  const config = { headers: { 'content-type': 'multipart/form-data' } }
-
-  const { data } = await axios.post(`/api/survey/collect-import`, formData, config)
+  const { data } = await axios.post(`/api/survey/collect-import`, formData)
 
   dispatch(showAppJobMonitor(data.job, async (job) => {
     const surveyId = job.result.surveyId

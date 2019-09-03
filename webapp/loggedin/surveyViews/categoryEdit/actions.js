@@ -73,14 +73,8 @@ export const uploadCategory = (categoryUuid, file) => async (dispatch, getState)
   const formData = new FormData()
   formData.append('file', file)
 
-  const config = {
-    headers: {
-      'content-type': 'multipart/form-data'
-    }
-  }
-
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data: summary } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData, config)
+  const { data: summary } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData)
 
   const { data: { job } } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, summary)
 
