@@ -22,7 +22,7 @@ import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    user, surveyInfo, userUuid, groups: groupsProps,
+    user, surveyInfo, userUuid,
     showAppLoader, hideAppLoader, showNotificationMessage, setUser,
     history,
   } = props
@@ -72,7 +72,16 @@ export const useUserViewState = props => {
 
   useEffect(() => {
     // init form groups
-    setSurveyGroups(groupsProps.map(g => ({
+    const surveyGroups = Survey.isPublished(surveyInfo)
+      ? Survey.getAuthGroups(surveyInfo)
+      : [Survey.getSurveyAdminGroup(surveyInfo)]
+
+    const menuGroups = R.when(
+      R.always(Authorizer.isSystemAdmin(user)),
+      R.concat(User.getAuthGroups(user))
+    )(surveyGroups)
+
+    setSurveyGroups(menuGroups.map(g => ({
       uuid: AuthGroups.getUuid(g),
       label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label`)
     })))
@@ -83,7 +92,7 @@ export const useUserViewState = props => {
     }
   }, [])
 
-  const ready = useRef(false)
+  const ready = useRef(isInvitation)
 
   useEffect(() => {
     if (loaded) {

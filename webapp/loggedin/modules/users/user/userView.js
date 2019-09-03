@@ -45,16 +45,18 @@ const UserView = props => {
 
     <div className="user-view form">
       {
-        canEdit
-          ? (
-            <ProfilePictureEditor
-              userUuid={userUuid}
-              onPictureUpdate={setProfilePicture}
-              enabled={pictureEditorEnabled}/>
-          )
-          : (
-            <ProfilePicture userUuid={userUuid}/>
-          )
+        !isInvitation && (
+          canEdit
+            ? (
+              <ProfilePictureEditor
+                userUuid={userUuid}
+                onPictureUpdate={setProfilePicture}
+                enabled={pictureEditorEnabled}/>
+            )
+            : (
+              <ProfilePicture userUuid={userUuid}/>
+            )
+        )
       }
 
       {
@@ -109,15 +111,9 @@ const mapStateToProps = (state, { match }) => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
 
-  const groups = R.when(
-    R.always(Authorizer.isSystemAdmin(user)),
-    R.concat(User.getAuthGroups(user))
-  )(Survey.getAuthGroups(surveyInfo))
-
   return {
     user,
     surveyInfo,
-    groups,
     userUuid: getUrlParam('userUuid')(match),
   }
 }
