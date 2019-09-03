@@ -1,6 +1,7 @@
+const R = require('ramda')
+
 const Job = require('../../../job/job')
 
-const Survey = require('../../../../common/survey/survey')
 const Category = require('../../../../common/survey/category')
 const CategoryImportSummary = require('../../../../common/survey/categoryImportSummary')
 const CategoryLevel = require('../../../../common/survey/categoryLevel')
@@ -9,7 +10,6 @@ const Validator = require('../../../../common/validation/validator')
 const ValidatorErrorKeys = require('../../../../common/validation/validatorErrorKeys')
 const StringUtils = require('../../../../common/stringUtils')
 
-const SurveyManager = require('../../survey/manager/surveyManager')
 const CategoryManager = require('../manager/categoryManager')
 const CategoryImportCSVParser = require('./categoryImportCSVParser')
 const CategoryImportJobParams = require('./categoryImportJobParams')
@@ -25,6 +25,9 @@ class CategoryImportJob extends Job {
   async execute () {
     // levels
     let category = await this._importLevels()
+
+    // item extra def
+    category = await this._importItemExtraDef(category)
 
     // items
     await this._importItems(category)
@@ -67,7 +70,31 @@ class CategoryImportJob extends Job {
       category = Category.assocLevel(level)(category)
     }
 
-    this.logDebug(`levels importing: ${levelNames}`)
+    this.logDebug(`levels imported: ${levelNames}`)
+
+    return category
+  }
+
+  async _importItemExtraDef (category) {
+    this.logDebug('importing item extra def')
+
+    const summary = CategoryImportJobParams.getSummary(this.params)
+
+    const itemExtraDef = Object.entries(CategoryImportSummary.getColumns(summary)).reduce((accExtraDef, [columnName, column]) => {
+        if (CategoryImportSummary.isColumnExtra(column)) {
+          accExtraDef[columnName] = R.pick([CategoryImportSummary.keysColumn.dataType])(column)
+        }
+        return accExtraDef
+      },
+      {}
+    )
+    if (!R.isEmpty(itemExtraDef)) {
+      const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
+      await CategoryManager.updateCategoryProp(this.getUser(), this.getSurveyId(), categoryUuid, Category.props.itemExtraDef, itemExtraDef, this.tx)
+      category = Category.assocItemExtraDef(itemExtraDef)(category)
+    }
+
+    this.logDebug('item extra def imported', itemExtraDef)
 
     return category
   }

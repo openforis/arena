@@ -154,8 +154,6 @@ module.exports = {
   getItemExtraDef: getProp(props.itemExtraDef, {}),
   assocItemExtraDef: extraDef => setProp(props.itemExtraDef, extraDef),
 
-  assocItemExtraDefType: (name, type) => R.assocPath([props.itemExtraDef, name, propsItemExtraDef.type], type),
-
   //UTILS
   isLevelDeleteAllowed,
 }

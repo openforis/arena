@@ -6,6 +6,8 @@ const keys = {
 }
 
 const keysColumn = {
+  dataType: 'dataType',
+  lang: 'lang',
   levelIndex: 'levelIndex',
   levelName: 'levelName',
   name: 'name',
@@ -20,6 +22,7 @@ const columnTypes = {
 }
 
 const columnDataTypes = {
+  geometryPoint: 'geometryPoint',
   number: 'number',
   text: 'text',
 }
@@ -35,10 +38,12 @@ const getColumns = R.propOr({}, keys.columns)
 
 // ===== COLUMN
 
-const newColumn = (type, levelName = null, levelIndex = -1) => ({
+const newColumn = (type, levelName = null, levelIndex = -1, lang = null, dataType = null) => ({
   [keysColumn.type]: type,
   [keysColumn.levelName]: levelName,
-  [keysColumn.levelIndex]: levelIndex
+  [keysColumn.levelIndex]: levelIndex,
+  [keysColumn.lang]: lang,
+  [keysColumn.dataType]: dataType,
 })
 
 const getColumnType = R.prop(keysColumn.type)
@@ -46,6 +51,10 @@ const getColumnType = R.prop(keysColumn.type)
 const getColumnLevelName = R.prop(keysColumn.levelName)
 
 const getColumnLevelIndex = R.prop(keysColumn.levelIndex)
+
+const getColumnLang = R.prop(keysColumn.lang)
+
+const getColumnDataType = R.prop(keysColumn.dataType)
 
 const isColumnType = type => R.pipe(
   getColumnType,
@@ -85,20 +94,31 @@ module.exports = {
   columnTypes,
   columnDataTypes,
 
+  keysColumn,
+
+  // ==== SUMMARY
+  // CREATE
   newSummary,
+  // READ
   getColumns,
   getFilePath: R.prop(keys.filePath),
+  // UPDATE
+  assocColumnDataType: (columnName, dataType) => R.assocPath([keys.columns, columnName, keysColumn.dataType], dataType),
 
-  // ==== column
+  // ==== COLUMN
   newColumn,
 
   getColumnType,
   getColumnLevelName,
   getColumnLevelIndex,
+  getColumnLang,
+  getColumnDataType,
+
   isColumnCode,
   isColumnExtra,
   isColumnLabel,
   isColumnDescription,
+  hasColumnLang: column => isColumnLabel(column) || isColumnDescription(column),
 
   // ==== utils
   getLevelNames,

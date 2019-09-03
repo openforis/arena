@@ -27,6 +27,7 @@ module.exports = {
     formContainsErrors: 'Form contains errors',
     group: 'Group',
     id: 'id',
+    import: 'Import',
     invalid: 'INVALID',
     item: 'Item',
     item_plural: 'Items',
@@ -276,6 +277,25 @@ module.exports = {
     level: 'Level',
     confirmDelete: 'Delete the item with all children? $t(common.cantUndoWarning)',
     deleteItem: 'Delete item',
+
+    importSummary: {
+      column: 'Column',
+      columnTypeSummary: 'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
+      columnTypeSummaryExtra: '{{type}}',
+      columnTypeSummaryWithLanguage: '$t(categoryEdit.importSummary.columnTypeSummary) ({{language}})',
+      columnType: {
+        code: 'code',
+        description: 'description',
+        label: 'label',
+        extra: 'extra'
+      },
+      columnDataType: {
+        geometryPoint: 'Geometry Point',
+        number: 'Number',
+        text: 'Text'
+      },
+      dataType: 'Data Type',
+    }
   },
 
   // ===== All validation errors
