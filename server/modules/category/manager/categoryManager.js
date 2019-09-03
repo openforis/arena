@@ -163,37 +163,37 @@ const updateItemProp = async (user, surveyId, itemUuid, key, value, client = db)
   })
 
 // ====== DELETE
-const deleteCategory = async (user, surveyId, categoryUuid) =>
-  await db.tx(async t => {
-    await CategoryRepository.deleteCategory(surveyId, categoryUuid, t)
-    await markSurveyDraft(surveyId, t)
+const deleteCategory = async (user, surveyId, categoryUuid, client = db) =>
+  await client.tx(t => Promise.all([
+      CategoryRepository.deleteCategory(surveyId, categoryUuid, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryDelete, { categoryUuid }, t)
+    ])
+  )
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryDelete, { categoryUuid }, t)
-  })
-
-const deleteLevel = async (user, surveyId, levelUuid) =>
-  await db.tx(async t => {
-    await CategoryRepository.deleteLevel(surveyId, levelUuid, t)
-    await markSurveyDraft(surveyId, t)
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, { levelUuid }, t)
-  })
+const deleteLevel = async (user, surveyId, levelUuid, client = db) =>
+  await client.tx(t => Promise.all([
+      CategoryRepository.deleteLevel(surveyId, levelUuid, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, { levelUuid }, t)
+    ])
+  )
 
 const deleteLevelsByCategory = async (user, surveyId, categoryUuid, client = db) =>
-  await client.tx(async t => {
-    await CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t)
-    await markSurveyDraft(surveyId, t)
+  await client.tx(t => Promise.all([
+      CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelsDelete, { categoryUuid }, t)
+    ])
+  )
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelsDelete, { categoryUuid }, t)
-  })
-
-const deleteItem = async (user, surveyId, itemUuid) =>
-  await db.tx(async t => {
-    await CategoryRepository.deleteItem(surveyId, itemUuid, t)
-    await markSurveyDraft(surveyId, t)
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemDelete, { itemUuid }, t)
-  })
+const deleteItem = async (user, surveyId, itemUuid, client = db) =>
+  await client.tx(t => Promise.all([
+      CategoryRepository.deleteItem(surveyId, itemUuid, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemDelete, { itemUuid }, t)
+    ])
+  )
 
 module.exports = {
 
