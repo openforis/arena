@@ -113,7 +113,7 @@ export const useUserViewState = props => {
   const pictureChanged = useRef(false)
 
   useEffect(() => {
-    setFormData({ ...formObject })
+    setFormData(formDataPrev => ({ ...formDataPrev, ...formObject }))
   }, [formObject])
 
   useEffect(() => {
