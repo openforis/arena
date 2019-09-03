@@ -6,22 +6,22 @@ const keys = {
 }
 
 const keysColumn = {
-  name: 'name',
-  type: 'type',
   levelIndex: 'levelIndex',
   levelName: 'levelName',
+  name: 'name',
+  type: 'type',
 }
 
 const columnTypes = {
   code: 'code',
-  label: 'label',
   description: 'description',
-  extra: 'extra'
+  extra: 'extra',
+  label: 'label'
 }
 
 const columnDataTypes = {
-  text: 'text',
   number: 'number',
+  text: 'text',
 }
 
 // ===== SUMMARY
@@ -53,7 +53,6 @@ const isColumnType = type => R.pipe(
 )
 
 const isColumnCode = isColumnType(columnTypes.code)
-
 const isColumnExtra = isColumnType(columnTypes.extra)
 const isColumnLabel = isColumnType(columnTypes.label)
 const isColumnDescription = isColumnType(columnTypes.description)
@@ -63,7 +62,7 @@ const isColumnDescription = isColumnType(columnTypes.description)
 const getLevelNames = R.pipe(
   getColumns,
   R.values,
-  R.filter(column => getColumnType(column) === columnTypes.code),
+  R.filter(isColumnCode),
   R.map(getColumnLevelName)
 )
 

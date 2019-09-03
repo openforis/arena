@@ -1,62 +1,23 @@
-const R = require('ramda')
-
-const keys = {
-  id: 'id',
-  uuid: 'uuid',
-  parentUuid: 'parentUuid',
-  props: 'props',
-}
+const ObjectUtils = require('../objectUtils')
 
 // READ
-const getUuid = R.propOr(null, keys.uuid)
-
-const isEqual = other => self => getUuid(other) === getUuid(self)
-
-const getProps = R.propOr({}, keys.props)
-
-const getProp = (prop, defaultTo = null) => R.pipe(
-  getProps,
-  R.pathOr(defaultTo, prop.split('.'))
-)
-
-const getLabels = getProp('labels', {})
-
-const getLabel = (lang, defaultTo = null) => R.pipe(
-  getLabels,
-  R.propOr(defaultTo, lang)
-)
-
-//UPDATE
-const setProp = (key, value) => R.assocPath([keys.props, key], value)
-
-// UTILS / uuid
-
-const toIndexedObj = (array, prop) => array.reduce(
-  (acc, item) => {
-    acc[item[prop]] = item
-    return acc
-  },
-  {}
-)
-
-const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
 module.exports = {
-  keys,
+  keys: ObjectUtils.keys,
 
   // PROPS
-  getProps,
-  getProp,
-  setProp,
+  getProps: ObjectUtils.getProps,
+  getProp: ObjectUtils.getProp,
+  setProp: ObjectUtils.setProp,
 
   // LABELS
-  getLabels,
-  getLabel,
+  getLabels: ObjectUtils.getLabels,
+  getLabel: ObjectUtils.getLabel,
 
   // UTILS / uuid
-  getUuid,
-  isEqual,
-  getParentUuid: R.propOr(null, keys.parentUuid),
-  toIndexedObj,
-  toUuidIndexedObj,
+  getUuid: ObjectUtils.getUuid,
+  isEqual: ObjectUtils.isEqual,
+  getParentUuid: ObjectUtils.getParentUuid,
+  toIndexedObj: ObjectUtils.toIndexedObj,
+  toUuidIndexedObj: ObjectUtils.toUuidIndexedObj,
 }

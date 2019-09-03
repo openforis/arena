@@ -1,7 +1,7 @@
 const R = require('ramda')
 const { uuidv4 } = require('../uuid')
 
-const SurveyUtils = require('./surveyUtils')
+const ObjectUtils = require('../objectUtils')
 
 const keys = {
   uuid: 'uuid',
@@ -26,23 +26,9 @@ const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
 })
 
 // ====== READ
-const getCode = SurveyUtils.getProp(props.code, '')
+const getCode = ObjectUtils.getProp(props.code, '')
 
-const getLabels = SurveyUtils.getProp(props.labels)
-
-const getLabel = language => item =>
-  R.pipe(
-    getLabels,
-    R.propOr(getCode(item), language),
-  )(item)
-
-const getDescriptions = SurveyUtils.getProp(props.descriptions)
-
-const getDescription = language => item =>
-  R.pipe(
-    getDescriptions,
-    R.propOr('', language),
-  )(item)
+const getLabel = language => item => ObjectUtils.getLabel(language, getCode(item))(item)
 
 module.exports = {
   keys,
@@ -52,18 +38,18 @@ module.exports = {
   newItem,
 
   //READ
-  getUuid: SurveyUtils.getUuid,
+  getUuid: ObjectUtils.getUuid,
   getLevelUuid: R.prop(keys.levelUuid),
   getParentUuid: R.prop(keys.parentUuid),
   getCode,
-  getLabels,
-  getLabel,
-  getDescriptions,
-  getDescription,
+  getLabels: ObjectUtils.getLabels,
+  getLabel ,
+  getDescriptions: ObjectUtils.getDescriptions,
+  getDescription: ObjectUtils.getDescription,
   getExtraProp: prop => R.pipe(
-    SurveyUtils.getProp(keys.extra),
+    ObjectUtils.getProp(keys.extra),
     R.propOr('', prop)
   ),
 
-  isEqual: SurveyUtils.isEqual
+  isEqual: ObjectUtils.isEqual
 }

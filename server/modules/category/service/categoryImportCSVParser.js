@@ -72,6 +72,8 @@ const createImportSummary = async (filePath) => {
   const summary = CategoryImportSummary.newSummary(columns, filePath)
 
   _validateSummary(summary)
+
+  return summary
 }
 
 const createRowsReader = async (summary, onRowItem, onTotalChange) => {

@@ -77,6 +77,8 @@ class CategoryImportJob extends Job {
 
     const summary = CategoryImportJobParams.getSummary(this.params)
 
+    this.logDebug('summary', summary)
+
     const levels = Category.getLevelsArray(category)
 
     const reader = await CategoryImportCSVParser.createRowsReader(
