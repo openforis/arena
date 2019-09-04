@@ -62,7 +62,8 @@ module.exports = {
   hasCollectReportIssues: SurveyInfo.hasCollectReportIssues,
 
   getAuthGroups: SurveyInfo.getAuthGroups,
-  getSurveyAdminGroup: SurveyInfo.getSurveyAdminGroup,
+  isAuthGroupAdmin: SurveyInfo.isAuthGroupAdmin,
+  getAuthGroupAdmin: SurveyInfo.getAuthGroupAdmin,
 
   // UPDATE
   markDraft: SurveyInfo.markDraft,

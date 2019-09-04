@@ -104,6 +104,13 @@ const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 const getAuthGroups = R.prop(keys.authGroups)
 
+const getAuthGroupAdmin = R.pipe(
+  getAuthGroups,
+  R.find(g => g.name === AuthGroups.groupNames.surveyAdmin))
+
+const isAuthGroupAdmin = group => surveyInfo =>
+  AuthGroups.getUuid(getAuthGroupAdmin(surveyInfo)) === AuthGroups.getUuid(group)
+
 module.exports = {
   keys,
   collectReportKeys,
@@ -136,7 +143,8 @@ module.exports = {
 
   // ====== AUTH GROUPS
   getAuthGroups,
-  getSurveyAdminGroup: AuthGroups.getSurveyAdminGroup,
+  getAuthGroupAdmin,
+  isAuthGroupAdmin,
 
   // ====== UTILS
   isValid,

@@ -16,7 +16,6 @@ const Validator = require('../../../../common/validation/validator')
 const SurveyRdbManager = require('../../surveyRdb/manager/surveyRdbManager')
 const NodeDefManager = require('../../nodeDef/manager/nodeDefManager')
 const AuthGroups = require('../../../../common/auth/authGroups')
-const Authorizer = require('../../../../common/auth/authorizer')
 
 const SurveyRepository = require('../repository/surveyRepository')
 const CategoryRepository = require('../../category/repository/categoryRepository')
@@ -69,7 +68,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
 
       surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
 
-      if (!Authorizer.isSystemAdmin(user)) {
+      if (!User.isSystemAdmin(user)) {
         await AuthGroupRepository.insertUserGroup(AuthGroups.getUuid(Survey.getSurveyAdminGroup(surveyDb)), User.getUuid(user), t)
       }
 
@@ -123,7 +122,7 @@ const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (surveyId, draft = fals
 
 const fetchUserSurveysInfo = async (user) => R.map(
   assocSurveyInfo,
-  await SurveyRepository.fetchSurveys(user, !Authorizer.isSystemAdmin(user))
+  await SurveyRepository.fetchSurveys(user, !User.isSystemAdmin(user))
 )
 
 // ====== UPDATE

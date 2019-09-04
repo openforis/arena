@@ -15,13 +15,13 @@ const SystemError = require('../../../utils/systemError')
 const UnauthorizedError = require('../../../utils/unauthorizedError')
 
 const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
-  const fetchSystemAdmins = Authorizer.isSystemAdmin(user)
+  const fetchSystemAdmins = User.isSystemAdmin(user)
 
   return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
 }
 
 const countUsersBySurveyId = async (user, surveyId) => {
-  const countSystemAdmins = Authorizer.isSystemAdmin(user)
+  const countSystemAdmins = User.isSystemAdmin(user)
 
   return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
 }
@@ -30,7 +30,7 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
-  if (!Authorizer.isSystemAdmin(user) && AuthGroups.isSystemAdminGroup(group)) {
+  if (!User.isSystemAdmin(user) && AuthGroups.isSystemAdminGroup(group)) {
     throw new UnauthorizedError(User.getName(user))
   }
 
@@ -38,7 +38,7 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const isPublished = Survey.isPublished(surveyInfo)
-  if (!isPublished && !(AuthGroups.isSystemAdminGroup(group) || AuthGroups.isSurveyAdminGroup(group, surveyInfo))) {
+  if (!isPublished && !(AuthGroups.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))) {
     throw new UnauthorizedError(User.getName(user))
   }
 
@@ -50,7 +50,7 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
     if (hasRoleInSurvey) {
       throw new SystemError('userHasRole')
     }
-    if (Authorizer.isSystemAdmin(dbUser)) {
+    if (User.isSystemAdmin(dbUser)) {
       throw new SystemError('userIsAdmin')
     }
 

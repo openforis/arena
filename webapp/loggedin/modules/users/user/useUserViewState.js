@@ -80,7 +80,7 @@ export const useUserViewState = props => {
 
     // Add SystemAdmin group if current user is a SystemAdmin himself
     const menuGroups = R.when(
-      R.always(Authorizer.isSystemAdmin(user)),
+      R.always(User.isSystemAdmin(user)),
       R.concat(User.getAuthGroups(user))
     )(surveyGroups)
 

@@ -11,19 +11,15 @@ const {
   getAuthGroups,
 } = AuthGroups
 
-const isSystemAdmin = user =>
-  user &&
-  R.any(AuthGroups.isSystemAdminGroup)(User.getAuthGroups(user))
-
 const isSurveyAdmin = (user, surveyInfo) =>
-  AuthGroups.isSurveyAdminGroup(getSurveyUserGroup(user, surveyInfo), surveyInfo)
+  Survey.isAuthGroupAdmin(getSurveyUserGroup(user, surveyInfo))(surveyInfo)
 
 // ======
 // ====== Survey
 // ======
 
 const getSurveyUserGroup = (user, surveyInfo) => {
-  if (isSystemAdmin(user))
+  if (User.isSystemAdmin(user))
     return R.pipe(User.getAuthGroups, R.head)(user)
 
   const userGroups = getAuthGroups(user)
@@ -43,13 +39,13 @@ const getSurveyUserPermissions = (user, surveyInfo) =>
 
 const hasSurveyPermission = permission => (user, surveyInfo) =>
   user && surveyInfo && (
-    isSystemAdmin(user) ||
+    User.isSystemAdmin(user) ||
     R.includes(permission, getSurveyUserPermissions(user, surveyInfo))
   )
 
 // READ
 const canViewSurvey = (user, surveyInfo) =>
-  isSystemAdmin(user) ||
+  User.isSystemAdmin(user) ||
   !!getSurveyUserGroup(user, surveyInfo)
 
 // UPDATE
@@ -70,7 +66,7 @@ const canEditRecord = (user, record) => {
   if (!(user && record))
     return false
 
-  if (isSystemAdmin(user))
+  if (User.isSystemAdmin(user))
     return true
 
   const recordDataStep = Record.getStep(record)
@@ -93,7 +89,7 @@ const canInviteUsers = hasSurveyPermission(permissions.userInvite)
 
 // READ
 const canViewUser = (user, surveyInfo, userToView) => {
-  if (isSystemAdmin(user)) {
+  if (User.isSystemAdmin(user)) {
     return true
   }
 
@@ -107,7 +103,7 @@ const isSurveyUser = (surveyInfo, user) => AuthGroups.getAuthGroups(user).some(
 
 const canEditUser = (user, surveyInfo, userToUpdate) => (
   User.hasAccepted(userToUpdate) && (
-    isSystemAdmin(user) ||
+    User.isSystemAdmin(user) ||
     User.getUuid(user) === User.getUuid(userToUpdate) ||
     (
       isSurveyAdmin(user, surveyInfo) &&
@@ -117,7 +113,7 @@ const canEditUser = (user, surveyInfo, userToUpdate) => (
 )
 
 const canEditUserEmail = (user, surveyInfo, userToUpdate) => (
-  isSystemAdmin(user) ||
+  User.isSystemAdmin(user) ||
   (
     isSurveyAdmin(user, surveyInfo) &&
     isSurveyUser(surveyInfo, userToUpdate)
@@ -127,7 +123,7 @@ const canEditUserEmail = (user, surveyInfo, userToUpdate) => (
 const canEditUserGroup = (user, surveyInfo, userToUpdate) => {
   return (
     !User.isEqual(user)(userToUpdate) && (
-      isSystemAdmin(user) ||
+      User.isSystemAdmin(user) ||
       (
         isSurveyAdmin(user, surveyInfo) &&
         isSurveyUser(surveyInfo, userToUpdate)
@@ -137,8 +133,7 @@ const canEditUserGroup = (user, surveyInfo, userToUpdate) => {
 }
 
 module.exports = {
-  isSystemAdmin,
-  isSurveyAdmin,
+  isSystemAdmin: () => {},
   getSurveyUserGroup,
 
   // Survey permissions
