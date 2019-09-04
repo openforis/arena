@@ -136,21 +136,20 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
   )
 }
 
-const _readHeaders = filePath => new Promise((resolve, reject) => {
-  try {
-    const reader = CSVReader.createReader(
-      filePath,
-      headers => {
-        reader.cancel()
-        resolve(headers)
-      },
-    )
+const _readHeaders = async filePath => {
+  let result = null
 
-    reader.start()
-  } catch (error) {
-    reject(error)
-  }
-})
+  const reader = CSVReader.createReader(
+    filePath,
+    headers => {
+      reader.cancel()
+      result = headers
+    }
+  )
+  await reader.start()
+
+  return result
+}
 
 const _validateSummary = summary => {
   const columns = CategoryImportSummary.getColumns(summary)

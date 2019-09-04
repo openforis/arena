@@ -31,7 +31,7 @@ class CategoryImportJob extends Job {
     category = await this._importItemExtraDef(category)
 
     // items
-    await this._importItems(category)
+    await this._readItems(category)
 
     if (this.hasErrors()) {
       // errors found
@@ -39,13 +39,7 @@ class CategoryImportJob extends Job {
       await this.setStatusFailed()
     } else {
       // no errors found
-      const surveyId = this.getSurveyId()
-      const user = this.getUser()
-
-      const items = Object.values(this.itemsByCodes)
-      await CategoryManager.insertItems(user, surveyId, items, this.tx)
-
-      this.logDebug(`${items.length} items imported`)
+      await this.insertItems()
     }
   }
 
@@ -99,8 +93,8 @@ class CategoryImportJob extends Job {
     return category
   }
 
-  async _importItems (category) {
-    this.logDebug('importing items')
+  async _readItems (category) {
+    this.logDebug('reading items')
 
     const summary = CategoryImportJobParams.getSummary(this.params)
 
@@ -115,15 +109,27 @@ class CategoryImportJob extends Job {
           reader.cancel()
           return
         }
-        await this._importRow(itemRow, levels)
+        await this._onRow(itemRow, levels)
       },
       total => this.total = total
     )
 
     await reader.start()
+
+    this.logDebug(`${this.total} items read`)
+
+    if (this.total === 0)
+      this.addError({
+        error: {
+          [Validator.keys.valid]: false,
+          [Validator.keys.errors]: [{
+            key: ValidatorErrorKeys.categoryImport.emptyFile
+          }]
+        }
+      })
   }
 
-  async _importRow (itemRow, levels) {
+  async _onRow (itemRow, levels) {
     const { levelIndexDeeper, codes, labelsByLevel, descriptionsByLevel, extra } = itemRow
 
     if (this._checkCodesNotEmpty(codes)) {
@@ -164,6 +170,18 @@ class CategoryImportJob extends Job {
       }
     }
     this.incrementProcessedItems()
+  }
+
+  async insertItems () {
+    this.logDebug('inserting items')
+
+    const surveyId = this.getSurveyId()
+    const user = this.getUser()
+
+    const items = Object.values(this.itemsByCodes)
+    await CategoryManager.insertItems(user, surveyId, items, this.tx)
+
+    this.logDebug(`${items.length} items imported`)
   }
 
   _checkCodesNotEmpty (codes) {

@@ -44,10 +44,16 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
       }
     }
 
+    const onEnd = () => {
+      ended = true
+      if (queue.isEmpty())
+        resolve()
+    }
+
     stream
       .pipe(csvParser())
       .on('data', onData)
-      .on('end', () => ended = true)
+      .on('end', onEnd)
       .on('error', reject)
   })
 

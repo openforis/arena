@@ -331,7 +331,8 @@ module.exports = {
       codeRequired: '{{columnName}}: a code is required',
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
       columnMissing: 'Missing column: {{columnNameMissing}}',
-      emptyHeaderFound: 'The file contains an empty header'
+      emptyHeaderFound: 'The file contains an empty header',
+      emptyFile: 'The file you are trying to import is empty'
     },
 
     nodeDefEdit: {
