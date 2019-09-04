@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import * as R from 'ramda'
 
 import useI18n from '../../../../commonComponents/useI18n'
@@ -12,16 +12,17 @@ import Authorizer from '../../../../../common/auth/authorizer'
 import {
   useAsyncGetRequest,
   useAsyncPostRequest,
-  useAsyncPutRequest,
+  useAsyncMultipartPutRequest,
   useFormObject,
-  useOnUpdate
+  useOnUpdate,
+  usePrevious,
 } from '../../../../commonComponents/hooks'
 
 import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    user, surveyInfo, userUuidUrlParam, groups: groupsProps,
+    user, surveyInfo, userUuid, groups: groupsProps,
     showAppLoader, hideAppLoader, showNotificationMessage, setUser,
     history,
   } = props
@@ -30,11 +31,14 @@ export const useUserViewState = props => {
   const i18n = useI18n()
 
   const { data: userToUpdate = {}, dispatch: fetchUser, loaded } = useAsyncGetRequest(
-    `/api/survey/${surveyId}/user/${userUuidUrlParam}`
+    `/api/survey/${surveyId}/user/${userUuid}`
   )
 
-  const isInvitation = !userUuidUrlParam
+  const isInvitation = !userUuid
   const isUserAcceptPending = !(isInvitation || User.hasAccepted(userToUpdate))
+
+  // FormData object to be used for the multipart/form-data put request
+  const [formData, setFormData] = useState(null)
 
   // form fields edit permissions
   const [editPermissions, setEditPermissions] = useState({
@@ -52,6 +56,9 @@ export const useUserViewState = props => {
     isInvitation || isUserAcceptPending ? UserValidator.validateInvitation : UserValidator.validateUser,
     !isInvitation
   )
+
+
+  // USER ATTRIBUTES
 
   // form object setters
   const setName = name => setObjectField('name', name)
@@ -76,6 +83,8 @@ export const useUserViewState = props => {
     }
   }, [])
 
+  const ready = useRef(isInvitation)
+
   useEffect(() => {
     if (loaded) {
       // set form object field from server side response
@@ -91,9 +100,31 @@ export const useUserViewState = props => {
         group: !isUserAcceptPending && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
       })
 
+      ready.current = true
       enableValidation()
     }
   }, [loaded])
+
+
+  // PROFILE PICTURE
+
+  const [profilePicture, setProfilePicture] = useState(null)
+  const prevProfilePicture = usePrevious(profilePicture)
+  const pictureChanged = useRef(false)
+
+  useEffect(() => {
+    setFormData(formDataPrev => ({ ...formDataPrev, ...formObject }))
+  }, [formObject])
+
+  useEffect(() => {
+    if (prevProfilePicture) {
+      pictureChanged.current = true
+      // Only send the picture file if it has been edited by the user
+      setFormData(formDataPrev => ({ ...formDataPrev, file: profilePicture }))
+    }
+  }, [profilePicture])
+
+  // SAVE
 
   // persist user/invitation actions
   const {
@@ -103,7 +134,7 @@ export const useUserViewState = props => {
     error: userSaveError,
   } = isInvitation
     ? useAsyncPostRequest(`/api/survey/${surveyId}/users/invite`, R.omit(['name'], formObject))
-    : useAsyncPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, formObject)
+    : useAsyncMultipartPutRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`, formData)
 
   useOnUpdate(() => {
     hideAppLoader()
@@ -131,6 +162,7 @@ export const useUserViewState = props => {
   }
 
   return {
+    ready: ready.current,
     loaded: isInvitation || loaded,
 
     isUserAcceptPending,
@@ -140,6 +172,7 @@ export const useUserViewState = props => {
     canEditName: editPermissions.name,
     canEditGroup: editPermissions.group,
     canEditEmail: editPermissions.email,
+    pictureEditorEnabled: userToUpdate.hasProfilePicture || pictureChanged.current,
 
     name: formObject.name,
     email: formObject.email,
@@ -151,6 +184,8 @@ export const useUserViewState = props => {
     setName,
     setEmail,
     setGroup,
+    setProfilePicture,
+
     sendRequest,
   }
 }

@@ -3,4 +3,4 @@ import axios from 'axios'
 
 import useAsync from './useAsync'
 
-export default (url, config = {}) => useAsync(axios.put, [url, config])
+export default (url, data = {}, config = {}) => useAsync(axios.put, [url, data, config])

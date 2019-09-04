@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 const aws = require('../../../system/aws')
 
 const UserManager = require('../manager/userManager')
@@ -51,7 +53,7 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   }
 }
 
-const updateUser = async (user, surveyId, userUuid, name, email, groupUuid) => {
+const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
@@ -77,7 +79,9 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid) => {
     await aws.updateEmail(oldEmail, email)
   }
 
-  return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid)
+  // Get profile picture
+  const profilePicture = file ? fs.readFileSync(file.tempFilePath) : null
+  return await UserManager.updateUser(user, surveyId, userUuid, name, email, groupUuid, profilePicture)
 }
 
 const updateUsername = async (user, userUuid, name) => {
@@ -95,6 +99,8 @@ module.exports = {
   fetchUsersBySurveyId,
 
   fetchUserByUuid: UserManager.fetchUserByUuid,
+
+  fetchUserProfilePicture: UserManager.fetchUserProfilePicture,
 
   updateUser,
 

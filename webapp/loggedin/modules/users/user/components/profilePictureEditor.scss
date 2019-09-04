@@ -1,0 +1,71 @@
+@import "../../../../../style/vars";
+
+.profile-picture-editor {
+  display: grid;
+  justify-content: center;
+  grid-row-gap: 0.75rem;
+
+  canvas {
+    border: $profilePictureBorder;
+    margin: auto;
+  }
+
+  .btn-upload {
+    padding: 0;
+  }
+}
+
+.profile-picture-editor__sliders {
+  justify-content: center;
+  grid-row-gap: 0.5rem;
+
+  .form-item {
+    grid-template-columns: 70px auto;
+  }
+
+  .slider {
+    padding: 0;
+    -webkit-appearance: none;
+    height: 8px;
+    border-radius: 4px;
+    background: $blueLight;
+    outline: none;
+    opacity: 0.7;
+
+    &:focus {
+      background-color: $blueLight;
+    }
+
+    &:disabled {
+      background: rgba($blueLight, .5);
+
+      &::-webkit-slider-thumb {
+        background: rgba($blue, .3);
+      }
+
+      &::-moz-range-thumb {
+        background: rgba($blue, .3);
+      }
+    }
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: $blue;
+    }
+
+    &::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: $blue;
+    }
+
+    &::-moz-focus-outer {
+      border: 0;
+    }
+  }
+}

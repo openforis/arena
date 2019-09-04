@@ -9,6 +9,7 @@ import { getUrlParam } from '../../../../utils/routerUtils'
 import useI18n from '../../../../commonComponents/useI18n.js'
 
 import Dropdown from '../../../../commonComponents/form/dropdown'
+import ProfilePicture from '../../../../commonComponents/profilePicture'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
 
 import Survey from '../../../../../common/survey/survey'
@@ -20,21 +21,44 @@ import * as SurveyState from '../../../../survey/surveyState'
 
 import { showAppLoader, hideAppLoader, showNotificationMessage, setUser } from '../../../../app/actions'
 
-import { useUserViewState } from './userViewState'
+import { useUserViewState } from './useUserViewState'
+
+import ProfilePictureEditor from './components/profilePictureEditor'
 
 const UserView = props => {
+
+  const { userUuid } = props
+
   const i18n = useI18n()
 
   const {
-    isInvitation, loaded,
+    ready, isInvitation,
     name, email, group, surveyGroups, objectValid,
     canEdit, canEditName, canEditGroup, canEditEmail,
     getFieldValidation, setName, setEmail, setGroup,
+    setProfilePicture,
+    pictureEditorEnabled,
     sendRequest,
   } = useUserViewState(props)
 
-  return loaded && (
-    <div className="form user">
+  return ready && (
+
+    <div className="user-view form">
+      {
+        !isInvitation && (
+          canEdit
+            ? (
+              <ProfilePictureEditor
+                userUuid={userUuid}
+                onPictureUpdate={setProfilePicture}
+                enabled={pictureEditorEnabled}/>
+            )
+            : (
+              <ProfilePicture userUuid={userUuid}/>
+            )
+        )
+      }
+
       {
         !isInvitation && (
           <FormItem label={i18n.t('common.name')}>
@@ -96,7 +120,7 @@ const mapStateToProps = (state, { match }) => {
     user,
     surveyInfo,
     groups,
-    userUuidUrlParam: getUrlParam('userUuid')(match),
+    userUuid: getUrlParam('userUuid')(match),
   }
 }
 

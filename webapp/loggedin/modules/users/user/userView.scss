@@ -1,21 +1,27 @@
-.form.user {
-    width: 50%;
-    align-content: center;
-    margin: auto;
+.user-view {
+  width: 50%;
+  margin: auto;
+  padding-top: 1rem;
+  grid-row-gap: 1.5rem;
 
-    .form-item {
-        grid-template-columns: .1fr .9fr;
+  .profile-picture {
+    margin-bottom: 20px;
+    justify-self: center;
+  }
 
-        .tooltip {
-            &:hover {
-                cursor: default;
-            }
-        }
+  .form-item {
+    grid-template-columns: .1fr .9fr;
+
+    .tooltip {
+      &:hover {
+        cursor: default;
+      }
     }
+  }
 
-    .btn {
-        justify-self: center;
-        padding-left: 3rem;
-        padding-right: 3rem;
-    }
+  .btn {
+    justify-self: center;
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
 }
