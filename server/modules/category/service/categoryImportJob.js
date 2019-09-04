@@ -1,6 +1,5 @@
 const Job = require('../../../job/job')
 
-const Survey = require('../../../../common/survey/survey')
 const Category = require('../../../../common/survey/category')
 const CategoryImportSummary = require('../../../../common/survey/categoryImportSummary')
 const CategoryLevel = require('../../../../common/survey/categoryLevel')
@@ -8,8 +7,8 @@ const CategoryItem = require('../../../../common/survey/categoryItem')
 const Validator = require('../../../../common/validation/validator')
 const ValidatorErrorKeys = require('../../../../common/validation/validatorErrorKeys')
 const StringUtils = require('../../../../common/stringUtils')
+const ObjectUtils = require('../../../../common/objectUtils')
 
-const SurveyManager = require('../../survey/manager/surveyManager')
 const CategoryManager = require('../manager/categoryManager')
 const CategoryImportCSVParser = require('./categoryImportCSVParser')
 const CategoryImportJobParams = require('./categoryImportJobParams')
@@ -54,8 +53,7 @@ class CategoryImportJob extends Job {
     const surveyId = this.getSurveyId()
     const user = this.getUser()
 
-    await CategoryManager.deleteLevelsByCategory(user, surveyId, categoryUuid, this.tx)
-    let category = await CategoryManager.fetchCategoryByUuid(surveyId, categoryUuid, true, false, this.tx)
+    let category = await CategoryManager.deleteLevelsByCategory(user, surveyId, categoryUuid, this.tx)
 
     const levelNames = CategoryImportSummary.getLevelNames(summary)
 
@@ -130,8 +128,8 @@ class CategoryImportJob extends Job {
             itemParentUuid,
             {
               [CategoryItem.props.code]: codeLevel,
-              [CategoryItem.props.labels]: labels[levelName],
-              [CategoryItem.props.descriptions]: descriptions[levelName],
+              [ObjectUtils.keysProps.labels]: labels[levelName],
+              [ObjectUtils.keysProps.descriptions]: descriptions[levelName],
               [CategoryItem.props.extra]: extra,
             }
           )

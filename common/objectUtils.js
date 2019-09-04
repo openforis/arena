@@ -76,6 +76,7 @@ const toUuidIndexedObj = R.partialRight(toIndexedObj, [keys.uuid])
 
 module.exports = {
   keys,
+  keysProps,
 
   setInPath,
 

@@ -12,9 +12,7 @@ const keys = {
 
 const props = {
   code: 'code',
-  descriptions: 'descriptions',
   extra: 'extra',
-  labels: 'labels',
 }
 
 // ====== CREATE
