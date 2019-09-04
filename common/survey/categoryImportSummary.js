@@ -22,9 +22,9 @@ const columnTypes = {
 }
 
 const columnDataTypes = {
-  geometryPoint: 'geometryPoint',
-  number: 'number',
   text: 'text',
+  number: 'number',
+  geometryPoint: 'geometryPoint',
 }
 
 // ===== SUMMARY
