@@ -37,3 +37,10 @@ $zIndex190AppLoader: 190;
 $shadow1: 0 0 4px rgba($black, .2);
 $shadow2: 0 0 8px rgba($black, .2);
 $shadow3: 0 0 8px 1px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.1);
+
+// table
+$tableRowHeight: 35px;
+$tableRowBorder: 1px solid $greyBorder;
+
+// profile picture
+$profilePictureBorder: 2px solid lighten($greyBorder, 10%);

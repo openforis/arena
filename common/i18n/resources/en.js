@@ -174,6 +174,13 @@ module.exports = {
     notAcceptedYet: 'Invitation not accepted yet',
   },
 
+  userView: {
+    scale: 'Scale',
+    rotate: 'Rotate',
+    dragAndDrop: 'Drop an image above or',
+    upload: 'click here to upload'
+  },
+
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',

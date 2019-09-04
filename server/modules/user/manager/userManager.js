@@ -58,7 +58,7 @@ const fetchUsersBySurveyId = async (surveyId, offset, limit, fetchSystemAdmins, 
 
 // ==== UPDATE
 
-const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, client = db) =>
+const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, profilePicture, client = db) =>
   await client.tx(async t => {
     const newGroup = await AuthGroupRepository.fetchGroupByUuid(groupUuid)
 
@@ -78,7 +78,7 @@ const _updateUser = async (user, surveyId, userUuid, name, email, groupUuid, cli
       t
     )
 
-    return await UserRepository.updateUser(userUuid, name, email, t)
+    return await UserRepository.updateUser(userUuid, name, email, profilePicture, t)
   })
 
 const updateUser = _userFetcher(_updateUser)
@@ -101,6 +101,8 @@ module.exports = {
   countUsersBySurveyId: UserRepository.countUsersBySurveyId,
 
   fetchUserByUuid,
+
+  fetchUserProfilePicture: UserRepository.fetchUserProfilePicture,
 
   fetchUserByEmail,
 

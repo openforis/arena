@@ -7,6 +7,7 @@ CREATE TABLE
   name  VARCHAR(128),
   email VARCHAR NOT NULL,
   prefs jsonb DEFAULT '{}'::jsonb,
+  profile_picture bytea
 
   PRIMARY KEY ("uuid"),
   CONSTRAINT user_email_idx UNIQUE ("email")

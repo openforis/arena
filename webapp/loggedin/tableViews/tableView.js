@@ -16,6 +16,7 @@ const TableView = props => {
     rowHeaderComponent, rowComponent, noItemsLabelKey,
     list, offset, limit, count,
     initList, fetchListItems,
+    onRowClick,
   } = props
 
   useEffect(() => {
@@ -59,7 +60,10 @@ const TableView = props => {
 
                 {
                   list.map((row, i) => (
-                    <div className="table__row" key={i} style={{ gridTemplateColumns }}>
+                    <div onClick={() => onRowClick && onRowClick(row)}
+                         className={`table__row${onRowClick ? ' hoverable' : ''}`}
+                         key={i}
+                         style={{ gridTemplateColumns }}>
                       {
                         React.createElement(
                           rowComponent,
@@ -90,8 +94,8 @@ TableView.defaultProps = {
   headerLeftComponent: () => <div></div>,
   rowHeaderComponent: () => <div></div>,
   rowComponent: () => <div></div>,
-  noItemsLabelKey: 'common.noItems'
-
+  noItemsLabelKey: 'common.noItems',
+  onRowClick: null,
 }
 
 const mapStateToProps = (state, props) => {

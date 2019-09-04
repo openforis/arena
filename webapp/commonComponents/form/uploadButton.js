@@ -14,8 +14,9 @@ const UploadButton = props => {
 
   const {
     label = i18n.t('common.upload'),
-    disabled, showLabel, maxSize, accept,
+    disabled, showLabel, showIcon, maxSize, accept,
     onChange,
+    className,
   } = props
 
   const fileInput = useRef(null)
@@ -36,14 +37,14 @@ const UploadButton = props => {
         }}/>
 
       <button
-        className="btn btn-s"
+        className={className || 'btn btn-s'}
         aria-disabled={disabled}
         onClick={() => {
           // first reset current value, then trigger click event
           fileInput.current.value = ''
           fileInput.current.dispatchEvent(new MouseEvent('click'))
         }}>
-        <span className={`icon icon-upload2 icon-14px${showLabel ? ' icon-left' : ''}`}/>
+        {showIcon && <span className={`icon icon-upload2 icon-14px${showLabel ? ' icon-left' : ''}`}/>}
         {showLabel && label}
       </button>
 
@@ -57,8 +58,10 @@ UploadButton.defaultProps = {
   label: null,
   onChange: null,
   showLabel: true,
+  showIcon: true,
   maxSize: 10, //mega bytes
-  accept: null //e.g. .txt, .xls (null = all type of files are accepted)
+  accept: null, //e.g. .txt, .xls (null = all type of files are accepted)
+  className: null, // Custom css class
 }
 
 export default UploadButton

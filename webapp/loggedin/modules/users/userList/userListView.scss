@@ -1,5 +1,7 @@
-.user-list {
-  .table__row, .table__row-header {
-    grid-template-columns: repeat(4, 1fr);
-  }
+@import "../../../../style/vars";
+
+.users-list__cell-profile-picture {
+  height: $tableRowHeight;
+  display: flex;
+  align-items: center;
 }

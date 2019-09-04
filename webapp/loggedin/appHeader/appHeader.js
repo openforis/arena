@@ -1,18 +1,26 @@
 import './appHeader.scss'
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { connect } from 'react-redux'
+
+import { usePrevious } from '../../commonComponents/hooks'
+import ProfilePicture from '../../commonComponents/profilePicture'
 
 import UserPopupMenu from './components/userPopupMenu'
 
+import User from '../../../common/user/user'
 import Survey from '../../../common/survey/survey'
 
 import * as AppState from '../../app/appState'
 import * as SurveyState from '../../survey/surveyState'
 
 const AppHeader = props => {
-  const { surveyInfo, lang } = props
+  const { user, surveyInfo, lang } = props
   const [showUserPopup, setShowUserPopup] = useState(false)
+  const prevUser = usePrevious(user)
+  const pictureUpdateKeyRef = useRef(0)
+
+  pictureUpdateKeyRef.current += !!(prevUser !== user)
 
   return (
     <div className="app-header">
@@ -29,7 +37,13 @@ const AppHeader = props => {
            onClick={() => {
              setShowUserPopup(showUserPopupPrev => !showUserPopupPrev)
            }}>
-        <img src="https://cdn0.iconfinder.com/data/icons/user-pictures/100/unknown2-512.png"/>
+
+        <ProfilePicture
+          userUuid={User.getUuid(user)}
+          forceUpdateKey={pictureUpdateKeyRef.current}
+          thumbnail={true}
+        />
+
         <button className="btn btn-transparent">
           <span className="icon icon-ctrl"/>
         </button>
