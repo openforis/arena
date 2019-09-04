@@ -27,26 +27,34 @@ const countUsersBySurveyId = async (user, surveyId) => {
 }
 
 const inviteUser = async (user, surveyId, email, groupUuid) => {
-  if (!Authorizer.isSystemAdmin(user)) {
-    const group = await AuthManager.fetchGroupByUuid(groupUuid)
+  const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
-    if (AuthGroups.isSystemAdminGroup(group))
-      throw new UnauthorizedError(User.getName(user))
+  // Only system admins can invite new system admins
+  if (!Authorizer.isSystemAdmin(user) && AuthGroups.isSystemAdminGroup(group)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+
+  // If the survey is not published, only survey admins and system admins can be invited
+  const survey = await SurveyManager.fetchSurveyById(surveyId)
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const isPublished = Survey.isPublished(surveyInfo)
+  if (!isPublished && !(AuthGroups.isSystemAdminGroup(group) || AuthGroups.isSurveyAdminGroup(group, surveyInfo))) {
+    throw new UnauthorizedError(User.getName(user))
   }
 
   const dbUser = await UserManager.fetchUserByEmail(email)
   if (dbUser) {
-    const survey = await SurveyManager.fetchSurveyById(surveyId)
     const newUserGroups = User.getAuthGroups(dbUser)
     const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(Survey.getSurveyInfo(survey)))
 
     if (hasRoleInSurvey) {
       throw new SystemError('userHasRole')
-    } else if (Authorizer.isSystemAdmin(dbUser)) {
-      throw new SystemError('userIsAdmin')
-    } else {
-      await UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser)
     }
+    if (Authorizer.isSystemAdmin(dbUser)) {
+      throw new SystemError('userIsAdmin')
+    }
+
+    await UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser)
   } else {
     const { User: { Username: userUuid } } = await aws.inviteUser(email)
     await UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)

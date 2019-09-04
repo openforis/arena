@@ -6,7 +6,6 @@ const User = require('../user/user')
 const AuthGroups = require('./authGroups')
 
 const {
-  groupNames,
   permissions,
   keys,
   getAuthGroups,
@@ -14,12 +13,10 @@ const {
 
 const isSystemAdmin = user =>
   user &&
-  R.any(
-    group => AuthGroups.getName(group) === groupNames.systemAdmin
-  )(User.getAuthGroups(user))
+  R.any(AuthGroups.isSystemAdminGroup)(User.getAuthGroups(user))
 
 const isSurveyAdmin = (user, surveyInfo) =>
-  AuthGroups.getName(getSurveyUserGroup(user, surveyInfo)) === groupNames.surveyAdmin
+  AuthGroups.isSurveyAdminGroup(getSurveyUserGroup(user, surveyInfo), surveyInfo)
 
 // ======
 // ====== Survey

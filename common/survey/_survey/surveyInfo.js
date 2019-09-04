@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const SurveyUtils = require('../surveyUtils')
 
-const { groupNames } = require('../../auth/authGroups')
+const AuthGroups = require('../../auth/authGroups')
 const { isBlank } = require('../../stringUtils')
 
 const keys = {
@@ -104,11 +104,6 @@ const isValid = surveyInfo => surveyInfo && surveyInfo.id
 
 const getAuthGroups = R.prop(keys.authGroups)
 
-const getSurveyAdminGroup = R.pipe(
-  getAuthGroups,
-  R.find(g => g.name === groupNames.surveyAdmin)
-)
-
 module.exports = {
   keys,
   collectReportKeys,
@@ -141,7 +136,7 @@ module.exports = {
 
   // ====== AUTH GROUPS
   getAuthGroups,
-  getSurveyAdminGroup,
+  getSurveyAdminGroup: AuthGroups.getSurveyAdminGroup,
 
   // ====== UTILS
   isValid,

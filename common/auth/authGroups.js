@@ -56,6 +56,14 @@ R.pipe(
   R.equals(groupNames.systemAdmin)
 )
 
+const getSurveyAdminGroup = R.pipe(
+  getAuthGroups,
+  R.find(g => g.name === groupNames.surveyAdmin)
+)
+
+const isSurveyAdminGroup = (group, surveyInfo) =>
+  getUuid(getSurveyAdminGroup(surveyInfo)) === getUuid(group)
+
 module.exports = {
   keys,
   permissions,
@@ -63,7 +71,9 @@ module.exports = {
 
   getUuid,
   getName,
+  getSurveyAdminGroup,
   isSystemAdminGroup,
+  isSurveyAdminGroup,
   getSurveyUuid,
   getAuthGroups,
 }

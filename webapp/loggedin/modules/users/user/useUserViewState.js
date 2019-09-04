@@ -68,20 +68,23 @@ export const useUserViewState = props => {
     setObjectField('groupUuid', groupUuid)
   }
 
-  const [surveyGroups, setSurveyGroups] = useState([])
+  const [surveyGroupsMenuItems, setSurveyGroupsMenuItems] = useState([])
 
   useEffect(() => {
     // init form groups
+
+    // All groups if published, SurveyAdmin group otherwise
     const surveyGroups = Survey.isPublished(surveyInfo)
       ? Survey.getAuthGroups(surveyInfo)
       : [Survey.getSurveyAdminGroup(surveyInfo)]
 
+    // Add SystemAdmin group if current user is a SystemAdmin himself
     const menuGroups = R.when(
       R.always(Authorizer.isSystemAdmin(user)),
       R.concat(User.getAuthGroups(user))
     )(surveyGroups)
 
-    setSurveyGroups(menuGroups.map(g => ({
+    setSurveyGroupsMenuItems(menuGroups.map(g => ({
       uuid: AuthGroups.getUuid(g),
       label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label`)
     })))
@@ -185,8 +188,8 @@ export const useUserViewState = props => {
 
     name: formObject.name,
     email: formObject.email,
-    group: surveyGroups.find(R.propEq('uuid', formObject.groupUuid)),
-    surveyGroups,
+    group: surveyGroupsMenuItems.find(R.propEq('uuid', formObject.groupUuid)),
+    surveyGroupsMenuItems,
     objectValid,
 
     getFieldValidation,
