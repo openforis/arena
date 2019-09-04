@@ -45,7 +45,7 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   const dbUser = await UserManager.fetchUserByEmail(email)
   if (dbUser) {
     const newUserGroups = User.getAuthGroups(dbUser)
-    const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(Survey.getSurveyInfo(survey)))
+    const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
 
     if (hasRoleInSurvey) {
       throw new SystemError('userHasRole')
@@ -65,12 +65,10 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
-  const groupUserToUpdate = Authorizer.getSurveyUserGroup(userToUpdate, surveyInfo)
+  const groupToUpdate = Authorizer.getSurveyUserGroup(userToUpdate, surveyInfo)
 
-  if (AuthGroups.getUuid(groupUserToUpdate) !== groupUuid) {
-    if (!Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)) {
-      throw new UnauthorizedError(User.getName(user))
-    }
+  if (AuthGroups.getUuid(groupToUpdate) !== groupUuid && !Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate)) {
+    throw new UnauthorizedError(User.getName(user))
   }
 
   // Check if email has changed
