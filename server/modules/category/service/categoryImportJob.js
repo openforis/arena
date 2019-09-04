@@ -124,7 +124,7 @@ class CategoryImportJob extends Job {
   }
 
   async _importRow (itemRow, levels) {
-    const { levelIndexDeeper, codes, labels, descriptions, extra } = itemRow
+    const { levelIndexDeeper, codes, labelsByLevel, descriptionsByLevel, extra } = itemRow
 
     if (this._checkCodesNotEmpty(codes)) {
       for (let levelIndex = 0; levelIndex <= levelIndexDeeper; levelIndex++) {
@@ -148,8 +148,6 @@ class CategoryImportJob extends Job {
             itemParentUuid = CategoryItem.getUuid(itemParent)
           }
 
-          // this.logDebug('inserting item', codesLevel)
-
           const codeLevel = codesLevel[codesLevel.length - 1]
 
           this.itemsByCodes[codesLevel] = CategoryItem.newItem(
@@ -157,8 +155,8 @@ class CategoryImportJob extends Job {
             itemParentUuid,
             {
               [CategoryItem.props.code]: codeLevel,
-              [ObjectUtils.keysProps.labels]: labels[levelName],
-              [ObjectUtils.keysProps.descriptions]: descriptions[levelName],
+              [ObjectUtils.keysProps.labels]: labelsByLevel[levelName],
+              [ObjectUtils.keysProps.descriptions]: descriptionsByLevel[levelName],
               [CategoryItem.props.extra]: extra,
             }
           )

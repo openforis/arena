@@ -16,8 +16,6 @@ const keysProps = {
 
 const getUuid = R.propOr(null, keys.uuid)
 
-const isEqual = other => self => getUuid(other) === getUuid(self)
-
 const getProps = R.propOr({}, keys.props)
 
 const getProp = (prop, defaultTo = null) => R.pipe(
@@ -62,7 +60,17 @@ const setInPath = (pathArray = [], value = '') => obj => {
   return obj
 }
 
+const clean = obj => {
+  for (const [key, value] of Object.entries(obj))
+    if (value === null || value === undefined || R.isEmpty(obj))
+      delete obj[key]
+
+  return obj
+}
+
 // UTILS / uuid
+
+const isEqual = other => self => getUuid(other) === getUuid(self)
 
 const toIndexedObj = (array, prop) => array.reduce(
   (acc, item) => {
@@ -78,26 +86,23 @@ module.exports = {
   keys,
   keysProps,
 
-  setInPath,
-
-  // PROPS
+  // READ
   getProps,
   getProp,
-  setProp,
-
   getUuid,
   getParentUuid: R.propOr(null, keys.parentUuid),
-
-  // LABELS
   getLabels,
   getLabel,
-
-  // DESCRIPTIONS
   getDescriptions,
   getDescription,
 
+  // UPDATE
+  setProp,
+  setInPath,
+  clean,
+
   // UTILS
+  isEqual,
   toIndexedObj,
   toUuidIndexedObj,
-  isEqual,
 }

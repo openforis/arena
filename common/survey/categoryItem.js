@@ -20,7 +20,7 @@ const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
   [keys.uuid]: uuidv4(),
   [keys.levelUuid]: levelUuid,
   [keys.parentUuid]: parentItemUuid,
-  [keys.props]: props,
+  [keys.props]: ObjectUtils.clean(props),
 })
 
 // ====== READ

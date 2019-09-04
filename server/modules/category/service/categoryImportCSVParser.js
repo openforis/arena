@@ -95,8 +95,8 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
 
       const codes = []
       const extra = {}
-      const labels = {}
-      const descriptions = {}
+      const labelsByLevel = {}
+      const descriptionsByLevel = {}
 
       Object.entries(columns).forEach(
         ([columnName, column], index) => {
@@ -113,9 +113,9 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
               const levelName = CategoryImportSummary.getColumnLevelName(column)
 
               if (CategoryImportSummary.isColumnLabel(column))
-                ObjectUtils.setInPath([levelName, lang], columnValue)(labels)
+                ObjectUtils.setInPath([levelName, lang], columnValue)(labelsByLevel)
               else if (CategoryImportSummary.isColumnDescription(column))
-                ObjectUtils.setInPath([levelName, lang], columnValue)(descriptions)
+                ObjectUtils.setInPath([levelName, lang], columnValue)(descriptionsByLevel)
             }
           }
         }
@@ -127,8 +127,8 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
       await onRowItem({
         levelIndexDeeper,
         codes: codes.slice(0, levelIndexDeeper + 1),
-        labels,
-        descriptions,
+        labelsByLevel,
+        descriptionsByLevel,
         extra
       })
     },
@@ -154,10 +154,15 @@ const _readHeaders = filePath => new Promise((resolve, reject) => {
 
 const _validateSummary = summary => {
   const columns = CategoryImportSummary.getColumns(summary)
+
+  let atLeastOneCodeColumn = false
+
   Object.entries(columns).forEach(([columnName, column]) => {
-    //if column is label or description, a code in the same level must be defined
-    if (CategoryImportSummary.isColumnLabel(column) ||
+    if (CategoryImportSummary.isColumnCode(column)) {
+      atLeastOneCodeColumn = true
+    } else if (CategoryImportSummary.isColumnLabel(column) ||
       CategoryImportSummary.isColumnDescription(column)) {
+      //if column is label or description, a code in the same level must be defined
 
       if (!CategoryImportSummary.hasColumn(CategoryImportSummary.columnTypes.code, CategoryImportSummary.getColumnLevelIndex(column))(summary)) {
         const levelName = CategoryImportSummary.getColumnLevelName(column)
@@ -166,6 +171,10 @@ const _validateSummary = summary => {
       }
     }
   })
+
+  if (!atLeastOneCodeColumn) {
+    throw new SystemError(ValidatorErrorKeys.categoryImport.codeColumnMissing)
+  }
 }
 
 module.exports = {

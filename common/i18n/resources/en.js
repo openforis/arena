@@ -327,6 +327,7 @@ module.exports = {
     },
 
     categoryImport: {
+      codeColumnMissing: 'There should be at least one "code" column',
       codeRequired: '{{columnName}}: a code is required',
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
       columnMissing: 'Missing column: {{columnNameMissing}}',
