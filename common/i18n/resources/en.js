@@ -177,6 +177,7 @@ module.exports = {
   userView: {
     scale: 'Scale',
     rotate: 'Rotate',
+    errorSavingUser: 'Error saving user: {{error}}',
     dragAndDrop: 'Drop an image above or',
     upload: 'click here to upload'
   },

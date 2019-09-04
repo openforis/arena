@@ -1,6 +1,8 @@
 const R = require('ramda')
 const StringUtils = require('../stringUtils')
 
+const AuthGroups = require('../auth/authGroups')
+
 const keys = {
   uuid: 'uuid',
   name: 'name',
@@ -21,6 +23,10 @@ const getEmail = R.prop(keys.email)
 
 const getAuthGroups = R.prop(keys.authGroups)
 
+const isSystemAdmin = user =>
+  user &&
+  R.any(AuthGroups.isSystemAdminGroup)(getAuthGroups(user))
+
 const hasAccepted = R.pipe(
   R.propOr('', keys.name),
   StringUtils.isNotBlank
@@ -34,5 +40,6 @@ module.exports = {
   getName,
   getEmail,
   getAuthGroups,
+  isSystemAdmin,
   hasAccepted,
 }

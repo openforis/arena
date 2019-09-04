@@ -33,7 +33,7 @@ const UserView = props => {
 
   const {
     ready, isInvitation,
-    name, email, group, surveyGroups, objectValid,
+    name, email, group, surveyGroupsMenuItems, objectValid,
     canEdit, canEditName, canEditGroup, canEditEmail,
     getFieldValidation, setName, setEmail, setGroup,
     setProfilePicture,
@@ -85,7 +85,7 @@ const UserView = props => {
           disabled={!canEditGroup}
           validation={getFieldValidation('groupUuid')}
           placeholder={i18n.t('common.group')}
-          items={surveyGroups}
+          items={surveyGroupsMenuItems}
           itemKeyProp={'uuid'}
           itemLabelProp={'label'}
           selection={group}
@@ -111,15 +111,9 @@ const mapStateToProps = (state, { match }) => {
   const surveyInfo = SurveyState.getSurveyInfo(state)
   const user = AppState.getUser(state)
 
-  const groups = R.when(
-    R.always(Authorizer.isSystemAdmin(user)),
-    R.concat(User.getAuthGroups(user))
-  )(Survey.getAuthGroups(surveyInfo))
-
   return {
     user,
     surveyInfo,
-    groups,
     userUuid: getUrlParam('userUuid')(match),
   }
 }

@@ -14,7 +14,7 @@ const selectFieldsCommaSep = selectFields.map(f => `u.${f}`).join(',')
 
 const insertUser = async (surveyId, uuid, email, client = db) =>
   await client.one(`
-    INSERT INTO "user" (uuid, email, prefs)
+    INSERT INTO "user" AS u (uuid, email, prefs)
     VALUES ($1, $2, $3::jsonb)
     RETURNING ${selectFieldsCommaSep}`,
     [uuid, email, { survey: surveyId }],
