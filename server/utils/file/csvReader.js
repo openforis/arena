@@ -29,6 +29,9 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
     }
 
     const onData = data => {
+      if (canceled)
+        return resolve()
+
       if (headers) {
         const wasEmpty = queue.isEmpty()
         queue.enqueue(data)

@@ -81,6 +81,10 @@ $borderColor: $greyBorder;
     cursor: pointer;
   }
 
+  .labels-editor.with-label {
+    grid-template-columns: .3fr .65fr;
+  }
+
   .btn-close {
     position: absolute;
     right: 0;
@@ -89,12 +93,6 @@ $borderColor: $greyBorder;
 
   .btn-delete {
     justify-self: center;
-  }
-
-  > div {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 }
 
