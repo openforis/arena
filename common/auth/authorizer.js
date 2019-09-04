@@ -133,7 +133,6 @@ const canEditUserGroup = (user, surveyInfo, userToUpdate) => {
 }
 
 module.exports = {
-  isSystemAdmin: () => {},
   getSurveyUserGroup,
 
   // Survey permissions
