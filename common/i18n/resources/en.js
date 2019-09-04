@@ -306,6 +306,13 @@ module.exports = {
       levelDuplicate: 'Level name is duplicate',
     },
 
+    categoryImport: {
+      codeRequired: '{{columnName}}: a code is required',
+      codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
+      columnMissing: 'Missing column: {{columnNameMissing}}',
+      emptyHeaderFound: 'The file contains an empty header'
+    },
+
     nodeDefEdit: {
       applyIfDuplicate: '"Apply if" condition is duplicate',
       countMaxMustBePositiveNumber: 'Max Count must be a positive integer',
@@ -360,6 +367,7 @@ module.exports = {
   // ====== Jobs
   jobs: {
     CategoriesImportJob: 'Categories Import',
+    CategoryImportJob: 'Category Import',
     CategoriesValidationJob: 'Categories Validation',
     CollectImportJob: 'Collect Import',
     CollectSurveyReaderJob: 'Collect Survey Reader',

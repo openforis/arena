@@ -7,6 +7,7 @@ import { normalizeName } from '../../../../../common/stringUtils'
 
 import LevelEdit from './levelEdit'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
+import UploadButton from '../../../../commonComponents/form/uploadButton'
 import useI18n from '../../../../commonComponents/useI18n'
 
 import Category from '../../../../../common/survey/category'
@@ -16,7 +17,7 @@ import { getFieldValidation } from '../../../../../common/validation/validator'
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
 
-import { putCategoryProp, createCategoryLevel, setCategoryForEdit } from '../actions'
+import { putCategoryProp, createCategoryLevel, setCategoryForEdit, uploadCategory } from '../actions'
 
 import Authorizer from '../../../../../common/auth/authorizer'
 
@@ -24,7 +25,7 @@ const CategoryEdit = props => {
 
   const {
     category, readOnly,
-    putCategoryProp, createCategoryLevel, setCategoryForEdit,
+    putCategoryProp, createCategoryLevel, setCategoryForEdit, uploadCategory,
   } = props
 
   const { validation } = category
@@ -34,13 +35,20 @@ const CategoryEdit = props => {
 
   return (
     <div className="category-edit">
-      <div>
+      <div className="category-edit__header">
         <FormItem label={i18n.t('categoryEdit.categoryName')}>
           <Input value={Category.getName(category)}
                  validation={getFieldValidation('name')(validation)}
                  onChange={value => putCategoryProp(category, 'name', normalizeName(value))}
                  readOnly={readOnly}/>
+
         </FormItem>
+
+        {!readOnly &&
+        <UploadButton label={i18n.t('common.csvImport')}
+                      accept=".csv"
+                      onChange={(files) => uploadCategory(Category.getUuid(category), files[0])}/>
+        }
       </div>
 
       <div className="category-edit__levels">
@@ -83,5 +91,6 @@ export default connect(
     putCategoryProp,
     createCategoryLevel,
     setCategoryForEdit,
+    uploadCategory,
   }
 )(CategoryEdit)

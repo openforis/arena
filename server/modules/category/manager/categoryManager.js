@@ -33,7 +33,7 @@ const insertCategory = async (user, surveyId, category, client = db) =>
     //insert levels
     const levelsDb = await Promise.all(
       levels.map(async level =>
-        await CategoryRepository.insertLevel(surveyId, Category.getUuid(categoryDb), level, t)
+        await CategoryRepository.insertLevel(surveyId, level, t)
       )
     )
     await markSurveyDraft(surveyId, t)
@@ -43,16 +43,13 @@ const insertCategory = async (user, surveyId, category, client = db) =>
     return await assocValidation(Category.assocLevelsArray(levelsDb)(categoryDb))
   })
 
-const insertLevel = async (user, surveyId, categoryUuid, level, client = db) =>
-  await client.tx(async t => {
-    const levelDb = await CategoryRepository.insertLevel(surveyId, categoryUuid, level, t)
-
-    await markSurveyDraft(surveyId, t)
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, { categoryUuid, level }, t)
-
-    return levelDb
-  })
+const insertLevel = async (user, surveyId, level, client = db) =>
+  (await client.tx(t => Promise.all([
+      CategoryRepository.insertLevel(surveyId, level, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelInsert, { level }, t)
+    ])
+  ))[0]
 
 const insertItem = async (user, surveyId, item, client = db) =>
   await client.tx(async t => {
@@ -63,6 +60,20 @@ const insertItem = async (user, surveyId, item, client = db) =>
     await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemInsert, item, t)
 
     return itemDb
+  })
+
+const insertItems = async (user, surveyId, items, client = db) =>
+  await client.tx(async t => {
+    await CategoryRepository.insertItems(surveyId, items, client)
+
+    await markSurveyDraft(surveyId, t)
+
+    const activities = items.map(item => ({
+        type: ActivityLog.type.categoryItemInsert,
+        params: item
+      })
+    )
+    await ActivityLog.logMany(user, surveyId, activities, client)
   })
 
 // ====== READ
@@ -80,8 +91,8 @@ const fetchCategoriesAndLevels = async (surveyId, draft, client = db) => {
   )
 }
 
-const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, validate = true) => {
-  const categories = await fetchCategoriesAndLevels(surveyId, draft)
+const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, validate = true, client = db) => {
+  const categories = await fetchCategoriesAndLevels(surveyId, draft, client)
   const category = R.find(R.propEq('uuid', categoryUuid))(categories)
 
   return validate
@@ -149,29 +160,39 @@ const updateItemProp = async (user, surveyId, itemUuid, key, value, client = db)
   })
 
 // ====== DELETE
-const deleteCategory = async (user, surveyId, categoryUuid) =>
-  await db.tx(async t => {
-    await CategoryRepository.deleteCategory(surveyId, categoryUuid, t)
-    await markSurveyDraft(surveyId, t)
+const deleteCategory = async (user, surveyId, categoryUuid, client = db) =>
+  await client.tx(t => Promise.all([
+      CategoryRepository.deleteCategory(surveyId, categoryUuid, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryDelete, { categoryUuid }, t)
+    ])
+  )
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryDelete, { categoryUuid }, t)
-  })
+const deleteLevel = async (user, surveyId, levelUuid, client = db) =>
+  await client.tx(t => Promise.all([
+      CategoryRepository.deleteLevel(surveyId, levelUuid, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, { levelUuid }, t)
+    ])
+  )
 
-const deleteLevel = async (user, surveyId, levelUuid) =>
-  await db.tx(async t => {
-    await CategoryRepository.deleteLevel(surveyId, levelUuid, t)
-    await markSurveyDraft(surveyId, t)
+const deleteLevelsByCategory = async (user, surveyId, categoryUuid, client = db) => {
+  await client.tx(t => Promise.all([
+      CategoryRepository.deleteLevelsByCategory(surveyId, categoryUuid, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelsDelete, { categoryUuid }, t)
+    ])
+  )
+  return await fetchCategoryByUuid(surveyId, categoryUuid, true, false, client)
+}
 
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryLevelDelete, { levelUuid }, t)
-  })
-
-const deleteItem = async (user, surveyId, itemUuid) =>
-  await db.tx(async t => {
-    await CategoryRepository.deleteItem(surveyId, itemUuid, t)
-    await markSurveyDraft(surveyId, t)
-
-    await ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemDelete, { itemUuid }, t)
-  })
+const deleteItem = async (user, surveyId, itemUuid, client = db) =>
+  await client.tx(t => Promise.all([
+      CategoryRepository.deleteItem(surveyId, itemUuid, t),
+      markSurveyDraft(surveyId, t),
+      ActivityLog.log(user, surveyId, ActivityLog.type.categoryItemDelete, { itemUuid }, t)
+    ])
+  )
 
 module.exports = {
 
@@ -182,7 +203,7 @@ module.exports = {
   insertCategory,
   insertLevel,
   insertItem,
-  insertItems: CategoryRepository.insertItems,
+  insertItems,
 
   //READ
   fetchCategoryByUuid,
@@ -201,5 +222,6 @@ module.exports = {
   //DELETE
   deleteCategory,
   deleteLevel,
+  deleteLevelsByCategory,
   deleteItem,
 }

@@ -16,6 +16,13 @@ module.exports = {
     levelDuplicate: 'validationErrors.categoryEdit.levelDuplicate',
   },
 
+  categoryImport: {
+    codeDuplicate: 'validationErrors.categoryImport.codeDuplicate',
+    codeRequired: 'validationErrors.categoryImport.codeRequired',
+    columnMissing: 'validationErrors.categoryImport.columnMissing',
+    emptyHeaderFound: 'validationErrors.categoryImport.emptyHeaderFound',
+  },
+
   nodeDefEdit: {
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',
     countMaxMustBePositiveNumber: 'validationErrors.nodeDefEdit.countMaxMustBePositiveNumber',

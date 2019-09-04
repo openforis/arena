@@ -41,9 +41,13 @@ class TaxonomyImportJob extends Job {
     }
 
     this.taxonomyImportManager = null //to be initialized before starting the import
+
+    this.csvParser = new CSVParser(this.filePath)
   }
 
   async execute (tx) {
+    await this.csvParser.init()
+
     const { taxonomyUuid } = this
     const surveyId = this.getSurveyId()
 
@@ -58,7 +62,7 @@ class TaxonomyImportJob extends Job {
     }
 
     // 2. calculate total number of rows
-    this.total = await new CSVParser(this.filePath).calculateSize()
+    this.total = await this.csvParser.calculateSize()
 
     this.logDebug(`${this.total} rows found in the CSV file`)
 
@@ -85,12 +89,9 @@ class TaxonomyImportJob extends Job {
 
     this.taxonomyImportManager = new TaxonomyImportManager(this.getUser(), surveyId, this.vernacularLanguageCodes)
 
-    const csvParser = new CSVParser(this.filePath)
-    csvParser.init()
-
     this.processed = 0
 
-    let row = await csvParser.next()
+    let row = await this.csvParser.next()
 
     while (row) {
       if (this.isCanceled()) {
@@ -99,7 +100,7 @@ class TaxonomyImportJob extends Job {
 
       await this.processRow(row)
 
-      row = await csvParser.next()
+      row = await this.csvParser.next()
     }
 
     this.logDebug(`CSV file processed, ${this.processed} rows processed`)
@@ -114,14 +115,11 @@ class TaxonomyImportJob extends Job {
       }
     }
 
-    csvParser.destroy()
+    this.csvParser.destroy()
   }
 
   async processHeaders () {
-    const csvParser = new CSVParser(this.filePath, false)
-    csvParser.init()
-    const headers = await csvParser.next()
-    csvParser.destroy()
+    const headers = this.csvParser.headers
     const validHeaders = this.validateHeaders(headers)
     if (validHeaders) {
       this.vernacularLanguageCodes = R.innerJoin((a, b) => a === b, languageCodes, headers)

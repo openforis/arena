@@ -24,6 +24,8 @@ import {
   categoriesUpdate,
 } from '../../../survey/categories/actions'
 
+import { showAppJobMonitor } from '../../../app/actions'
+
 export const categoryEditUpdate = 'surveyForm/categoryEdit/update'
 export const categoryEditLevelActiveItemUpdate = 'surveyForm/categoryEdit/levelActiveItem/update'
 
@@ -67,6 +69,21 @@ export const createCategory = () => async (dispatch, getState) => {
   return category
 }
 
+export const uploadCategory = (categoryUuid, file) => async (dispatch, getState) => {
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const surveyId = SurveyState.getSurveyId(getState())
+  const { data: summary } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData)
+
+  const { data: { job } } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, summary)
+
+  dispatch(showAppJobMonitor(job, () => {
+    // reload category
+    dispatch(setCategoryForEdit({[Category.keys.uuid]: categoryUuid}))
+  }))
+}
+
 export const createCategoryLevel = (category) => async (dispatch, getState) => {
   const level = Category.newLevel(category)
   const surveyId = SurveyState.getSurveyId(getState())
@@ -76,7 +93,7 @@ export const createCategoryLevel = (category) => async (dispatch, getState) => {
 }
 
 export const createCategoryLevelItem = (category, level, parentItem) => async (dispatch, getState) => {
-  const item = CategoryItem.newItem(CategoryLevel.getUuid(level), parentItem)
+  const item = CategoryItem.newItem(CategoryLevel.getUuid(level), CategoryItem.getUuid(parentItem))
   dispatch({ type: categoryItemCreate, level, item })
 
   const surveyId = SurveyState.getSurveyId(getState())

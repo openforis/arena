@@ -3,6 +3,7 @@ const R = require('ramda')
 const Category = require('../../../../../../common/survey/category')
 const CategoryItem = require('../../../../../../common/survey/categoryItem')
 const CategoryLevel = require('../../../../../../common/survey/categoryLevel')
+const ObjectUtils = require('../../../../../../common/objectUtils')
 
 const Job = require('../../../../../job/job')
 const BatchPersister = require('../../../../../db/batchPersister')
@@ -81,7 +82,7 @@ class CategoriesImportJob extends Job {
 
         const hierarchyLevel = hierarchyLevels[i]
         const levelToCreate = Category.assocLevelName(hierarchyLevel.attributes.name)(Category.newLevel(category))
-        const level = await CategoryManager.insertLevel(user, surveyId, Category.getUuid(category), levelToCreate, tx)
+        const level = await CategoryManager.insertLevel(user, surveyId, levelToCreate, tx)
 
         category = Category.assocLevel(level)(category)
       }
@@ -100,9 +101,9 @@ class CategoriesImportJob extends Job {
       const labels = CollectSurvey.toLabels('label', defaultLanguage)(collectItem)
 
       const itemCode = CollectSurvey.getChildElementText('code')(collectItem)
-      const item = CategoryItem.newItem(levelUuid, parentItem, {
+      const item = CategoryItem.newItem(levelUuid, CategoryItem.getUuid(parentItem), {
         [CategoryItem.props.code]: itemCode,
-        [CategoryItem.props.labels]: labels
+        [ObjectUtils.keysProps.labels]: labels
       })
       await this.itemBatchPersister.addItem(item, tx)
 

@@ -8,6 +8,11 @@ $borderColor: $greyBorder;
   align-items: center;
 }
 
+.category-edit__header {
+  display: grid;
+  grid-template-columns: .8fr .1fr;
+}
+
 .category-edit__levels {
   display: flex;
   //justify-content: center;
@@ -59,9 +64,10 @@ $borderColor: $greyBorder;
   border-bottom: 1px dotted $borderColor;
   display: grid;
   align-content: center;
-  grid-template-columns: 35px 80px 1fr;
+  grid-template-columns: 80px 35px 1fr;
   min-height: 35px;
   grid-row-gap: 2rem;
+  font-size: .9rem;
 
   &.active {
     grid-template-columns: 1fr;

@@ -109,14 +109,8 @@ export const uploadTaxonomyFile = (taxonomy, file) => async (dispatch, getState)
   const formData = new FormData()
   formData.append('file', file)
 
-  const config = {
-    headers: {
-      'content-type': 'multipart/form-data'
-    }
-  }
-
   const surveyId = SurveyState.getSurveyId(getState())
-  const { data } = await axios.post(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/upload`, formData, config)
+  const { data } = await axios.post(`/api/survey/${surveyId}/taxonomies/${Taxonomy.getUuid(taxonomy)}/upload`, formData)
 
   dispatch(showAppJobMonitor(data.job, () => {
     //on import complete validate taxonomy and reload taxa

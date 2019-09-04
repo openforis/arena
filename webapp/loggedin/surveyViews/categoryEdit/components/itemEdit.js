@@ -18,7 +18,7 @@ const ItemEdit = (props) => {
 
   useEffect(() => {
     if (props.active) {
-      elemRef.current.scrollIntoView()
+      elemRef.current.scrollIntoView(false)
     }
   }, [props.active])
 

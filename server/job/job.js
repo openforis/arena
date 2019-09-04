@@ -358,12 +358,12 @@ class Job {
     return `job-${this.uuid}-progress`
   }
 
-  logDebug (message) {
-    this._logger.debug(message)
+  logDebug (...msgs) {
+    this._logger.debug(...msgs)
   }
 
-  logError (message) {
-    this._logger.error(message)
+  logError (...msgs) {
+    this._logger.error(...msgs)
   }
 
 }

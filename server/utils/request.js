@@ -39,19 +39,6 @@ const getJsonParam = (req, param, defaultValue = null) => {
     : defaultValue
 }
 
-const toQueryString = obj =>
-  R.reduce((acc, key) => {
-    const value = R.prop(key)(obj)
-    if (value || value === false) {
-      const reqVal = R.is(Object, value)
-        ? JSON.stringify(value)
-        : value
-      return `${acc}&${key}=${reqVal}`
-    } else {
-      return acc
-    }
-  }, '')(R.keys(obj))
-
 const getRequiredParam = (req, param) => {
   const value = getRestParam(req, param, '')
   if (R.isEmpty(value))
@@ -72,7 +59,6 @@ module.exports = {
   getRestParam,
   getBoolParam,
   getJsonParam,
-  toQueryString,
   getRequiredParam,
   getFile,
 

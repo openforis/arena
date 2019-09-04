@@ -96,12 +96,8 @@ const _updateNodeDebounced = (node, file, delay) => {
     if (file)
       formData.append('file', file)
 
-    const config = file
-      ? { headers: { 'content-type': 'multipart/form-data' } }
-      : {}
-
     const surveyId = SurveyState.getSurveyId(getState())
-    await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData, config)
+    await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData)
   }
 
   return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)

@@ -64,7 +64,7 @@ class TaxonomiesImportJob extends Job {
 
     for (const speciesFileName of speciesFileNames) {
       const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
-      const csvParser = new CSVParser(speciesFileStream, true)
+      const csvParser = new CSVParser(speciesFileStream)
       this.total += await csvParser.calculateSize()
     }
   }
@@ -88,40 +88,36 @@ class TaxonomiesImportJob extends Job {
     // 3. parse CSV file
     const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
 
-    const csvParser = new CSVParser(speciesFileStream, true)
-    csvParser.init()
+    const csvParser = new CSVParser(speciesFileStream)
+    await csvParser.init()
+
+    const headers = csvParser.headers
+
+    const vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
+
+    this.taxonomyImportManager = new TaxonomyImportManager(this.getUser(), surveyId, vernacularLangCodes)
 
     let row = await csvParser.next()
 
     this.currentRow = 1
     this.incrementProcessedItems()
 
-    if (row) {
-      // read headers from first row
+    while (row) {
+      if (this.isCanceled())
+        break
 
-      const headers = R.keys(row)
+      await this.processRow(speciesFileName, taxonomyUuid, vernacularLangCodes, row, tx)
 
-      const vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO636_2, headers)
+      row = await csvParser.next()
 
-      this.taxonomyImportManager = new TaxonomyImportManager(this.getUser(), surveyId, vernacularLangCodes)
+      this.currentRow++
+      this.incrementProcessedItems()
+    }
 
-      while (row) {
-        if (this.isCanceled())
-          break
-
-        await this.processRow(speciesFileName, taxonomyUuid, vernacularLangCodes, row, tx)
-
-        row = await csvParser.next()
-
-        this.currentRow++
-        this.incrementProcessedItems()
-      }
-
-      if (this.hasErrors()) {
-        await this.setStatusFailed()
-      } else {
-        await this.taxonomyImportManager.finalizeImport(taxonomy, tx)
-      }
+    if (this.hasErrors()) {
+      await this.setStatusFailed()
+    } else {
+      await this.taxonomyImportManager.finalizeImport(taxonomy, tx)
     }
 
     return taxonomy

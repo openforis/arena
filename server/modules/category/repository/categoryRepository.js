@@ -26,12 +26,12 @@ const insertCategory = async (surveyId, category, client = db) =>
     def => dbTransformCallback(def, true, true)
   )
 
-const insertLevel = async (surveyId, categoryUuid, level, client = db) =>
+const insertLevel = async (surveyId, level, client = db) =>
   await client.one(`
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
-    [Category.getUuid(level), categoryUuid, CategoryLevel.getIndex(level), level.props],
+    [Category.getUuid(level), CategoryLevel.getCategoryUuid(level), CategoryLevel.getIndex(level), level.props],
     def => dbTransformCallback(def, true, true)
   )
 
@@ -180,6 +180,14 @@ const deleteCategory = async (surveyId, categoryUuid, client = db) =>
 const deleteLevel = async (surveyId, levelUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category_level', levelUuid, client)
 
+const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db) =>
+  await client.none(`
+      DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level 
+      WHERE category_uuid = $1
+    `,
+    [categoryUuid]
+  )
+
 const deleteItem = async (surveyId, itemUuid, client = db) =>
   await deleteSurveySchemaTableRecord(surveyId, 'category_item', itemUuid, client)
 
@@ -210,6 +218,7 @@ module.exports = {
   //DELETE
   deleteCategory,
   deleteLevel,
+  deleteLevelsByCategory,
   deleteItem,
 
   deleteItemLabels,

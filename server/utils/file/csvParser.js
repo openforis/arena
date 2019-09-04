@@ -3,92 +3,118 @@ const R = require('ramda')
 
 class CSVParser {
 
-  constructor (filePathOrStream, readHeaders = true) {
-    this.destroyed = false
-    this.csvStreamEnded = false
-    this.filePathOrStream = filePathOrStream
-    this.readHeaders = readHeaders
-    this.rowReadyListener = null
-    this.error = null
-    this.initialized = false
+  constructor (filePathOrStream) {
+    this._reset()
+    this._filePathOrStream = filePathOrStream
   }
 
-  init () {
-    this.csvStream = this._createCsvStream({ headers: this.readHeaders })
+  async init () {
+    this._csvStream = this._createCsvStream({ headers: false })
 
-    this.csvStream
+    this._csvStream
       .on('data', data => this._onData(data))
       .on('end', () => this._onStreamEnd())
-      .on('error', error => this.error = error)
-      .pause()
+      .on('error', error => this._error = error)
 
-    this.initialized = true
+    this._initialized = true
   }
 
   calculateSize () {
     return new Promise((resolve, reject) => {
-      if (this.error)
-        reject(this.error)
-
-      let count = 0
-      // do not consume instance csv stream, create a new one
-      this._createCsvStream({ headers: true })
-        .on('data', () => count++)
-        .on('end', () => resolve(count))
-        .on('error', reject)
+      if (this._error) {
+        reject(this._error)
+      } else {
+        let count = -1 //do not include headers
+        // do not consume instance csv stream, create a new one
+        this._createCsvStream({ headers: false })
+          .on('data', () => count++)
+          .on('end', () => resolve(count))
+          .on('error', reject)
+      }
     })
   }
 
   async next () {
-    if (!this.initialized)
+    if (!this._initialized)
       throw new Error(`${this.constructor.name} not initialized yet`)
 
     return new Promise((resolve, reject) => {
-      if (this.error)
-        reject(this.error)
-
-      if (this.csvStreamEnded)
-        resolve(null)
-
-      this.rowReadyListener = row => {
-        this.rowReadyListener = null
-        resolve(row)
+        if (this._error) {
+          reject(this._error)
+        } else if (this._csvStreamEnded) {
+          // stream ended; no new rows to read
+          resolve(null)
+        } else {
+          // resume the stream and wait for a new row
+          this._rowReadyListener = row => {
+            this._rowReadyListener = null
+            resolve(row)
+          }
+          this._csvStream.resume()
+        }
       }
-      this.csvStream.resume()
-    })
+    )
   }
 
   destroy () {
-    if (!this.destroyed && this.csvStream) {
-      this.csvStream.destroy()
-      this.csvStream = null
-      this.filePath = null
-      this.rowReadyListener = null
-      this.destroyed = true
+    if (!this._destroyed && this._csvStream) {
+      this._csvStream.destroy()
+      this._reset()
+      this._destroyed = true
     }
   }
 
+  get headers () {
+    return this._headers
+  }
+
+  get error () {
+    return this._error
+  }
+
   _createCsvStream (options) {
-    return R.is(String, this.filePathOrStream)
-      ? fastcsv.parseFile(this.filePathOrStream, options)
-      : fastcsv.parseStream(this.filePathOrStream, options)
+    return R.is(String, this._filePathOrStream)
+      ? fastcsv.parseFile(this._filePathOrStream, options)
+      : fastcsv.parseStream(this._filePathOrStream, options)
   }
 
   _onData (data) {
-    this.csvStream.pause()
+    this._csvStream.pause()
 
-    this._notifyRowReady(data)
+    if (this._headers === null) {
+      this._headers = data
+    } else {
+      this._notifyRowReady(data)
+    }
   }
 
   _notifyRowReady (row) {
-    if (this.rowReadyListener)
-      this.rowReadyListener(row)
+    if (this._rowReadyListener) {
+      // index row data by headers
+      const rowIndexed = this._headers.reduce((acc, header, index) => {
+          acc[header] = row[index]
+          return acc
+        },
+        {}
+      )
+      this._rowReadyListener(rowIndexed)
+    }
   }
 
   _onStreamEnd () {
-    this.csvStreamEnded = true
-
+    this._csvStreamEnded = true
     this._notifyRowReady(null)
+  }
+
+  _reset () {
+    this._csvStream = null
+    this._csvStreamEnded = false
+    this._destroyed = false
+    this._error = null
+    this._filePathOrStream = null
+    this._headers = null
+    this._initialized = false
+    this._rowReadyListener = null
   }
 
 }

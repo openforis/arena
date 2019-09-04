@@ -15,7 +15,12 @@ const keys = {
 }
 
 const props = {
-  name: 'name'
+  name: 'name',
+  itemExtraDef: 'itemExtraDef'
+}
+
+const propsItemExtraDef = {
+  type: 'type'
 }
 
 /**
@@ -37,7 +42,7 @@ const newCategory = (props = {}) => {
  * LEVELS
  */
 // ==== CREATE
-const newLevel = (category) => {
+const newLevel = (category, props = {}) => {
   const index = getLevelsArray(category).length
 
   return {
@@ -46,6 +51,7 @@ const newLevel = (category) => {
     [CategoryLevel.keys.index]: index,
     [CategoryLevel.keys.props]: {
       name: 'level_' + (index + 1),
+      ...props
     }
   }
 }
@@ -143,6 +149,12 @@ module.exports = {
   getItemValidation,
   getItemLevelIndex,
   isItemLeaf,
+
+  // ====== ITEMS extra def
+  getItemExtraDef: getProp(props.itemExtraDef, {}),
+  assocItemExtraDef: extraDef => setProp(props.itemExtraDef, extraDef),
+
+  assocItemExtraDefType: (name, type) => R.assocPath([props.itemExtraDef, name, propsItemExtraDef.type], type),
 
   //UTILS
   isLevelDeleteAllowed,
