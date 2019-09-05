@@ -76,7 +76,7 @@ export const useUserViewState = props => {
     // All groups if published, SurveyAdmin group otherwise
     const surveyGroups = Survey.isPublished(surveyInfo)
       ? Survey.getAuthGroups(surveyInfo)
-      : [Survey.getSurveyAdminGroup(surveyInfo)]
+      : [Survey.getAuthGroupAdmin(surveyInfo)]
 
     // Add SystemAdmin group if current user is a SystemAdmin himself
     const menuGroups = R.when(

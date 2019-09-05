@@ -59,7 +59,7 @@ export const assocSurveyAdminGroup = surveyInfo =>
 
       const userGroups = R.pipe(
         R.prop(User.keys.authGroups),
-        R.append(Survey.getSurveyAdminGroup(surveyInfo))
+        R.append(Survey.getAuthGroupAdmin(surveyInfo))
       )(user)
 
       return R.assocPath([keys.user, User.keys.authGroups], userGroups, appState)
