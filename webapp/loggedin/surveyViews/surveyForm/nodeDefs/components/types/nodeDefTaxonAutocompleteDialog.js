@@ -36,6 +36,7 @@ const NodeDefTaxonAutocompleteDialog = props => {
   const {
     surveyId, taxonomyUuid, draft,
     inputRef, field, fieldValue,
+    autocompleteSourceElement,
     onItemSelect, onClose,
   } = props
 
@@ -62,6 +63,7 @@ const NodeDefTaxonAutocompleteDialog = props => {
       inputField={inputRef.current}
       onItemSelect={onItemSelect}
       onClose={onClose}
+      sourceElement={autocompleteSourceElement}
     />
     ,
     document.body
@@ -79,6 +81,7 @@ NodeDefTaxonAutocompleteDialog.defaultProps = {
   fieldValue: '',
   onItemSelect: null,
   onClose: null,
+  autocompleteSourceElement: null, // used as sourceElement for the autocompleteDialog when rendered in tableBody
 }
 
 export default NodeDefTaxonAutocompleteDialog
