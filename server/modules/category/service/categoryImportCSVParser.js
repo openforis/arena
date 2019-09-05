@@ -137,7 +137,7 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
 }
 
 const _readHeaders = async filePath => {
-  let result = null
+  let result = []
 
   const reader = CSVReader.createReader(
     filePath,
