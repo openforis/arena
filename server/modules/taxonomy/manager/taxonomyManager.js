@@ -63,10 +63,33 @@ const includeUnknownUnlistedItems = async (surveyId, taxonomyUuid, taxa, include
     ]
     : taxa
 
-const fetchTaxaByPropLike = async (surveyId, taxonomyUuid, filterProp, filterValue, draft = false, includeUnlUnk = false) => {
-  const taxaDb = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, filterProp, filterValue, draft)
-  return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
-}
+
+const fetchTaxaByCode = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
+  includeUnknownUnlistedItems(
+    surveyId,
+    taxonomyUuid,
+    await TaxonomyRepository.fetchTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, client),
+    includeUnlUnk,
+    draft
+  )
+
+const fetchTaxaByScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
+  includeUnknownUnlistedItems(
+    surveyId,
+    taxonomyUuid,
+    await TaxonomyRepository.fetchTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
+    includeUnlUnk,
+    draft
+  )
+
+const fetchTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
+  includeUnknownUnlistedItems(
+    surveyId,
+    taxonomyUuid,
+    await TaxonomyRepository.fetchTaxaByCodeOrScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
+    includeUnlUnk,
+    draft
+  )
 
 const fetchTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) => {
   const taxaDb = await TaxonomyRepository.fetchTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client)
@@ -122,9 +145,10 @@ module.exports = {
   fetchTaxonomyByUuid,
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyUuid: TaxonomyRepository.countTaxaByTaxonomyUuid,
-  fetchTaxaByPropLike,
+  fetchTaxaByCode,
+  fetchTaxaByScientificName,
+  fetchTaxaByCodeOrScientificName,
   fetchTaxaByVernacularName,
-  findTaxaByCodeOrScientificName: TaxonomyRepository.findTaxaByCodeOrScientificName,
   fetchTaxonByUuid: TaxonomyRepository.fetchTaxonByUuid,
   fetchTaxonByCode: TaxonomyRepository.fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid: TaxonomyRepository.fetchTaxonVernacularNameByUuid,

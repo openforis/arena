@@ -64,7 +64,9 @@ module.exports = {
 
   fetchTaxonByUuid: TaxonomyManager.fetchTaxonByUuid,
   fetchTaxaByVernacularName: TaxonomyManager.fetchTaxaByVernacularName,
-  fetchTaxaByPropLike: TaxonomyManager.fetchTaxaByPropLike,
+  fetchTaxaByCode: TaxonomyManager.fetchTaxaByCode,
+  fetchTaxaByScientificName: TaxonomyManager.fetchTaxaByScientificName,
+  fetchTaxaByCodeOrScientificName: TaxonomyManager.fetchTaxaByCodeOrScientificName,
   fetchTaxaWithVernacularNames: TaxonomyManager.fetchTaxaWithVernacularNames,
   countTaxaByTaxonomyUuid: TaxonomyManager.countTaxaByTaxonomyUuid,
 

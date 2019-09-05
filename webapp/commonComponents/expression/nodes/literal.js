@@ -51,7 +51,7 @@ const Literal = props => {
   if (literalSearchParams) {
     useEffect(() => {
       (async () => {
-        fetchItem()
+        nodeValue && fetchItem()
         const itemsUpdate = await loadItems({ ...literalSearchParams, value: '' })
         setItems(itemsUpdate)
       })()

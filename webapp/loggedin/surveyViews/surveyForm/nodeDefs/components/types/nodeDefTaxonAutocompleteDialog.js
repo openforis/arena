@@ -10,6 +10,8 @@ import ReactDOM from 'react-dom'
 const NodeDefTaxonAutocompleteItemRenderer = props => {
   const { item: taxon, ...otherProps } = props
 
+  const vernacularLang = Taxon.getVernacularLanguage(taxon)
+
   return (
     <div {...otherProps}
          key={Taxon.getUuid(taxon)}
@@ -21,9 +23,11 @@ const NodeDefTaxonAutocompleteItemRenderer = props => {
       <div>
         {Taxon.getScientificName(taxon)}
       </div>
+      {vernacularLang &&
       <div style={{ gridColumn: 2 }}>
-        {`${Taxon.getVernacularName()(taxon)} (${Taxon.getVernacularLanguage(taxon)})`}
+        {`${Taxon.getVernacularName()(taxon)} (${vernacularLang})`}
       </div>
+      }
     </div>
   )
 }

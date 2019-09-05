@@ -14,8 +14,6 @@ const {
 const Taxonomy = require('../../../../common/survey/taxonomy')
 const Taxon = require('../../../../common/survey/taxon')
 
-const { isBlank } = require('../../../../common/stringUtils')
-
 const getTaxonVernacularNameSelectFields = draft => `
   t.*,
   vn.uuid AS vernacular_name_uuid,
@@ -108,10 +106,12 @@ const fetchTaxaWithVernacularNames = async (surveyId, taxonomyUuid, draft = fals
       (
       SELECT
           vn.taxon_uuid,
-          json_build_object(${DbUtils.getPropColCombined('lang', draft, 'vn.')}, ${DbUtils.getPropColCombined('name', draft, 'vn.')})
+          json_object_agg(${DbUtils.getPropColCombined('lang', draft, 'vn.')}, ${DbUtils.getPropColCombined('name', draft, 'vn.')})
           AS names
       FROM
           ${schema}.taxon_vernacular_name vn
+      GROUP BY 
+          vn.taxon_uuid
       )
       
       SELECT
@@ -147,30 +147,43 @@ const fetchTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, sear
     taxon => dbTransformCallback(taxon, draft, true)
   )
 
+const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
+  const searchValue = toSearchValue(code)
+  const filterCondition = searchValue ? DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft) : ''
+
+  const taxa = await fetchTaxaByCondition(surveyId, taxonomyUuid, filterCondition, searchValue, Taxon.propKeys.code, draft, client)
+  return R.head(taxa)
+}
+
 const fetchTaxaByPropLike = async (surveyId,
                                    taxonomyUuid,
                                    filterProp,
                                    filterValue,
                                    draft = false,
                                    client = db) => {
-
   const searchValue = toSearchValue(filterValue)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition(filterProp, draft) : ''
-
   return await fetchTaxaByCondition(surveyId, taxonomyUuid, filterCondition, searchValue, filterProp, draft, client)
 }
 
-const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
-  const taxa = await fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.code, code, draft, client)
-  return R.head(taxa)
-}
+const fetchTaxaByCode = async (surveyId,
+                               taxonomyUuid,
+                               filterValue,
+                               draft = false,
+                               client = db) =>
+  await fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.code, filterValue, draft, client)
 
-const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) => {
+const fetchTaxaByScientificName = async (surveyId,
+                                         taxonomyUuid,
+                                         filterValue,
+                                         draft = false,
+                                         client = db) =>
+  await fetchTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.scientificName, filterValue, draft, client)
 
-  const searchValue = toSearchValue(filterValue)
-  const whereCondition = isBlank(searchValue)
-    ? null
-    : `
+const fetchTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) => {
+
+  const searchValue = toSearchValue(`*${filterValue}*`)
+  const whereCondition = `
     ${DbUtils.getPropFilterCondition(Taxon.propKeys.scientificName, draft)} 
      OR  
     ${DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft)}
@@ -287,16 +300,21 @@ module.exports = {
   insertTaxa,
 
   //READ
+  // taxonomies
   fetchTaxonomiesBySurveyId,
   fetchTaxonomyByUuid,
+
+  // taxa
   countTaxaByTaxonomyUuid,
-  fetchTaxaByPropLike,
+  fetchTaxaByCode,
+  fetchTaxaByScientificName,
+  fetchTaxaByCodeOrScientificName,
   fetchTaxaByVernacularName,
-  findTaxaByCodeOrScientificName,
+  fetchTaxaWithVernacularNames,
+
   fetchTaxonByUuid,
   fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid,
-  fetchTaxaWithVernacularNames,
 
   fetchIndex,
 
