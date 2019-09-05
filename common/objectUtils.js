@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const StringUtils = require('./stringUtils')
+
 const keys = {
   id: 'id',
   uuid: 'uuid',
@@ -11,6 +13,10 @@ const keysProps = {
   descriptions: 'descriptions',
   labels: 'labels',
 }
+
+// CHECK
+
+const isBlank = value => value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)
 
 // READ
 
@@ -41,7 +47,11 @@ const getDescription = (lang, defaultTo = null) => R.pipe(
 
 const setProp = (key, value) => R.assocPath([keys.props, key], value)
 
-const setInPath = (pathArray = [], value = '') => obj => {
+const setInPath = (pathArray, value, includeEmpty = true) => obj => {
+  if (!includeEmpty && isBlank(value)) {
+    return obj
+  }
+
   let objCurrent = obj
 
   pathArray.forEach((pathPart, i) => {
@@ -56,14 +66,6 @@ const setInPath = (pathArray = [], value = '') => obj => {
     }
 
   })
-
-  return obj
-}
-
-const clean = obj => {
-  for (const [key, value] of Object.entries(obj))
-    if (value === null || value === undefined || R.isEmpty(obj))
-      delete obj[key]
 
   return obj
 }
@@ -99,7 +101,6 @@ module.exports = {
   // UPDATE
   setProp,
   setInPath,
-  clean,
 
   // UTILS
   isEqual,

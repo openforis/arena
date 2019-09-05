@@ -20,7 +20,7 @@ const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
   [keys.uuid]: uuidv4(),
   [keys.levelUuid]: levelUuid,
   [keys.parentUuid]: parentItemUuid,
-  [keys.props]: ObjectUtils.clean(props),
+  [keys.props]: props,
 })
 
 // ====== READ
@@ -44,10 +44,13 @@ module.exports = {
   getLabel ,
   getDescriptions: ObjectUtils.getDescriptions,
   getDescription: ObjectUtils.getDescription,
+
+  isEqual: ObjectUtils.isEqual,
+
+  // NOT USED YET
   getExtraProp: prop => R.pipe(
     ObjectUtils.getProp(keys.extra),
     R.propOr('', prop)
   ),
 
-  isEqual: ObjectUtils.isEqual
 }

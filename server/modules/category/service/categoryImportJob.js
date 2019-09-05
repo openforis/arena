@@ -156,15 +156,18 @@ class CategoryImportJob extends Job {
 
           const codeLevel = codesLevel[codesLevel.length - 1]
 
+          const itemProps = {
+            [CategoryItem.props.code]: codeLevel
+          }
+
+          ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLevel[levelName], false)(itemProps)
+          ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLevel[levelName], false)(itemProps)
+          ObjectUtils.setInPath([CategoryItem.props.extra], extra, false)(itemProps)
+
           this.itemsByCodes[codesLevel] = CategoryItem.newItem(
             CategoryLevel.getUuid(level),
             itemParentUuid,
-            {
-              [CategoryItem.props.code]: codeLevel,
-              [ObjectUtils.keysProps.labels]: labelsByLevel[levelName],
-              [ObjectUtils.keysProps.descriptions]: descriptionsByLevel[levelName],
-              [CategoryItem.props.extra]: extra,
-            }
+            itemProps
           )
         }
       }
