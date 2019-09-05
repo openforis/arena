@@ -18,8 +18,8 @@ export const useAcceptInvitationFormState = props => {
   const validateObj = async obj => await Validator.validate(
     obj,
     {
-      'userName': [Validator.validateRequired],
-      'password': [Validator.validateRequired, validatePassword, validatePasswordStrength],
+      'userName': [Validator.validateRequired('User name is required')],
+      'password': [Validator.validateRequired('Password is required'), validatePassword, validatePasswordStrength],
       'passwordConfirm': [validatePasswordConfirm],
     })
 
