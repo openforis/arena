@@ -9,10 +9,13 @@ import UserValidator from '../../../../../common/user/userValidator'
 import AuthGroups from '../../../../../common/auth/authGroups'
 import Authorizer from '../../../../../common/auth/authorizer'
 
+import * as AppState from '../../../../app/appState'
+
 import {
   useAsyncGetRequest,
   useAsyncPostRequest,
   useAsyncMultipartPutRequest,
+  useAsyncDeleteRequest,
   useFormObject,
   useOnUpdate,
   usePrevious,
@@ -151,7 +154,7 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotificationMessage('userView.errorSavingUser', { error: userSaveError })
+      showNotificationMessage('appErrors.generic', { error: userSaveError }, AppState.notificationSeverity.error)
     } else if (userSaved) {
       // update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
@@ -172,6 +175,22 @@ export const useUserViewState = props => {
     showAppLoader()
     saveUser()
   }
+
+  // REMOVE
+  const {
+    dispatch: removeUser,
+    loaded: removeUserLoaded,
+    error: removeUserError,
+  } = useAsyncDeleteRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`)
+
+  useOnUpdate(() => {
+    hideAppLoader()
+    if (removeUserLoaded) {
+      showNotificationMessage('usersView.removeUserConfirmation', { user: formObject.name })
+    } else if (removeUserError) {
+      showNotificationMessage('appErrors.generic', { text: removeUserError }, AppState.notificationSeverity.error)
+    }
+  }, [removeUserLoaded, removeUserError])
 
   return {
     ready: ready.current,
@@ -200,5 +219,9 @@ export const useUserViewState = props => {
     setProfilePicture,
 
     sendRequest,
+    removeUser: () => {
+      showAppLoader()
+      removeUser()
+    }
   }
 }

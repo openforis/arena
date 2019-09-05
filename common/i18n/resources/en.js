@@ -167,20 +167,21 @@ module.exports = {
 
   usersView: {
     inviteUser: 'Invite',
-    sendInvitation: 'Send invitation',
     accepted: 'Accepted',
     inviteUserConfirmation: 'An email to {{email}} has been sent',
     updateUserConfirmation: 'User {{name}} has been updated',
     notAcceptedYet: 'Invitation not accepted yet',
-    removeFromSurvey:'Remove from survey',
   },
 
   userView: {
     scale: 'Scale',
     rotate: 'Rotate',
-    errorSavingUser: 'Error saving user: {{error}}',
     dragAndDrop: 'Drop an image above or',
-    upload: 'click here to upload'
+    upload: 'click here to upload',
+    sendInvitation: 'Send invitation',
+    removeFromSurvey: 'Remove from survey',
+    confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
+    removeUserConfirmation: 'User {{user}} has been remove from survey {{survey}}',
   },
 
   itemsTable: {
