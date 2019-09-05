@@ -19,9 +19,21 @@
     }
   }
 
-  .btn {
-    justify-self: center;
+}
+
+.user-view__buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  .btn-save {
     padding-left: 3rem;
     padding-right: 3rem;
+  }
+
+  .btn-remove-user {
+    position: absolute;
+    left: 0;
   }
 }

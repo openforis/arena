@@ -1,7 +1,6 @@
 import './userView.scss'
 
 import React from 'react'
-import * as R from 'ramda'
 import { connect } from 'react-redux'
 
 import { getUrlParam } from '../../../../utils/routerUtils'
@@ -11,10 +10,6 @@ import useI18n from '../../../../commonComponents/useI18n.js'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import ProfilePicture from '../../../../commonComponents/profilePicture'
 import { FormItem, Input } from '../../../../commonComponents/form/input'
-
-import Survey from '../../../../../common/survey/survey'
-import User from '../../../../../common/user/user'
-import Authorizer from '../../../../../common/auth/authorizer'
 
 import * as AppState from '../../../../app/appState'
 import * as SurveyState from '../../../../survey/surveyState'
@@ -34,7 +29,7 @@ const UserView = props => {
   const {
     ready, isInvitation,
     name, email, group, surveyGroupsMenuItems, objectValid,
-    canEdit, canEditName, canEditGroup, canEditEmail,
+    canEdit, canEditName, canEditGroup, canEditEmail, canRemove,
     getFieldValidation, setName, setEmail, setGroup,
     setProfilePicture,
     pictureEditorEnabled,
@@ -94,14 +89,26 @@ const UserView = props => {
       </FormItem>
 
       {
-        canEdit && (
-          <button className="btn"
+        canEdit &&
+        <div className="user-view__buttons">
+
+          {
+            canRemove &&
+            <button className="btn-s btn-danger btn-remove-user"
+                    onClick={sendRequest}>
+              <span className="icon icon-bin icon-left icon-10px"/>
+              {i18n.t('usersView.removeFromSurvey')}
+            </button>
+          }
+
+          <button className="btn btn-save"
                   aria-disabled={!objectValid}
                   onClick={sendRequest}>
             <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`}/>
             {isInvitation ? i18n.t('usersView.sendInvitation') : i18n.t('common.save')}
           </button>
-        )
+        </div>
+
       }
     </div>
   )

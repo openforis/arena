@@ -172,6 +172,7 @@ module.exports = {
     inviteUserConfirmation: 'An email to {{email}} has been sent',
     updateUserConfirmation: 'User {{name}} has been updated',
     notAcceptedYet: 'Invitation not accepted yet',
+    removeFromSurvey:'Remove from survey',
   },
 
   userView: {

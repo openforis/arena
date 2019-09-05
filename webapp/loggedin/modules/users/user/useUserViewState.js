@@ -45,6 +45,7 @@ export const useUserViewState = props => {
     name: false,
     group: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
     email: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
+    remove: false,
   })
 
   // local form object
@@ -56,7 +57,6 @@ export const useUserViewState = props => {
     isInvitation || isUserAcceptPending ? UserValidator.validateInvitation : UserValidator.validateUser,
     !isInvitation
   )
-
 
   // USER ATTRIBUTES
 
@@ -110,13 +110,13 @@ export const useUserViewState = props => {
         name: !isUserAcceptPending && canEdit,
         email: !isUserAcceptPending && Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate),
         group: !isUserAcceptPending && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
+        remove: !isUserAcceptPending && Authorizer.canRemoveUser(user, surveyInfo, userToUpdate),
       })
 
       ready.current = true
       enableValidation()
     }
   }, [loaded])
-
 
   // PROFILE PICTURE
 
@@ -184,7 +184,8 @@ export const useUserViewState = props => {
     canEditName: editPermissions.name,
     canEditGroup: editPermissions.group,
     canEditEmail: editPermissions.email,
-    pictureEditorEnabled: userToUpdate.hasProfilePicture || pictureChanged.current,
+    canRemove: editPermissions.remove,
+    pictureEditorEnabled: User.hasProfilePicture(userToUpdate) || pictureChanged.current,
 
     name: formObject.name,
     email: formObject.email,
