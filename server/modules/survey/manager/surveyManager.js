@@ -69,7 +69,7 @@ const insertSurvey = async (user, surveyParam, createRootEntityDef = true, clien
       surveyDb.authGroups = await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
 
       if (!User.isSystemAdmin(user)) {
-        await AuthGroupRepository.insertUserGroup(AuthGroups.getUuid(Survey.getSurveyAdminGroup(surveyDb)), User.getUuid(user), t)
+        await AuthGroupRepository.insertUserGroup(AuthGroups.getUuid(Survey.getAuthGroupAdmin(surveyDb)), User.getUuid(user), t)
       }
 
       await ActivityLog.log(user, surveyId, ActivityLog.type.surveyCreate, surveyParam, t)
