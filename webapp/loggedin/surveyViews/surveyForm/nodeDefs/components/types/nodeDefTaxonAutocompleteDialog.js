@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react'
+import ReactDOM from 'react-dom'
 
 import AutocompleteDialog from '../../../../../../commonComponents/form/autocompleteDialog'
 import { useAsyncGetRequest } from '../../../../../../commonComponents/hooks'
 
 import Taxon from '../../../../../../../common/survey/taxon'
-import Node from '../../../../../../../common/record/node'
-import ReactDOM from 'react-dom'
 
 const NodeDefTaxonAutocompleteItemRenderer = props => {
   const { item: taxon, ...otherProps } = props
@@ -42,7 +41,7 @@ const NodeDefTaxonAutocompleteDialog = props => {
 
   const params = {
     filterProp: field,
-    filterValue: field === Node.valuePropKeys.code ? `${fieldValue}*` : `*${fieldValue}*`,
+    filterValue: fieldValue,
     includeUnlUnk: true,
     draft,
   }

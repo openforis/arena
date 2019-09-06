@@ -82,11 +82,11 @@ module.exports.init = app => {
       let taxa
       if (filterProp) {
         if (filterProp === Taxon.keys.vernacularName) {
-          taxa = await TaxonomyService.fetchTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+          taxa = await TaxonomyService.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
         } else if (filterProp === Taxon.propKeys.code) {
-          taxa = await TaxonomyService.fetchTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+          taxa = await TaxonomyService.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
         } else {
-          taxa = await TaxonomyService.fetchTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+          taxa = await TaxonomyService.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
         }
       } else {
         taxa = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)

@@ -64,35 +64,35 @@ const includeUnknownUnlistedItems = async (surveyId, taxonomyUuid, taxa, include
     : taxa
 
 
-const fetchTaxaByCode = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
+const findTaxaByCode = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
   includeUnknownUnlistedItems(
     surveyId,
     taxonomyUuid,
-    await TaxonomyRepository.fetchTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, client),
+    await TaxonomyRepository.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, client),
     includeUnlUnk,
     draft
   )
 
-const fetchTaxaByScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
+const findTaxaByScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
   includeUnknownUnlistedItems(
     surveyId,
     taxonomyUuid,
-    await TaxonomyRepository.fetchTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
+    await TaxonomyRepository.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
     includeUnlUnk,
     draft
   )
 
-const fetchTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
+const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
   includeUnknownUnlistedItems(
     surveyId,
     taxonomyUuid,
-    await TaxonomyRepository.fetchTaxaByCodeOrScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
+    await TaxonomyRepository.findTaxaByCodeOrScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
     includeUnlUnk,
     draft
   )
 
-const fetchTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) => {
-  const taxaDb = await TaxonomyRepository.fetchTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client)
+const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) => {
+  const taxaDb = await TaxonomyRepository.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client)
   return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
 }
 
@@ -145,10 +145,10 @@ module.exports = {
   fetchTaxonomyByUuid,
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyUuid: TaxonomyRepository.countTaxaByTaxonomyUuid,
-  fetchTaxaByCode,
-  fetchTaxaByScientificName,
-  fetchTaxaByCodeOrScientificName,
-  fetchTaxaByVernacularName,
+  findTaxaByCode,
+  findTaxaByScientificName,
+  findTaxaByCodeOrScientificName,
+  findTaxaByVernacularName,
   fetchTaxonByUuid: TaxonomyRepository.fetchTaxonByUuid,
   fetchTaxonByCode: TaxonomyRepository.fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid: TaxonomyRepository.fetchTaxonVernacularNameByUuid,
