@@ -25,7 +25,7 @@ import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    user, surveyInfo, userUuid,
+    user, surveyInfo, lang, userUuid,
     showAppLoader, hideAppLoader, showNotificationMessage, setUser,
     history,
   } = props
@@ -171,11 +171,6 @@ export const useUserViewState = props => {
     }
   }, [userSaved, userSaveError])
 
-  const sendRequest = () => {
-    showAppLoader()
-    saveUser()
-  }
-
   // REMOVE
   const {
     dispatch: removeUser,
@@ -186,7 +181,10 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (removeUserLoaded) {
-      showNotificationMessage('usersView.removeUserConfirmation', { user: formObject.name })
+      showNotificationMessage('usersView.removeUserConfirmation', {
+        user: formObject.name,
+        survey: Survey.getLabel(surveyInfo, lang)
+      })
     } else if (removeUserError) {
       showNotificationMessage('appErrors.generic', { text: removeUserError }, AppState.notificationSeverity.error)
     }
@@ -218,7 +216,10 @@ export const useUserViewState = props => {
     setGroup,
     setProfilePicture,
 
-    sendRequest,
+    saveUser: () => {
+      showAppLoader()
+      saveUser()
+    },
     removeUser: () => {
       showAppLoader()
       removeUser()

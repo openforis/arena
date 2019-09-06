@@ -33,7 +33,7 @@ const UserView = props => {
     canEdit, canEditName, canEditGroup, canEditEmail, canRemove,
     getFieldValidation, setName, setEmail, setGroup,
     pictureEditorEnabled, setProfilePicture,
-    sendRequest, removeUser,
+    saveUser, removeUser,
   } = useUserViewState(props)
 
   return ready && (
@@ -109,7 +109,7 @@ const UserView = props => {
 
           <button className="btn btn-save"
                   aria-disabled={!objectValid}
-                  onClick={sendRequest}>
+                  onClick={saveUser}>
             <span className={`icon icon-${isInvitation ? 'envelop' : 'floppy-disk'} icon-left icon-12px`}/>
             {isInvitation ? i18n.t('userView.sendInvitation') : i18n.t('common.save')}
           </button>
