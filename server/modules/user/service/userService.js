@@ -17,17 +17,7 @@ const SystemError = require('../../../utils/systemError')
 const UnauthorizedError = require('../../../utils/unauthorizedError')
 const Mailer = require('../../../utils/mailer')
 
-const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
-  const fetchSystemAdmins = User.isSystemAdmin(user)
-
-  return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
-}
-
-const countUsersBySurveyId = async (user, surveyId) => {
-  const countSystemAdmins = User.isSystemAdmin(user)
-
-  return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
-}
+// ====== CREATE
 
 const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => {
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
@@ -49,6 +39,7 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => 
 
   const dbUser = await UserManager.fetchUserByEmail(email)
   const groupName = AuthGroups.getName(Authorizer.getSurveyUserGroup(user, surveyInfo))
+  const groupLabel = `$t(authGroups.${groupName}.label)`
   if (dbUser) {
     const newUserGroups = User.getAuthGroups(dbUser)
     const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
@@ -62,25 +53,35 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => 
 
     await Promise.all([
       UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser),
-      Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel: `$t(authGroups.${groupName}.label)` }, i18n),
+      Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel }, i18n),
     ])
   } else {
     const password = passwordGenerator.generate({ length: 8, numbers: true, uppercase: true, strict: true })
     const { User: { Username: userUuid } } = await aws.inviteUser(email, password)
 
-    const msgParams = {
-      serverUrl,
-      email,
-      password,
-      surveyLabel,
-      groupLabel: `$t(authGroups.${groupName}.label) }`,
-      temporaryPasswordMsg: password ? '$t(emails.userInvite.temporaryPasswordMsg)' : '' }
+    const msgParams = { serverUrl, email, password, surveyLabel, groupLabel, temporaryPasswordMsg: password ? '$t(emails.userInvite.temporaryPasswordMsg)' : '' }
     await Promise.all([
       Mailer.sendEmail(email, 'emails.userInvite', msgParams, i18n),
       UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)
     ])
   }
 }
+
+// ====== READ
+
+const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
+  const fetchSystemAdmins = User.isSystemAdmin(user)
+
+  return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
+}
+
+const countUsersBySurveyId = async (user, surveyId) => {
+  const countSystemAdmins = User.isSystemAdmin(user)
+
+  return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
+}
+
+// ====== UPDATE
 
 const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId)
@@ -121,21 +122,24 @@ const updateUsername = async (user, userUuid, name) => {
 }
 
 module.exports = {
+  // ==== User
+  // CREATE
+  inviteUser,
+
+  // READ
   countUsersBySurveyId,
-
   fetchUsersBySurveyId,
-
   fetchUserByUuid: UserManager.fetchUserByUuid,
-
   fetchUserProfilePicture: UserManager.fetchUserProfilePicture,
 
+  // UPDATE
   updateUser,
-
   updateUsername,
 
+  // DELETE
+  deleteUser: UserManager.deleteUser,
+
+  // ==== User prefs
   updateUserPref: UserManager.updateUserPref,
-
   deleteUserPref: UserManager.deleteUserPref,
-
-  inviteUser,
 }

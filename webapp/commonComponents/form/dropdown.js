@@ -137,15 +137,15 @@ class Dropdown extends React.Component {
   }
 
   extractValueFromFunctionOrProp (item, func, prop, defaultProp) {
-    return R.is(Object, item) ?
-      func ?
-        func(item)
-        : prop ?
-        R.prop(prop)(item)
-        : R.has(defaultProp)(item) ?
-          R.prop(defaultProp)(item)
-          : item
-      : item //primitive
+    return func
+      ? func(item)
+      : R.is(Object, item)
+        ? prop ?
+          R.prop(prop)(item)
+          : R.has(defaultProp)(item) ?
+            R.prop(defaultProp)(item)
+            : item
+        : item //primitive
   }
 
   render () {

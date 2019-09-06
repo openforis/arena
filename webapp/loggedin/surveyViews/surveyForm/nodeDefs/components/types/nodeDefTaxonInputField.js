@@ -13,6 +13,7 @@ const NodeDefTaxonInputField = props => {
     canEditRecord, readOnly,
     field, selection,
     onChangeTaxon, onChangeSelectionField,
+    autocompleteSourceElement,
   } = props
 
   const entryDisabled = edit || !canEditRecord || readOnly
@@ -53,6 +54,7 @@ const NodeDefTaxonInputField = props => {
           fieldValue={inputRef.current.value}
           onItemSelect={onItemSelectAutocomplete}
           onClose={onItemSelectAutocomplete}
+          autocompleteSourceElement={autocompleteSourceElement}
         />
       }
 
@@ -76,6 +78,7 @@ NodeDefTaxonInputField.defaultProps = {
   },
   onChangeTaxon: null, // function to call when the taxon value changed
   onChangeSelectionField: null, // function to call when local selection changes
+  autocompleteSourceElement: null, // used as sourceElement for the autocompleteDialog when rendered in tableBody
 }
 
 export default NodeDefTaxonInputField

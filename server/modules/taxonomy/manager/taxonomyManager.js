@@ -63,13 +63,36 @@ const includeUnknownUnlistedItems = async (surveyId, taxonomyUuid, taxa, include
     ]
     : taxa
 
-const fetchTaxaByPropLike = async (surveyId, taxonomyUuid, filterProp, filterValue, draft = false, includeUnlUnk = false) => {
-  const taxaDb = await TaxonomyRepository.fetchTaxaByPropLike(surveyId, taxonomyUuid, filterProp, filterValue, draft)
-  return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
-}
 
-const fetchTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) => {
-  const taxaDb = await TaxonomyRepository.fetchTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client)
+const findTaxaByCode = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
+  includeUnknownUnlistedItems(
+    surveyId,
+    taxonomyUuid,
+    await TaxonomyRepository.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, client),
+    includeUnlUnk,
+    draft
+  )
+
+const findTaxaByScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
+  includeUnknownUnlistedItems(
+    surveyId,
+    taxonomyUuid,
+    await TaxonomyRepository.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
+    includeUnlUnk,
+    draft
+  )
+
+const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) =>
+  includeUnknownUnlistedItems(
+    surveyId,
+    taxonomyUuid,
+    await TaxonomyRepository.findTaxaByCodeOrScientificName(surveyId, taxonomyUuid, filterValue, draft, client),
+    includeUnlUnk,
+    draft
+  )
+
+const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, includeUnlUnk = false, client = db) => {
+  const taxaDb = await TaxonomyRepository.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, client)
   return includeUnknownUnlistedItems(surveyId, taxonomyUuid, taxaDb, includeUnlUnk, draft)
 }
 
@@ -122,9 +145,10 @@ module.exports = {
   fetchTaxonomyByUuid,
   fetchTaxonomiesBySurveyId,
   countTaxaByTaxonomyUuid: TaxonomyRepository.countTaxaByTaxonomyUuid,
-  fetchTaxaByPropLike,
-  fetchTaxaByVernacularName,
-  findTaxaByCodeOrScientificName: TaxonomyRepository.findTaxaByCodeOrScientificName,
+  findTaxaByCode,
+  findTaxaByScientificName,
+  findTaxaByCodeOrScientificName,
+  findTaxaByVernacularName,
   fetchTaxonByUuid: TaxonomyRepository.fetchTaxonByUuid,
   fetchTaxonByCode: TaxonomyRepository.fetchTaxonByCode,
   fetchTaxonVernacularNameByUuid: TaxonomyRepository.fetchTaxonVernacularNameByUuid,

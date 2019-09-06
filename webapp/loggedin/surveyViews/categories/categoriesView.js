@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import * as R from 'ramda'
 
 import ItemsView from '../items/itemsView'
-import CategoryEdit from '../categoryEdit/components/categoryEdit'
+import CategoryEditView from '../categoryEdit/categoryEditView'
 
 import Survey from '../../../../common/survey/survey'
 import Category from '../../../../common/survey/category'
@@ -43,7 +43,7 @@ class CategoriesView extends React.Component {
     return (
       <ItemsView
         headerText="Categories"
-        itemEditComponent={CategoryEdit}
+        itemEditComponent={CategoryEditView}
         itemEditProp="category"
         itemLabelFunction={category => Category.getName(category)}
         editedItem={category}

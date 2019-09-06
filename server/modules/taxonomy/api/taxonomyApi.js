@@ -1,5 +1,7 @@
 const Request = require('../../../utils/request')
 const Response = require('../../../utils/response')
+
+const Taxon = require('../../../../common/survey/taxon')
 const { toUuidIndexedObj } = require('../../../../common/survey/surveyUtils')
 
 const { jobToJSON } = require('../../../job/jobUtils')
@@ -17,7 +19,7 @@ module.exports.init = app => {
   // ====== CREATE
   app.post('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
+      const { surveyId } = Request.getParams(req)
       const { body, user } = req
 
       const taxonomy = await TaxonomyService.insertTaxonomy(user, surveyId, body)
@@ -32,9 +34,7 @@ module.exports.init = app => {
 
   app.get(`/survey/:surveyId/taxonomies`, AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const draft = Request.getBoolParam(req, 'draft')
-      const validate = Request.getBoolParam(req, 'validate')
+      const { surveyId, draft, validate } = Request.getParams(req)
 
       await sendTaxonomies(res, surveyId, draft, validate)
     } catch (err) {
@@ -44,10 +44,7 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/taxonomies/:taxonomyUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const taxonomyUuid = Request.getRestParam(req, 'taxonomyUuid')
-      const draft = Request.getBoolParam(req, 'draft')
-      const validate = Request.getBoolParam(req, 'validate')
+      const { surveyId, taxonomyUuid, draft, validate } = Request.getParams(req)
 
       const taxonomy = await TaxonomyService.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft, validate)
 
@@ -59,9 +56,7 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/taxa/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const taxonomyUuid = Request.getRestParam(req, 'taxonomyUuid')
-      const draft = Request.getBoolParam(req, 'draft')
+      const { surveyId, taxonomyUuid, draft } = Request.getParams(req)
 
       const count = await TaxonomyService.countTaxaByTaxonomyUuid(surveyId, taxonomyUuid, draft)
 
@@ -73,22 +68,25 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/taxa', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const taxonomyUuid = Request.getRestParam(req, 'taxonomyUuid')
-      const filterProp = Request.getRestParam(req, 'filterProp')
-      const filterValue = Request.getRestParam(req, 'filterValue')
-
-      const draft = Request.getBoolParam(req, 'draft')
-      const limit = Request.getRestParam(req, 'limit', 20)
-      const offset = Request.getRestParam(req, 'offset', 0)
-      const includeUnlUnk = Request.getRestParam(req, 'includeUnlUnk', false)
+      const {
+        surveyId,
+        taxonomyUuid,
+        filterProp,
+        filterValue,
+        draft,
+        limit = 20,
+        offset = 0,
+        includeUnlUnk = false
+      } = Request.getParams(req)
 
       let taxa
       if (filterProp) {
-        if (filterProp === 'vernacularName') {
-          taxa = await TaxonomyService.fetchTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+        if (filterProp === Taxon.keys.vernacularName) {
+          taxa = await TaxonomyService.findTaxaByVernacularName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
+        } else if (filterProp === Taxon.propKeys.code) {
+          taxa = await TaxonomyService.findTaxaByCode(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
         } else {
-          taxa = await TaxonomyService.fetchTaxaByPropLike(surveyId, taxonomyUuid, filterProp, filterValue, draft, includeUnlUnk)
+          taxa = await TaxonomyService.findTaxaByScientificName(surveyId, taxonomyUuid, filterValue, draft, includeUnlUnk)
         }
       } else {
         taxa = await TaxonomyService.fetchTaxaWithVernacularNames(surveyId, taxonomyUuid, draft, limit, offset)
@@ -102,10 +100,7 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/taxon', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const taxonUuid = Request.getRestParam(req, 'taxonUuid')
-      const vernacularNameUuid = Request.getRestParam(req, 'vernacularNameUuid')
-      const draft = Request.getBoolParam(req, 'draft')
+      const { surveyId, taxonUuid, vernacularNameUuid, draft } = Request.getParams(req)
 
       const taxon = vernacularNameUuid
         ? await TaxonomyService.fetchTaxonVernacularNameByUuid(surveyId, vernacularNameUuid, draft)
@@ -119,9 +114,7 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/taxonomies/:taxonomyUuid/export', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const taxonomyUuid = Request.getRestParam(req, 'taxonomyUuid')
-      const draft = Request.getBoolParam(req, 'draft')
+      const { surveyId, taxonomyUuid, draft } = Request.getParams(req)
 
       Response.setContentTypeFile(res, `taxonomy_${taxonomyUuid}.csv`, null, Response.contentTypes.csv)
 
@@ -137,10 +130,8 @@ module.exports.init = app => {
 
   app.put('/survey/:surveyId/taxonomies/:taxonomyUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const taxonomyUuid = Request.getRestParam(req, 'taxonomyUuid')
-      const { body, user } = req
-      const { key, value } = body
+      const { surveyId, taxonomyUuid } = Request.getParams(req)
+      const { body: { key, value }, user } = req
 
       await TaxonomyService.updateTaxonomyProp(user, surveyId, taxonomyUuid, key, value)
 
@@ -151,10 +142,8 @@ module.exports.init = app => {
   })
 
   app.post('/survey/:surveyId/taxonomies/:taxonomyUuid/upload', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
-    const user = req.user
-    const surveyId = Request.getRestParam(req, 'surveyId')
-    const taxonomyUuid = Request.getRestParam(req, 'taxonomyUuid')
-
+    const { surveyId, taxonomyUuid } = Request.getParams(req)
+    const user = Request.getUser(req)
     const file = Request.getFile(req)
 
     const job = TaxonomyService.importTaxonomy(user, surveyId, taxonomyUuid, file.tempFilePath)
@@ -166,9 +155,8 @@ module.exports.init = app => {
 
   app.delete('/survey/:surveyId/taxonomies/:taxonomyUuid', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const surveyId = Request.getRestParam(req, 'surveyId')
-      const taxonomyUuid = Request.getRestParam(req, 'taxonomyUuid')
-      const { user } = req
+      const { surveyId, taxonomyUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
 
       await TaxonomyService.deleteTaxonomy(user, surveyId, taxonomyUuid)
 

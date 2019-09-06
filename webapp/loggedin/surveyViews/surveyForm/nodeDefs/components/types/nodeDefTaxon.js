@@ -1,6 +1,6 @@
 import './nodeDefTaxon.scss'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import * as R from 'ramda'
 
@@ -8,7 +8,6 @@ import { FormItem } from '../../../../../../commonComponents/form/input'
 import useI18n from '../../../../../../commonComponents/useI18n'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
-import Survey from '../../../../../../../common/survey/survey'
 import Taxon from '../../../../../../../common/survey/taxon'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../../common/record/node'
@@ -39,6 +38,7 @@ const NodeDefTaxon = props => {
   } = props
 
   const [selection, setSelection] = useState(selectionDefault)
+  const elementRef = useRef(null)
 
   const i18n = useI18n()
   const taxonRefData = edit ? null : NodeRefData.getTaxon(node)
@@ -115,7 +115,7 @@ const NodeDefTaxon = props => {
     : 'survey-form__node-def-taxon'
 
   return (
-    <div className={className}>
+    <div className={className} ref={elementRef}>
       {
         R.keys(selectionDefault).map(field => {
             const inputField = (
@@ -132,6 +132,7 @@ const NodeDefTaxon = props => {
                 selection={selection}
                 onChangeTaxon={onChangeTaxon}
                 onChangeSelectionField={onChangeSelectionField}
+                autocompleteSourceElement={isTableBody ? elementRef.current : null}
               />
             )
 
@@ -159,7 +160,7 @@ const mapStateToProps = (state, props) => {
   return {
     taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
     surveyId,
-    draft: Survey.isDraft(surveyInfo),
+    draft: edit,
     node: edit ? null : nodes[0]
   }
 }

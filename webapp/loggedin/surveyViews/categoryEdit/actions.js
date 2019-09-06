@@ -26,8 +26,13 @@ import {
 
 import { showAppJobMonitor } from '../../../app/actions'
 
+import * as CategoryEditState from './categoryEditState'
+
 export const categoryEditUpdate = 'surveyForm/categoryEdit/update'
 export const categoryEditLevelActiveItemUpdate = 'surveyForm/categoryEdit/levelActiveItem/update'
+export const categoryEditImportSummaryShow = 'surveyForm/categoryEdit/importSummary/show'
+export const categoryEditImportSummaryHide = 'surveyForm/categoryEdit/importSummary/hide'
+export const categoryEditImportSummaryColumnDataTypeUpdate = 'surveyForm/categoryEdit/importSummary/column/dataType/update'
 
 export const dispatchCategoryUpdate = (dispatch, category) =>
   dispatch({ type: categoryUpdate, category })
@@ -76,13 +81,29 @@ export const uploadCategory = (categoryUuid, file) => async (dispatch, getState)
   const surveyId = SurveyState.getSurveyId(getState())
   const { data: summary } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/upload`, formData)
 
-  const { data: { job } } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, summary)
+  dispatch({ type: categoryEditImportSummaryShow, summary })
+}
+
+export const importCategory = () => async (dispatch, getState) => {
+  const state = getState()
+  const surveyId = SurveyState.getSurveyId(state)
+  const category = CategoryEditState.getCategoryForEdit(state)
+  const categoryUuid = Category.getUuid(category)
+  const importSummary = CategoryEditState.getImportSummary(state)
+
+  const { data: { job } } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, importSummary)
 
   dispatch(showAppJobMonitor(job, () => {
     // reload category
-    dispatch(setCategoryForEdit({[Category.keys.uuid]: categoryUuid}))
+    dispatch(setCategoryForEdit({ [Category.keys.uuid]: categoryUuid }))
   }))
 }
+
+export const hideCategoryImportSummary = () => dispatch =>
+  dispatch({ type: categoryEditImportSummaryHide })
+
+export const setCategoryImportSummaryColumnDataType = (columnName, dataType) => dispatch =>
+  dispatch({ type: categoryEditImportSummaryColumnDataTypeUpdate, columnName, dataType })
 
 export const createCategoryLevel = (category) => async (dispatch, getState) => {
   const level = Category.newLevel(category)

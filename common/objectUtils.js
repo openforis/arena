@@ -1,5 +1,7 @@
 const R = require('ramda')
 
+const StringUtils = require('./stringUtils')
+
 const keys = {
   id: 'id',
   uuid: 'uuid',
@@ -12,11 +14,13 @@ const keysProps = {
   labels: 'labels',
 }
 
+// CHECK
+
+const isBlank = value => value === null || value === undefined || R.isEmpty(value) || StringUtils.isBlank(value)
+
 // READ
 
 const getUuid = R.propOr(null, keys.uuid)
-
-const isEqual = other => self => getUuid(other) === getUuid(self)
 
 const getProps = R.propOr({}, keys.props)
 
@@ -43,7 +47,11 @@ const getDescription = (lang, defaultTo = null) => R.pipe(
 
 const setProp = (key, value) => R.assocPath([keys.props, key], value)
 
-const setInPath = (pathArray = [], value = '') => obj => {
+const setInPath = (pathArray, value, includeEmpty = true) => obj => {
+  if (!includeEmpty && isBlank(value)) {
+    return obj
+  }
+
   let objCurrent = obj
 
   pathArray.forEach((pathPart, i) => {
@@ -64,6 +72,8 @@ const setInPath = (pathArray = [], value = '') => obj => {
 
 // UTILS / uuid
 
+const isEqual = other => self => getUuid(other) === getUuid(self)
+
 const toIndexedObj = (array, prop) => array.reduce(
   (acc, item) => {
     acc[item[prop]] = item
@@ -78,26 +88,22 @@ module.exports = {
   keys,
   keysProps,
 
-  setInPath,
-
-  // PROPS
+  // READ
   getProps,
   getProp,
-  setProp,
-
   getUuid,
   getParentUuid: R.propOr(null, keys.parentUuid),
-
-  // LABELS
   getLabels,
   getLabel,
-
-  // DESCRIPTIONS
   getDescriptions,
   getDescription,
 
+  // UPDATE
+  setProp,
+  setInPath,
+
   // UTILS
+  isEqual,
   toIndexedObj,
   toUuidIndexedObj,
-  isEqual,
 }

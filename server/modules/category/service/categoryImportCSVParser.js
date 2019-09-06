@@ -62,7 +62,16 @@ const createImportSummary = async (filePath) => {
 
       const level = getOrCreateLevel(columnName, columnType)
 
-      acc[columnName] = CategoryImportSummary.newColumn(columnType, level.name, level.index)
+      const extraDataType = columnType === CategoryImportSummary.columnTypes.extra
+        ? CategoryImportSummary.columnDataTypes.text
+        : null
+
+      const columnProp = columnProps[columnType]
+      const language = columnProp && columnProp.lang
+        ? columnName.substring(columnName.lastIndexOf('_') + 1)
+        : null
+
+      acc[columnName] = CategoryImportSummary.newColumn(columnType, level.name, level.index, language, extraDataType)
 
       return acc
     },
@@ -86,8 +95,8 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
 
       const codes = []
       const extra = {}
-      const labels = {}
-      const descriptions = {}
+      const labelsByLevel = {}
+      const descriptionsByLevel = {}
 
       Object.entries(columns).forEach(
         ([columnName, column], index) => {
@@ -100,13 +109,13 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
               extra[columnName] = columnValue
             } else {
               // label or description
-              const lang = columnName.substring(columnName.lastIndexOf('_') + 1)
-              const levelName = _extractLevelName(columnName, CategoryImportSummary.getColumnType(column))
+              const lang = CategoryImportSummary.getColumnLang(column)
+              const levelName = CategoryImportSummary.getColumnLevelName(column)
 
               if (CategoryImportSummary.isColumnLabel(column))
-                ObjectUtils.setInPath([levelName, lang], columnValue)(labels)
+                ObjectUtils.setInPath([levelName, lang], columnValue)(labelsByLevel)
               else if (CategoryImportSummary.isColumnDescription(column))
-                ObjectUtils.setInPath([levelName, lang], columnValue)(descriptions)
+                ObjectUtils.setInPath([levelName, lang], columnValue)(descriptionsByLevel)
             }
           }
         }
@@ -118,8 +127,8 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
       await onRowItem({
         levelIndexDeeper,
         codes: codes.slice(0, levelIndexDeeper + 1),
-        labels,
-        descriptions,
+        labelsByLevel,
+        descriptionsByLevel,
         extra
       })
     },
@@ -127,40 +136,45 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
   )
 }
 
-const _readHeaders = filePath => new Promise((resolve, reject) => {
-  try {
-    const reader = CSVReader.createReader(
-      filePath,
-      headers => {
-        reader.cancel()
-        resolve(headers)
-      },
-    )
+const _readHeaders = async filePath => {
+  let result = []
 
-    reader.start()
-  } catch (error) {
-    reject(error)
-  }
-})
+  const reader = CSVReader.createReader(
+    filePath,
+    headers => {
+      reader.cancel()
+      result = headers
+    }
+  )
+  await reader.start()
+
+  return result
+}
 
 const _validateSummary = summary => {
   const columns = CategoryImportSummary.getColumns(summary)
+
+  let atLeastOneCodeColumn = false
+
   Object.entries(columns).forEach(([columnName, column]) => {
-    //if column is label or description, a code in the same level must be defined
-    if (CategoryImportSummary.isColumnLabel(column) ||
+    if (CategoryImportSummary.isColumnCode(column)) {
+      atLeastOneCodeColumn = true
+    } else if (CategoryImportSummary.isColumnLabel(column) ||
       CategoryImportSummary.isColumnDescription(column)) {
+      //if column is label or description, a code in the same level must be defined
 
       if (!CategoryImportSummary.hasColumn(CategoryImportSummary.columnTypes.code, CategoryImportSummary.getColumnLevelIndex(column))(summary)) {
-        const levelName = _extractLevelName(columnName, CategoryImportSummary.getColumnType(column))
+        const levelName = CategoryImportSummary.getColumnLevelName(column)
         const columnNameMissing = `${levelName}${columnCodeSuffix}`
-        throw new SystemError(ValidatorErrorKeys.categoryImport.columnMissing, {columnNameMissing})
+        throw new SystemError(ValidatorErrorKeys.categoryImport.columnMissing, { columnNameMissing })
       }
     }
   })
-}
 
-const _extractLevelName = (columnName, columnType) =>
-  columnName.substring(0, columnName.lastIndexOf(columnProps[columnType].suffix))
+  if (!atLeastOneCodeColumn) {
+    throw new SystemError(ValidatorErrorKeys.categoryImport.codeColumnMissing)
+  }
+}
 
 module.exports = {
   createImportSummary,

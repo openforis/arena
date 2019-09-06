@@ -9,7 +9,7 @@ const CategoryManager = require('../../category/manager/categoryManager')
 const TaxonomyManager = require('../../taxonomy/manager/taxonomyManager')
 
 const SystemError = require('../../../utils/systemError')
-const { getRestParam } = require('../../../utils/request')
+const Request = require('../../../utils/request')
 
 const toItem = (type, lang = null) =>
   item => item
@@ -32,13 +32,10 @@ module.exports.init = app => {
   // ==== READ
   app.get('/expression/literal/item', async (req, res, next) => {
     try {
-      const surveyId = getRestParam(req, 'surveyId')
-      const type = getRestParam(req, 'type')
-      const value = getRestParam(req, 'value')
+      const { surveyId, type, value } = Request.getParams(req)
 
       if (NodeDef.nodeDefType.code === type) {
-        const categoryUuid = getRestParam(req, 'categoryUuid')
-        const lang = getRestParam(req, 'lang')
+        const { categoryUuid, lang } = Request.getParams(req)
 
         const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, 0, true)
 
@@ -50,7 +47,7 @@ module.exports.init = app => {
         res.json({ item })
 
       } else if (NodeDef.nodeDefType.taxon === type) {
-        const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
+        const { taxonomyUuid } = Request.getParams(req)
 
         const itemDb = await TaxonomyManager.fetchTaxonByCode(surveyId, taxonomyUuid, value, true)
 
@@ -66,15 +63,10 @@ module.exports.init = app => {
 
   app.get('/expression/literal/items', async (req, res, next) => {
     try {
-      const surveyId = getRestParam(req, 'surveyId')
-      const type = getRestParam(req, 'type')
-      const value = getRestParam(req, 'value')
+      const { surveyId, type, value } = Request.getParams(req)
 
       if (NodeDef.nodeDefType.code === type) {
-
-        const categoryUuid = getRestParam(req, 'categoryUuid')
-        const categoryLevelIndex = getRestParam(req, 'categoryLevelIndex')
-        const lang = getRestParam(req, 'lang')
+        const { categoryUuid, categoryLevelIndex, lang } = Request.getParams(req)
 
         const itemsDb = await CategoryManager.fetchItemsByLevelIndex(surveyId, categoryUuid, categoryLevelIndex, true)
 
@@ -95,7 +87,7 @@ module.exports.init = app => {
         res.json({ items })
 
       } else if (NodeDef.nodeDefType.taxon === type) {
-        const taxonomyUuid = getRestParam(req, 'taxonomyUuid')
+        const { taxonomyUuid } = Request.getParams(req)
 
         const itemsDb = await TaxonomyManager.findTaxaByCodeOrScientificName(surveyId, taxonomyUuid, value, true)
 

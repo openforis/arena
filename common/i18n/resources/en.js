@@ -27,6 +27,7 @@ module.exports = {
     formContainsErrors: 'Form contains errors',
     group: 'Group',
     id: 'id',
+    import: 'Import',
     invalid: 'INVALID',
     item: 'Item',
     item_plural: 'Items',
@@ -167,7 +168,6 @@ module.exports = {
 
   usersView: {
     inviteUser: 'Invite',
-    sendInvitation: 'Send invitation',
     accepted: 'Accepted',
     inviteUserConfirmation: 'An email to {{email}} has been sent',
     updateUserConfirmation: 'User {{name}} has been updated',
@@ -177,9 +177,12 @@ module.exports = {
   userView: {
     scale: 'Scale',
     rotate: 'Rotate',
-    errorSavingUser: 'Error saving user: {{error}}',
     dragAndDrop: 'Drop an image above or',
-    upload: 'click here to upload'
+    upload: 'click here to upload',
+    sendInvitation: 'Send invitation',
+    removeFromSurvey: 'Remove from survey',
+    confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
+    removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
   },
 
   itemsTable: {
@@ -284,6 +287,25 @@ module.exports = {
     level: 'Level',
     confirmDelete: 'Delete the item with all children? $t(common.cantUndoWarning)',
     deleteItem: 'Delete item',
+
+    importSummary: {
+      column: 'Column',
+      columnTypeSummary: 'Level {{level}} $t(categoryEdit.importSummary.columnType.{{type}})',
+      columnTypeSummaryExtra: '{{type}}',
+      columnTypeSummaryWithLanguage: '$t(categoryEdit.importSummary.columnTypeSummary) ({{language}})',
+      columnType: {
+        code: 'code',
+        description: 'description',
+        label: 'label',
+        extra: 'extra'
+      },
+      columnDataType: {
+        geometryPoint: 'Geometry Point',
+        number: 'Number',
+        text: 'Text'
+      },
+      dataType: 'Data Type',
+    }
   },
 
   // ===== All validation errors
@@ -308,10 +330,12 @@ module.exports = {
     },
 
     categoryImport: {
+      codeColumnMissing: 'There should be at least one "code" column',
       codeRequired: '{{columnName}}: a code is required',
       codeDuplicate: '{{columnName}}: duplicate code "{{code}}"',
       columnMissing: 'Missing column: {{columnNameMissing}}',
-      emptyHeaderFound: 'The file contains an empty header'
+      emptyHeaderFound: 'The file contains an empty header',
+      emptyFile: 'The file you are trying to import is empty'
     },
 
     nodeDefEdit: {

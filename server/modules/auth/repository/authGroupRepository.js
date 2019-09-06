@@ -48,7 +48,6 @@ const fetchGroupByUuid = async (groupUuid, client = db) =>
     dbTransformCallback
   )
 
-
 const fetchSurveyGroups = async (surveyId, client = db) =>
   await client.map(`
     SELECT auth_group.*
@@ -100,6 +99,33 @@ const deleteAllUserGroups = async (userUuid, client = db) =>
     WHERE user_uuid = $1`,
     userUuid)
 
+// ==== DELETE
+
+const deleteUserGroup = async (surveyId, userUuid, client = db) =>
+  await client.query(`
+    DELETE
+    FROM
+      auth_group_user
+    WHERE
+      user_uuid = $1
+    AND group_uuid = (
+        SELECT
+          gu.group_uuid
+        FROM
+          auth_group_user gu
+        JOIN
+          auth_group g
+        ON
+          gu.group_uuid = g.uuid
+        JOIN
+          survey s
+        ON
+          s.id = $2
+        WHERE
+          gu.user_uuid = $1
+    )               
+  `, [userUuid, surveyId])
+
 module.exports = {
   // CREATE
   createSurveyGroups,
@@ -115,4 +141,5 @@ module.exports = {
 
   // DELETE
   deleteAllUserGroups,
+  deleteUserGroup,
 }

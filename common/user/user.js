@@ -8,7 +8,7 @@ const keys = {
   name: 'name',
   email: 'email',
   authGroups: 'authGroups',
-
+  hasProfilePicture: 'hasProfilePicture',
   groupName: 'groupName',
 }
 
@@ -22,6 +22,8 @@ const getName = R.prop(keys.name)
 const getEmail = R.prop(keys.email)
 
 const getAuthGroups = R.prop(keys.authGroups)
+
+const hasProfilePicture = R.propEq(keys.hasProfilePicture, true)
 
 const isSystemAdmin = user =>
   user &&
@@ -40,6 +42,7 @@ module.exports = {
   getName,
   getEmail,
   getAuthGroups,
+  hasProfilePicture,
   isSystemAdmin,
   hasAccepted,
 }

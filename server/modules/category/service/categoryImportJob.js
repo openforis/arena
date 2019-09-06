@@ -1,3 +1,5 @@
+const R = require('ramda')
+
 const Job = require('../../../job/job')
 
 const Category = require('../../../../common/survey/category')
@@ -25,8 +27,11 @@ class CategoryImportJob extends Job {
     // levels
     let category = await this._importLevels()
 
+    // item extra def
+    category = await this._importItemExtraDef(category)
+
     // items
-    await this._importItems(category)
+    await this._readItems(category)
 
     if (this.hasErrors()) {
       // errors found
@@ -34,13 +39,7 @@ class CategoryImportJob extends Job {
       await this.setStatusFailed()
     } else {
       // no errors found
-      const surveyId = this.getSurveyId()
-      const user = this.getUser()
-
-      const items = Object.values(this.itemsByCodes)
-      await CategoryManager.insertItems(user, surveyId, items, this.tx)
-
-      this.logDebug(`${items.length} items imported`)
+      await this.insertItems()
     }
   }
 
@@ -65,13 +64,37 @@ class CategoryImportJob extends Job {
       category = Category.assocLevel(level)(category)
     }
 
-    this.logDebug(`levels importing: ${levelNames}`)
+    this.logDebug(`levels imported: ${levelNames}`)
 
     return category
   }
 
-  async _importItems (category) {
-    this.logDebug('importing items')
+  async _importItemExtraDef (category) {
+    this.logDebug('importing item extra def')
+
+    const summary = CategoryImportJobParams.getSummary(this.params)
+
+    const itemExtraDef = Object.entries(CategoryImportSummary.getColumns(summary)).reduce((accExtraDef, [columnName, column]) => {
+        if (CategoryImportSummary.isColumnExtra(column)) {
+          accExtraDef[columnName] = R.pick([CategoryImportSummary.keysColumn.dataType])(column)
+        }
+        return accExtraDef
+      },
+      {}
+    )
+    if (!R.isEmpty(itemExtraDef)) {
+      const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
+      await CategoryManager.updateCategoryProp(this.getUser(), this.getSurveyId(), categoryUuid, Category.props.itemExtraDef, itemExtraDef, this.tx)
+      category = Category.assocItemExtraDef(itemExtraDef)(category)
+    }
+
+    this.logDebug('item extra def imported', itemExtraDef)
+
+    return category
+  }
+
+  async _readItems (category) {
+    this.logDebug('reading items')
 
     const summary = CategoryImportJobParams.getSummary(this.params)
 
@@ -86,16 +109,28 @@ class CategoryImportJob extends Job {
           reader.cancel()
           return
         }
-        await this._importRow(itemRow, levels)
+        await this._onRow(itemRow, levels)
       },
       total => this.total = total
     )
 
     await reader.start()
+
+    this.logDebug(`${this.total} items read`)
+
+    if (this.total === 0)
+      this.addError({
+        error: {
+          [Validator.keys.valid]: false,
+          [Validator.keys.errors]: [{
+            key: ValidatorErrorKeys.categoryImport.emptyFile
+          }]
+        }
+      })
   }
 
-  async _importRow (itemRow, levels) {
-    const { levelIndexDeeper, codes, labels, descriptions, extra } = itemRow
+  async _onRow (itemRow, levels) {
+    const { levelIndexDeeper, codes, labelsByLevel, descriptionsByLevel, extra } = itemRow
 
     if (this._checkCodesNotEmpty(codes)) {
       for (let levelIndex = 0; levelIndex <= levelIndexDeeper; levelIndex++) {
@@ -119,24 +154,37 @@ class CategoryImportJob extends Job {
             itemParentUuid = CategoryItem.getUuid(itemParent)
           }
 
-          // this.logDebug('inserting item', codesLevel)
-
           const codeLevel = codesLevel[codesLevel.length - 1]
+
+          const itemProps = {
+            [CategoryItem.props.code]: codeLevel
+          }
+
+          ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLevel[levelName], false)(itemProps)
+          ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLevel[levelName], false)(itemProps)
+          ObjectUtils.setInPath([CategoryItem.props.extra], extra, false)(itemProps)
 
           this.itemsByCodes[codesLevel] = CategoryItem.newItem(
             CategoryLevel.getUuid(level),
             itemParentUuid,
-            {
-              [CategoryItem.props.code]: codeLevel,
-              [ObjectUtils.keysProps.labels]: labels[levelName],
-              [ObjectUtils.keysProps.descriptions]: descriptions[levelName],
-              [CategoryItem.props.extra]: extra,
-            }
+            itemProps
           )
         }
       }
     }
     this.incrementProcessedItems()
+  }
+
+  async insertItems () {
+    this.logDebug('inserting items')
+
+    const surveyId = this.getSurveyId()
+    const user = this.getUser()
+
+    const items = Object.values(this.itemsByCodes)
+    await CategoryManager.insertItems(user, surveyId, items, this.tx)
+
+    this.logDebug(`${items.length} items imported`)
   }
 
   _checkCodesNotEmpty (codes) {

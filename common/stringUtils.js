@@ -2,6 +2,8 @@ const R = require('ramda')
 
 const nbsp = '\xA0'
 
+const isString = R.is(String)
+
 const trim = R.pipe(R.defaultTo(''), R.trim)
 
 const leftTrim = R.replace(/^\s+/, '')
@@ -14,11 +16,13 @@ const truncate = maxLength =>
 
 const contains = (value = '', string = '') => R.includes(toLower(value), toLower(string))
 
-const isBlank = R.pipe(trim, R.isEmpty)
+const isBlank = R.ifElse(
+  isString,
+  R.pipe(trim, R.isEmpty),
+  R.always(false)
+)
 
 const isNotBlank = R.pipe(isBlank, R.not)
-
-const isString = R.is(String)
 
 const normalizeName = R.pipe(
   leftTrim,

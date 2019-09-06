@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react'
+import ReactDOM from 'react-dom'
 
 import AutocompleteDialog from '../../../../../../commonComponents/form/autocompleteDialog'
 import { useAsyncGetRequest } from '../../../../../../commonComponents/hooks'
 
 import Taxon from '../../../../../../../common/survey/taxon'
-import Node from '../../../../../../../common/record/node'
-import ReactDOM from 'react-dom'
 
 const NodeDefTaxonAutocompleteItemRenderer = props => {
   const { item: taxon, ...otherProps } = props
+
+  const vernacularLang = Taxon.getVernacularLanguage(taxon)
 
   return (
     <div {...otherProps}
@@ -21,9 +22,11 @@ const NodeDefTaxonAutocompleteItemRenderer = props => {
       <div>
         {Taxon.getScientificName(taxon)}
       </div>
+      {vernacularLang &&
       <div style={{ gridColumn: 2 }}>
-        {`${Taxon.getVernacularName()(taxon)} (${Taxon.getVernacularLanguage(taxon)})`}
+        {`${Taxon.getVernacularName()(taxon)} (${vernacularLang})`}
       </div>
+      }
     </div>
   )
 }
@@ -32,12 +35,13 @@ const NodeDefTaxonAutocompleteDialog = props => {
   const {
     surveyId, taxonomyUuid, draft,
     inputRef, field, fieldValue,
+    autocompleteSourceElement,
     onItemSelect, onClose,
   } = props
 
   const params = {
     filterProp: field,
-    filterValue: field === Node.valuePropKeys.code ? `${fieldValue}*` : `*${fieldValue}*`,
+    filterValue: fieldValue,
     includeUnlUnk: true,
     draft,
   }
@@ -58,6 +62,7 @@ const NodeDefTaxonAutocompleteDialog = props => {
       inputField={inputRef.current}
       onItemSelect={onItemSelect}
       onClose={onClose}
+      sourceElement={autocompleteSourceElement}
     />
     ,
     document.body
@@ -75,6 +80,7 @@ NodeDefTaxonAutocompleteDialog.defaultProps = {
   fieldValue: '',
   onItemSelect: null,
   onClose: null,
+  autocompleteSourceElement: null, // used as sourceElement for the autocompleteDialog when rendered in tableBody
 }
 
 export default NodeDefTaxonAutocompleteDialog

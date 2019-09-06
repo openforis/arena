@@ -9,10 +9,13 @@ import UserValidator from '../../../../../common/user/userValidator'
 import AuthGroups from '../../../../../common/auth/authGroups'
 import Authorizer from '../../../../../common/auth/authorizer'
 
+import * as AppState from '../../../../app/appState'
+
 import {
   useAsyncGetRequest,
   useAsyncPostRequest,
   useAsyncMultipartPutRequest,
+  useAsyncDeleteRequest,
   useFormObject,
   useOnUpdate,
   usePrevious,
@@ -22,7 +25,7 @@ import { appModuleUri, userModules } from '../../../appModules'
 
 export const useUserViewState = props => {
   const {
-    user, surveyInfo, userUuid,
+    user, surveyInfo, lang, userUuid,
     showAppLoader, hideAppLoader, showNotificationMessage, setUser,
     history,
   } = props
@@ -45,6 +48,7 @@ export const useUserViewState = props => {
     name: false,
     group: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
     email: isInvitation ? Authorizer.canInviteUsers(user, surveyInfo) : false,
+    remove: false,
   })
 
   // local form object
@@ -56,7 +60,6 @@ export const useUserViewState = props => {
     isInvitation || isUserAcceptPending ? UserValidator.validateInvitation : UserValidator.validateUser,
     !isInvitation
   )
-
 
   // USER ATTRIBUTES
 
@@ -110,13 +113,13 @@ export const useUserViewState = props => {
         name: !isUserAcceptPending && canEdit,
         email: !isUserAcceptPending && Authorizer.canEditUserEmail(user, surveyInfo, userToUpdate),
         group: !isUserAcceptPending && Authorizer.canEditUserGroup(user, surveyInfo, userToUpdate),
+        remove: !isUserAcceptPending && Authorizer.canRemoveUser(user, surveyInfo, userToUpdate),
       })
 
       ready.current = true
       enableValidation()
     }
   }, [loaded])
-
 
   // PROFILE PICTURE
 
@@ -151,7 +154,7 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotificationMessage('userView.errorSavingUser', { error: userSaveError })
+      showNotificationMessage('appErrors.generic', { text: userSaveError }, AppState.notificationSeverity.error)
     } else if (userSaved) {
       // update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
@@ -168,10 +171,25 @@ export const useUserViewState = props => {
     }
   }, [userSaved, userSaveError])
 
-  const sendRequest = () => {
-    showAppLoader()
-    saveUser()
-  }
+  // REMOVE
+  const {
+    dispatch: removeUser,
+    loaded: removeUserLoaded,
+    error: removeUserError,
+  } = useAsyncDeleteRequest(`/api/survey/${surveyId}/user/${User.getUuid(userToUpdate)}`)
+
+  useOnUpdate(() => {
+    hideAppLoader()
+    if (removeUserLoaded) {
+      showNotificationMessage('userView.removeUserConfirmation', {
+        user: formObject.name,
+        survey: Survey.getLabel(surveyInfo, lang)
+      })
+      history.push(appModuleUri(userModules.users))
+    } else if (removeUserError) {
+      showNotificationMessage('appErrors.generic', { text: removeUserError }, AppState.notificationSeverity.error)
+    }
+  }, [removeUserLoaded, removeUserError])
 
   return {
     ready: ready.current,
@@ -184,7 +202,8 @@ export const useUserViewState = props => {
     canEditName: editPermissions.name,
     canEditGroup: editPermissions.group,
     canEditEmail: editPermissions.email,
-    pictureEditorEnabled: userToUpdate.hasProfilePicture || pictureChanged.current,
+    canRemove: editPermissions.remove,
+    pictureEditorEnabled: User.hasProfilePicture(userToUpdate) || pictureChanged.current,
 
     name: formObject.name,
     email: formObject.email,
@@ -198,6 +217,13 @@ export const useUserViewState = props => {
     setGroup,
     setProfilePicture,
 
-    sendRequest,
+    saveUser: () => {
+      showAppLoader()
+      saveUser()
+    },
+    removeUser: () => {
+      showAppLoader()
+      removeUser()
+    }
   }
 }
