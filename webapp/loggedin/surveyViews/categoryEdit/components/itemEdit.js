@@ -89,9 +89,9 @@ const ItemEdit = (props) => {
           )
           : (
             <React.Fragment>
-              <div>{CategoryItem.getCode(item)}</div>
-              <div>{'\xA0'}-{'\xA0'}</div>
-              <div>{CategoryItem.getLabel(lang)(item)}</div>
+              <div className="ellipsis">{CategoryItem.getCode(item)}</div>
+              <div className="ellipsis">{'\xA0'}-{'\xA0'}</div>
+              <div className="ellipsis">{CategoryItem.getLabel(lang)(item)}</div>
             </React.Fragment>
           )
       }

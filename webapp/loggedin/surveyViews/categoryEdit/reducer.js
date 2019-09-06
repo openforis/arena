@@ -11,6 +11,9 @@ import { formReset } from '../surveyForm/actions'
 
 import {
   categoryEditUpdate,
+  categoryEditImportSummaryHide,
+  categoryEditImportSummaryShow,
+  categoryEditImportSummaryColumnDataTypeUpdate,
   categoryEditLevelActiveItemUpdate,
 } from './actions'
 
@@ -55,6 +58,14 @@ const actionHandlers = {
 
   // ===== category level active item
   [categoryEditLevelActiveItemUpdate]: (state, { levelIndex, itemUuid }) => CategoryEditState.assocLevelActiveItem(levelIndex, itemUuid)(state),
+
+  // ===== category import summary
+  [categoryEditImportSummaryShow]: (state, { summary }) => CategoryEditState.assocImportSummary(summary)(state),
+
+  [categoryEditImportSummaryHide]: state => CategoryEditState.dissocImportSummary(state),
+
+  [categoryEditImportSummaryColumnDataTypeUpdate]: (state, { columnName, dataType }) => CategoryEditState.assocImportSummaryColumnDataType(columnName, dataType)(state)
+
 }
 
 export default exportReducer(actionHandlers)

@@ -2,6 +2,7 @@ import * as R from 'ramda'
 
 import Survey from '../../../../common/survey/survey'
 import CategoryItem from '../../../../common/survey/categoryItem'
+import CategoryImportSummary from '../../../../common/survey/categoryImportSummary'
 
 import * as SurveyViewsState from '../surveyViewsState'
 import * as SurveyState from '../../../survey/surveyState'
@@ -27,6 +28,7 @@ const keys = {
   categoryUuid: 'categoryUuid', // current editing category uuid
   levelItems: 'levelItems',
   levelActiveItems: 'levelActiveItems',
+  importSummary: 'importSummary',
 }
 
 export const stateKey = 'categoryEdit'
@@ -115,3 +117,18 @@ const resetNextLevels = (levelIndex, prop) =>
       R.map(k => +k)
     )(categoryEditState)
   )
+
+// ==== import summary
+
+export const getImportSummary = state => getStateProp(keys.importSummary)(state)
+
+export const assocImportSummary = summary => state => R.assoc(keys.importSummary, summary)(state)
+
+export const dissocImportSummary = state => R.dissoc(keys.importSummary)(state)
+
+export const assocImportSummaryColumnDataType = (columnName, dataType) => categoryEditState => R.pipe(
+  R.prop(keys.importSummary),
+  summary => {
+    return assocImportSummary(CategoryImportSummary.assocColumnDataType(columnName, dataType)(summary))(categoryEditState)
+  }
+)(categoryEditState)

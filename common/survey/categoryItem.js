@@ -44,10 +44,13 @@ module.exports = {
   getLabel ,
   getDescriptions: ObjectUtils.getDescriptions,
   getDescription: ObjectUtils.getDescription,
+
+  isEqual: ObjectUtils.isEqual,
+
+  // NOT USED YET
   getExtraProp: prop => R.pipe(
     ObjectUtils.getProp(keys.extra),
     R.propOr('', prop)
   ),
 
-  isEqual: ObjectUtils.isEqual
 }

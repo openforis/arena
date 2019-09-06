@@ -32,10 +32,9 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/categories/:categoryUuid/upload', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
-      const { surveyId, categoryUuid } = Request.getParams(req)
       const file = Request.getFile(req)
 
-      const summary = await CategoryService.createImportSummary(surveyId, categoryUuid, file.tempFilePath)
+      const summary = await CategoryService.createImportSummary(file.tempFilePath)
 
       res.json(summary)
     } catch (err) {
