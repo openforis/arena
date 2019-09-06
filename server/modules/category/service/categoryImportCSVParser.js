@@ -1,3 +1,4 @@
+const fs = require('fs')
 const R = require('ramda')
 
 const CategoryImportSummary = require('../../../../common/survey/categoryImportSummary')
@@ -21,8 +22,8 @@ const columnDescriptionSuffix = columnProps[CategoryImportSummary.columnTypes.de
 const columnRegExpLabel = new RegExp(`^.*${columnLabelSuffix}(_[a-z]{2})?$`)
 const columnRegExpDescription = new RegExp(`^.*${columnDescriptionSuffix}(_[a-z]{2})?$`)
 
-const createImportSummary = async (filePath) => {
-  const columnNames = await _readHeaders(filePath)
+const createImportSummaryFromStream = async stream => {
+  const columnNames = await _readHeaders(stream)
 
   if (R.find(StringUtils.isBlank)(columnNames)) {
     throw new SystemError(ValidatorErrorKeys.categoryImport.emptyHeaderFound)
@@ -85,11 +86,14 @@ const createImportSummary = async (filePath) => {
   return summary
 }
 
-const createRowsReader = async (summary, onRowItem, onTotalChange) => {
+const createImportSummary = async filePath =>
+  await createImportSummaryFromStream(fs.createReadStream(filePath))
+
+const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalChange) => {
   const columns = CategoryImportSummary.getColumns(summary)
 
-  return CSVReader.createReader(
-    CategoryImportSummary.getFilePath(summary),
+  return CSVReader.createReaderFromStream(
+    stream,
     null,
     async row => {
 
@@ -136,11 +140,14 @@ const createRowsReader = async (summary, onRowItem, onTotalChange) => {
   )
 }
 
-const _readHeaders = async filePath => {
+const createRowsReader = async (summary, onRowItem, onTotalChange) =>
+  await createRowsReaderFromStream(fs.createReadStream(CategoryImportSummary.getFilePath(summary)), summary, onRowItem, onTotalChange)
+
+const _readHeaders = async stream => {
   let result = []
 
-  const reader = CSVReader.createReader(
-    filePath,
+  const reader = CSVReader.createReaderFromStream(
+    stream,
     headers => {
       reader.cancel()
       result = headers
@@ -178,5 +185,6 @@ const _validateSummary = summary => {
 
 module.exports = {
   createImportSummary,
-  createRowsReader
+  createRowsReader,
+  createRowsReaderFromStream
 }

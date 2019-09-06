@@ -132,9 +132,7 @@ class CategoriesImportJob extends Job {
   }
 
   async itemsInsertHandler (items, tx) {
-    const surveyId = this.getSurveyId()
-
-    await CategoryManager.insertItems(surveyId, items, tx)
+    await CategoryManager.insertItems(this.getUser(), this.getSurveyId(), items, tx)
   }
 
 }

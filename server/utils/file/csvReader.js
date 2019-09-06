@@ -3,16 +3,14 @@ const fs = require('fs')
 
 const Queue = require('../../../common/queue')
 
-const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
+const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalChange = null) => {
 
   let headers = null
   let total = 0
   let canceled = false
-  let stream = null
   const queue = new Queue()
 
   const start = () => new Promise((resolve, reject) => {
-    stream = fs.createReadStream(filePath)
     let started = false
     let ended = false
 
@@ -60,14 +58,28 @@ const createReader = (filePath, onHeaders, onRow, onTotalChange) => {
       .on('error', reject)
   })
 
+  const calculateSize = () => new Promise((resolve, reject) => {
+    let total = 0
+
+    stream
+      .pipe(csvParser())
+      .on('data', () => total++)
+      .on('end', () => resolve(total))
+      .on('error', reject)
+  })
+
   const cancel = () => {
     canceled = true
     stream && stream.destroy()
   }
 
-  return { start, cancel }
+  return { start, calculateSize, cancel }
 }
 
+const createReader = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
+  createReaderFromStream(fs.createReadStream(filePath), onHeaders, onRow, onTotalChange)
+
 module.exports = {
-  createReader
+  createReader,
+  createReaderFromStream
 }

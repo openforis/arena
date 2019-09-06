@@ -94,6 +94,7 @@ module.exports = {
   columnTypes,
   columnDataTypes,
 
+  keys,
   keysColumn,
 
   // ==== SUMMARY
@@ -103,6 +104,7 @@ module.exports = {
   getColumns,
   getFilePath: R.prop(keys.filePath),
   // UPDATE
+  assocColumns: R.assoc(keys.columns),
   assocColumnDataType: (columnName, dataType) => R.assocPath([keys.columns, columnName, keysColumn.dataType], dataType),
 
   // ==== COLUMN
