@@ -17,7 +17,7 @@ module.exports.init = app => {
 
   app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
     try {
-      const { user } = req
+      const user = Request.getUser(req)
 
       const { surveyId, email, groupUuid } = Request.getParams(req)
       const validation = await UserValidator.validateInvitation(req.body)
@@ -48,7 +48,7 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { user } = req
+      const user = Request.getUser(req)
       const surveyId = Request.getRestParam(req, 'surveyId')
 
       const count = await UserService.countUsersBySurveyId(user, surveyId)
@@ -61,7 +61,7 @@ module.exports.init = app => {
 
   app.get('/survey/:surveyId/users', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { user } = req
+      const user = Request.getUser(req)
       const { surveyId, offset, limit } = Request.getParams(req)
 
       const list = await UserService.fetchUsersBySurveyId(user, surveyId, offset, limit)
@@ -91,7 +91,7 @@ module.exports.init = app => {
 
   app.put('/user/:userUuid/name', async (req, res, next) => {
     try {
-      const { user } = req
+      const user = Request.getUser(req)
       const { userUuid, name } = Request.getParams(req)
 
       await UserService.updateUsername(user, userUuid, name)
@@ -110,7 +110,7 @@ module.exports.init = app => {
         throw new SystemError('invalidUser')
       }
 
-      const { user } = req
+      const user = Request.getUser(req)
       const { surveyId, userUuid, name, email, groupUuid } = Request.getParams(req)
 
       const fileReq = Request.getFile(req)
@@ -125,7 +125,7 @@ module.exports.init = app => {
 
   app.post('/user/:userUuid/pref/:name/:value', async (req, res, next) => {
     try {
-      const { user } = req
+      const user = Request.getUser(req)
 
       const { userUuid, name, value } = Request.getParams(req)
 
@@ -141,4 +141,19 @@ module.exports.init = app => {
     }
 
   })
+
+  // ==== DELETE
+  app.delete('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserRemovePermission, async (req, res, next) => {
+    try {
+      const { surveyId, userUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await UserService.deleteUser(user, surveyId, userUuid)
+
+      Response.sendOk(res)
+    } catch (err) {
+      next(err)
+    }
+  })
+
 }

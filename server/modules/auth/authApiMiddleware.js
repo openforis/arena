@@ -73,8 +73,8 @@ module.exports = {
   requireRecordViewPermission: requireSurveyPermission(Authorizer.canViewRecord),
 
   // User
-  // requireUserEditPermission: requireUserEditPermissions,
   requireUserInvitePermission: requireSurveyPermission(Authorizer.canInviteUsers),
   requireUserViewPermission: requireUserPermission(Authorizer.canViewUser),
   requireUserEditPermission: requireUserPermission(Authorizer.canEditUser),
+  requireUserRemovePermission: requireUserPermission(Authorizer.canRemoveUser),
 }

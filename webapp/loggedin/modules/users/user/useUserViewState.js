@@ -154,7 +154,7 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (userSaveError) {
-      showNotificationMessage('appErrors.generic', { error: userSaveError }, AppState.notificationSeverity.error)
+      showNotificationMessage('appErrors.generic', { text: userSaveError }, AppState.notificationSeverity.error)
     } else if (userSaved) {
       // update user in redux state if self
       if (User.isEqual(user)(userSaveResponse)) {
@@ -181,10 +181,11 @@ export const useUserViewState = props => {
   useOnUpdate(() => {
     hideAppLoader()
     if (removeUserLoaded) {
-      showNotificationMessage('usersView.removeUserConfirmation', {
+      showNotificationMessage('userView.removeUserConfirmation', {
         user: formObject.name,
         survey: Survey.getLabel(surveyInfo, lang)
       })
+      history.push(appModuleUri(userModules.users))
     } else if (removeUserError) {
       showNotificationMessage('appErrors.generic', { text: removeUserError }, AppState.notificationSeverity.error)
     }

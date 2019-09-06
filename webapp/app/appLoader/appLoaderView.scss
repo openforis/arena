@@ -10,16 +10,16 @@
   z-index: $zIndex190AppLoader;
 }
 
-.app-loader.enter-done {
-  opacity: 1;
-}
-
 .app-loader.enter-active {
   animation: animate-in 750ms ease-out;
 }
 
 .app-loader.exit-active {
   animation: animate-out 750ms ease-out;
+}
+
+.app-loader.exit, .app-loader.exit-done {
+  opacity: 0;
 }
 
 @keyframes animate-in {

@@ -14,17 +14,7 @@ const Authorizer = require('../../../../common/auth/authorizer')
 const SystemError = require('../../../utils/systemError')
 const UnauthorizedError = require('../../../utils/unauthorizedError')
 
-const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
-  const fetchSystemAdmins = User.isSystemAdmin(user)
-
-  return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
-}
-
-const countUsersBySurveyId = async (user, surveyId) => {
-  const countSystemAdmins = User.isSystemAdmin(user)
-
-  return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
-}
+// ====== CREATE
 
 const inviteUser = async (user, surveyId, email, groupUuid) => {
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
@@ -60,6 +50,22 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
     await UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)
   }
 }
+
+// ====== READ
+
+const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
+  const fetchSystemAdmins = User.isSystemAdmin(user)
+
+  return await UserManager.fetchUsersBySurveyId(surveyId, offset, limit, fetchSystemAdmins)
+}
+
+const countUsersBySurveyId = async (user, surveyId) => {
+  const countSystemAdmins = User.isSystemAdmin(user)
+
+  return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
+}
+
+// ====== UPDATE
 
 const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file) => {
   const survey = await SurveyManager.fetchSurveyById(surveyId)
@@ -100,21 +106,24 @@ const updateUsername = async (user, userUuid, name) => {
 }
 
 module.exports = {
+  // ==== User
+  // CREATE
+  inviteUser,
+
+  // READ
   countUsersBySurveyId,
-
   fetchUsersBySurveyId,
-
   fetchUserByUuid: UserManager.fetchUserByUuid,
-
   fetchUserProfilePicture: UserManager.fetchUserProfilePicture,
 
+  // UPDATE
   updateUser,
-
   updateUsername,
 
+  // DELETE
+  deleteUser: UserManager.deleteUser,
+
+  // ==== User prefs
   updateUserPref: UserManager.updateUserPref,
-
   deleteUserPref: UserManager.deleteUserPref,
-
-  inviteUser,
 }

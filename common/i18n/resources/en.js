@@ -181,7 +181,7 @@ module.exports = {
     sendInvitation: 'Send invitation',
     removeFromSurvey: 'Remove from survey',
     confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
-    removeUserConfirmation: 'User {{user}} has been remove from survey {{survey}}',
+    removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
   },
 
   itemsTable: {
