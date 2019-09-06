@@ -66,7 +66,7 @@ const UsersRow = props => {
         {User.getEmail(userListItem)}
       </div>
       <div>
-        {i18n.t(`authGroups.${AuthGroups.getName(authGroup)}.label`)}
+        {i18n.t(`authGroups.${AuthGroups.getName(authGroup)}.label_plural`)}
       </div>
       <div>
         {

@@ -3,7 +3,6 @@ import * as R from 'ramda'
 
 import { useFormObject } from '../../../../../commonComponents/hooks'
 
-import Survey from '../../../../../../common/survey/survey'
 import Validator from '../../../../../../common/validation/validator'
 import StringUtils from '../../../../../../common/stringUtils'
 import ObjectUtils from '../../../../../../common/objectUtils'
@@ -13,7 +12,7 @@ export const useSurveyInfoViewState = props => {
   const { surveyInfo, updateSurveyInfoProps, } = props
 
   const {
-    object, objectValid,
+    object,
     setObjectField, enableValidation, getFieldValidation, setValidation
   } = useFormObject(ObjectUtils.getProps(surveyInfo), null)
 

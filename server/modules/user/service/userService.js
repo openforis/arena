@@ -1,5 +1,7 @@
 const fs = require('fs')
 
+const passwordGenerator = require('generate-password')
+
 const aws = require('../../../system/aws')
 
 const UserManager = require('../manager/userManager')
@@ -13,6 +15,7 @@ const Authorizer = require('../../../../common/auth/authorizer')
 
 const SystemError = require('../../../utils/systemError')
 const UnauthorizedError = require('../../../utils/unauthorizedError')
+const Mailer = require('../../../utils/mailer')
 
 const fetchUsersBySurveyId = async (user, surveyId, offset, limit) => {
   const fetchSystemAdmins = User.isSystemAdmin(user)
@@ -26,7 +29,7 @@ const countUsersBySurveyId = async (user, surveyId) => {
   return await UserManager.countUsersBySurveyId(surveyId, countSystemAdmins)
 }
 
-const inviteUser = async (user, surveyId, email, groupUuid) => {
+const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => {
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
@@ -37,12 +40,15 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   // If the survey is not published, only survey admins and system admins can be invited
   const survey = await SurveyManager.fetchSurveyById(surveyId)
   const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyLabel = Survey.getLabel(surveyInfo)
   const isPublished = Survey.isPublished(surveyInfo)
+
   if (!isPublished && !(AuthGroups.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))) {
     throw new UnauthorizedError(User.getName(user))
   }
 
   const dbUser = await UserManager.fetchUserByEmail(email)
+  const groupName = AuthGroups.getName(Authorizer.getSurveyUserGroup(user, surveyInfo))
   if (dbUser) {
     const newUserGroups = User.getAuthGroups(dbUser)
     const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
@@ -54,10 +60,25 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
       throw new SystemError('userIsAdmin')
     }
 
-    await UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser)
+    await Promise.all([
+      UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser),
+      Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel: `$t(authGroups.${groupName}.label)` }, i18n),
+    ])
   } else {
-    const { User: { Username: userUuid } } = await aws.inviteUser(email)
-    await UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)
+    const password = passwordGenerator.generate({ length: 8, numbers: true, uppercase: true, strict: true })
+    const { User: { Username: userUuid } } = await aws.inviteUser(email, password)
+
+    const msgParams = {
+      serverUrl,
+      email,
+      password,
+      surveyLabel,
+      groupLabel: `$t(authGroups.${groupName}.label) }`,
+      temporaryPasswordMsg: password ? '$t(emails.userInvite.temporaryPasswordMsg)' : '' }
+    await Promise.all([
+      Mailer.sendEmail(email, 'emails.userInvite', msgParams, i18n),
+      UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)
+    ])
   }
 }
 

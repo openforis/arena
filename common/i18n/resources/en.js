@@ -431,32 +431,55 @@ module.exports = {
 
   authGroups: {
     systemAdmin: {
-      label: 'System Administrators',
+      label: 'System Administrator',
+      label_plural: 'System Administrators',
       description: 'OF Arena system administrators',
     },
     surveyAdmin: {
-      label: 'Survey administrators',
+      label: 'Survey administrator',
+      label_plural: 'Survey administrators',
       description: 'Full rights',
     },
     surveyEditor: {
-      label: 'Survey editors',
+      label: 'Survey editor',
+      label_plural: 'Survey editors',
       description: 'Can edit survey, records, invite users',
     },
     dataEditor: {
-      label: 'Data editors',
+      label: 'Survey editor',
+      label_plural: 'Data editors',
       description: 'Can edit records in data entry step',
     },
     dataCleanser: {
-      label: 'Data cleansers',
+      label: 'Data cleanser',
+      label_plural: 'Data cleansers',
       description: 'Can edit records in data cleansing step',
     },
     dataAnalyst: {
-      label: 'Data analysts',
+      label: 'Data analyst',
+      label_plural: 'Data analysts',
       description: 'Can edit records in data analysis step',
     },
     surveyGuest: {
       label: 'System guest',
+      label_plural: 'System guests',
       description: 'Can view records',
     },
   },
+
+  emails: {
+    userInvite: {
+      subject: 'You have been invited to OpenForis Arena!',
+      body: `<p>Hello,</p>
+             <p>You have been invited to join the survey <strong>{{surveyLabel}}</strong> as {{groupLabel}}</p>
+             {{temporaryPasswordMsg}}
+             <p><a href="{{serverUrl}}">Click here to access OpenForis Arena</a></p>
+             <p>
+             Thank you,
+             <br>
+             The OpenForis Arena team
+             </p>`,
+      temporaryPasswordMsg: '<p>Your username is <strong>{{email}}</strong> and your temporary password is <strong>{{password}}</strong/></p>',
+    }
+  }
 }

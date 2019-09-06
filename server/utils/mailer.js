@@ -1,7 +1,11 @@
 const aws = require('../system/aws')
 
-export const sendEmail = async (to, msgKey, msgParams = {}) => {
-  await aws.sendEmail('from_email', to, 'test', 'test')
+const sendEmail = async (to, msgKey, msgParams = {}, i18n) => {
+  const mailSubject = i18n.t(`${msgKey}.subject`)
+  const msgBody = i18n.t(`${msgKey}.body`, msgParams)
+  await aws.sendEmail(process.env.ADMIN_EMAIL, to, mailSubject, msgBody)
 }
 
-sendEmail()
+module.exports = {
+  sendEmail,
+}

@@ -18,7 +18,6 @@ module.exports.init = app => {
   app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
     try {
       const { user } = req
-
       const { surveyId, email, groupUuid } = Request.getParams(req)
       const validation = await UserValidator.validateInvitation(req.body)
 
@@ -26,7 +25,8 @@ module.exports.init = app => {
         throw new SystemError('invalidUser')
       }
 
-      await UserService.inviteUser(user, surveyId, email, groupUuid)
+      const serverUrl = `${req.protocol}://${req.headers.host}`
+      await UserService.inviteUser(user, surveyId, email, groupUuid, serverUrl, req.i18n)
       Response.sendOk(res)
     } catch (err) {
       next(err)

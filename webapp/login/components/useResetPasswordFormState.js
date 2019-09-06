@@ -27,7 +27,7 @@ export const useResetPasswordFormState = props => {
   const validateObj = async obj => await validate(
     obj,
     {
-      'password': [validateRequired, validatePassword, validatePasswordStrength],
+      'password': [validateRequired('Password is required'), validatePassword, validatePasswordStrength],
       'passwordConfirm': [validatePasswordConfirm],
       'verificationCode': [validateVerificationCode],
     })

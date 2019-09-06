@@ -14,12 +14,14 @@ const _sendAwsRequest = request =>
     })
   })
 
-const inviteUser = email => {
+const inviteUser = async (email, temporaryPassword) => {
   const params = {
     UserPoolId: process.env.COGNITO_USER_POOL_ID,
     // Username and email are the same in our case
     Username: email,
-    DesiredDeliveryMediums: ['EMAIL'],
+    TemporaryPassword: temporaryPassword,
+    // Message will be sent by us
+    MessageAction: 'SUPPRESS',
     ForceAliasCreation: false,
     UserAttributes: [{
       Name: 'email',
@@ -33,7 +35,7 @@ const inviteUser = email => {
   return _sendAwsRequest(_getAwsClient().adminCreateUser(params))
 }
 
-const updateEmail = (oldEmail, newEmail) => {
+const updateEmail = async (oldEmail, newEmail) => {
   const params = {
     UserAttributes: [{
       Name: 'email',
@@ -50,8 +52,6 @@ const updateEmail = (oldEmail, newEmail) => {
 }
 
 const sendEmail = async (from, to, subject, body) => {
-  // aws.config.update({ region: process.env.COGNITO_REGION })
-
   // Create sendEmail params 
   const params = {
     Destination: {
@@ -74,20 +74,12 @@ const sendEmail = async (from, to, subject, body) => {
   }
 
   // Create the promise and SES service object
-  const sendPromise = new aws.SES({
+  const sendEmailPromise = new aws.SES({
+    apiVersion: '2010-12-01',
     region: process.env.COGNITO_REGION,
-    apiVersion: '2016-04-19'
   }).sendEmail(params).promise()
 
-  // // Handle promise's fulfilled/rejected states
-  // sendPromise.then(
-  //   function (data) {
-  //     console.log(data.MessageId)
-  //   }).catch(err => {
-  //   console.error(err, err.stack)
-  // })
-
-  return sendPromise
+  return sendEmailPromise
 }
 
 module.exports = {

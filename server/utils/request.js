@@ -54,6 +54,10 @@ const getFile = R.pathOr(null, ['files', 'file'])
 const getUser = R.prop('user')
 const getUserUuid = R.pipe(getUser, R.prop('uuid'))
 
+// i18n
+
+const getI18n = R.prop('i18n')
+
 module.exports = {
   getParams,
   getRestParam,
@@ -65,4 +69,7 @@ module.exports = {
   // User
   getUserUuid,
   getUser,
+
+  // i18n
+  getI18n,
 }
