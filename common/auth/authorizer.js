@@ -120,17 +120,27 @@ const canEditUserEmail = (user, surveyInfo, userToUpdate) => (
   )
 )
 
-const canEditUserGroup = (user, surveyInfo, userToUpdate) => {
-  return (
-    !User.isEqual(user)(userToUpdate) && (
-      User.isSystemAdmin(user) ||
-      (
-        isSurveyAdmin(user, surveyInfo) &&
-        isSurveyUser(surveyInfo, userToUpdate)
-      )
+const canEditUserGroup = (user, surveyInfo, userToUpdate) => (
+  !User.isEqual(user)(userToUpdate) && (
+    User.isSystemAdmin(user) ||
+    (
+      isSurveyAdmin(user, surveyInfo) &&
+      isSurveyUser(surveyInfo, userToUpdate)
     )
   )
-}
+)
+
+const canRemoveUser = (user, surveyInfo, userToRemove) => (
+  !User.isEqual(user)(userToRemove) &&
+  !User.isSystemAdmin(userToRemove) &&
+  (
+    User.isSystemAdmin(user) ||
+    (
+      isSurveyAdmin(user, surveyInfo) &&
+      isSurveyUser(surveyInfo, userToRemove)
+    )
+  )
+)
 
 module.exports = {
   getSurveyUserGroup,
@@ -150,4 +160,5 @@ module.exports = {
   canEditUser,
   canEditUserEmail,
   canEditUserGroup,
+  canRemoveUser,
 }

@@ -168,7 +168,6 @@ module.exports = {
 
   usersView: {
     inviteUser: 'Invite',
-    sendInvitation: 'Send invitation',
     accepted: 'Accepted',
     inviteUserConfirmation: 'An email to {{email}} has been sent',
     updateUserConfirmation: 'User {{name}} has been updated',
@@ -178,9 +177,12 @@ module.exports = {
   userView: {
     scale: 'Scale',
     rotate: 'Rotate',
-    errorSavingUser: 'Error saving user: {{error}}',
     dragAndDrop: 'Drop an image above or',
-    upload: 'click here to upload'
+    upload: 'click here to upload',
+    sendInvitation: 'Send invitation',
+    removeFromSurvey: 'Remove from survey',
+    confirmRemove: 'Are you sure you want to revoke access to {{user}} from survey {{survey}}?',
+    removeUserConfirmation: 'User {{user}} has been removed from survey {{survey}}',
   },
 
   itemsTable: {

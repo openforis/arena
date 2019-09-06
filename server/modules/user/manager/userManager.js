@@ -85,6 +85,14 @@ const updateUser = _userFetcher(_updateUser)
 
 // ==== DELETE
 
+const deleteUser = async (user, surveyId, userUuidToRemove, client = db) =>
+  await Promise.all([
+    AuthGroupRepository.deleteUserGroup(surveyId, userUuidToRemove, client),
+    ActivityLog.log(
+      user, surveyId, ActivityLog.type.userRemove, { userUuid: userUuidToRemove }, client
+    )
+  ])
+
 const deleteUserPref = async (user, name) => ({
   ...(await UserRepository.deleteUserPref(user, name)),
   authGroups: await AuthGroupRepository.fetchUserGroups(User.getUuid(user))
@@ -115,4 +123,5 @@ module.exports = {
 
   // DELETE
   deleteUserPref,
+  deleteUser,
 }
