@@ -117,14 +117,12 @@ const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const nodeDef = NodeDefEditState.getNodeDef(state)
 
-  const isCode = NodeDef.isCode(nodeDef)
-
   return {
-    categories: isCode ? Survey.getCategoriesArray(survey) : null,
-    canUpdateCategory: isCode && Survey.canUpdateCategory(nodeDef)(survey),
-    category: isCode ? Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey) : null,
-    candidateParentCodeNodeDefs: isCode ? Survey.getNodeDefCodeCandidateParents(nodeDef)(survey) : null,
-    parentCodeDef: isCode ? Survey.getNodeDefParentCode(nodeDef)(survey) : null,
+    categories: Survey.getCategoriesArray(survey),
+    canUpdateCategory: Survey.canUpdateCategory(nodeDef)(survey),
+    category: Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey),
+    candidateParentCodeNodeDefs: Survey.getNodeDefCodeCandidateParents(nodeDef)(survey),
+    parentCodeDef: Survey.getNodeDefParentCode(nodeDef)(survey),
   }
 }
 
