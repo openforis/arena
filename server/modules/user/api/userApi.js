@@ -26,7 +26,7 @@ module.exports.init = app => {
       }
 
       const serverUrl = `${req.protocol}://${req.headers.host}`
-      await UserService.inviteUser(user, surveyId, email, groupUuid, serverUrl, req.i18n)
+      await UserService.inviteUser(user, surveyId, email, groupUuid, serverUrl, Request.getI18n(req))
       Response.sendOk(res)
     } catch (err) {
       next(err)
