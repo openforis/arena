@@ -126,6 +126,7 @@ module.exports = {
   getTaxonomiesArray: SurveyTaxonomies.getTaxonomiesArray,
   getTaxonomyByUuid: SurveyTaxonomies.getTaxonomyByUuid,
   assocTaxonomies: SurveyTaxonomies.assocTaxonomies,
+  canUpdateTaxonomy: SurveyNodeDefs.canUpdateTaxonomy,
 
   // ====== Survey Reference data index
   // category index

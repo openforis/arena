@@ -21,9 +21,11 @@ const { propKeys } = NodeDef
 const TaxonProps = (props) => {
   const {
     nodeDef, validation,
-    putNodeDefProp,
     taxonomies,
     taxonomy,
+    canUpdateTaxonomy,
+
+    putNodeDefProp,
     createTaxonomy,
     toggleTaxonomyEdit,
   } = props
@@ -45,6 +47,7 @@ const TaxonProps = (props) => {
                     itemLabelFunction={Taxonomy.getName}
                     validation={Validator.getFieldValidation(propKeys.taxonomyUuid)(validation)}
                     selection={taxonomy}
+                    disabled={!canUpdateTaxonomy}
                     onChange={putTaxonomyProp}/>
           <button className="btn btn-s"
                   style={{ justifySelf: 'center' }}
@@ -71,11 +74,10 @@ const mapStateToProps = state => {
   const survey = SurveyState.getSurvey(state)
   const nodeDef = NodeDefEditState.getNodeDef(state)
 
-  const isTaxon = NodeDef.isTaxon(nodeDef)
-
   return {
-    taxonomy: isTaxon ? Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey) : null,
-    taxonomies: isTaxon ? Survey.getTaxonomiesArray(survey) : null,
+    taxonomy: Survey.getTaxonomyByUuid(NodeDef.getTaxonomyUuid(nodeDef))(survey),
+    taxonomies: Survey.getTaxonomiesArray(survey),
+    canUpdateTaxonomy: Survey.canUpdateTaxonomy(nodeDef)(survey),
   }
 }
 

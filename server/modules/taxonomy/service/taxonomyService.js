@@ -62,12 +62,14 @@ module.exports = {
   fetchTaxonomyByUuid: TaxonomyManager.fetchTaxonomyByUuid,
   fetchTaxonomiesBySurveyId: TaxonomyManager.fetchTaxonomiesBySurveyId,
 
-  fetchTaxonByUuid: TaxonomyManager.fetchTaxonByUuid,
-  fetchTaxaByVernacularName: TaxonomyManager.fetchTaxaByVernacularName,
-  fetchTaxaByPropLike: TaxonomyManager.fetchTaxaByPropLike,
-  fetchTaxaWithVernacularNames: TaxonomyManager.fetchTaxaWithVernacularNames,
   countTaxaByTaxonomyUuid: TaxonomyManager.countTaxaByTaxonomyUuid,
+  findTaxaByCode: TaxonomyManager.findTaxaByCode,
+  findTaxaByScientificName: TaxonomyManager.findTaxaByScientificName,
+  findTaxaByCodeOrScientificName: TaxonomyManager.findTaxaByCodeOrScientificName,
+  findTaxaByVernacularName: TaxonomyManager.findTaxaByVernacularName,
 
+  fetchTaxaWithVernacularNames: TaxonomyManager.fetchTaxaWithVernacularNames,
+  fetchTaxonByUuid: TaxonomyManager.fetchTaxonByUuid,
   fetchTaxonVernacularNameByUuid: TaxonomyManager.fetchTaxonVernacularNameByUuid,
 
   // update
