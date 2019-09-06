@@ -198,6 +198,8 @@ const canUpdateCategory = nodeDef =>
   survey =>
     !(NodeDef.isPublished(nodeDef) || isNodeDefParentCode(nodeDef)(survey))
 
+const canUpdateTaxonomy = nodeDef => () => !NodeDef.isPublished(nodeDef)
+
 module.exports = {
   getNodeDefs,
   getNodeDefsArray,
@@ -236,4 +238,7 @@ module.exports = {
   getNodeDefCodeCandidateParents,
   isNodeDefParentCode,
   canUpdateCategory,
+
+  // ====== NodeDef Taxonomy
+  canUpdateTaxonomy,
 }
