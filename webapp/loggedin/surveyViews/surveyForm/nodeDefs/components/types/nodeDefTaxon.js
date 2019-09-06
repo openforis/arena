@@ -8,7 +8,6 @@ import { FormItem } from '../../../../../../commonComponents/form/input'
 import useI18n from '../../../../../../commonComponents/useI18n'
 import NodeDefTaxonInputField from './nodeDefTaxonInputField'
 
-import Survey from '../../../../../../../common/survey/survey'
 import Taxon from '../../../../../../../common/survey/taxon'
 import NodeDef from '../../../../../../../common/survey/nodeDef'
 import Node from '../../../../../../../common/record/node'
@@ -161,7 +160,7 @@ const mapStateToProps = (state, props) => {
   return {
     taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
     surveyId,
-    draft: Survey.isDraft(surveyInfo),
+    draft: edit,
     node: edit ? null : nodes[0]
   }
 }
