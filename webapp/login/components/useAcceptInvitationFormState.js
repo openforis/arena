@@ -2,25 +2,19 @@ import React from 'react'
 
 import useFormObject from '../../commonComponents/hooks/useFormObject'
 import Validator from '../../../common/validation/validator'
+import ValidatorErrorKeys from '../../../common/validation/validatorErrorKeys'
 
-import { validatePassword, validatePasswordStrength, validatePasswordConfirm, errors } from './passwordValidator'
+import { validatePassword, validatePasswordStrength, validatePasswordConfirm } from './passwordValidator'
 
 export const useAcceptInvitationFormState = props => {
   const { acceptInvitation, setLoginError } = props
 
-  const formErrors = {
-    ...errors,
-    userName: {
-      requiredField: 'Please enter a new name',
-    }
-  }
-
   const validateObj = async obj => await Validator.validate(
     obj,
     {
-      'userName': [Validator.validateRequired('User name is required')],
-      'password': [Validator.validateRequired('Password is required'), validatePassword, validatePasswordStrength],
+      'userName': [Validator.validateRequired(ValidatorErrorKeys.user.userNameRequired)],
       'passwordConfirm': [validatePasswordConfirm],
+      'password': [Validator.validateRequired(ValidatorErrorKeys.user.passwordRequired), validatePassword, validatePasswordStrength],
     })
 
   const {
@@ -45,8 +39,7 @@ export const useAcceptInvitationFormState = props => {
       const firstMatch = ['userName', 'passwordConfirm', 'password']
         .map(field => ({ field, validation: getFieldValidation(field) }))
         .find(v => !Validator.isValidationValid(v.validation))
-      const key = firstMatch.validation.errors[0].key
-      setLoginError(formErrors[firstMatch.field][key])
+      setLoginError(firstMatch.validation.errors[0].key)
     }
   }
 

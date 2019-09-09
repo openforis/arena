@@ -28,9 +28,8 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => 
   }
 
   // If the survey is not published, only survey admins and system admins can be invited
-  const survey = await SurveyManager.fetchSurveyById(surveyId)
+  const survey = await SurveyManager.fetchSurveyById(surveyId, true)
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const surveyLabel = Survey.getLabel(surveyInfo)
   const isPublished = Survey.isPublished(surveyInfo)
 
   if (!isPublished && !(AuthGroups.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))) {
@@ -38,17 +37,22 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => 
   }
 
   const dbUser = await UserManager.fetchUserByEmail(email)
+  const lang = User.getLang(user)
+  const surveyLabel = Survey.getLabel(surveyInfo, lang)
   const groupName = AuthGroups.getName(Authorizer.getSurveyUserGroup(user, surveyInfo))
   const groupLabel = `$t(authGroups.${groupName}.label)`
+
+  await i18n.changeLanguage(lang)
+
   if (dbUser) {
     const newUserGroups = User.getAuthGroups(dbUser)
     const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
 
     if (hasRoleInSurvey) {
-      throw new SystemError('userHasRole')
+      throw new SystemError('appErrors.userHasRole')
     }
     if (User.isSystemAdmin(dbUser)) {
-      throw new SystemError('userIsAdmin')
+      throw new SystemError('appErrors.userIsAdmin')
     }
 
     await Promise.all([
@@ -59,7 +63,7 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => 
     const password = passwordGenerator.generate({ length: 8, numbers: true, uppercase: true, strict: true })
     const { User: { Username: userUuid } } = await aws.inviteUser(email, password)
 
-    const msgParams = { serverUrl, email, password, surveyLabel, groupLabel, temporaryPasswordMsg: password ? '$t(emails.userInvite.temporaryPasswordMsg)' : '' }
+    const msgParams = { serverUrl, email, password, surveyLabel, groupLabel, temporaryPasswordMsg: '$t(emails.userInvite.temporaryPasswordMsg)' }
     await Promise.all([
       Mailer.sendEmail(email, 'emails.userInvite', msgParams, i18n),
       UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)

@@ -72,5 +72,12 @@ module.exports = {
     emailInvalid: 'validationErrors.user.emailInvalid',
     emailRequired: 'validationErrors.user.emailRequired',
     groupRequired: 'validationErrors.user.groupRequired',
+
+    passwordRequired: 'validationErrors.user.passwordRequired',
+    passwordInvalid: 'validationErrors.user.passwordInvalid',
+    passwordUnsafe: 'validationErrors.user.passwordUnsafe',
+    userNameRequired: 'validationErrors.user.userNameRequired',
+    passwordsDoNotMatch: 'validationErrors.user.passwordsDoNotMatch',
+    verificationCodeInvalid: 'validationErrors.user.verificationCodeInvalid',
   }
 }

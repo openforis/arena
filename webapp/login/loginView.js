@@ -3,6 +3,7 @@ import './loginView.scss'
 import React from 'react'
 import { connect } from 'react-redux'
 
+import * as AppState from '../app/appState'
 import * as LoginState from './loginState'
 
 import LoginForm from './components/loginForm'
@@ -19,7 +20,7 @@ const forms = {
 
 const LoginView = props => {
 
-  const { userAction, error } = props
+  const { userAction, error, i18n } = props
 
   return (
     <>
@@ -50,7 +51,7 @@ const LoginView = props => {
 
       {
         error &&
-        <div className="login-form__error text-center">{error}</div>
+        <div className="login-form__error text-center">{i18n.t(error)}</div>
       }
 
       {
@@ -63,6 +64,7 @@ const LoginView = props => {
 const mapStateToProps = state => ({
   userAction: LoginState.getUserAction(state),
   error: LoginState.getError(state),
+  i18n: AppState.getI18n(state),
 })
 
 export default connect(mapStateToProps)(LoginView)

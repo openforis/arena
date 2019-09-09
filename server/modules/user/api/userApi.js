@@ -26,7 +26,7 @@ module.exports.init = app => {
         throw new SystemError('invalidUser')
       }
 
-      const serverUrl = `${req.protocol}://${req.headers.host}`
+      const serverUrl = Request.getServerUrl(req)
       await UserService.inviteUser(user, surveyId, email, groupUuid, serverUrl, Request.getI18n(req))
       Response.sendOk(res)
     } catch (err) {

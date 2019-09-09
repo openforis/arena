@@ -1,9 +1,10 @@
 import React from 'react'
 
 import useFormObject from '../../commonComponents/hooks/useFormObject'
-import { validate, validateRequired, isValidationValid } from '../../../common/validation/validator'
+import Validator from '../../../common/validation/validator'
+import ValidatorErrorKeys from '../../../common/validation/validatorErrorKeys'
 
-import { validatePassword, validatePasswordStrength, validatePasswordConfirm, errors } from './passwordValidator'
+import { validatePassword, validatePasswordStrength, validatePasswordConfirm } from './passwordValidator'
 
 export const useResetPasswordFormState = props => {
   const {
@@ -11,23 +12,16 @@ export const useResetPasswordFormState = props => {
     resetPassword,
   } = props
 
-  const formErrors = {
-    ...errors,
-    verificationCode: {
-      invalidVerificationCode: 'Please enter a valid verification code',
-    }
-  }
-
   const validateVerificationCode = (propName, item) => {
     const verificationCodeRe = new RegExp(/^[\S]+$/)
     const verificationCode = item[propName]
-    return !verificationCodeRe.test(verificationCode) ? { key: 'invalidVerificationCode' } : null
+    return !verificationCodeRe.test(verificationCode) ? { key: ValidatorErrorKeys.user.verificationCodeInvalid } : null
   }
 
-  const validateObj = async obj => await validate(
+  const validateObj = async obj => await Validator.validate(
     obj,
     {
-      'password': [validateRequired('Password is required'), validatePassword, validatePasswordStrength],
+      'password': [Validator.validateRequired(ValidatorErrorKeys.user.passwordRequired), validatePassword, validatePasswordStrength],
       'passwordConfirm': [validatePasswordConfirm],
       'verificationCode': [validateVerificationCode],
     })
@@ -53,9 +47,8 @@ export const useResetPasswordFormState = props => {
     } else {
       const firstMatch = ['passwordConfirm', 'password', 'verificationCode']
         .map(field => ({ field, validation: getFieldValidation(field) }))
-        .find(v => !isValidationValid(v.validation))
-      const key = firstMatch.validation.errors[0].key
-      setLoginError(formErrors[firstMatch.field][key])
+        .find(v => !Validator.isValidationValid(v.validation))
+      setLoginError(firstMatch.validation.errors[0].key)
     }
   }
 

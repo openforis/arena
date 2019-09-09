@@ -386,6 +386,13 @@ module.exports = {
       emailRequired: 'Email is required',
       emailInvalid: 'Email is invalid',
       groupRequired: 'Group is required',
+
+      userNameRequired: 'User name is required',
+      passwordRequired: 'Password is required',
+      passwordInvalid: 'Password should not start nor end with white spaces',
+      passwordUnsafe: 'Password should be at least 8 characters long and contain lowercase characters, uppercase characters and numbers',
+      passwordsDoNotMatch: `Passwords don't match`,
+      verificationCodeInvalid: 'Invalid verification code',
     }
   },
 
@@ -470,7 +477,7 @@ module.exports = {
       description: 'Can edit survey, records, invite users',
     },
     dataEditor: {
-      label: 'Survey editor',
+      label: 'Data editor',
       label_plural: 'Data editors',
       description: 'Can edit records in data entry step',
     },
@@ -485,8 +492,8 @@ module.exports = {
       description: 'Can edit records in data analysis step',
     },
     surveyGuest: {
-      label: 'System guest',
-      label_plural: 'System guests',
+      label: 'Survey guest',
+      label_plural: 'Survey guests',
       description: 'Can view records',
     },
   },

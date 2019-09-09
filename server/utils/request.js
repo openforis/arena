@@ -2,6 +2,8 @@ const R = require('ramda')
 
 const SystemError = require('../../server/utils/systemError')
 
+const getServerUrl = req => `${req.protocol}://${req.headers.host}`
+
 const getParams = req => R.pipe(
   R.mergeLeft(R.prop('query', req)),
   R.mergeLeft(R.prop('params', req)),
@@ -59,6 +61,7 @@ const getUserUuid = R.pipe(getUser, R.prop('uuid'))
 const getI18n = R.prop('i18n')
 
 module.exports = {
+  getServerUrl,
   getParams,
   getRestParam,
   getBoolParam,
