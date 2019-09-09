@@ -81,7 +81,7 @@ const canInviteUsers = hasSurveyPermission(permissions.userInvite)
 // READ
 const canViewUser = (user, surveyInfo, userToView) => {
   return User.isSystemAdmin(user) || (
-    !!getSurveyUserGroup(user, surveyInfo) && !!getSurveyUserGroup(userToView, surveyInfo)
+    !!_getNonSystemAdminSurveyUserGroup(user, surveyInfo) && !!_getNonSystemAdminSurveyUserGroup(userToView, surveyInfo)
   )
 }
 
