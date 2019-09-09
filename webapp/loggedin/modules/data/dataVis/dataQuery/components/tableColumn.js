@@ -1,5 +1,6 @@
 import React from 'react'
 
+import useI18n from '../../../../../../commonComponents/useI18n'
 import ProgressBar from '../../../../../../commonComponents/progressBar'
 import NodeDefTableCellHeader from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellHeader'
 
@@ -13,6 +14,8 @@ const TableColumn = (props) => {
   const {
     nodeDef, row, lang, colWidth, editMode
   } = props
+
+  const i18n = useI18n()
 
   const colNames = NodeDefTable.getColNames(nodeDef)
   const isHeader = !row
@@ -47,38 +50,39 @@ const TableColumn = (props) => {
       {
         editMode
           ? isData
-          ? (
-            <TableColumnEdit
-              nodeDef={nodeDef}
-              record={row.record}
-              cell={row.cols[NodeDef.getUuid(nodeDef)]}/>
-          )
-          : null
+            ? (
+              <TableColumnEdit
+                nodeDef={nodeDef}
+                record={row.record}
+                cell={row.cols[NodeDef.getUuid(nodeDef)]}/>
+            )
+            : null
           : <div className="table__inner-cell">
             {
               colNames.map((col, i) =>
-                isData ?
-                  <div key={i} style={{ width: widthInner }} className="ellipsis">
-                    {
-                      row.hasOwnProperty(col)
-                        ? row[col]
-                        : (
-                          <div style={{ width: '20%', marginLeft: '40%', opacity: '.5' }}>
-                            <ProgressBar
-                              className="running progress-bar-striped"
-                              progress={100}
-                              showText={false}/>
-                          </div>
-                        )
-                    }
-                  </div>
-                  : isHeader && noCols > 1
+                isData
                   ? (
-                    <div key={i} style={{ width: widthInner }}>
-                      {NodeDefTable.extractColName(nodeDef, col)}
+                    <div key={i} style={{ width: widthInner }} className="ellipsis">
+                      {
+                        row.hasOwnProperty(col)
+                          ? row[col]
+                          : (
+                            <div style={{ width: '20%', marginLeft: '40%', opacity: '.5' }}>
+                              <ProgressBar
+                                className="running progress-bar-striped"
+                                progress={100}
+                                showText={false}/>
+                            </div>
+                          )
+                      }
                     </div>
-                  )
-                  : null
+                  ) : isHeader && noCols > 1
+                    ? (
+                      <div key={i} style={{ width: widthInner }}>
+                        {i18n.t(`data.dataVis.${NodeDefTable.extractColName(nodeDef, col)}`)}
+                      </div>
+                    )
+                    : null
               )
             }
           </div>

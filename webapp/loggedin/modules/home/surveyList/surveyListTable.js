@@ -18,8 +18,8 @@ const SurveyRow = ({ user, surveyInfoRow, surveyInfo, setActiveSurvey, i18n }) =
     <div className={`table__row${activeClass}`}>
       <div>{Survey.getName(surveyInfoRow)}</div>
       <div>{Survey.getDefaultLabel(surveyInfoRow)}</div>
-      <div>{DateUtils.getRelativeDate(surveyInfoRow.dateCreated)}</div>
-      <div>{DateUtils.getRelativeDate(surveyInfoRow.dateModified)}</div>
+      <div>{DateUtils.getRelativeDate(i18n, surveyInfoRow.dateCreated)}</div>
+      <div>{DateUtils.getRelativeDate(i18n, surveyInfoRow.dateModified)}</div>
       <div>{Survey.getStatus(surveyInfoRow)}</div>
       <div>
         <button className={`btn btn-s${activeClass}`}

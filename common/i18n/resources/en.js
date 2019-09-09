@@ -117,6 +117,11 @@ module.exports = {
         ascending: 'ascending',
         descending: 'descending',
       },
+      code: 'code',
+      label: 'label',
+      scientific_name: 'Scientific name',
+      file_uuid: 'File uuid',
+      file_name: 'File name',
     },
   },
 
@@ -164,6 +169,10 @@ module.exports = {
 
   designerView: {
     formPreview: 'Form preview',
+  },
+
+  recordView: {
+    justDeleted: 'This record has just been deleted by another user',
   },
 
   usersView: {
@@ -306,6 +315,17 @@ module.exports = {
       },
       dataType: 'Data Type',
     }
+  },
+
+  dateUtils: {
+    aMomentAgo: 'A moment ago',
+    hour: 'hour',
+    hour_plural: 'hours',
+    day: 'day',
+    day_plural: 'days',
+    week: 'week',
+    week_plural: 'weeks',
+    timeDiff: `{{diff}} $t(dateUtils.{{unit}}, { 'count': 3 }) ago`,
   },
 
   // ===== All validation errors

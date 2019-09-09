@@ -3,6 +3,7 @@ import camelize from 'camelize'
 
 import { Link } from 'react-router-dom'
 
+import useI18n from '../../../../../commonComponents/useI18n'
 import ErrorBadge from '../../../../../commonComponents/errorBadge'
 
 import Survey from '../../../../../../common/survey/survey'
@@ -20,6 +21,8 @@ const RecordsRow = props => {
     surveyInfo, user,
     idx, offset,
   } = props
+
+  const i18n = useI18n()
 
   const canEdit = Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record)
 
@@ -39,10 +42,10 @@ const RecordsRow = props => {
         )
       }
       <div>
-        {getRelativeDate(Record.getDateCreated(record))}
+        {getRelativeDate(i18n, Record.getDateCreated(record))}
       </div>
       <div>
-        {getRelativeDate(Record.getDateModified(record))}
+        {getRelativeDate(i18n, Record.getDateModified(record))}
       </div>
       <div>
         {Record.getOwnerName(record)}

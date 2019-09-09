@@ -99,7 +99,7 @@ const isPublished = R.propEq(propKeys.published, true)
 
 const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
-  return isBlank(label)
+  return isBlank(label) || label === undefined
     ? getName(nodeDef)
     : label
 }

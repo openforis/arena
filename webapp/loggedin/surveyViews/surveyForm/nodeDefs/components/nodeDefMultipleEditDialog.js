@@ -2,12 +2,15 @@ import './nodeDefMultipleEditDialog.scss'
 
 import React from 'react'
 
+import useI18n from '../../../../../commonComponents/useI18n'
 import { Modal, ModalBody, ModalFooter, ModalHeader } from '../../../../../commonComponents/modal'
 
 import * as NodeDefUiProps from '../nodeDefUIProps'
 
 const NodeDefMultipleEditDialog = props => {
   const { nodeDef, label, onClose } = props
+
+  const i18n = useI18n()
 
   return (
     <Modal isOpen={true}
@@ -26,7 +29,7 @@ const NodeDefMultipleEditDialog = props => {
         <div>
           <button className="btn modal-footer__item"
                   onClick={onClose}>
-            Close
+            {i18n.t('common.close')}
           </button>
         </div>
       </ModalFooter>
