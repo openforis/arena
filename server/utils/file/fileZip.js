@@ -35,7 +35,7 @@ class FileZip {
   getEntryData (entryName) {
     try {
       return this.streamZip.entryDataSync(entryName)
-    } catch(e) {
+    } catch (e) {
       // entry not found
       return null
     }
@@ -48,7 +48,10 @@ class FileZip {
 
   async getEntryStream (entryName) {
     return new Promise(resolve =>
-      this.streamZip.stream(entryName, (err, stm) => resolve(stm))
+      this.streamZip.stream(entryName, (err, stm) =>
+        err
+          ? resolve(null)
+          : resolve(stm))
     )
   }
 

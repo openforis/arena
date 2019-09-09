@@ -1,15 +1,13 @@
 const R = require('ramda')
 
+const CollectImportJobContext = require('../collectImportJobContext')
 const CategoryItem = require('../../../../../../common/survey/categoryItem')
 const CategoryImportSummary = require('../../../../../../common/survey/categoryImportSummary')
+const Geometry = require('../../../../../../common/geometry')
 
 const CategoryService = require('../../../../category/service/categoryService')
 const CategoryImportJob = require('../../../../category/service/categoryImportJob')
 const CategoryImportJobParams = require('../../../../category/service/categoryImportJobParams')
-
-const keys = {
-  categoryName: 'sampling_point_data'
-}
 
 const keysExtra = {
   x: 'x',
@@ -21,19 +19,26 @@ const keysItem = {
   location: 'location'
 }
 
+const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
+
 class SamplingPointDataImportJob extends CategoryImportJob {
 
   constructor (params) {
     super({
       ...params,
-      [CategoryImportJobParams.keys.categoryName]: keys.categoryName
+      [CategoryImportJobParams.keys.categoryName]: SamplingPointDataImportJob.categoryName
     }, 'SamplingPointDataImportJob')
   }
 
-  //extends the method of the superclass
+  //start of overridden methods from CategoryImportJob
+  async createReadStream () {
+    const collectSurveyFileZip = CollectImportJobContext.getCollectSurveyFileZip(this.context)
+    return await collectSurveyFileZip.getEntryStream(samplingPointDataZipEntryPath)
+  }
+
   async getOrCreateSummary () {
-    const filePath = '/home/ricci/Downloads/sampling_points.csv' //TODO
-    return await CategoryService.createImportSummary(filePath)
+    const stream = await this.createReadStream()
+    return stream ? await CategoryService.createImportSummaryFromStream(stream) : null
   }
 
   extractItemExtraDef () {
@@ -45,16 +50,26 @@ class SamplingPointDataImportJob extends CategoryImportJob {
     )(super.extractItemExtraDef())
   }
 
-  extractItemProps (codeLevel, levelName, labelsByLevel, descriptionsByLevel, extra) {
+  extractItemExtraProps (extra) {
     const { srs_id, x, y } = extra
 
     const extraUpdated = {
       ...R.omit(R.keys(keysExtra))(extra),
-      [keysItem.location]: `SRID=${srs_id};POINT(${x} ${y})`
+      [keysItem.location]: Geometry.newPoint(srs_id, x, y)
     }
 
-    return super.extractItemProps(codeLevel, labelsByLevel, levelName, descriptionsByLevel, extraUpdated)
+    return super.extractItemExtraProps(extraUpdated)
+  }
+  //end of overridden methods from CategoryImportJob
+
+  //overridden from Job
+  async beforeEnd() {
+    await super.beforeEnd()
+    //assoc imported category to context categories (to be used by NodeDefsImportJob)
+    this.setContext(CollectImportJobContext.assocCategory(this.category)(this.context))
   }
 }
+
+SamplingPointDataImportJob.categoryName = 'sampling_point_data'
 
 module.exports = SamplingPointDataImportJob

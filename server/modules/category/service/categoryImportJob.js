@@ -24,6 +24,7 @@ class CategoryImportJob extends Job {
     this.itemsByCodes = {} // cache of category items by ancestor codes
     this.summary = null
     this.category = null
+    this.levelIndexDeepest = 0 // used to remove unused levels
   }
 
   async execute () {
@@ -32,7 +33,11 @@ class CategoryImportJob extends Job {
 
     this.logDebug('summary', this.summary)
 
-    this.category = await this.getOrCreateCategory()
+    //skip import if summary is not specified
+    if (!this.summary)
+      return
+
+    this.category = await this._getOrCreateCategory()
 
     // levels
     await this._importLevels()
@@ -43,17 +48,59 @@ class CategoryImportJob extends Job {
     // items
     await this._readItems()
 
+    // delete unused levels
+    await this._deleteUnusedLevels()
+
     if (this.hasErrors()) {
       // errors found
       this.logDebug(`${Object.keys(this.errors).length} errors found`)
       await this.setStatusFailed()
     } else {
       // no errors found
-      await this.insertItems()
+      await this._insertItems()
     }
   }
 
-  async getOrCreateCategory () {
+  // start of methods that can be overridden by subclasses
+  async createReadStream () {
+    return fs.createReadStream(CategoryImportSummary.getFilePath(this.summary))
+  }
+
+  async getOrCreateSummary () {
+    return CategoryImportJobParams.getSummary(this.params)
+  }
+
+  extractItemExtraDef () {
+    return Object.entries(CategoryImportSummary.getColumns(this.summary)).reduce((accExtraDef, [columnName, column]) => {
+        if (CategoryImportSummary.isColumnExtra(column)) {
+          accExtraDef[columnName] = {
+            [CategoryItem.keysExtraDef.dataType]: CategoryImportSummary.getColumnDataType(column)
+          }
+        }
+        return accExtraDef
+      },
+      {}
+    )
+  }
+
+  extractItemExtraProps (extra) {
+    return extra
+  }
+  // end of methods that can be overridden by subclasses
+
+  async _deleteUnusedLevels () {
+    let levels = Category.getLevelsArray(this.category)
+    let lastLevelIndex = levels.length - 1
+
+    while (lastLevelIndex > this.levelIndexDeepest) {
+      const level = levels.pop()
+      await CategoryManager.deleteLevel(this.getUser(), this.getSurveyId(), CategoryLevel.getUuid(level), this.tx)
+      this.category = Category.assocLevelsArray(levels)(this.category)
+      lastLevelIndex--
+    }
+  }
+
+  async _getOrCreateCategory () {
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
 
     if (categoryUuid) {
@@ -67,10 +114,6 @@ class CategoryImportJob extends Job {
 
       return await CategoryManager.insertCategory(this.getUser(), this.getSurveyId(), category, this.tx)
     }
-  }
-
-  async getOrCreateSummary () {
-    return CategoryImportJobParams.getSummary(this.params)
   }
 
   async _importLevels () {
@@ -107,24 +150,12 @@ class CategoryImportJob extends Job {
     this.logDebug('item extra def imported', itemExtraDef)
   }
 
-  extractItemExtraDef () {
-    return Object.entries(CategoryImportSummary.getColumns(this.summary)).reduce((accExtraDef, [columnName, column]) => {
-        if (CategoryImportSummary.isColumnExtra(column)) {
-          accExtraDef[columnName] = {
-            [CategoryItem.keysExtraDef.dataType]: CategoryImportSummary.getColumnDataType(column)
-          }
-        }
-        return accExtraDef
-      },
-      {}
-    )
-  }
-
   async _readItems () {
     this.logDebug('reading items')
 
     const reader = await CategoryImportCSVParser.createRowsReaderFromStream(
-      this.createReadStream(),
+      await this.createReadStream(),
+      this.summary,
       async itemRow => {
         if (this.isCanceled()) {
           reader.cancel()
@@ -150,65 +181,64 @@ class CategoryImportJob extends Job {
       })
   }
 
-  createReadStream () {
-    return fs.createReadStream(CategoryImportSummary.getFilePath(this.summary))
-  }
-
   async _onRow (itemRow) {
-    const { levelIndexDeeper, codes, labelsByLevel, descriptionsByLevel, extra } = itemRow
+    const { levelIndex: levelIndexItem, codes, labelsByLevel, descriptionsByLevel, extra } = itemRow
 
     const levels = Category.getLevelsArray(this.category)
 
     if (this._checkCodesNotEmpty(codes)) {
-      for (let levelIndex = 0; levelIndex <= levelIndexDeeper; levelIndex++) {
+      this.levelIndexDeepest = Math.max(this.levelIndexDeepest, levelIndexItem)
+
+      for (let levelIndex = 0; levelIndex <= levelIndexItem; levelIndex++) {
         const level = levels[levelIndex]
-        const levelName = CategoryLevel.getName(level)
 
         const codesLevel = codes.slice(0, levelIndex + 1)
 
-        const alreadyInserted = !!this.itemsByCodes[codesLevel]
+        const itemAlreadyParsed = this.itemsByCodes[codesLevel]
 
-        if (alreadyInserted) {
-          if (levelIndex === levelIndexDeeper) {
-            this._addErrorCodeDuplicate(codesLevel)
-          }
+        const mostSpecificLevel = levelIndex === levelIndexItem
+
+        if (itemAlreadyParsed && itemAlreadyParsed.mostSpecificLevel && mostSpecificLevel) {
+          this._addErrorCodeDuplicate(codesLevel)
         } else {
-          let itemParentUuid = null
-          if (levelIndex > 0) {
-            const codesParent = codesLevel.slice(0, levelIndex)
+          const item = this._getOrCreateItem(level, levelIndex, codesLevel, labelsByLevel, descriptionsByLevel, extra, itemAlreadyParsed)
 
-            const itemParent = this.itemsByCodes[codesParent]
-            itemParentUuid = CategoryItem.getUuid(itemParent)
+          this.itemsByCodes[codesLevel] = {
+            ...item,
+            mostSpecificLevel
           }
-
-          const codeLevel = codesLevel[codesLevel.length - 1]
-
-          const itemProps = this.extractItemProps(codeLevel, levelName, labelsByLevel, descriptionsByLevel, extra)
-
-          this.itemsByCodes[codesLevel] = CategoryItem.newItem(
-            CategoryLevel.getUuid(level),
-            itemParentUuid,
-            itemProps
-          )
         }
       }
     }
     this.incrementProcessedItems()
   }
 
-  extractItemProps (codeLevel, levelName, labelsByLevel, descriptionsByLevel, extra) {
-    const itemProps = {
-      [CategoryItem.props.code]: codeLevel
-    }
+  _getOrCreateItem (level, levelIndex, codesLevel, labelsByLevel, descriptionsByLevel, extra, itemAlreadyParsed) {
+    const levelName = CategoryLevel.getName(level)
+    const codeLastLevel = codesLevel[codesLevel.length - 1]
+    const itemParentUuid = this._getParentItemUuid(codesLevel, levelIndex)
 
+    const itemProps = {
+      [CategoryItem.props.code]: codeLastLevel
+    }
     ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLevel[levelName], false)(itemProps)
     ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLevel[levelName], false)(itemProps)
-    ObjectUtils.setInPath([CategoryItem.props.extra], extra, false)(itemProps)
+    ObjectUtils.setInPath([CategoryItem.props.extra], this.extractItemExtraProps(extra), false)(itemProps)
 
-    return itemProps
+    return itemAlreadyParsed
+      ? {
+        ...itemAlreadyParsed,
+        //override already inserted item props
+        [CategoryItem.keys.props]: itemProps
+      }
+      : CategoryItem.newItem(
+        CategoryLevel.getUuid(level),
+        itemParentUuid,
+        itemProps
+      )
   }
 
-  async insertItems () {
+  async _insertItems () {
     this.logDebug('inserting items')
 
     const surveyId = this.getSurveyId()
@@ -224,13 +254,13 @@ class CategoryImportJob extends Job {
     let errorsFound = false
 
     if (codes.length === 0) {
-      this.addErrorCodeRequired(0)
+      this._addErrorCodeRequired(0)
       errorsFound = true
     } else {
       for (let i = 0; i < codes.length; i++) {
         const code = codes[i]
         if (StringUtils.isBlank(code)) {
-          this.addErrorCodeRequired(i)
+          this._addErrorCodeRequired(i)
           errorsFound = true
         }
       }
@@ -257,7 +287,7 @@ class CategoryImportJob extends Job {
     })
   }
 
-  addErrorCodeRequired (levelIndex) {
+  _addErrorCodeRequired (levelIndex) {
     const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.code, levelIndex)(this.summary)
 
     this.addError({
@@ -272,6 +302,17 @@ class CategoryImportJob extends Job {
       }
     })
   }
+
+  _getParentItemUuid (codes, levelIndex) {
+    if (levelIndex > 0) {
+      const codesParent = codes.slice(0, levelIndex)
+      const itemParent = this.itemsByCodes[codesParent]
+      return CategoryItem.getUuid(itemParent)
+    } else {
+      return null
+    }
+  }
+
 }
 
 CategoryImportJob.type = 'CategoryImportJob'

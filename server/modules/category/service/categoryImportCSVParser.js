@@ -79,15 +79,17 @@ const createImportSummaryFromStream = async stream => {
     {}
   )
 
-  const summary = CategoryImportSummary.newSummary(columns, filePath)
+  const summary = CategoryImportSummary.newSummary(columns)
 
   _validateSummary(summary)
 
   return summary
 }
 
-const createImportSummary = async filePath =>
-  await createImportSummaryFromStream(fs.createReadStream(filePath))
+const createImportSummary = async filePath => ({
+  ...await createImportSummaryFromStream(fs.createReadStream(filePath)),
+  [CategoryImportSummary.keys.filePath]: filePath
+})
 
 const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalChange) => {
   const columns = CategoryImportSummary.getColumns(summary)
@@ -126,11 +128,11 @@ const createRowsReaderFromStream = async (stream, summary, onRowItem, onTotalCha
       )
 
       // determine level
-      const levelIndexDeeper = R.findLastIndex(StringUtils.isNotBlank)(codes)
+      const levelIndex = R.findLastIndex(StringUtils.isNotBlank)(codes)
 
       await onRowItem({
-        levelIndexDeeper,
-        codes: codes.slice(0, levelIndexDeeper + 1),
+        levelIndex,
+        codes: codes.slice(0, levelIndex + 1),
         labelsByLevel,
         descriptionsByLevel,
         extra
@@ -184,7 +186,8 @@ const _validateSummary = summary => {
 }
 
 module.exports = {
+  createImportSummaryFromStream,
   createImportSummary,
+  createRowsReaderFromStream,
   createRowsReader,
-  createRowsReaderFromStream
 }

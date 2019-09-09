@@ -29,7 +29,7 @@ const columnDataTypes = {
 
 // ===== SUMMARY
 
-const newSummary = (columns, filePath) => ({
+const newSummary = (columns, filePath = null) => ({
   [keys.columns]: columns,
   [keys.filePath]: filePath
 })

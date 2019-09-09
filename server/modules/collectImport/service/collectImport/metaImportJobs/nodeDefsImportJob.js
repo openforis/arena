@@ -17,6 +17,8 @@ const CollectImportReportItem = require('../../../../../../common/survey/collect
 const Validator = require('../../../../../../common/validation/validator')
 
 const Job = require('../../../../../job/job')
+const SamplingPointDataImportJob = require('./samplingPointDataImportJob')
+const CollectImportJobContext = require('../collectImportJobContext')
 
 const SurveyManager = require('../../../../survey/manager/surveyManager')
 const NodeDefManager = require('../../../../nodeDef/manager/nodeDefManager')
@@ -256,7 +258,10 @@ class NodeDefsImportJob extends Job {
     switch (type) {
       case nodeDefType.code:
         const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
-        const category = R.find(c => listName === Category.getName(c), this.getContextProp('categories', []))
+        const categoryName = R.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
+          ? SamplingPointDataImportJob.categoryName
+          : listName
+        const category = CollectImportJobContext.getCategoryByName(categoryName)(this.context)
 
         return {
           [NodeDef.propKeys.categoryUuid]: Category.getUuid(category),
@@ -264,7 +269,7 @@ class NodeDefsImportJob extends Job {
         }
       case nodeDefType.taxon:
         const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)
-        const taxonomy = R.find(t => taxonomyName === Taxonomy.getName(t), this.getContextProp('taxonomies', []))
+        const taxonomy =  CollectImportJobContext.getTaxonomyByName(taxonomyName)(this.context)
 
         return {
           [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy)

@@ -3,6 +3,15 @@ const R = require('ramda')
 const NodeDef = require('../../../../../../common/survey/nodeDef')
 const { nodeDefType } = NodeDef
 
+const keys = {
+  attributes: 'attributes',
+  elements: 'elements',
+  name: 'name',
+  type: 'type',
+  lang: 'xml:lang',
+  text: 'text',
+}
+
 const collectNodeDefTypes = {
   boolean: 'boolean',
   code: 'code',
@@ -44,23 +53,16 @@ const nodeDefFieldsExtractorByCollectType = {
   [collectNodeDefTypes.time]: () => [{ type: nodeDefType.time }],
 }
 
+const layoutTypes = {
+  table: 'table',
+}
+
+const samplingPointDataCodeListNames = ['sampling_design', 'ofc_sampling_design']
+
 const getNodeDefFieldsByCollectNodeDef = collectNodeDef => {
   const collectType = getElementName(collectNodeDef)
   const fieldsExtractor = nodeDefFieldsExtractorByCollectType[collectType]
   return fieldsExtractor && fieldsExtractor(collectNodeDef)
-}
-
-const keys = {
-  attributes: 'attributes',
-  elements: 'elements',
-  name: 'name',
-  type: 'type',
-  lang: 'xml:lang',
-  text: 'text',
-}
-
-const layoutTypes = {
-  table: 'table',
 }
 
 const toLabels = (elName, defaultLang, typesFilter = [], suffix = '') =>
@@ -181,6 +183,8 @@ const _isNodeDefElement = R.pipe(
 
 module.exports = {
   layoutTypes,
+
+  samplingPointDataCodeListNames,
 
   getNodeDefFieldsByCollectNodeDef,
 
