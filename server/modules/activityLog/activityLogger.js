@@ -43,7 +43,6 @@ const type = {
   nodeDelete: 'nodeDelete',
 
   // user
-  userJoined: 'userJoined',
   userInvite: 'userInvite',
   userUpdate: 'userUpdate',
   userRemove: 'userRemove',
