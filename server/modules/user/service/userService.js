@@ -120,6 +120,8 @@ const updateUsername = async (user, userUuid, name) => {
     throw new UnauthorizedError(User.getName(user))
   }
 
+  const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
+  await aws.updateUser(User.getEmail(userToUpdate), null, name)
   await UserManager.updateUsername(user, name)
 }
 
