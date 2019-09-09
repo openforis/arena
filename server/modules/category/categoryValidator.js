@@ -44,11 +44,20 @@ const validateLevels = async (category, itemsByParentUuid) => {
 
 // ====== ITEMS
 
-const itemValidators = (isLeaf, itemsByParentUuid, siblings) => ({
+const validateItemCodeUniqueness = itemsByCode =>
+  (propName, item) => {
+    const itemsWithSameCode = itemsByCode[CategoryItem.getCode(item)]
+
+    return itemsWithSameCode.length > 1
+      ? { key: ValidatorErrorKeys.categoryEdit.codeDuplicate }
+      : null
+  }
+
+const itemValidators = (isLeaf, itemsByParentUuid, siblingsByCode) => ({
   'props.code': [
     Validator.validateRequired(ValidatorErrorKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(ValidatorErrorKeys.categoryEdit.codeCannotBeKeyword),
-    Validator.validateItemPropUniqueness(ValidatorErrorKeys.categoryEdit.codeDuplicate)(siblings)
+    validateItemCodeUniqueness(siblingsByCode)
   ],
   [keys.children]: [validateNotEmptyChildrenItems(isLeaf, itemsByParentUuid)],
 })
@@ -67,13 +76,12 @@ const validateNotEmptyFirstLevelItems = itemsByParentUuid => (propName, level) =
     ? { key: ValidatorErrorKeys.categoryEdit.itemsEmpty }
     : null
 
-const validateItem = async (category, itemsByParentUuid, parentItemUuid, itemUuid) => {
-  const siblings = getChildrenItems(itemsByParentUuid, parentItemUuid)
-  const item = R.find(R.propEq('uuid', itemUuid))(siblings)
+const validateItem = async (category, siblings, siblingsByUuid, siblingsByCode, itemsByParentUuid, parentItemUuid, itemUuid) => {
+  const item = siblingsByUuid[itemUuid][0]
 
   const isLeaf = Category.isItemLeaf(item)(category)
 
-  const validation = await Validator.validate(item, itemValidators(isLeaf, itemsByParentUuid, siblings))
+  const validation = await Validator.validate(item, itemValidators(isLeaf, itemsByParentUuid, siblingsByCode))
 
   if (isLeaf) {
     return { [itemUuid]: validation }
@@ -101,9 +109,11 @@ const validateItem = async (category, itemsByParentUuid, parentItemUuid, itemUui
 
 const validateItemsByParentUuid = async (category, itemsByParentUuid, parentItemUuid) => {
   const children = getChildrenItems(itemsByParentUuid, parentItemUuid)
+  const childrenByCode = R.groupBy(CategoryItem.getCode)(children)
+  const childrenByUuid = R.groupBy(R.prop(CategoryItem.keys.uuid))(children)
 
   const childValidationsArr = await Promise.all(children.map(
-    async child => await validateItem(category, itemsByParentUuid, parentItemUuid, CategoryItem.getUuid(child))
+    async child => await validateItem(category, children, childrenByUuid, childrenByCode, itemsByParentUuid, parentItemUuid, CategoryItem.getUuid(child))
   ))
 
   const childValidations = R.mergeAll(childValidationsArr)
