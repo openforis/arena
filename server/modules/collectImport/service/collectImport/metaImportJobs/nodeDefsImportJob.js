@@ -128,6 +128,7 @@ class NodeDefsImportJob extends Job {
       [NodeDef.propKeys.multiple]: multiple,
       [NodeDef.propKeys.key]: NodeDef.canNodeDefTypeBeKey(type) && key,
       [NodeDef.propKeys.labels]: CollectSurvey.toLabels('label', defaultLanguage, ['instance', 'heading'], nodeDefLabelSuffix)(collectNodeDef),
+      //layout props (render)
       ...type === NodeDef.nodeDefType.entity
         ? {
           [NodeDefLayout.nodeDefLayoutProps.render]:
@@ -135,10 +136,13 @@ class NodeDefsImportJob extends Job {
               ? NodeDefLayout.nodeDefRenderType.table
               : NodeDefLayout.nodeDefRenderType.form
         }
+        // calculated
         : {
           [NodeDef.propKeys.readOnly]: calculated
         },
+      // layout props (layout)
       [NodeDefLayout.nodeDefLayoutProps.layout]: tableLayout ? [] : null,
+      // extra props
       ...this.extractNodeDefExtraProps(parentNodeDef, type, collectNodeDef)
     }
 
@@ -184,6 +188,11 @@ class NodeDefsImportJob extends Job {
         propsUpdated[NodeDefLayout.nodeDefLayoutProps.layout] = childrenUuids
       }
     } else if (type === nodeDefType.code) {
+      // add parent code def uuid
+      const parentCodeDefUuid = await this._getCodeParentUuid(nodeDef, parentPath, collectNodeDef)
+      if (parentCodeDefUuid) {
+        propsUpdated[NodeDef.propKeys.parentCodeDefUuid] = parentCodeDefUuid
+      }
       // 4b. add specify text attribute def
       await this.addSpecifyTextAttribute(surveyId, parentNodeDef, nodeDef, tx)
     }
@@ -239,12 +248,6 @@ class NodeDefsImportJob extends Job {
       await this.parseNodeDefValidationRules(nodeDefUuid, collectNodeDef, tx)
     }
 
-    if (type === nodeDefType.code) {
-      const parentExpr = CollectSurvey.getAttribute('parent')(collectNodeDef)
-      if (parentExpr)
-        await this.addNodeDefImportIssue(nodeDefUuid, CollectImportReportItem.exprTypes.codeParent, parentExpr, null, null, tx)
-    }
-
     // 3. applicable (not supported)
     const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
     if (relevantExpr) {
@@ -269,7 +272,7 @@ class NodeDefsImportJob extends Job {
         }
       case nodeDefType.taxon:
         const taxonomyName = CollectSurvey.getAttribute('taxonomy')(collectNodeDef)
-        const taxonomy =  CollectImportJobContext.getTaxonomyByName(taxonomyName)(this.context)
+        const taxonomy = CollectImportJobContext.getTaxonomyByName(taxonomyName)(this.context)
 
         return {
           [NodeDef.propKeys.taxonomyUuid]: Taxonomy.getUuid(taxonomy)
@@ -417,6 +420,34 @@ class NodeDefsImportJob extends Job {
       }
     }
     this.total = count
+  }
+
+  async _getCodeParentUuid (nodeDef, parentPath, collectNodeDef) {
+    const collectCodeParentExpr = NodeDef.nodeDefType.code ? CollectSurvey.getAttribute('parent')(collectNodeDef) : null
+    if (collectCodeParentExpr) {
+      const collectNodeDefParentPathParts = parentPath.split('/')
+      const codeParentExprParts = collectCodeParentExpr.split('/')
+
+      for (let index = 0; index < codeParentExprParts.length - 1; index++) {
+        const part = codeParentExprParts[index]
+        if (part === 'parent()') {
+          collectNodeDefParentPathParts.pop()
+        } else {
+          //unsupported expression
+          await this.addNodeDefImportIssue(NodeDef.getUuid(nodeDef), CollectImportReportItem.exprTypes.codeParent, collectCodeParentExpr, null, null, this.tx)
+          return null
+        }
+      }
+      const codeParentPath = `${collectNodeDefParentPathParts.join('/')}/${codeParentExprParts[codeParentExprParts.length - 1]}`
+      const nodeDefInfosCodeParent = this.nodeDefsInfoByCollectPath[codeParentPath]
+
+      return R.pipe(
+        R.head,
+        R.propOr(null, 'uuid')
+      )(nodeDefInfosCodeParent)
+    } else {
+      return null
+    }
   }
 }
 
