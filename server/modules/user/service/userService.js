@@ -99,17 +99,15 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file
 
   // Check if email has changed
   const oldEmail = User.getEmail(userToUpdate)
+  const oldName = User.getName(userToUpdate)
   if (oldEmail !== email) {
+    // Throw exception if user is not allowed to edit the email
     const canEditEmail = Authorizer.canEditUserEmail(user, Survey.getSurveyInfo(survey), userToUpdate)
-
-    // Throw exception if user is not allowed
     if (!canEditEmail) {
       throw new UnauthorizedError(User.getName(user))
     }
-
-    // Send aws a email update request if changed
-    await aws.updateEmail(oldEmail, email)
   }
+  await aws.updateUser(oldEmail, oldEmail !== email ? email : null, oldName !== name ? name : null)
 
   // Get profile picture
   const profilePicture = file ? fs.readFileSync(file.tempFilePath) : null

@@ -35,15 +35,30 @@ const inviteUser = (email, temporaryPassword) => {
   return _sendAwsRequest(_getAwsClient().adminCreateUser(params))
 }
 
-const updateEmail = (oldEmail, newEmail) => {
-  const params = {
-    UserAttributes: [{
+const updateUser = (oldEmail, email, name) => {
+  if (email === null && name === null) {
+    return
+  }
+
+  const UserAttributes = email === null
+    ? []
+    : [{
       Name: 'email',
-      Value: newEmail,
+      Value: email,
     }, {
       Name: 'email_verified',
       Value: 'true',
-    }],
+    }]
+
+  if (name !== null) {
+    UserAttributes.push({
+      Name: 'name',
+      Value: name,
+    })
+  }
+
+  const params = {
+    UserAttributes,
     Username: oldEmail,
     UserPoolId: process.env.COGNITO_USER_POOL_ID
   }
@@ -82,6 +97,6 @@ const sendEmail = (from, to, subject, body) => {
 
 module.exports = {
   inviteUser,
-  updateEmail,
+  updateUser,
   sendEmail,
 }
