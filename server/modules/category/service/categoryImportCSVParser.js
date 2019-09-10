@@ -1,6 +1,7 @@
 const fs = require('fs')
 const R = require('ramda')
 
+const Category = require('../../../../common/survey/category')
 const CategoryImportSummary = require('../../../../common/survey/categoryImportSummary')
 const ValidatorErrorKeys = require('../../../../common/validation/validatorErrorKeys')
 const ObjectUtils = require('../../../../common/objectUtils')
@@ -64,7 +65,7 @@ const createImportSummaryFromStream = async stream => {
       const level = getOrCreateLevel(columnName, columnType)
 
       const extraDataType = columnType === CategoryImportSummary.columnTypes.extra
-        ? CategoryImportSummary.columnDataTypes.text
+        ? Category.itemExtraDefDataTypes.text
         : null
 
       const columnProp = columnProps[columnType]

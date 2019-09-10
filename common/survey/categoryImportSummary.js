@@ -21,12 +21,6 @@ const columnTypes = {
   label: 'label'
 }
 
-const columnDataTypes = {
-  text: 'text',
-  number: 'number',
-  geometryPoint: 'geometryPoint',
-}
-
 // ===== SUMMARY
 
 const newSummary = (columns, filePath = null) => ({
@@ -92,7 +86,6 @@ const hasColumn = (type, levelIndex) => R.pipe(
 
 module.exports = {
   columnTypes,
-  columnDataTypes,
 
   keys,
   keysColumn,

@@ -19,8 +19,10 @@ const props = {
   itemExtraDef: 'itemExtraDef'
 }
 
-const propsItemExtraDef = {
-  type: 'type'
+const itemExtraDefDataTypes = {
+  text: 'text',
+  number: 'number',
+  geometryPoint: 'geometryPoint',
 }
 
 /**
@@ -116,6 +118,7 @@ const isLevelDeleteAllowed = level => R.pipe(
 module.exports = {
   props,
   keys,
+  itemExtraDefDataTypes,
 
   // ======
   //CREATE
@@ -147,7 +150,6 @@ module.exports = {
   // ====== ITEMS
 
   getItemValidation,
-  getItemLevelIndex,
   isItemLeaf,
 
   // ====== ITEMS extra def

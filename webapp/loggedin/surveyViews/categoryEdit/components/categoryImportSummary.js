@@ -7,6 +7,7 @@ import useI18n from '../../../../commonComponents/useI18n'
 import Dropdown from '../../../../commonComponents/form/dropdown'
 import { Modal, ModalBody, ModalFooter } from '../../../../commonComponents/modal'
 
+import Category from '../../../../../common/survey/category'
 import CategoryImportSummary from '../../../../../common/survey/categoryImportSummary'
 import Languages from '../../../../../common/app/languages'
 
@@ -58,7 +59,7 @@ const TableRow = ({ idx, columnName, column, setCategoryImportSummaryColumnDataT
           CategoryImportSummary.isColumnExtra(column) &&
           <Dropdown
             readOnlyInput={true}
-            items={Object.keys(CategoryImportSummary.columnDataTypes)}
+            items={Object.keys(Category.itemExtraDefDataTypes)}
             itemLabelFunction={dataType => i18n.t(`categoryEdit.importSummary.columnDataType.${dataType}`)}
             selection={dataType}
             onChange={dataType => setCategoryImportSummaryColumnDataType(columnName, dataType)}

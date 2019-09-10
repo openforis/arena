@@ -1,8 +1,8 @@
 const R = require('ramda')
 
 const CollectImportJobContext = require('../collectImportJobContext')
+const Category = require('../../../../../../common/survey/category')
 const CategoryItem = require('../../../../../../common/survey/categoryItem')
-const CategoryImportSummary = require('../../../../../../common/survey/categoryImportSummary')
 const Geometry = require('../../../../../../common/geometry')
 
 const CategoryService = require('../../../../category/service/categoryService')
@@ -45,7 +45,7 @@ class SamplingPointDataImportJob extends CategoryImportJob {
     return R.pipe(
       R.omit(R.keys(keysExtra)),
       R.assoc(keysItem.location, {
-        [CategoryItem.keysExtraDef.dataType]: CategoryImportSummary.columnDataTypes.geometryPoint
+        [CategoryItem.keysExtraDef.dataType]: Category.itemExtraDefDataTypes.geometryPoint
       })
     )(super.extractItemExtraDef())
   }
