@@ -2,7 +2,7 @@ const R = require('ramda')
 
 const SystemError = require('../../server/utils/systemError')
 
-const getServerUrl = req => `${req.protocol}://${req.headers.host}`
+const getServerUrl = req => `${req.protocol}://${req.get('host')}`
 
 const getParams = req => R.pipe(
   R.mergeLeft(R.prop('query', req)),

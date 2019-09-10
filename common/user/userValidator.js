@@ -28,6 +28,7 @@ const validateInvitation = async user => await Validator.validate(
   })
 
 module.exports = {
+  validateEmail,
   validateInvitation,
   validateUser,
 }

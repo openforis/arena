@@ -14,7 +14,6 @@ const apiRouter = require('./apiRouter')
 const WebSocket = require('../utils/webSocket')
 const RecordPreviewCleanup = require('./recordPreviewCleanup')
 const ExpiredJwtTokensCleanup = require('./expiredJwtTokensCleanup')
-const I18n = require('../system/middleware/i18nMiddleware')
 
 module.exports = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -46,9 +45,6 @@ module.exports = async () => {
   app.use('/app*', express.static(`${__dirname}/../../dist`))
   app.use('/img/', express.static(`${__dirname}/../../web-resources/img`))
   // app.use('/css/', express.static(`${__dirname}/../web-resources/css`))
-
-  // i18n
-  I18n.init(app)
 
   // ====== apis
   authApi.init(app)

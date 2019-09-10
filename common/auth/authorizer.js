@@ -17,14 +17,11 @@ const _isSurveyAdmin = (user, surveyInfo) =>
 // ====== Survey
 // ======
 
-const _getNonSystemAdminSurveyUserGroup = (user, surveyInfo) =>
-  AuthGroups.getAuthGroups(user).find(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
-
-const getSurveyUserGroup = (user, surveyInfo) => {
-  if (User.isSystemAdmin(user)) {
+const getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) => {
+  if (includeSystemAdmin && User.isSystemAdmin(user)) {
     return R.pipe(User.getAuthGroups, R.head)(user)
   }
-  return _getNonSystemAdminSurveyUserGroup(user, surveyInfo)
+  return AuthGroups.getAuthGroups(user).find(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
 }
 
 const getSurveyUserPermissions = (user, surveyInfo) =>
@@ -81,33 +78,34 @@ const canInviteUsers = hasSurveyPermission(permissions.userInvite)
 // READ
 const canViewUser = (user, surveyInfo, userToView) => {
   return User.isSystemAdmin(user) || (
-    !!_getNonSystemAdminSurveyUserGroup(user, surveyInfo) && !!_getNonSystemAdminSurveyUserGroup(userToView, surveyInfo)
+    !!getSurveyUserGroup(user, surveyInfo, false) &&
+    !!getSurveyUserGroup(userToView, surveyInfo, false)
   )
 }
 
 // EDIT
-const _hasUserAccess = (user, surveyInfo, userToUpdate) =>
+const _hasUserEditAccess = (user, surveyInfo, userToUpdate) =>
   User.isSystemAdmin(user) || (
     _isSurveyAdmin(user, surveyInfo) &&
-    !!_getNonSystemAdminSurveyUserGroup(userToUpdate, surveyInfo)
+    !!getSurveyUserGroup(userToUpdate, surveyInfo, false)
   )
 
 const canEditUser = (user, surveyInfo, userToUpdate) => (
   User.hasAccepted(userToUpdate) && (
-    User.isEqual(user)(userToUpdate) || _hasUserAccess(user, surveyInfo, userToUpdate)
+    User.isEqual(user)(userToUpdate) || _hasUserEditAccess(user, surveyInfo, userToUpdate)
   )
 )
 
-const canEditUserEmail = _hasUserAccess
+const canEditUserEmail = _hasUserEditAccess
 
 const canEditUserGroup = (user, surveyInfo, userToUpdate) => (
-  !User.isEqual(user)(userToUpdate) && _hasUserAccess(user, surveyInfo, userToUpdate)
+  !User.isEqual(user)(userToUpdate) && _hasUserEditAccess(user, surveyInfo, userToUpdate)
 )
 
 const canRemoveUser = (user, surveyInfo, userToRemove) => (
   !User.isEqual(user)(userToRemove) &&
   !User.isSystemAdmin(userToRemove) &&
-  _hasUserAccess(user, surveyInfo, userToRemove)
+  _hasUserEditAccess(user, surveyInfo, userToRemove)
 )
 
 module.exports = {

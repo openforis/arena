@@ -19,7 +19,7 @@ const Mailer = require('../../../utils/mailer')
 
 // ====== CREATE
 
-const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => {
+const inviteUser = async (user, surveyId, email, groupUuid, serverUrl) => {
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
@@ -42,8 +42,6 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => 
   const groupName = AuthGroups.getName(Authorizer.getSurveyUserGroup(user, surveyInfo))
   const groupLabel = `$t(authGroups.${groupName}.label)`
 
-  await i18n.changeLanguage(lang)
-
   if (dbUser) {
     const newUserGroups = User.getAuthGroups(dbUser)
     const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
@@ -57,7 +55,7 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => 
 
     await Promise.all([
       UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser),
-      Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel }, i18n),
+      Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel }, lang),
     ])
   } else {
     const password = passwordGenerator.generate({ length: 8, numbers: true, uppercase: true, strict: true })
@@ -65,7 +63,7 @@ const inviteUser = async (user, surveyId, email, groupUuid, serverUrl, i18n) => 
 
     const msgParams = { serverUrl, email, password, surveyLabel, groupLabel, temporaryPasswordMsg: '$t(emails.userInvite.temporaryPasswordMsg)' }
     await Promise.all([
-      Mailer.sendEmail(email, 'emails.userInvite', msgParams, i18n),
+      Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang),
       UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)
     ])
   }
