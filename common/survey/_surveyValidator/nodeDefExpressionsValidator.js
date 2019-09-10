@@ -71,7 +71,7 @@ const validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
   async (propName, nodeDefExpression) => {
     const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
     return R.isEmpty(expr) && i < nodeDefExpressions.length - 1
-      ? 'only_last_can_have_empty_apply_if'
+      ? { key: ValidatorErrorKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty }
       : null
   }
 

@@ -345,6 +345,7 @@ module.exports = {
       categoryRequired: 'Category is required',
       childrenEmpty: '$t(common.childrenEmpty)',
       defaultValuesNotSpecified: 'Default value not specified',
+      expressionApplyIfOnlyLastOneCanBeEmpty: 'Only last expression can have empty "Apply if" condition',
       expressionDuplicate: 'Expression duplicate',
       expressionRequired: 'Expression required',
       keysEmpty: 'Define at least one key attribute',

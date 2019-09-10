@@ -30,7 +30,7 @@ const ValidationsProps = props => {
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
 
   const handleValidationsUpdate = validations =>
-    putNodeDefProp(nodeDef, 'validations', validations, true)
+    putNodeDefProp(nodeDef, NodeDef.propKeys.validations, validations, true)
 
   const i18n = useI18n()
 
@@ -44,8 +44,8 @@ const ValidationsProps = props => {
                 <Input value={NodeDefValidations.getMinCount(nodeDefValidations)}
                        disabled={readOnly}
                        validation={R.pipe(
-                         Validator.getFieldValidation('validations'),
-                         Validator.getFieldValidation('min'),
+                         Validator.getFieldValidation(NodeDef.propKeys.validations),
+                         Validator.getFieldValidation(NodeDefValidations.keys.min),
                        )(validation)}
                        mask={integerMask}
                        onChange={value => handleValidationsUpdate(
@@ -56,8 +56,8 @@ const ValidationsProps = props => {
                 <Input value={NodeDefValidations.getMaxCount(nodeDefValidations)}
                        disabled={readOnly}
                        validation={R.pipe(
-                         Validator.getFieldValidation('validations'),
-                         Validator.getFieldValidation('max'),
+                         Validator.getFieldValidation(NodeDef.propKeys.validations),
+                         Validator.getFieldValidation(NodeDefValidations.keys.max),
                        )(validation)}
                        mask={integerMask}
                        onChange={value => handleValidationsUpdate(
@@ -86,8 +86,8 @@ const ValidationsProps = props => {
                          showLabels={true}
                          values={NodeDefValidations.getExpressions(nodeDefValidations)}
                          validation={R.pipe(
-                           Validator.getFieldValidation('validations'),
-                           Validator.getFieldValidation('expressions'),
+                           Validator.getFieldValidation(NodeDef.propKeys.validations),
+                           Validator.getFieldValidation(NodeDefValidations.keys.expressions),
                          )(validation)}
                          onChange={expressions => handleValidationsUpdate(
                            NodeDefValidations.assocExpressions(expressions)(nodeDefValidations)
