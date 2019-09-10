@@ -50,6 +50,16 @@ module.exports = {
     upload: 'Upload',
     view: 'View',
     yes: 'Yes',
+    date: {
+      aMomentAgo: 'A moment ago',
+      hour: 'hour',
+      hour_plural: 'hours',
+      day: 'day',
+      day_plural: 'days',
+      week: 'week',
+      week_plural: 'weeks',
+      timeDiff: `{{diff}} $t(common.date.{{unit}}, { 'count': {{diff}} }) ago`,
+    },
   },
 
   sidebar: {
@@ -117,11 +127,6 @@ module.exports = {
         ascending: 'ascending',
         descending: 'descending',
       },
-      code: 'code',
-      label: 'label',
-      scientific_name: 'Scientific name',
-      file_uuid: 'File uuid',
-      file_name: 'File name',
     },
   },
 
@@ -276,6 +281,13 @@ module.exports = {
       analysis: 'Analysis',
     },
     confirmNodeDelete: 'Are you sure you want to delete this item?',
+    dataVisHeader: {
+      code: '$t(common.code)',
+      label: '$t(common.label)',
+      scientific_name: '$t(surveyForm.nodeDefTaxon.scientificName)',
+      file_uuid: 'File uuid',
+      file_name: 'File name',
+    },
   },
 
   taxonomy: {
@@ -315,17 +327,6 @@ module.exports = {
       },
       dataType: 'Data Type',
     }
-  },
-
-  dateUtils: {
-    aMomentAgo: 'A moment ago',
-    hour: 'hour',
-    hour_plural: 'hours',
-    day: 'day',
-    day_plural: 'days',
-    week: 'week',
-    week_plural: 'weeks',
-    timeDiff: `{{diff}} $t(dateUtils.{{unit}}, { 'count': 3 }) ago`,
   },
 
   // ===== All validation errors

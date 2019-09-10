@@ -11,7 +11,7 @@ import NodeDef from '../../../../../../common/survey/nodeDef'
 import Record from '../../../../../../common/record/record'
 import Validator from '../../../../../../common/validation/validator'
 import Authorizer from '../../../../../../common/auth/authorizer'
-import { getRelativeDate } from '../../../../../../common/dateUtils'
+import Date from '../../../../../../common/dateUtils'
 
 import { appModuleUri, dataModules } from '../../../../appModules'
 
@@ -42,10 +42,10 @@ const RecordsRow = props => {
         )
       }
       <div>
-        {getRelativeDate(i18n, Record.getDateCreated(record))}
+        {Date.getRelativeDate(i18n, Record.getDateCreated(record))}
       </div>
       <div>
-        {getRelativeDate(i18n, Record.getDateModified(record))}
+        {Date.getRelativeDate(i18n, Record.getDateModified(record))}
       </div>
       <div>
         {Record.getOwnerName(record)}

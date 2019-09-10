@@ -38,7 +38,7 @@ const getRelativeDate = (i18n, date) => {
 
   const formatDiff = (fn, unit) => {
     const diff = fn(now, timestamp)
-    return i18n.t('dateUtils.timeDiff', { diff, unit })
+    return i18n.t('common.date.timeDiff', { diff, unit })
   }
 
   if (differenceInMonths(now, timestamp) > 0)
@@ -53,7 +53,7 @@ const getRelativeDate = (i18n, date) => {
   if (differenceInHours(now, timestamp) > 0)
     return formatDiff(differenceInHours, 'hour')
 
-  return i18n.t('dateUtils.aMomentAgo')
+  return i18n.t('common.date.aMomentAgo')
 }
 
 const isDateBefore = isBefore
