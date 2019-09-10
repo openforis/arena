@@ -102,22 +102,12 @@ const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, valida
 const fetchCategoriesBySurveyId = async (surveyId, draft = false, validate = true, client = db) => {
   const categories = await fetchCategoriesAndLevels(surveyId, draft, client)
 
-  if (validate) {
-    const categoriesValidated = []
-    for (const category of categories) {
-      categoriesValidated.push(await validateCategory(surveyId, categories, category, draft))
-    }
-    return categoriesValidated
-  } else {
-    return categories
-  }
-
-  // return validate
-  //   ? await Promise.all(
-  //     categories.map(category => validateCategory(surveyId, categories, category, draft)
-  //     )
-  //   )
-  //   : categories
+  return validate
+    ? await Promise.all(
+      categories.map(category => validateCategory(surveyId, categories, category, draft)
+      )
+    )
+    : categories
 }
 
 // ====== UPDATE
