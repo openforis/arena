@@ -39,24 +39,22 @@ class CategoryImportJob extends Job {
 
     this.category = await this._getOrCreateCategory()
 
-    // levels
     await this._importLevels()
-
-    // item extra def
     await this._importItemExtraDef()
 
-    // items
     await this._readItems()
 
-    // delete unused levels
-    await this._deleteUnusedLevels()
-
-    if (this.hasErrors()) {
+    if (this.total === 0) {
+      this._addError(ValidatorErrorKeys.categoryImport.emptyFile)
+    } else if (this.hasErrors()) {
       // errors found
       this.logDebug(`${Object.keys(this.errors).length} errors found`)
       await this.setStatusFailed()
     } else {
       // no errors found
+      // delete unused levels
+      this.category = await CategoryManager.deleteLevelsFromIndex(this.user, this.surveyId, this.category, this.levelIndexDeepest, this.tx)
+      // import items
       await this._insertItems()
     }
   }
@@ -86,53 +84,26 @@ class CategoryImportJob extends Job {
   extractItemExtraProps (extra) {
     return extra
   }
+
   // end of methods that can be overridden by subclasses
-
-  async _deleteUnusedLevels () {
-    let levels = Category.getLevelsArray(this.category)
-    let lastLevelIndex = levels.length - 1
-
-    while (lastLevelIndex > this.levelIndexDeepest) {
-      const level = levels.pop()
-      await CategoryManager.deleteLevel(this.getUser(), this.getSurveyId(), CategoryLevel.getUuid(level), this.tx)
-      this.category = Category.assocLevelsArray(levels)(this.category)
-      lastLevelIndex--
-    }
-  }
 
   async _getOrCreateCategory () {
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
-
     if (categoryUuid) {
-      return await CategoryManager.fetchCategoryByUuid(this.getSurveyId(), categoryUuid, true, false, this.tx)
+      return await CategoryManager.fetchCategoryByUuid(this.surveyId, categoryUuid, true, false, this.tx)
     } else {
-      const categoryName = CategoryImportJobParams.getCategoryName(this.params)
-
       const category = Category.newCategory({
-        [Category.props.name]: categoryName
+        [Category.props.name]: CategoryImportJobParams.getCategoryName(this.params)
       })
-
-      return await CategoryManager.insertCategory(this.getUser(), this.getSurveyId(), category, this.tx)
+      return await CategoryManager.insertCategory(this.user, this.surveyId, category, this.tx)
     }
   }
 
   async _importLevels () {
     this.logDebug('importing levels')
 
-    const surveyId = this.getSurveyId()
-    const user = this.getUser()
-
-    this.category = await CategoryManager.deleteLevelsByCategory(user, surveyId, Category.getUuid(this.category), this.tx)
-
     const levelNames = CategoryImportSummary.getLevelNames(this.summary)
-
-    for (const levelName of levelNames) {
-      const levelToInsert = Category.newLevel(this.category, {
-        [CategoryLevel.props.name]: levelName
-      })
-      const level = await CategoryManager.insertLevel(user, surveyId, levelToInsert, this.tx)
-      this.category = Category.assocLevel(level)(this.category)
-    }
+    this.category = await CategoryManager.replaceLevels(this.user, this.surveyId, Category.getUuid(this.category), levelNames, this.tx)
 
     this.logDebug(`levels imported: ${levelNames}`)
   }
@@ -143,7 +114,7 @@ class CategoryImportJob extends Job {
     const itemExtraDef = this.extractItemExtraDef()
 
     if (!R.isEmpty(itemExtraDef)) {
-      await CategoryManager.updateCategoryProp(this.getUser(), this.getSurveyId(), Category.getUuid(this.category), Category.props.itemExtraDef, itemExtraDef, this.tx)
+      await CategoryManager.updateCategoryProp(this.user, this.surveyId, Category.getUuid(this.category), Category.props.itemExtraDef, itemExtraDef, this.tx)
       this.category = Category.assocItemExtraDef(itemExtraDef)(this.category)
     }
 
@@ -169,16 +140,6 @@ class CategoryImportJob extends Job {
     await reader.start()
 
     this.logDebug(`${this.total} items read`)
-
-    if (this.total === 0)
-      this.addError({
-        error: {
-          [Validator.keys.valid]: false,
-          [Validator.keys.errors]: [{
-            key: ValidatorErrorKeys.categoryImport.emptyFile
-          }]
-        }
-      })
   }
 
   async _onRow (itemRow) {
@@ -199,7 +160,7 @@ class CategoryImportJob extends Job {
         const mostSpecificLevel = levelIndex === levelIndexItem
 
         if (itemAlreadyParsed && itemAlreadyParsed.mostSpecificLevel && mostSpecificLevel) {
-          this._addErrorCodeDuplicate(codesLevel)
+          this._addErrorCodeDuplicate(levelIndex, codesLevel)
         } else {
           const item = this._getOrCreateItem(level, levelIndex, codesLevel, labelsByLevel, descriptionsByLevel, extra, itemAlreadyParsed)
 
@@ -215,11 +176,9 @@ class CategoryImportJob extends Job {
 
   _getOrCreateItem (level, levelIndex, codesLevel, labelsByLevel, descriptionsByLevel, extra, itemAlreadyParsed) {
     const levelName = CategoryLevel.getName(level)
-    const codeLastLevel = codesLevel[codesLevel.length - 1]
-    const itemParentUuid = this._getParentItemUuid(codesLevel, levelIndex)
 
     const itemProps = {
-      [CategoryItem.props.code]: codeLastLevel
+      [CategoryItem.props.code]: codesLevel[codesLevel.length - 1]
     }
     ObjectUtils.setInPath([ObjectUtils.keysProps.labels], labelsByLevel[levelName], false)(itemProps)
     ObjectUtils.setInPath([ObjectUtils.keysProps.descriptions], descriptionsByLevel[levelName], false)(itemProps)
@@ -233,30 +192,24 @@ class CategoryImportJob extends Job {
       }
       : CategoryItem.newItem(
         CategoryLevel.getUuid(level),
-        itemParentUuid,
+        this._getParentItemUuid(codesLevel, levelIndex),
         itemProps
       )
   }
 
   async _insertItems () {
     this.logDebug('inserting items')
-
-    const surveyId = this.getSurveyId()
-    const user = this.getUser()
-
     const items = Object.values(this.itemsByCodes)
-    await CategoryManager.insertItems(user, surveyId, items, this.tx)
-
+    await CategoryManager.insertItems(this.user, this.surveyId, items, this.tx)
     this.logDebug(`${items.length} items inserted`)
   }
 
   _checkCodesNotEmpty (codes) {
-    let errorsFound = false
-
     if (codes.length === 0) {
       this._addErrorCodeRequired(0)
-      errorsFound = true
+      return false
     } else {
+      let errorsFound = false
       for (let i = 0; i < codes.length; i++) {
         const code = codes[i]
         if (StringUtils.isBlank(code)) {
@@ -264,41 +217,26 @@ class CategoryImportJob extends Job {
           errorsFound = true
         }
       }
+      return !errorsFound
     }
-    return !errorsFound
   }
 
-  _addErrorCodeDuplicate (codes) {
-    const levelIndex = codes.length - 1
+  _addErrorCodeDuplicate (levelIndex, codes) {
     const code = codes[levelIndex]
     const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.code, levelIndex)(this.summary)
-
-    this.addError({
-      error: {
-        [Validator.keys.valid]: false,
-        [Validator.keys.errors]: [{
-          key: ValidatorErrorKeys.categoryImport.codeDuplicate,
-          params: {
-            columnName,
-            code
-          }
-        }]
-      }
-    })
+    this._addError(ValidatorErrorKeys.categoryImport.codeDuplicate, { columnName, code })
   }
 
   _addErrorCodeRequired (levelIndex) {
     const columnName = CategoryImportSummary.getColumnName(CategoryImportSummary.columnTypes.code, levelIndex)(this.summary)
+    this._addError(ValidatorErrorKeys.categoryImport.codeRequired, { columnName })
+  }
 
+  _addError (key, params = {}) {
     this.addError({
       error: {
         [Validator.keys.valid]: false,
-        [Validator.keys.errors]: [{
-          key: ValidatorErrorKeys.categoryImport.codeRequired,
-          params: {
-            columnName
-          }
-        }]
+        [Validator.keys.errors]: [{ key, params }]
       }
     })
   }

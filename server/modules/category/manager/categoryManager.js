@@ -8,6 +8,7 @@ const { toIndexedObj } = require('../../../../common/survey/surveyUtils')
 const CategoryRepository = require('../repository/categoryRepository')
 const CategoryValidator = require('../categoryValidator')
 const Category = require('../../../../common/survey/category')
+const CategoryLevel = require('../../../../common/survey/categoryLevel')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
@@ -184,6 +185,35 @@ const deleteLevelsByCategory = async (user, surveyId, categoryUuid, client = db)
   return await fetchCategoryByUuid(surveyId, categoryUuid, true, false, client)
 }
 
+const deleteLevelsFromIndex = async (user, surveyId, category, fromIndex, tx) => {
+  let levels = Category.getLevelsArray(category)
+  let lastLevelIndex = levels.length - 1
+
+  while (lastLevelIndex > fromIndex) {
+    const level = levels.pop()
+    await deleteLevel(user, surveyId, CategoryLevel.getUuid(level), tx)
+    category = Category.assocLevelsArray(levels)(category)
+    lastLevelIndex--
+  }
+  return category
+}
+
+/**
+ * Deletes all levels and creates new ones with the specified names
+ */
+const replaceLevels = async (user, surveyId, categoryUuid, levelNamesNew, client = db) => {
+  let category = await deleteLevelsByCategory(user, surveyId, categoryUuid, client)
+
+  for (const levelName of levelNamesNew) {
+    const levelToInsert = Category.newLevel(category, {
+      [CategoryLevel.props.name]: levelName
+    })
+    const level = await insertLevel(user, surveyId, levelToInsert, client)
+    category = Category.assocLevel(level)(category)
+  }
+  return category
+}
+
 const deleteItem = async (user, surveyId, itemUuid, client = db) =>
   await client.tx(t => Promise.all([
       CategoryRepository.deleteItem(surveyId, itemUuid, t),
@@ -221,5 +251,9 @@ module.exports = {
   deleteCategory,
   deleteLevel,
   deleteLevelsByCategory,
+  deleteLevelsFromIndex,
   deleteItem,
+
+  //UTILS
+  replaceLevels,
 }
