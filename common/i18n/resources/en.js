@@ -345,6 +345,7 @@ module.exports = {
       categoryRequired: 'Category is required',
       childrenEmpty: '$t(common.childrenEmpty)',
       defaultValuesNotSpecified: 'Default value not specified',
+      expressionDuplicate: 'Expression duplicate',
       expressionRequired: 'Expression required',
       keysEmpty: 'Define at least one key attribute',
       keysExceedingMax: 'Exceeding maximum number of key attributes',

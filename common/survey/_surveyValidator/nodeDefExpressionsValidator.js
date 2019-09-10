@@ -6,6 +6,7 @@ const Survey = require('../survey')
 const NodeDef = require('../nodeDef')
 const NodeDefExpression = require('../nodeDefExpression')
 const Expression = require('../../exprParser/expression')
+const ObjectUtils = require('../../objectUtils')
 
 const SystemError = require('../../../server/utils/systemError')
 
@@ -74,6 +75,17 @@ const validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) =>
       : null
   }
 
+const validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
+  R.any(nodeDefExpr => !ObjectUtils.isEqual(nodeDefExpression)(nodeDefExpr) &&
+    NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&
+    NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression)
+  )(nodeDefExpressions)
+    ? {
+      [Validator.keys.valid]: false,
+      [Validator.keys.errors]: [{ key: ValidatorErrorKeys.nodeDefEdit.expressionDuplicate }]
+    }
+    : null
+
 const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness) => {
   const nodeDefExpression = nodeDefExpressions[i]
   const validation = await Validator.validate(
@@ -94,15 +106,17 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
       ]
     }
   )
-  return validation
+  return Validator.isValidationValid(validation)
+    ? validateExpressionUniqueness(nodeDefExpressions, nodeDefExpression)
+    : validation
 }
 
 const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniqueness = true) => {
   const result = Validator.newValidationValid()
 
   const validations = await Promise.all(
-    nodeDefExpressions.map(async (nodeDefExpression, i) =>
-      await validateExpression(survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness)
+    nodeDefExpressions.map((nodeDefExpression, i) =>
+      validateExpression(survey, nodeDef, nodeDefExpressions, i, validateApplyIfUniqueness)
     )
   )
 

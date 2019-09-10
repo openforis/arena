@@ -32,6 +32,7 @@ module.exports = {
     defaultValuesNotSpecified: 'validationErrors.nodeDefEdit.defaultValuesNotSpecified',
     categoryRequired: 'validationErrors.nodeDefEdit.categoryRequired',
     childrenEmpty: 'validationErrors.nodeDefEdit.childrenEmpty',
+    expressionDuplicate: 'validationErrors.nodeDefEdit.expressionDuplicate',
     expressionRequired: 'validationErrors.nodeDefEdit.expressionRequired',
     keysEmpty: 'validationErrors.nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors.nodeDefEdit.keysExceedingMax',
