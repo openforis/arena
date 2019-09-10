@@ -33,11 +33,18 @@ const dbTransformCallback = (surveyId, includeValidationFields = true) => record
 const insertRecord = async (surveyId, record, client = db) =>
   await client.one(`
     INSERT INTO ${getSurveyDBSchema(surveyId)}.record 
-    (owner_uuid, uuid, step, preview)
-    VALUES ($1, $2, $3, $4)
-    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $5)
+    (owner_uuid, uuid, step, preview, date_created)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING ${recordSelectFields}, (SELECT s.uuid AS survey_uuid FROM survey s WHERE s.id = $6)
     `,
-    [Record.getOwnerUuid(record), Record.getUuid(record), Record.getStep(record), Record.isPreview(record), surveyId],
+    [
+      Record.getOwnerUuid(record),
+      Record.getUuid(record),
+      Record.getStep(record),
+      Record.isPreview(record),
+      Record.getDateCreated(record) || new Date(),
+      surveyId
+    ],
     dbTransformCallback(surveyId)
   )
 
