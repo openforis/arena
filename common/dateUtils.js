@@ -37,8 +37,8 @@ const getRelativeDate = (i18n, date) => {
   const now = new Date()
 
   const formatDiff = (fn, unit) => {
-    const diff = fn(now, timestamp)
-    return i18n.t('common.date.timeDiff', { diff, unit })
+    const count = fn(now, timestamp)
+    return i18n.t('common.date.timeDiff', { count, unit })
   }
 
   if (differenceInMonths(now, timestamp) > 0)

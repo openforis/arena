@@ -58,7 +58,7 @@ module.exports = {
       day_plural: 'days',
       week: 'week',
       week_plural: 'weeks',
-      timeDiff: `{{diff}} $t(common.date.{{unit}}, { 'count': {{diff}} }) ago`,
+      timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
     },
   },
 
