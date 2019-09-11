@@ -28,7 +28,7 @@ class CategoryImportJob extends Job {
   }
 
   async execute () {
-    //initialize summary (get it from params by default)
+    // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()
 
     this.logDebug('summary', this.summary)
@@ -37,24 +37,28 @@ class CategoryImportJob extends Job {
     if (!this.summary)
       return
 
-    this.category = await this._getOrCreateCategory()
+    // 2. fetch or create category
+    this.category = await this._fetchOrCreateCategory()
 
+    // 3. import levels
     await this._importLevels()
+    // 4. import item extra def
     await this._importItemExtraDef()
-
+    // 5. read items from csv file
     await this._readItems()
 
     if (this.total === 0) {
+      // error: empty file
       this._addError(ValidatorErrorKeys.categoryImport.emptyFile)
     } else if (this.hasErrors()) {
-      // errors found
+      // errors found in csv rows
       this.logDebug(`${Object.keys(this.errors).length} errors found`)
       await this.setStatusFailed()
     } else {
       // no errors found
-      // delete unused levels
+      // 6. delete unused levels
       this.category = await CategoryManager.deleteLevelsFromIndex(this.user, this.surveyId, this.category, this.levelIndexDeepest, this.tx)
-      // import items
+      // 7. import items
       await this._insertItems()
     }
   }
@@ -69,7 +73,10 @@ class CategoryImportJob extends Job {
   }
 
   extractItemExtraDef () {
-    return Object.entries(CategoryImportSummary.getColumns(this.summary)).reduce((accExtraDef, [columnName, column]) => {
+    const columns = CategoryImportSummary.getColumns(this.summary)
+
+    return Object.entries(columns).reduce(
+      (accExtraDef, [columnName, column]) => {
         if (CategoryImportSummary.isColumnExtra(column)) {
           accExtraDef[columnName] = {
             [CategoryItem.keysExtraDef.dataType]: CategoryImportSummary.getColumnDataType(column)
@@ -87,7 +94,7 @@ class CategoryImportJob extends Job {
 
   // end of methods that can be overridden by subclasses
 
-  async _getOrCreateCategory () {
+  async _fetchOrCreateCategory () {
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
     if (categoryUuid) {
       return await CategoryManager.fetchCategoryByUuid(this.surveyId, categoryUuid, true, false, this.tx)
@@ -103,6 +110,7 @@ class CategoryImportJob extends Job {
     this.logDebug('importing levels')
 
     const levelNames = CategoryImportSummary.getLevelNames(this.summary)
+    // delete existing levels and insert new ones using level names from summary
     this.category = await CategoryManager.replaceLevels(this.user, this.surveyId, Category.getUuid(this.category), levelNames, this.tx)
 
     this.logDebug(`levels imported: ${levelNames}`)
@@ -150,6 +158,7 @@ class CategoryImportJob extends Job {
     if (this._checkCodesNotEmpty(codes)) {
       this.levelIndexDeepest = Math.max(this.levelIndexDeepest, levelIndexItem)
 
+      // for each level insert an item or replace its props if already parsed
       for (let levelIndex = 0; levelIndex <= levelIndexItem; levelIndex++) {
         const level = levels[levelIndex]
 
