@@ -27,7 +27,7 @@ const TableColumn = (props) => {
   const widthOuter = colWidth * noCols// (editMode ? NodeDefUIProps.getNodeDefFormFields(nodeDef).length : colNames.length)
   const widthInner = (1 / noCols * 100) + '%'
 
-  const getColLabel = (nodeDef, col) => {
+  const getColKey = (nodeDef, col) => {
     const nodeDefTypePrefix = `nodeDef${capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
     const colName = camelize(NodeDefTable.extractColName(nodeDef, col))
     return `surveyForm.${nodeDefTypePrefix}.${colName}`
@@ -87,7 +87,7 @@ const TableColumn = (props) => {
                   : isHeader && noCols > 1
                   ? (
                     <div key={i} style={{ width: widthInner }}>
-                      {i18n.t(getColLabel(nodeDef, col))}
+                      {i18n.t(getColKey(nodeDef, col))}
                     </div>
                   )
                   : null
