@@ -1,4 +1,7 @@
 import React from 'react'
+import camelize from 'camelize'
+
+import { capitalizeFirstLetter } from '../../../../../../../common/stringUtils'
 
 import useI18n from '../../../../../../commonComponents/useI18n'
 import ProgressBar from '../../../../../../commonComponents/progressBar'
@@ -23,6 +26,12 @@ const TableColumn = (props) => {
   const noCols = editMode ? 1 : colNames.length
   const widthOuter = colWidth * noCols// (editMode ? NodeDefUIProps.getNodeDefFormFields(nodeDef).length : colNames.length)
   const widthInner = (1 / noCols * 100) + '%'
+
+  const getColLabel = (nodeDef, col) => {
+    const nodeDefTypePrefix = `nodeDef${capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
+    const colName = camelize(NodeDefTable.extractColName(nodeDef, col))
+    return `surveyForm.${nodeDefTypePrefix}.${colName}`
+  }
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
@@ -78,7 +87,7 @@ const TableColumn = (props) => {
                   : isHeader && noCols > 1
                   ? (
                     <div key={i} style={{ width: widthInner }}>
-                      {i18n.t(`surveyForm.dataVisHeader.${NodeDefTable.extractColName(nodeDef, col)}`)}
+                      {i18n.t(getColLabel(nodeDef, col))}
                     </div>
                   )
                   : null

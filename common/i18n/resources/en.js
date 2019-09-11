@@ -261,6 +261,8 @@ module.exports = {
     },
     nodeDefCode: {
       buttonCode: 'Button code',
+      code: '$t(common.code)',
+      label: '$t(common.label)',
     },
     nodeDefCoordinate: {
       x: 'X',
@@ -275,19 +277,16 @@ module.exports = {
       scientificName: 'Scientific name',
       vernacularName: 'Vernacular name',
     },
+    nodeDefFile: {
+      fileUuid: 'File uuid',
+      fileName: 'File name',
+    },
     step: {
       entry: 'Entry',
       cleansing: 'Cleansing',
       analysis: 'Analysis',
     },
     confirmNodeDelete: 'Are you sure you want to delete this item?',
-    dataVisHeader: {
-      code: '$t(common.code)',
-      label: '$t(common.label)',
-      scientific_name: '$t(surveyForm.nodeDefTaxon.scientificName)',
-      file_uuid: 'File uuid',
-      file_name: 'File name',
-    },
   },
 
   taxonomy: {

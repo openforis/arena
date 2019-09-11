@@ -31,6 +31,8 @@ const normalizeName = R.pipe(
   R.slice(0, 60),
 )
 
+const capitalizeFirstLetter = text => text.charAt(0).toUpperCase() + text.slice(1)
+
 module.exports = {
   nbsp,
 
@@ -45,4 +47,5 @@ module.exports = {
   isString,
 
   normalizeName,
+  capitalizeFirstLetter,
 }
