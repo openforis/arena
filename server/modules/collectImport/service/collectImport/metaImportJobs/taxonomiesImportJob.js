@@ -36,8 +36,6 @@ class TaxonomiesImportJob extends Job {
 
     const speciesFileNames = collectSurveyFileZip.getEntryNames(speciesFilesPath)
 
-    await this.calculateTotal()
-
     for (const speciesFileName of speciesFileNames) {
       if (this.isCanceled())
         break
@@ -53,19 +51,6 @@ class TaxonomiesImportJob extends Job {
     }
 
     this.setContext({ taxonomies })
-  }
-
-  async calculateTotal () {
-    const { collectSurveyFileZip } = this.context
-
-    this.total = 0
-
-    const speciesFileNames = collectSurveyFileZip.getEntryNames(speciesFilesPath)
-
-    for (const speciesFileName of speciesFileNames) {
-      const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
-      this.total += await CSVReader.createReaderFromStream(speciesFileStream).calculateSize()
-    }
   }
 
   async importTaxonomyFromSpeciesFile (speciesFileName, tx) {
@@ -87,11 +72,13 @@ class TaxonomiesImportJob extends Job {
     // 3. parse CSV file
     const speciesFileStream = await collectSurveyFileZip.getEntryStream(`${speciesFilesPath}${speciesFileName}`)
 
+    const totalPrevious = this.total
+
     await CSVReader.createReaderFromStream(
       speciesFileStream,
       headers => this.onHeaders(headers),
       async row => await this.onRow(speciesFileName, taxonomyUuid, row, tx),
-      total => this.total = total
+      total => this.total = totalPrevious + total
     ).start()
 
     if (this.hasErrors()) {
@@ -180,7 +167,12 @@ class TaxonomiesImportJob extends Job {
   }
 
   _indexRowByHeaders (row) {
-    return this.headers.map((header, index) => ({ [header]: row[index] }))
+    return this.headers.reduce((acc, header, index) => {
+        acc[header] = row[index]
+        return acc
+      },
+      {}
+    )
   }
 }
 

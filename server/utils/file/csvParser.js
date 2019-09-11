@@ -83,7 +83,6 @@ class CSVParser {
 
     if (this._headers === null) {
       this._headers = data
-      console.log('headers', this._headers, this.headers)
     } else {
       this._notifyRowReady(data)
     }

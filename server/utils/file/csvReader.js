@@ -58,22 +58,12 @@ const createReaderFromStream = (stream, onHeaders = null, onRow = null, onTotalC
       .on('error', reject)
   })
 
-  const calculateSize = () => new Promise((resolve, reject) => {
-    let total = 0
-
-    stream
-      .pipe(csvParser())
-      .on('data', () => total++)
-      .on('end', () => resolve(total))
-      .on('error', reject)
-  })
-
   const cancel = () => {
     canceled = true
     stream && stream.destroy()
   }
 
-  return { start, calculateSize, cancel }
+  return { start, cancel }
 }
 
 const createReader = (filePath, onHeaders = null, onRow = null, onTotalChange = null) =>
