@@ -26,7 +26,8 @@ const keys = {
   uuid: 'uuid',
   props: 'props',
   meta: 'meta',
-  draftAdvanced: 'draftAdvanced'
+  draftAdvanced: 'draftAdvanced',
+  type: 'type',
 }
 
 const propKeys = {
@@ -40,7 +41,6 @@ const propKeys = {
   parentUuid: 'parentUuid',
   published: 'published',
   readOnly: 'readOnly',
-  type: 'type',
   validations: 'validations',
 
   //code
@@ -67,7 +67,7 @@ const newNodeDef = (parentUuid, type, props) => ({
 
 // ==== READ
 
-const getType = R.prop(propKeys.type)
+const getType = R.prop(keys.type)
 const getName = SurveyUtils.getProp(propKeys.name, '')
 const getParentUuid = SurveyUtils.getParentUuid
 
