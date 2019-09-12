@@ -142,7 +142,7 @@ class CategoryImportJob extends Job {
         }
         await this._onRow(itemRow)
       },
-      total => this.total = total
+      total => this.total = total + 1 //+1 consider db insert
     )
 
     await reader.start()
@@ -210,6 +210,7 @@ class CategoryImportJob extends Job {
     this.logDebug('inserting items')
     const items = Object.values(this.itemsByCodes)
     await CategoryManager.insertItems(this.user, this.surveyId, items, this.tx)
+    this.incrementProcessedItems()
     this.logDebug(`${items.length} items inserted`)
   }
 
