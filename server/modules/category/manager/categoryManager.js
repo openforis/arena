@@ -13,8 +13,8 @@ const CategoryLevel = require('../../../../common/survey/categoryLevel')
 const ActivityLog = require('../../activityLog/activityLogger')
 
 // ====== VALIDATION
-const validateCategory = async (surveyId, categories, category, draft) => {
-  const items = await CategoryRepository.fetchItemsByCategoryUuid(surveyId, Category.getUuid(category), draft)
+const validateCategory = async (surveyId, categories, category, draft, client = db) => {
+  const items = await CategoryRepository.fetchItemsByCategoryUuid(surveyId, Category.getUuid(category), draft, client)
   return await assocValidation(category, categories, items)
 }
 
@@ -96,7 +96,7 @@ const fetchCategoryByUuid = async (surveyId, categoryUuid, draft = false, valida
   const category = R.find(R.propEq('uuid', categoryUuid))(categories)
 
   return validate
-    ? await validateCategory(surveyId, categories, category, draft)
+    ? await validateCategory(surveyId, categories, category, draft, client)
     : category
 }
 
@@ -105,7 +105,7 @@ const fetchCategoriesBySurveyId = async (surveyId, draft = false, validate = tru
 
   return validate
     ? await Promise.all(
-      categories.map(category => validateCategory(surveyId, categories, category, draft)
+      categories.map(category => validateCategory(surveyId, categories, category, draft, client)
       )
     )
     : categories

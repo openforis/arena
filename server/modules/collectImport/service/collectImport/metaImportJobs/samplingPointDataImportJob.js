@@ -5,6 +5,7 @@ const Category = require('../../../../../../common/survey/category')
 const CategoryItem = require('../../../../../../common/survey/categoryItem')
 const Geometry = require('../../../../../../common/geometry')
 
+const CategoryManager = require('../../../../category/manager/categoryManager')
 const CategoryService = require('../../../../category/service/categoryService')
 const CategoryImportJob = require('../../../../category/service/categoryImportJob')
 const CategoryImportJobParams = require('../../../../category/service/categoryImportJobParams')
@@ -28,6 +29,13 @@ class SamplingPointDataImportJob extends CategoryImportJob {
       ...params,
       [CategoryImportJobParams.keys.categoryName]: SamplingPointDataImportJob.categoryName
     }, 'SamplingPointDataImportJob')
+  }
+
+  async beforeSuccess () {
+    await super.beforeSuccess()
+
+    // 6. delete unused levels
+    this.category = await CategoryManager.deleteLevelsFromIndex(this.user, this.surveyId, this.category, this.levelIndexDeepest, this.tx)
   }
 
   //start of overridden methods from CategoryImportJob
@@ -60,10 +68,11 @@ class SamplingPointDataImportJob extends CategoryImportJob {
 
     return super.extractItemExtraProps(extraUpdated)
   }
+
   //end of overridden methods from CategoryImportJob
 
   //overridden from Job
-  async beforeEnd() {
+  async beforeEnd () {
     await super.beforeEnd()
     //assoc imported category to context categories (to be used by NodeDefsImportJob)
     this.setContext(CollectImportJobContext.assocCategory(this.category)(this.context))

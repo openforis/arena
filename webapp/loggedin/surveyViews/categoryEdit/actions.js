@@ -93,8 +93,9 @@ export const importCategory = () => async (dispatch, getState) => {
 
   const { data: { job } } = await axios.post(`/api/survey/${surveyId}/categories/${categoryUuid}/import`, importSummary)
 
-  dispatch(showAppJobMonitor(job, () => {
+  dispatch(showAppJobMonitor(job, jobCompleted => {
     // reload category
+    dispatchCategoryUpdate(dispatch, jobCompleted.result.category)
     dispatch(setCategoryForEdit({ [Category.keys.uuid]: categoryUuid }))
   }))
 }

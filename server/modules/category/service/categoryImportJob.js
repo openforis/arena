@@ -54,13 +54,20 @@ class CategoryImportJob extends Job {
       // errors found in csv rows
       this.logDebug(`${Object.keys(this.errors).length} errors found`)
       await this.setStatusFailed()
-    } else {
-      // no errors found
-      // 6. delete unused levels
-      this.category = await CategoryManager.deleteLevelsFromIndex(this.user, this.surveyId, this.category, this.levelIndexDeepest, this.tx)
-      // 7. import items
-      await this._insertItems()
     }
+  }
+
+  async beforeSuccess () {
+    await super.beforeSuccess()
+
+    await this._insertItems()
+
+    // fetch and validate category
+    this.category = await CategoryManager.fetchCategoryByUuid(this.surveyId, Category.getUuid(this.category), true, true, this.tx)
+
+    this.setResult({
+      category: this.category
+    })
   }
 
   // start of methods that can be overridden by subclasses
