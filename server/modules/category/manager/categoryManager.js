@@ -12,6 +12,8 @@ const CategoryLevel = require('../../../../common/survey/categoryLevel')
 
 const ActivityLog = require('../../activityLog/activityLogger')
 
+const CategoryImportCSVParser = require('./categoryImportCSVParser')
+
 // ====== VALIDATION
 const validateCategory = async (surveyId, categories, category, draft, client = db) => {
   const items = await CategoryRepository.fetchItemsByCategoryUuid(surveyId, Category.getUuid(category), draft, client)
@@ -232,6 +234,8 @@ module.exports = {
   insertLevel,
   insertItem,
   insertItems,
+  createImportSummary: CategoryImportCSVParser.createImportSummary,
+  createImportSummaryFromStream: CategoryImportCSVParser.createImportSummaryFromStream,
 
   //READ
   fetchCategoryByUuid,

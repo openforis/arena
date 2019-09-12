@@ -6,7 +6,6 @@ const CategoryItem = require('../../../../../../common/survey/categoryItem')
 const Geometry = require('../../../../../../common/geometry')
 
 const CategoryManager = require('../../../../category/manager/categoryManager')
-const CategoryService = require('../../../../category/service/categoryService')
 const CategoryImportJob = require('../../../../category/service/categoryImportJob')
 const CategoryImportJobParams = require('../../../../category/service/categoryImportJobParams')
 
@@ -46,7 +45,7 @@ class SamplingPointDataImportJob extends CategoryImportJob {
 
   async getOrCreateSummary () {
     const stream = await this.createReadStream()
-    return stream ? await CategoryService.createImportSummaryFromStream(stream) : null
+    return stream ? await CategoryManager.createImportSummaryFromStream(stream) : null
   }
 
   extractItemExtraDef () {

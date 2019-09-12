@@ -1,7 +1,6 @@
 const CategoryManager = require('../manager/categoryManager')
 const JobManager = require('../../../job/jobManager')
 const CategoryImportJob = require('./categoryImportJob')
-const CategoryImportCSVParser = require('./categoryImportCSVParser')
 const CategoryImportJobParams = require('./categoryImportJobParams')
 
 const importCategory = (user, surveyId, categoryUuid, summary) => {
@@ -19,8 +18,8 @@ const importCategory = (user, surveyId, categoryUuid, summary) => {
 
 module.exports = {
   insertCategory: CategoryManager.insertCategory,
-  createImportSummary: CategoryImportCSVParser.createImportSummary,
-  createImportSummaryFromStream: CategoryImportCSVParser.createImportSummaryFromStream,
+  createImportSummary: CategoryManager.createImportSummary,
+  createImportSummaryFromStream: CategoryManager.createImportSummaryFromStream,
   importCategory,
   insertLevel: CategoryManager.insertLevel,
   insertItem: CategoryManager.insertItem,

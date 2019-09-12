@@ -13,7 +13,7 @@ const StringUtils = require('../../../../common/stringUtils')
 const ObjectUtils = require('../../../../common/objectUtils')
 
 const CategoryManager = require('../manager/categoryManager')
-const CategoryImportCSVParser = require('./categoryImportCSVParser')
+const CategoryImportCSVParser = require('../manager/categoryImportCSVParser')
 const CategoryImportJobParams = require('./categoryImportJobParams')
 
 class CategoryImportJob extends Job {
@@ -27,16 +27,20 @@ class CategoryImportJob extends Job {
     this.levelIndexDeepest = 0 // used to remove unused levels
   }
 
-  async execute () {
+  async onStart () {
+    await super.onStart()
+
     // 1. initialize summary (get it from params by default)
     this.summary = await this.getOrCreateSummary()
-
     this.logDebug('summary', this.summary)
+  }
 
+  async shouldExecute () {
     //skip import if summary is not specified
-    if (!this.summary)
-      return
+    return !!this.summary
+  }
 
+  async execute () {
     // 2. fetch or create category
     this.category = await this._fetchOrCreateCategory()
 
@@ -50,6 +54,7 @@ class CategoryImportJob extends Job {
     if (this.total === 0) {
       // error: empty file
       this._addError(ValidatorErrorKeys.categoryImport.emptyFile)
+      await this.setStatusFailed()
     } else if (this.hasErrors()) {
       // errors found in csv rows
       this.logDebug(`${Object.keys(this.errors).length} errors found`)
