@@ -6,12 +6,12 @@ const { now } = require('../../../db/dbUtils')
 const mergeProps = (def, draft) => {
   const { props, propsDraft } = def
 
+  const propsMerged = draft
+    ? R.mergeRight(props, propsDraft)
+    : props
+
   return R.pipe(
-    R.when(
-      R.always(draft),
-      () => R.mergeRight(props, propsDraft)
-    ),
-    propsMerged => R.assoc('props', propsMerged)(def),
+    R.assoc('props', propsMerged),
     R.dissoc('propsDraft'),
   )(def)
 }
