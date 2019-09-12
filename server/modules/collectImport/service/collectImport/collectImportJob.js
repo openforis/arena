@@ -6,6 +6,7 @@ const CollectSurveyReaderJob = require('./metaImportJobs/collectSurveyReaderJob'
 const SurveyCreatorJob = require('./metaImportJobs/surveyCreatorJob')
 const CategoriesImportJob = require('./metaImportJobs/categoriesImportJob')
 const TaxonomiesImportJob = require('./metaImportJobs/taxonomiesImportJob')
+const SamplingPointDataImportJob = require('./metaImportJobs/samplingPointDataImportJob')
 const NodeDefsImportJob = require('./metaImportJobs/nodeDefsImportJob')
 const SurveyDependencyGraphsGenerationJob = require('../../../survey/service/surveyDependencyGraphsGenerationJob')
 
@@ -21,6 +22,7 @@ class CollectImportJob extends Job {
       new SurveyCreatorJob(),
       new CategoriesImportJob(),
       new TaxonomiesImportJob(),
+      new SamplingPointDataImportJob(),
       new NodeDefsImportJob(),
       new SurveyDependencyGraphsGenerationJob(),
       new RecordsImportJob(),

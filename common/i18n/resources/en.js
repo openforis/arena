@@ -401,6 +401,7 @@ module.exports = {
     RecordCheckJob: 'Record Check',
     RecordsImportJob: 'Records Import',
     RecordsUniquenessValidationJob: 'Records Uniqueness Validation',
+    SamplingPointDataImportJob: 'Sampling Point Data Import',
     SurveyCreatorJob: 'Survey Create',
     SurveyDependencyGraphsGenerationJob: 'Survey Dependency Graph Generation',
     SurveyIndexGeneratorJob: 'Survey Index Generator',

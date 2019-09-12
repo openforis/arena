@@ -20,6 +20,7 @@ const importCategory = (user, surveyId, categoryUuid, summary) => {
 module.exports = {
   insertCategory: CategoryManager.insertCategory,
   createImportSummary: CategoryImportCSVParser.createImportSummary,
+  createImportSummaryFromStream: CategoryImportCSVParser.createImportSummaryFromStream,
   importCategory,
   insertLevel: CategoryManager.insertLevel,
   insertItem: CategoryManager.insertItem,
