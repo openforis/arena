@@ -1,4 +1,5 @@
 const R = require('ramda')
+const ObjectUtils = require('../objectUtils')
 
 const keys = {
   uuid: 'uuid',
@@ -44,14 +45,13 @@ const groupNames = {
 
 const getAuthGroups = R.propOr([], keys.authGroups)
 
-const getSurveyUuid = R.prop(keys.surveyUuid)
-
 const getUuid = R.prop(keys.uuid)
 
 const getName = R.prop(keys.name)
 
-const isSystemAdminGroup =
-R.pipe(
+const getSurveyUuid = R.prop(keys.surveyUuid)
+
+const isSystemAdminGroup = R.pipe(
   getName,
   R.equals(groupNames.systemAdmin)
 )
@@ -61,9 +61,11 @@ module.exports = {
   permissions,
   groupNames,
 
+  getAuthGroups,
+
   getUuid,
   getName,
-  isSystemAdminGroup,
   getSurveyUuid,
-  getAuthGroups,
+  isSystemAdminGroup,
+  isEqual: ObjectUtils.isEqual,
 }
