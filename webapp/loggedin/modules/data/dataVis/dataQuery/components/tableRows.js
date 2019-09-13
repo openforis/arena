@@ -31,7 +31,7 @@ const TableRows = ({ nodeDefCols, data, offset, lang, colWidth, defaultColWidth,
       <div className="table__rows">
 
         <div className="table__row-header">
-          <div style={{ width: defaultColWidth }}>{i18n.t('data.rowNum')}</div>
+          <div style={{ width: defaultColWidth }}>{i18n.t('dataView.rowNum')}</div>
           <TableColumns
             nodeDefCols={nodeDefCols}
             lang={lang}
