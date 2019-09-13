@@ -78,6 +78,10 @@ module.exports = {
     passwordUnsafe: 'validationErrors.user.passwordUnsafe',
     userNameRequired: 'validationErrors.user.userNameRequired',
     passwordsDoNotMatch: 'validationErrors.user.passwordsDoNotMatch',
-    verificationCodeInvalid: 'validationErrors.user.verificationCodeInvalid',
+
+    // Cognito exceptions
+    UserNotFoundException: 'validationErrors.user.userDoesNotExist',
+    NotAuthorizedException: 'validationErrors.user.userNotAuthorized',
+    CodeMismatchException: 'validationErrors.user.verificationCodeInvalid',
   }
 }

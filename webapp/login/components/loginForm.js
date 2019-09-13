@@ -1,29 +1,55 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 
+import useFormObject from '../../commonComponents/hooks/useFormObject'
+
 import * as LoginState from '../loginState'
-import { setEmail, login, showForgotPasswordForm } from '../actions'
+import { setEmail, login, showForgotPasswordForm, setLoginError } from '../actions'
+
+import * as LoginValidator from './loginValidator'
 
 const LoginForm = props => {
 
   const {
-    email,
-    setEmail, login, showForgotPasswordForm
+    email: initialEmail,
+    setEmail: setStateEmail, login, showForgotPasswordForm, setLoginError
   } = props
 
-  const [password, setPassword] = useState('')
+  const {
+    object: formObject,
+    setObjectField,
+    objectValid,
+    validation,
+  } = useFormObject({
+    email: initialEmail,
+    password: '',
+  }, LoginValidator.validateLoginObj, true)
+
+  const onClickLogin = () => {
+    if (objectValid) {
+      login(formObject.email, formObject.password)
+    } else {
+      console.log(LoginValidator.getFirstError(validation, ['email', 'password']))
+      setLoginError(LoginValidator.getFirstError(validation, ['email', 'password']))
+    }
+  }
+
+  const setEmail = email => {
+    setStateEmail(email)
+    setObjectField('email', email)
+  }
 
   return (
     <div className="login-form">
-      <input value={email}
+      <input value={formObject.email}
              onChange={e => setEmail(e.target.value)}
              type='text'
              name='email'
              className="login-form__input"
              placeholder='Your email'/>
 
-      <input value={password}
-             onChange={e => setPassword(e.target.value)}
+      <input value={formObject.password}
+             onChange={e => setObjectField('password', e.target.value)}
              type='password'
              name='password'
              className="login-form__input"
@@ -33,7 +59,7 @@ const LoginForm = props => {
 
         <button type="button"
                 className="btn btn-login"
-                onClick={() => login(email, password)}>
+                onClick={onClickLogin}>
           Login
         </button>
 
@@ -53,4 +79,9 @@ const mapStateToProps = state => ({
   email: LoginState.getEmail(state),
 })
 
-export default connect(mapStateToProps, { setEmail, login, showForgotPasswordForm })(LoginForm)
+export default connect(mapStateToProps, {
+  setEmail,
+  login,
+  showForgotPasswordForm,
+  setLoginError,
+})(LoginForm)

@@ -28,7 +28,7 @@ const _validatePasswordConfirm = (propName, item) => {
 const _validateVerificationCode = (propName, item) => {
   const verificationCodeRe = new RegExp(/^[\S]+$/)
   const verificationCode = item[propName]
-  return !verificationCodeRe.test(verificationCode) ? { key: ValidatorErrorKeys.user.verificationCodeInvalid } : null
+  return !verificationCodeRe.test(verificationCode) ? { key: ValidatorErrorKeys.user.CodeMismatchException } : null
 }
 
 
@@ -47,6 +47,14 @@ export const validateAcceptInvitationObj = async obj => await Validator.validate
     'passwordConfirm': [_validatePasswordConfirm],
     'password': [Validator.validateRequired(ValidatorErrorKeys.user.passwordRequired), _validatePassword, _validatePasswordStrength],
   })
+
+export const validateLoginObj = async obj => await Validator.validate(
+  obj,
+  {
+    'email': [Validator.validateRequired(ValidatorErrorKeys.user.emailRequired), UserValidator.validateEmail],
+    'password': [Validator.validateRequired(ValidatorErrorKeys.user.passwordRequired)]
+  }
+)
 
 export const validateEmail = async obj => await Validator.validate(
   obj,
