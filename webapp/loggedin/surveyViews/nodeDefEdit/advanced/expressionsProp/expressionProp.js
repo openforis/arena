@@ -7,8 +7,7 @@ import LabelsEditor from '../../../labelsEditor/labelsEditor'
 import useI18n from '../../../../../commonComponents/useI18n'
 
 import NodeDefExpression from '../../../../../../common/survey/nodeDefExpression'
-import Validator from '../../../../../../common/validation/validator'
-import { getValidationFieldMessages } from '../../../../../utils/validationUtils'
+import * as ValidationUtils from '../../../../../utils/validationUtils'
 
 const ExpressionProp = (props) => {
 
@@ -21,9 +20,10 @@ const ExpressionProp = (props) => {
 
   const i18n = useI18n()
 
-  const errorMessages = getValidationFieldMessages(i18n)(Validator.getFieldValidations(validation))
+  const errorMessages = ValidationUtils.getValidationFieldMessages(i18n, false)(validation)
 
   const isPlaceholder = NodeDefExpression.isPlaceholder(expression)
+
   return (
     <Tooltip
       messages={errorMessages}

@@ -25,17 +25,16 @@ const AppJobErrors = ({ job }) => {
         </div>
         <div className="body">
           {
-            R.keys(errors)
-              .map(errorKey =>
-                <div key={errorKey} className="row">
-                  <div className="item">
-                    {i18n.t(errorKey)}
-                  </div>
-                  <div className="item-error">
-                    {getValidationFieldMessagesHTML(i18n, false)(validationWrapper(errors[errorKey]))}
-                  </div>
+            Object.entries(errors).map(([errorKey, error]) =>
+              <div key={errorKey} className="row">
+                <div className="item">
+                  {i18n.t(errorKey)}
                 </div>
-              )
+                <div className="item-error">
+                  {getValidationFieldMessagesHTML(i18n, false)(validationWrapper(error))}
+                </div>
+              </div>
+            )
           }
         </div>
       </div>

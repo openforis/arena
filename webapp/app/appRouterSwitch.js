@@ -13,6 +13,8 @@ import { useOnUpdate } from '../commonComponents/hooks'
 import * as AppWebSocket from './appWebSocket'
 import WebSocketEvents from '../../common/webSocket/webSocketEvents'
 
+import AppContext from './appContext'
+
 import * as AppState from './appState'
 
 import { throwSystemError, initApp, activeJobUpdate } from './actions'
@@ -64,7 +66,7 @@ const AppRouterSwitch = props => {
     )
     : isReady &&
     (
-      <>
+      <AppContext.Provider value={{ i18n }}>
 
         {
           user
@@ -84,7 +86,7 @@ const AppRouterSwitch = props => {
         <AppLoaderView/>
         <AppNotificationView/>
 
-      </>
+      </AppContext.Provider>
     )
 
 }

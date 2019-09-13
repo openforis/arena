@@ -150,6 +150,8 @@ const getInvalidFieldValidations = R.pipe(
 
 const getErrors = R.propOr([], keys.errors)
 
+const hasErrors = R.pipe(getErrors, R.isEmpty, R.not)
+
 //==== update
 /**
  * Removes valid fields validations and updates 'valid' attribute
@@ -237,6 +239,7 @@ module.exports = {
   getFieldValidations,
   getInvalidFieldValidations,
   getErrors,
+  hasErrors,
 
   // UPDATE
   cleanup,

@@ -27,16 +27,21 @@ module.exports = {
 
   nodeDefEdit: {
     applyIfDuplicate: 'validationErrors.nodeDefEdit.applyIfDuplicate',
+    applyIfInvalid: 'validationErrors.nodeDefEdit.applyIfInvalid',
     countMaxMustBePositiveNumber: 'validationErrors.nodeDefEdit.countMaxMustBePositiveNumber',
     countMinMustBePositiveNumber: 'validationErrors.nodeDefEdit.countMinMustBePositiveNumber',
+    defaultValuesInvalid: 'validationErrors.nodeDefEdit.defaultValuesInvalid',
     defaultValuesNotSpecified: 'validationErrors.nodeDefEdit.defaultValuesNotSpecified',
     categoryRequired: 'validationErrors.nodeDefEdit.categoryRequired',
     childrenEmpty: 'validationErrors.nodeDefEdit.childrenEmpty',
+    expressionApplyIfOnlyLastOneCanBeEmpty: 'validationErrors.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty',
+    expressionDuplicate: 'validationErrors.nodeDefEdit.expressionDuplicate',
     expressionRequired: 'validationErrors.nodeDefEdit.expressionRequired',
     keysEmpty: 'validationErrors.nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors.nodeDefEdit.keysExceedingMax',
     nameInvalid: 'validationErrors.nodeDefEdit.nameInvalid',
     taxonomyRequired: 'validationErrors.nodeDefEdit.taxonomyRequired',
+    validationsInvalid: 'validationErrors.nodeDefEdit.validationsInvalid',
   },
 
   record: {

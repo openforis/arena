@@ -6,7 +6,7 @@ const Validator = require('../../validation/validator')
 const ValidatorErrorKeys = require('../../validation/validatorErrorKeys')
 const NodeDefExpressionsValidator = require('./nodeDefExpressionsValidator')
 
-const validate = async (survey, nodeDef, nodeDefValidations) => {
+const validate = async (survey, nodeDef, nodeDefValidations, errorKey = null) => {
   const validation = NodeDef.isMultiple(nodeDef)
     ? await Validator.validate(nodeDefValidations, {
       [`${NodeDefValidations.keys.count}.${NodeDefValidations.keys.min}`]:
@@ -21,7 +21,11 @@ const validate = async (survey, nodeDef, nodeDefValidations) => {
       [Validator.keys.fields, NodeDefValidations.keys.expressions],
       await NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDefValidations.getExpressions(nodeDefValidations), false)
     ),
-    Validator.cleanup
+    Validator.cleanup,
+    R.when(
+      validation => errorKey && !Validator.isValidationValid(validation) && !Validator.hasErrors(validation),
+      R.assoc(Validator.keys.errors, [{ key: errorKey }])
+    )
   )(validation)
 }
 

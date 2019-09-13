@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import useI18n from '../../commonComponents/useI18n'
 import useFormObject from '../../commonComponents/hooks/useFormObject'
 
 import * as LoginState from '../loginState'
@@ -14,6 +15,8 @@ const LoginForm = props => {
     email: initialEmail,
     setEmail: setStateEmail, login, showForgotPasswordForm, setLoginError
   } = props
+
+  const i18n = useI18n()
 
   const {
     object: formObject,
@@ -29,7 +32,6 @@ const LoginForm = props => {
     if (objectValid) {
       login(formObject.email, formObject.password)
     } else {
-      console.log(LoginValidator.getFirstError(validation, ['email', 'password']))
       setLoginError(LoginValidator.getFirstError(validation, ['email', 'password']))
     }
   }
@@ -46,28 +48,28 @@ const LoginForm = props => {
              type='text'
              name='email'
              className="login-form__input"
-             placeholder='Your email'/>
+             placeholder={i18n.t('loginView.yourEmail')}/>
 
       <input value={formObject.password}
              onChange={e => setObjectField('password', e.target.value)}
              type='password'
              name='password'
              className="login-form__input"
-             placeholder='Your password'/>
+             placeholder={i18n.t('loginView.yourPassword')}/>
 
       <div className="login-form__buttons">
 
         <button type="button"
                 className="btn btn-login"
                 onClick={onClickLogin}>
-          Login
+          {i18n.t('loginView.login')}
         </button>
 
         <button type="button"
                 className="btn btn-s btn-transparent btn-forgot-pwd"
                 onClick={showForgotPasswordForm}>
           <span className="icon icon-question icon-left icon-12px"/>
-          Forgot Password
+          {i18n.t('loginView.forgotPassword')}
         </button>
 
       </div>
