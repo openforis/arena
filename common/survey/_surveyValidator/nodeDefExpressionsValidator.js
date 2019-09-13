@@ -111,7 +111,7 @@ const validateExpression = async (survey, nodeDef, nodeDefExpressions, i, valida
     : validation
 }
 
-const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniqueness = true) => {
+const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniqueness = true, errorKey = null) => {
   const result = Validator.newValidationValid()
 
   const validations = await Promise.all(
@@ -121,9 +121,12 @@ const validate = async (survey, nodeDef, nodeDefExpressions, validateApplyIfUniq
   )
 
   validations.forEach((validation, i) => {
-    result.fields[i + ''] = validation
-    result.valid = result.valid && (!validation || validation.valid)
+    result[Validator.keys.fields]['' + i] = validation
+    result[Validator.keys.valid] = Validator.isValidationValid(result) && Validator.isValidationValid(validation)
   })
+
+  if (errorKey && !Validator.isValidationValid(result))
+    result[Validator.keys.errors] = [{ key: errorKey }]
 
   return result
 }

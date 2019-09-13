@@ -97,19 +97,19 @@ const propsValidations = survey => ({
 
 const validateAdvancedProps = async (survey, nodeDef) => {
   const validations = await Promise.all([
-    NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getDefaultValues(nodeDef)),
-    NodeDefExpressionsValidator.validate(survey, Survey.getNodeDefParent(nodeDef)(survey), NodeDef.getApplicable(nodeDef)),
-    NodeDefValidationsValidator.validate(survey, nodeDef, NodeDef.getValidations(nodeDef))
+    NodeDefExpressionsValidator.validate(survey, nodeDef, NodeDef.getDefaultValues(nodeDef), false, ValidatorErrorKeys.nodeDefEdit.defaultValuesInvalid),
+    NodeDefExpressionsValidator.validate(survey, Survey.getNodeDefParent(nodeDef)(survey), NodeDef.getApplicable(nodeDef), false, ValidatorErrorKeys.nodeDefEdit.applyIfInvalid),
+    NodeDefValidationsValidator.validate(survey, nodeDef, NodeDef.getValidations(nodeDef), ValidatorErrorKeys.nodeDefEdit.validationsInvalid)
   ])
 
-  return Validator.cleanup({
+  return {
+    [Validator.keys.valid]: R.all(Validator.isValidationValid, validations),
     [Validator.keys.fields]: {
       [NodeDef.propKeys.defaultValues]: validations[0],
       [NodeDef.propKeys.applicable]: validations[1],
-      [NodeDef.propKeys.validations]: validations[2],
-    },
-    [Validator.keys.valid]: true,
-  })
+      [NodeDef.propKeys.validations]: validations[2]
+    }
+  }
 }
 
 const validateNodeDef = async (survey, nodeDef) => {
