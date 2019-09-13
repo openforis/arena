@@ -5,7 +5,7 @@ const Category = require('../../../../../../common/survey/category')
 const CategoryItem = require('../../../../../../common/survey/categoryItem')
 const Geometry = require('../../../../../../common/geometry')
 
-const CategoryService = require('../../../../category/service/categoryService')
+const CategoryManager = require('../../../../category/manager/categoryManager')
 const CategoryImportJob = require('../../../../category/service/categoryImportJob')
 const CategoryImportJobParams = require('../../../../category/service/categoryImportJobParams')
 
@@ -30,6 +30,18 @@ class SamplingPointDataImportJob extends CategoryImportJob {
     }, 'SamplingPointDataImportJob')
   }
 
+  async shouldExecute () {
+    //skip import if summary is not specified (csv file not found)
+    return !!this.summary
+  }
+
+  async beforeSuccess () {
+    await super.beforeSuccess()
+
+    // 6. delete unused levels
+    this.category = await CategoryManager.deleteLevelsFromIndex(this.user, this.surveyId, this.category, this.levelIndexDeepest, this.tx)
+  }
+
   //start of overridden methods from CategoryImportJob
   async createReadStream () {
     const collectSurveyFileZip = CollectImportJobContext.getCollectSurveyFileZip(this.context)
@@ -38,7 +50,7 @@ class SamplingPointDataImportJob extends CategoryImportJob {
 
   async getOrCreateSummary () {
     const stream = await this.createReadStream()
-    return stream ? await CategoryService.createImportSummaryFromStream(stream) : null
+    return stream ? await CategoryManager.createImportSummaryFromStream(stream) : null
   }
 
   extractItemExtraDef () {
@@ -60,10 +72,11 @@ class SamplingPointDataImportJob extends CategoryImportJob {
 
     return super.extractItemExtraProps(extraUpdated)
   }
+
   //end of overridden methods from CategoryImportJob
 
   //overridden from Job
-  async beforeEnd() {
+  async beforeEnd () {
     await super.beforeEnd()
     //assoc imported category to context categories (to be used by NodeDefsImportJob)
     this.setContext(CollectImportJobContext.assocCategory(this.category)(this.context))

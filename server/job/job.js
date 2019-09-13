@@ -97,6 +97,10 @@ class Job {
     }
   }
 
+  async shouldExecute () {
+    return true
+  }
+
   async _executeInTransaction (tx) {
     try {
       this.tx = tx
@@ -104,18 +108,23 @@ class Job {
       // 1. notify start
       await this.onStart()
 
-      // 2. execute
-      if (this.innerJobs.length > 0) {
-        await this._executeInnerJobs()
-      } else {
-        await this.execute(tx)
-      }
+      const shouldExecute = await this.shouldExecute()
+      this.logDebug('Should execute?', shouldExecute)
+      
+      if (shouldExecute) {
+        // 2. execute
+        if (this.innerJobs.length > 0) {
+          await this._executeInnerJobs()
+        } else {
+          await this.execute(tx)
+        }
 
-      // 3. execution completed, prepare result
-      if (this.isRunning()) {
-        this.logDebug('beforeSuccess...')
-        await this.beforeSuccess()
-        this.logDebug('beforeSuccess run')
+        // 3. execution completed, prepare result
+        if (this.isRunning()) {
+          this.logDebug('beforeSuccess...')
+          await this.beforeSuccess()
+          this.logDebug('beforeSuccess run')
+        }
       }
       // DO NOT CATCH EXCEPTIONS! Transaction will be aborted in that case
     } finally {
