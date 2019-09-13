@@ -19,7 +19,7 @@ const contains = (value = '', string = '') => R.includes(toLower(value), toLower
 const isBlank = R.ifElse(
   isString,
   R.pipe(trim, R.isEmpty),
-  R.isNil
+  R.isNil,
 )
 
 const isNotBlank = R.pipe(isBlank, R.not)

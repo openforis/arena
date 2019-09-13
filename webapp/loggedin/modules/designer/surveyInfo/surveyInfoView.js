@@ -73,11 +73,14 @@ const SurveyInfoView = (props) => {
           onChange={setDescription}
         />
 
-        <button className="btn btn-save"
-                onClick={saveProps}>
-          <span className="icon icon-floppy-disk icon-12px icon-left"/>
-          {i18n.t('common.save')}
-        </button>
+        {
+          !readOnly &&
+          <button className="btn btn-save"
+                  onClick={saveProps}>
+            <span className="icon icon-floppy-disk icon-12px icon-left"/>
+            {i18n.t('common.save')}
+          </button>
+        }
 
       </div>
     </div>

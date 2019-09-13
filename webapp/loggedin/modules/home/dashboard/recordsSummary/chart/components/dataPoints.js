@@ -29,14 +29,19 @@ const DataPoints = props => {
   const tooltipRef = useRef(null)
 
   useEffect(() => {
+    const tooltipClassName = 'home-dashboard__records-summary__chart-data-point-tip'
     tooltipRef.current = d3Tip()
-      .attr('class', 'home-dashboard__records-summary__chart-data-point-tip')
+      .attr('class', tooltipClassName)
       .offset([-10, 0])
       .html((d) => ReactDOMServer.renderToString(
         <DataPointTooltip dataPoint={d} i18n={i18n}/>
       ))
 
     d3.select(elementRef.current).call(tooltipRef.current)
+
+    return () => {
+      document.getElementsByClassName(tooltipClassName)[0].remove()
+    }
   }, [])
 
   useEffect(() => {

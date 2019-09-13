@@ -1,7 +1,7 @@
 import React from 'react'
 import camelize from 'camelize'
 
-import { capitalizeFirstLetter } from '../../../../../../../common/stringUtils'
+import StringUtils from '../../../../../../../common/stringUtils'
 
 import useI18n from '../../../../../../commonComponents/useI18n'
 import ProgressBar from '../../../../../../commonComponents/progressBar'
@@ -28,7 +28,7 @@ const TableColumn = (props) => {
   const widthInner = (1 / noCols * 100) + '%'
 
   const getColKey = (nodeDef, col) => {
-    const nodeDefTypePrefix = `nodeDef${capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
+    const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
     const colName = camelize(NodeDefTable.extractColName(nodeDef, col))
     return `surveyForm.${nodeDefTypePrefix}.${colName}`
   }

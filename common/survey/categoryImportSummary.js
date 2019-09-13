@@ -21,15 +21,9 @@ const columnTypes = {
   label: 'label'
 }
 
-const columnDataTypes = {
-  text: 'text',
-  number: 'number',
-  geometryPoint: 'geometryPoint',
-}
-
 // ===== SUMMARY
 
-const newSummary = (columns, filePath) => ({
+const newSummary = (columns, filePath = null) => ({
   [keys.columns]: columns,
   [keys.filePath]: filePath
 })
@@ -92,8 +86,8 @@ const hasColumn = (type, levelIndex) => R.pipe(
 
 module.exports = {
   columnTypes,
-  columnDataTypes,
 
+  keys,
   keysColumn,
 
   // ==== SUMMARY
@@ -103,6 +97,7 @@ module.exports = {
   getColumns,
   getFilePath: R.prop(keys.filePath),
   // UPDATE
+  assocColumns: R.assoc(keys.columns),
   assocColumnDataType: (columnName, dataType) => R.assocPath([keys.columns, columnName, keysColumn.dataType], dataType),
 
   // ==== COLUMN

@@ -12,11 +12,12 @@ const RecordUpdater = require('./_record/recordUpdater')
 
 // ====== CREATE
 
-const newRecord = (user, preview = false) => ({
+const newRecord = (user, preview = false, dateCreated = null) => ({
   [keys.uuid]: uuidv4(),
   [keys.ownerUuid]: User.getUuid(user),
   [keys.step]: RecordStep.getDefaultStep(),
-  [keys.preview]: preview
+  [keys.preview]: preview,
+  [keys.dateCreated]: dateCreated,
 })
 
 module.exports = {
@@ -26,7 +27,7 @@ module.exports = {
   newRecord,
 
   // ====== READ
-  getSurveyUuid : R.prop(keys.surveyUuid),
+  getSurveyUuid: R.prop(keys.surveyUuid),
 
   getUuid: SurveyUtils.getUuid,
   isPreview: R.propEq(keys.preview, true),

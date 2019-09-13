@@ -261,11 +261,21 @@ class Job {
     return this.getContextProp(Job.keysContext.survey)
   }
 
+  //TODO replace it with surveyId getter
   getSurveyId () {
+    return this.surveyId
+  }
+
+  get surveyId () {
     return this.getContextProp(Job.keysContext.surveyId)
   }
 
+  //TODO replace it with user getter
   getUser () {
+    return this.user
+  }
+
+  get user () {
     return this.getContextProp(Job.keysContext.user)
   }
 
