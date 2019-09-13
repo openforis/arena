@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom'
 import { Input } from '../../commonComponents/form/input'
 
 import * as LoginState from '../loginState'
-import { setEmail, resetPassword, setLoginError } from '../actions'
+import { resetPassword, setLoginError } from '../actions'
 
 import { useResetPasswordFormState } from './useResetPasswordFormState'
 
@@ -19,9 +19,7 @@ const ResetPasswordForm = props => {
     onClickReset
   } = useResetPasswordFormState(props)
 
-  const {
-    email,
-  } = props
+  const { email } = props
 
   return (
     <div className='login-form'>
@@ -71,7 +69,7 @@ const enhance = compose(
   withRouter,
   connect(
     mapStateToProps,
-    { setEmail, resetPassword, setLoginError }
+    { resetPassword, setLoginError }
   )
 )
 

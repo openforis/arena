@@ -89,7 +89,7 @@ export const useUserViewState = props => {
 
     setSurveyGroupsMenuItems(menuGroups.map(g => ({
       uuid: AuthGroups.getUuid(g),
-      label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label`)
+      label: i18n.t(`authGroups.${AuthGroups.getName(g)}.label_plural`)
     })))
 
     // init user

@@ -1,5 +1,7 @@
 const fs = require('fs')
 
+const passwordGenerator = require('generate-password')
+
 const aws = require('../../../system/aws')
 
 const UserManager = require('../manager/userManager')
@@ -13,10 +15,11 @@ const Authorizer = require('../../../../common/auth/authorizer')
 
 const SystemError = require('../../../utils/systemError')
 const UnauthorizedError = require('../../../utils/unauthorizedError')
+const Mailer = require('../../../utils/mailer')
 
 // ====== CREATE
 
-const inviteUser = async (user, surveyId, email, groupUuid) => {
+const inviteUser = async (user, surveyId, email, groupUuid, serverUrl) => {
   const group = await AuthManager.fetchGroupByUuid(groupUuid)
 
   // Only system admins can invite new system admins
@@ -25,29 +28,44 @@ const inviteUser = async (user, surveyId, email, groupUuid) => {
   }
 
   // If the survey is not published, only survey admins and system admins can be invited
-  const survey = await SurveyManager.fetchSurveyById(surveyId)
+  const survey = await SurveyManager.fetchSurveyById(surveyId, true)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const isPublished = Survey.isPublished(surveyInfo)
+
   if (!isPublished && !(AuthGroups.isSystemAdminGroup(group) || Survey.isAuthGroupAdmin(group)(surveyInfo))) {
     throw new UnauthorizedError(User.getName(user))
   }
 
   const dbUser = await UserManager.fetchUserByEmail(email)
+  const lang = User.getLang(user)
+  const surveyLabel = Survey.getLabel(surveyInfo, lang)
+  const groupName = AuthGroups.getName(Authorizer.getSurveyUserGroup(user, surveyInfo))
+  const groupLabel = `$t(authGroups.${groupName}.label)`
+
   if (dbUser) {
     const newUserGroups = User.getAuthGroups(dbUser)
     const hasRoleInSurvey = newUserGroups.some(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
 
     if (hasRoleInSurvey) {
-      throw new SystemError('userHasRole')
+      throw new SystemError('appErrors.userHasRole')
     }
     if (User.isSystemAdmin(dbUser)) {
-      throw new SystemError('userIsAdmin')
+      throw new SystemError('appErrors.userIsAdmin')
     }
 
-    await UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser)
+    await Promise.all([
+      UserManager.addUserToGroup(user, surveyId, groupUuid, dbUser),
+      Mailer.sendEmail(email, 'emails.userInvite', { serverUrl, surveyLabel, groupLabel }, lang),
+    ])
   } else {
-    const { User: { Username: userUuid } } = await aws.inviteUser(email)
-    await UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)
+    const password = passwordGenerator.generate({ length: 8, numbers: true, uppercase: true, strict: true })
+    const { User: { Username: userUuid } } = await aws.inviteUser(email, password)
+
+    const msgParams = { serverUrl, email, password, surveyLabel, groupLabel, temporaryPasswordMsg: '$t(emails.userInvite.temporaryPasswordMsg)' }
+    await Promise.all([
+      Mailer.sendEmail(email, 'emails.userInvite', msgParams, lang),
+      UserManager.insertUser(user, surveyId, userUuid, email, groupUuid)
+    ])
   }
 }
 
@@ -79,17 +97,15 @@ const updateUser = async (user, surveyId, userUuid, name, email, groupUuid, file
 
   // Check if email has changed
   const oldEmail = User.getEmail(userToUpdate)
+  const oldName = User.getName(userToUpdate)
   if (oldEmail !== email) {
+    // Throw exception if user is not allowed to edit the email
     const canEditEmail = Authorizer.canEditUserEmail(user, Survey.getSurveyInfo(survey), userToUpdate)
-
-    // Throw exception if user is not allowed
     if (!canEditEmail) {
       throw new UnauthorizedError(User.getName(user))
     }
-
-    // Send aws a email update request if changed
-    await aws.updateEmail(oldEmail, email)
   }
+  await aws.updateUser(oldEmail, oldEmail !== email ? email : null, oldName !== name ? name : null)
 
   // Get profile picture
   const profilePicture = file ? fs.readFileSync(file.tempFilePath) : null
@@ -102,6 +118,8 @@ const updateUsername = async (user, userUuid, name) => {
     throw new UnauthorizedError(User.getName(user))
   }
 
+  const userToUpdate = await UserManager.fetchUserByUuid(userUuid)
+  await aws.updateUser(User.getEmail(userToUpdate), null, name)
   await UserManager.updateUsername(user, name)
 }
 

@@ -8,30 +8,20 @@ const AuthGroups = require('./authGroups')
 const {
   permissions,
   keys,
-  getAuthGroups,
 } = AuthGroups
 
-const isSurveyAdmin = (user, surveyInfo) =>
+const _isSurveyAdmin = (user, surveyInfo) =>
   Survey.isAuthGroupAdmin(getSurveyUserGroup(user, surveyInfo))(surveyInfo)
 
 // ======
 // ====== Survey
 // ======
 
-const getSurveyUserGroup = (user, surveyInfo) => {
-  if (User.isSystemAdmin(user))
+const getSurveyUserGroup = (user, surveyInfo, includeSystemAdmin = true) => {
+  if (includeSystemAdmin && User.isSystemAdmin(user)) {
     return R.pipe(User.getAuthGroups, R.head)(user)
-
-  const userGroups = getAuthGroups(user)
-  const surveyGroups = getAuthGroups(surveyInfo)
-
-  const groups = R.innerJoin(
-    (userGroup, surveyGroup) => AuthGroups.getUuid(userGroup) === AuthGroups.getUuid(surveyGroup),
-    userGroups,
-    surveyGroups
-  )
-
-  return R.head(groups)
+  }
+  return AuthGroups.getAuthGroups(user).find(g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo))
 }
 
 const getSurveyUserPermissions = (user, surveyInfo) =>
@@ -44,9 +34,7 @@ const hasSurveyPermission = permission => (user, surveyInfo) =>
   )
 
 // READ
-const canViewSurvey = (user, surveyInfo) =>
-  User.isSystemAdmin(user) ||
-  !!getSurveyUserGroup(user, surveyInfo)
+const canViewSurvey = (user, surveyInfo) => !!getSurveyUserGroup(user, surveyInfo)
 
 // UPDATE
 const canEditSurvey = hasSurveyPermission(permissions.surveyEdit)
@@ -103,57 +91,35 @@ const canInviteUsers = hasSurveyPermission(permissions.userInvite)
 
 // READ
 const canViewUser = (user, surveyInfo, userToView) => {
-  if (User.isSystemAdmin(user)) {
-    return true
-  }
-
-  return !!getSurveyUserGroup(user, surveyInfo) && !!getSurveyUserGroup(userToView, surveyInfo)
+  return User.isSystemAdmin(user) || (
+    !!getSurveyUserGroup(user, surveyInfo, false) &&
+    !!getSurveyUserGroup(userToView, surveyInfo, false)
+  )
 }
 
 // EDIT
-const isSurveyUser = (surveyInfo, user) => AuthGroups.getAuthGroups(user).some(
-  g => AuthGroups.getSurveyUuid(g) === Survey.getUuid(surveyInfo)
-)
+const _hasUserEditAccess = (user, surveyInfo, userToUpdate) =>
+  User.isSystemAdmin(user) || (
+    _isSurveyAdmin(user, surveyInfo) &&
+    !!getSurveyUserGroup(userToUpdate, surveyInfo, false)
+  )
 
 const canEditUser = (user, surveyInfo, userToUpdate) => (
   User.hasAccepted(userToUpdate) && (
-    User.isSystemAdmin(user) ||
-    User.getUuid(user) === User.getUuid(userToUpdate) ||
-    (
-      isSurveyAdmin(user, surveyInfo) &&
-      isSurveyUser(surveyInfo, userToUpdate)
-    )
+    User.isEqual(user)(userToUpdate) || _hasUserEditAccess(user, surveyInfo, userToUpdate)
   )
 )
 
-const canEditUserEmail = (user, surveyInfo, userToUpdate) => (
-  User.isSystemAdmin(user) ||
-  (
-    isSurveyAdmin(user, surveyInfo) &&
-    isSurveyUser(surveyInfo, userToUpdate)
-  )
-)
+const canEditUserEmail = _hasUserEditAccess
 
 const canEditUserGroup = (user, surveyInfo, userToUpdate) => (
-  !User.isEqual(user)(userToUpdate) && (
-    User.isSystemAdmin(user) ||
-    (
-      isSurveyAdmin(user, surveyInfo) &&
-      isSurveyUser(surveyInfo, userToUpdate)
-    )
-  )
+  !User.isEqual(user)(userToUpdate) && _hasUserEditAccess(user, surveyInfo, userToUpdate)
 )
 
 const canRemoveUser = (user, surveyInfo, userToRemove) => (
   !User.isEqual(user)(userToRemove) &&
   !User.isSystemAdmin(userToRemove) &&
-  (
-    User.isSystemAdmin(user) ||
-    (
-      isSurveyAdmin(user, surveyInfo) &&
-      isSurveyUser(surveyInfo, userToRemove)
-    )
-  )
+  _hasUserEditAccess(user, surveyInfo, userToRemove)
 )
 
 module.exports = {

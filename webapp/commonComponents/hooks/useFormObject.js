@@ -49,6 +49,7 @@ export default (obj, validatorFn = null, validationEnabled = false) => {
     setValidation,
     enableValidation,
     getFieldValidation,
+    validation: state.validation,
   }
 
 }

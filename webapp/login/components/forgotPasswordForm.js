@@ -1,26 +1,40 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import useFormObject from '../../commonComponents/hooks/useFormObject'
+
 import * as LoginState from '../loginState'
-import { setEmail, sendVerificationCode } from '../actions'
+import { sendVerificationCode, setLoginError } from '../actions'
+
+import * as LoginValidator from './loginValidator'
 
 const ForgotPasswordForm = props => {
 
   const {
-    email,
-    setEmail, sendVerificationCode
+    email: initialEmail, sendVerificationCode, setLoginError,
   } = props
 
+  const {
+    object: formObject,
+    setObjectField,
+    objectValid,
+    validation,
+  } = useFormObject({
+    email: initialEmail,
+  }, LoginValidator.validateEmail, true)
+
   const onClickReset = () => {
-    if (email) {
-      sendVerificationCode(email)
+    if (objectValid) {
+      sendVerificationCode(formObject.email)
+    } else {
+      setLoginError(LoginValidator.getFirstError(validation, ['email']))
     }
   }
 
   return (
     <div className="login-form">
-      <input value={email}
-             onChange={e => setEmail(e.target.value)}
+      <input value={formObject.email}
+             onChange={e => setObjectField('email', e.target.value)}
              type='text'
              name='username'
              className="login-form__input"
@@ -43,6 +57,6 @@ const mapStateToProps = state => ({
 })
 
 export default connect(mapStateToProps, {
-  setEmail,
   sendVerificationCode,
+  setLoginError,
 })(ForgotPasswordForm)

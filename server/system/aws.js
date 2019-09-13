@@ -14,12 +14,14 @@ const _sendAwsRequest = request =>
     })
   })
 
-const inviteUser = email => {
+const inviteUser = (email, temporaryPassword) => {
   const params = {
     UserPoolId: process.env.COGNITO_USER_POOL_ID,
     // Username and email are the same in our case
     Username: email,
-    DesiredDeliveryMediums: ['EMAIL'],
+    TemporaryPassword: temporaryPassword,
+    // Message will be sent by us
+    MessageAction: 'SUPPRESS',
     ForceAliasCreation: false,
     UserAttributes: [{
       Name: 'email',
@@ -33,15 +35,30 @@ const inviteUser = email => {
   return _sendAwsRequest(_getAwsClient().adminCreateUser(params))
 }
 
-const updateEmail = (oldEmail, newEmail) => {
-  const params = {
-    UserAttributes: [{
+const updateUser = (oldEmail, email, name) => {
+  if (email === null && name === null) {
+    return
+  }
+
+  const UserAttributes = email === null
+    ? []
+    : [{
       Name: 'email',
-      Value: newEmail,
+      Value: email,
     }, {
       Name: 'email_verified',
       Value: 'true',
-    }],
+    }]
+
+  if (name !== null) {
+    UserAttributes.push({
+      Name: 'name',
+      Value: name,
+    })
+  }
+
+  const params = {
+    UserAttributes,
     Username: oldEmail,
     UserPoolId: process.env.COGNITO_USER_POOL_ID
   }
@@ -49,7 +66,37 @@ const updateEmail = (oldEmail, newEmail) => {
   return _sendAwsRequest(_getAwsClient().adminUpdateUserAttributes(params))
 }
 
+const sendEmail = (from, to, subject, body) => {
+  // Create sendEmail params 
+  const params = {
+    Destination: {
+      ToAddresses: [to]
+    },
+    Message: {
+      Body: {
+        Html: {
+          Charset: 'UTF-8',
+          Data: body
+        },
+      },
+      Subject: {
+        Charset: 'UTF-8',
+        Data: subject
+      }
+    },
+    Source: from,
+    ReplyToAddresses: [from],
+  }
+
+  // Returns a promise
+  return new aws.SES({
+    apiVersion: '2010-12-01',
+    region: process.env.COGNITO_REGION,
+  }).sendEmail(params).promise()
+}
+
 module.exports = {
   inviteUser,
-  updateEmail,
+  updateUser,
+  sendEmail,
 }

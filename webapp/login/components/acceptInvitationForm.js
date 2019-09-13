@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { Input } from '../../commonComponents/form/input'
 
 import { acceptInvitation, setLoginError } from '../actions'
-import { useAcceptInvitationFormState } from './useAcceptInvitationFormState';
+import { useAcceptInvitationFormState } from './useAcceptInvitationFormState'
 
 const AcceptInvitationForm = props => {
 

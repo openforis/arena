@@ -7,6 +7,7 @@ const keys = {
   uuid: 'uuid',
   name: 'name',
   email: 'email',
+  lang: 'lang',
   authGroups: 'authGroups',
   hasProfilePicture: 'hasProfilePicture',
   groupName: 'groupName',
@@ -20,6 +21,8 @@ const getUuid = R.prop(keys.uuid)
 const getName = R.prop(keys.name)
 
 const getEmail = R.prop(keys.email)
+
+const getLang = R.propOr('en', keys.lang)
 
 const getAuthGroups = R.prop(keys.authGroups)
 
@@ -41,6 +44,7 @@ module.exports = {
   getUuid,
   getName,
   getEmail,
+  getLang,
   getAuthGroups,
   hasProfilePicture,
   isSystemAdmin,
