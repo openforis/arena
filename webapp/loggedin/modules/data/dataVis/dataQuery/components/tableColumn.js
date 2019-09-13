@@ -1,5 +1,9 @@
 import React from 'react'
+import camelize from 'camelize'
 
+import StringUtils from '../../../../../../../common/stringUtils'
+
+import useI18n from '../../../../../../commonComponents/useI18n'
 import ProgressBar from '../../../../../../commonComponents/progressBar'
 import NodeDefTableCellHeader from '../../../../../surveyViews/surveyForm/nodeDefs/components/nodeDefTableCellHeader'
 
@@ -14,12 +18,20 @@ const TableColumn = (props) => {
     nodeDef, row, lang, colWidth, editMode
   } = props
 
+  const i18n = useI18n()
+
   const colNames = NodeDefTable.getColNames(nodeDef)
   const isHeader = !row
   const isData = !!row
   const noCols = editMode ? 1 : colNames.length
   const widthOuter = colWidth * noCols// (editMode ? NodeDefUIProps.getNodeDefFormFields(nodeDef).length : colNames.length)
   const widthInner = (1 / noCols * 100) + '%'
+
+  const getColKey = (nodeDef, col) => {
+    const nodeDefTypePrefix = `nodeDef${StringUtils.capitalizeFirstLetter(NodeDef.getType(nodeDef))}`
+    const colName = camelize(NodeDefTable.extractColName(nodeDef, col))
+    return `surveyForm.${nodeDefTypePrefix}.${colName}`
+  }
 
   return (
     <div className="table__cell" style={{ width: widthOuter }}>
@@ -75,7 +87,7 @@ const TableColumn = (props) => {
                   : isHeader && noCols > 1
                   ? (
                     <div key={i} style={{ width: widthInner }}>
-                      {NodeDefTable.extractColName(nodeDef, col)}
+                      {i18n.t(getColKey(nodeDef, col))}
                     </div>
                   )
                   : null

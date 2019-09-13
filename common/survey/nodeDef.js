@@ -4,7 +4,7 @@ const { uuidv4 } = require('../uuid')
 const SurveyUtils = require('./surveyUtils')
 const NodeDefValidations = require('./nodeDefValidations')
 
-const { isBlank } = require('../stringUtils')
+const StringUtils = require('../stringUtils')
 
 // ======== NODE DEF PROPERTIES
 
@@ -99,7 +99,7 @@ const isPublished = R.propEq(propKeys.published, true)
 
 const getLabel = (nodeDef, lang) => {
   const label = R.path([keys.props, propKeys.labels, lang], nodeDef)
-  return isBlank(label)
+  return StringUtils.isBlank(label)
     ? getName(nodeDef)
     : label
 }

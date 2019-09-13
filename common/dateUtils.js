@@ -9,7 +9,6 @@ const {
   isBefore,
   format,
 
-  compareDesc,
   isValid: fnsIsValid,
 
   subDays,
@@ -29,7 +28,7 @@ const normalizeDateTimeValue = length => value => R.pipe(
   val => val.padStart(length, '0')
 )(value)
 
-const getRelativeDate = date => {
+const getRelativeDate = (i18n, date) => {
 
   if (R.isNil(date))
     return null
@@ -38,8 +37,8 @@ const getRelativeDate = date => {
   const now = new Date()
 
   const formatDiff = (fn, unit) => {
-    const diff = fn(now, timestamp)
-    return `${diff} ${unit}${diff > 1 ? 's' : ''} ago`
+    const count = fn(now, timestamp)
+    return i18n.t('common.date.timeDiff', { count, unit })
   }
 
   if (differenceInMonths(now, timestamp) > 0)
@@ -54,7 +53,7 @@ const getRelativeDate = date => {
   if (differenceInHours(now, timestamp) > 0)
     return formatDiff(differenceInHours, 'hour')
 
-  return 'A moment ago'
+  return i18n.t('common.date.aMomentAgo')
 }
 
 const isDateBefore = isBefore
@@ -75,10 +74,10 @@ const isValidDate = (year, month, day) => {
 
   const date = (new Date(year, month - 1, day))
 
-  return !!fnsIsValid(date)
-    && date.getFullYear() === +year
-    && date.getMonth() + 1 === +month
-    && date.getDate() === +day
+  return !!fnsIsValid(date) &&
+    date.getFullYear() === +year &&
+    date.getMonth() + 1 === +month &&
+    date.getDate() === +day
 }
 
 const isValidTime = (hour = '', minutes = '') =>

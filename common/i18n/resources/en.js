@@ -50,6 +50,16 @@ module.exports = {
     upload: 'Upload',
     view: 'View',
     yes: 'Yes',
+    date: {
+      aMomentAgo: 'A moment ago',
+      hour: 'hour',
+      hour_plural: 'hours',
+      day: 'day',
+      day_plural: 'days',
+      week: 'week',
+      week_plural: 'weeks',
+      timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) ago`,
+    },
   },
 
   sidebar: {
@@ -166,6 +176,10 @@ module.exports = {
     formPreview: 'Form preview',
   },
 
+  recordView: {
+    justDeleted: 'This record has just been deleted by another user',
+  },
+
   usersView: {
     inviteUser: 'Invite',
     accepted: 'Accepted',
@@ -247,6 +261,8 @@ module.exports = {
     },
     nodeDefCode: {
       buttonCode: 'Button code',
+      code: '$t(common.code)',
+      label: '$t(common.label)',
     },
     nodeDefCoordinate: {
       x: 'X',
@@ -260,6 +276,10 @@ module.exports = {
       code: '$t(common.code)',
       scientificName: 'Scientific name',
       vernacularName: 'Vernacular name',
+    },
+    nodeDefFile: {
+      fileUuid: 'File uuid',
+      fileName: 'File name',
     },
     step: {
       entry: 'Entry',

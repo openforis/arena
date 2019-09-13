@@ -6,6 +6,8 @@ import * as R from 'ramda'
 
 import { getUrlParam } from '../../../utils/routerUtils'
 
+import useI18n from '../../../commonComponents/useI18n'
+
 import Survey from '../../../../common/survey/survey'
 import Record from '../../../../common/record/record'
 
@@ -31,6 +33,8 @@ import {
 const RecordView = props => {
   const { recordLoaded, preview, canEditRecord, } = props
 
+  const i18n = useI18n()
+
   const recordLoadedRef = useRef(false)
 
   const componentLoad = () => {
@@ -47,7 +51,7 @@ const RecordView = props => {
     AppWebSocket.on(WebSocketEvents.nodesUpdate, recordNodesUpdate)
     AppWebSocket.on(WebSocketEvents.nodeValidationsUpdate, nodeValidationsUpdate)
     AppWebSocket.on(WebSocketEvents.recordDelete, () => {
-      alert('This record has just been deleted by another user')
+      alert(i18n.t('recordView.justDeleted'))
       recordDeleted(history)
     })
 
