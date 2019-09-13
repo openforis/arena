@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
+import useI18n from '../../commonComponents/useI18n'
+
 import useFormObject from '../../commonComponents/hooks/useFormObject'
 
 import * as LoginState from '../loginState'
@@ -13,6 +15,8 @@ const ForgotPasswordForm = props => {
   const {
     email: initialEmail, sendVerificationCode, setLoginError,
   } = props
+
+  const i18n = useI18n()
 
   const {
     object: formObject,
@@ -38,14 +42,14 @@ const ForgotPasswordForm = props => {
              type='text'
              name='username'
              className="login-form__input"
-             placeholder='Your email'/>
+             placeholder={i18n.t('loginView.yourEmail')}/>
 
       <div className="login-form__buttons">
         <button type="button"
                 className="btn btn-login"
                 onClick={onClickReset}>
           <span className="icon icon-envelop icon-12px icon-left"/>
-          Send verification code
+          {i18n.t('loginView.sendVerificationCode')}
         </button>
       </div>
     </div>

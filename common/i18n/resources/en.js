@@ -112,22 +112,17 @@ module.exports = {
     requireSurveyPublish: 'This section is available when survey is published',
   },
 
-  data: {
-    records: {
-      owner: 'Owner',
-      step: 'Step',
-      noRecordsAdded: 'No records added',
-    },
-    rowNum: 'Row #',
-    invalidRecord: 'Invalid record',
-    dataVis: {
-      dataSort: {
-        orderBy: 'Order by:',
-        thenBy: 'Then by:',
-        ascending: 'ascending',
-        descending: 'descending',
-      },
-    },
+  loginView: {
+    yourName: 'Your name',
+    yourEmail: 'Your email',
+    yourPassword: 'Your password',
+    yourNewPassword: 'Your new password',
+    repeatYourNewPassword: 'Repeat your new password',
+    verificationCode: 'Verification code',
+    resetPassword: 'Reset password',
+    login: 'Login',
+    forgotPassword: 'Forgot password',
+    sendVerificationCode: 'Send verification code',
   },
 
   homeView: {
@@ -178,6 +173,24 @@ module.exports = {
 
   recordView: {
     justDeleted: 'This record has just been deleted by another user',
+  },
+
+  dataView: {
+    records: {
+      owner: 'Owner',
+      step: 'Step',
+      noRecordsAdded: 'No records added',
+    },
+    rowNum: 'Row #',
+    invalidRecord: 'Invalid record',
+    dataVis: {
+      dataSort: {
+        orderBy: 'Order by:',
+        thenBy: 'Then by:',
+        ascending: 'ascending',
+        descending: 'descending',
+      },
+    },
   },
 
   usersView: {

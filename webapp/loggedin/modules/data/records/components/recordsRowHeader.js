@@ -15,8 +15,8 @@ const RecordsRowHeader = ({ nodeDefKeys, lang }) => {
       }
       <div>{i18n.t('common.dateCreated')}</div>
       <div>{i18n.t('common.dateLastModified')}</div>
-      <div>{i18n.t('data.records.owner')}</div>
-      <div>{i18n.t('data.records.step')}</div>
+      <div>{i18n.t('dataView.records.owner')}</div>
+      <div>{i18n.t('dataView.records.step')}</div>
     </>
   )
 }

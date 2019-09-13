@@ -4,22 +4,24 @@ import { compose } from 'redux'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { Input } from '../../commonComponents/form/input'
-
 import * as LoginState from '../loginState'
 import { resetPassword, setLoginError } from '../actions'
+
+import useI18n from '../../commonComponents/useI18n'
 
 import { useResetPasswordFormState } from './useResetPasswordFormState'
 
 const ResetPasswordForm = props => {
+
+  const { email } = props
+
+  const i18n = useI18n()
 
   const {
     password, passwordConfirm, verificationCode,
     setPassword, setPasswordConfirm, setVerificationCode,
     onClickReset
   } = useResetPasswordFormState(props)
-
-  const { email } = props
 
   return (
     <div className='login-form'>
@@ -29,32 +31,32 @@ const ResetPasswordForm = props => {
              name='email'
              className="login-form__input"/>
 
-      <Input value={password}
-             onChange={setPassword}
+      <input value={password}
+             onChange={e => setPassword(e.target.value)}
              type='password'
              name='newPassword'
              className="login-form__input"
-             placeholder='Your new Password'/>
+             placeholder={i18n.t('loginView.yourNewPassword')}/>
 
-      <Input value={passwordConfirm}
-             onChange={setPasswordConfirm}
+      <input value={passwordConfirm}
+             onChange={e => setPasswordConfirm(e.target.value)}
              type='password'
              name='newPasswordRepeat'
              className="login-form__input"
-             placeholder='Repeat your new Password'/>
+             placeholder={i18n.t('loginView.repeatYourNewPassword')}/>
 
-      <Input value={verificationCode}
-             onChange={setVerificationCode}
+      <input value={verificationCode}
+             onChange={e => setVerificationCode(e.target.value)}
              type='text'
              name='verificationCode'
              className="login-form__input"
-             placeholder='Verification code'/>
+             placeholder={i18n.t('loginView.verificationCode')} />
 
       <div className="login-form__buttons">
         <button type="button"
                 className="btn btn-login"
                 onClick={onClickReset}>
-          Reset password
+          {i18n.t('loginView.resetPassword')}
         </button>
       </div>
     </div>
